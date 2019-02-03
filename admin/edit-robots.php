@@ -1177,7 +1177,7 @@
                                                     <em>Main sprites used for robot. Faded are unused, all others are required.</em>
                                                 <? } else { ?>
                                                     <?= ucfirst($alt_token).' Sprite Sheets'  ?>
-                                                    <em>Sprites are used for robot's <strong><?= $alt_token ?></strong> skin. Faded are unused, shadows are optional.</em>
+                                                    <em>Sprites used for robot's <strong><?= $alt_token ?></strong> skin. Faded are unused, shadows are optional.</em>
                                                 <? } ?>
                                             </strong>
                                         </div>
@@ -1236,12 +1236,15 @@
                                                                 if ($group == 'shadows' && ($kind == 'mug' || $size_key == 0)){ $file_is_unused = true; }
                                                                 $file_is_optional = $group == 'shadows' && !$is_base_sprite ? true : false;
                                                                 echo('<li>');
-                                                                    echo('<div class="filebar'.($file_is_unused ? ' unused' : '').($file_is_optional ? ' optional' : '').'" data-auto="filebar" data-filepath="'.$this_alt_path.'" data-filename="'.$file_name.'">');
-                                                                        echo($file_exists ? '<a class="link view" href="'.$file_href.'" target="_blank">'.$group.'/'.$file_name.'</a>' : '<a class="link view disabled" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>');
-                                                                        echo('<span class="info size">'.$sheet_height.'h &times; '.$sheet_width.'w</span>');
+                                                                    echo('<div class="filebar'.($file_is_unused ? ' unused' : '').($file_is_optional ? ' optional' : '').'" data-auto="file-bar" data-file-path="'.$this_alt_path.'" data-file-name="'.$file_name.'" data-file-kind="image/png" data-file-width="'.$sheet_width.'" data-file-height="'.$sheet_height.'">');
+                                                                        echo($file_exists ? '<a class="link view" href="'.$file_href.'?'.time().'" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>' : '<a class="link view disabled" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>');
+                                                                        echo('<span class="info size">'.$sheet_width.'w &times; '.$sheet_height.'h</span>');
                                                                         echo($file_exists ? '<span class="info status good">&check;</span>' : '<span class="info status bad">&cross;</span>');
-                                                                        echo('<a class="action delete'.(!$file_exists ? ' disabled' : '').'" data-action="delete">Delete</a>');
-                                                                        echo('<a class="action upload'.($file_exists ? ' disabled' : '').'" data-action="upload">Upload</a>');
+                                                                        echo('<a class="action delete'.(!$file_exists ? ' disabled' : '').'" data-action="delete" data-file-hash="'.md5('delete/'.$this_alt_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">Delete</a>');
+                                                                        echo('<a class="action upload'.($file_exists ? ' disabled' : '').'" data-action="upload" data-file-hash="'.md5('upload/'.$this_alt_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">');
+                                                                            echo('<span class="text">Upload</span>');
+                                                                            echo('<input class="input" type="file" name="file_info" value=""'.($file_exists ? ' disabled="disabled"' : '').' />');
+                                                                        echo('</a>');
                                                                     echo('</div>');
                                                                     /* echo('<div class="preview">');
                                                                         echo('<img class="image" src="'.$file_href.'" alt="'.$file_name.'" />');
@@ -1362,6 +1365,9 @@
                     </div>
 
                 </form>
+
+                <form class="ajax" name="ajax-form" target="ajax-frame" action="admin/update_image.php" method="post" enctype="multipart/form-data"></form>
+                <iframe class="ajax" name="ajax-frame" src="about:blank"></iframe>
 
             </div>
 

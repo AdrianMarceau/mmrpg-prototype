@@ -511,14 +511,32 @@ tr:nth-child(odd) td {
     display: block;
     margin: 0 auto 5px;
     border: 1px solid #d6d6d6;
+    background-color: #ededed;
     position: relative;
+    transition: border-color 0.3s, background-color 0.3s;
+}
+.adminform .editor ul.files > li.pending {
+    border-color: #ffc107;
+    background-color: #fff0c2;
+}
+.adminform .editor ul.files > li.pending,
+.adminform .editor ul.files > li.pending * {
+    cursor: wait;
+    pointer-events: none;
+}
+.adminform .editor ul.files > li.success {
+    border-color: #1be43c;
+    background-color: #a8efb4;
+}
+.adminform .editor ul.files > li.error {
+    border-color: #fd9a9a;
+    background-color: #fdbfbf;
 }
 .adminform .editor ul.files > li .filebar {
     display: block;
     padding: 3px 6px;
     margin: 0 auto;
     position: relative;
-    background-color: #ededed;
 }
 .adminform .editor ul.files > li .filebar .link {
     color: #008aab;
@@ -587,6 +605,38 @@ tr:nth-child(odd) td {
     color: #ef4848;
 }
 
+.adminform .editor ul.files > li .filebar .action.upload {
+    max-width: 42px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+}
+.adminform .editor ul.files > li .filebar .action.upload .text {
+    position: relative;
+    z-index: 1;
+}
+.adminform .editor ul.files > li .filebar .action.upload .input {
+    display: block;
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: -10px;
+    opacity: 0;
+    cursor: inherit;
+}
+
+/* Chrome/Safari and web-kit-based browsers
+   (if it doesn't work, try maybe also on the parent/wrapper)
+*/
+::-webkit-file-upload-button {
+    cursor:pointer;
+}
+
+/* IE11 (if it doesn't work, try maybe also on the parent/wrapper) */
+input[type=file] {
+    cursor:pointer;
+}
+
 .adminform .editor ul.files > li .filebar.unused {
     opacity: 0.3;
     transition: opacity 0.3s;
@@ -631,6 +681,27 @@ tr:nth-child(odd) td {
     box-shadow: 1px 0 6px rgba(0, 0, 0, 0.6);
 }
 */
+
+.adminform .editor form[name="ajax-form"],
+.adminform .editor iframe[name="ajax-frame"] {
+    display: none;
+    box-sizing: border-box;
+    margin: 20px auto 0;
+    padding: 0;
+    width: 100%;
+}
+.adminform .editor form[name="ajax-form"] {
+    padding: 20px;
+    border: 1px dotted rgba(255, 0, 255, 1.0);
+    background-color: rgba(255, 0, 255, 0.3);
+    min-height: 40px;
+}
+.adminform .editor iframe[name="ajax-frame"] {
+    border: 1px dotted rgba(0, 255, 255, 1.0);
+    background-color: rgba(0, 255, 255, 0.3);
+    height: 300px;
+    overflow: auto;
+}
 
 
 .adminform .field,
