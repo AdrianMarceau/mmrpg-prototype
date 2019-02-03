@@ -2,6 +2,9 @@
 
 // -- SHOP SELLING ROBOTS -- //
 
+// Collect a better robot index with hidden included
+$mmrpg_index_robots = rpg_robot::get_index(true, false);
+
 ?>
 
 <table class="full" style="margin-bottom: 5px;">
@@ -46,7 +49,7 @@
                 // Loop through the items and print them one by one
                 $robot_counter = 0;
                 foreach ($robot_list_array AS $token => $price){
-                    if (isset($mmrpg_database_robots[$token])){ $robot_info = rpg_robot::parse_index_info($mmrpg_database_robots[$token]); }
+                    if (isset($mmrpg_index_robots[$token])){ $robot_info = $mmrpg_index_robots[$token]; }
                     else { continue; }
 
                     $robot_info_token = $token;

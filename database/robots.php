@@ -1,5 +1,8 @@
 <?
 
+// Compensate for missing arg
+if (!isset($is_preview_mode)){ $is_preview_mode = false; }
+
 // ROBOT MASTER DATABASE
 
 // Define the index of counters for robot types

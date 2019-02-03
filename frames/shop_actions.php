@@ -334,10 +334,9 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
         $temp_actual_token = preg_replace('/^robot-/i', '', $temp_token);
 
         // Ensure this robot exists before continuing
-        if (isset($mmrpg_database_robots[$temp_actual_token])){
-
-            // Collect detailed info on this robot from the database
-            $unlock_robot_info = $mmrpg_database_robots[$temp_actual_token];
+        $unlock_robot_info = rpg_robot::get_index_info($temp_actual_token);
+        if (!empty($unlock_robot_info)
+            && !empty($unlock_robot_info['robot_flag_unlockable'])){
 
             // Decide which play this robot will be unlocked for
             $this_best_stat_value = 0;
