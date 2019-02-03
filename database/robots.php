@@ -57,7 +57,7 @@ foreach ($mmrpg_database_robots AS $temp_token => $temp_info){
     $temp_info['robot_key'] = $mmrpg_database_robots_numbers[$temp_token]['robot_key'];
 
     // Ensure this robot's image exists, else default to the placeholder
-    if ($temp_info['robot_flag_complete']){ $temp_info['robot_image'] = $temp_token; }
+    if ($temp_info['robot_flag_complete'] || ($is_preview_mode === true && $temp_token === $this_current_token)){ $temp_info['robot_image'] = $temp_token; }
     else { $temp_info['robot_image'] = 'robot'; }
 
     // Modify the name of this robot if it is of the mecha class
@@ -73,7 +73,6 @@ foreach ($mmrpg_database_robots AS $temp_token => $temp_info){
     } elseif ($temp_info['robot_class'] == 'boss'){
         $temp_info['robot_master_number'] = $temp_info['robot_number'];
     }
-
 
     // Increment the robot core counter if not empty
     if (!empty($temp_info['robot_core'])){ $mmrpg_database_robots_types['cores'][$temp_info['robot_core']]++; }

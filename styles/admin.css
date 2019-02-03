@@ -252,15 +252,18 @@ a:hover {
 .adminform .editor .header .title {
     display: inline-block;
 }
+.adminform .editor .header a.view,
 .adminform .editor .header a.preview {
     display: inline-block;
     float: right;
+    margin-left: 10px;
     color: inherit;
     text-decoration: none;
     font-size: 90%;
 }
+.adminform .editor .header a.view .fas,
 .adminform .editor .header a.preview .fas {
-    margin-left: 4px;
+    margin-left: 2px;
 }
 
 .adminform .editor .editor-tabs,

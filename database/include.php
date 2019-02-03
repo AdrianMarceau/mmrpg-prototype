@@ -1,5 +1,8 @@
 <?
 
+// Check to see if we're in the PREVIEW MODE for previews
+$is_preview_mode = !empty($_GET['preview']) && $_GET['preview'] == 'true' ? true : false;
+
 // Require the types database
 require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 
