@@ -187,7 +187,16 @@ require('prototype_awards.php');
 
 
 // If possible, attempt to save the game to the session
-if (rpg_game::is_user()){ mmrpg_prototype_refresh_battle_points(); }
+if (rpg_game::is_user()){
+    $old_points = !empty($_SESSION[$session_token]['counters']['battle_points']) ? $_SESSION[$session_token]['counters']['battle_points'] : 0;
+    mmrpg_prototype_refresh_battle_points();
+    mmrpg_save_game_session();
+    $new_points = !empty($_SESSION[$session_token]['counters']['battle_points']) ? $_SESSION[$session_token]['counters']['battle_points'] : 0;
+    if ($old_points != $new_points){
+        header('Location: prototype.php?wap='.($flag_wap ? 'true' : 'false'));
+        exit();
+    }
+}
 
 ?>
 <!DOCTYPE html>
