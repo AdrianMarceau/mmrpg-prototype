@@ -1494,9 +1494,9 @@
 
             <?
 
-            $debug_robot_data = $robot_data;
-            $debug_robot_data['robot_description2'] = str_replace(PHP_EOL, '\\n', $debug_robot_data['robot_description2']);
-            echo('<pre>$robot_data = '.(!empty($debug_robot_data) ? htmlentities(print_r($debug_robot_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
+            //$debug_robot_data = $robot_data;
+            //$debug_robot_data['robot_description2'] = str_replace(PHP_EOL, '\\n', $debug_robot_data['robot_description2']);
+            //echo('<pre>$robot_data = '.(!empty($debug_robot_data) ? htmlentities(print_r($debug_robot_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
 
             ?>
 
