@@ -650,7 +650,7 @@ function mmrpg_prototype_robot_unlocked($player_token, $robot_token){
     if (!empty($player_token)){
         // Check if this battle has been completed and return true is it was
         if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token])
-            && !empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token])){
+            || !empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token])){
             return true;
         } else {
             return false;
