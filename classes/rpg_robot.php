@@ -2105,6 +2105,7 @@ class rpg_robot extends rpg_object {
             'robot_image',
             'robot_image_size',
             'robot_image_editor',
+            'robot_image_editor2',
             'robot_image_alts',
             'robot_core',
             'robot_core2',
@@ -3164,22 +3165,27 @@ class rpg_robot extends rpg_object {
                         // Define the editor title based on ID
                         $temp_editor_title = 'Undefined';
                         $temp_final_divider = '<span class="pipe"> | </span>';
-                        if (!empty($robot_info['robot_image_editor'])){
-                            $temp_editor_title = $db->get_value("SELECT
+                        $editor_ids = array();
+                        if (!empty($robot_info['robot_image_editor'])){ $editor_ids[] = $robot_info['robot_image_editor']; }
+                        if (!empty($robot_info['robot_image_editor2'])){ $editor_ids[] = $robot_info['robot_image_editor2']; }
+                        if (!empty($editor_ids)){
+                            $editor_ids_string = implode(', ', $editor_ids);
+                            $temp_editor_titles = $db->get_array_list("SELECT
                                 (CASE WHEN user_name_public <> '' AND user_name <> user_name_public
                                     THEN CONCAT(user_name_public, ' / ', user_name)
                                     ELSE user_name END) AS user_name
                                 FROM mmrpg_users
-                                WHERE user_id = {$robot_info['robot_image_editor']}
+                                WHERE user_id IN ({$editor_ids_string})
                                 ;", 'user_name');
+                            $temp_editor_titles = '<strong>'.implode('</strong> and <strong>', array_keys($temp_editor_titles)).'</strong>';
                         }
                         $temp_is_capcom = true;
                         $temp_is_original = array('disco', 'rhythm', 'flutter-fly', 'flutter-fly-2', 'flutter-fly-3');
                         if (in_array($robot_info['robot_token'], $temp_is_original)){ $temp_is_capcom = false; }
                         if ($temp_is_capcom){
-                            echo '<p class="text text_editor" style="text-align: center; color: #868686; font-size: 10px; line-height: 13px; margin-top: 6px;">Sprite Editing by <strong>'.$temp_editor_title.'</strong> '.$temp_final_divider.' Original Artwork by <strong>Capcom</strong></p>'."\n";
+                            echo '<p class="text text_editor" style="text-align: center; color: #868686; font-size: 10px; line-height: 13px; margin-top: 6px;">Sprite Editing by '.$temp_editor_titles.' '.$temp_final_divider.' Original Artwork by <strong>Capcom</strong></p>'."\n";
                         } else {
-                            echo '<p class="text text_editor" style="text-align: center; color: #868686; font-size: 10px; line-height: 13px; margin-top: 6px;">Sprite Editing by <strong>'.$temp_editor_title.'</strong> '.$temp_final_divider.' Original Character by <strong>Adrian Marceau</strong></p>'."\n";
+                            echo '<p class="text text_editor" style="text-align: center; color: #868686; font-size: 10px; line-height: 13px; margin-top: 6px;">Sprite Editing by '.$temp_editor_titles.' '.$temp_final_divider.' Original Character by <strong>Adrian Marceau</strong></p>'."\n";
                         }
                         ?>
                     </div>
