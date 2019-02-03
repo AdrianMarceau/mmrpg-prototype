@@ -375,7 +375,13 @@
                         );
                 }
                 $alt_keys = array_keys($form_data['robot_image_alts']);
-                sort($alt_keys);
+                usort($alt_keys, function($a, $b){
+                    $a = strstr($a, 'alt') ? (int)(str_replace('alt', '', $a)) : 0;
+                    $b = strstr($b, 'alt') ? (int)(str_replace('alt', '', $b)) : 0;
+                    if ($a < $b){ return -1; }
+                    elseif ($a > $b){ return 1; }
+                    else { return 0; }
+                    });
                 $new_robot_image_alts = array();
                 foreach ($alt_keys AS $alt_key){
                     $alt_info = $form_data['robot_image_alts'][$alt_key];
@@ -1332,12 +1338,15 @@
                                         <option value="">-</option>
                                         <?
                                         $alt_limit = 10;
-                                        if ($alt_limit <= count($robot_image_alts)){ $alt_limit = count($robot_image_alts) + 1; }
+                                        if ($alt_limit < count($robot_image_alts)){ $alt_limit = count($robot_image_alts) + 1; }
+                                        foreach ($robot_image_alts AS $info){ if (!empty($info['token'])){
+                                            $num = (int)(str_replace('alt', '', $info['token']));
+                                            if ($alt_limit < $num){ $alt_limit = $num + 1; }
+                                            } }
                                         for ($i = 1; $i <= $alt_limit; $i++){
                                             $alt_token = 'alt'.($i > 1 ? $i : '');
-                                            if (in_array($alt_token, $robot_image_alts_tokens)){ continue; }
                                             ?>
-                                            <option value="<?= $alt_token ?>">
+                                            <option value="<?= $alt_token ?>"<?= in_array($alt_token, $robot_image_alts_tokens) ? ' disabled="disabled"' : '' ?>>
                                                 <?= $robot_data['robot_name'] ?>
                                                 (<?= ucfirst($alt_token) ?> / <?
                                                     if ($i < 9){
