@@ -14,7 +14,7 @@ $this_graph_data['description'] = 'Welcome to the Mega Man RPG Prototype, where 
 //$this_graph_data['type'] = 'website';
 
 // Define the MARKUP variables for this page
-$this_markup_header = 'Mega Man RPG Prototype <span class="count">( Last Updated '.preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE).' )</span>';
+$this_markup_header = 'Mega Man RPG Prototype <span class="count">( Last Updated '.preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2,4})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE).' )</span>';
 
 // Start generating the page markup
 ob_start();
