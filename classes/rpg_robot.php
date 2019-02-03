@@ -2282,7 +2282,7 @@ class rpg_robot extends rpg_object {
         else { $robot_info['_parsed'] = true; }
 
         // Explode the weaknesses, resistances, affinities, and immunities into an array
-        $temp_field_names = array('robot_field2', 'robot_weaknesses', 'robot_resistances', 'robot_affinities', 'robot_immunities', 'robot_image_alts');
+        $temp_field_names = array('robot_weaknesses', 'robot_resistances', 'robot_affinities', 'robot_immunities', 'robot_image_alts');
         foreach ($temp_field_names AS $field_name){
             if (!empty($robot_info[$field_name])){ $robot_info[$field_name] = json_decode($robot_info[$field_name], true); }
             else { $robot_info[$field_name] = array(); }
@@ -2578,17 +2578,8 @@ class rpg_robot extends rpg_object {
 
         // Collect the field info if applicable
         $field_info_array = array();
-        $temp_robot_fields = array();
-        if (!empty($robot_info['robot_field']) && $robot_info['robot_field'] != 'field'){ $temp_robot_fields[] = $robot_info['robot_field']; }
-        if (!empty($robot_info['robot_field2'])){ $temp_robot_fields = array_merge($temp_robot_fields, $robot_info['robot_field2']); }
-        if ($temp_robot_fields){
-            foreach ($temp_robot_fields AS $key => $token){
-                $index_info = rpg_field::get_index_info($token);
-                if (!empty($index_info)){
-                    $field_info_array[] = $index_info;
-                }
-            }
-        }
+        if (!empty($robot_info['robot_field']) && $robot_info['robot_field'] != 'field'){ $index_info = rpg_field::get_index_info($robot_info['robot_field']); if (!empty($index_info)){ $field_info_array[] = $index_info; } }
+        if (!empty($robot_info['robot_field2']) && $robot_info['robot_field2'] != 'field'){ $index_info = rpg_field::get_index_info($robot_info['robot_field2']); if (!empty($index_info)){ $field_info_array[] = $index_info; } }
 
         // Define the class token for this robot
         $robot_class_token = '';
@@ -3512,7 +3503,8 @@ class rpg_robot extends rpg_object {
                                 <col width="100%" />
                             </colgroup>
                             <tbody>
-                                <? if($robot_info['robot_class'] == 'master'): ?>
+                                <? if($robot_info['robot_class'] == 'master'
+                                    && !empty($robot_info['robot_flag_unlockable'])): ?>
                                     <tr>
                                         <td class="right">
                                             <label>Unlocked By : </label>
