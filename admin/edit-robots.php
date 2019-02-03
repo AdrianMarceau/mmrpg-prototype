@@ -377,7 +377,11 @@
                 $alt_keys = array_keys($form_data['robot_image_alts']);
                 sort($alt_keys);
                 $new_robot_image_alts = array();
-                foreach ($alt_keys AS $alt_key){ $new_robot_image_alts[] = $form_data['robot_image_alts'][$alt_key]; }
+                foreach ($alt_keys AS $alt_key){
+                    $alt_info = $form_data['robot_image_alts'][$alt_key];
+                    if (!empty($alt_info['delete'])){ continue; }
+                    $new_robot_image_alts[] = $alt_info;
+                    }
                 $form_data['robot_image_alts'] = $new_robot_image_alts;
                 $form_data['robot_image_alts'] = !empty($form_data['robot_image_alts']) ? json_encode($form_data['robot_image_alts']) : '';
             }
@@ -1288,7 +1292,23 @@
                                                 }
                                             }
                                             ?>
+
                                         </div>
+
+                                        <? if (!$is_base_sprite){ ?>
+                                            <div class="options" style="margin-top: -5px; padding-top: 0;">
+
+                                                <div class="field checkwrap" style="width: 100%; text-align: right;">
+                                                    <label class="label">
+                                                        <strong style="color: #e91e1e;">Remove Alt</strong>
+                                                        <input type="hidden" name="robot_image_alts[<?= $alt_token ?>][delete]" value="0" checked="checked" />
+                                                        <input class="checkbox" type="checkbox" name="robot_image_alts[<?= $alt_token ?>][delete]" value="1" />
+                                                    </label>
+                                                    <p class="subtext" style="padding-right: 10px; color: #d55858;">Remove this alt from the list (images will not be deleted)</p>
+                                                </div>
+
+                                            </div>
+                                        <? } ?>
 
                                         <?
 
