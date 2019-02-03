@@ -439,10 +439,20 @@
             //$form_messages[] = array('alert', '<pre>$_POST = '.print_r($_POST, true).'</pre>');
             //$form_messages[] = array('alert', '<pre>$form_data = '.print_r($form_data, true).'</pre>');
 
-            // Loop through fields to create an update string
+            // Make a copy of the update data sans the robot ID
             $update_data = $form_data;
-            //$update_data['robot_date_modified'] = time();
             unset($update_data['robot_id']);
+
+            // If a recent backup of this data doesn't exist, create one now
+            $backup_date_time = date('Ymd-Hi');
+            $backup_exists = $db->get_value("SELECT robot_id FROM mmrpg_index_robots_backups WHERE robot_token = '{$update_data['robot_token']}' AND backup_date_time = '{$backup_date_time}';", 'robot_id');
+            if (empty($backup_exists)){
+                $backup_data = $update_data;
+                $backup_data['backup_date_time'] = $backup_date_time;
+                $db->insert('mmrpg_index_robots_backups', $backup_data);
+            }
+
+            // Update the main database index with changes to this robot's data
             $update_results = $db->update('mmrpg_index_robots', $update_data, array('robot_id' => $form_data['robot_id']));
 
             // DEBUG
@@ -516,7 +526,7 @@
                     <div class="field">
                         <strong class="label">By Class</strong>
                         <select class="select" name="robot_class">
-                            <option value="">-</option>
+                            <option value=""></option>
                             <option value="mecha"<?= !empty($search_data['robot_class']) && $search_data['robot_class'] === 'mecha' ? ' selected="selected"' : '' ?>>Mecha</option>
                             <option value="master"<?= !empty($search_data['robot_class']) && $search_data['robot_class'] === 'master' ? ' selected="selected"' : '' ?>>Master</option>
                             <option value="boss"<?= !empty($search_data['robot_class']) && $search_data['robot_class'] === 'boss' ? ' selected="selected"' : '' ?>>Boss</option>
@@ -525,7 +535,7 @@
 
                     <div class="field">
                         <strong class="label">By Type</strong>
-                        <select class="select" name="robot_core"><option value="">-</option><?
+                        <select class="select" name="robot_core"><option value=""></option><?
                             foreach ($mmrpg_types_index AS $type_token => $type_info){
                                 if ($type_info['type_class'] === 'special' && $type_token !== 'none'){ continue; }
                                 ?><option value="<?= $type_token ?>"<?= !empty($search_data['robot_core']) && $search_data['robot_core'] === $type_token ? ' selected="selected"' : '' ?>><?= $type_token === 'none' ? 'Neutral' : ucfirst($type_token) ?></option><?
@@ -535,12 +545,12 @@
 
                     <div class="field">
                         <strong class="label">By Flavour</strong>
-                        <input class="textbox" type="text" name="robot_flavour" placeholder="-" value="<?= !empty($search_data['robot_flavour']) ? htmlentities($search_data['robot_flavour'], ENT_QUOTES, 'UTF-8', true) : '' ?>" />
+                        <input class="textbox" type="text" name="robot_flavour" placeholder="" value="<?= !empty($search_data['robot_flavour']) ? htmlentities($search_data['robot_flavour'], ENT_QUOTES, 'UTF-8', true) : '' ?>" />
                     </div>
 
                     <div class="field">
                         <strong class="label">By Game</strong>
-                        <select class="select" name="robot_game"><option value="">-</option><?
+                        <select class="select" name="robot_game"><option value=""></option><?
                             $robot_games_tokens = $db->get_array_list("SELECT DISTINCT (robot_game) AS game_token FROM mmrpg_index_robots ORDER BY robot_game ASC;");
                             foreach ($robot_games_tokens AS $game_key => $game_info){
                                 $game_token = $game_info['game_token'];
@@ -551,7 +561,7 @@
 
                     <div class="field">
                         <strong class="label">By Group</strong>
-                        <select class="select" name="robot_group"><option value="">-</option><?
+                        <select class="select" name="robot_group"><option value=""></option><?
                             $robot_groups_tokens = $db->get_array_list("SELECT DISTINCT (robot_group) AS group_token FROM mmrpg_index_robots ORDER BY robot_group ASC;");
                             foreach ($robot_groups_tokens AS $group_key => $group_info){
                                 $group_token = $group_info['group_token'];
@@ -575,7 +585,7 @@
                         <div class="subfield">
                             <strong class="label"><?= $flag_label ?> <span class="<?= $flag_info['icon'] ?>"></span></strong>
                             <select class="select" name="<?= $flag_name ?>">
-                                <option value=""<?= !isset($search_data[$flag_name]) || $search_data[$flag_name] === '' ? ' selected="selected"' : '' ?>>-</option>
+                                <option value=""<?= !isset($search_data[$flag_name]) || $search_data[$flag_name] === '' ? ' selected="selected"' : '' ?>></option>
                                 <option value="1"<?= isset($search_data[$flag_name]) && $search_data[$flag_name] === 1 ? ' selected="selected"' : '' ?>><?= $flag_info['yes'] ?></option>
                                 <option value="0"<?= isset($search_data[$flag_name]) && $search_data[$flag_name] === 0 ? ' selected="selected"' : '' ?>><?= $flag_info['no'] ?></option>
                             </select><span></span>
