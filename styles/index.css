@@ -1075,6 +1075,26 @@ button {
     background: #4d4d4d url(../images/sprite-grid.gif) scroll repeat -10px -30px;
     overflow: hidden; padding: 10px 30px;
 }
+#window .page .database_container .subbody .body.sprites_body .grid + .grid {
+    margin-top: 10px;
+}
+
+#window .page .database_container .subbody .body.sprites_body .text_editor {
+    text-align: center;
+    color: #868686;
+    font-size: 10px;
+    line-height: 13px;
+    margin-top: 6px;
+}
+#window .page .database_container .subbody .body.sprites_body .text_editor a {
+    color: inherit;
+    text-decoration: none;
+}
+#window .page .database_container .subbody .body.sprites_body .text_editor a:hover {
+    color: #898989;
+    text-decoration: underline;
+}
+
 
 #window .page .database_container .subbody .body table.full {
     margin: 0;

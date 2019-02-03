@@ -3033,90 +3033,110 @@ class rpg_robot extends rpg_object {
                     <?
 
                     // Start the output buffer and prepare to collect sprites
-                    ob_start();
+                    $this_sprite_markup = '';
+                    if (true){
 
-                    // Define the alts we'll be looping through for this robot
-                    $temp_alts_array = array();
-                    $temp_alts_array[] = array('token' => '', 'name' => $robot_info['robot_name'], 'summons' => 0);
-                    // Append predefined alts automatically, based on the robot image alt array
-                    if (!empty($robot_info['robot_image_alts'])){
-                        $temp_alts_array = array_merge($temp_alts_array, $robot_info['robot_image_alts']);
-                    }
-                    // Otherwise, if this is a copy robot, append based on all the types in the index
-                    elseif ($robot_info['robot_core'] == 'copy' && preg_match('/^(mega-man|proto-man|bass|doc-robot)$/i', $robot_info['robot_token'])){
-                        foreach ($mmrpg_database_types AS $type_token => $type_info){
-                            if (empty($type_token) || $type_token == 'none' || $type_token == 'copy'){ continue; }
-                            $temp_alts_array[] = array('token' => $type_token, 'name' => $robot_info['robot_name'].' ('.ucfirst($type_token).' Core)', 'summons' => 0);
+                        // Define the alts we'll be looping through for this robot
+                        $temp_alts_array = array();
+                        $temp_alts_array[] = array('token' => '', 'name' => $robot_info['robot_name'], 'summons' => 0);
+                        // Append predefined alts automatically, based on the robot image alt array
+                        if (!empty($robot_info['robot_image_alts'])){
+                            $temp_alts_array = array_merge($temp_alts_array, $robot_info['robot_image_alts']);
                         }
-                    }
-                    // Otherwise, if this robot has multiple sheets, add them as alt options
-                    elseif (!empty($robot_info['robot_image_sheets'])){
-                        for ($i = 2; $i <= $robot_info['robot_image_sheets']; $i++){
-                            $temp_alts_array[] = array('sheet' => $i, 'name' => $robot_info['robot_name'].' (Sheet #'.$i.')', 'summons' => 0);
+                        // Otherwise, if this is a copy robot, append based on all the types in the index
+                        elseif ($robot_info['robot_core'] == 'copy' && preg_match('/^(mega-man|proto-man|bass|doc-robot)$/i', $robot_info['robot_token'])){
+                            foreach ($mmrpg_database_types AS $type_token => $type_info){
+                                if (empty($type_token) || $type_token == 'none' || $type_token == 'copy'){ continue; }
+                                $temp_alts_array[] = array('token' => $type_token, 'name' => $robot_info['robot_name'].' ('.ucfirst($type_token).' Core)', 'summons' => 0);
+                            }
                         }
-                    }
-
-                    // Loop through the alts and display images for them (yay!)
-                    foreach ($temp_alts_array AS $alt_key => $alt_info){
-
-                        // Define the current image token with alt in mind
-                        $temp_robot_image_token = $robot_image_token;
-                        $temp_robot_image_token .= !empty($alt_info['token']) ? '_'.$alt_info['token'] : '';
-                        $temp_robot_image_token .= !empty($alt_info['sheet']) ? '-'.$alt_info['sheet'] : '';
-                        $temp_robot_image_name = $alt_info['name'];
-                        // Update the alt array with this info
-                        $temp_alts_array[$alt_key]['image'] = $temp_robot_image_token;
-
-                        // Collect the number of sheets
-                        $temp_sheet_number = !empty($robot_info['robot_image_sheets']) ? $robot_info['robot_image_sheets'] : 1;
-
-                        // Loop through the different frames and print out the sprite sheets
-                        foreach (array('right', 'left') AS $temp_direction){
-                            $temp_direction2 = substr($temp_direction, 0, 1);
-                            $temp_embed = '[robot:'.$temp_direction.']{'.$temp_robot_image_token.'}';
-                            $temp_title = $temp_robot_image_name.' | Mugshot Sprite '.ucfirst($temp_direction);
-                            $temp_title .= '<div style="margin-top: 4px; letting-spacing: 1px; font-size: 90%; font-family: Courier New; color: rgb(159, 150, 172);">'.$temp_embed.'</div>';
-                            $temp_title = htmlentities($temp_title, ENT_QUOTES, 'UTF-8', true);
-                            $temp_label = 'Mugshot '.ucfirst(substr($temp_direction, 0, 1));
-                            echo '<div class="frame_container" data-clickcopy="'.$temp_embed.'" data-direction="'.$temp_direction.'" data-image="'.$temp_robot_image_token.'" data-frame="mugshot" style="padding-top: 20px; float: left; position: relative; margin: 0; box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.75); width: '.$robot_sprite_size.'px; height: '.$robot_sprite_size.'px; overflow: hidden;">';
-                                echo '<img style="margin-left: 0;" data-tooltip="'.$temp_title.'" src="images/robots/'.$temp_robot_image_token.'/mug_'.$temp_direction.'_'.$robot_sprite_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
-                                echo '<label style="position: absolute; left: 5px; top: 0; color: #EFEFEF; font-size: 10px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);">'.$temp_label.'</label>';
-                            echo '</div>';
-                        }
-
-
-                        // Loop through the different frames and print out the sprite sheets
-                        foreach ($robot_sprite_frames AS $this_key => $this_frame){
-                            $margin_left = ceil((0 - $this_key) * $robot_sprite_size);
-                            $frame_relative = $this_frame;
-                            //if ($temp_sheet > 1){ $frame_relative = 'frame_'.str_pad((($temp_sheet - 1) * count($robot_sprite_frames) + $this_key + 1), 2, '0', STR_PAD_LEFT); }
-                            $frame_relative_text = ucfirst(str_replace('_', ' ', $frame_relative));
-                            foreach (array('right', 'left') AS $temp_direction){
-                                $temp_direction2 = substr($temp_direction, 0, 1);
-                                $temp_embed = '[robot:'.$temp_direction.':'.$frame_relative.']{'.$temp_robot_image_token.'}';
-                                $temp_title = $temp_robot_image_name.' | '.$frame_relative_text.' Sprite '.ucfirst($temp_direction);
-                                $temp_imgalt = $temp_title;
-                                $temp_title .= '<div style="margin-top: 4px; letting-spacing: 1px; font-size: 90%; font-family: Courier New; color: rgb(159, 150, 172);">'.$temp_embed.'</div>';
-                                $temp_title = htmlentities($temp_title, ENT_QUOTES, 'UTF-8', true);
-                                $temp_label = $frame_relative_text.' '.ucfirst(substr($temp_direction, 0, 1));
-                                //$image_token = !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'];
-                                //if ($temp_sheet > 1){ $temp_robot_image_token .= '-'.$temp_sheet; }
-                                echo '<div class="frame_container" data-clickcopy="'.$temp_embed.'" data-direction="'.$temp_direction.'" data-image="'.$temp_robot_image_token.'" data-frame="'.$frame_relative.'" style="padding-top: 20px; float: left; position: relative; margin: 0; box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.75); width: '.$robot_sprite_size.'px; height: '.$robot_sprite_size.'px; overflow: hidden;">';
-                                    echo '<img style="margin-left: '.$margin_left.'px;" data-tooltip="'.$temp_title.'" alt="'.$temp_imgalt.'" src="images/robots/'.$temp_robot_image_token.'/sprite_'.$temp_direction.'_'.$robot_sprite_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
-                                    echo '<label style="position: absolute; left: 5px; top: 0; color: #EFEFEF; font-size: 10px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);">'.$temp_label.'</label>';
-                                echo '</div>';
+                        // Otherwise, if this robot has multiple sheets, add them as alt options
+                        elseif (!empty($robot_info['robot_image_sheets'])){
+                            for ($i = 2; $i <= $robot_info['robot_image_sheets']; $i++){
+                                $temp_alts_array[] = array('sheet' => $i, 'name' => $robot_info['robot_name'].' (Sheet #'.$i.')', 'summons' => 0);
                             }
                         }
 
-                    }
+                        // Loop through sizes to show and generate markup
+                        $show_sizes = array();
+                        $base_size = $robot_image_size;
+                        $zoom_size = $robot_image_size * 2;
+                        $show_sizes[$base_size] = $base_size.'x'.$base_size;
+                        $show_sizes[$zoom_size] = $zoom_size.'x'.$zoom_size;
+                        $size_key = -1;
+                        foreach ($show_sizes AS $size_value => $sprite_size_text){
+                            $size_key++;
+                            $size_is_final = $size_key == (count($show_sizes) - 1);
 
-                    // Collect the sprite markup from the output buffer for later
-                    $this_sprite_markup = ob_get_clean();
+                            // Start the output buffer and prepare to collect sprites
+                            ob_start();
+
+                                // Loop through the alts and display images for them (yay!)
+                                foreach ($temp_alts_array AS $alt_key => $alt_info){
+
+                                    // Define the current image token with alt in mind
+                                    $temp_robot_image_token = $robot_image_token;
+                                    $temp_robot_image_token .= !empty($alt_info['token']) ? '_'.$alt_info['token'] : '';
+                                    $temp_robot_image_token .= !empty($alt_info['sheet']) ? '-'.$alt_info['sheet'] : '';
+                                    $temp_robot_image_name = $alt_info['name'];
+                                    // Update the alt array with this info
+                                    $temp_alts_array[$alt_key]['image'] = $temp_robot_image_token;
+
+                                    // Collect the number of sheets
+                                    $temp_sheet_number = !empty($robot_info['robot_image_sheets']) ? $robot_info['robot_image_sheets'] : 1;
+
+                                    // Loop through the different frames and print out the sprite sheets
+                                    foreach (array('right', 'left') AS $temp_direction){
+                                        $temp_direction2 = substr($temp_direction, 0, 1);
+                                        $temp_embed = '[robot:'.$temp_direction.']{'.$temp_robot_image_token.'}';
+                                        $temp_title = $temp_robot_image_name.' | Mugshot Sprite '.ucfirst($temp_direction);
+                                        $temp_title .= '<div style="margin-top: 4px; letting-spacing: 1px; font-size: 90%; font-family: Courier New; color: rgb(159, 150, 172);">'.$temp_embed.'</div>';
+                                        $temp_title = htmlentities($temp_title, ENT_QUOTES, 'UTF-8', true);
+                                        $temp_label = 'Mugshot '.ucfirst(substr($temp_direction, 0, 1));
+                                        echo '<div class="frame_container" data-clickcopy="'.$temp_embed.'" data-direction="'.$temp_direction.'" data-image="'.$temp_robot_image_token.'" data-frame="mugshot" style="'.($size_is_final ? 'padding-top: 20px;' : 'padding: 0;').' float: left; position: relative; margin: 0; box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.75); width: '.$size_value.'px; height: '.$size_value.'px; overflow: hidden;">';
+                                            echo '<img style="margin-left: 0;" data-tooltip="'.$temp_title.'" src="images/robots/'.$temp_robot_image_token.'/mug_'.$temp_direction.'_'.$sprite_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
+                                            if ($size_is_final){ echo '<label style="position: absolute; left: 5px; top: 0; color: #EFEFEF; font-size: 10px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);">'.$temp_label.'</label>'; }
+                                        echo '</div>';
+                                    }
+
+
+                                    // Loop through the different frames and print out the sprite sheets
+                                    foreach ($robot_sprite_frames AS $this_key => $this_frame){
+                                        $margin_left = ceil((0 - $this_key) * $size_value);
+                                        $frame_relative = $this_frame;
+                                        //if ($temp_sheet > 1){ $frame_relative = 'frame_'.str_pad((($temp_sheet - 1) * count($robot_sprite_frames) + $this_key + 1), 2, '0', STR_PAD_LEFT); }
+                                        $frame_relative_text = ucfirst(str_replace('_', ' ', $frame_relative));
+                                        foreach (array('right', 'left') AS $temp_direction){
+                                            $temp_direction2 = substr($temp_direction, 0, 1);
+                                            $temp_embed = '[robot:'.$temp_direction.':'.$frame_relative.']{'.$temp_robot_image_token.'}';
+                                            $temp_title = $temp_robot_image_name.' | '.$frame_relative_text.' Sprite '.ucfirst($temp_direction);
+                                            $temp_imgalt = $temp_title;
+                                            $temp_title .= '<div style="margin-top: 4px; letting-spacing: 1px; font-size: 90%; font-family: Courier New; color: rgb(159, 150, 172);">'.$temp_embed.'</div>';
+                                            $temp_title = htmlentities($temp_title, ENT_QUOTES, 'UTF-8', true);
+                                            $temp_label = $frame_relative_text.' '.ucfirst(substr($temp_direction, 0, 1));
+                                            //$image_token = !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'];
+                                            //if ($temp_sheet > 1){ $temp_robot_image_token .= '-'.$temp_sheet; }
+                                            echo '<div class="frame_container" data-clickcopy="'.$temp_embed.'" data-direction="'.$temp_direction.'" data-image="'.$temp_robot_image_token.'" data-frame="'.$frame_relative.'" style="'.($size_is_final ? 'padding-top: 20px;' : 'padding: 0;').' float: left; position: relative; margin: 0; box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.75); width: '.$size_value.'px; height: '.$size_value.'px; overflow: hidden;">';
+                                                echo '<img style="margin-left: '.$margin_left.'px;" data-tooltip="'.$temp_title.'" alt="'.$temp_imgalt.'" src="images/robots/'.$temp_robot_image_token.'/sprite_'.$temp_direction.'_'.$sprite_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
+                                                if ($size_is_final){ echo '<label style="position: absolute; left: 5px; top: 0; color: #EFEFEF; font-size: 10px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);">'.$temp_label.'</label>'; }
+                                            echo '</div>';
+                                        }
+                                    }
+
+                                }
+
+                            // Collect the sprite markup from the output buffer for later
+                            $this_sprite_markup .= '<div class="grid">'.ob_get_clean().'</div>'.PHP_EOL;
+
+                        }
+
+
+                    }
 
                     ?>
 
                     <h2 id="sprites" class="header header_full <?= $robot_header_types ?>" style="margin: 10px 0 0; text-align: left; overflow: hidden; height: auto;">
-                        Sprites Sheets
+                        Sprite Sheets
                         <span class="header_links image_link_container">
                             <span class="images" style="<?= count($temp_alts_array) == 1 ? 'display: none;' : '' ?>"><?
                                 // Loop though and print links for the alts
@@ -3158,9 +3178,7 @@ class rpg_robot extends rpg_object {
                     </h2>
 
                     <div id="sprites_body" class="body body_full sprites_body solid">
-                        <div class="grid">
-                            <?= $this_sprite_markup ?>
-                        </div>
+                        <?= $this_sprite_markup ?>
                         <?
                         // Define the editor title based on ID
                         $temp_editor_title = 'Undefined';
@@ -3170,22 +3188,26 @@ class rpg_robot extends rpg_object {
                         if (!empty($robot_info['robot_image_editor2'])){ $editor_ids[] = $robot_info['robot_image_editor2']; }
                         if (!empty($editor_ids)){
                             $editor_ids_string = implode(', ', $editor_ids);
-                            $temp_editor_titles = $db->get_array_list("SELECT
-                                (CASE WHEN user_name_public <> '' AND user_name <> user_name_public
-                                    THEN CONCAT(user_name_public, ' / ', user_name)
-                                    ELSE user_name END) AS user_name
+                            $temp_editor_details = $db->get_array_list("SELECT
+                                user_name, user_name_public, user_name_clean
                                 FROM mmrpg_users
                                 WHERE user_id IN ({$editor_ids_string})
-                                ;", 'user_name');
-                            $temp_editor_titles = '<strong>'.implode('</strong> and <strong>', array_keys($temp_editor_titles)).'</strong>';
+                                ;", 'user_name_clean');
+                            $temp_editor_titles = array();
+                            foreach ($temp_editor_details AS $editor_url => $editor_info){
+                                $editor_name = $editor_info['user_name'];
+                                if (!empty($editor_info['user_name_public']) && $editor_info['user_name_public'] !== $editor_info['user_name']){ $editor_name = $editor_info['user_name_public'].' / '.$editor_name; }
+                                $temp_editor_titles[] = '<strong><a href="leaderboard/'.$editor_url.'/">'.$editor_name.'</a></strong>';
+                            }
+                            $temp_editor_title = implode(' and ', $temp_editor_titles);
                         }
                         $temp_is_capcom = true;
                         $temp_is_original = array('disco', 'rhythm', 'flutter-fly', 'flutter-fly-2', 'flutter-fly-3');
                         if (in_array($robot_info['robot_token'], $temp_is_original)){ $temp_is_capcom = false; }
                         if ($temp_is_capcom){
-                            echo '<p class="text text_editor" style="text-align: center; color: #868686; font-size: 10px; line-height: 13px; margin-top: 6px;">Sprite Editing by '.$temp_editor_titles.' '.$temp_final_divider.' Original Artwork by <strong>Capcom</strong></p>'."\n";
+                            echo '<p class="text text_editor">Sprite Editing by '.$temp_editor_title.' '.$temp_final_divider.' Original Artwork by <strong>Capcom</strong></p>'."\n";
                         } else {
-                            echo '<p class="text text_editor" style="text-align: center; color: #868686; font-size: 10px; line-height: 13px; margin-top: 6px;">Sprite Editing by '.$temp_editor_titles.' '.$temp_final_divider.' Original Character by <strong>Adrian Marceau</strong></p>'."\n";
+                            echo '<p class="text text_editor">Sprite Editing by '.$temp_editor_title.' '.$temp_final_divider.' Original Character by <strong>Adrian Marceau</strong></p>'."\n";
                         }
                         ?>
                     </div>
