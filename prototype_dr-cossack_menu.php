@@ -75,7 +75,7 @@ require('prototype_dr-xxx_missions.php');
 // Define the robot options and counter for this mode
 if (empty($_SESSION['PROTOTYPE_TEMP'][$this_prototype_data['this_player_token'].'_robot_options'])){
     $this_prototype_data['robot_options'] = $db->get_array_list("SELECT (300 + robot_id) AS robot_id, robot_token FROM mmrpg_index_robots
-        WHERE robot_flag_published = 1 AND robot_flag_complete = 1 AND robot_class = 'master'
+        WHERE robot_flag_published = 1 AND robot_flag_complete = 1 AND robot_flag_unlockable = 1 AND robot_class = 'master'
         ORDER BY robot_order ASC
         ;");
     foreach ($this_prototype_data['robot_options'] AS $key => $info){
