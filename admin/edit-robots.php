@@ -389,8 +389,15 @@
             //$form_messages[] = array('alert', '<pre>$form_data = '.print_r($form_data, true).'</pre>');
 
             // If we made it this far, the update must have been a success
-            if ($update_results !== false){ $form_messages[] = array('success', 'Robot data was updated successfully!'); }
-            else { $form_messages[] = array('error', 'Robot data could not be updated...'); }
+            if ($update_results !== false){ $form_success = true; $form_messages[] = array('success', 'Robot data was updated successfully!'); }
+            else { $form_success = false; $form_messages[] = array('error', 'Robot data could not be updated...'); }
+
+            // Update cache timestamp if changes were successful
+            if ($form_success){
+                list($date, $time) = explode('-', date('Ymd-Hi'));
+                $db->update('mmrpg_config', array('config_value' => $date), "config_group = 'global' AND config_name = 'cache_date'");
+                $db->update('mmrpg_config', array('config_value' => $time), "config_group = 'global' AND config_name = 'cache_time'");
+            }
 
             // We're done processing the form, we can exit
             exit_robot_edit_action($form_data['robot_id']);
