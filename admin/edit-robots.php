@@ -540,7 +540,7 @@
 
                     <div class="field">
                         <strong class="label">By Name</strong>
-                        <input class="textbox" type="text" name="robot_name" placeholder="-" value="<?= !empty($search_data['robot_name']) ? htmlentities($search_data['robot_name'], ENT_QUOTES, 'UTF-8', true) : '' ?>" />
+                        <input class="textbox" type="text" name="robot_name" placeholder="" value="<?= !empty($search_data['robot_name']) ? htmlentities($search_data['robot_name'], ENT_QUOTES, 'UTF-8', true) : '' ?>" />
                     </div>
 
                     <div class="field">
