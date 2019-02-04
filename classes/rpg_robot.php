@@ -3189,8 +3189,12 @@ class rpg_robot extends rpg_object {
                                 ;", 'user_name_clean');
                             $temp_editor_titles = array();
                             foreach ($temp_editor_details AS $editor_url => $editor_info){
-                                $editor_name = $editor_info['user_name'];
-                                if (!empty($editor_info['user_name_public']) && $editor_info['user_name_public'] !== $editor_info['user_name']){ $editor_name = $editor_info['user_name_public'].' / '.$editor_name; }
+                                $editor_name = !empty($editor_info['user_name_public']) ? $editor_info['user_name_public'] : $editor_info['user_name'];
+                                if (!empty($editor_info['user_name_public'])
+                                    && trim(str_replace(' ', '', $editor_info['user_name_public'])) !== trim(str_replace(' ', '', $editor_info['user_name']))
+                                    ){
+                                    $editor_name = $editor_info['user_name_public'].' / '.$editor_info['user_name'];
+                                }
                                 $temp_editor_titles[] = '<strong><a href="leaderboard/'.$editor_url.'/">'.$editor_name.'</a></strong>';
                             }
                             $temp_editor_title = implode(' and ', $temp_editor_titles);
