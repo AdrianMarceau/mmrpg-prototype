@@ -104,6 +104,11 @@ body:before {
         margin: 0 20px 0 0;
     }
 
+    .adminform.edit_robots .results table .game,
+    .adminform.edit_robots .results table .group {
+        display: none;
+    }
+
 }
 
 /* -- Even Less than Portrait Mode -- */
@@ -111,6 +116,10 @@ body:before {
 
     body:before {
         content: "05";
+    }
+
+    .adminform.edit_robots .results table .type {
+        display: none;
     }
 
 }
@@ -142,6 +151,32 @@ body:before {
         margin-bottom: 5px;
         width: calc(100% - 5px);
     }
+
+    .adminform .editor .editor-tabs .tab {
+        margin: 0 6px 6px 0;
+        position: static;
+        -moz-border-radius: 3px;
+        -webkit-border-radius: 3px;
+        border-radius: 3px;
+        min-width: calc((100% / 3) - 6px);
+    }
+    .adminform .editor .editor-tabs .tab + span {
+        display: none;
+    }
+    .adminform .editor .editor-tabs .tab,
+    .adminform .editor .editor-tabs .tab.active,
+    .adminform .editor .editor-tabs .tab:hover {
+        border: 1px solid #CACACA;
+    }
+
+    .adminform.edit_robots .results table tbody td {
+        font-size: 13px;
+    }
+    .adminform.edit_robots .results table .class,
+    .adminform.edit_robots .results table .actions {
+        display: none;
+    }
+
 
 }
 
@@ -187,23 +222,6 @@ body:before {
         display: block;
         float: none;
         width: auto;
-    }
-
-    .adminform .editor .editor-tabs .tab {
-        margin: 0 6px 6px 0;
-        position: static;
-        -moz-border-radius: 3px;
-        -webkit-border-radius: 3px;
-        border-radius: 3px;
-        min-width: calc((100% / 3) - 6px);
-    }
-    .adminform .editor .editor-tabs .tab + span {
-        display: none;
-    }
-    .adminform .editor .editor-tabs .tab,
-    .adminform .editor .editor-tabs .tab.active,
-    .adminform .editor .editor-tabs .tab:hover {
-        border: 1px solid #CACACA;
     }
 
     .adminform .search .form {

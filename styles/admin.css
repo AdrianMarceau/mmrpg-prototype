@@ -390,6 +390,14 @@ tr:nth-child(odd) td {
     text-overflow: ellipsis;
 }
 
+.adminform table.backups {
+    width: 100%;
+}
+.adminform table.backups thead th {
+    background-color: #e0e0e0;
+    color: #090909;
+}
+
 .adminform .field,
 .adminform .field .subfield {
     overflow: visible;
@@ -887,6 +895,14 @@ input[type=file] {
     border: 1px solid #DEDEDE;
     background-color: #EFEFEF;
     pointer-events: none;
+    cursor: not-allowed;
+}
+.adminform .field input[readonly],
+.adminform .field button[readonly],
+.adminform .field select[readonly],
+.adminform .field textarea[readonly] {
+    border: 1px solid #DEDEDE;
+    background-color: #EFEFEF;
     cursor: not-allowed;
 }
 
