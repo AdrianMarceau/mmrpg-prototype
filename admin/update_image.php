@@ -57,7 +57,7 @@ if ($image_data['action'] == 'upload' && $image_data['exists']){ js_exit('error'
 elseif ($image_data['action'] == 'delete' && !$image_data['exists']){ js_exit('error', 'file-not-exists'); }
 
 // DEBUG DEBUG DEBUG
-echo('<pre>$image_data = '.print_r($image_data, true).'</pre>'.PHP_EOL);
+//echo('<pre>$image_data = '.print_r($image_data, true).'</pre>'.PHP_EOL);
 
 // Ensure the main folder is created for this file
 if (!file_exists(MMRPG_CONFIG_ROOTDIR.$image_data['path'])){ @mkdir(MMRPG_CONFIG_ROOTDIR.$image_data['path']); }
@@ -72,7 +72,7 @@ if ($image_data['action'] == 'upload'){
     $image_size = getimagesize($image_data['fileinfo']['tmp_name']);
     $image_size['width'] = isset($image_size[0]) ? $image_size[0] : 0;
     $image_size['height'] = isset($image_size[1]) ? $image_size[1] : 0;
-    echo('<pre>$image_size = '.print_r($image_size, true).'</pre>'.PHP_EOL);
+    //echo('<pre>$image_size = '.print_r($image_size, true).'</pre>'.PHP_EOL);
 
     // Validate the image type AGAIN if a type filter was provided
     $file_mime_type = str_replace('/jpeg', '/jpg', $image_size['mime']);

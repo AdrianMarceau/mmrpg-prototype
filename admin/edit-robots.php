@@ -422,6 +422,8 @@
             if (isset($form_data['robot_abilities_rewards'])){ $form_data['robot_abilities_rewards'] = !empty($form_data['robot_abilities_rewards']) ? json_encode($form_data['robot_abilities_rewards']) : ''; }
             if (isset($form_data['robot_abilities_compatible'])){ $form_data['robot_abilities_compatible'] = !empty($form_data['robot_abilities_compatible']) ? json_encode($form_data['robot_abilities_compatible']) : ''; }
 
+            $empty_image_folders = array();
+
             if (isset($form_data['robot_image_alts'])){
                 if (!empty($robot_image_alts_new)){
                     $alt_num = $robot_image_alts_new != 'alt' ? (int)(str_replace('alt', '', $robot_image_alts_new)) : 1;
@@ -443,13 +445,60 @@
                 $new_robot_image_alts = array();
                 foreach ($alt_keys AS $alt_key){
                     $alt_info = $form_data['robot_image_alts'][$alt_key];
-                    if (!empty($alt_info['delete'])){ continue; }
-                    $new_robot_image_alts[] = $alt_info;
+                    $alt_path = $robot_data['robot_image'].($alt_key != 'base' ? '_'.$alt_key : '');
+                    if (!empty($alt_info['delete_images'])){
+                        $delete_sprite_path = 'images/robots/'.$alt_path.'/';
+                        $delete_shadow_path = 'images/robots_shadows/'.$alt_path.'/';
+                        $empty_image_folders[] = $delete_sprite_path;
+                        $empty_image_folders[] = $delete_shadow_path;
                     }
+                    if (!empty($alt_info['delete'])){ continue; }
+                    elseif ($alt_key == 'base'){ continue; }
+                    unset($alt_info['delete_images'], $alt_info['delete']);
+                    $new_robot_image_alts[] = $alt_info;
+                }
                 $form_data['robot_image_alts'] = $new_robot_image_alts;
                 $form_data['robot_image_alts'] = !empty($form_data['robot_image_alts']) ? json_encode($form_data['robot_image_alts']) : '';
             }
             //$form_messages[] = array('alert', '<pre>$form_data[\'robot_image_alts\']  = '.print_r($form_data['robot_image_alts'] , true).'</pre>');
+
+            if (!empty($empty_image_folders)){
+                //$form_messages[] = array('alert', '<pre>$empty_image_folders = '.print_r($empty_image_folders, true).'</pre>');
+                foreach ($empty_image_folders AS $empty_path_key => $empty_path){
+
+                    // Continue if this folder doesn't exist
+                    if (!file_exists(MMRPG_CONFIG_ROOTDIR.$empty_path)){ continue; }
+
+                    // Otherwise, collect directory contents (continue if empty)
+                    $empty_files = getDirContents(MMRPG_CONFIG_ROOTDIR.$empty_path);
+                    $empty_files = !empty($empty_files) ? array_map(function($s){ return str_replace('\\', '/', $s); }, $empty_files) : array();
+                    if (empty($empty_files)){ continue; }
+                    //$form_messages[] = array('alert', '<pre>$empty_path_key = '.print_r($empty_path_key, true).' | $empty_path = '.print_r($empty_path, true).' | $empty_files = '.print_r($empty_files, true).'</pre>');
+
+                    // Ensure the backup folder is created for this file
+                    $backup_path = str_replace('/images/', '/images/backups/', MMRPG_CONFIG_ROOTDIR.$empty_path);
+                    if (!file_exists($backup_path)){ @mkdir($backup_path); }
+
+                    // Loop through empty files and delete one by one
+                    foreach ($empty_files AS $empty_file_key => $empty_file_path){
+                        $empty_file = basename($empty_file_path);
+
+                        // Move the file to the backup folder, renaming the file with the timestamp
+                        $bak_append = '.bak'.date('YmdHi');
+                        $old_location = $empty_file_path;
+                        $new_location = $backup_path.preg_replace('/(\.[a-z0-9]{3,})$/i', $bak_append.'$1', $empty_file);
+
+                        // Attempt to copy the image and return the status of the action (remove old file if successful)
+                        $copy_status = copy($old_location, $new_location);
+                        if (file_exists($new_location)){ @unlink($old_location); $form_messages[] = array('alert', str_replace(MMRPG_CONFIG_ROOTDIR, '', $old_location).' was deleted!'); }
+                        else { $form_messages[] = array('warning', str_replace(MMRPG_CONFIG_ROOTDIR, '', $old_location).' could not be deleted! ('.$copy_status.')');  }
+
+                    }
+
+
+                }
+
+            }
 
             // DEBUG
             //$form_messages[] = array('alert', '<pre>$_POST = '.print_r($_POST, true).'</pre>');
@@ -1201,12 +1250,12 @@
                                 <? $placeholder_folder = $robot_data['robot_class'] != 'master' ? $robot_data['robot_class'] : 'robot'; ?>
                                 <div class="field halfsize">
                                     <div class="label">
-                                        <strong>Sprite Status</strong>
-                                        <em>select if ready or pending</em>
+                                        <strong>Sprite Path</strong>
+                                        <em>base image path for sprites</em>
                                     </div>
                                     <select class="select" name="robot_image">
-                                        <option value="<?= $placeholder_folder ?>" <?= $robot_data['robot_image'] == $placeholder_folder ? 'selected="selected"' : '' ?>>Pending</option>
-                                        <option value="<?= $robot_data['robot_token'] ?>" <?= $robot_data['robot_image'] == $robot_data['robot_token'] ? 'selected="selected"' : '' ?>>Ready</option>
+                                        <option value="<?= $placeholder_folder ?>" <?= $robot_data['robot_image'] == $placeholder_folder ? 'selected="selected"' : '' ?>>images/robots/<?= $placeholder_folder ?>/</option>
+                                        <option value="<?= $robot_data['robot_token'] ?>" <?= $robot_data['robot_image'] == $robot_data['robot_token'] ? 'selected="selected"' : '' ?>>images/robots/<?= $robot_data['robot_token'] ?>/</option>
                                     </select><span></span>
                                 </div>
 
@@ -1423,20 +1472,52 @@
 
                                                 </div>
 
-                                                <? if (!$is_base_sprite && !$has_elemental_alts){ ?>
-                                                    <div class="options" style="margin-top: -5px; padding-top: 0;">
+                                                <div class="options" style="margin-top: -5px; padding-top: 0;">
 
-                                                        <div class="field checkwrap" style="width: 100%; text-align: right;">
-                                                            <label class="label">
-                                                                <strong style="color: #e91e1e;">Remove Alt</strong>
-                                                                <input type="hidden" name="robot_image_alts[<?= $alt_token ?>][delete]" value="0" checked="checked" />
-                                                                <input class="checkbox" type="checkbox" name="robot_image_alts[<?= $alt_token ?>][delete]" value="1" />
-                                                            </label>
-                                                            <p class="subtext" style="padding-right: 10px; color: #d55858;">Remove this alt from the list (images will not be deleted)</p>
-                                                        </div>
+                                                    <? if ($is_base_sprite){ ?>
 
-                                                    </div>
-                                                <? } ?>
+                                                            <div class="field checkwrap rfloat fullsize">
+                                                                <label class="label">
+                                                                    <strong style="color: #da1616;">Delete Base Images?</strong>
+                                                                    <input type="hidden" name="robot_image_alts[<?= $alt_token ?>][delete_images]" value="0" checked="checked" />
+                                                                    <input class="checkbox" type="checkbox" name="robot_image_alts[<?= $alt_token ?>][delete_images]" value="1" />
+                                                                </label>
+                                                                <p class="subtext" style="color: #da1616;">Empty <strong>base</strong> image folder and remove all sprites/shadows</p>
+                                                                <? if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/backups/robots/'.($robot_data['robot_image']).'/')){ ?>
+                                                                    <p class="subtext" style="color: #da1616;">(<a style="color: inherit; text-decoration: none;" href="images/viewer.php?path=backups/robots/<?= $robot_data['robot_image'] ?>/" target="_blank"><u>view base backups</u> <i class="fas fa-external-link-square-alt"></i></a>)</p>
+                                                                <? } ?>
+                                                            </div>
+
+                                                    <? } else { ?>
+
+                                                            <div class="field checkwrap rfloat fullsize">
+                                                                <label class="label">
+                                                                    <strong style="color: #da1616;">Delete <?= ucfirst($alt_token) ?> Images?</strong>
+                                                                    <input type="hidden" name="robot_image_alts[<?= $alt_token ?>][delete_images]" value="0" checked="checked" />
+                                                                    <input class="checkbox" type="checkbox" name="robot_image_alts[<?= $alt_token ?>][delete_images]" value="1" />
+                                                                </label>
+                                                                <p class="subtext" style="color: #da1616;">Empty the <strong><?= $alt_token ?></strong> image folder and remove all sprites/shadows</p>
+                                                                <? if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/backups/robots/'.($robot_data['robot_image'].'_'.$alt_token).'/')){ ?>
+                                                                    <p class="subtext" style="color: #da1616;">(<a style="color: inherit; text-decoration: none;" href="images/viewer.php?path=backups/robots/<?= $robot_data['robot_image'].'_'.$alt_token ?>/" target="_blank"><u>view <?= $alt_token ?> backups</u> <i class="fas fa-external-link-square-alt"></i></a>)</p>
+                                                                <? } ?>
+                                                            </div>
+
+                                                            <? if (!$has_elemental_alts){ ?>
+
+                                                                    <div class="field checkwrap rfloat fullsize">
+                                                                        <label class="label">
+                                                                            <strong style="color: #da1616;">Delete <?= ucfirst($alt_token) ?> Data?</strong>
+                                                                            <input type="hidden" name="robot_image_alts[<?= $alt_token ?>][delete]" value="0" checked="checked" />
+                                                                            <input class="checkbox" type="checkbox" name="robot_image_alts[<?= $alt_token ?>][delete]" value="1" />
+                                                                        </label>
+                                                                        <p class="subtext" style="color: #da1616;">Remove <strong><?= $alt_token ?></strong> from the list (images will not be deleted)</p>
+                                                                    </div>
+
+                                                            <? } ?>
+
+                                                    <? } ?>
+
+                                                </div>
 
                                             <? } ?>
 
