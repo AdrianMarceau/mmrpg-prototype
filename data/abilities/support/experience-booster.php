@@ -23,7 +23,7 @@ $ability = array(
                 'frame' => 'summon',
                 'success' => array(9, 0, 0, -10,
                     $this_robot->print_name().' activated the '.$this_ability->print_name().'!<br />'.
-                    'But the battle\'s experience wont go any higher&hellip;'
+                    'But the battle\'s experience won\'t go any higher&hellip;'
                     )
                 ));
             $this_robot->trigger_target($this_robot, $this_ability);
