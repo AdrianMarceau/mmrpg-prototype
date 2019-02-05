@@ -961,6 +961,25 @@ input[type=file] {
     margin: 2px 0 0;
 
 }
+.adminform .options .field.checkwrap {
+
+}
+.adminform .options .field.checkwrap.lfloat {
+    float: left;
+}
+.adminform .options .field.checkwrap.rfloat {
+    width: auto;
+    text-align: right;
+    float: right;
+    padding-left: 10px;
+}
+.adminform .options .field.checkwrap.rfloat .subtext {
+    padding-right: 10px;
+}
+.adminform .options .field.checkwrap.rfloat.fullsize {
+    width: 100%;
+    clear: both;
+}
 
 .adminform .search,
 .adminform .results,
