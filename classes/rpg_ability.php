@@ -2044,7 +2044,7 @@ class rpg_ability extends rpg_object {
 
             // Target this robot's self to show the failure message
             $trigger_ability->set_flag('skip_canvas_header', true);
-            $trigger_ability->target_options_update(array('frame' => 'defend', 'success' => array($failure_frame, -2, 0, -10, $extra_text.$target_robot->print_name().'&#39;s '.$stat_type.' wont go any higher&hellip;')));
+            $trigger_ability->target_options_update(array('frame' => 'defend', 'success' => array($failure_frame, -2, 0, -10, $extra_text.$target_robot->print_name().'&#39;s '.$stat_type.' won\'t go any higher&hellip;')));
             $target_robot->trigger_target($target_robot, $trigger_ability);
 
         }
@@ -2103,7 +2103,7 @@ class rpg_ability extends rpg_object {
 
             // Target this robot's self to show the failure message
             $trigger_ability->set_flag('skip_canvas_header', true);
-            $trigger_ability->target_options_update(array('frame' => 'base', 'success' => array($failure_frame, -2, 0, -10, $extra_text.$target_robot->print_name().'&#39;s '.$stat_type.' wont go any lower&hellip;')));
+            $trigger_ability->target_options_update(array('frame' => 'base', 'success' => array($failure_frame, -2, 0, -10, $extra_text.$target_robot->print_name().'&#39;s '.$stat_type.' won\'t go any lower&hellip;')));
             $target_robot->trigger_target($target_robot, $trigger_ability);
 
         }

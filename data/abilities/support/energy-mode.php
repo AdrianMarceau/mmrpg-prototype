@@ -24,9 +24,9 @@ $ability = array(
         $allow_move = true;
         $stats_wont_go = '';
         if ($this_robot->robot_energy >= $this_robot->robot_base_energy){ $allow_move = false; $stats_wont_go = ' is already a full health'; }
-        elseif ($this_robot->counters[$lower_stats[0].'_mods'] <= MMRPG_SETTINGS_STATS_MOD_MIN){ $allow_move = false; $stats_wont_go = '&#39;s '.$lower_stats[0].' stat wont go any lower'; }
-        elseif ($this_robot->counters[$lower_stats[1].'_mods'] <= MMRPG_SETTINGS_STATS_MOD_MIN){ $allow_move = false; $stats_wont_go = '&#39;s '.$lower_stats[1].' stat wont go any lower'; }
-        elseif ($this_robot->counters[$lower_stats[2].'_mods'] <= MMRPG_SETTINGS_STATS_MOD_MIN){ $allow_move = false; $stats_wont_go = '&#39;s '.$lower_stats[2].' stat wont go any lower'; }
+        elseif ($this_robot->counters[$lower_stats[0].'_mods'] <= MMRPG_SETTINGS_STATS_MOD_MIN){ $allow_move = false; $stats_wont_go = '&#39;s '.$lower_stats[0].' stat won\'t go any lower'; }
+        elseif ($this_robot->counters[$lower_stats[1].'_mods'] <= MMRPG_SETTINGS_STATS_MOD_MIN){ $allow_move = false; $stats_wont_go = '&#39;s '.$lower_stats[1].' stat won\'t go any lower'; }
+        elseif ($this_robot->counters[$lower_stats[2].'_mods'] <= MMRPG_SETTINGS_STATS_MOD_MIN){ $allow_move = false; $stats_wont_go = '&#39;s '.$lower_stats[2].' stat won\'t go any lower'; }
 
         // If move is not allowed, do nothing right now
         if (!$allow_move){

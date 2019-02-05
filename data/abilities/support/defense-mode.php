@@ -24,9 +24,9 @@ $ability = array(
         // Check to see if this robot is allowed to use the move or not
         $allow_move = true;
         $stats_wont_go = '';
-        if ($this_robot->counters[$raise_stat.'_mods'] >= MMRPG_SETTINGS_STATS_MOD_MAX){ $allow_move = false; $stats_wont_go = $raise_stat.' stat wont go any higher'; }
-        elseif ($this_robot->counters[$lower_stats[0].'_mods'] <= MMRPG_SETTINGS_STATS_MOD_MIN){ $allow_move = false; $stats_wont_go = $lower_stats[0].' stat wont go any lower'; }
-        elseif ($this_robot->counters[$lower_stats[1].'_mods'] <= MMRPG_SETTINGS_STATS_MOD_MIN){ $allow_move = false; $stats_wont_go = $lower_stats[1].' stat wont go any lower'; }
+        if ($this_robot->counters[$raise_stat.'_mods'] >= MMRPG_SETTINGS_STATS_MOD_MAX){ $allow_move = false; $stats_wont_go = $raise_stat.' stat won\'t go any higher'; }
+        elseif ($this_robot->counters[$lower_stats[0].'_mods'] <= MMRPG_SETTINGS_STATS_MOD_MIN){ $allow_move = false; $stats_wont_go = $lower_stats[0].' stat won\'t go any lower'; }
+        elseif ($this_robot->counters[$lower_stats[1].'_mods'] <= MMRPG_SETTINGS_STATS_MOD_MIN){ $allow_move = false; $stats_wont_go = $lower_stats[1].' stat won\'t go any lower'; }
 
         // If move is not allowed, do nothing right now
         if (!$allow_move){
