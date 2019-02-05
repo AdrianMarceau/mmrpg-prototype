@@ -82,6 +82,58 @@ class rpg_user {
     }
 
     /**
+     * Get a list of all user save fields as an array or, optionally, imploded into a string
+     * @param bool $implode
+     * @param string $table (optional)
+     * @return mixed
+     */
+    public static function get_save_index_fields($implode = false, $table = ''){
+
+        // Define the various table fields for user objects
+        $save_fields = array(
+            'save_id',
+            'user_id',
+            'save_counters',
+            'save_values',
+            'save_values_battle_index',
+            'save_values_battle_complete',
+            'save_values_battle_failure',
+            'save_values_battle_rewards',
+            'save_values_battle_settings',
+            'save_values_battle_items',
+            'save_values_battle_abilities',
+            'save_values_battle_stars',
+            'save_values_robot_database',
+            'save_values_robot_alts',
+            'save_flags',
+            'save_settings',
+            'save_cache_date',
+            'save_file_name',
+            'save_file_path',
+            'save_date_created',
+            'save_date_accessed',
+            'save_date_modified',
+            'save_patches_applied'
+            );
+
+        // Add table name to each field string if requested
+        if (!empty($table)){
+            foreach ($save_fields AS $key => $field){
+                $save_fields[$key] = $table.'.'.$field;
+            }
+        }
+
+        // Implode the table fields into a string if requested
+        if ($implode){
+            $save_fields = implode(', ', $save_fields);
+        }
+
+        // Return the table fields, array or string
+        return $save_fields;
+
+    }
+
+    /**
      * Get the entire user index as an array with parsed info
      * @param bool $include_nologin (optional)
      * @param bool $include_unapproved (optional)

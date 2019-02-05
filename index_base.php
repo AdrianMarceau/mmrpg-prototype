@@ -355,8 +355,6 @@ if ($this_current_page == 'file' // File sub-pages
         <div class="banner <?= defined('MMRPG_INDEX_COMPACT_MODE') ? 'compact' : '' ?>">
 
             <?
-            // Collect the current user's info from the database
-            //$this_userinfo = $db->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
             // Define variables based on login status
             if (!defined('MMRPG_CRITICAL_ERROR') && $this_userid != MMRPG_SETTINGS_GUEST_ID){
                 // Define the avatar class and path variables

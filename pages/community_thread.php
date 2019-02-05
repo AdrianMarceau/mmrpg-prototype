@@ -605,7 +605,14 @@ else { $this_thread_info['post_count'] = false; }
                     $temp_post_body = isset($_POST['post_body']) ? htmlentities($_POST['post_body'], ENT_QUOTES, 'UTF-8', true) : '';
                     $temp_avatar_frame = isset($_REQUEST['post_frame']) ? $_REQUEST['post_frame'] : '00';
                     if (!empty($temp_post_id)){
-                        $temp_post_info = $db->get_array("SELECT mmrpg_posts.*, mmrpg_users.user_image_path FROM mmrpg_posts LEFT JOIN mmrpg_users on mmrpg_users.user_id = mmrpg_posts.user_id WHERE post_id = {$temp_post_id} ".(!COMMUNITY_VIEW_MODERATOR ? " AND mmrpg_posts.user_id = {$this_userid}" : ''));
+                        $temp_post_fields = mmrpg_community_post_index_fields(true, 'mmrpg_posts');
+                        $temp_post_info = $db->get_array("SELECT
+                            {$temp_post_fields},
+                            mmrpg_users.user_image_path
+                            FROM mmrpg_posts
+                            LEFT JOIN mmrpg_users on mmrpg_users.user_id = mmrpg_posts.user_id
+                            WHERE post_id = {$temp_post_id} ".(!COMMUNITY_VIEW_MODERATOR ? " AND mmrpg_posts.user_id = {$this_userid}" : '')."
+                            ;");
                         //die('$temp_post_info = <pre>'.print_r($temp_post_info, true).'</pre>');
                         $temp_post_body = !empty($temp_post_info['post_body']) ? htmlentities($temp_post_info['post_body'], ENT_QUOTES, 'UTF-8', true) : '';
                         $temp_avatar_path = !empty($temp_post_info['user_image_path']) ? $temp_post_info['user_image_path'] : $temp_avatar_path;

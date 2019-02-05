@@ -544,7 +544,7 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
         LEFT JOIN (
             SELECT
             posts.thread_id,
-            count(*) AS post_count
+            count(posts.thread_id) AS post_count
             FROM mmrpg_posts AS posts
             GROUP BY posts.thread_id
             ) AS posts
@@ -554,7 +554,7 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
             SELECT
             posts2.thread_id,
             posts2.post_mod,
-            count(*) AS new_post_count
+            count(posts2.thread_id) AS new_post_count
             FROM mmrpg_posts AS posts2
             WHERE posts2.post_mod > {$temp_last_login}
             GROUP BY posts2.thread_id
@@ -627,7 +627,7 @@ function mmrpg_website_community_category_threads_count($this_category_info, $fi
     // Generate the query for collecting discussion threads for a given category
     $this_threads_query = "SELECT
 
-        COUNT(*) AS thread_count
+        COUNT(threads.thread_id) AS thread_count
 
         FROM mmrpg_threads AS threads
 
@@ -670,7 +670,7 @@ function mmrpg_website_community_category_threads_count($this_category_info, $fi
         LEFT JOIN (
             SELECT
             posts.thread_id,
-            count(*) AS post_count
+            count(posts.thread_id) AS post_count
             FROM mmrpg_posts AS posts
             GROUP BY posts.thread_id
             ) AS posts
@@ -680,7 +680,7 @@ function mmrpg_website_community_category_threads_count($this_category_info, $fi
             SELECT
             posts2.thread_id,
             posts2.post_mod,
-            count(*) AS new_post_count
+            count(posts2.thread_id) AS new_post_count
             FROM mmrpg_posts AS posts2
             WHERE posts2.post_mod > {$temp_last_login}
             GROUP BY posts2.thread_id
@@ -905,6 +905,85 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
     return $this_markup;
 
 }
+
+// Get a list of all community thread fields as an array or, optionally, imploded into a string
+function mmrpg_community_thread_index_fields($implode = false, $table = ''){
+
+    // Define the various table fields for user objects
+    $thread_fields = array(
+        'thread_id',
+        'category_id',
+        'user_id',
+        'user_ip',
+        'thread_name',
+        'thread_token',
+        'thread_body',
+        'thread_frame',
+        'thread_colour',
+        'thread_date',
+        'thread_mod_date',
+        'thread_mod_user',
+        'thread_published',
+        'thread_locked',
+        'thread_sticky',
+        'thread_views',
+        'thread_votes',
+        'thread_target'
+        );
+
+    // Add table name to each field string if requested
+    if (!empty($table)){
+        foreach ($thread_fields AS $key => $field){
+            $thread_fields[$key] = $table.'.'.$field;
+        }
+    }
+
+    // Implode the table fields into a string if requested
+    if ($implode){
+        $thread_fields = implode(', ', $thread_fields);
+    }
+
+    // Return the table fields, array or string
+    return $thread_fields;
+
+}
+
+// Get a list of all community post fields as an array or, optionally, imploded into a string
+function mmrpg_community_post_index_fields($implode = false, $table = ''){
+
+    // Define the various table fields for user objects
+    $post_fields = array(
+        'post_id',
+        'category_id',
+        'thread_id',
+        'user_id',
+        'user_ip',
+        'post_body',
+        'post_frame',
+        'post_date',
+        'post_mod',
+        'post_deleted',
+        'post_votes',
+        'post_target'
+        );
+
+    // Add table name to each field string if requested
+    if (!empty($table)){
+        foreach ($post_fields AS $key => $field){
+            $post_fields[$key] = $table.'.'.$field;
+        }
+    }
+
+    // Implode the table fields into a string if requested
+    if ($implode){
+        $post_fields = implode(', ', $post_fields);
+    }
+
+    // Return the table fields, array or string
+    return $post_fields;
+
+}
+
 
 // Define a function for deleting a directory
 function deleteDir($dirPath) {
