@@ -63,7 +63,8 @@ $this_thread_info = array();
 if (empty($this_current_id) && $this_current_token == 'new'){
 
     // Collect this specific thread from the database
-    $this_thread_query = "SELECT threads.*
+    $temp_thread_fields = mmrpg_community_thread_index_fields(true, 'threads');
+    $this_thread_query = "SELECT {$temp_thread_fields}
         FROM mmrpg_threads AS threads
         LIMIT 1";
         //WHERE threads.thread_id = '0'";

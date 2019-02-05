@@ -188,7 +188,9 @@ if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defi
         // Collect this userinfo from the database
         $this_userid = (int)($_SESSION['GAME']['USER']['userid']);
         if (empty($_SESSION['GAME']['USER']['userinfo'])){
-            $this_userinfo = $db->get_array("SELECT users.*, roles.* FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
+            $temp_user_fields = rpg_user::get_index_fields(true, 'users');
+            $temp_user_role_fields = rpg_user_role::get_index_fields(true, 'roles');
+            $this_userinfo = $db->get_array("SELECT {$temp_user_fields}, {$temp_user_role_fields} FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
             $_SESSION['GAME']['USER']['userinfo'] = $this_userinfo;
             $_SESSION['GAME']['USER']['userinfo']['user_password'] = '';
             $_SESSION['GAME']['USER']['userinfo']['user_password_encoded'] = '';
