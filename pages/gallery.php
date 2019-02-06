@@ -25,7 +25,7 @@ ob_start();
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Screenshot Gallery</h2>
 <div class="subbody">
 
-  <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_04" style="background-image: url(images/robots/fire-man/sprite_left_80x80.png);">Fire Man</div></div>
+  <?= mmrpg_website_text_float_robot_markup('fire-man', 'right', '04') ?>
   <p class="text">The <strong>Mega Man RPG Prototype</strong> has gone through many, many changes over the last few years and - luckily - I'm pretty good at taking screenshots! Each of these images is a window into the game's development and progress at that point in time, and together they provide a clearer picture of how far the prototype since it's early days of a single-button main menu and one hours-long eight-vs-eight battle. :P  Hover over any of the thumbnails below to see a brief description of its contents and date, or click it to view the screenshot at full resolution.  Please enjoy the images, and <a href="contact/">let me know</a> if you have any questions.</p>
 
 </div>

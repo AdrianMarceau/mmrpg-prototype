@@ -25,12 +25,12 @@ ob_start();
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Prototype Overview</h2>
 <div class="subbody">
 
-  <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/robots/guts-man/sprite_left_80x80.png);">Guts Man</div></div>
+  <?= mmrpg_website_text_float_robot_markup('air-man', 'right', '02') ?>
   <p class="text">
     The <strong>Mega Man RPG Prototype</strong> is an ongoing fan-game project with the goal of creating a progress-saving, no-download, no-install, cross-platform, browser-based Mega Man RPG (or what some would call a <a href="http://www.pbbg.org/" target="_blank" rel="related">PBBG</a>) that combines the addictive collection and battle mechanics of the Pokémon series with the beloved robots and special weapons of the classic Mega Man series. Fight your way through more than fifty different robot masters in a turn-based battle system reminiscent of both play-by-post forum games and early 8-bit role-playing games.
   </p>
 
-  <div class="float float_left"><div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/robots/air-man/sprite_right_80x80.png);">Air Man</div></div>
+  <?= mmrpg_website_text_float_robot_markup('guts-man', 'left', '02', 80) ?>
   <p class="text">This game is written with a combination of HTML, CSS, Javascript, <a href="http://jquery.com/" target="_blank">jQuery</a>, and PHP, and is completely DOM-based on the front-end (no &lt;canvas&gt; here, folks!).  The game uses a great deal of assets from official <a href="http://www.capcom.com/" target="_blank">Capcom</a> games and is derivative in every sense of the word, but still has a lot of new ideas and content to offer including a considerable amount of custom sprite work for robots, abilities, players, and fields as well as clever mechanics, addictive gameplay, and fun new twists on the classic Mega Man formula.</p>
 
 </div>
@@ -39,13 +39,13 @@ ob_start();
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Mechanics &amp; Development</h2>
 <div class="subbody">
 
-  <div class="float float_left"><div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/robots/crash-man/sprite_right_80x80.png);">Crash Man</div></div>
+  <?= mmrpg_website_text_float_robot_markup('crash-man', 'left', '01') ?>
   <p class="text">The rock-paper-scissors weakness cycle in the classic Mega Man series has striking similarities to the weakness/resistance cycle found in some RPGs and - specifically - Pokémon.  The <strong>Mega Man RPG Prototype</strong> exploits this similarity in fun and interesting ways, allowing the player to take control of multiple robots outside of using the usual blue hero and battle through a gauntlet of Robot Master opponents, each with their own set of weaknesses, resistances, affinities, immunities, and abilities!</p>
 
-  <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/robots/bomb-man/sprite_left_80x80.png);">Bomb Man</div></div>
+  <?= mmrpg_website_text_float_robot_markup('bomb-man', 'right', '02') ?>
   <p class="text">The <strong>Mega Man RPG Prototype</strong> allows visitors to play the game as often or as infrequently as they desire, with the ability to create a personal save file and come back at a later date to resume their game.  Save files can be loaded from any machine that has a capable, modern browser, and allows sharing of game progress across multiple desktop and mobile devices. Each robot has their own unique set of stats, strengths, weaknesses, and unlockable abilities, and with each robot's abilities being completely customizable the combinations are endless.</p>
 
-  <div class="float float_left"><div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/robots/flash-man/sprite_right_80x80.png);">Flash Man</div></div>
+  <?= mmrpg_website_text_float_robot_markup('flash-man', 'left', '04') ?>
   <p class="text">Though the game is fully playable in its current state, it is always in development and as such things are constantly changing.  I apologize for bugs or confusion you may experience during this process, but we hope that you enjoy what we&#39;ve created so far.   Also, it never hurts to send us your feedback!  Thank you so much for visiting this website and for playing our game - we look forward to seeing everyone on the <a href="leaderboard/">Leaderboard</a>!</p>
 
 </div>
@@ -54,7 +54,7 @@ ob_start();
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">External Links</h2>
 <div class="subbody">
 
-  <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_05" style="background-image: url(images/robots/cut-man/sprite_left_80x80.png);">Cut Man</div></div>
+  <?= mmrpg_website_text_float_robot_markup('cut-man', 'right', '09') ?>
   <div class="text">
     <p>
       <a href="https://www.facebook.com/megamanrpgprototype" target="_blank"><strong>Official Facebook Page</strong></a><br />
@@ -98,7 +98,7 @@ ob_start();
 </div>
 
 <div class="subbody" style="margin-top: 20px;">
-  <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/robots/robot/sprite_left_80x80.png);">Robot</div></div>
+  <?= mmrpg_website_text_float_robot_markup('robot', 'right', '02') ?>
   <p class="text">
   (!) If you would like to contribute to this game with story ideas, <del>sprites</del>, stat balancing, bug testing, or anything else please <a href="contact/">contact me</a> or post in <a href="community/">our community</a> and we can discuss the details. The robots, mechas, and fields for MM1, MM2, and MM4 are complete, robots from MM3, MM4, and several from other games are complete (but not their stages) and new stuff is being worked on all the time so our exact requirements are always changing.  Whatever you end up working on, your work will be credited appropriately and all help is appreciated. :)
   </p>

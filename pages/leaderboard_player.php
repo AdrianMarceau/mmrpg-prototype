@@ -13,19 +13,19 @@ $temp_background_path = !empty($this_playerinfo['user_background_path']) ? $this
 $temp_is_contributor = in_array($this_playerinfo['role_token'], array('developer', 'administrator', 'moderator', 'contributor')) ? true : false;
 if ($temp_is_contributor){
     $temp_item_class = 'sprite sprite_80x80 sprite_80x80_00';
-    $temp_item_path = 'images/items/'.(!empty($this_playerinfo['role_icon']) ? $this_playerinfo['role_icon'] : 'energy-pellet' ).'/icon_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
+    $temp_item_path = 'images/items/'.(!empty($this_playerinfo['role_icon']) ? $this_playerinfo['role_icon'] : 'energy-pellet' ).'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
     $temp_item_title = !empty($this_playerinfo['role_name']) ? $this_playerinfo['role_name'] : 'Contributor';
 }
 $temp_last_login = !empty($this_playerinfo['user_date_accessed']) ? $this_playerinfo['user_date_accessed'] : $this_playerinfo['user_date_created'];
 $temp_last_login_diff = time() - $temp_last_login;
 $temp_display_created = !empty($this_playerinfo['user_date_created']) ? $this_playerinfo['user_date_created'] : time();
-list($temp_avatar_kind, $temp_avatar_token, $temp_avatar_size) = explode('/', $temp_avatar_path);
+list($temp_avatar_kind, $temp_avatar_token, $temp_avatar_base_size) = explode('/', $temp_avatar_path);
 list($temp_background_kind, $temp_background_token) = explode('/', $temp_background_path);
 $temp_avatar_frame = str_pad(mt_rand(0, 2), 2, '0', STR_PAD_LEFT);
-$temp_avatar_size = $temp_avatar_size * 2;
+$temp_avatar_size = $temp_avatar_base_size * 2;
 $temp_avatar_class = 'avatar avatar_80x80 float float_right ';
 $temp_sprite_class = 'sprite sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.' sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.'_'.$temp_avatar_frame;
-$temp_sprite_path = 'images/'.$temp_avatar_kind.'/'.$temp_avatar_token.'/sprite_left_'.$temp_avatar_size.'x'.$temp_avatar_size.'.png?'.MMRPG_CONFIG_CACHE_DATE;
+$temp_sprite_path = 'images/'.$temp_avatar_kind.'/'.$temp_avatar_token.'/sprite_left_'.$temp_avatar_base_size.'x'.$temp_avatar_base_size.'.png?'.MMRPG_CONFIG_CACHE_DATE;
 $temp_background_path = 'images/'.$temp_background_kind.'/'.$temp_background_token.'/battle-field_avatar.png?'.MMRPG_CONFIG_CACHE_DATE;
 if ($this_playerinfo['user_gender'] == 'male'){ $temp_gender_pronoun = 'his'; }
 elseif ($this_playerinfo['user_gender'] == 'female'){ $temp_gender_pronoun = 'her'; }
@@ -288,8 +288,8 @@ ob_start();
             </div>
         </div>
         <div class="<?= $temp_avatar_class ?> avatar_userimage" style="margin-top: 0;"  title="<?= isset($temp_item_title) ? $temp_item_title : 'Member' ?>" data-tooltip-type="type player_type_<?= !empty($this_playerinfo['user_colour_token']) ? $this_playerinfo['user_colour_token'] : 'none' ?>">
-            <? if($temp_is_contributor): ?><div class="<?= $temp_item_class ?>" style="background-image: url(<?= $temp_item_path ?>); position: absolute; top: -22px; right: -30px;" alt="<?= $temp_item_title ?>"><?= $temp_item_title ?></div><? endif; ?>
-            <div class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>);"><?= $temp_display_name ?></div>
+            <? if($temp_is_contributor): ?><div class="<?= $temp_item_class ?>" style="background-image: url(<?= $temp_item_path ?>); background-size: auto 80px; position: absolute; top: -22px; right: -30px;" alt="<?= $temp_item_title ?>"><?= $temp_item_title ?></div><? endif; ?>
+            <div class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>); background-size: auto <?= $temp_avatar_size ?>px;"><?= $temp_display_name ?></div>
         </div>
         <div class="bodytext">
             <p class="text" style="color: rgb(157, 220, 255);">

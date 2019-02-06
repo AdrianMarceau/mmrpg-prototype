@@ -33,7 +33,7 @@ $this_markup_header = 'Mega Man RPG Prototype '.$this_category_info['category_na
 if ($this_category_info['category_id'] != 0){
     ?>
     <div class="subbody">
-    <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_0<?= mt_rand(0, 2) ?>" style="background-image: url(images/robots/<?= MMRPG_SETTINGS_CURRENT_FIELDMECHA ?>/sprite_left_80x80.png);">Met</div></div>
+    <?= mmrpg_website_text_float_robot_markup(MMRPG_SETTINGS_CURRENT_FIELDMECHA, 'right', '0'.mt_rand(0, 2)) ?>
     <p class="text"><?= $this_category_info['category_description'] ?></p>
     <div style="clear:both;">&nbsp;</div>
     <?

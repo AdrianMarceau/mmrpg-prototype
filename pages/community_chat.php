@@ -35,7 +35,7 @@ $user_chat_name = preg_replace('/([^-_a-z0-9]+)/i', '', $user_chat_name);
   <a class="link" style="display: inline;" href="<?= $_GET['this_current_url'] ?>"><?= $this_category_info['category_name'] ?></a>
 </h2>
 <div class="subbody">
-  <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_0<?= mt_rand(0, 2) ?>" style="background-image: url(images/robots/<?= MMRPG_SETTINGS_CURRENT_FIELDMECHA ?>/sprite_left_80x80.png);">Met</div></div>
+  <?= mmrpg_website_text_float_robot_markup(MMRPG_SETTINGS_CURRENT_FIELDMECHA, 'right', '0'.mt_rand(0, 2)) ?>
   <p class="text"><?= $this_category_info['category_description'] ?></p>
   <p class="text" style="margin-bottom: 6px;">(!) You will need a Discord account to use the chat, <a href="https://discordapp.com/register?redirect_to=%2Fchannels%342807345782325249%342807977906143237" target="_blank">please create one</a> if you do not have one already</p>
   <p class="text" style="margin-bottom: 6px;">(!) Please see <a href="community/general/1107/official-chat-help-and-guidelines/">this thread</a> for a more thorough overview of the rules for the chat room<br />
