@@ -6,7 +6,6 @@
 
 // Loop through the different categories and collect their threads one by one
 $this_category_key = 0;
-$total_threads_count = 0;
 foreach ($this_categories_index AS $this_category_id => $this_category_info){
 
     // If this is the personal message center, do not display on index
@@ -14,9 +13,6 @@ foreach ($this_categories_index AS $this_category_id => $this_category_info){
 
     // Collect a list of recent threads for this category
     $this_threads_array = mmrpg_website_community_category_threads($this_category_info, true, false, MMRPG_SETTINGS_THREADS_RECENT);
-    $this_threads_count = mmrpg_website_community_category_threads_count($this_category_info, true, false);
-    $this_threads_count_more = $this_threads_count - MMRPG_SETTINGS_THREADS_RECENT;
-    $total_threads_count += $this_threads_count;
 
     // If this is the news category, ensure the threads are arranged by date only
     if ($this_category_info['category_token'] == 'news'){
@@ -30,14 +26,7 @@ foreach ($this_categories_index AS $this_category_id => $this_category_info){
 
     // Define the extra links array for the header
     $temp_header_links = array();
-    // If there are more threads in this category to display, show the more link
-    if ($this_threads_count_more > 0){
-        $temp_header_links[] = array(
-            'href' => 'community/'.$this_category_info['category_token'].'/',
-            'title' => 'View '.($this_threads_count_more == '1' ? '1 More '.($this_category_info['category_id'] != 0 ? 'Discussion' : 'Message') : $this_threads_count_more.' More '.($this_category_info['category_id'] != 0 ? 'Discussions' : 'Messages')),
-            'class' => 'field_type field_type_none'
-            );
-    }
+
     // If this user has the necessary permissions, show the new thread link
     if ($this_userid != MMRPG_SETTINGS_GUEST_ID
         && $community_battle_points >= 10000
@@ -45,19 +34,28 @@ foreach ($this_categories_index AS $this_category_id => $this_category_info){
         && !empty($this_userinfo['user_flag_postpublic'])){
         $temp_header_links[] = array(
             'href' => 'community/'.$this_category_info['category_token'].'/0/new/',
-            'title' => 'Create New '.($this_category_info['category_id'] != 0 ? 'Discussion' : 'Message'),
+            'title' => 'Create New',
             'class' => 'field_type field_type_none'
             );
     }
+
+    // If there are more threads in this category to display, show the more link
+    $temp_header_links[] = array(
+        'href' => 'community/'.$this_category_info['category_token'].'/',
+        'title' => 'View All',
+        'class' => 'field_type field_type_none'
+        );
+
     // If there are new threads in this category, show the new/recent link
     $this_threads_count_new = !empty($_SESSION['COMMUNITY']['threads_new_categories'][$this_category_info['category_id']]) ? $_SESSION['COMMUNITY']['threads_new_categories'][$this_category_info['category_id']] : 0;
     if ($this_threads_count_new > 0){
         $temp_header_links[] = array(
             'href' => 'community/'.$this_category_info['category_token'].'/new/',
-            'title' => 'View '.($this_threads_count_new == '1' ? '1 Updated Thread' : $this_threads_count_new.' Updated Threads'),
+            'title' => 'View Updated ('.$this_threads_count_new.')',
             'class' => 'field_type field_type_electric'
             );
     }
+
     // Reverse them for display purposes
     $temp_header_links = array_reverse($temp_header_links);
     // Loop through and generate the appropriate markup to display
@@ -70,7 +68,6 @@ foreach ($this_categories_index AS $this_category_id => $this_category_info){
     ?>
     <h2 class="subheader thread_name field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="clear: both; <?= $this_category_key > 0 ? 'margin-top: 6px; ' : '' ?>">
         <a class="link" href="<?= 'community/'.$this_category_info['category_token'].'/' ?>" style="display: inline;"><?= $this_category_info['category_name'] ?></a>
-        <span class="count">( <?= ($this_threads_count > MMRPG_SETTINGS_THREADS_RECENT  ? MMRPG_SETTINGS_THREADS_RECENT.' of ' : '').($this_threads_count == '1' ? '1 '.($this_category_info['category_id'] != 0 ? 'Discussion' : 'Message') : $this_threads_count.' '.($this_category_info['category_id'] != 0 ? 'Discussions' : 'Messages'))  ?> )</span>
         <?= !empty($temp_header_links) ? '<span class="br"></span>'.PHP_EOL.implode(PHP_EOL, $temp_header_links) : '' ?>
     </h2>
     <div class="subbody threads" style="overflow: hidden; margin-bottom: 25px;">
@@ -101,8 +98,5 @@ foreach ($this_categories_index AS $this_category_id => $this_category_info){
     <?
     $this_category_key++;
 }
-
-// Define the MARKUP count variable for this page
-//$this_markup_counter = '<span class="count count_header">( '.($total_threads_count == 1 ? '1 Discussion' : $total_threads_count.' Discussions').' )</span>';
 
 ?>
