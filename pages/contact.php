@@ -102,7 +102,7 @@ while ($this_formaction == 'contact'){
         $verified = false;
     } else {
         $formdata['contact_name'] = strip_tags($formdata['contact_name']);
-        $formdata['contact_name'] = preg_replace('/[^-_a-z0-9\s\.\']/i', '?', $formdata['contact_name']);        
+        $formdata['contact_name'] = preg_replace('/[^-_a-z0-9\s\.\']/i', '?', $formdata['contact_name']);
     }
     if (empty($formdata['contact_email'])){
         $this_formerrors[] = "Your email was not provided.";
@@ -172,7 +172,7 @@ ob_start();
 ?>
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Contact Methods</h2>
 <div class="subbody">
-    <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_05" style="background-image: url(images/robots/met/sprite_left_80x80.png);">Met</div></div>
+    <?= mmrpg_website_text_float_robot_markup('met', 'right', '05') ?>
     <p class="text">If you would like to get in contact with the webmaster and/or developers of the <strong>Mega Man RPG Prototype</strong> - you have one of <del>three</del> two options. You can email the webmaster directly at <a href="mailto:info@megamanpoweredup.net?subject=Mega%20Man%20RPG%20Prototype">info@megamanpoweredup.net</a> or you can post on the <a href="community/">community forums</a> (requires an account).  Messages sent to through email are replied to usually within a few days, but if you have a question about the game that needs a more immediate response you might have luck posting on the community instead.</p>
 </div>
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">Feedback Form</h2>

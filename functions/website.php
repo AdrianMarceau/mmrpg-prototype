@@ -4,6 +4,21 @@
  * WEBSITE FUNCTIONS
  */
 
+// Define a function for generating the float robot markup for the various website pages
+function mmrpg_website_text_float_robot_markup($robot_token, $float_side = 'right', $frame_key = '00', $robot_image_size = 40){
+    $zoom_size = $robot_image_size * 2;
+    $zoom_size_text = $zoom_size.'x'.$zoom_size;
+    $robot_direction = $float_side != 'left' ? 'left' : 'right';
+    $robot_image_path = 'images/robots/'.$robot_token.'/sprite_'.$robot_direction.'_'.$robot_image_size.'x'.$robot_image_size.'.png';
+    $robot_image_styles = 'background-image: url('.$robot_image_path.'); background-size: auto '.$zoom_size.'px; ';
+    if ($robot_image_size >= 80){ $robot_image_styles .= 'margin: -'.($robot_image_size + 10).'px auto 0 -'.($robot_image_size / 2).'px; '; }
+    else { $robot_image_styles .= 'margin: -10px auto 0 0; '; }
+    $robot_image_classes = 'sprite sprite_'.$zoom_size_text.' sprite_'.$zoom_size_text.'_'.$frame_key;
+    return '<div class="float float_'.$float_side.' float_80x80">'.
+            '<div class="'.$robot_image_classes.'" style="'.$robot_image_styles.'"></div>'.
+        '</div>';
+}
+
 // Define a function for parsing formatting code from a string
 function mmrpg_formatting_decode($string){
 

@@ -942,6 +942,18 @@ button {
     float: left;
     margin: 0 10px 3px 0;
 }
+#window .page .body .subbody .float_40x40 {
+    width: 40px;
+    height: 40px;
+}
+#window .page .body .subbody .float_80x80 {
+    width: 80px;
+    height: 80px;
+}
+#window .page .body .subbody .float_160x160 {
+    width: 160px;
+    height: 160px;
+}
 #window .page .body .subbody .sprite {
     display: block;
     position: static;

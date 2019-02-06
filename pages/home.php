@@ -44,15 +44,17 @@ ob_start();
     </p>
 </div>
 <div class="subbody" style="position: relative; ">
+    <? /*
     <div id="youtube_playlist" style="">
         <iframe width="356" height="200" src="//www.youtube.com/embed/videoseries?list=PL2yhjPks7HSo_vJNq02ls_DwhmrA2pmU5&index=<?= mt_rand(1, 9) ?>" frameborder="0" allowfullscreen></iframe>
     </div>
+    */ ?>
+    <?= mmrpg_website_text_float_robot_markup('mega-man', 'left', '04') ?>
     <p class="text">
-        <span class="float float_right"><span class="sprite sprite_80x80 sprite_80x80_04" style="background-image: url(images/robots/mega-man/sprite_left_80x80.png);">Mega Man</span></span>
         The <strong>Mega Man RPG Prototype</strong> is an ongoing fangame project with the goal of creating a progress-saving, no-download, no-install, cross-platform, browser-based Mega Man RPG (or what some would call a <a href="http://www.pbbg.org/" target="_blank" rel="related">PBBG</a>) that combines the addictive collection and battle mechanics of the Pokémon series with the beloved robots and special weapons of the classic Mega Man series. Fight your way through more than fifty different robot masters in a turn-based battle system reminiscent of both play-by-post forum games and early 8-bit role-playing games.
     </p>
+    <?= mmrpg_website_text_float_robot_markup('bass', 'right', '04') ?>
     <p class="text">
-        <span class="float float_left"><span class="sprite sprite_80x80 sprite_80x80_04" style="background-image: url(images/robots/proto-man/sprite_right_80x80.png);">Proto Man</span></span>
         This project is a labour of love and a massive work-in-progress, but you can always <a href="prototype/">play the game online</a> by clicking the link in the menu above.  Create a new account to gain access to the full game with save functionality, 40 unique battle fields, over 1000 dynamically generated missions, 3 playable characters, 50+ unlockable robots, 100+ abilities, and tons of interesting features and mechanics. Additional information about the development of the game can be found on the <a href="about/">About</a>, <a href="credits/">Credits</a>, and <a href="database/">Database</a> pages, and discussions about the game can be found on the <a href="community/">Community</a> pages.  If you have any feedback or questions about the project please <a href="contact/">contact me</a> for more information.
     </p>
     <?/*

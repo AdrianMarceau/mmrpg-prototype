@@ -70,10 +70,10 @@ ob_start();
 
 <div class="subbody">
 
-    <div class="float float_right"><div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/robots/bomb-man/sprite_left_80x80.png);">Adrian Marceau</div></div>
+    <?= mmrpg_website_text_float_robot_markup('star-man', 'right', '04', 80) ?>
     <p class="text">The <strong>Mega Man RPG Prototype</strong> was created and is continually developed and maintained by Adrian Marceau / Ageman20XX, though the project would not have been possible without a great deal of inspiration and contributions from multiple outside sources.  Being a Mega Man fan-game, this project obviously owes most of it's thanks to <a href="http://www.capcom.com/" target="_blank" rel="nofollow">Capcom</a> and of course, Keiji Inafune.  Most of the assets used throughout this website and game were created by Capcom for use in the original games, so their role in this project is far from minor and greatly influential. In addition, their generally positive attitude about fan-games and other types of fan-tribute have been very admirable over the years, and both this game and the Mega Man community owe them much gratitude.</p>
 
-    <div class="float float_left"><div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/robots/metal-man/sprite_right_80x80.png);">Metal Man</div></div>
+    <?= mmrpg_website_text_float_robot_markup('shadow-man', 'left', '05') ?>
     <p class="text">Capcom are not the only ones to thank, however, as many others have contributed to this project over the years.  Though most of the actual design and development has been done by Adrian thus far, hours of play-testing, tons of feature ideas, mechanics discussions, and even additional sprite editing has been provided by talented and generous outside sources over the years.  New members are being added to the team all the time, and even the smallest amount of effort is appreciated.  If you would like to help with sprite editing, bug testing, feature ideas, or anything please <a href="contact/">contact me</a> and we'll discuss the details.  You'll be credited appropriately on this page, with a link back to your home page and a custom description if you want them.</p>
 
 </div>

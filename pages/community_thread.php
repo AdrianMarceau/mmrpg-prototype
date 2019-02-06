@@ -202,18 +202,18 @@ $temp_avatar_frame = !empty($this_thread_info['thread_frame']) ? $this_thread_in
 $temp_avatar_path = !empty($this_thread_info['user_image_path']) ? $this_thread_info['user_image_path'] : 'robots/mega-man/40';
 $temp_background_path = !empty($this_thread_info['user_background_path']) ? $this_thread_info['user_background_path'] : 'fields/intro-field';
 if (empty($this_thread_info['user_id'])){ $temp_avatar_path = 'robots/robot/40'; $temp_background_path = 'fields/intro-field'; }
-list($temp_avatar_kind, $temp_avatar_token, $temp_avatar_size) = explode('/', $temp_avatar_path);
-$temp_avatar_size = $temp_avatar_size * 2;
+list($temp_avatar_kind, $temp_avatar_token, $temp_avatar_base_size) = explode('/', $temp_avatar_path);
+$temp_avatar_size = $temp_avatar_base_size * 2;
 list($temp_background_kind, $temp_background_token) = explode('/', $temp_background_path);
 $temp_avatar_class = 'avatar avatar_80x80 float float_'.($is_personal_message_creator ? 'left' : 'right').' ';
 $temp_avatar_colour = !empty($this_thread_info['user_colour_token']) ? $this_thread_info['user_colour_token'] : 'none';
 $temp_sprite_class = 'sprite sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.' sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.'_'.$temp_avatar_frame;
-$temp_sprite_path = 'images/'.$temp_avatar_kind.'/'.$temp_avatar_token.'/sprite_'.($is_personal_message_creator ? 'right' : 'left').'_'.$temp_avatar_size.'x'.$temp_avatar_size.'.png?'.MMRPG_CONFIG_CACHE_DATE;
+$temp_sprite_path = 'images/'.$temp_avatar_kind.'/'.$temp_avatar_token.'/sprite_'.($is_personal_message_creator ? 'right' : 'left').'_'.$temp_avatar_base_size.'x'.$temp_avatar_base_size.'.png?'.MMRPG_CONFIG_CACHE_DATE;
 $temp_background_path = 'images/'.$temp_background_kind.'/'.$temp_background_token.'/battle-field_avatar.png?'.MMRPG_CONFIG_CACHE_DATE;
 $temp_is_contributor = in_array($this_thread_info['role_token'], array('developer', 'administrator', 'contributor', 'moderator')) ? true : false;
 if ($temp_is_contributor){
     $temp_item_class = 'sprite sprite_80x80 sprite_80x80_00';
-    $temp_item_path = 'images/items/'.(!empty($this_thread_info['role_icon']) ? $this_thread_info['role_icon'] : 'energy-pellet' ).'/icon_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
+    $temp_item_path = 'images/items/'.(!empty($this_thread_info['role_icon']) ? $this_thread_info['role_icon'] : 'energy-pellet' ).'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
     $temp_item_title = !empty($this_thread_info['role_name']) ? $this_thread_info['role_name'] : 'Contributor';
 }
 
@@ -257,8 +257,8 @@ else { $this_thread_info['post_count'] = false; }
         </div>
         <div class="<?= $temp_avatar_class ?> avatar_userimage">
             <?/*<div class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/robots/mega-man/sprite_left_40x40.png);"><?= $temp_thread_author ?></div>*/?>
-            <? if($temp_is_contributor): ?><div class="<?= $temp_item_class ?>" style="background-image: url(<?= $temp_item_path ?>); position: absolute; top: -22px; left: -30px;" title="<?= $temp_item_title ?>"><?= $temp_item_title ?></div><? endif; ?>
-            <div class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>);"><?= $temp_thread_author ?></div>
+            <? if($temp_is_contributor): ?><div class="<?= $temp_item_class ?>" style="background-image: url(<?= $temp_item_path ?>); background-size: auto 80px; position: absolute; top: -22px; left: -30px;" title="<?= $temp_item_title ?>"><?= $temp_item_title ?></div><? endif; ?>
+            <div class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>); background-size: auto <?= $temp_avatar_size ?>px;"><?= $temp_thread_author ?></div>
             <div class="userblock">
                 <?= !$temp_thread_guest ? '<a href="leaderboard/'.$this_thread_info['user_name_clean'].'/">' : '' ?>
                 <strong data-tooltip-type="player_type_<?= $temp_avatar_colour ?>" title="<?= $temp_thread_author.($temp_is_contributor ? ' | '.$temp_item_title : ' | Player').($temp_is_online ? ' | Online' : '') ?>" class="name thread_username"><?= $temp_thread_author ?></strong>
@@ -282,8 +282,8 @@ else { $this_thread_info['post_count'] = false; }
             </div>
         </div>
         <div class="<?= $temp_avatar_class ?> avatar_userimage">
-            <? if($temp_is_contributor): ?><div class="<?= $temp_item_class ?>" style="background-image: url(<?= $temp_item_path ?>); position: absolute; top: -22px; right: -30px;" title="<?= $temp_item_title ?>"><?= $temp_item_title ?></div><? endif; ?>
-            <div class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>);"><?= $temp_thread_author ?></div>
+            <? if($temp_is_contributor): ?><div class="<?= $temp_item_class ?>" style="background-image: url(<?= $temp_item_path ?>); background-size: auto 80px; position: absolute; top: -22px; right: -30px;" title="<?= $temp_item_title ?>"><?= $temp_item_title ?></div><? endif; ?>
+            <div class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>); background-size: auto <?= $temp_avatar_size ?>px;"><?= $temp_thread_author ?></div>
             <div class="userblock">
                 <?= !$temp_thread_guest ? '<a href="leaderboard/'.$this_thread_info['user_name_clean'].'/">' : '' ?>
                 <strong data-tooltip-type="player_type_<?= $temp_avatar_colour ?>" title="<?= $temp_thread_author.($temp_is_contributor ? ' | '.$temp_item_title : ' | Player').($temp_is_online ? ' | Online' : '') ?>" class="name thread_username"><?= $temp_thread_author ?></strong>
@@ -307,7 +307,7 @@ else { $this_thread_info['post_count'] = false; }
             </div>
         </div>
         <div class="<?= $temp_avatar_class ?> avatar_userimage">
-            <div class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>);"><?= $temp_thread_author ?></div>
+            <div class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>); background-size: auto <?= $temp_avatar_size ?>px;"><?= $temp_thread_author ?></div>
             <div class="userblock">
                 <?= !$temp_thread_guest ? '<a href="leaderboard/'.$this_thread_info['user_name_clean'].'/">' : '' ?>
                 <strong data-tooltip-type="player_type_<?= $temp_avatar_colour ?>" title="<?= $temp_thread_author.($temp_is_contributor ? ' | '.$temp_item_title : ' | Player').($temp_is_online ? ' | Online' : '') ?>" class="name thread_username"><?= $temp_thread_author ?></strong>
