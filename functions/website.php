@@ -420,19 +420,24 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
     // Define the extra WHERE string based on arguments
     $temp_where_filter = array();
 
+    // Only return threads in this category
+    $temp_where_filter[] = "threads.category_id = {$this_category_info['category_id']}";
+
+    // Only return published threads
+    $temp_where_filter[] = "threads.thread_published = 1";
+
     // Append to where query if locked threads should be excluded
-    if ($filter_locked == true){
-        $temp_where_filter[] = "threads.thread_locked = 0";
-    }
+    if ($filter_locked == true){ $temp_where_filter[] = "threads.thread_locked = 0"; }
+
+    // Append to where query if a list of filter IDs has been provided
+    if (!empty($filter_ids)){ $temp_where_filter[] = "threads.thread_id NOT IN(".implode(',', $filter_ids).")"; }
+
     // Append to where query if filtering by recent threads only
     if ($filter_recent == true){
         $temp_where_filter[] = "threads.thread_mod_date > {$temp_last_login}";
         $temp_where_filter[] = "threads.thread_mod_user <> {$this_userinfo['user_id']}";
     }
-    // Append to where query if a list of filter IDs has been provided
-    if (!empty($filter_ids)){
-        $temp_where_filter[] = "threads.thread_id NOT IN(".implode(',', $filter_ids).")";
-    }
+
     // Append a default to the where query if empty
     if (empty($temp_where_filter)){
         $temp_where_filter[] = "1 = 1";
@@ -562,13 +567,11 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
             ON threads.thread_id = posts_new.thread_id
 
         WHERE
-            threads.category_id = {$this_category_info['category_id']} AND
-            threads.thread_published = 1 AND
+            {$temp_where_filter} AND
             (threads.thread_target = 0 OR
                 threads.thread_target = {$this_userinfo['user_id']} OR
                 threads.user_id = {$this_userinfo['user_id']}
-                ) AND
-            {$temp_where_filter}
+                )
 
         ORDER BY
             threads.thread_locked ASC,
