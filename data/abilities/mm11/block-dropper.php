@@ -17,6 +17,7 @@ $ability = array(
 
         // Count the number of active robots on the target's side of the  field
         $target_robot_ids = array();
+        $target_robots_active = $target_player->values['robots_active'];
         $target_robots_active_count = $target_player->counters['robots_active'];
         $get_next_target_robot = function($robot_id = 0) use($this_battle, $target_player, &$target_robot_ids){
             $robot_info = array();
@@ -42,7 +43,7 @@ $ability = array(
             'ability_token' => $this_ability->ability_token,
             'ability_frame' => 2,
             'ability_frame_animate' => array(2),
-            'ability_frame_offset' => array('x' => 40, 'y' => 75, 'z' => 20)
+            'ability_frame_offset' => array('x' => 40, 'y' => 95, 'z' => 20)
             );
 
         // The first attachment always exists (though it's part of the attack itself)
@@ -53,7 +54,7 @@ $ability = array(
         if ($target_robots_active_count >= 2){
             $this_attachment_info2 = $this_attachment_info;
             $this_attachment_info2['ability_id'] .= '02';
-            $this_attachment_info2['ability_frame_offset'] = array('x' => 120, 'y' => 35, 'z' => 30);
+            $this_attachment_info2['ability_frame_offset'] = array('x' => 120, 'y' => 55, 'z' => 30);
             $this_attachment_info2['ability_frame'] = 4;
             $this_attachment_info2['ability_frame_animate'] = array(4);
             $this_robot->set_attachment($this_attachment_token.'_2', $this_attachment_info2);
@@ -64,7 +65,7 @@ $ability = array(
         if ($target_robots_active_count >= 3){
             $this_attachment_info3 = $this_attachment_info;
             $this_attachment_info3['ability_id'] .= '03';
-            $this_attachment_info3['ability_frame_offset'] = array('x' => 140, 'y' => 120, 'z' => 20);
+            $this_attachment_info3['ability_frame_offset'] = array('x' => 140, 'y' => 140, 'z' => 20);
             $this_attachment_info2['ability_frame'] = 3;
             $this_attachment_info3['ability_frame_animate'] = array(3);
             $this_robot->set_attachment($this_attachment_token.'_3', $this_attachment_info3);
@@ -75,7 +76,7 @@ $ability = array(
         if ($target_robots_active_count >= 4){
             $this_attachment_info4 = $this_attachment_info;
             $this_attachment_info4['ability_id'] .= '04';
-            $this_attachment_info4['ability_frame_offset'] = array('x' => 240, 'y' => 80, 'z' => 30);
+            $this_attachment_info4['ability_frame_offset'] = array('x' => 240, 'y' => 100, 'z' => 30);
             $this_attachment_info4['ability_frame'] = 5;
             $this_attachment_info4['ability_frame_animate'] = array(5);
             $this_robot->set_attachment($this_attachment_token.'_4', $this_attachment_info4);
@@ -94,33 +95,6 @@ $ability = array(
                 )
             ));
         $this_robot->trigger_target($target_robot_1, $this_ability);
-
-
-        // Set the first attachment for this robot temporarily
-        $this_attachment_info1['ability_frame_offset']['y'] += 100;
-        $this_robot->set_attachment($this_attachment_token.'_1', $this_attachment_info1);
-
-        // Move the second attachment upwards and re-set so it's rising
-        if ($this_robot->has_attachment($this_attachment_token.'_2')){
-            $this_attachment_info2['ability_frame_offset']['y'] += 120;
-            $this_robot->set_attachment($this_attachment_token.'_2', $this_attachment_info2);
-        }
-
-        // Move the third attachment upwards and re-set so it's rising
-        if ($this_robot->has_attachment($this_attachment_token.'_3')){
-            $this_attachment_info3['ability_frame_offset']['y'] += 100;
-            $this_robot->set_attachment($this_attachment_token.'_3', $this_attachment_info3);
-        }
-
-        // Move the fourth attachment upwards and re-set so it's rising
-        if ($this_robot->has_attachment($this_attachment_token.'_4')){
-            $this_attachment_info4['ability_frame_offset']['y'] += 120;
-            $this_robot->set_attachment($this_attachment_token.'_4', $this_attachment_info4);
-        }
-
-        // Create an empty event while the attachments rise higher
-        $this_robot->set_frame('summon');
-        $this_battle->events_create(false, false, '', '');
 
         // Remove the first attachment as it is no-longer in from view
         if ($this_robot->has_attachment($this_attachment_token.'_1')){ $this_robot->unset_attachment($this_attachment_token.'_1'); }
@@ -154,7 +128,7 @@ $ability = array(
             'failure' => array(6, -105, 0, -10, 'The '.$this_ability->print_name().' just missed the target&hellip;')
             ));
         $energy_damage_amount = $this_ability->ability_damage;
-        $target_robot_1->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
+        $target_robot_1->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
 
         // If a second attachment has been created, we can fire it off at a different target
         if (isset($this_attachment_info2)){
@@ -185,7 +159,7 @@ $ability = array(
                 'success' => array(7, -45, 0, 10, $success_text),
                 'failure' => array(7, -105, 0, -10, $failure_text)
                 ));
-            $target_robot_2->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
+            $target_robot_2->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
 
         }
 
@@ -216,7 +190,7 @@ $ability = array(
                 'success' => array(8, -45, 0, 10, $success_text),
                 'failure' => array(8, -105, 0, -10, $failure_text)
                 ));
-            $target_robot_3->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
+            $target_robot_3->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
 
         }
 
@@ -247,12 +221,22 @@ $ability = array(
                 'success' => array(9, -45, 0, 10, $success_text),
                 'failure' => array(9, -105, 0, -10, $failure_text)
                 ));
-            $target_robot_4->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
+            $target_robot_4->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
 
         }
 
         // Return the user to their base frame now that we're done
         $this_robot->set_frame('base');
+
+        // Loop through all robots on the target side and disable any that need it
+        $target_robots_active = $target_player->get_robots();
+        foreach ($target_robots_active AS $key => $info){
+            if ($info['robot_id'] == $target_robot->robot_id){ $temp_target_robot = $target_robot; }
+            else { $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $info); }
+            if ($temp_target_robot->robot_energy <= 0 || $temp_target_robot->robot_status == 'disabled'){
+                $temp_target_robot->trigger_disabled($this_robot);
+            }
+        }
 
         // Return true on success
         return true;

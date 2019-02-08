@@ -9,6 +9,9 @@ class rpg_target {
     public static function trigger_ability_target($this_robot, $target_robot, $this_ability, $trigger_options = array()){
         global $db;
 
+        // Return false if either are missing
+        if (empty($this_robot) || empty($target_robot)){ return false; }
+
         // Define the event console options
         $event_options = array();
         $event_options['console_container_height'] = 1;
