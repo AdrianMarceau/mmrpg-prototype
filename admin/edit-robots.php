@@ -981,6 +981,7 @@
                                         echo('<option value=""'.(empty($robot_data['robot_field']) ? 'selected="selected"' : '').'>- none -</option>');
                                         foreach ($mmrpg_fields_index AS $field_token => $field_data){
                                             $label = $field_data['field_name'];
+                                            $label .= ' ('.(!empty($field_data['field_type']) ? ucfirst($field_data['field_type']) : 'Neutral').')';
                                             $selected = !empty($robot_data['robot_field']) && $robot_data['robot_field'] == $field_token ? 'selected="selected"' : '';
                                             echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
                                         }
@@ -995,6 +996,7 @@
                                         echo('<option value=""'.(empty($robot_data['robot_field2']) ? 'selected="selected"' : '').'>- none -</option>');
                                         foreach ($mmrpg_fields_index AS $field_token => $field_data){
                                             $label = $field_data['field_name'];
+                                            $label .= ' ('.(!empty($field_data['field_type']) ? ucfirst($field_data['field_type']) : 'Neutral').')';
                                             $selected = !empty($robot_data['robot_field2']) && $robot_data['robot_field2'] == $field_token ? 'selected="selected"' : '';
                                             echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
                                         }
