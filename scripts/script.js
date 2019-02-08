@@ -1414,9 +1414,10 @@ function mmrpg_events(){
         // Start animating the canvas randomly
         mmrpg_canvas_animate();
         } else if (mmrpgEvents.length >= 1){
+            var autoClickTimer = false;
             if (gameSettings.eventAutoPlay && thisEvent.event_flags.autoplay != false){
                 requestAnimationFrame(function(){
-                    var autoClickTimer = setTimeout(function(){
+                    autoClickTimer = setTimeout(function(){
                         mmrpg_events();
                         }, parseInt(gameSettings.eventTimeout));
                     });
@@ -1425,7 +1426,10 @@ function mmrpg_events(){
                 $('a[data-action="continue"]').removeClass('button_disabled');
                 }
             $('a[data-action="continue"]').click(function(){
-                clearTimeout(autoClickTimer);
+                if (autoClickTimer !== false){
+                    clearTimeout(autoClickTimer);
+                    autoClickTimer = false;
+                    }
                 });
         }
 
