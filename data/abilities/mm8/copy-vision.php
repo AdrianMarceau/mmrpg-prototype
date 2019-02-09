@@ -42,6 +42,7 @@ $ability = array(
         // Return true on success
         return true;
 
-    }
+    },
+    'ability_flag_hidden' => true
     );
 ?>
