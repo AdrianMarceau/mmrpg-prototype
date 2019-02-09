@@ -550,21 +550,15 @@ class rpg_player extends rpg_object {
     // -- ROBOT FUNCTIONS -- //
 
     /**
-     * Get the list of robots owned by this player object
+     * Get the currently active robot owned by this player object
      * @return array
      */
-    public function get_robots($sort = true){
-        $player_robots = $this->get_info('player_robots');
-        if ($sort){
-            usort($player_robots, function($a, $b){
-                if ($a->robot_position == 'active'){ return -1; }
-                elseif ($b->robot_position == 'active'){ return 1; }
-                elseif ($a->robot_key < $b->robot_key){ return -1; }
-                elseif ($a->robot_key > $b->robot_key){ return 1; }
-                else { return 0; }
-                });
-        }
-        return $player_robots;
+    public function get_active_robot(){
+        $filters = array('player_id' => $this->player_id, 'robot_position' => 'active');
+        $robots = rpg_game::find_robots($filters);
+        if (!empty($robots)){ $robot = array_shift($robots); }
+        else { $robot = false; }
+        return $robot;
     }
 
     /**
@@ -575,36 +569,23 @@ class rpg_player extends rpg_object {
         $this->set_info('player_robots', $robots);
     }
 
-    /*
-
     /**
-     * Get the base list of robots owned by this player object
-     * @return array
-     * /
-    public function get_base_robots(){
-        return $this->get_info('player_base_robots');
-    }
-
-    /**
-     * Set the list of robots owned by this player object
-     * @param array $robots
-     * /
-    public function set_base_robots($robots){
-        $this->set_info('player_base_robots', $robots);
-    }
-
-    */
-
-    /**
-     * Get the currently active robot owned by this player object
+     * Get the list of robots owned by this player object
      * @return array
      */
-    public function get_active_robot(){
-        $filters = array('player_id' => $this->player_id, 'robot_position' => 'active');
-        $robots = rpg_game::find_robots($filters);
-        if (!empty($robots)){ $robot = array_shift($robots); }
-        else { $robot = false; }
-        return $robot;
+    public function get_robots($sort = true){
+        $filters = array('player_id' => $this->player_id);
+        $player_robots = rpg_game::find_robots($filters);
+        if ($sort){
+            usort($player_robots, function($a, $b){
+                if ($a->robot_position == 'active'){ return -1; }
+                elseif ($b->robot_position == 'active'){ return 1; }
+                elseif ($a->robot_key < $b->robot_key){ return -1; }
+                elseif ($a->robot_key > $b->robot_key){ return 1; }
+                else { return 0; }
+                });
+        }
+        return $player_robots;
     }
 
     /**
@@ -632,6 +613,7 @@ class rpg_player extends rpg_object {
      */
     public function get_robots_disabled($sort = true){
         $filters = array('player_id' => $this->player_id, 'robot_status' => 'disabled');
+        $player_robots = rpg_game::find_robots($filters);
         if ($sort){
             usort($player_robots, function($a, $b){
                 if ($a->robot_position == 'active'){ return -1; }
