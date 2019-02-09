@@ -89,6 +89,9 @@ $ability = array(
         $backup_target_robots_active = $target_player->get_robots_active();
         foreach ($backup_target_robots_active AS $key => $robot){
 
+            // If this is somehow not a valid robot, continue
+            if ($robot->robot_token == 'robot'){ continue; }
+
             // Shift the summon's frame back and forth
             $this_robot->set_frame($num_hits_counter % 2 === 0 ? 'defend' : 'taunt');
 
