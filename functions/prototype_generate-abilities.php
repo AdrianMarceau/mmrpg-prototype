@@ -13,35 +13,37 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
     if (empty($mmrpg_prototype_core_abilities)){
         $mmrpg_prototype_core_abilities = array(
             array(
-                'rolling-cutter', 'super-throw', 'ice-breath', 'hyper-bomb', 'fire-storm', 'thunder-strike', 'time-arrow', 'oil-shooter',
-                'metal-blade', 'air-shooter', 'bubble-spray', 'quick-boomerang', 'crash-bomber', 'flash-stopper', 'atomic-fire', 'leaf-shield',
-                'needle-cannon', 'magnet-missile', 'gemini-laser', 'hard-knuckle', 'top-spin', 'search-snake', 'spark-shock', 'shadow-blade',
-                'bright-burst', 'rain-flush', 'drill-blitz', 'pharaoh-shot', 'ring-boomerang', 'dust-crusher', 'dive-torpedo', 'skull-barrier',
-                'cutter-shot', 'cutter-buster',
-                'freeze-shot', 'freeze-buster',
-                'crystal-shot', 'crystal-buster',
-                'flame-shot', 'flame-buster',
-                'electric-shot', 'electric-buster',
-                'space-shot', 'space-buster',
-                'laser-shot', 'laser-buster'
+                'rolling-cutter', 'super-throw', 'ice-breath', 'hyper-bomb', 'fire-storm', 'thunder-strike', 'time-arrow', 'oil-shooter', // MM1
+                'metal-blade', 'air-shooter', 'bubble-spray', 'quick-boomerang', 'crash-bomber', 'flash-stopper', 'atomic-fire', 'leaf-shield', // MM2
+                'needle-cannon', 'magnet-missile', 'gemini-laser', 'hard-knuckle', 'top-spin', 'search-snake', 'spark-shock', 'shadow-blade', // MM3
+                'bright-burst', 'rain-flush', 'drill-blitz', 'pharaoh-shot', 'ring-boomerang', 'dust-crusher', 'dive-torpedo', 'skull-barrier', // MM4
+                'water-wave', 'blizzard-attack', // MM5
+                'slash-claw', // MM7
+                'frost-wave', // MM8
+                // Elemental Shots
+                'cutter-shot', 'freeze-shot', 'crystal-shot',
+                'flame-shot', 'electric-shot', 'space-shot',
+                'laser-shot', 'shield-shot'
                 ),
             array(
-                'rising-cutter', 'super-arm', 'ice-slasher', 'danger-bomb', 'fire-chaser', 'thunder-beam', 'time-slow', 'oil-slider',
-                'bubble-lead',
-                'gyro-attack', 'star-crash',
-                'laser-trident', 'jewel-satellite',
-                'slash-claw',
-                'magic-card',
-                'bubble-bomb'
+                'rising-cutter', 'super-arm', 'ice-slasher', 'danger-bomb', 'fire-chaser', 'thunder-beam', 'time-slow', 'oil-slider', // MM1
+                'bubble-lead', // MM2
+                'gyro-attack', 'star-crash', 'gravity-hold', // MM5
+                'freeze-cracker', // MM7
+                'astro-crush', // MM8
+                'magic-card', // MM8b
+                'laser-trident', 'jewel-satellite', // MM9
+                'bubble-bomb', // MMV
+                // Elemental Busters
+                'cutter-buster', 'freeze-buster', 'crystal-buster',
+                'flame-buster', 'electric-buster', 'space-buster',
+                'laser-buster', 'shield-buster'
                 ),
             array(
-                'cutter-overdrive',
-                'freeze-overdrive',
-                'crystal-overdrive',
-                'flame-overdrive',
-                'electric-overdrive',
-                'space-overdrive',
-                'laser-overdrive'
+                // Elemental Overdrives
+                'cutter-overdrive', 'freeze-overdrive', 'crystal-overdrive',
+                'flame-overdrive', 'electric-overdrive', 'space-overdrive',
+                'laser-overdrive', 'shield-overdrive'
                 )
             );
     }
