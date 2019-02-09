@@ -20,7 +20,7 @@ $ability = array(
             $target_robot->print_name().' is prevented from switching!'
             );
         $this_destroy_text = ('The '.$this_ability->print_name().'\'s frozen foothold melted away...<br /> '.
-            'The active robot isn\'t prevented from switching anymore!'
+            'The active robot isn\'t prevented from switching any more!'
             );
         $this_refresh_text = ($this_robot->print_name().' refreshed the '.$this_ability->print_name().'\'s frozen foothold!<br /> '.
             'The active robot is still prevented from switching!'
