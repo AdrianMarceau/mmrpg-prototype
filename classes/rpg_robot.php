@@ -4806,7 +4806,7 @@ class rpg_robot extends rpg_object {
                             $temp_damage_words = rpg_functions::get_stat_damage_words($temp_damage_kind);
 
                             // Update the success message to reflect the current target
-                            $attachment_info['attachment_repeat']['success'] = array(9, -10, -10, -10, 'The '.$this_attachment->print_name().' '.$temp_damage_words['action'].' '.$this_robot->print_name().'&#39;s '.$temp_damage_words['object'].' systems!');
+                            if (!isset($attachment_info['attachment_repeat']['success'])){ $attachment_info['attachment_repeat']['success'] = array(9, -10, -10, -10, 'The '.$this_attachment->print_name().' '.$temp_damage_words['action'].' '.$this_robot->print_name().'&#39;s '.$temp_damage_words['object'].' systems!'); }
                             $this_attachment->damage_options_update($attachment_info['attachment_repeat']);
                             $this_attachment->recovery_options_update($attachment_info['attachment_repeat']);
                             $temp_trigger_options = isset($attachment_info['attachment_repeat']['options']) ? $attachment_info['attachment_repeat']['options'] : array('apply_modifiers' => false);
@@ -4857,7 +4857,7 @@ class rpg_robot extends rpg_object {
                             $temp_recovery_words = rpg_functions::get_stat_recovery_words($temp_recovery_kind);
 
                             // Update the success message to reflect the current target
-                            $attachment_info['attachment_repeat']['success'] = array(9, -10, -10, -10, 'The '.$this_attachment->print_name().' '.$temp_recovery_words['action'].' '.$this_robot->print_name().'&#39;s '.$temp_recovery_words['object'].' systems!');
+                            if (!isset($attachment_info['attachment_repeat']['success'])){ $attachment_info['attachment_repeat']['success'] = array(9, -10, -10, -10, 'The '.$this_attachment->print_name().' '.$temp_recovery_words['action'].' '.$this_robot->print_name().'&#39;s '.$temp_recovery_words['object'].' systems!'); }
                             $this_attachment->recovery_options_update($attachment_info['attachment_repeat']);
                             $this_attachment->damage_options_update($attachment_info['attachment_repeat']);
                             $temp_trigger_options = isset($attachment_info['attachment_repeat']['options']) ? $attachment_info['attachment_repeat']['options'] : array('apply_modifiers' => false);
@@ -4915,12 +4915,13 @@ class rpg_robot extends rpg_object {
                         }
 
                         // If the temp robot was disabled, trigger the event
-                        if ($temp_stat_amount < 1){
+                        if ($this_robot->get_energy() < 1){
                             $this_robot->trigger_disabled($target_robot);
                             // If this the player's last robot
-                            if ($this_player->counters['robots_active'] < 1){
+                            $active_robots = $this_player->get_robots_active();
+                            if (empty($active_robots)){
                                 // Trigger the battle complete event
-                                $this_battle->trigger_complete($target_player, $target_robot, $this_player, $this_robot);
+                                $this_battle->battle_complete_trigger($target_player, $target_robot, $this_player, $this_robot);
                                 $attachment_action_flag = true;
                             }
                         }
