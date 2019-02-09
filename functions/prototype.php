@@ -2008,7 +2008,7 @@ function mmrpg_prototype_database_summoned($robot_token = ''){
 }
 
 // Define a function for collecting robot sprite markup
-function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token = 'GAME'){
+function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token = 'GAME', $robot_limit = 10){
     global $mmrpg_index, $db;
     $temp_offset_x = 14;
     $temp_offset_z = 50;
@@ -2024,6 +2024,7 @@ function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token 
         WHERE robots.robot_flag_complete = 1
         AND robot_token IN ({$temp_db_tokens})
         ;", 'robot_token');
+    $sprites_displayed = 0;
     foreach ($temp_player_robots AS $token => $info){
         if (!isset($temp_robot_index[$token])){ continue; }
         $index = rpg_robot::parse_index_info($temp_robot_index[$token]);
@@ -2034,10 +2035,15 @@ function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token 
             $temp_offset_x += $temp_size > 40 ? 0 : 20;
             $temp_offset_y = $temp_size > 40 ? -42 : -2;
             $temp_offset_z -= 1;
-            $temp_offset_opacity -= 0.05;
+            $temp_offset_opacity -= 0.06;
             if ($temp_offset_opacity <= 0){ $temp_offset_opacity = 0; break; }
             $text_sprites_markup .= '<span class="sprite sprite_nobanner sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_base" style="background-image: url(images/robots/'.(!empty($info['robot_image']) ? $info['robot_image'] : $info['robot_token']).'/sprite_right_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: '.$temp_offset_y.'px; right: '.$temp_offset_x.'px; z-index: '.$temp_offset_z.'; opacity: '.$temp_offset_opacity.'; ">'.$info['robot_name'].'</span>';
             if ($temp_size > 40){ $temp_offset_x += 20;  }
+            $sprites_displayed++;
+            if (!empty($robot_limit)
+                && $sprites_displayed >= $robot_limit){
+                break;
+            }
         }
     }
     return $text_sprites_markup;
