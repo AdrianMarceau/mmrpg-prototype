@@ -6,10 +6,10 @@ $ability = array(
     'ability_game' => 'MM04',
     'ability_group' => 'MM04/Weapons/026',
     'ability_image_sheets' => 2,
-    'ability_description' => 'The user releases a large capsule into the air that showers the field in acid rain and damages all robots on the opponent\'s side of the battle! This ability\'s base damage is equal to the user\'s level and is not affected by attack, defense, or position variables.',
+    'ability_description' => 'The user releases a large capsule into the air that showers the field in acid rain and damages all robots on the opponent\'s side of the battle! This ability\'s damage is not affected by attack stats, defense stats, or position variables.',
     'ability_type' => 'water',
-    'ability_energy' => 4,
-    'ability_damage' => 1,
+    'ability_energy' => 8,
+    'ability_damage' => 50,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
@@ -153,24 +153,14 @@ $ability = array(
 
         }
 
-
-        // -- DISABLE FALLEN -- //
-
-        // Trigger the disabled event on the targets now if necessary
-        if ($target_robot->robot_status == 'disabled'){
-            $target_robot->trigger_disabled($this_robot);
-        }
-        else { $target_robot->robot_frame = 'base'; }
-        $target_robot->update_session();
-        foreach ($backup_target_robots_active AS $key => $info){
-            if ($info['robot_id'] == $target_robot->robot_id){ continue; }
-            $info2 = array('robot_id' => $info['robot_id'], 'robot_token' => $info['robot_token']);
-            $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $info2);
+        // Loop through all robots on the target side and disable any that need it
+        $target_robots_active = $target_player->get_robots();
+        foreach ($target_robots_active AS $key => $info){
+            if ($info['robot_id'] == $target_robot->robot_id){ $temp_target_robot = $target_robot; }
+            else { $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $info); }
             if ($temp_target_robot->robot_energy <= 0 || $temp_target_robot->robot_status == 'disabled'){
                 $temp_target_robot->trigger_disabled($this_robot);
             }
-            else { $temp_target_robot->robot_frame = 'base'; }
-            $temp_target_robot->update_session();
         }
 
         // Change the image to the full-screen rain effect
@@ -189,9 +179,9 @@ $ability = array(
         extract($objects);
 
         // Set or update this ability's base damage equal to user's level
-        $this_ability->ability_damage = $this_robot->robot_level;
+        //$this_ability->ability_damage = $this_robot->robot_level;
         // Update the ability session
-        $this_ability->update_session();
+        //$this_ability->update_session();
 
         // Return true on success
         return true;
