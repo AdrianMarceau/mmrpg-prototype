@@ -53,7 +53,7 @@ class rpg_disabled {
 
         // Create the robot disabled event
         $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
-        $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : 'The target ').' '.$this_robot->print_name().' was disabled!<br />'; //'.($this_robot->robot_position == 'bench' ? ' and removed from battle' : '').'
+        $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : 'The target ').' '.$this_robot->print_name().' was disabled!<br />';
         if (isset($this_robot->robot_quotes['battle_defeat'])){
             $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
             $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
@@ -1127,13 +1127,10 @@ class rpg_disabled {
         */
 
         // Either way, set the hidden flag on the robot
-        //if (($this_robot->robot_status == 'disabled' || $this_robot->robot_energy < 1) && $this_robot->robot_position == 'bench'){
-        if ($this_robot->robot_status == 'disabled' || $this_robot->robot_energy < 1){
-            $this_robot->robot_status == 'disabled';
-            $this_robot->flags['apply_disabled_state'] = true;
-            if ($this_robot->robot_position == 'bench'){ $this_robot->flags['hidden'] = true; }
-            $this_robot->update_session();
-        }
+        $this_robot->flags['apply_disabled_state'] = true;
+        if ($this_robot->robot_energy < 1 && $this_robot->robot_status != 'disabled'){ $this_robot->robot_status = 'disabled'; }
+        if ($this_robot->robot_status == 'disabled' && $this_robot->robot_position == 'bench'){ $this_robot->flags['hidden'] = true; }
+        $this_robot->update_session();
 
         // -- ROBOT UNLOCKING STUFF!!! -- //
 
