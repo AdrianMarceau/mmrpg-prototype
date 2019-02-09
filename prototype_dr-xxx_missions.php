@@ -303,10 +303,10 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 if (!empty($item_options)){ $info['robot_item'] = $item_options[mt_rand(0, $item_max_key)]; }
                 $info['robot_abilities'] = array();
                 $info['robot_abilities'] = mmrpg_prototype_generate_abilities($index, $info['robot_level'], 8);
-                $info['values']['robot_rewards'] = array();
-                $info['values']['robot_rewards']['robot_attack'] = 1000;
-                $info['values']['robot_rewards']['robot_defense'] = 1000;
-                $info['values']['robot_rewards']['robot_speed'] = 1000;
+                //$info['values']['robot_rewards'] = array();
+                //$info['values']['robot_rewards']['robot_attack'] = 1000;
+                //$info['values']['robot_rewards']['robot_defense'] = 1000;
+                //$info['values']['robot_rewards']['robot_speed'] = 1000;
                 $temp_final_option['battle_target_player']['player_robots'][] = $info;
             }
 
