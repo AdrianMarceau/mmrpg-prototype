@@ -4636,7 +4636,7 @@ class rpg_robot extends rpg_object {
                 $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' checkpoint has attachment '.$attachment_debug_token);
 
                 // Check to see if this is a static or dynamic attachment
-                $is_static_attachment = !isset($this_robot->robot_attachments[$attachment_token]) ? true : false;
+                $is_static_attachment = isset($this_battle->battle_attachments[$static_attachment_key][$attachment_token]) ? true : false;
 
                 // Collect or load the attachment into memory
                 $this_attachment = rpg_game::get_ability($this_battle, $this_player, $this_robot, $attachment_info);
