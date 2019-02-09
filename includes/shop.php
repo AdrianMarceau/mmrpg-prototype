@@ -496,7 +496,7 @@ if (!empty($this_shop_index['auto'])){
                         if (!isset($alt_info['summons'])){ continue; }
                         // Generate the token and then add to the parent shop
                         $alt_token = $robot_token.'_'.$alt_info['token'];
-                        $alt_rate = in_array($robot_token, $discount_tokens) ? 10 : 100;
+                        $alt_rate = in_array($robot_token, $discount_tokens) ? 10 : 20;
                         $alt_price = $alt_info['summons'] * $alt_rate;
                         $unlocked_alts_list[$alt_info['token']][$alt_token] = $alt_price;
                     }
