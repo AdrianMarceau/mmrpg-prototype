@@ -130,20 +130,15 @@ $ability = array(
 
         }
 
-
-        // -- DISABLE FALLEN -- //
-
-        // Trigger the disabled event on the targets now if necessary
-        if ($target_robot->robot_status == 'disabled'){ $target_robot->trigger_disabled($this_robot); }
-        else { $target_robot->robot_frame = 'base'; }
-        $target_robot->update_session();
-        foreach ($backup_target_robots_active AS $key => $info){
-            if ($info['robot_id'] == $target_robot->robot_id){ continue; }
-            $info2 = array('robot_id' => $info['robot_id'], 'robot_token' => $info['robot_token']);
-            $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $info2);
-            if ($temp_target_robot->robot_energy <= 0 || $temp_target_robot->robot_status == 'disabled'){ $temp_target_robot->trigger_disabled($this_robot); }
-            else { $temp_target_robot->robot_frame = 'base'; }
-            $temp_target_robot->update_session();
+        // Loop through all robots on the target side and disable any that need it
+        $target_robots_active = $target_player->get_robots();
+        foreach ($target_robots_active AS $key => $robot){
+            if ($robot->robot_id == $target_robot->robot_id){ $temp_target_robot = $target_robot; }
+            else { $temp_target_robot = $robot; }
+            if (($temp_target_robot->robot_energy < 1 || $temp_target_robot->robot_status == 'disabled')
+                && empty($temp_target_robot->flags['apply_disabled_state'])){
+                $temp_target_robot->trigger_disabled($this_robot);
+            }
         }
 
         // Change the image to the full-screen rain effect
