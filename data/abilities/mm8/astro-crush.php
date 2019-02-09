@@ -161,7 +161,8 @@ $ability = array(
         foreach ($target_robots_active AS $key => $info){
             if ($info['robot_id'] == $target_robot->robot_id){ $temp_target_robot = $target_robot; }
             else { $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $info); }
-            if ($temp_target_robot->robot_energy <= 0 || $temp_target_robot->robot_status == 'disabled'){
+            if (($temp_target_robot->robot_energy < 1 || $temp_target_robot->robot_status == 'disabled')
+                && empty($temp_target_robot->flags['apply_disabled_state'])){
                 $temp_target_robot->trigger_disabled($this_robot);
             }
         }

@@ -553,8 +553,18 @@ class rpg_player extends rpg_object {
      * Get the list of robots owned by this player object
      * @return array
      */
-    public function get_robots(){
-        return $this->get_info('player_robots');
+    public function get_robots($sort = true){
+        $player_robots = $this->get_info('player_robots');
+        if ($sort){
+            usort($player_robots, function($a, $b){
+                if ($a->robot_position == 'active'){ return -1; }
+                elseif ($b->robot_position == 'active'){ return 1; }
+                elseif ($a->robot_key < $b->robot_key){ return -1; }
+                elseif ($a->robot_key > $b->robot_key){ return 1; }
+                else { return 0; }
+                });
+        }
+        return $player_robots;
     }
 
     /**
