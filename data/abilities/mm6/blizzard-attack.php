@@ -9,8 +9,8 @@ $ability = array(
     'ability_description' => 'The user summons a powerful blizzard that covers the screen and damages all robots on the opponent\'s side of the field!',
     'ability_type' => 'freeze',
     'ability_energy' => 4,
-    'ability_damage' => 8,
-    'ability_accuracy' => 98,
+    'ability_damage' => 10,
+    'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
