@@ -49,7 +49,7 @@ $ability = array(
 
         // Define this ability's attachment token
         $static_attachment_key = $target_robot->get_static_attachment_key();
-        $static_attachment_duration = 3;
+        $static_attachment_duration = 6;
         $static_attachment_multiplier = 0.5;
         $static_attachment_image = in_array($this_robot->robot_image, array('disco_alt', 'disco_alt3', 'disco_alt5')) ? $this_ability->ability_token.'-2' : $this_ability->ability_image;
         $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$static_attachment_key;

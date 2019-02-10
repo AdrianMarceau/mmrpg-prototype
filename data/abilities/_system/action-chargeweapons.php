@@ -15,7 +15,7 @@ $ability = array(
         extract($objects);
 
         // Define the base attachment duration
-        $base_attachment_duration = 0;
+        $base_attachment_duration = 1;
         $base_attachment_multiplier = 1.25;
 
         // Define this ability's attachment token
