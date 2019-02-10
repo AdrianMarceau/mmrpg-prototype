@@ -477,7 +477,10 @@
 
                     // Ensure the backup folder is created for this file
                     $backup_path = str_replace('/images/', '/images/backups/', MMRPG_CONFIG_ROOTDIR.$empty_path);
-                    if (!file_exists($backup_path)){ @mkdir($backup_path); }
+                    if (!file_exists($backup_path)){
+                        @mkdir($backup_path);
+                        @chown($backup_path, 'mmrpgworld');
+                    }
 
                     // Loop through empty files and delete one by one
                     foreach ($empty_files AS $empty_file_key => $empty_file_path){

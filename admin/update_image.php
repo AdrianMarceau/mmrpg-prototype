@@ -60,7 +60,10 @@ elseif ($image_data['action'] == 'delete' && !$image_data['exists']){ js_exit('e
 //echo('<pre>$image_data = '.print_r($image_data, true).'</pre>'.PHP_EOL);
 
 // Ensure the main folder is created for this file
-if (!file_exists(MMRPG_CONFIG_ROOTDIR.$image_data['path'])){ @mkdir(MMRPG_CONFIG_ROOTDIR.$image_data['path']); }
+if (!file_exists(MMRPG_CONFIG_ROOTDIR.$image_data['path'])){
+    @mkdir(MMRPG_CONFIG_ROOTDIR.$image_data['path']);
+    @chown(MMRPG_CONFIG_ROOTDIR.$image_data['path'], 'mmrpgworld');
+}
 
 // If this is an UPLOAD request, validate the file and then move it if possible
 if ($image_data['action'] == 'upload'){
@@ -98,7 +101,10 @@ elseif ($image_data['action'] == 'delete'){
 
     // Ensure the backup folder is created for this file
     $backup_path = str_replace('/images/', '/images/backups/', MMRPG_CONFIG_ROOTDIR.$image_data['path']);
-    if (!file_exists($backup_path)){ @mkdir($backup_path); }
+    if (!file_exists($backup_path)){
+        @mkdir($backup_path);
+        @chown($backup_path, 'mmrpgworld');
+    }
 
     // Move the file to the backup folder, renaming the file with the timestamp
     $bak_append = '.bak'.date('YmdHi');
