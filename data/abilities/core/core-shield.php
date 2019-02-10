@@ -20,7 +20,7 @@ $ability = array(
         else { $current_target_robot = $this_robot; }
 
         // Define the base values for the attachment
-        $base_attachment_duration = 9;
+        $base_attachment_duration = 10;
         $base_effect_element = $this_ability->ability_type;
         $base_effect_multiplier = 1 - ($this_ability->ability_recovery2 / 100);
         $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$base_effect_element;

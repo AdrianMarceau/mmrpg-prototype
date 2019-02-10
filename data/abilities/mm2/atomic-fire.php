@@ -49,7 +49,7 @@ $ability = array(
                 );
         } else {
             $this_attachment_info = $this_robot->robot_attachments[$this_attachment_token];
-            $this_attachment_info['attachment_duration'] = 1;
+            $this_attachment_info['attachment_duration'] = 2;
             $this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
             $this_robot->update_session();
         }

@@ -75,10 +75,10 @@ $ability = array(
         $this_ability->update_session();
 
         // Define the base turn duration this attachment must charge
-        $attachment_duration = 1;
+        $attachment_duration = 2;
 
         // If the user is holding a Charge Module, cut charge time in half
-        if ($this_robot->has_item('charge-module')){ $attachment_duration = 0; }
+        if ($this_robot->has_item('charge-module')){ $attachment_duration = 1; }
 
         // Define this ability's attachment token
         $this_attachment_token = 'ability_'.$this_ability->ability_token;

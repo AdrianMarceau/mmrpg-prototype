@@ -39,7 +39,7 @@ $ability = array(
 
         // Define this ability's attachment token
         $static_attachment_key = $this_robot->get_static_attachment_key();
-        $static_attachment_duration = 9;
+        $static_attachment_duration = 10;
         $this_effect_multiplier = 1 - ($this_ability->ability_recovery2 / 100);
         $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$static_attachment_key;
         $this_attachment_info = array(
