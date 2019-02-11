@@ -349,8 +349,13 @@
 
             $form_data['robot_flag_unlockable'] = isset($_POST['robot_flag_unlockable']) && is_numeric($_POST['robot_flag_unlockable']) ? (int)(trim($_POST['robot_flag_unlockable'])) : 0;
 
-            $form_data['robot_image_alts'] = !empty($_POST['robot_image_alts']) && is_array($_POST['robot_image_alts']) ? array_filter($_POST['robot_image_alts']) : array();
-            $robot_image_alts_new = !empty($_POST['robot_image_alts_new']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_image_alts_new']) ? trim(strtolower($_POST['robot_image_alts_new'])) : '';
+            if ($form_data['robot_core'] != 'copy'){
+                $form_data['robot_image_alts'] = !empty($_POST['robot_image_alts']) && is_array($_POST['robot_image_alts']) ? array_filter($_POST['robot_image_alts']) : array();
+                $robot_image_alts_new = !empty($_POST['robot_image_alts_new']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_image_alts_new']) ? trim(strtolower($_POST['robot_image_alts_new'])) : '';
+            } else {
+                $form_data['robot_image_alts'] = array();
+                $robot_image_alts_new = '';
+            }
 
             // DEBUG
             //$form_messages[] = array('alert', '<pre>$_POST = '.print_r($_POST, true).'</pre>');
