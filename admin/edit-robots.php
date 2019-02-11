@@ -1318,10 +1318,10 @@
 
                                 // Collect the alt tokens from all defined alts so far
                                 $robot_image_alts_tokens = array();
-                                foreach ($robot_image_alts AS $alt){ $robot_image_alts_tokens[] = $alt['token']; }
+                                foreach ($robot_image_alts AS $alt){ if (!empty($alt['token'])){ $robot_image_alts_tokens[] = $alt['token'];  } }
 
                                 // Define a variable to toggle allowance of new alt creation
-                                $has_elemental_alts = $robot_data['robot_core'] == 'copy' && preg_match('/^(mega-man|proto-man|bass|doc-robot)$/i', $robot_data['robot_token']) ? true : false;
+                                $has_elemental_alts = $robot_data['robot_core'] == 'copy' ? true : false;
                                 $allow_new_alt_creation = !$has_elemental_alts ? true : false;
 
                                 // Only proceed if all required sprite fields are set
@@ -1339,23 +1339,27 @@
                                     // Define the alts we'll be looping through for this robot
                                     $temp_alts_array = array();
                                     $temp_alts_array[] = array('token' => '', 'name' => $robot_data['robot_name'], 'summons' => 0);
+
                                     // Append predefined alts automatically, based on the robot image alt array
                                     if (!empty($robot_data['robot_image_alts'])){
                                         $temp_alts_array = array_merge($temp_alts_array, $robot_image_alts);
                                     }
+
                                     // Otherwise, if this is a copy robot, append based on all the types in the index
-                                    elseif ($has_elemental_alts){
+                                    if ($has_elemental_alts){
                                         foreach ($mmrpg_types_index AS $type_token => $type_info){
                                             if (empty($type_token) || $type_token == 'none' || $type_token == 'copy' || $type_info['type_class'] == 'special'){ continue; }
                                             $temp_alts_array[] = array('token' => $type_token, 'name' => $robot_data['robot_name'].' ('.ucfirst($type_token).' Core)', 'summons' => 0, 'colour' => $type_token);
                                         }
                                     }
+
                                     // Otherwise, if this robot has multiple sheets, add them as alt options
-                                    elseif (!empty($robot_data['robot_image_sheets'])){
+                                    if (!empty($robot_data['robot_image_sheets'])){
                                         for ($i = 2; $i <= $robot_data['robot_image_sheets']; $i++){
                                             $temp_alts_array[] = array('sheet' => $i, 'name' => $robot_data['robot_name'].' (Sheet #'.$i.')', 'summons' => 0);
                                         }
                                     }
+
                                     // Loop through the defined alts for this robot and display image lists
                                     if (!empty($temp_alts_array)){
                                         foreach ($temp_alts_array AS $alt_key => $alt_info){
@@ -1702,9 +1706,9 @@
 
                 <?
 
-                //$debug_robot_data = $robot_data;
-                //$debug_robot_data['robot_description2'] = str_replace(PHP_EOL, '\\n', $debug_robot_data['robot_description2']);
-                //echo('<pre>$robot_data = '.(!empty($debug_robot_data) ? htmlentities(print_r($debug_robot_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
+                $debug_robot_data = $robot_data;
+                $debug_robot_data['robot_description2'] = str_replace(PHP_EOL, '\\n', $debug_robot_data['robot_description2']);
+                echo('<pre style="display: none;">$robot_data = '.(!empty($debug_robot_data) ? htmlentities(print_r($debug_robot_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
 
                 ?>
 
