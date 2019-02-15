@@ -1431,7 +1431,7 @@ class rpg_item extends rpg_object {
                                 <div class="icon item_type <?= $item_header_types ?>" style="font-size: 9px; line-height: 11px; text-align: center; margin-bottom: 2px; padding: 0 0 1px !important;"><?= 'No.'.$item_info['item_key'] ?></div>
                             <? endif; ?>
                             <? if ($item_image_token != 'item'){ ?>
-                                <div class="icon item_type <?= $item_header_types ?>"><div style="background-image: url(images/items/<?= $item_image_token ?>/icon_right_<?= $item_image_size_text ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>); background-color: #000000; background-color: rgba(0, 0, 0, 0.6); box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3); " class="sprite sprite_item sprite_40x40 sprite_40x40_icon sprite_size_<?= $item_image_size_text ?> sprite_size_<?= $item_image_size_text ?>_icon"><?= $item_info['item_name']?>'s Mugshot</div></div>
+                                <div class="icon item_type <?= $item_header_types ?>"><div style="background-image: url(images/items/<?= $item_image_token ?>/icon_right_<?= $item_image_size_text ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>); background-color: #000000; background-color: rgba(0, 0, 0, 0.6); box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3); " class="sprite sprite_item sprite_40x40 sprite_40x40_icon sprite_size_<?= $item_image_size_text ?> sprite_size_<?= $item_image_size_text ?>_icon"><?= $item_info['item_name']?>'s Icon</div></div>
                             <? } else { ?>
                                 <div class="icon item_type <?= $item_header_types ?>"><div style="background-image: none; background-color: #000000; background-color: rgba(0, 0, 0, 0.6); box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3); " class="sprite sprite_item sprite_40x40 sprite_40x40_icon sprite_size_<?= $item_image_size_text ?> sprite_size_<?= $item_image_size_text ?>_icon">No Image</div></div>
                             <? } ?>
@@ -1645,10 +1645,10 @@ class rpg_item extends rpg_object {
                                     foreach (array('right', 'left') AS $temp_direction){
                                         $temp_direction2 = substr($temp_direction, 0, 1);
                                         $temp_embed = '[item:'.$temp_direction.']{'.$temp_item_image_token.'}';
-                                        $temp_title = $temp_item_image_name.' | Mugshot Sprite '.ucfirst($temp_direction);
+                                        $temp_title = $temp_item_image_name.' | Icon Sprite '.ucfirst($temp_direction);
                                         $temp_title .= '<div style="margin-top: 4px; letting-spacing: 1px; font-size: 90%; font-family: Courier New; color: rgb(159, 150, 172);">'.$temp_embed.'</div>';
                                         $temp_title = htmlentities($temp_title, ENT_QUOTES, 'UTF-8', true);
-                                        $temp_label = 'Mugshot '.ucfirst(substr($temp_direction, 0, 1));
+                                        $temp_label = 'Icon '.ucfirst(substr($temp_direction, 0, 1));
                                         echo '<div class="frame_container" data-clickcopy="'.$temp_embed.'" data-direction="'.$temp_direction.'" data-image="'.$temp_item_image_token.'" data-frame="icon" style="'.($size_is_final ? 'padding-top: 20px;' : 'padding: 0;').' float: left; position: relative; margin: 0; box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.75); width: '.$size_value.'px; height: '.$size_value.'px; overflow: hidden;">';
                                             echo '<img class="has_pixels" style="margin-left: 0; height: '.$size_value.'px;" data-tooltip="'.$temp_title.'" src="images/items/'.$temp_item_image_token.'/icon_'.$temp_direction.'_'.$show_sizes[$base_size].'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
                                             if ($size_is_final){ echo '<label style="position: absolute; left: 5px; top: 0; color: #EFEFEF; font-size: 10px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);">'.$temp_label.'</label>'; }
@@ -1710,7 +1710,7 @@ class rpg_item extends rpg_object {
                                         $alt_style = 'border-color: rgba(0, 0, 0, 0.2) !important; ';
                                     }
                                     else {
-                                        $alt_name = $alt_key == 0 ? $item_info['item_name'] : 'Alt'.($alt_key > 1 ? ' '.$alt_key : '');
+                                        $alt_name = $alt_key + 1; //$alt_key == 0 ? $item_info['item_name'] : ($alt_key > 1 ? ' '.$alt_key : '');
                                         $alt_type = 'item_type type_empty ';
                                         $alt_style = 'border-color: rgba(0, 0, 0, 0.2) !important; background-color: rgba(0, 0, 0, 0.2) !important; ';
                                         //if ($item_info['item_type'] == 'copy' && $alt_key == 0){ $alt_type = 'item_type type_empty '; }
