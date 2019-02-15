@@ -308,7 +308,6 @@
 
                 // If password update successful, we can save details
                 if ($update_password){
-                    $form_data['user_password'] = $user_password_new;
                     $form_data['user_password_encoded'] = md5(MMRPG_SETTINGS_PASSWORD_SALT.$user_password_new);
                     $form_messages[] = array('alert', 'The account password was updated successfully');
                 }

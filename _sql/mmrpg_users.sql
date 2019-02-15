@@ -17,7 +17,6 @@ CREATE TABLE IF NOT EXISTS `mmrpg_users` (
   `user_name` varchar(128) NOT NULL COMMENT 'User Name',
   `user_name_clean` varchar(128) NOT NULL COMMENT 'User Name Clean',
   `user_name_public` varchar(128) NOT NULL COMMENT 'User Name Public',
-  `user_password` varchar(128) NOT NULL COMMENT 'User Password',
   `user_password_encoded` varchar(128) NOT NULL COMMENT 'User Password Encoded',
   `user_gender` varchar(10) NOT NULL DEFAULT 'male' COMMENT 'User Gender',
   `user_profile_text` text NOT NULL COMMENT 'User Profile Text',

@@ -307,7 +307,6 @@ while ($this_action == 'profile'){
                 $temp_password = $_POST['password_new'];
                 $temp_password_encoded = md5(MMRPG_SETTINGS_PASSWORD_SALT.$temp_password);
                 $db->update('mmrpg_users', array(
-                    'user_password' => $temp_password,
                     'user_password_encoded' => $temp_password_encoded
                     ), "user_id = {$this_userid}");
                 $_POST['password_new'] = '';
@@ -385,7 +384,6 @@ while ($this_action == 'profile'){
             LIMIT 1
             ;");
         $_SESSION['GAME']['USER']['userinfo'] = $this_userinfo;
-        $_SESSION['GAME']['USER']['userinfo']['user_password'] = '';
         $_SESSION['GAME']['USER']['userinfo']['user_password_encoded'] = '';
 
         // Update the has updated flag variable
@@ -402,9 +400,6 @@ while ($this_action == 'profile'){
     // Update the header markup text
     $html_header_text .= 'Use the fields below to update your player profile for the Mega Man RPG Prototype game and community pages.<br /> Usernames cannot be changed, so please remember them.';
 
-    // Update the form markup fields
-    $temp_password = $db->get_value("SELECT user_password FROM mmrpg_users WHERE user_id = {$this_userid} LIMIT 1;", 'user_password');
-
     // Start the output buffer to collect form fields
     ob_start();
     if (!$file_has_updated){
@@ -415,11 +410,7 @@ while ($this_action == 'profile'){
             <label class="label label_username">Username :</label>
             <input class="text text_username" type="text" name="username" value="<?= htmlentities(trim($_SESSION['GAME']['USER']['username']), ENT_QUOTES, 'UTF-8', true) ?>" disabled="disabled" />
         </div>
-        <div class="field field_password half">
-            <label class="label label_password" style="width: auto; ">Current Password : </label>
-            <input class="text text_password" type="password" name="password_display" value="<?= htmlentities(trim($temp_password), ENT_QUOTES, 'UTF-8', true) ?>" maxlength="18" disabled="disabled" />
-        </div>
-        <div class="field field_password_new half">
+        <div class="field field_password_new">
             <label class="label label_password" style="width: auto; ">Change Password : <span style="font-size: 10px; padding-left: 6px; position: relative; bottom: 1px; color: #CACACA;">(6 - 18 chars)</span></label>
             <input class="text text_password" type="text" name="password_new" value="" maxlength="18" />
         </div>

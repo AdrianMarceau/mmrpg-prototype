@@ -216,7 +216,6 @@ while ($this_action == 'save'){
             LIMIT 1
             ;");
         $_SESSION['GAME']['USER']['userinfo'] = $this_userinfo;
-        $_SESSION['GAME']['USER']['userinfo']['user_password'] = '';
         $_SESSION['GAME']['USER']['userinfo']['user_password_encoded'] = '';
 
         // Update the has updated flag variable
@@ -237,8 +236,6 @@ while ($this_action == 'save'){
     // Start the output buffer to collect form fields
     ob_start();
     if (!$file_has_updated){
-
-        $temp_password = $db->get_value("SELECT user_password FROM mmrpg_users WHERE user_id = {$this_userid} LIMIT 1;", 'user_password');
 
         // Update the form markup fields
 
