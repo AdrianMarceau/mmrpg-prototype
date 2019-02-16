@@ -5,12 +5,13 @@ $ability = array(
     'ability_token' => 'leaf-shield',
     'ability_game' => 'MM02',
     'ability_group' => 'MM02/Weapons/016',
-    'ability_description' => 'The user surrounds itself with sharp leaf-like blades to bolster shields and reduce damage by {RECOVERY2}%! The leaf blades can also be thrown at the target for massive damage!',
+    'ability_image_sheets' => 4,
+    'ability_description' => 'The user surrounds itself with sharp leaf-like blades to bolster shields and reduce damage by half! The leaf blades can also be thrown at the target for massive damage!',
     'ability_type' => 'nature',
     'ability_type2' => 'shield',
     'ability_energy' => 4,
     'ability_damage' => 28,
-    'ability_recovery2' => 40,
+    'ability_recovery2' => 50,
     'ability_recovery_percent2' => true,
     'ability_accuracy' => 96,
     'ability_function' => function($objects){
@@ -24,6 +25,7 @@ $ability = array(
         $this_attachment_info = array(
             'class' => 'ability',
             'ability_token' => $this_ability->ability_token,
+            'ability_image' => $this_ability->ability_image,
             'attachment_token' => $this_attachment_token,
             'attachment_damage_input_breaker' => $this_effect_multiplier,
             'attachment_weaknesses' => array('flame', 'cutter'),
@@ -156,6 +158,12 @@ $ability = array(
         // If the user is holding a Target Module, allow bench targeting
         if ($is_summoned && $this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
         else { $this_ability->reset_target(); }
+
+        // Update the ability image if the user is in their alt image
+        $alt_image_triggers = array('wood-man_alt' => 2, 'wood-man_alt2' => 3, 'wood-man_alt9' => 4);
+        if (isset($alt_image_triggers[$this_robot->robot_image])){ $ability_image = $this_ability->ability_token.'-'.$alt_image_triggers[$this_robot->robot_image]; }
+        else { $ability_image = $this_ability->ability_base_image; }
+        $this_ability->set_image($ability_image);
 
         // Return true on success
         return true;
