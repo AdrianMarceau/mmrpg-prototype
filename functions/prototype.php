@@ -881,7 +881,7 @@ function mmrpg_prototype_unlocked_field_tokens(){
     foreach ($base_omega_fields AS $key => $omega){ $unlocked_field_tokens[] = $omega['field']; }
 
     // Add any fields that have been manually unlocked to the list
-    if (!empty($_SESSION[$session_token]['values']['battle_fields'])){ $unlocked_field_tokens += $_SESSION[$session_token]['values']['battle_fields']; }
+    if (!empty($_SESSION[$session_token]['values']['battle_fields'])){ $unlocked_field_tokens = array_merge($unlocked_field_tokens, $_SESSION[$session_token]['values']['battle_fields']); }
 
     // Remove any duplicates that made their way through
     $unlocked_field_tokens = array_unique($unlocked_field_tokens);
