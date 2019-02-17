@@ -21,16 +21,16 @@ $ability = array(
         $summoned_flag_token = $this_ability->ability_token.'_summoned';
         if (empty($this_robot->flags[$summoned_flag_token])){
 
+            // Set the summoned flag on this robot and save
+            $this_robot->flags[$summoned_flag_token] = true;
+            $this_robot->update_session();
+
             // Target the opposing robot
             $this_ability->target_options_update(array(
                 'frame' => 'summon',
                 'success' => array(0, 0, 150, 30, $this_robot->print_name().' summons the '.$this_ability->print_name().'!')
                 ));
             $this_robot->trigger_target($target_robot, $this_ability);
-
-            // Set the summoned flag on this robot and save
-            $this_robot->flags[$summoned_flag_token] = true;
-            $this_robot->update_session();
 
             // Queue another use of this ability at the end of turn
             $this_battle->actions_append(
