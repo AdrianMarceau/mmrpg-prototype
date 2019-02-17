@@ -401,9 +401,13 @@
                     $new_rewards_tokens[] = $reward['token'];
                     $new_rewards[] = $reward;
                 }
-                usort($new_rewards, function($a, $b){
+                usort($new_rewards, function($a, $b) use($mmrpg_abilities_index){
+                    $ax = $mmrpg_abilities_index[$a['token']];
+                    $bx = $mmrpg_abilities_index[$b['token']];
                     if ($a['level'] < $b['level']){ return -1; }
                     elseif ($a['level'] > $b['level']){ return 1; }
+                    elseif ($ax['ability_order'] < $bx['ability_order']){ return -1; }
+                    elseif ($ax['ability_order'] > $bx['ability_order']){ return 1; }
                     else { return 0; }
                     });
                 $form_data['robot_abilities_rewards'] = $new_rewards;
