@@ -676,8 +676,8 @@
     position: relative;
     background-color: transparent;
     border: 0 none transparent;
-    margin: 0 4px 0 1px;
-    width: 6px;
+    margin: 0 4px 0 -4px;
+    width: 12px;
     height: 6px;
     top: 1px;
     padding: 0;
