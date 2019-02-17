@@ -9,7 +9,7 @@ $ability = array(
     'ability_type' => 'cutter',
     'ability_energy' => 4,
     'ability_damage' => 16,
-    'ability_accuracy' => 86,
+    'ability_accuracy' => 90,
     'ability_target' => 'select_target',
     'ability_function' => function($objects){
 
