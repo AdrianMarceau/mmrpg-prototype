@@ -99,7 +99,8 @@ $ability = array(
             // Calculate the difference in energy so we know how much payback
             $power_boost = 0;
             if (isset($this_robot->counters[$lifecounter_flag_token])
-                && $this_robot->robot_energy != $this_robot->counters[$lifecounter_flag_token]){
+                && $this_robot->robot_energy != $this_robot->counters[$lifecounter_flag_token]
+                && $this_robot->robot_energy < $this_robot->counters[$lifecounter_flag_token]){
                 $power_boost += $this_robot->counters[$lifecounter_flag_token] - $this_robot->robot_energy;
             }
 
