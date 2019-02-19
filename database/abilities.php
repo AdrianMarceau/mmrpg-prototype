@@ -56,8 +56,8 @@ foreach ($mmrpg_database_abilities AS $temp_token => $temp_info){
     $temp_image_token = isset($temp_info['ability_image']) ? $temp_info['ability_image'] : $temp_token;
     if ($temp_info['ability_flag_complete']){ $temp_info['ability_image'] = $temp_image_token; }
     else { $temp_info['ability_image'] = 'ability'; }
-    $temp_info['ability_speed'] = isset($temp_info['ability_speed']) ? ($temp_info['ability_speed'] + 9) : 10;
-    $temp_info['ability_energy'] = isset($temp_info['ability_energy']) ? $temp_info['ability_energy'] : 10;
+    $temp_info['ability_speed'] = isset($temp_info['ability_speed']) ? (int)($temp_info['ability_speed']) : 1;
+    $temp_info['ability_energy'] = isset($temp_info['ability_energy']) ? (int)($temp_info['ability_energy']) : 0;
 
     // Increment the corresponding type counter for this ability else the empty counter
     if (!empty($temp_info['ability_type'])){
