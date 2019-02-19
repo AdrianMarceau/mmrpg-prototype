@@ -8,10 +8,10 @@ $ability = array(
     'ability_description' => 'The user throws a boomerang-like blade at blinding speed toward the target, striking up to four times at increasing strength!',
     'ability_type' => 'swift',
     'ability_type2' => 'cutter',
-    'ability_energy' => 4,
+    'ability_energy' => 8,
     'ability_speed' => 4,
-    'ability_damage' => 3,
-    'ability_accuracy' => 80,
+    'ability_damage' => 8,
+    'ability_accuracy' => 90,
     'ability_target' => 'select_target',
     'ability_function' => function($objects){
 
