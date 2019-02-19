@@ -3446,6 +3446,12 @@ body.windowFlag_landscapeMode #window .page .gallery .screenshot img {
 #window .page .event .ability_name {
     color: #FFFFFF;
 }
+#window .page .event .ability_stat sup {
+    font-family: inherit;
+    font-size: 10px;
+    bottom: 4px;
+    color: #ababab;
+}
 
 
 #window .page .event .robot_container,

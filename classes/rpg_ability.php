@@ -1561,14 +1561,20 @@ class rpg_ability extends rpg_object {
                                     </tr>
                                     <tr>
                                         <td class="right">
-                                            <label style="display: block; float: left;">Accuracy :</label>
-                                            <span class="ability_stat"><?= $ability_info['ability_accuracy'].'%' ?></span>
+                                            <label style="display: block; float: left;">Speed :</label>
+                                            <? if (empty($ability_info['ability_speed']) || $ability_info['ability_speed'] === 1){ ?>
+                                                <span class="ability_stat">Normal</span>
+                                            <? } elseif ($ability_info['ability_speed'] > 1){ ?>
+                                                <span class="ability_stat">Fast <sup>(+<?= $ability_info['ability_speed'] - 1 ?>)</sup></span>
+                                            <? } elseif ($ability_info['ability_speed'] < 1){ ?>
+                                                <span class="ability_stat">Slow <sup>(<?= $ability_info['ability_speed'] + 1 ?>)</sup></span>
+                                            <? } ?>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td class="right">
-                                            <label style="display: block; float: left;">Speed :</label>
-                                            <span class="ability_stat"><?= !empty($ability_info['ability_speed']) ? $ability_info['ability_speed'] : '1' ?></span>
+                                            <label style="display: block; float: left;">Accuracy :</label>
+                                            <span class="ability_stat"><?= $ability_info['ability_accuracy'].'%' ?></span>
                                         </td>
                                     </tr>
                                 <? else: ?>
