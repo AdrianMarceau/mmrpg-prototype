@@ -5,7 +5,7 @@ $battle = array(
   'battle_size' => '1x4',
   'battle_encore' => true,
   'battle_description' => 'Defeat the dark soul variants of Bass, Proto Man, and Mega Man!',
-  'battle_field_base' => array('field_id' => 100, 'field_token' => 'final-destination-2', 'field_name' => 'Final Destination II', 'field_music' => 'final-destination-2', 'field_mechas' => array('batton-2', 'crazy-cannon-2', 'fan-fiend-2', 'killer-bullet-2', 'pierrobot-2', 'snapper-2', 'spring-head-2', 'telly-2')),
+  'battle_field_base' => array('field_id' => 100, 'field_token' => 'final-destination-2', 'field_name' => 'Final Destination II', 'field_music' => 'final-destination-2', 'field_mechas' => array('batton', 'crazy-cannon', 'fan-fiend', 'killer-bullet', 'pierrobot', 'snapper', 'spring-head', 'telly')),
   'battle_target_player' => array(
     'player_id' => MMRPG_SETTINGS_TARGET_PLAYERID,
     'player_token' => 'player',
