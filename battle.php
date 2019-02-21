@@ -479,6 +479,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
         <div id="actions_scan" class="actions_scan wrapper"></div>
         <div id="actions_target_this" class="actions_target action_target_this wrapper"></div>
         <div id="actions_target_this_disabled" class="actions_target action_target_this_disabled wrapper"></div>
+        <div id="actions_target_this_ally" class="actions_target action_target_this_ally wrapper"></div>
         <div id="actions_target_target" class="actions_target action_target_target wrapper"></div>
         <div id="actions_option" class="actions_option wrapper"></div>
         <div id="actions_settings" class="actions_settings wrapper">

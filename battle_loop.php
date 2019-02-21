@@ -556,6 +556,7 @@ if (empty($this_redirect) && $this_battle->battle_status != 'complete'){
     // Require the target menu markup
     require_once('battle/menus/target_this.php');
     require_once('battle/menus/target_this_disabled.php');
+    require_once('battle/menus/target_this_ally.php');
     require_once('battle/menus/target_target.php');
 
     // Require the scan menu markup

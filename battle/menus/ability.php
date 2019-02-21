@@ -97,8 +97,7 @@ ob_start();
                 $temp_target_text = '';
                 if ($temp_ability->ability_target == 'select_target' && $target_player->counters['robots_active'] > 1){ $temp_target = 'select_target'; $temp_target_text = 'Select Target'; }
                 elseif ($temp_ability->ability_target == 'select_this'){ $temp_target = 'select_this'; $temp_target_text = 'Select Target'; }
-                //elseif ($temp_ability->ability_target == 'select_this' && $this_player->counters['robots_active'] > 1){ $temp_target = 'select_this'; $temp_target_text = 'Select Target'; }
-                //$temp_target = $target_player->counters['robots_active'] > 1 ? $temp_ability->ability_target : 'auto';
+                elseif ($temp_ability->ability_target == 'select_this_ally'){ $temp_target = 'select_this_ally'; $temp_target_text = 'Select Target'; }
 
                 $temp_multiplier = 1;
                 if (!empty($temp_damage) || !empty($temp_recovery)){

@@ -109,16 +109,10 @@ ob_start();
                 if ($temp_item->item_target == 'select_target' && $target_player->counters['robots_active'] >= 1){ $temp_target = 'select_target'; }
                 elseif ($temp_item->item_target == 'select_this' && $this_player->counters['robots_active'] >= 1){ $temp_target = 'select_this'; }
                 elseif ($temp_item->item_target == 'select_this_disabled'){ $temp_target = 'select_this_disabled'; }
+                elseif ($temp_item->item_target == 'select_this_ally'){ $temp_target = 'select_this_ally'; }
                 elseif ($temp_item->item_target == 'auto'){ $temp_target = 'auto'; }
-                //elseif ($temp_item->item_target == 'select_this_disabled' && $this_player->counters['robots_disabled'] >= 1){ $temp_target = 'select_this_disabled'; }
-                //elseif ($temp_item->item_target == 'select_this_disabled' && $this_player->counters['robots_disabled'] < 1){ $temp_button_enabled = false; }
-                //$temp_target = $target_player->counters['robots_active'] > 1 ? $temp_item->item_target : 'auto';
 
                 $temp_multiplier = 1;
-                //if (!empty($this_robot->robot_core) && ($this_robot->robot_core == $temp_type || $this_robot->robot_core == $temp_type2)){ $temp_multiplier = $temp_multiplier * 1.5; }
-                //if (!empty($this_battle->battle_field->field_multipliers[$temp_type])){ $temp_multiplier = $temp_multiplier * $this_battle->battle_field->field_multipliers[$temp_type]; }
-                //if (!empty($this_battle->battle_field->field_multipliers[$temp_type2])){ $temp_multiplier = $temp_multiplier * $this_battle->battle_field->field_multipliers[$temp_type2]; }
-
                 $temp_damage = ceil($temp_damage * $temp_multiplier);
                 $temp_recovery = ceil($temp_recovery * $temp_multiplier);
 

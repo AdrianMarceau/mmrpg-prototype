@@ -1065,17 +1065,22 @@ function mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel){
             submitEngine = false;
             // Make sure the next panel is the target
             nextPanel = 'target_this';
-        } else if (thisTarget == 'select_this_disabled'){
+            } else if (thisTarget == 'select_this_disabled'){
             // Make sure the engine is not submit yet
             submitEngine = false;
             // Make sure the next panel is the target
             nextPanel = 'target_this_disabled';
-        } else if (thisTarget == 'select_target'){
+            } else if (thisTarget == 'select_this_ally'){
+            // Make sure the engine is not submit yet
+            submitEngine = false;
+            // Make sure the next panel is the target
+            nextPanel = 'target_this_ally';
+            } else if (thisTarget == 'select_target'){
             // Make sure the engine is not submit yet
             submitEngine = false;
             // Make sure the next panel is the target
             nextPanel = 'target_target';
-        }
+            }
         mmrpg_engine_update({this_action_token:thisAbility});
         thisAction = 'ability';
         } else if (thisAction.match(/^item_([-a-z0-9_]+)$/i)){
@@ -1087,17 +1092,22 @@ function mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel){
             submitEngine = false;
             // Make sure the next panel is the target
             nextPanel = 'target_this';
-        } else if (thisTarget == 'select_this_disabled'){
+            } else if (thisTarget == 'select_this_disabled'){
             // Make sure the engine is not submit yet
             submitEngine = false;
             // Make sure the next panel is the target
             nextPanel = 'target_this_disabled';
-        } else if (thisTarget == 'select_target'){
+            } else if (thisTarget == 'select_this_ally'){
+            // Make sure the engine is not submit yet
+            submitEngine = false;
+            // Make sure the next panel is the target
+            nextPanel = 'target_this_ally';
+            } else if (thisTarget == 'select_target'){
             // Make sure the engine is not submit yet
             submitEngine = false;
             // Make sure the next panel is the target
             nextPanel = 'target_target';
-        }
+            }
         mmrpg_engine_update({this_action_token:thisItem});
         thisAction = 'item';
         } else if (thisAction.match(/^switch_([-a-z0-9_]+)$/i)){
