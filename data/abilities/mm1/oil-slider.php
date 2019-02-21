@@ -9,7 +9,6 @@ $ability = array(
     'ability_type' => 'earth',
     'ability_type2' => 'impact',
     'ability_energy' => 8,
-    'ability_speed' => 2,
     'ability_damage' => 22,
     'ability_accuracy' => 92,
     'ability_function' => function($objects){
