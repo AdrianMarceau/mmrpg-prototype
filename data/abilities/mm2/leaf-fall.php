@@ -66,7 +66,8 @@ $ability = array(
             'failure' => array(2, -95, 0, -10, 'The '.$this_ability->print_name().'\'s leaves just missed the target&hellip;')
             ));
         $energy_damage_amount = $this_ability->ability_damage;
-        $target_robot_1->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
+        $trigger_options = array('apply_modifiers' => true, 'apply_position_modifiers' => false);
+        $target_robot_1->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false, $trigger_options);
 
         // Inflict damage on the second opposing robot if they're not disabled
         if ($target_robot_2->robot_status !== 'disabled'){
@@ -94,7 +95,7 @@ $ability = array(
                 'success' => array(3, 35, 0, 10, $success_text),
                 'failure' => array(3, 95, 0, -10, $failure_text)
                 ));
-            $target_robot_2->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
+            $target_robot_2->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false, $trigger_options);
 
         }
 
