@@ -53,16 +53,16 @@ $ability = array(
             // Inflict damage on the opposing robot
             $this_ability->damage_options_update(array(
                 'kind' => 'energy',
-                'kickback' => array(35, 25, 0),
-                'success' => array(1, 35, -25, 30, 'The '.$this_ability->print_name().' crushed the target with spikes!'),
-                'failure' => array(1, 35, -25, -10, 'The '.$this_ability->print_name().' somehow missed the target&hellip;')
+                'kickback' => array(5, 25, 0),
+                'success' => array(1, 0, -50, 30, 'The '.$this_ability->print_name().' crushed the target with spikes!'),
+                'failure' => array(1, 0, -50, -10, 'The '.$this_ability->print_name().' somehow missed the target&hellip;')
                 ));
             $this_ability->recovery_options_update(array(
                 'kind' => 'energy',
                 'frame' => 'taunt',
-                'kickback' => array(15, 15, 0),
-                'success' => array(1, 15, -15, 30, 'The '.$this_ability->print_name().' crushed the target but...'),
-                'failure' => array(1, 15, -15, -10, 'The '.$this_ability->print_name().' somehow missed the target&hellip;')
+                'kickback' => array(0, 15, 0),
+                'success' => array(1, 0, -30, 30, 'The '.$this_ability->print_name().' crushed the target but...'),
+                'failure' => array(1, 0, -30, -10, 'The '.$this_ability->print_name().' somehow missed the target&hellip;')
                 ));
             $energy_damage_amount = $this_ability->ability_damage;
             $this_robot->robot_frame = 'throw';
