@@ -127,6 +127,7 @@ $ability = array(
 
         // Adjust the target selection option based on available benched robots
         if ($this_player->counters['robots_active'] > 1){ $this_ability->set_target('select_this_ally'); }
+        elseif ($this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
         else { $this_ability->set_target('auto'); }
 
         // Return true on success
