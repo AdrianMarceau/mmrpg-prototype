@@ -288,15 +288,17 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
                     WHERE field_flag_complete = 1 AND field_flag_published = 1 AND field_flag_hidden = 0 AND field_game IN ('MM01', 'MM02', 'MM03', 'MM04')
                     ORDER BY RAND() LIMIT 1
                     ;");
-                $temp_field_type = 'none';
+                $temp_field_type = $temp_field_info['field_type'];
                 $temp_field_path = $temp_field_info['field_path'];
                 $temp_mecha_tokens = $db->get_array_list("SELECT
                     robot_token AS mecha_token
                     FROM mmrpg_index_robots
-                    WHERE robot_flag_complete = 1 AND robot_flag_published = 1 AND robot_flag_hidden = 0 AND robot_class = 'mecha' AND robot_core = '{$temp_field_info['field_type']}' AND robot_game IN ('MM01', 'MM02', 'MM03', 'MM04')
+                    WHERE robot_flag_complete = 1 AND robot_flag_published = 1 AND robot_flag_hidden = 0 AND robot_class = 'mecha' AND robot_core = '{$temp_field_type}' AND robot_game IN ('MM01', 'MM02', 'MM03', 'MM04')
                     ORDER BY RAND()
                     ;", 'mecha_token');
-                $temp_mecha_tokens = array_keys($temp_mecha_tokens);
+                $temp_mecha_tokens = !empty($temp_mecha_tokens) ? array_keys($temp_mecha_tokens) : array();
+                // Autocast the field type to none for logged-out users
+                $temp_field_type = 'none';
                 // Update the session with these settings
                 $_SESSION['INDEX']['theme_cache'] = time();
                 $_SESSION['INDEX']['theme_field_path'] = $temp_field_path;
