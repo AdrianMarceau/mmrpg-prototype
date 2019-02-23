@@ -20,8 +20,8 @@ $battle = array(
                 'robot_abilities' => array(
                     'buster-shot', 'buster-charge',
                     'energy-break', 'attack-break', 'defense-break', 'speed-break',
-                    'rising-cutter', 'shadow-blade', 'hard-knuckle',
-                    'spark-shock', 'bright-burst', 'super-throw',
+                    'rising-cutter', 'shadow-blade', 'hard-knuckle', 'spark-shock', 'bright-burst', 'metal-press',
+                    'cutter-shot', 'cutter-buster', 'cutter-overdrive',
                     'mecha-support'
                     ),
                 'values' => array(

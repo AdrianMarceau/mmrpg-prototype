@@ -20,6 +20,7 @@ $battle = array(
                     'buster-shot', 'buster-charge',
                     'energy-boost', 'attack-boost', 'defense-boost', 'speed-boost',
                     'mega-slide', 'bass-baroque', 'proto-strike',
+                    'shield-shot', 'shield-buster', 'shield-overdrive',
                     'mecha-support'
                     ),
                 'values' => array(
