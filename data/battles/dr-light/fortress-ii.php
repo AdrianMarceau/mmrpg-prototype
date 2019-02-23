@@ -10,11 +10,11 @@ $battle = array(
         'player_id' => MMRPG_SETTINGS_TARGET_PLAYERID,
         'player_token' => 'player',
         'player_robots' => array(
-            array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'beak', 'robot_image' => 'beak', 'robot_level' => 30, 'robot_abilities' => array('beak-shot', 'attack-boost', 'defense-boost', 'speed-boost'), 'flags' => array('hide_from_mission_select' => true)),
+            array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'beak', 'robot_image' => 'beak', 'robot_level' => 20, 'robot_abilities' => array('beak-shot', 'attack-boost', 'defense-boost', 'speed-boost'), 'flags' => array('hide_from_mission_select' => true)),
             array(
                 'robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 2),
                 'robot_token' => 'enker',
-                'robot_level' => 35,
+                'robot_level' => 20,
                 'robot_item' => 'super-capsule',
                 'robot_abilities' => array(
                     'buster-shot', 'buster-charge',
