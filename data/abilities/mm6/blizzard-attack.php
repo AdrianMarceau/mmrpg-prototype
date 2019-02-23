@@ -9,7 +9,7 @@ $ability = array(
     'ability_description' => 'The user summons a powerful blizzard that covers the screen and damages all robots on the opponent\'s side of the field!',
     'ability_type' => 'freeze',
     'ability_energy' => 4,
-    'ability_damage' => 10,
+    'ability_damage' => 12,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
@@ -71,7 +71,8 @@ $ability = array(
             'failure' => array(0, -5, 0, 9, 'The '.$this_ability->print_name().' had no effect on the first target&hellip;')
             ));
         $energy_damage_amount = $this_ability->ability_damage;
-        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
+        $trigger_options = array('apply_modifiers' => true, 'apply_position_modifiers' => false, 'apply_stat_modifiers' => true);
+        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false, $trigger_options);
         $target_robot->unset_attachment($this_attachment_token.'_fx');
         $num_hits_counter++;
 
@@ -101,7 +102,7 @@ $ability = array(
                 'failure' => array(($key % 2), -5, 0, 9, 'The attack had no effect on '.$temp_target_robot->print_name().'&hellip;')
                 ));
             $energy_damage_amount = $this_ability->ability_damage;
-            $temp_target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
+            $temp_target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false, $trigger_options);
             $temp_target_robot->unset_attachment($this_attachment_token.'_fx');
             $num_hits_counter++;
         }
