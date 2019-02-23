@@ -589,7 +589,7 @@ if (!empty($this_shop_index['reggae'])){
             $this_shop_index['reggae']['shop_weapons']['weapons_selling'] = array();
 
             // If the player has sold any cores, loop through them and add associated abilities
-            $level_discount = $this_battle_shops['reggae']['shop_level'] > 1 ? $this_battle_shops['reggae']['shop_level'] / 100 : 0;
+            $level_discount = $this_battle_shops['reggae']['shop_level'] > 1 ? $this_battle_shops['reggae']['shop_level'] / 101 : 0;
             if (!empty($this_battle_shops['reggae']['cores_bought'])){
                 foreach ($this_battle_shops['reggae']['cores_bought'] AS $item_token => $item_quantity){
                     if (preg_match('/^item-core-/i', $item_token)){ $type_token = preg_replace('/^item-core-/i', '', $item_token); }
@@ -782,7 +782,7 @@ if (!empty($this_shop_index['reggae'])){
 
         // If Reggae's Shop has reached sufficient levels, decrease his selling prices
         if ($this_shop_index['reggae']['shop_level'] > 1){
-            $level_discount = $this_battle_shops['reggae']['shop_level'] / 100;
+            $level_discount = $this_battle_shops['reggae']['shop_level'] / 101;
             if (!empty($this_shop_index['reggae']['shop_abilities']['abilities_selling'])){
                 foreach ($this_shop_index['reggae']['shop_abilities']['abilities_selling'] AS $ability_kind => $ability_price){
                     $ability_price -= round(($ability_price / 2) * $level_discount);
@@ -864,7 +864,7 @@ if (!empty($this_shop_index['kalinka'])){
 
     // If Kalinka's Shop has reached sufficient levels, decrease her selling prices
     if ($this_shop_index['kalinka']['shop_level'] > 1){
-        $level_discount = $this_battle_shops['kalinka']['shop_level'] / 100;
+        $level_discount = $this_battle_shops['kalinka']['shop_level'] / 101;
 
         // If her shop is selling items, discount their prices
         if (!empty($this_shop_index['kalinka']['shop_items']['items_selling'])){
