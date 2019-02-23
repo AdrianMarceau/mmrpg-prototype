@@ -6,7 +6,15 @@
 $this_prototype_data['this_player_token'] = 'dr-wily';
 $this_prototype_data['this_player_field'] = 'wily-castle';
 $this_prototype_data['this_support_robot'] = 'disco';
-$this_prototype_data['this_chapter_levels'] = array(0 => 1, 1 => 12, 2 => 20, 3 => 36, 4 => 40, 5 => 45, 6 => 50);
+$this_prototype_data['this_chapter_levels'] = array(
+    0 => 1,   // Intro
+    1 => 12,  // Singles
+    2 => 20,  // Rivals
+    3 => 25,  // Doubles
+    4 => 30,  // Final I
+    5 => 40,  // Final II
+    6 => 50   // Final III
+    );
 $this_prototype_data['this_chapter_unlocked'] = $chapters_unlocked_wily;
 $this_prototype_data['target_player_token'] = 'dr-cossack';
 $this_prototype_data['battle_phase'] = 0;
