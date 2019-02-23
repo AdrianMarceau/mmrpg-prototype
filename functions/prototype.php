@@ -72,7 +72,7 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
         save_values_battle_items, save_values_battle_abilities,
         save_values_battle_stars, save_values_robot_database,
         save_values_robot_alts,
-        save_date_modified
+        save_date_modified, save_date_created
         FROM mmrpg_saves
         WHERE user_id = {$user_id}
         ;");
@@ -356,12 +356,17 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
 
     // -- BONUS POINTS -- //
 
-    // Grant the user bonus veteran points based on their account age (user id relative to current max)
+    // Grant the user bonus veteran points based on their account age (date created vs date modified)
     if (true){
-        $guest_id = MMRPG_SETTINGS_GUEST_ID;
-        $max_user_id = (int)($db->get_value("SELECT MAX(user_id) AS max_id FROM mmrpg_users WHERE user_id < {$guest_id};", 'max_id'));
-        $points_index['veteran_bonus'] = 'Max User ID ('.$max_user_id.') - This User ID ('.$user_id.') = Bonus ('.($max_user_id - $user_id).')';
-        $points_index['veteran_bonus_points'] = $max_user_id - $user_id;
+        $date_modified = $user_save_array['save_date_modified'];
+        $date_created = $user_save_array['save_date_created'];
+        $total_days = ceil((((($date_modified - $date_created) / 60) / 60) / 24));
+        $veteran_bonus = $total_days * 100;
+        $points_index['veteran_bonus'] = 'First Save: '.date('Y/m/d', $date_created).'';
+        $points_index['veteran_bonus'] .= '<br /> Last Save: '.date('Y/m/d', $date_modified).'';
+        $points_index['veteran_bonus'] .= '<br /> Total Days: '.number_format($total_days, 0, '.', ',').' Days';
+        $points_index['veteran_bonus'] .= '<br /> <strong>Veteran Bonus: '.number_format($veteran_bonus, 0, '.', ',').' BP</strong>';
+        $points_index['veteran_bonus_points'] = $veteran_bonus;
         $total_battle_points += $points_index['veteran_bonus_points'];
     }
 

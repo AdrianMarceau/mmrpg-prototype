@@ -67,8 +67,8 @@ $ability = array(
         // Define the types for this ability
         $ability_types = array();
         $ability_types[] = $ability_base_type;
-        if (!empty($robot_core_type) && $robot_core_type != 'copy'){ $ability_types[] = $robot_core_type; }
-        if (!empty($robot_item_type) && $robot_item_type != 'copy'){ $ability_types[] = $robot_item_type; }
+        if (!empty($robot_core_type) && $robot_core_type != 'copy' && !in_array($robot_core_type, $ability_types)){ $ability_types[] = $robot_core_type; }
+        if (!empty($robot_item_type) && $robot_item_type != 'copy' && !in_array($robot_item_type, $ability_types)){ $ability_types[] = $robot_item_type; }
         $ability_types = array_reverse($ability_types);
         $ability_types = array_slice($ability_types, 0, 2);
 

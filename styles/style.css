@@ -862,6 +862,11 @@ body.index #header {
 #mmrpg .robot_details_left .robot_speed {
 
 }
+#mmrpg .robot_details .robot_attack.limit_break,
+#mmrpg .robot_details .robot_defense.limit_break,
+#mmrpg .robot_details .robot_speed.limit_break {
+    font-size: 10px;
+}
 #mmrpg .robot_details_left .robot_speed {
 
 }

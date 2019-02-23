@@ -15,7 +15,8 @@ if (!empty($_SESSION[$session_token]['DEMO'])){
 
         // Print out the demo mode's mission select screen for Dr. Light
         echo '<div class="option_wrapper option_wrapper_hidden '.($prototype_data['demo']['battles_complete'] >= 4 ? 'option_wrapper_complete ' : 'option_wrapper_default ').'" data-condition="this_player_token=dr-light" data-music="'.$prototype_data['demo']['missions_music'].'">'."\n";
-        echo $prototype_data['demo']['missions_markup']."\n";
+        //echo $prototype_data['demo']['missions_markup']."\n";
+        echo "<strong>YOU HAVE BEEN LOGGED OUT! NO MISSIONS ARE AVAILABLE!</strong>\n";
         echo '<a class="option option_1x4 option_spacer" style="visibility: hidden;">&nbsp;</a>'."\n";
         echo '</div>'."\n";
 

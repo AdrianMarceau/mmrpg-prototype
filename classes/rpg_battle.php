@@ -1482,23 +1482,24 @@ class rpg_battle extends rpg_object {
                 elseif (empty($this_token) && $this_player->player_side == 'right'){
 
                     // Decide which robot the target should use (random)
+                    $this_player->update_session();
                     $active_robot_count = count($this_player->values['robots_active']);
                     if ($active_robot_count == 1){
                         $this_robotinfo = $this_player->values['robots_active'][0];
-                    }
-                    elseif ($active_robot_count > 1) {
+                    } elseif ($active_robot_count > 1){
                         $this_last_switch = !empty($this_recent_switches) ? array_slice($this_recent_switches, -1, 1, false) : array('');
                         $this_last_switch = $this_last_switch[0];
                         $this_current_token = $this_robot->robot_id.'_'.$this_robot->robot_token;
                         do {
                             $this_robotinfo = $this_player->values['robots_active'][mt_rand(0, ($active_robot_count - 1))];
-                            if ($this_robotinfo['robot_id'] == $this_robot->robot_id ){ continue; }
+                            if ($this_robotinfo['robot_id'] == $this_robot->robot_id){ continue; }
+                            elseif ($this_robotinfo['robot_token'] == 'robot'){ continue; }
                             $this_temp_token = $this_robotinfo['robot_id'].'_'.$this_robotinfo['robot_token'];
                             //$this->events_create(false, false, 'DEBUG', '!empty('.$this_last_switch.') && '.$this_temp_token.' == '.$this_last_switch);
                         } while(empty($this_temp_token));
-                    }
-                    else {
+                    } else {
                         $this_robotinfo = array('robot_id' => 0, 'robot_token' => 'robot');
+                        return false;
                     }
                     //$this->events_create(false, false, 'DEBUG', 'auto switch picked ['.print_r($this_robotinfo['robot_name'], true).'] | recent : ['.preg_replace('#\s+#', ' ', print_r($this_recent_switches, true)).']');
                 }
@@ -1687,19 +1688,25 @@ class rpg_battle extends rpg_object {
                 $temp_attack_base_padding = ceil(($temp_target_robot->robot_base_attack / $temp_stat_counter_base_total) * $temp_stat_padding_total);
                 $temp_attack_base_padding = $temp_attack_base_padding - $temp_attack_padding;
                 if ($temp_attack_padding < 1){ $temp_attack_padding = 0; }
+                elseif ($temp_attack_padding > $temp_stat_padding_total){ $temp_attack_padding = $temp_stat_padding_total; }
                 if ($temp_attack_base_padding < 1){ $temp_attack_base_padding = 0; }
+                elseif ($temp_attack_base_padding > $temp_stat_padding_total){ $temp_attack_base_padding = $temp_stat_padding_total; }
 
                 $temp_defense_padding = ceil(($temp_target_robot->robot_defense / $temp_stat_counter_base_total) * $temp_stat_padding_total);
                 $temp_defense_base_padding = ceil(($temp_target_robot->robot_base_defense / $temp_stat_counter_base_total) * $temp_stat_padding_total);
                 $temp_defense_base_padding = $temp_defense_base_padding - $temp_defense_padding;
                 if ($temp_defense_padding < 1){ $temp_defense_padding = 0; }
+                elseif ($temp_defense_padding > $temp_stat_padding_total){ $temp_defense_padding = $temp_stat_padding_total; }
                 if ($temp_defense_base_padding < 1){ $temp_defense_base_padding = 0; }
+                elseif ($temp_defense_base_padding > $temp_stat_padding_total){ $temp_defense_base_padding = $temp_stat_padding_total; }
 
                 $temp_speed_padding = ceil(($temp_target_robot->robot_speed / $temp_stat_counter_base_total) * $temp_stat_padding_total);
                 $temp_speed_base_padding = ceil(($temp_target_robot->robot_base_speed / $temp_stat_counter_base_total) * $temp_stat_padding_total);
                 $temp_speed_base_padding = $temp_speed_base_padding - $temp_speed_padding;
                 if ($temp_speed_padding < 1){ $temp_speed_padding = 0; }
+                elseif ($temp_speed_padding > $temp_stat_padding_total){ $temp_speed_padding = $temp_stat_padding_total; }
                 if ($temp_speed_base_padding < 1){ $temp_speed_base_padding = 0; }
+                elseif ($temp_speed_base_padding > $temp_stat_padding_total){ $temp_speed_base_padding = $temp_stat_padding_total; }
 
                 // Create an event showing the scanned robot's data
                 $event_header = ($temp_target_player->player_token != 'player' ? $temp_target_player->player_name.'&#39;s ' : '').$temp_target_robot->robot_name;

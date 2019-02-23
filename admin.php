@@ -204,5 +204,8 @@ unset($db);
     <? } ?>
 <script type="text/javascript" src="scripts/jquery.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/admin.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<? if (!empty($admin_inline_javascript)){ ?>
+    <?= $admin_inline_javascript ?>
+<? } ?>
 </body>
 </html>

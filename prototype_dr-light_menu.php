@@ -6,7 +6,15 @@
 $this_prototype_data['this_player_token'] = 'dr-light';
 $this_prototype_data['this_player_field'] = 'light-laboratory';
 $this_prototype_data['this_support_robot'] = 'roll';
-$this_prototype_data['this_chapter_levels'] = array(0 => 1, 1 => 2, 2 => 10, 3 => 31, 4 => 35, 5 => 40, 6 => 45);
+$this_prototype_data['this_chapter_levels'] = array(
+    0 => 1,   // Intro
+    1 => 02,  // Singles
+    2 => 10,  // Rivals
+    3 => 15,  // Doubles
+    4 => 20,  // Final I
+    5 => 30,  // Final II
+    6 => 40   // Final III
+    );
 $this_prototype_data['this_chapter_unlocked'] = $chapters_unlocked_light;
 $this_prototype_data['target_player_token'] = 'dr-wily';
 $this_prototype_data['battle_phase'] = 0;

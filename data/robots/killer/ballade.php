@@ -97,21 +97,11 @@ $robot = array(
 
             // Loop through and double all other stats and increase
             $stats = array('attack', 'defense', 'speed');
-            $systems = array('weapons were', 'shields were', 'mobility was');
-            $frames = array('shoot', 'defend', 'slide');
             foreach ($stats AS $key => $stat){
-                $system = $systems[$key];
-                $frame = $frames[$key];
-                $stat_base = $this_robot->get_info('robot_base_'.$stat);
-                $this_ability->recovery_options_update(array(
-                    'kind' => $stat,
-                    'percent' => true,
-                    'modifiers' => false,
-                    'frame' => $frame,
-                    'success' => array(0, -2, 0, -10, $this_robot->print_name().'&#39;s '.$system.' boosted!'),
-                    'failure' => array(9, -2, 0, -10, $this_robot->print_name().'&#39;s '.$system.' not affected&hellip;')
-                    ));
-                $this_robot->trigger_recovery($this_robot, $this_ability, $stat_base);
+
+                // Call the global stat boost function with customized options
+                rpg_ability::ability_function_stat_boost($this_robot, $stat, 5, $this_ability);
+
             }
 
             // Set the flag so we don't display this message again

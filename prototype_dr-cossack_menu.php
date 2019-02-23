@@ -6,7 +6,15 @@
 $this_prototype_data['this_player_token'] = 'dr-cossack';
 $this_prototype_data['this_player_field'] = 'cossack-citadel';
 $this_prototype_data['this_support_robot'] = 'rhythm';
-$this_prototype_data['this_chapter_levels'] = array(0 => 1, 1 => 22, 2 => 30, 3 => 41, 4 => 45, 5 => 50, 6 => 55);
+$this_prototype_data['this_chapter_levels'] = array(
+    0 => 1,   // Intro
+    1 => 22,  // Singles
+    2 => 30,  // Rivals
+    3 => 35,  // Doubles
+    4 => 40,  // Final I
+    5 => 50,  // Final II
+    6 => 60   // Final III
+    );
 $this_prototype_data['this_chapter_unlocked'] = $chapters_unlocked_cossack;
 $this_prototype_data['target_player_token'] = 'dr-light';
 $this_prototype_data['battle_phase'] = 0;

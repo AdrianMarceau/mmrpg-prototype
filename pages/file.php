@@ -784,7 +784,7 @@ while ($this_action == 'load'){
             if ($this_user['password_encoded'] == $temp_database_user['user_password_encoded']
                 || (MMRPG_CONFIG_IS_LIVE === false && $this_user['password'] == $this_user['username_clean'])){
 
-                // Clear the password from these vars, we don't need it anymore
+                // Clear the password from these vars, we don't need it any more
                 $this_user['password'] = '';
                 $this_user['password_encoded'] = '';
 

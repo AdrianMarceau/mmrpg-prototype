@@ -174,7 +174,7 @@ class rpg_mission_single extends rpg_mission {
         } else {
             $omega_robot_level_max = $this_start_level + 7;
             if ($omega_robot_level_max >= 100){ $omega_robot_level_max = 100; }
-            $omega_robot_level = $this_start_level + (!empty($this_prototype_data['battles_complete']) ? $this_prototype_data['battles_complete'] - 1 : 0);
+            $omega_robot_level = $this_start_level + (!empty($this_prototype_data['battles_complete']) ? $this_prototype_data['battles_complete'] - MMRPG_SETTINGS_CHAPTER1_MISSIONCOUNT : 0);
             if ($omega_robot_level >= $omega_robot_level_max){ $omega_robot_level = $omega_robot_level_max; }
             if ($omega_robot_level >= 100){ $omega_robot_level = 100; }
         }
@@ -264,11 +264,14 @@ class rpg_mission_single extends rpg_mission {
         $temp_complete_level = 0;
         $temp_complete_count = 0;
         if (!empty($temp_battle_omega['battle_complete'])){
-            if (!empty($temp_battle_omega['battle_complete']['battle_min_level'])){ $temp_complete_level = $temp_battle_omega['battle_complete']['battle_min_level']; }
-            else { $temp_complete_level = $temp_omega_robot_level; }
+            $temp_complete_level = $temp_omega_robot_level;
+            //if (!empty($temp_battle_omega['battle_complete']['battle_min_level'])){ $temp_complete_level = $temp_battle_omega['battle_complete']['battle_min_level']; }
+            //else { $temp_complete_level = $temp_omega_robot_level; }
             if (!empty($temp_battle_omega['battle_complete']['battle_count'])){ $temp_complete_count = $temp_battle_omega['battle_complete']['battle_count']; }
             else { $temp_complete_count = 1; }
-            $temp_omega_robot_level = $temp_complete_level + $temp_complete_count - 1;
+            //$temp_omega_robot_level = $temp_complete_level + $temp_complete_count - 1;
+            $temp_omega_robot_level = $temp_complete_level + $temp_complete_count;
+            if ($temp_omega_robot_level > 100){ $temp_omega_robot_level = 100; }
             // DEBUG
             //echo('battle is complete '.$temp_battle_omega['battle_token'].' | omega robot level'.$temp_omega_robot_level.' | battle_level '.$temp_battle_omega['battle_complete']['battle_level'].' | battle_count '.$temp_battle_omega['battle_complete']['battle_count'].'<br />');
         } else {
