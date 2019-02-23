@@ -59,7 +59,7 @@ class rpg_disabled {
             $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
             $event_body .= $this_robot->print_quote('battle_defeat', $this_find, $this_replace);
         }
-        $target_robot->robot_frame = 'base';
+        if ($target_robot->robot_status != 'disabled'){ $target_robot->robot_frame = 'base'; }
         $this_robot->robot_frame = 'defeat';
         $target_robot->update_session();
         $this_robot->update_session();
@@ -91,11 +91,11 @@ class rpg_disabled {
 
                 // Restore the target robot's health and weapons back to their full amounts
                 $this_robot->robot_status = 'active';
-                $this_robot->robot_energy = 0; //$target_robot->robot_base_energy;
-                $this_robot->robot_weapons = 0; //$target_robot->robot_base_weapons;
-                $this_robot->robot_attack = $target_robot->robot_base_attack;
-                $this_robot->robot_defense = $target_robot->robot_base_defense;
-                $this_robot->robot_speed = $target_robot->robot_base_speed;
+                $this_robot->robot_energy = 0;
+                $this_robot->robot_weapons = 0;
+                $this_robot->robot_attack = $this_robot->robot_base_attack;
+                $this_robot->robot_defense = $this_robot->robot_base_defense;
+                $this_robot->robot_speed = $this_robot->robot_base_speed;
                 $this_robot->update_session();
 
                 // Update the target player's session
@@ -171,6 +171,7 @@ class rpg_disabled {
         // Calculate the bonus boosts from defeating the target robot (if NOT player battle)
         if ($target_player->player_side == 'left'
             && $target_robot->robot_class == 'master'
+            && $target_robot->robot_status != 'disabled'
             && $this_player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID
             ){
 
@@ -326,6 +327,7 @@ class rpg_disabled {
             // -- EXPERIENCE POINTS / LEVEL UP -- //
 
             // Filter out robots who were active in this battle in at least some way
+            $target_player->update_session();
             $temp_robots_active = $target_player->values['robots_active'];
             usort($temp_robots_active, array('rpg_player','robot_sort_by_active'));
 
