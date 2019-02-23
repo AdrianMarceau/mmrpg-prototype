@@ -79,6 +79,49 @@ $ability = array(
                 ));
             $target_robot->trigger_target($target_robot, $old_item, array('prevent_default_text' => true));
 
+            // If the old item happened to be a life or weapon energy upgrade, recalculate stats
+            if ($old_item_token == 'energy-upgrade'){
+                //$this_battle->events_create(false, false, 'debug', 'The knocked-off item was a life energy upgrade!');
+                $target_current_energy = $target_robot->robot_energy;
+                $target_current_base_energy = $target_robot->robot_base_energy;
+                $target_current_damage = $target_current_base_energy - $target_current_energy;
+                $target_new_base_energy = $target_current_base_energy / 2;
+                $target_new_energy = $target_new_base_energy - $target_current_damage;
+                if ($target_new_energy > $target_new_base_energy){ $target_new_energy = $target_new_base_energy; }
+                /*
+                $this_battle->events_create(false, false, 'debug',
+                    '$target_current_energy = '.$target_current_energy.
+                    ' / '.'$target_current_base_energy = '.$target_current_base_energy.
+                    ' <br /> '.'$target_current_damage = '.$target_current_damage.
+                    ' <br /> '.'$target_new_energy = '.$target_new_energy.
+                    ' / '.'$target_new_base_energy = '.$target_new_base_energy.
+                    '');
+                */
+                $target_robot->robot_energy = $target_new_energy;
+                $target_robot->robot_base_energy = $target_new_base_energy;
+                $target_robot->update_session();
+            } elseif ($old_item_token == 'weapon-upgrade'){
+                //$this_battle->events_create(false, false, 'debug', 'The knocked-off item was a weapon energy upgrade!');
+                $target_current_energy = $target_robot->robot_weapons;
+                $target_current_base_energy = $target_robot->robot_base_weapons;
+                $target_current_damage = $target_current_base_energy - $target_current_energy;
+                $target_new_base_energy = $target_current_base_energy / 2;
+                $target_new_energy = $target_new_base_energy - $target_current_damage;
+                if ($target_new_energy > $target_new_base_energy){ $target_new_energy = $target_new_base_energy; }
+                /*
+                $this_battle->events_create(false, false, 'debug',
+                    '$target_current_energy = '.$target_current_energy.
+                    ' / '.'$target_current_base_energy = '.$target_current_base_energy.
+                    ' <br /> '.'$target_current_damage = '.$target_current_damage.
+                    ' <br /> '.'$target_new_energy = '.$target_new_energy.
+                    ' / '.'$target_new_base_energy = '.$target_new_base_energy.
+                    '');
+                    */
+                $target_robot->robot_weapons = $target_new_energy;
+                $target_robot->robot_base_weapons = $target_new_base_energy;
+                $target_robot->update_session();
+            }
+
             // Remove the visual icon attachment from the target
             unset($target_robot->robot_attachments[$this_attachment_token]);
             $target_robot->update_session();
@@ -89,6 +132,17 @@ $ability = array(
         $this_robot->set_frame('base');
         $this_robot->set_frame_offset('x', 0);
         $this_robot->set_frame_styles('');
+
+        // Loop through all robots on the target side and disable any that need it
+        $target_robots_active = $target_player->get_robots();
+        foreach ($target_robots_active AS $key => $robot){
+            if ($robot->robot_id == $target_robot->robot_id){ $temp_target_robot = $target_robot; }
+            else { $temp_target_robot = $robot; }
+            if (($temp_target_robot->robot_energy < 1 || $temp_target_robot->robot_status == 'disabled')
+                && empty($temp_target_robot->flags['apply_disabled_state'])){
+                $temp_target_robot->trigger_disabled($this_robot);
+            }
+        }
 
         // Return true on success
         return true;
