@@ -1044,7 +1044,10 @@ class rpg_disabled {
             // Try to find at least one active POSITION robot before requiring a switch
             $has_active_positon_robot = false;
             foreach ($this_player->values['robots_active'] AS $key => $robot){
-                if ($robot['robot_position'] == 'active'){ $has_active_positon_robot = true; }
+                if ($robot['robot_position'] == 'active'
+                    && $robot['robot_id'] != $this_robot->robot_id){
+                    $has_active_positon_robot = true;
+                }
             }
 
             // If the player does NOT have an active position robot, trigger a switch
