@@ -17,14 +17,12 @@ $battle = array(
                 'robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 4),
                 'robot_token' => 'ballade',
                 'robot_level' => 40,
-                'robot_item' => 'extra-life',
+                'robot_item' => 'energy-upgrade',
                 'robot_abilities' => array(
                     'buster-shot', 'buster-charge',
-                    'energy-support', 'attack-support', 'defense-support', 'speed-support',
                     'energy-assault', 'attack-assault', 'defense-assault', 'speed-assault',
-                    'cutter-shot', 'freeze-shot', 'flame-shot',
-                    'electric-shot',  'crystal-shot',  'space-shot',
-                    'shield-shot', 'laser-shot',
+                    'hyper-bomb', 'crash-avenger', 'quick-boomerang', 'gemini-laser', 'core-laser',
+                    'laser-shot', 'laser-buster', 'laser-overdrive',
                     'mecha-support'
                     ),
                 'values' => array(
