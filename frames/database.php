@@ -52,7 +52,8 @@ require(MMRPG_CONFIG_ROOTDIR.'database/players.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/robots.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/mechas.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/bosses.php');
-require(MMRPG_CONFIG_ROOTDIR.'database/abilities.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/abilities.php');
+$mmrpg_database_abilities = rpg_ability::get_index(true);
 require(MMRPG_CONFIG_ROOTDIR.'database/fields.php');
 //require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
 
