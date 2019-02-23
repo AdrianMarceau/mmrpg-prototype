@@ -27,7 +27,7 @@ $ability = array(
         $this_ability->damage_options_update(array(
             'kind' => 'energy',
             'kickback' => array(10, 0, 0),
-            'success' => array(1, -140, 0, 10, 'The '.$this_ability->print_name().'\s blades through the target!'),
+            'success' => array(1, -140, 0, 10, 'The '.$this_ability->print_name().'\s blades cut through the target!'),
             'failure' => array(2, -160, 0, -10, 'The '.$this_ability->print_name().' missed&hellip;')
             ));
         $this_ability->recovery_options_update(array(
@@ -38,7 +38,7 @@ $ability = array(
             'failure' => array(2, -160, 0, -10, 'The '.$this_ability->print_name().' missed&hellip;')
             ));
         $energy_damage_amount = $this_ability->ability_damage;
-        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
+        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
 
         // Ensure there are active robots left to attack
         if (!empty($target_player->values['robots_active'])){
@@ -70,10 +70,21 @@ $ability = array(
                     'success' => array(3, 140, 0, 10, 'Oh no! Not again!'),
                     'failure' => array(0, 160, 0, -10, 'Oh! The second hit missed!')
                     ));
-                $last_target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
+                $last_target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
 
             }
 
+        }
+
+        // Loop through all robots on the target side and disable any that need it
+        $target_robots_active = $target_player->get_robots();
+        foreach ($target_robots_active AS $key => $robot){
+            if ($robot->robot_id == $target_robot->robot_id){ $temp_target_robot = $target_robot; }
+            else { $temp_target_robot = $robot; }
+            if (($temp_target_robot->robot_energy < 1 || $temp_target_robot->robot_status == 'disabled')
+                && empty($temp_target_robot->flags['apply_disabled_state'])){
+                $temp_target_robot->trigger_disabled($this_robot);
+            }
         }
 
         // Return true on success
