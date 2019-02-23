@@ -398,7 +398,7 @@ while ($this_action == 'load'){
             // And now let's let's check the password
             if ($this_user['password_encoded'] == $temp_database_user['user_password_encoded']){
 
-                // Clear the password from these vars, we don't need it anymore
+                // Clear the password from these vars, we don't need it any more
                 $this_user['password'] = '';
                 $this_user['password_encoded'] = '';
 

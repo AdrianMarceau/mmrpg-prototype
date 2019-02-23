@@ -942,7 +942,7 @@ class rpg_disabled {
                     || ($temp_drop_kind === 'core' && $num_existing_cores < MMRPG_SETTINGS_CORES_MAXQUANTITY)
                     )){
 
-                    // Clear the existing set of items as they're not relevant anymore
+                    // Clear the existing set of items as they're not relevant any more
                     $target_player_rewards['items'] = array();
 
                     // If this robot was a MECHA class it will drop a SHARD, else if a MASTER/BOSS class it will drop a CORE
