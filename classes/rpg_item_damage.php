@@ -983,17 +983,22 @@ class rpg_item_damage extends rpg_damage {
 
         }
 
-        // Update this robot's history with the triggered damage amount
-        $this_robot->history['triggered_damage'][] = $this_item->item_results['this_amount'];
+        // Only update triggered damage history if damage was actually dealt
+        if ($this_ability->ability_results['this_amount'] > 0){
 
-        // Update the robot's history with the triggered damage types
-        if (!empty($this_item->item_results['damage_type'])){
-            $temp_types = array();
-            $temp_types[] = $this_item->item_results['damage_type'];
-            if (!empty($this_item->item_results['damage_type2'])){ $temp_types[] = $this_item->item_results['damage_type2']; }
-            $this_robot->history['triggered_damage_types'][] = $temp_types;
-        } else {
-            $this_robot->history['triggered_damage_types'][] = array();
+            // Update this robot's history with the triggered damage amount
+            $this_robot->history['triggered_damage'][] = $this_item->item_results['this_amount'];
+
+            // Update the robot's history with the triggered damage types
+            if (!empty($this_item->item_results['damage_type'])){
+                $temp_types = array();
+                $temp_types[] = $this_item->item_results['damage_type'];
+                if (!empty($this_item->item_results['damage_type2'])){ $temp_types[] = $this_item->item_results['damage_type2']; }
+                $this_robot->history['triggered_damage_types'][] = $temp_types;
+            } else {
+                $this_robot->history['triggered_damage_types'][] = array();
+            }
+
         }
 
         // Check to see if damage overkill was inflicted by the target
