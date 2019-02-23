@@ -25,7 +25,7 @@ $ability = array(
         $this_destroy_text = ('The '.$this_ability->print_name().'\'s foamy bubbles faded away...<br /> '.
             'That position on the field isn\'t vulnerable to '.
             rpg_type::print_span('electric').' or '.rpg_type::print_span('freeze').' '.
-            'types anymore!'
+            'types any more!'
             );
         $this_refresh_text = ($this_robot->print_name().' refreshed the '.$this_ability->print_name().'\'s mound of foamy bubbles!<br /> '.
             'That position on the field is still vulnerable to '.

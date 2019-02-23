@@ -10,7 +10,7 @@ $battle = array(
     'player_id' => MMRPG_SETTINGS_TARGET_PLAYERID,
     'player_token' => 'player',
     'player_robots' => array(
-      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'robot', 'robot_level' => 45, 'robot_abilities' => array('buster-shot'))
+      array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => 'robot', 'robot_level' => 40, 'robot_abilities' => array('buster-shot'))
       )
     ),
   'battle_rewards' => array(

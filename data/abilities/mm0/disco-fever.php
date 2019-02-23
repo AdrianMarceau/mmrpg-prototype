@@ -41,7 +41,7 @@ $ability = array(
             $target_robot->print_name().'\'s damage output has been compromised!'
             );
         $this_destroy_text = ('The disco lights distracting '.$target_robot->print_name().' faded away...<br /> '.
-            $target_robot->print_name().'\'s damage output isn\'t compromised anymore!'
+            $target_robot->print_name().'\'s damage output isn\'t compromised any more!'
             );
         $this_refresh_text = ($this_robot->print_name().' spun the disco ball in front of '.$target_robot->print_name().'!<br /> '.
             $target_robot->print_name().'\'s damage output is still compromised!'

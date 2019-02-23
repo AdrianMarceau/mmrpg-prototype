@@ -208,7 +208,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             'option_maintext' => 'Chapter Five : The Final Battles'
             );
 
-        // Final Destination I
+        // Final Destination I (ENKER/PUNK/BALLADE)
         // Only continue if the player has defeated the first 1 + 8 + 1 + 4 + 1 + 8 + 1 + 4 battles
         if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['4a'])){
 
@@ -224,7 +224,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
         }
 
-        // Final Destination II
+        // Final Destination II (MEGA-DS/BASS-DS/PROTO-DS)
         // Only continue if the player has defeated the first 1 + 8 + 1 + 4 + 1 + 8 + 1 + 4 battles
         if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['4b'])){
 
@@ -240,7 +240,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
         }
 
-        // Final Destination III
+        // Final Destination III (ROBOT MASTERS w/ DARKNESS ALTS)
         // Only continue if the player has defeated the first 1 + 8 + 1 + 4 + 1 + 8 + 1 + 4 battles
         if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['4c'])){
 

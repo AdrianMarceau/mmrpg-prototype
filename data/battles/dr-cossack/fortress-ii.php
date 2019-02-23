@@ -16,7 +16,7 @@ $battle = array(
             array(
                 'robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 4),
                 'robot_token' => 'ballade',
-                'robot_level' => 45,
+                'robot_level' => 40,
                 'robot_item' => 'extra-life',
                 'robot_abilities' => array(
                     'buster-shot', 'buster-charge',

@@ -2708,6 +2708,13 @@ button {
     margin: 0 5px 5px 0;
     padding: 0;
 }
+#window .page .leaderboard .subbody .view_points .points_table tbody tr.details.veteran_bonus ul li {
+    float: none;
+    clear: both;
+    text-align: left;
+    padding: 5px;
+    line-height: 1.8;
+}
 #window .page .leaderboard .subbody .view_points .points_table tbody tr.details.hidden {
     display: none;
 }

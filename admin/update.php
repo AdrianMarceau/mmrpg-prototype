@@ -274,7 +274,8 @@ function admin_trigger_update(thisHref){
 
 </script>
     <?
-    $this_page_markup .= ob_get_clean();
+    if (!isset($admin_inline_javascript)){ $admin_inline_javascript = '';}
+    $admin_inline_javascript .= ob_get_clean();
 }
 
 ?>
