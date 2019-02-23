@@ -558,13 +558,15 @@ class rpg_canvas {
                     $prop_stat_base = 'robot_base_'.$stat;
                     $prop_stat_max = 'robot_max_'.$stat;
                     $prop_markup = 'robot_'.$stat.'_markup';
-                    $temp_stat_break = $this_robot->$prop_stat < 1 ? true : false;
-                    $temp_stat_break_chance = $this_robot->$prop_stat < ($this_robot->$prop_stat_base / 2) ? true : false;
+                    $prop_value = $this_robot->$prop_stat;
+                    $prop_value_base = $this_robot->$prop_stat_base;
+                    $temp_stat_break = $prop_value < 1 ? true : false;
+                    $temp_stat_break_chance = $prop_value < ($prop_value_base / 2) ? true : false;
                     $temp_stat_maxed = $this_stats[$stat]['current'] >= $this_stats[$stat]['max'] ? true : false;
-                    $temp_stat_percent = round(($this_robot->$prop_stat / $this_robot->$prop_stat_base) * 100);
-                    if ($this_data['robot_float'] == 'left'){ $temp_stat_title = $this_robot->$prop_stat.' / '.$this_robot->$prop_stat_base.' '.$letters.' | '.$temp_stat_percent.'%'.($temp_stat_break ? ' | BREAK!' : '').($temp_stat_maxed ? ' | &#9733;' : ''); }
-                    elseif ($this_data['robot_float'] == 'right'){ $temp_stat_title = ($temp_stat_maxed ? '&#9733; |' : '').($temp_stat_break ? 'BREAK! | ' : '').$temp_stat_percent.'% | '.$this_robot->$prop_stat.' / '.$this_robot->$prop_stat_base.' '.$letters; }
-                    $$prop_markup = '<div class="robot_'.$stat.''.($temp_stat_break ? ' robot_'.$stat.'_break' : ($temp_stat_break_chance ? ' robot_'.$stat.'_break_chance' : '')).'" title="'.$temp_stat_title.'" data-tooltip-align="'.$this_data['robot_float'].'" data-tooltip-type="robot_type robot_type_'.$stat.'">'.$this_robot->$prop_stat.'</div>';
+                    $temp_stat_percent = round(($prop_value / $prop_value_base) * 100);
+                    if ($this_data['robot_float'] == 'left'){ $temp_stat_title = $prop_value.' / '.$prop_value_base.' '.$letters.' | '.$temp_stat_percent.'%'; }
+                    elseif ($this_data['robot_float'] == 'right'){ $temp_stat_title = ($temp_stat_maxed ? '&#9733; |' : '').$temp_stat_percent.'% | '.$prop_value.' / '.$prop_value_base.' '.$letters; }
+                    $$prop_markup = '<div class="robot_'.$stat.''.($temp_stat_break ? ' robot_'.$stat.'_break' : ($temp_stat_break_chance ? ' robot_'.$stat.'_break_chance' : '')).($prop_value > MMRPG_SETTINGS_STATS_MAX ? ' limit_break' : '').'" title="'.$temp_stat_title.'" data-tooltip-align="'.$this_data['robot_float'].'" data-tooltip-type="robot_type robot_type_'.$stat.'">'.$prop_value.'</div>';
                     if (!empty($this_robot->counters[$stat.'_mods'])){
                         $temp_stat_mods = $this_robot->counters[$stat.'_mods'];
                         if ($temp_stat_mods > 0){ $$prop_markup .= '<div class="stat_mod '.$stat.' plus s'.$temp_stat_mods.'"></div>'; }
