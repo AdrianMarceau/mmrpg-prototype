@@ -40,7 +40,8 @@ $ability = array(
             'failure' => array(0, ($temp_offset - 50), 0, -10, 'The '.$this_ability->print_name().' missed&hellip;')
             ));
         $energy_damage_amount = $this_ability->ability_damage;
-        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
+        $trigger_options = array('apply_modifiers' => true, 'apply_position_modifiers' => false, 'apply_stat_modifiers' => true);
+        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false, $trigger_options);
 
         // Randomly trigger a bench damage if the ability was successful
         $backup_robots_active = $target_player->values['robots_active'];
@@ -71,7 +72,7 @@ $ability = array(
                     ));
                 //$energy_damage_amount = ceil($this_ability->ability_damage / ($key + 2));
                 $energy_damage_amount = ceil($this_ability->ability_damage / ($target_robot->robot_key + 2));
-                $temp_target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
+                $temp_target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false, $trigger_options);
                 $target_key++;
             }
 

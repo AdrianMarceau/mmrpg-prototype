@@ -59,7 +59,8 @@ $ability = array(
             'failure' => array(2, -5, 0, -8, $this_ability->print_name().' had no effect&hellip;')
             ));
         $energy_damage_amount = ceil($this_ability->ability_damage / $target_robots_active);
-        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
+        $trigger_options = array('apply_modifiers' => true, 'apply_position_modifiers' => false, 'apply_stat_modifiers' => true);
+        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false, $trigger_options);
 
         // Remove the black background attachment
         unset($target_robot->robot_attachments[$this_attachment_token]);
@@ -75,7 +76,7 @@ $ability = array(
             $temp_target_robot->update_session();
             //$energy_damage_amount = ceil($this_ability->ability_damage / $target_robots_active);
             $energy_damage_amount = $this_ability->ability_damage;
-            $temp_target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
+            $temp_target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false, $trigger_options);
             unset($temp_target_robot->robot_attachments[$this_attachment_token]);
             $temp_target_robot->update_session();
         }
