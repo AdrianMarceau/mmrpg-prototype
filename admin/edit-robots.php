@@ -436,9 +436,12 @@
             if (isset($form_data['robot_image_alts'])){
                 if (!empty($robot_image_alts_new)){
                     $alt_num = $robot_image_alts_new != 'alt' ? (int)(str_replace('alt', '', $robot_image_alts_new)) : 1;
+                    $alt_name = ucfirst($robot_image_alts_new);
+                    if ($alt_num == 9){ $alt_name = 'Darkness Alt'; }
+                    elseif ($alt_num == 3){ $alt_name = 'Weapon Alt'; }
                     $form_data['robot_image_alts'][$robot_image_alts_new] = array(
                         'token' => $robot_image_alts_new,
-                        'name' => $form_data['robot_name'].' ('.ucfirst($robot_image_alts_new).')',
+                        'name' => $form_data['robot_name'].' ('.$alt_name.')',
                         'summons' => ($alt_num * 100),
                         'colour' => ($alt_num == 9 ? 'empty' : 'none')
                         );
@@ -1575,10 +1578,12 @@
                                                     <option value="<?= $alt_token ?>"<?= in_array($alt_token, $robot_image_alts_tokens) ? ' disabled="disabled"' : '' ?>>
                                                         <?= $robot_data['robot_name'] ?>
                                                         (<?= ucfirst($alt_token) ?> / <?
-                                                            if ($i < 9){
-                                                                echo('Standard');
-                                                            } elseif ($i == 9){
+                                                            if ($i == 9){
                                                                 echo('Darkness');
+                                                            } elseif ($i == 3){
+                                                                echo('Weapon');
+                                                            } elseif ($i < 9){
+                                                                echo('Standard');
                                                             } elseif ($i > 9){
                                                                 echo('Custom');
                                                             } ?>)
