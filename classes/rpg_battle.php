@@ -1765,6 +1765,12 @@ class rpg_battle extends rpg_object {
                                             <?= !empty($temp_target_robot_abilities) ? $temp_target_robot_abilities : '<span class="robot_ability">None</span>' ?>
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td class="right" colspan="5">
+                                            <span style="float: left;">Export Array :</span>
+                                            <?= ('<pre style="clear: both; padding: 10px; text-align: left; white-space: normal; overflow: auto;">'.print_r($temp_target_robot->export_array(), true).'</pre>') ?>
+                                        </td>
+                                    </tr>
                                 <? } ?>
                             </tbody>
                         </table>
