@@ -110,7 +110,7 @@ $ability = array(
 
             // Generate the new robot and add it to this player's team
             $this_key = $this_player->counters['robots_active'] + $this_player->counters['robots_disabled'];
-            $this_id = $this_player->player_id + 2 + $this_key;
+            $this_id = $this_original_robot_id.str_pad($this_key, 3, '0', STR_PAD_LEFT);
             $this_id_token = $this_id.'_'.$this_mecha_info['robot_token'];
             $this_boost_abilities = array('attack-boost', 'defense-boost', 'speed-boost', 'energy-boost');
             $this_break_abilities = array('attack-break', 'defense-break', 'speed-break', 'energy-break');
