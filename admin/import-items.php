@@ -126,8 +126,9 @@ $temp_pattern_last[] = '/^speed-booster$/i';
 $temp_pattern_last[] = '/^field-booster$/i';
 $temp_pattern_last[] = '/^target-module$/i';
 $temp_pattern_last[] = '/^charge-module$/i';
-$temp_pattern_last[] = '/^growth-module$/i';
 $temp_pattern_last[] = '/^fortune-module$/i';
+$temp_pattern_last[] = '/^growth-module$/i';
+$temp_pattern_last[] = '/^reverse-module$/i';
 
 $temp_pattern_last[] = '/^light-program$/i';
 $temp_pattern_last[] = '/^wily-program$/i';

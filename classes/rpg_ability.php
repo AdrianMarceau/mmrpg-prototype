@@ -2047,11 +2047,19 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function to use as a common action for all stat boosting
-    public static function ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = ''){
+    public static function ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = '', $item_redirect = false){
 
         // Do not boost stats if the battle is over
         if ($target_robot->battle->battle_status === 'complete'){ return false; }
         elseif ($target_robot->robot_status === 'disabled' || $target_robot->robot_energy <= 0){ return false; }
+
+        // If the target robot is holding a Revser Module, redirect to a break
+        if (!$item_redirect
+            && !empty($target_robot->robot_item)
+            && $target_robot->robot_item == 'reverse-module'){
+            $target_robot->battle->events_debug(__FILE__, __LINE__, $target_robot->robot_token.' '.$target_robot->get_item().' changes reverses stat changes!');
+            return rpg_ability::ability_function_stat_break($target_robot, $stat_type, $boost_amount, $trigger_ability, $success_frame, $failure_frame, $extra_text, true);
+        }
 
         // Compensate for malformed arguments
         if (empty($trigger_ability)){ $trigger_ability = false; }
@@ -2106,11 +2114,19 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function to use as a common action for all stat breaking
-    public static function ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = ''){
+    public static function ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = '', $item_redirect = false){
 
         // Do not boost stats if the battle is over
         if ($target_robot->battle->battle_status === 'complete'){ return false; }
         elseif ($target_robot->robot_status === 'disabled' || $target_robot->robot_energy <= 0){ return false; }
+
+        // If the target robot is holding a Revser Module, redirect to a break
+        if (!$item_redirect
+            && !empty($target_robot->robot_item)
+            && $target_robot->robot_item == 'reverse-module'){
+            $target_robot->battle->events_debug(__FILE__, __LINE__, $target_robot->robot_token.' '.$target_robot->get_item().' changes reverses stat changes!');
+            return rpg_ability::ability_function_stat_boost($target_robot, $stat_type, $break_amount, $trigger_ability, $success_frame, $failure_frame, $extra_text, true);
+        }
 
         // Compensate for malformed arguments
         if (empty($trigger_ability)){ $trigger_ability = false; }

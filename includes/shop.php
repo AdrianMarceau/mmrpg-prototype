@@ -343,6 +343,14 @@ $this_shop_index['kalinka'] = array(
                 'speed-booster', 'field-booster',
                 'growth-module', 'fortune-module',
                 'target-module', 'charge-module'
+                ),
+            'items_selling3' => get_items_with_prices(
+                'energy-upgrade', 'weapon-upgrade',
+                'attack-booster', 'defense-booster',
+                'speed-booster', 'field-booster',
+                'growth-module', 'fortune-module',
+                'target-module', 'charge-module',
+                'reverse-module'
                 )
             )
         );
@@ -801,7 +809,8 @@ if (!empty($this_shop_index['kalinka'])){
 
     // If Kalinka's Shop has reached sufficient levels, expand the inventory
     if ($this_shop_index['kalinka']['shop_level'] >= 30){ $this_shop_index['kalinka']['shop_items']['items_selling'] = $this_shop_index['kalinka']['shop_items']['items_selling2']; }
-    unset($this_shop_index['kalinka']['shop_items']['items_selling2']);
+    if ($this_shop_index['kalinka']['shop_level'] >= 60){ $this_shop_index['kalinka']['shop_items']['items_selling'] = $this_shop_index['kalinka']['shop_items']['items_selling3']; }
+    unset($this_shop_index['kalinka']['shop_items']['items_selling2'], $this_shop_index['kalinka']['shop_items']['items_selling3']);
 
     // If the player has unlocked the Legacy Codes, Kalinka's Shop also sells legacy fields & robots
     if (mmrpg_prototype_item_unlocked('legacy-codes')
