@@ -84,14 +84,13 @@ $(document).ready(function(){
         });
 
     // Define a function for creating necessary click-events for any quantity mod buttons
-    var generateQuantityModEvents = function($itemCellConfirm){
+    var generateQuantityModEvents = function($itemCellConfirm, thisAction){
         if ($itemCellConfirm.attr('data-kind') != 'item'){ return false; }
-        //console.log('generateQuantityModEvents($itemCellConfirm)', $itemCellConfirm);
+        //console.log('generateQuantityModEvents($itemCellConfirm, thisAction)', $itemCellConfirm);
         var itemToken = $itemCellConfirm.attr('data-token');
-        var $itemCell = $('.item_cell[data-token="'+itemToken+'"][data-action="sell"]', gameConsole);
-        var maxQuantity = parseInt($itemCell.find('.item_quantity').attr('data-quantity') || 0);
+        var $itemCell = $('.item_cell[data-token="'+itemToken+'"][data-action="'+thisAction+'"]', gameConsole);
         var unitPrice = parseInt($itemCell.find('.item_price').attr('data-price') || 0);
-        //console.log('itemToken =', itemToken, '$itemCell = ', $itemCell.length, 'maxQuantity = ', maxQuantity, 'unitPrice = ', unitPrice);
+        //console.log('itemToken =', itemToken, '$itemCell = ', $itemCell.length, 'unitPrice = ', unitPrice);
         var $modButtons = $('a[data-inc],a[data-dec]', $itemCellConfirm);
         $modButtons.bind('click', function(e){
             e.preventDefault();
@@ -100,7 +99,15 @@ $(document).ready(function(){
             var modKind = $button.is('[data-inc]') ? 'inc' : 'dec';
             var modAmount = parseInt($button.attr('data-'+modKind));
             var currentQuantity = parseInt($itemCellConfirm.attr('data-quantity'));
+            if (thisAction == 'sell'){
+                var maxQuantity = parseInt($itemCell.find('.item_quantity').attr('data-quantity') || 0);
+                } else if (thisAction == 'buy'){
+                var maxQuantity = Math.floor(thisShopData.zennyCounter / unitPrice);
+                if (maxQuantity > 99){ maxQuantity = 99; }
+                maxQuantity -= parseInt($itemCell.find('.item_quantity').attr('data-quantity') || 0);
+                }
             var newQuantity = modKind == 'inc' ? (currentQuantity + modAmount) : (currentQuantity - modAmount);
+            //console.log('currentQuantity =', currentQuantity, 'maxQuantity = ', maxQuantity, 'newQuantity = ', newQuantity);
             if (newQuantity > maxQuantity){ newQuantity = maxQuantity; }
             else if (newQuantity < 0){ newQuantity = 0; }
             var newPrice = newQuantity * unitPrice;
@@ -115,7 +122,7 @@ $(document).ready(function(){
         };
 
     // Functionality to the sell links for all shops
-    $('.item_cell[data-token][data-action=sell] .sell_button', gameConsole).live('click', function(e){
+    $('.item_cell[data-token][data-action="sell"] .sell_button', gameConsole).live('click', function(e){
         e.preventDefault();
         if (!thisShopData.allowEdit){ return false; }
         var thisButton = $(this);
@@ -136,6 +143,8 @@ $(document).ready(function(){
         var thisItemName = thisCell.find('.item_name').clone();
         //console.log(thisSeller+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+thisQuantity+' / '+thisPrice+'z');
         var itemCellConfirm = $('.item_cell_confirm', thisTab);
+        itemCellConfirm.removeClass('with_mods');
+        if (thisKind == 'item'){ itemCellConfirm.addClass('with_mods'); }
         if (itemCellConfirm.attr('data-token') == thisToken){
             var sellQuantity = parseInt(itemCellConfirm.attr('data-quantity')) + 1;
             if (sellQuantity > thisQuantity){ sellQuantity = thisQuantity; }
@@ -149,8 +158,7 @@ $(document).ready(function(){
             itemCellConfirm.append('<a class="cancel_button ability_type ability_type_attack" href="#">Cancel</a>');
             itemCellConfirm.append('<a class="confirm_button ability_type ability_type_energy" href="#">Confirm</a>');
             itemCellConfirm.append('<label class="item_price" data-price="'+sellPrice+'">&hellip; '+printNumberWithCommas(sellPrice)+'z</label>');
-            if (thisKind == 'item' && thisAction == 'sell'){
-                itemCellConfirm.addClass('with_mods');
+            if (thisKind == 'item'){
                 itemCellConfirm.append('<label class="item_quantity_mods">'
                     + '<a class="inc ability_type ability_type_none" data-inc="1"><i>+1</i></a>'
                     + '<a class="inc ability_type ability_type_none" data-inc="10"><i>+10</i></a>'
@@ -161,69 +169,16 @@ $(document).ready(function(){
                     + '<a class="dec ability_type ability_type_none disabled" data-dec="1"><i>-1</i></a>'
                     + '</label>');
                 } else {
-                itemCellConfirm.removeClass('with_mods');
                 itemCellConfirm.append('<label class="item_quantity" data-quantity="'+sellQuantity+'">x '+sellQuantity+'</label>');
                 }
             itemCellConfirm.append(thisItemName);
-            generateQuantityModEvents(itemCellConfirm);
+            generateQuantityModEvents(itemCellConfirm, thisAction);
             }
         return true;
         });
 
-    /*
-    // Functionality to the player toggles on hover
-    $('.item_cell_confirm .player_button', gameConsole).live('mouseenter', function(e){
-
-        //e.preventDefault();
-        var thisButton = $(this);
-        var thisStat = thisButton.attr('data-stat');
-        var thisPlayer = thisButton.attr('data-player');
-        if (thisButton.hasClass('player_button_active')){ return false; }
-        else if (thisButton.hasClass('player_button_disabled')){ return false; }
-        thisButton.addClass('ability_type_'+thisStat);
-        //console.log('hover in player button '+thisStat+' '+thisPlayer);
-        return true;
-
-        }).live('mouseleave', function(e){
-
-        //e.preventDefault();
-        var thisButton = $(this);
-        var thisStat = thisButton.attr('data-stat');
-        var thisPlayer = thisButton.attr('data-player');
-        if (thisButton.hasClass('player_button_active')){ return false; }
-        else if (thisButton.hasClass('player_button_disabled')){ return false; }
-        thisButton.removeClass('ability_type_'+thisStat);
-        //console.log('hover out player button '+thisStat+' '+thisPlayer);
-        return true;
-
-        });
-
-    // Functionality to the player toggles on hover
-    $('.item_cell_confirm .player_button', gameConsole).live('click', function(e){
-
-        e.preventDefault();
-        var thisButton = $(this);
-        var thisCell = thisButton.parent();
-        var thisTab = thisCell.parents('.tab_container[data-tab]');
-        var thisStat = thisButton.attr('data-stat');
-        var thisPlayer = thisButton.attr('data-player');
-        var itemCellConfirm = $('.item_cell_confirm', thisTab);
-        if (thisButton.hasClass('player_button_disabled')){ return false; }
-        //console.log('click on player button '+thisStat+' '+thisPlayer);
-        $('.item_cell_confirm .player_button_active', gameConsole).removeClass('player_button_active').removeClass(function(){ return 'ability_type_'+$(this).attr('data-stat'); });
-        thisButton.addClass('ability_type_'+thisStat).addClass('player_button_active');
-        itemCellConfirm.attr('data-player', thisPlayer);
-        $('.item_cell_confirm .confirm_button', gameConsole).removeClass('confirm_button_disabled');
-
-        return true;
-
-
-        });
-
-    */
-
     // Functionality to the buy links for all shops
-    $('.item_cell[data-token][data-action=buy] .buy_button', gameConsole).live('click', function(e){
+    $('.item_cell[data-token][data-action="buy"] .buy_button', gameConsole).live('click', function(e){
         e.preventDefault();
         if (!thisShopData.allowEdit){ return false; }
         var thisButton = $(this);
@@ -244,93 +199,67 @@ $(document).ready(function(){
         var thisItemName = thisCell.find('.item_name').clone();
         //console.log(thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / '+thisPrice+'z');
         var itemCellConfirm = $('.item_cell_confirm', thisTab);
-        if (thisKind == 'item' && itemCellConfirm.attr('data-token') == thisToken){
-
-            buyQuantity = parseInt(itemCellConfirm.attr('data-quantity')) + 1;
-            //console.log('A) '+thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+buyQuantity+' / '+thisPrice+'z');
-            buyPrice = buyQuantity * parseInt(thisPrice);
-            if (buyQuantity + thisQuantity > 99){
-                //console.log('buyQuantity + thisQuantity > 99 | '+buyQuantity+' + '+thisQuantity+' > 99');
-                buyQuantity = 99 - thisQuantity;
-                buyPrice = buyQuantity * parseInt(thisPrice);
-                } else if (buyPrice > thisShopData.zennyCounter){
-                //console.log('buyPrice > thisShopData.zennyCounter | '+buyPrice+' > '+thisShopData.zennyCounter+' ');
-                buyQuantity = buyQuantity - 1;
-                buyPrice = buyQuantity * parseInt(thisPrice);
-                }
-            itemCellConfirm.attr('data-quantity', buyQuantity).attr('data-price', buyPrice).attr('data-shop', thisBuyer);
-            itemCellConfirm.find('.item_quantity').attr('data-quantity', buyQuantity).html('x '+buyQuantity);
-            itemCellConfirm.find('.item_price').attr('data-price', buyPrice).html('&hellip; '+printNumberWithCommas(buyPrice)+'z');
-
-        } else if (thisKind == 'ability') {
-
-            var actualQuantity = 1; //3 - thisQuantity;
+        itemCellConfirm.removeClass('with_mods');
+        if (thisKind == 'item'){ itemCellConfirm.addClass('with_mods'); }
+        if (thisKind == 'ability'){
+            var actualQuantity = 1;
             var actualPrice = buyPrice * actualQuantity;
             var thisUnlocked = thisCell.attr('data-unlocked').split(',');
             //console.log('thisUnlocked', thisUnlocked);
-            //console.log('B) '+thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+actualQuantity+' / '+thisPrice+'z');
+            //console.log('ABILITY-A) '+thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+actualQuantity+' / '+thisPrice+'z '+' / '+(thisUnlocked ? 'Unlocked' : 'Not Unlocked'));
             itemCellConfirm.empty();
             itemCellConfirm.attr('data-kind', thisKind).attr('data-action', thisAction).attr('data-token', thisToken).attr('data-price', thisPrice).attr('data-quantity', buyQuantity).attr('data-shop', thisBuyer).attr('data-player', 'all');
             itemCellConfirm.append('<a class="cancel_button ability_type ability_type_attack" href="#">Cancel</a>');
-            //itemCellConfirm.append('<a class="confirm_button confirm_button_disabled ability_type ability_type_energy" href="#">Confirm</a>');
             itemCellConfirm.append('<a class="confirm_button ability_type ability_type_energy" href="#">Confirm</a>');
-
             var buttonCounter = 0;
             var buttonMarkup = [];
-
-            /*
-            if (jQuery.inArray('dr-light', thisShopData.unlockedPlayers) != -1){
-                if (jQuery.inArray('dr-light', thisUnlocked) != -1){
-                    buttonCounter++;
-                    //console.log('jQuery.inArray(\'dr-light\', thisUnlocked) == TRUE');
-                    buttonMarkup.push('<a class="player_button player_button_1 player_button_disabled ability_type ability_type_defense" data-stat="defense" data-player="dr-light" data-tooltip="Dr. Light" data-tooltip-type="ability_type_defense">L</a>');
-                    } else {
-                    buttonCounter++;
-                    //console.log('jQuery.inArray(\'dr-light\', thisUnlocked) == FALSE');
-                    buttonMarkup.push('<a class="player_button player_button_1 ability_type" data-stat="defense" data-player="dr-light" href="#" data-tooltip="Dr. Light" data-tooltip-type="ability_type_defense">L</a>');
-                    }
-                }
-
-            if (jQuery.inArray('dr-wily', thisShopData.unlockedPlayers) != -1){
-                if (jQuery.inArray('dr-wily', thisUnlocked) != -1){
-                    buttonCounter++;
-                    //console.log('jQuery.inArray(\'dr-wily\', thisUnlocked) == TRUE');
-                    buttonMarkup.push('<a class="player_button player_button_2 player_button_disabled ability_type ability_type_attack" data-stat="attack" data-player="dr-wily" data-tooltip="Dr. Wily" data-tooltip-type="ability_type_attack">W</a>');
-                    } else {
-                    buttonCounter++;
-                    //console.log('jQuery.inArray(\'dr-wily\', thisUnlocked) == FALSE');
-                    buttonMarkup.push('<a class="player_button player_button_2 ability_type" data-stat="attack" data-player="dr-wily" href="#" data-tooltip="Dr. Wily" data-tooltip-type="ability_type_attack">W</a>');
-                    }
-                }
-
-            if (jQuery.inArray('dr-cossack', thisShopData.unlockedPlayers) != -1){
-                if (jQuery.inArray('dr-cossack', thisUnlocked) != -1){
-                    buttonCounter++;
-                    //console.log('jQuery.inArray(\'dr-cossack\', thisUnlocked) == TRUE');
-                    buttonMarkup.push('<a class="player_button player_button_3 player_button_disabled ability_type ability_type_speed" data-stat="speed" data-player="dr-cossack" data-tooltip="Dr. Cossack" data-tooltip-type="ability_type_speed">C</a>');
-                    } else {
-                    buttonCounter++;
-                    //console.log('jQuery.inArray(\'dr-cossack\', thisUnlocked) == FALSE');
-                    buttonMarkup.push('<a class="player_button player_button_3 ability_type" data-stat="speed" data-player="dr-cossack" href="#"  data-tooltip="Dr. Cossack" data-tooltip-type="ability_type_speed">C</a>');
-                    }
-                }
-            */
-
             buttonMarkup.reverse();
             for (i in buttonMarkup){
                 var newButton = $(buttonMarkup[i]);
                 if (i == (buttonMarkup.length - 1)){ newButton.css({marginLeft:'20px'}); }
                 newButton.appendTo(itemCellConfirm);
                 }
-
             itemCellConfirm.append('<label class="item_price" data-price="'+actualPrice+'">&hellip; '+printNumberWithCommas(actualPrice)+'z</label>');
-            //itemCellConfirm.append('<label class="item_quantity" data-quantity="1">&#10004;</label>');
             itemCellConfirm.append('<label class="item_quantity" data-quantity="'+buyQuantity+'">x '+buyQuantity+'</label>');
             itemCellConfirm.append(thisItemName);
-
+            } else if (thisKind == 'item'){
+            if (itemCellConfirm.attr('data-token') == thisToken){
+                buyQuantity = parseInt(itemCellConfirm.attr('data-quantity')) + 1;
+                //console.log('ITEM-A) '+thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+buyQuantity+' / '+thisPrice+'z');
+                buyPrice = buyQuantity * parseInt(thisPrice);
+                if (buyQuantity + thisQuantity > 99){
+                    //console.log('buyQuantity + thisQuantity > 99 | '+buyQuantity+' + '+thisQuantity+' > 99');
+                    buyQuantity = 99 - thisQuantity;
+                    buyPrice = buyQuantity * parseInt(thisPrice);
+                    } else if (buyPrice > thisShopData.zennyCounter){
+                    //console.log('buyPrice > thisShopData.zennyCounter | '+buyPrice+' > '+thisShopData.zennyCounter+' ');
+                    buyQuantity = buyQuantity - 1;
+                    buyPrice = buyQuantity * parseInt(thisPrice);
+                    }
+                itemCellConfirm.attr('data-quantity', buyQuantity).attr('data-price', buyPrice);
+                itemCellConfirm.find('.item_quantity').attr('data-quantity', buyQuantity).html('x '+buyQuantity);
+                itemCellConfirm.find('.item_price').attr('data-price', buyPrice).html('&hellip; '+printNumberWithCommas(buyPrice)+'z');
+                } else {
+                //console.log('ITEM-B) '+thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+buyQuantity+' / '+thisPrice+'z');
+                itemCellConfirm.empty();
+                itemCellConfirm.attr('data-kind', thisKind).attr('data-action', thisAction).attr('data-token', thisToken).attr('data-price', thisPrice).attr('data-quantity', buyQuantity).attr('data-shop', thisBuyer);
+                itemCellConfirm.append('<a class="cancel_button ability_type ability_type_attack" href="#">Cancel</a>');
+                itemCellConfirm.append('<a class="confirm_button ability_type ability_type_energy" href="#">Confirm</a>');
+                itemCellConfirm.append('<label class="item_price" data-price="'+buyPrice+'">&hellip; '+printNumberWithCommas(buyPrice)+'z</label>');
+                itemCellConfirm.append('<label class="item_quantity_mods">'
+                    + '<a class="inc ability_type ability_type_none" data-inc="1"><i>+1</i></a>'
+                    + '<a class="inc ability_type ability_type_none" data-inc="10"><i>+10</i></a>'
+                    + '</label>');
+                itemCellConfirm.append('<label class="item_quantity" data-quantity="'+buyQuantity+'">x '+buyQuantity+'</label>');
+                itemCellConfirm.append('<label class="item_quantity_mods">'
+                    + '<a class="dec ability_type ability_type_none disabled" data-dec="10"><i>-10</i></a>'
+                    + '<a class="dec ability_type ability_type_none disabled" data-dec="1"><i>-1</i></a>'
+                    + '</label>');
+                itemCellConfirm.append(thisItemName);
+                generateQuantityModEvents(itemCellConfirm, thisAction);
+                }
             } else {
-
-            //console.log('C) '+thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+buyQuantity+' / '+thisPrice+'z');
+            //console.log('OTHER-A) '+thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+buyQuantity+' / '+thisPrice+'z');
             itemCellConfirm.empty();
             itemCellConfirm.attr('data-kind', thisKind).attr('data-action', thisAction).attr('data-token', thisToken).attr('data-price', thisPrice).attr('data-quantity', buyQuantity).attr('data-shop', thisBuyer);
             itemCellConfirm.append('<a class="cancel_button ability_type ability_type_attack" href="#">Cancel</a>');
@@ -338,7 +267,6 @@ $(document).ready(function(){
             itemCellConfirm.append('<label class="item_price" data-price="'+buyPrice+'">&hellip; '+printNumberWithCommas(buyPrice)+'z</label>');
             itemCellConfirm.append('<label class="item_quantity" data-quantity="'+buyQuantity+'">x '+buyQuantity+'</label>');
             itemCellConfirm.append(thisItemName);
-
             }
         return true;
         });
