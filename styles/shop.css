@@ -438,6 +438,8 @@
 #shop #console .event .player_button,
 #shop #console .event .item_price,
 #shop #console .event .item_quantity,
+#shop #console .event .item_quantity_mods,
+#shop #console .event .item_quantity_mods a,
 #shop #console .event .item_owned {
     display: block;
     float: left;
@@ -475,7 +477,8 @@
 #shop #console .event .sell_button,
 #shop #console .event .confirm_button,
 #shop #console .event .cancel_button,
-#shop #console .event .player_button {
+#shop #console .event .player_button,
+#shop #console .event .item_quantity_mods a {
     float: right;
     width: 30px;
     text-transform: uppercase;
@@ -516,8 +519,75 @@
     filter: alpha(opacity=30);
     cursor: default;
 }
+#shop #console .event .item_quantity_mods a {
+    margin: 2px;
+    width: 26px;
+    height: 19px;
+    text-align: center;
+    box-sizing: border-box;
+    overflow: visible;
+    float: left;
+    transition: opacity 0.3s;
+}
+#shop #console .event .item_quantity_mods a i {
+    display: inline-block;
+    direction: ltr;
+    text-indent: -9999px;
+    overflow: hidden;
+    width: 26px;
+    height: 18px;
+    font-size: 15px;
+    position: relative;
+    top: -1px;
+    left: -7px;
+    background-image: url(../images/shops/quantity-arrows.png?20190224);
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    background-size: auto;
+    transition: top 0.2s;
+}
+#shop #console .event .item_quantity_mods a:hover i {
+    top: -4px;
+}
+#shop #console .event .item_quantity_mods a[data-dec="10"] i {
+    background-position: 0 0;
+}
+#shop #console .event .item_quantity_mods a[data-dec="1"] i {
+    background-position: -26px 0;
+}
+#shop #console .event .item_quantity_mods a[data-inc="1"] i {
+    background-position: -52px 0;
+}
+#shop #console .event .item_quantity_mods a[data-inc="10"] i {
+    background-position: -78px 0;
+}
+
+#shop #console .event .item_quantity_mods a.disabled {
+    opacity: 0.3;
+}
+#shop #console .event .item_quantity_mods a.disabled i {
+    opacity: 0.3;
+}
+#shop #console .event .item_quantity_mods a.disabled:hover i {
+    top: -1px;
+}
+
+
+#shop #console .event .item_cell_confirm.with_mods .item_price {
+    min-width: 75px;
+    text-align: right;
+}
+#shop #console .event .item_cell_confirm.with_mods .item_quantity {
+    text-align: center;
+    background-color: #383838;
+    margin: 0 0 0 5px;
+    padding: 2px 5px 3px;
+    width: 42px;
+}
+
 #shop #console .event .item_price,
 #shop #console .event .item_quantity,
+#shop #console .event .item_quantity_mods,
 #shop #console .event .item_owned {
     float: right;
     font-size: 11px;
@@ -527,11 +597,18 @@
 }
 #shop #console .event .item_cell_confirm .item_price,
 #shop #console .event .item_cell_confirm .item_quantity,
+#shop #console .event .item_cell_confirm .item_quantity_mods,
 #shop #console .event .item_cell_confirm .item_owned {
     margin-left: 10px;
 }
 #shop #console .event .item_quantity {
     width: 32px;
+    text-align: right;
+}
+#shop #console .event .item_quantity_mods {
+    width: auto;
+    padding: 0;
+    margin: 0 auto;
     text-align: right;
 }
 #shop #console .event .item_owned {

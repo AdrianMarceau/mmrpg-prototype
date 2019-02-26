@@ -83,6 +83,37 @@ $(document).ready(function(){
         return true;
         });
 
+    // Define a function for creating necessary click-events for any quantity mod buttons
+    var generateQuantityModEvents = function($itemCellConfirm){
+        if ($itemCellConfirm.attr('data-kind') != 'item'){ return false; }
+        //console.log('generateQuantityModEvents($itemCellConfirm)', $itemCellConfirm);
+        var itemToken = $itemCellConfirm.attr('data-token');
+        var $itemCell = $('.item_cell[data-token="'+itemToken+'"][data-action="sell"]', gameConsole);
+        var maxQuantity = parseInt($itemCell.find('.item_quantity').attr('data-quantity') || 0);
+        var unitPrice = parseInt($itemCell.find('.item_price').attr('data-price') || 0);
+        //console.log('itemToken =', itemToken, '$itemCell = ', $itemCell.length, 'maxQuantity = ', maxQuantity, 'unitPrice = ', unitPrice);
+        var $modButtons = $('a[data-inc],a[data-dec]', $itemCellConfirm);
+        $modButtons.bind('click', function(e){
+            e.preventDefault();
+            var $button = $(this);
+            if ($button.hasClass('disabled')){ return false; }
+            var modKind = $button.is('[data-inc]') ? 'inc' : 'dec';
+            var modAmount = parseInt($button.attr('data-'+modKind));
+            var currentQuantity = parseInt($itemCellConfirm.attr('data-quantity'));
+            var newQuantity = modKind == 'inc' ? (currentQuantity + modAmount) : (currentQuantity - modAmount);
+            if (newQuantity > maxQuantity){ newQuantity = maxQuantity; }
+            else if (newQuantity < 0){ newQuantity = 0; }
+            var newPrice = newQuantity * unitPrice;
+            $itemCellConfirm.attr('data-quantity', newQuantity).attr('data-price', newPrice);
+            $itemCellConfirm.find('.item_quantity').attr('data-quantity', newQuantity).html('x '+newQuantity);
+            $itemCellConfirm.find('.item_price').attr('data-price', newPrice).html('&hellip; '+printNumberWithCommas(newPrice)+'z');
+            //console.log('currentQuantity is '+currentQuantity+' | '+modKind+' by '+modAmount+' | '+newQuantity);
+            $modButtons.removeClass('disabled');
+            if (newQuantity >= maxQuantity){ $modButtons.filter('[data-inc]').addClass('disabled'); }
+            if (newQuantity <= 0){ $modButtons.filter('[data-dec]').addClass('disabled'); }
+            });
+        };
+
     // Functionality to the sell links for all shops
     $('.item_cell[data-token][data-action=sell] .sell_button', gameConsole).live('click', function(e){
         e.preventDefault();
@@ -109,7 +140,7 @@ $(document).ready(function(){
             var sellQuantity = parseInt(itemCellConfirm.attr('data-quantity')) + 1;
             if (sellQuantity > thisQuantity){ sellQuantity = thisQuantity; }
             var sellPrice = sellQuantity * parseInt(thisPrice);
-            itemCellConfirm.attr('data-quantity', sellQuantity).attr('data-price', sellPrice).attr('data-shop', thisSeller);
+            itemCellConfirm.attr('data-quantity', sellQuantity).attr('data-price', sellPrice);
             itemCellConfirm.find('.item_quantity').attr('data-quantity', sellQuantity).html('x '+sellQuantity);
             itemCellConfirm.find('.item_price').attr('data-price', sellPrice).html('&hellip; '+printNumberWithCommas(sellPrice)+'z');
             } else {
@@ -118,8 +149,23 @@ $(document).ready(function(){
             itemCellConfirm.append('<a class="cancel_button ability_type ability_type_attack" href="#">Cancel</a>');
             itemCellConfirm.append('<a class="confirm_button ability_type ability_type_energy" href="#">Confirm</a>');
             itemCellConfirm.append('<label class="item_price" data-price="'+sellPrice+'">&hellip; '+printNumberWithCommas(sellPrice)+'z</label>');
-            itemCellConfirm.append('<label class="item_quantity" data-quantity="'+sellQuantity+'">x '+sellQuantity+'</label>');
+            if (thisKind == 'item' && thisAction == 'sell'){
+                itemCellConfirm.addClass('with_mods');
+                itemCellConfirm.append('<label class="item_quantity_mods">'
+                    + '<a class="inc ability_type ability_type_none" data-inc="1"><i>+1</i></a>'
+                    + '<a class="inc ability_type ability_type_none" data-inc="10"><i>+10</i></a>'
+                    + '</label>');
+                itemCellConfirm.append('<label class="item_quantity" data-quantity="'+sellQuantity+'">x '+sellQuantity+'</label>');
+                itemCellConfirm.append('<label class="item_quantity_mods">'
+                    + '<a class="dec ability_type ability_type_none disabled" data-dec="10"><i>-10</i></a>'
+                    + '<a class="dec ability_type ability_type_none disabled" data-dec="1"><i>-1</i></a>'
+                    + '</label>');
+                } else {
+                itemCellConfirm.removeClass('with_mods');
+                itemCellConfirm.append('<label class="item_quantity" data-quantity="'+sellQuantity+'">x '+sellQuantity+'</label>');
+                }
             itemCellConfirm.append(thisItemName);
+            generateQuantityModEvents(itemCellConfirm);
             }
         return true;
         });
