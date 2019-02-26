@@ -109,7 +109,7 @@ $(document).ready(function(){
             var newQuantity = modKind == 'inc' ? (currentQuantity + modAmount) : (currentQuantity - modAmount);
             //console.log('currentQuantity =', currentQuantity, 'maxQuantity = ', maxQuantity, 'newQuantity = ', newQuantity);
             if (newQuantity > maxQuantity){ newQuantity = maxQuantity; }
-            else if (newQuantity < 0){ newQuantity = 0; }
+            else if (newQuantity < 1){ newQuantity = 1; }
             var newPrice = newQuantity * unitPrice;
             $itemCellConfirm.attr('data-quantity', newQuantity).attr('data-price', newPrice);
             $itemCellConfirm.find('.item_quantity').attr('data-quantity', newQuantity).html('x '+newQuantity);
@@ -117,7 +117,7 @@ $(document).ready(function(){
             //console.log('currentQuantity is '+currentQuantity+' | '+modKind+' by '+modAmount+' | '+newQuantity);
             $modButtons.removeClass('disabled');
             if (newQuantity >= maxQuantity){ $modButtons.filter('[data-inc]').addClass('disabled'); }
-            if (newQuantity <= 0){ $modButtons.filter('[data-dec]').addClass('disabled'); }
+            if (newQuantity <= 1){ $modButtons.filter('[data-dec]').addClass('disabled'); }
             });
         };
 
