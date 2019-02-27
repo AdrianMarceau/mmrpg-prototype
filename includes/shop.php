@@ -196,7 +196,8 @@ $this_shop_index['auto'] = array(
                 'attack-capsule', 'defense-capsule',
                 'speed-pellet', 'super-pellet',
                 'speed-capsule', 'super-capsule',
-                'extra-life', 'yashichi'
+                'extra-life', 'yashichi',
+                'speed-booster'
                 )
             )
         );
@@ -811,6 +812,16 @@ if (!empty($this_shop_index['kalinka'])){
     if ($this_shop_index['kalinka']['shop_level'] >= 30){ $this_shop_index['kalinka']['shop_items']['items_selling'] = $this_shop_index['kalinka']['shop_items']['items_selling2']; }
     if ($this_shop_index['kalinka']['shop_level'] >= 60){ $this_shop_index['kalinka']['shop_items']['items_selling'] = $this_shop_index['kalinka']['shop_items']['items_selling3']; }
     unset($this_shop_index['kalinka']['shop_items']['items_selling2'], $this_shop_index['kalinka']['shop_items']['items_selling3']);
+
+    // Collect values for all of Kalinka's parts so we can add them to Auto's shop
+    $kalinka_part_values = call_user_func_array('get_items_with_values', array_keys($this_shop_index['kalinka']['shop_items']['items_selling']));
+    if (!empty($kalinka_part_values)){
+        foreach ($kalinka_part_values AS $token => $value){
+            if (isset($this_shop_index['auto']['shop_items']['items_buying'][$token])){ continue; }
+            elseif (empty($value)){ continue; }
+            $this_shop_index['auto']['shop_items']['items_buying'][$token] = $value;
+        }
+    }
 
     // If the player has unlocked the Legacy Codes, Kalinka's Shop also sells legacy fields & robots
     if (mmrpg_prototype_item_unlocked('legacy-codes')
