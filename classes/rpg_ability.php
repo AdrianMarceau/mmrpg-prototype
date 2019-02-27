@@ -1817,6 +1817,7 @@ class rpg_ability extends rpg_object {
                                 user_name, user_name_public, user_name_clean
                                 FROM mmrpg_users
                                 WHERE user_id IN ({$editor_ids_string})
+                                ORDER BY FIELD(user_id, {$editor_ids_string})
                                 ;", 'user_name_clean');
                             $temp_editor_titles = array();
                             foreach ($temp_editor_details AS $editor_url => $editor_info){
