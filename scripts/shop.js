@@ -87,17 +87,16 @@ $(document).ready(function(){
     var generateQuantityModEvents = function($itemCellConfirm, thisAction){
         if ($itemCellConfirm.attr('data-kind') != 'item'){ return false; }
         //console.log('generateQuantityModEvents($itemCellConfirm, thisAction)', $itemCellConfirm);
+
+        // Collect basic details about he item and cell
         var itemToken = $itemCellConfirm.attr('data-token');
         var $itemCell = $('.item_cell[data-token="'+itemToken+'"][data-action="'+thisAction+'"]', gameConsole);
         var unitPrice = parseInt($itemCell.find('.item_price').attr('data-price') || 0);
+        var currentQuantity = parseInt($itemCellConfirm.attr('data-quantity'));
         //console.log('itemToken =', itemToken, '$itemCell = ', $itemCell.length, 'unitPrice = ', unitPrice);
-        var $modButtons = $('a[data-inc],a[data-dec]', $itemCellConfirm);
-        $modButtons.bind('click', function(e){
-            e.preventDefault();
-            var $button = $(this);
-            if ($button.hasClass('disabled')){ return false; }
-            var modKind = $button.is('[data-inc]') ? 'inc' : 'dec';
-            var modAmount = parseInt($button.attr('data-'+modKind));
+
+        // Define a quick function for determining current and max values, based on action type
+        var getCurrentAndMax = function(){
             var currentQuantity = parseInt($itemCellConfirm.attr('data-quantity'));
             if (thisAction == 'sell'){
                 var maxQuantity = parseInt($itemCell.find('.item_quantity').attr('data-quantity') || 0);
@@ -106,6 +105,31 @@ $(document).ready(function(){
                 if (maxQuantity > 99){ maxQuantity = 99; }
                 maxQuantity -= parseInt($itemCell.find('.item_quantity').attr('data-quantity') || 0);
                 }
+            return [currentQuantity, maxQuantity];
+            };
+
+        // Collect a reference to all the mod butons so we loop through them
+        var $modButtons = $('a[data-inc],a[data-dec]', $itemCellConfirm);
+
+        // Collect temp and max quantity values
+        var tempValues = getCurrentAndMax();
+        var currentQuantity = tempValues[0];
+        var maxQuantity = tempValues[1];
+
+        // Add the disabled class to all buttons, then remove where applicable
+        $modButtons.addClass('disabled');
+        if ((currentQuantity + 1) <= maxQuantity){ $modButtons.filter('[data-inc]').removeClass('disabled'); }
+
+        // Bind the click action to each of the mod buttonsw with functionality
+        $modButtons.bind('click', function(e){
+            e.preventDefault();
+            var $button = $(this);
+            if ($button.hasClass('disabled')){ return false; }
+            var modKind = $button.is('[data-inc]') ? 'inc' : 'dec';
+            var modAmount = parseInt($button.attr('data-'+modKind));
+            var tempValues = getCurrentAndMax();
+            var currentQuantity = tempValues[0];
+            var maxQuantity = tempValues[1];
             var newQuantity = modKind == 'inc' ? (currentQuantity + modAmount) : (currentQuantity - modAmount);
             //console.log('currentQuantity =', currentQuantity, 'maxQuantity = ', maxQuantity, 'newQuantity = ', newQuantity);
             if (newQuantity > maxQuantity){ newQuantity = maxQuantity; }
@@ -119,6 +143,7 @@ $(document).ready(function(){
             if (newQuantity >= maxQuantity){ $modButtons.filter('[data-inc]').addClass('disabled'); }
             if (newQuantity <= 1){ $modButtons.filter('[data-dec]').addClass('disabled'); }
             });
+
         };
 
     // Functionality to the sell links for all shops
