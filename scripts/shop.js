@@ -101,9 +101,10 @@ $(document).ready(function(){
             if (thisAction == 'sell'){
                 var maxQuantity = parseInt($itemCell.find('.item_quantity').attr('data-quantity') || 0);
                 } else if (thisAction == 'buy'){
+                var maxItemDiff = 99 - parseInt($itemCell.find('.item_quantity').attr('data-quantity') || 0);
                 var maxQuantity = Math.floor(thisShopData.zennyCounter / unitPrice);
-                if (maxQuantity > 99){ maxQuantity = 99; }
-                maxQuantity -= parseInt($itemCell.find('.item_quantity').attr('data-quantity') || 0);
+                if (maxQuantity > maxItemDiff){ maxQuantity = maxItemDiff; }
+                //console.log('currentQuantity =', currentQuantity, 'maxItemDiff = ', maxItemDiff, 'maxQuantity = ', maxQuantity);
                 }
             return [currentQuantity, maxQuantity];
             };
@@ -115,13 +116,15 @@ $(document).ready(function(){
         var tempValues = getCurrentAndMax();
         var currentQuantity = tempValues[0];
         var maxQuantity = tempValues[1];
+        //console.log('currentQuantity =', currentQuantity, 'maxQuantity = ', maxQuantity);
 
         // Add the disabled class to all buttons, then remove where applicable
         $modButtons.addClass('disabled');
         if ((currentQuantity + 1) <= maxQuantity){ $modButtons.filter('[data-inc]').removeClass('disabled'); }
+        if (currentQuantity > 1){ $modButtons.filter('[data-dec]').removeClass('disabled'); }
 
         // Bind the click action to each of the mod buttonsw with functionality
-        $modButtons.bind('click', function(e){
+        $modButtons.unbind('click').bind('click', function(e){
             e.preventDefault();
             var $button = $(this);
             if ($button.hasClass('disabled')){ return false; }
@@ -197,6 +200,8 @@ $(document).ready(function(){
                 itemCellConfirm.append('<label class="item_quantity" data-quantity="'+sellQuantity+'">x '+sellQuantity+'</label>');
                 }
             itemCellConfirm.append(thisItemName);
+            }
+        if (thisKind == 'item'){
             generateQuantityModEvents(itemCellConfirm, thisAction);
             }
         return true;
@@ -281,7 +286,6 @@ $(document).ready(function(){
                     + '<a class="dec ability_type ability_type_none disabled" data-dec="1"><i>-1</i></a>'
                     + '</label>');
                 itemCellConfirm.append(thisItemName);
-                generateQuantityModEvents(itemCellConfirm, thisAction);
                 }
             } else {
             //console.log('OTHER-A) '+thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+buyQuantity+' / '+thisPrice+'z');
@@ -292,6 +296,9 @@ $(document).ready(function(){
             itemCellConfirm.append('<label class="item_price" data-price="'+buyPrice+'">&hellip; '+printNumberWithCommas(buyPrice)+'z</label>');
             itemCellConfirm.append('<label class="item_quantity" data-quantity="'+buyQuantity+'">x '+buyQuantity+'</label>');
             itemCellConfirm.append(thisItemName);
+            }
+        if (thisKind == 'item'){
+            generateQuantityModEvents(itemCellConfirm, thisAction);
             }
         return true;
         });
