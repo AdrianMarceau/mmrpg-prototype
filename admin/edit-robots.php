@@ -1464,8 +1464,7 @@
                                                                         if ($group == 'sprites'){ $file_exists = in_array($file_name, $alt_files_existing) ? true : false; }
                                                                         elseif ($group == 'shadows'){ $file_exists = in_array($file_name, $alt_shadows_existing) ? true : false; }
                                                                         $file_is_unused = false;
-                                                                        //if ($group == 'shadows' && ($kind == 'mug' || $size_key == 0)){ $file_is_unused = true; }
-                                                                        if ($group == 'shadows' && $kind == 'mug'){ $file_is_unused = true; }
+                                                                        if ($group == 'shadows' && ($kind == 'mug' || $size_key == 0)){ $file_is_unused = true; }
                                                                         $file_is_optional = $group == 'shadows' && !$is_base_sprite ? true : false;
                                                                         echo('<li>');
                                                                             echo('<div class="filebar'.($file_is_unused ? ' unused' : '').($file_is_optional ? ' optional' : '').'" data-auto="file-bar" data-file-path="'.$this_alt_path.'" data-file-name="'.$file_name.'" data-file-kind="image/png" data-file-width="'.$sheet_width.'" data-file-height="'.$sheet_height.'">');
