@@ -23,13 +23,6 @@ $battle = array(
                     'rising-cutter', 'shadow-blade', 'hard-knuckle', 'spark-shock', 'bright-burst', 'metal-press',
                     'cutter-shot', 'cutter-buster', 'cutter-overdrive',
                     'mecha-support'
-                    ),
-                'values' => array(
-                    'robot_rewards' => array(
-                        'robot_attack' => 200,
-                        'robot_defense' => 200,
-                        'robot_speed' => 200
-                        )
                     )
                 )
             )

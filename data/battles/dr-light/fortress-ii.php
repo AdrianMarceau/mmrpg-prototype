@@ -22,13 +22,6 @@ $battle = array(
                     'mega-slide', 'bass-baroque', 'proto-strike',
                     'shield-shot', 'shield-buster', 'shield-overdrive',
                     'mecha-support'
-                    ),
-                'values' => array(
-                    'robot_rewards' => array(
-                        'robot_attack' => 100,
-                        'robot_defense' => 100,
-                        'robot_speed' => 100
-                        )
                     )
                 )
             )

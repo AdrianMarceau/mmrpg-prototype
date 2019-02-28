@@ -24,13 +24,6 @@ $battle = array(
                     'hyper-bomb', 'crash-avenger', 'quick-boomerang', 'gemini-laser', 'core-laser',
                     'laser-shot', 'laser-buster', 'laser-overdrive',
                     'mecha-support'
-                    ),
-                'values' => array(
-                    'robot_rewards' => array(
-                        'robot_attack' => 300,
-                        'robot_defense' => 300,
-                        'robot_speed' => 300
-                        )
                     )
                 )
             )
