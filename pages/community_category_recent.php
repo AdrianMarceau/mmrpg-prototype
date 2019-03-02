@@ -88,6 +88,8 @@ if (!empty($temp_thread_ids)){
 
         WHERE posts.thread_id IN ({$temp_thread_ids})
 
+        AND posts.post_deleted = 0
+
         ORDER BY posts.post_date ASC
 
         ;";
