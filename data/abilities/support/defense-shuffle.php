@@ -30,7 +30,7 @@ $ability = array(
         // Target this robot's self
         $this_ability->target_options_update(array(
             'frame' => 'summon',
-            'success' => array(9, 0, 10, -10, $this_robot->print_name().' triggered an '.$this_ability->print_name().'!')
+            'success' => array(9, 0, 10, -10, $this_robot->print_name().' triggered a '.$this_ability->print_name().'!')
             ));
         $this_robot->trigger_target($this_robot, $this_ability);
 
@@ -59,7 +59,7 @@ $ability = array(
                 $is_mecha = $this_robot->robot_class == 'mecha' ? true : false;
                 $this_ability->target_options_update(array(
                     'frame' => 'defend',
-                    'success' => array(9, 0, 10, -10, $this_robot->print_name().'&#39;s life defense was modified&hellip;<br /> '.($is_her ? 'Her' : ($is_mecha ? 'Its' : 'His')).' new defense stats are '.$this_robot->print_defense().' / '.$this_robot->print_robot_base_defense().'!')
+                    'success' => array(9, 0, 10, -10, $this_robot->print_name().'&#39;s defense was modified&hellip;<br /> '.($is_her ? 'Her' : ($is_mecha ? 'Its' : 'His')).' new defense stats are '.$this_robot->print_defense().' / '.$this_robot->print_robot_base_defense().'!')
                     ));
                 $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
 
@@ -70,7 +70,7 @@ $ability = array(
                 // Target this robot's self and show the ability failing
                 $this_ability->target_options_update(array(
                     'frame' => 'defend',
-                    'success' => array(9, 0, 0, -10, $this_robot->print_name().'&#39;s life defense was not affected&hellip;')
+                    'success' => array(9, 0, 0, -10, $this_robot->print_name().'&#39;s defense was not affected&hellip;')
                     ));
                 $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
 
