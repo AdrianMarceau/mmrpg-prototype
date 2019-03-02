@@ -120,15 +120,21 @@ $temp_pattern_last[] = '/^fusion-star$/i';
 
 $temp_pattern_last[] = '/^energy-upgrade$/i';
 $temp_pattern_last[] = '/^weapon-upgrade$/i';
+
 $temp_pattern_last[] = '/^attack-booster$/i';
 $temp_pattern_last[] = '/^defense-booster$/i';
 $temp_pattern_last[] = '/^speed-booster$/i';
 $temp_pattern_last[] = '/^field-booster$/i';
+
 $temp_pattern_last[] = '/^target-module$/i';
 $temp_pattern_last[] = '/^charge-module$/i';
 $temp_pattern_last[] = '/^fortune-module$/i';
 $temp_pattern_last[] = '/^growth-module$/i';
 $temp_pattern_last[] = '/^reverse-module$/i';
+
+$temp_pattern_last[] = '/^battery-circuit/i';
+$temp_pattern_last[] = '/^sponge-circuit$/i';
+$temp_pattern_last[] = '/^forge-circuit$/i';
 
 $temp_pattern_last[] = '/^light-program$/i';
 $temp_pattern_last[] = '/^wily-program$/i';
