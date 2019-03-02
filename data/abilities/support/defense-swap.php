@@ -45,7 +45,7 @@ $ability = array(
         $target_stat_mods = $target_robot->counters[$stat_token.'_mods'];
 
         // If this robot happens to be targeting itself or the stats are otherwise the same, do nothing and return now
-        if ($has_target_self || $this_stat_mods === $target_stat_mods){
+        if ($has_target_self || $this_stat_mods === $target_stat_mods || $target_robot->robot_status != 'active'){
 
             // Update the ability's target options and trigger
             $this_ability->target_options_update(array('frame' => 'defend', 'success' => array(0, 0, 0, 10, '&hellip;but nothing happened.')));
