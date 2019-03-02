@@ -74,8 +74,11 @@
             // If there were no errors, we can contiue
             if ($form_success){
 
+                // Check to see what the allowable admin IDs are
+                $allowed_admin_ids = defined('MMRPG_CONFIG_ADMIN_LIST') && MMRPG_CONFIG_ADMIN_LIST !== '' ? explode(',', MMRPG_CONFIG_ADMIN_LIST) : array();
+
                 // Check to ensure the user is of the appropriate admin level
-                if ($login_data['role_level'] < 4){
+                if ($login_data['role_level'] < 4 || !in_array($login_data['user_id'], $allowed_admin_ids)){
                     $form_messages[] = array('error', 'Your account does not have required access permissions');
                     $form_success = false;
                 }
