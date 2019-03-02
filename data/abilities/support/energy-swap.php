@@ -27,6 +27,9 @@ $ability = array(
         $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
         $target_robot->update_session();
 
+        // Check if this robot is targetting itself
+        $has_target_self = $this_robot->robot_id == $target_robot->robot_id ? true : false;
+
         // Target this robot's self
         $this_ability->target_options_update(array(
             'frame' => 'summon',
@@ -39,13 +42,10 @@ $ability = array(
         $target_robot->update_session();
 
         // If this robot happens to be targeting itself, nothing happens
-        if ($this_robot->robot_id == $target_robot->robot_id){
+        if ($has_target_self || $target_robot->robot_status != 'active'){
 
             // Update the ability's target options and trigger
-            $this_ability->target_options_update(array(
-                'frame' => 'defend',
-                'success' => array(0, 0, 0, 10, '&hellip;but nothing happened.')
-                ));
+            $this_ability->target_options_update(array('frame' => 'defend', 'success' => array(0, 0, 0, 10, '&hellip;but nothing happened.')));
             $this_robot->trigger_target($target_robot, $this_ability, array('prevent_default_text' => true));
             return;
 
