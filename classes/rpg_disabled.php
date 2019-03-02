@@ -467,6 +467,7 @@ class rpg_disabled {
 
                     // If this robot has been traded, give it an additional experience boost
                     $temp_experience_boost = 0;
+                    $temp_robot_boosted_word = 'boosted';
                     $temp_robot_boost_kinds = array();
                     $temp_robot_boost_text = $temp_boost_text;
                     $temp_player_boosted = false;
@@ -501,6 +502,7 @@ class rpg_disabled {
                     $temp_experience_boost = 0;
                     if (isset($this_robot->field->field_multipliers['experience']) && $this_robot->field->field_multipliers['experience'] != 1){
                         $temp_robot_boost_kinds[] = 'field';
+                        if ($this_robot->field->field_multipliers['experience'] < 1){ $temp_robot_boosted_word = 'modified'; }
                         $temp_experience_bak = $target_robot_experience;
                         $target_robot_experience = ceil($target_robot_experience * $this_robot->field->field_multipliers['experience']);
                         $temp_experience_boost = $target_robot_experience - $temp_experience_bak;
@@ -515,7 +517,7 @@ class rpg_disabled {
                     if (!empty($temp_robot_boost_kinds)){
                         $temp_robot_boost_text = implode(', ', $temp_robot_boost_kinds);
                         $temp_robot_boost_text = preg_replace('/,\s([a-z]+)$/i', ', and $1', $temp_robot_boost_text);
-                        $temp_robot_boost_text = (preg_match('/^(a|e|i|o|y)/', $temp_robot_boost_text) ? 'an ' : 'a ').$temp_robot_boost_text.' boosted ';
+                        $temp_robot_boost_text = (preg_match('/^(a|e|i|o|y)/', $temp_robot_boost_text) ? 'an ' : 'a ').$temp_robot_boost_text.' '.$temp_robot_boosted_word.' ';
                     }
 
                     // If the experience is greater then the max, level it off at the max (sorry guys!)
