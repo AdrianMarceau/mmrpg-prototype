@@ -220,7 +220,10 @@ function mmrpg_game_robot_tokens_unlocked($player_token = ''){
         foreach ($battle_values AS $value_token){
             if (!empty($_SESSION[$session_token]['values'][$value_token][$player_token]['player_robots'])){
                 foreach ($_SESSION[$session_token]['values'][$value_token][$player_token]['player_robots'] AS $robot_token => $robot_info){
-                    if (!empty($robot_token) && !empty($robot_info) && !in_array($robot_token, $unlocked_robots_tokens)){
+                    if (!empty($robot_token)
+                        && !empty($robot_info)
+                        && !in_array($robot_token, $unlocked_robots_tokens)
+                        && mmrpg_game_robot_unlocked('', $robot_token)){
                         $unlocked_robots_tokens[] = $robot_token;
                     }
                 }
@@ -235,7 +238,10 @@ function mmrpg_game_robot_tokens_unlocked($player_token = ''){
             foreach ($_SESSION[$session_token]['values'][$value_token] AS $player_token => $player_info){
                 if (!empty($_SESSION[$session_token]['values'][$value_token][$player_token]['player_robots'])){
                     foreach ($_SESSION[$session_token]['values'][$value_token][$player_token]['player_robots'] AS $robot_token => $robot_info){
-                        if (!empty($robot_token) && !empty($robot_info) && !in_array($robot_token, $unlocked_robots_tokens)){
+                        if (!empty($robot_token)
+                            && !empty($robot_info)
+                            && !in_array($robot_token, $unlocked_robots_tokens)
+                            && mmrpg_game_robot_unlocked('', $robot_token)){
                             $unlocked_robots_tokens[] = $robot_token;
                         }
                     }
