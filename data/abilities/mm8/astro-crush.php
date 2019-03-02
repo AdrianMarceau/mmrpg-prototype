@@ -159,6 +159,18 @@ $ability = array(
         unset($this_robot->robot_attachments[$this_blackout_token]);
         $this_robot->update_session();
 
+        // Loop through all robots on the target side and remove leftover attachments
+        $target_robots_active = $target_player->get_robots();
+        foreach ($target_robots_active AS $key => $robot){
+            if ($robot->robot_id == $target_robot->robot_id){ $temp_target_robot = $target_robot; }
+            else { $temp_target_robot = $robot; }
+            if (isset($temp_target_robot->robot_attachments[$this_meteor_token])){
+                unset($temp_target_robot->robot_attachments[$this_meteor_token]);
+                $temp_target_robot->update_session();
+            }
+            unset($temp_target_robot);
+        }
+
         // Loop through all robots on the target side and disable any that need it
         $target_robots_active = $target_player->get_robots();
         foreach ($target_robots_active AS $key => $robot){
@@ -168,6 +180,7 @@ $ability = array(
                 && empty($temp_target_robot->flags['apply_disabled_state'])){
                 $temp_target_robot->trigger_disabled($this_robot);
             }
+            unset($temp_target_robot);
         }
 
         // Call the global stat break function with customized options

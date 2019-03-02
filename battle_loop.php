@@ -586,7 +586,12 @@ if ($this_battle->battle_status == 'complete'){
 // Determine the next action based on everything that's happened
 if (empty($this_redirect)){
     $this_next_action = 'battle';
-    if (($this_robot->robot_status == 'disabled' || $this_robot->robot_position != 'active')
+    $has_active_robot = rpg_game::find_robot(array(
+        'player_id' => $this_player->player_id,
+        'robot_position' => 'active',
+        'robot_status' => 'active'
+        ));
+    if ((!$has_active_robot || $this_robot->robot_status == 'disabled' || $this_robot->robot_position != 'active')
         && $this_battle->battle_status != 'complete'){
         $this_next_action = 'switch';
     }

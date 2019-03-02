@@ -94,12 +94,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
             $_SESSION[$session_token]['SHOP'][$temp_session_key]['shown']['star-'.$temp_actual_token] = true;
             $temp_current_quantity = 0;
 
-            /*
-            // Remove this star's entry from the global arrayand define the new quantity
-            unset($_SESSION[$session_token]['values']['battle_stars'][$temp_actual_token]);
-            $temp_current_quantity = 0;
-            */
-
             // Increment the player's zenny count based on the provided price
             $_SESSION[$session_token]['counters']['battle_zenny'] = $global_zenny_counter + $temp_price;
             $global_zenny_counter = $_SESSION[$session_token]['counters']['battle_zenny'];
