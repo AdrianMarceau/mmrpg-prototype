@@ -205,7 +205,7 @@ $(document).ready(function(){
             generateQuantityModEvents(itemCellConfirm, thisAction);
             }
         if (thisKind == 'star'){
-            console.log('We should auto-confirm stars being shown!');
+            //console.log('We should auto-confirm stars being shown!');
             thisCell.addClass('item_cell_disabled');
             itemCellConfirm.find('a.cancel_button').remove();
             itemCellConfirm.find('a.confirm_button').html('Scanning&hellip;').trigger('click');
