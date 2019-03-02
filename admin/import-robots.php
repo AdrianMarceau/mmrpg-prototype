@@ -782,4 +782,9 @@ else {
     $this_page_markup .= '<p style="padding: 6px; background-color: rgb(218, 255, 218);"><strong>ALL BOSS HAVE BEEN IMPORTED UPDATED!</strong></p>';
 }
 
+// Update the cache timestamp now that we've refreshed the database
+list($date, $time) = explode('-', date('Ymd-Hi'));
+$db->update('mmrpg_config', array('config_value' => $date), "config_group = 'global' AND config_name = 'cache_date'");
+$db->update('mmrpg_config', array('config_value' => $time), "config_group = 'global' AND config_name = 'cache_time'");
+
 ?>
