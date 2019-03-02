@@ -566,6 +566,7 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
             posts.thread_id,
             count(posts.thread_id) AS post_count
             FROM mmrpg_posts AS posts
+            WHERE posts.post_deleted = 0
             GROUP BY posts.thread_id
             ) AS posts
             ON threads.thread_id = posts.thread_id
@@ -576,7 +577,7 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
             posts2.post_mod,
             count(posts2.thread_id) AS new_post_count
             FROM mmrpg_posts AS posts2
-            WHERE posts2.post_mod > {$temp_last_login}
+            WHERE posts2.post_mod > {$temp_last_login} AND posts2.post_deleted = 0
             GROUP BY posts2.thread_id
             ) AS posts_new
             ON threads.thread_id = posts_new.thread_id
@@ -690,6 +691,7 @@ function mmrpg_website_community_category_threads_count($this_category_info, $fi
             posts.thread_id,
             count(posts.thread_id) AS post_count
             FROM mmrpg_posts AS posts
+            WHERE posts.post_deleted = 0
             GROUP BY posts.thread_id
             ) AS posts
             ON threads.thread_id = posts.thread_id
@@ -700,7 +702,7 @@ function mmrpg_website_community_category_threads_count($this_category_info, $fi
             posts2.post_mod,
             count(posts2.thread_id) AS new_post_count
             FROM mmrpg_posts AS posts2
-            WHERE posts2.post_mod > {$temp_last_login}
+            WHERE posts2.post_mod > {$temp_last_login} AND posts2.post_deleted = 0
             GROUP BY posts2.thread_id
             ) AS posts_new
             ON threads.thread_id = posts_new.thread_id
