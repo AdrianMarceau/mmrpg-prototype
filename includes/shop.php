@@ -352,6 +352,15 @@ $this_shop_index['kalinka'] = array(
                 'growth-module', 'fortune-module',
                 'target-module', 'charge-module',
                 'reverse-module'
+                ),
+            'items_selling4' => get_items_with_prices(
+                'energy-upgrade', 'weapon-upgrade',
+                'attack-booster', 'defense-booster',
+                'speed-booster', 'field-booster',
+                'growth-module', 'fortune-module',
+                'target-module', 'charge-module',
+                'reverse-module', 'battery-circuit',
+                'sponge-circuit', 'forge-circuit'
                 )
             )
         );
@@ -811,7 +820,8 @@ if (!empty($this_shop_index['kalinka'])){
     // If Kalinka's Shop has reached sufficient levels, expand the inventory
     if ($this_shop_index['kalinka']['shop_level'] >= 30){ $this_shop_index['kalinka']['shop_items']['items_selling'] = $this_shop_index['kalinka']['shop_items']['items_selling2']; }
     if ($this_shop_index['kalinka']['shop_level'] >= 60){ $this_shop_index['kalinka']['shop_items']['items_selling'] = $this_shop_index['kalinka']['shop_items']['items_selling3']; }
-    unset($this_shop_index['kalinka']['shop_items']['items_selling2'], $this_shop_index['kalinka']['shop_items']['items_selling3']);
+    if ($this_shop_index['kalinka']['shop_level'] >= 90){ $this_shop_index['kalinka']['shop_items']['items_selling'] = $this_shop_index['kalinka']['shop_items']['items_selling4']; }
+    unset($this_shop_index['kalinka']['shop_items']['items_selling2'], $this_shop_index['kalinka']['shop_items']['items_selling3'], $this_shop_index['kalinka']['shop_items']['items_selling4']);
 
     // Collect values for all of Kalinka's parts so we can add them to Auto's shop
     $kalinka_part_values = call_user_func_array('get_items_with_values', array_keys($this_shop_index['kalinka']['shop_items']['items_selling']));
