@@ -2322,6 +2322,7 @@ class rpg_robot extends rpg_object {
         $mod_numerator = 2;
         $mod_denominator = 2;
         foreach ($stat_tokens AS $key => $stat){
+            // Collect prop names and base value
             $prop_stat = 'robot_'.$stat;
             $prop_stat_base = 'robot_base_'.$stat;
             $base_value = $this->$prop_stat_base;
@@ -2338,6 +2339,28 @@ class rpg_robot extends rpg_object {
             }
             // Update the robot with the recalculated value
             $this->$prop_stat = $new_value;
+        }
+
+        // Reset this robot's elemental properties back to base
+        $element_stats = array('weaknesses', 'resistances', 'affinities', 'immunities');
+        foreach ($element_stats AS $key => $stat){
+            $prop_stat = 'robot_'.$stat;
+            $prop_stat_base = 'robot_base_'.$stat;
+            $this->$prop_stat = $this->$prop_stat_base;
+        }
+
+        // Apply any affinities granted by hold items
+        $item_affinities = array('battery-circuit' => 'electric', 'sponge-circuit' => 'water', 'forge-circuit' => 'flame');
+        if (!empty($this->robot_item)
+            && !empty($item_affinities[$this->robot_item])){
+            // Collect the element associated with this item
+            $item_element = $item_affinities[$this->robot_item];
+            // Add the element as an affinity if not already there
+            if (!in_array($item_element, $this->robot_affinities)){ $this->robot_affinities[] = $item_element; }
+            // Remove the element from other lists if applicable
+            if (in_array($item_element, $this->robot_weaknesses)){ unset($this->robot_weaknesses[array_search($item_element, $this->robot_weaknesses)]); }
+            if (in_array($item_element, $this->robot_resistances)){ unset($this->robot_resistances[array_search($item_element, $this->robot_resistances)]); }
+            if (in_array($item_element, $this->robot_immunities)){ unset($this->robot_immunities[array_search($item_element, $this->robot_immunities)]); }
         }
 
         // Now collect an export array for this object
