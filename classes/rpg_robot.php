@@ -2307,12 +2307,12 @@ class rpg_robot extends rpg_object {
         return $robot_info;
     }
 
-
     // Define a public function for recalculating internal counters
     public function update_variables(){
 
-        // Update parent objects first
-        //$this->player->update_variables();
+        // Create variables that don't exist if necessary
+        if (!isset($this->history['turns_active'])){ $this->history['turns_active'] = array(); }
+        if (!isset($this->history['turns_benched'])){ $this->history['turns_benched'] = array(); }
 
         // Calculate this robot's count variables
         $this->counters['abilities_total'] = count($this->robot_abilities);
@@ -4629,6 +4629,33 @@ class rpg_robot extends rpg_object {
 
     // -- END-OF-TURN CHECK FUNCTIONS -- //
 
+    // Define a function for checking the current turn and updating history
+    public function check_history(rpg_player $target_player, rpg_robot $target_robot){
+
+        // Collect references to global objects
+        $db = cms_database::get_database();
+        $this_battle = rpg_battle::get_battle();
+        $this_field = rpg_field::get_field();
+
+        // Collect references to relative player and robot objects
+        $this_player = $this->player;
+        $this_robot = $this;
+
+        // Update the history if this robot is active
+        $current_battle_turn = $this_battle->counters['battle_turn'];
+        if ($current_battle_turn){
+            if ($this_robot->robot_position == 'active'){
+                if (!in_array($current_battle_turn, $this_robot->history['turns_active'])){ $this_robot->history['turns_active'][] = $current_battle_turn; }
+            } elseif ($this_robot->robot_position == 'bench'){
+                if (!in_array($current_battle_turn, $this_robot->history['turns_benched'])){ $this_robot->history['turns_benched'][] = $current_battle_turn; }
+            }
+        }
+
+        // Update this robot's setting data
+        $this_robot->update_session();
+
+    }
+
     // Define a function for checking attachment status
     public function check_attachments(rpg_player $target_player, rpg_robot $target_robot){
 
@@ -5279,11 +5306,12 @@ class rpg_robot extends rpg_object {
             // Else the robot is holding an Attack Capsule or Attack Pellet item, apply recovery
             elseif ($item_token === 'attack-pellet' || $item_token === 'attack-capsule'){
 
-                // Ensure this robot's stat has actually taken damage
-                $item_restore_value = $item_token === 'attack-capsule' ? 5 : 2;
-                $item_trigger_value = $item_restore_value * -1;
-                if ($this_robot->counters['attack_mods'] <= $item_trigger_value){
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores attack by '.$item_restore_value.' stages');
+                // Only use this item if the robot is active and turns have passed
+                $item_restore_value = strstr($item_token, 'pellet') ? 2 : 3;
+                $item_wait_time = 1; // strstr($item_token, 'pellet') ? 1 : 2;
+                $robot_turns_active = count($this_robot->history['turns_active']);
+                if ($this_robot->robot_position == 'active' && $robot_turns_active >= $item_wait_time){
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' increases attack by '.$item_restore_value.' stages');
 
                     // Remove the robot's current item now that it's used up in battle
                     $this_robot->set_item('');
@@ -5306,11 +5334,12 @@ class rpg_robot extends rpg_object {
             // Else the robot is holding an Defense Capsule or Defense Pellet item, apply recovery
             elseif ($item_token == 'defense-pellet' || $item_token == 'defense-capsule'){
 
-                // Ensure this robot's stat has actually taken damage
-                $item_restore_value = $item_token === 'defense-capsule' ? 5 : 2;
-                $item_trigger_value = $item_restore_value * -1;
-                if ($this_robot->counters['defense_mods'] <= $item_trigger_value){
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores defense by '.$item_restore_value.' stages');
+                // Only use this item if the robot is active and turns have passed
+                $item_restore_value = strstr($item_token, 'pellet') ? 2 : 3;
+                $item_wait_time = 1; // strstr($item_token, 'pellet') ? 1 : 2;
+                $robot_turns_active = count($this_robot->history['turns_active']);
+                if ($this_robot->robot_position == 'active' && $robot_turns_active >= $item_wait_time){
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' increases defense by '.$item_restore_value.' stages');
 
                     // Remove the robot's current item now that it's used up in battle
                     $this_robot->set_item('');
@@ -5333,11 +5362,12 @@ class rpg_robot extends rpg_object {
             // Else the robot is holding an Speed Capsule or Speed Pellet item, apply recovery
             elseif ($item_token == 'speed-pellet' || $item_token == 'speed-capsule'){
 
-                // Ensure this robot's stat has actually taken damage
-                $item_restore_value = $item_token === 'speed-capsule' ? 5 : 2;
-                $item_trigger_value = $item_restore_value * -1;
-                if ($this_robot->counters['speed_mods'] <= $item_trigger_value){
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores speed by '.$item_restore_value.' stages');
+                // Only use this item if the robot is active and turns have passed
+                $item_restore_value = strstr($item_token, 'pellet') ? 2 : 3;
+                $item_wait_time = 1; // strstr($item_token, 'pellet') ? 1 : 2;
+                $robot_turns_active = count($this_robot->history['turns_active']);
+                if ($this_robot->robot_position == 'active' && $robot_turns_active >= $item_wait_time){
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' increases speed by '.$item_restore_value.' stages');
 
                     // Remove the robot's current item now that it's used up in battle
                     $this_robot->set_item('');
@@ -5360,31 +5390,23 @@ class rpg_robot extends rpg_object {
             // Else the robot is holding an Super Capsule or Super Pellet item, apply recovery
             elseif ($item_token == 'super-pellet' || $item_token == 'super-capsule'){
 
-                // Loop through the three stat types that can be restored
-                $trigger_stat = false;
-                $trigger_item = false;
+                // Define the three stat types that can be increased
                 $temp_stat_tokens = array('attack', 'defense', 'speed');
-                $item_restore_value = $item_token === 'super-capsule' ? 5 : 2;
-                $item_trigger_value = $item_restore_value * -1;
-                foreach ($temp_stat_tokens AS $temp_stat){
-                    // Ensure this robot's stat has actually taken damage
-                    if ($this_robot->counters[$temp_stat.'_mods'] <= $item_trigger_value){
-                        $trigger_stat = $temp_stat;
-                        $trigger_item = true;
-                    }
-                }
 
-                // Ensure this robot's stat has actually taken damage
-                if ($trigger_item){
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores attack/defense/speed by '.$item_restore_value.' stages');
+                // Only use this item if the robot is active and turns have passed
+                $item_restore_value = strstr($item_token, 'pellet') ? 2 : 3;
+                $item_wait_time = 1; // strstr($item_token, 'pellet') ? 1 : 2;
+                $robot_turns_active = count($this_robot->history['turns_active']);
+                if ($this_robot->robot_position == 'active' && $robot_turns_active >= $item_wait_time){
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' increases attack/defense/speed by '.$item_restore_value.' stages');
 
                     // Remove the robot's current item now that it's used up in battle
                     $this_robot->set_item('');
 
                     // Call the global stat boost function with customized options
-                    rpg_ability::ability_function_stat_boost($this_robot, $trigger_stat, $item_restore_value, false, null, null, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!');
+                    rpg_ability::ability_function_stat_boost($this_robot, $temp_stat_tokens[0], $item_restore_value, false, null, null, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!');
                     foreach ($temp_stat_tokens AS $temp_stat){
-                        if ($temp_stat === $trigger_stat){ continue; }
+                        if ($temp_stat === $temp_stat_tokens[0]){ continue; }
                         rpg_ability::ability_function_stat_boost($this_robot, $temp_stat, $item_restore_value);
                     }
 
