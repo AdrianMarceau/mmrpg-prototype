@@ -1636,8 +1636,8 @@ class rpg_robot extends rpg_object {
         $static_attachment_key = $this->get_static_attachment_key();
         if (!empty($this_attachments)){
             //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments');
-            $db_ability_fields = rpg_ability::get_index_fields(true);
-            $temp_attachments_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_items WHERE item_flag_complete = 1;", 'item_token');
+            $db_item_fields = rpg_item::get_index_fields(true);
+            $temp_attachments_index = $db->get_array_list("SELECT {$db_item_fields} FROM mmrpg_index_items WHERE item_flag_complete = 1;", 'item_token');
             foreach ($this_attachments AS $attachment_token => $attachment_info){
 
                 // Ensure this item has a type before checking weaknesses, resistances, etc.
