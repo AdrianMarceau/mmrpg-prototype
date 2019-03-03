@@ -6,11 +6,12 @@ $ability = array(
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Weapons/Copy',
     'ability_type' => 'copy',
-    'ability_description' => 'The user summons a large emulation device behind the target that deals damage and copies its core type to the user for the rest of the battle! This ability cannot be used to copy the core types of dark elements or fortress bosses so use with great care.',
+    'ability_description' => 'The user summons a large emulation device that hovers behind the target and drains their elemental energy to deal damage! This ability will generate a new core if the user isn\'t already holding an item, otherwise the overflowing energy may transform an existing core instead!',
     'ability_energy' => 8,
     'ability_speed' => 10,
-    'ability_damage' => 24,
+    'ability_damage' => 18,
     'ability_accuracy' => 100,
+    'ability_target' => 'select_target',
     'ability_function' => function($objects){
 
         // Pull in the global index
@@ -49,7 +50,7 @@ $ability = array(
             'success' => array($temp_ability_frames['damage'], -15, 45, -10, 'The '.$this_ability->print_name().' drains the target!'),
             'failure' => array($temp_ability_frames['damage'], -15, 45, -10, 'The '.$this_ability->print_name().' had no effect...')
             ));
-        $target_robot->trigger_damage($this_robot, $this_ability, $this_ability->ability_damage);
+        $target_robot->trigger_damage($this_robot, $this_ability, $this_ability->ability_damage, false);
 
         // Check to ensure the ability was a success before continuing
         $copy_soul_success = false;
@@ -65,8 +66,7 @@ $ability = array(
 
                 // If the new core type was not empty and was from a valid source
                 if (!empty($new_core_type)
-                    && $new_core_type != 'empty'
-                    && ($target_robot->robot_class != 'boss')){
+                    && $new_core_type != 'empty'){
 
                     // Create the new item info for display
                     $new_item_info = array('item_token' => $new_core_type.'-core');
@@ -75,15 +75,35 @@ $ability = array(
                     $this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
                     $this_robot->update_session();
 
-                    // Update the core type for the robot
-                    $this_robot->set_core($new_core_type);
-
                     // Set the success frames for the player and robot
                     $this_robot->set_frame('taunt');
                     $this_player->set_frame('victory');
 
-                    // Only change the image for this robot IF NATIVE COPY CORE
+                    // Collect index data for the user robot
                     $this_robot_index = rpg_robot::get_index_info($this_robot->robot_token);
+
+                    // If this robot isn't holding an item, generate a new core
+                    $new_item_generated = false;
+                    $existing_item_transformed = false;
+                    if (empty($this_robot->robot_item)
+                        || (preg_match('/-core$/i', $this_robot->robot_item)
+                            && $this_robot->robot_item != $new_core_type.'-core')){
+
+                        // Update the core type for the robot
+                        if (empty($this_robot->robot_item)){ $new_item_generated = true; }
+                        else { $existing_item_transformed = true; }
+                        $this_robot->set_item($new_core_type.'-core');
+
+                    }
+                    // Otherwise we need to change the core type directly
+                    else {
+
+                        // Update the core type for this robot
+                        $this_robot->set_core($new_core_type);
+
+                    }
+
+                    // Only change the image for this robot IF NATIVE COPY CORE
                     if ($this_robot_index['robot_core'] == 'copy'){
 
                         // Change the robot's image to one matching the core
@@ -101,7 +121,9 @@ $ability = array(
                     // Create an event displaying the new copied element
                     $event_header = $this_new_item->item_name.' Copied';
                     $event_body = $this_ability->print_name().' downloads the target\'s elemental core&hellip;<br />';
-                    $event_body .= $this_robot->print_name().' turned into a '.$this_new_item->print_name().' robot!';
+                    if ($new_item_generated){ $event_body .= $this_robot->print_name().' generated a new '.$this_new_item->print_name().'!'; }
+                    elseif ($existing_item_transformed){ $event_body .= $this_robot->print_name().'\'s held core turned into a <span class="item_name item_type item_type_'.$new_core_type.'">'.ucfirst($new_core_type).'</span> type!'; }
+                    else { $event_body .= $this_robot->print_name().'\'s internal core shifted into the <span class="item_name item_type item_type_'.$new_core_type.'">'.ucfirst($new_core_type).'</span> type!'; }
                     $event_options = array();
                     $event_options['console_show_target'] = false;
                     $event_options['this_item'] = $this_new_item;
@@ -115,6 +137,19 @@ $ability = array(
                     // Attach the ability to this robot
                     unset($this_robot->robot_attachments[$this_attachment_token]);
                     $this_robot->update_session();
+
+                    // If a core was generated or modified, we need to add it to the session
+                    if (($new_item_generated || $existing_item_transformed)
+                        && $this_player->player_side == 'left'
+                        && empty($this_battle->flags['player_battle'])){
+                        $stoken = rpg_game::session_token();
+                        $ptoken = $this_player->player_token;
+                        $rtoken = $this_robot->robot_token;
+                        $itoken = $new_core_type.'-core';
+                        if (isset($_SESSION[$stoken]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken])){
+                            $_SESSION[$stoken]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = $itoken;
+                        }
+                    }
 
                 }
 
@@ -133,6 +168,12 @@ $ability = array(
             $this_robot->trigger_target($target_robot, $this_ability, array('prevent_default_text' => true));
             return;
 
+        }
+
+        // Check the target robot and disable if necessary
+        if (($target_robot->robot_energy < 1 || $target_robot->robot_status == 'disabled')
+            && empty($target_robot->flags['apply_disabled_state'])){
+            $target_robot->trigger_disabled($this_robot);
         }
 
         // Return true on success
