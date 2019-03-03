@@ -401,6 +401,7 @@ if ($this_battle->battle_status != 'complete'){
     // Loop through this player's robots and apply end-turn checks
     foreach ($this_robots_active AS $key => $active_robot){
         if ($active_robot->get_id() == $this_robot->get_id()){ $active_robot = $this_robot; }
+        $active_robot->check_history($target_player, $target_robot);
         $active_robot->check_items($target_player, $target_robot);
         $active_robot->check_attachments($target_player, $target_robot);
         $active_robot->check_weapons($target_player, $target_robot);
@@ -409,6 +410,7 @@ if ($this_battle->battle_status != 'complete'){
     // Loop through the target player's robots and apply end-turn checks
     foreach ($target_robots_active AS $key => $active_robot){
         if ($active_robot->get_id() == $target_robot->get_id()){ $active_robot = $target_robot; }
+        $active_robot->check_history($this_player, $this_robot);
         $active_robot->check_items($this_player, $this_robot);
         $active_robot->check_attachments($this_player, $this_robot);
         $active_robot->check_weapons($this_player, $this_robot);
