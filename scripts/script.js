@@ -21,6 +21,7 @@ gameSettings.wapFlag = false; // whether or not this game is running in mobile m
 gameSettings.wapFlagIphone = false; // whether or not this game is running in mobile iphone mode
 gameSettings.wapFlagIpad = false; // whether or not this game is running in mobile iphone mode
 gameSettings.eventTimeout = 1250; // default animation frame base internal
+gameSettings.eventTimeoutThreshold = 250; // timeout theshold for when frames stop cross-fading
 gameSettings.eventAutoPlay = true; // whether or not to automatically advance events
 gameSettings.eventCrossFade = true; // whether or not to canvas events have crossfade animation
 gameSettings.idleAnimation = true; // default to allow idle animations
@@ -659,7 +660,6 @@ function mmrpg_canvas_animate(){
         var thisType = thisSprite.attr('data-type');
         // Call the animation function based on sprite type
         if (thisType == 'attachment'){
-
             if (thisSprite.attr('data-status') != 'disabled' || thisSprite.attr('data-direction') == 'right'){
                 mmrpg_canvas_attachment_frame(thisSprite, '');
             } else {
@@ -673,12 +673,17 @@ function mmrpg_canvas_animate(){
             //var detailsSprite = $('.sprite[data-detailsid='+spriteID+']', gameCanvas);
             //var mugshotSprite = $('.sprite[data-mugshotid='+spriteID+']', gameCanvas);
             //alert('Shadowsprite '+(shadowSprite.length ? 'exists' : 'does not exist')+'!');
-            thisSprite.stop(true, true).animate({opacity:0},1000,'linear',function(){
-                $(this).remove();
-                if (shadowSprite.length){ shadowSprite.stop(true, true).animate({opacity:0},1000,'linear',function(){ $(this).remove(); }); }
-                //if (detailsSprite.length){ detailsSprite.animate({opacity:0},1000,'linear',function(){ $(this).remove(); }); }
-                //if (mugshotSprite.length){ mugshotSprite.animate({opacity:0},1000,'linear',function(){ $(this).remove(); }); }
-                });
+            if (gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold){
+                // We're at a normal speed, so we can animate normally
+                thisSprite.stop(true, true).animate({opacity:0},Math.ceil(gameSettings.eventTimeout / 2),'linear',function(){
+                    $(this).remove();
+                    if (shadowSprite.length){ shadowSprite.stop(true, true).animate({opacity:0},Math.ceil(gameSettings.eventTimeout / 2),'linear',function(){ $(this).remove(); }); }
+                    });
+                } else {
+                // We're at a super-fast speed, so we should NOT cross-fade
+                thisSprite.stop(true, true).remove();
+                if (shadowSprite.length){ shadowSprite.stop(true, true).remove(); }
+                }
             }
         }
 
@@ -1017,8 +1022,15 @@ function mmrpg_canvas_attachment_frame(thisAttachment, newFrame){
             // If the frame's offsets have changed, update the css offsets
             if (thisAnimateFrameShift){ thisAttachment.stop(true, true).css(thisFloat, newFrameShiftX).css('bottom', newFrameShiftY); }
             // Fade this attachment back into view and fade the cloned attachment in the old frame out
-            thisAttachment.stop(true, true).animate({opacity:1}, {duration:400,easing:'swing',queue:false});
-            cloneAttachment.stop(true, true).animate({opacity:0}, {duration:400,easing:'swing',queue:false,complete:function(){ $(this).remove(); }});
+            if (gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold){
+                // We're at a normal speed, so we can animate normally
+                thisAttachment.stop(true, true).animate({opacity:1}, {duration:Math.ceil(gameSettings.eventTimeout / 2),easing:'swing',queue:false});
+                cloneAttachment.stop(true, true).animate({opacity:0}, {duration:Math.ceil(gameSettings.eventTimeout / 2),easing:'swing',queue:false,complete:function(){ $(this).remove(); }});
+                } else {
+                // We're at a super-fast speed, so we should NOT cross-fade
+                thisAttachment.stop(true, true).css({opacity:1});
+                cloneAttachment.stop(true, true).remove();
+                }
             } else {
             // If the frame's offsets have changed, update the css offsets
             if (thisAnimateFrameShift){ thisAttachment.stop(true, true).css(thisFloat, newFrameShiftX).css('bottom', newFrameShiftY); }
@@ -1487,11 +1499,17 @@ function mmrpg_canvas_event(thisMarkup){ //, flagsMarkup
         // Wait for all the event's assets to finish loading
         thisEvent.waitForImages(function(){
             // Animate a fade out of the other events
-            $('.event:not(.sticky):gt(0)', thisContext).animate({opacity:0},{
-                duration: 800,
-                easing: 'linear',
-                queue: false
-                });
+            if (gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold){
+                // We're at a normal speed, so we can animate normally
+                $('.event:not(.sticky):gt(0)', thisContext).animate({opacity:0},{
+                    duration: Math.ceil(gameSettings.eventTimeout / 2),
+                    easing: 'linear',
+                    queue: false
+                    });
+                } else {
+                // We're at a super-fast speed, so we should NOT cross-fade
+                $('.event:not(.sticky):gt(0)', thisContext).css({opacity:0});
+                }
             // Loop through all field layers on the canvas and trigger animations
             $('.background[data-animate],.foreground[data-animate]', gameCanvas).each(function(){
                 // Trigger an animation frame change for this field
@@ -1511,20 +1529,28 @@ function mmrpg_canvas_event(thisMarkup){ //, flagsMarkup
             // Find all the details in this event markup and move them to the sticky
             $(this).find('.details').addClass('hidden').css({opacity:0}).appendTo('.event_details', gameCanvas);
             // Animate a fade in, and the remove the old images
-            $(this).animate({opacity:1.0}, {
-                duration: 400, //300,
-                easing: 'linear',
-                complete: function(){
-                    //$('.event:is(.sticky)', thisContext).find('.ability_damage,.ability_recovery').animate({opacity:0},400,'swing',function(){ $(this).remove(); });
-                    //var statMods = $('.event:not(.sticky):gt(0)', thisContext).find('.ability_damage,.ability_recovery').clone();
-                    //$('.event:is(.sticky)', thisContext).append(statMods);
-                    $('.details:not(.hidden)', thisContext).remove();
-                    $('.details', thisContext).css({opacity:1}).removeClass('hidden');
-                    $('.event:not(.sticky):gt(0)', thisContext).remove();
-                    $(this).css({zIndex:500});
-                    },
-                queue: false
-                });
+            if (gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold){
+                // We're at a normal speed, so we can animate normally
+                $(this).animate({opacity:1.0}, {
+                    duration: Math.ceil(gameSettings.eventTimeout / 2),
+                    easing: 'linear',
+                    complete: function(){
+                        $('.details:not(.hidden)', thisContext).remove();
+                        $('.details', thisContext).css({opacity:1}).removeClass('hidden');
+                        $('.event:not(.sticky):gt(0)', thisContext).remove();
+                        $(this).css({zIndex:500});
+                        },
+                    queue: false
+                    });
+                } else {
+                // We're at a super-fast speed, so we should NOT cross-fade
+                $(this).css({opacity:1.0});
+                $('.details:not(.hidden)', thisContext).remove();
+                $('.details', thisContext).css({opacity:1}).removeClass('hidden');
+                $('.event:not(.sticky):gt(0)', thisContext).remove();
+                $(this).css({zIndex:500});
+                }
+
             });
         }
 }
@@ -1556,19 +1582,33 @@ function mmrpg_console_event(thisMarkup){ //, flagsMarkup
         thisContext.prepend(thisMarkup);
         gameConsole.find('.wrapper').scrollTop(0);
         $('.event:first-child', thisContext).css({top:-100});
-        $('.event:first-child', thisContext).animate({top:0}, 400, 'swing');
-        $('.event:eq(1)', thisContext).animate({opacity:0.90}, 100, 'swing');
-        $('.event:eq(2)', thisContext).animate({opacity:0.80}, 100, 'swing');
-        $('.event:eq(3)', thisContext).animate({opacity:0.70}, 100, 'swing');
-        $('.event:eq(4)', thisContext).animate({opacity:0.65}, 100, 'swing');
-        $('.event:eq(5)', thisContext).animate({opacity:0.60}, 100, 'swing');
-        $('.event:eq(6)', thisContext).animate({opacity:0.55}, 100, 'swing');
-        $('.event:eq(7)', thisContext).animate({opacity:0.50}, 100, 'swing');
-        $('.event:eq(8)', thisContext).animate({opacity:0.45}, 100, 'swing');
-        $('.event:gt(9)', thisContext).animate({opacity:0.40}, 100, 'swing');
+            if (gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold){
+                // We're at a normal speed, so we can animate normally
+                $('.event:first-child', thisContext).animate({top:0}, 400, 'swing');
+                $('.event:eq(1)', thisContext).animate({opacity:0.90}, 100, 'swing');
+                $('.event:eq(2)', thisContext).animate({opacity:0.80}, 100, 'swing');
+                $('.event:eq(3)', thisContext).animate({opacity:0.70}, 100, 'swing');
+                $('.event:eq(4)', thisContext).animate({opacity:0.65}, 100, 'swing');
+                $('.event:eq(5)', thisContext).animate({opacity:0.60}, 100, 'swing');
+                $('.event:eq(6)', thisContext).animate({opacity:0.55}, 100, 'swing');
+                $('.event:eq(7)', thisContext).animate({opacity:0.50}, 100, 'swing');
+                $('.event:eq(8)', thisContext).animate({opacity:0.45}, 100, 'swing');
+                $('.event:gt(9)', thisContext).animate({opacity:0.40}, 100, 'swing');
+                } else {
+                // We're at a super-fast speed, so we should NOT cross-fade
+                $('.event:first-child', thisContext).css({top:0});
+                $('.event:eq(1)', thisContext).css({opacity:0.90});
+                $('.event:eq(2)', thisContext).css({opacity:0.80});
+                $('.event:eq(3)', thisContext).css({opacity:0.70});
+                $('.event:eq(4)', thisContext).css({opacity:0.65});
+                $('.event:eq(5)', thisContext).css({opacity:0.60});
+                $('.event:eq(6)', thisContext).css({opacity:0.55});
+                $('.event:eq(7)', thisContext).css({opacity:0.50});
+                $('.event:eq(8)', thisContext).css({opacity:0.45});
+                $('.event:gt(9)', thisContext).css({opacity:0.40});
+                }
         // Hide any leftover boxes from previous events over the limit
         $('.event:gt(50)', thisContext).appendTo('#event_console_backup');
-
         // Remove any leftover boxes from previous events
         //$('.event:gt(10)', thisContext).remove();
         }

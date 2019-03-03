@@ -517,7 +517,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                 <a data-order="5" class="button action_setting block_5" type="button" data-action="settings_eventTimeout_800"><label><span class="multi">Normal&nbsp;Fast<br />(1f/800ms)</span></label></a>
                 <a data-order="6" class="button action_setting block_6" type="button" data-action="settings_eventTimeout_700"><label><span class="multi">Medium&nbsp;Fast<br />(1f/700ms)</span></label></a>
                 <a data-order="7" class="button action_setting block_7" type="button" data-action="settings_eventTimeout_600"><label><span class="multi">Super&nbsp;Fast<br />(1f/600ms)</span></label></a>
-                <a data-order="8" class="button action_setting block_8" type="button" data-action="settings_eventTimeout_500"><label><span class="multi">Ultra&nbsp;Fast<br />(1f/500ms)</span></label></a>
+                <a data-order="8" class="button action_setting block_8" type="button" data-action="settings_eventTimeout_250"><label><span class="multi">Ultra&nbsp;Fast<br />(1f/250ms)</span></label></a>
             </div>
             <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="option"><label>Back</label></a></div>
         </div>
