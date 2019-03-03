@@ -16,6 +16,7 @@ $ability = array(
 
         // Pull in the global index
         global $mmrpg_index;
+
         // Extract all objects into the current scope
         extract($objects);
 
@@ -68,6 +69,9 @@ $ability = array(
                 if (!empty($new_core_type)
                     && $new_core_type != 'empty'){
 
+                    // Collect session token for later
+                    $session_token = rpg_game::session_token();
+
                     // Create the new item info for display
                     $new_item_info = array('item_token' => $new_core_type.'-core');
 
@@ -113,6 +117,17 @@ $ability = array(
                         unset($this_robot->robot_image_overlay['copy_type2']);
                         $this_robot->update_session();
 
+                        // If a core was generated or modified, we need to add it to the session
+                        if ($this_player->player_side == 'left'
+                            && empty($this_battle->flags['player_battle'])){
+                            $ptoken = $this_player->player_token;
+                            $rtoken = $this_robot->robot_token;
+                            $itoken = $new_core_type.'-core';
+                            if (!empty($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken])){
+                                $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_image'] = $new_robot_image;
+                            }
+                        }
+
                     }
 
                     // Create the item object to trigger data loading
@@ -142,12 +157,11 @@ $ability = array(
                     if (($new_item_generated || $existing_item_transformed)
                         && $this_player->player_side == 'left'
                         && empty($this_battle->flags['player_battle'])){
-                        $stoken = rpg_game::session_token();
                         $ptoken = $this_player->player_token;
                         $rtoken = $this_robot->robot_token;
                         $itoken = $new_core_type.'-core';
-                        if (isset($_SESSION[$stoken]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken])){
-                            $_SESSION[$stoken]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = $itoken;
+                        if (!empty($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken])){
+                            $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = $itoken;
                         }
                     }
 
