@@ -311,7 +311,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             }
 
             // Add the mechas info into the omega battle
-            $temp_battle_omega['battle_field_base']['field_mechas'] = $temp_support_mechas;
+            $temp_final_option['battle_field_base']['field_mechas'] = $temp_support_mechas;
             shuffle($temp_final_option['battle_target_player']['player_robots']);
             //die('<pre>'.print_r($temp_final_option, true).'</pre>');
             rpg_mission::calculate_mission_zenny_and_turns($temp_final_option, $this_prototype_data, $mmrpg_robots_index);
@@ -530,7 +530,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     }
 
 
-    // -- BONUS CHAPTER : BONUS MISSIONS (5) -- //
+    // -- BONUS CHAPTER : RANDOM MISSIONS (5) -- //
 
     // Update the prototype data's global current chapter variable
     $this_prototype_data['this_current_chapter'] = '5';
