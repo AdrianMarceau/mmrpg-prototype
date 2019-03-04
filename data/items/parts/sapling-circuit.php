@@ -1,15 +1,15 @@
 <?
-// ITEM : BATTERY CIRCUIT
+// ITEM : SAPLING CIRCUIT
 $item = array(
-    'item_name' => 'Battery Circuit',
-    'item_token' => 'battery-circuit',
+    'item_name' => 'Sapling Circuit',
+    'item_token' => 'sapling-circuit',
     'item_game' => 'MMRPG',
     'item_group' => 'MMRPG/Items/Circuits',
     'item_class' => 'item',
     'item_subclass' => 'holdable',
     'item_type' => '',
-    'item_type2' => 'electric',
-    'item_description' => 'A mysterious battery-like circuit that grants the holder an elemental affinity to Electric type damage in exchange for a weakness to Nature type damage.',
+    'item_type2' => 'nature',
+    'item_description' => 'A mysterious sapling-like circuit that grants the holder an elemental affinity to Nature type damage in exchange for a weakness to Flame type damage.',
     'item_energy' => 0,
     'item_speed' => 10,
     'item_price' => 8500,
