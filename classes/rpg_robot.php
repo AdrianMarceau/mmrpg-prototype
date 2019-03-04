@@ -2350,17 +2350,36 @@ class rpg_robot extends rpg_object {
         }
 
         // Apply any affinities granted by hold items
-        $item_affinities = array('battery-circuit' => 'electric', 'sponge-circuit' => 'water', 'forge-circuit' => 'flame');
+        $elemental_items = array(
+            'battery-circuit' => array('electric', 'nature'),
+            'sponge-circuit' => array('water', 'electric'),
+            'forge-circuit' => array('flame', 'water'),
+            'sapling-circuit' => array('nature', 'flame')
+            );
         if (!empty($this->robot_item)
-            && !empty($item_affinities[$this->robot_item])){
+            && !empty($elemental_items[$this->robot_item])){
             // Collect the element associated with this item
-            $item_element = $item_affinities[$this->robot_item];
-            // Add the element as an affinity if not already there
-            if (!in_array($item_element, $this->robot_affinities)){ $this->robot_affinities[] = $item_element; }
-            // Remove the element from other lists if applicable
-            if (in_array($item_element, $this->robot_weaknesses)){ unset($this->robot_weaknesses[array_search($item_element, $this->robot_weaknesses)]); }
-            if (in_array($item_element, $this->robot_resistances)){ unset($this->robot_resistances[array_search($item_element, $this->robot_resistances)]); }
-            if (in_array($item_element, $this->robot_immunities)){ unset($this->robot_immunities[array_search($item_element, $this->robot_immunities)]); }
+            $elemental_item = $elemental_items[$this->robot_item];
+            // First we process the AFFINITY mods for this robot
+            if (!empty($elemental_item[0])){
+                $item_affinity = $elemental_item[0];
+                // Add the element as an affinity if not already there
+                if (!in_array($item_affinity, $this->robot_affinities)){ $this->robot_affinities[] = $item_affinity; }
+                // Remove the element from other lists if applicable
+                if (in_array($item_affinity, $this->robot_weaknesses)){ unset($this->robot_weaknesses[array_search($item_affinity, $this->robot_weaknesses)]); }
+                if (in_array($item_affinity, $this->robot_resistances)){ unset($this->robot_resistances[array_search($item_affinity, $this->robot_resistances)]); }
+                if (in_array($item_affinity, $this->robot_immunities)){ unset($this->robot_immunities[array_search($item_affinity, $this->robot_immunities)]); }
+            }
+            // First we process the WEAKNESS mods for this robot
+            if (!empty($elemental_item[1])){
+                $item_weakness = $elemental_item[1];
+                // Add the element as an weakness if not already there
+                if (!in_array($item_weakness, $this->robot_weaknesses)){ $this->robot_weaknesses[] = $item_weakness; }
+                // Remove the element from other lists if applicable
+                if (in_array($item_weakness, $this->robot_affinities)){ unset($this->robot_affinities[array_search($item_weakness, $this->robot_affinities)]); }
+                if (in_array($item_weakness, $this->robot_resistances)){ unset($this->robot_resistances[array_search($item_weakness, $this->robot_resistances)]); }
+                if (in_array($item_weakness, $this->robot_immunities)){ unset($this->robot_immunities[array_search($item_weakness, $this->robot_immunities)]); }
+            }
         }
 
         // Now collect an export array for this object
