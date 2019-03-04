@@ -6,10 +6,10 @@ $ability = array(
     'ability_game' => 'MM00',
     'ability_group' => 'MM00/Weapons/T0',
     'ability_image_sheets' => 0,
-    'ability_description' => 'The user relays a buster charge they are currently holding to another robot on their side of the field, transferring any effects or elemental boosts to the new robot. Charges transferred this way intensify in power with each passing and will automatically merge with others of the same kind and element.',
+    'ability_description' => 'The user relays any buster charges, core shields, or stat changes they are currently holding to another robot on their side of the field!',
     'ability_energy' => 0,
     'ability_accuracy' => 100,
-    'ability_target' => 'select_this',
+    'ability_target' => 'select_this_ally',
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
@@ -30,97 +30,112 @@ $ability = array(
         // Automatically fail if the user has targetted itself
         if ($target_robot->robot_id == $this_robot->robot_id){
 
-            // Target this robot's self and show the ability failing
-            $this_ability->target_options_update(array(
-                'frame' => 'summon',
-                'success' => array(9, 0, 0, -10,
-                    'But this robot cannot target itself&hellip;<br />'
-                    )
-                ));
-            $this_robot->trigger_target($this_robot, $this_ability);
+            // Print out a failure message as the robot can't target itself
+            $this_ability->target_options_update(array('frame' => 'defend', 'success' => array(9, 0, 0, -10, 'But this robot cannot target itself!<br />' )));
+            $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
 
         }
         // Automatically fail if there was no buster charge to transfer
-        elseif (empty($this_robot->robot_attachments)){
+        elseif (empty($this_robot->robot_attachments)
+            && empty($this_robot->counters['attack_mods'])
+            && empty($this_robot->counters['defense_mods'])
+            && empty($this_robot->counters['speed_mods'])){
 
-            // Target this robot's self and show the ability failing
-            $this_ability->target_options_update(array(
-                'frame' => 'summon',
-                'success' => array(9, 0, 0, -10,
-                    'But there was nothing to transfer&hellip;<br />'
-                    )
-                ));
-            $this_robot->trigger_target($this_robot, $this_ability);
+                // Print out a failure message if nothing could be transferred
+                $this_ability->target_options_update(array('frame' => 'defend', 'success' => array(9, 0, 0, -10, 'But there was nothing to transfer&hellip;')));
+                $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
 
         }
-        // Otherwise if not empty, loop through this robot's attachments, looking for a buster
-        elseif (!empty($this_robot->robot_attachments)){
-            $attachment_key = 0;
-            foreach ($this_robot->robot_attachments AS $attachment_token => $attachment_info){
-                // If this is a buster charge of any kind, move it to the target robot
-                if (preg_match('/^([-_a-z0-9]+)-buster$/i', $attachment_token)){
+        // Otherwise, we have at least something to transfer
+        else {
 
-                    // Collect the information for this buster ability
-                    $relay_buster_token = $attachment_token;
-                    $relay_buster_info = $attachment_info;
-                    $relay_buster_object = rpg_game::get_ability($this_battle, $this_player, $this_robot, $relay_buster_info);
+            // Define a list to keep all things transferred
+            $transferred_things = array();
 
-                    // Remove this attachment from the source robot
-                    unset($this_robot->robot_attachments[$relay_buster_token]);
-                    $this_robot->update_session();
+            // Otherwise if not empty, loop through this robot's attachments, looking for a buster or shield
+            if (!empty($this_robot->robot_attachments)){
+                //$this_battle->events_create(false, false, 'debug', '$this_robot->robot_attachments = '.print_r($this_robot->robot_attachments, true));
+                foreach ($this_robot->robot_attachments AS $attachment_token => $attachment_info){
 
-                    // If this buster has any boosters or breakers, intensify their values
-                    foreach ($relay_buster_info AS $field => $value){
-                        if (preg_match('/^attachment_(damage|recovery)(_input|_output)?(_booster|_breaker)(_[a-z]+)?$/i', $field)){
-                            $new_value = $value;
-                            if (!isset($relay_buster_info[$field.'_base'])){ $relay_buster_info[$field.'_base'] = $value; }
-                            $base = $relay_buster_info[$field.'_base'];
-                            $new_value = $new_value * $base;
-                            if (isset($target_robot->robot_attachments[$relay_buster_token][$field])){
-                                $merge = $target_robot->robot_attachments[$relay_buster_token][$field];
-                                $new_value = $new_value * $merge;
-                            }
-                            $relay_buster_info[$field] = $new_value;
-                        }
+                    // If this is a buster charge of any kind, move it to the target robot
+                    if (preg_match('/^ability_([a-z]+)-buster$/i', $attachment_token)){
+
+                        // Collect the information for this buster ability
+                        $relay_buster_token = $attachment_token;
+                        $relay_buster_info = $attachment_info;
+
+                        // Remove this attachment from the source robot
+                        unset($this_robot->robot_attachments[$relay_buster_token]);
+                        $this_robot->update_session();
+
+                        // Append this attachment to the new target robot
+                        $target_robot->set_attachment($relay_buster_token, $relay_buster_info);
+
+                        // Add to transferred things if not already there
+                        if (!in_array('buster charges', $transferred_things)){ $transferred_things[] = 'buster charges'; }
+
                     }
+                    // If this is a core shield of any kind, move it to the target robot
+                    elseif (preg_match('/^ability_core-shield_([a-z]+)$/i', $attachment_token)){
 
-                    // Append this attachment to the new target robot
-                    $temp_buster_exists = isset($target_robot->robot_attachments[$relay_buster_token]) ? true : false;
-                    $target_robot->set_frame($attachment_key % 2 == 0 ? 'defend' : 'taunt');
-                    $target_robot->set_attachment($relay_buster_token, $relay_buster_info);
+                        // Collect the information for this shield ability
+                        $relay_shield_token = $attachment_token;
+                        $relay_shield_info = $attachment_info;
 
-                    // Trigger the robot target and show the buster charge moving
-                    $this_ability->target_options_update(array(
-                        'frame' => $attachment_key % 2 == 0 ? 'taunt' : 'summon',
-                        'success' => array(9, 0, 0, -10,
-                            'The '.$relay_buster_object->print_name().' charge was '.
-                            (!$temp_buster_exists ? 'transferred to '.$target_robot->print_name().'!' : 'merged with '.$target_robot->print_name().'&#39;s!').
-                            '<br />'
-                            )
-                        ));
-                    $this_robot->trigger_target($target_robot, $this_ability);
+                        // Remove this attachment from the source robot
+                        unset($this_robot->robot_attachments[$relay_shield_token]);
+                        $this_robot->update_session();
 
-                    // Reset the target robot's frame
-                    $target_robot->set_frame('base');
+                        // Append this attachment to the new target robot
+                        $target_robot->set_attachment($relay_shield_token, $relay_shield_info);
 
-                    // Increment the attachment key
-                    $attachment_key++;
+                        // Add to transferred things if not already there
+                        if (!in_array('core shields', $transferred_things)){ $transferred_things[] = 'core shields'; }
+
+                    }
 
                 }
             }
-            // Automatically fail if there was no buster charge to transfer
-            if (empty($relay_buster_token)){
 
-                // Target this robot's self and show the ability failing
-                $this_ability->target_options_update(array(
-                    'frame' => 'summon',
-                    'success' => array(9, 0, 0, -10,
-                        'But there weren\'t any buster charges to transfer&hellip;<br />'
-                        )
-                    ));
-                $this_robot->trigger_target($this_robot, $this_ability);
+            // Loop through stats and pass any positive changes onto the target as well
+            $stat_kinds = array('attack', 'defense', 'speed');
+            foreach ($stat_kinds AS $stat_kind){
+                if (!empty($this_robot->counters[$stat_kind.'_mods'])){
+
+                    // Apply the stat buffs to the target robot first
+                    $target_robot->counters[$stat_kind.'_mods'] += $this_robot->counters[$stat_kind.'_mods'];
+                    if ($target_robot->counters[$stat_kind.'_mods'] > MMRPG_SETTINGS_STATS_MOD_MAX){ $target_robot->counters[$stat_kind.'_mods'] = MMRPG_SETTINGS_STATS_MOD_MAX; }
+                    elseif ($target_robot->counters[$stat_kind.'_mods'] < MMRPG_SETTINGS_STATS_MOD_MIN){ $target_robot->counters[$stat_kind.'_mods'] = MMRPG_SETTINGS_STATS_MOD_MIN; }
+                    $target_robot->update_session();
+
+                    // Remove the stat buffs from the user next
+                    $this_robot->counters[$stat_kind.'_mods'] = 0;
+                    $this_robot->update_session();
+
+                    // Add to transferred things if not already there
+                    if (!in_array('stat changes', $transferred_things)){ $transferred_things[] = 'stat changes'; }
+
+                }
+            }
+
+            // Check to make sure there were actually things transferred in the process
+            if (!empty($transferred_things)){
+
+                // Print out a failure message if nothing could be transferred
+                $target_robot->set_frame('taunt');
+                $this_ability->target_options_update(array('frame' => 'summon', 'success' => array(9, 0, 0, -10, $this_robot->print_name().' transferred '.preg_replace('/, ([a-z]+)$/', ' and $1', implode(', ', $transferred_things)).' to '.$target_robot->print_name().'!')));
+                $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
+                $target_robot->set_frame('base');
+
+
+            } else {
+
+                // Print out a failure message if nothing could be transferred
+                $this_ability->target_options_update(array('frame' => 'defend', 'success' => array(9, 0, 0, -10, 'But there was nothing to transfer&hellip;')));
+                $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
 
             }
+
         }
 
         // Return true on success
