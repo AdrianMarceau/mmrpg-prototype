@@ -118,7 +118,8 @@ $ability = array(
                         $this_robot->update_session();
 
                         // If a core was generated or modified, we need to add it to the session
-                        if ($this_player->player_side == 'left'
+                        if (($new_item_generated || $existing_item_transformed)
+                            && $this_player->player_side == 'left'
                             && empty($this_battle->flags['player_battle'])){
                             $ptoken = $this_player->player_token;
                             $rtoken = $this_robot->robot_token;
