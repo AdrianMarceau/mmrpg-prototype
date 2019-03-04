@@ -20,6 +20,7 @@ gameSettings.cacheTime = '00000000-00'; // the timestamp of when this game was l
 gameSettings.wapFlag = false; // whether or not this game is running in mobile mode
 gameSettings.wapFlagIphone = false; // whether or not this game is running in mobile iphone mode
 gameSettings.wapFlagIpad = false; // whether or not this game is running in mobile iphone mode
+gameSettings.baseVolume = 0.2; // default animation frame base internal
 gameSettings.eventTimeout = 1250; // default animation frame base internal
 gameSettings.eventTimeoutThreshold = 250; // timeout theshold for when frames stop cross-fading
 gameSettings.eventAutoPlay = true; // whether or not to automatically advance events
@@ -1656,7 +1657,7 @@ function mmrpg_music_toggle(){
     if (musicStreamObject.paused){
         //alert('starting playback');
         musicStream.removeClass('paused').addClass('playing');
-        musicStreamObject.volume = 1;
+        musicStreamObject.volume = gameSettings.baseVolume;
         musicStreamObject.play();
         musicToggle.html('&#9658;');
         musicToggle.removeClass('paused').addClass('playing');
@@ -1684,7 +1685,7 @@ function mmrpg_music_play(){
     if (musicStream.get(0).paused){
         //console.log('starting playback');
         musicStream.removeClass('paused').addClass('playing');
-        musicStream.get(0).volume = 1;
+        musicStream.get(0).volume = gameSettings.baseVolume;
         musicStream.get(0).addEventListener('canplay', function(){
             musicStream.get(0).play();
             musicToggle.html('&#9658;');
