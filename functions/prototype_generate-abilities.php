@@ -150,7 +150,7 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
         $robot_item_core = !empty($robot_item) && preg_match('/-core$/i', $robot_item) ? preg_replace('/-core$/i', '', $robot_item) : '';
 
         // Define the number of core and support abilities for the robot
-        if ($this_robot_index['robot_class'] == 'master'){
+        if ($this_robot_index['robot_class'] == 'master' || $this_robot_index['robot_class'] == 'boss'){
             foreach ($mmrpg_prototype_core_abilities AS $group_key => $group_abilities){
                 if (!empty($this_robot_abilities) && floor($robot_level / 10) < ($group_key + 1)){ continue; }
                 foreach ($group_abilities AS $ability_key => $ability_token){
