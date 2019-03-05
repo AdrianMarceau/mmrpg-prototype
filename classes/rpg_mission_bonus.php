@@ -44,7 +44,7 @@ class rpg_mission_bonus extends rpg_mission {
             $robot_index_query .= "AND robot_class = 'boss' ";
             $robot_index_query .= "AND base_total >= 400 ";
             $robot_index_query .= "AND (robot_flag_hidden = 0 OR (robot_flag_unlockable = 1 AND robot_number NOT LIKE 'RPG-%' AND robot_number NOT LIKE 'PCR-%')) ";
-            $robot_index_query .= "AND robot_token IN ('enker', 'punk', 'ballade', 'quint', 'mega-man-ds', 'bass-ds', 'proto-man-ds', 'dark-man', 'dark-man-2', 'dark-man-3', 'dark-man-4') ";
+            $robot_index_query .= "AND robot_token IN ('enker', 'punk', 'ballade', 'mega-man-ds', 'bass-ds', 'proto-man-ds') ";
             $robot_index_query .= "AND robot_flag_published = 1 ";
         }
         $robot_index_query .= "ORDER BY robot_order ASC ";
@@ -101,17 +101,24 @@ class rpg_mission_bonus extends rpg_mission {
             //$temp_bonus_level_max = ceil($temp_total_level / $temp_total_robots);
             //$temp_bonus_level_min = ceil($temp_bonus_level_max / 3);
         }
+        if ($temp_bonus_level_min > $temp_bonus_level_max){
+            list($temp_bonus_level_min, $temp_bonus_level_max) = array($temp_bonus_level_max, $temp_bonus_level_min);
+        }
 
         // Define a list of items that can be equipped to target robots
-        $hold_item_index = $db->get_array_list("SELECT item_token
-            FROM mmrpg_index_items
-            WHERE
-            item_flag_hidden = 0
-            AND item_flag_complete = 1
-            AND item_flag_published = 1
-            AND item_subclass IN ('consumable', 'holdable')
-            ;", 'item_token');
-        $hold_item_list = !empty($hold_item_index) ? array_keys($hold_item_index) : array();
+        static $hold_item_index;
+        static $hold_item_list;
+        if (empty($hold_item_index)){
+            $hold_item_index = $db->get_array_list("SELECT item_token
+                FROM mmrpg_index_items
+                WHERE
+                item_flag_hidden = 0
+                AND item_flag_complete = 1
+                AND item_flag_published = 1
+                AND item_subclass IN ('consumable', 'holdable')
+                ;", 'item_token');
+            $hold_item_list = !empty($hold_item_index) ? array_keys($hold_item_index) : array();
+        }
 
         // Loop through each of the bonus robots and update their levels
         $temp_battle_omega['battle_zenny'] = 0;
@@ -120,7 +127,7 @@ class rpg_mission_bonus extends rpg_mission {
             $info['robot_level'] = mt_rand($temp_bonus_level_min, $temp_bonus_level_max);
             $index = rpg_robot::parse_index_info($this_robot_index[$info['robot_token']]);
             // Randomly attach a hold or consumable item to this bot
-            if (mt_rand(0, 2) > 0){ $info['robot_item'] = $hold_item_list[mt_rand(0, (count($hold_item_list) - 1))]; }
+            if (mt_rand(0, 100) >= 75){ $info['robot_item'] = $hold_item_list[mt_rand(0, (count($hold_item_list) - 1))]; }
             // Generate a number of abilities based on robot class
             if ($this_robot_class == 'boss'){ $extra_count = 8; }
             elseif ($this_robot_class == 'master'){ $extra_count = 6; }
