@@ -126,6 +126,22 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
     // Define a new array to hold all the addon abilities
     $this_robot_abilities_addons = array('base' => $this_robot_abilities, 'weapons' => array(), 'support' => array());
 
+    // Collect the ability index for calculation purposes
+    static $this_ability_index;
+    if (empty($this_ability_index)){
+        $db_ability_fields = rpg_ability::get_index_fields(true);
+        $this_ability_index = $db->get_array_list("SELECT $db_ability_fields FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+    }
+
+    // Remove abilities from the list that are not yet complete
+    foreach ($this_robot_abilities AS $key => $token){
+        if (isset($this_ability_index[$token]) && !empty($this_ability_index[$token]['ability_flag_complete'])){ continue; }
+        else { unset($this_robot_abilities[$key]); }
+    }
+
+    // Re-key the base ability list just in case
+    $this_robot_abilities = array_values($this_robot_abilities);
+
     // If we have already enough abilities, we have nothing more to do
     if (count($this_robot_abilities) >= $ability_num){
 
@@ -138,13 +154,6 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
 
         // Define the number of additional abilities to add
         $remaining_abilities = $ability_num - count($this_robot_abilities);
-
-        // Collect the ability index for calculation purposes
-        static $this_ability_index;
-        if (empty($this_ability_index)){
-            $db_ability_fields = rpg_ability::get_index_fields(true);
-            $this_ability_index = $db->get_array_list("SELECT $db_ability_fields FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
-        }
 
         // Check if this robot is holding a core
         $robot_item_core = !empty($robot_item) && preg_match('/-core$/i', $robot_item) ? preg_replace('/-core$/i', '', $robot_item) : '';
