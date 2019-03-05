@@ -553,7 +553,14 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
 
         // Generate the bonus battle and using the prototype data
-        $temp_battle_omega = rpg_mission_bonus::generate($this_prototype_data, 8, 'master');
+        $temp_battle_omega = rpg_mission_bonus::generate($this_prototype_data, 7, 'master');
+        $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
+        // Add the omega battle to the options, index, and session
+        $this_prototype_data['battle_options'][] = $temp_battle_omega;
+        rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+
+        // Generate the bonus battle and using the prototype data
+        $temp_battle_omega = rpg_mission_bonus::generate($this_prototype_data, 6, 'boss');
         $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
         // Add the omega battle to the options, index, and session
         $this_prototype_data['battle_options'][] = $temp_battle_omega;
@@ -563,8 +570,5 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
 
 }
-//die('<pre>checkpoint 7 i guess? : ---</pre>');
-
-
 
 ?>
