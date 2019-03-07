@@ -5,7 +5,7 @@ $ability = array(
     'ability_token' => 'core-shield',
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Weapons/Core',
-    'ability_description' => 'The user generates an elemental barrier that hovers in front of the target to protect it from damage. This ability\'s typing appears to be influenced by the energy of nearby cores.',
+    'ability_description' => 'The user generates an elemental barrier that hovers in front of the target and protects it from {RECOVERY2}% of all damage that matches the shield\'s type! This ability\'s typing appears to be influenced by the energy of nearby cores, internal or otherwise...',
     'ability_type' => 'shield',
     'ability_energy' => 8,
     'ability_recovery2' => 99,
@@ -22,7 +22,7 @@ $ability = array(
         // Define the base values for the attachment
         $base_attachment_duration = 10;
         $base_effect_element = $this_ability->ability_type;
-        $base_effect_multiplier = 1 - ($this_ability->ability_recovery2 / 100);
+        $base_effect_multiplier = 1 - (99.9999999999 / 100);
         $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$base_effect_element;
 
         // Define the animation sequence for the attachment
