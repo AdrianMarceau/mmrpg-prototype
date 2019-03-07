@@ -799,12 +799,16 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
 }
 
 #prototype .option_wrapper_missions .chapter_select .chapter_link.extra {
-    width: 7%;
+    /* width: 7%; */
+    width: 5%;
     padding-bottom: 3px;
     padding-top: 1px;
     font-size: 7px;
     text-transform: uppercase;
     border-width: 1px;
+    direction: ltr;
+    text-indent: -9999px;
+    overflow: hidden;
 }
 #prototype .option_wrapper_missions .chapter_select .chapter_link.extra:hover,
 #prototype .option_wrapper_missions .chapter_select .chapter_link.extra.chapter_link_active {
@@ -815,12 +819,43 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
 }
 body.windowFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link.extra,
 body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link.extra {
-    width: 7%;
+    width: 5%;
 }
 body.windowFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link.extra.stars,
 body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link.extra.stars {
     margin-left: 3%;
 }
+
+#prototype .option_wrapper_missions .chapter_select .chapter_link.extra:before {
+    content: " ";
+    display: block;
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    top: 2px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    background-color: transparent;
+    background-image: url(../images/assets/bonus-chapter-icons.png);
+    background-position: 0 0;
+    background-size: 48px 24px;
+}
+
+#prototype .option_wrapper_missions .chapter_select .chapter_link.extra.stars:before { background-position: 0 0; }
+#prototype .option_wrapper_missions .chapter_select .chapter_link.extra.stars:hover:before,
+#prototype .option_wrapper_missions .chapter_select .chapter_link.extra.stars.chapter_link_active:before { background-position: 0 -12px; }
+
+#prototype .option_wrapper_missions .chapter_select .chapter_link.extra.players:before { background-position: -12px 0; }
+#prototype .option_wrapper_missions .chapter_select .chapter_link.extra.players:hover:before,
+#prototype .option_wrapper_missions .chapter_select .chapter_link.extra.players.chapter_link_active:before { background-position: -12px -12px; }
+
+#prototype .option_wrapper_missions .chapter_select .chapter_link.extra.challenges:before { background-position: -24px 0; }
+#prototype .option_wrapper_missions .chapter_select .chapter_link.extra.challenges:hover:before,
+#prototype .option_wrapper_missions .chapter_select .chapter_link.extra.challenges.chapter_link_active:before { background-position: -24px -12px; }
+
+#prototype .option_wrapper_missions .chapter_select .chapter_link.extra.random:before { background-position: -36px 0; }
+#prototype .option_wrapper_missions .chapter_select .chapter_link.extra.random:hover:before,
+#prototype .option_wrapper_missions .chapter_select .chapter_link.extra.random.chapter_link_active:before { background-position: -36px -12px; }
 
 #prototype .option_wrapper_missions .hidden_chapter_option {
     display: none !important;
