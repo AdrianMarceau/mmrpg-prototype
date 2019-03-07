@@ -569,6 +569,44 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     }
 
 
+    // -- BONUS CHAPTER : CHALLENGE MISSIONS (8) -- //
+
+    // Update the prototype data's global current chapter variable
+    $this_prototype_data['this_current_chapter'] = '8';
+
+    // Only continue if the player has unlocked this extra chapter
+    if ($this_prototype_data['prototype_complete'] || $this_prototype_data['this_chapter_unlocked']['8']){
+
+        // EVENT MESSAGE : CHALLENGE CHAPTER
+        $this_prototype_data['battle_options'][] = array(
+            'option_type' => 'message',
+            'option_chapter' => $this_prototype_data['this_current_chapter'],
+            'option_maintext' => 'Bonus Chapter : Challenge Mode'
+            );
+
+        // Add the first database-driven event mission to the list
+        $temp_battle_omega = rpg_mission_event::get_mission($this_prototype_data, 1);
+        rpg_mission::calculate_mission_zenny_and_turns($temp_battle_omega, $this_prototype_data, $mmrpg_robots_index);
+        $this_prototype_data['battle_options'][] = $temp_battle_omega;
+        rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+
+
+        // Add the second database-driven event mission to the list
+        $temp_battle_omega = rpg_mission_event::get_mission($this_prototype_data, 3);
+        rpg_mission::calculate_mission_zenny_and_turns($temp_battle_omega, $this_prototype_data, $mmrpg_robots_index);
+        $this_prototype_data['battle_options'][] = $temp_battle_omega;
+        rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+
+
+        // Add the second database-driven event mission to the list
+        $temp_battle_omega = rpg_mission_event::get_mission($this_prototype_data, 2);
+        rpg_mission::calculate_mission_zenny_and_turns($temp_battle_omega, $this_prototype_data, $mmrpg_robots_index);
+        $this_prototype_data['battle_options'][] = $temp_battle_omega;
+        rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+
+    }
+
+
 }
 
 ?>

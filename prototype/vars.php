@@ -123,10 +123,13 @@ else {
             // Stars
             $chapters_unlocked['7'] = true;
 
-            // Player
+            // Players
             $chapters_unlocked['6'] = true;
 
-            // Bonus
+            // Challenges
+            $chapters_unlocked['8'] = true;
+
+            // Random
             $chapters_unlocked['5'] = true;
 
         } else {
@@ -134,10 +137,13 @@ else {
             // Stars
             $chapters_unlocked['7'] = mmrpg_prototype_item_unlocked('cossack-program') ? true : false;
 
-            // Player
+            // Players
             $chapters_unlocked['6'] = false;
 
-            // Bonus
+            // Challenges
+            $chapters_unlocked['8'] = false;
+
+            // Random
             $chapters_unlocked['5'] = false;
 
         }

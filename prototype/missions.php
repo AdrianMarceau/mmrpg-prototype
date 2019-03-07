@@ -189,25 +189,34 @@ else {
             // CHAPTER STARS(7)
             if ($allow_star_fields){
                 $chapters_display_count++;
-                echo '<a class="chapter_link extra stars '.($temp_last_chapter === '7' ? 'chapter_link_active ' : '').'" href="#" data-chapter="7">Stars'.($battle_star_counter >= MMRPG_SETTINGS_STARFORCE_STARTOTAL ? ' &check;' : '').'</a>';
+                echo '<a class="chapter_link extra stars '.($temp_last_chapter === '7' ? 'chapter_link_active ' : '').'" href="#" data-chapter="7" title="Bonus Chapter : Star Fields">Stars'.($battle_star_counter >= MMRPG_SETTINGS_STARFORCE_STARTOTAL ? ' &check;' : '').'</a>';
                 } elseif ($num_extra > 0){
                 $chapters_display_count++;
                 echo '<a class="chapter_link extra stars chapter_link_disabled">???</a>';
                 }
 
-            // CHAPTER PLAYER(6)
+            // CHAPTER PLAYERS(6)
             if ($allow_player_battles){
                 $chapters_display_count++;
-                echo '<a class="chapter_link extra players '.($temp_last_chapter === '6' ? 'chapter_link_active ' : '').'" href="#" data-chapter="6">Players</a>';
+                echo '<a class="chapter_link extra players '.($temp_last_chapter === '6' ? 'chapter_link_active ' : '').'" href="#" data-chapter="6" title="Bonus Chapter : Player Battles">Players</a>';
                 } elseif ($num_extra > 0){
                 $chapters_display_count++;
                 echo '<a class="chapter_link extra players chapter_link_disabled">???</a>';
                 }
 
-            // CHAPTER BONUS(5)
+            // CHAPTER CHALLENGES(8)
+            if ($allow_player_battles){
+                $chapters_display_count++;
+                echo '<a class="chapter_link extra challenges '.($temp_last_chapter === '8' ? 'chapter_link_active ' : '').'" href="#" data-chapter="8" title="Bonus Chapter : Challenge Mode">Challenges</a>';
+                } elseif ($num_extra > 0){
+                $chapters_display_count++;
+                echo '<a class="chapter_link extra challenges chapter_link_disabled">???</a>';
+                }
+
+            // CHAPTER RANDOM(5)
             if ($allow_bonus_fields){
                 $chapters_display_count++;
-                echo '<a class="chapter_link extra random '.($temp_last_chapter === '5' ? 'chapter_link_active ' : '').'" href="#" data-chapter="5">Random</a>';
+                echo '<a class="chapter_link extra random '.($temp_last_chapter === '5' ? 'chapter_link_active ' : '').'" href="#" data-chapter="5" title="Bonus Chapter : Mission Randomizer">Random</a>';
                 } elseif ($num_extra > 0){
                 $chapters_display_count++;
                 echo '<a class="chapter_link extra random chapter_link_disabled">???</a>';
