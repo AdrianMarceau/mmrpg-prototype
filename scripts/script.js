@@ -143,24 +143,22 @@ $(document).ready(function(){
 
             // Define the function for positioning the tooltip
             var alignTooltipFunction = function(e){
-                var thisDate = new Date();
-                var thisTime = thisDate.getTime();
-                //console.log('trigger the align function at '+thisTime);
-                var mousex = e.pageX + 10;
-                var mousey = e.pageY + 5;
-                var toolwidth = $('.tooltip', mmrpgBody).outerWidth() + 20;
-                var toolheight = $('.tooltip', mmrpgBody).outerHeight() + 10;
-                //console.log('START '+
-                //  'gameSettings.currentBodyWidth = '+gameSettings.currentBodyWidth+'; mousex = '+mousex+'; toolwidth = '+toolwidth+'; \n'+
-                //  'gameSettings.currentBodyHeight = '+gameSettings.currentBodyHeight+'; mousey = '+mousex+'; toolheight = '+toolheight+'; \n'
-                //  );
-                if (gameSettings.currentBodyWidth - mousex < toolwidth){ mousex = gameSettings.currentBodyWidth - toolwidth; }
-                if (gameSettings.currentBodyHeight - mousey < (toolheight + 50)){ mousey = mousey - (toolheight + 10); }
-                //console.log('END '+
-                //  'gameSettings.currentBodyWidth = '+gameSettings.currentBodyWidth+'; mousex = '+mousex+'; toolwidth = '+toolwidth+'; \n'+
-                //  'gameSettings.currentBodyHeight = '+gameSettings.currentBodyHeight+'; mousey = '+mousex+'; toolheight = '+toolheight+'; \n'
-                //  );
-                $('.tooltip', mmrpgBody).css({ top: mousey, left: mousex });
+
+                var mouseX = e.pageX;
+                var mouseY = e.pageY;
+
+                $('.tooltip', mmrpgBody).css({left:0,top:0,right:'auto',bottom:'auto'});
+                var toolWidth = $('.tooltip', mmrpgBody).outerWidth() + 20;
+                var toolHeight = $('.tooltip', mmrpgBody).outerHeight() + 10;
+
+                var invertX = mouseX >= (gameSettings.currentBodyWidth / 2) ? true : false;
+                var invertY = mouseY >= (gameSettings.currentBodyHeight / 2) ? true : false;
+
+                var newPosX = mouseX + (invertX ? ((toolWidth + 5) * -1) : 5);
+                var newPosY = mouseY + (invertY ? ((toolHeight + 5) * -1) : 5);
+
+                $('.tooltip', mmrpgBody).css({left:newPosX,top:newPosY});
+
                 };
 
             // Define the live MOUSEENTER events for any elements with a title tag (which should be many)
