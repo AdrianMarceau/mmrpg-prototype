@@ -79,12 +79,13 @@ body.index #header {
     color:#fff;
     width: auto !important;
     min-width: 100px;
-    max-width: 450px;
+    max-width: 400px;
     text-align: left;
     font-size: 12px;
     line-height: 16px;
     font-weight: normal;
     pointer-events: none;
+    cursor: none;
 }
 #mmrpg .tooltip:empty {
     display: none !important;
