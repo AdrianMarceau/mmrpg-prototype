@@ -144,7 +144,7 @@ require('classes/rpg_mission_double.php');
 require('classes/rpg_mission_fortress.php');
 require('classes/rpg_mission_bonus.php');
 require('classes/rpg_mission_player.php');
-require('classes/rpg_mission_event.php');
+require('classes/rpg_mission_challenge.php');
 require('classes/rpg_type.php');
 require('classes/rpg_object.php');
 require('classes/rpg_canvas.php');

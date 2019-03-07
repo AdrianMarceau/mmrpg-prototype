@@ -1,9 +1,9 @@
 <?php
 /**
- * Mega Man RPG Event-Battle Mission
- * <p>The event mission class for the Mega Man RPG Prototype.</p>
+ * Mega Man RPG Challenge Mission
+ * <p>The challenge mission class for the Mega Man RPG Prototype.</p>
  */
-class rpg_mission_event extends rpg_mission {
+class rpg_mission_challenge extends rpg_mission {
 
     // Define a function for pulling a specific event mission from the database
     public static function get_mission($this_prototype_data, $battle_id = 0){

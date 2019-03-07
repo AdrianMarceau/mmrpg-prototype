@@ -584,22 +584,22 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             'option_maintext' => 'Bonus Chapter : Challenge Mode'
             );
 
-        // Add the first database-driven event mission to the list
-        $temp_battle_omega = rpg_mission_event::get_mission($this_prototype_data, 1);
+        // Pull challenge mission data from the database and add it to the list
+        $temp_battle_omega = rpg_mission_challenge::get_mission($this_prototype_data, 1);
         rpg_mission::calculate_mission_zenny_and_turns($temp_battle_omega, $this_prototype_data, $mmrpg_robots_index);
         $this_prototype_data['battle_options'][] = $temp_battle_omega;
         rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
 
 
-        // Add the second database-driven event mission to the list
-        $temp_battle_omega = rpg_mission_event::get_mission($this_prototype_data, 3);
+        // Pull challenge mission data from the database and add it to the list
+        $temp_battle_omega = rpg_mission_challenge::get_mission($this_prototype_data, 3);
         rpg_mission::calculate_mission_zenny_and_turns($temp_battle_omega, $this_prototype_data, $mmrpg_robots_index);
         $this_prototype_data['battle_options'][] = $temp_battle_omega;
         rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
 
 
-        // Add the second database-driven event mission to the list
-        $temp_battle_omega = rpg_mission_event::get_mission($this_prototype_data, 2);
+        // Pull challenge mission data from the database and add it to the list
+        $temp_battle_omega = rpg_mission_challenge::get_mission($this_prototype_data, 2);
         rpg_mission::calculate_mission_zenny_and_turns($temp_battle_omega, $this_prototype_data, $mmrpg_robots_index);
         $this_prototype_data['battle_options'][] = $temp_battle_omega;
         rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
