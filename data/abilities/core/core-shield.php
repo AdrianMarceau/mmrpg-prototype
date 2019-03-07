@@ -48,7 +48,7 @@ $ability = array(
         $this_attachment_create_text = 'The '.$this_ability->print_name().' resists '.$this_ability->ability_recovery2.'% of all <span class="ability_name ability_type ability_type_'.$base_effect_element.'">'.ucfirst($base_effect_element).'</span> type damage!<br /> ';
         $this_attachment_create_text .= $this_robot->print_name().'\'s elemental defenses were improved considerably!';
         $this_attachment_destroy_text = 'The <span class="ability_name ability_type ability_type_'.$base_effect_element.'">'.ucfirst($base_effect_element).'</span> type '.$this_ability->print_name().' faded away!<br /> ';
-        $this_attachment_destroy_text .= $this_robot->print_name().' is no longer protected from the <span class="ability_name ability_type ability_type_'.$base_effect_element.'">'.ucfirst($base_effect_element).'</span> element...';
+        $this_attachment_destroy_text .= 'This robot is no longer protected from the <span class="ability_name ability_type ability_type_'.$base_effect_element.'">'.ucfirst($base_effect_element).'</span> element...';
 
         // Define this ability's attachment token and info
         $this_attachment_info = array(
