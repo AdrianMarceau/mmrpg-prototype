@@ -588,7 +588,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 );
 
             // Pull user-challenge mission data from the database and add it to the list
-            $temp_battles_omega = rpg_mission_challenge::get_missions($this_prototype_data, 'challenge', 4, false);
+            $temp_battles_omega = rpg_mission_challenge::get_missions($this_prototype_data, 'user', 4, false);
             //exit('<pre>$temp_battles_omega = '.print_r($temp_battles_omega, true).'</pre>');
             if (!empty($temp_battles_omega)){
                 foreach ($temp_battles_omega AS $key => $temp_battle_omega){
