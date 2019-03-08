@@ -754,21 +754,31 @@ class rpg_robot extends rpg_object {
             }
         }
 
-        // If this robot is holder a relavant item, apply stat upgrades
+        // If this robot is holder a relavant item, apply stat upgrades or other effects
         $this_robot_item = $this->get_item();
-        switch ($this_robot_item){
+        if (!empty($this_robot_item)){
+
             // If this robot is holding an Energy Upgrade, double the life energy stat
-            case 'energy-upgrade' : {
+            if ($this_robot_item == 'energy-upgrade'){
                 $this->robot_energy = $this->robot_energy * 2;
                 $this->robot_base_energy = $this->robot_base_energy * 2;
-                break;
             }
+
             // Else if this robot is holding a Weapon Upgrade, double the weapon energy stat
-            case 'weapon-upgrade' : {
+            if ($this_robot_item == 'weapon-upgrade'){
                 $this->robot_weapons = $this->robot_weapons * 2;
                 $this->robot_base_weapons = $this->robot_base_weapons * 2;
-                break;
             }
+
+            // Else if this robot is holding an Elemental Core, apply a temp core shield
+            if (preg_match('/^([a-z]+)-core$/', $this_robot_item)){
+                list($item_type, $item_kind) = explode('-', $this_robot_item);
+                if ($item_type != 'none' && $item_type != 'empty'){
+                    $shield_info = rpg_ability::get_static_core_shield($item_type, 6, 0);
+                    $this->robot_attachments[$shield_info['attachment_token']] = $shield_info;
+                }
+            }
+
         }
 
         // Create the stat boost flag
