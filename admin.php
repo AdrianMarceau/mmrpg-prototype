@@ -143,6 +143,11 @@ elseif ($this_page_action == 'edit_robots'){
     // Require the edit robots file
     require(MMRPG_CONFIG_ROOTDIR.'admin/edit-robots.php');
 }
+// Else if this is an EDIT CHALLENGE MISSIONS request
+elseif ($this_page_action == 'edit_challenges'){
+    // Require the edit challenges file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/edit-challenges.php');
+}
 // Otherwise, not a valid page
 else {
     // Define error 404 text to print
