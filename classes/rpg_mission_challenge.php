@@ -137,6 +137,14 @@ class rpg_mission_challenge extends rpg_mission {
         //elseif ($num_targets >= 2 && $num_targets <= 4){ $challenge_size = '1x2'; }
         //elseif ($num_targets >= 5 && $num_targets <= 8){ $challenge_size = '1x4'; }
 
+        // Calculate the allowed turns and reward zenny for this mission
+        $challenge_reward_zenny = 0;
+        $challenge_allowed_turns = 0;
+        foreach ($challenge_target_player['player_robots'] AS $info){
+            $challenge_reward_zenny += ceil(MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER * MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER * $info['robot_level']);
+            $challenge_allowed_turns += ceil(MMRPG_SETTINGS_BATTLETURNS_PERROBOT * MMRPG_SETTINGS_BATTLETURNS_PLAYERBATTLE_MULTIPLIER);
+        }
+
         // Define and battle flag, values, or counters we need to
         $challenge_flags = array();
         $challenge_values = array();
@@ -158,6 +166,8 @@ class rpg_mission_challenge extends rpg_mission {
             'battle_description' => $challenge_data['challenge_description'],
             'battle_field_base' => $challenge_field_base,
             'battle_target_player' => $challenge_target_player,
+            'battle_zenny' => $challenge_reward_zenny,
+            'battle_turns' => $challenge_allowed_turns,
             'flags' => $challenge_flags,
             'values' => $challenge_values,
             'counters' => $challenge_counters

@@ -142,7 +142,7 @@ class rpg_disabled {
                 if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
 
                 // Also remove this robot's item from the session, we're done with it
-                if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
+                if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle']) && empty($this_battle->flags['challenge_battle'])){
                     $ptoken = $this_player->player_token;
                     $rtoken = $this_robot->robot_token;
                     if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
@@ -172,7 +172,8 @@ class rpg_disabled {
         if ($target_player->player_side == 'left'
             && $target_robot->robot_class == 'master'
             && $target_robot->robot_status != 'disabled'
-            && $this_player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID
+            && empty($this_battle->flags['player_battle'])
+            && empty($this_battle->flags['challenge_battle'])
             ){
 
             // Collect this robot's stat details for reference
@@ -321,7 +322,8 @@ class rpg_disabled {
          */
 
         if ($target_player->player_side == 'left'
-            && $this_player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID
+            && empty($this_battle->flags['player_battle'])
+            && empty($this_battle->flags['challenge_battle'])
             && empty($_SESSION['GAME']['DEMO'])){
 
             // -- EXPERIENCE POINTS / LEVEL UP -- //
@@ -588,7 +590,7 @@ class rpg_disabled {
                     if ($temp_start_level != $temp_new_level){ $temp_robot->robot_experience = 1000; }
                     $target_player->player_frame = 'victory';
                     $event_header = $temp_robot->robot_name.'&#39;s Rewards';
-                    $event_multiplier_text = $temp_robot_boost_text;
+                    $event_multiplier_text = !empty($temp_robot_boost_text) ? $temp_robot_boost_text : '';
                     $event_body = $temp_robot->print_name().' collects '.$event_multiplier_text.'<span class="recovery_amount ability_type ability_type_cutter">'.$target_robot_experience.'</span> experience points! ';
                     $event_body .= '<br />';
                     if (isset($temp_robot->robot_quotes['battle_victory'])){
@@ -984,7 +986,11 @@ class rpg_disabled {
             */
 
             // Loop through the ability rewards for this robot if set and NOT demo mode
-            if (empty($_SESSION['GAME']['DEMO']) && !empty($target_player_rewards['items']) && $this_robot->player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID){
+            if (empty($_SESSION['GAME']['DEMO'])
+                && !empty($target_player_rewards['items'])
+                && empty($this_battle->flags['player_battle'])
+                && empty($this_battle->flags['challenge_battle'])
+                ){
 
                 // Calculate the drop result based on success vs failure values
                 $temp_success_value = $this_robot->robot_class != 'mecha' ? 50 : 25;
