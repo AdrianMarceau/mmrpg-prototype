@@ -451,20 +451,6 @@ elseif ($this_action == 'item'){
 
 */
 
-// -- END OF TURN ACTIONS -- //
-
-// If this is a player or challenge battle, turns must be respected
-if (!empty($this_battle->counters['battle_turn']) && $this_battle->battle_status != 'complete'){
-    if (!empty($this_battle->flags['player_battle']) || !empty($this_battle->flags['challenge_battle'])){
-        if ($this_battle->counters['battle_turn'] >= $this_battle->battle_turns){
-
-            // Trigger the battle complete event
-            $this_battle->battle_complete_trigger($target_player, $target_robot, $this_player, $this_robot, '', '');
-
-        }
-    }
-}
-
 // Now execute the stored actions (and any created in the process of executing them!)
 $this_battle->actions_execute();
 
@@ -664,6 +650,24 @@ if (empty($active_target_robot)){
 if (!empty($active_target_robot) && $active_target_robot->robot_id != $target_robot->robot_id){
     $target_robot = $active_target_robot;
     $canvas_refresh = true;
+}
+
+// -- END OF TURN ACTIONS -- //
+
+// If this is a player or challenge battle, turns must be respected
+if (!empty($this_battle->counters['battle_turn']) && $this_battle->battle_status != 'complete'){
+    if (!empty($this_battle->flags['player_battle']) || !empty($this_battle->flags['challenge_battle'])){
+        if ($this_battle->counters['battle_turn'] >= $this_battle->battle_turns){
+
+            // Trigger the battle complete event
+            $this_battle->battle_complete_trigger($target_player, $target_robot, $this_player, $this_robot, '', '');
+
+            // Now execute the stored actions (and any created in the process of executing them!)
+            $this_battle->actions_execute();
+            $canvas_refresh = true;
+
+        }
+    }
 }
 
 // If canvas refresh is needed, create an empty event
