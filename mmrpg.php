@@ -245,6 +245,12 @@ if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defi
     $this_userinfo = array();
 }
 
+// Check to see if this is an admin user
+$allowed_admin_ids = defined('MMRPG_CONFIG_ADMIN_LIST') && MMRPG_CONFIG_ADMIN_LIST !== '' ? explode(',', MMRPG_CONFIG_ADMIN_LIST) : array();
+if (in_array($this_userid, $allowed_admin_ids)){ define('MMRPG_USER_IS_ADMIN', true); }
+else { define('MMRPG_USER_IS_ADMIN', false); }
+
+
 /*
  * WEBSITE THEME GENERATION
  */
