@@ -24,12 +24,12 @@
             <strong>Game Editors</strong>
         </li>
         <li class="item">
-            <a href="admin.php?action=edit_robots">Edit Robot Database</a>
+            <a href="admin.php?action=edit_robots">Edit Robots</a>
             <em>edit the stats, abilities, and details of database robots</em>
         </li>
         <li class="item">
-            <a href="admin.php?action=edit_robots">Edit Challenge Missions</a>
-            <em>edit and create various challenge missions for the post-game</em>
+            <a href="admin.php?action=edit_challenges">Edit Challenges</a>
+            <em>edit and create challenge missions for the post-game</em>
         </li>
     </ul>
 
