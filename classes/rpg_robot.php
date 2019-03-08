@@ -692,7 +692,8 @@ class rpg_robot extends rpg_object {
             $this->robot_original_player = mmrpg_prototype_robot_original_player($this->player_token, $this->robot_token);
 
             // If we're in a player battle, cast all robots as level 100
-            if (!empty($this->battle->flags['player_battle'])){
+            if (!empty($this->battle->flags['player_battle'])
+                || !empty($this->battle->flags['challenge_battle'])){
                 $this->robot_base_experience = $this->robot_experience = 1000;
                 $this->robot_base_level = $this->robot_level = 100;
             }
@@ -5138,7 +5139,7 @@ class rpg_robot extends rpg_object {
                     if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
 
                     // Also remove this robot's item from the session, we're done with it
-                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
+                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle']) && empty($this_battle->flags['challenge_battle'])){
                         $ptoken = $this_player->player_token;
                         $rtoken = $this_robot->robot_token;
                         if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
@@ -5185,7 +5186,7 @@ class rpg_robot extends rpg_object {
                     if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
 
                     // Also remove this robot's item from the session, we're done with it
-                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
+                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle']) && empty($this_battle->flags['challenge_battle'])){
                         $ptoken = $this_player->player_token;
                         $rtoken = $this_robot->robot_token;
                         if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
@@ -5278,7 +5279,7 @@ class rpg_robot extends rpg_object {
                     if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
 
                     // Also remove this robot's item from the session, we're done with it
-                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
+                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle']) && empty($this_battle->flags['challenge_battle'])){
                         $ptoken = $this_player->player_token;
                         $rtoken = $this_robot->robot_token;
                         if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
@@ -5339,7 +5340,7 @@ class rpg_robot extends rpg_object {
                     rpg_ability::ability_function_stat_boost($this_robot, 'attack', $item_restore_value, false, null, null, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!');
 
                     // Also remove this robot's item from the session, we're done with it
-                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
+                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle']) && empty($this_battle->flags['challenge_battle'])){
                         $ptoken = $this_player->player_token;
                         $rtoken = $this_robot->robot_token;
                         if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
@@ -5367,7 +5368,7 @@ class rpg_robot extends rpg_object {
                     rpg_ability::ability_function_stat_boost($this_robot, 'defense', $item_restore_value, false, null, null, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!');
 
                     // Also remove this robot's item from the session, we're done with it
-                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
+                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle']) && empty($this_battle->flags['challenge_battle'])){
                         $ptoken = $this_player->player_token;
                         $rtoken = $this_robot->robot_token;
                         if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
@@ -5395,7 +5396,7 @@ class rpg_robot extends rpg_object {
                     rpg_ability::ability_function_stat_boost($this_robot, 'speed', $item_restore_value, false, null, null, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!');
 
                     // Also remove this robot's item from the session, we're done with it
-                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
+                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle']) && empty($this_battle->flags['challenge_battle'])){
                         $ptoken = $this_player->player_token;
                         $rtoken = $this_robot->robot_token;
                         if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
@@ -5430,7 +5431,7 @@ class rpg_robot extends rpg_object {
                     }
 
                     // Also remove this robot's item from the session, we're done with it
-                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle'])){
+                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle']) && empty($this_battle->flags['challenge_battle'])){
                         $ptoken = $this_player->player_token;
                         $rtoken = $this_robot->robot_token;
                         if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
