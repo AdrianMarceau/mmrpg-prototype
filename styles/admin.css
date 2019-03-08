@@ -514,6 +514,25 @@ tr:nth-child(odd) td {
     margin-right: 4px;
 }
 
+.adminform.edit_challenges table .kind,
+.adminform.edit_challenges table .creator,
+.adminform.edit_challenges table .slot,
+.adminform.edit_challenges table .flag,
+.adminform.edit_challenges table .flag {
+    text-align: center;
+}
+
+.adminform.edit_challenges table td.kind .type_span {
+    min-width: 75px;
+}
+.adminform.edit_challenges table td.creator .type_span,
+.adminform.edit_challenges table td.slot .type_span {
+    min-width: 50px;
+}
+.adminform.edit_challenges table td.kind .type_span .fas {
+    margin-right: 4px;
+}
+
 .adminform .editor ul.files {
     border: 0 none transparent;
     list-style-type: none;

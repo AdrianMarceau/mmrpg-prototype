@@ -10,7 +10,7 @@ class rpg_mission_challenge extends rpg_mission {
         global $db;
         // Collect or define filters for the query
         $challenge_filters = array();
-        $challenge_filters[] = 'challenges.challenge_flag_active = 1';
+        $challenge_filters[] = 'challenges.challenge_flag_published = 1';
         if (!$include_hidden){ $challenge_filters[] = 'challenges.challenge_flag_hidden = 0'; }
         if (!empty($challenge_kind)){ $challenge_filters[] = "challenges.challenge_kind = '{$challenge_kind}'"; }
         $challenge_filters = !empty($challenge_filters) ? implode(' AND ', $challenge_filters) : '1 = 1';
@@ -226,7 +226,7 @@ class rpg_mission_challenge extends rpg_mission {
             'challenge_target_data',
             'challenge_reward_data',
             'challenge_robot_limit',
-            'challenge_flag_active',
+            'challenge_flag_published',
             'challenge_flag_hidden'
             );
 
