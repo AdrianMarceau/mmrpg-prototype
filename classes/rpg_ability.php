@@ -2754,5 +2754,37 @@ class rpg_ability extends rpg_object {
         return $temp_global_abilities;
     }
 
+    // Define a static function for getting a preset core shield for the challenge
+    public static function get_preset_core_shield($shield_type){
+        $this_ability_token = 'core-shield';
+        $this_attachment_token = $this_ability_token.'-'.$shield_type;
+        $this_attachment_image = $this_ability_token.'_'.$shield_type;
+        $this_attachment_destroy_text = 'The <span class="ability_name ability_type ability_type_'.$shield_type.'">'.ucfirst($shield_type).'</span> type <span class="ability_name ability_type ability_type_'.$shield_type.'">Core Shield</span> faded away!<br /> ';
+        $this_attachment_destroy_text .= 'This robot is no longer protected from the <span class="ability_name ability_type ability_type_'.$shield_type.'">'.ucfirst($shield_type).'</span> element...';
+        $this_attachment_info = array(
+            'class' => 'ability',
+            'ability_token' => $this_ability_token,
+            'ability_image' => $this_attachment_image,
+            'attachment_token' => $this_attachment_token,
+            'attachment_duration' => 9,
+            'attachment_damage_input_breaker_'.$shield_type => 0.0000000001,
+            'attachment_destroy' => array(
+                'trigger' => 'special',
+                'kind' => '',
+                'type' => '',
+                'percent' => true,
+                'modifiers' => false,
+                'frame' => 'defend',
+                'rates' => array(100, 0, 0),
+                'success' => array(9, -9999, -9999, 10, $this_attachment_destroy_text),
+                'failure' => array(9, -9999, -9999, 10, $this_attachment_destroy_text)
+                ),
+            'ability_frame' => 2,
+            'ability_frame_animate' => array(2, 3, 4, 3),
+            'ability_frame_offset' => array('x' => 10, 'y' => 0, 'z' => 10)
+            );
+        return $this_attachment_info;
+    }
+
 }
 ?>
