@@ -156,6 +156,8 @@ $temp_pattern_last[] = '/^legacy-codes$/i';
 
 $temp_pattern_last[] = '/^omega-seed$/i';
 
+$temp_pattern_last[] = '/^skull-medallion$/i';
+
 $types = implode('|', array_keys($mmrpg_database_types));
 $temp_pattern_last[] = '/^('.$types.')-star$/i';
 
