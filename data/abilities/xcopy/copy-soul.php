@@ -117,7 +117,7 @@ $ability = array(
                         unset($this_robot->robot_image_overlay['copy_type2']);
                         $this_robot->update_session();
 
-                        // If a core was generated or modified, we need to add it to the session
+                        // If a core was generated or modified, we need to add update the user's image in the session
                         if (($new_item_generated || $existing_item_transformed)
                             && $this_player->player_side == 'left'
                             && empty($this_battle->flags['player_battle'])){
@@ -129,6 +129,17 @@ $ability = array(
                             }
                         }
 
+                    }
+
+                    // If the user created a new core or shifted an existing one, apply the auto core shield
+                    if ($new_item_generated
+                        || $existing_item_transformed){
+                        $existing_shields = !empty($this_robot->robot_attachments) ? substr_count(implode('|', array_keys($this_robot->robot_attachments)), 'ability_core-shield_') : 0;
+                        $shield_info = rpg_ability::get_static_core_shield($new_core_type, 3, $existing_shields);
+                        $shield_token = $shield_info['attachment_token'];
+                        $shield_duration = $shield_info['attachment_duration'];
+                        if (!isset($this_robot->robot_attachments[$shield_token])){ $this_robot->robot_attachments[$shield_token] = $shield_info; }
+                        else { $this_robot->robot_attachments[$shield_token]['attachment_duration'] += $shield_duration; }
                     }
 
                     // Create the item object to trigger data loading
@@ -154,7 +165,7 @@ $ability = array(
                     unset($this_robot->robot_attachments[$this_attachment_token]);
                     $this_robot->update_session();
 
-                    // If a core was generated or modified, we need to add it to the session
+                    // If a core was generated or modified, we need to add update the user's item in the session
                     if (($new_item_generated || $existing_item_transformed)
                         && $this_player->player_side == 'left'
                         && empty($this_battle->flags['player_battle'])){

@@ -1,7 +1,7 @@
 <?
 // ACTION : NO WEAPONS
 $ability = array(
-    'ability_name' => 'Waiting',
+    'ability_name' => 'Low Weapon Energy',
     'ability_token' => 'action-noweapons',
     'ability_class' => 'system',
     'ability_description' => 'Critically low on weapon energy and unable to use an ability, the active robot waits to recharge for one turn...',

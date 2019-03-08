@@ -21,7 +21,7 @@ $ability = array(
         else { $current_target_robot = $this_robot; }
 
         // Define the base values for the attachment
-        $base_attachment_duration = 10;
+        $base_attachment_duration = 9;
         $base_effect_element = $this_ability->ability_type;
         $base_effect_multiplier = 1 - (99.9999999999 / 100);
         $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$base_effect_element;
@@ -32,18 +32,11 @@ $ability = array(
             array_push($base_animation_sequence, array_shift($base_animation_sequence));
         }
 
-        // Define the base offset values for the attachment
-        $base_offset_shift = 0;
-        if (!empty($current_target_robot->robot_attachments)){
-            foreach ($current_target_robot->robot_attachments AS $token => $info){
-                if ($token == $this_attachment_token){ continue; }
-                if (strstr($token, 'ability_'.$this_ability->ability_token.'_')){
-                    $base_offset_shift++;
-                }
-            }
-        }
-        $base_offset_x = 10 + $base_offset_shift;
-        $base_offset_y = 0 + $base_offset_shift;
+        // Count the number of existing shields so we know the positioning
+        $existing_shields = !empty($current_target_robot->robot_attachments) ? substr_count(implode('|', array_keys($current_target_robot->robot_attachments)), 'ability_core-shield_') : 0;
+        $base_offset_x = 10 + ($existing_shields * 8);
+        $base_offset_y = 0;
+        $base_offset_z = 10 + $existing_shields;
 
         // Define the flavour text for the attachment
         $this_attachment_create_text = 'The '.$this_ability->print_name().' resists '.$this_ability->ability_recovery2.'% of all <span class="ability_name ability_type ability_type_'.$base_effect_element.'">'.ucfirst($base_effect_element).'</span> type damage!<br /> ';
@@ -56,6 +49,7 @@ $ability = array(
             'class' => 'ability',
             'ability_token' => $this_ability->ability_token,
             'ability_image' => $this_ability->ability_image,
+            'attachment_token' => $this_attachment_token,
             'attachment_duration' => $base_attachment_duration,
             'attachment_damage_input_breaker_'.$base_effect_element => $base_effect_multiplier,
             'attachment_create' => array(
@@ -65,8 +59,8 @@ $ability = array(
                 'modifiers' => false,
                 'frame' => 'taunt',
                 'rates' => array(100, 0, 0),
-                'success' => array($base_animation_sequence[0], $base_offset_x, $base_offset_y, 10, $this_attachment_create_text),
-                'failure' => array($base_animation_sequence[0], $base_offset_x, $base_offset_y, 10, $this_attachment_create_text)
+                'success' => array($base_animation_sequence[0], $base_offset_x, $base_offset_y, $base_offset_z, $this_attachment_create_text),
+                'failure' => array($base_animation_sequence[0], $base_offset_x, $base_offset_y, $base_offset_z, $this_attachment_create_text)
                 ),
             'attachment_destroy' => array(
                 'trigger' => 'special',
@@ -76,16 +70,21 @@ $ability = array(
                 'modifiers' => false,
                 'frame' => 'defend',
                 'rates' => array(100, 0, 0),
-                'success' => array(9, $base_offset_x, $base_offset_y, 10, $this_attachment_destroy_text),
-                'failure' => array(9, $base_offset_x, $base_offset_y, 10, $this_attachment_destroy_text)
+                'success' => array(9, $base_offset_x, $base_offset_y, $base_offset_z, $this_attachment_destroy_text),
+                'failure' => array(9, $base_offset_x, $base_offset_y, $base_offset_z, $this_attachment_destroy_text)
                 ),
             'ability_frame' => $base_animation_sequence[0],
             'ability_frame_animate' => $base_animation_sequence,
-            'ability_frame_offset' => array('x' => $base_offset_x, 'y' => $base_offset_y, 'z' => 10)
+            'ability_frame_offset' => array(
+                'x' => $base_offset_x,
+                'y' => $base_offset_y,
+                'z' => $base_offset_z
+                )
             );
 
         // Create the attachment object for this ability
         $this_attachment = new rpg_ability($this_battle, $this_player, $current_target_robot, $this_attachment_info);
+        $this_attachment->update_session();
 
         // If the ability flag was not set, attach the ability to the target
         if (!$current_target_robot->has_attachment($this_attachment_token)){
@@ -201,15 +200,6 @@ $ability = array(
         // Collect this robot's primary type and change its image if necessary
         $this_ability->set_image($this_ability->ability_token.'_'.$ability_types[0]);
         $this_ability->set_type($ability_types[0]);
-        /*
-        if (!empty($ability_types[1])){
-            $this_ability->set_image2($this_ability->ability_token.'_'.$ability_types[1].'2');
-            $this_ability->set_type2($ability_types[1]);
-        } else {
-            $this_ability->set_image2('');
-            $this_ability->set_type2('');
-        }
-        */
 
         // Return true on success
         return true;

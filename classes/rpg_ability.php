@@ -2755,9 +2755,9 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function for getting a preset core shield for the challenge
-    public static function get_preset_core_shield($shield_type){
+    public static function get_static_core_shield($shield_type, $shield_duration = 3, $existing_shields = 0){
         $this_ability_token = 'core-shield';
-        $this_attachment_token = $this_ability_token.'-'.$shield_type;
+        $this_attachment_token = 'ability_'.$this_ability_token.'_'.$shield_type;
         $this_attachment_image = $this_ability_token.'_'.$shield_type;
         $this_attachment_destroy_text = 'The <span class="ability_name ability_type ability_type_'.$shield_type.'">'.ucfirst($shield_type).'</span> type <span class="ability_name ability_type ability_type_'.$shield_type.'">Core Shield</span> faded away!<br /> ';
         $this_attachment_destroy_text .= 'This robot is no longer protected from the <span class="ability_name ability_type ability_type_'.$shield_type.'">'.ucfirst($shield_type).'</span> element...';
@@ -2766,7 +2766,7 @@ class rpg_ability extends rpg_object {
             'ability_token' => $this_ability_token,
             'ability_image' => $this_attachment_image,
             'attachment_token' => $this_attachment_token,
-            'attachment_duration' => 9,
+            'attachment_duration' => $shield_duration,
             'attachment_damage_input_breaker_'.$shield_type => 0.0000000001,
             'attachment_destroy' => array(
                 'trigger' => 'special',
@@ -2781,7 +2781,11 @@ class rpg_ability extends rpg_object {
                 ),
             'ability_frame' => 2,
             'ability_frame_animate' => array(2, 3, 4, 3),
-            'ability_frame_offset' => array('x' => 10, 'y' => 0, 'z' => 10)
+            'ability_frame_offset' => array(
+                'x' => (10 + ($existing_shields * 8)),
+                'y' => (0),
+                'z' => (10 + $existing_shields)
+                )
             );
         return $this_attachment_info;
     }
