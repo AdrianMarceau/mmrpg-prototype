@@ -67,7 +67,7 @@ class rpg_mission_challenge extends rpg_mission {
         $temp_robot_rewards = array('robot_attack' => 9999, 'robot_defense' => 9999, 'robot_speed' => 9999);
 
         // Generate the challenge token based on available data
-        $challenge_token = $this_prototype_data['phase_battle_token'].'-'.$challenge_data['challenge_kind'].'-'.$challenge_data['challenge_creator'].'-'.$challenge_data['challenge_slot'];
+        $challenge_token = $this_prototype_data['phase_battle_token'].'-'.$challenge_data['challenge_kind'].'-'.$challenge_data['challenge_creator'].'-'.$challenge_data['challenge_id'];
 
         // Generate the challenge name with created if applicable
         if ($challenge_data['challenge_kind'] == 'event'){
@@ -218,7 +218,6 @@ class rpg_mission_challenge extends rpg_mission {
             'challenge_id',
             'challenge_creator',
             'challenge_kind',
-            'challenge_slot',
             'challenge_level',
             'challenge_name',
             'challenge_description',
