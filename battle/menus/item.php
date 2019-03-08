@@ -60,10 +60,18 @@ ob_start();
 
             // Define the default button enabled option
             //if (!empty($_SESSION['GAME']['DEMO']) || $target_player->player_id != MMRPG_SETTINGS_TARGET_PLAYERID || !isset($_SESSION['GAME']['values']['battle_items'])){ $temp_button_enabled_base = false; }
-            if ($target_player->player_id != MMRPG_SETTINGS_TARGET_PLAYERID){ $temp_button_enabled_base = false; }
-            else { $temp_button_enabled_base = true; }
+            //if ($target_player->player_id != MMRPG_SETTINGS_TARGET_PLAYERID){ $temp_button_enabled_base = false; }
+            if (!empty($this_battle->flags['player_battle'])
+                || !empty($this_battle->flags['challenge_battle'])){
+                $temp_button_enabled_base = false;
+            } else {
+                $temp_button_enabled_base = true;
+            }
+
             // If this player has already used an item this turn
-            if (!empty($this_player->flags['item_used_this_turn'])){ $temp_button_enabled_base = false; }
+            if (!empty($this_player->flags['item_used_this_turn'])){
+                $temp_button_enabled_base = false;
+            }
 
             // Loop through each item and display its button
             $item_key = 0;
