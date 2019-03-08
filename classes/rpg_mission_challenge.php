@@ -6,7 +6,7 @@
 class rpg_mission_challenge extends rpg_mission {
 
     // Define a function for pulling a specific event mission from the database
-    public static function get_missions($this_prototype_data, $battle_kind = '', $battle_limit = 0, $include_hidden = false){
+    public static function get_missions($this_prototype_data, $battle_kind = '', $battle_limit = 0, $include_hidden = false, $shuffle_list = true){
         global $db;
         // Collect or define filters for the query
         $battle_filters = array();
@@ -18,6 +18,7 @@ class rpg_mission_challenge extends rpg_mission {
         $battle_order = array();
         $battle_order[] = 'battles.battle_level ASC';
         $battle_order[] = "FIELD(battles.battle_kind, 'challenge', 'event')";
+        if ($shuffle_list){ $battle_order[] = 'RAND()'; }
         $battle_order = !empty($battle_order) ? implode(', ', $battle_order) : 'battles.battle_id ASC';
         // Collect or define the query result limit
         $battle_limit = !empty($battle_limit) && is_numeric($battle_limit) ? 'LIMIT '.$battle_limit : '';
