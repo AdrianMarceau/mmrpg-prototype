@@ -857,6 +857,13 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
 #prototype .option_wrapper_missions .chapter_select .chapter_link.extra.random:hover:before,
 #prototype .option_wrapper_missions .chapter_select .chapter_link.extra.random.chapter_link_active:before { background-position: -36px -12px; }
 
+#prototype .option_wrapper_missions .chapter_select .chapter_link.extra.chapter_link_disabled {
+    text-indent: 0;
+}
+#prototype .option_wrapper_missions .chapter_select .chapter_link.extra.chapter_link_disabled:before {
+    display: none;
+}
+
 #prototype .option_wrapper_missions .hidden_chapter_option {
     display: none !important;
 }

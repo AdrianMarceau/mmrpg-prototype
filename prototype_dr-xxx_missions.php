@@ -571,39 +571,44 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
     // -- BONUS CHAPTER : CHALLENGE MISSIONS (8) -- //
 
-    // Update the prototype data's global current chapter variable
-    $this_prototype_data['this_current_chapter'] = '8';
+    // WORK-IN-PROGRESS ONLY FOR ADMINS TEMP TEMP TEMP
+    if (MMRPG_USER_IS_ADMIN){
 
-    // Only continue if the player has unlocked this extra chapter
-    if ($this_prototype_data['prototype_complete'] || $this_prototype_data['this_chapter_unlocked']['8']){
+        // Update the prototype data's global current chapter variable
+        $this_prototype_data['this_current_chapter'] = '8';
 
-        // EVENT MESSAGE : CHALLENGE CHAPTER
-        $this_prototype_data['battle_options'][] = array(
-            'option_type' => 'message',
-            'option_chapter' => $this_prototype_data['this_current_chapter'],
-            'option_maintext' => 'Bonus Chapter : Challenge Mode'
-            );
+        // Only continue if the player has unlocked this extra chapter
+        if ($this_prototype_data['prototype_complete'] || $this_prototype_data['this_chapter_unlocked']['8']){
 
-        // Pull user-challenge mission data from the database and add it to the list
-        $temp_battles_omega = rpg_mission_challenge::get_missions($this_prototype_data, 'challenge', 4, false);
-        //exit('<pre>$temp_battles_omega = '.print_r($temp_battles_omega, true).'</pre>');
-        if (!empty($temp_battles_omega)){
-            foreach ($temp_battles_omega AS $key => $temp_battle_omega){
-                rpg_mission::calculate_mission_zenny_and_turns($temp_battle_omega, $this_prototype_data, $mmrpg_robots_index);
-                $this_prototype_data['battle_options'][] = $temp_battle_omega;
-                rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+            // EVENT MESSAGE : CHALLENGE CHAPTER
+            $this_prototype_data['battle_options'][] = array(
+                'option_type' => 'message',
+                'option_chapter' => $this_prototype_data['this_current_chapter'],
+                'option_maintext' => 'Bonus Chapter : Challenge Mode'
+                );
+
+            // Pull user-challenge mission data from the database and add it to the list
+            $temp_battles_omega = rpg_mission_challenge::get_missions($this_prototype_data, 'challenge', 4, false);
+            //exit('<pre>$temp_battles_omega = '.print_r($temp_battles_omega, true).'</pre>');
+            if (!empty($temp_battles_omega)){
+                foreach ($temp_battles_omega AS $key => $temp_battle_omega){
+                    rpg_mission::calculate_mission_zenny_and_turns($temp_battle_omega, $this_prototype_data, $mmrpg_robots_index);
+                    $this_prototype_data['battle_options'][] = $temp_battle_omega;
+                    rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+                }
             }
-        }
 
-        // Pull event-challenge mission data from the database and add it to the list
-        $temp_battles_omega = rpg_mission_challenge::get_missions($this_prototype_data, 'event', 1, false);
-        //exit('<pre>$temp_battles_omega = '.print_r($temp_battles_omega, true).'</pre>');
-        if (!empty($temp_battles_omega)){
-            foreach ($temp_battles_omega AS $key => $temp_battle_omega){
-                rpg_mission::calculate_mission_zenny_and_turns($temp_battle_omega, $this_prototype_data, $mmrpg_robots_index);
-                $this_prototype_data['battle_options'][] = $temp_battle_omega;
-                rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+            // Pull event-challenge mission data from the database and add it to the list
+            $temp_battles_omega = rpg_mission_challenge::get_missions($this_prototype_data, 'event', 1, false);
+            //exit('<pre>$temp_battles_omega = '.print_r($temp_battles_omega, true).'</pre>');
+            if (!empty($temp_battles_omega)){
+                foreach ($temp_battles_omega AS $key => $temp_battle_omega){
+                    rpg_mission::calculate_mission_zenny_and_turns($temp_battle_omega, $this_prototype_data, $mmrpg_robots_index);
+                    $this_prototype_data['battle_options'][] = $temp_battle_omega;
+                    rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+                }
             }
+
         }
 
     }
