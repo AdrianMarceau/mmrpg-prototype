@@ -18,7 +18,7 @@
 
     // Collect an index of challenge colours for options
     $mmrpg_mission_challenges_fields = rpg_mission_challenge::get_index_fields(true);
-    $mmrpg_mission_challenges_index = $db->get_array_list("SELECT {$mmrpg_mission_challenges_fields} FROM mmrpg_challenges WHERE 1 = 1 ORDER BY FIELD(challenge_kind, 'event', 'user'), challenge_creator ASC, challenge_slot ASC", 'challenge_id');
+    $mmrpg_mission_challenges_index = $db->get_array_list("SELECT {$mmrpg_mission_challenges_fields} FROM mmrpg_challenges WHERE 1 = 1 ORDER BY FIELD(challenge_kind, 'event', 'user'), challenge_creator ASC", 'challenge_id');
 
     // Collect an index of challenge colours for options
     $mmrpg_abilities_fields = rpg_ability::get_index_fields(true);
@@ -185,7 +185,7 @@
         // If the challenge creator ID was provided, we can search by exact match
         if ($search_data['challenge_creator'] !== ''){
             $challenge_id = $search_data['challenge_id'];
-            $search_query .= "AND challenge_id = {$challenge_id} ";
+            $search_query .= "AND challenge_creator = {$search_data['challenge_creator']} ";
         }
 
         // If the challenge hidden flag was provided
@@ -496,7 +496,6 @@
                 WHERE
                 challenge_kind = '{$update_data['challenge_kind']}'
                 AND challenge_creator = '{$update_data['challenge_creator']}'
-                AND challenge_slot = '{$update_data['challenge_slot']}'
                 AND backup_date_time = '{$backup_date_time}'
                 ;", 'backup_id');
             if (empty($backup_exists)){
@@ -648,9 +647,8 @@
                         <colgroup>
                             <col class="id" width="60" />
                             <col class="name" width="" />
-                            <col class="kind" width="100" />
-                            <col class="creator" width="160" />
-                            <col class="slot" width="80" />
+                            <col class="kind" width="120" />
+                            <col class="creator" width="180" />
                             <col class="flag published" width="80" />
                             <col class="flag hidden" width="70" />
                             <col class="actions" width="90" />
@@ -661,7 +659,6 @@
                                 <th class="name">Name</th>
                                 <th class="kind">Kind</th>
                                 <th class="creator">Creator</th>
-                                <th class="slot">Slot</th>
                                 <th class="flag published">Published</th>
                                 <th class="flag hidden">Hidden</th>
                                 <th class="actions">Actions</th>
@@ -673,7 +670,6 @@
                                 <td class="foot name"></td>
                                 <td class="foot kind"></td>
                                 <td class="foot creator"></td>
-                                <td class="foot slot"></td>
                                 <td class="foot flag published"></td>
                                 <td class="foot flag hidden"></td>
                                 <td class="foot actions count">
@@ -697,9 +693,6 @@
                                 $challenge_creator_name = !empty($challenge_creator['user_name_display']) ? $challenge_creator['user_name_display'] : false;
                                 $challenge_creator_type = !empty($challenge_creator['user_colour_token']) ? $challenge_creator['user_colour_token'] : 'none';
                                 $challenge_creator_span = !empty($challenge_creator_name) ? '<span class="type_span type_'.$challenge_creator_type.'">'.$challenge_creator_name.'</span>' : '-';
-                                $challenge_slot = !empty($challenge_data['challenge_slot']) ? $challenge_data['challenge_slot'] : 0;
-                                $challenge_slot = $challenge_data['challenge_kind'] == 'user' ? ($challenge_slot.' / 3') : $challenge_slot.' / &infin;';
-                                $challenge_slot_span = '<span class="type_span type_cutter">'.$challenge_slot.'</span>';
                                 $challenge_flag_published = !empty($challenge_data['challenge_flag_published']) ? '<i class="fas fa-check-square"></i>' : '-';
                                 $challenge_flag_hidden = !empty($challenge_data['challenge_flag_hidden']) ? '<i class="fas fa-eye-slash"></i>' : '-';
 
@@ -716,7 +709,6 @@
                                     echo '<td class="name"><div class="wrap">'.$challenge_name_link.'</div></td>'.PHP_EOL;
                                     echo '<td class="kind"><div class="wrap">'.$challenge_kind_span.'</div></td>'.PHP_EOL;
                                     echo '<td class="creator"><div class="wrap">'.$challenge_creator_span.'</div></td>'.PHP_EOL;
-                                    echo '<td class="slot"><div class="wrap">'.$challenge_slot_span.'</div></td>'.PHP_EOL;
                                     echo '<td class="flag published"><div>'.$challenge_flag_published.'</div></td>'.PHP_EOL;
                                     echo '<td class="flag hidden"><div>'.$challenge_flag_hidden.'</div></td>'.PHP_EOL;
                                     echo '<td class="actions"><div>'.$challenge_actions.'</div></td>'.PHP_EOL;
