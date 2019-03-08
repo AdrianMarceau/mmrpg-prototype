@@ -589,10 +589,8 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
             // Pull user-challenge mission data from the database and add it to the list
             $temp_battles_omega = rpg_mission_challenge::get_missions($this_prototype_data, 'user', 4, false);
-            //exit('<pre>$temp_battles_omega = '.print_r($temp_battles_omega, true).'</pre>');
             if (!empty($temp_battles_omega)){
                 foreach ($temp_battles_omega AS $key => $temp_battle_omega){
-                    rpg_mission::calculate_mission_zenny_and_turns($temp_battle_omega, $this_prototype_data, $mmrpg_robots_index);
                     $this_prototype_data['battle_options'][] = $temp_battle_omega;
                     rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
                 }
@@ -600,10 +598,8 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
             // Pull event-challenge mission data from the database and add it to the list
             $temp_battles_omega = rpg_mission_challenge::get_missions($this_prototype_data, 'event', 1, false);
-            //exit('<pre>$temp_battles_omega = '.print_r($temp_battles_omega, true).'</pre>');
             if (!empty($temp_battles_omega)){
                 foreach ($temp_battles_omega AS $key => $temp_battle_omega){
-                    rpg_mission::calculate_mission_zenny_and_turns($temp_battle_omega, $this_prototype_data, $mmrpg_robots_index);
                     $this_prototype_data['battle_options'][] = $temp_battle_omega;
                     rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
                 }
