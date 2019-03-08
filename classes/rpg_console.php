@@ -427,7 +427,21 @@ class rpg_console {
             */
 
             // Prepend the turn counter to the header if necessary
-            if (!empty($this_battle->counters['battle_turn']) && $this_battle->battle_status != 'complete'){ $eventinfo['event_header'] = 'Turn #'.$this_battle->counters['battle_turn'].' : '.$eventinfo['event_header']; }
+            if (!empty($this_battle->counters['battle_turn']) && $this_battle->battle_status != 'complete'){
+                if (!empty($this_battle->flags['player_battle']) || !empty($this_battle->flags['challenge_battle'])){
+                    $curr_turn = $this_battle->counters['battle_turn'];
+                    $max_turns = $this_battle->battle_turns;
+                    $turn_header = $curr_turn.' / '.$max_turns;
+                    if ($curr_turn >= ($max_turns - 1)){ $turn_colour = '#ffa9a9'; }
+                    elseif ($curr_turn >= ceil($max_turns / 2)){ $turn_colour = '#fdd67d'; }
+                    else { $turn_colour = ''; }
+                    if (!empty($turn_colour)){ $turn_header = '<span style="color: '.$turn_colour.';">'.$turn_header.'</span>'; }
+                    $turn_header = 'Turn '.$turn_header;
+                } else {
+                    $turn_header = 'Turn #'.$this_battle->counters['battle_turn'];
+                }
+                $eventinfo['event_header'] = $turn_header.' : '.$eventinfo['event_header'];
+            }
 
             // Display the event header and event body
             $this_markup .= '<div class="header header_'.$options['console_header_float'].'">'.$eventinfo['event_header'].'</div>';
