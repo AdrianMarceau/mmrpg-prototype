@@ -21,37 +21,41 @@
 
     <ul class="adminhome">
         <li class="top">
-            <strong>Database Editors</strong>
+            <strong>Game Editors</strong>
         </li>
         <li class="item">
-            <a href="admin.php?action=edit_robots">Edit Robots</a>
+            <a href="admin.php?action=edit_robots">Edit Robot Database</a>
             <em>edit the stats, abilities, and details of database robots</em>
+        </li>
+        <li class="item">
+            <a href="admin.php?action=edit_robots">Edit Challenge Missions</a>
+            <em>edit and create various challenge missions for the post-game</em>
         </li>
     </ul>
 
     <ul class="adminhome">
         <li class="top">
-            <strong>Database Update</strong>
+            <strong>Import Scripts</strong>
         </li>
         <li class="item">
             <a href="admin.php?action=import_players">Refresh Player Database</a>
-            <em>rescan the players directory and update the database</em>
+            <em>rescan players directory then purge + update the database</em>
         </li>
         <li class="item">
             <a href="admin.php?action=import_abilities">Refresh Ability Database</a>
-            <em>rescan the abilities directory and update the database</em>
+            <em>rescan players abilities then purge + update the database</em>
         </li>
         <li class="item">
             <a href="admin.php?action=import_items">Refresh Item Database</a>
-            <em>rescan the items directory and update the database</em>
+            <em>rescan items directory then purge + update the database</em>
         </li>
         <li class="item">
             <a href="admin.php?action=import_fields">Refresh Field Database</a>
-            <em>rescan the fields directory and update the database</em>
+            <em>rescan fields directory then purge + update the database</em>
         </li>
         <li class="item">
             <a data-old-href="admin.php?action=import_robots"><del>Refresh Robot Databases</del></a>
-            <em><del>rescan the robots directory and update the database</del></em>
+            <em><del>rescan robots directory then purge + update the database</del></em>
         </li>
     </ul>
 
