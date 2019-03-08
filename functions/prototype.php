@@ -1047,6 +1047,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             $this_targetinfo = !empty($mmrpg_index['players'][$this_battleinfo['battle_target_player']['player_token']]) ? array_replace($mmrpg_index['players'][$this_battleinfo['battle_target_player']['player_token']], $this_battleinfo['battle_target_player']) : $this_battleinfo['battle_target_player'];
 
             $is_player_battle = !empty($this_battleinfo['flags']['player_battle']) ? true : false;
+            $is_challenge_battle = !empty($this_battleinfo['flags']['challenge_battle']) ? true : false;
             $is_battle_counts = isset($this_battleinfo['battle_counts']) && $this_battleinfo['battle_counts'] == false ? false : true;
 
             // Check the GAME session to see if this battle has been completed, increment the counter if it was
@@ -1131,7 +1132,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 foreach ($this_targetinfo['player_robots'] AS $this_robotinfo){
 
                     // HIDE MECHAS
-                    if (empty($this_battleinfo['flags']['starter_battle']) && empty($this_battleinfo['flags']['player_battle'])
+                    if (empty($this_battleinfo['flags']['starter_battle']) && empty($this_battleinfo['flags']['player_battle']) && empty($this_battleinfo['flags']['challenge_battle'])
                         && !empty($this_robotinfo['robot_class']) && $this_robotinfo['robot_class'] == 'mecha'
                         && $temp_robot_tokens_count > 1 && $this_master_count > 0){ continue; }
 
@@ -1189,6 +1190,17 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 array_unshift($this_battleinfo['battle_sprite'], $temp_star_front, $temp_star_back);
 
             }
+
+            // Add the fusion star sprite if one has been added
+            $this_has_skull_medallion = false;
+            if (!empty($this_battleinfo['values']['skull_medallion'])){
+                $this_has_skull_medallion = true;
+                $this_option_disabled = false;
+                $temp_kind = $this_battleinfo['values']['skull_medallion'];
+                $temp_sprite = array('path' => 'items/'.$temp_kind.'-skull-medallion', 'frame' => '00', 'size' => 40);
+                array_unshift($this_battleinfo['battle_sprite'], $temp_sprite);
+            }
+
             // Loop through the battle sprites and display them
             if (!empty($this_battleinfo['battle_sprite'])){
                 $temp_right = false;
@@ -1219,13 +1231,15 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                     $temp_top = -2 + (40 - $temp_size);
                     if (!preg_match('/^(abilities|items)/i', $temp_path)){
                         if ($temp_right === false){
+
                             if ($temp_size == 40){
                                 $temp_right_inc =  0;
-                                $temp_right = 18 + $temp_right_inc;
+                                $temp_right += 18 + $temp_right_inc;
                             } else {
                                 $temp_right_inc =  -1 * ceil(($temp_size - 40) * 0.5);
-                                $temp_right = 18 + $temp_right_inc;
+                                $temp_right += 18 + $temp_right_inc;
                             }
+
                         } else {
                             if ($temp_size == 40){
                                 $temp_right_inc = ceil($temp_size * 0.5);
@@ -1242,8 +1256,12 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                         }
                     } else {
                         $temp_right = 5;
+                        if ($this_has_skull_medallion){ $temp_right = 30; }
                     }
-                    if (preg_match('/^(abilities|items)/i', $temp_path)){
+
+                    if (strstr($temp_path, 'skull-medallion')){
+                        $this_option_label .= '<span class="sprite sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_'.str_pad($temp_frame, 2, '0', STR_PAD_LEFT).' " style="background-image: url(images/'.$temp_path.'/sprite_left_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: -3px; right: 15px; z-index: '.$temp_layer.'; opacity: '.$temp_opacity.'; '.$temp_other_styles.'">&nbsp;</span>';
+                    } elseif (preg_match('/^(abilities|items)/i', $temp_path)){
                         $this_option_label .= '<span class="sprite sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_'.str_pad($temp_frame, 2, '0', STR_PAD_LEFT).' " style="background-image: url(images/'.$temp_path.'/sprite_left_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: 1px; right: -3px; z-index: '.$temp_layer.'; opacity: '.$temp_opacity.'; '.$temp_other_styles.'">&nbsp;</span>';
                     } else {
                         $this_option_label .= '<span class="sprite sprite_'.$temp_size_text.' '.($this_option_complete && !$this_has_field_star && $this_option_frame == 'base' ? 'sprite_'.$temp_size_text.'_defeat ' : 'sprite_'.$temp_size_text.'_'.$this_option_frame.' ').'" style="background-image: url(images/'.$temp_path.'/sprite_left_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: '.$temp_top.'px; right: '.$temp_right.'px; z-index: '.$temp_layer.'; opacity: '.$temp_opacity.'; '.$temp_other_styles.'">&nbsp;</span>';
