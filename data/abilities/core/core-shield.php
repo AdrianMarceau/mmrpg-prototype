@@ -10,13 +10,14 @@ $ability = array(
     'ability_energy' => 8,
     'ability_recovery2' => 99,
     'ability_accuracy' => 100,
+    'ability_target' => 'select_this',
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
         extract($objects);
 
         // Collect or define the current "target" of this ability
-        if ($this_ability->ability_target == 'select_this'){ $current_target_robot = $target_robot; }
+        if ($target_robot->robot_id != $this_robot->robot_id){ $current_target_robot = $target_robot; }
         else { $current_target_robot = $this_robot; }
 
         // Define the base values for the attachment
@@ -46,7 +47,7 @@ $ability = array(
 
         // Define the flavour text for the attachment
         $this_attachment_create_text = 'The '.$this_ability->print_name().' resists '.$this_ability->ability_recovery2.'% of all <span class="ability_name ability_type ability_type_'.$base_effect_element.'">'.ucfirst($base_effect_element).'</span> type damage!<br /> ';
-        $this_attachment_create_text .= $this_robot->print_name().'\'s elemental defenses were improved considerably!';
+        $this_attachment_create_text .= $current_target_robot->print_name().'\'s elemental defenses were improved considerably!';
         $this_attachment_destroy_text = 'The <span class="ability_name ability_type ability_type_'.$base_effect_element.'">'.ucfirst($base_effect_element).'</span> type '.$this_ability->print_name().' faded away!<br /> ';
         $this_attachment_destroy_text .= 'This robot is no longer protected from the <span class="ability_name ability_type ability_type_'.$base_effect_element.'">'.ucfirst($base_effect_element).'</span> element...';
 
@@ -209,10 +210,6 @@ $ability = array(
             $this_ability->set_type2('');
         }
         */
-
-        // If the user is holding a Target Module, allow bench targeting
-        if ($this_robot->has_item('target-module')){ $this_ability->set_target('select_this'); }
-        else { $this_ability->reset_target(); }
 
         // Return true on success
         return true;
