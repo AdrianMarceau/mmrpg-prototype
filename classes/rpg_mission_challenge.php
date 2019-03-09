@@ -16,7 +16,6 @@ class rpg_mission_challenge extends rpg_mission {
         $challenge_filters = !empty($challenge_filters) ? implode(' AND ', $challenge_filters) : '1 = 1';
         // Collect or define the order for the query
         $challenge_order = array();
-        $challenge_order[] = 'challenges.challenge_level ASC';
         $challenge_order[] = "FIELD(challenges.challenge_kind, 'event', 'user')";
         if ($shuffle_list){ $challenge_order[] = 'RAND()'; }
         $challenge_order = !empty($challenge_order) ? implode(', ', $challenge_order) : 'challenges.challenge_id ASC';
@@ -64,7 +63,8 @@ class rpg_mission_challenge extends rpg_mission {
         $mmrpg_index_fields = rpg_field::get_index();
 
         // Define any bonus stats applied to these robots
-        $temp_robot_rewards = array('robot_attack' => 9999, 'robot_defense' => 9999, 'robot_speed' => 9999);
+        $challenge_robot_token = 100;
+        $challenge_robot_rewards = array('robot_attack' => 9999, 'robot_defense' => 9999, 'robot_speed' => 9999);
 
         // Generate the challenge token based on available data
         $challenge_token = $this_prototype_data['phase_battle_token'].'-'.$challenge_data['challenge_kind'].'-'.$challenge_data['challenge_creator'].'-'.$challenge_data['challenge_id'];
@@ -124,8 +124,8 @@ class rpg_mission_challenge extends rpg_mission {
         if (!isset($challenge_target_player['player_name'])){ $challenge_target_player['player_name'] = ucwords(str_replace('-', '. ', $challenge_target_player['player_token'])); }
         foreach ($challenge_target_player['player_robots'] AS $k => $r){
             $challenge_target_player['player_robots'][$k]['robot_id'] = MMRPG_SETTINGS_TARGET_PLAYERID + ($k + 1);
-            $challenge_target_player['player_robots'][$k]['robot_level'] = $challenge_data['challenge_level'];
-            $challenge_target_player['player_robots'][$k]['values'] = array('robot_rewards' => $temp_robot_rewards);
+            $challenge_target_player['player_robots'][$k]['robot_level'] = $challenge_robot_token;
+            $challenge_target_player['player_robots'][$k]['values'] = array('robot_rewards' => $challenge_robot_rewards);
         }
 
         // Determine what size this battle should be
@@ -158,7 +158,7 @@ class rpg_mission_challenge extends rpg_mission {
             'battle_token' => $challenge_token,
             'battle_name' => $challenge_name,
             'battle_button' => $challenge_data['challenge_name'],
-            'battle_level' => $challenge_data['challenge_level'],
+            'battle_level' => $challenge_robot_token,
             'battle_robot_limit' => $challenge_data['challenge_robot_limit'],
             'battle_size' => $challenge_size,
             'battle_encore' => true,
@@ -186,7 +186,6 @@ class rpg_mission_challenge extends rpg_mission {
             'challenge_id',
             'challenge_creator',
             'challenge_kind',
-            'challenge_level',
             'challenge_name',
             'challenge_description',
             'challenge_field_data',
