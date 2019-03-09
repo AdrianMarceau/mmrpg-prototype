@@ -258,32 +258,18 @@
     // If we're in editor mode, we should collect challenge info from database
     $challenge_data = array();
     $editor_data = array();
-    $is_backup_data = false;
     if ($sub_action == 'editor'
-        && (!empty($_GET['challenge_id'])
-            || !empty($_GET['backup_id']))){
+        && !empty($_GET['challenge_id'])
+        ){
 
         // Collect form data for processing
         $editor_data['challenge_id'] = !empty($_GET['challenge_id']) && is_numeric($_GET['challenge_id']) ? trim($_GET['challenge_id']) : '';
-        if (empty($editor_data['challenge_id'])
-            && !empty($_GET['backup_id'])
-            && is_numeric($_GET['backup_id'])){
-            $editor_data['backup_id'] = trim($_GET['backup_id']);
-            $is_backup_data = true;
-        }
-
 
         /* -- Collect Challenge Data -- */
 
         // Collect challenge details from the database
         $temp_challenge_fields = rpg_mission_challenge::get_index_fields(true);
-        if (!$is_backup_data){
-            $challenge_data = $db->get_array("SELECT {$temp_challenge_fields} FROM mmrpg_challenges WHERE challenge_id = {$editor_data['challenge_id']};");
-        } else {
-            $temp_challenge_backup_fields = str_replace('challenge_id,', 'backup_id AS challenge_id,', $temp_challenge_fields);
-            $temp_challenge_backup_fields .= ', backup_date_time';
-            $challenge_data = $db->get_array("SELECT {$temp_challenge_backup_fields} FROM mmrpg_challenges_backups WHERE backup_id = {$editor_data['backup_id']};");
-        }
+        $challenge_data = $db->get_array("SELECT {$temp_challenge_fields} FROM mmrpg_challenges WHERE challenge_id = {$editor_data['challenge_id']};");
 
         // If challenge data could not be found, produce error and exit
         if (empty($challenge_data)){ exit_challenge_edit_action(); }
@@ -291,7 +277,6 @@
         // Collect the challenge's name(s) for display
         $challenge_name_display = $challenge_data['challenge_name'];
         $this_page_tabtitle = $challenge_name_display.' | '.$this_page_tabtitle;
-        if ($is_backup_data){ $this_page_tabtitle = str_replace('Edit Challenges', 'View Backups', $this_page_tabtitle); }
 
         // If form data has been submit for this challenge, we should process it
         $form_data = array();
@@ -525,23 +510,6 @@
             $update_data = $form_data;
             unset($update_data['challenge_id']);
 
-            /*
-            // If a recent backup of this data doesn't exist, create one now
-            $backup_date_time = date('Ymd-Hi');
-            $backup_exists = $db->get_value("SELECT backup_id
-                FROM mmrpg_challenges_backups
-                WHERE
-                challenge_kind = '{$update_data['challenge_kind']}'
-                AND challenge_creator = '{$update_data['challenge_creator']}'
-                AND backup_date_time = '{$backup_date_time}'
-                ;", 'backup_id');
-            if (empty($backup_exists)){
-                $backup_data = $update_data;
-                $backup_data['backup_date_time'] = $backup_date_time;
-                $db->insert('mmrpg_challenges_backups', $backup_data);
-            }
-            */
-
             // Update the main database index with changes to this challenge's data
             $update_results = $db->update('mmrpg_challenges', $update_data, array('challenge_id' => $form_data['challenge_id']));
 
@@ -578,11 +546,7 @@
         <a href="admin.php">Admin Panel</a>
         &raquo; <a href="admin.php?action=edit_challenges">Edit Challenges</a>
         <? if ($sub_action == 'editor' && !empty($challenge_data)): ?>
-            <? if (!$is_backup_data){ ?>
-                &raquo; <a href="admin.php?action=edit_challenges&amp;subaction=editor&amp;challenge_id=<?= $challenge_data['challenge_id'] ?>"><?= $challenge_name_display ?></a>
-            <? } else { ?>
-                &raquo; <a><?= $challenge_name_display ?></a>
-            <? } ?>
+            &raquo; <a href="admin.php?action=edit_challenges&amp;subaction=editor&amp;challenge_id=<?= $challenge_data['challenge_id'] ?>"><?= $challenge_name_display ?></a>
         <? endif; ?>
     </div>
 
@@ -771,7 +735,8 @@
 
         <?
         if ($sub_action == 'editor'
-            && (!empty($_GET['challenge_id']) || !empty($_GET['backup_id']))){
+            && !empty($_GET['challenge_id'])
+            ){
 
             // Capture editor markup in a buffer in case we need to modify
             if (true){
@@ -783,37 +748,15 @@
                 <div class="editor">
 
                     <h3 class="header type_span type_<?= !empty($challenge_data['challenge_core']) ? $challenge_data['challenge_core'].(!empty($challenge_data['challenge_core2']) ? '_'.$challenge_data['challenge_core2'] : '') : 'none' ?>" data-auto="field-type" data-field-type="challenge_core,challenge_core2">
-                        <span class="title"><?= !$is_backup_data ? 'Edit' : 'View' ?> Challenge &quot;<?= $challenge_name_display ?>&quot;</span>
-                        <?
-                        // If this is backup data, show the backup creation date
-                        if ($is_backup_data){
-
-                            // Print out the creation date in a readable form
-                            echo '<span style="display: block; clear: left; font-size: 90%; font-weight: normal;">Backup Created '.date('Y/m/d @ g:s a', strtotime(preg_replace('/^([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})([0-9]{2})$/', '$1/$2/$3T$4:$5', $challenge_data['backup_date_time']))).'</span>';
-
-                        }
-                        ?>
+                        <span class="title">Edit Challenge &quot;<?= $challenge_name_display ?>&quot;</span>
                     </h3>
 
                     <? print_form_messages() ?>
 
-                    <?
-                    // Collect a list of backups for this challenge from the database, if any
-                    $challenge_backup_list = array();
-                    /* $challenge_backup_list = $db->get_array_list("SELECT
-                        backup_id, challenge_id, challenge_name, backup_date_time
-                        FROM mmrpg_challenges_backups
-                        WHERE challenge_id = '{$challenge_data['challenge_id']}'
-                        ORDER BY backup_date_time DESC
-                        ;"); */
-                    ?>
-
                     <div class="editor-tabs" data-tabgroup="challenge">
-                        <a class="tab active" data-tab="basic">Basic</a><span></span>
+                        <a class="tab active" data-tab="main">Main</a><span></span>
+                        <a class="tab" data-tab="field">Field</a><span></span>
                         <a class="tab" data-tab="robots">Robots</a><span></span>
-                        <? if (!$is_backup_data && !empty($challenge_backup_list)){ ?>
-                            <a class="tab" data-tab="backups">Backups</a><span></span>
-                        <? } ?>
                     </div>
 
                     <form class="form" method="post">
@@ -823,7 +766,7 @@
 
                         <div class="editor-panels" data-tabgroup="challenge">
 
-                            <div class="panel active" data-tab="basic">
+                            <div class="panel active" data-tab="main">
 
                                 <div class="field">
                                     <strong class="label">Challenge ID</strong>
@@ -886,7 +829,9 @@
                                     <textarea class="textarea" name="challenge_description" maxlength="256" rows="3"><?= htmlentities($challenge_data['challenge_description'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
                                 </div>
 
-                                <hr />
+                            </div>
+
+                            <div class="panel active" data-tab="field">
 
                                 <?
                                 // Decode the field data so we can work with it
@@ -1022,46 +967,6 @@
 
                             </div>
 
-                            <? if (!$is_backup_data && !empty($challenge_backup_list)){ ?>
-                                <div class="panel" data-tab="backups">
-                                    <table class="backups">
-                                        <colgroup>
-                                            <col class="id" width="50" />
-                                            <col class="name" width="" />
-                                            <col class="date" width="100" />
-                                            <col class="time" width="75" />
-                                            <col class="actions" width="100" />
-                                        </colgroup>
-                                        <thead>
-                                            <tr>
-                                                <th class="id">ID</th>
-                                                <th class="name">Name</th>
-                                                <th class="date">Date</th>
-                                                <th class="time">Time</th>
-                                                <th class="actions">&nbsp;</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <? foreach ($challenge_backup_list AS $backup_key => $backup_info){ ?>
-                                                <? $backup_unix_time = strtotime(preg_replace('/^([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})([0-9]{2})$/', '$1/$2/$3T$4:$5', $backup_info['backup_date_time'])); ?>
-                                                <tr>
-                                                    <td class="id"><?= $backup_info['backup_id'] ?></td>
-                                                    <td class="name"><?= $backup_info['challenge_name'] ?></td>
-                                                    <td class="date"><?= date('Y/m/d', $backup_unix_time) ?></td>
-                                                    <td class="time"><?= date('g:i a', $backup_unix_time) ?></td>
-                                                    <td class="actions">
-                                                        <a href="admin.php?action=edit_challenges&subaction=editor&backup_id=<?= $backup_info['backup_id'] ?>" target="_blank" style="text-decoration: none;">
-                                                            <span style="text-decoration: underline;">View Backup</span>
-                                                            <i class="fas fa-external-link-square-alt"></i>
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            <? } ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            <? } ?>
-
                         </div>
 
                         <hr />
@@ -1105,15 +1010,13 @@
 
                         <div class="formfoot">
 
-                            <? if (!$is_backup_data){ ?>
-                                <div class="buttons">
-                                    <input class="button save" type="submit" value="Save Changes" />
-                                    <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin.php?action=edit_challenges&subaction=editor&challenge_id=<?= $challenge_data['challenge_id'] ?>';" />
-                                    <? /*
-                                    <input class="button delete" type="button" value="Delete Challenge" data-delete="challenges" data-challenge-id="<?= $challenge_data['challenge_id'] ?>" />
-                                    */ ?>
-                                </div>
-                            <? } ?>
+                            <div class="buttons">
+                                <input class="button save" type="submit" value="Save Changes" />
+                                <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin.php?action=edit_challenges&subaction=editor&challenge_id=<?= $challenge_data['challenge_id'] ?>';" />
+                                <? /*
+                                <input class="button delete" type="button" value="Delete Challenge" data-delete="challenges" data-challenge-id="<?= $challenge_data['challenge_id'] ?>" />
+                                */ ?>
+                            </div>
 
                             <? /*
                             <div class="metadata">
@@ -1133,18 +1036,13 @@
 
                 <?
 
-                $debug_challenge_data = $challenge_data;
-                echo('<pre style="display: block;">$challenge_data = '.(!empty($debug_challenge_data) ? htmlentities(print_r($debug_challenge_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
+                //$debug_challenge_data = $challenge_data;
+                //echo('<pre style="display: block;">$challenge_data = '.(!empty($debug_challenge_data) ? htmlentities(print_r($debug_challenge_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
 
                 ?>
 
                 <?
                 $temp_edit_markup = ob_get_clean();
-                if ($is_backup_data){
-                    $temp_edit_markup = str_replace('<input ', '<input readonly="readonly" disabled="disabled" ', $temp_edit_markup);
-                    $temp_edit_markup = str_replace('<select ', '<select readonly="readonly" disabled="disabled" ', $temp_edit_markup);
-                    $temp_edit_markup = str_replace('<textarea ', '<textarea readonly="readonly" ', $temp_edit_markup);
-                }
                 echo($temp_edit_markup).PHP_EOL;
             }
 
