@@ -10,19 +10,23 @@
 
     // Collect an index of battle fields for options
     $mmrpg_fields_fields = rpg_field::get_index_fields(true);
-    $mmrpg_fields_index = $db->get_array_list("SELECT {$mmrpg_fields_fields} FROM mmrpg_index_fields WHERE field_token <> 'field' ORDER BY field_order ASC", 'field_token');
+    $mmrpg_fields_index = $db->get_array_list("SELECT {$mmrpg_fields_fields} FROM mmrpg_index_fields WHERE field_token <> 'field' AND field_flag_published = 1  AND field_flag_complete = 1 ORDER BY field_order ASC", 'field_token');
 
     // Collect an index of player colours for options
     $mmrpg_players_fields = rpg_player::get_index_fields(true);
-    $mmrpg_players_index = $db->get_array_list("SELECT {$mmrpg_players_fields} FROM mmrpg_index_players WHERE player_token <> 'player' ORDER BY player_order ASC", 'player_token');
+    $mmrpg_players_index = $db->get_array_list("SELECT {$mmrpg_players_fields} FROM mmrpg_index_players WHERE player_token <> 'player' AND player_flag_published = 1 AND player_flag_complete = 1  ORDER BY player_order ASC", 'player_token');
 
-    // Collect an index of challenge colours for options
-    $mmrpg_mission_challenges_fields = rpg_mission_challenge::get_index_fields(true);
-    $mmrpg_mission_challenges_index = $db->get_array_list("SELECT {$mmrpg_mission_challenges_fields} FROM mmrpg_challenges WHERE 1 = 1 ORDER BY FIELD(challenge_kind, 'event', 'user'), challenge_creator ASC", 'challenge_id');
+    // Collect an index of robot colours for options
+    $mmrpg_robots_fields = rpg_robot::get_index_fields(true);
+    $mmrpg_robots_index = $db->get_array_list("SELECT {$mmrpg_robots_fields} FROM mmrpg_index_robots WHERE robot_token <> 'robot' AND robot_class <> 'boss' AND robot_flag_published = 1 AND robot_flag_complete = 1 ORDER BY FIELD(robot_class, 'master', 'mecha', 'boss'), robot_name ASC", 'robot_token');
 
     // Collect an index of challenge colours for options
     $mmrpg_abilities_fields = rpg_ability::get_index_fields(true);
-    $mmrpg_abilities_index = $db->get_array_list("SELECT {$mmrpg_abilities_fields} FROM mmrpg_index_abilities WHERE ability_token <> 'ability' AND ability_class <> 'system' ORDER BY ability_order ASC", 'ability_token');
+    $mmrpg_abilities_index = $db->get_array_list("SELECT {$mmrpg_abilities_fields} FROM mmrpg_index_abilities WHERE ability_token <> 'ability' AND ability_class <> 'system' AND ability_flag_published = 1 AND ability_flag_complete = 1 ORDER BY FIELD(ability_class, 'master', 'mecha', 'boss'), ability_name ASC, ability_order ASC", 'ability_token');
+
+    // Collect an index of challenge colours for options
+    $mmrpg_items_fields = rpg_item::get_index_fields(true);
+    $mmrpg_items_index = $db->get_array_list("SELECT {$mmrpg_items_fields} FROM mmrpg_index_items WHERE item_token <> 'item' AND item_class <> 'system' AND (item_subclass = 'consumable' OR item_subclass = 'holdable') AND item_flag_published = 1 AND item_flag_complete = 1 ORDER BY item_order ASC", 'item_token');
 
     // Collect an index of contributors and admins that have made challenges
     $mmrpg_contributors_index = $db->get_array_list("SELECT
@@ -49,9 +53,62 @@
             OR users.user_credit_text <> ''
             OR editors.challenges_created_count IS NOT NULL)
         ORDER BY
-        uroles.role_level DESC,
-        users.user_name_clean ASC
+        users.user_name_clean ASC,
+        uroles.role_level DESC
         ;", 'user_id');
+
+
+    /* -- Generate Select Option Markup -- */
+
+    // Pre-generate a list of all robots so we can re-use it over and over
+    $robot_options_count = 0;
+    $robot_options_group = '';
+    $robot_options_markup = array();
+    $robot_options_markup[] = '<option value="">-</option>';
+    foreach ($mmrpg_robots_index AS $robot_token => $robot_info){
+        if ($robot_info['robot_class'] != $robot_options_group){
+            if (!empty($robot_options_group)){ $robot_options_markup[] = '</optgroup>'; }
+            $robot_options_group = $robot_info['robot_class'];
+            $robot_options_markup[] = '<optgroup label="'.ucfirst($robot_info['robot_class']).' Robots">';
+        }
+        $robot_name = $robot_info['robot_name'];
+        $robot_types = ucwords(implode(' / ', array_values(array_filter(array($robot_info['robot_core'], $robot_info['robot_core2'])))));
+        if (empty($robot_types)){ $robot_types = 'Neutral'; }
+        $robot_options_markup[] = '<option value="'.$robot_token.'">'.$robot_name.' ('.$robot_types.')</option>';
+        $robot_options_count++;
+    }
+    if (!empty($robot_options_group)){ $robot_options_markup[] = '</optgroup>'; }
+    $robot_options_markup = implode(PHP_EOL, $robot_options_markup);
+
+    // Pre-generate a list of all abilities so we can re-use it over and over
+    $ability_options_count = 0;
+    $ability_options_group = '';
+    $ability_options_markup = array();
+    $ability_options_markup[] = '<option value="">-</option>';
+    foreach ($mmrpg_abilities_index AS $ability_token => $ability_info){
+        if ($ability_info['ability_class'] != $ability_options_group){
+            if (!empty($ability_options_group)){ $ability_options_markup[] = '</optgroup>'; }
+            $ability_options_group = $ability_info['ability_class'];
+            $ability_options_markup[] = '<optgroup label="'.ucfirst($ability_info['ability_class']).' Abilities">';
+        }
+        $ability_name = $ability_info['ability_name'];
+        $ability_types = ucwords(implode(' / ', array_values(array_filter(array($ability_info['ability_type'], $ability_info['ability_type2'])))));
+        if (empty($ability_types)){ $ability_types = 'Neutral'; }
+        $ability_options_markup[] = '<option value="'.$ability_token.'">'.$ability_name.' ('.$ability_types.')</option>';
+        $ability_options_count++;
+    }
+    if (!empty($ability_options_group)){ $ability_options_markup[] = '</optgroup>'; }
+    $ability_options_markup = implode(PHP_EOL, $ability_options_markup);
+
+    // Pre-generate a list of all items so we can re-use it over and over
+    $item_options_markup = array();
+    $item_options_markup[] = '<option value="">-</option>';
+    foreach ($mmrpg_items_index AS $item_token => $item_info){
+        $item_name = $item_info['item_name'];
+        $item_options_markup[] = '<option value="'.$item_token.'">'.$item_name.'</option>';
+    }
+    $item_options_count = count($item_options_markup);
+    $item_options_markup = implode(PHP_EOL, $item_options_markup);
 
     // Pre-generate a list of all contributors so we can re-use it over and over
     $contributor_options_markup = array();
@@ -753,8 +810,7 @@
 
                     <div class="editor-tabs" data-tabgroup="challenge">
                         <a class="tab active" data-tab="basic">Basic</a><span></span>
-                        <a class="tab" data-tab="stats">Stats</a><span></span>
-                        <a class="tab" data-tab="abilities">Abilities</a><span></span>
+                        <a class="tab" data-tab="robots">Robots</a><span></span>
                         <? if (!$is_backup_data && !empty($challenge_backup_list)){ ?>
                             <a class="tab" data-tab="backups">Backups</a><span></span>
                         <? } ?>
@@ -884,116 +940,85 @@
 
                             </div>
 
-                            <div class="panel" data-tab="stats">
+                            <div class="panel active" data-tab="robots">
 
                                 <?
-                                $challenge_type_matchups = array('weaknesses', 'resistances', 'affinities', 'immunities');
-                                foreach ($challenge_type_matchups AS $matchup_key => $matchup_token){
-                                    $matchup_list = $challenge_data['challenge_'.$matchup_token];
-                                    $matchup_list = !empty($matchup_list) ? json_decode($matchup_list, true) : array();
+
+                                // Decode the target data so we can work with it
+                                $challenge_target_data = !empty($challenge_data['challenge_target_data']) ? json_decode($challenge_data['challenge_target_data'], true) : array();
+
+                                // Print out the player token before the robots
+                                $target_player_token = !empty($challenge_target_data['player_token']) ? $challenge_target_data['player_token'] : 'player';
+                                echo('<input type="hidden" name="challenge_target_data[player_token]" value="'.$target_player_token.'" />'.PHP_EOL);
+
+                                // Loop through and generate robot target fields
+                                $challenge_target_robots = !empty($challenge_target_data['player_robots']) ? $challenge_target_data['player_robots'] : array();
+                                $target_robots_count = count($challenge_target_robots);
+                                $target_robot_slots = $target_robots_count < 8 ? $target_robots_count + 1 : $target_robots_count;
+                                for ($robot_key = 0; $robot_key < $target_robot_slots; $robot_key++){
+
+                                    // Print horizontal rule if necessary
+                                    if ($robot_key > 0){ echo('<hr />'.PHP_EOL); }
+
+                                    // Collect the current robot data for this position
+                                    $current_robot_data = !empty($challenge_target_robots[$robot_key]) ? $challenge_target_robots[$robot_key] : array();
+                                    $current_robot_token = !empty($current_robot_data['robot_token']) ? $current_robot_data['robot_token'] : '';
+                                    $current_robot_image = !empty($current_robot_data['robot_image']) && $current_robot_data['robot_image'] != $current_robot_token ? $current_robot_data['robot_image'] : '';
+                                    $current_robot_item = !empty($current_robot_data['robot_item']) ? $current_robot_data['robot_item'] : '';
+                                    $current_robot_abilities = !empty($current_robot_data['robot_abilities']) ? $current_robot_data['robot_abilities'] : array();
+
                                     ?>
-                                    <div class="field fullsize has4cols">
+
+                                    <div class="field fullsize has4cols multirow">
                                         <strong class="label">
-                                            Challenge <?= ucfirst($matchup_token) ?>
+                                            Target Robot #<?= ($robot_key + 1) ?>
+                                            <em>Select a robot, an optional alt and/or item, then at least one ability</em>
                                         </strong>
-                                        <? for ($i = 0; $i < 4; $i++){ ?>
+                                        <div class="subfield">
+                                            <strong class="label sublabel">Robot</strong>
+                                            <select class="select" name="challenge_target_data[player_robots][<?= $robot_key ?>][robot_token]">
+                                                <?= str_replace('value="'.$current_robot_token.'"', 'value="'.$current_robot_token.'" selected="selected"', $robot_options_markup) ?>
+                                            </select><span></span>
+                                        </div>
+                                        <div class="subfield">
+                                            <strong class="label sublabel">Alt</strong>
+                                            <select class="select" name="challenge_target_data[player_robots][<?= $robot_key ?>][robot_item]">
+                                                <option value=""<?= empty($current_robot_image) ? 'selected="selected"' : '' ?>>-</option>
+                                                <? for ($a = 1; $a <= 9; $a++){ ?>
+                                                    <? $alt_image = $current_robot_token.'_alt'.($a > 1 ? $a : '') ?>
+                                                    <option value="<?= $alt_image ?>"<?= $current_robot_image == $alt_image ? 'selected="selected"' : '' ?>>Alt<?= $a > 1 ? $a : '' ?></option>
+                                                <? } ?>
+                                            </select><span></span>
+                                        </div>
+                                        <div class="subfield">
+                                            <strong class="label sublabel">Item</strong>
+                                            <select class="select" name="challenge_target_data[player_robots][<?= $robot_key ?>][robot_item]">
+                                                <?= str_replace('value="'.$current_robot_item.'"', 'value="'.$current_robot_item.'" selected="selected"', $item_options_markup) ?>
+                                            </select><span></span>
+                                        </div>
+                                    </div>
+                                    <div class="field fullsize has4cols multirow" style="margin-top: -6px;">
+                                        <strong class="label sublabel">Abilities</strong>
+                                        <?
+                                        for ($i = 0; $i < 8; $i++){
+                                            $current_value = isset($current_robot_abilities[$i]) ? $current_robot_abilities[$i] : '';
+                                            ?>
                                             <div class="subfield">
-                                                <span class="type_span type_<?= !empty($matchup_list[$i]) ? $matchup_list[$i] : '' ?> swatch floatright hidenone" data-auto="field-type" data-field-type="challenge_<?= $matchup_token ?>[<?= $i ?>]">&nbsp;</span>
-                                                <select class="select" name="challenge_<?= $matchup_token ?>[<?= $i ?>]">
-                                                    <option value=""<?= empty($matchup_list[$i]) ? ' selected="selected"' : '' ?>>-</option>
-                                                    <?
-                                                    foreach ($mmrpg_types_index AS $type_token => $type_info){
-                                                        if ($type_info['type_class'] === 'special'){ continue; }
-                                                        $label = $type_info['type_name'];
-                                                        if (!empty($matchup_list[$i]) && $matchup_list[$i] === $type_token){ $selected = 'selected="selected"'; }
-                                                        else { $selected = ''; }
-                                                        echo('<option value="'.$type_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                                    }
-                                                    ?>
+                                                <select class="select" name="challenge_target_data[player_robots][<?= $robot_key ?>][robot_abilities][<?= $i ?>]">
+                                                    <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $ability_options_markup) ?>
                                                 </select><span></span>
                                             </div>
-                                        <? } ?>
+                                            <?
+                                        }
+                                        ?>
                                     </div>
+
                                     <?
+
+
                                 }
-                                ?>
-
-                            </div>
-
-                            <div class="panel" data-tab="abilities">
-
-                                <?
-
-                                // Collect global abilities so we can skip them
-                                $global_ability_tokens = rpg_ability::get_global_abilities();
-
-                                // Pre-generate a list of all abilities so we can re-use it over and over
-                                $ability_options_markup = array();
-                                $ability_options_markup[] = '<option value="">-</option>';
-                                foreach ($mmrpg_abilities_index AS $ability_token => $ability_info){
-                                    //if (in_array($ability_token, $global_ability_tokens)){ continue; }
-                                    if ($ability_info['ability_class'] === 'mecha' && $challenge_data['challenge_kind'] !== 'mecha'){ continue; }
-                                    elseif ($ability_info['ability_class'] === 'boss' && $challenge_data['challenge_kind'] !== 'boss'){ continue; }
-                                    $ability_name = $ability_info['ability_name'];
-                                    $ability_types = ucwords(implode(' / ', array_values(array_filter(array($ability_info['ability_type'], $ability_info['ability_type2'])))));
-                                    if (empty($ability_types)){ $ability_types = 'Neutral'; }
-                                    $ability_options_markup[] = '<option value="'.$ability_token.'">'.$ability_name.' ('.$ability_types.')</option>';
-                                }
-                                $ability_options_count = count($ability_options_markup);
-                                $ability_options_markup = implode(PHP_EOL, $ability_options_markup);
 
                                 ?>
-
-                                <div class="field fullsize multirow">
-                                    <strong class="label">
-                                        Level-Up Abilities
-                                        <em>Only hero and support challenges require level-up, others should unlock all at start</em>
-                                    </strong>
-                                    <?
-                                    $current_ability_list = !empty($challenge_data['challenge_abilities_rewards']) ? json_decode($challenge_data['challenge_abilities_rewards'], true) : array();
-                                    $select_limit = max(8, count($current_ability_list));
-                                    $select_limit += 2;
-                                    for ($i = 0; $i < $select_limit; $i++){
-                                        $current_value = isset($current_ability_list[$i]) ? $current_ability_list[$i] : array();
-                                        $current_value_level = !empty($current_value) ? $current_value['level'] : '';
-                                        $current_value_token = !empty($current_value) ? $current_value['token'] : '';
-                                        ?>
-                                        <div class="subfield levelup">
-                                            <input class="textarea" type="number" name="challenge_abilities_rewards[<?= $i ?>][level]" value="<?= $current_value_level ?>" maxlength="3" placeholder="0" />
-                                            <select class="select" name="challenge_abilities_rewards[<?= $i ?>][token]">
-                                                <?= str_replace('value="'.$current_value_token.'"', 'value="'.$current_value_token.'" selected="selected"', $ability_options_markup) ?>
-                                            </select><span></span>
-                                        </div>
-                                        <?
-                                    }
-                                    ?>
-                                </div>
-
-                                <hr />
-
-                                <div class="field fullsize has4cols multirow">
-                                    <strong class="label">
-                                        Compatible Abilities
-                                        <em>Excluding level-up abilities and <u title="<?= implode(', ', $global_ability_tokens) ?>">global ones</u> available to all challenges by default</em>
-                                    </strong>
-                                    <?
-                                    $current_ability_list = !empty($challenge_data['challenge_abilities_compatible']) ? json_decode($challenge_data['challenge_abilities_compatible'], true) : array();
-                                    $current_ability_list = array_values(array_filter($current_ability_list, function($token) use($global_ability_tokens){ return !in_array($token, $global_ability_tokens); }));
-                                    $select_limit = max(12, count($current_ability_list));
-                                    $select_limit += 4 - ($select_limit % 4);
-                                    $select_limit += 4;
-                                    for ($i = 0; $i < $select_limit; $i++){
-                                        $current_value = isset($current_ability_list[$i]) ? $current_ability_list[$i] : '';
-                                        ?>
-                                        <div class="subfield">
-                                            <select class="select" name="challenge_abilities_compatible[<?= $i ?>]">
-                                                <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $ability_options_markup) ?>
-                                            </select><span></span>
-                                        </div>
-                                        <?
-                                    }
-                                    ?>
-                                </div>
 
                             </div>
 
