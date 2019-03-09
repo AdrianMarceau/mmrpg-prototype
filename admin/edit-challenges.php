@@ -24,34 +24,7 @@
     $mmrpg_abilities_fields = rpg_ability::get_index_fields(true);
     $mmrpg_abilities_index = $db->get_array_list("SELECT {$mmrpg_abilities_fields} FROM mmrpg_index_abilities WHERE ability_token <> 'ability' AND ability_class <> 'system' ORDER BY ability_order ASC", 'ability_token');
 
-    // Collect an index of challenge function files for options
-    $functions_path = MMRPG_CONFIG_ROOTDIR.'data/';
-    $functions_list = getDirContents($functions_path.'challenges/');
-    $mmrpg_functions_index = array();
-    if (!empty($functions_list)){
-        foreach ($functions_list as $key => $value){
-            if (strstr($value, '_index.php')){ continue; }
-            elseif (!preg_match('/\.php$/i', $value)){ continue; }
-            $value = str_replace('\\', '/', $value);
-            $value = str_replace($functions_path, '', $value);
-            $mmrpg_functions_index[] = $value;
-        }
-        usort($mmrpg_functions_index, function($a, $b){
-            $ax = explode('/', $a); $axcount = count($ax);
-            $bx = explode('/', $b); $bxcount = count($bx);
-            $az = strstr($a, '/mm') ? true : false;
-            $bz = strstr($b, '/mm') ? true : false;
-            if ($axcount < $bxcount){ return -1; }
-            elseif ($axcount > $bxcount){ return 1; }
-            elseif ($az && !$bz){ return -1; }
-            elseif (!$az && $bz){ return 1; }
-            elseif ($a < $b){ return -1; }
-            elseif ($a > $b){ return 1; }
-            else { return 0; }
-            });
-    }
-
-    // Collect an index of contributors and admins that have made sprites
+    // Collect an index of contributors and admins that have made challenges
     $mmrpg_contributors_index = $db->get_array_list("SELECT
         users.user_id AS user_id,
         users.user_name AS user_name,
@@ -79,6 +52,17 @@
         uroles.role_level DESC,
         users.user_name_clean ASC
         ;", 'user_id');
+
+    // Pre-generate a list of all contributors so we can re-use it over and over
+    $contributor_options_markup = array();
+    $contributor_options_markup[] = '<option value="0">-</option>';
+    foreach ($mmrpg_contributors_index AS $user_id => $user_info){
+        $option_label = $user_info['user_name'];
+        if (!empty($user_info['user_name_public']) && $user_info['user_name_public'] !== $user_info['user_name']){ $option_label = $user_info['user_name_public'].' ('.$option_label.')'; }
+        $contributor_options_markup[] = '<option value="'.$user_id.'">'.$option_label.'</option>';
+    }
+    $contributor_options_count = count($contributor_options_markup);
+    $contributor_options_markup = implode(PHP_EOL, $contributor_options_markup);
 
 
     /* -- Form Setup Actions -- */
@@ -260,10 +244,7 @@
 
             // COLLECT form data from the request and parse out simple rules
 
-            $old_challenge_token = !empty($_POST['old_challenge_token']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['old_challenge_token']) ? trim(strtolower($_POST['old_challenge_token'])) : '';
-
             $form_data['challenge_id'] = !empty($_POST['challenge_id']) && is_numeric($_POST['challenge_id']) ? trim($_POST['challenge_id']) : 0;
-            $form_data['challenge_token'] = !empty($_POST['challenge_token']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['challenge_token']) ? trim(strtolower($_POST['challenge_token'])) : '';
             $form_data['challenge_name'] = !empty($_POST['challenge_name']) && preg_match('/^[-_0-9a-z\.\*\s]+$/i', $_POST['challenge_name']) ? trim($_POST['challenge_name']) : '';
             $form_data['challenge_kind'] = !empty($_POST['challenge_kind']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['challenge_kind']) ? trim(strtolower($_POST['challenge_kind'])) : '';
             $form_data['challenge_core'] = !empty($_POST['challenge_core']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['challenge_core']) ? trim(strtolower($_POST['challenge_core'])) : '';
@@ -330,7 +311,6 @@
 
             // VALIDATE all of the MANDATORY FIELDS to see if any are invalid and abort the update entirely if necessary
             if (empty($form_data['challenge_id'])){ $form_messages[] = array('error', 'Challenge ID was not provided'); $form_success = false; }
-            if (empty($form_data['challenge_token']) || empty($old_challenge_token)){ $form_messages[] = array('error', 'Challenge Token was not provided or was invalid'); $form_success = false; }
             if (empty($form_data['challenge_name'])){ $form_messages[] = array('error', 'Challenge Name was not provided or was invalid'); $form_success = false; }
             if (empty($form_data['challenge_kind'])){ $form_messages[] = array('error', 'Challenge Kind was not provided or was invalid'); $form_success = false; }
             if (!isset($_POST['challenge_core']) || !isset($_POST['challenge_core2'])){ $form_messages[] = array('warning', 'Core Types were not provided or were invalid'); $form_success = false; }
@@ -748,29 +728,13 @@
                     <h3 class="header type_span type_<?= !empty($challenge_data['challenge_core']) ? $challenge_data['challenge_core'].(!empty($challenge_data['challenge_core2']) ? '_'.$challenge_data['challenge_core2'] : '') : 'none' ?>" data-auto="field-type" data-field-type="challenge_core,challenge_core2">
                         <span class="title"><?= !$is_backup_data ? 'Edit' : 'View' ?> Challenge &quot;<?= $challenge_name_display ?>&quot;</span>
                         <?
-                        // If this is NOT backup data, we can generate links
-                        if (!$is_backup_data){
-
-                            // If the challenge is published, generate and display a preview link
-                            if (!empty($challenge_data['challenge_flag_published'])){
-                                $preview_link = 'database/';
-                                if ($challenge_data['challenge_kind'] === 'master'){ $preview_link .= 'challenges/'; }
-                                elseif ($challenge_data['challenge_kind'] === 'mecha'){ $preview_link .= 'mechas/'; }
-                                elseif ($challenge_data['challenge_kind'] === 'boss'){ $preview_link .= 'bosses/'; }
-                                $preview_link .= $challenge_data['challenge_token'].'/';
-                                echo '<a class="view" href="'.$preview_link.'" target="_blank">View <i class="fas fa-external-link-square-alt"></i></a>'.PHP_EOL;
-                                echo '<a class="preview" href="'.$preview_link.'preview=true" target="_blank">Preview <i class="fas fa-external-link-square-alt"></i></a>'.PHP_EOL;
-                            }
-
-                        }
-                        // Otherwise we'll simply show the backup creation date
-                        else {
+                        // If this is backup data, show the backup creation date
+                        if ($is_backup_data){
 
                             // Print out the creation date in a readable form
                             echo '<span style="display: block; clear: left; font-size: 90%; font-weight: normal;">Backup Created '.date('Y/m/d @ g:s a', strtotime(preg_replace('/^([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})([0-9]{2})$/', '$1/$2/$3T$4:$5', $challenge_data['backup_date_time']))).'</span>';
 
                         }
-
                         ?>
                     </h3>
 
@@ -780,9 +744,9 @@
                     // Collect a list of backups for this challenge from the database, if any
                     $challenge_backup_list = array();
                     /* $challenge_backup_list = $db->get_array_list("SELECT
-                        backup_id, challenge_token, challenge_name, backup_date_time
+                        backup_id, challenge_id, challenge_name, backup_date_time
                         FROM mmrpg_challenges_backups
-                        WHERE challenge_token = '{$challenge_data['challenge_token']}'
+                        WHERE challenge_id = '{$challenge_data['challenge_id']}'
                         ORDER BY backup_date_time DESC
                         ;"); */
                     ?>
@@ -790,9 +754,7 @@
                     <div class="editor-tabs" data-tabgroup="challenge">
                         <a class="tab active" data-tab="basic">Basic</a><span></span>
                         <a class="tab" data-tab="stats">Stats</a><span></span>
-                        <a class="tab" data-tab="flavour">Flavour</a><span></span>
                         <a class="tab" data-tab="abilities">Abilities</a><span></span>
-                        <a class="tab" data-tab="sprites">Sprites</a><span></span>
                         <? if (!$is_backup_data && !empty($challenge_backup_list)){ ?>
                             <a class="tab" data-tab="backups">Backups</a><span></span>
                         <? } ?>
@@ -814,213 +776,115 @@
                                 </div>
 
                                 <div class="field">
-                                    <div class="label">
-                                        <strong>Challenge Token</strong>
-                                        <em>avoid changing</em>
-                                    </div>
-                                    <input type="hidden" name="old_challenge_token" value="<?= $challenge_data['challenge_token'] ?>" />
-                                    <input class="textbox" type="text" name="challenge_token" value="<?= $challenge_data['challenge_token'] ?>" maxlength="64" />
-                                </div>
-
-                                <div class="field">
-                                    <strong class="label">Challenge Name</strong>
-                                    <input class="textbox" type="text" name="challenge_name" value="<?= $challenge_data['challenge_name'] ?>" maxlength="128" />
-                                </div>
-
-                                <div class="field">
                                     <strong class="label">Challenge Kind</strong>
                                     <select class="select" name="challenge_kind">
-                                        <option value="mecha" <?= $challenge_data['challenge_kind'] == 'mecha' ? 'selected="selected"' : '' ?>>Support Mecha</option>
-                                        <option value="master" <?= empty($challenge_data['challenge_kind']) || $challenge_data['challenge_kind'] == 'master' ? 'selected="selected"' : '' ?>>Challenge Master</option>
-                                        <option value="boss" <?= $challenge_data['challenge_kind'] == 'boss' ? 'selected="selected"' : '' ?>>Fortress Boss</option>
-                                    </select><span></span>
-                                </div>
-
-                                <div class="field has2cols">
-                                    <strong class="label">
-                                        Core Type(s)
-                                        <span class="type_span type_<?= (!empty($challenge_data['challenge_core']) ? $challenge_data['challenge_core'].(!empty($challenge_data['challenge_core2']) ? '_'.$challenge_data['challenge_core2'] : '') : 'none') ?> swatch floatright" data-auto="field-type" data-field-type="challenge_core,challenge_core2">&nbsp;</span>
-                                    </strong>
-                                    <div class="subfield">
-                                        <select class="select" name="challenge_core">
-                                            <option value=""<?= empty($challenge_data['challenge_core']) ? ' selected="selected"' : '' ?>>Neutral</option>
-                                            <?
-                                            foreach ($mmrpg_types_index AS $type_token => $type_info){
-                                                if ($type_info['type_class'] === 'special'){ continue; }
-                                                $label = $type_info['type_name'];
-                                                if (!empty($challenge_data['challenge_core']) && $challenge_data['challenge_core'] === $type_token){ $selected = 'selected="selected"'; }
-                                                else { $selected = ''; }
-                                                echo('<option value="'.$type_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                            }
-                                            ?>
-                                        </select><span></span>
-                                    </div>
-                                    <div class="subfield">
-                                        <select class="select" name="challenge_core2">
-                                            <option value=""<?= empty($challenge_data['challenge_core2']) ? ' selected="selected"' : '' ?>>-</option>
-                                            <?
-                                            foreach ($mmrpg_types_index AS $type_token => $type_info){
-                                                if ($type_info['type_class'] === 'special'){ continue; }
-                                                $label = $type_info['type_name'];
-                                                if (!empty($challenge_data['challenge_core2']) && $challenge_data['challenge_core2'] === $type_token){ $selected = 'selected="selected"'; }
-                                                else { $selected = ''; }
-                                                echo('<option value="'.$type_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                            }
-                                            ?>
-                                        </select><span></span>
-                                    </div>
-                                </div>
-
-                                <div class="field">
-                                    <strong class="label">Gender</strong>
-                                    <div class="subfield">
-                                        <select class="select" name="challenge_gender">
-                                            <option value="none" <?= empty($challenge_data['challenge_gender']) || $challenge_data['challenge_gender'] == 'none' ? 'selected="selected"' : '' ?>>None</option>
-                                            <option value="other" <?= $challenge_data['challenge_gender'] == 'other' ? 'selected="selected"' : '' ?>>Other</option>
-                                            <option value="male" <?= $challenge_data['challenge_gender'] == 'male' ? 'selected="selected"' : '' ?>>Male</option>
-                                            <option value="female" <?= $challenge_data['challenge_gender'] == 'female' ? 'selected="selected"' : '' ?>>Female</option>
-                                        </select><span></span>
-                                    </div>
-                                </div>
-
-                                <hr />
-
-                                <div class="field foursize">
-                                    <strong class="label">Source Game</strong>
-                                    <select class="select" name="challenge_game">
-                                        <?
-                                        $challenge_games_tokens = $db->get_array_list("SELECT DISTINCT (challenge_game) AS game_token FROM mmrpg_challenges WHERE challenge_game <> '' ORDER BY challenge_game ASC;", 'game_token');
-                                        echo('<option value=""'.(empty($challenge_data['challenge_game']) ? 'selected="selected"' : '').'>- none -</option>');
-                                        foreach ($challenge_games_tokens AS $game_token => $game_data){
-                                            $label = $game_token;
-                                            $selected = !empty($challenge_data['challenge_game']) && $challenge_data['challenge_game'] == $game_token ? 'selected="selected"' : '';
-                                            echo('<option value="'.$game_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                        }
-                                        ?>
-                                    </select><span></span>
-                                </div>
-
-                                <div class="field foursize">
-                                    <strong class="label">Sort Group</strong>
-                                    <input class="textbox" type="text" name="challenge_group" value="<?= $challenge_data['challenge_group'] ?>" maxlength="64" />
-                                </div>
-
-                                <div class="field foursize">
-                                    <strong class="label">Serial Number</strong>
-                                    <input class="textbox" type="text" name="challenge_number" value="<?= $challenge_data['challenge_number'] ?>" maxlength="64" />
-                                </div>
-
-                                <div class="field foursize">
-                                    <strong class="label">Sort Order</strong>
-                                    <input class="textbox" type="number" name="challenge_order" value="<?= $challenge_data['challenge_order'] ?>" maxlength="8" />
-                                </div>
-
-                                <hr />
-
-                                <div class="field">
-                                    <strong class="label">Home Field</strong>
-                                    <select class="select" name="challenge_field">
-                                        <?
-                                        echo('<option value=""'.(empty($challenge_data['challenge_field']) ? 'selected="selected"' : '').'>- none -</option>');
-                                        foreach ($mmrpg_fields_index AS $field_token => $field_data){
-                                            $label = $field_data['field_name'];
-                                            $label .= ' ('.(!empty($field_data['field_type']) ? ucfirst($field_data['field_type']) : 'Neutral').')';
-                                            $selected = !empty($challenge_data['challenge_field']) && $challenge_data['challenge_field'] == $field_token ? 'selected="selected"' : '';
-                                            echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                        }
-                                        ?>
+                                        <option value="event" <?= $challenge_data['challenge_kind'] == 'event' ? 'selected="selected"' : '' ?>>Event Challenge</option>
+                                        <option value="user" <?= empty($challenge_data['challenge_kind']) || $challenge_data['challenge_kind'] == 'user' ? 'selected="selected"' : '' ?>>User Challenge</option>
                                     </select><span></span>
                                 </div>
 
                                 <div class="field">
-                                    <strong class="label">Echo Field</strong>
-                                    <select class="select" name="challenge_field2">
-                                        <?
-                                        echo('<option value=""'.(empty($challenge_data['challenge_field2']) ? 'selected="selected"' : '').'>- none -</option>');
-                                        foreach ($mmrpg_fields_index AS $field_token => $field_data){
-                                            $label = $field_data['field_name'];
-                                            $label .= ' ('.(!empty($field_data['field_type']) ? ucfirst($field_data['field_type']) : 'Neutral').')';
-                                            $selected = !empty($challenge_data['challenge_field2']) && $challenge_data['challenge_field2'] == $field_token ? 'selected="selected"' : '';
-                                            echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                        }
-                                        ?>
-                                    </select><span></span>
+                                    <div class="label">
+                                        <strong>Challenge Creator</strong>
+                                        <em>leave blank for events</em>
+                                    </div>
+                                    <? if ($challenge_data['challenge_kind'] == 'user'){ ?>
+                                        <select class="select" name="challenge_creator">
+                                            <?= str_replace('value="'.$challenge_data['challenge_creator'].'"', 'value="'.$challenge_data['challenge_creator'].'" selected="selected"', $contributor_options_markup) ?>
+                                        </select><span></span>
+                                    <? } else { ?>
+                                        <input type="hidden" name="challenge_creator" value="<?= $challenge_data['challenge_creator'] ?>" />
+                                        <input class="textbox" type="text" name="challenge_creator" value="-" disabled="disabled" />
+                                    <? } ?>
                                 </div>
 
-                                <? if ($challenge_data['challenge_field'] !== 'mecha'){
-                                    ?>
-                                    <div class="field disabled">
-                                        <strong class="label">Support Mecha</strong>
-                                        <select class="select disabled" name="challenge_mecha" disabled="disabled">
-                                            <option value="">-</option>
-                                        </select><span></span>
+                                <div class="field">
+                                    <div class="label">
+                                        <strong>Challenge Name</strong>
+                                        <em>appears on the button</em>
                                     </div>
-                                    <?
-                                } ?>
+                                    <input class="textbox" type="text" name="challenge_name" value="<?= $challenge_data['challenge_name'] ?>" maxlength="64" />
+                                </div>
+
+                                <div class="field">
+                                    <div class="label">
+                                        <strong>Robot Limit</strong>
+                                        <em>use zero for auto</em>
+                                    </div>
+                                    <input class="textbox" type="number" name="challenge_robot_limit" value="<?= $challenge_data['challenge_robot_limit'] ?>" min="0" max="8" />
+                                </div>
+
+                                <div class="field">
+                                    <div class="label">
+                                        <strong>Turn Limit</strong>
+                                        <em>use zero for auto</em>
+                                    </div>
+                                    <input class="textbox" type="number" name="challenge_turn_limit" value="<?= $challenge_data['challenge_turn_limit'] ?>" min="0" max="99" />
+                                </div>
+
+                                <div class="field fullsize">
+                                    <div class="label">
+                                        <strong>Challenge Description</strong>
+                                        <em>appears at battle start, max 256 characters</em>
+                                    </div>
+                                    <textarea class="textarea" name="challenge_description" maxlength="256" rows="3"><?= htmlentities($challenge_data['challenge_description'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                                </div>
 
                                 <hr />
 
                                 <?
-
-                                // Pre-generate a list of all functions so we can re-use it over and over
-                                $function_options_markup = array();
-                                $function_options_markup[] = '<option value="">-</option>';
-                                foreach ($mmrpg_functions_index AS $function_key => $function_path){
-                                    $function_options_markup[] = '<option value="'.$function_path.'">'.$function_path.'</option>';
-                                }
-                                $function_options_count = count($function_options_markup);
-                                $function_options_markup = implode(PHP_EOL, $function_options_markup);
-
+                                // Decode the field data so we can work with it
+                                $challenge_field_data = !empty($challenge_data['challenge_field_data']) ? json_decode($challenge_data['challenge_field_data'], true) : array();
                                 ?>
 
-                                <div class="field halfsize">
-                                    <div class="label">
-                                        <strong>Challenge Functions</strong>
-                                        <em>file path for script with challenge functions like onload, ondefeat, etc.</em>
-                                    </div>
-                                    <select class="select" name="challenge_functions">
-                                        <?= str_replace('value="'.$challenge_data['challenge_functions'].'"', 'value="'.$challenge_data['challenge_functions'].'" selected="selected"', $function_options_markup) ?>
+                                <div class="field">
+                                    <strong class="label">Field Background</strong>
+                                    <select class="select" name="challenge_field_data[field_background]">
+                                        <?
+                                        echo('<option value=""'.(empty($challenge_field_data['field_background']) ? 'selected="selected"' : '').'>- none -</option>');
+                                        foreach ($mmrpg_fields_index AS $field_token => $field_data){
+                                            $label = $field_data['field_name'];
+                                            $label .= ' ('.(!empty($field_data['field_type']) ? ucfirst($field_data['field_type']) : 'Neutral').')';
+                                            $selected = !empty($challenge_field_data['field_background']) && $challenge_field_data['field_background'] == $field_token ? 'selected="selected"' : '';
+                                            echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                        }
+                                        ?>
+                                    </select><span></span>
+                                </div>
+
+                                <div class="field">
+                                    <strong class="label">Field Foreground</strong>
+                                    <select class="select" name="challenge_field_data[field_foreground]">
+                                        <?
+                                        echo('<option value=""'.(empty($challenge_field_data['field_foreground']) ? 'selected="selected"' : '').'>- none -</option>');
+                                        foreach ($mmrpg_fields_index AS $field_token => $field_data){
+                                            $label = $field_data['field_name'];
+                                            $label .= ' ('.(!empty($field_data['field_type']) ? ucfirst($field_data['field_type']) : 'Neutral').')';
+                                            $selected = !empty($challenge_field_data['field_foreground']) && $challenge_field_data['field_foreground'] == $field_token ? 'selected="selected"' : '';
+                                            echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                        }
+                                        ?>
+                                    </select><span></span>
+                                </div>
+
+                                <div class="field">
+                                    <strong class="label">Field Music</strong>
+                                    <select class="select" name="challenge_field_data[field_music]">
+                                        <?
+                                        echo('<option value=""'.(empty($challenge_field_data['field_music']) ? 'selected="selected"' : '').'>- none -</option>');
+                                        foreach ($mmrpg_fields_index AS $field_token => $field_data){
+                                            $label = $field_data['field_name'];
+                                            $label .= ' ('.(!empty($field_data['field_type']) ? ucfirst($field_data['field_type']) : 'Neutral').')';
+                                            $selected = !empty($challenge_field_data['field_music']) && $challenge_field_data['field_music'] == $field_token ? 'selected="selected"' : '';
+                                            echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                        }
+                                        ?>
                                     </select><span></span>
                                 </div>
 
                             </div>
 
                             <div class="panel" data-tab="stats">
-
-                                <div class="field foursize">
-                                    <strong class="label"><span class="type_span type_energy">Energy</span> <em>LE</em></strong>
-                                    <input class="textbox" type="number" name="challenge_energy" value="<?= $challenge_data['challenge_energy'] ?>" maxlength="8" />
-                                </div>
-
-                                <div class="field foursize">
-                                    <strong class="label"><span class="type_span type_attack">Attack</span> <em>AT</em></strong>
-                                    <input class="textbox" type="number" name="challenge_attack" value="<?= $challenge_data['challenge_attack'] ?>" maxlength="8" />
-                                </div>
-
-                                <div class="field foursize">
-                                    <strong class="label"><span class="type_span type_defense">Defense</span> <em>DF</em></strong>
-                                    <input class="textbox" type="number" name="challenge_defense" value="<?= $challenge_data['challenge_defense'] ?>" maxlength="8" />
-                                </div>
-
-                                <div class="field foursize">
-                                    <strong class="label"><span class="type_span type_speed">Speed</span> <em>SP</em></strong>
-                                    <input class="textbox" type="number" name="challenge_speed" value="<?= $challenge_data['challenge_speed'] ?>" maxlength="8" />
-                                </div>
-
-                                <div class="field halfsize">
-                                    <strong class="label"><span class="type_span type_weapons">Weapons</span> <em>WE</em></strong>
-                                    <input class="textbox" type="number" name="challenge_weapons" value="<?= $challenge_data['challenge_weapons'] ?>" maxlength="8" />
-                                </div>
-
-                                <div class="field halfsize">
-                                    <div class="label">
-                                        <strong><span class="type_span type_cutter">Base Stat Total</span> <em>LE + AT + DF + SP</em></strong>
-                                    </div>
-                                    <? $bst_value = $challenge_data['challenge_energy'] + $challenge_data['challenge_attack'] + $challenge_data['challenge_defense'] + $challenge_data['challenge_speed']; ?>
-                                    <input class="textbox disabled" type="text" name="challenge_bst" value="<?= $bst_value ?>" maxlength="8" disabled="disabled" data-auto="field-sum" data-field-sum="challenge_energy,challenge_attack,challenge_defense,challenge_speed" />
-                                </div>
-
-                                <hr />
 
                                 <?
                                 $challenge_type_matchups = array('weaknesses', 'resistances', 'affinities', 'immunities');
@@ -1053,48 +917,6 @@
                                     <?
                                 }
                                 ?>
-
-                            </div>
-
-                            <div class="panel" data-tab="flavour">
-
-                                <div class="field halfsize">
-                                    <div class="label">
-                                        <strong>Challenge Class</strong>
-                                        <em>three word classification</em>
-                                    </div>
-                                    <input class="textbox" type="text" name="challenge_description" value="<?= htmlentities($challenge_data['challenge_description'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="32" />
-                                </div>
-
-                                <div class="field fullsize">
-                                    <div class="label">
-                                        <strong>Challenge Description</strong>
-                                        <em>short paragraph about challenge's design, personality, background, etc.</em>
-                                    </div>
-                                    <textarea class="textarea" name="challenge_description2" rows="10"><?= htmlentities($challenge_data['challenge_description2'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
-                                </div>
-
-                                <hr />
-
-                                <?
-                                $challenge_quote_kinds = array('start', 'taunt', 'victory', 'defeat');
-                                foreach ($challenge_quote_kinds AS $kind_key => $kind_token){
-                                    ?>
-                                    <div class="field halfsize">
-                                        <div class="label">
-                                            <strong><?= ucfirst($kind_token) ?> Quote</strong>
-                                        </div>
-                                        <input class="textbox" type="text" name="challenge_quotes_<?= $kind_token ?>" value="<?= htmlentities($challenge_data['challenge_quotes_'.$kind_token], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="256" />
-                                    </div>
-                                    <?
-                                }
-                                ?>
-
-                                <div class="field fullsize" style="min-height: 0; margin-bottom: 0; padding-bottom: 0;">
-                                    <div class="label">
-                                        <em class="nowrap" style="margin-left: 0;">(!) You can use <strong>{this_player}</strong>, <strong>{this_challenge}</strong>, <strong>{target_player}</strong>, and <strong>{target_challenge}</strong> variables for dynamic text</em>
-                                    </div>
-                                </div>
 
                             </div>
 
@@ -1175,359 +997,6 @@
 
                             </div>
 
-                            <div class="panel" data-tab="sprites">
-
-                                <?
-
-                                // Pre-generate a list of all contributors so we can re-use it over and over
-                                $contributor_options_markup = array();
-                                $contributor_options_markup[] = '<option value="0">-</option>';
-                                foreach ($mmrpg_contributors_index AS $user_id => $user_info){
-                                    $option_label = $user_info['user_name'];
-                                    if (!empty($user_info['user_name_public']) && $user_info['user_name_public'] !== $user_info['user_name']){ $option_label = $user_info['user_name_public'].' ('.$option_label.')'; }
-                                    $contributor_options_markup[] = '<option value="'.$user_id.'">'.$option_label.'</option>';
-                                }
-                                $contributor_options_count = count($contributor_options_markup);
-                                $contributor_options_markup = implode(PHP_EOL, $contributor_options_markup);
-
-                                ?>
-
-                                <? $placeholder_folder = $challenge_data['challenge_kind'] != 'master' ? $challenge_data['challenge_kind'] : 'challenge'; ?>
-                                <div class="field halfsize">
-                                    <div class="label">
-                                        <strong>Sprite Path</strong>
-                                        <em>base image path for sprites</em>
-                                    </div>
-                                    <select class="select" name="challenge_image">
-                                        <option value="<?= $placeholder_folder ?>" <?= $challenge_data['challenge_image'] == $placeholder_folder ? 'selected="selected"' : '' ?>>images/challenges/<?= $placeholder_folder ?>/</option>
-                                        <option value="<?= $challenge_data['challenge_token'] ?>" <?= $challenge_data['challenge_image'] == $challenge_data['challenge_token'] ? 'selected="selected"' : '' ?>>images/challenges/<?= $challenge_data['challenge_token'] ?>/</option>
-                                    </select><span></span>
-                                </div>
-
-                                <div class="field halfsize">
-                                    <div class="label">
-                                        <strong>Sprite Size</strong>
-                                        <em>base frame size for each sprite</em>
-                                    </div>
-                                    <? if ($challenge_data['challenge_image'] != $placeholder_folder){ ?>
-                                        <select class="select" name="challenge_image_size">
-                                            <option value="40" <?= $challenge_data['challenge_image_size'] == 40 ? 'selected="selected"' : '' ?>>40x40</option>
-                                            <option value="80" <?= $challenge_data['challenge_image_size'] == 80 ? 'selected="selected"' : '' ?>>80x80</option>
-                                            <option disabled="disabled" value="160" <?= $challenge_data['challenge_image_size'] == 160 ? 'selected="selected"' : '' ?>>160x160</option>
-                                        </select><span></span>
-                                    <? } else { ?>
-                                        <input type="hidden" name="challenge_image_size" value="<?= $challenge_data['challenge_image_size'] ?>" />
-                                        <input class="textbox" type="text" name="challenge_image_size" value="-" disabled="disabled" />
-                                    <? } ?>
-                                </div>
-
-                                <div class="field halfsize">
-                                    <div class="label">
-                                        <strong>Sprite Editor #1</strong>
-                                        <em>user who edited or created this sprite</em>
-                                    </div>
-                                    <? if ($challenge_data['challenge_image'] != $placeholder_folder){ ?>
-                                        <select class="select" name="challenge_creator">
-                                            <?= str_replace('value="'.$challenge_data['challenge_creator'].'"', 'value="'.$challenge_data['challenge_creator'].'" selected="selected"', $contributor_options_markup) ?>
-                                        </select><span></span>
-                                    <? } else { ?>
-                                        <input type="hidden" name="challenge_creator" value="<?= $challenge_data['challenge_creator'] ?>" />
-                                        <input class="textbox" type="text" name="challenge_creator" value="-" disabled="disabled" />
-                                    <? } ?>
-                                </div>
-
-                                <div class="field halfsize">
-                                    <div class="label">
-                                        <strong>Sprite Editor #2</strong>
-                                        <em>another user who collaborated on this sprite</em>
-                                    </div>
-                                    <? if ($challenge_data['challenge_image'] != $placeholder_folder){ ?>
-                                        <select class="select" name="challenge_creator2">
-                                            <?= str_replace('value="'.$challenge_data['challenge_creator2'].'"', 'value="'.$challenge_data['challenge_creator2'].'" selected="selected"', $contributor_options_markup) ?>
-                                        </select><span></span>
-                                    <? } else { ?>
-                                        <input type="hidden" name="challenge_creator2" value="<?= $challenge_data['challenge_creator2'] ?>" />
-                                        <input class="textbox" type="text" name="challenge_creator2" value="-" disabled="disabled" />
-                                    <? } ?>
-                                </div>
-
-                                <?
-
-                                // Decompress existing image alts pulled from the database
-                                $challenge_image_alts = !empty($challenge_data['challenge_image_alts']) ? json_decode($challenge_data['challenge_image_alts'], true) : array();
-
-                                // Collect the alt tokens from all defined alts so far
-                                $challenge_image_alts_tokens = array();
-                                foreach ($challenge_image_alts AS $alt){ if (!empty($alt['token'])){ $challenge_image_alts_tokens[] = $alt['token'];  } }
-
-                                // Define a variable to toggle allowance of new alt creation
-                                $has_elemental_alts = $challenge_data['challenge_core'] == 'copy' ? true : false;
-                                $allow_new_alt_creation = !$has_elemental_alts ? true : false;
-
-                                // Only proceed if all required sprite fields are set
-                                if (!empty($challenge_data['challenge_image'])
-                                    && !in_array($challenge_data['challenge_image'], array('challenge', 'master', 'boss', 'mecha'))
-                                    && !empty($challenge_data['challenge_image_size'])
-                                    && !($is_backup_data && $has_elemental_alts)){
-
-                                    echo('<hr />'.PHP_EOL);
-
-                                    // Define the base sprite and shadow paths for this challenge given its image token
-                                    $base_sprite_path = 'images/challenges/'.$challenge_data['challenge_image'].'/';
-                                    $base_shadow_path = 'images/challenges_shadows/'.$challenge_data['challenge_image'].'/';
-
-                                    // Define the alts we'll be looping through for this challenge
-                                    $temp_alts_array = array();
-                                    $temp_alts_array[] = array('token' => '', 'name' => $challenge_data['challenge_name'], 'summons' => 0);
-
-                                    // Append predefined alts automatically, based on the challenge image alt array
-                                    if (!empty($challenge_data['challenge_image_alts'])){
-                                        $temp_alts_array = array_merge($temp_alts_array, $challenge_image_alts);
-                                    }
-
-                                    // Otherwise, if this is a copy challenge, append based on all the types in the index
-                                    if ($has_elemental_alts){
-                                        foreach ($mmrpg_types_index AS $type_token => $type_info){
-                                            if (empty($type_token) || $type_token == 'none' || $type_token == 'copy' || $type_info['type_class'] == 'special'){ continue; }
-                                            $temp_alts_array[] = array('token' => $type_token, 'name' => $challenge_data['challenge_name'].' ('.ucfirst($type_token).' Core)', 'summons' => 0, 'colour' => $type_token);
-                                        }
-                                    }
-
-                                    // Otherwise, if this challenge has multiple sheets, add them as alt options
-                                    if (!empty($challenge_data['challenge_image_sheets'])){
-                                        for ($i = 2; $i <= $challenge_data['challenge_image_sheets']; $i++){
-                                            $temp_alts_array[] = array('sheet' => $i, 'name' => $challenge_data['challenge_name'].' (Sheet #'.$i.')', 'summons' => 0);
-                                        }
-                                    }
-
-                                    // Loop through the defined alts for this challenge and display image lists
-                                    if (!empty($temp_alts_array)){
-                                        foreach ($temp_alts_array AS $alt_key => $alt_info){
-
-                                            $is_base_sprite = empty($alt_info['token']) ? true : false;
-                                            if ($is_backup_data && $is_base_sprite){ continue; }
-                                            $alt_token = $is_base_sprite ? 'base' : $alt_info['token'];
-
-                                            $alt_file_path = rtrim($base_sprite_path, '/').(!$is_base_sprite ? '_'.$alt_info['token'] : '').'/';
-                                            $alt_file_dir = MMRPG_CONFIG_ROOTDIR.$alt_file_path;
-                                            $alt_files_existing = getDirContents($alt_file_dir);
-
-                                            $alt_shadow_path = rtrim($base_shadow_path, '/').(!$is_base_sprite ? '_'.$alt_info['token'] : '').'/';
-                                            $alt_shadow_dir = MMRPG_CONFIG_ROOTDIR.$alt_shadow_path;
-                                            $alt_shadows_existing = getDirContents($alt_shadow_dir);
-
-                                            if (!empty($alt_files_existing)){ $alt_files_existing = array_map(function($s)use($alt_file_dir){ return str_replace($alt_file_dir, '', str_replace('\\', '/', $s)); }, $alt_files_existing); }
-                                            if (!empty($alt_shadows_existing)){ $alt_shadows_existing = array_map(function($s)use($alt_shadow_dir){ return str_replace($alt_shadow_dir, '', str_replace('\\', '/', $s)); }, $alt_shadows_existing); }
-
-                                            //echo('<pre>$alt_files_existing = '.(!empty($alt_files_existing) ? htmlentities(print_r($alt_files_existing, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
-                                            //echo('<pre>$alt_shadows_existing = '.(!empty($alt_shadows_existing) ? htmlentities(print_r($alt_shadows_existing, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
-
-                                            ?>
-
-                                            <?= (!$is_backup_data && $alt_key > 0) || ($is_backup_data && $alt_key > 1) ? '<hr />' : '' ?>
-
-                                            <div class="field fullsize" style="margin-bottom: 0; min-height: 0;">
-                                                <strong class="label">
-                                                    <? if ($is_base_sprite){ ?>
-                                                        Base Sprite Sheets
-                                                        <em>Main sprites used for challenge. Faded are unused, all others are required.</em>
-                                                    <? } else { ?>
-                                                        <?= ucfirst($alt_token).' Sprite Sheets'  ?>
-                                                        <em>Sprites used for challenge's <strong><?= $alt_token ?></strong> skin. Faded are unused, shadows are optional.</em>
-                                                    <? } ?>
-                                                </strong>
-                                            </div>
-                                            <? if (!$is_base_sprite){ ?>
-                                                <input class="hidden" type="hidden" name="challenge_image_alts[<?= $alt_token ?>][token]" value="<?= $alt_info['token'] ?>" maxlength="64" <?= $has_elemental_alts ? 'disabled="disabled"' : '' ?> />
-                                                <div class="field">
-                                                    <div class="label"><strong>Name</strong></div>
-                                                    <input class="textbox" type="text" name="challenge_image_alts[<?= $alt_token ?>][name]" value="<?= $alt_info['name'] ?>" maxlength="64" <?= $has_elemental_alts ? 'disabled="disabled"' : '' ?> />
-                                                </div>
-                                                <div class="field">
-                                                    <div class="label"><strong>Summons</strong></div>
-                                                    <input class="textbox" type="number" name="challenge_image_alts[<?= $alt_token ?>][summons]" value="<?= $alt_info['summons'] ?>" maxlength="3" <?= $has_elemental_alts ? 'disabled="disabled"' : '' ?> />
-                                                </div>
-                                                <div class="field">
-                                                    <div class="label">
-                                                        <strong>Colour</strong>
-                                                        <span class="type_span type_<?= (!empty($alt_info['colour']) ? $alt_info['colour'] : 'none') ?> swatch floatright" data-auto="field-type" data-field-type="challenge_image_alts[<?= $alt_token ?>][colour]">&nbsp;</span>
-                                                    </div>
-                                                    <select class="select" name="challenge_image_alts[<?= $alt_token ?>][colour]" <?= $has_elemental_alts ? 'disabled="disabled"' : '' ?>>
-                                                        <option value=""<?= empty($alt_info['colour']) ? ' selected="selected"' : '' ?>>-</option>
-                                                        <?
-                                                        foreach ($mmrpg_types_index AS $type_token => $type_info){
-                                                            //if ($type_info['type_class'] === 'special'){ continue; }
-                                                            $label = $type_info['type_name'];
-                                                            if (!empty($alt_info['colour']) && $alt_info['colour'] === $type_token){ $selected = 'selected="selected"'; }
-                                                            else { $selected = ''; }
-                                                            echo('<option value="'.$type_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                                        }
-                                                        ?>
-                                                    </select><span></span>
-                                                </div>
-                                            <? } ?>
-
-                                            <? if (!$is_backup_data){ ?>
-
-                                                <div class="field fullsize has2cols widecols multirow">
-                                                    <?
-                                                    $sheet_groups = array('sprites', 'shadows');
-                                                    $sheet_kinds = array('mug', 'sprite');
-                                                    $sheet_sizes = array($challenge_data['challenge_image_size'], $challenge_data['challenge_image_size'] * 2);
-                                                    $sheet_directions = array('left', 'right');
-                                                    $num_frames = count(explode('/', MMRPG_SETTINGS_ROBOT_FRAMEINDEX));
-                                                    foreach ($sheet_groups AS $group_key => $group){
-                                                        if ($group == 'sprites'){ $this_alt_path = $alt_file_path; }
-                                                        elseif ($group == 'shadows'){ $this_alt_path = $alt_shadow_path; }
-                                                        foreach ($sheet_sizes AS $size_key => $size){
-                                                            $sheet_height = $size;
-                                                            echo('<div class="subfield"'.($size_key == 0 ? ' style="clear: left;"' : '').'>'.PHP_EOL);
-                                                                echo('<strong class="sublabel" style="font-size: 90%;">'.$group.' @ '.(100 + ($size_key * 100)).'%</strong><br />'.PHP_EOL);
-                                                                echo('<ul class="files">'.PHP_EOL);
-                                                                foreach ($sheet_kinds AS $kind_key => $kind){
-                                                                    $sheet_width = $kind != 'mug' ? ($size * $num_frames) : $size;
-                                                                    foreach ($sheet_directions AS $direction_key => $direction){
-                                                                        $file_name = $kind.'_'.$direction.'_'.$size.'x'.$size.'.png';
-                                                                        $file_href = MMRPG_CONFIG_ROOTURL.$this_alt_path.$file_name;
-                                                                        if ($group == 'sprites'){ $file_exists = in_array($file_name, $alt_files_existing) ? true : false; }
-                                                                        elseif ($group == 'shadows'){ $file_exists = in_array($file_name, $alt_shadows_existing) ? true : false; }
-                                                                        $file_is_unused = false;
-                                                                        if ($group == 'shadows' && ($kind == 'mug' || $size_key == 0)){ $file_is_unused = true; }
-                                                                        $file_is_optional = $group == 'shadows' && !$is_base_sprite ? true : false;
-                                                                        echo('<li>');
-                                                                            echo('<div class="filebar'.($file_is_unused ? ' unused' : '').($file_is_optional ? ' optional' : '').'" data-auto="file-bar" data-file-path="'.$this_alt_path.'" data-file-name="'.$file_name.'" data-file-kind="image/png" data-file-width="'.$sheet_width.'" data-file-height="'.$sheet_height.'">');
-                                                                                echo($file_exists ? '<a class="link view" href="'.$file_href.'?'.time().'" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>' : '<a class="link view disabled" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>');
-                                                                                echo('<span class="info size">'.$sheet_width.'w &times; '.$sheet_height.'h</span>');
-                                                                                echo($file_exists ? '<span class="info status good">&check;</span>' : '<span class="info status bad">&cross;</span>');
-                                                                                if (!$is_backup_data){
-                                                                                    echo('<a class="action delete'.(!$file_exists ? ' disabled' : '').'" data-action="delete" data-file-hash="'.md5('delete/'.$this_alt_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">Delete</a>');
-                                                                                    echo('<a class="action upload'.($file_exists ? ' disabled' : '').'" data-action="upload" data-file-hash="'.md5('upload/'.$this_alt_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">');
-                                                                                        echo('<span class="text">Upload</span>');
-                                                                                        echo('<input class="input" type="file" name="file_info" value=""'.($file_exists ? ' disabled="disabled"' : '').' />');
-                                                                                    echo('</a>');
-                                                                                }
-                                                                            echo('</div>');
-                                                                            /* echo('<div class="preview">');
-                                                                                echo('<img class="image" src="'.$file_href.'" alt="'.$file_name.'" />');
-                                                                            echo('</div>'); */
-                                                                        echo('</li>'.PHP_EOL);
-                                                                    }
-                                                                }
-                                                                echo('</ul>'.PHP_EOL);
-                                                            echo('</div>'.PHP_EOL);
-                                                        }
-                                                    }
-                                                    ?>
-
-                                                </div>
-
-                                                <div class="options" style="margin-top: -5px; padding-top: 0;">
-
-                                                    <? if ($is_base_sprite){ ?>
-
-                                                            <div class="field checkwrap rfloat fullsize">
-                                                                <label class="label">
-                                                                    <strong style="color: #da1616;">Delete Base Images?</strong>
-                                                                    <input type="hidden" name="challenge_image_alts[<?= $alt_token ?>][delete_images]" value="0" checked="checked" />
-                                                                    <input class="checkbox" type="checkbox" name="challenge_image_alts[<?= $alt_token ?>][delete_images]" value="1" />
-                                                                </label>
-                                                                <p class="subtext" style="color: #da1616;">Empty <strong>base</strong> image folder and remove all sprites/shadows</p>
-                                                                <? if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/backups/challenges/'.($challenge_data['challenge_image']).'/')){ ?>
-                                                                    <p class="subtext" style="color: #da1616;">(<a style="color: inherit; text-decoration: none;" href="images/viewer.php?path=backups/challenges/<?= $challenge_data['challenge_image'] ?>/" target="_blank"><u>view base backups</u> <i class="fas fa-external-link-square-alt"></i></a>)</p>
-                                                                <? } ?>
-                                                            </div>
-
-                                                    <? } else { ?>
-
-                                                            <div class="field checkwrap rfloat fullsize">
-                                                                <label class="label">
-                                                                    <strong style="color: #da1616;">Delete <?= ucfirst($alt_token) ?> Images?</strong>
-                                                                    <input type="hidden" name="challenge_image_alts[<?= $alt_token ?>][delete_images]" value="0" checked="checked" />
-                                                                    <input class="checkbox" type="checkbox" name="challenge_image_alts[<?= $alt_token ?>][delete_images]" value="1" />
-                                                                </label>
-                                                                <p class="subtext" style="color: #da1616;">Empty the <strong><?= $alt_token ?></strong> image folder and remove all sprites/shadows</p>
-                                                                <? if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/backups/challenges/'.($challenge_data['challenge_image'].'_'.$alt_token).'/')){ ?>
-                                                                    <p class="subtext" style="color: #da1616;">(<a style="color: inherit; text-decoration: none;" href="images/viewer.php?path=backups/challenges/<?= $challenge_data['challenge_image'].'_'.$alt_token ?>/" target="_blank"><u>view <?= $alt_token ?> backups</u> <i class="fas fa-external-link-square-alt"></i></a>)</p>
-                                                                <? } ?>
-                                                            </div>
-
-                                                            <? if (!$has_elemental_alts){ ?>
-
-                                                                    <div class="field checkwrap rfloat fullsize">
-                                                                        <label class="label">
-                                                                            <strong style="color: #da1616;">Delete <?= ucfirst($alt_token) ?> Data?</strong>
-                                                                            <input type="hidden" name="challenge_image_alts[<?= $alt_token ?>][delete]" value="0" checked="checked" />
-                                                                            <input class="checkbox" type="checkbox" name="challenge_image_alts[<?= $alt_token ?>][delete]" value="1" />
-                                                                        </label>
-                                                                        <p class="subtext" style="color: #da1616;">Remove <strong><?= $alt_token ?></strong> from the list (images will not be deleted)</p>
-                                                                    </div>
-
-                                                            <? } ?>
-
-                                                    <? } ?>
-
-                                                </div>
-
-                                            <? } ?>
-
-
-                                            <?
-
-                                        }
-                                    }
-
-                                    //$base_sprite_list = getDirContents(MMRPG_CONFIG_ROOTDIR.$base_sprite_path);
-                                    //echo('<pre>$base_sprite_path = '.print_r($base_sprite_path, true).'</pre>');
-                                    //echo('<pre>$base_sprite_list = '.(!empty($base_sprite_list) ? htmlentities(print_r($base_sprite_list, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
-                                    //echo('<pre>$temp_alts_array = '.(!empty($temp_alts_array) ? htmlentities(print_r($temp_alts_array, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
-
-                                    // Only if we're allowed to create new alts for this challenge
-                                    if ($allow_new_alt_creation){
-                                        echo('<hr />'.PHP_EOL);
-
-                                        ?>
-                                        <div class="field halfsize">
-                                            <div class="label">
-                                                <strong>Add Another Alt</strong>
-                                                <em>select the alt you want to add and then save</em>
-                                            </div>
-                                            <select class="select" name="challenge_image_alts_new">
-                                                <option value="">-</option>
-                                                <?
-                                                $alt_limit = 10;
-                                                if ($alt_limit < count($challenge_image_alts)){ $alt_limit = count($challenge_image_alts) + 1; }
-                                                foreach ($challenge_image_alts AS $info){ if (!empty($info['token'])){
-                                                    $num = (int)(str_replace('alt', '', $info['token']));
-                                                    if ($alt_limit < $num){ $alt_limit = $num + 1; }
-                                                    } }
-                                                for ($i = 1; $i <= $alt_limit; $i++){
-                                                    $alt_token = 'alt'.($i > 1 ? $i : '');
-                                                    ?>
-                                                    <option value="<?= $alt_token ?>"<?= in_array($alt_token, $challenge_image_alts_tokens) ? ' disabled="disabled"' : '' ?>>
-                                                        <?= $challenge_data['challenge_name'] ?>
-                                                        (<?= ucfirst($alt_token) ?> / <?
-                                                            if ($i == 9){
-                                                                echo('Darkness');
-                                                            } elseif ($i == 3){
-                                                                echo('Weapon');
-                                                            } elseif ($i < 9){
-                                                                echo('Standard');
-                                                            } elseif ($i > 9){
-                                                                echo('Custom');
-                                                            } ?>)
-                                                    </option>
-                                                <? } ?>
-                                            </select><span></span>
-                                        </div>
-                                        <?
-                                    }
-
-                                }
-
-                                ?>
-
-                            </div>
-
                             <? if (!$is_backup_data && !empty($challenge_backup_list)){ ?>
                                 <div class="panel" data-tab="backups">
                                     <table class="backups">
@@ -1580,16 +1049,7 @@
                                     <input type="hidden" name="challenge_flag_published" value="0" checked="checked" />
                                     <input class="checkbox" type="checkbox" name="challenge_flag_published" value="1" <?= !empty($challenge_data['challenge_flag_published']) ? 'checked="checked"' : '' ?> />
                                 </label>
-                                <p class="subtext">This challenge is ready to appear on the site</p>
-                            </div>
-
-                            <div class="field checkwrap">
-                                <label class="label">
-                                    <strong>Complete</strong>
-                                    <input type="hidden" name="challenge_flag_complete" value="0" checked="checked" />
-                                    <input class="checkbox" type="checkbox" name="challenge_flag_complete" value="1" <?= !empty($challenge_data['challenge_flag_complete']) ? 'checked="checked"' : '' ?> />
-                                </label>
-                                <p class="subtext">This challenge's sprites have been completed</p>
+                                <p class="subtext">This challenge is ready to appear in the game</p>
                             </div>
 
                             <div class="field checkwrap">
@@ -1649,8 +1109,7 @@
                 <?
 
                 $debug_challenge_data = $challenge_data;
-                $debug_challenge_data['challenge_description2'] = str_replace(PHP_EOL, '\\n', $debug_challenge_data['challenge_description2']);
-                echo('<pre style="display: none;">$challenge_data = '.(!empty($debug_challenge_data) ? htmlentities(print_r($debug_challenge_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
+                echo('<pre style="display: block;">$challenge_data = '.(!empty($debug_challenge_data) ? htmlentities(print_r($debug_challenge_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
 
                 ?>
 
