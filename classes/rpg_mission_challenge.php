@@ -145,6 +145,11 @@ class rpg_mission_challenge extends rpg_mission {
             $challenge_allowed_turns += ceil(MMRPG_SETTINGS_BATTLETURNS_PERROBOT * MMRPG_SETTINGS_BATTLETURNS_PLAYERBATTLE_MULTIPLIER);
         }
 
+        // Overwrite calculated turns if hard-coded limit has been defined
+        if (!empty($challenge_data['challenge_turn_limit'])){
+            $challenge_allowed_turns = $challenge_data['challenge_turn_limit'];
+        }
+
         // Define and battle flag, values, or counters we need to
         $challenge_flags = array();
         $challenge_values = array();
@@ -184,16 +189,21 @@ class rpg_mission_challenge extends rpg_mission {
         // Define the various index fields for item objects
         $index_fields = array(
             'challenge_id',
-            'challenge_creator',
             'challenge_kind',
+            'challenge_creator',
             'challenge_name',
             'challenge_description',
             'challenge_field_data',
             'challenge_target_data',
             'challenge_reward_data',
             'challenge_robot_limit',
+            'challenge_turn_limit',
             'challenge_flag_published',
-            'challenge_flag_hidden'
+            'challenge_flag_hidden',
+            'challenge_times_accessed',
+            'challenge_times_concluded',
+            'challenge_user_victories',
+            'challenge_user_defeats'
             );
 
         // Add table name to each field string if requested
