@@ -666,12 +666,28 @@ if (!empty($this_battle->counters['battle_turn']) && $this_battle->battle_status
             $this_battle->actions_execute();
             $canvas_refresh = true;
 
+            // Otherwise, if the battle has ended due to the above
+            if ($this_battle->battle_status == 'complete'){
+
+                // Require the option menu markup
+                require_once('battle/menus/option.php');
+
+                // Require the complete menu markup
+                require_once('battle/menus/complete.php');
+
+                // Save the game session
+                mmrpg_save_game_session();
+
+            }
+
         }
     }
 }
 
 // If canvas refresh is needed, create an empty event
-if ($canvas_refresh && $this_battle->battle_status != 'complete'){ $this_battle->events_create(false, false, '', ''); }
+if ($canvas_refresh && $this_battle->battle_status != 'complete'){
+    $this_battle->events_create(false, false, '', '');
+}
 
 // Stop the output buffer and collect contents
 $output_buffer_contents = trim(ob_get_clean());
