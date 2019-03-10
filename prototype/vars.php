@@ -120,6 +120,9 @@ else {
         if ($prototype_complete_flag
             || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 
+            // Random
+            $chapters_unlocked['5'] = true;
+
             // Stars
             $chapters_unlocked['7'] = true;
 
@@ -130,10 +133,10 @@ else {
             // WORK-IN-PROGRESS ONLY FOR ADMINS TEMP TEMP TEMP
             $chapters_unlocked['8'] = MMRPG_USER_IS_ADMIN === true ? true : false;
 
-            // Random
-            $chapters_unlocked['5'] = true;
-
         } else {
+
+            // Random
+            $chapters_unlocked['5'] = false;
 
             // Stars
             $chapters_unlocked['7'] = mmrpg_prototype_item_unlocked('cossack-program') ? true : false;
@@ -143,9 +146,6 @@ else {
 
             // Challenges
             $chapters_unlocked['8'] = false;
-
-            // Random
-            $chapters_unlocked['5'] = false;
 
         }
 
