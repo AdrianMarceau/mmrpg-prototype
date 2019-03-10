@@ -1056,6 +1056,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
 
             // Generate the markup fields for display
             $this_option_token = $this_battleinfo['battle_token'];
+            $this_option_turns = !empty($this_battleinfo['battle_turns']) ? $this_battleinfo['battle_turns'] : 1;
             $this_option_limit = !empty($this_battleinfo['battle_robot_limit']) ? $this_battleinfo['battle_robot_limit'] : 8;
             $this_option_frame = !empty($this_battleinfo['battle_sprite_frame']) ? $this_battleinfo['battle_sprite_frame'] : 'base';
             $this_option_status = !empty($this_battleinfo['battle_status']) ? $this_battleinfo['battle_status'] : 'enabled';
@@ -1281,11 +1282,27 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
 
             $this_option_zenny_amount = number_format($this_option_zenny, 0, '.', ',').' Zenny';
 
-            $this_option_label .= (
-                !empty($this_option_button_text)
-                    ? '<span class="multi"><span class="maintext">'.$this_option_button_text.'</span><span class="subtext">'.$this_option_level_range.'</span><span class="subtext2">'.$this_option_zenny_amount.'</span></span>'.(!$this_has_field_star && (!$this_option_complete || ($this_option_complete && $this_option_encore)) ? '<span class="arrow"> &#9658;</span>' : '')
-                    : '<span class="single">???</span>'
-                    );
+            if (!empty($this_option_button_text)){
+                $this_option_label .= '<span class="multi">';
+                    $this_option_label .= '<span class="maintext">'.$this_option_button_text.'</span>';
+                    if ($is_player_battle || $is_challenge_battle){
+                        $robots = $this_option_limit.($this_option_limit == 1 ? ' R' : ' Rs');
+                        $turns = $this_option_turns.($this_option_turns == 1 ? ' T' : ' Ts');
+                        $zenny = str_replace('Zenny', 'Zs', $this_option_zenny_amount);
+                        $this_option_label .= '<span class="subtext">'.$robots.' | '.$turns.' | '.$zenny.'</span>';
+                        if ($is_player_battle){ $this_option_label .= '<span class="subtext2">At '.$this_fieldinfo['field_name'].'</span>'; }
+                        elseif ($is_challenge_battle){ $this_option_label .= '<span class="subtext2">By '.ucwords($this_battleinfo['values']['challenge_battle_by']).'</span>'; }
+                    } else {
+                        $this_option_label .= '<span class="subtext">'.$this_option_level_range.'</span>';
+                        $this_option_label .= '<span class="subtext2">'.$this_option_zenny_amount.'</span>';
+                    }
+                $this_option_label .= '</span>';
+                if (!$this_has_field_star && (!$this_option_complete || ($this_option_complete && $this_option_encore))){
+                    $this_option_label .= '<span class="arrow"> &#9658;</span>';
+                }
+            } else {
+                $this_option_label .= '<span class="single">???</span>';
+            }
 
             // Generate this options hover tooltip details
             $this_option_title = ''; //$this_battleinfo['battle_button'];
@@ -1299,12 +1316,15 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             }
             $this_option_title .= ' <br />'.$this_option_level_range;
 
+            if ($this_option_limit < 8){ $this_option_title .= ' | '.($this_option_limit == 1 ? '1 Robot' : $this_option_limit.' Robots'); }
+            $this_option_title .= ' | '.($this_option_turns == 1 ? '1 Turn' : $this_option_turns.' Turns');
+
             if (!empty($this_battleinfo['battle_zenny'])){
                 $this_option_title .= ' | '.($this_battleinfo['battle_zenny'] == 1 ? '1 Zenny' : number_format($this_battleinfo['battle_zenny'], 0, '.', ',').' Zenny');
             }
 
-            $this_option_title .= ' | '.($this_battleinfo['battle_turns'] == 1 ? '1 Turn' : $this_battleinfo['battle_turns'].' Turns');
             $this_option_title .= ' <br />'.$this_battleinfo['battle_description'].(!empty($this_battleinfo['battle_description2']) ? ' '.$this_battleinfo['battle_description2'] : '');
+
             if (!isset($this_battleinfo['battle_counts'])
                 || $this_battleinfo['battle_counts'] !== false){
                 if (!empty($this_option_complete) || !empty($this_option_failure) || !empty($this_has_field_star)){
@@ -1313,6 +1333,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                     $this_option_title .= ' | Failed : '.(!empty($this_option_failure['battle_count']) ? ($this_option_failure['battle_count'] == 1 ? '1 Time' : $this_option_failure['battle_count'].' Times') : '0 Times');
                 }
             }
+
             $this_option_title_plain = strip_tags(str_replace('<br />', '&#10;', $this_option_title));
             $this_option_title_tooltip = htmlentities($this_option_title, ENT_QUOTES, 'UTF-8');
             $this_option_title_tooltip = str_replace('&#039;', "'", $this_option_title_tooltip);
