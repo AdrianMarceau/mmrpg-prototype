@@ -146,6 +146,7 @@ class rpg_mission_player extends rpg_mission {
             $temp_battle_token = $this_prototype_data['phase_battle_token'].'-vs-player-'.$temp_battle_usertoken;
             $temp_battle_omega = rpg_battle::get_index_info('bonus-prototype-complete-3');
             $temp_battle_omega['flags']['player_battle'] = true;
+            $temp_battle_omega['values']['player_battle_vs'] = $temp_battle_username;
             $temp_challenge_type = $temp_max_robots.'-on-'.$temp_max_robots;
             $temp_battle_omega['battle_token'] = $temp_battle_token;
             $temp_battle_omega['battle_size'] = '1x2';
@@ -169,7 +170,7 @@ class rpg_mission_player extends rpg_mission {
             }
 
             // Define the fusion field properties
-            $temp_battle_omega['battle_button'] = ucfirst($temp_battle_username);
+            $temp_battle_omega['battle_button'] = 'Vs. '.ucfirst($temp_battle_username);
             $temp_field_info_options = array_keys($temp_player_field_settings);
             $temp_rand_int = mt_rand(1, 4);
             $temp_rand_start = ($temp_rand_int - 1) * 2;
