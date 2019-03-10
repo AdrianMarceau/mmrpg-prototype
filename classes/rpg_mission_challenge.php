@@ -91,7 +91,9 @@ class rpg_mission_challenge extends rpg_mission {
         $field_info_2 = !empty($mmrpg_index_fields[$challenge_field_base['field_foreground']]) ? $mmrpg_index_fields[$challenge_field_base['field_foreground']] : false;
         if (empty($field_info_1) || empty($field_info_2)){ return false; }
         $temp_option_multipliers = array();
-        $temp_option_field_list = array($field_info_1, $field_info_2);
+        $temp_option_field_list = array();
+        $temp_option_field_list[] = $field_info_1;
+        if ($field_info_2 != $field_info_1){ $temp_option_field_list[] = $field_info_2; }
         $challenge_field_base['field_name'] = preg_replace('/^([-_a-z0-9\s]+)\s+([-_a-z0-9]+)$/i', '$1', $field_info_1['field_name']).' '.preg_replace('/^([-_a-z0-9\s]+)\s+([-_a-z0-9]+)$/i', '$2', $field_info_2['field_name']);
         foreach ($temp_option_field_list AS $temp_field){
             if (!empty($temp_field['field_multipliers'])){
