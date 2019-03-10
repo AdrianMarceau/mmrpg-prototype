@@ -814,15 +814,15 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
 #prototype .option_wrapper_missions .chapter_select .chapter_link.extra.chapter_link_active {
     text-decoration: none;
 }
-#prototype .option_wrapper_missions .chapter_select .chapter_link.extra.stars {
+#prototype .option_wrapper_missions .chapter_select .chapter_link.extra.first {
     margin-left: 3%;
 }
 body.windowFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link.extra,
 body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link.extra {
     width: 5%;
 }
-body.windowFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link.extra.stars,
-body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link.extra.stars {
+body.windowFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link.extra.first,
+body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link.extra.first {
     margin-left: 3%;
 }
 

@@ -51,6 +51,12 @@ else {
 
             /* -- Calculate Chapter Unlocks -- */
 
+            if ($chapters_unlocked['8']  // Challenges
+                && empty($_SESSION[$session_token]['battle_settings']['flags'][$ptoken.'_unlocked_chapter_8'])){
+                //unset($_SESSION[$session_token]['battle_settings'][$ptoken.'_current_chapter']);
+                $_SESSION[$session_token]['battle_settings']['flags'][$ptoken.'_unlocked_chapter_8'] = true;
+            }
+
             if ($chapters_unlocked['7']  // Stars
                 && empty($_SESSION[$session_token]['battle_settings']['flags'][$ptoken.'_unlocked_chapter_7'])){
                 //unset($_SESSION[$session_token]['battle_settings'][$ptoken.'_current_chapter']);
@@ -182,10 +188,19 @@ else {
 
             // Pre-check to see how many extra tabs to add
             $num_extra = 0;
-            $num_extra += $allow_player_battles = $chapters_unlocked['6'] ? 1 : 0;
-            $num_extra += $allow_challenge_battles = $chapters_unlocked['8'] ? 1 : 0;
             $num_extra += $allow_bonus_fields = $chapters_unlocked['5'] ? 1 : 0;
             $num_extra += $allow_star_fields = $chapters_unlocked['7'] ? 1 : 0;
+            $num_extra += $allow_player_battles = $chapters_unlocked['6'] ? 1 : 0;
+            $num_extra += $allow_challenge_battles = $chapters_unlocked['8'] ? 1 : 0;
+
+            // CHAPTER RANDOM(5)
+            if ($allow_bonus_fields){
+                $chapters_display_count++;
+                echo '<a class="chapter_link extra first random '.($temp_last_chapter === '5' ? 'chapter_link_active ' : '').'" href="#" data-chapter="5" title="Bonus Chapter : Mission Randomizer || [[Face off against randomized mechas, robots, and bosses!]]">Random</a>';
+                } elseif ($num_extra > 0){
+                $chapters_display_count++;
+                echo '<a class="chapter_link extra first random chapter_link_disabled">???</a>';
+                }
 
             // CHAPTER STARS(7)
             if ($allow_star_fields){
@@ -194,15 +209,6 @@ else {
                 } elseif ($num_extra > 0){
                 $chapters_display_count++;
                 echo '<a class="chapter_link extra stars chapter_link_disabled">???</a>';
-                }
-
-            // CHAPTER RANDOM(5)
-            if ($allow_bonus_fields){
-                $chapters_display_count++;
-                echo '<a class="chapter_link extra random '.($temp_last_chapter === '5' ? 'chapter_link_active ' : '').'" href="#" data-chapter="5" title="Bonus Chapter : Mission Randomizer || [[Face off against randomized mechas, robots, and bosses!]]">Random</a>';
-                } elseif ($num_extra > 0){
-                $chapters_display_count++;
-                echo '<a class="chapter_link extra random chapter_link_disabled">???</a>';
                 }
 
             // CHAPTER PLAYERS(6)
