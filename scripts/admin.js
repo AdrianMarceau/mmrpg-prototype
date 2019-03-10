@@ -263,4 +263,168 @@ $(document).ready(function(){
             });
         }
 
+
+    // ROBOT EDITOR EVENTS
+
+    // ...none at the moment
+
+
+    // CHALLENGE EDITOR EVENTS
+
+    // Check to make sure we're on the challenge editor page
+    var $editChallenges = $('.adminform.edit_challenges', thisAdmin);
+    //console.log('$editChallenges =', $editChallenges);
+    if ($editChallenges.length){
+
+        // Collect the MMRPG object indexes is defined
+        if (typeof window.mmrpgRobotsIndex === 'undefined'){ window.mmrpgRobotsIndex = {}; }
+        if (typeof window.mmrpgAbilitiesIndex === 'undefined'){ window.mmrpgAbilitiesIndex = {}; }
+        if (typeof window.mmrpgAbilitiesGlobal === 'undefined'){ window.mmrpgAbilitiesGlobal = {}; }
+        if (typeof window.mmrpgItemsIndex === 'undefined'){ window.mmrpgItemsIndex = {}; }
+
+        // Define a function for refreshing a robot alt select
+        var robotAltSelectRefresh = function($altSelect, robotInfo){
+            var robotToken = robotInfo['robot_token'];
+            var currrentAlt = $altSelect.val();
+            //console.log('selected alt', robotToken, currrentAlt);
+            var newOptions = '<option value="">-</option>';
+            if (robotInfo['robot_image_alts'].length){
+                for (var i = 0; i < robotInfo['robot_image_alts'].length; i++){
+                    var altInfo = robotInfo['robot_image_alts'][i];
+                    var altToken = altInfo['token'];
+                    var altToken2 = altToken.replace('alt', 'Alt');
+                    var altName = altInfo['name'].replace(/^([^\(\)]+)\((.*?)\s+Alt\)$/i, altToken2+' ($2)');
+                    newOptions += '<option value="'+altToken+'">'+altName+'</option>';
+                    }
+                }
+            $altSelect.empty().append(newOptions);
+            $altSelect.val(currrentAlt ? currrentAlt : '');
+            };
+
+        // Define a function for refreshing robot ability selects
+        var robotAbilitySelectRefresh = function($abilitySelects, robotInfo, robotItem){
+            //console.log('robotAbilitySelectRefresh($abilitySelects, robotInfo)', $abilitySelects, robotInfo);
+            var robotToken = robotInfo['robot_token'];
+            var newOptions = '<option value="">-</option>';
+            var mmrpgAbilityTokens = Object.keys(window.mmrpgAbilitiesIndex);
+            if (mmrpgAbilityTokens.length){
+                var optionsGroup = '';
+                for (var i = 0; i < mmrpgAbilityTokens.length; i++){
+                    var abilityToken = mmrpgAbilityTokens[i];
+                    var abilityInfo = window.mmrpgAbilitiesIndex[abilityToken];
+                    var abilityName = abilityInfo['ability_name'];
+                    var abilityTypes = [];
+                    if (abilityInfo['ability_type'].length){ abilityTypes.push(upperCaseFirst(abilityInfo['ability_type'])); }
+                    if (abilityTypes.length && abilityInfo['ability_type2'].length){ abilityTypes.push(upperCaseFirst(abilityInfo['ability_type2'])); }
+                    abilityTypes = abilityTypes.length ? abilityTypes.join(' / ') : 'Neutral';
+                    if (abilityInfo['ability_class'] == 'mecha' && robotInfo['robot_class'] != 'mecha'){ var abilityIsCompatible = false; }
+                    else if (abilityInfo['ability_class'] == 'boss' && robotInfo['robot_class'] != 'boss'){ var abilityIsCompatible = false; }
+                    else { var abilityIsCompatible = robotHasCompatibility(robotToken, abilityToken, robotItem); }
+                    if (!abilityIsCompatible){ continue; }
+                    if (abilityInfo['ability_class'] != optionsGroup){
+                        if (optionsGroup.length){ newOptions += '</optgroup>'; }
+                        optionsGroup = abilityInfo['ability_class'];
+                        newOptions += '<optgroup label="'+ upperCaseFirst(abilityInfo['ability_class']) +' Abilities">';
+                    }
+                    newOptions += '<option value="'+ abilityToken +'"'+ (!abilityIsCompatible ? 'disabled="disabled"' : '') +'>';
+                        newOptions += abilityName +' ('+ abilityTypes  +')';
+                    newOptions += '</option>';
+                    }
+                if (optionsGroup.length){ newOptions += '</optgroup>'; }
+                }
+            $abilitySelects.each(function(){
+                $abilitySelect = $(this);
+                var currrentAbility = $abilitySelect.val();
+                //console.log('selected ability = ', robotToken, currrentAbility);
+                $abilitySelect.empty().append(newOptions);
+                $abilitySelect.val(currrentAbility ? currrentAbility : '');
+                });
+            };
+
+        // Define a function for checking if this robot is compatible with a specific ability
+        var robotHasCompatibility = function(robotToken, abilityToken, itemToken){
+            //console.log('robotHasCompatibility()');
+            if (typeof robotToken !== 'string' || !robotToken.length){ return false; }
+            if (typeof abilityToken !== 'string' || !abilityToken.length){ return false; }
+            if (typeof itemToken !== 'string' || !itemToken.length){ itemToken = ''; }
+            //console.log('robotToken = ', robotToken, 'abilityToken = ', abilityToken, 'itemToken =', itemToken);
+            var robotInfo = typeof window.mmrpgRobotsIndex[robotToken] !== 'undefined' ? window.mmrpgRobotsIndex[robotToken] : false;
+            var abilityInfo = typeof window.mmrpgAbilitiesIndex[abilityToken] !== 'undefined' ? window.mmrpgAbilitiesIndex[abilityToken] : false;
+            var itemInfo = itemToken.length && typeof window.mmrpgItemsIndex[itemToken] !== 'undefined' ? window.mmrpgItemsIndex[itemToken] : false;
+            //console.log('robotInfo = ', robotInfo, 'abilityInfo = ', abilityInfo, 'itemInfo = ', itemInfo);
+            if (!robotInfo || !abilityInfo){ return false; }
+            if (!itemInfo){ itemToken = ''; }
+            var robotCore = robotInfo['robot_core'].length ? robotInfo['robot_core'] : '';
+            var robotCore2 = robotInfo['robot_core2'].length ? robotInfo['robot_core2'] : '';
+            var itemCore = itemToken.length && itemToken.match(/-core$/i) ? itemToken.replace(/-core$/i, '') : '';
+            if (itemCore == 'none' || itemCore == 'copy'){ itemCore = ''; }
+            //console.log('robotCore = ', robotCore, 'robotCore2 = ', robotCore2, 'itemCore = ', itemCore);
+            var globalAbilities = typeof window.mmrpgAbilitiesGlobal !== 'undefined' ? window.mmrpgAbilitiesGlobal : [];
+            if (mmrpgAbilitiesGlobal.indexOf(abilityToken) !== -1){
+                return true;
+                } else if (abilityInfo['ability_type'].length || abilityInfo['ability_type2'].length){
+                var allowTypes = [];
+                if (robotCore.length){ allowTypes.push(robotCore); }
+                if (robotCore2.length){ allowTypes.push(robotCore2); }
+                if (itemCore.length){ allowTypes.push(itemCore); }
+                if (allowTypes.length){
+                    if (robotCore == 'copy'){ return true; }
+                    else if (abilityInfo['ability_type'].length && allowTypes.indexOf(abilityInfo['ability_type']) !== -1){ return true; }
+                    else if (abilityInfo['ability_type2'].length && allowTypes.indexOf(abilityInfo['ability_type2']) !== -1){ return true; }
+                    }
+                }
+            if (robotInfo['robot_rewards']['abilities'].length){
+                for (var i = 0; i < robotInfo['robot_rewards']['abilities'].length; i++){
+                    if (robotInfo['robot_rewards']['abilities'][i]['token'] == abilityInfo['ability_token']){ return true; }
+                    }
+                }
+            if (robotInfo['robot_abilities'].length){
+                if (robotInfo['robot_abilities'].indexOf(abilityInfo['ability_token']) !== -1){ return true; }
+            }
+            return false;
+        }
+
+        // Define an onchange function for the robot token dropdowns
+        var robotTokenSelectChange = function($robotSelect){
+            var $robotDiv = $robotSelect.closest('.target_robot');
+            var robotToken = $robotSelect.val();
+            var robotInfo = robotToken && typeof window.mmrpgRobotsIndex[robotToken] !== 'undefined' ? window.mmrpgRobotsIndex[robotToken] : false;
+            var $altSelect = $robotDiv.find('select[name*="robot_image"]');
+            var $itemSelect = $robotDiv.find('select[name*="robot_item"]');
+            var $abilitySelects = $robotDiv.find('select[name*="robot_abilities"]');
+            //console.log('selected robot', robotToken, robotInfo);
+            if (!robotToken || !robotInfo){
+                $altSelect.empty().append('<option value="">-</option>').val('');
+                $abilitySelects.each(function(){ $(this).empty().append('<option value="">-</option>').val(''); });
+                return false;
+                }
+            robotAltSelectRefresh($altSelect, robotInfo);
+            robotAbilitySelectRefresh($abilitySelects, robotInfo, $itemSelect.val());
+            };
+
+        // Define an onchange function for the robot item dropdowns
+        var robotItemSelectChange = function($itemSelect){
+            var $robotDiv = $itemSelect.closest('.target_robot');
+            var $robotSelect = $robotDiv.find('select[name*="robot_token"]');
+            var robotToken = $robotSelect.val();
+            var robotInfo = robotToken && typeof window.mmrpgRobotsIndex[robotToken] !== 'undefined' ? window.mmrpgRobotsIndex[robotToken] : false;
+            var $abilitySelects = $robotDiv.find('select[name*="robot_abilities"]');
+            robotAbilitySelectRefresh($abilitySelects, robotInfo, $itemSelect.val());
+            };
+
+        // Attach change-events to all the robot token dropdowns
+        var $robotTokenSelects = $('.target_robot select[name*="robot_token"]', $editChallenges);
+        var $robotItemSelects = $('.target_robot select[name*="robot_item"]', $editChallenges);
+        //console.log('$robotTokenSelects =', $robotTokenSelects);
+        $robotTokenSelects.bind('change blur', function(){ robotTokenSelectChange($(this)); });
+        $robotItemSelects.bind('change blur', function(){ robotItemSelectChange($(this)); });
+        $robotTokenSelects.each(function(){ robotTokenSelectChange($(this)); });
+
+        }
+
 });
+
+// Helper functions for simple yet annoying tasks
+function upperCaseFirst(string){ return string[0].toUpperCase() + string.substring(1); }
+function upperCaseWords(string){ return this.replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); }); }
+

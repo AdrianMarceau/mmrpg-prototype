@@ -1007,7 +1007,6 @@ class rpg_robot extends rpg_object {
 
     // Define a function for checking if this robot is compatible with a specific ability
     static public function has_ability_compatibility($robot_token, $ability_token, $item_token = ''){
-        global $mmrpg_index;
         if (empty($robot_token) || empty($ability_token)){ return false; }
         $robot_info = is_array($robot_token) ? $robot_token : self::get_index_info($robot_token);
         $ability_info = is_array($ability_token) ? $ability_token : rpg_ability::get_index_info($ability_token);

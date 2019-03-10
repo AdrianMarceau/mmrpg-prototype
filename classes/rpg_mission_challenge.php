@@ -146,9 +146,11 @@ class rpg_mission_challenge extends rpg_mission {
         }
 
         // Overwrite calculated turns if hard-coded limit has been defined
-        if (!empty($challenge_data['challenge_turn_limit'])){
-            $challenge_allowed_turns = $challenge_data['challenge_turn_limit'];
-        }
+        if (!empty($challenge_data['challenge_robot_limit'])){ $challenge_allowed_robots = $challenge_data['challenge_robot_limit']; }
+        else { $challenge_allowed_robots = count($challenge_target_player['player_robots']); }
+
+        // Overwrite calculated turns if hard-coded limit has been defined
+        if (!empty($challenge_data['challenge_turn_limit'])){ $challenge_allowed_turns = $challenge_data['challenge_turn_limit']; }
 
         // Define and battle flag, values, or counters we need to
         $challenge_flags = array();
@@ -164,7 +166,7 @@ class rpg_mission_challenge extends rpg_mission {
             'battle_name' => $challenge_name,
             'battle_button' => $challenge_data['challenge_name'],
             'battle_level' => $challenge_robot_token,
-            'battle_robot_limit' => $challenge_data['challenge_robot_limit'],
+            'battle_robot_limit' => $challenge_allowed_robots,
             'battle_size' => $challenge_size,
             'battle_encore' => true,
             'battle_counts' => false,
