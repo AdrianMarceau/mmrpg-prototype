@@ -1652,6 +1652,10 @@ body[data-source="website"] #prototype .menu {
 #prototype .banner .option div label .arrow {
     display: none;
 }
+#prototype .banner .option[data-select="this_battle_token"] div label .subtext,
+#prototype .banner .option[data-select="this_battle_token"] div label .subtext2 {
+    text-transform: none;
+}
 
 #prototype .option_this-team-select .count {
     text-transform: uppercase;
