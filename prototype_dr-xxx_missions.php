@@ -587,19 +587,23 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 'option_maintext' => 'Bonus Chapter : Challenge Mode'
                 );
 
-            // Pull user-challenge mission data from the database and add it to the list
-            $temp_battles_omega = rpg_mission_challenge::get_missions($this_prototype_data, 'user', 4, false);
-            if (!empty($temp_battles_omega)){
-                foreach ($temp_battles_omega AS $key => $temp_battle_omega){
-                    $this_prototype_data['battle_options'][] = $temp_battle_omega;
-                    rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
-                }
+            // Create an array to hold all the challenge missions
+            $temp_challenge_missions = array();
+
+            // Check to see if there are any event challenges to display right now
+            $temp_event_challenges = rpg_mission_challenge::get_missions($this_prototype_data, 'event', 1, false);
+            if (!empty($temp_event_challenges)){ $temp_challenge_missions = array_merge($temp_challenge_missions, $temp_event_challenges); }
+
+            // Pad out the rest of the mission tab with user challenges if possible
+            $req_user_challenges = 6 - (!empty($temp_event_challenges) ? (count($temp_event_challenges) * 2) : 0);
+            if ($req_user_challenges > 0){
+                $temp_user_challenges = rpg_mission_challenge::get_missions($this_prototype_data, 'user', $req_user_challenges, false);
+                if (!empty($temp_user_challenges)){ $temp_challenge_missions = array_merge($temp_challenge_missions, $temp_user_challenges); }
             }
 
-            // Pull event-challenge mission data from the database and add it to the list
-            $temp_battles_omega = rpg_mission_challenge::get_missions($this_prototype_data, 'event', 1, false);
-            if (!empty($temp_battles_omega)){
-                foreach ($temp_battles_omega AS $key => $temp_battle_omega){
+            // Loop through any collected event or user challenges and then add them to the list
+            if (!empty($temp_challenge_missions)){
+                foreach ($temp_challenge_missions AS $key => $temp_battle_omega){
                     $this_prototype_data['battle_options'][] = $temp_battle_omega;
                     rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
                 }
