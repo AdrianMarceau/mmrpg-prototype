@@ -69,17 +69,6 @@ class rpg_mission_challenge extends rpg_mission {
         // Generate the challenge token based on available data
         $challenge_token = $this_prototype_data['phase_battle_token'].'-'.$challenge_data['challenge_kind'].'-'.$challenge_data['challenge_creator'].'-'.$challenge_data['challenge_id'];
 
-        // Generate the challenge name with created if applicable
-        if ($challenge_data['challenge_kind'] == 'event'){
-            $challenge_name = 'Challenge Mode Event Battle';
-        } else {
-            $challenge_name = 'Challenge Mode Battle';
-            if (!empty($challenge_data['challenge_creator'])
-                && !empty($challenge_data['challenge_creator_name'])){
-                $challenge_name .= ' by '.ucwords($challenge_data['challenge_creator_name']);
-            }
-        }
-
         // Automatically expand the field data with all required details given base
         if (empty($challenge_data['challenge_field_data'])){ return false; }
         $challenge_field_base = json_decode($challenge_data['challenge_field_data'], true);
@@ -105,7 +94,7 @@ class rpg_mission_challenge extends rpg_mission {
             }
         }
         $challenge_field_base['field_type'] = !empty($field_info_1['field_type']) ? $field_info_1['field_type'] : '';
-        $challenge_field_base['field_type2'] = !empty($field_info_2['field_type']) ? $field_info_2['field_type'] : '';
+        $challenge_field_base['field_type2'] = !empty($field_info_2['field_type']) && $field_info_2['field_type'] != $field_info_1['field_type'] ? $field_info_2['field_type'] : '';
         if (!isset($challenge_field_base['field_music'])){ $challenge_field_base['field_music'] = $challenge_field_base['field_foreground']; }
         if (!isset($challenge_field_base['field_multipliers'])){ $challenge_field_base['field_multipliers'] = $temp_option_multipliers; }
         if (!isset($challenge_field_base['field_mechas'])){
@@ -130,6 +119,7 @@ class rpg_mission_challenge extends rpg_mission {
             $challenge_target_player['player_robots'][$k]['robot_level'] = $challenge_robot_token;
             $challenge_target_player['player_robots'][$k]['values'] = array('robot_rewards' => $challenge_robot_rewards);
         }
+        $num_target_robots = count($challenge_target_player['player_robots']);
 
         // Determine what size this battle should be
         if ($challenge_data['challenge_kind'] == 'event'){ $challenge_size = '1x4'; }
@@ -155,6 +145,36 @@ class rpg_mission_challenge extends rpg_mission {
         // Overwrite calculated turns if hard-coded limit has been defined
         if (!empty($challenge_data['challenge_turn_limit'])){ $challenge_allowed_turns = $challenge_data['challenge_turn_limit']; }
 
+        // Generate the challenge name with created if applicable
+        if ($challenge_data['challenge_kind'] == 'event'){
+            $challenge_name = 'Challenge Mode Event Battle';
+        } else {
+            $challenge_name = 'Challenge Mode Battle';
+            if (!empty($challenge_data['challenge_creator'])
+                && !empty($challenge_data['challenge_creator_name'])){
+                $challenge_name .= ' by '.ucwords(trim($challenge_data['challenge_creator_name']));
+            }
+        }
+
+        // Collect the challenge description and prepend the button name
+        if (!empty($challenge_data['challenge_description'])){
+            $challenge_description = $challenge_data['challenge_description'];
+        } else {
+            if ($challenge_data['challenge_kind'] == 'event'){
+                $challenge_description = 'Defeat the '.
+                    ($num_target_robots == 1 ? 'target robot ' : 'target robots ').
+                    'in this <em>'.$challenge_data['challenge_name'].'</em> event challenge '.
+                    'by the MMRPG team! '.
+                    'Good luck and have fun!';
+            } else {
+                $challenge_description = 'Defeat the '.
+                    ($num_target_robots == 1 ? 'target robot ' : 'target robots ').
+                    'in this <em>'.$challenge_data['challenge_name'].'</em> user challenge '.
+                    'by '.ucwords(trim($challenge_data['challenge_creator_name'])).'! '.
+                    'Good luck and have fun!';
+            }
+        }
+
         // Define and battle flag, values, or counters we need to
         $challenge_flags = array();
         $challenge_values = array();
@@ -175,7 +195,7 @@ class rpg_mission_challenge extends rpg_mission {
             'battle_size' => $challenge_size,
             'battle_encore' => true,
             'battle_counts' => false,
-            'battle_description' => $challenge_data['challenge_description'],
+            'battle_description' => $challenge_description,
             'battle_field_base' => $challenge_field_base,
             'battle_target_player' => $challenge_target_player,
             'battle_zenny' => $challenge_reward_zenny,

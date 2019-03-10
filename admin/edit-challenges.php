@@ -320,11 +320,11 @@
             if (!$form_success){ exit_challenge_edit_action($form_data['challenge_id']); }
 
             // VALIDATE all of the SEMI-MANDATORY FIELDS to see if any were not provided and unset them from updating if necessary
-            if (empty($form_data['challenge_description'])){ $form_messages[] = array('warning', 'Challenge Description was not provided and may cause issues on the front-end'); }
+            //if (empty($form_data['challenge_description'])){ $form_messages[] = array('warning', 'Challenge Description was not provided and may cause issues on the front-end'); }
 
             // PREVENT publishing if required fields are not filled out
             if ($form_data['challenge_flag_published']){
-                if (empty($form_data['challenge_description'])){ $form_messages[] = array('warning', 'Challenge cannot be published without a description'); $form_data['challenge_flag_published'] = 0; }
+                //if (empty($form_data['challenge_description'])){ $form_messages[] = array('warning', 'Challenge cannot be published without a description'); $form_data['challenge_flag_published'] = 0; }
                 if (empty($form_data['challenge_target_data']['player_robots'])){ $form_messages[] = array('warning', 'Challenge cannot be published without target robots'); $form_data['challenge_flag_published'] = 0; }
             }
 
@@ -683,7 +683,7 @@
                                 <div class="field fullsize">
                                     <div class="label">
                                         <strong>Challenge Description</strong>
-                                        <em>appears at battle start, max 256 characters</em>
+                                        <em>appears at battle start, leave blank for auto-generated</em>
                                     </div>
                                     <textarea class="textarea" name="challenge_description" maxlength="256" rows="3"><?= htmlentities($challenge_data['challenge_description'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
                                 </div>
