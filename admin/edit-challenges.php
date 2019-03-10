@@ -289,7 +289,7 @@
             $form_data['challenge_id'] = !empty($_POST['challenge_id']) && is_numeric($_POST['challenge_id']) ? (int)(trim($_POST['challenge_id'])) : 0;
             $form_data['challenge_kind'] = !empty($_POST['challenge_kind']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['challenge_kind']) ? trim(strtolower($_POST['challenge_kind'])) : '';
             $form_data['challenge_creator'] = !empty($_POST['challenge_creator']) && is_numeric($_POST['challenge_creator']) ? (int)(trim($_POST['challenge_creator'])) : 0;
-            $form_data['challenge_name'] = !empty($_POST['challenge_name']) && preg_match('/^[-_0-9a-z\.\*\s]+$/i', $_POST['challenge_name']) ? trim($_POST['challenge_name']) : '';
+            $form_data['challenge_name'] = !empty($_POST['challenge_name']) && !is_numeric($_POST['challenge_name']) && strlen($_POST['challenge_name']) >= 2 ? strip_tags(trim($_POST['challenge_name'])) : '';
             $form_data['challenge_description'] = !empty($_POST['challenge_description']) ? preg_replace('/\s+/', ' ', trim(strip_tags($_POST['challenge_description']))) : '';
             $form_data['challenge_robot_limit'] = !empty($_POST['challenge_robot_limit']) && is_numeric($_POST['challenge_robot_limit']) ? (int)(trim($_POST['challenge_robot_limit'])) : 0;
             $form_data['challenge_turn_limit'] = !empty($_POST['challenge_turn_limit']) && is_numeric($_POST['challenge_turn_limit']) ? (int)(trim($_POST['challenge_turn_limit'])) : 0;
