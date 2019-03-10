@@ -96,6 +96,7 @@ class rpg_mission_challenge extends rpg_mission {
         foreach ($temp_option_field_list AS $temp_field){
             if (!empty($temp_field['field_multipliers'])){
                 foreach ($temp_field['field_multipliers'] AS $temp_type => $temp_multiplier){
+                    if ($temp_type == 'experience'){ continue; }
                     if (!isset($temp_option_multipliers[$temp_type])){ $temp_option_multipliers[$temp_type] = $temp_multiplier; }
                     else { $temp_option_multipliers[$temp_type] = $temp_option_multipliers[$temp_type] * $temp_multiplier; }
                 }
