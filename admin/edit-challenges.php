@@ -243,8 +243,8 @@
         $order_by = array();
         if (!empty($search_data['challenge_name'])){ $order_by[] = "challenge_name ASC"; }
         $order_by[] = "FIELD(challenge_kind, 'event', 'user')";
-        $order_by[] = "challenge_level ASC";
         $order_by[] = "challenge_creator ASC";
+        $order_by[] = "challenge_id ASC";
         $order_by_string = implode(', ', $order_by);
         $search_query .= "ORDER BY {$order_by_string};";
 
@@ -286,221 +286,80 @@
 
             // COLLECT form data from the request and parse out simple rules
 
-            $form_data['challenge_id'] = !empty($_POST['challenge_id']) && is_numeric($_POST['challenge_id']) ? trim($_POST['challenge_id']) : 0;
-            $form_data['challenge_name'] = !empty($_POST['challenge_name']) && preg_match('/^[-_0-9a-z\.\*\s]+$/i', $_POST['challenge_name']) ? trim($_POST['challenge_name']) : '';
+            $form_data['challenge_id'] = !empty($_POST['challenge_id']) && is_numeric($_POST['challenge_id']) ? (int)(trim($_POST['challenge_id'])) : 0;
             $form_data['challenge_kind'] = !empty($_POST['challenge_kind']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['challenge_kind']) ? trim(strtolower($_POST['challenge_kind'])) : '';
-            $form_data['challenge_core'] = !empty($_POST['challenge_core']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['challenge_core']) ? trim(strtolower($_POST['challenge_core'])) : '';
-            $form_data['challenge_core2'] = !empty($_POST['challenge_core2']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['challenge_core2']) ? trim(strtolower($_POST['challenge_core2'])) : '';
-            $form_data['challenge_gender'] = !empty($_POST['challenge_gender']) && preg_match('/^(male|female|other|none)$/', $_POST['challenge_gender']) ? trim(strtolower($_POST['challenge_gender'])) : '';
-
-            $form_data['challenge_game'] = !empty($_POST['challenge_game']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['challenge_game']) ? trim($_POST['challenge_game']) : '';
-            $form_data['challenge_group'] = !empty($_POST['challenge_group']) && preg_match('/^[-_a-z0-9\/]+$/i', $_POST['challenge_group']) ? trim($_POST['challenge_group']) : '';
-            $form_data['challenge_number'] = !empty($_POST['challenge_number']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['challenge_number']) ? trim($_POST['challenge_number']) : '';
-            $form_data['challenge_order'] = !empty($_POST['challenge_order']) && is_numeric($_POST['challenge_order']) ? (int)(trim($_POST['challenge_order'])) : 0;
-
-            $form_data['challenge_field'] = !empty($_POST['challenge_field']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['challenge_field']) ? trim(strtolower($_POST['challenge_field'])) : '';
-            $form_data['challenge_field2'] = !empty($_POST['challenge_field2']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['challenge_field2']) ? trim(strtolower($_POST['challenge_field2'])) : '';
-            //$form_data['challenge_mecha'] = !empty($_POST['challenge_mecha']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['challenge_mecha']) ? trim(strtolower($_POST['challenge_mecha'])) : '';
-
-            $form_data['challenge_energy'] = !empty($_POST['challenge_energy']) && is_numeric($_POST['challenge_energy']) ? (int)(trim($_POST['challenge_energy'])) : 0;
-            $form_data['challenge_weapons'] = !empty($_POST['challenge_weapons']) && is_numeric($_POST['challenge_weapons']) ? (int)(trim($_POST['challenge_weapons'])) : 0;
-            $form_data['challenge_attack'] = !empty($_POST['challenge_attack']) && is_numeric($_POST['challenge_attack']) ? (int)(trim($_POST['challenge_attack'])) : 0;
-            $form_data['challenge_defense'] = !empty($_POST['challenge_defense']) && is_numeric($_POST['challenge_defense']) ? (int)(trim($_POST['challenge_defense'])) : 0;
-            $form_data['challenge_speed'] = !empty($_POST['challenge_speed']) && is_numeric($_POST['challenge_speed']) ? (int)(trim($_POST['challenge_speed'])) : 0;
-
-            $form_data['challenge_weaknesses'] = !empty($_POST['challenge_weaknesses']) && is_array($_POST['challenge_weaknesses']) ? array_values(array_unique(array_filter($_POST['challenge_weaknesses']))) : array();
-            $form_data['challenge_resistances'] = !empty($_POST['challenge_resistances']) && is_array($_POST['challenge_resistances']) ? array_values(array_unique(array_filter($_POST['challenge_resistances']))) : array();
-            $form_data['challenge_affinities'] = !empty($_POST['challenge_affinities']) && is_array($_POST['challenge_affinities']) ? array_values(array_unique(array_filter($_POST['challenge_affinities']))) : array();
-            $form_data['challenge_immunities'] = !empty($_POST['challenge_immunities']) && is_array($_POST['challenge_immunities']) ? array_values(array_unique(array_filter($_POST['challenge_immunities']))) : array();
-
-            $form_data['challenge_description'] = !empty($_POST['challenge_description']) && preg_match('/^[-_0-9a-z\.\*\s]+$/i', $_POST['challenge_description']) ? trim($_POST['challenge_description']) : '';
-            $form_data['challenge_description2'] = !empty($_POST['challenge_description2']) ? trim(strip_tags($_POST['challenge_description2'])) : '';
-
-            $form_data['challenge_quotes_start'] = !empty($_POST['challenge_quotes_start']) ? trim(strip_tags($_POST['challenge_quotes_start'])) : '';
-            $form_data['challenge_quotes_taunt'] = !empty($_POST['challenge_quotes_taunt']) ? trim(strip_tags($_POST['challenge_quotes_taunt'])) : '';
-            $form_data['challenge_quotes_victory'] = !empty($_POST['challenge_quotes_victory']) ? trim(strip_tags($_POST['challenge_quotes_victory'])) : '';
-            $form_data['challenge_quotes_defeat'] = !empty($_POST['challenge_quotes_defeat']) ? trim(strip_tags($_POST['challenge_quotes_defeat'])) : '';
-
-            $form_data['challenge_abilities_rewards'] = !empty($_POST['challenge_abilities_rewards']) ? array_values(array_filter($_POST['challenge_abilities_rewards'])) : array();
-            $form_data['challenge_abilities_compatible'] = !empty($_POST['challenge_abilities_compatible']) && is_array($_POST['challenge_abilities_compatible']) ? array_values(array_unique(array_filter($_POST['challenge_abilities_compatible']))) : array();
-
-            $form_data['challenge_functions'] = !empty($_POST['challenge_functions']) && preg_match('/^[-_0-9a-z\.\/]+$/i', $_POST['challenge_functions']) ? trim($_POST['challenge_functions']) : '';
-
-            $form_data['challenge_image'] = !empty($_POST['challenge_image']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['challenge_image']) ? trim(strtolower($_POST['challenge_image'])) : '';
-            $form_data['challenge_image_size'] = !empty($_POST['challenge_image_size']) && is_numeric($_POST['challenge_image_size']) ? (int)(trim($_POST['challenge_image_size'])) : 0;
             $form_data['challenge_creator'] = !empty($_POST['challenge_creator']) && is_numeric($_POST['challenge_creator']) ? (int)(trim($_POST['challenge_creator'])) : 0;
-            $form_data['challenge_creator2'] = !empty($_POST['challenge_creator2']) && is_numeric($_POST['challenge_creator2']) ? (int)(trim($_POST['challenge_creator2'])) : 0;
+            $form_data['challenge_name'] = !empty($_POST['challenge_name']) && preg_match('/^[-_0-9a-z\.\*\s]+$/i', $_POST['challenge_name']) ? trim($_POST['challenge_name']) : '';
+            $form_data['challenge_description'] = !empty($_POST['challenge_description']) ? preg_replace('/\s+/', ' ', trim(strip_tags($_POST['challenge_description']))) : '';
+            $form_data['challenge_robot_limit'] = !empty($_POST['challenge_robot_limit']) && is_numeric($_POST['challenge_robot_limit']) ? (int)(trim($_POST['challenge_robot_limit'])) : 0;
+            $form_data['challenge_turn_limit'] = !empty($_POST['challenge_turn_limit']) && is_numeric($_POST['challenge_turn_limit']) ? (int)(trim($_POST['challenge_turn_limit'])) : 0;
+
+            $form_data['challenge_field_data'] = !empty($_POST['challenge_field_data']) && is_array($_POST['challenge_field_data']) ? $_POST['challenge_field_data'] : array();
+            $form_data['challenge_target_data'] = !empty($_POST['challenge_target_data']) && is_array($_POST['challenge_target_data']) ? $_POST['challenge_target_data'] : array();
+            if (isset($form_data['challenge_target_data']['player_robots'])){
+                $form_data['challenge_target_data']['player_robots'] = array_filter($form_data['challenge_target_data']['player_robots'], function($arr){ return !empty($arr['robot_token']) ? true : false; });
+                $form_data['challenge_target_data']['player_robots'] = array_values($form_data['challenge_target_data']['player_robots']);
+            }
 
             $form_data['challenge_flag_published'] = isset($_POST['challenge_flag_published']) && is_numeric($_POST['challenge_flag_published']) ? (int)(trim($_POST['challenge_flag_published'])) : 0;
-            $form_data['challenge_flag_complete'] = isset($_POST['challenge_flag_complete']) && is_numeric($_POST['challenge_flag_complete']) ? (int)(trim($_POST['challenge_flag_complete'])) : 0;
             $form_data['challenge_flag_hidden'] = isset($_POST['challenge_flag_hidden']) && is_numeric($_POST['challenge_flag_hidden']) ? (int)(trim($_POST['challenge_flag_hidden'])) : 0;
-
-            $form_data['challenge_flag_unlockable'] = isset($_POST['challenge_flag_unlockable']) && is_numeric($_POST['challenge_flag_unlockable']) ? (int)(trim($_POST['challenge_flag_unlockable'])) : 0;
-
-            if ($form_data['challenge_core'] != 'copy'){
-                $form_data['challenge_image_alts'] = !empty($_POST['challenge_image_alts']) && is_array($_POST['challenge_image_alts']) ? array_filter($_POST['challenge_image_alts']) : array();
-                $challenge_image_alts_new = !empty($_POST['challenge_image_alts_new']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['challenge_image_alts_new']) ? trim(strtolower($_POST['challenge_image_alts_new'])) : '';
-            } else {
-                $form_data['challenge_image_alts'] = array();
-                $challenge_image_alts_new = '';
-            }
 
             // DEBUG
             //$form_messages[] = array('alert', '<pre>$_POST = '.print_r($_POST, true).'</pre>');
-            //$form_messages[] = array('alert', '<pre>$_POST[\'challenge_image_alts\']  = '.print_r($_POST['challenge_image_alts'] , true).'</pre>');
-            //$form_messages[] = array('alert', '<pre>$_POST[\'challenge_image_alts_new\']  = '.print_r($_POST['challenge_image_alts_new'] , true).'</pre>');
             //$form_messages[] = array('alert', '<pre>$form_data = '.print_r($form_data, true).'</pre>');
 
             // VALIDATE all of the MANDATORY FIELDS to see if any are invalid and abort the update entirely if necessary
             if (empty($form_data['challenge_id'])){ $form_messages[] = array('error', 'Challenge ID was not provided'); $form_success = false; }
-            if (empty($form_data['challenge_name'])){ $form_messages[] = array('error', 'Challenge Name was not provided or was invalid'); $form_success = false; }
             if (empty($form_data['challenge_kind'])){ $form_messages[] = array('error', 'Challenge Kind was not provided or was invalid'); $form_success = false; }
-            if (!isset($_POST['challenge_core']) || !isset($_POST['challenge_core2'])){ $form_messages[] = array('warning', 'Core Types were not provided or were invalid'); $form_success = false; }
-            if (empty($form_data['challenge_gender'])){ $form_messages[] = array('error', 'Challenge Gender was not provided or was invalid'); $form_success = false; }
+            if (empty($form_data['challenge_name'])){ $form_messages[] = array('error', 'Challenge Name was not provided or was invalid'); $form_success = false; }
+            if (empty($form_data['challenge_field_data']['field_background'])){ $form_messages[] = array('error', 'Field Background was not provided or was invalid'); $form_success = false; }
+            if (empty($form_data['challenge_field_data']['field_foreground'])){ $form_messages[] = array('error', 'Field Foreground was not provided or was invalid'); $form_success = false; }
+            if (empty($form_data['challenge_field_data']['field_music'])){ $form_messages[] = array('error', 'Field Music was not provided or was invalid'); $form_success = false; }
+            if (empty($form_data['challenge_target_data']['player_token'])){ $form_messages[] = array('error', 'Target Player was not provided or was invalid'); $form_success = false; }
+            //if (empty($form_data['challenge_target_data']['player_robots'])){ $form_messages[] = array('error', 'Target Robot array was not provided or were invalid'); $form_success = false; }
             if (!$form_success){ exit_challenge_edit_action($form_data['challenge_id']); }
 
             // VALIDATE all of the SEMI-MANDATORY FIELDS to see if any were not provided and unset them from updating if necessary
-            if (empty($form_data['challenge_game'])){ $form_messages[] = array('warning', 'Source Game was not provided and may cause issues on the front-end'); }
-            if (empty($form_data['challenge_group'])){ $form_messages[] = array('warning', 'Sorting Group was not provided and may cause issues on the front-end'); }
-            if (empty($form_data['challenge_number'])){ $form_messages[] = array('warning', 'Serial Number was not provided and may cause issues on the front-end'); }
+            if (empty($form_data['challenge_description'])){ $form_messages[] = array('warning', 'Challenge Description was not provided and may cause issues on the front-end'); }
+
+            // PREVENT publishing if required fields are not filled out
+            if ($form_data['challenge_flag_published']){
+                if (empty($form_data['challenge_description'])){ $form_messages[] = array('warning', 'Challenge cannot be published without a description'); $form_data['challenge_flag_published'] = 0; }
+                if (empty($form_data['challenge_target_data']['player_robots'])){ $form_messages[] = array('warning', 'Challenge cannot be published without target robots'); $form_data['challenge_flag_published'] = 0; }
+            }
 
             // REFORMAT or OPTIMIZE data for provided fields where necessary
 
-            if (isset($form_data['challenge_core'])){
-                // Fix any core ordering problems (like selecting Neutral + anything)
-                $cores = array_values(array_filter(array($form_data['challenge_core'], $form_data['challenge_core2'])));
-                $form_data['challenge_core'] = isset($cores[0]) ? $cores[0] : '';
-                $form_data['challenge_core2'] = isset($cores[1]) ? $cores[1] : '';
-            }
-
-            if (isset($form_data['challenge_weaknesses'])){ $form_data['challenge_weaknesses'] = !empty($form_data['challenge_weaknesses']) ? json_encode($form_data['challenge_weaknesses']) : ''; }
-            if (isset($form_data['challenge_resistances'])){ $form_data['challenge_resistances'] = !empty($form_data['challenge_resistances']) ? json_encode($form_data['challenge_resistances']) : ''; }
-            if (isset($form_data['challenge_affinities'])){ $form_data['challenge_affinities'] = !empty($form_data['challenge_affinities']) ? json_encode($form_data['challenge_affinities']) : ''; }
-            if (isset($form_data['challenge_immunities'])){ $form_data['challenge_immunities'] = !empty($form_data['challenge_immunities']) ? json_encode($form_data['challenge_immunities']) : ''; }
-
-            if (!empty($form_data['challenge_abilities_rewards'])){
-                $new_rewards = array();
-                $new_rewards_tokens = array();
-                foreach ($form_data['challenge_abilities_rewards'] AS $key => $reward){
-                    if (empty($reward) || empty($reward['token'])){ continue; }
-                    elseif (in_array($reward['token'], $new_rewards_tokens)){ continue; }
-                    if (empty($reward['level'])){ $reward['level'] = 0; }
-                    $new_rewards_tokens[] = $reward['token'];
-                    $new_rewards[] = $reward;
-                }
-                usort($new_rewards, function($a, $b) use($mmrpg_abilities_index){
-                    $ax = $mmrpg_abilities_index[$a['token']];
-                    $bx = $mmrpg_abilities_index[$b['token']];
-                    if ($a['level'] < $b['level']){ return -1; }
-                    elseif ($a['level'] > $b['level']){ return 1; }
-                    elseif ($ax['ability_order'] < $bx['ability_order']){ return -1; }
-                    elseif ($ax['ability_order'] > $bx['ability_order']){ return 1; }
-                    else { return 0; }
-                    });
-                $form_data['challenge_abilities_rewards'] = $new_rewards;
-            }
-
-            if ($form_data['challenge_flag_unlockable']){
-                if (!$form_data['challenge_flag_published']){ $form_messages[] = array('warning', 'Challenge must be published to be unlockable'); $form_data['challenge_flag_unlockable'] = 0; }
-                elseif (!$form_data['challenge_flag_complete']){ $form_messages[] = array('warning', 'Challenge must be complete to be unlockable'); $form_data['challenge_flag_unlockable'] = 0; }
-                elseif ($form_data['challenge_kind'] !== 'master'){ $form_messages[] = array('warning', 'Only challenge masters can be marked as unlockable'); $form_data['challenge_flag_unlockable'] = 0; }
-                elseif (empty($form_data['challenge_field']) && empty($form_data['challenge_field2'])){ $form_messages[] = array('warning', 'Challenge must have battle field to be unlockable'); $form_data['challenge_flag_unlockable'] = 0; }
-                elseif (empty($form_data['challenge_functions'])){ $form_messages[] = array('warning', 'Challenge must have a function file to be unlockable'); $form_data['challenge_flag_unlockable'] = 0; }
-                elseif (empty($form_data['challenge_description'])){ $form_messages[] = array('warning', 'Challenge must have a flavour class to be unlockable'); $form_data['challenge_flag_unlockable'] = 0; }
-                elseif (empty($form_data['challenge_quotes_start'])){ $form_messages[] = array('warning', 'Challenge must have a start quote to be unlockable'); $form_data['challenge_flag_unlockable'] = 0; }
-                elseif (empty($form_data['challenge_quotes_taunt'])){ $form_messages[] = array('warning', 'Challenge must have a taunt quote to be unlockable'); $form_data['challenge_flag_unlockable'] = 0; }
-                elseif (empty($form_data['challenge_quotes_victory'])){ $form_messages[] = array('warning', 'Challenge must have a victory quote to be unlockable'); $form_data['challenge_flag_unlockable'] = 0; }
-                elseif (empty($form_data['challenge_quotes_defeat'])){ $form_messages[] = array('warning', 'Challenge must have a defeat quote to be unlockable'); $form_data['challenge_flag_unlockable'] = 0; }
-                elseif (empty($form_data['challenge_abilities_rewards'])){ $form_messages[] = array('warning', 'Challenge must have at least one ability to be unlockable'); $form_data['challenge_flag_unlockable'] = 0; }
-            }
-
-
-            if (isset($form_data['challenge_abilities_rewards'])){ $form_data['challenge_abilities_rewards'] = !empty($form_data['challenge_abilities_rewards']) ? json_encode($form_data['challenge_abilities_rewards']) : ''; }
-            if (isset($form_data['challenge_abilities_compatible'])){ $form_data['challenge_abilities_compatible'] = !empty($form_data['challenge_abilities_compatible']) ? json_encode($form_data['challenge_abilities_compatible']) : ''; }
-
-            $empty_image_folders = array();
-
-            if (isset($form_data['challenge_image_alts'])){
-                if (!empty($challenge_image_alts_new)){
-                    $alt_num = $challenge_image_alts_new != 'alt' ? (int)(str_replace('alt', '', $challenge_image_alts_new)) : 1;
-                    $alt_name = ucfirst($challenge_image_alts_new);
-                    if ($alt_num == 9){ $alt_name = 'Darkness Alt'; }
-                    elseif ($alt_num == 3){ $alt_name = 'Weapon Alt'; }
-                    $form_data['challenge_image_alts'][$challenge_image_alts_new] = array(
-                        'token' => $challenge_image_alts_new,
-                        'name' => $form_data['challenge_name'].' ('.$alt_name.')',
-                        'summons' => ($alt_num * 100),
-                        'colour' => ($alt_num == 9 ? 'empty' : 'none')
-                        );
-                }
-                $alt_keys = array_keys($form_data['challenge_image_alts']);
-                usort($alt_keys, function($a, $b){
-                    $a = strstr($a, 'alt') ? (int)(str_replace('alt', '', $a)) : 0;
-                    $b = strstr($b, 'alt') ? (int)(str_replace('alt', '', $b)) : 0;
-                    if ($a < $b){ return -1; }
-                    elseif ($a > $b){ return 1; }
-                    else { return 0; }
-                    });
-                $new_challenge_image_alts = array();
-                foreach ($alt_keys AS $alt_key){
-                    $alt_info = $form_data['challenge_image_alts'][$alt_key];
-                    $alt_path = $challenge_data['challenge_image'].($alt_key != 'base' ? '_'.$alt_key : '');
-                    if (!empty($alt_info['delete_images'])){
-                        $delete_sprite_path = 'images/challenges/'.$alt_path.'/';
-                        $delete_shadow_path = 'images/challenges_shadows/'.$alt_path.'/';
-                        $empty_image_folders[] = $delete_sprite_path;
-                        $empty_image_folders[] = $delete_shadow_path;
+            // Check player robots and remove incompatible abilities
+            if (!empty($form_data['challenge_target_data']['player_robots'])){
+                $target_player_robots = $form_data['challenge_target_data']['player_robots'];
+                foreach ($target_player_robots AS $key => $robot){
+                    if (empty($robot['robot_token'])){
+                        unset($target_player_robots[$key]);
+                        continue;
+                    } else {
+                        $rtoken = $robot['robot_token'];
+                        $ritem = !empty($robot['robot_item']) ? $robot['robot_item'] : '';
+                        if (empty($robot['robot_item'])){ unset($robot['robot_item']); }
+                        if (empty($robot['robot_image'])){ unset($robot['robot_image']); }
+                        else { $robot['robot_image'] = $rtoken.'_'.$robot['robot_image']; }
+                        $robot['robot_abilities'] = array_unique(array_filter($robot['robot_abilities']));
+                        foreach ($robot['robot_abilities'] AS $key2 => $atoken){
+                            if (!rpg_robot::has_ability_compatibility($rtoken, $atoken, $ritem)){
+                                unset($robot['robot_abilities'][$key2]);
+                                continue;
+                            }
+                        }
+                        $robot['robot_abilities'] = array_values($robot['robot_abilities']);
+                        if (empty($robot['robot_abilities'])){ $robot['robot_abilities'] = array('buster-shot'); }
+                        $target_player_robots[$key] = $robot;
                     }
-                    if (!empty($alt_info['delete'])){ continue; }
-                    elseif ($alt_key == 'base'){ continue; }
-                    unset($alt_info['delete_images'], $alt_info['delete']);
-                    $new_challenge_image_alts[] = $alt_info;
                 }
-                $form_data['challenge_image_alts'] = $new_challenge_image_alts;
-                $form_data['challenge_image_alts'] = !empty($form_data['challenge_image_alts']) ? json_encode($form_data['challenge_image_alts']) : '';
+                $form_data['challenge_target_data']['player_robots'] = $target_player_robots;
             }
-            //$form_messages[] = array('alert', '<pre>$form_data[\'challenge_image_alts\']  = '.print_r($form_data['challenge_image_alts'] , true).'</pre>');
 
-            if (!empty($empty_image_folders)){
-                //$form_messages[] = array('alert', '<pre>$empty_image_folders = '.print_r($empty_image_folders, true).'</pre>');
-                foreach ($empty_image_folders AS $empty_path_key => $empty_path){
-
-                    // Continue if this folder doesn't exist
-                    if (!file_exists(MMRPG_CONFIG_ROOTDIR.$empty_path)){ continue; }
-
-                    // Otherwise, collect directory contents (continue if empty)
-                    $empty_files = getDirContents(MMRPG_CONFIG_ROOTDIR.$empty_path);
-                    $empty_files = !empty($empty_files) ? array_map(function($s){ return str_replace('\\', '/', $s); }, $empty_files) : array();
-                    if (empty($empty_files)){ continue; }
-                    //$form_messages[] = array('alert', '<pre>$empty_path_key = '.print_r($empty_path_key, true).' | $empty_path = '.print_r($empty_path, true).' | $empty_files = '.print_r($empty_files, true).'</pre>');
-
-                    // Ensure the backup folder is created for this file
-                    $backup_path = str_replace('/images/', '/images/backups/', MMRPG_CONFIG_ROOTDIR.$empty_path);
-                    if (!file_exists($backup_path)){
-                        @mkdir($backup_path);
-                        @chown($backup_path, 'mmrpgworld');
-                    }
-
-                    // Loop through empty files and delete one by one
-                    foreach ($empty_files AS $empty_file_key => $empty_file_path){
-                        $empty_file = basename($empty_file_path);
-
-                        // Move the file to the backup folder, renaming the file with the timestamp
-                        $bak_append = '.bak'.date('YmdHi');
-                        $old_location = $empty_file_path;
-                        $new_location = $backup_path.preg_replace('/(\.[a-z0-9]{3,})$/i', $bak_append.'$1', $empty_file);
-
-                        // Attempt to copy the image and return the status of the action (remove old file if successful)
-                        $copy_status = copy($old_location, $new_location);
-                        if (file_exists($new_location)){ @unlink($old_location); $form_messages[] = array('alert', str_replace(MMRPG_CONFIG_ROOTDIR, '', $old_location).' was deleted!'); }
-                        else { $form_messages[] = array('warning', str_replace(MMRPG_CONFIG_ROOTDIR, '', $old_location).' could not be deleted! ('.$copy_status.')');  }
-
-                    }
-
-
-                }
-
-            }
+            if (isset($form_data['challenge_field_data'])){ $form_data['challenge_field_data'] = !empty($form_data['challenge_field_data']) ? json_encode($form_data['challenge_field_data']) : ''; }
+            if (isset($form_data['challenge_target_data'])){ $form_data['challenge_target_data'] = !empty($form_data['challenge_target_data']) ? json_encode($form_data['challenge_target_data']) : ''; }
 
             // DEBUG
             //$form_messages[] = array('alert', '<pre>$_POST = '.print_r($_POST, true).'</pre>');
@@ -648,7 +507,7 @@
                         <colgroup>
                             <col class="id" width="60" />
                             <col class="name" width="" />
-                            <col class="kind" width="120" />
+                            <col class="kind" width="85" />
                             <col class="creator" width="180" />
                             <col class="flag published" width="80" />
                             <col class="flag hidden" width="70" />
@@ -842,7 +701,7 @@
                                     <strong class="label">Field Background</strong>
                                     <select class="select" name="challenge_field_data[field_background]">
                                         <?
-                                        echo('<option value=""'.(empty($challenge_field_data['field_background']) ? 'selected="selected"' : '').'>- none -</option>');
+                                        //echo('<option value=""'.(empty($challenge_field_data['field_background']) ? 'selected="selected"' : '').'>- none -</option>');
                                         foreach ($mmrpg_fields_index AS $field_token => $field_data){
                                             $label = $field_data['field_name'];
                                             $label .= ' ('.(!empty($field_data['field_type']) ? ucfirst($field_data['field_type']) : 'Neutral').')';
@@ -857,7 +716,7 @@
                                     <strong class="label">Field Foreground</strong>
                                     <select class="select" name="challenge_field_data[field_foreground]">
                                         <?
-                                        echo('<option value=""'.(empty($challenge_field_data['field_foreground']) ? 'selected="selected"' : '').'>- none -</option>');
+                                        //echo('<option value=""'.(empty($challenge_field_data['field_foreground']) ? 'selected="selected"' : '').'>- none -</option>');
                                         foreach ($mmrpg_fields_index AS $field_token => $field_data){
                                             $label = $field_data['field_name'];
                                             $label .= ' ('.(!empty($field_data['field_type']) ? ucfirst($field_data['field_type']) : 'Neutral').')';
@@ -872,7 +731,7 @@
                                     <strong class="label">Field Music</strong>
                                     <select class="select" name="challenge_field_data[field_music]">
                                         <?
-                                        echo('<option value=""'.(empty($challenge_field_data['field_music']) ? 'selected="selected"' : '').'>- none -</option>');
+                                        //echo('<option value=""'.(empty($challenge_field_data['field_music']) ? 'selected="selected"' : '').'>- none -</option>');
                                         foreach ($mmrpg_fields_index AS $field_token => $field_data){
                                             $label = $field_data['field_name'];
                                             $label .= ' ('.(!empty($field_data['field_type']) ? ucfirst($field_data['field_type']) : 'Neutral').')';
@@ -909,53 +768,54 @@
                                     $current_robot_data = !empty($challenge_target_robots[$robot_key]) ? $challenge_target_robots[$robot_key] : array();
                                     $current_robot_token = !empty($current_robot_data['robot_token']) ? $current_robot_data['robot_token'] : '';
                                     $current_robot_image = !empty($current_robot_data['robot_image']) && $current_robot_data['robot_image'] != $current_robot_token ? $current_robot_data['robot_image'] : '';
+                                    $current_robot_alt = str_replace($current_robot_token.'_', '', $current_robot_image);
                                     $current_robot_item = !empty($current_robot_data['robot_item']) ? $current_robot_data['robot_item'] : '';
                                     $current_robot_abilities = !empty($current_robot_data['robot_abilities']) ? $current_robot_data['robot_abilities'] : array();
 
                                     ?>
 
-                                    <div class="field fullsize has4cols multirow">
-                                        <strong class="label">
-                                            Target Robot #<?= ($robot_key + 1) ?>
-                                            <em>Select a robot, an optional alt and/or item, then at least one ability</em>
-                                        </strong>
-                                        <div class="subfield">
-                                            <strong class="label sublabel">Robot</strong>
-                                            <select class="select" name="challenge_target_data[player_robots][<?= $robot_key ?>][robot_token]">
-                                                <?= str_replace('value="'.$current_robot_token.'"', 'value="'.$current_robot_token.'" selected="selected"', $robot_options_markup) ?>
-                                            </select><span></span>
-                                        </div>
-                                        <div class="subfield">
-                                            <strong class="label sublabel">Alt</strong>
-                                            <select class="select" name="challenge_target_data[player_robots][<?= $robot_key ?>][robot_item]">
-                                                <option value=""<?= empty($current_robot_image) ? 'selected="selected"' : '' ?>>-</option>
-                                                <? for ($a = 1; $a <= 9; $a++){ ?>
-                                                    <? $alt_image = $current_robot_token.'_alt'.($a > 1 ? $a : '') ?>
-                                                    <option value="<?= $alt_image ?>"<?= $current_robot_image == $alt_image ? 'selected="selected"' : '' ?>>Alt<?= $a > 1 ? $a : '' ?></option>
-                                                <? } ?>
-                                            </select><span></span>
-                                        </div>
-                                        <div class="subfield">
-                                            <strong class="label sublabel">Item</strong>
-                                            <select class="select" name="challenge_target_data[player_robots][<?= $robot_key ?>][robot_item]">
-                                                <?= str_replace('value="'.$current_robot_item.'"', 'value="'.$current_robot_item.'" selected="selected"', $item_options_markup) ?>
-                                            </select><span></span>
-                                        </div>
-                                    </div>
-                                    <div class="field fullsize has4cols multirow" style="margin-top: -6px;">
-                                        <strong class="label sublabel">Abilities</strong>
-                                        <?
-                                        for ($i = 0; $i < 8; $i++){
-                                            $current_value = isset($current_robot_abilities[$i]) ? $current_robot_abilities[$i] : '';
-                                            ?>
+
+                                    <div class="target_robot" data-key="<?= $robot_key ?>">
+                                        <div class="field fullsize has4cols multirow">
+                                            <strong class="label">
+                                                Target Robot #<?= ($robot_key + 1) ?>
+                                                <em>Select a robot, an optional alt and/or item, then at least one ability</em>
+                                            </strong>
                                             <div class="subfield">
-                                                <select class="select" name="challenge_target_data[player_robots][<?= $robot_key ?>][robot_abilities][<?= $i ?>]">
-                                                    <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $ability_options_markup) ?>
+                                                <strong class="label sublabel">Robot</strong>
+                                                <select class="select" name="challenge_target_data[player_robots][<?= $robot_key ?>][robot_token]">
+                                                    <?= str_replace('value="'.$current_robot_token.'"', 'value="'.$current_robot_token.'" selected="selected"', $robot_options_markup) ?>
                                                 </select><span></span>
                                             </div>
+                                            <div class="subfield">
+                                                <strong class="label sublabel">Alt</strong>
+                                                <select class="select" name="challenge_target_data[player_robots][<?= $robot_key ?>][robot_image]">
+                                                    <option value="<?= $current_robot_alt ?>" selected="selected"><?= $current_robot_alt ?></option>
+                                                </select><span></span>
+                                            </div>
+                                            <div class="subfield">
+                                                <strong class="label sublabel">Item</strong>
+                                                <select class="select" name="challenge_target_data[player_robots][<?= $robot_key ?>][robot_item]">
+                                                    <?= str_replace('value="'.$current_robot_item.'"', 'value="'.$current_robot_item.'" selected="selected"', $item_options_markup) ?>
+                                                </select><span></span>
+                                            </div>
+                                        </div>
+                                        <div class="field fullsize has4cols multirow" style="margin-top: -6px;">
+                                            <strong class="label sublabel">Abilities</strong>
                                             <?
-                                        }
-                                        ?>
+                                            for ($i = 0; $i < 8; $i++){
+                                                $current_value = isset($current_robot_abilities[$i]) ? $current_robot_abilities[$i] : '';
+                                                ?>
+                                                <div class="subfield">
+                                                    <select class="select" name="challenge_target_data[player_robots][<?= $robot_key ?>][robot_abilities][<?= $i ?>]">
+                                                        <option value="<?= $current_value ?>" selected="selected"><?= $current_value ?></option>
+                                                        <? /* = str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $ability_options_markup) */ ?>
+                                                    </select><span></span>
+                                                </div>
+                                                <?
+                                            }
+                                            ?>
+                                        </div>
                                     </div>
 
                                     <?
@@ -990,19 +850,6 @@
                                 </label>
                                 <p class="subtext">This challenge's data should stay hidden</p>
                             </div>
-
-                            <? if (!empty($challenge_data['challenge_flag_published'])
-                                && !empty($challenge_data['challenge_flag_complete'])
-                                && $challenge_data['challenge_kind'] == 'master'){ ?>
-                                <div class="field checkwrap">
-                                    <label class="label">
-                                        <strong>Unlockable</strong>
-                                        <input type="hidden" name="challenge_flag_unlockable" value="0" checked="checked" />
-                                        <input class="checkbox" type="checkbox" name="challenge_flag_unlockable" value="1" <?= !empty($challenge_data['challenge_flag_unlockable']) ? 'checked="checked"' : '' ?> />
-                                    </label>
-                                    <p class="subtext">This challenge is ready to be used in the game</p>
-                                </div>
-                            <? } ?>
 
                         </div>
 
@@ -1050,5 +897,20 @@
         ?>
 
     </div>
+
+    <?
+    // Generate custom javascript for this page and put it in the buffer
+    ob_start();
+    ?>
+        <script type="text/javascript">
+            window.mmrpgRobotsIndex = <?= json_encode(rpg_robot::parse_index($mmrpg_robots_index)) ?>;
+            window.mmrpgAbilitiesIndex = <?= json_encode(rpg_ability::parse_index($mmrpg_abilities_index)) ?>;
+            window.mmrpgAbilitiesGlobal = <?= json_encode(rpg_ability::get_global_abilities()) ?>;
+            window.mmrpgItemsIndex = <?= json_encode(rpg_item::parse_index($mmrpg_items_index)) ?>;
+        </script>
+    <?
+    if (!isset($admin_inline_javascript)){ $admin_inline_javascript = '';}
+    $admin_inline_javascript .= ob_get_clean();
+    ?>
 
 <? $this_page_markup .= ob_get_clean(); ?>
