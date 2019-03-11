@@ -2755,7 +2755,7 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function for getting a preset core shield for the challenge
-    public static function get_static_core_shield($shield_type, $shield_duration = 3, $existing_shields = 0){
+    public static function get_static_core_shield($shield_type, $shield_duration = 99, $existing_shields = 0){
         $this_ability_token = 'core-shield';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$shield_type;
         $this_attachment_image = $this_ability_token.'_'.$shield_type;
@@ -2786,6 +2786,41 @@ class rpg_ability extends rpg_object {
                 'y' => (0),
                 'z' => (10 + $existing_shields)
                 )
+            );
+        return $this_attachment_info;
+    }
+
+    // Define a static function for getting a preset core shield for the challenge
+    public static function get_static_crude_oil($static_attachment_key, $this_attachment_duration = 99){
+        $this_ability_token = 'oil-shooter';
+        $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
+        $this_attachment_image = $this_ability_token;
+        $this_attachment_destroy_text = 'The puddle of <span class="ability_name ability_type ability_type_earth">Crude Oil</span> faded away...<br /> ';
+        $this_attachment_destroy_text .= 'That position on the field isn\'t vulnerable to '.rpg_type::print_span('flame').' or '.rpg_type::print_span('explode').' types any more! ';
+        $this_attachment_info = array(
+            'class' => 'ability',
+            'sticky' => true,
+            'ability_token' => $this_ability_token,
+            'ability_image' => $this_attachment_image,
+            'attachment_token' => $this_attachment_token,
+            'attachment_duration' => $this_attachment_duration,
+            'attachment_sticky' => true,
+            'attachment_damage_input_booster_flame' => 2.0,
+            'attachment_damage_input_booster_explode' => 2.0,
+            'attachment_destroy' => array(
+                'trigger' => 'special',
+                'kind' => '',
+                'type' => '',
+                'percent' => true,
+                'modifiers' => false,
+                'frame' => 'defend',
+                'rates' => array(100, 0, 0),
+                'success' => array(9, -9999, -9999, 10, $this_attachment_destroy_text),
+                'failure' => array(9, -9999, -9999, 10, $this_attachment_destroy_text)
+                ),
+            'ability_frame' => 1,
+            'ability_frame_animate' => array(1, 2),
+            'ability_frame_offset' => array('x' => 0, 'y' => -10, 'z' => -8)
             );
         return $this_attachment_info;
     }
