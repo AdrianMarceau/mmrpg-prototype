@@ -25,7 +25,8 @@ if (!empty($this_battle->battle_field_base['values']['hazards'])){
                     if ($hazards_added >= $hazards_to_add){ break; }
                     if ($key == -1){ $static_key = $player_side.'-active'; }
                     else { $static_key = $player_side.'-bench-'.$key; }
-                    $hazard_info = call_user_func('rpg_ability::get_static_'.$hazard_token, $static_key, 99);
+                    $existing = !empty($this_battle->battle_attachments[$static_key]) ? count($this_battle->battle_attachments[$static_key]) : 0;
+                    $hazard_info = call_user_func('rpg_ability::get_static_'.$hazard_token, $static_key, 99, $existing);
                     $this_battle->battle_attachments[$static_key][$hazard_info['attachment_token']] = $hazard_info;
                     $hazards_added++;
                 }
