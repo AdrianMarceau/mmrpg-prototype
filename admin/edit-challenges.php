@@ -159,15 +159,16 @@
     $search_query = '';
     $search_results = array();
     $search_results_count = 0;
-    if ($sub_action == 'search' && (
-        !empty($_GET['challenge_id'])
-        || !empty($_GET['challenge_name'])
-        || !empty($_GET['challenge_content'])
-        || !empty($_GET['challenge_kind'])
-        || !empty($_GET['challenge_creator'])
-        || (isset($_GET['challenge_flag_hidden']) && $_GET['challenge_flag_hidden'] !== '')
-        || (isset($_GET['challenge_flag_published']) && $_GET['challenge_flag_published'] !== '')
-        )){
+    $search_results_limit = 100;
+    if ($sub_action == 'search'){
+
+        // Collect the sorting order and direction
+        $sort_data = array('name' => 'challenge_id', 'dir' => 'desc');
+        if (!empty($_GET['order'])
+            && preg_match('/^([-_a-z0-9]+)\:(desc|asc)$/i', $_GET['order'])){
+            list($r_name, $r_dir) = explode(':', trim($_GET['order']));
+            $sort_data = array('name' => $r_name, 'dir' => $r_dir);
+        }
 
         // Collect form data for processing
         $search_data['challenge_id'] = !empty($_GET['challenge_id']) && is_numeric($_GET['challenge_id']) ? trim($_GET['challenge_id']) : '';
@@ -241,17 +242,26 @@
 
         // Append sorting parameters to the end of the query
         $order_by = array();
-        if (!empty($search_data['challenge_name'])){ $order_by[] = "challenge_name ASC"; }
+        if (!empty($sort_data)){ $order_by[] = $sort_data['name'].' '.strtoupper($sort_data['dir']); }
         $order_by[] = "FIELD(challenge_kind, 'event', 'user')";
         $order_by[] = "challenge_creator ASC";
+        $order_by[] = "challenge_name ASC";
         $order_by[] = "challenge_id ASC";
         $order_by_string = implode(', ', $order_by);
-        $search_query .= "ORDER BY {$order_by_string};";
+        $search_query .= "ORDER BY {$order_by_string} ";
+
+        // Impose a limit on the search results
+        $search_query .= "LIMIT {$search_results_limit} ";
+
+        // End the query now that we're done
+        $search_query .= ";";
 
         // Collect search results from the database
         $search_results = $db->get_array_list($search_query);
         $search_results_count = is_array($search_results) ? count($search_results) : 0;
 
+        // Collect a total number from the database
+        $search_results_total = $db->get_value("SELECT COUNT(challenge_id) AS total FROM mmrpg_challenges WHERE 1=1;", 'total');
 
     }
 
@@ -514,6 +524,45 @@
 
                 <!-- SEARCH RESULTS -->
 
+                <?
+
+                // Define a function for checking the current sort
+                function is_sort_link($name, $dir = ''){
+                    global $sort_data;
+                    if (empty($name)){ return false; }
+                    if ($name != $sort_data['name']){ return false; }
+                    if (!empty($dir) && $dir != $sort_data['dir']){ return false; }
+                    return true;
+                }
+
+                // Define a function for generating an href sort link
+                function get_sort_href($name, $dir){
+                    global $search_data;
+                    $sort_link = 'admin.php?action=edit_challenges&subaction=search';
+                    if (!empty($search_data)){
+                        $arg_strings = array();
+                        foreach ($search_data AS $n => $v){ $arg_strings[] = $n.'='.urlencode($v); }
+                        $sort_link .= '&'.implode('&', $arg_strings);
+                    }
+                    $sort_link .= '&order='.$name.':'.$dir;
+                    return $sort_link;
+                }
+
+                // Define a function for generating sort link markup
+                function get_sort_link($name, $text = ''){
+                    global $sort_data;
+                    if (empty($text)){ $text = ucfirst($name); }
+                    $active = is_sort_link($name) ? true : false;
+                    $curr_dir = $active ? $sort_data['dir'] : '';
+                    $new_dir = $active && $curr_dir == 'asc' ? 'desc' : 'asc';
+                    $class = 'sort'.($active ? ' active '.$curr_dir : '');
+                    $href = get_sort_href($name, $new_dir);
+                    $link = '<a class="'.$class.'" href="'.$href.'"><span>'.$text.'</span></a>';
+                    return $link;
+                }
+
+                ?>
+
                 <div class="results">
 
                     <table class="list" style="width: 100%;">
@@ -528,25 +577,30 @@
                         </colgroup>
                         <thead>
                             <tr>
-                                <th class="id">ID</th>
-                                <th class="name">Name</th>
-                                <th class="kind">Kind</th>
-                                <th class="creator">Creator</th>
-                                <th class="flag published">Published</th>
-                                <th class="flag hidden">Hidden</th>
+                                <th class="id"><?= get_sort_link('challenge_id', 'ID') ?></th>
+                                <th class="name"><?= get_sort_link('challenge_name', 'Name') ?></th>
+                                <th class="kind"><?= get_sort_link('challenge_kind', 'Kind') ?></th>
+                                <th class="creator"><?= get_sort_link('challenge_creator', 'Creator') ?></th>
+                                <th class="flag published"><?= get_sort_link('challenge_flag_published', 'Published') ?></th>
+                                <th class="flag hidden"><?= get_sort_link('challenge_flag_hidden', 'Hidden') ?></th>
                                 <th class="actions">Actions</th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
+                                <? /*
                                 <td class="foot id"></td>
                                 <td class="foot name"></td>
                                 <td class="foot kind"></td>
                                 <td class="foot creator"></td>
                                 <td class="foot flag published"></td>
                                 <td class="foot flag hidden"></td>
-                                <td class="foot actions count">
+                                */ ?>
+                                <td class="foot actions count" colspan="7">
                                     <?= $search_results_count == 1 ? '1 Result' : $search_results_count.' Results' ?>
+                                    <? if ($search_results_count != $search_results_total){ ?>
+                                        <span class="total"><?= $search_results_total.' Total' ?></span>
+                                    <? } ?>
                                 </td>
                             </tr>
                         </tfoot>
