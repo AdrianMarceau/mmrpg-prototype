@@ -2790,12 +2790,12 @@ class rpg_ability extends rpg_object {
         return $this_attachment_info;
     }
 
-    // Define a static function for getting a preset core shield for the challenge
-    public static function get_static_crude_oil($static_attachment_key, $this_attachment_duration = 99){
+    // Define a static function for generating a static field attachment of "crude oil" (from the Oil Shooter ability)
+    public static function get_static_crude_oil($static_attachment_key, $this_attachment_duration = 99, $existing_attachments = 0){
         $this_ability_token = 'oil-shooter';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
         $this_attachment_image = $this_ability_token;
-        $this_attachment_destroy_text = 'The puddle of <span class="ability_name ability_type ability_type_earth">Crude Oil</span> faded away...<br /> ';
+        $this_attachment_destroy_text = 'The puddle of <span class="ability_name ability_type ability_type_earth">crude oil</span> faded away...<br /> ';
         $this_attachment_destroy_text .= 'That position on the field isn\'t vulnerable to '.rpg_type::print_span('flame').' or '.rpg_type::print_span('explode').' types any more! ';
         $this_attachment_info = array(
             'class' => 'ability',
@@ -2820,7 +2820,50 @@ class rpg_ability extends rpg_object {
                 ),
             'ability_frame' => 1,
             'ability_frame_animate' => array(1, 2),
-            'ability_frame_offset' => array('x' => 0, 'y' => -10, 'z' => -8)
+            'ability_frame_offset' => array(
+                'x' => (0 + ($existing_attachments * 8)),
+                'y' => (-10 + ($existing_attachments * 2)),
+                'z' => (-8 - $existing_attachments)
+                )
+            );
+        return $this_attachment_info;
+    }
+
+    // Define a static function for generating a static field attachment of "foamy bubbles" (from the Bubble Spray ability)
+    public static function get_static_foamy_bubbles($static_attachment_key, $this_attachment_duration = 99, $existing_attachments = 0){
+        $this_ability_token = 'bubble-spray';
+        $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
+        $this_attachment_image = $this_ability_token;
+        $this_attachment_destroy_text = 'The mound of <span class="ability_name ability_type ability_type_water">foamy bubbles</span> faded away...<br /> ';
+        $this_attachment_destroy_text .= 'That position on the field isn\'t vulnerable to '.rpg_type::print_span('electric').' or '.rpg_type::print_span('freeze').' types any more! ';
+        $this_attachment_info = array(
+            'class' => 'ability',
+            'sticky' => true,
+            'ability_token' => $this_ability_token,
+            'ability_image' => $this_attachment_image,
+            'attachment_token' => $this_attachment_token,
+            'attachment_duration' => $this_attachment_duration,
+            'attachment_sticky' => true,
+            'attachment_damage_input_booster_electric' => 2.0,
+            'attachment_damage_input_booster_freeze' => 2.0,
+            'attachment_destroy' => array(
+                'trigger' => 'special',
+                'kind' => '',
+                'type' => '',
+                'percent' => true,
+                'modifiers' => false,
+                'frame' => 'defend',
+                'rates' => array(100, 0, 0),
+                'success' => array(9, -9999, -9999, 10, $this_attachment_destroy_text),
+                'failure' => array(9, -9999, -9999, 10, $this_attachment_destroy_text)
+                ),
+            'ability_frame' => 2,
+            'ability_frame_animate' => array(2, 3),
+            'ability_frame_offset' => array(
+                'x' => (0 + ($existing_attachments * 8)),
+                'y' => (-5 + $existing_attachments),
+                'z' => (6 + $existing_attachments)
+                )
             );
         return $this_attachment_info;
     }
