@@ -448,10 +448,14 @@ tr:nth-child(odd) td {
 .adminform .field .subfield select + span {
     bottom: 3px;
 }
+
 .adminform .field .sublabel {
     font-size: 80%;
     margin-bottom: 0;
     line-height: 1;
+}
+.adminform .field .label.sublabel em {
+    font-size: inherit;
 }
 
 .adminform .editor .type_span,

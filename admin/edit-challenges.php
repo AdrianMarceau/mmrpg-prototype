@@ -330,6 +330,19 @@
 
             // REFORMAT or OPTIMIZE data for provided fields where necessary
 
+            // Parse any field hazards that have been applied
+            $field_hazards = array();
+            if (!empty($form_data['challenge_field_data']['values']['hazards'])){
+                foreach ($form_data['challenge_field_data']['values']['hazards'] AS $hazard_token => $hazard_value){
+                    if (empty($hazard_value)){ continue; }
+                    $field_hazards[$hazard_token] = $hazard_value;
+                }
+            }
+            if (!empty($field_hazards)){ $form_data['challenge_field_data']['values']['hazards'] = $field_hazards; }
+            else { unset($form_data['challenge_field_data']['values']['hazards']); }
+
+            if (empty($form_data['challenge_field_data']['values'])){ unset($form_data['challenge_field_data']['values']); }
+
             // Check player robots and remove incompatible abilities
             if (!empty($form_data['challenge_target_data']['player_robots'])){
                 $target_player_robots = $form_data['challenge_target_data']['player_robots'];
@@ -740,6 +753,62 @@
                                         }
                                         ?>
                                     </select><span></span>
+                                </div>
+
+                                <hr />
+
+                                <div class="field fullsize has4cols multirow" style="min-height: 0;">
+                                    <strong class="label">Field Hazards</strong>
+                                    <? $challenge_field_hazards = !empty($challenge_field_data['values']['hazards']) ? $challenge_field_data['values']['hazards'] : array(); ?>
+                                </div>
+                                <div class="field fullsize has4cols multirow">
+                                    <div class="subfield">
+                                        <strong class="label sublabel">Crude Oil <em>via Oil Shooter</em></strong>
+                                        <select class="select" name="challenge_field_data[values][hazards][crude_oil]">
+                                            <option value=""<?= empty($challenge_field_hazards['crude_oil']) ? ' selected="selected"' : '' ?>>-</option>
+                                            <option value="both"<?= !empty($challenge_field_hazards['crude_oil']) && $challenge_field_hazards['crude_oil'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
+                                            <option value="left"<?= !empty($challenge_field_hazards['crude_oil']) && $challenge_field_hazards['crude_oil'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
+                                            <option value="right"<?= !empty($challenge_field_hazards['crude_oil']) && $challenge_field_hazards['crude_oil'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
+                                        </select><span></span>
+                                    </div>
+                                    <div class="subfield">
+                                        <strong class="label sublabel">Foamy Bubbles <em>via Bubble Spray</em></strong>
+                                        <select class="select" name="challenge_field_data[values][hazards][foamy_bubbles]">
+                                            <option value=""<?= empty($challenge_field_hazards['foamy_bubbles']) ? ' selected="selected"' : '' ?>>-</option>
+                                            <option value="both"<?= !empty($challenge_field_hazards['foamy_bubbles']) && $challenge_field_hazards['foamy_bubbles'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
+                                            <option value="left"<?= !empty($challenge_field_hazards['foamy_bubbles']) && $challenge_field_hazards['foamy_bubbles'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
+                                            <option value="right"<?= !empty($challenge_field_hazards['foamy_bubbles']) && $challenge_field_hazards['foamy_bubbles'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
+                                        </select><span></span>
+                                    </div>
+                                    <div class="subfield">
+                                        <strong class="label sublabel">Frozen Footholds <em>via Ice Breath</em></strong>
+                                        <select class="select" name="challenge_field_data[values][hazards][frozen_footholds]">
+                                            <option value=""<?= empty($challenge_field_hazards['frozen_footholds']) ? ' selected="selected"' : '' ?>>-</option>
+                                            <option value="both"<?= !empty($challenge_field_hazards['frozen_footholds']) && $challenge_field_hazards['frozen_footholds'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
+                                            <option value="left"<?= !empty($challenge_field_hazards['frozen_footholds']) && $challenge_field_hazards['frozen_footholds'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
+                                            <option value="right"<?= !empty($challenge_field_hazards['frozen_footholds']) && $challenge_field_hazards['frozen_footholds'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
+                                        </select><span></span>
+                                    </div>
+                                    <div class="subfield">
+                                        <strong class="label sublabel">Super Blocks <em>via Super Arm</em></strong>
+                                        <select class="select" name="challenge_field_data[values][hazards][super_blocks]">
+                                            <option value=""<?= empty($challenge_field_hazards['super_blocks']) ? ' selected="selected"' : '' ?>>-</option>
+                                            <option value="both"<?= !empty($challenge_field_hazards['super_blocks']) && $challenge_field_hazards['super_blocks'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
+                                            <option value="left"<?= !empty($challenge_field_hazards['super_blocks']) && $challenge_field_hazards['super_blocks'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
+                                            <option value="right"<?= !empty($challenge_field_hazards['super_blocks']) && $challenge_field_hazards['super_blocks'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
+                                        </select><span></span>
+                                    </div>
+                                </div>
+                                <div class="field fullsize has4cols multirow">
+                                    <div class="subfield">
+                                        <strong class="label sublabel">Black Holes <em>via Galaxy Bomb</em></strong>
+                                        <select class="select" name="challenge_field_data[values][hazards][black_holes]">
+                                            <option value=""<?= empty($challenge_field_hazards['black_holes']) ? ' selected="selected"' : '' ?>>-</option>
+                                            <option value="both"<?= !empty($challenge_field_hazards['black_holes']) && $challenge_field_hazards['black_holes'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
+                                            <option value="left"<?= !empty($challenge_field_hazards['black_holes']) && $challenge_field_hazards['black_holes'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
+                                            <option value="right"<?= !empty($challenge_field_hazards['black_holes']) && $challenge_field_hazards['black_holes'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
+                                        </select><span></span>
+                                    </div>
                                 </div>
 
                             </div>
