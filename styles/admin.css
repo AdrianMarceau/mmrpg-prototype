@@ -384,12 +384,44 @@ tr:nth-child(odd) td {
     color: #262626;
     font-size: 11px;
     line-height: 15px;
-
 }
 .adminform table tbody td .wrap {
     width: 95%;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+
+.adminform table tfoot td .total {
+    color: #cacaca;
+    margin-left: 6px;
+}
+.adminform table tfoot td .total:before {
+    content: "(";
+    padding-right: 1px;
+}
+.adminform table tfoot td .total:after {
+    content: ")";
+    padding-left: 1px;
+}
+
+.adminform table thead th .sort {
+    color: inherit;
+    text-decoration: none;
+}
+.adminform table thead th .sort.active {
+    text-decoration: none;
+}
+.adminform table thead th .sort.active > span {
+    text-decoration: underline;
+}
+.adminform table thead th .sort.active.asc:after {
+    content: "+";
+    padding-left: 2px;
+}
+.adminform table thead th .sort.active.desc:after {
+    content: "-";
+    padding-left: 2px;
 }
 
 .adminform table.backups {
