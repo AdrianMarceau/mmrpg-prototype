@@ -2020,11 +2020,13 @@ class rpg_battle extends rpg_object {
         // If the robot is on the bench, calculate position offsets based on key
         if ($sprite_position == 'bench'){
 
-            // If this bench is smaller than 8, we should offset a bit
+            // If this bench is smaller than max, we should offset a bit
+            /*
             if ($bench_size < $current_max_bench_size){
                 $bench_diff = $current_max_bench_size - $bench_size;
                 $sprite_key += ceil($bench_diff / 2);
             }
+            */
             $this_data['canvas_offset_z'] -= 100 * $sprite_key;
 
             // Base the scale on this robot's position on the bench
