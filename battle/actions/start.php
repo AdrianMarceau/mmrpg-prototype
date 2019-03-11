@@ -6,6 +6,39 @@
 $this_battle->counters['battle_turn'] = 0;
 $this_battle->update_session();
 
+
+// Check if there are any field hazards to place beneath this robot
+if (!empty($this_battle->battle_field_base['values']['hazards'])){
+
+    // Loop through field hazards and create any battle attachments
+    $player_sides = array('left', 'right');
+    $player_bench_sizes = array('left' => $this_player->counters['robots_total'], 'right' => $target_player->counters['robots_total']);
+    $max_bench_size = max($this_player->counters['robots_total'], $target_player->counters['robots_total']);
+    foreach ($this_battle->battle_field_base['values']['hazards'] AS $hazard_token => $hazard_value){
+        if (!empty($hazard_value) && method_exists('rpg_ability','get_static_'.$hazard_token)){
+            foreach ($player_sides AS $player_side){
+                if ($hazard_value != 'both' && $hazard_value != $player_side){ continue; }
+                $bench_size = $player_bench_sizes[$player_side];
+                $hazards_added = 0;
+                $hazards_to_add = $bench_size == 1 ? 1 : $bench_size + 1;
+                for ($key = -1; $key < $max_bench_size; $key++){
+                    if ($hazards_added >= $hazards_to_add){ break; }
+                    if ($key == -1){ $static_key = $player_side.'-active'; }
+                    else { $static_key = $player_side.'-bench-'.$key; }
+                    $hazard_info = call_user_func('rpg_ability::get_static_'.$hazard_token, $static_key, 99);
+                    $this_battle->battle_attachments[$static_key][$hazard_info['attachment_token']] = $hazard_info;
+                    $hazards_added++;
+                }
+            }
+        }
+    }
+
+    // Update the session with any changes
+    $this_battle->update_session();
+
+}
+
+
 // Check if this is a player battle
 $flag_player_battle = $target_player_id != MMRPG_SETTINGS_TARGET_PLAYERID ? true : false;
 
@@ -24,7 +57,10 @@ $first_event_body .= '<span style="opacity:0.25;">|</span> ';
 $first_event_body .= 'Reward : '.number_format($this_battle->battle_zenny, 0, '.', ',').' Zenny ';
 $first_event_body .= '<br />';
 
+//$first_event_body .= '$this_battle->values = '.preg_replace('/\s+/', ' ', print_r($this_battle->values, true)).'<br />';
 //$first_event_body .= '$this_battle->flags = '.preg_replace('/\s+/', ' ', print_r($this_battle->flags, true)).'<br />';
+//$first_event_body .= '$this_battle->battle_field_base = '.preg_replace('/\s+/', ' ', print_r($this_battle->battle_field_base, true)).'<br />';
+//$first_event_body .= '$this->counters[\'robots_perside_max\'] = '.preg_replace('/\s+/', ' ', print_r($this_battle->counters['robots_perside_max'], true)).'<br />';
 
 // Update the summon counts for all this player's robots
 foreach ($this_player->values['robots_active'] AS $key => $info){
