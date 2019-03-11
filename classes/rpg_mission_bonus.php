@@ -44,7 +44,7 @@ class rpg_mission_bonus extends rpg_mission {
             $robot_index_query .= "AND robot_class = 'boss' ";
             $robot_index_query .= "AND base_total >= 400 ";
             $robot_index_query .= "AND (robot_flag_hidden = 0 OR (robot_flag_unlockable = 1 AND robot_number NOT LIKE 'RPG-%' AND robot_number NOT LIKE 'PCR-%')) ";
-            $robot_index_query .= "AND robot_token IN ('enker', 'punk', 'ballade', 'mega-man-ds', 'bass-ds', 'proto-man-ds') ";
+            $robot_index_query .= "AND robot_token IN ('enker', 'punk', 'ballade', 'mega-man-ds', 'bass-ds', 'proto-man-ds', 'quint') ";
             $robot_index_query .= "AND robot_flag_published = 1 ";
         }
         $robot_index_query .= "ORDER BY robot_order ASC ";
