@@ -157,6 +157,8 @@ class rpg_mission_challenge extends rpg_mission {
         }
 
         // Collect the challenge description and prepend the button name
+        $challenge_description = '';
+        $challenge_description2 = '';
         if (!empty($challenge_data['challenge_description'])){
             $challenge_description = $challenge_data['challenge_description'];
         } else {
@@ -164,15 +166,14 @@ class rpg_mission_challenge extends rpg_mission {
                 $challenge_description = 'Defeat the '.
                     ($num_target_robots == 1 ? 'target robot ' : 'target robots ').
                     'in this <em>'.$challenge_data['challenge_name'].'</em> event challenge '.
-                    'by the MMRPG team! '.
-                    'Good luck and have fun!';
+                    'by the MMRPG team! ';
             } else {
                 $challenge_description = 'Defeat the '.
                     ($num_target_robots == 1 ? 'target robot ' : 'target robots ').
                     'in this <em>'.$challenge_data['challenge_name'].'</em> user challenge '.
-                    'by '.ucwords(trim($challenge_data['challenge_creator_name'])).'! '.
-                    'Good luck and have fun!';
+                    'by '.ucwords(trim($challenge_data['challenge_creator_name'])).'! ';
             }
+            $challenge_description2 = 'Good luck and have fun!';
         }
 
         // Define and battle flag, values, or counters we need to
@@ -196,6 +197,7 @@ class rpg_mission_challenge extends rpg_mission {
             'battle_encore' => true,
             'battle_counts' => false,
             'battle_description' => $challenge_description,
+            'battle_description2' => $challenge_description2,
             'battle_field_base' => $challenge_field_base,
             'battle_target_player' => $challenge_target_player,
             'battle_zenny' => $challenge_reward_zenny,
