@@ -2869,7 +2869,7 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function for generating a static field attachment of a "black hole" (from the Galaxy Bomb ability)
-    public static function get_static_black_holes($static_attachment_key, $this_attachment_duration = 99, $existing_attachments = 0){
+    public static function get_static_black_hole($static_attachment_key, $this_attachment_duration = 99, $existing_attachments = 0){
         $this_ability_token = 'galaxy-bomb';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
         $this_attachment_image = $this_ability_token;
