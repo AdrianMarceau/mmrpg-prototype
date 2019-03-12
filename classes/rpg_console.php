@@ -428,7 +428,7 @@ class rpg_console {
 
             // Prepend the turn counter to the header if necessary
             if (!empty($this_battle->counters['battle_turn']) && $this_battle->battle_status != 'complete'){
-                if (!empty($this_battle->flags['player_battle']) || !empty($this_battle->flags['challenge_battle'])){
+                if (!empty($this_battle->flags['challenge_battle'])){
                     $curr_turn = $this_battle->counters['battle_turn'];
                     $max_turns = $this_battle->battle_turns;
                     $turn_header = $curr_turn.' / '.$max_turns;
