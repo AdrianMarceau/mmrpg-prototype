@@ -654,9 +654,9 @@ if (!empty($active_target_robot) && $active_target_robot->robot_id != $target_ro
 
 // -- END OF TURN ACTIONS -- //
 
-// If this is a player or challenge battle, turns must be respected
+// If this is a challenge battle, turns must be respected
 if (!empty($this_battle->counters['battle_turn']) && $this_battle->battle_status != 'complete'){
-    if (!empty($this_battle->flags['player_battle']) || !empty($this_battle->flags['challenge_battle'])){
+    if (!empty($this_battle->flags['challenge_battle'])){
         if ($this_battle->counters['battle_turn'] >= $this_battle->battle_turns){
 
             // Trigger the battle complete event
