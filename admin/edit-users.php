@@ -2,6 +2,13 @@
 
     <?
 
+    /* -- Collect Editor Indexes -- */
+
+    // Collect an index of user roles for options
+    $mmrpg_roles_fields = rpg_user_role::get_index_fields(true);
+    $mmrpg_roles_index = $db->get_array_list("SELECT {$mmrpg_roles_fields} FROM mmrpg_roles WHERE role_level <> 0 ORDER BY role_level ASC", 'role_id');
+
+
     /* -- Form Setup Actions -- */
 
     // Define a function for exiting a user edit action
@@ -16,6 +23,9 @@
 
     // Collect or define current subaction
     $sub_action =  !empty($_GET['subaction']) ? $_GET['subaction'] : 'search';
+
+    // Update the tab name with the page name
+    $this_page_tabtitle = 'Edit Users | '.$this_page_tabtitle;
 
     // If we're in delete mode, we need to remove some data
     $delete_data = array();
@@ -37,15 +47,32 @@
     $search_query = '';
     $search_results = array();
     $search_results_count = 0;
-    if ($sub_action == 'search' && (!empty($_GET['user_id']) || !empty($_GET['user_name'])|| !empty($_GET['user_email']))){
+    $search_results_limit = 50;
+    if ($sub_action == 'search'){
+
+        // Collect the sorting order and direction
+        $sort_data = array('name' => 'user_id', 'dir' => 'desc');
+        if (!empty($_GET['order'])
+            && preg_match('/^([-_a-z0-9]+)\:(desc|asc)$/i', $_GET['order'])){
+            list($r_name, $r_dir) = explode(':', trim($_GET['order']));
+            $sort_data = array('name' => $r_name, 'dir' => $r_dir);
+        }
 
         // Collect form data for processing
         $search_data['user_id'] = !empty($_GET['user_id']) && is_numeric($_GET['user_id']) ? trim($_GET['user_id']) : '';
+        $search_data['role_id'] = !empty($_GET['role_id']) && is_numeric($_GET['role_id']) ? trim($_GET['role_id']) : '';
         $search_data['user_name'] = !empty($_GET['user_name']) && preg_match('/[-_0-9a-z\.\*]+/i', $_GET['user_name']) ? trim(strtolower($_GET['user_name'])) : '';
         $search_data['user_email'] = !empty($_GET['user_email']) && preg_match('/[-_0-9a-z\.@\*]+/i', $_GET['user_email']) ? trim(strtolower($_GET['user_email'])) : '';
+        $search_data['user_gender'] = !empty($_GET['user_gender']) && preg_match('/[a-z]+/i', $_GET['user_gender']) ? trim(strtolower($_GET['user_gender'])) : '';
+        $search_data['user_flag_approved'] = isset($_GET['user_flag_approved']) && $_GET['user_flag_approved'] !== '' ? (!empty($_GET['user_flag_approved']) ? 1 : 0) : '';
+        $search_data['user_flag_postpublic'] = isset($_GET['user_flag_postpublic']) && $_GET['user_flag_postpublic'] !== '' ? (!empty($_GET['user_flag_postpublic']) ? 1 : 0) : '';
+        $search_data['user_flag_postprivate'] = isset($_GET['user_flag_postprivate']) && $_GET['user_flag_postprivate'] !== '' ? (!empty($_GET['user_flag_postprivate']) ? 1 : 0) : '';
 
 
         /* -- Collect Search Results -- */
+
+        // Define the guest ID to exclude
+        $exclude_guest_id = MMRPG_SETTINGS_GUEST_ID;
 
         // Define the search query to use
         $search_query = "SELECT
@@ -61,12 +88,21 @@
             FROM mmrpg_users AS user
             LEFT JOIN mmrpg_roles AS role ON role.role_id = user.role_id
             WHERE 1=1
+            AND user_id <> {$exclude_guest_id}
             ";
 
         // If the user ID was provided, we can search by exact match
         if (!empty($search_data['user_id'])){
             $user_id = $search_data['user_id'];
             $search_query .= "AND user_id = {$user_id} ";
+            $search_results_limit = false;
+        }
+
+        // If the role ID was provided, we can search by exact match
+        if (!empty($search_data['role_id'])){
+            $role_id = $search_data['role_id'];
+            $search_query .= "AND user.role_id = {$role_id} ";
+            $search_results_limit = false;
         }
 
         // Else if the user name was provided, we can use wildcards
@@ -76,6 +112,7 @@
             $user_name = preg_replace('/%+/', '%', $user_name);
             $user_name = '%'.$user_name.'%';
             $search_query .= "AND (user_name LIKE '{$user_name}' OR user_name_public LIKE '{$user_name}') ";
+            $search_results_limit = false;
         }
 
         // Else if the user email was provided, we can use wildcards
@@ -85,15 +122,53 @@
             $user_email = preg_replace('/%+/', '%', $user_email);
             $user_email = '%'.$user_email.'%';
             $search_query .= "AND user_email_address LIKE '{$user_email}' ";
+            $search_results_limit = false;
+        }
+
+        // If the user gender was provided, we can search by exact match
+        if (!empty($search_data['user_gender'])){
+            $user_gender = $search_data['user_gender'];
+            $search_query .= "AND user_gender = '{$user_gender}' ";
+            $search_results_limit = false;
+        }
+
+        // If the user approved flag was provided
+        if ($search_data['user_flag_approved'] !== ''){
+            $search_query .= "AND user_flag_approved = {$search_data['user_flag_approved']} ";
+            $search_results_limit = false;
+        }
+
+        // If the user post public flag was provided
+        if ($search_data['user_flag_postpublic'] !== ''){
+            $search_query .= "AND user_flag_postpublic = {$search_data['user_flag_postpublic']} ";
+            $search_results_limit = false;
+        }
+
+        // If the user post private flag was provided
+        if ($search_data['user_flag_postprivate'] !== ''){
+            $search_query .= "AND user_flag_postprivate = {$search_data['user_flag_postprivate']} ";
+            $search_results_limit = false;
         }
 
         // Append sorting parameters to the end of the query
-        $search_query .= "ORDER BY user_name ASC; ";
+        $order_by = array();
+        if (!empty($sort_data)){ $order_by[] = $sort_data['name'].' '.strtoupper($sort_data['dir']); }
+        $order_by[] = "user_name ASC";
+        $order_by_string = implode(', ', $order_by);
+        $search_query .= "ORDER BY {$order_by_string} ";
+
+        // Impose a limit on the search results
+        if (!empty($search_results_limit)){ $search_query .= "LIMIT {$search_results_limit} "; }
+
+        // End the query now that we're done
+        $search_query .= ";";
 
         // Collect search results from the database
         $search_results = $db->get_array_list($search_query);
         $search_results_count = is_array($search_results) ? count($search_results) : 0;
 
+        // Collect a total number from the database
+        $search_results_total = $db->get_value("SELECT COUNT(user_id) AS total FROM mmrpg_users WHERE 1=1 AND user_id <> {$exclude_guest_id};", 'total');
 
     }
 
@@ -107,10 +182,6 @@
 
 
         /* -- Collect Editor Indexes -- */
-
-        // Collect an index of user roles for options
-        $mmrpg_roles_fields = rpg_user_role::get_index_fields(true);
-        $mmrpg_roles_index = $db->get_array_list("SELECT {$mmrpg_roles_fields} FROM mmrpg_roles ORDER BY role_level ASC", 'role_id');
 
         // Collect an index of type colours for options
         $mmrpg_types_fields = rpg_type::get_index_fields(true);
@@ -392,23 +463,73 @@
                     <input type="hidden" name="action" value="edit_users" />
                     <input type="hidden" name="subaction" value="search" />
 
-                    <div class="field">
-                        <strong class="label">By User Name</strong>
+                    <div class="field foursize">
+                        <strong class="label">By ID</strong>
+                        <input class="textbox" type="text" name="user_id" value="<?= !empty($search_data['user_id']) ? $search_data['user_id'] : '' ?>" />
+                    </div>
+
+                    <div class="field foursize">
+                        <strong class="label">By Name</strong>
                         <input class="textbox" type="text" name="user_name" value="<?= !empty($search_data['user_name']) ? htmlentities($search_data['user_name'], ENT_QUOTES, 'UTF-8', true) : '' ?>" />
                     </div>
 
-                    <div class="field">
-                        <strong class="label">By Email Address</strong>
+                    <div class="field foursize">
+                        <strong class="label">By Email</strong>
                         <input class="textbox" type="text" name="user_email" value="<?= !empty($search_data['user_email']) ? htmlentities($search_data['user_email'], ENT_QUOTES, 'UTF-8', true) : '' ?>" />
                     </div>
 
-                    <div class="field">
-                        <strong class="label">By ID Number</strong>
-                        <input class="textbox" type="text" name="user_id" value="<?= !empty($search_data['user_id']) ? $search_data['user_id'] : '' ?>" />
+                    <div class="field foursize">
+                        <strong class="label">By Role</strong>
+                        <select class="select" name="role_id">
+                            <option value=""></option>
+                            <?
+                            foreach ($mmrpg_roles_index AS $role_id => $role_data){
+                                $label = $role_data['role_name'];
+                                $selected = !empty($search_data['role_id']) && $search_data['role_id'] == $role_id ? 'selected="selected"' : '';
+                                echo('<option value="'.$role_id.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                            }
+                            ?>
+                        </select><span></span>
+                    </div>
+
+                    <div class="field foursize">
+                        <strong class="label">By Gender</strong>
+                        <select class="select" name="user_gender">
+                            <option value=""></option>
+                            <option value="none" <?= $search_data['user_gender'] == 'none' ? 'selected="selected"' : '' ?>>None</option>
+                            <option value="other" <?= $search_data['user_gender'] == 'other' ? 'selected="selected"' : '' ?>>Other</option>
+                            <option value="male" <?= $search_data['user_gender'] == 'male' ? 'selected="selected"' : '' ?>>Male</option>
+                            <option value="female" <?= $search_data['user_gender'] == 'female' ? 'selected="selected"' : '' ?>>Female</option>
+                        </select><span></span>
+                    </div>
+
+                    <div class="field halfsize has3cols flags">
+                    <?
+                    $flag_names = array(
+                        'approved' => array('icon' => 'fas fa-check-square', 'yes' => 'Approved', 'no' => 'Not Approved'),
+                        'postpublic' => array('icon' => 'fas fa-comment', 'yes' => 'Allowed', 'no' => 'Not Allowed', 'label' => 'Public Posts'),
+                        'postprivate' => array('icon' => 'fas fa-envelope', 'yes' => 'Allowed', 'no' => 'Not Allowed', 'label' => 'Private Messages')
+                        );
+                    foreach ($flag_names AS $flag_token => $flag_info){
+                        $flag_name = 'user_flag_'.$flag_token;
+                        $flag_label = isset($flag_info['label']) ? $flag_info['label'] : ucfirst($flag_token);
+                        ?>
+                        <div class="subfield">
+                            <strong class="label"><?= $flag_label ?> <span class="<?= $flag_info['icon'] ?>"></span></strong>
+                            <select class="select" name="<?= $flag_name ?>">
+                                <option value=""<?= !isset($search_data[$flag_name]) || $search_data[$flag_name] === '' ? ' selected="selected"' : '' ?>></option>
+                                <option value="1"<?= isset($search_data[$flag_name]) && $search_data[$flag_name] === 1 ? ' selected="selected"' : '' ?>><?= $flag_info['yes'] ?></option>
+                                <option value="0"<?= isset($search_data[$flag_name]) && $search_data[$flag_name] === 0 ? ' selected="selected"' : '' ?>><?= $flag_info['no'] ?></option>
+                            </select><span></span>
+                        </div>
+                        <?
+                    }
+                    ?>
                     </div>
 
                     <div class="buttons">
                         <input class="button" type="submit" value="Search" />
+                        <input class="button" type="reset" value="Reset" onclick="javascript:window.location.href='admin.php?action=edit_users';" />
                     </div>
 
                 </form>
@@ -433,26 +554,21 @@
                         </colgroup>
                         <thead>
                             <tr>
-                                <th class="id">ID</th>
-                                <th class="name">Name</th>
-                                <th class="email">Email</th>
-                                <th class="role">Role</th>
-                                <th class="created">Created</th>
-                                <th class="modified">Modified</th>
+                                <th class="id"><?= cms_admin::get_sort_link('user_id', 'ID') ?></th>
+                                <th class="name"><?= cms_admin::get_sort_link('user_name_clean', 'Name') ?></th>
+                                <th class="email"><?= cms_admin::get_sort_link('user_email_address', 'Email') ?></th>
+                                <th class="role"><?= cms_admin::get_sort_link('role_id', 'Role') ?></th>
+                                <th class="date created"><?= cms_admin::get_sort_link('user_date_created', 'Created') ?></th>
+                                <th class="date modified"><?= cms_admin::get_sort_link('user_date_modified', 'Modified') ?></th>
                                 <th class="actions">Actions</th>
+                            </tr>
+                            <tr>
+                                <th class="head count" colspan="7"><?= cms_admin::get_totals_markup() ?></th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
-                                <td class="foot id"></td>
-                                <td class="foot name"></td>
-                                <td class="foot email"></td>
-                                <td class="foot role"></td>
-                                <td class="foot created"></td>
-                                <td class="foot modified"></td>
-                                <td class="foot actions count">
-                                    <?= $search_results_count == 1 ? '1 Result' : $search_results_count.' Results' ?>
-                                </td>
+                                <td class="foot count" colspan="7"><?= cms_admin::get_totals_markup() ?></td>
                             </tr>
                         </tfoot>
                         <tbody>
@@ -470,7 +586,7 @@
                                 // Collect the user's name(s) for display
                                 $user_name_display = $user_data['user_name'];
                                 if (!empty($user_data['user_name_public']) && $user_data['user_name_public'] != $user_data['user_name']){
-                                    $user_name_display = $user_data['user_name_public'] .' / '. $user_name_display;
+                                    $user_name_display = $user_name_display .' / '. $user_data['user_name_public'];
                                 }
 
                                 $user_edit = 'admin.php?action=edit_users&subaction=editor&user_id='.$user_id;

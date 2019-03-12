@@ -162,6 +162,7 @@
         if (!empty($search_data['robot_id'])){
             $robot_id = $search_data['robot_id'];
             $search_query .= "AND robot_id = {$robot_id} ";
+            $search_results_limit = false;
         }
 
         // Else if the robot name was provided, we can use wildcards
@@ -171,6 +172,7 @@
             $robot_name = preg_replace('/%+/', '%', $robot_name);
             $robot_name = '%'.$robot_name.'%';
             $search_query .= "AND (robot_name LIKE '{$robot_name}' OR robot_token LIKE '{$robot_name}') ";
+            $search_results_limit = false;
         }
 
         // Else if the robot core was provided, we can use wildcards
@@ -178,11 +180,13 @@
             $robot_core = $search_data['robot_core'];
             if ($robot_core !== 'none'){ $search_query .= "AND (robot_core LIKE '{$robot_core}' OR robot_core2 LIKE '{$robot_core}') "; }
             else { $search_query .= "AND robot_core = '' "; }
+            $search_results_limit = false;
         }
 
         // If the robot class was provided
         if (!empty($search_data['robot_class'])){
             $search_query .= "AND robot_class = '{$search_data['robot_class']}' ";
+            $search_results_limit = false;
         }
 
         // Else if the robot flavour was provided, we can use wildcards
@@ -199,36 +203,43 @@
                 OR robot_quotes_victory LIKE '{$robot_flavour}'
                 OR robot_quotes_defeat LIKE '{$robot_flavour}'
                 ) ";
+            $search_results_limit = false;
         }
 
         // If the robot game was provided
         if (!empty($search_data['robot_game'])){
             $search_query .= "AND robot_game = '{$search_data['robot_game']}' ";
+            $search_results_limit = false;
         }
 
         // If the robot group was provided
         if (!empty($search_data['robot_group'])){
             $search_query .= "AND robot_group = '{$search_data['robot_group']}' ";
+            $search_results_limit = false;
         }
 
         // If the robot hidden flag was provided
         if ($search_data['robot_flag_hidden'] !== ''){
             $search_query .= "AND robot_flag_hidden = {$search_data['robot_flag_hidden']} ";
+            $search_results_limit = false;
         }
 
         // If the robot complete flag was provided
         if ($search_data['robot_flag_complete'] !== ''){
             $search_query .= "AND robot_flag_complete = {$search_data['robot_flag_complete']} ";
+            $search_results_limit = false;
         }
 
         // If the robot unlockable flag was provided
         if ($search_data['robot_flag_unlockable'] !== ''){
             $search_query .= "AND robot_flag_unlockable = {$search_data['robot_flag_unlockable']} ";
+            $search_results_limit = false;
         }
 
         // If the robot published flag was provided
         if ($search_data['robot_flag_published'] !== ''){
             $search_query .= "AND robot_flag_published = {$search_data['robot_flag_published']} ";
+            $search_results_limit = false;
         }
 
         // Append sorting parameters to the end of the query
@@ -241,7 +252,7 @@
         $search_query .= "ORDER BY {$order_by_string} ";
 
         // Impose a limit on the search results
-        $search_query .= "LIMIT {$search_results_limit} ";
+        if (!empty($search_results_limit)){ $search_query .= "LIMIT {$search_results_limit} "; }
 
         // End the query now that we're done
         $search_query .= ";";
@@ -727,22 +738,12 @@
                                 <th class="actions">Actions</th>
                             </tr>
                             <tr>
-                                <th class="head count" colspan="10">
-                                    <?= $search_results_count == 1 ? '1 Result' : $search_results_count.' Results' ?>
-                                    <? if ($search_results_count != $search_results_total){ ?>
-                                        <span class="total"><?= $search_results_total.' Total' ?></span>
-                                    <? } ?>
-                                </th>
+                                <th class="head count" colspan="10"><?= cms_admin::get_totals_markup() ?></th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
-                                <td class="foot count" colspan="10">
-                                    <?= $search_results_count == 1 ? '1 Result' : $search_results_count.' Results' ?>
-                                    <? if ($search_results_count != $search_results_total){ ?>
-                                        <span class="total"><?= $search_results_total.' Total' ?></span>
-                                    <? } ?>
-                                </td>
+                                <td class="foot count" colspan="10"><?= cms_admin::get_totals_markup() ?></td>
                             </tr>
                         </tfoot>
                         <tbody>

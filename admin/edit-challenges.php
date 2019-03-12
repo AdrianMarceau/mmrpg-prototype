@@ -193,6 +193,7 @@
         if (!empty($search_data['challenge_id'])){
             $challenge_id = $search_data['challenge_id'];
             $search_query .= "AND challenge_id = {$challenge_id} ";
+            $search_results_limit = false;
         }
 
         // Else if the challenge name was provided, we can use wildcards
@@ -202,6 +203,7 @@
             $challenge_name = preg_replace('/%+/', '%', $challenge_name);
             $challenge_name = '%'.$challenge_name.'%';
             $search_query .= "AND challenge_name LIKE '{$challenge_name}' ";
+            $search_results_limit = false;
         }
 
         // Else if the challenge content was provided, we can use wildcards
@@ -217,27 +219,32 @@
                 OR challenge_target_data LIKE '{$challenge_content}'
                 OR challenge_reward_data LIKE '{$challenge_content}'
                 ) ";
+            $search_results_limit = false;
         }
 
         // If the challenge kind was provided
         if (!empty($search_data['challenge_kind'])){
             $search_query .= "AND challenge_kind = '{$search_data['challenge_kind']}' ";
+            $search_results_limit = false;
         }
 
         // If the challenge creator ID was provided, we can search by exact match
         if ($search_data['challenge_creator'] !== ''){
             $challenge_id = $search_data['challenge_id'];
             $search_query .= "AND challenge_creator = {$search_data['challenge_creator']} ";
+            $search_results_limit = false;
         }
 
         // If the challenge hidden flag was provided
         if ($search_data['challenge_flag_hidden'] !== ''){
             $search_query .= "AND challenge_flag_hidden = {$search_data['challenge_flag_hidden']} ";
+            $search_results_limit = false;
         }
 
         // If the challenge published flag was provided
         if ($search_data['challenge_flag_published'] !== ''){
             $search_query .= "AND challenge_flag_published = {$search_data['challenge_flag_published']} ";
+            $search_results_limit = false;
         }
 
         // Append sorting parameters to the end of the query
@@ -251,7 +258,7 @@
         $search_query .= "ORDER BY {$order_by_string} ";
 
         // Impose a limit on the search results
-        $search_query .= "LIMIT {$search_results_limit} ";
+        if (!empty($search_results_limit)){ $search_query .= "LIMIT {$search_results_limit} "; }
 
         // End the query now that we're done
         $search_query .= ";";
@@ -548,22 +555,12 @@
                                 <th class="actions">Actions</th>
                             </tr>
                             <tr>
-                                <th class="head count" colspan="9">
-                                    <?= $search_results_count == 1 ? '1 Result' : $search_results_count.' Results' ?>
-                                    <? if ($search_results_count != $search_results_total){ ?>
-                                        <span class="total"><?= $search_results_total.' Total' ?></span>
-                                    <? } ?>
-                                </th>
+                                <th class="head count" colspan="9"><?= cms_admin::get_totals_markup() ?></th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
-                                <td class="foot count" colspan="9">
-                                    <?= $search_results_count == 1 ? '1 Result' : $search_results_count.' Results' ?>
-                                    <? if ($search_results_count != $search_results_total){ ?>
-                                        <span class="total"><?= $search_results_total.' Total' ?></span>
-                                    <? } ?>
-                                </td>
+                                <td class="foot count" colspan="9"><?= cms_admin::get_totals_markup() ?></td>
                             </tr>
                         </tfoot>
                         <tbody>
