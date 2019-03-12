@@ -15,24 +15,24 @@ if (!empty($this_battle->battle_field_base['values']['hazards'])){
     $player_bench_sizes = array('left' => $this_player->counters['robots_total'], 'right' => $target_player->counters['robots_total']);
     $max_bench_size = max($this_player->counters['robots_total'], $target_player->counters['robots_total']);
     foreach ($this_battle->battle_field_base['values']['hazards'] AS $hazard_token => $hazard_value){
-        $hazard_method_name = 'get_static_'.$hazard_token;
-        $hazard_method_name = preg_replace('/ies$/i', 'y', $hazard_method_name);
-        $hazard_method_name = preg_replace('/s$/i', '', $hazard_method_name);
-        if (!empty($hazard_value) && method_exists('rpg_ability', $hazard_method_name)){
-            foreach ($player_sides AS $player_side){
-                if ($hazard_value != 'both' && $hazard_value != $player_side){ continue; }
-                $bench_size = $player_bench_sizes[$player_side];
-                $hazards_added = 0;
-                $hazards_to_add = $bench_size == 1 ? 1 : $bench_size + 1;
-                for ($key = -1; $key < $max_bench_size; $key++){
-                    if ($hazards_added >= $hazards_to_add){ break; }
-                    if ($key == -1){ $static_key = $player_side.'-active'; }
-                    else { $static_key = $player_side.'-bench-'.$key; }
-                    $existing = !empty($this_battle->battle_attachments[$static_key]) ? count($this_battle->battle_attachments[$static_key]) : 0;
-                    $hazard_info = call_user_func('rpg_ability::'.$hazard_method_name, $static_key, 99, $existing);
-                    $this_battle->battle_attachments[$static_key][$hazard_info['attachment_token']] = $hazard_info;
-                    $hazards_added++;
-                }
+        if (empty($hazard_value)){ continue; }
+        $method_name = 'get_static_'.$hazard_token;
+        if (!method_exists('rpg_ability', $method_name)){ $method_name = preg_replace('/ies$/i', 'y', $method_name); }
+        if (!method_exists('rpg_ability', $method_name)){ $method_name = preg_replace('/s$/i', '', $method_name); }
+        if (!method_exists('rpg_ability', $method_name)){ continue; }
+        foreach ($player_sides AS $player_side){
+            if ($hazard_value != 'both' && $hazard_value != $player_side){ continue; }
+            $bench_size = $player_bench_sizes[$player_side];
+            $hazards_added = 0;
+            $hazards_to_add = $bench_size == 1 ? 1 : $bench_size + 1;
+            for ($key = -1; $key < $max_bench_size; $key++){
+                if ($hazards_added >= $hazards_to_add){ break; }
+                if ($key == -1){ $static_key = $player_side.'-active'; }
+                else { $static_key = $player_side.'-bench-'.$key; }
+                $existing = !empty($this_battle->battle_attachments[$static_key]) ? count($this_battle->battle_attachments[$static_key]) : 0;
+                $hazard_info = call_user_func('rpg_ability::'.$method_name, $static_key, 99, $existing);
+                $this_battle->battle_attachments[$static_key][$hazard_info['attachment_token']] = $hazard_info;
+                $hazards_added++;
             }
         }
     }
