@@ -17,7 +17,7 @@ class cms_admin {
         $sort_link = 'admin.php?action='.$this_page_action.'&subaction=search';
         if (!empty($search_data)){
             $arg_strings = array();
-            foreach ($search_data AS $n => $v){ $arg_strings[] = $n.'='.urlencode($v); }
+            foreach ($search_data AS $n => $v){ if ($v !== ''){ $arg_strings[] = $n.'='.urlencode($v); } }
             $sort_link .= '&'.implode('&', $arg_strings);
         }
         $sort_link .= '&order='.$name.':'.$dir;

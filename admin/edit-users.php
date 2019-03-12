@@ -84,7 +84,9 @@
             user.user_date_created,
             user.user_date_modified,
             role.role_id,
-            role.role_name
+            role.role_name,
+            role.role_level,
+            role.role_colour
             FROM mmrpg_users AS user
             LEFT JOIN mmrpg_roles AS role ON role.role_id = user.role_id
             WHERE 1=1
@@ -101,7 +103,8 @@
         // If the role ID was provided, we can search by exact match
         if (!empty($search_data['role_id'])){
             $role_id = $search_data['role_id'];
-            $search_query .= "AND user.role_id = {$role_id} ";
+            if ($role_id < 0){ $not_role_id = $role_id * -1; $search_query .= "AND user.role_id <> {$not_role_id} "; }
+            else { $search_query .= "AND user.role_id = {$role_id} "; }
             $search_results_limit = false;
         }
 
@@ -152,7 +155,8 @@
 
         // Append sorting parameters to the end of the query
         $order_by = array();
-        if (!empty($sort_data)){ $order_by[] = $sort_data['name'].' '.strtoupper($sort_data['dir']); }
+        if (!empty($sort_data) && $sort_data['name'] == 'role_id'){ $order_by[] = 'role_level '.strtoupper($sort_data['dir']); $order_by[] = 'role_id '.strtoupper($sort_data['dir'] != 'asc' ? 'asc' : 'desc'); }
+        elseif (!empty($sort_data)){ $order_by[] = $sort_data['name'].' '.strtoupper($sort_data['dir']); }
         $order_by[] = "user_name ASC";
         $order_by_string = implode(', ', $order_by);
         $search_query .= "ORDER BY {$order_by_string} ";
@@ -482,8 +486,11 @@
                         <strong class="label">By Role</strong>
                         <select class="select" name="role_id">
                             <option value=""></option>
+                            <option value="-3"<?= !empty($search_data['role_id']) && $search_data['role_id'] == -3 ? 'selected="selected"' : '' ?>>Any Staff-Level Role</option>
                             <?
-                            foreach ($mmrpg_roles_index AS $role_id => $role_data){
+                            $pseudo_roles_index = $mmrpg_roles_index;
+                            $pseudo_roles_index = array_reverse($pseudo_roles_index, true);
+                            foreach ($pseudo_roles_index AS $role_id => $role_data){
                                 $label = $role_data['role_name'];
                                 $selected = !empty($search_data['role_id']) && $search_data['role_id'] == $role_id ? 'selected="selected"' : '';
                                 echo('<option value="'.$role_id.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
@@ -546,8 +553,8 @@
                         <colgroup>
                             <col class="id" width="60" />
                             <col class="name" width="" />
+                            <col class="role" width="120" />
                             <col class="email" width="" />
-                            <col class="role" width="90" />
                             <col class="created" width="90" />
                             <col class="modified" width="90" />
                             <col class="actions" width="120" />
@@ -556,8 +563,8 @@
                             <tr>
                                 <th class="id"><?= cms_admin::get_sort_link('user_id', 'ID') ?></th>
                                 <th class="name"><?= cms_admin::get_sort_link('user_name_clean', 'Name') ?></th>
-                                <th class="email"><?= cms_admin::get_sort_link('user_email_address', 'Email') ?></th>
                                 <th class="role"><?= cms_admin::get_sort_link('role_id', 'Role') ?></th>
+                                <th class="email"><?= cms_admin::get_sort_link('user_email_address', 'Email') ?></th>
                                 <th class="date created"><?= cms_admin::get_sort_link('user_date_created', 'Created') ?></th>
                                 <th class="date modified"><?= cms_admin::get_sort_link('user_date_modified', 'Modified') ?></th>
                                 <th class="actions">Actions</th>
@@ -573,12 +580,18 @@
                         </tfoot>
                         <tbody>
                             <?
+                            $temp_class_colours = array(
+                                'mecha' => array('speed', '<i class="fas fa-ghost"></i>'),
+                                'master' => array('defense', '<i class="fas fa-robot"></i>'),
+                                'boss' => array('space', '<i class="fas fa-skull"></i>')
+                                );
                             foreach ($search_results AS $key => $user_data){
 
                                 $user_id = $user_data['user_id'];
                                 $user_name = $user_data['user_name_clean'];
                                 $user_email = !empty($user_data['user_email_address']) ? $user_data['user_email_address'] : '-';
                                 $user_role = $user_data['role_name'];
+                                $user_role_span = '<span class="type_span type_'.$user_data['role_colour'].'"><i class="fas fa-user"></i> '.$user_data['role_name'].'</span>';
                                 $user_created = !empty($user_data['user_date_created']) ? date('Y-m-d', $user_data['user_date_created']) : '-';
                                 $user_modified = !empty($user_data['user_date_modified']) ? date('Y-m-d', $user_data['user_date_modified']) : '-';
 
@@ -600,8 +613,8 @@
                                 echo '<tr>'.PHP_EOL;
                                     echo '<td class="id"><div>'.$user_id.'</div></td>'.PHP_EOL;
                                     echo '<td class="name"><div class="wrap">'.$user_name.'</div></td>'.PHP_EOL;
+                                    echo '<td class="role"><div class="wrap">'.$user_role_span.'</div></td>'.PHP_EOL;
                                     echo '<td class="email"><div class="wrap">'.$user_email.'</div></td>'.PHP_EOL;
-                                    echo '<td class="role"><div class="wrap">'.$user_role.'</div></td>'.PHP_EOL;
                                     echo '<td class="created"><div>'.$user_created.'</div></td>'.PHP_EOL;
                                     echo '<td class="modified"><div>'.$user_modified.'</div></td>'.PHP_EOL;
                                     echo '<td class="actions"><div>'.$user_actions.'</div></td>'.PHP_EOL;
