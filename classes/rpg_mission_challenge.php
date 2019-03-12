@@ -182,8 +182,8 @@ class rpg_mission_challenge extends rpg_mission {
         $challenge_counters = array();
         $challenge_flags['challenge_battle'] = true;
         $challenge_values['challenge_battle_by'] = $challenge_data['challenge_creator_name'];
-        $challenge_values['skull_medallion'] = 'pseudo';
-        //$challenge_values['skull_medallion'] = 'base';
+        //$challenge_values['skull_medallion'] = 'pseudo';
+        $challenge_values['skull_medallion'] = 'base';
 
         // Pull event mission data from the database
         $temp_battle_omega = array(
