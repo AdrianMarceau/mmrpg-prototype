@@ -292,6 +292,7 @@ class rpg_game {
     public static function find_robot($filters){
         if (empty(self::$index['robots']) || empty($filters)){ return false; }
         foreach (self::$index['robots'] AS $robot_id => $this_robot){
+            if ($this_robot->robot_token == 'robot'){ continue; }
             $is_match = true;
             foreach ($filters AS $field_name => $field_value){
                 if ($this_robot->$field_name != $field_value){
@@ -315,6 +316,7 @@ class rpg_game {
         if (empty(self::$index['robots']) || empty($filters)){ return false; }
         $robots = array();
         foreach (self::$index['robots'] AS $robot_id => $this_robot){
+            if ($this_robot->robot_token == 'robot'){ continue; }
             $is_match = true;
             foreach ($filters AS $field_name => $field_value){
                 if ($this_robot->$field_name != $field_value){
