@@ -165,12 +165,12 @@ class rpg_mission_challenge extends rpg_mission {
             if ($challenge_data['challenge_kind'] == 'event'){
                 $challenge_description = 'Defeat the '.
                     ($num_target_robots == 1 ? 'target robot ' : 'target robots ').
-                    'in this <em>'.$challenge_data['challenge_name'].'</em> event challenge '.
+                    'in the "<em>'.$challenge_data['challenge_name'].'</em>" event challenge '.
                     'by the MMRPG team! ';
             } else {
                 $challenge_description = 'Defeat the '.
                     ($num_target_robots == 1 ? 'target robot ' : 'target robots ').
-                    'in this <em>'.$challenge_data['challenge_name'].'</em> user challenge '.
+                    'in the "<em>'.$challenge_data['challenge_name'].'</em>" user challenge '.
                     'by '.ucwords(trim($challenge_data['challenge_creator_name'])).'! ';
             }
             $challenge_description2 = 'Good luck and have fun!';

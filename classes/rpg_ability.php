@@ -2792,10 +2792,14 @@ class rpg_ability extends rpg_object {
 
     // Define a static function for generating a static field attachment of "crude oil" (from the Oil Shooter ability)
     public static function get_static_crude_oil($static_attachment_key, $this_attachment_duration = 99, $existing_attachments = 0){
+        $this_battle = rpg_battle::get_battle();
+        $this_attachment_json = json_encode($this_battle->battle_attachments);
         $this_ability_token = 'oil-shooter';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
         $this_attachment_image = $this_ability_token;
-        $this_attachment_destroy_text = 'The puddle of <span class="ability_name ability_type ability_type_earth">crude oil</span> faded away...<br /> ';
+        $this_existing = substr_count($this_attachment_json, 'ability_'.$this_ability_token);
+        $this_text_prefix = $this_existing > 0 ? 'One of the puddles of' : 'The puddle of';
+        $this_attachment_destroy_text = $this_text_prefix.' <span class="ability_name ability_type ability_type_earth">crude oil</span> faded away...<br /> ';
         $this_attachment_destroy_text .= 'That position on the field isn\'t vulnerable to '.rpg_type::print_span('flame').' or '.rpg_type::print_span('explode').' types any more! ';
         $this_attachment_info = array(
             'class' => 'ability',
@@ -2831,10 +2835,14 @@ class rpg_ability extends rpg_object {
 
     // Define a static function for generating a static field attachment of "foamy bubbles" (from the Bubble Spray ability)
     public static function get_static_foamy_bubbles($static_attachment_key, $this_attachment_duration = 99, $existing_attachments = 0){
+        $this_battle = rpg_battle::get_battle();
+        $this_attachment_json = json_encode($this_battle->battle_attachments);
         $this_ability_token = 'bubble-spray';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
         $this_attachment_image = $this_ability_token;
-        $this_attachment_destroy_text = 'The mound of <span class="ability_name ability_type ability_type_water">foamy bubbles</span> faded away...<br /> ';
+        $this_existing = substr_count($this_attachment_json, 'ability_'.$this_ability_token);
+        $this_text_prefix = $this_existing > 0 ? 'One of the mounds of' : 'The mound of';
+        $this_attachment_destroy_text = $this_text_prefix.' <span class="ability_name ability_type ability_type_water">foamy bubbles</span> faded away...<br /> ';
         $this_attachment_destroy_text .= 'That position on the field isn\'t vulnerable to '.rpg_type::print_span('electric').' or '.rpg_type::print_span('freeze').' types any more! ';
         $this_attachment_info = array(
             'class' => 'ability',
@@ -2870,12 +2878,17 @@ class rpg_ability extends rpg_object {
 
     // Define a static function for generating a static field attachment of a "black hole" (from the Galaxy Bomb ability)
     public static function get_static_black_hole($static_attachment_key, $this_attachment_duration = 99, $existing_attachments = 0){
+        $this_battle = rpg_battle::get_battle();
+        $this_attachment_json = json_encode($this_battle->battle_attachments);
         $this_ability_token = 'galaxy-bomb';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
         $this_attachment_image = $this_ability_token;
-        $this_attachment_destroy_text = 'The crushing <span class="ability_name ability_type ability_type_space_explode">black hole</span> faded away...<br /> ';
+        $this_existing = substr_count($this_attachment_json, 'ability_'.$this_ability_token);
+        $this_text_prefix = $this_existing > 0 ? 'One of the' : 'The';
+        $this_text_noun = 'black hole'.($this_existing > 0 ? 's' : '');
+        $this_attachment_destroy_text = $this_text_prefix.' crushing <span class="ability_name ability_type ability_type_space_explode">'.$this_text_noun.'</span> faded away...<br /> ';
         $this_attachment_destroy_text .= 'That position on the field won\'t take end-of-turn damage any more! ';
-        $this_attachment_repeat_text = 'The <span class="ability_name ability_type ability_type_space_explode">black hole</span> crushed the '.(strstr($static_attachment_key, 'active') ? 'active' : 'benched').' robot!';
+        $this_attachment_repeat_text = $this_text_prefix.' <span class="ability_name ability_type ability_type_space_explode">'.$this_text_noun.'</span> exherted its crushing power!';
         $this_attachment_info = array(
             'class' => 'ability',
             'sticky' => true,
