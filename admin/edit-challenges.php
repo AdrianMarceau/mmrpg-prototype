@@ -421,7 +421,6 @@
 
     }
 
-
     ?>
 
     <div class="breadcrumb">
@@ -451,12 +450,10 @@
                     <input type="hidden" name="action" value="edit_challenges" />
                     <input type="hidden" name="subaction" value="search" />
 
-                    <? /*
                     <div class="field">
-                        <strong class="label">By ID Number</strong>
+                        <strong class="label">By ID</strong>
                         <input class="textbox" type="text" name="challenge_id" value="<?= !empty($search_data['challenge_id']) ? $search_data['challenge_id'] : '' ?>" />
                     </div>
-                    */ ?>
 
                     <div class="field">
                         <strong class="label">By Name</strong>
@@ -524,45 +521,6 @@
 
                 <!-- SEARCH RESULTS -->
 
-                <?
-
-                // Define a function for checking the current sort
-                function is_sort_link($name, $dir = ''){
-                    global $sort_data;
-                    if (empty($name)){ return false; }
-                    if ($name != $sort_data['name']){ return false; }
-                    if (!empty($dir) && $dir != $sort_data['dir']){ return false; }
-                    return true;
-                }
-
-                // Define a function for generating an href sort link
-                function get_sort_href($name, $dir){
-                    global $search_data;
-                    $sort_link = 'admin.php?action=edit_challenges&subaction=search';
-                    if (!empty($search_data)){
-                        $arg_strings = array();
-                        foreach ($search_data AS $n => $v){ $arg_strings[] = $n.'='.urlencode($v); }
-                        $sort_link .= '&'.implode('&', $arg_strings);
-                    }
-                    $sort_link .= '&order='.$name.':'.$dir;
-                    return $sort_link;
-                }
-
-                // Define a function for generating sort link markup
-                function get_sort_link($name, $text = ''){
-                    global $sort_data;
-                    if (empty($text)){ $text = ucfirst($name); }
-                    $active = is_sort_link($name) ? true : false;
-                    $curr_dir = $active ? $sort_data['dir'] : '';
-                    $new_dir = $active && $curr_dir == 'asc' ? 'desc' : 'asc';
-                    $class = 'sort'.($active ? ' active '.$curr_dir : '');
-                    $href = get_sort_href($name, $new_dir);
-                    $link = '<a class="'.$class.'" href="'.$href.'"><span>'.$text.'</span></a>';
-                    return $link;
-                }
-
-                ?>
-
                 <div class="results">
 
                     <table class="list" style="width: 100%;">
@@ -571,32 +529,36 @@
                             <col class="name" width="" />
                             <col class="kind" width="85" />
                             <col class="creator" width="180" />
+                            <col class="date created" width="100" />
+                            <col class="date modified" width="100" />
                             <col class="flag published" width="80" />
                             <col class="flag hidden" width="70" />
                             <col class="actions" width="90" />
                         </colgroup>
                         <thead>
                             <tr>
-                                <th class="id"><?= get_sort_link('challenge_id', 'ID') ?></th>
-                                <th class="name"><?= get_sort_link('challenge_name', 'Name') ?></th>
-                                <th class="kind"><?= get_sort_link('challenge_kind', 'Kind') ?></th>
-                                <th class="creator"><?= get_sort_link('challenge_creator', 'Creator') ?></th>
-                                <th class="flag published"><?= get_sort_link('challenge_flag_published', 'Published') ?></th>
-                                <th class="flag hidden"><?= get_sort_link('challenge_flag_hidden', 'Hidden') ?></th>
+                                <th class="id"><?= cms_admin::get_sort_link('challenge_id', 'ID') ?></th>
+                                <th class="name"><?= cms_admin::get_sort_link('challenge_name', 'Name') ?></th>
+                                <th class="kind"><?= cms_admin::get_sort_link('challenge_kind', 'Kind') ?></th>
+                                <th class="creator"><?= cms_admin::get_sort_link('challenge_creator', 'Creator') ?></th>
+                                <th class="date created"><?= cms_admin::get_sort_link('challenge_date_created', 'Created') ?></th>
+                                <th class="date modified"><?= cms_admin::get_sort_link('challenge_date_modified', 'Modified') ?></th>
+                                <th class="flag published"><?= cms_admin::get_sort_link('challenge_flag_published', 'Published') ?></th>
+                                <th class="flag hidden"><?= cms_admin::get_sort_link('challenge_flag_hidden', 'Hidden') ?></th>
                                 <th class="actions">Actions</th>
+                            </tr>
+                            <tr>
+                                <th class="head count" colspan="9">
+                                    <?= $search_results_count == 1 ? '1 Result' : $search_results_count.' Results' ?>
+                                    <? if ($search_results_count != $search_results_total){ ?>
+                                        <span class="total"><?= $search_results_total.' Total' ?></span>
+                                    <? } ?>
+                                </th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
-                                <? /*
-                                <td class="foot id"></td>
-                                <td class="foot name"></td>
-                                <td class="foot kind"></td>
-                                <td class="foot creator"></td>
-                                <td class="foot flag published"></td>
-                                <td class="foot flag hidden"></td>
-                                */ ?>
-                                <td class="foot actions count" colspan="7">
+                                <td class="foot count" colspan="9">
                                     <?= $search_results_count == 1 ? '1 Result' : $search_results_count.' Results' ?>
                                     <? if ($search_results_count != $search_results_total){ ?>
                                         <span class="total"><?= $search_results_total.' Total' ?></span>
@@ -608,7 +570,7 @@
                             <?
                             $temp_class_colours = array(
                                 'user' => array('defense', '<i class="fas fa-robot"></i>'),
-                                'event' => array('attack', '<i class="fas fa-skull"></i>')
+                                'event' => array('attack', '<i class="fas fa-star"></i>')
                                 );
                             foreach ($search_results AS $key => $challenge_data){
 
@@ -620,6 +582,8 @@
                                 $challenge_creator_name = !empty($challenge_creator['user_name_display']) ? $challenge_creator['user_name_display'] : false;
                                 $challenge_creator_type = !empty($challenge_creator['user_colour_token']) ? $challenge_creator['user_colour_token'] : 'none';
                                 $challenge_creator_span = !empty($challenge_creator_name) ? '<span class="type_span type_'.$challenge_creator_type.'">'.$challenge_creator_name.'</span>' : '-';
+                                $challenge_date_created = !empty($challenge_data['challenge_date_created']) ? date('Y-m-d', $challenge_data['challenge_date_created']) : '-';
+                                $challenge_date_modified = !empty($challenge_data['challenge_date_modified']) ? date('Y-m-d', $challenge_data['challenge_date_modified']) : '-';
                                 $challenge_flag_published = !empty($challenge_data['challenge_flag_published']) ? '<i class="fas fa-check-square"></i>' : '-';
                                 $challenge_flag_hidden = !empty($challenge_data['challenge_flag_hidden']) ? '<i class="fas fa-eye-slash"></i>' : '-';
 
@@ -636,6 +600,8 @@
                                     echo '<td class="name"><div class="wrap">'.$challenge_name_link.'</div></td>'.PHP_EOL;
                                     echo '<td class="kind"><div class="wrap">'.$challenge_kind_span.'</div></td>'.PHP_EOL;
                                     echo '<td class="creator"><div class="wrap">'.$challenge_creator_span.'</div></td>'.PHP_EOL;
+                                    echo '<td class="date created"><div>'.$challenge_date_created.'</div></td>'.PHP_EOL;
+                                    echo '<td class="date modified"><div>'.$challenge_date_modified.'</div></td>'.PHP_EOL;
                                     echo '<td class="flag published"><div>'.$challenge_flag_published.'</div></td>'.PHP_EOL;
                                     echo '<td class="flag hidden"><div>'.$challenge_flag_hidden.'</div></td>'.PHP_EOL;
                                     echo '<td class="actions"><div>'.$challenge_actions.'</div></td>'.PHP_EOL;
