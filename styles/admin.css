@@ -391,16 +391,31 @@ tr:nth-child(odd) td {
     text-overflow: ellipsis;
 }
 
+.adminform table thead th.head.count,
+.adminform table tfoot td.foot.count {
+    text-align: right;
+    font-size: 80%;
+    padding: 3px 6px;
+    color: #dedede;
+    font-weight: normal;
+}
+.adminform table thead th.head.count {
+    border-top: 1px solid #383838;
+}
 
-.adminform table tfoot td .total {
+
+.adminform table thead th.head.count .total,
+.adminform table tfoot td.foot.count .total {
     color: #cacaca;
     margin-left: 6px;
 }
-.adminform table tfoot td .total:before {
+.adminform table thead th.head.count .total:before,
+.adminform table tfoot td.foot.count .total:before {
     content: "(";
     padding-right: 1px;
 }
-.adminform table tfoot td .total:after {
+.adminform table thead th.head.count .total:after,
+.adminform table tfoot td.foot.count .total:after {
     content: ")";
     padding-left: 1px;
 }
@@ -412,6 +427,7 @@ tr:nth-child(odd) td {
 .adminform table thead th .sort.active {
     text-decoration: none;
 }
+.adminform table thead th .sort:hover > span,
 .adminform table thead th .sort.active > span {
     text-decoration: underline;
 }

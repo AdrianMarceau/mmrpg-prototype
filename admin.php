@@ -3,6 +3,7 @@
 // Require the application top file
 define('MMRPG_ADMIN_PANEL', true);
 require_once('top.php');
+require_once('classes/cms_admin.php');
 
 // Define the page title and markup variables
 $this_page_title = 'MMRPG Admin Panel';
