@@ -123,19 +123,16 @@
     $search_query = '';
     $search_results = array();
     $search_results_count = 0;
-    if ($sub_action == 'search' && (
-        !empty($_GET['robot_id'])
-        || !empty($_GET['robot_name'])
-        || !empty($_GET['robot_core'])
-        || !empty($_GET['robot_class'])
-        || !empty($_GET['robot_flavour'])
-        || !empty($_GET['robot_game'])
-        || !empty($_GET['robot_group'])
-        || (isset($_GET['robot_flag_hidden']) && $_GET['robot_flag_hidden'] !== '')
-        || (isset($_GET['robot_flag_complete']) && $_GET['robot_flag_complete'] !== '')
-        || (isset($_GET['robot_flag_unlockable']) && $_GET['robot_flag_unlockable'] !== '')
-        || (isset($_GET['robot_flag_published']) && $_GET['robot_flag_published'] !== '')
-        )){
+    $search_results_limit = 50;
+    if ($sub_action == 'search'){
+
+        // Collect the sorting order and direction
+        $sort_data = array('name' => 'robot_id', 'dir' => 'desc');
+        if (!empty($_GET['order'])
+            && preg_match('/^([-_a-z0-9]+)\:(desc|asc)$/i', $_GET['order'])){
+            list($r_name, $r_dir) = explode(':', trim($_GET['order']));
+            $sort_data = array('name' => $r_name, 'dir' => $r_dir);
+        }
 
         // Collect form data for processing
         $search_data['robot_id'] = !empty($_GET['robot_id']) && is_numeric($_GET['robot_id']) ? trim($_GET['robot_id']) : '';
@@ -236,16 +233,25 @@
 
         // Append sorting parameters to the end of the query
         $order_by = array();
-        if (!empty($search_data['robot_name'])){ $order_by[] = "robot_name ASC"; }
+        if (!empty($sort_data)){ $order_by[] = $sort_data['name'].' '.strtoupper($sort_data['dir']); }
+        $order_by[] = "robot_name ASC";
         $order_by[] = "FIELD(robot_class, 'mecha', 'master', 'boss')";
         $order_by[] = "robot_order ASC";
         $order_by_string = implode(', ', $order_by);
-        $search_query .= "ORDER BY {$order_by_string};";
+        $search_query .= "ORDER BY {$order_by_string} ";
+
+        // Impose a limit on the search results
+        $search_query .= "LIMIT {$search_results_limit} ";
+
+        // End the query now that we're done
+        $search_query .= ";";
 
         // Collect search results from the database
         $search_results = $db->get_array_list($search_query);
         $search_results_count = is_array($search_results) ? count($search_results) : 0;
 
+        // Collect a total number from the database
+        $search_results_total = $db->get_value("SELECT COUNT(robot_id) AS total FROM mmrpg_index_robots WHERE 1=1 AND robot_token <> 'robot';", 'total');
 
     }
 
@@ -709,31 +715,33 @@
                         </colgroup>
                         <thead>
                             <tr>
-                                <th class="id">ID</th>
-                                <th class="name">Name</th>
-                                <th class="class">Class</th>
-                                <th class="type">Type(s)</th>
-                                <th class="game">Game</th>
-                                <th class="group">Group</th>
-                                <th class="flag published">Published</th>
-                                <th class="flag complete">Complete</th>
-                                <th class="flag hidden">Hidden</th>
+                                <th class="id"><?= cms_admin::get_sort_link('robot_id', 'ID') ?></th>
+                                <th class="name"><?= cms_admin::get_sort_link('robot_name', 'Name') ?></th>
+                                <th class="class"><?= cms_admin::get_sort_link('robot_class', 'Class') ?></th>
+                                <th class="type"><?= cms_admin::get_sort_link('robot_core', 'Core(s)') ?></th>
+                                <th class="game"><?= cms_admin::get_sort_link('robot_game', 'Game') ?></th>
+                                <th class="group"><?= cms_admin::get_sort_link('robot_group', 'Group') ?></th>
+                                <th class="flag published"><?= cms_admin::get_sort_link('robot_flag_published', 'Published') ?></th>
+                                <th class="flag complete"><?= cms_admin::get_sort_link('robot_flag_complete', 'Complete') ?></th>
+                                <th class="flag hidden"><?= cms_admin::get_sort_link('robot_flag_hidden', 'Hidden') ?></th>
                                 <th class="actions">Actions</th>
+                            </tr>
+                            <tr>
+                                <th class="head count" colspan="10">
+                                    <?= $search_results_count == 1 ? '1 Result' : $search_results_count.' Results' ?>
+                                    <? if ($search_results_count != $search_results_total){ ?>
+                                        <span class="total"><?= $search_results_total.' Total' ?></span>
+                                    <? } ?>
+                                </th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
-                                <td class="foot id"></td>
-                                <td class="foot name"></td>
-                                <td class="foot class"></td>
-                                <td class="foot type"></td>
-                                <td class="foot game"></td>
-                                <td class="foot group"></td>
-                                <td class="foot flag published"></td>
-                                <td class="foot flag complete"></td>
-                                <td class="foot flag hidden"></td>
-                                <td class="foot actions count">
+                                <td class="foot count" colspan="10">
                                     <?= $search_results_count == 1 ? '1 Result' : $search_results_count.' Results' ?>
+                                    <? if ($search_results_count != $search_results_total){ ?>
+                                        <span class="total"><?= $search_results_total.' Total' ?></span>
+                                    <? } ?>
                                 </td>
                             </tr>
                         </tfoot>
