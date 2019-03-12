@@ -159,7 +159,7 @@
     $search_query = '';
     $search_results = array();
     $search_results_count = 0;
-    $search_results_limit = 100;
+    $search_results_limit = 50;
     if ($sub_action == 'search'){
 
         // Collect the sorting order and direction
