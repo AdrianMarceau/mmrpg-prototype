@@ -232,7 +232,9 @@ class rpg_mission_challenge extends rpg_mission {
             'challenge_times_accessed',
             'challenge_times_concluded',
             'challenge_user_victories',
-            'challenge_user_defeats'
+            'challenge_user_defeats',
+            'challenge_date_created',
+            'challenge_date_modified'
             );
 
         // Add table name to each field string if requested
