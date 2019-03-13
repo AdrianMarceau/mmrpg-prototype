@@ -1527,6 +1527,10 @@ class rpg_battle extends rpg_object {
                     '');
                 */
 
+                // Collect a temp version of the new robot for key reading
+                $temp_new_robot = rpg_game::get_robot($this, $this_player, $this_robotinfo);
+                $temp_new_robot_key = $temp_new_robot->robot_key;
+
                 // If this robot is being withdrawn on the same turn it entered, return false
                 if ($this_player->player_side == 'right' && $this_switch_reason == 'withdrawn' && $this_player->values['current_robot_enter'] == $this->counters['battle_turn']){
                     // Return false to cancel the switch action
@@ -1539,10 +1543,15 @@ class rpg_battle extends rpg_object {
                     $this_robot->update_session();
                 }
 
+                // Define the horizontal shift amount for the benched robot switch animation
+                $temp_shift_amount = $this_player->player_side == 'left' ? 50 : -50;
+
                 // Withdraw the player's robot and display an event for it
                 if ($this_robot->robot_position != 'bench'){
                     $this_robot->robot_frame = $this_robot->robot_status != 'disabled' ? 'base' : 'defeat';
                     $this_robot->robot_position = 'bench';
+                    $this_robot->robot_key = $temp_new_robot_key;
+                    $this_robot->robot_frame_styles = 'transform: translate('.$temp_shift_amount.'%, 0); -webkit-transform: translate('.$temp_shift_amount.'%, 0); ';
                     $this_player->player_frame = 'base';
                     $this_player->values['current_robot'] = false;
                     $this_player->values['current_robot_enter'] = false;
@@ -1561,7 +1570,9 @@ class rpg_battle extends rpg_object {
                     if ($this_switch_reason == 'removed' || $this_player->counters['robots_active'] > 1){
                         $this->events_create($this_robot, false, $event_header, $event_body, array('canvas_show_disabled_bench' => $this_robot->robot_id.'_'.$this_robot->robot_token));
                     }
+                    $this_robot->robot_frame_styles = '';
                     $this_robot->update_session();
+
                 }
 
                 // If the switch reason was removal, hide the robot from view
@@ -1583,6 +1594,7 @@ class rpg_battle extends rpg_object {
                 $this_robot = rpg_game::get_robot($this, $this_player, $this_robotinfo);
                 if ($this_robot->robot_position != 'active'){
                     $this_robot->robot_position = 'active';
+                    $this_robot->robot_key = 0;
                     $this_player->player_frame = 'command';
                     $this_player->values['current_robot'] = $this_robot->robot_string;
                     $this_player->values['current_robot_enter'] = $this->counters['battle_turn'];

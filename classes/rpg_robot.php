@@ -4666,6 +4666,9 @@ class rpg_robot extends rpg_object {
         $this_battle = rpg_battle::get_battle();
         $this_field = rpg_field::get_field();
 
+        // If the battle has ended, don't do this
+        if ($this_battle->battle_status == 'complete'){ return false; }
+
         // Collect references to relative player and robot objects
         $this_player = $this->player;
         $this_robot = $this;
@@ -4692,6 +4695,9 @@ class rpg_robot extends rpg_object {
         $db = cms_database::get_database();
         $this_battle = rpg_battle::get_battle();
         $this_field = rpg_field::get_field();
+
+        // If the battle has ended, don't do this
+        if ($this_battle->battle_status == 'complete'){ return false; }
 
         // Collect references to relative player and robot objects
         $this_player = $this->player;
@@ -5033,6 +5039,9 @@ class rpg_robot extends rpg_object {
         $this_battle = rpg_battle::get_battle();
         $this_field = rpg_field::get_field();
         $session_token = rpg_game::session_token();
+
+        // If the battle has ended, don't do this
+        if ($this_battle->battle_status == 'complete'){ return false; }
 
         // Collect references to relative player and robot objects
         $this_player = $this->player;
@@ -5464,6 +5473,9 @@ class rpg_robot extends rpg_object {
         $db = cms_database::get_database();
         $this_battle = rpg_battle::get_battle();
         $this_field = rpg_field::get_field();
+
+        // If the battle has ended, don't do this
+        if ($this_battle->battle_status == 'complete'){ return false; }
 
         // Collect references to relative player and robot objects
         $this_player = $this->player;
