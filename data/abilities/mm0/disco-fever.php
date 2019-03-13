@@ -118,16 +118,17 @@ $ability = array(
 
             // Collect the attachment from the robot to back up its info
             $this_attachment_info = $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token];
-            $this_attachment_info['attachment_duration'] = $static_attachment_duration;
-            $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token] = $this_attachment_info;
-            $this_battle->update_session();
-
-            // Target the opposing robot
-            $this_ability->target_options_update(array(
-                'frame' => 'summon',
-                'success' => array(9, -10, 0, -10, $this_refresh_text)
-                ));
-            $this_robot->trigger_target($this_robot, $this_ability);
+            if (empty($this_attachment_info['attachment_duration'])
+                || $this_attachment_info['attachment_duration'] < $static_attachment_duration){
+                $this_attachment_info['attachment_duration'] = $static_attachment_duration;
+                $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token] = $this_attachment_info;
+                $this_battle->update_session();
+                $this_ability->target_options_update(array(
+                    'frame' => 'summon',
+                    'success' => array(9, -10, 0, -10, $this_refresh_text)
+                    ));
+                $this_robot->trigger_target($this_robot, $this_ability);
+            }
 
         }
 
