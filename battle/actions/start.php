@@ -24,8 +24,9 @@ if (!empty($this_battle->battle_field_base['values']['hazards'])){
             if ($hazard_value != 'both' && $hazard_value != $player_side){ continue; }
             $bench_size = $player_bench_sizes[$player_side];
             $hazards_added = 0;
-            $hazards_to_add = $bench_size == 1 ? 1 : $bench_size + 1;
+            $hazards_to_add = $bench_size == 1 ? 1 : $bench_size;
             for ($key = -1; $key < $max_bench_size; $key++){
+                if ($key == 0){ continue; }
                 if ($hazards_added >= $hazards_to_add){ break; }
                 if ($key == -1){ $static_key = $player_side.'-active'; }
                 else { $static_key = $player_side.'-bench-'.$key; }
