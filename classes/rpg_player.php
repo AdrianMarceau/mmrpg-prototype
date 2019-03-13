@@ -1892,7 +1892,7 @@ class rpg_player extends rpg_object {
                 if (empty($this_robotinfo['robot_id']) || empty($this_robotinfo['robot_token'])){ continue; }
                 // Define the current temp robot object using the loaded robot data
                 $temp_robot = rpg_game::get_robot($this->battle, $this, $this_robotinfo);
-                $temp_robot->robot_key = $this_key;
+                if (!isset($temp_robot->robot_key)){ $temp_robot->robot_key = $this_key; }
                 $temp_robot->update_session();
                 // Check if this robot is in the active position
                 if ($temp_robot->robot_position == 'active'){
