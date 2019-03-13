@@ -178,7 +178,8 @@ $ability = array(
                     elseif (!empty($this_robot->robot_core)){ $effect_text = '<span class="ability_name ability_type ability_type_'.$type_token.'">'.$type_name.' Effects</span> were '.$temp_change_text.' by '.$temp_change_percent.'%!<br />'; }
                     else { $effect_text = '<span class="ability_name ability_type ability_type_'.$type_token.'">'.$type_name.' Effects</span> returned to normal!<br />'; }
                     $this_battle->events_create($this_robot, false, $this_field->field_name.' Multipliers',
-                        $temp_change_alert.' '.$effect_text.
+                        //$temp_change_alert.' '.$effect_text.
+                        $effect_text.
                         'The multiplier is now at <span class="ability_name ability_type ability_type_'.$type_name.'">'.$type_name.' x '.number_format($temp_new_amount, 1).'</span>!',
                         array('canvas_show_this_ability_overlay' => true)
                         );
