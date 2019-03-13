@@ -154,8 +154,6 @@ $temp_pattern_last[] = '/^weapon-codes$/i';
 $temp_pattern_last[] = '/^equip-codes$/i';
 $temp_pattern_last[] = '/^legacy-codes$/i';
 
-$temp_pattern_last[] = '/^skull-medallion$/i';
-
 $temp_pattern_last[] = '/^omega-seed$/i';
 
 $types = implode('|', array_keys($mmrpg_database_types));

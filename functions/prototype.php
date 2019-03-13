@@ -1192,13 +1192,13 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
 
             }
 
-            // Add the fusion star sprite if one has been added
-            $this_has_skull_medallion = false;
-            if (!empty($this_battleinfo['values']['skull_medallion'])){
-                $this_has_skull_medallion = true;
+            // Add the challenge marker sprite if one has been added
+            $this_has_challenge_marker = false;
+            if (!empty($this_battleinfo['values']['challenge_marker'])){
+                $this_has_challenge_marker = true;
                 $this_option_disabled = false;
-                $temp_kind = $this_battleinfo['values']['skull_medallion'];
-                $temp_sprite = array('path' => 'items/'.$temp_kind.'-skull-medallion', 'frame' => '00', 'size' => 40);
+                $temp_kind = $this_battleinfo['values']['challenge_marker'];
+                $temp_sprite = array('path' => 'items/challenge-marker_'.$temp_kind.'', 'frame' => '00', 'size' => 40);
                 array_unshift($this_battleinfo['battle_sprite'], $temp_sprite);
             }
 
@@ -1257,10 +1257,10 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                         }
                     } else {
                         $temp_right = 5;
-                        if ($this_has_skull_medallion){ $temp_right = 30; }
+                        if ($this_has_challenge_marker){ $temp_right = 30; }
                     }
 
-                    if (strstr($temp_path, 'skull-medallion')){
+                    if (strstr($temp_path, 'challenge-marker')){
                         $this_option_label .= '<span class="sprite sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_'.str_pad($temp_frame, 2, '0', STR_PAD_LEFT).' " style="background-image: url(images/'.$temp_path.'/sprite_left_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: -3px; right: 15px; z-index: '.$temp_layer.'; opacity: '.$temp_opacity.'; '.$temp_other_styles.'">&nbsp;</span>';
                     } elseif (preg_match('/^(abilities|items)/i', $temp_path)){
                         $this_option_label .= '<span class="sprite sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_'.str_pad($temp_frame, 2, '0', STR_PAD_LEFT).' " style="background-image: url(images/'.$temp_path.'/sprite_left_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: 1px; right: -3px; z-index: '.$temp_layer.'; opacity: '.$temp_opacity.'; '.$temp_other_styles.'">&nbsp;</span>';
