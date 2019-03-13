@@ -365,12 +365,12 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                         $this_field_data['field_foreground_attachments']['star-marker'] = array(
                             'class' => 'item',
                             'size' => 80,
-                            'offset_x' => 325,
+                            'offset_x' => 331,
                             'offset_y' => 90,
                             'item_token' => 'star',
                             'item_image' => $temp_star_image,
                             'item_frame' => array(0, 0, 0, 0),
-                            'item_frame_shift' => array('325,90', '325,95', '325,100', '325,95'),
+                            'item_frame_shift' => array('331,90', '331,95', '331,100', '331,95'),
                             'item_direction' => 'left',
                             'item_text' => $temp_star_text
                             );
@@ -380,12 +380,12 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                         $this_field_data['field_foreground_attachments']['star-marker_shadow'] = array(
                             'class' => 'item',
                             'size' => 80,
-                            'offset_x' => 325,
+                            'offset_x' => 331,
                             'offset_y' => 75,
                             'item_token' => 'star',
                             'item_image' => $temp_shadow_image,
                             'item_frame' => array(2, 1, 0, 1),
-                            'item_frame_shift' => array('325,75', '325,75', '325,75', '325,75'),
+                            'item_frame_shift' => array('331,75', '331,75', '331,75', '331,75'),
                             'item_direction' => 'left',
                             'item_text' => ''
                             );
@@ -402,12 +402,12 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                         $this_field_data['field_foreground_attachments']['challenge-marker'] = array(
                             'class' => 'item',
                             'size' => 80,
-                            'offset_x' => 325,
+                            'offset_x' => 331,
                             'offset_y' => 90,
                             'item_token' => 'challenge-marker',
                             'item_image' => $temp_skull_image,
                             'item_frame' => array(0, 0, 0, 0),
-                            'item_frame_shift' => array('325,90', '325,95', '325,100', '325,95'),
+                            'item_frame_shift' => array('331,90', '331,95', '331,100', '331,95'),
                             'item_direction' => 'left',
                             'item_text' => ''
                             );
@@ -417,12 +417,12 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                         $this_field_data['field_foreground_attachments']['challenge-marker_shadow'] = array(
                             'class' => 'item',
                             'size' => 80,
-                            'offset_x' => 325,
+                            'offset_x' => 331,
                             'offset_y' => 75,
                             'item_token' => 'challenge-marker',
                             'item_image' => $temp_shadow_image,
                             'item_frame' => array(2, 1, 0, 1),
-                            'item_frame_shift' => array('325,75', '325,75', '325,75', '325,75'),
+                            'item_frame_shift' => array('331,75', '331,75', '331,75', '331,75'),
                             'item_direction' => 'left',
                             'item_text' => ''
                             );
