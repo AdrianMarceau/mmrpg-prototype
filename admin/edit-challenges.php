@@ -826,6 +826,15 @@
                                             <option value="right"<?= !empty($challenge_field_hazards['black_holes']) && $challenge_field_hazards['black_holes'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
                                         </select><span></span>
                                     </div>
+                                    <div class="subfield">
+                                        <strong class="label sublabel">Disco Balls <em>via Disco Fever</em></strong>
+                                        <select class="select" name="challenge_field_data[values][hazards][disco_balls]">
+                                            <option value=""<?= empty($challenge_field_hazards['disco_balls']) ? ' selected="selected"' : '' ?>>-</option>
+                                            <option value="both"<?= !empty($challenge_field_hazards['disco_balls']) && $challenge_field_hazards['disco_balls'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
+                                            <option value="left"<?= !empty($challenge_field_hazards['disco_balls']) && $challenge_field_hazards['disco_balls'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
+                                            <option value="right"<?= !empty($challenge_field_hazards['disco_balls']) && $challenge_field_hazards['disco_balls'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
+                                        </select><span></span>
+                                    </div>
                                 </div>
 
                             </div>
