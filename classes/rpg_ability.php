@@ -2945,5 +2945,50 @@ class rpg_ability extends rpg_object {
         return $this_attachment_info;
     }
 
+    // Define a static function for generating a static field attachment of a "frozen foothold" (from the Ice Breath ability)
+    public static function get_static_frozen_foothold($static_attachment_key, $this_attachment_duration = 99, $existing_attachments = 0){
+        $this_battle = rpg_battle::get_battle();
+        $this_attachment_json = json_encode($this_battle->battle_attachments);
+        $this_ability_token = 'ice-breath';
+        $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
+        $this_attachment_image = $this_ability_token;
+        $this_existing = substr_count($this_attachment_json, 'ability_'.$this_ability_token);
+        $this_text_prefix = $this_existing > 0 ? 'One of the' : 'The';
+        $this_text_noun = 'frozen foothold'.($this_existing > 0 ? 's' : '');
+        $this_attachment_destroy_text = $this_text_prefix.' <span class="ability_name ability_type ability_type_freeze">'.$this_text_noun.'</span> faded away...<br /> ';
+        $this_attachment_destroy_text .= 'That position on the field isn\'t prevented from switching any more! ';
+        $this_attachment_info = array(
+            'class' => 'ability',
+            'sticky' => true,
+            'ability_token' => $this_ability_token,
+            'ability_image' => $this_attachment_image,
+            'attachment_token' => $this_attachment_token,
+            'attachment_duration' => $this_attachment_duration,
+            'attachment_sticky' => true,
+            'attachment_switch_disabled' => true,
+            'attachment_weaknesses' => array('flame', 'laser'),
+            'attachment_weaknesses_trigger' => 'either',
+            'attachment_destroy' => array(
+                'trigger' => 'special',
+                'kind' => '',
+                'type' => '',
+                'percent' => true,
+                'modifiers' => false,
+                'frame' => 'defend',
+                'rates' => array(100, 0, 0),
+                'success' => array(9, -9999, -9999, 10, $this_attachment_destroy_text),
+                'failure' => array(9, -9999, -9999, 10, $this_attachment_destroy_text)
+                ),
+            'ability_frame' => 2,
+            'ability_frame_animate' => array(2, 3),
+            'ability_frame_offset' => array(
+                'x' => (0 + ($existing_attachments * 8)),
+                'y' => (-5 + $existing_attachments),
+                'z' => (8 + $existing_attachments)
+                )
+            );
+        return $this_attachment_info;
+    }
+
 }
 ?>
