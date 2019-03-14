@@ -109,6 +109,12 @@ body:before {
         display: none;
     }
 
+    .adminform.edit_challenges .results table .flag.hidden,
+    .adminform.edit_challenges .results table .date.created {
+        display: none;
+    }
+
+
 }
 
 /* -- Even Less than Portrait Mode -- */
@@ -118,9 +124,6 @@ body:before {
         content: "05";
     }
 
-    .adminform.edit_robots .results table .type {
-        display: none;
-    }
 
 }
 
@@ -135,8 +138,8 @@ body:before {
         width: 50%;
     }
 
-    .adminform .results .list .created,
-    .adminform .results .list .modified {
+    .adminform .results .list .date,
+    .adminform .results .list .flag {
         display: none;
     }
 
@@ -169,13 +172,19 @@ body:before {
         border: 1px solid #CACACA;
     }
 
-    .adminform.edit_robots .results table tbody td {
-        font-size: 13px;
-    }
-    .adminform.edit_robots .results table .class,
-    .adminform.edit_robots .results table .actions {
+    /*
+    .adminform.edit_robots .results table .game,
+    .adminform.edit_robots .results table .group {
         display: none;
     }
+    .adminform.edit_robots .results table .class {
+        display: none;
+    }
+
+    .adminform.edit_robots .results table .type {
+        display: none;
+    }
+    */
 
 
 }
@@ -228,15 +237,17 @@ body:before {
         padding-left: 3px;
         padding-right: 3px;
     }
+    .adminform .search .field .subfield .label {
+        font-size: 11px;
+    }
     .adminform .results .list .id {
-        padding-left: 3px;
+
     }
     .adminform .results .list .actions {
-        padding-right: 3px;
+
     }
 
     .adminform .results .list .email,
-    .adminform .results .list .role,
     .adminform .results .list .created,
     .adminform .results .list .modified {
         display: none;
@@ -280,6 +291,13 @@ body:before {
     .adminform .formfoot .metadata .date {
         display: block;
         margin: 0 auto 5px;
+    }
+
+    .adminform.edit_robots .results table .type {
+        display: none;
+    }
+    .adminform.edit_challenges .results table .creator {
+        display: none;
     }
 
 }
