@@ -44,8 +44,16 @@ $(document).ready(function(){
         // Define the object label and ID based on kind
         var deleteObject = 'object';
         if (deleteKind == 'users'){
+            // If we're deleting USERS set up the vars
             deleteObject = 'user';
             deleteID = deleteLink.attr('data-user-id');
+            if (typeof deleteID == 'undefined'){ return false; }
+            deleteID = parseInt(deleteID);
+            if (deleteID == 0){ return false; }
+            } else if (deleteKind == 'challenges'){
+            // If we're deleting CHALLENGES set up the vars
+            deleteObject = 'challenge';
+            deleteID = deleteLink.attr('data-challenge-id');
             if (typeof deleteID == 'undefined'){ return false; }
             deleteID = parseInt(deleteID);
             if (deleteID == 0){ return false; }
@@ -63,6 +71,8 @@ $(document).ready(function(){
             var postURL = '';
             if (deleteKind == 'users'){
                 postURL = 'admin.php?action=edit_users&subaction=delete&user_id='+deleteID;
+                } else if (deleteKind == 'challenges'){
+                postURL = 'admin.php?action=edit_challenges&subaction=delete&challenge_id='+deleteID;
                 } else {
                 return false;
                 }
@@ -90,6 +100,7 @@ $(document).ready(function(){
     if ($editorTabs.length){
         $editorTabs.each(function(){
             var $tabList = $(this);
+            if ($tabList.is('.hidden')){ return true; }
             var tabGroup = $tabList.attr('data-tabgroup');
             var $tabLinks = $tabList.find('.tab[data-tab]');
             var $tabPanels = thisAdminEditor.find('.editor-panels[data-tabgroup="'+tabGroup+'"] .panel[data-tab]');
