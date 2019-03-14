@@ -29,10 +29,23 @@ if (!empty($_SESSION['mmrpg_admin']['form_messages'])){
     $form_messages = $_SESSION['mmrpg_admin']['form_messages'];
 }
 
+// Define the form messages and collect any from session
+$backup_form_data = array();
+if (!empty($_SESSION['mmrpg_admin']['form_data'])){
+    $backup_form_data = $_SESSION['mmrpg_admin']['form_data'];
+    unset($_SESSION['mmrpg_admin']['form_data']);
+}
+
 // Define a function for saving form messages to session
 function backup_form_messages(){
     global $form_messages;
     $_SESSION['mmrpg_admin']['form_messages'] = $form_messages;
+}
+
+// Define a function for saving form messages to session
+function backup_form_data(){
+    global $form_data;
+    $_SESSION['mmrpg_admin']['form_data'] = $form_data;
 }
 
 // Define a function for generating form messages
@@ -61,13 +74,15 @@ function print_form_messages($print = true, $clear = true){
 // Define a function for exiting a form action
 function redirect_form_action($location){
     backup_form_messages();
+    backup_form_data();
     if (!empty($location)){ header('Location: '.$location); }
-    exit_form_action();
+    exit();
 }
 
 // Define a function for exiting a form action
 function exit_form_action($output = ''){
     backup_form_messages();
+    backup_form_data();
     exit($output);
 }
 

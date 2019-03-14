@@ -125,8 +125,8 @@
     /* -- Form Setup Actions -- */
 
     // Define a function for exiting a challenge edit action
-    function exit_challenge_edit_action($challenge_id = 0){
-        if (!empty($challenge_id)){ $location = 'admin.php?action=edit_challenges&subaction=editor&challenge_id='.$challenge_id; }
+    function exit_challenge_edit_action($challenge_id = false){
+        if ($challenge_id !== false){ $location = 'admin.php?action=edit_challenges&subaction=editor&challenge_id='.$challenge_id; }
         else { $location = 'admin.php?action=edit_challenges&subaction=search'; }
         redirect_form_action($location);
     }
@@ -142,7 +142,7 @@
 
     // If we're in delete mode, we need to remove some data
     $delete_data = array();
-    if (false && $sub_action == 'delete' && !empty($_GET['challenge_id'])){
+    if ($sub_action == 'delete' && !empty($_GET['challenge_id'])){
 
         // Collect form data for processing
         $delete_data['challenge_id'] = !empty($_GET['challenge_id']) && is_numeric($_GET['challenge_id']) ? trim($_GET['challenge_id']) : '';
@@ -274,26 +274,66 @@
 
     // If we're in editor mode, we should collect challenge info from database
     $challenge_data = array();
+    $challenge_data_is_new = false;
     $editor_data = array();
     if ($sub_action == 'editor'
-        && !empty($_GET['challenge_id'])
+        && isset($_GET['challenge_id'])
         ){
 
         // Collect form data for processing
-        $editor_data['challenge_id'] = !empty($_GET['challenge_id']) && is_numeric($_GET['challenge_id']) ? trim($_GET['challenge_id']) : '';
+        $editor_data['challenge_id'] = isset($_GET['challenge_id']) && is_numeric($_GET['challenge_id']) ? trim($_GET['challenge_id']) : '';
 
         /* -- Collect Challenge Data -- */
 
         // Collect challenge details from the database
-        $temp_challenge_fields = rpg_mission_challenge::get_index_fields(true);
-        $challenge_data = $db->get_array("SELECT {$temp_challenge_fields} FROM mmrpg_challenges WHERE challenge_id = {$editor_data['challenge_id']};");
+        $temp_challenge_fields = rpg_mission_challenge::get_index_fields();
+        $temp_challenge_fields_string = implode(', ', $temp_challenge_fields);
+        if (!empty($editor_data['challenge_id'])){
+            $challenge_data = $db->get_array("SELECT {$temp_challenge_fields_string} FROM mmrpg_challenges WHERE challenge_id = {$editor_data['challenge_id']};");
+        } else {
+
+            // Generate temp data structure for the new challenge
+            $challenge_data_is_new = true;
+            $admin_id = $_SESSION['admin_id'];
+            $challenge_data = array(
+                'challenge_id' => 0,
+                'challenge_kind' => '',
+                'challenge_creator' => 0,
+                'challenge_name' => '',
+                'challenge_description' => '',
+                'challenge_field_data' => '',
+                'challenge_target_data' => '',
+                'challenge_reward_data' => '',
+                'challenge_robot_limit' => 0,
+                'challenge_turn_limit' => 0,
+                'challenge_flag_published' => 0,
+                'challenge_flag_hidden' => 0,
+                'challenge_times_accessed' => 0,
+                'challenge_times_concluded' => 0,
+                'challenge_user_victories' => 0,
+                'challenge_user_defeats' => 0,
+                'challenge_date_created' => time(),
+                'challenge_date_modified' => 0
+                );
+
+            // Overwrite temp data with any backup data provided
+            if (!empty($backup_form_data)){
+                foreach ($backup_form_data AS $f => $v){
+                    $challenge_data[$f] = $v;
+                }
+            }
+
+        }
+
 
         // If challenge data could not be found, produce error and exit
         if (empty($challenge_data)){ exit_challenge_edit_action(); }
 
         // Collect the challenge's name(s) for display
         $challenge_name_display = $challenge_data['challenge_name'];
-        $this_page_tabtitle = $challenge_name_display.' | '.$this_page_tabtitle;
+        if ($challenge_data_is_new){ $this_page_tabtitle = 'New Challenge | '.$this_page_tabtitle; }
+        else { $this_page_tabtitle = $challenge_name_display.' | '.$this_page_tabtitle; }
+
 
         // If form data has been submit for this challenge, we should process it
         $form_data = array();
@@ -321,18 +361,22 @@
             $form_data['challenge_flag_published'] = isset($_POST['challenge_flag_published']) && is_numeric($_POST['challenge_flag_published']) ? (int)(trim($_POST['challenge_flag_published'])) : 0;
             $form_data['challenge_flag_hidden'] = isset($_POST['challenge_flag_hidden']) && is_numeric($_POST['challenge_flag_hidden']) ? (int)(trim($_POST['challenge_flag_hidden'])) : 0;
 
+            // If we're creating a new challenge, merge form data with the temp challenge data
+            if (empty($form_data['challenge_id'])){ foreach ($form_data AS $f => $v){ $challenge_data[$f] = $v; } }
+
             // DEBUG
             //$form_messages[] = array('alert', '<pre>$_POST = '.print_r($_POST, true).'</pre>');
             //$form_messages[] = array('alert', '<pre>$form_data = '.print_r($form_data, true).'</pre>');
+            //$form_messages[] = array('alert', '<pre>$challenge_data = '.print_r($challenge_data, true).'</pre>');
 
             // VALIDATE all of the MANDATORY FIELDS to see if any are invalid and abort the update entirely if necessary
-            if (empty($form_data['challenge_id'])){ $form_messages[] = array('error', 'Challenge ID was not provided'); $form_success = false; }
+            if (!$challenge_data_is_new && empty($form_data['challenge_id'])){ $form_messages[] = array('error', 'Challenge ID was not provided'); $form_success = false; }
             if (empty($form_data['challenge_kind'])){ $form_messages[] = array('error', 'Challenge Kind was not provided or was invalid'); $form_success = false; }
             if (empty($form_data['challenge_name'])){ $form_messages[] = array('error', 'Challenge Name was not provided or was invalid'); $form_success = false; }
-            if (empty($form_data['challenge_field_data']['field_background'])){ $form_messages[] = array('error', 'Field Background was not provided or was invalid'); $form_success = false; }
-            if (empty($form_data['challenge_field_data']['field_foreground'])){ $form_messages[] = array('error', 'Field Foreground was not provided or was invalid'); $form_success = false; }
-            if (empty($form_data['challenge_field_data']['field_music'])){ $form_messages[] = array('error', 'Field Music was not provided or was invalid'); $form_success = false; }
-            if (empty($form_data['challenge_target_data']['player_token'])){ $form_messages[] = array('error', 'Target Player was not provided or was invalid'); $form_success = false; }
+            //if (empty($form_data['challenge_field_data']['field_background'])){ $form_messages[] = array('error', 'Field Background was not provided or was invalid'); $form_success = false; }
+            //if (empty($form_data['challenge_field_data']['field_foreground'])){ $form_messages[] = array('error', 'Field Foreground was not provided or was invalid'); $form_success = false; }
+            //if (empty($form_data['challenge_field_data']['field_music'])){ $form_messages[] = array('error', 'Field Music was not provided or was invalid'); $form_success = false; }
+            //if (empty($form_data['challenge_target_data']['player_token'])){ $form_messages[] = array('error', 'Target Player was not provided or was invalid'); $form_success = false; }
             //if (empty($form_data['challenge_target_data']['player_robots'])){ $form_messages[] = array('error', 'Target Robot array was not provided or were invalid'); $form_success = false; }
             if (!$form_success){ exit_challenge_edit_action($form_data['challenge_id']); }
 
@@ -341,8 +385,13 @@
 
             // PREVENT publishing if required fields are not filled out
             if ($form_data['challenge_flag_published']){
-                //if (empty($form_data['challenge_description'])){ $form_messages[] = array('warning', 'Challenge cannot be published without a description'); $form_data['challenge_flag_published'] = 0; }
+                if (empty($form_data['challenge_field_data']['field_background'])){ $form_messages[] = array('warning', 'Challenge cannot be published without a field background'); $form_data['challenge_flag_published'] = 0; }
+                if (empty($form_data['challenge_field_data']['field_foreground'])){ $form_messages[] = array('warning', 'Challenge cannot be published without a field foreground'); $form_data['challenge_flag_published'] = 0; }
+                if (empty($form_data['challenge_field_data']['field_music'])){ $form_messages[] = array('warning', 'Challenge cannot be published without field music'); $form_data['challenge_flag_published'] = 0; }
+                if (empty($form_data['challenge_target_data']['player_token'])){ $form_messages[] = array('warning', 'Challenge cannot be published without target player'); $form_data['challenge_flag_published'] = 0; }
                 if (empty($form_data['challenge_target_data']['player_robots'])){ $form_messages[] = array('warning', 'Challenge cannot be published without target robots'); $form_data['challenge_flag_published'] = 0; }
+                //if (empty($form_data['challenge_description'])){ $form_messages[] = array('warning', 'Challenge cannot be published without a description'); $form_data['challenge_flag_published'] = 0; }
+
             }
 
             // REFORMAT or OPTIMIZE data for provided fields where necessary
@@ -397,17 +446,39 @@
 
             // Make a copy of the update data sans the challenge ID
             $update_data = $form_data;
+            if ($challenge_data_is_new){ $update_data['challenge_date_created'] = time(); }
+            else { $update_data['challenge_date_modified'] = time(); }
             unset($update_data['challenge_id']);
-
-            // Update the main database index with changes to this challenge's data
-            $update_results = $db->update('mmrpg_challenges', $update_data, array('challenge_id' => $form_data['challenge_id']));
 
             // DEBUG
             //$form_messages[] = array('alert', '<pre>$form_data = '.print_r($form_data, true).'</pre>');
 
-            // If we made it this far, the update must have been a success
-            if ($update_results !== false){ $form_success = true; $form_messages[] = array('success', 'Challenge data was updated successfully!'); }
-            else { $form_success = false; $form_messages[] = array('error', 'Challenge data could not be updated...'); }
+            // If this is a new challenge we insert, otherwise we update the existing
+            if ($challenge_data_is_new){
+
+                // Update the main database index with changes to this challenge's data
+                $insert_results = $db->insert('mmrpg_challenges', $update_data);
+
+                // If we made it this far, the update must have been a success
+                if ($insert_results !== false){ $form_success = true; $form_messages[] = array('success', 'Challenge data was created successfully!'); }
+                else { $form_success = false; $form_messages[] = array('error', 'Challenge data could not be created...'); }
+
+                // If the form was a success, collect the new ID and redirect
+                if ($form_success){
+                    $new_challenge_id = $db->get_value("SELECT MAX(challenge_id) AS max FROM mmrpg_challenges;", 'max');
+                    $form_data['challenge_id'] = $new_challenge_id;
+                }
+
+            } else {
+
+                // Update the main database index with changes to this challenge's data
+                $update_results = $db->update('mmrpg_challenges', $update_data, array('challenge_id' => $form_data['challenge_id']));
+
+                // If we made it this far, the update must have been a success
+                if ($update_results !== false){ $form_success = true; $form_messages[] = array('success', 'Challenge data was updated successfully!'); }
+                else { $form_success = false; $form_messages[] = array('error', 'Challenge data could not be updated...'); }
+
+            }
 
             // Update cache timestamp if changes were successful
             if ($form_success){
@@ -434,7 +505,7 @@
         <a href="admin.php">Admin Panel</a>
         &raquo; <a href="admin.php?action=edit_challenges">Edit Challenges</a>
         <? if ($sub_action == 'editor' && !empty($challenge_data)): ?>
-            &raquo; <a href="admin.php?action=edit_challenges&amp;subaction=editor&amp;challenge_id=<?= $challenge_data['challenge_id'] ?>"><?= $challenge_name_display ?></a>
+            &raquo; <a href="admin.php?action=edit_challenges&amp;subaction=editor&amp;challenge_id=<?= $challenge_data['challenge_id'] ?>"><?= !empty($challenge_name_display) ? $challenge_name_display : 'New Challenge';  ?></a>
         <? endif; ?>
     </div>
 
@@ -516,8 +587,9 @@
                     </div>
 
                     <div class="buttons">
-                        <input class="button" type="submit" value="Search" />
-                        <input class="button" type="reset" value="Reset" onclick="javascript:window.location.href='admin.php?action=edit_challenges';" />
+                        <input class="button search" type="submit" value="Search" />
+                        <input class="button reset" type="reset" value="Reset" onclick="javascript:window.location.href='admin.php?action=edit_challenges';" />
+                        <a class="button new" href="admin.php?action=edit_challenges&subaction=editor&challenge_id=0">Create New</a>
                     </div>
 
                 </form>
@@ -589,8 +661,8 @@
 
                                 $challenge_actions = '';
                                 $challenge_actions .= '<a class="link edit" href="'.$challenge_edit_url.'"><span>edit</span></a>';
-                                $challenge_actions .= '<span class="link delete disabled"><span>delete</span></span>';
-                                //$challenge_actions .= '<a class="link delete" data-delete="challenges" data-challenge-id="'.$challenge_id.'"><span>delete</span></a>';
+                                //$challenge_actions .= '<span class="link delete disabled"><span>delete</span></span>';
+                                $challenge_actions .= '<a class="link delete" data-delete="challenges" data-challenge-id="'.$challenge_id.'"><span>delete</span></a>';
 
                                 echo '<tr>'.PHP_EOL;
                                     echo '<td class="id"><div>'.$challenge_id.'</div></td>'.PHP_EOL;
@@ -624,7 +696,7 @@
 
         <?
         if ($sub_action == 'editor'
-            && !empty($_GET['challenge_id'])
+            && isset($_GET['challenge_id'])
             ){
 
             // Capture editor markup in a buffer in case we need to modify
@@ -637,337 +709,398 @@
                 <div class="editor">
 
                     <h3 class="header type_span type_<?= !empty($challenge_data['challenge_core']) ? $challenge_data['challenge_core'].(!empty($challenge_data['challenge_core2']) ? '_'.$challenge_data['challenge_core2'] : '') : 'none' ?>" data-auto="field-type" data-field-type="challenge_core,challenge_core2">
-                        <span class="title">Edit Challenge &quot;<?= $challenge_name_display ?>&quot;</span>
+                        <span class="title"><?= !empty($challenge_name_display) ? 'Edit Challenge &quot;'.$challenge_name_display.'&quot;' : 'New Challenge' ?></span>
                     </h3>
 
                     <? print_form_messages() ?>
 
-                    <div class="editor-tabs" data-tabgroup="challenge">
-                        <a class="tab active" data-tab="main">Main</a><span></span>
-                        <a class="tab" data-tab="field">Field</a><span></span>
-                        <a class="tab" data-tab="robots">Robots</a><span></span>
-                    </div>
+                    <? if (!$challenge_data_is_new){ ?>
+                        <div class="editor-tabs" data-tabgroup="challenge">
+                            <a class="tab active" data-tab="main">Main</a><span></span>
+                            <a class="tab" data-tab="field">Field</a><span></span>
+                            <a class="tab" data-tab="robots">Robots</a><span></span>
+                        </div>
+                    <? } ?>
 
                     <form class="form" method="post">
 
                         <input type="hidden" name="action" value="edit_challenges" />
                         <input type="hidden" name="subaction" value="editor" />
 
-                        <div class="editor-panels" data-tabgroup="challenge">
+                        <?
+                        // If this is a NEW challenge, display only the most basic fields
+                        if ($challenge_data_is_new){
+                            ?>
 
-                            <div class="panel active" data-tab="main">
+                                <input type="hidden" name="challenge_id" value="0" />
 
-                                <div class="field">
-                                    <strong class="label">Challenge ID</strong>
-                                    <input type="hidden" name="challenge_id" value="<?= $challenge_data['challenge_id'] ?>" />
-                                    <input class="textbox" type="text" name="challenge_id" value="<?= $challenge_data['challenge_id'] ?>" disabled="disabled" />
-                                </div>
+                                <div class="editor-panels">
 
-                                <div class="field">
-                                    <strong class="label">Challenge Kind</strong>
-                                    <select class="select" name="challenge_kind">
-                                        <option value="event" <?= $challenge_data['challenge_kind'] == 'event' ? 'selected="selected"' : '' ?>>Event Challenge</option>
-                                        <option value="user" <?= empty($challenge_data['challenge_kind']) || $challenge_data['challenge_kind'] == 'user' ? 'selected="selected"' : '' ?>>User Challenge</option>
-                                    </select><span></span>
-                                </div>
+                                    <div class="panel active">
 
-                                <div class="field">
-                                    <div class="label">
-                                        <strong>Challenge Creator</strong>
-                                        <em>leave blank for events</em>
+                                        <div class="field fullsize">
+                                            <strong class="label">Challenge Kind</strong>
+                                            <select class="select" name="challenge_kind">
+                                                <option value="" <?= empty($challenge_data['challenge_kind']) ? 'selected="selected"' : '' ?>>-</option>
+                                                <option value="event" <?= $challenge_data['challenge_kind'] == 'event' ? 'selected="selected"' : '' ?>>Event Challenge</option>
+                                                <option value="user" <?= $challenge_data['challenge_kind'] == 'user' ? 'selected="selected"' : '' ?>>User Challenge</option>
+                                            </select><span></span>
+                                        </div>
+
+                                        <div class="field fullsize">
+                                            <div class="label">
+                                                <strong>Challenge Creator</strong>
+                                                <em>leave blank for events</em>
+                                            </div>
+                                            <select class="select" name="challenge_creator">
+                                                <?= str_replace('value="'.$challenge_data['challenge_creator'].'"', 'value="'.$challenge_data['challenge_creator'].'" selected="selected"', $contributor_options_markup) ?>
+                                            </select><span></span>
+                                        </div>
+
+                                        <div class="field fullsize">
+                                            <div class="label">
+                                                <strong>Challenge Name</strong>
+                                                <em>appears on the button</em>
+                                            </div>
+                                            <input class="textbox" type="text" name="challenge_name" value="<?= $challenge_data['challenge_name'] ?>" maxlength="64" />
+                                        </div>
+
                                     </div>
-                                    <? if ($challenge_data['challenge_kind'] == 'user'){ ?>
-                                        <select class="select" name="challenge_creator">
-                                            <?= str_replace('value="'.$challenge_data['challenge_creator'].'"', 'value="'.$challenge_data['challenge_creator'].'" selected="selected"', $contributor_options_markup) ?>
-                                        </select><span></span>
-                                    <? } else { ?>
-                                        <input type="hidden" name="challenge_creator" value="<?= $challenge_data['challenge_creator'] ?>" />
-                                        <input class="textbox" type="text" name="challenge_creator" value="-" disabled="disabled" />
-                                    <? } ?>
+
                                 </div>
 
-                                <div class="field">
-                                    <div class="label">
-                                        <strong>Challenge Name</strong>
-                                        <em>appears on the button</em>
+                                <div class="formfoot">
+
+                                    <div class="buttons">
+                                        <input class="button save" type="submit" value="Create Challenge" />
                                     </div>
-                                    <input class="textbox" type="text" name="challenge_name" value="<?= $challenge_data['challenge_name'] ?>" maxlength="64" />
+
                                 </div>
 
-                                <div class="field">
-                                    <div class="label">
-                                        <strong>Robot Limit</strong>
-                                        <em>use zero for auto</em>
+                            <?
+                        }
+                        // Otherwise, display the full editor with everything available
+                        else {
+                            ?>
+
+                                <div class="editor-panels" data-tabgroup="challenge">
+
+                                    <div class="panel active" data-tab="main">
+
+                                        <div class="field">
+                                            <strong class="label">Challenge ID</strong>
+                                            <input type="hidden" name="challenge_id" value="<?= $challenge_data['challenge_id'] ?>" />
+                                            <input class="textbox" type="text" name="challenge_id" value="<?= $challenge_data['challenge_id'] ?>" disabled="disabled" />
+                                        </div>
+
+                                        <div class="field">
+                                            <strong class="label">Challenge Kind</strong>
+                                            <select class="select" name="challenge_kind">
+                                                <option value="event" <?= $challenge_data['challenge_kind'] == 'event' ? 'selected="selected"' : '' ?>>Event Challenge</option>
+                                                <option value="user" <?= empty($challenge_data['challenge_kind']) || $challenge_data['challenge_kind'] == 'user' ? 'selected="selected"' : '' ?>>User Challenge</option>
+                                            </select><span></span>
+                                        </div>
+
+                                        <div class="field">
+                                            <div class="label">
+                                                <strong>Challenge Creator</strong>
+                                                <em>leave blank for events</em>
+                                            </div>
+                                            <? if ($challenge_data['challenge_kind'] == 'user'){ ?>
+                                                <select class="select" name="challenge_creator">
+                                                    <?= str_replace('value="'.$challenge_data['challenge_creator'].'"', 'value="'.$challenge_data['challenge_creator'].'" selected="selected"', $contributor_options_markup) ?>
+                                                </select><span></span>
+                                            <? } else { ?>
+                                                <input type="hidden" name="challenge_creator" value="<?= $challenge_data['challenge_creator'] ?>" />
+                                                <input class="textbox" type="text" name="challenge_creator" value="-" disabled="disabled" />
+                                            <? } ?>
+                                        </div>
+
+                                        <div class="field">
+                                            <div class="label">
+                                                <strong>Challenge Name <?= $challenge_data_is_new ? '<span class="required" style="color: red; font-weight: bold;">*</span>' : '' ?></strong>
+                                                <em>appears on the button</em>
+                                            </div>
+                                            <input class="textbox" type="text" name="challenge_name" value="<?= $challenge_data['challenge_name'] ?>" maxlength="64" />
+                                        </div>
+
+                                        <div class="field">
+                                            <div class="label">
+                                                <strong>Robot Limit</strong>
+                                                <em>use zero for auto</em>
+                                            </div>
+                                            <input class="textbox" type="number" name="challenge_robot_limit" value="<?= $challenge_data['challenge_robot_limit'] ?>" min="0" max="8" />
+                                        </div>
+
+                                        <div class="field">
+                                            <div class="label">
+                                                <strong>Turn Limit</strong>
+                                                <em>use zero for auto</em>
+                                            </div>
+                                            <input class="textbox" type="number" name="challenge_turn_limit" value="<?= $challenge_data['challenge_turn_limit'] ?>" min="0" max="99" />
+                                        </div>
+
+                                        <div class="field fullsize">
+                                            <div class="label">
+                                                <strong>Challenge Description</strong>
+                                                <em>appears at battle start, leave blank for auto-generated</em>
+                                            </div>
+                                            <textarea class="textarea" name="challenge_description" maxlength="256" rows="3"><?= htmlentities($challenge_data['challenge_description'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                                        </div>
+
                                     </div>
-                                    <input class="textbox" type="number" name="challenge_robot_limit" value="<?= $challenge_data['challenge_robot_limit'] ?>" min="0" max="8" />
-                                </div>
 
-                                <div class="field">
-                                    <div class="label">
-                                        <strong>Turn Limit</strong>
-                                        <em>use zero for auto</em>
-                                    </div>
-                                    <input class="textbox" type="number" name="challenge_turn_limit" value="<?= $challenge_data['challenge_turn_limit'] ?>" min="0" max="99" />
-                                </div>
+                                    <div class="panel" data-tab="field">
 
-                                <div class="field fullsize">
-                                    <div class="label">
-                                        <strong>Challenge Description</strong>
-                                        <em>appears at battle start, leave blank for auto-generated</em>
-                                    </div>
-                                    <textarea class="textarea" name="challenge_description" maxlength="256" rows="3"><?= htmlentities($challenge_data['challenge_description'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
-                                </div>
-
-                            </div>
-
-                            <div class="panel active" data-tab="field">
-
-                                <?
-                                // Decode the field data so we can work with it
-                                $challenge_field_data = !empty($challenge_data['challenge_field_data']) ? json_decode($challenge_data['challenge_field_data'], true) : array();
-                                ?>
-
-                                <div class="field">
-                                    <strong class="label">Field Background</strong>
-                                    <select class="select" name="challenge_field_data[field_background]">
                                         <?
-                                        //echo('<option value=""'.(empty($challenge_field_data['field_background']) ? 'selected="selected"' : '').'>- none -</option>');
-                                        foreach ($mmrpg_fields_index AS $field_token => $field_data){
-                                            $label = $field_data['field_name'];
-                                            $label .= ' ('.(!empty($field_data['field_type']) ? ucfirst($field_data['field_type']) : 'Neutral').')';
-                                            $selected = !empty($challenge_field_data['field_background']) && $challenge_field_data['field_background'] == $field_token ? 'selected="selected"' : '';
-                                            echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                        }
+                                        // Decode the field data so we can work with it
+                                        $challenge_field_data = !empty($challenge_data['challenge_field_data']) ? $challenge_data['challenge_field_data'] : array();
+                                        if (is_string($challenge_field_data)){ $challenge_field_data = json_decode($challenge_field_data, true); }
                                         ?>
-                                    </select><span></span>
-                                </div>
 
-                                <div class="field">
-                                    <strong class="label">Field Foreground</strong>
-                                    <select class="select" name="challenge_field_data[field_foreground]">
-                                        <?
-                                        //echo('<option value=""'.(empty($challenge_field_data['field_foreground']) ? 'selected="selected"' : '').'>- none -</option>');
-                                        foreach ($mmrpg_fields_index AS $field_token => $field_data){
-                                            $label = $field_data['field_name'];
-                                            $label .= ' ('.(!empty($field_data['field_type']) ? ucfirst($field_data['field_type']) : 'Neutral').')';
-                                            $selected = !empty($challenge_field_data['field_foreground']) && $challenge_field_data['field_foreground'] == $field_token ? 'selected="selected"' : '';
-                                            echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                        }
-                                        ?>
-                                    </select><span></span>
-                                </div>
+                                        <div class="field">
+                                            <strong class="label">Field Background</strong>
+                                            <select class="select" name="challenge_field_data[field_background]">
+                                                <?
+                                                //echo('<option value=""'.(empty($challenge_field_data['field_background']) ? 'selected="selected"' : '').'>- none -</option>');
+                                                foreach ($mmrpg_fields_index AS $field_token => $field_data){
+                                                    $label = $field_data['field_name'];
+                                                    $label .= ' ('.(!empty($field_data['field_type']) ? ucfirst($field_data['field_type']) : 'Neutral').')';
+                                                    $selected = !empty($challenge_field_data['field_background']) && $challenge_field_data['field_background'] == $field_token ? 'selected="selected"' : '';
+                                                    echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                                }
+                                                ?>
+                                            </select><span></span>
+                                        </div>
 
-                                <div class="field">
-                                    <strong class="label">Field Music</strong>
-                                    <select class="select" name="challenge_field_data[field_music]">
+                                        <div class="field">
+                                            <strong class="label">Field Foreground</strong>
+                                            <select class="select" name="challenge_field_data[field_foreground]">
+                                                <?
+                                                //echo('<option value=""'.(empty($challenge_field_data['field_foreground']) ? 'selected="selected"' : '').'>- none -</option>');
+                                                foreach ($mmrpg_fields_index AS $field_token => $field_data){
+                                                    $label = $field_data['field_name'];
+                                                    $label .= ' ('.(!empty($field_data['field_type']) ? ucfirst($field_data['field_type']) : 'Neutral').')';
+                                                    $selected = !empty($challenge_field_data['field_foreground']) && $challenge_field_data['field_foreground'] == $field_token ? 'selected="selected"' : '';
+                                                    echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                                }
+                                                ?>
+                                            </select><span></span>
+                                        </div>
+
+                                        <div class="field">
+                                            <strong class="label">Field Music</strong>
+                                            <select class="select" name="challenge_field_data[field_music]">
+                                                <?
+                                                //echo('<option value=""'.(empty($challenge_field_data['field_music']) ? 'selected="selected"' : '').'>- none -</option>');
+                                                foreach ($mmrpg_fields_index AS $field_token => $field_data){
+                                                    $label = $field_data['field_name'];
+                                                    $label .= ' ('.(!empty($field_data['field_type']) ? ucfirst($field_data['field_type']) : 'Neutral').')';
+                                                    $selected = !empty($challenge_field_data['field_music']) && $challenge_field_data['field_music'] == $field_token ? 'selected="selected"' : '';
+                                                    echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                                }
+                                                ?>
+                                            </select><span></span>
+                                        </div>
+
+                                        <hr />
+
+                                        <div class="field fullsize has4cols multirow" style="min-height: 0;">
+                                            <strong class="label">Field Hazards</strong>
+                                            <? $challenge_field_hazards = !empty($challenge_field_data['values']['hazards']) ? $challenge_field_data['values']['hazards'] : array(); ?>
+                                        </div>
+                                        <div class="field fullsize has4cols multirow">
+                                            <div class="subfield">
+                                                <strong class="label sublabel">Crude Oil <em>via Oil Shooter</em></strong>
+                                                <select class="select" name="challenge_field_data[values][hazards][crude_oil]">
+                                                    <option value=""<?= empty($challenge_field_hazards['crude_oil']) ? ' selected="selected"' : '' ?>>-</option>
+                                                    <option value="both"<?= !empty($challenge_field_hazards['crude_oil']) && $challenge_field_hazards['crude_oil'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
+                                                    <option value="left"<?= !empty($challenge_field_hazards['crude_oil']) && $challenge_field_hazards['crude_oil'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
+                                                    <option value="right"<?= !empty($challenge_field_hazards['crude_oil']) && $challenge_field_hazards['crude_oil'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
+                                                </select><span></span>
+                                            </div>
+                                            <div class="subfield">
+                                                <strong class="label sublabel">Foamy Bubbles <em>via Bubble Spray</em></strong>
+                                                <select class="select" name="challenge_field_data[values][hazards][foamy_bubbles]">
+                                                    <option value=""<?= empty($challenge_field_hazards['foamy_bubbles']) ? ' selected="selected"' : '' ?>>-</option>
+                                                    <option value="both"<?= !empty($challenge_field_hazards['foamy_bubbles']) && $challenge_field_hazards['foamy_bubbles'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
+                                                    <option value="left"<?= !empty($challenge_field_hazards['foamy_bubbles']) && $challenge_field_hazards['foamy_bubbles'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
+                                                    <option value="right"<?= !empty($challenge_field_hazards['foamy_bubbles']) && $challenge_field_hazards['foamy_bubbles'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
+                                                </select><span></span>
+                                            </div>
+                                            <div class="subfield">
+                                                <strong class="label sublabel">Frozen Footholds <em>via Ice Breath</em></strong>
+                                                <select class="select" name="challenge_field_data[values][hazards][frozen_footholds]">
+                                                    <option value=""<?= empty($challenge_field_hazards['frozen_footholds']) ? ' selected="selected"' : '' ?>>-</option>
+                                                    <option value="both"<?= !empty($challenge_field_hazards['frozen_footholds']) && $challenge_field_hazards['frozen_footholds'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
+                                                    <option value="left"<?= !empty($challenge_field_hazards['frozen_footholds']) && $challenge_field_hazards['frozen_footholds'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
+                                                    <option value="right"<?= !empty($challenge_field_hazards['frozen_footholds']) && $challenge_field_hazards['frozen_footholds'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
+                                                </select><span></span>
+                                            </div>
+                                            <div class="subfield">
+                                                <strong class="label sublabel">Super Blocks <em>via Super Arm</em></strong>
+                                                <select class="select" name="challenge_field_data[values][hazards][super_blocks]">
+                                                    <option value=""<?= empty($challenge_field_hazards['super_blocks']) ? ' selected="selected"' : '' ?>>-</option>
+                                                    <option value="both"<?= !empty($challenge_field_hazards['super_blocks']) && $challenge_field_hazards['super_blocks'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
+                                                    <option value="left"<?= !empty($challenge_field_hazards['super_blocks']) && $challenge_field_hazards['super_blocks'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
+                                                    <option value="right"<?= !empty($challenge_field_hazards['super_blocks']) && $challenge_field_hazards['super_blocks'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
+                                                </select><span></span>
+                                            </div>
+                                        </div>
+                                        <div class="field fullsize has4cols multirow">
+                                            <div class="subfield">
+                                                <strong class="label sublabel">Black Holes <em>via Galaxy Bomb</em></strong>
+                                                <select class="select" name="challenge_field_data[values][hazards][black_holes]">
+                                                    <option value=""<?= empty($challenge_field_hazards['black_holes']) ? ' selected="selected"' : '' ?>>-</option>
+                                                    <option value="both"<?= !empty($challenge_field_hazards['black_holes']) && $challenge_field_hazards['black_holes'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
+                                                    <option value="left"<?= !empty($challenge_field_hazards['black_holes']) && $challenge_field_hazards['black_holes'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
+                                                    <option value="right"<?= !empty($challenge_field_hazards['black_holes']) && $challenge_field_hazards['black_holes'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
+                                                </select><span></span>
+                                            </div>
+                                            <div class="subfield">
+                                                <strong class="label sublabel">Disco Balls <em>via Disco Fever</em></strong>
+                                                <select class="select" name="challenge_field_data[values][hazards][disco_balls]">
+                                                    <option value=""<?= empty($challenge_field_hazards['disco_balls']) ? ' selected="selected"' : '' ?>>-</option>
+                                                    <option value="both"<?= !empty($challenge_field_hazards['disco_balls']) && $challenge_field_hazards['disco_balls'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
+                                                    <option value="left"<?= !empty($challenge_field_hazards['disco_balls']) && $challenge_field_hazards['disco_balls'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
+                                                    <option value="right"<?= !empty($challenge_field_hazards['disco_balls']) && $challenge_field_hazards['disco_balls'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
+                                                </select><span></span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="panel" data-tab="robots">
+
                                         <?
-                                        //echo('<option value=""'.(empty($challenge_field_data['field_music']) ? 'selected="selected"' : '').'>- none -</option>');
-                                        foreach ($mmrpg_fields_index AS $field_token => $field_data){
-                                            $label = $field_data['field_name'];
-                                            $label .= ' ('.(!empty($field_data['field_type']) ? ucfirst($field_data['field_type']) : 'Neutral').')';
-                                            $selected = !empty($challenge_field_data['field_music']) && $challenge_field_data['field_music'] == $field_token ? 'selected="selected"' : '';
-                                            echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+
+                                        // Decode the target data so we can work with it
+                                        $challenge_target_data = !empty($challenge_data['challenge_target_data']) ? $challenge_data['challenge_target_data'] : array();
+                                        if (is_string($challenge_target_data)){ $challenge_target_data = json_decode($challenge_target_data, true); }
+
+                                        // Print out the player token before the robots
+                                        $target_player_token = !empty($challenge_target_data['player_token']) ? $challenge_target_data['player_token'] : 'player';
+                                        echo('<input type="hidden" name="challenge_target_data[player_token]" value="'.$target_player_token.'" />'.PHP_EOL);
+
+                                        // Loop through and generate robot target fields
+                                        $challenge_target_robots = !empty($challenge_target_data['player_robots']) ? $challenge_target_data['player_robots'] : array();
+                                        $target_robots_count = count($challenge_target_robots);
+                                        $target_robot_slots = $target_robots_count < 8 ? $target_robots_count + 1 : $target_robots_count;
+                                        for ($robot_key = 0; $robot_key < $target_robot_slots; $robot_key++){
+
+                                            // Print horizontal rule if necessary
+                                            if ($robot_key > 0){ echo('<hr />'.PHP_EOL); }
+
+                                            // Collect the current robot data for this position
+                                            $current_robot_data = !empty($challenge_target_robots[$robot_key]) ? $challenge_target_robots[$robot_key] : array();
+                                            $current_robot_token = !empty($current_robot_data['robot_token']) ? $current_robot_data['robot_token'] : '';
+                                            $current_robot_image = !empty($current_robot_data['robot_image']) && $current_robot_data['robot_image'] != $current_robot_token ? $current_robot_data['robot_image'] : '';
+                                            $current_robot_alt = str_replace($current_robot_token.'_', '', $current_robot_image);
+                                            $current_robot_item = !empty($current_robot_data['robot_item']) ? $current_robot_data['robot_item'] : '';
+                                            $current_robot_abilities = !empty($current_robot_data['robot_abilities']) ? $current_robot_data['robot_abilities'] : array();
+
+                                            ?>
+
+
+                                            <div class="target_robot" data-key="<?= $robot_key ?>">
+                                                <div class="field fullsize has4cols multirow">
+                                                    <strong class="label">
+                                                        Target Robot #<?= ($robot_key + 1) ?>
+                                                        <em>Select a robot, an optional alt and/or item, then at least one ability</em>
+                                                    </strong>
+                                                    <div class="subfield">
+                                                        <strong class="label sublabel">Robot</strong>
+                                                        <select class="select" name="challenge_target_data[player_robots][<?= $robot_key ?>][robot_token]">
+                                                            <?= str_replace('value="'.$current_robot_token.'"', 'value="'.$current_robot_token.'" selected="selected"', $robot_options_markup) ?>
+                                                        </select><span></span>
+                                                    </div>
+                                                    <div class="subfield">
+                                                        <strong class="label sublabel">Alt</strong>
+                                                        <select class="select" name="challenge_target_data[player_robots][<?= $robot_key ?>][robot_image]">
+                                                            <option value="<?= $current_robot_alt ?>" selected="selected"><?= $current_robot_alt ?></option>
+                                                        </select><span></span>
+                                                    </div>
+                                                    <div class="subfield">
+                                                        <strong class="label sublabel">Item</strong>
+                                                        <select class="select" name="challenge_target_data[player_robots][<?= $robot_key ?>][robot_item]">
+                                                            <?= str_replace('value="'.$current_robot_item.'"', 'value="'.$current_robot_item.'" selected="selected"', $item_options_markup) ?>
+                                                        </select><span></span>
+                                                    </div>
+                                                </div>
+                                                <div class="field fullsize has4cols multirow" style="margin-top: -6px;">
+                                                    <strong class="label sublabel">Abilities</strong>
+                                                    <?
+                                                    for ($i = 0; $i < 8; $i++){
+                                                        $current_value = isset($current_robot_abilities[$i]) ? $current_robot_abilities[$i] : '';
+                                                        ?>
+                                                        <div class="subfield">
+                                                            <select class="select" name="challenge_target_data[player_robots][<?= $robot_key ?>][robot_abilities][<?= $i ?>]">
+                                                                <option value="<?= $current_value ?>" selected="selected"><?= $current_value ?></option>
+                                                                <? /* = str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $ability_options_markup) */ ?>
+                                                            </select><span></span>
+                                                        </div>
+                                                        <?
+                                                    }
+                                                    ?>
+                                                </div>
+                                            </div>
+
+                                            <?
+
+
                                         }
+
                                         ?>
-                                    </select><span></span>
+
+                                    </div>
+
                                 </div>
 
                                 <hr />
 
-                                <div class="field fullsize has4cols multirow" style="min-height: 0;">
-                                    <strong class="label">Field Hazards</strong>
-                                    <? $challenge_field_hazards = !empty($challenge_field_data['values']['hazards']) ? $challenge_field_data['values']['hazards'] : array(); ?>
-                                </div>
-                                <div class="field fullsize has4cols multirow">
-                                    <div class="subfield">
-                                        <strong class="label sublabel">Crude Oil <em>via Oil Shooter</em></strong>
-                                        <select class="select" name="challenge_field_data[values][hazards][crude_oil]">
-                                            <option value=""<?= empty($challenge_field_hazards['crude_oil']) ? ' selected="selected"' : '' ?>>-</option>
-                                            <option value="both"<?= !empty($challenge_field_hazards['crude_oil']) && $challenge_field_hazards['crude_oil'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
-                                            <option value="left"<?= !empty($challenge_field_hazards['crude_oil']) && $challenge_field_hazards['crude_oil'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
-                                            <option value="right"<?= !empty($challenge_field_hazards['crude_oil']) && $challenge_field_hazards['crude_oil'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
-                                        </select><span></span>
+                                <div class="options">
+
+                                    <div class="field checkwrap">
+                                        <label class="label">
+                                            <strong>Published</strong>
+                                            <input type="hidden" name="challenge_flag_published" value="0" checked="checked" />
+                                            <input class="checkbox" type="checkbox" name="challenge_flag_published" value="1" <?= !empty($challenge_data['challenge_flag_published']) ? 'checked="checked"' : '' ?> />
+                                        </label>
+                                        <p class="subtext">This challenge is ready to appear in the game</p>
                                     </div>
-                                    <div class="subfield">
-                                        <strong class="label sublabel">Foamy Bubbles <em>via Bubble Spray</em></strong>
-                                        <select class="select" name="challenge_field_data[values][hazards][foamy_bubbles]">
-                                            <option value=""<?= empty($challenge_field_hazards['foamy_bubbles']) ? ' selected="selected"' : '' ?>>-</option>
-                                            <option value="both"<?= !empty($challenge_field_hazards['foamy_bubbles']) && $challenge_field_hazards['foamy_bubbles'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
-                                            <option value="left"<?= !empty($challenge_field_hazards['foamy_bubbles']) && $challenge_field_hazards['foamy_bubbles'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
-                                            <option value="right"<?= !empty($challenge_field_hazards['foamy_bubbles']) && $challenge_field_hazards['foamy_bubbles'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
-                                        </select><span></span>
+
+                                    <div class="field checkwrap">
+                                        <label class="label">
+                                            <strong>Hidden</strong>
+                                            <input type="hidden" name="challenge_flag_hidden" value="0" checked="checked" />
+                                            <input class="checkbox" type="checkbox" name="challenge_flag_hidden" value="1" <?= !empty($challenge_data['challenge_flag_hidden']) ? 'checked="checked"' : '' ?> />
+                                        </label>
+                                        <p class="subtext">This challenge's data should stay hidden</p>
                                     </div>
-                                    <div class="subfield">
-                                        <strong class="label sublabel">Frozen Footholds <em>via Ice Breath</em></strong>
-                                        <select class="select" name="challenge_field_data[values][hazards][frozen_footholds]">
-                                            <option value=""<?= empty($challenge_field_hazards['frozen_footholds']) ? ' selected="selected"' : '' ?>>-</option>
-                                            <option value="both"<?= !empty($challenge_field_hazards['frozen_footholds']) && $challenge_field_hazards['frozen_footholds'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
-                                            <option value="left"<?= !empty($challenge_field_hazards['frozen_footholds']) && $challenge_field_hazards['frozen_footholds'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
-                                            <option value="right"<?= !empty($challenge_field_hazards['frozen_footholds']) && $challenge_field_hazards['frozen_footholds'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
-                                        </select><span></span>
-                                    </div>
-                                    <div class="subfield">
-                                        <strong class="label sublabel">Super Blocks <em>via Super Arm</em></strong>
-                                        <select class="select" name="challenge_field_data[values][hazards][super_blocks]">
-                                            <option value=""<?= empty($challenge_field_hazards['super_blocks']) ? ' selected="selected"' : '' ?>>-</option>
-                                            <option value="both"<?= !empty($challenge_field_hazards['super_blocks']) && $challenge_field_hazards['super_blocks'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
-                                            <option value="left"<?= !empty($challenge_field_hazards['super_blocks']) && $challenge_field_hazards['super_blocks'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
-                                            <option value="right"<?= !empty($challenge_field_hazards['super_blocks']) && $challenge_field_hazards['super_blocks'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
-                                        </select><span></span>
-                                    </div>
-                                </div>
-                                <div class="field fullsize has4cols multirow">
-                                    <div class="subfield">
-                                        <strong class="label sublabel">Black Holes <em>via Galaxy Bomb</em></strong>
-                                        <select class="select" name="challenge_field_data[values][hazards][black_holes]">
-                                            <option value=""<?= empty($challenge_field_hazards['black_holes']) ? ' selected="selected"' : '' ?>>-</option>
-                                            <option value="both"<?= !empty($challenge_field_hazards['black_holes']) && $challenge_field_hazards['black_holes'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
-                                            <option value="left"<?= !empty($challenge_field_hazards['black_holes']) && $challenge_field_hazards['black_holes'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
-                                            <option value="right"<?= !empty($challenge_field_hazards['black_holes']) && $challenge_field_hazards['black_holes'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
-                                        </select><span></span>
-                                    </div>
-                                    <div class="subfield">
-                                        <strong class="label sublabel">Disco Balls <em>via Disco Fever</em></strong>
-                                        <select class="select" name="challenge_field_data[values][hazards][disco_balls]">
-                                            <option value=""<?= empty($challenge_field_hazards['disco_balls']) ? ' selected="selected"' : '' ?>>-</option>
-                                            <option value="both"<?= !empty($challenge_field_hazards['disco_balls']) && $challenge_field_hazards['disco_balls'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
-                                            <option value="left"<?= !empty($challenge_field_hazards['disco_balls']) && $challenge_field_hazards['disco_balls'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
-                                            <option value="right"<?= !empty($challenge_field_hazards['disco_balls']) && $challenge_field_hazards['disco_balls'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
-                                        </select><span></span>
-                                    </div>
+
                                 </div>
 
-                            </div>
+                                <hr />
 
-                            <div class="panel active" data-tab="robots">
+                                <div class="formfoot">
 
-                                <?
-
-                                // Decode the target data so we can work with it
-                                $challenge_target_data = !empty($challenge_data['challenge_target_data']) ? json_decode($challenge_data['challenge_target_data'], true) : array();
-
-                                // Print out the player token before the robots
-                                $target_player_token = !empty($challenge_target_data['player_token']) ? $challenge_target_data['player_token'] : 'player';
-                                echo('<input type="hidden" name="challenge_target_data[player_token]" value="'.$target_player_token.'" />'.PHP_EOL);
-
-                                // Loop through and generate robot target fields
-                                $challenge_target_robots = !empty($challenge_target_data['player_robots']) ? $challenge_target_data['player_robots'] : array();
-                                $target_robots_count = count($challenge_target_robots);
-                                $target_robot_slots = $target_robots_count < 8 ? $target_robots_count + 1 : $target_robots_count;
-                                for ($robot_key = 0; $robot_key < $target_robot_slots; $robot_key++){
-
-                                    // Print horizontal rule if necessary
-                                    if ($robot_key > 0){ echo('<hr />'.PHP_EOL); }
-
-                                    // Collect the current robot data for this position
-                                    $current_robot_data = !empty($challenge_target_robots[$robot_key]) ? $challenge_target_robots[$robot_key] : array();
-                                    $current_robot_token = !empty($current_robot_data['robot_token']) ? $current_robot_data['robot_token'] : '';
-                                    $current_robot_image = !empty($current_robot_data['robot_image']) && $current_robot_data['robot_image'] != $current_robot_token ? $current_robot_data['robot_image'] : '';
-                                    $current_robot_alt = str_replace($current_robot_token.'_', '', $current_robot_image);
-                                    $current_robot_item = !empty($current_robot_data['robot_item']) ? $current_robot_data['robot_item'] : '';
-                                    $current_robot_abilities = !empty($current_robot_data['robot_abilities']) ? $current_robot_data['robot_abilities'] : array();
-
-                                    ?>
-
-
-                                    <div class="target_robot" data-key="<?= $robot_key ?>">
-                                        <div class="field fullsize has4cols multirow">
-                                            <strong class="label">
-                                                Target Robot #<?= ($robot_key + 1) ?>
-                                                <em>Select a robot, an optional alt and/or item, then at least one ability</em>
-                                            </strong>
-                                            <div class="subfield">
-                                                <strong class="label sublabel">Robot</strong>
-                                                <select class="select" name="challenge_target_data[player_robots][<?= $robot_key ?>][robot_token]">
-                                                    <?= str_replace('value="'.$current_robot_token.'"', 'value="'.$current_robot_token.'" selected="selected"', $robot_options_markup) ?>
-                                                </select><span></span>
-                                            </div>
-                                            <div class="subfield">
-                                                <strong class="label sublabel">Alt</strong>
-                                                <select class="select" name="challenge_target_data[player_robots][<?= $robot_key ?>][robot_image]">
-                                                    <option value="<?= $current_robot_alt ?>" selected="selected"><?= $current_robot_alt ?></option>
-                                                </select><span></span>
-                                            </div>
-                                            <div class="subfield">
-                                                <strong class="label sublabel">Item</strong>
-                                                <select class="select" name="challenge_target_data[player_robots][<?= $robot_key ?>][robot_item]">
-                                                    <?= str_replace('value="'.$current_robot_item.'"', 'value="'.$current_robot_item.'" selected="selected"', $item_options_markup) ?>
-                                                </select><span></span>
-                                            </div>
-                                        </div>
-                                        <div class="field fullsize has4cols multirow" style="margin-top: -6px;">
-                                            <strong class="label sublabel">Abilities</strong>
-                                            <?
-                                            for ($i = 0; $i < 8; $i++){
-                                                $current_value = isset($current_robot_abilities[$i]) ? $current_robot_abilities[$i] : '';
-                                                ?>
-                                                <div class="subfield">
-                                                    <select class="select" name="challenge_target_data[player_robots][<?= $robot_key ?>][robot_abilities][<?= $i ?>]">
-                                                        <option value="<?= $current_value ?>" selected="selected"><?= $current_value ?></option>
-                                                        <? /* = str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $ability_options_markup) */ ?>
-                                                    </select><span></span>
-                                                </div>
-                                                <?
-                                            }
-                                            ?>
-                                        </div>
+                                    <div class="buttons">
+                                        <input class="button save" type="submit" value="Save Changes" />
+                                        <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin.php?action=edit_challenges&subaction=editor&challenge_id=<?= $challenge_data['challenge_id'] ?>';" />
+                                        <input class="button delete" type="button" value="Delete Challenge" data-delete="challenges" data-challenge-id="<?= $challenge_data['challenge_id'] ?>" />
                                     </div>
 
-                                    <?
+                                    <div class="metadata">
+                                        <div class="date"><strong>Created</strong>: <?= !empty($challenge_data['challenge_date_created']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $challenge_data['challenge_date_created'])): '-' ?></div>
+                                        <div class="date"><strong>Modified</strong>: <?= !empty($challenge_data['challenge_date_modified']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $challenge_data['challenge_date_modified'])) : '-' ?></div>
+                                    </div>
 
+                                </div>
 
-                                }
+                            <?
+                        }
 
-                                ?>
-
-                            </div>
-
-                        </div>
-
-                        <hr />
-
-                        <div class="options">
-
-                            <div class="field checkwrap">
-                                <label class="label">
-                                    <strong>Published</strong>
-                                    <input type="hidden" name="challenge_flag_published" value="0" checked="checked" />
-                                    <input class="checkbox" type="checkbox" name="challenge_flag_published" value="1" <?= !empty($challenge_data['challenge_flag_published']) ? 'checked="checked"' : '' ?> />
-                                </label>
-                                <p class="subtext">This challenge is ready to appear in the game</p>
-                            </div>
-
-                            <div class="field checkwrap">
-                                <label class="label">
-                                    <strong>Hidden</strong>
-                                    <input type="hidden" name="challenge_flag_hidden" value="0" checked="checked" />
-                                    <input class="checkbox" type="checkbox" name="challenge_flag_hidden" value="1" <?= !empty($challenge_data['challenge_flag_hidden']) ? 'checked="checked"' : '' ?> />
-                                </label>
-                                <p class="subtext">This challenge's data should stay hidden</p>
-                            </div>
-
-                        </div>
-
-                        <hr />
-
-                        <div class="formfoot">
-
-                            <div class="buttons">
-                                <input class="button save" type="submit" value="Save Changes" />
-                                <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin.php?action=edit_challenges&subaction=editor&challenge_id=<?= $challenge_data['challenge_id'] ?>';" />
-                                <? /*
-                                <input class="button delete" type="button" value="Delete Challenge" data-delete="challenges" data-challenge-id="<?= $challenge_data['challenge_id'] ?>" />
-                                */ ?>
-                            </div>
-
-                            <? /*
-                            <div class="metadata">
-                                <div class="date"><strong>Created</strong>: <?= !empty($challenge_data['challenge_date_created']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $challenge_data['challenge_date_created'])): '-' ?></div>
-                                <div class="date"><strong>Modified</strong>: <?= !empty($challenge_data['challenge_date_modified']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $challenge_data['challenge_date_modified'])) : '-' ?></div>
-                            </div>
-                            */ ?>
-
-                        </div>
+                        ?>
 
                     </form>
 

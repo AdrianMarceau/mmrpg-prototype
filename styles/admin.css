@@ -277,6 +277,10 @@ a:hover {
     box-sizing: border-box;
 }
 
+.adminform .editor .editor-tabs.hidden {
+    display: none;
+}
+
 .adminform .editor .editor-tabs {
     padding-bottom: 0;
     margin-bottom: 20px;
@@ -984,10 +988,12 @@ input[type=file] {
     cursor: not-allowed;
 }
 
+.adminform .buttons a.button,
 .adminform .buttons input[type="button"],
 .adminform .buttons input[type="submit"],
 .adminform .buttons input[type="reset"] {
     display: inline-block;
+    vertical-align: middle;
     margin: 0 5px 0 0;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
@@ -1005,6 +1011,8 @@ input[type=file] {
     -webkit-appearance: none;
    -moz-appearance: none;
    appearance: none;
+   text-decoration: none;
+   text-align: center;
 }
 
 
@@ -1092,6 +1100,15 @@ input[type=file] {
 }
 .adminform .search .buttons .button:hover {
     background-color: #5d97b6;
+}
+
+.adminform .search .buttons .button.new {
+    float: right;
+    background-color: #479e56;
+    border-color: #41904e;
+}
+.adminform .search .buttons .button.new:hover {
+    background-color: #4aa559;
 }
 
 .adminform .login {
