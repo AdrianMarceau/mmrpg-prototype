@@ -553,29 +553,41 @@
                         <colgroup>
                             <col class="id" width="60" />
                             <col class="name" width="" />
-                            <col class="role" width="120" />
                             <col class="email" width="" />
-                            <col class="created" width="90" />
-                            <col class="modified" width="90" />
-                            <col class="actions" width="120" />
+                            <col class="role" width="100" />
+                            <col class="date created" width="90" />
+                            <col class="date modified" width="90" />
+                            <col class="actions" width="100" />
                         </colgroup>
                         <thead>
                             <tr>
                                 <th class="id"><?= cms_admin::get_sort_link('user_id', 'ID') ?></th>
                                 <th class="name"><?= cms_admin::get_sort_link('user_name_clean', 'Name') ?></th>
-                                <th class="role"><?= cms_admin::get_sort_link('role_id', 'Role') ?></th>
                                 <th class="email"><?= cms_admin::get_sort_link('user_email_address', 'Email') ?></th>
+                                <th class="role"><?= cms_admin::get_sort_link('role_id', 'Role') ?></th>
                                 <th class="date created"><?= cms_admin::get_sort_link('user_date_created', 'Created') ?></th>
                                 <th class="date modified"><?= cms_admin::get_sort_link('user_date_modified', 'Modified') ?></th>
                                 <th class="actions">Actions</th>
                             </tr>
                             <tr>
-                                <th class="head count" colspan="7"><?= cms_admin::get_totals_markup() ?></th>
+                                <th class="head id"></th>
+                                <th class="head name"></th>
+                                <th class="head email"></th>
+                                <th class="head role"></th>
+                                <th class="head date created"></th>
+                                <th class="head date modified"></th>
+                                <th class="head count"><?= cms_admin::get_totals_markup() ?></th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
-                                <td class="foot count" colspan="7"><?= cms_admin::get_totals_markup() ?></td>
+                                <td class="foot id"></td>
+                                <td class="foot name"></td>
+                                <td class="foot email"></td>
+                                <td class="foot role"></td>
+                                <td class="foot date created"></td>
+                                <td class="foot date modified"></td>
+                                <td class="foot count"><?= cms_admin::get_totals_markup() ?></td>
                             </tr>
                         </tfoot>
                         <tbody>
@@ -613,10 +625,10 @@
                                 echo '<tr>'.PHP_EOL;
                                     echo '<td class="id"><div>'.$user_id.'</div></td>'.PHP_EOL;
                                     echo '<td class="name"><div class="wrap">'.$user_name.'</div></td>'.PHP_EOL;
-                                    echo '<td class="role"><div class="wrap">'.$user_role_span.'</div></td>'.PHP_EOL;
                                     echo '<td class="email"><div class="wrap">'.$user_email.'</div></td>'.PHP_EOL;
-                                    echo '<td class="created"><div>'.$user_created.'</div></td>'.PHP_EOL;
-                                    echo '<td class="modified"><div>'.$user_modified.'</div></td>'.PHP_EOL;
+                                    echo '<td class="role"><div class="wrap">'.$user_role_span.'</div></td>'.PHP_EOL;
+                                    echo '<td class="date created"><div>'.$user_created.'</div></td>'.PHP_EOL;
+                                    echo '<td class="date modified"><div>'.$user_modified.'</div></td>'.PHP_EOL;
                                     echo '<td class="actions"><div>'.$user_actions.'</div></td>'.PHP_EOL;
                                 echo '</tr>'.PHP_EOL;
 

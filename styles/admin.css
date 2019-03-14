@@ -402,12 +402,27 @@ tr:nth-child(odd) td {
     padding: 3px 6px;
     color: #dedede;
     font-weight: normal;
+    overflow: visible;
+    position: relative;
 }
 .adminform table thead th.head.count {
     border-top: 1px solid #383838;
 }
+.adminform table thead th.head.count:before,
+.adminform table tfoot td.foot.count:before {
+    content: "\00a0";
+}
 
 
+.adminform table thead th.head.count .totals_div,
+.adminform table tfoot td.foot.count .totals_div {
+    display: block;
+    white-space: nowrap;
+    text-align: right;
+    position: absolute;
+    right: 6px;
+    top: 3px;
+}
 .adminform table thead th.head.count .total,
 .adminform table tfoot td.foot.count .total {
     color: #cacaca;

@@ -41,9 +41,11 @@ class cms_admin {
     public static function get_totals_markup(){
         global $search_results_limit, $search_results_count, $search_results_total;
         $totals_markup = '';
+        $totals_markup .= '<div class="totals_div">';
         if (!empty($search_results_limit)){ $totals_markup .= ('<span class="showing">Showing '.($search_results_count == 1 ? '1 Row' : $search_results_count.' Rows').'</span>');  }
         else {  $totals_markup .= ('<span class="showing">'.($search_results_count == 1 ? '1 Result' : $search_results_count.' Results').'</span>');  }
         if ($search_results_count != $search_results_total){ $totals_markup .= ('<span class="total">'.$search_results_total.' Total</span>'); }
+        $totals_markup .= '</div>';
         return $totals_markup;
     }
 

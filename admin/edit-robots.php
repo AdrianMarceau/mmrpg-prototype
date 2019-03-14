@@ -722,7 +722,7 @@
                             <col class="flag published" width="80" />
                             <col class="flag complete" width="75" />
                             <col class="flag hidden" width="70" />
-                            <col class="actions" width="90" />
+                            <col class="actions" width="100" />
                         </colgroup>
                         <thead>
                             <tr>
@@ -738,12 +738,30 @@
                                 <th class="actions">Actions</th>
                             </tr>
                             <tr>
-                                <th class="head count" colspan="10"><?= cms_admin::get_totals_markup() ?></th>
+                                <th class="head id"></th>
+                                <th class="head name"></th>
+                                <th class="head class"></th>
+                                <th class="head type"></th>
+                                <th class="head game"></th>
+                                <th class="head group"></th>
+                                <th class="head flag published"></th>
+                                <th class="head flag complete"></th>
+                                <th class="head flag hidden"></th>
+                                <th class="head count"><?= cms_admin::get_totals_markup() ?></th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
-                                <td class="foot count" colspan="10"><?= cms_admin::get_totals_markup() ?></td>
+                                <td class="foot id"></td>
+                                <td class="foot name"></td>
+                                <td class="foot class"></td>
+                                <td class="foot type"></td>
+                                <td class="foot game"></td>
+                                <td class="foot group"></td>
+                                <td class="foot flag published"></td>
+                                <td class="foot flag complete"></td>
+                                <td class="foot flag hidden"></td>
+                                <td class="foot count"><?= cms_admin::get_totals_markup() ?></td>
                             </tr>
                         </tfoot>
                         <tbody>

@@ -607,9 +607,9 @@
                             <col class="id" width="60" />
                             <col class="name" width="" />
                             <col class="kind" width="85" />
-                            <col class="creator" width="180" />
-                            <col class="date created" width="100" />
-                            <col class="date modified" width="100" />
+                            <col class="creator" width="160" />
+                            <col class="date created" width="90" />
+                            <col class="date modified" width="90" />
                             <col class="flag published" width="80" />
                             <col class="flag hidden" width="70" />
                             <col class="actions" width="90" />
@@ -627,12 +627,28 @@
                                 <th class="actions">Actions</th>
                             </tr>
                             <tr>
-                                <th class="head count" colspan="9"><?= cms_admin::get_totals_markup() ?></th>
+                                <th class="head id"></th>
+                                <th class="head name"></th>
+                                <th class="head kind"></th>
+                                <th class="head creator"></th>
+                                <th class="head date created"></th>
+                                <th class="head date modified"></th>
+                                <th class="head flag published"></th>
+                                <th class="head flag hidden"></th>
+                                <th class="head count"><?= cms_admin::get_totals_markup() ?></th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
-                                <td class="foot count" colspan="9"><?= cms_admin::get_totals_markup() ?></td>
+                                <td class="foot id"></td>
+                                <td class="foot name"></td>
+                                <td class="foot kind"></td>
+                                <td class="foot creator"></td>
+                                <td class="foot date created"></td>
+                                <td class="foot date modified"></td>
+                                <td class="foot flag published"></td>
+                                <td class="foot flag hidden"></td>
+                                <td class="foot count"><?= cms_admin::get_totals_markup() ?></td>
                             </tr>
                         </tfoot>
                         <tbody>
