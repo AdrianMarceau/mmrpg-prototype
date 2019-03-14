@@ -172,6 +172,7 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
             elseif (in_array($item_token, $items_unlocked)){ continue; }
             elseif (empty($item_quantity)){ continue; }
             elseif (strstr($item_token, '-screw')){ continue; }
+            elseif (strstr($item_token, '-shard')){ continue; }
             $item_info = $mmrpg_items[$item_token];
             if (!$item_info['item_flag_complete']){ continue; }
             elseif ($item_info['item_flag_hidden']){ continue; }
