@@ -840,10 +840,10 @@ $chapter_unlock_popup_index[] = array('chapter_key' => '3', 'chapter_token' => '
 $chapter_unlock_popup_index[] = array('chapter_key' => '4a', 'chapter_token' => 'chapter-5', 'chapter_name' => 'Chapter 5', 'chapter_subname' => 'Chapter Five : The Final Battles', 'chapter_is_endgame' => true);
 
 // Post-Game Chapters
+$chapter_unlock_popup_index[] = array('chapter_key' => '6', 'chapter_token' => 'chapter-random', 'chapter_name' => 'Random', 'chapter_subname' => 'Bonus Chapter : Mission Randomizer', 'chapter_is_bonus' => true);
 $chapter_unlock_popup_index[] = array('chapter_key' => '7', 'chapter_token' => 'chapter-stars', 'chapter_name' => 'Stars', 'chapter_subname' => 'Bonus Chapter : Star Fields', 'chapter_is_bonus' => true);
 $chapter_unlock_popup_index[] = array('chapter_key' => '5', 'chapter_token' => 'chapter-players', 'chapter_name' => 'Players', 'chapter_subname' => 'Bonus Chapter : Player Battles', 'chapter_is_bonus' => true);
 $chapter_unlock_popup_index[] = array('chapter_key' => '8', 'chapter_token' => 'chapter-challenges', 'chapter_name' => 'Challenges', 'chapter_subname' => 'Bonus Chapter : Challenge Mode', 'chapter_is_bonus' => true);
-$chapter_unlock_popup_index[] = array('chapter_key' => '6', 'chapter_token' => 'chapter-random', 'chapter_name' => 'Random', 'chapter_subname' => 'Bonus Chapter : Mission Randomizer', 'chapter_is_bonus' => true);
 
 // Loop through and display chapter unlock messages where relevant
 foreach ($chapter_unlock_popup_index AS $key => $chapter_info){
