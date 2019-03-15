@@ -28,7 +28,7 @@ ob_start();
 
 	// Display the option for RESTART MUSIC
 	$block_num++;
-	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" onclick="parent.mmrpg_music_load(\'fields/'.$this_field->field_music.'/battle-field_background_music\', true);"><label><span class="multi">Restart<br />Music</span></label></a>';
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" onclick="parent.mmrpg_music_load(\''.(!strstr($this_field->field_music, '/') ? 'fields/'.$this_field->field_music : $this_field->field_music).'\', true);"><label><span class="multi">Restart<br />Music</span></label></a>';
 
 	// Display the option for DEBUG MODE
 	$block_num++;
