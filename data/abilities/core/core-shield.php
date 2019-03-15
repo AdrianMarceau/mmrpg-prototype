@@ -17,8 +17,12 @@ $ability = array(
         extract($objects);
 
         // Collect or define the current "target" of this ability
-        if ($target_robot->robot_id != $this_robot->robot_id){ $current_target_robot = $target_robot; }
-        else { $current_target_robot = $this_robot; }
+        if ($target_robot->player->player_id == $this_robot->player->player_id
+            && $target_robot->robot_id != $this_robot->robot_id){
+            $current_target_robot = $target_robot;
+        } else {
+            $current_target_robot = $this_robot;
+        }
 
         // Define the base values for the attachment
         $base_attachment_duration = 9;
