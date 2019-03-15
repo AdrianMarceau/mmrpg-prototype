@@ -22,7 +22,7 @@
 
     // Collect an index of challenge colours for options
     $mmrpg_abilities_fields = rpg_ability::get_index_fields(true);
-    $mmrpg_abilities_index = $db->get_array_list("SELECT {$mmrpg_abilities_fields} FROM mmrpg_index_abilities WHERE ability_token <> 'ability' AND ability_class <> 'system' AND ability_flag_published = 1 AND ability_flag_complete = 1 ORDER BY FIELD(ability_class, 'master', 'mecha', 'boss'), ability_name ASC, ability_order ASC", 'ability_token');
+    $mmrpg_abilities_index = $db->get_array_list("SELECT {$mmrpg_abilities_fields} FROM mmrpg_index_abilities WHERE ability_token <> 'ability' AND ability_class <> 'system' AND ability_flag_published = 1 AND ability_flag_complete = 1 AND ability_flag_hidden = 0 ORDER BY FIELD(ability_class, 'master', 'mecha', 'boss'), ability_name ASC, ability_order ASC", 'ability_token');
 
     // Collect an index of challenge colours for options
     $mmrpg_items_fields = rpg_item::get_index_fields(true);
@@ -101,13 +101,28 @@
     $ability_options_markup = implode(PHP_EOL, $ability_options_markup);
 
     // Pre-generate a list of all items so we can re-use it over and over
+    $item_options_count = 0;
     $item_options_markup = array();
     $item_options_markup[] = '<option value="">-</option>';
+    $item_options_group = '';
     foreach ($mmrpg_items_index AS $item_token => $item_info){
-        $item_name = $item_info['item_name'];
-        $item_options_markup[] = '<option value="'.$item_token.'">'.$item_name.'</option>';
+        $item_label = $item_info['item_name'];
+        if (strstr($item_token, '-core')){ $item_group = 'Elemental Cores'; }
+        elseif (strstr($item_token, '-upgrade')){ $item_group = 'Upgrade Parts'; }
+        elseif (strstr($item_token, '-booster')){ $item_group = 'Booster Parts'; }
+        elseif (strstr($item_token, '-module')){ $item_group = 'Module Parts'; }
+        elseif (strstr($item_token, '-circuit')){ $item_group = 'Circuit Parts'; }
+        elseif ($item_token == 'extra-life' || $item_token == 'yashichi'){ $item_group = 'Restorative Items'; }
+        elseif (preg_match('/^(energy|weapon)-(pellet|capsule|tank)$/i', $item_token)){ $item_group = 'Restorative Items'; }
+        elseif (preg_match('/^(attack|defense|speed|super)-(pellet|capsule)$/i', $item_token)){ $item_group = 'Boosting Items'; }
+        if ($item_group != $item_options_group){
+            if (!empty($item_options_group)){ $item_options_markup[] = '</optgroup>'; }
+            $item_options_markup[] = '<optgroup label="'.$item_group.'">';
+            $item_options_group = $item_group;
+        }
+        $item_options_markup[] = '<option value="'.$item_token.'">'.$item_label.'</option>';
+        $item_options_count++;
     }
-    $item_options_count = count($item_options_markup);
     $item_options_markup = implode(PHP_EOL, $item_options_markup);
 
     // Pre-generate a list of all contributors so we can re-use it over and over
