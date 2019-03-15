@@ -10,7 +10,10 @@
 
     // Collect an index of battle fields for options
     $mmrpg_fields_fields = rpg_field::get_index_fields(true);
-    $mmrpg_fields_index = $db->get_array_list("SELECT {$mmrpg_fields_fields} FROM mmrpg_index_fields WHERE field_token <> 'field' AND field_flag_published = 1  AND field_flag_complete = 1 ORDER BY field_order ASC", 'field_token');
+    $mmrpg_fields_index = $db->get_array_list("SELECT {$mmrpg_fields_fields} FROM mmrpg_index_fields WHERE field_token <> 'field' AND field_flag_published = 1  AND field_flag_complete = 1 ORDER BY FIELD(field_token, 'intro-field') DESC, FIELD(field_game, 'MMRPG', 'MM00') DESC, field_game ASC, field_order ASC", 'field_token');
+
+    // Collect an index of music tracks for options
+    $mmrpg_music_index = $db->get_array_list("SELECT music_id, music_token, music_album, music_game, music_name FROM mmrpg_index_music ORDER BY music_game ASC, music_order ASC, music_token ASC;", 'music_id');
 
     // Collect an index of player colours for options
     $mmrpg_players_fields = rpg_player::get_index_fields(true);
@@ -79,6 +82,48 @@
     }
     if (!empty($robot_options_group)){ $robot_options_markup[] = '</optgroup>'; }
     $robot_options_markup = implode(PHP_EOL, $robot_options_markup);
+
+    // Pre-generate a list of all fields so we can re-use it over and over
+    $field_options_count = 0;
+    $field_options_group = '';
+    $field_options_markup = array();
+    $field_options_markup[] = '<option value="">-</option>';
+    foreach ($mmrpg_fields_index AS $field_token => $field_info){
+        $game_to_cateory = strstr($field_info['field_game'], 'MMRPG') || strstr($field_info['field_game'], 'MM00') ? 'Misc' : ucfirst($field_info['field_game']);
+        if ($game_to_cateory != $field_options_group){
+            if (!empty($field_options_group)){ $field_options_markup[] = '</optgroup>'; }
+            $field_options_group = $game_to_cateory;
+            $field_options_markup[] = '<optgroup label="'.ucfirst($game_to_cateory).' Fields">';
+        }
+        $field_name = $field_info['field_name'];
+        $field_types = ucwords(implode(' / ', array_values(array_filter(array($field_info['field_type'], $field_info['field_type2'])))));
+        if (empty($field_types)){ $field_types = 'Neutral'; }
+        $field_options_markup[] = '<option value="'.$field_token.'">'.$field_name.' ('.$field_types.')</option>';
+        $field_options_count++;
+    }
+    if (!empty($field_options_group)){ $field_options_markup[] = '</optgroup>'; }
+    $field_options_markup = implode(PHP_EOL, $field_options_markup);
+
+    // Pre-generate a list of all fields so we can re-use it over and over
+    $music_options_count = 0;
+    $music_options_group = '';
+    $music_options_markup = array();
+    $music_options_markup[] = '<option value="">-</option>';
+    foreach ($mmrpg_music_index AS $music_id => $music_info){
+        $music_path = $music_info['music_album'].'/'.$music_info['music_token'];
+        if (!file_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path.'/')){ continue; }
+        $music_group = $music_info['music_game'] == 'MM085' ? 'MM&B' : $music_info['music_game'];
+        if ($music_group != $music_options_group){
+            if (!empty($music_options_group)){ $music_options_markup[] = '</optgroup>'; }
+            $music_options_group = $music_group;
+            $music_options_markup[] = '<optgroup label="'.ucfirst($music_group).' Music">';
+        }
+        $music_name = $music_info['music_name'];
+        $music_options_markup[] = '<option value="'.$music_path.'">'.$music_name.'</option>';
+        $music_options_count++;
+    }
+    if (!empty($music_options_group)){ $music_options_markup[] = '</optgroup>'; }
+    $music_options_markup = implode(PHP_EOL, $music_options_markup);
 
     // Pre-generate a list of all abilities so we can re-use it over and over
     $ability_options_count = 0;
@@ -892,45 +937,21 @@
                                         <div class="field">
                                             <strong class="label">Field Background</strong>
                                             <select class="select" name="challenge_field_data[field_background]">
-                                                <?
-                                                //echo('<option value=""'.(empty($challenge_field_data['field_background']) ? 'selected="selected"' : '').'>- none -</option>');
-                                                foreach ($mmrpg_fields_index AS $field_token => $field_data){
-                                                    $label = $field_data['field_name'];
-                                                    $label .= ' ('.(!empty($field_data['field_type']) ? ucfirst($field_data['field_type']) : 'Neutral').')';
-                                                    $selected = !empty($challenge_field_data['field_background']) && $challenge_field_data['field_background'] == $field_token ? 'selected="selected"' : '';
-                                                    echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                                }
-                                                ?>
+                                                <?= str_replace('value="'.$challenge_field_data['field_background'].'"', 'value="'.$challenge_field_data['field_background'].'" selected="selected"', $field_options_markup) ?>
                                             </select><span></span>
                                         </div>
 
                                         <div class="field">
                                             <strong class="label">Field Foreground</strong>
                                             <select class="select" name="challenge_field_data[field_foreground]">
-                                                <?
-                                                //echo('<option value=""'.(empty($challenge_field_data['field_foreground']) ? 'selected="selected"' : '').'>- none -</option>');
-                                                foreach ($mmrpg_fields_index AS $field_token => $field_data){
-                                                    $label = $field_data['field_name'];
-                                                    $label .= ' ('.(!empty($field_data['field_type']) ? ucfirst($field_data['field_type']) : 'Neutral').')';
-                                                    $selected = !empty($challenge_field_data['field_foreground']) && $challenge_field_data['field_foreground'] == $field_token ? 'selected="selected"' : '';
-                                                    echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                                }
-                                                ?>
+                                                <?= str_replace('value="'.$challenge_field_data['field_foreground'].'"', 'value="'.$challenge_field_data['field_foreground'].'" selected="selected"', $field_options_markup) ?>
                                             </select><span></span>
                                         </div>
 
                                         <div class="field">
                                             <strong class="label">Field Music</strong>
                                             <select class="select" name="challenge_field_data[field_music]">
-                                                <?
-                                                //echo('<option value=""'.(empty($challenge_field_data['field_music']) ? 'selected="selected"' : '').'>- none -</option>');
-                                                foreach ($mmrpg_fields_index AS $field_token => $field_data){
-                                                    $label = $field_data['field_name'];
-                                                    $label .= ' ('.(!empty($field_data['field_type']) ? ucfirst($field_data['field_type']) : 'Neutral').')';
-                                                    $selected = !empty($challenge_field_data['field_music']) && $challenge_field_data['field_music'] == $field_token ? 'selected="selected"' : '';
-                                                    echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                                }
-                                                ?>
+                                                <?= str_replace('value="'.$challenge_field_data['field_music'].'"', 'value="'.$challenge_field_data['field_music'].'" selected="selected"', $music_options_markup) ?>
                                             </select><span></span>
                                         </div>
 

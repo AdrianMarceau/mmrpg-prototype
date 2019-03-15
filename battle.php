@@ -179,7 +179,7 @@ gameSettings.wapFlag = <?= $flag_wap ? 'true' : 'false' ?>;
 gameSettings.eventTimeout = <?= $flag_wap ? 700 : 900 ?>;
 gameSettings.cacheTime = '<?=MMRPG_CONFIG_CACHE_DATE?>';
 gameSettings.idleAnimation = <?= $debug_flag_animation ? 'true' : 'false' ?>;
-gameSettings.fieldMusic = 'fields/<?=$this_field_data['field_music']?>';
+gameSettings.fieldMusic = '<?= !strstr($this_field_data['field_music'], '/') ? 'fields/'.$this_field_data['field_music'] : $this_field_data['field_music'] ?>';
 //gameSettings.eventCrossFade = true;
 <?
 // Update the event timeout setting if set
