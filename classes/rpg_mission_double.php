@@ -503,6 +503,23 @@ class rpg_mission_double extends rpg_mission {
 
             );
 
+        // If this is a starfield mission, we might be able to CUSTOMIZE THE MUSIC
+        if ($starfield_mission){
+            //$temp_battle_omega['battle_description2'] .= '| testing ';
+            $trobots = array_values($temp_battle_omega['battle_target_player']['player_robots']);
+            if (!empty($trobots)){
+                $atoken = 'sega-remix';
+                $rtoken = $trobots[0]['robot_token'];
+                $gtoken = strtolower($this_robot_index[$rtoken]['robot_game']);
+                $music_path = $atoken.'/'.$rtoken.'-'.$gtoken.'/';
+                //$temp_battle_omega['battle_description2'] .= '| maybe music:'.$music_path.' ';
+                if (file_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
+                    $temp_battle_omega['battle_field_base']['field_music'] = $music_path;
+                }
+            }
+            //$temp_battle_omega['battle_description2'] .= '| final music:'.$temp_battle_omega['battle_field_base']['field_music'].' ';
+        }
+
         // Return the generated battle data
         return $temp_battle_omega;
 
