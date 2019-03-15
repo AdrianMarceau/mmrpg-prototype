@@ -64,6 +64,7 @@
         $search_data['user_name'] = !empty($_GET['user_name']) && preg_match('/[-_0-9a-z\.\*]+/i', $_GET['user_name']) ? trim(strtolower($_GET['user_name'])) : '';
         $search_data['user_email'] = !empty($_GET['user_email']) && preg_match('/[-_0-9a-z\.@\*]+/i', $_GET['user_email']) ? trim(strtolower($_GET['user_email'])) : '';
         $search_data['user_gender'] = !empty($_GET['user_gender']) && preg_match('/[a-z]+/i', $_GET['user_gender']) ? trim(strtolower($_GET['user_gender'])) : '';
+        $search_data['user_ip'] = !empty($_GET['user_ip']) && preg_match('/[0-9\.\*]+/i', $_GET['user_ip']) ? trim(strtolower($_GET['user_ip'])) : '';
         $search_data['user_flag_approved'] = isset($_GET['user_flag_approved']) && $_GET['user_flag_approved'] !== '' ? (!empty($_GET['user_flag_approved']) ? 1 : 0) : '';
         $search_data['user_flag_postpublic'] = isset($_GET['user_flag_postpublic']) && $_GET['user_flag_postpublic'] !== '' ? (!empty($_GET['user_flag_postpublic']) ? 1 : 0) : '';
         $search_data['user_flag_postprivate'] = isset($_GET['user_flag_postprivate']) && $_GET['user_flag_postprivate'] !== '' ? (!empty($_GET['user_flag_postprivate']) ? 1 : 0) : '';
@@ -132,6 +133,16 @@
         if (!empty($search_data['user_gender'])){
             $user_gender = $search_data['user_gender'];
             $search_query .= "AND user_gender = '{$user_gender}' ";
+            $search_results_limit = false;
+        }
+
+        // Else if the user IP address was provided, we can use wildcards
+        if (!empty($search_data['user_ip'])){
+            $user_ip = $search_data['user_ip'];
+            $user_ip = str_replace(array(' ', '*', '%'), '%', $user_ip);
+            $user_ip = preg_replace('/%+/', '%', $user_ip);
+            $user_ip = '%'.$user_ip.'%';
+            $search_query .= "AND user_ip_addresses LIKE '{$user_ip}' ";
             $search_results_limit = false;
         }
 
@@ -508,6 +519,11 @@
                             <option value="male" <?= $search_data['user_gender'] == 'male' ? 'selected="selected"' : '' ?>>Male</option>
                             <option value="female" <?= $search_data['user_gender'] == 'female' ? 'selected="selected"' : '' ?>>Female</option>
                         </select><span></span>
+                    </div>
+
+                    <div class="field foursize">
+                        <strong class="label">By IP Address</strong>
+                        <input class="textbox" type="text" name="user_ip" value="<?= !empty($search_data['user_ip']) ? htmlentities($search_data['user_ip'], ENT_QUOTES, 'UTF-8', true) : '' ?>" />
                     </div>
 
                     <div class="field halfsize has3cols flags">

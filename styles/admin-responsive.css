@@ -238,7 +238,7 @@ body:before {
         padding-right: 3px;
     }
     .adminform .search .field .subfield .label {
-        font-size: 11px;
+
     }
     .adminform .results .list .id {
 
@@ -255,8 +255,17 @@ body:before {
 
     .adminform .field,
     .adminform .field.foursize,
-    .adminform .field.halfsize {
+    .adminform .field.halfsize,
+    .adminform .search .field .subfield {
         width: 100%;
+        margin-right: auto;
+        padding-right: 0;
+    }
+    .adminform .search .field.flags {
+        margin: 5px auto 15px;
+    }
+    .adminform .search .field.flags .subfield {
+        margin-bottom: 6px;
     }
     .adminform .field.has4cols input[type="text"],
     .adminform .field.has4cols input[type="number"],
