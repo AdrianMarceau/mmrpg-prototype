@@ -22,7 +22,7 @@
 
     // Collect an index of challenge colours for options
     $mmrpg_abilities_fields = rpg_ability::get_index_fields(true);
-    $mmrpg_abilities_index = $db->get_array_list("SELECT {$mmrpg_abilities_fields} FROM mmrpg_index_abilities WHERE ability_token <> 'ability' AND ability_class <> 'system' AND ability_flag_published = 1 AND ability_flag_complete = 1 AND ability_flag_hidden = 0 ORDER BY FIELD(ability_class, 'master', 'mecha', 'boss'), ability_name ASC, ability_order ASC", 'ability_token');
+    $mmrpg_abilities_index = $db->get_array_list("SELECT {$mmrpg_abilities_fields} FROM mmrpg_index_abilities WHERE ability_token <> 'ability' AND ability_class <> 'system' AND ability_flag_published = 1 AND ability_flag_complete = 1 ORDER BY FIELD(ability_class, 'master', 'mecha', 'boss'), ability_name ASC, ability_order ASC", 'ability_token');
 
     // Collect an index of challenge colours for options
     $mmrpg_items_fields = rpg_item::get_index_fields(true);
