@@ -573,7 +573,7 @@ class rpg_ability_recovery extends rpg_recovery {
             }
 
             // Only apply attachment modifiers if allowed to and not referred
-            if ($trigger_options['apply_modifiers'] != false && $trigger_options['referred_recovery'] == false){
+            if ($trigger_options['apply_modifiers'] != false){
 
                 // If this robot has an attachment with a recovery multiplier
                 $this_robot_attachments = $this_robot->get_current_attachments();

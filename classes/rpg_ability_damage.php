@@ -580,7 +580,7 @@ class rpg_ability_damage extends rpg_damage {
             }
 
             // Only apply attachment modifiers if allowed to and not referred
-            if ($trigger_options['apply_modifiers'] != false && $trigger_options['referred_damage'] == false){
+            if ($trigger_options['apply_modifiers'] != false){
 
                 // If this robot has an attachment with a damage multiplier
                 $this_robot_attachments = $this_robot->get_current_attachments();
