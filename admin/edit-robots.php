@@ -145,6 +145,7 @@
         $search_data['robot_flag_hidden'] = isset($_GET['robot_flag_hidden']) && $_GET['robot_flag_hidden'] !== '' ? (!empty($_GET['robot_flag_hidden']) ? 1 : 0) : '';
         $search_data['robot_flag_complete'] = isset($_GET['robot_flag_complete']) && $_GET['robot_flag_complete'] !== '' ? (!empty($_GET['robot_flag_complete']) ? 1 : 0) : '';
         $search_data['robot_flag_unlockable'] = isset($_GET['robot_flag_unlockable']) && $_GET['robot_flag_unlockable'] !== '' ? (!empty($_GET['robot_flag_unlockable']) ? 1 : 0) : '';
+        $search_data['robot_flag_exclusive'] = isset($_GET['robot_flag_exclusive']) && $_GET['robot_flag_exclusive'] !== '' ? (!empty($_GET['robot_flag_exclusive']) ? 1 : 0) : '';
         $search_data['robot_flag_published'] = isset($_GET['robot_flag_published']) && $_GET['robot_flag_published'] !== '' ? (!empty($_GET['robot_flag_published']) ? 1 : 0) : '';
 
         /* -- Collect Search Results -- */
@@ -233,6 +234,12 @@
         // If the robot unlockable flag was provided
         if ($search_data['robot_flag_unlockable'] !== ''){
             $search_query .= "AND robot_flag_unlockable = {$search_data['robot_flag_unlockable']} ";
+            $search_results_limit = false;
+        }
+
+        // If the robot exclusive flag was provided
+        if ($search_data['robot_flag_exclusive'] !== ''){
+            $search_query .= "AND robot_flag_exclusive = {$search_data['robot_flag_exclusive']} ";
             $search_results_limit = false;
         }
 
@@ -365,6 +372,7 @@
             $form_data['robot_flag_hidden'] = isset($_POST['robot_flag_hidden']) && is_numeric($_POST['robot_flag_hidden']) ? (int)(trim($_POST['robot_flag_hidden'])) : 0;
 
             $form_data['robot_flag_unlockable'] = isset($_POST['robot_flag_unlockable']) && is_numeric($_POST['robot_flag_unlockable']) ? (int)(trim($_POST['robot_flag_unlockable'])) : 0;
+            $form_data['robot_flag_exclusive'] = isset($_POST['robot_flag_exclusive']) && is_numeric($_POST['robot_flag_exclusive']) ? (int)(trim($_POST['robot_flag_exclusive'])) : 0;
 
             if ($form_data['robot_core'] != 'copy'){
                 $form_data['robot_image_alts'] = !empty($_POST['robot_image_alts']) && is_array($_POST['robot_image_alts']) ? array_filter($_POST['robot_image_alts']) : array();
@@ -671,12 +679,13 @@
                         </select><span></span>
                     </div>
 
-                    <div class="field fullsize has4cols flags">
+                    <div class="field fullsize has3cols flags">
                     <?
                     $flag_names = array(
                         'published' => array('icon' => 'fas fa-check-square', 'yes' => 'Published', 'no' => 'Unpublished'),
                         'complete' => array('icon' => 'fas fa-check-circle', 'yes' => 'Complete', 'no' => 'Incomplete'),
                         'unlockable' => array('icon' => 'fas fa-unlock', 'yes' => 'Unlockable', 'no' => 'Locked'),
+                        'exclusive' => array('icon' => 'fas fa-ghost', 'yes' => 'Exclusive', 'no' => 'Standard'),
                         'hidden' => array('icon' => 'fas fa-eye-slash', 'yes' => 'Hidden', 'no' => 'Visible')
                         );
                     foreach ($flag_names AS $flag_token => $flag_info){
@@ -1703,14 +1712,29 @@
                             <? if (!empty($robot_data['robot_flag_published'])
                                 && !empty($robot_data['robot_flag_complete'])
                                 && $robot_data['robot_class'] == 'master'){ ?>
-                                <div class="field checkwrap">
-                                    <label class="label">
-                                        <strong>Unlockable</strong>
-                                        <input type="hidden" name="robot_flag_unlockable" value="0" checked="checked" />
-                                        <input class="checkbox" type="checkbox" name="robot_flag_unlockable" value="1" <?= !empty($robot_data['robot_flag_unlockable']) ? 'checked="checked"' : '' ?> />
-                                    </label>
-                                    <p class="subtext">This robot is ready to be used in the game</p>
+
+                                <div style="clear: both; padding-top: 20px;">
+
+                                    <div class="field checkwrap">
+                                        <label class="label">
+                                            <strong>Unlockable</strong>
+                                            <input type="hidden" name="robot_flag_unlockable" value="0" checked="checked" />
+                                            <input class="checkbox" type="checkbox" name="robot_flag_unlockable" value="1" <?= !empty($robot_data['robot_flag_unlockable']) ? 'checked="checked"' : '' ?> />
+                                        </label>
+                                        <p class="subtext">This robot is ready to be used in the game</p>
+                                    </div>
+
+                                    <div class="field checkwrap">
+                                        <label class="label">
+                                            <strong>Exclusive</strong>
+                                            <input type="hidden" name="robot_flag_exclusive" value="0" checked="checked" />
+                                            <input class="checkbox" type="checkbox" name="robot_flag_exclusive" value="1" <?= !empty($robot_data['robot_flag_exclusive']) ? 'checked="checked"' : '' ?> />
+                                        </label>
+                                        <p class="subtext">Exclude from shop &amp; procedural missions</p>
+                                    </div>
+
                                 </div>
+
                             <? } ?>
 
                         </div>
