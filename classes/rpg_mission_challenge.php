@@ -60,7 +60,10 @@ class rpg_mission_challenge extends rpg_mission {
     public static function parse_mission($this_prototype_data, $challenge_data){
 
         // Collect a field index for reference later
-        $mmrpg_index_fields = rpg_field::get_index();
+        static $mmrpg_index_fields;
+        static $mmrpg_index_robots;
+        if (empty($mmrpg_index_fields)){ $mmrpg_index_fields = rpg_field::get_index(); }
+        if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = rpg_robot::get_index(); }
 
         // Define any bonus stats applied to these robots
         $challenge_robot_token = 100;
@@ -182,9 +185,25 @@ class rpg_mission_challenge extends rpg_mission {
             $challenge_battle_rewards['robots'] = array();
             foreach ($challenge_target_player['player_robots'] AS $key => $robot){
                 if (!empty($robot['robot_image'])){ continue; }
+                $rtoken = $robot['robot_token'];
+                if (!isset($mmrpg_index_robots[$rtoken])){ continue; }
+                $rindex = $mmrpg_index_robots[$rtoken];
+                if (empty($rindex['robot_flag_published'])){ continue; }
+                elseif (empty($rindex['robot_flag_complete'])){ continue; }
+                elseif (empty($rindex['robot_flag_unlockable'])){ continue; }
+                elseif ($rindex['robot_class'] != 'master'){ continue; }
                 $challenge_battle_rewards['robots'][] = array('token' => $robot['robot_token'], 'level' => 99);
             }
         }
+
+        // Define the marker type for this challenge
+        $challenge_marker_type = 'base';
+        if ($challenge_data['challenge_kind'] == 'event'){ $challenge_marker_type = 'gold'; }
+
+        // Increase the reward zenny if this is a bronze, silver, or gold challenge
+        if ($challenge_marker_type == 'bronze'){ $challenge_reward_zenny += ($challenge_reward_zenny * 1); }
+        if ($challenge_marker_type == 'silver'){ $challenge_reward_zenny += ($challenge_reward_zenny * 2); }
+        if ($challenge_marker_type == 'gold'){ $challenge_reward_zenny += ($challenge_reward_zenny * 3); }
 
         // Define and battle flag, values, or counters we need to
         $challenge_flags = array();
@@ -194,7 +213,7 @@ class rpg_mission_challenge extends rpg_mission {
         $challenge_values['challenge_battle_kind'] = $challenge_data['challenge_kind'];
         $challenge_values['challenge_battle_by'] = $challenge_data['challenge_creator_name'];
         //$challenge_values['challenge_marker'] = 'glass';
-        $challenge_values['challenge_marker'] = $challenge_data['challenge_kind'] == 'event' ? 'gold' : 'base';
+        $challenge_values['challenge_marker'] = $challenge_marker_type;
 
         // Pull event mission data from the database
         $temp_battle_omega = array(
