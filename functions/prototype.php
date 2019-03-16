@@ -1292,7 +1292,13 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                         $zenny = str_replace('Zenny', 'Zs', $this_option_zenny_amount);
                         $this_option_label .= '<span class="subtext">'.$robots.' | '.$turns.' | '.$zenny.'</span>';
                         if ($is_player_battle){ $this_option_label .= '<span class="subtext2">At '.$this_fieldinfo['field_name'].'</span>'; }
-                        elseif ($is_challenge_battle){ $this_option_label .= '<span class="subtext2">By '.ucwords($this_battleinfo['values']['challenge_battle_by']).'</span>'; }
+                        elseif ($is_challenge_battle){
+                            if ($this_battleinfo['values']['challenge_battle_kind'] == 'user'){
+                                $this_option_label .= '<span class="subtext2">By '.ucwords($this_battleinfo['values']['challenge_battle_by']).'</span>';
+                            } elseif ($this_battleinfo['values']['challenge_battle_kind'] == 'event'){
+                                $this_option_label .= '<span class="subtext2">Special Event Mission</span>';
+                            }
+                        }
                     } else {
                         $this_option_label .= '<span class="subtext">'.$this_option_level_range.'</span>';
                         $this_option_label .= '<span class="subtext2">'.$this_option_zenny_amount.'</span>';

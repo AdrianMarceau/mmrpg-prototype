@@ -176,14 +176,25 @@ class rpg_mission_challenge extends rpg_mission {
             $challenge_description2 = 'Good luck and have fun!';
         }
 
+        // Define the battle rewards based on above data
+        $challenge_battle_rewards = array();
+        if ($challenge_data['challenge_kind'] == 'event'){
+            $challenge_battle_rewards['robots'] = array();
+            foreach ($challenge_target_player['player_robots'] AS $key => $robot){
+                if (!empty($robot['robot_image'])){ continue; }
+                $challenge_battle_rewards['robots'][] = array('token' => $robot['robot_token'], 'level' => 99);
+            }
+        }
+
         // Define and battle flag, values, or counters we need to
         $challenge_flags = array();
         $challenge_values = array();
         $challenge_counters = array();
         $challenge_flags['challenge_battle'] = true;
+        $challenge_values['challenge_battle_kind'] = $challenge_data['challenge_kind'];
         $challenge_values['challenge_battle_by'] = $challenge_data['challenge_creator_name'];
         //$challenge_values['challenge_marker'] = 'glass';
-        $challenge_values['challenge_marker'] = 'base';
+        $challenge_values['challenge_marker'] = $challenge_data['challenge_kind'] == 'event' ? 'gold' : 'base';
 
         // Pull event mission data from the database
         $temp_battle_omega = array(
@@ -202,6 +213,7 @@ class rpg_mission_challenge extends rpg_mission {
             'battle_target_player' => $challenge_target_player,
             'battle_zenny' => $challenge_reward_zenny,
             'battle_turns' => $challenge_allowed_turns,
+            'battle_rewards' => $challenge_battle_rewards,
             'flags' => $challenge_flags,
             'values' => $challenge_values,
             'counters' => $challenge_counters
