@@ -215,6 +215,11 @@ class rpg_mission_challenge extends rpg_mission {
         $challenge_values['challenge_battle_by'] = $challenge_data['challenge_creator_name'];
         //$challenge_values['challenge_marker'] = 'glass';
         $challenge_values['challenge_marker'] = $challenge_marker_type;
+        $challenge_values['challenge_records'] = array();
+        $challenge_values['challenge_records']['accessed'] = (int)($challenge_data['challenge_times_accessed']);
+        $challenge_values['challenge_records']['concluded'] = (int)($challenge_data['challenge_times_concluded']);
+        $challenge_values['challenge_records']['victories'] = (int)($challenge_data['challenge_user_victories']);
+        $challenge_values['challenge_records']['defeats'] = (int)($challenge_data['challenge_user_defeats']);
 
         // Pull event mission data from the database
         $temp_battle_omega = array(
