@@ -341,6 +341,19 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         // Define how many fields we should show at once
         $star_fields_to_show = 12;
 
+        // TEMP TEMP TEMP TEMP
+        if (true){
+            // Check to see if there are any event challenges to display right now (we'll show these in the other chapter later)
+            $temp_event_challenge = false;
+            $temp_event_challenges = rpg_mission_challenge::get_missions($this_prototype_data, 'event', 1, false);
+            if (!empty($temp_event_challenges)){
+                foreach ($temp_event_challenges AS $key => $temp_event_challenge){
+                    $star_fields_to_show -= 4;
+                    break;
+                }
+            }
+        }
+
         // Count the number of stars collected to determine level
         $star_count = mmrpg_prototype_stars_unlocked();
         $star_level = 50 + ceil(50 * ($star_count / MMRPG_SETTINGS_STARFORCE_STARTOTAL));
@@ -392,6 +405,14 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $added_star_fields++;
             if ($added_star_fields >= $star_fields_to_show){ break; }
 
+        }
+
+        // TEMP TEMP TEMP TEMP
+        if (true){
+            if (!empty($temp_event_challenge)){
+                $this_prototype_data['battle_options'][] = $temp_event_challenge;
+                rpg_battle::update_index_info($temp_event_challenge['battle_token'], $temp_event_challenge);
+            }
         }
 
     }
@@ -591,14 +612,14 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $temp_challenge_missions = array();
 
             // Check to see if there are any event challenges to display right now
-            $temp_event_challenges = rpg_mission_challenge::get_missions($this_prototype_data, 'event', 1, false);
+            $temp_event_challenges = rpg_mission_challenge::get_missions($this_prototype_data, 'event', 1, true); // CHANGE TO FALSE TEMP TEMP TEMP
             if (!empty($temp_event_challenges)){ $temp_challenge_missions = array_merge($temp_challenge_missions, $temp_event_challenges); }
 
             // Pad out the rest of the mission tab with user challenges if possible
             $req_user_challenges = 6 - (!empty($temp_event_challenges) ? (count($temp_event_challenges) * 2) : 0);
             if ($req_user_challenges > 0){
                 $temp_user_challenges = rpg_mission_challenge::get_missions($this_prototype_data, 'user', $req_user_challenges, false);
-                if (!empty($temp_user_challenges)){ $temp_challenge_missions = array_merge($temp_challenge_missions, $temp_user_challenges); }
+                if (!empty($temp_user_challenges)){ $temp_challenge_missions = array_merge($temp_user_challenges, $temp_challenge_missions); }
             }
 
             // Loop through any collected event or user challenges and then add them to the list
