@@ -1339,6 +1339,16 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                     $this_option_title .= ' <br />Cleared : '.(!empty($this_option_complete['battle_count']) ? ($this_option_complete['battle_count'] == 1 ? '1 Time' : $this_option_complete['battle_count'].' Times') : '0 Times');
                     $this_option_title .= ' | Failed : '.(!empty($this_option_failure['battle_count']) ? ($this_option_failure['battle_count'] == 1 ? '1 Time' : $this_option_failure['battle_count'].' Times') : '0 Times');
                 }
+            } elseif ($is_challenge_battle && !empty($this_battleinfo['values']['challenge_records'])){
+                    $temp_records = $this_battleinfo['values']['challenge_records'];
+                    //$this_option_title .= ' <br />JSON: '.str_replace('"', '&quot;', json_encode($temp_records));
+                    if (!empty($temp_records['accessed'])){
+                        $this_option_title .= ' <hr />&laquo; Global Challenge Records &raquo;';
+                        $this_option_title .= ' <br />Attempted: '.($temp_records['accessed'] === 1 ? '1 Time ' : number_format($temp_records['accessed'], 0, '.', ',').' Times');
+                        $this_option_title .= ' | Failed: '.($temp_records['defeats'] === 1 ? '1 Time ' : number_format($temp_records['defeats'], 0, '.', ',').' Times');
+                        $this_option_title .= ' | Cleared: '.($temp_records['victories'] === 1 ? '1 Time ' : number_format($temp_records['victories'], 0, '.', ',').' Times');
+                        //$this_option_title .= ' <br />Success Rate: '.str_replace('.00', '', number_format((($temp_records['victories'] / $temp_records['accessed']) * 100), 2, '.', ',')).'%';
+                    }
             }
 
             $this_option_title_plain = strip_tags(str_replace('<br />', '&#10;', $this_option_title));
