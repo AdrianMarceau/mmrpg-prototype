@@ -44,6 +44,7 @@ $ability = array(
             'sticky' => true,
             'ability_id' => $this_ability->ability_id.'_'.$static_attachment_key,
             'ability_token' => $this_ability->ability_token,
+            'ability_image' => $this_ability->ability_image,
             'attachment_duration' => $static_attachment_duration,
             'attachment_energy' => 0,
             'attachment_energy_base_percent' => $this_ability->ability_damage,
@@ -96,7 +97,7 @@ $ability = array(
                 ),
             'ability_frame' => 0,
             'ability_frame_animate' => array(0, 2, 4, 1, 3, 5),
-            'ability_frame_offset' => array('x' => -5, 'y' => 40, 'z' => -10)
+            'ability_frame_offset' => array('x' => -5, 'y' => 40, 'z' => -8)
             );
 
         // Target the opposing robot
