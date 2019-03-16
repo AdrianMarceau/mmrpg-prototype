@@ -480,6 +480,7 @@ $(document).ready(function(){
 });
 
 // Define a function for updating the window sizes
+var windowResizeUpdateTimeout = false;
 function windowResizeUpdate(updateType){
     //alert('windowResizeUpdate('+updateType+')');
 
@@ -532,8 +533,11 @@ function windowResizeUpdate(updateType){
     var thisRequestData = 'index_settings,windowFlag,';
     if (windowWidth >= (1024 + 12)){ $('body').addClass('windowFlag_landscapeMode'); thisRequestData += 'landscapeMode'; }
     else { $('body').removeClass('windowFlag_landscapeMode'); thisRequestData += 'portraitMode'; }
-    $.post('scripts/script.php',{requestType:thisRequestType,requestData:thisRequestData});
-    //console.log('scripts/script.php',{requestType:thisRequestType,requestData:thisRequestData});
+    if (windowResizeUpdateTimeout !== false){ clearTimeout(windowResizeUpdateTimeout); }
+    windowResizeUpdateTimeout = setTimeout(function(){
+        $.post('scripts/script.php',{requestType:thisRequestType,requestData:thisRequestData});
+        //console.log('scripts/script.php',{requestType:thisRequestType,requestData:thisRequestData});
+        }, 1000);
 
     // Calculate the new game and console height values
     var newGameHeight = windowHeight - 25; //15;
@@ -1849,6 +1853,7 @@ function mmrpg_toggle_debug_mode(element){
 }
 
 // Define a function for updating the loaded status of the main index page
+var windowTogglePerspectiveTimeout = false;
 function mmrpg_toggle_perspective_mode(element){
     // Collect the object references to the button and internal label
     var thisButton = $(element);
@@ -1866,7 +1871,10 @@ function mmrpg_toggle_perspective_mode(element){
     // Send the new value to the server to update the session
     var thisRequestType = 'session';
     var thisRequestData = 'perspective_mode,'+newValue;
-    $.post('scripts/script.php',{requestType:thisRequestType,requestData:thisRequestData});
+    if (windowTogglePerspectiveTimeout !== false){ clearTimeout(windowTogglePerspectiveTimeout); }
+    windowTogglePerspectiveTimeout = setTimeout(function(){
+        $.post('scripts/script.php',{requestType:thisRequestType,requestData:thisRequestData});
+        }, 1000);
     return true;
 }
 
