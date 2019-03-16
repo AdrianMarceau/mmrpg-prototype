@@ -2812,7 +2812,7 @@ class rpg_ability extends rpg_object {
             $this_sprite_index['mineral-quarry'] = array(5, 2, 3, 'mineral pillar');
             $this_sprite_index['lighting-control'] = array(5, 4, 5, 'summoned platform');
             $this_sprite_index['robosaur-boneyard'] = array(5, 6, 7, 'boney pillar');
-            $this_sprite_index['space-station'] = array(5, 8, 9, 'crystal blockade');
+            $this_sprite_index['space-simulator'] = array(5, 8, 9, 'crystal blockade');
 
             // Sheet SIX
             $this_sprite_index['submerged-armory'] = array(6, 0, 1, 'iron blockade');
@@ -3088,13 +3088,16 @@ class rpg_ability extends rpg_object {
         $this_impact_frame = 1;
         $this_object_name = 'boulder';
         $this_sprite_index = self::get_super_block_sprite_index();
-        $this_field_token = $this_battle->battle_field->field_background;
-        if (isset($this_sprite_index[$this_field_token])){
-            $this_sprite_sheet = $this_sprite_index[$this_field_token][0];
-            $this_target_frame = $this_sprite_index[$this_field_token][1];
-            $this_impact_frame = $this_sprite_index[$this_field_token][2];
-            $this_object_name = $this_sprite_index[$this_field_token][3];
-            $this_object_name_plural = isset($this_sprite_index[$this_field_token][4]) ? $this_sprite_index[$this_field_token][4] : $this_object_name.'s';
+        $this_field_token1 = $this_battle->battle_field->field_background;
+        $this_field_token2 = $this_battle->battle_field->field_foreground;
+        if (isset($this_sprite_index[$this_field_token1])){ $this_sheet_token = $this_field_token1; }
+        elseif (isset($this_sprite_index[$this_field_token2])){ $this_sheet_token = $this_field_token2; }
+        if (isset($this_sheet_token)){
+            $this_sprite_sheet = $this_sprite_index[$this_sheet_token][0];
+            $this_target_frame = $this_sprite_index[$this_sheet_token][1];
+            $this_impact_frame = $this_sprite_index[$this_sheet_token][2];
+            $this_object_name = $this_sprite_index[$this_sheet_token][3];
+            $this_object_name_plural = isset($this_sprite_index[$this_sheet_token][4]) ? $this_sprite_index[$this_sheet_token][4] : $this_object_name.'s';
         }
         $this_attachment_image = $this_ability_token.($this_sprite_sheet > 1 ? '-'.$this_sprite_sheet : '');
         $this_text_prefix = $this_existing > 0 ? 'One of the' : 'The';
