@@ -146,6 +146,7 @@ class rpg_mission_single extends rpg_mission {
                     //$debug_backup .= 'factor = '.implode(',', array_values($this_factor)).' // ';
                     if (empty($this_factor['robot'])){ continue; }
                     $bonus_robot_info = rpg_robot::parse_index_info($this_robot_index[$this_factor['robot']]);
+                    if (!empty($bonus_robot_info['robot_flag_exclusive'])){ continue; }
                     if (!isset($bonus_robot_info['robot_core'])){ $bonus_robot_info['robot_core'] = ''; }
                     if ($bonus_robot_info['robot_core'] == $temp_option_field['field_type']){
                         if (!in_array($bonus_robot_info['robot_token'], $temp_robot_master_tokens)){

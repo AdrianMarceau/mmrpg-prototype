@@ -175,6 +175,7 @@ class rpg_mission_double extends rpg_mission {
                     //$debug_backup .= 'factor = '.implode(',', array_values($this_factor)).' // ';
                     if (empty($this_factor['robot'])){ continue; }
                     $bonus_robot_info = rpg_robot::parse_index_info($this_robot_index[$this_factor['robot']]);
+                    if (!empty($bonus_robot_info['robot_flag_exclusive'])){ continue; }
                     if (!isset($bonus_robot_info['robot_core'])){ $bonus_robot_info['robot_core'] = ''; }
                     if ($bonus_robot_info['robot_core'] == $temp_option_field['field_type']
                         || $bonus_robot_info['robot_core'] == $temp_option_field2['field_type']){
