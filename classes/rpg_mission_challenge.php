@@ -210,6 +210,7 @@ class rpg_mission_challenge extends rpg_mission {
         $challenge_values = array();
         $challenge_counters = array();
         $challenge_flags['challenge_battle'] = true;
+        $challenge_values['challenge_battle_id'] = $challenge_data['challenge_id'];
         $challenge_values['challenge_battle_kind'] = $challenge_data['challenge_kind'];
         $challenge_values['challenge_battle_by'] = $challenge_data['challenge_creator_name'];
         //$challenge_values['challenge_marker'] = 'glass';

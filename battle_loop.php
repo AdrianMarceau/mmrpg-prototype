@@ -684,6 +684,42 @@ if (!empty($this_battle->counters['battle_turn']) && $this_battle->battle_status
     }
 }
 
+// If this is a challenge battle, we might need to update records
+if (!empty($this_battle->flags['challenge_battle'])
+    && !empty($this_battle->values['challenge_battle_id'])){
+
+    // Collect the challenge battle ID for reference
+    //$challenge_id = (int)($this_battle->values['challenge_battle_id']);
+    //$this_battle->events_create(false, false, 'debug', '$challenge_id = '.preg_replace('/\s+/', ' ', print_r($challenge_id, true)).'<br />');
+    //$this_battle->events_create(false, false, 'debug', '$this_battle->battle_status = '.preg_replace('/\s+/', ' ', print_r($this_battle->battle_status, true)).'<br />');
+    //$this_battle->events_create(false, false, 'debug', '$this_battle->battle_result = '.preg_replace('/\s+/', ' ', print_r($this_battle->battle_result, true)).'<br />');
+
+    // Update the "accessed" count if we're at the battle start action
+    if ($this_action == 'start'
+        && empty($this_battle->flags['challenge_battle_accessed'])){
+        $db->query("UPDATE mmrpg_challenges SET challenge_times_accessed = (challenge_times_accessed + 1) WHERE challenge_id = {$challenge_id};");
+        $this_battle->flags['challenge_battle_accessed'] = true;
+    }
+
+    // Update the "concluded" count if we're at the end of the mission (regardless of result)
+    if ($this_battle->battle_status == 'complete'
+        && empty($this_battle->flags['challenge_battle_concluded'])){
+
+        // Update the concluded flag regardless and count of the actual result
+        $db->query("UPDATE mmrpg_challenges SET challenge_times_concluded = (challenge_times_concluded + 1) WHERE challenge_id = {$challenge_id};");
+        $this_battle->flags['challenge_battle_concluded'] = true;
+
+        // Now update the victory or defeat counters based on the result of the battle
+        if ($this_battle->battle_result == 'victory'){
+            $db->query("UPDATE mmrpg_challenges SET challenge_user_victories = (challenge_user_victories + 1) WHERE challenge_id = {$challenge_id};");
+        } elseif ($this_battle->battle_result == 'defeat'){
+            $db->query("UPDATE mmrpg_challenges SET challenge_user_defeats = (challenge_user_defeats + 1) WHERE challenge_id = {$challenge_id};");
+        }
+
+    }
+
+}
+
 // If canvas refresh is needed, create an empty event
 if ($canvas_refresh && $this_battle->battle_status != 'complete'){
     $this_battle->events_create(false, false, '', '');
