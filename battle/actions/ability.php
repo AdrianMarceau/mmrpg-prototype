@@ -461,57 +461,8 @@ $this_battle->actions_execute();
 
 // -- END OF TURN ACTIONS -- //
 
-// If the battle has not concluded, check the robot attachments
-if ($this_battle->battle_status != 'complete'){
-
-    // DEBUG
-    if (empty($this_robot)){
-        die('<pre>$this_robot is empty on line '.__LINE__.'! :'.print_r($this_robot, true).'</pre>');
-    } elseif (empty($target_robot)){
-        die('<pre>$target_robot is empty on line '.__LINE__.'! :'.print_r($target_robot, true).'</pre>');
-    }
-
-    // Collect both player's active pokemon
-    $this_robots_active = $this_player->get_robots_active();
-    $target_robots_active = $target_player->get_robots_active();
-
-    // Loop through this player's robots and apply end-turn checks
-    foreach ($this_robots_active AS $key => $active_robot){
-        if ($active_robot->get_id() == $this_robot->get_id()){ $active_robot = $this_robot; }
-        $active_robot->check_history($target_player, $target_robot);
-        $active_robot->check_items($target_player, $target_robot);
-        $active_robot->check_attachments($target_player, $target_robot);
-        $active_robot->check_weapons($target_player, $target_robot);
-    }
-
-    // Loop through the target player's robots and apply end-turn checks
-    foreach ($target_robots_active AS $key => $active_robot){
-        if ($active_robot->get_id() == $target_robot->get_id()){ $active_robot = $target_robot; }
-        $active_robot->check_history($this_player, $this_robot);
-        $active_robot->check_items($this_player, $this_robot);
-        $active_robot->check_attachments($this_player, $this_robot);
-        $active_robot->check_weapons($this_player, $this_robot);
-    }
-
-    // Re-collect both player's active pokemon
-    $this_robots_active = $this_player->get_robots_active();
-    $target_robots_active = $target_player->get_robots_active();
-
-    // Create an empty field to remove any leftover frames
-    $this_battle->events_create();
-
-    // If this the player's last robot
-    if ($this_player->counters['robots_active'] == 0){
-        // Trigger the battle complete event
-        $this_battle->battle_complete_trigger($target_player, $target_robot, $this_player, $this_robot, '', '');
-    }
-    // Else if the target player's on their last robot
-    elseif ($target_player->counters['robots_active'] == 0){
-        // Trigger the battle complete event
-        $this_battle->battle_complete_trigger($this_player, $this_robot, $target_player, $target_robot, '', '');
-    }
-
-}
+// Require the common end-of-turn action file
+require(MMRPG_CONFIG_ROOTDIR.'battle/actions/action_endofturn.php');
 
 // Unset any item use flags for this player, so they can use one again next turn
 if (isset($this_player->flags['item_used_this_turn'])){
