@@ -689,7 +689,7 @@ if (!empty($this_battle->flags['challenge_battle'])
     && !empty($this_battle->values['challenge_battle_id'])){
 
     // Collect the challenge battle ID for reference
-    //$challenge_id = (int)($this_battle->values['challenge_battle_id']);
+    $challenge_id = (int)($this_battle->values['challenge_battle_id']);
     //$this_battle->events_create(false, false, 'debug', '$challenge_id = '.preg_replace('/\s+/', ' ', print_r($challenge_id, true)).'<br />');
     //$this_battle->events_create(false, false, 'debug', '$this_battle->battle_status = '.preg_replace('/\s+/', ' ', print_r($this_battle->battle_status, true)).'<br />');
     //$this_battle->events_create(false, false, 'debug', '$this_battle->battle_result = '.preg_replace('/\s+/', ' ', print_r($this_battle->battle_result, true)).'<br />');
