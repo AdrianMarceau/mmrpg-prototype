@@ -501,15 +501,11 @@ class rpg_battle extends rpg_object {
         if ($this->battle_result == 'pending'){
             $this->battle_result = $target_player->player_side == 'right' ? 'victory' : 'defeat';
             $this->update_session();
-            $event_options = array();
-            if ($this->battle_result == 'victory'){
-                $event_options['event_flag_victory'] = true;
-            }
-            elseif ($this->battle_result == 'defeat'){
-                $event_options['event_flag_defeat'] = true;
-            }
-            $this->events_create(false, false, '', '', $event_options);
         }
+        $event_options = array();
+        if ($this->battle_result == 'victory'){ $event_options['event_flag_victory'] = true; }
+        elseif ($this->battle_result == 'defeat'){ $event_options['event_flag_defeat'] = true; }
+        $this->events_create(false, false, '', '', $event_options);
 
         // Define variables for the human's rewards in this scenario
         $temp_human_token = $target_player->player_side == 'left' ? $target_player->player_token : $this_player->player_token;

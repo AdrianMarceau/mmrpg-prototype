@@ -660,6 +660,7 @@ if (!empty($this_battle->counters['battle_turn']) && $this_battle->battle_status
         if ($this_battle->counters['battle_turn'] >= $this_battle->battle_turns){
 
             // Trigger the battle complete event
+            $this_battle->battle_result = 'defeat';
             $this_battle->battle_complete_trigger($target_player, $target_robot, $this_player, $this_robot, '', '');
 
             // Now execute the stored actions (and any created in the process of executing them!)

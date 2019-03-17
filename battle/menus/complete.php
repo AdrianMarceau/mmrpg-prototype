@@ -2,7 +2,8 @@
 // Generate the markup for the action switch panel
 ob_start();
   // If the current robot is not disabled (WE WIN!)
-  if ($this_player->counters['robots_active'] > 0){
+  if ($this_player->counters['robots_active'] > 0
+    && $this_battle->battle_result != 'defeat'){
     // Display available main actions
     ?><div class="main_actions"><?
     ?><a class="button action_ability" data-action="prototype" type="button" data-order="1"><label>Mission Complete!</label></a><?
