@@ -120,6 +120,14 @@ $ability = array(
                 $target_robot->robot_weapons = $target_new_energy;
                 $target_robot->robot_base_weapons = $target_new_base_energy;
                 $target_robot->update_session();
+            } elseif (strstr($old_item_token, '-core')){
+                //$this_battle->events_create(false, false, 'debug', 'The knocked-off item was a robot core!');
+                $lost_core_type = preg_replace('/-core$/', '', $old_item_token);
+                $possible_attachment_token = 'ability_core-shield_'.$lost_core_type;
+                if (!empty($target_robot->robot_attachments[$possible_attachment_token])){
+                    $target_robot->robot_attachments[$possible_attachment_token]['attachment_duration'] = 0;
+                    $target_robot->update_session();
+                }
             }
 
             // Remove the visual icon attachment from the target
