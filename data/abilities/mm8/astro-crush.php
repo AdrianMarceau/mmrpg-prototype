@@ -19,10 +19,10 @@ $ability = array(
 
         // Define an image index for this ability
         $image_index = array();
-        $image_index['blackout'] = $this_ability->ability_base_image.'-4';
-        if ($this_robot->robot_core == 'space'){ $image_index['base'] = $this_ability->ability_base_image; }
-        elseif ($this_robot->robot_core == 'copy'){ $image_index['base'] = $this_ability->ability_base_image.'-2'; }
-        else { $image_index['base'] = $this_ability->ability_base_image.'-3'; }
+        $image_index['blackout'] = $this_ability->ability_token.'-4';
+        if ($this_robot->robot_core == 'space'){ $image_index['base'] = $this_ability->ability_token; }
+        elseif ($this_robot->robot_core == 'copy'){ $image_index['base'] = $this_ability->ability_token.'-2'; }
+        else { $image_index['base'] = $this_ability->ability_token.'-3'; }
 
         // Define and attach this ability's aura attachment
         $this_aura_token = 'ability_'.$this_ability->ability_token.'_aura';
@@ -197,9 +197,9 @@ $ability = array(
         extract($objects);
 
         // Change this ability's image based on the holding robot's type
-        if ($this_robot->robot_core == 'space'){ $this_ability->ability_image = $this_ability->ability_base_image; }
-        elseif ($this_robot->robot_core == 'copy'){ $this_ability->ability_image = $this_ability->ability_base_image.'-2'; }
-        else { $this_ability->ability_image = $this_ability->ability_base_image.'-3'; }
+        if ($this_robot->robot_core == 'space'){ $this_ability->ability_image = $this_ability->ability_token; }
+        elseif ($this_robot->robot_core == 'copy'){ $this_ability->ability_image = $this_ability->ability_token.'-2'; }
+        else { $this_ability->ability_image = $this_ability->ability_token.'-3'; }
         $this_ability->update_session();
 
         // Return true on success
