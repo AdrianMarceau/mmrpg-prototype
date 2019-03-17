@@ -38,22 +38,13 @@ $this_battle->actions_execute();
 
 // -- END OF TURN ACTIONS -- //
 
-// If the battle has not concluded, check the robot attachments
-if ($target_robot->robot_status == 'disabled'){
+// Require the common end-of-turn action file
+require(MMRPG_CONFIG_ROOTDIR.'battle/actions/action_endofturn.php');
 
-    // If this the player's last robot
-    if ($this_player->counters['robots_active'] == 0){
-        // Trigger the battle complete event
-        $this_battle->battle_complete_trigger($target_player, $target_robot, $this_player, $this_robot, '', '');
-    }
-    // Else if the target player's on their last robot
-    elseif ($target_player->counters['robots_active'] == 0){
-        // Trigger the battle complete event
-        $this_battle->battle_complete_trigger($this_player, $this_robot, $target_player, $target_robot, '', '');
-    }
-
+// Unset any switch use flags for this player, so they can use one again next turn
+if (isset($this_player->flags['switch_used_this_turn'])){
+    unset($this_player->flags['switch_used_this_turn']);
+    $this_player->update_session();
 }
-
-
 
 ?>
