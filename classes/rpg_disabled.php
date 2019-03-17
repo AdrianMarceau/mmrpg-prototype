@@ -51,19 +51,21 @@ class rpg_disabled {
         // Update the target player's session
         $this_player->update_session();
 
-        // Create the robot disabled event
-        $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
-        $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : 'The target ').' '.$this_robot->print_name().' was disabled!<br />';
-        if (isset($this_robot->robot_quotes['battle_defeat'])){
-            $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
-            $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
-            $event_body .= $this_robot->print_quote('battle_defeat', $this_find, $this_replace);
+        // Create the robot disabled event if not disabled already some other way
+        if ($this_robot->robot_status != 'disabled'){
+            $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
+            $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : 'The target ').' '.$this_robot->print_name().' was disabled!<br />';
+            if (isset($this_robot->robot_quotes['battle_defeat'])){
+                $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
+                $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
+                $event_body .= $this_robot->print_quote('battle_defeat', $this_find, $this_replace);
+            }
+            if ($target_robot->robot_status != 'disabled'){ $target_robot->robot_frame = 'base'; }
+            $this_robot->robot_frame = 'defeat';
+            $target_robot->update_session();
+            $this_robot->update_session();
+            $this_battle->events_create($this_robot, $target_robot, $event_header, $event_body, array('console_show_target' => false, 'canvas_show_disabled_bench' => $this_robot->robot_id.'_'.$this_robot->robot_token));
         }
-        if ($target_robot->robot_status != 'disabled'){ $target_robot->robot_frame = 'base'; }
-        $this_robot->robot_frame = 'defeat';
-        $target_robot->update_session();
-        $this_robot->update_session();
-        $this_battle->events_create($this_robot, $target_robot, $event_header, $event_body, array('console_show_target' => false, 'canvas_show_disabled_bench' => $this_robot->robot_id.'_'.$this_robot->robot_token));
 
         // Check to see if this robot is holding an Extra Life before disabling
         if ($this_robot->has_item()){
