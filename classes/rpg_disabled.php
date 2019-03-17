@@ -204,10 +204,7 @@ class rpg_disabled {
                 $this_stat_boost = $this_robot->$prop_stat_base / 100;
                 if ($this_robot->robot_class == 'mecha'){ $this_stat_boost = $this_stat_boost / 2; }
                 if ($target_player->player_side == 'left' && $target_robot->robot_class == 'mecha'){ $this_stat_boost = $this_stat_boost * 2; }
-                if ($target_robot->$prop_stat + $this_stat_boost > MMRPG_SETTINGS_STATS_MAX){
-                    $this_stat_overboost = (MMRPG_SETTINGS_STATS_MAX - $target_robot->$prop_stat) * -1;
-                    $this_stat_boost = $this_stat_boost - $this_stat_overboost;
-                } elseif ($temp_robot_stats[$stat]['bonus'] >= $temp_robot_stats[$stat]['bonus_max']){
+                if ($temp_robot_stats[$stat]['bonus'] >= $temp_robot_stats[$stat]['bonus_max']){
                     $this_stat_overboost = 0;
                     $this_stat_boost = 0;
                 }
