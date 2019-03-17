@@ -52,7 +52,9 @@ class rpg_disabled {
         $this_player->update_session();
 
         // Create the robot disabled event if not disabled already some other way
-        if ($this_robot->robot_status != 'disabled'){
+        $disabled_message_flag = 'disabled_on_'.$this_battle->counters['battle_turn'];
+        if (!isset($this_robot->flags[$disabled_message_flag])){
+            $this_robot->flags[$disabled_message_flag] = true;
             $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
             $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : 'The target ').' '.$this_robot->print_name().' was disabled!<br />';
             if (isset($this_robot->robot_quotes['battle_defeat'])){
