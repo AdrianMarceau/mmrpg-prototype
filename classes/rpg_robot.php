@@ -4705,7 +4705,8 @@ class rpg_robot extends rpg_object {
         $this_robot = $this;
 
         // Hide any disabled robots and return
-        if ($this_robot->get_status() == 'disabled'){
+        if ($this_robot->get_status() == 'disabled'
+            && $this_robot->robot_status == 'disabled'){
             $this_robot->set_flag('apply_disabled_state', true);
             $this_battle->events_create();
             return;
@@ -4847,7 +4848,9 @@ class rpg_robot extends rpg_object {
                             $this_attachment->update_session();
                             $temp_trigger_options = isset($attachment_info['attachment_repeat']['options']) ? $attachment_info['attachment_repeat']['options'] : array();
                             $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' triggers special!');
-                            $this_robot->trigger_damage($this_robot, $this_attachment, 0, false, $temp_trigger_options);
+                            if ($this_robot->get_energy() > 0){
+                                $this_robot->trigger_damage($this_robot, $this_attachment, 0, false, $temp_trigger_options);
+                            }
                             $attachment_action_flag = true;
 
                         }
