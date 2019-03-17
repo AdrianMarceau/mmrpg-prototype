@@ -418,7 +418,12 @@ class rpg_ability_recovery extends rpg_recovery {
                     $this_robot->flags['triggered_weakness'] = true;
                     if (isset($this_robot->counters['triggered_weakness'])){ $this_robot->counters['triggered_weakness'] += 1; }
                     else { $this_robot->counters['triggered_weakness'] = 1; }
-                    if ($this_ability->recovery_options['recovery_kind'] == 'energy' && $this_robot->player->player_side == 'right'){ $this_robot->field->field_multipliers['experience'] += 0.1; }
+                    if ($this_ability->recovery_options['recovery_kind'] == 'energy'
+                        && $this_robot->player->player_side == 'right'
+                        && empty($this_battle->flags['player_battle'])
+                        && empty($this_battle->flags['challenge_battle'])){
+                        $this_robot->field->field_multipliers['experience'] += 0.1;
+                    }
                     //elseif ($this_robot->player->player_side == 'left'){ $this_robot->field->field_multipliers['experience'] -= 0.1; }
                 }
                 if (!empty($this_ability->ability_results['flag_affinity'])){
