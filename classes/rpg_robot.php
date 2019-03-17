@@ -4706,7 +4706,7 @@ class rpg_robot extends rpg_object {
 
         // Hide any disabled robots and return
         if ($this_robot->get_status() == 'disabled'
-            && $this_robot->robot_status == 'disabled'){
+            || $this_robot->robot_status == 'disabled'){
             $this_robot->set_flag('apply_disabled_state', true);
             $this_battle->events_create();
             return;
