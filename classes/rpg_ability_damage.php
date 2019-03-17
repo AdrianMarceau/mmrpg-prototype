@@ -419,7 +419,10 @@ class rpg_ability_damage extends rpg_damage {
                     $this_robot->flags['triggered_weakness'] = true;
                     if (isset($this_robot->counters['triggered_weakness'])){ $this_robot->counters['triggered_weakness'] += 1; }
                     else { $this_robot->counters['triggered_weakness'] = 1; }
-                    if ($this_ability->damage_options['damage_kind'] == 'energy' && $this_robot->player->player_side == 'right'){
+                    if ($this_ability->damage_options['damage_kind'] == 'energy'
+                        && $this_robot->player->player_side == 'right'
+                        && empty($this_battle->flags['player_battle'])
+                        && empty($this_battle->flags['challenge_battle'])){
                         $this_robot->field->field_multipliers['experience'] += 0.1;
                         $this_ability->damage_options['damage_kickback']['x'] = ceil($this_ability->damage_options['damage_kickback']['x'] * 2);
                     }
