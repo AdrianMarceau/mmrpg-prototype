@@ -1316,6 +1316,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             //$this_option_title .= '$this_master_count = '.$this_master_count.'; $this_mecha_count = '.$this_mecha_count.'; ';
             //if ($this_battleinfo['battle_button'] != $this_battleinfo['battle_name']){ $this_option_title .= ' | '.$this_battleinfo['battle_name']; }
             $this_option_title .= '&laquo; '.$this_battleinfo['battle_name'].' &raquo;';
+            if ($is_challenge_battle && !empty($this_battleinfo['battle_button'])){ $this_option_title .= ' <br />&quot;'.$this_battleinfo['battle_button'].'&quot;'; }
             $this_option_title .= ' <br />'.$this_fieldinfo['field_name'];
             if (!empty($this_fieldinfo['field_type'])){
                 if (!empty($this_fieldinfo['field_type2'])){ $this_option_title .= ' | '.ucfirst($this_fieldinfo['field_type']).' / '.ucfirst($this_fieldinfo['field_type2']).' Type'; }
@@ -1330,7 +1331,8 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 $this_option_title .= ' | '.($this_battleinfo['battle_zenny'] == 1 ? '1 Zenny' : number_format($this_battleinfo['battle_zenny'], 0, '.', ',').' Zenny');
             }
 
-            $this_option_title .= ' <br />'.$this_battleinfo['battle_description'].(!empty($this_battleinfo['battle_description2']) ? ' '.$this_battleinfo['battle_description2'] : '');
+            $this_option_title .= ' <br />'.$this_battleinfo['battle_description'];
+            if (!empty($this_battleinfo['battle_description2'])){ $this_option_title .= ' '.$this_battleinfo['battle_description2']; }
 
             if (!isset($this_battleinfo['battle_counts'])
                 || $this_battleinfo['battle_counts'] !== false){
