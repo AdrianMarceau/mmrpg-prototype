@@ -12,7 +12,35 @@ if ($this_battle->battle_status != 'complete'){
         die('<pre>$target_robot is empty on line '.__LINE__.'! :'.print_r($target_robot, true).'</pre>');
     }
 
-    // Collect both player's active pokemon
+    // Collect both player's robots to check for inactive
+    $this_player_robots = $this_player->get_robots();
+    $target_player_robots = $target_player->get_robots();
+
+    // Loop through this player's robots and check to see if any disabled have been missed
+    foreach ($this_player_robots AS $key => $active_robot){
+        if ($active_robot->get_id() == $this_robot->get_id()){ $active_robot = $this_robot; }
+        if ($active_robot->robot_energy > 0){ continue; }
+        if (empty($active_robot->flags['apply_disabled_state'])){
+            $active_robot->trigger_disabled($target_robot);
+        } else {
+            $active_robot->set_status('disabled');
+            $active_robot->set_flag('hidden', true);
+        }
+    }
+
+    // Loop through the target player's robots and check to see if any disabled have been missed
+    foreach ($target_player_robots AS $key => $active_robot){
+        if ($active_robot->get_id() == $target_robot->get_id()){ $active_robot = $target_robot; }
+        if ($active_robot->robot_energy > 0){ continue; }
+        if (empty($active_robot->flags['apply_disabled_state'])){
+            $active_robot->trigger_disabled($this_robot);
+        } else {
+            $active_robot->set_status('disabled');
+            $active_robot->set_flag('hidden', true);
+        }
+    }
+
+    // Collect both player's active robots
     $this_robots_active = $this_player->get_robots_active();
     $target_robots_active = $target_player->get_robots_active();
 
