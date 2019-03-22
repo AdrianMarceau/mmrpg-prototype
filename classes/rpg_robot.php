@@ -749,7 +749,9 @@ class rpg_robot extends rpg_object {
                 $this->$prop_stat_base += $temp_boost;
             }
             // Also create a variable for mods if applicable
-            if ($stat !== 'energy' && $stat !== 'weapons'){
+            if ($stat !== 'energy'
+                && $stat !== 'weapons'
+                && !isset($this->counters[$stat.'_mods'])){
                 $this->counters[$stat.'_mods'] = 0;
             }
         }
