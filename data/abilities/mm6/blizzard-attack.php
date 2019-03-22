@@ -28,9 +28,6 @@ $ability = array(
             'ability_frame_classes' => ' '
             );
 
-        // Count the number of active robots on the target's side of the field
-        $target_robots_active = $target_player->counters['robots_active'];
-
         // Change the image to the full-screen rain effect
         $this_ability->ability_image = $this_ability->ability_base_image;
         $this_ability->ability_frame_classes = '';
