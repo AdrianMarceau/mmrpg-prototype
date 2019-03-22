@@ -5,11 +5,11 @@ $ability = array(
     'ability_token' => 'dynamo-bolt',
     'ability_game' => 'MM085',
     'ability_group' => 'MM10B/Weapons/001',
-    'ability_description' => 'The user charges themselves with electricity to build power and restore life energy.  If used again after charging this ability can release a storm of lightning bolts on all targets!  Stay healthy, as this ability\'s power is based on the user\'s remaining energy.',
+    'ability_description' => 'The user charges themselves with electricity to build power and restore life energy.  If used again after charging this ability can release a storm of lightning bolts on all targets!  Stay healthy, as this ability\'s power decreases if the user has sustained any damage.',
     'ability_type' => 'electric',
     'ability_energy' => 8,
     'ability_damage' => 50,
-    'ability_recovery2' => 10,
+    'ability_recovery2' => 20,
     'ability_recovery2_percent' => true,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
@@ -60,6 +60,8 @@ $ability = array(
             if ($this_robot->robot_energy < $this_robot->robot_base_energy){
                 $this_ability->recovery_options_update(array(
                     'kind' => 'energy',
+                    'type' => '',
+                    'type2' => '',
                     'percent' => true,
                     'rates' => array(100, 0, 0),
                     'success' => array(2, -10, 0, -10, $this_robot->print_name().'\'s energy was restored!'),
@@ -92,7 +94,7 @@ $ability = array(
                 'modifiers' => true,
                 'kickback' => array(5, 0, 0),
                 'success' => array(3, -5, 10, 10, 'The target was struck by the '. $this_ability->print_name().'\'s lightning!'),
-                'failure' => array(2, -5, 10, -1,'The '. $this_ability->print_name().' missed the first target&hellip;')
+                'failure' => array(2, -5, 10, -1,'The '. $this_ability->print_name().' missed '.$target_robot->print_name().'&hellip;')
                 ));
             $this_ability->recovery_options_update(array(
                 'kind' => 'energy',
@@ -100,7 +102,7 @@ $ability = array(
                 'frame' => 'taunt',
                 'kickback' => array(5, 0, 0),
                 'success' => array(3, -5, 10, 10, 'The target absorbed the '.$this_ability->print_name().'\'s lightning!'),
-                'failure' => array(2, -5, 10, -1, 'The '.$this_ability->print_name().' had no effect on the first target&hellip;')
+                'failure' => array(2, -5, 10, -1, 'The '.$this_ability->print_name().' had no effect on '.$target_robot->print_name().'&hellip;')
                 ));
             $energy_damage_amount = $this_ability->ability_damage;
             $trigger_options = array('apply_modifiers' => true, 'apply_position_modifiers' => false, 'apply_stat_modifiers' => true);
