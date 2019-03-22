@@ -60,6 +60,10 @@
         uroles.role_level DESC
         ;", 'user_id');
 
+    // Define the various stat mod kinds and value range
+    $stat_mod_kinds = array('attack', 'defense', 'speed');
+    $stat_mod_values = array(5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5);
+
 
     /* -- Generate Select Option Markup -- */
 
@@ -1050,6 +1054,8 @@
                                             $current_robot_alt = str_replace($current_robot_token.'_', '', $current_robot_image);
                                             $current_robot_item = !empty($current_robot_data['robot_item']) ? $current_robot_data['robot_item'] : '';
                                             $current_robot_abilities = !empty($current_robot_data['robot_abilities']) ? $current_robot_data['robot_abilities'] : array();
+                                            $current_robot_values = !empty($current_robot_data['values']) ? $current_robot_data['values'] : array();
+                                            $current_robot_counters = !empty($current_robot_data['counters']) ? $current_robot_data['counters'] : array();
 
                                             ?>
 
@@ -1094,6 +1100,25 @@
                                                         <?
                                                     }
                                                     ?>
+                                                </div>
+                                                <div class="field halfsize has4cols multirow" style="margin-top: -6px;">
+                                                    <?
+                                                    foreach ($stat_mod_kinds AS $stat_kind){
+                                                        $counter_token = $stat_kind.'_mods';
+                                                        $current_value = isset($current_robot_counters[$counter_token]) ? $current_robot_counters[$counter_token] : 0;
+                                                        ?>
+                                                        <div class="subfield">
+                                                            <strong class="label sublabel" title="Increase or decrease this robot's <?= $stat_kind ?> stat at the start of battle"><?= ucfirst($stat_kind).' Mods' ?></strong>
+                                                            <input class="textbox" type="number" name="challenge_target_data[player_robots][<?= $robot_key ?>][counters][<?= $counter_token ?>]" value="<?= $current_value ?>" min="-5" max="5" />
+                                                        </div>
+                                                        <?
+                                                    }
+                                                    ?>
+                                                    <div class="subfield">
+                                                        <? $current_value = !empty($current_robot_values['robot_switch']) ? $current_robot_values['robot_switch'] : 0; ?>
+                                                        <strong class="label sublabel" title="Increase or decrease the frequency at which this robot switches out">Switch Mods</strong>
+                                                        <input class="textbox" type="number" name="challenge_target_data[player_robots][<?= $robot_key ?>][values][robot_switch]" value="<?= $current_value ?>" min="-5" max="5" />
+                                                    </div>
                                                 </div>
                                             </div>
 

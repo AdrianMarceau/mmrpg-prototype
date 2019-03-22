@@ -944,7 +944,10 @@ input[type=file] {
     float: left;
 }
 .adminform .field.has4cols .subfield select,
-.adminform .field.has4cols .subfield textarea {
+.adminform .field.has4cols .subfield textarea,
+.adminform .field.has4cols .subfield input[type="text"],
+.adminform .field.has4cols .subfield input[type="number"],
+.adminform .field.has4cols .subfield input[type="password"] {
     width: 100%;
     margin-right: 0;
 }

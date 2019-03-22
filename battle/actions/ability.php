@@ -69,8 +69,12 @@ if ($target_energy_damage_percent > 0){ $temp_critical_chance = ceil($target_ene
 elseif ($target_weapons_damage_percent > 0){ $temp_critical_chance = ceil($target_weapons_damage_percent / 3); }
 else { $temp_critical_chance = 1; }
 if ($target_player->player_switch != 1){ $temp_critical_chance = ceil($temp_critical_chance * $target_player->player_switch); }
+if (!empty($active_target_robot->values['robot_switch'])){
+    if ($active_target_robot->values['robot_switch'] > 1){ $temp_critical_chance = ceil($temp_critical_chance * $active_target_robot->values['robot_switch']);  }
+    elseif ($active_target_robot->values['robot_switch'] < 1){ $temp_critical_chance = ceil($temp_critical_chance * (1 / ($active_target_robot->values['robot_switch'] * -1)));  }
+}
 if ($temp_critical_chance > 100){ $temp_critical_chance = 100; }
-$temp_critical_chance = (int)($temp_critical_chance);
+//$temp_critical_chance = (int)($temp_critical_chance);
 
 // Check if the switch should be disabled
 $temp_switch_disabled = false;

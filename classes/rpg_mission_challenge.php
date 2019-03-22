@@ -66,7 +66,7 @@ class rpg_mission_challenge extends rpg_mission {
         if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = rpg_robot::get_index(); }
 
         // Define any bonus stats applied to these robots
-        $challenge_robot_token = 100;
+        $challenge_robot_level = 100;
         $challenge_robot_rewards = array('robot_attack' => 9999, 'robot_defense' => 9999, 'robot_speed' => 9999);
 
         // Generate the challenge token based on available data
@@ -119,8 +119,8 @@ class rpg_mission_challenge extends rpg_mission {
         if (!isset($challenge_target_player['player_name'])){ $challenge_target_player['player_name'] = ucwords(str_replace('-', '. ', $challenge_target_player['player_token'])); }
         foreach ($challenge_target_player['player_robots'] AS $k => $r){
             $challenge_target_player['player_robots'][$k]['robot_id'] = MMRPG_SETTINGS_TARGET_PLAYERID + ($k + 1);
-            $challenge_target_player['player_robots'][$k]['robot_level'] = $challenge_robot_token;
-            $challenge_target_player['player_robots'][$k]['values'] = array('robot_rewards' => $challenge_robot_rewards);
+            $challenge_target_player['player_robots'][$k]['robot_level'] = $challenge_robot_level;
+            $challenge_target_player['player_robots'][$k]['values']['robot_rewards'] = $challenge_robot_rewards;
         }
         $num_target_robots = count($challenge_target_player['player_robots']);
 
@@ -227,7 +227,7 @@ class rpg_mission_challenge extends rpg_mission {
             'battle_token' => $challenge_token,
             'battle_name' => $challenge_name,
             'battle_button' => $challenge_data['challenge_name'],
-            'battle_level' => $challenge_robot_token,
+            'battle_level' => $challenge_robot_level,
             'battle_robot_limit' => $challenge_allowed_robots,
             'battle_size' => $challenge_size,
             'battle_encore' => true,
