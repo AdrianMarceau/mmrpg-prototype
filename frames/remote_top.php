@@ -109,4 +109,15 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
     }
 
 }
+
+// If we're somehow in the demo mode, break immediately
+$session_token = rpg_game::session_token();
+if (!defined('MMRPG_REMOTE_GAME') && !empty($_SESSION[$session_token]['DEMO'])){
+    echo('<p style="font-weight: normal; color: #dedede; text-align: center; padding: 50px; font-size: 16px; line-height: 1.3;">');
+        echo(rpg_battle::random_negative_word().' ');
+        echo('It looks like you were logged out of your account! <br /> This was either due to inactivity or the result of an action in another tab. <br /> Please reload your game if you want to continue playing.');
+    echo('</p>'.PHP_EOL);
+    exit();
+}
+
 ?>
