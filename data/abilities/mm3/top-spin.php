@@ -5,12 +5,12 @@ $ability = array(
     'ability_token' => 'top-spin',
     'ability_game' => 'MM03',
     //'ability_group' => 'MM03/Weapons/021',
-    'ability_group' => 'MM03/Weapons/019x',
+    'ability_group' => 'MM03/Weapons/019T1',
     'ability_description' => 'The user launches a large, top-shaped weapon at the target that spins around frantically and continues dealing damage until it misses!',
     'ability_type' => 'swift',
     'ability_energy' => 4,
-    'ability_damage' => 1,
-    'ability_accuracy' => 70,
+    'ability_damage' => 2,
+    'ability_accuracy' => 72,
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope

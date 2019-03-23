@@ -5,12 +5,12 @@ $ability = array(
     'ability_token' => 'shadow-blade',
     'ability_game' => 'MM03',
     //'ability_group' => 'MM03/Weapons/024',
-    'ability_group' => 'MM03/Weapons/019x',
+    'ability_group' => 'MM03/Weapons/019T2',
     'ability_description' => 'The user throws a dark ninja star at the target to inflict damage and lower an their highest stat!',
     'ability_type' => 'shadow',
     'ability_type2' => 'cutter',
-    'ability_energy' => 4,
-    'ability_damage' => 16,
+    'ability_energy' => 8,
+    'ability_damage' => 32,
     'ability_accuracy' => 92,
     'ability_function' => function($objects){
 
