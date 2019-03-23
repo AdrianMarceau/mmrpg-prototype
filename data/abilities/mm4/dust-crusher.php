@@ -4,12 +4,13 @@ $ability = array(
     'ability_name' => 'Dust Crusher',
     'ability_token' => 'dust-crusher',
     'ability_game' => 'MM04',
-    'ability_group' => 'MM04/Weapons/030',
+    //'ability_group' => 'MM04/Weapons/030',
+    'ability_group' => 'MM04/Weapons/025T2',
     'ability_description' => 'The user collects a piece of stage debris with its powerful vaccuum and then blasts it at the target for massive damage!',
     'ability_type' => 'wind',
     'ability_type2' => 'impact',
-    'ability_energy' => 4,
-    'ability_damage' => 18,
+    'ability_energy' => 8,
+    'ability_damage' => 26,
     'ability_accuracy' => 94,
     'ability_function' => function($objects){
 
