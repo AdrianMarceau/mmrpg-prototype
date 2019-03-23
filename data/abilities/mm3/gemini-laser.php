@@ -5,12 +5,12 @@ $ability = array(
     'ability_token' => 'gemini-laser',
     'ability_game' => 'MM03',
     //'ability_group' => 'MM03/Weapons/019',
-    'ability_group' => 'MM03/Weapons/019x',
+    'ability_group' => 'MM03/Weapons/019T2',
     'ability_description' => 'The user fires a powerful laser that bounces back and forth across the battle field, damaging all target robots until it runs out of power!',
     'ability_type' => 'crystal',
     'ability_type2' => 'laser',
-    'ability_energy' => 4,
-    'ability_damage' => 12,
+    'ability_energy' => 8,
+    'ability_damage' => 28,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 

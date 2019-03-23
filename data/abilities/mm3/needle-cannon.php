@@ -5,12 +5,12 @@ $ability = array(
     'ability_token' => 'needle-cannon',
     'ability_game' => 'MM03',
     //'ability_group' => 'MM03/Weapons/017',
-    'ability_group' => 'MM03/Weapons/019x',
+    'ability_group' => 'MM03/Weapons/019T2',
     'ability_description' => 'The user fires a volley of three needle-like projectiles that piece the target\'s defenses and repeatedly inflict damage!',
     'ability_type' => 'cutter',
     'ability_type2' => 'missile',
-    'ability_energy' => 4,
-    'ability_damage' => 12,
+    'ability_energy' => 8,
+    'ability_damage' => 24,
     'ability_accuracy' => 98,
     'ability_function' => function($objects){
 
