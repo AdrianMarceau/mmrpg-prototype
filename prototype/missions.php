@@ -16,7 +16,10 @@ if (!empty($_SESSION[$session_token]['DEMO'])){
         // Print out the demo mode's mission select screen for Dr. Light
         echo '<div class="option_wrapper option_wrapper_hidden '.($prototype_data['demo']['battles_complete'] >= 4 ? 'option_wrapper_complete ' : 'option_wrapper_default ').'" data-condition="this_player_token=dr-light" data-music="'.$prototype_data['demo']['missions_music'].'">'."\n";
         //echo $prototype_data['demo']['missions_markup']."\n";
-        echo "<strong>YOU HAVE BEEN LOGGED OUT! NO MISSIONS ARE AVAILABLE!</strong>\n";
+        echo('<p style="font-weight: normal; color: #dedede; text-align: center; padding: 50px; font-size: 16px; line-height: 1.3;">');
+            echo(rpg_battle::random_negative_word().' ');
+            echo('It looks like you were logged out of your account! <br /> This was either due to inactivity or the result of an action in another tab. <br /> Please reload your game if you want to continue playing.');
+        echo('</p>'.PHP_EOL);
         echo '<a class="option option_1x4 option_spacer" style="visibility: hidden;">&nbsp;</a>'."\n";
         echo '</div>'."\n";
 

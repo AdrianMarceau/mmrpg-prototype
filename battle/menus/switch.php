@@ -13,6 +13,12 @@ ob_start();
         }
     }
 
+    // Check to see if a switch SHOULD be allowed
+    $this_switch_required = false;
+    if ($this_robot->robot_status == 'disabled' && $this_robot->robot_position == 'active'){
+        $this_switch_required = true;
+    }
+
     // Define and start the order counter
     $temp_order_counter = 1;
 
@@ -56,11 +62,15 @@ ob_start();
 
                 // Check if the switch should be disabled based on attachments on this robot
                 $temp_switch_disabled = false;
-                if ($temp_robot->robot_status != 'disabled'){
+                if (!$this_switch_required
+                    && $temp_robot->robot_status != 'disabled'){
                     $temp_robot_attachments = $temp_robot->get_current_attachments();
                     if (!empty($temp_robot_attachments)){
                         foreach ($temp_robot_attachments AS $attachment_token => $attachment_info){
-                            if (!empty($attachment_info['attachment_switch_disabled'])){ $temp_switch_disabled = true; }
+                            if (!empty($attachment_info['attachment_switch_disabled'])){
+                                $temp_switch_disabled = true;
+                                break;
+                            }
                         }
                     }
                 }

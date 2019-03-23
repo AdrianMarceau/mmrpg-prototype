@@ -44,10 +44,24 @@ $ability = array(
                 ));
             $this_robot->trigger_target($target_robot, $this_ability);
 
+            // Check to see which keys are already being used
+            $available_keys = array(0, 1, 2, 3, 4, 5, 6, 7);
+            $target_robots_active = $target_player->get_robots_active();
+            foreach ($target_robots_active AS $key => $robot){
+                if ($robot->robot_id == $target_robot->robot_id){ $temp_target_robot = $target_robot; }
+                else { $temp_target_robot = $robot; }
+                $key_pos = array_search($temp_target_robot->robot_key, $available_keys);
+                if ($key_pos != -1){
+                    unset($available_keys[$key_pos]);
+                    $available_keys = array_values($available_keys);
+                }
+            }
+
             // Inflict damage on the opposing robot
             $this_robot->robot_frame = 'throw';
             $this_robot->update_session();
             $target_robot->robot_position = 'bench';
+            $target_robot->robot_key = !empty($available_keys) ? array_shift($available_keys) : 0;
             $target_robot->update_session();
             $this_ability->damage_options_update(array(
                 'kind' => 'energy',

@@ -666,7 +666,10 @@ ob_start();
                                         $info = $mmrpg_index_robots[$token];
                                         $type = !empty($info['robot_core']) ? $info['robot_core'] : 'none';
                                         if (!empty($info['robot_core2'])){ $type = ($type !== 'none' ? $type.'_'.$info['robot_core2'] : $info['robot_core2']); }
-                                        $details_markup[] = '<li><a class="robot_type type_'.$type.'" href="database/robots/'.$info['robot_token'].'/">'.$info['robot_name'].($num !== 1 ? ' x'.$num : '').'</a></li>';
+                                        if ($info['robot_class'] == 'boss'){ $cls = 'bosses'; }
+                                        elseif ($info['robot_class'] == 'mecha'){ $cls = 'mechas'; }
+                                        else { $cls = 'robots'; }
+                                        $details_markup[] = '<li><a class="robot_type type_'.$type.'" href="database/'.$cls.'/'.$info['robot_token'].'/">'.$info['robot_name'].($num !== 1 ? ' x'.$num : '').'</a></li>';
                                     } elseif ($category_token === 'abilities_unlocked'){
                                         $token = $data;
                                         $info = $mmrpg_index_abilities[$token];
