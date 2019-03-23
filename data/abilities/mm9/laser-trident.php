@@ -4,12 +4,13 @@ $ability = array(
     'ability_name' => 'Laser Trident',
     'ability_token' => 'laser-trident',
     'ability_game' => 'MM09',
-    'ability_group' => 'MM09/Weapons/067',
+    //'ability_group' => 'MM09/Weapons/067',
+    'ability_group' => 'MM09/Weapons/065T2',
     'ability_description' => 'The user fires a three-pronged energy beam at the target to inflict damage and remove any positive stat changes benefiting them!',
     'ability_type' => 'water',
     'ability_type2' => 'laser',
     'ability_energy' => 8,
-    'ability_damage' => 20,
+    'ability_damage' => 23,
     'ability_accuracy' => 94,
     'ability_function' => function($objects){
 
