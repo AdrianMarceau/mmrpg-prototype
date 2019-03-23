@@ -91,6 +91,8 @@ $ability = array(
             $this_robot->set_frame('throw');
             $this_ability->damage_options_update(array(
                 'kind' => 'energy',
+                'type' => $this_ability->ability_type,
+                'type2' => '',
                 'modifiers' => true,
                 'kickback' => array(5, 0, 0),
                 'success' => array(3, -5, 10, 10, 'The target was struck by the '. $this_ability->print_name().'\'s lightning!'),
@@ -98,6 +100,8 @@ $ability = array(
                 ));
             $this_ability->recovery_options_update(array(
                 'kind' => 'energy',
+                'type' => $this_ability->ability_type,
+                'type2' => '',
                 'modifiers' => true,
                 'frame' => 'taunt',
                 'kickback' => array(5, 0, 0),
