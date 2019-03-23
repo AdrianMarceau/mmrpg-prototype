@@ -1,13 +1,13 @@
 <?
-// COPY VISION
+// ASTRO VISION
 $ability = array(
-    'ability_name' => 'Copy Vision',
-    'ability_token' => 'copy-vision',
+    'ability_name' => 'Astro Vision',
+    'ability_token' => 'astro-vision',
     'ability_game' => 'MM08',
-    'ability_group' => 'MM08/Weapons/058',
+    //'ability_group' => 'MM08/Weapons/058',
+    'ability_group' => 'MM08/Weapons/057T1',
     'ability_description' => '...',
     'ability_type' => 'space',
-    'ability_type2' => 'copy',
     'ability_damage' => 10,
     'ability_accuracy' => 90,
     'ability_function' => function($objects){
