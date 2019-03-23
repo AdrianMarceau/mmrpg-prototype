@@ -2004,7 +2004,10 @@ class rpg_ability extends rpg_object {
                                                 if ($this_robot_method == 'level' && $ability_info['ability_token'] == 'buster-shot' || $this_robot_method != 'level' && in_array($ability_info['ability_token'], $temp_global_abilities)){ continue; }
                                                 if ($this_level >= 0){
                                                     //title="'.$this_robot_title_plain.'"
-                                                    $temp_markup = '<a href="'.MMRPG_CONFIG_ROOTURL.'database/robots/'.$this_robot['robot_token'].'/"  class="robot_name robot_type robot_type_'.(!empty($this_robot['robot_core']) ? $this_robot['robot_core'].(!empty($this_robot['robot_core2']) ? '_'.$this_robot['robot_core2'] : '') : 'none').'" style="'.($this_robot_image == 'robot' ? 'opacity: 0.3; ' : '').'">';
+                                                    if ($this_robot['robot_class'] == 'boss'){ $temp_db_url = 'database/bosses/'; }
+                                                    elseif ($this_robot['robot_class'] == 'mecha'){ $temp_db_url = 'database/mechas/'; }
+                                                    else { $temp_db_url = 'database/robots/'; }
+                                                    $temp_markup = '<a href="'.MMRPG_CONFIG_ROOTURL.$temp_db_url.$this_robot['robot_token'].'/"  class="robot_name robot_type robot_type_'.(!empty($this_robot['robot_core']) ? $this_robot['robot_core'].(!empty($this_robot['robot_core2']) ? '_'.$this_robot['robot_core2'] : '') : 'none').'" style="'.($this_robot_image == 'robot' ? 'opacity: 0.3; ' : '').'">';
                                                     $temp_markup .= '<span class="chrome">'.$this_robot_sprite_html.$this_robot_title_html.'</span>';
                                                     $temp_markup .= '</a>';
                                                     $temp_string[] = $temp_markup;
