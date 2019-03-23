@@ -3869,20 +3869,25 @@ class rpg_robot extends rpg_object {
             // Loop through and generate the robot image display token markup
             $robot_image_unlock_tokens = '';
             $temp_total_alts_count = 0;
-            for ($i = 0; $i < 6; $i++){
+            $max_alt_slots = 12;
+            $break_after_slot = 6;
+            for ($i = 0; $i < $max_alt_slots; $i++){
                 $temp_enabled = true;
                 $temp_active = false;
                 if ($i + 1 > $robot_alt_count){ break; }
                 if ($i > 0 && !isset($robot_alt_options[$i - 1])){ $temp_enabled = false; }
                 if ($temp_enabled && $i == 0 && $robot_image_unlock_current == 'base'){ $temp_active = true; }
                 elseif ($temp_enabled && $i >= 1 && $robot_image_unlock_current == $robot_alt_options[$i - 1]){ $temp_active = true; }
-                $robot_image_unlock_tokens .= '<span class="token token_'.($temp_enabled ? 'enabled' : 'disabled').' '.($temp_active ? 'token_active' : '').'" style="left: '.($token_first_offset + ($i * $token_other_offset)).'px;">&bull;</span>';
+                $rel_i = ($i >= $break_after_slot) ? ($i - $break_after_slot) : $i;
+                $left_offset = ($token_first_offset + ($rel_i * $token_other_offset));
+                $bottom_offset = ($i >= $break_after_slot) ? -17 : -12;
+                $robot_image_unlock_tokens .= '<span class="token token_'.($temp_enabled ? 'enabled' : 'disabled').' '.($temp_active ? 'token_active' : '').'" style="left: '.$left_offset.'px; bottom: '.$bottom_offset.'px;">&bull;</span>';
                 $temp_total_alts_count += 1;
             }
             $temp_unlocked_alts_count = count($robot_alt_options) + 1;
             $temp_image_alt_title = '';
             if ($temp_total_alts_count > 1){
-                $temp_image_alt_title = '<strong>'.$temp_unlocked_alts_count.' / '.$temp_total_alts_count.' Outfits Unlocked</strong><br />';
+                $temp_image_alt_title = '<strong>'.$temp_unlocked_alts_count.' / '.$robot_alt_count.' Outfits Unlocked</strong><br />';
                 //$temp_image_alt_title .= '<span style="font-size: 90%;">';
                     $temp_image_alt_title .= '&#8226; <span style="font-size: 90%;">'.$robot_info['robot_name'].'</span><br />';
                     foreach ($robot_info['robot_image_alts'] AS $alt_key => $alt_info){
