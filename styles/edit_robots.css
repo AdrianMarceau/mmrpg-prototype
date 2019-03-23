@@ -409,11 +409,11 @@ body.windowFlag_landscapeMode #prototype {
 
 #edit #console .event .event_robot_images {
     margin-top: 48px;
-    height: 48px;
+    height: 52px;
     z-index: 90;
 }
 #edit #console .event .event_robot_summons {
-    margin-top: 104px;
+    margin-top: 108px;
     height: 21px;
     text-align: center;
     line-height: 10px;
@@ -431,7 +431,7 @@ body.windowFlag_landscapeMode #prototype {
     color: #CECECE;
 }
 #edit #console .event .event_robot_favourite {
-    margin-top: 133px;
+    margin-top: 137px;
     height: 14px;
     z-index: 70;
 }
