@@ -23,7 +23,7 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                 // Elemental Shots
                 'cutter-shot', 'freeze-shot', 'crystal-shot',
                 'flame-shot', 'electric-shot', 'space-shot',
-                'laser-shot', 'shield-shot'
+                'nature-shot', 'laser-shot', 'shield-shot'
                 ),
             array(
                 'rising-cutter', 'super-arm', 'ice-slasher', 'danger-bomb', 'fire-chaser', 'thunder-beam', 'time-slow', 'oil-slider', // MM1
@@ -37,13 +37,13 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                 // Elemental Busters
                 'cutter-buster', 'freeze-buster', 'crystal-buster',
                 'flame-buster', 'electric-buster', 'space-buster',
-                'laser-buster', 'shield-buster'
+                'nature-buster', 'laser-buster', 'shield-buster'
                 ),
             array(
                 // Elemental Overdrives
                 'cutter-overdrive', 'freeze-overdrive', 'crystal-overdrive',
                 'flame-overdrive', 'electric-overdrive', 'space-overdrive',
-                'laser-overdrive', 'shield-overdrive'
+                'nature-overdrive', 'laser-overdrive', 'shield-overdrive'
                 )
             );
     }
