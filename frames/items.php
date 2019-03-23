@@ -253,6 +253,7 @@ if (true){
 
                                                 // Collect the items details and current quantity
                                                 $item_info_quantity = !empty($this_battle_stars_fusion_count) ? $this_battle_stars_fusion_count : 0;
+                                                if (!empty($this_battle_stars_perfect_fusion_count)){ $item_info_quantity += $this_battle_stars_perfect_fusion_count; }
                                                 $temp_info_tooltip = rpg_item::print_editor_title_markup($robot_info, $item_info, $item_print_options);
                                                 $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
 
