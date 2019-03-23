@@ -227,9 +227,12 @@ if ($this_action == 'start'){
         //die('<pre>after:'.print_r($debug['player_robots'], true).'</pre>');
         $this_key_counter = 0;
         $temp_this_player_robots = strstr($this_player_robots, ',') ? explode(',', $this_player_robots) : array($this_player_robots);
+        $temp_this_player_robots_ids = array();
         foreach ($this_playerinfo['player_robots'] AS $this_key => $this_data){
             if (!mmrpg_prototype_robot_unlocked($this_player_token, $this_data['robot_token'])){ continue; }
             $this_info = rpg_robot::parse_index_info($battle_robots_index[$this_data['robot_token']]);
+            if (in_array($this_data['robot_id'], $temp_this_player_robots_ids)){ continue; }
+            else { $temp_this_player_robots_ids[] = $this_data['robot_id']; }
             $this_token = $this_data['robot_id'].'_'.$this_data['robot_token'];
             $this_position = array_search($this_token, $temp_this_player_robots);
             $this_data['robot_key'] = $this_key_counter;
@@ -245,6 +248,7 @@ if ($this_action == 'start'){
             }
         }
         // Update the player session with changes
+        $this_player->counters['robots_start_total'] = $this_key_counter;
         $this_player->update_session();
 
     }
@@ -286,23 +290,27 @@ if ($this_action == 'start'){
         // Break apart the allowed robots string and unset undefined robots
         //strstr($target_player_robots, ',') ? explode(',', $target_player_robots) : array($target_player_robots);
         //$target_playerinfo = $target_player->export_array();
+        $target_key_counter = 0;
         $target_playerinfo_robots = array();
-        $this_key_counter = 0;
+        $temp_target_player_robots_ids = array();
         foreach ($target_playerinfo['player_robots'] AS $this_key => $this_data){
             $this_info = rpg_robot::parse_index_info($battle_robots_index[$this_data['robot_token']]);
+            if (in_array($this_data['robot_id'], $temp_target_player_robots_ids)){ continue; }
+            else { $temp_target_player_robots_ids[] = $this_data['robot_id']; }
             $this_token = $this_data['robot_id'].'_'.$this_data['robot_token'];
             $this_position = $this_key; //array_search($this_token, $target_player_robots);
-            $this_data['robot_key'] = $this_key_counter;
+            $this_data['robot_key'] = $target_key_counter;
             // Only allow this robot if it exists in the robot string
             if ($this_position !== false){
                 // Create the temporary robot object to load data
                 $this_data = array_merge($this_info, $this_data);
                 $target_player->player_robots[$this_key] = $this_data;
-                $target_player->load_robot($this_data, $this_key_counter, true);
-                $this_key_counter++;
+                $target_player->load_robot($this_data, $target_key_counter, true);
+                $target_key_counter++;
             }
         }
         // Update the player session with changes
+        $target_player->counters['robots_start_total'] = $target_key_counter;
         $target_player->update_session();
 
         // DEBUG
@@ -712,10 +720,51 @@ if (!empty($this_battle->flags['challenge_battle'])
         $this_battle->flags['challenge_battle_concluded'] = true;
 
         // Now update the victory or defeat counters based on the result of the battle
-        if ($this_battle->battle_result == 'victory'){
-            $db->query("UPDATE mmrpg_challenges SET challenge_user_victories = (challenge_user_victories + 1) WHERE challenge_id = {$challenge_id};");
-        } elseif ($this_battle->battle_result == 'defeat'){
+        if ($this_battle->battle_result == 'defeat'){
+
+            // Update the defeat counter for this challenge and be done with it
             $db->query("UPDATE mmrpg_challenges SET challenge_user_defeats = (challenge_user_defeats + 1) WHERE challenge_id = {$challenge_id};");
+        } elseif ($this_battle->battle_result == 'victory'){
+
+            // Update the victory counter for this challenge before we update leaderboard
+            $db->query("UPDATE mmrpg_challenges SET challenge_user_victories = (challenge_user_victories + 1) WHERE challenge_id = {$challenge_id};");
+
+            // Check to see if this user already has a record on the challenge leaderboard
+            $existing_db_row = $db->get_array("SELECT
+                board_id,
+                challenge_turns_used,
+                challenge_robots_used,
+                challenge_zenny_earned
+                FROM mmrpg_challenges_leaderboard
+                WHERE
+                challenge_id = {$challenge_id}
+                AND user_id = {$this_user_id}
+                ;");
+            $db_common_fields = array();
+            $db_common_fields['challenge_turns_used'] = $this_battle->counters['battle_turn'];
+            $db_common_fields['challenge_robots_used'] = !empty($this_player->counters['robots_start_total']) ? $this_player->counters['robots_start_total'] : 0;
+            $db_common_fields['challenge_zenny_earned'] = !empty($this_battle->counters['final_zenny_reward']) ? $this_battle->counters['final_zenny_reward'] : 0;
+            $new_rank_value = $db_common_fields['challenge_turns_used'] * $db_common_fields['challenge_robots_used'];
+            if (!empty($existing_db_row)){
+                $existing_rank_value = $existing_db_row['challenge_turns_used'] * $existing_db_row['challenge_robots_used'];
+                if ($new_rank_value <= $existing_db_row){ $update_fields = $db_common_fields; }
+                else { $update_fields = array(); }
+                $update_fields['challenge_date_lastclear'] = time();
+                $condition_data = array();
+                $condition_data['user_id'] = $this_user_id;
+                $condition_data['challenge_id'] = $challenge_id;
+                $db->update('mmrpg_challenges_leaderboard', $update_fields, $condition_data);
+                //$this_battle->events_create(false, false, 'DEBUG', '$update_fields = '.print_r($update_fields, true));
+            } else {
+                $insert_fields = $db_common_fields;
+                $insert_fields['user_id'] = $this_user_id;
+                $insert_fields['challenge_id'] = $challenge_id;
+                $insert_fields['challenge_result'] = 'victory';
+                $insert_fields['challenge_date_firstclear'] = time();
+                $db->insert('mmrpg_challenges_leaderboard', $insert_fields);
+                //$this_battle->events_create(false, false, 'DEBUG', '$insert_fields = '.print_r($insert_fields, true));
+            }
+
         }
 
     }

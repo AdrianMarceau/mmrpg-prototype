@@ -666,6 +666,7 @@ class rpg_battle extends rpg_object {
 
                 // Collect the battle zenny from the function
                 $other_battle_zenny_modded = $this->calculate_battle_zenny($target_player, $other_player_zenny, $other_player_turns);
+                $this->counters['final_zenny_reward'] = $other_battle_zenny_modded;
 
                 // Create the victory event for the target player
                 $this_player->player_frame = 'victory';
@@ -1105,6 +1106,7 @@ class rpg_battle extends rpg_object {
                 $first_event_body_foot = 'Final Reward: '.number_format($total_zenny_rewards, 0, '.', ',').'z';
                 if (!isset($_SESSION['GAME']['counters']['battle_zenny'])){ $_SESSION['GAME']['counters']['battle_zenny'] = 0; }
                 $_SESSION['GAME']['counters']['battle_zenny'] += $total_zenny_rewards;
+                $this->counters['final_zenny_reward'] = $total_zenny_rewards;
             }
 
         }
@@ -1775,8 +1777,14 @@ class rpg_battle extends rpg_object {
                                     </tr>
                                     <tr>
                                         <td class="right" colspan="5">
-                                            <span style="float: left;">Export Array :</span>
+                                            <span style="float: left;">Robot Export Array :</span>
                                             <?= ('<pre style="clear: both; padding: 10px; text-align: left; white-space: normal; overflow: auto;">'.print_r($temp_target_robot->export_array(), true).'</pre>') ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="right" colspan="5">
+                                            <span style="float: left;">Player Counters Array :</span>
+                                            <?= ('<pre style="clear: both; padding: 10px; text-align: left; white-space: normal; overflow: auto;">'.print_r($temp_target_player->counters, true).'</pre>') ?>
                                         </td>
                                     </tr>
                                 <? } ?>
