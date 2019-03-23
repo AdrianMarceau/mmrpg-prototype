@@ -5,6 +5,7 @@ $ability = array(
     'ability_token' => 'napalm-bomb',
     'ability_game' => 'MM05',
     'ability_group' => 'MM05/Weapons/039',
+    'ability_group' => 'MM05/Weapons/033T1',
     'ability_description' => '...',
     'ability_type' => 'explode',
     'ability_damage' => 10,
