@@ -2687,36 +2687,81 @@ class rpg_robot extends rpg_object {
         // Collect the database records for this robot
         if ($print_options['show_records']){
 
+            // Pull in global DB and preset the record array
             global $db;
             $temp_robot_records = array('robot_encountered' => 0, 'robot_defeated' => 0, 'robot_unlocked' => 0, 'robot_summoned' => 0, 'robot_scanned' => 0, 'robot_avatars' => 0);
-            //$temp_robot_records['player_count'] = $db->get_value("SELECT COUNT(board_id) AS player_count  FROM mmrpg_leaderboard WHERE board_robots LIKE '%[".$robot_info['robot_token'].":%' AND board_points > 0", 'player_count');
-            $temp_player_query = "SELECT
-                saves.user_id,
-                saves.save_values_robot_database,
-                board.board_points,
-                users.user_image_path
-                FROM mmrpg_saves AS saves
-                LEFT JOIN mmrpg_leaderboard AS board ON board.user_id = saves.user_id
-                LEFT JOIN mmrpg_users AS users ON users.user_id = saves.user_id
-                WHERE
-                saves.save_values_robot_database LIKE '%\"{$robot_info['robot_token']}\"%'
-                AND board.board_points > 0
-                ;";
-            $temp_player_list = $db->get_array_list($temp_player_query);
-            if (!empty($temp_player_list)){
-                foreach ($temp_player_list AS $temp_data){
-                    $temp_values = !empty($temp_data['save_values_robot_database']) ? json_decode($temp_data['save_values_robot_database'], true) : array();
-                    $temp_entry = !empty($temp_values[$robot_info['robot_token']]) ? $temp_values[$robot_info['robot_token']] : array();
-                    foreach ($temp_robot_records AS $temp_record => $temp_count){
-                        if (!empty($temp_entry[$temp_record])){ $temp_robot_records[$temp_record] += $temp_entry[$temp_record]; }
-                    }
-                    if (strstr($temp_data['user_image_path'], 'robots/'.$robot_info['robot_token'])){
-                        $temp_robot_records['robot_avatars'] += 1;
+
+            // Check to see if a recent record already exists and use it if possible
+            $temp_fields = implode(', ', array_keys($temp_robot_records));
+            $record_token = $robot_info['robot_token'];
+            $existing_record = $db->get_array("SELECT
+                record_id,
+                record_time,
+                robot_token,
+                {$temp_fields}
+                FROM mmrpg_records_robots
+                WHERE robot_token = '{$record_token}'
+                ;");
+
+            // If the record exists and isn't too old, loop through and collect
+            if (!empty($existing_record)
+                && $existing_record['record_time'] >= MMRPG_CONFIG_LAST_SAVE_DATE){
+                foreach ($temp_robot_records AS $token => $value){
+                    if (!empty($existing_record[$token])){
+                        $temp_robot_records[$token] = $existing_record[$token];
+                        continue;
                     }
                 }
             }
-            $temp_values = array();
-            //echo '<pre>'.print_r($temp_robot_records, true).'</pre>';
+            // Otherwise, if record not exists or too old, generate a new one
+            else {
+
+                // Collect relevant save files from the database
+                $temp_player_query = "SELECT
+                    saves.user_id,
+                    saves.save_values_robot_database,
+                    board.board_points,
+                    users.user_image_path
+                    FROM mmrpg_saves AS saves
+                    LEFT JOIN mmrpg_leaderboard AS board ON board.user_id = saves.user_id
+                    LEFT JOIN mmrpg_users AS users ON users.user_id = saves.user_id
+                    WHERE
+                    board.board_points > 0
+                    AND saves.save_values_robot_database LIKE '%\"{$record_token}\"%'
+                    ;";
+                $temp_player_list = $db->get_array_list($temp_player_query);
+
+                // Loop through save files and count unlock records etc.
+                if (!empty($temp_player_list)){
+                    foreach ($temp_player_list AS $temp_data){
+                        $temp_values = !empty($temp_data['save_values_robot_database']) ? json_decode($temp_data['save_values_robot_database'], true) : array();
+                        $temp_entry = !empty($temp_values[$robot_info['robot_token']]) ? $temp_values[$robot_info['robot_token']] : array();
+                        foreach ($temp_robot_records AS $temp_record => $temp_count){
+                            if (!empty($temp_entry[$temp_record])){ $temp_robot_records[$temp_record] += $temp_entry[$temp_record]; }
+                        }
+                        if (strstr($temp_data['user_image_path'], 'robots/'.$robot_info['robot_token'])){
+                            $temp_robot_records['robot_avatars'] += 1;
+                        }
+                    }
+                }
+
+                // Now that we have the data, either insert or update the record in the db
+                if (empty($existing_record)){
+                    $insert_array = array();
+                    $insert_array['record_time'] = MMRPG_CONFIG_LAST_SAVE_DATE;
+                    $insert_array['robot_token'] = $record_token;
+                    foreach ($temp_robot_records AS $token => $value){ $insert_array[$token] = $value; }
+                    $db->insert('mmrpg_records_robots', $insert_array);
+                } else {
+                    $update_array = array();
+                    $update_array['record_time'] = MMRPG_CONFIG_LAST_SAVE_DATE;
+                    foreach ($temp_robot_records AS $token => $value){ $update_array[$token] = $value; }
+                    $db->update('mmrpg_records_robots', $update_array, array('robot_token' => $record_token));
+                }
+
+
+            }
+
 
         }
 

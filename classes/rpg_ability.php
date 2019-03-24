@@ -1427,6 +1427,98 @@ class rpg_ability extends rpg_object {
         if (!empty($ability_info['ability_recovery_percent']) && $ability_info['ability_recovery'] > 100){ $ability_info['ability_recovery'] = 100; }
         if (!empty($ability_info['ability_recovery2_percent']) && $ability_info['ability_recovery2'] > 100){ $ability_info['ability_recovery2'] = 100; }
 
+        // If this ability is not complete, we can't show sprites or records
+        if (!$ability_info['ability_flag_complete']){
+            $print_options['show_sprites'] = false;
+            $print_options['show_records'] = false;
+        }
+        // If this ability is a mecha weapon, don't show records
+        if ($ability_info['ability_class'] != 'master'){
+            $print_options['show_records'] = false;
+        }
+
+        // Collect the database records for this ability
+        if ($print_options['show_records']){
+
+            // Pull in global DB and preset the record array
+            global $db;
+            $temp_ability_records = array('ability_unlocked' => 0, 'ability_equipped' => 0);
+
+            // Check to see if a recent record already exists and use it if possible
+            $temp_fields = implode(', ', array_keys($temp_ability_records));
+            $record_token = $ability_info['ability_token'];
+            $existing_record = $db->get_array("SELECT
+                record_id,
+                record_time,
+                ability_token,
+                {$temp_fields}
+                FROM mmrpg_records_abilities
+                WHERE ability_token = '{$record_token}'
+                ;");
+
+            // If the record exists and isn't too old, loop through and collect
+            if (!empty($existing_record)
+                && $existing_record['record_time'] >= MMRPG_CONFIG_LAST_SAVE_DATE){
+                foreach ($temp_ability_records AS $token => $value){
+                    if (!empty($existing_record[$token])){
+                        $temp_ability_records[$token] = $existing_record[$token];
+                        continue;
+                    }
+                }
+            }
+            // Otherwise, if record not exists or too old, generate a new one
+            else {
+
+                // Collect relevant save files from the database
+                $temp_player_query = "SELECT
+                    saves.user_id,
+                    saves.save_values_battle_rewards,
+                    saves.save_values_battle_settings,
+                    board.board_points
+                    FROM mmrpg_saves AS saves
+                    LEFT JOIN mmrpg_leaderboard AS board ON board.user_id = saves.user_id
+                    WHERE
+                    board.board_points > 0
+                    AND (saves.save_values_battle_rewards LIKE '%\"{$record_token}\"%'
+                    OR saves.save_values_battle_settings LIKE '%\"{$record_token}\"%')
+                    ;";
+                $temp_player_list = $db->get_array_list($temp_player_query);
+
+                // Loop through save files and count unlock records etc.
+                if (!empty($temp_player_list)){
+                    foreach ($temp_player_list AS $temp_data){
+                        $temp_rewards = !empty($temp_data['save_values_battle_rewards']) ? $temp_data['save_values_battle_rewards'] : array();
+                        $temp_settings = !empty($temp_data['save_values_battle_settings']) ? $temp_data['save_values_battle_settings'] : array();
+                        if (strstr($temp_settings, '"'.$record_token.'"')){
+                            $temp_ability_records['ability_equipped'] += substr_count($temp_settings, '"'.$record_token.'"');
+                            $temp_ability_records['ability_unlocked'] += 1;
+                        } elseif (strstr($temp_rewards, '"'.$record_token.'"')){
+                            $temp_ability_records['ability_unlocked'] += 1;
+                        }
+
+                    }
+                }
+
+                // Now that we have the data, either insert or update the record in the db
+                if (empty($existing_record)){
+                    $insert_array = array();
+                    $insert_array['record_time'] = MMRPG_CONFIG_LAST_SAVE_DATE;
+                    $insert_array['ability_token'] = $record_token;
+                    foreach ($temp_ability_records AS $token => $value){ $insert_array[$token] = $value; }
+                    $db->insert('mmrpg_records_abilities', $insert_array);
+                } else {
+                    $update_array = array();
+                    $update_array['record_time'] = MMRPG_CONFIG_LAST_SAVE_DATE;
+                    foreach ($temp_ability_records AS $token => $value){ $update_array[$token] = $value; }
+                    $db->update('mmrpg_records_abilities', $update_array, array('ability_token' => $record_token));
+                }
+
+
+            }
+
+
+        }
+
         // Start the output buffer
         ob_start();
         ?>
@@ -1635,7 +1727,7 @@ class rpg_ability extends rpg_object {
                     //if ($print_options['show_description']){ $section_tabs[] = array('description', 'Description', false); }
                     if ($print_options['show_sprites']){ $section_tabs[] = array('sprites', 'Sprites', false); }
                     if ($print_options['show_robots']){ $section_tabs[] = array('robots', 'Robots', false); }
-                    //if ($print_options['show_records']){ $section_tabs[] = array('records', 'Records', false); }
+                    if ($print_options['show_records']){ $section_tabs[] = array('records', 'Records', false); }
                     // Automatically mark the first element as true or active
                     $section_tabs[0][2] = true;
                     // Define the current URL for this ability page
@@ -2026,6 +2118,41 @@ class rpg_ability extends rpg_object {
                             </tbody>
                         </table>
                     </div>
+
+                <? endif; ?>
+
+                <? if($print_options['show_records']): ?>
+
+                    <h2 id="records" class="header header_full <?= $ability_header_types ?>" style="margin: 10px 0 0; text-align: left;">
+                        Community Records
+                    </h2>
+                    <div class="body body_full" style="margin: 0 auto 5px; padding: 0 0 5px; min-height: 10px;">
+                        <table class="full records">
+                            <colgroup>
+                                <col width="100%" />
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <td class="right">
+                                        <label>Unlocked By : </label>
+                                        <span class="ability_record"><?= $temp_ability_records['ability_unlocked'] == 1 ? '1 Player' : number_format($temp_ability_records['ability_unlocked'], 0, '.', ',').' Players' ?></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="right">
+                                        <label>Equipped To : </label>
+                                        <span class="ability_record"><?= $temp_ability_records['ability_equipped'] == 1 ? '1 Robot' : number_format($temp_ability_records['ability_equipped'], 0, '.', ',').' Robots' ?></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <? if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
+                        <div class="link_wrapper">
+                            <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
+                        </div>
+                    <? endif; ?>
 
                 <? endif; ?>
 
