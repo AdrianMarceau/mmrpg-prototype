@@ -2688,15 +2688,20 @@ class rpg_robot extends rpg_object {
         if ($print_options['show_records']){
 
             global $db;
-            $temp_robot_records = array('robot_encountered' => 0, 'robot_defeated' => 0, 'robot_unlocked' => 0, 'robot_summoned' => 0, 'robot_scanned' => 0);
+            $temp_robot_records = array('robot_encountered' => 0, 'robot_defeated' => 0, 'robot_unlocked' => 0, 'robot_summoned' => 0, 'robot_scanned' => 0, 'robot_avatars' => 0);
             //$temp_robot_records['player_count'] = $db->get_value("SELECT COUNT(board_id) AS player_count  FROM mmrpg_leaderboard WHERE board_robots LIKE '%[".$robot_info['robot_token'].":%' AND board_points > 0", 'player_count');
             $temp_player_query = "SELECT
-                mmrpg_saves.user_id,
-                mmrpg_saves.save_values_robot_database,
-                mmrpg_leaderboard.board_points
-                FROM mmrpg_saves
-                LEFT JOIN mmrpg_leaderboard ON mmrpg_leaderboard.user_id = mmrpg_saves.user_id
-                WHERE mmrpg_saves.save_values_robot_database LIKE '%\"{$robot_info['robot_token']}\"%' AND mmrpg_leaderboard.board_points > 0;";
+                saves.user_id,
+                saves.save_values_robot_database,
+                board.board_points,
+                users.user_image_path
+                FROM mmrpg_saves AS saves
+                LEFT JOIN mmrpg_leaderboard AS board ON board.user_id = saves.user_id
+                LEFT JOIN mmrpg_users AS users ON users.user_id = saves.user_id
+                WHERE
+                saves.save_values_robot_database LIKE '%\"{$robot_info['robot_token']}\"%'
+                AND board.board_points > 0
+                ;";
             $temp_player_list = $db->get_array_list($temp_player_query);
             if (!empty($temp_player_list)){
                 foreach ($temp_player_list AS $temp_data){
@@ -2704,6 +2709,9 @@ class rpg_robot extends rpg_object {
                     $temp_entry = !empty($temp_values[$robot_info['robot_token']]) ? $temp_values[$robot_info['robot_token']] : array();
                     foreach ($temp_robot_records AS $temp_record => $temp_count){
                         if (!empty($temp_entry[$temp_record])){ $temp_robot_records[$temp_record] += $temp_entry[$temp_record]; }
+                    }
+                    if (strstr($temp_data['user_image_path'], 'robots/'.$robot_info['robot_token'])){
+                        $temp_robot_records['robot_avatars'] += 1;
                     }
                 }
             }
@@ -3569,6 +3577,12 @@ class rpg_robot extends rpg_object {
                                         <td class="right">
                                             <label>Unlocked By : </label>
                                             <span class="robot_record"><?= $temp_robot_records['robot_unlocked'] == 1 ? '1 Player' : number_format($temp_robot_records['robot_unlocked'], 0, '.', ',').' Players' ?></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="right">
+                                            <label>Avatar Of : </label>
+                                            <span class="robot_record"><?= $temp_robot_records['robot_avatars'] == 1 ? '1 Player' : number_format($temp_robot_records['robot_avatars'], 0, '.', ',').' Players' ?></span>
                                         </td>
                                     </tr>
                                 <? endif; ?>
