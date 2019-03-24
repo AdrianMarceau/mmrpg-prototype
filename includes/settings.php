@@ -172,4 +172,15 @@ if (!defined('MMRPG_CONFIG_ADMIN_LIST')){
     define(MMRPG_CONFIG_ADMIN_LIST, '');
 }
 
+// Define the last save timestamp now if not already done so
+if (!defined('MMRPG_CONFIG_LAST_SAVE_DATE')){
+    $guest_id = MMRPG_SETTINGS_GUEST_ID;
+    $last_save_time = $db->get_value("SELECT MAX(save_date_modified) AS last_save_time FROM mmrpg_saves WHERE user_id <> {$guest_id};", 'last_save_time');
+    //echo('<pre>$last_save_time = '.print_r($last_save_time, true).'</pre>');
+    if (!empty($last_save_time)){ define('MMRPG_CONFIG_LAST_SAVE_DATE', $last_save_time); }
+    else { define('MMRPG_CONFIG_LAST_SAVE_DATE', time()); }
+    //echo('MMRPG_CONFIG_LAST_SAVE_DATE = '. MMRPG_CONFIG_LAST_SAVE_DATE);
+    //exit();
+}
+
 ?>
