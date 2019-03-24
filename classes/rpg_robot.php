@@ -2765,11 +2765,14 @@ class rpg_robot extends rpg_object {
                 <? if($print_options['show_basics']): ?>
 
                     <h2 class="header header_left <?= $robot_header_types ?> <?= (!$print_options['show_mugshot']) ? 'nomug' : '' ?>" style="<?= (!$print_options['show_mugshot']) ? 'margin-left: 0;' : '' ?>">
-                        <? if($print_options['layout_style'] == 'website_compact'): ?>
+                        <? if ($print_options['layout_style'] == 'website_compact'){ ?>
                             <a href="<?= $database_category_robot_url ?>"><?= $robot_info['robot_name'].$robot_info['robot_name_append'] ?></a>
-                        <? else: ?>
+                        <? } else { ?>
                             <?= $robot_info['robot_name'].$robot_info['robot_name_append'] ?>
-                        <? endif; ?>
+                        <? } ?>
+                        <? if (empty($robot_info['robot_flag_unlockable'])){ ?>
+                            <span class="not_unlockable" data-tooltip-type="<?= $robot_header_types ?>" title="* This robot cannot be unlocked right now">*</span>
+                        <? } ?>
                         <div class="header_core robot_type"><?= !empty($robot_info['robot_core']) ? ucwords($robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? ' / '.$robot_info['robot_core2'] : '')) : 'Neutral' ?><?= $robot_info['robot_class'] == 'mecha' ? ' Type' : ' Core' ?></div>
                     </h2>
 
