@@ -129,7 +129,11 @@ if (empty($this_current_token)){
     <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
         <span class="subheader_typewrapper">
             <a class="inline_link" href="database/robots/">Robot Database</a>
-            <span class="count">( <?= $mmrpg_database_robots_count_complete ?> / <?= $mmrpg_database_robots_count == 1 ? '1 Robot' : $mmrpg_database_robots_count.' Robots' ?> )</span>
+            <span class="count">(
+                <span data-tooltip-type="type type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" title="<?= $mmrpg_database_robots_count_unlockable.' Unlockable '.($mmrpg_database_robots_count_unlockable == 1 ? 'Robot' : 'Robots') ?>"><?= $mmrpg_database_robots_count_unlockable ?></span>
+                / <span data-tooltip-type="type type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" title="<?= $mmrpg_database_robots_count_complete.' Completed '.($mmrpg_database_robots_count_complete == 1 ? 'Robot' : 'Robots') ?>"><?= $mmrpg_database_robots_count_complete ?></span>
+                / <span data-tooltip-type="type type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" title="<?= $mmrpg_database_robots_count.' '.($mmrpg_database_robots_count == 1 ? 'Robot' : 'Robots').' Total' ?>"><?= $mmrpg_database_robots_count.' '.($mmrpg_database_robots_count == 1 ? 'Robot' : 'Robots') ?></span>
+            )</span>
             <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Core )</span>' : '' ?>
         </span>
     </h2>

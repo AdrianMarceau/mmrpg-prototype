@@ -123,6 +123,7 @@ $mmrpg_database_robots_links = '';
 $mmrpg_database_robots_links_index = array();
 $mmrpg_database_robots_links_counter = 0;
 $mmrpg_database_robots_count_complete = 0;
+$mmrpg_database_robots_count_unlockable = 0;
 
 // Loop through the results and generate the links for these robots
 foreach ($mmrpg_database_robots AS $robot_key => $robot_info){
@@ -151,6 +152,7 @@ foreach ($mmrpg_database_robots AS $robot_key => $robot_info){
 
     // Collect the robot sprite dimensions
     $robot_flag_complete = !empty($robot_info['robot_flag_complete']) ? true : false;
+    $robot_flag_unlockable = !empty($robot_info['robot_flag_unlockable']) ? true : false;
     $robot_image_size = !empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40;
     $robot_image_size_text = $robot_image_size.'x'.$robot_image_size;
     $robot_image_token = !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'];
@@ -177,6 +179,7 @@ foreach ($mmrpg_database_robots AS $robot_key => $robot_info){
     </div>
     <?php
     if ($robot_flag_complete){ $mmrpg_database_robots_count_complete++; }
+    if ($robot_flag_unlockable){ $mmrpg_database_robots_count_unlockable++; }
     $temp_markup = ob_get_clean();
     $mmrpg_database_robots_links_index[$robot_key] = $temp_markup;
     if ($show_in_link_list){ $mmrpg_database_robots_links .= $temp_markup; }
