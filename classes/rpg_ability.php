@@ -2680,13 +2680,14 @@ class rpg_ability extends rpg_object {
         // Define the charge required flag based on existing attachments of this ability
         $this_robot_attachments = $this_robot->get_current_attachments();
         $this_charge_required = !isset($this_robot_attachments[$this_attachment_token]) ? true : false;
-        // If this robot is holding a Charge Module, bypass changing and set to false
-        if ($this_robot->has_item('charge-module')){ $this_charge_required = false; }
 
         // If the ability flag had already been set, reduce the weapon energy to zero
         if (!$this_charge_required){ $this_ability->set_energy(0); }
         // Otherwise, return the weapon energy back to default
         else { $this_ability->reset_energy(); }
+
+        // If this robot is holding a Charge Module, bypass changing and set to false
+        if ($this_robot->has_item('charge-module')){ $this_charge_required = false; }
 
         // If this robot is holding a Target Module, allow target selection
         if ($this_robot->has_item('target-module')){
