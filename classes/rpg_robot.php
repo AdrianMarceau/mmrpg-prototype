@@ -3574,8 +3574,39 @@ class rpg_robot extends rpg_object {
                                 <col width="100%" />
                             </colgroup>
                             <tbody>
-                                <? if($robot_info['robot_class'] == 'master'
-                                    && !empty($robot_info['robot_flag_unlockable'])): ?>
+                                <tr>
+                                    <td class="right">
+                                        <label>Encountered : </label>
+                                        <span class="robot_record"><?= $temp_robot_records['robot_encountered'] == 1 ? '1 Time' : number_format($temp_robot_records['robot_encountered'], 0, '.', ',').' Times' ?></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="right">
+                                        <label>Scanned : </label>
+                                        <span class="robot_record"><?= $temp_robot_records['robot_scanned'] == 1 ? '1 Time' : number_format($temp_robot_records['robot_scanned'], 0, '.', ',').' Times' ?></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="right">
+                                        <label>Defeated : </label>
+                                        <span class="robot_record"><?= $temp_robot_records['robot_defeated'] == 1 ? '1 Time' : number_format($temp_robot_records['robot_defeated'], 0, '.', ',').' Times' ?></span>
+                                    </td>
+                                </tr>
+                                <? if (
+                                    ($robot_info['robot_class'] == 'mecha')
+                                    || ($robot_info['robot_class'] == 'master' && !empty($robot_info['robot_flag_unlockable']))
+                                    ){ ?>
+                                    <tr>
+                                        <td class="right">
+                                            <label>Summoned : </label>
+                                            <span class="robot_record"><?= $temp_robot_records['robot_summoned'] == 1 ? '1 Time' : number_format($temp_robot_records['robot_summoned'], 0, '.', ',').' Times' ?></span>
+                                        </td>
+                                    </tr>
+                                <? } ?>
+                                <? if (
+                                    $robot_info['robot_class'] == 'master'
+                                    && !empty($robot_info['robot_flag_unlockable'])
+                                    ){ ?>
                                     <tr>
                                         <td class="right">
                                             <label>Unlocked By : </label>
@@ -3588,31 +3619,7 @@ class rpg_robot extends rpg_object {
                                             <span class="robot_record"><?= $temp_robot_records['robot_avatars'] == 1 ? '1 Player' : number_format($temp_robot_records['robot_avatars'], 0, '.', ',').' Players' ?></span>
                                         </td>
                                     </tr>
-                                <? endif; ?>
-                                <tr>
-                                    <td class="right">
-                                        <label>Encountered : </label>
-                                        <span class="robot_record"><?= $temp_robot_records['robot_encountered'] == 1 ? '1 Time' : number_format($temp_robot_records['robot_encountered'], 0, '.', ',').' Times' ?></span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="right">
-                                        <label>Summoned : </label>
-                                        <span class="robot_record"><?= $temp_robot_records['robot_summoned'] == 1 ? '1 Time' : number_format($temp_robot_records['robot_summoned'], 0, '.', ',').' Times' ?></span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="right">
-                                        <label>Defeated : </label>
-                                        <span class="robot_record"><?= $temp_robot_records['robot_defeated'] == 1 ? '1 Time' : number_format($temp_robot_records['robot_defeated'], 0, '.', ',').' Times' ?></span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="right">
-                                        <label>Scanned : </label>
-                                        <span class="robot_record"><?= $temp_robot_records['robot_scanned'] == 1 ? '1 Time' : number_format($temp_robot_records['robot_scanned'], 0, '.', ',').' Times' ?></span>
-                                    </td>
-                                </tr>
+                                <? } ?>
                             </tbody>
                         </table>
                     </div>
