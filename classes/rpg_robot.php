@@ -1880,6 +1880,9 @@ class rpg_robot extends rpg_object {
     // Define a trigger for using one of this robot's abilities or items in battle
     public function trigger_target($target_robot, $this_object, $trigger_options = array()){
 
+        // If the battle has ended, trigger no targets
+        if ($this->battle->battle_status == 'complete'){ return false; }
+
         // Check to see which object type has been provided
         if (isset($this_object->ability_token)){
             // This was an ability so delegate to the ability function
@@ -1894,6 +1897,9 @@ class rpg_robot extends rpg_object {
 
     // Define a trigger for inflicting all types of ability or item damage on this robot
     public function trigger_damage($target_robot, $this_object, $damage_amount, $trigger_disabled = true, $trigger_options = array()){
+
+        // If the battle has ended, trigger no damage
+        if ($this->battle->battle_status == 'complete'){ return false; }
 
         // Define the return variable to pass back later
         $trigger_return = false;
@@ -1936,6 +1942,10 @@ class rpg_robot extends rpg_object {
     // Define a trigger for inflicting all types of ability or item recovery on this robot
     public function trigger_recovery($target_robot, $this_object, $recovery_amount, $trigger_disabled = true, $trigger_options = array()){
 
+        // If the battle has ended, trigger no recovery
+        $this_battle = rpg_battle::get_battle();
+        if ($this_battle->battle_status == 'complete'){ return false; }
+
         // Check to see which object type has been provided
         if (isset($this_object->ability_token)){
             // This was an ability so delegate to the ability class function
@@ -1950,6 +1960,9 @@ class rpg_robot extends rpg_object {
 
     // Define a trigger for processing disabled events from abilities
     public function trigger_disabled($target_robot, $trigger_options = array()){
+
+        // If the battle has ended, trigger no disables
+        if ($this->battle->battle_status == 'complete'){ return false; }
 
         // This was an ability so delegate to the ability class function
         return rpg_disabled::trigger_robot_disabled($this, $target_robot, $trigger_options);
