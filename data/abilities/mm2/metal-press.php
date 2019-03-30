@@ -40,7 +40,8 @@ $ability = array(
                 $target_player,
                 $target_robot,
                 'ability',
-                $this_ability->ability_id.'_'.$this_ability->ability_token
+                $this_ability->ability_id.'_'.$this_ability->ability_token,
+                true
                 );
 
         }
