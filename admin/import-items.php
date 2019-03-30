@@ -1,5 +1,8 @@
 <?php
 
+// Update the page title to show which script this is
+$this_page_tabtitle = 'Import Items | '.$this_page_tabtitle;
+
 // Prevent updating if logged into a file
 if ($this_user['userid'] != MMRPG_SETTINGS_GUEST_ID){ die('<strong>FATAL UPDATE ERROR!</strong><br /> You cannot be logged in while importing!');  }
 
