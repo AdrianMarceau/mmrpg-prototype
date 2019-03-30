@@ -8,6 +8,7 @@ class rpg_battle extends rpg_object {
     // Define global class variables
     public $events;
     public $actions;
+    public $endofturn_actions;
 
     // Define the constructor class
     public function rpg_battle(){
@@ -331,18 +332,30 @@ class rpg_battle extends rpg_object {
     }
 
     // Define a public function for appending to the action array
-    public function actions_append($this_player, $this_robot, $target_player, $target_robot, $this_action, $this_action_token){
+    public function actions_append($this_player, $this_robot, $target_player, $target_robot, $this_action, $this_action_token, $end_of_turn = false){
 
         // Append the new action to the array
-        $this->actions[] = array(
-            'this_field' => $this->battle_field,
-            'this_player' => $this_player,
-            'this_robot' => $this_robot,
-            'target_player' => $target_player,
-            'target_robot' => $target_robot,
-            'this_action' => $this_action,
-            'this_action_token' => $this_action_token
-            );
+        if ($end_of_turn === true){
+            $this->endofturn_actions[] = array(
+                'this_field' => $this->battle_field,
+                'this_player' => $this_player,
+                'this_robot' => $this_robot,
+                'target_player' => $target_player,
+                'target_robot' => $target_robot,
+                'this_action' => $this_action,
+                'this_action_token' => $this_action_token
+                );
+        } else {
+            $this->actions[] = array(
+                'this_field' => $this->battle_field,
+                'this_player' => $this_player,
+                'this_robot' => $this_robot,
+                'target_player' => $target_player,
+                'target_robot' => $target_robot,
+                'this_action' => $this_action,
+                'this_action_token' => $this_action_token
+                );
+        }
 
         // Return the resulting array
         return $this->actions;
@@ -361,17 +374,20 @@ class rpg_battle extends rpg_object {
     }
 
     // Define a public function for execution queued items in the actions array
-    public function actions_execute(){
+    public function actions_execute($endofturn_actions = false){
 
         // Back up the IDs of this and the target robot in the global space
         $temp_this_robot_backup = array('robot_id' => $GLOBALS['this_robot']->robot_id, 'robot_token' => $GLOBALS['this_robot']->robot_token);
         $temp_target_robot_backup = array('robot_id' => $GLOBALS['target_robot']->robot_id, 'robot_token' => $GLOBALS['target_robot']->robot_token);
 
         // Loop through the non-empty action queue and trigger actions
-        while (!empty($this->actions) && $this->battle_status != 'complete'){
+        $this_actions_array = $endofturn_actions === true ? $this->endofturn_actions : $this->actions;
+        while (!empty($this_actions_array) && $this->battle_status != 'complete'){
 
             // Shift and collect the oldest action from the queue
-            $current_action = array_shift($this->actions);
+            $current_action = array_shift($this_actions_array);
+            if ($endofturn_actions === true){ array_shift($this->endofturn_actions); }
+            else { array_shift($this->actions); }
 
             // If the robot's player is on autopilot and the action is empty, automate input
             if (empty($current_action['this_action']) && $current_action['this_player']->player_autopilot == true){
