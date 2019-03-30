@@ -507,9 +507,12 @@ if (true){
                                     </table>
                                     <?
                                     // Collect the robot field if not empty
-                                    if (!empty($robot_info['robot_field']) && $robot_info['robot_field'] != 'field'){
+                                    $temp_robot_field = '';
+                                    if (!empty($robot_info['robot_field']) && $robot_info['robot_field'] != 'field'){ $temp_robot_field = $robot_info['robot_field']; }
+                                    elseif (!empty($robot_info['robot_field2']) && $robot_info['robot_field2'] != 'field'){ $temp_robot_field = $robot_info['robot_field2']; }
+                                    if (!empty($temp_robot_field)){
                                         //echo $robot_info['robot_field'];
-                                        $temp_robot_field = !empty($mmrpg_database_fields[$robot_info['robot_field']]) ? $mmrpg_database_fields[$robot_info['robot_field']] : array();
+                                        $temp_robot_field = !empty($mmrpg_database_fields[$temp_robot_field]) ? $mmrpg_database_fields[$temp_robot_field] : array();
                                         $temp_field_title = $temp_robot_field['field_name'];
                                         $temp_field_title .= !empty($temp_robot_field['field_type']) ? ' ('.ucfirst($temp_robot_field['field_type']).' Type)' : ' (Neutral Type)';
                                         if (!empty($temp_robot_field['field_multipliers'])){
