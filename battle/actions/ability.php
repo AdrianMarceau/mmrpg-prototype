@@ -346,10 +346,33 @@ else {
 
     }
 
+}
+
+// Now execute the stored actions
+$this_battle->actions_execute();
+
+// If the target has been disabled but for some reason hasn't switched
+$active_target_robot = $target_player->get_active_robot();
+if ($active_target_robot->robot_status == 'disabled'
+    || $active_target_robot->robot_energy == 0){
+
+    // Prepend a switch action for the target robot
+    $this_battle->actions_append(
+        $target_player,
+        $active_target_robot,
+        $this_player,
+        $this_robot,
+        'switch',
+        ''
+        );
+
     // Now execute the stored actions
     $this_battle->actions_execute();
 
 }
+
+// Execute any remaining end-of-turn actions that were queued
+$this_battle->actions_execute(true);
 
 // DEBUG
 if (empty($this_robot)){
