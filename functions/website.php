@@ -495,6 +495,7 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
         users.user_colour_token,
         users.user_image_path,
         users.user_date_modified,
+        users.user_flag_postpublic,
 
         users2.mod_user_id,
         users2.mod_user_name,
@@ -503,6 +504,7 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
         users2.mod_user_background_path,
         users2.mod_user_colour_token,
         users2.mod_user_image_path,
+        users2.mod_user_flag_postpublic,
 
         users3.target_user_id,
         users3.target_user_name,
@@ -511,6 +513,7 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
         users3.target_user_background_path,
         users3.target_user_colour_token,
         users3.target_user_image_path,
+        users3.target_user_flag_postpublic,
 
         categories.category_id,
         categories.category_level,
@@ -539,7 +542,8 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
             user_name_public AS mod_user_name_public,
             user_colour_token AS mod_user_colour_token,
             user_image_path AS mod_user_image_path,
-            user_background_path AS mod_user_background_path
+            user_background_path AS mod_user_background_path,
+            user_flag_postpublic AS mod_user_flag_postpublic
             FROM mmrpg_users
             ) AS users2
             ON threads.thread_mod_user = users2.mod_user_id
@@ -552,7 +556,8 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
             user_name_public AS target_user_name_public,
             user_colour_token AS target_user_colour_token,
             user_image_path AS target_user_image_path,
-            user_background_path AS target_user_background_path
+            user_background_path AS target_user_background_path,
+            user_flag_postpublic AS target_user_flag_postpublic
             FROM mmrpg_users
             ) AS users3
             ON threads.thread_target = users3.target_user_id
@@ -664,7 +669,8 @@ function mmrpg_website_community_category_threads_count($this_category_info, $fi
             user_name_public AS mod_user_name_public,
             user_colour_token AS mod_user_colour_token,
             user_image_path AS mod_user_image_path,
-            user_background_path AS mod_user_background_path
+            user_background_path AS mod_user_background_path,
+            user_flag_postpublic AS mod_user_flag_postpublic
             FROM mmrpg_users
             ) AS users2
             ON threads.thread_mod_user = users2.mod_user_id
@@ -677,7 +683,8 @@ function mmrpg_website_community_category_threads_count($this_category_info, $fi
             user_name_public AS target_user_name_public,
             user_colour_token AS target_user_colour_token,
             user_image_path AS target_user_image_path,
-            user_background_path AS target_user_background_path
+            user_background_path AS target_user_background_path,
+            user_flag_postpublic AS target_user_flag_postpublic
             FROM mmrpg_users
             ) AS users3
             ON threads.thread_target = users3.target_user_id
@@ -784,10 +791,10 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
         $temp_thread_id = $this_thread_info['thread_id'];
         $temp_thread_token = $this_thread_info['thread_token'];
         $temp_thread_name = $this_thread_info['thread_name'];
-        $temp_thread_author = !empty($this_thread_info['user_name_public']) ? $this_thread_info['user_name_public'] : $this_thread_info['user_name'];
+        $temp_thread_author = !empty($this_thread_info['user_name_public']) && !empty($this_thread_info['user_flag_postpublic']) ? $this_thread_info['user_name_public'] : $this_thread_info['user_name'];
         $temp_thread_author_colour = !empty($this_thread_info['user_colour_token']) ? $this_thread_info['user_colour_token'] : 'none';
         $temp_thread_date = date('F jS, Y', $temp_thread_date).' at '.date('g:ia', $temp_thread_date);
-        $temp_thread_mod_user = !empty($this_thread_info['mod_user_name_public']) ? $this_thread_info['mod_user_name_public'] : $this_thread_info['mod_user_name'];
+        $temp_thread_mod_user = !empty($this_thread_info['mod_user_name_public']) && !empty($this_thread_info['mod_user_flag_postpublic']) ? $this_thread_info['mod_user_name_public'] : $this_thread_info['mod_user_name'];
         $temp_thread_mod_date = !empty($this_thread_info['thread_mod_date']) && $this_thread_info['thread_mod_date'] != $this_thread_info['thread_date'] ? $this_thread_info['thread_mod_date'] : false;
         $temp_thread_mod_date = !empty($temp_thread_mod_date) ? 'Updated by '.$temp_thread_mod_user : false;
         $temp_thread_body = strlen($this_thread_info['thread_body']) > 255 ? substr($this_thread_info['thread_body'], 0, 255).'&hellip;' : $this_thread_info['thread_body'];
@@ -815,7 +822,7 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
         $temp_thread_link_comments .= !empty($temp_posts_count) ? '#comment-listing' : '#comment-form';
 
         // Define the target option text
-        $temp_target_thread_author = !empty($this_thread_info['target_user_name_public']) ? $this_thread_info['target_user_name_public'] : $this_thread_info['target_user_name'];
+        $temp_target_thread_author = !empty($this_thread_info['target_user_name_public']) && !empty($this_thread_info['target_user_flag_postpublic']) ? $this_thread_info['target_user_name_public'] : $this_thread_info['target_user_name'];
         $temp_target_thread_author_colour = !empty($this_thread_info['target_user_colour_token']) ? $this_thread_info['target_user_colour_token'] : 'none';
 
         // Define if this post is new to the logged in user or not

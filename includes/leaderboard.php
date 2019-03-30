@@ -43,7 +43,7 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
     $this_is_online = !empty($board['user_is_online']) ? true : false;
     $this_last_save = !empty($this_last_save) ? date('Y/m/d @ H:i', $this_last_save) : '????-??-?? ??:??';
     $this_style = $this_is_online ? 'border-color: green; ' : '';
-    $this_username = !empty($board['user_name_public']) ? $board['user_name_public'] : $board['user_name'];
+    $this_username = !empty($board['user_name_public']) && !empty($board['user_flag_postpublic']) ? $board['user_name_public'] : $board['user_name'];
     $this_username = htmlentities($this_username, ENT_QUOTES, 'UTF-8', true);
     $this_user_id = !empty($board['user_id']) ? $board['user_id'] : 0;
     if ($this_userid != MMRPG_SETTINGS_GUEST_ID && $this_user_id == $_SESSION['GAME']['USER']['userid']){
