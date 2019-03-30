@@ -323,8 +323,9 @@ if (rpg_game::is_user()){
         <div class="options options_userinfo field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
             <div class="wrapper">
                 <? if(empty($_SESSION[$session_token]['DEMO'])): ?>
+                    <? $temp_user_name = !empty($this_userinfo['user_name_public']) && !empty($this_userinfo['user_flag_postpublic']) ? $this_userinfo['user_name_public'] : $this_userinfo['user_name']; ?>
                     <span class="info info_username">
-                        <label><?= !empty($_SESSION[$session_token]['USER']['displayname']) ? $_SESSION[$session_token]['USER']['displayname'] : $_SESSION[$session_token]['USER']['username'] ?></label>
+                        <label><?= $temp_user_name ?></label>
                     </span>
                 <? else: ?>
                     <span class="info info_username info_demo">

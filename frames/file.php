@@ -246,10 +246,14 @@ while ($this_action == 'save'){
         echo '</div>';
 
         // Display Name
-        echo '<div class="field field_displayname">';
-            echo '<label class="label label_displayname">Display Name :</label>';
-            echo '<input class="text text_displayname" type="text" name="displayname" maxlength="18" value="'.htmlentities(trim(!empty($_SESSION[$session_token]['USER']['displayname']) ? $_SESSION[$session_token]['USER']['displayname'] : ''), ENT_QUOTES, 'UTF-8', true).'" />';
-        echo '</div>';
+        if (!empty($this_userinfo['user_flag_postpublic'])){
+            echo '<div class="field field_displayname">';
+                echo '<label class="label label_displayname">Display Name :</label>';
+                echo '<input class="text text_displayname" type="text" name="displayname" maxlength="18" value="'.htmlentities(trim(!empty($_SESSION[$session_token]['USER']['displayname']) ? $_SESSION[$session_token]['USER']['displayname'] : ''), ENT_QUOTES, 'UTF-8', true).'" />';
+            echo '</div>';
+        } else {
+            echo '<input type="hidden" name="displayname" maxlength="18" value="'.htmlentities(trim(!empty($_SESSION[$session_token]['USER']['displayname']) ? $_SESSION[$session_token]['USER']['displayname'] : ''), ENT_QUOTES, 'UTF-8', true).'" />';
+        }
 
         echo '<div class="field field_colourtoken">';
             echo '<label class="label label_colourtoken">Profile Colour :</label>';

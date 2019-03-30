@@ -4,10 +4,10 @@
  */
 
 // Define the avatar class and path variables
-$temp_display_name = !empty($this_playerinfo['user_name_public']) ? $this_playerinfo['user_name_public'] : $this_playerinfo['user_name'];
+$temp_display_name = !empty($this_playerinfo['user_name_public']) && !empty($this_playerinfo['user_flag_postpublic']) ? $this_playerinfo['user_name_public'] : $this_playerinfo['user_name'];
 $temp_display_points = $this_playerinfo['board_points'];
 $temp_display_zenny = !empty($this_playerinfo['save_counters']['battle_zenny']) ? $this_playerinfo['save_counters']['battle_zenny'] : 0;
-$temp_display_text = !empty($this_playerinfo['user_profile_text']) ? $this_playerinfo['user_profile_text'] : '';
+$temp_display_text = !empty($this_playerinfo['user_profile_text']) && !empty($this_playerinfo['user_flag_postpublic']) ? $this_playerinfo['user_profile_text'] : '';
 $temp_avatar_path = !empty($this_playerinfo['user_image_path']) ? $this_playerinfo['user_image_path'] : 'robots/mega-man/40';
 $temp_background_path = !empty($this_playerinfo['user_background_path']) ? $this_playerinfo['user_background_path'] : 'fields/intro-field';
 $temp_is_contributor = in_array($this_playerinfo['role_token'], array('developer', 'administrator', 'moderator', 'contributor')) ? true : false;

@@ -321,11 +321,13 @@ while ($this_action == 'profile'){
             // Collect any profile details
             $user_displayname = !empty($_POST['displayname']) ? preg_replace('/[^-_a-z0-9\.\s]+/i', '', trim($_POST['displayname'])) : '';
             $user_emailaddress = !empty($_POST['emailaddress']) ? preg_replace('/[^-_a-z0-9\.\+@]+/i', '', trim($_POST['emailaddress'])) : '';
-            $user_websiteaddress = !empty($_POST['websiteaddress']) ? 'http://'.preg_replace('/^https?:\/\//i', '', trim($_POST['websiteaddress'])) : '';
 
-            $user_profiletext = !empty($_POST['profiletext']) ? strip_tags(trim($_POST['profiletext'])) : '';
-            $user_creditstext = !empty($_POST['creditstext']) ? strip_tags(trim($_POST['creditstext'])) : '';
-            $user_creditsline = !empty($_POST['creditsline']) ? strip_tags(trim($_POST['creditsline'])) : '';
+            if (!empty($this_userinfo['user_flag_postpublic'])){
+                $user_websiteaddress = !empty($_POST['websiteaddress']) ? 'http://'.preg_replace('/^https?:\/\//i', '', trim($_POST['websiteaddress'])) : '';
+                $user_profiletext = !empty($_POST['profiletext']) ? strip_tags(trim($_POST['profiletext'])) : '';
+                $user_creditstext = !empty($_POST['creditstext']) ? strip_tags(trim($_POST['creditstext'])) : '';
+                $user_creditsline = !empty($_POST['creditsline']) ? strip_tags(trim($_POST['creditsline'])) : '';
+            }
 
             // Only process omega fields if function unlocked
             if (mmrpg_prototype_item_unlocked('omega-seed')){
@@ -355,10 +357,12 @@ while ($this_action == 'profile'){
                 // Update the current game's user and file info using the new password
                 $_SESSION['GAME']['USER']['displayname'] = $user_displayname;
                 $_SESSION['GAME']['USER']['emailaddress'] = $user_emailaddress;
-                $_SESSION['GAME']['USER']['websiteaddress'] = $user_websiteaddress;
-                $_SESSION['GAME']['USER']['profiletext'] = $user_profiletext;
-                $_SESSION['GAME']['USER']['creditstext'] = $user_creditstext;
-                $_SESSION['GAME']['USER']['creditsline'] = $user_creditsline;
+                if (!empty($this_userinfo['user_flag_postpublic'])){
+                    $_SESSION['GAME']['USER']['websiteaddress'] = $user_websiteaddress;
+                    $_SESSION['GAME']['USER']['profiletext'] = $user_profiletext;
+                    $_SESSION['GAME']['USER']['creditstext'] = $user_creditstext;
+                    $_SESSION['GAME']['USER']['creditsline'] = $user_creditsline;
+                }
                 $_SESSION['GAME']['USER']['imagepath'] = $post_imagepath;
                 $_SESSION['GAME']['USER']['backgroundpath'] = $post_backgroundpath;
                 $_SESSION['GAME']['USER']['colourtoken'] = $post_colourtoken;
@@ -410,22 +414,34 @@ while ($this_action == 'profile'){
             <label class="label label_username">Username :</label>
             <input class="text text_username" type="text" name="username" value="<?= htmlentities(trim($_SESSION['GAME']['USER']['username']), ENT_QUOTES, 'UTF-8', true) ?>" disabled="disabled" />
         </div>
+
         <div class="field field_password_new">
             <label class="label label_password" style="width: auto; ">Change Password : <span style="font-size: 10px; padding-left: 6px; position: relative; bottom: 1px; color: #CACACA;">(6 - 18 chars)</span></label>
             <input class="text text_password" type="text" name="password_new" value="" maxlength="18" />
         </div>
-        <div class="field field_displayname">
-            <label class="label label_displayname">Display Name :</label>
-            <input class="text text_displayname" type="text" name="displayname" maxlength="18" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['displayname']) ? $_SESSION['GAME']['USER']['displayname'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
-        </div>
+
+        <? if (!empty($this_userinfo['user_flag_postpublic'])){ ?>
+            <div class="field field_displayname">
+                <label class="label label_displayname">Display Name :</label>
+                <input class="text text_displayname" type="text" name="displayname" maxlength="18" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['displayname']) ? $_SESSION['GAME']['USER']['displayname'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
+            </div>
+        <? } else { ?>
+            <input type="hidden" name="displayname" maxlength="18" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['displayname']) ? $_SESSION['GAME']['USER']['displayname'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
+        <? } ?>
+
         <div class="field field_emailaddress">
             <label class="label label_emailaddress">Email Address :</label>
             <input class="text text_emailaddress" type="text" name="emailaddress" maxlength="128" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['emailaddress']) ? $_SESSION['GAME']['USER']['emailaddress'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
         </div>
-        <div class="field field_websiteaddress">
-            <label class="label label_websiteaddress">Website Address :</label>
-            <input class="text text_websiteaddress" type="text" name="websiteaddress" maxlength="128" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['websiteaddress']) ? $_SESSION['GAME']['USER']['websiteaddress'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
-        </div>
+
+        <? if (!empty($this_userinfo['user_flag_postpublic'])){ ?>
+            <div class="field field_websiteaddress">
+                <label class="label label_websiteaddress">Website Address :</label>
+                <input class="text text_websiteaddress" type="text" name="websiteaddress" maxlength="128" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['websiteaddress']) ? $_SESSION['GAME']['USER']['websiteaddress'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
+            </div>
+        <? } else { ?>
+            <input type="hidden" name="websiteaddress" maxlength="128" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['websiteaddress']) ? $_SESSION['GAME']['USER']['websiteaddress'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
+        <? } ?>
 
         <div class="field field_gender">
             <label class="label label_gender">Player Gender :</label>
@@ -487,11 +503,13 @@ while ($this_action == 'profile'){
         }
         ?>
 
-        <div class="field field_profiletext full">
-            <label class="label label_profiletext">Profile Description :</label>
-            <textarea class="textarea textarea_profiletext" style="height: 250px; " name="profiletext"><?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['profiletext']) ? $_SESSION['GAME']['USER']['profiletext'] : ''), ENT_QUOTES, 'UTF-8', true) ?></textarea>
-            <?= mmrpg_formatting_help() ?>
-        </div>
+        <? if (!empty($this_userinfo['user_flag_postpublic'])){ ?>
+            <div class="field field_profiletext full">
+                <label class="label label_profiletext">Profile Description :</label>
+                <textarea class="textarea textarea_profiletext" style="height: 250px; " name="profiletext"><?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['profiletext']) ? $_SESSION['GAME']['USER']['profiletext'] : ''), ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                <?= mmrpg_formatting_help() ?>
+            </div>
+        <? } ?>
 
         <?
 

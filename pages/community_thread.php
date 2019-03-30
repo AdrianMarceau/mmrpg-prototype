@@ -38,7 +38,7 @@ $this_graph_data['article__published_time'] = !empty($this_thread_info['thread_d
 $this_graph_data['article__published_time'] = date('Y-m-d', $this_graph_data['article__published_time']).'T'.date('H:i', $this_graph_data['article__published_time']);
 $this_graph_data['article__modified_time'] = !empty($this_thread_info['thread_date']) ? $this_thread_info['thread_date'] : mktime(0, 0, 1, 1, 1, 2011);
 $this_graph_data['article__modified_time'] = date('Y-m-d', $this_graph_data['article__modified_time']).'T'.date('H:i', $this_graph_data['article__modified_time']);
-$this_graph_data['article__author'] = !empty($this_thread_info['user_name_public']) ? $this_thread_info['user_name_public'] : $this_thread_info['user_name'];
+$this_graph_data['article__author'] = !empty($this_thread_info['user_name_public']) && !empty($this_thread_info['user_flag_postpublic']) ? $this_thread_info['user_name_public'] : $this_thread_info['user_name'];
 
 /*
 article:published_time - datetime - When the article was first published.
@@ -119,6 +119,7 @@ $this_posts_query = "SELECT
     users.user_colour_token,
     users.user_image_path,
     users.user_date_modified,
+    users.user_flag_postpublic,
 
     roles.role_id,
     roles.role_name,
@@ -185,7 +186,7 @@ $this_user_countindex = $db->get_array_list('SELECT
 // Define the temporary display variables
 $temp_thread_guest = $this_thread_info['user_id'] == MMRPG_SETTINGS_GUEST_ID ? true : false;
 $temp_thread_name = $this_thread_info['thread_name'];
-$temp_thread_author = !empty($this_thread_info['user_name_public']) ? $this_thread_info['user_name_public'] : $this_thread_info['user_name'];
+$temp_thread_author = !empty($this_thread_info['user_name_public']) && !empty($this_thread_info['user_flag_postpublic']) ? $this_thread_info['user_name_public'] : $this_thread_info['user_name'];
 $temp_thread_date = !empty($this_thread_info['thread_date']) ? $this_thread_info['thread_date'] : mktime(0, 0, 1, 1, 1, 2011);
 $temp_thread_date = date('F jS, Y', $temp_thread_date).' at '.date('g:ia', $temp_thread_date);
 $temp_thread_body = $this_thread_info['thread_body'];
@@ -193,8 +194,8 @@ $temp_thread_views = !empty($this_thread_info['thread_views']) ? $this_thread_in
 
 // If this is a PM, collect the target's info
 if ($is_personal_message){
-    $temp_thread_targetinfo = $db->get_array("SELECT user_id, user_name, user_name_public, user_name_clean FROM mmrpg_users WHERE user_id = {$this_thread_info['thread_target']} LIMIT 1");
-    $temp_thread_target = !empty($temp_thread_targetinfo['user_name_public']) ? $temp_thread_targetinfo['user_name_public'] : $temp_thread_targetinfo['user_name'];
+    $temp_thread_targetinfo = $db->get_array("SELECT user_id, user_name, user_name_public, user_name_clean, user_flag_postpublic FROM mmrpg_users WHERE user_id = {$this_thread_info['thread_target']} LIMIT 1");
+    $temp_thread_target = !empty($temp_thread_targetinfo['user_name_public']) && !empty($temp_thread_targetinfo['user_flag_postpublic']) ? $temp_thread_targetinfo['user_name_public'] : $temp_thread_targetinfo['user_name'];
 }
 
 // Define the avatar class and path variables
@@ -319,7 +320,7 @@ else { $this_thread_info['post_count'] = false; }
     <? } ?>
 
     <div class="bodytext"><?= mmrpg_formatting_decode($temp_thread_body) ?></div>
-    <? if((COMMUNITY_VIEW_MODERATOR || $this_userinfo['user_id'] == $this_thread_info['user_id']) && $this_thread_info['category_id'] != 0): ?>
+    <? if((COMMUNITY_VIEW_MODERATOR || ($this_userinfo['user_id'] == $this_thread_info['user_id'] && !empty($this_userinfo['user_flag_postpublic']))) && $this_thread_info['category_id'] != 0): ?>
         <? if($this_thread_info['thread_target'] == 0): ?>
         <div class="published" style="position: absolute; bottom: 10px; right: 10px;">
             <?/*<strong><?= $temp_thread_author ?></strong> on <strong><?= $temp_thread_date ?></strong>*/?>
@@ -419,7 +420,7 @@ else { $this_thread_info['post_count'] = false; }
 
             // Define the temporary display variables
             $temp_post_guest = $this_post_info['user_id'] == MMRPG_SETTINGS_GUEST_ID ? true : false;
-            $temp_post_author = !empty($this_post_info['user_name_public']) ? $this_post_info['user_name_public'] : $this_post_info['user_name'];
+            $temp_post_author = !empty($this_post_info['user_name_public']) && !empty($this_post_info['user_flag_postpublic']) ? $this_post_info['user_name_public'] : $this_post_info['user_name'];
             $temp_post_date = !empty($this_post_info['post_date']) ? $this_post_info['post_date'] : mktime(0, 0, 1, 1, 1, 2011);
             $temp_post_date_full = 'Posted on '.date('F jS, Y', $temp_post_date).' at '.date('g:ia', $temp_post_date);
             $temp_post_date_short = 'Posted '.date('Y/m/d', $temp_post_date).' at '.date('g:ia', $temp_post_date);
@@ -532,7 +533,7 @@ else { $this_thread_info['post_count'] = false; }
                                 <?= $temp_is_new ? '<strong class="new">New!</strong>' : '' ?>
                             </div>
                             <span class="key right">#<?= $this_post_key + 1 ?></span>
-                            <? if(!$temp_post_guest && (COMMUNITY_VIEW_MODERATOR || $this_userinfo['user_id'] == $this_post_info['user_id'])): ?>
+                            <? if(!$temp_post_guest && (COMMUNITY_VIEW_MODERATOR || ($this_userinfo['user_id'] == $this_post_info['user_id'] && !empty($this_userinfo['user_flag_postpublic'])))): ?>
                                 <? if($this_thread_info['thread_target'] == 0): ?>
                                     <span class="options">[ <a class="edit" rel="noindex,nofollow" href="<?= $_GET['this_current_url'].'action=edit&amp;post_id='.$this_post_info['post_id'].'#comment-form' ?>">edit</a> | <a class="delete" rel="noindex,nofollow" href="<?= $_GET['this_current_url'] ?>" data-href="<?= $_GET['this_current_url'].'action=delete&amp;post_id='.$this_post_info['post_id'].'#comment-form' ?>">delete</a> ]</span>
                                 <? endif; ?>
@@ -596,7 +597,7 @@ else { $this_thread_info['post_count'] = false; }
                     <?
                     // Define and display the avatar variables
                     $temp_avatar_guest = $this_userid == MMRPG_SETTINGS_GUEST_ID ? true : false;
-                    $temp_avatar_name = (!empty($this_userinfo['user_name_public']) ? $this_userinfo['user_name_public'] : $this_userinfo['user_name']);
+                    $temp_avatar_name = (!empty($this_userinfo['user_name_public']) && !empty($this_userinfo['user_flag_postpublic']) ? $this_userinfo['user_name_public'] : $this_userinfo['user_name']);
                     $temp_avatar_title = '#'.$this_userid.' : '.$temp_avatar_name;
 
                     // Define the avatar class and path variables

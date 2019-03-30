@@ -73,6 +73,7 @@ if (!empty($temp_thread_ids)){
         users.user_colour_token,
         users.user_image_path,
         users.user_date_modified,
+        users.user_flag_postpublic,
 
         roles.role_id,
         roles.role_name,
@@ -224,7 +225,7 @@ if (!empty($this_threads_array)){
 
                 // Define the temporary display variables
                 $temp_post_guest = $this_post_info['user_id'] == MMRPG_SETTINGS_GUEST_ID ? true : false;
-                $temp_post_author = !empty($this_post_info['user_name_public']) ? $this_post_info['user_name_public'] : $this_post_info['user_name'];
+                $temp_post_author = !empty($this_post_info['user_name_public']) && !empty($this_post_info['user_flag_postpublic']) ? $this_post_info['user_name_public'] : $this_post_info['user_name'];
                 $temp_reply_name = $temp_post_author;
                 $temp_reply_colour = !empty($this_post_info['user_colour_token']) ? $this_post_info['user_colour_token'] : 'none';
                 $temp_post_date = !empty($this_post_info['post_date']) ? $this_post_info['post_date'] : mktime(0, 0, 1, 1, 1, 2011);
