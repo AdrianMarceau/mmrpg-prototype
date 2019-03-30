@@ -10,7 +10,7 @@ $ability = array(
     'ability_type' => 'wind',
     'ability_type2' => 'shield',
     'ability_energy' => 8,
-    'ability_speed' => 2,
+    'ability_speed' => 3,
     'ability_damage' => 16,
     'ability_recovery2' => 50,
     'ability_recovery_percent2' => true,
@@ -90,7 +90,8 @@ $ability = array(
                 $target_player,
                 $target_robot,
                 'ability',
-                $this_ability->ability_id.'_'.$this_ability->ability_token
+                $this_ability->ability_id.'_'.$this_ability->ability_token,
+                true
                 );
 
         }
