@@ -759,7 +759,7 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
         $temp_thread_mod_date = !empty($this_thread_info['thread_mod_date']) ? $this_thread_info['thread_mod_date'] : $temp_thread_date;
 
         // Check if this thread's date group is different then previous
-        $temp_date_group = date('Y-m', $temp_thread_mod_date);
+        $temp_date_group = $this_thread_info['category_token'] == 'news' ? date('Y-m', $temp_thread_date) : date('Y-m', $temp_thread_mod_date);
         if (!empty($this_thread_info['thread_locked'])){ $temp_date_group = 'locked'; }
         elseif (!empty($this_thread_info['thread_sticky'])){ $temp_date_group = 'sticky'; }
         // If the date group was different, update the static variable
