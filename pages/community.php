@@ -97,7 +97,8 @@ elseif (!empty($this_current_id) && !empty($this_current_token)){
         users.user_date_created,
         users.user_date_accessed,
         users.user_date_modified,
-        users.user_last_login
+        users.user_last_login,
+        users.user_flag_postpublic
         FROM mmrpg_threads AS threads
         LEFT JOIN mmrpg_users AS users ON threads.user_id = users.user_id
         LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
