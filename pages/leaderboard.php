@@ -31,6 +31,7 @@ elseif (!empty($this_current_sub) && preg_match('/^([-_a-z0-9]+)$/i', $this_curr
     mmrpg_users.user_date_accessed,
     mmrpg_users.user_date_modified,
     mmrpg_users.user_last_login,
+    mmrpg_users.user_flag_postpublic,
     mmrpg_leaderboard.board_id,
     mmrpg_leaderboard.board_points,
     mmrpg_leaderboard.board_points_dr_light,
