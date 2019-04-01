@@ -10,6 +10,7 @@ function mmrpg_website_text_float_robot_markup($robot_token, $float_side = 'righ
     $zoom_size_text = $zoom_size.'x'.$zoom_size;
     $robot_direction = $float_side != 'left' ? 'left' : 'right';
     $robot_image_path = 'images/robots/'.$robot_token.'/sprite_'.$robot_direction.'_'.$robot_image_size.'x'.$robot_image_size.'.png';
+    $robot_image_path .= '?'.MMRPG_CONFIG_CACHE_DATE;
     $robot_image_styles = 'background-image: url('.$robot_image_path.'); background-size: auto '.$zoom_size.'px; ';
     if ($robot_image_size >= 80){ $robot_image_styles .= 'margin: -'.($robot_image_size + 10).'px auto 0 -'.($robot_image_size / 2).'px; '; }
     else { $robot_image_styles .= 'margin: -10px auto 0 0; '; }
