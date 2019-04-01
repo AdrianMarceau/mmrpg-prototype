@@ -2828,7 +2828,7 @@ class rpg_robot extends rpg_object {
                         <? } else { ?>
                             <?= $robot_info['robot_name'].$robot_info['robot_name_append'] ?>
                         <? } ?>
-                        <? if (empty($robot_info['robot_flag_unlockable'])){ ?>
+                        <? if ($robot_info['robot_class'] == 'master' && empty($robot_info['robot_flag_unlockable'])){ ?>
                             <span class="not_unlockable" data-tooltip-type="<?= $robot_header_types ?>" title="* This robot cannot be unlocked right now">*</span>
                         <? } ?>
                         <div class="header_core robot_type"><?= !empty($robot_info['robot_core']) ? ucwords($robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? ' / '.$robot_info['robot_core2'] : '')) : 'Neutral' ?><?= $robot_info['robot_class'] == 'mecha' ? ' Type' : ' Core' ?></div>
