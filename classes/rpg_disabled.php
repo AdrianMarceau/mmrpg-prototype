@@ -827,26 +827,28 @@ class rpg_disabled {
                             $temp_ability_token = $ability_info['ability_token'];
 
                             // Display the robot reward message markup
-                            $event_header = $ability_info['ability_name'].' Unlocked';
-                            $event_body = '<span class="robot_name">'.$temp_info['robot_name'].'</span> unlocked new ability data!<br />';
-                            $event_body .= '<span class="ability_name">'.$ability_info['ability_name'].'</span> can now be used in battle!';
-                            $event_options = array();
-                            $event_options['console_show_target'] = false;
-                            $event_options['this_header_float'] = $target_player->player_side;
-                            $event_options['this_body_float'] = $target_player->player_side;
-                            $event_options['this_ability'] = $temp_ability;
-                            $event_options['this_ability_image'] = 'icon';
-                            $event_options['console_show_this_player'] = false;
-                            $event_options['console_show_this_robot'] = false;
-                            $event_options['console_show_this_ability'] = true;
-                            $event_options['canvas_show_this_ability'] = false;
-                            $temp_robot->robot_frame = $ability_reward_key % 2 == 2 ? 'taunt' : 'victory';
-                            $temp_robot->update_session();
-                            $temp_ability->ability_frame = 'base';
-                            $temp_ability->update_session();
-                            $this_battle->events_create($temp_robot, false, $event_header, $event_body, $event_options);
-                            $temp_robot->robot_frame = 'base';
-                            $temp_robot->update_session();
+                            if (!mmrpg_prototype_ability_unlocked('', $temp_robot_token, $ability_reward_info['token'])){
+                                $event_header = $ability_info['ability_name'].' Unlocked';
+                                $event_body = '<span class="robot_name">'.$temp_info['robot_name'].'</span> unlocked new ability data!<br />';
+                                $event_body .= '<span class="ability_name">'.$ability_info['ability_name'].'</span> can now be used in battle!';
+                                $event_options = array();
+                                $event_options['console_show_target'] = false;
+                                $event_options['this_header_float'] = $target_player->player_side;
+                                $event_options['this_body_float'] = $target_player->player_side;
+                                $event_options['this_ability'] = $temp_ability;
+                                $event_options['this_ability_image'] = 'icon';
+                                $event_options['console_show_this_player'] = false;
+                                $event_options['console_show_this_robot'] = false;
+                                $event_options['console_show_this_ability'] = true;
+                                $event_options['canvas_show_this_ability'] = false;
+                                $temp_robot->robot_frame = $ability_reward_key % 2 == 2 ? 'taunt' : 'victory';
+                                $temp_robot->update_session();
+                                $temp_ability->ability_frame = 'base';
+                                $temp_ability->update_session();
+                                $this_battle->events_create($temp_robot, false, $event_header, $event_body, $event_options);
+                                $temp_robot->robot_frame = 'base';
+                                $temp_robot->update_session();
+                            }
 
                             // Automatically unlock this ability for use in battle
                             $this_reward = array('ability_token' => $temp_ability_token);

@@ -1467,7 +1467,9 @@ class rpg_battle extends rpg_object {
             elseif ($this_action == 'switch'){
 
                 // If this player already switched this turn, break now
-                if (!empty($this_player->flags['switched_this_turn'])){
+                if (!empty($this_player->flags['switched_this_turn'])
+                    && $this_robot->robot_status != 'disabled'
+                    && $this_robot->robot_energy > 0){
                     $this_return = false;
                     break;
                 }
