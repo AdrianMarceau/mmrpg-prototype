@@ -144,10 +144,17 @@ $target_playerinfo['player_side'] = 'right';
 
 // Only create the arrays with minimal info if NOT start
 if ($this_action != 'start'){
+
     // Define the current player object using the loaded player data and update session
     $this_player = rpg_game::get_player($this_battle, $this_playerinfo);
+
     // Define the target player object using the loaded player data and update session
     $target_player = rpg_game::get_player($this_battle, $target_playerinfo);
+
+    // Remove temporary flags that might prevent actions
+    unset($this_player->flags['switched_this_turn']);
+    unset($target_player->flags['switched_this_turn']);
+
 }
 // Otherwise, prepopulate their robot arrays
 elseif ($this_action == 'start'){
