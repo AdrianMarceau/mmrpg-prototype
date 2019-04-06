@@ -337,9 +337,11 @@ ob_start();
         <?=$temp_display_name?>&#39;s Leaderboard
         <span class="count" style="position: relative; bottom: 1px;"><?
             // Add the prototype complete flags if applicable
-            if (count($this_playerinfo['board_battles_dr_light']) >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){ echo '<span class="prototype_complete prototype_complete_dr-light" title="Dr. Light Prototype Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span> '; }
-            if (count($this_playerinfo['board_battles_dr_wily']) >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){ echo '<span class="prototype_complete prototype_complete_dr-wily" title="Dr. Wily Prototype Complete!" data-tooltip-type="player_type player_type_attack">&clubs;</span> '; }
-            if (count($this_playerinfo['board_battles_dr_cossack']) >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){ echo '<span class="prototype_complete prototype_complete_dr-cossack" title="Dr. Cossack Prototype Complete!" data-tooltip-type="player_type player_type_speed">&diams;</span> '; }
+            $this_awards = !empty($this_playerinfo['board_awards']) ? explode(',', $this_playerinfo['board_awards']) : array();
+            if (in_array('prototype_complete_light', $this_awards)){ echo '<span class="prototype_complete prototype_complete_dr-light" title="Dr. Light Prototype Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span> '; }
+            if (in_array('prototype_complete_wily', $this_awards)){ echo '<span class="prototype_complete prototype_complete_dr-wily" title="Dr. Wily Prototype Complete!" data-tooltip-type="player_type player_type_attack">&clubs;</span> '; }
+            if (in_array('prototype_complete_cossack', $this_awards)){ echo '<span class="prototype_complete prototype_complete_dr-cossack" title="Dr. Cossack Prototype Complete!" data-tooltip-type="player_type player_type_speed">&diams;</span> '; }
+            if (in_array('ranking_first_place', $this_awards)){ echo '<span class="prototype_complete prototype_complete_firstplace" data-tooltip="Reached First Place" data-tooltip-type="player_type player_type_level">&#9733;</span> '; }
         ?></span>
     </h2>
 
