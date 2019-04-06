@@ -1466,6 +1466,12 @@ class rpg_battle extends rpg_object {
             // Else if the player has chosen to switch
             elseif ($this_action == 'switch'){
 
+                // If this player already switched this turn, break now
+                if (!empty($this_player->flags['switched_this_turn'])){
+                    $this_return = false;
+                    break;
+                }
+
                 // Collect this player's last action if it exists
                 if (!empty($this_player->history['actions'])){
                     $this_recent_switches = array_slice($this_player->history['actions'], -5, 5, false);
@@ -1605,54 +1611,57 @@ class rpg_battle extends rpg_object {
                 }
 
                 // Switch in the player's new robot and display an event for it
-                $this_robot = rpg_game::get_robot($this, $this_player, $this_robotinfo);
-                if ($this_robot->robot_position != 'active'){
-                    $this_robot->robot_position = 'active';
-                    $this_robot->robot_key = 0;
+                if ($temp_new_robot->robot_position != 'active'){
+                    $temp_new_robot->robot_position = 'active';
+                    $temp_new_robot->robot_key = 0;
                     $this_player->player_frame = 'command';
-                    $this_player->values['current_robot'] = $this_robot->robot_string;
+                    $this_player->values['current_robot'] = $temp_new_robot->robot_string;
                     $this_player->values['current_robot_enter'] = $this->counters['battle_turn'];
-                    $this_robot->update_session();
+                    $temp_new_robot->update_session();
                     $this_player->update_session();
-                    $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
-                    $event_body = "{$this_robot->print_name()} joins the battle!<br />";
-                    if (isset($this_robot->robot_quotes['battle_start'])){
-                        $this_robot->robot_frame = 'taunt';
+                    $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$temp_new_robot->robot_name;
+                    $event_body = "{$temp_new_robot->print_name()} joins the battle!<br />";
+                    if (isset($temp_new_robot->robot_quotes['battle_start'])){
+                        $temp_new_robot->robot_frame = 'taunt';
                         $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
-                        $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
-                        $event_body .= $this_robot->print_quote('battle_start', $this_find, $this_replace);
-                        //$this_quote_text = str_replace($this_find, $this_replace, $this_robot->robot_quotes['battle_start']);
+                        $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $temp_new_robot->robot_name);
+                        $event_body .= $temp_new_robot->print_quote('battle_start', $this_find, $this_replace);
+                        //$this_quote_text = str_replace($this_find, $this_replace, $temp_new_robot->robot_quotes['battle_start']);
                         //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
                     }
                     // Only show the enter event if the switch reason was removed or if there is more then one robot
                     if ($this_switch_reason == 'removed' || $this_player->counters['robots_active'] > 1){
-                        $this->events_create($this_robot, false, $event_header, $event_body);
+                        $this->events_create($temp_new_robot, false, $event_header, $event_body);
                     }
                 }
 
                 // Ensure this robot has abilities to loop through
-                if (!isset($this_robot->flags['ability_startup']) && !empty($this_robot->robot_abilities)){
+                if (!isset($temp_new_robot->flags['ability_startup']) && !empty($temp_new_robot->robot_abilities)){
                     // Loop through each of this robot's abilities and trigger the start event
                     $temp_abilities_index = rpg_ability::get_index(true);
-                    foreach ($this_robot->robot_abilities AS $this_key => $this_token){
+                    foreach ($temp_new_robot->robot_abilities AS $this_key => $this_token){
                         if (!isset($temp_abilities_index[$this_token])){ continue; }
                         // Define the current ability object using the loaded ability data
                         $temp_abilityinfo = $temp_abilities_index[$this_token];
                         $temp_ability = rpg_game::get_ability($this, $this_player, $this_robot, $temp_abilityinfo);
                     }
                     // And now update the robot with the flag
-                    $this_robot->flags['ability_startup'] = true;
-                    $this_robot->update_session();
+                    $temp_new_robot->flags['ability_startup'] = true;
+                    $temp_new_robot->update_session();
                 }
 
                 // Now we can update the current robot's frame regardless of what happened
-                $this_robot->robot_frame = $this_robot->robot_status != 'disabled' ? 'base' : 'defeat';
-                $this_robot->update_session();
+                $temp_new_robot->robot_frame = $temp_new_robot->robot_status != 'disabled' ? 'base' : 'defeat';
+                $temp_new_robot->update_session();
 
                 // Set this token to the ID and token of the switched robot
                 $this_token = $this_robotinfo['robot_id'].'_'.$this_robotinfo['robot_token'];
 
                 //$this->events_create(false, false, 'DEBUG', 'checkpoint ['.$this_token.'] | other : []');
+
+                // Set a flag on this player so they don't switch again
+                $this_player->flags['switched_this_turn'] = true;
+                $this_player->update_session();
 
                 // Return from the battle function
                 $this_return = true;
