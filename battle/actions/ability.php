@@ -261,10 +261,14 @@ if ($target_action != 'switch' && (
 )){
 
     // Queue up an this robot's action first, because it's faster
-    if ($this_robot->robot_id != $target_robot->robot_id && $temp_thisability->ability_target != 'select_this' && $temp_thisability->ability_target != 'select_this_ally'){
+    if ($this_robot->robot_id != $target_robot->robot_id
+        && ($temp_thisability->ability_target != 'select_this'
+            && $temp_thisability->ability_target != 'select_this_ally')){
         $this_battle->actions_append($this_player, $this_robot, $target_player, $target_robot, $this_action, $this_action_token);
     }
-    elseif ($this_robot->robot_id != $target_robot->robot_id && $temp_thisability->ability_target == 'select_this' && $temp_thisability->ability_target == 'select_this_ally'){
+    elseif ($this_robot->robot_id != $target_robot->robot_id
+        && ($temp_thisability->ability_target == 'select_this'
+            || $temp_thisability->ability_target == 'select_this_ally')){
         $this_battle->actions_append($this_player, $this_robot, $this_player, $target_robot, $this_action, $this_action_token);
     }
     else {
