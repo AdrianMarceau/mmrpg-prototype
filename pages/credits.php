@@ -159,15 +159,26 @@ foreach ($contributor_ids AS $id){
 <div class="subbody creditblock compact">
     <div class="text">
         <div class="detail">
-            <a class="name" href="http://www.youtube.com/user/TheLegendOfRenegade/" target="_blank"><strong>TheLegendOfRenegade</strong></a>
+            <strong style="text-decoration: underline;">TheLegendOfRenegade</strong>
             <span class="pipe">|</span>
             <span class="title">Contributor</span>
             <span class="pipe">|</span>
             <em class="reason">Mega Man Sega Genesis Remixes</em>
+            <span class="pipe">|</span>
+            <a class="name" href="http://www.youtube.com/user/TheLegendOfRenegade/" target="_blank"><strong>YouTube</strong></a>
+            <span class="pipe">|</span>
+            <a class="name" href="https://www.patreon.com/thelegendofrenegade" target="_blank"><strong>Patreon</strong></a>
         </div>
         <div class="text description">
-            <p>YouTube user TheLegendOfRenegade is responsible for any and all music and sound effects in the prototype and graciously agreed to let us use his work in July 2013.  All tracks come from his massive, multiple-game-spanning Sega Genesis / MD Remix project and they are really, really incredible.  All field music thus far has come from his <a href="http://www.youtube.com/playlist?list=PL0jbwTITrHXaBy3etRm-nmkx-f-QaPOwQ" target="_blank">Mega Man 1 - 4</a> collection with various menu and special battle themes coming from the <a href="http://www.youtube.com/playlist?list=PL0jbwTITrHXZfMogt7ll1ThTlpND_5KZH" target="_blank">Rockman &amp; Forte</a> and <a href="http://www.youtube.com/playlist?list=PL0jbwTITrHXbA31nYgKs863E4UgLxUJkh" target="_blank">Mega Man 7</a> collections in addition to the former.  The level of quality and polish these remixes bring to the game is beyond words, and I am so grateful that we're able to showcase them in our prototype.  TheLegendOfRenegade has done some truly great work, and I think I speak for everyone on the team when I say &quot;thank you&quot;.  ^_^</p>
-            <p class="subtext">* Because TheLegendOfRenegade has not created remixes for Time Man and Oil Man's stages in Powered Up, the R&amp;F themes for Astro Man and Tengu Man are currently being used in their place. The game will be updated if/when he ever creates them, but please enjoy the current selection until then. :)</p>
+            <p>
+                Video game remixer TheLegendOfRenegade is responsible for all music and sound effects found in the Mega Man RPG and graciously agreed to let us use his work way back in July 2013.
+                All tracks come from his massive, multi-game-spanning Sega Genesis / MD Remix library of music and they each bring unique and much-appreciated flavour to the atmosphere of the RPG's soundtrack.
+            </p>
+            <p>
+                Renegade's robot master themes from Mega Man 1 - 10, Mega Man & Bass, and even Mega Man Powered Up are represented here as well as a few miscellaneous boss themes, menu themes, stage select themes, and even special stage themes from a range of classic titles.
+                The overall level of quality and polish these remixes bring to our game is beyond words, and I am so, <em>so</em> grateful that we've been able to showcase them in the RPG for all these years.
+            </p>
+            <p>TheLegendOfRenegade has done some truly great work, and I think I speak for everyone on the team when I say &quot;thank you&quot;!  ^_^</p>
         </div>
     </div>
 </div>
