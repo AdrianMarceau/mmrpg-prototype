@@ -88,15 +88,6 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
     // Collect any members that are currently viewing the community page
     $temp_viewing_community = mmrpg_website_sessions_active('community/', 3, true);
 
-    // Collect the number of people currently in chat
-    $chat_online = $db->get_array_list("SELECT userID, userName, userRole, channel, dateTime, ip FROM ajax_chat_online WHERE 1 = 1;");
-    // Increment the community count by the number in the chat room
-    if (!empty($chat_online)){
-        foreach ($chat_online AS $online){
-            $temp_viewing_community[] = array('user_id' => $online['userID'], 'session_href' => 'chat/');
-        }
-    }
-
 }
 
 // Predefine the variable to hold nav menu markip
