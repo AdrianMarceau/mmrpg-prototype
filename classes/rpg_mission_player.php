@@ -102,7 +102,10 @@ class rpg_mission_player extends rpg_mission {
                 $temp_robot_rewards = $temp_rewards_array;
                 // Collect this robot's abilities, format them, and crop if necessary
                 $temp_robot_abilities = array();
-                foreach ($temp_settings_array['robot_abilities'] AS $key2 => $temp_abilityinfo){ $temp_robot_abilities[] = $temp_abilityinfo['ability_token']; }
+                foreach ($temp_settings_array['robot_abilities'] AS $key2 => $temp_abilityinfo){
+                    if (!empty($temp_abilityinfo['ability_token'])){ $temp_robot_abilities[] = $temp_abilityinfo['ability_token']; }
+                    elseif (!empty($key2) && !is_numeric($key2)){ $temp_robot_abilities[] = $key2; }
+                }
                 $temp_robot_abilities = count($temp_robot_abilities) > 8 ? array_slice($temp_robot_abilities, 0, 8) : $temp_robot_abilities;
                 // Create the new robot info array to be added to the omega battle options
                 $temp_new_array = array(
