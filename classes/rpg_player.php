@@ -1471,6 +1471,7 @@ class rpg_player extends rpg_object {
         // Create the session variable for this item if it does not exist and collect its value
         if (empty($_SESSION['GAME']['values']['battle_items'][$temp_item_token])){ $_SESSION['GAME']['values']['battle_items'][$temp_item_token] = 0; }
         $temp_item_quantity = $_SESSION['GAME']['values']['battle_items'][$temp_item_token];
+        $temp_item_quantity_old = $temp_item_quantity;
 
         // If this item is already at the quantity limit, skip it entirely
         if ($temp_item_quantity >= $temp_item_quantity_max){
@@ -1512,8 +1513,10 @@ class rpg_player extends rpg_object {
         // Else if this is a core, show the altered inventory text
         elseif ($temp_is_core){
 
-            // Define the robot core drop text for displau
+            // Define the robot core drop text for display
+
             $temp_body_addon = $target_player->print_name().' added the new core to the inventory.';
+            $temp_body_addon .= ' <span class="item_stat item_type item_type_none">'.$temp_item_quantity_old.' <sup style="bottom: 2px;">&raquo;</sup> '.$temp_item_quantity_new.'</span>';
 
         }
         // Otherwise, if a normal item show the standard message
@@ -1521,6 +1524,7 @@ class rpg_player extends rpg_object {
 
             // Define the normal item drop text for display
             $temp_body_addon = $target_player->print_name().' added the dropped item'.($item_quantity_dropped > 1 ? 's' : '').' to the inventory.';
+            $temp_body_addon .= ' <span class="item_stat item_type item_type_none">'.$temp_item_quantity_old.' <sup style="bottom: 2px;">&raquo;</sup> '.$temp_item_quantity_new.'</span>';
 
         }
 
@@ -1532,6 +1536,7 @@ class rpg_player extends rpg_object {
             $event_body = rpg_battle::random_positive_word().' The disabled '.$this_robot->print_name().' dropped '.(preg_match('/^(a|e|i|o|u)/i', $temp_item_name) ? 'an' : 'a').' <span class="item_name item_type item_type_'.$temp_item_colour.'">'.$temp_item_name.'</span>!<br />';
         }
         $event_body .= $temp_body_addon;
+        //$event_body .= ' ('.$temp_item_quantity_old.' &raquo; '.$temp_item_quantity_new.')';
         $event_options = array();
         $event_options['console_show_target'] = false;
         $event_options['this_header_float'] = $target_player->player_side;
@@ -1591,6 +1596,7 @@ class rpg_player extends rpg_object {
             // Create the session variable for this item if it does not exist and collect its value
             if (empty($_SESSION['GAME']['values']['battle_items'][$temp_core_token])){ $_SESSION['GAME']['values']['battle_items'][$temp_core_token] = 0; }
             $temp_core_quantity = $_SESSION['GAME']['values']['battle_items'][$temp_core_token];
+            $temp_core_quantity_old = $temp_core_quantity;
 
             // If this item is already at the quantity limit, skip it entirely
             if ($temp_core_quantity >= $temp_core_quantity_max){
@@ -1599,10 +1605,16 @@ class rpg_player extends rpg_object {
                 return true;
             }
 
+            // Create and/or increment the session variable for this item increasing its quantity
+            if (empty($_SESSION['GAME']['values']['battle_items'][$temp_core_token])){ $_SESSION['GAME']['values']['battle_items'][$temp_core_token] = 0; }
+            if ($temp_core_quantity < $temp_core_quantity_max){ $_SESSION['GAME']['values']['battle_items'][$temp_core_token] += 1; }
+            $temp_core_quantity_new = $_SESSION['GAME']['values']['battle_items'][$temp_core_token];
+
             // Display the robot reward message markup
             $event_header = $temp_core_name.' Item Fusion';
             $event_body = rpg_battle::random_positive_word().' The glowing shards fused to create a new '.$temp_core->print_name().'!<br />';
             $event_body .= $target_player->print_name().' added the new core to the inventory.';
+            $event_body .= ' <span class="item_stat item_type item_type_none">'.$temp_core_quantity_old.' <sup style="bottom: 2px;">&raquo;</sup> '.$temp_core_quantity_new.'</span>';
             $event_options = array();
             $event_options['console_show_target'] = false;
             $event_options['this_header_float'] = $target_player->player_side;
@@ -1621,10 +1633,6 @@ class rpg_player extends rpg_object {
             $temp_core->item_frame_offset = array('x' => 220, 'y' => 0, 'z' => 10);
             $temp_core->update_session();
             $this_battle->events_create($target_robot, $target_robot, $event_header, $event_body, $event_options);
-
-            // Create and/or increment the session variable for this item increasing its quantity
-            if (empty($_SESSION['GAME']['values']['battle_items'][$temp_core_token])){ $_SESSION['GAME']['values']['battle_items'][$temp_core_token] = 0; }
-            if ($temp_core_quantity < $temp_core_quantity_max){ $_SESSION['GAME']['values']['battle_items'][$temp_core_token] += 1; }
 
             // Set the old shard counter back to zero now that they've fused
             $_SESSION['GAME']['values']['battle_items'][$temp_item_token] = 0;
