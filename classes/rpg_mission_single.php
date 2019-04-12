@@ -433,6 +433,30 @@ class rpg_mission_single extends rpg_mission {
 
         }
 
+        // If this is a starfield mission, SORT the robots by number of encounters
+        if ($starfield_mission){
+            $user_robot_database = !empty($_SESSION['GAME']['values']['robot_database']) ? $_SESSION['GAME']['values']['robot_database'] : array();
+            $temp_encounter_index = array();
+            foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $robot){
+                $token = $robot['robot_token'];
+                $count = 0;
+                if (!empty($user_robot_database[$token])){ $count += 1; }
+                if (!empty($user_robot_database[$token]['robot_summoned'])){ $count += $user_robot_database[$token]['robot_summoned']; }
+                if (!empty($user_robot_database[$token]['robot_encountered'])){ $count += $user_robot_database[$token]['robot_encountered']; }
+                if (!empty($user_robot_database[$token]['robot_unlocked'])){ $count += $count; }
+                $temp_encounter_index[$token] = $count;
+            }
+            usort($temp_battle_omega['battle_target_player']['player_robots'], function($r1, $r2) use($temp_encounter_index){
+                $r1_token = $r1['robot_token'];
+                $r2_token = $r2['robot_token'];
+                $r1_count = isset($temp_encounter_index[$r1_token]) ? $temp_encounter_index[$r1_token] : 0;
+                $r2_count = isset($temp_encounter_index[$r2_token]) ? $temp_encounter_index[$r2_token] : 0;
+                if ($r1_count < $r2_count){ return -1; }
+                elseif ($r1_count > $r2_count){ return 1; }
+                else { return 0; }
+            });
+        }
+
         // Update the battle description based on what we've calculated
         if ($starfield_mission){
             if ($temp_field_star_present){
