@@ -4,3 +4,170 @@
   width: 300px;
   margin-top: 4px;
 }
+
+
+/* ROGUE STAR STYLES */
+
+@-webkit-keyframes rotateInPlace { /* Safari and Chrome */
+    from { -webkit-transform: rotate(0deg); -o-transform: rotate(0deg); transform: rotate(0deg); }
+    to { -webkit-transform: rotate(360deg); -o-transform: rotate(360deg); transform: rotate(360deg); }
+}
+@keyframes rotateInPlace {
+    from { -ms-transform: rotate(0deg); -moz-transform: rotate(0deg); -webkit-transform: rotate(0deg); -o-transform: rotate(0deg); transform: rotate(0deg); }
+    to { -ms-transform: rotate(360deg); -moz-transform: rotate(360deg); -webkit-transform: rotate(360deg); -o-transform: rotate(360deg); transform: rotate(360deg); }
+}
+
+@-webkit-keyframes fadeInAndOut {
+    0% {opacity:0.9}
+    50% {opacity:0.7}
+    100% {opacity:1.0}
+}
+@-moz-keyframes fadeInAndOut {
+    0% {opacity:0.9}
+    50% {opacity:0.7}
+    100% {opacity:1.0}
+}
+@keyframes fadeInAndOut {
+    0% {opacity:0.9}
+    50% {opacity:0.7}
+    100% {opacity:1.0}
+}
+
+#mmrpg #canvas .event .rogue_star {
+    width: 193px;
+    height: 15px;
+    z-index: 30;
+    top: 14px;
+    left: 50%;
+    left: calc(50% + 10px);
+    transform: translate(-50%, 0);
+    transition: opacity 3s;
+}
+#mmrpg #canvas .event .rogue_star.loading {
+    opacity: 0;
+}
+#mmrpg #canvas .event .rogue_star > .wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+#mmrpg #canvas .event .rogue_star * {
+    pointer-events: all;
+}
+
+#mmrpg #canvas .event .rogue_star .track,
+#mmrpg #canvas .event .rogue_star .trail {
+    position: absolute;
+    bottom: 0;
+    left: -40px;
+    height: auto;
+    width: auto;
+    border-style: solid;
+    border-width: 2px;
+    -webkit-border-radius: 50% 5px 5px 50%;
+    -moz-border-radius: 50% 5px 5px 50%;
+    border-radius: 50% 5px 5px 50%;
+    box-sizing: border-box;
+}
+#mmrpg #canvas .event .rogue_star .track {
+    z-index: 1;
+    opacity: 0.7;
+    height: 100%;
+    right: 0;
+}
+#mmrpg #canvas .event .rogue_star .ruler {
+    z-index: 2;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background-image: url(../images/assets/rogue-star_ruler.png);
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+#mmrpg #canvas .event .rogue_star .trail {
+    z-index: 3;
+    bottom: 3px;
+    opacity: 0.9;
+    height: 10px;
+    border-top-width: 3px;
+    border-bottom-width: 3px;
+    -webkit-animation: fadeInAndOut 5s ease infinite;
+    -moz-animation: fadeInAndOut 5s ease infinite;
+    -ms-animation: fadeInAndOut 5s ease infinite;
+    -o-animation: fadeInAndOut 5s ease infinite;
+    animation: fadeInAndOut 5s ease infinite;
+    transition: right 9;
+}
+
+#mmrpg #canvas .event .rogue_star .star {
+    z-index: 4;
+    width: 40px;
+    height: 40px;
+    z-index: 40;
+    bottom: -12px;
+    transform: rotate(45deg);
+    -webkit-animation: rotateInPlace 10s linear infinite;
+    -moz-animation: rotateInPlace 10s linear infinite;
+    -ms-animation: rotateInPlace 10s linear infinite;
+    -o-animation: rotateInPlace 10s linear infinite;
+    animation: rotateInPlace 10s linear infinite;
+    transition: right 9s;
+}
+
+#mmrpg #canvas .event .rogue_star .label {
+    position: absolute;
+    z-index: 5;
+    text-indent: 0;
+    left: -46px;
+    right: -10px;
+    top: 19px;
+    height: 17px;
+    width: auto;
+    box-sizing: border-box;
+    font-size: 9px;
+    line-height: 9px;
+    font-weight: normal;
+    color: #ffffff;
+    opacity: 1;
+    transition: opacity 3s;
+}
+#mmrpg #canvas .event .rogue_star.hidelabel .label {
+    opacity: 0;
+}
+#mmrpg #canvas .event .rogue_star .label:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+#mmrpg #canvas .event .rogue_star .label .name,
+#mmrpg #canvas .event .rogue_star .label .effect {
+    display: block;
+    float: left;
+    box-sizing: border-box;
+    border-style: solid;
+    border-width: 1px;
+    padding: 3px 6px;
+    margin: 0 auto 0 0;
+    text-align: center;
+    vertical-align: middle;
+    border-color: rgb(22, 22, 22) !important;
+}
+#mmrpg #canvas .event .rogue_star .label .name {
+    width: 120px;
+    font-size: 8px;
+    text-transform: uppercase;
+    -webkit-border-radius: 4px 0 0 4px;
+    -moz-border-radius: 4px 0 0 4px;
+    border-radius: 4px 0 0 4px;
+}
+#mmrpg #canvas .event .rogue_star .label .effect {
+    width: 124px;
+    font-size: 9px;
+    text-transform: none;
+    -webkit-border-radius: 0 4px 4px 0;
+    -moz-border-radius: 0 4px 4px 0;
+    border-radius: 0 4px 4px 0;
+}

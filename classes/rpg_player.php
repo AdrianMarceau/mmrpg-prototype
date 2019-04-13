@@ -136,19 +136,31 @@ class rpg_player extends rpg_object {
         }
         */
 
+        // Decide whether we should include Rogue Stars or not
+        $include_rogue_star_power = true;
+        if (!empty($this->battle->flags['player_battle'])
+            || !empty($this->battle->flags['challenge_battle'])){
+            $include_rogue_star_power = false;
+        }
+
         // Pull in session starforce if available for human players
-        if (empty($this->player_starforce) && $this->player_side == 'left'){
+        if ($this->player_side == 'left'
+            && empty($this->player_starforce)){
+            include(MMRPG_CONFIG_ROOTDIR.'includes/starforce.php');
             if (!empty($_SESSION['GAME']['values']['star_force'])){
                 $this->player_starforce = $_SESSION['GAME']['values']['star_force'];
             }
         }
-        // Pull in Rogue Star starforce if available for CPU players
-        elseif ($this->player_side == 'right' && empty($this->flags['rogue_star_applied'])){
-            $this_rogue_star = mmrpg_prototype_get_current_rogue_star();
-            if (!empty($this_rogue_star)){
-                if (!isset($this->player_starforce[$this_rogue_star['star_type']])){ $this->player_starforce[$this_rogue_star['star_type']] = 0; }
-                $this->player_starforce[$this_rogue_star['star_type']] += $this_rogue_star['star_power'];
-                $this->flags['rogue_star_applied'] = true;
+        // Pull in any external starforce if available for CPU players
+        elseif ($this->player_side == 'right'){
+            // Apply any Rogue Star boosts if not already done so
+            if ($include_rogue_star_power && empty($this->flags['rogue_star_applied'])){
+                $this_rogue_star = mmrpg_prototype_get_current_rogue_star();
+                if (!empty($this_rogue_star)){
+                    if (!isset($this->player_starforce[$this_rogue_star['star_type']])){ $this->player_starforce[$this_rogue_star['star_type']] = 0; }
+                    $this->player_starforce[$this_rogue_star['star_type']] += $this_rogue_star['star_power'];
+                    $this->flags['rogue_star_applied'] = true;
+                }
             }
         }
 
