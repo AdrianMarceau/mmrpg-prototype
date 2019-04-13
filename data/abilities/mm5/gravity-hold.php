@@ -49,7 +49,7 @@ $ability = array(
                 ),
             'ability_frame' => 0,
             'ability_frame_animate' => array(2, 3),
-            'ability_frame_offset' => array('x' => -15, 'y' => -5, 'z' => -10)
+            'ability_frame_offset' => array('x' => 0, 'y' => -5, 'z' => -10)
             );
 
         // Target the opposing robot
