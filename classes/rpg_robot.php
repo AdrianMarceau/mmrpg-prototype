@@ -1210,10 +1210,8 @@ class rpg_robot extends rpg_object {
         // Define the frequency of the energy break ability if set
         if ($this_robot->has_ability('energy-break')){
             $options[] = 'energy-break';
-            if ($target_robot->robot_energy >= $target_robot->robot_base_energy){ $weights[] = 28 * $support_multiplier;  }
-            elseif ($target_robot->robot_energy < ($target_robot->robot_base_energy / 4)){ $weights[] = 10 * $support_multiplier;  }
-            elseif ($target_robot->robot_energy < ($target_robot->robot_base_energy / 3)){ $weights[] = 12 * $support_multiplier;  }
-            elseif ($target_robot->robot_energy < ($target_robot->robot_base_energy / 2)){ $weights[] = 14 * $support_multiplier;  }
+            if ($target_robot->robot_energy < ($target_robot->robot_base_energy / 2)){ $weights[] = 28 * $support_multiplier;  }
+            else { $weights[] = 12 * $support_multiplier; }
         }
 
         // Define the frequency of the energy swap ability if set
@@ -1261,17 +1259,17 @@ class rpg_robot extends rpg_object {
         if ($this_robot->has_ability('attack-swap')){
             $options[] = 'attack-swap';
             if ($this_robot->counters['attack_mods'] < $target_robot->counters['attack_mods']){ $weights[] = 3 * $support_multiplier;  }
-            else { $weights[] = 1;  }
+            else { $weights[] = 0;  }
         }
         if ($this_robot->has_ability('defense-swap')){
             $options[] = 'defense-swap';
             if ($this_robot->counters['defense_mods'] < $target_robot->counters['defense_mods']){ $weights[] = 3 * $support_multiplier;  }
-            else { $weights[] = 1;  }
+            else { $weights[] = 0;  }
         }
         if ($this_robot->has_ability('speed-swap')){
             $options[] = 'speed-swap';
             if ($this_robot->counters['speed_mods'] < $target_robot->counters['speed_mods']){ $weights[] = 3 * $support_multiplier;  }
-            else { $weights[] = 1;  }
+            else { $weights[] = 0;  }
         }
 
         // Define the frequency of the energy/repair mode ability if set
@@ -1318,29 +1316,75 @@ class rpg_robot extends rpg_object {
             else { $weights[] = 0; }
         }
 
+        // Define the frequency of the buster charge ability if set
+        if ($this_robot->has_ability('buster-charge')){
+            $options[] = 'buster-charge';
+            if ($this_robot->robot_weapons < ($this_robot->robot_base_weapons / 3)){ $weights[] = 10;  }
+            elseif ($this_robot->robot_weapons < ($this_robot->robot_base_weapons / 2)){ $weights[] = 5;  }
+            else { $weights[] = 0;  }
+        }
+
+        // Check to see if the target has any damage-resistant cores
+        $target_core_shields = array();
+        if (!empty($target_robot->robot_attachments)){
+            $temp_attachment_tokens = array_keys($target_robot->robot_attachments);
+            foreach ($temp_attachment_tokens AS $key => $token){
+                if (preg_match('/^ability_core-shield_([a-z]+)$/', $token)){
+                    $target_core_shields[] = str_replace('ability_core-shield_', '', $token);
+                }
+            }
+        }
+
         // Loop through any leftover abilities and add them to the weighted ability options
         $db_ability_fields = rpg_ability::get_index_fields(true);
         $temp_ability_tokens = "'".implode("','", array_values($this_robot->robot_abilities))."'";
         $temp_ability_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_token IN ({$temp_ability_tokens});", 'ability_token');
         foreach ($this_robot->robot_abilities AS $key => $token){
             if (!in_array($token, $options)){
+
+                // Collect ability info and define base chance
                 $info = rpg_ability::parse_index_info($temp_ability_index[$token]);
                 $value = 3;
-                if (!empty($this_robot->robot_core) && !empty($info['ability_type'])){
-                    if ($this_robot->robot_core == $info['ability_type']){ $value = 50; }
-                    elseif ($this_robot->robot_core == 'copy'){ $value = 40; }
-                    elseif ($this_robot->robot_core != $info['ability_type']){ $value = 30; }
-                } elseif (empty($this_robot->robot_core)){
-                    $value = 30;
-                } else {
-                    $value = 3;
+
+                // If this ability has a type, we can use it to alter chance values
+                if (!empty($info['ability_type'])){
+
+                    // Collect ability types into an array
+                    $ability_types = array();
+                    $ability_types[] = $info['ability_type'];
+                    if (!empty($info['ability_type2'])){ $ability_types[] = $info['ability_type2']; }
+
+                    // Increase chance for abilities with type that matches user's core
+                    if (empty($this_robot->robot_core)){ $value *= 10; }
+                    elseif ($this_robot->robot_core == 'copy'){ $value *= 12; }
+                    elseif (in_array($this_robot->robot_core, $ability_types)){ $value *= 16; }
+
+                    // Increase chance for abilities with type that matches user's held core
+                    if (!empty($this_robot->robot_item) && in_array(str_replace('-core', '', $this_robot->robot_item), $ability_types)){ $value *= 8; }
+
+                    // Increase chance if the target is weak to this ability's types
+                    foreach ($ability_types AS $key2 => $type){
+                        if ($target_robot->has_weakness($type)){ $value *= 2; }
+                        if ($target_robot->has_resistance($type)){ $value *= 0.5; }
+                        if ($target_robot->has_affinity($type)){ $value *= 0; }
+                        if ($target_robot->has_immunity($type)){ $value *= 0; }
+                        if (in_array($type, $target_core_shields)){ $value *= 0; }
+                    }
+
                 }
-                $options[] = $token;
-                $weights[] = $value;
+
+                // Append this option and its weight to the parent arrays
+                if ($value > 0){
+                    $options[] = $token;
+                    $weights[] = ceil($value);
+                }
+
             }
         }
 
         // Remove any options that have absolute zero values
+        $weights = array_values($weights);
+        $options = array_values($options);
         foreach ($weights AS $key => $value){
             if (empty($value)){
                 unset($weights[$key]);
@@ -1353,8 +1397,24 @@ class rpg_robot extends rpg_object {
         $weights = array_values($weights);
         $options = array_values($options);
 
-        // This robot doesn't have ANY abilities, return buster shot
-        if (empty($options) || empty($weights)){ return 'action-noweapons'; }
+        /*
+        $debug_text = '----------'.PHP_EOL.PHP_EOL;
+        $debug_text .= 'this_robot('.$this_robot->robot_token.') vs target_robot('.$target_robot->robot_token.')'.PHP_EOL.PHP_EOL;
+        $debug_text .= 'this_abilities = '.print_r($this_robot->robot_abilities, true);
+        $debug_text .= 'target_core_shields = '.print_r($target_core_shields, true);
+        $debug_text .= '$weights = '.print_r($weights, true);
+        $debug_text .= '$options = '.print_r($options, true);
+        $debug_text .= PHP_EOL.PHP_EOL;
+        $debug_file = fopen(MMRPG_CONFIG_ROOTDIR.'_cache/aaaa-debug.txt', 'a');
+        fwrite($debug_file, $debug_text);
+        fclose($debug_file);
+        */
+
+        // This robot doesn't have ANY abilities, automatically charge
+        if (empty($options) || empty($weights)){
+            if ($this_robot->robot_weapons <= 4){ return 'action-chargeweapons';  }
+            else { return 'action-noweapons';  }
+        }
 
         // Return an ability based on a weighted chance
         $ability_token = $this_battle->weighted_chance($options, $weights);
