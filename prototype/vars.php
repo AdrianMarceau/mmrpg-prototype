@@ -130,8 +130,7 @@ else {
             $chapters_unlocked['6'] = true;
 
             // Challenges
-            // WORK-IN-PROGRESS ONLY FOR ADMINS TEMP TEMP TEMP
-            $chapters_unlocked['8'] = MMRPG_USER_IS_ADMIN === true ? true : false;
+            $chapters_unlocked['8'] = true;
 
         } else {
 
