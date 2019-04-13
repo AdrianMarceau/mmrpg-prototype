@@ -18,6 +18,7 @@ class rpg_mission_challenge extends rpg_mission {
         $challenge_order = array();
         $challenge_order[] = "FIELD(challenges.challenge_kind, 'event', 'user')";
         if ($shuffle_list){ $challenge_order[] = 'RAND()'; }
+        else { $challenge_order[] = 'challenge_id DESC'; }
         $challenge_order = !empty($challenge_order) ? implode(', ', $challenge_order) : 'challenges.challenge_id ASC';
         // Collect or define the query result limit
         $challenge_limit = !empty($challenge_limit) && is_numeric($challenge_limit) ? 'LIMIT '.$challenge_limit : '';
