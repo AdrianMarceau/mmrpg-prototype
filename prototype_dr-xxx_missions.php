@@ -341,19 +341,6 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         // Define how many fields we should show at once
         $star_fields_to_show = 12;
 
-        // TEMP TEMP TEMP TEMP
-        if (true){
-            // Check to see if there are any event challenges to display right now (we'll show these in the other chapter later)
-            $temp_event_challenge = false;
-            $temp_event_challenges = rpg_mission_challenge::get_missions($this_prototype_data, 'event', 1, false);
-            if (!empty($temp_event_challenges)){
-                foreach ($temp_event_challenges AS $key => $temp_event_challenge){
-                    $star_fields_to_show -= 4;
-                    break;
-                }
-            }
-        }
-
         // Count the number of stars collected to determine level
         $star_count = mmrpg_prototype_stars_unlocked();
         $star_level = 50 + ceil(50 * ($star_count / MMRPG_SETTINGS_STARFORCE_STARTOTAL));
@@ -405,14 +392,6 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $added_star_fields++;
             if ($added_star_fields >= $star_fields_to_show){ break; }
 
-        }
-
-        // TEMP TEMP TEMP TEMP
-        if (true){
-            if (!empty($temp_event_challenge)){
-                $this_prototype_data['battle_options'][] = $temp_event_challenge;
-                rpg_battle::update_index_info($temp_event_challenge['battle_token'], $temp_event_challenge);
-            }
         }
 
     }
@@ -592,44 +571,44 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
     // -- BONUS CHAPTER : CHALLENGE MISSIONS (8) -- //
 
-    // WORK-IN-PROGRESS ONLY FOR ADMINS TEMP TEMP TEMP
-    if (MMRPG_USER_IS_ADMIN){
+    // Update the prototype data's global current chapter variable
+    $this_prototype_data['this_current_chapter'] = '8';
 
-        // Update the prototype data's global current chapter variable
-        $this_prototype_data['this_current_chapter'] = '8';
+    // Only continue if the player has unlocked this extra chapter
+    if ($this_prototype_data['prototype_complete'] || $this_prototype_data['this_chapter_unlocked']['8']){
 
-        // Only continue if the player has unlocked this extra chapter
-        if ($this_prototype_data['prototype_complete'] || $this_prototype_data['this_chapter_unlocked']['8']){
+        // EVENT MESSAGE : CHALLENGE CHAPTER
+        $this_prototype_data['battle_options'][] = array(
+            'option_type' => 'message',
+            'option_chapter' => $this_prototype_data['this_current_chapter'],
+            'option_maintext' => 'Bonus Chapter : Challenge Mode'
+            );
 
-            // EVENT MESSAGE : CHALLENGE CHAPTER
-            $this_prototype_data['battle_options'][] = array(
-                'option_type' => 'message',
-                'option_chapter' => $this_prototype_data['this_current_chapter'],
-                'option_maintext' => 'Bonus Chapter : Challenge Mode'
-                );
+        // Create an array to hold all the challenge missions
+        $temp_challenge_missions = array();
 
-            // Create an array to hold all the challenge missions
-            $temp_challenge_missions = array();
+        // Check to see if there are any event challenges to display right now
+        $temp_event_challenges = rpg_mission_challenge::get_missions($this_prototype_data, 'event', 3, false, false);
+        if (!empty($temp_event_challenges)){ $temp_challenge_missions = array_merge($temp_challenge_missions, $temp_event_challenges); }
 
-            // Check to see if there are any event challenges to display right now
-            $temp_event_challenges = rpg_mission_challenge::get_missions($this_prototype_data, 'event', 1, true); // CHANGE TO FALSE TEMP TEMP TEMP
-            if (!empty($temp_event_challenges)){ $temp_challenge_missions = array_merge($temp_challenge_missions, $temp_event_challenges); }
-
+        /*
+        // WORK-IN-PROGRESS ONLY FOR ADMINS TEMP TEMP TEMP
+        if (MMRPG_USER_IS_ADMIN){
             // Pad out the rest of the mission tab with user challenges if possible
             $req_user_challenges = 6 - (!empty($temp_event_challenges) ? (count($temp_event_challenges) * 2) : 0);
             if ($req_user_challenges > 0){
                 $temp_user_challenges = rpg_mission_challenge::get_missions($this_prototype_data, 'user', $req_user_challenges, false);
                 if (!empty($temp_user_challenges)){ $temp_challenge_missions = array_merge($temp_user_challenges, $temp_challenge_missions); }
             }
+        }
+        */
 
-            // Loop through any collected event or user challenges and then add them to the list
-            if (!empty($temp_challenge_missions)){
-                foreach ($temp_challenge_missions AS $key => $temp_battle_omega){
-                    $this_prototype_data['battle_options'][] = $temp_battle_omega;
-                    rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
-                }
+        // Loop through any collected event or user challenges and then add them to the list
+        if (!empty($temp_challenge_missions)){
+            foreach ($temp_challenge_missions AS $key => $temp_battle_omega){
+                $this_prototype_data['battle_options'][] = $temp_battle_omega;
+                rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
             }
-
         }
 
     }

@@ -227,7 +227,7 @@ else {
             // CHAPTER CHALLENGES(8)
             if ($allow_challenge_battles){
                 $chapters_display_count++;
-                echo '<a class="chapter_link extra challenges '.($temp_last_chapter === '8' ? 'chapter_link_active ' : '').'" href="#" data-chapter="8" title="Bonus Chapter : Challenge Mode || [[Fight in unique challenges designed by others!]] || [[Limited turns and robots + only hold items allowed!]]'.(!empty($this_rogue_star) ? ' || [[(Rogue Stars are disabled here!)]]' : '').'">Challenges</a>';
+                echo '<a class="chapter_link extra challenges '.($temp_last_chapter === '8' ? 'chapter_link_active ' : '').'" href="#" data-chapter="8" title="Bonus Chapter : Challenge Mode || [[Fight in unique challenges designed by MMRPG staff!]] || [[Limited turns and robots + only hold items allowed!]]'.(!empty($this_rogue_star) ? ' || [[(Rogue Stars are disabled here!)]]' : '').'">Challenges</a>';
                 } elseif ($num_extra > 0){
                 $chapters_display_count++;
                 echo '<a class="chapter_link extra challenges chapter_link_disabled">???</a>';
