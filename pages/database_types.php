@@ -328,7 +328,7 @@ foreach ($type_stats_index AS $category_token => $category_counts){
                 }
                 elseif ($category_token == 'affinity'){
                     $chart_class = 'affinities';
-                    $chart_title = $title_prefix.' Afffiities';
+                    $chart_title = $title_prefix.' Affiities';
                 }
                 elseif ($category_token == 'immunity'){
                     $chart_class = 'immunities';
