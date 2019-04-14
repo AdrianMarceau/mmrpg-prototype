@@ -8,6 +8,7 @@ $ability = array(
     'ability_group' => 'MM08/Weapons/057T1',
     'ability_description' => 'The user pummels the target with water-filled balloons that burst on contact to deal damage!  This ability will continue shooting balloons until either the target is disabled or the user runs out of weapon energy.',
     'ability_type' => 'water',
+    'ability_energy' => 4,
     'ability_damage' => 10,
     'ability_accuracy' => 98,
     'ability_function' => function($objects){
