@@ -8,7 +8,7 @@ $ability = array(
     'ability_description' => 'The user swings a hand-held weapon at the target to deal damage and break through barriers! The exact weapon used for this ability and the resulting damage appear to rotate with each turn that passes...',
     'ability_type' => '',
     'ability_energy' => 8,
-    'ability_damage' => 10,
+    'ability_damage' => 25,
     'ability_accuracy' => 98,
     'ability_function' => function($objects){
 
