@@ -1622,8 +1622,8 @@ class rpg_ability extends rpg_object {
                                 <? if($ability_image_token != 'ability'): ?>
                                     <tr>
                                         <td  class="right">
-                                            <label style="display: block; float: left;">Energy :</label>
-                                            <span class="ability_stat"><?= !empty($ability_info['ability_energy']) ? $ability_info['ability_energy'] : '-' ?></span>
+                                            <label style="display: block; float: left;">Cost :</label>
+                                            <span class="ability_stat"><?= !empty($ability_info['ability_energy']) ? $ability_info['ability_energy'].' WE' : '-' ?></span>
                                         </td>
                                     </tr>
                                 <? else: ?>
