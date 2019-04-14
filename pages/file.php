@@ -356,7 +356,10 @@ while ($this_action == 'profile'){
 
                 // Update the current game's user and file info using the new password
                 $_SESSION['GAME']['USER']['displayname'] = $user_displayname;
-                $_SESSION['GAME']['USER']['emailaddress'] = $user_emailaddress;
+                if (!empty($user_emailaddress)
+                    && preg_match('/^([^@]+)@([-_a-z0-9\.]+)\.([a-z0-9]+)/i', $user_emailaddress)){
+                    $_SESSION['GAME']['USER']['emailaddress'] = $user_emailaddress;
+                }
                 if (!empty($this_userinfo['user_flag_postpublic'])){
                     $_SESSION['GAME']['USER']['websiteaddress'] = $user_websiteaddress;
                     $_SESSION['GAME']['USER']['profiletext'] = $user_profiletext;
@@ -411,7 +414,7 @@ while ($this_action == 'profile'){
         ?>
 
         <div class="field field_username">
-            <label class="label label_username">Username :</label>
+            <label class="label label_username">Username : <span style="color: red;">*</span></label>
             <input class="text text_username" type="text" name="username" value="<?= htmlentities(trim($_SESSION['GAME']['USER']['username']), ENT_QUOTES, 'UTF-8', true) ?>" disabled="disabled" />
         </div>
 
@@ -430,8 +433,8 @@ while ($this_action == 'profile'){
         <? } ?>
 
         <div class="field field_emailaddress">
-            <label class="label label_emailaddress">Email Address :</label>
-            <input class="text text_emailaddress" type="text" name="emailaddress" maxlength="128" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['emailaddress']) ? $_SESSION['GAME']['USER']['emailaddress'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
+            <label class="label label_emailaddress">Email Address : <span style="color: red;">*</span></label>
+            <input class="text text_emailaddress" type="text" name="emailaddress" maxlength="128" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['emailaddress']) ? $_SESSION['GAME']['USER']['emailaddress'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" required="required" />
         </div>
 
         <? if (!empty($this_userinfo['user_flag_postpublic'])){ ?>
