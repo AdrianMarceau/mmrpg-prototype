@@ -37,7 +37,7 @@
     width: 193px;
     height: 15px;
     z-index: 30;
-    top: 14px;
+    top: 40px;
     left: 50%;
     left: calc(50% + 10px);
     transform: translate(-50%, 0);
