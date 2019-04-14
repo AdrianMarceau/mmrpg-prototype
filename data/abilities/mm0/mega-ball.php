@@ -5,11 +5,11 @@ $ability = array(
     'ability_token' => 'mega-ball',
     'ability_game' => 'MM08',
     'ability_group' => 'MM00/Weapons/Mega',
-    'ability_description' => 'The user creates a ball-shaped weapon that rocks back and forth along the ground until being kicked at any target for massive damage!',
+    'ability_description' => 'The user generates a powerful ball-shaped explosive that rocks back and forth at their feet.  At the end of the turn, the user kicks the ball at the target to deal damage and break through core shields! ',
     'ability_type' => '',
     'ability_energy' => 4,
-    'ability_damage' => 60,
-    'ability_accuracy' => 94,
+    'ability_damage' => 32,
+    'ability_accuracy' => 96,
     'ability_target' => 'select_target',
     'ability_function' => function($objects){
 
@@ -32,14 +32,13 @@ $ability = array(
         // Create the attachment object for this ability
         $this_attachment = rpg_game::get_ability($this_battle, $this_player, $this_robot, $this_attachment_info);
 
-        // Check if this ability is already summoned
-        $is_summoned = isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
+        // If this ability has not been summoned yet, do the action and then queue a conclusion move
+        $summoned_flag_token = $this_ability->ability_token.'_summoned';
+        if (empty($this_robot->flags[$summoned_flag_token])){
 
-        // If the user is holding a Charge Module, auto-summon the ability
-        if ($this_robot->has_item('charge-module')){ $is_summoned = true; }
-
-        // If the ability flag was not set, this ability begins charging
-        if (!$is_summoned){
+            // Set the summoned flag on this robot and save
+            $this_robot->flags[$summoned_flag_token] = true;
+            $this_robot->update_session();
 
             // Target this robot's self
             $this_ability->target_options_update(array(
@@ -48,17 +47,28 @@ $ability = array(
                 ));
             $this_robot->trigger_target($this_robot, $this_ability);
 
-            // Update this ability's targetting setting
-            $this_ability->ability_target = 'select_target';
-            $this_ability->update_session();
-
             // Attach this ability attachment to the robot using it
             $this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
             $this_robot->update_session();
 
+            // Queue another use of this ability at the end of turn
+            $this_battle->actions_append(
+                $this_player,
+                $this_robot,
+                $target_player,
+                $target_robot,
+                'ability',
+                $this_ability->ability_id.'_'.$this_ability->ability_token,
+                true
+                );
+
         }
-        // Else if the ability flag was set, the ability is released at the target
+        // The ability has already been summoned, so we can finish executing it now and deal damage
         else {
+
+            // Remove the summoned flag from this robot and save
+            unset($this_robot->flags[$summoned_flag_token]);
+            $this_robot->update_session();
 
             // Remove this ability attachment to the robot using it
             unset($this_robot->robot_attachments[$this_attachment_token]);
@@ -82,9 +92,22 @@ $ability = array(
             $energy_damage_amount = $this_ability->ability_damage;
             $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
 
-            // Update this ability's targetting setting
-            $this_ability->ability_target = 'auto';
-            $this_ability->update_session();
+            // If the ability was successful, loop through and remove recent core shield
+            if ($this_ability->ability_results['this_result'] != 'failure'){
+                if (!empty($target_robot->robot_attachments)){
+                    $temp_attachment_tokens = array_keys($target_robot->robot_attachments);
+                    $temp_attachment_tokens = array_reverse($temp_attachment_tokens);
+                    foreach ($temp_attachment_tokens AS $temp_key => $temp_attachment_token){
+                        $temp_attachment_info = $target_robot->robot_attachments[$temp_attachment_token];
+                        if (strstr($temp_attachment_token, 'ability_core-shield_')){
+                            $temp_attachment_info['attachment_duration'] = 0;
+                            $target_robot->robot_attachments[$temp_attachment_token] = $temp_attachment_info;
+                            $target_robot->update_session();
+                            break;
+                        }
+                    }
+                }
+            }
 
         }
 
@@ -97,23 +120,10 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
-        // Define this ability's attachment token
-        $this_attachment_token = 'ability_'.$this_ability->ability_token;
-
-        // Check if this ability is already summoned
-        $is_summoned = isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
-
-        // If the ability flag had already been set, reduce the weapon energy to zero
-        if ($is_summoned){ $this_ability->set_energy(0); }
-        // Otherwise, return the weapon energy back to default
+        // If the ability has already been summoned earlier this turn, decrease WE to zero
+        $summoned_flag_token = $this_ability->ability_token.'_summoned';
+        if (!empty($this_robot->flags[$summoned_flag_token])){ $this_ability->set_energy(0); }
         else { $this_ability->reset_energy(); }
-
-        // If the user is holding a Charge Module, auto-charge the ability
-        if ($this_robot->has_item('charge-module')){ $is_summoned = true; }
-
-        // If the ability is already summoned, allow bench targeting
-        if ($is_summoned){ $this_ability->set_target('select_target'); }
-        else { $this_ability->set_target('auto'); }
 
         // Return true on success
         return true;
