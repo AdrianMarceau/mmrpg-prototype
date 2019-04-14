@@ -5,7 +5,7 @@ $ability = array(
     'ability_token' => 'roll-swing',
     'ability_game' => 'MM08',
     'ability_group' => 'MM00/Weapons/Roll',
-    'ability_description' => 'The user swings a hand-held weapon at the target to deal damage! The exact weapon used for this ability and the resulting damage appear to rotate with each turn that passes...',
+    'ability_description' => 'The user swings a hand-held weapon at the target to deal damage and break through barriers! The exact weapon used for this ability and the resulting damage appear to rotate with each turn that passes...',
     'ability_type' => '',
     'ability_energy' => 8,
     'ability_damage' => 10,
@@ -57,6 +57,20 @@ $ability = array(
         $this_robot->set_frame('throw');
         $this_robot->set_frame_offset('x', 310);
 
+        // Check to see if there's a Super Block at this position
+        $static_ability_token = 'super-arm';
+        if ($target_robot->robot_position == 'active'){ $static_key = $target_player->player_side.'-active'; }
+        else { $static_key = $target_player->player_side.'-bench-'.$target_robot->robot_key; }
+        $static_attachment_token = 'ability_'.$static_ability_token.'_'.$static_key;
+        if (!empty($this_battle->battle_attachments[$static_key][$static_attachment_token])){
+            $static_attachment_info = $this_battle->battle_attachments[$static_key][$static_attachment_token];
+            if (!isset($static_attachment_info['ability_frame_styles'])){ $static_attachment_info['ability_frame_styles'] = ''; }
+            $static_attachment_info['ability_frame_styles'] .= 'opacity: 0.5; ';
+            $static_attachment_info['ability_frame_styles'] .= 'transform: translate('.($target_player->player_side == 'left' ? '-30%' : '30%').', 0); ';
+            $this_battle->battle_attachments[$static_key][$static_attachment_token] = $static_attachment_info;
+            $this_battle->update_session();
+        }
+
         // Inflict damage on the opposing robot with a broom
         $this_ability->damage_options_update(array(
             'kind' => 'energy',
@@ -66,6 +80,19 @@ $ability = array(
             ));
         $energy_damage_amount = $this_ability->ability_damage;
         $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
+
+        // Check to see if there's a Super Block at this position
+        $static_ability_token = 'super-arm';
+        if ($target_robot->robot_position == 'active'){ $static_key = $target_player->player_side.'-active'; }
+        else { $static_key = $target_player->player_side.'-bench-'.$target_robot->robot_key; }
+        $static_attachment_token = 'ability_'.$static_ability_token.'_'.$static_key;
+        if (!empty($this_battle->battle_attachments[$static_key][$static_attachment_token])){
+            $static_attachment_info = $this_battle->battle_attachments[$static_key][$static_attachment_token];
+            if ($this_ability->ability_results['this_result'] != 'failure'){ $static_attachment_info['attachment_duration'] = 0; }
+            else { $static_attachment_info['ability_frame_styles'] = ''; }
+            $this_battle->battle_attachments[$static_key][$static_attachment_token] = $static_attachment_info;
+            $this_battle->update_session();
+        }
 
         // Reset the offset and move the user back to their position
         $this_robot->set_frame('base');
