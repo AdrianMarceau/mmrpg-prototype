@@ -1629,7 +1629,7 @@ class rpg_ability extends rpg_object {
                                 <? else: ?>
                                     <tr>
                                         <td  class="right">
-                                            <label style="display: block; float: left;">Energy :</label>
+                                            <label style="display: block; float: left;">Cost :</label>
                                             <span class="ability_stat">-</span>
                                         </td>
                                     </tr>
