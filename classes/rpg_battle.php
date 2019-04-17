@@ -220,6 +220,10 @@ class rpg_battle extends rpg_object {
         $this->battle_base_level = isset($this_battleinfo['battle_base_level']) ? $this_battleinfo['battle_base_level'] : $this->battle_level;
         $this->battle_base_attachments = isset($this_battleinfo['battle_base_attachments']) ? $this_battleinfo['battle_base_attachments'] : $this->battle_attachments;
 
+        // Collect any battle-complete tokens or seeds to generate with
+        $this->battle_complete_redirect_token = !empty($this_battleinfo['battle_complete_redirect_token']) ? $this_battleinfo['battle_complete_redirect_token'] : '';
+        $this->battle_complete_redirect_seed = !empty($this_battleinfo['battle_complete_redirect_seed']) ? $this_battleinfo['battle_complete_redirect_seed'] : array();
+
         // Collect any functions associated with this battle
         $this->battle_functions = isset($this_battleinfo['battle_functions']) ? $this_battleinfo['battle_functions'] : 'battles/battle.php';
         $temp_functions_path = file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$this->battle_functions) ? $this->battle_functions : 'battles/battle.php';
@@ -2501,6 +2505,8 @@ class rpg_battle extends rpg_object {
             'battle_robot_limit' => $this->battle_robot_limit,
             'battle_field_base' => $this->battle_field_base,
             'battle_target_player' => $this->battle_target_player,
+            'battle_complete_redirect_token' => $this->battle_complete_redirect_token,
+            'battle_complete_redirect_seed' => $this->battle_complete_redirect_seed,
             'flags' => $this->flags,
             'counters' => $this->counters,
             'values' => $this->values,
