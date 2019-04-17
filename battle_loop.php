@@ -413,6 +413,13 @@ elseif ($this_action == 'restart'){
     require_once('battle/actions/restart.php');
 
 }
+// Else if the player is has requested to restart the battle
+elseif ($this_action == 'next'){
+
+    // Require the next action file
+    require_once('battle/actions/next.php');
+
+}
 // Else if the player is just starting the battle, queue start actions
 elseif ($this_action == 'start'){
 

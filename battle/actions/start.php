@@ -6,7 +6,6 @@
 $this_battle->counters['battle_turn'] = 0;
 $this_battle->update_session();
 
-
 // Check if there are any field hazards to place beneath this robot
 if (!empty($this_battle->battle_field_base['values']['hazards'])){
 
@@ -43,6 +42,28 @@ if (!empty($this_battle->battle_field_base['values']['hazards'])){
 
 }
 
+// Check for any robot details preloaded into session from a prev mission
+if (!empty($_SESSION['ROBOTS_PRELOAD'][$this_battle->battle_token])){
+
+    // Loop through this player's robots and apply any save states from the session
+    foreach ($this_player->values['robots_active'] AS $key => $info){
+        if ($this_robot->robot_id == $info['robot_id']){ $temp_robot = $this_robot; }
+        else { $temp_robot = rpg_game::get_robot($this_battle, $this_player, $info); }
+        $temp_robot_string = $temp_robot->robot_id.'_'.$temp_robot->robot_token;
+        if (!empty($_SESSION['ROBOTS_PRELOAD'][$this_battle->battle_token][$temp_robot_string])){
+            $temp_preload_data = $_SESSION['ROBOTS_PRELOAD'][$this_battle->battle_token][$temp_robot_string];
+            if (isset($temp_preload_data['robot_energy'])){ $temp_robot->robot_energy = $temp_preload_data['robot_energy']; }
+            if (isset($temp_preload_data['robot_weapons'])){ $temp_robot->robot_weapons = $temp_preload_data['robot_weapons']; }
+            if (isset($temp_preload_data['robot_attack_mods'])){ $temp_robot->counters['attack_mods'] = $temp_preload_data['robot_attack_mods']; }
+            if (isset($temp_preload_data['robot_defense_mods'])){ $temp_robot->counters['robot_defense_mods'] = $temp_preload_data['robot_defense_mods']; }
+            if (isset($temp_preload_data['robot_speed_mods'])){ $temp_robot->counters['robot_speed_mods'] = $temp_preload_data['robot_speed_mods']; }
+            if (isset($temp_preload_data['robot_image'])){ $temp_robot->robot_image = $temp_preload_data['robot_image']; }
+            if (isset($temp_preload_data['robot_item'])){ $temp_robot->robot_item = $temp_preload_data['robot_item']; }
+            $temp_robot->update_session();
+        }
+    }
+
+}
 
 // Check if this is a player battle
 $flag_player_battle = $target_player_id != MMRPG_SETTINGS_TARGET_PLAYERID ? true : false;
@@ -66,6 +87,9 @@ $first_event_body .= '<br />';
 //$first_event_body .= '$this_battle->flags = '.preg_replace('/\s+/', ' ', print_r($this_battle->flags, true)).'<br />';
 //$first_event_body .= '$this_battle->battle_field_base = '.preg_replace('/\s+/', ' ', print_r($this_battle->battle_field_base, true)).'<br />';
 //$first_event_body .= '$this->counters[\'robots_perside_max\'] = '.preg_replace('/\s+/', ' ', print_r($this_battle->counters['robots_perside_max'], true)).'<br />';
+
+//$this_battle->events_create(false, false, 'debug', ('$_SESSION[\'ROBOTS_PRELOAD\'] = '.preg_replace('/\s+/', ' ', print_r($_SESSION['ROBOTS_PRELOAD'], true)).'<br />'));
+//$this_battle->events_create(false, false, 'debug', ('$this_robot = '.preg_replace('/\s+/', ' ', print_r($this_robot->export_array(), true)).'<br />'));
 
 // Update the summon counts for all this player's robots
 foreach ($this_player->values['robots_active'] AS $key => $info){
