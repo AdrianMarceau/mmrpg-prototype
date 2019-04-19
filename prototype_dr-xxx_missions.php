@@ -88,6 +88,14 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             // Add the omega battle to the options, index, and session
             $this_prototype_data['battle_options'][] = $temp_battle_omega;
 
+            // GENERATE ALPHA BATTLE (SINGLES)
+            // Split this mission into two phases, once with only mechas and once with the master
+            $temp_battle_alpha = mmrpg_prototypt_extract_alpha_battle($temp_battle_omega, $this_prototype_data);
+            rpg_battle::update_index_info($temp_battle_alpha['battle_token'], $temp_battle_alpha);
+            rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+            $temp_option_key = count($this_prototype_data['battle_options']) - 1;
+            $this_prototype_data['battle_options'][$temp_option_key]['alpha_battle_token'] = $temp_battle_alpha['battle_token'];
+
         }
 
     }
@@ -184,6 +192,14 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
             // Add the omega battle to the options, index, and session
             $this_prototype_data['battle_options'][] = $temp_battle_omega;
+
+            // GENERATE ALPHA BATTLE (DOUBLES)
+            // Split this mission into two phases, once with only mechas and once with the master
+            $temp_battle_alpha = mmrpg_prototypt_extract_alpha_battle($temp_battle_omega, $this_prototype_data);
+            rpg_battle::update_index_info($temp_battle_alpha['battle_token'], $temp_battle_alpha);
+            rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+            $temp_option_key = count($this_prototype_data['battle_options']) - 1;
+            $this_prototype_data['battle_options'][$temp_option_key]['alpha_battle_token'] = $temp_battle_alpha['battle_token'];
 
         }
 
