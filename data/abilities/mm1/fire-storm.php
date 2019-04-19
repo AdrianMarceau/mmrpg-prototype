@@ -156,7 +156,7 @@ $ability = array(
         $this_attachment_token = 'ability_'.$this_ability->ability_token;
         if (isset($this_robot->robot_attachments[$this_attachment_token])){
             $this_attachment_info = $this_robot->robot_attachments[$this_attachment_token];
-            $shot_power = !empty($this_attachment_info['attachment_power']) ? $this_attachment_info['attachment_power'] + 1 : 1;
+            $shot_power = !empty($this_attachment_info['attachment_power']) ? $this_attachment_info['attachment_power'] : 0;
             $shot_numeral = $shot_power == 3 ? 'III' : 'II';
             $ability_damage = ceil($this_ability->ability_base_damage + (($shot_power - 1) * 2));
             $this_ability->set_damage($ability_damage);
