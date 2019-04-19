@@ -319,6 +319,12 @@ class rpg_battle extends rpg_object {
     // Define a public function for prepending to the action array
     public function actions_prepend($this_player, $this_robot, $target_player, $target_robot, $this_action, $this_action_token){
 
+        // If this is a switch, check to ensure we're not already doing that
+        if ($this_action == 'switch'){
+            if (empty($this->flags['switch_queued_for_'.$this_robot->robot_id])){ $this->flags['switch_queued_for_'.$this_robot->robot_id] = true; }
+            else { return false; }
+        }
+
         // Prepend the new action to the array
         array_unshift($this->actions, array(
             'this_field' => $this->battle_field,
@@ -337,6 +343,12 @@ class rpg_battle extends rpg_object {
 
     // Define a public function for appending to the action array
     public function actions_append($this_player, $this_robot, $target_player, $target_robot, $this_action, $this_action_token, $end_of_turn = false){
+
+        // If this is a switch, check to ensure we're not already doing that
+        if ($this_action == 'switch'){
+            if (empty($this->flags['switch_queued_for_'.$this_robot->robot_id])){ $this->flags['switch_queued_for_'.$this_robot->robot_id] = true; }
+            else { return false; }
+        }
 
         // Append the new action to the array
         if ($end_of_turn === true){
@@ -1673,6 +1685,9 @@ class rpg_battle extends rpg_object {
                 // Set a flag on this player so they don't switch again
                 $this_player->flags['switched_this_turn'] = true;
                 $this_player->update_session();
+
+                // Unset the queued switch flag in case we need to do another
+                unset($this->flags['switch_queued_for_'.$this_robot->robot_id]);
 
                 // Return from the battle function
                 $this_return = true;
