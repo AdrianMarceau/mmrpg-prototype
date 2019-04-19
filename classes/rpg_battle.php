@@ -1069,9 +1069,14 @@ class rpg_battle extends rpg_object {
         // Define the first event body markup, regardless of player type
         $first_event_header = $this->battle_name.($this->battle_result == 'victory' ? ' Complete' : ' Failure').' <span style="opacity:0.25;">|</span> '.$this->battle_field->field_name;
 
-
-        if ($this->battle_result == 'victory'){ $first_event_body_head = 'Mission complete! '.rpg_battle::random_victory_quote().($temp_human_rewards['battle_complete'] > 1 ? '<br /> That&#39;s '.$temp_human_rewards['battle_complete'].' times now! '.rpg_battle::random_positive_word() : ''); }
-        elseif ($this->battle_result == 'defeat'){ $first_event_body_head = 'Mission failure. '.rpg_battle::random_defeat_quote().($temp_human_rewards['battle_failure'] > 1 ? '<br /> That&#39;s '.$temp_human_rewards['battle_failure'].' times now&hellip; ' : ''); }
+        $is_final_battle = empty($this->battle_complete_redirect_token) && empty($this->battle_complete_redirect_seed) ? true : false;
+        if ($this->battle_result == 'victory'){
+            $first_event_body_head = $is_final_battle ? 'Mission complete! ' : 'Battle complete! ';
+            $first_event_body_head .= rpg_battle::random_victory_quote().($temp_human_rewards['battle_complete'] > 1 ? '<br /> That&#39;s '.$temp_human_rewards['battle_complete'].' times now! '.rpg_battle::random_positive_word() : '');
+        } elseif ($this->battle_result == 'defeat'){
+            $first_event_body_head = $is_final_battle ? 'Mission failure. ' : 'Battle failure. ';
+            $first_event_body_head .= rpg_battle::random_defeat_quote().($temp_human_rewards['battle_failure'] > 1 ? '<br /> That&#39;s '.$temp_human_rewards['battle_failure'].' times now&hellip; ' : '');
+        }
         //$first_event_body = '<div style="border-bottom: 1px solid rgba(0, 0, 0, 0.1); padding: 0 0 3px; margin: 0 0 3px;">'.$first_event_body.'</div> ';
         //$first_event_body .= '<br />';
 
