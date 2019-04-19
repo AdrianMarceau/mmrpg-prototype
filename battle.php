@@ -39,6 +39,7 @@ $this_player_token = isset($_GET['this_player_token']) ? $_GET['this_player_toke
 $this_player_robots = isset($_GET['this_player_robots']) ? $_GET['this_player_robots'] : '';
 $target_player_id = isset($_GET['target_player_id']) ? $_GET['target_player_id'] : 0;
 $target_player_token = isset($_GET['target_player_token']) ? $_GET['target_player_token'] : '';
+$flag_skip_fadein = isset($_GET['flag_skip_fadein']) && $_GET['flag_skip_fadein'] == 'true' ? true : false;
 
 // Collect the battle index data if available
 if (!empty($this_battle_token)){
@@ -213,7 +214,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
 </script>
 </head>
 <body id="mmrpg" class="battle">
-<div id="battle" class="hidden">
+<div id="battle" class="hidden <?= $flag_skip_fadein ? 'fastfade' : '' ?>">
 
     <form id="engine" action="battle_loop.php<?= $flag_wap ? '?wap=true' : '' ?>" target="connect" method="post">
 
@@ -269,12 +270,11 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                     }
                     $background_data_animate = count($background_animate) > 1 ? implode(',', $background_animate) : false;
                     // Display the markup of the background layer
-                    //echo '<div class="animate_fadein background_canvas background background_'.$background_animate[0].'" data-frame="'.$background_animate[0].'" '.(!empty($background_data_animate) ? 'data-animate="'.$background_data_animate.'"' : '').' style="background-image: url(images/fields/'.$this_field_data['field_background'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
-                    echo '<div class="animate_fadein background_canvas background background_00" data-frame="00" style="background-color: #000000; background-image: url(images/fields/'.$this_field_data['field_background'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
+                    echo '<div class="'.(!$flag_skip_fadein ? 'animate_fadein ' : '').'background_canvas background background_00" data-frame="00" style="background-color: #000000; background-image: url(images/fields/'.$this_field_data['field_background'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
 
                     // Loop through and display the markup of any background attachments
                     if (!empty($this_field_data['field_background_attachments'])){
-                        echo '<div class="animate_fadein background_event event clearback sticky" style="z-index: 30; border-color: transparent;">';
+                        echo '<div class="'.(!$flag_skip_fadein ? 'animate_fadein ' : '').' background_event event clearback sticky" style="z-index: 30; border-color: transparent;">';
                         $this_key = -1;
                         foreach ($this_field_data['field_background_attachments'] AS $this_id => $this_info){
                             if ($flag_wap && preg_match('/^(mecha|object)/i', $this_id)){ continue; }
@@ -342,7 +342,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                     $foreground_data_animate = count($foreground_animate) > 1 ? implode(',', $foreground_animate) : false;
 
                     // Display the markup of the foreground layer
-                    echo '<div class="animate_fadein foreground_canvas foreground foreground_00" data-frame="00" style="background-image: url(images/fields/'.$this_field_data['field_foreground'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
+                    echo '<div class="'.(!$flag_skip_fadein ? 'animate_fadein ' : '').' foreground_canvas foreground foreground_00" data-frame="00" style="background-image: url(images/fields/'.$this_field_data['field_foreground'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
 
                     // Check if this field has a field or fusion star in it
                     if (!empty($this_battle_data['values']['field_star'])){
@@ -431,7 +431,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
 
                     // Loop through and display the markup of any foreground attachments
                     if (!empty($this_field_data['field_foreground_attachments'])){
-                        echo '<div class="animate_fadein foreground_event event clearback sticky" style="z-index: 60; border-color: transparent;">';
+                        echo '<div class="'.(!$flag_skip_fadein ? 'animate_fadein ' : '').' foreground_event event clearback sticky" style="z-index: 60; border-color: transparent;">';
                         $this_key = -1;
                         foreach ($this_field_data['field_foreground_attachments'] AS $this_id => $this_info){
                             if ($flag_wap && preg_match('/^(mecha|object)/i', $this_id)){ continue; }
