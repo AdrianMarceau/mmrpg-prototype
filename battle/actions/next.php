@@ -19,7 +19,8 @@ foreach ($this_player->values['robots_active'] AS $key => $robot){
         'robot_defense_mods' => $robot['counters']['defense_mods'],
         'robot_speed_mods' => $robot['counters']['speed_mods'],
         'robot_image' => $robot['robot_image'],
-        'robot_item' => $robot['robot_item']
+        'robot_item' => $robot['robot_item'],
+        'robot_attachments' => $robot['robot_attachments']
         );
 
 }
