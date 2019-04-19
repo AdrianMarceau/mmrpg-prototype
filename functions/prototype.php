@@ -1551,7 +1551,7 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
         $best_stat = rpg_robot::get_best_stat($index_info);
         $robot_info['counters'][$best_stat.'_mods'] = $master_boost_power;
         $worst_stat = rpg_robot::get_worst_stat($index_info);
-        $robot_info['counters'][$best_stat.'_mods'] = floor($master_boost_power / 2);
+        $robot_info['counters'][$worst_stat.'_mods'] = floor($master_boost_power / 2);
         $temp_player_robots[$key] = $robot_info;
     }
     $temp_player_robots = array_values($temp_player_robots);
