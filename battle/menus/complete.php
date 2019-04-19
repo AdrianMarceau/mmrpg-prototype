@@ -11,19 +11,14 @@ ob_start();
 
             // Display available main actions
             ?><div class="main_actions"><?
-                ?><a class="button action_ability" data-action="next" type="button" data-order="1"><label>Battle Complete!</label></a><?
+                ?><a class="button action_ability" data-action="next" type="button" data-order="1"><label>Continue</label></a><?
             ?></div><?
             // Display the available sub options
             ?><div class="sub_actions"><?
-            ?><a class="button action_scan button_disabled" type="button">&nbsp;</a><?
-            if (empty($this_battle->flags['player_battle']) && empty($this_battle->flags['starfield_mission'])){
-                ?><a class="button action_item" data-action="prototype" type="button" data-order="2"><label>Exit Mission</label></a><?
-                ?><a class="button action_option" data-action="restart" type="button" data-order="3"><label>Restart Battle</label></a><?
-            } else {
+                ?><a class="button action_scan button_disabled" type="button">&nbsp;</a><?
                 ?><a class="button action_item button_disabled" type="button">&nbsp;</a><?
                 ?><a class="button action_option button_disabled" type="button">&nbsp;</a><?
-            }
-            ?><a class="button action_switch button_disabled" type="button">&nbsp;</a><?
+                ?><a class="button action_switch button_disabled" type="button">&nbsp;</a><?
             ?></div><?
 
 

@@ -16,7 +16,7 @@ ob_start();
 
 	// Display the option for RESTART BATTLE
 	$block_num++;
-	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-action="restart"><label><span class="multi">Restart<br />Mission</span></label></a>';
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-action="restart"><label><span class="multi">Restart<br />Battle</span></label></a>';
 
 	// Display the option for RETURN TO MAIN MENU
 	$block_num++;
