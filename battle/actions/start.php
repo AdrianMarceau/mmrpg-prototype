@@ -55,10 +55,11 @@ if (!empty($_SESSION['ROBOTS_PRELOAD'][$this_battle->battle_token])){
             if (isset($temp_preload_data['robot_energy'])){ $temp_robot->robot_energy = $temp_preload_data['robot_energy']; }
             if (isset($temp_preload_data['robot_weapons'])){ $temp_robot->robot_weapons = $temp_preload_data['robot_weapons']; }
             if (isset($temp_preload_data['robot_attack_mods'])){ $temp_robot->counters['attack_mods'] = $temp_preload_data['robot_attack_mods']; }
-            if (isset($temp_preload_data['robot_defense_mods'])){ $temp_robot->counters['robot_defense_mods'] = $temp_preload_data['robot_defense_mods']; }
-            if (isset($temp_preload_data['robot_speed_mods'])){ $temp_robot->counters['robot_speed_mods'] = $temp_preload_data['robot_speed_mods']; }
+            if (isset($temp_preload_data['robot_defense_mods'])){ $temp_robot->counters['defense_mods'] = $temp_preload_data['robot_defense_mods']; }
+            if (isset($temp_preload_data['robot_speed_mods'])){ $temp_robot->counters['speed_mods'] = $temp_preload_data['robot_speed_mods']; }
             if (isset($temp_preload_data['robot_image'])){ $temp_robot->robot_image = $temp_preload_data['robot_image']; }
             if (isset($temp_preload_data['robot_item'])){ $temp_robot->robot_item = $temp_preload_data['robot_item']; }
+            if (isset($temp_preload_data['robot_attachments'])){ $temp_robot->robot_attachments = $temp_preload_data['robot_attachments']; }
             $temp_robot->update_session();
         }
     }
