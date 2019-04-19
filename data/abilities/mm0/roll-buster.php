@@ -83,8 +83,14 @@ $ability = array(
                 ));
             $target_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
 
-            // Call the global stat break function with customized options
-            rpg_ability::ability_function_stat_break($target_robot, 'defense', 3);
+            // Ensure the target is not disabled before apply a stat change
+            if ($target_robot->robot_status != 'disabled'
+                && $this_ability->ability_results['this_result'] != 'failure'){
+
+                // Call the global stat break function with customized options
+                rpg_ability::ability_function_stat_break($target_robot, 'defense', 3);
+
+            }
 
         }
 
