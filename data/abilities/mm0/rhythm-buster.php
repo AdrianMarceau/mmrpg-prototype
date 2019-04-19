@@ -45,15 +45,17 @@ $ability = array(
             $this_robot->trigger_target($this_robot, $this_ability);
 
             // Increase this robot's speed stat slightly
-            $this_ability->recovery_options_update(array(
-                'kind' => 'energy',
-                'percent' => true,
-                'rates' => array(100, 0, 0),
-                'success' => array(2, -10, 0, -10, $this_robot->print_name().'&#39;s energy was restored!'),
-                'failure' => array(2, -10, 0, -10, $this_robot->print_name().'&#39;s energy was not affected&hellip;')
-                ));
-            $energy_recovery_amount = ceil($this_robot->robot_base_energy * ($this_ability->ability_recovery2 / 100));
-            $this_robot->trigger_recovery($this_robot, $this_ability, $energy_recovery_amount);
+            if ($this_robot->robot_energy < $this_robot->robot_base_energy){
+                $this_ability->recovery_options_update(array(
+                    'kind' => 'energy',
+                    'percent' => true,
+                    'rates' => array(100, 0, 0),
+                    'success' => array(2, -10, 0, -10, $this_robot->print_name().'&#39;s energy was restored!'),
+                    'failure' => array(2, -10, 0, -10, $this_robot->print_name().'&#39;s energy was not affected&hellip;')
+                    ));
+                $energy_recovery_amount = ceil($this_robot->robot_base_energy * ($this_ability->ability_recovery2 / 100));
+                $this_robot->trigger_recovery($this_robot, $this_ability, $energy_recovery_amount);
+            }
 
             // Attach this ability attachment to the robot using it
             $this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
