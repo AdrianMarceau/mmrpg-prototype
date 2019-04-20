@@ -503,14 +503,14 @@ class rpg_mission_double extends rpg_mission {
         } elseif (!empty($temp_battle_omega['values']['field_star'])){
             $temp_battle_omega['battle_description'] = 'Defeat '.$temp_description_target_robots.' and collect their Fusion Star!';
             $temp_battle_omega['battle_description2'] = 'The star\'s energy appears to have attracted more robots to the field...';
-        } elseif (!empty($this_unlock_abilities_count)){
+        } /* elseif (!empty($this_unlock_abilities_count)){
             $temp_battle_omega['battle_description'] = 'Defeat '.$temp_description_target_robots.' and download their special weapons!';
             $temp_battle_omega['battle_description2'] = 'Once we\'ve acquired them, we may be able to equip the abilities to other robots...';
         } elseif (!empty($this_unlock_robots_count)){
             $temp_battle_omega['battle_description'] = 'Defeat '.$temp_description_target_robots.' and download their robot data!';
             if ($this_unlock_robots_count > 1){ $temp_battle_omega['battle_description2'] = 'If we use only Neutral type abilities on the targets we may be able to save them...'; }
             else { $temp_battle_omega['battle_description2'] = 'If we use only Neutral type abilities on the target we may be able to save it...'; }
-        } else {
+        } */ else {
             $temp_battle_omega['battle_description'] = 'Defeat the powered up copies of '.$temp_description_target_robots.' on their fusion field!';
         }
 
