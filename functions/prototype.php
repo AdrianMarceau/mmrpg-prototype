@@ -1437,6 +1437,7 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
     $player_token = $this_prototype_data['this_player_token'];
     $battle_phase = $this_prototype_data['battle_phase'];
     $battle_field = $temp_battle_omega['battle_field_base'];
+    $battle_name = $temp_battle_omega['battle_name'];
     $omega_robot_level = $temp_battle_omega['battle_level'];
 
     // Define the stat boost power based on phase alone
@@ -1483,8 +1484,8 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
     $temp_battle_alpha = array_merge(array(), $temp_battle_omega);
     $temp_battle_alpha['battle_token'] = $temp_battle_omega['battle_token'].'-alpha';
     $temp_battle_alpha['battle_complete_redirect_token'] = $temp_battle_omega['battle_token'];
-    $temp_battle_alpha['battle_name'] = str_replace('Master Battle', 'Mecha Battle', $temp_battle_alpha['battle_name']);
-    $temp_battle_alpha['battle_description'] = 'Defeat the support mechas blocking your path to the robot master!';
+    $temp_battle_alpha['battle_name'] = $battle_name.' (1/2)';
+    $temp_battle_alpha['battle_description'] = 'Defeat the support mechas blocking your path to the robot master'.($battle_phase > 1 ? 's' : '').'!';
     $temp_battle_alpha['battle_counts'] = false;
     $temp_battle_alpha['battle_field_base']['values']['hazards'] = array();
     $temp_battle_alpha['battle_field_base']['field_music']  = $field1_info['field_token'];
@@ -1540,6 +1541,7 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
     /* UPDATE EXISTING OMEGA BATTLE (MASTERS) */
 
     // Add super block protection on the target robot side of the field
+    $temp_battle_omega['battle_name'] = $battle_name.' (2/2)';
     $temp_battle_omega['battle_field_base']['values']['hazards']['super_blocks'] = 'right';
     $temp_battle_omega['battle_field_base']['field_music']  = $field1_info['field_token'];
 
