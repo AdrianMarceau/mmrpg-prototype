@@ -1385,8 +1385,8 @@ class rpg_robot extends rpg_object {
         }
 
         // Remove any options that have absolute zero values
-        $weights = array_values($weights);
-        $options = array_values($options);
+        $weights_backup = $weights = array_values($weights);
+        $options_backup = $options = array_values($options);
         foreach ($weights AS $key => $value){
             if (empty($value)){
                 unset($weights[$key]);
@@ -1414,8 +1414,8 @@ class rpg_robot extends rpg_object {
 
         // This robot doesn't have ANY abilities, automatically charge
         if (empty($options) || empty($weights)){
-            if ($this_robot->robot_weapons <= 4){ return 'action-chargeweapons';  }
-            else { return 'action-noweapons';  }
+            if ($this_robot->robot_weapons <= ($this_robot->robot_base_weapons / 2)){ return 'action-chargeweapons';  }
+            else { return $options_backup[mt_rand(0, (count($options_backup) - 1))];  }
         }
 
         // Return an ability based on a weighted chance
