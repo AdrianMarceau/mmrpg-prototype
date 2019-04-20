@@ -320,11 +320,18 @@ class rpg_mission_single extends rpg_mission {
             // Randomly assign this robot a hold item if applicable
             $temp_item = '';
             if ($robot['robot_class'] == 'master'){
-                $rand = $starfield_mission || $temp_field_star_present ? mt_rand(1, 4) : mt_rand(1, 10);
-                if ($rand == 1){
-                    $stats = array('energy', 'weapon', 'attack', 'defense', 'speed');
-                    $items = array('pellet', 'capsule');
-                    $temp_item = $stats[mt_rand(0, (count($stats) - 1))].'-'.$items[mt_rand(0, (count($items) - 1))];
+                if ($starfield_mission
+                    || $temp_field_star_present){
+                    $rand = mt_rand(1, 3);
+                    if ($rand == 1){
+                        $stats = array('energy', 'weapon', 'attack', 'defense', 'speed');
+                        $items = array('pellet', 'capsule');
+                        $temp_item = $stats[mt_rand(0, (count($stats) - 1))].'-'.$items[mt_rand(0, (count($items) - 1))];
+                    } elseif ($rand == 2){
+                        if ($robot['robot_core'] != $temp_option_field['field_type']){ $temp_item = $temp_option_field['field_type'].'-core'; }
+                        else { $temp_item = $temp_option_field2['field_type'].'-core'; }
+                        $ability_count += 1;
+                    }
                 }
                 $temp_battle_omega['battle_target_player']['player_robots'][$key2]['robot_item'] = $temp_item;
             }
