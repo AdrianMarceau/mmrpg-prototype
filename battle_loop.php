@@ -47,7 +47,7 @@ $this_robot_token = isset($_REQUEST['this_robot_token']) ? $_REQUEST['this_robot
 $target_user_id = isset($_REQUEST['target_user_id']) ? $_REQUEST['target_user_id'] : 2;
 $target_player_id = isset($_REQUEST['target_player_id']) ? $_REQUEST['target_player_id'] : 2;
 $target_player_token = isset($_REQUEST['target_player_token']) ? $_REQUEST['target_player_token'] : 'player';
-$target_player_robots = !empty($_REQUEST['target_player_robots']) ? $_REQUEST['target_player_robots'] : '00_robot';
+//$target_player_robots = !empty($_REQUEST['target_player_robots']) ? $_REQUEST['target_player_robots'] : '00_robot';
 $target_robot_id = isset($_REQUEST['target_robot_id']) ? $_REQUEST['target_robot_id'] : 2;
 $target_robot_token = isset($_REQUEST['target_robot_token']) ? $_REQUEST['target_robot_token'] : 'robot';
 
@@ -411,6 +411,13 @@ elseif ($this_action == 'restart'){
 
     // Require the restart action file
     require_once('battle/actions/restart.php');
+
+}
+// Else if the player is has requested to restart the battle
+elseif ($this_action == 'next'){
+
+    // Require the next action file
+    require_once('battle/actions/next.php');
 
 }
 // Else if the player is just starting the battle, queue start actions

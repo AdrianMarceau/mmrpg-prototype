@@ -220,6 +220,10 @@ class rpg_battle extends rpg_object {
         $this->battle_base_level = isset($this_battleinfo['battle_base_level']) ? $this_battleinfo['battle_base_level'] : $this->battle_level;
         $this->battle_base_attachments = isset($this_battleinfo['battle_base_attachments']) ? $this_battleinfo['battle_base_attachments'] : $this->battle_attachments;
 
+        // Collect any battle-complete tokens or seeds to generate with
+        $this->battle_complete_redirect_token = !empty($this_battleinfo['battle_complete_redirect_token']) ? $this_battleinfo['battle_complete_redirect_token'] : '';
+        $this->battle_complete_redirect_seed = !empty($this_battleinfo['battle_complete_redirect_seed']) ? $this_battleinfo['battle_complete_redirect_seed'] : array();
+
         // Collect any functions associated with this battle
         $this->battle_functions = isset($this_battleinfo['battle_functions']) ? $this_battleinfo['battle_functions'] : 'battles/battle.php';
         $temp_functions_path = file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$this->battle_functions) ? $this->battle_functions : 'battles/battle.php';
@@ -379,6 +383,18 @@ class rpg_battle extends rpg_object {
         // Back up the IDs of this and the target robot in the global space
         $temp_this_robot_backup = array('robot_id' => $GLOBALS['this_robot']->robot_id, 'robot_token' => $GLOBALS['this_robot']->robot_token);
         $temp_target_robot_backup = array('robot_id' => $GLOBALS['target_robot']->robot_id, 'robot_token' => $GLOBALS['target_robot']->robot_token);
+
+        // Prevent duplicate switch actions from the same side
+        if (!empty($this->actions)){
+            $temp_switch_strings = array();
+            foreach($this->actions AS $key => $action){
+                if ($action['this_action'] == 'switch'){
+                    $switch_string = $action['this_action'].'-'.$action['this_player']->player_id.'-w-'.$action['this_robot']->robot_id;
+                    if (!in_array($switch_string, $temp_switch_strings)){ $temp_switch_strings[] = $switch_string; continue; }
+                    unset($this->actions[$key]);
+                }
+            }
+        }
 
         // Loop through the non-empty action queue and trigger actions
         $this_actions_array = $endofturn_actions === true ? $this->endofturn_actions : $this->actions;
@@ -1065,9 +1081,14 @@ class rpg_battle extends rpg_object {
         // Define the first event body markup, regardless of player type
         $first_event_header = $this->battle_name.($this->battle_result == 'victory' ? ' Complete' : ' Failure').' <span style="opacity:0.25;">|</span> '.$this->battle_field->field_name;
 
-
-        if ($this->battle_result == 'victory'){ $first_event_body_head = 'Mission complete! '.rpg_battle::random_victory_quote().($temp_human_rewards['battle_complete'] > 1 ? '<br /> That&#39;s '.$temp_human_rewards['battle_complete'].' times now! '.rpg_battle::random_positive_word() : ''); }
-        elseif ($this->battle_result == 'defeat'){ $first_event_body_head = 'Mission failure. '.rpg_battle::random_defeat_quote().($temp_human_rewards['battle_failure'] > 1 ? '<br /> That&#39;s '.$temp_human_rewards['battle_failure'].' times now&hellip; ' : ''); }
+        $is_final_battle = empty($this->battle_complete_redirect_token) && empty($this->battle_complete_redirect_seed) ? true : false;
+        if ($this->battle_result == 'victory'){
+            $first_event_body_head = $is_final_battle ? 'Mission complete! ' : 'Battle complete! ';
+            $first_event_body_head .= rpg_battle::random_victory_quote().($temp_human_rewards['battle_complete'] > 1 ? '<br /> That&#39;s '.$temp_human_rewards['battle_complete'].' times now! '.rpg_battle::random_positive_word() : '');
+        } elseif ($this->battle_result == 'defeat'){
+            $first_event_body_head = $is_final_battle ? 'Mission failure. ' : 'Battle failure. ';
+            $first_event_body_head .= rpg_battle::random_defeat_quote().($temp_human_rewards['battle_failure'] > 1 ? '<br /> That&#39;s '.$temp_human_rewards['battle_failure'].' times now&hellip; ' : '');
+        }
         //$first_event_body = '<div style="border-bottom: 1px solid rgba(0, 0, 0, 0.1); padding: 0 0 3px; margin: 0 0 3px;">'.$first_event_body.'</div> ';
         //$first_event_body .= '<br />';
 
@@ -1628,13 +1649,13 @@ class rpg_battle extends rpg_object {
                         $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                         $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $temp_new_robot->robot_name);
                         $event_body .= $temp_new_robot->print_quote('battle_start', $this_find, $this_replace);
-                        //$this_quote_text = str_replace($this_find, $this_replace, $temp_new_robot->robot_quotes['battle_start']);
-                        //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
                     }
+
                     // Only show the enter event if the switch reason was removed or if there is more then one robot
                     if ($this_switch_reason == 'removed' || $this_player->counters['robots_active'] > 1){
                         $this->events_create($temp_new_robot, false, $event_header, $event_body);
                     }
+
                 }
 
                 // Ensure this robot has abilities to loop through
@@ -2501,6 +2522,8 @@ class rpg_battle extends rpg_object {
             'battle_robot_limit' => $this->battle_robot_limit,
             'battle_field_base' => $this->battle_field_base,
             'battle_target_player' => $this->battle_target_player,
+            'battle_complete_redirect_token' => $this->battle_complete_redirect_token,
+            'battle_complete_redirect_seed' => $this->battle_complete_redirect_seed,
             'flags' => $this->flags,
             'counters' => $this->counters,
             'values' => $this->values,

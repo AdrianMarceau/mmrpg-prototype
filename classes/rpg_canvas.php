@@ -1885,12 +1885,13 @@ class rpg_canvas {
 
         // If this battle is over, display the mission complete/failed result
         if ($this_battle->battle_status == 'complete'){
+            $is_final_battle = empty($this_battle->battle_complete_redirect_token) && empty($this_battle->battle_complete_redirect_seed) ? true : false;
             if ($this_battle->battle_result == 'victory'){
-                $result_text = 'Mission Complete!';
+                $result_text = $is_final_battle ? 'Mission Complete!' : 'Battle Complete!';
                 $result_class = 'nature';
             }
             elseif ($this_battle->battle_result == 'defeat') {
-                $result_text = 'Mission Failure&hellip;';
+                $result_text = $is_final_battle ? 'Mission Failure&hellip;' : 'Battle Failure&hellip;';
                 $result_class = 'flame';
             }
             if (!empty($this_markup) && $this_battle->battle_status == 'complete' || $this_battle->battle_result == 'defeat'){

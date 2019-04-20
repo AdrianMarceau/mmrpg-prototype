@@ -400,9 +400,13 @@ if (empty($this_robot)){
     die('<pre>$target_robot is empty on line '.__LINE__.'! :'.print_r($target_robot, true).'</pre>');
 }
 
+// If empty, replace active target robot
+if (empty($active_target_robot)){ $active_target_robot = $target_player->get_active_robot(); }
+
 // Refresh the backed up target robot
 $target_robot = rpg_game::get_robot($this_battle, $target_player, array('robot_id' => $backup_target_robot_id, 'robot_token' => $backup_target_robot_token));
-if ($target_robot->robot_status == 'disabled'){
+if ($target_robot->robot_status == 'disabled'
+    && !empty($active_target_robot)){
 
     // Recollect the active target robot for the sake of auto targetting
     $target_robot = rpg_game::get_robot($this_battle, $target_player, array('robot_id' => $active_target_robot->robot_id, 'robot_token' => $active_target_robot->robot_token));
