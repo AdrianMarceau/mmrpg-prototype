@@ -384,6 +384,18 @@ class rpg_battle extends rpg_object {
         $temp_this_robot_backup = array('robot_id' => $GLOBALS['this_robot']->robot_id, 'robot_token' => $GLOBALS['this_robot']->robot_token);
         $temp_target_robot_backup = array('robot_id' => $GLOBALS['target_robot']->robot_id, 'robot_token' => $GLOBALS['target_robot']->robot_token);
 
+        // Prevent duplicate switch actions from the same side
+        if (!empty($this->actions)){
+            $temp_switch_strings = array();
+            foreach($this->actions AS $key => $action){
+                if ($action['this_action'] == 'switch'){
+                    $switch_string = $action['this_action'].'-'.$action['this_player']->player_id.'-w-'.$action['this_robot']->robot_id;
+                    if (!in_array($switch_string, $temp_switch_strings)){ $temp_switch_strings[] = $switch_string; continue; }
+                    unset($this->actions[$key]);
+                }
+            }
+        }
+
         // Loop through the non-empty action queue and trigger actions
         $this_actions_array = $endofturn_actions === true ? $this->endofturn_actions : $this->actions;
         while (!empty($this_actions_array) && $this->battle_status != 'complete'){
@@ -1637,13 +1649,13 @@ class rpg_battle extends rpg_object {
                         $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                         $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $temp_new_robot->robot_name);
                         $event_body .= $temp_new_robot->print_quote('battle_start', $this_find, $this_replace);
-                        //$this_quote_text = str_replace($this_find, $this_replace, $temp_new_robot->robot_quotes['battle_start']);
-                        //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
                     }
+
                     // Only show the enter event if the switch reason was removed or if there is more then one robot
                     if ($this_switch_reason == 'removed' || $this_player->counters['robots_active'] > 1){
                         $this->events_create($temp_new_robot, false, $event_header, $event_body);
                     }
+
                 }
 
                 // Ensure this robot has abilities to loop through
