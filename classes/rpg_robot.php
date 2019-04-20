@@ -911,6 +911,8 @@ class rpg_robot extends rpg_object {
             }
             // Collect the quote text with any search/replace modifications
             $this_quote_text = str_replace($this_find, $this_replace, $this->robot_quotes[$quote_type]);
+            $this_quote_text = preg_replace(', the master', ', master', $this_quote_text);
+            $this_quote_text = preg_replace(', your master', ', player', $this_quote_text);
             // Collect the text colour for this robot
             $this_type_token = !empty($this->robot_core) ? $this->robot_core : 'none';
             $this_text_colour = !empty($mmrpg_index['types'][$this_type_token]) ? $mmrpg_index['types'][$this_type_token]['type_colour_light'] : array(200, 200, 200);
