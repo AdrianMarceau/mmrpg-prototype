@@ -32,7 +32,7 @@ $ability = array(
 
         // Target this robot's self to initiate ability
         $target_name_text = $has_target_self ? 'itself' : $target_robot->print_name();
-        $this_ability->target_options_update(array('frame' => 'summon', 'success' => array(0, 0, 10, -10, $this_robot->print_name().' triggered an '.$this_ability->print_name().' with '.$target_name_text.'!')));
+        $this_ability->target_options_update(array('frame' => 'summon', 'success' => array(0, 0, 10, -10, $this_robot->print_name().' triggered a '.$this_ability->print_name().' with '.$target_name_text.'!')));
         $this_robot->trigger_target($this_robot, $this_ability);
 
         // Remove this ability from the target
