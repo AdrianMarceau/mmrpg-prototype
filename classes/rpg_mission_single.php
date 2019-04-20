@@ -369,26 +369,16 @@ class rpg_mission_single extends rpg_mission {
         $this_unlock_robots_count = count($temp_battle_omega['battle_rewards']['robots']);
         $this_unlock_abilities_count = count($temp_battle_omega['battle_rewards']['abilities']);
 
-        // Loop through the omega battle robot rewards and update the robot levels there too
-        if (!empty($temp_battle_omega['battle_rewards']['robots'])){
-            foreach ($temp_battle_omega['battle_rewards']['robots'] AS $key2 => $robot){
-                // Update the robot level and battle or button details
-                $temp_battle_omega['battle_rewards']['robots'][$key2]['level'] = $temp_omega_robot_level;  //1;
-                // Remove if this robot is already unlocked
-                if (mmrpg_prototype_robot_unlocked(false, $robot['token'])){
+        // Review the unlockable RMs for this field and grey-out any that are already unlocked
+        if (!empty($temp_battle_omega['values']['single_battle_masters'])
+            && $temp_battle_omega['battle_complete']
+            && !$starfield_mission){
+            foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $robot){
+                if (!in_array($robot['robot_token'], $temp_battle_omega['values']['single_battle_masters'])){ continue; }
+                if (mmrpg_prototype_robot_unlocked(false, $robot['robot_token'])){
+                    $robot['flags']['shadow_on_mission_select'] = true;
+                    $temp_battle_omega['battle_target_player']['player_robots'][$key] = $robot;
                     $this_unlock_robots_count -= 1;
-                    // If this isn't a starforce/starfield mission, we don't show already-unlocked robots
-                    if ($temp_battle_omega['battle_complete']
-                        && !$starfield_mission
-                        && !$temp_field_star_present){
-                        foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $rm_key => $rm_robot){
-                            if ($rm_robot['robot_token'] === $robot['token']){
-                                //$rm_robot['flags']['hide_from_mission_select'] = true;
-                                $rm_robot['flags']['shadow_on_mission_select'] = true;
-                                $temp_battle_omega['battle_target_player']['player_robots'][$rm_key] = $rm_robot;
-                            }
-                        }
-                    }
                 }
             }
         }
