@@ -99,7 +99,7 @@ $ability = array(
         // If used by support robot OR the has a Target Module, allow opponent targetting
         $temp_support_robots = array('roll', 'disco', 'rhythm');
         if (in_array($this_robot->robot_token, $temp_support_robots)
-            || $this_robot->has_item('target-module')){ $this_ability->set_target('select_this'); }
+            || $this_robot->has_item('target-module')){ $this_ability->set_target('select_this_ally'); }
         else { $this_ability->set_target('auto'); }
 
         // Check to see if this ability has been used already, and if so increase the cost
