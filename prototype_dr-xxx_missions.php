@@ -118,7 +118,8 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
         // Unlock the first fortress battle
         $temp_battle_token = $this_prototype_data['this_player_token'].'-fortress-i';
-        $temp_battle_omega = rpg_battle::get_index_info($temp_battle_token);
+        $temp_index_battle = rpg_battle::get_index_info($temp_battle_token, true);
+        $temp_battle_omega = $temp_index_battle;
         $temp_battle_omega['battle_phase'] = $this_prototype_data['battle_phase'];
         $temp_battle_omega['battle_level'] = $this_prototype_data['this_chapter_levels'][2];
         $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
@@ -126,7 +127,6 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         // If the battle is complete, remove the player from the description
         $temp_battle_complete = mmrpg_prototype_battle_complete($this_prototype_data['this_player_token'], $temp_battle_token);
         if ($temp_battle_complete){
-            $temp_index_battle = rpg_battle::get_index_info($temp_battle_token);
             $temp_battle_omega['battle_target_player'] = $temp_index_battle['battle_target_player'];
             $temp_battle_omega['battle_target_player']['player_token'] = 'player';
             $temp_battle_omega['battle_description'] = $temp_index_battle['battle_description'];
@@ -366,6 +366,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
         // Collect a list of all stars that have not been claimed yet
         $remaining_stars = mmrpg_prototype_remaining_stars(true, $possible_star_list);
+        $num_remaining_stars = count($remaining_stars);
 
         // Collect a list of star fields to display, prioritizing those the player doesn't have yet
         $visible_star_fields = array();
@@ -380,6 +381,13 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         }
         $num_visible_star_fields = count($visible_star_fields);
         shuffle($visible_star_fields);
+
+        // Create a flag variables for the random encounter
+        $random_encounter_added = false;
+        $random_encounter_chance = $num_remaining_stars == 0 || mt_rand(0, $num_remaining_stars) == 0 ? true : false;
+        //$random_encounter_chance = true; // DEBUG
+        $random_encounter_key = mt_rand(0, ($star_fields_to_show - 1));
+        //$random_encounter_key = 0; // DEBUG
 
         // Loop through remaining stars and display the first twelve
         $added_star_fields = 0;
@@ -403,6 +411,42 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
             // Add the omega battle to the options, index, and session
             $this_prototype_data['battle_options'][] = $temp_battle_omega;
+
+            // If random encounter has not been added, check to see if we can add now
+            if (empty($random_encounter_added)
+                && $random_encounter_chance
+                && $key == $random_encounter_key
+                ){
+                // Add a subtle indicator to the battle name
+                $temp_option_key = count($this_prototype_data['battle_options']) - 1;
+                $this_prototype_data['battle_options'][$temp_option_key]['battle_description2'] = rtrim($this_prototype_data['battle_options'][$temp_option_key]['battle_description2']).' Let\'s go!';
+                // Generate a random encounter mission for the star fields
+                $random_encounter_added = true;
+                $random_field_type = !empty($info2) ? $mmrpg_fields_index[$info2['field']]['field_type'] : $mmrpg_fields_index[$info['field']]['field_type'];
+                $temp_battle_sigma = mmrpg_prototype_generate_mission($this_prototype_data,
+                    $temp_battle_omega['battle_token'].'-random-encounter', array(
+                        'battle_name' => 'Challenger from the Future?',
+                        'battle_level' => 100,
+                        'battle_description' => 'A mysterious challenger has appeared! Can you defeat them in battle?',
+                        'battle_counts' => false
+                        ), array_merge($temp_battle_omega['battle_field_base'], array(
+                            'field_background' => 'prototype-complete',
+                            'field_background_attachments' => array(),
+                            'field_music' => 'sega-remix/boss-theme-mm10',
+                            'values' => array('hazards' => array('super_blocks' => 'right'))
+                            )
+                        ), array(
+                        'player_token' => 'player',
+                        ), array(
+                        array('robot_token' => 'quint', 'robot_item' => $random_field_type.'-core', 'counters' => array('attack_mods' => 5, 'defense_mods' => 5, 'speed_mods' => 5)),
+                        ), true);
+                rpg_battle::update_index_info($temp_battle_sigma['battle_token'], $temp_battle_sigma);
+                mmrpg_prototype_mission_autoplay_append($temp_battle_omega, $temp_battle_sigma, $this_prototype_data, true);
+            }
+
+            // TEST TEST TEST
+            // TEST TEST TEST
+
 
             // If we're over the limit, break now
             $added_star_fields++;
