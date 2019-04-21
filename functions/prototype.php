@@ -1659,7 +1659,7 @@ function mmrpg_prototype_generate_mission($this_prototype_data,
         $robot_info['robot_item'] = !empty($robot_info['robot_item']) ? $robot_info['robot_item'] : '';
         $robot_info['robot_abilities'] = !empty($robot_info['robot_abilities']) ? $robot_info['robot_abilities'] : 'auto';
         $auto_battle_zenny += ($index_info['robot_class'] == 'mecha' ? MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL2 : MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL) * $robot_info['robot_level'];
-        $auto_battle_turn_limit += $index_info['robot_class'] == 'mecha' ? MMRPG_SETTINGS_BATTLETURNS_PERMECHA : MMRPG_SETTINGS_BATTLETURNS_PERROBOT;
+        $auto_battle_turn_limit += $index_info['robot_class'] == 'mecha' ? MMRPG_SETTINGS_BATTLETURNS_PERMECHA : ($index_info['robot_class'] == 'boss' ? (MMRPG_SETTINGS_BATTLETURNS_PERROBOT * 2) : MMRPG_SETTINGS_BATTLETURNS_PERROBOT);
         $auto_battle_robot_limit += $index_info['robot_class'] == 'mecha' ? 0.5 : ($index_info['robot_class'] == 'boss' ? 1.5 : 1.0);
         if ($robot_info['robot_abilities'] === 'auto'
             || !is_array($robot_info['robot_abilities'])){
