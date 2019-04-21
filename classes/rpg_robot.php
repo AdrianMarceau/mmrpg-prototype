@@ -1204,9 +1204,10 @@ class rpg_robot extends rpg_object {
         if ($this_robot->has_ability('energy-boost')){
             $options[] = 'energy-boost';
             if ($this_robot->robot_energy >= $this_robot->robot_base_energy){ $weights[] = 0;  }
-            elseif ($this_robot->robot_energy < ($this_robot->robot_base_energy / 4)){ $weights[] = 14 * $support_multiplier;  }
-            elseif ($this_robot->robot_energy < ($this_robot->robot_base_energy / 3)){ $weights[] = 12 * $support_multiplier;  }
-            elseif ($this_robot->robot_energy < ($this_robot->robot_base_energy / 2)){ $weights[] = 10 * $support_multiplier;  }
+            elseif ($this_robot->robot_energy < ($this_robot->robot_base_energy / 4)){ $weights[] = 9 * $support_multiplier;  }
+            elseif ($this_robot->robot_energy < ($this_robot->robot_base_energy / 3)){ $weights[] = 6 * $support_multiplier;  }
+            elseif ($this_robot->robot_energy < ($this_robot->robot_base_energy / 2)){ $weights[] = 3 * $support_multiplier;  }
+            else { $weights[] = 0; }
         }
 
         // Define the frequency of the energy break ability if set
@@ -1221,56 +1222,57 @@ class rpg_robot extends rpg_object {
             $options[] = 'energy-swap';
             if ($this_robot->robot_energy < $target_robot->robot_energy){ $weights[] = 3 * $support_multiplier;  }
             elseif ($this_robot->robot_energy >= $target_robot->robot_energy){ $weights[] = 0;  }
+            else { $weights[] = 0; }
         }
 
         // Define the frequency of the attack, defense, and speed boost abiliies if set
         if ($this_robot->has_ability('attack-boost')){
             $options[] = 'attack-boost';
-            if ($this_robot->robot_attack < ($this_robot->robot_base_attack * 0.5)){ $weights[] = 3 * $support_multiplier;  }
-            else { $weights[] = 1;  }
+            if ($this_robot->counters['attack_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){ $weights[] = ((MMRPG_SETTINGS_STATS_MOD_MAX - $this_robot->counters['attack_mods']) + 5) * $support_multiplier;  }
+            else { $weights[] = 0;  }
         }
         if ($this_robot->has_ability('defense-boost')){
             $options[] = 'defense-boost';
-            if ($this_robot->robot_defense < ($this_robot->robot_base_defense * 0.5)){ $weights[] = 3 * $support_multiplier;  }
-            else { $weights[] = 1;  }
+            if ($this_robot->counters['defense_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){ $weights[] = ((MMRPG_SETTINGS_STATS_MOD_MAX - $this_robot->counters['defense_mods']) + 5) * $support_multiplier;  }
+            else { $weights[] = 0;  }
         }
         if ($this_robot->has_ability('speed-boost')){
             $options[] = 'speed-boost';
-            if ($this_robot->robot_speed < ($this_robot->robot_base_speed * 0.5)){ $weights[] = 3 * $support_multiplier;  }
-            else { $weights[] = 1;  }
+            if ($this_robot->counters['speed_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){ $weights[] = ((MMRPG_SETTINGS_STATS_MOD_MAX - $this_robot->counters['speed_mods']) + 5) * $support_multiplier;  }
+            else { $weights[] = 0;  }
         }
 
         // Define the frequency of the attack, defense, and speed break abilities if set
         if ($this_robot->has_ability('attack-break')){
             $options[] = 'attack-break';
-            if ($target_robot->robot_attack > $this_robot->robot_defense){ $weights[] = 3 * $support_multiplier;  }
-            else { $weights[] = 1;  }
+            if ($target_robot->counters['attack_mods'] > MMRPG_SETTINGS_STATS_MOD_MIN){ $weights[] = ($this_robot->counters['attack_mods'] + 5) * $support_multiplier;  }
+            else { $weights[] = 0;  }
         }
         if ($this_robot->has_ability('defense-break')){
             $options[] = 'defense-break';
-            if ($target_robot->robot_defense > $this_robot->robot_attack){ $weights[] = 3 * $support_multiplier;  }
-            else { $weights[] = 1;  }
+            if ($target_robot->counters['defense_mods'] > MMRPG_SETTINGS_STATS_MOD_MIN){ $weights[] = ($this_robot->counters['defense_mods'] + 5) * $support_multiplier;  }
+            else { $weights[] = 0;  }
         }
         if ($this_robot->has_ability('speed-break')){
             $options[] = 'speed-break';
-            if ($this_robot->robot_speed < $target_robot->robot_speed){ $weights[] = 3 * $support_multiplier;  }
-            else { $weights[] = 1;  }
+            if ($target_robot->counters['speed_mods'] > MMRPG_SETTINGS_STATS_MOD_MIN){ $weights[] = ($this_robot->counters['speed_mods'] + 5) * $support_multiplier;  }
+            else { $weights[] = 0;  }
         }
 
         // Define the frequency of the attack, defense, and speed swap abilities if set
         if ($this_robot->has_ability('attack-swap')){
             $options[] = 'attack-swap';
-            if ($this_robot->counters['attack_mods'] < $target_robot->counters['attack_mods']){ $weights[] = 3 * $support_multiplier;  }
+            if ($this_robot->counters['attack_mods'] < $target_robot->counters['attack_mods']){ $weights[] = (($target_robot->counters['attack_mods'] - $this_robot->counters['attack_mods']) + 5) * $support_multiplier;  }
             else { $weights[] = 0;  }
         }
         if ($this_robot->has_ability('defense-swap')){
             $options[] = 'defense-swap';
-            if ($this_robot->counters['defense_mods'] < $target_robot->counters['defense_mods']){ $weights[] = 3 * $support_multiplier;  }
+            if ($this_robot->counters['defense_mods'] < $target_robot->counters['defense_mods']){ $weights[] = (($target_robot->counters['defense_mods'] - $this_robot->counters['defense_mods']) + 5) * $support_multiplier;  }
             else { $weights[] = 0;  }
         }
         if ($this_robot->has_ability('speed-swap')){
             $options[] = 'speed-swap';
-            if ($this_robot->counters['speed_mods'] < $target_robot->counters['speed_mods']){ $weights[] = 3 * $support_multiplier;  }
+            if ($this_robot->counters['speed_mods'] < $target_robot->counters['speed_mods']){ $weights[] = (($target_robot->counters['speed_mods'] - $this_robot->counters['speed_mods']) + 5) * $support_multiplier;  }
             else { $weights[] = 0;  }
         }
 
@@ -1278,29 +1280,31 @@ class rpg_robot extends rpg_object {
         if ($this_robot->has_ability('energy-mode')){
             $options[] = 'energy-mode';
             if ($this_robot->robot_energy < ($this_robot->robot_base_energy * 0.5)){ $weights[] = 9 * $support_multiplier;  }
-            else { $weights[] = 1;  }
+            elseif ($this_robot->robot_energy < ($this_robot->robot_base_energy * 0.75)){ $weights[] = 6 * $support_multiplier;  }
+            else { $weights[] = 0;  }
         }
         if ($this_robot->has_ability('repair-mode')){
             $options[] = 'repair-mode';
             if ($this_robot->robot_energy < ($this_robot->robot_base_energy * 0.5)){ $weights[] = 9 * $support_multiplier;  }
-            else { $weights[] = 1;  }
+            elseif ($this_robot->robot_energy < ($this_robot->robot_base_energy * 0.75)){ $weights[] = 6 * $support_multiplier;  }
+            else { $weights[] = 0;  }
         }
 
         // Define the frequency of the attack, defense, and speed mode abilities if set
         if ($this_robot->has_ability('attack-mode')){
             $options[] = 'attack-mode';
-            if ($this_robot->counters['attack_mods'] <= MMRPG_SETTINGS_STATS_MOD_MIN){ $weights[] = 6 * $support_multiplier;  }
-            else { $weights[] = 1;  }
+            if ($this_robot->counters['attack_mods'] < 0){ $weights[] = (($this_robot->counters['attack_mods'] * -1) + 5) * $support_multiplier;  }
+            else { $weights[] = 0;  }
         }
         if ($this_robot->has_ability('defense-mode')){
             $options[] = 'defense-mode';
-            if ($this_robot->counters['defense_mods'] <= MMRPG_SETTINGS_STATS_MOD_MIN){ $weights[] = 6 * $support_multiplier;  }
-            else { $weights[] = 1;  }
+            if ($this_robot->counters['defense_mods'] < 0){ $weights[] = (($this_robot->counters['defense_mods'] * -1) + 5) * $support_multiplier;  }
+            else { $weights[] = 0;  }
         }
         if ($this_robot->has_ability('speed-mode')){
             $options[] = 'speed-mode';
-            if ($this_robot->counters['speed_mods'] <= MMRPG_SETTINGS_STATS_MOD_MIN){ $weights[] = 6 * $support_multiplier;  }
-            else { $weights[] = 1;  }
+            if ($this_robot->counters['speed_mods'] < 0){ $weights[] = (($this_robot->counters['speed_mods'] * -1) + 5) * $support_multiplier;  }
+            else { $weights[] = 0;  }
         }
 
         // Define the frequency of the super throw ability based on benched targets
@@ -1404,6 +1408,8 @@ class rpg_robot extends rpg_object {
         $debug_text .= 'this_robot('.$this_robot->robot_token.') vs target_robot('.$target_robot->robot_token.')'.PHP_EOL.PHP_EOL;
         $debug_text .= 'this_abilities = '.print_r($this_robot->robot_abilities, true);
         $debug_text .= 'target_core_shields = '.print_r($target_core_shields, true);
+        $debug_text .= '$weights_backup = '.print_r($weights_backup, true);
+        $debug_text .= '$options_backup = '.print_r($options_backup, true);
         $debug_text .= '$weights = '.print_r($weights, true);
         $debug_text .= '$options = '.print_r($options, true);
         $debug_text .= PHP_EOL.PHP_EOL;
