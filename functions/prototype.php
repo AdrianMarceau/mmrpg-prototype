@@ -1565,6 +1565,116 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
 
 }
 
+// Define a function for autoplaying one mission before another
+function mmrpg_prototype_mission_autoplay_prepend(&$base_battle_omega, &$prepend_battle_omega, &$this_prototype_data, $is_hidden = false){
+    $prepend_battle_omega['battle_complete_redirect_token'] = $base_battle_omega['battle_token'];
+    if (!$is_hidden){
+        $prepend_battle_omega['battle_name'] .= ' (1/2)';
+        $base_battle_omega['battle_name'] .= ' (2/2)';
+    }
+    foreach ($this_prototype_data['battle_options'] AS $key => $option){
+        if (isset($option['battle_token'])
+            && $option['battle_token'] == $base_battle_omega['battle_token']){
+            $option['alpha_battle_token'] = $prepend_battle_omega['battle_token'];
+        }
+    }
+    return true;
+}
+
+// Define a function for autoplaying one mission after another
+function mmrpg_prototype_mission_autoplay_append(&$base_battle_omega, &$append_battle_omega, &$this_prototype_data, $is_hidden = false){
+    $base_battle_omega['battle_complete_redirect_token'] = $append_battle_omega['battle_token'];
+    if (!$is_hidden){
+        $base_battle_omega['battle_name'] .= ' (1/2)';
+        $append_battle_omega['battle_name'] .= ' (2/2)';
+    }
+    return true;
+}
+
+// Define a function for easily generating the basic mission data structure
+function mmrpg_prototype_generate_mission($this_prototype_data,
+    $battle_token,
+    $battle_info = array(),
+    $field_info = array(),
+    $target_info = array(),
+    $target_robots = array()){
+
+    // Fix empty args in wrong format
+    if (empty($battle_info) || !is_array($battle_info)){ $battle_info = array(); }
+    if (empty($field_info) || !is_array($field_info)){ $field_info = array(); }
+    if (empty($target_info) || !is_array($target_info)){ $target_info = array(); }
+    if (empty($target_robots) || !is_array($target_robots)){ $target_robots = array(); }
+
+    // Collect a temporary object indexes for reference
+    static $temp_robot_index, $temp_field_index;
+    if (empty($temp_robot_index)){ $temp_robot_index = rpg_robot::get_index(true); }
+    if (empty($temp_field_index)){ $temp_field_index = rpg_field::get_index(); }
+
+    // Pre-count the number of target robots
+    $num_target_robots = count($target_robots);
+
+    // Create the main battle array for the omega battle
+    $temp_battle_omega = array();
+    $temp_battle_omega = array_merge($temp_battle_omega, $battle_info);
+    $temp_battle_omega['battle_token'] = $battle_token;
+    $temp_battle_omega['battle_size'] = !empty($battle_info['battle_size']) ? $battle_info['battle_size'] : '1x4';
+    $temp_battle_omega['battle_name'] = !empty($battle_info['battle_name']) ? $battle_info['battle_name'] : (!empty($battle_info['battle_button']) ? $battle_info['battle_button'] : ucwords(str_replace('-', ' ', $battle_token)));
+    $temp_battle_omega['battle_description'] = !empty($battle_info['battle_description']) ? $battle_info['battle_description'] : 'Defeat the target robot'.($num_target_robots > 1 ? '' : '').'!';
+    $temp_battle_omega['battle_counts'] = isset($battle_info['battle_counts']) ? $battle_info['battle_counts'] : true;
+    $temp_battle_omega['option_chapter'] = !empty($battle_info['option_chapter']) ? $battle_info['option_chapter'] : $this_prototype_data['this_current_chapter'];
+    $temp_battle_omega['battle_phase'] = !empty($battle_info['battle_phase']) ? $battle_info['battle_phase'] : $this_prototype_data['battle_phase'];
+    $temp_battle_omega['battle_level'] = !empty($battle_info['battle_level']) ? $battle_info['battle_level'] : 100;
+    $temp_battle_omega['battle_zenny'] = !empty($battle_info['battle_zenny']) ? $battle_info['battle_zenny'] : 0;
+    $temp_battle_omega['battle_turns'] = !empty($battle_info['battle_turns']) ? $battle_info['battle_turns'] : 0;
+    $temp_battle_omega['battle_robot_limit'] = isset($battle_info['battle_robot_limit']) ? $battle_info['battle_robot_limit'] : 0;
+    if (empty($battle_info['battle_robot_limit'])){ $battle_info['battle_robot_limit'] = MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX; }
+
+    // Parse the field info array and fill-in missing fields, then add to battle
+    $field_info['field_id'] = !empty($field_info['field_id']) ? $field_info['field_id'] : 1000;
+    $field_info['field_token'] = !empty($field_info['field_token']) ? $field_info['field_token'] : 'intro-field';
+    $temp_battle_omega['battle_field_base'] = $field_info;
+
+    // Parse the target player array and fill-in missing fields, then add to battle
+    $target_info['player_id'] = !empty($target_info['player_id']) ? $target_info['player_id'] : MMRPG_SETTINGS_TARGET_PLAYERID;
+    $target_info['player_token'] = !empty($target_info['player_token']) ? $target_info['player_token'] : 'player';
+    $temp_battle_omega['battle_target_player'] = $target_info;
+
+    // Parse the target robot array and fill-in missing fields, then add to player and battle
+    $auto_battle_zenny = 0;
+    $auto_battle_turn_limit = 0;
+    $auto_battle_robot_limit = 0;
+    if (empty($target_robots) || !is_array($target_robots)){ $target_robots = array(); }
+    foreach ($target_robots AS $key => $robot_info){ if (!isset($robot_info['robot_token'])){ unset($target_robots); continue; } }
+    if (empty($target_robots)){ $target_robots[] = array('robot_token' => 'met'); }
+    foreach ($target_robots AS $key => $robot_info){
+        $index_info = $temp_robot_index[$robot_info['robot_token']];
+        $robot_info['robot_id'] = !empty($robot_info['robot_id']) ? $robot_info['robot_id'] : (MMRPG_SETTINGS_TARGET_PLAYERID + $key + 1);
+        $robot_info['robot_level'] = !empty($robot_info['robot_level']) ? $robot_info['robot_level'] : $temp_battle_omega['battle_level'];
+        $robot_info['robot_item'] = !empty($robot_info['robot_item']) ? $robot_info['robot_item'] : '';
+        $robot_info['robot_abilities'] = !empty($robot_info['robot_abilities']) ? $robot_info['robot_abilities'] : 'auto';
+        $auto_battle_zenny += ($index_info['robot_class'] == 'mecha' ? MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL2 : MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL) * $robot_info['robot_level'];
+        $auto_battle_turn_limit += $index_info['robot_class'] == 'mecha' ? MMRPG_SETTINGS_BATTLETURNS_PERMECHA : MMRPG_SETTINGS_BATTLETURNS_PERROBOT;
+        $auto_battle_robot_limit += $index_info['robot_class'] == 'mecha' ? 0.5 : ($index_info['robot_class'] == 'boss' ? 1.5 : 1.0);
+        if ($robot_info['robot_abilities'] === 'auto'
+            || !is_array($robot_info['robot_abilities'])){
+            $num_abilities = ceil($temp_battle_omega['battle_level'] / 10);
+            if ($num_abilities < 1){ $num_abilities = 1; } elseif ($num_abilities > 8){ $num_abilities = 8; }
+            $num_abilities = 8;
+            $robot_info['robot_abilities'] = mmrpg_prototype_generate_abilities($index_info, $robot_info['robot_level'], $num_abilities, $robot_info['robot_item']);
+        }
+        $target_robots[$key] = $robot_info;
+    }
+    if (empty($temp_battle_omega['battle_zenny'])){ $temp_battle_omega['battle_zenny'] = $auto_battle_zenny; }
+    if (empty($temp_battle_omega['battle_turns'])){ $temp_battle_omega['battle_turns'] = $auto_battle_turn_limit; }
+    if ($temp_battle_omega['battle_robot_limit'] == 'auto'){ $temp_battle_omega['battle_robot_limit'] = ceil($auto_battle_robot_limit); }
+    $target_info['player_robots'] = $target_robots;
+    $temp_battle_omega['battle_target_player']['player_robots'] = $target_info['player_robots'];
+
+    // Return the generated omega battle
+    return $temp_battle_omega;
+
+}
+
 // Define a function for generating an ability set for a given robot
 require(MMRPG_CONFIG_ROOTDIR.'functions/prototype_generate-abilities.php');
 
