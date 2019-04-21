@@ -1568,14 +1568,18 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
 // Define a function for autoplaying one mission before another
 function mmrpg_prototype_mission_autoplay_prepend(&$base_battle_omega, &$prepend_battle_omega, &$this_prototype_data, $is_hidden = false){
     $prepend_battle_omega['battle_complete_redirect_token'] = $base_battle_omega['battle_token'];
+    $base_battle_omega['battle_name'] = preg_replace('/\s?\([0-9]+\/[0-9]+\)$/i', '', $base_battle_omega['battle_name']);
+    $prepend_battle_omega['battle_name'] = preg_replace('/\s?\([0-9]+\/[0-9]+\)$/i', '', $prepend_battle_omega['battle_name']);
     if (!$is_hidden){
         $prepend_battle_omega['battle_name'] .= ' (1/2)';
         $base_battle_omega['battle_name'] .= ' (2/2)';
     }
-    foreach ($this_prototype_data['battle_options'] AS $key => $option){
-        if (isset($option['battle_token'])
-            && $option['battle_token'] == $base_battle_omega['battle_token']){
-            $option['alpha_battle_token'] = $prepend_battle_omega['battle_token'];
+    rpg_battle::update_index_info($base_battle_omega['battle_token'], $base_battle_omega);
+    rpg_battle::update_index_info($prepend_battle_omega['battle_token'], $prepend_battle_omega);
+    foreach ($this_prototype_data['battle_options'] AS $key => $battle_option){
+        if (isset($battle_option['battle_token'])
+            && $battle_option['battle_token'] == $base_battle_omega['battle_token']){
+            $battle_option['alpha_battle_token'] = $prepend_battle_omega['battle_token'];
         }
     }
     return true;
@@ -1584,10 +1588,14 @@ function mmrpg_prototype_mission_autoplay_prepend(&$base_battle_omega, &$prepend
 // Define a function for autoplaying one mission after another
 function mmrpg_prototype_mission_autoplay_append(&$base_battle_omega, &$append_battle_omega, &$this_prototype_data, $is_hidden = false){
     $base_battle_omega['battle_complete_redirect_token'] = $append_battle_omega['battle_token'];
+    $base_battle_omega['battle_name'] = preg_replace('/\s?\([0-9]+\/[0-9]+\)$/i', '', $base_battle_omega['battle_name']);
+    $append_battle_omega['battle_name'] = preg_replace('/\s?\([0-9]+\/[0-9]+\)$/i', '', $append_battle_omega['battle_name']);
     if (!$is_hidden){
         $base_battle_omega['battle_name'] .= ' (1/2)';
         $append_battle_omega['battle_name'] .= ' (2/2)';
     }
+    rpg_battle::update_index_info($base_battle_omega['battle_token'], $base_battle_omega);
+    rpg_battle::update_index_info($append_battle_omega['battle_token'], $append_battle_omega);
     return true;
 }
 
@@ -1626,8 +1634,6 @@ function mmrpg_prototype_generate_mission($this_prototype_data,
     $temp_battle_omega['battle_level'] = !empty($battle_info['battle_level']) ? $battle_info['battle_level'] : 100;
     $temp_battle_omega['battle_zenny'] = !empty($battle_info['battle_zenny']) ? $battle_info['battle_zenny'] : 0;
     $temp_battle_omega['battle_turns'] = !empty($battle_info['battle_turns']) ? $battle_info['battle_turns'] : 0;
-    $temp_battle_omega['battle_robot_limit'] = isset($battle_info['battle_robot_limit']) ? $battle_info['battle_robot_limit'] : 0;
-    if (empty($battle_info['battle_robot_limit'])){ $battle_info['battle_robot_limit'] = MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX; }
 
     // Parse the field info array and fill-in missing fields, then add to battle
     $field_info['field_id'] = !empty($field_info['field_id']) ? $field_info['field_id'] : 1000;
@@ -1666,7 +1672,9 @@ function mmrpg_prototype_generate_mission($this_prototype_data,
     }
     if (empty($temp_battle_omega['battle_zenny'])){ $temp_battle_omega['battle_zenny'] = $auto_battle_zenny; }
     if (empty($temp_battle_omega['battle_turns'])){ $temp_battle_omega['battle_turns'] = $auto_battle_turn_limit; }
-    if ($temp_battle_omega['battle_robot_limit'] == 'auto'){ $temp_battle_omega['battle_robot_limit'] = ceil($auto_battle_robot_limit); }
+    if (isset($battle_info['battle_robot_limit']) && $temp_battle_omega['battle_robot_limit'] == 'max'){ $battle_info['battle_robot_limit'] = MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX; }
+    elseif (isset($battle_info['battle_robot_limit']) && $temp_battle_omega['battle_robot_limit'] == 'auto'){ $temp_battle_omega['battle_robot_limit'] = ceil($auto_battle_robot_limit); }
+    elseif (empty($battle_info['battle_robot_limit']) || !is_numeric($battle_info['battle_robot_limit'])){ unset($battle_info['battle_robot_limit']); }
     $target_info['player_robots'] = $target_robots;
     $temp_battle_omega['battle_target_player']['player_robots'] = $target_info['player_robots'];
 
