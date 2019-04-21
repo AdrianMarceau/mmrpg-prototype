@@ -2,11 +2,28 @@
 
 // -- NEXT BATTLE ACTION -- //
 
+// Create the battle chain array if not exists
+if (!isset($_SESSION['BATTLES_CHAIN'])){ $_SESSION['BATTLES_CHAIN'] = array(); }
+$_SESSION['BATTLES_CHAIN'][] = array(
+    'battle_token' => $this_battle->battle_token,
+    'battle_turns_used' => $this_battle->counters['battle_turn'],
+    'battle_robots_used' => (!empty($this_player->counters['robots_start_total']) ? $this_player->counters['robots_start_total'] : 0),
+    'battle_zenny_earned' => (!empty($this_battle->counters['final_zenny_reward']) ? $this_battle->counters['final_zenny_reward'] : 0)
+    );
+
 // Pre-generate active robots string and save any buffs/debuffs/etc.
 $active_robot_array = array();
 $active_robot_array_first = array();
 $_SESSION['ROBOTS_PRELOAD'] = array();
-foreach ($this_player->values['robots_active'] AS $key => $robot){
+$temp_player_active_robots = $this_player->values['robots_active'];
+usort($temp_player_active_robots, function($r1, $r2){
+    if ($r1['robot_position'] == 'active'){ return -1; }
+    elseif ($r2['robot_position'] == 'active'){ return 1; }
+    elseif ($r1['robot_key'] < $r2['robot_key']){ return -1; }
+    elseif ($r1['robot_key'] > $r2['robot_key']){ return 1; }
+    else { return 0; }
+    });
+foreach ($temp_player_active_robots AS $key => $robot){
 
     // Add this robot's ID + token to the list
     $robot_string = $robot['robot_id'].'_'.$robot['robot_token'];

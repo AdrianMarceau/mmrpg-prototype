@@ -521,7 +521,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                         if ($star_hours_left >= 1){ $star_tooltip .= 'You have less than '.($star_hours_left > 1 ? ceil($star_hours_left).' hours' : '1 hour').' remaining! '; }
                         elseif ($star_hours_left < 1){ $star_tooltip .= 'You have only '.($star_minutes_left > 1 ? ceil($star_minutes_left).' minutes' : '1 minute').' remaining! ';  }
                         ?>
-                        <div class="sprite rogue_star loading"
+                        <div class="sprite rogue_star loading <?= $flag_skip_fadein ? 'hidelabel' : '' ?>"
                             data-star-type="<?= $star_type ?>"
                             data-from-date="<?= $this_rogue_star['star_from_date'] ?>"
                             data-from-date-time="<?= $this_rogue_star['star_from_date_time'] ?>"

@@ -14,6 +14,7 @@ $session_token = mmrpg_game_token();
 
 // Automatically empty all temporary battle variables
 $_SESSION['BATTLES'] = array();
+$_SESSION['BATTLES_CHAIN'] = array();
 $_SESSION['FIELDS'] = array();
 $_SESSION['PLAYERS'] = array();
 $_SESSION['ROBOTS'] = array();

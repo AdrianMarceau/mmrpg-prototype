@@ -23,6 +23,7 @@ $this_redirect = 'battle.php?'.
     '&this_player_robots='.$this_player_robots.
     //'&target_player_id='.$target_player->player_id.
     //'&target_player_token='.$target_player->player_token.
+    (!empty($_SESSION['BATTLES_CHAIN']) ? '&flag_skip_fadein=true' : '').
     '';
 
 // Automatically empty all temporary battle variables
