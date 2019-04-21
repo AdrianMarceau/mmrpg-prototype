@@ -9,8 +9,8 @@ $ability = array(
     'ability_description' => 'The user launches a large, top-shaped weapon at the target that spins around frantically and continues dealing damage until it misses!',
     'ability_type' => 'swift',
     'ability_energy' => 4,
-    'ability_damage' => 2,
-    'ability_accuracy' => 72,
+    'ability_damage' => 3,
+    'ability_accuracy' => 83,
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
@@ -46,7 +46,8 @@ $ability = array(
         // If this attack returns and strikes a second time (random chance)
         $temp_hit_counter = 0;
         while ($this_ability->ability_results['this_result'] != 'failure'
-            && $target_robot->robot_status != 'disabled'){
+            && $target_robot->robot_status != 'disabled'
+            && $temp_hit_counter < $this_robot->robot_level){
 
             // Define the offset variables
             $temp_frame = $temp_hit_counter == 0 || $temp_hit_counter % 2 == 0 ? 1 : 0;
