@@ -1742,29 +1742,35 @@ class rpg_battle extends rpg_object {
                 $temp_energy_base_padding = ceil(($temp_target_robot->robot_base_energy / $temp_stat_counter_base_total) * $temp_stat_padding_total);
                 $temp_energy_base_padding = $temp_energy_base_padding - $temp_energy_padding;
 
-                $temp_attack_padding = ceil(($temp_target_robot->robot_attack / $temp_stat_counter_base_total) * $temp_stat_padding_total);
+                $temp_attack_padding = ceil((min($temp_target_robot->robot_attack, $temp_target_robot->robot_base_attack) / $temp_stat_counter_base_total) * $temp_stat_padding_total);
                 $temp_attack_base_padding = ceil(($temp_target_robot->robot_base_attack / $temp_stat_counter_base_total) * $temp_stat_padding_total);
                 $temp_attack_base_padding = $temp_attack_base_padding - $temp_attack_padding;
                 if ($temp_attack_padding < 1){ $temp_attack_padding = 0; }
                 elseif ($temp_attack_padding > $temp_stat_padding_total){ $temp_attack_padding = $temp_stat_padding_total; }
                 if ($temp_attack_base_padding < 1){ $temp_attack_base_padding = 0; }
                 elseif ($temp_attack_base_padding > $temp_stat_padding_total){ $temp_attack_base_padding = $temp_stat_padding_total; }
+                $temp_attack_mod_icon = $temp_target_robot->counters['attack_mods'] > 0 ? '&#x25b2;' : ($temp_target_robot->counters['attack_mods'] < 0 ? '&#x25bc;' : '');
+                if (!empty($temp_attack_mod_icon)){ $temp_attack_mod_icon = '<sub style="display:inline-block;font-size:60%;transform:translate(0,-2px);">'.$temp_attack_mod_icon.'</sub>'; }
 
-                $temp_defense_padding = ceil(($temp_target_robot->robot_defense / $temp_stat_counter_base_total) * $temp_stat_padding_total);
+                $temp_defense_padding = ceil((min($temp_target_robot->robot_defense, $temp_target_robot->robot_base_defense) / $temp_stat_counter_base_total) * $temp_stat_padding_total);
                 $temp_defense_base_padding = ceil(($temp_target_robot->robot_base_defense / $temp_stat_counter_base_total) * $temp_stat_padding_total);
                 $temp_defense_base_padding = $temp_defense_base_padding - $temp_defense_padding;
                 if ($temp_defense_padding < 1){ $temp_defense_padding = 0; }
                 elseif ($temp_defense_padding > $temp_stat_padding_total){ $temp_defense_padding = $temp_stat_padding_total; }
                 if ($temp_defense_base_padding < 1){ $temp_defense_base_padding = 0; }
                 elseif ($temp_defense_base_padding > $temp_stat_padding_total){ $temp_defense_base_padding = $temp_stat_padding_total; }
+                $temp_defense_mod_icon = $temp_target_robot->counters['defense_mods'] > 0 ? '&#x25b2;' : ($temp_target_robot->counters['defense_mods'] < 0 ? '&#x25bc;' : '');
+                if (!empty($temp_defense_mod_icon)){ $temp_defense_mod_icon = '<sub style="display:inline-block;font-size:60%;transform:translate(0,-2px);">'.$temp_defense_mod_icon.'</sub>'; }
 
-                $temp_speed_padding = ceil(($temp_target_robot->robot_speed / $temp_stat_counter_base_total) * $temp_stat_padding_total);
+                $temp_speed_padding = ceil((min($temp_target_robot->robot_speed, $temp_target_robot->robot_base_speed) / $temp_stat_counter_base_total) * $temp_stat_padding_total);
                 $temp_speed_base_padding = ceil(($temp_target_robot->robot_base_speed / $temp_stat_counter_base_total) * $temp_stat_padding_total);
                 $temp_speed_base_padding = $temp_speed_base_padding - $temp_speed_padding;
                 if ($temp_speed_padding < 1){ $temp_speed_padding = 0; }
                 elseif ($temp_speed_padding > $temp_stat_padding_total){ $temp_speed_padding = $temp_stat_padding_total; }
                 if ($temp_speed_base_padding < 1){ $temp_speed_base_padding = 0; }
                 elseif ($temp_speed_base_padding > $temp_stat_padding_total){ $temp_speed_base_padding = $temp_stat_padding_total; }
+                $temp_speed_mod_icon = $temp_target_robot->counters['speed_mods'] > 0 ? '&#x25b2;' : ($temp_target_robot->counters['speed_mods'] < 0 ? '&#x25bc;' : '');
+                if (!empty($temp_speed_mod_icon)){ $temp_speed_mod_icon = '<sub style="display:inline-block;font-size:60%;transform:translate(0,-2px);">'.$temp_speed_mod_icon.'</sub>'; }
 
                 // Create an event showing the scanned robot's data
                 $event_header = ($temp_target_player->player_token != 'player' ? $temp_target_player->player_name.'&#39;s ' : '').$temp_target_robot->robot_name;
@@ -1793,34 +1799,34 @@ class rpg_battle extends rpg_object {
                                     <td  class="right"><?= !empty($temp_target_robot_weaknesses) ? $temp_target_robot_weaknesses : '<span class="robot_weakness">None</span>' ?></td>
                                     <td class="center">&nbsp;</td>
                                     <td class="left">Energy : </td>
-                                    <td  class="right"><span title="<?= ceil(($temp_target_robot->robot_energy / $temp_target_robot->robot_base_energy) * 100).'% | '.$temp_target_robot->robot_energy.' / '.$temp_target_robot->robot_base_energy ?>"data-tooltip-type="robot_type robot_type_energy" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_energy_base_padding ?>px;"><span class="robot_stat robot_type robot_type_energy" style="padding-left: <?= $temp_energy_padding ?>px;"><?= $temp_target_robot->robot_energy ?></span></span></td>
+                                    <td  class="right"><span title="<?= floor(($temp_target_robot->robot_energy / $temp_target_robot->robot_base_energy) * 100).'% | '.$temp_target_robot->robot_energy.' / '.$temp_target_robot->robot_base_energy ?>"data-tooltip-type="robot_type robot_type_energy" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_energy_base_padding ?>px;"><span class="robot_stat robot_type robot_type_energy" style="padding-left: <?= $temp_energy_padding ?>px;"><?= $temp_target_robot->robot_energy ?></span></span></td>
                                 </tr>
                                 <tr>
                                     <td class="left">Resistances : </td>
                                     <td  class="right"><?= !empty($temp_target_robot_resistances) ? $temp_target_robot_resistances : '<span class="robot_resistance">None</span>' ?></td>
                                     <td class="center">&nbsp;</td>
                                     <td class="left">Attack : </td>
-                                    <td  class="right"><span title="<?= ceil(($temp_target_robot->robot_attack / $temp_target_robot->robot_base_attack) * 100).'% | '.$temp_target_robot->robot_attack.' / '.$temp_target_robot->robot_base_attack ?>"data-tooltip-type="robot_type robot_type_attack" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_attack_base_padding ?>px;"><span class="robot_stat robot_type robot_type_attack" style="padding-left: <?= $temp_attack_padding ?>px;"><?= $temp_target_robot->robot_attack ?></span></span></td>
+                                    <td  class="right"><span title="<?= floor(($temp_target_robot->robot_attack / $temp_target_robot->robot_base_attack) * 100).'% | '.$temp_target_robot->robot_attack.' / '.$temp_target_robot->robot_base_attack ?>"data-tooltip-type="robot_type robot_type_attack" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_attack_base_padding ?>px;"><span class="robot_stat robot_type robot_type_attack" style="padding-left: <?= $temp_attack_padding ?>px;"><?= $temp_attack_mod_icon.' '.$temp_target_robot->robot_attack ?></span></span></td>
                                 </tr>
                                 <tr>
                                     <td class="left">Affinities : </td>
                                     <td  class="right"><?= !empty($temp_target_robot_affinities) ? $temp_target_robot_affinities : '<span class="robot_affinity">None</span>' ?></td>
                                     <td class="center">&nbsp;</td>
                                     <td class="left">Defense : </td>
-                                    <td  class="right"><span title="<?= ceil(($temp_target_robot->robot_defense / $temp_target_robot->robot_base_defense) * 100).'% | '.$temp_target_robot->robot_defense.' / '.$temp_target_robot->robot_base_defense ?>"data-tooltip-type="robot_type robot_type_defense" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_defense_base_padding ?>px;"><span class="robot_stat robot_type robot_type_defense" style="padding-left: <?= $temp_defense_padding ?>px;"><?= $temp_target_robot->robot_defense ?></span></span></td>
+                                    <td  class="right"><span title="<?= floor(($temp_target_robot->robot_defense / $temp_target_robot->robot_base_defense) * 100).'% | '.$temp_target_robot->robot_defense.' / '.$temp_target_robot->robot_base_defense ?>"data-tooltip-type="robot_type robot_type_defense" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_defense_base_padding ?>px;"><span class="robot_stat robot_type robot_type_defense" style="padding-left: <?= $temp_defense_padding ?>px;"><?= $temp_defense_mod_icon.' '.$temp_target_robot->robot_defense ?></span></span></td>
                                 </tr>
                                 <tr>
                                     <td class="left">Immunities : </td>
                                     <td  class="right"><?= !empty($temp_target_robot_immunities) ? $temp_target_robot_immunities : '<span class="robot_immunity">None</span>' ?></td>
                                     <td class="center">&nbsp;</td>
                                     <td class="left">Speed : </td>
-                                    <td  class="right"><span title="<?= ceil(($temp_target_robot->robot_speed / $temp_target_robot->robot_base_speed) * 100).'% | '.$temp_target_robot->robot_speed.' / '.$temp_target_robot->robot_base_speed ?>"data-tooltip-type="robot_type robot_type_speed" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_speed_base_padding ?>px;"><span class="robot_stat robot_type robot_type_speed" style="padding-left: <?= $temp_speed_padding ?>px;"><?= $temp_target_robot->robot_speed ?></span></span></td>
+                                    <td  class="right"><span title="<?= floor(($temp_target_robot->robot_speed / $temp_target_robot->robot_base_speed) * 100).'% | '.$temp_target_robot->robot_speed.' / '.$temp_target_robot->robot_base_speed ?>"data-tooltip-type="robot_type robot_type_speed" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_speed_base_padding ?>px;"><span class="robot_stat robot_type robot_type_speed" style="padding-left: <?= $temp_speed_padding ?>px;"><?= $temp_speed_mod_icon.' '.$temp_target_robot->robot_speed ?></span></span></td>
                                 </tr>
                                 <? if (MMRPG_CONFIG_DEBUG_MODE){ ?>
                                     <tr>
                                         <td class="right" colspan="5">
                                             <span style="float: left;">Abilities :</span>
-                                            <?= !empty($temp_target_robot_abilities) ? $temp_target_robot_abilities : '<span class="robot_ability">None</span>' ?>
+                                            <?= !empty($temp_target_robot_abilities) ? '<span style="display:block;white-space:normal;overflow:hidden;max-width:500px;float:right;padding:  5px;">'.$temp_target_robot_abilities.'</span>' : '<span class="robot_ability">None</span>' ?>
                                         </td>
                                     </tr>
                                     <tr>
