@@ -62,14 +62,19 @@ class rpg_battle extends rpg_object {
     }
 
     // Define a public function requesting a battle index entry
-    public static function get_index_info($battle_token){
+    public static function get_index_info($battle_token, $raw = false){
         global $db;
 
         // If the internal index has not been created yet, load it into memory
         if (!isset($db->INDEX['BATTLES'])){ rpg_battle::load_battle_index(); }
 
         // If the requested index is not empty, return the entry
-        if (!empty($db->INDEX['BATTLES'][$battle_token])){
+        if ($raw && !empty($db->INDEX['BATTLES_RAW'][$battle_token])){
+            // Decode the info and return the array
+            $battle_info = json_decode($db->INDEX['BATTLES_RAW'][$battle_token], true);
+            //die('$battle_info = <pre>'.print_r($battle_info, true).'</pre>');
+            return $battle_info;
+        } elseif (!empty($db->INDEX['BATTLES'][$battle_token])){
             // Decode the info and return the array
             $battle_info = json_decode($db->INDEX['BATTLES'][$battle_token], true);
             //die('$battle_info = <pre>'.print_r($battle_info, true).'</pre>');
@@ -110,6 +115,7 @@ class rpg_battle extends rpg_object {
         if (empty($mmrpg_battles_index)){ return false; }
         // Loop through the battles and index them after serializing
         foreach ($mmrpg_battles_index AS $token => $array){ $db->INDEX['BATTLES'][$token] = json_encode($array); }
+        $db->INDEX['BATTLES_RAW'] = $db->INDEX['BATTLES'];
         // Additionally, include any dynamic session-based battles
         if (!empty($_SESSION['GAME']['values']['battle_index'])){
             // The session-based battles exist, so merge them with the index
