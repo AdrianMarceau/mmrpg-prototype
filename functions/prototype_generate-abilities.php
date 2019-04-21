@@ -266,11 +266,13 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
 
         // Define the last addon array which will have alternating values
         $temp_addons_final = array();
+        $temp_count_weapons_added = 0;
         $temp_count_limit = count($this_robot_abilities_addons['weapons']) + count($this_robot_abilities_addons['support']);
+        $temp_count_support_added = 0;
         for ($i = 0; $i < $temp_count_limit; $i++){
             if (isset($this_robot_abilities_addons['weapons'][$i]) || isset($this_robot_abilities_addons['support'][$i])){
-                if (isset($this_robot_abilities_addons['support'][$i])){ $temp_addons_final[] = $this_robot_abilities_addons['support'][$i]; }
-                if (isset($this_robot_abilities_addons['weapons'][$i])){ $temp_addons_final[] = $this_robot_abilities_addons['weapons'][$i]; }
+                if ($i % 2 == 0 && isset($this_robot_abilities_addons['support'][$i])){ $temp_addons_final[] = $this_robot_abilities_addons['support'][$i]; $temp_count_support_added++; }
+                if (isset($this_robot_abilities_addons['weapons'][$i])){ $temp_addons_final[] = $this_robot_abilities_addons['weapons'][$i]; $temp_count_weapons_added++; }
             } else {
                 break;
             }
