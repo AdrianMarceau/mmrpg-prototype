@@ -44,7 +44,7 @@ class rpg_type {
      * @param bool $parse_data
      * @return array
      */
-    public static function get_index($include_hidden = false, $include_unpublished = false){
+    public static function get_index($include_hidden = false, $include_unpublished = false, $include_special = true, $include_pseudo_special = true){
 
         // Pull in global variables
         $db = cms_database::get_database();
@@ -53,6 +53,8 @@ class rpg_type {
         $temp_where = '';
         if (!$include_hidden){ $temp_where .= 'AND type_flag_hidden = 0 '; }
         if (!$include_unpublished){ $temp_where .= 'AND type_flag_published = 1 '; }
+        if (!$include_special){ $temp_where .= 'AND type_class <> \'special\' '; }
+        if (!$include_pseudo_special){ $temp_where .= 'AND type_token <> \'none\' AND type_token <> \'copy\' '; }
 
         // Collect every type's info from the database index
         $type_fields = self::get_index_fields(true);
@@ -72,7 +74,7 @@ class rpg_type {
      * Get the tokens for all types in the global index
      * @return array
      */
-    public static function get_index_tokens($include_hidden = false, $include_unpublished = false){
+    public static function get_index_tokens($include_hidden = false, $include_unpublished = false, $include_special = true, $include_pseudo_special = true){
 
         // Pull in global variables
         $db = cms_database::get_database();
@@ -81,6 +83,8 @@ class rpg_type {
         $temp_where = '';
         if (!$include_hidden){ $temp_where .= 'AND type_flag_hidden = 0 '; }
         if (!$include_unpublished){ $temp_where .= 'AND type_flag_published = 1 '; }
+        if (!$include_special){ $temp_where .= 'AND type_class <> \'special\' '; }
+        if (!$include_pseudo_special){ $temp_where .= 'AND type_token <> \'none\' AND type_token <> \'copy\' '; }
 
         // Collect an array of type tokens from the database
         $type_index = $db->get_array_list("SELECT type_token FROM mmrpg_index_types WHERE type_id <> 0 {$temp_where};", 'type_token');
