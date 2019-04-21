@@ -183,7 +183,7 @@ class rpg_mission_single extends rpg_mission {
         // Define the battle rewards based on above data
         $temp_battle_omega['battle_rewards']['robots'] = array();
         $temp_battle_omega['battle_rewards']['abilities'] = array();
-        if (!mmrpg_game_robot_unlocked('', $this_robot_token)){ $temp_battle_omega['battle_rewards']['robots'][] = array('token' => $this_robot_token); }
+        if (!mmrpg_game_robot_unlocked('', $this_robot_token)){ $temp_battle_omega['battle_rewards']['robots'][] = array('token' => $this_robot_token, 'level' => $omega_robot_level, 'experience' => 999); }
         if (!empty($temp_option_robot['robot_rewards']['abilities'])){
             foreach ($temp_option_robot['robot_rewards']['abilities'] AS $key => $info){
                 if ($info['token'] == 'buster-shot' || $info['level'] > $omega_robot_level){ continue; }

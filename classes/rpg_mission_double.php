@@ -385,8 +385,8 @@ class rpg_mission_double extends rpg_mission {
         // Empty the robot rewards array if not allowed
         $temp_battle_omega['battle_rewards']['robots'] = array();
         if ($this_unlock_robots){
-            if (!mmrpg_game_robot_unlocked('', $temp_option_robot['robot_token'])){ $temp_battle_omega['battle_rewards']['robots'][] = array('token' => $temp_option_robot['robot_token']); }
-            if (!mmrpg_game_robot_unlocked('', $temp_option_robot2['robot_token'])){ $temp_battle_omega['battle_rewards']['robots'][] = array('token' => $temp_option_robot2['robot_token']); }
+            if (!mmrpg_game_robot_unlocked('', $temp_option_robot['robot_token'])){ $temp_battle_omega['battle_rewards']['robots'][] = array('token' => $temp_option_robot['robot_token'], 'level' => $omega_robot_level, 'experience' => 999); }
+            if (!mmrpg_game_robot_unlocked('', $temp_option_robot2['robot_token'])){ $temp_battle_omega['battle_rewards']['robots'][] = array('token' => $temp_option_robot2['robot_token'], 'level' => $omega_robot_level, 'experience' => 999); }
         }
         // Empty the ability rewards array if not allowed
         $temp_battle_omega['battle_rewards']['abilities'] = array();
