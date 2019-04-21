@@ -198,7 +198,7 @@ foreach ($active_target_robot->robot_abilities AS $key => $token){
 }
 
 // If there are no abilities left to use, the robot will automatically enter a recharge state
-if (empty($active_target_robot->robot_abilities)){ $active_target_robot->robot_abilities[] = 'action-noweapons'; }
+if (empty($active_target_robot->robot_abilities)){ $active_target_robot->robot_abilities[] = 'action-chargeweapons'; }
 
 // Update the robot's session with ability changes
 $active_target_robot->update_session();
