@@ -43,7 +43,19 @@ if (!empty($this_battle->battle_field_base['values']['hazards'])){
 }
 
 // Check for any robot details preloaded into session from a prev mission
+if (!empty($_SESSION['BATTLES_CHAIN'])){
+    //$this_battle->events_create(false, false, 'debug', ('$_SESSION[\'BATTLES_CHAIN\'] = '.preg_replace('/\s+/', ' ', print_r($_SESSION['BATTLES_CHAIN'], true)).'<br />'));
+
+    // Calculate the chain bonus for zenny rewards
+    $zenny_earned_total = 0;
+    foreach ($_SESSION['BATTLES_CHAIN'] AS $key => $record){ $zenny_earned_total += $record['battle_zenny_earned']; }
+    $this_battle->battle_zenny += $zenny_earned_total;
+
+}
+
+// Check for any robot details preloaded into session from a prev mission
 if (!empty($_SESSION['ROBOTS_PRELOAD'][$this_battle->battle_token])){
+    //$this_battle->events_create(false, false, 'debug', ('$_SESSION[\'ROBOTS_PRELOAD\'] = '.preg_replace('/\s+/', ' ', print_r($_SESSION['ROBOTS_PRELOAD'], true)).'<br />'));
 
     // Loop through this player's robots and apply any save states from the session
     foreach ($this_player->values['robots_active'] AS $key => $info){
