@@ -1403,7 +1403,7 @@ class rpg_robot extends rpg_object {
         $weights = array_values($weights);
         $options = array_values($options);
 
-        /*
+
         $debug_text = '----------'.PHP_EOL.PHP_EOL;
         $debug_text .= 'this_robot('.$this_robot->robot_token.') vs target_robot('.$target_robot->robot_token.')'.PHP_EOL.PHP_EOL;
         $debug_text .= 'this_abilities = '.print_r($this_robot->robot_abilities, true);
@@ -1416,11 +1416,13 @@ class rpg_robot extends rpg_object {
         $debug_file = fopen(MMRPG_CONFIG_ROOTDIR.'_cache/aaaa-debug.txt', 'a');
         fwrite($debug_file, $debug_text);
         fclose($debug_file);
-        */
+
 
         // This robot doesn't have ANY abilities, automatically charge
         if (empty($options) || empty($weights)){
             if ($this_robot->robot_weapons <= ($this_robot->robot_base_weapons / 2)){ return 'action-chargeweapons';  }
+            elseif (!empty($options_backup)) { return $options_backup[mt_rand(0, (count($options_backup) - 1))];  }
+            elseif (!empty($this_robot->robot_abilities)) { return $this_robot->robot_abilities[mt_rand(0, (count($this_robot->robot_abilities) - 1))];  }
             else { return $options_backup[mt_rand(0, (count($options_backup) - 1))];  }
         }
 
