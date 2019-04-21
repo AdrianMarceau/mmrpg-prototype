@@ -2885,6 +2885,103 @@ class rpg_ability extends rpg_object {
         return $temp_global_abilities;
     }
 
+    // Define a static function that returns a list of all T1 abilities (for the purposes of auto-generation)
+    public static function get_tier_one_abilities(){
+        global $db;
+
+        // Collect a list of relevant abilities from the database
+        $temp_tier_one_abilities = $db->get_array_list("SELECT
+            ability_token
+            -- , ability_energy
+            -- , mmrpg_index_abilities.*
+            FROM mmrpg_index_abilities
+            WHERE
+            ability_flag_published = 1
+            AND ability_flag_complete = 1
+            AND (
+                -- elemental T1 abilities
+                (ability_type <> ''
+                AND ability_type <> 'empty'
+                AND ability_group NOT LIKE 'MM00/Weapons/%'
+                AND (
+                    (ability_energy = 4 AND ability_token NOT LIKE '%-buster')
+                    OR (ability_energy = 0 AND ability_token LIKE '%-shot')
+                ))
+                OR
+                -- neutral T1 abilities
+                ability_token IN ('buster-shot')
+            )
+            AND ability_class = 'master'
+            ORDER BY
+            ability_token ASC
+            ;", 'ability_token');
+
+        // Return the keys for the requested abilities
+        return !empty($temp_tier_one_abilities) ? array_keys($temp_tier_one_abilities) : array();
+
+    }
+
+    // Define a static function that returns a list of all T2 abilities (for the purposes of auto-generation)
+    public static function get_tier_two_abilities(){
+        global $db;
+
+        // Collect a list of relevant abilities from the database
+        $temp_tier_two_abilities = $db->get_array_list("SELECT
+            ability_token
+            -- , ability_energy
+            -- , mmrpg_index_abilities.*
+            FROM mmrpg_index_abilities
+            WHERE
+            ability_flag_published = 1
+            AND ability_flag_complete = 1
+            AND (
+                -- elemental T2 abilities
+                (ability_type <> ''
+                AND ability_type <> 'empty'
+                AND (
+                    (ability_energy = 8)
+                    OR (ability_energy = 4 AND ability_group LIKE 'MM00/Weapons/%')
+                    OR (ability_energy = 4 AND ability_token LIKE '%-buster')
+                ))
+            )
+            AND ability_class = 'master'
+            ORDER BY
+            ability_token ASC
+            ;", 'ability_token');
+
+        // Return the keys for the requested abilities
+        return !empty($temp_tier_two_abilities) ? array_keys($temp_tier_two_abilities) : array();
+
+    }
+
+    // Define a static function that returns a list of all T3 abilities (for the purposes of auto-generation)
+    public static function get_tier_three_abilities(){
+        global $db;
+
+        // Collect a list of relevant abilities from the database
+        $temp_tier_three_abilities = $db->get_array_list("SELECT
+            ability_token
+            -- , ability_energy
+            -- , mmrpg_index_abilities.*
+            FROM mmrpg_index_abilities
+            WHERE
+            ability_flag_published = 1
+            AND ability_flag_complete = 1
+            AND (
+                -- elemental T3 abilities
+                (ability_type <> ''
+                AND ability_type <> 'empty'
+                AND ability_energy = 10)
+            )
+            AND ability_class = 'master'
+            ORDER BY
+            ability_token ASC
+            ;", 'ability_token');
+
+        // Return the keys for the requested abilities
+        return !empty($temp_tier_three_abilities) ? array_keys($temp_tier_three_abilities) : array();
+
+    }
 
 
     /* -- ABILITY-SPECIFIC FUNCTIONS THAT DON'T FIT ANYWHERE ELSE RIGHT NOW -- */
