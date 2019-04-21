@@ -94,7 +94,7 @@ class rpg_mission_starter extends rpg_mission {
                 elseif ($this_rescue_token === 'disco'){ $level += 10; $rescue_robot_frame = array(0,1,2,1,2,10); }
                 elseif ($this_rescue_token === 'rhythm'){ $level += 20; $rescue_robot_frame = array(0,6,2,6,2,10); }
                 $temp_battle_omega['battle_rewards']['robots'] = array();
-                $temp_battle_omega['battle_rewards']['robots'][] = array('token' => $this_rescue_token, 'level' => $level);
+                $temp_battle_omega['battle_rewards']['robots'][] = array('token' => $this_rescue_token, 'level' => $level, 'experience' => 999);
                 $rescue_is_unlockable = true;
             }
 
