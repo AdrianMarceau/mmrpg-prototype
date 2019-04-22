@@ -1525,15 +1525,18 @@ class rpg_robot extends rpg_object {
 
         // Copy the ability function to local scope and execute it
         $this_ability_function = $this_ability->ability_function;
-        $this_ability_function(array(
-            'this_battle' => $this->battle,
-            'this_field' => $this->field,
-            'this_player' => $this->player,
-            'this_robot' => $this,
-            'target_player' => $target_robot->player,
-            'target_robot' => $target_robot,
-            'this_ability' => $this_ability
-            ));
+        if (!empty($this_ability_function)
+            && is_callable($this_ability_function)){
+            $this_ability_function(array(
+                'this_battle' => $this->battle,
+                'this_field' => $this->field,
+                'this_player' => $this->player,
+                'this_robot' => $this,
+                'target_player' => $target_robot->player,
+                'target_robot' => $target_robot,
+                'this_ability' => $this_ability
+                ));
+        }
 
 
         // If this robot's image has been changed, reveert it back to what it was
