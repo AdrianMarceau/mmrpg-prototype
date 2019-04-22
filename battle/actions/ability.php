@@ -232,13 +232,21 @@ if ($temp_targetability->ability_target == 'select_target'){
     // Select a random active robot on this player's side of the field
     $temp_activerobots = $target_player->values['robots_active'];
     shuffle($temp_activerobots);
-    $temp_targetability_targetinfo = array_shift($temp_activerobots);
-    if ($temp_targetability_targetinfo['robot_id'] == $active_target_robot->robot_id){
-        $temp_targetability_targetinfo = array_shift($temp_activerobots);
+    $temp_targetability_targetinfo = array();
+    if (!empty($temp_activerobots)){
+        foreach ($temp_activerobots AS $key => $info){
+            if ($info['robot_id'] == $active_target_robot->robot_id){ continue; }
+            $temp_targetability_targetinfo = $info;
+            break;
+        }
     }
     $temp_targetability_targetplayer = $target_player;
     if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG']['checkpoint_queries'][] = "\$temp_targetability_targetrobot = rpg_game::get_robot(\$this_battle, \$target_player, \$temp_targetability_targetinfo); on line ".__LINE__." {$temp_targetability_targetinfo['robot_token']} ";  }
-    $temp_targetability_targetrobot = rpg_game::get_robot($this_battle, $target_player, $temp_targetability_targetinfo);
+    if (!empty($temp_targetability_targetinfo)){
+        $temp_targetability_targetrobot = rpg_game::get_robot($this_battle, $target_player, $temp_targetability_targetinfo);
+    } else {
+        $temp_targetability_targetrobot = $active_target_robot;
+    }
 
 } else {
 
