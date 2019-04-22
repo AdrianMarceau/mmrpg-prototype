@@ -1178,6 +1178,10 @@ class rpg_robot extends rpg_object {
         $options = array();
         $weights = array();
 
+        // Count the number of active target and ally robots
+        $num_this_robots_active = $this_player->counters['robots_active'];
+        $num_target_robots_active = $target_player->counters['robots_active'];
+
         // Define the support multiplier for this robot
         $support_multiplier = 1;
         if (in_array($this_robot->robot_token, array('roll', 'disco', 'rhythm'))){ $support_multiplier += 1; }
@@ -1186,6 +1190,13 @@ class rpg_robot extends rpg_object {
         if ($this_robot->has_ability('buster-shot')){
             $options[] = 'buster-shot';
             $weights[] = $this_robot->robot_token == 'met' ? 90 : 1;
+        }
+
+        // Define the freency of the default buster ability if set
+        if ($this_robot->has_ability('buster-relay')){
+            $options[] = 'buster-relay';
+            if ($num_this_robots_active > 1){ $weights[] = 3; }
+            else { $weights[] = 0; }
         }
 
         // Define the freency of the omega pulse ability if set
@@ -1379,6 +1390,13 @@ class rpg_robot extends rpg_object {
 
                 }
 
+                // If this ability is ally-only but we have no allies, set chance at zero
+                if (!empty($info['ability_target'])
+                    && $info['ability_target'] == 'select_this_ally'
+                    && $num_this_robots_active < 2){
+                    $value = 0;
+                }
+
                 // Append this option and its weight to the parent arrays
                 if ($value > 0){
                     $options[] = $token;
@@ -1404,20 +1422,21 @@ class rpg_robot extends rpg_object {
         $options = array_values($options);
 
         /*
-        $debug_text = '----------'.PHP_EOL.PHP_EOL;
-        $debug_text .= 'this_robot('.$this_robot->robot_token.') vs target_robot('.$target_robot->robot_token.')'.PHP_EOL.PHP_EOL;
-        $debug_text .= 'this_abilities = '.print_r($this_robot->robot_abilities, true);
-        $debug_text .= 'target_core_shields = '.print_r($target_core_shields, true);
-        $debug_text .= '$weights_backup = '.print_r($weights_backup, true);
-        $debug_text .= '$options_backup = '.print_r($options_backup, true);
-        $debug_text .= '$weights = '.print_r($weights, true);
-        $debug_text .= '$options = '.print_r($options, true);
-        $debug_text .= PHP_EOL.PHP_EOL;
-        $debug_file = fopen(MMRPG_CONFIG_ROOTDIR.'_cache/aaaa-debug.txt', 'a');
-        fwrite($debug_file, $debug_text);
-        fclose($debug_file);
+        if (MMRPG_CONFIG_IS_LIVE === false){
+            $debug_text = '----------'.PHP_EOL.PHP_EOL;
+            $debug_text .= 'this_robot('.$this_robot->robot_token.') vs target_robot('.$target_robot->robot_token.')'.PHP_EOL.PHP_EOL;
+            $debug_text .= 'this_abilities = '.print_r($this_robot->robot_abilities, true);
+            $debug_text .= 'target_core_shields = '.print_r($target_core_shields, true);
+            $debug_text .= '$weights_backup = '.print_r($weights_backup, true);
+            $debug_text .= '$options_backup = '.print_r($options_backup, true);
+            $debug_text .= '$weights = '.print_r($weights, true);
+            $debug_text .= '$options = '.print_r($options, true);
+            $debug_text .= PHP_EOL.PHP_EOL;
+            $debug_file = fopen(MMRPG_CONFIG_ROOTDIR.'_cache/aaaa-debug.txt', 'a');
+            fwrite($debug_file, $debug_text);
+            fclose($debug_file);
+        }
         */
-
 
         // This robot doesn't have ANY abilities, automatically charge
         if (empty($options) || empty($weights)){
