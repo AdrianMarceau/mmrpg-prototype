@@ -895,24 +895,32 @@ class rpg_robot extends rpg_object {
     }
     public function print_quote($quote_type, $this_find = array(), $this_replace = array()){
         global $mmrpg_index;
+
         // Define the quote text variable
         $quote_text = '';
+
         // If the robot is visible and has the requested quote text
         if ($this->robot_token != 'robot' && isset($this->robot_quotes[$quote_type])){
+
             // Loop through and replace ambiguous "Player" references in quotes
             $num_words = count($this_find);
             for ($key = 0; $key < $num_words; $key++){
                 $find = $this_find[$key];
                 $replace = $this_replace[$key];
-                if ($this->player->player_side === 'right' && $find === '{this_player}' && $replace === 'Player'){ $replace = 'the master'; }
-                elseif ($this->player->player_side === 'left' && $find === '{target_player}' && $replace === 'Player'){ $replace = 'your master'; }
+                if ($this->player->player_side === 'right' && $find === '{this_player}' && $replace === 'Player'){ $replace = 'xmasterx'; }
+                elseif ($this->player->player_side === 'left' && $find === '{target_player}' && $replace === 'Player'){ $replace = 'player'; }
                 else { continue; }
                 $this_replace[$key] = $replace;
             }
+
             // Collect the quote text with any search/replace modifications
             $this_quote_text = str_replace($this_find, $this_replace, $this->robot_quotes[$quote_type]);
-            $this_quote_text = str_replace(', the master', ', master', $this_quote_text);
-            $this_quote_text = str_replace(', your master', ', player', $this_quote_text);
+            $this_quote_text = preg_replace('/^xmasterx([^a-z0-9])/', 'Master$1', $this_quote_text);
+            $this_quote_text = preg_replace('/ or xmasterx([^a-z0-9])/', '$1', $this_quote_text);
+            $this_quote_text = preg_replace('/, xmasterx([^a-z0-9])/', '$1', $this_quote_text);
+            $this_quote_text = preg_replace('/ xmasterx, /', ', ', $this_quote_text);
+            $this_quote_text = str_replace('xmasterx', 'master', $this_quote_text);
+
             // Collect the text colour for this robot
             $this_type_token = !empty($this->robot_core) ? $this->robot_core : 'none';
             $this_text_colour = !empty($mmrpg_index['types'][$this_type_token]) ? $mmrpg_index['types'][$this_type_token]['type_colour_light'] : array(200, 200, 200);
