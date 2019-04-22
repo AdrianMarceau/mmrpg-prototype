@@ -5192,7 +5192,7 @@ class rpg_robot extends rpg_object {
                                 $this_attachment->recovery_options_update($attachment_info['attachment_destroy']);
                                 $this_attachment->damage_options_update($attachment_info['attachment_destroy']);
                                 $temp_trigger_options = isset($attachment_info['attachment_destroy']['options']) ? $attachment_info['attachment_destroy']['options'] : array();
-                                $this_robot->trigger_damage($this_robot, $this_attachment, 0, false, $temp_trigger_options);
+                                $this_robot->trigger_target($this_robot, $this_attachment, 0, false, $temp_trigger_options);
                                 $attachment_action_flag = true;
 
                             }
