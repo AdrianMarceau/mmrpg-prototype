@@ -6,11 +6,11 @@ $ability = array(
     'ability_game' => 'MM01',
     //'ability_group' => 'MM01/Weapons/007',
     'ability_group' => 'MM01/Weapons/003T2',
-    'ability_description' => 'The user a unleashes a powerful wave of fire that chases the target to inflict damage. The slower the user is compared to the target, the greater this ability\'s power.',
+    'ability_description' => 'The user a unleashes a powerful wave of fire that chases the target to inflict massive damage! This ability deals extra damage to targets with boosted speed stats, growing up to twice as strong when the target is at max speed!',
     'ability_type' => 'flame',
     'ability_type2' => 'swift',
     'ability_energy' => 8,
-    'ability_damage' => 24,
+    'ability_damage' => 25,
     'ability_accuracy' => 94,
     'ability_function' => function($objects){
 
@@ -18,13 +18,10 @@ $ability = array(
         extract($objects);
 
         // Update this ability's damage based on the user and target's speed
-        if ($target_robot->robot_speed != $this_robot->robot_speed){
-            $name_symbol = $target_robot->robot_speed > $this_robot->robot_speed ? 'Δ' : '∇';
-            $relative_speed = $target_robot->robot_speed / $this_robot->robot_speed;
-            $new_damage_amount = ceil($this_ability->ability_base_damage * $relative_speed);
-            if ($new_damage_amount < 1){ $new_damage_amount = 1; }
-            elseif ($new_damage_amount > 100){ $new_damage_amount = 100; }
-            $this_ability->set_name($this_ability->ability_base_name.' '.$name_symbol);
+        if (!empty($target_robot->counters['speed_mods'])
+            && $target_robot->counters['speed_mods'] > 0){
+            $new_damage_amount = $this_ability->ability_base_damage + ($target_robot->counters['speed_mods'] * 5);
+            $this_ability->set_name($this_ability->ability_base_name.' Δ');
             $this_ability->set_damage($new_damage_amount);
         } else {
             $this_ability->reset_name();
@@ -66,13 +63,10 @@ $ability = array(
 
         // Update this ability's damage based on the user and target's speed
         if (!empty($target_robot)){
-            if ($target_robot->robot_speed != $this_robot->robot_speed){
-                $name_symbol = $target_robot->robot_speed > $this_robot->robot_speed ? 'Δ' : '∇';
-                $relative_speed = $target_robot->robot_speed / $this_robot->robot_speed;
-                $new_damage_amount = ceil($this_ability->ability_base_damage * $relative_speed);
-                if ($new_damage_amount < 1){ $new_damage_amount = 1; }
-                elseif ($new_damage_amount > 100){ $new_damage_amount = 100; }
-                $this_ability->set_name($this_ability->ability_base_name.' '.$name_symbol);
+            if (!empty($target_robot->counters['speed_mods'])
+                && $target_robot->counters['speed_mods'] > 0){
+                $new_damage_amount = $this_ability->ability_base_damage + ($target_robot->counters['speed_mods'] * 5);
+                $this_ability->set_name($this_ability->ability_base_name.' Δ');
                 $this_ability->set_damage($new_damage_amount);
             } else {
                 $this_ability->reset_name();
