@@ -6,7 +6,7 @@ $ability = array(
     'ability_game' => 'MM04',
     //'ability_group' => 'MM04/Weapons/028',
     'ability_group' => 'MM04/Weapons/025T1',
-    'ability_description' => 'The user charges on the first turn to build power and collect solar energy, then releases a powerful shot at the target on the second to inflict massive damage!',
+    'ability_description' => 'The user charges itself with a solar energy that doubles the damage of its own attacks for up to three turns.  If this ability is used again after charging, the held solar energy will instead be released at the target to inflict massive damage!',
     'ability_type' => 'flame',
     'ability_energy' => 4,
     'ability_damage' => 30,
@@ -16,6 +16,10 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
+        // Define the base attachment duration
+        $base_attachment_duration = 3;
+        $base_attachment_multiplier = 2.0;
+
         // Define this ability's attachment token
         $this_attachment_token = 'ability_'.$this_ability->ability_token;
         $this_attachment_info = array(
@@ -24,7 +28,20 @@ $ability = array(
             'ability_frame' => 0,
             'ability_frame_animate' => array(2, 3, 4, 5, 6),
             'ability_frame_offset' => array('x' => 4, 'y' => 50, 'z' => 12),
-            'attachment_token' => $this_attachment_token
+            'attachment_token' => $this_attachment_token,
+            'attachment_duration' => $base_attachment_duration + 1,
+            'attachment_damage_output_booster' => $base_attachment_multiplier,
+            'attachment_destroy' => array(
+                'trigger' => 'special',
+                'kind' => '',
+                'type' => '',
+                'percent' => true,
+                'modifiers' => false,
+                'frame' => 'defend',
+                'rates' => array(100, 0, 0),
+                'success' => array(2, -24, 10, -18,  'The '.$this_ability->print_name().' faded away!<br /> '.$target_robot->print_name().'\'s weapons returned to normal!'),
+                'failure' => array(2, -24, 10, -18, 'The '.$this_ability->print_name().' faded away!<br /> '.$target_robot->print_name().'\'s weapons returned to normal!')
+                )
             );
 
         // Check if this ability is already charged
@@ -51,8 +68,10 @@ $ability = array(
         // Else if the ability flag was set, the ability is released at the target
         else {
 
-            // Remove this ability attachment to the robot using it
-            unset($this_robot->robot_attachments[$this_attachment_token]);
+            // Hide the attachment before we remove it (so the effect still applies)
+            $this_robot->robot_attachments[$this_attachment_token]['ability_frame'] = 9;
+            $this_robot->robot_attachments[$this_attachment_token]['ability_frame_animate'] = array(9);
+            $this_robot->robot_attachments[$this_attachment_token]['ability_frame_offset']['z'] = -9999;
             $this_robot->update_session();
 
             // Update this ability's target options and trigger
@@ -72,6 +91,10 @@ $ability = array(
                 ));
             $energy_damage_amount = $this_ability->ability_damage;
             $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
+
+            // Remove this ability attachment to the robot using it
+            unset($this_robot->robot_attachments[$this_attachment_token]);
+            $this_robot->update_session();
 
         }
 
