@@ -116,7 +116,9 @@ if (MMRPG_CONFIG_ADMIN_MODE){
 if (!MMRPG_CONFIG_ADMIN_MODE && MMRPG_CONFIG_IS_LIVE){
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
-    error_reporting(0);
+    error_reporting(E_ERROR | E_WARNING | E_PARSE);
+    ini_set('log_errors', 1);
+    ini_set('error_log', 'php_error.log');
 }
 
 // Stop BANNED users from accessing the website
