@@ -967,41 +967,46 @@
                                             <strong class="label">Field Hazards</strong>
                                             <? $challenge_field_hazards = !empty($challenge_field_data['values']['hazards']) ? $challenge_field_data['values']['hazards'] : array(); ?>
                                         </div>
+                                        <?
+                                        // Define a quick function for printing hazard dropdown options
+                                        $print_hazard_options = function($hazard_token) use($challenge_field_hazards){
+                                            ob_start();
+                                            ?>
+                                                <option value=""<?= empty($challenge_field_hazards[$hazard_token]) ? ' selected="selected"' : '' ?>>-</option>
+                                                <option value="both"<?= !empty($challenge_field_hazards[$hazard_token]) && $challenge_field_hazards[$hazard_token] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
+                                                <option value="left"<?= !empty($challenge_field_hazards[$hazard_token]) && $challenge_field_hazards[$hazard_token] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
+                                                <option value="left-active"<?= !empty($challenge_field_hazards[$hazard_token]) && $challenge_field_hazards[$hazard_token] == 'left-active' ? ' selected="selected"' : '' ?>>Player Side (Left / Active Only)</option>
+                                                <option value="left-bench"<?= !empty($challenge_field_hazards[$hazard_token]) && $challenge_field_hazards[$hazard_token] == 'left-bench' ? ' selected="selected"' : '' ?>>Player Side (Left / Bench Only)</option>
+                                                <option value="right"<?= !empty($challenge_field_hazards[$hazard_token]) && $challenge_field_hazards[$hazard_token] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
+                                                <option value="right-active"<?= !empty($challenge_field_hazards[$hazard_token]) && $challenge_field_hazards[$hazard_token] == 'right-active' ? ' selected="selected"' : '' ?>>Target Side (Right / Active Only)</option>
+                                                <option value="right-bench"<?= !empty($challenge_field_hazards[$hazard_token]) && $challenge_field_hazards[$hazard_token] == 'right-bench' ? ' selected="selected"' : '' ?>>Target Side (Right / Bench Only)</option>
+                                            <?
+                                            return ob_get_clean();
+                                            };
+                                        ?>
                                         <div class="field fullsize has4cols multirow">
                                             <div class="subfield">
                                                 <strong class="label sublabel">Crude Oil <em>via Oil Shooter</em></strong>
                                                 <select class="select" name="challenge_field_data[values][hazards][crude_oil]">
-                                                    <option value=""<?= empty($challenge_field_hazards['crude_oil']) ? ' selected="selected"' : '' ?>>-</option>
-                                                    <option value="both"<?= !empty($challenge_field_hazards['crude_oil']) && $challenge_field_hazards['crude_oil'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
-                                                    <option value="left"<?= !empty($challenge_field_hazards['crude_oil']) && $challenge_field_hazards['crude_oil'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
-                                                    <option value="right"<?= !empty($challenge_field_hazards['crude_oil']) && $challenge_field_hazards['crude_oil'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
+                                                    <?= $print_hazard_options('crude_oil') ?>
                                                 </select><span></span>
                                             </div>
                                             <div class="subfield">
                                                 <strong class="label sublabel">Foamy Bubbles <em>via Bubble Spray</em></strong>
                                                 <select class="select" name="challenge_field_data[values][hazards][foamy_bubbles]">
-                                                    <option value=""<?= empty($challenge_field_hazards['foamy_bubbles']) ? ' selected="selected"' : '' ?>>-</option>
-                                                    <option value="both"<?= !empty($challenge_field_hazards['foamy_bubbles']) && $challenge_field_hazards['foamy_bubbles'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
-                                                    <option value="left"<?= !empty($challenge_field_hazards['foamy_bubbles']) && $challenge_field_hazards['foamy_bubbles'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
-                                                    <option value="right"<?= !empty($challenge_field_hazards['foamy_bubbles']) && $challenge_field_hazards['foamy_bubbles'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
+                                                    <?= $print_hazard_options('foamy_bubbles') ?>
                                                 </select><span></span>
                                             </div>
                                             <div class="subfield">
                                                 <strong class="label sublabel">Frozen Footholds <em>via Ice Breath</em></strong>
                                                 <select class="select" name="challenge_field_data[values][hazards][frozen_footholds]">
-                                                    <option value=""<?= empty($challenge_field_hazards['frozen_footholds']) ? ' selected="selected"' : '' ?>>-</option>
-                                                    <option value="both"<?= !empty($challenge_field_hazards['frozen_footholds']) && $challenge_field_hazards['frozen_footholds'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
-                                                    <option value="left"<?= !empty($challenge_field_hazards['frozen_footholds']) && $challenge_field_hazards['frozen_footholds'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
-                                                    <option value="right"<?= !empty($challenge_field_hazards['frozen_footholds']) && $challenge_field_hazards['frozen_footholds'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
+                                                    <?= $print_hazard_options('frozen_footholds') ?>
                                                 </select><span></span>
                                             </div>
                                             <div class="subfield">
                                                 <strong class="label sublabel">Super Blocks <em>via Super Arm</em></strong>
                                                 <select class="select" name="challenge_field_data[values][hazards][super_blocks]">
-                                                    <option value=""<?= empty($challenge_field_hazards['super_blocks']) ? ' selected="selected"' : '' ?>>-</option>
-                                                    <option value="both"<?= !empty($challenge_field_hazards['super_blocks']) && $challenge_field_hazards['super_blocks'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
-                                                    <option value="left"<?= !empty($challenge_field_hazards['super_blocks']) && $challenge_field_hazards['super_blocks'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
-                                                    <option value="right"<?= !empty($challenge_field_hazards['super_blocks']) && $challenge_field_hazards['super_blocks'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
+                                                    <?= $print_hazard_options('super_blocks') ?>
                                                 </select><span></span>
                                             </div>
                                         </div>
@@ -1009,19 +1014,13 @@
                                             <div class="subfield">
                                                 <strong class="label sublabel">Black Holes <em>via Galaxy Bomb</em></strong>
                                                 <select class="select" name="challenge_field_data[values][hazards][black_holes]">
-                                                    <option value=""<?= empty($challenge_field_hazards['black_holes']) ? ' selected="selected"' : '' ?>>-</option>
-                                                    <option value="both"<?= !empty($challenge_field_hazards['black_holes']) && $challenge_field_hazards['black_holes'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
-                                                    <option value="left"<?= !empty($challenge_field_hazards['black_holes']) && $challenge_field_hazards['black_holes'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
-                                                    <option value="right"<?= !empty($challenge_field_hazards['black_holes']) && $challenge_field_hazards['black_holes'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
+                                                    <?= $print_hazard_options('black_holes') ?>
                                                 </select><span></span>
                                             </div>
                                             <div class="subfield">
                                                 <strong class="label sublabel">Disco Balls <em>via Disco Fever</em></strong>
                                                 <select class="select" name="challenge_field_data[values][hazards][disco_balls]">
-                                                    <option value=""<?= empty($challenge_field_hazards['disco_balls']) ? ' selected="selected"' : '' ?>>-</option>
-                                                    <option value="both"<?= !empty($challenge_field_hazards['disco_balls']) && $challenge_field_hazards['disco_balls'] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
-                                                    <option value="left"<?= !empty($challenge_field_hazards['disco_balls']) && $challenge_field_hazards['disco_balls'] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
-                                                    <option value="right"<?= !empty($challenge_field_hazards['disco_balls']) && $challenge_field_hazards['disco_balls'] == 'right' ? ' selected="selected"' : '' ?>>Target Side (Right)</option>
+                                                    <?= $print_hazard_options('disco_balls') ?>
                                                 </select><span></span>
                                             </div>
                                         </div>

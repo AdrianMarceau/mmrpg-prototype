@@ -20,14 +20,19 @@ if (!empty($this_battle->battle_field_base['values']['hazards'])){
         if (!method_exists('rpg_ability', $method_name)){ $method_name = preg_replace('/s$/i', '', $method_name); }
         if (!method_exists('rpg_ability', $method_name)){ continue; }
         foreach ($player_sides AS $player_side){
-            if ($hazard_value != 'both' && $hazard_value != $player_side){ continue; }
+            if ($hazard_value != 'both' // not [both]
+                && $hazard_value != $player_side // not [left/right]
+                && $hazard_value != $player_side.'-active' && $hazard_value != $player_side.'-bench' // not [left/right]-[active/bench]
+                ){ continue; } // doesn't match any criteria, so skip this player side
             $bench_size = $player_bench_sizes[$player_side];
             $hazards_added = 0;
             $hazards_to_add = $bench_size == 1 ? 1 : $bench_size;
             for ($key = -1; $key < $max_bench_size; $key++){
                 if ($key == 0){ continue; }
+                elseif ($key == -1 && $hazard_value == ($player_side.'-bench')){ continue; } // skip if active but bench-only
+                elseif ($key != -1 && $hazard_value == ($player_side.'-active')){ continue; } // skip of bench but active-only
                 if ($hazards_added >= $hazards_to_add){ break; }
-                if ($key == -1){ $static_key = $player_side.'-active'; }
+                if ($key == -1){  $static_key = $player_side.'-active';  }
                 else { $static_key = $player_side.'-bench-'.$key; }
                 $existing = !empty($this_battle->battle_attachments[$static_key]) ? count($this_battle->battle_attachments[$static_key]) : 0;
                 $hazard_info = call_user_func('rpg_ability::'.$method_name, $static_key, 99, $existing);
