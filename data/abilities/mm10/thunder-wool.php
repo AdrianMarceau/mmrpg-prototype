@@ -25,14 +25,14 @@ $ability = array(
         $this_ability->update_session();
 
         // Predefine attachment create and destroy text for later
-        $this_create_text = ($target_robot->print_name().' found '.$target_robot->get_pronoun('reflexive').' in under a woolly cloud!<br /> '.
+        $this_create_text = ($target_robot->print_name().' found '.$target_robot->get_pronoun('reflexive').' under a woolly cloud!<br /> '.
             $target_robot->print_name().' will take damage at the end of each turn!'
             );
         $this_destroy_text = ('The '.$this_ability->print_name().'\'s woolly cloud faded away...<br /> '.
-            'The active robot won\'t take end-of-turn damage any more!'
+            'This robot won\'t take end-of-turn damage any more!'
             );
         $this_refresh_text = ('The '.$this_ability->print_name().' extended the woolly cloud\'s life!<br /> '.
-            'The active robot will continue taking damage at the end of each turn!'
+            'This robot will continue taking damage at the end of each turn!'
             );
         $this_repeat_text = ('The '.$this_ability->print_name().'\'s woolly cloud released a lightning bolt!');
 
