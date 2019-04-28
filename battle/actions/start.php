@@ -27,6 +27,7 @@ if (!empty($this_battle->battle_field_base['values']['hazards'])){
             $bench_size = $player_bench_sizes[$player_side];
             $hazards_added = 0;
             $hazards_to_add = $bench_size == 1 ? 1 : $bench_size;
+            if ($hazard_value == $player_side.'-bench'){ $hazards_to_add -= 1; }
             for ($key = -1; $key < $max_bench_size; $key++){
                 if ($key == 0){ continue; }
                 elseif ($key == -1 && $hazard_value == ($player_side.'-bench')){ continue; } // skip if active but bench-only
