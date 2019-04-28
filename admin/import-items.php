@@ -138,10 +138,11 @@ $temp_pattern_last[] = '/^field-booster$/i';
 
 $temp_pattern_last[] = '/^target-module$/i';
 $temp_pattern_last[] = '/^charge-module$/i';
-$temp_pattern_last[] = '/^fortune-module$/i';
-$temp_pattern_last[] = '/^growth-module$/i';
 $temp_pattern_last[] = '/^reverse-module$/i';
-$temp_pattern_last[] = '/^locking-module$/i';
+$temp_pattern_last[] = '/^guard-module$/i';
+
+$temp_pattern_last[] = '/^growth-module$/i';
+$temp_pattern_last[] = '/^fortune-module$/i';
 
 $temp_pattern_last[] = '/^battery-circuit/i';
 $temp_pattern_last[] = '/^sponge-circuit$/i';
@@ -268,7 +269,7 @@ if (!empty($mmrpg_index['items'])){
         $temp_insert_array['item_frame_classes'] = !empty($item_data['item_frame_classes']) ? $item_data['item_frame_classes'] : '';
 
         // Define the flags
-        $temp_insert_array['item_flag_hidden'] = in_array($temp_insert_array['item_token'], $hidden_database_items) ? 1 : 0;
+        $temp_insert_array['item_flag_hidden'] = !empty($item_data['item_flag_hidden']) ? 1 : (in_array($temp_insert_array['item_token'], $hidden_database_items) ? 1 : 0);
         $temp_insert_array['item_flag_complete'] = $temp_insert_array['item_class'] == 'system' || $item_data['item_image'] != 'item' ? 1 : 0;
         $temp_insert_array['item_flag_published'] = 1;
 
