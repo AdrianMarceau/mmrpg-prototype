@@ -24,6 +24,19 @@ function mmrpg_load_game_session(){
     $is_demo_mode = rpg_game::is_demo();
     if (!$is_demo_mode && !empty($login_user_id)){
 
+        // Define a function for replacing legacy strings (names) in save data
+        $temp_replace_legacy_strings = function($raw_json_string){
+            $new_json_string = $raw_json_string;
+            // Legacy ABILITY string replacements
+            $new_json_string = str_replace('"repair-mode"', '"energy-mode"', $new_json_string);
+            // Legacy ITEM string replacements
+            $new_json_string = str_replace('"locking-module"', '"guard-module"', $new_json_string);
+            // Legacy FIELD string replacements
+            $new_json_string = str_replace('"lightning-control"', '"lighting-control"', $new_json_string);
+            // Return the cleaned string
+            return $new_json_string;
+            };
+
         // LOAD DATABASE INFO
 
         // Collect the user and save info from the database
@@ -65,47 +78,47 @@ function mmrpg_load_game_session(){
         }
 
         if (!empty($this_database_save['save_values_battle_complete'])){
-            $new_game_data['values']['battle_complete'] = json_decode($this_database_save['save_values_battle_complete'], true);
+            $new_game_data['values']['battle_complete'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_complete']), true);
             $new_game_data['values']['battle_complete_hash'] = md5($this_database_save['save_values_battle_complete']);
         }
 
         if (!empty($this_database_save['save_values_battle_failure'])){
-            $new_game_data['values']['battle_failure'] = json_decode($this_database_save['save_values_battle_failure'], true);
+            $new_game_data['values']['battle_failure'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_failure']), true);
             $new_game_data['values']['battle_failure_hash'] = md5($this_database_save['save_values_battle_failure']);
         }
 
         if (!empty($this_database_save['save_values_battle_rewards'])){
-            $new_game_data['values']['battle_rewards'] = json_decode($this_database_save['save_values_battle_rewards'], true);
+            $new_game_data['values']['battle_rewards'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_rewards']), true);
             $new_game_data['values']['battle_rewards_hash'] = md5($this_database_save['save_values_battle_rewards']);
         }
 
         if (!empty($this_database_save['save_values_battle_settings'])){
-            $new_game_data['values']['battle_settings'] = json_decode($this_database_save['save_values_battle_settings'], true);
+            $new_game_data['values']['battle_settings'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_settings']), true);
             $new_game_data['values']['battle_settings_hash'] = md5($this_database_save['save_values_battle_settings']);
         }
 
         if (!empty($this_database_save['save_values_battle_items'])){
-            $new_game_data['values']['battle_items'] = json_decode($this_database_save['save_values_battle_items'], true);
+            $new_game_data['values']['battle_items'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_items']), true);
             $new_game_data['values']['battle_items_hash'] = md5($this_database_save['save_values_battle_items']);
         }
 
         if (!empty($this_database_save['save_values_battle_abilities'])){
-            $new_game_data['values']['battle_abilities'] = json_decode($this_database_save['save_values_battle_abilities'], true);
+            $new_game_data['values']['battle_abilities'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_abilities']), true);
             $new_game_data['values']['battle_abilities_hash'] = md5($this_database_save['save_values_battle_abilities']);
         }
 
         if (!empty($this_database_save['save_values_battle_stars'])){
-            $new_game_data['values']['battle_stars'] = json_decode($this_database_save['save_values_battle_stars'], true);
+            $new_game_data['values']['battle_stars'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_stars']), true);
             $new_game_data['values']['battle_stars_hash'] = md5($this_database_save['save_values_battle_stars']);
         }
 
         if (!empty($this_database_save['save_values_robot_alts'])){
-            $new_game_data['values']['robot_alts'] = json_decode($this_database_save['save_values_robot_alts'], true);
+            $new_game_data['values']['robot_alts'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_robot_alts']), true);
             $new_game_data['values']['robot_alts_hash'] = md5($this_database_save['save_values_robot_alts']);
         }
 
         if (!empty($this_database_save['save_values_robot_database'])){
-            $new_game_data['values']['robot_database'] = json_decode($this_database_save['save_values_robot_database'], true);
+            $new_game_data['values']['robot_database'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_robot_database']), true);
             $new_game_data['values']['robot_database_hash'] = md5($this_database_save['save_values_robot_database']);
         }
 
