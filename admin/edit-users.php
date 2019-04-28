@@ -2,6 +2,13 @@
 
     <?
 
+    // Pre-check access permissions before continuing
+    if (!in_array('*', $this_adminaccess)
+        && !in_array('edit_users', $this_adminaccess)){
+        $form_messages[] = array('error', 'You do not have permission to edit users!');
+        redirect_form_action('admin.php?action=home');
+    }
+
     /* -- Collect Editor Indexes -- */
 
     // Collect an index of user roles for options

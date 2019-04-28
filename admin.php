@@ -86,6 +86,38 @@ function exit_form_action($output = ''){
     exit($output);
 }
 
+// Collect details for this admin user from the database
+$this_admininfo = array();
+if (!empty($_SESSION['admin_id'])){
+    $this_admininfo = $db->get_array("SELECT
+        users.user_id,
+        users.user_name,
+        users.user_name_public,
+        users.user_name_clean,
+        roles.role_id,
+        roles.role_name,
+        roles.role_token,
+        roles.role_level
+        FROM mmrpg_users AS users
+        LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
+        WHERE
+        users.user_id = '{$_SESSION['admin_id']}'
+        ORDER BY
+        user_id ASC
+        ;");
+}
+
+// Define which pages this specific user has access to
+$this_adminaccess = array();
+$this_adminaccess[] = 'home';
+if (!empty($this_admininfo)
+    && MMRPG_CONFIG_ADMIN_PERMS_LIST !== ''){
+    $temp_admin_perms = json_decode(MMRPG_CONFIG_ADMIN_PERMS_LIST, true);
+    if (isset($temp_admin_perms[$this_admininfo['user_id']])){
+        $this_adminaccess = array_merge($this_adminaccess, $temp_admin_perms[$this_admininfo['user_id']]);
+    }
+}
+
 // If we're not logged in yet
 if (!MMRPG_CONFIG_ADMIN_MODE){
     // Require the admin home file

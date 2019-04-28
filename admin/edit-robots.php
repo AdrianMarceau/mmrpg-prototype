@@ -2,6 +2,13 @@
 
     <?
 
+    // Pre-check access permissions before continuing
+    if (!in_array('*', $this_adminaccess)
+        && !in_array('edit_robots', $this_adminaccess)){
+        $form_messages[] = array('error', 'You do not have permission to edit robots!');
+        redirect_form_action('admin.php?action=home');
+    }
+
     /* -- Collect Dependant Indexes -- */
 
     // Collect an index of type colours for options
