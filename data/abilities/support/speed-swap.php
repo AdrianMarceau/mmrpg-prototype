@@ -54,6 +54,16 @@ $ability = array(
 
         }
 
+        // If the target is holding a Locking Module, we are not allowed to modify stats
+        if ($target_robot->robot_item == 'locking-module'){
+
+            // Update the ability's target options and trigger
+            $this_ability->target_options_update(array('frame' => 'defend', 'success' => array(0, 0, 0, 10, '&hellip;but the target\'s item protects it from stat changes!')));
+            $this_robot->trigger_target($target_robot, $this_ability, array('prevent_default_text' => true));
+            return;
+
+        }
+
         // Swap the two robot's stat values now and then save the changes
         $this_robot->counters[$stat_token.'_mods'] = $target_stat_mods;
         $target_robot->counters[$stat_token.'_mods'] = $this_stat_mods;
