@@ -1069,6 +1069,7 @@
                                             $current_robot_abilities = !empty($current_robot_data['robot_abilities']) ? $current_robot_data['robot_abilities'] : array();
                                             $current_robot_values = !empty($current_robot_data['values']) ? $current_robot_data['values'] : array();
                                             $current_robot_counters = !empty($current_robot_data['counters']) ? $current_robot_data['counters'] : array();
+                                            $current_robot_flags = !empty($current_robot_data['flags']) ? $current_robot_data['flags'] : array();
 
                                             ?>
 
@@ -1131,6 +1132,17 @@
                                                         <? $current_value = !empty($current_robot_values['robot_switch']) ? $current_robot_values['robot_switch'] : 0; ?>
                                                         <strong class="label sublabel" title="Increase or decrease the frequency at which this robot switches out">Switch Mods</strong>
                                                         <input class="textbox" type="number" name="challenge_target_data[player_robots][<?= $robot_key ?>][values][robot_switch]" value="<?= $current_value ?>" min="-5" max="5" />
+                                                    </div>
+                                                </div>
+                                                <div class="field halfsize has4cols multirow" style="margin-top: -6px;">
+                                                    <div class="subfield">
+                                                        <? $current_value = !empty($current_robot_values['robot_focus']) ? $current_robot_values['robot_focus'] : ''; ?>
+                                                        <strong class="label sublabel" title="Direct this robot's attention to either active or the bench">Focus</strong>
+                                                        <select class="select" name="challenge_target_data[player_robots][<?= $robot_key ?>][values][robot_focus]">
+                                                            <option value=""<?= empty($current_value) ? ' selected="selected"' : '' ?>>-</option>
+                                                            <option value="active"<?= $current_value == 'active' ? ' selected="selected"' : '' ?>>Active</option>
+                                                            <option value="bench"<?= $current_value == 'bench' ? ' selected="selected"' : '' ?>>Bench</option>
+                                                        </select><span></span>
                                                     </div>
                                                 </div>
                                             </div>
