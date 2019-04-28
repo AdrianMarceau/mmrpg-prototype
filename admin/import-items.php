@@ -138,8 +138,10 @@ $temp_pattern_last[] = '/^field-booster$/i';
 
 $temp_pattern_last[] = '/^target-module$/i';
 $temp_pattern_last[] = '/^charge-module$/i';
-$temp_pattern_last[] = '/^reverse-module$/i';
+
 $temp_pattern_last[] = '/^guard-module$/i';
+$temp_pattern_last[] = '/^reverse-module$/i';
+$temp_pattern_last[] = '/^xtreme-module$/i';
 
 $temp_pattern_last[] = '/^growth-module$/i';
 $temp_pattern_last[] = '/^fortune-module$/i';
