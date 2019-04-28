@@ -10,7 +10,7 @@ $ability = array(
     'ability_description' => 'The user fires a large glob of corrosive acid at the target\'s feet that deals damage at the end of each turn for up to nine turns! This ability can be used without weapon energy and at increased power if the user is currently protected by an Acid Barrier!',
     'ability_type' => 'water',
     'ability_energy' => 4,
-    'ability_damage' => 6,
+    'ability_damage' => 8,
     'ability_damage_percent' => true,
     'ability_accuracy' => 98,
     'ability_target' => 'select_target',
@@ -40,7 +40,7 @@ $ability = array(
         $this_refresh_text = ('The '.$this_ability->print_name().' extended the corrosive fluid\'s duration!<br /> '.
             'This robot will continue taking damage at the end of each turn!'
             );
-        $this_repeat_text = ('The '.$this_ability->print_name().'\'s corrodes the target\'s defenses!');
+        $this_repeat_text = ('The '.$this_ability->print_name().'\'s corrodes the target\'s armor!');
 
         // Define this ability's attachment token
         $static_attachment_key = $target_robot->get_static_attachment_key();
@@ -104,7 +104,7 @@ $ability = array(
                 ),
             'ability_frame' => 2,
             'ability_frame_animate' => array(2, 3),
-            'ability_frame_offset' => array('x' => 5, 'y' => 0, 'z' => 5)
+            'ability_frame_offset' => array('x' => 5, 'y' => 0, 'z' => 10)
             );
 
         // Target the opposing robot
@@ -120,8 +120,8 @@ $ability = array(
             'percent' => true,
             'modifiers' => true,
             'kickback' => array(5, 0, 0),
-            'success' => array(0, -5, -5, 99, 'The '.$this_ability->print_name().' melts through the target!'),
-            'failure' => array(0, -10, -5, 99,'The '. $this_ability->print_name().' had no effect on '.$target_robot->print_name().'&hellip;')
+            'success' => array(0, -5, -5, 10, 'The '.$this_ability->print_name().' melts through the target!'),
+            'failure' => array(0, -10, -5, -10,'The '. $this_ability->print_name().' missed '.$target_robot->print_name().'&hellip;')
             ));
         $this_ability->recovery_options_update(array(
             'kind' => 'energy',
@@ -129,8 +129,8 @@ $ability = array(
             'modifiers' => true,
             'frame' => 'taunt',
             'kickback' => array(5, 0, 0),
-            'success' => array(0, -5, -5, 9, 'The '.$this_ability->print_name().' was absorbed by the target!'),
-            'failure' => array(0, -10, -5, 9, 'The '.$this_ability->print_name().' had no effect on '.$target_robot->print_name().'&hellip;')
+            'success' => array(0, -5, -5, 10, 'The '.$this_ability->print_name().' was absorbed by the target!'),
+            'failure' => array(0, -10, -5, -10, 'The '.$this_ability->print_name().' missed '.$target_robot->print_name().'&hellip;')
             ));
         $energy_damage_amount = ceil($target_robot->robot_base_energy * ($this_ability->ability_damage / 100));
         $trigger_options = $this_attachment_info['attachment_repeat']['options'];
@@ -209,7 +209,7 @@ $ability = array(
         foreach ($this_robot->robot_attachments AS $this_attachment_token => $this_attachment_info){
             if (strstr('ability_acid-barrier', $this_attachment_token)){
                 $temp_new_energy = 0;
-                $temp_new_damage += ceil($temp_new_damage / 2);
+                $temp_new_damage *= 2;
                 break;
             }
         }
