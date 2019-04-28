@@ -50,9 +50,9 @@ ob_start();
                                 list($path, $token, $size) = explode('/', $info['image']);
                                 $frame = $info['placeint'] <= 3 ? 'victory' : 'base';
                                 if ($key > 0 && $key % 5 == 0){ echo '<br />'; }
-                                echo ' <a data-playerid="'.$info['id'].'" class="player_type player_type_'.$info['colour'].'" href="leaderboard/'.$info['token'].'/" style="text-decoration: none; line-height: 20px; padding-right: 12px; margin: 0 0 0 6px;">';
+                                echo ' <a data-playerid="'.$info['id'].'" class="player_type player_type_'.$info['colour'].'" href="leaderboard/'.$info['token'].'/" style="text-decoration: none; line-height: 20px; padding-right: 12px; margin: 0 0 0 6px; white-space: nowrap;">';
                                         echo '<span style="pointer-events: none; display: inline-block; width: 34px; height: 14px; position: relative;"><span class="sprite sprite_'.$size.'x'.$size.' sprite_'.$size.'x'.$size.'_'.$frame.'" style="margin: 0; position: absolute; left: '.($size == 40 ? -4 : -26).'px; bottom: 0; background-image: url(images/'.$path.'/'.$token.'/sprite_left_'.$size.'x'.$size.'.png?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</span></span>';
-                                        echo '<span style="vertical-align: top; line-height: 18px;">'.strip_tags($info['place']).' : '.$info['name'].'</span>';
+                                        echo '<span style="vertical-align: top; line-height: 18px; white-space: nowrap;">'.strip_tags($info['place']).' : '.$info['name'].'</span>';
                                 echo '</a>';
                         } ?>
                 </p>
