@@ -8,6 +8,9 @@ class rpg_mission_double extends rpg_mission {
     // Define a function for generating the DOUBLES missions
     public static function generate($this_prototype_data, $this_robot_tokens, $this_field_tokens, $this_start_level = 1, $this_unlock_robots = true, $this_unlock_abilities = true, $starfield_mission = false){
 
+        // Collect the session token
+        $session_token = mmrpg_game_token();
+
         // Pull in global variables for this function
         global $mmrpg_index, $db;
         global $this_omega_factors_one;
@@ -451,11 +454,14 @@ class rpg_mission_double extends rpg_mission {
             $temp_field_star['star_date'] = time();
             $temp_battle_omega['values']['field_star'] = $temp_field_star;
             $temp_battle_omega['battle_target_player']['player_starforce'] = array();
+            if (!empty($_SESSION[$session_token]['values']['star_force'])){ $temp_battle_omega['battle_target_player']['player_starforce'] = $_SESSION[$session_token]['values']['star_force']; }
+            if (!isset($temp_battle_omega['battle_target_player']['player_starforce'][$temp_field_star['star_type']])){ $temp_battle_omega['battle_target_player']['player_starforce'][$temp_field_star['star_type']] = 0; }
+            if (!isset($temp_battle_omega['battle_target_player']['player_starforce'][$temp_field_star['star_type2']])){ $temp_battle_omega['battle_target_player']['player_starforce'][$temp_field_star['star_type2']] = 0; }
             if ($temp_field_star['star_type'] == $temp_field_star['star_type2']){
-                $temp_battle_omega['battle_target_player']['player_starforce'][$temp_field_star['star_type']] = 2;
+                $temp_battle_omega['battle_target_player']['player_starforce'][$temp_field_star['star_type']] += 2;
             } else {
-                $temp_battle_omega['battle_target_player']['player_starforce'][$temp_field_star['star_type']] = 1;
-                $temp_battle_omega['battle_target_player']['player_starforce'][$temp_field_star['star_type2']] = 1;
+                $temp_battle_omega['battle_target_player']['player_starforce'][$temp_field_star['star_type']] += 1;
+                $temp_battle_omega['battle_target_player']['player_starforce'][$temp_field_star['star_type2']] += 1;
             }
 
             // Increase the power of the robot masters by 20% in each field

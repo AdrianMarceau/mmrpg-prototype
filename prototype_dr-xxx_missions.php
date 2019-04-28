@@ -363,6 +363,23 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
         // Collect a list of possible stars
         $possible_star_list = mmrpg_prototype_possible_stars(true);
+        $max_star_force = array();
+        if (!empty($possible_star_list)){
+            foreach ($possible_star_list AS $star_token => $star_info){
+                if (!isset($max_star_force[$star_info['info1']['type']])){ $max_star_force[$star_info['info1']['type']] = 0; }
+                if (!empty($star_info['info2']) && !isset($max_star_force[$star_info['info2']['type']])){ $max_star_force[$star_info['info2']['type']] = 0; }
+                if ($star_info['kind'] == 'fusion'){
+                    if ($star_info['info1']['type'] == $star_info['info2']['type']){
+                        $max_star_force[$star_info['info1']['type']] += 2;
+                    } else {
+                        $max_star_force[$star_info['info1']['type']] += 1;
+                        $max_star_force[$star_info['info2']['type']] += 1;
+                    }
+                } else {
+                    $max_star_force[$star_info['info1']['type']] += 1;
+                }
+            }
+        }
 
         // Collect a list of all stars that have not been claimed yet
         $remaining_stars = mmrpg_prototype_remaining_stars(true, $possible_star_list);
@@ -416,11 +433,13 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             if (empty($random_encounter_added)
                 && $random_encounter_chance
                 && $key == $random_encounter_key
+                //&& $key == 0
                 ){
                 // Add a subtle indicator to the battle name
                 $temp_option_key = count($this_prototype_data['battle_options']) - 1;
                 $this_prototype_data['battle_options'][$temp_option_key]['battle_description2'] = rtrim($this_prototype_data['battle_options'][$temp_option_key]['battle_description2']).' Let\'s go!';
                 // Generate a random encounter mission for the star fields
+                //$player_starforce_levels = !empty($_SESSION[$session_token]['values']['star_force']) ? $_SESSION[$session_token]['values']['star_force'] : array();
                 $random_encounter_added = true;
                 $random_field_type = !empty($info2) ? $mmrpg_fields_index[$info2['field']]['field_type'] : $mmrpg_fields_index[$info['field']]['field_type'];
                 $temp_battle_sigma = mmrpg_prototype_generate_mission($this_prototype_data,
@@ -437,11 +456,13 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                             )
                         ), array(
                         'player_token' => 'player',
+                        'player_starforce' => $max_star_force
                         ), array(
                         array('robot_token' => 'quint', 'robot_item' => $random_field_type.'-core', 'counters' => array('attack_mods' => 5, 'defense_mods' => 5, 'speed_mods' => 5)),
                         ), true);
                 rpg_battle::update_index_info($temp_battle_sigma['battle_token'], $temp_battle_sigma);
                 mmrpg_prototype_mission_autoplay_append($temp_battle_omega, $temp_battle_sigma, $this_prototype_data, true);
+                //$this_prototype_data['battle_options'][] = $temp_battle_sigma;
             }
 
             // TEST TEST TEST

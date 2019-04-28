@@ -922,7 +922,7 @@ function mmrpg_prototype_possible_stars($return_arrays = false){
             'token' => $field1_token,
             'name' => $field1_info['field_name'],
             'kind' => 'field',
-            'info1' => array('field' => $field1_token, 'robot' => $field1_info['field_master']),
+            'info1' => array('field' => $field1_token, 'robot' => $field1_info['field_master'], 'type' => $field1_info['field_type']),
             'info2' => false
             );
 
@@ -940,8 +940,8 @@ function mmrpg_prototype_possible_stars($return_arrays = false){
                 'token' => $fusion_token,
                 'name' => ucwords(str_replace('-', ' ', $fusion_token)),
                 'kind' => 'fusion',
-                'info1' => array('field' => $field1_token, 'robot' => $field1_info['field_master']),
-                'info2' => array('field' => $field2_token, 'robot' => $field2_info['field_master'])
+                'info1' => array('field' => $field1_token, 'robot' => $field1_info['field_master'], 'type' => $field1_info['field_type']),
+                'info2' => array('field' => $field2_token, 'robot' => $field2_info['field_master'], 'type' => $field2_info['field_type'])
                 );
 
         }
@@ -1352,6 +1352,8 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                         //$this_option_title .= ' <br />Success Rate: '.str_replace('.00', '', number_format((($temp_records['victories'] / $temp_records['accessed']) * 100), 2, '.', ',')).'%';
                     }
             }
+
+            //$this_option_title .= '<br /> player_starforce: '.(!empty($this_battleinfo['battle_target_player']['player_starforce']) ? json_encode($this_battleinfo['battle_target_player']['player_starforce']) : '---');
 
             $this_option_title_plain = strip_tags(str_replace('<br />', '&#10;', $this_option_title));
             $this_option_title_tooltip = htmlentities($this_option_title, ENT_QUOTES, 'UTF-8');
