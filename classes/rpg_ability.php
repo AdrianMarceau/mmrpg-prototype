@@ -2188,8 +2188,16 @@ class rpg_ability extends rpg_object {
         if (!$item_redirect
             && !empty($target_robot->robot_item)
             && $target_robot->robot_item == 'reverse-module'){
-            $target_robot->battle->events_debug(__FILE__, __LINE__, $target_robot->robot_token.' '.$target_robot->get_item().' changes reverses stat changes!');
+            $target_robot->battle->events_debug(__FILE__, __LINE__, $target_robot->robot_token.' '.$target_robot->get_item().' reverses stat changes!');
             return rpg_ability::ability_function_stat_break($target_robot, $stat_type, $boost_amount, $trigger_ability, $success_frame, $failure_frame, $extra_text, true);
+        }
+
+        // If the target robot is holding an Xtreme Module, all stat changes are max
+        if (!$item_redirect
+            && !empty($target_robot->robot_item)
+            && $target_robot->robot_item == 'xtreme-module'){
+            $target_robot->battle->events_debug(__FILE__, __LINE__, $target_robot->robot_token.' '.$target_robot->get_item().' overclocks stat changes!');
+            $boost_amount *= 2;
         }
 
         // Compensate for malformed arguments
@@ -2267,6 +2275,14 @@ class rpg_ability extends rpg_object {
             && $target_robot->robot_item == 'reverse-module'){
             $target_robot->battle->events_debug(__FILE__, __LINE__, $target_robot->robot_token.' '.$target_robot->get_item().' changes reverses stat changes!');
             return rpg_ability::ability_function_stat_boost($target_robot, $stat_type, $break_amount, $trigger_ability, $success_frame, $failure_frame, $extra_text, true);
+        }
+
+        // If the target robot is holding an Xtreme Module, all stat changes are max
+        if (!$item_redirect
+            && !empty($target_robot->robot_item)
+            && $target_robot->robot_item == 'xtreme-module'){
+            $target_robot->battle->events_debug(__FILE__, __LINE__, $target_robot->robot_token.' '.$target_robot->get_item().' overclocks stat changes!');
+            $break_amount *= 2;
         }
 
         // Compensate for malformed arguments

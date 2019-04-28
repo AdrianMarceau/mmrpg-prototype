@@ -350,18 +350,20 @@ $this_shop_index['kalinka'] = array(
                 'attack-booster', 'defense-booster',
                 'speed-booster', 'field-booster',
                 'target-module', 'charge-module',
-                'reverse-module', 'guard-module',
-                'growth-module', 'fortune-module'
+                'guard-module', 'reverse-module',
+                'xtreme-module', 'growth-module',
+                'fortune-module'
                 ),
             'items_selling4' => get_items_with_prices(
                 'energy-upgrade', 'weapon-upgrade',
                 'attack-booster', 'defense-booster',
                 'speed-booster', 'field-booster',
                 'target-module', 'charge-module',
-                'reverse-module', 'guard-module',
-                'growth-module', 'fortune-module',
-                'battery-circuit', 'sponge-circuit',
-                'forge-circuit', 'sapling-circuit'
+                'guard-module', 'reverse-module',
+                'xtreme-module', 'growth-module',
+                'fortune-module', 'battery-circuit',
+                'sponge-circuit', 'forge-circuit',
+                'sapling-circuit'
                 )
             )
         );
