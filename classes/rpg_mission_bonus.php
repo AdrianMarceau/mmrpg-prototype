@@ -8,6 +8,9 @@ class rpg_mission_bonus extends rpg_mission {
     // Define a function for generating the BONUS missions
     public static function generate($this_prototype_data, $this_robot_count = 8, $this_robot_class = 'master'){
 
+        // Collect the session token
+        $session_token = mmrpg_game_token();
+
         // Pull in global variables for this function
         global $mmrpg_index, $db;
         global $this_omega_factors_one;
@@ -63,11 +66,16 @@ class rpg_mission_bonus extends rpg_mission {
             $temp_battle_omega = rpg_battle::get_index_info('bonus-prototype-complete-2');
             $temp_battle_omega['battle_field_base']['field_name'] = 'Boss Field';
         }
+
+        // Collect an index of which robots have been encountered already
+        $session_robot_database = !empty($_SESSION[$session_token]['values']['robot_database']) ? $_SESSION[$session_token]['values']['robot_database'] : array();
+
         // Populate the player's target robots with compatible class matches
         $temp_battle_omega['battle_target_player']['player_robots'] = array();
         $temp_counter = 0;
         foreach ($this_robot_index AS $token => $info){
             if (empty($info['robot_flag_complete']) || $info['robot_class'] != $this_robot_class){ continue; }
+            if (!isset($session_robot_database[$token]) || empty($session_robot_database[$token]['robot_encountered'])){ continue; }
             $temp_counter++;
             $temp_robot_info = array();
             $temp_robot_info['robot_id'] = MMRPG_SETTINGS_TARGET_PLAYERID + $temp_counter;
