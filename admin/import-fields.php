@@ -1,5 +1,12 @@
 <?php
 
+// Pre-check access permissions before continuing
+if (!in_array('*', $this_adminaccess)
+    && !in_array('import_fields', $this_adminaccess)){
+    $form_messages[] = array('error', 'You do not have permission to import fields!');
+    redirect_form_action('admin.php?action=home');
+}
+
 // Update the page title to show which script this is
 $this_page_tabtitle = 'Import Fields | '.$this_page_tabtitle;
 

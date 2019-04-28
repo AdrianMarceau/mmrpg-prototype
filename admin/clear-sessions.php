@@ -1,5 +1,12 @@
 <?
 
+// Pre-check access permissions before continuing
+if (!in_array('*', $this_adminaccess)
+    && !in_array('clear_sessions', $this_adminaccess)){
+    $form_messages[] = array('error', 'You do not have permission to clear sessions!');
+    redirect_form_action('admin.php?action=home');
+}
+
 // Prevent updating if logged into a file
 if ($this_user['userid'] != MMRPG_SETTINGS_GUEST_ID){ die('<strong>FATAL UPDATE ERROR!</strong><br /> You cannot be logged in while updating!');  }
 

@@ -1,5 +1,27 @@
 <?
 
+// There are different permissions for the different patches
+if (!empty($_REQUEST['patch'])
+    && $_REQUEST['patch'] == 'recalculate_all_battle_points'){
+
+    // Pre-check access permissions before continuing
+    if (!in_array('*', $this_adminaccess)
+        && !in_array('refresh_leaderboard', $this_adminaccess)){
+        $form_messages[] = array('error', 'You do not have permission to refresh the leaderboard!');
+        redirect_form_action('admin.php?action=home');
+    }
+
+} else {
+
+    // Pre-check access permissions before continuing
+    if (!in_array('*', $this_adminaccess)
+        && !in_array('patch_saves', $this_adminaccess)){
+        $form_messages[] = array('error', 'You do not have permission to patch save files!');
+        redirect_form_action('admin.php?action=home');
+    }
+
+}
+
 // Require the update actions file
 $update_patch_tokens = array();
 require_once('update_actions.php');

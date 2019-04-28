@@ -172,6 +172,11 @@ if (!defined('MMRPG_CONFIG_ADMIN_LIST')){
     define(MMRPG_CONFIG_ADMIN_LIST, '');
 }
 
+// Back-up definition in case ADMIN PERMS are not defined
+if (!defined('MMRPG_CONFIG_ADMIN_PERMS_LIST')){
+    define(MMRPG_CONFIG_ADMIN_PERMS_LIST, '');
+}
+
 // Define the last save timestamp now if not already done so
 if (!defined('MMRPG_CONFIG_LAST_SAVE_DATE')){
     $guest_id = MMRPG_SETTINGS_GUEST_ID;
