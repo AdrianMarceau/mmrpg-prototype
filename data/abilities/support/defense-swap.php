@@ -49,7 +49,7 @@ $ability = array(
 
             // Update the ability's target options and trigger
             $this_ability->target_options_update(array('frame' => 'defend', 'success' => array(0, 0, 0, 10, '&hellip;but nothing happened.')));
-            $this_robot->trigger_target($target_robot, $this_ability, array('prevent_default_text' => true));
+            $target_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
             return;
 
         }
@@ -57,9 +57,12 @@ $ability = array(
         // If the target is holding a Guard Module, we are not allowed to modify stats
         if ($target_robot->robot_item == 'guard-module'){
 
-            // Update the ability's target options and trigger
-            $this_ability->target_options_update(array('frame' => 'defend', 'success' => array(0, 0, 0, 10, '&hellip;but the target\'s item protects it from stat changes!')));
-            $this_robot->trigger_target($target_robot, $this_ability, array('prevent_default_text' => true));
+            // Create a temp item object so we can show it resisting stat swaps
+            $temp_item = rpg_game::get_item($this_battle, $target_player, $target_robot, array('item_token' => $target_robot->robot_item));
+            $temp_message = '&hellip;but the target\'s '.$temp_item->print_name().' kicked in! ';
+            $temp_message .= '<br /> '.$target_robot->print_name().'\'s item protects '.$target_robot->get_pronoun('object').' from stat swaps!';
+            $temp_item->target_options_update(array( 'frame' => 'defend', 'success' => array(9, 0, 0, 10, $temp_message)));
+            $target_robot->trigger_target($this_robot, $temp_item, array('prevent_default_text' => true));
             return;
 
         }
