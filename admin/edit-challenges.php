@@ -1023,6 +1023,18 @@
                                                     <?= $print_hazard_options('disco_balls') ?>
                                                 </select><span></span>
                                             </div>
+                                            <div class="subfield">
+                                                <strong class="label sublabel">Woolly Clouds <em>via Thunder Wool</em></strong>
+                                                <select class="select" name="challenge_field_data[values][hazards][woolly_cloud]">
+                                                    <?= $print_hazard_options('woolly_cloud') ?>
+                                                </select><span></span>
+                                            </div>
+                                            <div class="subfield">
+                                                <strong class="label sublabel">Acid Globs <em>via Acid Glob</em></strong>
+                                                <select class="select" name="challenge_field_data[values][hazards][acid_globs]">
+                                                    <?= $print_hazard_options('acid_globs') ?>
+                                                </select><span></span>
+                                            </div>
                                         </div>
 
                                     </div>
