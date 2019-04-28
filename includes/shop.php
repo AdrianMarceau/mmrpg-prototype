@@ -351,7 +351,7 @@ $this_shop_index['kalinka'] = array(
                 'speed-booster', 'field-booster',
                 'growth-module', 'fortune-module',
                 'target-module', 'charge-module',
-                'reverse-module'
+                'reverse-module', 'locking-module'
                 ),
             'items_selling4' => get_items_with_prices(
                 'energy-upgrade', 'weapon-upgrade',
@@ -359,9 +359,9 @@ $this_shop_index['kalinka'] = array(
                 'speed-booster', 'field-booster',
                 'growth-module', 'fortune-module',
                 'target-module', 'charge-module',
-                'reverse-module', 'battery-circuit',
-                'sponge-circuit', 'forge-circuit',
-                'sapling-circuit'
+                'reverse-module', 'locking-module',
+                'battery-circuit', 'sponge-circuit',
+                'forge-circuit', 'sapling-circuit'
                 )
             )
         );

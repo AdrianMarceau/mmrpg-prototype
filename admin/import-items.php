@@ -134,6 +134,7 @@ $temp_pattern_last[] = '/^charge-module$/i';
 $temp_pattern_last[] = '/^fortune-module$/i';
 $temp_pattern_last[] = '/^growth-module$/i';
 $temp_pattern_last[] = '/^reverse-module$/i';
+$temp_pattern_last[] = '/^locking-module$/i';
 
 $temp_pattern_last[] = '/^battery-circuit/i';
 $temp_pattern_last[] = '/^sponge-circuit$/i';

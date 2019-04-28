@@ -2184,7 +2184,7 @@ class rpg_ability extends rpg_object {
         if ($target_robot->battle->battle_status === 'complete'){ return false; }
         elseif ($target_robot->robot_status === 'disabled' || $target_robot->robot_energy <= 0){ return false; }
 
-        // If the target robot is holding a Revser Module, redirect to a break
+        // If the target robot is holding a Reverse Module, redirect to a break
         if (!$item_redirect
             && !empty($target_robot->robot_item)
             && $target_robot->robot_item == 'reverse-module'){
@@ -2209,6 +2209,16 @@ class rpg_ability extends rpg_object {
         if (!$trigger_ability){
             $hide_ability_header = true;
             $trigger_ability = rpg_game::get_ability($target_robot->battle, $target_robot->player, $target_robot, array('ability_token' => $stat_type.'-boost'));
+        }
+
+        // If the target robot is holding a Locking Module, redirect to a break
+        if (!empty($target_robot->robot_item)
+            && $target_robot->robot_item == 'locking-module'){
+            $target_robot->battle->events_debug(__FILE__, __LINE__, $target_robot->robot_token.' '.$target_robot->get_item().' prevents all stat changes!');
+            $trigger_ability->set_flag('skip_canvas_header', true);
+            $trigger_ability->target_options_update(array('frame' => 'taunt', 'success' => array($failure_frame, -2, 0, -10, $extra_text.'...but '.$target_robot->print_name().'\'s item protects it from stat changes!')));
+            $target_robot->trigger_target($target_robot, $trigger_ability);
+            return false;
         }
 
         // Increase the target's stat modifier only if it's not already at max
@@ -2251,7 +2261,7 @@ class rpg_ability extends rpg_object {
         if ($target_robot->battle->battle_status === 'complete'){ return false; }
         elseif ($target_robot->robot_status === 'disabled' || $target_robot->robot_energy <= 0){ return false; }
 
-        // If the target robot is holding a Revser Module, redirect to a break
+        // If the target robot is holding a Reverse Module, redirect to a break
         if (!$item_redirect
             && !empty($target_robot->robot_item)
             && $target_robot->robot_item == 'reverse-module'){
@@ -2276,6 +2286,16 @@ class rpg_ability extends rpg_object {
         if (!$trigger_ability){
             $hide_ability_header = true;
             $trigger_ability = rpg_game::get_ability($target_robot->battle, $target_robot->player, $target_robot, array('ability_token' => $stat_type.'-break'));
+        }
+
+        // If the target robot is holding a Locking Module, redirect to a break
+        if (!empty($target_robot->robot_item)
+            && $target_robot->robot_item == 'locking-module'){
+            $target_robot->battle->events_debug(__FILE__, __LINE__, $target_robot->robot_token.' '.$target_robot->get_item().' prevents all stat changes!');
+            $trigger_ability->set_flag('skip_canvas_header', true);
+            $trigger_ability->target_options_update(array('frame' => 'taunt', 'success' => array($failure_frame, -2, 0, -10, $extra_text.'...but '.$target_robot->print_name().'\'s item protects it from stat changes!')));
+            $target_robot->trigger_target($target_robot, $trigger_ability);
+            return false;
         }
 
         // Increase the target's stat modifier only if it's not already at min
