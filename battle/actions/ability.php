@@ -200,17 +200,31 @@ $temp_targetability = rpg_game::get_ability($this_battle, $target_player, $activ
 // If the target player's temporary ability allows target selection
 if ($temp_targetability->ability_target == 'select_target'){
 
+    // If the target has focused attention, only select active
+    $temp_select_focus = 'auto';
+    if (!empty($active_target_robot->values['robot_focus'])){ $temp_select_focus = $active_target_robot->values['robot_focus']; }
+    if ($temp_select_focus == 'auto'){
+        if ($this_player->counters['robots_active'] == 1){ $temp_select_focus = 'active'; }
+        else { $temp_select_focus = mt_rand(0, 1) == 0 ? 'active' : 'bench'; }
+    }
+
     // Select a random active robot on this player's side of the field
-    $temp_activerobots = $this_player->values['robots_active'];
-    shuffle($temp_activerobots);
-    $temp_targetability_targetinfo = array_shift($temp_activerobots);
-    if ($temp_targetability_targetinfo['robot_id'] == $this_robot->robot_id){
+    if ($temp_select_focus == 'active'
+        || $this_player->counters['robots_active'] == 1){
         $temp_targetability_targetplayer = $this_player;
         $temp_targetability_targetrobot = $this_robot;
     } else {
+        $temp_targetability_targetinfo = false;
+        $temp_activerobots = $this_player->values['robots_active'];
+        shuffle($temp_activerobots);
+        while (empty($temp_targetability_targetinfo)
+            || $temp_targetability_targetinfo['robot_id'] == $this_robot->robot_id){
+            $temp_targetability_targetinfo = array_shift($temp_activerobots);
+        }
         $temp_targetability_targetplayer = $this_player;
         $temp_targetability_targetrobot = rpg_game::get_robot($this_battle, $this_player, $temp_targetability_targetinfo);
     }
+
 
 } elseif ($temp_targetability->ability_target == 'select_this'){
 
