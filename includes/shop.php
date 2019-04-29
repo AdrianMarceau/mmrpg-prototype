@@ -146,8 +146,7 @@ $this_shop_index['auto'] = array(
         'shop_kind_selling' => array('items'),
         'shop_kind_buying' => array('items'),
         'shop_quote_selling' => array(
-            'items' => 'Welcome to Auto\'s Shop! I\'ve got lots of useful items for sale, so let me know if you need anything.',
-            'alts' => 'Great news! I designed some alternate outfits for the robots on our team. Interested in a new look?'
+            'items' => 'Welcome to Auto\'s Shop! I\'ve got lots of useful items for sale, so let me know if you need anything.'
             ),
         'shop_quote_buying' => array(
             'items' => 'So you wanna sell something, eh? Let\'s see what you\'ve collected so far! Hopefully lots of screws!'
@@ -330,7 +329,10 @@ $this_shop_index['kalinka'] = array(
         'shop_number' => 'SHOP-003',
         'shop_kind_selling' => array('items'),
         'shop_kind_buying' => array(),
-        'shop_quote_selling' => array('items' => 'Greetings and welcome to Kalinka\'s Shop! I think you\'ll enjoy the new hold items I\'m developing.'),
+        'shop_quote_selling' => array(
+            'items' => 'Greetings and welcome to Kalinka\'s Shop! I think you\'ll enjoy the new hold items I\'m developing.',
+            'alts' => 'Great news! I designed some alternate outfits for the robots on our team. Interested in a new look?'
+            ),
         'shop_quote_buying' => array(),
         'shop_items' => array(
             'items_selling' => get_items_with_prices(
@@ -473,85 +475,6 @@ if (!empty($this_shop_index['auto'])){
         $this_shop_index['auto']['shop_items']['items_selling'] = $this_shop_index['auto']['shop_items']['items_selling4'];
         unset($this_shop_index['auto']['shop_items']['items_selling4']);
     }
-
-    // If the player has unlocked the Dress Codes, Auto's Shop also sells alts
-    if (mmrpg_prototype_item_unlocked('dress-codes')){
-
-        // Generate the max tier of alts to sell based on level
-        $max_alt_tier_key = floor($this_shop_index['auto']['shop_level'] / 10);
-
-        // Create an array to hold any alts unlocked for selling
-        $unlocked_alts_list = array();
-
-        // Collect all the robot tokens unlocked by the player so far and filter special
-        $banned_tokens = array('mega-man', 'proto-man', 'bass');
-        $discount_tokens = array('roll', 'disco', 'rhythm');
-        $allowed_tokens = array_values($global_unlocked_robots);
-        $allowed_tokens = array_diff_key($allowed_tokens, array_flip($banned_tokens));
-
-        // Pull alt images from the database for the player's unlocked robots
-        if (!empty($allowed_tokens)){
-
-            // Generate the allowed token string and pull alt data from the database
-            $allowed_tokens_string = "'".implode("', '", $allowed_tokens)."'";
-            $unlocked_robot_data = $db->get_array_list("SELECT
-                robot_token,
-                robot_image_alts
-                FROM mmrpg_index_robots
-                WHERE
-                robot_token IN ({$allowed_tokens_string})
-                AND robot_image_alts <> ''
-                AND robot_image_alts <> '[]'
-                ORDER BY robot_order ASC
-                ;");
-
-            // If alts were found, loop through and collect their details
-            if (!empty($unlocked_robot_data)){
-                foreach ($unlocked_robot_data AS $key => $robot_info){
-                    // Collect the alt data and decompress its fields
-                    $robot_token = $robot_info['robot_token'];
-                    $alt_array = json_decode($robot_info['robot_image_alts'], true);
-                    // Loop through the alts themselves and add any with prices
-                    foreach ($alt_array AS $key2 => $alt_info){
-                        // Skip alts without defined prices
-                        if (!isset($alt_info['summons'])){ continue; }
-                        // Generate the token and then add to the parent shop
-                        $alt_token = $robot_token.'_'.$alt_info['token'];
-                        $alt_rate = in_array($robot_token, $discount_tokens) ? 10 : 20;
-                        $alt_price = $alt_info['summons'] * $alt_rate;
-                        $unlocked_alts_list[$alt_info['token']][$alt_token] = $alt_price;
-                    }
-                }
-            }
-
-            // If any alts groups were unlocked, loop through and extract into parent array
-            if (!empty($unlocked_alts_list)){
-                $backup_alts_list = $unlocked_alts_list;
-                $unlocked_alts_list = array();
-                $group_key = 0;
-                foreach ($backup_alts_list AS $group_token => $group_list){
-                    if ($group_key > $max_alt_tier_key){ break; }
-                    foreach ($group_list AS $alt_token => $alt_price){
-                        $unlocked_alts_list[$alt_token] = $alt_price;
-                    }
-                    $group_key++;
-                }
-            }
-
-            //echo('<pre>$unlocked_robot_data = '.print_r($unlocked_robot_data, true).'</pre>');
-            //echo('<pre>$unlocked_alts_list = '.print_r($unlocked_alts_list, true).'</pre>');
-            //exit();
-
-            // If any alts were unlocked, add them to the parent shop array
-            if (!empty($unlocked_alts_list)){
-                $this_shop_index['auto']['shop_kind_selling'][] = 'alts';
-                $this_shop_index['auto']['shop_alts']['alts_selling'] = $unlocked_alts_list;
-            }
-
-        }
-
-    }
-
 
     // Loop through Auto's shop and remove items you do not yet own from the buying list
     $key_items = array('small-screw', 'large-screw');
@@ -825,6 +748,84 @@ if (!empty($this_shop_index['kalinka'])){
     if ($this_shop_index['kalinka']['shop_level'] >= 50){ $this_shop_index['kalinka']['shop_items']['items_selling'] = $this_shop_index['kalinka']['shop_items']['items_selling3']; }
     if ($this_shop_index['kalinka']['shop_level'] >= 75){ $this_shop_index['kalinka']['shop_items']['items_selling'] = $this_shop_index['kalinka']['shop_items']['items_selling4']; }
     unset($this_shop_index['kalinka']['shop_items']['items_selling2'], $this_shop_index['kalinka']['shop_items']['items_selling3'], $this_shop_index['kalinka']['shop_items']['items_selling4']);
+
+    // If the player has unlocked the Dress Codes, Auto's Shop also sells alts
+    if (mmrpg_prototype_item_unlocked('dress-codes')){
+
+        // Generate the max tier of alts to sell based on level
+        $max_alt_tier_key = floor($this_shop_index['kalinka']['shop_level'] / 10);
+
+        // Create an array to hold any alts unlocked for selling
+        $unlocked_alts_list = array();
+
+        // Collect all the robot tokens unlocked by the player so far and filter special
+        $banned_tokens = array('mega-man', 'proto-man', 'bass');
+        $discount_tokens = array('roll', 'disco', 'rhythm');
+        $allowed_tokens = array_values($global_unlocked_robots);
+        $allowed_tokens = array_diff_key($allowed_tokens, array_flip($banned_tokens));
+
+        // Pull alt images from the database for the player's unlocked robots
+        if (!empty($allowed_tokens)){
+
+            // Generate the allowed token string and pull alt data from the database
+            $allowed_tokens_string = "'".implode("', '", $allowed_tokens)."'";
+            $unlocked_robot_data = $db->get_array_list("SELECT
+                robot_token,
+                robot_image_alts
+                FROM mmrpg_index_robots
+                WHERE
+                robot_token IN ({$allowed_tokens_string})
+                AND robot_image_alts <> ''
+                AND robot_image_alts <> '[]'
+                ORDER BY robot_order ASC
+                ;");
+
+            // If alts were found, loop through and collect their details
+            if (!empty($unlocked_robot_data)){
+                foreach ($unlocked_robot_data AS $key => $robot_info){
+                    // Collect the alt data and decompress its fields
+                    $robot_token = $robot_info['robot_token'];
+                    $alt_array = json_decode($robot_info['robot_image_alts'], true);
+                    // Loop through the alts themselves and add any with prices
+                    foreach ($alt_array AS $key2 => $alt_info){
+                        // Skip alts without defined prices
+                        if (!isset($alt_info['summons'])){ continue; }
+                        // Generate the token and then add to the parent shop
+                        $alt_token = $robot_token.'_'.$alt_info['token'];
+                        $alt_rate = in_array($robot_token, $discount_tokens) ? 10 : 20;
+                        $alt_price = $alt_info['summons'] * $alt_rate;
+                        $unlocked_alts_list[$alt_info['token']][$alt_token] = $alt_price;
+                    }
+                }
+            }
+
+            // If any alts groups were unlocked, loop through and extract into parent array
+            if (!empty($unlocked_alts_list)){
+                $backup_alts_list = $unlocked_alts_list;
+                $unlocked_alts_list = array();
+                $group_key = 0;
+                foreach ($backup_alts_list AS $group_token => $group_list){
+                    if ($group_key > $max_alt_tier_key){ break; }
+                    foreach ($group_list AS $alt_token => $alt_price){
+                        $unlocked_alts_list[$alt_token] = $alt_price;
+                    }
+                    $group_key++;
+                }
+            }
+
+            //echo('<pre>$unlocked_robot_data = '.print_r($unlocked_robot_data, true).'</pre>');
+            //echo('<pre>$unlocked_alts_list = '.print_r($unlocked_alts_list, true).'</pre>');
+            //exit();
+
+            // If any alts were unlocked, add them to the parent shop array
+            if (!empty($unlocked_alts_list)){
+                $this_shop_index['kalinka']['shop_kind_selling'][] = 'alts';
+                $this_shop_index['kalinka']['shop_alts']['alts_selling'] = $unlocked_alts_list;
+            }
+
+        }
+
+    }
 
     // Collect values for all of Kalinka's parts so we can add them to Auto's shop
     $kalinka_part_values = call_user_func_array('get_items_with_values', array_keys($this_shop_index['kalinka']['shop_items']['items_selling']));
