@@ -59,8 +59,8 @@ $ability = array(
 
             // Create a temp item object so we can show it resisting stat swaps
             $temp_item = rpg_game::get_item($this_battle, $target_player, $target_robot, array('item_token' => $target_robot->robot_item));
-            $temp_message = '&hellip;but the target\'s '.$temp_item->print_name().' kicked in! ';
-            $temp_message .= '<br /> '.$target_robot->print_name().'\'s item protects '.$target_robot->get_pronoun('object').' from stat swaps!';
+            $temp_message = '&hellip;but the held '.$temp_item->print_name().' kicked in! ';
+            $temp_message .= '<br /> '.$target_robot->print_name().'\'s item protects '.$target_robot->get_pronoun('object').' from stat changes!';
             $temp_item->target_options_update(array( 'frame' => 'defend', 'success' => array(9, 0, 0, 10, $temp_message)));
             $target_robot->trigger_target($this_robot, $temp_item, array('prevent_default_text' => true));
             return;
