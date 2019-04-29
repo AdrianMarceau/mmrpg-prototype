@@ -160,12 +160,12 @@ $temp_pattern_last[] = '/^reggae-link$/i';
 $temp_pattern_last[] = '/^kalinka-link$/i';
 
 $temp_pattern_last[] = '/^item-codes$/i';
-$temp_pattern_last[] = '/^dress-codes$/i';
+$temp_pattern_last[] = '/^equip-codes$/i';
 
 $temp_pattern_last[] = '/^ability-codes$/i';
 $temp_pattern_last[] = '/^weapon-codes$/i';
 
-$temp_pattern_last[] = '/^equip-codes$/i';
+$temp_pattern_last[] = '/^dress-codes$/i';
 $temp_pattern_last[] = '/^legacy-codes$/i';
 
 $temp_pattern_last[] = '/^omega-seed$/i';
