@@ -40,7 +40,8 @@ $ability = array(
         $this_refresh_text = ('The '.$this_ability->print_name().' extended the corrosive fluid\'s duration!<br /> '.
             'This robot will continue taking damage at the end of each turn!'
             );
-        $this_repeat_text = ('The '.$this_ability->print_name().'\'s corrodes the target\'s armor!');
+        $this_repeat_text = ('The '.$this_ability->print_name().'\'s corrosive fluid damaged the target!');
+        $this_repeat_text2 = ('The '.$this_ability->print_name().'\'s corrosive fluid was ignored by the target!');
 
         // Define this ability's attachment token
         $static_attachment_key = $target_robot->get_static_attachment_key();
@@ -89,7 +90,7 @@ $ability = array(
                 'frame' => 'damage',
                 'rates' => array(100, 0, 0),
                 'success' => array(9, -5, 30, 10, $this_repeat_text),
-                'failure' => array(9, -5, 30, 10, $this_repeat_text),
+                'failure' => array(9, -5, 30, 10, $this_repeat_text2),
                 'options' => array(
                     'apply_modifiers' => true,
                     'apply_type_modifiers' => true,

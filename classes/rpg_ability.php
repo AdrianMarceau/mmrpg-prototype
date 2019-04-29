@@ -2219,13 +2219,17 @@ class rpg_ability extends rpg_object {
             $trigger_ability = rpg_game::get_ability($target_robot->battle, $target_robot->player, $target_robot, array('ability_token' => $stat_type.'-boost'));
         }
 
-        // If the target robot is holding a Guard Module, redirect to a break
+        // If the target robot is holding a Locking Module, redirect to a break
         if (!empty($target_robot->robot_item)
             && $target_robot->robot_item == 'guard-module'){
             $target_robot->battle->events_debug(__FILE__, __LINE__, $target_robot->robot_token.' '.$target_robot->get_item().' prevents all stat changes!');
-            $trigger_ability->set_flag('skip_canvas_header', true);
-            $trigger_ability->target_options_update(array('frame' => 'taunt', 'success' => array($failure_frame, -2, 0, -10, $extra_text.'...but '.$target_robot->print_name().'\'s item protects it from stat changes!')));
-            $target_robot->trigger_target($target_robot, $trigger_ability);
+            $temp_item = rpg_game::get_item($target_robot->battle, $target_robot->player, $target_robot, array('item_token' => $target_robot->robot_item));
+            if (!empty($temp_item->item_results['flag_'.$target_robot->robot_item.'_triggered'])){ return false; }
+            else { $temp_item->item_results['flag_'.$target_robot->robot_item.'_triggered'] = true; }
+            $temp_message = '&hellip;but the held '.$temp_item->print_name().' kicked in! ';
+            $temp_message .= '<br /> '.$target_robot->print_name().'\'s item protects '.$target_robot->get_pronoun('object').' from stat changes!';
+            $temp_item->target_options_update(array( 'frame' => 'defend', 'success' => array(9, 0, 0, 10, $temp_message)));
+            $target_robot->trigger_target($trigger_ability->robot, $temp_item, array('prevent_default_text' => true));
             return false;
         }
 
@@ -2308,9 +2312,13 @@ class rpg_ability extends rpg_object {
         if (!empty($target_robot->robot_item)
             && $target_robot->robot_item == 'guard-module'){
             $target_robot->battle->events_debug(__FILE__, __LINE__, $target_robot->robot_token.' '.$target_robot->get_item().' prevents all stat changes!');
-            $trigger_ability->set_flag('skip_canvas_header', true);
-            $trigger_ability->target_options_update(array('frame' => 'taunt', 'success' => array($failure_frame, -2, 0, -10, $extra_text.'...but '.$target_robot->print_name().'\'s item protects it from stat changes!')));
-            $target_robot->trigger_target($target_robot, $trigger_ability);
+            $temp_item = rpg_game::get_item($target_robot->battle, $target_robot->player, $target_robot, array('item_token' => $target_robot->robot_item));
+            if (!empty($temp_item->item_results['flag_'.$target_robot->robot_item.'_triggered'])){ return false; }
+            else { $temp_item->item_results['flag_'.$target_robot->robot_item.'_triggered'] = true; }
+            $temp_message = '&hellip;but the held '.$temp_item->print_name().' kicked in! ';
+            $temp_message .= '<br /> '.$target_robot->print_name().'\'s item protects '.$target_robot->get_pronoun('object').' from stat changes!';
+            $temp_item->target_options_update(array( 'frame' => 'defend', 'success' => array(9, 0, 0, 10, $temp_message)));
+            $target_robot->trigger_target($trigger_ability->robot, $temp_item, array('prevent_default_text' => true));
             return false;
         }
 
