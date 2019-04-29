@@ -2197,7 +2197,7 @@ class rpg_ability extends rpg_object {
             && !empty($target_robot->robot_item)
             && $target_robot->robot_item == 'xtreme-module'){
             $target_robot->battle->events_debug(__FILE__, __LINE__, $target_robot->robot_token.' '.$target_robot->get_item().' overclocks stat changes!');
-            $boost_amount *= 2;
+            $boost_amount = ceil(MMRPG_SETTINGS_STATS_MOD_MAX * 2);
         }
 
         // Compensate for malformed arguments
@@ -2237,6 +2237,7 @@ class rpg_ability extends rpg_object {
         if ($target_robot->counters[$mods_token] < MMRPG_SETTINGS_STATS_MOD_MAX){
 
             // Increase the stat by X stages and then floor if too high
+            $old_mod_value = $target_robot->counters[$mods_token];
             $rel_boost_amount = $boost_amount;
             $target_robot->counters[$mods_token] += $rel_boost_amount;
             if ($target_robot->counters[$mods_token] > MMRPG_SETTINGS_STATS_MOD_MAX){
@@ -2251,16 +2252,20 @@ class rpg_ability extends rpg_object {
             else { $boost_text = 'rose'; }
 
             // Target this robot's self to show the success message
+            $amount_text = ''; //' (old:'.$old_mod_value.', amount:'.$boost_amount.', rel-amount:'.$rel_boost_amount.', result:'.$target_robot->counters[$mods_token].')';
             $trigger_ability->set_flag('skip_canvas_header', true);
-            $trigger_ability->target_options_update(array('frame' => 'taunt', 'success' => array($success_frame, -2, 0, -10, $extra_text.$target_robot->print_name().'&#39;s '.$stat_type.' '.$boost_text.'!')));
+            $trigger_ability->target_options_update(array('frame' => 'taunt', 'success' => array($success_frame, -2, 0, -10, $extra_text.$target_robot->print_name().'&#39;s '.$stat_type.' '.$boost_text.$amount_text.'!')));
             $target_robot->trigger_target($target_robot, $trigger_ability);
 
         } else {
 
             // Target this robot's self to show the failure message
+            $amount_text = ''; //' ('.($target_robot->counters[$mods_token] > 0 ? '+'.$target_robot->counters[$mods_token] : $target_robot->counters[$mods_token]).')';
             $trigger_ability->set_flag('skip_canvas_header', true);
-            $trigger_ability->target_options_update(array('frame' => 'defend', 'success' => array($failure_frame, -2, 0, -10, $extra_text.$target_robot->print_name().'&#39;s '.$stat_type.' won\'t go any higher&hellip;')));
+            $trigger_ability->target_options_update(array('frame' => 'defend', 'success' => array($failure_frame, -2, 0, -10, $extra_text.$target_robot->print_name().'&#39;s '.$stat_type.' won\'t go any higher'.$amount_text.'&hellip;')));
             $target_robot->trigger_target($target_robot, $trigger_ability);
+            $target_robot->counters[$mods_token] = MMRPG_SETTINGS_STATS_MOD_MAX;
+            $target_robot->update_session();
 
         }
 
@@ -2286,7 +2291,7 @@ class rpg_ability extends rpg_object {
             && !empty($target_robot->robot_item)
             && $target_robot->robot_item == 'xtreme-module'){
             $target_robot->battle->events_debug(__FILE__, __LINE__, $target_robot->robot_token.' '.$target_robot->get_item().' overclocks stat changes!');
-            $break_amount *= 2;
+            $break_amount = ceil(MMRPG_SETTINGS_STATS_MOD_MAX * 2);
         }
 
         // Compensate for malformed arguments
@@ -2326,10 +2331,11 @@ class rpg_ability extends rpg_object {
         if ($target_robot->counters[$mods_token] > MMRPG_SETTINGS_STATS_MOD_MIN){
 
             // Decrease the stat by X stages and then ceil if too low
+            $old_mod_value = $target_robot->counters[$mods_token];
             $rel_break_amount = $break_amount;
             $target_robot->counters[$mods_token] -= $rel_break_amount;
             if ($target_robot->counters[$mods_token] < MMRPG_SETTINGS_STATS_MOD_MIN){
-                $rel_break_amount += ($target_robot->counters[$mods_token] + MMRPG_SETTINGS_STATS_MOD_MIN);
+                $rel_break_amount += ($target_robot->counters[$mods_token] + (MMRPG_SETTINGS_STATS_MOD_MIN * -1));
                 $target_robot->counters[$mods_token] = MMRPG_SETTINGS_STATS_MOD_MIN;
             }
             $target_robot->update_session();
@@ -2340,16 +2346,20 @@ class rpg_ability extends rpg_object {
             else { $break_text = 'fell'; }
 
             // Target this robot's self to show the success message
+            $amount_text = ''; //' (old:'.$old_mod_value.', amount:'.$break_amount.', rel-amount:'.$rel_break_amount.', result:'.$target_robot->counters[$mods_token].')';
             $trigger_ability->set_flag('skip_canvas_header', true);
-            $trigger_ability->target_options_update(array('frame' => 'defend', 'success' => array($success_frame, -2, 0, -10, $extra_text.$target_robot->print_name().'&#39;s '.$stat_type.' '.$break_text.'!')));
+            $trigger_ability->target_options_update(array('frame' => 'defend', 'success' => array($success_frame, -2, 0, -10, $extra_text.$target_robot->print_name().'&#39;s '.$stat_type.' '.$break_text.$amount_text.'!')));
             $target_robot->trigger_target($target_robot, $trigger_ability);
 
         } else {
 
             // Target this robot's self to show the failure message
+            $amount_text = ''; //' ('.($target_robot->counters[$mods_token] > 0 ? '+'.$target_robot->counters[$mods_token] : $target_robot->counters[$mods_token]).')';
             $trigger_ability->set_flag('skip_canvas_header', true);
-            $trigger_ability->target_options_update(array('frame' => 'base', 'success' => array($failure_frame, -2, 0, -10, $extra_text.$target_robot->print_name().'&#39;s '.$stat_type.' won\'t go any lower&hellip;')));
+            $trigger_ability->target_options_update(array('frame' => 'base', 'success' => array($failure_frame, -2, 0, -10, $extra_text.$target_robot->print_name().'&#39;s '.$stat_type.' won\'t go any lower'.$amount_text.'&hellip;')));
             $target_robot->trigger_target($target_robot, $trigger_ability);
+            $target_robot->counters[$mods_token] = MMRPG_SETTINGS_STATS_MOD_MIN;
+            $target_robot->update_session();
 
         }
 
