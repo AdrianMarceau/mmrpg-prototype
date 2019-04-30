@@ -1,6 +1,6 @@
 <?
 
-// -- SHOP SELLING ITEMS / CORES -- //
+// -- SHOP SELLING ITEMS / PARTS / CORES -- //
 
 ?>
 
@@ -38,7 +38,10 @@
                 <?
 
                 // Collect the items for buying and slice/shuffle if nessary
-                $item_list_array = $shop_info['shop_items']['items_selling'];
+                $item_list_array = array();
+                if ($selling_token == 'items' && !empty($shop_info['shop_items']['items_selling'])){ $item_list_array = $shop_info['shop_items']['items_selling']; }
+                elseif ($selling_token == 'parts' && !empty($shop_info['shop_parts']['parts_selling'])){ $item_list_array = $shop_info['shop_parts']['parts_selling']; }
+                elseif ($selling_token == 'cores' && !empty($shop_info['shop_cores']['cores_selling'])){ $item_list_array = $shop_info['shop_cores']['cores_selling']; }
 
                 // Loop through the items and print them one by one
                 $item_counter = 0;

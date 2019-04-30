@@ -16,7 +16,8 @@ foreach ($shop_selling_tokens AS $selling_token){
             // If this shop has items to sell, print them out
             if (
                 ($selling_token == 'items' && !empty($shop_info['shop_items']['items_selling'])) ||
-                ($selling_token == 'cores' && !empty($shop_info['shop_items']['cores_selling']))
+                ($selling_token == 'parts' && !empty($shop_info['shop_parts']['parts_selling'])) ||
+                ($selling_token == 'cores' && !empty($shop_info['shop_cores']['cores_selling']))
                 ){
 
                 // Include the selling markup for items and cores

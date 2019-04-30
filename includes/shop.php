@@ -146,7 +146,8 @@ $this_shop_index['auto'] = array(
         'shop_kind_selling' => array('items'),
         'shop_kind_buying' => array('items'),
         'shop_quote_selling' => array(
-            'items' => 'Welcome to Auto\'s Shop! I\'ve got lots of useful items for sale, so let me know if you need anything.'
+            'items' => 'Welcome to Auto\'s Shop! I\'ve got lots of useful items for sale, so let me know if you need anything.',
+            'parts' => 'Great news! I\'ve cracked the code on holdable items and created new parts! See anything you like?'
             ),
         'shop_quote_buying' => array(
             'items' => 'So you wanna sell something, eh? Let\'s see what you\'ve collected so far! Hopefully lots of screws!'
@@ -197,6 +198,40 @@ $this_shop_index['auto'] = array(
                 'speed-capsule', 'super-capsule',
                 'extra-life', 'yashichi',
                 'speed-booster'
+                )
+            ),
+        'shop_parts' => array(
+            'parts_selling' => get_items_with_values(
+                'energy-upgrade', 'weapon-upgrade',
+                'attack-booster', 'defense-booster',
+                'growth-module', 'fortune-module'
+                ),
+            'parts_selling2' => get_items_with_values(
+                'energy-upgrade', 'weapon-upgrade',
+                'attack-booster', 'defense-booster',
+                'speed-booster', 'field-booster',
+                'target-module', 'charge-module',
+                'growth-module', 'fortune-module'
+                ),
+            'parts_selling3' => get_items_with_values(
+                'energy-upgrade', 'weapon-upgrade',
+                'attack-booster', 'defense-booster',
+                'speed-booster', 'field-booster',
+                'target-module', 'charge-module',
+                'guard-module', 'reverse-module',
+                'xtreme-module', 'growth-module',
+                'fortune-module'
+                ),
+            'parts_selling4' => get_items_with_values(
+                'energy-upgrade', 'weapon-upgrade',
+                'attack-booster', 'defense-booster',
+                'speed-booster', 'field-booster',
+                'target-module', 'charge-module',
+                'guard-module', 'reverse-module',
+                'xtreme-module', 'growth-module',
+                'fortune-module', 'battery-circuit',
+                'sponge-circuit', 'forge-circuit',
+                'sapling-circuit'
                 )
             )
         );
@@ -327,47 +362,13 @@ $this_shop_index['kalinka'] = array(
         'shop_field' => 'final-destination',
         'shop_player' => 'dr-cossack',
         'shop_number' => 'SHOP-003',
-        'shop_kind_selling' => array('items'),
+        'shop_kind_selling' => array('alts'),
         'shop_kind_buying' => array(),
         'shop_quote_selling' => array(
-            'items' => 'Greetings and welcome to Kalinka\'s Shop! I think you\'ll enjoy the new hold items I\'m developing.',
-            'alts' => 'Great news! I designed some alternate outfits for the robots on our team. Interested in a new look?'
+            'alts' => 'Greetings and welcome to Kalinka\'s Shop! Interested in some new outfits for your robots?'
             ),
         'shop_quote_buying' => array(),
-        'shop_items' => array(
-            'items_selling' => get_items_with_prices(
-                'energy-upgrade', 'weapon-upgrade',
-                'attack-booster', 'defense-booster',
-                'growth-module', 'fortune-module'
-                ),
-            'items_selling2' => get_items_with_prices(
-                'energy-upgrade', 'weapon-upgrade',
-                'attack-booster', 'defense-booster',
-                'speed-booster', 'field-booster',
-                'target-module', 'charge-module',
-                'growth-module', 'fortune-module'
-                ),
-            'items_selling3' => get_items_with_prices(
-                'energy-upgrade', 'weapon-upgrade',
-                'attack-booster', 'defense-booster',
-                'speed-booster', 'field-booster',
-                'target-module', 'charge-module',
-                'guard-module', 'reverse-module',
-                'xtreme-module', 'growth-module',
-                'fortune-module'
-                ),
-            'items_selling4' => get_items_with_prices(
-                'energy-upgrade', 'weapon-upgrade',
-                'attack-booster', 'defense-booster',
-                'speed-booster', 'field-booster',
-                'target-module', 'charge-module',
-                'guard-module', 'reverse-module',
-                'xtreme-module', 'growth-module',
-                'fortune-module', 'battery-circuit',
-                'sponge-circuit', 'forge-circuit',
-                'sapling-circuit'
-                )
-            )
+        'shop_alts' => array()
         );
 
 
@@ -462,7 +463,7 @@ foreach ($this_shop_index AS $shop_token => $shop_info){
 // Only continue if the shop has been unlocked
 if (!empty($this_shop_index['auto'])){
 
-    // If Auto's Shop has reached sufficient levels, expand the inventory
+    // If Auto's Shop has reached sufficient levels, expand the Item Shop inventory
     if ($this_shop_index['auto']['shop_level'] >= 10){
         $this_shop_index['auto']['shop_items']['items_selling'] = $this_shop_index['auto']['shop_items']['items_selling2'];
         unset($this_shop_index['auto']['shop_items']['items_selling2']);
@@ -476,7 +477,7 @@ if (!empty($this_shop_index['auto'])){
         unset($this_shop_index['auto']['shop_items']['items_selling4']);
     }
 
-    // Loop through Auto's shop and remove items you do not yet own from the buying list
+    // Loop through the Item Shop and remove items you do not yet own from the buying list
     $key_items = array('small-screw', 'large-screw');
     if (!empty($this_shop_index['auto']['shop_items']['items_buying'])){
         foreach ($this_shop_index['auto']['shop_items']['items_buying'] AS $token => $price){
@@ -486,7 +487,7 @@ if (!empty($this_shop_index['auto'])){
         }
     }
 
-    // If Robots or Abilities have been unlocked, increase the core selling prices
+    // If this shop has a hidden power, loop through and increase sell prices
     if (!empty($this_shop_index['auto']['shop_hidden_power'])){
         if (!empty($this_shop_index['auto']['shop_items']['items_buying'])){
             $items_list = $this_shop_index['auto']['shop_items']['items_buying'];
@@ -499,6 +500,30 @@ if (!empty($this_shop_index['auto'])){
                 $this_shop_index['auto']['shop_items']['items_buying'][$item_token] = $item_price;
             }
         }
+    }
+
+    // If the player has unlocked the Equip Codes, Auto's kiosk also has a Part Shop tab
+    if (mmrpg_prototype_item_unlocked('equip-codes')){
+
+        // Add the Parts Shop token to the selling array if not there already
+        if (!in_array('parts', $this_shop_index['auto']['shop_kind_selling'])){ $this_shop_index['auto']['shop_kind_selling'][] = 'parts'; }
+
+        // If Auto's  Shop has reached sufficient levels, expand the Parts Shop inventory
+        if ($this_shop_index['auto']['shop_level'] >= 40){ $this_shop_index['auto']['shop_parts']['parts_selling'] = $this_shop_index['auto']['shop_parts']['parts_selling2']; }
+        if ($this_shop_index['auto']['shop_level'] >= 50){ $this_shop_index['auto']['shop_parts']['parts_selling'] = $this_shop_index['auto']['shop_parts']['parts_selling3']; }
+        if ($this_shop_index['auto']['shop_level'] >= 60){ $this_shop_index['auto']['shop_parts']['parts_selling'] = $this_shop_index['auto']['shop_parts']['parts_selling4']; }
+        unset($this_shop_index['auto']['shop_parts']['parts_selling2'], $this_shop_index['auto']['shop_parts']['parts_selling3'], $this_shop_index['auto']['shop_parts']['parts_selling4']);
+
+        // Collect parts for the Parts Shop so we can add them to Kalinka's kiosk
+        $auto_part_values = call_user_func_array('get_items_with_values', array_keys($this_shop_index['auto']['shop_parts']['parts_selling']));
+        if (!empty($auto_part_values)){
+            foreach ($auto_part_values AS $token => $value){
+                if (isset($this_shop_index['auto']['shop_items']['items_buying'][$token])){ continue; }
+                elseif (empty($value)){ continue; }
+                $this_shop_index['auto']['shop_items']['items_buying'][$token] = $value;
+            }
+        }
+
     }
 
 }
@@ -525,8 +550,8 @@ if (!empty($this_shop_index['reggae'])){
         // If the player has unlocked the Weapon Codes, Reggae's Shop also sells weapons
         if (mmrpg_prototype_item_unlocked('weapon-codes')){
 
-            // Update the shop parameters to include code-based weapons
-            array_unshift($this_shop_index['reggae']['shop_kind_selling'], 'weapons');
+            // Add the Weapons Shop token to the selling array if not there already
+            if (!in_array('parts', $this_shop_index['reggae']['shop_kind_selling'])){ $this_shop_index['reggae']['shop_kind_selling'][] = 'weapons'; }
             $this_shop_index['reggae']['shop_quote_selling']['weapons'] = 'Reggae use cores make new weapons! Squaaak! Heroes use weapons defeat bad guys! Squaaak!';
 
             // Define the weapon selling array and start it empty
@@ -743,13 +768,7 @@ if (!empty($this_shop_index['reggae'])){
 // Only continue if the shop has been unlocked
 if (!empty($this_shop_index['kalinka'])){
 
-    // If Kalinka's Shop has reached sufficient levels, expand the inventory
-    if ($this_shop_index['kalinka']['shop_level'] >= 25){ $this_shop_index['kalinka']['shop_items']['items_selling'] = $this_shop_index['kalinka']['shop_items']['items_selling2']; }
-    if ($this_shop_index['kalinka']['shop_level'] >= 50){ $this_shop_index['kalinka']['shop_items']['items_selling'] = $this_shop_index['kalinka']['shop_items']['items_selling3']; }
-    if ($this_shop_index['kalinka']['shop_level'] >= 75){ $this_shop_index['kalinka']['shop_items']['items_selling'] = $this_shop_index['kalinka']['shop_items']['items_selling4']; }
-    unset($this_shop_index['kalinka']['shop_items']['items_selling2'], $this_shop_index['kalinka']['shop_items']['items_selling3'], $this_shop_index['kalinka']['shop_items']['items_selling4']);
-
-    // If the player has unlocked the Dress Codes, Auto's Shop also sells alts
+    // If the player has unlocked the Dress Codes, Kalinka's kiosk also has an Alt Shop tab
     if (mmrpg_prototype_item_unlocked('dress-codes')){
 
         // Generate the max tier of alts to sell based on level
@@ -819,7 +838,7 @@ if (!empty($this_shop_index['kalinka'])){
 
             // If any alts were unlocked, add them to the parent shop array
             if (!empty($unlocked_alts_list)){
-                $this_shop_index['kalinka']['shop_kind_selling'][] = 'alts';
+                if (!in_array('alts', $this_shop_index['kalinka']['shop_kind_selling'])){ $this_shop_index['kalinka']['shop_kind_selling'][] = 'alts'; }
                 $this_shop_index['kalinka']['shop_alts']['alts_selling'] = $unlocked_alts_list;
             }
 
@@ -827,17 +846,7 @@ if (!empty($this_shop_index['kalinka'])){
 
     }
 
-    // Collect values for all of Kalinka's parts so we can add them to Auto's shop
-    $kalinka_part_values = call_user_func_array('get_items_with_values', array_keys($this_shop_index['kalinka']['shop_items']['items_selling']));
-    if (!empty($kalinka_part_values)){
-        foreach ($kalinka_part_values AS $token => $value){
-            if (isset($this_shop_index['auto']['shop_items']['items_buying'][$token])){ continue; }
-            elseif (empty($value)){ continue; }
-            $this_shop_index['auto']['shop_items']['items_buying'][$token] = $value;
-        }
-    }
-
-    // If the player has unlocked the Legacy Codes, Kalinka's Shop also sells legacy fields & robots
+    // If the player has unlocked the Legacy Codes, Kalinka's Shop also has a Robot Shop and a Field Shop tab
     if (mmrpg_prototype_item_unlocked('legacy-codes')
         || mmrpg_prototype_item_unlocked('robot-codes')
         || mmrpg_prototype_item_unlocked('field-codes')){
@@ -883,7 +892,7 @@ if (!empty($this_shop_index['kalinka'])){
 
     }
 
-    // If the player has unlocked the Cossack Program, Kalinka's Shop also sells fields
+    // If the player has unlocked the Cossack Program, Kalinka's kiosk also has a Show Stars tab
     if ($this_battle_stars_count > 0
         && mmrpg_prototype_item_unlocked('cossack-program')){
 
