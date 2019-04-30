@@ -662,17 +662,17 @@ if (!mmrpg_prototype_item_unlocked('light-program')
 
 }
 
-// Unlock the DRESS CODES after Dr. Light has completed at least half of Chapter Four
+// Unlock the EQUIP CODES after Dr. Light has completed at least half of Chapter Four
 $required_missions = MMRPG_SETTINGS_CHAPTER1_MISSIONS;
 $required_missions += MMRPG_SETTINGS_CHAPTER2_MISSIONS;
 $required_missions += MMRPG_SETTINGS_CHAPTER3_MISSIONS;
 $required_missions += round(MMRPG_SETTINGS_CHAPTER4_MISSIONS / 2);
-if (!mmrpg_prototype_item_unlocked('dress-codes')
+if (!mmrpg_prototype_item_unlocked('equip-codes')
     && mmrpg_prototype_battles_complete('dr-light') >= $required_missions
     ){
 
-    // Unlock the Dress Codes and generate the required event details
-    mmrpg_game_unlock_item('dress-codes', array(
+    // Unlock the Equip Codes and generate the required event details
+    mmrpg_game_unlock_item('equip-codes', array(
         'event_text' => '{shop} made another discovery! The {item} have been unlocked!',
         'player_token' => 'dr-light',
         'shop_token' => 'auto',
@@ -772,11 +772,11 @@ if (!mmrpg_prototype_item_unlocked('kalinka-link')
         'show_images' => array('player', 'shop')
         ));
 
-    // Unlock the EQUIP CODES immediately after the Kalinka Link has been unlocked
-    if (!mmrpg_prototype_item_unlocked('equip-codes')){
+    // Unlock the DRESS CODES immediately after the Kalinka Link has been unlocked
+    if (!mmrpg_prototype_item_unlocked('dress-codes')){
 
         // Unlock the Equip Codes and generate the required event details
-        mmrpg_game_unlock_item('equip-codes', array(
+        mmrpg_game_unlock_item('dress-codes', array(
             'event_text' => '{shop} already made a discovery! The {item} have been unlocked!',
             'player_token' => 'dr-cossack',
             'shop_token' => 'kalinka',
