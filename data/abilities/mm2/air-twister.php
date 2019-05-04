@@ -11,10 +11,10 @@ $ability = array(
     'ability_type2' => 'shield',
     'ability_energy' => 8,
     'ability_speed' => 3,
-    'ability_damage' => 16,
+    'ability_damage' => 22,
     'ability_recovery2' => 50,
     'ability_recovery_percent2' => true,
-    'ability_accuracy' => 96,
+    'ability_accuracy' => 98,
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
@@ -30,6 +30,7 @@ $ability = array(
             'ability_image' => $this_ability->ability_image,
             'attachment_token' => $this_attachment_token,
             'attachment_damage_input_breaker' => $this_effect_multiplier,
+            'attachment_duration' => 1,
             'attachment_create' => array(
                 'trigger' => 'special',
                 'kind' => '',
