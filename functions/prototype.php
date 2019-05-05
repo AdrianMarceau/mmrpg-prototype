@@ -97,7 +97,6 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
     $user_battle_abilities = !empty($user_save_array['save_values_battle_abilities']) ? $user_save_array['save_values_battle_abilities'] : array();
     $user_battle_items = !empty($user_save_array['save_values_battle_items']) ? $user_save_array['save_values_battle_items'] : array();
     $user_battle_stars = !empty($user_save_array['save_values_battle_stars']) ? $user_save_array['save_values_battle_stars'] : array();
-    $user_battle_fields = !empty($user_save_array['save_values']['battle_fields']) ? $user_save_array['save_values']['battle_fields'] : array();
     $user_robot_alts = !empty($user_save_array['save_values_robot_alts']) ? $user_save_array['save_values_robot_alts'] : array();
     $user_robot_database = !empty($user_save_array['save_values_robot_database']) ? $user_save_array['save_values_robot_database'] : array();
 
@@ -189,30 +188,6 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
         $points_index['items_unlocked'] = $items_unlocked;
         $points_index['items_unlocked_points'] = $item_points;
         $total_battle_points += $points_index['items_unlocked_points'];
-    }
-
-    // -- FIELD POINTS -- //
-
-    // Loop through and grant the user battle points for each field unlocked
-    if (true){
-        global $this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three;
-        if (empty($this_omega_factors_one)){ require(MMRPG_CONFIG_ROOTDIR.'prototype/omega.php'); }
-        $field_points = 0;
-        $fields_unlocked = array();
-        foreach ($user_battle_fields As $field_key => $field_token){
-            if (!isset($mmrpg_fields[$field_token])){ continue; }
-            elseif (in_array($field_token, $fields_unlocked)){ continue; }
-            elseif (!$mmrpg_fields[$field_token]['field_flag_complete']){ continue; }
-            elseif ($mmrpg_fields[$field_token]['field_flag_hidden']){ continue; }
-            $fields_unlocked[] = $field_token;
-        }
-        if (in_array('dr-light', $doctors_unlocked)){ foreach ($this_omega_factors_one AS $omega){ $fields_unlocked[] = $omega['field']; } }
-        if (in_array('dr-wily', $doctors_unlocked)){ foreach ($this_omega_factors_two AS $omega){ $fields_unlocked[] = $omega['field']; } }
-        if (in_array('dr-cossack', $doctors_unlocked)){ foreach ($this_omega_factors_three AS $omega){ $fields_unlocked[] = $omega['field']; } }
-        $fields_unlocked = array_unique($fields_unlocked);
-        $points_index['fields_unlocked'] = $fields_unlocked;
-        $points_index['fields_unlocked_points'] = count($fields_unlocked) * 15000;
-        $total_battle_points += $points_index['fields_unlocked_points'];
     }
 
 
@@ -881,13 +856,16 @@ function mmrpg_prototype_unlocked_field_tokens(){
     $unlocked_field_tokens = array();
 
     // Add the base fields given throughout the campaign
-    global $this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three;
+    global $this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three, $this_omega_factors_four;
     if (empty($this_omega_factors_one)){ require(MMRPG_CONFIG_ROOTDIR.'prototype/omega.php'); }
-    $base_omega_fields = array_merge($this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three);
-    foreach ($base_omega_fields AS $key => $omega){ $unlocked_field_tokens[] = $omega['field']; }
-
-    // Add any fields that have been manually unlocked to the list
-    if (!empty($_SESSION[$session_token]['values']['battle_fields'])){ $unlocked_field_tokens = array_merge($unlocked_field_tokens, $_SESSION[$session_token]['values']['battle_fields']); }
+    $base_omega_fields = array_merge($this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three, $this_omega_factors_four);
+    $session_robot_database = !empty($_SESSION[$session_token]['values']['robot_database']) ? $_SESSION[$session_token]['values']['robot_database'] : array();
+    foreach ($base_omega_fields AS $key => $omega){
+        if (isset($session_robot_database[$omega['robot']])
+            && !empty($session_robot_database[$omega['robot']]['robot_unlocked'])){
+            $unlocked_field_tokens[] = $omega['field'];
+        }
+    }
 
     // Remove any duplicates that made their way through
     $unlocked_field_tokens = array_unique($unlocked_field_tokens);
