@@ -198,9 +198,12 @@ function generate_prototype_postgame_message($player_token){
         $temp_console_markup .= 'As a thank you for playing, <strong>three new bonus chapters</strong> have been unlocked! ';
     $temp_console_markup .= '</p>';
     $temp_console_markup .= '<div style="padding: 10px; margin: 5px auto; border-top: 1px solid #212121; border-bottom: 1px solid #090909;">';
-        $temp_console_markup .= '<p>The <strong class="ability_type ability_type_defense">Star Fields</strong> chapter locates and displays any Field Star or Fusion Star missions that you\'ve yet to complete.  Collecting stars helps your robots grow stronger!</p>';
-        $temp_console_markup .= '<p>The <strong class="ability_type ability_type_attack">Player Battles</strong> chapter contains missions against the ghost-data of other users from the leaderboard.  These missions are great for grinding lots of zenny!</p>';
-        $temp_console_markup .= '<p>The <strong class="ability_type ability_type_speed">Mission Randomizer</strong> chapter offers exactly what you\'d expect given the name.  These missions are perfect for trying out new strategies or grinding for cores!</p>';
+        $temp_console_markup .= '<p>The <strong class="ability_type ability_type_speed">Mission Randomizer</strong> chapter offers exactly what you\'d expect given the name. These missions are perfect for trying out new strategies or grinding for cores!</p>';
+        if (mmrpg_prototype_item_unlocked('cossack-program')){
+            $temp_console_markup .= '<p>The <strong class="ability_type ability_type_defense">Star Fields</strong> chapter locates and displays any Field Star or Fusion Star missions that you\'ve yet to complete.  Collecting stars helps your robots grow stronger!</p>';
+        }
+        $temp_console_markup .= '<p>The <strong class="ability_type ability_type_attack">Player Battles</strong> chapter contains missions against the ghost-data of other users from the leaderboard. These missions are great for grinding lots of zenny!</p>';
+        $temp_console_markup .= '<p>The <strong class="ability_type ability_type_energy">Challenge Mode</strong> chapter offers a collection of unique challenges designed by the MMRPG staff. These missions are hard but tend to have great rewards!</p>';
     $temp_console_markup .= '</div>';
     $temp_console_markup .= '<p>';
         $temp_console_markup .= 'We hope you enjoyed the <strong class="ability_type ability_type_shield">Mega Man RPG Prototype</strong> and we encourage you to join our ever-growing ';
@@ -283,7 +286,7 @@ if ($battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 
     // Display the prototype complete message, showing the doctor and their unlocked robots
     $temp_event_flag = 'dr-light-event-99_prototype-complete-new';
-    if (empty($temp_game_flags['events'][$temp_event_flag])){
+    if (true || empty($temp_game_flags['events'][$temp_event_flag])){
         $temp_game_flags['events'][$temp_event_flag] = true;
 
         // Generate the prototype complete message and append it
@@ -292,7 +295,7 @@ if ($battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 
         // Display the prototype postgame message, showing the doctor and hero + support bots
         $temp_event_flag = 'dr-light-event-99_prototype-postgame-new';
-        if (empty($temp_game_flags['events'][$temp_event_flag])){
+        if (true || empty($temp_game_flags['events'][$temp_event_flag])){
             $temp_game_flags['events'][$temp_event_flag] = true;
 
             // Generate the prototype complete message and append it
