@@ -124,7 +124,7 @@ else {
             $chapters_unlocked['5'] = true;
 
             // Stars
-            $chapters_unlocked['7'] = true;
+            $chapters_unlocked['7'] = mmrpg_prototype_item_unlocked('cossack-program') ? true : false;
 
             // Players
             $chapters_unlocked['6'] = true;
