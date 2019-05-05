@@ -29,35 +29,13 @@ $unlocked_factor_three_robots = false;
 $unlocked_factor_four_robots = false;
 $temp_omega_factor_options = array();
 $temp_omega_factor_options_unlocked = array();
-if (mmrpg_prototype_player_unlocked('dr-light')){
-    $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_one);
-    $unlocked_factor_one_robots = true;
-}
-if (mmrpg_prototype_player_unlocked('dr-wily')){
-    $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_two);
-    $unlocked_factor_two_robots = true;
-}
-if (mmrpg_prototype_player_unlocked('dr-cossack')){
-    $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_three);
-    $unlocked_factor_three_robots = true;
-}
+$temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_one); $unlocked_factor_one_robots = true;
+$temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_two); $unlocked_factor_two_robots = true;
+$temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_three); $unlocked_factor_three_robots = true;
+$temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_four); $unlocked_factor_four_robots = true;
 
 // Collect any fields unlocked via other means
-$temp_unlocked_fields = !empty($_SESSION[$session_token]['values']['battle_fields']) ? $_SESSION[$session_token]['values']['battle_fields'] : array();
-
-// Loop through unlockable system fields with no type
-foreach ($this_omega_factors_system AS $key => $factor){
-    if (in_array($factor['field'], $temp_unlocked_fields)){
-        $temp_omega_factor_options[] = $factor;
-    }
-}
-// Loop through the unlockable MM3 fields (from omega factor four)
-foreach ($this_omega_factors_four AS $key => $factor){
-    if (in_array($factor['field'], $temp_unlocked_fields)){
-        $temp_omega_factor_options[] = $factor;
-        $unlocked_factor_four_robots = true;
-    }
-}
+$temp_unlocked_fields = mmrpg_prototype_unlocked_field_tokens();
 
 // Loop through the collected options and pull just the robot tokens
 foreach ($temp_omega_factor_options AS $key => $factor){
