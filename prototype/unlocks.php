@@ -194,9 +194,9 @@ function generate_prototype_postgame_message($player_token){
     // Generate the markup for bonus chapters unlocks
     $temp_bonus_chapter_markup = array();
     $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_speed">Mission Randomizer</strong> chapter offers exactly what you\'d expect given the name. These missions are perfect for trying out new strategies or grinding for cores!</p>';
-    $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_attack">Player Battles</strong> chapter contains missions against the ghost-data of other users from the leaderboard. These missions are great for grinding lots of zenny!</p>';
+    if (mmrpg_prototype_item_unlocked('light-program')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_attack">Player Battles</strong> chapter contains missions against the ghost-data of other users from the leaderboard. These missions are great for grinding lots of zenny!</p>'; }
     if (mmrpg_prototype_item_unlocked('cossack-program')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_defense">Star Fields</strong> chapter locates and displays any Field Star or Fusion Star missions that you\'ve yet to complete.  Collecting stars helps your robots grow stronger!</p>'; }
-    if (mmrpg_prototype_complete() >= 3){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_energy">Challenge Mode</strong> chapter offers a collection of unique challenges designed by the MMRPG staff. These missions are hard but tend to have great rewards!</p>'; }
+    if (mmrpg_prototype_item_unlocked('wily-program')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_energy">Challenge Mode</strong> chapter offers a collection of unique challenges designed by the MMRPG staff. These missions are hard but tend to have great rewards!</p>'; }
 
     // Generate the canvas markup with the player standing with and their team of robots
     $temp_console_markup = '';
