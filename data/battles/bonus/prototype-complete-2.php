@@ -26,7 +26,7 @@ $battle = array(
     ),
   'battle_rewards' => array(
     'abilities' => array(
-      array('token' => 'field-support')
+
       )
     )
   );
