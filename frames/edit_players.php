@@ -26,13 +26,29 @@ $global_frame_source = !empty($_GET['source']) ? trim($_GET['source']) : 'protot
 // Include the prototype data for getting omega factors
 //require_once(MMRPG_CONFIG_ROOTDIR.'prototype/include.php');
 require_once(MMRPG_CONFIG_ROOTDIR.'prototype/omega.php');
+
+// Add all unlockable fields in the game so far (we'll filter later)
 $temp_omega_factor_options = array();
-if (mmrpg_prototype_player_unlocked('dr-light')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_one); }
-if (mmrpg_prototype_player_unlocked('dr-wily')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_two); }
-if (mmrpg_prototype_player_unlocked('dr-cossack')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_three); }
-$temp_unlocked_fields = !empty($_SESSION[$session_token]['values']['battle_fields']) ? $_SESSION[$session_token]['values']['battle_fields'] : array();
-// Loop through the unlockable MM3 fields (from omega factor four)
-foreach ($this_omega_factors_four AS $key => $factor){ if (in_array($factor['field'], $temp_unlocked_fields)){ $temp_omega_factor_options[] = $factor; } }
+$temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_one);
+$temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_two);
+$temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_three);
+$temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_four);
+
+// Loop through and remove any fields who's robots haven't been encountered yet
+$session_robot_database = !empty($_SESSION[$session_token]['values']['robot_database']) ? $_SESSION[$session_token]['values']['robot_database'] : array();
+foreach($temp_omega_factor_options AS $key => $option){
+    $rtoken = $option['robot'];
+    if (!isset($session_robot_database[$rtoken])
+        || empty($session_robot_database[$rtoken]['robot_unlocked'])){
+        unset($temp_omega_factor_options[$key]);
+    }
+}
+
+/*
+echo('<pre>$session_robot_database = '.print_r($session_robot_database, true).'</pre>');
+echo('<pre>$temp_omega_factor_options = '.print_r($temp_omega_factor_options, true).'</pre>');
+exit();
+*/
 
 /*
 // Collect all the unlocked players for all players
@@ -337,19 +353,6 @@ if (true){
     foreach($allowed_edit_data AS $player_token => $player_info){
         $temp_player_totals[$player_token] = !empty($player_info['player_players']) ? count($player_info['player_players']) : 0;
     }
-
-    /*
-    // Include the prototype data for getting omega factors
-    //require_once('../prototype/include.php');
-    require_once('../prototype/omega.php');
-    $temp_omega_factor_options = array();
-    if (mmrpg_prototype_complete('dr-light')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_one); }
-    if (mmrpg_prototype_complete('dr-wily')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_two); }
-    if (mmrpg_prototype_complete('dr-cossack')){ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_three); }
-    $temp_unlocked_fields = !empty($_SESSION[$session_token]['values']['battle_fields']) ? $_SESSION[$session_token]['values']['battle_fields'] : array();
-    // Loop through the unlockable MM3 fields (from omega factor four)
-    foreach ($this_omega_factors_four AS $key => $factor){ if (in_array($factor['field'], $temp_unlocked_fields)){ $temp_omega_factor_options[] = $factor; } }
-*/
 
     // Loop through the players in the field edit data
     foreach($allowed_edit_data AS $player_token => $player_info){
