@@ -277,50 +277,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
         }
 
     }
-    // Check if this is an FIELD based action
-    elseif ($temp_kind == 'field'){
-
-        // Collect the actual field token from the provided one
-        $temp_actual_token = preg_replace('/^field-/i', '', $temp_token);
-
-        // Ensure this field exists before continuing
-        if (isset($mmrpg_database_fields[$temp_actual_token])){
-
-            // Remove this field's entry from the global array and define the new quantity
-            $temp_unlocked_fields = !empty($_SESSION[$session_token]['values']['battle_fields']) ? $_SESSION[$session_token]['values']['battle_fields'] : array();
-            $temp_unlocked_fields[] = $temp_actual_token;
-            $temp_unlocked_fields = array_unique($temp_unlocked_fields);
-            $_SESSION[$session_token]['values']['battle_fields'] = $temp_unlocked_fields;
-            $temp_current_quantity = 1;
-
-            // Decrement the player's zenny count based on the provided price
-            $_SESSION[$session_token]['counters']['battle_zenny'] = $global_zenny_counter - $temp_price;
-            $global_zenny_counter = $_SESSION[$session_token]['counters']['battle_zenny'];
-
-            // Update the shop history with this sold item under the given character
-            if (!isset($_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['fields_sold'][$temp_token])){ $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['fields_sold'][$temp_token] = 0; }
-            $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['fields_sold'][$temp_token] += 1;
-            $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['zenny_earned'] += $temp_price;
-            $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_experience'] += $temp_price;
-
-            // Refresh battle points and ranking so we can return updated score
-            mmrpg_prototype_refresh_battle_points();
-            $new_battle_points = $_SESSION[$session_token]['counters']['battle_points'];
-            $new_board_rank = $_SESSION[$session_token]['BOARD']['boardrank'];
-
-            // Save, produce the success message with the new field order
-            exit('success|field-purchased|'.$temp_current_quantity.'|'.$global_zenny_counter.'|points:'.$new_battle_points.'|rank:'.mmrpg_number_suffix($new_board_rank));
-
-        }
-        // Otherwise if this star does not exist
-        else {
-
-            // Print an error message and kill the script
-            exit('error|invalid-field|'.$temp_actual_token);
-
-        }
-
-    }
     // Check if this is an ROBOT based action
     elseif ($temp_kind == 'robot'){
 

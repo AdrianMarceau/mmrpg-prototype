@@ -880,16 +880,6 @@ if (!empty($this_shop_index['kalinka'])){
 
         }
 
-        // Add field data to Kalinka's Shop
-        $this_shop_index['kalinka']['shop_kind_selling'][] = 'fields';
-        $this_shop_index['kalinka']['shop_quote_selling']['fields'] = 'I\'ve discovered that we can generate new stars using the data of legacy battle fields. Interested?';
-        $this_shop_index['kalinka']['shop_fields']['fields_selling'] = array(
-            'construction-site' => MMRPG_SETTINGS_SHOP_FIELD_PRICE, 'magnetic-generator' => MMRPG_SETTINGS_SHOP_FIELD_PRICE,
-            'reflection-chamber' => MMRPG_SETTINGS_SHOP_FIELD_PRICE, 'rocky-plateau' => MMRPG_SETTINGS_SHOP_FIELD_PRICE,
-            'spinning-greenhouse' => MMRPG_SETTINGS_SHOP_FIELD_PRICE, 'serpent-column' => MMRPG_SETTINGS_SHOP_FIELD_PRICE,
-            'power-plant' => MMRPG_SETTINGS_SHOP_FIELD_PRICE, 'septic-system' => MMRPG_SETTINGS_SHOP_FIELD_PRICE
-            );
-
     }
 
     // If the player has unlocked the Cossack Program, Kalinka's kiosk also has a Show Stars tab
@@ -914,14 +904,6 @@ if (!empty($this_shop_index['kalinka'])){
             foreach ($this_shop_index['kalinka']['shop_items']['items_selling'] AS $field_kind => $field_price){
                 $field_price -= round(($field_price / 2) * $level_discount);
                 $this_shop_index['kalinka']['shop_items']['items_selling'][$field_kind] = $field_price;
-            }
-        }
-
-        // If her shop is selling fields, discount their prices
-        if (!empty($this_shop_index['kalinka']['shop_fields']['fields_selling'])){
-            foreach ($this_shop_index['kalinka']['shop_fields']['fields_selling'] AS $field_kind => $field_price){
-                $field_price -= round(($field_price / 2) * $level_discount);
-                $this_shop_index['kalinka']['shop_fields']['fields_selling'][$field_kind] = $field_price;
             }
         }
 
