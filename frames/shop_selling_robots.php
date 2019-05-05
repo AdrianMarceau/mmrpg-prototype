@@ -59,19 +59,33 @@ $mmrpg_index_robots = rpg_robot::get_index(true, false);
                     $robot_info_type_name = !empty($robot_info['robot_core']) ? ucfirst($robot_info['robot_core']) : 'Neutral';
                     if (!empty($robot_info['robot_core2'])){ $robot_info_type .= '_'.$robot_info['robot_core2']; }
                     $robot_info_unlocked = mmrpg_prototype_robot_unlocked('', $robot_info_token);
-                    $robot_info_hidden = empty($_SESSION['GAME']['values']['robot_database'][$robot_info_token]['robot_scanned']) ? true : false;
+
                     $robot_info_exclusive = !empty($robot_info['robot_flag_exclusive']) ? true : false;
-                    if ($robot_info_exclusive){
+                    $robot_was_scanned = !empty($_SESSION['GAME']['values']['robot_database'][$robot_info_token]['robot_scanned']) ? true : false;
+                    $robot_was_defeated = !empty($_SESSION['GAME']['values']['robot_database'][$robot_info_token]['robot_defeated']) ? true : false;
+
+                    $robot_info_hidden = !$robot_info_unlocked && !$robot_was_scanned && !$robot_was_defeated ? true : false;
+                    $robot_info_known = $robot_info_unlocked || $robot_was_scanned || $robot_was_defeated ? true : false;
+
+                    if (!$robot_info_unlocked
+                        && $robot_info_exclusive){
                         $global_item_quantities['robot-'.$robot_info_token] = 1;
                         $global_item_prices['buy']['robot-'.$robot_info_token] = 0;
                         $temp_info_tooltip = 'I\'m sorry but this robot is going to take me a little longer to build than usual.  If you encounter it in battle before I finish, can you try unlocking it the old-fashioned way?';
-                        if ($robot_info_hidden){$robot_info_name = preg_replace('/[a-z]{1}/i', '?', $robot_info_name); }
+                        if (!$robot_info_known){ $robot_info_name = preg_replace('/[a-z]{1}/i', '?', $robot_info_name); }
                         //else { $robot_info_name = preg_replace('/[a-z]{1}/i', '-', $robot_info_name); }
-                    } elseif ($robot_info_hidden){
+                    } elseif (!$robot_info_unlocked
+                        && (!$robot_was_scanned || !$robot_was_defeated)){
                         $global_item_quantities['robot-'.$robot_info_token] = 1;
                         $global_item_prices['buy']['robot-'.$robot_info_token] = 0;
-                        $temp_info_tooltip = 'My apologies, but I haven\'t finished this one yet. If you encounter any new '.$robot_info_type_name.' Core robots in battle, would you mind scanning their data for me?';
-                        $robot_info_name = preg_replace('/[a-z]{1}/i', '?', $robot_info_name);
+                        if ($robot_info_known){
+                            if (!$robot_was_scanned){ $temp_info_tooltip = 'My apologies, but I haven\'t finished this one yet. If you encounter '.$robot_info_name.' in battle again, would you mind scanning '.($robot_info['robot_gender'] == 'male' ? 'his' : ($robot_info['robot_gender'] == 'female' ? 'her' : 'their')).' data for me before you leave the mission?'; }
+                            elseif (!$robot_was_defeated){ $temp_info_tooltip = 'My apologies, but I haven\'t finished this one yet. If you encounter '.$robot_info_name.' in battle again, would you mind defeating '.($robot_info['robot_gender'] == 'male' ? 'him' : ($robot_info['robot_gender'] == 'female' ? 'her' : 'them')).' for me before you leave the mission?'; }
+                        } else {
+                            $temp_info_tooltip = 'My apologies, but I haven\'t finished this one yet. If you encounter any new '.$robot_info_type_name.' Core robots in battle, would you mind scanning their data and then defeating them for me before you leave the mission?';
+                            $robot_info_name = preg_replace('/[a-z]{1}/i', '?', $robot_info_name);
+                        }
+
                     } else {
                         $global_item_quantities['robot-'.$robot_info_token] = $robot_info_unlocked ? 1 : 0;
                         $global_item_prices['buy']['robot-'.$robot_info_token] = $robot_info_unlocked ? 0 : $robot_info_price;
@@ -96,7 +110,8 @@ $mmrpg_index_robots = rpg_robot::get_index(true, false);
                     $robot_counter++;
                     $robot_cell_float = $robot_counter % 2 == 0 ? 'right' : 'left';
 
-                    $robot_block_purchase = $robot_info_exclusive || $robot_info_hidden ? true : false;
+                    // See if we should block the purchase for any reason
+                    $robot_block_purchase = !$robot_info_unlocked && ($robot_info_exclusive || !$robot_was_scanned || !$robot_was_defeated) ? true : false;
 
                     ?>
                         <td class="<?= $robot_cell_float ?> item_cell" data-kind="robot" data-action="buy" data-token="<?= 'robot-'.$robot_info_token ?>">

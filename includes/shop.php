@@ -781,7 +781,7 @@ if (!empty($this_shop_index['kalinka'])){
             AND robot_flag_unlockable = 1
             AND robot_number NOT LIKE 'RPG-%'
             AND robot_number NOT LIKE 'PCR-%'
-            AND robot_game NOT IN ('MM00', 'MM01', 'MM02', 'MM04')
+            AND robot_game NOT IN ('MM00')
             ORDER BY
             robot_order ASC
             ;", 'robot_token');
