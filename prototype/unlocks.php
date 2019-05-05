@@ -635,18 +635,18 @@ if (!mmrpg_prototype_item_unlocked('auto-link')
         'show_images' => array('player', 'shop')
         ));
 
-    // Unlock the ITEM CODES immediately after the Auto Link has been unlocked
-    if (!mmrpg_prototype_item_unlocked('item-codes')){
+}
+// Unlock the ITEM CODES immediately after the Auto Link has been unlocked
+if (mmrpg_prototype_item_unlocked('auto-link')
+    && !mmrpg_prototype_item_unlocked('item-codes')){
 
-        // Unlock the Item Codes and generate the required event details
-        mmrpg_game_unlock_item('item-codes', array(
-            'event_text' => '{shop} already made a discovery! The {item} have been unlocked!',
-            'player_token' => 'dr-light',
-            'shop_token' => 'auto',
-            'show_images' => array('shop')
-            ));
-
-    }
+    // Unlock the Item Codes and generate the required event details
+    mmrpg_game_unlock_item('item-codes', array(
+        'event_text' => '{shop} already made a discovery! The {item} have been unlocked!',
+        'player_token' => 'dr-light',
+        'shop_token' => 'auto',
+        'show_images' => array('shop')
+        ));
 
 }
 
@@ -706,18 +706,18 @@ if (!mmrpg_prototype_item_unlocked('reggae-link')
         'show_images' => array('player', 'shop')
         ));
 
-    // Unlock the ABILITY CODES immediately after the Reggae Link has been unlocked
-    if (!mmrpg_prototype_item_unlocked('ability-codes')){
+}
+// Unlock the ABILITY CODES immediately after the Reggae Link has been unlocked
+if (mmrpg_prototype_item_unlocked('reggae-link')
+    && !mmrpg_prototype_item_unlocked('ability-codes')){
 
-        // Unlock the Ability Codes and generate the required event details
-        mmrpg_game_unlock_item('ability-codes', array(
-            'event_text' => '{shop} already made a discovery! The {item} have been unlocked!',
-            'player_token' => 'dr-wily',
-            'shop_token' => 'reggae',
-            'show_images' => array('shop')
-            ));
-
-    }
+    // Unlock the Ability Codes and generate the required event details
+    mmrpg_game_unlock_item('ability-codes', array(
+        'event_text' => '{shop} already made a discovery! The {item} have been unlocked!',
+        'player_token' => 'dr-wily',
+        'shop_token' => 'reggae',
+        'show_images' => array('shop')
+        ));
 
 }
 
@@ -777,18 +777,18 @@ if (!mmrpg_prototype_item_unlocked('kalinka-link')
         'show_images' => array('player', 'shop')
         ));
 
-    // Unlock the LEGACY CODES immediately after the Kalinka Link has been unlocked
-    if (!mmrpg_prototype_item_unlocked('legacy-codes')){
+}
+// Unlock the MASTER CODES immediately after the Kalinka Link has been unlocked
+if (mmrpg_prototype_item_unlocked('kalinka-link')
+    && !mmrpg_prototype_item_unlocked('master-codes')){
 
-        // Unlock the Equip Codes and generate the required event details
-        mmrpg_game_unlock_item('legacy-codes', array(
-            'event_text' => '{shop} already made a discovery! The {item} have been unlocked!',
-            'player_token' => 'dr-cossack',
-            'shop_token' => 'kalinka',
-            'show_images' => array('shop')
-            ));
-
-    }
+    // Unlock the Master Codes and generate the required event details
+    mmrpg_game_unlock_item('master-codes', array(
+        'event_text' => '{shop} already made a discovery! The {item} have been unlocked!',
+        'player_token' => 'dr-cossack',
+        'shop_token' => 'kalinka',
+        'show_images' => array('shop')
+        ));
 
 }
 
