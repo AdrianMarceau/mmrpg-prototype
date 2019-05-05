@@ -286,7 +286,7 @@ if ($battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 
     // Display the prototype complete message, showing the doctor and their unlocked robots
     $temp_event_flag = 'dr-light-event-99_prototype-complete-new';
-    if (true || empty($temp_game_flags['events'][$temp_event_flag])){
+    if (empty($temp_game_flags['events'][$temp_event_flag])){
         $temp_game_flags['events'][$temp_event_flag] = true;
 
         // Generate the prototype complete message and append it
@@ -295,7 +295,7 @@ if ($battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 
         // Display the prototype postgame message, showing the doctor and hero + support bots
         $temp_event_flag = 'dr-light-event-99_prototype-postgame-new';
-        if (true || empty($temp_game_flags['events'][$temp_event_flag])){
+        if (empty($temp_game_flags['events'][$temp_event_flag])){
             $temp_game_flags['events'][$temp_event_flag] = true;
 
             // Generate the prototype complete message and append it
