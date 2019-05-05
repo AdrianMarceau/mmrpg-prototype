@@ -200,7 +200,7 @@ function generate_prototype_postgame_message($player_token){
     $temp_console_markup .= '<div style="padding: 10px; margin: 5px auto; border-top: 1px solid #212121; border-bottom: 1px solid #090909;">';
         $temp_console_markup .= '<p>The <strong class="ability_type ability_type_defense">Star Fields</strong> chapter locates and displays any Field Star or Fusion Star missions that you\'ve yet to complete.  Collecting stars helps your robots grow stronger!</p>';
         $temp_console_markup .= '<p>The <strong class="ability_type ability_type_attack">Player Battles</strong> chapter contains missions against the ghost-data of other users from the leaderboard.  These missions are great for grinding lots of zenny!</p>';
-        $temp_console_markup .= '<p>The <strong class="ability_type ability_type_speed">Mission Randomizer</strong> chapter offers exactly what you\'d expect given the name.  These missions are perfect for scanning new robots into your database!</p>';
+        $temp_console_markup .= '<p>The <strong class="ability_type ability_type_speed">Mission Randomizer</strong> chapter offers exactly what you\'d expect given the name.  These missions are perfect for trying out new strategies or grinding for cores!</p>';
     $temp_console_markup .= '</div>';
     $temp_console_markup .= '<p>';
         $temp_console_markup .= 'We hope you enjoyed the <strong class="ability_type ability_type_shield">Mega Man RPG Prototype</strong> and we encourage you to join our ever-growing ';
