@@ -130,13 +130,13 @@ else {
             $chapters_unlocked['5'] = true;
 
             // Players
-            $chapters_unlocked['6'] = true;
+            $chapters_unlocked['6'] = mmrpg_prototype_item_unlocked('light-program') ? true : false;
+
+            // Challenges
+            $chapters_unlocked['8'] = mmrpg_prototype_item_unlocked('wily-program') ? true : false;
 
             // Stars
             $chapters_unlocked['7'] = mmrpg_prototype_item_unlocked('cossack-program') ? true : false;
-
-            // Challenges
-            $chapters_unlocked['8'] = $prototype_complete_count >= 3 ? true : false;
 
         } else {
 
@@ -146,11 +146,11 @@ else {
             // Players
             $chapters_unlocked['6'] = false;
 
-            // Stars
-            $chapters_unlocked['7'] = mmrpg_prototype_item_unlocked('cossack-program') ? true : false;
-
             // Challenges
-            $chapters_unlocked['8'] = $prototype_complete_count >= 3 ? true : false;
+            $chapters_unlocked['8'] = false; //$prototype_complete_count >= 3 ? true : false;
+
+            // Stars
+            $chapters_unlocked['7'] = false; //mmrpg_prototype_item_unlocked('cossack-program') ? true : false;
 
         }
 
