@@ -288,20 +288,41 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
         if (!empty($unlock_robot_info)
             && !empty($unlock_robot_info['robot_flag_unlockable'])){
 
-            // Decide which play this robot will be unlocked for
-            $this_best_stat_value = 0;
-            $this_best_stat_kind = '';
-            $stat_kinds = array('attack', 'defense', 'speed', 'energy');
-            foreach ($stat_kinds AS $kind){
-                if ($unlock_robot_info['robot_'.$kind] > $this_best_stat_value){
-                    $this_best_stat_value = $unlock_robot_info['robot_'.$kind];
-                    $this_best_stat_kind = $kind;
+            // Hard-code this robot's player if from specific games
+            if ($unlock_robot_info['robot_game'] == 'MM01'){
+
+                // All MM01 robot masters go to Dr. Light
+                $unlock_player_token = 'dr-light';
+
+            } elseif ($unlock_robot_info['robot_game'] == 'MM02'){
+
+                // All MM02 robot masters go to Dr. Wily
+                $unlock_player_token = 'dr-wily';
+
+            } elseif ($unlock_robot_info['robot_game'] == 'MM04'){
+
+                // All MM04 robot masters go to Dr. Cossack
+                $unlock_player_token = 'dr-cossack';
+
+            } else {
+
+                // All other robots have their Dr. based on best stat
+                $this_best_stat_value = 0;
+                $this_best_stat_kind = '';
+                $stat_kinds = array('attack', 'defense', 'speed', 'energy');
+                foreach ($stat_kinds AS $kind){
+                    if ($unlock_robot_info['robot_'.$kind] > $this_best_stat_value){
+                        $this_best_stat_value = $unlock_robot_info['robot_'.$kind];
+                        $this_best_stat_kind = $kind;
+                    }
                 }
+                if ($this_best_stat_kind === 'attack'){ $unlock_player_token = 'dr-wily'; }
+                elseif ($this_best_stat_kind === 'defense'){ $unlock_player_token = 'dr-light'; }
+                elseif ($this_best_stat_kind === 'speed'){ $unlock_player_token = 'dr-cossack'; }
+                //elseif ($this_best_stat_kind === 'energy'){ $unlock_player_token = 'dr-lalinde'; }
+                else { $unlock_player_token = 'dr-light'; } // default
+
             }
-            if ($this_best_stat_kind === 'attack'){ $unlock_player_token = 'dr-wily'; }
-            elseif ($this_best_stat_kind === 'defense'){ $unlock_player_token = 'dr-light'; }
-            elseif ($this_best_stat_kind === 'speed'){ $unlock_player_token = 'dr-cossack'; }
-            elseif ($this_best_stat_kind === 'energy'){ $unlock_player_token = 'dr-light'; } // dr-lalinde?
 
             // Manually unlock this robot using the predefined global function
             $temp_current_quantity = 1;
