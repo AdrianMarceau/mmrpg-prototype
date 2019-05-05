@@ -772,11 +772,11 @@ if (!mmrpg_prototype_item_unlocked('kalinka-link')
         'show_images' => array('player', 'shop')
         ));
 
-    // Unlock the DRESS CODES immediately after the Kalinka Link has been unlocked
-    if (!mmrpg_prototype_item_unlocked('dress-codes')){
+    // Unlock the LEGACY CODES immediately after the Kalinka Link has been unlocked
+    if (!mmrpg_prototype_item_unlocked('legacy-codes')){
 
         // Unlock the Equip Codes and generate the required event details
-        mmrpg_game_unlock_item('dress-codes', array(
+        mmrpg_game_unlock_item('legacy-codes', array(
             'event_text' => '{shop} already made a discovery! The {item} have been unlocked!',
             'player_token' => 'dr-cossack',
             'shop_token' => 'kalinka',
@@ -804,17 +804,17 @@ if (!mmrpg_prototype_item_unlocked('cossack-program')
 
 }
 
-// Unlock the LEGACY CODES after Dr. Cossack has completed at least half of Chapter Four
+// Unlock the DRESS CODES after Dr. Cossack has completed at least half of Chapter Four
 $required_missions = MMRPG_SETTINGS_CHAPTER1_MISSIONS;
 $required_missions += MMRPG_SETTINGS_CHAPTER2_MISSIONS;
 $required_missions += MMRPG_SETTINGS_CHAPTER3_MISSIONS;
 $required_missions += round(MMRPG_SETTINGS_CHAPTER4_MISSIONS / 2);
-if (!mmrpg_prototype_item_unlocked('legacy-codes')
+if (!mmrpg_prototype_item_unlocked('dress-codes')
     && mmrpg_prototype_battles_complete('dr-cossack') >= $required_missions
     ){
 
     // Unlock the Legacy Codes and generate the required event details
-    mmrpg_game_unlock_item('legacy-codes', array(
+    mmrpg_game_unlock_item('dress-codes', array(
         'event_text' => '{shop} made another discovery! The {item} have been unlocked!',
         'player_token' => 'dr-cossack',
         'shop_token' => 'kalinka',
