@@ -180,6 +180,24 @@ $ability = array(
         // Return true on success
         return true;
 
-    }
+        },
+    'ability_function_onload' => function($objects){
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // If the user is holding a Target Module, allow bench targeting
+        if ($this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
+        else { $this_ability->reset_target(); }
+
+        // If the ability has already been summoned earlier this turn, decrease WE to zero
+        $summoned_flag_token = $this_ability->ability_token.'_summoned';
+        if (!empty($this_robot->flags[$summoned_flag_token])){ $this_ability->set_energy(0); }
+        else { $this_ability->reset_energy(); }
+
+        // Return true on success
+        return true;
+
+        }
     );
 ?>
