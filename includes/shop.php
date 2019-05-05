@@ -766,10 +766,8 @@ if (!empty($this_shop_index['reggae'])){
 // Only continue if the shop has been unlocked
 if (!empty($this_shop_index['kalinka'])){
 
-    // If the player has unlocked the Legacy Codes, Kalinka's Shop also has a Robot Shop and a Field Shop tab
-    if (mmrpg_prototype_item_unlocked('legacy-codes')
-        || mmrpg_prototype_item_unlocked('robot-codes')
-        || mmrpg_prototype_item_unlocked('field-codes')){
+    // If the player has unlocked the Master Codes, Kalinka's Shop also has a Robot Shop and a Field Shop tab
+    if (mmrpg_prototype_item_unlocked('master-codes')){
 
         // Collect a list of robot masters that we're allowed to sell
         $buyable_robots = $db->get_array_list("SELECT
@@ -791,7 +789,7 @@ if (!empty($this_shop_index['kalinka'])){
 
             // Add robot data to Kalinka's Shop
             if (!in_array('robots', $this_shop_index['kalinka']['shop_kind_selling'])){ $this_shop_index['kalinka']['shop_kind_selling'][] = 'robots'; }
-            $this_shop_index['kalinka']['shop_quote_selling']['robots'] = 'Greetings and welcome to Kalinka\'s Shop! I can create new robots from your scan data!';
+            $this_shop_index['kalinka']['shop_quote_selling']['robots'] = 'Greetings and welcome to Kalinka\'s Shop! I can create new robots from your battle data!';
             $this_shop_index['kalinka']['shop_robots']['robots_selling'] = array();
             $buyable_robots = array_keys($buyable_robots);
             foreach ($buyable_robots AS $token){
