@@ -6,7 +6,7 @@ $ability = array(
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Weapons/Copy',
     'ability_type' => 'copy',
-    'ability_description' => 'The user summons a large emulation device that hovers behind the target and drains their elemental energy to deal damage! This ability will generate a new core if the user isn\'t already holding an item, otherwise the overflowing energy may transform an existing core instead!',
+    'ability_description' => 'The user summons a large emulation device behind the target that drains their elemental energy and deals damage!  If the user isn\'t already holding an item, this ability can generate a new core and surround the user in an elemental shield!',
     'ability_energy' => 8,
     'ability_speed' => 10,
     'ability_damage' => 18,
@@ -53,9 +53,10 @@ $ability = array(
             ));
         $target_robot->trigger_damage($this_robot, $this_ability, $this_ability->ability_damage, false);
 
-        // Check to ensure the ability was a success before continuing
+        // Check to ensure the ability was a success before continuing AND the user isn't holding incompatible item
         $copy_soul_success = false;
-        if ($this_ability->ability_results['this_result'] != 'failure'){
+        if ($this_ability->ability_results['this_result'] != 'failure'
+            && (empty($this_robot->robot_item) || preg_match('/-core$/i', $this_robot->robot_item))){
 
             // Ensure the target robot has a core type to draw from
             if (!empty($target_robot->robot_core)){
@@ -89,6 +90,7 @@ $ability = array(
                     // If this robot isn't holding an item, generate a new core
                     $new_item_generated = false;
                     $existing_item_transformed = false;
+                    $core_shield_refreshed = false;
                     if (empty($this_robot->robot_item)
                         || (preg_match('/-core$/i', $this_robot->robot_item)
                             && $this_robot->robot_item != $new_core_type.'-core')){
@@ -98,17 +100,16 @@ $ability = array(
                         else { $existing_item_transformed = true; }
                         $this_robot->set_item($new_core_type.'-core');
 
-                    }
-                    // Otherwise we need to change the core type directly
-                    else {
+                    } else {
 
-                        // Update the core type for this robot
-                        $this_robot->set_core($new_core_type);
+                        // We'll simply refresh the core shield
+                        $core_shield_refreshed = true;
 
                     }
 
                     // Only change the image for this robot IF NATIVE COPY CORE
-                    if ($this_robot_index['robot_core'] == 'copy'){
+                    if ($this_robot_index['robot_core'] == 'copy'
+                        && ($new_item_generated || $existing_item_transformed)){
 
                         // Change the robot's image to one matching the core
                         $new_robot_image = $this_robot_index['robot_image'].'_'.$new_core_type;
@@ -133,7 +134,8 @@ $ability = array(
 
                     // If the user created a new core or shifted an existing one, apply the auto core shield
                     if ($new_item_generated
-                        || $existing_item_transformed){
+                        || $existing_item_transformed
+                        || $core_shield_refreshed){
                         $existing_shields = !empty($this_robot->robot_attachments) ? substr_count(implode('|', array_keys($this_robot->robot_attachments)), 'ability_core-shield_') : 0;
                         $shield_info = rpg_ability::get_static_core_shield($new_core_type, 3, $existing_shields);
                         $shield_token = $shield_info['attachment_token'];
@@ -150,7 +152,7 @@ $ability = array(
                     $event_body = $this_ability->print_name().' downloads the target\'s elemental core&hellip;<br />';
                     if ($new_item_generated){ $event_body .= $this_robot->print_name().' generated a new '.$this_new_item->print_name().'!'; }
                     elseif ($existing_item_transformed){ $event_body .= $this_robot->print_name().'\'s held core turned into a <span class="item_name item_type item_type_'.$new_core_type.'">'.ucfirst($new_core_type).'</span> type!'; }
-                    else { $event_body .= $this_robot->print_name().'\'s internal core shifted into the <span class="item_name item_type item_type_'.$new_core_type.'">'.ucfirst($new_core_type).'</span> type!'; }
+                    elseif ($core_shield_refreshed){ $event_body .= $this_robot->print_name().'\'s protection from <span class="item_name item_type item_type_'.$new_core_type.'">'.ucfirst($new_core_type).'</span> type damage was extended!'; }
                     $event_options = array();
                     $event_options['console_show_target'] = false;
                     $event_options['this_item'] = $this_new_item;
@@ -168,7 +170,8 @@ $ability = array(
                     // If a core was generated or modified, we need to add update the user's item in the session
                     if (($new_item_generated || $existing_item_transformed)
                         && $this_player->player_side == 'left'
-                        && empty($this_battle->flags['player_battle'])){
+                        && empty($this_battle->flags['player_battle'])
+                        && empty($this_battle->flags['challenge_battle'])){
                         $ptoken = $this_player->player_token;
                         $rtoken = $this_robot->robot_token;
                         $itoken = $new_core_type.'-core';
@@ -201,19 +204,6 @@ $ability = array(
             && empty($target_robot->flags['apply_disabled_state'])){
             $target_robot->trigger_disabled($this_robot);
         }
-
-        // Return true on success
-        return true;
-
-        },
-    'ability_function_onload' => function($objects){
-
-        // Extract all objects into the current scope
-        extract($objects);
-
-        // If the user is holding a Target Module, allow bench targeting
-        if ($this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
-        else { $this_ability->reset_target(); }
 
         // Return true on success
         return true;

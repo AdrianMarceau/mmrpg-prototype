@@ -49,4 +49,14 @@ if (!empty($temp_flags['drwily_password_abilitygetnowivegotyourpower'])){
     }
 }
 
+// If the UNLOCK COPY SOUL password was created
+if (!empty($temp_flags['drlight_password_abilitygetwithallmyheartandsoul'])){
+    if (!mmrpg_prototype_ability_unlocked('dr-wily', false, 'copy-soul')){
+        // Unlock Copy Shot as an equippable ability
+        mmrpg_game_unlock_ability($mmrpg_index['players']['dr-wily'], false, array('ability_token' => 'copy-soul'), true);
+        header('Location: prototype.php');
+        exit();
+    }
+}
+
 ?>
