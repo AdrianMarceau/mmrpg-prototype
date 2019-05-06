@@ -1331,6 +1331,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                     }
             }
 
+            //$this_option_title .= '<br /> battle_rewards: '.(!empty($this_battleinfo['battle_rewards']) ? json_encode($this_battleinfo['battle_rewards']) : '---');
             //$this_option_title .= '<br /> player_starforce: '.(!empty($this_battleinfo['battle_target_player']['player_starforce']) ? json_encode($this_battleinfo['battle_target_player']['player_starforce']) : '---');
 
             $this_option_title_plain = strip_tags(str_replace('<br />', '&#10;', $this_option_title));
@@ -1358,7 +1359,20 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
 
             // Check if this is a starfield mission or not
             $is_starfield_mission = !empty($this_battleinfo['flags']['starfield_mission']) ? true : false;
-            if ($is_starfield_mission){ $this_option_class .= ' starfield'; }
+            if ($is_starfield_mission){
+                $this_option_class .= ' starfield';
+                if (!empty($this_battleinfo['battle_complete_redirect_token'])){
+                    $this_option_class .= ' starshake';
+                    $this_option_class .= ' dx';
+                } elseif (!empty($this_battleinfo['battle_rewards']['robots'])){
+                    static $shake_delay;
+                    if (empty($shake_delay)){ $shake_delay = 0; }
+                    elseif ($shake_delay >= 3){ $shake_delay = 0; }
+                    $shake_delay++;
+                    $this_option_class .= ' starshake';
+                    $this_option_class .= ' d'.$shake_delay;
+                }
+            }
 
             // Print out the option button markup with sprite and name
             $this_markup .= '<a '.
