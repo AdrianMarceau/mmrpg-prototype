@@ -465,10 +465,6 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 //$this_prototype_data['battle_options'][] = $temp_battle_sigma;
             }
 
-            // TEST TEST TEST
-            // TEST TEST TEST
-
-
             // If we're over the limit, break now
             $added_star_fields++;
             if ($added_star_fields >= $star_fields_to_show){ break; }
