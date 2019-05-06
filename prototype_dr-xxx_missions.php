@@ -416,10 +416,10 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $info2 = $star_info['info2'];
 
             // Generate either a double or single battle based on field factors
-            if (!empty($info) && !empty($info2)){
-                $temp_battle_omega = rpg_mission_double::generate($this_prototype_data, array($info['robot'], $info2['robot']), array($info['field'], $info2['field']), $star_level, false, false, true);
+            if (!empty($info) && !empty($info2) && $info['field'] != $info2['field']){
+                $temp_battle_omega = rpg_mission_double::generate($this_prototype_data, array($info['robot'], $info2['robot']), array($info['field'], $info2['field']), $star_level, true, false, true);
             } elseif (!empty($info)){
-                $temp_battle_omega = rpg_mission_single::generate($this_prototype_data, $info['robot'], $info['field'], $star_level, false, false, true);
+                $temp_battle_omega = rpg_mission_single::generate($this_prototype_data, $info['robot'], $info['field'], $star_level, true, false, true);
             }
 
             // Update the chapter number and then save this data to the temp index

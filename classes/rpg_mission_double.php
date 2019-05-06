@@ -388,9 +388,17 @@ class rpg_mission_double extends rpg_mission {
         // Empty the robot rewards array if not allowed
         $temp_battle_omega['battle_rewards']['robots'] = array();
         if ($this_unlock_robots){
-            if (!mmrpg_game_robot_unlocked('', $temp_option_robot['robot_token'])){ $temp_battle_omega['battle_rewards']['robots'][] = array('token' => $temp_option_robot['robot_token'], 'level' => $omega_robot_level, 'experience' => 999); }
-            if (!mmrpg_game_robot_unlocked('', $temp_option_robot2['robot_token'])){ $temp_battle_omega['battle_rewards']['robots'][] = array('token' => $temp_option_robot2['robot_token'], 'level' => $omega_robot_level, 'experience' => 999); }
+            foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $robot_info){
+                $index_info = rpg_robot::parse_index_info($this_robot_index[$robot_info['robot_token']]);
+                if ($index_info['robot_class'] == 'master'
+                    && $index_info['robot_flag_unlockable']
+                    && !$index_info['robot_flag_exclusive']
+                    && !mmrpg_game_robot_unlocked('', $robot_info['robot_token'])){
+                    $temp_battle_omega['battle_rewards']['robots'][] = array('token' => $robot_info['robot_token'], 'level' => $omega_robot_level, 'experience' => 999);
+                }
+            }
         }
+
         // Empty the ability rewards array if not allowed
         $temp_battle_omega['battle_rewards']['abilities'] = array();
         if ($this_unlock_abilities){
@@ -491,12 +499,16 @@ class rpg_mission_double extends rpg_mission {
                 if (!empty($user_robot_database[$token]['robot_unlocked'])){ $count += $count; }
                 $temp_encounter_index[$token] = $count;
             }
-            usort($temp_battle_omega['battle_target_player']['player_robots'], function($r1, $r2) use($temp_encounter_index){
+            usort($temp_battle_omega['battle_target_player']['player_robots'], function($r1, $r2) use($this_robot_index, $temp_encounter_index){
                 $r1_token = $r1['robot_token'];
                 $r2_token = $r2['robot_token'];
                 $r1_count = isset($temp_encounter_index[$r1_token]) ? $temp_encounter_index[$r1_token] : 0;
                 $r2_count = isset($temp_encounter_index[$r2_token]) ? $temp_encounter_index[$r2_token] : 0;
-                if ($r1_count < $r2_count){ return -1; }
+                $r1_unlockable = !empty($this_robot_index[$r1_token]['robot_flag_unlockable']) && empty($temp_encounter_index[$r1_token]['robot_unlocked']) ? 1 : 0;
+                $r2_unlockable = !empty($this_robot_index[$r2_token]['robot_flag_unlockable']) && empty($temp_encounter_index[$r2_token]['robot_unlocked']) ? 1 : 0;
+                if ($r1_unlockable && !$r2_unlockable){ return -1; }
+                elseif (!$r1_unlockable && $r2_unlockable){ return 1; }
+                elseif ($r1_count < $r2_count){ return -1; }
                 elseif ($r1_count > $r2_count){ return 1; }
                 else { return 0; }
             });
