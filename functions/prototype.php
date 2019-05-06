@@ -847,7 +847,7 @@ function mmrpg_prototype_stars_unlocked($player_token = '', $star_kind = ''){
 }
 
 // Define a function that returns a list of all allowed fields
-function mmrpg_prototype_unlocked_field_tokens(){
+function mmrpg_prototype_unlocked_field_tokens($include_all = false){
 
     // Collect the current session token
     $session_token = mmrpg_game_token();
@@ -861,8 +861,9 @@ function mmrpg_prototype_unlocked_field_tokens(){
     $base_omega_fields = array_merge($this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three, $this_omega_factors_four);
     $session_robot_database = !empty($_SESSION[$session_token]['values']['robot_database']) ? $_SESSION[$session_token]['values']['robot_database'] : array();
     foreach ($base_omega_fields AS $key => $omega){
-        if (isset($session_robot_database[$omega['robot']])
-            && !empty($session_robot_database[$omega['robot']]['robot_unlocked'])){
+        if ($include_all
+            || (isset($session_robot_database[$omega['robot']])
+                && !empty($session_robot_database[$omega['robot']]['robot_unlocked']))){
             $unlocked_field_tokens[] = $omega['field'];
         }
     }
@@ -885,7 +886,7 @@ function mmrpg_prototype_possible_stars($return_arrays = false){
     $mmrpg_index_fields = rpg_field::get_index();
 
     // Collect a list of all unlocked field tokens
-    $unlocked_field_tokens = mmrpg_prototype_unlocked_field_tokens();
+    $unlocked_field_tokens = mmrpg_prototype_unlocked_field_tokens(true);
 
     // Loop through the field tokens to construct a list of field stars
     $possible_star_list = array();
