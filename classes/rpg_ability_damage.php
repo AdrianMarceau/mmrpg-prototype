@@ -288,6 +288,7 @@ class rpg_ability_damage extends rpg_damage {
         $this_ability->ability_results['trigger_kind'] = 'damage';
         $this_ability->ability_results['damage_kind'] = $this_ability->damage_options['damage_kind'];
         $this_ability->ability_results['damage_type'] = $this_ability->damage_options['damage_type'];
+        $this_ability->ability_results['damage_type2'] = !empty($this_ability->damage_options['damage_type2']) ? $this_ability->damage_options['damage_type2'] : '';
 
         // If the success rate was not provided, auto-calculate
         if ($this_ability->damage_options['success_rate'] == 'auto'){
