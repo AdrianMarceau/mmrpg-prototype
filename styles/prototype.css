@@ -1693,6 +1693,13 @@ body[data-source="website"] #prototype .menu {
   4%, 6% { transform: translate(2px, 0) rotate(0); }
   10% { transform: translate(0, 0) rotate(0); }
 }
+@keyframes starshakeB {
+  1%, 9% { transform: translate(1px, 0) rotate(0); }
+  2%, 8% { transform: translate(-1px, 0) rotate(0); }
+  3%, 5%, 7% { transform: translate(2px, 0) rotate(0); }
+  4%, 6% { transform: translate(-2px, 0) rotate(0); }
+  10% { transform: translate(0, 0) rotate(0); }
+}
 @keyframes starshakeX {
   1%, 9% { transform: translate(-1px, 0) rotate(-2deg); }
   2%, 8% { transform: translate(1px, -2px) rotate(2deg); }
@@ -1725,37 +1732,21 @@ body[data-source="website"] #prototype .menu {
     animation-delay: 0s;
 
 }
-#prototype .option_wrapper .option_1x1.starfield.starshake.d1 div label.has_image,
-#prototype .option_wrapper .option_1x2.starfield.starshake.d1 div label.has_image,
-#prototype .option_wrapper .option_1x3.starfield.starshake.d1 div label.has_image,
-#prototype .option_wrapper .option_1x4.starfield.starshake.d1 div label.has_image {
-    -moz-animation-delay: 2s;
-    -webkit-animation-delay: 2s;
-    animation-delay: 2s;
-}
-#prototype .option_wrapper .option_1x1.starfield.starshake.d2 div label.has_image,
-#prototype .option_wrapper .option_1x2.starfield.starshake.d2 div label.has_image,
-#prototype .option_wrapper .option_1x3.starfield.starshake.d2 div label.has_image,
-#prototype .option_wrapper .option_1x4.starfield.starshake.d2 div label.has_image {
-    -moz-animation-delay: 4s;
-    -webkit-animation-delay: 4s;
-    animation-delay: 4s;
-}
-#prototype .option_wrapper .option_1x1.starfield.starshake.d3 div label.has_image,
-#prototype .option_wrapper .option_1x2.starfield.starshake.d3 div label.has_image,
-#prototype .option_wrapper .option_1x3.starfield.starshake.d3 div label.has_image,
-#prototype .option_wrapper .option_1x4.starfield.starshake.d3 div label.has_image {
-    -moz-animation-delay: 6s;
-    -webkit-animation-delay: 6s;
-    animation-delay: 6s;
+#prototype .option_wrapper .option_1x1:nth-child(odd).starfield.starshake div label.has_image,
+#prototype .option_wrapper .option_1x2:nth-child(odd).starfield.starshake div label.has_image,
+#prototype .option_wrapper .option_1x3:nth-child(odd).starfield.starshake div label.has_image,
+#prototype .option_wrapper .option_1x4:nth-child(odd).starfield.starshake div label.has_image {
+    -moz-animation-name: starshakeB;
+    -webkit-animation-name: starshakeB;
+    animation-name: starshakeB;
 }
 #prototype .option_wrapper .option_1x1.starfield.starshake.dx div label.has_image,
 #prototype .option_wrapper .option_1x2.starfield.starshake.dx div label.has_image,
 #prototype .option_wrapper .option_1x3.starfield.starshake.dx div label.has_image,
 #prototype .option_wrapper .option_1x4.starfield.starshake.dx div label.has_image {
-    -moz-animation-delay: 8s;
-    -webkit-animation-delay: 8s;
-    animation-delay: 8s;
+    -moz-animation-delay: 0.1s;
+    -webkit-animation-delay: 0.1s;
+    animation-delay: 0.1s;
     -moz-animation-name: starshakeX;
     -webkit-animation-name: starshakeX;
     animation-name: starshakeX;

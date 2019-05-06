@@ -986,8 +986,11 @@ function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '
 // Define a function for displaying prototype battle option markup
 function mmrpg_prototype_options_markup(&$battle_options, $player_token){
     // Refence the global config and index objects for easy access
+    global $star_shake_delay;
     global $mmrpg_index, $db;
     $mmrpg_index_fields = rpg_field::get_index();
+    if (empty($star_shake_delay)){ $star_shake_delay = array(); }
+    if (empty($star_shake_delay[$player_token])){ $star_shake_delay[$player_token] = 0; }
 
     // Define the variable to collect option markup
     $this_markup = '';
@@ -1359,6 +1362,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
 
 
             // Check if this is a starfield mission or not
+            $this_image_style = '';
             $is_starfield_mission = !empty($this_battleinfo['flags']['starfield_mission']) ? true : false;
             if ($is_starfield_mission){
                 $this_option_class .= ' starfield';
@@ -1366,12 +1370,11 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                     $this_option_class .= ' starshake';
                     $this_option_class .= ' dx';
                 } elseif (!empty($this_battleinfo['battle_rewards']['robots'])){
-                    static $shake_delay;
-                    if (empty($shake_delay)){ $shake_delay = 0; }
-                    elseif ($shake_delay >= 3){ $shake_delay = 0; }
-                    $shake_delay++;
+                    if ($star_shake_delay[$player_token] >= 7){ $star_shake_delay[$player_token] = 0; }
+                    $star_shake_delay[$player_token] += 1;
                     $this_option_class .= ' starshake';
-                    $this_option_class .= ' d'.$shake_delay;
+                    $star_shake_seconds = ($star_shake_delay[$player_token] / 3) + (0.1 * mt_rand(1, 3));
+                    $this_image_style .= ' -moz-animation-delay: '.$star_shake_seconds.'s; -webkit-animation-delay: '.$star_shake_seconds.'s; animation-delay: '.$star_shake_seconds.'s;';
                 }
             }
 
@@ -1392,7 +1395,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 $this_markup .= '<div class="platform" style="'.$this_option_platform_style.'">';
                     $this_markup .= '<div class="chrome">';
                         $this_markup .= '<div class="inset">';
-                            $this_markup .= '<label class="'.(!empty($this_battleinfo['battle_sprite']) ? 'has_image' : 'no_image').'">';
+                            $this_markup .= '<label class="'.(!empty($this_battleinfo['battle_sprite']) ? 'has_image' : 'no_image').'"'.(!empty($this_image_style) ? ' style="'.$this_image_style.'"' : '').'>';
                                 $this_markup .= $this_option_label;
                             $this_markup .= '</label>';
                         $this_markup .= '</div>';
