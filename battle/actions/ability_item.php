@@ -5,6 +5,13 @@
 // Increment the battle's turn counter by 1
 $this_battle->counters['battle_turn'] += 1;
 $this_battle->update_session();
+if (empty($this_battle->flags['player_battle'])
+    && empty($this_battle->flags['challenge_battle'])){
+    if (!isset($_SESSION['GAME']['counters']['battle_turns_'.$this_player->player_token.'_total'])){ $_SESSION['GAME']['counters']['battle_turns_'.$this_player->player_token.'_total'] = 0; }
+    if (!isset($_SESSION['GAME']['counters']['battle_turns_total'])){ $_SESSION['GAME']['counters']['battle_turns_total'] = 0; }
+    $_SESSION['GAME']['counters']['battle_turns_'.$this_player->player_token.'_total'] += 1;
+    $_SESSION['GAME']['counters']['battle_turns_total'] += 1;
+}
 
 
 // -- This Item Action -- //

@@ -2717,6 +2717,10 @@ class rpg_player extends rpg_object {
             //die($debug_experience_sum);
         }
 
+        // Collect the player's total turns count so far
+        $player_info['battle_turns_player_total'] = !empty($_SESSION[$session_token]['counters']['battle_turns_'.$player_info['player_token'].'_total']) ? $_SESSION[$session_token]['counters']['battle_turns_'.$player_info['player_token'].'_total'] : 0;
+        $player_info['battle_turns_total'] = !empty($_SESSION[$session_token]['counters']['battle_turns_total']) ? $_SESSION[$session_token]['counters']['battle_turns_total'] : 0;
+
         // Collect this player's current field selection from the omega session
         $temp_session_key = $player_info['player_token'].'_target-robot-omega_prototype';
         $player_info['target_robot_omega'] = !empty($_SESSION[$session_token]['values'][$temp_session_key]) ? $_SESSION[$session_token]['values'][$temp_session_key] : array();
@@ -2864,22 +2868,19 @@ class rpg_player extends rpg_object {
 
                             <tr>
                                 <td  class="right">
-                                    <? if(!empty($player_info['player_field_stars'])): ?>
-                                    <label style="display: block; float: left;">Field Stars :</label>
-                                    <span class="player_stat player_type player_type_<?= !empty($player_info['player_field_stars']) ? 'electric' : 'empty' ?>"><?= $player_info['player_field_stars'].' '.($player_info['player_field_stars'] == 1 ? 'Star' : 'Stars') ?></span>
-                                    <? else: ?>
-                                    <label style="display: block; float: left; opacity: 0.5; filter: alpha(opacity=50); ">??? :</label>
-                                    <span class="player_stat player_type player_type_empty" style=" opacity: 0.5; filter: alpha(opacity=50); ">0</span>
-                                    <? endif; ?>
+                                    <label style="display: block; float: left;">Total Turns :</label>
+                                    <span class="player_stat player_type player_type_<?= !empty($player_info['battle_turns_player_total']) ? 'cutter' : 'none' ?>" title="<?= $player_info['battle_turns_player_total'].' of '.$player_info['battle_turns_total'].' Turns Overall' ?>"><?= $player_info['battle_turns_player_total'] == 1 ? '1 Turn' : $player_info['battle_turns_player_total'].' Turns'  ?></span>
                                 </td>
                                 <td class="center">&nbsp;</td>
                                 <td  class="right">
-                                    <? if(!empty($player_info['player_fusion_stars'])): ?>
-                                    <label style="display: block; float: left;">Fusion Stars :</label>
-                                    <span class="player_stat player_type player_type_<?= !empty($player_info['player_fusion_stars']) ? 'time' : 'empty' ?>"><?= $player_info['player_fusion_stars'].' '.($player_info['player_fusion_stars'] == 1 ? 'Star' : 'Stars') ?></span>
+                                    <? if(!empty($player_info['player_field_stars'])
+                                        || !empty($player_info['player_fusion_stars'])): ?>
+                                        <label style="display: block; float: left;">Stars Collected :</label>
+                                        <? $total_stars_collected = $player_info['player_field_stars'] + $player_info['player_fusion_stars']; ?>
+                                        <span class="player_stat player_type player_type_cutter" title="<?= 'Field x'.$player_info['player_field_stars'].' | Fusion x'.$player_info['player_fusion_stars'] ?>"><?= $total_stars_collected.' '.($total_stars_collected == 1 ? 'Star' : 'Stars') ?></span>
                                     <? else: ?>
-                                    <label style="display: block; float: left; opacity: 0.5; filter: alpha(opacity=50); ">??? :</label>
-                                    <span class="player_stat player_type player_type_empty" style=" opacity: 0.5; filter: alpha(opacity=50); ">0</span>
+                                        <label style="display: block; float: left; opacity: 0.5; filter: alpha(opacity=50); ">??? :</label>
+                                        <span class="player_stat player_type player_type_empty" style=" opacity: 0.5; filter: alpha(opacity=50); ">0</span>
                                     <? endif; ?>
                                 </td>
                             </tr>
