@@ -1865,7 +1865,7 @@ class rpg_canvas {
             $multiplier_markup_right = '';
             foreach ($temp_multipliers AS $this_type => $this_multiplier){
                 if ($this_type == 'experience' && !empty($_SESSION['GAME']['DEMO'])){ continue; }
-                if ($this_multiplier == 1){ continue; }
+                if ((int)($this_multiplier) == 1){ continue; }
                 if ($this_multiplier < MMRPG_SETTINGS_MULTIPLIER_MIN){ $this_multiplier = MMRPG_SETTINGS_MULTIPLIER_MIN; }
                 elseif ($this_multiplier > MMRPG_SETTINGS_MULTIPLIER_MAX){ $this_multiplier = MMRPG_SETTINGS_MULTIPLIER_MAX; }
                 $temp_name = $this_type != 'none' ? ucfirst($this_type) : 'Neutral';
