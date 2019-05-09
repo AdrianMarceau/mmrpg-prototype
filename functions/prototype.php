@@ -1431,11 +1431,14 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
     // DEBUG DEBUG DEBUG
     //$temp_battle_omega['values']['debug']['target_robots_backup'] = json_encode($temp_battle_omega['battle_target_player']['player_robots']);
 
+    // Backup the base name if not exists yet
+    if (!isset($temp_battle_omega['battle_base_name'])){ $temp_battle_omega['battle_base_name'] = $temp_battle_omega['battle_name']; }
+
     // Collect the player token and other battle info
     $player_token = $this_prototype_data['this_player_token'];
     $battle_phase = $this_prototype_data['battle_phase'];
     $battle_field = $temp_battle_omega['battle_field_base'];
-    $battle_name = $temp_battle_omega['battle_name'];
+    $battle_name = $temp_battle_omega['battle_base_name'];
     $omega_robot_level = $temp_battle_omega['battle_level'];
 
     // Define the stat boost power based on phase alone
