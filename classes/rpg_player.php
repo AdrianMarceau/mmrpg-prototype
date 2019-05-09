@@ -1457,6 +1457,7 @@ class rpg_player extends rpg_object {
 
         // Create the temporary item object for event creation
         $item_reward_info = rpg_item::get_index_info($item_reward_token);
+        if (empty($item_reward_info)){ return false; }
         $temp_item = rpg_game::get_item($this_battle, $target_player, $target_robot, $item_reward_info);
         $temp_item->item_name = $item_reward_info['item_name'];
         $temp_item->item_image = $item_reward_info['item_token'];
