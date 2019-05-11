@@ -517,14 +517,6 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
         users3.target_user_image_path,
         users3.target_user_flag_postpublic,
 
-        categories.category_id,
-        categories.category_level,
-        categories.category_name,
-        categories.category_token,
-        categories.category_description,
-        categories.category_published,
-        categories.category_order,
-
         posts.post_count,
         posts_new.new_post_count
 
@@ -563,10 +555,6 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
             FROM mmrpg_users
             ) AS users3
             ON threads.thread_target = users3.target_user_id
-
-        LEFT JOIN mmrpg_categories
-            AS categories
-            ON threads.category_id = categories.category_id
 
         LEFT JOIN (
             SELECT
@@ -692,10 +680,6 @@ function mmrpg_website_community_category_threads_count($this_category_info, $fi
             ) AS users3
             ON threads.thread_target = users3.target_user_id
 
-        LEFT JOIN mmrpg_categories
-            AS categories
-            ON threads.category_id = categories.category_id
-
         LEFT JOIN (
             SELECT
             posts.thread_id,
@@ -744,7 +728,10 @@ function mmrpg_website_community_category_threads_count($this_category_info, $fi
 function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread_info, $header_mode = false, $compact_mode = false){
 
     // Pull in global variables necessary for the linkblock
-    global $this_userinfo;
+    global $this_userinfo, $this_category_info;
+
+    // Merge the category info back into the thread info
+    $this_thread_info = array_merge($this_thread_info, $this_category_info);
 
     // Collect or define the temporary timeout variables
     global $this_time, $this_online_timeout;
@@ -772,6 +759,7 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
         $temp_date_group = $this_thread_info['category_token'] == 'news' ? date('Y-m', $temp_thread_date) : date('Y-m', $temp_thread_mod_date);
         if (!empty($this_thread_info['thread_locked'])){ $temp_date_group = 'locked'; }
         elseif (!empty($this_thread_info['thread_sticky'])){ $temp_date_group = 'sticky'; }
+
         // If the date group was different, update the static variable
         if ($temp_date_group != $this_date_group){
             $this_date_group = $temp_date_group;
