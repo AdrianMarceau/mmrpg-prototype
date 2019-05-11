@@ -44,9 +44,9 @@ $ability = array(
             'modifiers' => false,
             'success' => array(0, 0, 0, 0, 'The <strong class="ability_name ability_type type_'.(!empty($damage_type) ? $damage_type : 'none').'">DevPower</strong> cleared out '.$target_robot->print_name().'!')
             ));
-        $energy_damage_amount = $target_robot->robot_base_energy;
+        $energy_damage_amount = $target_robot->robot_base_energy * 2;
         $trigger_options = array('apply_modifiers' => true, 'apply_position_modifiers' => false, 'apply_stat_modifiers' => false);
-        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false, $trigger_options);
+        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, true, $trigger_options);
 
         // Loop through the target's benched robots, inflicting damage to each
         $backup_target_robots_active = $target_player->values['robots_active'];
@@ -72,19 +72,8 @@ $ability = array(
 	            'modifiers' => false,
 	            'success' => array(0, 0, 0, 0, 'The <strong class="ability_name ability_type type_'.(!empty($damage_type) ? $damage_type : 'none').'">DevPower</strong> cleared out '.$temp_target_robot->print_name().'!')
                 ));
-            $energy_damage_amount = $temp_target_robot->robot_base_energy;
-            $temp_target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false, $trigger_options);
-        }
-
-        // Loop through all robots on the target side and disable any that need it
-        $target_robots_active = $target_player->get_robots();
-        foreach ($target_robots_active AS $key => $robot){
-            if ($robot->robot_id == $target_robot->robot_id){ $temp_target_robot = $target_robot; }
-            else { $temp_target_robot = $robot; }
-            if (($temp_target_robot->robot_energy < 1 || $temp_target_robot->robot_status == 'disabled')
-                && empty($temp_target_robot->flags['apply_disabled_state'])){
-                $temp_target_robot->trigger_disabled($this_robot);
-            }
+            $energy_damage_amount = $temp_target_robot->robot_base_energy * 2;
+            $temp_target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, true, $trigger_options);
         }
 
         // Return true on success
