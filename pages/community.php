@@ -35,7 +35,12 @@ if (empty($_SESSION[mmrpg_game_token()]['DEMO'])){
 // Collect all the categories from the index
 $this_categories_index = mmrpg_website_community_index();
 $this_categories_index_tokens = array();
-foreach ($this_categories_index AS $token => $info){ $this_categories_index_tokens[$info['category_id']] = $token; }
+if (!empty($this_categories_index)){
+    foreach ($this_categories_index AS $token => $info){
+        $this_categories_index_tokens[$info['category_id']] = $token;
+    }
+}
+
 
 // Include the community form actions
 require_once('pages/community_actions.php');

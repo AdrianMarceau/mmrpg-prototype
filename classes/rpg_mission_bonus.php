@@ -119,6 +119,13 @@ class rpg_mission_bonus extends rpg_mission {
         if ($temp_bonus_level_min > $temp_bonus_level_max){
             list($temp_bonus_level_min, $temp_bonus_level_max) = array($temp_bonus_level_max, $temp_bonus_level_min);
         }
+        if ($temp_bonus_level_min < 1){
+            $temp_bonus_level_min = 1;
+        }
+        if ($temp_bonus_level_max < 1
+            || $temp_bonus_level_max < $temp_bonus_level_min){
+            $temp_bonus_level_max = $temp_bonus_level_min;
+        }
 
         // Define a list of items that can be equipped to target robots
         static $hold_item_index;

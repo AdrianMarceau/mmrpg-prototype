@@ -519,7 +519,7 @@ class rpg_battle extends rpg_object {
     }
 
     // Define a public function for triggering battle actions
-    public function battle_complete_trigger($this_player, $this_robot, $target_player, $target_robot, $this_action, $this_token = ''){
+    public function battle_complete_trigger($this_player, $this_robot, $target_player, $target_robot, $this_action = '', $this_token = ''){
         global $mmrpg_index, $db;
         // DEBUG
         //$this->events_create(false, false, 'DEBUG', 'Battle complete trigger triggered!');

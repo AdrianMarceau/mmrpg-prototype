@@ -29,6 +29,7 @@ $this_markup_header = 'Mega Man RPG Prototype Ability Database';
 //$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_abilities_links_counter) ? ($mmrpg_database_abilities_links_counter == 1 ? '1 Ability' : $mmrpg_database_abilities_links_counter.' Abilities') : '0 Abilities').' )</span>';
 
 // If a specific ability has NOT been defined, show the quick-switcher
+if (empty($mmrpg_database_abilities)){ $mmrpg_database_abilities = array(); }
 reset($mmrpg_database_abilities);
 if (!empty($this_current_token)){ $first_ability_key = $this_current_token; }
 else { $first_ability_key = key($mmrpg_database_abilities); }
@@ -172,20 +173,22 @@ if (empty($this_current_token)){
 if (empty($this_current_token)){
     // Loop through the ability database and display the appropriate data
     $key_counter = 0;
-    foreach($mmrpg_database_abilities AS $ability_key => $ability_info){
-        // If a type filter has been applied to the ability page
-        $temp_ability_types = array();
-        if (!empty($ability_info['ability_type'])){ $temp_ability_types[] = $ability_info['ability_type']; }
-        if (!empty($ability_info['ability_type2'])){ $temp_ability_types[] = $ability_info['ability_type2']; }
-        if (empty($temp_ability_types)){ $temp_ability_types[] = 'none'; }
-        if (isset($this_current_filter) && !in_array($this_current_filter, $temp_ability_types)){ $key_counter++; continue; }
-        // Collect information about this ability
-        $this_ability_image = !empty($ability_info['ability_image']) ? $ability_info['ability_image'] : $ability_info['ability_token'];
-        if ($this_ability_image == 'ability'){ $this_seo_abilities = 'noindex'; }
-        // Collect the markup for this ability and print it to the browser
-        $temp_ability_markup = rpg_ability::print_database_markup($ability_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
-        echo $temp_ability_markup;
-        $key_counter++;
+    if (!empty($mmrpg_database_abilities)){
+        foreach($mmrpg_database_abilities AS $ability_key => $ability_info){
+            // If a type filter has been applied to the ability page
+            $temp_ability_types = array();
+            if (!empty($ability_info['ability_type'])){ $temp_ability_types[] = $ability_info['ability_type']; }
+            if (!empty($ability_info['ability_type2'])){ $temp_ability_types[] = $ability_info['ability_type2']; }
+            if (empty($temp_ability_types)){ $temp_ability_types[] = 'none'; }
+            if (isset($this_current_filter) && !in_array($this_current_filter, $temp_ability_types)){ $key_counter++; continue; }
+            // Collect information about this ability
+            $this_ability_image = !empty($ability_info['ability_image']) ? $ability_info['ability_image'] : $ability_info['ability_token'];
+            if ($this_ability_image == 'ability'){ $this_seo_abilities = 'noindex'; }
+            // Collect the markup for this ability and print it to the browser
+            $temp_ability_markup = rpg_ability::print_database_markup($ability_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
+            echo $temp_ability_markup;
+            $key_counter++;
+        }
     }
 }
 
