@@ -362,11 +362,9 @@ $this_shop_index['kalinka'] = array(
         'shop_field' => 'final-destination',
         'shop_player' => 'dr-cossack',
         'shop_number' => 'SHOP-003',
-        'shop_kind_selling' => array('alts'),
+        'shop_kind_selling' => array(),
         'shop_kind_buying' => array(),
-        'shop_quote_selling' => array(
-            'alts' => 'Greetings and welcome to Kalinka\'s Shop! Interested in some new outfits for your robots?'
-            ),
+        'shop_quote_selling' => array(),
         'shop_quote_buying' => array(),
         'shop_alts' => array()
         );
@@ -768,6 +766,40 @@ if (!empty($this_shop_index['reggae'])){
 // Only continue if the shop has been unlocked
 if (!empty($this_shop_index['kalinka'])){
 
+    // If the player has unlocked the Master Codes, Kalinka's Shop also has a Robot Shop and a Field Shop tab
+    if (mmrpg_prototype_item_unlocked('master-codes')){
+
+        // Collect a list of robot masters that we're allowed to sell
+        $buyable_robots = $db->get_array_list("SELECT
+            robot_token
+            FROM mmrpg_index_robots
+            WHERE
+            robot_flag_published = 1
+            AND robot_flag_complete = 1
+            AND robot_flag_unlockable = 1
+            AND robot_number NOT LIKE 'RPG-%'
+            AND robot_number NOT LIKE 'PCR-%'
+            AND robot_game NOT IN ('MM00')
+            ORDER BY
+            robot_order ASC
+            ;", 'robot_token');
+
+        // Ensure there are robots to see before showing them
+        if (!empty($buyable_robots)){
+
+            // Add robot data to Kalinka's Shop
+            if (!in_array('robots', $this_shop_index['kalinka']['shop_kind_selling'])){ $this_shop_index['kalinka']['shop_kind_selling'][] = 'robots'; }
+            $this_shop_index['kalinka']['shop_quote_selling']['robots'] = 'Greetings and welcome to Kalinka\'s Shop! I can create new robots from your battle data!';
+            $this_shop_index['kalinka']['shop_robots']['robots_selling'] = array();
+            $buyable_robots = array_keys($buyable_robots);
+            foreach ($buyable_robots AS $token){
+                $this_shop_index['kalinka']['shop_robots']['robots_selling'][$token] = MMRPG_SETTINGS_SHOP_ROBOT_PRICE;
+            }
+
+        }
+
+    }
+
     // If the player has unlocked the Dress Codes, Kalinka's kiosk also has an Alt Shop tab
     if (mmrpg_prototype_item_unlocked('dress-codes')){
 
@@ -839,56 +871,11 @@ if (!empty($this_shop_index['kalinka'])){
             // If any alts were unlocked, add them to the parent shop array
             if (!empty($unlocked_alts_list)){
                 if (!in_array('alts', $this_shop_index['kalinka']['shop_kind_selling'])){ $this_shop_index['kalinka']['shop_kind_selling'][] = 'alts'; }
+                $this_shop_index['kalinka']['shop_quote_selling']['alts'] = 'Would you be interested in new outfits for your robots? I\'ve already designed so many great looks!';
                 $this_shop_index['kalinka']['shop_alts']['alts_selling'] = $unlocked_alts_list;
             }
 
         }
-
-    }
-
-    // If the player has unlocked the Legacy Codes, Kalinka's Shop also has a Robot Shop and a Field Shop tab
-    if (mmrpg_prototype_item_unlocked('legacy-codes')
-        || mmrpg_prototype_item_unlocked('robot-codes')
-        || mmrpg_prototype_item_unlocked('field-codes')){
-
-        // Collect a list of robot masters that we're allowed to sell
-        $buyable_robots = $db->get_array_list("SELECT
-            robot_token
-            FROM mmrpg_index_robots
-            WHERE
-            robot_flag_published = 1
-            AND robot_flag_complete = 1
-            AND robot_flag_unlockable = 1
-            AND robot_number NOT LIKE 'RPG-%'
-            AND robot_number NOT LIKE 'PCR-%'
-            AND robot_game NOT IN ('MM00', 'MM01', 'MM02', 'MM04')
-            ORDER BY
-            robot_order ASC
-            ;", 'robot_token');
-
-        // Ensure there are robots to see before showing them
-        if (!empty($buyable_robots)){
-
-            // Add robot data to Kalinka's Shop
-            $this_shop_index['kalinka']['shop_kind_selling'][] = 'robots';
-            $this_shop_index['kalinka']['shop_quote_selling']['robots'] = 'Would you like me to build you a new robot or two? I created a few blueprints using your scan data.';
-            $this_shop_index['kalinka']['shop_robots']['robots_selling'] = array();
-            $buyable_robots = array_keys($buyable_robots);
-            foreach ($buyable_robots AS $token){
-                $this_shop_index['kalinka']['shop_robots']['robots_selling'][$token] = MMRPG_SETTINGS_SHOP_ROBOT_PRICE;
-            }
-
-        }
-
-        // Add field data to Kalinka's Shop
-        $this_shop_index['kalinka']['shop_kind_selling'][] = 'fields';
-        $this_shop_index['kalinka']['shop_quote_selling']['fields'] = 'I\'ve discovered that we can generate new stars using the data of legacy battle fields. Interested?';
-        $this_shop_index['kalinka']['shop_fields']['fields_selling'] = array(
-            'construction-site' => MMRPG_SETTINGS_SHOP_FIELD_PRICE, 'magnetic-generator' => MMRPG_SETTINGS_SHOP_FIELD_PRICE,
-            'reflection-chamber' => MMRPG_SETTINGS_SHOP_FIELD_PRICE, 'rocky-plateau' => MMRPG_SETTINGS_SHOP_FIELD_PRICE,
-            'spinning-greenhouse' => MMRPG_SETTINGS_SHOP_FIELD_PRICE, 'serpent-column' => MMRPG_SETTINGS_SHOP_FIELD_PRICE,
-            'power-plant' => MMRPG_SETTINGS_SHOP_FIELD_PRICE, 'septic-system' => MMRPG_SETTINGS_SHOP_FIELD_PRICE
-            );
 
     }
 
@@ -914,14 +901,6 @@ if (!empty($this_shop_index['kalinka'])){
             foreach ($this_shop_index['kalinka']['shop_items']['items_selling'] AS $field_kind => $field_price){
                 $field_price -= round(($field_price / 2) * $level_discount);
                 $this_shop_index['kalinka']['shop_items']['items_selling'][$field_kind] = $field_price;
-            }
-        }
-
-        // If her shop is selling fields, discount their prices
-        if (!empty($this_shop_index['kalinka']['shop_fields']['fields_selling'])){
-            foreach ($this_shop_index['kalinka']['shop_fields']['fields_selling'] AS $field_kind => $field_price){
-                $field_price -= round(($field_price / 2) * $level_discount);
-                $this_shop_index['kalinka']['shop_fields']['fields_selling'][$field_kind] = $field_price;
             }
         }
 

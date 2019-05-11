@@ -191,16 +191,21 @@ function generate_prototype_postgame_message($player_token){
 
     $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/players/'.$player_token.'/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 15px; left: '.$temp_canvas_center.'px;"></div>';
 
+    // Generate the markup for bonus chapters unlocks
+    $temp_bonus_chapter_markup = array();
+    $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_speed">Mission Randomizer</strong> chapter offers exactly what you\'d expect given the name. These missions are perfect for trying out new strategies or grinding for cores!</p>';
+    if (mmrpg_prototype_item_unlocked('light-program')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_attack">Player Battles</strong> chapter contains missions against the ghost-data of other users from the leaderboard. These missions are great for grinding lots of zenny!</p>'; }
+    if (mmrpg_prototype_item_unlocked('cossack-program')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_defense">Star Fields</strong> chapter locates and displays any Field Star or Fusion Star missions that you\'ve yet to complete.  Collecting stars helps your robots grow stronger!</p>'; }
+    if (mmrpg_prototype_item_unlocked('wily-program')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_energy">Challenge Mode</strong> chapter offers a collection of unique challenges designed by the MMRPG staff. These missions are hard but tend to have great rewards!</p>'; }
+
     // Generate the canvas markup with the player standing with and their team of robots
     $temp_console_markup = '';
     $temp_console_markup .= '<p>';
         $temp_console_markup .= '<strong>'.$player_info['player_name'].'</strong>\'s story has come to an end, but there\'s still more to do and discover!<br /> ';
-        $temp_console_markup .= 'As a thank you for playing, <strong>three new bonus chapters</strong> have been unlocked! ';
+        $temp_console_markup .= 'As thanks for playing, <strong>'.count($temp_bonus_chapter_markup).' new bonus chapters</strong> have been unlocked in his campaign! ';
     $temp_console_markup .= '</p>';
     $temp_console_markup .= '<div style="padding: 10px; margin: 5px auto; border-top: 1px solid #212121; border-bottom: 1px solid #090909;">';
-        $temp_console_markup .= '<p>The <strong class="ability_type ability_type_defense">Star Fields</strong> chapter locates and displays any Field Star or Fusion Star missions that you\'ve yet to complete.  Collecting stars helps your robots grow stronger!</p>';
-        $temp_console_markup .= '<p>The <strong class="ability_type ability_type_attack">Player Battles</strong> chapter contains missions against the ghost-data of other users from the leaderboard.  These missions are great for grinding lots of zenny!</p>';
-        $temp_console_markup .= '<p>The <strong class="ability_type ability_type_speed">Mission Randomizer</strong> chapter offers exactly what you\'d expect given the name.  These missions are perfect for scanning new robots into your database!</p>';
+        $temp_console_markup .= implode('', $temp_bonus_chapter_markup);
     $temp_console_markup .= '</div>';
     $temp_console_markup .= '<p>';
         $temp_console_markup .= 'We hope you enjoyed the <strong class="ability_type ability_type_shield">Mega Man RPG Prototype</strong> and we encourage you to join our ever-growing ';
@@ -630,18 +635,18 @@ if (!mmrpg_prototype_item_unlocked('auto-link')
         'show_images' => array('player', 'shop')
         ));
 
-    // Unlock the ITEM CODES immediately after the Auto Link has been unlocked
-    if (!mmrpg_prototype_item_unlocked('item-codes')){
+}
+// Unlock the ITEM CODES immediately after the Auto Link has been unlocked
+if (mmrpg_prototype_item_unlocked('auto-link')
+    && !mmrpg_prototype_item_unlocked('item-codes')){
 
-        // Unlock the Item Codes and generate the required event details
-        mmrpg_game_unlock_item('item-codes', array(
-            'event_text' => '{shop} already made a discovery! The {item} have been unlocked!',
-            'player_token' => 'dr-light',
-            'shop_token' => 'auto',
-            'show_images' => array('shop')
-            ));
-
-    }
+    // Unlock the Item Codes and generate the required event details
+    mmrpg_game_unlock_item('item-codes', array(
+        'event_text' => '{shop} already made a discovery! The {item} have been unlocked!',
+        'player_token' => 'dr-light',
+        'shop_token' => 'auto',
+        'show_images' => array('shop')
+        ));
 
 }
 
@@ -701,18 +706,18 @@ if (!mmrpg_prototype_item_unlocked('reggae-link')
         'show_images' => array('player', 'shop')
         ));
 
-    // Unlock the ABILITY CODES immediately after the Reggae Link has been unlocked
-    if (!mmrpg_prototype_item_unlocked('ability-codes')){
+}
+// Unlock the ABILITY CODES immediately after the Reggae Link has been unlocked
+if (mmrpg_prototype_item_unlocked('reggae-link')
+    && !mmrpg_prototype_item_unlocked('ability-codes')){
 
-        // Unlock the Ability Codes and generate the required event details
-        mmrpg_game_unlock_item('ability-codes', array(
-            'event_text' => '{shop} already made a discovery! The {item} have been unlocked!',
-            'player_token' => 'dr-wily',
-            'shop_token' => 'reggae',
-            'show_images' => array('shop')
-            ));
-
-    }
+    // Unlock the Ability Codes and generate the required event details
+    mmrpg_game_unlock_item('ability-codes', array(
+        'event_text' => '{shop} already made a discovery! The {item} have been unlocked!',
+        'player_token' => 'dr-wily',
+        'shop_token' => 'reggae',
+        'show_images' => array('shop')
+        ));
 
 }
 
@@ -772,18 +777,18 @@ if (!mmrpg_prototype_item_unlocked('kalinka-link')
         'show_images' => array('player', 'shop')
         ));
 
-    // Unlock the DRESS CODES immediately after the Kalinka Link has been unlocked
-    if (!mmrpg_prototype_item_unlocked('dress-codes')){
+}
+// Unlock the MASTER CODES immediately after the Kalinka Link has been unlocked
+if (mmrpg_prototype_item_unlocked('kalinka-link')
+    && !mmrpg_prototype_item_unlocked('master-codes')){
 
-        // Unlock the Equip Codes and generate the required event details
-        mmrpg_game_unlock_item('dress-codes', array(
-            'event_text' => '{shop} already made a discovery! The {item} have been unlocked!',
-            'player_token' => 'dr-cossack',
-            'shop_token' => 'kalinka',
-            'show_images' => array('shop')
-            ));
-
-    }
+    // Unlock the Master Codes and generate the required event details
+    mmrpg_game_unlock_item('master-codes', array(
+        'event_text' => '{shop} already made a discovery! The {item} have been unlocked!',
+        'player_token' => 'dr-cossack',
+        'shop_token' => 'kalinka',
+        'show_images' => array('shop')
+        ));
 
 }
 
@@ -804,17 +809,17 @@ if (!mmrpg_prototype_item_unlocked('cossack-program')
 
 }
 
-// Unlock the LEGACY CODES after Dr. Cossack has completed at least half of Chapter Four
+// Unlock the DRESS CODES after Dr. Cossack has completed at least half of Chapter Four
 $required_missions = MMRPG_SETTINGS_CHAPTER1_MISSIONS;
 $required_missions += MMRPG_SETTINGS_CHAPTER2_MISSIONS;
 $required_missions += MMRPG_SETTINGS_CHAPTER3_MISSIONS;
 $required_missions += round(MMRPG_SETTINGS_CHAPTER4_MISSIONS / 2);
-if (!mmrpg_prototype_item_unlocked('legacy-codes')
+if (!mmrpg_prototype_item_unlocked('dress-codes')
     && mmrpg_prototype_battles_complete('dr-cossack') >= $required_missions
     ){
 
     // Unlock the Legacy Codes and generate the required event details
-    mmrpg_game_unlock_item('legacy-codes', array(
+    mmrpg_game_unlock_item('dress-codes', array(
         'event_text' => '{shop} made another discovery! The {item} have been unlocked!',
         'player_token' => 'dr-cossack',
         'shop_token' => 'kalinka',

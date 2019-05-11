@@ -30,6 +30,7 @@ $this_markup_header = 'Mega Man RPG Prototype Boss Database';
 //$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_bosses_links_counter) ? ($mmrpg_database_bosses_links_counter == 1 ? '1 Boss' : $mmrpg_database_bosses_links_counter.' Bosses') : '0 Bosses').' )</span>';
 
 // If a specific boss has NOT been defined, show the quick-switcher
+if (empty($mmrpg_database_bosses)){ $mmrpg_database_bosses = array(); }
 reset($mmrpg_database_bosses);
 if (!empty($this_current_token)){ $first_boss_key = $this_current_token; }
 else { $first_boss_key = key($mmrpg_database_bosses); }
@@ -216,17 +217,19 @@ if (empty($this_current_token)){
 if (empty($this_current_token)){
     // Loop through the boss database and display the appropriate data
     $key_counter = 0;
-    foreach($mmrpg_database_bosses AS $boss_key => $boss_info){
-        // If a type filter has been applied to the boss page
-        if (isset($this_current_filter) && $this_current_filter == 'none' && $boss_info['robot_core'] != ''){ $key_counter++; continue; }
-        elseif (isset($this_current_filter) && $this_current_filter != 'none' && $boss_info['robot_core'] != $this_current_filter && $boss_info['robot_core2'] != $this_current_filter){ $key_counter++; continue; }
-        // Collect information about this boss
-        $this_robot_image = !empty($boss_info['robot_image']) ? $boss_info['robot_image'] : $boss_info['robot_token'];
-        if ($this_robot_image == 'robot'){ $this_seo_robots = 'noindex'; }
-        // Collect the markup for this robot and print it to the browser
-        $temp_boss_markup = rpg_robot::print_database_markup($boss_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
-        echo $temp_boss_markup;
-        $key_counter++;
+    if (!empty($mmrpg_database_bosses)){
+        foreach($mmrpg_database_bosses AS $boss_key => $boss_info){
+            // If a type filter has been applied to the boss page
+            if (isset($this_current_filter) && $this_current_filter == 'none' && $boss_info['robot_core'] != ''){ $key_counter++; continue; }
+            elseif (isset($this_current_filter) && $this_current_filter != 'none' && $boss_info['robot_core'] != $this_current_filter && $boss_info['robot_core2'] != $this_current_filter){ $key_counter++; continue; }
+            // Collect information about this boss
+            $this_robot_image = !empty($boss_info['robot_image']) ? $boss_info['robot_image'] : $boss_info['robot_token'];
+            if ($this_robot_image == 'robot'){ $this_seo_robots = 'noindex'; }
+            // Collect the markup for this robot and print it to the browser
+            $temp_boss_markup = rpg_robot::print_database_markup($boss_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
+            echo $temp_boss_markup;
+            $key_counter++;
+        }
     }
 }
 

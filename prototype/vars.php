@@ -84,11 +84,17 @@ else {
         $_SESSION[$session_token]['flags']['prototype_events']['dr-cossack']['prototype_complete'] = $prototype_complete_flag_cossack = true;
     }
 
+    // Count how many prototypes have been completed
+    $prototype_complete_count = 0;
+    if ($prototype_complete_flag_light){ $prototype_complete_count += 1; }
+    if ($prototype_complete_flag_wily){ $prototype_complete_count += 1; }
+    if ($prototype_complete_flag_cossack){ $prototype_complete_count += 1; }
+
     // Collect the global star count for everyone
     $battle_star_counter = mmrpg_prototype_stars_unlocked();
 
     // Define an inline function for calculating campaign progress for a given player
-    function temp_calculate_player_progress(&$chapters_unlocked, &$battle_complete_counter, &$prototype_complete_flag){
+    function temp_calculate_player_progress(&$chapters_unlocked, &$battle_complete_counter, &$prototype_complete_flag, &$prototype_complete_count){
         global $battle_star_counter;
 
 
@@ -123,28 +129,28 @@ else {
             // Random
             $chapters_unlocked['5'] = true;
 
-            // Stars
-            $chapters_unlocked['7'] = true;
-
             // Players
-            $chapters_unlocked['6'] = true;
+            $chapters_unlocked['6'] = mmrpg_prototype_item_unlocked('light-program') ? true : false;
 
             // Challenges
-            $chapters_unlocked['8'] = true;
+            $chapters_unlocked['8'] = mmrpg_prototype_item_unlocked('wily-program') ? true : false;
+
+            // Stars
+            $chapters_unlocked['7'] = mmrpg_prototype_item_unlocked('cossack-program') ? true : false;
 
         } else {
 
             // Random
             $chapters_unlocked['5'] = false;
 
-            // Stars
-            $chapters_unlocked['7'] = mmrpg_prototype_item_unlocked('cossack-program') ? true : false;
-
             // Players
             $chapters_unlocked['6'] = false;
 
             // Challenges
-            $chapters_unlocked['8'] = false;
+            $chapters_unlocked['8'] = false; //$prototype_complete_count >= 3 ? true : false;
+
+            // Stars
+            $chapters_unlocked['7'] = false; //mmrpg_prototype_item_unlocked('cossack-program') ? true : false;
 
         }
 
@@ -152,15 +158,15 @@ else {
 
     // Define which chapters should be unlocked for Dr. Light based on missions complete
     $chapters_unlocked_light = array();
-    temp_calculate_player_progress($chapters_unlocked_light, $battle_complete_counter_light, $prototype_complete_flag_light);
+    temp_calculate_player_progress($chapters_unlocked_light, $battle_complete_counter_light, $prototype_complete_flag_light, $prototype_complete_count);
 
     // Define which chapters should be unlocked for Dr. Wily based on missions complete
     $chapters_unlocked_wily = array();
-    temp_calculate_player_progress($chapters_unlocked_wily, $battle_complete_counter_wily, $prototype_complete_flag_wily);
+    temp_calculate_player_progress($chapters_unlocked_wily, $battle_complete_counter_wily, $prototype_complete_flag_wily, $prototype_complete_count);
 
     // Define which chapters should be unlocked for Dr. Cossack based on missions complete
     $chapters_unlocked_cossack = array();
-    temp_calculate_player_progress($chapters_unlocked_cossack, $battle_complete_counter_cossack, $prototype_complete_flag_cossack);
+    temp_calculate_player_progress($chapters_unlocked_cossack, $battle_complete_counter_cossack, $prototype_complete_flag_cossack, $prototype_complete_count);
 
     // Define an index to hold all the chapter unlocks for later reference
     $chapters_unlocked_index = array();

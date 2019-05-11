@@ -5,6 +5,13 @@
 // Increment the battle's turn counter by 1
 $this_battle->counters['battle_turn'] += 1;
 $this_battle->update_session();
+if (empty($this_battle->flags['player_battle'])
+    && empty($this_battle->flags['challenge_battle'])){
+    if (!isset($_SESSION['GAME']['counters']['battle_turns_'.$this_player->player_token.'_total'])){ $_SESSION['GAME']['counters']['battle_turns_'.$this_player->player_token.'_total'] = 0; }
+    if (!isset($_SESSION['GAME']['counters']['battle_turns_total'])){ $_SESSION['GAME']['counters']['battle_turns_total'] = 0; }
+    $_SESSION['GAME']['counters']['battle_turns_'.$this_player->player_token.'_total'] += 1;
+    $_SESSION['GAME']['counters']['battle_turns_total'] += 1;
+}
 
 // Backup the data for the this robot for later reference
 $backup_this_robot_id = $this_robot->robot_id;
@@ -338,16 +345,16 @@ else {
             // Update the target robot's session
             $new_target_robot->update_session();
             // Queue up an this robot's action second, because its slower
-            $this_battle->actions_append($this_player, $this_robot, $this_player, $new_target_robot, $this_action, $this_action_token);
+            $this_battle->actions_append($this_player, $this_robot, $target_player, $new_target_robot, $this_action, $this_action_token);
 
         } else {
 
             // Define the new target robot which is actually a team mate
-            $new_target_robot = rpg_game::get_robot($this_battle, $this_player, array('robot_id' => $backup_target_robot_id, 'robot_token' => $backup_target_robot_token));
+            $new_target_robot = rpg_game::get_robot($this_battle, $target_player, array('robot_id' => $backup_target_robot_id, 'robot_token' => $backup_target_robot_token));
             // Update the target robot's session
             $new_target_robot->update_session();
             // Queue up an this robot's action second, because its slower
-            $this_battle->actions_append($this_player, $this_robot, $this_player, $new_target_robot, $this_action, $this_action_token);
+            $this_battle->actions_append($this_player, $this_robot, $target_player, $new_target_robot, $this_action, $this_action_token);
 
         }
 

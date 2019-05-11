@@ -30,6 +30,7 @@ $this_markup_header = 'Mega Man RPG Prototype Robot Database';
 //$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_robots_links_counter) ? ($mmrpg_database_robots_links_counter == 1 ? '1 Robot' : $mmrpg_database_robots_links_counter.' Robots') : '0 Robots').' )</span>';
 
 // If a specific robot has NOT been defined, show the quick-switcher
+if (empty($mmrpg_database_robots)){ $mmrpg_database_robots = array(); }
 reset($mmrpg_database_robots);
 if (!empty($this_current_token)){ $first_robot_key = $this_current_token; }
 else { $first_robot_key = key($mmrpg_database_robots); }
@@ -219,17 +220,19 @@ if (empty($this_current_token)){
 if (empty($this_current_token)){
     // Loop through the robot database and display the appropriate data
     $key_counter = 0;
-    foreach($mmrpg_database_robots AS $robot_key => $robot_info){
-        // If a type filter has been applied to the robot page
-    if (isset($this_current_filter) && $this_current_filter == 'none' && $robot_info['robot_core'] != ''){ $key_counter++; continue; }
-    elseif (isset($this_current_filter) && $this_current_filter != 'none' && $robot_info['robot_core'] != $this_current_filter && $robot_info['robot_core2'] != $this_current_filter){ $key_counter++; continue; }
-        // Collect information about this robot
-        $this_robot_image = !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'];
-        if ($this_robot_image == 'robot'){ $this_seo_robots = 'noindex'; }
-        // Collect the markup for this robot and print it to the browser
-        $temp_robot_markup = rpg_robot::print_database_markup($robot_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
-        echo $temp_robot_markup;
-        $key_counter++;
+    if (!empty($mmrpg_database_robots)){
+        foreach($mmrpg_database_robots AS $robot_key => $robot_info){
+            // If a type filter has been applied to the robot page
+            if (isset($this_current_filter) && $this_current_filter == 'none' && $robot_info['robot_core'] != ''){ $key_counter++; continue; }
+            elseif (isset($this_current_filter) && $this_current_filter != 'none' && $robot_info['robot_core'] != $this_current_filter && $robot_info['robot_core2'] != $this_current_filter){ $key_counter++; continue; }
+            // Collect information about this robot
+            $this_robot_image = !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'];
+            if ($this_robot_image == 'robot'){ $this_seo_robots = 'noindex'; }
+            // Collect the markup for this robot and print it to the browser
+            $temp_robot_markup = rpg_robot::print_database_markup($robot_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
+            echo $temp_robot_markup;
+            $key_counter++;
+        }
     }
 }
 

@@ -57,14 +57,23 @@ class rpg_mission_bonus extends rpg_mission {
         if ($this_robot_class == 'mecha'){
             $temp_battle_omega = rpg_battle::get_index_info('bonus-prototype-complete');
             $temp_battle_omega['battle_field_base']['field_name'] = 'Mecha Field';
+            $temp_battle_omega['battle_name'] = 'Bonus Battle vs Random Mechas';
+            $temp_battle_omega['battle_description'] = 'Face off against a randomized assortment of support mechas in this special bonus battle!';
+            $temp_battle_omega['battle_description2'] = 'This mission is great for grinding EXP or collecting Small Screws and Mecha Shards!';
         }
         elseif ($this_robot_class == 'master'){
             $temp_battle_omega = rpg_battle::get_index_info('bonus-prototype-complete-2');
             $temp_battle_omega['battle_field_base']['field_name'] = 'Master Field';
+            $temp_battle_omega['battle_name'] = 'Bonus Battle vs Random Masters';
+            $temp_battle_omega['battle_description'] = 'Face off against a randomized assortment of robot masters in this special bonus battle!';
+            $temp_battle_omega['battle_description2'] = 'This mission is great for grinding EXP or collecting Large Screws and Robot Cores!';
         }
         elseif ($this_robot_class == 'boss'){
             $temp_battle_omega = rpg_battle::get_index_info('bonus-prototype-complete-2');
             $temp_battle_omega['battle_field_base']['field_name'] = 'Boss Field';
+            $temp_battle_omega['battle_name'] = 'Bonus Battle vs Random Bosses';
+            $temp_battle_omega['battle_description'] = 'Face off against a randomized assortment of fortress bosses in this special bonus battle!';
+            $temp_battle_omega['battle_description2'] = 'This mission is great for grinding EXP or collecting Large Screws and Robot Cores!';
         }
 
         // Collect an index of which robots have been encountered already
@@ -109,6 +118,13 @@ class rpg_mission_bonus extends rpg_mission {
         }
         if ($temp_bonus_level_min > $temp_bonus_level_max){
             list($temp_bonus_level_min, $temp_bonus_level_max) = array($temp_bonus_level_max, $temp_bonus_level_min);
+        }
+        if ($temp_bonus_level_min < 1){
+            $temp_bonus_level_min = 1;
+        }
+        if ($temp_bonus_level_max < 1
+            || $temp_bonus_level_max < $temp_bonus_level_min){
+            $temp_bonus_level_max = $temp_bonus_level_min;
         }
 
         // Define a list of items that can be equipped to target robots

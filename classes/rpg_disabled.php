@@ -1159,14 +1159,14 @@ class rpg_disabled {
         }
 
         // Check if this battle has any robot rewards to unlock and the winner was a HUMAN player
-        if ($target_player->player_side == 'left' && !empty($this_robot->battle->battle_rewards['robots'])){
+        if ($target_player->player_side == 'left' && !empty($this_battle->battle_rewards['robots'])){
 
             // Only continue if this robot is unlockable
             if (!empty($this_robot->flags['robot_is_unlockable'])){
 
                 // Scan the reward array to find this robot's key
                 $temp_reward_key = false;
-                foreach ($this_robot->battle->battle_rewards['robots'] AS $key => $reward){
+                foreach ($this_battle->battle_rewards['robots'] AS $key => $reward){
                     if ($reward['token'] == $this_robot->robot_token){
                         $temp_reward_key = $key;
                         break;
@@ -1186,10 +1186,12 @@ class rpg_disabled {
                 }
 
                 // If this robot's data has NOT been corrupted, unlock is successful
-                if (!$temp_is_corrupted){
+                if ($temp_reward_key !== false
+                    && !$temp_is_corrupted){
 
                     // Collect this reward's information
-                    $robot_reward_info = $this_robot->battle->battle_rewards['robots'][$temp_reward_key];
+                    $robot_reward_info = $this_battle->battle_rewards['robots'][$temp_reward_key];
+                    $robot_reward_index = rpg_robot::get_index_info($robot_reward_info['token']);
 
                     // Collect or define the robot points and robot rewards variables
                     $this_robot_token = $robot_reward_info['token'];
@@ -1198,20 +1200,26 @@ class rpg_disabled {
                     $this_robot_rewards = !empty($robot_info['robot_rewards']) ? $robot_info['robot_rewards'] : array();
 
                     // Create the temp new robot for the player
-                    $temp_index_robot = rpg_robot::get_index_info($this_robot_token);
-                    $temp_index_robot['robot_id'] = MMRPG_SETTINGS_TARGET_PLAYERID * 2;
-                    $temp_index_robot['robot_level'] = $this_robot_level;
-                    $temp_index_robot['robot_experience'] = $this_robot_experience;
-                    $temp_unlocked_robot = rpg_game::get_robot($this_battle, $target_player, $temp_index_robot);
+                    $temp_unlock_robot_data = array();
+                    $temp_unlock_robot_data['robot_id'] = MMRPG_SETTINGS_GUEST_ID + $robot_reward_index['robot_id'] + 1;
+                    $temp_unlock_robot_data['robot_token'] = $this_robot_token;
+                    $temp_unlock_robot_data['robot_level'] = $this_robot_level;
+                    $temp_unlock_robot_data['robot_experience'] = $this_robot_experience;
+                    $temp_unlocked_robot = rpg_game::get_robot($this_battle, $target_player, $temp_unlock_robot_data);
 
                     // Automatically unlock this robot for use in battle
                     $temp_unlocked_player = $mmrpg_index['players'][$target_player->player_token];
-                    mmrpg_game_unlock_robot($temp_unlocked_player, $temp_index_robot, true, true);
+                    mmrpg_game_unlock_robot($temp_unlocked_player, $temp_unlock_robot, true, true);
 
                     // Display the robot reward message markup
                     $event_header = $temp_unlocked_robot->robot_name.' Unlocked';
                     $event_body = rpg_battle::random_positive_word().' '.$target_player->print_name().' unlocked new robot data!<br />';
                     $event_body .= $temp_unlocked_robot->print_name().' can now be used in battle!';
+                    //$event_body .= '<br /> key: '.$temp_reward_key.' ';
+                    //$event_body .= '<br /> in rewards: '.json_encode($this_battle->battle_rewards['robots']).' ';
+                    //$event_body .= '<br /> picked: '.json_encode($robot_reward_info).' ';
+                    //$event_body .= '<br /> unlock: '.json_encode($temp_unlock_robot_data).' ';
+                    //$event_body .= '<br /> final token: '.$temp_unlocked_robot->robot_token.' ';
                     $event_options = array();
                     $event_options['console_show_target'] = false;
                     $event_options['this_header_float'] = $target_player->player_side;
@@ -1220,14 +1228,16 @@ class rpg_disabled {
                     $temp_unlocked_robot->robot_frame = 'base';
                     $temp_unlocked_robot->update_session();
                     $this_battle->events_create($temp_unlocked_robot, false, $event_header, $event_body, $event_options);
+                    unset($temp_unlocked_robot);
 
-                }
-                // Otherwise, if corrupted, we should remove from battle rewards
-                else {
+                } elseif ($temp_reward_key !== false
+                    && $temp_is_corrupted){
 
-                    // Remove this robot from the battle rewards array
-                    unset($this_robot->battle->battle_rewards['robots'][$temp_reward_key]);
-                    $this_robot->battle->update_session();
+                    // Remove this robot from the rewards as they're corrupted
+                    $this_robot->flags['robot_is_unlockable'] = false;
+                    $this_robot->update_session();
+                    unset($this_battle->battle_rewards['robots'][$temp_reward_key]);
+                    $this_battle->update_session();
 
                 }
 

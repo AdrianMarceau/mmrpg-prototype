@@ -519,7 +519,7 @@ class rpg_battle extends rpg_object {
     }
 
     // Define a public function for triggering battle actions
-    public function battle_complete_trigger($this_player, $this_robot, $target_player, $target_robot, $this_action, $this_token = ''){
+    public function battle_complete_trigger($this_player, $this_robot, $target_player, $target_robot, $this_action = '', $this_token = ''){
         global $mmrpg_index, $db;
         // DEBUG
         //$this->events_create(false, false, 'DEBUG', 'Battle complete trigger triggered!');
@@ -1780,7 +1780,7 @@ class rpg_battle extends rpg_object {
 
                 // Create an event showing the scanned robot's data
                 $event_header = ($temp_target_player->player_token != 'player' ? $temp_target_player->player_name.'&#39;s ' : '').$temp_target_robot->robot_name;
-                if (empty($_SESSION['GAME']['values']['robot_database'][$temp_target_robot->robot_token]['robot_scanned'])){ $event_header .= ' (New!)'; }
+                if (empty($_SESSION['GAME']['values']['robot_database'][$temp_target_robot->robot_token]['robot_scanned'])){ $event_header .= '  <span class="robot_stat robot_type robot_type_electric" style="font-size: 90%; top: -1px;">New!</span>'; }
                 $event_body = '';
                 ob_start();
                 ?>

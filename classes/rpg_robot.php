@@ -2746,8 +2746,9 @@ class rpg_robot extends rpg_object {
         $robot_sprite_frames = array('base','taunt','victory','defeat','shoot','throw','summon','slide','defend','damage','base2');
 
         // Collect the field info if applicable
+        $show_field_info = false;
         $field_info_array = array();
-        if (!empty($robot_info['robot_field']) && $robot_info['robot_field'] != 'field'){ $index_info = rpg_field::get_index_info($robot_info['robot_field']); if (!empty($index_info)){ $field_info_array[] = $index_info; } }
+        if (!empty($robot_info['robot_field']) && $robot_info['robot_field'] != 'field'){ $index_info = rpg_field::get_index_info($robot_info['robot_field']); if (!empty($index_info)){ $field_info_array[] = $index_info; $show_field_info = true; } }
         if (!empty($robot_info['robot_field2']) && $robot_info['robot_field2'] != 'field'){ $index_info = rpg_field::get_index_info($robot_info['robot_field2']); if (!empty($index_info)){ $field_info_array[] = $index_info; } }
 
         // Define the class token for this robot
@@ -3029,7 +3030,7 @@ class rpg_robot extends rpg_object {
                                         <label><?= empty($field_info_array) || count($field_info_array) == 1 ? 'Field' : 'Fields' ?> :</label>
                                         <?
                                         // Loop through the robots fields if available
-                                        if (!empty($field_info_array)){
+                                        if ($show_field_info && !empty($field_info_array)){
                                             foreach ($field_info_array AS $key => $field_info){
                                                 $name = $field_info['field_name'];
                                                 list($name1, $name2) = explode(' ', $name);

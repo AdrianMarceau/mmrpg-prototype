@@ -277,50 +277,6 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
         }
 
     }
-    // Check if this is an FIELD based action
-    elseif ($temp_kind == 'field'){
-
-        // Collect the actual field token from the provided one
-        $temp_actual_token = preg_replace('/^field-/i', '', $temp_token);
-
-        // Ensure this field exists before continuing
-        if (isset($mmrpg_database_fields[$temp_actual_token])){
-
-            // Remove this field's entry from the global array and define the new quantity
-            $temp_unlocked_fields = !empty($_SESSION[$session_token]['values']['battle_fields']) ? $_SESSION[$session_token]['values']['battle_fields'] : array();
-            $temp_unlocked_fields[] = $temp_actual_token;
-            $temp_unlocked_fields = array_unique($temp_unlocked_fields);
-            $_SESSION[$session_token]['values']['battle_fields'] = $temp_unlocked_fields;
-            $temp_current_quantity = 1;
-
-            // Decrement the player's zenny count based on the provided price
-            $_SESSION[$session_token]['counters']['battle_zenny'] = $global_zenny_counter - $temp_price;
-            $global_zenny_counter = $_SESSION[$session_token]['counters']['battle_zenny'];
-
-            // Update the shop history with this sold item under the given character
-            if (!isset($_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['fields_sold'][$temp_token])){ $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['fields_sold'][$temp_token] = 0; }
-            $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['fields_sold'][$temp_token] += 1;
-            $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['zenny_earned'] += $temp_price;
-            $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_experience'] += $temp_price;
-
-            // Refresh battle points and ranking so we can return updated score
-            mmrpg_prototype_refresh_battle_points();
-            $new_battle_points = $_SESSION[$session_token]['counters']['battle_points'];
-            $new_board_rank = $_SESSION[$session_token]['BOARD']['boardrank'];
-
-            // Save, produce the success message with the new field order
-            exit('success|field-purchased|'.$temp_current_quantity.'|'.$global_zenny_counter.'|points:'.$new_battle_points.'|rank:'.mmrpg_number_suffix($new_board_rank));
-
-        }
-        // Otherwise if this star does not exist
-        else {
-
-            // Print an error message and kill the script
-            exit('error|invalid-field|'.$temp_actual_token);
-
-        }
-
-    }
     // Check if this is an ROBOT based action
     elseif ($temp_kind == 'robot'){
 
@@ -332,20 +288,41 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
         if (!empty($unlock_robot_info)
             && !empty($unlock_robot_info['robot_flag_unlockable'])){
 
-            // Decide which play this robot will be unlocked for
-            $this_best_stat_value = 0;
-            $this_best_stat_kind = '';
-            $stat_kinds = array('attack', 'defense', 'speed', 'energy');
-            foreach ($stat_kinds AS $kind){
-                if ($unlock_robot_info['robot_'.$kind] > $this_best_stat_value){
-                    $this_best_stat_value = $unlock_robot_info['robot_'.$kind];
-                    $this_best_stat_kind = $kind;
+            // Hard-code this robot's player if from specific games
+            if ($unlock_robot_info['robot_game'] == 'MM01'){
+
+                // All MM01 robot masters go to Dr. Light
+                $unlock_player_token = 'dr-light';
+
+            } elseif ($unlock_robot_info['robot_game'] == 'MM02'){
+
+                // All MM02 robot masters go to Dr. Wily
+                $unlock_player_token = 'dr-wily';
+
+            } elseif ($unlock_robot_info['robot_game'] == 'MM04'){
+
+                // All MM04 robot masters go to Dr. Cossack
+                $unlock_player_token = 'dr-cossack';
+
+            } else {
+
+                // All other robots have their Dr. based on best stat
+                $this_best_stat_value = 0;
+                $this_best_stat_kind = '';
+                $stat_kinds = array('attack', 'defense', 'speed', 'energy');
+                foreach ($stat_kinds AS $kind){
+                    if ($unlock_robot_info['robot_'.$kind] > $this_best_stat_value){
+                        $this_best_stat_value = $unlock_robot_info['robot_'.$kind];
+                        $this_best_stat_kind = $kind;
+                    }
                 }
+                if ($this_best_stat_kind === 'attack'){ $unlock_player_token = 'dr-wily'; }
+                elseif ($this_best_stat_kind === 'defense'){ $unlock_player_token = 'dr-light'; }
+                elseif ($this_best_stat_kind === 'speed'){ $unlock_player_token = 'dr-cossack'; }
+                //elseif ($this_best_stat_kind === 'energy'){ $unlock_player_token = 'dr-lalinde'; }
+                else { $unlock_player_token = 'dr-light'; } // default
+
             }
-            if ($this_best_stat_kind === 'attack'){ $unlock_player_token = 'dr-wily'; }
-            elseif ($this_best_stat_kind === 'defense'){ $unlock_player_token = 'dr-light'; }
-            elseif ($this_best_stat_kind === 'speed'){ $unlock_player_token = 'dr-cossack'; }
-            elseif ($this_best_stat_kind === 'energy'){ $unlock_player_token = 'dr-light'; } // dr-lalinde?
 
             // Manually unlock this robot using the predefined global function
             $temp_current_quantity = 1;

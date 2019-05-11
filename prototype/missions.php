@@ -197,41 +197,49 @@ else {
             $num_extra += $allow_player_battles = $chapters_unlocked['6'] ? 1 : 0;
             $num_extra += $allow_challenge_battles = $chapters_unlocked['8'] ? 1 : 0;
 
+            // Create vars for enabled and disabled tab markup
+            $enabled_extra_tab_markup = '';
+            $disabled_extra_tab_markup = '';
+
             // CHAPTER RANDOM(5)
             if ($allow_bonus_fields){
                 $chapters_display_count++;
-                echo '<a class="chapter_link extra first random '.($temp_last_chapter === '5' ? 'chapter_link_active ' : '').'" href="#" data-chapter="5" title="Bonus Chapter : Mission Randomizer || [[Face off against randomized mechas, robots, and bosses!]]">Random</a>';
+                $enabled_extra_tab_markup .= '<a class="chapter_link extra first random '.($temp_last_chapter === '5' ? 'chapter_link_active ' : '').'" href="#" data-chapter="5" title="Bonus Chapter : Mission Randomizer || [[Face off against randomized mechas, robots, and bosses!]]">Random</a>';
                 } elseif ($num_extra > 0){
                 $chapters_display_count++;
-                echo '<a class="chapter_link extra first random chapter_link_disabled">???</a>';
+                $disabled_extra_tab_markup .= '<a class="chapter_link extra first random chapter_link_disabled">???</a>';
                 }
 
             // CHAPTER STARS(7)
             if ($allow_star_fields){
                 $chapters_display_count++;
-                echo '<a class="chapter_link extra stars '.($temp_last_chapter === '7' ? 'chapter_link_active ' : '').'" href="#" data-chapter="7" title="Bonus Chapter : Star Fields || [[Collect elemental stars to power up your robots!]]">Stars'.($battle_star_counter >= MMRPG_SETTINGS_STARFORCE_STARTOTAL ? ' &check;' : '').'</a>';
+                $enabled_extra_tab_markup .= '<a class="chapter_link extra stars '.($temp_last_chapter === '7' ? 'chapter_link_active ' : '').'" href="#" data-chapter="7" title="Bonus Chapter : Star Fields || [[Collect elemental stars to power up your robots!]]">Stars'.($battle_star_counter >= MMRPG_SETTINGS_STARFORCE_STARTOTAL ? ' &check;' : '').'</a>';
                 } elseif ($num_extra > 0){
                 $chapters_display_count++;
-                echo '<a class="chapter_link extra stars chapter_link_disabled">???</a>';
+                $disabled_extra_tab_markup .= '<a class="chapter_link extra stars chapter_link_disabled">???</a>';
                 }
 
             // CHAPTER PLAYERS(6)
             if ($allow_player_battles){
                 $chapters_display_count++;
-                echo '<a class="chapter_link extra players '.($temp_last_chapter === '6' ? 'chapter_link_active ' : '').'" href="#" data-chapter="6" title="Bonus Chapter : Player Battles || [[Fight against other players\' ghost data!]] || [[Limited robots + only hold items allowed!]]'.(!empty($this_rogue_star) ? ' || [[(Rogue Stars are disabled here!)]]' : '').'">Players</a>';
+                $enabled_extra_tab_markup .= '<a class="chapter_link extra players '.($temp_last_chapter === '6' ? 'chapter_link_active ' : '').'" href="#" data-chapter="6" title="Bonus Chapter : Player Battles || [[Fight against other players\' ghost data!]] || [[Limited robots + only hold items allowed!]]'.(!empty($this_rogue_star) ? ' || [[(Rogue Stars are disabled here!)]]' : '').'">Players</a>';
                 } elseif ($num_extra > 0){
                 $chapters_display_count++;
-                echo '<a class="chapter_link extra players chapter_link_disabled">???</a>';
+                $disabled_extra_tab_markup .= '<a class="chapter_link extra players chapter_link_disabled">???</a>';
                 }
 
             // CHAPTER CHALLENGES(8)
             if ($allow_challenge_battles){
                 $chapters_display_count++;
-                echo '<a class="chapter_link extra challenges '.($temp_last_chapter === '8' ? 'chapter_link_active ' : '').'" href="#" data-chapter="8" title="Bonus Chapter : Challenge Mode || [[Fight in unique challenges designed by MMRPG staff!]] || [[Limited turns and robots + only hold items allowed!]]'.(!empty($this_rogue_star) ? ' || [[(Rogue Stars are disabled here!)]]' : '').'">Challenges</a>';
+                $enabled_extra_tab_markup .= '<a class="chapter_link extra challenges '.($temp_last_chapter === '8' ? 'chapter_link_active ' : '').'" href="#" data-chapter="8" title="Bonus Chapter : Challenge Mode || [[Fight in unique challenges designed by MMRPG staff!]] || [[Limited turns and robots + only hold items allowed!]]'.(!empty($this_rogue_star) ? ' || [[(Rogue Stars are disabled here!)]]' : '').'">Challenges</a>';
                 } elseif ($num_extra > 0){
                 $chapters_display_count++;
-                echo '<a class="chapter_link extra challenges chapter_link_disabled">???</a>';
+                $disabled_extra_tab_markup .= '<a class="chapter_link extra challenges chapter_link_disabled">???</a>';
                 }
+
+            // Print out the enabled and disabled tab markup
+            echo $enabled_extra_tab_markup;
+            echo $disabled_extra_tab_markup;
 
         // Collect generated chapter markup
         $chapters_display_markup = ob_get_clean();
