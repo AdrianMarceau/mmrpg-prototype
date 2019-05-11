@@ -2322,40 +2322,52 @@ button {
 }
 
 
-#window .page .leaderboard .pagelinks {
+#window .page .body_wrapper .pagelinks {
     display: block;
     margin: 0 auto;
     overflow: hidden;
     text-align: center;
     position: relative;
+    border: 1px solid transparent;
+    background-color: #1e1e1e;
+    padding: 6px 6px 2px;
+    border-radius: 0.3em;
+    -moz-border-radius: 0.3em;
+    -webkit-border-radius: 0.3em;
 }
-#window .page .leaderboard .pagelinks.head {
+#window .page .body_wrapper .pagelinks.head {
     margin-bottom: 10px;
 }
-#window .page .leaderboard .pagelinks.foot {
+#window .page .body_wrapper .pagelinks.foot {
     margin-top: 10px;
 }
-#window .page .leaderboard .pagelinks .link {
+#window .page .community .pagelinks.head {
+    margin-bottom: 5px;
+}
+#window .page .community .pagelinks.foot {
+    margin-top: 5px;
+}
+#window .page .body_wrapper .pagelinks .link {
     display: inline-block;
     margin: 0 4px 4px 0;
     padding: 3px 6px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     border-radius: 3px;
-    background-color: #1e1e1e;
+    background-color: #242424;
     color: #DEDEDE;
     min-width: 20px;
     box-sizing: border-box;
     text-align: center;
     text-decoration: none;
 }
-#window .page .leaderboard .pagelinks .link.active,
-#window .page .leaderboard .pagelinks .link:hover {
+#window .page .body_wrapper .pagelinks .link.active,
+#window .page .body_wrapper .pagelinks .link:hover {
     background-color: #4e4e4e;
     text-decoration: underline;
 }
-#window .page .leaderboard .pagelinks .link.prev,
-#window .page .leaderboard .pagelinks .link.next {
+#window .page .body_wrapper .pagelinks .link.prev,
+#window .page .body_wrapper .pagelinks .link.next {
     min-width: 50px;
     font-size: 11px;
     border: 1px solid #1A1A1A;
@@ -2377,21 +2389,21 @@ button {
     -website-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
 }
-#window .page .leaderboard .pagelinks .link.prev {
+#window .page .body_wrapper .pagelinks .link.prev {
     float: left;
 }
-#window .page .leaderboard .pagelinks .link.next {
+#window .page .body_wrapper .pagelinks .link.next {
     float: right;
 }
-#window .page .leaderboard .pagelinks .link.number,
-#window .page .leaderboard .pagelinks .link.bullet {
+#window .page .body_wrapper .pagelinks .link.number,
+#window .page .body_wrapper .pagelinks .link.bullet {
     min-height: 22px;
     line-height: 20px;
 }
-#window .page .leaderboard .pagelinks .link.number {
+#window .page .body_wrapper .pagelinks .link.number {
 
 }
-#window .page .leaderboard .pagelinks .link.bullet {
+#window .page .body_wrapper .pagelinks .link.bullet {
 
 }
 
@@ -4194,6 +4206,21 @@ body.windowFlag_landscapeMode #window .page .type_block {
     right: -52px;
     margin-left: -52px;
 }
+#window .page .body .community .thread_subbody_small.thread_is_sticky {
+    position: relative;
+}
+#window .page .body .community .thread_subbody_small.thread_is_sticky:after {
+    content: "\01f588";
+    display: block;
+    position: absolute;
+    top: 6px;
+    right: 4px;
+    font-size: 20px;
+    color: #ffffff;
+    transform: scaleX(-1);
+}
+
+
 #window .page .body .community .thread_subbody_full {
     /*padding: 10px 10px 10px 15px;*/
     padding: 10px;

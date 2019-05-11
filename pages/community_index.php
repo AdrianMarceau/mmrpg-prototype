@@ -12,7 +12,7 @@ foreach ($this_categories_index AS $this_category_id => $this_category_info){
     if ($this_category_info['category_id'] == 0 || $this_category_info['category_token'] == 'chat'){ continue; }
 
     // Collect a list of recent threads for this category
-    $this_threads_array = mmrpg_website_community_category_threads($this_category_info, true, false, MMRPG_SETTINGS_THREADS_RECENT);
+    $this_threads_array = mmrpg_website_community_category_threads($this_category_info, true, false, MMRPG_SETTINGS_THREADS_RECENT, 0);
 
     // If this is the news category, ensure the threads are arranged by date only
     if ($this_category_info['category_token'] == 'news'){
