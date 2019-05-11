@@ -420,7 +420,7 @@ function mmrpg_website_community_index(){
 }
 
 // Define a function for selecting a list of threads in a category
-function mmrpg_website_community_category_threads($this_category_info, $filter_locked = false, $filter_recent = false, $row_limit = false, $filter_ids = array()){
+function mmrpg_website_community_category_threads($this_category_info, $filter_locked = false, $filter_recent = false, $row_limit = false, $row_offset = false, $filter_ids = array()){
 
     // Pull in global variables
     global $db, $this_userinfo;
@@ -463,8 +463,9 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
     $temp_where_filter = implode(" AND \n", $temp_where_filter)."\n";
 
     // If a row limit has been defined, generate the string for it
-    if (!empty($row_limit) && is_numeric($row_limit)){ $temp_limit_string = "LIMIT {$row_limit} "; }
-    else { $temp_limit_string = ''; }
+    $temp_limit_string = '';
+    if (!empty($row_limit) && is_numeric($row_limit)){ $temp_limit_string .= "LIMIT {$row_limit} "; }
+    if (!empty($row_offset) && is_numeric($row_offset)){ $temp_limit_string .= "OFFSET {$row_offset} "; }
 
     // Generate the query for collecting discussion threads for a given category
     $this_threads_query = "SELECT
@@ -604,6 +605,7 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
             ;";
 
     // Collect all the threads for this category from the database
+    //exit($this_threads_query);
     $this_threads_array = $db->get_array_list($this_threads_query);
 
     // Return the threads array if not empty
@@ -773,6 +775,7 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
         // If the date group was different, update the static variable
         if ($temp_date_group != $this_date_group){
             $this_date_group = $temp_date_group;
+            /*
             // ONly show group separators if not in header mode
             if (!$header_mode){
                 if ($temp_date_group == 'locked'){
@@ -783,7 +786,7 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
                     echo '<h3 id="date-'.$temp_date_group.'" data-group="'.$temp_date_group.'" class="subheader category_date_group">'.date('F Y', $temp_thread_mod_date).'</h3>';
                 }
             }
-
+            */
         }
 
         // Define the temporary display variables
@@ -842,7 +845,7 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
         }
 
         ?>
-        <div id="thread-<?= $temp_thread_id ?>" data-group="<?= $temp_date_group ?>" class="subbody thread_subbody thread_subbody_small <?= $header_mode ? 'thread_subbody_small_nohover' : '' ?> <?= $compact_mode ? 'thread_subbody_compact' : '' ?> thread_right field_type_<?= !empty($this_thread_info['thread_colour']) ? $this_thread_info['thread_colour'] : 'none' ?>">
+        <div id="thread-<?= $temp_thread_id ?>" data-group="<?= $temp_date_group ?>" class="subbody thread_subbody thread_subbody_small <?= $header_mode ? 'thread_subbody_small_nohover' : '' ?> <?= $temp_date_group == 'sticky' ? 'thread_is_sticky' : '' ?> <?= $compact_mode ? 'thread_subbody_compact' : '' ?> thread_right field_type_<?= !empty($this_thread_info['thread_colour']) ? $this_thread_info['thread_colour'] : 'none' ?>">
             <?
             // If this thread has a specific target, display their avatar to the right
             if ($this_thread_info['thread_target'] != 0){

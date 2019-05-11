@@ -38,7 +38,7 @@ if (!empty($_SESSION['COMMUNITY']['threads_viewed'])){
 }
 
 // Collect a list and count of all threads in this category
-$this_threads_array = mmrpg_website_community_category_threads($this_category_info, true, true, false, $temp_exclude_ids);
+$this_threads_array = mmrpg_website_community_category_threads($this_category_info, true, true, false, false, $temp_exclude_ids);
 $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) : 0;
 //die('<pre>'.print_r($this_threads_array, true).'</pre>');
 
