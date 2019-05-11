@@ -2019,7 +2019,11 @@ function mmrpg_prototype_leaderboard_online(){
         $this_leaderboard_index = mmrpg_prototype_leaderboard_index();
         // Generate the points index and then break it down to unique for ranks
         $this_points_index = array();
-        foreach ($this_leaderboard_index AS $info){ $this_points_index[] = $info['board_points']; }
+        if (!empty($this_leaderboard_index)){
+            foreach ($this_leaderboard_index AS $info){
+                $this_points_index[] = $info['board_points'];
+            }
+        }
         $this_points_index = array_unique($this_points_index);
         // Define the vars for finding the online players
         $this_time = time();

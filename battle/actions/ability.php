@@ -345,16 +345,16 @@ else {
             // Update the target robot's session
             $new_target_robot->update_session();
             // Queue up an this robot's action second, because its slower
-            $this_battle->actions_append($this_player, $this_robot, $this_player, $new_target_robot, $this_action, $this_action_token);
+            $this_battle->actions_append($this_player, $this_robot, $target_player, $new_target_robot, $this_action, $this_action_token);
 
         } else {
 
             // Define the new target robot which is actually a team mate
-            $new_target_robot = rpg_game::get_robot($this_battle, $this_player, array('robot_id' => $backup_target_robot_id, 'robot_token' => $backup_target_robot_token));
+            $new_target_robot = rpg_game::get_robot($this_battle, $target_player, array('robot_id' => $backup_target_robot_id, 'robot_token' => $backup_target_robot_token));
             // Update the target robot's session
             $new_target_robot->update_session();
             // Queue up an this robot's action second, because its slower
-            $this_battle->actions_append($this_player, $this_robot, $this_player, $new_target_robot, $this_action, $this_action_token);
+            $this_battle->actions_append($this_player, $this_robot, $target_player, $new_target_robot, $this_action, $this_action_token);
 
         }
 

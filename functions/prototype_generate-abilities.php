@@ -162,6 +162,8 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
 
             // Collect a list of global abilities to reference
             $temp_global_abilities = rpg_ability::get_global_abilities();
+            if (empty($temp_global_abilities)){ $temp_global_abilities = array(); }
+            if (empty($robot_index_info['robot_abilities'])){ $robot_index_info['robot_abilities'] = array(); }
 
             // Define the number of core and master support abilities for the robot
             if ($robot_index_info['robot_class'] != 'mecha'){
@@ -171,20 +173,26 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                         if (in_array($ability_token, $this_robot_abilities)){ continue; }
                         $ability_info = $this_ability_index[$ability_token];
                         $is_compatible = false;
-                        if (!$is_compatible && (in_array($ability_token, $robot_index_info['robot_abilities']) || in_array($ability_token, $temp_global_abilities))){
+                        if (!$is_compatible
+                            && (in_array($ability_token, $robot_index_info['robot_abilities'])
+                                || in_array($ability_token, $temp_global_abilities))){
                             $is_compatible = true;
                         }
-                        if (!$is_compatible && !empty($robot_index_info['robot_core'])){
+                        if (!$is_compatible
+                            && !empty($robot_index_info['robot_core'])){
                             if ($robot_index_info['robot_core'] == 'copy' && $ability_info['ability_type'] != 'empty'){ $is_compatible = true; }
                             elseif (!empty($ability_info['ability_type']) && $robot_index_info['robot_core'] == $ability_info['ability_type']){ $is_compatible = true; }
                             elseif (!empty($ability_info['ability_type2']) && $robot_index_info['robot_core'] == $ability_info['ability_type2']){ $is_compatible = true; }
                         }
-                        if (!$is_compatible && !empty($robot_item_core)){
+                        if (!$is_compatible
+                            && !empty($robot_item_core)){
                             if ($robot_item_core == 'copy' && $ability_info['ability_type'] == 'copy'){ $is_compatible = true; }
                             elseif (!empty($ability_info['ability_type']) && $robot_item_core == $ability_info['ability_type']){ $is_compatible = true; }
                             elseif (!empty($ability_info['ability_type2']) && $robot_item_core == $ability_info['ability_type2']){ $is_compatible = true; }
                         }
-                        if ($is_compatible){ $this_robot_abilities_addons['support'][] = $ability_token; }
+                        if ($is_compatible){
+                            $this_robot_abilities_addons['support'][] = $ability_token;
+                        }
                     }
                     unset($ability_info);
                 }

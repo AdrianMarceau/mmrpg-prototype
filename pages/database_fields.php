@@ -30,6 +30,7 @@ $this_markup_header = 'Mega Man RPG Prototype Field Database';
 //$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_fields_links_counter) ? ($mmrpg_database_fields_links_counter == 1 ? '1 Field' : $mmrpg_database_fields_links_counter.' Fields') : '0 Fields').' )</span>';
 
 // If a specific field has NOT been defined, show the quick-switcher
+if (empty($mmrpg_database_fields)){ $mmrpg_database_fields = array(); }
 reset($mmrpg_database_fields);
 if (!empty($this_current_token)){ $first_field_key = $this_current_token; }
 else { $first_field_key = key($mmrpg_database_fields); }
@@ -165,20 +166,22 @@ if (empty($this_current_token)){
 if (empty($this_current_token)){
     // Loop through the field database and display the appropriate data
     $key_counter = 0;
-    foreach($mmrpg_database_fields AS $field_key => $field_info){
-        // If a type filter has been applied to the field page
-        $temp_field_types = array();
-        if (!empty($field_info['field_type'])){ $temp_field_types[] = $field_info['field_type']; }
-        if (!empty($field_info['field_type2'])){ $temp_field_types[] = $field_info['field_type2']; }
-        if (empty($temp_field_types)){ $temp_field_types[] = 'none'; }
-        if (isset($this_current_filter) && !in_array($this_current_filter, $temp_field_types)){ $key_counter++; continue; }
-        // Collect information about this field
-        $this_field_image = !empty($field_info['field_image']) ? $field_info['field_image'] : $field_info['field_token'];
-        if ($this_field_image == 'field'){ $this_seo_fields = 'noindex'; }
-        // Collect the markup for this field and print it to the browser
-        $temp_field_markup = rpg_field::print_database_markup($field_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
-        echo $temp_field_markup;
-        $key_counter++;
+    if (!empty($mmrpg_database_fields)){
+        foreach($mmrpg_database_fields AS $field_key => $field_info){
+            // If a type filter has been applied to the field page
+            $temp_field_types = array();
+            if (!empty($field_info['field_type'])){ $temp_field_types[] = $field_info['field_type']; }
+            if (!empty($field_info['field_type2'])){ $temp_field_types[] = $field_info['field_type2']; }
+            if (empty($temp_field_types)){ $temp_field_types[] = 'none'; }
+            if (isset($this_current_filter) && !in_array($this_current_filter, $temp_field_types)){ $key_counter++; continue; }
+            // Collect information about this field
+            $this_field_image = !empty($field_info['field_image']) ? $field_info['field_image'] : $field_info['field_token'];
+            if ($this_field_image == 'field'){ $this_seo_fields = 'noindex'; }
+            // Collect the markup for this field and print it to the browser
+            $temp_field_markup = rpg_field::print_database_markup($field_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
+            echo $temp_field_markup;
+            $key_counter++;
+        }
     }
 }
 
