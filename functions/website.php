@@ -508,15 +508,6 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
         users2.mod_user_image_path,
         users2.mod_user_flag_postpublic,
 
-        users3.target_user_id,
-        users3.target_user_name,
-        users3.target_user_name_public,
-        users3.target_user_name_clean,
-        users3.target_user_background_path,
-        users3.target_user_colour_token,
-        users3.target_user_image_path,
-        users3.target_user_flag_postpublic,
-
         posts.post_count,
         posts_new.new_post_count
 
@@ -541,20 +532,6 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
             FROM mmrpg_users
             ) AS users2
             ON threads.thread_mod_user = users2.mod_user_id
-
-        LEFT JOIN (
-            SELECT
-            user_id AS target_user_id,
-            user_name AS target_user_name,
-            user_name_clean AS target_user_name_clean,
-            user_name_public AS target_user_name_public,
-            user_colour_token AS target_user_colour_token,
-            user_image_path AS target_user_image_path,
-            user_background_path AS target_user_background_path,
-            user_flag_postpublic AS target_user_flag_postpublic
-            FROM mmrpg_users
-            ) AS users3
-            ON threads.thread_target = users3.target_user_id
 
         LEFT JOIN (
             SELECT
@@ -665,20 +642,6 @@ function mmrpg_website_community_category_threads_count($this_category_info, $fi
             FROM mmrpg_users
             ) AS users2
             ON threads.thread_mod_user = users2.mod_user_id
-
-        LEFT JOIN (
-            SELECT
-            user_id AS target_user_id,
-            user_name AS target_user_name,
-            user_name_clean AS target_user_name_clean,
-            user_name_public AS target_user_name_public,
-            user_colour_token AS target_user_colour_token,
-            user_image_path AS target_user_image_path,
-            user_background_path AS target_user_background_path,
-            user_flag_postpublic AS target_user_flag_postpublic
-            FROM mmrpg_users
-            ) AS users3
-            ON threads.thread_target = users3.target_user_id
 
         LEFT JOIN (
             SELECT
@@ -814,8 +777,12 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
         $temp_thread_link_comments .= !empty($temp_posts_count) ? '#comment-listing' : '#comment-form';
 
         // Define the target option text
-        $temp_target_thread_author = !empty($this_thread_info['target_user_name_public']) && !empty($this_thread_info['target_user_flag_postpublic']) ? $this_thread_info['target_user_name_public'] : $this_thread_info['target_user_name'];
-        $temp_target_thread_author_colour = !empty($this_thread_info['target_user_colour_token']) ? $this_thread_info['target_user_colour_token'] : 'none';
+        $temp_target_thread_author = '?';
+        $temp_target_thread_author_colour = 'none';
+        if ($temp_category_token == 'personal'){
+            $temp_target_thread_author = !empty($this_userinfo['user_name_public']) && !empty($this_userinfo['user_flag_postpublic']) ? $this_userinfo['user_name_public'] : $this_userinfo['user_name'];
+            $temp_target_thread_author_colour = !empty($this_userinfo['user_colour_token']) ? $this_userinfo['user_colour_token'] : 'none';
+        }
 
         // Define if this post is new to the logged in user or not
         $temp_is_new = false;
