@@ -30,6 +30,7 @@ $omega_game_index = array(
     );
 
 // Collect a list of all "omega" field robots (basically everyone from MM01-MM11) and format them
+if (!isset($db)){ global $db; }
 $raw_game_string = "'".implode("', '", array_keys($omega_game_index))."'";
 $raw_omega_factors = $db->get_array_list("SELECT
     robots.robot_token AS `robot`,

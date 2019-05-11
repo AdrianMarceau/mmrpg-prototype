@@ -273,7 +273,9 @@ $index_nav_markup .= trim(ob_get_clean()).PHP_EOL;
 }
 
 // Include the required page logic files
-require_once('pages/'.$this_current_page.'.php');
+if (file_exists('pages/'.$this_current_page.'.php')){
+    require_once('pages/'.$this_current_page.'.php');
+}
 
 ?>
 <!DOCTYPE html>

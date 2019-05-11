@@ -285,6 +285,7 @@ class rpg_ability_recovery extends rpg_recovery {
         $this_ability->ability_results['trigger_kind'] = 'recovery';
         $this_ability->ability_results['recovery_kind'] = $this_ability->recovery_options['recovery_kind'];
         $this_ability->ability_results['recovery_type'] = $this_ability->recovery_options['recovery_type'];
+        $this_ability->ability_results['recovery_type2'] = !empty($this_ability->recovery_options['recovery_type2']) ? $this_ability->recovery_options['recovery_type2'] : '';
 
         // If the success rate was not provided, auto-calculate
         if ($this_ability->recovery_options['success_rate'] == 'auto'){

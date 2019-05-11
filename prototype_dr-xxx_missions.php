@@ -73,28 +73,34 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         //die('<pre>'.print_r($this_prototype_data['target_robot_omega'], true).'</pre>');
         foreach ($this_prototype_data['target_robot_omega'] AS $key => $info){
 
-            // Generate the battle option with the starter data
+            // Check to see if we're generating from scratch or pulling from cache
             $temp_session_token = $this_prototype_data['this_player_token'].'_battle_'.$this_prototype_data['this_current_chapter'].'_'.$key;
             if (empty($_SESSION['PROTOTYPE_TEMP'][$temp_session_token])){
+
+                // GENERATE OMEGA BATTLE (SINGLES)
+                // Generate a single battle against a specific robot master
                 $temp_battle_omega = rpg_mission_single::generate($this_prototype_data, $info['robot'], $info['field'], $this_prototype_data['this_chapter_levels'][1]);
                 $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
                 rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
-                $_SESSION['PROTOTYPE_TEMP'][$temp_session_token] = $temp_battle_omega['battle_token'];
+                $this_prototype_data['battle_options'][] = $temp_battle_omega;
+
+                // GENERATE ALPHA BATTLE (SINGLES)
+                // Split this mission into two phases, once with only mechas and once with the master
+                $temp_battle_alpha = mmrpg_prototypt_extract_alpha_battle($temp_battle_omega, $this_prototype_data);
+                rpg_battle::update_index_info($temp_battle_alpha['battle_token'], $temp_battle_alpha);
+                rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+                $temp_option_key = count($this_prototype_data['battle_options']) - 1;
+                $this_prototype_data['battle_options'][$temp_option_key]['alpha_battle_token'] = $temp_battle_alpha['battle_token'];
+
+                // Cache the details required for the omega and alpha battles
+                $_SESSION['PROTOTYPE_TEMP'][$temp_session_token] = $this_prototype_data['battle_options'][$temp_option_key];
+
             } else {
-                $temp_battle_token = $_SESSION['PROTOTYPE_TEMP'][$temp_session_token];
-                $temp_battle_omega = rpg_battle::get_index_info($temp_battle_token);
+
+                // Pull battle details from the cache and add to the options
+                $this_prototype_data['battle_options'][] = $_SESSION['PROTOTYPE_TEMP'][$temp_session_token];
+
             }
-
-            // Add the omega battle to the options, index, and session
-            $this_prototype_data['battle_options'][] = $temp_battle_omega;
-
-            // GENERATE ALPHA BATTLE (SINGLES)
-            // Split this mission into two phases, once with only mechas and once with the master
-            $temp_battle_alpha = mmrpg_prototypt_extract_alpha_battle($temp_battle_omega, $this_prototype_data);
-            rpg_battle::update_index_info($temp_battle_alpha['battle_token'], $temp_battle_alpha);
-            rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
-            $temp_option_key = count($this_prototype_data['battle_options']) - 1;
-            $this_prototype_data['battle_options'][$temp_option_key]['alpha_battle_token'] = $temp_battle_alpha['battle_token'];
 
         }
 
@@ -174,32 +180,39 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         // Populate the battle options with the initial eight robots combined
         if (isset($this_prototype_data['target_robot_omega'][1][0])){ $this_prototype_data['target_robot_omega'] = $this_prototype_data['target_robot_omega'][1]; }
         foreach ($this_prototype_data['target_robot_omega'] AS $key => $info){
+
             // Generate the second info option and skip if already used
             if ($key > 0 && ($key + 1) % 2 == 0){ continue; }
 
-            // Generate the battle option with the starter data
+            // Check to see if we're generating from scratch or pulling from cache
             $temp_session_token = $this_prototype_data['this_player_token'].'_battle_'.$this_prototype_data['this_current_chapter'].'_'.$key;
             if (empty($_SESSION['PROTOTYPE_TEMP'][$temp_session_token])){
+
+                // GENERATE OMEGA BATTLE (DOUBLES)
+                // Generate a double battle against two different robot masters
                 $info2 = $this_prototype_data['target_robot_omega'][$key + 1];
                 $temp_battle_omega = rpg_mission_double::generate($this_prototype_data, array($info['robot'], $info2['robot']), array($info['field'], $info2['field']), $this_prototype_data['this_chapter_levels'][3], true, true);
                 $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
                 rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
-                $_SESSION['PROTOTYPE_TEMP'][$temp_session_token] = $temp_battle_omega['battle_token'];
+                $this_prototype_data['battle_options'][] = $temp_battle_omega;
+
+                // GENERATE ALPHA BATTLE (DOUBLES)
+                // Split this mission into two phases, once with only mechas and once with the masters
+                $temp_battle_alpha = mmrpg_prototypt_extract_alpha_battle($temp_battle_omega, $this_prototype_data);
+                rpg_battle::update_index_info($temp_battle_alpha['battle_token'], $temp_battle_alpha);
+                rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+                $temp_option_key = count($this_prototype_data['battle_options']) - 1;
+                $this_prototype_data['battle_options'][$temp_option_key]['alpha_battle_token'] = $temp_battle_alpha['battle_token'];
+
+                // Cache the details required for the omega and alpha battles
+                $_SESSION['PROTOTYPE_TEMP'][$temp_session_token] = $this_prototype_data['battle_options'][$temp_option_key];
+
             } else {
-                $temp_battle_token = $_SESSION['PROTOTYPE_TEMP'][$temp_session_token];
-                $temp_battle_omega = rpg_battle::get_index_info($temp_battle_token);
+
+                // Pull battle details from the cache and add to the options
+                $this_prototype_data['battle_options'][] = $_SESSION['PROTOTYPE_TEMP'][$temp_session_token];
+
             }
-
-            // Add the omega battle to the options, index, and session
-            $this_prototype_data['battle_options'][] = $temp_battle_omega;
-
-            // GENERATE ALPHA BATTLE (DOUBLES)
-            // Split this mission into two phases, once with only mechas and once with the master
-            $temp_battle_alpha = mmrpg_prototypt_extract_alpha_battle($temp_battle_omega, $this_prototype_data);
-            rpg_battle::update_index_info($temp_battle_alpha['battle_token'], $temp_battle_alpha);
-            rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
-            $temp_option_key = count($this_prototype_data['battle_options']) - 1;
-            $this_prototype_data['battle_options'][$temp_option_key]['alpha_battle_token'] = $temp_battle_alpha['battle_token'];
 
         }
 
@@ -416,10 +429,10 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $info2 = $star_info['info2'];
 
             // Generate either a double or single battle based on field factors
-            if (!empty($info) && !empty($info2)){
-                $temp_battle_omega = rpg_mission_double::generate($this_prototype_data, array($info['robot'], $info2['robot']), array($info['field'], $info2['field']), $star_level, false, false, true);
+            if (!empty($info) && !empty($info2) && $info['field'] != $info2['field']){
+                $temp_battle_omega = rpg_mission_double::generate($this_prototype_data, array($info['robot'], $info2['robot']), array($info['field'], $info2['field']), $star_level, true, false, true);
             } elseif (!empty($info)){
-                $temp_battle_omega = rpg_mission_single::generate($this_prototype_data, $info['robot'], $info['field'], $star_level, false, false, true);
+                $temp_battle_omega = rpg_mission_single::generate($this_prototype_data, $info['robot'], $info['field'], $star_level, true, false, true);
             }
 
             // Update the chapter number and then save this data to the temp index
@@ -464,10 +477,6 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 mmrpg_prototype_mission_autoplay_append($temp_battle_omega, $temp_battle_sigma, $this_prototype_data, true);
                 //$this_prototype_data['battle_options'][] = $temp_battle_sigma;
             }
-
-            // TEST TEST TEST
-            // TEST TEST TEST
-
 
             // If we're over the limit, break now
             $added_star_fields++;

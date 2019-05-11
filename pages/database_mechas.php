@@ -31,6 +31,7 @@ $this_markup_header = 'Mega Man RPG Prototype Mecha Database';
 //$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_mechas_links_counter) ? ($mmrpg_database_mechas_links_counter == 1 ? '1 Mecha' : $mmrpg_database_mechas_links_counter.' Mechas') : '0 Mechas').' )</span>';
 
 // If a specific mecha has NOT been defined, show the quick-switcher
+if (empty($mmrpg_database_mechas)){ $mmrpg_database_mechas = array(); }
 reset($mmrpg_database_mechas);
 if (!empty($this_current_token)){ $first_mecha_key = $this_current_token; }
 else { $first_mecha_key = key($mmrpg_database_mechas); }
@@ -215,17 +216,19 @@ if (empty($this_current_token)){
 if (empty($this_current_token)){
     // Loop through the mecha database and display the appropriate data
     $key_counter = 0;
-    foreach($mmrpg_database_mechas AS $mecha_key => $mecha_info){
-        // If a type filter has been applied to the mecha page
-        if (isset($this_current_filter) && $this_current_filter == 'none' && $mecha_info['robot_core'] != ''){ $key_counter++; continue; }
-        elseif (isset($this_current_filter) && $this_current_filter != 'none' && $mecha_info['robot_core'] != $this_current_filter && $mecha_info['robot_core2'] != $this_current_filter){ $key_counter++; continue; }
-        // Collect information about this mecha
-        $this_robot_image = !empty($mecha_info['robot_image']) ? $mecha_info['robot_image'] : $mecha_info['robot_token'];
-        if ($this_robot_image == 'robot'){ $this_seo_robots = 'noindex'; }
-        // Collect the markup for this robot and print it to the browser
-        $temp_mecha_markup = rpg_robot::print_database_markup($mecha_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
-        echo $temp_mecha_markup;
-        $key_counter++;
+    if (!empty($mmrpg_database_mechas)){
+        foreach($mmrpg_database_mechas AS $mecha_key => $mecha_info){
+            // If a type filter has been applied to the mecha page
+            if (isset($this_current_filter) && $this_current_filter == 'none' && $mecha_info['robot_core'] != ''){ $key_counter++; continue; }
+            elseif (isset($this_current_filter) && $this_current_filter != 'none' && $mecha_info['robot_core'] != $this_current_filter && $mecha_info['robot_core2'] != $this_current_filter){ $key_counter++; continue; }
+            // Collect information about this mecha
+            $this_robot_image = !empty($mecha_info['robot_image']) ? $mecha_info['robot_image'] : $mecha_info['robot_token'];
+            if ($this_robot_image == 'robot'){ $this_seo_robots = 'noindex'; }
+            // Collect the markup for this robot and print it to the browser
+            $temp_mecha_markup = rpg_robot::print_database_markup($mecha_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
+            echo $temp_mecha_markup;
+            $key_counter++;
+        }
     }
 }
 

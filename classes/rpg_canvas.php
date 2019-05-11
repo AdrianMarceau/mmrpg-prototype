@@ -1870,6 +1870,7 @@ class rpg_canvas {
                 elseif ($this_multiplier > MMRPG_SETTINGS_MULTIPLIER_MAX){ $this_multiplier = MMRPG_SETTINGS_MULTIPLIER_MAX; }
                 $temp_name = $this_type != 'none' ? ucfirst($this_type) : 'Neutral';
                 $temp_number = number_format($this_multiplier, 1);
+                if ($temp_number == '1.0'){ continue; }
                 $temp_title = $temp_name.' x '.$temp_number;
                 if ($temp_multipliers_count >= 8){ $temp_name = substr($temp_name, 0, 2); }
                 $temp_markup = '<span title="'.$temp_title.'" data-tooltip-align="center" class="field_multiplier field_multiplier_'.$this_type.' field_multiplier_count_'.$temp_multipliers_count.' field_type field_type_'.$this_type.'"><span class="text"><span class="type">'.$temp_name.' </span><span class="cross">x</span><span class="number"> '.$temp_number.'</span></span></span>';

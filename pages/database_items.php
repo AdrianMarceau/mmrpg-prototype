@@ -30,6 +30,7 @@ $this_markup_header = 'Mega Man RPG Prototype Item Database';
 //$this_markup_counter = '<span class="count count_header">( '.(!empty($mmrpg_database_items_links_counter) ? ($mmrpg_database_items_links_counter == 1 ? '1 Item' : $mmrpg_database_items_links_counter.' Items') : '0 Items').' )</span>';
 
 // If a specific item has NOT been defined, show the quick-switcher
+if (empty($mmrpg_database_items)){ $mmrpg_database_items = array(); }
 reset($mmrpg_database_items);
 if (!empty($this_current_token)){ $first_item_key = $this_current_token; }
 else { $first_item_key = key($mmrpg_database_items); }
@@ -173,22 +174,24 @@ if (empty($this_current_token)){
 if (empty($this_current_token)){
     // Loop through the item database and display the appropriate data
     $key_counter = 0;
-    foreach($mmrpg_database_items AS $item_key => $item_info){
-        // If a type filter has been applied to the item page
-        $temp_item_types = array();
-        if (!empty($item_info['item_type'])){ $temp_item_types[] = $item_info['item_type']; }
-        if (!empty($item_info['item_type2'])){ $temp_item_types[] = $item_info['item_type2']; }
-        if (preg_match('/^(red|blue|green|purple)-score-ball$/i', $item_info['item_token'])){ $temp_item_types[] = 'bonus'; }
-        elseif (preg_match('/^super-(pellet|capsule)$/i', $item_info['item_token'])){ $temp_item_types[] = 'multi'; }
-        if (empty($temp_item_types)){ $temp_item_types[] = 'none'; }
-        if (isset($this_current_filter) && !in_array($this_current_filter, $temp_item_types)){ $key_counter++; continue; }
-        // Collect information about this item
-        $this_item_image = !empty($item_info['item_image']) ? $item_info['item_image'] : $item_info['item_token'];
-        if ($this_item_image == 'item'){ $this_seo_items = 'noindex'; }
-        // Collect the markup for this item and print it to the browser
-        $temp_item_markup = rpg_item::print_database_markup($item_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
-        echo $temp_item_markup;
-        $key_counter++;
+    if (!empty($mmrpg_database_items)){
+        foreach($mmrpg_database_items AS $item_key => $item_info){
+            // If a type filter has been applied to the item page
+            $temp_item_types = array();
+            if (!empty($item_info['item_type'])){ $temp_item_types[] = $item_info['item_type']; }
+            if (!empty($item_info['item_type2'])){ $temp_item_types[] = $item_info['item_type2']; }
+            if (preg_match('/^(red|blue|green|purple)-score-ball$/i', $item_info['item_token'])){ $temp_item_types[] = 'bonus'; }
+            elseif (preg_match('/^super-(pellet|capsule)$/i', $item_info['item_token'])){ $temp_item_types[] = 'multi'; }
+            if (empty($temp_item_types)){ $temp_item_types[] = 'none'; }
+            if (isset($this_current_filter) && !in_array($this_current_filter, $temp_item_types)){ $key_counter++; continue; }
+            // Collect information about this item
+            $this_item_image = !empty($item_info['item_image']) ? $item_info['item_image'] : $item_info['item_token'];
+            if ($this_item_image == 'item'){ $this_seo_items = 'noindex'; }
+            // Collect the markup for this item and print it to the browser
+            $temp_item_markup = rpg_item::print_database_markup($item_info, array('layout_style' => 'website_compact', 'show_key' => $key_counter));
+            echo $temp_item_markup;
+            $key_counter++;
+        }
     }
 }
 

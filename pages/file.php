@@ -227,13 +227,19 @@ while ($this_action == 'profile'){
         // Collect player background omega options
         require('prototype/omega.php');
         $temp_omega_factor_options = array();
-        if (mmrpg_prototype_player_unlocked('dr-light')){ $temp_omega_factor_options['MM01'] = $this_omega_factors_one; }
-        if (mmrpg_prototype_player_unlocked('dr-wily')){ $temp_omega_factor_options['MM02'] = $this_omega_factors_two; }
-        if (mmrpg_prototype_player_unlocked('dr-cossack')){ $temp_omega_factor_options['MM04'] = $this_omega_factors_three; }
-        if (!empty($_SESSION['GAME']['values']['battle_fields'])){
-            foreach ($this_omega_factors_four AS $key => $info){
-                if (in_array($info['field'], $_SESSION['GAME']['values']['battle_fields'])){
-                    $temp_omega_factor_options['MM03'][] = $info;
+        $temp_omega_factor_options['MM01'] = $this_omega_factors_one;
+        $temp_omega_factor_options['MM02'] = $this_omega_factors_two;
+        $temp_omega_factor_options['MM04'] = $this_omega_factors_three;
+        $temp_omega_factor_options['MM03'] = $this_omega_factors_four;
+
+        // Loop through and remove any fields who's robots haven't been encountered yet
+        $session_robot_database = !empty($_SESSION['GAME']['values']['robot_database']) ? $_SESSION['GAME']['values']['robot_database'] : array();
+        foreach($temp_omega_factor_options AS $game => $options){
+            foreach($options AS $key => $option){
+                $rtoken = $option['robot'];
+                if (!isset($session_robot_database[$rtoken])
+                    || empty($session_robot_database[$rtoken]['robot_unlocked'])){
+                    unset($temp_omega_factor_options[$game][$key]);
                 }
             }
         }

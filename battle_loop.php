@@ -562,6 +562,13 @@ $target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_target_r
 // Ensure the battle is still in progress
 if (empty($this_redirect) && $this_battle->battle_status != 'complete'){
 
+    // Remove any temp flags from the players
+    if ($this_action != 'scan'
+        && $this_action != 'switch'){
+        unset($this_player->flags['item_used_this_turn']);
+        unset($target_player->flags['item_used_this_turn']);
+    }
+
     // Require the option menu markup
     require_once('battle/menus/option.php');
 

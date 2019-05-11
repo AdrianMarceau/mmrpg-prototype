@@ -72,7 +72,7 @@ class cms_database {
     // Define the error handler for when the database goes bye bye
     private function critical_error($message){
         if (MMRPG_CONFIG_IS_LIVE){
-            $file = fopen(dirname(MMRPG_CONFIG_ROOTDIR).'/logs/mmrpg-database-errors_'.date('Y-m-d').'.txt', 'a');
+            $file = fopen(dirname(MMRPG_CONFIG_ROOTDIR).'/_logs/mmrpg-database-errors_'.date('Y-m-d').'.txt', 'a+');
             fwrite($file, date('Y-m-d @ H:i:s').' ('.$_SERVER['REMOTE_ADDR'].') : '.$message."\r\n\r\n");
             fclose($file);
         } else {

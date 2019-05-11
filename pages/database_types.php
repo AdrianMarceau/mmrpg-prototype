@@ -202,17 +202,21 @@ $filtered_ability_total = $db->get_value("SELECT
 $stat_categories = array('robot', 'ability', 'weakness', 'resistance', 'affinity', 'immunity');
 // Loop through collected type stats and break down into categories
 $type_stats_index = array();
-foreach ($filtered_type_stats AS $type_token => $type_info){
-    foreach ($stat_categories AS $category_key => $category_token){
-        if (!isset($type_stats_index[$category_token])){ $type_stats_index[$category_token] = array(); }
-        if (empty($type_info[$category_token.'_count'])){ continue; }
-        $type_stats_index[$category_token][$type_token] = $type_info[$category_token.'_count'];
+if (!empty($filtered_type_stats)){
+    foreach ($filtered_type_stats AS $type_token => $type_info){
+        foreach ($stat_categories AS $category_key => $category_token){
+            if (!isset($type_stats_index[$category_token])){ $type_stats_index[$category_token] = array(); }
+            if (empty($type_info[$category_token.'_count'])){ continue; }
+            $type_stats_index[$category_token][$type_token] = $type_info[$category_token.'_count'];
+        }
     }
 }
 // Loop through and sort each category with largest first
-foreach ($type_stats_index AS $category_token => $category_counts){
-    arsort($category_counts);
-    $type_stats_index[$category_token] = $category_counts;
+if (!empty($type_stats_index)){
+    foreach ($type_stats_index AS $category_token => $category_counts){
+        arsort($category_counts);
+        $type_stats_index[$category_token] = $category_counts;
+    }
 }
 
 //echo('<pre>$filtered_robot_total = '.print_r($filtered_robot_total, true).'</pre>');
