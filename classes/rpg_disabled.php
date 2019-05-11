@@ -1209,26 +1209,40 @@ class rpg_disabled {
 
                     // Automatically unlock this robot for use in battle
                     $temp_unlocked_player = $mmrpg_index['players'][$target_player->player_token];
-                    mmrpg_game_unlock_robot($temp_unlocked_player, $temp_unlock_robot, true, true);
+                    $temp_was_unlocked = mmrpg_game_unlock_robot($temp_unlocked_player, array_merge($robot_reward_index, $temp_unlock_robot_data), true, true);
 
-                    // Display the robot reward message markup
-                    $event_header = $temp_unlocked_robot->robot_name.' Unlocked';
-                    $event_body = rpg_battle::random_positive_word().' '.$target_player->print_name().' unlocked new robot data!<br />';
-                    $event_body .= $temp_unlocked_robot->print_name().' can now be used in battle!';
-                    //$event_body .= '<br /> key: '.$temp_reward_key.' ';
-                    //$event_body .= '<br /> in rewards: '.json_encode($this_battle->battle_rewards['robots']).' ';
-                    //$event_body .= '<br /> picked: '.json_encode($robot_reward_info).' ';
-                    //$event_body .= '<br /> unlock: '.json_encode($temp_unlock_robot_data).' ';
-                    //$event_body .= '<br /> final token: '.$temp_unlocked_robot->robot_token.' ';
+                    /*
+                    // DEBUG
+                    $event_body = $this_robot->robot_token.' unlock attempt:';
+                    $event_body .= '<br /> key: '.$temp_reward_key.' ';
+                    $event_body .= '<br /> in rewards: '.json_encode($this_battle->battle_rewards['robots']).' ';
+                    $event_body .= '<br /> picked: '.json_encode($robot_reward_info).' ';
+                    $event_body .= '<br /> unlock: '.json_encode($temp_unlock_robot_data).' ';
+                    $event_body .= '<br /> final token: '.$temp_unlocked_robot->robot_token.' ';
+                    $event_body .= '<br /> unlocked: '.($temp_was_unlocked ? 'true' : 'false').' ';
                     $event_options = array();
                     $event_options['console_show_target'] = false;
                     $event_options['this_header_float'] = $target_player->player_side;
                     $event_options['this_body_float'] = $target_player->player_side;
                     $event_options['this_robot_image'] = 'mug';
-                    $temp_unlocked_robot->robot_frame = 'base';
-                    $temp_unlocked_robot->update_session();
-                    $this_battle->events_create($temp_unlocked_robot, false, $event_header, $event_body, $event_options);
-                    unset($temp_unlocked_robot);
+                    $this_battle->events_create($temp_unlocked_robot, false, 'debug', $event_body, $event_options);
+                    */
+
+                    // Display the robot reward message markup
+                    if ($temp_was_unlocked){
+                        $event_header = $temp_unlocked_robot->robot_name.' Unlocked';
+                        $event_body = rpg_battle::random_positive_word().' '.$target_player->print_name().' unlocked new robot data!<br />';
+                        $event_body .= $temp_unlocked_robot->print_name().' can now be used in battle!';
+                        $event_options = array();
+                        $event_options['console_show_target'] = false;
+                        $event_options['this_header_float'] = $target_player->player_side;
+                        $event_options['this_body_float'] = $target_player->player_side;
+                        $event_options['this_robot_image'] = 'mug';
+                        $temp_unlocked_robot->robot_frame = 'base';
+                        $temp_unlocked_robot->update_session();
+                        $this_battle->events_create($temp_unlocked_robot, false, $event_header, $event_body, $event_options);
+                        unset($temp_unlocked_robot);
+                    }
 
                 } elseif ($temp_reward_key !== false
                     && $temp_is_corrupted){
