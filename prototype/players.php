@@ -66,7 +66,7 @@ else {
         //if ($star_counter_light > 0){ $text_player_subtext .= ' <span class="pipe" style="color: #616161;">|</span> '.($star_counter_light == 1 ? '1 Star' : $star_counter_light.' Stars'); }
         echo '<a data-music-token="'.$text_player_music.'" data-battle-complete="'.$battle_complete_counter_light.'" class="option option_'.$this_button_size.' option_this-player-select option_this-dr-light-player-select option_dr-light block_1" data-token="dr-light">';
         echo '<div class="platform"><div class="chrome"><div class="inset">';
-        echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">Dr. Light'.(!empty($text_player_special) ? ' <span style="position: relative; bottom: 2px;" title="Thank you for playing!!! :D">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_subtext.'</span><span class="subtext2">'.$text_doctor_bonus.'</span></span><span class="arrow">&#9658;</span></label>';
+        echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">Dr. Light'.(!empty($text_player_special) ? ' <span class="achievement_icon achievement_dr-light-complete" style="display: inline-block; position: relative; bottom: 2px;" title="Light Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_subtext.'</span><span class="subtext2">'.$text_doctor_bonus.'</span></span><span class="arrow">&#9658;</span></label>';
         echo '</div></div></div>';
         echo '</a>'."\n";
     }
@@ -87,7 +87,7 @@ else {
         //if ($star_counter_wily > 0){ $text_player_subtext .= ' <span class="pipe" style="color: #616161;">|</span> '.($star_counter_wily == 1 ? '1 Star' : $star_counter_wily.' Stars'); }
         echo '<a data-music-token="'.$text_player_music.'" data-battle-complete="'.$battle_complete_counter_wily.'" class="option option_'.$this_button_size.' option_this-player-select option_this-dr-wily-player-select option_dr-wily block_1" data-token="dr-wily">';
         echo '<div class="platform"><div class="chrome"><div class="inset">';
-        echo '<label class="has_image">'.$text_sprites_markup.'<span class="multi"><span class="maintext">Dr. Wily'.(!empty($text_player_special) ? ' <span style="position: relative; bottom: 2px;" title="Thank you for playing!!! >:D">&clubs;</span>' : '').'</span><span class="subtext">'.$text_player_subtext.'</span><span class="subtext2">'.$text_doctor_bonus.'</span></span><span class="arrow">&#9658;</span></label>';
+        echo '<label class="has_image">'.$text_sprites_markup.'<span class="multi"><span class="maintext">Dr. Wily'.(!empty($text_player_special) ? ' <span class="achievement_icon achievement_dr-wily-complete" style="display: inline-block; position: relative; bottom: 2px;" title="Wily Campaign Complete!" data-tooltip-type="player_type player_type_attack">&clubs;</span>' : '').'</span><span class="subtext">'.$text_player_subtext.'</span><span class="subtext2">'.$text_doctor_bonus.'</span></span><span class="arrow">&#9658;</span></label>';
         echo '</div></div></div>';
         echo '</a>'."\n";
     }
@@ -108,7 +108,7 @@ else {
         //if ($star_counter_cossack > 0){ $text_player_subtext .= ' <span class="pipe" style="color: #616161;">|</span> '.($star_counter_cossack == 1 ? '1 Star' : $star_counter_cossack.' Stars'); }
         echo '<a data-music-token="'.$text_player_music.'" data-battle-complete="'.$battle_complete_counter_cossack.'" class="option option_'.$this_button_size.' option_this-player-select option_this-dr-cossack-player-select option_dr-cossack block_1" data-token="dr-cossack">';
         echo '<div class="platform"><div class="chrome"><div class="inset">';
-        echo '<label class="has_image">'.$text_sprites_markup.'<span class="multi"><span class="maintext">Dr. Cossack'.(!empty($text_player_special) ? ' <span style="position: relative; bottom: 2px;" title="Thank you for playing!!! >:D">&diams;</span>' : '').'</span><span class="subtext">'.$text_player_subtext.'</span><span class="subtext2">'.$text_doctor_bonus.'</span></span><span class="arrow">&#9658;</span></label>';
+        echo '<label class="has_image">'.$text_sprites_markup.'<span class="multi"><span class="maintext">Dr. Cossack'.(!empty($text_player_special) ? ' <span class="achievement_icon achievement_dr-cossack-complete" style="display: inline-block; position: relative; bottom: 2px;" title="Cossack Campaign Complete!" data-tooltip-type="player_type player_type_speed">&diams;</span>' : '').'</span><span class="subtext">'.$text_player_subtext.'</span><span class="subtext2">'.$text_doctor_bonus.'</span></span><span class="arrow">&#9658;</span></label>';
         echo '</div></div></div>';
         echo '</a>'."\n";
     }

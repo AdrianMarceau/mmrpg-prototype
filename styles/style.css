@@ -3238,6 +3238,41 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 }
 
 
+#mmrpg .achievement_icon {
+    display: block;
+    width: 19px;
+    height: 19px;
+    font-size: 13px;
+    line-height: 13px;
+    direction: ltr;
+    text-indent: -9999px;
+    background-color: transparent;
+    background-image: none;
+    background-position: 0 0;
+    background-repeat: no-repeat;
+}
+#mmrpg .achievement_icon.achievement_is-first-place {
+    background-image: url(../images/assets/achievements/is-first-place.png);
+    width: 20px;
+}
+#mmrpg .achievement_icon.achievement_reached-first-place {
+    background-image: url(../images/assets/achievements/reached-first-place.png);
+    width: 20px;
+}
+#mmrpg .achievement_icon.achievement_dr-light-complete {
+    background-image: url(../images/assets/achievements/dr-light-complete.png);
+    width: 17px;
+}
+#mmrpg .achievement_icon.achievement_dr-wily-complete {
+    background-image: url(../images/assets/achievements/dr-wily-complete.png);
+    width: 20px;
+}
+#mmrpg .achievement_icon.achievement_dr-cossack-complete {
+    background-image: url(../images/assets/achievements/dr-cossack-complete.png);
+    width: 15px;
+}
+
+
 /* WINDOW SIZE STYLES */
 
 body.windowFlag_landscapeMode {

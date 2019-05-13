@@ -1,115 +1,115 @@
 #mmrpg,
 #prototype {
-  margin: 0;
-  padding: 0;
-  background-color: transparent;
-  width: 762px;
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    width: 762px;
 }
 #prototype .header {
-  width: 100%;
+    width: 100%;
 }
 #prototype .leaderboard {
 
 }
 #prototype .leaderboard {
-  display: block;
-  float: none;
-  clear: left;
-  text-align: left;
-  height: 284px;
-  overflow: hidden;
+    display: block;
+    float: none;
+    clear: left;
+    text-align: left;
+    height: 284px;
+    overflow: hidden;
 }
 #prototype .leaderboard .wrapper {
-  display: block;
-  height: 284px;
-  overflow: scroll;
-  overflow-x: hidden;
-  margin-right: -17px;
-  padding-right: 3px;
-  padding-left: 3px;
+    display: block;
+    height: 284px;
+    overflow: scroll;
+    overflow-x: hidden;
+    margin-right: -17px;
+    padding-right: 3px;
+    padding-left: 3px;
 }
 #prototype .leaderboard .wrapper_full {
-  height: auto;
-  overflow: hidden;
+    height: auto;
+    overflow: hidden;
 }
 
 #prototype .leaderboard .inner_wrapper {
-  height: auto;
-  overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.25);
-  border-radius: 0.3em;
-  -moz-border-radius: 0.3em;
-  -webkit-border-radius: 0.3em;
-  padding: 2px;
-  width: auto;
-  float: left;
-  clear: left;
-  margin: 0 auto 1px 0;
+    height: auto;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    border-radius: 0.3em;
+    -moz-border-radius: 0.3em;
+    -webkit-border-radius: 0.3em;
+    padding: 2px;
+    width: auto;
+    float: left;
+    clear: left;
+    margin: 0 auto 1px 0;
 }
 #prototype .leaderboard .inner_wrapper_dr-light {
-  background-color: rgba(0, 0, 255, 0.15);
+    background-color: rgba(0, 0, 255, 0.15);
 }
 #prototype .leaderboard .inner_wrapper_dr-wily {
-  background-color: rgba(255, 0, 0, 0.15);
+    background-color: rgba(255, 0, 0, 0.15);
 }
 
 #prototype .leaderboard .file,
 #prototype .leaderboard .more {
-  display: block;
-  position: relative;
-  margin: 0 auto 2px;
-  veritcal-align: top;
-  border: 1px solid #1A1A1A;
-  border-width: 1px 2px;
-  font-size: 14px;
-  line-height: 16px;
-  letter-spacing: 1px;
-  /*text-transform: uppercase;*/
-  text-decoration: none;
-  padding: 4px 0;
-  border-radius: 0.5em;
-  -moz-border-radius: 0.5em;
-  -webkit-border-radius: 0.5em;
-  color: #FFFFFF;
-  background-position: center top;
-  background-color: #2A2A2A;
-  background-image: -webkit-gradient(
-      linear,
-      left bottom,
-      left top,
-      color-stop(0.15, rgba(0, 0, 0, 0.05)),
-      color-stop(0.75, rgba(255, 255, 255, 0.05))
-  );
-  background-image: -moz-linear-gradient(
-      center bottom,
-      rgba(0, 0, 0, 0.05) 15%,
-      rgba(255, 255, 255, 0.05) 75%
-  );
-  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -o-user-select: none;
-  user-select: none;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
-  -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
-  -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
-  overflow: visible;
+    display: block;
+    position: relative;
+    margin: 0 auto 2px;
+    veritcal-align: top;
+    border: 1px solid #1A1A1A;
+    border-width: 1px 2px;
+    font-size: 14px;
+    line-height: 16px;
+    letter-spacing: 1px;
+    /*text-transform: uppercase;*/
+    text-decoration: none;
+    padding: 4px 0;
+    border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    color: #FFFFFF;
+    background-position: center top;
+    background-color: #2A2A2A;
+    background-image: -webkit-gradient(
+            linear,
+            left bottom,
+            left top,
+            color-stop(0.15, rgba(0, 0, 0, 0.05)),
+            color-stop(0.75, rgba(255, 255, 255, 0.05))
+    );
+    background-image: -moz-linear-gradient(
+            center bottom,
+            rgba(0, 0, 0, 0.05) 15%,
+            rgba(255, 255, 255, 0.05) 75%
+    );
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+    -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+    -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+    overflow: visible;
 }
 #prototype .leaderboard .file:first-child {
-  border-top-width: 2px;
+    border-top-width: 2px;
 }
 #prototype .leaderboard .file:last-child {
-  border-bottom-width: 2px;
+    border-bottom-width: 2px;
 }
 #prototype .leaderboard .file_01 {
-  background-color: rgba(136, 113, 19, 0.75);
+    background-color: rgba(136, 113, 19, 0.75);
 }
 #prototype .leaderboard .file_02 {
-  background-color: rgba(101, 108, 112, 0.75);
+    background-color: rgba(101, 108, 112, 0.75);
 }
 #prototype .leaderboard .file_03 {
-  background-color: rgba(99, 61, 21, 0.75);
+    background-color: rgba(99, 61, 21, 0.75);
 }
 #prototype .leaderboard .file {
 
@@ -119,202 +119,246 @@
 
 }
 #prototype .leaderboard .file .inset {
-  display: block;
-  margin: 4px 8px;
-  veritcal-align: top;
-  border: 1px solid rgba(0, 0, 0, 0.6) !important;
-  text-decoration: none;
-  padding: 4px 0;
-  border-radius: 0.5em;
-  -moz-border-radius: 0.5em;
-  -webkit-border-radius: 0.5em;
-  color: #FFFFFF;
-  background-position: center top;
-  background-image: -webkit-gradient(
-      linear,
-      left bottom,
-      left top,
-      color-stop(0.15, rgba(0, 0, 0, 0.45)),
-      color-stop(0.75, rgba(0, 0, 0, 0.25))
-  );
-  background-image: -moz-linear-gradient(
-      center bottom,
-      rgba(0, 0, 0, 0.45) 15%,
-      rgba(0, 0, 0, 0.25) 75%
-  );
-  box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.25);
-  -moz-box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.25);
-  -webkit-box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.25);
-  overflow: hidden;
-  position: relative;
+    display: block;
+    margin: 4px 8px;
+    veritcal-align: top;
+    border: 1px solid rgba(0, 0, 0, 0.6) !important;
+    text-decoration: none;
+    padding: 4px 0;
+    border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    color: #FFFFFF;
+    background-position: center top;
+    background-image: -webkit-gradient(
+            linear,
+            left bottom,
+            left top,
+            color-stop(0.15, rgba(0, 0, 0, 0.45)),
+            color-stop(0.75, rgba(0, 0, 0, 0.25))
+    );
+    background-image: -moz-linear-gradient(
+            center bottom,
+            rgba(0, 0, 0, 0.45) 15%,
+            rgba(0, 0, 0, 0.25) 75%
+    );
+    box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.25);
+    -moz-box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.25);
+    -webkit-box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    position: relative;
 }
 #prototype .leaderboard .file .place,
 #prototype .leaderboard .file .userinfo,
 #prototype .leaderboard .file .points {
-  display: block;
-  float: left;
-  margin-left: 10px;
-  letter-spacing: 2px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+    display: block;
+    float: left;
+    margin-left: 10px;
+    letter-spacing: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 #prototype .leaderboard .file .avatar {
-  display: block;
-  position: absolute;
-  z-index: 100;
-  top: -16px;
-  left: 87px;
-  height: 80px;
-  width: 80px;
+    display: block;
+    position: absolute;
+    z-index: 100;
+    top: -16px;
+    left: 87px;
+    height: 80px;
+    width: 80px;
 }
 #prototype .leaderboard .file .avatar .avatar_wrapper {
-  display: block;
-  height: 80px;
-  width: 80px;
+    display: block;
+    height: 80px;
+    width: 80px;
 }
 #prototype .leaderboard .file .avatar .avatar_wrapper .sprite_shadow {
-  margin-left: 2px;
+    margin-left: 2px;
 }
 #prototype .leaderboard .file .avatar .avatar_wrapper .sprite_160x160 {
-  margin-left: -40px;
-  margin-top: -80px;
+    margin-left: -40px;
+    margin-top: -80px;
 }
 #prototype .leaderboard .file .avatar .avatar_wrapper .sprite_shadow_160x160 {
-  margin-left: -38px;
+    margin-left: -38px;
 }
 #prototype .leaderboard .file .place {
-  display: block;
-  float: left;
-  width: 66px;
-  margin-top: 8px;
-  font-size: 18px;
-  line-height: 18px;
-  margin-right: 80px;
-  margin-left: 10px;
-  text-align: center;
+    display: block;
+    float: left;
+    width: 66px;
+    margin-top: 8px;
+    font-size: 18px;
+    line-height: 18px;
+    margin-right: 80px;
+    margin-left: 10px;
+    text-align: center;
 }
 #prototype .leaderboard .file .place sup {
-  position: relative;
-  bottom: 0;
-  font-size: 11px;
-  padding-left: 1px;
+    position: relative;
+    bottom: 0;
+    font-size: 11px;
+    padding-left: 1px;
 }
 #prototype .leaderboard .file_1st .place {
-  font-size: 26px;
-  line-height: 20px;
+    font-size: 26px;
+    line-height: 20px;
 }
 #prototype .leaderboard .file_2nd .place {
-  font-size: 24px;
-  line-height: 20px;
+    font-size: 24px;
+    line-height: 20px;
 }
 #prototype .leaderboard .file_3rd .place {
-  font-size: 22px;
-  line-height: 20px;
+    font-size: 22px;
+    line-height: 20px;
 }
 #prototype .leaderboard .file .userinfo {
-  width: 260px;
-  margin-top: 3px;
-  font-size: 16px;
-  line-height: 16px;
-  padding: 0 20px 4px 0;
+    width: 260px;
+    margin-top: 3px;
+    font-size: 16px;
+    line-height: 16px;
+    padding: 0 20px 4px 0;
 }
 #prototype .leaderboard .file .userinfo .username,
 #prototype .leaderboard .file .userinfo .details {
-  display: block;
-  float: left;
-  clear: both;
-  width: 260px;
-  line-height: 22px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+    display: block;
+    float: left;
+    clear: both;
+    width: 260px;
+    line-height: 22px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 #prototype .leaderboard .file .userinfo .details {
-  margin-top: 0;
-  font-size: 10px;
-  line-height: 16px;
+    margin-top: 0;
+    font-size: 10px;
+    line-height: 16px;
 }
+
+#prototype .leaderboard .file .achievement_icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+#prototype .leaderboard .file .userinfo .username .achievement_icon {
+    display: inline-block;
+    position: relative;
+    top: auto;
+    right: auto;
+    left: auto;
+    bottom: 2px;
+    margin: 0 auto;
+}
+
+@keyframes iconHover {
+  1%, 9% { transform: translate(0, 0) rotate(0); }
+  2%, 8% { transform: translate(0, 0) rotate(-10deg); }
+  3%, 5%, 7% { transform: translate(0, 0) rotate(0); }
+  4%, 6% { transform: translate(0, 0) rotate(10deg); }
+  10% { transform: translate(0, 0) rotate(0); }
+}
+#window .page .leaderboard .file.file_1st .achievement_is-first-place {
+
+    transform: translate(0, 0), rotate(0);
+    transition: transform 0.3s;
+
+    -moz-animation-name: iconHover;
+    -webkit-animation-name: iconHover;
+    animation-name: iconHover;
+
+    -moz-animation-duration: 6s;
+    -webkit-animation-duration: 6s;
+    animation-duration: 6s;
+
+    -moz-animation-iteration-count: infinite;
+    -webkit-animation-iteration-count: infinite;
+    animation-iteration-count: infinite;
+
+    -moz-animation-delay: 0s;
+    -webkit-animation-delay: 0s;
+    animation-delay: 0s;
+}
+
+
 #prototype .leaderboard .file .robots {
-  display: block;
-  float: left;
-  overflow: hidden;
+
 }
 #prototype .leaderboard .file .points,
 #prototype .leaderboard .file .records {
-  position: absolute;
-  text-align: right;
-  width: 260px;
-  margin: 0;
-  color: #F2F2F2;
-  font-size: 18px;
-  line-height: 18px;
+    position: absolute;
+    text-align: right;
+    width: 260px;
+    margin: 0;
+    color: #F2F2F2;
+    font-size: 18px;
+    line-height: 18px;
 }
 #prototype .leaderboard .file .points {
-  top: 10px;
-  right: 10px;
+    top: 10px;
+    right: 10px;
 }
 #prototype .leaderboard .file .records {
-  top: 34px;
-  right: 10px;
-  font-size: 9px;
-  line-height: 9px;
-  width: 400px;
-  text-transform: uppercase;
-  color: #DEDEDE;
+    top: 34px;
+    right: 10px;
+    font-size: 9px;
+    line-height: 9px;
+    width: 400px;
+    text-transform: uppercase;
+    color: #DEDEDE;
 }
 #prototype .leaderboard .file .points .padding {
-  color: #969696;
+    color: #969696;
 }
 #prototype .leaderboard .file .points .value {
-  color: #EFEFEF;
+    color: #EFEFEF;
 }
 #prototype .menu .back {
-  display: block;
-  margin: 20px auto 0 0;
-  color: #ABABAB;
-  text-align: center;
-  cursor: pointer;
-  _cursor: hand;
+    display: block;
+    margin: 20px auto 0 0;
+    color: #ABABAB;
+    text-align: center;
+    cursor: pointer;
+    _cursor: hand;
 }
 #prototype .menu .back:hover {
-  text-decoration: underline;
+    text-decoration: underline;
 }
 
 #prototype .leaderboard .file .robots .sprite {
-  position: static;
-  float: left;
-  width: 16px;
-  height: 16px;
-  background-size: 16px 16px;
+    position: static;
+    float: left;
+    width: 16px;
+    height: 16px;
+    background-size: 16px 16px;
 }
 #prototype .leaderboard .file .robots .sprite_base_80x80 {
-  background-size: 32px 32px;
-  background-position: -8px -8px;
+    background-size: 32px 32px;
+    background-position: -8px -8px;
 }
 
 #prototype .leaderboard .more {
-  border: 0 none transparent;
-  background-color: transparent;
-  background-image: none;
-  text-align: center;
-  text-decoration: none;
-  cursor: pointer;
-  _cursor: hand;
-  box-shadow: 0 0 0 transparent;
-  -moz-box-shadow: 0 0 0 transparent;
-  -webkit-box-shadow: 0 0 0 transparent;
-  font-size: 10px;
-  line-height: 10px;
-  height: 10px;
-  color: #CACACA;
+    border: 0 none transparent;
+    background-color: transparent;
+    background-image: none;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    _cursor: hand;
+    box-shadow: 0 0 0 transparent;
+    -moz-box-shadow: 0 0 0 transparent;
+    -webkit-box-shadow: 0 0 0 transparent;
+    font-size: 10px;
+    line-height: 10px;
+    height: 10px;
+    color: #CACACA;
 }
 #prototype .leaderboard .more:hover {
-  color: #FAFAFA;
+    color: #FAFAFA;
 }
 #prototype .leaderboard .container {
-  display: block;
-  margin: 5px auto 0;
+    display: block;
+    margin: 5px auto 0;
 }
 
 
@@ -325,13 +369,13 @@
 /* -- Landscape Mode -- */
 @media (min-width: 1024px){
 
-  #mmrpg,
-  #mmrpg #prototype {
-    width: 1024px;
-  }
-  #prototype .leaderboard .wrapper {
-    padding-left: 0;
-  }
+    #mmrpg,
+    #mmrpg #prototype {
+        width: 1024px;
+    }
+    #prototype .leaderboard .wrapper {
+        padding-left: 0;
+    }
 
 
 
