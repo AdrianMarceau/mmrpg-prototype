@@ -65,10 +65,16 @@ $ability = array(
             'failure' => array(2, -65, 0, -10, $target_robot->print_name().' avoided the blast&hellip;')
             ));
         $energy_damage_amount = $this_ability->ability_damage;
-        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
+        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
         unset($target_robot->robot_attachments[$this_attachment_token_one]);
         unset($target_robot->robot_attachments[$this_attachment_token_two]);
         $target_robot->update_session();
+
+        // If the target was disabled, trigger approptiate action
+        if ($target_robot->robot_status == 'disabled'
+            || $target_robot->robot_energy <= 0){
+            $target_robot->trigger_disabled($this_robot);
+        }
 
         // Ensure the target is not disabled before apply a stat change
         if ($target_robot->robot_status != 'disabled'
