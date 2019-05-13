@@ -335,14 +335,14 @@ ob_start();
     <? $temp_colour_token = !empty($this_playerinfo['user_colour_token']) ? $this_playerinfo['user_colour_token'] : 'none'; ?>
     <h2 class="subheader field_type_<?= $temp_colour_token ?>" style="margin: 10px 0 4px; text-align: left;">
         <?=$temp_display_name?>&#39;s Leaderboard
-        <span class="count" style="position: relative; bottom: 1px;"><?
+        <? /*<span class="count" style="position: relative; bottom: 1px;"><?
             // Add the prototype complete flags if applicable
             $this_awards = !empty($this_playerinfo['board_awards']) ? explode(',', $this_playerinfo['board_awards']) : array();
             if (in_array('prototype_complete_light', $this_awards)){ echo '<span class="prototype_complete prototype_complete_dr-light" title="Dr. Light Prototype Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span> '; }
             if (in_array('prototype_complete_wily', $this_awards)){ echo '<span class="prototype_complete prototype_complete_dr-wily" title="Dr. Wily Prototype Complete!" data-tooltip-type="player_type player_type_attack">&clubs;</span> '; }
             if (in_array('prototype_complete_cossack', $this_awards)){ echo '<span class="prototype_complete prototype_complete_dr-cossack" title="Dr. Cossack Prototype Complete!" data-tooltip-type="player_type player_type_speed">&diams;</span> '; }
             if (in_array('ranking_first_place', $this_awards)){ echo '<span class="prototype_complete prototype_complete_firstplace" data-tooltip="Reached First Place" data-tooltip-type="player_type player_type_level">&#9733;</span> '; }
-        ?></span>
+        ?></span>*/ ?>
     </h2>
 
     <div id="game_container" class="subbody thread_subbody thread_subbody_full thread_subbody_full_right thread_right event event_triple event_visible <?= in_array($this_current_token, array('robots', 'players', 'database', 'items', 'stars')) ? 'has_iframe' : '' ?>" style="text-align: left; position: relative; padding-bottom: 6px; margin-bottom: 4px;">

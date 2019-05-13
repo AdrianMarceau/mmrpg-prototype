@@ -98,10 +98,14 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
             // -- LEADERBOARD MARKUP -- //
 
             // Add the prototype complete flags if applicable
-            if (in_array('prototype_complete_light', $this_awards)){ $this_user_awards .= '<span class="prototype_complete prototype_complete_dr-light" data-tooltip="Completed Dr. Light\'s Game" data-tooltip-type="player_type player_type_defense">&hearts;</span>'; }
-            if (in_array('prototype_complete_wily', $this_awards)){ $this_user_awards .= '<span class="prototype_complete prototype_complete_dr-wily" data-tooltip="Completed Dr. Wily\'s Game" data-tooltip-type="player_type player_type_attack">&clubs;</span>'; }
-            if (in_array('prototype_complete_cossack', $this_awards)){ $this_user_awards .= '<span class="prototype_complete prototype_complete_dr-cossack" data-tooltip="Completed Dr. Cossack\'s Game" data-tooltip-type="player_type player_type_speed">&diams;</span>'; }
-            if (in_array('ranking_first_place', $this_awards)){ $this_user_awards .= '<span class="prototype_complete prototype_complete_firstplace" data-tooltip="Reached First Place" data-tooltip-type="player_type player_type_level">&#9733;</span>'; }
+            $pos = 0;
+            if (in_array('prototype_complete_light', $this_awards)){ $pos++; $this_user_awards .= '<span class="achievement_icon achievement_dr-light-complete'.($pos ? ' pos'.$pos : '').'" data-tooltip="Light Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>'; }
+            if (in_array('prototype_complete_wily', $this_awards)){ $pos++; $this_user_awards .= '<span class="achievement_icon achievement_dr-wily-complete'.($pos ? ' pos'.$pos : '').'" data-tooltip="Wily Campaign Complete!" data-tooltip-type="player_type player_type_attack">&clubs;</span>'; }
+            if (in_array('prototype_complete_cossack', $this_awards)){ $pos++; $this_user_awards .= '<span class="achievement_icon achievement_dr-cossack-complete'.($pos ? ' pos'.$pos : '').'" data-tooltip="Cossack Campaign Complete!" data-tooltip-type="player_type player_type_speed">&diams;</span>'; }
+            // Add the first place flag if applicable
+            $this_user_awards_sticky = '';
+            if (in_array('ranking_first_place', $this_awards)){ $this_user_awards_sticky .= '<span class="achievement_icon achievement_'.($place_counter == 1 ? 'is' : 'reached').'-first-place" data-tooltip="Reached First Place!" data-tooltip-type="player_type player_type_level">&#9733;</span>'; }
+
 
             // Start the output buffer
             ob_start();
@@ -115,6 +119,7 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
                     echo '<span class="points">'.$this_points_html.'</span>'."\n";
                     echo '<span class="records">'.$this_records_html.'</span>'."\n";
                 echo '</div>'."\n";
+                if (!empty($this_user_awards_sticky)){ echo $this_user_awards_sticky."\n"; }
                 if (!empty($board['user_image_path'])){ list($avatar_class, $avatar_token, $avatar_base_size) = explode('/', $board['user_image_path']); }
                 else { $avatar_class = 'robots'; $avatar_token = 'mega-man'; $avatar_base_size = 40; }
                 if (!empty($board['user_background_path'])){ list($background_class, $background_token) = explode('/', $board['user_background_path']); }

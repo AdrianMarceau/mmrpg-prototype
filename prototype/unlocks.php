@@ -142,9 +142,9 @@ function generate_prototype_complete_message($player_token){
     // Generate the console markup with the congratulations message and the records text
     $temp_user_name = !empty($_SESSION[$session_token]['USER']['displayname']) ? $_SESSION[$session_token]['USER']['displayname'] : $_SESSION[$session_token]['USER']['username'];
     $temp_user_colour = !empty($_SESSION[$session_token]['USER']['colourtoken']) ? $_SESSION[$session_token]['USER']['colourtoken'] : $player_info['player_type'];
-    if ($player_token === 'dr-light'){ $temp_icon_code = '&hearts;'; }
-    elseif ($player_token === 'dr-wily'){ $temp_icon_code = '&clubs;'; }
-    elseif ($player_token === 'dr-cossack'){ $temp_icon_code = '&diams;'; }
+    if ($player_token === 'dr-light'){ $temp_icon_code = '<span class="achievement_icon achievement_dr-light-complete" style="display: inline-block; position: relative; bottom: 6px;" title="Light Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>'; }
+    elseif ($player_token === 'dr-wily'){ $temp_icon_code = '<span class="achievement_icon achievement_dr-wily-complete" style="display: inline-block; position: relative; bottom: 6px;" title="Wily Campaign Complete!" data-tooltip-type="player_type player_type_attack">&clubs;</span>'; }
+    elseif ($player_token === 'dr-cossack'){ $temp_icon_code = '<span class="achievement_icon achievement_dr-cossack-complete" style="display: inline-block; position: relative; bottom: 6px;" title="Cossack Campaign Complete!" data-tooltip-type="player_type player_type_speed">&diams;</span>'; }
     $temp_console_markup = '';
     $temp_console_markup .= '<p><strong class="ability_type ability_type_'.$temp_user_colour.'">Congratulations, '.$temp_user_name.'!</strong>  You\'ve completed the <strong>Mega Man RPG Prototype</strong> as <strong>'.$player_info['player_name'].'</strong> and his robots! '.rpg_battle::random_victory_quote().'! Your completion records are as follows:</p>';
     $temp_console_markup .= '<div id="console" style="width: auto; height: auto;"><div class="extra"><div class="extra2">'.preg_replace('/\s+/', ' ', $temp_player_records).'</div></div></div>';
