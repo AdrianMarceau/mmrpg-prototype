@@ -80,7 +80,7 @@ require(MMRPG_CONFIG_ROOTDIR.'includes/leaderboard.php');
     </span>
 </h2>
 <div class="leaderboard" style="margin-bottom: 12px; overflow: visible;">
-    <div class="wrapper" style="margin-bottom: 0; overflow: visible;">
+    <div class="wrapper" style="padding-top: 40px; margin-top: -40px; margin-bottom: 0; overflow: hidden;">
     <?
 
     // Define the leaderboard displauy limit
