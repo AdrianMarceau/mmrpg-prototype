@@ -592,7 +592,7 @@ class rpg_disabled {
                     $target_player->player_frame = 'victory';
                     $event_header = $temp_robot->robot_name.'&#39;s Rewards';
                     $event_multiplier_text = !empty($temp_robot_boost_text) ? $temp_robot_boost_text : '';
-                    $event_body = $temp_robot->print_name().' collects '.$event_multiplier_text.'<span class="recovery_amount ability_type ability_type_cutter">'.$target_robot_experience.'</span> experience points! ';
+                    $event_body = $temp_robot->print_name().' collects '.$event_multiplier_text.'<span class="recovery_amount ability_type ability_type_cutter">'.number_format($target_robot_experience, 0, '.', ',').'</span> experience points! ';
                     $event_body .= '<br />';
                     if (isset($temp_robot->robot_quotes['battle_victory'])){
                         $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
