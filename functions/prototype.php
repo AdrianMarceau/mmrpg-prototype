@@ -332,8 +332,9 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
 
     // -- BONUS POINTS -- //
 
+    /*
     // Grant the user bonus veteran points based on their account age (date created vs date modified)
-    if (true){
+    if (false){
         $date_modified = $user_save_array['save_date_modified'];
         $date_created = $user_save_array['save_date_created'];
         $total_days = ceil((((($date_modified - $date_created) / 60) / 60) / 24));
@@ -345,6 +346,7 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
         $points_index['veteran_bonus_points'] = $veteran_bonus;
         $total_battle_points += $points_index['veteran_bonus_points'];
     }
+    */
 
     // -- CAMPAIGN POINTS -- //
 
