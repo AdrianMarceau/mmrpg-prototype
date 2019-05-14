@@ -76,6 +76,7 @@ $this_posts_query = "SELECT
     WHERE
     posts.thread_id = '{$this_thread_info['thread_id']}'
     {$is_personal_query_condition}
+    AND posts.post_deleted = 0
     ORDER BY posts.post_date ASC
     ;";
 $this_posts_count = $db->get_value($this_posts_query, 'post_count');
@@ -136,6 +137,7 @@ $this_posts_query = "SELECT
     WHERE
         posts.thread_id = '{$this_thread_info['thread_id']}'
         {$is_personal_query_condition}
+        AND posts.post_deleted = 0
 
     ORDER BY posts.post_date ASC
 
