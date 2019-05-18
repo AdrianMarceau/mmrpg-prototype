@@ -10,7 +10,7 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
     global $db, $mmrpg_index;
     global $this_userid, $this_userinfo, $this_boardinfo;
     global $this_display_limit, $this_num_offset;
-    global $this_time, $this_start_key;
+    global $this_time, $this_start_key, $this_display_limit_default;
 
     $board_key = $key;
 
@@ -43,6 +43,7 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
     $this_is_online = !empty($board['user_is_online']) ? true : false;
     $this_last_save = !empty($this_last_save) ? date('Y/m/d @ H:i', $this_last_save) : '????-??-?? ??:??';
     $this_style = $this_is_online ? 'border-color: green; ' : '';
+    $this_style .= 'z-index: '.($this_display_limit_default - $key).'; ';
     $this_username = !empty($board['user_name_public']) && !empty($board['user_flag_postpublic']) ? $board['user_name_public'] : $board['user_name'];
     $this_username = htmlentities($this_username, ENT_QUOTES, 'UTF-8', true);
     $this_user_id = !empty($board['user_id']) ? $board['user_id'] : 0;
@@ -129,7 +130,9 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
                 if ($place_counter == 3){ $place_frame = 'taunt'; }
                 elseif ($place_counter == 2){ $place_frame = 'summon'; }
                 elseif ($place_counter == 1){ $place_frame = 'victory'; }
-                echo '<span class="avatar"><span class="avatar_wrapper">';
+                $y_offset = 0;
+                if (strstr($avatar_token, 'astro-man') && $this_place > 1){ $y_offset = -16; }
+                echo '<span class="avatar"><span class="avatar_wrapper"'.(!empty($y_offset) ? 'style="bottom: '.$y_offset.'px;"' : '').'>';
                 echo '<span class="sprite sprite_shadow sprite_'.$avatar_size.'x'.$avatar_size.' sprite_shadow_'.$avatar_size.'x'.$avatar_size.' sprite_'.$avatar_size.'x'.$avatar_size.'_'.$place_frame.'" style="background-image: url(images/'.$avatar_class.'_shadows/'.preg_replace('/^([-a-z0-9]+)(_[a-z0-9]+)?$/i', '$1', $avatar_token).'/sprite_left_'.$avatar_size.'x'.$avatar_size.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-size: auto '.$avatar_size.'px;">'.$this_username.'</span>';
                 echo '<span class="sprite sprite_'.$avatar_size.'x'.$avatar_size.' sprite_'.$avatar_size.'x'.$avatar_size.'_'.$place_frame.'" style="background-image: url(images/'.$avatar_class.'/'.$avatar_token.'/sprite_left_'.$avatar_size.'x'.$avatar_size.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-size: auto '.$avatar_size.'px;">'.$this_username.'</span>';
                 echo '</span></span>'."\n";
