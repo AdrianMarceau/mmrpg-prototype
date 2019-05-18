@@ -2242,6 +2242,7 @@ button {
     position: absolute;
     top: 0;
     right: 0;
+    z-index: 9;
 }
 #window .page .leaderboard .file .userinfo .username .achievement_icon {
     display: inline-block;
