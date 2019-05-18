@@ -193,8 +193,11 @@ $temp_leaderboard_query = "SELECT
     board.board_date_modified
     FROM mmrpg_users AS users
     LEFT JOIN mmrpg_leaderboard AS board ON users.user_id = board.user_id
+    LEFT JOIN mmrpg_saves AS saves ON saves.user_id = board.user_id
     WHERE board.board_points > 0
-    ORDER BY board.board_points DESC
+    ORDER BY
+    board.board_points DESC,
+    saves.save_date_modified DESC
     ";
 
 // Query the database and collect the array list of all non-bogus players

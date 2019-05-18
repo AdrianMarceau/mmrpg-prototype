@@ -2154,7 +2154,8 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
                 ORDER BY
                 '.(!empty($temp_include_usernames_string) ? ' FIELD(user_name_clean, '.$temp_include_usernames_string.') DESC, ' : '').'
                 '.(!empty($temp_exclude_usernames_string) ? ' FIELD(user_name_clean, '.$temp_exclude_usernames_string.') ASC, ' : '').'
-                board_points DESC
+                board_points DESC,
+                mmrpg_saves.save_date_modified DESC
                 LIMIT 12
             ';
 
