@@ -611,9 +611,12 @@ if (true){
                                                 <td class="right">
                                                     <label style="display: block; float: left;">Records :</label>
                                                     <div class="record_container">
-                                                        <span class="ability_name ability_type ability_empty record_name">Summoned : <?= $robot_info['robot_summoned'] == 1 ? '1 Times' : $robot_info['robot_summoned'].' Times' ?></span>
-                                                        <span class="ability_name ability_type ability_empty record_name">Encountered : <?= $robot_info['robot_encountered'] == 1 ? '1 Times' : $robot_info['robot_encountered'].' Times' ?></span>
-                                                        <span class="ability_name ability_type ability_empty record_name">Defeated : <?= $robot_info['robot_defeated'] == 1 ? '1 Times' : $robot_info['robot_defeated'].' Times' ?></span>
+                                                        <span class="ability_name ability_type ability_empty record_name" title="Number of times this robot has been summoned by the player in battle">Summoned : <?= $robot_info['robot_summoned'] == 1 ? '1 Times' : number_format($robot_info['robot_summoned'], 0, '.', ',').' Times' ?></span>
+                                                        <span class="ability_name ability_type ability_empty record_name" title="Number of times this robot has been encountered as a target in battle">Encountered : <?= $robot_info['robot_encountered'] == 1 ? '1 Times' : number_format($robot_info['robot_encountered'], 0, '.', ',').' Times' ?></span>
+                                                        <span class="ability_name ability_type ability_empty record_name" title="Number of times this robot has been defeated as a target in battle">Defeated : <?= $robot_info['robot_defeated'] == 1 ? '1 Times' :number_format( $robot_info['robot_defeated'], 0, '.', ',').' Times' ?></span>
+                                                        <span class="ability_name ability_type ability_empty record_name" title="Highest overkill damage inflicted on this robot as a target in battle">Overkill : <?= (isset($robot_info['max_overkill_damage']) ? number_format($robot_info['max_overkill_damage'], 0, '.', ',').' Damage' : '---') ?></span>
+                                                        <span class="ability_name ability_type ability_empty record_name">&nbsp;</span>
+                                                        <span class="ability_name ability_type ability_empty record_name">&nbsp;</span>
                                                     </div>
                                                 </td>
                                             </tr>

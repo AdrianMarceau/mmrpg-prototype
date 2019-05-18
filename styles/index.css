@@ -2015,6 +2015,29 @@ button {
     color: #FFFFFF;
     background-position: center top;
     background-color: #2A2A2A;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+    -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+    -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+    overflow: visible;
+    position: relative;
+}
+#window .page .leaderboard .file:before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    border-radius: 0.5em;
+    background-position: center top;
+    background-color: #2A2A2A;
     /* IE9 SVG, needs conditional override of 'filter' to 'none' */
     background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwLjA1Ii8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC4xIi8+CiAgPC9saW5lYXJHcmFkaWVudD4KICA8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSJ1cmwoI2dyYWQtdWNnZy1nZW5lcmF0ZWQpIiAvPgo8L3N2Zz4=);
     background: -moz-linear-gradient(top,  rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.1) 100%); /* FF3.6+ */
@@ -2024,12 +2047,7 @@ button {
     background: -ms-linear-gradient(top,  rgba(255,255,255,0.05) 0%,rgba(0,0,0,0.1) 100%); /* IE10+ */
     background: linear-gradient(to bottom,  rgba(255,255,255,0.05) 0%,rgba(0,0,0,0.1) 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0dffffff', endColorstr='#1a000000',GradientType=0 ); /* IE6-8 */
-    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
-    -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
-    -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
-    overflow: visible;
-    position: relative;
+    overflow: hidden;
 }
 #window .page .leaderboard .file:first-child {
     border-top-width: 2px;
@@ -2081,6 +2099,7 @@ button {
     box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.25);
     overflow: hidden;
     position: relative;
+    z-index: 2;
 }
 #window .page .leaderboard .file:hover .inset,
 #window .page .leaderboard .file .inset:hover {
@@ -2133,6 +2152,7 @@ button {
     overflow: visible;
     left: 87px;
     bottom: 16px;
+    z-index: 3;
 }
 #window .page .leaderboard .file .avatar_wrapper {
     display: block;
