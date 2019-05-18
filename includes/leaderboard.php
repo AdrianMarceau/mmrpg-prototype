@@ -12,6 +12,11 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
     global $this_display_limit, $this_num_offset;
     global $this_time, $this_start_key, $this_display_limit_default;
 
+    static $z_index;
+    if (empty($z_index)){ $z_index = $this_display_limit_default + 1; }
+    $z_index -= 1;
+
+
     $board_key = $key;
 
     // Collect the points
@@ -43,7 +48,7 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
     $this_is_online = !empty($board['user_is_online']) ? true : false;
     $this_last_save = !empty($this_last_save) ? date('Y/m/d @ H:i', $this_last_save) : '????-??-?? ??:??';
     $this_style = $this_is_online ? 'border-color: green; ' : '';
-    $this_style .= 'z-index: '.($this_display_limit_default - $key).'; ';
+    $this_style .= 'z-index: '.$z_index.'; ';
     $this_username = !empty($board['user_name_public']) && !empty($board['user_flag_postpublic']) ? $board['user_name_public'] : $board['user_name'];
     $this_username = htmlentities($this_username, ENT_QUOTES, 'UTF-8', true);
     $this_user_id = !empty($board['user_id']) ? $board['user_id'] : 0;
