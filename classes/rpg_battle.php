@@ -1404,8 +1404,20 @@ class rpg_battle extends rpg_object {
                 $this_ability = rpg_game::get_ability($this, $this_player, $this_robot, $this_token);
                 $this_ability->reset_all();
 
+                // Double-check this ability's target if switching has occured to prevent issues
+                if ($target_robot->player->player_id != $this_robot->player->player_id
+                    && $target_robot->robot_position == 'bench'
+                    && $this_ability->ability_target != 'select_target'
+                    && $this_robot->robot_item != 'target-module'){
+                    //$this->events_create(false, false, 'debug', 'we should correct the target...');
+                    $actual_target_robot = $target_player->get_active_robot();
+                } else {
+                    $actual_target_robot = $target_robot;
+                }
+
+
                 // Trigger this robot's ability
-                $this_ability->ability_results = $this_robot->trigger_ability($target_robot, $this_ability);
+                $this_ability->ability_results = $this_robot->trigger_ability($actual_target_robot, $this_ability);
 
                 // Ensure the battle has not completed before triggering the taunt event
                 if ($this->battle_status != 'complete'){
@@ -1415,19 +1427,19 @@ class rpg_battle extends rpg_object {
                         && isset($this_robot->robot_quotes['battle_taunt'])
                         && $this_robot->robot_quotes['battle_taunt'] != '...'
                         && $this_ability->ability_results['this_amount'] > 0
-                        && $target_robot->robot_status != 'disabled'
+                        && $actual_target_robot->robot_status != 'disabled'
                         && $this->critical_chance(3)){
                         // Generate this robot's taunt event after dealing damage, which only happens once per battle
                         $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
                         $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
-                        $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
+                        $this_replace = array($target_player->player_name, $actual_target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
                         //$this_quote_text = str_replace($this_find, $this_replace, $this_robot->robot_quotes['battle_taunt']);
                         $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : '').$this_robot->print_name().' taunts the opponent!<br />';
                         $event_body .= $this_robot->print_quote('battle_taunt', $this_find, $this_replace);
                         //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
                         $this_robot->robot_frame = 'taunt';
-                        $target_robot->robot_frame = 'base';
-                        $this->events_create($this_robot, $target_robot, $event_header, $event_body, array('console_show_target' => false));
+                        $actual_target_robot->robot_frame = 'base';
+                        $this->events_create($this_robot, $actual_target_robot, $event_header, $event_body, array('console_show_target' => false));
                         $this_robot->robot_frame = 'base';
                         // Create the quote flag to ensure robots don't repeat themselves
                         $this_robot->flags['robot_quotes']['battle_taunt'] = true;
