@@ -17,6 +17,9 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
+        // Collect session token for later
+        $session_token = rpg_game::session_token();
+
         // Target the opposing robot
         $this_ability->target_options_update(array(
             'frame' => 'slide',
@@ -127,7 +130,22 @@ $ability = array(
                 $possible_attachment_token = 'ability_core-shield_'.$lost_core_type;
                 if (!empty($target_robot->robot_attachments[$possible_attachment_token])){
                     $target_robot->robot_attachments[$possible_attachment_token]['attachment_duration'] = 0;
+                    unset($target_robot->robot_attachments[$possible_attachment_token]);
                     $target_robot->update_session();
+                }
+                if ($target_robot->robot_base_core == 'copy'
+                    && $target_robot->robot_image == $target_robot->robot_token.'_'.$lost_core_type){
+                    $target_robot->robot_image = $target_robot->robot_token;
+                    $target_robot->update_session();
+                    if ($target_player->player_side == 'left'
+                        && empty($this_battle->flags['player_battle'])
+                        && empty($this_battle->flags['challenge_battle'])){
+                        $ptoken = $target_player->player_token;
+                        $rtoken = $target_robot->robot_token;
+                        if (!empty($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_image'])){
+                            unset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_image']);
+                        }
+                    }
                 }
             }
 
