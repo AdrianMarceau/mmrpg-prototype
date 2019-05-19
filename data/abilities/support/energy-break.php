@@ -44,7 +44,8 @@ $ability = array(
 
         // If used by support robot OR the has a Target Module, allow bench targetting
         $temp_support_robots = array('roll', 'disco', 'rhythm');
-        if (in_array($this_robot->robot_token, $temp_support_robots)
+        if ($this_robot->robot_class == 'mecha'
+            || in_array($this_robot->robot_token, $temp_support_robots)
             || $this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
         else { $this_ability->reset_target(); }
 
