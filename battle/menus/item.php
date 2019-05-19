@@ -32,7 +32,12 @@ ob_start();
     // Display container for the main actions
     ?>
     <div class="main_actions main_actions_hastitle">
-        <span class="main_actions_title <?= $target_player->player_id != MMRPG_SETTINGS_TARGET_PLAYERID || !empty($this_player->flags['item_used_this_turn']) ? 'main_actions_title_disabled' : '' ?>">
+        <span class="main_actions_title <?=
+            !empty($this_player->flags['item_used_this_turn'])
+            || !empty($this_battle->flags['player_battle'])
+            || !empty($this_battle->flags['challenge_battle'])
+            ? 'main_actions_title_disabled'
+            : '' ?>">
             <?
             // If there were more than eight items, print the page numbers
             if ($current_player_items_count > 8){
@@ -58,19 +63,13 @@ ob_start();
             // Define the item display counter
             $equipped_items_count = 0;
 
-            // Define the default button enabled option
-            //if (!empty($_SESSION['GAME']['DEMO']) || $target_player->player_id != MMRPG_SETTINGS_TARGET_PLAYERID || !isset($_SESSION['GAME']['values']['battle_items'])){ $temp_button_enabled_base = false; }
-            //if ($target_player->player_id != MMRPG_SETTINGS_TARGET_PLAYERID){ $temp_button_enabled_base = false; }
-            if (!empty($this_battle->flags['player_battle'])
+            // If this player has already used an item this turn or items are disabled
+            if (!empty($this_player->flags['item_used_this_turn'])
+                || !empty($this_battle->flags['player_battle'])
                 || !empty($this_battle->flags['challenge_battle'])){
                 $temp_button_enabled_base = false;
             } else {
                 $temp_button_enabled_base = true;
-            }
-
-            // If this player has already used an item this turn
-            if (!empty($this_player->flags['item_used_this_turn'])){
-                $temp_button_enabled_base = false;
             }
 
             // Loop through each item and display its button
