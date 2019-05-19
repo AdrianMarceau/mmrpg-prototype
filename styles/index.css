@@ -491,6 +491,7 @@ button {
     width: auto;
 }
 #mmrpg #window .menu {
+    z-index: 100;
     border-color: #1A1A1A !important;
     background-image: linear-gradient(bottom, rgba(0,0,0,0.30) 0%, rgba(0,0,0,0.20) 100%);
     background-image: -o-linear-gradient(bottom, rgba(0,0,0,0.30) 0%, rgba(0,0,0,0.20) 100%);
