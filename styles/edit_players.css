@@ -374,6 +374,33 @@ body.windowFlag_landscapeMode #prototype {
 }
 
 
+#edit #console .sprite_player {
+    animation: loop steps(2) 3s infinite;
+}
+#edit #console .event[data-token="dr-light"] .sprite_player {
+    animation: loop steps(3) 6s infinite;
+}
+#edit #console .event[data-token="dr-wily"] .sprite_player {
+    animation: loop steps(3) 5s infinite;
+}
+#edit #console .event[data-token="dr-cossack"] .sprite_player {
+    animation: loop steps(3) 4s infinite;
+}
+
+@-moz-keyframes loop {
+  0% { background-position: 0 0; }
+  100% { background-position: -80px 0; }
+}
+@-webkit-keyframes loop {
+  0% { background-position: 0 0; }
+  100% { background-position: -80px 0; }
+}
+@keyframes loop {
+  0% { background-position: 0 0; }
+  100% { background-position: -80px 0; }
+}
+
+
 #edit #console .event .statboost_player {
     color: rgb(213, 255, 202) !important;
 }
