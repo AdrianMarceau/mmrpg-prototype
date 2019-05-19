@@ -6,7 +6,7 @@ $ability = array(
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Weapons/Copy',
     'ability_type' => 'copy',
-    'ability_description' => 'The user summons a large emulation device behind the target that drains their elemental energy and deals damage!  If the user isn\'t already holding an item, this ability can generate a new core and surround the user in an elemental shield!',
+    'ability_description' => 'The user summons a large emulation device that drains the target\'s elemental energy to deal damage!  If the user isn\'t already holding an item, this ability can generate a new core and surround the user in an elemental shield!',
     'ability_energy' => 8,
     'ability_speed' => 10,
     'ability_damage' => 18,
@@ -14,11 +14,14 @@ $ability = array(
     'ability_target' => 'select_target',
     'ability_function' => function($objects){
 
+        // Extract all objects into the current scope
+        extract($objects);
+
         // Pull in the global index
         global $mmrpg_index;
 
-        // Extract all objects into the current scope
-        extract($objects);
+        // Collect session token for later
+        $session_token = rpg_game::session_token();
 
         // Define the frames based on current character
         $temp_ability_frames = array('target' => 0, 'damage' => 1, 'summon' => 2);
@@ -69,9 +72,6 @@ $ability = array(
                 // If the new core type was not empty and was from a valid source
                 if (!empty($new_core_type)
                     && $new_core_type != 'empty'){
-
-                    // Collect session token for later
-                    $session_token = rpg_game::session_token();
 
                     // Create the new item info for display
                     $new_item_info = array('item_token' => $new_core_type.'-core');
