@@ -135,6 +135,17 @@ $ability = array(
             unset($target_robot->robot_attachments[$this_attachment_token]);
             $target_robot->update_session();
 
+            // If the target robot was the player, we gotta update the session
+            if ($target_player->player_side == 'left'
+                && empty($this_battle->flags['player_battle'])
+                && empty($this_battle->flags['challenge_battle'])){
+                $ptoken = $target_player->player_token;
+                $rtoken = $target_robot->robot_token;
+                if (!empty($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
+                    $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
+                }
+            }
+
         }
 
         // Reset the offset and move the user back to their position
