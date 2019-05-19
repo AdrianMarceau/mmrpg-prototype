@@ -17,9 +17,21 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
+        // Predefine attachment create and destroy text for later
+        $this_create_text = ($target_robot->print_name().' found '.$target_robot->get_pronoun('reflexive').' in a well of intense gravity!<br /> '.
+            $target_robot->print_name().' is prevented from switching!'
+            );
+        $this_destroy_text = ('The '.$this_ability->print_name().' magnetic field faded away...<br /> '.
+            'The active robot isn\'t prevented from switching any more!'
+            );
+        $this_refresh_text = ($this_robot->print_name().' bolstered the '.$this_ability->print_name().'\'s intense gravity!<br /> '.
+            'The active robot is still prevented from switching!'
+            );
+
         // Define this ability's attachment token
+        $static_attachment_key = $target_robot->get_static_attachment_key();
         $this_gender = preg_match('/^(roll|disco|rhythm|[-a-z]+woman)$/i', $target_robot->robot_token) ? 'female' : 'male';
-        $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$target_robot->robot_id;
+        $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$static_attachment_key;
         $this_attachment_info = array(
             'class' => 'ability',
             'sticky' => true,
@@ -32,8 +44,8 @@ $ability = array(
                 'percent' => true,
                 'frame' => 'defend',
                 'rates' => array(100, 0, 0),
-                'success' => array(9, -15, -5, -10, $target_robot->print_name().' found '.($this_gender == 'female' ? 'herself' : 'himself').' paralyzed!<br /> '.$target_robot->print_name().' is prevented from switching!'),
-                'failure' => array(9, -15, -5, -10, $target_robot->print_name().' found '.($this_gender == 'female' ? 'herself' : 'himself').' paralyzed!<br /> '.$target_robot->print_name().' is prevented from switching!')
+                'success' => array(9, -15, -5, -10, $this_create_text),
+                'failure' => array(9, -15, -5, -10, $this_create_text)
                 ),
             'attachment_destroy' => array(
                 'trigger' => 'special',
@@ -44,8 +56,8 @@ $ability = array(
                 'modifiers' => false,
                 'frame' => 'taunt',
                 'rates' => array(100, 0, 0),
-                'success' => array(1, -20, -5, -10,  'The paralysis immobilizing '.$target_robot->print_name().' faded away&hellip;<br /> '.$target_robot->print_name().' is no longer prevented from switching!'),
-                'failure' => array(1, -20, -5, -10, 'The paralysis immobilizing '.$target_robot->print_name().' faded away&hellip;<br /> '.$target_robot->print_name().' is no longer prevented from switching!')
+                'success' => array(1, -20, -5, -10,  $this_destroy_text),
+                'failure' => array(1, -20, -5, -10, $this_destroy_text)
                 ),
             'ability_frame' => 0,
             'ability_frame_animate' => array(2, 3),
@@ -89,12 +101,12 @@ $ability = array(
             && $this_ability->ability_results['this_result'] != 'failure'
             && $this_ability->ability_results['this_amount'] > 0){
 
-            // If the ability flag was not set, attach the Proto Shield to the target
-            if (!isset($target_robot->robot_attachments[$this_attachment_token])){
+            // If the ability flag was not set, attach the hazard to the target position
+            if (!isset($this_battle->battle_attachments[$static_attachment_key][$this_attachment_token])){
 
                 // Attach this ability attachment to the robot using it
-                $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-                $target_robot->update_session();
+                $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token] = $this_attachment_info;
+                $this_battle->update_session();
 
                 // Target this robot's self
                 $this_robot->robot_frame = 'base';
@@ -107,17 +119,20 @@ $ability = array(
             else {
 
                 // Collect the attachment from the robot to back up its info
-                $this_attachment_info = $target_robot->robot_attachments[$this_attachment_token];
-                $this_attachment_info['attachment_duration'] = 3;
-                $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-                $target_robot->update_session();
-
-                // Target the opposing robot
-                $this_ability->target_options_update(array(
-                    'frame' => 'defend',
-                    'success' => array(9, 85, -10, -10, $this_robot->print_name().' further paralyzed '.$target_robot->print_name().'!<br /> '.$target_robot->print_name().'&#39;s inability to switch has been prolonged!')
-                    ));
-                $target_robot->trigger_target($target_robot, $this_ability);
+                $this_attachment_info = $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token];
+                if (empty($this_attachment_info['attachment_duration'])
+                    || $this_attachment_info['attachment_duration'] < $static_attachment_duration){
+                    $this_attachment_info['attachment_duration'] = $static_attachment_duration;
+                    $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token] = $this_attachment_info;
+                    $this_battle->update_session();
+                    if ($target_robot->robot_status != 'disabled'){
+                        $this_ability->target_options_update(array(
+                            'frame' => 'defend',
+                            'success' => array(9, 85, -10, -10, $this_refresh_text)
+                            ));
+                        $target_robot->trigger_target($target_robot, $this_ability);
+                    }
+                }
 
             }
 
