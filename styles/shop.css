@@ -269,6 +269,14 @@
 #shop #console .event[data-token="kalinka"] .sprite_player {
     animation: loop steps(2) 2s infinite;
 }
+@-moz-keyframes loop {
+  from { background-position: 0 0; }
+  to { background-position: -80px 0; }
+}
+@-webkit-keyframes loop {
+  from { background-position: 0 0; }
+  to { background-position: -80px 0; }
+}
 @keyframes loop {
   from { background-position: 0 0; }
   to { background-position: -80px 0; }
