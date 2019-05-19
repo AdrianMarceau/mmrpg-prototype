@@ -42,10 +42,23 @@ ob_start();
             // If there were more than eight items, print the page numbers
             if ($current_player_items_count > 8){
                 $temp_selected_page = 1; //!empty($_SESSION['GAME']['battle_settings']['action_item_page_num']) ? $_SESSION['GAME']['battle_settings']['action_item_page_num'] : 1;
-                echo '<span class="float_title">Select Item</span>';
-                echo '<span class="float_links"><span class="page">Page</span>';
-                for ($i = 1; $i <= $current_player_items_pages; $i++){ echo '<a class="num'.($i == $temp_selected_page ? ' active' : '').'" href="#'.$i.'">'.$i.'</a>'; }
-                echo '</span>';
+                echo '<span class="float_title">Select Item</span> ';
+                echo '<span class="float_links">';
+                    echo '<span class="page">Page</span>';
+                    for ($i = 1; $i <= $current_player_items_pages; $i++){ echo '<a class="num'.($i == $temp_selected_page ? ' active' : '').'" href="#'.$i.'">'.$i.'</a>'; }
+                    if (!empty($this_robot->robot_item)
+                        && empty($this_battle->flags['player_battle'])
+                        && empty($this_battle->flags['challenge_battle'])
+                        && ((empty($_SESSION['GAME']['values']['battle_items'][$this_robot->robot_item])
+                            || $_SESSION['GAME']['values']['battle_items'][$this_robot->robot_item] < MMRPG_SETTINGS_ITEMS_MAXQUANTITY))){
+                        $temp_iteminfo = $mmrpg_database_items[$this_robot->robot_item];
+                        echo '<a class="button" data-action="ability_11_action-unequipitem" title="Unequip this item and return it to the inventory?">';
+                            echo '<span class="sprite sprite_40x40 sprite_40x40_base sprite_40x40_item" style="background-image: url(images/items/'.$this_robot->robot_item.'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span>';
+                            echo 'Unequip '.$temp_iteminfo['item_name'].'';
+                            //echo 'Send to Inventory?';
+                        echo '</a>';
+                    }
+                echo '</span> ';
             }
             // Otherwise, simply print the item select text label
             else {

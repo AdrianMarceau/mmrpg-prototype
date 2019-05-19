@@ -323,9 +323,10 @@ $(document).ready(function(){
         $('a[data-action]', gameActions).live('click', function(e){
             // Collect the action and preload, if set
             var thisAction = $(this).attr('data-action');
-            var thisPreload = $(this).attr('data-preload')  !== undefined ? $(this).attr('data-preload') : false;
-            var thisTarget = $(this).attr('data-target')  !== undefined ? $(this).attr('data-target') : false;
-            var thisPanel = $(this).parent().parent().attr('id');
+            var thisPreload = $(this).attr('data-preload') !== undefined ? $(this).attr('data-preload') : false;
+            var thisTarget = $(this).attr('data-target') !== undefined ? $(this).attr('data-target') : false;
+            //var thisPanel = $(this).parent().parent().attr('id');
+            var thisPanel = $(this).closest('.wrapper').attr('id');
             thisPanel = thisPanel.replace(/^actions_/i, '');
             //alert(thisPanel);
             // Trigger the requested action and return the result
@@ -1297,7 +1298,7 @@ function mmrpg_action_panel(thisPanel, currentPanel){
     if (floatLinkContainer.length){
 
         // Assign events to any of the page links here
-        $('.num', floatLinkContainer).click(function(e){
+        $('.num[href]', floatLinkContainer).click(function(e){
             e.preventDefault();
 
             // Collect references to this link and number
