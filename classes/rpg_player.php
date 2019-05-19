@@ -1962,6 +1962,11 @@ class rpg_player extends rpg_object {
             $this->values['current_robot_enter'] = false;
         }
 
+        // Create the counter variables and defeault to zero
+        if (empty($this->values['robots_start_total'])){
+            $this->values['robots_start_total'] = $this->counters['robots_total'];
+        }
+
         // Now collect an export array for this object
         $this_data = $this->export_array();
 
