@@ -15,12 +15,23 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
+        // Collect the target robot and correct for bugs
+        if ($target_robot->player->player_id == $this_robot->player->player_id){ $temp_ally_robot = $target_robot; }
+        else { $temp_ally_robot = $this_robot; }
+
         // Update the ability's target options and trigger
         $this_ability->target_options_update(array(
             'frame' => 'summon',
-            'success' => array(0, 0, 0, 10, $this_robot->print_name().' uses the '.$this_ability->print_name().'!')
+            'success' => array(0, 0, 0, 10,
+                $this_robot->print_name().' '.(
+                    $temp_ally_robot->robot_id == $this_robot->robot_id
+                    ? 'targets '.$this_robot->get_pronoun('reflexive').'...'
+                    : 'targets '.$temp_ally_robot->print_name().'!'
+                    ).' <br /> '.
+                $this_robot->print_name().' uses the '.$this_ability->print_name().'!'
+                )
             ));
-        $this_robot->trigger_target($target_robot, $this_ability);
+        $this_robot->trigger_target($temp_ally_robot, $this_ability, array('prevent_default_text' => true));
 
         // Define the default ability info vars
         $relay_buster_token = '';
@@ -28,7 +39,7 @@ $ability = array(
         $relay_buster_object = false;
 
         // Automatically fail if the user has targetted itself
-        if ($target_robot->robot_id == $this_robot->robot_id){
+        if ($temp_ally_robot->robot_id == $this_robot->robot_id){
 
             // Print out a failure message as the robot can't target itself
             $this_ability->target_options_update(array('frame' => 'defend', 'success' => array(9, 0, 0, -10, 'But this robot cannot target itself!<br />' )));
@@ -69,7 +80,7 @@ $ability = array(
                         $this_robot->update_session();
 
                         // Append this attachment to the new target robot
-                        $target_robot->set_attachment($relay_buster_token, $relay_buster_info);
+                        $temp_ally_robot->set_attachment($relay_buster_token, $relay_buster_info);
 
                         // Add to transferred things if not already there
                         if (!in_array('buster charges', $transferred_things)){ $transferred_things[] = 'buster charges'; }
@@ -87,7 +98,7 @@ $ability = array(
                         $this_robot->update_session();
 
                         // Append this attachment to the new target robot
-                        $target_robot->set_attachment($relay_shield_token, $relay_shield_info);
+                        $temp_ally_robot->set_attachment($relay_shield_token, $relay_shield_info);
 
                         // Add to transferred things if not already there
                         if (!in_array('core shields', $transferred_things)){ $transferred_things[] = 'core shields'; }
@@ -103,10 +114,10 @@ $ability = array(
                 if (!empty($this_robot->counters[$stat_kind.'_mods'])){
 
                     // Apply the stat buffs to the target robot first
-                    $target_robot->counters[$stat_kind.'_mods'] += $this_robot->counters[$stat_kind.'_mods'];
-                    if ($target_robot->counters[$stat_kind.'_mods'] > MMRPG_SETTINGS_STATS_MOD_MAX){ $target_robot->counters[$stat_kind.'_mods'] = MMRPG_SETTINGS_STATS_MOD_MAX; }
-                    elseif ($target_robot->counters[$stat_kind.'_mods'] < MMRPG_SETTINGS_STATS_MOD_MIN){ $target_robot->counters[$stat_kind.'_mods'] = MMRPG_SETTINGS_STATS_MOD_MIN; }
-                    $target_robot->update_session();
+                    $temp_ally_robot->counters[$stat_kind.'_mods'] += $this_robot->counters[$stat_kind.'_mods'];
+                    if ($temp_ally_robot->counters[$stat_kind.'_mods'] > MMRPG_SETTINGS_STATS_MOD_MAX){ $temp_ally_robot->counters[$stat_kind.'_mods'] = MMRPG_SETTINGS_STATS_MOD_MAX; }
+                    elseif ($temp_ally_robot->counters[$stat_kind.'_mods'] < MMRPG_SETTINGS_STATS_MOD_MIN){ $temp_ally_robot->counters[$stat_kind.'_mods'] = MMRPG_SETTINGS_STATS_MOD_MIN; }
+                    $temp_ally_robot->update_session();
 
                     // Remove the stat buffs from the user next
                     $this_robot->counters[$stat_kind.'_mods'] = 0;
@@ -122,10 +133,15 @@ $ability = array(
             if (!empty($transferred_things)){
 
                 // Print out a failure message if nothing could be transferred
-                $target_robot->set_frame('taunt');
-                $this_ability->target_options_update(array('frame' => 'summon', 'success' => array(9, 0, 0, -10, $this_robot->print_name().' transferred '.preg_replace('/, ([a-z]+)$/', ' and $1', implode(', ', $transferred_things)).' to '.$target_robot->print_name().'!')));
-                $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
-                $target_robot->set_frame('base');
+                $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
+                $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $temp_ally_robot->robot_name);
+                $temp_ally_robot->set_frame('taunt');
+                $this_ability->target_options_update(array('frame' => 'summon', 'success' => array(9, 0, 0, -10,
+                    $this_robot->print_name().' transferred '.preg_replace('/, ([a-z]+)$/', ' and $1', implode(', ', $transferred_things)).' to '.$temp_ally_robot->print_name().'! '.
+                    (!empty($temp_ally_robot->robot_quotes['battle_taunt']) ? '<br /> '.$temp_ally_robot->print_quote('battle_taunt', $this_find, $this_replace) : '')
+                    )));
+                $temp_ally_robot->trigger_target($temp_ally_robot, $this_ability, array('prevent_default_text' => true));
+                $temp_ally_robot->set_frame('base');
 
 
             } else {
