@@ -121,7 +121,8 @@ $ability = array(
                         // If a core was generated or modified, we need to add update the user's image in the session
                         if (($new_item_generated || $existing_item_transformed)
                             && $this_player->player_side == 'left'
-                            && empty($this_battle->flags['player_battle'])){
+                            && empty($this_battle->flags['player_battle'])
+                            && empty($this_battle->flags['challenge_battle'])){
                             $ptoken = $this_player->player_token;
                             $rtoken = $this_robot->robot_token;
                             $itoken = $new_core_type.'-core';
