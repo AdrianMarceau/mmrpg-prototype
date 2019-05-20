@@ -986,7 +986,7 @@ class rpg_ability_damage extends rpg_damage {
             // Define the print variables to return
             $this_ability->ability_results['print_strikes'] = '<span class="damage_strikes">'.(!empty($this_ability->ability_results['total_strikes']) ? number_format($this_ability->ability_results['total_strikes'], 0, '.', ',') : 0).'</span>';
             $this_ability->ability_results['print_misses'] = '<span class="damage_misses">'.(!empty($this_ability->ability_results['total_misses']) ? number_format($this_ability->ability_results['total_misses'], 0, '.', ',') : 0).'</span>';
-            $this_ability->ability_results['print_result'] = '<span class="damage_result">'.(!empty($this_ability->ability_results['total_result']) ? number_format($this_ability->ability_results['total_result'], 0, '.', ',') : 0).'</span>';
+            $this_ability->ability_results['print_result'] = '<span class="damage_result">'.(!empty($this_ability->ability_results['total_result']) ? $this_ability->ability_results['total_result'] : 0).'</span>';
             $this_ability->ability_results['print_amount'] = '<span class="damage_amount">'.(!empty($this_ability->ability_results['this_amount']) ? number_format($this_ability->ability_results['this_amount'], 0, '.', ',') : 0).'</span>';
             $this_ability->ability_results['print_overkill'] = '<span class="damage_overkill">'.(!empty($this_ability->ability_results['this_overkill']) ? number_format($this_ability->ability_results['this_overkill'], 0, '.', ',') : 0).'</span>';
 
