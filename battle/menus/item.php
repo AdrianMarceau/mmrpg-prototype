@@ -48,13 +48,15 @@ ob_start();
                     for ($i = 1; $i <= $current_player_items_pages; $i++){ echo '<a class="num'.($i == $temp_selected_page ? ' active' : '').'" href="#'.$i.'">'.$i.'</a>'; }
                     if (!empty($this_robot->robot_item)
                         && empty($this_battle->flags['player_battle'])
-                        && empty($this_battle->flags['challenge_battle'])
-                        && ((empty($_SESSION['GAME']['values']['battle_items'][$this_robot->robot_item])
-                            || $_SESSION['GAME']['values']['battle_items'][$this_robot->robot_item] < MMRPG_SETTINGS_ITEMS_MAXQUANTITY))){
+                        && empty($this_battle->flags['challenge_battle'])){
                         $temp_iteminfo = $mmrpg_database_items[$this_robot->robot_item];
-                        echo '<a class="button" data-action="ability_11_action-unequipitem" title="Unequip this item and return it to the inventory?">';
+                        $temp_owned = !empty($_SESSION['GAME']['values']['battle_items'][$this_robot->robot_item]) ? $_SESSION['GAME']['values']['battle_items'][$this_robot->robot_item] : 0;
+                        $temp_allowed = $temp_owned < MMRPG_SETTINGS_ITEMS_MAXQUANTITY ? true : false;
+                        echo '<a class="button'.(!$temp_allowed ? ' button_disabled' : '').'" data-action="ability_11_action-unequipitem" title="Unequip this item and return it to the inventory?">';
                             echo '<span class="sprite sprite_40x40 sprite_40x40_base sprite_40x40_item" style="background-image: url(images/items/'.$this_robot->robot_item.'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span>';
-                            echo 'Unequip '.$temp_iteminfo['item_name'].'';
+                            if ($temp_allowed){ echo 'Unequip '.$temp_iteminfo['item_name'].''; }
+                            else { echo '<del>Unequip '.$temp_iteminfo['item_name'].'</del>'; }
+                            echo ' (x'.$temp_owned.')';
                             //echo 'Send to Inventory?';
                         echo '</a>';
                     }
