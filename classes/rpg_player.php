@@ -2902,7 +2902,10 @@ class rpg_player extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td class="right" style="padding-top: 4px;">
-                                        <label class="field_header">Player Fields :</label>
+                                        <label class="field_header">Players Fields :
+                                            <span style="font-size: 80%; color: #969696; position: relative; bottom: 1px;">
+                                            (Used in chapter 2 + 4 mission generation. Also influences online player battle appearances.)
+                                            </span></label>
                                         <div class="field_container" style="height: auto;">
                                         <?
 
