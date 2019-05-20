@@ -1875,6 +1875,7 @@ class rpg_battle extends rpg_object {
                                     <td  class="right"><span title="<?= floor(($temp_target_robot->robot_speed / $temp_target_robot->robot_base_speed) * 100).'% | '.$temp_target_robot->robot_speed.' / '.$temp_target_robot->robot_base_speed ?>"data-tooltip-type="robot_type robot_type_speed" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_speed_base_padding ?>px;"><span class="robot_stat robot_type robot_type_speed" style="padding-left: <?= $temp_speed_padding ?>px;"><?= $temp_speed_mod_icon.' '.$temp_target_robot->robot_speed ?></span></span></td>
                                 </tr>
                                 <? if (MMRPG_CONFIG_DEBUG_MODE){ ?>
+                                    <? $pre_styles = 'float: left; clear: both; box-sizing: border-box; padding: 10px; text-align: left; width: 100%; border: 0 none transparent; background-color: rgba(0, 0, 0, 0.1); color: #efefef; margin-bottom: 4px;'; ?>
                                     <tr>
                                         <td class="right" colspan="5">
                                             <span style="float: left;">Abilities :</span>
@@ -1884,15 +1885,45 @@ class rpg_battle extends rpg_object {
                                     <tr>
                                         <td class="right" colspan="5">
                                             <span style="float: left;">Robot Export Array :</span>
-                                            <?= ('<pre style="clear: both; padding: 10px; text-align: left; white-space: normal; overflow: auto;">'.print_r($temp_target_robot->export_array(), true).'</pre>') ?>
+                                            <input type="text"
+                                                readonly="readonly"
+                                                style="<?= $pre_styles ?>"
+                                                value="<?= str_replace('"', '&quot;', json_encode( $temp_target_robot->export_array() )) ?>"
+                                                />
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td class="right" colspan="5">
-                                            <span style="float: left;">Player Counters Array :</span>
-                                            <?= ('<pre style="clear: both; padding: 10px; text-align: left; white-space: normal; overflow: auto;">'.print_r($temp_target_player->counters, true).'</pre>') ?>
-                                        </td>
-                                    </tr>
+                                    <? if (MMRPG_CONFIG_IS_LIVE === false){ ?>
+                                        <tr>
+                                            <td class="right" colspan="5">
+                                            <span style="float: left;">Target Player Counters Array :</span>
+                                            <input type="text"
+                                                readonly="readonly"
+                                                style="<?= $pre_styles ?>"
+                                                value="<?= str_replace('"', '&quot;', json_encode( $temp_target_player->counters )) ?>"
+                                                />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="right" colspan="5">
+                                                <span style="float: left;">Target Player Starforce Array :</span>
+                                                <input type="text"
+                                                    readonly="readonly"
+                                                    style="<?= $pre_styles ?>"
+                                                    value="<?= str_replace('"', '&quot;', json_encode( $temp_target_player->player_starforce )) ?>"
+                                                    />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="right" colspan="5">
+                                                <span style="float: left;">Your Player Starforce Array :</span>
+                                                <input type="text"
+                                                    readonly="readonly"
+                                                    style="<?= $pre_styles ?>"
+                                                    value="<?= str_replace('"', '&quot;', json_encode( $this_player->player_starforce )) ?>"
+                                                    />
+                                            </td>
+                                        </tr>
+                                    <? } ?>
                                 <? } ?>
                             </tbody>
                         </table>
