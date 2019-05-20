@@ -1626,6 +1626,9 @@ class rpg_battle extends rpg_object {
                 $temp_new_robot = rpg_game::get_robot($this, $this_player, $this_robotinfo);
                 $temp_new_robot_key = $temp_new_robot->robot_key;
 
+                // If the new robot is not valid for some reason, return false
+                if ($temp_new_robot->robot_token == 'robot'){ return false; }
+
                 // If this robot is being withdrawn on the same turn it entered, return false
                 if ($this_player->player_side == 'right' && $this_switch_reason == 'withdrawn' && $this_player->values['current_robot_enter'] == $this->counters['battle_turn']){
                     // Return false to cancel the switch action
