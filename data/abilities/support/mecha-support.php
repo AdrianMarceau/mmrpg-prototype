@@ -119,7 +119,7 @@ $ability = array(
 
             // Generate the new robot and add it to this player's team
             $this_mecha_key = $temp_summoner_key; //$this_player->counters['robots_active'] + $this_player->counters['robots_disabled'] + 1;
-            $this_mecha_id = $this_original_robot_id.str_pad(($this_mecha_key + $this_robot->counters['ability_mecha_support']), 3, '0', STR_PAD_LEFT);
+            $this_mecha_id = $this_original_robot_id.str_pad($this_mecha_info['robot_id'], 3, '0', STR_PAD_LEFT).str_pad(($this_robot->counters['ability_mecha_support'] + 1), 3, '0', STR_PAD_LEFT);
             $this_mecha_id_token = $this_mecha_id.'_'.$this_mecha_info['robot_token'];
             $this_boost_abilities = array('attack-boost', 'defense-boost', 'speed-boost', 'energy-boost');
             $this_break_abilities = array('attack-break', 'defense-break', 'speed-break', 'energy-break');
@@ -170,7 +170,7 @@ $ability = array(
             $temp_mecha->flags['ability_startup'] = true;
             $temp_mecha->update_session();
             $this_mecha_info = $temp_mecha->export_array();
-            $this_player->load_robot($this_mecha_info, $this_key);
+            $this_player->load_robot($this_mecha_info, $this_player->counters['robots_total']);
             $this_player->update_session();
 
             // Automatically trigger a switch action to the new mecha support robot
@@ -182,16 +182,15 @@ $ability = array(
 
             // Automatically trigger an ability action from the new mecha support robot
             $temp_mecha = rpg_game::get_robot($this_battle, $this_player, array('robot_id' => $temp_mecha->robot_id));
-            $temp_ability_token = $this_mecha_info['robot_abilities'][0];
-            $temp_ability_info = rpg_ability::get_index_info($temp_ability_token);
-            $temp_ability_id = $this_robot->robot_id.str_pad($temp_ability_info['ability_id'], '3', '0', STR_PAD_LEFT);
+            $temp_mecha_ability = rpg_game::get_ability($this_battle, $this_player, $temp_mecha, array('ability_token' => $this_mecha_info['robot_abilities'][0]));
+            $temp_mecha_ability_action = $temp_mecha_ability->ability_id.'_'.$temp_mecha_ability->ability_token;
             $this_battle->actions_append(
                 $this_player,
                 $temp_mecha,
                 $target_player,
                 $target_robot,
                 'ability',
-                $temp_ability_id.'_'.$temp_ability_token,
+                $temp_mecha_ability_action,
                 true
                 );
 
