@@ -183,7 +183,8 @@ $ability = array(
             // Automatically trigger an ability action from the new mecha support robot
             $temp_mecha = rpg_game::get_robot($this_battle, $this_player, array('robot_id' => $temp_mecha->robot_id));
             $temp_ability_token = $this_mecha_info['robot_abilities'][0];
-            $temp_ability_id = $this_robot->robot_id.str_pad($this->index['abilities'][$temp_ability_token]['ability_id'], '3', '0', STR_PAD_LEFT);
+            $temp_ability_info = rpg_ability::get_index_info($temp_ability_token);
+            $temp_ability_id = $this_robot->robot_id.str_pad($temp_ability_info['ability_id'], '3', '0', STR_PAD_LEFT);
             $this_battle->actions_append(
                 $this_player,
                 $temp_mecha,
