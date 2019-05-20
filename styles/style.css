@@ -2739,11 +2739,11 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     cursor: pointer;
     _cursor: hand;
     position: absolute;
-    top: 6px;
-    left: 1px;
+    top: 3px;
+    left: 3px;
     font-size: 8px;
     border-width: 1px;
-    padding: 0 12px 0 28px;
+    padding: 2px 12px 2px 28px;
 }
 #actions .actions_item .main_actions_hastitle .main_actions_title .float_links .button[data-action] .sprite {
     bottom: -12px;
