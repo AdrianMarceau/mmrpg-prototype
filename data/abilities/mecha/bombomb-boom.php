@@ -58,9 +58,10 @@ $ability = array(
                 'failure' => array(6, -9999, 5, -10, $this_robot->print_name().' was not affected by the blast&hellip;')
                 ));
             $energy_damage_amount = $this_robot->robot_energy;
-            $this_robot->trigger_damage($target_robot, $this_ability, $energy_damage_amount, false);
-            $this_robot->robot_frame = 'defeat';
-            $this_robot->trigger_disabled($target_robot);
+            $this_robot->trigger_damage($target_robot, $this_ability, $energy_damage_amount, true);
+            //$this_robot->trigger_damage($target_robot, $this_ability, $energy_damage_amount, false);
+            //$this_robot->robot_frame = 'defeat';
+            //$this_robot->trigger_disabled($target_robot);
 
         }
 
