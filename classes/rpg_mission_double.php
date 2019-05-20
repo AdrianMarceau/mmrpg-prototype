@@ -449,6 +449,13 @@ class rpg_mission_double extends rpg_mission {
         // Check to see if we should be adding a field star to this battle
         if ($temp_fusion_star_present){
 
+            // Collect Rogue Star info if there is one
+            static $this_rogue_star;
+            if (empty($this_rogue_star)
+                && $this_rogue_star !== false){
+                $this_rogue_star = mmrpg_prototype_get_current_rogue_star();
+            }
+
             // Generate the necessary field star variables and add them to the battle data
             $temp_field_star = array();
             $temp_field_star['star_name'] = $temp_option_battle['battle_field_base']['field_name'];
@@ -462,7 +469,12 @@ class rpg_mission_double extends rpg_mission {
             $temp_field_star['star_date'] = time();
             $temp_battle_omega['values']['field_star'] = $temp_field_star;
             $temp_battle_omega['battle_target_player']['player_starforce'] = array();
-            if (!empty($_SESSION[$session_token]['values']['star_force'])){ $temp_battle_omega['battle_target_player']['player_starforce'] = $_SESSION[$session_token]['values']['star_force']; }
+            if (!empty($_SESSION[$session_token]['values']['star_force'])){
+                $temp_battle_omega['battle_target_player']['player_starforce'] = $_SESSION[$session_token]['values']['star_force'];
+                if (!empty($this_rogue_star)){
+                    $temp_battle_omega['battle_target_player']['player_starforce'][$this_rogue_star['star_type']] -= $this_rogue_star['star_power'];
+                }
+            }
             if (!isset($temp_battle_omega['battle_target_player']['player_starforce'][$temp_field_star['star_type']])){ $temp_battle_omega['battle_target_player']['player_starforce'][$temp_field_star['star_type']] = 0; }
             if (!isset($temp_battle_omega['battle_target_player']['player_starforce'][$temp_field_star['star_type2']])){ $temp_battle_omega['battle_target_player']['player_starforce'][$temp_field_star['star_type2']] = 0; }
             if ($temp_field_star['star_type'] == $temp_field_star['star_type2']){
@@ -472,6 +484,7 @@ class rpg_mission_double extends rpg_mission {
                 $temp_battle_omega['battle_target_player']['player_starforce'][$temp_field_star['star_type2']] += 1;
             }
 
+            /*
             // Increase the power of the robot masters by 20% in each field
             foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $robot){
                 if (!isset($this_robot_index[$robot['robot_token']])){ continue; }
@@ -483,6 +496,7 @@ class rpg_mission_double extends rpg_mission {
                     'robot_speed' => round($rindex['robot_speed'] * 0.20)
                     );
             }
+            */
 
         }
 
