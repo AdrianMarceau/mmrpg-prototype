@@ -49,15 +49,12 @@ $ability = array(
                 //$this_battle->events_create(false, false, 'debug', 'The knocked-off item was a life energy upgrade!');
                 $this_current_energy = $this_robot->robot_energy;
                 $this_current_base_energy = $this_robot->robot_base_energy;
-                $this_current_damage = $this_current_base_energy - $this_current_energy;
-                $this_new_base_energy = $this_current_base_energy / 2;
-                $this_new_energy = $this_new_base_energy - $this_current_damage;
-                if ($this_new_energy > $this_new_base_energy){ $this_new_energy = $this_new_base_energy; }
+                $this_new_energy = ceil($this_current_energy / 2);
+                $this_new_base_energy = ceil($this_current_base_energy / 2);
                 /*
                 $this_battle->events_create(false, false, 'debug',
                     '$this_current_energy = '.$this_current_energy.
                     ' / '.'$this_current_base_energy = '.$this_current_base_energy.
-                    ' <br /> '.'$this_current_damage = '.$this_current_damage.
                     ' <br /> '.'$this_new_energy = '.$this_new_energy.
                     ' / '.'$this_new_base_energy = '.$this_new_base_energy.
                     '');
@@ -69,15 +66,12 @@ $ability = array(
                 //$this_battle->events_create(false, false, 'debug', 'The knocked-off item was a weapon energy upgrade!');
                 $this_current_energy = $this_robot->robot_weapons;
                 $this_current_base_energy = $this_robot->robot_base_weapons;
-                $this_current_damage = $this_current_base_energy - $this_current_energy;
-                $this_new_base_energy = $this_current_base_energy / 2;
-                $this_new_energy = $this_new_base_energy - $this_current_damage;
-                if ($this_new_energy > $this_new_base_energy){ $this_new_energy = $this_new_base_energy; }
+                $this_new_energy = ceil($this_current_energy / 2);
+                $this_new_base_energy = ceil($this_current_base_energy / 2);
                 /*
                 $this_battle->events_create(false, false, 'debug',
                     '$this_current_energy = '.$this_current_energy.
                     ' / '.'$this_current_base_energy = '.$this_current_base_energy.
-                    ' <br /> '.'$this_current_damage = '.$this_current_damage.
                     ' <br /> '.'$this_new_energy = '.$this_new_energy.
                     ' / '.'$this_new_base_energy = '.$this_new_base_energy.
                     '');
