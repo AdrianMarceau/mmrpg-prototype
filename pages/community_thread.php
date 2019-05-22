@@ -166,21 +166,26 @@ if ($this_posts_count >= $this_thread_info['thread_views']){
 }
 
 // Collect the thread counts for all users in an index
-$this_user_countindex = $db->get_array_list('SELECT
-    mmrpg_users.user_id,
-    mmrpg_leaderboard.board_points,
-    mmrpg_threads.thread_count,
-    mmrpg_posts.post_count
-    FROM mmrpg_users
-    LEFT JOIN mmrpg_leaderboard ON mmrpg_leaderboard.user_id = mmrpg_users.user_id
-    LEFT JOIN (
-    SELECT user_id, COUNT(thread_id) AS thread_count FROM mmrpg_threads WHERE mmrpg_threads.thread_target = 0 AND thread_published = 1 GROUP BY mmrpg_threads.user_id
-    ) mmrpg_threads ON mmrpg_threads.user_id = mmrpg_users.user_id
-    LEFT JOIN (
-    SELECT user_id, COUNT(post_id) AS post_count FROM mmrpg_posts WHERE mmrpg_posts.post_target = 0 AND post_deleted = 0 GROUP BY mmrpg_posts.user_id
-    ) mmrpg_posts ON mmrpg_posts.user_id = mmrpg_users.user_id
-    WHERE mmrpg_leaderboard.board_points > 0 AND mmrpg_users.user_id IN ('.implode(', ', $temp_user_ids).')
-    ;', 'user_id');
+$this_user_countindex = array();
+if (!empty($temp_user_ids)){
+    $this_user_countindex = $db->get_array_list('SELECT
+        mmrpg_users.user_id,
+        mmrpg_leaderboard.board_points,
+        mmrpg_threads.thread_count,
+        mmrpg_posts.post_count
+        FROM mmrpg_users
+        LEFT JOIN mmrpg_leaderboard ON mmrpg_leaderboard.user_id = mmrpg_users.user_id
+        LEFT JOIN (
+        SELECT user_id, COUNT(thread_id) AS thread_count FROM mmrpg_threads WHERE mmrpg_threads.thread_target = 0 AND thread_published = 1 GROUP BY mmrpg_threads.user_id
+        ) mmrpg_threads ON mmrpg_threads.user_id = mmrpg_users.user_id
+        LEFT JOIN (
+        SELECT user_id, COUNT(post_id) AS post_count FROM mmrpg_posts WHERE mmrpg_posts.post_target = 0 AND post_deleted = 0 GROUP BY mmrpg_posts.user_id
+        ) mmrpg_posts ON mmrpg_posts.user_id = mmrpg_users.user_id
+        WHERE
+        mmrpg_leaderboard.board_points > 0
+        AND mmrpg_users.user_id IN ('.implode(', ', $temp_user_ids).')
+        ;', 'user_id');
+}
 
 
 

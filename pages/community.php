@@ -111,13 +111,15 @@ elseif (!empty($this_current_id) && !empty($this_current_token)){
     $this_thread_info = $db->get_array($this_thread_query);
 
     // If this thread has not already been viewed this session, increment the counter
-    $temp_session_key = 'mmrpg_thread_viewed_'.$this_thread_info['thread_id'];
-    if (empty($_SESSION[$temp_session_key])){
-        $temp_current_views = $this_thread_info['thread_views'];
-        $temp_new_views = $temp_current_views + 1;
-        $temp_update_session = $db->query("UPDATE mmrpg_threads SET thread_views = {$temp_new_views} WHERE thread_id = {$this_thread_info['thread_id']}");
-        if (!empty($temp_update_session)){ $this_thread_info['thread_views'] = $temp_new_views; }
-        $_SESSION[$temp_session_key] = true;
+    if (!empty($this_thread_info)){
+        $temp_session_key = 'mmrpg_thread_viewed_'.$this_thread_info['thread_id'];
+        if (!empty($_SESSION[$temp_session_key])){
+            $temp_current_views = $this_thread_info['thread_views'];
+            $temp_new_views = $temp_current_views + 1;
+            $temp_update_session = $db->query("UPDATE mmrpg_threads SET thread_views = {$temp_new_views} WHERE thread_id = {$this_thread_info['thread_id']}");
+            if (!empty($temp_update_session)){ $this_thread_info['thread_views'] = $temp_new_views; }
+            $_SESSION[$temp_session_key] = true;
+        }
     }
 
 }
