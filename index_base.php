@@ -582,7 +582,7 @@ if ($this_current_page == 'file' // File sub-pages
 </html>
 <?
 // If we're NOT in demo mode, automatically update the date-accessed for their database entry
-if (rpg_game::is_user()){
+if (rpg_game::is_user() && !empty($_SESSION['GAME']['USER']['userid'])){
     $temp_query = 'UPDATE mmrpg_users SET user_date_accessed = '.time().' WHERE user_id = '.$_SESSION['GAME']['USER']['userid'];
     $temp_result = $db->query($temp_query);
 }
