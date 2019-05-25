@@ -292,5 +292,127 @@ class rpg_mission_challenge extends rpg_mission {
 
     }
 
+    // Define a function for calculating the battle point rewards for a challenge victory
+    public static function calculate_challenge_reward_points($victory_results, &$victory_percent = 0, &$victory_rank = ''){
+        static $rank_index;
+        if (empty($rank_index)){ $rank_index = array(10 => 'SS', 9 => 'S', 8 => 'A', 7 => 'B', 6 => 'C', 5 => 'D', 4 => 'E', 3 => 'F', 2 => 'F', 1 => 'F', 0 => 'F'); }
+        $victory_points_possible = 2000;
+        $victory_points = ($victory_points_possible / 2);
+        $victory_points += ($victory_points_possible / 4) - ceil(($victory_points_possible / 4) * (($victory_results['challenge_turns_used'] - 1) / $victory_results['challenge_turn_limit']));
+        $victory_points += ($victory_points_possible / 4) - ceil(($victory_points_possible / 4) * (($victory_results['challenge_robots_used'] - 1) / $victory_results['challenge_robot_limit']));
+        $victory_percent = round((($victory_points / $victory_points_possible) * 100), 0);
+        $victory_rank_num = floor(($victory_points / $victory_points_possible) * 10);
+        $victory_rank = $rank_index[$victory_rank_num];
+        return $victory_points;
+    }
+
+
+    // -- PRINT FUNCTIONS -- /
+
+    // Define a static function for printing out the challenge's title markup
+    public static function print_editor_title_markup($challenge_info, $challenge_victories_index, $mmrpg_field_index = false, $mmrpg_robot_index = false){
+
+        // Pull in global variables
+        $session_token = rpg_game::session_token();
+
+        // Collect a field index in case we need it later
+        if ($mmrpg_field_index === false){ static $mmrpg_field_index; if (empty($mmrpg_field_index)){ $mmrpg_field_index = rpg_field::get_index(); } }
+        if ($mmrpg_robot_index === false){ static $mmrpg_robot_index; if (empty($mmrpg_robot_index)){ $mmrpg_robot_index = rpg_robot::get_index(); } }
+
+        // Collect data about this challenge mission from the array
+        $this_challenge_id = $challenge_info['challenge_id'];
+        $this_challenge_name = $challenge_info['challenge_name'];
+        $this_field_data = json_decode($challenge_info['challenge_field_data'], true);
+        $this_field_info1 = $mmrpg_field_index[$this_field_data['field_background']];
+        $this_field_info2 = $mmrpg_field_index[$this_field_data['field_foreground']];
+        $this_target_data = json_decode($challenge_info['challenge_target_data'], true);
+        $this_challenge_description = !empty($challenge_info['challenge_description']) ? $challenge_info['challenge_description'] : '';
+
+        // Generate the actual title markup given available fields
+        $this_challenge_title = $this_challenge_name;
+        $this_challenge_title .= ' // '.explode(' ', $this_field_info1['field_name'])[0].' '.explode(' ', $this_field_info2['field_name'])[1];
+        if ($challenge_info['challenge_kind'] == 'event'
+            && !empty($this_target_data['player_robots'])){
+            $first_robot_token = $this_target_data['player_robots'][0]['robot_token'];
+            $first_robot_info = $mmrpg_robot_index[$first_robot_token];
+            $this_challenge_title .= ' | Vs. '.$first_robot_info['robot_name'];
+        }
+
+        if (!empty($this_challenge_description)){
+            $this_challenge_title .= ' // [['.str_replace('"', '&quot;', $this_challenge_description).']]';
+        }
+
+        if (!empty($challenge_victories_index[$this_challenge_id])){
+            $victory_results = $challenge_victories_index[$this_challenge_id];
+            $victory_points = self::calculate_challenge_reward_points($victory_results, $victory_percent, $victory_rank);
+            $this_challenge_title .= ' // '.$victory_rank.'-Rank Clear! [['.
+                '// Turns: '.$victory_results['challenge_turns_used'].'/'.$victory_results['challenge_turn_limit'].' '.
+                '| Robots: '.$victory_results['challenge_robots_used'].'/'.$victory_results['challenge_robot_limit'].' '.
+                '| Reward: '.number_format($victory_points, 0, '.', ',').' BP ('.$victory_percent.'%)'.
+                ']]';
+        }
+
+        // Return the generated title for this challenge mission
+        return $this_challenge_title;
+
+    }
+
+    // Define a static function for printing out the missions's title markup
+    public static function print_editor_option_markup($challenge_info, $challenge_victories_index, $mmrpg_field_index = false, $mmrpg_robot_index = false){
+
+        // Pull in global variables
+        $session_token = rpg_game::session_token();
+
+        // Collect a field index in case we need it later
+        if ($mmrpg_field_index === false){ static $mmrpg_field_index; if (empty($mmrpg_field_index)){ $mmrpg_field_index = rpg_field::get_index(); } }
+        if ($mmrpg_robot_index === false){ static $mmrpg_robot_index; if (empty($mmrpg_robot_index)){ $mmrpg_robot_index = rpg_robot::get_index(); } }
+
+        // Generate the actual title markup given available fields
+        $this_challenge_id = $challenge_info['challenge_id'];
+        $this_challenge_name = $challenge_info['challenge_name'];
+        $this_field_data = json_decode($challenge_info['challenge_field_data'], true);
+        $this_field_info1 = $mmrpg_field_index[$this_field_data['field_background']];
+        $this_field_info2 = $mmrpg_field_index[$this_field_data['field_foreground']];
+        $this_target_data = json_decode($challenge_info['challenge_target_data'], true);
+
+        $this_challenge_title = self::print_editor_title_markup($challenge_info, $challenge_victories_index);
+        $this_challenge_title_plain = strip_tags(str_replace('<br />', '&#10;', $this_challenge_title));
+        $this_challenge_title_plain = str_replace(array('[[', ']]'), '', $this_challenge_title_plain);
+        $this_challenge_title_tooltip = htmlentities($this_challenge_title, ENT_QUOTES, 'UTF-8');
+        $this_challenge_title_html = str_replace(' ', '&nbsp;', $this_challenge_name);
+        $this_challenge_field_type1 = !empty($this_field_info1['field_type']) ? $this_field_info1['field_type'] : 'none';
+        $this_challenge_field_type2 = !empty($this_field_info2['field_type']) ? $this_field_info2['field_type'] : 'none';
+
+        $this_challenge_label = $challenge_info['challenge_name'];
+        if ($challenge_info['challenge_kind'] == 'event'
+            && !empty($this_target_data['player_robots'])){
+            $first_robot_token = $this_target_data['player_robots'][0]['robot_token'];
+            $first_robot_info = $mmrpg_robot_index[$first_robot_token];
+            $this_challenge_label .= ' | Vs. '.$first_robot_info['robot_name'];
+        } elseif ($challenge_info['challenge_kind'] == 'user'
+            && !empty($challenge_info['challenge_creator'])){
+            $this_challenge_label .= ' | By '.$challenge_info['challenge_creator_name'];
+        }
+
+        if (!empty($challenge_victories_index[$this_challenge_id])){
+            $victory_results = $challenge_victories_index[$this_challenge_id];
+            $victory_points = self::calculate_challenge_reward_points($victory_results, $victory_percent, $victory_rank);
+            $this_challenge_label = '['.$victory_rank.'-RANK CLEAR!] - '.$this_challenge_label;
+        }
+
+        $this_challenge_field_option = '<option '.
+            'value="'.$challenge_info['challenge_id'].'" '.
+            'data-label="'.$this_challenge_name.'" '.
+            'data-type="'.$this_challenge_field_type1.'" '.
+            'data-type2="'.$this_challenge_field_type2.'" '.
+            'title="'.$this_challenge_title_plain.'" '.
+            'data-tooltip="'.$this_challenge_title_tooltip.'" '.
+            'data-tooltip-type="field_type field_type_'.($this_challenge_field_type1).($this_challenge_field_type1 != 'none' ? '_'.$this_challenge_field_type1 : '').'" '.
+            '>'.$this_challenge_label.'</option>';
+
+        return $this_challenge_field_option;
+
+    }
+
 }
 ?>
