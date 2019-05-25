@@ -160,7 +160,8 @@ foreach ($this_posts_array AS $key => $array){
 $temp_user_ids = array_unique($temp_user_ids);
 
 // If the current post count is somehow higher than the view count, fix it up
-if ($this_posts_count >= $this_thread_info['thread_views']){
+if (!empty($this_thread_info)
+    && $this_posts_count >= $this_thread_info['thread_views']){
     $this_thread_info['thread_views'] += $this_posts_count;
     $db->query("UPDATE mmrpg_threads SET thread_views = {$this_thread_info['thread_views']} WHERE thread_id = {$this_thread_info['thread_id']}");
 }

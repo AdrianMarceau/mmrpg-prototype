@@ -180,6 +180,7 @@ if (empty($this_current_page) || !in_array($this_current_page, $this_allowed_pag
  */
 
 // If we're NOT viewing the session info
+$this_userid = MMRPG_SETTINGS_GUEST_ID;
 if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
 
     // If the user session is already in progress, collect the details
