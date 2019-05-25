@@ -415,7 +415,8 @@ body.windowFlag_landscapeMode #prototype {
 }
 
 #edit #console .event .item_header,
-#edit #console .event .field_header {
+#edit #console .event .field_header,
+#edit #console .event .challenge_header {
     display: block;
     float: none;
     clear: both;
@@ -423,7 +424,8 @@ body.windowFlag_landscapeMode #prototype {
     font-size: 12px;
 }
 #edit #console .event .item_container,
-#edit #console .event .field_container {
+#edit #console .event .field_container,
+#edit #console .event .challenge_container {
     display: block;
     float: none;
     clear: both;
@@ -486,6 +488,11 @@ body.windowFlag_landscapeMode #prototype {
     -webkit-border-radius: 3px;
     border: 1px solid #000000 !important;
     border-color: rgba(0, 0, 0, 0.75) !important;
+}
+#edit #console .event a.mission_name label {
+    background-size: auto;
+    background-position: center center;
+    background-repeat: repeat;
 }
 #edit #console .event select.field_name,
 #edit #console .event select.field_name:hover,
