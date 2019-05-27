@@ -702,7 +702,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     $victory_results = $temp_battle_omega['values']['challenge_records']['personal'];
                     $victory_points = rpg_mission_challenge::calculate_challenge_reward_points($temp_challenge_kind, $victory_results, $victory_percent, $victory_rank);
                     $cleared_token_colour = 'electric'; //!empty($temp_battle_omega['values']['colour_token']) ? $temp_battle_omega['values']['colour_token'] : 'none';
-                    $temp_battle_omega['battle_button'] = (!empty($temp_battle_omega['battle_button']) ? $temp_battle_omega['battle_button'] : $temp_battle_omega['battle_name']).' <sup class="special_type player_type player_type_'.$cleared_token_colour.'">&#9733; '.$victory_rank.'-Rank Clear!</sup>';
+                    $temp_battle_omega['battle_button'] = (!empty($temp_battle_omega['battle_button']) ? $temp_battle_omega['battle_button'] : $temp_battle_omega['battle_name']).' <sup class="special_type player_type player_type_'.$cleared_token_colour.'">&#9733; '.$victory_rank.'<span class="nobanner">-Rank Clear!</span></sup>';
                 }
                 if (!empty($temp_battle_omega['flags']['is_hidden'])){
                     $temp_battle_omega['option_style'] = 'border-color: red !important; ';
