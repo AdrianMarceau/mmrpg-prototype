@@ -587,15 +587,16 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
 
                     // If this user is online, update the battle button with details
-                    if (!empty($temp_player_array['values']['flags_online'])){
+                    if (!empty($temp_player_array['values']['flag_online'])){
                         $temp_battle_omega['option_style'] = 'border-color: green !important; ';
+                        $temp_battle_omega['battle_description2'] .= 'This player was recently online!';
                         $temp_battle_omega['battle_button'] = (!empty($temp_battle_omega['battle_button']) ? $temp_battle_omega['battle_button'] : $temp_battle_omega['battle_name']).' <sup class="online_type player_type player_type_nature">Online</sup>';
                     }
 
                     // If this user is defeated, update the battle button with details
                     if (!empty($temp_player_array['values']['flag_defeated'])){
                         $victory_token_colour = !empty($temp_player_array['values']['colour_token']) ? $temp_player_array['values']['colour_token'] : 'none';
-                        $temp_battle_omega['battle_button'] = (!empty($temp_battle_omega['battle_button']) ? $temp_battle_omega['battle_button'] : $temp_battle_omega['battle_name']).' <sup class="online_type player_type player_type_'.$victory_token_colour.'">&#9733;</sup>';
+                        $temp_battle_omega['battle_button'] = (!empty($temp_battle_omega['battle_button']) ? $temp_battle_omega['battle_button'] : $temp_battle_omega['battle_name']).' <sup class="special_type player_type player_type_'.$victory_token_colour.'">&#9733;</sup>';
                         $temp_battle_omega['battle_description2'] .= 'This player\'s victory token has already been collected...';
                         $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * 0.10);
                     } else {
@@ -677,25 +678,36 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         // Create an array to hold all the challenge missions
         $temp_challenge_missions = array();
 
-        // Check to see if there are any event challenges to display right now
-        $temp_event_challenges = rpg_mission_challenge::get_missions($this_prototype_data, 'event', 3, false, false);
-        if (!empty($temp_event_challenges)){ $temp_challenge_missions = array_merge($temp_challenge_missions, $temp_event_challenges); }
-
-        /*
-        // WORK-IN-PROGRESS ONLY FOR ADMINS TEMP TEMP TEMP
-        if (MMRPG_USER_IS_ADMIN){
-            // Pad out the rest of the mission tab with user challenges if possible
-            $req_user_challenges = 6 - (!empty($temp_event_challenges) ? (count($temp_event_challenges) * 2) : 0);
-            if ($req_user_challenges > 0){
-                $temp_user_challenges = rpg_mission_challenge::get_missions($this_prototype_data, 'user', $req_user_challenges, false);
-                if (!empty($temp_user_challenges)){ $temp_challenge_missions = array_merge($temp_user_challenges, $temp_challenge_missions); }
-            }
+        // Check to see if this user already has a playlist of challenges
+        $temp_session_key = $this_prototype_data['this_player_token'].'_target-challenge-missions';
+        $temp_challenge_playlist = !empty($_SESSION[$session_token]['values'][$temp_session_key]) ? $_SESSION[$session_token]['values'][$temp_session_key] : array();
+        if (!empty($temp_challenge_playlist)){
+            $temp_playlist_challenges = rpg_mission_challenge::get_custom_missions($this_prototype_data, $temp_challenge_playlist);
+            if (!empty($temp_playlist_challenges)){ $temp_challenge_missions = array_merge($temp_challenge_missions, $temp_playlist_challenges); }
         }
-        */
+
+        // Check to see if there are any event challenges to display right now
+        if (count($temp_challenge_missions) < 3){
+            $include_hidden = MMRPG_USER_IS_ADMIN === true ? true : false;
+            $temp_required = 3 - count($temp_challenge_missions);
+            $temp_event_challenges = rpg_mission_challenge::get_missions($this_prototype_data, 'event', $temp_required, $include_hidden, false);
+            if (!empty($temp_event_challenges)){ $temp_challenge_missions = array_merge($temp_challenge_missions, $temp_event_challenges); }
+        }
 
         // Loop through any collected event or user challenges and then add them to the list
         if (!empty($temp_challenge_missions)){
             foreach ($temp_challenge_missions AS $key => $temp_battle_omega){
+                $temp_challenge_kind = $temp_battle_omega['values']['challenge_battle_kind'];
+                if (!empty($temp_battle_omega['flags']['is_cleared'])){
+                    $victory_results = $temp_battle_omega['values']['challenge_records']['personal'];
+                    $victory_points = rpg_mission_challenge::calculate_challenge_reward_points($temp_challenge_kind, $victory_results, $victory_percent, $victory_rank);
+                    $cleared_token_colour = 'electric'; //!empty($temp_battle_omega['values']['colour_token']) ? $temp_battle_omega['values']['colour_token'] : 'none';
+                    $temp_battle_omega['battle_button'] = (!empty($temp_battle_omega['battle_button']) ? $temp_battle_omega['battle_button'] : $temp_battle_omega['battle_name']).' <sup class="special_type player_type player_type_'.$cleared_token_colour.'">&#9733; '.$victory_rank.'-Rank Clear!</sup>';
+                }
+                if (!empty($temp_battle_omega['flags']['is_hidden'])){
+                    $temp_battle_omega['option_style'] = 'border-color: red !important; ';
+                    $temp_battle_omega['battle_button'] = (!empty($temp_battle_omega['battle_button']) ? $temp_battle_omega['battle_button'] : $temp_battle_omega['battle_name']).' <sup class="special_type player_type player_type_flame">Hidden</sup>';
+                }
                 $this_prototype_data['battle_options'][] = $temp_battle_omega;
                 rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
             }
