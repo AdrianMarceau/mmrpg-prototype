@@ -7,956 +7,1167 @@ var thisEditorData = {playerTotal:0,playerTotal:0};
 var resizePlayerWrapper = function(){};
 $(document).ready(function(){
 
-  // Update global reference variables
-  thisBody = $('#mmrpg');
-  thisPrototype = $('#prototype', thisBody);
-  thisWindow = $(window);
-  thisEditor = $('#edit', thisBody);
+    // Update global reference variables
+    thisBody = $('#mmrpg');
+    thisPrototype = $('#prototype', thisBody);
+    thisWindow = $(window);
+    thisEditor = $('#edit', thisBody);
 
-  // Update the player and player count by counting elements
-  //thisEditorData.playerTotal = $('#canvas .wrapper[data-player]', thisEditor).length;
-  //thisEditorData.playerTotal = $('#canvas .sprite[data-player]', thisEditor).length;
+    // Update the player and player count by counting elements
+    //thisEditorData.playerTotal = $('#canvas .wrapper[data-player]', thisEditor).length;
+    //thisEditorData.playerTotal = $('#canvas .sprite[data-player]', thisEditor).length;
 
-  //console.log(thisEditorData);
+    //console.log(thisEditorData);
 
-  // Define a function for resizing player wrappers based on player count
-  /*
-  resizePlayerWrapper = function(){
-    $('#canvas .wrapper[data-player]', thisEditor).each(function(){
-      var tempPlayerWrapper = $(this);
-      var tempPlayerCell = tempPlayerWrapper.parent();
-      var tempPlayerToken = tempPlayerWrapper.attr('data-player');
-      var tempRobotCount = $('.sprite[data-player]', tempPlayerWrapper).length;
-      var tempRobotPercent = Math.ceil((tempRobotCount / thisEditorData.playerTotal) * 100);
-      tempPlayerCell.css({width:tempRobotPercent+'%'});
-      if (tempRobotCount < 2){ tempPlayerWrapper.find('.sort').css({display:'none'}); }
-      else { tempPlayerWrapper.find('.sort').css({display:''}); }
-      //console.log(thisEditorData);
-      //console.log(tempPlayerToken+' has '+tempRobotCount+' players which is '+tempRobotPercent+'% of the total');
-      });
-    };
-  */
-
-  // Trigger the resize wrapper on load
-  //resizePlayerWrapper();
-
-  //alert('I, the edit, have a wap setting of '+(gameSettings.wapFlag ? 'true' : 'false')+'?! and my body has a class of '+$('body').attr('class')+'!');
-
-  // Start playing the appropriate stage music
-  //top.mmrpg_music_load('misc/data-base');
-
-  /*
-
-  // Create the click event for canvas sort button
-  $('.wrapper .sort', gameCanvas).live('click', function(e){
-    var thisSortButton = $(this);
-    var thisSortPlayer = thisSortButton.attr('data-player');
-    var thisPlayerContainer = $('.wrapper[data-player='+thisSortPlayer+']', gameCanvas);
-    var thisPlayerRobots = $('.sprite[data-token]', thisPlayerContainer);
-    var thisPlayerRobotsTokens = [];
-    thisPlayerRobots.each(function(){ thisPlayerRobotsTokens.push($(this).attr('data-player')); });
-    thisPlayerRobotsTokens.join(',');
-    //console.log('clicked sort; player tokens = '+thisPlayerRobotsTokens);
-    // Define the post options for the ajax call
-    var postData = {action:'sort',player:thisSortPlayer};
-    // Post the sort request to the server
-    $.ajax({
-      type: 'POST',
-      url: 'frames/edit_players.php',
-      data: postData,
-      success: function(data, status){
-
-        // DEBUG
-        //alert(data);
-
-        // Break apart the response into parts
-        var data = data.split('|');
-        var dataStatus = data[0] != undefined ? data[0] : false;
-        var dataMessage = data[1] != undefined ? data[1] : false;
-        var dataContent = data[2] != undefined ? data[2] : false;
-
-        // If there was an error, reset select, otherwise, refresh the page
-        if (dataStatus == 'error'){
-          //console.log('error');
-          //console.log(data);
-          return false;
-          } else if (dataStatus == 'success'){
-          //console.log('success');
-          //console.log(data);
-          // check if the array is the same
-          //if (dataContent == thisPlayerRobotsTokens){ //console.log('dataContent == thisPlayerRobotsTokens'); }
-          //else { //console.log('dataContent != thisPlayerRobotsTokens'); }
-          // split the new order
-          var myArrayOrder = dataContent.split(',');
-          //console.log(myArrayOrder);
-          // get array of elements
-          var myArray = thisPlayerRobots;
-          // sort based on timestamp attribute
-          myArray.sort(function (a, b){
-            // convert to integers from strings
-            var playerToken1 = $(a).attr('data-player');
-            var playerToken2 = $(b).attr('data-player');
-            var playerToken1Position = myArrayOrder.indexOf(playerToken1);
-            var playerToken2Position = myArrayOrder.indexOf(playerToken2);
-            //console.log('playerToken1('+playerToken1+') = playerToken1Position('+playerToken1Position+');\n');
-            //console.log('playerToken2('+playerToken2+') = playerToken2Position('+playerToken2Position+');\n ');
-            // compare
-            if (playerToken1Position > playerToken2Position) { return 1; }
-            else if (playerToken1Position < playerToken2Position) { return -1; }
-            else { return 0; }
+    // Define a function for resizing player wrappers based on player count
+    /*
+    resizePlayerWrapper = function(){
+        $('#canvas .wrapper[data-player]', thisEditor).each(function(){
+            var tempPlayerWrapper = $(this);
+            var tempPlayerCell = tempPlayerWrapper.parent();
+            var tempPlayerToken = tempPlayerWrapper.attr('data-player');
+            var tempRobotCount = $('.sprite[data-player]', tempPlayerWrapper).length;
+            var tempRobotPercent = Math.ceil((tempRobotCount / thisEditorData.playerTotal) * 100);
+            tempPlayerCell.css({width:tempRobotPercent+'%'});
+            if (tempRobotCount < 2){ tempPlayerWrapper.find('.sort').css({display:'none'}); }
+            else { tempPlayerWrapper.find('.sort').css({display:''}); }
+            //console.log(thisEditorData);
+            //console.log(tempPlayerToken+' has '+tempRobotCount+' players which is '+tempRobotPercent+'% of the total');
             });
-          // put sorted results back on page
-          thisPlayerContainer.find('.sprite[data-token]').remove();
-          thisPlayerContainer.append(myArray);
-          return true;
-          } else {
-          //console.log('ummmm');
-          //console.log(data);
-          return false;
-          }
+        };
+    */
 
-        // DEBUG
-        //alert('dataStatus = '+dataStatus+', dataMessage = '+dataMessage+', dataContent = '+dataContent+'; ');
+    // Trigger the resize wrapper on load
+    //resizePlayerWrapper();
 
-        }
-      });
+    //alert('I, the edit, have a wap setting of '+(gameSettings.wapFlag ? 'true' : 'false')+'?! and my body has a class of '+$('body').attr('class')+'!');
 
-    });
+    // Start playing the appropriate stage music
+    //top.mmrpg_music_load('misc/data-base');
 
-  */
+    /*
 
+    // Create the click event for canvas sort button
+    $('.wrapper .sort', gameCanvas).live('click', function(e){
+        var thisSortButton = $(this);
+        var thisSortPlayer = thisSortButton.attr('data-player');
+        var thisPlayerContainer = $('.wrapper[data-player='+thisSortPlayer+']', gameCanvas);
+        var thisPlayerRobots = $('.sprite[data-token]', thisPlayerContainer);
+        var thisPlayerRobotsTokens = [];
+        thisPlayerRobots.each(function(){ thisPlayerRobotsTokens.push($(this).attr('data-player')); });
+        thisPlayerRobotsTokens.join(',');
+        //console.log('clicked sort; player tokens = '+thisPlayerRobotsTokens);
+        // Define the post options for the ajax call
+        var postData = {action:'sort',player:thisSortPlayer};
+        // Post the sort request to the server
+        $.ajax({
+            type: 'POST',
+            url: 'frames/edit_players.php',
+            data: postData,
+            success: function(data, status){
 
-  // Create the click event for canvas sprites
-  $('.sprite[data-token]', gameCanvas).live('click', function(e){
-    e.preventDefault();
-    var dataSprite = $(this);
-    var dataParent = $(this).closest('.wrapper')
-    var dataSelect = dataParent.attr('data-select');
-    var dataToken = $(this).attr('data-token');
-    var dataPlayer = $(this).attr('data-player');
-    var dataSelectorCurrent = '#'+dataSelect+' .event_visible';
-    var dataSelectorNext = '#'+dataSelect+' .event[data-token='+dataToken+']';
-    $('.sprite[data-token]', gameCanvas).removeClass('sprite_player_current').removeClass('sprite_player_dr-light_current sprite_player_dr-wily_current sprite_player_dr-cossack_current');
-    dataSprite.addClass('sprite_player_current').addClass('sprite_player_current').addClass('sprite_player_'+dataPlayer+'_current');
-    dataParent.css({display:'block'});
-    if ($(dataSelectorCurrent, gameConsole).length){
-      $(dataSelectorCurrent, gameConsole).stop().animate({opacity:0},250,'swing',function(){
-        $(this).removeClass('event_visible').addClass('event_hidden').css({opacity:1});
-        $(dataSelectorNext, gameConsole).css({opacity:0}).removeClass('event_hidden').addClass('event_visible').animate({opacity:1.0},250,'swing');
+                // DEBUG
+                //alert(data);
+
+                // Break apart the response into parts
+                var data = data.split('|');
+                var dataStatus = data[0] != undefined ? data[0] : false;
+                var dataMessage = data[1] != undefined ? data[1] : false;
+                var dataContent = data[2] != undefined ? data[2] : false;
+
+                // If there was an error, reset select, otherwise, refresh the page
+                if (dataStatus == 'error'){
+                    //console.log('error');
+                    //console.log(data);
+                    return false;
+                    } else if (dataStatus == 'success'){
+                    //console.log('success');
+                    //console.log(data);
+                    // check if the array is the same
+                    //if (dataContent == thisPlayerRobotsTokens){ //console.log('dataContent == thisPlayerRobotsTokens'); }
+                    //else { //console.log('dataContent != thisPlayerRobotsTokens'); }
+                    // split the new order
+                    var myArrayOrder = dataContent.split(',');
+                    //console.log(myArrayOrder);
+                    // get array of elements
+                    var myArray = thisPlayerRobots;
+                    // sort based on timestamp attribute
+                    myArray.sort(function (a, b){
+                        // convert to integers from strings
+                        var playerToken1 = $(a).attr('data-player');
+                        var playerToken2 = $(b).attr('data-player');
+                        var playerToken1Position = myArrayOrder.indexOf(playerToken1);
+                        var playerToken2Position = myArrayOrder.indexOf(playerToken2);
+                        //console.log('playerToken1('+playerToken1+') = playerToken1Position('+playerToken1Position+');\n');
+                        //console.log('playerToken2('+playerToken2+') = playerToken2Position('+playerToken2Position+');\n ');
+                        // compare
+                        if (playerToken1Position > playerToken2Position) { return 1; }
+                        else if (playerToken1Position < playerToken2Position) { return -1; }
+                        else { return 0; }
+                        });
+                    // put sorted results back on page
+                    thisPlayerContainer.find('.sprite[data-token]').remove();
+                    thisPlayerContainer.append(myArray);
+                    return true;
+                    } else {
+                    //console.log('ummmm');
+                    //console.log(data);
+                    return false;
+                    }
+
+                // DEBUG
+                //alert('dataStatus = '+dataStatus+', dataMessage = '+dataMessage+', dataContent = '+dataContent+'; ');
+
+                }
+            });
+
         });
-      } else {
-        $(dataSelectorNext, gameConsole).css({opacity:0}).removeClass('event_hidden').addClass('event_visible').animate({opacity:1.0},250,'swing');
-      }
 
-    });
+    */
 
-  /*
 
-  // Create the change event for the player selectors
-  $('select.player_name', gameConsole).live('change', function(e){
-    // Prevent the default action
-    e.preventDefault();
-    // Collect a reference to this select object
-    var thisPlayerSelect = $(this);
-    var thisPlayerLink = thisPlayerSelect.parent();
-    var newPlayerOption = $('option:selected', thisPlayerSelect);
-    // Collect the current player name and token
-    var thisRobotToken = thisPlayerSelect.attr('data-player');
-    var thisRobotName = $('a[data-player='+thisRobotToken+']', gameCanvas).attr('title');
-    // Collect the current and target player tokens
-    var currentPlayerToken = thisPlayerSelect.attr('data-player');
-    var currentPlayerLabel = $('label', thisPlayerLink).html();
-    var newPlayerToken = newPlayerOption.val();
-    var newPlayerLabel = newPlayerOption.html();
-    // Count the number of other options for this player
-    var thisParentWrapper = $('.wrapper_'+currentPlayerToken, gameCanvas);
-    var countRobotOptions = $('a[data-token]', thisParentWrapper).length;
-    if (countRobotOptions < 2){ thisPlayerSelect.val(currentPlayerToken); return false; }
-    // Define the post options for the ajax call
-    var postData = {action:'player',player:thisRobotToken,player1:currentPlayerToken,player2:newPlayerToken};
-    // Trigger a transfer of this player to the requested player
-    var confirmTransfer = true; //confirm('Transfer ownership of '+thisRobotName+' from '+currentPlayerLabel+' to '+newPlayerLabel+'?');
-    if (confirmTransfer){
-      $('#edit_overlay', thisPrototype).css({display:'block'});
-      // Post the transfer request to the server
-      $.ajax({
-        type: 'POST',
-        url: 'frames/edit_players.php',
-        data: postData,
-        success: function(data, status){
-
-          // DEBUG
-          //alert(data);
-
-          // Break apart the response into parts
-          var data = data.split('|');
-          var dataStatus = data[0] != undefined ? data[0] : false;
-          var dataMessage = data[1] != undefined ? data[1] : false;
-          var dataContent = data[2] != undefined ? data[2] : false;
-
-          // If there was an error, reset select, otherwise, refresh the page
-          if (dataStatus == 'error'){
-            // Reset the select button's position and return false
-            thisPlayerSelect.val(currentPlayerToken);
-            //console.log(data);
-            $('#edit_overlay', thisPrototype).css({display:'none'});
-            return false;
-            } else if (dataStatus == 'success'){
-            //console.log('success! now let\'s move the player...');
-            //console.log(data);
-            var newData = data.slice(2);
-            newData = newData.join('|');
-            $('#console #players').append(newData);
-            // Collect the container and token references and prepare the move
-            var canvasButton = $('.sprite[data-player='+thisRobotToken+']', gameCanvas);
-            var consoleEvent = $('.event[data-token='+currentPlayerToken+'_'+thisRobotToken+']', gameConsole);
-            var consolePlayerSelect = $('.player_select_block', consoleEvent);
-            //if (!consolePlayerSelect.length){ //console.log('player select block not found'); }
-            consolePlayerSelect.css({backgroundColor:'blue !important'});
-            var newCanvasWrapper = $('.wrapper_'+newPlayerToken+'[data-select=players]', gameCanvas);
-            var newConsoleToken = newPlayerToken+'_'+thisRobotToken;
-            if (newPlayerToken == 'dr-light'){ var newPlayerName = 'Dr. Light'; }
-            else if (newPlayerToken == 'dr-wily'){ var newPlayerName = 'Dr. Wily'; }
-            else if (newPlayerToken == 'dr-cossack'){ var newPlayerName = 'Dr. Cossack'; }
-            // Remove this player from the console
-            consoleEvent.remove();
-            // Move this player's button to the new wrapper and update their data token
-            //$('.current_player', consolePlayerSelect).removeClass('current_player_'+currentPlayerToken).addClass('current_player_'+newPlayerToken);
-            //$('.player_name label', consolePlayerSelect).html(newPlayerName);
-            //$('.player_name select', consolePlayerSelect).attr('data-player', newPlayerToken);
-            //$('select.field_name', consoleEvent).attr('data-player', newPlayerToken);
-            canvasButton.removeClass('sprite_player_'+currentPlayerToken).removeClass('sprite_player_'+currentPlayerToken+'_current');
-            canvasButton.addClass('sprite_player_'+newPlayerToken).addClass('sprite_player_'+newPlayerToken+'_current');
-            canvasButton.attr('data-player', newPlayerToken);
-            canvasButton.attr('data-token', newConsoleToken);
-            canvasButton.appendTo(newCanvasWrapper);
-            //consoleEvent.attr('data-token', newConsoleToken);
-            // Reload the current page and return true
-            //window.location = window.location.href;
-            // Trigger the wrapper resize function based on the new player amount
-            resizePlayerWrapper();
-            $('#edit_overlay', thisPrototype).css({display:'none'});
-            return true;
+    // Create the click event for canvas sprites
+    $('.sprite[data-token]', gameCanvas).live('click', function(e){
+        e.preventDefault();
+        var dataSprite = $(this);
+        var dataParent = $(this).closest('.wrapper')
+        var dataSelect = dataParent.attr('data-select');
+        var dataToken = $(this).attr('data-token');
+        var dataPlayer = $(this).attr('data-player');
+        var dataSelectorCurrent = '#'+dataSelect+' .event_visible';
+        var dataSelectorNext = '#'+dataSelect+' .event[data-token='+dataToken+']';
+        $('.sprite[data-token]', gameCanvas).removeClass('sprite_player_current').removeClass('sprite_player_dr-light_current sprite_player_dr-wily_current sprite_player_dr-cossack_current');
+        dataSprite.addClass('sprite_player_current').addClass('sprite_player_current').addClass('sprite_player_'+dataPlayer+'_current');
+        dataParent.css({display:'block'});
+        if ($(dataSelectorCurrent, gameConsole).length){
+            $(dataSelectorCurrent, gameConsole).stop().animate({opacity:0},250,'swing',function(){
+                $(this).removeClass('event_visible').addClass('event_hidden').css({opacity:1});
+                $(dataSelectorNext, gameConsole).css({opacity:0}).removeClass('event_hidden').addClass('event_visible').animate({opacity:1.0},250,'swing');
+                });
             } else {
-            //console.log('ummmm');
-            //console.log(data);
-            $('#edit_overlay', thisPrototype).css({display:'none'});
+                $(dataSelectorNext, gameConsole).css({opacity:0}).removeClass('event_hidden').addClass('event_visible').animate({opacity:1.0},250,'swing');
+            }
+
+        });
+
+    /*
+
+    // Create the change event for the player selectors
+    $('select.player_name', gameConsole).live('change', function(e){
+        // Prevent the default action
+        e.preventDefault();
+        // Collect a reference to this select object
+        var thisPlayerSelect = $(this);
+        var thisPlayerLink = thisPlayerSelect.parent();
+        var newPlayerOption = $('option:selected', thisPlayerSelect);
+        // Collect the current player name and token
+        var thisRobotToken = thisPlayerSelect.attr('data-player');
+        var thisRobotName = $('a[data-player='+thisRobotToken+']', gameCanvas).attr('title');
+        // Collect the current and target player tokens
+        var currentPlayerToken = thisPlayerSelect.attr('data-player');
+        var currentPlayerLabel = $('label', thisPlayerLink).html();
+        var newPlayerToken = newPlayerOption.val();
+        var newPlayerLabel = newPlayerOption.html();
+        // Count the number of other options for this player
+        var thisParentWrapper = $('.wrapper_'+currentPlayerToken, gameCanvas);
+        var countRobotOptions = $('a[data-token]', thisParentWrapper).length;
+        if (countRobotOptions < 2){ thisPlayerSelect.val(currentPlayerToken); return false; }
+        // Define the post options for the ajax call
+        var postData = {action:'player',player:thisRobotToken,player1:currentPlayerToken,player2:newPlayerToken};
+        // Trigger a transfer of this player to the requested player
+        var confirmTransfer = true; //confirm('Transfer ownership of '+thisRobotName+' from '+currentPlayerLabel+' to '+newPlayerLabel+'?');
+        if (confirmTransfer){
+            $('#edit_overlay', thisPrototype).css({display:'block'});
+            // Post the transfer request to the server
+            $.ajax({
+                type: 'POST',
+                url: 'frames/edit_players.php',
+                data: postData,
+                success: function(data, status){
+
+                    // DEBUG
+                    //alert(data);
+
+                    // Break apart the response into parts
+                    var data = data.split('|');
+                    var dataStatus = data[0] != undefined ? data[0] : false;
+                    var dataMessage = data[1] != undefined ? data[1] : false;
+                    var dataContent = data[2] != undefined ? data[2] : false;
+
+                    // If there was an error, reset select, otherwise, refresh the page
+                    if (dataStatus == 'error'){
+                        // Reset the select button's position and return false
+                        thisPlayerSelect.val(currentPlayerToken);
+                        //console.log(data);
+                        $('#edit_overlay', thisPrototype).css({display:'none'});
+                        return false;
+                        } else if (dataStatus == 'success'){
+                        //console.log('success! now let\'s move the player...');
+                        //console.log(data);
+                        var newData = data.slice(2);
+                        newData = newData.join('|');
+                        $('#console #players').append(newData);
+                        // Collect the container and token references and prepare the move
+                        var canvasButton = $('.sprite[data-player='+thisRobotToken+']', gameCanvas);
+                        var consoleEvent = $('.event[data-token='+currentPlayerToken+'_'+thisRobotToken+']', gameConsole);
+                        var consolePlayerSelect = $('.player_select_block', consoleEvent);
+                        //if (!consolePlayerSelect.length){ //console.log('player select block not found'); }
+                        consolePlayerSelect.css({backgroundColor:'blue !important'});
+                        var newCanvasWrapper = $('.wrapper_'+newPlayerToken+'[data-select=players]', gameCanvas);
+                        var newConsoleToken = newPlayerToken+'_'+thisRobotToken;
+                        if (newPlayerToken == 'dr-light'){ var newPlayerName = 'Dr. Light'; }
+                        else if (newPlayerToken == 'dr-wily'){ var newPlayerName = 'Dr. Wily'; }
+                        else if (newPlayerToken == 'dr-cossack'){ var newPlayerName = 'Dr. Cossack'; }
+                        // Remove this player from the console
+                        consoleEvent.remove();
+                        // Move this player's button to the new wrapper and update their data token
+                        //$('.current_player', consolePlayerSelect).removeClass('current_player_'+currentPlayerToken).addClass('current_player_'+newPlayerToken);
+                        //$('.player_name label', consolePlayerSelect).html(newPlayerName);
+                        //$('.player_name select', consolePlayerSelect).attr('data-player', newPlayerToken);
+                        //$('select.field_name', consoleEvent).attr('data-player', newPlayerToken);
+                        canvasButton.removeClass('sprite_player_'+currentPlayerToken).removeClass('sprite_player_'+currentPlayerToken+'_current');
+                        canvasButton.addClass('sprite_player_'+newPlayerToken).addClass('sprite_player_'+newPlayerToken+'_current');
+                        canvasButton.attr('data-player', newPlayerToken);
+                        canvasButton.attr('data-token', newConsoleToken);
+                        canvasButton.appendTo(newCanvasWrapper);
+                        //consoleEvent.attr('data-token', newConsoleToken);
+                        // Reload the current page and return true
+                        //window.location = window.location.href;
+                        // Trigger the wrapper resize function based on the new player amount
+                        resizePlayerWrapper();
+                        $('#edit_overlay', thisPrototype).css({display:'none'});
+                        return true;
+                        } else {
+                        //console.log('ummmm');
+                        //console.log(data);
+                        $('#edit_overlay', thisPrototype).css({display:'none'});
+                        return false;
+                        }
+
+                    // DEBUG
+                    //alert('dataStatus = '+dataStatus+', dataMessage = '+dataMessage+', dataContent = '+dataContent+'; ');
+
+                    }
+                });
+
+            }
+
+        return false;
+
+    });
+
+    */
+
+
+    /*
+     * FIELD EVENTS
+     */
+
+    // Define events for the toolbar actions (shuffle, randomize, etc.)
+    $('.tool[data-tool]', gameConsole).live('click', function(e){
+
+        // Prevent the default action
+        e.preventDefault();
+        // Collect the global reference objects
+        var thisLink = $(this);
+        var thisContainer = thisLink.parent().parent();
+        var thisContainerStatus = thisContainer.attr('data-status') != undefined ? thisContainer.attr('data-status') : 'enabled';
+        var thisSelect = $('select.field_name', thisContainer).eq(0);
+        var thisLabel = 'tools';
+        var dataKey = 0;
+        var dataPlayer = thisLink.attr('data-player');
+        var optionFieldToken = thisLink.attr('data-tool');
+        var optionSelected = $('option[value='+optionFieldToken+']', thisSelect);
+        var postData = {action:'field',key:dataKey,player:dataPlayer};
+        if (optionFieldToken.length){ postData.field = optionFieldToken; }
+        else { postData.field = ''; }
+
+        // Ensure the parent container is enabled before sending any AJAX, else just update text
+        if (thisContainerStatus == 'enabled'){
+
+            // Change the body cursor to wait
+            $('body').css('cursor', 'wait !important');
+            // Temporarily disable the window while we update stuff
+            thisContainer.css({opacity:0.25}).attr('data-status', 'disabled');
+            // Loop through all this field links for this player and disable
+            $('select.field_name', thisContainer).each(function(key, value){
+                $(this).attr('disabled', 'disabled').prop('disabled', true);
+                });
+
+            // Post this change back to the server
+            $.ajax({
+                type: 'POST',
+                url: 'frames/edit_players.php',
+                data: postData,
+                success: function(data, status){
+
+                    // DEBUG
+                    //console.log(data);
+
+                    // Break apart the response into parts
+                    var data = data.split('|');
+                    var dataStatus = data[0] != undefined ? data[0] : false;
+                    var dataMessage = data[1] != undefined ? data[1] : false;
+                    var dataContent = data[2] != undefined ? data[2] : false;
+                    var dataExtra = data[3] != undefined ? data[3] : false;
+
+                    // DEBUG
+                    //console.log('$(.tool[data-tool], gameConsole).live(click); \n dataStatus = '+dataStatus+', dataMessage = '+dataMessage+', dataContent = '+dataContent+'; dataExtra = '+dataExtra+';');
+
+                    // If the field change was a success, flash the box green
+                    if (dataStatus == 'success'){
+
+                        /*
+
+                        // Make the clicked link flash green to show success
+                        thisLink.css({borderColor:'green !important'});
+                        var tempTimeout = setTimeout(function(){ thisLink.css({borderColor:''}); }, 1000);
+
+                        // Update the link attributes based on if the field was empty
+                        if (optionFieldToken.length){
+                            //console.log('Updating '+optionFieldToken+' on line 327 ---------------------');
+                            var optionFieldLabel = optionSelected.attr('data-label');
+                            var optionFieldTitle = optionSelected.attr('title');
+                            var optionFieldTooltip = optionSelected.attr('data-tooltip');
+                            var optionFieldImage = 'images/fields/'+optionFieldToken+'/battle-field_preview.png?'+gameSettings.cacheTime;
+                            var optionFieldType = optionSelected.attr('data-type');
+                            var optionFieldType2 = optionSelected.attr('data-type2');
+                            thisLink.attr('data-field', optionFieldToken).attr('title', optionFieldTitle).attr('data-tooltip', optionFieldTooltip);
+                            thisLink.css({backgroundImage:'url('+optionFieldImage+')'});
+                            //console.log('335: backgroundImage:url('+optionFieldImage+');');
+                            thisLabel.removeClass().addClass('field_type field_type_'+optionFieldType+(optionFieldType2.length ? '_'+optionFieldType2 : '')+'');
+                            thisSelect.attr('data-field', optionFieldToken);
+                            thisLabel.html(optionFieldLabel);
+                            } else {
+                            //console.log('Updating empty on line 340 -------------------');
+                            thisLink.attr('data-field', '').attr('title', '-').attr('data-tooltip', '-');
+                            thisLabel.removeClass().addClass('field_type field_type_none');
+                            thisSelect.attr('data-field', '').val('');
+                            thisLabel.html('-');
+                            thisLabel.css({backgroundImage:'none !important'});
+                            }
+
+                        */
+
+                        // Create the empty field count variable
+                        var emptyFieldCount = 0;
+                        // If the new field list was provided, break it apart
+                        if (dataContent.length){ var newFieldList = dataContent.split(','); }
+                        else { var newFieldList = []; }
+
+                        // Loop through all this field links for this player and update
+                        $('a.field_name', thisContainer).each(function(key, value){
+
+                            // Collect the approriate reference variables
+                            var tempLink = $(this);
+                            var tempSelect = $('select', tempLink);
+                            var tempOption = $('option:selected', tempSelect);
+                            var tempLabel = $('label', tempLink);
+                            var tempField = tempOption.val();
+                            var tempCurrentField = tempLink.attr('data-field');
+
+                            // If a new field list was provided, update this link
+                            if (newFieldList.length){
+
+                                // Collect the new field from this position in the list
+                                var newField = newFieldList[key] != undefined ? newFieldList[key]: '';
+
+                                // DEBUG DEBUG DEBUG
+                                //if (tempCurrentField == newField){ return true; }
+
+                                // DEBUG
+                                //console.log('current field at position '+key+' is ['+tempField+']...');
+
+                                // Update the select box with the new field and recollect it's value
+                                tempSelect.val(newField);
+                                tempOption = $('option:selected', tempSelect);
+                                tempField = tempOption.val();
+
+                                // Update the link attributes based on if the new field was empty
+                                if (newField.length){
+                                    //console.log('Updating ['+tempCurrentField+' -> '+tempField+' -> '+newField+'] on line 380 ----------------');
+                                    var newFieldLabel = tempOption.attr('data-label');
+                                    var newFieldTitle = tempOption.attr('title');
+                                    var newFieldTooltip = tempOption.attr('data-tooltip');
+                                    var newFieldImage = 'images/fields/'+newField+'/battle-field_preview.png?'+gameSettings.cacheTime;
+                                    var newFieldType = tempOption.attr('data-type');
+                                    var newFieldType2 = tempOption.attr('data-type2');
+                                    tempLink.attr('data-field', newField).attr('title', newFieldTitle).attr('data-tooltip', newFieldTooltip);
+                                    //console.log('before_background-image: '+tempLink.css('background-image'));
+                                    //tempLink.attr('style', '');
+                                    //console.log('389 : tempLink.css(\'background-image\', \'url('+newFieldImage+')\'); ');
+                                    tempLink.css('background-image', 'url('+newFieldImage+')');
+                                    //console.log('after_background-image: '+tempLink.css('background-image'));
+                                    tempLink.removeClass().addClass('field_name field_type field_type_'+newFieldType+(newFieldType2.length ? '_'+newFieldType2 : ''));
+                                    tempLabel.removeClass().addClass('field_type field_type_'+newFieldType+(newFieldType2.length ? '_'+newFieldType2 : ''));
+                                    tempSelect.attr('data-field', newField);
+                                    tempSelect.find('option').prop('disabled', false);
+                                    tempSelect.find('option[value='+newField+']').prop('disabled', true);
+                                    tempLabel.html(newFieldLabel);
+                                    } else {
+                                    //console.log('Updating empty on line 399');
+                                    tempLink.attr('data-field', '').attr('title', '-').attr('data-tooltip', '-');
+                                    tempLabel.removeClass().addClass('field_type field_type_none');
+                                    tempSelect.attr('data-field', '').val('');
+                                    tempSelect.find('option').prop('disabled', false);
+                                    tempLabel.html('-');
+                                    tempLink.css({backgroundImage:'none !important'});
+                                    }
+
+                                // DEBUG
+                                //console.log('...but should be ['+newField+']!');
+
+                                }
+
+                            // Disable any overflow field containers
+                            if (!tempField.length){ emptyFieldCount++; }
+                            if (emptyFieldCount >= 2){ tempLink.css({opacity:0.25}); tempSelect.attr('disabled', 'disabled'); }
+                            else { tempLink.css({opacity:1.0}); tempSelect.removeAttr('disabled'); }
+
+                            });
+
+                            // Update the field and fusion star count for this player
+                            if (dataExtra != false){
+
+                                // Collect the star counts from the extra data
+                                var starCounts = dataExtra.split(',');
+                                // Collect a reference to the star count container
+                                var starCountsContainer = $('.field_stars', thisContainer);
+                                // Update the values in the two containers
+                                $('.star_field', starCountsContainer).html(starCounts[0]+' field');
+                                $('.star_fusion', starCountsContainer).html(starCounts[1]+' fusion');
+
+                                }
+
+                        }
+
+                        // Change the body cursor back to default
+                        $('body').css('cursor', '');
+                        // Enable the conatiner again now that we're done
+                        thisContainer.css({opacity:1.0}).attr('data-status', 'enabled');
+                        // Loop through all this field links for this player and disable
+                        $('select.field_name', thisContainer).each(function(key, value){
+                            $(this).removeAttr('disabled').prop('disabled', false);
+                            });
+
+                    }
+                });
+
+            } else {
+
+            // Update the link attributes based on if the field was empty
+            if (optionFieldToken.length){
+                //console.log('446: optionFieldToken.length ---------------');
+                var optionFieldLabel = optionSelected.attr('data-label');
+                var optionFieldImage = 'images/fields/'+optionFieldToken+'/battle-field_preview.png?'+gameSettings.cacheTime;
+                var optionFieldTitle = optionSelected.attr('title');
+                var optionFieldTooltip = optionSelected.attr('data-tooltip');
+                var optionFieldType = optionSelected.attr('data-type');
+                thisLink.attr('data-field', optionFieldToken).attr('title', optionFieldTitle).attr('data-tooltip', optionFieldTooltip);
+                thisLabel.removeClass().addClass('field_type field_type_'+optionFieldType);
+                thisSelect.attr('data-field', optionFieldToken);
+                thisLabel.html(optionFieldLabel);
+                thisLink.css({backgroundImage:'url('+optionFieldImage+')'});
+                } else {
+                //console.log('457: !optionFieldToken.length ---------------');
+                thisLink.attr('data-field', '').attr('title', '-').attr('data-tooltip', '-');
+                thisLabel.removeClass().addClass('field_type field_type_none');
+                thisSelect.attr('data-field', '').val('');
+                thisLabel.html('-');
+                thisLink.css({backgroundImage:'none'});
+                }
+
+            }
+
+        });
+
+    // Prevent clicks if the parent field or mission container is disabled
+    $('select.field_name, select.challenge_name', gameConsole).live('click', function(e){
+        var thisSelect = $(this);
+        var thisLink = thisSelect.parent();
+        var thisContainer = thisLink.parent();
+        var thisContainerStatus = thisContainer.attr('data-status') != undefined ? thisContainer.attr('data-status') : 'enabled';
+        if (thisContainerStatus == 'disabled'){
+            e.preventDefault();
             return false;
             }
-
-          // DEBUG
-          //alert('dataStatus = '+dataStatus+', dataMessage = '+dataMessage+', dataContent = '+dataContent+'; ');
-
-          }
         });
 
-      }
+    // Create the change event for the field selectors
+    $('.field_container select.field_name', gameConsole).live('change', function(e){
+        // Prevent the default action
+        e.preventDefault();
+        // Collect the global reference objects
+        var thisSelect = $(this);
+        var thisLink = thisSelect.parent();
+        var thisContainer = thisLink.parent();
+        var thisContainerStatus = thisContainer.attr('data-status') != undefined ? thisContainer.attr('data-status') : 'enabled';
+        var thisLabel = $('label', thisLink);
+        var dataKey = thisSelect.attr('data-key');
+        var dataPlayer = thisSelect.attr('data-player');
+        var optionSelected = $('option:selected', thisSelect);
+        var optionFieldToken = optionSelected.val();
+        var postData = {action:'field',key:dataKey,player:dataPlayer};
+        //if (dataKey == 0 && !optionFieldToken.length){ alert('first option cannot be empty!'); return false; }
+        if (optionFieldToken.length){ postData.field = optionFieldToken; }
+        else { postData.field = ''; }
 
-    return false;
+        // Ensure the parent container is enabled before sending any AJAX, else just update text
+        if (thisContainerStatus == 'enabled'){
 
-  });
+            // Change the body cursor to wait
+            $('body').css('cursor', 'wait !important');
+            // Temporarily disable the window while we update stuff
+            thisContainer.css({opacity:0.25}).attr('data-status', 'disabled');
+            // Loop through all this field links for this player and disable
+            $('select.field_name', thisContainer).each(function(key, value){
+                $(this).attr('disabled', 'disabled').prop('disabled', true);
+                });
 
-  */
+            // Post this change back to the server
+            $.ajax({
+                type: 'POST',
+                url: 'frames/edit_players.php',
+                data: postData,
+                success: function(data, status){
+
+                    // DEBUG
+                    //console.log(data);
+
+                    // Break apart the response into parts
+                    var data = data.split('|');
+                    var dataStatus = data[0] != undefined ? data[0] : false;
+                    var dataMessage = data[1] != undefined ? data[1] : false;
+                    var dataContent = data[2] != undefined ? data[2] : false;
+                    var dataExtra = data[3] != undefined ? data[3] : false;
+
+                    // DEBUG
+                    //console.log('$(select.field_name, gameConsole).live(click); \n dataStatus = '+dataStatus+', dataMessage = '+dataMessage+', dataContent = '+dataContent+'; dataExtra = '+dataExtra+';');
+
+                    // If the field change was a success, flash the box green
+                    if (dataStatus == 'success'){
+
+                        // Make the clicked link flash green to show success
+                        thisLink.css({borderColor:'green !important'});
+                        var tempTimeout = setTimeout(function(){ thisLink.css({borderColor:''}); }, 1000);
+
+                        // Update the link attributes based on if the field was empty
+                        if (optionFieldToken.length){
+                            //console.log('Updating '+optionFieldToken+' on line 327 ---------------------');
+                            var optionFieldLabel = optionSelected.attr('data-label');
+                            var optionFieldTitle = optionSelected.attr('title');
+                            var optionFieldTooltip = optionSelected.attr('data-tooltip');
+                            var optionFieldImage = 'images/fields/'+optionFieldToken+'/battle-field_preview.png?'+gameSettings.cacheTime;
+                            var optionFieldType = optionSelected.attr('data-type');
+                            var optionFieldType2 = optionSelected.attr('data-type2');
+                            thisLink.attr('data-field', optionFieldToken).attr('title', optionFieldTitle).attr('data-tooltip', optionFieldTooltip);
+                            thisLink.css({backgroundImage:'url('+optionFieldImage+')'});
+                            //console.log('335: backgroundImage:url('+optionFieldImage+');');
+                            thisLabel.removeClass().addClass('field_type field_type_'+optionFieldType+(optionFieldType2.length ? '_'+optionFieldType2 : '')+'');
+                            thisSelect.attr('data-field', optionFieldToken);
+                            thisLabel.html(optionFieldLabel);
+                            } else {
+                            //console.log('Updating empty on line 340 -------------------');
+                            thisLink.attr('data-field', '').attr('title', '-').attr('data-tooltip', '-');
+                            thisLabel.removeClass().addClass('field_type field_type_none');
+                            thisSelect.attr('data-field', '').val('');
+                            thisLabel.html('-');
+                            thisLabel.css({backgroundImage:'none !important'});
+                            }
 
 
-  /*
-   * FIELD EVENTS
-   */
+                        // Create the empty field count variable
+                        var emptyFieldCount = 0;
+                        // If the new field list was provided, break it apart
+                        if (dataContent.length){ var newFieldList = dataContent.split(','); }
+                        else { var newFieldList = []; }
 
-  // Prevent clicks if the parent container is disabled
-  $('.tool[data-tool]', gameConsole).live('click', function(e){
+                        // Loop through all this field links for this player and update
+                        $('a.field_name', thisContainer).each(function(key, value){
 
-    // Prevent the default action
-    e.preventDefault();
-    // Collect the global reference objects
-    var thisLink = $(this);
-    var thisContainer = thisLink.parent().parent();
-    var thisContainerStatus = thisContainer.attr('data-status') != undefined ? thisContainer.attr('data-status') : 'enabled';
-    var thisSelect = $('select.field_name', thisContainer).eq(0);
-    var thisLabel = 'tools';
-    var dataKey = 0;
-    var dataPlayer = thisLink.attr('data-player');
-    var optionFieldToken = thisLink.attr('data-tool');
-    var optionSelected = $('option[value='+optionFieldToken+']', thisSelect);
-    var postData = {action:'field',key:dataKey,player:dataPlayer};
-    if (optionFieldToken.length){ postData.field = optionFieldToken; }
-    else { postData.field = ''; }
+                            // Collect the approriate reference variables
+                            var tempLink = $(this);
+                            var tempSelect = $('select', tempLink);
+                            var tempOption = $('option:selected', tempSelect);
+                            var tempLabel = $('label', tempLink);
+                            var tempField = tempOption.val();
+                            var tempCurrentField = tempLink.attr('data-field');
 
-    // Ensure the parent container is enabled before sending any AJAX, else just update text
-    if (thisContainerStatus == 'enabled'){
+                            // If a new field list was provided, update this link
+                            if (newFieldList.length){
 
-      // Change the body cursor to wait
-      $('body').css('cursor', 'wait !important');
-      // Temporarily disable the window while we update stuff
-      thisContainer.css({opacity:0.25}).attr('data-status', 'disabled');
-      // Loop through all this field links for this player and disable
-      $('select.field_name', thisContainer).each(function(key, value){
-        $(this).attr('disabled', 'disabled').prop('disabled', true);
-        });
+                                // Collect the new field from this position in the list
+                                var newField = newFieldList[key] != undefined ? newFieldList[key]: '';
 
-      // Post this change back to the server
-      $.ajax({
-        type: 'POST',
-        url: 'frames/edit_players.php',
-        data: postData,
-        success: function(data, status){
+                                // DEBUG DEBUG DEBUG
+                                //if (tempCurrentField == newField){ return true; }
 
-          // DEBUG
-          //console.log(data);
+                                // DEBUG
+                                //console.log('current field at position '+key+' is ['+tempField+']...');
 
-          // Break apart the response into parts
-          var data = data.split('|');
-          var dataStatus = data[0] != undefined ? data[0] : false;
-          var dataMessage = data[1] != undefined ? data[1] : false;
-          var dataContent = data[2] != undefined ? data[2] : false;
-          var dataExtra = data[3] != undefined ? data[3] : false;
+                                // Update the select box with the new field and recollect it's value
+                                tempSelect.val(newField);
+                                tempOption = $('option:selected', tempSelect);
+                                tempField = tempOption.val();
 
-          // DEBUG
-          //console.log('$(.tool[data-tool], gameConsole).live(click); \n dataStatus = '+dataStatus+', dataMessage = '+dataMessage+', dataContent = '+dataContent+'; dataExtra = '+dataExtra+';');
+                                // Update the link attributes based on if the new field was empty
+                                if (newField.length){
+                                    //console.log('Updating ['+tempCurrentField+' -> '+tempField+' -> '+newField+'] on line 380 ----------------');
+                                    var newFieldLabel = tempOption.attr('data-label');
+                                    var newFieldTitle = tempOption.attr('title');
+                                    var newFieldTooltip = tempOption.attr('data-tooltip');
+                                    var newFieldImage = 'images/fields/'+newField+'/battle-field_preview.png?'+gameSettings.cacheTime;
+                                    var newFieldType = tempOption.attr('data-type');
+                                    var newFieldType2 = tempOption.attr('data-type2');
+                                    tempLink.attr('data-field', newField).attr('title', newFieldTitle).attr('data-tooltip', newFieldTooltip);
+                                    //console.log('before_background-image: '+tempLink.css('background-image'));
+                                    //tempLink.attr('style', '');
+                                    //console.log('389 : tempLink.css(\'background-image\', \'url('+newFieldImage+')\'); ');
+                                    tempLink.css('background-image', 'url('+newFieldImage+')');
+                                    //console.log('after_background-image: '+tempLink.css('background-image'));
+                                    tempLink.removeClass().addClass('field_name field_type field_type_'+newFieldType+(newFieldType2.length ? '_'+newFieldType2 : ''));
+                                    tempLabel.removeClass().addClass('field_type field_type_'+newFieldType+(newFieldType2.length ? '_'+newFieldType2 : ''));
+                                    tempSelect.attr('data-field', newField);
+                                    tempSelect.find('option').prop('disabled', false);
+                                    tempSelect.find('option[value='+newField+']').prop('disabled', true);
+                                    tempLabel.html(newFieldLabel);
+                                    } else {
+                                    //console.log('Updating empty on line 399');
+                                    tempLink.attr('data-field', '').attr('title', '-').attr('data-tooltip', '-');
+                                    tempLabel.removeClass().addClass('field_type field_type_none');
+                                    tempSelect.attr('data-field', '').val('');
+                                    tempSelect.find('option').prop('disabled', false);
+                                    tempLabel.html('-');
+                                    tempLink.css({backgroundImage:'none !important'});
+                                    }
 
-          // If the field change was a success, flash the box green
-          if (dataStatus == 'success'){
+                                // DEBUG
+                                //console.log('...but should be ['+newField+']!');
 
-            /*
+                                }
 
-            // Make the clicked link flash green to show success
-            thisLink.css({borderColor:'green !important'});
-            var tempTimeout = setTimeout(function(){ thisLink.css({borderColor:''}); }, 1000);
+                            // Disable any overflow field containers
+                            if (!tempField.length){ emptyFieldCount++; }
+                            if (emptyFieldCount >= 2){ tempLink.css({opacity:0.25}); tempSelect.attr('disabled', 'disabled'); }
+                            else { tempLink.css({opacity:1.0}); tempSelect.removeAttr('disabled'); }
+
+                            });
+
+                            // Update the field and fusion star count for this player
+                            if (dataExtra != false){
+
+                                // Collect the star counts from the extra data
+                                var starCounts = dataExtra.split(',');
+                                // Collect a reference to the star count container
+                                var starCountsContainer = $('.field_stars', thisContainer);
+                                // Update the values in the two containers
+                                $('.star_field', starCountsContainer).html(starCounts[0]+' field');
+                                $('.star_fusion', starCountsContainer).html(starCounts[1]+' fusion');
+
+                                }
+
+                        }
+
+                        // Change the body cursor back to default
+                        $('body').css('cursor', '');
+                        // Enable the conatiner again now that we're done
+                        thisContainer.css({opacity:1.0}).attr('data-status', 'enabled');
+                        // Loop through all this field links for this player and disable
+                        $('select.field_name', thisContainer).each(function(key, value){
+                            $(this).removeAttr('disabled').prop('disabled', false);
+                            });
+
+                    }
+                });
+
+            } else {
 
             // Update the link attributes based on if the field was empty
             if (optionFieldToken.length){
-              //console.log('Updating '+optionFieldToken+' on line 327 ---------------------');
-              var optionFieldLabel = optionSelected.attr('data-label');
-              var optionFieldTitle = optionSelected.attr('title');
-              var optionFieldTooltip = optionSelected.attr('data-tooltip');
-              var optionFieldImage = 'images/fields/'+optionFieldToken+'/battle-field_preview.png?'+gameSettings.cacheTime;
-              var optionFieldType = optionSelected.attr('data-type');
-              var optionFieldType2 = optionSelected.attr('data-type2');
-              thisLink.attr('data-field', optionFieldToken).attr('title', optionFieldTitle).attr('data-tooltip', optionFieldTooltip);
-              thisLink.css({backgroundImage:'url('+optionFieldImage+')'});
-              //console.log('335: backgroundImage:url('+optionFieldImage+');');
-              thisLabel.removeClass().addClass('field_type field_type_'+optionFieldType+(optionFieldType2.length ? '_'+optionFieldType2 : '')+'');
-              thisSelect.attr('data-field', optionFieldToken);
-              thisLabel.html(optionFieldLabel);
-              } else {
-              //console.log('Updating empty on line 340 -------------------');
-              thisLink.attr('data-field', '').attr('title', '-').attr('data-tooltip', '-');
-              thisLabel.removeClass().addClass('field_type field_type_none');
-              thisSelect.attr('data-field', '').val('');
-              thisLabel.html('-');
-              thisLabel.css({backgroundImage:'none !important'});
-              }
-
-            */
-
-            // Create the empty field count variable
-            var emptyFieldCount = 0;
-            // If the new field list was provided, break it apart
-            if (dataContent.length){ var newFieldList = dataContent.split(','); }
-            else { var newFieldList = []; }
-
-            // Loop through all this field links for this player and update
-            $('a.field_name', thisContainer).each(function(key, value){
-
-              // Collect the approriate reference variables
-              var tempLink = $(this);
-              var tempSelect = $('select', tempLink);
-              var tempOption = $('option:selected', tempSelect);
-              var tempLabel = $('label', tempLink);
-              var tempField = tempOption.val();
-              var tempCurrentField = tempLink.attr('data-field');
-
-              // If a new field list was provided, update this link
-              if (newFieldList.length){
-
-                // Collect the new field from this position in the list
-                var newField = newFieldList[key] != undefined ? newFieldList[key]: '';
-
-                // DEBUG DEBUG DEBUG
-                //if (tempCurrentField == newField){ return true; }
-
-                // DEBUG
-                //console.log('current field at position '+key+' is ['+tempField+']...');
-
-                // Update the select box with the new field and recollect it's value
-                tempSelect.val(newField);
-                tempOption = $('option:selected', tempSelect);
-                tempField = tempOption.val();
-
-                // Update the link attributes based on if the new field was empty
-                if (newField.length){
-                  //console.log('Updating ['+tempCurrentField+' -> '+tempField+' -> '+newField+'] on line 380 ----------------');
-                  var newFieldLabel = tempOption.attr('data-label');
-                  var newFieldTitle = tempOption.attr('title');
-                  var newFieldTooltip = tempOption.attr('data-tooltip');
-                  var newFieldImage = 'images/fields/'+newField+'/battle-field_preview.png?'+gameSettings.cacheTime;
-                  var newFieldType = tempOption.attr('data-type');
-                  var newFieldType2 = tempOption.attr('data-type2');
-                  tempLink.attr('data-field', newField).attr('title', newFieldTitle).attr('data-tooltip', newFieldTooltip);
-                  //console.log('before_background-image: '+tempLink.css('background-image'));
-                  //tempLink.attr('style', '');
-                  //console.log('389 : tempLink.css(\'background-image\', \'url('+newFieldImage+')\'); ');
-                  tempLink.css('background-image', 'url('+newFieldImage+')');
-                  //console.log('after_background-image: '+tempLink.css('background-image'));
-                  tempLink.removeClass().addClass('field_name field_type field_type_'+newFieldType+(newFieldType2.length ? '_'+newFieldType2 : ''));
-                  tempLabel.removeClass().addClass('field_type field_type_'+newFieldType+(newFieldType2.length ? '_'+newFieldType2 : ''));
-                  tempSelect.attr('data-field', newField);
-                  tempSelect.find('option').prop('disabled', false);
-                  tempSelect.find('option[value='+newField+']').prop('disabled', true);
-                  tempLabel.html(newFieldLabel);
-                  } else {
-                  //console.log('Updating empty on line 399');
-                  tempLink.attr('data-field', '').attr('title', '-').attr('data-tooltip', '-');
-                  tempLabel.removeClass().addClass('field_type field_type_none');
-                  tempSelect.attr('data-field', '').val('');
-                  tempSelect.find('option').prop('disabled', false);
-                  tempLabel.html('-');
-                  tempLink.css({backgroundImage:'none !important'});
-                  }
-
-                // DEBUG
-                //console.log('...but should be ['+newField+']!');
-
-                }
-
-              // Disable any overflow field containers
-              if (!tempField.length){ emptyFieldCount++; }
-              if (emptyFieldCount >= 2){ tempLink.css({opacity:0.25}); tempSelect.attr('disabled', 'disabled'); }
-              else { tempLink.css({opacity:1.0}); tempSelect.removeAttr('disabled'); }
-
-              });
-
-              // Update the field and fusion star count for this player
-              if (dataExtra != false){
-
-                // Collect the star counts from the extra data
-                var starCounts = dataExtra.split(',');
-                // Collect a reference to the star count container
-                var starCountsContainer = $('.field_stars', thisContainer);
-                // Update the values in the two containers
-                $('.star_field', starCountsContainer).html(starCounts[0]+' field');
-                $('.star_fusion', starCountsContainer).html(starCounts[1]+' fusion');
-
+                //console.log('446: optionFieldToken.length ---------------');
+                var optionFieldLabel = optionSelected.attr('data-label');
+                var optionFieldImage = 'images/fields/'+optionFieldToken+'/battle-field_preview.png?'+gameSettings.cacheTime;
+                var optionFieldTitle = optionSelected.attr('title');
+                var optionFieldTooltip = optionSelected.attr('data-tooltip');
+                var optionFieldType = optionSelected.attr('data-type');
+                thisLink.attr('data-field', optionFieldToken).attr('title', optionFieldTitle).attr('data-tooltip', optionFieldTooltip);
+                thisLabel.removeClass().addClass('field_type field_type_'+optionFieldType);
+                thisSelect.attr('data-field', optionFieldToken);
+                thisLabel.html(optionFieldLabel);
+                thisLink.css({backgroundImage:'url('+optionFieldImage+')'});
+                } else {
+                //console.log('457: !optionFieldToken.length ---------------');
+                thisLink.attr('data-field', '').attr('title', '-').attr('data-tooltip', '-');
+                thisLabel.removeClass().addClass('field_type field_type_none');
+                thisSelect.attr('data-field', '').val('');
+                thisLabel.html('-');
+                thisLink.css({backgroundImage:'none'});
                 }
 
             }
 
-            // Change the body cursor back to default
-            $('body').css('cursor', '');
-            // Enable the conatiner again now that we're done
-            thisContainer.css({opacity:1.0}).attr('data-status', 'enabled');
+        });//.trigger('change');
+
+    // Create the change event for the mission selectors
+    $('.challenge_container select.challenge_name', gameConsole).live('change', function(e){
+        // Prevent the default action
+        e.preventDefault();
+        // Collect the global reference objects
+        var thisSelect = $(this);
+        var thisLink = thisSelect.parent();
+        var thisContainer = thisLink.parent();
+        var thisContainerStatus = thisContainer.attr('data-status') != undefined ? thisContainer.attr('data-status') : 'enabled';
+        var thisLabel = $('label', thisLink);
+        var dataKey = thisSelect.attr('data-key');
+        var dataPlayer = thisSelect.attr('data-player');
+        var optionSelected = $('option:selected', thisSelect);
+        var optionChallengeID = optionSelected.val();
+        var postData = {action:'challenge',key:dataKey,player:dataPlayer};
+        //if (dataKey == 0 && !optionChallengeID.length){ alert('first option cannot be empty!'); return false; }
+        if (optionChallengeID.length){ postData.challenge = optionChallengeID; }
+        else { postData.challenge = ''; }
+
+        // Ensure the parent container is enabled before sending any AJAX, else just update text
+        if (thisContainerStatus == 'enabled'){
+
+            // Change the body cursor to wait
+            $('body').css('cursor', 'wait !important');
+            // Temporarily disable the window while we update stuff
+            thisContainer.css({opacity:0.25}).attr('data-status', 'disabled');
             // Loop through all this field links for this player and disable
-            $('select.field_name', thisContainer).each(function(key, value){
-              $(this).removeAttr('disabled').prop('disabled', false);
-              });
+            $('select.challenge_name', thisContainer).each(function(key, value){
+                $(this).attr('disabled', 'disabled').prop('disabled', true);
+                });
 
-          }
-        });
+            // Post this change back to the server
+            $.ajax({
+                type: 'POST',
+                url: 'frames/edit_players.php',
+                data: postData,
+                success: function(data, status){
 
-      } else {
+                    // DEBUG
+                    //console.log(data);
 
-      // Update the link attributes based on if the field was empty
-      if (optionFieldToken.length){
-        //console.log('446: optionFieldToken.length ---------------');
-        var optionFieldLabel = optionSelected.attr('data-label');
-        var optionFieldImage = 'images/fields/'+optionFieldToken+'/battle-field_preview.png?'+gameSettings.cacheTime;
-        var optionFieldTitle = optionSelected.attr('title');
-        var optionFieldTooltip = optionSelected.attr('data-tooltip');
-        var optionFieldType = optionSelected.attr('data-type');
-        thisLink.attr('data-field', optionFieldToken).attr('title', optionFieldTitle).attr('data-tooltip', optionFieldTooltip);
-        thisLabel.removeClass().addClass('field_type field_type_'+optionFieldType);
-        thisSelect.attr('data-field', optionFieldToken);
-        thisLabel.html(optionFieldLabel);
-        thisLink.css({backgroundImage:'url('+optionFieldImage+')'});
-        } else {
-        //console.log('457: !optionFieldToken.length ---------------');
-        thisLink.attr('data-field', '').attr('title', '-').attr('data-tooltip', '-');
-        thisLabel.removeClass().addClass('field_type field_type_none');
-        thisSelect.attr('data-field', '').val('');
-        thisLabel.html('-');
-        thisLink.css({backgroundImage:'none'});
-        }
+                    // Break apart the response into parts
+                    var data = data.split('|');
+                    var dataStatus = data[0] != undefined ? data[0] : false;
+                    var dataMessage = data[1] != undefined ? data[1] : false;
+                    var dataContent = data[2] != undefined ? data[2] : false;
+                    var dataExtra = data[3] != undefined ? data[3] : false;
 
-      }
+                    // DEBUG
+                    //console.log('$(select.challenge_name, gameConsole).live(click); \n dataStatus = '+dataStatus+', dataMessage = '+dataMessage+', dataContent = '+dataContent+'; dataExtra = '+dataExtra+';');
 
-    });
+                    // If the field change was a success, flash the box green
+                    if (dataStatus == 'success'){
 
-  // Prevent clicks if the parent container is disabled
-  $('select.field_name', gameConsole).live('click', function(e){
-    var thisSelect = $(this);
-    var thisLink = thisSelect.parent();
-    var thisContainer = thisLink.parent();
-    var thisContainerStatus = thisContainer.attr('data-status') != undefined ? thisContainer.attr('data-status') : 'enabled';
-    if (thisContainerStatus == 'disabled'){
-      e.preventDefault();
-      return false;
-      }
-    });
+                        // Make the clicked link flash green to show success
+                        thisLink.css({borderColor:'green !important'});
+                        var tempTimeout = setTimeout(function(){ thisLink.css({borderColor:''}); }, 1000);
 
-  // Create the change event for the field selectors
-  $('select.field_name', gameConsole).live('change', function(e){
-    // Prevent the default action
-    e.preventDefault();
-    // Collect the global reference objects
-    var thisSelect = $(this);
-    var thisLink = thisSelect.parent();
-    var thisContainer = thisLink.parent();
-    var thisContainerStatus = thisContainer.attr('data-status') != undefined ? thisContainer.attr('data-status') : 'enabled';
-    var thisLabel = $('label', thisLink);
-    var dataKey = thisSelect.attr('data-key');
-    var dataPlayer = thisSelect.attr('data-player');
-    var optionSelected = $('option:selected', thisSelect);
-    var optionFieldToken = optionSelected.val();
-    var postData = {action:'field',key:dataKey,player:dataPlayer};
-    //if (dataKey == 0 && !optionFieldToken.length){ alert('first option cannot be empty!'); return false; }
-    if (optionFieldToken.length){ postData.field = optionFieldToken; }
-    else { postData.field = ''; }
+                        // Update the link attributes based on if the field was empty
+                        if (optionChallengeID.length){
+                            //console.log('Updating '+optionChallengeID+' on line 771 ---------------------');
+                            var optionChallengeLabel = optionSelected.attr('data-label');
+                            var optionChallengeTitle = optionSelected.attr('title');
+                            var optionChallengeTooltip = optionSelected.attr('data-tooltip');
+                            var optionChallengeTooltipType = optionSelected.attr('data-tooltip-type');
+                            var optionChallengeBackground = optionSelected.attr('data-background');
+                            var optionChallengeForeground = optionSelected.attr('data-foreground');
+                            var optionChallengeImage = 'images/fields/'+optionChallengeBackground+'/battle-field_preview.png?'+gameSettings.cacheTime;
+                            var optionChallengeType = optionSelected.attr('data-type');
+                            var optionChallengeType2 = optionSelected.attr('data-type2');
+                            thisLink.attr('data-challenge', optionChallengeID).attr('title', optionChallengeTitle).attr('data-tooltip', optionChallengeTooltip).attr('data-tooltip-type', optionChallengeTooltipType);
+                            thisLink.css({backgroundImage:'url('+optionChallengeImage+')'});
+                            //console.log('783: backgroundImage:url('+optionChallengeImage+');');
+                            thisLabel.removeClass().addClass('field_type field_type_'+optionChallengeType+(optionChallengeType2.length ? '_'+optionChallengeType2 : '')+'');
+                            thisSelect.attr('data-challenge', optionChallengeID);
+                            thisLabel.html(optionChallengeLabel);
+                            } else {
+                            //console.log('Updating empty on line 788 -------------------');
+                            thisLink.attr('data-challenge', '').attr('title', '-').attr('data-tooltip', '-').attr('data-tooltip-type', '');
+                            thisLabel.removeClass().addClass('field_type field_type_none');
+                            thisSelect.attr('data-challenge', '').val('');
+                            thisLabel.html('-');
+                            thisLabel.css({backgroundImage:'none !important'});
+                            }
 
-    // Ensure the parent container is enabled before sending any AJAX, else just update text
-    if (thisContainerStatus == 'enabled'){
 
-      // Change the body cursor to wait
-      $('body').css('cursor', 'wait !important');
-      // Temporarily disable the window while we update stuff
-      thisContainer.css({opacity:0.25}).attr('data-status', 'disabled');
-      // Loop through all this field links for this player and disable
-      $('select.field_name', thisContainer).each(function(key, value){
-        $(this).attr('disabled', 'disabled').prop('disabled', true);
-        });
+                        // Create the empty field count variable
+                        var emptyFieldCount = 0;
+                        // If the new field list was provided, break it apart
+                        if (dataContent.length){ var newChallengeList = dataContent.split(','); }
+                        else { var newChallengeList = []; }
+                        //console.log('802: newChallengeList = ', newChallengeList);
 
-      // Post this change back to the server
-      $.ajax({
-        type: 'POST',
-        url: 'frames/edit_players.php',
-        data: postData,
-        success: function(data, status){
+                        // Loop through all this field links for this player and update
+                        $('a.challenge_name', thisContainer).each(function(key, value){
 
-          // DEBUG
-          //console.log(data);
+                            // Collect the approriate reference variables
+                            var tempLink = $(this);
+                            var tempSelect = $('select', tempLink);
+                            var tempOption = $('option:selected', tempSelect);
+                            var tempLabel = $('label', tempLink);
+                            var tempChallenge = tempOption.val();
+                            var tempCurrentField = tempLink.attr('data-challenge');
 
-          // Break apart the response into parts
-          var data = data.split('|');
-          var dataStatus = data[0] != undefined ? data[0] : false;
-          var dataMessage = data[1] != undefined ? data[1] : false;
-          var dataContent = data[2] != undefined ? data[2] : false;
-          var dataExtra = data[3] != undefined ? data[3] : false;
+                            // If a new field list was provided, update this link
+                            if (newChallengeList.length){
 
-          // DEBUG
-          //console.log('$(select.field_name, gameConsole).live(click); \n dataStatus = '+dataStatus+', dataMessage = '+dataMessage+', dataContent = '+dataContent+'; dataExtra = '+dataExtra+';');
+                                // Collect the new field from this position in the list
+                                var newChallenge = newChallengeList[key] != undefined ? newChallengeList[key]: '';
 
-          // If the field change was a success, flash the box green
-          if (dataStatus == 'success'){
+                                // DEBUG DEBUG DEBUG
+                                if (tempCurrentField == newChallenge){ return true; }
 
-            // Make the clicked link flash green to show success
-            thisLink.css({borderColor:'green !important'});
-            var tempTimeout = setTimeout(function(){ thisLink.css({borderColor:''}); }, 1000);
+                                // DEBUG
+                                //console.log('current field at position '+key+' is ['+tempChallenge+']...');
+
+                                // Update the select box with the new field and recollect it's value
+                                tempSelect.val(newChallenge);
+                                tempOption = $('option:selected', tempSelect);
+                                tempChallenge = tempOption.val();
+
+                                // Update the link attributes based on if the new field was empty
+                                if (newChallenge.length){
+                                    //console.log('Updating ['+tempCurrentField+' -> '+tempChallenge+' -> '+newChallenge+'] on line 380 ----------------');
+                                    var newChallengeLabel = tempOption.attr('data-label');
+                                    var newChallengeTitle = tempOption.attr('title');
+                                    var newChallengeTooltip = tempOption.attr('data-tooltip');
+                                    var newChallengeTooltipType = tempOption.attr('data-tooltip-type');
+                                    var newChallengeBackground = tempOption.attr('data-background');
+                                    var newChallengeForeground = tempOption.attr('data-foreground');
+                                    var newChallengeImage = 'images/fields/'+newChallengeBackground+'/battle-field_preview.png?'+gameSettings.cacheTime;
+                                    var newChallengeType = tempOption.attr('data-type');
+                                    var newChallengeType2 = tempOption.attr('data-type2');
+                                    tempLink.attr('data-challenge', newChallenge).attr('title', newChallengeTitle).attr('data-tooltip', newChallengeTooltip).attr('data-tooltip-type', newChallengeTooltipType);
+                                    //console.log('before_background-image: '+tempLink.css('background-image'));
+                                    //tempLink.attr('style', '');
+                                    //console.log('389 : tempLink.css(\'background-image\', \'url('+newChallengeImage+')\'); ');
+                                    tempLink.css('background-image', 'url('+newChallengeImage+')');
+                                    //console.log('after_background-image: '+tempLink.css('background-image'));
+                                    tempLink.removeClass().addClass('challenge_name challenge_battle field_type field_type_'+newChallengeType);
+                                    tempLabel.removeClass().addClass('field_type field_type_'+newChallengeType+(newChallengeType2.length ? '_'+newChallengeType2 : ''));
+                                    tempSelect.attr('data-challenge', newChallenge);
+                                    tempSelect.find('option').prop('disabled', false);
+                                    tempSelect.find('option[value='+newChallenge+']').prop('disabled', true);
+                                    tempLabel.html(newChallengeLabel);
+                                    } else {
+                                    //console.log('Updating empty on line 399');
+                                    tempLink.attr('data-challenge', '').attr('title', '-').attr('data-tooltip', '-').attr('data-tooltip-type', '');
+                                    tempLabel.removeClass().addClass('field_type field_type_none');
+                                    tempSelect.attr('data-challenge', '').val('');
+                                    tempSelect.find('option').prop('disabled', false);
+                                    tempLabel.html('-');
+                                    tempLink.css({backgroundImage:'none !important'});
+                                    }
+
+                                // DEBUG
+                                //console.log('...but should be ['+newChallenge+']!');
+
+                                }
+
+                            // Disable any overflow field containers
+                            if (!tempChallenge.length){ emptyFieldCount++; }
+                            if (emptyFieldCount >= 2){ tempLink.css({opacity:0.25}); tempSelect.attr('disabled', 'disabled'); }
+                            else { tempLink.css({opacity:1.0}); tempSelect.removeAttr('disabled'); }
+
+                            });
+
+                        }
+
+                        // Change the body cursor back to default
+                        $('body').css('cursor', '');
+                        // Enable the conatiner again now that we're done
+                        thisContainer.css({opacity:1.0}).attr('data-status', 'enabled');
+                        // Loop through all this field links for this player and disable
+                        $('select.challenge_name', thisContainer).each(function(key, value){
+                            $(this).removeAttr('disabled').prop('disabled', false);
+                            });
+
+                    }
+                });
+
+            } else {
 
             // Update the link attributes based on if the field was empty
-            if (optionFieldToken.length){
-              //console.log('Updating '+optionFieldToken+' on line 327 ---------------------');
-              var optionFieldLabel = optionSelected.attr('data-label');
-              var optionFieldTitle = optionSelected.attr('title');
-              var optionFieldTooltip = optionSelected.attr('data-tooltip');
-              var optionFieldImage = 'images/fields/'+optionFieldToken+'/battle-field_preview.png?'+gameSettings.cacheTime;
-              var optionFieldType = optionSelected.attr('data-type');
-              var optionFieldType2 = optionSelected.attr('data-type2');
-              thisLink.attr('data-field', optionFieldToken).attr('title', optionFieldTitle).attr('data-tooltip', optionFieldTooltip);
-              thisLink.css({backgroundImage:'url('+optionFieldImage+')'});
-              //console.log('335: backgroundImage:url('+optionFieldImage+');');
-              thisLabel.removeClass().addClass('field_type field_type_'+optionFieldType+(optionFieldType2.length ? '_'+optionFieldType2 : '')+'');
-              thisSelect.attr('data-field', optionFieldToken);
-              thisLabel.html(optionFieldLabel);
-              } else {
-              //console.log('Updating empty on line 340 -------------------');
-              thisLink.attr('data-field', '').attr('title', '-').attr('data-tooltip', '-');
-              thisLabel.removeClass().addClass('field_type field_type_none');
-              thisSelect.attr('data-field', '').val('');
-              thisLabel.html('-');
-              thisLabel.css({backgroundImage:'none !important'});
-              }
-
-
-            // Create the empty field count variable
-            var emptyFieldCount = 0;
-            // If the new field list was provided, break it apart
-            if (dataContent.length){ var newFieldList = dataContent.split(','); }
-            else { var newFieldList = []; }
-
-            // Loop through all this field links for this player and update
-            $('a.field_name', thisContainer).each(function(key, value){
-
-              // Collect the approriate reference variables
-              var tempLink = $(this);
-              var tempSelect = $('select', tempLink);
-              var tempOption = $('option:selected', tempSelect);
-              var tempLabel = $('label', tempLink);
-              var tempField = tempOption.val();
-              var tempCurrentField = tempLink.attr('data-field');
-
-              // If a new field list was provided, update this link
-              if (newFieldList.length){
-
-                // Collect the new field from this position in the list
-                var newField = newFieldList[key] != undefined ? newFieldList[key]: '';
-
-                // DEBUG DEBUG DEBUG
-                //if (tempCurrentField == newField){ return true; }
-
-                // DEBUG
-                //console.log('current field at position '+key+' is ['+tempField+']...');
-
-                // Update the select box with the new field and recollect it's value
-                tempSelect.val(newField);
-                tempOption = $('option:selected', tempSelect);
-                tempField = tempOption.val();
-
-                // Update the link attributes based on if the new field was empty
-                if (newField.length){
-                  //console.log('Updating ['+tempCurrentField+' -> '+tempField+' -> '+newField+'] on line 380 ----------------');
-                  var newFieldLabel = tempOption.attr('data-label');
-                  var newFieldTitle = tempOption.attr('title');
-                  var newFieldTooltip = tempOption.attr('data-tooltip');
-                  var newFieldImage = 'images/fields/'+newField+'/battle-field_preview.png?'+gameSettings.cacheTime;
-                  var newFieldType = tempOption.attr('data-type');
-                  var newFieldType2 = tempOption.attr('data-type2');
-                  tempLink.attr('data-field', newField).attr('title', newFieldTitle).attr('data-tooltip', newFieldTooltip);
-                  //console.log('before_background-image: '+tempLink.css('background-image'));
-                  //tempLink.attr('style', '');
-                  //console.log('389 : tempLink.css(\'background-image\', \'url('+newFieldImage+')\'); ');
-                  tempLink.css('background-image', 'url('+newFieldImage+')');
-                  //console.log('after_background-image: '+tempLink.css('background-image'));
-                  tempLink.removeClass().addClass('field_name field_type field_type_'+newFieldType+(newFieldType2.length ? '_'+newFieldType2 : ''));
-                  tempLabel.removeClass().addClass('field_type field_type_'+newFieldType+(newFieldType2.length ? '_'+newFieldType2 : ''));
-                  tempSelect.attr('data-field', newField);
-                  tempSelect.find('option').prop('disabled', false);
-                  tempSelect.find('option[value='+newField+']').prop('disabled', true);
-                  tempLabel.html(newFieldLabel);
-                  } else {
-                  //console.log('Updating empty on line 399');
-                  tempLink.attr('data-field', '').attr('title', '-').attr('data-tooltip', '-');
-                  tempLabel.removeClass().addClass('field_type field_type_none');
-                  tempSelect.attr('data-field', '').val('');
-                  tempSelect.find('option').prop('disabled', false);
-                  tempLabel.html('-');
-                  tempLink.css({backgroundImage:'none !important'});
-                  }
-
-                // DEBUG
-                //console.log('...but should be ['+newField+']!');
-
-                }
-
-              // Disable any overflow field containers
-              if (!tempField.length){ emptyFieldCount++; }
-              if (emptyFieldCount >= 2){ tempLink.css({opacity:0.25}); tempSelect.attr('disabled', 'disabled'); }
-              else { tempLink.css({opacity:1.0}); tempSelect.removeAttr('disabled'); }
-
-              });
-
-              // Update the field and fusion star count for this player
-              if (dataExtra != false){
-
-                // Collect the star counts from the extra data
-                var starCounts = dataExtra.split(',');
-                // Collect a reference to the star count container
-                var starCountsContainer = $('.field_stars', thisContainer);
-                // Update the values in the two containers
-                $('.star_field', starCountsContainer).html(starCounts[0]+' field');
-                $('.star_fusion', starCountsContainer).html(starCounts[1]+' fusion');
-
+            if (optionChallengeID.length){
+                //console.log('446: optionChallengeID.length ---------------');
+                var optionChallengeLabel = optionSelected.attr('data-label');
+                var optionChallengeBackground = optionSelected.attr('data-background');
+                var optionChallengeForeground = optionSelected.attr('data-foreground');
+                var optionChallengeImage = 'images/fields/'+optionChallengeBackground+'/battle-field_preview.png?'+gameSettings.cacheTime;
+                var optionChallengeTitle = optionSelected.attr('title');
+                var optionChallengeTooltip = optionSelected.attr('data-tooltip');
+                var optionChallengeTooltipType = optionSelected.attr('data-tooltip-type');
+                var optionChallengeType = optionSelected.attr('data-type');
+                thisLink.attr('data-challenge', optionChallengeID).attr('title', optionChallengeTitle).attr('data-tooltip', optionChallengeTooltip).attr('data-tooltip-type', optionChallengeTooltipType);
+                thisLabel.removeClass().addClass('field_type field_type_'+optionChallengeType);
+                thisSelect.attr('data-challenge', optionChallengeID);
+                thisLabel.html(optionChallengeLabel);
+                thisLink.css({backgroundImage:'url('+optionChallengeImage+')'});
+                } else {
+                //console.log('457: !optionChallengeID.length ---------------');
+                thisLink.attr('data-challenge', '').attr('title', '-').attr('data-tooltip', '-').attr('data-tooltip-type', '');
+                thisLabel.removeClass().addClass('field_type field_type_none');
+                thisSelect.attr('data-challenge', '').val('');
+                thisLabel.html('-');
+                thisLink.css({backgroundImage:'none'});
                 }
 
             }
 
-            // Change the body cursor back to default
-            $('body').css('cursor', '');
-            // Enable the conatiner again now that we're done
-            thisContainer.css({opacity:1.0}).attr('data-status', 'enabled');
-            // Loop through all this field links for this player and disable
-            $('select.field_name', thisContainer).each(function(key, value){
-              $(this).removeAttr('disabled').prop('disabled', false);
-              });
-
-          }
-        });
-
-      } else {
-
-      // Update the link attributes based on if the field was empty
-      if (optionFieldToken.length){
-        //console.log('446: optionFieldToken.length ---------------');
-        var optionFieldLabel = optionSelected.attr('data-label');
-        var optionFieldImage = 'images/fields/'+optionFieldToken+'/battle-field_preview.png?'+gameSettings.cacheTime;
-        var optionFieldTitle = optionSelected.attr('title');
-        var optionFieldTooltip = optionSelected.attr('data-tooltip');
-        var optionFieldType = optionSelected.attr('data-type');
-        thisLink.attr('data-field', optionFieldToken).attr('title', optionFieldTitle).attr('data-tooltip', optionFieldTooltip);
-        thisLabel.removeClass().addClass('field_type field_type_'+optionFieldType);
-        thisSelect.attr('data-field', optionFieldToken);
-        thisLabel.html(optionFieldLabel);
-        thisLink.css({backgroundImage:'url('+optionFieldImage+')'});
-        } else {
-        //console.log('457: !optionFieldToken.length ---------------');
-        thisLink.attr('data-field', '').attr('title', '-').attr('data-tooltip', '-');
-        thisLabel.removeClass().addClass('field_type field_type_none');
-        thisSelect.attr('data-field', '').val('');
-        thisLabel.html('-');
-        thisLink.css({backgroundImage:'none'});
-        }
-
-      }
-
-    });//.trigger('change');
+        });//.trigger('change');
 
 
+    /*
+     * ITEM EVENTS
+     */
 
-  /*
-   * ITEM EVENTS
-   */
+    /*
 
-  /*
-
-  // Prevent clicks if the parent container is disabled
-  $('select.ability_name', gameConsole).live('click', function(e){
-    var thisSelect = $(this);
-    var thisLink = thisSelect.parent();
-    var thisContainer = thisLink.parent();
-    var thisContainerStatus = thisContainer.attr('data-status') != undefined ? thisContainer.attr('data-status') : 'enabled';
-    if (thisContainerStatus == 'disabled'){
-      e.preventDefault();
-      return false;
-      }
-    });
-
-
-  // Create the change event for the ability selectors
-  $('select.ability_name', gameConsole).live('change', function(e){
-    // Prevent the default action
-    e.preventDefault();
-    // Collect the global reference objects
-    var thisSelect = $(this);
-    var thisLink = thisSelect.parent();
-    var thisContainer = thisLink.parent();
-    var thisContainerStatus = thisContainer.attr('data-status') != undefined ? thisContainer.attr('data-status') : 'enabled';
-    var thisLabel = $('label', thisLink);
-    var dataKey = thisSelect.attr('data-key');
-    var dataPlayer = thisSelect.attr('data-player');
-    var optionSelected = $('option:selected', thisSelect);
-    var optionItemToken = optionSelected.val();
-    var postData = {action:'item',key:dataKey,player:dataPlayer};
-    //if (dataKey == 0 && !optionItemToken.length){ alert('first option cannot be empty!'); return false; }
-    if (optionItemToken.length){ postData.item = optionItemToken; }
-    else { postData.item = ''; }
-
-    // Ensure the parent container is enabled before sending any AJAX, else just update text
-    if (thisContainerStatus == 'enabled'){
-
-      // Change the body cursor to wait
-      $('body').css('cursor', 'wait !important');
-      // Temporarily disable the window while we update stuff
-      thisContainer.css({opacity:0.25}).attr('data-status', 'disabled');
-      // Loop through all this ability links for this robot and disable
-      $('select.ability_name', thisContainer).each(function(key, value){
-        $(this).attr('disabled', 'disabled').prop('disabled', true);
+    // Prevent clicks if the parent container is disabled
+    $('select.ability_name', gameConsole).live('click', function(e){
+        var thisSelect = $(this);
+        var thisLink = thisSelect.parent();
+        var thisContainer = thisLink.parent();
+        var thisContainerStatus = thisContainer.attr('data-status') != undefined ? thisContainer.attr('data-status') : 'enabled';
+        if (thisContainerStatus == 'disabled'){
+            e.preventDefault();
+            return false;
+            }
         });
 
 
+    // Create the change event for the ability selectors
+    $('select.ability_name', gameConsole).live('change', function(e){
+        // Prevent the default action
+        e.preventDefault();
+        // Collect the global reference objects
+        var thisSelect = $(this);
+        var thisLink = thisSelect.parent();
+        var thisContainer = thisLink.parent();
+        var thisContainerStatus = thisContainer.attr('data-status') != undefined ? thisContainer.attr('data-status') : 'enabled';
+        var thisLabel = $('label', thisLink);
+        var dataKey = thisSelect.attr('data-key');
+        var dataPlayer = thisSelect.attr('data-player');
+        var optionSelected = $('option:selected', thisSelect);
+        var optionItemToken = optionSelected.val();
+        var postData = {action:'item',key:dataKey,player:dataPlayer};
+        //if (dataKey == 0 && !optionItemToken.length){ alert('first option cannot be empty!'); return false; }
+        if (optionItemToken.length){ postData.item = optionItemToken; }
+        else { postData.item = ''; }
 
-      // Post this change back to the server
-      $.ajax({
-        type: 'POST',
-        url: 'frames/edit_players.php',
-        data: postData,
-        success: function(data, status){
+        // Ensure the parent container is enabled before sending any AJAX, else just update text
+        if (thisContainerStatus == 'enabled'){
 
-          // DEBUG
-          //alert(data);
+            // Change the body cursor to wait
+            $('body').css('cursor', 'wait !important');
+            // Temporarily disable the window while we update stuff
+            thisContainer.css({opacity:0.25}).attr('data-status', 'disabled');
+            // Loop through all this ability links for this robot and disable
+            $('select.ability_name', thisContainer).each(function(key, value){
+                $(this).attr('disabled', 'disabled').prop('disabled', true);
+                });
 
-          // Break apart the response into parts
-          var data = data.split('|');
-          var dataStatus = data[0] != undefined ? data[0] : false;
-          var dataMessage = data[1] != undefined ? data[1] : false;
-          var dataContent = data[2] != undefined ? data[2] : false;
 
-          // DEBUG
-          //console.log('dataStatus = '+dataStatus+', dataMessage = '+dataMessage+', dataContent = '+dataContent+'; ');
 
-          // If the ability change was a success, flash the box green
-          if (dataStatus == 'success'){
+            // Post this change back to the server
+            $.ajax({
+                type: 'POST',
+                url: 'frames/edit_players.php',
+                data: postData,
+                success: function(data, status){
 
-            // Make the clicked link flash green to show success
-            thisLink.css({borderColor:'green !important'});
-            var tempTimeout = setTimeout(function(){ thisLink.css({borderColor:''}); }, 1000);
+                    // DEBUG
+                    //alert(data);
+
+                    // Break apart the response into parts
+                    var data = data.split('|');
+                    var dataStatus = data[0] != undefined ? data[0] : false;
+                    var dataMessage = data[1] != undefined ? data[1] : false;
+                    var dataContent = data[2] != undefined ? data[2] : false;
+
+                    // DEBUG
+                    //console.log('dataStatus = '+dataStatus+', dataMessage = '+dataMessage+', dataContent = '+dataContent+'; ');
+
+                    // If the ability change was a success, flash the box green
+                    if (dataStatus == 'success'){
+
+                        // Make the clicked link flash green to show success
+                        thisLink.css({borderColor:'green !important'});
+                        var tempTimeout = setTimeout(function(){ thisLink.css({borderColor:''}); }, 1000);
+
+                        // Update the link attributes based on if the ability was empty
+                        if (optionItemToken.length){
+                            var optionItemLabel = optionSelected.attr('data-label');
+                            var optionItemTitle = optionSelected.attr('title');
+                            var optionItemTooltip = optionSelected.attr('data-tooltip');
+                            var optionItemImage = 'images/abilities/'+optionItemToken+'/icon_left_40x40.png?';
+                            var optionItemType = optionSelected.attr('data-type');
+                            var optionItemType2 = optionSelected.attr('data-type2');
+                            thisLink.attr('data-item', optionItemToken).attr('title', optionItemTitle).attr('data-tooltip', optionItemTooltip);
+                            thisLink.removeClass().addClass('ability_name ability_type ability_type_'+optionItemType+(optionItemType2.length ? '_'+optionItemType2 : '')+'');
+                            thisSelect.attr('data-item', optionItemToken);
+                            thisLabel.html(optionItemLabel).css({backgroundImage:'url('+optionItemImage+')'});
+                            } else {
+                            thisLink.attr('data-item', '').attr('title', '-').attr('data-tooltip', '-');
+                            thisLink.removeClass().addClass('ability_name ability_type ability_type_none');
+                            thisSelect.attr('data-item', '').val('');
+                            thisLabel.html('-').css({backgroundImage:'none'});
+                            }
+
+                        // Create the empty ability count variable
+                        var emptyAbilityCount = 0;
+                        // If the new ability list was provided, break it apart
+                        if (dataContent.length){ var newItemList = dataContent.split(','); }
+                        else { var newItemList = []; }
+
+                        // Loop through all this ability links for this robot and update
+                        $('a.ability_name', thisContainer).each(function(key, value){
+
+                            // Collect the approriate reference variables
+                            var tempLink = $(this);
+                            var tempSelect = $('select', tempLink);
+                            var tempOption = $('option:selected', tempSelect);
+                            var tempLabel = $('label', tempLink);
+                            var tempAbility = tempOption.val();
+
+                            // If a new ability list was provided, update this link
+                            if (newItemList.length){
+
+                                // Collect the new ability from this position in the list
+                                var newItem = newItemList[key] != undefined ? newItemList[key]: '';
+
+                                // DEBUG
+                                //console.log('current item at position '+key+' is ['+tempAbility+']...');
+
+                                // Update the select box with the new ability and recollect it's value
+                                tempSelect.val(newItem);
+                                tempOption = $('option:selected', tempSelect);
+                                tempAbility = tempOption.val();
+
+                                // Update the link attributes based on if the new ability was empty
+                                if (newItem.length){
+                                    var newItemLabel = tempOption.attr('data-label');
+                                    var newItemTitle = tempOption.attr('title');
+                                    var newItemTooltip = tempOption.attr('data-tooltip');
+                                    var newItemImage = 'images/abilities/'+newItem+'/icon_left_40x40.png?';
+                                    var newItemType = tempOption.attr('data-type');
+                                    var newItemType2 = tempOption.attr('data-type2');
+                                    tempLink.attr('data-item', newItem).attr('title', newItemTitle).attr('data-tooltip', newItemTooltip);
+                                    tempLink.removeClass().addClass('ability_name ability_type ability_type_'+newItemType+(newItemType2.length ? '_'+newItemType2 : ''));
+                                    tempSelect.attr('data-item', newItem);
+                                    tempSelect.find('option').prop('disabled', false);
+                                    tempSelect.find('option[value='+newItem+']').prop('disabled', true);
+                                    tempLabel.html(newItemLabel).css({backgroundImage:'url('+newItemImage+')'});
+                                    } else {
+                                    tempLink.attr('data-item', '').attr('title', '-').attr('data-tooltip', '-');
+                                    tempLink.removeClass().addClass('ability_name ability_type ability_type_none');
+                                    tempSelect.attr('data-item', '').val('');
+                                    tempSelect.find('option').prop('disabled', false);
+                                    tempLabel.html('-').css({backgroundImage:'none'});
+                                    }
+
+                                // DEBUG
+                                //console.log('...but should be ['+newItem+']!');
+
+                                }
+
+                            // Disable any overflow ability containers
+                            if (!tempAbility.length){ emptyAbilityCount++; }
+                            if (emptyAbilityCount >= 2){ tempLink.css({opacity:0.25}); tempSelect.attr('disabled', 'disabled'); }
+                            else { tempLink.css({opacity:1.0}); tempSelect.removeAttr('disabled'); }
+
+                            });
+
+                        }
+
+                        // Change the body cursor back to default
+                        $('body').css('cursor', '');
+                        // Enable the conatiner again now that we're done
+                        thisContainer.css({opacity:1.0}).attr('data-status', 'enabled');
+                        // Loop through all this ability links for this robot and disable
+                        $('select.ability_name', thisContainer).each(function(key, value){
+                            $(this).removeAttr('disabled').prop('disabled', false);
+                            });
+
+                    }
+                });
+
+            } else {
 
             // Update the link attributes based on if the ability was empty
             if (optionItemToken.length){
-              var optionItemLabel = optionSelected.attr('data-label');
-              var optionItemTitle = optionSelected.attr('title');
-              var optionItemTooltip = optionSelected.attr('data-tooltip');
-              var optionItemImage = 'images/abilities/'+optionItemToken+'/icon_left_40x40.png?';
-              var optionItemType = optionSelected.attr('data-type');
-              var optionItemType2 = optionSelected.attr('data-type2');
-              thisLink.attr('data-item', optionItemToken).attr('title', optionItemTitle).attr('data-tooltip', optionItemTooltip);
-              thisLink.removeClass().addClass('ability_name ability_type ability_type_'+optionItemType+(optionItemType2.length ? '_'+optionItemType2 : '')+'');
-              thisSelect.attr('data-item', optionItemToken);
-              thisLabel.html(optionItemLabel).css({backgroundImage:'url('+optionItemImage+')'});
-              } else {
-              thisLink.attr('data-item', '').attr('title', '-').attr('data-tooltip', '-');
-              thisLink.removeClass().addClass('ability_name ability_type ability_type_none');
-              thisSelect.attr('data-item', '').val('');
-              thisLabel.html('-').css({backgroundImage:'none'});
-              }
-
-            // Create the empty ability count variable
-            var emptyAbilityCount = 0;
-            // If the new ability list was provided, break it apart
-            if (dataContent.length){ var newItemList = dataContent.split(','); }
-            else { var newItemList = []; }
-
-            // Loop through all this ability links for this robot and update
-            $('a.ability_name', thisContainer).each(function(key, value){
-
-              // Collect the approriate reference variables
-              var tempLink = $(this);
-              var tempSelect = $('select', tempLink);
-              var tempOption = $('option:selected', tempSelect);
-              var tempLabel = $('label', tempLink);
-              var tempAbility = tempOption.val();
-
-              // If a new ability list was provided, update this link
-              if (newItemList.length){
-
-                // Collect the new ability from this position in the list
-                var newItem = newItemList[key] != undefined ? newItemList[key]: '';
-
-                // DEBUG
-                //console.log('current item at position '+key+' is ['+tempAbility+']...');
-
-                // Update the select box with the new ability and recollect it's value
-                tempSelect.val(newItem);
-                tempOption = $('option:selected', tempSelect);
-                tempAbility = tempOption.val();
-
-                // Update the link attributes based on if the new ability was empty
-                if (newItem.length){
-                  var newItemLabel = tempOption.attr('data-label');
-                  var newItemTitle = tempOption.attr('title');
-                  var newItemTooltip = tempOption.attr('data-tooltip');
-                  var newItemImage = 'images/abilities/'+newItem+'/icon_left_40x40.png?';
-                  var newItemType = tempOption.attr('data-type');
-                  var newItemType2 = tempOption.attr('data-type2');
-                  tempLink.attr('data-item', newItem).attr('title', newItemTitle).attr('data-tooltip', newItemTooltip);
-                  tempLink.removeClass().addClass('ability_name ability_type ability_type_'+newItemType+(newItemType2.length ? '_'+newItemType2 : ''));
-                  tempSelect.attr('data-item', newItem);
-                  tempSelect.find('option').prop('disabled', false);
-                  tempSelect.find('option[value='+newItem+']').prop('disabled', true);
-                  tempLabel.html(newItemLabel).css({backgroundImage:'url('+newItemImage+')'});
-                  } else {
-                  tempLink.attr('data-item', '').attr('title', '-').attr('data-tooltip', '-');
-                  tempLink.removeClass().addClass('ability_name ability_type ability_type_none');
-                  tempSelect.attr('data-item', '').val('');
-                  tempSelect.find('option').prop('disabled', false);
-                  tempLabel.html('-').css({backgroundImage:'none'});
-                  }
-
-                // DEBUG
-                //console.log('...but should be ['+newItem+']!');
-
+                var optionItemLabel = optionSelected.attr('data-label');
+                var optionItemImage = 'images/abilities/'+optionItemToken+'/icon_left_40x40.png?';
+                var optionItemTitle = optionSelected.attr('title');
+                var optionItemTooltip = optionSelected.attr('data-tooltip');
+                var optionItemType = optionSelected.attr('data-type');
+                thisLink.attr('data-item', optionItemToken).attr('title', optionItemTitle).attr('data-tooltip', optionItemTooltip);
+                thisLink.removeClass().addClass('ability_name ability_type ability_type_'+optionItemType);
+                thisSelect.attr('data-item', optionItemToken);
+                thisLabel.html(optionItemLabel).css({backgroundImage:'url('+optionItemImage+')'});
+                } else {
+                thisLink.attr('data-item', '').attr('title', '-').attr('data-tooltip', '-');
+                thisLink.removeClass().addClass('ability_name ability_type ability_type_none');
+                thisSelect.attr('data-item', '').val('');
+                thisLabel.html('-').css({backgroundImage:'none'});
                 }
-
-              // Disable any overflow ability containers
-              if (!tempAbility.length){ emptyAbilityCount++; }
-              if (emptyAbilityCount >= 2){ tempLink.css({opacity:0.25}); tempSelect.attr('disabled', 'disabled'); }
-              else { tempLink.css({opacity:1.0}); tempSelect.removeAttr('disabled'); }
-
-              });
 
             }
 
-            // Change the body cursor back to default
-            $('body').css('cursor', '');
-            // Enable the conatiner again now that we're done
-            thisContainer.css({opacity:1.0}).attr('data-status', 'enabled');
-            // Loop through all this ability links for this robot and disable
-            $('select.ability_name', thisContainer).each(function(key, value){
-              $(this).removeAttr('disabled').prop('disabled', false);
-              });
+        });//.trigger('change');
 
-          }
-        });
-
-      } else {
-
-      // Update the link attributes based on if the ability was empty
-      if (optionItemToken.length){
-        var optionItemLabel = optionSelected.attr('data-label');
-        var optionItemImage = 'images/abilities/'+optionItemToken+'/icon_left_40x40.png?';
-        var optionItemTitle = optionSelected.attr('title');
-        var optionItemTooltip = optionSelected.attr('data-tooltip');
-        var optionItemType = optionSelected.attr('data-type');
-        thisLink.attr('data-item', optionItemToken).attr('title', optionItemTitle).attr('data-tooltip', optionItemTooltip);
-        thisLink.removeClass().addClass('ability_name ability_type ability_type_'+optionItemType);
-        thisSelect.attr('data-item', optionItemToken);
-        thisLabel.html(optionItemLabel).css({backgroundImage:'url('+optionItemImage+')'});
-        } else {
-        thisLink.attr('data-item', '').attr('title', '-').attr('data-tooltip', '-');
-        thisLink.removeClass().addClass('ability_name ability_type ability_type_none');
-        thisSelect.attr('data-item', '').val('');
-        thisLabel.html('-').css({backgroundImage:'none'});
-        }
-
-      }
-
-    });//.trigger('change');
-
-   */
+     */
 
 
 
 
 
-  /*
-   * OTHER STUFF
-   */
+    /*
+     * OTHER STUFF
+     */
 
-  // Attach resize events to the window
-  thisWindow.resize(function(){ windowResizeFrame(); });
-  setTimeout(function(){ windowResizeFrame(); }, 1000);
-  windowResizeFrame();
+    // Attach resize events to the window
+    thisWindow.resize(function(){ windowResizeFrame(); });
+    setTimeout(function(){ windowResizeFrame(); }, 1000);
+    windowResizeFrame();
 
-  var windowHeight = $(window).height();
-  var htmlHeight = $('html').height();
-  var htmlScroll = $('html').scrollTop();
-  //alert('windowHeight = '+windowHeight+'; htmlHeight = '+htmlHeight+'; htmlScroll = '+htmlScroll+'; ');
+    var windowHeight = $(window).height();
+    var htmlHeight = $('html').height();
+    var htmlScroll = $('html').scrollTop();
+    //alert('windowHeight = '+windowHeight+'; htmlHeight = '+htmlHeight+'; htmlScroll = '+htmlScroll+'; ');
 
-  // Fade in the leaderboard screen slowly
-  thisBody.waitForImages(function(){
-    var tempTimeout = setTimeout(function(){
-      if (gameSettings.fadeIn){ thisBody.css({opacity:0}).removeClass('hidden').animate({opacity:1.0}, 800, 'swing'); }
-      else { thisBody.removeClass('hidden').css({opacity:1}); }
-      // Let the parent window know the menu has loaded
-      parent.prototype_menu_loaded();
-      }, 1000);
-    }, false, true);
+    // Fade in the leaderboard screen slowly
+    thisBody.waitForImages(function(){
+        var tempTimeout = setTimeout(function(){
+            if (gameSettings.fadeIn){ thisBody.css({opacity:0}).removeClass('hidden').animate({opacity:1.0}, 800, 'swing'); }
+            else { thisBody.removeClass('hidden').css({opacity:1}); }
+            // Let the parent window know the menu has loaded
+            parent.prototype_menu_loaded();
+            }, 1000);
+        }, false, true);
 
 });
 
 // Create the windowResize event for this page
 function windowResizeFrame(){
 
-  var windowWidth = thisWindow.width();
-  var windowHeight = thisWindow.height();
-  var headerHeight = $('.header', thisBody).outerHeight(true);
+    var windowWidth = thisWindow.width();
+    var windowHeight = thisWindow.height();
+    var headerHeight = $('.header', thisBody).outerHeight(true);
 
-  var newBodyHeight = windowHeight;
-  var newFrameHeight = newBodyHeight - headerHeight;
+    var newBodyHeight = windowHeight;
+    var newFrameHeight = newBodyHeight - headerHeight;
 
-  if (windowWidth > 800){ thisBody.addClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
-  else { thisBody.removeClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
+    if (windowWidth > 800){ thisBody.addClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
+    else { thisBody.removeClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
 
-  thisBody.css({height:newBodyHeight+'px'});
-  thisPrototype.css({height:newBodyHeight+'px'});
+    thisBody.css({height:newBodyHeight+'px'});
+    thisPrototype.css({height:newBodyHeight+'px'});
 
-  //console.log('windowWidth = '+windowWidth+'; parentWidth = '+parentWidth+'; thisTypeContainerWidth = '+thisTypeContainerWidth+'; thisStarContainerWidth = '+thisStarContainerWidth+'; ');
+    //console.log('windowWidth = '+windowWidth+'; parentWidth = '+parentWidth+'; thisTypeContainerWidth = '+thisTypeContainerWidth+'; thisStarContainerWidth = '+thisStarContainerWidth+'; ');
 
 }

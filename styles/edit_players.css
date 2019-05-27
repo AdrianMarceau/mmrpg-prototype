@@ -436,7 +436,7 @@ body.windowFlag_landscapeMode #prototype {
     height: 50px;
 }
 #edit #console .event a.field_name,
-#edit #console .event a.mission_name {
+#edit #console .event a.challenge_name {
     display: block;
     float: left;
     padding: 3px;
@@ -457,16 +457,16 @@ body.windowFlag_landscapeMode #prototype {
     border-color: rgb(22,22,22) !important;
     box-sizing: border-box;
 }
-#edit #console .event a.mission_name.challenge_battle {
+#edit #console .event a.challenge_name.challenge_battle {
     width: 31.0%;
     width: calc((100% / 3) - 5px);
 }
 #edit #console .event a.field_name:hover,
-#edit #console .event a.mission_name:hover {
+#edit #console .event a.challenge_name:hover {
     background-color: #515151;
 }
 #edit #console .event a.field_name label,
-#edit #console .event a.mission_name label {
+#edit #console .event a.challenge_name label {
     display: block;
     margin: 0;
     padding: 2px 0;
@@ -489,15 +489,15 @@ body.windowFlag_landscapeMode #prototype {
     border: 1px solid #000000 !important;
     border-color: rgba(0, 0, 0, 0.75) !important;
 }
-#edit #console .event a.mission_name label {
+#edit #console .event a.challenge_name label {
     background-size: auto;
     background-position: center center;
     background-repeat: repeat;
 }
 #edit #console .event select.field_name,
 #edit #console .event select.field_name:hover,
-#edit #console .event select.mission_name,
-#edit #console .event select.mission_name:hover {
+#edit #console .event select.challenge_name,
+#edit #console .event select.challenge_name:hover {
     display: block;
     margin: 0;
     padding: 2px 0;
@@ -527,7 +527,7 @@ body.windowFlag_landscapeMode #prototype {
     */
 }
 #edit #console .event select.field_name option,
-#edit #console .event select.mission_name option {
+#edit #console .event select.challenge_name option {
     text-align: left;
 }
 #edit #console .event a.ability_name {
