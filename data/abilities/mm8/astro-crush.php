@@ -12,7 +12,7 @@ $ability = array(
     'ability_type2' => 'impact',
     'ability_energy' => 8,
     'ability_damage' => 40,
-    'ability_accuracy' => 100,
+    'ability_accuracy' => 98,
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
