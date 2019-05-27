@@ -1206,7 +1206,7 @@ class rpg_battle extends rpg_object {
                 $first_event_body_foot .= ' <span style="opacity:0.25;">|</span> ';
                 $first_event_body_foot .= ' <span>'.$victory_rank.'-Rank Clear! </span>';
                 $first_event_body_foot .= ' <span style="opacity:0.25;">|</span>';
-                $first_event_body_foot .= ' <span>'.number_format($victory_points, 0, '.', ',').' BP Earned ('.$victory_percent.'%)</span>';
+                $first_event_body_foot .= ' <span>Score: '.number_format($victory_points, 0, '.', ',').' BP ('.$victory_percent.'%)</span>';
             }
 
         }

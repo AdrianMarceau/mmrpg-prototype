@@ -750,6 +750,14 @@ if (!empty($this_battle->flags['challenge_battle'])
             // Update the victory counter for this challenge before we update leaderboard
             $db->query("UPDATE mmrpg_challenges SET challenge_user_victories = (challenge_user_victories + 1) WHERE challenge_id = {$challenge_id};");
 
+            // Define the base variables for this particular victory
+            $temp_challenge_kind = $this_battle->values['challenge_battle_kind'];
+            $temp_player_turns_used = $this_battle->counters['battle_turn'];
+            $temp_player_robots_used = !empty($this_player->counters['robots_start_total']) ? $this_player->counters['robots_start_total'] : 0;
+            $temp_target_turn_limit = !empty($this_battle->battle_turns) ? $this_battle->battle_turns : 99;
+            $temp_target_robot_limit = !empty($this_battle->battle_robot_limit) ? $this_battle->battle_robot_limit : $target_player->counters['robots_start_total'];
+            $temp_zenny_earned = !empty($this_battle->counters['final_zenny_reward']) ? $this_battle->counters['final_zenny_reward'] : 0;
+
             // Check to see if this user already has a record on the challenge leaderboard
             $existing_db_row = $db->get_array("SELECT
                 board_id,
@@ -762,13 +770,57 @@ if (!empty($this_battle->flags['challenge_battle'])
                 AND user_id = {$this_user_id}
                 ;");
             $db_common_fields = array();
-            $db_common_fields['challenge_turns_used'] = $this_battle->counters['battle_turn'];
-            $db_common_fields['challenge_robots_used'] = !empty($this_player->counters['robots_start_total']) ? $this_player->counters['robots_start_total'] : 0;
-            $db_common_fields['challenge_zenny_earned'] = !empty($this_battle->counters['final_zenny_reward']) ? $this_battle->counters['final_zenny_reward'] : 0;
-            $new_rank_value = $db_common_fields['challenge_turns_used'] * $db_common_fields['challenge_robots_used'];
+            $db_common_fields['challenge_turns_used'] = $temp_player_turns_used;
+            $db_common_fields['challenge_robots_used'] = $temp_player_robots_used;
+            $db_common_fields['challenge_zenny_earned'] = $temp_zenny_earned;
+
+            // Calculate the earned points and rank for this run based on used turns and robots vs goal
+            $new_points = rpg_mission_challenge::calculate_challenge_reward_points($temp_challenge_kind, array(
+                'challenge_turns_used' => $temp_player_turns_used,
+                'challenge_turn_limit' => $temp_target_turn_limit,
+                'challenge_robots_used' => $temp_player_robots_used,
+                'challenge_robot_limit' => $temp_target_robot_limit
+                ), $new_percent, $new_rank);
+
+            /*
+            $this_battle->events_create(false, false, 'DEBUG', 'NEW results = '.print_r(array(
+                'challenge_turns_used' => $temp_player_turns_used,
+                'challenge_turn_limit' => $temp_target_turn_limit,
+                'challenge_robots_used' => $temp_player_robots_used,
+                'challenge_robot_limit' => $temp_target_robot_limit
+                ), true).' <br /> '.
+                ' $new_points = '.$new_points.
+                ' | $new_percent = '.$new_percent.
+                ' | $new_rank = '.$new_rank
+                );
+            */
+
+            // Check to see if an existing row exists to update before inserting
             if (!empty($existing_db_row)){
-                $existing_rank_value = $existing_db_row['challenge_turns_used'] * $existing_db_row['challenge_robots_used'];
-                if ($new_rank_value <= $existing_db_row){ $update_fields = $db_common_fields; }
+
+                // Calculate the earned points and rank for the previous run so we can compare to current
+                $old_points = rpg_mission_challenge::calculate_challenge_reward_points($temp_challenge_kind, array(
+                    'challenge_turns_used' => $existing_db_row['challenge_turns_used'],
+                    'challenge_turn_limit' => $temp_target_turn_limit,
+                    'challenge_robots_used' => $existing_db_row['challenge_robots_used'],
+                    'challenge_robot_limit' => $temp_target_robot_limit
+                    ), $old_percent, $old_rank);
+
+                /*
+                $this_battle->events_create(false, false, 'DEBUG', 'OLD results = '.print_r(array(
+                    'challenge_turns_used' => $existing_db_row['challenge_turns_used'],
+                    'challenge_turn_limit' => $temp_target_turn_limit,
+                    'challenge_robots_used' => $existing_db_row['challenge_robots_used'],
+                    'challenge_robot_limit' => $temp_target_robot_limit
+                    ), true).' <br /> '.
+                    ' $old_points = '.$old_points.
+                    ' | $old_percent = '.$old_percent.
+                    ' | $old_rank = '.$old_rank
+                    );
+                */
+
+                // If new points are higher, we can update record, else just update access time
+                if ($new_points >= $old_points){ $update_fields = $db_common_fields; }
                 else { $update_fields = array(); }
                 $update_fields['challenge_date_lastclear'] = time();
                 $condition_data = array();
@@ -776,7 +828,10 @@ if (!empty($this_battle->flags['challenge_battle'])
                 $condition_data['challenge_id'] = $challenge_id;
                 $db->update('mmrpg_challenges_leaderboard', $update_fields, $condition_data);
                 //$this_battle->events_create(false, false, 'DEBUG', '$update_fields = '.print_r($update_fields, true));
+
             } else {
+
+                // There are no records yet so we can just insert freely into the database
                 $insert_fields = $db_common_fields;
                 $insert_fields['user_id'] = $this_user_id;
                 $insert_fields['challenge_id'] = $challenge_id;
@@ -784,6 +839,7 @@ if (!empty($this_battle->flags['challenge_battle'])
                 $insert_fields['challenge_date_firstclear'] = time();
                 $db->insert('mmrpg_challenges_leaderboard', $insert_fields);
                 //$this_battle->events_create(false, false, 'DEBUG', '$insert_fields = '.print_r($insert_fields, true));
+
             }
 
         }
