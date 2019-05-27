@@ -1149,10 +1149,10 @@ class rpg_battle extends rpg_object {
             }
 
             // Print out the current vs allowed robots for this mission and the penalty or bonus, if any
-            $temp_target_robot_limit = !empty($this_battle->battle_robot_limit) ? $this_battle->battle_robot_limit : $target_player->counters['robots_start_total'];
-            $temp_target_limit_kind = !empty($this_battle->battle_robot_limit) ? 'Goal' : 'Target';
+            $temp_target_robot_limit = !empty($this->battle_robot_limit) ? $this->battle_robot_limit : $target_player->counters['robots_start_total'];
+            $temp_target_limit_kind = !empty($this->battle_robot_limit) ? 'Goal' : 'Target';
             $reward_mod_strings = array();
-            $reward_mod_strings[] = ' Robots vs '.$temp_target_limit_kind.': '.$this_player->counters['robots_start_total'].' - '.$target_player->counters['robots_start_total'];
+            $reward_mod_strings[] = ' Robots vs '.$temp_target_limit_kind.': '.$this_player->counters['robots_start_total'].' / '.$temp_target_robot_limit;
             if ($this_player->counters['robots_start_total'] != $target_player->counters['robots_start_total']){
                 $temp_bonus_multiplier = number_format(round(($target_player->counters['robots_start_total'] / $this_player->counters['robots_start_total']), 2), 1, '.', ',');
                 if ($this_player->counters['robots_start_total'] < $target_player->counters['robots_start_total']){  $this_star_rating += 1; $reward_mod_strings[] = 'Team Bonus: x'.$temp_bonus_multiplier.''; }
@@ -1170,21 +1170,44 @@ class rpg_battle extends rpg_object {
             if (empty($this_player->counters['robots_disabled'])){ $this_star_rating += 1;  }
             else { $this_star_rating -= 1;  }
 
-            // Print out the final zenny reward amounts after mods (if not empty)
-            if (true){
-                $first_event_body_foot = 'Final Reward: '.number_format($total_zenny_rewards, 0, '.', ',').'&#438;';
-                if (!isset($_SESSION['GAME']['counters']['battle_zenny'])){ $_SESSION['GAME']['counters']['battle_zenny'] = 0; }
-                $_SESSION['GAME']['counters']['battle_zenny'] += $total_zenny_rewards;
-                $this->counters['final_zenny_reward'] = $total_zenny_rewards;
+            // Define the victory results for calculating
+            if (!empty($this->flags['challenge_battle'])){
+                $victory_results = array(
+                    'challenge_turns_used' => $this->counters['battle_turn'],
+                    'challenge_turn_limit' => $this->battle_turns,
+                    'challenge_robots_used' => $this_player->counters['robots_start_total'],
+                    'challenge_robot_limit' => $temp_target_robot_limit
+                    );
+                $victory_points = rpg_mission_challenge::calculate_challenge_reward_points(
+                    $this->values['challenge_battle_kind'],
+                    $victory_results,
+                    $victory_percent,
+                    $victory_rank
+                    );
             }
 
-            // Print out the star rating based on how the user did in battle
-            if ($this_star_rating < 1){ $this_star_rating = 1; }
-            elseif ($this_star_rating > 5){ $this_star_rating = 5; }
-            $first_event_body_foot .= ' <span style="opacity:0.25;">|</span> ';
-            for ($i = 0; $i < $this_star_rating; $i++){ $first_event_body_foot .= '<span>&#9733;</span>'; }
-            for ($i = 0; $i < (5 - $this_star_rating); $i++){ $first_event_body_foot .= '<span style="opacity:0.25;">&#9734;</span>'; }
+            // Print out the final zenny reward amounts after mods (if not empty)
+            $first_event_body_foot = '';
+            $first_event_body_foot .= 'Final Reward: '.number_format($total_zenny_rewards, 0, '.', ',').'&#438;';
+            if (!isset($_SESSION['GAME']['counters']['battle_zenny'])){ $_SESSION['GAME']['counters']['battle_zenny'] = 0; }
+            $_SESSION['GAME']['counters']['battle_zenny'] += $total_zenny_rewards;
+            $this->counters['final_zenny_reward'] = $total_zenny_rewards;
 
+            // Print out the star rating based on how the user did in battle
+            if (empty($this->flags['challenge_battle'])){
+                if ($this_star_rating < 1){ $this_star_rating = 1; }
+                elseif ($this_star_rating > 5){ $this_star_rating = 5; }
+                $first_event_body_foot .= ' <span style="opacity:0.25;">|</span> ';
+                for ($i = 0; $i < $this_star_rating; $i++){ $first_event_body_foot .= '<span>&#9733;</span>'; }
+                for ($i = 0; $i < (5 - $this_star_rating); $i++){ $first_event_body_foot .= '<span style="opacity:0.25;">&#9734;</span>'; }
+            }
+            // If this was a challenge battle, we should print out the rank
+            elseif (!empty($this->flags['challenge_battle'])){
+                $first_event_body_foot .= ' <span style="opacity:0.25;">|</span> ';
+                $first_event_body_foot .= ' <span>'.$victory_rank.'-Rank Clear! </span>';
+                $first_event_body_foot .= ' <span style="opacity:0.25;">|</span>';
+                $first_event_body_foot .= ' <span>'.number_format($victory_points, 0, '.', ',').' BP Earned ('.$victory_percent.'%)</span>';
+            }
 
         }
         // Otherwise if defeated, do nothing
