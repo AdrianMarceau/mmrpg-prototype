@@ -179,7 +179,7 @@ function mmrpg_patch_recalculate_all_battle_points($_GAME){
     $update_array['board_abilities'] = count($new_points_index['abilities_unlocked']);
     $update_array['board_items'] = count($new_points_index['items_unlocked']);
     $update_array['board_stars'] = count($new_points_index['field_stars_collected']) + count($new_points_index['fusion_stars_collected']);
-    $update_array['board_date_modified'] = $now_time;
+    //$update_array['board_date_modified'] = $now_time;
     $db->update('mmrpg_leaderboard', $update_array, array('user_id' => $_GAME['user_id']));
 
     // Return the updated game array
