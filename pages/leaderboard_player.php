@@ -575,6 +575,8 @@ ob_start();
                             $category_name = ucwords(str_replace('_', ' ', $category_token));
                             $category_name = str_replace('Robots Unlocked ', 'Robots w/ ', $category_name);
                             $category_name = str_replace('Database Robots ', 'Robots ', $category_name);
+                            $category_name = str_replace('Players Defeated', 'Player Battle Victories', $category_name);
+                            $category_name = str_replace('Challenges Completed', 'Challenge Mode Victories', $category_name);
                             $category_list = $battle_points_index[$category_token];
                             $category_count = count($category_list);
                             $category_points = $battle_points_index[$category_token.'_points'];
@@ -701,6 +703,17 @@ ob_start();
                                     } elseif ($category_token === 'players_defeated'){
                                         $type = !empty($data['target_user_colour']) ? $data['target_user_colour'] : 'none';
                                         $details_markup[] = '<li><a class="field_type type_'.$type.'" href="leaderboard/'.$data['target_user_token'].'/">'.$data['target_user_name'].'</a></li>';
+                                    } elseif ($category_token === 'challenges_completed'){
+                                        $type = $data['challenge_kind'] == 'event' ? 'electric' : 'cutter';
+                                        $title = $data['challenge_name'].' //'.
+                                            'Turns: '.$data['challenge_turns_used'].'/'.$data['challenge_turn_limit'].' '.
+                                            '| Robots: '.$data['challenge_robots_used'].'/'.$data['challenge_robot_limit'].' '.
+                                            '| Reward: '.number_format($data['challenge_victory_points'], 0, '.', ',').' BP ('.$data['challenge_victory_percent'].'%) '.
+                                            '// '.$data['challenge_victory_rank'].'-Rank Victory! '.
+                                            '';
+                                        $details_markup[] = '<li><a class="field_type type_'.$type.'" title="'.$title.'" data-href="challenges/'.$data['challenge_id'].'/">'.
+                                            $data['challenge_name'].' ('.$data['challenge_victory_rank'].')'.
+                                            '</a></li>';
                                     }  else {
                                         $details_markup[] = '<li><span class="field_type type_none">'.print_r($data, true).'</span></li>';
                                     }
