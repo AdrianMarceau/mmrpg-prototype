@@ -191,9 +191,9 @@ while ($this_action == 'save'){
 
             // Update the current game's user and file info using the new password
             $_SESSION[$session_token]['USER']['displayname'] = $user_displayname;
-            $_SESSION[$session_token]['USER']['emailaddress'] = $user_emailaddress;
-            $_SESSION[$session_token]['USER']['imagepath'] = $user_imagepath;
-            $_SESSION[$session_token]['USER']['colourtoken'] = $user_colourtoken;
+            if (!empty($user_emailaddress)){ $_SESSION[$session_token]['USER']['emailaddress'] = $user_emailaddress; }
+            if (!empty($user_imagepath)){ $_SESSION[$session_token]['USER']['imagepath'] = $user_imagepath; }
+            if (!empty($user_colourtoken)){ $_SESSION[$session_token]['USER']['colourtoken'] = $user_colourtoken; }
             if (!empty($user_omegaseed)){
                 $_SESSION[$session_token]['USER']['omega'] = md5(MMRPG_SETTINGS_OMEGA_SEED.$user_omegaseed);
             }
