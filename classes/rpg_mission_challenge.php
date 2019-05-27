@@ -6,7 +6,7 @@
 class rpg_mission_challenge extends rpg_mission {
 
     // Define a function for pulling a specific event mission from the database
-    public static function get_missions($this_prototype_data, $challenge_kind = '', $challenge_limit = 0, $include_hidden = false, $shuffle_list = true){
+    public static function get_missions($this_prototype_data, $challenge_kind = '', $challenge_limit = 0, $include_hidden = false, $shuffle_list = false){
         global $db;
         // Collect or define filters for the query
         $challenge_filters = array();
@@ -18,7 +18,7 @@ class rpg_mission_challenge extends rpg_mission {
         $challenge_order = array();
         $challenge_order[] = "FIELD(challenges.challenge_kind, 'event', 'user')";
         if ($shuffle_list){ $challenge_order[] = 'RAND()'; }
-        else { $challenge_order[] = 'challenge_id DESC'; }
+        else { $challenge_order[] = 'challenges.challenge_creator ASC'; $challenge_order[] = 'challenges.challenge_id ASC'; }
         $challenge_order = !empty($challenge_order) ? implode(', ', $challenge_order) : 'challenges.challenge_id ASC';
         // Collect or define the query result limit
         $challenge_limit = !empty($challenge_limit) && is_numeric($challenge_limit) ? 'LIMIT '.$challenge_limit : '';
@@ -46,6 +46,31 @@ class rpg_mission_challenge extends rpg_mission {
     }
 
     // Define a function for pulling a specific event mission from the database
+    public static function get_custom_missions($this_prototype_data, $custom_mission_ids = array()){
+        global $db;
+        if (!is_array($custom_mission_ids) || empty($custom_mission_ids)){ return false; }
+        $challenge_fields = self::get_index_fields(true, 'challenges');
+        $challenge_ids_string = implode(',', $custom_mission_ids);
+        $raw_list = $db->get_array_list("SELECT
+            {$challenge_fields},
+            (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS challenge_creator_name
+            FROM mmrpg_challenges AS challenges
+            LEFT JOIN mmrpg_users AS users ON users.user_id = challenges.challenge_creator
+            WHERE challenges.challenge_id IN ({$challenge_ids_string})
+            ORDER BY FIELD(challenges.challenge_id, {$challenge_ids_string})
+            ;");
+        if (empty($raw_list)){ return false; }
+        $parsed_data_list = array();
+        foreach ($raw_list AS $key => $raw_data){
+            $parsed_data = self::parse_mission($this_prototype_data, $raw_data);
+            if (empty($parsed_data)){ return false; }
+            $parsed_data_list[] = $parsed_data;
+        }
+        if (empty($parsed_data_list)){ return false; }
+        else { return $parsed_data_list; }
+    }
+
+    // Define a function for pulling a specific event mission from the database
     public static function get_mission($this_prototype_data, $challenge_id = 0){
         global $db;
         if (!is_numeric($challenge_id)){ return false; }
@@ -65,6 +90,16 @@ class rpg_mission_challenge extends rpg_mission {
         static $mmrpg_index_robots;
         if (empty($mmrpg_index_fields)){ $mmrpg_index_fields = rpg_field::get_index(); }
         if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = rpg_robot::get_index(); }
+
+        // Collect any victories records so we can show 'em
+        static $challenge_mission_victories;
+        if (empty($challenge_mission_victories)){
+            global $this_userid;
+            if (!empty($this_userid)
+                && $this_userid !== MMRPG_SETTINGS_GUEST_ID){
+                $challenge_mission_victories = self::get_challenge_victories($this_userid);
+            }
+        }
 
         // Define any bonus stats applied to these robots
         $challenge_robot_level = 100;
@@ -126,8 +161,9 @@ class rpg_mission_challenge extends rpg_mission {
         $num_target_robots = count($challenge_target_player['player_robots']);
 
         // Determine what size this battle should be
-        if ($challenge_data['challenge_kind'] == 'event'){ $challenge_size = '1x4'; }
-        else { $challenge_size = '1x2'; }
+        $challenge_size = '1x4'; // all battles are same size now
+        //if ($challenge_data['challenge_kind'] == 'event'){ $challenge_size = '1x4'; }
+        //else { $challenge_size = '1x2'; }
         //$num_targets = count($challenge_target_player['player_robots']);
         //$challenge_size = '1x'.(ceil($num_targets / 4) + 1);
         //if ($num_targets == 1){ $challenge_size = '1x1'; }
@@ -211,6 +247,9 @@ class rpg_mission_challenge extends rpg_mission {
         $challenge_values = array();
         $challenge_counters = array();
         $challenge_flags['challenge_battle'] = true;
+        if (!empty($challenge_data['challenge_flag_hidden'])){ $challenge_flags['is_hidden'] = true; }
+        if (!empty($challenge_mission_victories[$challenge_data['challenge_id']])){ $challenge_flags['is_cleared'] = true; }
+        //$challenge_target_player['player_robots'][0]['robot_token']
         $challenge_values['challenge_battle_id'] = $challenge_data['challenge_id'];
         $challenge_values['challenge_battle_kind'] = $challenge_data['challenge_kind'];
         $challenge_values['challenge_battle_by'] = $challenge_data['challenge_creator_name'];
@@ -221,6 +260,13 @@ class rpg_mission_challenge extends rpg_mission {
         $challenge_values['challenge_records']['concluded'] = (int)($challenge_data['challenge_times_concluded']);
         $challenge_values['challenge_records']['victories'] = (int)($challenge_data['challenge_user_victories']);
         $challenge_values['challenge_records']['defeats'] = (int)($challenge_data['challenge_user_defeats']);
+        $challenge_values['challenge_records']['personal'] = !empty($challenge_mission_victories[$challenge_data['challenge_id']]) ? $challenge_mission_victories[$challenge_data['challenge_id']] : array();
+        if ($challenge_data['challenge_kind'] == 'event'){
+            $vsrobot = $challenge_target_player['player_robots'][0]['robot_token'];
+            $challenge_values['colour_token'] = $mmrpg_index_robots[$vsrobot]['robot_core'];
+        } else {
+            $challenge_values['colour_token'] = $challenge_field_base['field_type'];
+        }
 
         // Pull event mission data from the database
         $temp_battle_omega = array(
@@ -292,11 +338,35 @@ class rpg_mission_challenge extends rpg_mission {
 
     }
 
+    // Define a function for collecting challenge victories for a given user
+    public static function get_challenge_victories($this_userid){
+        global $db;
+        if (!empty($this_userid)
+            && $this_userid !== MMRPG_SETTINGS_GUEST_ID){
+            $challenge_mission_victories = $db->get_array_list("SELECT
+                board.challenge_id,
+                board.challenge_turns_used,
+                challenges.challenge_turn_limit,
+                board.challenge_robots_used,
+                challenges.challenge_robot_limit,
+                board.challenge_result
+                FROM mmrpg_challenges_leaderboard AS board
+                LEFT JOIN mmrpg_challenges AS challenges ON challenges.challenge_id = board.challenge_id
+                WHERE
+                board.user_id = {$this_userid}
+                AND board.challenge_result = 'victory'
+                ;", 'challenge_id');
+            return $challenge_mission_victories;
+        } else {
+            return false;
+        }
+    }
+
     // Define a function for calculating the battle point rewards for a challenge victory
-    public static function calculate_challenge_reward_points($victory_results, &$victory_percent = 0, &$victory_rank = ''){
+    public static function calculate_challenge_reward_points($challenge_kind, $victory_results, &$victory_percent = 0, &$victory_rank = ''){
         static $rank_index;
         if (empty($rank_index)){ $rank_index = array(10 => 'SS', 9 => 'S', 8 => 'A', 7 => 'B', 6 => 'C', 5 => 'D', 4 => 'E', 3 => 'F', 2 => 'F', 1 => 'F', 0 => 'F'); }
-        $victory_points_possible = 2000;
+        $victory_points_possible = $challenge_kind == 'event' ? 2000 : 200;
         $victory_points = ($victory_points_possible / 2);
         $victory_points += ($victory_points_possible / 4) - ceil(($victory_points_possible / 4) * (($victory_results['challenge_turns_used'] - 1) / $victory_results['challenge_turn_limit']));
         $victory_points += ($victory_points_possible / 4) - ceil(($victory_points_possible / 4) * (($victory_results['challenge_robots_used'] - 1) / $victory_results['challenge_robot_limit']));
@@ -330,12 +400,17 @@ class rpg_mission_challenge extends rpg_mission {
 
         // Generate the actual title markup given available fields
         $this_challenge_title = $this_challenge_name;
-        $this_challenge_title .= ' // '.explode(' ', $this_field_info1['field_name'])[0].' '.explode(' ', $this_field_info2['field_name'])[1];
+        $this_challenge_title .= ' //';
+        $this_challenge_title .= ' '.($challenge_info['challenge_kind'] == 'event' ? 'Event' : 'Player').' Challenge';
+        $this_challenge_title .= ' | '.explode(' ', $this_field_info1['field_name'])[0].' '.explode(' ', $this_field_info2['field_name'])[1];
         if ($challenge_info['challenge_kind'] == 'event'
             && !empty($this_target_data['player_robots'])){
             $first_robot_token = $this_target_data['player_robots'][0]['robot_token'];
             $first_robot_info = $mmrpg_robot_index[$first_robot_token];
             $this_challenge_title .= ' | Vs. '.$first_robot_info['robot_name'];
+        } elseif ($challenge_info['challenge_kind'] == 'user'
+            && !empty($challenge_info['challenge_creator_name'])){
+            $this_challenge_title .= ' | By '.$challenge_info['challenge_creator_name'];
         }
 
         if (!empty($this_challenge_description)){
@@ -344,7 +419,7 @@ class rpg_mission_challenge extends rpg_mission {
 
         if (!empty($challenge_victories_index[$this_challenge_id])){
             $victory_results = $challenge_victories_index[$this_challenge_id];
-            $victory_points = self::calculate_challenge_reward_points($victory_results, $victory_percent, $victory_rank);
+            $victory_points = self::calculate_challenge_reward_points($challenge_info['challenge_kind'], $victory_results, $victory_percent, $victory_rank);
             $this_challenge_title .= ' // '.$victory_rank.'-Rank Clear! [['.
                 '// Turns: '.$victory_results['challenge_turns_used'].'/'.$victory_results['challenge_turn_limit'].' '.
                 '| Robots: '.$victory_results['challenge_robots_used'].'/'.$victory_results['challenge_robot_limit'].' '.
@@ -390,24 +465,28 @@ class rpg_mission_challenge extends rpg_mission {
             $first_robot_info = $mmrpg_robot_index[$first_robot_token];
             $this_challenge_label .= ' | Vs. '.$first_robot_info['robot_name'];
         } elseif ($challenge_info['challenge_kind'] == 'user'
-            && !empty($challenge_info['challenge_creator'])){
+            && !empty($challenge_info['challenge_creator_name'])){
             $this_challenge_label .= ' | By '.$challenge_info['challenge_creator_name'];
         }
 
         if (!empty($challenge_victories_index[$this_challenge_id])){
             $victory_results = $challenge_victories_index[$this_challenge_id];
-            $victory_points = self::calculate_challenge_reward_points($victory_results, $victory_percent, $victory_rank);
-            $this_challenge_label = '['.$victory_rank.'-RANK CLEAR!] - '.$this_challenge_label;
+            $victory_points = self::calculate_challenge_reward_points($challenge_info['challenge_kind'], $victory_results, $victory_percent, $victory_rank);
+            //$this_challenge_label = '&#9733; '.$victory_rank.'-RANK CLEAR! | '.$this_challenge_label;
+            $this_challenge_label = '&#9733; '.$this_challenge_label.' | '.$victory_rank.'-RANK CLEAR!';
+            $this_challenge_name = '&#9733; '.$this_challenge_name;
         }
 
         $this_challenge_field_option = '<option '.
             'value="'.$challenge_info['challenge_id'].'" '.
+            'title="'.$this_challenge_title_plain.'" '.
             'data-label="'.$this_challenge_name.'" '.
             'data-type="'.$this_challenge_field_type1.'" '.
             'data-type2="'.$this_challenge_field_type2.'" '.
-            'title="'.$this_challenge_title_plain.'" '.
             'data-tooltip="'.$this_challenge_title_tooltip.'" '.
-            'data-tooltip-type="field_type field_type_'.($this_challenge_field_type1).($this_challenge_field_type1 != 'none' ? '_'.$this_challenge_field_type1 : '').'" '.
+            'data-tooltip-type="field_type field_type_'.($this_challenge_field_type1).(($this_challenge_field_type2 != 'none' && $this_challenge_field_type2 != $this_challenge_field_type1) ? '_'.$this_challenge_field_type2 : '').'" '.
+            'data-background="'.$this_field_data['field_background'].'" '.
+            'data-foreground="'.$this_field_data['field_foreground'].'" '.
             '>'.$this_challenge_label.'</option>';
 
         return $this_challenge_field_option;
