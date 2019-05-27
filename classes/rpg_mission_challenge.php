@@ -366,6 +366,9 @@ class rpg_mission_challenge extends rpg_mission {
     public static function calculate_challenge_reward_points($challenge_kind, $victory_results, &$victory_percent = 0, &$victory_rank = ''){
         static $rank_index;
         if (empty($rank_index)){ $rank_index = array(10 => 'SS', 9 => 'S', 8 => 'A', 7 => 'B', 6 => 'C', 5 => 'D', 4 => 'E', 3 => 'F', 2 => 'F', 1 => 'F', 0 => 'F'); }
+        if (empty($victory_results)){ return 0; }
+        if ($victory_results['challenge_turns_used'] > $victory_results['challenge_turn_limit']){ $victory_results['challenge_turn_limit'] = $victory_results['challenge_turns_used']; }
+        if ($victory_results['challenge_robots_used'] > $victory_results['challenge_robot_limit']){ $victory_results['challenge_robot_limit'] = $victory_results['challenge_robots_used']; }
         $victory_points_possible = $challenge_kind == 'event' ? 2000 : 200;
         $victory_points = ($victory_points_possible / 2);
         $victory_points += ($victory_points_possible / 4) - ceil(($victory_points_possible / 4) * (($victory_results['challenge_turns_used'] - 1) / $victory_results['challenge_turn_limit']));
