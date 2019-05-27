@@ -350,6 +350,7 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
         AND challenges.challenge_kind = 'event'
         AND challenges.challenge_flag_published = 1
         AND challenges.challenge_flag_hidden = 0
+        AND challenges.user_id <> {$user_id}
         ;", 'challenge_id');
         $points_index['challenges_completed'] = array();
         $points_index['challenges_completed_points'] = 0;
