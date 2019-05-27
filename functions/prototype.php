@@ -1335,6 +1335,16 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                         $this_option_title .= ' | Cleared: '.($temp_records['victories'] === 1 ? '1 Time ' : number_format($temp_records['victories'], 0, '.', ',').' Times');
                         //$this_option_title .= ' <br />Success Rate: '.str_replace('.00', '', number_format((($temp_records['victories'] / $temp_records['accessed']) * 100), 2, '.', ',')).'%';
                     }
+                    if (!empty($temp_records['personal'])){
+                        $victory_results = $temp_records['personal'];
+                        $victory_points = rpg_mission_challenge::calculate_challenge_reward_points($this_battleinfo['values']['challenge_battle_kind'], $victory_results, $victory_percent, $victory_rank);
+                        $this_option_title .= ' <hr />&laquo; Your Challenge Records &raquo;';
+                        //$this_option_title .= ' <br />'.$victory_rank.'-Rank Clear!';
+                        $this_option_title .= ' <br />Turns: '.$victory_results['challenge_turns_used'].'/'.$victory_results['challenge_turn_limit'];
+                        $this_option_title .= ' | Robots: '.$victory_results['challenge_robots_used'].'/'.$victory_results['challenge_robot_limit'];
+                        $this_option_title .= ' | Reward: '.number_format($victory_points, 0, '.', ',').' BP ('.$victory_percent.'%)';
+                    }
+
             }
 
             //$this_option_title .= '<br /> battle_rewards: '.(!empty($this_battleinfo['battle_rewards']) ? json_encode($this_battleinfo['battle_rewards']) : '---');
@@ -2165,21 +2175,30 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
         // Loop through and decode any fields that require it
         if (!empty($this_leaderboard_target_players)){
             foreach ($this_leaderboard_target_players AS $key => $player){
+
                 $player['player_rewards'] = !empty($player['player_rewards']) ? json_decode($player['player_rewards'], true) : array();
                 $player['player_settings'] = !empty($player['player_settings']) ? json_decode($player['player_settings'], true) : array();
                 $player['values'] = !empty($player['player_values']) ? json_decode($player['player_values'], true) : array();
                 $player['counters'] = !empty($player['player_counters']) ? json_decode($player['player_counters'], true) : array();
                 unset($player['player_values']);
                 unset($player['player_counters']);
+
                 $player['player_favourites'] = !empty($player['values']['robot_favourites']) ? $player['values']['robot_favourites'] : array();
                 $player['player_starforce'] = !empty($player['values']['star_force']) ? $player['values']['star_force'] : array();
                 if (!empty($player_robot_sort)){ $player['counters']['player_robots_count'] = !empty($player['player_rewards'][$player_robot_sort]['player_robots']) ? count($player['player_rewards'][$player_robot_sort]['player_robots']) : 0; }
                 $player['values']['flag_online'] = in_array($player['user_name_clean'], $this_leaderboard_online_usernames) ? 1 : 0;
                 $player['values']['flag_defeated'] = in_array($player['user_name_clean'], $this_leaderboard_defeated_players) ? 1 : 0;
                 $player['values']['colour_token'] = !empty($player['user_colour_token']) ? $player['user_colour_token'] : '';
+
+                unset($player['values']['battle_shops'], $player['values']['prototype_awards']);
+                unset($player['values']['player_this-item-omega_prototype'], $player['values']['dr-light_this-item-omega_prototype'], $player['values']['dr-wily_this-item-omega_prototype'], $player['values']['dr-cossack_this-item-omega_prototype']);
+                unset($player['values']['player_target-robot-omega_prototype'], $player['values']['dr-light_target-robot-omega_prototype'], $player['values']['dr-wily_target-robot-omega_prototype'], $player['values']['dr-cossack_target-robot-omega_prototype']);
+
                 $this_leaderboard_target_players[$key] = $player;
+
             }
         }
+
         // Update the database index cache
         //if (!empty($player_robot_sort)){ uasort($this_leaderboard_target_players, 'mmrpg_prototype_leaderboard_targets_sort'); }
         $db->INDEX['LEADERBOARD']['targets'] = json_encode($this_leaderboard_target_players);
