@@ -1653,7 +1653,8 @@ body[data-source="website"] #prototype .menu {
     right: 3px;
 }
 
-#prototype .banner .option div label .arrow {
+#prototype .banner .option div label .arrow,
+#prototype .banner .option div label .nobanner {
     display: none;
 }
 #prototype .banner .option[data-select="this_battle_token"] div label .subtext,
