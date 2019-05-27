@@ -277,6 +277,74 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'field'){
 }
 
 
+// -- PROCESS CHALLENGE ACTION -- //
+
+// Check if an action request has been sent with an challenge type
+if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'challenge'){
+
+    // Collect the challenge variables from the request header, if they exist
+    $temp_key = !empty($_REQUEST['key']) ? $_REQUEST['key'] : 0;
+    $temp_player = !empty($_REQUEST['player']) ? $_REQUEST['player'] : '';
+    $temp_challenge = !empty($_REQUEST['challenge']) ? $_REQUEST['challenge']: '';
+    // If key variables are not provided, kill the script in error
+    if (empty($temp_player) || empty($temp_player) || empty($temp_challenge)){ die('error|request-error|'.preg_replace('/\s+/', ' ', print_r($_REQUEST, true))); }
+
+    //die(print_r($_REQUEST, true));
+
+    // Collect this player's current challenge selection from the omega session
+    $temp_session_key = $temp_player.'_target-challenge-missions';
+    $temp_current_challenges = !empty($_SESSION[$session_token]['values'][$temp_session_key]) ? $_SESSION[$session_token]['values'][$temp_session_key] : array();
+
+    // Crop the challenge settings if they've somehow exceeded the eight limit
+    $temp_new_challenges = $temp_current_challenges;
+    for ($i = 0; $i < 3; $i++){ $temp_new_challenges[] = 0; }
+    if (count($temp_new_challenges) > 3){ $temp_new_challenges = array_slice($temp_new_challenges, 0, 3, true); }
+
+    // Otherwise, if there was a new challenge provided, update it in the array
+    if (!in_array($temp_challenge, $temp_current_challenges)){
+
+        // Update this position in the array with the new challenge
+        $temp_new_challenges[$temp_key] = $temp_challenge;
+
+        // Update the session with the new challenge ID value
+        $_SESSION[$session_token]['values'][$temp_session_key] = $temp_new_challenges;
+
+        // Save, produce the success message with the new challenge order
+        mmrpg_save_game_session();
+        exit('success|challenge-updated|'.implode(',', $temp_new_challenges));
+
+    }
+    // Otherwise, if this challenge already exists, swap position in array
+    elseif (in_array($temp_challenge, $temp_new_challenges)){
+
+        // Update this position in the array with the new challenge
+        $this_slot_key = $temp_key;
+        $this_slot_value = $temp_new_challenges[$temp_key];
+        $copy_slot_value = $temp_challenge;
+        $copy_slot_key = array_search($temp_challenge, $temp_new_challenges);
+
+        // Update this slot with new value
+        $temp_new_challenges[$this_slot_key] = $copy_slot_value;
+        // Update copy slot with new value
+        $temp_new_challenges[$copy_slot_key] = $this_slot_value;
+
+        // Update the session with the new challenge ID value
+        $_SESSION[$session_token]['values'][$temp_session_key] = $temp_new_challenges;
+
+        // Save, produce the success message with the new challenge order
+        mmrpg_save_game_session();
+        exit('success|challenge-updated|'.implode(',', $temp_new_challenges));
+
+    } else {
+
+        // Produce an error show this challenge has already been selected
+        exit('error|challenge-exists|'.implode(',', $temp_new_challenges));
+
+    }
+
+}
+
+
 // -- RECOLLECT SETTINGS DATA -- //
 
 // Define the index of allowable players to appear in the edit
