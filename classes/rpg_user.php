@@ -347,6 +347,22 @@ class rpg_user {
 
     }
 
+    /**
+     * Define a function for getting the current USER ID, returning 0 if not logged in
+     * @return bool
+     */
+    public static function get_current_userid(){
+
+        // Check if there is a logged in session user
+        if (!empty($_SESSION['GAME']['USER']['userid'])
+            && $_SESSION['GAME']['USER']['userid'] != MMRPG_SETTINGS_GUEST_ID){
+            return $_SESSION['GAME']['USER']['userid'];
+        } else {
+            return false;
+        }
+
+    }
+
 
 }
 ?>
