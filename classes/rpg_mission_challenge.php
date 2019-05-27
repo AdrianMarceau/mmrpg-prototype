@@ -402,10 +402,12 @@ class rpg_mission_challenge extends rpg_mission {
         $this_challenge_description = !empty($challenge_info['challenge_description']) ? $challenge_info['challenge_description'] : '';
 
         // Generate the actual title markup given available fields
+        $field_names1 = explode(' ', $this_field_info1['field_name']);
+        $field_names2 = explode(' ', $this_field_info2['field_name']);
         $this_challenge_title = $this_challenge_name;
         $this_challenge_title .= ' //';
         $this_challenge_title .= ' '.($challenge_info['challenge_kind'] == 'event' ? 'Event' : 'Player').' Challenge';
-        $this_challenge_title .= ' | '.explode(' ', $this_field_info1['field_name'])[0].' '.explode(' ', $this_field_info2['field_name'])[1];
+        $this_challenge_title .= ' | '.$field_names1[0].' '.$field_names2[1];
         if ($challenge_info['challenge_kind'] == 'event'
             && !empty($this_target_data['player_robots'])){
             $first_robot_token = $this_target_data['player_robots'][0]['robot_token'];
