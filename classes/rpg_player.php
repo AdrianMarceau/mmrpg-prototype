@@ -2742,6 +2742,7 @@ class rpg_player extends rpg_object {
         // Collect this player's current challenge selection from the session
         $temp_session_key = $player_info['player_token'].'_target-challenge-missions';
         $player_info['player_challenges_current'] = !empty($_SESSION[$session_token]['values'][$temp_session_key]) ? $_SESSION[$session_token]['values'][$temp_session_key] : array();
+        $player_info['player_challenges_current'] = array_filter($player_info['player_challenges_current']);
 
         // Collect this player's current item selection from the omega session
         $temp_session_key = $player_info['player_token'].'_this-item-omega_prototype';
@@ -2921,6 +2922,35 @@ class rpg_player extends rpg_object {
                         //$temp_user_challenges = rpg_mission_challenge::get_missions($temp_prototype_data, 'user');
                         //$available_challenge_missions = array_merge(array(), $temp_event_challenges);
 
+                        // Collect the admin permissions in case we need them
+                        $temp_admin_permissions = MMRPG_CONFIG_ADMIN_PERMS_LIST != '' ? json_decode(MMRPG_CONFIG_ADMIN_PERMS_LIST, true) : array();
+                        $this_admin_permissions = !empty($temp_admin_permissions[$this_userid]) ? $temp_admin_permissions[$this_userid] : array();
+
+                        // Decide which types of missions we can show here
+                        $include_event_kind = true;
+                        $include_player_kind = false;
+                        $include_hidden = false;
+                        if (MMRPG_USER_IS_ADMIN === true
+                            && (in_array('*', $this_admin_permissions) || in_array('edit_challenges', $this_admin_permissions))){
+                            $include_player_kind = true;
+                            $include_hidden = true;
+                        }
+
+                        // Define the query conditions for collecting missions
+                        $query_conditions = '';
+                        $query_conditions .= 'AND challenges.challenge_flag_published = 1 ';
+                        if ($include_event_kind && $include_player_kind){
+                            $query_conditions .= 'AND (challenges.challenge_kind = \'event\' OR challenges.challenge_kind = \'user\') ';
+                        } elseif ($include_event_kind){
+                            $query_conditions .= 'AND challenges.challenge_kind = \'event\' ';
+                        } elseif ($include_player_kind){
+                            $query_conditions .= 'AND challenges.challenge_kind = \'user\' ';
+                        }
+                        if (!$include_hidden){
+                            if (!empty($this_userid) && $this_userid !== MMRPG_SETTINGS_GUEST_ID){ $query_conditions .= 'AND (challenges.challenge_flag_hidden = 0 OR challenges.challenge_creator = '.$this_userid.')'; }
+                            else { $query_conditions .= 'AND challenges.challenge_flag_hidden = 0'; }
+                        }
+
                         // Pull data from the database given filters and ordering
                         $challenge_fields = rpg_mission_challenge::get_index_fields(true, 'challenges');
                         $available_challenge_missions = $db->get_array_list("SELECT
@@ -2928,10 +2958,7 @@ class rpg_player extends rpg_object {
                             (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS challenge_creator_name
                             FROM mmrpg_challenges AS challenges
                             LEFT JOIN mmrpg_users AS users ON users.user_id = challenges.challenge_creator
-                            WHERE
-                            challenges.challenge_flag_published = 1
-                            AND challenges.challenge_flag_hidden = 0
-                            AND (challenges.challenge_kind = 'event' OR challenges.challenge_kind = 'user')
+                            WHERE 1 = 1 {$query_conditions}
                             ORDER BY
                             FIELD(challenges.challenge_kind, 'event', 'user'),
                             challenges.challenge_creator ASC,
@@ -2959,10 +2986,24 @@ class rpg_player extends rpg_object {
                                 ;", 'challenge_id');
                         }
 
+                        // If challenge missions have not been selected yet, padd-out with recent items
+                        if (empty($player_info['player_challenges_current'])
+                            || count($player_info['player_challenges_current']) < 3
+                            && !empty($available_challenge_missions)){
+                            foreach ($available_challenge_missions AS $challenge_id => $challenge_info){
+                                $player_info['player_challenges_current'][] = $challenge_id;
+                                if (count($player_info['player_challenges_current']) >= 3){ break; }
+                            }
+                            $temp_session_key = $player_info['player_token'].'_target-challenge-missions';
+                            $_SESSION[$session_token]['values'][$temp_session_key] = $player_info['player_challenges_current'];
+                        }
+
                         // Collect
                         //echo('<pre>$challenge_mission_victories = '.print_r($challenge_mission_victories, true).'</pre>');
                         //exit;
                         //echo('<pre>$available_challenge_missions = '.print_r($available_challenge_missions, true).'</pre>');
+                        //exit;
+                        //echo('<pre>$player_info[\'player_challenges_current\'] = '.print_r($player_info['player_challenges_current'], true).'</pre>');
                         //exit;
 
                         ?>
@@ -2984,6 +3025,7 @@ class rpg_player extends rpg_object {
 
                                         // Define the array to hold ALL the reward option markup
                                         $challenge_rewards_options = '';
+                                        //$challenge_rewards_options .= '<option value="0">- Select Mission -</option>';
 
                                         // Don't bother generating the option markup if disabled editing
                                         if ($global_allow_editing
@@ -3017,6 +3059,7 @@ class rpg_player extends rpg_object {
                                                 $challenge_info = $available_challenge_missions[$challenge_id];
                                                 $this_challenge_id = $challenge_info['challenge_id'];
                                                 $this_challenge_name = $challenge_info['challenge_name'];
+                                                if (!empty($challenge_mission_victories[$this_challenge_id])){ $this_challenge_name = '&#9733; '.$this_challenge_name; }
                                                 $this_field_data = json_decode($challenge_info['challenge_field_data'], true);
                                                 $this_field_info1 = $mmrpg_field_index[$this_field_data['field_background']];
                                                 $this_field_info2 = $mmrpg_field_index[$this_field_data['field_foreground']];
@@ -3027,11 +3070,11 @@ class rpg_player extends rpg_object {
                                                 $temp_select_options = str_replace('value="'.$this_challenge_id.'"', 'value="'.$this_challenge_id.'" selected="selected" disabled="disabled"', $challenge_rewards_options);
                                                 $temp_challenge_type_class1 = 'field_type_'.(!empty($this_field_info1['field_type']) ? $this_field_info1['field_type'] : 'none');
                                                 //$temp_challenge_type_class2 = 'field_type_'.(!empty($this_field_info2['field_type']) ? $this_field_info2['field_type'] : 'none');
-                                                $temp_challenge_type_class3 = 'field_type_'.(!empty($this_field_info1['field_type']) ? $this_field_info1['field_type'] : 'none').(!empty($this_field_info2['field_type']) ? '_'.$this_field_info2['field_type'] : 'none');
-                                                if ($global_allow_editing && $temp_allow_challenge_switch){ $this_challenge_title_html = '<label class="field_type  '.$temp_challenge_type_class3.'" style="">'.$this_challenge_title_html.'</label><select class="mission_name" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'">'.$temp_select_options.'</select>'; }
+                                                $temp_challenge_type_class3 = 'field_type_'.(!empty($this_field_info1['field_type']) ? $this_field_info1['field_type'] : 'none').((!empty($this_field_info2['field_type']) && $this_field_info2['field_type'] != 'none' && $this_field_info2['field_type'] != $this_field_info1['field_type']) ? '_'.$this_field_info2['field_type'] : '');
+                                                if ($global_allow_editing && $temp_allow_challenge_switch){ $this_challenge_title_html = '<label class="field_type  '.$temp_challenge_type_class3.'" style="">'.$this_challenge_title_html.'</label><select class="challenge_name" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'">'.$temp_select_options.'</select>'; }
                                                 elseif (!$global_allow_editing && $temp_allow_challenge_switch){ $this_challenge_title_html = '<label class="field_type  '.$temp_challenge_type_class3.'" style="cursor: default !important;">'.$this_challenge_title_html.'</label>'; }
                                                 else { $this_challenge_title_html = '<label class="field_type '.$temp_challenge_type_class3.'" style="cursor: default !important;">'.$this_challenge_title_html.'</label>'; }
-                                                $temp_string[] = '<a class="mission_name challenge_battle field_type '.$temp_challenge_type_class1.'" style="background-image: url(images/fields/'.$this_field_info1['field_token'].'/battle-field_preview.png?'.MMRPG_CONFIG_CACHE_DATE.') !important; '.(($challenge_key + 1) % 3 == 0 ? 'margin-right: 0; ' : '').(!$temp_allow_challenge_switch || !$global_allow_editing ? 'cursor: default !important; ' : '').(!$temp_allow_challenge_switch ? 'opacity: 0.50; filter: alpha(opacity=50); ' : '').'" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" data-challenge="'.$this_challenge_id.'" data-tooltip="'.$this_challenge_title_tooltip.'" data-tooltip-type="field_type '.$temp_challenge_type_class3.'">'.$this_challenge_title_html.'</a>';
+                                                $temp_string[] = '<a class="challenge_name challenge_battle field_type '.$temp_challenge_type_class1.'" style="background-image: url(images/fields/'.$this_field_info1['field_token'].'/battle-field_preview.png?'.MMRPG_CONFIG_CACHE_DATE.') !important; '.(($challenge_key + 1) % 3 == 0 ? 'margin-right: 0; ' : '').(!$temp_allow_challenge_switch || !$global_allow_editing ? 'cursor: default !important; ' : '').(!$temp_allow_challenge_switch ? 'opacity: 0.50; filter: alpha(opacity=50); ' : '').'" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" data-challenge="'.$this_challenge_id.'" data-tooltip="'.$this_challenge_title_tooltip.'" data-tooltip-type="field_type '.$temp_challenge_type_class3.'">'.$this_challenge_title_html.'</a>';
                                                 $challenge_key++;
                                             }
 
@@ -3041,8 +3084,8 @@ class rpg_player extends rpg_object {
                                                     if ($empty_challenge_counter >= 2){ $empty_challenge_disable = true; }
                                                     else { $empty_challenge_disable = false; }
                                                     $temp_select_options = str_replace('value=""', 'value="" selected="selected" disabled="disabled"', $challenge_rewards_options);
-                                                    $this_challenge_title_html = '<label>-</label><select class="mission_name" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" '.($empty_challenge_disable ? 'disabled="disabled" ' : '').'>'.$temp_select_options.'</select>';
-                                                    $temp_string[] = '<a class="mission_name challenge_battle " style="'.(($challenge_key + 1) % 4 == 0 ? 'margin-right: 0; ' : '').($empty_challenge_disable ? 'opacity:0.25; ' : '').'" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" data-challenge="" title="">'.$this_challenge_title_html.'</a>';
+                                                    $this_challenge_title_html = '<label>-</label><select class="challenge_name" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" '.($empty_challenge_disable ? 'disabled="disabled" ' : '').'>'.$temp_select_options.'</select>';
+                                                    $temp_string[] = '<a class="challenge_name challenge_battle " style="'.(($challenge_key + 1) % 4 == 0 ? 'margin-right: 0; ' : '').($empty_challenge_disable ? 'opacity:0.25; ' : '').'" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" data-challenge="" title="">'.$this_challenge_title_html.'</a>';
                                                 }
                                             }
 
@@ -3054,8 +3097,8 @@ class rpg_player extends rpg_object {
                                                 if ($empty_challenge_counter >= 2){ $empty_challenge_disable = true; }
                                                 else { $empty_challenge_disable = false; }
                                                 $temp_select_options = str_replace('value=""', 'value="" selected="selected"', $challenge_rewards_options);
-                                                $this_challenge_title_html = '<label>-</label><select class="mission_name" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" '.($empty_challenge_disable ? 'disabled="disabled" ' : '').'>'.$temp_select_options.'</select>';
-                                                $temp_string[] = '<a class="mission_name challenge_battle " style="'.(($challenge_key + 1) % 3 == 0 ? 'margin-right: 0; ' : '').($empty_challenge_disable ? 'opacity:0.25; ' : '').'" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" data-challenge="" title="">'.$this_challenge_title_html.'</a>';
+                                                $this_challenge_title_html = '<label>-</label><select class="challenge_name" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" '.($empty_challenge_disable ? 'disabled="disabled" ' : '').'>'.$temp_select_options.'</select>';
+                                                $temp_string[] = '<a class="challenge_name challenge_battle " style="'.(($challenge_key + 1) % 3 == 0 ? 'margin-right: 0; ' : '').($empty_challenge_disable ? 'opacity:0.25; ' : '').'" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" data-challenge="" title="">'.$this_challenge_title_html.'</a>';
                                             }
 
                                         }
