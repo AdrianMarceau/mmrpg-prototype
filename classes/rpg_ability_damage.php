@@ -1195,7 +1195,8 @@ class rpg_ability_damage extends rpg_damage {
                                     || in_array($this_ability->ability_type2, $attachment_info['attachment_weaknesses']))
                                 && (!isset($attachment_info['attachment_weaknesses_trigger'])
                                     || $attachment_info['attachment_weaknesses_trigger'] === 'either'
-                                    || $attachment_info['attachment_weaknesses_trigger'] === 'target')
+                                    || ($attachment_info['attachment_weaknesses_trigger'] === 'self' && ($this_robot->robot_id == $target_robot->robot_id))
+                                    || ($attachment_info['attachment_weaknesses_trigger'] === 'target' && ($this_robot->robot_id != $target_robot->robot_id)))
                                     ){
                                 // Check to see if this attachment is part of a group
                                 if (!empty($attachment_info['attachment_group'])){
