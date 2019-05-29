@@ -6,7 +6,7 @@ $ability = array(
     'ability_game' => 'MM10',
     //'ability_group' => 'MM10/Weapons/074',
     'ability_group' => 'MM10/Weapons/073T2',
-    'ability_description' => 'The user surrounds itself with an orbit of eight large water droplets, each acting as a separate shield and the reducing the damage from incoming attacks by {RECOVERY2}%!  Each droplet can only withstand a single attack before fading, but any remaining ones can be thrown at the target for decent damage!',
+    'ability_description' => 'The user surrounds itself with an orbit of eight large water droplets, each acting as a separate shield and the reducing the damage from incoming attacks!  Each droplet can only withstand a single attack before fading, but any remaining ones can be thrown at the target for decent damage!',
     'ability_type' => 'water',
     'ability_type2' => 'shield',
     'ability_energy' => 8,
@@ -144,7 +144,7 @@ $ability = array(
             $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
 
         }
-        // Else if the ability flag was set, leaf shield is thrown and defense is lowered by 30%
+        // Else if the ability flag was set, pieces of the shield are thrown all at once
         else {
 
             // Loop through and throw each piece of the shield
