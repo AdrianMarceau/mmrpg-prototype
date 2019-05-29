@@ -1349,13 +1349,32 @@ class rpg_robot extends rpg_object {
             else { $weights[] = 0;  }
         }
 
-        // Check to see if the target has any damage-resistant cores
+        // Check to see if this robot has any damage-resistant cores or attachments
+        $this_core_shields = array();
+        $this_other_attachments = array();
+        if (!empty($this_robot->robot_attachments)){
+            $temp_attachment_tokens = array_keys($this_robot->robot_attachments);
+            foreach ($temp_attachment_tokens AS $key => $token){
+                if (preg_match('/^ability_core-shield_([a-z]+)$/', $token)){
+                    $this_core_shields[] = str_replace('ability_core-shield_', '', $token);
+                } elseif (preg_match('/^ability_([-a-z]+)_([a-z0-9]+)$/', $token)){
+                    $xtokens = explode('_', $token);
+                    if (!in_array($xtokens[1], $this_other_attachments)){ $this_other_attachments[] = $xtokens[1]; }
+                }
+            }
+        }
+
+        // Check to see if the target has any damage-resistant cores or attachments
         $target_core_shields = array();
+        $target_other_attachments = array();
         if (!empty($target_robot->robot_attachments)){
             $temp_attachment_tokens = array_keys($target_robot->robot_attachments);
             foreach ($temp_attachment_tokens AS $key => $token){
                 if (preg_match('/^ability_core-shield_([a-z]+)$/', $token)){
                     $target_core_shields[] = str_replace('ability_core-shield_', '', $token);
+                } elseif (preg_match('/^ability_([a-z]+)_([a-z]+)$/', $token)){
+                    $xtokens = explode('_', $token);
+                    if (!in_array($xtokens[1], $target_other_attachments)){ $target_other_attachments[] = $xtokens[1]; }
                 }
             }
         }
@@ -1370,6 +1389,10 @@ class rpg_robot extends rpg_object {
                 // Collect ability info and define base chance
                 $info = rpg_ability::parse_index_info($temp_ability_index[$token]);
                 $value = 3;
+
+                // If this is their first ability and it's the first turn, high chance
+                if ($key == 0 && $this_battle->counters['battle_turn'] == 1){ $value *= 100; }
+                elseif ($key == 0){ $value += 10; }
 
                 // If this ability has a type, we can use it to alter chance values
                 if (!empty($info['ability_type'])){
@@ -1396,6 +1419,12 @@ class rpg_robot extends rpg_object {
                         if (in_array($type, $target_core_shields)){ $value *= 0; }
                     }
 
+                }
+
+                // If this ability has already been summoned, reduce/increase the chance of using again
+                if (in_array($info['ability_token'], $this_other_attachments)){
+                    if (!empty($info['ability_damage'])){ $value *= 2; }
+                    else { $value *= 0; }
                 }
 
                 // If this ability is ally-only but we have no allies, set chance at zero
@@ -1434,7 +1463,10 @@ class rpg_robot extends rpg_object {
             $debug_text = '----------'.PHP_EOL.PHP_EOL;
             $debug_text .= 'this_robot('.$this_robot->robot_token.') vs target_robot('.$target_robot->robot_token.')'.PHP_EOL.PHP_EOL;
             $debug_text .= 'this_abilities = '.print_r($this_robot->robot_abilities, true);
+            $debug_text .= 'this_core_shields = '.print_r($this_core_shields, true);
+            $debug_text .= 'this_other_attachments = '.print_r($this_other_attachments, true);
             $debug_text .= 'target_core_shields = '.print_r($target_core_shields, true);
+            $debug_text .= 'target_other_attachments = '.print_r($target_other_attachments, true);
             $debug_text .= '$weights_backup = '.print_r($weights_backup, true);
             $debug_text .= '$options_backup = '.print_r($options_backup, true);
             $debug_text .= '$weights = '.print_r($weights, true);
@@ -1454,8 +1486,19 @@ class rpg_robot extends rpg_object {
             else { return $options_backup[mt_rand(0, (count($options_backup) - 1))];  }
         }
 
-        // Return an ability based on a weighted chance
+        // Pull a specific ability given waited chance
         $ability_token = $this_battle->weighted_chance($options, $weights);
+
+        /*
+        if (MMRPG_CONFIG_IS_LIVE === false){
+            $debug_text = '$ability_token = '.print_r($ability_token, true).PHP_EOL.PHP_EOL;
+            $debug_file = fopen(MMRPG_CONFIG_ROOTDIR.'_cache/aaaa-debug.txt', 'a');
+            fwrite($debug_file, $debug_text);
+            fclose($debug_file);
+        }
+        */
+
+        // Return an ability based on a weighted chance
         return $ability_token;
 
     }
