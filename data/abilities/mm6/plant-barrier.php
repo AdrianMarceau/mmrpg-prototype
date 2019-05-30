@@ -7,7 +7,7 @@ $ability = array(
     //'ability_group' => 'MM06/Weapons/045',
     'ability_group' => 'MM06/Weapons/041T2',
     'ability_image_sheets' => 5,
-    'ability_description' => 'The user surrounds itself with a barrier of four large flower pedals, each acting independantly to protect the user from damage and restore depleted life energy at the end of each turn!  Each pedal can only withstand a single attack before fading, however.',
+    'ability_description' => 'The user surrounds itself with a barrier of four large flower petals, each acting independantly to protect the user from damage and restore depleted life energy at the end of each turn!  Each petal can only withstand a single attack before fading, however.',
     'ability_type' => 'nature',
     'ability_type2' => 'shield',
     'ability_energy' => 8,
@@ -63,11 +63,11 @@ $ability = array(
                 'frame' => 'defend',
                 'rates' => array(100, 0, 0),
                 'success' => array(0, -9999, -9999, -9999,
-                    'A '.$this_ability->print_name().' pedal faded away!<br /> '.
+                    'A '.$this_ability->print_name().' petal faded away!<br /> '.
                     $this_robot->print_name().' lost a bit of protection...'
                     ),
                 'failure' => array(0, -9999, -9999, -9999,
-                    'A '.$this_ability->print_name().' pedal faded away!<br /> '.
+                    'A '.$this_ability->print_name().' petal faded away!<br /> '.
                     $this_robot->print_name().' lost a bit of protection...'
                     )
                 ),
@@ -81,8 +81,8 @@ $ability = array(
                 'modifiers' => true,
                 'frame' => 'summon',
                 'rates' => array(100, 0, 0),
-                'success' => array(1, -5, 5, -10, 'One of the '.$this_ability->print_name().'\'s pedals healed its owner!'),
-                'failure' => array(1, -5, 5, -99, 'One of the '.$this_ability->print_name().'\'s pedals healed its owner!'),
+                'success' => array(1, -5, 5, -10, 'One of the '.$this_ability->print_name().'\'s petals healed its owner!'),
+                'failure' => array(1, -5, 5, -99, 'One of the '.$this_ability->print_name().'\'s petals healed its owner!'),
                 'options' => array(
                     'apply_modifiers' => false,
                     'referred_recovery' => true,
@@ -158,10 +158,10 @@ $ability = array(
                 'type2' => '',
                 'percent' => true,
                 'rates' => array(100, 0, 0),
-                'success' => array(2, -10, 0, -10, 'The barrier\'s pedals restored '.$this_robot->print_name().'\'s energy!'),
-                'failure' => array(2, -10, 0, -10, $this_robot->print_name().'\'s energy was not affected by the pedals&hellip;')
+                'success' => array(2, -10, 0, -10, 'The barrier\'s petals restored '.$this_robot->print_name().'\'s energy!'),
+                'failure' => array(2, -10, 0, -10, $this_robot->print_name().'\'s energy was not affected by the petals&hellip;')
                 ));
-            $energy_recovery_amount = ceil($this_robot->robot_base_energy * (($this_ability->ability_recovery2 * $num_shield_pieces) / 100));
+            $energy_recovery_amount = ceil($this_robot->robot_base_energy * (($this_ability->ability_recovery2 * $num_shield_pieces * 2) / 100));
             $this_robot->trigger_recovery($this_robot, $this_ability, $energy_recovery_amount);
 
         }
@@ -198,7 +198,7 @@ $ability = array(
                                 'type2' => '',
                                 'percent' => true,
                                 'rates' => array(100, 0, 0),
-                                'success' => array(2, -10, 0, -10, (empty($boost_count) ? 'A' : 'Another').' pedal restored '.$this_robot->print_name().'\'s energy!'),
+                                'success' => array(2, -10, 0, -10, (empty($boost_count) ? 'A' : 'Another').' petal restored '.$this_robot->print_name().'\'s energy!'),
                                 'failure' => array(2, -10, 0, -10, '')
                                 ));
                             $energy_recovery_amount = ceil($this_robot->robot_base_energy * ($this_ability->ability_recovery2 / 100));
