@@ -463,6 +463,7 @@ class rpg_mission_challenge extends rpg_mission {
         $this_challenge_field_type1 = !empty($this_field_info1['field_type']) ? $this_field_info1['field_type'] : 'none';
         $this_challenge_field_type2 = !empty($this_field_info2['field_type']) ? $this_field_info2['field_type'] : 'none';
 
+        // Generate the challenge label that shows up in the option
         $this_challenge_label = $challenge_info['challenge_name'];
         if ($challenge_info['challenge_kind'] == 'event'
             && !empty($this_target_data['player_robots'])){
@@ -473,6 +474,13 @@ class rpg_mission_challenge extends rpg_mission {
             && !empty($challenge_info['challenge_creator_name'])){
             $this_challenge_label .= ' | By '.$challenge_info['challenge_creator_name'];
         }
+
+        // Check to see if this is a new challenge (relatively speaking)
+        $date_created = $challenge_info['challenge_date_created'];
+        $time_online = time() - $date_created;
+        $new_theshold = 60 * 60 * 24 * 7;
+        $is_new = $time_online <= $new_theshold ? true : false;
+        if ($is_new){ $this_challenge_label = '(New!) '.$this_challenge_label; }
 
         if (!empty($challenge_victories_index[$this_challenge_id])){
             $victory_results = $challenge_victories_index[$this_challenge_id];
