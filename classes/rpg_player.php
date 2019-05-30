@@ -2758,11 +2758,14 @@ class rpg_player extends rpg_object {
         elseif (!empty($player_info['player_defense'])){ $player_info['player_stat_type'] = 'defense'; }
         elseif (!empty($player_info['player_speed'])){ $player_info['player_stat_type'] = 'speed'; }
 
+        // Check to see if anyone has finished the prototype yet
+        $temp_prototype_complete = mmrpg_prototype_complete();
+
         // Define whether or not challenge switching is enabled
-        $temp_allow_challenge_switch = mmrpg_prototype_item_unlocked('wily-program');
+        $temp_allow_challenge_switch = $temp_prototype_complete && mmrpg_prototype_item_unlocked('wily-program');
 
         // Define whether or not field switching is enabled
-        $temp_allow_field_switch = mmrpg_prototype_item_unlocked('cossack-program');
+        $temp_allow_field_switch = $temp_prototype_complete && mmrpg_prototype_item_unlocked('cossack-program');
 
         // Collect a temp robot object for printing items
         if ($player_info['player_token'] == 'dr-light'){
