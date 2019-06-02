@@ -323,29 +323,36 @@ function mmrpg_website_print_online($this_leaderboard_online_players = array(), 
 
 // Define a function for collecting active sessions, optionally filtered by page
 function mmrpg_website_sessions_active($session_href = '', $session_timeout = 3, $strict_filtering = false){
+
     // Import required global variables
     global $db, $this_userid;
-    // Define the timeouts for active sessions
-    $this_time = time();
-    $min_time = strtotime('-'.$session_timeout.' minutes', $this_time);
-    // If we're not using strict filtering, just collect normally
-    if (!$strict_filtering){
-        // Collect any sessions that are active and match the query
-        $inner_href_query = !empty($session_href) ? "AND session_href LIKE '{$session_href}%'" : '';
-        $active_sessions = $db->get_array_list("SELECT DISTINCT user_id, session_href FROM mmrpg_sessions WHERE session_access >= {$min_time} {$inner_href_query} ORDER BY session_access DESC", 'user_id');
+
+    // Pull all active sessions from the DB if not done so already
+    static $saved_active_sessions;
+    if (empty($saved_active_sessions)){
+        $this_time = time();
+        $min_time = strtotime('-'.$session_timeout.' minutes', $this_time);
+        $saved_active_sessions = $db->get_array_list("SELECT
+            DISTINCT user_id,
+            session_href
+            FROM mmrpg_sessions
+            WHERE session_access >= {$min_time}
+            ORDER BY session_access ASC
+            ;", 'user_id');
     }
-    // Otherwise, we have to excluce users who have since visited other pages
-    else {
-        // Collect any sessions that are active and match the query
-        $active_sessions = $db->get_array_list("SELECT DISTINCT user_id, session_href FROM mmrpg_sessions WHERE session_access >= {$min_time} ORDER BY session_access ASC", 'user_id');
-        if (!empty($active_sessions) && !empty($session_href)){
-            foreach ($active_sessions AS $key => $session){
-                if (!preg_match('/^'.str_replace("/", "\/", $session_href).'/i', $session['session_href'])){
-                    unset($active_sessions[$key]);
-                }
+
+    // Clone the saved active sessions arrray, then filter
+    $active_sessions = !empty($saved_active_sessions) ? $saved_active_sessions : array();
+    if (!empty($active_sessions) && !empty($session_href)){
+        if ($strict_filtering){ $session_href_pattern = '/^'.str_replace("/", "\/", rtrim($session_href, '/')).'\/$/i'; }
+        else { $session_href_pattern = '/^'.str_replace("/", "\/", rtrim($session_href, '/')).'\//i'; }
+        foreach ($active_sessions As $key => $session){
+            if (!preg_match($session_href_pattern, $session['session_href'])){
+                unset($active_sessions[$key]);
             }
         }
     }
+
     // Return the active session count if not empty
     return !empty($active_sessions) ? $active_sessions : array();
 }
