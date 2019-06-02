@@ -845,17 +845,31 @@ class rpg_item extends rpg_object {
             $temp_where .= 'OR item_token IN ('.$include_tokens.') ';
         }
 
+        // Define a static array for cached queries
+        static $index_cache = array();
+
+        // Define the static token for this query
+        $cache_token = md5($temp_where);
+
+        // If already found, return the collected index directly, else collect from DB
+        if (!empty($index_cache[$cache_token])){
+
+            // Return the cached index array
+            return $index_cache[$cache_token];
+
+        }
+
         // Collect every type's info from the database index
         $item_fields = self::get_index_fields(true);
         $item_index = $db->get_array_list("SELECT {$item_fields} FROM mmrpg_index_items WHERE item_id <> 0 {$temp_where};", 'item_token');
 
         // Parse and return the data if not empty, else nothing
-        if (!empty($item_index)){
-            $item_index = self::parse_index($item_index);
-            return $item_index;
-        } else {
-            return array();
-        }
+        if (!empty($item_index)){ $item_index = self::parse_index($item_index); }
+        else { $item_index = array(); }
+
+        // Return the cached index array
+        $index_cache[$cache_token] = $item_index;
+        return $index_cache[$cache_token];
 
     }
 
@@ -914,20 +928,29 @@ class rpg_item extends rpg_object {
     // Define a public function for collecting index data from the database
     public static function get_index_info($item_token){
 
-        // Pull in global variables
-        $db = cms_database::get_database();
+        // If empty, return nothing
+        if (empty($item_token)){ return false; };
 
-        // Collect this item's info from the database index
-        $lookup = !is_numeric($item_token) ? "item_token = '{$item_token}'" : "item_id = {$item_token}";
-        $item_fields = self::get_index_fields(true);
-        $item_index = $db->get_array("SELECT {$item_fields} FROM mmrpg_index_items WHERE {$lookup};", 'item_token');
+        // Collect a local copy of the item index
+        static $item_index = false;
+        static $item_index_byid = false;
+        if ($item_index === false){
+            $item_index_byid = array();
+            $item_index = self::get_index(true, true);
+            if (empty($item_index)){ $item_index = array(); }
+            foreach ($item_index AS $token => $item){ $item_index_byid[$item['item_id']] = $token; }
+        }
 
-        // Parse and return the data if not empty, else nothing
-        if (!empty($item_index)){
-            $item_index = self::parse_index_info($item_index);
-            return $item_index;
+        // Return either by token or by ID if number provided
+        if (is_numeric($item_token)){
+            // Search by item ID
+            $item_id = $item_token;
+            if (!empty($item_index_byid[$item_id])){ return $item_index[$item_index_byid[$item_id]]; }
+            else { return false; }
         } else {
-            return array();
+            // Search by item TOKEN
+            if (!empty($item_index[$item_token])){ return $item_index[$item_token]; }
+            else { return false; }
         }
 
     }
