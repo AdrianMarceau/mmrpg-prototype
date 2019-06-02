@@ -1,7 +1,7 @@
 <?
 
 // Collect and define the display limit if set
-$this_display_limit_default = 50;
+$this_display_limit_default = !empty($this_display_limit_default) ? $this_display_limit_default : 200;
 $this_display_limit = !empty($_GET['limit']) ? trim($_GET['limit']) : $this_display_limit_default;
 $this_start_key = !empty($_GET['start']) ? trim($_GET['start']) : 0;
 
@@ -157,6 +157,9 @@ if (MMRPG_CONFIG_CACHE_INDEXES && file_exists($this_cache_filedir)){
 
         // Collect the output into the buffer
         $this_gallery_xml[] = trim(ob_get_clean());
+
+        // If we're over the limit we should break
+        if ($image_counter >= $this_display_limit_default){ break; }
 
       }
 

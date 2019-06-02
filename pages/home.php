@@ -109,13 +109,13 @@ $temp_leaderboard_online_count = !empty($temp_leaderboard_online) ? count($temp_
 <?
 
 // Require the gallery data for display
+$this_display_limit_default = 16;
 require_once(MMRPG_CONFIG_ROOTDIR.'includes/gallery.php');
 
 ?>
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
     <span class="subheader_typewrapper">
         <a class="inline_link" href="gallery/">Screenshot Gallery </a>
-        <span class="count">( <?= !empty($this_file_count) ? ($this_file_count == 1 ? '1 Image' : $this_file_count.' Images') : '0 Images' ?> )</span>
         <a class="float_link" href="gallery/">More Images &raquo;</a>
     </span>
 </h2>
