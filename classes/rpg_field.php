@@ -208,17 +208,31 @@ class rpg_field extends rpg_object {
         if (!$include_unpublished){ $temp_where .= 'AND field_flag_published = 1 '; }
         if (!$include_incomplete){ $temp_where .= 'AND field_flag_complete = 1 '; }
 
+        // Define a static array for cached queries
+        static $index_cache = array();
+
+        // Define the static token for this query
+        $cache_token = md5($temp_where);
+
+        // If already found, return the collected index directly, else collect from DB
+        if (!empty($index_cache[$cache_token])){
+
+            // Return the cached index array
+            return $index_cache[$cache_token];
+
+        }
+
         // Collect every type's info from the database index
         $field_fields = self::get_index_fields(true);
         $field_index = $db->get_array_list("SELECT {$field_fields} FROM mmrpg_index_fields WHERE field_id <> 0 {$temp_where};", 'field_token');
 
         // Parse and return the data if not empty, else nothing
-        if (!empty($field_index)){
-            $field_index = self::parse_index($field_index);
-            return $field_index;
-        } else {
-            return array();
-        }
+        if (!empty($field_index)){ $field_index = self::parse_index($field_index); }
+        else { $field_index = array(); }
+
+        // Return the cached index array
+        $index_cache[$cache_token] = $field_index;
+        return $index_cache[$cache_token];
 
     }
 
@@ -278,20 +292,29 @@ class rpg_field extends rpg_object {
     // Define a public function for collecting index data from the database
     public static function get_index_info($field_token){
 
-        // Pull in global variables
-        $db = cms_database::get_database();
+        // If empty, return nothing
+        if (empty($field_token)){ return false; };
 
-        // Collect this field's info from the database index
-        $lookup = !is_numeric($field_token) ? "field_token = '{$field_token}'" : "field_id = {$field_token}";
-        $field_fields = self::get_index_fields(true);
-        $field_index = $db->get_array("SELECT {$field_fields} FROM mmrpg_index_fields WHERE {$lookup};", 'field_token');
+        // Collect a local copy of the field index
+        static $field_index = false;
+        static $field_index_byid = false;
+        if ($field_index === false){
+            $field_index_byid = array();
+            $field_index = self::get_index(true, true);
+            if (empty($field_index)){ $field_index = array(); }
+            foreach ($field_index AS $token => $field){ $field_index_byid[$field['field_id']] = $token; }
+        }
 
-        // Parse and return the data if not empty, else nothing
-        if (!empty($field_index)){
-            $field_index = self::parse_index_info($field_index);
-            return $field_index;
+        // Return either by token or by ID if number provided
+        if (is_numeric($field_token)){
+            // Search by field ID
+            $field_id = $field_token;
+            if (!empty($field_index_byid[$field_id])){ return $field_index[$field_index_byid[$field_id]]; }
+            else { return false; }
         } else {
-            return array();
+            // Search by field TOKEN
+            if (!empty($field_index[$field_token])){ return $field_index[$field_token]; }
+            else { return false; }
         }
 
     }
