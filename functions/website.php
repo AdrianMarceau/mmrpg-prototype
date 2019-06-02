@@ -328,8 +328,8 @@ function mmrpg_website_sessions_active($session_href = '', $session_timeout = 3,
     global $db, $this_userid;
 
     // Pull all active sessions from the DB if not done so already
-    static $saved_active_sessions;
-    if (empty($saved_active_sessions)){
+    static $saved_active_sessions = false;
+    if ($saved_active_sessions === false){
         $this_time = time();
         $min_time = strtotime('-'.$session_timeout.' minutes', $this_time);
         $saved_active_sessions = $db->get_array_list("SELECT
@@ -339,6 +339,7 @@ function mmrpg_website_sessions_active($session_href = '', $session_timeout = 3,
             WHERE session_access >= {$min_time}
             ORDER BY session_access ASC
             ;", 'user_id');
+        if (empty($saved_active_sessions)){ $saved_active_sessions = array(); }
     }
 
     // Clone the saved active sessions arrray, then filter
