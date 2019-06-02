@@ -856,19 +856,34 @@ class rpg_ability extends rpg_object {
             $temp_where .= 'OR ability_token IN ('.$include_tokens.') ';
         }
 
+        // Define a static array for cached queries
+        static $index_cache = array();
+
+        // Define the static token for this query
+        $cache_token = md5($temp_where);
+
+        // If already found, return the collected index directly, else collect from DB
+        if (!empty($index_cache[$cache_token])){
+
+            // Return the cached index array
+            return $index_cache[$cache_token];
+
+        }
+
         // Collect every type's info from the database index
         $ability_fields = self::get_index_fields(true);
         $ability_index = $db->get_array_list("SELECT {$ability_fields} FROM mmrpg_index_abilities WHERE ability_id <> 0 {$temp_where};", 'ability_token');
 
         // Parse and return the data if not empty, else nothing
-        if (!empty($ability_index)){
-            $ability_index = self::parse_index($ability_index);
-            return $ability_index;
-        } else {
-            return array();
-        }
+        if (!empty($ability_index)){ $ability_index = self::parse_index($ability_index); }
+        else { $ability_index = array(); }
+
+        // Return the cached index array
+        $index_cache[$cache_token] = $ability_index;
+        return $index_cache[$cache_token];
 
     }
+
 
     /**
      * Get the tokens for all abilities in the global index
@@ -925,20 +940,29 @@ class rpg_ability extends rpg_object {
     // Define a public function for collecting index data from the database
     public static function get_index_info($ability_token){
 
-        // Pull in global variables
-        $db = cms_database::get_database();
+        // If empty, return nothing
+        if (empty($ability_token)){ return false; };
 
-        // Collect this ability's info from the database index
-        $lookup = !is_numeric($ability_token) ? "ability_token = '{$ability_token}'" : "ability_id = {$ability_token}";
-        $ability_fields = self::get_index_fields(true);
-        $ability_index = $db->get_array("SELECT {$ability_fields} FROM mmrpg_index_abilities WHERE {$lookup};", 'ability_token');
+        // Collect a local copy of the ability index
+        static $ability_index = false;
+        static $ability_index_byid = false;
+        if ($ability_index === false){
+            $ability_index_byid = array();
+            $ability_index = self::get_index(true, true);
+            if (empty($ability_index)){ $ability_index = array(); }
+            foreach ($ability_index AS $token => $ability){ $ability_index_byid[$ability['ability_id']] = $token; }
+        }
 
-        // Parse and return the data if not empty, else nothing
-        if (!empty($ability_index)){
-            $ability_index = self::parse_index_info($ability_index);
-            return $ability_index;
+        // Return either by token or by ID if number provided
+        if (is_numeric($ability_token)){
+            // Search by ability ID
+            $ability_id = $ability_token;
+            if (!empty($ability_index_byid[$ability_id])){ return $ability_index[$ability_index_byid[$ability_id]]; }
+            else { return false; }
         } else {
-            return array();
+            // Search by ability TOKEN
+            if (!empty($ability_index[$ability_token])){ return $ability_index[$ability_token]; }
+            else { return false; }
         }
 
     }
