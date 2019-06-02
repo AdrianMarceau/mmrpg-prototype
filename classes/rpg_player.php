@@ -1730,17 +1730,31 @@ class rpg_player extends rpg_object {
         if (!$include_hidden){ $temp_where .= 'AND player_flag_hidden = 0 '; }
         if (!$include_unpublished){ $temp_where .= 'AND player_flag_published = 1 '; }
 
+        // Define a static array for cached queries
+        static $index_cache = array();
+
+        // Define the static token for this query
+        $cache_token = md5($temp_where);
+
+        // If already found, return the collected index directly, else collect from DB
+        if (!empty($index_cache[$cache_token])){
+
+            // Return the cached index array
+            return $index_cache[$cache_token];
+
+        }
+
         // Collect every type's info from the database index
         $player_fields = self::get_index_fields(true);
         $player_index = $db->get_array_list("SELECT {$player_fields} FROM mmrpg_index_players WHERE player_id <> 0 {$temp_where};", 'player_token');
 
         // Parse and return the data if not empty, else nothing
-        if (!empty($player_index)){
-            $player_index = self::parse_index($player_index);
-            return $player_index;
-        } else {
-            return array();
-        }
+        if (!empty($player_index)){ $player_index = self::parse_index($player_index); }
+        else { $player_index = array(); }
+
+        // Return the cached index array
+        $index_cache[$cache_token] = $player_index;
+        return $index_cache[$cache_token];
 
     }
 
@@ -1799,20 +1813,29 @@ class rpg_player extends rpg_object {
     // Define a public function for collecting index data from the database
     public static function get_index_info($player_token){
 
-        // Pull in global variables
-        $db = cms_database::get_database();
+        // If empty, return nothing
+        if (empty($player_token)){ return false; };
 
-        // Collect this player's info from the database index
-        $lookup = !is_numeric($player_token) ? "player_token = '{$player_token}'" : "player_id = {$player_token}";
-        $player_fields = self::get_index_fields(true);
-        $player_index = $db->get_array("SELECT {$player_fields} FROM mmrpg_index_players WHERE {$lookup};", 'player_token');
+        // Collect a local copy of the player index
+        static $player_index = false;
+        static $player_index_byid = false;
+        if ($player_index === false){
+            $player_index_byid = array();
+            $player_index = self::get_index(true, true);
+            if (empty($player_index)){ $player_index = array(); }
+            foreach ($player_index AS $token => $player){ $player_index_byid[$player['player_id']] = $token; }
+        }
 
-        // Parse and return the data if not empty, else nothing
-        if (!empty($player_index)){
-            $player_index = self::parse_index_info($player_index);
-            return $player_index;
+        // Return either by token or by ID if number provided
+        if (is_numeric($player_token)){
+            // Search by player ID
+            $player_id = $player_token;
+            if (!empty($player_index_byid[$player_id])){ return $player_index[$player_index_byid[$player_id]]; }
+            else { return false; }
         } else {
-            return array();
+            // Search by player TOKEN
+            if (!empty($player_index[$player_token])){ return $player_index[$player_token]; }
+            else { return false; }
         }
 
     }
@@ -2123,6 +2146,9 @@ class rpg_player extends rpg_object {
 
         // Define the sprite frame index for robot images
         $player_sprite_frames = array('base','taunt','victory','defeat','command','damage','base2');
+
+        // Define the player header types
+        $player_header_types = 'player_type_'.$player_type_token;
 
         // Define the markup variable
         $this_markup = '';
