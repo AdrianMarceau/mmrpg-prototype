@@ -2337,17 +2337,31 @@ class rpg_robot extends rpg_object {
             $temp_where .= 'OR robot_token IN ('.$include_tokens.') ';
         }
 
+        // Define a static array for cached queries
+        static $index_cache = array();
+
+        // Define the static token for this query
+        $cache_token = md5($temp_where);
+
+        // If already found, return the collected index directly, else collect from DB
+        if (!empty($index_cache[$cache_token])){
+
+            // Return the cached index array
+            return $index_cache[$cache_token];
+
+        }
+
         // Collect every type's info from the database index
         $robot_fields = self::get_index_fields(true);
         $robot_index = $db->get_array_list("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_id <> 0 {$temp_where};", 'robot_token');
 
         // Parse and return the data if not empty, else nothing
-        if (!empty($robot_index)){
-            $robot_index = self::parse_index($robot_index);
-            return $robot_index;
-        } else {
-            return array();
-        }
+        if (!empty($robot_index)){ $robot_index = self::parse_index($robot_index); }
+        else { $robot_index = array(); }
+
+        // Return the cached index array
+        $index_cache[$cache_token] = $robot_index;
+        return $index_cache[$cache_token];
 
     }
 
@@ -2410,20 +2424,29 @@ class rpg_robot extends rpg_object {
     // Define a public function for collecting index data from the database
     public static function get_index_info($robot_token){
 
-        // Pull in global variables
-        $db = cms_database::get_database();
+        // If empty, return nothing
+        if (empty($robot_token)){ return false; };
 
-        // Collect this robot's info from the database index
-        $lookup = !is_numeric($robot_token) ? "robot_token = '{$robot_token}'" : "robot_id = {$robot_token}";
-        $robot_fields = self::get_index_fields(true);
-        $robot_index = $db->get_array("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE {$lookup};", 'robot_token');
+        // Collect a local copy of the robot index
+        static $robot_index = false;
+        static $robot_index_byid = false;
+        if ($robot_index === false){
+            $robot_index_byid = array();
+            $robot_index = self::get_index(true, true);
+            if (empty($robot_index)){ $robot_index = array(); }
+            foreach ($robot_index AS $token => $robot){ $robot_index_byid[$robot['robot_id']] = $token; }
+        }
 
-        // Parse and return the data if not empty, else nothing
-        if (!empty($robot_index)){
-            $robot_index = self::parse_index_info($robot_index);
-            return $robot_index;
+        // Return either by token or by ID if number provided
+        if (is_numeric($robot_token)){
+            // Search by robot ID
+            $robot_id = $robot_token;
+            if (!empty($robot_index_byid[$robot_id])){ return $robot_index[$robot_index_byid[$robot_id]]; }
+            else { return false; }
         } else {
-            return array();
+            // Search by robot TOKEN
+            if (!empty($robot_index[$robot_token])){ return $robot_index[$robot_token]; }
+            else { return false; }
         }
 
     }
