@@ -154,6 +154,8 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
 }
 
 // Define the array for pulling all the leaderboard data
+$this_limit_query = '';
+if ($this_current_page == 'home'){ $this_limit_query = "LIMIT {$this_display_limit_default} "; }
 $this_online_timeout = MMRPG_SETTINGS_ONLINE_TIMEOUT;
 $temp_leaderboard_query = "SELECT
     users.user_id,
@@ -203,7 +205,8 @@ $temp_leaderboard_query = "SELECT
     ORDER BY
     board.board_points DESC,
     saves.save_date_modified DESC
-    ";
+    {$this_limit_query}
+    ;";
 
 // Query the database and collect the array list of all non-bogus players
 $this_leaderboard_index = $db->get_array_list($temp_leaderboard_query);
@@ -217,6 +220,20 @@ $this_leaderboard_online_count = 0;
 $this_leaderboard_online_players = array();
 $this_leaderboard_online_pages = array();
 $this_leaderboard_markup = array();
+
+// If we're on the home page, we need to collect count independantly
+if ($this_current_page == 'home'){
+    $this_leaderboard_count = $db->get_value("SELECT
+    COUNT(*) AS num_players
+    FROM mmrpg_users AS users
+    LEFT JOIN mmrpg_leaderboard AS board ON users.user_id = board.user_id
+    LEFT JOIN mmrpg_saves AS saves ON saves.user_id = board.user_id
+    WHERE board.board_points > 0
+    ORDER BY
+    board.board_points DESC,
+    saves.save_date_modified DESC
+    ;", 'num_players');
+}
 
 // Ensure the leaderboard array is not empty before continuing
 if (!empty($this_leaderboard_index)){
