@@ -70,12 +70,14 @@ ob_start();
 // Require the leaderboard data for display
 $this_display_limit_default = 3;
 require(MMRPG_CONFIG_ROOTDIR.'includes/leaderboard.php');
+$temp_leaderboard_online = mmrpg_prototype_leaderboard_online();
+$temp_leaderboard_online_count = !empty($temp_leaderboard_online) ? count($temp_leaderboard_online) : 0;
 
 ?>
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
     <span class="subheader_typewrapper">
         <a class="inline_link" href="leaderboard/">Prototype Leaderboard</a>
-        <span class="count">( <?= (!empty($this_leaderboard_count) ? ($this_leaderboard_count == 1 ? '1 Player' : $this_leaderboard_count.' Players') : '0 Players').($this_leaderboard_online_count > 0 ? ' <span style="opacity: 0.25;">|</span> <span style="text-shadow: 0 0 5px lime;">'.$this_leaderboard_online_count.' Online</span>' : '') ?> )</span>
+        <span class="count">( <?= (!empty($this_leaderboard_count) ? ($this_leaderboard_count == 1 ? '1 Player' : $this_leaderboard_count.' Players') : '0 Players').($temp_leaderboard_online_count > 0 ? ' <span style="opacity: 0.25;">|</span> <span style="text-shadow: 0 0 5px lime;">'.$temp_leaderboard_online_count.' Online</span>' : '') ?> )</span>
         <a class="float_link" href="leaderboard/">More Players &raquo;</a>
     </span>
 </h2>
