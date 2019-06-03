@@ -143,15 +143,16 @@ require_once(MMRPG_CONFIG_ROOTDIR.'includes/gallery.php');
 <?
 
 // Collect a list and count of all threads in this category
+$thread_display_limit = 6;
+$thread_display_count = 0;
 $this_category_info = array('category_id' => 1, 'category_token' => 'news');
-$this_threads_array = mmrpg_website_community_category_threads($this_category_info, true);
+$this_threads_array = mmrpg_website_community_category_threads($this_category_info, true, false, $thread_display_limit);
 $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) : 0;
 
 ?>
 <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
     <span class="subheader_typewrapper">
         <a class="inline_link" href="community/news/">News &amp; Updates </a>
-        <span class="count">( <?= !empty($this_threads_count) ? ($this_threads_count == 1 ? '1 Post' : $this_threads_count.' Posts') : '0 Posts' ?> )</span>
         <a class="float_link" href="community/news/">More Posts &raquo;</a>
     </span>
 </h2>
@@ -168,16 +169,14 @@ $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) :
 
     // Loop through the thread array and display its contents
     if (!empty($this_threads_array)){
-        $temp_display_limit = 6;
-        $temp_display_count = 0;
         foreach ($this_threads_array AS $this_thread_key => $this_thread_info){
 
             // Print out the thread link block
             echo mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread_info, true, true);
-            $temp_display_count++;
+            $thread_display_count++;
 
             // Break if over the limit
-            if ($temp_display_count >= $temp_display_limit){ break; }
+            if ($thread_display_count >= $thread_display_limit){ break; }
 
         }
     }
