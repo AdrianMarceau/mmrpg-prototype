@@ -36,7 +36,8 @@ class cms_database {
         //$this->CONNECT = $this->db_select();
         //if ($this->CONNECT === false){ $this->CONNECT = false; return $this->CONNECT; }
         // Set the names and character set
-        $this->CONNECT = $this->query("SET NAMES {$this->CHARSET};");
+        //$this->CONNECT = $this->query("SET NAMES {$this->CHARSET};");
+        $this->CONNECT = $this->LINK->set_charset($this->CHARSET);
         if ($this->CONNECT === false){ $this->CONNECT = false; return $this->CONNECT; }
         // Clear any links or whatever this function does not
         $this->CONNECT = $this->clear();
