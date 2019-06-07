@@ -3284,24 +3284,35 @@ body.mobileFlag_landscapeMode #window .page .event .option_this-team-select .chr
     overflow: hidden;
 }
 #window .page_home .gallery .wrapper {
-    max-height: 130px;
     margin-bottom: 6px;
-}
-body.windowFlag_landscapeMode #window .page_home .gallery .wrapper {
-    max-height: 160px;
 }
 #window .page .gallery .wrapper_full {
     height: auto;
     overflow: hidden;
 }
 
-#window .page .gallery .dateblock,
-#window .page .gallery .screenshot {
+#window .page .gallery .row {
     display: block;
-    float: left;
-    margin: 0 5px 5px 0;
-    width: 100px;
-    height: 60px;
+    float: none;
+    clear: both;
+    width: auto;
+    height: auto;
+    margin: 0 auto 20px;
+    padding: 0;
+    text-align: left;
+}
+#window .page .gallery .row:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+#window .page .gallery .dateblock {
+    display: block;
+    float: none;
+    clear: both;
+    width: auto;
+    height: auto;
     background-color: rgba(0, 0, 0, 0.20);
     border: 1px solid rgba(0, 0, 0, 0.15);
     border-radius: 0.5em;
@@ -3309,27 +3320,50 @@ body.windowFlag_landscapeMode #window .page_home .gallery .wrapper {
     -webkit-border-radius: 0.5em;
     overflow: hidden;
     position: relative;
+    padding: 5px 10px;
+    text-align: left;
+    color: #FFFFFF;
+    font-size: 120%;
+    line-height: 1.2;
+    margin: 0 0 5px;
+}
+
+#window .page .gallery .screenshot {
+    display: block;
+    box-sizing: border-box;
+    float: left;
+    margin: 0 5px 5px 0;
+    width: 100px;
+    width: calc((100% / 8) - 5px);
+    max-width: 122px;
+    max-height: 75px;
+    height: auto;
+    background-color: rgba(0, 0, 0, 0.20);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    overflow: hidden;
+    position: relative;
+    vertical-align: top;
+}
+#window .page .gallery .screenshot {
+    display: inline-block;
+    float: none;
+    margin: 0 2px 4px;
 }
 #window .page .gallery .screenshot:hover {
     border: 1px solid rgba(10, 10, 10, 0.15);
 }
-body.windowFlag_landscapeMode #window .page .gallery .dateblock,
-body.windowFlag_landscapeMode #window .page .gallery .screenshot {
-    width: 120px;
-    height: 70px;
-    margin: 0 4px 4px 0;
-}
+
 #window .page .gallery .screenshot img {
     display: block;
     margin: 0;
-    width: 100px;
+    width: 100%;
     opacity: 0.75;
 }
 #window .page .gallery .screenshot:hover img {
     opacity: 1.00;
-}
-body.windowFlag_landscapeMode #window .page .gallery .screenshot img {
-    width: 120px;
 }
 #window .page .gallery .screenshot .title,
 #window .page .gallery .screenshot .date {
