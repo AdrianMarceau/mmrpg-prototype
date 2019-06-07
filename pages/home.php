@@ -139,7 +139,6 @@ require_once(MMRPG_CONFIG_ROOTDIR.'includes/gallery.php');
     ?>
     </div>
 </div>
-
 <?
 
 // Collect a list and count of all threads in this category
@@ -184,6 +183,8 @@ $this_threads_count = !empty($this_threads_array) ? count($this_threads_array) :
     ?>
 </div>
 <?
+
+
 // Collect the buffer and define the page markup
 $this_markup_body = trim(preg_replace('#\s+#', ' ', ob_get_clean()));
 ?>

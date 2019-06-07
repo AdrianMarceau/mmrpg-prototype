@@ -40,16 +40,13 @@ body:before {
         margin-left: 560px !important;
     }
     #window .page_home .gallery .wrapper {
-        max-height: 160px;
+
     }
-    #window .page .gallery .dateblock,
     #window .page .gallery .screenshot {
-        width: 120px;
-        height: 70px;
-        margin: 0 4px 4px 0;
+
     }
     #window .page .gallery .screenshot img {
-        width: 120px;
+
     }
     #window .page .subbody .float_link .sprite,
     #window .page .subbody .float.link .sprite {
@@ -1344,9 +1341,11 @@ body:before {
         margin: 0 auto 9px;
     }
 
-    #window .page .gallery .dateblock,
+    #window .page_home .gallery .wrapper {
+        text-align: center;
+    }
     #window .page .gallery .screenshot {
-        width: 93px;
+        width: calc((100% / 4) - 5px);
     }
 
     #mmrpg #credits {
