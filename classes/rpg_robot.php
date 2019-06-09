@@ -615,6 +615,7 @@ class rpg_robot extends rpg_object {
 
     public function get_frame(){ return $this->get_info('robot_frame'); }
     public function set_frame($value){ $this->set_info('robot_frame', $value); }
+    public function reset_frame(){ $this->set_info('robot_frame', 'base'); }
 
     public function get_frame_offset(){
         $args = func_get_args();
