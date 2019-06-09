@@ -208,7 +208,7 @@ class rpg_battle extends rpg_object {
         $this->battle_counts = isset($this_battleinfo['battle_counts']) ? $this_battleinfo['battle_counts'] : true;
         $this->battle_status = isset($this_battleinfo['battle_status']) ? $this_battleinfo['battle_status'] : 'active';
         $this->battle_result = isset($this_battleinfo['battle_result']) ? $this_battleinfo['battle_result'] : 'pending';
-        $this->battle_robot_limit = isset($this_battleinfo['battle_robot_limit']) ? $this_battleinfo['battle_robot_limit'] : 1;
+        $this->battle_robot_limit = isset($this_battleinfo['battle_robot_limit']) ? $this_battleinfo['battle_robot_limit'] : false;
         $this->battle_field_base = isset($this_battleinfo['battle_field_base']) ? $this_battleinfo['battle_field_base'] : array();
         $this->battle_target_player = isset($this_battleinfo['battle_target_player']) ? $this_battleinfo['battle_target_player'] : array();
         $this->battle_rewards = isset($this_battleinfo['battle_rewards']) ? $this_battleinfo['battle_rewards'] : array();
@@ -1153,9 +1153,9 @@ class rpg_battle extends rpg_object {
             $temp_target_limit_kind = !empty($this->battle_robot_limit) ? 'Goal' : 'Target';
             $reward_mod_strings = array();
             $reward_mod_strings[] = ' Robots vs '.$temp_target_limit_kind.': '.$this_player->counters['robots_start_total'].' / '.$temp_target_robot_limit;
-            if ($this_player->counters['robots_start_total'] != $target_player->counters['robots_start_total']){
-                $temp_bonus_multiplier = number_format(round(($target_player->counters['robots_start_total'] / $this_player->counters['robots_start_total']), 2), 1, '.', ',');
-                if ($this_player->counters['robots_start_total'] < $target_player->counters['robots_start_total']){  $this_star_rating += 1; $reward_mod_strings[] = 'Team Bonus: x'.$temp_bonus_multiplier.''; }
+            if ($this_player->counters['robots_start_total'] != $temp_target_robot_limit){
+                $temp_bonus_multiplier = number_format(round(($temp_target_robot_limit / $this_player->counters['robots_start_total']), 2), 1, '.', ',');
+                if ($this_player->counters['robots_start_total'] < $temp_target_robot_limit){  $this_star_rating += 1; $reward_mod_strings[] = 'Team Bonus: x'.$temp_bonus_multiplier.''; }
                 else { $this_star_rating -= 1; $reward_mod_strings[] = 'Team Penalty: x'.$temp_bonus_multiplier.''; }
                 $total_zenny_rewards = ceil($total_zenny_rewards * $temp_bonus_multiplier);
             } else {
