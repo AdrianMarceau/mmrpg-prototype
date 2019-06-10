@@ -8,6 +8,7 @@ $ability = array(
     'ability_group' => 'MM05/Weapons/033T2',
     'ability_description' => 'The user fires a large crystal orb at the target that splits in mid-air to form three smaller ones, each able to hit a different target and inflict damage!  Whoever this ability hits, the resulting damage is guaranteed to be super effective!',
     'ability_type' => 'crystal',
+    'ability_type2' => 'copy',
     'ability_energy' => 8,
     'ability_damage' => 20,
     'ability_accuracy' => 98,
@@ -18,7 +19,7 @@ $ability = array(
 
         // Define a quick function for calculating ability types
         $get_ability_types = function($target_robot) use($this_ability){
-            $ability_types = array($this_ability->ability_type, '');
+            $ability_types = array($this_ability->ability_type, $this_ability->ability_type2);
             if (!$target_robot->has_weakness($ability_types[0])
                 && !empty($target_robot->robot_weaknesses)){
                 foreach ($target_robot->robot_weaknesses AS $temp_type){
@@ -299,8 +300,8 @@ $ability = array(
         $this_robot->unset_attachment($foreground_attachment_token);
 
         // Reset the ability image to default, whatever it is
-        $this_ability->reset_type('');
-        $this_ability->reset_type2('');
+        $this_ability->reset_type();
+        $this_ability->reset_type2();
         $this_ability->reset_image();
 
         // Loop through all robots on the target side and disable any that need it
@@ -324,8 +325,8 @@ $ability = array(
         extract($objects);
 
         // Reset the ability image to default, whatever it is
-        $this_ability->reset_type('');
-        $this_ability->reset_type2('');
+        $this_ability->reset_type();
+        $this_ability->reset_type2();
         $this_ability->reset_image();
 
         // Return true on success
