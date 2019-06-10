@@ -22,7 +22,7 @@ $ability = array(
             'frame' => 'summon',
             'success' => array(1, -90, 25, 10, $this_robot->print_name().' uses the '.$this_ability->print_name().' to collect debris!')
             ));
-        $this_robot->robot_frame_styles = 'transform: scaleX(-1); -moz-transform: scaleX(-1); -webkit-transform: scaleX(-1); ';
+        $this_robot->robot_frame_styles = '-moz-transform: scaleX(-1); -webkit-transform: scaleX(-1); transform: scaleX(-1); ';
         $this_robot->update_session();
         $this_robot->trigger_target($target_robot, $this_ability, array('prevent_default_text' => true));
         $this_robot->robot_frame_styles = '';
