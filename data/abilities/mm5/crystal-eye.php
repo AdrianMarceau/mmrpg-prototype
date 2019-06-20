@@ -9,7 +9,7 @@ $ability = array(
     'ability_description' => 'The user fires a large crystal orb at the target that splits in mid-air to form three smaller ones, each able to hit a different target and inflict damage!  Whoever this ability hits, the resulting damage is guaranteed to be super effective!',
     'ability_type' => 'crystal',
     'ability_energy' => 8,
-    'ability_damage' => 20,
+    'ability_damage' => 14,
     'ability_accuracy' => 98,
     'ability_function' => function($objects){
 
