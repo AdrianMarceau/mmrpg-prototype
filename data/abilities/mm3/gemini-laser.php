@@ -47,6 +47,10 @@ $ability = array(
         // Randomly trigger a bench damage if the ability was successful
         $backup_robots_active = $target_player->values['robots_active'];
         $backup_robots_active_count = !empty($backup_robots_active) ? count($backup_robots_active) : 0;
+        if (isset($this_robot->robot_attachments['ability_gemini-clone'])
+            && !empty($this_robot->flags['gemini-clone_is_using_ability'])){
+            $backup_robots_active = array_reverse($backup_robots_active);
+        }
         if (true){ //$this_ability->ability_results['this_result'] != 'failure'
 
             // Loop through the target's benched robots, inflicting les and less damage to each
