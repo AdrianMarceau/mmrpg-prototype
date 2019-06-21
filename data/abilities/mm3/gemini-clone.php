@@ -56,9 +56,9 @@ $ability = array(
                 $this_robot->print_name().' created a clone of '.$this_robot->get_pronoun('reflexive').'!'
                 )
             ));
-        $this_robot->set_flag('gemini_clone_is_using_ability', true);
+        $this_robot->set_flag('gemini-clone_is_using_ability', true);
         $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
-        $this_robot->unset_flag('gemini_clone_is_using_ability');
+        $this_robot->unset_flag('gemini-clone_is_using_ability');
 
 
         // Return true on success
