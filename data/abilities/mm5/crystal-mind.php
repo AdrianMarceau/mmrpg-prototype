@@ -15,6 +15,13 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
+        // Check to see if a Gemini Clone is attached and if it's active
+        $has_gemini_clone = isset($this_robot->robot_attachments['ability_gemini-clone']) ? true : false;
+        $using_gemini_clone = $has_gemini_clone && !empty($this_robot->flags['gemini-clone_is_using_ability']) ? true : false;
+
+        // Do not allow a Gemini Clone to use this technique (we'll do it manually)
+        if ($has_gemini_clone && $using_gemini_clone){ return false; }
+
         // Define this ability's attachment token
         $this_attachment_token = 'ability_'.$this_ability->ability_token;
         $this_attachment_info = array(
@@ -40,11 +47,12 @@ $ability = array(
             $this_robot->set_attachment($this_attachment_token, $this_attachment_info);
 
             // Target the opposing robot
+            $clone_text = $has_gemini_clone ? ' and '.$this_robot->get_pronoun('possessive2').' clone' : '';
             $this_ability->target_options_update(array(
                 'frame' => 'summon',
                 'success' => array(0, 9999, 9999, -9999,
                     $this_robot->print_name().' used the '.$this_ability->print_name().' technique! '.
-                    '<br /> '.ucfirst($this_robot->get_pronoun('subject')).' fell into a deep trance...'
+                    '<br /> '.ucfirst($this_robot->get_pronoun('subject')).$clone_text.' fell into a deep trance...'
                     )
                 ));
             $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
@@ -74,11 +82,14 @@ $ability = array(
             $this_robot->unset_attachment($this_attachment_token);
 
             // Target the opposing robot
+            $clone_text = $has_gemini_clone ? ' and '.$this_robot->get_pronoun('possessive2').' clone' : '';
+            $effect_text1 = $has_gemini_clone ? 'their' : $this_robot->get_pronoun('possessive2');
+            $effect_text2 = $has_gemini_clone ? 'their' : ''.$this_robot->print_name().'\'s';
             $this_ability->target_options_update(array(
                 'frame' => 'taunt',
                 'success' => array(0, 9999, 9999, -9999,
-                    $this_robot->print_name().' woke up from '.$this_robot->get_pronoun('possessive2').' trance... '.
-                    '<br /> The '.$this_ability->print_name().' raises all of '.$this_robot->print_name().'\'s stats! '
+                    $this_robot->print_name().$clone_text.' woke up from '.$effect_text1.' trance... '.
+                    '<br /> The '.$this_ability->print_name().' raises all of '.$effect_text2.' stats! '
                     )
                 ));
             $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
@@ -87,9 +98,10 @@ $ability = array(
             if ($this_robot->robot_status != 'disabled'){
 
                 // Call the global stat break functions with customized options
-                rpg_ability::ability_function_stat_boost($this_robot, 'attack', 1);
-                rpg_ability::ability_function_stat_boost($this_robot, 'defense', 1);
-                rpg_ability::ability_function_stat_boost($this_robot, 'speed', 1);
+                $boost_amount = $has_gemini_clone ? 2 : 1;
+                rpg_ability::ability_function_stat_boost($this_robot, 'attack', $boost_amount);
+                rpg_ability::ability_function_stat_boost($this_robot, 'defense', $boost_amount);
+                rpg_ability::ability_function_stat_boost($this_robot, 'speed', $boost_amount);
 
             }
 
