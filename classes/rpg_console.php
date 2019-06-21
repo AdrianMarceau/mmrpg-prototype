@@ -109,6 +109,13 @@ class rpg_console {
             }
         }
 
+        // If a clone is present, we may have to adjust the sprite
+        $gemini_clone_active = false;
+        if (isset($this_robot->robot_attachments['ability_gemini-clone'])
+            && !empty($this_robot->flags['gemini-clone_is_using_ability'])){
+            $gemini_clone_active = true;
+        }
+
         // Define the rest of the display variables
         $this_data['container_class'] = 'this_sprite sprite_'.$this_data['robot_float'];
         $this_data['container_style'] = '';
@@ -123,6 +130,10 @@ class rpg_console {
         $this_data['robot_class'] .= 'robot_status_'.$this_data['robot_status'].' robot_position_'.$this_data['robot_position'].' ';
         if ($this_data['image_type'] == 'mug'){ $this_data['robot_class'] .= 'sprite_'.$this_data['robot_size'].'x'.$this_data['robot_size'].'_mugshot '; }
         $this_data['robot_style'] .= 'background-image: url('.$this_data['robot_image'].'); ';
+        if ($gemini_clone_active){
+            $filters = 'grayscale(100%) sepia(1) hue-rotate(145deg)';
+            $this_data['robot_style'] .= '-moz-filter: '.$filters.'; -webkit-filter: '.$filters.'; filter: '.$filters.'; ';
+        }
         $this_data['energy_title'] = $this_data['energy_fraction'].' LE ('.$this_data['energy_percent'].'%)';
         $this_data['robot_title'] .= ' <br />'.$this_data['energy_title'];
         $this_data['weapons_title'] = $this_data['weapons_fraction'].' WE ('.$this_data['weapons_percent'].'%)';
@@ -137,8 +148,13 @@ class rpg_console {
         // Generate the final markup for the console robot
         $this_data['robot_markup'] = '';
         $this_data['robot_markup'] .= '<div class="'.$this_data['container_class'].'" style="'.$this_data['container_style'].'">';
-        $this_data['robot_markup'] .= '<div class="'.$this_data['robot_class'].'" style="'.$this_data['robot_style'].'" title="'.$this_data['robot_title'].'" data-tooltip-type="robot_type type_'.$this_data['robot_type_class'].'">'.$this_data['robot_title'].'</div>';
-        if ($this_data['image_type'] != 'mug'){ $this_data['robot_markup'] .= '<div class="'.$this_data['energy_class'].'" style="'.$this_data['energy_style'].'" title="'.$this_data['energy_title'].'">'.$this_data['energy_title'].'</div>'; }
+
+            // Print out the robot sprite inside the event container
+            $this_data['robot_markup'] .= '<div class="'.$this_data['robot_class'].'" style="'.$this_data['robot_style'].'" title="'.$this_data['robot_title'].'" data-tooltip-type="robot_type type_'.$this_data['robot_type_class'].'">'.$this_data['robot_title'].'</div>';
+
+            // If this wasn't a mugshot, we should include the relative energy bar
+            if ($this_data['image_type'] != 'mug'){ $this_data['robot_markup'] .= '<div class="'.$this_data['energy_class'].'" style="'.$this_data['energy_style'].'" title="'.$this_data['energy_title'].'">'.$this_data['energy_title'].'</div>'; }
+
         $this_data['robot_markup'] .= '</div>';
 
         // Return the robot console data

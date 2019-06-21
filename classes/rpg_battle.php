@@ -1438,8 +1438,8 @@ class rpg_battle extends rpg_object {
                     $actual_target_robot = $target_robot;
                 }
 
-
                 // Trigger this robot's ability
+                $this_robot->set_flag('robot_is_using_ability', true);
                 $this_ability->ability_results = $this_robot->trigger_ability($actual_target_robot, $this_ability);
 
                 // Ensure the battle has not completed before triggering the taunt event
@@ -1467,6 +1467,79 @@ class rpg_battle extends rpg_object {
                         // Create the quote flag to ensure robots don't repeat themselves
                         $this_robot->flags['robot_quotes']['battle_taunt'] = true;
                     }
+
+                }
+
+                // We're done using this robot's ability
+                $this_robot->unset_flag('robot_is_using_ability');
+
+                // If this robot has a Gemini Clone attached, we need to do the ability again
+                if ($this->battle_status != 'complete'
+                    && $actual_target_robot->robot_status != 'disabled'
+                    && isset($this_robot->robot_attachments['ability_gemini-clone'])
+                    // ensure this robot has enough weapon energy to use the ability again
+                    && $this_robot->robot_weapons >= $this_robot->calculate_weapon_energy($this_ability)
+                    // user has no energy left after an overdrive so prevent
+                    && !strstr($this_ability->ability_token, '-overdrive')
+                    // ensure this is not a restricted ability that might cause bugs / be useless
+                    && !in_array($this_ability->ability_token, array(
+                        // prevent from using itself over again
+                        'gemini-clone',
+                        // causes user or the target to switch which could be messy
+                        'mecha-support', 'flash-pulse', 'super-throw',
+                        // self-attached charge/shield/booster with no repeat-use benefit
+                        'proto-shield', 'rhythm-satellite', 'acid-barrier', 'core-shield',
+                        // target attachment/breaker with no repeat-use benefit for user
+                        'bass-crush', 'disco-fever', 'galaxy-bomb', 'thunder-wool', '',
+                        // already uses itself multiple times
+                        'water-balloon',
+                        // swap moves would be pretty lame if used twice
+                        'energy-swap', 'attack-swap', 'defense-swap', 'speed-swap',
+                        // mode abilities already max things so repeat-use not needed
+                        'energy-mode', 'attack-mode', 'defense-mode', 'speed-mode',
+                        // just doesn't make sense to use twice for one reason or another
+                        'buster-charge', 'buster-relay',
+                        'copy-shot', 'copy-soul',
+                        ))
+                    ){
+
+                    // Trigger this Gemini Clone's ability
+                    $name_backup = $this_robot->robot_name;
+                    $this_robot->set_name($name_backup.' 2');
+                    $this_robot->set_flag('gemini-clone_is_using_ability', true);
+                    $this_ability->ability_results = $this_robot->trigger_ability($actual_target_robot, $this_ability);
+
+                    // Ensure the battle has not completed before triggering the taunt event
+                    if ($this->battle_status != 'complete'){
+
+                        // Check to ensure this robot hasn't taunted already
+                        if (!isset($this_robot->flags['robot_quotes']['battle_taunt'])
+                            && isset($this_robot->robot_quotes['battle_taunt'])
+                            && $this_robot->robot_quotes['battle_taunt'] != '...'
+                            && $this_ability->ability_results['this_amount'] > 0
+                            && $actual_target_robot->robot_status != 'disabled'
+                            && $this->critical_chance(3)){
+                            // Generate this robot's taunt event after dealing damage, which only happens once per battle
+                            $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
+                            $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
+                            $this_replace = array($target_player->player_name, $actual_target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
+                            //$this_quote_text = str_replace($this_find, $this_replace, $this_robot->robot_quotes['battle_taunt']);
+                            $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : '').$this_robot->print_name().' taunts the opponent!<br />';
+                            $event_body .= $this_robot->print_quote('battle_taunt', $this_find, $this_replace);
+                            //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
+                            $this_robot->robot_frame = 'taunt';
+                            $actual_target_robot->robot_frame = 'base';
+                            $this->events_create($this_robot, $actual_target_robot, $event_header, $event_body, array('console_show_target' => false));
+                            $this_robot->robot_frame = 'base';
+                            // Create the quote flag to ensure robots don't repeat themselves
+                            $this_robot->flags['robot_quotes']['battle_taunt'] = true;
+                        }
+
+                    }
+
+                    // We're done using this Gemini Clone's ability
+                    $this_robot->unset_flag('gemini-clone_is_using_ability');
+                    $this_robot->set_name($name_backup);
 
                 }
 

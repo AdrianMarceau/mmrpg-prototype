@@ -145,9 +145,15 @@ class rpg_canvas {
         $this_data['canvas_offset_rotate'] = 0;
         $this_data['robot_scale'] = $temp_data['canvas_scale'];
 
+        // Create a backup of the x and y-offset before we continue
+        $backup_canvas_offset_x = $temp_data['canvas_offset_x'];
+        $backup_canvas_offset_y = $temp_data['canvas_offset_y'];
+
         // If this robot has an oversized sprite, adjust their position accordingly
         if ($this_robot->robot_image_size > 40 && $this_data['robot_position'] === 'active'){
-            $this_data['canvas_offset_x'] += ceil((($this_robot->robot_image_size - 40) / 2) * $temp_data['canvas_scale']);
+            $x_shift_amount = ceil((($this_robot->robot_image_size - 40) / 2) * $temp_data['canvas_scale']);
+            $this_data['canvas_offset_x'] += $x_shift_amount;
+            $backup_canvas_offset_x += $x_shift_amount;
         }
 
         // Calculate the zoom properties for the robot sprite
@@ -181,14 +187,6 @@ class rpg_canvas {
             // Else if the random number was anything else, show the base frame
             else { $this_data['robot_frame'] = 'base'; }
         }
-
-        // If the robot is defeated, move its sprite accorss the field
-        if ($this_data['robot_frame'] == 'defeat'){
-            //$this_data['canvas_offset_x'] -= ceil($this_data['robot_size'] * 0.10);
-        }
-
-        // Fix the robot x position if it's size if greater than 80
-        //$this_data['canvas_offset_x'] -= ceil(($this_data['robot_size'] - 80) * 0.10);
 
         // If this robot is being damaged of is defending
         if ($this_data['robot_status'] == 'disabled' && $this_data['robot_frame'] != 'damage'){
@@ -317,33 +315,45 @@ class rpg_canvas {
             $reward_info = mmrpg_prototype_robot_rewards($this_robot->player->player_token, $this_robot->robot_token);
             $this_stats = rpg_robot::calculate_stat_values($this_robot->robot_level, $index_info, $reward_info, $this_robot->robot_core, $this_robot->player->player_starforce);
 
+            // If a Gemini Clone is present, and is attacking, "steal" the robot frame for later use
+            $this_robot_frame = $this_data['robot_frame'];
+            $this_robot_offset_x = $this_data['canvas_offset_x'];
+            $this_robot_offset_y = $this_data['canvas_offset_y'];
+            $gemini_clone_frame = false;
+            $gemini_clone_offset_x = false;
+            $gemini_clone_offset_y = false;
+            if (isset($this_robot->robot_attachments['ability_gemini-clone'])){
+                $gemini_clone_frame = empty($this_robot->flags['robot_is_using_ability']) ? $this_data['robot_frame'] : 'defend';
+                $gemini_clone_offset_x = empty($this_robot->flags['robot_is_using_ability']) ? $this_data['canvas_offset_x'] : $backup_canvas_offset_x;
+                $gemini_clone_offset_y = empty($this_robot->flags['robot_is_using_ability']) ? $this_data['canvas_offset_y'] : $backup_canvas_offset_y;
+                if (!empty($this_robot->flags['gemini-clone_is_using_ability'])){
+                    $this_robot_frame = $gemini_clone_frame != 'defend' ? 'defend' : 'base';
+                    $this_robot_offset_x = $backup_canvas_offset_x;
+                    $this_robot_offset_y = $backup_canvas_offset_y;
+                }
+            }
+
             // Define the rest of the display variables
             //$this_data['robot_file'] = 'images/robots/'.$this_data['robot_image'].'/sprite_'.$this_data['robot_direction'].'_'.$this_data['robot_size'].'x'.$this_data['robot_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE;
             $this_data['robot_file'] = 'images/robots/'.$this_data['robot_image'].'/sprite_'.$this_data['robot_direction'].'_'.$this_data['robot_size_path'].'.png?'.MMRPG_CONFIG_CACHE_DATE;
+
             $this_data['robot_markup_class'] = 'sprite ';
-            //$this_data['robot_markup_class'] .= 'sprite_'.$this_data['robot_size'].'x'.$this_data['robot_size'].' sprite_'.$this_data['robot_size'].'x'.$this_data['robot_size'].'_'.$this_data['robot_frame'].' ';
-            $this_data['robot_markup_class'] .= 'sprite_'.$this_data['robot_sprite_size'].'x'.$this_data['robot_sprite_size'].' sprite_'.$this_data['robot_sprite_size'].'x'.$this_data['robot_sprite_size'].'_'.$this_data['robot_frame'].' ';
+            $this_data['robot_markup_class'] .= 'sprite_'.$this_data['robot_sprite_size'].'x'.$this_data['robot_sprite_size'].' sprite_'.$this_data['robot_sprite_size'].'x'.$this_data['robot_sprite_size'].'_'.$this_robot_frame.' ';
             $this_data['robot_markup_class'] .= 'robot_status_'.$this_data['robot_status'].' robot_position_'.$this_data['robot_position'].' ';
-            $frame_position = is_numeric($this_data['robot_frame']) ? (int)($this_data['robot_frame']) : array_search($this_data['robot_frame'], $this_data['robot_frame_index']);
+            $frame_position = is_numeric($this_robot_frame) ? (int)($this_robot_frame) : array_search($this_robot_frame, $this_data['robot_frame_index']);
             if ($frame_position === false){ $frame_position = 0; }
             $this_data['robot_markup_class'] .= $this_data['robot_frame_classes'];
             $frame_background_offset = -1 * ceil(($this_data['robot_sprite_size'] * $frame_position));
             $this_data['robot_markup_style'] = 'background-position: '.(!empty($frame_background_offset) ? $frame_background_offset.'px' : '0').' 0; ';
-            $this_data['robot_markup_style'] .= 'z-index: '.$this_data['canvas_offset_z'].'; '.$this_data['robot_float'].': '.$this_data['canvas_offset_x'].'px; bottom: '.$this_data['canvas_offset_y'].'px; ';
-            if ($this_data['robot_frame'] == 'damage'){
+            $this_data['robot_markup_style'] .= 'z-index: '.$this_data['canvas_offset_z'].'; '.$this_data['robot_float'].': '.$this_robot_offset_x.'px; bottom: '.$this_robot_offset_y.'px; ';
+            if ($this_robot_frame == 'damage'){
                 $temp_rotate_amount = $this_data['canvas_offset_rotate'];
                 if ($this_data['robot_direction'] == 'right'){ $temp_rotate_amount = $temp_rotate_amount * -1; }
                 $this_data['robot_markup_style'] .= 'transform: rotate('.$temp_rotate_amount.'deg); -webkit-transform: rotate('.$temp_rotate_amount.'deg); -moz-transform: rotate('.$temp_rotate_amount.'deg); ';
             }
-            //$this_data['robot_markup_style'] .= 'background-image: url('.$this_data['robot_file'].'); ';
             $this_data['robot_markup_style'] .= 'background-image: url('.$this_data['robot_file'].'); width: '.$this_data['robot_sprite_size'].'px; height: '.$this_data['robot_sprite_size'].'px; background-size: '.$this_data['robot_file_width'].'px '.$this_data['robot_file_height'].'px; ';
-            /*
-            if ($this_data['robot_position'] != 'active'){
-                $brightness = 1 - (0.05 * $this_data['robot_key']);
-                $this_data['robot_markup_style'] .= 'filter: brightness('.$brightness.'); ';
-            }
-            */
             $this_data['robot_markup_style'] .= $this_data['robot_frame_styles'];
+
             $this_data['energy_class'] = 'energy';
             $this_data['energy_style'] = 'background-position: '.$this_data['energy_x_position'].'px '.$this_data['energy_y_position'].'px;';
             $this_data['weapons_class'] = 'weapons';
@@ -426,7 +436,7 @@ class rpg_canvas {
                     '" data-type="'.$this_data['data_type'].'_shadow'.
                     '" data-size="'.$this_data['robot_sprite_size'].
                     '" data-direction="'.$this_data['robot_direction'].
-                    '" data-frame="'.$this_data['robot_frame'].
+                    '" data-frame="'.$this_robot_frame.
                     '" data-position="'.$this_data['robot_position'].
                     '" data-status="'.$this_data['robot_status'].
                     '" data-scale="'.$this_data['robot_scale'].
@@ -451,12 +461,43 @@ class rpg_canvas {
                         '" data-type="'.$this_data['data_type'].'_overlay'.
                         '" data-size="'.$this_data['robot_sprite_size'].
                         '" data-direction="'.$this_data['robot_direction'].
-                        '" data-frame="'.$this_data['robot_frame'].
+                        '" data-frame="'.$this_robot_frame.
                         '" data-position="'.$this_data['robot_position'].
                         '" data-status="'.$this_data['robot_status'].
                         '" data-scale="'.$this_data['robot_scale'].
                         '"></div>';
                 }
+            }
+
+
+            // If this robot has a Gemini Clone, display a copy of its sprite
+            if (isset($this_robot->robot_attachments['ability_gemini-clone'])){
+
+                // Generate this clone sprite's class and style independently from the main one
+                $temp_clone_class = 'sprite ';
+                $temp_clone_class .= 'sprite_'.$this_data['robot_sprite_size'].'x'.$this_data['robot_sprite_size'].' sprite_'.$this_data['robot_sprite_size'].'x'.$this_data['robot_sprite_size'].'_'.$gemini_clone_frame.' ';
+                $temp_clone_class .= 'robot_status_'.$this_data['robot_status'].' robot_position_'.$this_data['robot_position'].' ';
+                $frame_position = is_numeric($gemini_clone_frame) ? (int)($gemini_clone_frame) : array_search($gemini_clone_frame, $this_data['robot_frame_index']);
+                if ($frame_position === false){ $frame_position = 0; }
+                $temp_clone_class .= $this_data['robot_frame_classes'];
+                $frame_background_offset = -1 * ceil(($this_data['robot_sprite_size'] * $frame_position));
+
+                $temp_clone_style = 'background-position: '.(!empty($frame_background_offset) ? $frame_background_offset.'px' : '0').' 0; ';
+                $temp_clone_style .= 'z-index: '.($this_data['canvas_offset_z'] + 1).'; '.$this_data['robot_float'].': '.($gemini_clone_offset_x - ceil($this_data['robot_scale'] * (40 + ($this_robot->robot_image_size > 40 ? 10 : 0)))).'px; bottom: '.($gemini_clone_offset_y - 2).'px; ';
+                if ($gemini_clone_frame == 'damage'){
+                    $temp_rotate_amount = $this_data['canvas_offset_rotate'];
+                    if ($this_data['robot_direction'] == 'right'){ $temp_rotate_amount = $temp_rotate_amount * -1; }
+                    $temp_clone_style .= 'transform: rotate('.$temp_rotate_amount.'deg); -webkit-transform: rotate('.$temp_rotate_amount.'deg); -moz-transform: rotate('.$temp_rotate_amount.'deg); ';
+                }
+                $temp_clone_style .= 'background-image: url('.$this_data['robot_file'].'); width: '.$this_data['robot_sprite_size'].'px; height: '.$this_data['robot_sprite_size'].'px; background-size: '.$this_data['robot_file_width'].'px '.$this_data['robot_file_height'].'px; ';
+
+                $filters = 'grayscale(100%) sepia(1) hue-rotate(145deg)';
+                $temp_clone_style .= '-moz-filter: '.$filters.'; -webkit-filter: '.$filters.'; filter: '.$filters.'; ';
+                $temp_clone_style .= $this_data['robot_frame_styles'];
+
+                // Print out the clone with adjusted styles for the sprite
+                echo '<div data-cloneid="'.$this_data['robot_id'].'" class="'.$temp_clone_class.'" style="'.$temp_clone_style.'" data-key="'.$this_data['robot_key'].'" data-type="'.$this_data['data_type'].'" data-size="'.$this_data['robot_sprite_size'].'" data-direction="'.$this_data['robot_direction'].'" data-frame="'.$this_data['robot_frame'].'" data-position="'.$this_data['robot_position'].'" data-status="'.$this_data['robot_status'].'" data-scale="'.$this_data['robot_scale'].'">'.$this_data['robot_token'].'</div>';
+
             }
 
             // Only append extra icons if this robot is visible
