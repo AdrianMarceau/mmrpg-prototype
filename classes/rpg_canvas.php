@@ -776,6 +776,18 @@ class rpg_canvas {
 
         }
 
+        // If a clone is present, we may have to adjust the sprite
+        $gemini_clone_active = false;
+        if (isset($this_ability->robot->robot_attachments['ability_gemini-clone'])
+            && !empty($this_ability->robot->flags['gemini-clone_is_using_ability'])){
+            $gemini_clone_active = true;
+        }
+
+        // If this ability is being used by a Gemini Clone, offset the position
+        if ($gemini_clone_active){
+            $this_data['canvas_offset_x'] -= 40;
+            $this_data['canvas_offset_y'] -= 2;
+        }
 
         // Define the rest of the display variables
         if (!preg_match('/^images/i', $this_data['ability_image'])){ $this_data['ability_image_path'] = 'images/abilities/'.$this_data['ability_image'].'/sprite_'.$this_data['ability_direction'].'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE; }
