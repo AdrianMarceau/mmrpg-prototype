@@ -6,7 +6,7 @@ $ability = array(
     'ability_game' => 'MM03',
     //'ability_group' => 'MM03/Weapons/019',
     'ability_group' => 'MM03/Weapons/019T1',
-    'ability_description' => 'The user generates a clone of itself that fights alongside for up to three turns! The clone allows the user to execute most abilities twice in a single turn, though it also causes them to use twice the weapon energy.',
+    'ability_description' => 'The user generates a clone of itself that fights alongside for up to three turns! The clone automatically mirrors the user\'s abilities as long as there\'s enough weapon energy to perform them again!',
     'ability_type' => 'crystal',
     'ability_energy' => 4,
     'ability_accuracy' => 100,
@@ -24,6 +24,7 @@ $ability = array(
             'class' => 'ability',
             'ability_id' => $this_ability->ability_id,
             'ability_token' => $this_ability->ability_token,
+            'ability_image' => 'ability',
             'attachment_token' => $this_attachment_token,
             'attachment_duration' => 1 + $base_attachment_duration, // +1 for summoning turn
             'attachment_destroy' => array(
@@ -36,10 +37,17 @@ $ability = array(
                 )
             );
 
+        // Check to see if a clone already existed
+        $clone_existed = false;
+        if (isset($this_robot->robot_attachments[$this_attachment_token])){
+            $this_robot->unset_attachment($this_attachment_token);
+            $clone_existed = true;
+        }
+
         // Target the opposing robot
         $this_ability->target_options_update(array(
             'frame' => 'summon',
-            'success' => array(0, 9999, 9999, -9999,
+            'success' => array(0, -5, 70, 20,
                 $this_robot->print_name().' used the '.$this_ability->print_name().' technique... '
                 )
             ));
@@ -52,8 +60,8 @@ $ability = array(
         // Target the opposing robot
         $this_ability->target_options_update(array(
             'frame' => 'summon',
-            'success' => array(0, 9999, 9999, -9999,
-                $this_robot->print_name().' created a clone of '.$this_robot->get_pronoun('reflexive').'!'
+            'success' => array(2, 15, 65, 20,
+                $this_robot->print_name().' created a '.($clone_existed ? 'new ' : '').'clone of '.$this_robot->get_pronoun('reflexive').'!'
                 )
             ));
         $this_robot->set_flag('gemini-clone_is_using_ability', true);
