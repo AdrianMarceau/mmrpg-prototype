@@ -30,7 +30,8 @@ $ability = array(
             'ability_token' => $this_ability->ability_token,
             'ability_frame' => 0,
             'ability_frame_animate' => array(0, 1, 2, 3, 4),
-            'ability_frame_offset' => array('x' => 5, 'y' => 40, 'z' => 30)
+            'ability_frame_offset' => array('x' => 5, 'y' => 40, 'z' => 30),
+            'attachment_duration' => 1
             );
 
         // If this ability has not been summoned yet, do the action and then queue a conclusion move
