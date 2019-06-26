@@ -34,7 +34,7 @@ Disallow: /wp-admin/
 Disallow: /wp-content/
 
 # Crawl Parameters
-Crawl-delay: 20
+Crawl-delay: 300000
 
 # Sitemap Files
 Sitemap: http://rpg.megamanpoweredup.net/sitemap.xml
