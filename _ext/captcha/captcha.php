@@ -350,14 +350,18 @@ class SimpleCaptcha {
 
         // Collect a random robot token from the database
         $temp_robots = $db->get_array_list("SELECT robot_token FROM mmrpg_index_robots WHERE robot_class LIKE 'master' AND robot_flag_hidden = 0 AND robot_flag_published = 1");
-        shuffle($temp_robots);
-        do {
-          $temp_robot = array_shift($temp_robots);
-          $temp_token = preg_replace('/[^a-z0-9]/i', '', $temp_robot['robot_token']);
-          $temp_token = preg_replace('/(wo)?man$/i', '', $temp_token);
-        } while (strlen($temp_token) > 10 || strlen($temp_token) < 1);
-        $text = $temp_token;
-        return $text;
+        if (!empty($temp_robots)){
+            shuffle($temp_robots);
+            do {
+              $temp_robot = array_shift($temp_robots);
+              $temp_token = preg_replace('/[^a-z0-9]/i', '', $temp_robot['robot_token']);
+              $temp_token = preg_replace('/(wo)?man$/i', '', $temp_token);
+            } while (strlen($temp_token) > 10 || strlen($temp_token) < 1);
+            $text = $temp_token;
+            return $text;
+        } else {
+            return strtoupper(substr(md5('test'.time()), 0, 5));
+        }
 
     }
 
