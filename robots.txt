@@ -31,6 +31,7 @@ Disallow: /images/gallery/screenshots/thumbs/
 Disallow: /file/
 Disallow: /community/personal/
 Disallow: /wp-admin/
+Disallow: /wp-content/
 
 # Crawl Parameters
 Crawl-delay: 20
