@@ -91,7 +91,7 @@ class cms_database {
         // If the connection was not successful, return false
         if ($this->LINK === false
             || $this->LINK->connect_errno){
-            if (MMRPG_CONFIG_IS_LIVE && !MMRPG_CONFIG_ADMIN_MODE){
+            if (MMRPG_CONFIG_IS_LIVE && (!defined('MMRPG_CONFIG_ADMIN_MODE') || MMRPG_CONFIG_ADMIN_MODE !== true)){
                 $this->critical_error("<strong>cms_database::db_connect</strong> : '.
                     'Critical error! Unable to connect to the database &lt;".("{$this->USERNAME}:******@")."{$this->HOST}&gt;!<br />'.
                     '[MySQL Error ".$this->LINK->connect_errno."] : '.
