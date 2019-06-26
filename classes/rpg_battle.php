@@ -1482,25 +1482,7 @@ class rpg_battle extends rpg_object {
                     // user has no energy left after an overdrive so prevent
                     && !strstr($this_ability->ability_token, '-overdrive')
                     // ensure this is not a restricted ability that might cause bugs / be useless
-                    && !in_array($this_ability->ability_token, array(
-                        // prevent from using itself over again
-                        'gemini-clone',
-                        // causes user or the target to switch which could be messy
-                        'mecha-support', 'flash-pulse', 'super-throw',
-                        // self-attached charge/shield/booster with no repeat-use benefit
-                        'proto-shield', 'rhythm-satellite', 'acid-barrier', 'core-shield',
-                        // target attachment/breaker with no repeat-use benefit for user
-                        'bass-crush', 'disco-fever', 'galaxy-bomb', 'thunder-wool', '',
-                        // already uses itself multiple times
-                        'water-balloon',
-                        // swap moves would be pretty lame if used twice
-                        'energy-swap', 'attack-swap', 'defense-swap', 'speed-swap',
-                        // mode abilities already max things so repeat-use not needed
-                        'energy-mode', 'attack-mode', 'defense-mode', 'speed-mode',
-                        // just doesn't make sense to use twice for one reason or another
-                        'buster-charge', 'buster-relay',
-                        'copy-shot', 'copy-soul',
-                        ))
+                    && rpg_ability::is_compatible_with_gemini_clone($this_ability->ability_token)
                     ){
 
                     // Trigger this Gemini Clone's ability
