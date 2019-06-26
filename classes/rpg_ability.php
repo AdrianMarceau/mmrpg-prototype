@@ -3064,6 +3064,29 @@ class rpg_ability extends rpg_object {
 
     /* -- ABILITY-SPECIFIC FUNCTIONS THAT DON'T FIT ANYWHERE ELSE RIGHT NOW -- */
 
+    // Define a function for checking if a given ability is complatible with the Gemini Clone mechanic
+    public static function is_compatible_with_gemini_clone($ability_token){
+        return !in_array($ability_token, array(
+            // prevent from using itself over again
+            'gemini-clone',
+            // causes user or the target to switch which could be messy
+            'mecha-support', 'flash-pulse', 'super-throw',
+            // self-attached charge/shield/booster with no repeat-use benefit
+            'proto-shield', 'rhythm-satellite', 'acid-barrier', 'core-shield',
+            // target attachment/breaker with no repeat-use benefit for user
+            'bass-crush', 'disco-fever', 'galaxy-bomb', 'thunder-wool', '',
+            // already uses itself multiple times
+            'water-balloon',
+            // swap moves would be pretty lame if used twice
+            'energy-swap', 'attack-swap', 'defense-swap', 'speed-swap',
+            // mode abilities already max things so repeat-use not needed
+            'energy-mode', 'attack-mode', 'defense-mode', 'speed-mode',
+            // just doesn't make sense to use twice for one reason or another
+            'buster-charge', 'buster-relay',
+            'copy-shot', 'copy-soul',
+            )) true : false;
+    }
+
     // Define a static function for generating/returning the Super Arm sprite index w/ sheet & frame refs for each field
     public static function get_super_block_sprite_index(){
         // Define the sprite sheets and the stages they contain
