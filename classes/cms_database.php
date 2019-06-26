@@ -89,9 +89,21 @@ class cms_database {
         // Attempt to open the connection to the MySQL database
         if (!isset($this->LINK) || $this->LINK === false){ $this->LINK = new mysqli($this->HOST, $this->USERNAME, $this->PASSWORD, $this->NAME);    }
         // If the connection was not successful, return false
-        if ($this->LINK === false){
-            if (MMRPG_CONFIG_IS_LIVE && !MMRPG_CONFIG_ADMIN_MODE){ $this->critical_error("<strong>cms_database::db_connect</strong> : Critical error! Unable to connect to the database &lt;".("{$this->USERNAME}:******@")."{$this->HOST}&gt;!<br />[MySQL Error ".mysqli_errno($this->LINK)."] : &quot;".htmlentities(mysqli_error($this->LINK), ENT_QUOTES, 'UTF-8', true)."&quot;"); }
-            else { $this->critical_error("<strong>cms_database::db_connect</strong> : Critical error! Unable to connect to the database &lt;".("{$this->USERNAME}:{$this->PASSWORD}@")."{$this->HOST}&gt;!<br />[MySQL Error ".mysqli_errno()."] : &quot;".htmlentities(mysqli_errno($this->LINK), ENT_QUOTES, 'UTF-8', true)."&quot;"); }
+        if ($this->LINK === false
+            || $this->LINK->connect_errno){
+            if (MMRPG_CONFIG_IS_LIVE && !MMRPG_CONFIG_ADMIN_MODE){
+                $this->critical_error("<strong>cms_database::db_connect</strong> : '.
+                    'Critical error! Unable to connect to the database &lt;".("{$this->USERNAME}:******@")."{$this->HOST}&gt;!<br />'.
+                    '[MySQL Error ".$this->LINK->connect_errno."] : '.
+                    '&quot;".htmlentities($this->LINK->connect_error, ENT_QUOTES, 'UTF-8', true)."&quot;"
+                    );
+            } else {
+                $this->critical_error("<strong>cms_database::db_connect</strong> : '.
+                    'Critical error! Unable to connect to the database &lt;".("{$this->USERNAME}:******@")."{$this->HOST}&gt;!<br />'.
+                    '[MySQL Error ".$this->LINK->connect_errno."] : '.
+                    '&quot;".htmlentities($this->LINK->connect_error, ENT_QUOTES, 'UTF-8', true)."&quot;"
+                    );
+            }
             return false;
         }
         // Set the character set, if possible
@@ -103,6 +115,8 @@ class cms_database {
 
     // Define the private function for closing the database connection
     private function db_close(){
+        // Return immediately if DB is not available
+        if (!$this->CONNECT){ return false; }
         // Close the open connection to the database
         if (isset($this->LINK) && $this->LINK != false){ $close = mysqli_close($this->LINK); }
         else { $close = true; }
@@ -117,6 +131,8 @@ class cms_database {
 
     // Define the private function for selecting the database
     private function db_select(){
+        // Return immediately if DB is not available
+        if (!$this->CONNECT){ return false; }
         // Attempt to select the database by name
         $select = mysqli_select_db($this->LINK, $this->NAME);
         // If the select was not successful, return false
@@ -134,6 +150,9 @@ class cms_database {
 
     // Define the function for querying the database
     public function query($query_string, &$affected_rows = 0){
+
+        // Return immediately if DB is not available
+        if (!$this->CONNECT){ return false; }
 
         // Execute the query against the database
         $this->MYSQL_RESULT = mysqli_query($this->LINK, $query_string);
