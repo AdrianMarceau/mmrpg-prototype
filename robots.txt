@@ -26,6 +26,7 @@ Disallow: /data/
 Disallow: /pages/
 Disallow: /frames/
 Disallow: /sounds/
+Disallow: /images/backups/
 Disallow: /images/gallery/screenshots/_thumbs/
 Disallow: /images/gallery/screenshots/thumbs/
 Disallow: /file/
@@ -37,4 +38,4 @@ Disallow: /wp-content/
 Crawl-delay: 300000
 
 # Sitemap Files
-Sitemap: http://rpg.megamanpoweredup.net/sitemap.xml
+Sitemap: http://prototype.mmrpg-world.net/sitemap.xml
