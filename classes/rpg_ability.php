@@ -3083,8 +3083,8 @@ class rpg_ability extends rpg_object {
             'energy-mode', 'attack-mode', 'defense-mode', 'speed-mode',
             // just doesn't make sense to use twice for one reason or another
             'buster-charge', 'buster-relay',
-            'copy-shot', 'copy-soul',
-            )) true : false;
+            'copy-shot', 'copy-soul'
+            )) ? true : false;
     }
 
     // Define a static function for generating/returning the Super Arm sprite index w/ sheet & frame refs for each field
