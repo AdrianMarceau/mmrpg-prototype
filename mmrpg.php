@@ -325,7 +325,7 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
     // Collect the info for the chosen temp field
     list($temp_field_kind, $temp_field_token) = explode('/', $temp_field_path);
     $temp_field_data = rpg_field::get_index_info($temp_field_token);
-    if (!empty($temp_mecha_tokens)){
+    if (!empty($temp_mecha_tokens) && !empty($temp_field_data)){
         $temp_field_data['field_mechas'] = array_merge($temp_field_data['field_mechas'], $temp_mecha_tokens);
         $temp_field_data['field_mechas'] = array_unique($temp_field_data['field_mechas']);
     }

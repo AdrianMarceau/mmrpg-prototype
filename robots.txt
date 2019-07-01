@@ -1,3 +1,17 @@
+
+# Block Aggressive Bots
+User-agent: Semrush
+Disallow: /
+User-agent: SemrushBot
+Disallow: /
+User-agent: Semrushbot-SA
+Disallow: /
+User-agent: Semrushbot-SI
+Disallow: /
+User-agent: AhrefsBot
+Disallow: /
+
+# General Access
 User-agent: *
 Disallow:
 Disallow: /cgi-bin/
@@ -12,8 +26,16 @@ Disallow: /data/
 Disallow: /pages/
 Disallow: /frames/
 Disallow: /sounds/
+Disallow: /images/backups/
 Disallow: /images/gallery/screenshots/_thumbs/
 Disallow: /images/gallery/screenshots/thumbs/
 Disallow: /file/
 Disallow: /community/personal/
-Sitemap: http://rpg.megamanpoweredup.net/sitemap.xml
+Disallow: /wp-admin/
+Disallow: /wp-content/
+
+# Crawl Parameters
+Crawl-delay: 300000
+
+# Sitemap Files
+Sitemap: http://prototype.mmrpg-world.net/sitemap.xml
