@@ -114,6 +114,22 @@ if (!empty($mmrpg_database_abilities)){
             if ($key_counter != 0){ $mmrpg_database_abilities_links .= '</div>'; }
             //if (!empty($this_current_sub) && $game_code == 'MM01/Weapons/003'){ $mmrpg_database_abilities_links .= '<span class="break"></span>'; }
             $mmrpg_database_abilities_links .= '<div class="float_link float_link_group" data-game="'.$game_code.'">';
+            /*
+            $game_code_label = explode('/', $game_code);
+            $game_code_label = array_merge(array_slice($game_code_label, 0, 1), array_slice($game_code_label, -1, 1));
+            $game_code_label = implode(' ', $game_code_label);
+            $mmrpg_database_abilities_links .= '<div class="float_link_label" style="
+                display: block;
+                clear: both;
+                margin: 0 auto;
+                font-size: 8px;
+                line-height: 1;
+                padding: 2px 2px 0;
+                letter-spacing: 1px;
+                color: #cacaca;
+                min-width: 110px;
+                ">'.$game_code_label.'</div>';
+            */
             $last_game_code = $game_code;
         }
 
