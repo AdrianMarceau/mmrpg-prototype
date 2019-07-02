@@ -117,7 +117,7 @@ ob_start();
                 $temp_order_counter += $allow_button ? 1 : 0;
 
                 // Now use the new object to generate a snapshot of this switch button
-                ?><a class="button <?= !$allow_button ? 'button_disabled' : '' ?> action_scan scan_<?= $temp_robot->robot_token ?> status_<?= $temp_robot->robot_status ?> robot_type robot_type_<?= $temp_robot_core_type.(!empty($temp_robot_core2_type) ? '_'.$temp_robot_core2_type : '') ?> block_<?= $robot_key + 1 ?>" type="button" data-tooltip="<?=$temp_robot_title_tooltip?>" <?=$order_button_markup?> <?if($allow_button):?>data-action="scan_<?= $temp_robot->robot_id.'_'.$temp_robot->robot_token ?>"<?endif;?> data-preload="<?= $temp_robot_sprite['preload'] ?>"><label><?= $temp_robot_sprite['markup'] ?><?= $temp_robot_label ?></label></a><?
+                ?><a class="button <?= !$allow_button ? 'button_disabled' : '' ?> action_scan scan_<?= $temp_robot->robot_token ?> status_<?= $temp_robot->robot_status ?> robot_type robot_type_<?= $temp_robot_core_type.(!empty($temp_robot_core2_type) ? '_'.$temp_robot_core2_type : '') ?> block_<?= $robot_key + 1 ?>" type="button" data-tooltip="<?=$temp_robot_title_tooltip?>" <?=$order_button_markup?> <?if($allow_button):?>data-action="scan_<?= $temp_robot->robot_id.'_'.$temp_robot->robot_token ?>"<?endif;?> data-preload="<?= $temp_robot_sprite['preload'] ?>" data-position="<?= $temp_robot->robot_position.'/'.$temp_robot->robot_key ?>"><label><?= $temp_robot_sprite['markup'] ?><?= $temp_robot_label ?></label></a><?
 
             }
         }

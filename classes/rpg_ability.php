@@ -3074,7 +3074,7 @@ class rpg_ability extends rpg_object {
             // self-attached charge/shield/booster with no repeat-use benefit
             'proto-shield', 'rhythm-satellite', 'acid-barrier', 'core-shield',
             // target attachment/breaker with no repeat-use benefit for user
-            'bass-crush', 'disco-fever', 'galaxy-bomb', 'thunder-wool', '',
+            'bass-crush', 'disco-fever', 'galaxy-bomb', 'thunder-wool',
             // already uses itself multiple times
             'water-balloon',
             // swap moves would be pretty lame if used twice
