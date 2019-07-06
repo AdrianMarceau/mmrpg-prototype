@@ -15,12 +15,10 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
-        // Check to see if a Gemini Clone is attached and if it's active
-        $has_gemini_clone = isset($this_robot->robot_attachments['ability_gemini-clone']) ? true : false;
-        $using_gemini_clone = $has_gemini_clone && !empty($this_robot->flags['gemini-clone_is_using_ability']) ? true : false;
-
-        // Do not allow a Gemini Clone to use this technique (we'll do it manually)
-        if ($has_gemini_clone && $using_gemini_clone){ return false; }
+        // Check to see if the ability has been summoned yet
+        $summoned_flag_token = $this_ability->ability_token.'_summoned';
+        if (!empty($this_robot->flags[$summoned_flag_token])){ $has_been_summoned = true; }
+        else { $has_been_summoned = false; }
 
         // Define this ability's attachment token
         $this_attachment_token = 'ability_'.$this_ability->ability_token;
@@ -35,8 +33,20 @@ $ability = array(
             );
 
         // If this ability has not been summoned yet, do the action and then queue a conclusion move
-        $summoned_flag_token = $this_ability->ability_token.'_summoned';
-        if (empty($this_robot->flags[$summoned_flag_token])){
+        if (!$has_been_summoned){
+
+            // Check to see if a Gemini Clone is attached and if it's active, then check to see if we can use it
+            $has_gemini_clone = isset($this_robot->robot_attachments['ability_gemini-clone']) ? true : false;
+            $required_weapon_energy = $this_robot->calculate_weapon_energy($this_ability);
+            if ($has_gemini_clone && !$has_been_summoned){
+                if ($this_robot->robot_weapons >= $required_weapon_energy){ $this_robot->set_weapons($this_robot->robot_weapons - $required_weapon_energy); }
+                else { $has_gemini_clone = false; }
+            }
+
+            // Set the summoned flag on this robot and save
+            $this_robot->flags[$summoned_flag_token] = true;
+            if ($has_gemini_clone){ $this_robot->flags[$summoned_flag_token.'_include_gemini_clone'] = true; }
+            $this_robot->update_session();
 
             // Set the summoned flag on this robot and save
             $this_robot->set_flag($summoned_flag_token, true);
@@ -73,8 +83,13 @@ $ability = array(
         // The ability has already been summoned, so we can finish executing it now and deal damage
         else {
 
+            // Check to see if a Gemini Clone is attached and if it's active, then check to see if we can use it
+            $has_gemini_clone = isset($this_robot->robot_attachments['ability_gemini-clone']) ? true : false;
+            if (empty($this_robot->flags[$summoned_flag_token.'_include_gemini_clone'])){ $has_gemini_clone = false; }
+
             // Remove the summoned flag from this robot and save
             $this_robot->unset_flag($summoned_flag_token);
+            $this_robot->unset_flag($summoned_flag_token.'_include_gemini_clone');
 
             // Remove the inverted styles from this robot's sprite
             $this_robot->set_frame_styles('');
