@@ -18,29 +18,46 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
-        // Check to see if a Gemini Clone is attached and if it's active
-        $has_gemini_clone = isset($this_robot->robot_attachments['ability_gemini-clone']) ? true : false;
-        $using_gemini_clone = $has_gemini_clone && !empty($this_robot->flags['gemini-clone_is_using_ability']) ? true : false;
-
-        // Do not allow a Gemini Clone to use this technique (we'll do it manually)
-        if ($has_gemini_clone && $using_gemini_clone){ return false; }
+        // Check to see if the ability has been summoned yet
+        $summoned_flag_token = $this_ability->ability_token.'_summoned';
+        if (!empty($this_robot->flags[$summoned_flag_token])){ $has_been_summoned = true; }
+        else { $has_been_summoned = false; }
 
         // If this ability has not been summoned yet, do the action and then queue a conclusion move
-        $summoned_flag_token = $this_ability->ability_token.'_summoned';
-        if (empty($this_robot->flags[$summoned_flag_token])){
+        if (!$has_been_summoned){
+
+            // Check to see if a Gemini Clone is attached and if it's active, then check to see if we can use it
+            $has_gemini_clone = isset($this_robot->robot_attachments['ability_gemini-clone']) ? true : false;
+            $required_weapon_energy = $this_robot->calculate_weapon_energy($this_ability);
+            if ($has_gemini_clone && !$has_been_summoned){
+                if ($this_robot->robot_weapons >= $required_weapon_energy){ $this_robot->set_weapons($this_robot->robot_weapons - $required_weapon_energy); }
+                else { $has_gemini_clone = false; }
+            }
 
             // Set the summoned flag on this robot and save
             $this_robot->flags[$summoned_flag_token] = true;
+            if ($has_gemini_clone){ $this_robot->flags[$summoned_flag_token.'_include_gemini_clone'] = true; }
             $this_robot->update_session();
 
-            // Target the opposing robot
-            if ($has_gemini_clone){ $summon_text = $this_robot->print_name().' and '.$this_robot->get_pronoun('possessive2').' clone summon the '.$this_ability->print_name().'!'; }
-            else { $summon_text = $this_robot->print_name().' summons the '.$this_ability->print_name().'!'; }
+             // Target the opposing robot and show summoning text
             $this_ability->target_options_update(array(
                 'frame' => 'summon',
-                'success' => array(0, 0, 150, 30, $summon_text)
+                'success' => array(0, 0, 150, 30, $this_robot->print_name().' summons the '.$this_ability->print_name().'!')
                 ));
             $this_robot->trigger_target($target_robot, $this_ability);
+
+            // If we have a clone present, let's summon another press
+            if ($has_gemini_clone){
+                $this_robot->unset_flag('robot_is_using_ability');
+                $this_robot->set_flag('gemini-clone_is_using_ability', true);
+                $this_ability->target_options_update(array(
+                    'frame' => 'summon',
+                    'success' => array(0, 0, 150, 30, $this_robot->print_name().' summons another '.$this_ability->print_name().'!')
+                    ));
+                $this_robot->trigger_target($target_robot, $this_ability);
+                $this_robot->unset_flag('gemini-clone_is_using_ability');
+                $this_robot->set_flag('robot_is_using_ability', true);
+            }
 
             // Queue another use of this ability at the end of turn
             $this_battle->actions_append(
@@ -57,8 +74,13 @@ $ability = array(
         // The ability has already been summoned, so we can finish executing it now and deal damage
         else {
 
+            // Check to see if a Gemini Clone is attached and if it's active, then check to see if we can use it
+            $has_gemini_clone = isset($this_robot->robot_attachments['ability_gemini-clone']) ? true : false;
+            if (empty($this_robot->flags[$summoned_flag_token.'_include_gemini_clone'])){ $has_gemini_clone = false; }
+
             // Remove the summoned flag from this robot and save
             unset($this_robot->flags[$summoned_flag_token]);
+            unset($this_robot->flags[$summoned_flag_token.'_include_gemini_clone']);
             $this_robot->update_session();
 
             // Inflict damage on the opposing robot
@@ -82,6 +104,17 @@ $ability = array(
             $this_robot->robot_frame = 'base';
             $this_robot->update_session();
 
+            // Only lower the target's stats of the ability was successful
+            if ($target_robot->robot_status != 'disabled'
+                && $this_ability->ability_results['this_result'] != 'failure'){
+
+                // Call the global stat break functions with customized options
+                rpg_ability::ability_function_stat_break($target_robot, 'attack', 1);
+                rpg_ability::ability_function_stat_break($target_robot, 'defense', 1);
+                rpg_ability::ability_function_stat_break($target_robot, 'speed', 1);
+
+            }
+
             // If the user has a Gemini Clone, we need to drop the press again
             if ($target_robot->robot_status != 'disabled'
                 && $has_gemini_clone){
@@ -98,15 +131,15 @@ $ability = array(
                 $this_ability->damage_options_update(array(
                     'kind' => 'energy',
                     'kickback' => array(10, 15, 0),
-                    'success' => array(1, 10, -40, 30, 'The '.$this_ability->print_name().' crushed the target with spikes'.$success_again_text.'!'),
-                    'failure' => array(1, 0, -40, -10, 'The '.$this_ability->print_name().' somehow missed the target'.$failure_again_text.'...')
+                    'success' => array(1, 10, -40, 30, 'The second '.$this_ability->print_name().' crushed the target with spikes'.$success_again_text.'!'),
+                    'failure' => array(1, 0, -40, -10, 'The second '.$this_ability->print_name().' somehow missed the target'.$failure_again_text.'...')
                     ));
                 $this_ability->recovery_options_update(array(
                     'kind' => 'energy',
                     'frame' => 'taunt',
                     'kickback' => array(5, 5, 0),
-                    'success' => array(1, 10, -20, 30, 'The '.$this_ability->print_name().' crushed the target'.$success_again_text.' but...'),
-                    'failure' => array(1, 0, -20, -10, 'The '.$this_ability->print_name().' somehow missed the target'.$failure_again_text.'...')
+                    'success' => array(1, 10, -20, 30, 'The second '.$this_ability->print_name().' crushed the target'.$success_again_text.' but...'),
+                    'failure' => array(1, 0, -20, -10, 'The second '.$this_ability->print_name().' somehow missed the target'.$failure_again_text.'...')
                     ));
                 $energy_damage_amount = $this_ability->ability_damage;
                 $this_robot->robot_frame = 'throw';
@@ -119,17 +152,16 @@ $ability = array(
                 $this_robot->unset_flag('gemini-clone_is_using_ability');
                 $this_robot->set_flag('robot_is_using_ability', true);
 
-            }
+                // Only lower the target's stats of the ability was successful
+                if ($target_robot->robot_status != 'disabled'
+                    && $this_ability->ability_results['this_result'] != 'failure'){
 
-            // Only lower the target's stats of the ability was successful
-            if ($target_robot->robot_status != 'disabled'
-                && $this_ability->ability_results['this_result'] != 'failure'){
+                    // Call the global stat break functions with customized options
+                    rpg_ability::ability_function_stat_break($target_robot, 'attack', 1);
+                    rpg_ability::ability_function_stat_break($target_robot, 'defense', 1);
+                    rpg_ability::ability_function_stat_break($target_robot, 'speed', 1);
 
-                // Call the global stat break functions with customized options
-                $break_amount = $has_gemini_clone ? 2 : 1;
-                rpg_ability::ability_function_stat_break($target_robot, 'attack', $break_amount);
-                rpg_ability::ability_function_stat_break($target_robot, 'defense', $break_amount);
-                rpg_ability::ability_function_stat_break($target_robot, 'speed', $break_amount);
+                }
 
             }
 
