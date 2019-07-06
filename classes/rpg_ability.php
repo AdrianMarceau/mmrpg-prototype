@@ -395,7 +395,7 @@ class rpg_ability extends rpg_object {
         $type_class = !empty($this->ability_type) ? $this->ability_type : 'none';
         if ($type_class != 'none' && !empty($this->ability_type2)){ $type_class .= '_'.$this->ability_type2; }
         elseif ($type_class == 'none' && !empty($this->ability_type2)){ $type_class = $this->ability_type2; }
-        return '<span class="ability_name ability_type ability_type_'.$type_class.'">'.$this->ability_name.($plural ? 's' : '').'</span>';
+        return '<span class="ability_name ability_type ability_type_'.$type_class.'">'.$this->ability_name.($plural ? (substr($this->ability_name, -1, 1) == 's' ? 'es' : 's') : '').'</span>';
     }
 
     public function print_token(){ return '<span class="ability_token">'.$this->ability_token.'</span>'; }
@@ -3066,25 +3066,51 @@ class rpg_ability extends rpg_object {
 
     // Define a function for checking if a given ability is complatible with the Gemini Clone mechanic
     public static function is_compatible_with_gemini_clone($ability_token){
-        return !in_array($ability_token, array(
-            // prevent from using itself over again
-            'gemini-clone',
-            // causes user or the target to switch which could be messy
-            'mecha-support', 'flash-pulse', 'super-throw',
-            // self-attached charge/shield/booster with no repeat-use benefit
-            'proto-shield', 'rhythm-satellite', 'acid-barrier', 'core-shield',
-            // target attachment/breaker with no repeat-use benefit for user
-            'bass-crush', 'disco-fever', 'galaxy-bomb', 'thunder-wool',
-            // already uses itself multiple times
-            'water-balloon',
-            // swap moves would be pretty lame if used twice
-            'energy-swap', 'attack-swap', 'defense-swap', 'speed-swap',
-            // mode abilities already max things so repeat-use not needed
-            'energy-mode', 'attack-mode', 'defense-mode', 'speed-mode',
-            // just doesn't make sense to use twice for one reason or another
-            'buster-charge', 'buster-relay',
-            'copy-shot', 'copy-soul'
-            )) ? true : false;
+        return
+            // user cannot double-up on system actions
+            substr($ability_token, 0, 7) != 'action-'
+            // user has no energy left after an overdrive so prevent
+            && substr($ability_token, -10, 10) != '-overdrive'
+            // ensure specific incompatible abilities are also blocked
+            && !in_array($ability_token, array(
+                // causes user or the target to switch which could be messy
+                'mecha-support', 'flash-pulse', 'super-throw',
+                // self-attached charge/shield/booster with no repeat-use benefit
+                'proto-shield', 'rhythm-satellite', 'acid-barrier', 'core-shield',
+                // target attachment/breaker with no repeat-use benefit for user
+                'bass-crush', 'disco-fever', 'galaxy-bomb', 'thunder-wool',
+                // already uses itself multiple times
+                'water-balloon',
+                // uses end-of-turn functionality + double counter damage wont work
+                'solar-blaze', 'air-twister',
+                // swap moves would be pretty lame if used twice
+                'energy-swap', 'attack-swap', 'defense-swap', 'speed-swap',
+                // mode abilities already max things so repeat-use not needed
+                'energy-mode', 'attack-mode', 'defense-mode', 'speed-mode',
+                // just doesn't make sense to use twice for one reason or another
+                'buster-charge', 'buster-relay', 'copy-shot', 'copy-soul',
+                // [deprecated] abilities should not double-up
+                'repair-mode', 'energy-shuffle', 'attack-shuffle', 'defense-shuffle', 'speed-shuffle',
+                // [action/system] abilities should never be doubled-up
+                'action-chargeweapons', 'action-noweapons', 'action-unequipitem',
+                // prevent from using itself over again
+                'gemini-clone'
+                ))
+            ? true
+            : false;
+    }
+
+    // Define a function for checking if a given ability is complatible with the Gemini Clone mechanic
+    public static function allow_auto_trigger_with_gemini_clone($ability_token){
+        return
+            self::is_compatible_with_gemini_clone($ability_token)
+            // ensure specific incompatible abilities are also blocked
+            && !in_array($ability_token, array(
+                // uses end-of-turn functionalit. but can be compensated for manually
+                'mega-ball', 'metal-press', 'crystal-mind',
+                ))
+            ? true
+            : false;
     }
 
     // Define a static function for generating/returning the Super Arm sprite index w/ sheet & frame refs for each field
