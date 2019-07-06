@@ -797,7 +797,11 @@ class rpg_robot extends rpg_object {
 
     // Define public print functions for markup generation
     public function print_number(){ return '<span class="robot_number">'.$this->robot_number.'</span>'; }
-    public function print_name(){ return '<span class="robot_name robot_type">'.$this->robot_name.'</span>'; } //.'<span>('.preg_replace('#\s+#', ' ', print_r($this->flags, true)).(!empty($this->flags['triggered_weakness']) ? 'true' : 'false').')</span>'
+    public function print_name(){
+        $gemini_clone_active = false;
+        if (isset($this->robot_attachments['ability_gemini-clone']) && !empty($this->flags['gemini-clone_is_using_ability'])){ $gemini_clone_active = true; }
+        return '<span class="robot_name robot_type">'.$this->robot_name.($gemini_clone_active ? ' II' : '').'</span>'; //&#960;
+    }
     public function print_token(){ return '<span class="robot_token">'.$this->robot_token.'</span>'; }
     public function print_core(){ return '<span class="robot_core '.(!empty($this->robot_core) ? 'robot_type_'.$this->robot_core : '').'">'.(!empty($this->robot_core) ? ucfirst($this->robot_core) : 'Neutral').'</span>'; }
     public function print_description(){ return '<span class="robot_description">'.$this->robot_description.'</span>'; }

@@ -1479,15 +1479,13 @@ class rpg_battle extends rpg_object {
                     && isset($this_robot->robot_attachments['ability_gemini-clone'])
                     // ensure this robot has enough weapon energy to use the ability again
                     && $this_robot->robot_weapons >= $this_robot->calculate_weapon_energy($this_ability)
-                    // user has no energy left after an overdrive so prevent
-                    && !strstr($this_ability->ability_token, '-overdrive')
                     // ensure this is not a restricted ability that might cause bugs / be useless
-                    && rpg_ability::is_compatible_with_gemini_clone($this_ability->ability_token)
+                    && rpg_ability::allow_auto_trigger_with_gemini_clone($this_ability->ability_token)
                     ){
 
                     // Trigger this Gemini Clone's ability
                     $name_backup = $this_robot->robot_name;
-                    $this_robot->set_name($name_backup.' 2');
+                    //$this_robot->set_name($name_backup.' 2');
                     $this_robot->set_flag('gemini-clone_is_using_ability', true);
                     $this_ability->ability_results = $this_robot->trigger_ability($actual_target_robot, $this_ability);
 
@@ -1521,7 +1519,7 @@ class rpg_battle extends rpg_object {
 
                     // We're done using this Gemini Clone's ability
                     $this_robot->unset_flag('gemini-clone_is_using_ability');
-                    $this_robot->set_name($name_backup);
+                    //$this_robot->set_name($name_backup);
 
                 }
 
