@@ -491,8 +491,9 @@ class rpg_canvas {
                 }
                 $temp_clone_style .= 'background-image: url('.$this_data['robot_file'].'); width: '.$this_data['robot_sprite_size'].'px; height: '.$this_data['robot_sprite_size'].'px; background-size: '.$this_data['robot_file_width'].'px '.$this_data['robot_file_height'].'px; ';
 
-                $filters = 'grayscale(100%) sepia(1) hue-rotate(145deg)';
-                $temp_clone_style .= '-moz-filter: '.$filters.'; -webkit-filter: '.$filters.'; filter: '.$filters.'; ';
+                //$filters = 'grayscale(100%) sepia(1) hue-rotate(145deg)';
+                //$temp_clone_style .= '-moz-filter: '.$filters.'; -webkit-filter: '.$filters.'; filter: '.$filters.'; ';
+                $temp_clone_style .= rpg_ability::get_css_filter_styles_for_gemini_clone();
                 $temp_clone_style .= $this_data['robot_frame_styles'];
 
                 // Print out the clone with adjusted styles for the sprite
@@ -784,7 +785,7 @@ class rpg_canvas {
         }
 
         // If this ability is being used by a Gemini Clone, offset the position
-        if ($gemini_clone_active){
+        if ($gemini_clone_active && !$this_data['data_sticky']){
             $this_data['canvas_offset_x'] -= 40;
             $this_data['canvas_offset_y'] -= 2;
         }
