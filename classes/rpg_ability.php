@@ -73,7 +73,7 @@ class rpg_ability extends rpg_object {
         // Otherwise base the ID off of the robot
         else {
             $ability_id = $this->robot_id.str_pad($this_indexinfo['ability_id'], 3, '0', STR_PAD_LEFT);
-            if (!empty($this_abilityinfo['flags']['is_attachment'])){
+            if (!empty($this_abilityinfo['flags']['is_attachment']) || isset($this_abilityinfo['attachment_token'])){
                 if (isset($this_abilityinfo['attachment_token'])){ $ability_id .= 'x'.strtoupper(substr(md5($this_abilityinfo['attachment_token']), 0, 3)); }
                 else { $ability_id .= substr(md5($this_abilityinfo['ability_token']), 0, 3); }
             }
@@ -3063,6 +3063,13 @@ class rpg_ability extends rpg_object {
 
 
     /* -- ABILITY-SPECIFIC FUNCTIONS THAT DON'T FIT ANYWHERE ELSE RIGHT NOW -- */
+
+    // Define a function for getting the CSS filter styles for a Gemini Clone sprite
+    public static function get_css_filter_styles_for_gemini_clone(){
+        $filters = 'grayscale(100%) sepia(1) hue-rotate(145deg)';
+        $styles = '-moz-filter: '.$filters.'; -webkit-filter: '.$filters.'; filter: '.$filters.'; ';
+        return $styles;
+    }
 
     // Define a function for checking if a given ability is complatible with the Gemini Clone mechanic
     public static function is_compatible_with_gemini_clone($ability_token){
