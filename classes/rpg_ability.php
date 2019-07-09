@@ -3088,7 +3088,7 @@ class rpg_ability extends rpg_object {
                 'bass-crush', 'disco-fever', 'galaxy-bomb', 'thunder-wool',
                 // already uses itself multiple times
                 'water-balloon',
-                // uses end-of-turn functionality + double counter damage wont work
+                // uses end-of-turn functionality & counter damage
                 'solar-blaze', 'air-twister',
                 // swap moves would be pretty lame if used twice
                 'energy-swap', 'attack-swap', 'defense-swap', 'speed-swap',
