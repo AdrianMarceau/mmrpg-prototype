@@ -1441,6 +1441,7 @@ class rpg_battle extends rpg_object {
                 // Trigger this robot's ability
                 $this_robot->set_flag('robot_is_using_ability', true);
                 $this_ability->ability_results = $this_robot->trigger_ability($actual_target_robot, $this_ability);
+                $this_ability->trigger_onload();
 
                 // Ensure the battle has not completed before triggering the taunt event
                 if ($this->battle_status != 'complete'){
