@@ -84,7 +84,7 @@ $ability = array(
                 $clone_attachment_info['attachment_token'] = $clone_attachment_token;
                 $clone_attachment_info['ability_frame_offset']['x'] -= 40;
                 $clone_attachment_info['ability_frame_offset']['y'] -= 4;
-                $clone_attachment_info['ability_frame_styles'] = rpg_ability::get_css_filter_styles_for_gemini_clone();
+                //$clone_attachment_info['ability_frame_styles'] = rpg_ability::get_css_filter_styles_for_gemini_clone();
                 array_push($clone_attachment_info['ability_frame_animate'], array_shift($clone_attachment_info['ability_frame_animate']));
                 $clone_attachment = rpg_game::get_ability($this_battle, $this_player, $this_robot, $clone_attachment_info);
 
@@ -187,7 +187,7 @@ $ability = array(
                     $clone_css_styles = rpg_ability::get_css_filter_styles_for_gemini_clone();
 
                     // Update this ability's target options and trigger
-                    $this_ability->set_frame_styles($clone_css_styles);
+                    //$this_ability->set_frame_styles($clone_css_styles);
                     $this_ability->target_options_update(array(
                         'frame' => 'slide',
                         'kickback' => array(60, 0, 0),
@@ -196,7 +196,7 @@ $ability = array(
                     $this_robot->trigger_target($target_robot, $this_ability);
 
                     // Inflict damage on the opposing robot
-                    $this_ability->set_frame_styles($clone_css_styles);
+                    //$this_ability->set_frame_styles($clone_css_styles);
                     $this_ability->damage_options_update(array(
                         'kind' => 'energy',
                         'kickback' => array(24, 0, 0),
@@ -205,7 +205,7 @@ $ability = array(
                         ));
                     $energy_damage_amount = $this_ability->ability_damage;
                     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
-                    $this_ability->set_frame_styles('');
+                    //$this_ability->set_frame_styles('');
 
                     // If the ability was successful, loop through and remove recent core shield
                     if ($this_ability->ability_results['this_result'] != 'failure'){
