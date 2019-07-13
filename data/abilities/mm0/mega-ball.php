@@ -8,6 +8,8 @@ $ability = array(
     'ability_description' => 'The user generates a powerful ball-shaped explosive that rocks back and forth at their feet.  At the end of the turn, the user kicks the ball at the target to deal damage and break through core shields! ',
     'ability_type' => '',
     'ability_energy' => 4,
+    'ability_speed' => -6,
+    'ability_speed2' => 6,
     'ability_damage' => 32,
     'ability_accuracy' => 96,
     'ability_target' => 'select_target',
@@ -48,10 +50,8 @@ $ability = array(
                 else { $has_gemini_clone = false; }
             }
 
-            // Set the summoned flag on this robot and save
-            $this_robot->flags[$summoned_flag_token] = true;
-            if ($has_gemini_clone){ $this_robot->flags[$summoned_flag_token.'_include_gemini_clone'] = true; }
-            $this_robot->update_session();
+            // If the robot was found to gave a Gemini Clone, set the appropriate flag value now
+            if ($has_gemini_clone){ $this_robot->set_flag($summoned_flag_token.'_include_gemini_clone', true); }
 
             // Set the summoned flag on this robot and save
             $this_robot->flags[$summoned_flag_token] = true;
@@ -123,16 +123,13 @@ $ability = array(
             // Check to see if a Gemini Clone is attached and if it's active, then check to see if we can use it
             $has_gemini_clone = isset($this_robot->robot_attachments['ability_gemini-clone']) ? true : false;
             if (empty($this_robot->flags[$summoned_flag_token.'_include_gemini_clone'])){ $has_gemini_clone = false; }
-
-            // Remove the summoned flag from this robot and save
-            unset($this_robot->flags[$summoned_flag_token]);
             unset($this_robot->flags[$summoned_flag_token.'_include_gemini_clone']);
-            $this_robot->update_session();
 
+            // Remove the summoned flag from this robot
+            $this_robot->unset_flag($summoned_flag_token);
 
-            // Remove this ability attachment to the robot using it
-            unset($this_robot->robot_attachments[$this_attachment_token]);
-            $this_robot->update_session();
+            // Remove the attachment from the summoner
+            $this_robot->unset_attachment($this_attachment_token);
 
             // Update this ability's target options and trigger
             $this_ability->target_options_update(array(
@@ -186,10 +183,11 @@ $ability = array(
                     $this_robot->set_flag('gemini-clone_is_using_ability', true);
 
                     // Collect the existing clone attachment info from the game object
-                    $clone_attachment = rpg_game::get_ability($this_battle, $this_player, $this_robot, array('attachment_token'));
+                    $clone_attachment = rpg_game::get_ability($this_battle, $this_player, $this_robot, array('attachment_token' => $clone_attachment_token));
+                    $clone_css_styles = rpg_ability::get_css_filter_styles_for_gemini_clone();
 
                     // Update this ability's target options and trigger
-                    $this_ability->set_frame_styles(rpg_ability::get_css_filter_styles_for_gemini_clone());
+                    $this_ability->set_frame_styles($clone_css_styles);
                     $this_ability->target_options_update(array(
                         'frame' => 'slide',
                         'kickback' => array(60, 0, 0),
@@ -198,7 +196,7 @@ $ability = array(
                     $this_robot->trigger_target($target_robot, $this_ability);
 
                     // Inflict damage on the opposing robot
-                    $this_ability->set_frame_styles(rpg_ability::get_css_filter_styles_for_gemini_clone());
+                    $this_ability->set_frame_styles($clone_css_styles);
                     $this_ability->damage_options_update(array(
                         'kind' => 'energy',
                         'kickback' => array(24, 0, 0),

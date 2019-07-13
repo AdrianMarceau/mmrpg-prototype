@@ -10,7 +10,8 @@ $ability = array(
     'ability_type' => 'cutter',
     'ability_type2' => 'impact',
     'ability_energy' => 8,
-    'ability_speed' => -2,
+    'ability_speed' => -6,
+    'ability_speed2' => 6,
     'ability_damage' => 22,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
@@ -34,9 +35,11 @@ $ability = array(
                 else { $has_gemini_clone = false; }
             }
 
+            // If the robot was found to gave a Gemini Clone, set the appropriate flag value now
+            if ($has_gemini_clone){ $this_robot->set_flag($summoned_flag_token.'_include_gemini_clone', true); }
+
             // Set the summoned flag on this robot and save
             $this_robot->flags[$summoned_flag_token] = true;
-            if ($has_gemini_clone){ $this_robot->flags[$summoned_flag_token.'_include_gemini_clone'] = true; }
             $this_robot->update_session();
 
              // Target the opposing robot and show summoning text
@@ -77,11 +80,10 @@ $ability = array(
             // Check to see if a Gemini Clone is attached and if it's active, then check to see if we can use it
             $has_gemini_clone = isset($this_robot->robot_attachments['ability_gemini-clone']) ? true : false;
             if (empty($this_robot->flags[$summoned_flag_token.'_include_gemini_clone'])){ $has_gemini_clone = false; }
+            $this_robot->unset_flag($summoned_flag_token.'_include_gemini_clone');
 
-            // Remove the summoned flag from this robot and save
-            unset($this_robot->flags[$summoned_flag_token]);
-            unset($this_robot->flags[$summoned_flag_token.'_include_gemini_clone']);
-            $this_robot->update_session();
+            // Remove the summoned flag from this robot
+            $this_robot->unset_flag($summoned_flag_token);
 
             // Inflict damage on the opposing robot
             $this_ability->damage_options_update(array(
