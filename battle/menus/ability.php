@@ -165,6 +165,7 @@ ob_start();
                 // Define the amount of weapon energy for this ability
                 $temp_robot_weapons = $this_robot->robot_weapons;
                 $temp_ability_energy = $this_robot->calculate_weapon_energy($temp_ability, $temp_ability_energy_base, $temp_ability_energy_mods);
+                $temp_ability_speed = $temp_ability->ability_speed;
 
                 // Define the ability title details text
                 $temp_ability_details = $temp_ability->ability_name;
@@ -179,6 +180,12 @@ ob_start();
                 $temp_ability_details .= ' | '.$temp_ability->ability_accuracy.'% Accuracy';
                 if (!empty($temp_ability_energy)){ $temp_ability_details .= ' | '.$temp_ability_energy.' Energy'; }
                 if (!empty($temp_target_text)){ $temp_ability_details .= ' | '.$temp_target_text; }
+
+                if (!empty($temp_ability_speed) && $temp_ability_speed !== 1){
+                    if ($temp_ability_speed > 1){ $temp_ability_details .= ' | Fast <sup>(+'.($temp_ability_speed - 1).')'; }
+                    elseif ($temp_ability_speed < 1){ $temp_ability_details .= ' | Slow <sup>('.($temp_ability_speed + 1).')'; }
+                }
+
                 $temp_ability_description = $temp_ability->ability_description;
                 $temp_ability_description = str_replace('{DAMAGE}', $temp_damage, $temp_ability_description);
                 $temp_ability_description = str_replace('{RECOVERY}', $temp_recovery, $temp_ability_description);
