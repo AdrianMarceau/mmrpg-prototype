@@ -109,6 +109,7 @@ class rpg_ability extends rpg_object {
         $this->ability_type = isset($this_abilityinfo['ability_type']) ? $this_abilityinfo['ability_type'] : '';
         $this->ability_type2 = isset($this_abilityinfo['ability_type2']) ? $this_abilityinfo['ability_type2'] : '';
         $this->ability_speed = isset($this_abilityinfo['ability_speed']) ? $this_abilityinfo['ability_speed'] : 1;
+        $this->ability_speed2 = isset($this_abilityinfo['ability_speed2']) ? $this_abilityinfo['ability_speed2'] : $this->ability_speed;
         $this->ability_energy = isset($this_abilityinfo['ability_energy']) ? $this_abilityinfo['ability_energy'] : 4;
         $this->ability_damage = isset($this_abilityinfo['ability_damage']) ? $this_abilityinfo['ability_damage'] : 0;
         $this->ability_damage2 = isset($this_abilityinfo['ability_damage2']) ? $this_abilityinfo['ability_damage2'] : 0;
@@ -152,6 +153,7 @@ class rpg_ability extends rpg_object {
         $this->ability_base_type2 = isset($this_abilityinfo['ability_base_type2']) ? $this_abilityinfo['ability_base_type2'] : $this->ability_type2;
         $this->ability_base_energy = isset($this_abilityinfo['ability_base_energy']) ? $this_abilityinfo['ability_base_energy'] : $this->ability_energy;
         $this->ability_base_speed = isset($this_abilityinfo['ability_base_speed']) ? $this_abilityinfo['ability_base_speed'] : $this->ability_speed;
+        $this->ability_base_speed2 = isset($this_abilityinfo['ability_base_speed2']) ? $this_abilityinfo['ability_base_speed2'] : $this->ability_speed2;
         $this->ability_base_damage = isset($this_abilityinfo['ability_base_damage']) ? $this_abilityinfo['ability_base_damage'] : $this->ability_damage;
         $this->ability_base_damage2 = isset($this_abilityinfo['ability_base_damage2']) ? $this_abilityinfo['ability_base_damage2'] : $this->ability_damage2;
         $this->ability_base_recovery = isset($this_abilityinfo['ability_base_recovery']) ? $this_abilityinfo['ability_base_recovery'] : $this->ability_recovery;
@@ -258,6 +260,12 @@ class rpg_ability extends rpg_object {
     public function get_base_speed(){ return $this->get_info('ability_base_speed'); }
     public function set_base_speed($value){ $this->set_info('ability_base_speed', $value); }
     public function reset_speed(){ $this->set_info('ability_speed', $this->get_base_speed()); }
+
+    public function get_speed2(){ return $this->get_info('ability_speed2'); }
+    public function set_speed2($value){ $this->set_info('ability_speed2', $value); }
+    public function get_base_speed2(){ return $this->get_info('ability_base_speed2'); }
+    public function set_base_speed2($value){ $this->set_info('ability_base_speed2', $value); }
+    public function reset_speed2(){ $this->set_info('ability_speed2', $this->get_base_speed()); }
 
     public function get_energy(){ return $this->get_info('ability_energy'); }
     public function set_energy($value){ $this->set_info('ability_energy', $value); }
@@ -785,6 +793,7 @@ class rpg_ability extends rpg_object {
             'ability_description',
             'ability_description2',
             'ability_speed',
+            'ability_speed2',
             'ability_energy',
             'ability_energy_percent',
             'ability_damage',
@@ -1030,6 +1039,7 @@ class rpg_ability extends rpg_object {
         $temp_ability_type = !empty($ability_info['ability_type']) ? $mmrpg_types[$ability_info['ability_type']] : false;
         $temp_ability_type2 = !empty($ability_info['ability_type2']) ? $mmrpg_types[$ability_info['ability_type2']] : false;
         $temp_ability_energy = rpg_robot::calculate_weapon_energy_static($robot_info, $ability_info);
+        //$temp_ability_speed = !empty($ability_info['ability_speed']) ? $ability_info['ability_speed'] : 1;
         $temp_ability_damage = !empty($ability_info['ability_damage']) ? $ability_info['ability_damage'] : 0;
         $temp_ability_damage2 = !empty($ability_info['ability_damage2']) ? $ability_info['ability_damage2'] : 0;
         $temp_ability_recovery = !empty($ability_info['ability_recovery']) ? $ability_info['ability_recovery'] : 0;
@@ -1070,6 +1080,7 @@ class rpg_ability extends rpg_object {
 
         if (!empty($temp_ability_energy)){ $temp_ability_title .= ' | '.$temp_ability_energy.' Energy'; }
         if ($temp_ability_target != 'auto'){ $temp_ability_title .= ' | Select Target'; }
+        //if (!empty($temp_ability_speed)){ $temp_ability_title .= ' | '.$temp_ability_speed.' Speed'; }
 
         if (!empty($ability_info['ability_description'])){
             $temp_find = array('{RECOVERY}', '{RECOVERY2}', '{DAMAGE}', '{DAMAGE2}');
@@ -1327,6 +1338,7 @@ class rpg_ability extends rpg_object {
             'ability_type2' => $this->ability_type2,
             'ability_energy' => $this->ability_energy,
             'ability_speed' => $this->ability_speed,
+            'ability_speed2' => $this->ability_speed2,
             'ability_damage' => $this->ability_damage,
             'ability_damage2' => $this->ability_damage2,
             'ability_damage_percent' => $this->ability_damage_percent,
@@ -1355,6 +1367,7 @@ class rpg_ability extends rpg_object {
             'ability_base_type2' => $this->ability_base_type2,
             'ability_base_energy' => $this->ability_base_energy,
             'ability_base_speed' => $this->ability_base_speed,
+            'ability_base_speed2' => $this->ability_base_speed2,
             'ability_base_damage' => $this->ability_base_damage,
             'ability_base_damage2' => $this->ability_base_damage2,
             'ability_base_recovery' => $this->ability_base_recovery,
