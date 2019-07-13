@@ -6,13 +6,13 @@ $ability = array(
     'ability_game' => 'MM10',
     //'ability_group' => 'MM10/Weapons/080',
     'ability_group' => 'MM10/Weapons/073T2',
-    'ability_description' => 'The user releases a fire-based explosive that hovers in the middle of the field and waits, absorbing energy from the target\'s attacks.  At the end of the turn, the projectile explodes to release a wave of fire that deals counter damage the target!',
+    'ability_description' => 'The user fires a flame-based explosive at the target that hovers in the middle of the field and waits to absorb energy from attacks.  At the end of the turn, the explosive detonates to deal massive counter damage to the target!',
     'ability_type' => 'flame',
     'ability_type2' => 'explode',
     'ability_energy' => 8,
     'ability_speed' => -6,
     'ability_speed2' => 6,
-    'ability_damage' => 26,
+    'ability_damage' => 20,
     'ability_accuracy' => 96,
     'ability_function' => function($objects){
 
@@ -110,7 +110,6 @@ $ability = array(
                 $clone_attachment_info['attachment_token'] = $clone_attachment_token;
                 $clone_attachment_info['ability_frame_offset']['x'] -= 40;
                 $clone_attachment_info['ability_frame_offset']['y'] -= 4;
-                //$clone_attachment_info['ability_frame_styles'] = rpg_ability::get_css_filter_styles_for_gemini_clone();
                 array_push($clone_attachment_info['ability_frame_animate'], array_shift($clone_attachment_info['ability_frame_animate']));
                 $clone_attachment = rpg_game::get_ability($this_battle, $this_player, $this_robot, $clone_attachment_info);
 
@@ -122,10 +121,10 @@ $ability = array(
                     'frame' => 'shoot',
                     'success' => array(false, -9999, -9999, -9999,
                         $this_robot->print_name().' releases another '.$this_ability->print_name().'!<br /> '.
-                        'The '.$this_ability->print_name().' started charging too! '
+                        'The second '.$this_ability->print_name().' started charging too! '
                         )
                     ));
-                $this_robot->trigger_target($this_robot, $this_ability);
+                $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
                 $this_robot->unset_flag('gemini-clone_is_using_ability');
                 $this_robot->set_flag('robot_is_using_ability', true);
 
@@ -186,7 +185,7 @@ $ability = array(
 
             // Target the opposing robot
             $this_ability->target_options_update(array(
-                'frame' => 'defend',
+                'frame' => 'summon',
                 'success' => array(4, 300, 0, 30,
                     'The '.$this_ability->print_name().' exploded! <br />'.
                     'Waves of fire race across the field! '
@@ -213,7 +212,7 @@ $ability = array(
                 'success' => array(5, -80, 0, 30, 'The '.$this_ability->print_name().'\'s flame burned through the target!'),
                 'failure' => array(5, -90, 0, -30, 'The '.$this_ability->print_name().'\'s flame missed the target...')
                 ));
-            $energy_damage_amount = $this_ability->ability_damage + $power_boost;
+            $energy_damage_amount = ceil($this_ability->ability_damage + ($power_boost * 2));
             $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
 
             // Remove this ability attachment from the robot using it
@@ -245,23 +244,20 @@ $ability = array(
                     // Define this ability's second attachment token
                     $clone_attachment_token_two = 'ability_'.$this_ability->ability_token.'_two_clone';
                     $clone_attachment_info_two = $this_attachment_info_two;
-                    //$clone_attachment_info_two['ability_frame_styles'] .= $clone_css_styles;
 
                     // Attach this ability attachment to the robot using it
                     $this_robot->robot_attachments[$clone_attachment_token_two] = $clone_attachment_info_two;
                     $this_robot->update_session();
 
                     // Target the opposing robot
-                    //$this_ability->set_frame_styles($clone_css_styles);
                     $this_ability->target_options_update(array(
-                        'frame' => 'defend',
+                        'frame' => 'summon',
                         'success' => array(4, 300, 0, 30,
                             'The second '.$this_ability->print_name().' exploded! <br />'.
                             'Waves of fire race across the field again! '
                             )
                         ));
                     $this_robot->trigger_target($target_robot, $this_ability, array('prevent_default_text' => true));
-                    //$this_ability->set_frame_styles('');
 
                     // Update the attachment to show movement
                     $this_robot->robot_frame = 'taunt';
@@ -269,7 +265,6 @@ $ability = array(
                     $this_robot->update_session();
 
                     // Inflict damage on the opposing robot
-                    //$this_ability->set_frame_styles($clone_css_styles);
                     $this_ability->damage_options_update(array(
                         'kind' => 'energy',
                         'kickback' => array(10, 0, 0),
@@ -283,9 +278,8 @@ $ability = array(
                         'success' => array(5, -80, 0, 30, 'The second '.$this_ability->print_name().'\'s flame burned through the target!'),
                         'failure' => array(5, -90, 0, -30, 'The second '.$this_ability->print_name().'\'s flame missed the target...')
                         ));
-                    $energy_damage_amount = $this_ability->ability_damage + $power_boost;
+                    $energy_damage_amount = ceil($this_ability->ability_damage + ($power_boost * 2));
                     $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
-                    //$this_ability->set_frame_styles('');
 
                     // Remove this ability attachment from the robot using it
                     $this_robot->set_frame('base');
