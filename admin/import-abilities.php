@@ -371,6 +371,7 @@ if (!empty($mmrpg_index['abilities'])){
         $temp_insert_array['ability_description'] = !empty($ability_data['ability_description']) && $ability_data['ability_description'] != '...' ? $ability_data['ability_description'] : '';
         $temp_insert_array['ability_description2'] = !empty($ability_data['ability_description2']) && $ability_data['ability_description2'] != '...' ? $ability_data['ability_description2'] : '';
         $temp_insert_array['ability_speed'] = !empty($ability_data['ability_speed']) ? $ability_data['ability_speed'] : 1;
+        $temp_insert_array['ability_speed2'] = !empty($ability_data['ability_speed2']) ? $ability_data['ability_speed2'] : $temp_insert_array['ability_speed'];
         $temp_insert_array['ability_energy'] = isset($ability_data['ability_energy']) ? $ability_data['ability_energy'] : 1;
         $temp_insert_array['ability_energy_percent'] = !empty($ability_data['ability_energy_percent']) ? 1 : 0;
         $temp_insert_array['ability_damage'] = !empty($ability_data['ability_damage']) ? $ability_data['ability_damage'] : 0;
