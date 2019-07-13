@@ -10,7 +10,8 @@ $ability = array(
     'ability_type' => 'wind',
     'ability_type2' => 'shield',
     'ability_energy' => 8,
-    'ability_speed' => 3,
+    'ability_speed' => -6,
+    'ability_speed2' => 6,
     'ability_damage' => 22,
     'ability_recovery2' => 50,
     'ability_recovery_percent2' => true,
@@ -19,6 +20,11 @@ $ability = array(
 
         // Extract all objects into the current scope
         extract($objects);
+
+        // Check to see if the ability has been summoned yet
+        $summoned_flag_token = $this_ability->ability_token.'_summoned';
+        if (!empty($this_robot->flags[$summoned_flag_token])){ $has_been_summoned = true; }
+        else { $has_been_summoned = false; }
 
         // Define this ability's attachment token
         $this_effect_multiplier = 1 - ($this_ability->ability_recovery2 / 100);
@@ -64,9 +70,19 @@ $ability = array(
             );
 
         // If this ability has not been summoned yet, do the action and then queue a conclusion move
-        $summoned_flag_token = $this_ability->ability_token.'_summoned';
         $lifecounter_flag_token = $this_ability->ability_token.'_lifecounter';
-        if (empty($this_robot->flags[$summoned_flag_token])){
+        if (!$has_been_summoned){
+
+            // Check to see if a Gemini Clone is attached and if it's active, then check to see if we can use it
+            $has_gemini_clone = isset($this_robot->robot_attachments['ability_gemini-clone']) ? true : false;
+            $required_weapon_energy = $this_robot->calculate_weapon_energy($this_ability);
+            if ($has_gemini_clone && !$has_been_summoned){
+                if ($this_robot->robot_weapons >= $required_weapon_energy){ $this_robot->set_weapons($this_robot->robot_weapons - $required_weapon_energy); }
+                else { $has_gemini_clone = false; }
+            }
+
+            // If the robot was found to gave a Gemini Clone, set the appropriate flag value now
+            if ($has_gemini_clone){ $this_robot->set_flag($summoned_flag_token.'_include_gemini_clone', true); }
 
             // Set the summoned flag on this robot and save
             $this_robot->flags[$summoned_flag_token] = true;
@@ -76,13 +92,46 @@ $ability = array(
             // Target the opposing robot
             $this_ability->target_options_update(array(
                 'frame' => 'summon',
-                'success' => array(2, 90, 0, 20, $this_robot->print_name().' summons an '.$this_ability->print_name().'!')
+                'success' => array(2, 90, 0, 20,
+                    $this_robot->print_name().' summons an '.$this_ability->print_name().'!<br /> '.
+                    'The '.$this_ability->print_name().' resists damage! '
+                    )
                 ));
-            $this_robot->trigger_target($target_robot, $this_ability);
+            $this_robot->trigger_target($target_robot, $this_ability, array('prevent_default_text' => true));
 
             // Attach this ability attachment to the robot using it
             $this_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
             $this_robot->update_session();
+
+            // If we have a clone present, let's summon another ball
+            if ($has_gemini_clone){
+
+                // Create the cloned attachment with matching hologram styles
+                $clone_attachment_token = $this_attachment_token.'_clone';
+                $clone_attachment_info = $this_attachment_info;
+                unset($clone_attachment_info['ability_id']);
+                $clone_attachment_info['attachment_token'] = $clone_attachment_token;
+                $clone_attachment_info['ability_frame_offset']['x'] -= 40;
+                $clone_attachment_info['ability_frame_offset']['y'] -= 4;
+                array_push($clone_attachment_info['ability_frame_animate'], array_shift($clone_attachment_info['ability_frame_animate']));
+                $clone_attachment = rpg_game::get_ability($this_battle, $this_player, $this_robot, $clone_attachment_info);
+
+                // Trigger the summon animation a second time and then attach the duplicate ball
+                $this_robot->unset_flag('robot_is_using_ability');
+                $this_robot->set_flag('gemini-clone_is_using_ability', true);
+                $this_robot->set_attachment($clone_attachment_token, $clone_attachment_info);
+                $this_ability->target_options_update(array(
+                    'frame' => 'summon',
+                    'success' => array(false, -9999, -9999, -9999,
+                        $this_robot->print_name().' summoned another '.$this_ability->print_name().'!<br /> '.
+                        'The second '.$this_ability->print_name().' resists damage too! '
+                        )
+                    ));
+                $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
+                $this_robot->unset_flag('gemini-clone_is_using_ability');
+                $this_robot->set_flag('robot_is_using_ability', true);
+
+            }
 
             // Queue another use of this ability at the end of turn
             $this_battle->actions_append(
@@ -99,6 +148,11 @@ $ability = array(
         // The ability has already been summoned, so we can finish executing it now and deal damage
         else {
 
+            // Check to see if a Gemini Clone is attached and if it's active, then check to see if we can use it
+            $has_gemini_clone = isset($this_robot->robot_attachments['ability_gemini-clone']) ? true : false;
+            if (empty($this_robot->flags[$summoned_flag_token.'_include_gemini_clone'])){ $has_gemini_clone = false; }
+            unset($this_robot->flags[$summoned_flag_token.'_include_gemini_clone']);
+
             // Calculate the difference in energy so we know how much payback
             $power_boost = 0;
             if (isset($this_robot->counters[$lifecounter_flag_token])
@@ -107,18 +161,18 @@ $ability = array(
                 $power_boost += $this_robot->counters[$lifecounter_flag_token] - $this_robot->robot_energy;
             }
 
-            // Remove the summoned flag from this robot and save
-            unset($this_robot->flags[$summoned_flag_token]);
-            unset($this_robot->counters[$lifecounter_flag_token]);
-            $this_robot->update_session();
+            // Remove the summoned flag from this robot
+            $this_robot->unset_flag($summoned_flag_token);
 
-            // Remove this ability attachment from the robot using it
-            unset($this_robot->robot_attachments[$this_attachment_token]);
-            $this_robot->update_session();
+            // Remove the life counter from this robot
+            $this_robot->unset_counter($lifecounter_flag_token);
+
+            // Remove the attachment from the summoner
+            $this_robot->unset_attachment($this_attachment_token);
 
             // Target the opposing robot
             $this_ability->target_options_update(array(
-                'frame' => 'summon',
+                'frame' => 'throw',
                 'success' => array(0, 180, 5, 10, $this_robot->print_name().' releases the '.$this_ability->print_name().'!')
                 ));
             $this_robot->trigger_target($target_robot, $this_ability);
@@ -139,6 +193,53 @@ $ability = array(
                 ));
             $energy_damage_amount = $this_ability->ability_damage + $power_boost;
             $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
+
+            // If a Gemini Clone is present and there's another explosive, we need to explode that one too
+            if ($has_gemini_clone){
+
+                // Remove this ability attachment to the robot using it
+                $clone_attachment_token = $this_attachment_token.'_clone';
+                unset($this_robot->robot_attachments[$clone_attachment_token]);
+                $this_robot->update_session();
+
+                // We can only show the kick animation if the target is not disabled
+                if ($target_robot->robot_status != 'disabled'){
+
+                    // Reverse the using ability flags for the robot
+                    $this_robot->unset_flag('robot_is_using_ability');
+                    $this_robot->set_flag('gemini-clone_is_using_ability', true);
+
+                    // Target the opposing robot
+                    $this_ability->target_options_update(array(
+                        'frame' => 'throw',
+                        'success' => array(0, 180, 5, 10, $this_robot->print_name().' releases the second '.$this_ability->print_name().'!')
+                        ));
+                    $this_robot->trigger_target($target_robot, $this_ability);
+
+                    // Inflict damage on the opposing robot
+                    $this_ability->damage_options_update(array(
+                        'kind' => 'energy',
+                        'kickback' => array(5, 0, 0),
+                        'success' => array(1, -80, 3, 10, 'The second '.$this_ability->print_name().'\'s whirlwind hit the target!'),
+                        'failure' => array(1, -90, 3, -10, 'The second '.$this_ability->print_name().'\'s whirlwind missed the target...')
+                        ));
+                    $this_ability->recovery_options_update(array(
+                        'kind' => 'energy',
+                        'frame' => 'taunt',
+                        'kickback' => array(0, 0, 0),
+                        'success' => array(2, -80, 6, 10, 'The second '.$this_ability->print_name().'\'s whirlwind hit the target!'),
+                        'failure' => array(2, -90, 6, -10, 'The second '.$this_ability->print_name().'\'s whirlwind missed the target...')
+                        ));
+                    $energy_damage_amount = $this_ability->ability_damage + $power_boost;
+                    $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
+
+                    // Reverse the using ability flags for the robot
+                    $this_robot->unset_flag('gemini-clone_is_using_ability');
+                    $this_robot->set_flag('robot_is_using_ability', true);
+
+                }
+
+            }
 
         }
 
