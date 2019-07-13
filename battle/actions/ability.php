@@ -285,9 +285,9 @@ if (empty($this_robot)){
 
 // If this robot is faster than the target
 if ($target_action != 'switch' && (
-($this_robot->robot_speed >= $active_target_robot->robot_speed && $temp_targetability->ability_speed <= $temp_thisability->ability_speed) ||
-($temp_thisability->ability_speed > $temp_targetability->ability_speed)
-)){
+    ($this_robot->robot_speed >= $active_target_robot->robot_speed && $temp_targetability->ability_speed2 <= $temp_thisability->ability_speed2) ||
+    ($temp_thisability->ability_speed2 > $temp_targetability->ability_speed2)
+    )){
 
     // Queue up an this robot's action first, because it's faster
     if ($this_robot->robot_id != $target_robot->robot_id
