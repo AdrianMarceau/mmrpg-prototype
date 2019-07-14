@@ -97,7 +97,7 @@ $ability = array(
                 'frame' => 'summon',
                 'success' => array(0, -10, 0, -10, $this_robot->print_name().' raises a '.$this_ability->print_name().'!')
                 ));
-            $this_robot->trigger_target($this_robot, $this_ability);
+            $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
 
             // Increase this robot's defense stat
             $this_ability->target_options_update($this_attachment_info['attachment_create'], true);
@@ -119,10 +119,17 @@ $ability = array(
         // Else if the ability was summoned in full via charge module, throw all at once
         elseif ($is_summoned_in_full){
 
+            // Target this robot's self
+            $this_ability->target_options_update(array(
+                'frame' => 'summon',
+                'success' => array(0, -10, 0, -10, $this_robot->print_name().' raises a '.$this_ability->print_name().'!')
+                ));
+            $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
+
             // Target the opposing robot
             $this_ability->target_options_update(array(
                 'frame' => 'throw',
-                'success' => array(0, 85, -10, -10, $this_robot->print_name().' releases the '.$this_ability->print_name().'!')
+                'success' => array(0, 85, -10, -10, $this_robot->print_name().' throws the '.$this_ability->print_name().'!')
                 ));
             $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -140,7 +147,7 @@ $ability = array(
                 'success' => array(0, -75, 0, -10, 'The '.$this_ability->print_name().' crashed the target!'),
                 'failure' => array(0, -85, 0, -10, 'The '.$this_ability->print_name().' missed the target...')
                 ));
-            $energy_damage_amount = ($this_ability->ability_damage * $num_shield_pieces);
+            $energy_damage_amount = ($this_ability->ability_base_damage * $num_shield_pieces);
             $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
 
         }
@@ -207,6 +214,9 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
+        // Define the total number of shield pieces
+        $num_shield_pieces = 8;
+
         // Define this ability's attachment token
         $this_attachment_token = 'ability_'.$this_ability->ability_token;
 
@@ -215,6 +225,7 @@ $ability = array(
 
         // Check if this ability is already summoned
         $is_summoned = false;
+        $is_summoned_in_full = false;
         $is_summoned_tokens = array();
         if (!empty($this_robot->robot_attachments)){
             foreach ($this_robot->robot_attachments AS $token => $attachment){ if (strstr($token, $this_attachment_token.'_')){ $is_summoned_tokens[] = $token; } }
@@ -227,11 +238,15 @@ $ability = array(
         else { $this_ability->reset_energy(); }
 
         // If the user is holding a Charge Module, auto-charge the ability
-        if ($this_robot->has_item('charge-module')){ $is_summoned = true; }
+        if ($this_robot->has_item('charge-module')){ $is_summoned = true; $is_summoned_in_full = true; }
 
         // If the user is holding a Target Module, allow bench targeting
         if ($is_summoned && $this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
         else { $this_ability->reset_target(); }
+
+        // If the ability is fully summoned, show the correct damage amount
+        if ($is_summoned_in_full){ $this_ability->set_damage($this_ability->ability_base_damage * $num_shield_pieces); }
+        else { $this_ability->reset_damage(); }
 
         // Return true on success
         return true;
