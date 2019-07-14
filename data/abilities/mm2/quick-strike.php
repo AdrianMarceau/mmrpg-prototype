@@ -155,6 +155,8 @@ $ability = array(
                 $rtoken = $target_robot->robot_token;
                 if (!empty($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
                     $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
+                    if (!isset($_SESSION[$session_token]['values']['battle_items'][$old_item_token])){ $_SESSION[$session_token]['values']['battle_items'][$old_item_token] = 0; }
+                    $_SESSION[$session_token]['values']['battle_items'][$old_item_token] += 1;
                 }
             }
 
