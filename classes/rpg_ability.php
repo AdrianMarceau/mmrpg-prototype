@@ -2218,10 +2218,10 @@ class rpg_ability extends rpg_object {
     public static function ability_function_stat_reset($target_robot, $stat_type, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = ''){
         if ($target_robot->counters[$stat_type.'_mods'] < 0){
             $boost_amount = $target_robot->counters[$stat_type.'_mods'] * -1;
-            self::ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_ability, $success_frame, $failure_frame, $extra_text, false, false, true);
+            self::ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_ability, $success_frame, $failure_frame, $extra_text, false, true, true);
         } elseif ($target_robot->counters[$stat_type.'_mods'] > 0){
             $break_amount = $target_robot->counters[$stat_type.'_mods'];
-            self::ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_ability, $success_frame, $failure_frame, $extra_text, false, false, true);
+            self::ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_ability, $success_frame, $failure_frame, $extra_text, false, true, true);
         } else {
             return false;
         }
@@ -2236,6 +2236,7 @@ class rpg_ability extends rpg_object {
 
         // If the target robot is holding a Reverse Module, redirect to a break
         if ($allow_item_effects
+            && !$is_reset
             && !$item_redirect
             && !empty($target_robot->robot_item)
             && $target_robot->robot_item == 'reverse-module'){
@@ -2245,6 +2246,7 @@ class rpg_ability extends rpg_object {
 
         // If the target robot is holding an Xtreme Module, all stat changes are max
         if ($allow_item_effects
+            && !$is_reset
             && !$item_redirect
             && !empty($target_robot->robot_item)
             && $target_robot->robot_item == 'xtreme-module'){
@@ -2334,6 +2336,7 @@ class rpg_ability extends rpg_object {
 
         // If the target robot is holding a Reverse Module, redirect to a break
         if ($allow_item_effects
+            && !$is_reset
             && !$item_redirect
             && !empty($target_robot->robot_item)
             && $target_robot->robot_item == 'reverse-module'){
@@ -2343,6 +2346,7 @@ class rpg_ability extends rpg_object {
 
         // If the target robot is holding an Xtreme Module, all stat changes are max
         if ($allow_item_effects
+            && !$is_reset
             && !$item_redirect
             && !empty($target_robot->robot_item)
             && $target_robot->robot_item == 'xtreme-module'){
