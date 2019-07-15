@@ -49,10 +49,6 @@ $ability = array(
             if ($has_gemini_clone){ $this_robot->set_flag($summoned_flag_token.'_include_gemini_clone', true); }
 
             // Set the summoned flag on this robot and save
-            $this_robot->flags[$summoned_flag_token] = true;
-            $this_robot->update_session();
-
-            // Set the summoned flag on this robot and save
             $this_robot->set_flag($summoned_flag_token, true);
 
             // Update this robot's sprite to show them with an inverted pallet
