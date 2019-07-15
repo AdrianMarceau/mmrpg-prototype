@@ -1009,14 +1009,20 @@ class rpg_ability_recovery extends rpg_recovery {
         $this_robot->player->update_session();
 
         // Generate an event with the collected recovery results based on recovery type
-        if ($this_robot->robot_id == $target_robot->robot_id){ //$this_ability->recovery_options['recovery_kind'] == 'energy'
+        $temp_event_header = $this_ability->recovery_options['recovery_header'];
+        $temp_event_body = $this_ability->ability_results['this_text'];
+        if ($this_robot->robot_id == $target_robot->robot_id){
             $event_options['console_show_target'] = false;
             $event_options['this_ability_target'] = $this_robot->robot_id.'_'.$this_robot->robot_token;
-            $this_robot->battle->events_create($target_robot, $this_robot, $this_ability->recovery_options['recovery_header'], $this_ability->ability_results['this_text'], $event_options);
+            $temp_event_body = str_replace('{this_robot}', $this_robot->print_name(), $temp_event_body);
+            $temp_event_body = str_replace('{target_robot}', $target_robot->print_name(), $temp_event_body);
+            $this_robot->battle->events_create($target_robot, $this_robot, $temp_event_header, $temp_event_body, $event_options);
         } else {
             $event_options['console_show_target'] = false;
-            $event_options['this_ability_target'] = $this_robot->robot_id.'_'.$this_robot->robot_token;;
-            $this_robot->battle->events_create($this_robot, $target_robot, $this_ability->recovery_options['recovery_header'], $this_ability->ability_results['this_text'], $event_options);
+            $event_options['this_ability_target'] = $this_robot->robot_id.'_'.$this_robot->robot_token;
+            $temp_event_body = str_replace('{this_robot}', $target_robot->print_name(), $temp_event_body);
+            $temp_event_body = str_replace('{target_robot}', $this_robot->print_name(), $temp_event_body);
+            $this_robot->battle->events_create($this_robot, $target_robot, $temp_event_header, $temp_event_body, $event_options);
         }
 
         // Restore this and the target robot's frames to their backed up state

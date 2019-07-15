@@ -3275,8 +3275,7 @@ class rpg_ability extends rpg_object {
         $this_ability_token = 'core-shield';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$shield_type;
         $this_attachment_image = $this_ability_token.'_'.$shield_type;
-        $this_attachment_destroy_text = 'The <span class="ability_name ability_type ability_type_'.$shield_type.'">'.ucfirst($shield_type).'</span> type <span class="ability_name ability_type ability_type_'.$shield_type.'">Core Shield</span> faded away!<br /> ';
-        $this_attachment_destroy_text .= 'This robot is no longer protected from the <span class="ability_name ability_type ability_type_'.$shield_type.'">'.ucfirst($shield_type).'</span> element...';
+        $this_attachment_destroy_text = '{this_robot}\'s <span class="ability_name ability_type ability_type_'.$shield_type.'">'.ucfirst($shield_type).'</span> type <span class="ability_name ability_type ability_type_'.$shield_type.'">Core Shield</span> faded away... ';
         $this_attachment_info = array(
             'class' => 'ability',
             'ability_token' => $this_ability_token,
@@ -3313,10 +3312,7 @@ class rpg_ability extends rpg_object {
         $this_ability_token = 'oil-shooter';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
         $this_attachment_image = $this_ability_token;
-        $this_existing = substr_count($this_attachment_json, 'ability_'.$this_ability_token);
-        $this_text_prefix = $this_existing > 0 ? 'One of the puddles of' : 'The puddle of';
-        $this_attachment_destroy_text = $this_text_prefix.' <span class="ability_name ability_type ability_type_earth">crude oil</span> faded away...<br /> ';
-        $this_attachment_destroy_text .= 'That position on the field isn\'t vulnerable to '.rpg_type::print_span('flame').' or '.rpg_type::print_span('explode').' types any more! ';
+        $this_attachment_destroy_text = 'The puddle of <span class="ability_name ability_type ability_type_earth">Crude Oil</span> below {this_robot} faded away... ';
         $this_attachment_info = array(
             'class' => 'ability',
             'sticky' => true,
@@ -3356,10 +3352,7 @@ class rpg_ability extends rpg_object {
         $this_ability_token = 'bubble-spray';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
         $this_attachment_image = $this_ability_token;
-        $this_existing = substr_count($this_attachment_json, 'ability_'.$this_ability_token);
-        $this_text_prefix = $this_existing > 0 ? 'One of the mounds of' : 'The mound of';
-        $this_attachment_destroy_text = $this_text_prefix.' <span class="ability_name ability_type ability_type_water">foamy bubbles</span> faded away...<br /> ';
-        $this_attachment_destroy_text .= 'That position on the field isn\'t vulnerable to '.rpg_type::print_span('electric').' or '.rpg_type::print_span('freeze').' types any more! ';
+        $this_attachment_destroy_text = 'The mound of <span class="ability_name ability_type ability_type_water">Foamy Bubbles</span> below {this_robot} faded away... ';
         $this_attachment_info = array(
             'class' => 'ability',
             'sticky' => true,
@@ -3399,12 +3392,8 @@ class rpg_ability extends rpg_object {
         $this_ability_token = 'galaxy-bomb';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
         $this_attachment_image = $this_ability_token;
-        $this_existing = substr_count($this_attachment_json, 'ability_'.$this_ability_token);
-        $this_text_prefix = $this_existing > 0 ? 'One of the' : 'The';
-        $this_text_noun = 'black hole'.($this_existing > 0 ? 's' : '');
-        $this_attachment_destroy_text = $this_text_prefix.' crushing <span class="ability_name ability_type ability_type_space_explode">'.$this_text_noun.'</span> faded away...<br /> ';
-        $this_attachment_destroy_text .= 'That position on the field won\'t take end-of-turn damage any more! ';
-        $this_attachment_repeat_text = $this_text_prefix.' <span class="ability_name ability_type ability_type_space_explode">'.$this_text_noun.'</span> exherted its crushing power!';
+        $this_attachment_destroy_text = 'The crushing <span class="ability_name ability_type ability_type_space_explode">Black Hole</span> behind {this_robot} faded away... ';
+        $this_attachment_repeat_text = 'The <span class="ability_name ability_type ability_type_space_explode">Black Hole</span> behind {this_robot} exherted its power! ';
         $this_attachment_info = array(
             'class' => 'ability',
             'sticky' => true,
@@ -3468,11 +3457,7 @@ class rpg_ability extends rpg_object {
         $this_ability_token = 'ice-breath';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
         $this_attachment_image = $this_ability_token;
-        $this_existing = substr_count($this_attachment_json, 'ability_'.$this_ability_token);
-        $this_text_prefix = $this_existing > 0 ? 'One of the' : 'The';
-        $this_text_noun = 'frozen foothold'.($this_existing > 0 ? 's' : '');
-        $this_attachment_destroy_text = $this_text_prefix.' <span class="ability_name ability_type ability_type_freeze">'.$this_text_noun.'</span> faded away...<br /> ';
-        $this_attachment_destroy_text .= 'That position on the field isn\'t prevented from switching any more! ';
+        $this_attachment_destroy_text = 'The <span class="ability_name ability_type ability_type_freeze">Frozen Foothold</span> trapping {this_robot} faded away... ';
         $this_attachment_info = array(
             'class' => 'ability',
             'sticky' => true,
@@ -3512,7 +3497,6 @@ class rpg_ability extends rpg_object {
         $this_attachment_json = json_encode($this_battle->battle_attachments);
         $this_ability_token = 'super-arm';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
-        $this_existing = substr_count($this_attachment_json, 'ability_'.$this_ability_token);
         $this_sprite_sheet = 1;
         $this_target_frame = 0;
         $this_impact_frame = 1;
@@ -3530,10 +3514,7 @@ class rpg_ability extends rpg_object {
             $this_object_name_plural = isset($this_sprite_index[$this_sheet_token][4]) ? $this_sprite_index[$this_sheet_token][4] : $this_object_name.'s';
         }
         $this_attachment_image = $this_ability_token.($this_sprite_sheet > 1 ? '-'.$this_sprite_sheet : '');
-        $this_text_prefix = $this_existing > 0 ? 'One of the' : 'The';
-        $this_text_noun = ($this_existing > 0 ? $this_object_name_plural : $this_object_name);
-        $this_attachment_destroy_text = $this_text_prefix.' <span class="ability_name ability_type ability_type_impact">'.$this_text_noun.'</span> faded away...<br /> ';
-        $this_attachment_destroy_text .= 'That position on the field isn\'t protected any more! ';
+        $this_attachment_destroy_text = 'The protective <span class="ability_name ability_type ability_type_impact">'.ucwords($this_object_name).'</span> in front of {this_robot} faded away... ';
         $this_attachment_info = array(
             'class' => 'ability',
             'sticky' => true,
@@ -3574,11 +3555,7 @@ class rpg_ability extends rpg_object {
         $this_ability_token = 'disco-fever';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
         $this_attachment_image = $this_ability_token;
-        $this_existing = substr_count($this_attachment_json, 'ability_'.$this_ability_token);
-        $this_text_prefix = $this_existing > 0 ? 'One of the' : 'The';
-        $this_text_noun = 'disco ball'.($this_existing > 0 ? 's' : '');
-        $this_attachment_destroy_text = $this_text_prefix.' <span class="ability_name ability_type ability_type_laser">'.$this_text_noun.'</span> faded away...<br /> ';
-        $this_attachment_destroy_text .= 'That position on the field\'s damage output isn\'t compromised any more! ';
+        $this_attachment_destroy_text = 'The spinning <span class="ability_name ability_type ability_type_laser">Disco Ball</span> in front of {this_robot} faded away... ';
         $this_attachment_info = array(
             'class' => 'ability',
             'sticky' => true,
@@ -3617,12 +3594,8 @@ class rpg_ability extends rpg_object {
         $this_ability_token = 'thunder-wool-2';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
         $this_attachment_image = $this_ability_token;
-        $this_existing = substr_count($this_attachment_json, 'ability_'.$this_ability_token);
-        $this_text_prefix = $this_existing > 0 ? 'One of the' : 'The';
-        $this_text_noun = 'woolly cloud'.($this_existing > 0 ? 's' : '');
-        $this_attachment_destroy_text = $this_text_prefix.' thunderous <span class="ability_name ability_type ability_type_electric">'.$this_text_noun.'</span> faded away...<br /> ';
-        $this_attachment_destroy_text .= 'That position on the field won\'t take end-of-turn damage any more! ';
-        $this_attachment_repeat_text = $this_text_prefix.' <span class="ability_name ability_type ability_type_electric">'.$this_text_noun.'</span> released a lightning bolt!';
+        $this_attachment_destroy_text = 'The thunderous <span class="ability_name ability_type ability_type_electric">Woolly Cloud</span> above {this_robot} faded away... ';
+        $this_attachment_repeat_text = 'The <span class="ability_name ability_type ability_type_electric">Wooly Cloud</span> above {this_robot} released a lightning bolt! ';
         $this_attachment_info = array(
             'class' => 'ability',
             'sticky' => true,
@@ -3686,12 +3659,8 @@ class rpg_ability extends rpg_object {
         $this_ability_token = 'acid-glob';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
         $this_attachment_image = $this_ability_token;
-        $this_existing = substr_count($this_attachment_json, 'ability_'.$this_ability_token);
-        $this_text_prefix = $this_existing > 0 ? 'One of the' : 'The';
-        $this_text_noun = 'acid glob'.($this_existing > 0 ? 's' : '');
-        $this_attachment_destroy_text = $this_text_prefix.' corrosive <span class="ability_name ability_type ability_type_water">'.$this_text_noun.'</span> faded away...<br /> ';
-        $this_attachment_destroy_text .= 'That position on the field won\'t take end-of-turn damage any more! ';
-        $this_attachment_repeat_text = $this_text_prefix.' <span class="ability_name ability_type ability_type_water">'.$this_text_noun.'</span> corroded its target\'s armor!';
+        $this_attachment_destroy_text = 'The corrosive <span class="ability_name ability_type ability_type_water">Acid Glob</span> below {this_robot} faded away... ';
+        $this_attachment_repeat_text = 'The corrosive <span class="ability_name ability_type ability_type_water">Acid Glob</span> melted through {this_robot}\'s armor! ';
         $this_attachment_info = array(
             'class' => 'ability',
             'sticky' => true,
