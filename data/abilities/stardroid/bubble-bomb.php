@@ -48,7 +48,7 @@ $ability = array(
             && $target_robot->counters['attack_mods'] > 0){
 
             // Call the global stat break function with customized options
-            rpg_ability::ability_function_stat_break($target_robot, 'attack', $target_robot->counters['attack_mods']);
+            rpg_ability::ability_function_stat_reset($target_robot, 'attack');
 
         }
 
