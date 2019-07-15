@@ -2214,15 +2214,29 @@ class rpg_ability extends rpg_object {
 
     }
 
+    // Define a static function to use as a common action for all stat resetting
+    public static function ability_function_stat_reset($target_robot, $stat_type, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = ''){
+        if ($target_robot->counters[$stat_type.'_mods'] < 0){
+            $boost_amount = $target_robot->counters[$stat_type.'_mods'] * -1;
+            self::ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_ability, $success_frame, $failure_frame, $extra_text, false, false, true);
+        } elseif ($target_robot->counters[$stat_type.'_mods'] > 0){
+            $break_amount = $target_robot->counters[$stat_type.'_mods'];
+            self::ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_ability, $success_frame, $failure_frame, $extra_text, false, false, true);
+        } else {
+            return false;
+        }
+    }
+
     // Define a static function to use as a common action for all stat boosting
-    public static function ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = '', $item_redirect = false){
+    public static function ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = '', $item_redirect = false, $allow_item_effects = true, $is_reset = false){
 
         // Do not boost stats if the battle is over
         if ($target_robot->battle->battle_status === 'complete'){ return false; }
         elseif ($target_robot->robot_status === 'disabled' || $target_robot->robot_energy <= 0){ return false; }
 
         // If the target robot is holding a Reverse Module, redirect to a break
-        if (!$item_redirect
+        if ($allow_item_effects
+            && !$item_redirect
             && !empty($target_robot->robot_item)
             && $target_robot->robot_item == 'reverse-module'){
             $target_robot->battle->events_debug(__FILE__, __LINE__, $target_robot->robot_token.' '.$target_robot->get_item().' reverses stat changes!');
@@ -2230,7 +2244,8 @@ class rpg_ability extends rpg_object {
         }
 
         // If the target robot is holding an Xtreme Module, all stat changes are max
-        if (!$item_redirect
+        if ($allow_item_effects
+            && !$item_redirect
             && !empty($target_robot->robot_item)
             && $target_robot->robot_item == 'xtreme-module'){
             $target_robot->battle->events_debug(__FILE__, __LINE__, $target_robot->robot_token.' '.$target_robot->get_item().' overclocks stat changes!');
@@ -2257,7 +2272,8 @@ class rpg_ability extends rpg_object {
         }
 
         // If the target robot is holding a Locking Module, redirect to a break
-        if (!empty($target_robot->robot_item)
+        if ($allow_item_effects
+            && !empty($target_robot->robot_item)
             && $target_robot->robot_item == 'guard-module'){
             $target_robot->battle->events_debug(__FILE__, __LINE__, $target_robot->robot_token.' '.$target_robot->get_item().' prevents all stat changes!');
             $temp_item = rpg_game::get_item($target_robot->battle, $target_robot->player, $target_robot, array('item_token' => $target_robot->robot_item));
@@ -2284,7 +2300,8 @@ class rpg_ability extends rpg_object {
             $target_robot->update_session();
 
             // Define the boost text based on how much was applied
-            if ($rel_boost_amount >= 3){ $boost_text = 'rose drastically'; }
+            if ($is_reset){ $boost_text = 'returned to normal'; }
+            elseif ($rel_boost_amount >= 3){ $boost_text = 'rose drastically'; }
             elseif ($rel_boost_amount >= 2){ $boost_text = 'sharply rose'; }
             else { $boost_text = 'rose'; }
 
@@ -2309,14 +2326,15 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function to use as a common action for all stat breaking
-    public static function ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = '', $item_redirect = false){
+    public static function ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = '', $item_redirect = false, $allow_item_effects = true, $is_reset = false){
 
         // Do not boost stats if the battle is over
         if ($target_robot->battle->battle_status === 'complete'){ return false; }
         elseif ($target_robot->robot_status === 'disabled' || $target_robot->robot_energy <= 0){ return false; }
 
         // If the target robot is holding a Reverse Module, redirect to a break
-        if (!$item_redirect
+        if ($allow_item_effects
+            && !$item_redirect
             && !empty($target_robot->robot_item)
             && $target_robot->robot_item == 'reverse-module'){
             $target_robot->battle->events_debug(__FILE__, __LINE__, $target_robot->robot_token.' '.$target_robot->get_item().' changes reverses stat changes!');
@@ -2324,7 +2342,8 @@ class rpg_ability extends rpg_object {
         }
 
         // If the target robot is holding an Xtreme Module, all stat changes are max
-        if (!$item_redirect
+        if ($allow_item_effects
+            && !$item_redirect
             && !empty($target_robot->robot_item)
             && $target_robot->robot_item == 'xtreme-module'){
             $target_robot->battle->events_debug(__FILE__, __LINE__, $target_robot->robot_token.' '.$target_robot->get_item().' overclocks stat changes!');
@@ -2351,7 +2370,8 @@ class rpg_ability extends rpg_object {
         }
 
         // If the target robot is holding a Locking Module, redirect to a break
-        if (!empty($target_robot->robot_item)
+        if ($allow_item_effects
+            && !empty($target_robot->robot_item)
             && $target_robot->robot_item == 'guard-module'){
             $target_robot->battle->events_debug(__FILE__, __LINE__, $target_robot->robot_token.' '.$target_robot->get_item().' prevents all stat changes!');
             $temp_item = rpg_game::get_item($target_robot->battle, $target_robot->player, $target_robot, array('item_token' => $target_robot->robot_item));
@@ -2378,7 +2398,8 @@ class rpg_ability extends rpg_object {
             $target_robot->update_session();
 
             // Define the break text based on how much was applied
-            if ($rel_break_amount >= 3){ $break_text = 'severely fell'; }
+            if ($is_reset){ $break_text = 'returned to normal'; }
+            elseif ($rel_break_amount >= 3){ $break_text = 'severely fell'; }
             elseif ($rel_break_amount >= 2){ $break_text = 'harshly fell'; }
             else { $break_text = 'fell'; }
 
@@ -3101,14 +3122,12 @@ class rpg_ability extends rpg_object {
                 'bass-crush', 'disco-fever', 'galaxy-bomb', 'thunder-wool',
                 // already uses itself multiple times
                 'water-balloon',
-                // uses end-of-turn functionality & counter damage
-                'solar-blaze', 'air-twister',
                 // swap moves would be pretty lame if used twice
                 'energy-swap', 'attack-swap', 'defense-swap', 'speed-swap',
                 // mode abilities already max things so repeat-use not needed
                 'energy-mode', 'attack-mode', 'defense-mode', 'speed-mode',
                 // just doesn't make sense to use twice for one reason or another
-                'buster-charge', 'buster-relay', 'copy-shot', 'copy-soul',
+                'buster-charge', 'buster-relay', 'copy-shot', 'copy-soul', 'jewel-polish',
                 // [deprecated] abilities should not double-up
                 'repair-mode', 'energy-shuffle', 'attack-shuffle', 'defense-shuffle', 'speed-shuffle',
                 // [action/system] abilities should never be doubled-up
@@ -3126,11 +3145,43 @@ class rpg_ability extends rpg_object {
             self::is_compatible_with_gemini_clone($ability_token)
             // ensure specific incompatible abilities are also blocked
             && !in_array($ability_token, array(
-                // uses end-of-turn functionalit. but can be compensated for manually
-                'mega-ball', 'metal-press', 'crystal-mind',
+                // uses end-of-turn functionality but can be compensated for manually
+                'mega-ball', 'metal-press',
+                'solar-blaze', 'air-twister',
+                'crystal-mind',
                 ))
             ? true
             : false;
+    }
+
+    // Define a function for getting the static list of positive field hazards with source and other info
+    public static function get_positive_field_hazard_index(){
+        static $field_hazard_index = false;
+        if ($field_hazard_index === false){
+            $field_hazard_index = array(
+                // positive
+                array('token' => 'super_blocks', 'source' => 'super-arm', 'noun' => 'super block', 'where' => 'in front of'),
+                );
+            }
+        return $field_hazard_index;
+    }
+
+    // Define a function for getting the static list of negative field hazards with source and other info
+    public static function get_negative_field_hazard_index(){
+        static $field_hazard_index = false;
+        if ($field_hazard_index === false){
+            $field_hazard_index = array(
+                // negative
+                array('token' => 'crude_oil', 'source' => 'oil-shooter', 'noun' => 'crude oil', 'where' => 'below'),
+                array('token' => 'foamy_bubbles', 'source' => 'bubble-spray', 'noun' => 'foamy bubbles', 'where' => 'below'),
+                array('token' => 'frozen_footholds', 'source' => 'ice-breath', 'noun' => 'frozen foothold', 'where' => 'below'),
+                array('token' => 'black_holes', 'source' => 'galaxy-bomb', 'noun' => 'black hole', 'where' => 'behind'),
+                array('token' => 'disco_balls', 'source' => 'disco-fever', 'noun' => 'disco ball', 'where' => 'above'),
+                array('token' => 'woolly_cloud', 'source' => 'thunder-wool', 'noun' => 'woolly cloud', 'where' => 'above'),
+                array('token' => 'acid_globs', 'source' => 'acid-glob', 'noun' => 'acid glob', 'where' => 'below'),
+                );
+            }
+        return $field_hazard_index;
     }
 
     // Define a static function for generating/returning the Super Arm sprite index w/ sheet & frame refs for each field
