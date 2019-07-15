@@ -49,11 +49,10 @@ $ability = array(
             // Check all three stats to see if they should be reversed
             $check_stats = array('attack', 'defense', 'speed');
             foreach ($check_stats AS $stat){
-                if ($target_robot->counters[$stat.'_mods'] <= 0){ continue; }
-
-                // Call the global stat break function with customized options
-                rpg_ability::ability_function_stat_break($target_robot, $stat, $target_robot->counters[$stat.'_mods']);
-
+                if ($target_robot->counters[$stat.'_mods'] > 0){
+                    // Call the global stat break function with customized options
+                    rpg_ability::ability_function_stat_reset($target_robot, $stat);
+                }
             }
 
         }

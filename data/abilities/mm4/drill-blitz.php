@@ -64,8 +64,8 @@ $ability = array(
             && $this_ability->ability_results['this_result'] != 'failure'
             && $target_robot->counters['defense_mods'] > 0){
 
-            // Call the global stat break function with customized options
-            rpg_ability::ability_function_stat_break($target_robot, 'defense', $target_robot->counters['defense_mods']);
+            // Call the global stat reset function with customized options
+            rpg_ability::ability_function_stat_reset($target_robot, 'defense');
 
         }
 
@@ -107,8 +107,8 @@ $ability = array(
                 && $this_ability->ability_results['this_result'] != 'failure'
                 && $target_robot->counters['defense_mods'] > 0){
 
-                // Call the global stat break function with customized options
-                rpg_ability::ability_function_stat_break($target_robot, 'defense', $target_robot->counters['defense_mods']);
+                // Call the global stat reset function with customized options
+                rpg_ability::ability_function_stat_reset($target_robot, 'defense');
 
             }
 
