@@ -71,7 +71,11 @@ class rpg_target {
         if (isset($trigger_options['canvas_show_this_ability'])){ $event_options['canvas_show_this_ability'] = $trigger_options['canvas_show_this_ability'];  }
 
         // Create a new entry in the event log for the targeting event
-        $this_robot->battle->events_create($this_robot, $target_robot, $this_ability->target_options['target_header'], $this_ability->ability_results['this_text'], $event_options);
+        $temp_event_header = $this_ability->target_options['target_header'];
+        $temp_event_body = $this_ability->ability_results['this_text'];
+        $temp_event_body = str_replace('{this_robot}', $this_robot->print_name(), $temp_event_body);
+        $temp_event_body = str_replace('{target_robot}', $target_robot->print_name(), $temp_event_body);
+        $this_robot->battle->events_create($this_robot, $target_robot, $temp_event_header, $temp_event_body, $event_options);
 
         // Update this ability's history with the triggered ability data and results
         $this_ability->history['ability_results'][] = $this_ability->ability_results;

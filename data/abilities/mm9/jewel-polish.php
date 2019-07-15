@@ -116,7 +116,7 @@ $ability = array(
                     $static_ability_object = rpg_game::get_ability($this_battle, $this_player, $temp_ally_robot, $static_ability_info);
                     $static_remove_frame = $hazards_removed % 2 == 0 ? 'taunt' : 'defend';
                     $static_remove_text = $this_robot->print_name().' removed '.($hazards_removed >= 1 ? 'another' : 'a').' field hazard!<br /> ';
-                    $static_ability_object->set_name($hazard_info['noun']);
+                    $static_ability_object->set_name(ucwords($hazard_info['noun']));
                     $static_remove_text .= 'The '.$static_ability_object->print_name().' '.$hazard_info['where'].' '.$temp_ally_robot->print_name().' faded away!';
                     $this_ability->target_options_update(array( 'frame' => $static_remove_frame, 'success' => array(0, -9999, -9999, -9999, $static_remove_text)));
                     $this_robot->trigger_target($temp_ally_robot, $this_ability, array('prevent_default_text' => true, 'canvas_show_this_ability' => false));
