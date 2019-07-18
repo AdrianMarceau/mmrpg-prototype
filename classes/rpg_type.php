@@ -202,8 +202,9 @@ class rpg_type {
     }
 
     // Define a function for printing this type's name span
-    public static function print_span($type_token){
-        return '<span class="ability_name ability_type ability_type_'.$type_token.'">'.ucfirst($type_token).'</span>';
+    public static function print_span($type_token, $type_text = ''){
+        if (empty($type_text)){ $type_text = ucwords(str_replace('_', ' ', $type_token)); }
+        return '<span class="ability_name ability_type ability_type_'.$type_token.'">'.$type_text.'</span>';
     }
 
 }
