@@ -68,10 +68,10 @@ $ability = array(
                     $this_attachment_info['attachment_duration'] = $static_attachment_duration;
                     $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token] = $this_attachment_info;
                     $this_battle->update_session();
-                    if ($target_robot->robot_status != 'disabled'){
-                        $this_ability->target_options_update(array('frame' => 'defend', 'success' => array(0, -9999, -9999, -9999, $this_refresh_text)));
-                        $target_robot->trigger_target($target_robot, $this_ability);
-                    }
+                }
+                if ($target_robot->robot_status != 'disabled'){
+                    $this_ability->target_options_update(array('frame' => 'defend', 'success' => array(0, -9999, -9999, -9999, $this_refresh_text)));
+                    $target_robot->trigger_target($target_robot, $this_ability);
                 }
 
             }
