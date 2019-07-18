@@ -3527,10 +3527,12 @@ class rpg_ability extends rpg_object {
             $this_target_frame = $this_sprite_index[$this_sheet_token][1];
             $this_impact_frame = $this_sprite_index[$this_sheet_token][2];
             $this_object_name = $this_sprite_index[$this_sheet_token][3];
-            $this_object_name_plural = isset($this_sprite_index[$this_sheet_token][4]) ? $this_sprite_index[$this_sheet_token][4] : $this_object_name.'s';
         }
+        $this_object_name = ucwords($this_object_name);
+        $this_object_name = str_replace(array(' A ', ' An ', ' Of ', ' The '), array(' a ', ' an ', ' of ', ' the '), $this_object_name);
+        $this_object_name_span = rpg_type::print_span('impact', $this_object_name);
         $this_attachment_image = $this_ability_token.($this_sprite_sheet > 1 ? '-'.$this_sprite_sheet : '');
-        $this_attachment_destroy_text = 'The protective <span class="ability_name ability_type ability_type_impact">'.ucwords($this_object_name).'</span> in front of {this_robot} faded away... ';
+        $this_attachment_destroy_text = 'The protective '.$this_object_name_span.' in front of {this_robot} faded away... ';
         $this_attachment_info = array(
             'class' => 'ability',
             'sticky' => true,
