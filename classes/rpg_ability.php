@@ -3322,8 +3322,9 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function for generating a static field attachment of "crude oil" (from the Oil Shooter ability)
-    public static function get_static_crude_oil($static_attachment_key, $this_attachment_duration = 99, $existing_attachments = 0){
+    public static function get_static_crude_oil($static_attachment_key, $this_attachment_duration = 99){
         $this_battle = rpg_battle::get_battle();
+        $existing_attachments = isset($this_battle->battle_attachments[$static_attachment_key]) ? count($this_battle->battle_attachments[$static_attachment_key]) : 0;
         $this_ability_token = 'oil-shooter';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
         $this_attachment_image = $this_ability_token;
@@ -3361,8 +3362,9 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function for generating a static field attachment of "foamy bubbles" (from the Bubble Spray ability)
-    public static function get_static_foamy_bubbles($static_attachment_key, $this_attachment_duration = 99, $existing_attachments = 0){
+    public static function get_static_foamy_bubbles($static_attachment_key, $this_attachment_duration = 99){
         $this_battle = rpg_battle::get_battle();
+        $existing_attachments = isset($this_battle->battle_attachments[$static_attachment_key]) ? count($this_battle->battle_attachments[$static_attachment_key]) : 0;
         $this_ability_token = 'bubble-spray';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
         $this_attachment_image = $this_ability_token;
@@ -3400,8 +3402,9 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function for generating a static field attachment of a "black hole" (from the Galaxy Bomb ability)
-    public static function get_static_black_hole($static_attachment_key, $this_attachment_duration = 99, $existing_attachments = 0){
+    public static function get_static_black_hole($static_attachment_key, $this_attachment_duration = 99){
         $this_battle = rpg_battle::get_battle();
+        $existing_attachments = isset($this_battle->battle_attachments[$static_attachment_key]) ? count($this_battle->battle_attachments[$static_attachment_key]) : 0;
         $this_ability_token = 'galaxy-bomb';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
         $this_attachment_image = $this_ability_token;
@@ -3464,8 +3467,9 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function for generating a static field attachment of a "frozen foothold" (from the Ice Breath ability)
-    public static function get_static_frozen_foothold($static_attachment_key, $this_attachment_duration = 99, $existing_attachments = 0){
+    public static function get_static_frozen_foothold($static_attachment_key, $this_attachment_duration = 99){
         $this_battle = rpg_battle::get_battle();
+        $existing_attachments = isset($this_battle->battle_attachments[$static_attachment_key]) ? count($this_battle->battle_attachments[$static_attachment_key]) : 0;
         $this_ability_token = 'ice-breath';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
         $this_attachment_image = $this_ability_token;
@@ -3504,8 +3508,9 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function for generating a static field attachment of a "super block" (from the Super Arm ability)
-    public static function get_static_super_block($static_attachment_key, $this_attachment_duration = 99, $existing_attachments = 0){
+    public static function get_static_super_block($static_attachment_key, $this_attachment_duration = 99){
         $this_battle = rpg_battle::get_battle();
+        $existing_attachments = isset($this_battle->battle_attachments[$static_attachment_key]) ? count($this_battle->battle_attachments[$static_attachment_key]) : 0;
         $this_ability_token = 'super-arm';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
         $this_sprite_sheet = 1;
@@ -3560,8 +3565,9 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function for generating a static field attachment of a "disco ball" (from the Disco Fever ability)
-    public static function get_static_disco_ball($static_attachment_key, $this_attachment_duration = 99, $existing_attachments = 0){
+    public static function get_static_disco_ball($static_attachment_key, $this_attachment_duration = 99){
         $this_battle = rpg_battle::get_battle();
+        $existing_attachments = isset($this_battle->battle_attachments[$static_attachment_key]) ? count($this_battle->battle_attachments[$static_attachment_key]) : 0;
         $this_ability_token = 'disco-fever';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
         $this_attachment_image = $this_ability_token;
@@ -3598,8 +3604,9 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function for generating a static field attachment of a "woolly cloud" (from the Thunder Wool ability)
-    public static function get_static_woolly_cloud($static_attachment_key, $this_attachment_duration = 99, $existing_attachments = 0){
+    public static function get_static_woolly_cloud($static_attachment_key, $this_attachment_duration = 99){
         $this_battle = rpg_battle::get_battle();
+        $existing_attachments = isset($this_battle->battle_attachments[$static_attachment_key]) ? count($this_battle->battle_attachments[$static_attachment_key]) : 0;
         $this_ability_token = 'thunder-wool-2';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
         $this_attachment_image = $this_ability_token;
@@ -3662,8 +3669,9 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function for generating a static field attachment of an "acid glob" (from the Acid Glob ability)
-    public static function get_static_acid_glob($static_attachment_key, $this_attachment_duration = 99, $existing_attachments = 0){
+    public static function get_static_acid_glob($static_attachment_key, $this_attachment_duration = 99){
         $this_battle = rpg_battle::get_battle();
+        $existing_attachments = isset($this_battle->battle_attachments[$static_attachment_key]) ? count($this_battle->battle_attachments[$static_attachment_key]) : 0;
         $this_ability_token = 'acid-glob';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
         $this_attachment_image = $this_ability_token;
