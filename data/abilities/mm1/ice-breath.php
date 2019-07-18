@@ -17,56 +17,18 @@ $ability = array(
         extract($objects);
 
         // Predefine attachment create and destroy text for later
-        $this_create_text = ($target_robot->print_name().' found '.$target_robot->get_pronoun('reflexive').' frozen in ice!<br /> '.
+        $this_create_text = ($target_robot->print_name().' found '.$target_robot->get_pronoun('reflexive').' in a '.rpg_type::print_span('freeze', 'Frozen Foothold').'!<br /> '.
             $target_robot->print_name().' is prevented from switching!'
             );
-        $this_destroy_text = ('The '.$this_ability->print_name().'\'s frozen foothold melted away...<br /> '.
-            'The active robot isn\'t prevented from switching any more!'
-            );
-        $this_refresh_text = ($this_robot->print_name().' refreshed the '.$this_ability->print_name().'\'s frozen foothold!<br /> '.
-            'The active robot is still prevented from switching!'
+        $this_refresh_text = ($this_robot->print_name().' refreshed the '.rpg_type::print_span('freeze', 'Frozen Foothold').' at '.$target_robot->print_name().'\'s feet!<br /> '.
+            $target_robot->print_name().' is still prevented from switching!'
             );
 
         // Define this ability's attachment token
         $static_attachment_key = $target_robot->get_static_attachment_key();
         $static_attachment_duration = 3;
-        $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$static_attachment_key;
-        $this_attachment_info = array(
-            'class' => 'ability',
-            'sticky' => true,
-            'ability_id' => $this_ability->ability_id.'_'.$static_attachment_key,
-            'ability_token' => $this_ability->ability_token,
-            'attachment_duration' => $static_attachment_duration,
-            'attachment_token' => $this_attachment_token,
-            'attachment_sticky' => true,
-            'attachment_switch_disabled' => true,
-            'attachment_weaknesses' => array('flame', 'laser'),
-            'attachment_weaknesses_trigger' => 'either',
-            'attachment_create' => array(
-                'trigger' => 'special',
-                'kind' => '',
-                'percent' => true,
-                'frame' => 'defend',
-                'rates' => array(100, 0, 0),
-                'success' => array(9, -10, -5, -10, $this_create_text),
-                'failure' => array(9, -10, -5, -10, $this_create_text)
-                ),
-            'attachment_destroy' => array(
-                'trigger' => 'special',
-                'kind' => '',
-                'type' => '',
-                'type2' => '',
-                'percent' => true,
-                'modifiers' => false,
-                'frame' => 'taunt',
-                'rates' => array(100, 0, 0),
-                'success' => array(9, 0, -9999, 0,  $this_destroy_text),
-                'failure' => array(9, 0, -9999, 0, $this_destroy_text)
-                ),
-            'ability_frame' => 2,
-            'ability_frame_animate' => array(2, 3),
-            'ability_frame_offset' => array('x' => 0, 'y' => -5, 'z' => 8)
-            );
+        $this_attachment_info = rpg_ability::get_static_frozen_foothold($static_attachment_key, $static_attachment_duration);
+        $this_attachment_token = $this_attachment_info['attachment_token'];
 
         // Target the opposing robot
         $this_ability->target_options_update(array(
@@ -106,7 +68,7 @@ $ability = array(
                 if ($target_robot->robot_status != 'disabled'){
                     $this_robot->robot_frame = 'base';
                     $this_robot->update_session();
-                    $this_ability->target_options_update($this_attachment_info['attachment_create']);
+                    $this_ability->target_options_update(array('frame' => 'defend', 'success' => array(0, -9999, -9999, -9999, $this_create_text)));
                     $target_robot->trigger_target($target_robot, $this_ability);
                 }
 
@@ -122,10 +84,7 @@ $ability = array(
                     $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token] = $this_attachment_info;
                     $this_battle->update_session();
                     if ($target_robot->robot_status != 'disabled'){
-                        $this_ability->target_options_update(array(
-                            'frame' => 'defend',
-                            'success' => array(9, 85, -10, -10, $this_refresh_text)
-                            ));
+                        $this_ability->target_options_update(array('frame' => 'defend', 'success' => array(0, -9999, -9999, -9999, $this_refresh_text)));
                         $target_robot->trigger_target($target_robot, $this_ability);
                     }
                 }
