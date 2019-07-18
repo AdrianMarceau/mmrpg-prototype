@@ -3530,7 +3530,7 @@ class rpg_ability extends rpg_object {
         }
         $this_object_name = ucwords($this_object_name);
         $this_object_name = str_replace(array(' A ', ' An ', ' Of ', ' The '), array(' a ', ' an ', ' of ', ' the '), $this_object_name);
-        $this_object_name_span = rpg_type::print_span('impact', $this_object_name);
+        $this_object_name_span = rpg_type::print_span('impact_shield', $this_object_name);
         $this_attachment_image = $this_ability_token.($this_sprite_sheet > 1 ? '-'.$this_sprite_sheet : '');
         $this_attachment_destroy_text = 'The protective '.$this_object_name_span.' in front of {this_robot} faded away... ';
         $this_attachment_info = array(
