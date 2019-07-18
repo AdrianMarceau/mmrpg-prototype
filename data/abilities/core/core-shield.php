@@ -24,6 +24,16 @@ $ability = array(
             $current_target_robot = $this_robot;
         }
 
+        // Generate the static attachment info for the robot's elemental Core Shield
+        $existing_shields = !empty($current_target_robot->robot_attachments) ? substr_count(implode('|', array_keys($current_target_robot->robot_attachments)), 'ability_core-shield_') : 0;
+        $this_attachment_info = rpg_ability::get_static_core_shield($this_ability->ability_type, 9, $existing_shields, $this_ability->ability_recovery2);
+
+        // Create the attachment object for this ability
+        $this_attachment = new rpg_ability($this_battle, $this_player, $current_target_robot, $this_attachment_info);
+        $this_attachment->update_session();
+
+        /*
+
         // Define the base values for the attachment
         $base_attachment_duration = 9;
         $base_effect_element = $this_ability->ability_type;
@@ -90,6 +100,8 @@ $ability = array(
         $this_attachment = new rpg_ability($this_battle, $this_player, $current_target_robot, $this_attachment_info);
         $this_attachment->update_session();
 
+        */
+
         // If the ability flag was not set, attach the ability to the target
         if (!$current_target_robot->has_attachment($this_attachment_token)){
 
@@ -149,7 +161,10 @@ $ability = array(
                 // Target the opposing robot
                 $this_ability->target_options_update(array(
                     'frame' => 'summon',
-                    'success' => array(0, -10, 0, -10, $this_robot->print_name().' reinforced the '.$this_ability->print_name().'!<br /> The duration of '.$this_robot->print_name().'\'s protection was extended!')
+                    'success' => array(0, -10, 0, -10,
+                        $this_robot->print_name().' reinforced the '.$this_ability->print_name().'!<br /> '.
+                        'The duration of '.$this_robot->print_name().'\'s protection was extended!'
+                        )
                     ));
                 $this_robot->trigger_target($this_robot, $this_ability);
 
