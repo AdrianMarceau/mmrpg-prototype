@@ -18,17 +18,12 @@ $ability = array(
         extract($objects);
 
         // Predefine attachment create and destroy text for later
-        $this_create_text = ($target_robot->print_name().' found '.$target_robot->get_pronoun('reflexive').' in a mound of foamy bubbles!<br /> '.
+        $this_create_text = ($target_robot->print_name().' found '.$target_robot->get_pronoun('reflexive').' in a mound of '.rpg_type::print_span('water', 'Foamy Bubbles').'!<br /> '.
             'That position on the field is vulnerable to '.
             rpg_type::print_span('electric').' and '.rpg_type::print_span('freeze').' '.
             'types now!'
             );
-        $this_destroy_text = ('The '.$this_ability->print_name().'\'s foamy bubbles faded away...<br /> '.
-            'That position on the field isn\'t vulnerable to '.
-            rpg_type::print_span('electric').' or '.rpg_type::print_span('freeze').' '.
-            'types any more!'
-            );
-        $this_refresh_text = ($this_robot->print_name().' refreshed the '.$this_ability->print_name().'\'s mound of foamy bubbles!<br /> '.
+        $this_refresh_text = ($this_robot->print_name().' refreshed the mound of '.rpg_type::print_span('water', 'Foamy Bubbles').' below '.$target_robot->print_name().'!<br /> '.
             'That position on the field is still vulnerable to '.
             rpg_type::print_span('electric').' and '.rpg_type::print_span('freeze').' '.
             'types!'
@@ -37,41 +32,8 @@ $ability = array(
         // Define this ability's attachment token
         $static_attachment_key = $target_robot->get_static_attachment_key();
         $static_attachment_duration = 6;
-        $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$static_attachment_key;
-        $this_attachment_info = array(
-            'class' => 'ability',
-            'sticky' => true,
-            'ability_id' => $this_ability->ability_id.'_'.$static_attachment_key,
-            'ability_token' => $this_ability->ability_token,
-            'attachment_duration' => $static_attachment_duration,
-            'attachment_token' => $this_attachment_token,
-            'attachment_sticky' => true,
-            'attachment_damage_input_booster_electric' => 2.0,
-            'attachment_damage_input_booster_freeze' => 2.0,
-            'attachment_create' => array(
-                'trigger' => 'special',
-                'kind' => '',
-                'percent' => true,
-                'frame' => 'defend',
-                'rates' => array(100, 0, 0),
-                'success' => array(9, -10, -5, -10, $this_create_text),
-                'failure' => array(9, -10, -5, -10, $this_create_text)
-                ),
-            'attachment_destroy' => array(
-                'trigger' => 'special',
-                'kind' => '',
-                'type' => '',
-                'percent' => true,
-                'modifiers' => false,
-                'frame' => 'taunt',
-                'rates' => array(100, 0, 0),
-                'success' => array(9, 0, -9999, 0, $this_destroy_text),
-                'failure' => array(9, 0, -9999, 0, $this_destroy_text)
-                ),
-            'ability_frame' => 2,
-            'ability_frame_animate' => array(2, 3),
-            'ability_frame_offset' => array('x' => 0, 'y' => -5, 'z' => 6)
-            );
+        $this_attachment_info = rpg_ability::get_static_foamy_bubbles($static_attachment_key, $static_attachment_duration);
+        $this_attachment_token = $this_attachment_info['attachment_token'];
 
         // Target the opposing robot
         $this_ability->target_options_update(array(
@@ -105,10 +67,10 @@ $ability = array(
         // If the target was not disabled, show the message for the attachment
         if ($target_robot->robot_status != 'disabled'){
             if (!$attachment_already_exists){
-                $this_ability->target_options_update($this_attachment_info['attachment_create']);
+                $this_ability->target_options_update(array('frame' => 'defend', 'success' => array(0, -9999, -9999, -9999, $this_create_text)));
                 $target_robot->trigger_target($target_robot, $this_ability);
             } else {
-                $this_ability->target_options_update(array('frame' => 'defend', 'success' => array(9, 85, -10, -10, $this_refresh_text)));
+                $this_ability->target_options_update(array('frame' => 'defend', 'success' => array(0, -9999, -9999, -9999, $this_refresh_text)));
                 $target_robot->trigger_target($target_robot, $this_ability);
             }
         }
