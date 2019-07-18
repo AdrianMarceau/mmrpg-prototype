@@ -41,7 +41,7 @@ $ability = array(
         // Upper-case object name while being sensitive to of/the/a/etc.
         $this_object_name = ucwords($this_object_name);
         $this_object_name = str_replace(array(' A ', ' An ', ' Of ', ' The '), array(' a ', ' an ', ' of ', ' the '), $this_object_name);
-        $this_object_name_span = rpg_type::print_span('impact', $this_object_name);
+        $this_object_name_span = rpg_type::print_span('impact_shield', $this_object_name);
 
         // Define this ability's attachment token
         $static_attachment_key = $this_robot->get_static_attachment_key();
