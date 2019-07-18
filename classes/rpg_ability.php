@@ -3271,10 +3271,14 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function for getting a preset core shield for the challenge
-    public static function get_static_core_shield($shield_type, $shield_duration = 99, $existing_shields = 0){
+    public static function get_static_core_shield($shield_type, $shield_duration = 99, $existing_shields = 0, $effect_percent = 99){
         $this_ability_token = 'core-shield';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$shield_type;
         $this_attachment_image = $this_ability_token.'_'.$shield_type;
+        $shield_animation_sequence = array(2, 3, 4, 3);
+        for ($i = 0; $i < $existing_shields; $i++){ array_push($shield_animation_sequence, array_shift($shield_animation_sequence)); }
+        $shield_effect_multiplier = 1 - (($effect_percent + 0.9999999999) / 100);
+        $this_attachment_create_text = '{this_robot}\'s new <span class="ability_name ability_type ability_type_'.$shield_type.'">Core Shield</span> resists damage!<br /> {this_robot} is virtually immune to the <span class="ability_name ability_type ability_type_'.$shield_type.'">'.ucfirst($shield_type).'</span> type now! ';
         $this_attachment_destroy_text = '{this_robot}\'s <span class="ability_name ability_type ability_type_'.$shield_type.'">'.ucfirst($shield_type).'</span> type <span class="ability_name ability_type ability_type_'.$shield_type.'">Core Shield</span> faded away... ';
         $this_attachment_info = array(
             'class' => 'ability',
@@ -3282,7 +3286,17 @@ class rpg_ability extends rpg_object {
             'ability_image' => $this_attachment_image,
             'attachment_token' => $this_attachment_token,
             'attachment_duration' => $shield_duration,
-            'attachment_damage_input_breaker_'.$shield_type => 0.0000000001,
+            'attachment_damage_input_breaker_'.$shield_type => $shield_effect_multiplier,
+            'attachment_create' => array(
+                'trigger' => 'special',
+                'kind' => '',
+                'percent' => true,
+                'modifiers' => false,
+                'frame' => 'taunt',
+                'rates' => array(100, 0, 0),
+                'success' => array(9, -9999, -9999, 10, $this_attachment_create_text),
+                'failure' => array(9, -9999, -9999, 10, $this_attachment_create_text)
+                ),
             'attachment_destroy' => array(
                 'trigger' => 'special',
                 'kind' => '',
@@ -3295,7 +3309,7 @@ class rpg_ability extends rpg_object {
                 'failure' => array(9, -9999, -9999, 10, $this_attachment_destroy_text)
                 ),
             'ability_frame' => 2,
-            'ability_frame_animate' => array(2, 3, 4, 3),
+            'ability_frame_animate' => $shield_animation_sequence,
             'ability_frame_offset' => array(
                 'x' => (10 + ($existing_shields * 8)),
                 'y' => (0),
