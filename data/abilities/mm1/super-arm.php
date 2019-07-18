@@ -38,61 +38,16 @@ $ability = array(
             $this_object_name = $this_sprite_index[$this_field_token][3];
         }
 
+        // Upper-case object name while being sensitive to of/the/a/etc.
+        $this_object_name = ucwords($this_object_name);
+        $this_object_name = str_replace(array(' A ', ' An ', ' Of ', ' The '), array(' a ', ' an ', ' of ', ' the '), $this_object_name);
+        $this_object_name_span = rpg_type::print_span('impact', $this_object_name);
+
         // Define this ability's attachment token
         $static_attachment_key = $this_robot->get_static_attachment_key();
         $static_attachment_duration = 10;
-        $this_effect_multiplier = 1 - ($this_ability->ability_recovery2 / 100);
-        $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$static_attachment_key;
-        $this_attachment_info = array(
-            'class' => 'ability',
-            'sticky' => true,
-            'ability_id' => $this_ability->ability_id.'_'.$static_attachment_key,
-            'ability_token' => $this_ability->ability_token,
-            'attachment_duration' => $static_attachment_duration,
-            'ability_image' => 'super-arm'.($this_sprite_sheet > 1 ? '-'.$this_sprite_sheet : ''),
-            'attachment_token' => $this_attachment_token,
-            'attachment_sticky' => true,
-            'attachment_damage_input_breaker' => $this_effect_multiplier,
-            'attachment_weaknesses' => array('explode', 'impact'),
-            'attachment_weaknesses_trigger' => 'target',
-            'attachment_create' => array(
-                'trigger' => 'special',
-                'kind' => '',
-                'percent' => true,
-                'frame' => 'defend',
-                'rates' => array(100, 0, 0),
-                'kickback' => array(0, 0, 0),
-                'success' => array($this_target_frame, 105, 0, 10,
-                    $this_robot->print_name().' shielded '.$this_robot->get_pronoun('reflexive').' with the '.$this_object_name.'!<br /> '.
-                    $this_robot->print_name().'\'s defenses were bolstered!'
-                    ),
-                'failure' => array($this_target_frame, 105, 0, 10,
-                    $this_robot->print_name().' shielded '.$this_robot->get_pronoun('reflexive').' with the '.$this_object_name.'!<br /> '.
-                    $this_robot->print_name().'\'s defenses were bolstered!'
-                    )
-                ),
-            'attachment_destroy' => array(
-                'trigger' => 'special',
-                'kind' => '',
-                'type2' => '',
-                'percent' => true,
-                'modifiers' => false,
-                'frame' => 'defend',
-                'rates' => array(100, 0, 0),
-                'kickback' => array(0, 0, 0),
-                'success' => array(-1, -10, 0, -10,
-                    'The '.$this_ability->print_name().'\'s '.$this_object_name.' faded away...<br /> '.
-                    'The '.$this_object_name.'\'s protection was lost!'
-                    ),
-                'failure' => array(-1, -10, 0, -10,
-                    'The '.$this_ability->print_name().'\'s '.$this_object_name.' faded away...<br /> '.
-                    'The '.$this_object_name.'\'s protection was lost!'
-                    )
-                ),
-            'ability_frame' => $this_target_frame,
-            'ability_frame_animate' => array($this_target_frame),
-            'ability_frame_offset' => array('x' => 105, 'y' => 0, 'z' => 2)
-            );
+        $this_attachment_info = rpg_ability::get_static_super_block($static_attachment_key, $static_attachment_duration);
+        $this_attachment_token = $this_attachment_info['attachment_token'];
 
         // Create the attachment object for this ability
         $this_attachment = rpg_game::get_ability($this_battle, $this_player, $this_robot, $this_attachment_info);
@@ -111,18 +66,36 @@ $ability = array(
         if (!$is_summoned){
 
             // Attach this ability attachment to the battle field itself
+            $this_attachment_info['ability_frame_styles'] = 'opacity: 0.1; ';
             $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token] = $this_attachment_info;
             $this_battle->update_session();
 
             // Target this robot's self
             $this_ability->target_options_update(array(
                 'frame' => 'summon',
-                'success' => array($this_target_frame, -9999, -9999, 0, 'The '.$this_ability->print_name().' created '.(preg_match('/^(a|e|i|o|u)/i', $this_object_name) ? 'an '.$this_object_name : 'a '.$this_object_name).'!')
+                'success' => array($this_target_frame, -9999, -9999, 0, $this_robot->print_name().' uses the '.$this_ability->print_name().' technique! ')
                 ));
-            $this_robot->trigger_target($target_robot, $this_ability);
+            $this_robot->trigger_target($target_robot, $this_ability, array('prevent_default_text' => true));
+
+            // Attach this ability attachment to the battle field itself
+            $this_attachment_info['ability_frame_styles'] = '';
+            $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token] = $this_attachment_info;
+            $this_battle->update_session();
+
+            // Target this robot's self
+            $this_ability->target_options_update(array(
+                'frame' => 'defend',
+                'success' => array($this_target_frame, -9999, -9999, 0, 'The '.$this_ability->print_name().' created '.
+                    (preg_match('/^(a|e|i|o|u)/i', $this_object_name) ? 'an ' : 'a ').
+                    $this_object_name_span.
+                    ' as a shield!<br /> '.
+                    'Damage from incoming attacks will be reduced!'
+                    )
+                ));
+            $this_robot->trigger_target($target_robot, $this_ability, array('prevent_default_text' => true));
 
         }
-        // Else if the ability flag was set, leaf shield is thrown and defense is lowered by 30%
+        // Else if the ability flag was set, the block is thrown and the attachment goes away
         else {
 
             // Remove this ability attachment from the battle field itself
@@ -132,7 +105,7 @@ $ability = array(
             // Target the opposing robot
             $this_ability->target_options_update(array(
                 'frame' => 'throw',
-                'success' => array($this_impact_frame, 175, 15, 10, $this_ability->print_name().' throws the '.$this_object_name.'!')
+                'success' => array($this_impact_frame, 175, 15, 10, $this_ability->print_name().' throws the '.$this_object_name_span.'!')
                 ));
             $this_robot->trigger_target($target_robot, $this_ability);
 
@@ -140,15 +113,15 @@ $ability = array(
             $this_ability->damage_options_update(array(
                 'kind' => 'energy',
                 'kickback' => array(20, 0, 0),
-                'success' => array($this_impact_frame, -125, 5, 10, 'The '.$this_object_name.' crashed into the target!'),
-                'failure' => array($this_impact_frame, -125, 5, -10, 'The '.$this_object_name.' missed the target&hellip;')
+                'success' => array($this_impact_frame, -125, 5, 10, 'The '.$this_object_name_span.' crashed into the target!'),
+                'failure' => array($this_impact_frame, -125, 5, -10, 'The '.$this_object_name_span.' missed the target&hellip;')
                 ));
             $this_ability->recovery_options_update(array(
                 'kind' => 'energy',
                 'frame' => 'taunt',
                 'kickback' => array(0, 0, 0),
-                'success' => array($this_impact_frame, -125, 5, 10, 'The '.$this_object_name.' crashed into the target!'),
-                'failure' => array($this_impact_frame, -125, 5, -10, 'The '.$this_object_name.' missed the target&hellip;')
+                'success' => array($this_impact_frame, -125, 5, 10, 'The '.$this_object_name_span.' crashed into the target!'),
+                'failure' => array($this_impact_frame, -125, 5, -10, 'The '.$this_object_name_span.' missed the target&hellip;')
                 ));
             $energy_damage_amount = $this_ability->ability_damage;
             $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
