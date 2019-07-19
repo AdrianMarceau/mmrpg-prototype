@@ -1101,9 +1101,9 @@ class rpg_ability_recovery extends rpg_recovery {
                                 $this_battle->events_debug(__FILE__, __LINE__, 'checkpoint weaknesses');
                                 // Remove this attachment and inflict damage on the robot
                                 unset($this_robot->robot_attachments[$attachment_token]);
-                                unset($this_robot->battle->battle_attachments[$static_attachment_key][$attachment_token]);
+                                unset($this_battle->battle_attachments[$static_attachment_key][$attachment_token]);
                                 $this_robot->update_session();
-                                $this_robot->battle->update_session();
+                                $this_battle->update_session();
                                 if ($attachment_info['attachment_destroy'] !== false){
                                     $attachment_info['flags']['is_attachment'] = true;
                                     if (!isset($attachment_info['attachment_token'])){ $attachment_info['attachment_token'] = $attachment_token; }
