@@ -6,7 +6,7 @@ $ability = array(
     'ability_game' => 'MMRPG',
     'ability_group' => 'MM00/Weapons/Disco',
     'ability_image_sheets' => 2,
-    'ability_description' => 'The user summons a spinning disco ball that hovers above the target to divert its attention. The target deals half damage from attacks while distracted by the ball.',
+    'ability_description' => 'The user summons a spinning disco ball that hovers in front of the target to divert its attention! Only one disco ball can be on the field at once, but the target deals half damage from all their attacks while distracted by it!',
     'ability_type' => 'laser',
     'ability_energy' => 4,
     'ability_accuracy' => 100,
@@ -44,9 +44,21 @@ $ability = array(
             ucfirst($target_robot->get_pronoun('possessive2')).' damage output is still compromised!'
             );
 
+        // If there's a hazard on this side already, we're gonna remove it first
+        $attachment_was_moved = false;
+        $static_attachment_key = $this_robot->get_static_attachment_key();
+        $static_attachment_duration = 6;
+        $this_attachment_info = rpg_ability::get_static_disco_ball($static_attachment_key, $static_attachment_duration);
+        $this_attachment_token = $this_attachment_info['attachment_token'];
+        if (isset($this_battle->battle_attachments[$static_attachment_key][$this_attachment_token])){
+            $static_attachment_duration = $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token]['attachment_duration'];
+            unset($this_battle->battle_attachments[$static_attachment_key][$this_attachment_token]);
+            $this_battle->update_session();
+            $attachment_was_moved = true;
+        }
+
         // Define this ability's attachment token
         $static_attachment_key = $target_robot->get_static_attachment_key();
-        $static_attachment_duration = 6;
         $this_attachment_info = rpg_ability::get_static_disco_ball($static_attachment_key, $static_attachment_duration);
         $this_attachment_token = $this_attachment_info['attachment_token'];
 
@@ -63,7 +75,7 @@ $ability = array(
             // Target this robot's self
             $this_ability->target_options_update(array(
                 'frame' => 'summon',
-                'success' => array(0, -10, 0, -18, $this_robot->print_name().' started a '.$this_ability->print_name().'!')
+                'success' => array(0, -10, 0, -18, $this_robot->print_name().(!$attachment_was_moved ? ' started a ' : ' moved the ').$this_ability->print_name().'!')
                 ));
             $this_robot->trigger_target($this_robot, $this_ability);
 
