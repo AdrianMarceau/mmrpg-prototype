@@ -35,7 +35,7 @@ foreach ($temp_player_active_robots AS $key => $robot){
     // Save this robot's current energy, weapons, and attack/defense/speed mods
     $_SESSION['ROBOTS_PRELOAD'][$this_battle->battle_complete_redirect_token][$robot_string] = array(
         'robot_energy' => $robot['robot_energy'],
-        'robot_weapons' => $robot['robot_weapons'],
+        'robot_weapons' => $robot['robot_weapons'] + ($robot['robot_position'] == 'active' ? 1 : 2),
         'robot_attack_mods' => $robot['counters']['attack_mods'],
         'robot_defense_mods' => $robot['counters']['defense_mods'],
         'robot_speed_mods' => $robot['counters']['speed_mods'],
