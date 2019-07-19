@@ -3597,8 +3597,8 @@ class rpg_ability extends rpg_object {
             'ability_frame' => 0,
             'ability_frame_animate' => array(0, 1, 2, 1),
             'ability_frame_offset' => array(
-                'x' => (60 + ($existing_attachments * 10)),
-                'y' => (0),
+                'x' => (70 + ($existing_attachments * 10)),
+                'y' => (10),
                 'z' => (20 + $existing_attachments)
                 )
             );
