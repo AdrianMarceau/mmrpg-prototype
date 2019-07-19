@@ -665,6 +665,11 @@ class rpg_robot extends rpg_object {
         if (!empty($this->robot_attachments)){ foreach ($this->robot_attachments AS $token => $info){ $current_attachments[$token] = $info; }  }
         $static_attachment_key = $this->get_static_attachment_key();
         if (!empty($this->battle->battle_attachments[$static_attachment_key])){ foreach ($this->battle->battle_attachments[$static_attachment_key] AS $token => $info){ $current_attachments[$token] = $info; } }
+        uasort($current_attachments, function($a1, $a2){
+            if (isset($a1['attachment_repeat']) && !isset($a2['attachment_repeat'])){ return -1; }
+            elseif (!isset($a1['attachment_repeat']) && isset($a2['attachment_repeat'])){ return 1; }
+            else { return 0; }
+            });
         return $current_attachments;
     }
 
@@ -4990,6 +4995,7 @@ class rpg_robot extends rpg_object {
 
                 // Collect or load the attachment into memory
                 $this_attachment = rpg_game::get_ability($this_battle, $this_player, $this_robot, $attachment_info);
+                $this_attachment->set_flag('ability_is_attachment', true);
 
                 // ATTACHMENT REPEAT
                 // If this attachment has REPEAT effects
@@ -5287,6 +5293,8 @@ class rpg_robot extends rpg_object {
 
                 }
 
+                // Unset the attachment flag and increment the key
+                $this_attachment->unset_flag('ability_is_attachment');
                 $attachment_key++;
 
             }

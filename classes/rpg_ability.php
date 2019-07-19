@@ -3612,8 +3612,8 @@ class rpg_ability extends rpg_object {
         $this_ability_token = 'thunder-wool-2';
         $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
         $this_attachment_image = $this_ability_token;
-        $this_attachment_destroy_text = 'The thunderous <span class="ability_name ability_type ability_type_electric">Woolly Cloud</span> above {this_robot} faded away... ';
-        $this_attachment_repeat_text = 'The <span class="ability_name ability_type ability_type_electric">Wooly Cloud</span> above {this_robot} released a lightning bolt! ';
+        $this_attachment_destroy_text = 'The thunderous '.rpg_type::print_span('electric', 'Woolly Cloud').' above {this_robot} faded away... ';
+        $this_attachment_repeat_text = 'The '.rpg_type::print_span('electric', 'Woolly Cloud').' above {this_robot} released a lightning bolt! ';
         $this_attachment_info = array(
             'class' => 'ability',
             'sticky' => true,
