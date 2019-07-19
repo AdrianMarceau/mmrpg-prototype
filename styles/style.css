@@ -2617,10 +2617,17 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
             rgba(255, 255, 255, 0.075) 75%
     );
 }
-#actions .button_hover,
-#actions .button_hover:hover {
+#mmrpg #actions .button_hover,
+#mmrpg #actions .button_hover:hover {
     border-color: rgba(255, 255, 255, 0.20) !important;
-    animation: border-pulsate 2s infinite;
+}
+#mmrpg #actions .robot_type.button_hover,
+#mmrpg #actions .robot_type.button_hover:hover,
+#mmrpg #actions .ability_type.button_hover,
+#mmrpg #actions .ability_type.button_hover:hover,
+#mmrpg #actions .item_type.button_hover,
+#mmrpg #actions .item_type.button_hover:hover {
+    border-color: rgba(255, 255, 255, 0.50) !important;
 }
 #actions .button_disabled {
     opacity: 0.45;
