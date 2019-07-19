@@ -6,7 +6,7 @@ $ability = array(
     'ability_game' => 'MM05',
     //'ability_group' => 'MM05/Weapons/040',
     'ability_group' => 'MM05/Weapons/033T1',
-    'ability_description' => 'The user enters a trance-like meditative state and stays there until the end of the turn.  Once the user has completed their meditation, all of their stats are raised by one stage!',
+    'ability_description' => 'The user enters a trance-like meditative state and stays there until the end of the turn.  Once the user has completed their meditation, all of their stats are raised either one or two stages depending on whether or not they took damage!',
     'ability_type' => 'crystal',
     'ability_energy' => 4,
     'ability_speed' => -6,
@@ -35,6 +35,7 @@ $ability = array(
             );
 
         // If this ability has not been summoned yet, do the action and then queue a conclusion move
+        $lifecounter_flag_token = $this_ability->ability_token.'_lifecounter';
         if (!$has_been_summoned){
 
             // Check to see if a Gemini Clone is attached and if it's active, then check to see if we can use it
@@ -50,6 +51,9 @@ $ability = array(
 
             // Set the summoned flag on this robot and save
             $this_robot->set_flag($summoned_flag_token, true);
+
+            // Define the starting life energy for this meditation
+            $this_robot->set_counter($lifecounter_flag_token, $this_robot->robot_energy);
 
             // Update this robot's sprite to show them with an inverted pallet
             $this_robot->set_frame_styles('-moz-filter: invert(1); -webkit-filter: invert(1); filter: invert(1); ');
@@ -88,6 +92,14 @@ $ability = array(
             if (empty($this_robot->flags[$summoned_flag_token.'_include_gemini_clone'])){ $has_gemini_clone = false; }
             $this_robot->unset_flag($summoned_flag_token.'_include_gemini_clone');
 
+            // Define the base power boost then reduce if the user took damage
+            $boost_amount = $has_gemini_clone ? 4 : 2;
+            if (isset($this_robot->counters[$lifecounter_flag_token])
+                && $this_robot->robot_energy != $this_robot->counters[$lifecounter_flag_token]
+                && $this_robot->robot_energy < $this_robot->counters[$lifecounter_flag_token]){
+                $boost_amount = ceil($boost_amount / 2);
+            }
+
             // Remove the summoned flag from this robot
             $this_robot->unset_flag($summoned_flag_token);
 
@@ -114,7 +126,6 @@ $ability = array(
             if ($this_robot->robot_status != 'disabled'){
 
                 // Call the global stat break functions with customized options
-                $boost_amount = $has_gemini_clone ? 2 : 1;
                 rpg_ability::ability_function_stat_boost($this_robot, 'attack', $boost_amount);
                 rpg_ability::ability_function_stat_boost($this_robot, 'defense', $boost_amount);
                 rpg_ability::ability_function_stat_boost($this_robot, 'speed', $boost_amount);
