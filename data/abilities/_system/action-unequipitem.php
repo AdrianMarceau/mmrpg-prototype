@@ -34,8 +34,12 @@ $ability = array(
             // Remove the item from this robot in the session
             $ptoken = $this_player->player_token;
             $rtoken = $this_robot->robot_token;
+            $rid = $this_robot->robot_id;
             if (!empty($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
                 $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
+            }
+            if (!empty($_SESSION['ROBOTS_PRELOAD'][$this_battle->battle_token][$rid.'_'.$rtoken]['robot_item'])){
+                $_SESSION['ROBOTS_PRELOAD'][$this_battle->battle_token][$rid.'_'.$rtoken]['robot_item'] = '';
             }
 
             // Remove the item from the robot and create an object out of it
