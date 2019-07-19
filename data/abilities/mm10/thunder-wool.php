@@ -25,20 +25,23 @@ $ability = array(
         $this_ability->update_session();
 
         // Predefine attachment create and destroy text for later
-        $this_create_text = ($target_robot->print_name().' found '.$target_robot->get_pronoun('reflexive').' under a woolly cloud!<br /> '.
+        $this_create_text = ($target_robot->print_name().' found '.$target_robot->get_pronoun('reflexive').' under a '.rpg_type::print_span('electric', 'Woolly Cloud').'!<br /> '.
             $target_robot->print_name().' will take damage at the end of each turn!'
             );
-        $this_destroy_text = ('The '.$this_ability->print_name().'\'s woolly cloud faded away...<br /> '.
-            'This robot won\'t take end-of-turn damage any more!'
+        $this_refresh_text = ($this_robot->print_name().' refreshed the '.rpg_type::print_span('electric', 'Woolly Cloud').' above '.$target_robot->print_name().'!<br /> '.
+            'That position on the field will continue to take end-of-turn damage!'
             );
-        $this_refresh_text = ('The '.$this_ability->print_name().' extended the woolly cloud\'s life!<br /> '.
-            'This robot will continue taking damage at the end of each turn!'
-            );
-        $this_repeat_text = ('The '.$this_ability->print_name().'\'s woolly cloud released a lightning bolt!');
 
         // Define this ability's attachment token
         $static_attachment_key = $target_robot->get_static_attachment_key();
         $static_attachment_duration = 3;
+        $this_attachment_info = rpg_ability::get_static_woolly_cloud($static_attachment_key, $static_attachment_duration);
+        $this_attachment_token = $this_attachment_info['attachment_token'];
+
+        // Update the attachment image if a special robot is using it
+        $this_attachment_info['ability_image'] = $this_ability->ability_image;
+
+        /*
         $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$static_attachment_key;
         $this_attachment_info = array(
             'class' => 'ability',
@@ -100,6 +103,7 @@ $ability = array(
             'ability_frame_animate' => array(0, 2, 4, 1, 3, 5),
             'ability_frame_offset' => array('x' => -5, 'y' => 40, 'z' => -8)
             );
+        */
 
         // Target the opposing robot
         if ($this_robot->robot_token == 'sheep-man'){
@@ -123,7 +127,7 @@ $ability = array(
                 if ($target_robot->robot_status != 'disabled'){
                     $this_robot->robot_frame = 'base';
                     $this_robot->update_session();
-                    $this_ability->target_options_update($this_attachment_info['attachment_create']);
+                    $this_ability->target_options_update(array('frame' => 'defend', 'success' => array(0, -9999, -9999, -9999, $this_create_text)));
                     $target_robot->trigger_target($target_robot, $this_ability);
                 }
 
@@ -138,13 +142,10 @@ $ability = array(
                     $this_attachment_info['attachment_duration'] = $static_attachment_duration;
                     $this_battle->battle_attachments[$static_attachment_key][$this_attachment_token] = $this_attachment_info;
                     $this_battle->update_session();
-                    if ($target_robot->robot_status != 'disabled'){
-                        $this_ability->target_options_update(array(
-                            'frame' => 'defend',
-                            'success' => array(1, -5, 5, -10, $this_refresh_text)
-                            ));
-                        $target_robot->trigger_target($target_robot, $this_ability);
-                    }
+                }
+                if ($target_robot->robot_status != 'disabled'){
+                    $this_ability->target_options_update(array('frame' => 'defend', 'success' => array(0, -9999, -9999, -9999, $this_refresh_text)));
+                    $target_robot->trigger_target($target_robot, $this_ability);
                 }
 
             }
