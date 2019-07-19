@@ -7,7 +7,7 @@ $ability = array(
     //'ability_group' => 'MM09/Weapons/069',
     'ability_group' => 'MM09/Weapons/065T2',
     'ability_image_sheets' => 6,
-    'ability_description' => 'The user surrounds itself with an orbit of four large diamonds, each acting as a separate elemental shield and offering protection against Nature, Flame, Electric, and Water-type damage!  Each diamond can only withstand a single attack, but any remaining ones can be thrown at a target for damage!',
+    'ability_description' => 'The user surrounds itself with an orbit of four large diamonds, each acting as a separate elemental shield and offering protection plus immunity to against Nature, Flame, Electric, and Water-type damage!  Each diamond can only withstand a single attack, but any remaining ones can be thrown at a target for damage!',
     'ability_type' => 'crystal',
     'ability_type2' => 'shield',
     'ability_energy' => 8,
@@ -15,7 +15,7 @@ $ability = array(
     'ability_recovery2' => 100,
     'ability_recovery_percent2' => true,
     'ability_accuracy' => 94,
-    'ability_target' => 'auto',
+    'ability_target' => 'select',
     'ability_function' => function($objects){
 
         // Extract all objects into the current scope
@@ -26,7 +26,8 @@ $ability = array(
         $num_shield_pieces = count($list_shield_elements);
 
         // Define this ability's attachment token
-        $this_effect_multiplier = 1 - ($this_ability->ability_recovery2 / 100);
+        $this_effect_multiplier = 1 - (5 / 100);
+        $this_effect_multiplier2 = 1 - ($this_ability->ability_recovery2 / 100);
         $this_attachment_token = 'ability_'.$this_ability->ability_token;
         $this_attachment_info = array(
             'class' => 'ability',
@@ -34,8 +35,7 @@ $ability = array(
             'ability_image' => $this_ability->ability_image,
             'attachment_token' => $this_attachment_token,
             'attachment_group' => $this_attachment_token,
-            //'attachment_damage_input_breaker' => $this_effect_multiplier,
-            //'attachment_weaknesses' => array('*'),
+            'attachment_damage_input_breaker' => $this_effect_multiplier,
             'attachment_weaknesses_trigger' => 'target',
             'attachment_create' => array(
                 'trigger' => 'special',
@@ -116,7 +116,7 @@ $ability = array(
                 $temp_attachment_info['attachment_token'] = $temp_attachment_token;
                 $temp_attachment_info['ability_image'] = $temp_attachment_image;
                 $temp_attachment_info['ability_frame_animate'] = $temp_animate_sequence;
-                $temp_attachment_info['attachment_damage_input_breaker_'.$temp_attachment_element] = $this_effect_multiplier;
+                $temp_attachment_info['attachment_damage_input_breaker_'.$temp_attachment_element] = $this_effect_multiplier2;
                 $temp_attachment_info['attachment_weaknesses'] = array($temp_attachment_element);
                 $temp_destroy_text = $temp_attachment_info['attachment_destroy']['success'][4];
                 $temp_type_span = '<span class="ability_name ability_type ability_type_'.$temp_attachment_element.'">'.ucfirst($temp_attachment_element).'</span>';
