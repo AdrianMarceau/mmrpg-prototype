@@ -21,8 +21,8 @@ $contributor_ids = array(
     412,  // AdrianMarceau (Developer)
     3842,  // MegaBossMan (Administrator)
     4117,  // Rhythm_BCA (Contributor)
-    1330, // TheDoc (Moderator)
-    6455, // Shiver (Moderator)
+    //1330, // TheDoc (Moderator)
+    //6455, // Shiver (Moderator)
     110,  // EliteP1 / MMX100 (Contributor)
     2,  // Brorman (Contributor)
     435,  // Spinstrike (Contributor)
@@ -230,18 +230,6 @@ if (!empty($contributor_ids)){
 <div class="subbody creditblock compact">
     <div class="text">
         <div class="detail">
-            <strong class="name">ThatGuyNamedMikey</strong>
-            <span class="pipe">|</span>
-            <em class="reason">Outspoken Game Critic / Persistently Pedantic Patron</em>
-        </div>
-        <div class="description">
-            <p>ThatGuyNamedMikey joined us in September 2014 and has been a frequent sight on the leaderboards, in the community, and around the various chat rooms since.  Many know Mike as our most vocal advocate for game-balance and he is often the first to point out potential issues with features or ideas before they go too far.  Mike was also responsible for creating our first chat room (Xat) and played a key role in our upgrading to a better platform (Ajax) when the time came.  Mike has hosted countless tournaments, contests, and other events since joining the community and even served as a moderator for a time.  His contributions are appreciated by many.</p>
-        </div>
-    </div>
-</div>
-<div class="subbody creditblock compact">
-    <div class="text">
-        <div class="detail">
             <strong class="name">MegaBoyX7</strong>
             <span class="pipe">|</span>
             <em class="reason">Chat Room Emoticons</em>
@@ -260,6 +248,42 @@ if (!empty($contributor_ids)){
         </div>
         <div class="description">
             <p>PaRcoO starting playing and contributing in December 2012 and has since offered a much assistance with bug tracking, feature ideas, and a great deal of time play-testing.  We all appreciate your contributions very much - thank you! :)</p>
+        </div>
+    </div>
+</div>
+<div class="subbody creditblock compact">
+    <div class="text">
+        <div class="detail">
+            <strong class="name">ThatGuyNamedMikey</strong>
+            <span class="pipe">|</span>
+            <em class="reason">Outspoken Game Critic / Persistently Pedantic Patron</em>
+        </div>
+        <div class="description">
+            <p>ThatGuyNamedMikey joined us in September 2014 and has been a frequent sight on the leaderboards, in the community, and around the various chat rooms since.  Many know Mike as our most vocal advocate for game-balance and he is often the first to point out potential issues with features or ideas before they go too far.  Mike was also responsible for creating our first chat room (Xat) and played a key role in our upgrading to a better platform (Ajax) when the time came.  Mike has hosted countless tournaments, contests, and other events since joining the community and even served as a moderator for a time.  His contributions are appreciated by many.</p>
+        </div>
+    </div>
+</div>
+<div class="subbody creditblock compact">
+    <div class="text">
+        <div class="detail">
+            <strong class="name">Shiver</strong>
+            <span class="pipe">|</span>
+            <em class="reason">Discord Chat Server Moderator</em>
+        </div>
+        <div class="description">
+            <p>Shiver joined our community in September of 2016, attracting immediate prominence for toppling our leaderboards and providing a unique competitive viewpoint. Coupled with a no-nonsense attitude and an amiable presence, it was only a matter of time before Shiver was bestowed the responsibility of chat and community moderator, always keeping conversations within the proper channels and boundaries. Sadly, as does often happen in life, Shiver went on their separate way, eventually choosing to resign from the role of moderator. Regardless, their services and assistance as a moderator and player will certainly not be forgotten, and we wish them the best in their future efforts!</p>
+        </div>
+    </div>
+</div>
+<div class="subbody creditblock compact">
+    <div class="text">
+        <div class="detail">
+            <strong class="name">TheDoc</strong>
+            <span class="pipe">|</span>
+            <em class="reason">Community & Chat Server Moderator</em>
+        </div>
+        <div class="description">
+            <p>TheDoc joined the community back in June 2013, being one of the early pioneers of MMRPG bug-testing and feedback assessments. Users who frequented the chat then would fondly remember TheDoc for his amusing demeanor, though when it came to game discussion, he could masterfully turn on a dime and cut precisely to the heart of an issue. It is of no surprise to anyone that TheDoc inevitably became a moderator, and in doing so still remained steadfast to always consider his peers and community first and foremost. It’s his involvement that continues to help shape our community today. Thank you Doc!</p>
         </div>
     </div>
 </div>
