@@ -56,7 +56,7 @@ $ability = array(
         if (!empty($temp_target_benched_robots)){
 
             // Calculate the "middle" position behind this robot, then the two to the side
-            $max_bench_key = ($target_player->values['robots_start_total'] - 1); // ex. 3
+            $max_bench_key = ($target_player->counters['robots_start_total'] - 1); // ex. 3
             $mid_bench_key = $max_bench_key / 2; // ex. 1.5
             $background_target_key = ceil($mid_bench_key + 1); // ex. 3
             $foreground_target_key = ceil($mid_bench_key - 1); // ex. 1
@@ -70,7 +70,7 @@ $ability = array(
 
             /*
             $this_battle->events_create(false, false, 'debug', preg_replace('/\s+/', ' ', "
-                \$target_player->values[robots_start_total] = {$target_player->values['robots_start_total']} <br />
+                \$target_player->values[robots_start_total] = {$target_player->counters['robots_start_total']} <br />
                 \$max_bench_key = {$max_bench_key} | \$mid_bench_key = {$mid_bench_key} <br />
                 \$background_target_key = {$background_target_key} | \$foreground_target_key = {$foreground_target_key} <br />
                 \$background_target_robot = {$background_target_robot->robot_token} | \$foreground_target_robot = {$foreground_target_robot->robot_token} <br />
