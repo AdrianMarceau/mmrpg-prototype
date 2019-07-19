@@ -5147,8 +5147,12 @@ class rpg_robot extends rpg_object {
                     if ($attachment_info['attachment_duration'] > 0){
 
                         $attachment_info['attachment_duration'] = $attachment_info['attachment_duration'] - 1;
-                        if ($is_static_attachment){ $this_battle->battle_attachments[$static_attachment_key][$attachment_token] = $attachment_info; }
-                        else { $this_robot->set_attachment($attachment_token, $attachment_info); }
+                        if ($is_static_attachment
+                            && isset($this_battle->battle_attachments[$static_attachment_key][$attachment_token])){
+                            $this_battle->battle_attachments[$static_attachment_key][$attachment_token] = $attachment_info;
+                        } elseif (isset($this_robot->robot_attachments[$attachment_token])){
+                            $this_robot->set_attachment($attachment_token, $attachment_info);
+                        }
                         $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' attachment '.$attachment_debug_token.' duration decreased to '.$attachment_info['attachment_duration']);
 
                     }
