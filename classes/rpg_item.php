@@ -828,16 +828,20 @@ class rpg_item extends rpg_object {
      * @param bool $parse_data
      * @return array
      */
-    public static function get_index($include_hidden = false, $include_unpublished = false, $filter_class = '', $include_tokens = array()){
+    public static function get_index($include_hidden = false, $include_unpublished = false, $filter_subclasses = '', $include_tokens = array()){
 
         // Pull in global variables
         $db = cms_database::get_database();
 
         // Define the query condition based on args
         $temp_where = '';
+        $temp_where .= "AND item_class = 'item' ";
         if (!$include_hidden){ $temp_where .= 'AND item_flag_hidden = 0 '; }
         if (!$include_unpublished){ $temp_where .= 'AND item_flag_published = 1 '; }
-        if (!empty($filter_class)){ $temp_where .= "AND item_class = '{$filter_class}' "; }
+        if (!empty($filter_subclasses)){
+            if (is_array($filter_subclasses)){ $temp_where .= "AND item_subclass IN ('".implode("','", $filter_subclasses)."') "; }
+            elseif (is_string($filter_subclasses)){ $temp_where .= "AND item_subclass = '{$filter_subclasses}' "; }
+            }
         if (!empty($include_tokens)){
             $include_string = $include_tokens;
             array_walk($include_string, function(&$s){ $s = "'{$s}'"; });
