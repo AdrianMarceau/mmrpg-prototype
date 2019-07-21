@@ -172,5 +172,170 @@ class rpg_mission_endless extends rpg_mission {
 
     }
 
+    // Define a function for generating an endless mission given a count
+    public static function generate_endless_mission($this_prototype_data, $mission_number){
+
+        // Collect a list of possible stars
+        static $possible_star_list = false;
+        static $max_star_force = false;
+        if ($possible_star_list === false){
+            $possible_star_list = mmrpg_prototype_possible_stars(true);
+            $max_star_force = array();
+            if (!empty($possible_star_list)){
+                foreach ($possible_star_list AS $star_token => $star_info){
+                    if (!isset($max_star_force[$star_info['info1']['type']])){ $max_star_force[$star_info['info1']['type']] = 0; }
+                    if (!empty($star_info['info2']) && !isset($max_star_force[$star_info['info2']['type']])){ $max_star_force[$star_info['info2']['type']] = 0; }
+                    if ($star_info['kind'] == 'fusion'){
+                        if ($star_info['info1']['type'] == $star_info['info2']['type']){
+                            $max_star_force[$star_info['info1']['type']] += 2;
+                        } else {
+                            $max_star_force[$star_info['info1']['type']] += 1;
+                            $max_star_force[$star_info['info2']['type']] += 1;
+                        }
+                    } else {
+                        $max_star_force[$star_info['info1']['type']] += 1;
+                    }
+                }
+            }
+        }
+
+        // Precollect a static field list for reference
+        static $mmrpg_fields_index = false;
+        if ($mmrpg_fields_index === false){ $mmrpg_fields_index = rpg_field::get_index(); }
+
+        // Collect the endless mission seed based on the mission number
+        $temp_battle_seed = self::generate_endless_mission_seed($mission_number);
+
+        // Precollect data about the requested fields
+        $temp_option_field = $mmrpg_fields_index[(!empty($temp_battle_seed['field']) ? $temp_battle_seed['field'] : 'intro-field')];
+        $temp_option_field2 = $mmrpg_fields_index[(!empty($temp_battle_seed['field2']) ? $temp_battle_seed['field2'] : $temp_option_field['field_token'])];
+        $temp_option_multipliers = array();
+        $temp_option_field_list = array($temp_option_field, $temp_option_field2);
+        foreach ($temp_option_field_list AS $temp_field){
+            if (!empty($temp_field['field_multipliers'])){
+                foreach ($temp_field['field_multipliers'] AS $temp_type => $temp_multiplier){
+                    if (!isset($temp_option_multipliers[$temp_type])){ $temp_option_multipliers[$temp_type] = $temp_multiplier; }
+                    else { $temp_option_multipliers[$temp_type] = $temp_option_multipliers[$temp_type] * $temp_multiplier; }
+                }
+            }
+        }
+
+        // Define the target field data with seed data
+        $target_field = array();
+        //$target_field['field_background'] = $temp_option_field['field_token'];
+        //$target_field['field_foreground'] = $temp_option_field2['field_token'];
+        //$target_field['field_music'] = $temp_option_field['field_music'];
+        $target_field['field_token'] = $temp_option_field['field_token'];
+        $target_field['field_name'] = preg_replace('/^([-_a-z0-9\s]+)\s+([-_a-z0-9]+)$/i', '$1', $temp_option_field['field_name']).' '.preg_replace('/^([-_a-z0-9\s]+)\s+([-_a-z0-9]+)$/i', '$2', $temp_option_field2['field_name']);
+        $target_field['field_type'] = !empty($temp_option_field['field_type']) ? $temp_option_field['field_type'] : '';
+        $target_field['field_type2'] = !empty($temp_option_field2['field_type']) ? $temp_option_field2['field_type'] : '';
+        $target_field['field_music'] = $temp_option_field2['field_token'];
+        $target_field['field_foreground'] = $temp_option_field2['field_foreground'];
+        $target_field['field_foreground_attachments'] = $temp_option_field2['field_foreground_attachments'];
+        $target_field['field_background'] = $temp_option_field['field_background'];
+        $target_field['field_background_attachments'] = $temp_option_field['field_background_attachments'];
+        $target_field['field_multipliers'] = $temp_option_multipliers;
+        //$target_field['field_music'] = 'sega-remix/boss-theme-mm10';
+        //$target_field['values'] = array('hazards' => array('super_blocks' => 'right'));
+
+        // Define the target player with seed data
+        $target_player = array(
+            'player_token' => 'player',
+            'player_starforce' => $max_star_force
+            );
+
+        // Generate the list of target robots given the seed data
+        $target_robots = array();
+        //$statmods = min(5, ($temp_battle_seed['phase'] - 1));
+        //$statmods = $mission_number > 1 ? mt_rand(0, min(5, $mission_number)) : 0;
+        //$statmodmax = $mission_number > 1 ? min(5, $mission_number) : 0;
+        $statmodmax = $temp_battle_seed['phase'] > 1 ? min(5, ($temp_battle_seed['phase'] - 1)) : 0;
+        $statrewards = 9999;
+        foreach ($temp_battle_seed['targets'] AS $key => $target){
+            list($robot, $item) = explode('@', $target);
+            $target_robots[] = array(
+                'robot_token' => $robot,
+                'robot_item' => $item,
+                'counters' => array(
+                    'attack_mods' => mt_rand(0, $statmodmax),
+                    'defense_mods' => mt_rand(0, $statmodmax),
+                    'speed_mods' => mt_rand(0, $statmodmax)
+                    ),
+                'values' => array(
+                    'robot_rewards' => array(
+                        'robot_attack' => $statrewards,
+                        'robot_defense' => $statrewards,
+                        'robot_speed' => $statrewards
+                        )
+                    )
+                );
+        }
+
+        // Now that robot data has been parsed, let's try to customize music
+        if (true){
+
+            /*
+            $trobots = array_values($temp_battle_omega['battle_target_player']['player_robots']);
+            if (!empty($trobots)){
+                $atoken = 'sega-remix';
+                $rtoken = $trobots[0]['robot_token'];
+                $gtoken = strtolower($this_robot_index[$rtoken]['robot_game']);
+                $music_path = $atoken.'/'.$rtoken.'-'.$gtoken.'/';
+                //$temp_battle_omega['battle_description2'] .= '| maybe music:'.$music_path.' ';
+                if (file_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
+                    $temp_battle_omega['battle_field_base']['field_music'] = $music_path;
+                } else {
+                    $atoken = 'fallbacks';
+                    $music_path2 = $atoken.'/'.$rtoken.'-'.$gtoken.'/';
+                    //$temp_battle_omega['battle_description2'] .= '| maybe music2:'.$music_path2.' ';
+                    if (file_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path2)){
+                        $temp_battle_omega['battle_field_base']['field_music'] = $music_path2;
+                    }
+                }
+            }
+            */
+
+        }
+
+        // Define and battle flag, values, or counters we need to
+        $challenge_flags = array();
+        $challenge_values = array();
+        $challenge_counters = array();
+        $challenge_flags['challenge_battle'] = true;
+        $challenge_flags['endless_battle'] = true;
+        if (false){ $challenge_flags['is_hidden'] = true; }
+        if (false){ $challenge_flags['is_cleared'] = true; }
+        $challenge_values['challenge_battle_id'] = -1;
+        $challenge_values['challenge_battle_kind'] = 'event';
+        $challenge_values['challenge_battle_by'] = '';
+        $challenge_values['challenge_marker'] = 'base';
+        if ($temp_battle_seed['phase'] >= 2){ $challenge_values['challenge_marker'] = 'bronze'; }
+        if ($temp_battle_seed['phase'] >= 3){ $challenge_values['challenge_marker'] = 'silver'; }
+        if ($temp_battle_seed['phase'] >= 4){ $challenge_values['challenge_marker'] = 'gold'; }
+        $challenge_values['challenge_records'] = array();
+        $challenge_values['colour_token'] = 'copy';
+
+        // Generate the first ENDLESS MISSION and append it to the list
+        $temp_battle_token = $this_prototype_data['this_player_token'].'-endless-mission';
+        $temp_battle_sigma = mmrpg_prototype_generate_mission($this_prototype_data, $temp_battle_token, array(
+                'battle_name' => 'Challenge Mode Endless Mission',
+                'battle_button' => 'Endless Attack Mode',
+                'battle_level' => 100,
+                'battle_robot_limit' => 6,
+                'battle_description' => 'Select a team of up to six robots and fight your way through as many waves of enemies as you can in this special challenge mission! ',
+                'battle_description2' => 'The targets you face will grow stronger as you progress and your team will NOT heal between battles.  Good luck!',
+                'battle_counts' => false,
+                'battle_zenny' => 1000,
+                'battle_complete_redirect_token' => $temp_battle_token,
+                'flags' => $challenge_flags,
+                'values' => $challenge_values,
+                'counters' => $challenge_counters
+                ), $target_field, $target_player, $target_robots, true);
+
+        // Return the generated endless mission
+        return $temp_battle_sigma;
+
+    }
+
 }
 ?>
