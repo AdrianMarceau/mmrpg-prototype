@@ -52,10 +52,10 @@ if (!empty($this_battle->battle_field_base['values']['hazards'])){
 if (!empty($_SESSION['BATTLES_CHAIN'])){
     //$this_battle->events_create(false, false, 'debug', ('$_SESSION[\'BATTLES_CHAIN\'] = '.preg_replace('/\s+/', ' ', print_r($_SESSION['BATTLES_CHAIN'], true)).'<br />'));
 
-    // Calculate the chain bonus for zenny rewards
-    $zenny_earned_total = 0;
-    foreach ($_SESSION['BATTLES_CHAIN'] AS $key => $record){ $zenny_earned_total += $record['battle_zenny_earned']; }
-    $this_battle->battle_zenny += $zenny_earned_total;
+    // Increase the zenny reward based on the current wave
+    $base_zenny = $this_battle->battle_zenny;
+    $current_chain = count($_SESSION['BATTLES_CHAIN']) + 1;
+    $this_battle->battle_zenny = $current_chain * $base_zenny;
 
 }
 
@@ -94,12 +94,35 @@ $flag_battle_counts = $this_battle->battle_counts ? true : false;
 $first_event_header = $this_battle->battle_name.' <span style="opacity:0.25;">|</span> '.$this_battle->battle_field->field_name;
 $first_event_body = $this_battle->battle_description.'<br />';
 
+// If this is an ENDLESS ATTACK MODE mission, display the counter
+if (!empty($this_battle->flags['challenge_battle'])
+    && !empty($this_battle->flags['endless_battle'])){
+
+    // Generate the first ENDLESS ATTACK MODE mission and append it to the list
+    $this_loop_size = 18;
+    $this_mission_number = count($_SESSION['BATTLES_CHAIN']) + 1;
+    $this_phase_number = floor($this_mission_number / $this_loop_size) + 1;
+    $this_battle_number = $this_mission_number > $this_loop_size ? ($this_mission_number % $this_loop_size) : $this_mission_number;
+    //$first_event_body .= 'Wave : '.number_format($this_mission_number, 0, '.', ',').' ';
+    //$first_event_body .= '('.number_format($this_phase_number, 0, '.', ',').'-'.number_format($this_battle_number, 0, '.', ',').') ';
+    //$first_event_body .= '<span style="opacity:0.25;">|</span> ';
+    $first_event_body .= 'Mission : '.number_format($this_mission_number, 0, '.', ',').' ';
+    $first_event_body .= '<span style="opacity:0.25;">|</span> ';
+    $first_event_body .= 'Wave : '.number_format($this_phase_number, 0, '.', ',').'-'.number_format($this_battle_number, 0, '.', ',').' ';
+    $first_event_body .= '<span style="opacity:0.25;">|</span> ';
+    //$first_event_body .= 'Phase : '.number_format($this_phase_number, 0, '.', ',').' ';
+    //$first_event_body .= '<span style="opacity:0.25;">|</span> ';
+    $first_event_body = preg_replace('/(^|\s)Select\s([^\.]+)\sfight\s/i', 'Fight ', $first_event_body);
+
+}
+
 // Print out the goals for this mission
 $first_event_body .= 'Goal : '.$this_battle->battle_turns.($this_battle->battle_turns > 1 ? ' Turns' : ' Turn').' ';
-$first_event_body .= '<span style="opacity:0.25;">|</span> ';
 
 // Print out the rewards for this mission
+$first_event_body .= '<span style="opacity:0.25;">|</span> ';
 $first_event_body .= 'Reward : '.number_format($this_battle->battle_zenny, 0, '.', ',').' Zenny ';
+
 $first_event_body .= '<br />';
 
 //$first_event_body .= '$this_battle->values = '.preg_replace('/\s+/', ' ', print_r($this_battle->values, true)).'<br />';
