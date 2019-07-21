@@ -40,7 +40,8 @@ ob_start();
 
             <ul class="text" style="padding-bottom: 10px;">
                 <li>&raquo; <a class="link_inline" href="#">Experimental link</a></li>
-                <li>&raquo; <a class="link_inline" href="dev/map-test/">Procedurally generated map experiment</a></li>
+                <li>&raquo; <a class="link_inline" href="dev/map-test/">Procedurally generated map experiment (MMRPG Conquest)</a></li>
+                <li>&raquo; <a class="link_inline" href="dev/endless-mode-v4/">Procedurally generated mission playlist (Endless Attack Mode)</a></li>
             </ul>
 
         </div>
