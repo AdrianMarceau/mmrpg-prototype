@@ -1073,6 +1073,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
 
             $is_player_battle = !empty($this_battleinfo['flags']['player_battle']) ? true : false;
             $is_challenge_battle = !empty($this_battleinfo['flags']['challenge_battle']) ? true : false;
+            $is_endless_battle = !empty($this_battleinfo['flags']['endless_battle']) ? true : false;
             $is_battle_counts = isset($this_battleinfo['battle_counts']) && $this_battleinfo['battle_counts'] == false ? false : true;
 
             // Check the GAME session to see if this battle has been completed, increment the counter if it was
@@ -1309,8 +1310,8 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
 
             if (!empty($this_option_button_text)){
                 $this_option_label .= '<span class="multi">';
-                    $this_option_label .= '<span class="maintext">'.$this_option_button_text.'</span>';
-                    if ($is_player_battle || $is_challenge_battle){
+                    if (($is_player_battle || $is_challenge_battle) && !$is_endless_battle){
+                        $this_option_label .= '<span class="maintext">'.$this_option_button_text.'</span>';
                         $robots = $this_option_limit.($this_option_limit == 1 ? ' R' : ' Rs');
                         $turns = $this_option_turns.($this_option_turns == 1 ? ' T' : ' Ts');
                         $zenny = str_replace('Zenny', 'Zs', $this_option_zenny_amount);
@@ -1323,7 +1324,14 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                                 $this_option_label .= '<span class="subtext2">Special Event Mission</span>';
                             }
                         }
+                    } elseif ($is_endless_battle){
+                        $this_option_label .= '<span class="maintext">&#10022; '.$this_option_button_text.' &#10022;</span>';
+                        $robots = $this_option_limit.($this_option_limit == 1 ? ' R' : ' Rs');
+                        //$this_option_label .= '<span class="subtext">6 Rs | &#8734; Ts | &#8734; Zs</span>';
+                        $this_option_label .= '<span class="subtext">'.$robots.' | ???? Ts | ???? Zs</span>';
+                        $this_option_label .= '<span class="subtext2">All-Star Challenge Mission</span>';
                     } else {
+                        $this_option_label .= '<span class="maintext">'.$this_option_button_text.'</span>';
                         $this_option_label .= '<span class="subtext">'.$this_option_level_range.'</span>';
                         $this_option_label .= '<span class="subtext2">'.$this_option_zenny_amount.'</span>';
                     }
@@ -1724,7 +1732,8 @@ function mmrpg_prototype_generate_mission($this_prototype_data,
         $target_robots[$key] = $robot_info;
     }
     if (empty($temp_battle_omega['battle_zenny'])){ $temp_battle_omega['battle_zenny'] = $auto_battle_zenny; }
-    if (empty($temp_battle_omega['battle_turns'])){ $temp_battle_omega['battle_turns'] = $auto_battle_turn_limit; }
+    if ($temp_battle_omega['battle_turns'] === 'double'){ $temp_battle_omega['battle_turns'] = $auto_battle_turn_limit * 2; }
+    elseif (empty($temp_battle_omega['battle_turns'])){ $temp_battle_omega['battle_turns'] = $auto_battle_turn_limit; }
     if (isset($battle_info['battle_robot_limit']) && $temp_battle_omega['battle_robot_limit'] == 'max'){ $battle_info['battle_robot_limit'] = MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX; }
     elseif (isset($battle_info['battle_robot_limit']) && $temp_battle_omega['battle_robot_limit'] == 'auto'){ $temp_battle_omega['battle_robot_limit'] = ceil($auto_battle_robot_limit); }
     elseif (empty($battle_info['battle_robot_limit']) || !is_numeric($battle_info['battle_robot_limit'])){ unset($battle_info['battle_robot_limit']); }
