@@ -33,9 +33,12 @@ foreach ($temp_player_active_robots AS $key => $robot){
     }
 
     // Save this robot's current energy, weapons, and attack/defense/speed mods
+    $old_weapon_energy = $robot['robot_weapons'];
+    $new_weapon_energy = $old_weapon_energy + ($robot['robot_position'] == 'active' ? 1 : 2);
+    if ($new_weapon_energy > $robot['robot_base_weapons']){ $new_weapon_energy = $robot['robot_base_weapons']; }
     $_SESSION['ROBOTS_PRELOAD'][$this_battle->battle_complete_redirect_token][$robot_string] = array(
         'robot_energy' => $robot['robot_energy'],
-        'robot_weapons' => $robot['robot_weapons'] + ($robot['robot_position'] == 'active' ? 1 : 2),
+        'robot_weapons' => $new_weapon_energy,
         'robot_attack_mods' => $robot['counters']['attack_mods'],
         'robot_defense_mods' => $robot['counters']['defense_mods'],
         'robot_speed_mods' => $robot['counters']['speed_mods'],
@@ -63,6 +66,21 @@ $next_missios_href .= '&this_player_id='.$this_player->player_id;
 $next_missios_href .= '&this_player_token='.$this_player->player_token;
 $next_missios_href .= '&this_player_robots='.$active_robot_string;
 $next_missios_href .= '&flag_skip_fadein=true';
+
+// If we're in the middle of an ENDLESS ATTACK MODE challene, regenerate the mission
+if (!empty($this_battle->flags['challenge_battle'])
+    && !empty($this_battle->flags['endless_battle'])){
+
+    // Generate the first ENDLESS ATTACK MODE mission and append it to the list
+    $next_mission_number = count($_SESSION['BATTLES_CHAIN']) + 1;
+    $this_prototype_data = array();
+    $this_prototype_data['this_player_token'] = $this_player->player_token;
+    $this_prototype_data['this_current_chapter'] = '8';
+    $this_prototype_data['battle_phase'] = 4;
+    $temp_battle_sigma = rpg_mission_endless::generate_endless_mission($this_prototype_data, $next_mission_number);
+    rpg_battle::update_index_info($temp_battle_sigma['battle_token'], $temp_battle_sigma);
+
+}
 
 // Redirect the user back to the next mission
 $this_redirect = $next_missios_href;
