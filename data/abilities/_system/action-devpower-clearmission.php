@@ -58,6 +58,7 @@ $ability = array(
             if ($this_robot->robot_core === 'copy'){ $damage_type = !empty($temp_target_robot->robot_weaknesses[0]) ? $temp_target_robot->robot_weaknesses[0] : ''; }
             elseif (!empty($this_robot->robot_core)){ $damage_type = $this_robot->robot_core; }
             if (in_array($damage_type, $temp_target_robot->robot_affinities) || in_array($damage_type, $temp_target_robot->robot_immunities)){ $damage_type = ''; }
+            elseif (!empty($temp_target_robot->robot_attachments['ability_core-shield_'.$damage_type])){ $damage_type = ''; }
             $this_ability->damage_options_update(array(
 	            'kind' => 'energy',
                 'type' => $damage_type,
