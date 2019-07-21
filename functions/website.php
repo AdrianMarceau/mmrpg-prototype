@@ -1015,5 +1015,12 @@ function getDirContents($dir, &$results = array()){
     return $results;
 }
 
+// Define a function for selecting an element from an array by number (not key) **with rollover**
+function select_from_array_with_rollover($array, $position){
+    $count = count($array);
+    $key = $position > 1 ? (($position - 1) % $count) : 0;
+    return $array[$key];
+}
+
 
 ?>
