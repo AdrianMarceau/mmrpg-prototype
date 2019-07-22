@@ -357,7 +357,7 @@ class rpg_mission_endless extends rpg_mission {
         $temp_battle_token = $this_prototype_data['this_player_token'].'-endless-mission';
         $temp_battle_sigma = mmrpg_prototype_generate_mission($this_prototype_data, $temp_battle_token, array(
                 'battle_name' => 'Special All-Star Challenge Mission',
-                'battle_button' => 'Endless Attack Mode',
+                'battle_button' => 'Endless Attack Mode BETA',
                 'battle_level' => $challenge_battle_level,
                 'battle_robot_limit' => 6,
                 'battle_description' => 'Select a team of up to six robots and fight your way through as many waves of enemies as you can in this special challenge mission! ',
