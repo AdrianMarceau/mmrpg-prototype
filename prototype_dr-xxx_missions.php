@@ -349,6 +349,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
         }
 
+
     }
 
 
@@ -712,6 +713,11 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
             }
         }
+
+        // Always add a final button for the ENDLESS ATTACK MODE challenge mission
+        $temp_battle_sigma = rpg_mission_endless::generate_endless_mission($this_prototype_data, 1);
+        rpg_battle::update_index_info($temp_battle_sigma['battle_token'], $temp_battle_sigma);
+        $this_prototype_data['battle_options'][] = $temp_battle_sigma;
 
     }
 
