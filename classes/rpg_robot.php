@@ -730,8 +730,10 @@ class rpg_robot extends rpg_object {
         }
 
         // Fix the level if it's over 100
-        if ($this->robot_level > 100){ $this->robot_level = 100;  }
-        if ($this->robot_base_level > 100){ $this->robot_base_level = 100;  }
+        if (!empty($this->values['robot_level_max'])){ $robot_level_max = $this->values['robot_level_max']; }
+        else { $robot_level_max = 100; }
+        if ($this->robot_level > $robot_level_max){ $this->robot_level = $robot_level_max;  }
+        if ($this->robot_base_level > $robot_level_max){ $this->robot_base_level = $robot_level_max;  }
 
         // Collect this robot's stat values for later reference
         $this_index_info = self::get_index_info($this->robot_token);
