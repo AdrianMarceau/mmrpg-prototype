@@ -29,12 +29,14 @@ $ability = array(
             $this_ability->recovery_options_update(array(
                 'kind' => 'energy',
                 'percent' => true,
+                'modifiers' => true,
                 'frame' => 'taunt',
                 'success' => array(0, -2, 0, -10, $target_robot->print_name().'&#39;s energy was restored!'),
                 'failure' => array(9, -2, 0, -10, $target_robot->print_name().'&#39;s energy was not affected&hellip;')
                 ));
             $energy_recovery_amount = ceil($target_robot->robot_base_energy * ($this_ability->ability_recovery / 100));
-            $target_robot->trigger_recovery($target_robot, $this_ability, $energy_recovery_amount);
+            $trigger_options = array('apply_modifiers' => true, 'apply_position_modifiers' => false, 'apply_stat_modifiers' => false);
+            $target_robot->trigger_recovery($this_robot, $this_ability, $energy_recovery_amount, true, $trigger_options);
 
         }
         // Otherwise if targetting a team mate
@@ -49,7 +51,8 @@ $ability = array(
                 'failure' => array(9, -2, 0, -10, $this_robot->print_name().'&#39;s energy was not affected&hellip;')
                 ));
             $energy_recovery_amount = ceil($this_robot->robot_base_energy * ($this_ability->ability_recovery / 100));
-            $this_robot->trigger_recovery($this_robot, $this_ability, $energy_recovery_amount);
+            $trigger_options = array('apply_modifiers' => true, 'apply_position_modifiers' => false, 'apply_stat_modifiers' => false);
+            $this_robot->trigger_recovery($this_robot, $this_ability, $energy_recovery_amount, true, $trigger_options);
 
         }
 

@@ -26,12 +26,14 @@ $ability = array(
         $this_ability->recovery_options_update(array(
             'kind' => 'energy',
             'percent' => true,
+            'modifiers' => true,
             'frame' => 'taunt',
             'success' => array(0, -2, 0, -10, $this_robot->print_name().'&#39;s energy was restored!'),
             'failure' => array(9, -2, 0, -10, $this_robot->print_name().'&#39;s energy was not affected&hellip;')
             ));
         $energy_recovery_amount = ceil($this_robot->robot_base_energy * ($this_ability->ability_recovery / 100));
-        $this_robot->trigger_recovery($this_robot, $this_ability, $energy_recovery_amount);
+        $trigger_options = array('apply_modifiers' => true, 'apply_position_modifiers' => false, 'apply_stat_modifiers' => false);
+        $this_robot->trigger_recovery($this_robot, $this_ability, $energy_recovery_amount, true, $trigger_options);
 
         // Attach this ability to all robots on this player's side of the field
         $backup_robots_active = $this_player->values['robots_active'];
@@ -46,12 +48,14 @@ $ability = array(
                 $this_ability->recovery_options_update(array(
                     'kind' => 'energy',
                     'percent' => true,
+                    'modifiers' => true,
                     'frame' => 'taunt',
                     'success' => array(0, -2, 0, -10, $temp_this_robot->print_name().'&#39;s energy was restored!'),
                     'failure' => array(9, -2, 0, -10, $temp_this_robot->print_name().'&#39;s energy was not affected&hellip;')
                     ));
                 $energy_recovery_amount = ceil($temp_this_robot->robot_base_energy * ($this_ability->ability_recovery / 100));
-                $temp_this_robot->trigger_recovery($temp_this_robot, $this_ability, $energy_recovery_amount);
+                $trigger_options = array('apply_modifiers' => true, 'apply_position_modifiers' => false, 'apply_stat_modifiers' => false);
+                $temp_this_robot->trigger_recovery($this_robot, $this_ability, $energy_recovery_amount, true, $trigger_options);
                 $this_key++;
             }
         }
