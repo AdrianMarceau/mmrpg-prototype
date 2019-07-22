@@ -685,7 +685,8 @@ if (!empty($active_target_robot) && $active_target_robot->robot_id != $target_ro
 
 // If this is a challenge battle, turns must be respected
 if (!empty($this_battle->counters['battle_turn']) && $this_battle->battle_status != 'complete'){
-    if (!empty($this_battle->flags['challenge_battle'])){
+    if (!empty($this_battle->flags['challenge_battle'])
+        && empty($this_battle->flags['endless_battle'])){
         if ($this_battle->counters['battle_turn'] >= $this_battle->battle_turns){
 
             // Trigger the battle complete event
@@ -715,9 +716,10 @@ if (!empty($this_battle->counters['battle_turn']) && $this_battle->battle_status
     }
 }
 
-// If this is a challenge battle, we might need to update records
+// If this is a normal CHALLENGE BATTLE, we might need to update records
 if (!empty($this_battle->flags['challenge_battle'])
-    && !empty($this_battle->values['challenge_battle_id'])){
+    && !empty($this_battle->values['challenge_battle_id'])
+    && empty($this_battle->flags['endless_battle'])){
 
     // Collect the challenge battle ID for reference
     $challenge_id = (int)($this_battle->values['challenge_battle_id']);
@@ -839,6 +841,106 @@ if (!empty($this_battle->flags['challenge_battle'])
                 $insert_fields['challenge_date_firstclear'] = time();
                 $db->insert('mmrpg_challenges_leaderboard', $insert_fields);
                 //$this_battle->events_create(false, false, 'DEBUG', '$insert_fields = '.print_r($insert_fields, true));
+
+            }
+
+        }
+
+    }
+
+}
+// Else If this is an ENDLESS ATTACK MODE battle, we might need to update records
+if (!empty($this_battle->flags['challenge_battle'])
+    && !empty($this_battle->flags['endless_battle'])){
+
+    // Update the "concluded" count if we're at the end of the mission (regardless of result)
+    if ($this_battle->battle_status == 'complete'
+        && empty($this_battle->flags['challenge_battle_concluded'])){
+
+        // Update the concluded flag regardless
+        $this_battle->flags['challenge_battle_concluded'] = true;
+
+        // Only update the waveboard with the results of victories
+        if ($this_battle->battle_result == 'victory'){
+
+            // Collect the current mission number so we now where we are
+            $this_loop_size = 18;
+            $this_mission_number = count($_SESSION['BATTLES_CHAIN']) + 1;
+            $this_phase_number = floor($this_mission_number / $this_loop_size) + 1;
+            $this_battle_number = $this_mission_number > $this_loop_size ? ($this_mission_number % $this_loop_size) : $this_mission_number;
+
+            // Collect the start robot count and then tally the total turns taken
+            $this_robot_used = 0;
+            $this_turns_used = 0;
+            if (!empty($_SESSION['BATTLES_CHAIN'])){ $this_robot_used = $_SESSION['BATTLES_CHAIN'][0]['battle_robots_used']; }
+            elseif (!empty($this_player->counters['robots_start_total'])){ $this_robot_used = $this_player->counters['robots_start_total']; }
+            if (!empty($_SESSION['BATTLES_CHAIN'])){ foreach ($_SESSION['BATTLES_CHAIN'] AS $key => $record){ $this_turns_used += $record['battle_turns_used']; } }
+            if (!empty($this_battle->counters['battle_turn'])){ $this_turns_used += $this_battle->counters['battle_turn']; }
+
+            // Check to see if there's an existing record for this user and this challenge
+            $current_user_id = rpg_user::get_current_userid();
+            $old_wave_record = $db->get_array("SELECT
+                board_id,
+                user_id,
+                challenge_result,
+                challenge_waves_completed,
+                challenge_robots_used,
+                challenge_turns_used,
+                challenge_date_firstclear,
+                challenge_date_lastclear
+                FROM mmrpg_challenges_waveboard
+                WHERE
+                user_id = {$current_user_id}
+                AND challenge_result = 'victory'
+                ;");
+
+            // Define a variable to hold required action
+            $this_required_action = false;
+
+            // Only bother updating the db if this run is better in some way or new
+            if (empty($old_wave_record)){
+                $this_required_action = 'insert';
+            } elseif (!empty($old_wave_record)){
+                //$this_battle->events_create(false, false, 'DEBUG', '$old_wave_record = '.print_r($old_wave_record, true).'');
+                $old_waves_completed = (int)($old_wave_record['challenge_waves_completed']);
+                $old_robots_used = (int)($old_wave_record['challenge_robots_used']);
+                $old_turns_used = (int)($old_wave_record['challenge_turns_used']);
+                $old_wave_score = $this_mission_number / $old_robots_used / $old_turns_used;
+                $new_wave_score = $this_mission_number / $this_robot_used / $this_turns_used;
+                if ($this_mission_number > $old_waves_completed
+                    || ($this_mission_number == $old_waves_completed
+                        && $new_wave_score > $old_wave_score)){
+                    $this_required_action = 'update';
+                }
+            }
+
+            // Predefine the comments fields for insert or update
+            $db_common_fields = array();
+            $db_common_fields['challenge_waves_completed'] = $this_mission_number;
+            $db_common_fields['challenge_robots_used'] = $this_robot_used;
+            $db_common_fields['challenge_turns_used'] = $this_turns_used;
+
+            // Insert a new record if this is the first time clearing
+            if ($this_required_action == 'insert'){
+
+                // Define the insert fields for this row
+                $db_insert_fields = $db_common_fields;
+                $db_insert_fields['user_id'] = $current_user_id;
+                $db_insert_fields['challenge_result'] = 'victory';
+                $db_insert_fields['challenge_date_firstclear'] = time();
+                $db_insert_fields['challenge_date_lastclear'] = time();
+                $db->insert('mmrpg_challenges_waveboard', $db_insert_fields);
+                //$this_battle->events_create(false, false, 'DEBUG', 'NEW $db_insert_fields = '.print_r($db_insert_fields, true).'');
+
+            }
+            // Otherwise update the existing record with the new score
+            elseif ($this_required_action == 'update'){
+
+                // Define the update fields for this row
+                $db_update_fields = $db_common_fields;
+                $db_update_fields['challenge_date_lastclear'] = time();
+                $db->update('mmrpg_challenges_waveboard', $db_update_fields, array('user_id' => $current_user_id));
+                //$this_battle->events_create(false, false, 'DEBUG', 'NEW $db_update_fields = '.print_r($db_update_fields, true).'');
 
             }
 
