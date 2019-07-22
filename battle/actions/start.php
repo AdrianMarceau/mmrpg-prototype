@@ -101,7 +101,7 @@ if (!empty($this_battle->flags['challenge_battle'])
     // Generate the first ENDLESS ATTACK MODE mission and append it to the list
     $this_loop_size = 18;
     $this_mission_number = count($_SESSION['BATTLES_CHAIN']) + 1;
-    $this_phase_number = floor($this_mission_number / $this_loop_size) + 1;
+    $this_phase_number = $this_mission_number > $this_loop_size ? ceil($this_mission_number / $this_loop_size) : 1;
     $this_battle_number = $this_mission_number > $this_loop_size ? ($this_mission_number % $this_loop_size) : $this_mission_number;
     //$first_event_body .= 'Wave : '.number_format($this_mission_number, 0, '.', ',').' ';
     //$first_event_body .= '('.number_format($this_phase_number, 0, '.', ',').'-'.number_format($this_battle_number, 0, '.', ',').') ';
