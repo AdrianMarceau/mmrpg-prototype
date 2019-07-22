@@ -288,20 +288,22 @@ class rpg_mission_endless extends rpg_mission {
 
         // Now that robot data has been parsed, let's try to customize music
         $music_is_customized = false;
-        if ($temp_battle_seed['types'][0] == 'copy'
-            || $temp_battle_seed['types'][0] == 'none'){
+        if ($temp_battle_seed['types'][0] == 'copy'){
 
+            // Define the music for the relevant stages based on phase
             $atoken = 'sega-remix';
-            if ($temp_battle_seed['types'][0] == 'copy'){ $moptions = array('wily-fortress-1-mm08', 'wily-fortress-2-mm08', 'wily-fortress-3-mm08', 'wily-fortress-4-mm08'); }
-            elseif ($temp_battle_seed['types'][0] == 'none'){ $moptions = array('wily-fortress-1-mm07', 'wily-fortress-2-mm07', 'wily-fortress-3-mm07', 'wily-fortress-4-mm07'); }
-            $mtoken = select_from_array_with_rollover($moptions, $mission_number);
+            $moptions = array('special-stage-3-mm10', 'special-stage-2-mm10', 'special-stage-1-mm10', 'wily-fortress-1-mm08', 'wily-fortress-2-mm08', 'wily-fortress-3-mm08', 'wily-fortress-4-mm08');
+            $mtoken = select_from_array_with_rollover($moptions, $temp_battle_seed['phase']);
             $music_path = $atoken.'/'.$mtoken.'/';
             if (file_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
                 $target_field['field_music'] = $music_path;
                 $music_is_customized = true;
-            } else {
-
             }
+
+        } elseif ($temp_battle_seed['types'][0] == 'none'){
+
+            // Do not interfere with music for support-bot stages
+            // ...yet?
 
         } elseif (!empty($target_robots)){
 
