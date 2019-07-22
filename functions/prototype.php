@@ -1104,7 +1104,14 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             //$this_option_class = 'option option_fieldback option_this-'.$player_token.'-battle-select option_'.$this_battleinfo['battle_size'].' option_'.$this_battleinfo['battle_token'].' option_'.$this_option_status.' block_'.($this_key + 1).' '.($this_option_complete && !$this_has_field_star ? 'option_complete ' : '').($this_option_disabled ? 'option_disabled '.($this_option_encore ? 'option_disabled_clickable ' : '') : '');
             $this_option_class = 'option option_fieldback option_this-'.$player_token.'-battle-select option_'.$this_battleinfo['battle_size'].' option_'.$this_option_status.' block_'.($this_key + 1).' '.($this_option_complete && !$this_has_field_star ? 'option_complete ' : '').($this_option_disabled ? 'option_disabled '.($this_option_encore ? 'option_disabled_clickable ' : '') : '');
             $this_option_style = 'background-position: -'.mt_rand(5, 50).'px -'.mt_rand(5, 50).'px; ';
-            if (!empty($this_fieldinfo['field_type'])){
+            if ($is_endless_battle){
+                if ($player_token == 'dr-light'){ $field_type = 'defense'; }
+                elseif ($player_token == 'dr-wily'){ $field_type = 'attack'; }
+                elseif ($player_token == 'dr-cossack'){ $field_type = 'speed'; }
+                else { $field_type = 'energy'; }
+                $this_type_class = 'field_type field_type_'.$field_type;
+                $this_option_class .= $this_type_class;
+            } elseif (!empty($this_fieldinfo['field_type'])){
                 $this_type_class = 'field_type field_type_'.$this_fieldinfo['field_type'].(!empty($this_fieldinfo['field_type2']) ? '_'.$this_fieldinfo['field_type2'] : '');
                 $this_option_class .= $this_type_class;
             } else {
@@ -1344,23 +1351,35 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             }
 
             // Generate this options hover tooltip details
-            $this_option_title = ''; //$this_battleinfo['battle_button'];
-            //$this_option_title .= '$this_master_count = '.$this_master_count.'; $this_mecha_count = '.$this_mecha_count.'; ';
-            //if ($this_battleinfo['battle_button'] != $this_battleinfo['battle_name']){ $this_option_title .= ' | '.$this_battleinfo['battle_name']; }
-            $this_option_title .= '&laquo; '.$this_battleinfo['battle_name'].' &raquo;';
-            if ($is_challenge_battle && !empty($this_battleinfo['battle_button'])){ $this_option_title .= ' <br />&quot;'.$this_battleinfo['battle_button'].'&quot;'; }
-            $this_option_title .= ' <br />'.$this_fieldinfo['field_name'];
-            if (!empty($this_fieldinfo['field_type'])){
-                if (!empty($this_fieldinfo['field_type2'])){ $this_option_title .= ' | '.ucfirst($this_fieldinfo['field_type']).' / '.ucfirst($this_fieldinfo['field_type2']).' Type'; }
-                else { $this_option_title .= ' | '.ucfirst($this_fieldinfo['field_type']).' Type'; }
+            $this_option_title = '';
+
+            // If this is a NORMAL MISSION and not an endless one, display normal button text
+            if (!$is_endless_battle){
+
+                $this_option_title .= '&laquo; '.$this_battleinfo['battle_name'].' &raquo;';
+                if ($is_challenge_battle && !empty($this_battleinfo['battle_button'])){ $this_option_title .= ' <br />&quot;'.$this_battleinfo['battle_button'].'&quot;'; }
+
+                $this_option_title .= ' <br />'.$this_fieldinfo['field_name'];
+                if (!empty($this_fieldinfo['field_type'])){
+                    if (!empty($this_fieldinfo['field_type2'])){ $this_option_title .= ' | '.ucfirst($this_fieldinfo['field_type']).' / '.ucfirst($this_fieldinfo['field_type2']).' Type'; }
+                    else { $this_option_title .= ' | '.ucfirst($this_fieldinfo['field_type']).' Type'; }
+                }
+                $this_option_title .= ' <br />'.$this_option_level_range;
+
+                if ($this_option_limit < 8){ $this_option_title .= ' | '.($this_option_limit == 1 ? '1 Robot' : $this_option_limit.' Robots'); }
+                $this_option_title .= ' | '.($this_option_turns == 1 ? '1 Turn' : $this_option_turns.' Turns');
+
+                if (!empty($this_battleinfo['battle_zenny'])){
+                    $this_option_title .= ' | '.($this_battleinfo['battle_zenny'] == 1 ? '1 Zenny' : number_format($this_battleinfo['battle_zenny'], 0, '.', ',').' Zenny');
+                }
+
             }
-            $this_option_title .= ' <br />'.$this_option_level_range;
+            // Otherwise if this is an ENDLESS ATTACK MODE mission, display a condensed header
+            elseif ($is_endless_battle){
 
-            if ($this_option_limit < 8){ $this_option_title .= ' | '.($this_option_limit == 1 ? '1 Robot' : $this_option_limit.' Robots'); }
-            $this_option_title .= ' | '.($this_option_turns == 1 ? '1 Turn' : $this_option_turns.' Turns');
+                if ($is_challenge_battle && !empty($this_battleinfo['battle_button'])){ $this_option_title .= '&#10022; '.$this_battleinfo['battle_button'].' &#10022;<br /> '; }
+                $this_option_title .= '&laquo; '.$this_battleinfo['battle_name'].' &raquo;';
 
-            if (!empty($this_battleinfo['battle_zenny'])){
-                $this_option_title .= ' | '.($this_battleinfo['battle_zenny'] == 1 ? '1 Zenny' : number_format($this_battleinfo['battle_zenny'], 0, '.', ',').' Zenny');
             }
 
             $this_option_title .= ' <br />'.$this_battleinfo['battle_description'];
@@ -1373,7 +1392,9 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                     $this_option_title .= ' <br />Cleared : '.(!empty($this_option_complete['battle_count']) ? ($this_option_complete['battle_count'] == 1 ? '1 Time' : $this_option_complete['battle_count'].' Times') : '0 Times');
                     $this_option_title .= ' | Failed : '.(!empty($this_option_failure['battle_count']) ? ($this_option_failure['battle_count'] == 1 ? '1 Time' : $this_option_failure['battle_count'].' Times') : '0 Times');
                 }
-            } elseif ($is_challenge_battle && !empty($this_battleinfo['values']['challenge_records'])){
+            } elseif ($is_challenge_battle
+                && !$is_endless_battle
+                && !empty($this_battleinfo['values']['challenge_records'])){
                     $temp_records = $this_battleinfo['values']['challenge_records'];
                     //$this_option_title .= ' <br />JSON: '.str_replace('"', '&quot;', json_encode($temp_records));
                     if (!empty($temp_records['accessed'])){
@@ -1392,6 +1413,32 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                         $this_option_title .= ' | Robots: '.$victory_results['challenge_robots_used'].'/'.$victory_results['challenge_robot_limit'];
                         $this_option_title .= ' | Reward: '.number_format($victory_points, 0, '.', ',').' BP ('.$victory_percent.'%)';
                     }
+
+            } elseif ($is_challenge_battle
+                && $is_endless_battle){
+
+                // Check to see if there's an existing record and print high score if we're better
+                static $personal_wave_record = false;
+                static $global_wave_record = false;
+                if ($personal_wave_record === false
+                    || $global_wave_record === false){
+                    $current_user_id = rpg_user::get_current_userid();
+                    $old_waves_completed = (int)($db->get_value("SELECT challenge_waves_completed FROM mmrpg_challenges_waveboard WHERE user_id = {$current_user_id} AND challenge_result = 'victory';", 'challenge_waves_completed'));
+                    if (!empty($old_waves_completed)){ $personal_wave_record = $old_waves_completed; }
+                    else { $personal_wave_record = 0; }
+                    $global_waves_completed = (int)($db->get_value("SELECT MAX(challenge_waves_completed) AS max_waves_completed FROM mmrpg_challenges_waveboard WHERE challenge_result = 'victory';", 'max_waves_completed'));
+                    if (!empty($global_waves_completed)){ $global_wave_record = $global_waves_completed; }
+                    else { $global_wave_record = 0; }
+                }
+
+                // Print out the challenge record headers and personal vs global high scores
+                if (!empty($personal_wave_record)
+                    || !empty($global_wave_record)){
+                    $this_option_title .= ' <hr />&laquo; Endless Challenge Records &raquo;<br /> ';
+                    if (!empty($personal_wave_record)){ $this_option_title .= 'Personal: '.number_format($personal_wave_record, 0, '.', ',').' Missions'; }
+                    if (!empty($personal_wave_record) && !empty($global_wave_record)){ $this_option_title .= ' | '; }
+                    if (!empty($global_wave_record)){ $this_option_title .= 'Global: '.number_format($global_wave_record, 0, '.', ',').' Missions'; }
+                }
 
             }
 
