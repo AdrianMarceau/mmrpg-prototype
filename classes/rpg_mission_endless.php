@@ -201,7 +201,9 @@ class rpg_mission_endless extends rpg_mission {
 
         // Precollect a static field list for reference
         static $mmrpg_fields_index = false;
+        static $mmrpg_robots_index = false;
         if ($mmrpg_fields_index === false){ $mmrpg_fields_index = rpg_field::get_index(); }
+        if ($mmrpg_robots_index === false){ $mmrpg_robots_index = rpg_robot::get_index(false, false, 'master'); }
 
         // Collect the endless mission seed based on the mission number
         $temp_battle_seed = self::generate_endless_mission_seed($mission_number);
@@ -220,6 +222,9 @@ class rpg_mission_endless extends rpg_mission {
             }
         }
 
+        // Do not allow experience mods for these multipliers
+        unset($temp_option_multipliers['experience']);
+
         // Define the target field data with seed data
         $target_field = array();
         //$target_field['field_background'] = $temp_option_field['field_token'];
@@ -229,7 +234,7 @@ class rpg_mission_endless extends rpg_mission {
         $target_field['field_name'] = preg_replace('/^([-_a-z0-9\s]+)\s+([-_a-z0-9]+)$/i', '$1', $temp_option_field['field_name']).' '.preg_replace('/^([-_a-z0-9\s]+)\s+([-_a-z0-9]+)$/i', '$2', $temp_option_field2['field_name']);
         $target_field['field_type'] = !empty($temp_option_field['field_type']) ? $temp_option_field['field_type'] : '';
         $target_field['field_type2'] = !empty($temp_option_field2['field_type']) ? $temp_option_field2['field_type'] : '';
-        $target_field['field_music'] = $temp_option_field2['field_token'];
+        $target_field['field_music'] = !empty($temp_option_field2['field_music']) ? $temp_option_field2['field_music'] : $temp_option_field2['field_token'];
         $target_field['field_foreground'] = $temp_option_field2['field_foreground'];
         $target_field['field_foreground_attachments'] = $temp_option_field2['field_foreground_attachments'];
         $target_field['field_background'] = $temp_option_field['field_background'];
@@ -272,29 +277,50 @@ class rpg_mission_endless extends rpg_mission {
         }
 
         // Now that robot data has been parsed, let's try to customize music
-        if (true){
+        $music_is_customized = false;
+        if ($temp_battle_seed['types'][0] == 'copy'
+            || $temp_battle_seed['types'][0] == 'none'){
 
-            /*
-            $trobots = array_values($temp_battle_omega['battle_target_player']['player_robots']);
-            if (!empty($trobots)){
-                $atoken = 'sega-remix';
-                $rtoken = $trobots[0]['robot_token'];
-                $gtoken = strtolower($this_robot_index[$rtoken]['robot_game']);
-                $music_path = $atoken.'/'.$rtoken.'-'.$gtoken.'/';
-                //$temp_battle_omega['battle_description2'] .= '| maybe music:'.$music_path.' ';
-                if (file_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
-                    $temp_battle_omega['battle_field_base']['field_music'] = $music_path;
-                } else {
-                    $atoken = 'fallbacks';
-                    $music_path2 = $atoken.'/'.$rtoken.'-'.$gtoken.'/';
-                    //$temp_battle_omega['battle_description2'] .= '| maybe music2:'.$music_path2.' ';
-                    if (file_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path2)){
-                        $temp_battle_omega['battle_field_base']['field_music'] = $music_path2;
-                    }
+            $atoken = 'sega-remix';
+            if ($temp_battle_seed['types'][0] == 'copy'){ $moptions = array('wily-fortress-1-mm08', 'wily-fortress-2-mm08', 'wily-fortress-3-mm08', 'wily-fortress-4-mm08'); }
+            elseif ($temp_battle_seed['types'][0] == 'none'){ $moptions = array('wily-fortress-1-mm07', 'wily-fortress-2-mm07', 'wily-fortress-3-mm07', 'wily-fortress-4-mm07'); }
+            $mtoken = select_from_array_with_rollover($moptions, $mission_number);
+            $music_path = $atoken.'/'.$mtoken.'/';
+            if (file_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
+                $target_field['field_music'] = $music_path;
+                $music_is_customized = true;
+            } else {
+
+            }
+
+        } elseif (!empty($target_robots)){
+
+            // For all other types, collect first robot and theme after them
+            $atoken = 'sega-remix';
+            $rtoken = $target_robots[0]['robot_token'];
+            $gtoken = strtolower($mmrpg_robots_index[$rtoken]['robot_game']);
+            $music_path = $atoken.'/'.$rtoken.'-'.$gtoken.'/';
+            //$temp_battle_omega['battle_description2'] .= '| maybe music:'.$music_path.' ';
+            if (file_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
+                $target_field['field_music'] = $music_path;
+                $music_is_customized = true;
+            } else {
+                $atoken = 'fallbacks';
+                $music_path2 = $atoken.'/'.$rtoken.'-'.$gtoken.'/';
+                //$temp_battle_omega['battle_description2'] .= '| maybe music2:'.$music_path2.' ';
+                if (file_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path2)){
+                    $target_field['field_music'] = $music_path2;
+                    $music_is_customized = true;
                 }
             }
-            */
 
+        }
+
+        // If custom music was not assigned, we should at least check the default exists
+        if (!$music_is_customized){
+            $boss_theme_num = str_pad(($mission_number > 10 ? ($mission_number % 10) : $mission_number), 2, '0', STR_PAD_LEFT);
+            $target_field['field_music'] = 'sega-remix/boss-theme-mm'.$boss_theme_num;
+            $music_is_customized = true;
         }
 
         // Define and battle flag, values, or counters we need to
@@ -318,7 +344,7 @@ class rpg_mission_endless extends rpg_mission {
         // Generate the first ENDLESS MISSION and append it to the list
         $temp_battle_token = $this_prototype_data['this_player_token'].'-endless-mission';
         $temp_battle_sigma = mmrpg_prototype_generate_mission($this_prototype_data, $temp_battle_token, array(
-                'battle_name' => 'Challenge Mode Endless Mission',
+                'battle_name' => 'Special All-Star Challenge Mission',
                 'battle_button' => 'Endless Attack Mode',
                 'battle_level' => 100,
                 'battle_robot_limit' => 6,
