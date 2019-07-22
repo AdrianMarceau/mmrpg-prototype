@@ -26,12 +26,14 @@ $ability = array(
         $this_ability->damage_options_update(array(
             'kind' => 'energy',
             'percent' => true,
+            'modifiers' => true,
             'kickback' => array(10, 0, 0),
             'success' => array(0, -2, 0, -10, $target_robot->print_name().'&#39;s systems were damaged!'),
             'failure' => array(9, -2, 0, -10, 'It had no effect on '.$target_robot->print_name().'&hellip;')
             ));
         $energy_damage_amount = ceil($target_robot->robot_base_energy * ($this_ability->ability_damage / 100));
-        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
+        $trigger_options = array('apply_modifiers' => true, 'apply_position_modifiers' => false, 'apply_stat_modifiers' => false);
+        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, true, $trigger_options);
 
         // Return true on success
         return true;
