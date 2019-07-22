@@ -243,6 +243,15 @@ class rpg_mission_endless extends rpg_mission {
         //$target_field['field_music'] = 'sega-remix/boss-theme-mm10';
         //$target_field['values'] = array('hazards' => array('super_blocks' => 'right'));
 
+        // Decide what level the battle should be at after overflow
+        $challenge_battle_level = 100;
+        if ($temp_battle_seed['phase'] > 1){
+            $level_max_boost = (10 * ($temp_battle_seed['phase'] - 1));
+            $challenge_battle_level += $level_max_boost;
+        } if ($challenge_battle_level > 999){
+            $challenge_battle_level = 999;
+        }
+
         // Define the target player with seed data
         $target_player = array(
             'player_token' => 'player',
@@ -267,6 +276,7 @@ class rpg_mission_endless extends rpg_mission {
                     'speed_mods' => mt_rand(0, $statmodmax)
                     ),
                 'values' => array(
+                    'robot_level_max' => $challenge_battle_level,
                     'robot_rewards' => array(
                         'robot_attack' => $statrewards,
                         'robot_defense' => $statrewards,
@@ -346,7 +356,7 @@ class rpg_mission_endless extends rpg_mission {
         $temp_battle_sigma = mmrpg_prototype_generate_mission($this_prototype_data, $temp_battle_token, array(
                 'battle_name' => 'Special All-Star Challenge Mission',
                 'battle_button' => 'Endless Attack Mode',
-                'battle_level' => 100,
+                'battle_level' => $challenge_battle_level,
                 'battle_robot_limit' => 6,
                 'battle_description' => 'Select a team of up to six robots and fight your way through as many waves of enemies as you can in this special challenge mission! ',
                 'battle_description2' => 'The targets you face will grow stronger as you progress and your team will NOT heal between battles.  Good luck!',
