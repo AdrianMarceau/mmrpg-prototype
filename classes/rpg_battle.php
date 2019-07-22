@@ -1238,7 +1238,7 @@ class rpg_battle extends rpg_object {
                 if ($this_mission_number >= $old_waves_completed
                     && $this_mission_number > $global_waves_completed){
                     $first_event_body_foot .= ' <span style="opacity:0.25;">|</span>';
-                    $first_event_body_foot .= ' <span title="Previous Record: '.$global_waves_completed.' Missions">'.rpg_type::print_span('electric_shield', 'New Global Record!').'</span>';
+                    $first_event_body_foot .= ' <span title="Previous Record: '.$global_waves_completed.' Missions">'.rpg_type::print_span('electric_water', 'New Global Record!').'</span>';
                 } elseif (!empty($old_waves_completed)){
                     if ($this_mission_number >= $old_waves_completed){
                         $first_event_body_foot .= ' <span style="opacity:0.25;">|</span>';
