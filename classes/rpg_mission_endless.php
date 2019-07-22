@@ -252,10 +252,15 @@ class rpg_mission_endless extends rpg_mission {
             $challenge_battle_level = 999;
         }
 
+        // Calculate the relative multiplier for starforce * stats
+        $rel_multiplier = $mission_number < 1024 ? ($mission_number / 1024) : 1;
+
         // Define the target player with seed data
+        $rel_star_force = $max_star_force;
+        foreach ($rel_star_force AS $type => $val){ $rel_star_force[$type] = floor($val * $rel_multiplier); }
         $target_player = array(
             'player_token' => 'player',
-            'player_starforce' => $max_star_force
+            'player_starforce' => $rel_star_force
             );
 
         // Generate the list of target robots given the seed data
@@ -264,7 +269,7 @@ class rpg_mission_endless extends rpg_mission {
         //$statmods = $mission_number > 1 ? mt_rand(0, min(5, $mission_number)) : 0;
         //$statmodmax = $mission_number > 1 ? min(5, $mission_number) : 0;
         $statmodmax = $temp_battle_seed['phase'] > 1 ? min(5, ($temp_battle_seed['phase'] - 1)) : 0;
-        $statrewards = 9999;
+        $statrewards = floor((9999) * $rel_multiplier);
         foreach ($temp_battle_seed['targets'] AS $key => $target){
             list($robot, $item) = explode('@', $target);
             $target_robots[] = array(
