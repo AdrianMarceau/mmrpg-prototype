@@ -1193,7 +1193,7 @@ class rpg_battle extends rpg_object {
             $_SESSION['GAME']['counters']['battle_zenny'] += $total_zenny_rewards;
             $this->counters['final_zenny_reward'] = $total_zenny_rewards;
 
-            // Print out the star rating based on how the user did in battle
+            // Print out the star rating if a NORMAL BATTLE based on how the user did
             if (empty($this->flags['challenge_battle'])){
                 if ($this_star_rating < 1){ $this_star_rating = 1; }
                 elseif ($this_star_rating > 5){ $this_star_rating = 5; }
@@ -1201,12 +1201,57 @@ class rpg_battle extends rpg_object {
                 for ($i = 0; $i < $this_star_rating; $i++){ $first_event_body_foot .= '<span>&#9733;</span>'; }
                 for ($i = 0; $i < (5 - $this_star_rating); $i++){ $first_event_body_foot .= '<span style="opacity:0.25;">&#9734;</span>'; }
             }
-            // If this was a challenge battle, we should print out the rank
-            elseif (!empty($this->flags['challenge_battle'])){
+            // If this is a normal CHALLENGE BATTLE, display the rank for this victory
+            elseif (!empty($this->flags['challenge_battle'])
+                && empty($this->flags['endless_battle'])){
+
+                // Print out the rank and collected BP for this attempt
                 $first_event_body_foot .= ' <span style="opacity:0.25;">|</span> ';
                 $first_event_body_foot .= ' <span>'.$victory_rank.'-Rank Clear! </span>';
                 $first_event_body_foot .= ' <span style="opacity:0.25;">|</span>';
                 $first_event_body_foot .= ' <span>Score: '.number_format($victory_points, 0, '.', ',').' BP ('.$victory_percent.'%)</span>';
+
+            }
+            // Otherwise, if this is an ENDLESS ATTACK MODE, display the total victory count
+            elseif (!empty($this->flags['challenge_battle'])
+                && !empty($this->flags['endless_battle'])){
+
+                // Collect the current mission number so we now where we are
+                $this_loop_size = 18;
+                $this_mission_number = count($_SESSION['BATTLES_CHAIN']) + 1;
+                $this_phase_number = floor($this_mission_number / $this_loop_size) + 1;
+                $this_battle_number = $this_mission_number > $this_loop_size ? ($this_mission_number % $this_loop_size) : $this_mission_number;
+
+                // Print out the percent (for the zenny) and then the completed mission number
+                $first_event_body_foot .= ' ('.$victory_percent.'%)';
+                $first_event_body_foot .= ' <span style="opacity:0.25;">|</span> ';
+                $first_event_body_foot .= ' <span>Mission #'.$this_mission_number.' Clear! </span>';
+
+                // Check to see if there's an existing record and print high score if we're better
+                $current_user_id = rpg_user::get_current_userid();
+                $old_waves_completed = (int)($db->get_value("SELECT challenge_waves_completed FROM mmrpg_challenges_waveboard WHERE user_id = {$current_user_id} AND challenge_result = 'victory';", 'challenge_waves_completed'));
+                $global_waves_completed = (int)($db->get_value("SELECT MAX(challenge_waves_completed) AS max_waves_completed FROM mmrpg_challenges_waveboard WHERE user_id <> {$current_user_id} AND challenge_result = 'victory';", 'max_waves_completed'));
+                //$first_event_body_foot .= ' <span style="opacity:0.25;">|</span>';
+                //$first_event_body_foot .= ' <span>$old_waves_completed = '.$old_waves_completed.'</span>';
+                //$first_event_body_foot .= ' <span style="opacity:0.25;">|</span>';
+                //$first_event_body_foot .= ' <span>$global_waves_completed = '.$global_waves_completed.'</span>';
+                if ($this_mission_number >= $old_waves_completed
+                    && $this_mission_number > $global_waves_completed){
+                    $first_event_body_foot .= ' <span style="opacity:0.25;">|</span>';
+                    $first_event_body_foot .= ' <span title="Previous Record: '.$global_waves_completed.' Missions">'.rpg_type::print_span('electric_shield', 'New Global Record!').'</span>';
+                } elseif (!empty($old_waves_completed)){
+                    if ($this_mission_number >= $old_waves_completed){
+                        $first_event_body_foot .= ' <span style="opacity:0.25;">|</span>';
+                        $first_event_body_foot .= ' <span title="Previous Record: '.$old_waves_completed.' Missions">'.rpg_type::print_span('electric', 'New Personal Record!').'</span>';
+                    } else {
+                        $first_event_body_foot .= ' <span style="opacity:0.25;">|</span>';
+                        $first_event_body_foot .= ' <span>Personal Record: '.$old_waves_completed.'</span>';
+                    }
+                } else {
+                    $first_event_body_foot .= ' <span style="opacity:0.25;">|</span>';
+                    $first_event_body_foot .= ' <span>'.rpg_type::print_span('electric', 'New Personal Record!').'</span>';
+                }
+
             }
 
         }
