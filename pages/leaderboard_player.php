@@ -568,17 +568,18 @@ ob_start();
                     <tbody>
                         <?
                         // Loop through the different point categories and display them
+                        $display_key = 0;
                         foreach ($battle_points_categories AS $key => $category_token){
 
                             // Define the category name using the token as reference
-                            $category_nth = $key % 2 === 0 ? 'even' : 'odd';
+                            $category_nth = $display_key % 2 === 0 ? 'even' : 'odd';
                             $category_name = ucwords(str_replace('_', ' ', $category_token));
                             $category_name = str_replace('Robots Unlocked ', 'Robots w/ ', $category_name);
                             $category_name = str_replace('Database Robots ', 'Robots ', $category_name);
                             $category_name = str_replace('Players Defeated', 'Player Battle Victories', $category_name);
                             $category_name = str_replace('Challenges Completed', 'Challenge Mode Victories', $category_name);
                             $category_list = $battle_points_index[$category_token];
-                            $category_count = count($category_list);
+                            $category_count = is_array($category_list) ? count($category_list) : (int)($category_list);
                             $category_points = $battle_points_index[$category_token.'_points'];
 
                             // If this category has nothing, we should just skip it
@@ -637,17 +638,16 @@ ob_start();
                                 $category_real_count = 0;
                                 if ($category_token === 'robots_unlocked_alt_outfits'
                                     || $category_token === 'items_unlocked'){
-                                    foreach ($category_list AS $key => $data){
+                                    foreach ($category_list AS $key2 => $data){
                                         if (strstr($data, ' x')){ list($data, $num) = explode(' x', $data); $num = (int)($num); }
                                         else { $num = 1; }
                                         $category_real_count += $num;
                                     }
-
                                 }
 
                                 // Loop through elements in the details list and add to markup array
                                 $details_markup = array();
-                                foreach ($category_list AS $key => $data){
+                                foreach ($category_list AS $key2 => $data){
 
                                     // Process the individual items in the category list differently depending on type
                                     if ($category_token === 'doctors_unlocked'){
@@ -714,6 +714,10 @@ ob_start();
                                         $details_markup[] = '<li><a class="field_type type_'.$type.'" title="'.$title.'" data-href="challenges/'.$data['challenge_id'].'/">'.
                                             $data['challenge_name'].' ('.$data['challenge_victory_rank'].')'.
                                             '</a></li>';
+                                    } elseif ($category_token === 'endless_waves_completed'){
+
+                                        $details_markup[] = '<li><span class="field_type type_none">$data = '.print_r($data, true).' | $category_list = '.print_r($category_list, true).'</span></li>';
+
                                     }  else {
                                         $details_markup[] = '<li><span class="field_type type_none">'.print_r($data, true).'</span></li>';
                                     }
@@ -722,8 +726,15 @@ ob_start();
                                 $details_markup = implode(' ', $details_markup);
 
                             }
+                            // Otherwise if this is an endless challenge mission record
+                            elseif ($category_token === 'endless_waves_completed'){
+                                $num_missions = (int)($category_list);
+                                $details_markup = '<li><span class="field_type type_none">'.
+                                    'Endless Record: '.
+                                    $num_missions.' '.($num_missions === 1 ? 'Mission' : 'Missions').'</span></li>';
+                            }
                             // Otherwise we show an empty span with no data
-                            elseif (!empty($category_list) && is_string($category_list)) {
+                            elseif (!empty($category_list) && (is_string($category_list) || is_numeric($category_list))) {
                                 $details_markup = '<li><span>'.$category_list.'</span></li>';
                             }
                             // Otherwise we show an empty span with no data
@@ -733,15 +744,16 @@ ob_start();
 
                             // Display a table row for this categories name and details
                             ?>
-                            <tr data-key="<?= $key ?>" class="<?= $category_nth ?> <?= $category_token ?> main">
+                            <tr data-key="<?= $display_key ?>" class="<?= $category_nth ?> <?= $category_token ?> main">
                                 <td class="category"><h5><?= $category_name ?></h5> <a class="toggle"><span>+</span></a></td>
                                 <td class="counter"><div><?= 'x '.(!empty($category_real_count) ? $category_real_count : $category_count) ?></div></td>
                                 <td class="points"><div>+ <?= number_format($category_points, 0, '.', ',') ?> BP</div></td>
                             </tr>
-                            <tr data-key="<?= $key ?>" class="<?= $category_nth ?> <?= $category_token ?> details hidden">
+                            <tr data-key="<?= $display_key ?>" class="<?= $category_nth ?> <?= $category_token ?> details hidden">
                                 <td class="details" colspan="3"><?= '<ul>'.$details_markup.'</ul>' ?></td>
                             </tr>
                             <?
+                            $display_key++;
 
                         }
                         ?>
