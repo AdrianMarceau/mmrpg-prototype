@@ -9,8 +9,8 @@ $ability = array(
     'ability_description' => 'The user summons a wave of frozen spikes that race toward the target and collide to inflict damage and lower the target\'s attack stat! This ability almost always goes first.',
     'ability_type' => 'freeze',
     'ability_energy' => 4,
-    'ability_speed' => 3,
-    'ability_damage' => 10,
+    'ability_speed' => 2,
+    'ability_damage' => 14,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
