@@ -49,12 +49,14 @@ $ability = array(
                 $this_ability->recovery_options_update(array(
                     'kind' => 'energy',
                     'percent' => true,
+                    'modifiers' => true,
                     'rates' => array(100, 0, 0),
                     'success' => array(2, -10, 0, -10, $this_robot->print_name().'&#39;s energy was restored!'),
                     'failure' => array(2, -10, 0, -10, $this_robot->print_name().'&#39;s energy was not affected&hellip;')
                     ));
                 $energy_recovery_amount = ceil($this_robot->robot_base_energy * ($this_ability->ability_recovery2 / 100));
-                $this_robot->trigger_recovery($this_robot, $this_ability, $energy_recovery_amount);
+                $trigger_options = array('apply_modifiers' => true, 'apply_position_modifiers' => false, 'apply_stat_modifiers' => false);
+                $this_robot->trigger_recovery($this_robot, $this_ability, $energy_recovery_amount, true, $trigger_options);
             }
 
             // Attach this ability attachment to the robot using it
@@ -110,6 +112,10 @@ $ability = array(
 
         // Check if this ability is already charged
         $is_charged = isset($this_robot->robot_attachments[$this_attachment_token]) ? true : false;
+
+        // If this is being used by the owning support robot, it's even more effective at healing
+        if ($this_robot->robot_token.'-buster' === $this_ability->ability_token){ $this_ability->set_recovery2(ceil($this_ability->ability_base_recovery2 * 1.5)); }
+        else { $this_ability->set_recovery2($this_ability->ability_base_recovery2); }
 
         // If the ability flag had already been set, reduce the weapon energy to zero
         if ($is_charged){ $this_ability->set_energy(0); }
