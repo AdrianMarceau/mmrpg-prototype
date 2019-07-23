@@ -335,7 +335,8 @@ class rpg_mission_endless extends rpg_mission {
 
         // If custom music was not assigned, we should at least check the default exists
         if (!$music_is_customized){
-            $boss_theme_num = str_pad(($mission_number > 10 ? ($mission_number % 10) : $mission_number), 2, '0', STR_PAD_LEFT);
+            $boss_theme_num = 10 - ($mission_number > 10 ? ($mission_number % 10) : $mission_number);
+            $boss_theme_num = str_pad($boss_theme_num, 2, '0', STR_PAD_LEFT);
             $target_field['field_music'] = 'sega-remix/boss-theme-mm'.$boss_theme_num;
             $music_is_customized = true;
         }
