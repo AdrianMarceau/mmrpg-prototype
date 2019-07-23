@@ -5713,7 +5713,7 @@ class rpg_robot extends rpg_object {
                 $temp_stat_tokens = array('attack', 'defense', 'speed');
 
                 // Only use this item if the robot is active and turns have passed
-                $item_restore_value = strstr($item_token, 'pellet') ? 2 : 3;
+                $item_restore_value = strstr($item_token, 'pellet') ? 1 : 2;
                 $item_wait_time = 1; // strstr($item_token, 'pellet') ? 1 : 2;
                 $robot_turns_active = count($this_robot->history['turns_active']);
                 if ($this_robot->robot_position == 'active' && $robot_turns_active >= $item_wait_time){
