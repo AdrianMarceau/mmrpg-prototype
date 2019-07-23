@@ -115,10 +115,11 @@ class rpg_mission_endless extends rpg_mission {
 
         // Define which items may appear on this robot
         $possible_item_kinds = array();
-        if ($mission_phase >= 1){ $possible_item_kinds[] = 'capsules'; $possible_item_kinds[] = 'tanks'; }
-        if ($mission_phase >= 2){ $possible_item_kinds[] = 'upgrades'; $possible_item_kinds[] = 'modules'; }
-        if ($mission_phase >= 3){ $possible_item_kinds[] = 'boosters'; $possible_item_kinds[] = 'circuits'; }
-        if ($mission_phase >= 4){ $possible_item_kinds[] = 'cores'; }
+        if ($mission_phase >= 1){ $possible_item_kinds[] = 'pellets'; }
+        if ($mission_phase >= 2){ $possible_item_kinds[] = 'capsules'; $possible_item_kinds[] = 'tanks'; }
+        if ($mission_phase >= 3){ $possible_item_kinds[] = 'upgrades'; $possible_item_kinds[] = 'modules'; }
+        if ($mission_phase >= 4){ $possible_item_kinds[] = 'boosters'; $possible_item_kinds[] = 'circuits'; }
+        if ($mission_phase >= 5){ $possible_item_kinds[] = 'cores'; }
 
         // Combine all possible items into a single list and then shuffle it
         $possible_item_tokens = array();
