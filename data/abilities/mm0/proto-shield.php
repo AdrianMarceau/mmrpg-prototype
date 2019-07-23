@@ -15,15 +15,19 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
+        // Collect the target robot and correct for bugs
+        if ($target_robot->player->player_id == $this_robot->player->player_id){ $temp_ally_robot = $target_robot; }
+        else { $temp_ally_robot = $this_robot; }
+
         // Define the base attachment duration
         $base_attachment_duration = 6;
         $base_attachment_multiplier = 0.5;
 
         // Define this ability's attachment token
-        $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$target_robot->robot_id;
+        $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$temp_ally_robot->robot_id;
         $this_attachment_info = array(
             'class' => 'ability',
-            //'ability_id' => $this_ability->ability_id.'_'.$target_robot->robot_id,
+            //'ability_id' => $this_ability->ability_id.'_'.$temp_ally_robot->robot_id,
             'ability_token' => $this_ability->ability_token,
             'attachment_token' => $this_attachment_token,
             'attachment_duration' => $base_attachment_duration,
@@ -34,8 +38,8 @@ $ability = array(
                 'percent' => true,
                 'frame' => 'taunt',
                 'rates' => array(100, 0, 0),
-                'success' => array(0, 34, -10, 18, 'The '.$this_ability->print_name().' hovers in front of '.$target_robot->print_name().'!<br /> '.$target_robot->print_name().'&#39;s defenses were bolstered!'),
-                'failure' => array(0, 34, -10, 18, 'The '.$this_ability->print_name().' hovers in front of '.$target_robot->print_name().'!<br /> '.$target_robot->print_name().'&#39;s defenses were bolstered!')
+                'success' => array(0, 34, -10, 18, 'The '.$this_ability->print_name().' hovers in front of '.$temp_ally_robot->print_name().'!<br /> '.$temp_ally_robot->print_name().'&#39;s defenses were bolstered!'),
+                'failure' => array(0, 34, -10, 18, 'The '.$this_ability->print_name().' hovers in front of '.$temp_ally_robot->print_name().'!<br /> '.$temp_ally_robot->print_name().'&#39;s defenses were bolstered!')
                 ),
             'attachment_destroy' => array(
                 'trigger' => 'special',
@@ -45,8 +49,8 @@ $ability = array(
                 'modifiers' => false,
                 'frame' => 'defend',
                 'rates' => array(100, 0, 0),
-                'success' => array(2, -2, 0, -10,  'The '.$this_ability->print_name().' faded away!<br /> '.$target_robot->print_name().'&#39;s defenses returned to normal!'),
-                'failure' => array(2, -2, 0, -10, 'The '.$this_ability->print_name().' faded away!<br /> '.$target_robot->print_name().'&#39;s defenses returned to normal!')
+                'success' => array(2, -2, 0, -10,  'The '.$this_ability->print_name().' faded away!<br /> '.$temp_ally_robot->print_name().'&#39;s defenses returned to normal!'),
+                'failure' => array(2, -2, 0, -10, 'The '.$this_ability->print_name().' faded away!<br /> '.$temp_ally_robot->print_name().'&#39;s defenses returned to normal!')
                 ),
                 'ability_frame' => 0,
                 'ability_frame_animate' => array(0, 1, 2, 1),
@@ -54,10 +58,10 @@ $ability = array(
             );
 
         // Create the attachment object for this ability
-        $this_attachment = new rpg_ability($this_battle, $this_player, $target_robot, $this_attachment_info);
+        $this_attachment = new rpg_ability($this_battle, $this_player, $temp_ally_robot, $this_attachment_info);
 
         // If the ability flag was not set, attach the ability to the target
-        if (!isset($target_robot->robot_attachments[$this_attachment_token])){
+        if (!isset($temp_ally_robot->robot_attachments[$this_attachment_token])){
 
             // Target this robot's self
             $this_ability->target_options_update(array(
@@ -67,7 +71,7 @@ $ability = array(
             $this_robot->trigger_target($this_robot, $this_ability);
 
             // If this robot is targetting itself
-            if ($this_robot->robot_id == $target_robot->robot_id){
+            if ($this_robot->robot_id == $temp_ally_robot->robot_id){
 
                 // Target this robot's self
                 $this_ability->target_options_update($this_attachment_info['attachment_create']);
@@ -86,12 +90,12 @@ $ability = array(
                 $this_robot->robot_frame = 'base';
                 $this_robot->update_session();
                 $this_attachment->target_options_update($this_attachment_info['attachment_create']);
-                $target_robot->trigger_target($target_robot, $this_attachment);
+                $temp_ally_robot->trigger_target($temp_ally_robot, $this_attachment);
 
                 // Attach this ability attachment to the robot using it
                 $this_attachment_info['ability_frame_animate'] = array(0, 1, 2, 1);
-                $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-                $target_robot->update_session();
+                $temp_ally_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
+                $temp_ally_robot->update_session();
 
             }
 
@@ -100,7 +104,7 @@ $ability = array(
         else {
 
             // If this robot is targetting itself
-            if ($this_robot->robot_id == $target_robot->robot_id){
+            if ($this_robot->robot_id == $temp_ally_robot->robot_id){
 
                 // Collect the attachment from the robot to back up its info
                 $this_attachment_info = $this_robot->robot_attachments[$this_attachment_token];
@@ -112,7 +116,7 @@ $ability = array(
                 // Target the opposing robot
                 $this_ability->target_options_update(array(
                     'frame' => 'summon',
-                    'success' => array(9, 85, -10, -10, $this_robot->print_name().' amplified the effects of the '.$this_ability->print_name().'!<br /> The duration of '.$this_robot->print_name().'&#39;s protection was extended!')
+                    'success' => array(9, 85, -10, -10, $this_robot->print_name().' refreshed the '.$this_ability->print_name().'!<br /> The duration of the shield\'s protection has been extended!')
                     ));
                 $this_robot->trigger_target($this_robot, $this_ability);
 
@@ -121,16 +125,16 @@ $ability = array(
             else {
 
                 // Collect the attachment from the robot to back up its info
-                $this_attachment_info = $target_robot->robot_attachments[$this_attachment_token];
+                $this_attachment_info = $temp_ally_robot->robot_attachments[$this_attachment_token];
                 $this_attachment_info['attachment_duration'] = $base_attachment_duration;
                 $this_attachment_info['attachment_damage_input_breaker'] = $this_attachment_info['attachment_damage_input_breaker'] * $base_attachment_multiplier;
-                $target_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
-                $target_robot->update_session();
+                $temp_ally_robot->robot_attachments[$this_attachment_token] = $this_attachment_info;
+                $temp_ally_robot->update_session();
 
                 // Target the opposing robot
                 $this_attachment->target_options_update(array(
                     'frame' => 'summon',
-                    'success' => array(9, 85, -10, -10, $this_robot->print_name().' amplified the effects of the '.$this_ability->print_name().'!<br /> The duration of '.$target_robot->print_name().'&#39;s protection was extended!')
+                    'success' => array(9, 85, -10, -10, $this_robot->print_name().' refreshed the '.$this_ability->print_name().' in front of '.$temp_ally_robot->print_name().'!<br /> The duration of the shield\'s protection has been extended!')
                     ));
                 $this_robot->trigger_target($this_robot, $this_attachment);
 
