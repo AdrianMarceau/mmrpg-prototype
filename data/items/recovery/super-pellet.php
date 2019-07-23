@@ -14,7 +14,7 @@ $item = array(
     'item_speed' => 10,
     'item_recovery' => 3,
     'item_accuracy' => 100,
-    'item_price' => 3600,
+    'item_price' => 1350,
     'item_target' => 'select_this',
     'item_function' => function($objects){
 
