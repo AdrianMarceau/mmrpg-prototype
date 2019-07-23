@@ -10,7 +10,7 @@ $ability = array(
     'ability_type' => 'crystal',
     'ability_energy' => 4,
     'ability_speed' => -6,
-    'ability_speed2' => 6,
+    'ability_speed2' => 9,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 

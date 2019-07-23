@@ -7,7 +7,7 @@ $ability = array(
     'ability_group' => 'MMRPG/Support/Special',
     'ability_description' => 'The user summons a familiar support mecha to their side of the field, allowing it to fight as part of the user\'s own team for the rest of the battle! However, the weapon energy cost for this ability increases after each use and it works differently for Neutral and Copy Core robots.',
     'ability_energy' => 5,
-    'ability_speed' => 10,
+    'ability_speed' => 6,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
