@@ -9,7 +9,7 @@ $ability = array(
     'ability_description' => 'The user fires a small emulation device at the target that deals damage and copies its last ability to the user for the rest of the battle! This ability cannot be used to copy abilities by support mecha or fortress bosses so use with great care.',
     'ability_energy' => 4,
     'ability_speed' => 5,
-    'ability_damage' => 12,
+    'ability_damage' => 10,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
