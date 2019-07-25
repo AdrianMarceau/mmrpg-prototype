@@ -32,16 +32,28 @@ foreach ($temp_player_active_robots AS $key => $robot){
         $active_robot_array_first = array($robot['robot_id'], $robot['robot_token']);
     }
 
-    // Save this robot's current energy, weapons, and attack/defense/speed mods
+    // Recover Weapon Energy between battles, one if active two if bench (as if a turn had passed)
     $old_weapon_energy = $robot['robot_weapons'];
     $new_weapon_energy = $old_weapon_energy + ($robot['robot_position'] == 'active' ? 1 : 2);
     if ($new_weapon_energy > $robot['robot_base_weapons']){ $new_weapon_energy = $robot['robot_base_weapons']; }
+
+    // Loop through attack/defense/speed mods and normalize them if not zero by one point where applicable
+    $stat_mods = array('attack_mods', 'defense_mods', 'speed_mods');
+    $new_mod_values = array();
+    foreach ($stat_mods AS $mod_token){
+        $new_mod_value = (int)($robot['counters'][$mod_token]);
+        if ($new_mod_value > 0){ $new_mod_value -= 1; }
+        elseif ($new_mod_value < 0){ $new_mod_value += 1; }
+        $new_mod_values[$mod_token] = $new_mod_value;
+    }
+
+    // Save this robot's current energy, weapons, attack/defense/speed mods, etc. to the session
     $_SESSION['ROBOTS_PRELOAD'][$this_battle->battle_complete_redirect_token][$robot_string] = array(
         'robot_energy' => $robot['robot_energy'],
         'robot_weapons' => $new_weapon_energy,
-        'robot_attack_mods' => $robot['counters']['attack_mods'],
-        'robot_defense_mods' => $robot['counters']['defense_mods'],
-        'robot_speed_mods' => $robot['counters']['speed_mods'],
+        'robot_attack_mods' => $new_mod_values['attack_mods'],
+        'robot_defense_mods' => $new_mod_values['defense_mods'],
+        'robot_speed_mods' => $new_mod_values['speed_mods'],
         'robot_image' => $robot['robot_image'],
         'robot_item' => $robot['robot_item'],
         'robot_attachments' => $robot['robot_attachments']
