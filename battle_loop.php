@@ -891,7 +891,6 @@ if (!empty($this_battle->flags['challenge_battle'])
                 FROM mmrpg_challenges_waveboard
                 WHERE
                 user_id = {$current_user_id}
-                AND challenge_result = 'victory'
                 ;");
 
             // Define a variable to hold required action
@@ -962,7 +961,7 @@ $output_buffer_contents = trim(ob_get_clean());
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>Mega Man RPG Prototype | Data API | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
+<title>Mega Man RPG Prototype | Data API | Last Updated <?= mmrpg_print_cache_date() ?></title>
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <style type="text/css">
 </style>
