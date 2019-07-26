@@ -265,7 +265,7 @@ class rpg_mission_endless extends rpg_mission {
 
         // Define the target player with seed data
         $rel_star_force = $max_star_force;
-        foreach ($rel_star_force AS $type => $val){ $rel_star_force[$type] = floor($val * $rel_multiplier); }
+        foreach ($rel_star_force AS $type => $val){ $rel_star_force[$type] = round($val * $rel_multiplier); }
         $target_player = array(
             'player_token' => 'player',
             'player_starforce' => $rel_star_force
