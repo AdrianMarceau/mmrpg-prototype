@@ -13,4 +13,13 @@ $_SESSION['ITEMS'] = array();
 // Redirect the user back to the prototype screen
 $this_redirect = 'prototype.php?'.($flag_wap ? 'wap=true' : '');
 
+// Check if this was an ENDLESS ATTACK MODE mission and we're exiting
+if (!empty($this_battle->flags['challenge_battle'])
+    && !empty($this_battle->flags['endless_battle'])){
+
+    // We need to clear any savestate data from the waveboard so it doesn't infinitly redirect
+    $db->update('mmrpg_challenges_waveboard', array('challenge_wave_savestate' => ''), array('user_id' => $this_user_id));
+
+}
+
 ?>
