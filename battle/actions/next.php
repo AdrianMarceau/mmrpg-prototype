@@ -71,13 +71,15 @@ $_SESSION['ABILITIES'] = array();
 $_SESSION['ITEMS'] = array();
 
 // Generate the URL for the next mission with provided token
-$next_missios_href = 'battle.php?wap='.($flag_wap ? 'true' : 'false');
-$next_missios_href .= '&this_battle_id='.($this_battle->battle_id + 1);
-$next_missios_href .= '&this_battle_token='.$this_battle->battle_complete_redirect_token;
-$next_missios_href .= '&this_player_id='.$this_player->player_id;
-$next_missios_href .= '&this_player_token='.$this_player->player_token;
-$next_missios_href .= '&this_player_robots='.$active_robot_string;
-$next_missios_href .= '&flag_skip_fadein=true';
+$next_battle_id = $this_battle->battle_id + 1;
+$next_battle_token = $this_battle->battle_complete_redirect_token;
+$next_mission_href = 'battle.php?wap='.($flag_wap ? 'true' : 'false');
+$next_mission_href .= '&this_battle_id='.$next_battle_id;
+$next_mission_href .= '&this_battle_token='.$next_battle_token;
+$next_mission_href .= '&this_player_id='.$this_player->player_id;
+$next_mission_href .= '&this_player_token='.$this_player->player_token;
+$next_mission_href .= '&this_player_robots='.$active_robot_string;
+$next_mission_href .= '&flag_skip_fadein=true';
 
 // If we're in the middle of an ENDLESS ATTACK MODE challene, regenerate the mission
 if (!empty($this_battle->flags['challenge_battle'])
@@ -92,35 +94,49 @@ if (!empty($this_battle->flags['challenge_battle'])
     $temp_battle_sigma = rpg_mission_endless::generate_endless_mission($this_prototype_data, $next_mission_number);
     rpg_battle::update_index_info($temp_battle_sigma['battle_token'], $temp_battle_sigma);
 
+    // We should also save this data in the DB in case we need to restore later
+    $db->update('mmrpg_challenges_waveboard', array('challenge_wave_savestate' => json_encode(array(
+        'BATTLES_CHAIN' => $_SESSION['BATTLES_CHAIN'],
+        'ROBOTS_PRELOAD' => $_SESSION['ROBOTS_PRELOAD'],
+        'NEXT_MISSION' => array(
+            'this_battle_id' => $next_battle_id,
+            'this_battle_token' => $next_battle_token,
+            'this_player_id' => $this_player->player_id,
+            'this_player_token' => $this_player->player_token,
+            'this_player_robots' => $active_robot_string
+            )
+        ), JSON_HEX_QUOT | JSON_HEX_TAG)), array('user_id' => $this_user_id));
+
+
 }
 
 // Redirect the user back to the next mission
-$this_redirect = $next_missios_href;
+$this_redirect = $next_mission_href;
 
 /*
 
 // Generate the URL for the next mission with provided token
-$next_missios_href = 'battle_loop.php?wap='.($flag_wap ? 'true' : 'false');
-$next_missios_href .= '&this_battle_id='.($this_battle->battle_id + 1);
-$next_missios_href .= '&this_battle_token='.$this_battle->battle_complete_redirect_token;
-$next_missios_href .= '&this_field_id='.$this_field_id;
-$next_missios_href .= '&this_field_token='.$this_field_token;
-$next_missios_href .= '&this_user_id='.$this_user_id;
-$next_missios_href .= '&this_player_id='.$this_player->player_id;
-$next_missios_href .= '&this_player_token='.$this_player->player_token;
-$next_missios_href .= '&this_player_robots='.$active_robot_string;
-$next_missios_href .= '&this_robot_id='.$active_robot_array_first[0];
-$next_missios_href .= '&this_robot_token='.$active_robot_array_first[1];
-$next_missios_href .= '&target_user_id='.$target_user_id;
-$next_missios_href .= '&target_player_id='.$target_player_id;
-$next_missios_href .= '&target_player_token='.$target_player_token;
-$next_missios_href .= '&target_robot_id=auto';
-$next_missios_href .= '&target_robot_token=auto';
-$next_missios_href .= '&this_action=start';
-$next_missios_href .= '&target_action=start';
+$next_mission_href = 'battle_loop.php?wap='.($flag_wap ? 'true' : 'false');
+$next_mission_href .= '&this_battle_id='.($this_battle->battle_id + 1);
+$next_mission_href .= '&this_battle_token='.$this_battle->battle_complete_redirect_token;
+$next_mission_href .= '&this_field_id='.$this_field_id;
+$next_mission_href .= '&this_field_token='.$this_field_token;
+$next_mission_href .= '&this_user_id='.$this_user_id;
+$next_mission_href .= '&this_player_id='.$this_player->player_id;
+$next_mission_href .= '&this_player_token='.$this_player->player_token;
+$next_mission_href .= '&this_player_robots='.$active_robot_string;
+$next_mission_href .= '&this_robot_id='.$active_robot_array_first[0];
+$next_mission_href .= '&this_robot_token='.$active_robot_array_first[1];
+$next_mission_href .= '&target_user_id='.$target_user_id;
+$next_mission_href .= '&target_player_id='.$target_player_id;
+$next_mission_href .= '&target_player_token='.$target_player_token;
+$next_mission_href .= '&target_robot_id=auto';
+$next_mission_href .= '&target_robot_token=auto';
+$next_mission_href .= '&this_action=start';
+$next_mission_href .= '&target_action=start';
 
 // Redirect to a new battle loop with new targets
-header('Location: '.$next_missios_href);
+header('Location: '.$next_mission_href);
 exit();
 
 */

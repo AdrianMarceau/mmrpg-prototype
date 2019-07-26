@@ -8,8 +8,19 @@ $(document).ready(function(){
 
     // Start playing the appropriate stage music
     parent.mmrpg_music_load(gameSettings.fieldMusic, true, false);
+
     // Preload battle related image files
     mmrpg_preload_assets();
+
+    // Attempt to define the top frame
+    var topFrame = window.top;
+    if (typeof topFrame.myFunction != 'function'){ topFrame = window.parent; }
+
+    // Attempt o notify the top frame of loaded if necessary
+    if (typeof topFrame.mmrpg_toggle_index_loaded == 'function'){
+        topFrame.mmrpg_toggle_index_loaded(true);
+    }
+
     // Fade in the battle screen slowly
     var thisContext = $('#battle');
     if (thisContext.hasClass('fastfade')){
