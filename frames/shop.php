@@ -305,7 +305,7 @@ if (true){
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>View Shop | Mega Man RPG Prototype | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></title>
+<title>View Shop | Mega Man RPG Prototype | Last Updated <?= mmrpg_print_cache_date() ?></title>
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="shops" content="noindex,nofollow" />
 <meta name="format-detection" content="telephone=no" />

@@ -22,7 +22,7 @@ if (!rpg_game::is_user()){
 //die('<pre>'.print_r($_GET, true).'</pre>');
 
 // Define the default SEO and MARKUP variables
-$this_seo_title = 'Prototype | Mega Man RPG Prototype | Last Updated '.preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE);
+$this_seo_title = 'Prototype | Mega Man RPG Prototype | Last Updated '.mmrpg_print_cache_date();
 $this_seo_keywords = 'megaman,mega man,protoman,proto man,bass,rpg,prototype,dr.light,dr.wily,dr.cossack,battle,browser,pbbg,ipad,firefox,chrome,safari';
 $this_seo_description = 'Battle through more than thirty robot masters in classic RPG style with either Dr. Light and Mega Man, Dr. Wily and Bass, or Dr. Cossack and Proto Man! The Mega Man RPG Prototype is a browser-based fangame that combines the mechanics of both the Pokémon and Mega Man series of video games into one strange and wonderful little time waster.';
 
@@ -146,7 +146,7 @@ if (count($matches)>1){
 <? $temp_window_flag = !empty($_SESSION['GAME']['index_settings']['windowFlag']) ? $_SESSION['GAME']['index_settings']['windowFlag'] : false; ?>
 <body id="mmrpg" class="index <?= !empty($temp_window_flag) ? 'windowFlag_'.$temp_window_flag : '' ?> <?= $this_current_sub == 'facebook' ? 'windowFlag_facebookFrame' : '' ?>">
 
-<h1 id="header">Mega Man RPG Prototype | Last Updated <?= preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE) ?></h1>
+<h1 id="header">Mega Man RPG Prototype | Last Updated <?= mmrpg_print_cache_date() ?></h1>
 <div id="window" style="position: relative; ">
 
     <?if($this_online_flag && $this_browser_flag):?>

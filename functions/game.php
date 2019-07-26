@@ -2,6 +2,11 @@
 
 // -- MODE FUNCTIONS -- //
 
+// Define a system function for printing the cachedate
+function mmrpg_print_cache_date(){
+    return preg_replace('#([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2,})#', '$1/$2/$3', MMRPG_CONFIG_CACHE_DATE);
+}
+
 // Define a function for collecting the current GAME token
 function mmrpg_game_token(){
     if (defined('MMRPG_REMOTE_GAME')){ return 'REMOTE_GAME_'.MMRPG_REMOTE_GAME; }
