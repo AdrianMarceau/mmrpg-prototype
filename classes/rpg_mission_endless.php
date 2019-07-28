@@ -377,7 +377,7 @@ class rpg_mission_endless extends rpg_mission {
                 'battle_description' => 'Select a team of up to six robots and fight your way through as many waves of enemies as you can in this special challenge mission! ',
                 'battle_description2' => 'The targets you face will grow stronger as you progress and your team will NOT heal between battles.  Good luck!',
                 'battle_counts' => false,
-                'battle_zenny' => 1000,
+                'battle_zenny' => 100,
                 'battle_complete_redirect_token' => $temp_battle_token,
                 'flags' => $challenge_flags,
                 'values' => $challenge_values,
