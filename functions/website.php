@@ -5,18 +5,35 @@
  */
 
 // Define a function for generating the float robot markup for the various website pages
-function mmrpg_website_text_float_robot_markup($robot_token, $float_side = 'right', $frame_key = '00', $robot_image_size = 40){
+function mmrpg_website_text_float_robot_markup($robot_token, $float_side = 'right', $frame_key = '00', $robot_image_size = 40, $robot_alt_token = '', $robot_item_token = ''){
     $zoom_size = $robot_image_size * 2;
     $zoom_size_text = $zoom_size.'x'.$zoom_size;
     $robot_direction = $float_side != 'left' ? 'left' : 'right';
-    $robot_image_path = 'images/robots/'.$robot_token.'/sprite_'.$robot_direction.'_'.$robot_image_size.'x'.$robot_image_size.'.png';
+    $robot_image_name = $robot_token.(!empty($robot_alt_token) ? '_'.$robot_alt_token : '');
+    $robot_image_path = 'images/robots/'.$robot_image_name.'/sprite_'.$robot_direction.'_'.$robot_image_size.'x'.$robot_image_size.'.png';
     $robot_image_path .= '?'.MMRPG_CONFIG_CACHE_DATE;
     $robot_image_styles = 'background-image: url('.$robot_image_path.'); background-size: auto '.$zoom_size.'px; ';
     if ($robot_image_size >= 80){ $robot_image_styles .= 'margin: -'.($robot_image_size + 10).'px auto 0 -'.($robot_image_size / 2).'px; '; }
     else { $robot_image_styles .= 'margin: -10px auto 0 0; '; }
+    $robot_image_styles .= 'z-index: 1; ';
     $robot_image_classes = 'sprite sprite_'.$zoom_size_text.' sprite_'.$zoom_size_text.'_'.$frame_key;
-    return '<div class="float float_'.$float_side.' float_80x80">'.
+    if (!empty($robot_item_token)){
+        $item_image_size = 40;
+        $zoom_size = $item_image_size * 2;
+        $zoom_size_text = $zoom_size.'x'.$zoom_size;
+        $item_image_path = 'images/items/'.$robot_item_token.'/icon_'.$robot_direction.'_'.$item_image_size.'x'.$item_image_size.'.png';
+        $item_image_path .= '?'.MMRPG_CONFIG_CACHE_DATE;
+        $item_image_styles = 'background-image: url('.$item_image_path.'); background-size: auto '.$zoom_size.'px; ';
+        $item_image_styles .= 'position: absolute; top: -10px; right: -30px; ';
+        $item_image_styles .= 'z-index: 2; ';
+        $item_image_classes = 'sprite sprite_'.$zoom_size_text.' sprite_'.$zoom_size_text.'_00';
+    }
+    return '<div class="float float_'.$float_side.' float_80x80" title="'.
+                (ucwords(str_replace('-', ' ', $robot_token))).
+                (!empty($robot_item_token) ? ' w/ '.ucwords(str_replace('-', ' ', $robot_item_token)) : '').
+                '">'.
             '<div class="'.$robot_image_classes.'" style="'.$robot_image_styles.'"></div>'.
+            (isset($item_image_classes) && isset($item_image_styles) ? '<div class="'.$item_image_classes.'" style="'.$item_image_styles.'"></div>' : '').
         '</div>';
 }
 

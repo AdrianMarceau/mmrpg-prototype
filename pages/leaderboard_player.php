@@ -586,7 +586,9 @@ ob_start();
                             if (empty($category_count)){ continue; }
 
                             // If the category list isn't empty and is an array, we need to loop for details
-                            if (!empty($category_list) && is_array($category_list)){
+                            if (!empty($category_list)
+                                && is_array($category_list)
+                                && isset($category_list[0])){
 
                                 // Pre-sort certain lists by their index orders
                                 $sort_index_tokens = false;
@@ -728,10 +730,66 @@ ob_start();
                             }
                             // Otherwise if this is an endless challenge mission record
                             elseif ($category_token === 'endless_waves_completed'){
-                                $num_missions = (int)($category_list);
-                                $details_markup = '<li><span class="field_type type_none">'.
-                                    'Endless Record: '.
-                                    $num_missions.' '.($num_missions === 1 ? 'Mission' : 'Missions').'</span></li>';
+
+                                // Ensure challenge waves have actually been completed first, then collect the counter
+                                if (!empty($category_list['challenge_waves_completed'])){ $category_real_count = $category_list['challenge_waves_completed']; }
+                                else { continue; }
+
+                                // Collect the base values for this battle point calculation
+                                $wave_value = MMRPG_SETTINGS_BATTLEPOINTS_PERWAVE;
+                                $num_waves = $category_list['challenge_waves_completed'];
+                                $num_robots = $category_list['challenge_robots_used'];
+                                $num_turns = $category_list['challenge_turns_used'];
+                                $team_config = $category_list['challenge_team_config'];
+
+                                // DEBUG DEBUG DEBUG
+                                if (empty($team_config)){
+                                    //$team_config = '["ice-man@weapon-capsule","blizzard-man_alt@fortune-module","freeze-man@reverse-module"]';
+                                    $team_config = '["charge-man@defense-capsule","grenade-man@wind-core","turbo-man@cutter-core","bomb-man_alt2@charge-module","nitro-man@impact-core","crash-man_alt2@water-core"]';
+                                }
+
+                                $base_points = $num_waves * $wave_value;
+                                $robot_points = ceil($base_points / $num_robots);
+                                $turn_points = ceil($base_points / $num_turns);
+                                $total_points = $base_points + $robot_points + $turn_points;
+
+                                $print_wave_value = number_format($wave_value, 0, '.', ',');
+                                $print_num_robots =number_format($num_robots, 0, '.', ',');
+                                $print_num_turns =number_format($num_turns, 0, '.', ',');
+                                $print_base_points = number_format($base_points, 0, '.', ',');
+                                $print_robot_points = number_format($robot_points, 0, '.', ',');
+                                $print_turn_points = number_format($turn_points, 0, '.', ',');
+                                $print_total_points = number_format($total_points, 0, '.', ',');
+
+                                $team_config_markup = array();
+                                if (!empty($team_config)){
+                                    $team_config_list = json_decode($team_config, true);
+                                    foreach ($team_config_list AS $key => $data){
+                                        $data = strstr($data, '@') ? explode('@', $data) : array($data);
+                                        $robot_token = $data[0];
+                                        $robot_alt_token = '';
+                                        if (strstr($robot_token, '_')){ list($robot_token, $robot_alt_token) = explode('_', $robot_token); }
+                                        $robot_info = $mmrpg_index_robots[$robot_token];
+                                        $robot_frame = $key == 0 ? 'victory' : ($key % 2 != 0 ? 'taunt' : 'base');
+                                        $item_token = !empty($data[1]) ? $data[1] : '';
+                                        $team_config_markup[] = mmrpg_website_text_float_robot_markup($robot_token, 'left', $robot_frame, $robot_info['robot_image_size'], $robot_alt_token, $item_token);
+                                    }
+
+                                }
+
+
+                                $lines = array();
+                                $lines[] = rpg_type::print_span('none', 'Endless Attack Mode Record: '.$num_waves.' '.($num_waves === 1 ? 'Wave' : 'Waves'));
+                                $lines[] = '<strong>BasePoints</strong>: '.$print_wave_value.' &times; Waves('.$num_waves.') = '.$print_base_points;
+                                $lines[] = '<strong>RobotPoints</strong>: BasePoints('.$print_base_points.') &divide; Robots('.$print_num_robots.') = '.$print_robot_points;
+                                $lines[] = '<strong>TurnPoints</strong>: BasePoints('.$print_base_points.') &divide; Turns('.$print_num_turns.') = '.$print_turn_points;
+                                $lines[] = '<strong>TotalPoints</strong>: BasePoints('.$print_base_points.') &plus; RobotPoints('.$print_robot_points.') &plus; TurnPoints('.$print_turn_points.') = '.$print_total_points;
+                                $lines[] = rpg_type::print_span('copy', 'Endless Attack Mode Reward: '.$print_total_points.' '.($total_points === 1 ? 'Point' : 'Points'));
+                                $lines[] = '<div class="robot_team">'.implode(' ', $team_config_markup).'</div>';
+
+                                $details_markup = '<li>'.implode('</li><li>', $lines).'</li>';
+                                $details_markup_class = 'autoheight';
+
                             }
                             // Otherwise we show an empty span with no data
                             elseif (!empty($category_list) && (is_string($category_list) || is_numeric($category_list))) {
@@ -743,6 +801,7 @@ ob_start();
                             }
 
                             // Display a table row for this categories name and details
+                            if (!isset($details_markup_class)){ $details_markup_class = ''; }
                             ?>
                             <tr data-key="<?= $display_key ?>" class="<?= $category_nth ?> <?= $category_token ?> main">
                                 <td class="category"><h5><?= $category_name ?></h5> <a class="toggle"><span>+</span></a></td>
@@ -750,7 +809,10 @@ ob_start();
                                 <td class="points"><div>+ <?= number_format($category_points, 0, '.', ',') ?> BP</div></td>
                             </tr>
                             <tr data-key="<?= $display_key ?>" class="<?= $category_nth ?> <?= $category_token ?> details hidden">
-                                <td class="details" colspan="3"><?= '<ul>'.$details_markup.'</ul>' ?></td>
+                                <td class="details" colspan="3"><?= strstr($details_markup, '</li>')
+                                    ? '<ul class="'.$details_markup_class.'">'.$details_markup.'</ul>'
+                                    : '<div class="'.$details_markup_class.'">'.$details_markup.'</div>'
+                                    ?></td>
                             </tr>
                             <?
                             $display_key++;
