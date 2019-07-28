@@ -372,15 +372,26 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
 
     // Grant the user points for their personal best record in the ENDLESS ATTACK MODE challenge
     if (false){
-        $endless_waves_completed = (int)($db->get_value("SELECT
-            challenge_waves_completed
-            FROM mmrpg_challenges_waveboard WHERE
-            user_id = {$user_id}
+        $wave_value = MMRPG_SETTINGS_BATTLEPOINTS_PERWAVE;
+        $challenge_waveboard_results = $db->get_array("SELECT
+            board.challenge_waves_completed,
+            board.challenge_robots_used,
+            board.challenge_turns_used,
+            board.challenge_team_config,
+            @base_points := (board.challenge_waves_completed * {$wave_value}) AS challenge_points_base,
+            @robot_points := CEIL(@base_points / board.challenge_robots_used) AS challenge_points_robot_bonus,
+            @turn_points := CEIL(@base_points / board.challenge_turns_used) AS challenge_points_turn_bonus,
+            CEIL(@base_points + @robot_points + @turn_points) AS challenge_points_total
+            FROM mmrpg_challenges_waveboard AS board
+            WHERE
+            board.user_id = {$user_id}
             AND challenge_result = 'victory'
-            ;", 'challenge_waves_completed'));
-        $points_index['endless_waves_completed'] = $endless_waves_completed;
-        $points_index['endless_waves_completed_points'] = ($endless_waves_completed * $endless_waves_completed) * 1000;
-        $total_battle_points += $points_index['endless_waves_completed_points'];
+            ;");
+        if (!empty($challenge_waveboard_results)){
+            $points_index['endless_waves_completed'] = $challenge_waveboard_results;
+            $points_index['endless_waves_completed_points'] = $challenge_waveboard_results['challenge_points_total'];
+            $total_battle_points += $points_index['endless_waves_completed_points'];
+        }
     }
 
     // -- BONUS POINTS -- //
