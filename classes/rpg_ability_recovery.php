@@ -1079,6 +1079,7 @@ class rpg_ability_recovery extends rpg_recovery {
                 $this_robot_attachments = $this_robot->get_current_attachments();
                 if (!empty($this_robot_attachments)){
                     $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' | checkpoint has attachments <br /> '.implode(',', array_keys($this_robot_attachments)));
+                    $temp_weakness_groups = array();
                     foreach ($this_robot_attachments AS $attachment_token => $attachment_info){
 
                         // Ensure this ability has a type before checking weaknesses, resistances, etc.
@@ -1095,10 +1096,18 @@ class rpg_ability_recovery extends rpg_recovery {
                                     || $attachment_info['attachment_weaknesses_trigger'] === 'either'
                                     || ($attachment_info['attachment_weaknesses_trigger'] === 'self' && ($this_robot->robot_id == $target_robot->robot_id))
                                     || ($attachment_info['attachment_weaknesses_trigger'] === 'target' && ($this_robot->robot_id != $target_robot->robot_id))
-                                    || !empty($this_ability->flags['ability_is_attachment'])
+                                    //|| !empty($this_ability->flags['ability_is_attachment'])
                                     )
+                                && empty($this_ability->flags['ability_is_attachment'])
                                 ){
-                                $this_battle->events_debug(__FILE__, __LINE__, 'checkpoint weaknesses');
+                                // Check to see if this attachment is part of a group
+                                if (!empty($attachment_info['attachment_group'])){
+                                    $temp_group = $attachment_info['attachment_group'];
+                                    if (empty($temp_weakness_groups[$temp_group])){ $temp_weakness_groups[$temp_group] = array(); }
+                                    $temp_weakness_groups[$temp_group][] = $attachment_token;
+                                    if (count($temp_weakness_groups[$temp_group]) > 1){ continue; }
+                                }
+                                $this_battle->events_debug(__FILE__, __LINE__, 'checkpoint '.$attachment_token.' has weaknesses ('.implode(', ', $attachment_info['attachment_weaknesses']).')');
                                 // Remove this attachment and inflict damage on the robot
                                 unset($this_robot->robot_attachments[$attachment_token]);
                                 unset($this_battle->battle_attachments[$static_attachment_key][$attachment_token]);
