@@ -612,7 +612,7 @@ $(document).ready(function(){
                 var $link = $(this);
                 var $topRow = $link.closest('tr');
                 var $nextRow = $topRow.next();
-                var $details = $nextRow.find('.details ul');
+                var $details = $nextRow.find('.details ul:not(.autoheight)');
                 if ($nextRow.hasClass('hidden')){
                     // Expand the next row, change the icon to a "-"
                     $nextRow.removeClass('hidden');
@@ -626,8 +626,8 @@ $(document).ready(function(){
                     $link.removeClass('expanded').html('<span>+</span>');
                     }
                 });
-            $pointsTable.find('.details ul').css({overflow:'hidden'}).perfectScrollbar(thisScrollbarSettings);
-            $(window).resize(function(){ $pointsTable.find('.details ul').perfectScrollbar('update'); });
+            $pointsTable.find('.details ul:not(.autoheight)').css({overflow:'hidden'}).perfectScrollbar(thisScrollbarSettings);
+            $(window).resize(function(){ $pointsTable.find('.details ul:not(.autoheight)').perfectScrollbar('update'); });
             // Define a click event for the global expand/collapse all button of all rows
             $('thead a.toggle', $pointsTable).bind('click', function(e){
                 e.preventDefault();
@@ -636,7 +636,7 @@ $(document).ready(function(){
                 var $allHidden = $tbody.find('tr.details.hidden');
                 if ($allHidden.length){
                     // Some are hidden so we should expand all
-                    $allHidden.removeClass('hidden').find('.details ul').perfectScrollbar('update');
+                    $allHidden.removeClass('hidden').find('.details ul:not(.autoheight)').perfectScrollbar('update');
                     } else {
                     // None are hidden so we should collapse all
                     $tbody.find('tr.details').addClass('hidden');
