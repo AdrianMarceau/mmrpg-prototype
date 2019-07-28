@@ -96,6 +96,7 @@ define('MMRPG_SETTINGS_BATTLETURNS_PERMECHA', 1); // The point rate per target s
 define('MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER', 0.05); // The conversion rate for battle points into zenny rewards
 define('MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER', 2.0); // The point rate per robot level multiplier for player battles
 define('MMRPG_SETTINGS_BATTLETURNS_PLAYERBATTLE_MULTIPLIER', 0.5); // The point rate per target robot multiplier for player battles
+define('MMRPG_SETTINGS_BATTLEPOINTS_PERWAVE', 10000); // The point rate per wave completed in endless attack mode
 
 // Define the global default values for game multipliers
 define('MMRPG_SETTINGS_WEAKNESS_MULTIPLIER', 2.0); // Core boosted abilites should recive a 50% boost
