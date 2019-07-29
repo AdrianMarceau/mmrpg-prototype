@@ -20,7 +20,7 @@ $ability = array(
         $base_attachment_multiplier = 2.0;
 
         // Define this ability's attachment token
-        $this_attachment_token = 'ability_'.$this_ability->ability_token.'_'.$target_robot->robot_id;
+        $this_attachment_token = 'ability_'.$this_ability->ability_token; //.'_'.$target_robot->robot_id;
         $this_attachment_info = array(
             'class' => 'ability',
             'ability_id' => $this_ability->ability_id,

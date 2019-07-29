@@ -133,6 +133,48 @@ $ability = array(
             }
         }
 
+        // Collect a list of robot attachments considered "negative" and then remove each
+        $negative_robot_atachments = rpg_ability::get_negative_robot_attachment_index();
+        $ally_robot_attachments_index = array();
+        foreach ($negative_robot_atachments AS $key => $info){ $ally_robot_attachments_index['ability_'.$info['source']] = $info; }
+        if (!empty($temp_ally_robot->robot_attachments)){
+            $attachments_removed = 0;
+            foreach ($temp_ally_robot->robot_attachments AS $ally_attachment_token => $ally_attachment_info){
+                if (!empty($ally_robot_attachments_index[$ally_attachment_token])){
+                    // Ensure user has enough WE for effect
+                    if ($this_robot->robot_weapons > 0){ $this_robot->set_weapons($this_robot->robot_weapons - 1); }
+                    else { break; }
+                    // Collect the debuff info and token
+                    $debuff_info = $ally_robot_attachments_index[$ally_attachment_token];
+                    $debuff_token = $debuff_info['token'];
+                    $ally_ability_token = $debuff_info['source'];
+                    // Update this field attachment with an opacity tweak before removing
+                    if (!isset($ally_attachment_info['ability_frame_styles'])){ $ally_attachment_info['ability_frame_styles'] = ''; }
+                    $ally_attachment_info['ability_frame_styles'] .= ' opacity: 0.5; ';
+                    $temp_ally_robot->robot_attachments[$ally_attachment_token] = $ally_attachment_info;
+                    $temp_ally_robot->update_session();
+                    // Show a message about the attachment being removed
+                    $ally_ability_info = rpg_ability::get_index_info($ally_ability_token);
+                    $ally_ability_object = rpg_game::get_ability($this_battle, $this_player, $temp_ally_robot, $ally_ability_info);
+                    $ally_remove_frame = $attachments_removed % 2 == 0 ? 'taunt' : 'defend';
+                    $ally_remove_text = $this_robot->print_name().' removed '.($attachments_removed >= 1 ? 'another' : 'a').' debuff attachment!<br /> ';
+                    $ally_ability_object->set_name(ucwords($debuff_info['noun']));
+                    $ally_remove_text .= 'The '.$ally_ability_object->print_name().' '.$debuff_info['where'].' '.$temp_ally_robot->print_name().' faded away!';
+                    $this_ability->target_options_update(array( 'frame' => $ally_remove_frame, 'success' => array(0, -9999, -9999, -9999, $ally_remove_text)));
+                    $this_robot->trigger_target($temp_ally_robot, $this_ability, array('prevent_default_text' => true, 'canvas_show_this_ability' => false));
+                    $ally_ability_object->reset_name();
+                    $something_happened = true;
+                    $attachments_removed += 1;
+                    // Remove this attachment from the field
+                    unset($temp_ally_robot->robot_attachments[$ally_attachment_token]);
+                    $temp_ally_robot->update_session();
+                    // Show the attachment being removed via a frame
+                    //$this_robot->events_create(false, false, '', '');
+
+                }
+            }
+        }
+
         // If nothing happened, we should state as such
         if (!$something_happened){
 
