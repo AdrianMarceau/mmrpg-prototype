@@ -762,7 +762,7 @@ ob_start();
                                     //$team_config_list = json_decode($team_config, true);
                                     list($team_doctor, $team_config_list) = explode('::', $team_config);
                                     $team_config_list = strstr($team_config_list, ',') ? explode(',',$team_config_list) : array($team_config_list);
-                                    $team_config_list = array_reverse($team_config_list, true);
+                                    //$team_config_list = array_reverse($team_config_list, true);
                                     foreach ($team_config_list AS $key => $data){
                                         $data = strstr($data, '@') ? explode('@', $data) : array($data);
                                         $robot_token = $data[0];
