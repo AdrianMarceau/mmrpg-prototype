@@ -3,13 +3,19 @@
 // -- NEXT BATTLE ACTION -- //
 
 // Create the battle chain array if not exists
-if (!isset($_SESSION['BATTLES_CHAIN'])){ $_SESSION['BATTLES_CHAIN'] = array(); }
-$_SESSION['BATTLES_CHAIN'][] = array(
+$is_first_mission = false;
+if (!isset($_SESSION['BATTLES_CHAIN'])){ $_SESSION['BATTLES_CHAIN'] = array(); $is_first_mission = true; }
+$this_chain_record = array(
     'battle_token' => $this_battle->battle_token,
     'battle_turns_used' => $this_battle->counters['battle_turn'],
     'battle_robots_used' => (!empty($this_player->counters['robots_start_total']) ? $this_player->counters['robots_start_total'] : 0),
     'battle_zenny_earned' => (!empty($this_battle->counters['final_zenny_reward']) ? $this_battle->counters['final_zenny_reward'] : 0)
     );
+if ($is_first_mission){
+    $this_team_config = $this_player->player_token.'::'.implode(',', $this_player->values['robots_start_team']);
+    $this_chain_record['battle_team_config'] = $this_team_config;
+}
+$_SESSION['BATTLES_CHAIN'][] = $this_chain_record;
 
 // Pre-generate active robots string and save any buffs/debuffs/etc.
 $active_robot_array = array();
@@ -86,7 +92,8 @@ if (!empty($this_battle->flags['challenge_battle'])
     && !empty($this_battle->flags['endless_battle'])){
 
     // Generate the first ENDLESS ATTACK MODE mission and append it to the list
-    $next_mission_number = count($_SESSION['BATTLES_CHAIN']) + 1;
+    $this_mission_number = count($_SESSION['BATTLES_CHAIN']);
+    $next_mission_number = $this_mission_number + 1;
     $this_prototype_data = array();
     $this_prototype_data['this_player_token'] = $this_player->player_token;
     $this_prototype_data['this_current_chapter'] = '8';
@@ -95,7 +102,7 @@ if (!empty($this_battle->flags['challenge_battle'])
     rpg_battle::update_index_info($temp_battle_sigma['battle_token'], $temp_battle_sigma);
 
     // We should also save this data in the DB in case we need to restore later
-    $db->update('mmrpg_challenges_waveboard', array('challenge_wave_savestate' => json_encode(array(
+    $update_array = array('challenge_wave_savestate' => json_encode(array(
         'BATTLES_CHAIN' => $_SESSION['BATTLES_CHAIN'],
         'ROBOTS_PRELOAD' => $_SESSION['ROBOTS_PRELOAD'],
         'NEXT_MISSION' => array(
@@ -105,7 +112,8 @@ if (!empty($this_battle->flags['challenge_battle'])
             'this_player_token' => $this_player->player_token,
             'this_player_robots' => $active_robot_string
             )
-        ), JSON_HEX_QUOT | JSON_HEX_TAG)), array('user_id' => $this_user_id));
+        ), JSON_HEX_QUOT | JSON_HEX_TAG));
+    $db->update('mmrpg_challenges_waveboard', $update_array, array('user_id' => $this_user_id));
 
 
 }
