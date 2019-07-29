@@ -233,6 +233,7 @@ if ($this_action == 'start'){
         //$this_playerinfo_robots = array();
         //die('<pre>after:'.print_r($debug['player_robots'], true).'</pre>');
         $this_key_counter = 0;
+        $this_team_string = array();
         $temp_this_player_robots = strstr($this_player_robots, ',') ? explode(',', $this_player_robots) : array($this_player_robots);
         $temp_this_player_robots_ids = array();
         foreach ($this_playerinfo['player_robots'] AS $this_key => $this_data){
@@ -249,13 +250,18 @@ if ($this_action == 'start'){
             if ($this_position !== false){
                 // Create the temporary robot object to load data
                 $this_data = array_merge($this_info, $this_data);
-                $this_player->load_robot($this_data, $this_key_counter, true);
+                $temp_robot = $this_player->load_robot($this_data, $this_key_counter, true, true);
                 $this_player->update_session();
                 $this_key_counter++;
+                $this_string = !empty($temp_robot->robot_image) ? $temp_robot->robot_image : $temp_robot->robot_token;
+                if (!empty($temp_robot->robot_item)){ $this_string .= '@'.$temp_robot->robot_item; }
+                $this_team_string[] = $this_string;
+                unset($temp_robot);
             }
         }
         // Update the player session with changes
         $this_player->counters['robots_start_total'] = $this_key_counter;
+        $this_player->values['robots_start_team'] = $this_team_string;
         $this_player->update_session();
 
     }
@@ -298,6 +304,7 @@ if ($this_action == 'start'){
         //strstr($target_player_robots, ',') ? explode(',', $target_player_robots) : array($target_player_robots);
         //$target_playerinfo = $target_player->export_array();
         $target_key_counter = 0;
+        $target_team_string = array();
         $target_playerinfo_robots = array();
         $temp_target_player_robots_ids = array();
         foreach ($target_playerinfo['player_robots'] AS $this_key => $this_data){
@@ -312,12 +319,17 @@ if ($this_action == 'start'){
                 // Create the temporary robot object to load data
                 $this_data = array_merge($this_info, $this_data);
                 $target_player->player_robots[$this_key] = $this_data;
-                $target_player->load_robot($this_data, $target_key_counter, true);
+                $temp_robot = $target_player->load_robot($this_data, $target_key_counter, true, true);
                 $target_key_counter++;
+                $target_string = !empty($temp_robot->robot_image) ? $temp_robot->robot_image : $temp_robot->robot_token;
+                if (!empty($temp_robot->robot_item)){ $target_string .= '@'.$temp_robot->robot_item; }
+                $target_team_string[] = $target_string;
+                unset($temp_robot);
             }
         }
         // Update the player session with changes
         $target_player->counters['robots_start_total'] = $target_key_counter;
+        $target_player->values['robots_start_team'] = $target_team_string;
         $target_player->update_session();
 
         // DEBUG
@@ -855,7 +867,8 @@ if (!empty($this_battle->flags['challenge_battle'])
 
     // Update the "concluded" count if we're at the end of the mission (regardless of result)
     if ($this_battle->battle_status == 'complete'
-        && empty($this_battle->flags['challenge_battle_concluded'])){
+        && empty($this_battle->flags['challenge_battle_concluded'])
+        && $this_action != 'next'){
 
         // Update the concluded flag regardless
         $this_battle->flags['challenge_battle_concluded'] = true;
@@ -872,8 +885,14 @@ if (!empty($this_battle->flags['challenge_battle'])
             // Collect the start robot count and then tally the total turns taken
             $this_robot_used = 0;
             $this_turns_used = 0;
-            if (!empty($_SESSION['BATTLES_CHAIN'])){ $this_robot_used = $_SESSION['BATTLES_CHAIN'][0]['battle_robots_used']; }
-            elseif (!empty($this_player->counters['robots_start_total'])){ $this_robot_used = $this_player->counters['robots_start_total']; }
+            $this_team_config = '';
+            if (!empty($_SESSION['BATTLES_CHAIN'])){
+                $this_robot_used = $_SESSION['BATTLES_CHAIN'][0]['battle_robots_used'];
+                $this_team_config = $_SESSION['BATTLES_CHAIN'][0]['battle_team_config'];
+            } elseif (!empty($this_player->counters['robots_start_total'])){
+                $this_robot_used = $this_player->counters['robots_start_total'];
+                $this_team_config = $this_player->values['robots_start_team'];
+            }
             if (!empty($_SESSION['BATTLES_CHAIN'])){ foreach ($_SESSION['BATTLES_CHAIN'] AS $key => $record){ $this_turns_used += $record['battle_turns_used']; } }
             if (!empty($this_battle->counters['battle_turn'])){ $this_turns_used += $this_battle->counters['battle_turn']; }
 
@@ -886,6 +905,7 @@ if (!empty($this_battle->flags['challenge_battle'])
                 challenge_waves_completed,
                 challenge_robots_used,
                 challenge_turns_used,
+                challenge_team_config,
                 challenge_date_firstclear,
                 challenge_date_lastclear
                 FROM mmrpg_challenges_waveboard
@@ -918,6 +938,7 @@ if (!empty($this_battle->flags['challenge_battle'])
             $db_common_fields['challenge_waves_completed'] = $this_mission_number;
             $db_common_fields['challenge_robots_used'] = $this_robot_used;
             $db_common_fields['challenge_turns_used'] = $this_turns_used;
+            $db_common_fields['challenge_team_config'] = $this_team_config;
 
             // Insert a new record if this is the first time clearing
             if ($this_required_action == 'insert'){

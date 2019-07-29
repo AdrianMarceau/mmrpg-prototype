@@ -1334,18 +1334,18 @@ class rpg_player extends rpg_object {
     // -- LOAD FUNCTIONS -- //
 
     // Define a function for adding a new robot to this player's object data
-    public function load_robot($this_robotinfo, $this_key, $apply_bonuses = false){
+    public function load_robot($this_robotinfo, $this_key, $apply_bonuses = false, $return_robot = false){
         //$GLOBALS['DEBUG']['checkpoint_line'] = 'class.player.php : line 107 <pre>'.print_r($this->player_robots, true).'</pre>';
         ////if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG']['checkpoint_queries'][] = "CHECKPOINT on line ".__LINE__." in ".__FILE__;  }
-        $this_robot = rpg_game::get_robot($this->battle, $this, $this_robotinfo);
+        $robot_object = rpg_game::get_robot($this->battle, $this, $this_robotinfo);
         ////if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG']['checkpoint_queries'][] = "CHECKPOINT on line ".__LINE__." in ".__FILE__;  }
-        if ($apply_bonuses){ $this_robot->apply_stat_bonuses(); }
+        if ($apply_bonuses){ $robot_object->apply_stat_bonuses(); }
         ////if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG']['checkpoint_queries'][] = "CHECKPOINT on line ".__LINE__." in ".__FILE__;  }
-        $this_export_array = $this_robot->export_array();
+        $this_export_array = $robot_object->export_array();
         ////if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG']['checkpoint_queries'][] = "CHECKPOINT on line ".__LINE__." in ".__FILE__;  }
         $this->player_robots[$this_key] = $this_export_array;
-        unset($this_robot);
-        return true;
+        if ($return_robot){ return $robot_object; }
+        else { return true; }
     }
 
     // Define public print functions for markup generation
