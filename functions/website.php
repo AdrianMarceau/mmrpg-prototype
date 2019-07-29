@@ -5,7 +5,7 @@
  */
 
 // Define a function for generating the float robot markup for the various website pages
-function mmrpg_website_text_float_robot_markup($robot_token, $float_side = 'right', $frame_key = '00', $robot_image_size = 40, $robot_alt_token = '', $robot_item_token = ''){
+function mmrpg_website_text_float_robot_markup($robot_token, $float_side = 'right', $frame_key = '00', $robot_image_size = 40, $robot_alt_token = '', $robot_item_token = '', $extra_float_classes = ''){
     $zoom_size = $robot_image_size * 2;
     $zoom_size_text = $zoom_size.'x'.$zoom_size;
     $robot_direction = $float_side != 'left' ? 'left' : 'right';
@@ -28,7 +28,7 @@ function mmrpg_website_text_float_robot_markup($robot_token, $float_side = 'righ
         $item_image_styles .= 'z-index: 2; ';
         $item_image_classes = 'sprite sprite_'.$zoom_size_text.' sprite_'.$zoom_size_text.'_00';
     }
-    return '<div class="float float_'.$float_side.' float_80x80" title="'.
+    return '<div class="float float_'.$float_side.' float_80x80 '.$extra_float_classes.'" title="'.
                 (ucwords(str_replace('-', ' ', $robot_token))).
                 (!empty($robot_item_token) ? ' w/ '.ucwords(str_replace('-', ' ', $robot_item_token)) : '').
                 '">'.

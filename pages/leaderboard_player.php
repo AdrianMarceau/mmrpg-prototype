@@ -578,6 +578,7 @@ ob_start();
                             $category_name = str_replace('Database Robots ', 'Robots ', $category_name);
                             $category_name = str_replace('Players Defeated', 'Player Battle Victories', $category_name);
                             $category_name = str_replace('Challenges Completed', 'Challenge Mode Victories', $category_name);
+                            $category_name = str_replace('Endless Waves Completed', 'Endless Attack Waves', $category_name);
                             $category_list = $battle_points_index[$category_token];
                             $category_count = is_array($category_list) ? count($category_list) : (int)($category_list);
                             $category_points = $battle_points_index[$category_token.'_points'];
@@ -588,7 +589,8 @@ ob_start();
                             // If the category list isn't empty and is an array, we need to loop for details
                             if (!empty($category_list)
                                 && is_array($category_list)
-                                && isset($category_list[0])){
+                                && !in_array($category_token, array('endless_waves_completed'))
+                                ){
 
                                 // Pre-sort certain lists by their index orders
                                 $sort_index_tokens = false;
@@ -742,20 +744,14 @@ ob_start();
                                 $num_turns = $category_list['challenge_turns_used'];
                                 $team_config = $category_list['challenge_team_config'];
 
-                                // DEBUG DEBUG DEBUG
-                                if (empty($team_config)){
-                                    //$team_config = '["ice-man@weapon-capsule","blizzard-man_alt@fortune-module","freeze-man@reverse-module"]';
-                                    $team_config = '["charge-man@defense-capsule","grenade-man@wind-core","turbo-man@cutter-core","bomb-man_alt2@charge-module","nitro-man@impact-core","crash-man_alt2@water-core"]';
-                                }
-
                                 $base_points = $num_waves * $wave_value;
                                 $robot_points = ceil($base_points / $num_robots);
                                 $turn_points = ceil($base_points / $num_turns);
                                 $total_points = $base_points + $robot_points + $turn_points;
 
                                 $print_wave_value = number_format($wave_value, 0, '.', ',');
-                                $print_num_robots =number_format($num_robots, 0, '.', ',');
-                                $print_num_turns =number_format($num_turns, 0, '.', ',');
+                                $print_num_robots = number_format($num_robots, 0, '.', ',');
+                                $print_num_turns = number_format($num_turns, 0, '.', ',');
                                 $print_base_points = number_format($base_points, 0, '.', ',');
                                 $print_robot_points = number_format($robot_points, 0, '.', ',');
                                 $print_turn_points = number_format($turn_points, 0, '.', ',');
@@ -763,7 +759,10 @@ ob_start();
 
                                 $team_config_markup = array();
                                 if (!empty($team_config)){
-                                    $team_config_list = json_decode($team_config, true);
+                                    //$team_config_list = json_decode($team_config, true);
+                                    list($team_doctor, $team_config_list) = explode('::', $team_config);
+                                    $team_config_list = strstr($team_config_list, ',') ? explode(',',$team_config_list) : array($team_config_list);
+                                    $team_config_list = array_reverse($team_config_list, true);
                                     foreach ($team_config_list AS $key => $data){
                                         $data = strstr($data, '@') ? explode('@', $data) : array($data);
                                         $robot_token = $data[0];
@@ -772,20 +771,28 @@ ob_start();
                                         $robot_info = $mmrpg_index_robots[$robot_token];
                                         $robot_frame = $key == 0 ? 'victory' : ($key % 2 != 0 ? 'taunt' : 'base');
                                         $item_token = !empty($data[1]) ? $data[1] : '';
-                                        $team_config_markup[] = mmrpg_website_text_float_robot_markup($robot_token, 'left', $robot_frame, $robot_info['robot_image_size'], $robot_alt_token, $item_token);
+                                        $team_config_markup[] = mmrpg_website_text_float_robot_markup(
+                                            $robot_token,
+                                            'left',
+                                            $robot_frame,
+                                            $robot_info['robot_image_size'],
+                                            $robot_alt_token,
+                                            $item_token,
+                                            'player_type player_type_'.str_replace('dr-', '', $team_doctor)
+                                            );
                                     }
 
                                 }
 
 
                                 $lines = array();
-                                $lines[] = rpg_type::print_span('none', 'Endless Attack Mode Record: '.$num_waves.' '.($num_waves === 1 ? 'Wave' : 'Waves'));
-                                $lines[] = '<strong>BasePoints</strong>: '.$print_wave_value.' &times; Waves('.$num_waves.') = '.$print_base_points;
-                                $lines[] = '<strong>RobotPoints</strong>: BasePoints('.$print_base_points.') &divide; Robots('.$print_num_robots.') = '.$print_robot_points;
-                                $lines[] = '<strong>TurnPoints</strong>: BasePoints('.$print_base_points.') &divide; Turns('.$print_num_turns.') = '.$print_turn_points;
-                                $lines[] = '<strong>TotalPoints</strong>: BasePoints('.$print_base_points.') &plus; RobotPoints('.$print_robot_points.') &plus; TurnPoints('.$print_turn_points.') = '.$print_total_points;
-                                $lines[] = rpg_type::print_span('copy', 'Endless Attack Mode Reward: '.$print_total_points.' '.($total_points === 1 ? 'Point' : 'Points'));
-                                $lines[] = '<div class="robot_team">'.implode(' ', $team_config_markup).'</div>';
+                                $lines[] = rpg_type::print_span('copy', 'Endless Attack Record: '.$num_waves.' '.($num_waves === 1 ? 'Wave' : 'Waves'));
+                                if (!empty($team_config_markup)){ $lines[] = '<div class="robot_team">'.implode(' ', $team_config_markup).'</div>'; }
+                                $lines[] = '<strong>Base Points</strong>: '.$print_wave_value.' &times; Waves('.$num_waves.') = '.$print_base_points;
+                                $lines[] = '<strong>Robot Points</strong>: BasePoints('.$print_base_points.') &divide; Robots('.$print_num_robots.') = '.$print_robot_points;
+                                $lines[] = '<strong>Turn Points</strong>: BasePoints('.$print_base_points.') &divide; Turns('.$print_num_turns.') = '.$print_turn_points;
+                                $lines[] = '<strong>Total Points</strong>: BasePoints('.$print_base_points.') &plus; RobotPoints('.$print_robot_points.') &plus; TurnPoints('.$print_turn_points.') = '.$print_total_points;
+                                //$lines[] = rpg_type::print_span('copy', 'Endless Attack Reward: '.$print_total_points.' '.($total_points === 1 ? 'Point' : 'Points'));
 
                                 $details_markup = '<li>'.implode('</li><li>', $lines).'</li>';
                                 $details_markup_class = 'autoheight';
