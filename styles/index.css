@@ -2809,19 +2809,23 @@ button {
     float: none;
     clear: both;
     text-align: left;
-    padding: 5px;
-    line-height: 1;
+    padding: 2px 5px;
+    line-height: 1.6;
+}
+#window .page .leaderboard .subbody .view_points .points_table tbody tr.details.endless_waves_completed ul li > strong {
+    color: #d4cdea;
 }
 #window .page .leaderboard .subbody .view_points .points_table tbody tr.details.endless_waves_completed ul li .robot_team {
-    padding-top: 15px;
+    padding: 0;
+}
+#window .page .leaderboard .subbody .view_points .points_table tbody tr.details.endless_waves_completed ul li .robot_team:after {
+    content: "";
+    display: block;
+    clear: both;
 }
 #window .page .leaderboard .subbody .view_points .points_table tbody tr.details.endless_waves_completed ul li .robot_team .float {
-    /*
-    border: 0 none transparent;
-    background-color: transparent;
-    */
     position: relative;
-    margin-right: 10px;
+    margin: 0 5px 5px 0;
 }
 #window .page .leaderboard .subbody .view_points .points_table tbody tr.details.endless_waves_completed ul li .robot_team .sprite {
     position: relative;
