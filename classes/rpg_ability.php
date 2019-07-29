@@ -3160,6 +3160,19 @@ class rpg_ability extends rpg_object {
             : false;
     }
 
+    // Define a function for getting the static list of negative robot attachments with source and other info
+    public static function get_negative_robot_attachment_index(){
+        static $robot_attachment_index = false;
+        if ($robot_attachment_index === false){
+            $robot_attachment_index = array(
+                // negative
+                array('token' => 'bass_crush', 'source' => 'bass-crush', 'noun' => 'Bass Crush', 'where' => 'behind'),
+                array('token' => 'crash_bomb', 'source' => 'crash-bomber', 'noun' => 'Crash Bomb', 'where' => 'attached to'),
+                );
+            }
+        return $robot_attachment_index;
+    }
+
     // Define a function for getting the static list of positive field hazards with source and other info
     public static function get_positive_field_hazard_index(){
         static $field_hazard_index = false;
@@ -3185,6 +3198,7 @@ class rpg_ability extends rpg_object {
                 array('token' => 'disco_balls', 'source' => 'disco-fever', 'noun' => 'disco ball', 'where' => 'above'),
                 array('token' => 'woolly_cloud', 'source' => 'thunder-wool', 'noun' => 'woolly cloud', 'where' => 'above'),
                 array('token' => 'acid_globs', 'source' => 'acid-glob', 'noun' => 'acid glob', 'where' => 'below'),
+                array('token' => 'gravity_well', 'source' => 'gravity-hold', 'noun' => 'gravity well', 'where' => 'below'),
                 );
             }
         return $field_hazard_index;

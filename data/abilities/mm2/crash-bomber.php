@@ -86,12 +86,13 @@ $ability = array(
         $this_attachment_info = array(
             'class' => 'ability',
             'sticky' => false,
+            'ability_id' => $this_ability->ability_id,
             'ability_token' => $this_ability->ability_token,
             'ability_frame' => 1,
             'ability_frame_animate' => array(1, 2),
             'ability_frame_offset' => array('x' => 0, 'y' => $temp_y_offset, 'z' => 10),
             'attachment_token' => $this_attachment_token,
-            'attachment_duration' => $attachment_duration,
+            'attachment_duration' => $attachment_duration + 1,
             'attachment_weaknesses' => array('electric', 'flame'),
             'attachment_energy' => 0,
             'attachment_create' => array(
