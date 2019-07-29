@@ -112,9 +112,11 @@ if (!empty($this_battle->flags['challenge_battle'])
             'this_player_token' => $this_player->player_token,
             'this_player_robots' => $active_robot_string
             )
-        ), JSON_HEX_QUOT | JSON_HEX_TAG));
+        ), JSON_HEX_QUOT | JSON_HEX_TAG | JSON_UNESCAPED_SLASHES));
     $db->update('mmrpg_challenges_waveboard', $update_array, array('user_id' => $this_user_id));
 
+    // And just-in-case the user closes the window, let's save the actual game now too
+    mmrpg_save_game_session();
 
 }
 
