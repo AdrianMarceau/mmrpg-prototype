@@ -7,7 +7,7 @@ $ability = array(
     //'ability_group' => 'MM06/Weapons/041',
     'ability_group' => 'MM06/Weapons/041T1',
     'ability_image_sheets' => 2,
-    'ability_description' => 'The user summons a powerful blizzard that covers the screen and damages all robots on the opponent\'s side of the field!',
+    'ability_description' => 'The user summons a powerful blizzard that covers the screen with snow and damages all robots on the opponent\'s side of the field!  If any of the robots hit by this attack have had their speed stat boosted, this ability will also reduce that stat boost by one stage!',
     'ability_type' => 'freeze',
     'ability_energy' => 4,
     'ability_damage' => 12,
@@ -74,6 +74,16 @@ $ability = array(
         $target_robot->unset_attachment($this_attachment_token.'_fx');
         $num_hits_counter++;
 
+        // Trigger a defense break if the ability was successful
+        if ($target_robot->robot_status != 'disabled'
+            && $this_ability->ability_results['this_result'] != 'failure'
+            && $target_robot->counters['speed_mods'] > 0){
+
+            // Call the global stat break function with customized options
+            rpg_ability::ability_function_fixed_stat_break($target_robot, 'speed', 1);
+
+        }
+
         // Loop through the target's benched robots, inflicting damage to each
         $backup_target_robots_active = $target_player->values['robots_active'];
         foreach ($backup_target_robots_active AS $key => $info){
@@ -103,6 +113,11 @@ $ability = array(
             $temp_target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false, $trigger_options);
             $temp_target_robot->unset_attachment($this_attachment_token.'_fx');
             $num_hits_counter++;
+            if ($temp_target_robot->robot_status != 'disabled'
+                && $this_ability->ability_results['this_result'] != 'failure'
+                && $temp_target_robot->counters['speed_mods'] > 0){
+                rpg_ability::ability_function_fixed_stat_break($temp_target_robot, 'speed', 1);
+            }
         }
 
         // Return the user to their base frame
