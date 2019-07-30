@@ -731,12 +731,12 @@ body.index #header {
 #mmrpg .robot_details .robot_attack_break,
 #mmrpg .robot_details .robot_defense_break,
 #mmrpg .robot_details .robot_speed_break {
-    color: red;
+    color: #ff7073;
 }
 #mmrpg .robot_details .robot_attack_break_chance,
 #mmrpg .robot_details .robot_defense_break_chance,
 #mmrpg .robot_details .robot_speed_break_chance {
-    color: yellow;
+    color: #f0d775;
 }
 #mmrpg .robot_details .robot_name {
     height: 19px;
@@ -3090,6 +3090,27 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     border-radius: 0.75em;
     -moz-border-radius: 0.75em;
     -webkit-border-radius: 0.75em;
+}
+
+#actions .actions_switch .action_switch label .stat_is_high,
+#actions .actions_scan .action_scan label .stat_is_high,
+#actions .actions_target .action_target label .stat_is_high {
+    color: inherit;
+}
+#actions .actions_switch .action_switch label .stat_is_medium,
+#actions .actions_scan .action_scan label .stat_is_medium,
+#actions .actions_target .action_target label .stat_is_medium {
+    color: #ffe066;
+}
+#actions .actions_switch .action_switch label .stat_is_low,
+#actions .actions_scan .action_scan label .stat_is_low,
+#actions .actions_target .action_target label .stat_is_low {
+    color: #f98686;
+}
+#actions .actions_switch .action_switch label .stat_is_zero,
+#actions .actions_scan .action_scan label .stat_is_zero,
+#actions .actions_target .action_target label .stat_is_zero {
+    color: #f98686;
 }
 #actions .actions_switch .action_switch label .sprite_80x80_energy_high,
 #actions .actions_scan .action_scan label .sprite_80x80_energy_high,

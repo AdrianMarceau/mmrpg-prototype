@@ -92,41 +92,46 @@ ob_start();
                     if (empty($temp_robot_core2_type) && $temp_robot_core_type != $temp_item_core_type){ $temp_robot_core2_type = $temp_item_core_type; }
                 }
 
-				// Define the robot button text variables
-				$temp_robot_label = '<span class="multi">';
+                // Collect the energy percent so we know how they're doing
+                $temp_energy_class = '';
+                $temp_energy_percent = ceil(($temp_robot->robot_energy / $temp_robot->robot_base_energy) * 100);
+                if ($temp_energy_percent > 50){ $temp_energy_class = 'high'; }
+                elseif ($temp_energy_percent > 25){ $temp_energy_class = 'medium';  }
+                elseif ($temp_energy_percent > 0){ $temp_energy_class = 'low'; }
+                else { $temp_energy_class = 'zero'; }
+
+                // Define the robot button text variables
+                $temp_robot_label = '<span class="multi">';
                 $temp_robot_label .= '<span class="maintext">'.$temp_robot->robot_name.' <sup>Lv. '.$temp_robot->robot_level.'</sup></span>';
-				$temp_robot_label .= '<span class="subtext">';
-					$temp_robot_label .= $temp_robot->robot_energy.'/'.$temp_robot->robot_base_energy.' Energy';
-				$temp_robot_label .= '</span>';
-				$temp_robot_label .= '<span class="subtext">';
-					$temp_robot_label .= 'A:'.$temp_robot->robot_attack;
-					$temp_robot_label .= '&nbsp;';
-					$temp_robot_label .= 'D:'.$temp_robot->robot_defense;
-					$temp_robot_label .= '&nbsp;';
-					$temp_robot_label .= 'S:'.$temp_robot->robot_speed;
-				$temp_robot_label .= '</span>';
-				$temp_robot_label .= '</span>';
+                $temp_robot_label .= '<span class="subtext">';
+                    $temp_robot_label .= '<span class="stat_is_'.$temp_energy_class.'">'.$temp_robot->robot_energy.'/'.$temp_robot->robot_base_energy.' Energy</span>';
+                $temp_robot_label .= '</span>';
+                $temp_robot_label .= '<span class="subtext">';
+                    $temp_robot_label .= 'A:'.$temp_robot->robot_attack;
+                    $temp_robot_label .= '&nbsp;';
+                    $temp_robot_label .= 'D:'.$temp_robot->robot_defense;
+                    $temp_robot_label .= '&nbsp;';
+                    $temp_robot_label .= 'S:'.$temp_robot->robot_speed;
+                $temp_robot_label .= '</span>';
+                $temp_robot_label .= '</span>';
 
-				// Define the robot sprite variables
-				$temp_robot_sprite = array();
-				$temp_robot_sprite['name'] = $temp_robot->robot_name;
-				$temp_robot_sprite['core'] = !empty($temp_robot->robot_core) ? $temp_robot->robot_core : 'none';
-				$temp_robot_sprite['image'] = $temp_robot->robot_image;
-				$temp_robot_sprite['image_size'] = $temp_robot->robot_image_size;
-				$temp_robot_sprite['image_size_text'] = $temp_robot_sprite['image_size'].'x'.$temp_robot_sprite['image_size'];
-				$temp_robot_sprite['image_size_zoom'] = $temp_robot->robot_image_size * 2;
-				$temp_robot_sprite['image_size_zoom_text'] = $temp_robot_sprite['image_size'].'x'.$temp_robot_sprite['image_size'];
-				$temp_robot_sprite['url'] = 'images/robots/'.$temp_robot_sprite['image'].'/sprite_'.$robot_direction.'_'.$temp_robot_sprite['image_size_text'].'.png';
-				$temp_robot_sprite['class'] = 'sprite sprite_'.$temp_robot_sprite['image_size_text'].' sprite_'.$temp_robot_sprite['image_size_text'].'_'.($temp_robot->robot_energy > 0 ? ($temp_robot->robot_energy > ($temp_robot->robot_base_energy/2) ? 'base' : 'defend') : 'defeat').' ';
-				$temp_robot_sprite['style'] = 'background-image: url('.$temp_robot_sprite['url'].'?'.MMRPG_CONFIG_CACHE_DATE.');  top: 6px; left: 5px; ';
-				if ($temp_robot->robot_position == 'active'){ $temp_robot_sprite['style'] .= 'border-color: #ababab; '; }
-				$temp_energy_percent = ceil(($temp_robot->robot_energy / $temp_robot->robot_base_energy) * 100);
-				if ($temp_energy_percent > 50){ $temp_robot_sprite['class'] .= 'sprite_'.$temp_robot_sprite['image_size_text'].'_energy_high ';  }
-				elseif ($temp_energy_percent > 25){ $temp_robot_sprite['class'] .= 'sprite_'.$temp_robot_sprite['image_size_text'].'_energy_medium ';  }
-				elseif ($temp_energy_percent > 0){ $temp_robot_sprite['class'] .= 'sprite_'.$temp_robot_sprite['image_size_text'].'_energy_low '; }
-				$temp_robot_sprite['markup'] = '<span class="'.$temp_robot_sprite['class'].'" style="'.$temp_robot_sprite['style'].'">'.$temp_robot_sprite['name'].'</span>';
+                // Define the robot sprite variables
+                $temp_robot_sprite = array();
+                $temp_robot_sprite['name'] = $temp_robot->robot_name;
+                $temp_robot_sprite['image'] = $temp_robot->robot_image;
+                $temp_robot_sprite['image_size'] = $temp_robot->robot_image_size;
+                $temp_robot_sprite['image_size_text'] = $temp_robot_sprite['image_size'].'x'.$temp_robot_sprite['image_size'];
+                $temp_robot_sprite['image_size_zoom'] = $temp_robot->robot_image_size * 2;
+                $temp_robot_sprite['image_size_zoom_text'] = $temp_robot_sprite['image_size'].'x'.$temp_robot_sprite['image_size'];
+                $temp_robot_sprite['url'] = 'images/robots/'.$temp_robot->robot_image.'/sprite_'.$robot_direction.'_'.$temp_robot_sprite['image_size_text'].'.png';
+                $temp_robot_sprite['preload'] = 'images/robots/'.$temp_robot->robot_image.'/sprite_'.$robot_direction.'_'.$temp_robot_sprite['image_size_zoom_text'].'.png';
+                $temp_robot_sprite['class'] = 'sprite sprite_'.$temp_robot_sprite['image_size_text'].' sprite_'.$temp_robot_sprite['image_size_text'].'_'.($temp_robot->robot_energy > 0 ? ($temp_robot->robot_energy > ($temp_robot->robot_base_energy/2) ? 'base' : 'defend') : 'defeat').' ';
+                $temp_robot_sprite['style'] = 'background-image: url('.$temp_robot_sprite['url'].'?'.MMRPG_CONFIG_CACHE_DATE.');  top: 5px; left: 5px; ';
+                if ($temp_robot->robot_position == 'active'){ $temp_robot_sprite['style'] .= 'border-color: #ababab; '; }
+                $temp_robot_sprite['class'] .= 'sprite_'.$temp_robot_sprite['image_size_text'].'_energy_'.$temp_energy_class.' ';
+                $temp_robot_sprite['markup'] = '<span class="'.$temp_robot_sprite['class'].'" style="'.$temp_robot_sprite['style'].'">'.$temp_robot_sprite['name'].'</span>';
 
-				// Update the order button if necessary
+                // Update the order button if necessary
 				$order_button_markup = $allow_button ? 'data-order="'.$temp_order_counter.'"' : '';
 				$temp_order_counter += $allow_button ? 1 : 0;
 
