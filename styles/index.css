@@ -2829,6 +2829,7 @@ button {
 }
 #window .page .leaderboard .subbody .view_points .points_table tbody tr.details.endless_waves_completed ul li .robot_team .sprite {
     position: relative;
+    pointer-events: none;
 }
 #window .page .leaderboard .subbody .view_points .points_table tbody tr.details.hidden {
     display: none;
