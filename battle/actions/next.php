@@ -102,7 +102,7 @@ if (!empty($this_battle->flags['challenge_battle'])
     rpg_battle::update_index_info($temp_battle_sigma['battle_token'], $temp_battle_sigma);
 
     // We should also save this data in the DB in case we need to restore later
-    $update_array = array('challenge_wave_savestate' => json_encode(array(
+    $save_state = array(
         'BATTLES_CHAIN' => $_SESSION['BATTLES_CHAIN'],
         'ROBOTS_PRELOAD' => $_SESSION['ROBOTS_PRELOAD'],
         'NEXT_MISSION' => array(
@@ -112,7 +112,12 @@ if (!empty($this_battle->flags['challenge_battle'])
             'this_player_token' => $this_player->player_token,
             'this_player_robots' => $active_robot_string
             )
-        ), JSON_HEX_QUOT | JSON_HEX_TAG | JSON_UNESCAPED_SLASHES));
+        );
+    $save_state_encoded = json_encode($save_state, JSON_HEX_QUOT);
+    $save_state_encoded = str_replace('\\u0022', '\\\\"', $save_state_encoded);
+    //$save_state_encoded = json_encode($save_state, JSON_HEX_QUOT | JSON_HEX_TAG);
+    //$save_state_encoded = serialize($save_state);
+    $update_array = array('challenge_wave_savestate' => $save_state_encoded);
     $db->update('mmrpg_challenges_waveboard', $update_array, array('user_id' => $this_user_id));
 
     // And just-in-case the user closes the window, let's save the actual game now too
