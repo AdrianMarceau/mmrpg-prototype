@@ -7,7 +7,7 @@ $ability = array(
     //'ability_group' => 'MM09/Weapons/069',
     'ability_group' => 'MM09/Weapons/065T2',
     'ability_image_sheets' => 6,
-    'ability_description' => 'The user surrounds itself with an orbit of four large diamonds, each acting as a separate elemental shield and offering a bit of protection plus virtual immunity to a different combo of types!  Each diamond can only withstand a single attack, but any remaining ones can be thrown at a target for damage!',
+    'ability_description' => 'The user surrounds itself with an orbit of four large diamonds, each acting as a separate shield and slightly reducing incoming damage!  All four diamonds represent a different elemental type and each grant the user total immunity to that type one time before being destroyed.  Any remaining diamonds can be thrown at a target for decent damage!',
     'ability_type' => 'crystal',
     'ability_type2' => 'shield',
     'ability_energy' => 8,
@@ -22,7 +22,7 @@ $ability = array(
         extract($objects);
 
         // Define the total number of shield pieces
-        $list_shield_elements = array('green/nature/earth', 'red/flame/explode', 'yellow/electric/wind', 'blue/water/freeze');
+        $list_shield_elements = array('green/nature', 'red/flame', 'yellow/electric', 'blue/water');
         $num_shield_pieces = count($list_shield_elements);
 
         // Define this ability's attachment token
@@ -110,7 +110,7 @@ $ability = array(
             $temp_animate_sequence = $this_attachment_info['ability_frame_animate'];
             for ($i = 1; $i <= $num_shield_pieces; $i++){
                 $temp_attachment_elements = $list_shield_elements[$i - 1];
-                list($temp_diamon_colour, $temp_main_element, $temp_sub_element) = explode('/', $temp_attachment_elements);
+                list($temp_diamon_colour, $temp_main_element) = explode('/', $temp_attachment_elements);
                 $temp_attachment_image = $this_ability->ability_image.'-'.(2 + $i);
                 $temp_attachment_token = $this_attachment_token.'_'.$i;
                 $temp_attachment_info = $this_attachment_info;
@@ -118,11 +118,10 @@ $ability = array(
                 $temp_attachment_info['ability_image'] = $temp_attachment_image;
                 $temp_attachment_info['ability_frame_animate'] = $temp_animate_sequence;
                 $temp_attachment_info['attachment_damage_input_breaker_'.$temp_main_element] = $this_effect_multiplier2;
-                $temp_attachment_info['attachment_damage_input_breaker_'.$temp_sub_element] = $this_effect_multiplier2;
-                $temp_attachment_info['attachment_weaknesses'] = array($temp_main_element, $temp_sub_element);
+                $temp_attachment_info['attachment_weaknesses'] = array($temp_main_element);
                 $temp_destroy_text = $temp_attachment_info['attachment_destroy']['success'][4];
                 $temp_destroy_text = 'The '.$temp_diamon_colour.' '.$this_ability->print_name().' diamond faded away!<br /> ';
-                $temp_destroy_text .= $this_robot->print_name().' is no longer protected from the '.rpg_type::print_span($temp_main_element).' or '.rpg_type::print_span($temp_sub_element).' types... ';
+                $temp_destroy_text .= $this_robot->print_name().' is no longer protected from the '.rpg_type::print_span($temp_main_element).' type... ';
                 $temp_attachment_info['attachment_destroy']['success'][4] = $temp_destroy_text;
                 $temp_attachment_info['attachment_destroy']['failure'][4] = $temp_destroy_text;
                 $this_robot->robot_attachments[$temp_attachment_token] = $temp_attachment_info;
@@ -176,7 +175,7 @@ $ability = array(
                 if (isset($this_robot->robot_attachments[$temp_attachment_token])){
                     $temp_attachment_info = $this_robot->robot_attachments[$temp_attachment_token];
                     $temp_attachment_elements = $list_shield_elements[$i - 1];
-                    list($temp_diamon_colour, $temp_main_element, $temp_sub_element) = explode('/', $temp_attachment_elements);
+                    list($temp_diamon_colour, $temp_main_element) = explode('/', $temp_attachment_elements);
 
                     // If the target robot is NOT disabled, we can shoot them again
                     if ($target_robot->robot_status != 'disabled'
