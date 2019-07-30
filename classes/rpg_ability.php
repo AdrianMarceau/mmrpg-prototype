@@ -2216,6 +2216,18 @@ class rpg_ability extends rpg_object {
 
     }
 
+    // Define a static function to use as a common action for all stat boosting without any mods
+    public static function ability_function_fixed_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = ''){
+        self::ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_ability, $success_frame, $failure_frame, $extra_text, false, true, true);
+        return true;
+    }
+
+    // Define a static function to use as a common action for all stat breaking without any mods
+    public static function ability_function_fixed_stat_break($target_robot, $stat_type, $break_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = ''){
+        self::ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_ability, $success_frame, $failure_frame, $extra_text, false, true, true);
+        return true;
+    }
+
     // Define a static function to use as a common action for all stat resetting
     public static function ability_function_stat_reset($target_robot, $stat_type, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = ''){
         if ($target_robot->counters[$stat_type.'_mods'] < 0){
@@ -2230,7 +2242,7 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function to use as a common action for all stat boosting
-    public static function ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = '', $item_redirect = false, $allow_item_effects = true, $is_reset = false){
+    public static function ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = '', $item_redirect = false, $allow_item_effects = true, $is_fixed_amount = false){
 
         // Do not boost stats if the battle is over
         if ($target_robot->battle->battle_status === 'complete'){ return false; }
@@ -2238,7 +2250,7 @@ class rpg_ability extends rpg_object {
 
         // If the target robot is holding a Reverse Module, redirect to a break
         if ($allow_item_effects
-            && !$is_reset
+            && !$is_fixed_amount
             && !$item_redirect
             && !empty($target_robot->robot_item)
             && $target_robot->robot_item == 'reverse-module'){
@@ -2248,7 +2260,7 @@ class rpg_ability extends rpg_object {
 
         // If the target robot is holding an Xtreme Module, all stat changes are max
         if ($allow_item_effects
-            && !$is_reset
+            && !$is_fixed_amount
             && !$item_redirect
             && !empty($target_robot->robot_item)
             && $target_robot->robot_item == 'xtreme-module'){
@@ -2304,7 +2316,7 @@ class rpg_ability extends rpg_object {
             $target_robot->update_session();
 
             // Define the boost text based on how much was applied
-            if ($is_reset){ $boost_text = 'returned to normal'; }
+            if (empty($target_robot->counters[$mods_token])){ $boost_text = 'returned to normal'; }
             elseif ($rel_boost_amount >= 3){ $boost_text = 'rose drastically'; }
             elseif ($rel_boost_amount >= 2){ $boost_text = 'sharply rose'; }
             else { $boost_text = 'rose'; }
@@ -2330,7 +2342,7 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function to use as a common action for all stat breaking
-    public static function ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = '', $item_redirect = false, $allow_item_effects = true, $is_reset = false){
+    public static function ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = '', $item_redirect = false, $allow_item_effects = true, $is_fixed_amount = false){
 
         // Do not boost stats if the battle is over
         if ($target_robot->battle->battle_status === 'complete'){ return false; }
@@ -2338,7 +2350,7 @@ class rpg_ability extends rpg_object {
 
         // If the target robot is holding a Reverse Module, redirect to a break
         if ($allow_item_effects
-            && !$is_reset
+            && !$is_fixed_amount
             && !$item_redirect
             && !empty($target_robot->robot_item)
             && $target_robot->robot_item == 'reverse-module'){
@@ -2348,7 +2360,7 @@ class rpg_ability extends rpg_object {
 
         // If the target robot is holding an Xtreme Module, all stat changes are max
         if ($allow_item_effects
-            && !$is_reset
+            && !$is_fixed_amount
             && !$item_redirect
             && !empty($target_robot->robot_item)
             && $target_robot->robot_item == 'xtreme-module'){
@@ -2404,7 +2416,7 @@ class rpg_ability extends rpg_object {
             $target_robot->update_session();
 
             // Define the break text based on how much was applied
-            if ($is_reset){ $break_text = 'returned to normal'; }
+            if (empty($target_robot->counters[$mods_token])){ $break_text = 'returned to normal'; }
             elseif ($rel_break_amount >= 3){ $break_text = 'severely fell'; }
             elseif ($rel_break_amount >= 2){ $break_text = 'harshly fell'; }
             else { $break_text = 'fell'; }
