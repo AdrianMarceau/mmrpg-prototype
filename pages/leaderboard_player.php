@@ -576,7 +576,7 @@ ob_start();
                             $category_name = ucwords(str_replace('_', ' ', $category_token));
                             $category_name = str_replace('Robots Unlocked ', 'Robots w/ ', $category_name);
                             $category_name = str_replace('Database Robots ', 'Robots ', $category_name);
-                            $category_name = str_replace('Players Defeated', 'Player Battle Victories', $category_name);
+                            $category_name = str_replace('Players Defeated', 'Player Battle Tokens', $category_name);
                             $category_name = str_replace('Challenges Completed', 'Challenge Mode Victories', $category_name);
                             $category_name = str_replace('Endless Waves Completed', 'Endless Attack Waves', $category_name);
                             $category_list = $battle_points_index[$category_token];
@@ -640,14 +640,6 @@ ob_start();
 
                                 // If this category has counters within, we need to define the "real" count
                                 $category_real_count = 0;
-                                if ($category_token === 'robots_unlocked_alt_outfits'
-                                    || $category_token === 'items_unlocked'){
-                                    foreach ($category_list AS $key2 => $data){
-                                        if (strstr($data, ' x')){ list($data, $num) = explode(' x', $data); $num = (int)($num); }
-                                        else { $num = 1; }
-                                        $category_real_count += $num;
-                                    }
-                                }
 
                                 // Loop through elements in the details list and add to markup array
                                 $details_markup = array();
@@ -658,7 +650,7 @@ ob_start();
                                         $token = $data;
                                         $info = $mmrpg_index_players[$token];
                                         $details_markup[] = '<li><a class="player_type type_'.$info['player_type'].'" href="database/players/'.$info['player_token'].'/">'.$info['player_name'].'</a></li>';
-                                    } elseif ($category_token === 'chapters_unlocked'){
+                                    } elseif ($category_token === 'chapters_completed'){
                                         list($token, $chapter) = explode('_', $data);
                                         $info = $mmrpg_index_players[$token];
                                         $chapter = ucwords(str_replace('-', ' ', $chapter));
