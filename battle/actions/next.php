@@ -4,7 +4,8 @@
 
 // Create the battle chain array if not exists
 $is_first_mission = false;
-if (!isset($_SESSION['BATTLES_CHAIN'])){ $_SESSION['BATTLES_CHAIN'] = array(); $is_first_mission = true; }
+if (!isset($_SESSION['BATTLES_CHAIN'])){ $_SESSION['BATTLES_CHAIN'] = array(); }
+if (empty($_SESSION['BATTLES_CHAIN'])){ $is_first_mission = true; }
 $this_chain_record = array(
     'battle_token' => $this_battle->battle_token,
     'battle_turns_used' => $this_battle->counters['battle_turn'],

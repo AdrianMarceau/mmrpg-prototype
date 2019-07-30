@@ -619,7 +619,9 @@ $(document).ready(function(){
                     $link.addClass('expanded').html('<span>-</span>');
                     $details.perfectScrollbar('update');
                     //$('html, body').animate({scrollTop: ($link.offset().top - 20)}, 'fast');
-                    $('html, body').animate({scrollTop: '+='+$details.outerHeight()+'px'}, 'slow');
+                    var newScrollTop = $details.outerHeight();
+                    //console.log('newScrollTop = ', newScrollTop);
+                    if (newScrollTop){ $('html, body').animate({scrollTop: '+='+newScrollTop+'px'}, 'slow'); }
                     } else {
                     // Collapse the next row, change the icon to a "+"
                     $nextRow.addClass('hidden');

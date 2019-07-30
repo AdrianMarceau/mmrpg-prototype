@@ -891,7 +891,7 @@ if (!empty($this_battle->flags['challenge_battle'])
                 $this_team_config = $_SESSION['BATTLES_CHAIN'][0]['battle_team_config'];
             } elseif (!empty($this_player->counters['robots_start_total'])){
                 $this_robot_used = $this_player->counters['robots_start_total'];
-                $this_team_config = $this_player->values['robots_start_team'];
+                $this_team_config = $this_player->player_token.'::'.implode(',', $this_player->values['robots_start_team']);
             }
             if (!empty($_SESSION['BATTLES_CHAIN'])){ foreach ($_SESSION['BATTLES_CHAIN'] AS $key => $record){ $this_turns_used += $record['battle_turns_used']; } }
             if (!empty($this_battle->counters['battle_turn'])){ $this_turns_used += $this_battle->counters['battle_turn']; }
