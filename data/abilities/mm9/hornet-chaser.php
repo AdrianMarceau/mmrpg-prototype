@@ -291,7 +291,7 @@ $ability = array(
                         $this_robot->update_session();
                     } elseif (strstr($new_item_token, '-core')){
                         //$this_battle->events_create(false, false, 'debug', 'The stolen item was a robot core!');
-                        $new_core_type = preg_replace('/-core$/', '', $old_item_token);
+                        $new_core_type = preg_replace('/-core$/', '', $new_item_token);
                         $existing_shields = !empty($this_robot->robot_attachments) ? substr_count(implode('|', array_keys($this_robot->robot_attachments)), 'ability_core-shield_') : 0;
                         $shield_info = rpg_ability::get_static_core_shield($new_core_type, 3, $existing_shields);
                         $shield_token = $shield_info['attachment_token'];
