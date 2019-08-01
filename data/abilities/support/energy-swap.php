@@ -127,7 +127,7 @@ $ability = array(
         // Check to see if this ability has been used already, and if so increase the cost
         if (!empty($this_robot->history['triggered_abilities'])){
             $new_energy_cost = $this_ability->ability_base_energy;
-            foreach ($this_robot->history['triggered_abilities'] AS $ta_token){ if ($ta_token == $this_ability->ability_token){ $new_energy_cost += $this_ability->ability_base_energy; } }
+            foreach ($this_robot->history['triggered_abilities'] AS $ta_token){ if ($ta_token == $this_ability->ability_token){ $new_energy_cost += ceil($this_ability->ability_base_energy / 2); } }
             $this_ability->set_energy($new_energy_cost);
         }
 
