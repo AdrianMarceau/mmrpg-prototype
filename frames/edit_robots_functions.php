@@ -31,6 +31,7 @@ function refresh_editor_arrays( &$allowed_edit_players, &$allowed_edit_robots, &
     // Collect a temporary player index
     $temp_player_tokens = array_keys($temp_player_array);
     $temp_player_index = rpg_player::get_index_custom($temp_player_tokens);
+    $temp_type_tokens = rpg_type::get_index_tokens();
 
     // Now to actually loop through and update the allowed players, robots, and abilities arrays
     foreach ($temp_player_array AS $player_token => $player_info){
@@ -52,6 +53,18 @@ function refresh_editor_arrays( &$allowed_edit_players, &$allowed_edit_robots, &
                 continue;
             }
             $robot_index_info = $temp_robot_index[$robot_token];
+
+            // LEGACYFIX: If this is a copy-core robot with an elemental alt, remove it now
+            if ($robot_info['robot_core'] == 'copy'
+                && isset($robot_info['robot_image'])
+                && $robot_info['robot_image'] != $robot_token){
+                list($rtoken, $atoken) = explode('_', $robot_info['robot_image']);
+                if (in_array($atoken, $temp_type_tokens)){
+                    unset($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['robot_image']);
+                    unset($robot_info['robot_image']);
+                }
+
+            }
 
             // Merge the robot and index info then append the token and info
             $robot_info = array_merge($robot_index_info, $robot_info);

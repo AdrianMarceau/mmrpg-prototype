@@ -118,32 +118,6 @@ $ability = array(
 
                         }
 
-                        // Only change the image for this robot IF NATIVE COPY CORE
-                        if ($this_robot_index['robot_core'] == 'copy'
-                            && ($new_item_generated || $existing_item_transformed)){
-
-                            // Change the robot's image to one matching the core
-                            $new_robot_image = $this_robot_index['robot_image'].'_'.$new_core_type;
-                            $this_robot->set_image($new_robot_image);
-                            unset($this_robot->robot_image_overlay['copy_type1']);
-                            unset($this_robot->robot_image_overlay['copy_type2']);
-                            $this_robot->update_session();
-
-                            // If a core was generated or modified, we need to add update the user's image in the session
-                            if (($new_item_generated || $existing_item_transformed)
-                                && $this_player->player_side == 'left'
-                                && empty($this_battle->flags['player_battle'])
-                                && empty($this_battle->flags['challenge_battle'])){
-                                $ptoken = $this_player->player_token;
-                                $rtoken = $this_robot->robot_token;
-                                $itoken = $new_core_type.'-core';
-                                if (!empty($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken])){
-                                    $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_image'] = $new_robot_image;
-                                }
-                            }
-
-                        }
-
                         // If the user created a new core or shifted an existing one, apply the auto core shield
                         if ($new_item_generated
                             || $existing_item_transformed
