@@ -163,20 +163,6 @@ $ability = array(
                 if (!isset($this_robot->robot_attachments[$shield_token])){ $this_robot->robot_attachments[$shield_token] = $shield_info; }
                 else { $this_robot->robot_attachments[$shield_token]['attachment_duration'] += $shield_duration; }
                 $this_robot->update_session();
-                if ($this_robot->robot_base_core == 'copy'
-                    && $this_robot->robot_image == $this_robot->robot_token){
-                    $this_robot->robot_image = $this_robot->robot_token.'_'.$new_core_type;
-                    $this_robot->update_session();
-                    if ($this_player->player_side == 'left'
-                        && empty($this_battle->flags['player_battle'])
-                        && empty($this_battle->flags['challenge_battle'])){
-                        $ptoken = $this_player->player_token;
-                        $rtoken = $this_robot->robot_token;
-                        if (!empty($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken])){
-                            $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_image'] = $this_robot->robot_image;
-                        }
-                    }
-                }
             }
         }
 
@@ -242,20 +228,6 @@ $ability = array(
                 if (!isset($target_robot->robot_attachments[$shield_token])){ $target_robot->robot_attachments[$shield_token] = $shield_info; }
                 else { $target_robot->robot_attachments[$shield_token]['attachment_duration'] += $shield_duration; }
                 $target_robot->update_session();
-                if ($target_robot->robot_base_core == 'copy'
-                    && $target_robot->robot_image == $target_robot->robot_token){
-                    $target_robot->robot_image = $target_robot->robot_token.'_'.$new_core_type;
-                    $target_robot->update_session();
-                    if ($target_player->player_side == 'left'
-                        && empty($this_battle->flags['player_battle'])
-                        && empty($this_battle->flags['challenge_battle'])){
-                        $ptoken = $target_player->player_token;
-                        $rtoken = $target_robot->robot_token;
-                        if (!empty($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken])){
-                            $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_image'] = $target_robot->robot_image;
-                        }
-                    }
-                }
             }
         }
 
