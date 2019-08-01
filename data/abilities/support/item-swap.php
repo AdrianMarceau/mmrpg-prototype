@@ -79,6 +79,8 @@ $ability = array(
         // Check to ensure at least one of the targets has an item
         $this_item_token = $this_robot->robot_item;
         $target_item_token = $target_robot->robot_item;
+        $this_item_index_info = !empty($this_item_token) ? rpg_item::get_index_info($this_item_token) : false;
+        $target_item_index_info = !empty($target_item_token) ? rpg_item::get_index_info($target_item_token) : false;
 
         // Collect this robot's stat mods and the target's so we can swap them
         //$stat_token = 'attack';
@@ -258,14 +260,22 @@ $ability = array(
         }
 
         // Check to see if the target's stats got better or worse
+        $this_item_object = !empty($this_robot->robot_item) ? rpg_game::get_item($this_battle, $this_player, $this_robot, array('item_token' => $this_robot->robot_item)) : false;
+        $this_item_pronoun = !empty($this_robot->robot_item) && preg_match('/^(a|e|i|o|u)/i', $this_robot->robot_item) ? 'an' : 'a';
+        $target_item_object = !empty($target_robot->robot_item) ? rpg_game::get_item($this_battle, $target_player, $target_robot, array('item_token' => $target_robot->robot_item)) : false;
+        $target_item_pronoun = !empty($target_robot->robot_item) && preg_match('/^(a|e|i|o|u)/i', $target_robot->robot_item) ? 'an' : 'a';
         if ($target_robot->robot_item === ''){
-            $effect_text = $target_name_text.'\'s item was stolen!';
+            $effect_text = $target_name_text.'\'s item was stolen! <br /> ';
+            $effect_text .= $this_robot->print_name().' got '.$this_item_pronoun.' '.$this_item_object->print_name().'! ';
             $effect_frame = 'taunt';
         } elseif ($this_robot->robot_item === ''){
-            $effect_text = $this_robot->print_name().' gave away '.$this_robot->get_pronoun('possessive2').' item!';
+            $effect_text = $this_robot->print_name().' gave away '.$this_robot->get_pronoun('possessive2').' item! <br /> ';
+            $effect_text .= $target_robot->print_name().' got '.$target_item_pronoun.' '.$target_item_object->print_name().'!';
             $effect_frame = 'damage';
         } else {
-            $effect_text = $this_robot->print_name().' and '.$target_name_text.'\'s items were swapped!';
+            $effect_text = $this_robot->print_name().' and '.$target_name_text.'\'s items were swapped! <br /> ';
+            $effect_text .= $this_robot->print_name().' got '.$this_item_pronoun.' '.$this_item_object->print_name().'! ';
+            $effect_text .= $target_robot->print_name().' got '.$target_item_pronoun.' '.$target_item_object->print_name().'!';
             $effect_frame = 'defend';
         }
 
@@ -291,7 +301,7 @@ $ability = array(
 
         // Generate an event showing the stat swap was successful
         $this_ability->target_options_update(array('frame' => $effect_frame, 'success' => array(9, 0, 10, -10, $effect_text)));
-        $target_robot->trigger_target($target_robot, $this_ability, array('prevent_default_text' => true));
+        $this_robot->trigger_target($target_robot, $this_ability, array('prevent_default_text' => true));
 
         // Remove item attachment from user if applicable
         if (!empty($this_item_attachment_token)){ $this_robot->unset_attachment($this_item_attachment_token); }
