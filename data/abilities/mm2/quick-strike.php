@@ -121,12 +121,6 @@ $ability = array(
             } elseif (strstr($old_item_token, '-core')){
                 //$this_battle->events_create(false, false, 'debug', 'The knocked-off item was a robot core!');
                 $lost_core_type = preg_replace('/-core$/', '', $old_item_token);
-                $possible_attachment_token = 'ability_core-shield_'.$lost_core_type;
-                if (!empty($target_robot->robot_attachments[$possible_attachment_token])){
-                    $target_robot->robot_attachments[$possible_attachment_token]['attachment_duration'] = 0;
-                    unset($target_robot->robot_attachments[$possible_attachment_token]);
-                    $target_robot->update_session();
-                }
                 if ($target_robot->robot_base_core == 'copy'
                     && $target_robot->robot_image == $target_robot->robot_token.'_'.$lost_core_type){
                     $target_robot->robot_image = $target_robot->robot_token;
