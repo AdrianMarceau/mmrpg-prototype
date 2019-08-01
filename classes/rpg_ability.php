@@ -3313,7 +3313,7 @@ class rpg_ability extends rpg_object {
             'ability_token' => $this_ability_token,
             'ability_image' => $this_attachment_image,
             'attachment_token' => $this_attachment_token,
-            'attachment_duration' => $shield_duration,
+            'attachment_duration' => $shield_duration + 1, // we do +1 so the summon turn doesn't count
             'attachment_damage_input_breaker_'.$shield_type => $shield_effect_multiplier,
             'attachment_create' => array(
                 'trigger' => 'special',
