@@ -5,7 +5,7 @@ $ability = array(
     'ability_token' => 'attack-boost',
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Support/Attack',
-    'ability_description' => 'The user optimizes internal systems to improve weapons and sharply raise its attack stat!',
+    'ability_description' => 'The user optimizes internal systems to improve weapons and sharply raise its attack stat! When used by a support robot, this ability can optionally boost an ally instead of the user!',
     'ability_energy' => 4,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
@@ -34,11 +34,9 @@ $ability = array(
         extract($objects);
 
         // If used by support robot OR the has a Target Module, allow bench targetting
-        $temp_support_robots = array('roll', 'disco', 'rhythm');
-        if ($this_robot->robot_class == 'mecha'
-            || in_array($this_robot->robot_token, $temp_support_robots)
-            || $this_robot->has_item('target-module')){ $this_ability->set_target('select_this'); }
-        else { $this_ability->reset_target(); }
+        if ($this_robot->robot_core === '' || $this_robot->robot_class == 'mecha'){ $this_ability->set_target('select_this'); }
+        elseif ($this_robot->has_item('target-module')){ $this_ability->set_target('select_this'); }
+        else { $this_ability->set_target('auto'); }
 
         // Return true on success
         return true;
