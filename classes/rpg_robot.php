@@ -5774,32 +5774,44 @@ class rpg_robot extends rpg_object {
             // Else if the robot is holding an elemental ROBOT CORE item, extend shield duration
             elseif (substr($item_token, -5, 5) === '-core'){
 
-                // Collect the elemental type for this core
-                list($held_core_type) = explode('-', $item_token);
-                $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' extends '.$held_core_type.'-type core shield');
-
-                // If a core shield already exists, we only need to extend the duration
-                $base_core_duration = 3;
-                $core_shield_token = 'ability_core-shield_'.$held_core_type;
-                if (!empty($this_robot->robot_attachments[$core_shield_token])){
-                    $core_shield_info = $this_robot->robot_attachments[$core_shield_token];
-                    if (empty($core_shield_info['attachment_duration'])
-                        || $core_shield_info['attachment_duration'] < $base_core_duration){
-                        $core_shield_info['attachment_duration'] = $base_core_duration;
+                // If there's a timer, decrement and then move on
+                if (!empty($this_robot->counters['core-shield_cooldown_timer'])){
+                    $this_robot->counters['core-shield_cooldown_timer'] -= 1;
+                    if (empty($this_robot->counters['core-shield_cooldown_timer'])){
+                        unset($this_robot->counters['core-shield_cooldown_timer']);
                     }
-                    $core_shield_info['attachment_duration'] += 1;
-                    $this_robot->set_attachment($core_shield_token, $core_shield_info);
                 }
-                // otherwise, if not exists, we should create a new shield and attach it
+                // Otherwise we can regenerate the core shield
                 else {
-                    $existing_shields = !empty($this_robot->robot_attachments) ? substr_count(implode('|', array_keys($this_robot->robot_attachments)), 'ability_core-shield_') : 0;
-                    $core_shield_info = rpg_ability::get_static_core_shield($held_core_type, $base_core_duration, $existing_shields);
-                    $this_robot->set_attachment($core_shield_token, $core_shield_info);
-                    $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_item->item_name,
-                        $this_robot->print_name().' triggers '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!<br />'.
-                        'The held item generated a new '.rpg_type::print_span($held_core_type, 'Core Shield').'!',
-                        array('canvas_show_this_item_overlay' => true)
-                        );
+
+                    // Collect the elemental type for this core
+                    list($held_core_type) = explode('-', $item_token);
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' extends '.$held_core_type.'-type core shield');
+
+                    // If a core shield already exists, we only need to extend the duration
+                    $base_core_duration = 3;
+                    $core_shield_token = 'ability_core-shield_'.$held_core_type;
+                    if (!empty($this_robot->robot_attachments[$core_shield_token])){
+                        $core_shield_info = $this_robot->robot_attachments[$core_shield_token];
+                        if (empty($core_shield_info['attachment_duration'])
+                            || $core_shield_info['attachment_duration'] < $base_core_duration){
+                            $core_shield_info['attachment_duration'] = $base_core_duration;
+                        }
+                        $core_shield_info['attachment_duration'] += 1;
+                        $this_robot->set_attachment($core_shield_token, $core_shield_info);
+                    }
+                    // otherwise, if not exists, we should create a new shield and attach it
+                    else {
+                        $existing_shields = !empty($this_robot->robot_attachments) ? substr_count(implode('|', array_keys($this_robot->robot_attachments)), 'ability_core-shield_') : 0;
+                        $core_shield_info = rpg_ability::get_static_core_shield($held_core_type, $base_core_duration, $existing_shields);
+                        $this_robot->set_attachment($core_shield_token, $core_shield_info);
+                        $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_item->item_name,
+                            $this_robot->print_name().' triggers '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!<br />'.
+                            'The held item generated a new '.rpg_type::print_span($held_core_type, 'Core Shield').'!',
+                            array('canvas_show_this_item_overlay' => true)
+                            );
+                    }
+
                 }
 
             }
