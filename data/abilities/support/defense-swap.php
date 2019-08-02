@@ -5,7 +5,7 @@ $ability = array(
     'ability_token' => 'defense-swap',
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Support/Defense',
-    'ability_description' => 'The user triggers an exploit in the prototype\'s code to instantly swap changes to its defense stat with the target! When used by a support robot, this ability can target allies instead! Use sparingly as this skill becomes more costly with each use...',
+    'ability_description' => 'The user triggers an exploit in the prototype\'s code to instantly swap changes to its defense stat with the target! When used by a support robot, this ability can swap with allies instead of the enemy!',
     'ability_energy' => 8,
     'ability_accuracy' => 100,
     'ability_target' => 'auto',
@@ -109,18 +109,12 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
-        // If used by support robot OR the has a Target Module, allow opponent targetting
-        $temp_support_robots = array('roll', 'disco', 'rhythm');
-        if ($this_robot->robot_class == 'mecha'
-            || in_array($this_robot->robot_token, $temp_support_robots)
-            || $this_robot->has_item('target-module')){ $this_ability->set_target('select_this_ally'); }
-        else { $this_ability->set_target('auto'); }
-
-        // Check to see if this ability has been used already, and if so increase the cost
-        if (!empty($this_robot->history['triggered_abilities'])){
-            $new_energy_cost = $this_ability->ability_base_energy;
-            foreach ($this_robot->history['triggered_abilities'] AS $ta_token){ if ($ta_token == $this_ability->ability_token){ $new_energy_cost += ceil($this_ability->ability_base_energy / 2); } }
-            $this_ability->set_energy($new_energy_cost);
+        // Support robots can target allies, while others target the enemy (inlcuding bench w/ Target Module)
+        if ($this_robot->robot_class == 'mecha' || $this_robot->robot_core === ''){
+            $this_ability->set_target('select_this_ally');
+        } else {
+            if ($this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
+            else { $this_ability->set_target('auto'); }
         }
 
         // Return true on success
