@@ -24,8 +24,8 @@ ob_start();
         }
 
         // Collect the robot's held item if any
-        if (!empty($_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_item'])){ $current_robot_item = $_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_item']; }
-        else { $current_robot_item = ''; }
+        //if (!empty($_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_item'])){ $current_robot_item = $_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_item']; }
+        //else { $current_robot_item = ''; }
 
     } elseif ($this_robot->robot_class == 'mecha'){
 
@@ -36,9 +36,12 @@ ob_start();
         }
 
         // Set the robot item to nothing
-        $current_robot_item = '';
+        //$current_robot_item = '';
 
     }
+
+    // Collect the robot's held item if any
+    $current_robot_item = $this_robot->robot_item;
 
     // Ensure this robot has abilities to display
     if (!empty($current_robot_abilities)){
