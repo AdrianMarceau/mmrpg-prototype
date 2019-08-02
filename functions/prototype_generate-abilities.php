@@ -49,8 +49,8 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                 'mecha-support', 'field-support'
                 ),
             array(
-                'experience-booster', 'recovery-booster', 'damage-booster',
-                'experience-breaker', 'recovery-breaker', 'damage-breaker',
+                'recovery-booster', 'damage-booster',
+                'recovery-breaker', 'damage-breaker',
                 )
             );
     }
