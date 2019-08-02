@@ -22,8 +22,8 @@ $ability = array(
             ));
         $this_robot->trigger_target($this_robot, $this_ability);
 
-        // If this ability is being used by a special support robot that allows targetting
-        if ($this_robot->player_id == $target_robot->player_id){
+        // If the target of this ability is not the user
+        if ($target_robot->robot_id != $this_robot->robot_id){
 
             // Increase this robot's energy stat
             $this_ability->recovery_options_update(array(
@@ -39,7 +39,7 @@ $ability = array(
             $target_robot->trigger_recovery($this_robot, $this_ability, $energy_recovery_amount, true, $trigger_options);
 
         }
-        // Otherwise if targetting a team mate
+        // Otherwise if the user if targeting themselves
         else {
 
             // Increase the target robot's energy stat
@@ -66,11 +66,9 @@ $ability = array(
         extract($objects);
 
         // If used by support robot OR the has a Target Module, allow bench targetting
-        $temp_support_robots = array('roll', 'disco', 'rhythm');
-        if ($this_robot->robot_class == 'mecha'
-            || in_array($this_robot->robot_token, $temp_support_robots)
-            || $this_robot->has_item('target-module')){ $this_ability->set_target('select_this'); }
-        else { $this_ability->reset_target(); }
+        if ($this_robot->robot_core === '' || $this_robot->robot_class == 'mecha'){ $this_ability->set_target('select_this'); }
+        elseif ($this_robot->has_item('target-module')){ $this_ability->set_target('select_this'); }
+        else { $this_ability->set_target('auto'); }
 
         // Return true on success
         return true;
