@@ -57,6 +57,19 @@ $ability = array(
 
         }
 
+        // If the target is holding a Guard Module, we are not allowed to modify stats
+        if ($target_robot->robot_item == 'guard-module'){
+
+            // Create a temp item object so we can show it resisting stat swaps
+            $temp_item = rpg_game::get_item($this_battle, $target_player, $target_robot, array('item_token' => $target_robot->robot_item));
+            $temp_message = '&hellip;but the held '.$temp_item->print_name().' kicked in! ';
+            $temp_message .= '<br /> '.$target_robot->print_name().'\'s item protects '.$target_robot->get_pronoun('object').' from stat changes!';
+            $temp_item->target_options_update(array( 'frame' => 'defend', 'success' => array(9, 0, 0, 10, $temp_message)));
+            $target_robot->trigger_target($this_robot, $temp_item, array('prevent_default_text' => true));
+            return;
+
+        }
+
         // Apply the target's life energy to the user, keep track of change, crop if too high
         $this_new_life_energy = $target_current_life_energy;
         if ($this_new_life_energy > $this_robot->robot_base_energy){ $this_new_life_energy = $this_robot->robot_base_energy;  }
@@ -96,12 +109,9 @@ $ability = array(
         extract($objects);
 
         // Support robots can target allies, while others target the enemy (inlcuding bench w/ Target Module)
-        if ($this_robot->robot_class == 'mecha' || $this_robot->robot_core === ''){
-            $this_ability->set_target('select_this_ally');
-        } else {
-            if ($this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
-            else { $this_ability->set_target('auto'); }
-        }
+        if ($this_robot->robot_core === '' || $this_robot->robot_class == 'mecha'){ $this_ability->set_target('select_this_ally'); }
+        elseif ($this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
+        else { $this_ability->set_target('auto'); }
 
         // Return true on success
         return true;
