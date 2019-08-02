@@ -184,6 +184,7 @@ $ability = array(
             if (!empty($foreground_target_robot)){
 
                 // Inflict damage on the opposing robot
+                $this_ability->ability_results_reset();
                 $this_ability->damage_options_update(array(
                     'kind' => 'energy',
                     'type' => $main_ability_types[0],
@@ -210,6 +211,7 @@ $ability = array(
             if (!empty($background_target_robot)){
 
                 // Inflict damage on the opposing robot
+                $this_ability->ability_results_reset();
                 $this_ability->damage_options_update(array(
                     'kind' => 'energy',
                     'type' => $main_ability_types[0],
