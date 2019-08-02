@@ -1342,10 +1342,10 @@ body[data-source="website"] #prototype .menu {
     display: block;
     position: absolute;
     box-sizing: border-box;
-    top: 26px;
-    right: 4px;
-    width: 26px;
-    height: 20px;
+    top: 22px;
+    right: 0px;
+    width: 32px;
+    height: 28px;
     z-index: 10;
     border-width: 1px;
 }
@@ -1361,9 +1361,10 @@ body[data-source="website"] #prototype .menu {
     border: 1px solid #090909;
     margin: 2px 4px 0;
     border-radius: 4px;
-    font-size: 20px;
-    line-height: 13px;
-    height: 14px;
+    font-size: 22px;
+    line-height: 17px;
+    height: 20px;
+    padding-left: 2px;
     box-sizing: border-box;
     color: #dedede;
 }
