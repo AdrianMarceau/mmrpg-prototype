@@ -154,13 +154,30 @@ $ability = array(
                 if (!empty($target_robot->robot_attachments)){
                     $temp_attachment_tokens = array_keys($target_robot->robot_attachments);
                     $temp_attachment_tokens = array_reverse($temp_attachment_tokens);
+                    $temp_shields_removed = 0;
                     foreach ($temp_attachment_tokens AS $temp_key => $temp_attachment_token){
                         $temp_attachment_info = $target_robot->robot_attachments[$temp_attachment_token];
                         if (strstr($temp_attachment_token, 'ability_core-shield_')){
-                            $temp_attachment_info['attachment_duration'] = 0;
+                            // Collect the type for this core shield we're removing
+                            list($ab, $at, $core_type) = explode('_', $temp_attachment_token);
+                            // Update this field attachment with an opacity tweak before removing
+                            if (!isset($temp_attachment_info['ability_frame_styles'])){ $temp_attachment_info['ability_frame_styles'] = ''; }
+                            $temp_attachment_info['ability_frame_styles'] .= ' opacity: 0.5; ';
                             $target_robot->robot_attachments[$temp_attachment_token] = $temp_attachment_info;
                             $target_robot->update_session();
-                            break;
+                            // Show a message about the attachment being removed
+                            $temp_ability_info = rpg_ability::get_index_info('core-shield');
+                            $temp_ability_object = rpg_game::get_ability($this_battle, $target_player, $target_robot, $temp_ability_info);
+                            $temp_remove_frame = $temp_shields_removed % 2 == 0 ? 'taunt' : 'defend';
+                            $temp_remove_text = $this_robot->print_name().' removed '.($temp_shields_removed >= 1 ? 'another' : 'a').' field hazard!<br /> ';
+                            $temp_remove_text .= 'The '.rpg_type::print_span($core_type, $temp_ability_object->ability_name).' around '.$target_robot->print_name().' faded away!';
+                            $temp_ability_object->target_options_update(array( 'frame' => $temp_remove_frame, 'success' => array(0, -9999, -9999, -9999, $temp_remove_text)));
+                            $target_robot->trigger_target($target_robot, $temp_ability_object, array('prevent_default_text' => true, 'canvas_show_this_ability' => false));
+                            $temp_shields_removed += 1;
+                            // Remove this attachment from the robot
+                            unset($target_robot->robot_attachments[$temp_attachment_token]);
+                            $target_robot->counters['core-shield_cooldown_timer'] = 1;
+                            $target_robot->update_session();
                         }
                     }
                 }
