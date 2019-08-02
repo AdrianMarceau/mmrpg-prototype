@@ -731,9 +731,9 @@ ob_start();
 
                                 // Collect the base values for this battle point calculation
                                 $wave_value = MMRPG_SETTINGS_BATTLEPOINTS_PERWAVE;
-                                $num_waves = $category_list['challenge_waves_completed'];
-                                $num_robots = $category_list['challenge_robots_used'];
-                                $num_turns = $category_list['challenge_turns_used'];
+                                $num_waves = (int)($category_list['challenge_waves_completed']);
+                                $num_robots = (int)($category_list['challenge_robots_used']);
+                                $num_turns = (int)($category_list['challenge_turns_used']);
                                 $team_config = $category_list['challenge_team_config'];
 
                                 $base_points = $num_waves * $wave_value;
