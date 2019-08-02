@@ -738,7 +738,7 @@ ob_start();
 
                                 $base_points = $num_waves * $wave_value;
                                 $robot_points = ceil($base_points / $num_robots);
-                                $turn_points = ceil($base_points / $num_turns);
+                                $turn_points = ceil($base_points / ($num_turns / $num_waves));
                                 $total_points = $base_points + $robot_points + $turn_points;
 
                                 $print_wave_value = number_format($wave_value, 0, '.', ',');
@@ -782,7 +782,7 @@ ob_start();
                                 if (!empty($team_config_markup)){ $lines[] = '<div class="robot_team">'.implode(' ', $team_config_markup).'</div>'; }
                                 $lines[] = '<strong>Base Points</strong>: '.$print_wave_value.' &times; Waves('.$num_waves.') = '.$print_base_points;
                                 $lines[] = '<strong>Robot Points</strong>: BasePoints('.$print_base_points.') &divide; Robots('.$print_num_robots.') = '.$print_robot_points;
-                                $lines[] = '<strong>Turn Points</strong>: BasePoints('.$print_base_points.') &divide; Turns('.$print_num_turns.') = '.$print_turn_points;
+                                $lines[] = '<strong>Turn Points</strong>: BasePoints('.$print_base_points.') &divide; (Turns('.$print_num_turns.') &divide; Waves('.$num_waves.')) = '.$print_turn_points;
                                 $lines[] = '<strong>Total Points</strong>: BasePoints('.$print_base_points.') &plus; RobotPoints('.$print_robot_points.') &plus; TurnPoints('.$print_turn_points.') = '.$print_total_points;
                                 //$lines[] = rpg_type::print_span('copy', 'Endless Attack Reward: '.$print_total_points.' '.($total_points === 1 ? 'Point' : 'Points'));
 

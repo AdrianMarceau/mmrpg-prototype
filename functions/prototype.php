@@ -379,7 +379,7 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
             board.challenge_team_config,
             @base_points := (board.challenge_waves_completed * {$wave_value}) AS challenge_points_base,
             @robot_points := CEIL(@base_points / board.challenge_robots_used) AS challenge_points_robot_bonus,
-            @turn_points := CEIL(@base_points / board.challenge_turns_used) AS challenge_points_turn_bonus,
+            @turn_points := CEIL(@base_points / (board.challenge_turns_used / board.challenge_waves_completed)) AS challenge_points_turn_bonus,
             CEIL(@base_points + @robot_points + @turn_points) AS challenge_points_total
             FROM mmrpg_challenges_waveboard AS board
             WHERE
