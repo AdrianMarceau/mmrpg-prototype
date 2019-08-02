@@ -2529,14 +2529,18 @@ class rpg_robot extends rpg_object {
         $this->counters['abilities_total'] = count($this->robot_abilities);
 
         // If this robot is holding an ENERGY UPGRADE, double the base amount for now
-        if (!empty($this->robot_item) && $this->robot_item == 'energy-upgrade'){ $this->robot_base_energy = $this->values['robot_base_energy_backup'] * 2; }
-        else { $this->robot_base_energy = $this->values['robot_base_energy_backup']; }
-        if ($this->robot_energy > $this->robot_base_energy){ $this->robot_energy = $this->robot_base_energy; }
+        if (isset($this->values['robot_base_energy_backup'])){
+            if (!empty($this->robot_item) && $this->robot_item == 'energy-upgrade'){ $this->robot_base_energy = $this->values['robot_base_energy_backup'] * 2; }
+            else { $this->robot_base_energy = $this->values['robot_base_energy_backup']; }
+            if ($this->robot_energy > $this->robot_base_energy){ $this->robot_energy = $this->robot_base_energy; }
+        }
 
         // If this robot is holding an WEAPON UPGRADE, double the base amount for now
-        if (!empty($this->robot_item) && $this->robot_item == 'weapon-upgrade'){ $this->robot_base_weapons = $this->values['robot_base_weapons_backup'] * 2; }
-        else { $this->robot_base_weapons = $this->values['robot_base_weapons_backup']; }
-        if ($this->robot_weapons > $this->robot_base_weapons){ $this->robot_weapons = $this->robot_base_weapons; }
+        if (isset($this->values['robot_base_weapons_backup'])){
+            if (!empty($this->robot_item) && $this->robot_item == 'weapon-upgrade'){ $this->robot_base_weapons = $this->values['robot_base_weapons_backup'] * 2; }
+            else { $this->robot_base_weapons = $this->values['robot_base_weapons_backup']; }
+            if ($this->robot_weapons > $this->robot_base_weapons){ $this->robot_weapons = $this->robot_base_weapons; }
+        }
 
         // Recalculate this robot's effective stats based on modifiers
         $stat_tokens = array('attack', 'defense', 'speed');
