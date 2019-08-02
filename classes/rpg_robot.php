@@ -5657,10 +5657,9 @@ class rpg_robot extends rpg_object {
 
                 // Only use this item if the robot is active and turns have passed
                 $item_restore_value = strstr($item_token, 'pellet') ? 2 : 3;
-                $item_wait_time = 1; // strstr($item_token, 'pellet') ? 1 : 2;
-                $robot_turns_active = count($this_robot->history['turns_active']);
-                if ($this_robot->robot_position == 'active' && $robot_turns_active >= $item_wait_time){
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' increases attack by '.$item_restore_value.' stages');
+                $item_restore_trigger = $item_restore_value - 1;
+                if (!empty($this_robot->counters['attack_breaks_applied']) && $this_robot->counters['attack_breaks_applied'] >= $item_restore_trigger){
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores attack by '.$item_restore_value.' stages');
 
                     // Remove the robot's current item now that it's used up in battle
                     $this_robot->set_item('');
@@ -5677,6 +5676,10 @@ class rpg_robot extends rpg_object {
                         }
                     }
 
+                    // Reset the applied breaks variable relative to restore amount
+                    $this_robot->counters['attack_breaks_applied'] -= $item_restore_value;
+                    if ($this_robot->counters['attack_breaks_applied'] < 0){ unset($this_robot->counters['attack_breaks_applied']); }
+
                 }
 
             }
@@ -5685,10 +5688,9 @@ class rpg_robot extends rpg_object {
 
                 // Only use this item if the robot is active and turns have passed
                 $item_restore_value = strstr($item_token, 'pellet') ? 2 : 3;
-                $item_wait_time = 1; // strstr($item_token, 'pellet') ? 1 : 2;
-                $robot_turns_active = count($this_robot->history['turns_active']);
-                if ($this_robot->robot_position == 'active' && $robot_turns_active >= $item_wait_time){
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' increases defense by '.$item_restore_value.' stages');
+                $item_restore_trigger = $item_restore_value - 1;
+                if (!empty($this_robot->counters['defense_breaks_applied']) && $this_robot->counters['defense_breaks_applied'] >= $item_restore_trigger){
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores defense by '.$item_restore_value.' stages');
 
                     // Remove the robot's current item now that it's used up in battle
                     $this_robot->set_item('');
@@ -5705,6 +5707,10 @@ class rpg_robot extends rpg_object {
                         }
                     }
 
+                    // Reset the applied breaks variable relative to restore amount
+                    $this_robot->counters['defense_breaks_applied'] -= $item_restore_value;
+                    if ($this_robot->counters['defense_breaks_applied'] < 0){ unset($this_robot->counters['defense_breaks_applied']); }
+
                 }
 
             }
@@ -5713,10 +5719,9 @@ class rpg_robot extends rpg_object {
 
                 // Only use this item if the robot is active and turns have passed
                 $item_restore_value = strstr($item_token, 'pellet') ? 2 : 3;
-                $item_wait_time = 1; // strstr($item_token, 'pellet') ? 1 : 2;
-                $robot_turns_active = count($this_robot->history['turns_active']);
-                if ($this_robot->robot_position == 'active' && $robot_turns_active >= $item_wait_time){
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' increases speed by '.$item_restore_value.' stages');
+                $item_restore_trigger = $item_restore_value - 1;
+                if (!empty($this_robot->counters['speed_breaks_applied']) && $this_robot->counters['speed_breaks_applied'] >= $item_restore_trigger){
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores speed by '.$item_restore_value.' stages');
 
                     // Remove the robot's current item now that it's used up in battle
                     $this_robot->set_item('');
@@ -5733,6 +5738,10 @@ class rpg_robot extends rpg_object {
                         }
                     }
 
+                    // Reset the applied breaks variable relative to restore amount
+                    $this_robot->counters['speed_breaks_applied'] -= $item_restore_value;
+                    if ($this_robot->counters['speed_breaks_applied'] < 0){ unset($this_robot->counters['speed_breaks_applied']); }
+
                 }
 
             }
@@ -5744,10 +5753,11 @@ class rpg_robot extends rpg_object {
 
                 // Only use this item if the robot is active and turns have passed
                 $item_restore_value = strstr($item_token, 'pellet') ? 1 : 2;
-                $item_wait_time = 1; // strstr($item_token, 'pellet') ? 1 : 2;
-                $robot_turns_active = count($this_robot->history['turns_active']);
-                if ($this_robot->robot_position == 'active' && $robot_turns_active >= $item_wait_time){
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' increases attack/defense/speed by '.$item_restore_value.' stages');
+                $item_restore_trigger = $item_restore_value;
+                if ((!empty($this_robot->counters['attack_breaks_applied']) && $this_robot->counters['attack_breaks_applied'] >= $item_restore_trigger)
+                    || (!empty($this_robot->counters['defense_breaks_applied']) && $this_robot->counters['defense_breaks_applied'] >= $item_restore_trigger)
+                    || (!empty($this_robot->counters['speed_breaks_applied']) && $this_robot->counters['speed_breaks_applied'] >= $item_restore_trigger)){
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores attack/defense/speed by '.$item_restore_value.' stages');
 
                     // Remove the robot's current item now that it's used up in battle
                     $this_robot->set_item('');
@@ -5767,6 +5777,18 @@ class rpg_robot extends rpg_object {
                             $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
                         }
                     }
+
+                    // Reset the applied breaks variable relative to restore amount
+                    $this_robot->counters['attack_breaks_applied'] -= $item_restore_value;
+                    if ($this_robot->counters['attack_breaks_applied'] < 0){ unset($this_robot->counters['attack_breaks_applied']); }
+
+                    // Reset the applied breaks variable relative to restore amount
+                    $this_robot->counters['defense_breaks_applied'] -= $item_restore_value;
+                    if ($this_robot->counters['defense_breaks_applied'] < 0){ unset($this_robot->counters['defense_breaks_applied']); }
+
+                    // Reset the applied breaks variable relative to restore amount
+                    $this_robot->counters['speed_breaks_applied'] -= $item_restore_value;
+                    if ($this_robot->counters['speed_breaks_applied'] < 0){ unset($this_robot->counters['speed_breaks_applied']); }
 
                 }
 
