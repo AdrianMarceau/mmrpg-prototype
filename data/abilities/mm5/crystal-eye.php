@@ -112,11 +112,12 @@ $ability = array(
         $backup_print_name = $this_ability->print_name();
         $this_ability->set_type2($main_ability_types[1]);
         $this_ability->set_image($main_ability_image);
+        $temp_displayed_type = !empty($main_ability_types[1]) ? $main_ability_types[1] : $main_ability_types[0];
         $this_ability->target_options_update(array(
             'frame' => 'defend',
             'success' => array(0, 0, 60, 10,
                 'The '.$backup_print_name.' identified '.$main_target_robot->print_name().'\'s weaknesses! '.
-                '<br /> The glowing orb '.($has_changed ? 'took on the' : 'maintained its').' <span class="ability_name ability_type ability_type_'.$main_ability_types[1].'">'.ucfirst($main_ability_types[1]).'</span> type! '
+                '<br /> The glowing orb '.($has_changed ? 'took on the' : 'maintained its').' <span class="ability_name ability_type ability_type_'.$temp_displayed_type.'">'.ucfirst($temp_displayed_type).'</span> type! '
                 )
             ));
         $this_robot->trigger_target($main_target_robot, $this_ability, array('prevent_default_text' => true));
