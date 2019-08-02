@@ -764,27 +764,33 @@ class rpg_robot extends rpg_object {
             }
         }
 
+        // Now that we have base amounts, we should backup energy and weapons
+        if (!isset($this->values['robot_base_energy_backup'])){ $this->values['robot_base_energy_backup'] = $this->robot_base_energy; }
+        if (!isset($this->values['robot_base_weapons_backup'])){ $this->values['robot_base_weapons_backup'] = $this->robot_base_weapons; }
+
         // If this robot is holder a relavant item, apply stat upgrades or other effects
         $this_robot_item = $this->get_item();
         if (!empty($this_robot_item)){
 
             // If this robot is holding an Energy Upgrade, double the life energy stat
             if ($this_robot_item == 'energy-upgrade'){
-                $this->robot_energy = $this->robot_energy * 2;
-                $this->robot_base_energy = $this->robot_base_energy * 2;
+                $new_start_energy = $this->values['robot_base_energy_backup'] * 2;
+                $this->robot_energy = $new_start_energy;
+                $this->robot_base_energy = $new_start_energy;
             }
 
             // Else if this robot is holding a Weapon Upgrade, double the weapon energy stat
             if ($this_robot_item == 'weapon-upgrade'){
-                $this->robot_weapons = $this->robot_weapons * 2;
-                $this->robot_base_weapons = $this->robot_base_weapons * 2;
+                $new_start_weapons = $this->values['robot_base_weapons_backup'] * 2;
+                $this->robot_weapons = $new_start_weapons;
+                $this->robot_base_weapons = $new_start_weapons;
             }
 
             // Else if this robot is holding an Elemental Core, apply a temp core shield
             if (preg_match('/^([a-z]+)-core$/', $this_robot_item)){
                 list($item_type, $item_kind) = explode('-', $this_robot_item);
                 if ($item_type != 'none' && $item_type != 'empty'){
-                    $shield_info = rpg_ability::get_static_core_shield($item_type, 6, 0);
+                    $shield_info = rpg_ability::get_static_core_shield($item_type, 3, 0);
                     $this->robot_attachments[$shield_info['attachment_token']] = $shield_info;
                 }
             }
@@ -2522,6 +2528,20 @@ class rpg_robot extends rpg_object {
         // Calculate this robot's count variables
         $this->counters['abilities_total'] = count($this->robot_abilities);
 
+        // If this robot is holding an ENERGY UPGRADE, double the base amount for now
+        if (isset($this->values['robot_base_energy_backup'])){
+            if (!empty($this->robot_item) && $this->robot_item == 'energy-upgrade'){ $this->robot_base_energy = $this->values['robot_base_energy_backup'] * 2; }
+            else { $this->robot_base_energy = $this->values['robot_base_energy_backup']; }
+            if ($this->robot_energy > $this->robot_base_energy){ $this->robot_energy = $this->robot_base_energy; }
+        }
+
+        // If this robot is holding an WEAPON UPGRADE, double the base amount for now
+        if (isset($this->values['robot_base_weapons_backup'])){
+            if (!empty($this->robot_item) && $this->robot_item == 'weapon-upgrade'){ $this->robot_base_weapons = $this->values['robot_base_weapons_backup'] * 2; }
+            else { $this->robot_base_weapons = $this->values['robot_base_weapons_backup']; }
+            if ($this->robot_weapons > $this->robot_base_weapons){ $this->robot_weapons = $this->robot_base_weapons; }
+        }
+
         // Recalculate this robot's effective stats based on modifiers
         $stat_tokens = array('attack', 'defense', 'speed');
         $mod_numerator = 2;
@@ -2544,6 +2564,16 @@ class rpg_robot extends rpg_object {
             }
             // Update the robot with the recalculated value
             $this->$prop_stat = $new_value;
+        }
+
+        // If this is a Copy type robot, make sure their colour is synced to held item
+        if ($this->robot_base_core == 'copy'){
+            $this->robot_image = $this->robot_base_image;
+            if (!empty($this->robot_item)
+                && substr($this->robot_item, -5, 5) === '-core'){
+                list($core_type) = explode('-', $this->robot_item);
+                $this->robot_image = $this->robot_base_image.'_'.$core_type;
+            }
         }
 
         // Reset this robot's elemental properties back to base
@@ -5627,10 +5657,9 @@ class rpg_robot extends rpg_object {
 
                 // Only use this item if the robot is active and turns have passed
                 $item_restore_value = strstr($item_token, 'pellet') ? 2 : 3;
-                $item_wait_time = 1; // strstr($item_token, 'pellet') ? 1 : 2;
-                $robot_turns_active = count($this_robot->history['turns_active']);
-                if ($this_robot->robot_position == 'active' && $robot_turns_active >= $item_wait_time){
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' increases attack by '.$item_restore_value.' stages');
+                $item_restore_trigger = $item_restore_value - 1;
+                if (!empty($this_robot->counters['attack_breaks_applied']) && $this_robot->counters['attack_breaks_applied'] >= $item_restore_trigger){
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores attack by '.$item_restore_value.' stages');
 
                     // Remove the robot's current item now that it's used up in battle
                     $this_robot->set_item('');
@@ -5647,6 +5676,10 @@ class rpg_robot extends rpg_object {
                         }
                     }
 
+                    // Reset the applied breaks variable relative to restore amount
+                    $this_robot->counters['attack_breaks_applied'] -= $item_restore_value;
+                    if ($this_robot->counters['attack_breaks_applied'] < 0){ unset($this_robot->counters['attack_breaks_applied']); }
+
                 }
 
             }
@@ -5655,10 +5688,9 @@ class rpg_robot extends rpg_object {
 
                 // Only use this item if the robot is active and turns have passed
                 $item_restore_value = strstr($item_token, 'pellet') ? 2 : 3;
-                $item_wait_time = 1; // strstr($item_token, 'pellet') ? 1 : 2;
-                $robot_turns_active = count($this_robot->history['turns_active']);
-                if ($this_robot->robot_position == 'active' && $robot_turns_active >= $item_wait_time){
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' increases defense by '.$item_restore_value.' stages');
+                $item_restore_trigger = $item_restore_value - 1;
+                if (!empty($this_robot->counters['defense_breaks_applied']) && $this_robot->counters['defense_breaks_applied'] >= $item_restore_trigger){
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores defense by '.$item_restore_value.' stages');
 
                     // Remove the robot's current item now that it's used up in battle
                     $this_robot->set_item('');
@@ -5675,6 +5707,10 @@ class rpg_robot extends rpg_object {
                         }
                     }
 
+                    // Reset the applied breaks variable relative to restore amount
+                    $this_robot->counters['defense_breaks_applied'] -= $item_restore_value;
+                    if ($this_robot->counters['defense_breaks_applied'] < 0){ unset($this_robot->counters['defense_breaks_applied']); }
+
                 }
 
             }
@@ -5683,10 +5719,9 @@ class rpg_robot extends rpg_object {
 
                 // Only use this item if the robot is active and turns have passed
                 $item_restore_value = strstr($item_token, 'pellet') ? 2 : 3;
-                $item_wait_time = 1; // strstr($item_token, 'pellet') ? 1 : 2;
-                $robot_turns_active = count($this_robot->history['turns_active']);
-                if ($this_robot->robot_position == 'active' && $robot_turns_active >= $item_wait_time){
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' increases speed by '.$item_restore_value.' stages');
+                $item_restore_trigger = $item_restore_value - 1;
+                if (!empty($this_robot->counters['speed_breaks_applied']) && $this_robot->counters['speed_breaks_applied'] >= $item_restore_trigger){
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores speed by '.$item_restore_value.' stages');
 
                     // Remove the robot's current item now that it's used up in battle
                     $this_robot->set_item('');
@@ -5703,6 +5738,10 @@ class rpg_robot extends rpg_object {
                         }
                     }
 
+                    // Reset the applied breaks variable relative to restore amount
+                    $this_robot->counters['speed_breaks_applied'] -= $item_restore_value;
+                    if ($this_robot->counters['speed_breaks_applied'] < 0){ unset($this_robot->counters['speed_breaks_applied']); }
+
                 }
 
             }
@@ -5714,10 +5753,11 @@ class rpg_robot extends rpg_object {
 
                 // Only use this item if the robot is active and turns have passed
                 $item_restore_value = strstr($item_token, 'pellet') ? 1 : 2;
-                $item_wait_time = 1; // strstr($item_token, 'pellet') ? 1 : 2;
-                $robot_turns_active = count($this_robot->history['turns_active']);
-                if ($this_robot->robot_position == 'active' && $robot_turns_active >= $item_wait_time){
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' increases attack/defense/speed by '.$item_restore_value.' stages');
+                $item_restore_trigger = $item_restore_value;
+                if ((!empty($this_robot->counters['attack_breaks_applied']) && $this_robot->counters['attack_breaks_applied'] >= $item_restore_trigger)
+                    || (!empty($this_robot->counters['defense_breaks_applied']) && $this_robot->counters['defense_breaks_applied'] >= $item_restore_trigger)
+                    || (!empty($this_robot->counters['speed_breaks_applied']) && $this_robot->counters['speed_breaks_applied'] >= $item_restore_trigger)){
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores attack/defense/speed by '.$item_restore_value.' stages');
 
                     // Remove the robot's current item now that it's used up in battle
                     $this_robot->set_item('');
@@ -5736,6 +5776,62 @@ class rpg_robot extends rpg_object {
                         if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
                             $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
                         }
+                    }
+
+                    // Reset the applied breaks variable relative to restore amount
+                    $this_robot->counters['attack_breaks_applied'] -= $item_restore_value;
+                    if ($this_robot->counters['attack_breaks_applied'] < 0){ unset($this_robot->counters['attack_breaks_applied']); }
+
+                    // Reset the applied breaks variable relative to restore amount
+                    $this_robot->counters['defense_breaks_applied'] -= $item_restore_value;
+                    if ($this_robot->counters['defense_breaks_applied'] < 0){ unset($this_robot->counters['defense_breaks_applied']); }
+
+                    // Reset the applied breaks variable relative to restore amount
+                    $this_robot->counters['speed_breaks_applied'] -= $item_restore_value;
+                    if ($this_robot->counters['speed_breaks_applied'] < 0){ unset($this_robot->counters['speed_breaks_applied']); }
+
+                }
+
+            }
+            // Else if the robot is holding an elemental ROBOT CORE item, extend shield duration
+            elseif (substr($item_token, -5, 5) === '-core'){
+
+                // If there's a timer, decrement and then move on
+                if (!empty($this_robot->counters['core-shield_cooldown_timer'])){
+                    $this_robot->counters['core-shield_cooldown_timer'] -= 1;
+                    if (empty($this_robot->counters['core-shield_cooldown_timer'])){
+                        unset($this_robot->counters['core-shield_cooldown_timer']);
+                    }
+                }
+                // Otherwise we can regenerate the core shield
+                else {
+
+                    // Collect the elemental type for this core
+                    list($held_core_type) = explode('-', $item_token);
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' extends '.$held_core_type.'-type core shield');
+
+                    // If a core shield already exists, we only need to extend the duration
+                    $base_core_duration = 3;
+                    $core_shield_token = 'ability_core-shield_'.$held_core_type;
+                    if (!empty($this_robot->robot_attachments[$core_shield_token])){
+                        $core_shield_info = $this_robot->robot_attachments[$core_shield_token];
+                        if (empty($core_shield_info['attachment_duration'])
+                            || $core_shield_info['attachment_duration'] < $base_core_duration){
+                            $core_shield_info['attachment_duration'] = $base_core_duration;
+                        }
+                        $core_shield_info['attachment_duration'] += 1;
+                        $this_robot->set_attachment($core_shield_token, $core_shield_info);
+                    }
+                    // otherwise, if not exists, we should create a new shield and attach it
+                    else {
+                        $existing_shields = !empty($this_robot->robot_attachments) ? substr_count(implode('|', array_keys($this_robot->robot_attachments)), 'ability_core-shield_') : 0;
+                        $core_shield_info = rpg_ability::get_static_core_shield($held_core_type, $base_core_duration, $existing_shields);
+                        $this_robot->set_attachment($core_shield_token, $core_shield_info);
+                        $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_item->item_name,
+                            $this_robot->print_name().' triggers '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!<br />'.
+                            'The held item generated a new '.rpg_type::print_span($held_core_type, 'Core Shield').'!',
+                            array('canvas_show_this_item_overlay' => true)
+                            );
                     }
 
                 }

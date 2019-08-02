@@ -1055,28 +1055,6 @@ $(document).ready(function(){
                         // Clone the inner html into the target item link
                         targetItemLink.html(thisItemLink.html()).find('.count').remove();
 
-                        // If the target robot is a copy core, change alts
-                        if (targetRobotCores.indexOf('copy') != -1){
-
-                            // Check if the item token was a robot core, else remove any alt
-                            if (thisItemToken.match(/-core$/i)){
-
-                                // Collect the held item's core type for alt colours
-                                var thisCoreType = thisItemToken.replace(/-core$/i, '');
-                                // Collect the new image name (core type) and trigger function
-                                var newImageToken = thisCoreType;
-                                updateRobotImageAlt(targetPlayerToken, targetRobotToken, newImageToken);
-
-                                } else {
-
-                                // Define the new image name (base) and trigger function
-                                var newImageToken = 'base';
-                                updateRobotImageAlt(targetPlayerToken, targetRobotToken, newImageToken);
-
-                                }
-
-                            }
-
                         }
                     // Otherwise if this was an item remove option, clear stuff
                     else {
@@ -1091,15 +1069,6 @@ $(document).ready(function(){
                         targetItemLink.attr('data-tooltip', '');
                         // Remove the label text and replace with empty hyphen
                         targetItemLink.find('label').attr('style', '').html('No Item <span class="arrow">&#8711;</span>');
-
-                        // If the target robot is a copy core, change alts
-                        if (targetRobotCores.indexOf('copy') != -1){
-
-                            // Define the new image name (base) and trigger function
-                            var newImageToken = 'base';
-                            updateRobotImageAlt(targetPlayerToken, targetRobotToken, newImageToken);
-
-                            }
 
                         }
 

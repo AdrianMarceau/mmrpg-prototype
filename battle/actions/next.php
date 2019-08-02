@@ -54,6 +54,16 @@ foreach ($temp_player_active_robots AS $key => $robot){
         $new_mod_values[$mod_token] = $new_mod_value;
     }
 
+    // Reduce any durations by one if we have to so things don't persist forever
+    $new_robot_attachments = $robot['robot_attachments'];
+    foreach ($new_robot_attachments AS $key => $info){
+        if (isset($info['attachment_duration']) && $info['attachment_duration'] > 0){
+            $info['attachment_duration'] -= 1;
+            $new_robot_attachments[$key] = $info;
+            //if ($info['attachment_duration'] <= 0){ unset($new_robot_attachments[$key]); }
+        }
+    }
+
     // Save this robot's current energy, weapons, attack/defense/speed mods, etc. to the session
     $_SESSION['ROBOTS_PRELOAD'][$this_battle->battle_complete_redirect_token][$robot_string] = array(
         'robot_energy' => $robot['robot_energy'],
@@ -63,7 +73,7 @@ foreach ($temp_player_active_robots AS $key => $robot){
         'robot_speed_mods' => $new_mod_values['speed_mods'],
         'robot_image' => $robot['robot_image'],
         'robot_item' => $robot['robot_item'],
-        'robot_attachments' => $robot['robot_attachments']
+        'robot_attachments' => $new_robot_attachments
         );
 
 }
