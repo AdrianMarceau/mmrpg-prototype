@@ -334,7 +334,8 @@ $this_shop_index['reggae'] = array(
             'field-support', 'mecha-support',
             'experience-booster', 'experience-breaker',
             'recovery-booster', 'recovery-breaker',
-            'damage-booster', 'damage-breaker'
+            'damage-booster', 'damage-breaker',
+            'item-swap'
             )
         ),
     'shop_items' => array(
