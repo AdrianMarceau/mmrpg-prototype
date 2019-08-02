@@ -2546,6 +2546,16 @@ class rpg_robot extends rpg_object {
             $this->$prop_stat = $new_value;
         }
 
+        // If this is a Copy type robot, make sure their colour is synced to held item
+        if ($this->robot_base_core == 'copy'){
+            $this->robot_image = $this->robot_base_image;
+            if (!empty($this->robot_item)
+                && substr($this->robot_item, -5, 5) === '-core'){
+                list($core_type) = explode('-', $this->robot_item);
+                $this->robot_image = $this->robot_base_image.'_'.$core_type;
+            }
+        }
+
         // Reset this robot's elemental properties back to base
         $element_stats = array('weaknesses', 'resistances', 'affinities', 'immunities');
         foreach ($element_stats AS $key => $stat){
