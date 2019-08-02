@@ -764,20 +764,26 @@ class rpg_robot extends rpg_object {
             }
         }
 
+        // Now that we have base amounts, we should backup energy and weapons
+        if (!isset($this->values['robot_base_energy_backup'])){ $this->values['robot_base_energy_backup'] = $this->robot_base_energy; }
+        if (!isset($this->values['robot_base_weapons_backup'])){ $this->values['robot_base_weapons_backup'] = $this->robot_base_weapons; }
+
         // If this robot is holder a relavant item, apply stat upgrades or other effects
         $this_robot_item = $this->get_item();
         if (!empty($this_robot_item)){
 
             // If this robot is holding an Energy Upgrade, double the life energy stat
             if ($this_robot_item == 'energy-upgrade'){
-                $this->robot_energy = $this->robot_energy * 2;
-                $this->robot_base_energy = $this->robot_base_energy * 2;
+                $new_start_energy = $this->values['robot_base_energy_backup'] * 2;
+                $this->robot_energy = $new_start_energy;
+                $this->robot_base_energy = $new_start_energy;
             }
 
             // Else if this robot is holding a Weapon Upgrade, double the weapon energy stat
             if ($this_robot_item == 'weapon-upgrade'){
-                $this->robot_weapons = $this->robot_weapons * 2;
-                $this->robot_base_weapons = $this->robot_base_weapons * 2;
+                $new_start_weapons = $this->values['robot_base_weapons_backup'] * 2;
+                $this->robot_weapons = $new_start_weapons;
+                $this->robot_base_weapons = $new_start_weapons;
             }
 
             // Else if this robot is holding an Elemental Core, apply a temp core shield
@@ -2521,6 +2527,16 @@ class rpg_robot extends rpg_object {
 
         // Calculate this robot's count variables
         $this->counters['abilities_total'] = count($this->robot_abilities);
+
+        // If this robot is holding an ENERGY UPGRADE, double the base amount for now
+        if (!empty($this->robot_item) && $this->robot_item == 'energy-upgrade'){ $this->robot_base_energy = $this->values['robot_base_energy_backup'] * 2; }
+        else { $this->robot_base_energy = $this->values['robot_base_energy_backup']; }
+        if ($this->robot_energy > $this->robot_base_energy){ $this->robot_energy = $this->robot_base_energy; }
+
+        // If this robot is holding an WEAPON UPGRADE, double the base amount for now
+        if (!empty($this->robot_item) && $this->robot_item == 'weapon-upgrade'){ $this->robot_base_weapons = $this->values['robot_base_weapons_backup'] * 2; }
+        else { $this->robot_base_weapons = $this->values['robot_base_weapons_backup']; }
+        if ($this->robot_weapons > $this->robot_base_weapons){ $this->robot_weapons = $this->robot_base_weapons; }
 
         // Recalculate this robot's effective stats based on modifiers
         $stat_tokens = array('attack', 'defense', 'speed');

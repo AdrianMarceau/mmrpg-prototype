@@ -253,55 +253,6 @@ $ability = array(
                         }
                     }
 
-                    // IF CORE OR UPGRADE WE NEED TO ADJUST STATS!
-                    // If the new item has effects that need manual application, do so now
-                    if ($new_item_token == 'energy-upgrade'){
-                        //$this_battle->events_create(false, false, 'debug', 'The stolen item was a life energy upgrade!');
-                        $this_current_energy = $this_robot->robot_energy;
-                        $this_current_base_energy = $this_robot->robot_base_energy;
-                        $this_new_energy = ceil($this_current_energy * 2);
-                        $this_new_base_energy = ceil($this_current_base_energy * 2);
-                        /*
-                        //$this_battle->events_create(false, false, 'debug',
-                            '$this_current_energy = '.$this_current_energy.
-                            ' / '.'$this_current_base_energy = '.$this_current_base_energy.
-                            ' <br /> '.'$this_new_energy = '.$this_new_energy.
-                            ' / '.'$this_new_base_energy = '.$this_new_base_energy.
-                            '');
-                        */
-                        $this_robot->robot_energy = $this_new_energy;
-                        $this_robot->robot_base_energy = $this_new_base_energy;
-                        $this_robot->update_session();
-                    } elseif ($new_item_token == 'weapon-upgrade'){
-                        //$this_battle->events_create(false, false, 'debug', 'The stolen item was a weapon energy upgrade!');
-                        $this_current_energy = $this_robot->robot_weapons;
-                        $this_current_base_energy = $this_robot->robot_base_weapons;
-                        $this_new_energy = ceil($this_current_energy * 2);
-                        $this_new_base_energy = ceil($this_current_base_energy * 2);
-                        /*
-                        //$this_battle->events_create(false, false, 'debug',
-                            '$this_current_energy = '.$this_current_energy.
-                            ' / '.'$this_current_base_energy = '.$this_current_base_energy.
-                            ' <br /> '.'$this_new_energy = '.$this_new_energy.
-                            ' / '.'$this_new_base_energy = '.$this_new_base_energy.
-                            '');
-                            */
-                        $this_robot->robot_weapons = $this_new_energy;
-                        $this_robot->robot_base_weapons = $this_new_base_energy;
-                        $this_robot->update_session();
-                    } elseif (strstr($new_item_token, '-core')){
-                        //$this_battle->events_create(false, false, 'debug', 'The stolen item was a robot core!');
-                        $new_core_type = preg_replace('/-core$/', '', $new_item_token);
-                        $existing_shields = !empty($this_robot->robot_attachments) ? substr_count(implode('|', array_keys($this_robot->robot_attachments)), 'ability_core-shield_') : 0;
-                        $shield_info = rpg_ability::get_static_core_shield($new_core_type, 3, $existing_shields);
-                        $shield_token = $shield_info['attachment_token'];
-                        $shield_duration = $shield_info['attachment_duration'];
-                        if (!isset($this_robot->robot_attachments[$shield_token])){ $this_robot->robot_attachments[$shield_token] = $shield_info; }
-                        else { $this_robot->robot_attachments[$shield_token]['attachment_duration'] += $shield_duration; }
-                        $this_robot->update_session();
-                    }
-
-
                     // Adjust the position of the ability attachment and show it moving before removing
                     $ability_attachment_info['ability_frame_offset'] = array('x' => -90, 'y' => 30, 'z' => -21);
                     $this_robot->robot_attachments[$ability_attachment_token] = $ability_attachment_info;

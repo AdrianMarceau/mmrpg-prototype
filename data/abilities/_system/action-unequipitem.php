@@ -48,42 +48,8 @@ $ability = array(
             $this_robot->robot_item = '';
             $this_robot->update_session();
 
-            // If the old item happened to be a life or weapon energy upgrade, recalculate stats
-            if ($old_item_token == 'energy-upgrade'){
-                //$this_battle->events_create(false, false, 'debug', 'The knocked-off item was a life energy upgrade!');
-                $this_current_energy = $this_robot->robot_energy;
-                $this_current_base_energy = $this_robot->robot_base_energy;
-                $this_new_energy = ceil($this_current_energy / 2);
-                $this_new_base_energy = ceil($this_current_base_energy / 2);
-                /*
-                $this_battle->events_create(false, false, 'debug',
-                    '$this_current_energy = '.$this_current_energy.
-                    ' / '.'$this_current_base_energy = '.$this_current_base_energy.
-                    ' <br /> '.'$this_new_energy = '.$this_new_energy.
-                    ' / '.'$this_new_base_energy = '.$this_new_base_energy.
-                    '');
-                */
-                $this_robot->robot_energy = $this_new_energy;
-                $this_robot->robot_base_energy = $this_new_base_energy;
-                $this_robot->update_session();
-            } elseif ($old_item_token == 'weapon-upgrade'){
-                //$this_battle->events_create(false, false, 'debug', 'The knocked-off item was a weapon energy upgrade!');
-                $this_current_energy = $this_robot->robot_weapons;
-                $this_current_base_energy = $this_robot->robot_base_weapons;
-                $this_new_energy = ceil($this_current_energy / 2);
-                $this_new_base_energy = ceil($this_current_base_energy / 2);
-                /*
-                $this_battle->events_create(false, false, 'debug',
-                    '$this_current_energy = '.$this_current_energy.
-                    ' / '.'$this_current_base_energy = '.$this_current_base_energy.
-                    ' <br /> '.'$this_new_energy = '.$this_new_energy.
-                    ' / '.'$this_new_base_energy = '.$this_new_base_energy.
-                    '');
-                    */
-                $this_robot->robot_weapons = $this_new_energy;
-                $this_robot->robot_base_weapons = $this_new_base_energy;
-                $this_robot->update_session();
-            } elseif (strstr($old_item_token, '-core')){
+            // If the old item happened to be a robot core, we may need to summon a shield
+            if (strstr($old_item_token, '-core')){
                 //$this_battle->events_create(false, false, 'debug', 'The knocked-off item was a robot core!');
                 $lost_core_type = preg_replace('/-core$/', '', $old_item_token);
                 $possible_attachment_token = 'ability_core-shield_'.$lost_core_type;
@@ -91,20 +57,6 @@ $ability = array(
                     $this_robot->robot_attachments[$possible_attachment_token]['attachment_duration'] = 0;
                     unset($this_robot->robot_attachments[$possible_attachment_token]);
                     $this_robot->update_session();
-                }
-                if ($this_robot->robot_base_core == 'copy'
-                    && $this_robot->robot_image == $this_robot->robot_token.'_'.$lost_core_type){
-                    $this_robot->robot_image = $this_robot->robot_token;
-                    $this_robot->update_session();
-                    if ($this_player->player_side == 'left'
-                        && empty($this_battle->flags['player_battle'])
-                        && empty($this_battle->flags['challenge_battle'])){
-                        $ptoken = $this_player->player_token;
-                        $rtoken = $this_robot->robot_token;
-                        if (!empty($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_image'])){
-                            unset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_image']);
-                        }
-                    }
                 }
             }
 
