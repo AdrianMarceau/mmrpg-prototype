@@ -6,7 +6,7 @@ $ability = array(
     'ability_game' => 'MM00',
     'ability_group' => 'MM00/Weapons/T0',
     'ability_image_sheets' => 0,
-    'ability_description' => 'The user takes a defensive stance and charges themselves to completely restore depleted weapon energy!',
+    'ability_description' => 'The user takes a defensive stance and charges themselves to completely restore depleted weapon energy! When used by a support robot, this ability can optionally charge an ally instead of the user!',
     'ability_energy' => 0,
     'ability_recovery2' => 100,
     'ability_recovery_percent2' => true,
@@ -16,6 +16,10 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
+        // Create a reference to the target robot, whichever one it is
+        if ($this_robot->player_id == $target_robot->player_id){ $temp_target_robot = $target_robot; }
+        else { $temp_target_robot = $this_robot; }
+
         // Update the ability's target options and trigger
         $this_ability->target_options_update(array(
             'frame' => 'defend',
@@ -24,7 +28,7 @@ $ability = array(
         $this_robot->trigger_target($this_robot, $this_ability);
 
         // If the target of this ability is not the user
-        if ($target_robot->robot_id != $this_robot->robot_id){
+        if ($temp_target_robot->robot_id != $this_robot->robot_id){
 
             // Recover the target robot's weapon energy
             $this_ability->recovery_options_update(array(
@@ -35,9 +39,9 @@ $ability = array(
                 'success' => array(0, 0, 0, -10, 'The '.$this_ability->print_name().' restored depleted power!'),
                 'failure' => array(0, 0, 0, -10, 'The '.$this_ability->print_name().' had no effect&hellip;')
                 ));
-            $weapons_recovery_amount = ceil($target_robot->robot_base_weapons * ($this_ability->ability_recovery2 / 100));
+            $weapons_recovery_amount = ceil($temp_target_robot->robot_base_weapons * ($this_ability->ability_recovery2 / 100));
             $trigger_options = array('apply_modifiers' => false, 'apply_position_modifiers' => false, 'apply_stat_modifiers' => false);
-            $target_robot->trigger_recovery($this_robot, $this_ability, $weapons_recovery_amount, true, $trigger_options);
+            $temp_target_robot->trigger_recovery($this_robot, $this_ability, $weapons_recovery_amount, true, $trigger_options);
 
         }
         // Otherwise if the user if targeting themselves

@@ -5,7 +5,7 @@ $ability = array(
     'ability_token' => 'energy-break',
     'ability_game' => 'MMRPG',
     'ability_group' => 'MMRPG/Support/Energy',
-    'ability_description' => 'The user bypasses the target\'s shields to deal direct life enery damage of up to {DAMAGE}%!',
+    'ability_description' => 'The user bypasses the target\'s shields to deal direct life enery damage of up to {DAMAGE}%! When used by a support robot, this ability can optionally target the bench instead of the active position!',
     'ability_energy' => 6,
     'ability_damage' => 20,
     'ability_damage_percent' => true,
@@ -45,11 +45,9 @@ $ability = array(
         extract($objects);
 
         // If used by support robot OR the has a Target Module, allow bench targetting
-        $temp_support_robots = array('roll', 'disco', 'rhythm');
-        if ($this_robot->robot_class == 'mecha'
-            || in_array($this_robot->robot_token, $temp_support_robots)
-            || $this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
-        else { $this_ability->reset_target(); }
+        if ($this_robot->robot_core === '' || $this_robot->robot_class == 'mecha'){ $this_ability->set_target('select_target'); }
+        elseif ($this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
+        else { $this_ability->set_target('auto'); }
 
         // Return true on success
         return true;
