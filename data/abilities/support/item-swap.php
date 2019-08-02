@@ -117,43 +117,8 @@ $ability = array(
                 }
             }
 
-            // IF CORE OR UPGRADE WE NEED TO ADJUST STATS!
-            // If the new item has effects that need manual application, do so now
-            if ($this_new_item_token == 'energy-upgrade'){
-                //$this_battle->events_create(false, false, 'debug', 'The stolen item was a life energy upgrade!');
-                $this_current_energy = $this_robot->robot_energy;
-                $this_current_base_energy = $this_robot->robot_base_energy;
-                $this_new_energy = ceil($this_current_energy * 2);
-                $this_new_base_energy = ceil($this_current_base_energy * 2);
-                /*
-                //$this_battle->events_create(false, false, 'debug',
-                    '$this_current_energy = '.$this_current_energy.
-                    ' / '.'$this_current_base_energy = '.$this_current_base_energy.
-                    ' <br /> '.'$this_new_energy = '.$this_new_energy.
-                    ' / '.'$this_new_base_energy = '.$this_new_base_energy.
-                    '');
-                */
-                $this_robot->robot_energy = $this_new_energy;
-                $this_robot->robot_base_energy = $this_new_base_energy;
-                $this_robot->update_session();
-            } elseif ($this_new_item_token == 'weapon-upgrade'){
-                //$this_battle->events_create(false, false, 'debug', 'The stolen item was a weapon energy upgrade!');
-                $this_current_energy = $this_robot->robot_weapons;
-                $this_current_base_energy = $this_robot->robot_base_weapons;
-                $this_new_energy = ceil($this_current_energy * 2);
-                $this_new_base_energy = ceil($this_current_base_energy * 2);
-                /*
-                //$this_battle->events_create(false, false, 'debug',
-                    '$this_current_energy = '.$this_current_energy.
-                    ' / '.'$this_current_base_energy = '.$this_current_base_energy.
-                    ' <br /> '.'$this_new_energy = '.$this_new_energy.
-                    ' / '.'$this_new_base_energy = '.$this_new_base_energy.
-                    '');
-                    */
-                $this_robot->robot_weapons = $this_new_energy;
-                $this_robot->robot_base_weapons = $this_new_base_energy;
-                $this_robot->update_session();
-            } elseif (strstr($this_new_item_token, '-core')){
+            // If the new item is a robot core, we need to summon and core shield
+            if (strstr($this_new_item_token, '-core')){
                 //$this_battle->events_create(false, false, 'debug', 'The stolen item was a robot core!');
                 $new_core_type = preg_replace('/-core$/', '', $this_new_item_token);
                 $existing_shields = !empty($this_robot->robot_attachments) ? substr_count(implode('|', array_keys($this_robot->robot_attachments)), 'ability_core-shield_') : 0;
@@ -164,6 +129,7 @@ $ability = array(
                 else { $this_robot->robot_attachments[$shield_token]['attachment_duration'] += $shield_duration; }
                 $this_robot->update_session();
             }
+
         }
 
         // Collect the target's new item token if set, then update
@@ -182,43 +148,8 @@ $ability = array(
                 }
             }
 
-            // IF CORE OR UPGRADE WE NEED TO ADJUST STATS!
-            // If the new item has effects that need manual application, do so now
-            if ($target_new_item_token == 'energy-upgrade'){
-                //$this_battle->events_create(false, false, 'debug', 'The stolen item was a life energy upgrade!');
-                $target_current_energy = $target_robot->robot_energy;
-                $target_current_base_energy = $target_robot->robot_base_energy;
-                $target_new_energy = ceil($target_current_energy * 2);
-                $target_new_base_energy = ceil($target_current_base_energy * 2);
-                /*
-                //$this_battle->events_create(false, false, 'debug',
-                    '$target_current_energy = '.$target_current_energy.
-                    ' / '.'$target_current_base_energy = '.$target_current_base_energy.
-                    ' <br /> '.'$target_new_energy = '.$target_new_energy.
-                    ' / '.'$target_new_base_energy = '.$target_new_base_energy.
-                    '');
-                */
-                $target_robot->robot_energy = $target_new_energy;
-                $target_robot->robot_base_energy = $target_new_base_energy;
-                $target_robot->update_session();
-            } elseif ($target_new_item_token == 'weapon-upgrade'){
-                //$this_battle->events_create(false, false, 'debug', 'The stolen item was a weapon energy upgrade!');
-                $target_current_energy = $target_robot->robot_weapons;
-                $target_current_base_energy = $target_robot->robot_base_weapons;
-                $target_new_energy = ceil($target_current_energy * 2);
-                $target_new_base_energy = ceil($target_current_base_energy * 2);
-                /*
-                //$this_battle->events_create(false, false, 'debug',
-                    '$target_current_energy = '.$target_current_energy.
-                    ' / '.'$target_current_base_energy = '.$target_current_base_energy.
-                    ' <br /> '.'$target_new_energy = '.$target_new_energy.
-                    ' / '.'$target_new_base_energy = '.$target_new_base_energy.
-                    '');
-                    */
-                $target_robot->robot_weapons = $target_new_energy;
-                $target_robot->robot_base_weapons = $target_new_base_energy;
-                $target_robot->update_session();
-            } elseif (strstr($target_new_item_token, '-core')){
+            // If the new item is a robot core, we need to summon and core shield
+            if (strstr($target_new_item_token, '-core')){
                 //$this_battle->events_create(false, false, 'debug', 'The stolen item was a robot core!');
                 $new_core_type = preg_replace('/-core$/', '', $target_new_item_token);
                 $existing_shields = !empty($target_robot->robot_attachments) ? substr_count(implode('|', array_keys($target_robot->robot_attachments)), 'ability_core-shield_') : 0;

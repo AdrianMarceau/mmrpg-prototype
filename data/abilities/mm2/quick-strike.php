@@ -83,60 +83,6 @@ $ability = array(
                 ));
             $target_robot->trigger_target($target_robot, $old_item, array('prevent_default_text' => true));
 
-            // If the old item happened to be a life or weapon energy upgrade, recalculate stats
-            if ($old_item_token == 'energy-upgrade'){
-                //$this_battle->events_create(false, false, 'debug', 'The knocked-off item was a life energy upgrade!');
-                $target_current_energy = $target_robot->robot_energy;
-                $target_current_base_energy = $target_robot->robot_base_energy;
-                $target_new_energy = ceil($target_current_energy / 2);
-                $target_new_base_energy = ceil($target_current_base_energy / 2);
-                /*
-                $this_battle->events_create(false, false, 'debug',
-                    '$target_current_energy = '.$target_current_energy.
-                    ' / '.'$target_current_base_energy = '.$target_current_base_energy.
-                    ' <br /> '.'$target_new_energy = '.$target_new_energy.
-                    ' / '.'$target_new_base_energy = '.$target_new_base_energy.
-                    '');
-                */
-                $target_robot->robot_energy = $target_new_energy;
-                $target_robot->robot_base_energy = $target_new_base_energy;
-                $target_robot->update_session();
-            } elseif ($old_item_token == 'weapon-upgrade'){
-                //$this_battle->events_create(false, false, 'debug', 'The knocked-off item was a weapon energy upgrade!');
-                $target_current_energy = $target_robot->robot_weapons;
-                $target_current_base_energy = $target_robot->robot_base_weapons;
-                $target_new_energy = ceil($target_current_energy / 2);
-                $target_new_base_energy = ceil($target_current_base_energy / 2);
-                /*
-                $this_battle->events_create(false, false, 'debug',
-                    '$target_current_energy = '.$target_current_energy.
-                    ' / '.'$target_current_base_energy = '.$target_current_base_energy.
-                    ' <br /> '.'$target_new_energy = '.$target_new_energy.
-                    ' / '.'$target_new_base_energy = '.$target_new_base_energy.
-                    '');
-                    */
-                $target_robot->robot_weapons = $target_new_energy;
-                $target_robot->robot_base_weapons = $target_new_base_energy;
-                $target_robot->update_session();
-            } elseif (strstr($old_item_token, '-core')){
-                //$this_battle->events_create(false, false, 'debug', 'The knocked-off item was a robot core!');
-                $lost_core_type = preg_replace('/-core$/', '', $old_item_token);
-                if ($target_robot->robot_base_core == 'copy'
-                    && $target_robot->robot_image == $target_robot->robot_token.'_'.$lost_core_type){
-                    $target_robot->robot_image = $target_robot->robot_token;
-                    $target_robot->update_session();
-                    if ($target_player->player_side == 'left'
-                        && empty($this_battle->flags['player_battle'])
-                        && empty($this_battle->flags['challenge_battle'])){
-                        $ptoken = $target_player->player_token;
-                        $rtoken = $target_robot->robot_token;
-                        if (!empty($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_image'])){
-                            unset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_image']);
-                        }
-                    }
-                }
-            }
-
             // Remove the visual icon attachment from the target
             unset($target_robot->robot_attachments[$this_attachment_token]);
             $target_robot->update_session();
