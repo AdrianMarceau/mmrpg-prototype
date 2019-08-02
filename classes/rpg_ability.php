@@ -2327,6 +2327,10 @@ class rpg_ability extends rpg_object {
             $trigger_ability->target_options_update(array('frame' => 'taunt', 'success' => array($success_frame, -2, 0, -10, $extra_text.$target_robot->print_name().'&#39;s '.$stat_type.' '.$boost_text.$amount_text.'!')));
             $target_robot->trigger_target($target_robot, $trigger_ability);
 
+            // Update the robot's counter for applied mods
+            if (!isset($target_robot->counters[$stat_type.'_boosts_applied'])){ $target_robot->counters[$stat_type.'_boosts_applied'] = 0; }
+            $target_robot->counters[$stat_type.'_boosts_applied'] += $rel_boost_amount;
+
         } else {
 
             // Target this robot's self to show the failure message
@@ -2426,6 +2430,11 @@ class rpg_ability extends rpg_object {
             $trigger_ability->set_flag('skip_canvas_header', true);
             $trigger_ability->target_options_update(array('frame' => 'defend', 'success' => array($success_frame, -2, 0, -10, $extra_text.$target_robot->print_name().'&#39;s '.$stat_type.' '.$break_text.$amount_text.'!')));
             $target_robot->trigger_target($target_robot, $trigger_ability);
+
+            // Update the robot's counter for applied mods
+            if (!isset($target_robot->counters[$stat_type.'_breaks_applied'])){ $target_robot->counters[$stat_type.'_breaks_applied'] = 0; }
+            $target_robot->counters[$stat_type.'_breaks_applied'] += $rel_break_amount;
+            $target_robot->update_session();
 
         } else {
 
