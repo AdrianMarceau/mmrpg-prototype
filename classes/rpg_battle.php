@@ -2688,6 +2688,13 @@ class rpg_battle extends rpg_object {
         }
         $this->counters['robots_perside_max'] = $perside_max;
 
+        // Define whether we're allowed to use experience or not
+        $this->flags['allow_experience_points'] = true;
+        if (!empty($this->flags['player_battle'])
+            || !empty($this->flags['challenge_battle'])){
+            $this->flags['allow_experience_points'] = false;
+        }
+
         // Return true on success
         return true;
 

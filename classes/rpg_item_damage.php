@@ -421,34 +421,34 @@ class rpg_item_damage extends rpg_damage {
                     if (isset($this_robot->counters['triggered_weakness'])){ $this_robot->counters['triggered_weakness'] += 1; }
                     else { $this_robot->counters['triggered_weakness'] = 1; }
                     if ($this_item->damage_options['damage_kind'] == 'energy' && $this_robot->player->player_side == 'right'){
-                        $this_robot->field->field_multipliers['experience'] += 0.1;
+                        if ($this_battle->flags['allow_experience_points']){ $this_robot->field->field_multipliers['experience'] += 0.1; }
                         $this_item->damage_options['damage_kickback']['x'] = ceil($this_item->damage_options['damage_kickback']['x'] * 2);
                     }
-                    //elseif ($this_robot->player->player_side == 'left'){ $this_robot->field->field_multipliers['experience'] -= 0.1; }
                 }
                 if (!empty($this_item->item_results['flag_affinity'])){
                     $this_robot->flags['triggered_affinity'] = true;
                     if (isset($this_robot->counters['triggered_affinity'])){ $this_robot->counters['triggered_affinity'] += 1; }
                     else { $this_robot->counters['triggered_affinity'] = 1; }
-                    if ($this_item->damage_options['damage_kind'] == 'energy' && $this_robot->player->player_side == 'right'){ $this_robot->field->field_multipliers['experience'] -= 0.1; }
-                    //elseif ($this_robot->player->player_side == 'left'){ $this_robot->field->field_multipliers['experience'] += 0.1; }
+                    if ($this_item->damage_options['damage_kind'] == 'energy' && $this_robot->player->player_side == 'right'){
+                        if ($this_battle->flags['allow_experience_points']){ $this_robot->field->field_multipliers['experience'] -= 0.1; }
+                    }
                 }
                 if (!empty($this_item->item_results['flag_resistance'])){
                     $this_robot->flags['triggered_resistance'] = true;
                     if (isset($this_robot->counters['triggered_resistance'])){ $this_robot->counters['triggered_resistance'] += 1; }
                     else { $this_robot->counters['triggered_resistance'] = 1; }
-                    if ($this_item->damage_options['damage_kind'] == 'energy' && $this_robot->player->player_side == 'right'){ $this_robot->field->field_multipliers['experience'] -= 0.1; }
-                    //elseif ($this_robot->player->player_side == 'left'){ $this_robot->field->field_multipliers['experience'] += 0.1; }
+                    if ($this_item->damage_options['damage_kind'] == 'energy' && $this_robot->player->player_side == 'right'){
+                        if ($this_battle->flags['allow_experience_points']){ $this_robot->field->field_multipliers['experience'] -= 0.1; }
+                    }
                 }
                 if (!empty($this_item->item_results['flag_critical'])){
                     $this_robot->flags['triggered_critical'] = true;
                     if (isset($this_robot->counters['triggered_critical'])){ $this_robot->counters['triggered_critical'] += 1; }
                     else { $this_robot->counters['triggered_critical'] = 1; }
                     if ($this_item->damage_options['damage_kind'] == 'energy' && $this_robot->player->player_side == 'right'){
-                        $this_robot->field->field_multipliers['experience'] += 0.1;
+                        if ($this_battle->flags['allow_experience_points']){ $this_robot->field->field_multipliers['experience'] += 0.1; }
                         $this_item->damage_options['damage_kickback']['x'] = ceil($this_item->damage_options['damage_kickback']['x'] * 2);
                     }
-                    //elseif ($this_robot->player->player_side == 'left'){ $this_robot->field->field_multipliers['experience'] -= 0.1; }
                 }
 
             }
