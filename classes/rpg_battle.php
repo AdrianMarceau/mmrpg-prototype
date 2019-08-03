@@ -1092,14 +1092,37 @@ class rpg_battle extends rpg_object {
             $first_event_body_head = $is_final_battle ? 'Mission complete! ' : 'Battle complete! ';
             $first_event_body_head .= rpg_battle::random_victory_quote().($temp_human_rewards['battle_complete'] > 1 ? ' That&#39;s '.$temp_human_rewards['battle_complete'].' times now! '.rpg_battle::random_positive_word() : '');
         } elseif ($this->battle_result == 'defeat'){
-            $first_event_body_head = $is_final_battle ? 'Mission failure. ' : 'Battle failure. ';
-            $first_event_body_head .= rpg_battle::random_defeat_quote().($temp_human_rewards['battle_failure'] > 1 ? '<br /> That&#39;s '.$temp_human_rewards['battle_failure'].' times now&hellip; ' : '');
+            // If this is an ENDLESS ATTACK MODE battle, show a special more positive message
+            if (!empty($this->flags['challenge_battle']) && !empty($this->flags['endless_battle'])){
+                $temp_current_wave = !empty($_SESSION['BATTLES_CHAIN']) ? (count($_SESSION['BATTLES_CHAIN']) + 1) : 1;
+                $first_event_body_head = 'Wave failure.  Mission #'.$temp_current_wave.' not completed.  Maybe try again? ';
+            }
+            // Otherwise if this is a normal battle, defeat is a little bit more netaive
+            else {
+                $first_event_body_head = $is_final_battle ? 'Mission failure. ' : 'Battle failure. ';
+                $first_event_body_head .= rpg_battle::random_defeat_quote().($temp_human_rewards['battle_failure'] > 1 ? '<br /> That&#39;s '.$temp_human_rewards['battle_failure'].' times now&hellip; ' : '');
+            }
         }
         //$first_event_body = '<div style="border-bottom: 1px solid rgba(0, 0, 0, 0.1); padding: 0 0 3px; margin: 0 0 3px;">'.$first_event_body.'</div> ';
         //$first_event_body .= '<br />';
 
-        // Print out the base reward amount
-        $first_event_body_details = 'Base Reward: '.number_format($this->battle_zenny, 0, '.', ',').'&#438;';
+        // If this is an ENDLESS ATTACK MODE battle, show the current record
+        if (!empty($this->flags['challenge_battle'])
+            && !empty($this->flags['endless_battle'])){
+            $current_user_id = rpg_user::get_current_userid();
+            $old_waves_completed = (int)($db->get_value("SELECT challenge_waves_completed FROM mmrpg_challenges_waveboard WHERE user_id = {$current_user_id} AND challenge_result = 'victory';", 'challenge_waves_completed'));
+            if (!empty($old_waves_completed)){ $personal_wave_record = $old_waves_completed; }
+            else { $personal_wave_record = 0; }
+            $global_waves_completed = (int)($db->get_value("SELECT MAX(challenge_waves_completed) AS max_waves_completed FROM mmrpg_challenges_waveboard WHERE challenge_result = 'victory';", 'max_waves_completed'));
+            if (!empty($global_waves_completed)){ $global_wave_record = $global_waves_completed; }
+            else { $global_wave_record = 0; }
+            $first_event_body_details = 'Your Record: '.number_format($personal_wave_record, 0, '.', ',').' ';
+            $first_event_body_details .= '| Global Record: '.number_format($global_waves_completed, 0, '.', ',').' ';
+        }
+        // Otherwise print out the base reward amount
+        else {
+            $first_event_body_details = 'Base Reward: '.number_format($this->battle_zenny, 0, '.', ',').'&#438;';
+        }
 
         // Print out the bonus and rewards based on the above stats
         if ($this->battle_result == 'victory'){
@@ -1258,8 +1281,17 @@ class rpg_battle extends rpg_object {
         // Otherwise if defeated, do nothing
         else {
 
-            // Do nothing for now
-            $first_event_body_foot = 'Final Reward : 0z';
+            // If this is an ENDLESS ATTACK MODE battle, show the sum of ALL battles as the final zenny reward
+            if (!empty($this->flags['challenge_battle'])
+                && !empty($this->flags['endless_battle'])){
+                $temp_zenny_value = 0;
+                if (!empty($_SESSION['BATTLES_CHAIN'])){ foreach ($_SESSION['BATTLES_CHAIN'] AS $key => $info){ $temp_zenny_value += $info['battle_zenny_earned']; } }
+                $first_event_body_foot = 'Final Reward : '.number_format($temp_zenny_value, 0, '.', ',').'&#438;';
+            }
+            // Otherwise if normal battle, show the values of THIS battle as the final zenny reward
+            else {
+                $first_event_body_foot = 'Final Reward : 0&#438;';
+            }
 
         }
 
