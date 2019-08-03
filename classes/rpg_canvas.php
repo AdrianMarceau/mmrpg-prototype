@@ -1946,7 +1946,8 @@ class rpg_canvas {
                 $result_class = 'nature';
             }
             elseif ($this_battle->battle_result == 'defeat') {
-                $result_text = $is_final_battle ? 'Mission Failure&hellip;' : 'Battle Failure&hellip;';
+                if (!empty($this_battle->flags['challenge_battle']) && !empty($this_battle->flags['endless_battle'])){ $result_text = 'Wave Failure&hellip;'; }
+                else { $result_text = $is_final_battle ? 'Mission Failure&hellip;' : 'Battle Failure&hellip;'; }
                 $result_class = 'flame';
             }
             if (!empty($this_markup) && $this_battle->battle_status == 'complete' || $this_battle->battle_result == 'defeat'){

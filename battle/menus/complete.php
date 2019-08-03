@@ -46,17 +46,34 @@ ob_start();
     }
     // Otherwise if this robot has been disabled (WE FAIL!)
     else {
-        // Display available main actions
-        ?><div class="main_actions"><?
-        ?><a class="button action_ability button_disabled" type="button"><label>Mission Failure&hellip;</label></a><?
-        ?></div><?
-        // Display the available sub options
-        ?><div class="sub_actions"><?
-        ?><a class="button action_scan button_disabled" type="button">&nbsp;</a><?
-        ?><a class="button action_item" data-action="prototype" type="button" data-order="1"><label>Exit Mission</label></a><?
-        ?><a class="button action_option" data-action="restart" type="button" data-order="2"><label>Retry Battle</label></a><?
-        ?><a class="button action_switch button_disabled" type="button">&nbsp;</a><?
-        ?></div><?
+        // If this is an ENDLESS ATTACK MODE battle, we show a slightly different end screen
+        if (!empty($this_battle->flags['challenge_battle']) && !empty($this_battle->flags['endless_battle'])){
+            // Display available main actions
+            ?><div class="main_actions"><?
+            ?><a class="button action_ability button_disabled" type="button"><label>Wave Failure&hellip;</label></a><?
+            ?></div><?
+            // Display the available sub options
+            ?><div class="sub_actions"><?
+            ?><a class="button action_scan button_disabled" type="button">&nbsp;</a><?
+            ?><a class="button action_item" data-action="prototype" type="button" data-order="1"><label>Exit Mission</label></a><?
+            ?><a class="button action_option" data-action="restart" type="button" data-order="2"><label>Retry Wave</label></a><?
+            ?><a class="button action_switch button_disabled" type="button">&nbsp;</a><?
+            ?></div><?
+        }
+        // Otherwise if this is any other kind of battle, we can display the default end screen
+        else {
+            // Display available main actions
+            ?><div class="main_actions"><?
+            ?><a class="button action_ability button_disabled" type="button"><label>Mission Failure&hellip;</label></a><?
+            ?></div><?
+            // Display the available sub options
+            ?><div class="sub_actions"><?
+            ?><a class="button action_scan button_disabled" type="button">&nbsp;</a><?
+            ?><a class="button action_item" data-action="prototype" type="button" data-order="1"><label>Exit Mission</label></a><?
+            ?><a class="button action_option" data-action="restart" type="button" data-order="2"><label>Retry Battle</label></a><?
+            ?><a class="button action_switch button_disabled" type="button">&nbsp;</a><?
+            ?></div><?
+        }
     }
 $actions_markup['battle'] = trim(ob_get_clean());
 $actions_markup['battle'] = preg_replace('#\s+#', ' ', $actions_markup['battle']);
