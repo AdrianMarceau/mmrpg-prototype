@@ -15,7 +15,8 @@ $ability = array(
         extract($objects);
 
         // If the multiplier is already at the limit of 0x, this ability fails
-        if (isset($this_field->field_multipliers['experience']) && $this_field->field_multipliers['experience'] <= MMRPG_SETTINGS_MULTIPLIER_MIN){
+        if (isset($this_field->field_multipliers['experience'])
+            && $this_field->field_multipliers['experience'] <= MMRPG_SETTINGS_MULTIPLIER_MIN){
 
             // Target this robot's self and show the ability failing
             $this_ability->target_options_update(array(
@@ -30,6 +31,18 @@ $ability = array(
             // Return true on success (well, failure, but whatever)
             return true;
 
+        }
+        // Else if this is a challenge or a player battle, this ability also fails
+        elseif (!$this_battle->flags['allow_experience_points']){
+            $this_ability->target_options_update(array(
+                'frame' => 'summon',
+                'success' => array(9, 0, 0, -10,
+                    $this_robot->print_name().' activated the '.$this_ability->print_name().'!<br />'.
+                    'But experience multipliers have no effect here!'
+                    )
+                ));
+            $this_robot->trigger_target($this_robot, $this_ability, array('prevent_default_text' => true));
+            return false;
         }
 
         // Target this robot's self and show the ability triggering
