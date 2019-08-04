@@ -2,6 +2,93 @@
 
 // -- NEXT BATTLE ACTION -- //
 
+// Pre-collect the redirect token (in case we need to change it)
+if (!empty($this_battle->battle_complete_redirect_token)){ $battle_complete_redirect_token = $this_battle->battle_complete_redirect_token; }
+$battle_complete_redirect_token = $this_battle->battle_token;
+
+// If this is a STAR FIELD battle, break apart the next action
+if (!empty($this_battle->flags['starfield_mission'])){
+
+    // Break apart the action token into the requested star type, else return to home if we can't
+    if (empty($this_action_token) || !strstr($this_action_token, '-star')){ $this_redirect = 'prototype.php?'.($flag_wap ? 'wap=true' : ''); return; }
+    list($next_star_type) = explode('-', $this_action_token);
+
+    //echo('$_GET = '.print_r($_GET, true).PHP_EOL);
+    //echo('$this_action = '.print_r($this_action, true).PHP_EOL);
+    //echo('$this_action_token = '.print_r($this_action_token, true).PHP_EOL);
+    //echo('$next_star_type = '.print_r($next_star_type, true).PHP_EOL.PHP_EOL);
+
+    // Collect a list of available stars still left for the player to encounter
+    $temp_remaining_stars = mmrpg_prototype_remaining_stars(true);
+    $temp_remaining_stars_types = array();
+    if (!empty($temp_remaining_stars)){
+        foreach ($temp_remaining_stars AS $token => $details){
+            if (!empty($details['info1']['type'])){
+                $type1 = $details['info1']['type'];
+                if (!isset($temp_remaining_stars_types[$type1])){ $temp_remaining_stars_types[$type1] = array(); }
+                $temp_remaining_stars_types[$type1][] = $token;
+            }
+            if (!empty($details['info2']['type'])){
+                $type2 = $details['info2']['type'];
+                if (!isset($temp_remaining_stars_types[$type2])){ $temp_remaining_stars_types[$type2] = array(); }
+                $temp_remaining_stars_types[$type2][] = $token;
+            }
+        }
+    }
+
+    // Ensure there is a star for the requested type, else return to home if we can't
+    if (empty($temp_remaining_stars_types[$next_star_type])){ $this_redirect = 'prototype.php?'.($flag_wap ? 'wap=true' : ''); return; }
+    $next_star_options = $temp_remaining_stars_types[$next_star_type];
+    $next_star_token = $next_star_options[mt_rand(0, (count($next_star_options) - 1))];
+    $next_star_info = $temp_remaining_stars[$next_star_token];
+
+    //echo('$next_star_token = '.print_r($next_star_token, true).PHP_EOL);
+    //echo('$next_star_info = '.print_r($next_star_info, true).PHP_EOL.PHP_EOL);
+
+    // Collect basic star variables necessary to generating next battle
+    $info = $next_star_info['info1'];
+    $info2 = $next_star_info['info2'];
+    $next_star_level = $this_battle->battle_level + 1;
+    if ($next_star_level > 100){ $next_star_level = 100; }
+
+    // Generate the pseudo prototype data needed for generating next battle
+    $this_prototype_data = array();
+    $this_prototype_data['this_player_token'] = $this_player->player_token;
+    $this_prototype_data['battle_phase'] = 2;
+    $this_prototype_data['phase_token'] = 'phase'.$this_prototype_data['battle_phase'];
+    $this_prototype_data['phase_battle_token'] = $this_prototype_data['this_player_token'].'-'.$this_prototype_data['phase_token'];
+    $this_prototype_data['battles_complete'] = mmrpg_prototype_battles_complete($this_prototype_data['this_player_token']);
+    $this_prototype_data['this_current_chapter'] = '7';
+
+    //echo('$info = '.print_r($info, true).PHP_EOL);
+    //echo('$info2 = '.print_r($info2, true).PHP_EOL);
+    //echo('$next_star_level = '.print_r($next_star_level, true).PHP_EOL);
+    //echo('$this_prototype_data = '.print_r($this_prototype_data, true).PHP_EOL.PHP_EOL);
+
+    // Include relevant dependent files like starforce and omega factors
+    include(MMRPG_CONFIG_ROOTDIR.'prototype/omega.php');
+
+    // Generate the actual battle given the provided star info, whether fusion or field variety
+    if (!empty($info) && !empty($info2) && $info['field'] != $info2['field']){
+        $temp_battle_omega = rpg_mission_double::generate($this_prototype_data, array($info['robot'], $info2['robot']), array($info['field'], $info2['field']), $next_star_level, true, false, true);
+    } elseif (!empty($info)){
+        $temp_battle_omega = rpg_mission_single::generate($this_prototype_data, $info['robot'], $info['field'], $next_star_level, true, false, true);
+    }
+
+    //echo('$temp_battle_token = '.print_r($temp_battle_omega['battle_token'], true).PHP_EOL.PHP_EOL);
+    //echo('$temp_battle_omega = '.print_r($temp_battle_omega, true).PHP_EOL.PHP_EOL);
+
+    // Update the chapter number and then save this data to the temp index
+    $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
+    rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+
+    // Update the redirect token to that of the new star field mission
+    $battle_complete_redirect_token = $temp_battle_omega['battle_token'];
+
+    //exit();
+
+}
+
 // Create the battle chain array if not exists
 $is_first_mission = false;
 if (!isset($_SESSION['BATTLES_CHAIN'])){ $_SESSION['BATTLES_CHAIN'] = array(); }
@@ -65,7 +152,7 @@ foreach ($temp_player_active_robots AS $key => $robot){
     }
 
     // Save this robot's current energy, weapons, attack/defense/speed mods, etc. to the session
-    $_SESSION['ROBOTS_PRELOAD'][$this_battle->battle_complete_redirect_token][$robot_string] = array(
+    $_SESSION['ROBOTS_PRELOAD'][$battle_complete_redirect_token][$robot_string] = array(
         'robot_energy' => $robot['robot_energy'],
         'robot_weapons' => $new_weapon_energy,
         'robot_attack_mods' => $new_mod_values['attack_mods'],
@@ -89,7 +176,7 @@ $_SESSION['ITEMS'] = array();
 
 // Generate the URL for the next mission with provided token
 $next_battle_id = $this_battle->battle_id + 1;
-$next_battle_token = $this_battle->battle_complete_redirect_token;
+$next_battle_token = $battle_complete_redirect_token;
 $next_mission_href = 'battle.php?wap='.($flag_wap ? 'true' : 'false');
 $next_mission_href .= '&this_battle_id='.$next_battle_id;
 $next_mission_href .= '&this_battle_token='.$next_battle_token;
@@ -136,6 +223,14 @@ if (!empty($this_battle->flags['challenge_battle'])
 
 }
 
+// If this is a STAR FIELD battle, break apart the next action
+if (!empty($this_battle->flags['starfield_mission'])){
+
+    // And just-in-case the user closes the window, let's save the actual game now too
+    mmrpg_save_game_session();
+
+}
+
 // Redirect the user back to the next mission
 $this_redirect = $next_mission_href;
 
@@ -144,7 +239,7 @@ $this_redirect = $next_mission_href;
 // Generate the URL for the next mission with provided token
 $next_mission_href = 'battle_loop.php?wap='.($flag_wap ? 'true' : 'false');
 $next_mission_href .= '&this_battle_id='.($this_battle->battle_id + 1);
-$next_mission_href .= '&this_battle_token='.$this_battle->battle_complete_redirect_token;
+$next_mission_href .= '&this_battle_token='.$battle_complete_redirect_token;
 $next_mission_href .= '&this_field_id='.$this_field_id;
 $next_mission_href .= '&this_field_token='.$this_field_token;
 $next_mission_href .= '&this_user_id='.$this_user_id;

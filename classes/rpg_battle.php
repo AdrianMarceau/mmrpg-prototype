@@ -1086,11 +1086,26 @@ class rpg_battle extends rpg_object {
 
         // Define the first event body markup, regardless of player type
         $first_event_header = $this->battle_name.($this->battle_result == 'victory' ? ' Complete' : ' Failure').' <span style="opacity:0.25;">|</span> '.$this->battle_field->field_name;
-
         $is_final_battle = empty($this->battle_complete_redirect_token) && empty($this->battle_complete_redirect_seed) ? true : false;
         if ($this->battle_result == 'victory'){
             $first_event_body_head = $is_final_battle ? 'Mission complete! ' : 'Battle complete! ';
-            $first_event_body_head .= rpg_battle::random_victory_quote().($temp_human_rewards['battle_complete'] > 1 ? ' That&#39;s '.$temp_human_rewards['battle_complete'].' times now! '.rpg_battle::random_positive_word() : '');
+            $first_event_body_head .= rpg_battle::random_victory_quote().' ';
+            // If this is a STAR FIELD battle, we should show the total collected so far
+            if (!empty($this->flags['starfield_mission'])){
+                $temp_possible_stars = mmrpg_prototype_possible_stars(false);
+                $temp_remaining_stars = mmrpg_prototype_remaining_stars(false, $temp_possible_stars);
+                $temp_possible_stars_total = count($temp_possible_stars);
+                $temp_remaining_stars_total = count($temp_remaining_stars);
+                $temp_collected_stars = $temp_possible_stars_total - $temp_remaining_stars_total;
+                $temp_print_number = number_format($temp_collected_stars, 0, '.', ',');
+                if ($temp_collected_stars == $temp_possible_stars_total){ $temp_print_number = rpg_type::print_span('electric', $temp_print_number); }
+                $first_event_body_head .= 'That\'s '.($temp_collected_stars == 1 ? $temp_print_number.' star so far' : $temp_print_number.' stars now').'! ';
+            }
+            // Otherwise if normal battle, we should show the number of times completed
+            else {
+                $first_event_body_head .= $temp_human_rewards['battle_complete'] > 1 ? ' That\'s '.$temp_human_rewards['battle_complete'].' times now! ' : '';
+            }
+            $first_event_body_head .= rpg_battle::random_positive_word().' ';
         } elseif ($this->battle_result == 'defeat'){
             // If this is an ENDLESS ATTACK MODE battle, show a special more positive message
             if (!empty($this->flags['challenge_battle']) && !empty($this->flags['endless_battle'])){

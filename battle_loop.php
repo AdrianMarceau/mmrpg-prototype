@@ -60,6 +60,9 @@ $target_action_token = isset($_REQUEST['target_action_token']) ? $_REQUEST['targ
 // If the player is not starting, the target shouldn't either
 if ($target_action == 'start' && $this_action != 'start'){ $target_action = 'ability'; }
 
+// If this is a "next" action w/ a substring, we need to break it apart
+if (substr($this_action, 0, 5) == 'next_'){ list($this_action, $this_action_token) = explode('_', $this_action); }
+
 // Define a variable to track the verified state and any errors in data processing
 $this_verified = true;
 $this_errors = array();
