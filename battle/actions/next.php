@@ -147,7 +147,7 @@ foreach ($temp_player_active_robots AS $key => $robot){
         if (isset($info['attachment_duration']) && $info['attachment_duration'] > 0){
             $info['attachment_duration'] -= 1;
             $new_robot_attachments[$key] = $info;
-            //if ($info['attachment_duration'] <= 0){ unset($new_robot_attachments[$key]); }
+            if ($info['attachment_duration'] <= 0){ unset($new_robot_attachments[$key]); }
         }
     }
 
