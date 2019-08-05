@@ -4,7 +4,7 @@
 
 // Pre-collect the redirect token (in case we need to change it)
 if (!empty($this_battle->battle_complete_redirect_token)){ $battle_complete_redirect_token = $this_battle->battle_complete_redirect_token; }
-$battle_complete_redirect_token = $this_battle->battle_token;
+else { $battle_complete_redirect_token = $this_battle->battle_token; }
 
 // If this is a STAR FIELD battle, break apart the next action
 if (!empty($this_battle->flags['starfield_mission'])){
