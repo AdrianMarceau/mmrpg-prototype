@@ -1583,12 +1583,15 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
     if ($player_token == 'dr-light'){
         $num_support_mechas = $battle_phase > 1 ? 4 : 3;
         $num_mecha_abilities = $battle_phase > 1 ? 2 : 1;
+        $super_block_position = false;
     } elseif ($player_token == 'dr-wily'){
         $num_support_mechas = $battle_phase > 1 ? 5 : 4;
         $num_mecha_abilities = $battle_phase > 1 ? 3 : 2;
+        $super_block_position = $battle_phase > 1 ? 'right-active' : false;
     } elseif ($player_token == 'dr-cossack'){
         $num_support_mechas = $battle_phase > 1 ? 6 : 5;
         $num_mecha_abilities = $battle_phase > 1 ? 4 : 3;
+        $super_block_position = $battle_phase > 1 ? 'right' : 'right-active';
     }
 
     // Collect details about this battle field
@@ -1678,7 +1681,7 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
 
     // Add super block protection on the target robot side of the field
     $temp_battle_omega['battle_name'] = $battle_name.' (2/2)';
-    $temp_battle_omega['battle_field_base']['values']['hazards']['super_blocks'] = 'right';
+    if (!empty($super_block_position)){ $temp_battle_omega['battle_field_base']['values']['hazards']['super_blocks'] = $super_block_position; }
     $temp_battle_omega['battle_field_base']['field_music']  = $field1_info['field_token'];
 
     // Update the omega battle with a new token, then remove all support mechas, boost robot master
