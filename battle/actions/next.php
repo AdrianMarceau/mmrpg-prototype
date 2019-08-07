@@ -7,7 +7,8 @@ if (!empty($this_battle->battle_complete_redirect_token)){ $battle_complete_redi
 else { $battle_complete_redirect_token = $this_battle->battle_token; }
 
 // If this is a STAR FIELD battle, break apart the next action
-if (!empty($this_battle->flags['starfield_mission'])){
+if (!empty($this_battle->flags['starfield_mission'])
+    && empty($this_battle->battle_complete_redirect_token)){
 
     // Break apart the action token into the requested star type, else return to home if we can't
     if (empty($this_action_token) || !strstr($this_action_token, '-star')){ $this_redirect = 'prototype.php?'.($flag_wap ? 'wap=true' : ''); return; }
