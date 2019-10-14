@@ -11,7 +11,7 @@ require(MMRPG_CONFIG_ROOTDIR.'api/api-common.php');
 $field_tokens = rpg_field::get_index_tokens(true, false, false);
 
 // Print out the field tokens as JSON so others can use them
-if (!empty($field_tokens)){ print_success_and_update_api_cache(array('fields' => $field_tokens)); }
+if (!empty($field_tokens)){ print_success_and_update_api_cache(array('fields' => $field_tokens, 'total' => count($field_tokens))); }
 else { print_success_and_update_api_cache('Field tokens could not be loaded from the database!'); }
 
 ?>
