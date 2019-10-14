@@ -21,7 +21,7 @@ if (!empty($fields_index)){
 }
 
 // Print out the fields index as JSON so others can use them
-if (!empty($fields_index)){ print_success_and_update_api_cache(array('fields' => $fields_index)); }
+if (!empty($fields_index)){ print_success_and_update_api_cache(array('fields' => $fields_index, 'total' => count($fields_index))); }
 else { print_success_and_update_api_cache('Field index could not be loaded from the database!'); }
 
 ?>
