@@ -55,6 +55,7 @@ class rpg_type {
         if (!$include_unpublished){ $temp_where .= 'AND type_flag_published = 1 '; }
         if (!$include_special){ $temp_where .= 'AND type_class <> \'special\' '; }
         if (!$include_pseudo_special){ $temp_where .= 'AND type_token <> \'none\' AND type_token <> \'copy\' '; }
+        elseif ($include_pseudo_special === true){ $temp_where .= "OR type_token IN ('none','copy') "; }
 
         // Collect every type's info from the database index
         $type_fields = self::get_index_fields(true);
@@ -85,6 +86,7 @@ class rpg_type {
         if (!$include_unpublished){ $temp_where .= 'AND type_flag_published = 1 '; }
         if (!$include_special){ $temp_where .= 'AND type_class <> \'special\' '; }
         if (!$include_pseudo_special){ $temp_where .= 'AND type_token <> \'none\' AND type_token <> \'copy\' '; }
+        elseif ($include_pseudo_special === true){ $temp_where .= "OR type_token IN ('none','copy') "; }
 
         // Collect an array of type tokens from the database
         $type_index = $db->get_array_list("SELECT type_token FROM mmrpg_index_types WHERE type_id <> 0 {$temp_where};", 'type_token');
