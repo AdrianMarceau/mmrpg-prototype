@@ -7,8 +7,8 @@ require('../../../top.php');
 $api_request_path = 'fields/index/{token}';
 require(MMRPG_CONFIG_ROOTDIR.'api/api-common.php');
 
-// Get an index of all fields from the database
-// $field_data = rpg_field::get_index_info($api_request_token, true, false, false);
+// Include the database file for fields and then parse necessary data
+require_once(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require_once(MMRPG_CONFIG_ROOTDIR.'database/fields.php');
 if (empty($mmrpg_database_fields)){ print_error_and_quit('The field database could not be loaded'); }
 $field_data = !empty($mmrpg_database_fields[$api_request_token]) ? $mmrpg_database_fields[$api_request_token] : false;
