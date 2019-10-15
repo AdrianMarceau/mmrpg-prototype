@@ -23,6 +23,8 @@ if (!empty($robots_index)){
         $robot_data['robot_abilities_rewards'] = !empty($robot_data['robot_rewards']['abilities']) ? $robot_data['robot_rewards']['abilities'] : array();
         $robot_data['robot_abilities_compatible'] = !empty($robot_data['robot_abilities']) ? $robot_data['robot_abilities'] : array();
         unset($robot_data['robot_abilities'], $robot_data['robot_rewards']);
+        $backup_robot_data = $robot_data; $robot_data = array();
+        foreach ($backup_robot_data AS $k => $v){ $robot_data[str_replace('robot_', '', $k)] = $v; }
         $robots_index[$robot_token] = $robot_data;
     }
 }

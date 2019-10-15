@@ -15,10 +15,12 @@ if (!empty($type_data)){
     unset($type_data['_parsed']);
     unset($type_data['type_id']);
     unset($type_data['type_functions']);
+    $backup_type_data = $type_data; $type_data = array();
+    foreach ($backup_type_data AS $k => $v){ $type_data[str_replace('type_', '', $k)] = $v; }
 }
 
 // Correct the name of the "none" type to "Neutral"
-if (!empty($type_data) && $type_data['type_token'] === 'none'){ $type_data['type_name'] = 'Neutral'; }
+if (!empty($type_data) && $type_data['token'] === 'none'){ $type_data['name'] = 'Neutral'; }
 
 // Print out the types index as JSON so others can use them
 if (!empty($type_data)){ print_success_and_update_api_cache(array('type' => $type_data)); }
