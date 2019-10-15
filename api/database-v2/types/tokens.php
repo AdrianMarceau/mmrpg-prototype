@@ -12,6 +12,6 @@ $type_tokens = rpg_type::get_index_tokens(true, false, false, true);
 
 // Print out the type tokens as JSON so others can use them
 if (!empty($type_tokens)){ print_success_and_update_api_cache(array('types' => $type_tokens, 'total' => count($type_tokens))); }
-else { print_success_and_update_api_cache('Field tokens could not be loaded from the database!'); }
+else { print_error_and_quit('The type token array was empty'); }
 
 ?>

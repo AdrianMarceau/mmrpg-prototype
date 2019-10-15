@@ -25,6 +25,6 @@ if (isset($types_index['none'])){ $types_index['none']['type_name'] = 'Neutral';
 
 // Print out the types index as JSON so others can use them
 if (!empty($types_index)){ print_success_and_update_api_cache(array('types' => $types_index, 'total' => count($types_index))); }
-else { print_success_and_update_api_cache('Field index could not be loaded from the database!'); }
+else { print_success_and_update_api_cache('The field index array was empty'); }
 
 ?>
