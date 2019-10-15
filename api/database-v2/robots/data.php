@@ -27,6 +27,6 @@ if (!empty($robot_data)){
 
 // Print out the robots index as JSON so others can use them
 if (!empty($robot_data)){ print_success_and_update_api_cache(array('robot' => $robot_data)); }
-else { print_error_and_quit('The robot token `'.$api_request_token.'` has no data', MMRPG_API_ERROR_NOTFOUND); }
+else { print_error_and_quit('Robot data for `'.$api_request_token.'` does not exist', MMRPG_API_ERROR_NOTFOUND); }
 
 ?>

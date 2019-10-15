@@ -27,6 +27,6 @@ if (!empty($mecha_data)){
 
 // Print out the mechas index as JSON so others can use them
 if (!empty($mecha_data)){ print_success_and_update_api_cache(array('mecha' => $mecha_data)); }
-else { print_error_and_quit('The mecha token `'.$api_request_token.'` has no data', MMRPG_API_ERROR_NOTFOUND); }
+else { print_error_and_quit('Mecha data for `'.$api_request_token.'` does not exist', MMRPG_API_ERROR_NOTFOUND); }
 
 ?>

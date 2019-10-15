@@ -8,7 +8,7 @@ $api_request_path = 'types/index/{token}';
 require(MMRPG_CONFIG_ROOTDIR.'api/api-common.php');
 
 // Get an index of all types from the database
-$type_data = rpg_type::get_index_info($api_request_token, true, false, true);
+$type_data = rpg_type::get_index_info($api_request_token);
 
 // If not empty, go through and remove api-incompatible data
 if (!empty($type_data)){
@@ -24,6 +24,6 @@ if (!empty($type_data) && $type_data['token'] === 'none'){ $type_data['name'] = 
 
 // Print out the types index as JSON so others can use them
 if (!empty($type_data)){ print_success_and_update_api_cache(array('type' => $type_data)); }
-else { print_error_and_quit('The type token `'.$api_request_token.'` has no data', MMRPG_API_ERROR_NOTFOUND); }
+else { print_error_and_quit('Type data for `'.$api_request_token.'` does not exist', MMRPG_API_ERROR_NOTFOUND); }
 
 ?>
