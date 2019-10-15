@@ -20,6 +20,8 @@ if (!empty($fields_index)){
         unset($field_data['_parsed']);
         unset($field_data['field_id']);
         unset($field_data['field_functions']);
+        $backup_field_data = $field_data; $field_data = array();
+        foreach ($backup_field_data AS $k => $v){ $field_data[str_replace('field_', '', $k)] = $v; }
         $fields_index[$field_token] = $field_data;
     }
 }

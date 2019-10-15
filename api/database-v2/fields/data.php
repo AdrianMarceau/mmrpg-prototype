@@ -18,6 +18,8 @@ if (!empty($field_data)){
     unset($field_data['_parsed']);
     unset($field_data['field_id']);
     unset($field_data['field_functions']);
+    $backup_field_data = $field_data; $field_data = array();
+    foreach ($backup_field_data AS $k => $v){ $field_data[str_replace('field_', '', $k)] = $v; }
 }
 
 // Print out the fields index as JSON so others can use them
