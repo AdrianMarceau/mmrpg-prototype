@@ -1,11 +1,8 @@
 <?php
 
-// Require the global top file
-require('../../../top.php');
-
 // Define the for the API cache file, then include API functionality
 $api_request_path = 'types/index';
-require(MMRPG_CONFIG_ROOTDIR.'api/api-common.php');
+require(MMRPG_CONFIG_API_ROOTDIR.'api-common.php');
 
 // Get an index of all types from the database
 $types_index = rpg_type::get_index(true, false, $api_include_hidden, true);

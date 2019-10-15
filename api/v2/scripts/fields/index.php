@@ -1,11 +1,8 @@
 <?php
 
-// Require the global top file
-require('../../../top.php');
-
 // Define the for the API cache file, then include API functionality
 $api_request_path = 'fields/index';
-require(MMRPG_CONFIG_ROOTDIR.'api/api-common.php');
+require(MMRPG_CONFIG_API_ROOTDIR.'api-common.php');
 
 // Include the database file for fields and then parse necessary data
 $mmrpg_database_fields_filter = "AND field_flag_published = 1 ";
