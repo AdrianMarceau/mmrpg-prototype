@@ -7,10 +7,9 @@ require('../../../top.php');
 $api_request_path = 'fields';
 require(MMRPG_CONFIG_ROOTDIR.'api/api-common.php');
 
-// Get a list of all field tokens from the database
-// $field_tokens = rpg_field::get_index_tokens(true, false, false);
-// OR Include the database file for fields and then parse necessary data
+// Include the database file for fields and then parse necessary data
 $mmrpg_database_fields_filter = "AND field_flag_hidden = 0 AND field_flag_complete = 1 AND field_flag_published = 1 ";
+require_once(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require_once(MMRPG_CONFIG_ROOTDIR.'database/fields.php');
 if (empty($mmrpg_database_fields)){ print_error_and_quit('The field database could not be loaded'); }
 $field_tokens = !empty($mmrpg_database_fields) ? array_keys($mmrpg_database_fields) : array();
