@@ -27,6 +27,6 @@ if (!empty($boss_data)){
 
 // Print out the bosses index as JSON so others can use them
 if (!empty($boss_data)){ print_success_and_update_api_cache(array('boss' => $boss_data)); }
-else { print_error_and_quit('The boss token `'.$api_request_token.'` has no data', MMRPG_API_ERROR_NOTFOUND); }
+else { print_error_and_quit('Boss data for `'.$api_request_token.'` does not exist', MMRPG_API_ERROR_NOTFOUND); }
 
 ?>

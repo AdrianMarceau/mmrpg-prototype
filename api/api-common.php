@@ -14,6 +14,14 @@ if (strstr($api_request_path, '{token}')){
     else { critical_api_error('Request Error | URL Token must be provided for '.$api_request_path.'!', __FILE__, __LINE__); }
 }
 
+// Collect any common (but optional) flags for the scripts
+$api_include_hidden = !empty($_GET['include_hidden']) && $_GET['include_hidden'] === 'true' ? true : false;
+$api_include_incomplete = !empty($_GET['include_incomplete']) && $_GET['include_incomplete'] === 'true' ? true : false;
+if (!empty($_GET['include_all']) && $_GET['include_all'] === 'true'){
+    $api_include_hidden = true;
+    $api_include_incomplete = true;
+}
+
 // Define the cache file name and path given everything we've learned
 $cache_file_name = 'cache.api_'.str_replace('/', '-', $api_request_path).'.json';
 $cache_file_path = MMRPG_CONFIG_CACHE_PATH.'api/'.$cache_file_name;

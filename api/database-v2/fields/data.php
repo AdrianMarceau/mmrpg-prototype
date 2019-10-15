@@ -24,6 +24,6 @@ if (!empty($field_data)){
 
 // Print out the fields index as JSON so others can use them
 if (!empty($field_data)){ print_success_and_update_api_cache(array('field' => $field_data)); }
-else { print_error_and_quit('The field token `'.$api_request_token.'` has no data', MMRPG_API_ERROR_NOTFOUND); }
+else { print_error_and_quit('Field data for `'.$api_request_token.'` does not exist', MMRPG_API_ERROR_NOTFOUND); }
 
 ?>

@@ -8,7 +8,7 @@ $api_request_path = 'types/index';
 require(MMRPG_CONFIG_ROOTDIR.'api/api-common.php');
 
 // Get an index of all types from the database
-$types_index = rpg_type::get_index(true, false, true);
+$types_index = rpg_type::get_index(true, false, $api_include_hidden, true);
 
 // If not empty, loop through and remove api-incompatible data
 if (!empty($types_index)){
