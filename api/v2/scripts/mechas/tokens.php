@@ -1,11 +1,8 @@
 <?php
 
-// Require the global top file
-require('../../../top.php');
-
 // Define the for the API cache file, then include API functionality
 $api_request_path = 'mechas';
-require(MMRPG_CONFIG_ROOTDIR.'api/api-common.php');
+require(MMRPG_CONFIG_API_ROOTDIR.'api-common.php');
 
 // Include the database file for mechas and then parse necessary data
 $mmrpg_database_mechas_filter = "AND robot_flag_published = 1 ";
