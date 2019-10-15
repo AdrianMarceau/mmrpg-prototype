@@ -4,7 +4,8 @@
 require('../../top.php');
 
 // Define the API path w/ version number
-define('MMRPG_CONFIG_API_ROOTDIR', MMRPG_CONFIG_ROOTDIR.'api/v2/');
+define('MMRPG_CONFIG_API_DIR', 'api/v2/');
+define('MMRPG_CONFIG_API_ROOTDIR', MMRPG_CONFIG_ROOTDIR.MMRPG_CONFIG_API_DIR);
 
 // If a valid kind and script are provided, include the API file, else show an error
 if (!empty($_GET['kind'])
