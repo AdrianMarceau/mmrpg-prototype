@@ -323,6 +323,7 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
     }
 
     // Collect the info for the chosen temp field
+    if (empty($temp_field_path)){ $temp_field_path = 'fields/intro-field'; }
     list($temp_field_kind, $temp_field_token) = explode('/', $temp_field_path);
     $temp_field_data = rpg_field::get_index_info($temp_field_token);
     if (!empty($temp_mecha_tokens) && !empty($temp_field_data)){
