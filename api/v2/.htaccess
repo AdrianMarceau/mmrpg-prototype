@@ -1,5 +1,5 @@
-
-#RewriteCond %{REQUEST_FILENAME} -d [OR]
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} -d [OR]
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule (.*) - [S=3]
 RewriteRule ^(players|robots|mechas|bosses|fields|abilities|items|types)/index/all/?\??(.*)$ index.php?kind=$1&script=index&include_all=true&$2 [L]
