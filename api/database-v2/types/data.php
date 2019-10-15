@@ -18,10 +18,10 @@ if (!empty($type_data)){
 }
 
 // Correct the name of the "none" type to "Neutral"
-if ($type_data['type_token'] === 'none'){ $type_data['type_name'] = 'Neutral'; }
+if (!empty($type_data) && $type_data['type_token'] === 'none'){ $type_data['type_name'] = 'Neutral'; }
 
 // Print out the types index as JSON so others can use them
 if (!empty($type_data)){ print_success_and_update_api_cache(array('type' => $type_data)); }
-else { print_success_and_update_api_cache('Field data for `'.$api_request_token.'` could not be loaded from the database!'); }
+else { print_error_and_quit('The type token `'.$api_request_token.'` has no data', MMRPG_API_ERROR_NOTFOUND); }
 
 ?>
