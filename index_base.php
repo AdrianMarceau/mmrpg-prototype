@@ -129,7 +129,7 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
 
     // Hard-code some sub-pages we know about beforehand
     $community_subs = array();
-    $community_subs['home'] = array('name' => 'Overview');
+    //$community_subs['home'] = array('name' => 'Overview');
     $main_menu_links['community']['subs'] = $community_subs;
 
     ?>
