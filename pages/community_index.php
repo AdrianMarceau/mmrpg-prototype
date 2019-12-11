@@ -4,6 +4,12 @@
  * COMMUNITY INDEX VIEW
  */
 
+// PAGE REMOVED UNTIL FURTHER NOTICE
+// This page needs optimization badly and until it can be done it's being disabled
+header("HTTP/1.1 301 Moved Permanently");
+header('Location: '.MMRPG_CONFIG_ROOTURL.'community/general/');
+exit();
+
 // Loop through the different categories and collect their threads one by one
 $this_category_key = 0;
 foreach ($this_categories_index AS $this_category_id => $this_category_info){
