@@ -32,6 +32,7 @@ if (get_magic_quotes_gpc()){
 // Include cms classs first and foremost
 require('classes/cms_database.php');
 require('classes/cms_website.php');
+require('classes/cms_website_page.php');
 require('classes/cms_index.php');
 
 // Define the debug mode flag based on session flag if not already set
