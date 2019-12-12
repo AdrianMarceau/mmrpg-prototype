@@ -592,9 +592,11 @@ tr:nth-child(odd) td {
 
 .adminform.edit_challenges table .kind,
 .adminform.edit_challenges table .creator,
-.adminform.edit_challenges table .slot,
-.adminform.edit_challenges table .flag,
-.adminform.edit_challenges table .flag {
+.adminform.edit_challenges table .slot {
+    text-align: center;
+}
+
+.adminform.edit_users table .role {
     text-align: center;
 }
 
@@ -1039,10 +1041,15 @@ input[type=file] {
     padding-right: 10px;
     padding-bottom: 5px;
     float: left;
-    overflow: hidden;
+    overflow: visible;
     font-size: 11px;
     line-height: 13px;
     min-height: 0;
+}
+.adminform .options .field:after {
+    content: "";
+    display: block;
+    clear: both;
 }
 .adminform .options .field .label {
     display: inline-block;
@@ -1172,7 +1179,8 @@ input[type=file] {
 }
 .adminform .results .list .created,
 .adminform .results .list .modified,
-.adminform .results .list .role {
+.adminform .results .list .flag,
+.adminform .results .list .order {
     text-align: center;
 }
 
