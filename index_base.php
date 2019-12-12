@@ -275,6 +275,10 @@ $index_nav_markup .= trim(ob_get_clean()).PHP_EOL;
 // Include the required page logic files
 if (file_exists('pages/'.$this_current_page.'.php')){
     require_once('pages/'.$this_current_page.'.php');
+} elseif (!empty($this_current_uri)) {
+    $db_page_fields = cms_website_page::get_index_fields(true);
+    $db_page_info = $db->get_array("SELECT {$db_page_fields} FROM mmrpg_website_pages WHERE page_url = '{$this_current_uri}';");
+    if (!empty($db_page_info)){ require_once('pages/db-page.php'); }
 }
 
 ?>
