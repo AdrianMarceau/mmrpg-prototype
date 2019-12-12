@@ -43,6 +43,34 @@
     ?>
 
     <?
+    /* -- PAGE EDITORS -- */
+    if (true){
+        $temp_group_name = 'Website Editors';
+        ob_start();
+        if (in_array('*', $this_adminaccess)
+            || in_array('edit_pages', $this_adminaccess)){
+            ?>
+            <li class="item">
+                <a href="admin.php?action=edit_pages">Edit Pages</a>
+                <em>edit the text and images on various website pages</em>
+            </li>
+            <?
+        }
+        $temp_item_markup = trim(ob_get_clean());
+        if (!empty($temp_item_markup)){
+            ?>
+            <ul class="adminhome">
+                <li class="top">
+                    <strong><?= $temp_group_name ?></strong>
+                </li>
+                <?= $temp_item_markup ?>
+            </ul>
+            <?
+        }
+    }
+    ?>
+
+    <?
     /* -- GAME EDITORS -- */
     if (true){
         $temp_group_name = 'Game Editors';

@@ -178,13 +178,18 @@ elseif ($this_page_action == 'delete_cache'){
 }
 // Else if this is an CLEAR SESSIONS request
 elseif ($this_page_action == 'clear_sessions'){
-    // Require the delete cache file
+    // Require the clear sessions file
     require(MMRPG_CONFIG_ROOTDIR.'admin/clear-sessions.php');
 }
 // Else if this is an EDIT USERS request
 elseif ($this_page_action == 'edit_users'){
-    // Require the delete cache file
+    // Require the edit users file
     require(MMRPG_CONFIG_ROOTDIR.'admin/edit-users.php');
+}
+// Else if this is an EDIT PAGES request
+elseif ($this_page_action == 'edit_pages'){
+    // Require the edit pages file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/edit-pages.php');
 }
 // Else if this is an EDIT ROBOT MASTERS request
 elseif ($this_page_action == 'edit_robots'){
