@@ -347,6 +347,13 @@ a:hover {
     clear: both;
 }
 
+.adminform .editor .CodeMirror {
+    resize: vertical;
+    height: 500px;
+    border: 1px solid #E9E9E9;
+    /* overflow: auto !important; */
+}
+
 
 .adminform table {
     margin: 0 auto 10px;

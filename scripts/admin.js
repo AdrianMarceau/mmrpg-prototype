@@ -275,6 +275,33 @@ $(document).ready(function(){
         }
 
 
+    // PAGE EDITOR EVENTS
+
+    // Check to make sure we're on the page editor page
+    var $editPages = $('.adminform.edit_pages', thisAdmin);
+    //console.log('$editPages =', $editPages);
+    if ($editPages.length){
+
+        // Replace any compatible textareas with CodeMirror instances
+        if (typeof window.CodeMirror !== 'undefined'){
+            var $codeMirrorFields = $('.field.codemirror', $editPages);
+            $codeMirrorFields.each(function(){
+                var $codeField = $(this);
+                var $textArea = $codeField.find('textarea');
+                var textArea = $textArea.get(0);
+                //$textArea.css({height:'auto'});
+                var textEditor = CodeMirror.fromTextArea(textArea, {
+                    mode: 'htmlmixed',
+                    lineNumbers: true,
+                    tabSize: 2,
+                    lineWrapping: true,
+                  });
+                });
+            }
+
+    }
+
+
     // ROBOT EDITOR EVENTS
 
     // ...none at the moment
