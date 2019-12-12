@@ -84,6 +84,11 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
 
 // Collect the current page from the header if set
 $this_allowed_pages = array('home', 'about', 'gallery', 'database', 'leaderboard', 'community', 'prototype', 'credits', 'contact', 'file', 'error', 'dev', 'test');
+if (!defined('MMRPG_CRITICAL_ERROR')){
+    $more_allowed_pages = $db->get_array_list("SELECT page_token FROM mmrpg_website_pages WHERE page_flag_published = 1;", 'page_token');
+    if (!empty($more_allowed_pages)){ $this_allowed_pages = array_unique(array_merge($this_allowed_pages, array_keys($more_allowed_pages))); }
+    //die('<pre>$more_allowed_pages = '.print_r($more_allowed_pages, true).'</pre>');
+}
 $this_current_page = $_GET['page'] = !empty($_GET['page']) ? strtolower($_GET['page']) : false;
 $this_current_sub = $_GET['sub'] = !empty($_GET['sub']) && !is_numeric($_GET['sub']) ? strtolower($_GET['sub']) : false;
 $this_current_cat = $_GET['cat'] = !empty($_GET['cat']) && !is_numeric($_GET['cat']) ? strtolower($_GET['cat']) : false;
@@ -169,7 +174,7 @@ elseif ($this_current_page == 'file'){
 $this_current_url = MMRPG_CONFIG_ROOTURL.$this_current_uri;
 $_GET['this_current_uri'] = $this_current_uri; //urlencode($this_current_uri);
 $_GET['this_current_url'] = $this_current_url; //urlencode($this_current_url);
-//die('<pre>'.print_r($_GET, true).'</pre>');
+//die('<pre>$_GET = '.print_r($_GET, true).'</pre>');
 
 // Now that all the redirecting is done, if the current page it totally empty, it's ACTUALLY home
 if (empty($this_current_page) || !in_array($this_current_page, $this_allowed_pages)){ $this_current_page = 'home'; }

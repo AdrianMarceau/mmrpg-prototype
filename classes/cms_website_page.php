@@ -36,6 +36,7 @@ class cms_website_page {
             'page_name',
             'page_url',
             'page_title',
+            'page_content',
             'page_seo_title',
             'page_seo_description',
             'page_seo_keywords',
@@ -66,42 +67,6 @@ class cms_website_page {
     // Define an alias function name for the above
     public static function get_fields($implode = false, $table = ''){
         return self::get_index_fields($implode, $table);
-    }
-
-    /**
-     * Get a list of all page section fields as an array or, optionally, imploded into a string
-     * @param bool $implode
-     * @param string $table (optional)
-     * @return mixed
-     */
-    public static function get_section_index_fields($implode = false, $table = ''){
-
-        // Define the various table fields for page objects
-        $section_fields = array(
-            'page_id',
-            'section_id',
-            'section_token',
-            'section_header',
-            'section_content',
-            'section_script',
-            'section_order'
-            );
-
-        // Add table name to each field string if requested
-        if (!empty($table)){
-            foreach ($section_fields AS $key => $field){
-                $section_fields[$key] = $table.'.'.$field;
-            }
-        }
-
-        // Implode the table fields into a string if requested
-        if ($implode){
-            $section_fields = implode(', ', $section_fields);
-        }
-
-        // Return the table fields, array or string
-        return $section_fields;
-
     }
 
     /**

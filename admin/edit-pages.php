@@ -64,8 +64,9 @@
         $search_data['page_id'] = !empty($_GET['page_id']) && is_numeric($_GET['page_id']) ? trim($_GET['page_id']) : '';
         $search_data['page_token'] = !empty($_GET['page_token']) && preg_match('/[-_0-9a-z\.\*]+/i', $_GET['page_token']) ? trim(strtolower($_GET['page_token'])) : '';
         $search_data['page_name'] = !empty($_GET['page_name']) && preg_match('/[-_0-9a-z\.\*\s]+/i', $_GET['page_name']) ? trim(strtolower($_GET['page_name'])) : '';
-        $search_data['page_title'] = !empty($_GET['page_title']) && preg_match('/[-_0-9a-z\.@\*\s]+/i', $_GET['page_title']) ? trim(strtolower($_GET['page_title'])) : '';
         $search_data['page_url'] = !empty($_GET['page_url']) && preg_match('/[-_0-9a-z\.\/\*]+/i', $_GET['page_url']) ? trim(strtolower($_GET['page_url'])) : '';
+        $search_data['page_title'] = !empty($_GET['page_title']) && preg_match('/[-_0-9a-z\.@\*\s]+/i', $_GET['page_title']) ? trim(strtolower($_GET['page_title'])) : '';
+        $search_data['page_content'] = !empty($_GET['page_content']) && preg_match('/[-_0-9a-z\.@\*\s]+/i', $_GET['page_content']) ? trim(strtolower($_GET['page_content'])) : '';
         $search_data['page_flag_published'] = isset($_GET['page_flag_published']) && $_GET['page_flag_published'] !== '' ? (!empty($_GET['page_flag_published']) ? 1 : 0) : '';
         $search_data['page_flag_hidden'] = isset($_GET['page_flag_hidden']) && $_GET['page_flag_hidden'] !== '' ? (!empty($_GET['page_flag_hidden']) ? 1 : 0) : '';
 
@@ -80,6 +81,7 @@
             page.page_name,
             page.page_url,
             page.page_title,
+            page.page_content,
             page.page_seo_title,
             page.page_seo_description,
             page.page_seo_keywords,
@@ -117,6 +119,16 @@
             $page_title = preg_replace('/%+/', '%', $page_title);
             $page_title = '%'.$page_title.'%';
             $search_query .= "AND page_title LIKE '{$page_title}' ";
+            $search_results_limit = false;
+        }
+
+        // Else if the page content was provided, we can use wildcards
+        if (!empty($search_data['page_content'])){
+            $page_content = $search_data['page_content'];
+            $page_content = str_replace(array(' ', '*', '%'), '%', $page_content);
+            $page_content = preg_replace('/%+/', '%', $page_content);
+            $page_content = '%'.$page_content.'%';
+            $search_query .= "AND page_content LIKE '{$page_content}' ";
             $search_results_limit = false;
         }
 
@@ -202,6 +214,7 @@
             $form_data['page_url'] = !empty($_POST['page_url']) && preg_match('/^[-_0-9a-z\.\/]+$/i', $_POST['page_url']) ? trim(strtolower($_POST['page_url'])) : '';
             $form_data['page_name'] = !empty($_POST['page_name']) && preg_match('/^[-_0-9a-z\.\*\s\&\!\?\$]+$/i', $_POST['page_name']) ? trim($_POST['page_name']) : '';
             $form_data['page_title'] = !empty($_POST['page_title']) && preg_match('/^[-_0-9a-z\.\*\s\&\!\?\$]+$/i', $_POST['page_title']) ? trim($_POST['page_title']) : '';
+            $form_data['page_content'] = !empty($_POST['page_content']) ? trim($_POST['page_content']) : '';
 
             $form_data['page_seo_title'] = !empty($_POST['page_seo_title']) && preg_match('/^[-_0-9a-z\.\s]+$/i', $_POST['page_seo_title']) ? trim($_POST['page_seo_title']) : '';
             $form_data['page_seo_keywords'] = !empty($_POST['page_seo_keywords']) && preg_match('/^[-_0-9a-z\.\*\s\,]+$/i', $_POST['page_seo_keywords']) ? trim(strtolower($_POST['page_seo_keywords'])) : '';
@@ -242,10 +255,16 @@
             // If there were errors, we should exit now
             if (!$form_success){ exit_page_edit_action($form_data['page_id']); }
 
-            // If trying to update the PUBLIC USER NAME but it was invalid, do not update
+            // If trying to update the PAGE TITLE but it was invalid, do not update
             if (empty($form_data['page_title']) && !empty($_POST['page_title'])){
                 $form_messages[] = array('warning', 'Page title was invalid and will not be updated');
                 unset($form_data['page_title']);
+            }
+
+            // If trying to update the PAGE CONTENT but it was invalid, do not update
+            if (empty($form_data['page_content']) && !empty($_POST['page_content'])){
+                $form_messages[] = array('warning', 'Page content was invalid and will not be updated');
+                unset($form_data['page_content']);
             }
 
             // Reformay the SEO keywords if provided
@@ -318,7 +337,7 @@
                     </div>
 
                     <div class="field halfsize">
-                        <strong class="label">By Name</strong>
+                        <strong class="label">By Name </strong>
                         <input class="textbox" type="text" name="page_name" value="<?= !empty($search_data['page_name']) ? htmlentities($search_data['page_name'], ENT_QUOTES, 'UTF-8', true) : '' ?>" />
                     </div>
 
@@ -330,6 +349,11 @@
                     <div class="field halfsize">
                         <strong class="label">By URL</strong>
                         <input class="textbox" type="text" name="page_url" value="<?= !empty($search_data['page_url']) ? htmlentities($search_data['page_url'], ENT_QUOTES, 'UTF-8', true) : '' ?>" />
+                    </div>
+
+                    <div class="field halfsize">
+                        <strong class="label">By Content</strong>
+                        <input class="textbox" type="text" name="page_content" value="<?= !empty($search_data['page_content']) ? htmlentities($search_data['page_content'], ENT_QUOTES, 'UTF-8', true) : '' ?>" />
                     </div>
 
                     <div class="field halfsize has3cols flags">
@@ -553,6 +577,16 @@
 
                     <div class="field fullsize">
                         <div class="label">
+                            <strong>Page Content</strong>
+                            <em>basic html and some psuedo-code allowed</em>
+                        </div>
+                        <textarea class="textarea" name="page_content" rows="20"><?= htmlentities($page_data['page_content'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                    </div>
+
+                    <hr />
+
+                    <div class="field fullsize">
+                        <div class="label">
                             <strong>Page SEO Title</strong>
                             <em>page title used by search engines</em>
                         </div>
@@ -576,20 +610,6 @@
                     </div>
 
                     <hr />
-
-                    <? /*
-
-                    <div class="field fullsize">
-                        <div class="label">
-                            <strong>Profile Text</strong>
-                            <em>public, displayed on leaderboard page</em>
-                        </div>
-                        <textarea class="textarea" name="page_profile_text" rows="10"><?= htmlentities($page_data['page_profile_text'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
-                    </div>
-
-                    <hr />
-
-                    */ ?>
 
                     <div class="options">
 
