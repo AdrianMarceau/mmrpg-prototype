@@ -223,7 +223,7 @@
             $form_data['page_id'] = !empty($_POST['page_id']) && is_numeric($_POST['page_id']) ? trim($_POST['page_id']) : 0;
 
             $form_data['page_token'] = !empty($_POST['page_token']) && preg_match('/^[-_0-9a-z\.]+$/i', $_POST['page_token']) ? trim(strtolower($_POST['page_token'])) : '';
-            $form_data['page_url'] = !empty($_POST['page_url']) && preg_match('/^[-_0-9a-z\.\/]+$/i', $_POST['page_url']) ? trim(strtolower($_POST['page_url'])) : '';
+            //$form_data['page_url'] = !empty($_POST['page_url']) && preg_match('/^[-_0-9a-z\.\/]+$/i', $_POST['page_url']) ? trim(strtolower($_POST['page_url'])) : '';
             $form_data['page_name'] = !empty($_POST['page_name']) && preg_match('/^[-_0-9a-z\.\*\s\&\!\?\$]+$/i', $_POST['page_name']) ? trim($_POST['page_name']) : '';
             $form_data['page_title'] = !empty($_POST['page_title']) && preg_match('/^[-_0-9a-z\.\*\s\&\!\?\$]+$/i', $_POST['page_title']) ? trim($_POST['page_title']) : '';
             $form_data['page_content'] = !empty($_POST['page_content']) ? trim($_POST['page_content']) : '';
@@ -259,10 +259,10 @@
             }
 
             // If the required PAGE URL field was empty, complete form failure
-            if (empty($form_data['page_url'])){
-                $form_messages[] = array('error', 'Page URL was not provided or was invalid');
-                $form_success = false;
-            }
+            // if (empty($form_data['page_url'])){
+            //     $form_messages[] = array('error', 'Page URL was not provided or was invalid');
+            //     $form_success = false;
+            // }
 
             // If there were errors, we should exit now
             if (!$form_success){ exit_page_edit_action($form_data['page_id']); }
@@ -279,12 +279,17 @@
                 unset($form_data['page_content']);
             }
 
-            // Reformay the SEO keywords if provided
+            // Reformat the SEO keywords if provided
             if (!empty($form_data['page_seo_keywords'])){
                 $seo_keywords = explode(',', $form_data['page_seo_keywords']);
                 $seo_keywords = array_map(function($s){ return trim($s); }, $seo_keywords);
                 $seo_keywords = array_unique($seo_keywords);
                 $form_data['page_seo_keywords'] = implode(', ', $seo_keywords);
+            }
+
+            // Regenerate the URL based on the page token and parent
+            if (!empty($form_data['page_token'])){
+                $form_data['page_url'] = $form_data['page_token'].'/';
             }
 
             // Loop through fields to create an update string
@@ -563,18 +568,18 @@
 
                     <div class="field halfsize">
                         <div class="label">
-                            <strong>Page Name</strong>
-                            <em>appears in navbar</em>
+                            <strong>Page URL</strong>
+                            <em>auto-generated</em>
                         </div>
-                        <input class="textbox" type="text" name="page_name" value="<?= $page_data['page_name'] ?>" maxlength="128" />
+                        <input class="textbox" type="text" name="page_url" value="<?= $page_data['page_url'] ?>" maxlength="128" disabled="disabled" />
                     </div>
 
                     <div class="field halfsize">
                         <div class="label">
-                            <strong>Page URL</strong>
-                            <em>avoid changing</em>
+                            <strong>Page Name</strong>
+                            <em>appears in navbar</em>
                         </div>
-                        <input class="textbox" type="text" name="page_url" value="<?= $page_data['page_url'] ?>" maxlength="64" />
+                        <input class="textbox" type="text" name="page_name" value="<?= $page_data['page_name'] ?>" maxlength="128" />
                     </div>
 
                     <div class="field fullsize">
@@ -593,6 +598,16 @@
                             <em>basic html and some psuedo-code allowed</em>
                         </div>
                         <textarea class="textarea" name="page_content" rows="20"><?= htmlentities($page_data['page_content'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                        <div class="label examples" style="font-size: 80%; padding-top: 4px;">
+                            <strong>Examples</strong>:
+                            <br />
+                            <code style="color: green;">&lt;!--&nbsp;MMRPG_CURRENT_FIELD_TYPE --&gt;</code>
+                            <br />
+                            <code style="color: green;">&lt;!-- MMRPG_ROBOT_FLOAT_SPRITE('mega-man', 'right', '03') --&gt;</code>
+                            <br />
+                            <code style="color: green;">&lt;!--&nbsp;MMRPG_LOAD_SCREENSHOT_GALLERY() --&gt;</code>
+                            then <code style="color: green;">&lt;!--&nbsp;MMRPG_SCREENSHOT_GALLERY_MARKUP --&gt;</code>
+                        </div>
                     </div>
 
                     <hr />
