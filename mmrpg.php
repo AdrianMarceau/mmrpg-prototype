@@ -82,12 +82,26 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
  * PAGE REQUESTS
  */
 
+// Collect an index of valid pages if available
+$mmrpg_page_index = array();
+if (!defined('MMRPG_CRITICAL_ERROR')){
+    $temp_page_fields = cms_website_page::get_index_fields(true);
+    $mmrpg_page_index = $db->get_array_list("SELECT
+        {$temp_page_fields}
+        FROM mmrpg_website_pages
+        WHERE page_flag_published = 1
+        ORDER BY page_order ASC
+        ;", 'page_url');
+    //die('<pre>$mmrpg_page_index = '.print_r($mmrpg_page_index, true).'</pre>');
+}
+
 // Collect the current page from the header if set
 $this_allowed_pages = array('home', 'about', 'gallery', 'database', 'leaderboard', 'community', 'prototype', 'credits', 'contact', 'file', 'error', 'dev', 'test');
-if (!defined('MMRPG_CRITICAL_ERROR')){
-    $more_allowed_pages = $db->get_array_list("SELECT page_token FROM mmrpg_website_pages WHERE page_flag_published = 1;", 'page_token');
-    if (!empty($more_allowed_pages)){ $this_allowed_pages = array_unique(array_merge($this_allowed_pages, array_keys($more_allowed_pages))); }
-    //die('<pre>$more_allowed_pages = '.print_r($more_allowed_pages, true).'</pre>');
+if (!empty($mmrpg_page_index)){
+    //$more_allowed_pages = array_keys($mmrpg_page_index);
+    $more_allowed_pages = array_map(function($a){ return $a['page_token']; }, $mmrpg_page_index);
+    if (!empty($more_allowed_pages)){ $this_allowed_pages = array_unique(array_merge($this_allowed_pages, $more_allowed_pages)); }
+    //die('<pre>$this_allowed_pages = '.print_r($this_allowed_pages, true).'</pre>');
 }
 $this_current_page = $_GET['page'] = !empty($_GET['page']) ? strtolower($_GET['page']) : false;
 $this_current_sub = $_GET['sub'] = !empty($_GET['sub']) && !is_numeric($_GET['sub']) ? strtolower($_GET['sub']) : false;
