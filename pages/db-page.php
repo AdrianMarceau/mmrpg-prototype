@@ -52,6 +52,22 @@ ob_start();
             }
         }
 
+        // -- PAGE-SPECIFIC PSEUDO-CODES -- //
+
+        // Parse the pseudo-code tag <!-- MMRPG_LOAD_SCREENSHOT_GALLERY() -->
+        $find = '<!-- MMRPG_LOAD_SCREENSHOT_GALLERY() -->';
+        if (strstr($page_content_parsed, $find)){
+            $page_content_parsed = str_replace($find, '', $page_content_parsed);
+            require(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/gallery.php');
+        }
+
+        // Parse the pseudo-code tag <!-- MMRPG_LOAD_CONTACT_FORM() -->
+        $find = '<!-- MMRPG_LOAD_CONTACT_FORM() -->';
+        if (strstr($page_content_parsed, $find)){
+            $page_content_parsed = str_replace($find, '', $page_content_parsed);
+            require(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/contact.php');
+        }
+
     }
 
     // Echo out the parsed content now that we're done with it
