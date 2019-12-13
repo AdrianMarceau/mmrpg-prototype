@@ -68,6 +68,13 @@ ob_start();
             require(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/contact.php');
         }
 
+        // Parse the pseudo-code tag <!-- MMRPG_LOAD_CONTRIBUTORS_INDEX() -->
+        $find = '<!-- MMRPG_LOAD_CONTRIBUTORS_INDEX() -->';
+        if (strstr($page_content_parsed, $find)){
+            $page_content_parsed = str_replace($find, '', $page_content_parsed);
+            require(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/contributors.php');
+        }
+
     }
 
     // Echo out the parsed content now that we're done with it
