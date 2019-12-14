@@ -65,7 +65,9 @@
 
         // Collect the sorting order and direction
         //$sort_data = array('name' => 'page_id', 'dir' => 'desc');
-        $sort_data = array('name' => 'page_order', 'dir' => 'asc');
+        //$sort_data = array('name' => 'parent_id', 'dir' => 'asc');
+        //$sort_data = array('name' => 'page_order', 'dir' => 'asc');
+        $sort_data = array('name' => 'page_rel_order', 'dir' => 'asc');
         if (!empty($_GET['order'])
             && preg_match('/^([-_a-z0-9]+)\:(desc|asc)$/i', $_GET['order'])){
             list($r_name, $r_dir) = explode(':', trim($_GET['order']));
@@ -101,10 +103,16 @@
             page.page_date_modified,
             page.page_flag_hidden,
             page.page_flag_published,
-            page.page_order
+            page.page_order,
+            (CASE
+                WHEN page2.page_order IS NOT NULL
+                    THEN CONCAT(page2.page_order, '_', page.page_order)
+                ELSE page.page_order
+            END) AS page_rel_order
             FROM mmrpg_website_pages AS page
+            LEFT JOIN mmrpg_website_pages AS page2 ON page2.page_id = page.parent_id
             WHERE 1=1
-            AND page_id <> 0
+            AND page.page_id <> 0
             ";
 
         // If the page ID was provided, we can search by exact match
@@ -169,7 +177,8 @@
         // Append sorting parameters to the end of the query
         $order_by = array();
         if (!empty($sort_data)){ $order_by[] = $sort_data['name'].' '.strtoupper($sort_data['dir']); }
-        $order_by[] = "page_order ASC";
+        $order_by[] = "page_rel_order ASC";
+        //$order_by[] = "page_order ASC";
         $order_by[] = "page_name ASC";
         $order_by_string = implode(', ', $order_by);
         $search_query .= "ORDER BY {$order_by_string} ";
@@ -416,8 +425,8 @@
                             <col class="id" width="60" />
                             <?/* <col class="token" width="80" /> */?>
                             <col class="name" width="100" />
-                            <col class="title" width="" />
-                            <col class="url" width="80" />
+                            <?/* <col class="title" width="" /> */?>
+                            <col class="url" width="" />
                             <col class="date created" width="90" />
                             <col class="date modified" width="90" />
                             <col class="flag published" width="80" />
@@ -430,20 +439,20 @@
                                 <th class="id"><?= cms_admin::get_sort_link('page_id', 'ID') ?></th>
                                 <?/* <th class="token"><?= cms_admin::get_sort_link('page_token', 'Token') ?></th> */ ?>
                                 <th class="name"><?= cms_admin::get_sort_link('page_name', 'Name') ?></th>
-                                <th class="title"><?= cms_admin::get_sort_link('page_name', 'Page Title') ?></th>
+                                <?/* <th class="title"><?= cms_admin::get_sort_link('page_name', 'Page Title') ?></th> */ ?>
                                 <th class="url"><?= cms_admin::get_sort_link('page_url', 'URL') ?></th>
                                 <th class="date created"><?= cms_admin::get_sort_link('page_date_created', 'Created') ?></th>
                                 <th class="date modified"><?= cms_admin::get_sort_link('page_date_modified', 'Modified') ?></th>
                                 <th class="flag published"><?= cms_admin::get_sort_link('challenge_flag_published', 'Published') ?></th>
                                 <th class="flag hidden"><?= cms_admin::get_sort_link('challenge_flag_hidden', 'Hidden') ?></th>
-                                <th class="order"><?= cms_admin::get_sort_link('page_order', 'Order') ?></th>
+                                <th class="order"><?= cms_admin::get_sort_link('page_rel_order', 'Order') ?></th>
                                 <th class="actions">Actions</th>
                             </tr>
                             <tr>
                                 <th class="head id"></th>
                                 <?/* <th class="head token"></th> */ ?>
                                 <th class="head name"></th>
-                                <th class="head title"></th>
+                                <?/* <th class="head title"></th> */ ?>
                                 <th class="head url"></th>
                                 <th class="head date created"></th>
                                 <th class="head date modified"></th>
@@ -458,7 +467,7 @@
                                 <td class="foot id"></td>
                                 <?/* <td class="foot token"></td> */ ?>
                                 <td class="foot name"></td>
-                                <td class="foot title"></td>
+                                <?/* <td class="foot title"></td> */ ?>
                                 <td class="foot url"></td>
                                 <td class="foot date created"></td>
                                 <td class="foot date modified"></td>
@@ -483,6 +492,7 @@
                                 $page_name = $page_data['page_name'];
                                 $page_title = $page_data['page_title'];
                                 $page_order = $page_data['page_order'];
+                                $page_rel_order = $page_data['page_rel_order'];
                                 $page_created = !empty($page_data['page_date_created']) ? date('Y-m-d', $page_data['page_date_created']) : '-';
                                 $page_modified = !empty($page_data['page_date_modified']) ? date('Y-m-d', $page_data['page_date_modified']) : '-';
                                 $page_flag_published = !empty($page_data['page_flag_published']) ? '<i class="fas fa-check-square"></i>' : '-';
@@ -509,13 +519,14 @@
                                     echo '<td class="id"><div>'.$page_id.'</div></td>'.PHP_EOL;
                                     //echo '<td class="token"><div class="wrap">'.$page_token.'</div></td>'.PHP_EOL;
                                     echo '<td class="name"><div class="wrap">'.$page_name_link.'</div></td>'.PHP_EOL;
-                                    echo '<td class="title"><div class="wrap">'.$page_title.'</div></td>'.PHP_EOL;
+                                    //echo '<td class="title"><div class="wrap">'.$page_title.'</div></td>'.PHP_EOL;
                                     echo '<td class="url"><div class="wrap">'.$page_url.'</div></td>'.PHP_EOL;
                                     echo '<td class="date created"><div>'.$page_created.'</div></td>'.PHP_EOL;
                                     echo '<td class="date modified"><div>'.$page_modified.'</div></td>'.PHP_EOL;
                                     echo '<td class="flag published"><div>'.$page_flag_published.'</div></td>'.PHP_EOL;
                                     echo '<td class="flag hidden"><div>'.$page_flag_hidden.'</div></td>'.PHP_EOL;
-                                    echo '<td class="order"><div class="wrap">'.$page_order.'</div></td>'.PHP_EOL;
+                                    //echo '<td class="order"><div class="wrap">'.$page_order.'</div></td>'.PHP_EOL;
+                                    echo '<td class="order"><div class="wrap">'.$page_rel_order.'</div></td>'.PHP_EOL;
                                     echo '<td class="actions"><div>'.$page_actions.'</div></td>'.PHP_EOL;
                                 echo '</tr>'.PHP_EOL;
 
@@ -605,7 +616,7 @@
                             <br />
                             <code style="color: green;">&lt;!-- MMRPG_ROBOT_FLOAT_SPRITE('mega-man', 'right', '03') --&gt;</code>
                             <br />
-                            <code style="color: green;">&lt;!--&nbsp;MMRPG_LOAD_SCREENSHOT_GALLERY() --&gt;</code>
+                            <code style="color: green;">&lt;!--&nbsp;MMRPG_LOAD_GALLERY_PAGE() --&gt;</code>
                             then <code style="color: green;">&lt;!--&nbsp;MMRPG_SCREENSHOT_GALLERY_MARKUP --&gt;</code>
                         </div>
                     </div>
