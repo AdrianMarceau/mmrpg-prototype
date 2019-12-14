@@ -1,7 +1,7 @@
 <?
 
 // Define the SEO variables for this page
-if ($this_current_num > 1){ $this_seo_title = str_replace('Leaderboard | ', 'Leaderboard | Page '.$this_current_num.' | ' : '').' | ', $this_seo_title); }
+if ($this_current_num > 1){ $this_seo_title = str_replace('Leaderboard | ', 'Leaderboard | Page '.$this_current_num.' | ', $this_seo_title); }
 $this_seo_description = 'The Mega Man RPG Prototype currently has '.(!empty($this_leaderboard_count) ? ($this_leaderboard_count == 1 ? '1 player' : $this_leaderboard_count.' players') : '0 players').' players and that number is growing all the time. '.$this_seo_description;
 
 // Update the GET variables with the current page num
