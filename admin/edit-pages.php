@@ -242,7 +242,7 @@
             $form_data['page_title'] = !empty($_POST['page_title']) && preg_match('/^[-_0-9a-z\.\*\s\&\!\?\$]+$/i', $_POST['page_title']) ? trim($_POST['page_title']) : '';
             $form_data['page_content'] = !empty($_POST['page_content']) ? trim($_POST['page_content']) : '';
 
-            $form_data['page_seo_title'] = !empty($_POST['page_seo_title']) && preg_match('/^[-_0-9a-z\.\s]+$/i', $_POST['page_seo_title']) ? trim($_POST['page_seo_title']) : '';
+            $form_data['page_seo_title'] = !empty($_POST['page_seo_title']) && preg_match('/^[-_0-9a-z\.\*\s\&\!\?\$]+$/i', $_POST['page_seo_title']) ? trim($_POST['page_seo_title']) : '';
             $form_data['page_seo_keywords'] = !empty($_POST['page_seo_keywords']) && preg_match('/^[-_0-9a-z\.\*\s\,]+$/i', $_POST['page_seo_keywords']) ? trim(strtolower($_POST['page_seo_keywords'])) : '';
             $form_data['page_seo_description'] = !empty($_POST['page_seo_description']) ? trim(strip_tags($_POST['page_seo_description'])) : '';
 
