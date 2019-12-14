@@ -4,9 +4,12 @@
  */
 
 // Define the SEO variables for this page
-if (!empty($db_page_info['page_name'])
-    && !strstr($db_page_info['page_name'].' | ', $db_page_info['page_name'])){
+if ($db_page_info['page_url'] === 'home/'){
+    $this_seo_title = $db_page_info['page_seo_title'].' | '.$this_seo_title;
+    $this_seo_title = implode(' | ', array_unique(explode(' | ', $this_seo_title)));
+} elseif (!empty($db_page_info['page_name'])){
     $this_seo_title = $db_page_info['page_name'].' | '.$this_seo_title;
+    $this_seo_title = implode(' | ', array_unique(explode(' | ', $this_seo_title)));
 }
 if (!empty($db_page_info['page_seo_keywords'])){
     $this_seo_keywords = explode(',', $db_page_info['page_seo_keywords'].','.$this_seo_keywords);
@@ -35,6 +38,21 @@ ob_start();
     if (!empty($page_content_parsed)){
 
         // -- GLOBAL PSEUDO-CODES -- //
+
+        // Parse the pseudo-code tag <!-- MMRPG_CONFIG_ROOTURL -->
+        $find = '<!-- MMRPG_CONFIG_ROOTURL -->';
+        $replace = MMRPG_SETTINGS_CURRENT_FIELDTYPE;
+        $page_content_parsed = str_replace($find, $replace, $page_content_parsed);
+
+        // Parse the pseudo-code tag <!-- MMRPG_CONFIG_CACHE_DATE -->
+        $find = '<!-- MMRPG_CONFIG_CACHE_DATE -->';
+        $replace = MMRPG_SETTINGS_CURRENT_FIELDTYPE;
+        $page_content_parsed = str_replace($find, $replace, $page_content_parsed);
+
+        // Parse the pseudo-code tag <!-- MMRPG_CURRENT_FIELD_TYPE -->
+        $find = '<!-- MMRPG_CURRENT_FIELD_TYPE -->';
+        $replace = MMRPG_SETTINGS_CURRENT_FIELDTYPE;
+        $page_content_parsed = str_replace($find, $replace, $page_content_parsed);
 
         // Parse the pseudo-code tag <!-- MMRPG_CURRENT_FIELD_TYPE -->
         $find = '<!-- MMRPG_CURRENT_FIELD_TYPE -->';
@@ -70,46 +88,32 @@ ob_start();
             require(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/home.php');
         }
 
-        // Parse the pseudo-code tag <!-- MMRPG_LOAD_HOME_LEADERBOARD() -->
-        $find = '<!-- MMRPG_LOAD_HOME_LEADERBOARD() -->';
-        if (strstr($page_content_parsed, $find)){
-            $page_content_parsed = str_replace($find, '', $page_content_parsed);
-            require(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/home_leaderboard.php');
-        }
-
-        // Parse the pseudo-code tag <!-- MMRPG_LOAD_HOME_GALLERY() -->
-        $find = '<!-- MMRPG_LOAD_HOME_GALLERY() -->';
-        if (strstr($page_content_parsed, $find)){
-            $page_content_parsed = str_replace($find, '', $page_content_parsed);
-            require(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/home_gallery.php');
-        }
-
-        // Parse the pseudo-code tag <!-- MMRPG_LOAD_HOME_NEWS() -->
-        $find = '<!-- MMRPG_LOAD_HOME_NEWS() -->';
-        if (strstr($page_content_parsed, $find)){
-            $page_content_parsed = str_replace($find, '', $page_content_parsed);
-            require(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/home_news.php');
-        }
-
-        // Parse the pseudo-code tag <!-- MMRPG_LOAD_SCREENSHOT_GALLERY() -->
-        $find = '<!-- MMRPG_LOAD_SCREENSHOT_GALLERY() -->';
+        // Parse the pseudo-code tag <!-- MMRPG_LOAD_GALLERY_PAGE() -->
+        $find = '<!-- MMRPG_LOAD_GALLERY_PAGE() -->';
         if (strstr($page_content_parsed, $find)){
             $page_content_parsed = str_replace($find, '', $page_content_parsed);
             require(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/gallery.php');
         }
 
-        // Parse the pseudo-code tag <!-- MMRPG_LOAD_CONTACT_FORM() -->
-        $find = '<!-- MMRPG_LOAD_CONTACT_FORM() -->';
+        // Parse the pseudo-code tag <!-- MMRPG_LOAD_LEADERBOARD_PAGE() -->
+        $find = '<!-- MMRPG_LOAD_LEADERBOARD_PAGE() -->';
+        if (strstr($page_content_parsed, $find)){
+            $page_content_parsed = str_replace($find, '', $page_content_parsed);
+            require(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/leaderboard.php');
+        }
+
+        // Parse the pseudo-code tag <!-- MMRPG_LOAD_CONTACT_PAGE() -->
+        $find = '<!-- MMRPG_LOAD_CONTACT_PAGE() -->';
         if (strstr($page_content_parsed, $find)){
             $page_content_parsed = str_replace($find, '', $page_content_parsed);
             require(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/contact.php');
         }
 
-        // Parse the pseudo-code tag <!-- MMRPG_LOAD_CONTRIBUTORS_INDEX() -->
-        $find = '<!-- MMRPG_LOAD_CONTRIBUTORS_INDEX() -->';
+        // Parse the pseudo-code tag <!-- MMRPG_LOAD_CREDITS_PAGE() -->
+        $find = '<!-- MMRPG_LOAD_CREDITS_PAGE() -->';
         if (strstr($page_content_parsed, $find)){
             $page_content_parsed = str_replace($find, '', $page_content_parsed);
-            require(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/contributors.php');
+            require(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/credits.php');
         }
 
     }
