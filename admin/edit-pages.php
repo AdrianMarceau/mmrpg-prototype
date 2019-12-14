@@ -2,6 +2,10 @@
 
     <?
 
+    // Collect an index of all existing pages for reference
+    $mmrpg_pages_fields = cms_website_page::get_index_fields(true);
+    $mmrpg_website_pages_index = $db->get_array_list("SELECT {$mmrpg_pages_fields} FROM mmrpg_website_pages WHERE page_id <> 0;", 'page_id');
+
     // Pre-check access permissions before continuing
     if (!in_array('*', $this_adminaccess)
         && !in_array('edit_pages', $this_adminaccess)){
@@ -230,6 +234,7 @@
             // Collect form data from the request and parse out simple rules
 
             $form_data['page_id'] = !empty($_POST['page_id']) && is_numeric($_POST['page_id']) ? trim($_POST['page_id']) : 0;
+            $form_data['parent_id'] = !empty($_POST['parent_id']) && is_numeric($_POST['parent_id']) ? trim($_POST['parent_id']) : 0;
 
             $form_data['page_token'] = !empty($_POST['page_token']) && preg_match('/^[-_0-9a-z\.]+$/i', $_POST['page_token']) ? trim(strtolower($_POST['page_token'])) : '';
             //$form_data['page_url'] = !empty($_POST['page_url']) && preg_match('/^[-_0-9a-z\.\/]+$/i', $_POST['page_url']) ? trim(strtolower($_POST['page_url'])) : '';
@@ -299,6 +304,11 @@
             // Regenerate the URL based on the page token and parent
             if (!empty($form_data['page_token'])){
                 $form_data['page_url'] = $form_data['page_token'].'/';
+                if (!empty($form_data['parent_id'])
+                    && !empty($mmrpg_website_pages_index[$form_data['parent_id']])){
+                    $parent_page_url = $mmrpg_website_pages_index[$form_data['parent_id']]['page_url'];
+                    if (!empty($parent_page_url)){ $form_data['page_url'] = rtrim($parent_page_url, '/').'/'.$form_data['page_url']; }
+                }
             }
 
             // Loop through fields to create an update string
@@ -515,6 +525,11 @@
                                 $page_name_link = '<a class="link" href="'.$page_edit.'">'.$page_name.'</a>';
                                 $page_url_link = '<a class="link" href="'.$page_view.'" target="_blank">'.$page_url.'</a>';
 
+                                if (!empty($page_data['parent_id'])
+                                    && $sort_data['name'] == 'page_rel_order'){
+                                    $page_name_link = '&raquo; '.$page_name_link;
+                                }
+
                                 echo '<tr>'.PHP_EOL;
                                     echo '<td class="id"><div>'.$page_id.'</div></td>'.PHP_EOL;
                                     //echo '<td class="token"><div class="wrap">'.$page_token.'</div></td>'.PHP_EOL;
@@ -570,11 +585,27 @@
                     </div>
 
                     <div class="field halfsize">
-                        <div class="label">
-                            <strong>Page Token</strong>
-                            <em>avoid changing</em>
-                        </div>
-                        <input class="textbox" type="text" name="page_token" value="<?= $page_data['page_token'] ?>" maxlength="64" />
+                        <strong class="label">Page Token</strong>
+                        <input type="hidden" name="page_token" value="<?= $page_data['page_token'] ?>" />
+                        <input class="textbox" type="text" name="page_token" value="<?= $page_data['page_token'] ?>" maxlength="64" disabled="disabled" />
+                    </div>
+
+                    <div class="field halfsize">
+                        <strong class="label">Page Parent</strong>
+                        <input type="hidden" name="parent_id" value="<?= $page_data['parent_id'] ?>" />
+                        <select class="select" name="parent_id" disabled="disabled">
+                            <option value="0" <?= empty($page_data['parent_id']) ? 'selected="selected"' : '' ?>>-</option>
+                            <? foreach ($mmrpg_website_pages_index AS $key => $parent_data){
+                                if (!empty($parent_data['parent_id'])){ continue; }
+                                $value = $parent_data['page_id'];
+                                $selected = $parent_data['page_id'] == $page_data['parent_id'] ? 'selected="selected"' : '';
+                                //$label = $parent_data['page_name'];
+                                $label = $parent_data['page_url']; //.' ('.$parent_data['page_name'].')';
+                                $title = $parent_data['page_name'].' | ID '.$parent_data['page_id'];
+                                //$label .= ' | ID '.$parent_data['page_id'].' ';
+                                echo('<option value="'.$value.'" title="'.$title.'" '.$selected.'>'.$label.'</option>');
+                            } ?>
+                        </select><span></span>
                     </div>
 
                     <div class="field halfsize">
@@ -593,7 +624,7 @@
                         <input class="textbox" type="text" name="page_name" value="<?= $page_data['page_name'] ?>" maxlength="128" />
                     </div>
 
-                    <div class="field fullsize">
+                    <div class="field halfsize">
                         <div class="label">
                             <strong>Page Title</strong>
                             <em>appears at top of page in header bar</em>
