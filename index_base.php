@@ -272,20 +272,31 @@ $index_nav_markup .= trim(ob_get_clean()).PHP_EOL;
 
 }
 
+//echo('$this_current_uri = '.$this_current_uri.'<br />'.PHP_EOL);
+//echo('$this_current_sub = '.$this_current_sub.'<br />'.PHP_EOL);
+
 // Check to see if this is a database-driver page first
+$db_page_info = false;
 if (empty($this_current_uri)
     && !empty($mmrpg_page_index['home/'])){
     $db_page_info = $mmrpg_page_index['home/'];
-    require_once('pages/db-page.php');
+} elseif (!empty($this_current_uri)
+    && preg_match('/^leaderboard\//', $this_current_uri)
+    && !empty($mmrpg_page_index['leaderboard/'])){
+    $db_page_info = $mmrpg_page_index['leaderboard/'];
 } elseif (!empty($this_current_uri)
     && !empty($mmrpg_page_index[$this_current_uri])){
     $db_page_info = $mmrpg_page_index[$this_current_uri];
-    require_once('pages/db-page.php');
 }
-// Else include the required page logic file if exists
-elseif (file_exists('pages/'.$this_current_page.'.php')){
+// Include db-page if exists, else include page logic from preset files
+if (!empty($db_page_info)){
+    require_once('pages/db-page.php');
+} elseif (file_exists('pages/'.$this_current_page.'.php')){
     require_once('pages/'.$this_current_page.'.php');
 }
+
+//echo('<pre>$db_page_info = '.print_r($db_page_info, true).'</pre><br />'.PHP_EOL);
+//exit();
 
 ?>
 <!DOCTYPE html>
