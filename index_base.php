@@ -275,6 +275,7 @@ $index_nav_markup .= trim(ob_get_clean()).PHP_EOL;
 //echo('$this_current_uri = '.$this_current_uri.'<br />'.PHP_EOL);
 //echo(preg_match('/^database\/(players|robots|mechas|bosses|abilities|items|fields|types)\//', $this_current_uri) ? 'true<br />' : 'false<br />');
 //echo('$this_current_sub = '.$this_current_sub.'<br />'.PHP_EOL);
+//echo('$this_current_cat = '.$this_current_cat.'<br />'.PHP_EOL);
 
 // Check to see if this is a database-driver page first
 $db_page_info = false;
@@ -291,6 +292,13 @@ if (empty($this_current_uri)
         $db_page_info = $mmrpg_page_index['database/'.$this_current_sub.'/'];
     } elseif (!empty($mmrpg_page_index['database/'])){
         $db_page_info = $mmrpg_page_index['database/'];
+    }
+} elseif (!empty($this_current_uri)
+    && preg_match('/^community\//', $this_current_uri)){
+    if (!empty($this_current_cat) && !empty($mmrpg_page_index['community/'.$this_current_cat.'/'])){
+        $db_page_info = $mmrpg_page_index['community/'.$this_current_cat.'/'];
+    } elseif (!empty($mmrpg_page_index['community/'])){
+        $db_page_info = $mmrpg_page_index['community/'];
     }
 } elseif (!empty($this_current_uri)
     && !empty($mmrpg_page_index[$this_current_uri])){
