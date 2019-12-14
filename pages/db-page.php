@@ -95,6 +95,13 @@ ob_start();
             require(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/gallery.php');
         }
 
+        // Parse the pseudo-code tag <!-- MMRPG_LOAD_DATABASE_PAGE() -->
+        $find = '<!-- MMRPG_LOAD_DATABASE_PAGE() -->';
+        if (strstr($page_content_parsed, $find)){
+            $page_content_parsed = str_replace($find, '', $page_content_parsed);
+            require(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/database.php');
+        }
+
         // Parse the pseudo-code tag <!-- MMRPG_LOAD_LEADERBOARD_PAGE() -->
         $find = '<!-- MMRPG_LOAD_LEADERBOARD_PAGE() -->';
         if (strstr($page_content_parsed, $find)){
