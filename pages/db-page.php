@@ -54,27 +54,27 @@ ob_start();
         $replace = MMRPG_SETTINGS_CURRENT_FIELDTYPE;
         $page_content_parsed = str_replace($find, $replace, $page_content_parsed);
 
-        // Parse the pseudo-code tag <!-- MMRPG_CURRENT_FIELD_TYPE -->
-        $find = '<!-- MMRPG_CURRENT_FIELD_TYPE -->';
-        $replace = MMRPG_SETTINGS_CURRENT_FIELDTYPE;
+        // Parse the pseudo-code tag <!-- MMRPG_CURRENT_FIELD_MECHA -->
+        $find = '<!-- MMRPG_CURRENT_FIELD_MECHA -->';
+        $replace = MMRPG_SETTINGS_CURRENT_FIELDMECHA;
         $page_content_parsed = str_replace($find, $replace, $page_content_parsed);
 
         // Parse the pseudo-code tag <!-- MMRPG_ROBOT_FLOAT_SPRITE(robot, direction, frame, [size]) -->
         $temp_float_robot_matches = array();
-        preg_match_all('/<!--\s+MMRPG_ROBOT_FLOAT_SPRITE\(([-_a-z0-9\'",\s]+)\)\s+-->/im', $page_content_parsed, $temp_float_robot_matches);
+        preg_match_all('/<!--\s+MMRPG_ROBOT_FLOAT_SPRITE\(([-_a-z0-9\'",\s\|]+)\)\s+-->/im', $page_content_parsed, $temp_float_robot_matches);
         if (!empty($temp_float_robot_matches[0])){
             foreach ($temp_float_robot_matches[0] AS $key => $find){
                 $args = $temp_float_robot_matches[1][$key];
                 $args = array_map(function($s){ return trim($s, '\'" '); }, explode(',', $args));
                 $num_args = count($args);
                 if ($num_args < 3){ continue; }
-                elseif ($num_args === 3){
-                    list($robot, $direction, $frame) = $args;
-                    $replace = mmrpg_website_text_float_robot_markup($robot, $direction, $frame);
-                } elseif ($num_args === 4){
-                    list($robot, $direction, $frame, $size) = $args;
-                    $replace = mmrpg_website_text_float_robot_markup($robot, $direction, $frame, $size);
-                }
+                $robot = $direction = $frame = $size = false;
+                if ($num_args === 4){ list($robot, $direction, $frame, $size) = $args; }
+                elseif ($num_args === 3){ list($robot, $direction, $frame) = $args; }
+                if ($robot === 'MMRPG_CURRENT_FIELD_MECHA'){ $robot = MMRPG_SETTINGS_CURRENT_FIELDMECHA; }
+                if (strstr($frame, '|')){ $frames = explode('|',$frame); $frame = $frames[mt_rand(0, (count($frames) - 1))]; }
+                if ($size !== false){ $replace = mmrpg_website_text_float_robot_markup($robot, $direction, $frame, $size); }
+                else { $replace = mmrpg_website_text_float_robot_markup($robot, $direction, $frame); }
                 $page_content_parsed = str_replace($find, $replace, $page_content_parsed);
             }
         }
@@ -85,42 +85,49 @@ ob_start();
         $find = '<!-- MMRPG_LOAD_HOME_PAGE() -->';
         if (strstr($page_content_parsed, $find)){
             $page_content_parsed = str_replace($find, '', $page_content_parsed);
-            require(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/home.php');
+            require_once(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/home.php');
         }
 
         // Parse the pseudo-code tag <!-- MMRPG_LOAD_GALLERY_PAGE() -->
         $find = '<!-- MMRPG_LOAD_GALLERY_PAGE() -->';
         if (strstr($page_content_parsed, $find)){
             $page_content_parsed = str_replace($find, '', $page_content_parsed);
-            require(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/gallery.php');
+            require_once(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/gallery.php');
         }
 
         // Parse the pseudo-code tag <!-- MMRPG_LOAD_DATABASE_PAGE() -->
         $find = '<!-- MMRPG_LOAD_DATABASE_PAGE() -->';
         if (strstr($page_content_parsed, $find)){
             $page_content_parsed = str_replace($find, '', $page_content_parsed);
-            require(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/database.php');
+            require_once(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/database.php');
+        }
+
+        // Parse the pseudo-code tag <!-- MMRPG_LOAD_COMMUNITY_PAGE() -->
+        $find = '<!-- MMRPG_LOAD_COMMUNITY_PAGE() -->';
+        if (strstr($page_content_parsed, $find)){
+            $page_content_parsed = str_replace($find, '', $page_content_parsed);
+            require_once(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/community.php');
         }
 
         // Parse the pseudo-code tag <!-- MMRPG_LOAD_LEADERBOARD_PAGE() -->
         $find = '<!-- MMRPG_LOAD_LEADERBOARD_PAGE() -->';
         if (strstr($page_content_parsed, $find)){
             $page_content_parsed = str_replace($find, '', $page_content_parsed);
-            require(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/leaderboard.php');
+            require_once(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/leaderboard.php');
         }
 
         // Parse the pseudo-code tag <!-- MMRPG_LOAD_CONTACT_PAGE() -->
         $find = '<!-- MMRPG_LOAD_CONTACT_PAGE() -->';
         if (strstr($page_content_parsed, $find)){
             $page_content_parsed = str_replace($find, '', $page_content_parsed);
-            require(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/contact.php');
+            require_once(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/contact.php');
         }
 
         // Parse the pseudo-code tag <!-- MMRPG_LOAD_CREDITS_PAGE() -->
         $find = '<!-- MMRPG_LOAD_CREDITS_PAGE() -->';
         if (strstr($page_content_parsed, $find)){
             $page_content_parsed = str_replace($find, '', $page_content_parsed);
-            require(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/credits.php');
+            require_once(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/credits.php');
         }
 
     }
