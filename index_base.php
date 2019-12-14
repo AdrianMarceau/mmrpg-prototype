@@ -273,6 +273,7 @@ $index_nav_markup .= trim(ob_get_clean()).PHP_EOL;
 }
 
 //echo('$this_current_uri = '.$this_current_uri.'<br />'.PHP_EOL);
+//echo(preg_match('/^database\/(players|robots|mechas|bosses|abilities|items|fields|types)\//', $this_current_uri) ? 'true<br />' : 'false<br />');
 //echo('$this_current_sub = '.$this_current_sub.'<br />'.PHP_EOL);
 
 // Check to see if this is a database-driver page first
@@ -284,6 +285,13 @@ if (empty($this_current_uri)
     && preg_match('/^leaderboard\//', $this_current_uri)
     && !empty($mmrpg_page_index['leaderboard/'])){
     $db_page_info = $mmrpg_page_index['leaderboard/'];
+} elseif (!empty($this_current_uri)
+    && preg_match('/^database\//', $this_current_uri)){
+    if (!empty($this_current_sub) && !empty($mmrpg_page_index['database/'.$this_current_sub.'/'])){
+        $db_page_info = $mmrpg_page_index['database/'.$this_current_sub.'/'];
+    } elseif (!empty($mmrpg_page_index['database/'])){
+        $db_page_info = $mmrpg_page_index['database/'];
+    }
 } elseif (!empty($this_current_uri)
     && !empty($mmrpg_page_index[$this_current_uri])){
     $db_page_info = $mmrpg_page_index[$this_current_uri];
