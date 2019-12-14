@@ -273,7 +273,11 @@ $index_nav_markup .= trim(ob_get_clean()).PHP_EOL;
 }
 
 // Check to see if this is a database-driver page first
-if (!empty($this_current_uri)
+if (empty($this_current_uri)
+    && !empty($mmrpg_page_index['home/'])){
+    $db_page_info = $mmrpg_page_index['home/'];
+    require_once('pages/db-page.php');
+} elseif (!empty($this_current_uri)
     && !empty($mmrpg_page_index[$this_current_uri])){
     $db_page_info = $mmrpg_page_index[$this_current_uri];
     require_once('pages/db-page.php');
