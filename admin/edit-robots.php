@@ -559,7 +559,8 @@
             $backup_date_time = date('Ymd-Hi');
             $backup_exists = $db->get_value("SELECT backup_id FROM mmrpg_index_robots_backups WHERE robot_token = '{$update_data['robot_token']}' AND backup_date_time = '{$backup_date_time}';", 'backup_id');
             if (empty($backup_exists)){
-                $backup_data = $update_data;
+                //$backup_data = $update_data;
+                $backup_data = $robot_data;
                 $backup_data['backup_date_time'] = $backup_date_time;
                 $db->insert('mmrpg_index_robots_backups', $backup_data);
             }
