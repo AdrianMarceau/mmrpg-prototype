@@ -130,6 +130,13 @@ ob_start();
             require_once(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/credits.php');
         }
 
+        // Parse the pseudo-code tag <!-- MMRPG_LOAD_FILE_PAGE() -->
+        $find = '<!-- MMRPG_LOAD_FILE_PAGE() -->';
+        if (strstr($page_content_parsed, $find)){
+            $page_content_parsed = str_replace($find, '', $page_content_parsed);
+            require_once(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/file.php');
+        }
+
     }
 
     // Echo out the parsed content now that we're done with it

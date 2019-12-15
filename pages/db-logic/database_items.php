@@ -15,7 +15,7 @@ $this_graph_data['title'] .= (!empty($this_current_filter) ? ' ('.$this_current_
 // Start an output buffer to collect page contents for later
 ob_start();
 
-// If a specific item has NOT been defined, show the quick-switcher
+    // If a specific item has NOT been defined, show the quick-switcher
     if (empty($mmrpg_database_items)){ $mmrpg_database_items = array(); }
     reset($mmrpg_database_items);
     if (!empty($this_current_token)){ $first_item_key = $this_current_token; }

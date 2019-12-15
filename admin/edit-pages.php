@@ -83,8 +83,8 @@
         $search_data['page_token'] = !empty($_GET['page_token']) && preg_match('/[-_0-9a-z\.\*]+/i', $_GET['page_token']) ? trim(strtolower($_GET['page_token'])) : '';
         $search_data['page_name'] = !empty($_GET['page_name']) && preg_match('/[-_0-9a-z\.\*\s]+/i', $_GET['page_name']) ? trim(strtolower($_GET['page_name'])) : '';
         $search_data['page_url'] = !empty($_GET['page_url']) && preg_match('/[-_0-9a-z\.\/\*]+/i', $_GET['page_url']) ? trim(strtolower($_GET['page_url'])) : '';
-        $search_data['page_title'] = !empty($_GET['page_title']) && preg_match('/[-_0-9a-z\.@\*\s]+/i', $_GET['page_title']) ? trim(strtolower($_GET['page_title'])) : '';
-        $search_data['page_content'] = !empty($_GET['page_content']) && preg_match('/[-_0-9a-z\.@\*\s]+/i', $_GET['page_content']) ? trim(strtolower($_GET['page_content'])) : '';
+        $search_data['page_title'] = !empty($_GET['page_title']) && preg_match('/[-_0-9a-z\.\*\s\&\!\?\$\/]+/i', $_GET['page_title']) ? trim(strtolower($_GET['page_title'])) : '';
+        $search_data['page_content'] = !empty($_GET['page_content']) && preg_match('/[-_0-9a-z\.\*\s\&\!\?\$\/]+/i', $_GET['page_content']) ? trim(strtolower($_GET['page_content'])) : '';
         $search_data['page_flag_published'] = isset($_GET['page_flag_published']) && $_GET['page_flag_published'] !== '' ? (!empty($_GET['page_flag_published']) ? 1 : 0) : '';
         $search_data['page_flag_hidden'] = isset($_GET['page_flag_hidden']) && $_GET['page_flag_hidden'] !== '' ? (!empty($_GET['page_flag_hidden']) ? 1 : 0) : '';
 
@@ -224,6 +224,7 @@
         //if (!empty($page_data['page_title']) && $page_data['page_title'] != $page_data['page_name']){
         //    $page_name_display = $page_data['page_title'] .' / '. $page_name_display;
         //}
+        $this_page_tabtitle = $page_name_display.' | '.$this_page_tabtitle;
 
         // If form data has been submit for this page, we should process it
         $form_data = array();
@@ -238,11 +239,11 @@
 
             $form_data['page_token'] = !empty($_POST['page_token']) && preg_match('/^[-_0-9a-z\.]+$/i', $_POST['page_token']) ? trim(strtolower($_POST['page_token'])) : '';
             //$form_data['page_url'] = !empty($_POST['page_url']) && preg_match('/^[-_0-9a-z\.\/]+$/i', $_POST['page_url']) ? trim(strtolower($_POST['page_url'])) : '';
-            $form_data['page_name'] = !empty($_POST['page_name']) && preg_match('/^[-_0-9a-z\.\*\s\&\!\?\$]+$/i', $_POST['page_name']) ? trim($_POST['page_name']) : '';
-            $form_data['page_title'] = !empty($_POST['page_title']) && preg_match('/^[-_0-9a-z\.\*\s\&\!\?\$]+$/i', $_POST['page_title']) ? trim($_POST['page_title']) : '';
+            $form_data['page_name'] = !empty($_POST['page_name']) && preg_match('/^[-_0-9a-z\.\*\s\&\!\?\$\/]+$/i', $_POST['page_name']) ? trim($_POST['page_name']) : '';
+            $form_data['page_title'] = !empty($_POST['page_title']) && preg_match('/^[-_0-9a-z\.\*\s\&\!\?\$\/]+$/i', $_POST['page_title']) ? trim($_POST['page_title']) : '';
             $form_data['page_content'] = !empty($_POST['page_content']) ? trim($_POST['page_content']) : '';
 
-            $form_data['page_seo_title'] = !empty($_POST['page_seo_title']) && preg_match('/^[-_0-9a-z\.\*\s\&\!\?\$]+$/i', $_POST['page_seo_title']) ? trim($_POST['page_seo_title']) : '';
+            $form_data['page_seo_title'] = !empty($_POST['page_seo_title']) && preg_match('/^[-_0-9a-z\.\*\s\&\!\?\$\/]+$/i', $_POST['page_seo_title']) ? trim($_POST['page_seo_title']) : '';
             $form_data['page_seo_keywords'] = !empty($_POST['page_seo_keywords']) && preg_match('/^[-_0-9a-z\.\*\s\,]+$/i', $_POST['page_seo_keywords']) ? trim(strtolower($_POST['page_seo_keywords'])) : '';
             $form_data['page_seo_description'] = !empty($_POST['page_seo_description']) ? trim(strip_tags($_POST['page_seo_description'])) : '';
 
