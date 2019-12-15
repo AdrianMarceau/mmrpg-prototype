@@ -46,14 +46,13 @@
 
     // If we're in delete mode, we need to remove some data
     $delete_data = array();
-    if ($sub_action == 'delete' && !empty($_GET['page_id'])){
+    if (false && $sub_action == 'delete' && !empty($_GET['page_id'])){
 
         // Collect form data for processing
         $delete_data['page_id'] = !empty($_GET['page_id']) && is_numeric($_GET['page_id']) ? trim($_GET['page_id']) : '';
 
         // Let's delete all of this page's data from the database
         $db->delete('mmrpg_website_pages', array('page_id' => $delete_data['page_id']));
-        $db->delete('mmrpg_website_pages_sections', array('page_id' => $delete_data['page_id']));
         $form_messages[] = array('success', 'The requested page has been deleted from the database');
         exit_form_action('success');
 
@@ -545,7 +544,8 @@
 
                                 $page_actions = '';
                                 $page_actions .= '<a class="link edit" href="'.$page_edit.'"><span>edit</span></a>';
-                                $page_actions .= '<a class="link delete" data-delete="pages" data-page-id="'.$page_id.'"><span>delete</span></a>';
+                                $page_actions .= '<span class="link delete disabled"><span>delete</span></span>';
+                                //$page_actions .= '<a class="link delete" data-delete="pages" data-page-id="'.$page_id.'"><span>delete</span></a>';
 
                                 //$page_name = '<a class="link" href="'.$page_edit.'">'.$page_name_display.'</a>';
                                 $page_name_link = '<a class="link" href="'.$page_edit.'">'.$page_name.'</a>';
@@ -842,7 +842,10 @@
                             <? if (!$is_backup_data){ ?>
                                 <div class="buttons">
                                     <input class="button save" type="submit" value="Save Changes" />
+                                    <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin.php?action=edit_pages&subaction=editor&page_id=<?= $page_data['page_id'] ?>';" />
+                                    <? /*
                                     <input class="button delete" type="button" value="Delete Page" data-delete="pages" data-page-id="<?= $page_data['page_id'] ?>" />
+                                    */ ?>
                                 </div>
                             <? } ?>
 
