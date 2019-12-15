@@ -205,26 +205,38 @@
     // If we're in editor mode, we should collect page info from database
     $page_data = array();
     $editor_data = array();
-    if ($sub_action == 'editor' && !empty($_GET['page_id'])){
+    $is_backup_data = false;
+    if ($sub_action == 'editor'
+        && (!empty($_GET['page_id']) || !empty($_GET['backup_id']))){
 
         // Collect form data for processing
         $editor_data['page_id'] = !empty($_GET['page_id']) && is_numeric($_GET['page_id']) ? trim($_GET['page_id']) : '';
+        if (empty($editor_data['page_id'])
+            && !empty($_GET['backup_id'])
+            && is_numeric($_GET['backup_id'])){
+            $editor_data['backup_id'] = trim($_GET['backup_id']);
+            $is_backup_data = true;
+        }
 
         /* -- Collect Page Data -- */
 
         // Collect page details from the database
-        $page_fields = cms_website_page::get_fields(true);
-        $page_data = $db->get_array("SELECT {$page_fields} FROM mmrpg_website_pages WHERE page_id = {$editor_data['page_id']};");
+        $temp_page_fields = cms_website_page::get_fields(true);
+        if (!$is_backup_data){
+            $page_data = $db->get_array("SELECT {$temp_page_fields} FROM mmrpg_website_pages WHERE page_id = {$editor_data['page_id']};");
+        } else {
+            $temp_page_backup_fields = str_replace('page_id,', 'backup_id AS page_id,', $temp_page_fields);
+            $temp_page_backup_fields .= ', backup_date_time';
+            $page_data = $db->get_array("SELECT {$temp_page_backup_fields} FROM mmrpg_website_pages_backups WHERE backup_id = {$editor_data['backup_id']};");
+        }
 
         // If page data could not be found, produce error and exit
         if (empty($page_data)){ exit_page_edit_action(); }
 
         // Collect the page's name(s) for display
         $page_name_display = $page_data['page_name'];
-        //if (!empty($page_data['page_title']) && $page_data['page_title'] != $page_data['page_name']){
-        //    $page_name_display = $page_data['page_title'] .' / '. $page_name_display;
-        //}
         $this_page_tabtitle = $page_name_display.' | '.$this_page_tabtitle;
+        if ($is_backup_data){ $this_page_tabtitle = str_replace('Edit Pages', 'View Backups', $this_page_tabtitle); }
 
         // If form data has been submit for this page, we should process it
         $form_data = array();
@@ -318,6 +330,15 @@
             unset($update_data['page_id']);
             $update_results = $db->update('mmrpg_website_pages', $update_data, array('page_id' => $form_data['page_id']));
 
+            // If a recent backup of this data doesn't exist, create one now
+            $backup_date_time = date('Ymd-Hi');
+            $backup_exists = $db->get_value("SELECT backup_id FROM mmrpg_website_pages_backups WHERE page_id = '{$page_data['page_id']}' AND backup_date_time = '{$backup_date_time}';", 'backup_id');
+            if (empty($backup_exists)){
+                $backup_data = array_merge($page_data, $update_data);
+                $backup_data['backup_date_time'] = $backup_date_time;
+                $db->insert('mmrpg_website_pages_backups', $backup_data);
+            }
+
             // DEBUG
             //$form_messages[] = array('alert', '<pre>$form_data = '.print_r($form_data, true).'</pre>');
             //$form_messages[] = array('alert', '<pre>$update_data = '.print_r($update_data, true).'</pre>');
@@ -345,7 +366,11 @@
         <a href="admin.php">Admin Panel</a>
         &raquo; <a href="admin.php?action=edit_pages">Edit Pages</a>
         <? if ($sub_action == 'editor' && !empty($page_data)): ?>
-            &raquo; <a href="admin.php?action=edit_pages&amp;subaction=editor&amp;page_id=<?= $page_data['page_id'] ?>"><?= $page_name_display ?></a>
+            <? if (!$is_backup_data){ ?>
+                &raquo; <a href="admin.php?action=edit_pages&amp;subaction=editor&amp;page_id=<?= $page_data['page_id'] ?>"><?= $page_name_display ?></a>
+            <? } else { ?>
+                &raquo; <a><?= $page_name_display ?></a>
+            <? } ?>
         <? endif; ?>
     </div>
 
@@ -564,186 +589,299 @@
 
         <? endif; ?>
 
-        <? if ($sub_action == 'editor' && !empty($_GET['page_id'])): ?>
+        <? if ($sub_action == 'editor'
+            && (!empty($_GET['page_id']) || !empty($_GET['backup_id']))){
 
-            <!-- EDITOR FORM -->
+            // Capture editor markup in a buffer in case we need to modify
+            if (true){
+                ob_start();
+                ?>
 
-            <div class="editor">
+                <!-- EDITOR FORM -->
 
-                <h3 class="header">Edit Page &quot;<?= $page_name_display ?>&quot;</h3>
+                <div class="editor">
 
-                <? print_form_messages() ?>
+                    <h3 class="header">
+                        <span class="title"><?= !$is_backup_data ? 'Edit' : 'View' ?> Page &quot;<?= $page_name_display ?>&quot;</span>
+                        <?
+                        // If this is NOT backup data, we can generate links
+                        if (!$is_backup_data){
 
-                <form class="form" method="post">
+                            // If the page is published, generate and display a preview link
+                            if (!empty($page_data['page_flag_published'])){
+                                $preview_link = $page_data['page_url'];
+                                echo '<a class="view" href="'.$preview_link.'" target="_blank">View <i class="fas fa-external-link-square-alt"></i></a>'.PHP_EOL;
+                            }
 
-                    <input type="hidden" name="action" value="edit_pages" />
-                    <input type="hidden" name="subaction" value="editor" />
+                        }
+                        // Otherwise we'll simply show the backup creation date
+                        else {
 
-                    <div class="field halfsize">
-                        <strong class="label">Page ID</strong>
-                        <input type="hidden" name="page_id" value="<?= $page_data['page_id'] ?>" />
-                        <input class="textbox" type="text" name="page_id" value="<?= $page_data['page_id'] ?>" disabled="disabled" />
+                            // Print out the creation date in a readable form
+                            echo '<span style="display: block; clear: left; font-size: 90%; font-weight: normal;">Backup Created '.date('Y/m/d @ g:s a', strtotime(preg_replace('/^([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})([0-9]{2})$/', '$1/$2/$3T$4:$5', $page_data['backup_date_time']))).'</span>';
+
+                        }
+
+                        ?>
+                    </h3>
+
+                    <? print_form_messages() ?>
+
+                    <?
+                    // Collect a list of backups for this page from the database, if any
+                    $page_backup_list = $db->get_array_list("SELECT
+                        backup_id, page_token, page_name, page_url, backup_date_time
+                        FROM mmrpg_website_pages_backups
+                        WHERE page_id = '{$page_data['page_id']}'
+                        ORDER BY backup_date_time DESC
+                        ;");
+                    ?>
+
+                    <div class="editor-tabs" data-tabgroup="page">
+                        <a class="tab active" data-tab="basic">Basic</a><span></span>
+                        <a class="tab" data-tab="seo">SEO</a><span></span>
+                        <? if (!$is_backup_data && !empty($page_backup_list)){ ?>
+                            <a class="tab" data-tab="backups">Backups</a><span></span>
+                        <? } ?>
                     </div>
 
-                    <div class="field halfsize">
-                        <strong class="label">Page Token</strong>
-                        <input type="hidden" name="page_token" value="<?= $page_data['page_token'] ?>" />
-                        <input class="textbox" type="text" name="page_token" value="<?= $page_data['page_token'] ?>" maxlength="64" disabled="disabled" />
-                    </div>
+                    <form class="form" method="post">
 
-                    <div class="field halfsize">
-                        <strong class="label">Page Parent</strong>
-                        <input type="hidden" name="parent_id" value="<?= $page_data['parent_id'] ?>" />
-                        <select class="select" name="parent_id" disabled="disabled">
-                            <option value="0" <?= empty($page_data['parent_id']) ? 'selected="selected"' : '' ?>>-</option>
-                            <? foreach ($mmrpg_website_pages_index AS $key => $parent_data){
-                                if (!empty($parent_data['parent_id'])){ continue; }
-                                $value = $parent_data['page_id'];
-                                $selected = $parent_data['page_id'] == $page_data['parent_id'] ? 'selected="selected"' : '';
-                                //$label = $parent_data['page_name'];
-                                $label = $parent_data['page_url']; //.' ('.$parent_data['page_name'].')';
-                                $title = $parent_data['page_name'].' | ID '.$parent_data['page_id'];
-                                //$label .= ' | ID '.$parent_data['page_id'].' ';
-                                echo('<option value="'.$value.'" title="'.$title.'" '.$selected.'>'.$label.'</option>');
-                            } ?>
-                        </select><span></span>
-                    </div>
+                        <input type="hidden" name="action" value="edit_pages" />
+                        <input type="hidden" name="subaction" value="editor" />
 
-                    <div class="field halfsize">
-                        <div class="label">
-                            <strong>Page URL</strong>
-                            <em>auto-generated</em>
+                        <div class="editor-panels" data-tabgroup="page">
+
+                            <div class="panel active" data-tab="basic">
+
+                                <div class="field halfsize">
+                                    <strong class="label">Page ID</strong>
+                                    <input type="hidden" name="page_id" value="<?= $page_data['page_id'] ?>" />
+                                    <input class="textbox" type="text" name="page_id" value="<?= $page_data['page_id'] ?>" disabled="disabled" />
+                                </div>
+
+                                <div class="field halfsize">
+                                    <strong class="label">Page Token</strong>
+                                    <input type="hidden" name="page_token" value="<?= $page_data['page_token'] ?>" />
+                                    <input class="textbox" type="text" name="page_token" value="<?= $page_data['page_token'] ?>" maxlength="64" disabled="disabled" />
+                                </div>
+
+                                <div class="field halfsize">
+                                    <strong class="label">Page Parent</strong>
+                                    <input type="hidden" name="parent_id" value="<?= $page_data['parent_id'] ?>" />
+                                    <select class="select" name="parent_id" disabled="disabled">
+                                        <option value="0" <?= empty($page_data['parent_id']) ? 'selected="selected"' : '' ?>>-</option>
+                                        <? foreach ($mmrpg_website_pages_index AS $key => $parent_data){
+                                            if (!empty($parent_data['parent_id'])){ continue; }
+                                            $value = $parent_data['page_id'];
+                                            $selected = $parent_data['page_id'] == $page_data['parent_id'] ? 'selected="selected"' : '';
+                                            //$label = $parent_data['page_name'];
+                                            $label = $parent_data['page_url']; //.' ('.$parent_data['page_name'].')';
+                                            $title = $parent_data['page_name'].' | ID '.$parent_data['page_id'];
+                                            //$label .= ' | ID '.$parent_data['page_id'].' ';
+                                            echo('<option value="'.$value.'" title="'.$title.'" '.$selected.'>'.$label.'</option>');
+                                        } ?>
+                                    </select><span></span>
+                                </div>
+
+                                <div class="field halfsize">
+                                    <div class="label">
+                                        <strong>Page URL</strong>
+                                        <em>auto-generated</em>
+                                    </div>
+                                    <input class="textbox" type="text" name="page_url" value="<?= $page_data['page_url'] ?>" maxlength="128" disabled="disabled" />
+                                </div>
+
+                                <div class="field halfsize">
+                                    <div class="label">
+                                        <strong>Page Name</strong>
+                                        <em>appears in navbar</em>
+                                    </div>
+                                    <input class="textbox" type="text" name="page_name" value="<?= $page_data['page_name'] ?>" maxlength="128" />
+                                </div>
+
+                                <div class="field halfsize">
+                                    <div class="label">
+                                        <strong>Page Title</strong>
+                                        <em>appears at top of page in header bar</em>
+                                    </div>
+                                    <input class="textbox" type="text" name="page_title" value="<?= $page_data['page_title'] ?>" maxlength="128" />
+                                </div>
+
+                                <hr />
+
+                                <div class="field fullsize codemirror <?= $is_backup_data ? 'readonly' : '' ?>">
+                                    <div class="label">
+                                        <strong>Page Content</strong>
+                                        <em>basic html and some psuedo-code allowed</em>
+                                    </div>
+                                    <textarea class="textarea" name="page_content" rows="20"><?= htmlentities($page_data['page_content'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                                    <div class="label examples" style="font-size: 80%; padding-top: 4px;">
+                                        <strong>Examples</strong>:
+                                        <br />
+                                        <code style="color: green;">&lt;!--&nbsp;MMRPG_CURRENT_FIELD_TYPE --&gt;</code>
+                                        <br />
+                                        <code style="color: green;">&lt;!-- MMRPG_ROBOT_FLOAT_SPRITE('mega-man', 'right', '03') --&gt;</code>
+                                        <br />
+                                        <code style="color: green;">&lt;!--&nbsp;MMRPG_LOAD_GALLERY_PAGE() --&gt;</code>
+                                        then <code style="color: green;">&lt;!--&nbsp;MMRPG_SCREENSHOT_GALLERY_MARKUP --&gt;</code>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="panel" data-tab="seo">
+
+                                <div class="field fullsize">
+                                    <div class="label">
+                                        <strong>Page SEO Title</strong>
+                                        <em>page title used by search engines</em>
+                                    </div>
+                                    <input class="textbox" type="text" name="page_seo_title" value="<?= $page_data['page_seo_title'] ?>" maxlength="64" />
+                                </div>
+
+                                <div class="field fullsize">
+                                    <div class="label">
+                                        <strong>Page SEO Keywords</strong>
+                                        <em>page keywords considered by search engines</em>
+                                    </div>
+                                    <input class="textbox" type="text" name="page_seo_keywords" value="<?= $page_data['page_seo_keywords'] ?>" maxlength="128" />
+                                </div>
+
+                                <div class="field fullsize">
+                                    <div class="label">
+                                        <strong>Page SEO Description</strong>
+                                        <em>page description displayed in search engine results</em>
+                                    </div>
+                                    <textarea class="textarea" name="page_seo_description" rows="3" maxlength="256"><?= htmlentities($page_data['page_seo_description'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                                </div>
+
+                            </div>
+
+                            <? if (!$is_backup_data && !empty($page_backup_list)){ ?>
+                                <div class="panel" data-tab="backups">
+                                    <table class="backups">
+                                        <colgroup>
+                                            <col class="id" width="50" />
+                                            <col class="name" width="" />
+                                            <col class="url" width="" />
+                                            <col class="date" width="100" />
+                                            <col class="time" width="75" />
+                                            <col class="actions" width="100" />
+                                        </colgroup>
+                                        <thead>
+                                            <tr>
+                                                <th class="id">ID</th>
+                                                <th class="name">Name</th>
+                                                <th class="url">URL</th>
+                                                <th class="date">Date</th>
+                                                <th class="time">Time</th>
+                                                <th class="actions">&nbsp;</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <? foreach ($page_backup_list AS $backup_key => $backup_info){ ?>
+                                                <? $backup_unix_time = strtotime(preg_replace('/^([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})([0-9]{2})$/', '$1/$2/$3T$4:$5', $backup_info['backup_date_time'])); ?>
+                                                <tr>
+                                                    <td class="id"><?= $backup_info['backup_id'] ?></td>
+                                                    <td class="name"><?= $backup_info['page_name'] ?></td>
+                                                    <td class="url"><?= $backup_info['page_url'] ?></td>
+                                                    <td class="date"><?= date('Y/m/d', $backup_unix_time) ?></td>
+                                                    <td class="time"><?= date('g:i a', $backup_unix_time) ?></td>
+                                                    <td class="actions">
+                                                        <a href="admin.php?action=edit_pages&subaction=editor&backup_id=<?= $backup_info['backup_id'] ?>" target="_blank" style="text-decoration: none;">
+                                                            <span style="text-decoration: underline;">View Backup</span>
+                                                            <i class="fas fa-external-link-square-alt"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            <? } ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <? } ?>
+
                         </div>
-                        <input class="textbox" type="text" name="page_url" value="<?= $page_data['page_url'] ?>" maxlength="128" disabled="disabled" />
-                    </div>
 
-                    <div class="field halfsize">
-                        <div class="label">
-                            <strong>Page Name</strong>
-                            <em>appears in navbar</em>
-                        </div>
-                        <input class="textbox" type="text" name="page_name" value="<?= $page_data['page_name'] ?>" maxlength="128" />
-                    </div>
+                        <hr />
 
-                    <div class="field halfsize">
-                        <div class="label">
-                            <strong>Page Title</strong>
-                            <em>appears at top of page in header bar</em>
-                        </div>
-                        <input class="textbox" type="text" name="page_title" value="<?= $page_data['page_title'] ?>" maxlength="128" />
-                    </div>
+                        <div class="options">
 
-                    <hr />
+                            <div class="field checkwrap">
+                                <label class="label">
+                                    <strong>Published</strong>
+                                    <input type="hidden" name="page_flag_published" value="0" checked="checked" />
+                                    <input class="checkbox" type="checkbox" name="page_flag_published" value="1" <?= !empty($page_data['page_flag_published']) ? 'checked="checked"' : '' ?> />
+                                </label>
+                                <p class="subtext">Allow this page to be accessed</p>
+                            </div>
 
-                    <div class="field fullsize codemirror" data-types="php,html">
-                        <div class="label">
-                            <strong>Page Content</strong>
-                            <em>basic html and some psuedo-code allowed</em>
-                        </div>
-                        <textarea class="textarea" name="page_content" rows="20"><?= htmlentities($page_data['page_content'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
-                        <div class="label examples" style="font-size: 80%; padding-top: 4px;">
-                            <strong>Examples</strong>:
-                            <br />
-                            <code style="color: green;">&lt;!--&nbsp;MMRPG_CURRENT_FIELD_TYPE --&gt;</code>
-                            <br />
-                            <code style="color: green;">&lt;!-- MMRPG_ROBOT_FLOAT_SPRITE('mega-man', 'right', '03') --&gt;</code>
-                            <br />
-                            <code style="color: green;">&lt;!--&nbsp;MMRPG_LOAD_GALLERY_PAGE() --&gt;</code>
-                            then <code style="color: green;">&lt;!--&nbsp;MMRPG_SCREENSHOT_GALLERY_MARKUP --&gt;</code>
-                        </div>
-                    </div>
+                            <div class="field checkwrap">
+                                <label class="label">
+                                    <strong>Hidden</strong>
+                                    <input type="hidden" name="page_flag_hidden" value="0" checked="checked" />
+                                    <input class="checkbox" type="checkbox" name="page_flag_hidden" value="1" <?= !empty($page_data['page_flag_hidden']) ? 'checked="checked"' : '' ?> />
+                                </label>
+                                <p class="subtext">Hide this page from the navbar</p>
+                            </div>
 
-                    <hr />
+                            <div class="field checkwrap">
+                                <label class="label">
+                                    <strong>Order</strong>
+                                    <input class="textbox" type="number" name="page_order" value="<?= $page_data['page_order'] ?>" maxlength="2" style="width: 50px; margin-top: -8px; top: -2px;" />
+                                </label>
+                                <p class="subtext">Navbar position for this page</p>
+                            </div>
 
-                    <div class="field fullsize">
-                        <div class="label">
-                            <strong>Page SEO Title</strong>
-                            <em>page title used by search engines</em>
-                        </div>
-                        <input class="textbox" type="text" name="page_seo_title" value="<?= $page_data['page_seo_title'] ?>" maxlength="64" />
-                    </div>
-
-                    <div class="field fullsize">
-                        <div class="label">
-                            <strong>Page SEO Keywords</strong>
-                            <em>page keywords considered by search engines</em>
-                        </div>
-                        <input class="textbox" type="text" name="page_seo_keywords" value="<?= $page_data['page_seo_keywords'] ?>" maxlength="128" />
-                    </div>
-
-                    <div class="field fullsize">
-                        <div class="label">
-                            <strong>Page SEO Description</strong>
-                            <em>page description displayed in search engine results</em>
-                        </div>
-                        <textarea class="textarea" name="page_seo_description" rows="3" maxlength="256"><?= htmlentities($page_data['page_seo_description'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
-                    </div>
-
-                    <hr />
-
-                    <div class="options">
-
-                        <div class="field checkwrap">
-                            <label class="label">
-                                <strong>Published</strong>
-                                <input type="hidden" name="page_flag_published" value="0" checked="checked" />
-                                <input class="checkbox" type="checkbox" name="page_flag_published" value="1" <?= !empty($page_data['page_flag_published']) ? 'checked="checked"' : '' ?> />
-                            </label>
-                            <p class="subtext">Allow this page to be accessed</p>
                         </div>
 
-                        <div class="field checkwrap">
-                            <label class="label">
-                                <strong>Hidden</strong>
-                                <input type="hidden" name="page_flag_hidden" value="0" checked="checked" />
-                                <input class="checkbox" type="checkbox" name="page_flag_hidden" value="1" <?= !empty($page_data['page_flag_hidden']) ? 'checked="checked"' : '' ?> />
-                            </label>
-                            <p class="subtext">Hide this page from the navbar</p>
+                        <hr />
+
+                        <div class="formfoot">
+
+                            <? if (!$is_backup_data){ ?>
+                                <div class="buttons">
+                                    <input class="button save" type="submit" value="Save Changes" />
+                                    <input class="button delete" type="button" value="Delete Page" data-delete="pages" data-page-id="<?= $page_data['page_id'] ?>" />
+                                </div>
+                            <? } ?>
+
+                            <div class="metadata">
+                                <div class="date"><strong>Created</strong>: <?= !empty($page_data['page_date_created']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $page_data['page_date_created'])): '-' ?></div>
+                                <div class="date"><strong>Modified</strong>: <?= !empty($page_data['page_date_modified']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $page_data['page_date_modified'])) : '-' ?></div>
+                            </div>
+
                         </div>
 
-                        <div class="field checkwrap">
-                            <label class="label">
-                                <strong>Order</strong>
-                                <input class="textbox" type="number" name="page_order" value="<?= $page_data['page_order'] ?>" maxlength="2" style="width: 50px; margin-top: -8px; top: -2px;" />
-                            </label>
-                            <p class="subtext">Navbar position for this page</p>
-                        </div>
+                    </form>
 
-                    </div>
+                </div>
 
-                    <hr />
+                <?
 
-                    <div class="formfoot">
+                /*
+                $debug_page_data = $page_data;
+                $debug_page_data['page_profile_text'] = str_replace(PHP_EOL, '\\n', $debug_page_data['page_profile_text']);
+                $debug_page_data['page_credit_text'] = str_replace(PHP_EOL, '\\n', $debug_page_data['page_credit_text']);
+                echo('<pre>$page_data = '.(!empty($debug_page_data) ? htmlentities(print_r($debug_page_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
+                */
 
-                        <div class="buttons">
-                            <input class="button save" type="submit" value="Save Changes" />
-                            <input class="button delete" type="button" value="Delete Page" data-delete="pages" data-page-id="<?= $page_data['page_id'] ?>" />
-                        </div>
+                ?>
 
-                        <div class="metadata">
-                            <div class="date"><strong>Created</strong>: <?= !empty($page_data['page_date_created']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $page_data['page_date_created'])): '-' ?></div>
-                            <div class="date"><strong>Modified</strong>: <?= !empty($page_data['page_date_modified']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $page_data['page_date_modified'])) : '-' ?></div>
-                        </div>
+                <?
 
-                    </div>
+                $temp_edit_markup = ob_get_clean();
+                if ($is_backup_data){
+                    $temp_edit_markup = str_replace('<input ', '<input readonly="readonly" disabled="disabled" ', $temp_edit_markup);
+                    $temp_edit_markup = str_replace('<select ', '<select readonly="readonly" disabled="disabled" ', $temp_edit_markup);
+                    $temp_edit_markup = str_replace('<textarea ', '<textarea readonly="readonly" ', $temp_edit_markup);
+                }
+                echo($temp_edit_markup).PHP_EOL;
+            }
 
-                </form>
+        }
 
-            </div>
-
-            <?
-
-            /*
-            $debug_page_data = $page_data;
-            $debug_page_data['page_profile_text'] = str_replace(PHP_EOL, '\\n', $debug_page_data['page_profile_text']);
-            $debug_page_data['page_credit_text'] = str_replace(PHP_EOL, '\\n', $debug_page_data['page_credit_text']);
-            echo('<pre>$page_data = '.(!empty($debug_page_data) ? htmlentities(print_r($debug_page_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
-            */
-
-            ?>
-
-
-        <? endif; ?>
+        ?>
 
     </div>
 
