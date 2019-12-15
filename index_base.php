@@ -301,6 +301,13 @@ if (empty($this_current_uri)
         $db_page_info = $mmrpg_page_index['community/'];
     }
 } elseif (!empty($this_current_uri)
+    && preg_match('/^file\//', $this_current_uri)){
+    if (!empty($this_current_sub) && !empty($mmrpg_page_index['file/'.$this_current_sub.'/'])){
+        $db_page_info = $mmrpg_page_index['file/'.$this_current_sub.'/'];
+    } elseif (!empty($mmrpg_page_index['file/'])){
+        $db_page_info = $mmrpg_page_index['file/'];
+    }
+} elseif (!empty($this_current_uri)
     && !empty($mmrpg_page_index[$this_current_uri])){
     $db_page_info = $mmrpg_page_index[$this_current_uri];
 }
