@@ -290,12 +290,14 @@ $(document).ready(function(){
                 var $textArea = $codeField.find('textarea');
                 var textArea = $textArea.get(0);
                 //$textArea.css({height:'auto'});
-                var textEditor = CodeMirror.fromTextArea(textArea, {
+                var editorConfig = {
                     mode: 'htmlmixed',
                     lineNumbers: true,
                     tabSize: 2,
-                    lineWrapping: true,
-                  });
+                    lineWrapping: true
+                    };
+                if ($codeField.hasClass('readonly')){ editorConfig.readOnly = true; }
+                var textEditor = CodeMirror.fromTextArea(textArea, editorConfig);
                 });
             }
 
