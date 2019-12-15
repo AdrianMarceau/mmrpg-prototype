@@ -5,13 +5,13 @@
  */
 
 // Return immediately to prevent any work from being done
-return;
+//return;
 
-// // PAGE REMOVED UNTIL FURTHER NOTICE
-// // This page needs optimization badly and until it can be done it's being disabled
-// header("HTTP/1.1 301 Moved Permanently");
-// header('Location: '.MMRPG_CONFIG_ROOTURL.'community/general/');
-// exit();
+// PAGE REMOVED UNTIL FURTHER NOTICE
+// This page needs optimization badly and until it can be done it's being disabled
+// header("HTTP/1.1 301 Moved Permanently"); // This is not permanent
+header('Location: '.MMRPG_CONFIG_ROOTURL.'community/general/');
+exit();
 
 /*
 
