@@ -333,7 +333,8 @@
             $backup_date_time = date('Ymd-Hi');
             $backup_exists = $db->get_value("SELECT backup_id FROM mmrpg_website_pages_backups WHERE page_id = '{$page_data['page_id']}' AND backup_date_time = '{$backup_date_time}';", 'backup_id');
             if (empty($backup_exists)){
-                $backup_data = array_merge($page_data, $update_data);
+                //$backup_data = array_merge($page_data, $update_data);
+                $backup_data = $page_data;
                 $backup_data['backup_date_time'] = $backup_date_time;
                 $db->insert('mmrpg_website_pages_backups', $backup_data);
             }

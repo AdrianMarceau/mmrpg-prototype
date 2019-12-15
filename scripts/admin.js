@@ -106,11 +106,19 @@ $(document).ready(function(){
             var $tabPanels = thisAdminEditor.find('.editor-panels[data-tabgroup="'+tabGroup+'"] .panel[data-tab]');
             var showTabFunction = function(tabToken){
                 //console.log('show tab '+tabToken);
+                var $thisTabLink = $tabLinks.filter('[data-tab="'+tabToken+'"]');
+                var $thisTabPanel = $tabPanels.filter('[data-tab="'+tabToken+'"]');
                 $tabLinks.removeClass('active');
-                $tabLinks.filter('[data-tab="'+tabToken+'"]').addClass('active');
+                $thisTabLink.addClass('active');
                 $tabPanels.removeClass('active');
-                $tabPanels.filter('[data-tab="'+tabToken+'"]').addClass('active');
+                $thisTabPanel.addClass('active');
                 window.location.hash = tabToken;
+                var $thisCodeField = $thisTabPanel.find('.field.codemirror[data-editor-id]');
+                if ($thisCodeField.length){
+                    var editorID = parseInt($thisCodeField.attr('data-editor-id'));
+                    codeEditor = codeEditorIndex[editorID];
+                    codeEditor.refresh();
+                    }
                 };
             $('a[data-tab]', $tabList).bind('click', function(e){ e.preventDefault(); showTabFunction($(this).attr('data-tab')); });
             //console.log(window.location.hash);
@@ -279,6 +287,7 @@ $(document).ready(function(){
 
     // Check to make sure we're on the page editor page
     var $editPages = $('.adminform.edit_pages', thisAdmin);
+    var codeEditorIndex = {};
     //console.log('$editPages =', $editPages);
     if ($editPages.length){
 
@@ -290,6 +299,7 @@ $(document).ready(function(){
                 var $textArea = $codeField.find('textarea');
                 var textArea = $textArea.get(0);
                 //$textArea.css({height:'auto'});
+                var editorID = Object.keys(codeEditorIndex).length + 1;
                 var editorConfig = {
                     mode: 'htmlmixed',
                     lineNumbers: true,
@@ -297,7 +307,9 @@ $(document).ready(function(){
                     lineWrapping: true
                     };
                 if ($codeField.hasClass('readonly')){ editorConfig.readOnly = true; }
-                var textEditor = CodeMirror.fromTextArea(textArea, editorConfig);
+                var codeEditor = CodeMirror.fromTextArea(textArea, editorConfig);
+                codeEditorIndex[editorID] = codeEditor;
+                $codeField.attr('data-editor-id', editorID);
                 });
             }
 
