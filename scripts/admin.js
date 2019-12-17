@@ -57,6 +57,13 @@ $(document).ready(function(){
             if (typeof deleteID == 'undefined'){ return false; }
             deleteID = parseInt(deleteID);
             if (deleteID == 0){ return false; }
+            } else if (deleteKind == 'stars'){
+            // If we're deleting STARS set up the vars
+            deleteObject = 'star';
+            deleteID = deleteLink.attr('data-star-id');
+            if (typeof deleteID == 'undefined'){ return false; }
+            deleteID = parseInt(deleteID);
+            if (deleteID == 0){ return false; }
             } else {
             return false;
             }
@@ -73,6 +80,8 @@ $(document).ready(function(){
                 postURL = 'admin.php?action=edit_users&subaction=delete&user_id='+deleteID;
                 } else if (deleteKind == 'challenges'){
                 postURL = 'admin.php?action=edit_challenges&subaction=delete&challenge_id='+deleteID;
+                } else if (deleteKind == 'stars'){
+                postURL = 'admin.php?action=edit_stars&subaction=delete&star_id='+deleteID;
                 } else {
                 return false;
                 }

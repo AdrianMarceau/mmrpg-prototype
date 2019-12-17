@@ -33,8 +33,8 @@
     /* -- Form Setup Actions -- */
 
     // Define a function for exiting a star edit action
-    function exit_star_edit_action($star_id = 0){
-        if (!empty($star_id)){ $location = 'admin.php?action=edit_stars&subaction=editor&star_id='.$star_id; }
+    function exit_star_edit_action($star_id = false){
+        if ($star_id !== false){ $location = 'admin.php?action=edit_stars&subaction=editor&star_id='.$star_id; }
         else { $location = 'admin.php?action=edit_stars&subaction=search'; }
         redirect_form_action($location);
     }
@@ -49,7 +49,7 @@
 
     // If we're in delete mode, we need to remove some data
     $delete_data = array();
-    if (false && $sub_action == 'delete' && !empty($_GET['star_id'])){
+    if ($sub_action == 'delete' && !empty($_GET['star_id'])){
 
         // Collect form data for processing
         $delete_data['star_id'] = !empty($_GET['star_id']) && is_numeric($_GET['star_id']) ? trim($_GET['star_id']) : '';
@@ -96,7 +96,7 @@
         $temp_star_fields = rpg_rogue_star::get_index_fields(true, 'star');
         $search_query = "SELECT
             {$temp_star_fields},
-            CONCAT('Rogue Star ', star_id) AS star_name,
+            CONCAT(star_type, ' star ', star_power) AS star_name,
             CONCAT(star.star_from_date, '_', star.star_to_date)
                 AS star_date_range,
             (CASE
@@ -194,8 +194,11 @@
 
     // If we're in editor mode, we should collect star info from database
     $star_data = array();
+    $star_data_is_new = false;
     $editor_data = array();
-    if ($sub_action == 'editor' && !empty($_GET['star_id'])){
+    if ($sub_action == 'editor'
+        && isset($_GET['star_id'])
+        ){
 
         // Collect form data for processing
         $editor_data['star_id'] = !empty($_GET['star_id']) && is_numeric($_GET['star_id']) ? trim($_GET['star_id']) : '';
@@ -204,15 +207,52 @@
 
         // Collect star details from the database
         $temp_star_fields = rpg_rogue_star::get_fields(true);
-        $star_data = $db->get_array("SELECT {$temp_star_fields} FROM mmrpg_rogue_stars WHERE star_id = {$editor_data['star_id']};");
+        if (!empty($editor_data['star_id'])){
+            $star_data = $db->get_array("SELECT {$temp_star_fields} FROM mmrpg_rogue_stars WHERE star_id = {$editor_data['star_id']};");
+        } else {
+
+            // Generate temp data structure for the new challenge
+            $star_data_is_new = true;
+            $admin_id = $_SESSION['admin_id'];
+            $star_data = array(
+                'star_id' => 0,
+                'star_type' => '',
+                'star_from_date' => '',
+                'star_from_date_time' => '',
+                'star_to_date' => '',
+                'star_to_date_time' => '',
+                'star_power' => 0,
+                'star_flag_enabled' => 1
+                );
+
+            // Overwrite temp data with any backup data provided
+            if (!empty($backup_form_data)){
+                foreach ($backup_form_data AS $f => $v){
+                    $star_data[$f] = $v;
+                }
+            }
+
+            // Check if there's an autofill request for the dates
+            if (!empty($_GET['autofill_dates'])
+                && $_GET['autofill_dates'] == 'next_weekend'){
+                $max_to_date = $db->get_value("SELECT MAX(star_to_date) AS max FROM mmrpg_rogue_stars WHERE star_flag_enabled = 1;", 'max');
+                $max_to_date_time = strtotime($max_to_date);
+                $next_saturday = date('Y-m-d', strtotime("next saturday", $max_to_date_time));
+                $next_sunday = date('Y-m-d', strtotime("next sunday", $max_to_date_time));
+                $star_data['star_from_date'] = $next_saturday;
+                $star_data['star_to_date'] = $next_sunday;
+            }
+
+        }
+
 
         // If star data could not be found, produce error and exit
         if (empty($star_data)){ exit_star_edit_action(); }
 
         // Collect the star's name(s) for display
-        $star_name_display = 'Rogue Star '.$editor_data['star_id'];
-
-        $this_page_tabtitle = $star_name_display.' | '.$this_page_tabtitle;
+        $star_name_display = !empty($star_data['star_id']) ? ucwords($star_data['star_type'].' star '.$star_data['star_power']) : '';
+        if ($star_data_is_new){ $this_page_tabtitle = 'Schedule New Star | '.$this_page_tabtitle; }
+        else { $this_page_tabtitle = $star_name_display.' | '.$this_page_tabtitle; }
 
         // If form data has been submit for this star, we should process it
         $form_data = array();
@@ -233,42 +273,45 @@
 
             $form_data['star_flag_enabled'] = isset($_POST['star_flag_enabled']) && is_numeric($_POST['star_flag_enabled']) ? trim($_POST['star_flag_enabled']) : 0;
 
+            // If we're creating a new star, merge form data with the temp star data
+            if (empty($form_data['star_id'])){ foreach ($form_data AS $f => $v){ $star_data[$f] = $v; } }
+
             // DEBUG
             //$form_messages[] = array('alert', '<pre>$_POST = '.print_r($_POST, true).'</pre>');
 
             // If the required USER ID field was empty, complete form failure
-            if (empty($form_data['star_id'])){
+            if (!$star_data_is_new && empty($form_data['star_id'])){
                 $form_messages[] = array('error', 'Star ID was not provided');
                 $form_success = false;
             }
 
             // If the required STAR TYPE field was empty, complete form failure
             if (empty($form_data['star_type'])){
-                $form_messages[] = array('error', 'Star type was not provided or was invalid');
+                $form_messages[] = array('error', 'Star Type was not provided or was invalid');
                 $form_success = false;
             }
 
             // If the required STAR FROM DATE or TIME fields were empty, complete form failure
             if (empty($form_data['star_from_date'])){
-                $form_messages[] = array('error', 'Star from-date field was not provided or was invalid');
+                $form_messages[] = array('error', 'Start Date was not provided or was invalid');
                 $form_success = false;
             } elseif (empty($form_data['star_from_date_time'])){
-                $form_messages[] = array('error', 'Star from-time field was not provided or was invalid');
+                $form_messages[] = array('error', 'Start Time field was not provided or was invalid');
                 $form_success = false;
             }
 
             // If the required STAR TO DATE or TIME fields were empty, complete form failure
             if (empty($form_data['star_to_date'])){
-                $form_messages[] = array('error', 'Star to-date field was not provided or was invalid');
+                $form_messages[] = array('error', 'End Date field was not provided or was invalid');
                 $form_success = false;
             } elseif (empty($form_data['star_to_date_time'])){
-                $form_messages[] = array('error', 'Star to-time field was not provided or was invalid');
+                $form_messages[] = array('error', 'End Time field was not provided or was invalid');
                 $form_success = false;
             }
 
             // If the required STAR POWER field was empty, complete form failure
             if (empty($form_data['star_power'])){
-                $form_messages[] = array('error', 'Star power was not provided');
+                $form_messages[] = array('error', 'Star Power was not provided');
                 $form_success = false;
             }
 
@@ -277,25 +320,56 @@
 
             // If trying to update the STAR TYPE but it was invalid, do not update
             if (empty($form_data['star_type']) && !empty($_POST['star_type'])){
-                $form_messages[] = array('warning', 'Star type was invalid and will not be updated');
+                $form_messages[] = array('warning', 'Star Type was invalid and will not be updated');
                 unset($form_data['star_type']);
             }
 
             // Loop through fields to create an update string
             $update_data = $form_data;
             unset($update_data['star_id']);
-            $update_results = $db->update('mmrpg_rogue_stars', $update_data, array('star_id' => $form_data['star_id']));
+            //$update_results = $db->update('mmrpg_rogue_stars', $update_data, array('star_id' => $form_data['star_id']));
 
             // DEBUG
             //$form_messages[] = array('alert', '<pre>$form_data = '.print_r($form_data, true).'</pre>');
             //$form_messages[] = array('alert', '<pre>$update_data = '.print_r($update_data, true).'</pre>');
 
-            // If we made it this far, the update must have been a success
-            if ($update_results !== false){ $form_messages[] = array('success', 'Star details were updated successfully'); }
-            else { $form_messages[] = array('error', 'Star details could not be updated'); }
+            // If this is a new star we insert, otherwise we update the existing
+            if ($star_data_is_new){
+
+                // Update the main database index with changes to this star's data
+                $insert_results = $db->insert('mmrpg_rogue_stars', $update_data);
+
+                // If we made it this far, the update must have been a success
+                if ($insert_results !== false){ $form_success = true; $form_messages[] = array('success', 'Rogue Star data was created successfully!'); }
+                else { $form_success = false; $form_messages[] = array('error', 'Rogue Star data could not be created...'); }
+
+                // If the form was a success, collect the new ID and redirect
+                if ($form_success){
+                    $new_star_id = $db->get_value("SELECT MAX(star_id) AS max FROM mmrpg_rogue_stars;", 'max');
+                    $form_data['star_id'] = $new_star_id;
+                }
+
+            } else {
+
+                // Update the main database index with changes to this star's data
+                $update_results = $db->update('mmrpg_rogue_stars', $update_data, array('star_id' => $form_data['star_id']));
+
+                // If we made it this far, the update must have been a success
+                if ($update_results !== false){ $form_messages[] = array('success', 'Rogue Star data was updated successfully!'); }
+                else { $form_messages[] = array('error', 'Rogue Star data could not be updated...'); }
+
+            }
+
+            // Update cache timestamp if changes were successful
+            if ($form_success){
+                list($date, $time) = explode('-', date('Ymd-Hi'));
+                $db->update('mmrpg_config', array('config_value' => $date), "config_group = 'global' AND config_name = 'cache_date'");
+                $db->update('mmrpg_config', array('config_value' => $time), "config_group = 'global' AND config_name = 'cache_time'");
+            }
 
             // We're done processing the form, we can exit
-            exit_star_edit_action($form_data['star_id']);
+            if ($star_data_is_new){ exit_star_edit_action(false); }
+            else { exit_star_edit_action($form_data['star_id']); }
 
             //echo('<pre>$form_action = '.print_r($form_action, true).'</pre>');
             //echo('<pre>$_POST = '.print_r($_POST, true).'</pre>');
@@ -313,7 +387,7 @@
         <a href="admin.php">Admin Panel</a>
         &raquo; <a href="admin.php?action=edit_stars">Edit Rogue Stars</a>
         <? if ($sub_action == 'editor' && !empty($star_data)): ?>
-            &raquo; <a href="admin.php?action=edit_stars&amp;subaction=editor&amp;star_id=<?= $star_data['star_id'] ?>"><?= $star_name_display ?></a>
+            &raquo; <a href="admin.php?action=edit_stars&amp;subaction=editor&amp;star_id=<?= $star_data['star_id'] ?>"><?= !empty($star_name_display) ? $star_name_display : 'Schedule New' ?></a>
         <? endif; ?>
     </div>
 
@@ -345,7 +419,7 @@
                         <strong class="label">By Type</strong>
                         <select class="select" name="star_type"><option value=""></option><?
                             foreach ($mmrpg_types_index AS $type_token => $type_info){
-                                if ($type_info['type_class'] === 'special' && $type_token !== 'none'){ continue; }
+                                if ($type_info['type_class'] === 'special' || $type_token === 'copy'){ continue; }
                                 ?><option value="<?= $type_token ?>"<?= !empty($search_data['star_type']) && $search_data['star_type'] === $type_token ? ' selected="selected"' : '' ?>><?= $type_token === 'none' ? 'Neutral' : ucfirst($type_token) ?></option><?
                                 } ?>
                         </select><span></span>
@@ -409,6 +483,7 @@
                     <div class="buttons">
                         <input class="button" type="submit" value="Search" />
                         <input class="button" type="reset" value="Reset" onclick="javascript:window.location.href='admin.php?action=edit_stars';" />
+                        <a class="button new" href="admin.php?action=edit_stars&subaction=editor&star_id=0&autofill_dates=next_weekend">Schedule Next Star</a>
                     </div>
 
                 </form>
@@ -492,7 +567,7 @@
                             foreach ($search_results AS $key => $star_data){
 
                                 $star_id = $star_data['star_id'];
-                                $star_name = $star_data['star_name'];
+                                $star_name = ucwords($star_data['star_name']);
                                 $star_power = $star_data['star_power'];
                                 $star_flag_enabled = !empty($star_data['star_flag_enabled']) ? '<i class="fas fa-check-square"></i>' : '-';
 
@@ -555,7 +630,9 @@
 
         <? endif; ?>
 
-        <? if ($sub_action == 'editor' && !empty($_GET['star_id'])){
+        <? if ($sub_action == 'editor'
+                && isset($_GET['star_id'])
+                ){
 
             // Capture editor markup in a buffer in case we need to modify
             if (true){
@@ -567,7 +644,7 @@
                 <div class="editor">
 
                     <h3 class="header type_span type_<?= !empty($star_data['star_type']) ? $star_data['star_type'] : 'none' ?>" data-auto="field-type" data-field-type="star_type">
-                        <span class="title">Editing &quot;<?= $star_name_display ?>&quot;</span>
+                        <span class="title"><?= !empty($star_name_display) ? 'Editing &quot;'.$star_name_display.'&quot;' : 'Schedule New Star' ?></span>
                     </h3>
 
                     <? print_form_messages() ?>
@@ -581,25 +658,6 @@
                             <strong class="label">Star ID</strong>
                             <input type="hidden" name="star_id" value="<?= $star_data['star_id'] ?>" />
                             <input class="textbox" type="text" name="star_id" value="<?= $star_data['star_id'] ?>" disabled="disabled" />
-                        </div>
-
-                        <div class="field halfsize">
-                            <strong class="label">Star Type</strong>
-                            <select class="select" name="star_type">
-                                <option value="0" <?= empty($star_data['star_type']) ? 'selected="selected"' : '' ?>>-</option>
-                                <? foreach ($mmrpg_types_index AS $key => $type_info){
-                                    if ($type_info['type_class'] !== 'normal'){ continue; }
-                                    $value = $type_info['type_token'];
-                                    $selected = $type_info['type_token'] == $star_data['star_type'] ? 'selected="selected"' : '';
-                                    $label = $type_info['type_name'];
-                                    echo('<option value="'.$value.'" title="'.$title.'" '.$selected.'>'.$label.'</option>');
-                                } ?>
-                            </select><span></span>
-                        </div>
-
-                        <div class="field halfsize">
-                            <strong class="label">Star Power</strong>
-                            <input class="textbox" type="number" name="star_power" value="<?= $star_data['star_power'] ?>" maxlength="4"  min="100" max="1000" step="100" />
                         </div>
 
                         <div class="field foursize litepicker">
@@ -620,6 +678,26 @@
                             <input class="textbox" type="hidden" name="star_to_date_time" value="<?= !empty($star_data['star_to_date_time']) ? $star_data['star_to_date_time'] : '23:59:59' ?>" maxlength="8" />
                         </div>
 
+                        <div class="field halfsize">
+                            <strong class="label">Star Type</strong>
+                            <select class="select" name="star_type">
+                                <option value="0" <?= empty($star_data['star_type']) ? 'selected="selected"' : '' ?>>-</option>
+                                <? foreach ($mmrpg_types_index AS $key => $type_info){
+                                    if ($type_info['type_class'] !== 'normal'){ continue; }
+                                    elseif ($type_info['type_token'] === 'copy'){ continue; }
+                                    $value = $type_info['type_token'];
+                                    $selected = $type_info['type_token'] == $star_data['star_type'] ? 'selected="selected"' : '';
+                                    $label = $type_info['type_name'];
+                                    echo('<option value="'.$value.'" title="'.$title.'" '.$selected.'>'.$label.'</option>');
+                                } ?>
+                            </select><span></span>
+                        </div>
+
+                        <div class="field halfsize">
+                            <strong class="label">Star Power</strong>
+                            <input class="textbox" type="number" name="star_power" value="<?= $star_data['star_power'] ?>" maxlength="4"  min="100" max="1000" step="100" />
+                        </div>
+
                         <hr />
 
                         <div class="options">
@@ -630,7 +708,7 @@
                                     <input type="hidden" name="star_flag_enabled" value="0" checked="checked" />
                                     <input class="checkbox" type="checkbox" name="star_flag_enabled" value="1" <?= !empty($star_data['star_flag_enabled']) ? 'checked="checked"' : '' ?> />
                                 </label>
-                                <p class="subtext">Allow this star to be appear in-game</p>
+                                <p class="subtext">Allow this star to appear in-game</p>
                             </div>
 
                         </div>
