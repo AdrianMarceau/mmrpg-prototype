@@ -479,8 +479,8 @@
                                 <th class="url"><?= cms_admin::get_sort_link('page_url', 'URL') ?></th>
                                 <th class="date created"><?= cms_admin::get_sort_link('page_date_created', 'Created') ?></th>
                                 <th class="date modified"><?= cms_admin::get_sort_link('page_date_modified', 'Modified') ?></th>
-                                <th class="flag published"><?= cms_admin::get_sort_link('challenge_flag_published', 'Published') ?></th>
-                                <th class="flag hidden"><?= cms_admin::get_sort_link('challenge_flag_hidden', 'Hidden') ?></th>
+                                <th class="flag published"><?= cms_admin::get_sort_link('page_flag_published', 'Published') ?></th>
+                                <th class="flag hidden"><?= cms_admin::get_sort_link('page_flag_hidden', 'Hidden') ?></th>
                                 <th class="order"><?= cms_admin::get_sort_link('page_rel_order', 'Order') ?></th>
                                 <th class="actions">Actions</th>
                             </tr>
