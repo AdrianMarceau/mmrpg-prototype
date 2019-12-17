@@ -201,6 +201,11 @@ elseif ($this_page_action == 'edit_challenges'){
     // Require the edit challenges file
     require(MMRPG_CONFIG_ROOTDIR.'admin/edit-challenges.php');
 }
+// Else if this is an EDIT ROGUE STARS request
+elseif ($this_page_action == 'edit_stars'){
+    // Require the edit stars file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/edit-stars.php');
+}
 // Otherwise, not a valid page
 else {
     // Define error 404 text to print

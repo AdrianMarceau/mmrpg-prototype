@@ -51,7 +51,7 @@
             || in_array('edit_pages', $this_adminaccess)){
             ?>
             <li class="item">
-                <a href="admin.php?action=edit_pages">Edit Pages</a>
+                <a href="admin.php?action=edit_pages">Edit Website Pages</a>
                 <em>edit the text and images on various website pages</em>
             </li>
             <?
@@ -79,8 +79,17 @@
             || in_array('edit_robots', $this_adminaccess)){
             ?>
             <li class="item">
-                <a href="admin.php?action=edit_robots">Edit Robots</a>
-                <em>edit the stats, abilities, and details of database robots</em>
+                <a href="admin.php?action=edit_robots">Edit Robot Index</a>
+                <em>edit the base stats, abilities, images, etc. of all robots</em>
+            </li>
+            <?
+        }
+        if (in_array('*', $this_adminaccess)
+            || in_array('edit_stars', $this_adminaccess)){
+            ?>
+            <li class="item">
+                <a href="admin.php?action=edit_stars">Add / Edit Rogue Stars</a>
+                <em>add or edit rogue star appearances in the post-game</em>
             </li>
             <?
         }
@@ -88,8 +97,8 @@
             || in_array('edit_challenges', $this_adminaccess)){
             ?>
             <li class="item">
-                <a href="admin.php?action=edit_challenges">Edit Challenges</a>
-                <em>edit and create challenge missions for the post-game</em>
+                <a href="admin.php?action=edit_challenges">Add / Edit Challenge Missions</a>
+                <em>add or edit custom challenge missions for the post-game</em>
             </li>
             <?
         }
