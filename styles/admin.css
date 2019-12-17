@@ -621,6 +621,21 @@ tr:nth-child(odd) td {
     margin-right: 4px;
 }
 
+
+
+.adminform.edit_stars table th.type,
+.adminform.edit_stars table td.type,
+.adminform.edit_stars table th.power,
+.adminform.edit_stars table td.power,
+.adminform.edit_stars table th.status,
+.adminform.edit_stars table td.status {
+    text-align: center;
+}
+.adminform.edit_stars table td.type .type_span,
+.adminform.edit_stars table td.status .type_span {
+    min-width: 75px;
+}
+
 .adminform .editor ul.files {
     border: 0 none transparent;
     list-style-type: none;
@@ -1187,8 +1202,7 @@ input[type=file] {
     text-align: right;
     padding-right: 6px;
 }
-.adminform .results .list .created,
-.adminform .results .list .modified,
+.adminform .results .list .date,
 .adminform .results .list .flag,
 .adminform .results .list .order {
     text-align: center;
@@ -1250,6 +1264,13 @@ input[type=file] {
 .adminform .editor .buttons .delete:hover,
 .adminform .editor .buttons .cancel:hover {
     background-color: #a52c2c;
+}
+.adminform .editor .buttons .reset {
+    background-color: #0b4c84;
+    border-color: #073155;
+}
+.adminform .editor .buttons .reset:hover {
+    background-color: #0e599a;
 }
 
 .adminform .editor .field input[name="user_omega"] {

@@ -316,6 +316,61 @@ $(document).ready(function(){
     }
 
 
+    // STAR EDITOR EVENTS
+
+    // Check to make sure we're on the star editor page
+    var $editStars = $('.adminform.edit_stars', thisAdmin);
+    var litePickerIndex = {};
+    //console.log('$editStars =', $editStars);
+    if ($editStars.length){
+
+        // Replace any compatible textareas with LitePicker instances
+        if (typeof window.Litepicker !== 'undefined'){
+            var $litePickerFields = $('.field.litepicker', $editStars);
+            $litePickerFields.each(function(){
+                var $pickerField = $(this);
+                //console.log('adding new picker field to ', $pickerField.attr('class'));
+                if ($pickerField.hasClass('readonly')){ return true; }
+                if ($pickerField.hasClass('haspicker')){ return true; }
+                var $textInput = $pickerField.find('input[type="text"]').first();
+                var textInput = $textInput.get(0);
+                var pickerID = Object.keys(litePickerIndex).length + 1;
+                var pickerConfig = {
+                    element: textInput,
+                    autoApply: true,
+                    lang: 'en-US',
+                    format: 'YYYY-MM-DD',
+                    firstDay: 1,
+                    minDays: 1
+                    };
+                if ($textInput.is('[data-next-name]')){
+                    //console.log('data-next-name found! looking for next input...');
+                    var nextName = $textInput.attr('data-next-name');
+                    var $nextInput = $editStars.find('input[name="'+nextName+'"]');
+                    var $nextField = $nextInput.closest('.field.litepicker');
+                    if ($nextInput.length){
+                        //console.log('...end-date found! updating config...');
+                        var nextInput = $nextInput.get(0);
+                        pickerConfig.elementEnd = nextInput;
+                        pickerConfig.singleMode = false;
+                        pickerConfig.selectForward = true;
+                        pickerConfig.numberOfMonths = 2;
+                        pickerConfig.numberOfColumns = 2;
+                        $nextField.addClass('haspicker');
+                        }
+                    }
+                var litePicker = new Litepicker(pickerConfig);
+                litePickerIndex[pickerID] = litePicker;
+                $pickerField.attr('data-picker-id', pickerID);
+                $pickerField.addClass('haspicker');
+                });
+            }
+
+            //var picker = new Litepicker({ element: document.getElementById('litepicker') });
+
+    }
+
+
     // ROBOT EDITOR EVENTS
 
     // ...none at the moment
