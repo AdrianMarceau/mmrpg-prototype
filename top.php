@@ -34,6 +34,7 @@ require('classes/cms_database.php');
 require('classes/cms_website.php');
 require('classes/cms_website_page.php');
 require('classes/cms_index.php');
+require('classes/cms_image.php');
 
 // Define the debug mode flag based on session flag if not already set
 if (!defined('MMRPG_CONFIG_DEBUG_MODE')){
