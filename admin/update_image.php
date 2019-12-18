@@ -41,6 +41,7 @@ $image_data['fileinfo'] = !empty($_FILES['file_info']) && is_array($_FILES['file
 $image_data['req_kind'] = !empty($_POST['file_kind']) && preg_match('/^[-_0-9a-z]+\/[-_0-9a-z]+$/i', $_POST['file_kind']) ? trim($_POST['file_kind']) : false;
 $image_data['req_width'] = !empty($_POST['file_width']) && is_numeric($_POST['file_width']) ? (int)(trim($_POST['file_width'])) : false;
 $image_data['req_height'] = !empty($_POST['file_height']) && is_numeric($_POST['file_height']) ? (int)(trim($_POST['file_height'])) : false;
+$image_data['req_extras'] = !empty($_POST['file_extras']) && preg_match('/^[-_0-9a-z\,]+$/i', $_POST['file_extras']) ? explode(',', (trim($_POST['file_extras']))) : false;
 
 // Check the hash to see if this action is approved and validated
 $actual_hash = md5($image_data['action'].'/'.$image_data['path'].$image_data['name'].'/'.MMRPG_SETTINGS_PASSWORD_SALT);
@@ -58,12 +59,19 @@ elseif ($image_data['action'] == 'delete' && !$image_data['exists']){ js_exit('e
 
 // DEBUG DEBUG DEBUG
 //echo('<pre>$image_data = '.print_r($image_data, true).'</pre>'.PHP_EOL);
+//echo('<pre>$_GET = '.print_r($_GET, true).'</pre>'.PHP_EOL);
+//echo('<pre>$_POST = '.print_r($_POST, true).'</pre>'.PHP_EOL);
+//echo('<pre>$image_data = '.print_r($image_data, true).'</pre>'.PHP_EOL);
+//exit();
 
 // Ensure the main folder is created for this file
 if (!file_exists(MMRPG_CONFIG_ROOTDIR.$image_data['path'])){
     @mkdir(MMRPG_CONFIG_ROOTDIR.$image_data['path']);
     @chown(MMRPG_CONFIG_ROOTDIR.$image_data['path'], 'mmrpgworld');
 }
+
+// Define an array to hold any updated files and what was done with them
+$updated_image_files = array();
 
 // If this is an UPLOAD request, validate the file and then move it if possible
 if ($image_data['action'] == 'upload'){
@@ -75,6 +83,7 @@ if ($image_data['action'] == 'upload'){
     $image_size = getimagesize($image_data['fileinfo']['tmp_name']);
     $image_size['width'] = isset($image_size[0]) ? $image_size[0] : 0;
     $image_size['height'] = isset($image_size[1]) ? $image_size[1] : 0;
+    $image_size['xsize'] = $image_size['height'].'x'.$image_size['height'];
     //echo('<pre>$image_size = '.print_r($image_size, true).'</pre>'.PHP_EOL);
 
     // Validate the image type AGAIN if a type filter was provided
@@ -92,7 +101,42 @@ if ($image_data['action'] == 'upload'){
 
     // Attempt to move the image and return the status of the action (we can move temp file directly)
     $move_status = move_uploaded_file($image_data['fileinfo']['tmp_name'], $image_data['dirpath']);
-    if (file_exists($image_data['dirpath'])){ js_exit('success', 'file-uploaded', $move_status); }
+    $move_success = file_exists($image_data['dirpath']) ? true : false;
+    if ($move_success){ $updated_image_files[basename($image_data['dirpath'])] = true; }
+
+    // Only apply extra filters/actions if the move was a success
+    if ($move_success){
+
+        // Check to see if the "AUTO-ZOOM-X2" extra has been requested
+        if (in_array('auto-zoom-x2', $image_data)){
+            //echo('upload w/ AUTO-ZOOM-X2 has been requested!'.PHP_EOL);
+            $zoom_data = array();
+            $zoom_data['width'] = $image_size['width'] * 2;
+            $zoom_data['height'] = $image_size['height'] * 2;
+            $zoom_data['xsize'] = $zoom_data['height'].'x'.$zoom_data['height'];
+            $find_name_pattern = '/(^|$|_|\.)'.$image_size['xsize'].'(^|$|_|\.)/';
+            $replace_name_pattern = '${1}'.$zoom_data['xsize'].'${2}';
+            $zoom_data['name'] = preg_replace($find_name_pattern, $replace_name_pattern, $image_data['name']);
+            $zoom_data['dirpath'] = preg_replace($find_name_pattern, $replace_name_pattern, $image_data['dirpath']);
+            //echo('<pre>$zoom_data = '.print_r($zoom_data, true).'</pre>'.PHP_EOL);
+            $cms_image = new cms_image();
+            $cms_image->image_create(
+                $image_data['dirpath'], // source_path
+                $zoom_data['dirpath'], // export_path
+                '', // export_type
+                $zoom_data['width'], // export_width
+                $zoom_data['height'], // export_height
+                array(), // options
+                array() // filters
+                );
+            $create_success = file_exists($zoom_data['dirpath']) ? true : false;
+            if ($create_success){ $updated_image_files[basename($zoom_data['dirpath'])] = true; }
+        }
+
+    }
+
+    // Return success of error by checking that the file has been added to the destination
+    if ($move_success){ js_exit('success', 'file-uploaded', json_encode(array('updated' => $updated_image_files))); }
     else { js_exit('error', 'upload-error', 'error-code-'.$move_status);  }
 
 }
@@ -117,7 +161,56 @@ elseif ($image_data['action'] == 'delete'){
 
     // Attempt to copy the image and return the status of the action (remove old file if successful)
     $copy_status = copy($old_location, $new_location);
-    if (file_exists($new_location)){ @unlink($old_location); js_exit('success','file-removed'); }
+    $copy_success = file_exists($new_location) ? true : false;
+    $unlink_status = $copy_success ? @unlink($old_location) : false;
+    $unlink_success = $copy_success ? (!file_exists($old_location) ? true : false) : false;
+    if ($copy_success && $unlink_success){ $updated_image_files[basename($old_location)] = false; }
+
+    // Only process extra actions if the copy and unlink were a success
+    if ($copy_success && $unlink_success){
+
+        // Collect this image's size (and REAL type details)
+        $image_size = getimagesize($new_location);
+        $image_size['width'] = isset($image_size[0]) ? $image_size[0] : 0;
+        $image_size['height'] = isset($image_size[1]) ? $image_size[1] : 0;
+        $image_size['xsize'] = $image_size['height'].'x'.$image_size['height'];
+        //echo('<pre>$image_size = '.print_r($image_size, true).'</pre>'.PHP_EOL);
+
+        // Check to see if the "AUTO-ZOOM-X2" extra has been requested
+        if (in_array('auto-zoom-x2', $image_data)){
+            //echo('delete w/ AUTO-ZOOM-X2 has been requested!'.PHP_EOL);
+            $zoom_data = array();
+            $zoom_data['width'] = $image_size['width'] * 2;
+            $zoom_data['height'] = $image_size['height'] * 2;
+            $zoom_data['xsize'] = $zoom_data['height'].'x'.$zoom_data['height'];
+            $find_name_pattern = '/(^|$|_|\.)'.$image_size['xsize'].'(^|$|_|\.)/';
+            $replace_name_pattern = '${1}'.$zoom_data['xsize'].'${2}';
+            $zoom_data['name'] = preg_replace($find_name_pattern, $replace_name_pattern, $image_data['name']);
+            $zoom_data['dirpath'] = preg_replace($find_name_pattern, $replace_name_pattern, $image_data['dirpath']);
+            //echo('<pre>$zoom_data = '.print_r($zoom_data, true).'</pre>'.PHP_EOL);
+            $old_zoom_location = preg_replace($find_name_pattern, $replace_name_pattern, $old_location);
+            $new_zoom_location = preg_replace($find_name_pattern, $replace_name_pattern, $new_location);
+            //echo('<pre>$old_zoom_location = '.print_r($old_zoom_location, true).'</pre>'.PHP_EOL);
+            //echo('<pre>$new_zoom_location = '.print_r($new_zoom_location, true).'</pre>'.PHP_EOL);
+            // Attempt to copy the image and return the status of the action (remove old file if successful)
+            if (file_exists($old_zoom_location)){
+                $copy_status2 = copy($old_zoom_location, $new_zoom_location);
+                $copy_success2 = file_exists($new_zoom_location) ? true : false;
+                $unlink_status2 = $copy_success2 ? @unlink($old_zoom_location) : false;
+                $unlink_success2 = $copy_success2 ? (!file_exists($old_zoom_location) ? true : false) : false;
+                if ($copy_success2 && $unlink_success2){ $updated_image_files[basename($old_zoom_location)] = false; }
+                //echo('<pre>$copy_status2 = '.print_r($copy_status2, true).'</pre>'.PHP_EOL);
+                //echo('<pre>$copy_success2 = '.print_r($copy_success2, true).'</pre>'.PHP_EOL);
+                //echo('<pre>$unlink_status2 = '.print_r($unlink_status2, true).'</pre>'.PHP_EOL);
+                //echo('<pre>$unlink_success2 = '.print_r($unlink_success2, true).'</pre>'.PHP_EOL);
+            }
+
+        }
+
+    }
+
+    // Return success of error by checking that the file has been added to the destination
+    if ($copy_success && $unlink_success){ js_exit('success','file-removed', json_encode(array('updated' => $updated_image_files))); }
     else { js_exit('error','remove-error', 'error-code-'.$copy_status);  }
 
 }

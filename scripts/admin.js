@@ -201,6 +201,7 @@ $(document).ready(function(){
                 var autoFileWidth = $element.is('[data-file-width]') ? parseInt($element.attr('data-file-width')) : '';
                 var autoFileHeight = $element.is('[data-file-height]') ? parseInt($element.attr('data-file-height')) : '';
                 //console.log('auto file bar! autoFilePath =', autoFilePath, 'autoFileName = ', autoFileName);
+                var autoFileExtras = $element.is('[data-file-extras]') ? $element.attr('data-file-extras') : '';
                 var $uploadLink = $element.find('[data-action="upload"]');
                 var $uploadInput = $uploadLink.find('input[type="file"]');
                 var $deleteLink = $element.find('[data-action="delete"]');
@@ -213,7 +214,51 @@ $(document).ready(function(){
                     $adminAjaxForm.append('<input type="text" name="file_name" value="'+autoFileName+'" />');
                     $adminAjaxForm.append('<input type="text" name="file_action" value="'+fileAction+'" />');
                     $adminAjaxForm.append('<input type="text" name="file_hash" value="'+fileHash+'" />');
+                    $adminAjaxForm.append('<input type="text" name="file_extras" value="'+autoFileExtras+'" />');
                     return;
+                    };
+                var parseActionDetails = function(detailsString){
+                    if (detailsString.slice(0, 1) === '{'){
+                        var detailsObject = JSON.parse(detailsString);
+                        if (typeof detailsObject.updated !== 'undefined'){
+                            updateUpdatedImages(detailsObject.updated);
+                            }
+                        }
+                    };
+                var updateUpdatedImages = function(updatedFiles){
+                    var updatedFileNames = Object.keys(updatedFiles);
+                    for (var i = 0; i < updatedFileNames.length; i++){
+                        var fileName = updatedFileNames[i];
+                        var fileExists = updatedFiles[fileName];
+                        //console.log(fileName+' '+(fileExists ? 'exists now!' : 'doesn\'t exist anymore!'));
+                        var $tempField = $listItem.closest('.field.sprites');
+                        var $tempElement = $tempField.find('.filebar[data-file-path="'+autoFilePath+'"][data-file-name="'+fileName+'"]');
+                        var $tempListItem = $tempElement.closest('li');
+                        //console.log('$tempField = ', $tempField.length, $tempField);
+                        //console.log('$tempElement = ', $tempElement.length, $tempElement);
+                        var $tempUploadLink = $tempElement.find('[data-action="upload"]');
+                        var $tempUploadInput = $tempUploadLink.find('input[type="file"]');
+                        var $tempDeleteLink = $tempElement.find('[data-action="delete"]');
+                        var $tempViewLink = $tempElement.find('.link.view');
+                        var $tempStatusSpan = $tempElement.find('.info.status');
+                        if (fileExists){
+                            $tempUploadLink.addClass('disabled');
+                            $tempUploadInput.prop('disabled', true);
+                            $tempDeleteLink.removeClass('disabled');
+                            $tempStatusSpan.removeClass('bad').addClass('good').html('&check;');
+                            var tempNewViewHref = $tempViewLink.attr('data-href') + '?' + Date.now();
+                            $tempViewLink.removeClass('disabled').attr('href', tempNewViewHref);
+                            $tempListItem.addClass('success');
+                            } else {
+                            $tempDeleteLink.addClass('disabled');
+                            $tempUploadLink.removeClass('disabled');
+                            $tempUploadInput.prop('disabled', false);
+                            $tempStatusSpan.removeClass('good').addClass('bad').html('&cross;');
+                            $tempViewLink.addClass('disabled').removeAttr('href');
+                            //$listItem.addClass('success');
+                            }
+                        setTimeout(function(){ $tempListItem.removeClass('pending success error'); }, 500);
+                        }
                     };
                 var uploadAction = function(){
                     if (actionInProgress || $uploadLink.hasClass('disabled')){ return false; }
@@ -232,6 +277,7 @@ $(document).ready(function(){
                                 var newViewHref = $viewLink.attr('data-href') + '?' + Date.now();
                                 $viewLink.removeClass('disabled').attr('href', newViewHref);
                                 $listItem.addClass('success');
+                                parseActionDetails(details);
                                 } else if (status == 'error'){
                                 alert('There was an problem uploading the image! \n' + message + ' \n' + details);
                                 $listItem.addClass('error');
@@ -267,6 +313,7 @@ $(document).ready(function(){
                                 $statusSpan.removeClass('good').addClass('bad').html('&cross;');
                                 $viewLink.addClass('disabled').removeAttr('href');
                                 //$listItem.addClass('success');
+                                parseActionDetails(details);
                                 } else if (status == 'error'){
                                 alert('There was an problem deleting the image! \n' + message + ' \n' + details);
                                 $listItem.addClass('error');
