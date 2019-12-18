@@ -1485,7 +1485,7 @@
 
                                             <? if (!$is_backup_data){ ?>
 
-                                                <div class="field fullsize has2cols widecols multirow">
+                                                <div class="field fullsize has2cols widecols multirow sprites">
                                                     <?
                                                     $sheet_groups = array('sprites', 'shadows');
                                                     $sheet_kinds = array('mug', 'sprite');
@@ -1497,8 +1497,19 @@
                                                         elseif ($group == 'shadows'){ $this_alt_path = $alt_shadow_path; }
                                                         foreach ($sheet_sizes AS $size_key => $size){
                                                             $sheet_height = $size;
-                                                            echo('<div class="subfield"'.($size_key == 0 ? ' style="clear: left;"' : '').'>'.PHP_EOL);
-                                                                echo('<strong class="sublabel" style="font-size: 90%;">'.$group.' @ '.(100 + ($size_key * 100)).'%</strong><br />'.PHP_EOL);
+                                                            $files_are_automatic = false;
+                                                            //if ($group == 'shadows' || $size_key != 0){ $files_are_automatic = true; }
+                                                            if ($size_key > 0){ $files_are_automatic = true; }
+                                                            $subfield_class = 'subfield';
+                                                            if ($files_are_automatic){ $subfield_class .= ' auto-generated'; }
+                                                            $subfield_style = '';
+                                                            if ($size_key == 0){ $subfield_style = 'clear: left; '; }
+                                                            if (!empty($subfield_style)){ $subfield_style = ' style="'.trim($subfield_style).'"'; }
+                                                            $subfield_name = $group.' @ '.(100 + ($size_key * 100)).'%';
+                                                            echo('<div class="'.$subfield_class.'"'.$subfield_style.'>'.PHP_EOL);
+                                                                echo('<strong class="sublabel" style="font-size: 90%;">'.$subfield_name.'</strong>'.PHP_EOL);
+                                                                if ($files_are_automatic){ echo('<span class="sublabel" style="font-size: 90%; color: #969696;">(auto-generated)</span>'.PHP_EOL); }
+                                                                echo('<br />'.PHP_EOL);
                                                                 echo('<ul class="files">'.PHP_EOL);
                                                                 foreach ($sheet_kinds AS $kind_key => $kind){
                                                                     $sheet_width = $kind != 'mug' ? ($size * $num_frames) : $size;
@@ -1508,14 +1519,15 @@
                                                                         if ($group == 'sprites'){ $file_exists = in_array($file_name, $alt_files_existing) ? true : false; }
                                                                         elseif ($group == 'shadows'){ $file_exists = in_array($file_name, $alt_shadows_existing) ? true : false; }
                                                                         $file_is_unused = false;
-                                                                        if ($group == 'shadows' && ($kind == 'mug' || $size_key == 0)){ $file_is_unused = true; }
+                                                                        //if ($group == 'shadows' && ($kind == 'mug' || $size_key == 0)){ $file_is_unused = true; }
+                                                                        if ($group == 'shadows' && $kind == 'mug'){ $file_is_unused = true; }
                                                                         $file_is_optional = $group == 'shadows' && !$is_base_sprite ? true : false;
                                                                         echo('<li>');
-                                                                            echo('<div class="filebar'.($file_is_unused ? ' unused' : '').($file_is_optional ? ' optional' : '').'" data-auto="file-bar" data-file-path="'.$this_alt_path.'" data-file-name="'.$file_name.'" data-file-kind="image/png" data-file-width="'.$sheet_width.'" data-file-height="'.$sheet_height.'">');
+                                                                            echo('<div class="filebar'.($file_is_unused ? ' unused' : '').($file_is_optional ? ' optional' : '').'" data-auto="file-bar" data-file-path="'.$this_alt_path.'" data-file-name="'.$file_name.'" data-file-kind="image/png" data-file-width="'.$sheet_width.'" data-file-height="'.$sheet_height.'" data-file-extras="auto-zoom-x2,auto-shadows">');
                                                                                 echo($file_exists ? '<a class="link view" href="'.$file_href.'?'.time().'" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>' : '<a class="link view disabled" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>');
                                                                                 echo('<span class="info size">'.$sheet_width.'w &times; '.$sheet_height.'h</span>');
                                                                                 echo($file_exists ? '<span class="info status good">&check;</span>' : '<span class="info status bad">&cross;</span>');
-                                                                                if (!$is_backup_data){
+                                                                                if (!$is_backup_data && !$files_are_automatic){
                                                                                     echo('<a class="action delete'.(!$file_exists ? ' disabled' : '').'" data-action="delete" data-file-hash="'.md5('delete/'.$this_alt_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">Delete</a>');
                                                                                     echo('<a class="action upload'.($file_exists ? ' disabled' : '').'" data-action="upload" data-file-hash="'.md5('upload/'.$this_alt_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">');
                                                                                         echo('<span class="text">Upload</span>');

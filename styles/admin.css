@@ -650,6 +650,9 @@ tr:nth-child(odd) td {
     position: relative;
     transition: border-color 0.3s, background-color 0.3s;
 }
+.adminform .editor .auto-generated ul.files > li {
+    border-color: transparent;
+}
 .adminform .editor ul.files > li.pending {
     border-color: #ffc107;
     background-color: #fff0c2;
