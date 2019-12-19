@@ -1315,7 +1315,7 @@
                                         <em>base image path for sprites</em>
                                     </div>
                                     <select class="select" name="robot_image">
-                                        <option value="<?= $placeholder_folder ?>" <?= $robot_data['robot_image'] == $placeholder_folder ? 'selected="selected"' : '' ?>>images/robots/<?= $placeholder_folder ?>/</option>
+                                        <option value="<?= $placeholder_folder ?>" <?= $robot_data['robot_image'] == $placeholder_folder ? 'selected="selected"' : '' ?>>-</option>
                                         <option value="<?= $robot_data['robot_token'] ?>" <?= $robot_data['robot_image'] == $robot_data['robot_token'] ? 'selected="selected"' : '' ?>>images/robots/<?= $robot_data['robot_token'] ?>/</option>
                                     </select><span></span>
                                 </div>
@@ -1325,16 +1325,18 @@
                                         <strong>Sprite Size</strong>
                                         <em>base frame size for each sprite</em>
                                     </div>
-                                    <? if ($robot_data['robot_image'] != $placeholder_folder){ ?>
-                                        <select class="select" name="robot_image_size">
+                                    <select class="select" name="robot_image_size">
+                                        <? if ($robot_data['robot_image'] == $placeholder_folder){ ?>
+                                            <option value="<?= $robot_data['robot_image_size'] ?>" selected="selected">-</option>
+                                            <option value="40">40x40</option>
+                                            <option value="80">80x80</option>
+                                            <option disabled="disabled" value="160">160x160</option>
+                                        <? } else { ?>
                                             <option value="40" <?= $robot_data['robot_image_size'] == 40 ? 'selected="selected"' : '' ?>>40x40</option>
                                             <option value="80" <?= $robot_data['robot_image_size'] == 80 ? 'selected="selected"' : '' ?>>80x80</option>
                                             <option disabled="disabled" value="160" <?= $robot_data['robot_image_size'] == 160 ? 'selected="selected"' : '' ?>>160x160</option>
-                                        </select><span></span>
-                                    <? } else { ?>
-                                        <input type="hidden" name="robot_image_size" value="<?= $robot_data['robot_image_size'] ?>" />
-                                        <input class="textbox" type="text" name="robot_image_size" value="-" disabled="disabled" />
-                                    <? } ?>
+                                        <? } ?>
+                                    </select><span></span>
                                 </div>
 
                                 <div class="field halfsize">
