@@ -227,38 +227,49 @@ $(document).ready(function(){
                     };
                 var updateUpdatedImages = function(updatedFiles){
                     var updatedFileNames = Object.keys(updatedFiles);
+                    var $updatedListItems = [];
                     for (var i = 0; i < updatedFileNames.length; i++){
                         var fileName = updatedFileNames[i];
                         var fileExists = updatedFiles[fileName];
                         //console.log(fileName+' '+(fileExists ? 'exists now!' : 'doesn\'t exist anymore!'));
                         var $tempField = $listItem.closest('.field.sprites');
-                        var $tempElement = $tempField.find('.filebar[data-file-path="'+autoFilePath+'"][data-file-name="'+fileName+'"]');
-                        var $tempListItem = $tempElement.closest('li');
-                        //console.log('$tempField = ', $tempField.length, $tempField);
-                        //console.log('$tempElement = ', $tempElement.length, $tempElement);
-                        var $tempUploadLink = $tempElement.find('[data-action="upload"]');
-                        var $tempUploadInput = $tempUploadLink.find('input[type="file"]');
-                        var $tempDeleteLink = $tempElement.find('[data-action="delete"]');
-                        var $tempViewLink = $tempElement.find('.link.view');
-                        var $tempStatusSpan = $tempElement.find('.info.status');
-                        if (fileExists){
-                            $tempUploadLink.addClass('disabled');
-                            $tempUploadInput.prop('disabled', true);
-                            $tempDeleteLink.removeClass('disabled');
-                            $tempStatusSpan.removeClass('bad').addClass('good').html('&check;');
-                            var tempNewViewHref = $tempViewLink.attr('data-href') + '?' + Date.now();
-                            $tempViewLink.removeClass('disabled').attr('href', tempNewViewHref);
-                            $tempListItem.addClass('success');
-                            } else {
-                            $tempDeleteLink.addClass('disabled');
-                            $tempUploadLink.removeClass('disabled');
-                            $tempUploadInput.prop('disabled', false);
-                            $tempStatusSpan.removeClass('good').addClass('bad').html('&cross;');
-                            $tempViewLink.addClass('disabled').removeAttr('href');
-                            //$listItem.addClass('success');
-                            }
-                        setTimeout(function(){ $tempListItem.removeClass('pending success error'); }, 500);
+                        //var $tempElements = $tempField.find('.filebar[data-file-path="'+autoFilePath+'"][data-file-name="'+fileName+'"]');
+                        var $tempElements = $tempField.find('.filebar[data-file-name="'+fileName+'"]');
+                        $tempElements.each(function(){
+                            var $tempElement = $(this);
+                            var $tempListItem = $tempElement.closest('li');
+                            $updatedListItems.push($tempListItem);
+                            //console.log('$tempField = ', $tempField.length, $tempField);
+                            //console.log('$tempElement = ', $tempElement.length, $tempElement);
+                            var $tempUploadLink = $tempElement.find('[data-action="upload"]');
+                            var $tempUploadInput = $tempUploadLink.find('input[type="file"]');
+                            var $tempDeleteLink = $tempElement.find('[data-action="delete"]');
+                            var $tempViewLink = $tempElement.find('.link.view');
+                            var $tempStatusSpan = $tempElement.find('.info.status');
+                            if (fileExists){
+                                $tempUploadLink.addClass('disabled');
+                                $tempUploadInput.prop('disabled', true);
+                                $tempDeleteLink.removeClass('disabled');
+                                $tempStatusSpan.removeClass('bad').addClass('good').html('&check;');
+                                var tempNewViewHref = $tempViewLink.attr('data-href') + '?' + Date.now();
+                                $tempViewLink.removeClass('disabled').attr('href', tempNewViewHref);
+                                $tempListItem.addClass('success');
+                                } else {
+                                $tempDeleteLink.addClass('disabled');
+                                $tempUploadLink.removeClass('disabled');
+                                $tempUploadInput.prop('disabled', false);
+                                $tempStatusSpan.removeClass('good').addClass('bad').html('&cross;');
+                                $tempViewLink.addClass('disabled').removeAttr('href');
+                                //$listItem.addClass('success');
+                                }
+                            });
                         }
+                    setTimeout(function(){
+                        for (var i = 0; i < $updatedListItems.length; i++){
+                            var $tempListItem = $updatedListItems[i];
+                            $tempListItem.removeClass('pending success error');
+                            }
+                        }, 500);
                     };
                 var uploadAction = function(){
                     if (actionInProgress || $uploadLink.hasClass('disabled')){ return false; }
