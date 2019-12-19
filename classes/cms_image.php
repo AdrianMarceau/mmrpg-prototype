@@ -582,6 +582,8 @@ class cms_image {
                 @imagefilter($source_link, $filterinfo['type'], $filterinfo['arg1']);
             elseif (defined('IMG_FILTER_BRIGHTNESS') && $filterinfo['type'] == IMG_FILTER_BRIGHTNESS):
                 @imagefilter($source_link, $filterinfo['type'], $filterinfo['arg1']);
+            elseif (defined('IMG_FILTER_ALPHA') && $filterinfo['type'] == IMG_FILTER_ALPHA):
+                $source_link = self::image_setopacity($source_link, $filterinfo['arg1']);
             else:
                 @imagefilter($source_link, $filterinfo['type']);
             endif;
@@ -790,6 +792,34 @@ class cms_image {
         return $new_height;
     }
 
+    // Define a function for altering (reducing) the transparency of a an image resource object
+    // Via: https://stackoverflow.com/questions/14468405/change-the-opacity-of-an-image-in-php
+    function image_setopacity( $imageSrc, $opacity )
+    {
+        $width  = imagesx( $imageSrc );
+        $height = imagesy( $imageSrc );
+
+        // Duplicate image and convert to TrueColor
+        $imageDst = imagecreatetruecolor( $width, $height );
+        imagealphablending( $imageDst, false );
+        imagefill( $imageDst, 0, 0, imagecolortransparent( $imageDst ));
+        imagecopy( $imageDst, $imageSrc, 0, 0, 0, 0, $width, $height );
+
+        // Set new opacity to each pixel
+        for ( $x = 0; $x < $width; ++$x )
+            for ( $y = 0; $y < $height; ++$y ) {
+                $pixelColor = imagecolorat( $imageDst, $x, $y );
+                $pixelOpacity = 127 - (( $pixelColor >> 24 ) & 0xFF );
+                if ( $pixelOpacity > 0 ) {
+                    $pixelOpacity = $pixelOpacity * $opacity;
+                    $pixelColor = ( $pixelColor & 0xFFFFFF ) | ( (int)round( 127 - $pixelOpacity ) << 24 );
+                    imagesetpixel( $imageDst, $x, $y, $pixelColor );
+                }
+            }
+
+        return $imageDst;
+    }
+
     /*
      * STATUS MESSAGE FUNCTIONS
      */
@@ -940,6 +970,9 @@ define('CMS_IMAGE_LOADING', 'loading');
 define('CMS_IMAGE_ALERT', 'alert');
 define('CMS_IMAGE_DEFAULT', 'default');
 define('CMS_IMAGE_UNKNOWN', 'unknown');
+
+// Define IMAGE FILTER constants for things that aren't native
+if (!defined('IMG_FILTER_ALPHA')){ define('IMG_FILTER_ALPHA', 'IMG_FILTER_ALPHA'); }
 
 
 ?>
