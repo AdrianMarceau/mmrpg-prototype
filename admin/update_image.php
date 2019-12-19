@@ -147,6 +147,8 @@ if ($image_data['action'] == 'upload'){
             $shadow_replace_pattern = '/images/${1}_shadows/';
             $shadow_dirpath = preg_replace($shadow_find_pattern, $shadow_replace_pattern, $image_data['dirpath']);
             //echo('<pre>$shadow_dirpath = '.print_r($shadow_dirpath, true).'</pre>'.PHP_EOL);
+            $shadow_dirname = dirname($shadow_dirpath);
+            if (!file_exists($shadow_dirname)){ @mkdir($shadow_dirname); @chown($shadow_dirname, 'mmrpgworld'); }
             if (file_exists($shadow_dirpath)){ @unlink($shadow_dirpath); }
             $cms_image->image_create(
                 $image_data['dirpath'], // source_path
