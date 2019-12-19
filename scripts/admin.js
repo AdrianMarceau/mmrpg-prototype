@@ -194,14 +194,15 @@ $(document).ready(function(){
 
             // Define functionality for the FILE BAR auto elements
             else if (autoType === 'file-bar'){
+
                 var $listItem = $element.closest('li');
                 var autoFilePath = $element.attr('data-file-path');
                 var autoFileName = $element.attr('data-file-name');
                 var autoFileKind = $element.is('[data-file-kind]') ? $element.attr('data-file-kind') : '';
                 var autoFileWidth = $element.is('[data-file-width]') ? parseInt($element.attr('data-file-width')) : '';
                 var autoFileHeight = $element.is('[data-file-height]') ? parseInt($element.attr('data-file-height')) : '';
-                //console.log('auto file bar! autoFilePath =', autoFilePath, 'autoFileName = ', autoFileName);
                 var autoFileExtras = $element.is('[data-file-extras]') ? $element.attr('data-file-extras') : '';
+                //console.log('auto file bar! autoFilePath =', autoFilePath, 'autoFileName = ', autoFileName);
                 var $uploadLink = $element.find('[data-action="upload"]');
                 var $uploadInput = $uploadLink.find('input[type="file"]');
                 var $deleteLink = $element.find('[data-action="delete"]');
@@ -217,6 +218,30 @@ $(document).ready(function(){
                     $adminAjaxForm.append('<input type="text" name="file_extras" value="'+autoFileExtras+'" />');
                     return;
                     };
+                var getCleanAutoFileExtras = function(){
+                    //console.log('getCleanAutoFileExtras() | autoFilePath =', autoFilePath, 'autoFileName = ', autoFileName);
+                    var cleanAutoFileExtras = [];
+                    if (autoFileExtras.length){
+                        var baseFileExtras = autoFileExtras.split(',');
+                        //console.log('baseFileExtras =', baseFileExtras.length, baseFileExtras);
+                        var $tempContainer = $element.closest('.field.has-filebars');
+                        //console.log('$tempContainer =', $tempContainer.length, $tempContainer);
+                        var disabledFileExtras = $tempContainer.is('[data-disable-extras]') ? $tempContainer.attr('data-disable-extras') : '';
+                        if (disabledFileExtras.length){ disabledFileExtras = disabledFileExtras.split(','); }
+                        else { disabledFileExtras = []; }
+                        //console.log('disabledFileExtras =', disabledFileExtras.length, disabledFileExtras);
+                        for (var i = 0; i < baseFileExtras.length; i++){
+                            var extra = baseFileExtras[i];
+                            var allowed = true;
+                            if (disabledFileExtras.indexOf(extra) !== -1){ allowed = false; }
+                            if (!allowed){ continue; }
+                            cleanAutoFileExtras.push(extra);
+                            }
+                        }
+                    cleanAutoFileExtras = cleanAutoFileExtras.join(',');
+                    //console.log('returning cleanAutoFileExtras =', cleanAutoFileExtras.length, cleanAutoFileExtras);
+                    return cleanAutoFileExtras;
+                    };
                 var parseActionDetails = function(detailsString){
                     if (detailsString.slice(0, 1) === '{'){
                         var detailsObject = JSON.parse(detailsString);
@@ -229,12 +254,18 @@ $(document).ready(function(){
                     var updatedFileNames = Object.keys(updatedFiles);
                     var $updatedListItems = [];
                     for (var i = 0; i < updatedFileNames.length; i++){
-                        var fileName = updatedFileNames[i];
-                        var fileExists = updatedFiles[fileName];
-                        //console.log(fileName+' '+(fileExists ? 'exists now!' : 'doesn\'t exist anymore!'));
-                        var $tempField = $listItem.closest('.field.sprites');
-                        //var $tempElements = $tempField.find('.filebar[data-file-path="'+autoFilePath+'"][data-file-name="'+fileName+'"]');
-                        var $tempElements = $tempField.find('.filebar[data-file-name="'+fileName+'"]');
+                        var fileURL = updatedFileNames[i];
+                        var filePath = fileURL.replace(/^(.*?)\/([^\/]+)$/i, '$1/');
+                        var fileName = fileURL.replace(/^(.*?)\/([^\/]+)$/i, '$2');
+                        var fileExists = updatedFiles[fileURL];
+                        //console.log('fileURL = ', fileURL.length, fileURL);
+                        //console.log('filePath = ', filePath.length, filePath);
+                        //console.log('fileName = ', fileName.length, fileName);
+                        //console.log('fileExists = ', fileExists);
+                        //console.log(fileURL+' '+(fileExists ? 'exists now!' : 'doesn\'t exist anymore!'));
+                        var $tempField = $listItem.closest('.field.has-filebars');
+                        var $tempElements = $tempField.find('.filebar[data-file-path="'+filePath+'"][data-file-name="'+fileName+'"]');
+                        //var $tempElements = $tempField.find('.filebar[data-file-name="'+fileName+'"]');
                         $tempElements.each(function(){
                             var $tempElement = $(this);
                             var $tempListItem = $tempElement.closest('li');
@@ -302,6 +333,8 @@ $(document).ready(function(){
                         $adminAjaxForm.append('<input type="text" name="file_kind" value="'+autoFileKind+'" />');
                         $adminAjaxForm.append('<input type="text" name="file_width" value="'+autoFileWidth+'" />');
                         $adminAjaxForm.append('<input type="text" name="file_height" value="'+autoFileHeight+'" />');
+                        $adminAjaxForm.append('<input type="text" name="file_extras" value="'+getCleanAutoFileExtras()+'" />');
+                        //console.log('$adminAjaxForm.html() =', $adminAjaxForm.html());
                         $adminAjaxForm.submit();
                         actionInProgress = true;
                         return true;
@@ -334,6 +367,7 @@ $(document).ready(function(){
                             };
                         $listItem.addClass('pending');
                         setupAjax('delete', $deleteLink.is('[data-file-hash]') ? $deleteLink.attr('data-file-hash') : '');
+                        //console.log('$adminAjaxForm.html() =', $adminAjaxForm.html());
                         $adminAjaxForm.submit();
                         actionInProgress = true;
                         return true;
@@ -346,6 +380,33 @@ $(document).ready(function(){
                 $deleteLink.bind('click', function(e){ e.preventDefault(); return deleteAction(); });
                 }
 
+            });
+        }
+
+
+    // Generate events for any generator checkboxes in fields with file-upload bars
+    var $fieldsWithFileBars = $('.field.has-filebars', thisAdminForm);
+    //console.log('$fieldsWithFileBars =', $fieldsWithFileBars.length, $fieldsWithFileBars);
+    if ($fieldsWithFileBars.length){
+        $fieldsWithFileBars.each(function(){
+            var $fileBarContainer = $(this);
+            var $autoShadowsCheckbox = $fileBarContainer.next('.options').find('input[type="checkbox"][name$="\[generate_shadows\]"]');
+            //console.log('$fileBarContainer =', $fileBarContainer.length, $fileBarContainer);
+            //console.log('$autoShadowsCheckbox =', $autoShadowsCheckbox.length, $autoShadowsCheckbox);
+            if ($autoShadowsCheckbox.length){
+                var $shadowFileBars = $fileBarContainer.find('.subfield[data-group="shadows"]');
+                $autoShadowsCheckbox.bind('change', function(e){
+                    var isChecked = $autoShadowsCheckbox.is(':checked') ? true : false;
+                    //console.log('isChecked =', isChecked);
+                    if (isChecked){
+                        $shadowFileBars.css({display:'block'});
+                        $fileBarContainer.removeAttr('data-disable-extras');
+                        } else {
+                        $shadowFileBars.css({display:'none'});
+                        $fileBarContainer.attr('data-disable-extras', 'auto-shadows');
+                        }
+                    }).trigger('change');
+                }
             });
         }
 
