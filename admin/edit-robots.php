@@ -1487,7 +1487,7 @@
 
                                             <? if (!$is_backup_data){ ?>
 
-                                                <div class="field fullsize has2cols widecols multirow sprites">
+                                                <div class="field fullsize has2cols widecols multirow sprites has-filebars">
                                                     <?
                                                     $sheet_groups = array('sprites', 'shadows');
                                                     $sheet_kinds = array('mug', 'sprite');
@@ -1508,7 +1508,7 @@
                                                             if ($size_key == 0){ $subfield_style = 'clear: left; '; }
                                                             if (!empty($subfield_style)){ $subfield_style = ' style="'.trim($subfield_style).'"'; }
                                                             $subfield_name = $group.' @ '.(100 + ($size_key * 100)).'%';
-                                                            echo('<div class="'.$subfield_class.'"'.$subfield_style.'>'.PHP_EOL);
+                                                            echo('<div class="'.$subfield_class.'"'.$subfield_style.' data-group="'.$group.'" data-size="'.$size.'">'.PHP_EOL);
                                                                 echo('<strong class="sublabel" style="font-size: 90%;">'.$subfield_name.'</strong>'.PHP_EOL);
                                                                 if ($files_are_automatic){ echo('<span class="sublabel" style="font-size: 90%; color: #969696;">(auto-generated)</span>'.PHP_EOL); }
                                                                 echo('<br />'.PHP_EOL);
@@ -1568,6 +1568,14 @@
                                                             </div>
 
                                                     <? } else { ?>
+
+                                                            <div class="field checkwrap rfloat">
+                                                                <label class="label">
+                                                                    <strong style="color: #262626;">Auto-Generate Shadows?</strong>
+                                                                    <input class="checkbox" type="checkbox" name="robot_image_alts[<?= $alt_token ?>][generate_shadows]" value="1" <?= !empty($alt_shadows_existing) ? 'checked="checked"' : '' ?> />
+                                                                </label>
+                                                                <p class="subtext" style="color: #262626;">Only generate alt shadows if silhouette differs from base</p>
+                                                            </div>
 
                                                             <div class="field checkwrap rfloat fullsize">
                                                                 <label class="label">
