@@ -1446,10 +1446,10 @@
                                                 <strong class="label">
                                                     <? if ($is_base_sprite){ ?>
                                                         Base Sprite Sheets
-                                                        <em>Main sprites used for robot. Faded are unused, all others are required.</em>
+                                                        <em>Main sprites used for robot. Zoom and shadow sprites are auto-generated.</em>
                                                     <? } else { ?>
                                                         <?= ucfirst($alt_token).' Sprite Sheets'  ?>
-                                                        <em>Sprites used for robot's <strong><?= $alt_token ?></strong> skin. Faded are unused, shadows are optional.</em>
+                                                        <em>Sprites used for robot's <strong><?= $alt_token ?></strong> skin. Zoom and shadow sprites are auto-generated.</em>
                                                     <? } ?>
                                                 </strong>
                                             </div>
@@ -1498,8 +1498,8 @@
                                                         foreach ($sheet_sizes AS $size_key => $size){
                                                             $sheet_height = $size;
                                                             $files_are_automatic = false;
-                                                            //if ($group == 'shadows' || $size_key != 0){ $files_are_automatic = true; }
-                                                            if ($size_key > 0){ $files_are_automatic = true; }
+                                                            if ($group == 'shadows' || $size_key != 0){ $files_are_automatic = true; }
+                                                            //if ($size_key > 0){ $files_are_automatic = true; }
                                                             $subfield_class = 'subfield';
                                                             if ($files_are_automatic){ $subfield_class .= ' auto-generated'; }
                                                             $subfield_style = '';
@@ -1520,7 +1520,7 @@
                                                                         elseif ($group == 'shadows'){ $file_exists = in_array($file_name, $alt_shadows_existing) ? true : false; }
                                                                         $file_is_unused = false;
                                                                         //if ($group == 'shadows' && ($kind == 'mug' || $size_key == 0)){ $file_is_unused = true; }
-                                                                        if ($group == 'shadows' && $kind == 'mug'){ $file_is_unused = true; }
+                                                                        //if ($group == 'shadows' && $kind == 'mug'){ $file_is_unused = true; }
                                                                         $file_is_optional = $group == 'shadows' && !$is_base_sprite ? true : false;
                                                                         echo('<li>');
                                                                             echo('<div class="filebar'.($file_is_unused ? ' unused' : '').($file_is_optional ? ' optional' : '').'" data-auto="file-bar" data-file-path="'.$this_alt_path.'" data-file-name="'.$file_name.'" data-file-kind="image/png" data-file-width="'.$sheet_width.'" data-file-height="'.$sheet_height.'" data-file-extras="auto-zoom-x2,auto-shadows">');
