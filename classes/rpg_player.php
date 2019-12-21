@@ -1680,6 +1680,7 @@ class rpg_player extends rpg_object {
             'player_image',
             'player_image_size',
             'player_image_editor',
+            'player_image_editor2',
             'player_image_alts',
             'player_type',
             'player_type2',
@@ -2529,7 +2530,7 @@ class rpg_player extends rpg_object {
                                     <td class="right">
                                         <div class="ability_container">
                                         <?
-                                        $index_player = $mmrpg_index['players'][$player_info['player_token']];
+                                        $index_player = $mmrpg_database_players[$player_info['player_token']];
                                         $player_ability_core = !empty($index_player['player_type']) ? $index_player['player_type'] : false;
                                         $player_ability_list = !empty($index_player['player_abilities']) ? $index_player['player_abilities'] : array();
                                         $player_ability_rewards = !empty($player_info['player_rewards']['abilities']) ? $player_info['player_rewards']['abilities'] : array();
