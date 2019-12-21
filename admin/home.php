@@ -76,11 +76,20 @@
         $temp_group_name = 'Game Editors';
         ob_start();
         if (in_array('*', $this_adminaccess)
+            || in_array('edit_players', $this_adminaccess)){
+            ?>
+            <li class="item">
+                <a href="admin.php?action=edit_players">Update Player Database</a>
+                <em>edit the details and images of the in-game player characters</em>
+            </li>
+            <?
+        }
+        if (in_array('*', $this_adminaccess)
             || in_array('edit_robots', $this_adminaccess)){
             ?>
             <li class="item">
                 <a href="admin.php?action=edit_robots">Update Robot Database</a>
-                <em>edit the base stats, abilities, images, etc. of all in-game robots</em>
+                <em>edit the details and images of robot masters, mechas, and bosses</em>
             </li>
             <?
         }
@@ -122,15 +131,6 @@
         $temp_group_name = 'Import Scripts';
         ob_start();
         if (in_array('*', $this_adminaccess)
-            || in_array('import_players', $this_adminaccess)){
-            ?>
-            <li class="item">
-                <a href="admin.php?action=import_players">Refresh Player Database</a>
-                <em>rescan players directory then purge + update the database</em>
-            </li>
-            <?
-        }
-        if (in_array('*', $this_adminaccess)
             || in_array('import_abilities', $this_adminaccess)){
             ?>
             <li class="item">
@@ -154,6 +154,15 @@
             <li class="item">
                 <a href="admin.php?action=import_fields">Refresh Field Database</a>
                 <em>rescan fields directory then purge + update the database</em>
+            </li>
+            <?
+        }
+        if (in_array('*', $this_adminaccess)
+            || in_array('import_players', $this_adminaccess)){
+            ?>
+            <li class="item">
+                <a data-old-href="admin.php?action=import_players"><del>Refresh Player Database</del></a>
+                <em><del>rescan players directory then purge + update the database</del></em>
             </li>
             <?
         }
