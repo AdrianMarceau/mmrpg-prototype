@@ -180,6 +180,12 @@ class rpg_type {
         return $type_info;
     }
 
+    // Define a static function that returns only stat-related typings
+    public static function get_stat_types(){
+        return array('energy', 'weapons', 'attack', 'defense', 'speed');
+    }
+
+
     // Define a static function for collecting the possible hidden power types
     public static function get_hidden_powers($kind = 'elements'){
 
