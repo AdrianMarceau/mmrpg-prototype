@@ -561,6 +561,7 @@
             if (empty($backup_exists)){
                 //$backup_data = $update_data;
                 $backup_data = $robot_data;
+                unset($backup_data['robot_id']);
                 $backup_data['backup_date_time'] = $backup_date_time;
                 $db->insert('mmrpg_index_robots_backups', $backup_data);
             }
