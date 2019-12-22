@@ -201,6 +201,11 @@ elseif ($this_page_action == 'edit_players'){
     // Require the edit robots file
     require(MMRPG_CONFIG_ROOTDIR.'admin/edit-players.php');
 }
+// Else if this is an EDIT BATTLE FIELDS request
+elseif ($this_page_action == 'edit_fields'){
+    // Require the edit robots file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/edit-fields.php');
+}
 // Else if this is an EDIT CHALLENGE MISSIONS request
 elseif ($this_page_action == 'edit_challenges'){
     // Require the edit challenges file

@@ -51,7 +51,7 @@
             || in_array('edit_pages', $this_adminaccess)){
             ?>
             <li class="item">
-                <a href="admin.php?action=edit_pages">Edit Website Pages</a>
+                <a href="admin.php?action=edit_pages">Update Website Pages</a>
                 <em>edit the text and images on various website pages</em>
             </li>
             <?
@@ -94,20 +94,48 @@
             <?
         }
         if (in_array('*', $this_adminaccess)
+            || in_array('edit_fields', $this_adminaccess)){
+            ?>
+            <li class="item">
+                <a href="admin.php?action=edit_fields">Update Field Database</a>
+                <em>edit the details and images of various the in-game battle fields</em>
+            </li>
+            <?
+        }
+        $temp_item_markup = trim(ob_get_clean());
+        if (!empty($temp_item_markup)){
+            ?>
+            <ul class="adminhome">
+                <li class="top">
+                    <strong><?= $temp_group_name ?></strong>
+                </li>
+                <?= $temp_item_markup ?>
+            </ul>
+            <?
+        }
+    }
+    ?>
+
+    <?
+    /* -- POST-GAME CONTENT -- */
+    if (true){
+        $temp_group_name = 'Post-Game Content';
+        ob_start();
+        if (in_array('*', $this_adminaccess)
+            || in_array('edit_challenges', $this_adminaccess)){
+            ?>
+            <li class="item">
+                <a href="admin.php?action=edit_challenges">Manage Custom Challenges</a>
+                <em>create or modify custom challenge missions for post-game users</em>
+            </li>
+            <?
+        }
+        if (in_array('*', $this_adminaccess)
             || in_array('edit_stars', $this_adminaccess)){
             ?>
             <li class="item">
                 <a href="admin.php?action=edit_stars">Schedule Rogue Stars</a>
                 <em>schedule and manage rogue star appearances in the post-game</em>
-            </li>
-            <?
-        }
-        if (in_array('*', $this_adminaccess)
-            || in_array('edit_challenges', $this_adminaccess)){
-            ?>
-            <li class="item">
-                <a href="admin.php?action=edit_challenges">Add/Edit Challenge Missions</a>
-                <em>create or modify custom challenge missions for post-game users</em>
             </li>
             <?
         }
@@ -149,15 +177,6 @@
             <?
         }
         if (in_array('*', $this_adminaccess)
-            || in_array('import_fields', $this_adminaccess)){
-            ?>
-            <li class="item">
-                <a href="admin.php?action=import_fields">Refresh Field Database</a>
-                <em>rescan fields directory then purge + update the database</em>
-            </li>
-            <?
-        }
-        if (in_array('*', $this_adminaccess)
             || in_array('import_players', $this_adminaccess)){
             ?>
             <li class="item">
@@ -172,6 +191,15 @@
             <li class="item">
                 <a data-old-href="admin.php?action=import_robots"><del>Refresh Robot Databases</del></a>
                 <em><del>rescan robots directory then purge + update the database</del></em>
+            </li>
+            <?
+        }
+        if (in_array('*', $this_adminaccess)
+            || in_array('import_fields', $this_adminaccess)){
+            ?>
+            <li class="item">
+                <a data-old-href="admin.php?action=import_fields"><del>Refresh Field Database</del></a>
+                <em><del>rescan fields directory then purge + update the database</del></em>
             </li>
             <?
         }
