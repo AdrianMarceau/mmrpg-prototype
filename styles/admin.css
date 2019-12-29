@@ -526,6 +526,17 @@ tr:nth-child(odd) td {
     bottom: 3px;
 }
 
+.adminform .field .subfield div.select-span-wrap {
+    display: block;
+    float: left;
+    position: relative;
+}
+.adminform .field .subfield div.select-span-wrap:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
 .adminform .field .sublabel {
     font-size: 80%;
     margin-bottom: 0;
@@ -606,6 +617,26 @@ tr:nth-child(odd) td {
     min-width: 50px;
 }
 .adminform.edit_robots table td.class .type_span .fas {
+    margin-right: 4px;
+}
+
+.adminform.edit_fields table .class,
+.adminform.edit_fields table .game,
+.adminform.edit_fields table .group,
+.adminform.edit_fields table .type,
+.adminform.edit_fields table .flag,
+.adminform.edit_fields table .flag {
+    text-align: center;
+}
+.adminform.edit_fields table td.class .type_span,
+.adminform.edit_fields table td.type .type_span {
+    min-width: 75px;
+}
+.adminform.edit_fields table td.game .type_span,
+.adminform.edit_fields table td.group .type_span {
+    min-width: 50px;
+}
+.adminform.edit_fields table td.class .type_span .fas {
     margin-right: 4px;
 }
 
@@ -1297,9 +1328,14 @@ input[type=file] {
     width: 75px;
     float: left;
 }
+.adminform .field .subfield div.select-span-wrap,
 .adminform .editor .field .subfield.levelup select {
     width: calc(100% - 80px);
     float: left;
+}
+.adminform .editor .field .subfield.levelup div.select-span-wrap select {
+    width: 100%;
+    float: none;
 }
 /*
 .adminform .editor .field .subfield.pointsup input[type="number"] {

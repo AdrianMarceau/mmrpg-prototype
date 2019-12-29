@@ -68,7 +68,8 @@ if (!empty($mmrpg_database_fields)){
     foreach ($mmrpg_database_fields AS $field_key => $field_info){
 
         // Do not show incomplete fields in the link list
-        if (!$field_info['field_flag_complete'] && $field_info['field_token'] !== $this_current_token){ $key_counter++; continue; }
+        $show_in_link_list = true;
+        if (!$field_info['field_flag_complete'] && $field_info['field_token'] !== $this_current_token){ $show_in_link_list = false; }
 
         // If a type filter has been applied to the field page
         $temp_field_types = array();
@@ -79,7 +80,7 @@ if (!empty($mmrpg_database_fields)){
 
         // If this is the first in a new group
         $game_code = !empty($field_info['field_group']) ? $field_info['field_group'] : (!empty($field_info['field_game']) ? $field_info['field_game'] : 'MMRPG');
-        if ($game_code != $last_game_code){
+        if ($show_in_link_list && $game_code != $last_game_code){
             if ($key_counter != 0){ $mmrpg_database_fields_links .= '</div>'; }
             $mmrpg_database_fields_links .= '<div class="float link group" data-game="'.$game_code.'">';
             $last_game_code = $game_code;
@@ -112,7 +113,7 @@ if (!empty($mmrpg_database_fields)){
         if ($field_flag_complete){ $mmrpg_database_fields_count_complete++; }
         $temp_markup = ob_get_clean();
         $mmrpg_database_fields_links_index[$field_key] = $temp_markup;
-        $mmrpg_database_fields_links .= $temp_markup;
+        if ($show_in_link_list){ $mmrpg_database_fields_links .= $temp_markup; }
         $mmrpg_database_fields_links_counter++;
         $key_counter++;
 
