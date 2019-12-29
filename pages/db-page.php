@@ -143,5 +143,5 @@ ob_start();
     echo($page_content_parsed);
 
 // Collect the buffer and define the page markup
-$this_markup_body = trim(preg_replace('#\s+#', ' ', ob_get_clean()));
+$this_markup_body = trim(ob_get_clean());
 ?>
