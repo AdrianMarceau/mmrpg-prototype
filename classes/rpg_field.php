@@ -151,7 +151,6 @@ class rpg_field extends rpg_object {
         $index_fields = array(
             'field_id',
             'field_token',
-            'field_number',
             'field_name',
             'field_game',
             'field_group',
@@ -159,8 +158,9 @@ class rpg_field extends rpg_object {
             'field_master',
             'field_master2',
             'field_mechas',
-            'field_editor',
             'field_image',
+            'field_image_editor',
+            'field_image_editor2',
             'field_type',
             'field_type2',
             'field_multipliers',
@@ -1025,7 +1025,6 @@ class rpg_field extends rpg_object {
         $field_sprite_size = $field_image_size * 2;
         $field_sprite_size_text = $field_sprite_size.'x'.$field_sprite_size;
         $field_sprite_title = $field_info['field_name'];
-        //$field_sprite_title = $field_info['field_number'].' '.$field_info['field_name'];
         //$field_sprite_title .= ' Sprite Sheet | Robot Database | Mega Man RPG Prototype';
 
         // Define the sprite frame index for robot images
@@ -1284,7 +1283,7 @@ class rpg_field extends rpg_object {
                     <h2 id="sprites" class="header header_full field_type_<?= $field_type_token ?>" style="margin: 10px 0 0; text-align: left;">
                         Sprite Sheets
                     </h2>
-                    <div class="body body_full solid" style="margin-right: 0; margin-left: 0; margin-bottom: 5px; padding: 4px; min-height: 10px;">
+                    <div id="sprites_body" class="body body_full solid" style="margin-right: 0; margin-left: 0; margin-bottom: 5px; padding: 4px; min-height: 10px;">
                         <div id="sprite_container" style="border: 1px solid rgba(0, 0, 0, 0.20); border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: #191919 none scroll repeat -10px -30px; overflow: hidden; padding: 0; margin-bottom: 10px;">
                             <div class="sprite_background" style="border: 0 none transparent; border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: #000000 url(images/fields/<?= $field_info['field_background'] ?>/battle-field_background_base.gif?<?= MMRPG_CONFIG_CACHE_DATE ?>) scroll repeat center center; overflow: hidden; height: 244px;">
                                 <div class="sprite_foreground" style="border: 0 none transparent; border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: transparent url(images/fields/<?= $field_info['field_background'] ?>/battle-field_foreground_base.png?<?= MMRPG_CONFIG_CACHE_DATE ?>) scroll repeat center center; overflow: hidden; height: 244px;">
@@ -1296,22 +1295,36 @@ class rpg_field extends rpg_object {
                         // Define the editor title based on ID
                         $temp_editor_title = 'Undefined';
                         $temp_final_divider = '<span class="pipe"> | </span>';
-                        if (empty($field_info['field_image_editor'])){ $field_info['field_image_editor'] = 412; }
-                        if (!empty($field_info['field_image_editor'])){
-                            $temp_break = false;
-                            if ($field_info['field_image_editor'] == 412){ $temp_editor_title = 'Adrian Marceau / Ageman20XX'; }
-                            elseif ($field_info['field_image_editor'] == 110){ $temp_break = true; $temp_editor_title = 'MetalMarioX100 / EliteP1</strong> <span style="color: #565656;"> | </span> Assembly by <strong>Adrian Marceau / Ageman20XX'; }
-                            elseif ($field_info['field_image_editor'] == 18){ $temp_break = true; $temp_editor_title = 'Sean Adamson / MetalMan</strong> <span style="color: #565656;"> | </span> Assembly by <strong>Adrian Marceau / Ageman20XX'; }
-                            elseif ($field_info['field_image_editor'] == 4117){ $temp_break = true; $temp_editor_title = 'Jonathan Backstrom / Rhythm_BCA</strong> <span style="color: #565656;"> | </span> Assembly by <strong>Adrian Marceau / Ageman20XX'; }
-                            if ($temp_break){ $temp_final_divider = '<br />'; }
+                        $editor_ids = array();
+                        if (!empty($field_info['field_image_editor'])){ $editor_ids[] = $field_info['field_image_editor']; }
+                        if (!empty($field_info['field_image_editor2'])){ $editor_ids[] = $field_info['field_image_editor2']; }
+                        if (!empty($editor_ids)){
+                            $editor_ids_string = implode(', ', $editor_ids);
+                            $temp_editor_details = $db->get_array_list("SELECT
+                                user_name, user_name_public, user_name_clean
+                                FROM mmrpg_users
+                                WHERE user_id IN ({$editor_ids_string})
+                                ORDER BY FIELD(user_id, {$editor_ids_string})
+                                ;", 'user_name_clean');
+                            $temp_editor_titles = array();
+                            foreach ($temp_editor_details AS $editor_url => $editor_info){
+                                $editor_name = !empty($editor_info['user_name_public']) ? $editor_info['user_name_public'] : $editor_info['user_name'];
+                                if (!empty($editor_info['user_name_public'])
+                                    && trim(str_replace(' ', '', $editor_info['user_name_public'])) !== trim(str_replace(' ', '', $editor_info['user_name']))
+                                    ){
+                                    $editor_name = $editor_info['user_name_public'].' / '.$editor_info['user_name'];
+                                }
+                                $temp_editor_titles[] = '<strong><a href="leaderboard/'.$editor_url.'/">'.$editor_name.'</a></strong>';
+                            }
+                            $temp_editor_title = implode(' and ', $temp_editor_titles);
                         }
                         $temp_is_capcom = true;
-                        $temp_is_original = array();
+                        $temp_is_original = array('disco', 'rhythm', 'flutter-fly', 'flutter-fly-2', 'flutter-fly-3');
                         if (in_array($field_info['field_token'], $temp_is_original)){ $temp_is_capcom = false; }
                         if ($temp_is_capcom){
-                            echo '<p class="text text_editor" style="text-align: center; color: #868686; font-size: 10px; line-height: 13px; margin-top: 6px;">Sprite Editing by <strong>'.$temp_editor_title.'</strong> '.$temp_final_divider.' Original Artwork by <strong>Capcom</strong></p>'."\n";
+                            echo '<p class="text text_editor">Image Editing by '.$temp_editor_title.' '.$temp_final_divider.' Original Artwork by <strong>Capcom</strong></p>'."\n";
                         } else {
-                            echo '<p class="text text_editor" style="text-align: center; color: #868686; font-size: 10px; line-height: 13px; margin-top: 6px;">Sprite Editing by <strong>'.$temp_editor_title.'</strong> '.$temp_final_divider.' Original Field by <strong>Adrian Marceau</strong></p>'."\n";
+                            echo '<p class="text text_editor">Image Editing by '.$temp_editor_title.' '.$temp_final_divider.' Original Location by <strong>Adrian Marceau</strong></p>'."\n";
                         }
                         ?>
                     </div>
