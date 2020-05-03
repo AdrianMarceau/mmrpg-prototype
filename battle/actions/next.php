@@ -19,6 +19,26 @@ if (!empty($this_battle->flags['starfield_mission'])
     //echo('$this_action_token = '.print_r($this_action_token, true).PHP_EOL);
     //echo('$next_star_type = '.print_r($next_star_type, true).PHP_EOL.PHP_EOL);
 
+    // Collect a list of possible stars
+    $possible_star_list = mmrpg_prototype_possible_stars(true);
+    $max_star_force = array();
+    if (!empty($possible_star_list)){
+        foreach ($possible_star_list AS $star_token => $star_info){
+            if (!isset($max_star_force[$star_info['info1']['type']])){ $max_star_force[$star_info['info1']['type']] = 0; }
+            if (!empty($star_info['info2']) && !isset($max_star_force[$star_info['info2']['type']])){ $max_star_force[$star_info['info2']['type']] = 0; }
+            if ($star_info['kind'] == 'fusion'){
+                if ($star_info['info1']['type'] == $star_info['info2']['type']){
+                    $max_star_force[$star_info['info1']['type']] += 2;
+                } else {
+                    $max_star_force[$star_info['info1']['type']] += 1;
+                    $max_star_force[$star_info['info2']['type']] += 1;
+                }
+            } else {
+                $max_star_force[$star_info['info1']['type']] += 1;
+            }
+        }
+    }
+
     // Collect a list of available stars still left for the player to encounter
     $temp_remaining_stars = mmrpg_prototype_remaining_stars(true);
     $temp_remaining_stars_types = array();
@@ -60,6 +80,11 @@ if (!empty($this_battle->flags['starfield_mission'])
     $this_prototype_data['phase_battle_token'] = $this_prototype_data['this_player_token'].'-'.$this_prototype_data['phase_token'];
     $this_prototype_data['battles_complete'] = mmrpg_prototype_battles_complete($this_prototype_data['this_player_token']);
     $this_prototype_data['this_current_chapter'] = '7';
+
+    // Calculate the current starforce total vs max starforce total for mission gen
+    $session_token = mmrpg_game_token();
+    $this_prototype_data['current_starforce_total'] = !empty($_SESSION[$session_token]['values']['star_force']) ? array_sum($_SESSION[$session_token]['values']['star_force']) : 0;
+    $this_prototype_data['max_starforce_total'] = array_sum($max_star_force);
 
     //echo('$info = '.print_r($info, true).PHP_EOL);
     //echo('$info2 = '.print_r($info2, true).PHP_EOL);
