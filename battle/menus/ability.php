@@ -119,6 +119,10 @@ ob_start();
                         $core_type_token3 = str_replace('-core', '', $this_robot->robot_item);
                     }
 
+                    // Collect this omega core type tokens if they exist
+                    $omega_type_token = !empty($this_robot->robot_omega) ? $this_robot->robot_omega : '';
+                    $omega_type_token2 = !empty($this_robot->robot_omega2) ? $this_robot->robot_omega2 : '';
+
                     // Check this ability's FIRST type for multiplier matches
                     if (!empty($ability_type_token)){
 
@@ -129,6 +133,11 @@ ob_start();
 
                         // Apply held robot core multipliers if they exist
                         if ($ability_type_token == $core_type_token3){ $temp_multiplier = $temp_multiplier * MMRPG_SETTINGS_SUBCOREBOOST_MULTIPLIER; }
+
+                        // Apply robot omega core multipliers if they exist
+                        if ($ability_type_token == $omega_type_token){ $temp_multiplier = $temp_multiplier * MMRPG_SETTINGS_OMEGACOREBOOST_MULTIPLIER; }
+                        // Apply player omega core multipliers if they exist
+                        if ($ability_type_token == $omega_type_token2){ $temp_multiplier = $temp_multiplier * MMRPG_SETTINGS_OMEGACOREBOOST_MULTIPLIER; }
 
                         // Apply any field multiplier matches if they exist
                         if (!empty($this_battle->battle_field->field_multipliers[$ability_type_token])){
@@ -147,6 +156,11 @@ ob_start();
 
                         // Apply held robot core multipliers if they exist
                         if ($ability_type_token2 == $core_type_token3){ $temp_multiplier = $temp_multiplier * MMRPG_SETTINGS_SUBCOREBOOST_MULTIPLIER; }
+
+                        // Apply robot omega core multipliers if they exist
+                        if ($ability_type_token2 == $omega_type_token){ $temp_multiplier = $temp_multiplier * MMRPG_SETTINGS_OMEGACOREBOOST_MULTIPLIER; }
+                        // Apply player omega core multipliers if they exist
+                        if ($ability_type_token2 == $omega_type_token2){ $temp_multiplier = $temp_multiplier * MMRPG_SETTINGS_OMEGACOREBOOST_MULTIPLIER; }
 
                         // Apply any field multiplier matches if they exist
                         if (!empty($this_battle->battle_field->field_multipliers[$ability_type_token2])){
