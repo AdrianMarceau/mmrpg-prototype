@@ -427,7 +427,9 @@ if ($this_current_page == 'file' // File sub-pages
                 // Loop through and display the markup of any background attachments
                 if (!empty($temp_field_data['field_background_attachments']) && !empty($temp_field_data['field_mechas'])){
                     echo '<div class="background_event event clearback sticky" style="z-index: 15; border-color: transparent;">';
-                    foreach ($temp_field_data['field_background_attachments'] AS $this_key => $this_info){
+                    $this_key = -1;
+                    foreach ($temp_field_data['field_background_attachments'] AS $this_info){
+                        $this_key++;
                         $this_class = $this_info['class'];
                         $this_size = $this_info['size'];
                         $this_boxsize = $this_size.'x'.$this_size;

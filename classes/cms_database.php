@@ -228,7 +228,7 @@ class cms_database {
         // If the result is empty NULL or empty, return false
         if (!$this->MYSQL_RESULT || mysqli_num_rows($this->MYSQL_RESULT) < 1) { return false; }
         // Otherwise, pull an array from the result
-        $result_array = mysqli_fetch_array($this->MYSQL_RESULT, MYSQL_ASSOC);
+        $result_array = mysqli_fetch_array($this->MYSQL_RESULT, MYSQLI_ASSOC);
         // Free the results of the query
         $this->clear();
         // Check to see if this is a cacheable result, and encode if so
@@ -269,7 +269,7 @@ class cms_database {
         // Create the list array to hold all the rows
         $array_list = array();
         // Now loop through the result rows, pulling associative arrays
-        while ($result_array = mysqli_fetch_array($this->MYSQL_RESULT, MYSQL_ASSOC)){
+        while ($result_array = mysqli_fetch_array($this->MYSQL_RESULT, MYSQLI_ASSOC)){
             // If there was an index defined, assign the array to a specific key in the list
             if ($index) { $array_list[$result_array[$index]] = $result_array; }
             // Otherwise, append the array to the end of the list
@@ -324,7 +324,7 @@ class cms_database {
         // If the result is empty NULL or empty, return false
         if (!$this->MYSQL_RESULT || mysqli_num_rows($this->MYSQL_RESULT) < 1) { return false; }
         // Otherwise, pull an array from the result
-        $result_array = mysqli_fetch_array($this->MYSQL_RESULT, MYSQL_ASSOC);
+        $result_array = mysqli_fetch_array($this->MYSQL_RESULT, MYSQLI_ASSOC);
         // Free the results of the query
         $this->clear();
         // Check to see if this is a cacheable result, and encode if so
