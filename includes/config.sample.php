@@ -20,6 +20,13 @@ define('MMRPG_CONFIG_DBNAME', 'mmrpg2k11');
 // Define the analytics account ID
 define('LEGACY_MMRPG_GA_ACCOUNTID', 'UA-00000000-0');
 
+// Define the PASSWORD SALT and OMEGA SEED string values
+define('MMRPG_SETTINGS_PASSWORD_SALT', 'password-salt');
+define('MMRPG_SETTINGS_OMEGA_SEED', 'omega-seed-salt');
+
+// Define some SALT for the IMAGEPROXY hash values
+define('MMRPG_SETTINGS_IMAGEPROXY_SALT', 'image-proxy-salt');
+
 // Define the list of administrator-approved remote addresses
 define('MMRPG_CONFIG_ADMIN_LIST', '127.0.0.1,999.999.999.999');
 
