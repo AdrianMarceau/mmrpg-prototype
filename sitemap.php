@@ -6,7 +6,7 @@ header("Content-type: text/xml; charset=utf-8");
 echo '<'.'?xml version="1.0" encoding="UTF-8"?'.'>'."\n";
 // Collect some quick-access variables for populating the sitemap
 $global_rooturl = MMRPG_CONFIG_ROOTURL;
-$global_lastmod = preg_replace('/^([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})$/', '$1-$2-$3', MMRPG_CONFIG_CACHE_DATE);
+$global_lastmod = preg_replace('/^([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2,4})$/', '$1-$2-$3', MMRPG_CONFIG_CACHE_DATE);
 // Define the gallery variables for the sitemap
 $iterator = new DirectoryIterator('images/gallery/screenshots/thumbs/');
 $gallery_mtime = -1;
@@ -19,6 +19,8 @@ foreach ($iterator as $fileinfo){
     }
   }
 }
+// Collect dynamic page details from the DB for modified timestamps
+$db_page_details = $db->get_array_list("SELECT page_url, page_date_modified FROM mmrpg_website_pages WHERE page_flag_published = 1;", 'page_url');
 // Include the global database include file
 require_once('database/include.php');
 ?>
@@ -31,7 +33,7 @@ require_once('database/include.php');
 	</url>
 	<url>
 		<loc><?= $global_rooturl ?>about/</loc>
-		<lastmod><?= date('Y-m-d', filemtime('pages/about.php')) ?></lastmod>
+		<lastmod><?= date('Y-m-d', $db_page_details['about/']['page_date_modified']) ?></lastmod>
 		<changefreq>monthly</changefreq>
 		<priority>0.7</priority>
 	</url>
@@ -106,7 +108,7 @@ require_once('database/include.php');
   ?>
   <url>
     <loc><?= $global_rooturl ?>database/types/</loc>
-    <lastmod><?= date('Y-m-d', filemtime('pages/database_types.php')) ?></lastmod>
+    <lastmod><?= date('Y-m-d', $db_page_details['database/types/']['page_date_modified']) ?></lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
@@ -154,13 +156,13 @@ require_once('database/include.php');
 	</url>
   <url>
     <loc><?= $global_rooturl ?>credits/</loc>
-    <lastmod><?= date('Y-m-d', filemtime('pages/credits.php')) ?></lastmod>
+    <lastmod><?= date('Y-m-d', $db_page_details['credits/']['page_date_modified']) ?></lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
 	<url>
 		<loc><?= $global_rooturl ?>contact/</loc>
-		<lastmod><?= date('Y-m-d', filemtime('pages/contact.php')) ?></lastmod>
+		<lastmod><?= date('Y-m-d', $db_page_details['contact/']['page_date_modified']) ?></lastmod>
 		<changefreq>monthly</changefreq>
 		<priority>0.3</priority>
 	</url>
