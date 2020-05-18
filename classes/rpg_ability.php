@@ -88,7 +88,7 @@ class rpg_ability extends rpg_object {
         // Otherwise, collect ability data from the index if not already
         elseif (!in_array($this_abilityinfo['ability_token'], $temp_system_abilities)){
             $temp_backup_id = $this_abilityinfo['ability_id'];
-            if (empty($this_abilityinfo_backup['_parsed'])){
+            if (empty($this_abilityinfo_backup['_parsed']) && !empty($this_indexinfo)){
                 $this_abilityinfo = array_replace($this_indexinfo, $this_abilityinfo_backup);
             }
         }
