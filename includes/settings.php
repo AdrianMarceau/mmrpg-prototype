@@ -40,6 +40,9 @@ define('MMRPG_CONFIG_ABILITIES_CACHE_PATH', MMRPG_CONFIG_CACHE_PATH.'cache.abili
 define('MMRPG_CONFIG_FIELDS_INDEX_PATH', MMRPG_CONFIG_ROOTDIR.'data/fields/');
 define('MMRPG_CONFIG_FIELDS_CACHE_PATH', MMRPG_CONFIG_CACHE_PATH.'cache.fields.'.MMRPG_CONFIG_CACHE_DATE.'.php');
 
+// Define the cache path for the image proxy script
+define('MMRPG_CONFIG_IMAGEPROXY_CACHE_PATH', MMRPG_CONFIG_CACHE_PATH.'imageproxy/');
+
 // Define the global timeout variables for online and new status
 define('MMRPG_SETTINGS_ONLINE_TIMEOUT', (60 * 30)); // In seconds (60sec x 30min = 1/2 Hour)
 define('MMRPG_SETTINGS_ACTIVE_TIMEOUT', (60 * 60 * 24 * 90)); // In seconds (60sec x 60min x 24hr x 90days)
@@ -105,12 +108,13 @@ define('MMRPG_SETTINGS_AFFINITY_MULTIPLIER', -1.0); // Core boosted abilites sho
 define('MMRPG_SETTINGS_IMMUNITY_MULTIPLIER', 0.0); // Core boosted abilites should recive a 50% boost
 
 // Define the global values for core boosts and bonuses
-define('MMRPG_SETTINGS_COREBOOST_MULTIPLIER', 1.5); // Core matched abilites should recive a 50% damage/recovery boost
+define('MMRPG_SETTINGS_COREBOOST_MULTIPLIER', 1.50); // Core matched abilites should recive a 50% damage/recovery boost
 define('MMRPG_SETTINGS_SUBCOREBOOST_MULTIPLIER', 1.25); // Sub-Core matched abilites should recive a 25% damage/recovery boost
-define('MMRPG_SETTINGS_COREBONUS_MULTIPLIER', 0.5); // Core matched abilites should recive a 50% weapon enery reduction
+define('MMRPG_SETTINGS_OMEGACOREBOOST_MULTIPLIER', 1.10); // Omega-Core matched abilites should recive a 10% damage/recovery boost
+define('MMRPG_SETTINGS_COREBONUS_MULTIPLIER', 0.50); // Core matched abilites should recive a 50% weapon enery reduction
 define('MMRPG_SETTINGS_SUBCOREBONUS_MULTIPLIER', 0.75); // Sub-Core matched abilites should recive a 25% weapon energy reduction
-define('MMRPG_SETTINGS_NATIVEBONUS_MULTIPLIER', 0.5); // Level-up abilites should recive a 50% weapon enery reduction
-define('MMRPG_SETTINGS_MECHABONUS_MULTIPLIER', 0.5); // support mechas should receive a 50% weapon enery reduction
+define('MMRPG_SETTINGS_NATIVEBONUS_MULTIPLIER', 0.50); // Level-up abilites should recive a 50% weapon enery reduction
+define('MMRPG_SETTINGS_MECHABONUS_MULTIPLIER', 0.50); // support mechas should receive a 50% weapon enery reduction
 
 // Define the global values for shop prices and multipliers
 define('MMRPG_SETTINGS_SHOP_ABILITY_PRICE', 1500);  // use as (PRICE * ENERGY)

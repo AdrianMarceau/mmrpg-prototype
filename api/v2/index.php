@@ -3,6 +3,11 @@
 // Require the global top file
 require('../../top.php');
 
+// Set the access control headers to allow others to use it
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST");
+header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
+
 // Define the API path w/ version number
 define('MMRPG_CONFIG_API_DIR', 'api/v2/');
 define('MMRPG_CONFIG_API_ROOTDIR', MMRPG_CONFIG_ROOTDIR.MMRPG_CONFIG_API_DIR);

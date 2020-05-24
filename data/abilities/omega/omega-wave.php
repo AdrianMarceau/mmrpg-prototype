@@ -8,7 +8,7 @@ $ability = array(
     'ability_description' => 'The users taps into their hidden power to generate a wave of elemental energy. This ability\'s types appear to differ between player-robot combinations.',
     'ability_type' => '',
     'ability_energy' => 8,
-    'ability_damage' => 32,
+    'ability_damage' => 26,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
@@ -59,26 +59,30 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
-        // Collect possible hidden power types
-        $hidden_power_types = rpg_type::get_hidden_powers();
-
         // Generate this robot's omega string, collect it's hidden power, and update type1
-        $robot_omega_string = rpg_game::generate_omega_robot_string($this_robot->robot_token, $this_player->user_omega);
-        $robot_hidden_power = rpg_game::select_omega_value($robot_omega_string, $hidden_power_types);
-        $robot_ability_image = $this_ability->get_base_image().'_'.$robot_hidden_power;
-        $this_ability->set_type($robot_hidden_power);
-        $this_ability->set_image($robot_ability_image);
+        $robot_hidden_power = $this_robot->robot_omega;
+        if (!empty($robot_hidden_power)){
+            $robot_ability_image = $this_ability->get_base_image().'_'.$robot_hidden_power;
+            $this_ability->set_type($robot_hidden_power);
+            $this_ability->set_image($robot_ability_image);
+        } else {
+            $this_ability->reset_type();
+            $this_ability->reset_image();
+            $robot_hidden_power = false;
+        }
 
         // Generate this player's omega string, collect their hidden power, and update type2
-        $player_omega_string = rpg_game::generate_omega_player_string($this_player->player_token, $this_player->user_omega);
-        $player_hidden_power = rpg_game::select_omega_value($player_omega_string, $hidden_power_types);
-        $player_ability_image = $this_ability->get_base_image().'_'.$player_hidden_power.'2';
-        if ($player_hidden_power != $robot_hidden_power){
-            $this_ability->set_type2($player_hidden_power);
-            $this_ability->set_image2($player_ability_image);
-        } else {
-            $this_ability->set_type2('');
-            $this_ability->set_image2('');
+        if (!empty($robot_hidden_power)){
+            $player_hidden_power = $this_robot->robot_omega2;
+            if ($player_hidden_power != $robot_hidden_power){
+                $player_ability_image = $this_ability->get_base_image().'_'.$player_hidden_power.'2';
+                $this_ability->set_type2($player_hidden_power);
+                $this_ability->set_image2($player_ability_image);
+            } else {
+                $this_ability->set_type2('');
+                $this_ability->set_image2('');
+                $player_hidden_power = false;
+            }
         }
 
         // If the user is holding a Target Module, allow bench targeting

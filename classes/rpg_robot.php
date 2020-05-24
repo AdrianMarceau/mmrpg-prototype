@@ -115,6 +115,8 @@ class rpg_robot extends rpg_object {
         $this->robot_image_alts = isset($this_robotinfo['robot_image_alts']) ? $this_robotinfo['robot_image_alts'] : array();
         $this->robot_core = isset($this_robotinfo['robot_core']) ? $this_robotinfo['robot_core'] : false;
         $this->robot_core2 = isset($this_robotinfo['robot_core2']) ? $this_robotinfo['robot_core2'] : false;
+        $this->robot_omega = isset($this_robotinfo['robot_omega']) ? $this_robotinfo['robot_omega'] : false;
+        $this->robot_omega2 = isset($this_robotinfo['robot_omega2']) ? $this_robotinfo['robot_omega2'] : false;
         $this->robot_description = isset($this_robotinfo['robot_description']) ? $this_robotinfo['robot_description'] : '';
         $this->robot_experience = isset($this_robotinfo['robot_experience']) ? $this_robotinfo['robot_experience'] : (isset($this_robotinfo['robot_points']) ? $this_robotinfo['robot_points'] : 0);
         $this->robot_level = isset($this_robotinfo['robot_level']) ? $this_robotinfo['robot_level'] : (!empty($this->robot_experience) ? $this->robot_experience / 1000 : 0) + 1;
@@ -153,6 +155,9 @@ class rpg_robot extends rpg_object {
 
         $this->robot_base_core = isset($this_robotinfo['robot_base_core']) ? $this_robotinfo['robot_base_core'] : $this->robot_core;
         $this->robot_base_core2 = isset($this_robotinfo['robot_base_core2']) ? $this_robotinfo['robot_base_core2'] : $this->robot_core2;
+
+        $this->robot_base_omega = isset($this_robotinfo['robot_base_omega']) ? $this_robotinfo['robot_base_omega'] : $this->robot_omega;
+        $this->robot_base_omega2 = isset($this_robotinfo['robot_base_omega2']) ? $this_robotinfo['robot_base_omega2'] : $this->robot_omega2;
 
         $this->robot_base_description = isset($this_robotinfo['robot_base_description']) ? $this_robotinfo['robot_base_description'] : $this->robot_description;
 
@@ -203,6 +208,33 @@ class rpg_robot extends rpg_object {
         $this->robot_function_onrecovery = isset($robot['robot_function_onrecovery']) ? $robot['robot_function_onrecovery'] : function(){};
         $this->robot_function_ondisabled = isset($robot['robot_function_ondisabled']) ? $robot['robot_function_ondisabled'] : function(){};
         unset($robot);
+
+        // If the omega settings have not been defined yet, do so now
+        if (empty($this->flags['calculate_omega_types'])){
+
+            // Only apply omega types to human players of either side
+            if ($this->player->player_side == 'left'
+                || ($this->player->player_side == 'right' && !empty($this->battle->flags['player_battle']))){
+
+                // Collect possible hidden power types
+                $hidden_power_types = rpg_type::get_hidden_powers();
+
+                // Generate this robot's omega string, collect it's hidden power, and determine its type
+                $robot_omega_string = rpg_game::generate_omega_robot_string($this->robot_token, $this->player->user_omega);
+                $robot_omega_type = rpg_game::select_omega_value($robot_omega_string, $hidden_power_types);
+                $this->robot_omega = $robot_omega_type;
+
+                // Generate this robot player's omega string, collect it's hidden power, and determine its type
+                $player_omega_string = rpg_game::generate_omega_player_string($this->player->player_token, $this->player->user_omega);
+                $player_omega_type = rpg_game::select_omega_value($player_omega_string, $hidden_power_types);
+                $this->robot_omega2 = $player_omega_type;
+
+            }
+
+            // Set the session settings flag to true
+            $this->flags['calculate_omega_types'] = true;
+
+        }
 
         // If this is a player-controlled robot, load settings from session
         if ($this->player->player_side == 'left' && empty($this->flags['apply_session_settings'])){
@@ -356,6 +388,16 @@ class rpg_robot extends rpg_object {
     public function set_core2($value){ $this->set_info('robot_core2', $value); }
     public function get_base_core2(){ return $this->get_info('robot_base_core2'); }
     public function set_base_core2($value){ $this->set_info('robot_base_core2', $value); }
+
+    public function get_omega(){ return $this->get_info('robot_omega'); }
+    public function set_omega($value){ $this->set_info('robot_omega', $value); }
+    public function get_base_omega(){ return $this->get_info('robot_base_omega'); }
+    public function set_base_omega($value){ $this->set_info('robot_base_omega', $value); }
+
+    public function get_omega2(){ return $this->get_info('robot_omega2'); }
+    public function set_omega2($value){ $this->set_info('robot_omega2', $value); }
+    public function get_base_omega2(){ return $this->get_info('robot_base_omega2'); }
+    public function set_base_omega2($value){ $this->set_info('robot_base_omega2', $value); }
 
     public function get_experience(){ return $this->get_info('robot_experience'); }
     public function set_experience($value){ $this->set_info('robot_experience', $value); }
@@ -768,7 +810,7 @@ class rpg_robot extends rpg_object {
         if (!isset($this->values['robot_base_energy_backup'])){ $this->values['robot_base_energy_backup'] = $this->robot_base_energy; }
         if (!isset($this->values['robot_base_weapons_backup'])){ $this->values['robot_base_weapons_backup'] = $this->robot_base_weapons; }
 
-        // If this robot is holder a relavant item, apply stat upgrades or other effects
+        // If this robot is holding a relavant item, apply stat upgrades or other effects
         $this_robot_item = $this->get_item();
         if (!empty($this_robot_item)){
 
@@ -2706,6 +2748,9 @@ class rpg_robot extends rpg_object {
             'robot_image_overlay' => $this->robot_image_overlay,
             'robot_image_alts' => $this->robot_image_alts,
             'robot_core' => $this->robot_core,
+            'robot_core2' => $this->robot_core2,
+            'robot_omega' => $this->robot_omega,
+            'robot_omega2' => $this->robot_omega2,
             'robot_description' => $this->robot_description,
             'robot_experience' => $this->robot_experience,
             'robot_level' => $this->robot_level,

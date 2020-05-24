@@ -8,7 +8,7 @@ $ability = array(
     'ability_description' => 'The user taps into its hidden power to generate a pulse of elemental energy. This ability\'s type appears to differ between robots.',
     'ability_type' => '',
     'ability_energy' => 4,
-    'ability_damage' => 16,
+    'ability_damage' => 14,
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
@@ -59,15 +59,17 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
-        // Collect possible hidden power types
-        $hidden_power_types = rpg_type::get_hidden_powers();
-
         // Generate this robot's omega string, collect it's hidden power, and update type1
-        $robot_omega_string = rpg_game::generate_omega_robot_string($this_robot->robot_token, $this_player->user_omega);
-        $robot_hidden_power = rpg_game::select_omega_value($robot_omega_string, $hidden_power_types);
-        $robot_ability_image = $this_ability->get_base_image().'_'.$robot_hidden_power;
-        $this_ability->set_type($robot_hidden_power);
-        $this_ability->set_image($robot_ability_image);
+        $robot_hidden_power = $this_robot->robot_omega;
+        if (!empty($robot_hidden_power)){
+            $robot_ability_image = $this_ability->get_base_image().'_'.$robot_hidden_power;
+            $this_ability->set_type($robot_hidden_power);
+            $this_ability->set_image($robot_ability_image);
+        } else {
+            $this_ability->reset_type();
+            $this_ability->reset_image();
+            $robot_hidden_power = false;
+        }
 
         // If the user is holding a Target Module, allow bench targeting
         if ($this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
