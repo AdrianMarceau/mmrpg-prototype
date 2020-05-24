@@ -232,6 +232,26 @@ function mmrpg_formatting_decode($string){
     //$string = '<p>'.preg_replace('/(<br\s?\/>\s?){2,}/i', '</p><p>', $string).'</p>';
     $string = '<div>'.$string.'</div>';
 
+    // If we'e in HTTPS mode, manually rewrite common external sources with proper protocols
+    if (defined('MMRPG_IS_HTTPS')
+        && MMRPG_IS_HTTPS === true){
+        // Replace any internal links with HTTPS urls
+        $string = preg_replace('/http:\/\/((?:[a-z0-9]+)\.mmrpg-world.net\/)/i', 'https://$1', $string);
+        // Replace any photobucket links with HTTPS urls
+        $string = preg_replace('/http:\/\/((?:[a-z0-9]+)\.photobucket\.com\/)/i', 'https://$1', $string);
+        // Replace any other image links with HTTPS urls
+        if (preg_match_all('/src="http:\/\/((?:[-_a-z0-9\.\/\+]+)\.(?:jpg|jpeg|png|ico|bmp|svg)(?:\?(.*)?)?)"/i', $string, $matches)){
+            $proxy_script = MMRPG_CONFIG_ROOTURL.'scripts/imageproxy.php';
+            foreach ($matches[1] AS $key => $src){
+                $find = $matches[0][$key];
+                $src_encoded = urlencode($src);
+                $src_hash = md5(MMRPG_SETTINGS_IMAGEPROXY_SALT . $src);
+                $replace = 'src="'.$proxy_script.'?url='.$src_encoded.'&hash='.$src_hash.'"';
+                $string = str_replace($find, $replace, $string);
+            }
+        }
+    }
+
     // Return the decoded string
     return $string;
 
@@ -998,21 +1018,21 @@ function mmrpg_community_post_index_fields($implode = false, $table = ''){
 
 // Define a function for deleting a directory
 function deleteDir($dirPath) {
-        if (! is_dir($dirPath)) {
-                throw new InvalidArgumentException("$dirPath must be a directory");
+    if (! is_dir($dirPath)) {
+        throw new InvalidArgumentException("{$dirPath} must be a directory");
+    }
+    if (substr($dirPath, strlen($dirPath) - 1, 1) != '/') {
+        $dirPath .= '/';
+    }
+    $files = glob($dirPath . '*', GLOB_MARK);
+    foreach ($files as $file) {
+        if (is_dir($file)) {
+            deleteDir($file);
+        } else {
+            unlink($file);
         }
-        if (substr($dirPath, strlen($dirPath) - 1, 1) != '/') {
-                $dirPath .= '/';
-        }
-        $files = glob($dirPath . '*', GLOB_MARK);
-        foreach ($files as $file) {
-                if (is_dir($file)) {
-                        self::deleteDir($file);
-                } else {
-                        unlink($file);
-                }
-        }
-        rmdir($dirPath);
+    }
+    rmdir($dirPath);
 }
 
 // Define a function for getting a list of directory contents, recursively

@@ -399,6 +399,10 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         $remaining_stars = mmrpg_prototype_remaining_stars(true, $possible_star_list);
         $num_remaining_stars = count($remaining_stars);
 
+        // Calculate the current starforce total vs max starforce total for mission gen
+        $this_prototype_data['current_starforce_total'] = !empty($_SESSION[$session_token]['values']['star_force']) ? array_sum($_SESSION[$session_token]['values']['star_force']) : 0;
+        $this_prototype_data['max_starforce_total'] = array_sum($max_star_force);
+
         // Collect a list of star fields to display, prioritizing those the player doesn't have yet
         $visible_star_fields = array();
         if (!empty($remaining_stars)){ $visible_star_fields += array_keys($remaining_stars); }

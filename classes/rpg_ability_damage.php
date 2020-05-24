@@ -19,6 +19,7 @@ class rpg_ability_damage extends rpg_damage {
         if (!isset($trigger_options['apply_modifiers'])){ $trigger_options['apply_modifiers'] = true; }
         if (!isset($trigger_options['apply_type_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_type_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['apply_core_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_core_modifiers'] = $trigger_options['apply_modifiers']; }
+        if (!isset($trigger_options['apply_omega_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_omega_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['apply_position_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_position_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['apply_field_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_field_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['apply_stat_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_stat_modifiers'] = $trigger_options['apply_modifiers']; }
@@ -155,12 +156,12 @@ class rpg_ability_damage extends rpg_damage {
 
             }
 
+            // Collect this ability's type tokens if they exist
+            $ability_type_token = !empty($this_ability->damage_options['damage_type']) ? $this_ability->damage_options['damage_type'] : 'none';
+            $ability_type_token2 = !empty($this_ability->damage_options['damage_type2']) ? $this_ability->damage_options['damage_type2'] : '';
+
             // Apply core boosts if allowed to
             if ($trigger_options['apply_core_modifiers'] != false){
-
-                // Collect this ability's type tokens if they exist
-                $ability_type_token = !empty($this_ability->damage_options['damage_type']) ? $this_ability->damage_options['damage_type'] : 'none';
-                $ability_type_token2 = !empty($this_ability->damage_options['damage_type2']) ? $this_ability->damage_options['damage_type2'] : '';
 
                 // Collect this robot's core type tokens if they exist
                 $core_type_token = !empty($target_robot->robot_core) ? $target_robot->robot_core : 'none';
@@ -225,6 +226,60 @@ class rpg_ability_damage extends rpg_damage {
                 // If any coreboosts were present, update the flag
                 if (!empty($this_ability->ability_results['counter_coreboosts'])){
                     $this_ability->ability_results['flag_coreboost'] = true;
+                }
+
+            }
+
+            // Apply omega boosts if allowed to
+            if ($trigger_options['apply_omega_modifiers'] != false){
+
+                // Collect this robot's omega type tokens if they exist
+                $omega_type_token = !empty($target_robot->robot_omega) ? $target_robot->robot_omega : '';
+                $omega_type_token2 = !empty($target_robot->robot_omega2) ? $target_robot->robot_omega2 : '';
+
+                // Define the omegaboost flag and default to false
+                $this_ability->ability_results['flag_omegaboost'] = false;
+
+                // Define an array to hold individual omegaboost values
+                $ability_omegaboost_multipliers = array();
+
+                // Check this ability's FIRST type for multiplier matches
+                if (!empty($ability_type_token)){
+
+                    // Apply robot omega core multipliers if they exist
+                    if ($ability_type_token == $omega_type_token){
+                        $this_ability->ability_results['counter_omegaboosts']++;
+                        $ability_omegaboost_multipliers[] = MMRPG_SETTINGS_OMEGACOREBOOST_MULTIPLIER;
+                    }
+
+                    // Apply player omega core multipliers if they exist
+                    if ($ability_type_token == $omega_type_token2){
+                        $this_ability->ability_results['counter_omegaboosts']++;
+                        $ability_omegaboost_multipliers[] = MMRPG_SETTINGS_OMEGACOREBOOST_MULTIPLIER;
+                    }
+
+                }
+
+                // Check this ability's SECOND type for multiplier matches
+                if (!empty($ability_type_token2)){
+
+                    // Apply robot omega core multipliers if they exist
+                    if ($ability_type_token2 == $omega_type_token){
+                        $this_ability->ability_results['counter_omegaboosts']++;
+                        $ability_omegaboost_multipliers[] = MMRPG_SETTINGS_OMEGACOREBOOST_MULTIPLIER;
+                    }
+
+                    // Apply player omega core multipliers if they exist
+                    if ($ability_type_token2 == $omega_type_token2){
+                        $this_ability->ability_results['counter_omegaboosts']++;
+                        $ability_omegaboost_multipliers[] = MMRPG_SETTINGS_OMEGACOREBOOST_MULTIPLIER;
+                    }
+
+                }
+
+                // If any omegaboosts were present, update the flag
+                if (!empty($this_ability->ability_results['counter_omegaboosts'])){
+                    $this_ability->ability_results['flag_omegaboost'] = true;
                 }
 
             }
@@ -484,6 +539,32 @@ class rpg_ability_damage extends rpg_damage {
 
             }
 
+            // Only apply omega modifiers if allowed to
+            if ($trigger_options['apply_omega_modifiers'] != false){
+
+                // If target robot has omega boost for the ability (based on type)
+                if ($this_ability->ability_results['flag_omegaboost']){
+                    foreach ($ability_omegaboost_multipliers AS $temp_multiplier){
+                        $this_ability->ability_results['this_amount'] = ceil($this_ability->ability_results['this_amount'] * $temp_multiplier);
+                        $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | apply_omega_modifiers | x '.$temp_multiplier.' = '.$this_ability->ability_results['this_amount'].'');
+                    }
+                }
+
+            }
+
+            // Only apply omega modifiers if allowed to
+            if ($trigger_options['apply_omega_modifiers'] != false){
+
+                // If target robot has omega boost for the ability (based on type)
+                if ($this_ability->ability_results['flag_omegaboost']){
+                    foreach ($ability_omegaboost_multipliers AS $temp_multiplier){
+                        $this_ability->ability_results['this_amount'] = ceil($this_ability->ability_results['this_amount'] * $temp_multiplier);
+                        $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | apply_omega_modifiers | x '.$temp_multiplier.' = '.$this_ability->ability_results['this_amount'].'');
+                    }
+                }
+
+            }
+
             // If we're not dealing with a percentage-based amount, apply stat mods
             if ($trigger_options['apply_stat_modifiers'] != false && !$this_ability->damage_options['damage_percent']){
 
@@ -598,8 +679,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_breaker']);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_breaker | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_breaker'].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_breaker']);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_breaker | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_breaker'].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                             // If this robot's attachment has a damage booster value set
@@ -607,8 +686,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_booster']);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_booster | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_booster'].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_booster']);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_booster | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_booster'].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                             // If this robot's attachment has a damage input breaker value set
@@ -616,8 +693,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_input_breaker']);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_input_breaker | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_input_breaker'].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_input_breaker']);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_input_breaker | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_input_breaker'].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                             // If this robot's attachment has a damage input booster value set
@@ -625,8 +700,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_input_booster']);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_input_booster | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_input_booster'].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_input_booster']);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_input_booster | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_input_booster'].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                         }
@@ -637,8 +710,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_breaker_'.$this_ability->damage_options['damage_type']]);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_breaker_'.$this_ability->damage_options['damage_type'].' | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_breaker_'.$this_ability->damage_options['damage_type']].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_breaker_'.$this_ability->damage_options['damage_type']]);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_breaker_'.$this_ability->damage_options['damage_type'].' | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_breaker_'.$this_ability->damage_options['damage_type']].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                             // If this robot's attachment has a damage booster value set
@@ -646,8 +717,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_booster_'.$this_ability->damage_options['damage_type']]);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_booster_'.$this_ability->damage_options['damage_type'].' | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_booster_'.$this_ability->damage_options['damage_type']].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_booster_'.$this_ability->damage_options['damage_type']]);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_booster_'.$this_ability->damage_options['damage_type'].' | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_booster_'.$this_ability->damage_options['damage_type']].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                             // If this robot's attachment has a damage breaker value set
@@ -655,8 +724,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_input_breaker_'.$this_ability->damage_options['damage_type']]);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_input_breaker_'.$this_ability->damage_options['damage_type'].' | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_input_breaker_'.$this_ability->damage_options['damage_type']].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_input_breaker_'.$this_ability->damage_options['damage_type']]);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_input_breaker_'.$this_ability->damage_options['damage_type'].' | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_input_breaker_'.$this_ability->damage_options['damage_type']].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                             // If this robot's attachment has a damage booster value set
@@ -664,8 +731,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_input_booster_'.$this_ability->damage_options['damage_type']]);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_input_booster_'.$this_ability->damage_options['damage_type'].' | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_input_booster_'.$this_ability->damage_options['damage_type']].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_input_booster_'.$this_ability->damage_options['damage_type']]);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_input_booster_'.$this_ability->damage_options['damage_type'].' | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_input_booster_'.$this_ability->damage_options['damage_type']].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                         }
@@ -676,8 +741,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_breaker_'.$this_ability->damage_options['damage_type2']]);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_breaker_'.$this_ability->damage_options['damage_type2'].' | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_breaker_'.$this_ability->damage_options['damage_type2']].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_breaker_'.$this_ability->damage_options['damage_type2']]);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_breaker_'.$this_ability->damage_options['damage_type2'].' | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_breaker_'.$this_ability->damage_options['damage_type2']].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                             // If this robot's attachment has a damage booster value set
@@ -685,8 +748,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_booster_'.$this_ability->damage_options['damage_type2']]);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_booster_'.$this_ability->damage_options['damage_type2'].' | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_booster_'.$this_ability->damage_options['damage_type2']].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_booster_'.$this_ability->damage_options['damage_type2']]);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_booster_'.$this_ability->damage_options['damage_type2'].' | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_booster_'.$this_ability->damage_options['damage_type2']].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                             // If this robot's attachment has a damage breaker value set
@@ -694,8 +755,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_input_breaker_'.$this_ability->damage_options['damage_type2']]);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_input_breaker_'.$this_ability->damage_options['damage_type2'].' | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_input_breaker_'.$this_ability->damage_options['damage_type2']].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_input_breaker_'.$this_ability->damage_options['damage_type2']]);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_input_breaker_'.$this_ability->damage_options['damage_type2'].' | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_input_breaker_'.$this_ability->damage_options['damage_type2']].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                             // If this robot's attachment has a damage booster value set
@@ -703,8 +762,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_input_booster_'.$this_ability->damage_options['damage_type2']]);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_input_booster_'.$this_ability->damage_options['damage_type2'].' | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_input_booster_'.$this_ability->damage_options['damage_type2']].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_input_booster_'.$this_ability->damage_options['damage_type2']]);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_input_booster_'.$this_ability->damage_options['damage_type2'].' | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_input_booster_'.$this_ability->damage_options['damage_type2']].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                         }
@@ -728,8 +785,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_breaker']);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_breaker | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_breaker'].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_breaker']);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_breaker | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_breaker'].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                             // If this robot's attachment has a damage booster value set
@@ -737,8 +792,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_booster']);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_booster | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_booster'].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_booster']);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_booster | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_booster'].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                             // If this robot's attachment has a damage output breaker value set
@@ -746,8 +799,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_output_breaker']);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_output_breaker | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_output_breaker'].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_output_breaker']);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_output_breaker | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_output_breaker'].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                             // If this robot's attachment has a damage output booster value set
@@ -755,8 +806,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_output_booster']);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_output_booster | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_output_booster'].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_output_booster']);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_output_booster | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_output_booster'].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                         }
@@ -767,8 +816,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_breaker_'.$this_ability->damage_options['damage_type']]);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_breaker_'.$this_ability->damage_options['damage_type'].' | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_breaker_'.$this_ability->damage_options['damage_type']].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_breaker_'.$this_ability->damage_options['damage_type']]);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_breaker_'.$this_ability->damage_options['damage_type'].' | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_breaker_'.$this_ability->damage_options['damage_type']].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                             // If this robot's attachment has a damage booster value set
@@ -776,8 +823,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_booster_'.$this_ability->damage_options['damage_type']]);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_booster_'.$this_ability->damage_options['damage_type'].' | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_booster_'.$this_ability->damage_options['damage_type']].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_booster_'.$this_ability->damage_options['damage_type']]);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_booster_'.$this_ability->damage_options['damage_type'].' | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_booster_'.$this_ability->damage_options['damage_type']].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                             // If this robot's attachment has a damage breaker value set
@@ -785,8 +830,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_output_breaker_'.$this_ability->damage_options['damage_type']]);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_output_breaker_'.$this_ability->damage_options['damage_type'].' | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_output_breaker_'.$this_ability->damage_options['damage_type']].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_output_breaker_'.$this_ability->damage_options['damage_type']]);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_output_breaker_'.$this_ability->damage_options['damage_type'].' | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_output_breaker_'.$this_ability->damage_options['damage_type']].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                             // If this robot's attachment has a damage booster value set
@@ -794,8 +837,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_output_booster_'.$this_ability->damage_options['damage_type']]);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_output_booster_'.$this_ability->damage_options['damage_type'].' | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_output_booster_'.$this_ability->damage_options['damage_type']].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_output_booster_'.$this_ability->damage_options['damage_type']]);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_output_booster_'.$this_ability->damage_options['damage_type'].' | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_output_booster_'.$this_ability->damage_options['damage_type']].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                         }
@@ -806,8 +847,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_breaker_'.$this_ability->damage_options['damage_type2']]);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_breaker_'.$this_ability->damage_options['damage_type2'].' | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_breaker_'.$this_ability->damage_options['damage_type2']].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_breaker_'.$this_ability->damage_options['damage_type2']]);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_breaker_'.$this_ability->damage_options['damage_type2'].' | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_breaker_'.$this_ability->damage_options['damage_type2']].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                             // If this robot's attachment has a damage booster value set
@@ -815,8 +854,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_booster_'.$this_ability->damage_options['damage_type2']]);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_booster_'.$this_ability->damage_options['damage_type2'].' | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_booster_'.$this_ability->damage_options['damage_type2']].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_booster_'.$this_ability->damage_options['damage_type2']]);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_booster_'.$this_ability->damage_options['damage_type2'].' | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_booster_'.$this_ability->damage_options['damage_type2']].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                             // If this robot's attachment has a damage breaker value set
@@ -824,8 +861,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_output_breaker_'.$this_ability->damage_options['damage_type2']]);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_output_breaker_'.$this_ability->damage_options['damage_type2'].' | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_output_breaker_'.$this_ability->damage_options['damage_type2']].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_output_breaker_'.$this_ability->damage_options['damage_type2']]);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_output_breaker_'.$this_ability->damage_options['damage_type2'].' | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_output_breaker_'.$this_ability->damage_options['damage_type2']].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                             // If this robot's attachment has a damage booster value set
@@ -833,8 +868,6 @@ class rpg_ability_damage extends rpg_damage {
                                 // Apply the damage breaker multiplier to the current damage amount
                                 $temp_new_amount = ($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_output_booster_'.$this_ability->damage_options['damage_type2']]);
                                 $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_output_booster_'.$this_ability->damage_options['damage_type2'].' | '.$this_ability->ability_results['this_amount'].' = ('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_output_booster_'.$this_ability->damage_options['damage_type2']].') = '.$temp_new_amount.'');
-                                //$temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount'] * $temp_info['attachment_damage_output_booster_'.$this_ability->damage_options['damage_type2']]);
-                                //$this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. '.$temp_token_debug.' <br /> attachment_damage_output_booster_'.$this_ability->damage_options['damage_type2'].' | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].' * '.$temp_info['attachment_damage_output_booster_'.$this_ability->damage_options['damage_type2']].') = '.$temp_new_amount.'');
                                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
                             }
                         }
@@ -845,9 +878,8 @@ class rpg_ability_damage extends rpg_damage {
 
                 // Round the resulting damage after applying all modifiers
                 $temp_new_amount = rpg_functions::round_ceil($this_ability->ability_results['this_amount']);
-                $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' vs. attachments <br /> rounding | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].') = '.$temp_new_amount.'');
+                $this_battle->events_debug(__FILE__, __LINE__, 'ability_'.$this_ability->ability_token.' modifiers applied <br /> round up results | '.$this_ability->ability_results['this_amount'].' = rpg_functions::round_ceil('.$this_ability->ability_results['this_amount'].') = '.$temp_new_amount.'');
                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
-
 
             }
 

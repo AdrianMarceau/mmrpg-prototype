@@ -653,7 +653,7 @@ ob_start();
                                     <a class="back">&#9668;</a>
                                     <a class="next">&#9658;</a>
                                 </div>
-                                <textarea class="textarea" name="post_body" rows="10"><?= str_replace("\n", '\\n', $temp_post_body) ?></textarea>
+                                <textarea class="textarea" name="post_body" rows="10"><?= str_replace('\\n', "\n", $temp_post_body) ?></textarea>
                             </div>
                             <div class="field field_post_info" style="clear: left; overflow: hidden; font-size: 11px;">
                                 <?= mmrpg_formatting_help() ?>

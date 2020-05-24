@@ -231,7 +231,7 @@ ob_start();
                             <input type="hidden" class="hidden" name="new_category_id" value="<?= $this_category_info['category_id'] ?>" />
                         <? endif; ?>
                         <input type="text" class="text" name="thread_name" value="<?= $temp_thread_name ?>" />
-                        <textarea class="textarea" name="thread_body" rows="15"><?= str_replace("\n", '\\n', $temp_thread_body) ?></textarea>
+                        <textarea class="textarea" name="thread_body" rows="15"><?= str_replace('\\n', "\n", $temp_thread_body) ?></textarea>
                     </div>
                     <div class="field field_thread_info" style="clear: left; overflow: hidden; font-size: 11px;">
                         <?= mmrpg_formatting_help() ?>

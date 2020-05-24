@@ -73,9 +73,7 @@ class cms_database {
     // Define the error handler for when the database goes bye bye
     private function critical_error($message){
         if (MMRPG_CONFIG_IS_LIVE){
-            $file = fopen(dirname(MMRPG_CONFIG_ROOTDIR).'/_logs/mmrpg-database-errors_'.date('Y-m-d').'.txt', 'a+');
-            fwrite($file, date('Y-m-d @ H:i:s').' ('.$_SERVER['REMOTE_ADDR'].') : '.$message."\r\n\r\n");
-            fclose($file);
+            error_log(date('Y-m-d @ H:i:s').' ('.$_SERVER['REMOTE_ADDR'].') - '.strip_tags(nl2br(htmlspecialchars_decode($message))).PHP_EOL);
         } else {
             echo('<pre style="display: block; clear: both; float: none; background-color: #f2f2f2; color: #292929; text-shadow: 0 0 0 transparent; white-space: normal; padding: 10px; text-align: left;">'.$message.'</pre>');
         }
@@ -228,7 +226,7 @@ class cms_database {
         // If the result is empty NULL or empty, return false
         if (!$this->MYSQL_RESULT || mysqli_num_rows($this->MYSQL_RESULT) < 1) { return false; }
         // Otherwise, pull an array from the result
-        $result_array = mysqli_fetch_array($this->MYSQL_RESULT, MYSQL_ASSOC);
+        $result_array = mysqli_fetch_array($this->MYSQL_RESULT, MYSQLI_ASSOC);
         // Free the results of the query
         $this->clear();
         // Check to see if this is a cacheable result, and encode if so
@@ -269,7 +267,7 @@ class cms_database {
         // Create the list array to hold all the rows
         $array_list = array();
         // Now loop through the result rows, pulling associative arrays
-        while ($result_array = mysqli_fetch_array($this->MYSQL_RESULT, MYSQL_ASSOC)){
+        while ($result_array = mysqli_fetch_array($this->MYSQL_RESULT, MYSQLI_ASSOC)){
             // If there was an index defined, assign the array to a specific key in the list
             if ($index) { $array_list[$result_array[$index]] = $result_array; }
             // Otherwise, append the array to the end of the list
@@ -324,7 +322,7 @@ class cms_database {
         // If the result is empty NULL or empty, return false
         if (!$this->MYSQL_RESULT || mysqli_num_rows($this->MYSQL_RESULT) < 1) { return false; }
         // Otherwise, pull an array from the result
-        $result_array = mysqli_fetch_array($this->MYSQL_RESULT, MYSQL_ASSOC);
+        $result_array = mysqli_fetch_array($this->MYSQL_RESULT, MYSQLI_ASSOC);
         // Free the results of the query
         $this->clear();
         // Check to see if this is a cacheable result, and encode if so

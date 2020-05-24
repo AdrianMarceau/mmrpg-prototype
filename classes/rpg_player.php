@@ -159,8 +159,8 @@ class rpg_player extends rpg_object {
                 if (!empty($this_rogue_star)){
                     if (!isset($this->player_starforce[$this_rogue_star['star_type']])){ $this->player_starforce[$this_rogue_star['star_type']] = 0; }
                     $this->player_starforce[$this_rogue_star['star_type']] += $this_rogue_star['star_power'];
-                    $this->flags['rogue_star_applied'] = true;
                 }
+                $this->flags['rogue_star_applied'] = true;
             }
         }
 

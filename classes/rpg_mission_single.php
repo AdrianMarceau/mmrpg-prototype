@@ -431,28 +431,22 @@ class rpg_mission_single extends rpg_mission {
             $temp_field_star['star_date'] = time();
             $temp_battle_omega['values']['field_star'] = $temp_field_star;
             $temp_battle_omega['battle_target_player']['player_starforce'] = array();
-            if (!empty($_SESSION[$session_token]['values']['star_force'])){
-                $temp_battle_omega['battle_target_player']['player_starforce'] = $_SESSION[$session_token]['values']['star_force'];
-                if (!empty($this_rogue_star)){
-                    $temp_battle_omega['battle_target_player']['player_starforce'][$this_rogue_star['star_type']] -= $this_rogue_star['star_power'];
-                }
-            }
             if (!isset($temp_battle_omega['battle_target_player']['player_starforce'][$temp_field_star['star_type']])){ $temp_battle_omega['battle_target_player']['player_starforce'][$temp_field_star['star_type']] = 0; }
             $temp_battle_omega['battle_target_player']['player_starforce'][$temp_field_star['star_type']] += 1;
 
-            /*
-            // Increase the power of the robot masters by 10% in each field
-            foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $robot){
-                if (!isset($this_robot_index[$robot['robot_token']])){ continue; }
-                $rindex = $this_robot_index[$robot['robot_token']];
-                // Update the robot rewards array by adding 10% to each of the three main stats
-                $temp_battle_omega['battle_target_player']['player_robots'][$key]['values']['robot_rewards'] = array(
-                    'robot_attack' => round($rindex['robot_attack'] * 0.10),
-                    'robot_defense' => round($rindex['robot_defense'] * 0.10),
-                    'robot_speed' => round($rindex['robot_speed'] * 0.10)
-                    );
+            // If the player has collected any starforce, increase stat bonuses for target robots by a percentage of base
+            if ($this_prototype_data['current_starforce_total'] > 0){
+                $stat_boost_percent = $this_prototype_data['current_starforce_total'] / $this_prototype_data['max_starforce_total'];
+                foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $robot){
+                    if (!isset($this_robot_index[$robot['robot_token']])){ continue; }
+                    $rindex = $this_robot_index[$robot['robot_token']];
+                    $temp_battle_omega['battle_target_player']['player_robots'][$key]['values']['robot_rewards'] = array(
+                        'robot_attack' => round($rindex['robot_attack'] * $stat_boost_percent),
+                        'robot_defense' => round($rindex['robot_defense'] * $stat_boost_percent),
+                        'robot_speed' => round($rindex['robot_speed'] * $stat_boost_percent)
+                        );
+                }
             }
-            */
 
         }
 

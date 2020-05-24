@@ -55,7 +55,8 @@ function refresh_editor_arrays( &$allowed_edit_players, &$allowed_edit_robots, &
             $robot_index_info = $temp_robot_index[$robot_token];
 
             // LEGACYFIX: If this is a copy-core robot with an elemental alt, remove it now
-            if ($robot_info['robot_core'] == 'copy'
+            if (isset($robot_info['robot_core'])
+                && $robot_info['robot_core'] == 'copy'
                 && isset($robot_info['robot_image'])
                 && $robot_info['robot_image'] != $robot_token){
                 list($rtoken, $atoken) = explode('_', $robot_info['robot_image']);
