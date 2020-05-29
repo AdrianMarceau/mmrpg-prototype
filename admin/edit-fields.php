@@ -379,7 +379,7 @@
             if (empty($form_data['field_token']) || empty($old_field_token)){ $form_messages[] = array('error', 'Field Token was not provided or was invalid'); $form_success = false; }
             if (empty($form_data['field_name'])){ $form_messages[] = array('error', 'Field Name was not provided or was invalid'); $form_success = false; }
             if (empty($form_data['field_class'])){ $form_messages[] = array('error', 'Field Kind was not provided or was invalid'); $form_success = false; }
-            if (empty($form_data['field_master'])){ $form_messages[] = array('error', 'Field Master was not provided or was invalid'); $form_success = false; }
+            if ($form_data['field_class'] === 'master' && empty($form_data['field_master'])){ $form_messages[] = array('error', 'Field Master was not provided or was invalid'); $form_success = false; }
             if (!isset($_POST['field_type'])){ $form_messages[] = array('warning', 'Field Type was not provided or were invalid'); $form_success = false; }
             if (!$form_success){ exit_field_edit_action($form_data['field_id']); }
 
