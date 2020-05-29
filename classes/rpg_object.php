@@ -21,7 +21,7 @@ class rpg_object {
      * Create a new RPG object
      * @return  rpg_object
      */
-    public function rpg_object(){
+    public function __construct(){
 
         // Update the session keys for this object
         $this->session_key = 'OBJECTS';

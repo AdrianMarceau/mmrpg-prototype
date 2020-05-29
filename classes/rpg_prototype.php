@@ -10,7 +10,7 @@ class rpg_prototype {
      * This is a wrapper class for static functions,
      * so object initialization is not necessary.
      */
-    public function rpg_prototype(){ }
+    public function __construct(){ }
 
     // Define a function for calculating required experience points to the next level
     public static function calculate_experience_required($this_level, $max_level = 100, $min_experience = 1000){

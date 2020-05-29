@@ -14,7 +14,7 @@ class rpg_game {
      * This is a wrapper class for static functions,
      * so object initialization is not necessary.
      */
-    public function rpg_game(){ }
+    public function __construct(){ }
 
 
 
