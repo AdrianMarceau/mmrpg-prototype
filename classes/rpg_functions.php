@@ -3,7 +3,7 @@
 class rpg_functions {
 
     // Define the constructor class
-    public function rpg_functions(){ }
+    public function __construct(){ }
 
 
     // -- STATIC CHANCE FUNCTIONS -- //

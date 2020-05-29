@@ -11,7 +11,7 @@ class rpg_battle extends rpg_object {
     public $endofturn_actions;
 
     // Define the constructor class
-    public function rpg_battle(){
+    public function __construct(){
 
         // Update the session keys for this object
         $this->session_key = 'BATTLES';

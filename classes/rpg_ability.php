@@ -6,7 +6,7 @@
 class rpg_ability extends rpg_object {
 
     // Define the constructor class
-    public function rpg_ability(){
+    public function __construct(){
 
         // Update the session keys for this object
         $this->session_key = 'ABILITIES';

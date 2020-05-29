@@ -10,7 +10,7 @@ class rpg_mission {
      * This is a wrapper class for static functions,
      * so object initialization is not necessary.
      */
-    public function rpg_mission(){ }
+    public function __construct(){ }
 
     // Define a function for recalculation a mission's battle zenny and turns
     public static function calculate_mission_zenny_and_turns(&$this_battle_omega, $this_prototype_data, $mmrpg_robots_index){
