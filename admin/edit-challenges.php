@@ -20,7 +20,7 @@
     $mmrpg_fields_index = $db->get_array_list("SELECT {$mmrpg_fields_fields} FROM mmrpg_index_fields WHERE field_token <> 'field' AND field_flag_published = 1  AND field_flag_complete = 1 ORDER BY FIELD(field_token, 'intro-field') DESC, FIELD(field_game, 'MMRPG', 'MM00') DESC, field_game ASC, field_order ASC", 'field_token');
 
     // Collect an index of music tracks for options
-    $mmrpg_music_index = $db->get_array_list("SELECT music_id, music_token, music_album, music_game, music_name FROM mmrpg_index_music ORDER BY music_game ASC, music_order ASC, music_token ASC;", 'music_id');
+    $mmrpg_music_index = $db->get_array_list("SELECT music_id, music_token, music_album, music_game, music_name, music_link FROM mmrpg_index_music ORDER BY music_game ASC, music_order ASC, music_token ASC;", 'music_id');
 
     // Collect an index of player colours for options
     $mmrpg_players_fields = rpg_player::get_index_fields(true);

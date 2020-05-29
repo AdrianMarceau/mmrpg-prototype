@@ -946,7 +946,8 @@ input[type=file] {
     margin: 0 auto 4px 0;
     font-weight: bold;
 }
-.adminform .field .label em {
+.adminform .field .label em,
+.adminform .subfield .sublabel em {
     display: inline-block;
     margin: 0 auto 0 10px;
     font-weight: normal;
@@ -956,10 +957,12 @@ input[type=file] {
     position: relative;
     bottom: 1px;
 }
-.adminform .field .label em:not(.nowrap):before {
+.adminform .field .label em:not(.nowrap):before,
+.adminform .subfield .sublabel em:not(.nowrap):before {
     content: "(";
 }
-.adminform .field .label em:not(.nowrap):after {
+.adminform .field .label em:not(.nowrap):after,
+.adminform .subfield .sublabel em:not(.nowrap):after {
     content: ")";
 }
 .adminform .field input[type="text"],
@@ -1018,6 +1021,26 @@ input[type=file] {
 .adminform .field.has4cols .subfield input[type="text"],
 .adminform .field.has4cols .subfield input[type="number"],
 .adminform .field.has4cols .subfield input[type="password"] {
+    width: 100%;
+    margin-right: 0;
+}
+
+.adminform .field.hasXcols input[type="text"],
+.adminform .field.hasXcols input[type="number"],
+.adminform .field.hasXcols input[type="password"],
+.adminform .field.hasXcols > select,
+.adminform .field.hasXcols > textarea,
+.adminform .field.hasXcols .subfield {
+    margin-right: 5px;
+}
+.adminform .field.hasXcols .subfield {
+    float: left;
+}
+.adminform .field.hasXcols .subfield select,
+.adminform .field.hasXcols .subfield textarea,
+.adminform .field.hasXcols .subfield input[type="text"],
+.adminform .field.hasXcols .subfield input[type="number"],
+.adminform .field.hasXcols .subfield input[type="password"] {
     width: 100%;
     margin-right: 0;
 }
@@ -1321,6 +1344,16 @@ input[type=file] {
 }
 
 
+
+.adminform .field .subfield div.select-span-wrap {
+    width: calc(100% - 80px);
+    float: left;
+}
+.adminform .field .subfield div.select-span-wrap select {
+    width: 100%;
+    float: none;
+}
+
 .adminform .editor .field .subfield.levelup {
 
 }
@@ -1328,22 +1361,182 @@ input[type=file] {
     width: 75px;
     float: left;
 }
-.adminform .field .subfield div.select-span-wrap,
 .adminform .editor .field .subfield.levelup select {
     width: calc(100% - 80px);
     float: left;
 }
-.adminform .editor .field .subfield.levelup div.select-span-wrap select {
-    width: 100%;
-    float: none;
-}
-/*
-.adminform .editor .field .subfield.pointsup input[type="number"] {
+
+.adminform .editor .field .subfield.fmultipliers input[type="number"] {
     width: 75px;
     float: left;
 }
-.adminform .editor .field .subfield.pointsup select {
-    width: calc(100% - 80px);
+.adminform .editor .field .subfield.fmultipliers div.select-span-wrap {
+    width: calc(100% - 100px);
     float: left;
 }
-*/
+.adminform .editor .field .subfield.fmultipliers .type_span.swatch {
+    top: 3px;
+}
+
+.adminform.edit_fields .CodeMirror,
+.adminform.edit_fields .panel[data-tab="attachments"] .CodeMirror {
+    height: 150px;
+}
+
+
+.adminform .field.bfg-attachment {
+    min-height: 0;
+}
+.adminform .field.bfg-attachment[data-key="{x}"] {
+    display: none;
+}
+.adminform .field.bfg-attachment .subfield {
+
+}
+.adminform .field.bfg-attachment.bfg-headers {
+    padding-bottom: 0;
+}
+
+.adminform .field.bfg-attachment .subfield {
+    width: calc(((100% - 70px) / 6) - 8px);
+}
+.adminform .field.bfg-attachment .subfield.bfg-number {
+    width: 35px;
+}
+.adminform .field.bfg-attachment .subfield.bfg-view {
+    width: 35px;
+    text-align: center;
+}
+
+.adminform .bfg-attachments-inputs {
+    text-align: center;
+}
+.adminform .bfg-attachments-inputs:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+.adminform .bfg-attachments-inputs .button.add-attachment {
+    display: inline-block;
+    margin: 0 auto;
+    font-size: 11px;
+    line-height: 1;
+    padding: 3px 6px;
+    border: 1px solid #cccccc;
+    background-color: #e6e6e6;
+    color: #4d4d4d;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+.adminform .bfg-attachments-inputs .button.add-attachment:hover {
+    background-color: #cccccc;
+    color: #333333;
+}
+
+.adminform .bfg-attachments-preview {
+    margin: 0 auto;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #E0E0E0;
+}
+.adminform .bfg-attachments-preview .preview_wrapper {
+    border: 1px solid #E0E0E0;
+    border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    background: #191919 none scroll repeat -10px -30px;
+    overflow: hidden;
+    padding: 0;
+    margin-bottom: 10px;
+    position: relative;
+    height: 248px;
+    width: 100%;
+    box-sizing: content-box;
+}
+.adminform .bfg-attachments-preview .background_image,
+.adminform .bfg-attachments-preview .foreground_image {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -2px;
+    right: -2px;
+    border: 0 none transparent;
+    border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    background-color: transparent;
+    background-image: none;
+    background-attachment: scroll;
+    background-repeat: repeat;
+    background-position: center center;
+    overflow: hidden;
+    height: auto;
+    width: auto;
+    opacity: 1;
+    transition: opacity 0.5s;
+}
+.adminform .bfg-attachments-preview .background_attachments,
+.adminform .bfg-attachments-preview .foreground_attachments {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: auto;
+    right: auto;
+    overflow: visible;
+    width: 750px;
+    height: 248px;
+    border: 2px solid transparent;
+    left: 50%;
+    transform: translate(-50%, 0);
+    opacity: 1;
+    transition: opacity 0.5s;
+}
+.adminform .bfg-attachments-preview .background_image.hidden,
+.adminform .bfg-attachments-preview .foreground_image.hidden,
+.adminform .bfg-attachments-preview .background_attachments.hidden,
+.adminform .bfg-attachments-preview .foreground_attachments.hidden {
+    opacity: 0;
+}
+.adminform .bfg-attachments-preview .preview_wrapper:after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 750px;
+    height: 248px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    border-left: 100px solid rgba(0, 0, 0, 0.1);
+    border-right: 100px solid rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+}
+.adminform .bfg-attachments-preview .sprite {
+    background-color: transparent !important;
+    transition: background-color 0.3s;
+}
+.adminform .bfg-attachments-preview .sprite.highlight {
+    background-color: rgba(255, 0, 255, 0.6) !important;
+}
+.adminform .bfg-attachments-preview .buttons {
+    text-align: center;
+}
+.adminform .bfg-attachments-preview .buttons input[type="button"] {
+    font-size: 11px;
+    line-height: 1;
+    padding: 4px 8px;
+    border-color: #cccccc;
+    background-color: #e6e6e6;
+    color: #4d4d4d;
+}
+.adminform .bfg-attachments-preview .buttons input[type="button"]:hover {
+    background-color: #cccccc;
+    color: #333333;
+}
+.adminform .bfg-attachments-preview .background_image { z-index: 1; }
+.adminform .bfg-attachments-preview .background_attachments { z-index: 2; }
+.adminform .bfg-attachments-preview .foreground_image { z-index: 3; }
+.adminform .bfg-attachments-preview .foreground_attachments { z-index: 4; }
+.adminform .bfg-attachments-preview .preview_wrapper:after { z-index: 5; }

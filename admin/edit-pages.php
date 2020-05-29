@@ -2,6 +2,8 @@
 
     <?
 
+    /* -- Collect Dependant Indexes -- */
+
     // Collect an index of all existing pages for reference
     $mmrpg_pages_fields = cms_website_page::get_index_fields(true);
     $mmrpg_website_pages_index = $db->get_array_list("SELECT {$mmrpg_pages_fields} FROM mmrpg_website_pages WHERE page_id <> 0;", 'page_id');
@@ -12,6 +14,8 @@
         $form_messages[] = array('error', 'You do not have permission to edit pages!');
         redirect_form_action('admin.php?action=home');
     }
+
+    /* -- Page Script/Style Dependencies  -- */
 
     // Define the extra stylesheets that must be included for this page
     if (!isset($admin_include_stylesheets)){ $admin_include_stylesheets = ''; }
@@ -24,7 +28,6 @@
     $admin_include_javascript .= '<script type="text/javascript" src="_ext/codemirror/mode/css/css.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
     $admin_include_javascript .= '<script type="text/javascript" src="_ext/codemirror/mode/javascript/javascript.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
     $admin_include_javascript .= '<script type="text/javascript" src="_ext/codemirror/mode/htmlmixed/htmlmixed.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
-
 
     /* -- Form Setup Actions -- */
 
