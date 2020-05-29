@@ -411,35 +411,65 @@ $(document).ready(function(){
         }
 
 
-    // PAGE EDITOR EVENTS
+    // COMMON EDITOR EVENTS
 
-    // Check to make sure we're on the page editor page
-    var $editPages = $('.adminform.edit_pages', thisAdmin);
+    // Check to make sure we're on the admin page
     var codeEditorIndex = {};
-    //console.log('$editPages =', $editPages);
-    if ($editPages.length){
+    if ($adminForm.length){
 
         // Replace any compatible textareas with CodeMirror instances
         if (typeof window.CodeMirror !== 'undefined'){
-            var $codeMirrorFields = $('.field.codemirror', $editPages);
+            var $codeMirrorFields = $('.field.codemirror', $adminForm);
+            //console.log('$codeMirrorFields =', $codeMirrorFields.length, $codeMirrorFields);
             $codeMirrorFields.each(function(){
                 var $codeField = $(this);
                 var $textArea = $codeField.find('textarea');
                 var textArea = $textArea.get(0);
                 //$textArea.css({height:'auto'});
                 var editorID = Object.keys(codeEditorIndex).length + 1;
+                var editorMode = $codeField.is('[data-codemirror-mode]') ? $codeField.attr('data-codemirror-mode') : 'html';
                 var editorConfig = {
-                    mode: 'htmlmixed',
-                    lineNumbers: true,
+                    mode: editorMode, //'htmlmixed',
                     tabSize: 2,
                     lineWrapping: true
                     };
+                // custom HTML settings
+                if (editorMode === 'html'){
+                    editorConfig.mode = 'htmlmixed';
+                    editorConfig.lineNumbers = true;
+                    } // custom JSON settings
+                else if (editorMode === 'json'){
+                    //editorConfig.mode = 'javascript';
+                    //editorConfig.mode = 'application/ld+json';
+                    editorConfig.mode = {
+                        name: "application/json",
+                        json: true,
+                        statementIndent: 2
+                        };
+                    editorConfig.lineNumbers = false;
+                    editorConfig.matchBrackets = true;
+                    editorConfig.autoCloseBrackets = true;
+                    }
+
                 if ($codeField.hasClass('readonly')){ editorConfig.readOnly = true; }
+                //console.log('editorConfig =', editorConfig);
                 var codeEditor = CodeMirror.fromTextArea(textArea, editorConfig);
                 codeEditorIndex[editorID] = codeEditor;
                 $codeField.attr('data-editor-id', editorID);
                 });
             }
+
+    }
+
+
+    // PAGE EDITOR EVENTS
+
+    // Check to make sure we're on the page editor page
+    var $editPages = $('.adminform.edit_pages', thisAdmin);
+    //console.log('$editPages =', $editPages);
+    if ($editPages.length){
+
+        // ...
 
     }
 
@@ -656,6 +686,214 @@ $(document).ready(function(){
         $robotTokenSelects.each(function(){ robotTokenSelectChange($(this)); });
 
         }
+
+
+    // FIELD EDITOR EVENTS
+
+    // Check to make sure we're on the field editor page
+    var $editFields = $('.adminform.edit_fields', thisAdmin);
+    //console.log('$editFields =', $editFields);
+    if ($editFields.length){
+
+        // Collect references to the background/foreground attachment containers
+        var $previewContainer = $('.bfg-attachments-preview', $editFields);
+        var $inputContainers = $('.bfg-attachments-inputs', $editFields);
+        if ($previewContainer.length
+            && $inputContainers.length){
+
+            // Define references to important attachment containers
+            var $previewBackgroundAttachments = $('.background_attachments', $previewContainer);
+            var $previewForegroundAttachments = $('.foreground_attachments', $previewContainer);
+
+            // Define a function for triggering background/foreground visibility in the preview
+            function bfgToggleVisibility($button, kind, ucKind){
+                //console.log('bfgToggleVisibility('+kind+');');
+                var $bfgImageDiv = $('.'+kind+'_image', $previewContainer);
+                var $bfgAttachmentsDiv = $('.'+kind+'_attachments', $previewContainer);
+                if (!$bfgImageDiv.hasClass('hidden')){ $bfgImageDiv.addClass('hidden'); $bfgAttachmentsDiv.addClass('hidden'); $button.attr('value', 'Show '+ucKind); }
+                else { $bfgImageDiv.removeClass('hidden'); $bfgAttachmentsDiv.removeClass('hidden'); $button.attr('value', 'Hide '+ucKind); }
+                }
+
+            // Define a function for parsing attachment data from a given row
+            function parseAttachmentData($row, kind, parsedAttachments){
+                var $inputs = $('input[name],select[name]', $row);
+                if (!$inputs.length){ return false; }
+                var data = {kind: kind};
+                $inputs.each(function(){
+                    var $input = $(this);
+                    var key_name = $input.attr('name').replace(/^(?:.*?)\[([^\[\]]+)\]\[([^\[\]]+)\]$/, '$1/$2').split('/');
+                    if (typeof data.key === 'undefined'){ data.key = parseInt(key_name[0]); }
+                    var name = key_name[1];
+                    if ($input.is('select')){ var value = $input.find('option:selected').val(); }
+                    else { var value = $input.val(); }
+                    if (value === ''){ data = false; return; }
+                    if ($input.is('[type="number"]')){ value = parseInt(value); }
+                    data[name] = value;
+                    });
+                if (!data){ return false; }
+                data.float = data.direction !== 'left' ? 'left' : 'right';
+                data.highlight = $row.find('.bfg-view input[type="checkbox"]').is(':checked') ? true : false;
+                if (typeof parsedAttachments !== 'undefined'){ parsedAttachments.push(data); return true; }
+                else { return data; }
+            }
+
+            // Define a function for generating sprite markup for a specific attachment
+            function getAttachmentSpriteMarkup(data, returnArray){
+                //console.log('getAttachmentSpriteMarkup(data, returnArray)', data, returnArray);
+                if (typeof returnArray !== 'boolean'){ returnArray = false; }
+                var spriteSize = data.size+'x'+data.size;
+                var spriteImage = 'images/'+data.class+'s/'+data.token+'/sprite_'+data.direction+'_'+spriteSize+'.png';
+                var spriteClass = 'sprite sprite_'+spriteSize+' sprite_'+spriteSize+'_'+data.direction+' sprite_'+spriteSize+'_00 ';
+                if (data.frame.length){ var frame = data.frame.split(',')[0]; spriteClass += 'sprite_'+spriteSize+'_'+('00'+frame).substring(frame.length)+' '; }
+                if (data.highlight){ spriteClass += 'highlight '; }
+                var spriteStyle = data.float+': '+data.offset_x+'px; bottom: '+data.offset_y+'px; z-index: '+(data.key + 1)+'; background-image: url('+spriteImage+');';
+                if (returnArray){ return [spriteClass, spriteStyle, data.key]; }
+                var markup = '<div class="'+spriteClass+'" style="'+spriteStyle+'" data-key="'+data.key+'"></div>';
+                return markup;
+            }
+
+            // Define a function for looping through parsed attachment data and appending sprites
+            function displayAttachmentSprites(parsedAttachments){
+                $previewBackgroundAttachments.find('.sprite').remove();
+                $previewForegroundAttachments.find('.sprite').remove();
+                var newBackgroundSprites = [];
+                var newForegroundSprites = [];
+                for (var i = 0; i < parsedAttachments.length; i++){
+                    var data = parsedAttachments[i];
+                    var markup = getAttachmentSpriteMarkup(data);
+                    if (data.kind === 'background'){ newBackgroundSprites.push(markup); }
+                    else if (data.kind === 'foreground'){ newForegroundSprites.push(markup); }
+                }
+                $previewBackgroundAttachments.append(newBackgroundSprites.join(''));
+                $previewForegroundAttachments.append(newForegroundSprites.join(''));
+            }
+
+            // Define a function for refreshing all attachments at once
+            function refreshAllAttachments(){
+                //console.log('refreshAttachments()');
+                var parsedAttachments = [];
+                $inputContainers.each(function(){
+                    var $inputContainer = $(this);
+                    var inputContainerKind = $inputContainer.attr('data-kind');
+                    $('.bfg-attachment', $inputContainer).each(function(){
+                        parseAttachmentData($(this), inputContainerKind, parsedAttachments);
+                        });
+                    });
+                //console.log('parsedAttachments =', parsedAttachments);
+                displayAttachmentSprites(parsedAttachments);
+            }
+
+            // Define click events for the background/foreground toggle buttons
+            $('input[name="toggle_background"],input[name="toggle_foreground"]', $previewContainer).each(function(e){
+                var $button = $(this);
+                var kind = $button.attr('name').replace('toggle_', '');
+                var ucKind = $button.attr('value').replace('Toggle ', '');
+                $button.attr('value', 'Hide '+ucKind);
+                $button.bind('click', function(e){
+                    e.preventDefault();
+                    bfgToggleVisibility($button, kind, ucKind);
+                    });
+                });
+
+            // Automatically populate certain fields when the attachment type is mecha
+            $('select[name$="\[class\]"]', $inputContainers).live('change', function(e){
+                var $classSelect = $(this);
+                var $parentRow = $classSelect.closest('.bfg-attachment');
+                var $tokenInput = $parentRow.find('input[name$="\[token\]"]');
+                var $directionSelect = $parentRow.find('select[name$="\[direction\]"]');
+                var $offsetXInput = $parentRow.find('input[name$="\[offset_x\]"]');
+                var $offsetYInput = $parentRow.find('input[name$="\[offset_y\]"]');
+                var $frameInput = $parentRow.find('input[name$="\[frame\]"]');
+                var classValue = $classSelect.find('option:selected').val();
+                //console.log('class changed to ', classValue);
+                $tokenInput.val('').prop('readonly', true);
+                $directionSelect.val('').prop('disabled', true);
+                $offsetXInput.val('').prop('disabled', true);
+                $offsetYInput.val('').prop('disabled', true);
+                $frameInput.val('').prop('readonly', true);
+                 if (classValue !== ''){
+                    if (classValue === 'robot'){ $tokenInput.val('met'); }
+                    else { $tokenInput.prop('readonly', false); }
+                    $directionSelect.prop('disabled', false);
+                    $offsetXInput.prop('disabled', false);
+                    $offsetYInput.prop('disabled', false);
+                    if (classValue === 'robot'){ $frameInput.val('0'); }
+                    else { $frameInput.prop('readonly', false); }
+                    }
+                });
+
+            // Automatically update individual sprites on input/select change
+            $('input[name],select[name]', $inputContainers).live('change', function(e){
+                var $input = $(this);
+                var $inputRow = $input.closest('.bfg-attachment');
+                var inputRowKey = parseInt($inputRow.attr('data-key'));
+                var $inputContainer = $inputRow.closest('.bfg-attachments-inputs');
+                var inputContainerKind = $inputContainer.attr('data-kind');
+                var $thisPreviewContainer = $('.'+inputContainerKind+'_attachments', $previewContainer);
+                var $thisSprite = $thisPreviewContainer.find('.sprite[data-key="'+inputRowKey+'"]');
+                var attachmentData = parseAttachmentData($inputRow, inputContainerKind);
+                if (!attachmentData){ if ($thisSprite.length){ $thisSprite.remove(); } return false; }
+                var attachmentMarkup = getAttachmentSpriteMarkup(attachmentData, true);
+                if ($thisSprite.length){ $thisSprite.attr('class', attachmentMarkup[0]).attr('style', attachmentMarkup[1]); }
+                else { $thisPreviewContainer.append('<div class="'+attachmentMarkup[0]+'" style="'+attachmentMarkup[1]+'" data-key="'+attachmentMarkup[2]+'"></div>'); }
+                });
+
+            // Define a click event for the highlight checkboxes along the side of the rows
+            $('.bfg-view input[type="checkbox"]', $inputContainers).live('change', function(e){
+                var $checkbox = $(this);
+                var isChecked = $checkbox.is(':checked') ? true : false;
+                var attachmentKind = $checkbox.attr('data-kind');
+                var attachmentKey = $checkbox.attr('data-key');
+                //console.log('checkbox changed! isChecked =', isChecked);
+                var $thisPreviewContainer = $('.'+attachmentKind+'_attachments', $previewContainer);
+                var $thisSprite = $thisPreviewContainer.find('.sprite[data-key="'+attachmentKey+'"]');
+                if (isChecked){ $thisSprite.addClass('highlight'); }
+                else { $thisSprite.removeClass('highlight'); }
+                });
+
+            // Prevent invalid characters or keys from being used in certain fields
+            $('input[name]', $inputContainers).live("keypress", function(e){
+                var inputName = $(this).attr('name').replace(/^(?:.*?)\[([^\[\]]+)\]$/, '$1');
+                //console.log('test inputName =', inputName, 'and e.charCode =', e.charCode);
+                // Always disable the enter key in these fields to prevent accidental form submission
+                if (e.keyCode == '13'){
+                    e.preventDefault();
+                    return;
+                    }
+                // Only allow numbers and commas in the frame field
+                else if (inputName === 'frame'){
+                    var regex = new RegExp("^[0-9,]+$");
+                    var key = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+                    if (!regex.test(key)) {
+                        e.preventDefault();
+                        return false;
+                        }
+                    }
+                });
+
+            // Define the click event for the add-attachment button under each section
+            $('.button.add-attachment', $inputContainers).bind('click', function(e){
+                e.preventDefault();
+                var $buttonParent = $(this).closest('.bfg-attachments-inputs');
+                var numExistingRows = $('.field.bfg-attachment[data-key!="{x}"]', $buttonParent).length;
+                var $templateRow = $buttonParent.find('.field.bfg-attachment[data-key="{x}"]');
+                var templateMarkup = $templateRow[0].outerHTML;
+                var templateKey = numExistingRows;
+                var templateNum = templateKey + 1;
+                templateMarkup = templateMarkup.replace(/#\{x\}/g, '#'+templateNum);
+                templateMarkup = templateMarkup.replace(/\{x\}/g, templateKey);
+                var $newRow = $(templateMarkup);
+                $newRow.insertBefore($templateRow);
+                $newRow.find('select[name$="\[class\]"]').trigger('change');
+                });
+
+            // Auto-refresh all attachments on page load
+            refreshAllAttachments();
+
+
+        }
+
+    }
 
 });
 
