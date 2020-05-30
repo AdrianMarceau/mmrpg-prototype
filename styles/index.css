@@ -133,6 +133,105 @@ button {
     right: 12px;
 }
 
+#window .header_social_icons {
+    display: block;
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    height: 32px;
+    width: auto;
+    overflow: visible;
+    line-height: 16px;
+    text-indent: 0px;
+    z-index: 9999;
+}
+#window .header_social_icons:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+#window .header_social_icons .link {
+    display: block;
+    float: right;
+    margin: 0 0 0 3px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid #1A1A1A;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+}
+#window .header_social_icons .link .icon {
+    display: block;
+    width: 32px;
+    height: 32px;
+    margin: 0;
+    direction: ltr;
+    text-indent: -9999px;
+    overflow: hidden;
+    background-image: url(../images/social-icons_32x32.png);
+    background-size: auto;
+    background-position: 0 0;
+    background-repeat: no-repeat;
+}
+#window .header_social_icons .link .icon.facebook {
+    background-position: 0 0;
+}
+#window .header_social_icons .link .icon.github {
+    background-position: -32px 0;
+}
+#window .header_social_icons .link .icon.discord {
+    background-position: -64px 0;
+}
+#window .header_social_icons .link .icon.reddit {
+    background-position: -96px 0;
+}
+
+#window .header_social_icons.x16 {
+    height: 16px;
+    line-height: 16px;
+}
+#window .header_social_icons.x16 .link .icon {
+    width: 16px;
+    height: 16px;
+    background-size: auto 16px;
+}
+#window .header_social_icons.x16 .link .icon.facebook {
+    background-position: 0 0;
+}
+#window .header_social_icons.x16 .link .icon.github {
+    background-position: -16px 0;
+}
+#window .header_social_icons.x16 .link .icon.discord {
+    background-position: -32px 0;
+}
+#window .header_social_icons.x16 .link .icon.reddit {
+    background-position: -48px 0;
+}
+
+#window .header_social_icons.x32 {
+    height: 32px;
+    line-height: 32px;
+    background-size: auto 32px;
+}
+#window .header_social_icons.x32 .link .icon {
+    width: 32px;
+    height: 32px;
+}
+#window .header_social_icons.x32 .link .icon.facebook {
+    background-position: 0 0;
+}
+#window .header_social_icons.x32 .link .icon.github {
+    background-position: -32px 0;
+}
+#window .header_social_icons.x32 .link .icon.discord {
+    background-position: -64px 0;
+}
+#window .header_social_icons.x32 .link .icon.reddit {
+    background-position: -96px 0;
+}
+
 #window .banner .event {
     display: block;
     margin: 0;
