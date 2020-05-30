@@ -1,16 +1,9 @@
--- --------------------------------------------------------
--- Host:                         127.0.0.1
--- Server version:               5.5.31-0ubuntu0.12.04.2 - (Ubuntu)
--- Server OS:                    debian-linux-gnu
--- HeidiSQL Version:             9.1.0.4867
--- --------------------------------------------------------
-
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET NAMES utf8mb4 */;
+/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- Dumping structure for table mmrpg2k11.mmrpg_leaderboard
 CREATE TABLE IF NOT EXISTS `mmrpg_leaderboard` (
   `board_id` mediumint(8) NOT NULL AUTO_INCREMENT COMMENT 'Board ID',
   `user_id` mediumint(8) NOT NULL COMMENT 'User ID',
@@ -23,10 +16,16 @@ CREATE TABLE IF NOT EXISTS `mmrpg_leaderboard` (
   `board_points_pending_dr_light` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Board Points Pending (Dr. Light)',
   `board_points_pending_dr_wily` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Board Points Pending (Dr. Wily)',
   `board_points_pending_dr_cossack` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Board Points Pending (Dr. Cossack)',
+  `board_points_legacy` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '(Legacy 2k16) Board Points',
+  `board_points_legacy2` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '(Legacy 2k19) Board Points',
+  `board_points_dr_light_legacy` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '(Legacy) Board Points (Dr. Light)',
+  `board_points_dr_wily_legacy` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '(Legacy) Board Points (Dr. Wily)',
+  `board_points_dr_cossack_legacy` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '(Legacy) Board Points (Dr. Cossack)',
   `board_robots` text NOT NULL COMMENT 'Board Robots',
   `board_robots_dr_light` text NOT NULL COMMENT 'Board Robots (Dr. Light)',
   `board_robots_dr_wily` text NOT NULL COMMENT 'Board Robots (Dr. Wily)',
   `board_robots_dr_cossack` text NOT NULL COMMENT 'Board Robots (Dr. Cossack)',
+  `board_robots_count` int(6) unsigned NOT NULL DEFAULT '0' COMMENT 'Board Robots (Count)',
   `board_battles` text NOT NULL COMMENT 'Board Battles',
   `board_battles_dr_light` text NOT NULL COMMENT 'Board Battles (Dr. Light)',
   `board_battles_dr_wily` text NOT NULL COMMENT 'Board Battles (Dr. Wily)',
@@ -39,6 +38,7 @@ CREATE TABLE IF NOT EXISTS `mmrpg_leaderboard` (
   `board_stars_dr_light` int(6) unsigned NOT NULL DEFAULT '0' COMMENT 'Board Stars (Dr. Light)',
   `board_stars_dr_wily` int(6) unsigned NOT NULL DEFAULT '0' COMMENT 'Board Stars (Dr. Wily)',
   `board_stars_dr_cossack` int(6) unsigned NOT NULL DEFAULT '0' COMMENT 'Board Stars (Dr. Cossack)',
+  `board_items` int(6) unsigned NOT NULL DEFAULT '0' COMMENT 'Board Items',
   `board_abilities` int(6) unsigned NOT NULL DEFAULT '0' COMMENT 'Board Abilities',
   `board_abilities_dr_light` int(6) unsigned NOT NULL DEFAULT '0' COMMENT 'Board Abilities (Dr. Light)',
   `board_abilities_dr_wily` int(6) unsigned NOT NULL DEFAULT '0' COMMENT 'Board Abilities (Dr. Wily)',
@@ -52,9 +52,8 @@ CREATE TABLE IF NOT EXISTS `mmrpg_leaderboard` (
   PRIMARY KEY (`board_id`),
   UNIQUE KEY `user_id` (`user_id`),
   UNIQUE KEY `save_id` (`save_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
--- Data exporting was unselected.
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

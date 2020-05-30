@@ -1,22 +1,17 @@
--- --------------------------------------------------------
--- Host:                         127.0.0.1
--- Server version:               5.5.31-0ubuntu0.12.04.2 - (Ubuntu)
--- Server OS:                    debian-linux-gnu
--- HeidiSQL Version:             9.1.0.4867
--- --------------------------------------------------------
-
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET NAMES utf8mb4 */;
+/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- Dumping structure for table mmrpg2k11.mmrpg_index_abilities
 CREATE TABLE IF NOT EXISTS `mmrpg_index_abilities` (
   `ability_id` mediumint(8) NOT NULL AUTO_INCREMENT COMMENT 'Ability ID',
   `ability_token` varchar(100) NOT NULL COMMENT 'Ability Token',
   `ability_name` varchar(100) NOT NULL COMMENT 'Ability Name',
   `ability_game` varchar(10) NOT NULL COMMENT 'Ability Game',
+  `ability_group` varchar(32) NOT NULL COMMENT 'Ability Group',
   `ability_class` varchar(32) NOT NULL COMMENT 'Ability Class',
+  `ability_subclass` varchar(32) NOT NULL COMMENT 'Ability Subclass',
   `ability_master` varchar(100) NOT NULL COMMENT 'Ability Master',
   `ability_number` varchar(10) NOT NULL COMMENT 'Ability Number',
   `ability_image` varchar(64) NOT NULL COMMENT 'Ability Image',
@@ -24,10 +19,11 @@ CREATE TABLE IF NOT EXISTS `mmrpg_index_abilities` (
   `ability_image_size` smallint(3) NOT NULL DEFAULT '40' COMMENT 'Ability Image Size',
   `ability_image_editor` mediumint(8) NOT NULL DEFAULT '0' COMMENT 'Ability Image Editor',
   `ability_type` varchar(32) NOT NULL COMMENT 'Ability Type',
-  `ability_type2` varchar(32) NOT NULL COMMENT 'Ability Type 2',
+  `ability_type2` varchar(32) NOT NULL COMMENT 'Ability ENGINE 2',
   `ability_description` text NOT NULL COMMENT 'Ability Description',
   `ability_description2` text NOT NULL COMMENT 'Ability Description 2',
   `ability_speed` smallint(6) NOT NULL DEFAULT '1' COMMENT 'Ability Speed',
+  `ability_speed2` smallint(6) NOT NULL DEFAULT '1' COMMENT 'Ability Speed 2',
   `ability_energy` smallint(6) NOT NULL DEFAULT '1' COMMENT 'Ability Energy',
   `ability_energy_percent` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Ability Energy Percent',
   `ability_damage` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Ability Damage',
@@ -39,6 +35,7 @@ CREATE TABLE IF NOT EXISTS `mmrpg_index_abilities` (
   `ability_recovery2` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Ability Recovery 2',
   `ability_recovery2_percent` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Ability Recovery 2 Percent',
   `ability_accuracy` smallint(3) NOT NULL DEFAULT '0' COMMENT 'Ability Accuracy',
+  `ability_price` mediumint(8) NOT NULL DEFAULT '0' COMMENT 'Ability Price',
   `ability_target` varchar(64) NOT NULL COMMENT 'Ability Target',
   `ability_frame` varchar(32) NOT NULL COMMENT 'Ability Frame',
   `ability_frame_animate` varchar(256) NOT NULL COMMENT 'Ability Frame Animate',
@@ -58,10 +55,16 @@ CREATE TABLE IF NOT EXISTS `mmrpg_index_abilities` (
   `ability_flag_published` smallint(1) NOT NULL DEFAULT '1' COMMENT 'Ability Flag Published',
   `ability_order` smallint(8) NOT NULL DEFAULT '0' COMMENT 'Ability Order',
   PRIMARY KEY (`ability_id`),
-  KEY `ability_token` (`ability_token`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  KEY `ability_token` (`ability_token`),
+  KEY `ability_flag_hidden` (`ability_flag_hidden`),
+  KEY `ability_flag_complete` (`ability_flag_complete`),
+  KEY `ability_flag_published` (`ability_flag_published`),
+  KEY `ability_class` (`ability_class`),
+  KEY `ability_type` (`ability_type`),
+  KEY `ability_type2` (`ability_type2`),
+  KEY `ability_flag_hidden_complete_published` (`ability_flag_hidden`,`ability_flag_complete`,`ability_flag_published`)
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
--- Data exporting was unselected.
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

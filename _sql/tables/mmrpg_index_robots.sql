@@ -1,16 +1,9 @@
--- --------------------------------------------------------
--- Host:                         127.0.0.1
--- Server version:               5.5.31-0ubuntu0.12.04.2 - (Ubuntu)
--- Server OS:                    debian-linux-gnu
--- HeidiSQL Version:             9.1.0.4867
--- --------------------------------------------------------
-
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET NAMES utf8mb4 */;
+/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- Dumping structure for table mmrpg2k11.mmrpg_index_robots
 CREATE TABLE IF NOT EXISTS `mmrpg_index_robots` (
   `robot_id` mediumint(8) NOT NULL AUTO_INCREMENT COMMENT 'Robot ID',
   `robot_token` varchar(100) NOT NULL COMMENT 'Robot Token',
@@ -20,10 +13,13 @@ CREATE TABLE IF NOT EXISTS `mmrpg_index_robots` (
   `robot_group` varchar(100) NOT NULL COMMENT 'Robot Group',
   `robot_field` varchar(100) NOT NULL COMMENT 'Robot Field',
   `robot_field2` varchar(100) NOT NULL COMMENT 'Robot Field 2',
+  `robot_mecha` varchar(100) NOT NULL COMMENT 'Robot Mecha',
   `robot_class` varchar(32) NOT NULL COMMENT 'Robot Class',
+  `robot_gender` varchar(10) NOT NULL COMMENT 'Robot Gender',
   `robot_image` varchar(64) NOT NULL COMMENT 'Robot Image',
   `robot_image_size` smallint(3) NOT NULL DEFAULT '40' COMMENT 'Robot Image Size',
   `robot_image_editor` mediumint(8) NOT NULL DEFAULT '0' COMMENT 'Robot Image Editor',
+  `robot_image_editor2` mediumint(8) NOT NULL DEFAULT '0' COMMENT 'Robot Image Editor 2',
   `robot_image_alts` text NOT NULL COMMENT 'Robot Image Alts',
   `robot_core` varchar(32) NOT NULL COMMENT 'Robot Core',
   `robot_core2` varchar(32) NOT NULL COMMENT 'Robot Core 2',
@@ -47,13 +43,25 @@ CREATE TABLE IF NOT EXISTS `mmrpg_index_robots` (
   `robot_functions` varchar(128) NOT NULL COMMENT 'Robot Functions',
   `robot_flag_hidden` smallint(1) NOT NULL DEFAULT '0' COMMENT 'Robot Flag Hidden',
   `robot_flag_complete` smallint(1) NOT NULL DEFAULT '0' COMMENT 'Robot Flag Complete',
-  `robot_flag_published` smallint(1) NOT NULL DEFAULT '1' COMMENT 'Robot Flag Published',
+  `robot_flag_unlockable` smallint(1) NOT NULL DEFAULT '0' COMMENT 'Robot Flag Unlockable',
+  `robot_flag_published` smallint(1) NOT NULL DEFAULT '0' COMMENT 'Robot Flag Published',
+  `robot_flag_exclusive` smallint(1) NOT NULL DEFAULT '0' COMMENT 'Robot Flag Exclusive',
   `robot_order` smallint(8) NOT NULL DEFAULT '0' COMMENT 'Robot Order',
   PRIMARY KEY (`robot_id`),
-  KEY `robot_token` (`robot_token`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  KEY `robot_token` (`robot_token`),
+  KEY `robot_flag_hidden` (`robot_flag_hidden`),
+  KEY `robot_flag_complete` (`robot_flag_complete`),
+  KEY `robot_flag_unlockable` (`robot_flag_unlockable`),
+  KEY `robot_flag_published` (`robot_flag_published`),
+  KEY `robot_core` (`robot_core`),
+  KEY `robot_core2` (`robot_core2`),
+  KEY `robot_flag_hidden_complete_published` (`robot_flag_hidden`,`robot_flag_complete`,`robot_flag_published`),
+  KEY `robot_flag_hidden_complete_unlockable_published` (`robot_flag_hidden`,`robot_flag_complete`,`robot_flag_unlockable`,`robot_flag_published`),
+  KEY `robot_class` (`robot_class`),
+  KEY `robot_flag_exclusive` (`robot_flag_exclusive`),
+  KEY `robot_flag_hidden_complete_unlockable_published_exclusive` (`robot_flag_hidden`,`robot_flag_complete`,`robot_flag_unlockable`,`robot_flag_published`,`robot_flag_exclusive`)
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
--- Data exporting was unselected.
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
