@@ -16,8 +16,7 @@ if (!defined('MMRPG_CONFIG_CACHE_DATE')){
 define('MMRPG_CONFIG_DOMAIN', (isset($THIS_DOMAIN[0]) ? $THIS_DOMAIN[0] : false));
 unset($THIS_DOMAIN);
 
-// Define the cache and save paths on this system
-define('MMRPG_CONFIG_SAVES_PATH', MMRPG_CONFIG_ROOTDIR.'_saves/');
+// Define the base cache paths for the system
 define('MMRPG_CONFIG_CACHE_PATH', MMRPG_CONFIG_ROOTDIR.'_cache/');
 
 // Define the cache and index paths for battles
