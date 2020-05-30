@@ -464,28 +464,12 @@ if ($this_current_page == 'file' // File sub-pages
             <div class="sprite credits banner_credits" style="background-image: url(images/menus/menu-banner_credits.png?<?=MMRPG_CONFIG_CACHE_DATE?>);">Mega Man RPG Prototype | PlutoLighthouse.NET</div>
             <div class="sprite overlay banner_overlay" style="">&nbsp;</div>
 
-            <? if(!defined('MMRPG_CRITICAL_ERROR') && MMRPG_CONFIG_IS_LIVE): ?>
-                <? if($this_current_page != 'file'): ?>
-
-                <!-- FACEBOOK -->
-                <div id="header_social_facebook" class="sprite fadein">
-                    <iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fmegamanpoweredup.net%2Frpg2k11%2F&amp;send=false&amp;layout=button_count&amp;width=100&amp;show_faces=false&amp;font&amp;colorscheme=light&amp;action=like&amp;height=21&amp;appId=409819409099131" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:21px;" allowTransparency="true"></iframe>
-                </div>
-
-                <!-- GITHUB -->
-                <div id="header_social_github" class="sprite fadein">
-                    <a class="github-button" href="https://github.com/AdrianMarceau/mmrpg-prototype" data-count-href="/AdrianMarceau/followers" data-count-api="/users/AdrianMarceau#followers" data-count-aria-label="# followers on GitHub" aria-label="Follow @AdrianMarceau and MMRPG-Prototype on GitHub">Follow</a>
-                </div>
-
-                <? /*
-                <!-- GOOGLE+ -->
-                <div id="header_social_google" class="sprite fadein">
-                    <div class="g-plusone" data-annotation="none" data-href="<?= MMRPG_CONFIG_ROOTURL ?>"></div>
-                </div>
-                */ ?>
-
-                <? endif; ?>
-            <? endif; ?>
+            <div class="header_social_icons x16">
+                <a class="link" href="https://www.facebook.com/megamanrpgprototype/" target="_blank"><i class="icon facebook">Facebook</i></a>
+                <a class="link" href="https://www.reddit.com/r/mmrpg/" target="_blank"><i class="icon reddit">Reddit</i></a>
+                <a class="link" href="https://discord.gg/SCt8ccu" target="_blank"><i class="icon discord">Discord</i></a>
+                <a class="link" href="https://github.com/AdrianMarceau/mmrpg-prototype" target="_blank"><i class="icon github">Github</i></a>
+            </div>
 
             <? if(!defined('MMRPG_CRITICAL_ERROR')): ?>
                 <div class="userinfo" style="">
