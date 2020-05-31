@@ -1058,7 +1058,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
     // Refence the global config and index objects for easy access
     global $star_shake_delay;
     global $mmrpg_index, $db;
-    $mmrpg_index_fields = rpg_field::get_index();
+    $mmrpg_index_fields = rpg_field::get_index(true);
     if (empty($star_shake_delay)){ $star_shake_delay = array(); }
     if (empty($star_shake_delay[$player_token])){ $star_shake_delay[$player_token] = 0; }
 

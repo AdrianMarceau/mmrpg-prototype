@@ -4,6 +4,7 @@
 
 // Define the robot options and counter for Dr. Wily mode
 $this_prototype_data['this_player_token'] = 'dr-wily';
+$this_prototype_data['this_intro_field'] = 'maniacal-hideaway';
 $this_prototype_data['this_player_field'] = 'wily-castle';
 $this_prototype_data['this_support_robot'] = 'disco';
 $this_prototype_data['this_chapter_levels'] = array(

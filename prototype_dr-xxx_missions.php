@@ -26,7 +26,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         // Generate the battle option with the starter data
         $temp_session_token = $this_prototype_data['this_player_token'].'_battle_'.$this_prototype_data['this_current_chapter'];
         if (empty($_SESSION['PROTOTYPE_TEMP'][$temp_session_token])){
-            $temp_battle_omega = rpg_mission_starter::generate($this_prototype_data, 'met', $this_prototype_data['this_chapter_levels'][0], $this_prototype_data['this_support_robot']);
+            $temp_battle_omega = rpg_mission_starter::generate($this_prototype_data, 'met', $this_prototype_data['this_chapter_levels'][0], $this_prototype_data['this_support_robot'], $this_prototype_data['this_intro_field']);
             $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
             rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
             $_SESSION['PROTOTYPE_TEMP'][$temp_session_token] = $temp_battle_omega['battle_token'];

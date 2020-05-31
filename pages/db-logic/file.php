@@ -225,7 +225,13 @@ while ($this_action == 'profile'){
         $html_background_options[] = '<option value="">- Select Field -</option>';
         $html_background_options[] = '<optgroup label="Mega Man Fields">';
         $html_background_options[] = '<option value="fields/intro-field">Intro Field (Neutral Type)</option>';
+        $html_background_options[] = '<option value="fields/gentle-countryside">Gentle Countryside (Neutral Type)</option>';
+        $html_background_options[] = '<option value="fields/maniacal-hideaway">Maniacal Hideaway (Neutral Type)</option>';
+        $html_background_options[] = '<option value="fields/wintry-forefront">Wintry Forefront (Neutral Type)</option>';
         $allowed_background_options[] = 'fields/intro-field';
+        if (mmrpg_prototype_player_unlocked('dr-light')){ $allowed_background_options[] = 'fields/gentle-countryside'; }
+        if (mmrpg_prototype_player_unlocked('dr-wily')){ $allowed_background_options[] = 'fields/maniacal-hideaway'; }
+        if (mmrpg_prototype_player_unlocked('dr-cossack')){ $allowed_background_options[] = 'fields/wintry-forefront'; }
         // Add all the robot avatars to the list
         //die('<pre>'.print_r($temp_omega_factor_options, true).'</pre>');
         foreach ($temp_omega_factor_options AS $omega_game => $omega_array){

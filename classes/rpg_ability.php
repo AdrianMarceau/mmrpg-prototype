@@ -3248,6 +3248,7 @@ class rpg_ability extends rpg_object {
             // Sheet ONE
             $this_sprite_index['field'] = array(1, 0, 1, 'plain block');
             $this_sprite_index['intro-field'] = array(1, 2, 3, 'piece of fence', 'pieces of fence');
+                $this_sprite_index['gentle-countryside'] = array(1, 2, 3, 'piece of fence', 'pieces of fence');
             $this_sprite_index['final-destination'] = array(1, 6, 7, 'shiny metal block');
             $this_sprite_index['final-destination-2'] = array(1, 6, 7, 'shiny metal block');
             $this_sprite_index['final-destination-3'] = array(1, 6, 7, 'shiny metal block');
@@ -3255,7 +3256,9 @@ class rpg_ability extends rpg_object {
 
             // Sheet TWO
             $this_sprite_index['mountain-mines'] = array(2, 0, 1, 'heavy boulder');
+                $this_sprite_index['maniacal-hideaway'] = array(2, 0, 1, 'heavy boulder');
             $this_sprite_index['arctic-jungle'] = array(2, 2, 3, 'frozen pillar');
+                $this_sprite_index['wintry-forefront'] = array(2, 2, 3, 'frozen pillar');
             $this_sprite_index['steel-mill'] = array(2, 4, 5, 'heated pillar');
             $this_sprite_index['electrical-tower'] = array(2, 6, 7, 'summoned pillar');
             $this_sprite_index['abandoned-warehouse'] = array(2, 8, 9, 'concrete block');
