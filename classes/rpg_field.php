@@ -1115,7 +1115,7 @@ class rpg_field extends rpg_object {
                                     <td class="right">
                                         <?
                                         // Define the source game string
-                                        if ($field_info['field_token'] == 'intro-field'){ $temp_source_string = 'Mega Man RPG Prototype'; }
+                                        if (in_array($field_info['field_token'], array('gentle-countryside', 'maniacal-hideaway', 'wintry-forefront'))){ $temp_source_string = 'Misc Mega Man'; }
                                         elseif ($field_info['field_token'] == 'light-laboratory' || $field_info['field_token'] == 'wily-castle'){ $temp_source_string = 'Mega Man'; }
                                         elseif ($field_info['field_token'] == 'cossack-citadel'){ $temp_source_string = 'Mega Man 4'; }
                                         elseif ($field_info['field_token'] == 'oil-wells' || $field_info['field_token'] == 'clock-citadel'){ $temp_source_string = 'Mega Man Powered Up'; }
@@ -1137,8 +1137,8 @@ class rpg_field extends rpg_object {
                                 <tr>
                                     <td class="right music" data-count="<?= count($field_info['field_music_link']) ?>">
                                         <label style="display: block; float: left;">Music :</label>
-                                        <? if(!empty($field_info['field_music_name']) && !empty($field_info['field_music_link'])): ?>
-                                            <?
+                                        <?
+                                        if (!empty($field_info['field_music_name'])){
                                             // Break up the field name for responsive styles
                                             $name = $field_info['field_music_name'];
                                             if (strstr('(', $name)){
@@ -1149,6 +1149,10 @@ class rpg_field extends rpg_object {
                                                 $name1 = '<span>'.$name1.'</span>';
                                                 $name2 = '<span> ('.$name2.')</span>';
                                             }
+                                        }
+                                        ?>
+                                        <? if(!empty($field_info['field_music_name']) && !empty($field_info['field_music_link'])): ?>
+                                            <?
                                             ?>
                                             <? if(is_array($field_info['field_music_link'])):?>
                                                 <? foreach($field_info['field_music_link'] AS $key => $link): ?>
@@ -1157,6 +1161,8 @@ class rpg_field extends rpg_object {
                                             <? else: ?>
                                                 <a href="<?= $field_info['field_music_link'] ?>" target="_blank" class="field_type field_type_none"><?= $name1.$name2 ?></a>
                                             <? endif; ?>
+                                        <? elseif(!empty($field_info['field_music_name'])): ?>
+                                            <span class="field_type field_type_none"><?= $name1.$name2 ?></span>
                                         <? else: ?>
                                             <span class="field_type">???</span>
                                         <? endif; ?>
@@ -1283,10 +1289,10 @@ class rpg_field extends rpg_object {
                     <h2 id="sprites" class="header header_full field_type_<?= $field_type_token ?>" style="margin: 10px 0 0; text-align: left;">
                         Sprite Sheets
                     </h2>
-                    <div id="sprites_body" class="body body_full solid" style="margin-right: 0; margin-left: 0; margin-bottom: 5px; padding: 4px; min-height: 10px;">
-                        <div id="sprite_container" style="border: 1px solid rgba(0, 0, 0, 0.20); border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: #191919 none scroll repeat -10px -30px; overflow: hidden; padding: 0; margin-bottom: 10px;">
-                            <div class="sprite_background" style="border: 0 none transparent; border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: #000000 url(images/fields/<?= $field_info['field_background'] ?>/battle-field_background_base.gif?<?= MMRPG_CONFIG_CACHE_DATE ?>) scroll repeat center center; overflow: hidden; height: 244px;">
-                                <div class="sprite_foreground" style="border: 0 none transparent; border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background: transparent url(images/fields/<?= $field_info['field_background'] ?>/battle-field_foreground_base.png?<?= MMRPG_CONFIG_CACHE_DATE ?>) scroll repeat center center; overflow: hidden; height: 244px;">
+                    <div id="sprites_body" class="body body_full sprites_body field_sprites_body solid">
+                        <div id="sprite_container" class="sprite_container">
+                            <div class="sprite_background" style="background-image: url(images/fields/<?= $field_info['field_background'] ?>/battle-field_background_base.gif?<?= MMRPG_CONFIG_CACHE_DATE ?>);">
+                                <div class="sprite_foreground" style="background-image: url(images/fields/<?= $field_info['field_background'] ?>/battle-field_foreground_base.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">
                                     &nbsp;
                                 </div>
                             </div>

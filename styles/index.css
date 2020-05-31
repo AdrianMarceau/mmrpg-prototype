@@ -1207,6 +1207,48 @@ button {
     text-decoration: underline;
 }
 
+#window .page .database_container .subbody .body.field_sprites_body {
+    margin-right: 0;
+    margin-left: 0;
+    margin-bottom: 5px;
+    padding: 4px 4px 10px;
+    min-height: 10px;
+}
+#window .page .database_container .subbody .body.field_sprites_body .sprite_container {
+    border: 1px solid rgba(0, 0, 0, 0.20);
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    border-radius: 0.5em;
+    background: #191919 none scroll repeat -10px -30px;
+    overflow: hidden;
+    padding: 0;
+    margin-bottom: 10px;
+}
+#window .page .database_container .subbody .body.field_sprites_body .sprite_background {
+    border: 0 none transparent;
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    border-radius: 0.5em;
+    background: #000000 none scroll repeat center center;
+    overflow: hidden;
+    height: 244px;
+}
+#window .page .database_container .subbody .body.field_sprites_body .sprite_foreground {
+    border: 0 none transparent;
+    border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    background: transparent none scroll repeat center center;
+    overflow: hidden;
+    height: 244px;
+    opacity: 1;
+    transition: 1s;
+    cursor: pointer;
+}
+#window .page .database_container .subbody .body.field_sprites_body .sprite_foreground:hover {
+    opacity: 0;
+}
+
 
 #window .page .database_container .subbody .body table.full {
     margin: 0;
