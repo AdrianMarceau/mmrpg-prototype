@@ -1579,6 +1579,15 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
     // Define the stat boost power based on phase alone
     $master_boost_power = $battle_phase > 1 ? 4 : 2;
 
+    // Define the battle kind, default to 'other'
+    $battle_kind = 'other';
+    if (!empty($temp_battle_omega['flags']['single_battle'])){ $battle_kind = 'single'; }
+    elseif (!empty($temp_battle_omega['flags']['double_battle'])){ $battle_kind = 'double'; }
+
+    // Check to see if this is a starfield mission
+    $is_starfield_mission = false;
+    if (!empty($temp_battle_omega['flags']['starfield_mission'])){ $is_starfield_mission = true; }
+
     // Define the number of mechas + abilities to add based on player + phase
     if ($player_token == 'dr-light'){
         $num_support_mechas = $battle_phase > 1 ? 4 : 3;
@@ -1697,6 +1706,29 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
     }
     $temp_player_robots = array_values($temp_player_robots);
     $temp_battle_omega['battle_target_player']['player_robots'] = $temp_player_robots;
+
+    // Change the music to the boss encounter theme relative to the master's source game
+    if (!$is_starfield_mission){
+        if ($battle_kind === 'single'){
+            $trobots = array_values($temp_battle_omega['battle_target_player']['player_robots']);
+            if (!empty($trobots)){
+                $atoken = 'sega-remix';
+                $rtoken = $trobots[0]['robot_token'];
+                $gtoken = strtolower($temp_robot_index[$rtoken]['robot_game']);
+                $music_path = $atoken.'/boss-theme-'.$gtoken.'/';
+                if (file_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
+                    $temp_battle_omega['battle_field_base']['field_music'] = $music_path;
+                }
+            }
+        } elseif ($battle_kind === 'double'){
+            $atoken = 'sega-remix';
+            $mtoken = 'mid-boss-mm08';
+            $music_path = $atoken.'/'.$mtoken.'/';
+            if (file_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
+                $temp_battle_omega['battle_field_base']['field_music'] = $music_path;
+            }
+        }
+    }
 
     // Return the generated alpha battle
     return $temp_battle_alpha;
