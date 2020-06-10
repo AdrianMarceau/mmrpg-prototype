@@ -5,3 +5,5 @@
 /players/*
 /robots/*
 /types/*
+migrate-objects.php
+migrate-objects_*.php
