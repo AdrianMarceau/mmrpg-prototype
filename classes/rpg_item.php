@@ -1420,8 +1420,7 @@ class rpg_item extends rpg_object {
         elseif ($item_type_class == 'none' && !empty($item_info['item_type2'])){ $item_type_class = $item_info['item_type2'];  }
         $item_header_types = 'item_type_'.$item_type_class.' ';
         // If this is a special category of item, it's a special type
-        if (preg_match('/^(red|blue|green|purple)-score-ball$/i', $item_info['item_token'])){ $item_info['item_type_special'] = 'bonus'; }
-        elseif (preg_match('/^super-(pellet|capsule)$/i', $item_info['item_token'])){ $item_info['item_type_special'] = 'multi'; }
+        if (preg_match('/^super-(pellet|capsule)$/i', $item_info['item_token'])){ $item_info['item_type_special'] = 'multi'; }
 
         // Define the sprite sheet alt and title text
         $item_sprite_size = $item_image_size * 2;

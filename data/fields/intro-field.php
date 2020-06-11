@@ -17,7 +17,7 @@ $field = array(
   'field_background_frame' => array(0), //array(0,1),
   'field_foreground_frame' => array(0),
   'field_foreground_attachments' => array(
-    //'object_intro-field-wily' => array('class' => 'object', 'size' => 160, 'offset_x' => 12, 'offset_y' => 121, 'object_token' => 'intro-field-wily', 'object_frame' => array(0), 'object_direction' => 'right')
+
     )
   );
 ?>

@@ -85,8 +85,7 @@ if (!empty($mmrpg_database_items)){
         $temp_item_types = array();
         if (!empty($item_info['item_type'])){ $temp_item_types[] = $item_info['item_type']; }
         if (!empty($item_info['item_type2'])){ $temp_item_types[] = $item_info['item_type2']; }
-        if (preg_match('/^(red|blue|green|purple)-score-ball$/i', $item_info['item_token'])){ $temp_item_types[] = 'bonus'; }
-        elseif (preg_match('/^super-(pellet|capsule)$/i', $item_info['item_token'])){ $temp_item_types[] = 'multi'; }
+        if (preg_match('/^super-(pellet|capsule)$/i', $item_info['item_token'])){ $temp_item_types[] = 'multi'; }
         if (empty($temp_item_types)){ $temp_item_types[] = 'none'; }
         if (isset($this_current_filter) && !in_array($this_current_filter, $temp_item_types)){ $key_counter++; continue; }
 
