@@ -1035,6 +1035,24 @@ function deleteDir($dirPath) {
     rmdir($dirPath);
 }
 
+// Define a function for recursively copying files from one dir to another
+// via https://stackoverflow.com/a/2050909
+function recurseCopy($src,$dst) {
+    $dir = opendir($src);
+    @mkdir($dst);
+    while(false !== ( $file = readdir($dir)) ) {
+        if (( $file != '.' ) && ( $file != '..' )) {
+            if ( is_dir($src . '/' . $file) ) {
+                recurse_copy($src . '/' . $file,$dst . '/' . $file);
+            }
+            else {
+                copy(rtrim($src, '/').'/'.$file, rtrim($dst, '/').'/'.$file);
+            }
+        }
+    }
+    closedir($dir);
+}
+
 // Define a function for getting a list of directory contents, recursively
 // via https://stackoverflow.com/a/24784144/1876397
 function getDirContents($dir, &$results = array()){
