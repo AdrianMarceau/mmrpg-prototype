@@ -455,14 +455,15 @@ class rpg_functions {
         // Define the defeat-explosion attachment token and data
         $temp_frames = array(0,4,1,5,2,6,3,7,4,8,5,9,0,1,2,3,4,5,6,7,8,9);
         shuffle($temp_frames);
-        $this_attachment_token = 'item_attachment-defeat';
+        $this_attachment_token = 'object_defeat-explosion';
         $this_attachment_info = array(
-            'class' => 'item',
-            'item_token' => 'attachment-defeat',
-            'attachment_flag_defeat' => true,
-            'item_frame' => 0,
-            'item_frame_animate' => $temp_frames,
-            'item_frame_offset' => array('x' => 0, 'y' => -10, 'z' => -10)
+            'class' => 'object',
+            'object_token' => 'defeat-explosion',
+            'object_image' => 'defeat-explosion',
+            'object_frame' => 0,
+            'object_frame_animate' => $temp_frames,
+            'object_frame_offset' => array('x' => 0, 'y' => -10, 'z' => -10),
+            'attachment_flag_defeat' => true
             );
 
         // Return the generated token and data
