@@ -260,6 +260,57 @@ class rpg_game {
     }
 
     /**
+     * Create or retrive a proto object from the session
+     * @param array $this_objectinfo
+     * @return rpg_object
+     */
+    public static function get_proto_object($this_battle, $this_player, $this_robot, $this_objectinfo){
+
+        // If the object index has not been created, do so
+        if (!isset(self::$index['objects'])){ self::$index['objects'] = array(); }
+
+        // Check if a object ID has been defined
+        if (isset($this_objectinfo['object_id'])){
+            $object_id = $this_objectinfo['object_id'];
+        }
+        // Otherwise if only a object token was defined
+        elseif (isset($this_objectinfo['object_token'])){
+            $object_id = 0;
+            $object_token = $this_objectinfo['object_token'];
+            foreach (self::$index['objects'] AS $object){
+                if ($object_token == $object->object_token
+                    && $this_robot->robot_id == $object->robot_id
+                    && $this_player->player_id == $object->player_id){
+                    $object_id = $object->object_id;
+                    break;
+                }
+            }
+        }
+
+        // If this object has already been created, retrieve it
+        if (!empty($object_id) && !empty(self::$index['objects'][$object_id])){
+
+            // Collect the object from the index and return
+            $this_object = self::$index['objects'][$object_id];
+
+        }
+        // Otherwise create a new object object in the index
+        else {
+
+            // Create and return the object object
+            $this_object = new rpg_object();
+            $this_object->proto_construct($this_battle, $this_player, $this_robot, $this_objectinfo);
+            self::$index['objects'][$this_object->object_id] = $this_object;
+
+        }
+
+        // Return the collect object object
+        $this_object->proto_update_session();
+        return $this_object;
+
+    }
+
+    /**
      * Request a reference to existing player data in the battle object via filters
      * @param array $filters
      * @return rpg_player

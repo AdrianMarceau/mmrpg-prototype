@@ -30,7 +30,11 @@ class rpg_object {
         $this->class = 'object';
         $this->multi = 'objects';
 
+        // Return true on success
+        return true;
+
     }
+
 
     /**
      * Refresh this object with data from the session
@@ -43,13 +47,6 @@ class rpg_object {
         $this->{$load_function}($this->{$this->session_id}, $this->{$this->session_token});
         // Update the session variable
         $this->update_session();
-    }
-
-    /**
-     * Update session data for this object
-     */
-    public function update_session(){
-        // Don't actually update this object
     }
 
     /**
@@ -719,5 +716,186 @@ class rpg_object {
         $token_value = $this->get_info($token_field);
         return array($id_field => $id_value, $token_field => $token_value);
     }
+
+
+    // -- PROTO FUNCTIONS -- //
+    // Use these functions for creating anonymouse / generic objects
+
+    /**
+     * Create a new proto RPG object
+     * @return  rpg_object
+     */
+    public function proto_construct(){
+
+        // Collect any provided arguments
+        $args = func_get_args();
+
+        // Define the internal battle pointer
+        $this->battle = isset($args[0]) ? $args[0] : $GLOBALS['this_battle'];
+        $this->battle_id = $this->battle->battle_id;
+        $this->battle_token = $this->battle->battle_token;
+
+        // Define the internal player values using the provided array
+        $this->player = isset($args[1]) ? $args[1] : $GLOBALS['this_player'];
+        $this->player_id = $this->player->player_id;
+        $this->player_token = $this->player->player_token;
+
+        // Define the internal player values using the provided array
+        $this->robot = isset($args[2]) ? $args[2] : $GLOBALS['this_robot'];
+        $this->robot_id = $this->robot->robot_id;
+        $this->robot_token = $this->robot->robot_token;
+
+        // Collect current object data from the function if available
+        $this_objectinfo = isset($args[3]) ? $args[3] : array('object_id' => 0, 'object_token' => 'object');
+
+        if (!is_array($this_objectinfo)){
+            die('!is_array($this_objectinfo){ '.print_r($this_objectinfo, true)).' }';
+        }
+
+        // Now load the object data from the session or index
+        $this->proto_object_load($this_objectinfo);
+
+        // Update the session by default
+        $this->proto_update_session();
+
+        // Return true on success
+        return true;
+
+    }
+
+    // Define a public function for manually loading data
+    public function proto_object_load($this_objectinfo){
+
+        // If the object info was not an array, return false
+        if (!is_array($this_objectinfo)){ return false; }
+        // If the object token was not provided, return false
+        if (!isset($this_objectinfo['object_token'])){ return false; }
+        // If the object ID was not provided, default to zero
+        if (!isset($this_objectinfo['object_id'])){ $this_objectinfo['object_id'] = 0; }
+
+        // If this is a special system object, hard-code its ID, otherwise base off robot
+        $temp_system_objects = array('defeat-explosion');
+        if (in_array($this_objectinfo['object_token'], $temp_system_objects)){
+            $this_objectinfo['object_id'] = $this->player_id.'000';
+        }
+        // Otherwise base the ID off of the robot
+        else {
+            $object_id = $this->robot_id.str_pad($this_objectinfo['object_id'], 3, '0', STR_PAD_LEFT);
+            if (!empty($this_objectinfo['flags']['is_attachment'])){
+                if (isset($this_objectinfo['attachment_token'])){ $object_id .= 'x'.strtoupper(substr(md5($this_objectinfo['attachment_token']), 0, 3)); }
+                else { $object_id .= substr(md5($this_objectinfo['object_token']), 0, 3); }
+            }
+            $this_objectinfo['object_id'] = $object_id;
+        }
+
+        // Collect current object data from the session if available
+        $this_objectinfo_backup = $this_objectinfo;
+        if (isset($_SESSION['OBJECTS'][$this_objectinfo['object_id']])){
+            $this_objectinfo = $_SESSION['OBJECTS'][$this_objectinfo['object_id']];
+        }
+
+        // Define the internal object values using the provided array
+        $this->flags = isset($this_objectinfo['flags']) ? $this_objectinfo['flags'] : array();
+        $this->counters = isset($this_objectinfo['counters']) ? $this_objectinfo['counters'] : array();
+        $this->values = isset($this_objectinfo['values']) ? $this_objectinfo['values'] : array();
+        $this->history = isset($this_objectinfo['history']) ? $this_objectinfo['history'] : array();
+        $this->object_id = isset($this_objectinfo['object_id']) ? $this_objectinfo['object_id'] : 0;
+        $this->object_name = isset($this_objectinfo['object_name']) ? $this_objectinfo['object_name'] : 'Object';
+        $this->object_token = isset($this_objectinfo['object_token']) ? $this_objectinfo['object_token'] : 'object';
+        $this->object_image = isset($this_objectinfo['object_image']) ? $this_objectinfo['object_image'] : $this->object_token;
+        $this->object_image_size = isset($this_objectinfo['object_image_size']) ? $this_objectinfo['object_image_size'] : 40;
+        $this->object_frame = isset($this_objectinfo['object_frame']) ? $this_objectinfo['object_frame'] : 'base';
+        $this->object_frame_span = isset($this_objectinfo['object_frame_span']) ? $this_objectinfo['object_frame_span'] : 1;
+        $this->object_frame_animate = isset($this_objectinfo['object_frame_animate']) ? $this_objectinfo['object_frame_animate'] : array($this->object_frame);
+        $this->object_frame_index = isset($this_objectinfo['object_frame_index']) ? $this_objectinfo['object_frame_index'] : array('00');
+        $this->object_frame_offset = isset($this_objectinfo['object_frame_offset']) ? $this_objectinfo['object_frame_offset'] : array('x' => 0, 'y' => 0, 'z' => 1);
+        $this->object_frame_styles = isset($this_objectinfo['object_frame_styles']) ? $this_objectinfo['object_frame_styles'] : '';
+        $this->object_frame_classes = isset($this_objectinfo['object_frame_classes']) ? $this_objectinfo['object_frame_classes'] : '';
+        $this->attachment_frame = isset($this_objectinfo['attachment_frame']) ? $this_objectinfo['attachment_frame'] : 'base';
+        $this->attachment_frame_animate = isset($this_objectinfo['attachment_frame_animate']) ? $this_objectinfo['attachment_frame_animate'] : array($this->attachment_frame);
+        $this->attachment_frame_index = isset($this_objectinfo['attachment_frame_index']) ? $this_objectinfo['attachment_frame_index'] : array('base');
+        $this->attachment_frame_offset = isset($this_objectinfo['attachment_frame_offset']) ? $this_objectinfo['attachment_frame_offset'] : array('x' => 0, 'y' => 0, 'z' => 1);
+
+        // Define the internal robot base values using the robots index array
+        $this->object_base_name = isset($this_objectinfo['object_base_name']) ? $this_objectinfo['object_base_name'] : $this->object_name;
+        $this->object_base_token = isset($this_objectinfo['object_base_token']) ? $this_objectinfo['object_base_token'] : $this->object_token;
+        $this->object_base_image = isset($this_objectinfo['object_base_image']) ? $this_objectinfo['object_base_image'] : $this->object_image;
+        $this->object_base_image_size = isset($this_objectinfo['object_base_image_size']) ? $this_objectinfo['object_base_image_size'] : $this->object_image_size;
+
+        // Update the session variable
+        $this->proto_update_session();
+
+        // Return true on success
+        return true;
+
+    }
+
+    // Define a public function for updating this player's session
+    public function proto_update_session(){
+
+        // Update the session with the export array
+        $this_data = $this->proto_export_array();
+        $_SESSION['OBJECTS'][$this->object_id] = $this_data;
+        $this->battle->values['objects'][$this->object_id] = $this_data;
+
+        // Return true on success
+        return true;
+
+    }
+
+    // Define a function for exporting the current data
+    public function proto_export_array(){
+
+        // Return all internal object fields in array format
+        return array(
+            'battle_id' => $this->battle_id,
+            'battle_token' => $this->battle_token,
+            'player_id' => $this->player_id,
+            'player_token' => $this->player_token,
+            'robot_id' => $this->robot_id,
+            'robot_token' => $this->robot_token,
+            'object_id' => $this->object_id,
+            'object_name' => $this->object_name,
+            'object_token' => $this->object_token,
+            'object_image' => $this->object_image,
+            'object_image_size' => $this->object_image_size,
+            'object_base_name' => $this->object_base_name,
+            'object_base_token' => $this->object_base_token,
+            'object_base_image' => $this->object_base_image,
+            'object_base_image_size' => $this->object_base_image_size,
+            'object_frame' => $this->object_frame,
+            'object_frame_span' => $this->object_frame_span,
+            'object_frame_animate' => $this->object_frame_animate,
+            'object_frame_offset' => $this->object_frame_offset,
+            'object_frame_classes' => $this->object_frame_classes,
+            'object_frame_styles' => $this->object_frame_styles,
+            'attachment_frame' => $this->attachment_frame,
+            'attachment_frame_animate' => $this->attachment_frame_animate,
+            'attachment_frame_offset' => $this->attachment_frame_offset,
+            'flags' => $this->flags,
+            'counters' => $this->counters,
+            'values' => $this->values,
+            'history' => $this->history
+            );
+
+    }
+
+    // Define a function for generating object canvas variables
+    public function proto_canvas_markup($options, $player_data, $robot_data){
+
+        // Delegate markup generation to the canvas class
+        return rpg_canvas::object_markup($this, $options, $player_data, $robot_data);
+
+    }
+
+    /*
+    // Define a function for generating object console variables
+    public function proto_console_markup($options, $player_data, $robot_data){
+
+        // Delegate markup generation to the console class
+        return rpg_console::object_markup($this, $options, $player_data, $robot_data);
+
+    }
+    */
 
 }

@@ -1244,6 +1244,287 @@ class rpg_canvas {
 
     }
 
+    // Define a function for generating object canvas variables
+    public static function object_markup($this_object, $options, $player_data, $robot_data){
+
+        // Define the variable to hold the console robot data
+        $this_data = array();
+
+        // Define the object data array and populate basic data
+        $this_data['object_markup'] = '';
+        $this_data['data_sticky'] = !empty($options['data_sticky']) ? true : false;
+        $this_data['data_type'] = !empty($options['data_type']) ? $options['data_type'] : 'object';
+        $this_data['data_debug'] = !empty($options['data_debug']) ? $options['data_debug'] : '';
+        $this_data['object_name'] = isset($options['object_name']) ? $options['object_name'] : $this_object->object_name;
+        $this_data['object_id'] = $this_object->object_id;
+        $this_data['object_title'] = $this_object->object_name;
+        $this_data['object_token'] = $this_object->object_token;
+        $this_data['object_id_token'] = $this_object->object_id.'_'.$this_object->object_token;
+        $this_data['object_image'] = isset($options['object_image']) ? $options['object_image'] : $this_object->object_image;
+        $this_data['object_status'] = $robot_data['robot_status'];
+        $this_data['object_position'] = $robot_data['robot_position'];
+        $this_data['robot_id_token'] = $robot_data['robot_id'].'_'.$robot_data['robot_token'];
+        $this_data['object_direction'] = $this_object->robot_id == $robot_data['robot_id'] ? $robot_data['robot_direction'] : ($robot_data['robot_direction'] == 'left' ? 'right' : 'left');
+        $this_data['object_float'] = $robot_data['robot_float'];
+        $this_data['object_size'] = $this_data['object_position'] == 'active' ? ($this_object->object_image_size * 2) : $this_object->object_image_size;
+        $this_data['object_frame'] = isset($options['object_frame']) ? $options['object_frame'] : $this_object->object_frame;
+        $this_data['object_frame_span'] = isset($options['object_frame_span']) ? $options['object_frame_span'] : $this_object->object_frame_span;
+        $this_data['object_frame_index'] = isset($options['object_frame_index']) ? $options['object_frame_index'] : $this_object->object_frame_index;
+        if (is_numeric($this_data['object_frame']) && $this_data['object_frame'] >= 0){ $this_data['object_frame'] = str_pad($this_data['object_frame'], 2, '0', STR_PAD_LEFT); }
+        elseif (is_numeric($this_data['object_frame']) && $this_data['object_frame'] < 0){ $this_data['object_frame'] = ''; }
+        //$this_data['object_image'] = 'images/objects/'.(!empty($this_data['object_image']) ? $this_data['object_image'] : $this_data['object_token']).'/sprite_'.$this_data['object_direction'].'_'.$this_data['object_size'].'x'.$this_data['object_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE;
+        $this_data['object_frame_offset'] = isset($options['object_frame_offset']) && is_array($options['object_frame_offset']) ? $options['object_frame_offset'] : $this_object->object_frame_offset;
+        $animate_frames_array = isset($options['object_frame_animate']) ? $options['object_frame_animate'] : array($this_data['object_frame']);
+        $animate_frames_string = array();
+        if (!empty($animate_frames_array)){
+            foreach ($animate_frames_array AS $key => $frame){
+                $animate_frames_string[] = is_numeric($frame) ? str_pad($frame, 2, '0', STR_PAD_LEFT) : $frame;
+            }
+        }
+        $this_data['object_frame_animate'] = implode(',', $animate_frames_string);
+        $this_data['object_frame_styles'] = isset($options['object_frame_styles']) ? $options['object_frame_styles'] : $this_object->object_frame_styles;
+        $this_data['object_frame_classes'] = isset($options['object_frame_classes']) ? $options['object_frame_classes'] : $this_object->object_frame_classes;
+
+        $this_data['object_scale'] = isset($robot_data['robot_scale']) ? $robot_data['robot_scale'] : ($robot_data['robot_position'] == 'active' ? 1 : 0.5 + (((8 - $robot_data['robot_key']) / 8) * 0.5));
+
+        // DEBUG
+        //$this_object->battle->events_create(false, false, 'DEBUG_'.__LINE__, '$this_data[\'robot_id_token\'] = '.$this_data['robot_id_token'].' | $options[\'this_object_target\'] = '.$options['this_object_target']);
+
+        // Calculate the rest of the sprite size variables
+        $zoom_size = ($this_object->object_image_size * 2);
+        $this_data['object_sprite_size'] = ceil($this_data['object_scale'] * $zoom_size);
+        $this_data['object_sprite_width'] = ceil($this_data['object_scale'] * $zoom_size);
+        $this_data['object_sprite_height'] = ceil($this_data['object_scale'] * $zoom_size);
+        $this_data['object_image_width'] = ceil($this_data['object_scale'] * $zoom_size * 10);
+        $this_data['object_image_height'] = ceil($this_data['object_scale'] * $zoom_size);
+
+        // Calculate the canvas offset variables for this robot
+        $canvas_offset_data = $this_object->battle->canvas_markup_offset($robot_data['robot_key'], $robot_data['robot_position'], $robot_data['robot_size']);
+        //$this_data['canvas_offset_x'] = $temp_data['canvas_offset_x'];
+        //$this_data['canvas_offset_y'] = $temp_data['canvas_offset_y'];
+        //$this_data['canvas_offset_z'] = $temp_data['canvas_offset_z'];
+
+        // Define the object's canvas offset variables
+        //$temp_size_diff = $robot_data['robot_sprite_size'] != $object_data['object_sprite_size'] ? ceil(($robot_data['robot_sprite_size'] - $object_data['object_sprite_size']) * 0.5) : ceil($object_data['object_sprite_size'] * 0.25);
+        //$temp_size_diff = $robot_data['robot_sprite_size'] > 80 ? ceil(($robot_data['robot_sprite_size'] - 80) / 2) : 0;
+        //if ($temp_size_diff > 0 && $robot_data['robot_position'] != 'active'){ $temp_size_diff += floor($this_data['object_scale'] * $this_data['object_sprite_size'] * 0.5); }
+        $temp_size_diff = 0;
+        if ($robot_data['robot_sprite_size'] != $this_data['object_sprite_size']){ $temp_size_diff = ceil(($robot_data['robot_sprite_size'] - $this_data['object_sprite_size']) / 2) ; }
+        //$temp_size_diff = floor(($temp_size_diff * 2) + ($temp_size_diff * $robot_data['robot_scale']));
+
+        // If this is a STICKY attachedment, make sure it doesn't move with the robot
+        if ($this_data['data_sticky'] != false){
+
+            //$this_data['data_sticky'] = 'true';
+
+            // Calculate the canvas X offsets using the robot's position as base
+            if ($this_data['object_frame_offset']['x'] > 0){ $this_data['canvas_offset_x'] = ceil($canvas_offset_data['canvas_offset_x'] + ($this_data['object_sprite_size'] * ($this_data['object_frame_offset']['x']/100))) + $temp_size_diff; }
+            elseif ($this_data['object_frame_offset']['x'] < 0){ $this_data['canvas_offset_x'] = ceil($canvas_offset_data['canvas_offset_x'] - ($this_data['object_sprite_size'] * (($this_data['object_frame_offset']['x'] * -1)/100))) + $temp_size_diff; }
+            else { $this_data['canvas_offset_x'] = $canvas_offset_data['canvas_offset_x'] + $temp_size_diff;  }
+            // Calculate the canvas Y offsets using the robot's position as base
+            if ($this_data['object_frame_offset']['y'] > 0){ $this_data['canvas_offset_y'] = ceil($canvas_offset_data['canvas_offset_y'] + ($this_data['object_sprite_size'] * ($this_data['object_frame_offset']['y']/100))); }
+            elseif ($this_data['object_frame_offset']['y'] < 0){ $this_data['canvas_offset_y'] = ceil($canvas_offset_data['canvas_offset_y'] - ($this_data['object_sprite_size'] * (($this_data['object_frame_offset']['y'] * -1)/100))); }
+            else { $this_data['canvas_offset_y'] = $canvas_offset_data['canvas_offset_y'];  }
+            // Calculate the canvas Z offsets using the robot's position as base
+            if ($this_data['object_frame_offset']['z'] > 0){ $this_data['canvas_offset_z'] = ceil($canvas_offset_data['canvas_offset_z'] + $this_data['object_frame_offset']['z']); }
+            elseif ($this_data['object_frame_offset']['z'] < 0){ $this_data['canvas_offset_z'] = ceil($canvas_offset_data['canvas_offset_z'] - ($this_data['object_frame_offset']['z'] * -1)); }
+            else { $this_data['canvas_offset_z'] = $canvas_offset_data['canvas_offset_z'];  }
+
+            // Collect the target, damage, and recovery options
+            $this_target_options = !empty($options['this_object']->target_options) ? $options['this_object']->target_options : array();
+            $this_damage_options = !empty($options['this_object']->damage_options) ? $options['this_object']->damage_options : array();
+            $this_recovery_options = !empty($options['this_object']->recovery_options) ? $options['this_object']->recovery_options : array();
+            $this_results = !empty($options['this_object']->object_results) ? $options['this_object']->object_results : array();
+
+            // Either way, apply target offsets if they exist and it's this robot using the object
+            if (isset($options['this_object_target']) && $options['this_object_target'] == $this_data['robot_id_token']){
+                // If any of the co-ordinates are provided, update all
+                if (!empty($this_target_options['target_kickback']['x'])
+                    || !empty($this_target_options['target_kickback']['y'])
+                    || !empty($this_target_options['target_kickback']['z'])){
+                    $this_data['canvas_offset_x'] -= $this_target_options['target_kickback']['x'];
+                    $this_data['canvas_offset_y'] -= $this_target_options['target_kickback']['y'];
+                    $this_data['canvas_offset_z'] -= $this_target_options['target_kickback']['z'];
+                }
+            }
+
+        }
+        // Else if this is a normal attachment, it moves with the robot
+        else {
+
+            // Calculate the canvas X offsets using the robot's offset as base
+            if ($this_data['object_frame_offset']['x'] > 0){ $this_data['canvas_offset_x'] = ceil($robot_data['canvas_offset_x'] + ($this_data['object_sprite_size'] * ($this_data['object_frame_offset']['x']/100))) + $temp_size_diff; }
+            elseif ($this_data['object_frame_offset']['x'] < 0){ $this_data['canvas_offset_x'] = ceil($robot_data['canvas_offset_x'] - ($this_data['object_sprite_size'] * (($this_data['object_frame_offset']['x'] * -1)/100))) + $temp_size_diff; }
+            else { $this_data['canvas_offset_x'] = $robot_data['canvas_offset_x'] + $temp_size_diff;  }
+            // Calculate the canvas Y offsets using the robot's offset as base
+            if ($this_data['object_frame_offset']['y'] > 0){ $this_data['canvas_offset_y'] = ceil($robot_data['canvas_offset_y'] + ($this_data['object_sprite_size'] * ($this_data['object_frame_offset']['y']/100))); }
+            elseif ($this_data['object_frame_offset']['y'] < 0){ $this_data['canvas_offset_y'] = ceil($robot_data['canvas_offset_y'] - ($this_data['object_sprite_size'] * (($this_data['object_frame_offset']['y'] * -1)/100))); }
+            else { $this_data['canvas_offset_y'] = $robot_data['canvas_offset_y'];  }
+            // Calculate the canvas Z offsets using the robot's offset as base
+            if ($this_data['object_frame_offset']['z'] > 0){ $this_data['canvas_offset_z'] = ceil($robot_data['canvas_offset_z'] + $this_data['object_frame_offset']['z']); }
+            elseif ($this_data['object_frame_offset']['z'] < 0){ $this_data['canvas_offset_z'] = ceil($robot_data['canvas_offset_z'] - ($this_data['object_frame_offset']['z'] * -1)); }
+            else { $this_data['canvas_offset_z'] = $robot_data['canvas_offset_z'];  }
+
+        }
+
+        // Generate the final markup for the canvas object
+        ob_start();
+
+            // Loop through the object quantity and display sprites
+            $canvas_offset_x = $this_data['canvas_offset_x'];
+            $canvas_offset_y = $this_data['canvas_offset_y'];
+            $canvas_offset_z = $this_data['canvas_offset_z'];
+
+            // Define the rest of the display variables
+            //$this_data['object_image'] = 'images/objects/'.(!empty($this_data['object_image']) ? $this_data['object_image'] : $this_data['object_token']).'/sprite_'.$this_data['object_direction'].'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
+            if (!preg_match('/^images/i', $this_data['object_image'])){ $this_data['object_image'] = 'images/objects/'.$this_data['object_image'].'/sprite_'.$this_data['object_direction'].'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE; }
+            $this_data['object_markup_class'] = 'sprite sprite_object ';
+            $this_data['object_markup_class'] .= 'sprite_'.$this_data['object_sprite_size'].'x'.$this_data['object_sprite_size'].' sprite_'.$this_data['object_sprite_size'].'x'.$this_data['object_sprite_size'].'_'.$this_data['object_frame'].' ';
+            $this_data['object_markup_class'] .= 'object_status_'.$this_data['object_status'].' object_position_'.$this_data['object_position'].' ';
+
+            $frame_position = is_numeric($this_data['object_frame']) ? (int)($this_data['object_frame']) : array_search($this_data['object_frame'], $this_data['object_frame_index']);
+            if ($frame_position === false){ $frame_position = 0; }
+            $frame_background_offset = -1 * ceil(($this_data['object_sprite_size'] * $frame_position));
+
+
+            $this_data['object_markup_style'] = 'background-position: '.$frame_background_offset.'px 0; ';
+            $this_data['object_markup_style'] .= 'pointer-events: none; z-index: '.$canvas_offset_z.'; '.$this_data['object_float'].': '.$canvas_offset_x.'px; bottom: '.$canvas_offset_y.'px; ';
+            $this_data['object_markup_style'] .= 'background-image: url('.$this_data['object_image'].'); width: '.($this_data['object_sprite_size'] * $this_data['object_frame_span']).'px; height: '.$this_data['object_sprite_size'].'px; background-size: '.$this_data['object_image_width'].'px '.$this_data['object_image_height'].'px; ';
+
+            // DEBUG
+            //$this_data['object_title'] .= 'DEBUG checkpoint data sticky = '.preg_replace('/\s+/i', ' ', htmlentities(print_r($options, true), ENT_QUOTES, 'UTF-8', true));
+
+            // Display the object's battle sprite
+            echo '<div data-object-id="'.$this_data['object_id_token'].'" data-robot-id="'.$robot_data['robot_id_token'].'" class="'.($this_data['object_markup_class'].$this_data['object_frame_classes']).'" style="'.($this_data['object_markup_style'].$this_data['object_frame_styles']).'" '.(!empty($this_data['data_debug']) ? 'data-debug="'.$this_data['data_debug'].'" ' : '').' data-sticky="'.($this_data['data_sticky']  ? 1 : 0).'" data-type="'.$this_data['data_type'].'" data-size="'.$this_data['object_sprite_size'].'" data-direction="'.$this_data['object_direction'].'" data-frame="'.$this_data['object_frame'].'" data-animate="'.$this_data['object_frame_animate'].'" data-position="'.$this_data['object_position'].'" data-status="'.$this_data['object_status'].'" data-scale="'.$this_data['object_scale'].'">'.$this_data['object_token'].'</div>';
+
+        // Collect the generated object markup
+        $this_data['object_markup'] .= trim(ob_get_clean());
+
+        // Return the robot canvas data
+        return $this_data;
+
+    }
+
+    // Define a static function for generating object canvas variables
+    public static function static_object_markup($this_object, $options, $player_data, $robot_data){
+
+        // Define the variable to hold the console robot data
+        $this_data = array();
+
+        // Define the object data array and populate basic data
+        $this_data['object_markup'] = '';
+        $this_data['data_sticky'] = !empty($options['data_sticky']) ? true : false;
+        $this_data['data_type'] = !empty($options['data_type']) ? $options['data_type'] : 'object';
+        $this_data['data_debug'] = !empty($options['data_debug']) ? $options['data_debug'] : '';
+        $this_data['object_name'] = isset($options['object_name']) ? $options['object_name'] : $this_object->object_name;
+        $this_data['object_id'] = $this_object->object_id;
+        $this_data['object_title'] = $this_object->object_name;
+        $this_data['object_token'] = $this_object->object_token;
+        $this_data['object_id_token'] = $this_object->object_id.'_'.$this_object->object_token;
+        $this_data['object_image'] = isset($options['object_image']) ? $options['object_image'] : $this_object->object_image;
+        $this_data['object_image2'] = isset($options['object_image2']) ? $options['object_image2'] : $this_object->object_image2;
+        $this_data['object_status'] = $robot_data['robot_status'];
+        $this_data['object_position'] = $robot_data['robot_position'];
+        $this_data['object_direction'] = $this_object->robot_id == $robot_data['robot_id'] ? $robot_data['robot_direction'] : ($robot_data['robot_direction'] == 'left' ? 'right' : 'left');
+        $this_data['object_float'] = $robot_data['robot_float'];
+        $this_data['object_size'] = $this_data['object_position'] == 'active' ? ($this_object->object_image_size * 2) : $this_object->object_image_size;
+        $this_data['object_frame'] = isset($options['object_frame']) ? $options['object_frame'] : $this_object->object_frame;
+        $this_data['object_frame_span'] = isset($options['object_frame_span']) ? $options['object_frame_span'] : $this_object->object_frame_span;
+        $this_data['object_frame_index'] = isset($options['object_frame_index']) ? $options['object_frame_index'] : $this_object->object_frame_index;
+        if (is_numeric($this_data['object_frame']) && $this_data['object_frame'] >= 0){ $this_data['object_frame'] = str_pad($this_data['object_frame'], 2, '0', STR_PAD_LEFT); }
+        elseif (is_numeric($this_data['object_frame']) && $this_data['object_frame'] < 0){ $this_data['object_frame'] = ''; }
+        $this_data['object_frame_offset'] = isset($options['object_frame_offset']) && is_array($options['object_frame_offset']) ? $options['object_frame_offset'] : array('x' => 0, 'y' => 0, 'z' => 0);
+        $animate_frames_array = isset($options['object_frame_animate']) ? $options['object_frame_animate'] : array($this_data['object_frame']);
+        $animate_frames_string = array();
+        if (!empty($animate_frames_array)){
+            foreach ($animate_frames_array AS $key => $frame){
+                $animate_frames_string[] = is_numeric($frame) ? str_pad($frame, 2, '0', STR_PAD_LEFT) : $frame;
+            }
+        }
+        $this_data['object_frame_animate'] = implode(',', $animate_frames_string);
+        $this_data['object_frame_styles'] = isset($options['object_frame_styles']) ? $options['object_frame_styles'] : $this_object->object_frame_styles;
+        $this_data['object_frame_classes'] = isset($options['object_frame_classes']) ? $options['object_frame_classes'] : $this_object->object_frame_classes;
+
+        $this_data['object_scale'] = isset($robot_data['robot_scale']) ? $robot_data['robot_scale'] : ($robot_data['robot_position'] == 'active' ? 1 : 0.5 + (((8 - $robot_data['robot_key']) / 8) * 0.5));
+
+        // Calculate the rest of the sprite size variables
+        $zoom_size = ($this_object->object_image_size * 2);
+        $this_data['object_sprite_size'] = ceil($this_data['object_scale'] * $zoom_size);
+        $this_data['object_sprite_width'] = ceil($this_data['object_scale'] * $zoom_size);
+        $this_data['object_sprite_height'] = ceil($this_data['object_scale'] * $zoom_size);
+        $this_data['object_image_width'] = ceil($this_data['object_scale'] * $zoom_size * 10);
+        $this_data['object_image_height'] = ceil($this_data['object_scale'] * $zoom_size);
+
+        // Calculate the canvas offset variables for this robot
+        $canvas_offset_data = $this_object->battle->canvas_markup_offset($robot_data['robot_key'], $robot_data['robot_position'], $robot_data['robot_size']);
+
+        // Define the object's canvas offset variables
+        $temp_size_diff = 0;
+        if ($robot_data['robot_sprite_size'] != $this_data['object_sprite_size']){ $temp_size_diff = ceil(($robot_data['robot_sprite_size'] - $this_data['object_sprite_size']) / 2) ; }
+
+        /*
+        // Update the canvas offsets using the base data
+        $this_data['canvas_offset_x'] = $robot_data['canvas_base_offset_x'] + $temp_size_diff;
+        $this_data['canvas_offset_y'] = $robot_data['canvas_base_offset_y'];
+        $this_data['canvas_offset_z'] = $robot_data['canvas_base_offset_z'];
+        */
+
+        // Calculate the canvas X offsets using the robot's offset as base
+        if ($this_data['object_frame_offset']['x'] > 0){ $this_data['canvas_offset_x'] = ceil($robot_data['canvas_base_offset_x'] + ($this_data['object_sprite_size'] * ($this_data['object_frame_offset']['x']/100))) + $temp_size_diff; }
+        elseif ($this_data['object_frame_offset']['x'] < 0){ $this_data['canvas_offset_x'] = ceil($robot_data['canvas_base_offset_x'] - ($this_data['object_sprite_size'] * (($this_data['object_frame_offset']['x'] * -1)/100))) + $temp_size_diff; }
+        else { $this_data['canvas_offset_x'] = $robot_data['canvas_base_offset_x'] + $temp_size_diff; }
+        // Calculate the canvas Y offsets using the robot's offset as base
+        if ($this_data['object_frame_offset']['y'] > 0){ $this_data['canvas_offset_y'] = ceil($robot_data['canvas_base_offset_y'] + ($this_data['object_sprite_size'] * ($this_data['object_frame_offset']['y']/100))); }
+        elseif ($this_data['object_frame_offset']['y'] < 0){ $this_data['canvas_offset_y'] = ceil($robot_data['canvas_base_offset_y'] - ($this_data['object_sprite_size'] * (($this_data['object_frame_offset']['y'] * -1)/100))); }
+        else { $this_data['canvas_offset_y'] = $robot_data['canvas_base_offset_y'];  }
+        // Calculate the canvas Z offsets using the robot's offset as base
+        if ($this_data['object_frame_offset']['z'] > 0){ $this_data['canvas_offset_z'] = ceil($robot_data['canvas_base_offset_z'] + $this_data['object_frame_offset']['z']); }
+        elseif ($this_data['object_frame_offset']['z'] < 0){ $this_data['canvas_offset_z'] = ceil($robot_data['canvas_base_offset_z'] - ($this_data['object_frame_offset']['z'] * -1)); }
+        else { $this_data['canvas_offset_z'] = $robot_data['canvas_base_offset_z'];  }
+
+        // Define the rest of the display variables
+        if (!preg_match('/^images/i', $this_data['object_image'])){ $this_data['object_image_path'] = 'images/objects/'.$this_data['object_image'].'/sprite_'.$this_data['object_direction'].'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE; }
+        else { $this_data['object_image_path'] = $this_data['object_image']; }
+        $this_data['object_markup_class'] = 'sprite sprite_object ';
+        $this_data['object_markup_class'] .= 'sprite_'.$this_data['object_sprite_size'].'x'.$this_data['object_sprite_size'].' sprite_'.$this_data['object_sprite_size'].'x'.$this_data['object_sprite_size'].'_'.$this_data['object_frame'].' ';
+        $this_data['object_markup_class'] .= 'object_status_'.$this_data['object_status'].' object_position_'.$this_data['object_position'].' ';
+        $frame_position = is_numeric($this_data['object_frame']) ? (int)($this_data['object_frame']) : array_search($this_data['object_frame'], $this_data['object_frame_index']);
+        if ($frame_position === false){ $frame_position = 0; }
+        $frame_background_offset = -1 * ceil(($this_data['object_sprite_size'] * $frame_position));
+        $this_data['object_markup_style'] = 'background-position: '.$frame_background_offset.'px 0; ';
+        $this_data['object_markup_style'] .= 'pointer-events: none; z-index: '.$this_data['canvas_offset_z'].'; '.$this_data['object_float'].': '.$this_data['canvas_offset_x'].'px; bottom: '.$this_data['canvas_offset_y'].'px; ';
+        $this_data['object_markup_style'] .= 'background-image: url('.$this_data['object_image_path'].'); width: '.($this_data['object_sprite_size'] * $this_data['object_frame_span']).'px; height: '.$this_data['object_sprite_size'].'px; background-size: '.$this_data['object_image_width'].'px '.$this_data['object_image_height'].'px; ';
+
+        // Generate the final markup for the canvas object
+        ob_start();
+
+            // Display the object's battle sprite
+            $temp_markup = '<div '.
+                'data-object-id="'.$this_data['object_id_token'].'" '.
+                'class="'.($this_data['object_markup_class'].$this_data['object_frame_classes']).'" '.
+                'style="'.($this_data['object_markup_style'].$this_data['object_frame_styles']).'" '.
+                (!empty($this_data['data_debug']) ? 'data-debug="'.$this_data['data_debug'].'" ' : '').
+                'data-sticky="'.($this_data['data_sticky']  ? 1 : 0).'" '.
+                'data-type="'.$this_data['data_type'].'" '.
+                'data-size="'.$this_data['object_sprite_size'].'" '.
+                'data-direction="'.$this_data['object_direction'].'" '.
+                'data-frame="'.$this_data['object_frame'].'" '.
+                'data-animate="'.$this_data['object_frame_animate'].'" '.
+                'data-position="'.$this_data['object_position'].'" '.
+                'data-status="'.$this_data['object_status'].'" '.
+                'data-scale="'.$this_data['object_scale'].'"'.
+                '></div>';
+            if (!empty($this_data['object_image2'])){ $temp_markup .= str_replace('/'.$this_data['object_image'].'/', '/'.$this_data['object_image2'].'/', $temp_markup); }
+            echo $temp_markup;
+
+        // Collect the generated object markup
+        $this_data['object_markup'] .= trim(ob_get_clean());
+
+        // Return the robot canvas data
+        return $this_data;
+
+    }
+
     // Define a function for generating canvas scene markup
     public static function battle_markup($this_battle, $eventinfo, $options = array()){
 
@@ -1587,6 +1868,36 @@ class rpg_canvas {
                                 $this_markup .= $this_item_data['item_markup'];
                             }
                         }
+                        // Else if this is an object attachment
+                        elseif ($attachment_info['class'] == 'object'){
+                            // Create the temporary object object using the provided data and generate its markup data
+                            $attachment_info['flags']['is_attachment'] = true;
+                            if (!isset($attachment_info['attachment_token'])){ $attachment_info['attachment_token'] = $attachment_token; }
+                            $this_object = rpg_game::get_proto_object($this_battle, $eventinfo['this_player'], $this_robot, $attachment_info);
+                            // Define this object data array and generate the markup data
+                            $this_attachment_options = $this_options;
+                            $this_attachment_options['data_sticky'] = !empty($this_options['sticky']) || !empty($attachment_info['sticky']) ? true : false;
+                            $this_attachment_options['data_type'] = 'attachment';
+                            $this_attachment_options['data_debug'] = ''; //$attachment_token;
+                            $this_attachment_options['object_image'] = isset($attachment_info['object_image']) ? $attachment_info['object_image'] : $this_object->object_image;
+                            $this_attachment_options['object_frame'] = isset($attachment_info['object_frame']) ? $attachment_info['object_frame'] : $this_object->object_frame;
+                            $this_attachment_options['object_frame_span'] = isset($attachment_info['object_frame_span']) ? $attachment_info['object_frame_span'] : $this_object->object_frame_span;
+                            $this_attachment_options['object_frame_animate'] = isset($attachment_info['object_frame_animate']) ? $attachment_info['object_frame_animate'] : $this_object->object_frame_animate;
+                            $attachment_frame_count = !empty($this_attachment_options['object_frame_animate']) ? sizeof($this_attachment_options['object_frame_animate']) : sizeof($this_attachment_options['object_frame']);
+                            $temp_event_frame = $this_battle->counters['event_frames'];
+                            if ($temp_event_frame == 1 || $attachment_frame_count == 1){ $attachment_frame_key = 0;  }
+                            elseif ($temp_event_frame < $attachment_frame_count){ $attachment_frame_key = $temp_event_frame; }
+                            elseif ($temp_event_frame >= $attachment_frame_count){ $attachment_frame_key = $temp_event_frame % $attachment_frame_count; }
+                            if (isset($this_attachment_options['object_frame_animate'][$attachment_frame_key])){ $this_attachment_options['object_frame'] = $this_attachment_options['object_frame_animate'][$attachment_frame_key]; }
+                            $this_attachment_options['object_frame_offset'] = isset($attachment_info['object_frame_offset']) ? $attachment_info['object_frame_offset'] : $this_object->object_frame_offset;
+                            $this_attachment_options['object_frame_styles'] = isset($attachment_info['object_frame_styles']) ? $attachment_info['object_frame_styles'] : $this_object->object_frame_styles;
+                            $this_attachment_options['object_frame_classes'] = isset($attachment_info['object_frame_classes']) ? $attachment_info['object_frame_classes'] : $this_object->object_frame_classes;
+                            $this_object_data = $this_object->proto_canvas_markup($this_attachment_options, $this_player_data, $this_robot_data);
+                            // Append this object's markup to the main markup array
+                            if (!preg_match('/display:\s?none;/i', $this_robot->robot_frame_styles)){
+                                $this_markup .= $this_object_data['object_markup'];
+                            }
+                        }
 
                     }
 
@@ -1750,6 +2061,42 @@ class rpg_canvas {
                             // Append this target's item's markup to the main markup array
                             if (!preg_match('/display:\s?none;/i', $target_robot->robot_frame_styles)){
                                 $this_markup .= $target_item_data['item_markup'];
+                            }
+
+                        }
+                        // If this is an object attachment
+                        elseif ($attachment_info['class'] == 'object'
+                            && !empty($attachment_info['object_token'])){
+
+                            // Create the target's temporary object object using the provided data
+                            $target_object = rpg_game::get_proto_object($this_battle, $eventinfo['target_player'], $target_robot, $attachment_info);
+
+                            // Define this object data array and generate the markup data
+                            $target_attachment_options = $target_options;
+                            $target_attachment_options['sticky'] = isset($attachment_info['sticky']) ? $attachment_info['sticky'] : false;
+                            $target_attachment_options['data_sticky'] = $target_attachment_options['sticky'];
+                            $target_attachment_options['data_type'] = 'attachment';
+                            $target_attachment_options['data_debug'] = ''; //$attachment_token;
+                            $target_attachment_options['object_image'] = isset($attachment_info['object_image']) ? $attachment_info['object_image'] : $target_object->object_image;
+                            $target_attachment_options['object_frame'] = isset($attachment_info['object_frame']) ? $attachment_info['object_frame'] : $target_object->object_frame;
+                            $target_attachment_options['object_frame_span'] = isset($attachment_info['object_frame_span']) ? $attachment_info['object_frame_span'] : $target_object->object_frame_span;
+                            $target_attachment_options['object_frame_animate'] = isset($attachment_info['object_frame_animate']) ? $attachment_info['object_frame_animate'] : $target_object->object_frame_animate;
+                            $attachment_frame_key = 0;
+                            $attachment_frame_count = sizeof($target_attachment_options['object_frame_animate']);
+                            $temp_event_frame = $this_battle->counters['event_frames'];
+                            if ($temp_event_frame == 1 || $attachment_frame_count == 1){ $attachment_frame_key = 0;  }
+                            elseif ($temp_event_frame < $attachment_frame_count){ $attachment_frame_key = $temp_event_frame; }
+                            elseif ($attachment_frame_count > 0 && $temp_event_frame >= $attachment_frame_count){ $attachment_frame_key = $temp_event_frame % $attachment_frame_count; }
+                            if (isset($target_attachment_options['object_frame_animate'][$attachment_frame_key])){ $target_attachment_options['object_frame'] = $target_attachment_options['object_frame_animate'][$attachment_frame_key]; }
+                            else { $target_attachment_options['object_frame'] = 0; }
+                            $target_attachment_options['object_frame_offset'] = isset($attachment_info['object_frame_offset']) ? $attachment_info['object_frame_offset'] : $target_object->object_frame_offset;
+                            $target_attachment_options['object_frame_styles'] = isset($attachment_info['object_frame_styles']) ? $attachment_info['object_frame_styles'] : $target_object->object_frame_styles;
+                            $target_attachment_options['object_frame_classes'] = isset($attachment_info['object_frame_classes']) ? $attachment_info['object_frame_classes'] : $target_object->object_frame_classes;
+                            $target_object_data = $target_object->proto_canvas_markup($target_attachment_options, $target_player_data, $target_robot_data);
+
+                            // Append this target's object's markup to the main markup array
+                            if (!preg_match('/display:\s?none;/i', $target_robot->robot_frame_styles)){
+                                $this_markup .= $target_object_data['object_markup'];
                             }
 
                         }
