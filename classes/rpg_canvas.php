@@ -2279,7 +2279,10 @@ class rpg_canvas {
                 else { $multiplier_markup_right .= $temp_markup; }
             }
             if (!empty($multiplier_markup_left) || !empty($multiplier_markup_right)){
-                $overlay_footer = '<div class="canvas_overlay_footer"><strong class="overlay_label">Field Multipliers</strong><span class="overlay_multiplier_count_'.$temp_multipliers_count.'">'.$multiplier_markup_left.$multiplier_markup_right.'</div></div>';
+                $overlay_footer = '<div class="canvas_overlay_footer">';
+                    $overlay_footer .= '<strong class="overlay_label">Field Multipliers</strong>';
+                    $overlay_footer .= '<span class="overlay_multiplier_count_'.$temp_multipliers_count.'">'.$multiplier_markup_left.$multiplier_markup_right.'</span>';
+                $overlay_footer .= '</div>';
                 $this_markup .= $overlay_footer;
             }
 
