@@ -66,7 +66,7 @@ class rpg_ability extends rpg_object {
         if (!isset($this_abilityinfo['ability_token'])){ return false; }
 
         // If this is a special system ability, hard-code its ID, otherwise base off robot
-        $temp_system_abilities = array('attachment-defeat');
+        $temp_system_abilities = array();
         if (in_array($this_abilityinfo['ability_token'], $temp_system_abilities)){
             $this_abilityinfo['ability_id'] = $this->player_id.'000';
         }

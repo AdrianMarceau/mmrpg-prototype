@@ -88,8 +88,7 @@ class rpg_disabled {
                 // Allow this robot to show on the canvas again so we can revive it
                 unset($this_robot->flags['apply_disabled_state']);
                 unset($this_robot->flags['hidden']);
-                unset($this_robot->robot_attachments['ability_attachment-defeat']);
-                unset($this_robot->robot_attachments['item_attachment-defeat']);
+                unset($this_robot->robot_attachments['object_defeat-explosion']);
                 $this_robot->robot_frame = 'defeat';
                 $this_robot->update_session();
 

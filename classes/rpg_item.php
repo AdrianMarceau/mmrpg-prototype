@@ -66,7 +66,7 @@ class rpg_item extends rpg_object {
         if (!isset($this_iteminfo['item_token'])){ return false; }
 
         // If this is a special system item, hard-code its ID, otherwise base off robot
-        $temp_system_items = array('attachment-defeat');
+        $temp_system_items = array();
         if (in_array($this_iteminfo['item_token'], $temp_system_items)){
             $this_iteminfo['item_id'] = $this->player_id.'000';
         }
