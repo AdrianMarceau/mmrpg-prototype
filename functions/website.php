@@ -1037,11 +1037,11 @@ function deleteDir($dirPath) {
 
 // Define a function for recursively copying files from one dir to another
 // via https://stackoverflow.com/a/2050909
-function recurseCopy($src,$dst) {
+function recurseCopy($src, $dst, $exclude = array()) {
     $dir = opendir($src);
     @mkdir($dst);
     while(false !== ( $file = readdir($dir)) ) {
-        if (( $file != '.' ) && ( $file != '..' )) {
+        if (( $file != '.' ) && ( $file != '..' ) && !in_array($file, $exclude)) {
             if ( is_dir($src . '/' . $file) ) {
                 recurse_copy($src . '/' . $file,$dst . '/' . $file);
             }
