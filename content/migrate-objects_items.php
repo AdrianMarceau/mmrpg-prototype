@@ -215,21 +215,6 @@ if (empty($migration_filter)){
         if ($migration_limit && ($copy_key + 1) >= $migration_limit){ break; }
     }
 
-    // Migrate the various effect sprites into the "_effects" directory instead
-    ob_echo('----------');
-    $copy_effect_sprites = array();
-    $copy_effect_sprites[] = array('field-support', $special_effect_items_dir.'type-arrows_boost-1/');
-    $copy_effect_sprites[] = array('field-support-2', $special_effect_items_dir.'type-arrows_boost-2/');
-    $copy_effect_sprites[] = array('field-support-3', $special_effect_items_dir.'type-arrows_break-1/');
-    $copy_effect_sprites[] = array('field-support-4', $special_effect_items_dir.'type-arrows_break-2/');
-    foreach ($copy_effect_sprites AS $copy_key => $copy_info){
-        list($sprite_token, $export_path) = $copy_info;
-        $count_string = '('.($copy_key + 1).' of '.count($copy_effect_sprites).')';
-        copy_sprites_to_new_dir($sprite_token, $count_string, $export_path, $icon_sprite_filenames);
-        copy_sprites_to_new_dir('item', '', $export_path, $sprite_sprite_filenames, false, true);
-        if ($migration_limit && ($copy_key + 1) >= $migration_limit){ break; }
-    }
-
     // Migrate the star shadow marker to the field and fusion star directories instead
     ob_echo('----------');
     $copy_shadow_sprites = array();
@@ -240,6 +225,20 @@ if (empty($migration_filter)){
     foreach ($copy_shadow_sprites AS $copy_key => $copy_info){
         list($sprite_token, $export_path) = $copy_info;
         $count_string = '('.($copy_key + 1).' of '.count($copy_shadow_sprites).')';
+        copy_sprites_to_new_dir($sprite_token, $count_string, $export_path);
+        if ($migration_limit && ($copy_key + 1) >= $migration_limit){ break; }
+    }
+
+    // Migrate the various effect sprites into the "_effects" directory instead
+    ob_echo('----------');
+    $copy_effect_sprites = array();
+    $copy_effect_sprites[] = array('field-support', $special_effect_items_dir.'type-arrows_boost-1/');
+    $copy_effect_sprites[] = array('field-support-2', $special_effect_items_dir.'type-arrows_boost-2/');
+    $copy_effect_sprites[] = array('field-support-3', $special_effect_items_dir.'type-arrows_break-1/');
+    $copy_effect_sprites[] = array('field-support-4', $special_effect_items_dir.'type-arrows_break-2/');
+    foreach ($copy_effect_sprites AS $copy_key => $copy_info){
+        list($sprite_token, $export_path) = $copy_info;
+        $count_string = '('.($copy_key + 1).' of '.count($copy_effect_sprites).')';
         copy_sprites_to_new_dir($sprite_token, $count_string, $export_path, $icon_sprite_filenames);
         copy_sprites_to_new_dir('item', '', $export_path, $sprite_sprite_filenames, false, true);
         if ($migration_limit && ($copy_key + 1) >= $migration_limit){ break; }
