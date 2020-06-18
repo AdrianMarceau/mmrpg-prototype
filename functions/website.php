@@ -1037,11 +1037,15 @@ function deleteDir($dirPath) {
 
 // Define a function for recursively copying files from one dir to another
 // via https://stackoverflow.com/a/2050909
-function recurseCopy($src, $dst, $exclude = array()) {
+function recurseCopy($src, $dst, $blacklist = array(), $whitelist = array()) {
+    if (empty($blacklist) || !is_array($blacklist)){ $blacklist = false; }
+    if (empty($whitelist) || !is_array($whitelist)){ $whitelist = false; }
     $dir = opendir($src);
     @mkdir($dst);
     while(false !== ( $file = readdir($dir)) ) {
-        if (( $file != '.' ) && ( $file != '..' ) && !in_array($file, $exclude)) {
+        if ( ($file != '.') && ($file != '..') ) {
+            if (!empty($blacklist) && in_array($file, $blacklist)){ continue; }
+            if (!empty($whitelist) && !in_array($file, $whitelist)){ continue; }
             if ( is_dir($src . '/' . $file) ) {
                 recurse_copy($src . '/' . $file,$dst . '/' . $file);
             }
@@ -1051,6 +1055,16 @@ function recurseCopy($src, $dst, $exclude = array()) {
         }
     }
     closedir($dir);
+}
+
+// Define a function for recursively copying files from one dir to another with a blacklist of banned files
+function recurseCopyWithBlacklist($src, $dst, $blacklist) {
+    return recurseCopy($src, $dst, $blacklist, false);
+}
+
+// Define a function for recursively copying files from one dir to another with a whitelist of allowable files
+function recurseCopyWithWhitelist($src, $dst, $whitelist) {
+    return recurseCopy($src, $dst, false, $whitelist);
 }
 
 // Define a function for getting a list of directory contents, recursively
