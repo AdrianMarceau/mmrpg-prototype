@@ -74,12 +74,12 @@ $sprite_sprite_filenames = array('sprite_left_40x40.png', 'sprite_right_40x40.pn
 
 // Pre-create special action and effect directories for later
 $special_ability_dirs = array();
-$special_ability_dirs[] = $special_action_abilities_dir = MMRPG_ABILITIES_CONTENT_DIR.'_ability-actions/';
-$special_ability_dirs[] = $special_effect_abilities_dir = MMRPG_ABILITIES_CONTENT_DIR.'_ability-effects/';
+$special_ability_dirs[] = $special_action_abilities_dir = MMRPG_ABILITIES_CONTENT_DIR.'_actions/';
+$special_ability_dirs[] = $special_effect_abilities_dir = MMRPG_ABILITIES_CONTENT_DIR.'_effects/';
 foreach ($special_ability_dirs AS $special_ability_dir){
     //ob_echo('-- $special_ability_dir = '.clean_path($special_ability_dir));
-    if (file_exists($special_ability_dir)){ deleteDir($special_ability_dir); }
-    mkdir($special_ability_dir);
+    if (empty($migration_filter) && file_exists($special_ability_dir)){ deleteDir($special_ability_dir); }
+    if (!file_exists($special_ability_dir)){ mkdir($special_ability_dir); }
 }
 
 // Count the number of abilities that we'll be looping through
@@ -118,7 +118,7 @@ foreach ($ability_index AS $ability_token => $ability_data){
     if (in_array($ability_token, $special_action_abilities)){
         $content_path = $special_action_abilities_dir.str_replace('action-', '', $ability_token).'/';
     } else {
-        $content_path = MMRPG_ABILITIES_CONTENT_DIR.($ability_token === 'ability' ? '_ability' : $ability_token).'/';
+        $content_path = MMRPG_ABILITIES_CONTENT_DIR.($ability_token === 'ability' ? '.ability' : $ability_token).'/';
     }
     //ob_echo('-- $content_path = '.clean_path($content_path));
     if (file_exists($content_path)){ deleteDir($content_path); }

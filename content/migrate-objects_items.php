@@ -46,12 +46,12 @@ $sprite_sprite_filenames = array('sprite_left_40x40.png', 'sprite_right_40x40.pn
 
 // Pre-create special action and effect directories for later
 $special_item_dirs = array();
-$special_item_dirs[] = $special_action_items_dir = MMRPG_ITEMS_CONTENT_DIR.'_item-actions/';
-$special_item_dirs[] = $special_effect_items_dir = MMRPG_ITEMS_CONTENT_DIR.'_item-effects/';
+$special_item_dirs[] = $special_action_items_dir = MMRPG_ITEMS_CONTENT_DIR.'_actions/';
+$special_item_dirs[] = $special_effect_items_dir = MMRPG_ITEMS_CONTENT_DIR.'_effects/';
 foreach ($special_item_dirs AS $special_item_dir){
     //ob_echo('-- $special_item_dir = '.clean_path($special_item_dir));
-    if (file_exists($special_item_dir)){ deleteDir($special_item_dir); }
-    mkdir($special_item_dir);
+    if (empty($migration_filter) && file_exists($special_item_dir)){ deleteDir($special_item_dir); }
+    if (!file_exists($special_item_dir)){ mkdir($special_item_dir); }
 }
 
 // Count the number of items that we'll be looping through
@@ -87,7 +87,7 @@ foreach ($item_index AS $item_token => $item_data){
     $data_path = MMRPG_CONFIG_ROOTDIR.'data/'.$function_path.$item_token.'.php';
     //ob_echo('-- $data_path = '.clean_path($data_path));
 
-    $content_path = MMRPG_ITEMS_CONTENT_DIR.($item_token === 'item' ? '_item' : $item_token).'/';
+    $content_path = MMRPG_ITEMS_CONTENT_DIR.($item_token === 'item' ? '.item' : $item_token).'/';
     //ob_echo('-- $content_path = '.clean_path($content_path));
     if (file_exists($content_path)){ deleteDir($content_path); }
     mkdir($content_path);

@@ -86,7 +86,7 @@ foreach ($player_index AS $player_token => $player_data){
     ob_echo('Processing player data and sprites "'.$player_token.'" '.$count_string);
     ob_flush();
 
-    $content_path = MMRPG_PLAYERS_CONTENT_DIR.($player_token === 'player' ? '_player' : $player_token).'/';
+    $content_path = MMRPG_PLAYERS_CONTENT_DIR.($player_token === 'player' ? '.player' : $player_token).'/';
     //ob_echo('-- $content_path = '.clean_path($content_path));
     if (file_exists($content_path)){ deleteDir($content_path); }
     mkdir($content_path);

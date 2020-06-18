@@ -10,6 +10,15 @@ ob_echo('');
 $type_fields = rpg_type::get_index_fields(true);
 $type_index = $db->get_array_list("SELECT {$type_fields} FROM mmrpg_index_types ORDER BY type_token ASC", 'type_token');
 
+// Manually add a template "type" to match the other repos
+$template_type = $type_index['none'];
+$template_type['type_token'] = 'type';
+$template_type['type_name'] = 'Type';
+$template_type['type_class'] = 'system';
+$template_type['type_order'] = -1;
+$type_index['type'] = $template_type;
+
+
 // If there's a filter present, remove all tokens not in the filter
 if (!empty($migration_filter)){
     $old_type_index = $type_index;
@@ -50,7 +59,7 @@ foreach ($type_index AS $type_token => $type_data){
     $data_path = MMRPG_CONFIG_ROOTDIR.'data/types/'.$type_token.'.php';
     //ob_echo('-- $data_path = '.clean_path($data_path));
 
-    $content_path = MMRPG_TYPES_CONTENT_DIR.($type_token === 'type' ? '_type' : $type_token).'/';
+    $content_path = MMRPG_TYPES_CONTENT_DIR.($type_token === 'type' ? '.type' : $type_token).'/';
     //ob_echo('-- $content_path = '.clean_path($content_path));
     if (file_exists($content_path)){ deleteDir($content_path); }
     mkdir($content_path);
