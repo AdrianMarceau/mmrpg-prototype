@@ -176,33 +176,6 @@
             </li>
             <?
         }
-        if (in_array('*', $this_adminaccess)
-            || in_array('import_players', $this_adminaccess)){
-            ?>
-            <li class="item">
-                <a data-old-href="admin.php?action=import_players"><del>Refresh Player Database</del></a>
-                <em><del>rescan players directory then purge + update the database</del></em>
-            </li>
-            <?
-        }
-        if (in_array('*', $this_adminaccess)
-            || in_array('import_robots', $this_adminaccess)){
-            ?>
-            <li class="item">
-                <a data-old-href="admin.php?action=import_robots"><del>Refresh Robot Databases</del></a>
-                <em><del>rescan robots directory then purge + update the database</del></em>
-            </li>
-            <?
-        }
-        if (in_array('*', $this_adminaccess)
-            || in_array('import_fields', $this_adminaccess)){
-            ?>
-            <li class="item">
-                <a data-old-href="admin.php?action=import_fields"><del>Refresh Field Database</del></a>
-                <em><del>rescan fields directory then purge + update the database</del></em>
-            </li>
-            <?
-        }
         $temp_item_markup = trim(ob_get_clean());
         if (!empty($temp_item_markup)){
             ?>
