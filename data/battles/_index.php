@@ -3,11 +3,11 @@
 $mmrpg_index['battles'] = array();
 
 // Define the cache and index paths for battles
-define('MMRPG_CONFIG_BATTLES_INDEX_PATH', MMRPG_CONFIG_ROOTDIR.'data/battles/');
-define('MMRPG_CONFIG_BATTLES_CACHE_PATH', MMRPG_CONFIG_CACHE_PATH.'cache.battles.'.MMRPG_CONFIG_CACHE_DATE.'.php');
+$battles_index_path = MMRPG_CONFIG_ROOTDIR.'data/battles/';
+$battles_cache_path = MMRPG_CONFIG_CACHE_PATH.'cache.battles.'.MMRPG_CONFIG_CACHE_DATE.'.php';
 
 // If caching is turned OFF, or a cache has not been created
-if (!MMRPG_CONFIG_CACHE_INDEXES || !file_exists(MMRPG_CONFIG_BATTLES_CACHE_PATH)){
+if (!MMRPG_CONFIG_CACHE_INDEXES || !file_exists($battles_cache_path)){
 
   // Start indexing the battle data files
   $battles_cache_markup = rpg_battle::index_battle_data();
@@ -17,7 +17,7 @@ if (!MMRPG_CONFIG_CACHE_INDEXES || !file_exists(MMRPG_CONFIG_BATTLES_CACHE_PATH)
   $battles_cache_markup = "<?\n".$battles_cache_markup."\n?>";
 
   // Write the index to a cache file, if caching is enabled
-  $battles_cache_file = @fopen(MMRPG_CONFIG_BATTLES_CACHE_PATH, 'w');
+  $battles_cache_file = @fopen($battles_cache_path, 'w');
   if (!empty($battles_cache_file)){
     @fwrite($battles_cache_file, $battles_cache_markup);
     @fclose($battles_cache_file);
@@ -26,7 +26,7 @@ if (!MMRPG_CONFIG_CACHE_INDEXES || !file_exists(MMRPG_CONFIG_BATTLES_CACHE_PATH)
 }
 
 // Include the cache file so it can be evaluated
-require_once(MMRPG_CONFIG_BATTLES_CACHE_PATH);
+require_once($battles_cache_path);
 
 // Additionally, include any dynamic session-based battles
 if (!empty($_SESSION['GAME']['values']['battle_index'])){

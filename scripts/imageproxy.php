@@ -29,7 +29,7 @@ if ($image_hash !== $actual_image_hash){
 }
 
 // Otherwise, define the hash path for where the image should be
-$image_hash_path = MMRPG_CONFIG_IMAGEPROXY_CACHE_PATH.$image_hash.$type_matches[0];
+$image_hash_path = MMRPG_CONFIG_CACHE_PATH.'imageproxy/'.$image_hash.$type_matches[0];
 
 // If the file does NOT exist yet, we need to try to download it
 if (!file_exists($image_hash_path)){

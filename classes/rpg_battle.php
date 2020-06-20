@@ -95,22 +95,23 @@ class rpg_battle extends rpg_object {
         $db->INDEX['BATTLES'] = array();
         // Default the battles index to an empty array
         $mmrpg_battles_index = array();
+        $mmrpg_battles_cache_path = MMRPG_CONFIG_CACHE_PATH.'cache.battles.'.MMRPG_CONFIG_CACHE_DATE.'.php';
         // If caching is turned OFF, or a cache has not been created
-        if (!MMRPG_CONFIG_CACHE_INDEXES || !file_exists(MMRPG_CONFIG_BATTLES_CACHE_PATH)){
+        if (!MMRPG_CONFIG_CACHE_INDEXES || !file_exists($mmrpg_battles_cache_path)){
             // Start indexing the battle data files
             $battles_cache_markup = rpg_battle::index_battle_data();
             // Implode the markup into a single string and enclose in PHP tags
             $battles_cache_markup = implode('', $battles_cache_markup);
             $battles_cache_markup = "<?\n".$battles_cache_markup."\n?>";
             // Write the index to a cache file, if caching is enabled
-            $battles_cache_file = @fopen(MMRPG_CONFIG_BATTLES_CACHE_PATH, 'w');
+            $battles_cache_file = @fopen($mmrpg_battles_cache_path, 'w');
             if (!empty($battles_cache_file)){
                 @fwrite($battles_cache_file, $battles_cache_markup);
                 @fclose($battles_cache_file);
             }
         }
         // Include the cache file so it can be evaluated
-        require_once(MMRPG_CONFIG_BATTLES_CACHE_PATH);
+        require_once($mmrpg_battles_cache_path);
         // Return false if we got nothing from the index
         if (empty($mmrpg_battles_index)){ return false; }
         // Loop through the battles and index them after serializing
@@ -132,15 +133,16 @@ class rpg_battle extends rpg_object {
         $battles_cache_markup = array();
 
         // Open the type data directory for scanning
-        $data_battles  = opendir(MMRPG_CONFIG_BATTLES_INDEX_PATH.$this_path);
+        $battles_index_path = MMRPG_CONFIG_ROOTDIR.'data/battles/';
+        $data_battles  = opendir($battles_index_path.$this_path);
 
-        //echo 'Scanning '.MMRPG_CONFIG_BATTLES_INDEX_PATH.$this_path.'<br />';
+        //echo 'Scanning '.$battles_index_path.$this_path.'<br />';
 
         // Loop through all the files in the directory
         while (false !== ($filename = readdir($data_battles))) {
 
             // If this is a directory, initiate a recusive scan
-            if (is_dir(MMRPG_CONFIG_BATTLES_INDEX_PATH.$this_path.$filename.'/') && $filename != '.' && $filename != '..'){
+            if (is_dir($battles_index_path.$this_path.$filename.'/') && $filename != '.' && $filename != '..'){
                 // Collect the markup from the recursive scan
                 $append_cache_markup = rpg_battle::index_battle_data($this_path.$filename.'/');
                 // If markup was found, append if to the main container
@@ -155,11 +157,11 @@ class rpg_battle extends rpg_object {
                 //echo '+ Adding battle token '.$this_battle_token.'...<br />';
 
                 // Read the file into memory as a string and crop slice out the imporant part
-                $this_battle_markup = trim(file_get_contents(MMRPG_CONFIG_BATTLES_INDEX_PATH.$this_path.$filename));
+                $this_battle_markup = trim(file_get_contents($battles_index_path.$this_path.$filename));
                 $this_battle_markup = explode("\n", $this_battle_markup);
                 $this_battle_markup = array_slice($this_battle_markup, 1, -1);
                 // Replace the first line with the appropriate index key
-                $this_battle_markup[1] = preg_replace('#\$battle = array\(#i', "\$mmrpg_battles_index['{$this_battle_token}'] = array(\n  'battle_token' => '{$this_battle_token}', 'battle_functions' => 'battles/{$this_path}{$filename}',", $this_battle_markup[1]);
+                $this_battle_markup[1] = preg_replace('#\$battle = array\(#i', "\$mmrpg_battles_index['{$this_battle_token}'] = array(\n  'battle_token' => '{$this_battle_token}',", $this_battle_markup[1]);
                 // Implode the markup into a single string
                 $this_battle_markup = implode("\n", $this_battle_markup);
                 // Copy this battle's data to the markup cache
