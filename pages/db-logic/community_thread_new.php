@@ -187,7 +187,7 @@ ob_start();
                                     <select class="select" name="thread_colour">
                                         <option value="">- none -</option><?
                                         // Collect the types from the index and append a few more
-                                        $temp_types_index = $mmrpg_index['types'];
+                                        $temp_types_index = rpg_type::get_index(true, false, true);
                                         if (COMMUNITY_VIEW_MODERATOR){
                                             $temp_types_index[] = array('type_token' => 'energy');
                                             $temp_types_index[] = array('type_token' => 'attack');

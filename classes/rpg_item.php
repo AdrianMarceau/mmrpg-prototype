@@ -1120,7 +1120,7 @@ class rpg_item extends rpg_object {
     public static function print_editor_options_list_markup($player_item_rewards, $robot_item_rewards, $player_info, $robot_info){
 
         // Define the global variables
-        global $mmrpg_index, $this_current_uri, $this_current_url, $db;
+        global $this_current_uri, $this_current_url, $db;
         global $allowed_edit_players, $allowed_edit_robots, $allowed_edit_items;
         global $allowed_edit_data_count, $allowed_edit_player_count, $allowed_edit_robot_count, $first_robot_token, $global_allow_editing;
         global $key_counter, $player_rewards, $player_robot_favourites, $player_robot_database, $temp_robot_totals, $player_options_markup, $item_options_markup;
@@ -1170,11 +1170,11 @@ class rpg_item extends rpg_object {
     public static function print_editor_select_markup($item_rewards_options, $player_info, $robot_info, $item_info, $item_key = 0){
 
         // Define the global variables
-        global $mmrpg_index, $this_current_uri, $this_current_url, $db;
+        global $this_current_uri, $this_current_url, $db;
         global $allowed_edit_players, $allowed_edit_robots, $allowed_edit_items;
         global $allowed_edit_data_count, $allowed_edit_player_count, $allowed_edit_robot_count, $first_robot_token, $global_allow_editing;
         global $key_counter, $player_rewards, $player_item_rewards, $player_robot_database, $temp_robot_totals, $player_options_markup, $item_options_markup;
-        global $mmrpg_database_items;
+        global $mmrpg_database_types, $mmrpg_database_items;
 
         // Collect the current session token
         $session_token = rpg_game::session_token();
@@ -1191,10 +1191,10 @@ class rpg_item extends rpg_object {
         $item_info_name = $item_info['item_name'];
         $item_info_type = !empty($item_info['item_type']) ? $item_info['item_type'] : false;
         $item_info_type2 = !empty($item_info['item_type2']) ? $item_info['item_type2'] : false;
-        if (!empty($item_info_type) && !empty($mmrpg_index['types'][$item_info_type])){
-            $item_info_type = $mmrpg_index['types'][$item_info_type]['type_name'].' Type';
-            if (!empty($item_info_type2) && !empty($mmrpg_index['types'][$item_info_type2])){
-                $item_info_type = str_replace(' Type', ' / '.$mmrpg_index['types'][$item_info_type2]['type_name'].' Type', $item_info_type);
+        if (!empty($item_info_type) && !empty($mmrpg_database_types[$item_info_type])){
+            $item_info_type = $mmrpg_database_types[$item_info_type]['type_name'].' Type';
+            if (!empty($item_info_type2) && !empty($mmrpg_database_types[$item_info_type2])){
+                $item_info_type = str_replace(' Type', ' / '.$mmrpg_database_types[$item_info_type2]['type_name'].' Type', $item_info_type);
             }
         } else {
             $item_info_type = '';
@@ -1358,9 +1358,9 @@ class rpg_item extends rpg_object {
     public static function print_database_markup($item_info, $print_options = array()){
 
         // Define the global variables
-        global $mmrpg_index, $this_current_uri, $this_current_url;
-        global $mmrpg_database_items, $mmrpg_database_robots, $mmrpg_database_items, $mmrpg_database_types;
         global $db;
+        global $this_current_uri, $this_current_url;
+        global $mmrpg_database_items, $mmrpg_database_robots, $mmrpg_database_items, $mmrpg_database_types;
 
         // Collect global indexes for easier search
         $mmrpg_types = rpg_type::get_index(true);

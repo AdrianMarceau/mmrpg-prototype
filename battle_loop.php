@@ -206,6 +206,10 @@ elseif ($this_action == 'start'){
 //echo 'memory_get_peak_usage() = '.round((memory_get_peak_usage() / 1024) / 1024, 2).'M'."\n";
 //exit();
 
+// Collect an index of all types so we can user later
+$db_type_fields = rpg_type::get_index_fields(true);
+$battle_types_index = $db->get_array_list("SELECT {$db_type_fields} FROM mmrpg_index_types WHERE type_class <> 'systen';", 'type_token');
+
 // Collect an index of all complete robots so we can use later
 $db_robot_fields = rpg_robot::get_index_fields(true);
 $battle_robots_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');

@@ -46,6 +46,9 @@ while ($this_action == 'save'){
     // -- GENERATE AVATAR OPTIONS -- //
     if (true){
 
+        // Collect the database types so we can use 'em later
+        if (!isset($mmrpg_index_types)){ $mmrpg_index_types = rpg_type::get_index(); }
+
         // Sort the robot index based on robot number
         $db_robot_fields = rpg_robot::get_index_fields(true);
         $mmrpg_database_robots = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND robot_flag_complete = 1 AND robot_flag_hidden = 0;", 'robot_token');
@@ -94,7 +97,7 @@ while ($this_action == 'save'){
 
             // If this is a copy core, add it's type alts
             if (isset($info['robot_core']) && $info['robot_core'] == 'copy'){
-                foreach ($mmrpg_index['types'] AS $type_token => $type_info){
+                foreach ($mmrpg_index_types AS $type_token => $type_info){
                     if ($type_token == 'none' || $type_token == 'copy' || (isset($type_info['type_class']) && $type_info['type_class'] == 'special')){ continue; }
                     if (!isset($_SESSION['GAME']['values']['battle_items'][$type_token.'-core']) && $this_userinfo['role_id'] != 1){ continue; }
                     $html_avatar_options[] = '<option value="robots/'.$token.'_'.$type_token.'/'.$size.'">'.$info['robot_number'].' : '.$info['robot_name'].' ('.$type_info['type_name'].' Core)</option>';
@@ -143,7 +146,7 @@ while ($this_action == 'save'){
     if (true){
 
         // Collect the type index and generate colour option html
-        $mmrpg_database_type = $mmrpg_index['types'];
+        $mmrpg_database_type = $mmrpg_index_types;
         sort($mmrpg_database_type);
         $allowed_colour_options = array();
         $html_colour_options = array();

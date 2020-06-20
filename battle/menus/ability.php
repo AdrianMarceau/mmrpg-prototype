@@ -186,8 +186,8 @@ ob_start();
 
                 // Define the ability title details text
                 $temp_ability_details = $temp_ability->ability_name;
-                $temp_ability_details .= ' ('.(!empty($temp_ability->ability_type) ? $mmrpg_index['types'][$temp_ability->ability_type]['type_name'] : 'Neutral');
-                if (!empty($temp_ability->ability_type2)){ $temp_ability_details .= ' / '.$mmrpg_index['types'][$temp_ability->ability_type2]['type_name']; }
+                $temp_ability_details .= ' ('.(!empty($temp_ability->ability_type) ? $battle_types_index[$temp_ability->ability_type]['type_name'] : 'Neutral');
+                if (!empty($temp_ability->ability_type2)){ $temp_ability_details .= ' / '.$battle_types_index[$temp_ability->ability_type2]['type_name']; }
                 else { $temp_ability_details .= ' Type'; }
                 $temp_ability_details .= ') <br />';
                 if ($temp_kind == 'damage' && !empty($temp_damage)){ $temp_ability_details .= $temp_damage.$temp_damage_unit.' Damage'; }
@@ -218,8 +218,8 @@ ob_start();
                 $temp_ability_label = '<span class="multi">';
                 $temp_ability_label .= '<span class="maintext">'.$temp_ability->ability_name.'</span>';
                 $temp_ability_label .= '<span class="subtext">';
-                    $temp_ability_label .= (!empty($temp_type) ? $mmrpg_index['types'][$temp_ability->ability_type]['type_name'].' ' : 'Neutral ');
-                    if (!empty($temp_type2)){ $temp_ability_label .= ' / '.$mmrpg_index['types'][$temp_ability->ability_type2]['type_name']; }
+                    $temp_ability_label .= (!empty($temp_type) ? $battle_types_index[$temp_ability->ability_type]['type_name'].' ' : 'Neutral ');
+                    if (!empty($temp_type2)){ $temp_ability_label .= ' / '.$battle_types_index[$temp_ability->ability_type2]['type_name']; }
                     else { $temp_ability_label .= ($temp_kind == 'damage' ? 'Damage' : ($temp_kind == 'recovery' ? 'Recovery' : ($temp_kind == 'multi' ? 'Effects' : 'Special'))); }
                 $temp_ability_label .= '</span>';
                 $temp_ability_label .= '<span class="subtext">';

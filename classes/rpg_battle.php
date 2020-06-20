@@ -661,9 +661,6 @@ class rpg_battle extends rpg_object {
                     $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                     $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
                     $event_body .= $this_robot->print_quote('battle_victory', $this_find, $this_replace);
-                    //$this_quote_text = str_replace($this_find, $this_replace, $this_robot->robot_quotes['battle_victory']);
-                    //$this_text_colour = !empty($mmrpg_index['types'][$this_robot->robot_token]) ? $mmrpg_index['types'][$this_robot->robot_token]['type_colour_light'] : array(200, 200, 200);
-                    //$event_body .= '&quot;<em style="color: rgb('.implode(',', $this_text_colour).');">'.$this_quote_text.'</em>&quot;';
                 }
                 $this->events_create($this_robot, $target_robot, $event_header, $event_body, $event_options);
 
@@ -686,8 +683,6 @@ class rpg_battle extends rpg_object {
                 $this_replace = array($this_player->player_name, $this_robot->robot_name, $target_player->player_name, $target_robot->robot_name);
                 $this_quote_text = str_replace($this_find, $this_replace, $target_player->player_quotes['battle_defeat']);
                 $event_body .= $target_player->print_quote('battle_defeat', $this_find, $this_replace);
-                //$this_text_colour = !empty($mmrpg_index['types'][$target_player->player_token]) ? $mmrpg_index['types'][$target_player->player_token]['type_colour_light'] : array(200, 200, 200);
-                //$event_body .= '&quot;<em style="color: rgb('.implode(',', $this_text_colour).');">'.$this_quote_text.'</em>&quot;';
             }
             $this->events_create($target_robot, $this_robot, $event_header, $event_body, $event_options);
 
@@ -726,9 +721,6 @@ class rpg_battle extends rpg_object {
                     $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                     $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
                     $event_body .= $this_player->print_quote('battle_victory', $this_find, $this_replace);
-                    //$this_quote_text = str_replace($this_find, $this_replace, $this_player->player_quotes['battle_victory']);
-                    //$this_text_colour = !empty($mmrpg_index['types'][$this_player->player_token]) ? $mmrpg_index['types'][$this_player->player_token]['type_colour_light'] : array(200, 200, 200);
-                    //$event_body .= '&quot;<em style="color: rgb('.implode(',', $this_text_colour).');">'.$this_quote_text.'</em>&quot;';
                 }
                 $this->events_create($this_robot, $target_robot, $event_header, $event_body, $event_options);
 

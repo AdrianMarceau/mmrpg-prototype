@@ -47,8 +47,6 @@ class rpg_field extends rpg_object {
 
     // Define a public function for manually loading data
     public function field_load($this_fieldinfo){
-        // Pull in the global index
-        global $mmrpg_index;
 
         // Collect current field data from the session if available
         $this_fieldinfo_backup = $this_fieldinfo;
@@ -990,8 +988,12 @@ class rpg_field extends rpg_object {
 
         // Define the global variables
         global $db;
-        global $mmrpg_index, $this_current_uri, $this_current_url;
-        global $mmrpg_database_players, $mmrpg_database_robots, $mmrpg_database_mechas, $mmrpg_database_abilities, $mmrpg_database_types;
+
+        global $this_current_uri, $this_current_url;
+        global $mmrpg_database_players, $mmrpg_database_robots, $mmrpg_database_mechas, $mmrpg_database_abilities;
+
+        global $mmrpg_index_all_types;
+        if (empty($mmrpg_index_all_types)){ $mmrpg_index_all_types = rpg_type::get_index(true); }
 
         // Define the print style defaults
         if (!isset($print_options['layout_style'])){ $print_options['layout_style'] = 'website'; }
@@ -1140,7 +1142,7 @@ class rpg_field extends rpg_object {
                                         if (!empty($field_info['field_music_name'])){
                                             // Break up the field name for responsive styles
                                             $name = $field_info['field_music_name'];
-                                            if (strstr('(', $name)){
+                                            if (!strstr($name, '(')){
                                                 $name1 = $name;
                                                 $name2 = '';
                                             } else {
@@ -1241,7 +1243,7 @@ class rpg_field extends rpg_object {
                                             asort($field_info['field_multipliers']);
                                             $field_info['field_multipliers'] = array_reverse($field_info['field_multipliers']);
                                             foreach ($field_info['field_multipliers'] AS $temp_token => $temp_value){
-                                                $temp_string[] = '<span class="field_multiplier field_type field_type_'.$temp_token.'">'.$mmrpg_index['types'][$temp_token]['type_name'].' x '.number_format($temp_value, 1).'</span>';
+                                                $temp_string[] = '<span class="field_multiplier field_type field_type_'.$temp_token.'">'.$mmrpg_index_all_types[$temp_token]['type_name'].' x '.number_format($temp_value, 1).'</span>';
                                             }
                                             echo implode(' ', $temp_string);
                                         } else {
@@ -1388,20 +1390,23 @@ class rpg_field extends rpg_object {
     // Define a static function for printing out the field's title markup
     public static function print_editor_title_markup($player_info, $field_info){
         // Pull in global variables
-        global $mmrpg_index, $db;
+        global $db;
+        global $mmrpg_index_types, $mmrpg_index_players;
+        if (empty($mmrpg_index_types)){ $mmrpg_index_types = rpg_type::get_index(); }
+        if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(); }
         // Collect the approriate database indexes
         $db_robot_fields = rpg_robot::get_index_fields(true);
         $mmrpg_database_robots = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
         // Generate the field option markup
         $temp_player_token = $player_info['player_token'];
-        if (!isset($mmrpg_index['players'][$temp_player_token])){ return false; }
-        $player_info = $mmrpg_index['players'][$temp_player_token];
+        if (!isset($mmrpg_index_players[$temp_player_token])){ return false; }
+        $player_info = $mmrpg_index_players[$temp_player_token];
         $temp_field_token = $field_info['field_token'];
         $field_info = rpg_field::get_index_info($temp_field_token);
         if (empty($field_info)){ return false; }
         $player_flag_copycore = !empty($player_info['player_core']) && $player_info['player_core'] == 'copy' ? true : false;
-        $temp_field_type = !empty($field_info['field_type']) ? $mmrpg_index['types'][$field_info['field_type']] : false;
-        $temp_field_type2 = !empty($field_info['field_type2']) ? $mmrpg_index['types'][$field_info['field_type2']] : false;
+        $temp_field_type = !empty($field_info['field_type']) ? $mmrpg_index_types[$field_info['field_type']] : false;
+        $temp_field_type2 = !empty($field_info['field_type2']) ? $mmrpg_index_types[$field_info['field_type2']] : false;
         $temp_field_master = !empty($field_info['field_master']) ? rpg_robot::parse_index_info($mmrpg_database_robots[$field_info['field_master']]) : false;
         $temp_field_mechas = !empty($field_info['field_mechas']) ? $field_info['field_mechas'] : array();
         foreach ($temp_field_mechas AS $key => $token){
@@ -1434,11 +1439,13 @@ class rpg_field extends rpg_object {
     // Define a static function for printing out the field's title markup
     public static function print_editor_option_markup($player_info, $field_info){
         // Pull in global variables
-        global $mmrpg_index;
+        global $mmrpg_index_types, $mmrpg_index_players;
+        if (empty($mmrpg_index_types)){ $mmrpg_index_types = rpg_type::get_index(); }
+        if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(); }
         // Generate the field option markup
         $temp_player_token = $player_info['player_token'];
-        if (!isset($mmrpg_index['players'][$temp_player_token])){ return false; }
-        $player_info = $mmrpg_index['players'][$temp_player_token];
+        if (!isset($mmrpg_index_players[$temp_player_token])){ return false; }
+        $player_info = $mmrpg_index_players[$temp_player_token];
         $temp_field_token = $field_info['field_token'];
         $field_info = rpg_field::get_index_info($temp_field_token);
         if (empty($field_info)){ return false; }
@@ -1446,8 +1453,8 @@ class rpg_field extends rpg_object {
         // DEBUG
         //if ($temp_player_token == 'oil-man' && $temp_field_token == 'oil-shooter'){ die('WHY?!'); }
 
-        $temp_field_type = !empty($field_info['field_type']) ? $mmrpg_index['types'][$field_info['field_type']] : false;
-        $temp_field_type2 = !empty($field_info['field_type2']) ? $mmrpg_index['types'][$field_info['field_type2']] : false;
+        $temp_field_type = !empty($field_info['field_type']) ? $mmrpg_index_types[$field_info['field_type']] : false;
+        $temp_field_type2 = !empty($field_info['field_type2']) ? $mmrpg_index_types[$field_info['field_type2']] : false;
         $temp_field_label = $field_info['field_name'];
         $temp_field_title = rpg_field::print_editor_title_markup($player_info, $field_info);
         $temp_field_title_plain = strip_tags(str_replace('<br />', '&#10;', $temp_field_title));

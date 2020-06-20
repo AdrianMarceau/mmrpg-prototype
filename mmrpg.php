@@ -6,12 +6,7 @@
 
 // Include mandatory library files
 $mmrpg_index = array();
-//require('data/battles/_index.php');
-//require('data/fields/_index.php');
 require('data/players/_index.php');
-//require('data/robots/_index.php');
-//require('data/abilities/_index.php');
-require('data/types/_index.php');
 
 
 /*
@@ -155,8 +150,9 @@ elseif ($this_current_page == 'community'){
 }
 // Trigger specific actions if we're on the DATABASE page
 elseif ($this_current_page == 'database'){
+    if (!isset($mmrpg_index_types)){ $mmrpg_index_types = rpg_type::get_index(); }
     $this_current_token = !empty($_GET['token']) ? $_GET['token'] : '';
-    if (!empty($this_current_token) && isset($mmrpg_index['types'][$this_current_token])){
+    if (!empty($this_current_token) && isset($mmrpg_index_types[$this_current_token])){
         $this_current_filter = $_GET['filter'] = $this_current_token;
         $this_current_filter_name = $this_current_filter == 'none' ? 'Neutral' : ucfirst($this_current_filter);
         $this_current_uri .= $this_current_filter.'/';

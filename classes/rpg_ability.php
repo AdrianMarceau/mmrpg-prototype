@@ -2145,6 +2145,9 @@ class rpg_ability extends rpg_object {
                                                     continue;
                                                 }
                                             }
+                                            if (empty($temp_string) && in_array($ability_info['ability_token'], $temp_global_abilities)){
+                                                $temp_string[] = '<div class="" style="margin: 10px auto; text-align: center; color: #767676; font-size: 11px;">'.$ability_info['ability_name'].' can be equipped by <em>any</em> robot master!</div>';
+                                            }
                                             echo implode(' ', $temp_string);
                                         } else {
                                             echo '<span class="robot_ability robot_type_none"><span class="chrome">Neutral</span></span>';
@@ -2156,6 +2159,12 @@ class rpg_ability extends rpg_object {
                             </tbody>
                         </table>
                     </div>
+
+                    <? if($print_options['show_footer'] && $print_options['layout_style'] == 'website'): ?>
+                        <div class="link_wrapper">
+                            <a class="link link_top" data-href="#top" rel="nofollow">^ Top</a>
+                        </div>
+                    <? endif; ?>
 
                 <? endif; ?>
 

@@ -115,14 +115,6 @@ function mmrpg_formatting_decode($string){
             '/\s?\[float-none\]\s?(.*?)\s?\[\/float(?:-none)?\]/is' => '<div class="float_none">$1</div>',
             //'/\s?\[align-(left|right|center)\]\s?(.*?)\s?\[\/align-\1\]/is' => '<span class="align_$1">$2</span>',
             );
-        /*
-        foreach ($mmrpg_index['types'] AS $key => $info){
-            $mmrpg_formatting_array += array('/\s?\[type-'.$info['type_token'].'\]\s?(.*?)\s?\[\/type-'.$info['type_token'].'\]/is' => '<div class="type type_panel ability_type ability_type_'.$info['type_token'].'">$1</div>');
-            foreach ($mmrpg_index['types'] AS $key2 => $info2){
-                $mmrpg_formatting_array += array('/\s?\[type-'.$info['type_token'].'_'.$info2['type_token'].'\]\s?(.*?)\s?\[\/type-'.$info['type_token'].'_'.$info2['type_token'].'\]/is' => '<div class="type type_panel ability_type ability_type_'.$info['type_token'].'_'.$info2['type_token'].'">$1</div>');
-            }
-        }
-        */
         $mmrpg_formatting_array += array(
             '/\s{2,}\[type-([_a-z]+)\]\s?(.*?)\s?\[\/type-\1\]\s{2,}/is' => '<div class="type type_panel ability_type ability_type_$1">$2</div>',
             '/\s?\[type-([_a-z]+)\]\s?(.*?)\s?\[\/type-\1\]\s?/is' => '<span class="type type_panel ability_type ability_type_$1">$2</span>',

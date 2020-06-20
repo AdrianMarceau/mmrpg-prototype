@@ -718,9 +718,6 @@ class rpg_robot extends rpg_object {
     // Define a public function for applying robot stat bonuses
     public function apply_stat_bonuses(){
 
-        // Pull in the global index
-        global $mmrpg_index;
-
         // Only continue if this hasn't been done already
         if (!empty($this->flags['apply_stat_bonuses'])){ return false; }
 
@@ -954,7 +951,9 @@ class rpg_robot extends rpg_object {
         return $this_markup;
     }
     public function print_quote($quote_type, $this_find = array(), $this_replace = array()){
-        global $mmrpg_index;
+
+        global $mmrpg_index_types;
+        if (empty($mmrpg_index_types)){ $mmrpg_index_types = rpg_type::get_index(); }
 
         // Define the quote text variable
         $quote_text = '';
@@ -983,7 +982,7 @@ class rpg_robot extends rpg_object {
 
             // Collect the text colour for this robot
             $this_type_token = !empty($this->robot_core) ? $this->robot_core : 'none';
-            $this_text_colour = !empty($mmrpg_index['types'][$this_type_token]) ? $mmrpg_index['types'][$this_type_token]['type_colour_light'] : array(200, 200, 200);
+            $this_text_colour = !empty($mmrpg_index_types[$this_type_token]) ? $mmrpg_index_types[$this_type_token]['type_colour_light'] : array(200, 200, 200);
             $this_text_colour_bak = $this_text_colour;
             $temp_saturator = 1.25;
             if (in_array($this_type_token, array('water','wind'))){ $temp_saturator = 1.5; }
@@ -1051,7 +1050,10 @@ class rpg_robot extends rpg_object {
         return $this_markup;
     }
     public static function print_robot_info_quote($robot_info, $quote_type, $this_find = array(), $this_replace = array()){
-        global $mmrpg_index;
+
+        global $mmrpg_index_types;
+        if (empty($mmrpg_index_types)){ $mmrpg_index_types = rpg_type::get_index(); }
+
         // Define the quote text variable
         $quote_text = '';
         // If the robot is visible and has the requested quote text
@@ -1060,7 +1062,7 @@ class rpg_robot extends rpg_object {
             $this_quote_text = str_replace($this_find, $this_replace, $robot_info['robot_quotes'][$quote_type]);
             // Collect the text colour for this robot
             $this_type_token = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none';
-            $this_text_colour = !empty($mmrpg_index['types'][$this_type_token]) ? $mmrpg_index['types'][$this_type_token]['type_colour_light'] : array(200, 200, 200);
+            $this_text_colour = !empty($mmrpg_index_types[$this_type_token]) ? $mmrpg_index_types[$this_type_token]['type_colour_light'] : array(200, 200, 200);
             $this_text_colour_bak = $this_text_colour;
             $temp_saturator = 1.25;
             if (in_array($this_type_token, array('water','wind'))){ $temp_saturator = 1.5; }
@@ -2822,7 +2824,7 @@ class rpg_robot extends rpg_object {
         $this_markup = '';
 
         // Define the global variables
-        global $mmrpg_index, $this_current_uri, $this_current_url, $db;
+        global $this_current_uri, $this_current_url, $db;
         global $mmrpg_database_players, $mmrpg_database_items, $mmrpg_database_types;
         global $mmrpg_stat_base_max_value;
 
@@ -3971,7 +3973,7 @@ class rpg_robot extends rpg_object {
     public static function print_editor_markup($player_info, $robot_info, $mmrpg_database_abilities = array()){
 
         // Define the global variables
-        global $mmrpg_index, $this_current_uri, $this_current_url, $db;
+        global $this_current_uri, $this_current_url, $db;
         global $allowed_edit_players, $allowed_edit_robots, $allowed_edit_abilities;
         global $allowed_edit_data_count, $allowed_edit_player_count, $allowed_edit_robot_count, $first_robot_token, $global_allow_editing;
         global $key_counter, $player_counter, $player_rewards, $player_ability_rewards, $player_robot_favourites, $player_robot_database, $temp_robot_totals, $player_options_markup;

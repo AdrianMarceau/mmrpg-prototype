@@ -56,8 +56,12 @@ while ($this_action == 'profile'){
     // -- GENERATE AVATAR OPTIONS -- //
     if (true){
 
+        // Collect the types index for use later in the script
+        $mmrpg_database_types = rpg_type::get_index(true, true, true);
+
         // Sort the robot index based on robot number
-        $mmrpg_database_robots = $db->get_array_list("SELECT * FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND robot_flag_complete = 1 AND robot_flag_hidden = 0;", 'robot_token');
+        $db_robot_fields = rpg_robot::get_index_fields(true);
+        $mmrpg_database_robots = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND robot_flag_complete = 1 AND robot_flag_hidden = 0;", 'robot_token');
         uasort($mmrpg_database_robots, 'mmrpg_index_sort_robots');
         //die('<pre>$mmrpg_database_robots = '.print_r($mmrpg_database_robots, true).'</pre>');
 
@@ -103,7 +107,7 @@ while ($this_action == 'profile'){
 
             // If this is a copy core, add it's type alts
             if (isset($info['robot_core']) && $info['robot_core'] == 'copy'){
-                foreach ($mmrpg_index['types'] AS $type_token => $type_info){
+                foreach ($mmrpg_database_types AS $type_token => $type_info){
                     if ($type_token == 'none' || $type_token == 'copy' || (isset($type_info['type_class']) && $type_info['type_class'] == 'special')){ continue; }
                     if (!isset($_SESSION['GAME']['values']['battle_items'][$type_token.'-core']) && $this_userinfo['role_id'] != 1){ continue; }
                     $html_avatar_options[] = '<option value="robots/'.$token.'_'.$type_token.'/'.$size.'">'.$info['robot_number'].' : '.$info['robot_name'].' ('.$type_info['type_name'].' Core)</option>';
@@ -152,14 +156,14 @@ while ($this_action == 'profile'){
     if (true){
 
         // Collect the type index and generate colour option html
-        $mmrpg_database_type = $mmrpg_index['types'];
-        sort($mmrpg_database_type);
+        $sorted_database_types = $mmrpg_database_types;
+        sort($sorted_database_types);
         $allowed_colour_options = array();
         $html_colour_options = array();
         $html_colour_options[] = '<option value="">- Select Type -</option>';
         $html_colour_options[] = '<option value="none">Neutral Type</option>';
         // Add all the robot avatars to the list
-        foreach ($mmrpg_database_type AS $token => $info){
+        foreach ($sorted_database_types AS $token => $info){
             if ($token == 'none'){ continue; }
             $html_colour_options[] = '<option value="'.$info['type_token'].'">'.$info['type_name'].' Type</option>';
             $allowed_colour_options[] = $info['type_token'];

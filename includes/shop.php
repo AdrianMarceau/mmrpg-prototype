@@ -562,7 +562,7 @@ if (!empty($this_shop_index['reggae'])){
                 foreach ($this_battle_shops['reggae']['cores_bought'] AS $item_token => $item_quantity){
                     if (preg_match('/^item-core-/i', $item_token)){ $type_token = preg_replace('/^item-core-/i', '', $item_token); }
                     else { $type_token = preg_replace('/-core$/i', '', $item_token); }
-                    $type_info = $mmrpg_index['types'][$type_token];
+                    $type_info = $mmrpg_database_types[$type_token];
                     if (!isset($core_level_index[$type_token])){ $core_level_index[$type_token] = 0; }
                     $core_level_index[$type_token] += $item_quantity;
                 }

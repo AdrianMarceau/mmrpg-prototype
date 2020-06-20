@@ -38,7 +38,8 @@ class rpg_player extends rpg_object {
     public function player_load($this_playerinfo){
 
         // Pull in the global index
-        global $mmrpg_index;
+        global $mmrpg_index_players;
+        if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(); }
 
         // Pull in global variables
         $db = cms_database::get_database();
@@ -51,7 +52,7 @@ class rpg_player extends rpg_object {
         // Otherwise, collect player data from the index
         else {
             // Copy over the base contents from the players index
-            $this_playerinfo = $mmrpg_index['players'][$this_playerinfo['player_token']];
+            $this_playerinfo = $mmrpg_index_players[$this_playerinfo['player_token']];
         }
         $this_playerinfo = array_replace($this_playerinfo, $this_playerinfo_backup);
 
@@ -1353,7 +1354,8 @@ class rpg_player extends rpg_object {
     public function print_token(){ return '<span class="player_token">'.$this->player_token.'</span>'; }
     public function print_description(){ return '<span class="player_description">'.$this->player_description.'</span>'; }
     public function print_quote($quote_type, $this_find = array(), $this_replace = array()){
-        global $mmrpg_index;
+        global $mmrpg_index_types;
+        if (empty($mmrpg_index_types)){ $mmrpg_index_types = rpg_type::get_index(); }
         // Define the quote text variable
         $quote_text = '';
         // If the player is visible and has the requested quote text
@@ -1362,7 +1364,7 @@ class rpg_player extends rpg_object {
             $this_quote_text = str_replace($this_find, $this_replace, $this->player_quotes[$quote_type]);
             // Collect the text colour for this player
             $this_type_token = str_replace('dr-', '', $this->player_token);
-            $this_text_colour = !empty($mmrpg_index['types'][$this_type_token]) ? $mmrpg_index['types'][$this_type_token]['type_colour_light'] : array(200, 200, 200);
+            $this_text_colour = !empty($mmrpg_index_types[$this_type_token]) ? $mmrpg_index_types[$this_type_token]['type_colour_light'] : array(200, 200, 200);
             foreach ($this_text_colour AS $key => $val){ $this_text_colour[$key] += 20; }
             // Generate the quote text markup with the appropriate RGB values
             $quote_text = '<span style="color: rgb('.implode(',', $this_text_colour).');">&quot;<em>'.$this_quote_text.'</em>&quot;</span>';
@@ -1427,7 +1429,7 @@ class rpg_player extends rpg_object {
 
     // Define a static function for printing out the robot's editor markup
     public static function items_sort_for_editor($item_one, $item_two){
-        global $mmrpg_index;
+
         $item_token_one = $item_one['item_token'];
         $item_token_two = $item_two['item_token'];
         list($x, $kind_one, $size_one) = explode('-', $item_token_one);
@@ -1450,10 +1452,10 @@ class rpg_player extends rpg_object {
         elseif ($item_one['item_token'] > $item_two['item_token']){ return 1; }
         elseif ($item_one['item_token'] < $item_two['item_token']){ return -1; }
         else { return 0; }
+
     }
 
     public static function trigger_item_drop($this_battle, $target_player, $target_robot, $this_robot, $item_reward_key, $item_reward_token, $item_quantity_dropped = 1){
-        global $mmrpg_index;
 
         // Create the temporary item object for event creation
         $item_reward_info = rpg_item::get_index_info($item_reward_token);
@@ -2099,7 +2101,7 @@ class rpg_player extends rpg_object {
 
         // Define the global variables
         global $db;
-        global $mmrpg_index, $this_current_uri, $this_current_url;
+        global $this_current_uri, $this_current_url;
         global $mmrpg_database_players, $mmrpg_database_robots, $mmrpg_database_abilities, $mmrpg_database_types;
 
         // Define the print style defaults
@@ -2577,7 +2579,7 @@ class rpg_player extends rpg_object {
                                                 $this_ability_name = $this_ability['ability_name'];
                                                 $this_ability_image = !empty($this_ability['ability_image']) ? $this_ability['ability_image']: $this_ability['ability_token'];
                                                 $this_ability_type = !empty($this_ability['ability_type']) ? $this_ability['ability_type'] : false;
-                                                if (!empty($this_ability_type) && !empty($mmrpg_index['types'][$this_ability_type])){ $this_ability_type = $mmrpg_index['types'][$this_ability_type]['type_name'].' Type'; }
+                                                if (!empty($this_ability_type) && !empty($mmrpg_database_types[$this_ability_type])){ $this_ability_type = $mmrpg_database_types[$this_ability_type]['type_name'].' Type'; }
                                                 else { $this_ability_type = ''; }
                                                 $this_ability_damage = !empty($this_ability['ability_damage']) ? $this_ability['ability_damage'] : 0;
                                                 $this_ability_damage2 = !empty($this_ability['ability_damage2']) ? $this_ability['ability_damage2'] : 0;
@@ -2675,7 +2677,7 @@ class rpg_player extends rpg_object {
         $this_markup = '';
         // Define the global variables
         global $this_userid;
-        global $mmrpg_index, $this_current_uri, $this_current_url, $db;
+        global $this_current_uri, $this_current_url, $db;
         global $allowed_edit_players, $allowed_edit_fields, $global_allow_editing;
         global $allowed_edit_data_count, $allowed_edit_player_count, $first_player_token;
         global $key_counter, $player_key, $player_counter, $player_rewards, $player_field_rewards, $player_item_rewards, $temp_player_totals, $player_options_markup;
@@ -2929,9 +2931,10 @@ class rpg_player extends rpg_object {
                     <?
 
                     // Collect a field index in case we need it later
-                    static $mmrpg_field_index, $mmrpg_robot_index;
-                    if (empty($mmrpg_field_index)){ $mmrpg_field_index = rpg_field::get_index(); }
-                    if (empty($mmrpg_robot_index)){ $mmrpg_robot_index = rpg_robot::get_index(); }
+                    global $mmrpg_index_types, $mmrpg_index_fields, $mmrpg_index_robots;
+                    if (empty($mmrpg_index_types)){ $mmrpg_index_types = rpg_type::get_index(); }
+                    if (empty($mmrpg_index_fields)){ $mmrpg_index_fields = rpg_field::get_index(); }
+                    if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = rpg_robot::get_index(); }
 
                     ?>
 
@@ -3064,7 +3067,7 @@ class rpg_player extends rpg_object {
                                                     if (!empty($group_kind)){ $challenge_rewards_options .= '</optgroup>'; }
                                                     $challenge_rewards_options .= '<optgroup label="'.$group_name.'">';
                                                 }
-                                                $option_markup = rpg_mission_challenge::print_editor_option_markup($challenge_info, $challenge_mission_victories, $mmrpg_field_index, $mmrpg_robot_index);
+                                                $option_markup = rpg_mission_challenge::print_editor_option_markup($challenge_info, $challenge_mission_victories, $mmrpg_index_fields, $mmrpg_index_robots);
                                                 $challenge_rewards_options .= $option_markup;
                                             }
                                             if (!empty($group_kind)){ $challenge_rewards_options .= '</optgroup>'; }
@@ -3085,9 +3088,9 @@ class rpg_player extends rpg_object {
                                                 $this_challenge_name = $challenge_info['challenge_name'];
                                                 if (!empty($challenge_mission_victories[$this_challenge_id])){ $this_challenge_name = '&#9733; '.$this_challenge_name; }
                                                 $this_field_data = json_decode($challenge_info['challenge_field_data'], true);
-                                                $this_field_info1 = $mmrpg_field_index[$this_field_data['field_background']];
-                                                $this_field_info2 = $mmrpg_field_index[$this_field_data['field_foreground']];
-                                                $this_challenge_title = rpg_mission_challenge::print_editor_title_markup($challenge_info, $challenge_mission_victories, $mmrpg_field_index, $mmrpg_robot_index);
+                                                $this_field_info1 = $mmrpg_index_fields[$this_field_data['field_background']];
+                                                $this_field_info2 = $mmrpg_index_fields[$this_field_data['field_foreground']];
+                                                $this_challenge_title = rpg_mission_challenge::print_editor_title_markup($challenge_info, $challenge_mission_victories, $mmrpg_index_fields, $mmrpg_index_robots);
                                                 $this_challenge_title_plain = strip_tags(str_replace('<br />', '&#10;', $this_challenge_title));
                                                 $this_challenge_title_tooltip = htmlentities($this_challenge_title, ENT_QUOTES, 'UTF-8');
                                                 $this_challenge_title_html = str_replace(' ', '&nbsp;', $this_challenge_name);
@@ -3223,19 +3226,19 @@ class rpg_player extends rpg_object {
                                             foreach ($player_info['player_fields_current'] AS $player_field){
 
                                                 if ($player_field['field_token'] == '*'){ continue; }
-                                                elseif (!isset($mmrpg_field_index[$player_field['field_token']])){ continue; }
+                                                elseif (!isset($mmrpg_index_fields[$player_field['field_token']])){ continue; }
                                                 elseif ($field_key > 7){ continue; }
-                                                $this_field = rpg_field::parse_index_info($mmrpg_field_index[$player_field['field_token']]);
+                                                $this_field = rpg_field::parse_index_info($mmrpg_index_fields[$player_field['field_token']]);
                                                 $this_field_token = $this_field['field_token'];
                                                 $this_robot_token = $this_field['field_master'];
                                                 $this_robot = rpg_robot::parse_index_info($mmrpg_database_robots[$this_robot_token]);
                                                 $this_field_name = $this_field['field_name'];
                                                 $this_field_type = !empty($this_field['field_type']) ? $this_field['field_type'] : false;
                                                 $this_field_type2 = !empty($this_field['field_type2']) ? $this_field['field_type2'] : false;
-                                                if (!empty($this_field_type) && !empty($mmrpg_index['types'][$this_field_type])){
-                                                    $this_field_type = $mmrpg_index['types'][$this_field_type]['type_name'].' Type';
-                                                    if (!empty($this_field_type2) && !empty($mmrpg_index['types'][$this_field_type2])){
-                                                        $this_field_type = str_replace(' Type', ' / '.$mmrpg_index['types'][$this_field_type2]['type_name'].' Type', $this_field_type);
+                                                if (!empty($this_field_type) && !empty($mmrpg_index_types[$this_field_type])){
+                                                    $this_field_type = $mmrpg_index_types[$this_field_type]['type_name'].' Type';
+                                                    if (!empty($this_field_type2) && !empty($mmrpg_index_types[$this_field_type2])){
+                                                        $this_field_type = str_replace(' Type', ' / '.$mmrpg_index_types[$this_field_type2]['type_name'].' Type', $this_field_type);
                                                     }
                                                 } else {
                                                     $this_field_type = '';
@@ -3366,7 +3369,7 @@ class rpg_player extends rpg_object {
     public static function print_editor_select_markup($player_info, $player_key = 0, $player_rewards = array(), $player_settings = array()){
 
         // Define the global variables
-        global $mmrpg_index, $this_current_uri, $this_current_url, $db;
+        global $this_current_uri, $this_current_url, $db;
         global $allowed_edit_players;
         global $allowed_edit_data_count, $allowed_edit_player_count, $first_player_token, $global_allow_editing;
         global $key_counter;

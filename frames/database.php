@@ -403,7 +403,7 @@ if (true){
                                                         if (!empty($robot_info['robot_weaknesses'])){
                                                             $temp_string = array();
                                                             foreach ($robot_info['robot_weaknesses'] AS $robot_weakness){
-                                                                $temp_string[] = '<span class="robot_weakness robot_type robot_type_'.$robot_weakness.'">'.$mmrpg_index['types'][$robot_weakness]['type_name'].'</span>';
+                                                                $temp_string[] = '<span class="robot_weakness robot_type robot_type_'.$robot_weakness.'">'.$mmrpg_database_types[$robot_weakness]['type_name'].'</span>';
                                                             }
                                                             echo implode(' ', $temp_string);
                                                         } else {
@@ -433,7 +433,7 @@ if (true){
                                                         if (!empty($robot_info['robot_resistances'])){
                                                             $temp_string = array();
                                                             foreach ($robot_info['robot_resistances'] AS $robot_resistance){
-                                                                $temp_string[] = '<span class="robot_resistance robot_type robot_type_'.$robot_resistance.'">'.$mmrpg_index['types'][$robot_resistance]['type_name'].'</span>';
+                                                                $temp_string[] = '<span class="robot_resistance robot_type robot_type_'.$robot_resistance.'">'.$mmrpg_database_types[$robot_resistance]['type_name'].'</span>';
                                                             }
                                                             echo implode(' ', $temp_string);
                                                         } else {
@@ -462,7 +462,7 @@ if (true){
                                                         if (!empty($robot_info['robot_affinities'])){
                                                             $temp_string = array();
                                                             foreach ($robot_info['robot_affinities'] AS $robot_affinity){
-                                                                $temp_string[] = '<span class="robot_affinity robot_type robot_type_'.$robot_affinity.'">'.$mmrpg_index['types'][$robot_affinity]['type_name'].'</span>';
+                                                                $temp_string[] = '<span class="robot_affinity robot_type robot_type_'.$robot_affinity.'">'.$mmrpg_database_types[$robot_affinity]['type_name'].'</span>';
                                                             }
                                                             echo implode(' ', $temp_string);
                                                         } else {
@@ -491,7 +491,7 @@ if (true){
                                                         if (!empty($robot_info['robot_immunities'])){
                                                             $temp_string = array();
                                                             foreach ($robot_info['robot_immunities'] AS $robot_immunity){
-                                                                $temp_string[] = '<span class="robot_immunity robot_type robot_type_'.$robot_immunity.'">'.$mmrpg_index['types'][$robot_immunity]['type_name'].'</span>';
+                                                                $temp_string[] = '<span class="robot_immunity robot_type robot_type_'.$robot_immunity.'">'.$mmrpg_database_types[$robot_immunity]['type_name'].'</span>';
                                                             }
                                                             echo implode(' ', $temp_string);
                                                         } else {
@@ -571,7 +571,7 @@ if (true){
                                                             $this_ability_name = $this_ability['ability_name'];
                                                             $this_ability_type = !empty($this_ability['ability_type']) ? $this_ability['ability_type'] : false;
                                                             $this_ability_type2 = !empty($this_ability['ability_type2']) ? $this_ability['ability_type2'] : false;
-                                                            if (!empty($this_ability_type) && !empty($mmrpg_index['types'][$this_ability_type])){ $this_ability_type = $mmrpg_index['types'][$this_ability_type]['type_name'].' Type'; }
+                                                            if (!empty($this_ability_type) && !empty($mmrpg_database_types[$this_ability_type])){ $this_ability_type = $mmrpg_database_types[$this_ability_type]['type_name'].' Type'; }
                                                             else { $this_ability_type = ''; }
                                                             $this_ability_damage = !empty($this_ability['ability_damage']) ? $this_ability['ability_damage'] : 0;
                                                             $this_ability_recovery = !empty($this_ability['ability_recovery']) ? $this_ability['ability_recovery'] : 0;

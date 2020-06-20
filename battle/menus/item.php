@@ -140,8 +140,8 @@ ob_start();
 
                 // Define the item title details text
                 $temp_item_details = $temp_item->item_name.' <br />';
-                //$temp_item_details .= ' ('.(!empty($temp_item->item_type) ? $mmrpg_index['types'][$temp_item->item_type]['type_name'] : 'Neutral');
-                //if (!empty($temp_item->item_type2)){ $temp_item_details .= ' / '.$mmrpg_index['types'][$temp_item->item_type2]['type_name']; }
+                //$temp_item_details .= ' ('.(!empty($temp_item->item_type) ? $battle_types_index[$temp_item->item_type]['type_name'] : 'Neutral');
+                //if (!empty($temp_item->item_type2)){ $temp_item_details .= ' / '.$battle_types_index[$temp_item->item_type2]['type_name']; }
                 //else { $temp_item_details .= ' Type'; }
                 //$temp_item_details .= ') <br />';
                 if ($temp_kind == 'damage'){ $temp_item_details .= $temp_damage.$temp_damage_unit.' Damage'; }
@@ -169,8 +169,8 @@ ob_start();
                 $temp_item_label = '<span class="multi">';
                 $temp_item_label .= '<span class="maintext">'.$temp_item->item_name.'</span>';
                 $temp_item_label .= '<span class="subtext">';
-                    $temp_item_label .= (!empty($temp_type) ? $mmrpg_index['types'][$temp_item->item_type]['type_name'].' ' : 'Neutral ');
-                    if (!empty($temp_type2)){ $temp_item_label .= ' / '.$mmrpg_index['types'][$temp_item->item_type2]['type_name']; }
+                    $temp_item_label .= (!empty($temp_type) ? $battle_types_index[$temp_item->item_type]['type_name'].' ' : 'Neutral ');
+                    if (!empty($temp_type2)){ $temp_item_label .= ' / '.$battle_types_index[$temp_item->item_type2]['type_name']; }
                     else { $temp_item_label .= ($temp_kind == 'damage' ? 'Damage' : ($temp_kind == 'recovery' ? 'Recovery' : ($temp_kind == 'multi' ? 'Effects' : 'Special'))); }
                 $temp_item_label .= '</span>';
                 $temp_item_label .= '<span class="subtext">';
