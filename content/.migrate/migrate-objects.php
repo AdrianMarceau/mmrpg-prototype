@@ -1,7 +1,9 @@
 <?
 
 // Require the top file for paths and stuff
-require('../top.php');
+$migrate_dir = str_replace('\\', '/', dirname(__FILE__)).'/';
+$base_dir = dirname(dirname($migrate_dir)).'/';
+require($base_dir.'top.php');
 
 // Define the header type so it's easier to display stuff
 header('Content-type: text/plain;');
@@ -16,7 +18,7 @@ ob_implicit_flush(true);
 ob_start();
 
 // Require the function definitions needed for migration stuff
-require('migrate-objects_xfunctions.php');
+require($migrate_dir.'migrate-objects_xfunctions.php');
 
 // Proceed based on the KIND of object we're migrating
 $allowed_modes = array('full', 'update');
@@ -27,8 +29,8 @@ $migration_filter = !empty($_REQUEST['filter']) && is_string($_REQUEST['filter']
 $migration_mode = !empty($_REQUEST['mode']) ? strtolower(trim($_REQUEST['mode'])) : $allowed_modes[0];
 if (!empty($migration_kind)){ $migration_kind_singular = substr($migration_kind, -3, 3) === 'ies' ? str_replace('ies', 'y', $migration_kind) : rtrim($migration_kind, 's'); }
 else { $migration_kind_singular = false; }
-if (!empty($migration_kind) && file_exists('migrate-objects_'.$migration_kind.'.php')){
-    require_once('migrate-objects_'.$migration_kind.'.php');
+if (!empty($migration_kind) && file_exists($migrate_dir.'migrate-objects_'.$migration_kind.'.php')){
+    require_once($migrate_dir.'migrate-objects_'.$migration_kind.'.php');
 } else {
     ob_echo('Migration kind "'.$migration_kind.'" not supported or file not ready yet!');
 }

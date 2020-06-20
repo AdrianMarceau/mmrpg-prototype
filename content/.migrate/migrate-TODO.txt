@@ -1,0 +1,59 @@
+Create migration scripts for all the CONTENT directories
+-  types  [DONE]
+-  battles  [DONE]
+-  players  [DONE]
+-  fields  [DONE]
+-  robots  [DONE]
+-  abilities  [DONE]
+-  items  [DONE]
+
+Create htaccess rules OR script to point sprites to new content directories
+-  players
+-  fields
+-  robots
+-  abilities
+-  items
+
+Update code to point to new CONTENT directories
+-  types
+-  battles
+-  players
+-  fields
+-  robots
+-  abilities
+-  items
+
+Update code to point to new OBJECT image locations
+-  items/attachment-defeat -> objects/defeat-explosion [DONE]
+-  items/freeze-heart -> objects/heart-cores/freeze
+-  items/challenge-marker_base -> objects/challenge-markers/base
+-  items/field-support -> content/items/_effects/type-arrows_boost-1
+-
+
+Update code for abilities to work with new _actions and _effects directories
+-  action-chargeweapons -> abilities/_actions/chargeweapons
+-  action-devpower-clearmission -> abilities/_actions/devpower-clearmission
+-  action-noweapons -> abilities/_actions/noweapons
+-  action-unequipitem -> abilities/_actions/unequipitem
+-  disco-fever:ability-effect_black-overlay -> abilities/_effects/black-overlay
+-  ability_function_overdrive():fullscreen-black -> abilities/_effects/black-overlay
+-  abilities/field-support   -> abilities/_effects/type-arrows_boost-1
+-  abilities/field-support-2 -> abilities/_effects/type-arrows_boost-2
+-  abilities/field-support-3 -> abilities/_effects/type-arrows_break-1
+-  abilities/field-support-4 -> abilities/_effects/type-arrows_break-2
+
+
+Update fields to pull objects from other places
+-  update steel-mill to incorporate the fire-bolt into the background
+-  update industrial-facility to incorporate the gear into the background
+-  move gentle-countryside's mini-light-lab into field folder, update code somehow
+-
+
+Update the admin panel to work with the new sprite directories
+-  players
+-  robots
+-  fields
+
+Update the admin panel with editors for the final object types
+-  abilities
+-  items
