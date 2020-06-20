@@ -32,15 +32,8 @@ function clean_path($path){ return str_replace(MMRPG_CONFIG_ROOTDIR, '/', $path)
 // Define the directory where all content is cloned into
 define('MMRPG_BASE_CONTENT_DIR', MMRPG_CONFIG_ROOTDIR.'content/');
 
-// Define an index of allowed content directories and their github URLs
-$content_repos_index = array();
-$content_repos_index['types'] = 'https://github.com/AdrianMarceau/mmrpg-prototype_types.git';
-$content_repos_index['players'] = 'https://github.com/AdrianMarceau/mmrpg-prototype_players.git';
-$content_repos_index['robots'] = 'https://github.com/AdrianMarceau/mmrpg-prototype_robots.git';
-$content_repos_index['abilities'] = 'https://github.com/AdrianMarceau/mmrpg-prototype_abilities.git';
-$content_repos_index['items'] = 'https://github.com/AdrianMarceau/mmrpg-prototype_items.git';
-$content_repos_index['fields'] = 'https://github.com/AdrianMarceau/mmrpg-prototype_fields.git';
-$content_repos_index['battles'] = 'https://github.com/AdrianMarceau/mmrpg-prototype_battles.git';
+// Require the repository index for looping
+require($clone_dir.'repo-index.php');
 
 // Proceed based on the KIND of object we're migrating
 $allowed_clone_types = array_keys($content_repos_index);
@@ -92,8 +85,14 @@ if (!empty($clone_kind)){
     ob_echo($subtitle);
     ob_echo(str_repeat('=', strlen($subtitle)));
 
+} elseif (!empty($clone_kind)) {
+
+    ob_echo('Repo kind "'.$clone_kind.'" not supported or repo not ready yet!');
+
 } else {
-    ob_echo('Clone kind "'.$clone_kind.'" not supported or repo not ready yet!');
+
+    ob_echo('Repo kind not provided!');
+
 }
 
 // Empty the output buffer (or whatever is left)
