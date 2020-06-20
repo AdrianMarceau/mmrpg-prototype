@@ -94,12 +94,12 @@ class rpg_field extends rpg_object {
         $this->field_base_music = isset($this_fieldinfo['field_base_music']) ? $this_fieldinfo['field_base_music'] : $this->field_music;
 
         // Collect any functions associated with this field
-        $this->field_functions = isset($this_fieldinfo['field_functions']) ? $this_fieldinfo['field_functions'] : 'fields/field.php';
-        $temp_functions_path = file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$this->field_functions) ? $this->field_functions : 'fields/field.php';
-        require(MMRPG_CONFIG_ROOTDIR.'data/'.$temp_functions_path);
-        $this->field_function = isset($field['field_function']) ? $field['field_function'] : function(){};
-        $this->field_function_onload = isset($field['field_function_onload']) ? $field['field_function_onload'] : function(){};
-        unset($field);
+        $temp_functions_path = MMRPG_CONFIG_FIELDS_CONTENT_PATH.$this->field_token.'/functions.php';
+        if (file_exists($temp_functions_path)){ require($temp_functions_path); }
+        else { $functions = array(); }
+        $this->field_function = isset($functions['field_function']) ? $functions['field_function'] : function(){};
+        $this->field_function_onload = isset($functions['field_function_onload']) ? $functions['field_function_onload'] : function(){};
+        unset($functions);
 
         // Trigger the onload function if it exists
         $this->trigger_onload();
@@ -175,7 +175,6 @@ class rpg_field extends rpg_object {
             'field_foreground',
             'field_foreground_frame',
             'field_foreground_attachments',
-            'field_functions',
             'field_flag_hidden',
             'field_flag_complete',
             'field_flag_published',

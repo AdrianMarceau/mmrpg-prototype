@@ -231,12 +231,12 @@ class rpg_battle extends rpg_object {
         $this->battle_complete_redirect_seed = !empty($this_battleinfo['battle_complete_redirect_seed']) ? $this_battleinfo['battle_complete_redirect_seed'] : array();
 
         // Collect any functions associated with this battle
-        $this->battle_functions = isset($this_battleinfo['battle_functions']) ? $this_battleinfo['battle_functions'] : 'battles/battle.php';
-        $temp_functions_path = file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$this->battle_functions) ? $this->battle_functions : 'battles/battle.php';
-        require(MMRPG_CONFIG_ROOTDIR.'data/'.$temp_functions_path);
-        $this->battle_function = isset($battle['battle_function']) ? $battle['battle_function'] : function(){};
-        $this->battle_function_onload = isset($battle['battle_function_onload']) ? $battle['battle_function_onload'] : function(){};
-        unset($battle);
+        $temp_functions_path = MMRPG_CONFIG_BATTLES_CONTENT_PATH.$this->battle_token.'/functions.php';
+        if (file_exists($temp_functions_path)){ require($temp_functions_path); }
+        else { $functions = array(); }
+        $this->battle_function = isset($functions['battle_function']) ? $functions['battle_function'] : function(){};
+        $this->battle_function_onload = isset($functions['battle_function_onload']) ? $functions['battle_function_onload'] : function(){};
+        unset($functions);
 
         // Trigger the onload function if it exists
         $this->trigger_onload();

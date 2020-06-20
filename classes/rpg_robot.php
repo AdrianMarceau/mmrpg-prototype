@@ -199,15 +199,15 @@ class rpg_robot extends rpg_object {
         if ($this->robot_base_speed > MMRPG_SETTINGS_STATS_MAX){ $this->robot_base_speed = MMRPG_SETTINGS_STATS_MAX; }
 
         // Collect any functions associated with this robot
-        $this->robot_functions = isset($this_robotinfo['robot_functions']) ? $this_robotinfo['robot_functions'] : 'robots/robot.php';
-        $temp_functions_path = file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$this->robot_functions) ? $this->robot_functions : 'robots/robot.php';
-        require(MMRPG_CONFIG_ROOTDIR.'data/'.$temp_functions_path);
-        $this->robot_function = isset($robot['robot_function']) ? $robot['robot_function'] : function(){};
-        $this->robot_function_onload = isset($robot['robot_function_onload']) ? $robot['robot_function_onload'] : function(){};
-        $this->robot_function_ondamage = isset($robot['robot_function_ondamage']) ? $robot['robot_function_ondamage'] : function(){};
-        $this->robot_function_onrecovery = isset($robot['robot_function_onrecovery']) ? $robot['robot_function_onrecovery'] : function(){};
-        $this->robot_function_ondisabled = isset($robot['robot_function_ondisabled']) ? $robot['robot_function_ondisabled'] : function(){};
-        unset($robot);
+        $temp_functions_path = MMRPG_CONFIG_ROBOTS_CONTENT_PATH.$this->robot_token.'/functions.php';
+        if (file_exists($temp_functions_path)){ require($temp_functions_path); }
+        else { $functions = array(); }
+        $this->robot_function = isset($functions['robot_function']) ? $functions['robot_function'] : function(){};
+        $this->robot_function_onload = isset($functions['robot_function_onload']) ? $functions['robot_function_onload'] : function(){};
+        $this->robot_function_ondamage = isset($functions['robot_function_ondamage']) ? $functions['robot_function_ondamage'] : function(){};
+        $this->robot_function_onrecovery = isset($functions['robot_function_onrecovery']) ? $functions['robot_function_onrecovery'] : function(){};
+        $this->robot_function_ondisabled = isset($functions['robot_function_ondisabled']) ? $functions['robot_function_ondisabled'] : function(){};
+        unset($functions);
 
         // If the omega settings have not been defined yet, do so now
         if (empty($this->flags['calculate_omega_types'])){

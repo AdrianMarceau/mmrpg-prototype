@@ -162,12 +162,13 @@ class rpg_item extends rpg_object {
         $this->item_base_target = isset($this_iteminfo['item_base_target']) ? $this_iteminfo['item_base_target'] : $this->item_target;
 
         // Collect any functions associated with this item
-        $this->item_functions = isset($this_iteminfo['item_functions']) ? $this_iteminfo['item_functions'] : 'items/item.php';
-        $temp_functions_path = file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$this->item_functions) ? $this->item_functions : 'items/item.php';
-        require(MMRPG_CONFIG_ROOTDIR.'data/'.$temp_functions_path);
-        $this->item_function = isset($item['item_function']) ? $item['item_function'] : function(){};
-        $this->item_function_onload = isset($item['item_function_onload']) ? $item['item_function_onload'] : function(){};
-        unset($item);
+        $temp_functions_path = MMRPG_CONFIG_ITEMS_CONTENT_PATH.$this->item_token.'/functions.php';
+        if (file_exists($temp_functions_path)){ require($temp_functions_path); }
+        else { $functions = array(); }
+        $this->item_function = isset($functions['item_function']) ? $functions['item_function'] : function(){};
+        $this->item_function_onload = isset($functions['item_function_onload']) ? $functions['item_function_onload'] : function(){};
+        $this->item_function_attachment = isset($functions['item_function_attachment']) ? $functions['item_function_attachment'] : function(){};
+        unset($functions);
 
         // Define a the default item results
         $this->item_results_reset();
@@ -321,9 +322,6 @@ class rpg_item extends rpg_object {
     public function get_base_target(){ return $this->get_info('item_base_target'); }
     public function set_base_target($value){ $this->set_info('item_base_target', $value); }
     public function reset_target(){ $this->set_info('item_target', $this->get_base_target()); }
-
-    public function get_functions(){ return $this->get_info('item_functions'); }
-    public function set_functions($value){ $this->set_info('item_functions', $value); }
 
     public function get_image(){ return $this->get_info('item_image'); }
     public function set_image($value){ $this->set_info('item_image', $value); }
@@ -799,7 +797,6 @@ class rpg_item extends rpg_object {
             'attachment_frame_offset',
             'attachment_frame_styles',
             'attachment_frame_classes',
-            'item_functions',
             'item_flag_hidden',
             'item_flag_complete',
             'item_flag_published',
@@ -1317,7 +1314,6 @@ class rpg_item extends rpg_object {
             'item_recovery2_percent' => $this->item_recovery2_percent,
             'item_accuracy' => $this->item_accuracy,
             'item_target' => $this->item_target,
-            'item_functions' => $this->item_functions,
             'item_results' => $this->item_results,
             'attachment_results' => $this->attachment_results,
             'item_options' => array(), //$this->item_options,

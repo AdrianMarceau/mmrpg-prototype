@@ -162,13 +162,13 @@ class rpg_ability extends rpg_object {
         $this->ability_base_target = isset($this_abilityinfo['ability_base_target']) ? $this_abilityinfo['ability_base_target'] : $this->ability_target;
 
         // Collect any functions associated with this ability
-        $this->ability_functions = isset($this_abilityinfo['ability_functions']) ? $this_abilityinfo['ability_functions'] : 'abilities/ability.php';
-        $temp_functions_path = file_exists(MMRPG_CONFIG_ROOTDIR.'data/'.$this->ability_functions) ? $this->ability_functions : 'abilities/ability.php';
-        require(MMRPG_CONFIG_ROOTDIR.'data/'.$temp_functions_path);
-        $this->ability_function = isset($ability['ability_function']) ? $ability['ability_function'] : function(){};
-        $this->ability_function_onload = isset($ability['ability_function_onload']) ? $ability['ability_function_onload'] : function(){};
-        $this->ability_function_attachment = isset($ability['ability_function_attachment']) ? $ability['ability_function_attachment'] : function(){};
-        unset($ability);
+        $temp_functions_path = MMRPG_CONFIG_ABILITIES_CONTENT_PATH.$this->ability_token.'/functions.php';
+        if (file_exists($temp_functions_path)){ require($temp_functions_path); }
+        else { $functions = array(); }
+        $this->ability_function = isset($functions['ability_function']) ? $functions['ability_function'] : function(){};
+        $this->ability_function_onload = isset($functions['ability_function_onload']) ? $functions['ability_function_onload'] : function(){};
+        $this->ability_function_attachment = isset($functions['ability_function_attachment']) ? $functions['ability_function_attachment'] : function(){};
+        unset($functions);
 
         // Define a the default ability results
         $this->ability_results_reset();
@@ -1351,7 +1351,6 @@ class rpg_ability extends rpg_object {
             'ability_recovery2_percent' => $this->ability_recovery2_percent,
             'ability_accuracy' => $this->ability_accuracy,
             'ability_target' => $this->ability_target,
-            'ability_functions' => $this->ability_functions,
             'ability_results' => $this->ability_results,
             'attachment_results' => $this->attachment_results,
             'ability_options' => array(), //$this->ability_options,

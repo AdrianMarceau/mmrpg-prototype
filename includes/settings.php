@@ -19,6 +19,16 @@ unset($THIS_DOMAIN);
 // Define the base cache paths for the system
 define('MMRPG_CONFIG_CACHE_PATH', MMRPG_CONFIG_ROOTDIR.'_cache/');
 
+// Define the directory where all content data/functions/images are stored
+define('MMRPG_CONFIG_CONTENT_PATH', MMRPG_CONFIG_ROOTDIR.'content/');
+define('MMRPG_CONFIG_TYPES_CONTENT_PATH', MMRPG_CONFIG_CONTENT_PATH.'types/');
+define('MMRPG_CONFIG_PLAYERS_CONTENT_PATH', MMRPG_CONFIG_CONTENT_PATH.'players/');
+define('MMRPG_CONFIG_ROBOTS_CONTENT_PATH', MMRPG_CONFIG_CONTENT_PATH.'robots/');
+define('MMRPG_CONFIG_ABILITIES_CONTENT_PATH', MMRPG_CONFIG_CONTENT_PATH.'abilities/');
+define('MMRPG_CONFIG_ITEMS_CONTENT_PATH', MMRPG_CONFIG_CONTENT_PATH.'items/');
+define('MMRPG_CONFIG_FIELDS_CONTENT_PATH', MMRPG_CONFIG_CONTENT_PATH.'fields/');
+define('MMRPG_CONFIG_BATTLES_CONTENT_PATH', MMRPG_CONFIG_CONTENT_PATH.'battles/');
+
 // Define the cache and index paths for battles
 define('MMRPG_CONFIG_BATTLES_INDEX_PATH', MMRPG_CONFIG_ROOTDIR.'data/battles/');
 define('MMRPG_CONFIG_BATTLES_CACHE_PATH', MMRPG_CONFIG_CACHE_PATH.'cache.battles.'.MMRPG_CONFIG_CACHE_DATE.'.php');
