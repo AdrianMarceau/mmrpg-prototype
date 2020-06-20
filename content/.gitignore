@@ -1,7 +1,3 @@
-/abilities/*
-/battles/*
-/fields/*
-/items/*
-/players/*
-/robots/*
-/types/*
+*
+!.gitignore
+!.migrate
