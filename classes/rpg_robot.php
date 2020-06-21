@@ -614,9 +614,6 @@ class rpg_robot extends rpg_object {
     public function get_base_rewards(){ return $this->get_info('robot_base_rewards'); }
     public function set_base_rewards($value){ $this->set_info('robot_base_rewards', $value); }
 
-    public function get_functions(){ return $this->get_info('robot_functions'); }
-    public function set_functions($value){ $this->set_info('robot_functions', $value); }
-
     public function get_image(){ return $this->get_info('robot_image'); }
     public function set_image($value){ $this->set_info('robot_image', $value); }
     public function get_base_image(){ return $this->get_info('robot_base_image'); }
@@ -2358,7 +2355,6 @@ class rpg_robot extends rpg_object {
             'robot_quotes_taunt',
             'robot_quotes_victory',
             'robot_quotes_defeat',
-            'robot_functions',
             'robot_flag_hidden',
             'robot_flag_complete',
             'robot_flag_unlockable',
@@ -2769,7 +2765,6 @@ class rpg_robot extends rpg_object {
             'robot_attachments' => $this->robot_attachments,
             'robot_quotes' => $this->robot_quotes,
             'robot_rewards' => $this->robot_rewards,
-            'robot_functions' => $this->robot_functions,
             'robot_base_name' => $this->robot_base_name,
             'robot_base_token' => $this->robot_base_token,
             'robot_base_image' => $this->robot_base_image,

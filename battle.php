@@ -88,10 +88,14 @@ if (!isset($mmrpg_index_players) || empty($mmrpg_index_players)){
     $mmrpg_index_players = rpg_player::get_index(true);
 }
 
+// Collect the robots index if not already populated
+if (!isset($mmrpg_index_robots) || empty($mmrpg_index_robots)){
+    $mmrpg_index_robots = rpg_robot::get_index(true);
+}
+
 // Collect this player's index data if available
 if (!empty($this_player_token) && isset($mmrpg_index_players[$this_player_token])){
     $this_player_data = $mmrpg_index_players[$this_player_token];
-
 
     if (empty($this_player_data['player_id'])){
         $this_player_id = !empty($this_player_id) ? $this_player_id : 1;
@@ -101,20 +105,21 @@ if (!empty($this_player_token) && isset($mmrpg_index_players[$this_player_token]
 
     if (!empty($this_player_robots)){
         $allowed_robots = strstr($this_player_robots, ',') ? explode(',', $this_player_robots) : array($this_player_robots);
-        foreach ($this_player_data['player_robots'] AS $key => $data){
-            if (!in_array($data['robot_id'].'_'.$data['robot_token'], $allowed_robots)){
-                unset($this_player_data['player_robots'][$key]);
-            } elseif (!mmrpg_prototype_robot_unlocked($this_player_token, $data['robot_token'])){
-                unset($allowed_robots[array_search($data['robot_id'].'_'.$data['robot_token'], $allowed_robots)]);
-                unset($this_player_data['player_robots'][$key]);
+        $this_player_data['player_robots'] = array();
+        foreach ($allowed_robots AS $key => $robot_string){
+            list($robot_id, $robot_token) = explode('_', $robot_string);
+            if (mmrpg_prototype_robot_unlocked($this_player_token, $robot_token)){
+                $this_player_data['player_robots'][] = array('robot_id' => $robot_id, 'robot_token' => $robot_token);
             }
         }
         $this_player_robots = implode(',', $allowed_robots);
         $this_player_data['player_robots'] = array_values($this_player_data['player_robots']);
-        //die('<pre>'.print_r($this_player_robots, true).'</pre>');
-        //die('<pre>'.print_r($allowed_robots, true).'</pre>');
-        //die('<pre>'.print_r($this_player_data, true).'</pre>');
+        //echo('<pre>'.print_r($this_player_robots, true).'</pre>');
+        //echo('<pre>'.print_r($allowed_robots, true).'</pre>');
+        //echo('<pre>'.print_r($this_player_data, true).'</pre>');
+        //exit();
     }
+
 }
 else {
     $this_player_data = false;
@@ -129,6 +134,10 @@ if (!empty($target_player_token) && isset($mmrpg_index_players[$target_player_to
         $target_player_data['player_id'] = $target_player_id;
     }
     $target_player_data['user_id'] = $target_player_data['player_id'];
+    //echo('<pre>'.print_r($this_player_robots, true).'</pre>');
+    //echo('<pre>'.print_r($allowed_robots, true).'</pre>');
+    //echo('<pre>'.print_r($target_player_data, true).'</pre>');
+    //exit();
 
 }
 elseif (!empty($this_battle_data['battle_target_player']['player_token']) && isset($mmrpg_index_players[$this_battle_data['battle_target_player']['player_token']])){
@@ -148,6 +157,10 @@ elseif (!empty($this_battle_data['battle_target_player']['player_token']) && iss
         }
         //die('<pre>'.print_r($target_player_data, true).'</pre>');
     }
+    //echo('<pre>'.print_r($target_player_robots, true).'</pre>');
+    //echo('<pre>'.print_r($this_battle_data, true).'</pre>');
+    //echo('<pre>'.print_r($target_player_data, true).'</pre>');
+    //exit();
 
 }
 else {

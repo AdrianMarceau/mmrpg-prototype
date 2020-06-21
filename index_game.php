@@ -10,6 +10,9 @@ if (MMRPG_CONFIG_MAINTENANCE_MODE && !in_array($_SERVER['REMOTE_ADDR'], array('9
 // Include the TOP file
 require_once('top.php');
 
+// Set a time limit for game scripts to prevent overdoing it
+if (defined('MMRPG_CONFIG_IS_LIVE') && MMRPG_CONFIG_IS_LIVE === false){ set_time_limit(5); }
+
 // If the user is not logged in, don't allow them here
 if (!rpg_game::is_user()){
     header('Location: '.MMRPG_CONFIG_ROOTURL.'file/load/');
