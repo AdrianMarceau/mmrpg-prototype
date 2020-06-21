@@ -360,8 +360,6 @@
 
             // REFORMAT or OPTIMIZE data for provided fields where necessary
 
-            $form_data['field_functions'] = 'fields/'.$form_data['field_token'].'/functions.php';
-
             if (isset($form_data['field_master2'])){ $form_data['field_master2'] = !empty($form_data['field_master2']) ? json_encode(array($form_data['field_master2'])) : ''; }
 
             if (isset($form_data['field_mechas'])){ $form_data['field_mechas'] = !empty($form_data['field_mechas']) ? json_encode($form_data['field_mechas']) : ''; }

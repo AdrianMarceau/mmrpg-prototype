@@ -369,8 +369,6 @@
 
             // REFORMAT or OPTIMIZE data for provided fields where necessary
 
-            $form_data['player_functions'] = 'players/'.$form_data['player_token'].'/functions.php';
-
             if (!empty($form_data['player_abilities_rewards'])){
                 $new_rewards = array();
                 $new_rewards_tokens = array();
@@ -554,6 +552,22 @@
                 list($date, $time) = explode('-', date('Ymd-Hi'));
                 $db->update('mmrpg_config', array('config_value' => $date), "config_group = 'global' AND config_name = 'cache_date'");
                 $db->update('mmrpg_config', array('config_value' => $time), "config_group = 'global' AND config_name = 'cache_time'");
+            }
+
+            // If successful, we need to update the JSON file
+            if ($form_success){
+                // Calculate the data file path and then write to the new/recreated file
+                $content_json_path = MMRPG_CONFIG_PLAYERS_CONTENT_PATH.$update_data['player_token'].'/data.json';
+                if (file_exists($content_json_path)){ unlink($content_json_path); }
+                $content_json_data = array_merge($player_data, $update_data);
+                unset($content_json_data['player_id']);
+                $h = fopen($content_json_path, 'w');
+                fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT));
+                fclose($h);
+                // If the player tokens have changed, delete the old one's data file
+                if ($old_player_token !== $update_data['player_token']){
+                    // ...
+                }
             }
 
             // We're done processing the form, we can exit

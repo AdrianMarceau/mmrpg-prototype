@@ -382,8 +382,6 @@
 
             // REFORMAT or OPTIMIZE data for provided fields where necessary
 
-            $form_data['robot_functions'] = 'robots/'.$form_data['robot_token'].'/functions.php';
-
             if (isset($form_data['robot_core'])){
                 // Fix any core ordering problems (like selecting Neutral + anything)
                 $cores = array_values(array_filter(array($form_data['robot_core'], $form_data['robot_core2'])));
