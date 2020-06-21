@@ -93,18 +93,19 @@ class rpg_battle extends rpg_object {
 
         // Otherwise, continue normally
         global $db;
+
         // Create the index as an empty array
         $db->INDEX['BATTLES'] = array();
+
         // Default the battles index to an empty array
         $mmrpg_battles_index = array();
-        $mmrpg_battles_cache_path = MMRPG_CONFIG_CACHE_PATH.'cache.battles.'.MMRPG_CONFIG_CACHE_DATE.'.php';
+        $mmrpg_battles_cache_path = MMRPG_CONFIG_CACHE_PATH.'cache.battles.'.MMRPG_CONFIG_CACHE_DATE.'.json';
+
         // If caching is turned OFF, or a cache has not been created
         if (!MMRPG_CONFIG_CACHE_INDEXES || !file_exists($mmrpg_battles_cache_path)){
             // Start indexing the battle data files
-            $battles_cache_markup = rpg_battle::index_battle_data();
-            // Implode the markup into a single string and enclose in PHP tags
-            $battles_cache_markup = implode('', $battles_cache_markup);
-            $battles_cache_markup = "<?\n".$battles_cache_markup."\n?>";
+            $mmrpg_battles_index = rpg_battle::index_battle_data(false);
+            $battles_cache_markup = json_encode($mmrpg_battles_index);
             // Write the index to a cache file, if caching is enabled
             $battles_cache_file = @fopen($mmrpg_battles_cache_path, 'w');
             if (!empty($battles_cache_file)){
@@ -112,72 +113,65 @@ class rpg_battle extends rpg_object {
                 @fclose($battles_cache_file);
             }
         }
-        // Include the cache file so it can be evaluated
-        require_once($mmrpg_battles_cache_path);
-        // Return false if we got nothing from the index
-        if (empty($mmrpg_battles_index)){ return false; }
+        // Otherwise pull the cache markup directly from the file
+        else {
+            // Pull the battle index markup from the JSON file and decompress
+            $battles_cache_markup = file_get_contents($mmrpg_battles_cache_path);
+            $mmrpg_battles_index = json_decode($battles_cache_markup, true);
+        }
+
         // Loop through the battles and index them after serializing
         foreach ($mmrpg_battles_index AS $token => $array){ $db->INDEX['BATTLES'][$token] = json_encode($array); }
         $db->INDEX['BATTLES_RAW'] = $db->INDEX['BATTLES'];
+
         // Additionally, include any dynamic session-based battles
         if (!empty($_SESSION['GAME']['values']['battle_index'])){
             // The session-based battles exist, so merge them with the index
             $db->INDEX['BATTLES'] = array_merge($db->INDEX['BATTLES'], $_SESSION['GAME']['values']['battle_index']);
         }
+
         // Return true on success
         return true;
 
     }
 
     // Define the function used for scanning the battle directory
-    public static function index_battle_data($this_path = ''){
+    public static function index_battle_data($return_json = true){
 
         // Default the battles markup index to an empty array
         $battles_cache_markup = array();
 
-        // Open the type data directory for scanning
-        $battles_index_path = MMRPG_CONFIG_ROOTDIR.'data/battles/';
-        $data_battles  = opendir($battles_index_path.$this_path);
+        // Get a list of directories in the battle content path so we can loop
+        $battles_base_path = MMRPG_CONFIG_BATTLES_CONTENT_PATH;
+        $battle_paths_list = scandir($battles_base_path);
+        $battle_paths_list = array_filter($battle_paths_list, function($s){ if ($s !== '.' && $s !== '..' && substr($s, 0, 1) !== '.'){ return true; } else { return false; } });
 
-        //echo 'Scanning '.$battles_index_path.$this_path.'<br />';
-
-        // Loop through all the files in the directory
-        while (false !== ($filename = readdir($data_battles))) {
-
-            // If this is a directory, initiate a recusive scan
-            if (is_dir($battles_index_path.$this_path.$filename.'/') && $filename != '.' && $filename != '..'){
-                // Collect the markup from the recursive scan
-                $append_cache_markup = rpg_battle::index_battle_data($this_path.$filename.'/');
-                // If markup was found, append if to the main container
-                if (!empty($append_cache_markup)){ $battles_cache_markup = array_merge($battles_cache_markup, $append_cache_markup); }
-            }
-            // Else, ensure the file matches the naming format
-            elseif ($filename != '_index.php' && preg_match('#^[-_a-z0-9]+\.php$#i', $filename)){
-                // Collect the battle token from the filename
-                $this_battle_token = preg_replace('#^([-_a-z0-9]+)\.php$#i', '$1', $filename);
-                if (!empty($this_path)){ $this_battle_token = trim(str_replace('/', '-', $this_path), '-').'-'.$this_battle_token; }
-
-                //echo '+ Adding battle token '.$this_battle_token.'...<br />';
-
-                // Read the file into memory as a string and crop slice out the imporant part
-                $this_battle_markup = trim(file_get_contents($battles_index_path.$this_path.$filename));
-                $this_battle_markup = explode("\n", $this_battle_markup);
-                $this_battle_markup = array_slice($this_battle_markup, 1, -1);
-                // Replace the first line with the appropriate index key
-                $this_battle_markup[1] = preg_replace('#\$battle = array\(#i', "\$mmrpg_battles_index['{$this_battle_token}'] = array(\n  'battle_token' => '{$this_battle_token}', 'battle_functions' => 'battles/{$this_path}{$filename}',", $this_battle_markup[1]);
-                // Implode the markup into a single string
-                $this_battle_markup = implode("\n", $this_battle_markup);
-                // Copy this battle's data to the markup cache
-                $battles_cache_markup[] = $this_battle_markup;
-            }
-
+        // Remove any paths that aren't directories or don't have JSON files in them
+        foreach ($battle_paths_list AS $key => $path){
+            if (!is_dir($battles_base_path.$path)){ unset($battle_paths_list[$key]); continue; }
+            if (!file_exists($battles_base_path.$path.'/data.json')){ unset($battle_paths_list[$key]); continue; }
         }
 
-        // Close the battle data directory
-        closedir($data_battles);
+        // Now loop through and collect data for all battles in the index
+        $this_battle_index = array();
+        foreach ($battle_paths_list AS $battle_token){
+            $battle_json = file_get_contents($battles_base_path.$battle_token.'/data.json');
+            $battle_data = json_decode($battle_json, true);
+            $this_battle_index[$battle_token] = $battle_data;
+        }
 
-        // Return the generated cache markup
-        return $battles_cache_markup;
+        //echo 'Scanning '.$battles_base_path.' for directories...'.PHP_EOL;
+        //echo('$battle_paths_list = '.print_r($battle_paths_list, true).PHP_EOL);
+        //echo('$this_battle_index = '.print_r($this_battle_index, true).PHP_EOL);
+        //exit();
+
+        // Now return the index, either compressed on not given function args
+        if ($return_json){
+            $battles_cache_markup = json_encode($this_battle_index);
+            return $battles_cache_markup;
+        } else {
+            return $this_battle_index;
+        }
 
     }
 
