@@ -423,7 +423,7 @@ class rpg_canvas {
                 $shadow_token = 'shadow-'.$this_robot->robot_class;
 
                 $shadow_image_token = $this_data['robot_image'];
-                if (!file_exists(MMRPG_CONFIG_ROOTDIR.'images/robots_shadows/'.$shadow_image_token.'/')){
+                if (!rpg_game::sprite_exists(MMRPG_CONFIG_ROOTDIR.'images/robots_shadows/'.$shadow_image_token.'/')){
                     if (strstr($shadow_image_token, '_')){ list($shadow_image_token) = explode('_', $shadow_image_token); }
                     elseif (preg_match('/(-[0-9])$/', $shadow_image_token)){ $shadow_image_token = preg_replace('/(-[0-9])$/', '', $shadow_image_token); }
                     else { $shadow_image_token = 'robot'; }

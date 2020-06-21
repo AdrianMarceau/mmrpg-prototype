@@ -774,7 +774,7 @@
                             <?
                             echo('<option value=""'.(empty($user_data['user_image_path']) ? 'selected="selected"' : '').'>- none -</option>');
                             foreach ($mmrpg_robots_index AS $robot_token => $robot_data){
-                                if (!file_exists(MMRPG_CONFIG_ROOTDIR.'images/robots/'.$robot_token.'/')){ continue; }
+                                if (!rpg_game::sprite_exists(MMRPG_CONFIG_ROOTDIR.'images/robots/'.$robot_token.'/')){ continue; }
                                 $robot_path = 'robots/'.$robot_token.'/'.$robot_data['robot_image_size'];
                                 $label = $robot_data['robot_number'].' '.$robot_data['robot_name'];
                                 $selected = !empty($user_data['user_image_path']) && $user_data['user_image_path'] == $robot_path ? 'selected="selected"' : '';
@@ -791,7 +791,7 @@
                                 }
                             }
                             foreach ($mmrpg_players_index AS $player_token => $player_data){
-                                if (!file_exists(MMRPG_CONFIG_ROOTDIR.'images/players/'.$player_token.'/')){ continue; }
+                                if (!rpg_game::sprite_exists(MMRPG_CONFIG_ROOTDIR.'images/players/'.$player_token.'/')){ continue; }
                                 $player_path = 'players/'.$player_token.'/'.$player_data['player_image_size'];
                                 $label = $player_data['player_name'];
                                 $selected = !empty($user_data['user_image_path']) && $user_data['user_image_path'] == $player_path ? 'selected="selected"' : '';

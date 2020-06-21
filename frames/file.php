@@ -73,7 +73,7 @@ while ($this_action == 'save'){
             elseif (isset($info['robot_image']) && $info['robot_image'] == 'robot'){ continue; }
             elseif (isset($info['robot_class']) && $info['robot_class'] == 'mecha'){ continue; }
             elseif (preg_match('/^(DLM)/i', $info['robot_number'])){ continue; }
-            elseif (!file_exists(MMRPG_CONFIG_ROOTDIR.'images/robots/'.$token.'/')){ continue; }
+            elseif (!rpg_game::sprite_exists(MMRPG_CONFIG_ROOTDIR.'images/robots/'.$token.'/')){ continue; }
             if (!mmrpg_prototype_robot_unlocked(false, $token) && $this_userinfo['role_id'] != 1){ continue; }
 
             // If the game has changed print the new optgroup

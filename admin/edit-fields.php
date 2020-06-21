@@ -1287,9 +1287,9 @@
                                 <?
                                 // Collect the background and foreground image URLs if available
                                 $background_image_url = 'images/fields/'.$field_data['field_background'].'/battle-field_background_base.gif';
-                                if (!file_exists(MMRPG_CONFIG_ROOTDIR.$background_image_url)){ $background_image_url = false; }
+                                if (!rpg_game::sprite_exists(MMRPG_CONFIG_ROOTDIR.$background_image_url)){ $background_image_url = false; }
                                 $foreground_image_url = 'images/fields/'.$field_data['field_foreground'].'/battle-field_foreground_base.png';
-                                if (!file_exists(MMRPG_CONFIG_ROOTDIR.$foreground_image_url)){ $foreground_image_url = false; }
+                                if (!rpg_game::sprite_exists(MMRPG_CONFIG_ROOTDIR.$foreground_image_url)){ $foreground_image_url = false; }
                                 ?>
                                 <div class="bfg-attachments-preview">
                                     <div class="preview_wrapper">
