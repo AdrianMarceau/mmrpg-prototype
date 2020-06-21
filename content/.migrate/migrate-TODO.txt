@@ -8,32 +8,32 @@ Create migration scripts for all the CONTENT directories
 -  items  [DONE]
 
 Remove dependencis on all of the /data/ directories first and foremost
--  types [DONE]
--  battles [DONE]
--  players [DONE]
--  fields [DONE]
--  robots [DONE]
--  abilities [DONE]
--  items [DONE]
+-  types  [DONE]
+-  battles  [DONE]
+-  players  [DONE]
+-  fields  [DONE]
+-  robots  [DONE]
+-  abilities  [DONE]
+-  items  [DONE]
 
 Create htaccess rules OR script to point sprites to new content directories
--  players
--  fields
--  robots
--  abilities
--  items
+-  players  [DONE]
+-  fields  [DONE]
+-  robots  [DONE]
+-  abilities  [DONE]
+-  items  [DONE]
 
 Update the admin panel to remove(?) the functions path field, it should be assumed now
--  players
--  robots
--  fields
+-  players  [DONE]
+-  robots  [DONE]
+-  fields  [DONE]
 
 Update the admin panel to work with the new sprite directories
 -  players
 -  robots
 -  fields
 
-Update the admin panel so that saving auto-updated the data.json file
+Update the admin panel so that saving auto-updates the data.json file
 -  types
 -  battles
 -  players
@@ -42,7 +42,7 @@ Update the admin panel so that saving auto-updated the data.json file
 -  abilities
 -  items
 
-Update code to point to new CONTENT directories
+Update code to point to new CONTENT directories (what part of the code?)
 -  types
 -  battles
 -  players
@@ -52,7 +52,7 @@ Update code to point to new CONTENT directories
 -  items
 
 Update code to point to new OBJECT image locations
--  items/attachment-defeat -> objects/defeat-explosion [DONE]
+-  items/attachment-defeat -> objects/defeat-explosion  [DONE]
 -  items/freeze-heart -> objects/heart-cores/freeze
 -  items/challenge-marker_base -> objects/challenge-markers/base
 -  items/field-support -> content/items/_effects/type-arrows_boost-1
@@ -69,6 +69,7 @@ Update code for abilities to work with new _actions and _effects directories
 -  abilities/field-support-2 -> abilities/_effects/type-arrows_boost-2
 -  abilities/field-support-3 -> abilities/_effects/type-arrows_break-1
 -  abilities/field-support-4 -> abilities/_effects/type-arrows_break-2
+-  abilities/ability-results   -> abilities/_effects/stat-arrows  [DONE]
 
 
 Update fields to pull objects from other places
