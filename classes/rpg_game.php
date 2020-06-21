@@ -1620,6 +1620,38 @@ class rpg_game {
 
 
 
+    // -- SPRITE FUNCTIONS -- //
+
+    public static function sprite_exists($sym_path){
+
+        // Define the symlink patterns and replacements for looping
+        static $sym_patterns;
+        if (empty($sym_patterns)){
+            $sym_patterns['^images/(abilities|fields|items|players|robots)/(ability|field|item|player|robot)(_[-_a-z0-9]+)?/(.*)?$'] = 'content/$1/.$2/sprites$3/$4';
+            $sym_patterns['^images/(abilities|fields|items|players|robots)_shadows/(ability|field|item|player|robot)(_[-_a-z0-9]+)?/(.*)?$'] = 'content/$1/.$2/shadows$3/$4';
+            $sym_patterns['^images/(abilities|fields|items|players|robots)/([-a-z0-9]+)(_[-_a-z0-9]+)?/(.*)?$'] = 'content/$1/$2/sprites$3/$4';
+            $sym_patterns['^images/(abilities|fields|items|players|robots)_shadows/([-a-z0-9]+)(_[-_a-z0-9]+)?/(.*)?$'] = 'content/$1/$2/shadows$3/$4';
+        }
+
+        // Attempt to calculate the real path given the symlink path
+        $real_path = str_replace(MMRPG_CONFIG_ROOTDIR, '', $sym_path);
+        foreach ($sym_patterns AS $find => $replace){
+            if (preg_match('#'.$find.'#i', $real_path)){
+                $real_path = preg_replace('#'.$find.'#i', $replace, $real_path);
+                break;
+            }
+        }
+
+        //echo('$sym_path = '.$sym_path.'<br />');
+        //echo('$real_path = '.$real_path.'<br />');
+        //exit();
+
+        // Now that we have the real path, check to see if it exists
+        return file_exists(MMRPG_CONFIG_ROOTDIR.$real_path);
+
+    }
+
+
     // -- SESSION FUNCTIONS -- //
 
 
