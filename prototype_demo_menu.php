@@ -1,5 +1,10 @@
 <?
 
+  // Collect the players index if not already populated
+  if (!isset($mmrpg_index_players) || empty($mmrpg_index_players)){
+      $mmrpg_index_players = rpg_player::get_index(true);
+  }
+
   // Define global prototype data variable for the demo
   $prototype_data['demo'] = $this_prototype_data = array();
 
@@ -89,7 +94,7 @@
   $this_prototype_data['battle_options']['demo-battle-i'] = array('battle_token' => 'demo-battle-i');
 
   // Define the robot options and counter for Dr. Light mode
-  $this_prototype_data['robot_options'] = !empty($mmrpg_index['players'][$this_prototype_data['this_player_token']]['player_robots']) ? $mmrpg_index['players'][$this_prototype_data['this_player_token']]['player_robots'] : array();
+  $this_prototype_data['robot_options'] = !empty($mmrpg_index_players[$this_prototype_data['this_player_token']]['player_robots']) ? $mmrpg_index_players[$this_prototype_data['this_player_token']]['player_robots'] : array();
   //die(print_r($this_prototype_data['robot_options'], true));
   foreach ($this_prototype_data['robot_options'] AS $key => $info){
     if (!mmrpg_prototype_robot_unlocked($this_prototype_data['this_player_token'], $info['robot_token'])){ unset($this_prototype_data['robot_options'][$key]); continue; }

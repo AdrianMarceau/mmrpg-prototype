@@ -12,7 +12,7 @@ class rpg_mission_single extends rpg_mission {
         $session_token = mmrpg_game_token();
 
         // Pull in global variables for this function
-        global $mmrpg_index, $db;
+        global $db;
         global $this_omega_factors_one;
         global $this_omega_factors_two;
         global $this_omega_factors_three;

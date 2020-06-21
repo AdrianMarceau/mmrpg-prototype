@@ -3,8 +3,10 @@
 function mmrpg_reset_game_session(){
 
     // Reference global variables
-    global $mmrpg_index, $db;
+    global $db;
     $session_token = mmrpg_game_token();
+    global $mmrpg_index_players;
+    if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
 
     //exit('mmrpg_reset_game_session()');
 
@@ -78,7 +80,7 @@ function mmrpg_reset_game_session(){
     if (!empty($_SESSION[$session_token]['DEMO'])){
 
         // Only unlock Dr. Light as a playable character
-        $unlock_player_info = $mmrpg_index['players']['dr-light'];
+        $unlock_player_info = $mmrpg_index_players['dr-light'];
         mmrpg_game_unlock_player($unlock_player_info, false, true);
         $_SESSION[$session_token]['values']['battle_rewards']['dr-light']['player_points'] = 0;
         $_SESSION[$session_token]['values']['battle_items'] = array('energy-pellet' => 3, 'energy-capsule' => 2, 'weapon-pellet' => 3, 'weapon-capsule' => 2);
@@ -158,7 +160,7 @@ function mmrpg_reset_game_session(){
         $_SESSION[$session_token]['values']['battle_abilities'] = array('buster-shot');
 
         // Unlock Dr. Light as a playable character
-        $unlock_player_info = $mmrpg_index['players']['dr-light'];
+        $unlock_player_info = $mmrpg_index_players['dr-light'];
         mmrpg_game_unlock_player($unlock_player_info, false, true);
         $_SESSION[$session_token]['values']['battle_rewards']['dr-light']['player_points'] = 0;
         mmrpg_game_unlock_ability($unlock_player_info, '', array('ability_token' => 'light-buster'), false);

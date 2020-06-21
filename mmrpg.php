@@ -1,15 +1,6 @@
 <?php
 
 /*
- * LIBRARY INDEXES
- */
-
-// Include mandatory library files
-$mmrpg_index = array();
-require('data/players/_index.php');
-
-
-/*
  * SESSION VARIABLES
  */
 

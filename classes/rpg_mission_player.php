@@ -9,7 +9,7 @@ class rpg_mission_player extends rpg_mission {
     public static function generate($this_prototype_data, $this_user_info, $this_max_robots, $this_flat_level, &$field_factors_one, &$field_factors_two, &$field_factors_three){
 
         // Pull in global variables for this function
-        global $mmrpg_index, $db;
+        global $db;
         global $this_omega_factors_one;
         global $this_omega_factors_two;
         global $this_omega_factors_three;

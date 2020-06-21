@@ -1164,7 +1164,7 @@ class rpg_ability extends rpg_object {
     public static function print_editor_options_list_markup($player_ability_rewards, $robot_ability_rewards, $player_info, $robot_info){
 
         // Define the global variables
-        global $mmrpg_index, $this_current_uri, $this_current_url, $db;
+        global $this_current_uri, $this_current_url, $db;
         global $allowed_edit_players, $allowed_edit_robots, $allowed_edit_abilities;
         global $allowed_edit_data_count, $allowed_edit_player_count, $allowed_edit_robot_count, $first_robot_token, $global_allow_editing;
         global $key_counter, $player_rewards, $player_robot_favourites, $player_robot_database, $temp_robot_totals, $player_options_markup, $item_options_markup;
@@ -1211,7 +1211,7 @@ class rpg_ability extends rpg_object {
     public static function print_editor_select_markup($ability_rewards_options, $player_info, $robot_info, $ability_info, $ability_key = 0){
 
         // Define the global variables
-        global $mmrpg_index, $this_current_uri, $this_current_url, $db;
+        global $this_current_uri, $this_current_url, $db;
         global $allowed_edit_players, $allowed_edit_robots, $allowed_edit_abilities;
         global $allowed_edit_data_count, $allowed_edit_player_count, $allowed_edit_robot_count, $first_robot_token, $global_allow_editing;
         global $key_counter, $player_rewards, $player_ability_rewards, $player_robot_favourites, $player_robot_database, $temp_robot_totals, $player_options_markup, $item_options_markup;
@@ -1397,7 +1397,7 @@ class rpg_ability extends rpg_object {
     public static function print_database_markup($ability_info, $print_options = array()){
 
         // Define the global variables
-        global $mmrpg_index, $this_current_uri, $this_current_url;
+        global $this_current_uri, $this_current_url;
         global $mmrpg_database_abilities, $mmrpg_database_abilities, $mmrpg_database_types;
         global $db;
 

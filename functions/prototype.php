@@ -29,10 +29,13 @@ function mmrpg_prototype_calculate_shop_level_by_experience($this_experience, $m
 
 // Define a function for checking a player has completed the prototype
 function mmrpg_prototype_complete($player_token = ''){
+
     // Pull in global variables
-    //global $mmrpg_index;
-    $mmrpg_index_players = $GLOBALS['mmrpg_index']['players'];
+    global $mmrpg_index_players;
+    if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
+
     $session_token = mmrpg_game_token();
+
     // If the player token was provided, do a quick check
     if (!empty($player_token)){
         // Return the prototype complete flag for this player
@@ -1028,11 +1031,13 @@ function mmrpg_prototype_remaining_stars($return_arrays = false, $possible_star_
 
 // Define a function for checking if a prototype ability has been unlocked
 function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = ''){
+
     // Pull in global variables
-    //global $mmrpg_index;
-    $mmrpg_index_players = $GLOBALS['mmrpg_index']['players'];
-    $mmrpg_index_abilities = rpg_ability::get_index();
+    global $mmrpg_index_players, $mmrpg_index_abilities;
+    if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
+    if (empty($mmrpg_index_abilities)){ $mmrpg_index_abilities = rpg_ability::get_index(true); }
     $session_token = mmrpg_game_token();
+
     // If a specific robot token was provided
     if (!empty($player_token) && !empty($robot_token)){
         // Check if this battle has been completed and return true is it was
@@ -1056,11 +1061,13 @@ function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '
 // Define a function for displaying prototype battle option markup
 function mmrpg_prototype_options_markup(&$battle_options, $player_token){
     // Refence the global config and index objects for easy access
+    global $db;
     global $star_shake_delay;
-    global $mmrpg_index, $db;
-    $mmrpg_index_fields = rpg_field::get_index(true);
     if (empty($star_shake_delay)){ $star_shake_delay = array(); }
     if (empty($star_shake_delay[$player_token])){ $star_shake_delay[$player_token] = 0; }
+    global $mmrpg_index_fields, $mmrpg_index_players;
+    if (empty($mmrpg_index_fields)){ $mmrpg_index_fields = rpg_field::get_index(true); }
+    if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
 
     // Define the variable to collect option markup
     $this_markup = '';
@@ -1097,7 +1104,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 !empty($mmrpg_index_fields[$this_fieldtoken])
                 ? array_replace(rpg_field::parse_index_info($mmrpg_index_fields[$this_fieldtoken]), $this_battleinfo['battle_field_base'])
                 : $this_battleinfo['battle_field_base'];
-            $this_targetinfo = !empty($mmrpg_index['players'][$this_battleinfo['battle_target_player']['player_token']]) ? array_replace($mmrpg_index['players'][$this_battleinfo['battle_target_player']['player_token']], $this_battleinfo['battle_target_player']) : $this_battleinfo['battle_target_player'];
+            $this_targetinfo = !empty($mmrpg_index_players[$this_battleinfo['battle_target_player']['player_token']]) ? array_replace($mmrpg_index_players[$this_battleinfo['battle_target_player']['player_token']], $this_battleinfo['battle_target_player']) : $this_battleinfo['battle_target_player'];
 
             $is_player_battle = !empty($this_battleinfo['flags']['player_battle']) ? true : false;
             $is_challenge_battle = !empty($this_battleinfo['flags']['challenge_battle']) ? true : false;
@@ -1161,7 +1168,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             $this_option_min_level = false;
             $this_option_max_level = false;
             $this_battleinfo['battle_sprite'] = array();
-            $this_targetinfo = !empty($mmrpg_index['players'][$this_targetinfo['player_token']]) ? array_merge($mmrpg_index['players'][$this_targetinfo['player_token']], $this_targetinfo) : $mmrpg_index['players']['player'];
+            $this_targetinfo = !empty($mmrpg_index_players[$this_targetinfo['player_token']]) ? array_merge($mmrpg_index_players[$this_targetinfo['player_token']], $this_targetinfo) : $mmrpg_index_players['player'];
             if ($this_targetinfo['player_token'] != 'player'){  $this_battleinfo['battle_sprite'][] = array('path' => 'players/'.$this_targetinfo['player_token'], 'size' => !empty($this_targetinfo['player_image_size']) ? $this_targetinfo['player_image_size'] : 40);  }
             if (!empty($this_targetinfo['player_robots'])){
 
@@ -1906,13 +1913,16 @@ function mmrpg_prototype_sort_robots_position($info1, $info2){
 
 // Define a function for displaying prototype robot button markup on the select screen
 function mmrpg_prototype_robot_select_markup($this_prototype_data){
-    global $db, $mmrpg_index;
+
+    global $db;
+    global $mmrpg_index_players;
+    if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
 
     // Define the temporary robot markup string
     $this_robots_markup = '';
 
     // Collect this player's index info
-    $this_player_info = $mmrpg_index['players'][$this_prototype_data['this_player_token']];
+    $this_player_info = $mmrpg_index_players[$this_prototype_data['this_player_token']];
 
     // Collect the list of robot and ability tokens we'll need
     $rtokens = array();
@@ -2397,7 +2407,8 @@ function mmrpg_prototype_leaderboard_targets_sort($player1, $player2){
 
 // Define a function for determining a player's battle music
 function mmrpg_prototype_get_player_music($player_token, $session_token = 'GAME'){
-    global $mmrpg_index, $db;
+
+    global $db;
 
     $temp_session_key = $player_token.'_target-robot-omega_prototype';
     $temp_robot_omega = !empty($_SESSION[$session_token]['values'][$temp_session_key]) ? $_SESSION[$session_token]['values'][$temp_session_key] : array();
@@ -2524,7 +2535,9 @@ function mmrpg_prototype_database_summoned($robot_token = ''){
 
 // Define a function for collecting robot sprite markup
 function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token = 'GAME', $robot_limit = 10){
-    global $mmrpg_index, $db;
+
+    global $db;
+
     $temp_offset_x = 14;
     $temp_offset_z = 50;
     $temp_offset_y = -2;
@@ -2561,6 +2574,8 @@ function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token 
             }
         }
     }
+
     return $text_sprites_markup;
+
 }
 ?>

@@ -47,7 +47,7 @@ function mmrpg_formatting_decode($string){
     if (empty($mmrpg_formatting_array)){
 
         // Collect the robot and ability index from the database
-        global $db, $mmrpg_index;
+        global $db;
         static $temp_robots_index, $temp_abilities_index;
         if (empty($temp_robots_index)){
             $db_robot_fields = rpg_robot::get_index_fields(true);

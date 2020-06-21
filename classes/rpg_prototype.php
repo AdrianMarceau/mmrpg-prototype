@@ -37,10 +37,12 @@ class rpg_prototype {
 
     // Define a function for checking a player has completed the prototype
     public static function campaign_complete($player_token = ''){
+
         // Pull in global variables
-        //global $mmrpg_index;
-        $mmrpg_index_players = rpg_player::get_index();
+        global $mmrpg_index_players;
+        if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
         $session_token = rpg_game::session_token();
+
         // If the player token was provided, do a quick check
         if (!empty($player_token)){
             // Return the prototype complete flag for this player

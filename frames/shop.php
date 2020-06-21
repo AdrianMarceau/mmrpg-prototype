@@ -108,7 +108,7 @@ if (true){
         $shop_info['shop_image_size'] = 40;
 
         // Collect a temp robot object for printing items
-        $player_info = $mmrpg_index['players'][$shop_info['shop_player']];
+        $player_info = $mmrpg_database_players[$shop_info['shop_player']];
 
         // Collect the tokens for all this shop's selling and buying tabs
         $shop_selling_tokens = is_array($shop_info['shop_kind_selling']) ? $shop_info['shop_kind_selling'] : array($shop_info['shop_kind_selling']);

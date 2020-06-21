@@ -1,5 +1,8 @@
 <?
 
+// Pull in the player index so we can use later in the script
+if (!isset($mmrpg_index_players) || empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
+
 // Define the avatar class and path variables
 $temp_display_name = !empty($this_playerinfo['user_name_public']) && !empty($this_playerinfo['user_flag_postpublic']) ? $this_playerinfo['user_name_public'] : $this_playerinfo['user_name'];
 $temp_display_points = $this_playerinfo['board_points'];
@@ -149,7 +152,7 @@ $temp_counter_levels = array_reverse($temp_counter_levels);
 $temp_top_player = '';
 foreach ($temp_counter_points AS $token => $value){
     if ($token != 'total'){
-        $temp_top_player = '<strong>'.$mmrpg_index['players'][$token]['player_name'].'</strong>';
+        $temp_top_player = '<strong>'.$mmrpg_index_players[$token]['player_name'].'</strong>';
         break;
     }
 }

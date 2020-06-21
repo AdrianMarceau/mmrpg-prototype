@@ -206,6 +206,10 @@ elseif ($this_action == 'start'){
 //echo 'memory_get_peak_usage() = '.round((memory_get_peak_usage() / 1024) / 1024, 2).'M'."\n";
 //exit();
 
+if (!isset($mmrpg_index_players) || empty($mmrpg_index_players)){
+    $mmrpg_index_players = rpg_player::get_index(true);
+}
+
 // Collect an index of all types so we can user later
 $db_type_fields = rpg_type::get_index_fields(true);
 $battle_types_index = $db->get_array_list("SELECT {$db_type_fields} FROM mmrpg_index_types WHERE type_class <> 'systen';", 'type_token');
@@ -517,7 +521,7 @@ if ($target_robot->robot_status == 'disabled' || $target_robot->robot_energy < 1
 if (!isset($_SESSION['GAME']['values']['battle_items'])){
     // Loop through player index if not empty
     $temp_items_array = array();
-    foreach ($mmrpg_index['players'] AS $player_token => $player_info){
+    foreach ($mmrpg_index_players AS $player_token => $player_info){
         if (!empty($_SESSION['GAME']['values']['battle_rewards'][$player_token]['player_items'])){
             foreach ($_SESSION['GAME']['values']['battle_rewards'][$player_token]['player_items'] AS $token => $count){
                 if (!isset($temp_items_array[$token])){ $temp_items_array[$token] = 0; }

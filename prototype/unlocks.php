@@ -3,18 +3,17 @@
  * COMMON UNLOCK MESSAGES
  */
 
-// Collect references to the player and robot indexes for later
-$mmrpg_players_index = $mmrpg_index['players'];
-$mmrpg_robots_index = rpg_robot::get_index();
-
 // Define a function for generating a common "Prototype Complete" message w/ records
 function generate_prototype_complete_message($player_token){
+
     global $session_token;
-    global $mmrpg_players_index, $mmrpg_robots_index;
+    global $mmrpg_index_players, $mmrpg_index_robots;
+    if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
+    if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = rpg_robot::get_index(true); }
 
     // Define the player's battle points total, battles complete, and other details
     //$player_token = 'dr-light';
-    $player_info = $mmrpg_players_index[$player_token];
+    $player_info = $mmrpg_index_players[$player_token];
     $player_info['player_points'] = mmrpg_prototype_player_points($player_token);
     $player_info['player_battles_complete'] = mmrpg_prototype_battles_complete($player_token);
     $player_info['player_battles_complete_total'] = mmrpg_prototype_battles_complete($player_token, false);
@@ -43,7 +42,7 @@ function generate_prototype_complete_message($player_token){
                             continue;
                         }
                         $temp_robot_token = $temp_robot_info['robot_token'];
-                        $temp_robot_index = $mmrpg_robots_index[$temp_robot_token];
+                        $temp_robot_index = $mmrpg_index_robots[$temp_robot_token];
                         $temp_robot_settings = $temp_player_robot_settings[$temp_robot_token];
                         $temp_robot_rewards = $temp_player_robot_settings[$temp_robot_token];
                         if (empty($temp_robot_settings['original_player']) && $temp_player != $player_token){ continue; }
@@ -161,10 +160,13 @@ function generate_prototype_complete_message($player_token){
 // Define a function for generating a common "Post-Game Overview" message w/ details
 function generate_prototype_postgame_message($player_token){
     global $session_token;
-    global $mmrpg_players_index, $mmrpg_robots_index;
+
+    global $mmrpg_index_players, $mmrpg_index_robots;
+    if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
+    if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = rpg_robot::get_index(true); }
 
     // Collect index details on this particular player
-    $player_info = $mmrpg_players_index[$player_token];
+    $player_info = $mmrpg_index_players[$player_token];
     $player_type = $player_info['player_type'];
     if ($player_token === 'dr-light'){ $partner_robots = array('mega-man', 'roll'); $star_types = array('water', 'flame', 'time'); }
     elseif ($player_token === 'dr-wily'){ $partner_robots = array('bass', 'disco'); $star_types = array('flame', 'time', 'water'); }
@@ -259,7 +261,7 @@ if ($battle_complete_counter_light >= 1 && $battle_complete_counter_light < 2){
 if ($battle_failure_counter_light >= 1 && !mmrpg_prototype_robot_unlocked(false, 'roll')){
 
     // Unlock Roll as a playable character
-    $unlock_player_info = $mmrpg_index['players']['dr-light'];
+    $unlock_player_info = $mmrpg_index_players['dr-light'];
     $unlock_robot_info = rpg_robot::get_index_info('roll');
     $unlock_robot_info['robot_level'] = 1;
     $unlock_robot_info['robot_experience'] = 999;
@@ -322,7 +324,7 @@ if ($battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 if ($battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT && !$unlock_flag_wily){
 
     // Unlock Dr. Wily as a playable character
-    $unlock_player_info = $mmrpg_index['players']['dr-wily'];
+    $unlock_player_info = $mmrpg_index_players['dr-wily'];
     mmrpg_game_unlock_player($unlock_player_info, false, true);
     $_SESSION[$session_token]['values']['battle_rewards']['dr-wily']['player_points'] = 0;
     mmrpg_game_unlock_ability($unlock_player_info, '', array('ability_token' => 'wily-buster'), false);
@@ -390,7 +392,7 @@ if ($battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT && !$
     // If Wily has been unlocked but somehow Bass was not
     if (!mmrpg_prototype_robot_unlocked(false, 'bass')){
         // Unlock Bass as a playable character
-        $unlock_player_info = $mmrpg_index['players']['dr-wily'];
+        $unlock_player_info = $mmrpg_index_players['dr-wily'];
         $unlock_robot_info = rpg_robot::get_index_info('bass');
         $unlock_robot_info['robot_level'] = 11;
         $unlock_robot_info['robot_experience'] = 999;
@@ -405,7 +407,7 @@ if ($battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT && !$
 if ($battle_failure_counter_wily >= 2 && !mmrpg_prototype_robot_unlocked(false, 'disco')){
 
     // Unlock Disco as a playable character
-    $unlock_player_info = $mmrpg_index['players']['dr-wily'];
+    $unlock_player_info = $mmrpg_index_players['dr-wily'];
     $unlock_robot_info = rpg_robot::get_index_info('disco');
     $unlock_robot_info['robot_level'] = 11;
     $unlock_robot_info['robot_experience'] = 999;
@@ -467,7 +469,7 @@ if ($battle_complete_counter_wily >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 if ($battle_complete_counter_wily >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT && !$unlock_flag_cossack){
 
     // Unlock Dr. Cossack as a playable character
-    $unlock_player_info = $mmrpg_index['players']['dr-cossack'];
+    $unlock_player_info = $mmrpg_index_players['dr-cossack'];
     mmrpg_game_unlock_player($unlock_player_info, false, true);
     $_SESSION[$session_token]['values']['battle_rewards']['dr-cossack']['player_points'] = 0;
     mmrpg_game_unlock_ability($unlock_player_info, '', array('ability_token' => 'cossack-buster'), false);
@@ -535,7 +537,7 @@ if ($battle_complete_counter_wily >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT && !$u
     // If Cossack has been unlocked but somehow Proto Man was not
     if (!mmrpg_prototype_robot_unlocked(false, 'proto-man')){
         // Unlock Proto Man as a playable character
-        $unlock_player_info = $mmrpg_index['players']['dr-cossack'];
+        $unlock_player_info = $mmrpg_index_players['dr-cossack'];
         $unlock_robot_info = rpg_robot::get_index_info('proto-man');
         $unlock_robot_info['robot_level'] = 21;
         $unlock_robot_info['robot_experience'] = 999;
@@ -550,7 +552,7 @@ if ($battle_complete_counter_wily >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT && !$u
 if ($battle_failure_counter_cossack >= 3 && !mmrpg_prototype_robot_unlocked(false, 'rhythm')){
 
     // Unlock Rhythm as a playable character
-    $unlock_player_info = $mmrpg_index['players']['dr-cossack'];
+    $unlock_player_info = $mmrpg_index_players['dr-cossack'];
     $unlock_robot_info = rpg_robot::get_index_info('rhythm');
     $unlock_robot_info['robot_level'] = 21;
     $unlock_robot_info['robot_experience'] = 999;
@@ -867,7 +869,7 @@ foreach ($chapter_unlock_popup_index AS $key => $chapter_info){
             $temp_game_flags['events'][$temp_event_flag] = true;
             if (!$chapter_is_bonus && $next_chapter_key !== false && $chapters_unlocked_index[$player_token][$next_chapter_key]){ continue; } // continue if already unlocked next and not bonus
             elseif ($chapter_is_endgame && mmrpg_prototype_complete($player_token)){ continue; } // continue if final chapter but player has already completed prototype
-            $player_info = $mmrpg_players_index[$player_token];
+            $player_info = $mmrpg_index_players[$player_token];
             $player_name = $player_info['player_name'];
             $player_type = $player_info['player_type'];
             $temp_canvas_markup = '';

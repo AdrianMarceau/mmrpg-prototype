@@ -56,7 +56,9 @@ function mmrpg_game_players_unlocked(){
 function mmrpg_game_unlock_player($player_info, $unlock_robots = true, $unlock_abilities = true){
 
     // Reference the global variables
-    global $mmrpg_index, $db;
+    global $db;
+    global $mmrpg_index_players;
+    if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
 
     //$GAME_SESSION = &$_SESSION[mmrpg_game_token()];
     $session_token = mmrpg_game_token();
@@ -68,9 +70,9 @@ function mmrpg_game_unlock_player($player_info, $unlock_robots = true, $unlock_a
     // If the player token does not exist, return false
     if (!isset($player_info['player_token'])){ return false; }
     // If this player does not exist in the global index, return false
-    if (!isset($mmrpg_index['players'][$player_info['player_token']])){ return false; }
+    if (!isset($mmrpg_index_players[$player_info['player_token']])){ return false; }
     // Collect the player info from the index
-    $player_info = array_replace($mmrpg_index['players'][$player_info['player_token']], $player_info);
+    $player_info = array_replace($mmrpg_index_players[$player_info['player_token']], $player_info);
     // Collect or define the player points and player rewards variables
     $this_player_token = $player_info['player_token'];
     $this_player_points = !empty($player_info['player_points']) ? $player_info['player_points'] : 0;
@@ -124,8 +126,6 @@ function mmrpg_game_unlock_player($player_info, $unlock_robots = true, $unlock_a
 
 // Define a function for updating a player setting for use in battle
 function mmrpg_game_player_setting($player_info, $setting_token, $setting_value){
-    // Reference the global variables
-    //global $mmrpg_index;
     // Update or create the player setting in the session
     $player_token = $player_info['player_token'];
     $_SESSION[mmrpg_game_token()]['values']['battle_settings'][$player_token][$setting_token] = $setting_value;
@@ -261,8 +261,11 @@ function mmrpg_game_robot_tokens_unlocked($player_token = ''){
 
 // Define a function for unlocking a game robot for use in battle
 function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = true, $events_create = true){
+
     // Reference the global variables
-    global $mmrpg_index, $db;
+    global $db;
+    global $mmrpg_index_players;
+    if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
 
     //$_SESSION[$session_token] = &$_SESSION[mmrpg_game_token()];
     $session_token = mmrpg_game_token();
@@ -283,7 +286,7 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
 
     // If this robot does not exist in the global index, return false
     //if (!isset($player_info['player_token'])){ echo 'player_info<pre>'.print_r($player_info, true).'</pre>'; }
-    $player_index_info = $mmrpg_index['players'][$player_info['player_token']];
+    $player_index_info = $mmrpg_index_players[$player_info['player_token']];
     $robot_index_info = $robot_info;
     if (!isset($player_index_info)){ return false; }
     if (!isset($robot_index_info)){ return false; }
@@ -474,8 +477,6 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
 
 // Define a function for updating a player setting for use in battle
 function mmrpg_game_robot_setting($player_info, $robot_info, $setting_token, $setting_value){
-    // Reference the global variables
-    //global $mmrpg_index;
     // Update or create the player setting in the session
     $player_token = $player_info['player_token'];
     $robot_token = $robot_info['robot_token'];
@@ -650,10 +651,12 @@ function mmrpg_game_ability_unlocked($player_token = '', $robot_token = '', $abi
 
 // Define a function for checking if a prototype ability has been unlocked
 function mmrpg_game_abilities_unlocked($player_token = '', $robot_token = ''){
+
     // Pull in global variables
-    //global $mmrpg_index;
-    $mmrpg_index_players = $GLOBALS['mmrpg_index']['players'];
+    global $mmrpg_index_players;
+    if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
     $session_token = mmrpg_game_token();
+
     // If the combined session array exists, use that to check to unlocked
     if (empty($player_token) && empty($robot_token) && isset($_SESSION[$session_token]['values']['battle_abilities'])){
         // Count the number of abilities in the combined array

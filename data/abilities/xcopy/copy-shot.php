@@ -13,8 +13,6 @@ $ability = array(
     'ability_accuracy' => 100,
     'ability_function' => function($objects){
 
-        // Pull in the global index
-        global $mmrpg_index;
         // Extract all objects into the current scope
         extract($objects);
 

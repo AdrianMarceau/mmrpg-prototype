@@ -115,7 +115,7 @@ if (true){
         $item_info['item_image_size'] = 40;
 
         // Collect a temp robot object for printing items
-        $player_info = $mmrpg_index['players']['dr-light'];
+        $player_info = $mmrpg_database_players['dr-light'];
         $robot_info = $mmrpg_database_robots['mega-man'];
         // Collect and print the editor markup for this player
         ?>

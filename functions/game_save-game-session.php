@@ -5,8 +5,9 @@ function mmrpg_save_game_session(){
     // Reference global variables
     global $db;
     $session_token = mmrpg_game_token();
-    $mmrpg_index_players = &$GLOBALS['mmrpg_index']['players'];
-    $mmrpg_index_robots = rpg_robot::get_index(true);
+    global $mmrpg_index_players, $mmrpg_index_robots;
+    if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
+    if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = rpg_robot::get_index(true); }
 
     // Do NOT load, save, or otherwise alter the game file while viewing remote
     if (defined('MMRPG_REMOTE_GAME')){ return true; }

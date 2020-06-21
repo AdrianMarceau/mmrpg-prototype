@@ -2,6 +2,11 @@
 
 // CANVAS MARKUP : ITEMS
 
+// Collect the players index if not already populated
+if (!isset($mmrpg_index_players) || empty($mmrpg_index_players)){
+    $mmrpg_index_players = rpg_player::get_index(true);
+}
+
 // Include the necessary database files
 require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
@@ -28,7 +33,7 @@ echo '<div class="wrapper no_sort">';
             else { $player_item_rewards = array(); }
 
             // Create a fake player and robot to pass the info check
-            $player_info = $mmrpg_index['players']['player'];
+            $player_info = $mmrpg_index_players['player'];
             $robot_info = rpg_robot::get_index_info('robot');
 
             // Sort the item rewards based on item number and such

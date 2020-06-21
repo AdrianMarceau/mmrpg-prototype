@@ -12,6 +12,9 @@ if (!rpg_game::is_user()){
 // Collect the game's session token
 $session_token = mmrpg_game_token();
 
+// Pull in necessary indexes in case we need them later
+if (!isset($mmrpg_index_players) || empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
+
 // Automatically empty all temporary battle variables
 $_SESSION['BATTLES'] = array();
 $_SESSION['BATTLES_CHAIN'] = array();
@@ -56,7 +59,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset'){
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset-missions' && !empty($_REQUEST['player'])){
 
     // Reset the appropriate session variables
-    if (!empty($mmrpg_index['players'][$_REQUEST['player']])){
+    if (!empty($mmrpg_index_players[$_REQUEST['player']])){
         $temp_session_key = $_REQUEST['player'].'_target-robot-omega_prototype';
         $_SESSION[$session_token]['values']['battle_complete'][$_REQUEST['player']] = array();
         $_SESSION[$session_token]['values']['battle_failure'][$_REQUEST['player']] = array();
@@ -122,8 +125,8 @@ if (!empty($temp_flags)){
 $is_admin = in_array($_SERVER['REMOTE_ADDR'], $dev_whitelist) ? true : false;
 if ($is_admin && !empty($temp_password_flags)){
 
-    // DEBUG PLAYERS / ABILITIES
-    $mmrpg_index_players = $mmrpg_index['players'];
+    // PLAYERS / ABILITIES
+    $this_player_index = $mmrpg_index_players;
 
     // Collect the robot index for calculation purposes
     $robot_fields = rpg_robot::get_index_fields(true);
@@ -134,12 +137,12 @@ if ($is_admin && !empty($temp_password_flags)){
     $this_ability_index = $db->get_array_list("SELECT {$ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
 
     // DEBUG PLAYERS / ABILITIES
-    foreach ($mmrpg_index_players AS $player_token => $player_info){
+    foreach ($this_player_index AS $player_token => $player_info){
         //$player_info = rpg_player::parse_index_info($player_info);
         $player_string = str_replace('-', '', $player_token);
         $player_pass = strlen($player_string);
 
-        // DEBUG ABILITY UNLOCKS
+        // ABILITY UNLOCKS
         foreach ($this_ability_index AS $ability_token => $ability_info){
             $ability_info = rpg_ability::parse_index_info($ability_info);
             $ability_string = str_replace('-', '', $ability_token);
@@ -158,7 +161,7 @@ if ($is_admin && !empty($temp_password_flags)){
             }
         }
 
-        // DEBUG ROBOT UNLOCKS
+        // ROBOT UNLOCKS
         foreach ($this_robot_index AS $robot_token => $robot_info){
             $robot_info = rpg_robot::parse_index_info($robot_info);
             $robot_string = str_replace('-', '', $robot_token);

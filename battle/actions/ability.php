@@ -175,7 +175,6 @@ $active_target_robot->update_session();
 
 // Collect the ability choice from the robot
 $temp_token = rpg_robot::robot_choices_abilities(array(
-    'this_index' => $mmrpg_index,
     'this_battle' => $this_battle,
     'this_field' => $this_battle->battle_field,
     'this_player' => $target_player,
@@ -486,7 +485,6 @@ if ($target_action == 'switch'){
 
     // Collect the ability choice from the robot
     $temp_token = rpg_robot::robot_choices_abilities(array(
-        'this_index' => $mmrpg_index,
         'this_battle' => $this_battle,
         'this_field' => $this_field,
         'this_player' => $target_player,

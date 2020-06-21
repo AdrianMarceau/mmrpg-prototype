@@ -181,9 +181,6 @@ class rpg_battle extends rpg_object {
     // Define a public function for manually loading data
     public function battle_load($this_battleinfo){
 
-        // Pull in the mmrpg index
-        global $mmrpg_index;
-
         // Collect current battle data from the session if available
         $this_battleinfo_backup = $this_battleinfo;
         if (isset($_SESSION['BATTLES'][$this_battleinfo['battle_id']])){
@@ -522,7 +519,8 @@ class rpg_battle extends rpg_object {
 
     // Define a public function for triggering battle actions
     public function battle_complete_trigger($this_player, $this_robot, $target_player, $target_robot, $this_action = '', $this_token = ''){
-        global $mmrpg_index, $db;
+
+        global $db;
         // DEBUG
         //$this->events_create(false, false, 'DEBUG', 'Battle complete trigger triggered!');
 

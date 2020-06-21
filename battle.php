@@ -83,9 +83,14 @@ else {
     $this_field_data = array();
 }
 
+// Collect the players index if not already populated
+if (!isset($mmrpg_index_players) || empty($mmrpg_index_players)){
+    $mmrpg_index_players = rpg_player::get_index(true);
+}
+
 // Collect this player's index data if available
-if (!empty($this_player_token) && isset($mmrpg_index['players'][$this_player_token])){
-    $this_player_data = $mmrpg_index['players'][$this_player_token];
+if (!empty($this_player_token) && isset($mmrpg_index_players[$this_player_token])){
+    $this_player_data = $mmrpg_index_players[$this_player_token];
 
 
     if (empty($this_player_data['player_id'])){
@@ -116,8 +121,8 @@ else {
 }
 
 // Collect the target player's index data if available
-if (!empty($target_player_token) && isset($mmrpg_index['players'][$target_player_token])){
-    $target_player_data = $mmrpg_index['players'][$target_player_token];
+if (!empty($target_player_token) && isset($mmrpg_index_players[$target_player_token])){
+    $target_player_data = $mmrpg_index_players[$target_player_token];
 
     if (empty($target_player_data['player_id'])){
         $target_player_id = !empty($target_player_id) ? $target_player_id : 2;
@@ -126,8 +131,8 @@ if (!empty($target_player_token) && isset($mmrpg_index['players'][$target_player
     $target_player_data['user_id'] = $target_player_data['player_id'];
 
 }
-elseif (!empty($this_battle_data['battle_target_player']['player_token']) && isset($mmrpg_index['players'][$this_battle_data['battle_target_player']['player_token']])){
-    $target_player_data = array_merge($mmrpg_index['players'][$this_battle_data['battle_target_player']['player_token']], $this_battle_data['battle_target_player']);
+elseif (!empty($this_battle_data['battle_target_player']['player_token']) && isset($mmrpg_index_players[$this_battle_data['battle_target_player']['player_token']])){
+    $target_player_data = array_merge($mmrpg_index_players[$this_battle_data['battle_target_player']['player_token']], $this_battle_data['battle_target_player']);
 
     if (empty($target_player_data['player_id'])){
         $target_player_id = !empty($target_player_id) ? $target_player_id : 2;

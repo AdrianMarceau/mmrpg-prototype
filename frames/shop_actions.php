@@ -328,7 +328,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
             $temp_current_quantity = 1;
             if (!mmrpg_prototype_robot_unlocked(false, $temp_actual_token)){
                 // Unlock Roll as a playable character
-                $unlock_player_info = $mmrpg_index['players'][$unlock_player_token];
+                $unlock_player_info = $mmrpg_database_players[$unlock_player_token];
                 $unlock_robot_info = rpg_robot::get_index_info($temp_actual_token);
                 $unlock_robot_info['robot_level'] = 99;
                 $unlock_robot_info['robot_experience'] = 999;

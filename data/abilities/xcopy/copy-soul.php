@@ -17,9 +17,6 @@ $ability = array(
         // Extract all objects into the current scope
         extract($objects);
 
-        // Pull in the global index
-        global $mmrpg_index;
-
         // Collect session token for later
         $session_token = rpg_game::session_token();
 

@@ -339,7 +339,6 @@ class rpg_functions {
      * @return int
      */
     public static function items_sort_for_editor($item_one, $item_two){
-        global $mmrpg_index;
         $item_token_one = preg_match('/^([a-z0-9]+)-(a-z0-9+)$/i', $item_one['item_token']) ? $item_one['item_token'] : $item_one['item_token'].'-size';
         $item_token_two = preg_match('/^([a-z0-9]+)-(a-z0-9+)$/i', $item_two['item_token']) ? $item_two['item_token'] : $item_two['item_token'].'-size';
         list($kind_one, $size_one) = explode('-', $item_token_one);

@@ -9,7 +9,9 @@ class rpg_disabled {
     public static function trigger_robot_disabled($this_robot, $target_robot, $trigger_options = array()){
 
         // Pull in the global variable
-        global $mmrpg_index, $db;
+        global $db;
+        global $mmrpg_index_players;
+        if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
 
         // Generate default trigger options if not set
         if (!isset($trigger_options['item_multiplier'])){ $trigger_options['item_multiplier'] = 1.0; }
@@ -1207,7 +1209,7 @@ class rpg_disabled {
                     $temp_unlocked_robot = rpg_game::get_robot($this_battle, $target_player, $temp_unlock_robot_data);
 
                     // Automatically unlock this robot for use in battle
-                    $temp_unlocked_player = $mmrpg_index['players'][$target_player->player_token];
+                    $temp_unlocked_player = $mmrpg_index_players[$target_player->player_token];
                     $temp_was_unlocked = mmrpg_game_unlock_robot($temp_unlocked_player, array_merge($robot_reward_index, $temp_unlock_robot_data), true, true);
 
                     /*

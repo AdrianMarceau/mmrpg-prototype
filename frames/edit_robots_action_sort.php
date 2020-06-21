@@ -40,7 +40,7 @@ if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player][
         if ($temp_token_order == 'number_asc'){
             // Define the sort function that uses these keys
             function temp_player_robots_sort($r1, $r2){
-                global $mmrpg_index, $mmrpg_database_robots_keys;
+                global $mmrpg_database_robots_keys;
                 if (empty($r1) || empty($r2)){ return 0; }
                 $robot1_number_position = array_search($r1['robot_token'], $mmrpg_database_robots_keys);
                 $robot2_number_position = array_search($r2['robot_token'], $mmrpg_database_robots_keys);
@@ -55,7 +55,7 @@ if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player][
         elseif ($temp_token_order == 'number_desc'){
             // Define the sort function that uses these keys
             function temp_player_robots_sort($r1, $r2){
-                global $mmrpg_index, $mmrpg_database_robots_keys;
+                global $mmrpg_database_robots_keys;
                 if (empty($r1) || empty($r2)){ return 0; }
                 $robot1_number_position = array_search($r1['robot_token'], $mmrpg_database_robots_keys);
                 $robot2_number_position = array_search($r2['robot_token'], $mmrpg_database_robots_keys);
@@ -70,7 +70,7 @@ if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player][
         elseif ($temp_token_order == 'level_asc'){
             // Define the sort function that uses these keys
             function temp_player_robots_sort($r1, $r2){
-                global $mmrpg_index, $mmrpg_database_robots_keys, $temp_player_robots_rewards;
+                global $mmrpg_database_robots_keys, $temp_player_robots_rewards;
                 if (empty($r1) || empty($r2)){ return 0; }
                 $robot1_number_position = array_search($r1['robot_token'], $mmrpg_database_robots_keys);
                 $robot2_number_position = array_search($r2['robot_token'], $mmrpg_database_robots_keys);
@@ -89,7 +89,7 @@ if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player][
         elseif ($temp_token_order == 'level_desc'){
             // Define the sort function that uses these keys
             function temp_player_robots_sort($r1, $r2){
-                global $mmrpg_index, $mmrpg_database_robots_keys, $temp_player_robots_rewards;
+                global $mmrpg_database_robots_keys, $temp_player_robots_rewards;
                 if (empty($r1) || empty($r2)){ return 0; }
                 $robot1_number_position = array_search($r1['robot_token'], $mmrpg_database_robots_keys);
                 $robot2_number_position = array_search($r2['robot_token'], $mmrpg_database_robots_keys);
@@ -109,7 +109,7 @@ if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player][
             //die($temp_token_order.' <pre>'.print_r(implode(',', $mmrpg_database_types_keys), true).'</pre>');
             // Define the sort function that uses these keys
             function temp_player_robots_sort($r1, $r2){
-                global $mmrpg_index, $temp_token_order, $mmrpg_database_types_keys, $mmrpg_database_robots_keys;
+                global $temp_token_order, $mmrpg_database_types_keys, $mmrpg_database_robots_keys;
                 if (empty($r1) || empty($r2)){ return 0; }
                 $robot1_core = !empty($r1['robot_core']) ? $r1['robot_core'] : 'none';
                 $robot2_core = !empty($r2['robot_core']) ? $r2['robot_core'] : 'none';
@@ -136,7 +136,7 @@ if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player][
             //die($temp_token_order.' <pre>'.print_r(implode(',', $mmrpg_database_types_keys), true).'</pre>');
             // Define the sort function that uses these keys
             function temp_player_robots_sort($r1, $r2){
-                global $mmrpg_index, $temp_token_order, $mmrpg_database_types_keys, $mmrpg_database_robots_keys;
+                global $temp_token_order, $mmrpg_database_types_keys, $mmrpg_database_robots_keys;
                 if (empty($r1) || empty($r2)){ return 0; }
                 $robot1_core = !empty($r1['robot_core']) ? $r1['robot_core'] : 'none';
                 $robot2_core = !empty($r2['robot_core']) ? $r2['robot_core'] : 'none';
@@ -166,7 +166,7 @@ if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player][
 
             // Define the sort function that uses these keys
             function temp_player_robots_sort($r1, $r2){
-                global $mmrpg_index, $mmrpg_manual_robots_keys, $mmrpg_database_robots_keys;
+                global $mmrpg_manual_robots_keys, $mmrpg_database_robots_keys;
                 if (empty($r1) || empty($r2)){ return 0; }
 
                 $robot1_token = !empty($r1['robot_token']) ? $r1['robot_token'] : 'robot';

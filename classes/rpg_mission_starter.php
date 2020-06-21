@@ -9,7 +9,7 @@ class rpg_mission_starter extends rpg_mission {
     public static function generate($this_prototype_data, $this_robot_token = 'met', $this_start_level = 1, $this_rescue_token = 'roll', $this_intro_field = 'intro-field'){
 
         // Pull in global variables for this function
-        global $mmrpg_index, $db;
+        global $db;
         global $this_omega_factors_one;
         global $this_omega_factors_two;
         global $this_omega_factors_three;

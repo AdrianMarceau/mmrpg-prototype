@@ -51,7 +51,7 @@
                     $temp_base_tokens = array();
                     $temp_fusion_tokens = array();
                     $temp_fusion_tokens_index = array();
-                    foreach ($mmrpg_index['players'] AS $temp_player_token => $temp_player_info){
+                    foreach ($mmrpg_database_players AS $temp_player_token => $temp_player_info){
 
                         // Collect this player's omega factors from the session
                         $temp_omega_session_key = $temp_player_token.'_target-robot-omega_prototype';
