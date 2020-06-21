@@ -37,8 +37,7 @@
     $mmrpg_functions_index = array();
     if (!empty($functions_list)){
         foreach ($functions_list as $key => $value){
-            if (strstr($value, '_index.php')){ continue; }
-            elseif (!preg_match('/\.php$/i', $value)){ continue; }
+            if (!preg_match('/\.php$/i', $value)){ continue; }
             $value = str_replace('\\', '/', $value);
             $value = str_replace($functions_path, '', $value);
             $mmrpg_functions_index[] = $value;

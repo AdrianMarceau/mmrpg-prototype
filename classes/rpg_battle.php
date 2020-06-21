@@ -236,7 +236,7 @@ class rpg_battle extends rpg_object {
                 if (!empty($append_cache_markup)){ $battles_cache_markup = array_merge($battles_cache_markup, $append_cache_markup); }
             }
             // Else, ensure the file matches the naming format
-            elseif ($filename != '_index.php' && preg_match('#^[-_a-z0-9]+\.php$#i', $filename)){
+            elseif (substr($filename, 0, 1) != '_' && preg_match('#^[-_a-z0-9]+\.php$#i', $filename)){
                 // Collect the battle token from the filename
                 $this_battle_token = preg_replace('#^([-_a-z0-9]+)\.php$#i', '$1', $filename);
                 if (!empty($this_path)){ $this_battle_token = trim(str_replace('/', '-', $this_path), '-').'-'.$this_battle_token; }
