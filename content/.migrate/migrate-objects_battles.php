@@ -25,7 +25,8 @@ if (!empty($migration_filter)){
     unset($old_battle_index);
 }
 
-define('MMRPG_BATTLES_CONTENT_DIR', MMRPG_CONFIG_ROOTDIR.'content/battles/');
+// Pre-define the base battle content dir
+define('MMRPG_BATTLES_NEW_CONTENT_DIR', MMRPG_CONFIG_ROOTDIR.'content/battles/');
 
 // Count the number of battles that we'll be looping through
 $battle_index_size = count($battle_index);
@@ -51,7 +52,7 @@ foreach ($battle_index AS $battle_token => $battle_data){
     ob_echo('Processing battle "'.$battle_token.'" '.$count_string);
     ob_flush();
 
-    $content_path = MMRPG_BATTLES_CONTENT_DIR.($battle_token === 'battle' ? '.battle' : $battle_token).'/';
+    $content_path = MMRPG_BATTLES_NEW_CONTENT_DIR.($battle_token === 'battle' ? '.battle' : $battle_token).'/';
     //ob_echo('-- $content_path = '.clean_path($content_path));
     if (file_exists($content_path)){ deleteDir($content_path); }
     mkdir($content_path);
@@ -72,12 +73,13 @@ foreach ($battle_index AS $battle_token => $battle_data){
     unset($content_json_data['battle_functions']);
     ob_echo('- export all other data to '.clean_path($content_json_path));
     $h = fopen($content_json_path, 'w');
-    fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT));
+    fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
     fclose($h);
 
     if ($migration_limit && $battle_num >= $migration_limit){ break; }
 
 }
+
 
 ob_echo('----------');
 
@@ -91,7 +93,7 @@ ob_echo('');
 ob_echo('============================');
 ob_echo('|    END BATTLE MIGRATION    |');
 ob_echo('============================');
-
+ob_echo('');
 
 
 // -- LEGACY FUNCTIONS! -- //

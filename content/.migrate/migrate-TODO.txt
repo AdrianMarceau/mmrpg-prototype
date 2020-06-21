@@ -34,13 +34,9 @@ Update the admin panel to work with the new sprite directories
 -  fields
 
 Update the admin panel so that saving auto-updates the data.json file
--  types
--  battles
 -  players
 -  fields
 -  robots
--  abilities
--  items
 
 Update code to point to new CONTENT directories (what part of the code?)
 -  types

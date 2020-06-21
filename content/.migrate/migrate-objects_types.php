@@ -18,7 +18,6 @@ $template_type['type_class'] = 'system';
 $template_type['type_order'] = -1;
 $type_index['type'] = $template_type;
 
-
 // If there's a filter present, remove all tokens not in the filter
 if (!empty($migration_filter)){
     $old_type_index = $type_index;
@@ -31,8 +30,8 @@ if (!empty($migration_filter)){
     unset($old_type_index);
 }
 
-define('MMRPG_TYPES_IMAGES_DIR', MMRPG_CONFIG_ROOTDIR.'images/types/');
-define('MMRPG_TYPES_CONTENT_DIR', MMRPG_CONFIG_ROOTDIR.'content/types/');
+// Pre-define the base type content dir
+define('MMRPG_TYPES_NEW_CONTENT_DIR', MMRPG_CONFIG_ROOTDIR.'content/types/');
 
 // Count the number of types that we'll be looping through
 $type_index_size = count($type_index);
@@ -59,7 +58,7 @@ foreach ($type_index AS $type_token => $type_data){
     $data_path = MMRPG_CONFIG_ROOTDIR.'data/types/'.$type_token.'.php';
     //ob_echo('-- $data_path = '.clean_path($data_path));
 
-    $content_path = MMRPG_TYPES_CONTENT_DIR.($type_token === 'type' ? '.type' : $type_token).'/';
+    $content_path = MMRPG_TYPES_NEW_CONTENT_DIR.($type_token === 'type' ? '.type' : $type_token).'/';
     //ob_echo('-- $content_path = '.clean_path($content_path));
     if (file_exists($content_path)){ deleteDir($content_path); }
     mkdir($content_path);
@@ -77,12 +76,13 @@ foreach ($type_index AS $type_token => $type_data){
     unset($content_json_data['type_id']);
     ob_echo('- export all other data to '.clean_path($content_json_path));
     $h = fopen($content_json_path, 'w');
-    fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT));
+    fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
     fclose($h);
 
     if ($migration_limit && $type_num >= $migration_limit){ break; }
 
 }
+
 
 ob_echo('----------');
 
@@ -96,7 +96,6 @@ ob_echo('');
 ob_echo('============================');
 ob_echo('|    END TYPE MIGRATION    |');
 ob_echo('============================');
-
-
+ob_echo('');
 
 ?>

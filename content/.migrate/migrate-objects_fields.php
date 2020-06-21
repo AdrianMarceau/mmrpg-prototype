@@ -11,7 +11,9 @@ $deprecated_fields = array(
     );
 
 // Collect an index of all valid fields from the database
-$field_fields = rpg_field::get_index_fields(true);
+$field_fields = rpg_field::get_index_fields();
+if (!in_array('field_functions', $field_fields)){ $field_fields[] = 'field_functions'; }
+$field_fields = implode(', ', $field_fields);
 $field_index = $db->get_array_list("SELECT {$field_fields} FROM mmrpg_index_fields ORDER BY field_token ASC", 'field_token');
 
 // If there's a filter present, remove all tokens not in the filter
@@ -26,8 +28,14 @@ if (!empty($migration_filter)){
     unset($old_field_index);
 }
 
+// Pre-define the base field image dir and the new field content dir
+define('MMRPG_FIELDS_NEW_CONTENT_DIR', MMRPG_CONFIG_ROOTDIR.'content/fields/');
+if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/fields/')){ define('MMRPG_FIELDS_OLD_IMAGES_DIR', MMRPG_CONFIG_ROOTDIR.'images/fields/'); }
+elseif (file_exists(MMRPG_CONFIG_ROOTDIR.'images/xxx_fields/')){ define('MMRPG_FIELDS_OLD_IMAGES_DIR', MMRPG_CONFIG_ROOTDIR.'images/xxx_fields/'); }
+else { exit('Required directory /images/fields/ does not exist!'); }
+
 // Pre-collect an index of field alts so we don't have to scan each later
-$field_sprites_list = scandir(MMRPG_CONFIG_ROOTDIR.'images/fields/');
+$field_sprites_list = scandir(MMRPG_FIELDS_OLD_IMAGES_DIR);
 $field_sprites_list = array_filter($field_sprites_list, function($s){ if ($s !== '.' && $s !== '..' && substr($s, 0, 1) !== '.'){ return true; } else { return false; } });
 //echo('$field_sprites_list = '.print_r($field_sprites_list, true));
 
@@ -49,10 +57,6 @@ foreach ($field_sprites_list AS $key => $token){
 }
 //echo('$field_sprites_alts_list = '.print_r($field_sprites_alts_list, true));
 //exit();
-
-// Pre-define the base field image dir and the new field content dir
-define('MMRPG_FIELDS_IMAGES_DIR', MMRPG_CONFIG_ROOTDIR.'images/fields/');
-define('MMRPG_FIELDS_CONTENT_DIR', MMRPG_CONFIG_ROOTDIR.'content/fields/');
 
 // Predefine a whitelist of sprites we can copy over for the fields
 $field_sprite_whitelist = array(
@@ -90,12 +94,12 @@ foreach ($field_index AS $field_token => $field_data){
     $function_path = rtrim(dirname($field_data['field_functions']), '/').'/';
     //ob_echo('-- $function_path = '.$function_path);
 
-    $sprite_path = MMRPG_CONFIG_ROOTDIR.'images/fields/'.$field_token.'/';
+    $sprite_path = MMRPG_FIELDS_OLD_IMAGES_DIR.$field_token.'/';
     //ob_echo('-- $sprite_path = '.clean_path($sprite_path));
     $data_path = MMRPG_CONFIG_ROOTDIR.'data/'.$function_path.$field_token.'.php';
     //ob_echo('-- $data_path = '.clean_path($data_path));
 
-    $content_path = MMRPG_FIELDS_CONTENT_DIR.($field_token === 'field' ? '.field' : $field_token).'/';
+    $content_path = MMRPG_FIELDS_NEW_CONTENT_DIR.($field_token === 'field' ? '.field' : $field_token).'/';
     //ob_echo('-- $content_path = '.clean_path($content_path));
     if (file_exists($content_path)){ deleteDir($content_path); }
     mkdir($content_path);
@@ -130,24 +134,13 @@ foreach ($field_index AS $field_token => $field_data){
     unset($content_json_data['field_functions']);
     ob_echo('- export all other data to '.clean_path($content_json_path));
     $h = fopen($content_json_path, 'w');
-    fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT));
+    fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
     fclose($h);
 
     if ($migration_limit && $field_num >= $migration_limit){ break; }
 
 }
 
-
-
-// MIGRATE OTHER FIELDS
-
-// Only migrate other fields if a filter isn't present
-if (empty($migration_filter)){
-
-    // Define the objects base path
-    $object_base_path = MMRPG_CONFIG_ROOTDIR.'images/objects/';
-
-}
 
 ob_echo('----------');
 
@@ -169,7 +162,6 @@ ob_echo('');
 ob_echo('=============================');
 ob_echo('|   END FIELD MIGRATION   |');
 ob_echo('=============================');
-
-
+ob_echo('');
 
 ?>

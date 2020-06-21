@@ -11,7 +11,9 @@ $deprecated_robots = array(
     );
 
 // Collect an index of all valid robots from the database
-$robot_fields = rpg_robot::get_index_fields(true);
+$robot_fields = rpg_robot::get_index_fields(false);
+if (!in_array('robot_functions', $robot_fields)){ $robot_fields[] = 'robot_functions'; }
+$robot_fields = implode(', ', $robot_fields);
 $robot_index = $db->get_array_list("SELECT {$robot_fields} FROM mmrpg_index_robots ORDER BY robot_token ASC", 'robot_token');
 
 // If there's a filter present, remove all tokens not in the filter
@@ -26,13 +28,20 @@ if (!empty($migration_filter)){
     unset($old_robot_index);
 }
 
+// Pre-define the base robot image dir and the new robot content dir
+define('MMRPG_ROBOTS_NEW_CONTENT_DIR', MMRPG_CONFIG_ROOTDIR.'content/robots/');
+if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/robots/')){ define('MMRPG_ROBOTS_OLD_IMAGES_DIR', MMRPG_CONFIG_ROOTDIR.'images/robots/'); }
+elseif (file_exists(MMRPG_CONFIG_ROOTDIR.'images/xxx_robots/')){ define('MMRPG_ROBOTS_OLD_IMAGES_DIR', MMRPG_CONFIG_ROOTDIR.'images/xxx_robots/'); }
+else { exit('Required directory /images/robots/ does not exist!'); }
+define('MMRPG_ROBOTS_OLD_SHADOW_IMAGES_DIR', rtrim(MMRPG_ROBOTS_OLD_IMAGES_DIR, '/').'_shadows/');
+
 // Pre-collect an index of robot sprite alts so we don't have to scan each later
-$robot_sprites_list = scandir(MMRPG_CONFIG_ROOTDIR.'images/robots/');
+$robot_sprites_list = scandir(MMRPG_ROBOTS_OLD_IMAGES_DIR);
 $robot_sprites_list = array_filter($robot_sprites_list, function($s){ if ($s !== '.' && $s !== '..' && substr($s, 0, 1) !== '.'){ return true; } else { return false; } });
 //echo('$robot_sprites_list = '.print_r($robot_sprites_list, true));
 
 // Pre-collect an index of robot shadow alts so we don't have to scan each later
-$robot_shadows_list = scandir(MMRPG_CONFIG_ROOTDIR.'images/robots_shadows/');
+$robot_shadows_list = scandir(MMRPG_ROBOTS_OLD_SHADOW_IMAGES_DIR);
 $robot_shadows_list = array_filter($robot_shadows_list, function($s){ if ($s !== '.' && $s !== '..' && substr($s, 0, 1) !== '.'){ return true; } else { return false; } });
 //echo('$robot_shadows_list = '.print_r($robot_shadows_list, true));
 
@@ -69,11 +78,6 @@ foreach ($robot_shadows_list AS $key => $token){
 //echo('$robot_sprites_alts_list = '.print_r($robot_sprites_alts_list, true));
 //exit();
 
-// Pre-define the base robot image dir and the new robot content dir
-define('MMRPG_ROBOTS_IMAGES_DIR', MMRPG_CONFIG_ROOTDIR.'images/robots/');
-define('MMRPG_ROBOTS_SHADOW_IMAGES_DIR', MMRPG_CONFIG_ROOTDIR.'images/robots_shadows/');
-define('MMRPG_ROBOTS_CONTENT_DIR', MMRPG_CONFIG_ROOTDIR.'content/robots/');
-
 // Predefine a size-agnostic whitelist of sprites we can copy over for robots
 $robot_sprite_whitelist = array(
     'mug_left_{{size}}.png', 'mug_right_{{size}}.png',
@@ -108,7 +112,7 @@ foreach ($robot_index AS $robot_token => $robot_data){
     ob_echo('Processing robot data and sprites "'.$robot_token.'" '.$count_string);
     ob_flush();
 
-    $content_path = MMRPG_ROBOTS_CONTENT_DIR.($robot_token === 'robot' ? '.robot' : $robot_token).'/';
+    $content_path = MMRPG_ROBOTS_NEW_CONTENT_DIR.($robot_token === 'robot' ? '.robot' : $robot_token).'/';
     //ob_echo('-- $content_path = '.clean_path($content_path));
     if (file_exists($content_path)){ deleteDir($content_path); }
     mkdir($content_path);
@@ -122,10 +126,10 @@ foreach ($robot_index AS $robot_token => $robot_data){
         $sprite_whitelist[] = str_replace('{{size}}', $zoom_size.'x'.$zoom_size, $sprite);
     }
 
-    $sprite_path = MMRPG_CONFIG_ROOTDIR.'images/robots/'.$robot_token.'/';
+    $sprite_path = MMRPG_ROBOTS_OLD_IMAGES_DIR.$robot_token.'/';
     //ob_echo('-- $sprite_path = '.clean_path($sprite_path));
 
-    $shadow_path = MMRPG_CONFIG_ROOTDIR.'images/robots_shadows/'.$robot_token.'/';
+    $shadow_path = MMRPG_ROBOTS_OLD_SHADOW_IMAGES_DIR.$robot_token.'/';
     //ob_echo('-- $shadow_path = '.clean_path($shadow_path));
 
     // Ensure the base sprite exists first and copy if so
@@ -201,28 +205,18 @@ foreach ($robot_index AS $robot_token => $robot_data){
     unset($content_json_data['robot_functions']);
     ob_echo('- export all other data to '.clean_path($content_json_path));
     $h = fopen($content_json_path, 'w');
-    fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT));
+    fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
     fclose($h);
 
     if ($migration_limit && $robot_num >= $migration_limit){ break; }
 
 }
 
-
-
-// MIGRATE OTHER ROBOTS
-
 // Delete directories that we don't want kept around
-$dot_robot_content_dir = MMRPG_ROBOTS_CONTENT_DIR.'.robot/';
+$dot_robot_content_dir = MMRPG_ROBOTS_NEW_CONTENT_DIR.'.robot/';
 if (file_exists($dot_robot_content_dir.'sprites_legacy/')){ deleteDir($dot_robot_content_dir.'sprites_legacy/'); }
 if (file_exists($dot_robot_content_dir.'shadows_legacy/')){ deleteDir($dot_robot_content_dir.'shadows_legacy/'); }
 
-// Only migrate other robots if a filter isn't present
-if (empty($migration_filter)){
-
-    // ...
-
-}
 
 ob_echo('----------');
 
@@ -245,9 +239,8 @@ sleep(1);
 
 ob_echo('');
 ob_echo('=============================');
-ob_echo('|   END ROBOT MIGRATION   |');
+ob_echo('|   END ROBOT MIGRATION     |');
 ob_echo('=============================');
-
-
+ob_echo('');
 
 ?>

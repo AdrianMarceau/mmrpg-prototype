@@ -25,7 +25,9 @@ $special_action_abilities = array(
     );
 
 // Collect an index of all valid abilities from the database
-$ability_fields = rpg_ability::get_index_fields(true);
+$ability_fields = rpg_ability::get_index_fields(false);
+if (!in_array('ability_functions', $ability_fields)){ $ability_fields[] = 'ability_functions'; }
+$ability_fields = implode(', ', $ability_fields);
 $ability_index = $db->get_array_list("SELECT {$ability_fields} FROM mmrpg_index_abilities ORDER BY ability_token ASC", 'ability_token');
 
 // If there's a filter present, remove all tokens not in the filter
@@ -40,8 +42,14 @@ if (!empty($migration_filter)){
     unset($old_ability_index);
 }
 
+// Pre-define the base ability image dir and the new ability content dir
+define('MMRPG_ABILITIES_NEW_CONTENT_DIR', MMRPG_CONFIG_ROOTDIR.'content/abilities/');
+if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/abilities/')){ define('MMRPG_ABILITIES_OLD_IMAGES_DIR', MMRPG_CONFIG_ROOTDIR.'images/abilities/'); }
+elseif (file_exists(MMRPG_CONFIG_ROOTDIR.'images/xxx_abilities/')){ define('MMRPG_ABILITIES_OLD_IMAGES_DIR', MMRPG_CONFIG_ROOTDIR.'images/xxx_abilities/'); }
+else { exit('Required directory /images/abilities/ does not exist!'); }
+
 // Pre-collect an index of ability alts so we don't have to scan each later
-$ability_sprites_list = scandir(MMRPG_CONFIG_ROOTDIR.'images/abilities/');
+$ability_sprites_list = scandir(MMRPG_ABILITIES_OLD_IMAGES_DIR);
 $ability_sprites_list = array_filter($ability_sprites_list, function($s){ if ($s !== '.' && $s !== '..'){ return true; } else { return false; } });
 //echo('$ability_sprites_list = '.print_r($ability_sprites_list, true));
 
@@ -64,18 +72,14 @@ foreach ($ability_sprites_list AS $key => $token){
 //echo('$ability_sprites_alts_list = '.print_r($ability_sprites_alts_list, true));
 //exit();
 
-// Pre-define the base ability image dir and the new ability content dir
-define('MMRPG_ABILITIES_IMAGES_DIR', MMRPG_CONFIG_ROOTDIR.'images/abilities/');
-define('MMRPG_ABILITIES_CONTENT_DIR', MMRPG_CONFIG_ROOTDIR.'content/abilities/');
-
 // Predefine the icon sprite and sprite-sprite filenames now
 $icon_sprite_filenames = array('icon_left_40x40.png', 'icon_right_40x40.png', 'icon_left_80x80.png', 'icon_right_80x80.png');
 $sprite_sprite_filenames = array('sprite_left_40x40.png', 'sprite_right_40x40.png', 'sprite_left_80x80.png', 'sprite_right_80x80.png');
 
 // Pre-create special action and effect directories for later
 $special_ability_dirs = array();
-$special_ability_dirs[] = $special_action_abilities_dir = MMRPG_ABILITIES_CONTENT_DIR.'_actions/';
-$special_ability_dirs[] = $special_effect_abilities_dir = MMRPG_ABILITIES_CONTENT_DIR.'_effects/';
+$special_ability_dirs[] = $special_action_abilities_dir = MMRPG_ABILITIES_NEW_CONTENT_DIR.'_actions/';
+$special_ability_dirs[] = $special_effect_abilities_dir = MMRPG_ABILITIES_NEW_CONTENT_DIR.'_effects/';
 foreach ($special_ability_dirs AS $special_ability_dir){
     //ob_echo('-- $special_ability_dir = '.clean_path($special_ability_dir));
     if (empty($migration_filter) && file_exists($special_ability_dir)){ deleteDir($special_ability_dir); }
@@ -110,7 +114,7 @@ foreach ($ability_index AS $ability_token => $ability_data){
     $function_path = rtrim(dirname($ability_data['ability_functions']), '/').'/';
     //ob_echo('-- $function_path = '.$function_path);
 
-    $sprite_path = MMRPG_CONFIG_ROOTDIR.'images/abilities/'.$ability_token.'/';
+    $sprite_path = MMRPG_ABILITIES_OLD_IMAGES_DIR.$ability_token.'/';
     //ob_echo('-- $sprite_path = '.clean_path($sprite_path));
     $data_path = MMRPG_CONFIG_ROOTDIR.'data/'.$function_path.$ability_token.'.php';
     //ob_echo('-- $data_path = '.clean_path($data_path));
@@ -118,7 +122,7 @@ foreach ($ability_index AS $ability_token => $ability_data){
     if (in_array($ability_token, $special_action_abilities)){
         $content_path = $special_action_abilities_dir.str_replace('action-', '', $ability_token).'/';
     } else {
-        $content_path = MMRPG_ABILITIES_CONTENT_DIR.($ability_token === 'ability' ? '.ability' : $ability_token).'/';
+        $content_path = MMRPG_ABILITIES_NEW_CONTENT_DIR.($ability_token === 'ability' ? '.ability' : $ability_token).'/';
     }
     //ob_echo('-- $content_path = '.clean_path($content_path));
     if (file_exists($content_path)){ deleteDir($content_path); }
@@ -215,7 +219,7 @@ foreach ($ability_index AS $ability_token => $ability_data){
     unset($content_json_data['ability_functions']);
     ob_echo('- export all other data to '.clean_path($content_json_path));
     $h = fopen($content_json_path, 'w');
-    fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT));
+    fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
     fclose($h);
 
     if ($migration_limit && $ability_num >= $migration_limit){ break; }
@@ -255,6 +259,7 @@ if (empty($migration_filter)){
 
 }
 
+
 ob_echo('----------');
 
 $ability_image_directories_copied = array_unique($ability_image_directories_copied);
@@ -275,7 +280,6 @@ ob_echo('');
 ob_echo('=============================');
 ob_echo('|   END ABILITY MIGRATION   |');
 ob_echo('=============================');
-
-
+ob_echo('');
 
 ?>
