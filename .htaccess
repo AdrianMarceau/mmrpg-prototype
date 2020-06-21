@@ -36,24 +36,14 @@ ExpiresByType text/css "access plus 1 months"
   mod_gzip_item_exclude rspheader ^Content-Encoding:.*gzip.*
 </ifModule>
 
+
 # Turn on URL rewriting and set the base
 RewriteEngine on
-#RewriteBase /
 
-#  Redirect non-www to the www domain
-RewriteCond %{HTTP_HOST} ^www.megamanpoweredup.net$ [NC]
-RewriteRule ^(.*)$ http://megamanpoweredup.net/$1 [R=301,L]
 
-#  Redirect and rpg2k11 traffic to the non-version
-RewriteCond %{HTTP_HOST} ^rpg.megamanpoweredup.net$ [NC]
-RewriteRule ^rpg2k11/(.*)$ http://rpg.megamanpoweredup.net/$1 [R=301,L]
-
-# Redirect the XML requests to their dynamic counterparts
-RewriteRule ^mmrpg-info\.xml$ mmrpg-info.php [L]
-RewriteRule ^mmrpg-ranking\.xml$ mmrpg-ranking.php [L]
-RewriteRule ^sitemap\.xml$ sitemap.php [L]
-RewriteRule ^styles/style\.css$ styles/style.php [L]
-RewriteRule ^styles/robots\.css$ styles/robots.php [L]
+####################################
+# -- LEGACY PAGE/ASSET REWRITES -- #
+####################################
 
 # Redirect the non-existant pages to better places
 RewriteRule ^home/?$ / [R,L]
@@ -72,6 +62,36 @@ RewriteRule ^images/abilities/item-core-([a-z]+)/(.*)?$ /images/items/$1-core/$2
 #RewriteRule ^images/abilities/item-([-_a-z0-9]+)/(.*)?$ /images/items/$1/$2 [R,L]
 RewriteRule ^(images|database)/items/core-([a-z]+)/(.*)?$ /$1/items/$2-core/$3 [R,L]
 RewriteRule ^(images|database)/items/screw-([a-z]+)/(.*)?$ /$1/items/$2-screw/$3 [R,L]
+
+
+#####################################
+# -- LEGACY SPRITE PATH REWRITES -- #
+#####################################
+
+# Redirect the old sprite URLs from /images/ to their new /content/ locations
+
+RewriteRule ^images/(abilities|fields|items|players|robots)/(ability|field|item|player|robot)(_[-_a-z0-9]+)?/(.*)?$ /content/$1/.$2/sprites$3/$4 [L]
+RewriteRule ^images/(abilities|fields|items|players|robots)_shadows/(ability|field|item|player|robot)(_[-_a-z0-9]+)?/(.*)?$ /content/$1/.$2/shadows$3/$4 [L]
+
+RewriteRule ^images/(abilities|fields|items|players|robots)/([-a-z0-9]+)(_[-_a-z0-9]+)?/(.*)?$ /content/$1/$2/sprites$3/$4 [L]
+RewriteRule ^images/(abilities|fields|items|players|robots)_shadows/([-a-z0-9]+)(_[-_a-z0-9]+)?/(.*)?$ /content/$1/$2/shadows$3/$4 [L]
+
+
+###################################
+# -- SCRIPT/STYLE/XML REWRITES -- #
+###################################
+
+# Redirect the XML requests to their dynamic counterparts
+RewriteRule ^mmrpg-info\.xml$ mmrpg-info.php [L]
+RewriteRule ^mmrpg-ranking\.xml$ mmrpg-ranking.php [L]
+RewriteRule ^sitemap\.xml$ sitemap.php [L]
+RewriteRule ^styles/style\.css$ styles/style.php [L]
+RewriteRule ^styles/robots\.css$ styles/robots.php [L]
+
+
+################################
+# -- SPECIFIC PAGE REWRITES -- #
+################################
 
 # Define the rewrite conditions
 #RewriteCond %{REQUEST_FILENAME} -d [OR]
@@ -101,6 +121,11 @@ RewriteRule ^(home|about|gallery|community|leaderboard|database|prototype|credit
 RewriteRule ^(home|about|gallery|community|leaderboard|database|prototype|credits|contact|file|dev|test)/([-_a-z0-9]+)/([0-9]+)/?\??(.*)$ index.php?page=$1&sub=$2&num=$3&$4 [L]
 RewriteRule ^(home|about|gallery|community|leaderboard|database|prototype|credits|contact|file|dev|test)/([-_a-z0-9]+)/?(.*)?$ index.php?page=$1&sub=$2&$3 [L]
 RewriteRule ^(home|about|gallery|community|leaderboard|database|prototype|credits|contact|file|error|dev|test)/?\??(.*)$ index.php?page=$1&$2 [L]
+
+
+#################################
+# -- ALL OTHER PAGE REWRITES -- #
+#################################
 
 # Define the rewrite conditions
 RewriteCond %{REQUEST_FILENAME} -f [OR]

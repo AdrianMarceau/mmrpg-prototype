@@ -7,7 +7,7 @@ Create migration scripts for all the CONTENT directories
 -  abilities  [DONE]
 -  items  [DONE]
 
-Remove dependencis on all of the /data/ directories first and foremore
+Remove dependencis on all of the /data/ directories first and foremost
 -  types [DONE]
 -  battles [DONE]
 -  players [DONE]
