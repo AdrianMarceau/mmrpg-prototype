@@ -1183,8 +1183,8 @@ var asset_sprite_cache = [];
 var asset_sprite_images = [
     'images/assets/battle-scene_robot-details.gif',
     'images/assets/battle-scene_robot-results.gif',
-    'images/abilities/ability-results/sprite_left_80x80.png',
-    'images/abilities/ability-results/sprite_right_80x80.png'
+    'images/abilities/_effects/stat-arrows/sprite_left_80x80.png',
+    'images/abilities/_effects/stat-arrows/sprite_right_80x80.png'
     ];
 function mmrpg_preload_assets(){
     // Loop through each of the asset images

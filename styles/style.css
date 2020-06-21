@@ -992,7 +992,6 @@ body.index #header {
     font-size: 10px;
     line-height: 48px;
     letter-spacing: 0;
-    /*background: transparent url(../images/assets/battle-scene_robot-results.gif) scroll no-repeat 0 0;*/
     background: transparent url(../images/assets/battle-scene_robot-results.png?20130828-2) scroll no-repeat 0 0;
 }
 

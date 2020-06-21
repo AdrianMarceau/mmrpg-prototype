@@ -76,6 +76,8 @@ RewriteRule ^images/(abilities|fields|items|players|robots)_shadows/(ability|fie
 RewriteRule ^images/(abilities|fields|items|players|robots)/([-a-z0-9]+)(_[-_a-z0-9]+)?/(.*)?$ /content/$1/$2/sprites$3/$4 [L]
 RewriteRule ^images/(abilities|fields|items|players|robots)_shadows/([-a-z0-9]+)(_[-_a-z0-9]+)?/(.*)?$ /content/$1/$2/shadows$3/$4 [L]
 
+RewriteRule ^images/(abilities|fields|items|players|robots)/(_effects)/([-_a-z0-9]+)?/(.*)?$ /content/$1/$2/$3/$4 [L]
+
 
 ###################################
 # -- SCRIPT/STYLE/XML REWRITES -- #

@@ -1718,7 +1718,7 @@ class rpg_canvas {
                     }
                     $this_results_data['results_amount_style'] = 'bottom: '.$this_results_data['results_amount_canvas_offset_y'].'px; '.$this_robot_data['robot_float'].': '.$this_results_data['results_amount_canvas_offset_x'].'px; z-index: '.$this_results_data['results_amount_canvas_offset_z'].'; opacity: '.$this_results_data['results_amount_canvas_opacity'].'; ';
                     $this_results_data['results_effect_class'] = 'sprite sprite_'.$this_results_data[$results_type.'_sprite_size'].'x'.$this_results_data[$results_type.'_sprite_size'].' '.$results_type.'_status_active '.$results_type.'_position_active ';
-                    $this_results_data['results_effect_style'] = 'z-index: '.$this_results_data['canvas_offset_z'].'; '.$this_robot_data['robot_float'].': '.$this_results_data['canvas_offset_x'].'px; bottom: '.$this_results_data['canvas_offset_y'].'px; background-image: url(images/abilities/ability-results/sprite_'.$this_robot_data['robot_direction'].'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); ';
+                    $this_results_data['results_effect_style'] = 'z-index: '.$this_results_data['canvas_offset_z'].'; '.$this_robot_data['robot_float'].': '.$this_results_data['canvas_offset_x'].'px; bottom: '.$this_results_data['canvas_offset_y'].'px; background-image: url(images/abilities/_effects/stat-arrows/sprite_'.$this_robot_data['robot_direction'].'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); ';
 
                     // Ensure a damage/recovery trigger has been sent and actual damage/recovery was done
                     if (!empty($this_options['this_'.$results_type.'_results']['this_amount'])
