@@ -8,7 +8,7 @@ ob_echo('');
 
 // Collect an index of all valid battles from the database
 // Load the complete battle index with the class function
-rpg_battle::load_battle_index();
+rpg_battle::load_legacy_battle_index();
 $battle_index = $db->INDEX['BATTLES'];
 //echo('<pre>$battle_index = '.print_r($battle_index, true).'</pre>');
 //exit();
