@@ -7,12 +7,31 @@ Create migration scripts for all the CONTENT directories
 -  abilities  [DONE]
 -  items  [DONE]
 
+Remove dependencis on all of the /data/ directories first and foremore
+-  types
+-  battles
+-  players
+-  fields
+-  robots
+-  abilities
+-  items
+
 Create htaccess rules OR script to point sprites to new content directories
 -  players
 -  fields
 -  robots
 -  abilities
 -  items
+
+Update the admin panel to remove(?) the functions path field, it should be assumed now
+-  players
+-  robots
+-  fields
+
+Update the admin panel to work with the new sprite directories
+-  players
+-  robots
+-  fields
 
 Update code to point to new CONTENT directories
 -  types
@@ -48,11 +67,6 @@ Update fields to pull objects from other places
 -  update industrial-facility to incorporate the gear into the background
 -  move gentle-countryside's mini-light-lab into field folder, update code somehow
 -
-
-Update the admin panel to work with the new sprite directories
--  players
--  robots
--  fields
 
 Update the admin panel with editors for the final object types
 -  abilities
