@@ -31,32 +31,6 @@
     $mmrpg_abilities_fields = rpg_ability::get_index_fields(true);
     $mmrpg_abilities_index = $db->get_array_list("SELECT {$mmrpg_abilities_fields} FROM mmrpg_index_abilities WHERE ability_token <> 'ability' AND ability_class <> 'system' ORDER BY ability_order ASC", 'ability_token');
 
-    // Collect an index of robot function files for options
-    $functions_path = MMRPG_CONFIG_ROOTDIR.'data/';
-    $functions_list = getDirContents($functions_path.'robots/');
-    $mmrpg_functions_index = array();
-    if (!empty($functions_list)){
-        foreach ($functions_list as $key => $value){
-            if (!preg_match('/\.php$/i', $value)){ continue; }
-            $value = str_replace('\\', '/', $value);
-            $value = str_replace($functions_path, '', $value);
-            $mmrpg_functions_index[] = $value;
-        }
-        usort($mmrpg_functions_index, function($a, $b){
-            $ax = explode('/', $a); $axcount = count($ax);
-            $bx = explode('/', $b); $bxcount = count($bx);
-            $az = strstr($a, '/mm') ? true : false;
-            $bz = strstr($b, '/mm') ? true : false;
-            if ($axcount < $bxcount){ return -1; }
-            elseif ($axcount > $bxcount){ return 1; }
-            elseif ($az && !$bz){ return -1; }
-            elseif (!$az && $bz){ return 1; }
-            elseif ($a < $b){ return -1; }
-            elseif ($a > $b){ return 1; }
-            else { return 0; }
-            });
-    }
-
     // Collect an index of contributors and admins that have made sprites
     $mmrpg_contributors_index = $db->get_array_list("SELECT
         users.user_id AS user_id,
@@ -366,8 +340,6 @@
             $form_data['robot_abilities_rewards'] = !empty($_POST['robot_abilities_rewards']) ? array_values(array_filter($_POST['robot_abilities_rewards'])) : array();
             $form_data['robot_abilities_compatible'] = !empty($_POST['robot_abilities_compatible']) && is_array($_POST['robot_abilities_compatible']) ? array_values(array_unique(array_filter($_POST['robot_abilities_compatible']))) : array();
 
-            $form_data['robot_functions'] = !empty($_POST['robot_functions']) && preg_match('/^[-_0-9a-z\.\/]+$/i', $_POST['robot_functions']) ? trim($_POST['robot_functions']) : '';
-
             $form_data['robot_image'] = !empty($_POST['robot_image']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_image']) ? trim(strtolower($_POST['robot_image'])) : '';
             $form_data['robot_image_size'] = !empty($_POST['robot_image_size']) && is_numeric($_POST['robot_image_size']) ? (int)(trim($_POST['robot_image_size'])) : 0;
             $form_data['robot_image_editor'] = !empty($_POST['robot_image_editor']) && is_numeric($_POST['robot_image_editor']) ? (int)(trim($_POST['robot_image_editor'])) : 0;
@@ -410,6 +382,8 @@
 
             // REFORMAT or OPTIMIZE data for provided fields where necessary
 
+            $form_data['robot_functions'] = 'robots/'.$form_data['robot_token'].'/functions.php';
+
             if (isset($form_data['robot_core'])){
                 // Fix any core ordering problems (like selecting Neutral + anything)
                 $cores = array_values(array_filter(array($form_data['robot_core'], $form_data['robot_core2'])));
@@ -449,7 +423,6 @@
                 elseif (!$form_data['robot_flag_complete']){ $form_messages[] = array('warning', 'Robot must be complete to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
                 elseif ($form_data['robot_class'] !== 'master'){ $form_messages[] = array('warning', 'Only robot masters can be marked as unlockable'); $form_data['robot_flag_unlockable'] = 0; }
                 elseif (empty($form_data['robot_field']) && empty($form_data['robot_field2'])){ $form_messages[] = array('warning', 'Robot must have battle field to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
-                elseif (empty($form_data['robot_functions'])){ $form_messages[] = array('warning', 'Robot must have a function file to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
                 elseif (empty($form_data['robot_description'])){ $form_messages[] = array('warning', 'Robot must have a flavour class to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
                 elseif (empty($form_data['robot_quotes_start'])){ $form_messages[] = array('warning', 'Robot must have a start quote to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
                 elseif (empty($form_data['robot_quotes_taunt'])){ $form_messages[] = array('warning', 'Robot must have a taunt quote to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
@@ -1073,31 +1046,6 @@
                                     </div>
                                     <?
                                 } ?>
-
-                                <hr />
-
-                                <?
-
-                                // Pre-generate a list of all functions so we can re-use it over and over
-                                $function_options_markup = array();
-                                $function_options_markup[] = '<option value="">-</option>';
-                                foreach ($mmrpg_functions_index AS $function_key => $function_path){
-                                    $function_options_markup[] = '<option value="'.$function_path.'">'.$function_path.'</option>';
-                                }
-                                $function_options_count = count($function_options_markup);
-                                $function_options_markup = implode(PHP_EOL, $function_options_markup);
-
-                                ?>
-
-                                <div class="field halfsize">
-                                    <div class="label">
-                                        <strong>Robot Functions</strong>
-                                        <em>file path for script with robot functions like onload, ondefeat, etc.</em>
-                                    </div>
-                                    <select class="select" name="robot_functions">
-                                        <?= str_replace('value="'.$robot_data['robot_functions'].'"', 'value="'.$robot_data['robot_functions'].'" selected="selected"', $function_options_markup) ?>
-                                    </select><span></span>
-                                </div>
 
                             </div>
 

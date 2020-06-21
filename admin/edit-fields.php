@@ -37,32 +37,6 @@
         }
     }
 
-    // Collect an index of field function files for options
-    $functions_path = MMRPG_CONFIG_ROOTDIR.'data/';
-    $functions_list = getDirContents($functions_path.'fields/');
-    $mmrpg_functions_index = array();
-    if (!empty($functions_list)){
-        foreach ($functions_list as $key => $value){
-            if (!preg_match('/\.php$/i', $value)){ continue; }
-            $value = str_replace('\\', '/', $value);
-            $value = str_replace($functions_path, '', $value);
-            $mmrpg_functions_index[] = $value;
-        }
-        usort($mmrpg_functions_index, function($a, $b){
-            $ax = explode('/', $a); $axcount = count($ax);
-            $bx = explode('/', $b); $bxcount = count($bx);
-            $az = strstr($a, '/mm') ? true : false;
-            $bz = strstr($b, '/mm') ? true : false;
-            if ($axcount < $bxcount){ return -1; }
-            elseif ($axcount > $bxcount){ return 1; }
-            elseif ($az && !$bz){ return -1; }
-            elseif (!$az && $bz){ return 1; }
-            elseif ($a < $b){ return -1; }
-            elseif ($a > $b){ return 1; }
-            else { return 0; }
-            });
-    }
-
     // Collect an index of contributors and admins that have made sprites
     $mmrpg_contributors_index = $db->get_array_list("SELECT
         users.user_id AS user_id,
@@ -347,8 +321,6 @@
             $form_data['field_mechas'] = !empty($_POST['field_mechas']) && is_array($_POST['field_mechas']) ? array_values(array_unique(array_filter($_POST['field_mechas']))) : array();
             $form_data['field_multipliers'] = !empty($_POST['field_multipliers']) && is_array($_POST['field_multipliers']) ? array_values(array_filter($_POST['field_multipliers'])) : array();
 
-            $form_data['field_functions'] = !empty($_POST['field_functions']) && preg_match('/^[-_0-9a-z\.\/]+$/i', $_POST['field_functions']) ? trim($_POST['field_functions']) : '';
-
             $form_data['field_description'] = !empty($_POST['field_description']) && preg_match('/^[-_0-9a-z\.\*\s\']+$/i', $_POST['field_description']) ? trim($_POST['field_description']) : '';
             $form_data['field_description2'] = !empty($_POST['field_description2']) ? trim(strip_tags($_POST['field_description2'])) : '';
 
@@ -387,6 +359,8 @@
             //if (empty($form_data['field_group'])){ $form_messages[] = array('warning', 'Sorting Group was not provided and may cause issues on the front-end'); }
 
             // REFORMAT or OPTIMIZE data for provided fields where necessary
+
+            $form_data['field_functions'] = 'fields/'.$form_data['field_token'].'/functions.php';
 
             if (isset($form_data['field_master2'])){ $form_data['field_master2'] = !empty($form_data['field_master2']) ? json_encode(array($form_data['field_master2'])) : ''; }
 
@@ -1033,31 +1007,6 @@
                                         <?
                                     }
                                     ?>
-                                </div>
-
-                                <hr />
-
-                                <?
-
-                                // Pre-generate a list of all functions so we can re-use it over and over
-                                $function_options_markup = array();
-                                $function_options_markup[] = '<option value="">-</option>';
-                                foreach ($mmrpg_functions_index AS $function_key => $function_path){
-                                    $function_options_markup[] = '<option value="'.$function_path.'">'.$function_path.'</option>';
-                                }
-                                $function_options_count = count($function_options_markup);
-                                $function_options_markup = implode(PHP_EOL, $function_options_markup);
-
-                                ?>
-
-                                <div class="field halfsize">
-                                    <div class="label">
-                                        <strong>Field Functions</strong>
-                                        <em>file path for script with field functions like onload, ondefeat, etc.</em>
-                                    </div>
-                                    <select class="select" name="field_functions">
-                                        <?= str_replace('value="'.$field_data['field_functions'].'"', 'value="'.$field_data['field_functions'].'" selected="selected"', $function_options_markup) ?>
-                                    </select><span></span>
                                 </div>
 
                             </div>

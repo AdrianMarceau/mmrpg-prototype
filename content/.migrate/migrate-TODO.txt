@@ -8,13 +8,13 @@ Create migration scripts for all the CONTENT directories
 -  items  [DONE]
 
 Remove dependencis on all of the /data/ directories first and foremore
--  types
--  battles
--  players
--  fields
--  robots
--  abilities
--  items
+-  types [DONE]
+-  battles [DONE]
+-  players [DONE]
+-  fields [DONE]
+-  robots [DONE]
+-  abilities [DONE]
+-  items [DONE]
 
 Create htaccess rules OR script to point sprites to new content directories
 -  players
@@ -32,6 +32,15 @@ Update the admin panel to work with the new sprite directories
 -  players
 -  robots
 -  fields
+
+Update the admin panel so that saving auto-updated the data.json file
+-  types
+-  battles
+-  players
+-  fields
+-  robots
+-  abilities
+-  items
 
 Update code to point to new CONTENT directories
 -  types

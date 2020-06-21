@@ -31,32 +31,6 @@
     $mmrpg_abilities_fields = rpg_ability::get_index_fields(true);
     $mmrpg_abilities_index = $db->get_array_list("SELECT {$mmrpg_abilities_fields} FROM mmrpg_index_abilities WHERE ability_token <> 'ability' AND ability_class <> 'system' ORDER BY ability_order ASC", 'ability_token');
 
-    // Collect an index of player function files for options
-    $functions_path = MMRPG_CONFIG_ROOTDIR.'data/';
-    $functions_list = getDirContents($functions_path.'players/');
-    $mmrpg_functions_index = array();
-    if (!empty($functions_list)){
-        foreach ($functions_list as $key => $value){
-            if (!preg_match('/\.php$/i', $value)){ continue; }
-            $value = str_replace('\\', '/', $value);
-            $value = str_replace($functions_path, '', $value);
-            $mmrpg_functions_index[] = $value;
-        }
-        usort($mmrpg_functions_index, function($a, $b){
-            $ax = explode('/', $a); $axcount = count($ax);
-            $bx = explode('/', $b); $bxcount = count($bx);
-            $az = strstr($a, '/mm') ? true : false;
-            $bz = strstr($b, '/mm') ? true : false;
-            if ($axcount < $bxcount){ return -1; }
-            elseif ($axcount > $bxcount){ return 1; }
-            elseif ($az && !$bz){ return -1; }
-            elseif (!$az && $bz){ return 1; }
-            elseif ($a < $b){ return -1; }
-            elseif ($a > $b){ return 1; }
-            else { return 0; }
-            });
-    }
-
     // Collect an index of contributors and admins that have made sprites
     $mmrpg_contributors_index = $db->get_array_list("SELECT
         users.user_id AS user_id,
@@ -357,8 +331,6 @@
             $form_data['player_robots_rewards'] = !empty($_POST['player_robots_rewards']) ? array_values(array_filter($_POST['player_robots_rewards'])) : array();
             $form_data['player_robots_compatible'] = !empty($_POST['player_robots_compatible']) && is_array($_POST['player_robots_compatible']) ? array_values(array_unique(array_filter($_POST['player_robots_compatible']))) : array();
 
-            $form_data['player_functions'] = !empty($_POST['player_functions']) && preg_match('/^[-_0-9a-z\.\/]+$/i', $_POST['player_functions']) ? trim($_POST['player_functions']) : '';
-
             $form_data['player_image'] = !empty($_POST['player_image']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['player_image']) ? trim(strtolower($_POST['player_image'])) : '';
             $form_data['player_image_size'] = !empty($_POST['player_image_size']) && is_numeric($_POST['player_image_size']) ? (int)(trim($_POST['player_image_size'])) : 0;
             $form_data['player_image_editor'] = !empty($_POST['player_image_editor']) && is_numeric($_POST['player_image_editor']) ? (int)(trim($_POST['player_image_editor'])) : 0;
@@ -396,6 +368,8 @@
             if (empty($form_data['player_number'])){ $form_messages[] = array('warning', 'Serial Number was not provided and may cause issues on the front-end'); }
 
             // REFORMAT or OPTIMIZE data for provided fields where necessary
+
+            $form_data['player_functions'] = 'players/'.$form_data['player_token'].'/functions.php';
 
             if (!empty($form_data['player_abilities_rewards'])){
                 $new_rewards = array();
@@ -914,28 +888,6 @@
                                 <div class="field">
                                     <strong class="label">Sort Order</strong>
                                     <input class="textbox" type="number" name="player_order" value="<?= $player_data['player_order'] ?>" maxlength="8" />
-                                </div>
-
-                                <hr />
-
-                                <div class="field halfsize">
-                                    <?
-                                    // Pre-generate a list of all functions so we can re-use it over and over
-                                    $function_options_markup = array();
-                                    $function_options_markup[] = '<option value="">-</option>';
-                                    foreach ($mmrpg_functions_index AS $function_key => $function_path){
-                                        $function_options_markup[] = '<option value="'.$function_path.'">'.$function_path.'</option>';
-                                    }
-                                    $function_options_count = count($function_options_markup);
-                                    $function_options_markup = implode(PHP_EOL, $function_options_markup);
-                                    ?>
-                                    <div class="label">
-                                        <strong>Player Functions</strong>
-                                        <em>file path for script with player functions like onload, ondefeat, etc.</em>
-                                    </div>
-                                    <select class="select" name="player_functions">
-                                        <?= str_replace('value="'.$player_data['player_functions'].'"', 'value="'.$player_data['player_functions'].'" selected="selected"', $function_options_markup) ?>
-                                    </select><span></span>
                                 </div>
 
                             </div>

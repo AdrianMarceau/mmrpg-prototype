@@ -22,7 +22,6 @@ Disallow: /_logs/
 Disallow: /_preview/
 Disallow: /_share/
 Disallow: /_tmp/
-Disallow: /data/
 Disallow: /pages/
 Disallow: /frames/
 Disallow: /sounds/
