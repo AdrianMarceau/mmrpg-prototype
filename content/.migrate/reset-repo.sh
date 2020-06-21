@@ -49,6 +49,8 @@ if test -d  "${REPO_PATH}"; then
         echo ""
         echo "DONE!"
 
+        start chrome "https://github.com/AdrianMarceau/mmrpg-prototype_${1}.git"
+
     else
 
         echo "${REPO_PATH}${REPO_CONFIG} does not exist!"
