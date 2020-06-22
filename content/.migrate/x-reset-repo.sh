@@ -1,9 +1,11 @@
 #!/bin/bash
 
-REPO_PATH="/c/wamp/www/mmrpg-world.net.prototype/public_html/content/${1}/"
+source "$(dirname "$0")/x-common.sh"
+
+REPO_PATH="${BASE_PATH}content/${1}/"
 REPO_GIT=".git/"
-REPO_CONFIG=".git/config"
-TEMP_CONFIG="/c/wamp/tmp/${1}_config"
+REPO_CONFIG="${REPO_GIT}config"
+TEMP_CONFIG="$(mktemp)"
 
 echo "================================"
 echo "-- FACTORY RESET ${1^^} REPO --"
@@ -49,7 +51,7 @@ if test -d  "${REPO_PATH}"; then
         echo ""
         echo "DONE!"
 
-        start chrome "https://github.com/AdrianMarceau/mmrpg-prototype_${1}.git"
+        start chrome "${GITHUB_BASE}mmrpg-prototype_${1}.git"
 
     else
 
@@ -66,3 +68,5 @@ else
     echo "FAILED!"
 
 fi
+
+echo ""

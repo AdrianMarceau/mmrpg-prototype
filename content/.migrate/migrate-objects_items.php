@@ -159,9 +159,7 @@ foreach ($item_index AS $item_token => $item_data){
 
     // And then write the rest of the non-function data into a json file
     $content_json_path = $content_path.'data.json';
-    $content_json_data = $item_data;
-    unset($content_json_data['item_id']);
-    unset($content_json_data['item_functions']);
+    $content_json_data = clean_json_content_array('item', $item_data);
     ob_echo('- export all other data to '.clean_path($content_json_path));
     $h = fopen($content_json_path, 'w');
     fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));

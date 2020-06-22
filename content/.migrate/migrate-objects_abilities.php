@@ -214,9 +214,7 @@ foreach ($ability_index AS $ability_token => $ability_data){
 
     // And then write the rest of the non-function data into a json file
     $content_json_path = $content_path.'data.json';
-    $content_json_data = $ability_data;
-    unset($content_json_data['ability_id']);
-    unset($content_json_data['ability_functions']);
+    $content_json_data = clean_json_content_array('ability', $ability_data);
     ob_echo('- export all other data to '.clean_path($content_json_path));
     $h = fopen($content_json_path, 'w');
     fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));

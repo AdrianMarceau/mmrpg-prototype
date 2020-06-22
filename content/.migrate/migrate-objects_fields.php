@@ -129,9 +129,7 @@ foreach ($field_index AS $field_token => $field_data){
 
     // And then write the rest of the non-function data into a json file
     $content_json_path = $content_path.'data.json';
-    $content_json_data = $field_data;
-    unset($content_json_data['field_id']);
-    unset($content_json_data['field_functions']);
+    $content_json_data = clean_json_content_array('field', $field_data);
     ob_echo('- export all other data to '.clean_path($content_json_path));
     $h = fopen($content_json_path, 'w');
     fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
