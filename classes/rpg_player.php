@@ -1718,6 +1718,32 @@ class rpg_player extends rpg_object {
     }
 
     /**
+     * Get a list of all JSON-based player index fields as an array or, optionally, imploded into a string
+     * @param bool $implode
+     * @return mixed
+     */
+    public static function get_json_index_fields($implode = false){
+
+        // Define the various json index fields for player objects
+        $json_index_fields = array(
+            'player_abilities_rewards',
+            'player_abilities_compatible',
+            'player_robots_rewards',
+            'player_robots_compatible',
+            'player_image_alts'
+            );
+
+        // Implode the index fields into a string if requested
+        if ($implode){
+            $json_index_fields = implode(', ', $json_index_fields);
+        }
+
+        // Return the index fields, array or string
+        return $json_index_fields;
+
+    }
+
+    /**
      * Get the entire player index array with parsed info
      * @param bool $parse_data
      * @return array
@@ -1866,7 +1892,7 @@ class rpg_player extends rpg_object {
         else { $player_info['_parsed'] = true; }
 
         // Explode json encoded fields into expanded array objects
-        $temp_fields = array('player_abilities_rewards', 'player_abilities_compatible', 'player_robots_rewards', 'player_robots_compatible', 'player_image_alts');
+        $temp_fields = self::get_json_index_fields();
         foreach ($temp_fields AS $field_name){
             if (!empty($player_info[$field_name])){ $player_info[$field_name] = json_decode($player_info[$field_name], true); }
             else { $player_info[$field_name] = array(); }

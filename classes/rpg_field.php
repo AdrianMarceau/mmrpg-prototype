@@ -190,6 +190,35 @@ class rpg_field extends rpg_object {
     }
 
     /**
+     * Get a list of all JSON-based player index fields as an array or, optionally, imploded into a string
+     * @param bool $implode
+     * @return mixed
+     */
+    public static function get_json_index_fields($implode = false){
+
+        // Define the various json index fields for player objects
+        $json_index_fields = array(
+            'field_master2',
+            'field_mechas',
+            'field_multipliers',
+            'field_music_link',
+            'field_background_frame',
+            'field_foreground_frame',
+            'field_background_attachments',
+            'field_foreground_attachments'
+            );
+
+        // Implode the index fields into a string if requested
+        if ($implode){
+            $json_index_fields = implode(', ', $json_index_fields);
+        }
+
+        // Return the index fields, array or string
+        return $json_index_fields;
+
+    }
+
+    /**
      * Get the entire field index array with parsed info
      * @param bool $parse_data
      * @return array
@@ -340,7 +369,7 @@ class rpg_field extends rpg_object {
         else { $field_info['_parsed'] = true; }
 
         // Explode json encoded fields into expanded array objects
-        $temp_field_names = array('field_master2', 'field_mechas', 'field_multipliers', 'field_music_link', 'field_background_frame', 'field_foreground_frame', 'field_background_attachments', 'field_foreground_attachments');
+        $temp_field_names = self::get_json_index_fields();
         foreach ($temp_field_names AS $field_name){
             if (!empty($field_info[$field_name])){ $field_info[$field_name] = json_decode($field_info[$field_name], true); }
             else { $field_info[$field_name] = array(); }

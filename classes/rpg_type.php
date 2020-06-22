@@ -42,6 +42,29 @@ class rpg_type {
     }
 
     /**
+     * Get a list of all JSON-based player index fields as an array or, optionally, imploded into a string
+     * @param bool $implode
+     * @return mixed
+     */
+    public static function get_json_index_fields($implode = false){
+
+        // Define the various json index fields for player objects
+        $json_index_fields = array(
+            'type_colour_dark',
+            'type_colour_light'
+            );
+
+        // Implode the index fields into a string if requested
+        if ($implode){
+            $json_index_fields = implode(', ', $json_index_fields);
+        }
+
+        // Return the index fields, array or string
+        return $json_index_fields;
+
+    }
+
+    /**
      * Get the entire type index array with parsed info
      * @param bool $parse_data
      * @return array
@@ -172,7 +195,7 @@ class rpg_type {
         else { $type_info['_parsed'] = true; }
 
         // Explode json encoded fields into expanded array objects
-        $temp_fields = array('type_colour_dark', 'type_colour_light');
+        $temp_fields = self::get_json_index_fields();
         foreach ($temp_fields AS $field_name){
             if (!empty($type_info[$field_name])){ $type_info[$field_name] = json_decode($type_info[$field_name], true); }
             else { $type_info[$field_name] = array(); }

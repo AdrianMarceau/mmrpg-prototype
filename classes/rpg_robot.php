@@ -2374,6 +2374,32 @@ class rpg_robot extends rpg_object {
     }
 
     /**
+     * Get a list of all JSON-based player index fields as an array or, optionally, imploded into a string
+     * @param bool $implode
+     * @return mixed
+     */
+    public static function get_json_index_fields($implode = false){
+
+        // Define the various json index fields for player objects
+        $json_index_fields = array(
+            'robot_weaknesses',
+            'robot_resistances',
+            'robot_affinities',
+            'robot_immunities',
+            'robot_image_alts'
+            );
+
+        // Implode the index fields into a string if requested
+        if ($implode){
+            $json_index_fields = implode(', ', $json_index_fields);
+        }
+
+        // Return the index fields, array or string
+        return $json_index_fields;
+
+    }
+
+    /**
      * Get the entire robot index array with parsed info
      * @param bool $parse_data
      * @return array
@@ -2533,7 +2559,7 @@ class rpg_robot extends rpg_object {
         else { $robot_info['_parsed'] = true; }
 
         // Explode the weaknesses, resistances, affinities, and immunities into an array
-        $temp_field_names = array('robot_weaknesses', 'robot_resistances', 'robot_affinities', 'robot_immunities', 'robot_image_alts');
+        $temp_field_names = self::get_json_index_fields();
         foreach ($temp_field_names AS $field_name){
             if (!empty($robot_info[$field_name])){ $robot_info[$field_name] = json_decode($robot_info[$field_name], true); }
             else { $robot_info[$field_name] = array(); }

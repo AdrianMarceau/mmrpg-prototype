@@ -821,6 +821,30 @@ class rpg_item extends rpg_object {
     }
 
     /**
+     * Get a list of all JSON-based player index fields as an array or, optionally, imploded into a string
+     * @param bool $implode
+     * @return mixed
+     */
+    public static function get_json_index_fields($implode = false){
+
+        // Define the various json index fields for player objects
+        $json_index_fields = array(
+            'item_frame_animate',
+            'item_frame_index',
+            'item_frame_offset'
+            );
+
+        // Implode the index fields into a string if requested
+        if ($implode){
+            $json_index_fields = implode(', ', $json_index_fields);
+        }
+
+        // Return the index fields, array or string
+        return $json_index_fields;
+
+    }
+
+    /**
      * Get the entire item index array with parsed info
      * @param bool $parse_data
      * @return array
@@ -980,7 +1004,7 @@ class rpg_item extends rpg_object {
         else { $item_info['_parsed'] = true; }
 
         // Explode the base and animation indexes into an array
-        $temp_field_names = array('item_frame_animate', 'item_frame_index', 'item_frame_offset');
+        $temp_field_names = self::get_json_index_fields();
         foreach ($temp_field_names AS $field_name){
             if (!empty($item_info[$field_name])){ $item_info[$field_name] = json_decode($item_info[$field_name], true); }
             else { $item_info[$field_name] = array(); }
