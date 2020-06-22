@@ -430,7 +430,7 @@
             }
 
 
-            if (isset($form_data['robot_abilities_rewards'])){ $form_data['robot_abilities_rewards'] = !empty($form_data['robot_abilities_rewards']) ? json_encode($form_data['robot_abilities_rewards']) : ''; }
+            if (isset($form_data['robot_abilities_rewards'])){ $form_data['robot_abilities_rewards'] = !empty($form_data['robot_abilities_rewards']) ? json_encode($form_data['robot_abilities_rewards'], JSON_NUMERIC_CHECK) : ''; }
             if (isset($form_data['robot_abilities_compatible'])){ $form_data['robot_abilities_compatible'] = !empty($form_data['robot_abilities_compatible']) ? json_encode($form_data['robot_abilities_compatible']) : ''; }
 
             $empty_image_folders = array();
@@ -469,10 +469,11 @@
                     if (!empty($alt_info['delete'])){ continue; }
                     elseif ($alt_key == 'base'){ continue; }
                     unset($alt_info['delete_images'], $alt_info['delete']);
+                    unset($alt_info['generate_shadows']);
                     $new_robot_image_alts[] = $alt_info;
                 }
                 $form_data['robot_image_alts'] = $new_robot_image_alts;
-                $form_data['robot_image_alts'] = !empty($form_data['robot_image_alts']) ? json_encode($form_data['robot_image_alts']) : '';
+                $form_data['robot_image_alts'] = !empty($form_data['robot_image_alts']) ? json_encode($form_data['robot_image_alts'], JSON_NUMERIC_CHECK) : '';
             }
             //$form_messages[] = array('alert', '<pre>$form_data[\'robot_image_alts\']  = '.print_r($form_data['robot_image_alts'] , true).'</pre>');
 
@@ -529,7 +530,6 @@
             $backup_date_time = date('Ymd-Hi');
             $backup_exists = $db->get_value("SELECT backup_id FROM mmrpg_index_robots_backups WHERE robot_token = '{$update_data['robot_token']}' AND backup_date_time = '{$backup_date_time}';", 'backup_id');
             if (empty($backup_exists)){
-                //$backup_data = $update_data;
                 $backup_data = $robot_data;
                 unset($backup_data['robot_id']);
                 $backup_data['backup_date_time'] = $backup_date_time;
@@ -551,6 +551,30 @@
                 list($date, $time) = explode('-', date('Ymd-Hi'));
                 $db->update('mmrpg_config', array('config_value' => $date), "config_group = 'global' AND config_name = 'cache_date'");
                 $db->update('mmrpg_config', array('config_value' => $time), "config_group = 'global' AND config_name = 'cache_time'");
+            }
+
+            // If successful, we need to update the JSON file
+            if ($form_success){
+                // Calculate the data file path and then write to the new/recreated file
+                $content_json_path = MMRPG_CONFIG_ROBOTS_CONTENT_PATH.$update_data['robot_token'].'/data.json';
+                if (file_exists($content_json_path)){ unlink($content_json_path); }
+                $content_json_data = array_merge($robot_data, $update_data);
+                unset($content_json_data['robot_id']);
+                $h = fopen($content_json_path, 'w');
+                fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
+                fclose($h);
+            }
+
+            // If the robot tokens have changed, we must move the entire folder
+            if ($old_robot_token !== $update_data['robot_token']){
+                $old_content_path = MMRPG_CONFIG_ROBOTS_CONTENT_PATH.$old_robot_token.'/';
+                $new_content_path = MMRPG_CONFIG_ROBOTS_CONTENT_PATH.$update_data['robot_token'].'/';
+                if (rename($old_content_path, $new_content_path)){
+                    $path_string = '<strong>'.mmrpg_clean_path($old_content_path).'</strong> &raquo; <strong>'.mmrpg_clean_path($new_content_path).'</strong>';
+                    $form_messages[] = array('alert', 'Robot directory renamed! '.$path_string);
+                } else {
+                    $form_messages[] = array('error', 'Unable to rename robot directory!');
+                }
             }
 
             // We're done processing the form, we can exit

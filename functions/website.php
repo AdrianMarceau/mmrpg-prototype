@@ -1059,6 +1059,11 @@ function recurseCopyWithWhitelist($src, $dst, $whitelist) {
     return recurseCopy($src, $dst, false, $whitelist);
 }
 
+// Define a function for "cleaning" a directory/path of it's MMRPG root dir/url
+function mmrpg_clean_path($path){
+    return str_replace(array(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL), '/', $path);
+}
+
 // Define a function for getting a list of directory contents, recursively
 // via https://stackoverflow.com/a/24784144/1876397
 function getDirContents($dir, &$results = array()){

@@ -308,7 +308,7 @@
             $form_data['player_type'] = !empty($_POST['player_type']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['player_type']) ? trim(strtolower($_POST['player_type'])) : '';
             $form_data['player_game'] = 'MMRPG'; //!empty($_POST['player_game']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['player_game']) ? trim($_POST['player_game']) : '';
             $form_data['player_group'] = 'MMRPG'; //!empty($_POST['player_group']) && preg_match('/^[-_a-z0-9\/]+$/i', $_POST['player_group']) ? trim($_POST['player_group']) : '';
-            $form_data['player_number'] = !empty($_POST['player_number']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['player_number']) ? trim($_POST['player_number']) : '';
+            $form_data['player_number'] = !empty($_POST['player_number']) && is_numeric($_POST['player_number']) ? (int)(trim($_POST['player_number'])) : 0;
             $form_data['player_order'] = !empty($_POST['player_order']) && is_numeric($_POST['player_order']) ? (int)(trim($_POST['player_order'])) : 0;
 
             $form_data['player_energy'] = $form_data['player_type'] === 'energy' ? 25 : 0; //!empty($_POST['player_energy']) && is_numeric($_POST['player_energy']) ? (int)(trim($_POST['player_energy'])) : 0;
@@ -428,10 +428,10 @@
                 $form_data['player_robots_compatible'] = $new_compatible;
             }
 
-            if (isset($form_data['player_abilities_rewards'])){ $form_data['player_abilities_rewards'] = !empty($form_data['player_abilities_rewards']) ? json_encode($form_data['player_abilities_rewards']) : ''; }
+            if (isset($form_data['player_abilities_rewards'])){ $form_data['player_abilities_rewards'] = !empty($form_data['player_abilities_rewards']) ? json_encode($form_data['player_abilities_rewards'], JSON_NUMERIC_CHECK) : ''; }
             if (isset($form_data['player_abilities_compatible'])){ $form_data['player_abilities_compatible'] = !empty($form_data['player_abilities_compatible']) ? json_encode($form_data['player_abilities_compatible']) : ''; }
 
-            if (isset($form_data['player_robots_rewards'])){ $form_data['player_robots_rewards'] = !empty($form_data['player_robots_rewards']) ? json_encode($form_data['player_robots_rewards']) : ''; }
+            if (isset($form_data['player_robots_rewards'])){ $form_data['player_robots_rewards'] = !empty($form_data['player_robots_rewards']) ? json_encode($form_data['player_robots_rewards'], JSON_NUMERIC_CHECK) : ''; }
             if (isset($form_data['player_robots_compatible'])){ $form_data['player_robots_compatible'] = !empty($form_data['player_robots_compatible']) ? json_encode($form_data['player_robots_compatible']) : ''; }
 
             $empty_image_folders = array();
@@ -469,10 +469,11 @@
                     if (!empty($alt_info['delete'])){ continue; }
                     elseif ($alt_key == 'base'){ continue; }
                     unset($alt_info['delete_images'], $alt_info['delete']);
+                    unset($alt_info['generate_shadows']);
                     $new_player_image_alts[] = $alt_info;
                 }
                 $form_data['player_image_alts'] = $new_player_image_alts;
-                $form_data['player_image_alts'] = !empty($form_data['player_image_alts']) ? json_encode($form_data['player_image_alts']) : '';
+                $form_data['player_image_alts'] = !empty($form_data['player_image_alts']) ? json_encode($form_data['player_image_alts'], JSON_NUMERIC_CHECK) : '';
             }
             //$form_messages[] = array('alert', '<pre>$form_data[\'player_image_alts\']  = '.print_r($form_data['player_image_alts'] , true).'</pre>');
 
@@ -530,7 +531,6 @@
             $backup_date_time = date('Ymd-Hi');
             $backup_exists = $db->get_value("SELECT backup_id FROM mmrpg_index_players_backups WHERE player_token = '{$update_data['player_token']}' AND backup_date_time = '{$backup_date_time}';", 'backup_id');
             if (empty($backup_exists)){
-                //$backup_data = $update_data;
                 $backup_data = $player_data;
                 unset($backup_data['player_id']);
                 $backup_data['backup_date_time'] = $backup_date_time;
@@ -562,11 +562,19 @@
                 $content_json_data = array_merge($player_data, $update_data);
                 unset($content_json_data['player_id']);
                 $h = fopen($content_json_path, 'w');
-                fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT));
+                fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
                 fclose($h);
-                // If the player tokens have changed, delete the old one's data file
-                if ($old_player_token !== $update_data['player_token']){
-                    // ...
+            }
+
+            // If the player tokens have changed, we must move the entire folder
+            if ($old_player_token !== $update_data['player_token']){
+                $old_content_path = MMRPG_CONFIG_PLAYERS_CONTENT_PATH.$old_player_token.'/';
+                $new_content_path = MMRPG_CONFIG_PLAYERS_CONTENT_PATH.$update_data['player_token'].'/';
+                if (rename($old_content_path, $new_content_path)){
+                    $path_string = '<strong>'.mmrpg_clean_path($old_content_path).'</strong> &raquo; <strong>'.mmrpg_clean_path($new_content_path).'</strong>';
+                    $form_messages[] = array('alert', 'Player directory renamed! '.$path_string);
+                } else {
+                    $form_messages[] = array('error', 'Unable to rename player directory!');
                 }
             }
 
@@ -896,7 +904,7 @@
 
                                 <div class="field">
                                     <strong class="label">Player Number</strong>
-                                    <input class="textbox" type="text" name="player_number" value="<?= $player_data['player_number'] ?>" maxlength="64" />
+                                    <input class="textbox" type="number" name="player_number" value="<?= $player_data['player_number'] ?>" maxlength="64" />
                                 </div>
 
                                 <div class="field">
