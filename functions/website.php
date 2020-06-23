@@ -1027,6 +1027,27 @@ function deleteDir($dirPath) {
     rmdir($dirPath);
 }
 
+// Define a function for recursively making directories given a path (within base_path limit)
+function recurseMakeDir($full_path, $base_path = ''){
+    if (empty($base_path)){ $base_path = MMRPG_CONFIG_ROOTDIR; }
+    elseif (!strstr($base_path, MMRPG_CONFIG_ROOTDIR)){ $base_path = MMRPG_CONFIG_ROOTDIR.ltrim($base_path, '/'); }
+    $full_path = preg_replace('/\/+/', '/', $full_path);
+    $base_path = preg_replace('/\/+/', '/', $base_path);
+    $rel_path = str_replace($base_path, '', $full_path);
+    $rel_path_parts = explode('/', trim($rel_path, '/'));
+    $make_path = $base_path;
+    foreach ($rel_path_parts AS $path){
+        $make_path .= $path.'/';
+        if (!is_dir($make_path)){
+            mkdir($make_path);
+            if (!is_dir($make_path)){
+                return false;
+            }
+        }
+    }
+    return is_dir($full_path) ? true : false;
+}
+
 // Define a function for recursively copying files from one dir to another
 // via https://stackoverflow.com/a/2050909
 function recurseCopy($src, $dst, $blacklist = array(), $whitelist = array()) {

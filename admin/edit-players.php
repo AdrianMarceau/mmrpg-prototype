@@ -459,10 +459,10 @@
                 $new_player_image_alts = array();
                 foreach ($alt_keys AS $alt_key){
                     $alt_info = $form_data['player_image_alts'][$alt_key];
-                    $alt_path = $player_data['player_image'].($alt_key != 'base' ? '_'.$alt_key : '');
+                    $alt_path = ($alt_key != 'base' ? '_'.$alt_key : '');
                     if (!empty($alt_info['delete_images'])){
-                        $delete_sprite_path = 'images/players/'.$alt_path.'/';
-                        $delete_shadow_path = 'images/players_shadows/'.$alt_path.'/';
+                        $delete_sprite_path = 'content/players/'.$player_data['player_image'].'/sprites'.$alt_path.'/';
+                        $delete_shadow_path = 'content/players/'.$player_data['player_image'].'/shadows'.$alt_path.'/';
                         $empty_image_folders[] = $delete_sprite_path;
                         $empty_image_folders[] = $delete_shadow_path;
                     }
@@ -491,8 +491,9 @@
                     //$form_messages[] = array('alert', '<pre>$empty_path_key = '.print_r($empty_path_key, true).' | $empty_path = '.print_r($empty_path, true).' | $empty_files = '.print_r($empty_files, true).'</pre>');
 
                     // Ensure the backup folder is created for this file
-                    $backup_path = str_replace('/images/', '/images/backups/', MMRPG_CONFIG_ROOTDIR.$empty_path);
+                    $backup_path = str_replace('/content/players/', '/images/backups/players/', MMRPG_CONFIG_ROOTDIR.$empty_path);
                     if (!file_exists($backup_path)){
+                        recurseMakeDir($backup_path, 'images/backups/');
                         @mkdir($backup_path);
                         @chown($backup_path, 'mmrpgworld');
                     }
@@ -1096,7 +1097,7 @@
                                     </div>
                                     <select class="select" name="player_image">
                                         <option value="<?= $placeholder_folder ?>" <?= $player_data['player_image'] == $placeholder_folder ? 'selected="selected"' : '' ?>>-</option>
-                                        <option value="<?= $player_data['player_token'] ?>" <?= $player_data['player_image'] == $player_data['player_token'] ? 'selected="selected"' : '' ?>>images/players/<?= $player_data['player_token'] ?>/</option>
+                                        <option value="<?= $player_data['player_token'] ?>" <?= $player_data['player_image'] == $player_data['player_token'] ? 'selected="selected"' : '' ?>>content/players/<?= $player_data['player_token'] ?>/</option>
                                     </select><span></span>
                                 </div>
 
@@ -1171,8 +1172,8 @@
                                     echo('<hr />'.PHP_EOL);
 
                                     // Define the base sprite and shadow paths for this player given its image token
-                                    $base_sprite_path = 'images/players/'.$player_data['player_image'].'/';
-                                    $base_shadow_path = 'images/players_shadows/'.$player_data['player_image'].'/';
+                                    $base_sprite_path = 'content/players/'.$player_data['player_image'].'/sprites/';
+                                    $base_shadow_path = 'content/players/'.$player_data['player_image'].'/shadows/';
 
                                     // Define the alts we'll be looping through for this player
                                     $temp_alts_array = array();

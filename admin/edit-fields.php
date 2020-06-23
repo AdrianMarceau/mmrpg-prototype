@@ -1135,12 +1135,12 @@
                                 <?
 
                                 // Define the base sprite path for all fields
-                                $base_image_path = 'images/fields/';
+                                $base_image_path = 'content/fields/';
                                 $base_field_width = 1124;
                                 $base_field_height = 248;
 
                                 // Define the file path for this field and collect existing files
-                                $field_file_path = rtrim($base_image_path, '/').'/'.$field_data['field_token'].'/';
+                                $field_file_path = rtrim($base_image_path, '/').'/'.$field_data['field_token'].'/sprites/';
                                 $field_file_dir = MMRPG_CONFIG_ROOTDIR.$field_file_path;
                                 $field_files_existing = getDirContents($field_file_dir);
                                 if (!empty($field_files_existing)){ $field_files_existing = array_map(function($s)use($field_file_dir){ return str_replace($field_file_dir, '', str_replace('\\', '/', $s)); }, $field_files_existing); }
@@ -1308,10 +1308,10 @@
 
                                 <?
                                 // Collect the background and foreground image URLs if available
-                                $background_image_url = 'images/fields/'.$field_data['field_background'].'/battle-field_background_base.gif';
-                                if (!rpg_game::sprite_exists(MMRPG_CONFIG_ROOTDIR.$background_image_url)){ $background_image_url = false; }
-                                $foreground_image_url = 'images/fields/'.$field_data['field_foreground'].'/battle-field_foreground_base.png';
-                                if (!rpg_game::sprite_exists(MMRPG_CONFIG_ROOTDIR.$foreground_image_url)){ $foreground_image_url = false; }
+                                $background_image_url = 'content/fields/'.$field_data['field_background'].'/sprites/battle-field_background_base.gif';
+                                if (!file_exists(MMRPG_CONFIG_ROOTDIR.$background_image_url)){ $background_image_url = false; }
+                                $foreground_image_url = 'content/fields/'.$field_data['field_foreground'].'/sprites/battle-field_foreground_base.png';
+                                if (!file_exists(MMRPG_CONFIG_ROOTDIR.$foreground_image_url)){ $foreground_image_url = false; }
                                 ?>
                                 <div class="bfg-attachments-preview">
                                     <div class="preview_wrapper">

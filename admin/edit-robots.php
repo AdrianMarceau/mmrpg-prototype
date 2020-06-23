@@ -459,10 +459,10 @@
                 $new_robot_image_alts = array();
                 foreach ($alt_keys AS $alt_key){
                     $alt_info = $form_data['robot_image_alts'][$alt_key];
-                    $alt_path = $robot_data['robot_image'].($alt_key != 'base' ? '_'.$alt_key : '');
+                    $alt_path = ($alt_key != 'base' ? '_'.$alt_key : '');
                     if (!empty($alt_info['delete_images'])){
-                        $delete_sprite_path = 'images/robots/'.$alt_path.'/';
-                        $delete_shadow_path = 'images/robots_shadows/'.$alt_path.'/';
+                        $delete_sprite_path = 'content/robots/'.$robot_data['robot_image'].'/sprites'.$alt_path.'/';
+                        $delete_shadow_path = 'content/robots/'.$robot_data['robot_image'].'/shadows'.$alt_path.'/';
                         $empty_image_folders[] = $delete_sprite_path;
                         $empty_image_folders[] = $delete_shadow_path;
                     }
@@ -491,8 +491,9 @@
                     //$form_messages[] = array('alert', '<pre>$empty_path_key = '.print_r($empty_path_key, true).' | $empty_path = '.print_r($empty_path, true).' | $empty_files = '.print_r($empty_files, true).'</pre>');
 
                     // Ensure the backup folder is created for this file
-                    $backup_path = str_replace('/images/', '/images/backups/', MMRPG_CONFIG_ROOTDIR.$empty_path);
+                    $backup_path = str_replace('/content/robots/', '/images/backups/robots/', MMRPG_CONFIG_ROOTDIR.$empty_path);
                     if (!file_exists($backup_path)){
+                        recurseMakeDir($backup_path, 'images/backups/');
                         @mkdir($backup_path);
                         @chown($backup_path, 'mmrpgworld');
                     }
@@ -1286,7 +1287,7 @@
                                     </div>
                                     <select class="select" name="robot_image">
                                         <option value="<?= $placeholder_folder ?>" <?= $robot_data['robot_image'] == $placeholder_folder ? 'selected="selected"' : '' ?>>-</option>
-                                        <option value="<?= $robot_data['robot_token'] ?>" <?= $robot_data['robot_image'] == $robot_data['robot_token'] ? 'selected="selected"' : '' ?>>images/robots/<?= $robot_data['robot_token'] ?>/</option>
+                                        <option value="<?= $robot_data['robot_token'] ?>" <?= $robot_data['robot_image'] == $robot_data['robot_token'] ? 'selected="selected"' : '' ?>>content/robots/<?= $robot_data['robot_token'] ?>/</option>
                                     </select><span></span>
                                 </div>
 
@@ -1361,8 +1362,8 @@
                                     echo('<hr />'.PHP_EOL);
 
                                     // Define the base sprite and shadow paths for this robot given its image token
-                                    $base_sprite_path = 'images/robots/'.$robot_data['robot_image'].'/';
-                                    $base_shadow_path = 'images/robots_shadows/'.$robot_data['robot_image'].'/';
+                                    $base_sprite_path = 'content/robots/'.$robot_data['robot_image'].'/sprites/';
+                                    $base_shadow_path = 'content/robots/'.$robot_data['robot_image'].'/shadows/';
 
                                     // Define the alts we'll be looping through for this robot
                                     $temp_alts_array = array();
