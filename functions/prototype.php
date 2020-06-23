@@ -1266,7 +1266,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 $this_has_challenge_marker = true;
                 $this_option_disabled = false;
                 $temp_kind = $this_battleinfo['values']['challenge_marker'];
-                $temp_sprite = array('path' => 'items/challenge-marker_'.$temp_kind.'', 'frame' => '00', 'size' => 40);
+                $temp_sprite = array('path' => 'objects/challenge-markers/'.$temp_kind, 'frame' => '00', 'size' => 40);
                 array_unshift($this_battleinfo['battle_sprite'], $temp_sprite);
             }
 

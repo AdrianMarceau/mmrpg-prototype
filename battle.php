@@ -414,35 +414,35 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
 
                         // Collect the marker kind and define the image name
                         $temp_skull_kind = $this_battle_data['values']['challenge_marker'];
-                        $temp_skull_image = 'challenge-marker_'.$temp_skull_kind;
+                        $temp_skull_image = 'challenge-markers/'.$temp_skull_kind;
 
                         // Append the new field star to the foreground attachment array
                         $this_field_data['field_foreground_attachments']['challenge-marker'] = array(
-                            'class' => 'item',
+                            'class' => 'object',
                             'size' => 80,
                             'offset_x' => 331,
                             'offset_y' => 90,
-                            'item_token' => 'challenge-marker',
-                            'item_image' => $temp_skull_image,
-                            'item_frame' => array(0, 0, 0, 0),
-                            'item_frame_shift' => array('331,90', '331,95', '331,100', '331,95'),
-                            'item_direction' => 'left',
-                            'item_text' => ''
+                            'object_token' => 'challenge-marker',
+                            'object_image' => $temp_skull_image,
+                            'object_frame' => array(0, 0, 0, 0),
+                            'object_frame_shift' => array('331,90', '331,95', '331,100', '331,95'),
+                            'object_direction' => 'left',
+                            'object_text' => ''
                             );
 
                         // Append the new field star to the foreground attachment array
-                        $temp_shadow_image = 'challenge-marker_shadow';
+                        $temp_shadow_image = 'challenge-markers/shadow';
                         $this_field_data['field_foreground_attachments']['challenge-marker_shadow'] = array(
-                            'class' => 'item',
+                            'class' => 'object',
                             'size' => 80,
                             'offset_x' => 331,
                             'offset_y' => 75,
-                            'item_token' => 'challenge-marker',
-                            'item_image' => $temp_shadow_image,
-                            'item_frame' => array(2, 1, 0, 1),
-                            'item_frame_shift' => array('331,75', '331,75', '331,75', '331,75'),
-                            'item_direction' => 'left',
-                            'item_text' => ''
+                            'object_token' => 'challenge-marker',
+                            'object_image' => $temp_shadow_image,
+                            'object_frame' => array(2, 1, 0, 1),
+                            'object_frame_shift' => array('331,75', '331,75', '331,75', '331,75'),
+                            'object_direction' => 'left',
+                            'object_text' => ''
                             );
 
                     }
