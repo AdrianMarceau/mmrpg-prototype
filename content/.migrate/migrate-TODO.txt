@@ -50,7 +50,7 @@ Update code to point to new CONTENT directories (what part of the code?)
 
 Update code to point to new OBJECT image locations
 -  items/attachment-defeat -> objects/defeat-explosion [DONE]
--  items/freeze-heart -> objects/heart-cores/freeze
+-  items/freeze-heart -> objects/heart-cores/freeze [DONE]
 -  items/challenge-marker_base -> objects/challenge-markers/base
 -  items/field-support -> content/items/_effects/type-arrows_boost-1
 -
