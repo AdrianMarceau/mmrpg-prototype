@@ -148,8 +148,8 @@ if ($image_data['action'] == 'upload'){
         // Check to see if the "AUTO-SHADOWS" extra has been requested
         if (in_array('auto-shadows', $image_data['req_extras'])){
             //echo('AUTO-SHADOWS requested for uploaded image!<br />'.PHP_EOL);
-            $shadow_find_pattern = '/\/images\/(abilities|fields|items|players|robots|shops)\//';
-            $shadow_replace_pattern = '/images/${1}_shadows/';
+            $shadow_find_pattern = '/\/content\/(abilities|fields|items|players|robots)\/([-_a-z0-9]+)\/sprites(_[-_a-z0-9]+)?\//';
+            $shadow_replace_pattern = '/content/${1}/${2}/shadows${3}/';
             $shadow_dirpath = preg_replace($shadow_find_pattern, $shadow_replace_pattern, $image_data['dirpath']);
             //echo('<pre>$shadow_dirpath = '.print_r($shadow_dirpath, true).'</pre>'.PHP_EOL);
             $shadow_dirname = dirname($shadow_dirpath);
@@ -176,8 +176,8 @@ if ($image_data['action'] == 'upload'){
         if (in_array('auto-zoom-x2', $image_data['req_extras'])
             && in_array('auto-shadows', $image_data['req_extras'])){
             //echo('AUTO-ZOOM-X2+AUTO-SHADOWS requested for uploaded image!<br />'.PHP_EOL);
-            $zoom_shadow_find_pattern = '/\/images\/(abilities|fields|items|players|robots|shops)\//';
-            $zoom_shadow_replace_pattern = '/images/${1}_shadows/';
+            $zoom_shadow_find_pattern = '/\/content\/(abilities|fields|items|players|robots)\/([-_a-z0-9]+)\/sprites(_[-_a-z0-9]+)?\//';
+            $zoom_shadow_replace_pattern = '/content/${1}/${2}/shadows${3}/';
             $zoom_shadow_dirpath = preg_replace($zoom_shadow_find_pattern, $zoom_shadow_replace_pattern, $zoom_dirpath);
             //echo('<pre>$zoom_shadow_dirpath = '.print_r($zoom_shadow_dirpath, true).'</pre>'.PHP_EOL);
             if (file_exists($zoom_shadow_dirpath)){ @unlink($zoom_shadow_dirpath); }
@@ -209,8 +209,9 @@ if ($image_data['action'] == 'upload'){
 elseif ($image_data['action'] == 'delete'){
 
     // Ensure the backup folder is created for this file
-    $backup_path = str_replace('/images/', '/images/backups/', MMRPG_CONFIG_ROOTDIR.$image_data['path']);
+    $backup_path = preg_replace('/\/content\/(abilities|fields|items|players|robots)\//', '/images/backups/${1}/', MMRPG_CONFIG_ROOTDIR.$image_data['path']);
     if (!file_exists($backup_path)){
+        recurseMakeDir($backup_path, 'images/backups/');
         @mkdir($backup_path);
         @chown($backup_path, 'mmrpgworld');
     }
@@ -270,8 +271,8 @@ elseif ($image_data['action'] == 'delete'){
         // Check to see if the "AUTO-SHADOWS" extra has been requested
         if (in_array('auto-shadows', $image_data['req_extras'])){
             //echo('AUTO-SHADOWS must also be deleted!<br />'.PHP_EOL);
-            $shadow_find_pattern = '/\/images\/(abilities|fields|items|players|robots|shops)\//';
-            $shadow_replace_pattern = '/images/${1}_shadows/';
+            $shadow_find_pattern = '/\/content\/(abilities|fields|items|players|robots)\/([-_a-z0-9]+)\/sprites(_[-_a-z0-9]+)?\//';
+            $shadow_replace_pattern = '/content/${1}/${2}/shadows${3}/';
             $old_shadow_location = preg_replace($shadow_find_pattern, $shadow_replace_pattern, $old_location);
             $new_shadow_location = preg_replace($shadow_find_pattern, $shadow_replace_pattern, $new_location);
             //echo('<pre>$old_shadow_location = '.print_r($old_shadow_location, true).'</pre>'.PHP_EOL);
@@ -290,8 +291,8 @@ elseif ($image_data['action'] == 'delete'){
         if (in_array('auto-zoom-x2', $image_data['req_extras'])
             && in_array('auto-shadows', $image_data['req_extras'])){
             //echo('AUTO-ZOOM-X2+AUTO-SHADOWS must also be deleted!<br />'.PHP_EOL);
-            $zoom_shadow_find_pattern = '/\/images\/(abilities|fields|items|players|robots|shops)\//';
-            $zoom_shadow_replace_pattern = '/images/${1}_shadows/';
+            $zoom_shadow_find_pattern = '/\/content\/(abilities|fields|items|players|robots)\/([-_a-z0-9]+)\/sprites(_[-_a-z0-9]+)?\//';
+            $zoom_shadow_replace_pattern = '/content/${1}/${2}/shadows${3}/';
             $old_zoom_shadow_location = preg_replace($zoom_shadow_find_pattern, $zoom_shadow_replace_pattern, $old_zoom_location);
             $new_zoom_shadow_location = preg_replace($zoom_shadow_find_pattern, $zoom_shadow_replace_pattern, $new_zoom_location);
             //echo('<pre>$old_zoom_shadow_location = '.print_r($old_zoom_shadow_location, true).'</pre>'.PHP_EOL);

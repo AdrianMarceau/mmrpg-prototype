@@ -494,7 +494,6 @@
                     $backup_path = str_replace('/content/players/', '/images/backups/players/', MMRPG_CONFIG_ROOTDIR.$empty_path);
                     if (!file_exists($backup_path)){
                         recurseMakeDir($backup_path, 'images/backups/');
-                        @mkdir($backup_path);
                         @chown($backup_path, 'mmrpgworld');
                     }
 

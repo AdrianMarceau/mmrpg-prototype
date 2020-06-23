@@ -314,6 +314,7 @@ $(document).ready(function(){
                             if (status == 'success'){ // image was uploaded, disable upload and allow delete + view
                                 $uploadLink.addClass('disabled');
                                 $uploadInput.prop('disabled', true);
+                                $uploadInput.val('');
                                 $deleteLink.removeClass('disabled');
                                 $statusSpan.removeClass('bad').addClass('good').html('&check;');
                                 var newViewHref = $viewLink.attr('data-href') + '?' + Date.now();
