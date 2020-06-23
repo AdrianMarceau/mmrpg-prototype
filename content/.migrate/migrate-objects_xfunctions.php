@@ -20,6 +20,10 @@ function copy_sprites_to_new_dir($base_token, $count_string, $new_sprite_path, $
     $base_sprite_path = MMRPG_CONFIG_ROOTDIR.'images/'.$kind_plural.'/'.$base_token.'/';
     //ob_echo('-- $base_sprite_path = '.clean_path($base_sprite_path), $silent_mode);
     if (!file_exists($base_sprite_path)){
+        $base_sprite_path = MMRPG_CONFIG_ROOTDIR.'images/xxx_'.$kind_plural.'/'.$base_token.'/';
+        //ob_echo('-- $base_sprite_path(2) = '.clean_path($base_sprite_path), $silent_mode);
+    }
+    if (!file_exists($base_sprite_path)){
         ob_echo('- '.clean_path($base_sprite_path).' does not exist', $silent_mode);
         return false;
     }
