@@ -162,7 +162,8 @@ class rpg_ability extends rpg_object {
         $this->ability_base_target = isset($this_abilityinfo['ability_base_target']) ? $this_abilityinfo['ability_base_target'] : $this->ability_target;
 
         // Collect any functions associated with this ability
-        $temp_functions_path = MMRPG_CONFIG_ABILITIES_CONTENT_PATH.$this->ability_token.'/functions.php';
+        $temp_functions_dir = preg_replace('/^action-/', '_actions/', $this->ability_token);
+        $temp_functions_path = MMRPG_CONFIG_ABILITIES_CONTENT_PATH.$temp_functions_dir.'/functions.php';
         if (file_exists($temp_functions_path)){ require($temp_functions_path); }
         else { $functions = array(); }
         $this->ability_function = isset($functions['ability_function']) ? $functions['ability_function'] : function(){};

@@ -56,10 +56,10 @@ Update code for items to work with new OBJECT image locations
 -
 
 Update code for abilities to work with new _actions and _effects directories
--  action-chargeweapons -> abilities/_actions/chargeweapons
--  action-devpower-clearmission -> abilities/_actions/devpower-clearmission
--  action-noweapons -> abilities/_actions/noweapons
--  action-unequipitem -> abilities/_actions/unequipitem
+-  action-chargeweapons -> abilities/_actions/chargeweapons [DONE]
+-  action-devpower-clearmission -> abilities/_actions/devpower-clearmission [DONE]
+-  action-noweapons -> abilities/_actions/noweapons [DONE]
+-  action-unequipitem -> abilities/_actions/unequipitem [DONE]
 -  disco-fever:ability-effect_black-overlay -> abilities/_effects/black-overlay
 -  ability_function_overdrive():fullscreen-black -> abilities/_effects/black-overlay
 -  abilities/field-support   -> abilities/_effects/type-arrows_boost-1
