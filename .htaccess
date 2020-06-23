@@ -73,6 +73,9 @@ RewriteRule ^(images|database)/items/screw-([a-z]+)/(.*)?$ /$1/items/$2-screw/$3
 RewriteRule ^images/(abilities|fields|items|players|robots)/(ability|field|item|player|robot)(_[-_a-z0-9]+)?/(.*)?$ /content/$1/.$2/sprites$3/$4 [L]
 RewriteRule ^images/(abilities|fields|items|players|robots)_shadows/(ability|field|item|player|robot)(_[-_a-z0-9]+)?/(.*)?$ /content/$1/.$2/shadows$3/$4 [L]
 
+RewriteRule ^images/(abilities|fields|items|players|robots)/([-a-z0-9]+)-([0-9]+)/(.*)?$ /content/$1/$2/sprites_$3/$4 [L]
+RewriteRule ^images/(abilities|fields|items|players|robots)_shadows/([-a-z0-9]+)-([0-9]+)/(.*)?$ /content/$1/$2/shadows_$3/$4 [L]
+
 RewriteRule ^images/(abilities|fields|items|players|robots)/([-a-z0-9]+)(_[-_a-z0-9]+)?/(.*)?$ /content/$1/$2/sprites$3/$4 [L]
 RewriteRule ^images/(abilities|fields|items|players|robots)_shadows/([-a-z0-9]+)(_[-_a-z0-9]+)?/(.*)?$ /content/$1/$2/shadows$3/$4 [L]
 
