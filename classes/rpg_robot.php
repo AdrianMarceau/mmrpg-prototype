@@ -5458,16 +5458,15 @@ class rpg_robot extends rpg_object {
                 if (!isset($this_field->field_multipliers[$temp_boost_type]) || $this_field->field_multipliers[$temp_boost_type] < MMRPG_SETTINGS_MULTIPLIER_MAX){
 
                     // Define this item's attachment token
-                    $this_star_index = rpg_prototype::star_image(!empty($temp_boost_type) ? $temp_boost_type : 'none');
-                    $this_sprite_sheet = 'field-support';
-                    $this_attachment_token = 'item_field-booster';
+                    $this_arrow_index = rpg_prototype::type_arrow_image('boost', !empty($temp_boost_type) ? $temp_boost_type : 'none');
+                    $this_attachment_token = 'item_effects_field-booster';
                     $this_attachment_info = array(
                         'class' => 'item',
                         'attachment_token' => $this_attachment_token,
                         'item_token' => $item_token,
-                        'item_image' => $this_sprite_sheet.($this_star_index['sheet'] > 1 ? '-'.$this_star_index['sheet'] : ''),
+                        'item_image' => $this_arrow_index['image'],
                         'item_frame' => $this_star_index['frame'],
-                        'item_frame_animate' => array($this_star_index['frame']),
+                        'item_frame_animate' => array($this_arrow_index['frame']),
                         'item_frame_offset' => array('x' => 0, 'y' => 0, 'z' => -10)
                         );
 

@@ -48,11 +48,11 @@ Update code to point to new CONTENT directories (what part of the code?)
 -  abilities
 -  items
 
-Update code to point to new OBJECT image locations
+Update code for items to work with new OBJECT image locations
 -  items/attachment-defeat -> objects/defeat-explosion [DONE]
 -  items/freeze-heart -> objects/heart-cores/freeze [DONE]
 -  items/challenge-marker_base -> objects/challenge-markers/base [DONE]
--  items/field-support -> content/items/_effects/type-arrows_boost-1
+-  items/field-support -> content/items/_effects/type-arrows_boost-1 [DONE]
 -
 
 Update code for abilities to work with new _actions and _effects directories

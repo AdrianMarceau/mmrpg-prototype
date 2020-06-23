@@ -161,6 +161,27 @@ class rpg_prototype {
         return $temp_array;
     }
 
+    // Define the type arrow image function for use in other parts of the game
+    public static function type_arrow_image($kind, $type){
+        static $type_order = array('none', 'copy', 'crystal', 'cutter', 'earth',
+            'electric', 'explode', 'flame', 'freeze', 'impact',
+            'laser', 'missile', 'nature', 'shadow', 'shield',
+            'space', 'swift', 'time', 'water', 'wind');
+
+        $type_sheet = 1;
+        $type_frame = array_search($type, $type_order);
+        if ($type_frame >= 10){
+            $type_sheet = 2;
+            $type_frame = $type_frame - 10;
+        } elseif ($type_frame < 0){
+            $type_sheet = 1;
+            $type_frame = 0;
+        }
+        $type_image = '_effects/type-arrows_'.$kind.'-'.$type_sheet;
+        $temp_array = array('image' => $type_image, 'frame' => $type_frame);
+        return $temp_array;
+    }
+
 
 }
 ?>
