@@ -119,16 +119,17 @@ $ability = array(
                     // CREATE ATTACHMENTS
                     if (true){
 
-                        // Define this ability's attachment token
-                        $this_star_index = mmrpg_prototype_star_image($type_token);
-                        if ($temp_modify_amount < 0){ $this_star_index['sheet'] += 2; }
-                        $this_attachment_token = 'ability_'.$this_ability->ability_token;
+                        // Define this ability's attachment token and effect parameters
+                        $kind = $temp_modify_amount < 0 ? 'break' : 'boost';
+                        $this_arrow_index = rpg_prototype::type_arrow_image($kind, $type_token);
+                        $this_attachment_token = 'ability_effects_'.$this_ability->ability_token;
                         $this_attachment_info = array(
                             'class' => 'ability',
+                            'attachment_token' => $this_attachment_token,
                             'ability_token' => $this_ability->ability_token,
-                            'ability_image' => $this_ability->ability_token.($this_star_index['sheet'] > 1 ? '-'.$this_star_index['sheet'] : ''),
+                            'ability_image' => $this_arrow_index['image'],
                             'ability_frame' => $this_star_index['frame'],
-                            'ability_frame_animate' => array($this_star_index['frame']),
+                            'ability_frame_animate' => array($this_arrow_index['frame']),
                             'ability_frame_offset' => array('x' => 0, 'y' => 0, 'z' => -10)
                             );
 
