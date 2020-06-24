@@ -37,7 +37,7 @@ $ability = array(
         //elseif (preg_match('/_alt2$/', $this_robot->robot_image)){ $this_frames = array('target' => 0, 'impact' => 1); }
 
         // Change the image to the full-screen rain effect
-        $this_ability->ability_image = $this_ability->ability_token.'-2';
+        $this_ability->ability_image = '_effects/yellow-overlay';
         $this_ability->ability_frame_classes = 'sprite_fullscreen ';
         $this_ability->ability_frame_styles = 'opacity: 0.5; filter: alpha(opacity=50); ';
         $this_ability->update_session();
