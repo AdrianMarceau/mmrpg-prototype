@@ -238,6 +238,7 @@ if (empty($migration_filter)){
     ob_echo('----------');
     $copy_effect_sprites = array();
     $copy_effect_sprites[] = array('ability-effect_black-overlay', $special_effect_abilities_dir.'black-overlay/');
+    $copy_effect_sprites[] = array('bright-burst-2', $special_effect_abilities_dir.'yellow-overlay/');
     $copy_effect_sprites[] = array('ability-results', $special_effect_abilities_dir.'stat-arrows/');
     $copy_effect_sprites[] = array('field-support', $special_effect_abilities_dir.'type-arrows_boost-1/');
     $copy_effect_sprites[] = array('field-support-2', $special_effect_abilities_dir.'type-arrows_boost-2/');
@@ -253,6 +254,13 @@ if (empty($migration_filter)){
             );
         copy_sprites_to_new_dir('ability', '', $export_path, $sprite_sprite_filenames, false, true);
         if ($migration_limit && ($copy_key + 1) >= $migration_limit){ break; }
+    }
+
+    // Delete migrated ability effects if they've been copied over properly
+    if (file_exists(MMRPG_ABILITIES_NEW_CONTENT_DIR.'bright-burst/sprites_2/')){ // if original exists
+        if (file_exists($special_effect_abilities_dir.'yellow-overlay/')){ // but has been copied
+            deleteDir(MMRPG_ABILITIES_NEW_CONTENT_DIR.'bright-burst/sprites_2/'); // delete the original
+        }
     }
 
 }
