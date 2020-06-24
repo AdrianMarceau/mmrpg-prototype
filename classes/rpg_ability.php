@@ -2912,13 +2912,13 @@ class rpg_ability extends rpg_object {
 
 
         // Define this ability's attachment token
-        $overlay_attachment_token = 'system_fullscreen-black';
+        $overlay_attachment_token = 'effect_'.$this_ability->ability_token;
         $overlay_attachment_info = array(
             'class' => 'ability',
             'sticky' => true,
             'ability_id' => $this_ability->ability_id,
             'ability_token' => $this_ability->ability_token,
-            'ability_image' => 'fullscreen-black',
+            'ability_image' => '_effects/black-overlay',
             'ability_frame' => 0,
             'ability_frame_animate' => array(0, 1),
             'ability_frame_offset' => array('x' => 0, 'y' => 0, 'z' => -12),

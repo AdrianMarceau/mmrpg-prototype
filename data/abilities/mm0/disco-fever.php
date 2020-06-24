@@ -21,7 +21,7 @@ $ability = array(
             'class' => 'ability',
             'sticky' => true,
             'ability_token' => 'ability',
-            'ability_image' => 'ability-effect_black-overlay',
+            'ability_image' => '_effects/black-overlay',
             'ability_frame' => 0,
             'ability_frame_animate' => array(0, 1),
             'ability_frame_offset' => array('x' => 0, 'y' => 0, 'z' => -20),
