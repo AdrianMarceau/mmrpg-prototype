@@ -9,12 +9,14 @@ function ob_echo($echo, $silent = false){ if (!$silent){ echo($echo.PHP_EOL); } 
 function clean_path($path){ return str_replace(MMRPG_CONFIG_ROOTDIR, '/', $path); }
 
 // Define a quick function for copying rpg object sprites from one directory to another
-function copy_sprites_to_new_dir($base_token, $count_string, $new_sprite_path, $exclude_sprites = array(), $delete_existing = true, $silent_mode = false){
+function copy_sprites_to_new_dir($base_token, $count_string, $new_sprite_path, $exclude_sprites = array(), $delete_existing = true, $silent_mode = false, $short_mode = false){
     global $migration_kind, $migration_kind_singular, $migration_limit;
     $kind = $migration_kind_singular;
     $kind_plural = $migration_kind;
-    ob_echo('----------', $silent_mode);
-    ob_echo('Processing '.$kind.' sprites for "'.$base_token.'" '.$count_string, $silent_mode);
+    if (!$short_mode){
+        ob_echo('----------', $silent_mode);
+        ob_echo('Processing '.$kind.' sprites for "'.$base_token.'" '.$count_string, $silent_mode);
+    }
     ob_flush();
     if (!strstr($new_sprite_path, MMRPG_CONFIG_ROOTDIR)){ $new_sprite_path = MMRPG_CONFIG_ROOTDIR.ltrim($new_sprite_path, '/'); }
     $base_sprite_path = MMRPG_CONFIG_ROOTDIR.'images/'.$kind_plural.'/'.$base_token.'/';

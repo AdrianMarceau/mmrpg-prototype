@@ -259,8 +259,36 @@ if (empty($migration_filter)){
     // Delete migrated ability effects if they've been copied over properly
     if (file_exists(MMRPG_ABILITIES_NEW_CONTENT_DIR.'bright-burst/sprites_2/')){ // if original exists
         if (file_exists($special_effect_abilities_dir.'yellow-overlay/')){ // but has been copied
+            ob_echo('----------');
+            ob_echo('Removing redundant sprites for bright-burst ability');
+            ob_echo('- delete '.clean_path(MMRPG_ABILITIES_NEW_CONTENT_DIR.'bright-burst/sprites_2/').'*');
             deleteDir(MMRPG_ABILITIES_NEW_CONTENT_DIR.'bright-burst/sprites_2/'); // delete the original
         }
+    }
+
+    // Overwrite redundant field booster sprites, overwrite base ones with empty images
+    if (file_exists(MMRPG_ABILITIES_NEW_CONTENT_DIR.'field-support/')){
+        $flag_print_removed = false;
+        for ($i = 1; $i <= 4; $i++){
+            $sprites_path = $i > 1 ? 'sprites_'.$i : 'sprites';
+            if (!file_exists(MMRPG_ABILITIES_NEW_CONTENT_DIR.'field-support/'.$sprites_path.'/')){ continue; }
+            if (!$flag_print_removed){
+                ob_echo('----------');
+                ob_echo('Removing redundant sprites for field-support ability');
+                $flag_print_removed = true;
+            }
+            ob_echo('- delete '.clean_path(MMRPG_ABILITIES_NEW_CONTENT_DIR.'field-support/'.$sprites_path.'/').'*');
+            deleteDir(MMRPG_ABILITIES_NEW_CONTENT_DIR.'field-support/'.$sprites_path.'/');
+        }
+        if (!$flag_print_removed){
+            ob_echo('----------');
+            ob_echo('Manually copying required sprites for field-support ability');
+        } else {
+            ob_echo('And replacing with required sprites from other directories');
+        }
+        $export_path = MMRPG_ABILITIES_NEW_CONTENT_DIR.'field-support/sprites/';
+        copy_sprites_to_new_dir('field-support', '', $export_path, $sprite_sprite_filenames, false, false, true);
+        copy_sprites_to_new_dir('mecha-support', '', $export_path, $icon_sprite_filenames, false, false, true);
     }
 
 }
