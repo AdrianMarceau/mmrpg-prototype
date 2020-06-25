@@ -102,11 +102,11 @@ RewriteRule ^styles/robots\.css$ styles/robots.php [L]
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule (.*) - [S=3]
 RewriteCond %{QUERY_STRING} ^(.*)?$
-RewriteRule ^admin/([-_a-z0-9]+)/([-_a-z0-9]+)(?:/([^/]+))?/?$ admin.php?action=$1&subaction=$2&$3&%1 [L]
+RewriteRule ^admin/([-_a-z0-9]+)/([-_a-z0-9]+)(?:/([^/]+))?/?$ admin/index.php?action=$1&subaction=$2&$3&%1 [L]
 RewriteCond %{QUERY_STRING} ^(.*)?$
-RewriteRule ^admin/([-_a-z0-9]+)(?:/([^/]+))?/?$ admin.php?action=$1&$2&%1 [L]
+RewriteRule ^admin/([-_a-z0-9]+)(?:/([^/]+))?/?$ admin/index.php?action=$1&$2&%1 [L]
 RewriteCond %{QUERY_STRING} ^(.*)?$
-RewriteRule ^admin(?:/([^/]+))?/?$ admin.php?$1&%1 [L]
+RewriteRule ^admin(?:/([^/]+))?/?$ admin/index.php?$1&%1 [L]
 
 
 #################################
