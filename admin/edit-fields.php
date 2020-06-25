@@ -1576,7 +1576,7 @@
 
                     </form>
 
-                    <form class="ajax" name="ajax-form" target="ajax-frame" action="admin/update_image.php" method="post" enctype="multipart/form-data"></form>
+                    <form class="ajax" name="ajax-form" target="ajax-frame" action="admin/scripts/update-image.php" method="post" enctype="multipart/form-data"></form>
                     <iframe class="ajax" name="ajax-frame" src="about:blank"></iframe>
 
                 </div>

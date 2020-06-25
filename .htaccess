@@ -99,6 +99,8 @@ RewriteRule ^styles/robots\.css$ styles/robots.php [L]
 ################################
 
 # Define the rewrite rules and conditions for admin pages
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule (.*) - [S=3]
 RewriteCond %{QUERY_STRING} ^(.*)?$
 RewriteRule ^admin/([-_a-z0-9]+)/([-_a-z0-9]+)(?:/([^/]+))?/?$ admin.php?action=$1&subaction=$2&$3&%1 [L]
 RewriteCond %{QUERY_STRING} ^(.*)?$

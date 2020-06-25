@@ -2,7 +2,7 @@
 
 // Require the application top file
 define('MMRPG_ADMIN_PANEL', true);
-require_once('../top.php');
+require_once('../../top.php');
 
 //echo('<pre>$_POST = '.print_r($_POST, true).'</pre>'.PHP_EOL);
 //echo('<pre>$_FILES = '.print_r($_FILES, true).'</pre>'.PHP_EOL);

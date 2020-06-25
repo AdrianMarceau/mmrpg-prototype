@@ -38,7 +38,7 @@ a:hover {
     height: 3px;
     right: 0;
     left: 0;
-    background-image: url(../images/fields/intro-field/battle-field_background_base.gif);
+    background-image: url(../../images/fields/intro-field/battle-field_background_base.gif);
     background-repeat: repeat-x;
 }
 #mmrpg #admin > .header:before {
@@ -844,7 +844,7 @@ input[type=file] {
     padding: 0;
     margin: 0 auto;
     background-color: #4d4d4d;
-    background-image: url(../images/sprite-grid.gif);
+    background-image: url(../../images/sprite-grid.gif);
     background-attachment: scroll;
     background-repeat: repeat;
     background-position: 0 0;
