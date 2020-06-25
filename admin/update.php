@@ -1,23 +1,39 @@
 <?
 
+// Collect any extra request variables for the update
+$this_cache_date = !empty($_REQUEST['date']) && preg_match('/^([0-9]{8})-([0-9]{2})$/', $_REQUEST['date']) ? $_REQUEST['date'] : MMRPG_CONFIG_CACHE_DATE;
+$this_update_limit = !empty($_REQUEST['limit']) && is_numeric($_REQUEST['limit']) ? $_REQUEST['limit'] : 10;
+$this_request_type = !empty($_REQUEST['type']) ? $_REQUEST['type'] : 'index';
+$this_request_id = !empty($_REQUEST['id']) && is_numeric($_REQUEST['id']) ? $_REQUEST['id'] : 0;
+$this_request_patch = !empty($_REQUEST['patch']) ? trim($_REQUEST['patch']) : '';
+$this_request_force = isset($_REQUEST['force']) && $_REQUEST['force'] == 'true' ? true : false;
+$this_request_incognito = isset($_REQUEST['incognito']) && $_REQUEST['incognito'] == 'true' ? true : false;
+$this_return_markup = '';
+
+// Define the base update href so we can modify later
+$base_update_href = 'admin/update/date='.$this_cache_date.'&patch='.$this_request_patch;
+
 // There are different permissions for the different patches
+$is_battlepoint_refresh = false;
 if (!empty($_REQUEST['patch'])
     && $_REQUEST['patch'] == 'recalculate_all_battle_points'){
 
     // Pre-check access permissions before continuing
+    $is_battlepoint_refresh = true;
+    $base_update_href = 'admin/refresh-leaderboard/';
     if (!in_array('*', $this_adminaccess)
-        && !in_array('refresh_leaderboard', $this_adminaccess)){
+        && !in_array('refresh-leaderboard', $this_adminaccess)){
         $form_messages[] = array('error', 'You do not have permission to refresh the leaderboard!');
-        redirect_form_action('admin.php?action=home');
+        redirect_form_action('admin/home/');
     }
 
 } else {
 
     // Pre-check access permissions before continuing
     if (!in_array('*', $this_adminaccess)
-        && !in_array('patch_saves', $this_adminaccess)){
+        && !in_array('patch-saves', $this_adminaccess)){
         $form_messages[] = array('error', 'You do not have permission to patch save files!');
-        redirect_form_action('admin.php?action=home');
+        redirect_form_action('admin/home/');
     }
 
 }
@@ -30,20 +46,9 @@ require_once('update_patches.php');
 // Prevent updating if logged into a file
 if ($this_user['userid'] != MMRPG_SETTINGS_GUEST_ID){ die('<strong>FATAL UPDATE ERROR!</strong><br /> You cannot be logged in while updating!');  }
 
-// Collect any extra request variables for the update
-$this_cache_date = !empty($_REQUEST['date']) && preg_match('/^([0-9]{8})-([0-9]{2})$/', $_REQUEST['date']) ? $_REQUEST['date'] : MMRPG_CONFIG_CACHE_DATE;
-$this_update_limit = !empty($_REQUEST['limit']) && is_numeric($_REQUEST['limit']) ? $_REQUEST['limit'] : 10;
-$this_request_type = !empty($_REQUEST['type']) ? $_REQUEST['type'] : 'index';
-$this_request_id = !empty($_REQUEST['id']) && is_numeric($_REQUEST['id']) ? $_REQUEST['id'] : 0;
-$this_request_patch = !empty($_REQUEST['patch']) ? trim($_REQUEST['patch']) : '';
-$this_request_force = isset($_REQUEST['force']) && $_REQUEST['force'] == 'true' ? true : false;
-$this_request_incognito = isset($_REQUEST['incognito']) && $_REQUEST['incognito'] == 'true' ? true : false;
-$this_return_markup = '';
-
 // Generate the base href for the update links
-$base_update_href = 'admin.php?action=update&amp;date='.$this_cache_date.'&amp;patch='.$this_request_patch;
-if ($this_request_force){ $base_update_href .= '&amp;force=true'; }
-if ($this_request_incognito){ $base_update_href .= '&amp;incognito=true'; }
+if ($this_request_force){ $base_update_href .= (strstr($base_update_href, '=') ? '&' : '').'force=true'; }
+if ($this_request_incognito){ $base_update_href .= (strstr($base_update_href, '=') ? '&' : '').'incognito=true'; }
 
 // Manually create or reset the incognito patch list based on vars
 if (!isset($_SESSION['admin']['patched_user_ids'])
@@ -121,23 +126,26 @@ if ($this_request_type == 'ajax'){ $this_page_markup = ''; }
 
 // Print out the menu header so we know where we are
 if ($this_request_type != 'ajax'){
+    $base_update_href = str_replace('&', '&amp;', $base_update_href);
     ob_start();
     ?>
     <div id="menu" style="margin: 0 auto 20px; font-weight: bold;">
-        <a href="admin.php">Admin Panel</a> &raquo;
-        <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=<?=$this_update_limit?>">Update Save Files</a> &raquo;
+        <a href="admin/">Admin Panel</a> &raquo;
+        <a href="<?= $base_update_href ?>"><?= $is_battlepoint_refresh ? 'Refresh Leaderboard' : 'Update Save Files' ?></a> &raquo;
         <? if (empty($this_request_patch)){ ?>
             <br /><br /><strong>Select Patch</strong> :<br />
             <? foreach ($update_patch_tokens AS $key => $patch){ ?>
                 <? if ($key === (count($update_patch_tokens) - 1)){ ?>
-                    + <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=<?=$this_update_limit?>&amp;patch=<?=$patch?>"><?= $update_patch_names[$patch] ?></a>
+                    + <a href="admin/update/?date=<?=$this_cache_date?>&amp;limit=<?=$this_update_limit?>&amp;patch=<?=$patch?>"><?= $update_patch_names[$patch] ?></a>
                 <? } else { ?>
                     + <a><del><?= $update_patch_names[$patch] ?></del></a>
                 <? } ?>
                 <br />
             <? } ?>
         <? } else { ?>
-            <a href="admin.php?action=update&amp;date=<?=$this_cache_date?>&amp;limit=<?=$this_update_limit?>&amp;patch=<?=$this_request_patch?>"><?= $update_patch_names[$this_request_patch] ?></a> &raquo;
+            <? if (!$is_battlepoint_refresh){ ?>
+                <a href="admin/update/?date=<?=$this_cache_date?>&amp;limit=<?=$this_update_limit?>&amp;patch=<?=$this_request_patch?>"><?= $update_patch_names[$this_request_patch] ?></a> &raquo;
+            <? } ?>
             <br />
             <a href="<?= $base_update_href ?>&amp;limit=1" data-limit="1">x1</a>
             |  <a href="<?= $base_update_href ?>&amp;limit=10" data-limit="10">x10</a>
@@ -247,7 +255,7 @@ function admin_trigger_update(thisHref){
             // Post this change back to the server
             $.ajax({
                 type: 'POST',
-                url: thisHref, //'admin.php?action=update&type=ajax',
+                url: thisHref, //'admin/update/?type=ajax',
                 data: postData,
                 success: function(data, status){
 

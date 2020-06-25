@@ -4,7 +4,7 @@
 if (!in_array('*', $this_adminaccess)
     && !in_array('purge_bogus', $this_adminaccess)){
     $form_messages[] = array('error', 'You do not have permission to purge bogus users!');
-    redirect_form_action('admin.php?action=home');
+    redirect_form_action('admin/home/');
 }
 
 // Prevent updating if logged into a file
@@ -18,8 +18,8 @@ $this_purge_limit = !empty($_REQUEST['limit']) && is_numeric($_REQUEST['limit'])
 ob_start();
 ?>
 <div style="margin: 0 auto 20px; font-weight: bold;">
-<a href="admin.php">Admin Panel</a> &raquo;
-<a href="admin.php?action=purge&date=<?=$this_cache_date?>&limit=<?=$this_purge_limit?>">Purge Inactive Members</a> &raquo;
+<a href="admin/">Admin Panel</a> &raquo;
+<a href="admin/purge/?date=<?=$this_cache_date?>&limit=<?=$this_purge_limit?>">Purge Inactive Members</a> &raquo;
 </div>
 <?
 $this_page_markup .= ob_get_clean();
@@ -61,8 +61,8 @@ if (!empty($this_purge_list)){
     }
 
     // Delete any files for this user
-    if (file_exists($this_save_dir.$data['save_file_path'].$data['save_file_name'])){ @unlink($this_save_dir.$data['save_file_path'].$data['save_file_name']); }
-    if (file_exists($this_save_dir.$data['save_file_path'])){ @deleteDir($this_save_dir.$data['save_file_path']); }
+    //if (file_exists($this_save_dir.$data['save_file_path'].$data['save_file_name'])){ @unlink($this_save_dir.$data['save_file_path'].$data['save_file_name']); }
+    //if (file_exists($this_save_dir.$data['save_file_path'])){ @deleteDir($this_save_dir.$data['save_file_path']); }
 
     // DEBUG
     $this_page_markup .= '<p style="margin: 2px auto; padding: 6px; background-color: '.($temp_success === false ? 'rgb(255, 218, 218)' : 'rgb(218, 255, 218)').';">';
@@ -72,8 +72,8 @@ if (!empty($this_purge_list)){
       $this_page_markup .= 'User ID:'.$data['user_id'].'<br />';
       $this_page_markup .= '<pre>'.print_r($data, true).'</pre><br /><hr /><br />';
       // Print database success
-      if ($temp_success === false){ $this_page_markup .= '...Database Failure!'; }
-      else { $this_page_markup .= '...Database Success'; }
+      if ($temp_success === false){ $this_page_markup .= '...Delete Failure!'; }
+      else { $this_page_markup .= '...Delete Success'; }
 
     $this_page_markup .= '</p><hr />';
 

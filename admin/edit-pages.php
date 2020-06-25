@@ -10,9 +10,9 @@
 
     // Pre-check access permissions before continuing
     if (!in_array('*', $this_adminaccess)
-        && !in_array('edit_pages', $this_adminaccess)){
+        && !in_array('edit-pages', $this_adminaccess)){
         $form_messages[] = array('error', 'You do not have permission to edit pages!');
-        redirect_form_action('admin.php?action=home');
+        redirect_form_action('admin/home/');
     }
 
     /* -- Page Script/Style Dependencies  -- */
@@ -33,8 +33,8 @@
 
     // Define a function for exiting a page edit action
     function exit_page_edit_action($page_id = 0){
-        if (!empty($page_id)){ $location = 'admin.php?action=edit_pages&subaction=editor&page_id='.$page_id; }
-        else { $location = 'admin.php?action=edit_pages&subaction=search'; }
+        if (!empty($page_id)){ $location = 'admin/edit-pages/editor/page_id='.$page_id; }
+        else { $location = 'admin/edit-pages/search/'; }
         redirect_form_action($location);
     }
 
@@ -244,7 +244,7 @@
         $form_data = array();
         $form_success = true;
         $form_action = !empty($_POST['action']) ? trim($_POST['action']) : '';
-        if ($form_action == 'edit_pages'){
+        if ($form_action == 'edit-pages'){
 
             // Collect form data from the request and parse out simple rules
 
@@ -366,11 +366,11 @@
     ?>
 
     <div class="breadcrumb">
-        <a href="admin.php">Admin Panel</a>
-        &raquo; <a href="admin.php?action=edit_pages">Edit Pages</a>
+        <a href="admin/">Admin Panel</a>
+        &raquo; <a href="admin/edit-pages/">Edit Pages</a>
         <? if ($sub_action == 'editor' && !empty($page_data)): ?>
             <? if (!$is_backup_data){ ?>
-                &raquo; <a href="admin.php?action=edit_pages&amp;subaction=editor&amp;page_id=<?= $page_data['page_id'] ?>"><?= $page_name_display ?></a>
+                &raquo; <a href="admin/edit-pages/editor/page_id=<?= $page_data['page_id'] ?>"><?= $page_name_display ?></a>
             <? } else { ?>
                 &raquo; <a><?= $page_name_display ?></a>
             <? } ?>
@@ -379,7 +379,7 @@
 
     <?= !empty($this_error_markup) ? '<div style="margin: 0 auto 20px">'.$this_error_markup.'</div>' : '' ?>
 
-    <div class="adminform edit_pages">
+    <div class="adminform edit-pages">
 
         <? if ($sub_action == 'search'): ?>
 
@@ -393,7 +393,7 @@
 
                 <form class="form" method="get">
 
-                    <input type="hidden" name="action" value="edit_pages" />
+                    <input type="hidden" name="action" value="edit-pages" />
                     <input type="hidden" name="subaction" value="search" />
 
                     <div class="field halfsize">
@@ -446,7 +446,7 @@
 
                     <div class="buttons">
                         <input class="button" type="submit" value="Search" />
-                        <input class="button" type="reset" value="Reset" onclick="javascript:window.location.href='admin.php?action=edit_pages';" />
+                        <input class="button" type="reset" value="Reset" onclick="javascript:window.location.href='admin/edit-pages/';" />
                     </div>
 
                 </form>
@@ -543,7 +543,7 @@
                                 //    $page_name_display = $page_name_display .' / '. $page_data['page_title'];
                                 //}
 
-                                $page_edit = 'admin.php?action=edit_pages&subaction=editor&page_id='.$page_id;
+                                $page_edit = 'admin/edit-pages/editor/page_id='.$page_id;
                                 $page_view = MMRPG_CONFIG_ROOTURL.$page_url;
 
                                 $page_actions = '';
@@ -651,7 +651,7 @@
 
                     <form class="form" method="post">
 
-                        <input type="hidden" name="action" value="edit_pages" />
+                        <input type="hidden" name="action" value="edit-pages" />
                         <input type="hidden" name="subaction" value="editor" />
 
                         <div class="editor-panels" data-tabgroup="page">
@@ -793,7 +793,7 @@
                                                     <td class="date"><?= date('Y/m/d', $backup_unix_time) ?></td>
                                                     <td class="time"><?= date('g:i a', $backup_unix_time) ?></td>
                                                     <td class="actions">
-                                                        <a href="admin.php?action=edit_pages&subaction=editor&backup_id=<?= $backup_info['backup_id'] ?>" target="_blank" style="text-decoration: none;">
+                                                        <a href="admin/edit-pages/editor/backup_id=<?= $backup_info['backup_id'] ?>" target="_blank" style="text-decoration: none;">
                                                             <span style="text-decoration: underline;">View Backup</span>
                                                             <i class="fas fa-external-link-square-alt"></i>
                                                         </a>
@@ -846,7 +846,7 @@
                             <? if (!$is_backup_data){ ?>
                                 <div class="buttons">
                                     <input class="button save" type="submit" value="Save Changes" />
-                                    <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin.php?action=edit_pages&subaction=editor&page_id=<?= $page_data['page_id'] ?>';" />
+                                    <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin/edit-pages/editor/page_id=<?= $page_data['page_id'] ?>';" />
                                     <? /*
                                     <input class="button delete" type="button" value="Delete Page" data-delete="pages" data-page-id="<?= $page_data['page_id'] ?>" />
                                     */ ?>

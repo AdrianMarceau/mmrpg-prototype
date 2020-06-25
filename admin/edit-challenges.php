@@ -4,9 +4,9 @@
 
     // Pre-check access permissions before continuing
     if (!in_array('*', $this_adminaccess)
-        && !in_array('edit_challenges', $this_adminaccess)){
+        && !in_array('edit-challenges', $this_adminaccess)){
         $form_messages[] = array('error', 'You do not have permission to edit challenges!');
-        redirect_form_action('admin.php?action=home');
+        redirect_form_action('admin/home/');
     }
 
     /* -- Collect Dependant Indexes -- */
@@ -199,8 +199,8 @@
 
     // Define a function for exiting a challenge edit action
     function exit_challenge_edit_action($challenge_id = false){
-        if ($challenge_id !== false){ $location = 'admin.php?action=edit_challenges&subaction=editor&challenge_id='.$challenge_id; }
-        else { $location = 'admin.php?action=edit_challenges&subaction=search'; }
+        if ($challenge_id !== false){ $location = 'admin/edit-challenges/editor/challenge_id='.$challenge_id; }
+        else { $location = 'admin/edit-challenges/search/'; }
         redirect_form_action($location);
     }
 
@@ -412,7 +412,7 @@
         $form_data = array();
         $form_success = true;
         $form_action = !empty($_POST['action']) ? trim($_POST['action']) : '';
-        if ($form_action == 'edit_challenges'){
+        if ($form_action == 'edit-challenges'){
 
             // COLLECT form data from the request and parse out simple rules
 
@@ -575,16 +575,16 @@
     ?>
 
     <div class="breadcrumb">
-        <a href="admin.php">Admin Panel</a>
-        &raquo; <a href="admin.php?action=edit_challenges">Edit Challenges</a>
+        <a href="admin/">Admin Panel</a>
+        &raquo; <a href="admin/edit-challenges/">Edit Challenges</a>
         <? if ($sub_action == 'editor' && !empty($challenge_data)): ?>
-            &raquo; <a href="admin.php?action=edit_challenges&amp;subaction=editor&amp;challenge_id=<?= $challenge_data['challenge_id'] ?>"><?= !empty($challenge_name_display) ? $challenge_name_display : 'New Challenge';  ?></a>
+            &raquo; <a href="admin/edit-challenges/editor/challenge_id=<?= $challenge_data['challenge_id'] ?>"><?= !empty($challenge_name_display) ? $challenge_name_display : 'New Challenge';  ?></a>
         <? endif; ?>
     </div>
 
     <?= !empty($this_error_markup) ? '<div style="margin: 0 auto 20px">'.$this_error_markup.'</div>' : '' ?>
 
-    <div class="adminform edit_challenges">
+    <div class="adminform edit-challenges">
 
         <? if ($sub_action == 'search'): ?>
 
@@ -598,7 +598,7 @@
 
                 <form class="form" method="get">
 
-                    <input type="hidden" name="action" value="edit_challenges" />
+                    <input type="hidden" name="action" value="edit-challenges" />
                     <input type="hidden" name="subaction" value="search" />
 
                     <div class="field">
@@ -661,8 +661,8 @@
 
                     <div class="buttons">
                         <input class="button search" type="submit" value="Search" />
-                        <input class="button reset" type="reset" value="Reset" onclick="javascript:window.location.href='admin.php?action=edit_challenges';" />
-                        <a class="button new" href="admin.php?action=edit_challenges&subaction=editor&challenge_id=0">Create New</a>
+                        <input class="button reset" type="reset" value="Reset" onclick="javascript:window.location.href='admin/edit-challenges/';" />
+                        <a class="button new" href="admin/edit-challenges/editor/challenge_id=0">Create New</a>
                     </div>
 
                 </form>
@@ -745,7 +745,7 @@
                                 $challenge_flag_published = !empty($challenge_data['challenge_flag_published']) ? '<i class="fas fa-check-square"></i>' : '-';
                                 $challenge_flag_hidden = !empty($challenge_data['challenge_flag_hidden']) ? '<i class="fas fa-eye-slash"></i>' : '-';
 
-                                $challenge_edit_url = 'admin.php?action=edit_challenges&subaction=editor&challenge_id='.$challenge_id;
+                                $challenge_edit_url = 'admin/edit-challenges/editor/challenge_id='.$challenge_id;
                                 $challenge_name_link = '<a class="link" href="'.$challenge_edit_url.'">'.$challenge_name.'</a>';
 
                                 $challenge_actions = '';
@@ -813,7 +813,7 @@
 
                     <form class="form" method="post">
 
-                        <input type="hidden" name="action" value="edit_challenges" />
+                        <input type="hidden" name="action" value="edit-challenges" />
                         <input type="hidden" name="subaction" value="editor" />
 
                         <?
@@ -1195,7 +1195,7 @@
 
                                     <div class="buttons">
                                         <input class="button save" type="submit" value="Save Changes" />
-                                        <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin.php?action=edit_challenges&subaction=editor&challenge_id=<?= $challenge_data['challenge_id'] ?>';" />
+                                        <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin/edit-challenges/editor/challenge_id=<?= $challenge_data['challenge_id'] ?>';" />
                                         <input class="button delete" type="button" value="Delete Challenge" data-delete="challenges" data-challenge-id="<?= $challenge_data['challenge_id'] ?>" />
                                     </div>
 

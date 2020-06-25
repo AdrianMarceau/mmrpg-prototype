@@ -4,9 +4,9 @@
 
     // Pre-check access permissions before continuing
     if (!in_array('*', $this_adminaccess)
-        && !in_array('edit_players', $this_adminaccess)){
+        && !in_array('edit-players', $this_adminaccess)){
         $form_messages[] = array('error', 'You do not have permission to edit players!');
-        redirect_form_action('admin.php?action=home');
+        redirect_form_action('admin/home/');
     }
 
     /* -- Collect Dependant Indexes -- */
@@ -70,8 +70,8 @@
 
     // Define a function for exiting a player edit action
     function exit_player_edit_action($player_id = 0){
-        if (!empty($player_id)){ $location = 'admin.php?action=edit_players&subaction=editor&player_id='.$player_id; }
-        else { $location = 'admin.php?action=edit_players&subaction=search'; }
+        if (!empty($player_id)){ $location = 'admin/edit-players/editor/player_id='.$player_id; }
+        else { $location = 'admin/edit-players/search/'; }
         redirect_form_action($location);
     }
 
@@ -295,7 +295,7 @@
         $form_data = array();
         $form_success = true;
         $form_action = !empty($_POST['action']) ? trim($_POST['action']) : '';
-        if ($form_action == 'edit_players'){
+        if ($form_action == 'edit-players'){
 
             // COLLECT form data from the request and parse out simple rules
 
@@ -594,11 +594,11 @@
     ?>
 
     <div class="breadcrumb">
-        <a href="admin.php">Admin Panel</a>
-        &raquo; <a href="admin.php?action=edit_players">Edit Players</a>
+        <a href="admin/">Admin Panel</a>
+        &raquo; <a href="admin/edit-players/">Edit Players</a>
         <? if ($sub_action == 'editor' && !empty($player_data)): ?>
             <? if (!$is_backup_data){ ?>
-                &raquo; <a href="admin.php?action=edit_players&amp;subaction=editor&amp;player_id=<?= $player_data['player_id'] ?>"><?= $player_name_display ?></a>
+                &raquo; <a href="admin/edit-players/editor/player_id=<?= $player_data['player_id'] ?>"><?= $player_name_display ?></a>
             <? } else { ?>
                 &raquo; <a><?= $player_name_display ?></a>
             <? } ?>
@@ -607,7 +607,7 @@
 
     <?= !empty($this_error_markup) ? '<div style="margin: 0 auto 20px">'.$this_error_markup.'</div>' : '' ?>
 
-    <div class="adminform edit_players">
+    <div class="adminform edit-players">
 
         <? if ($sub_action == 'search'): ?>
 
@@ -621,7 +621,7 @@
 
                 <form class="form" method="get">
 
-                    <input type="hidden" name="action" value="edit_players" />
+                    <input type="hidden" name="action" value="edit-players" />
                     <input type="hidden" name="subaction" value="search" />
 
                     <? /*
@@ -673,7 +673,7 @@
 
                     <div class="buttons">
                         <input class="button" type="submit" value="Search" />
-                        <input class="button" type="reset" value="Reset" onclick="javascript:window.location.href='admin.php?action=edit_players';" />
+                        <input class="button" type="reset" value="Reset" onclick="javascript:window.location.href='admin/edit-players/';" />
                     </div>
 
                 </form>
@@ -750,7 +750,7 @@
                                 $player_flag_complete = !empty($player_data['player_flag_complete']) ? '<i class="fas fa-check-circle"></i>' : '-';
                                 $player_flag_hidden = !empty($player_data['player_flag_hidden']) ? '<i class="fas fa-eye-slash"></i>' : '-';
 
-                                $player_edit_url = 'admin.php?action=edit_players&subaction=editor&player_id='.$player_id;
+                                $player_edit_url = 'admin/edit-players/editor/player_id='.$player_id;
                                 $player_name_link = '<a class="link" href="'.$player_edit_url.'">'.$player_name.'</a>';
 
                                 $player_actions = '';
@@ -853,7 +853,7 @@
 
                     <form class="form" method="post">
 
-                        <input type="hidden" name="action" value="edit_players" />
+                        <input type="hidden" name="action" value="edit-players" />
                         <input type="hidden" name="subaction" value="editor" />
 
                         <div class="editor-panels" data-tabgroup="player">
@@ -1506,7 +1506,7 @@
                                                     <td class="date"><?= date('Y/m/d', $backup_unix_time) ?></td>
                                                     <td class="time"><?= date('g:i a', $backup_unix_time) ?></td>
                                                     <td class="actions">
-                                                        <a href="admin.php?action=edit_players&subaction=editor&backup_id=<?= $backup_info['backup_id'] ?>" target="_blank" style="text-decoration: none;">
+                                                        <a href="admin/edit-players/editor/backup_id=<?= $backup_info['backup_id'] ?>" target="_blank" style="text-decoration: none;">
                                                             <span style="text-decoration: underline;">View Backup</span>
                                                             <i class="fas fa-external-link-square-alt"></i>
                                                         </a>
@@ -1560,7 +1560,7 @@
                             <? if (!$is_backup_data){ ?>
                                 <div class="buttons">
                                     <input class="button save" type="submit" value="Save Changes" />
-                                    <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin.php?action=edit_players&subaction=editor&player_id=<?= $player_data['player_id'] ?>';" />
+                                    <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin/edit-players/editor/player_id=<?= $player_data['player_id'] ?>';" />
                                     <? /*
                                     <input class="button delete" type="button" value="Delete Player" data-delete="players" data-player-id="<?= $player_data['player_id'] ?>" />
                                     */ ?>

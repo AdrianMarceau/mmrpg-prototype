@@ -503,7 +503,7 @@ if ($this_current_page == 'file' // File sub-pages
             if ($is_admin && rpg_game::is_demo()){
                 ?>
                 <div class="adminlink">
-                    <a class="link" href="admin.php" target="_blank"><span>Admin</span></a>
+                    <a class="link" href="admin/" target="_blank"><span>Admin</span></a>
                 </div>
                 <?
             }

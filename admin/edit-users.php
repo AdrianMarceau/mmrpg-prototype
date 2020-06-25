@@ -4,9 +4,9 @@
 
     // Pre-check access permissions before continuing
     if (!in_array('*', $this_adminaccess)
-        && !in_array('edit_users', $this_adminaccess)){
+        && !in_array('edit-users', $this_adminaccess)){
         $form_messages[] = array('error', 'You do not have permission to edit users!');
-        redirect_form_action('admin.php?action=home');
+        redirect_form_action('admin/home/');
     }
 
     /* -- Collect Editor Indexes -- */
@@ -20,8 +20,8 @@
 
     // Define a function for exiting a user edit action
     function exit_user_edit_action($user_id = 0){
-        if (!empty($user_id)){ $location = 'admin.php?action=edit_users&subaction=editor&user_id='.$user_id; }
-        else { $location = 'admin.php?action=edit_users&subaction=search'; }
+        if (!empty($user_id)){ $location = 'admin/edit-users/editor/user_id='.$user_id; }
+        else { $location = 'admin/edit-users/search/'; }
         redirect_form_action($location);
     }
 
@@ -241,7 +241,7 @@
         $form_data = array();
         $form_success = true;
         $form_action = !empty($_POST['action']) ? trim($_POST['action']) : '';
-        if ($form_action == 'edit_users'){
+        if ($form_action == 'edit-users'){
 
             // Collect form data from the request and parse out simple rules
 
@@ -459,16 +459,16 @@
     ?>
 
     <div class="breadcrumb">
-        <a href="admin.php">Admin Panel</a>
-        &raquo; <a href="admin.php?action=edit_users">Edit Users</a>
+        <a href="admin/">Admin Panel</a>
+        &raquo; <a href="admin/edit-users/">Edit Users</a>
         <? if ($sub_action == 'editor' && !empty($user_data)): ?>
-            &raquo; <a href="admin.php?action=edit_users&amp;subaction=editor&amp;user_id=<?= $user_data['user_id'] ?>"><?= $user_name_display ?></a>
+            &raquo; <a href="admin/edit-users/editor/user_id=<?= $user_data['user_id'] ?>"><?= $user_name_display ?></a>
         <? endif; ?>
     </div>
 
     <?= !empty($this_error_markup) ? '<div style="margin: 0 auto 20px">'.$this_error_markup.'</div>' : '' ?>
 
-    <div class="adminform edit_users">
+    <div class="adminform edit-users">
 
         <? if ($sub_action == 'search'): ?>
 
@@ -482,7 +482,7 @@
 
                 <form class="form" method="get">
 
-                    <input type="hidden" name="action" value="edit_users" />
+                    <input type="hidden" name="action" value="edit-users" />
                     <input type="hidden" name="subaction" value="search" />
 
                     <div class="field foursize">
@@ -559,7 +559,7 @@
 
                     <div class="buttons">
                         <input class="button" type="submit" value="Search" />
-                        <input class="button" type="reset" value="Reset" onclick="javascript:window.location.href='admin.php?action=edit_users';" />
+                        <input class="button" type="reset" value="Reset" onclick="javascript:window.location.href='admin/edit-users/';" />
                     </div>
 
                 </form>
@@ -637,7 +637,7 @@
                                     $user_name_display = $user_name_display .' / '. $user_data['user_name_public'];
                                 }
 
-                                $user_edit = 'admin.php?action=edit_users&subaction=editor&user_id='.$user_id;
+                                $user_edit = 'admin/edit-users/editor/user_id='.$user_id;
 
                                 $user_actions = '';
                                 $user_actions .= '<a class="link edit" href="'.$user_edit.'"><span>edit</span></a>';
@@ -685,7 +685,7 @@
 
                 <form class="form" method="post">
 
-                    <input type="hidden" name="action" value="edit_users" />
+                    <input type="hidden" name="action" value="edit-users" />
                     <input type="hidden" name="subaction" value="editor" />
 
                     <div class="field">

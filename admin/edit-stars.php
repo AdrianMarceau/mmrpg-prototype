@@ -16,9 +16,9 @@
 
     // Pre-check access permissions before continuing
     if (!in_array('*', $this_adminaccess)
-        && !in_array('edit_stars', $this_adminaccess)){
+        && !in_array('edit-stars', $this_adminaccess)){
         $form_messages[] = array('error', 'You do not have permission to edit stars!');
-        redirect_form_action('admin.php?action=home');
+        redirect_form_action('admin/home/');
     }
 
     // Define the extra stylesheets that must be included for this page
@@ -34,8 +34,8 @@
 
     // Define a function for exiting a star edit action
     function exit_star_edit_action($star_id = false){
-        if ($star_id !== false){ $location = 'admin.php?action=edit_stars&subaction=editor&star_id='.$star_id; }
-        else { $location = 'admin.php?action=edit_stars&subaction=search'; }
+        if ($star_id !== false){ $location = 'admin/edit-stars/editor/star_id='.$star_id; }
+        else { $location = 'admin/edit-stars/search/'; }
         redirect_form_action($location);
     }
 
@@ -258,7 +258,7 @@
         $form_data = array();
         $form_success = true;
         $form_action = !empty($_POST['action']) ? trim($_POST['action']) : '';
-        if ($form_action == 'edit_stars'){
+        if ($form_action == 'edit-stars'){
 
             // Collect form data from the request and parse out simple rules
 
@@ -384,16 +384,16 @@
     ?>
 
     <div class="breadcrumb">
-        <a href="admin.php">Admin Panel</a>
-        &raquo; <a href="admin.php?action=edit_stars">Edit Rogue Stars</a>
+        <a href="admin/">Admin Panel</a>
+        &raquo; <a href="admin/edit-stars/">Edit Rogue Stars</a>
         <? if ($sub_action == 'editor' && !empty($star_data)): ?>
-            &raquo; <a href="admin.php?action=edit_stars&amp;subaction=editor&amp;star_id=<?= $star_data['star_id'] ?>"><?= !empty($star_name_display) ? $star_name_display : 'Schedule New' ?></a>
+            &raquo; <a href="admin/edit-stars/editor/star_id=<?= $star_data['star_id'] ?>"><?= !empty($star_name_display) ? $star_name_display : 'Schedule New' ?></a>
         <? endif; ?>
     </div>
 
     <?= !empty($this_error_markup) ? '<div style="margin: 0 auto 20px">'.$this_error_markup.'</div>' : '' ?>
 
-    <div class="adminform edit_stars">
+    <div class="adminform edit-stars">
 
         <? if ($sub_action == 'search'): ?>
 
@@ -407,7 +407,7 @@
 
                 <form class="form" method="get">
 
-                    <input type="hidden" name="action" value="edit_stars" />
+                    <input type="hidden" name="action" value="edit-stars" />
                     <input type="hidden" name="subaction" value="search" />
 
                     <div class="field threesize">
@@ -482,8 +482,8 @@
 
                     <div class="buttons">
                         <input class="button" type="submit" value="Search" />
-                        <input class="button" type="reset" value="Reset" onclick="javascript:window.location.href='admin.php?action=edit_stars';" />
-                        <a class="button new" href="admin.php?action=edit_stars&subaction=editor&star_id=0&autofill_dates=next_weekend">Schedule Next Star</a>
+                        <input class="button" type="reset" value="Reset" onclick="javascript:window.location.href='admin/edit-stars/';" />
+                        <a class="button new" href="admin/edit-stars/editor/star_id=0&autofill_dates=next_weekend">Schedule Next Star</a>
                     </div>
 
                 </form>
@@ -584,7 +584,7 @@
                                 $star_type_name = !empty($star_type_info) ? $star_type_info['type_name'] : ucfirst($star_type);
                                 $star_type_span = '<span class="type_span type_'.(!empty($star_data['star_type']) ? $star_data['star_type'] : 'none').'">'.$star_type_name.'</span>';
 
-                                $star_edit = 'admin.php?action=edit_stars&subaction=editor&star_id='.$star_id;
+                                $star_edit = 'admin/edit-stars/editor/star_id='.$star_id;
 
                                 $star_actions = '';
                                 $star_actions .= '<a class="link edit" href="'.$star_edit.'"><span>edit</span></a>';
@@ -651,7 +651,7 @@
 
                     <form class="form" method="post">
 
-                        <input type="hidden" name="action" value="edit_stars" />
+                        <input type="hidden" name="action" value="edit-stars" />
                         <input type="hidden" name="subaction" value="editor" />
 
                         <div class="field halfsize">
@@ -719,7 +719,7 @@
 
                             <div class="buttons">
                                 <input class="button save" type="submit" value="Save Changes" />
-                                <input class="button reset" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin.php?action=edit_stars&subaction=editor&star_id=<?= $star_data['star_id'] ?>';" />
+                                <input class="button reset" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin/edit-stars/editor/star_id=<?= $star_data['star_id'] ?>';" />
                                 <input class="button delete" type="button" value="Delete Star" data-delete="stars" data-star-id="<?= $star_data['star_id'] ?>" />
                             </div>
 

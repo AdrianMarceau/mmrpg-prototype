@@ -23,6 +23,10 @@ $this_page_tabtitle = 'Admin';
 @ini_set('memory_limit', '128M'); //100MB
 @ini_set('max_execution_time', 300); //300 seconds = 5 minutes
 
+//echo('<pre>$_GET = '.print_r($_GET, true).'</pre>');
+//echo('<pre>$_SERVER = '.print_r($_SERVER, true).'</pre>');
+//exit();
+
 // Define the form messages and collect any from session
 $form_messages = array();
 if (!empty($_SESSION['mmrpg_admin']['form_messages'])){
@@ -75,7 +79,13 @@ function print_form_messages($print = true, $clear = true){
 function redirect_form_action($location){
     backup_form_messages();
     backup_form_data();
-    if (!empty($location)){ header('Location: '.$location); }
+    if (!empty($location)){
+        if (!preg_match('/^https?:\/\//', $location)
+            && !strstr($location, MMRPG_CONFIG_ROOTURL)){
+            $location = MMRPG_CONFIG_ROOTURL.ltrim($location, '/');
+        }
+        header('Location: '.$location);
+    }
     exit();
 }
 
@@ -129,97 +139,75 @@ elseif ($this_page_action == 'exit'){
     unset($_SESSION['admin_id']);
     unset($_SESSION['admin_username']);
     unset($_SESSION['admin_username_display']);
-    redirect_form_action('admin.php');
+    redirect_form_action('admin/');
 }
 // If this is the HOME request
 elseif ($this_page_action == 'home'){
     // Require the admin home file
     require(MMRPG_CONFIG_ROOTDIR.'admin/home.php');
 }
-// Else if this is an UPDATE request
-elseif ($this_page_action == 'update'){
+// Else if this is an REFRESH LEADERBOARD request
+elseif ($this_page_action == 'refresh-leaderboard'){
     // Require the update file
+    $_REQUEST['date'] = MMRPG_CONFIG_CACHE_DATE;
+    $_REQUEST['patch'] = 'recalculate_all_battle_points';
     require(MMRPG_CONFIG_ROOTDIR.'admin/update.php');
 }
-// Else if this is a PRURGE request
-elseif ($this_page_action == 'purge'){
+// Else if this is a PRURGE BOGUS USERS request
+elseif ($this_page_action == 'purge-bogus-users'){
     // Require the purge file
+    $_REQUEST['date'] = MMRPG_CONFIG_CACHE_DATE;
     require(MMRPG_CONFIG_ROOTDIR.'admin/purge.php');
 }
-// Else if this is an IMPORT PLAYERS request
-elseif ($this_page_action == 'import_players'){
-    // Require the import players file
-    require(MMRPG_CONFIG_ROOTDIR.'admin/import-players.php');
-}
-// Else if this is an IMPORT ROBOTS request
-elseif ($this_page_action == 'import_robots'){
-    // Require the import robots file
-    require(MMRPG_CONFIG_ROOTDIR.'admin/import-robots.php');
-}
-// Else if this is an IMPORT ABILITIES request
-elseif ($this_page_action == 'import_abilities'){
-    // Require the import abilities file
-    require(MMRPG_CONFIG_ROOTDIR.'admin/import-abilities.php');
-}
-// Else if this is an IMPORT ITEMS request
-elseif ($this_page_action == 'import_items'){
-    // Require the import items file
-    require(MMRPG_CONFIG_ROOTDIR.'admin/import-items.php');
-}
-// Else if this is an IMPORT FIELDS request
-elseif ($this_page_action == 'import_fields'){
-    // Require the import fields file
-    require(MMRPG_CONFIG_ROOTDIR.'admin/import-fields.php');
-}
-// Else if this is an DELETE CACHE request
-elseif ($this_page_action == 'delete_cache'){
+// Else if this is an DELETE CACHED FILES request
+elseif ($this_page_action == 'delete-cached-files'){
     // Require the delete cache file
     require(MMRPG_CONFIG_ROOTDIR.'admin/delete-cache.php');
 }
-// Else if this is an CLEAR SESSIONS request
-elseif ($this_page_action == 'clear_sessions'){
+// Else if this is an CLEAR ACTIVE SESSIONS request
+elseif ($this_page_action == 'clear-active-sessions'){
     // Require the clear sessions file
     require(MMRPG_CONFIG_ROOTDIR.'admin/clear-sessions.php');
 }
 // Else if this is an EDIT USERS request
-elseif ($this_page_action == 'edit_users'){
+elseif ($this_page_action == 'edit-users'){
     // Require the edit users file
     require(MMRPG_CONFIG_ROOTDIR.'admin/edit-users.php');
 }
 // Else if this is an EDIT PAGES request
-elseif ($this_page_action == 'edit_pages'){
+elseif ($this_page_action == 'edit-pages'){
     // Require the edit pages file
     require(MMRPG_CONFIG_ROOTDIR.'admin/edit-pages.php');
 }
 // Else if this is an EDIT ROBOT MASTERS request
-elseif ($this_page_action == 'edit_robots'){
+elseif ($this_page_action == 'edit-robots'){
     // Require the edit robots file
     require(MMRPG_CONFIG_ROOTDIR.'admin/edit-robots.php');
 }
 // Else if this is an EDIT PLAYER CHARACTERS request
-elseif ($this_page_action == 'edit_players'){
+elseif ($this_page_action == 'edit-players'){
     // Require the edit robots file
     require(MMRPG_CONFIG_ROOTDIR.'admin/edit-players.php');
 }
 // Else if this is an EDIT BATTLE FIELDS request
-elseif ($this_page_action == 'edit_fields'){
+elseif ($this_page_action == 'edit-fields'){
     // Require the edit robots file
     require(MMRPG_CONFIG_ROOTDIR.'admin/edit-fields.php');
 }
 // Else if this is an EDIT CHALLENGE MISSIONS request
-elseif ($this_page_action == 'edit_challenges'){
+elseif ($this_page_action == 'edit-challenges'){
     // Require the edit challenges file
     require(MMRPG_CONFIG_ROOTDIR.'admin/edit-challenges.php');
 }
 // Else if this is an EDIT ROGUE STARS request
-elseif ($this_page_action == 'edit_stars'){
+elseif ($this_page_action == 'edit-stars'){
     // Require the edit stars file
     require(MMRPG_CONFIG_ROOTDIR.'admin/edit-stars.php');
 }
 // Otherwise, not a valid page
 else {
     // Define error 404 text to print
-    $this_error_markup = '<strong>Error 404</strong><br />Page Not Found';
+    $this_error_markup = '<strong>Error 404</strong><br />Page Not Found<br />invalid action: '.$this_page_action.'<br />';
     // Require the admin home file
     require(MMRPG_CONFIG_ROOTDIR.'admin/home.php');
 }
@@ -263,7 +251,7 @@ unset($db);
                 <div class="userinfo">
                     <strong class="welcome">Welcome, <?= $_SESSION['admin_username_display'] ?></strong>
                     <span class="pipe">|</span>
-                    <a class="link" href="admin.php?action=exit">Exit</a>
+                    <a class="link" href="admin/exit/">Exit</a>
                 </div>
             <? endif; ?>
             <?= $this_page_markup ?>

@@ -7,8 +7,8 @@ if ($this_user['userid'] != MMRPG_SETTINGS_GUEST_ID){ die('<strong>FATAL UPDATE 
 ob_start();
 ?>
 <div style="margin: 0 auto 20px; font-weight: bold;">
-<a href="admin.php">Admin Panel</a> &raquo;
-<a href="admin.php?action=delete_cache">Delete Cached Files</a> &raquo;
+<a href="admin/">Admin Panel</a> &raquo;
+<a href="admin/delete-cached-files/">Delete Cached Files</a> &raquo;
 </div>
 <?
 $this_page_markup .= ob_get_clean();

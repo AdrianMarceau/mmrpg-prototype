@@ -4,9 +4,9 @@
 
     // Pre-check access permissions before continuing
     if (!in_array('*', $this_adminaccess)
-        && !in_array('edit_fields', $this_adminaccess)){
+        && !in_array('edit-fields', $this_adminaccess)){
         $form_messages[] = array('error', 'You do not have permission to edit fields!');
-        redirect_form_action('admin.php?action=home');
+        redirect_form_action('admin/home/');
     }
 
     /* -- Collect Dependant Indexes -- */
@@ -95,8 +95,8 @@
 
     // Define a function for exiting a field edit action
     function exit_field_edit_action($field_id = 0){
-        if (!empty($field_id)){ $location = 'admin.php?action=edit_fields&subaction=editor&field_id='.$field_id; }
-        else { $location = 'admin.php?action=edit_fields&subaction=search'; }
+        if (!empty($field_id)){ $location = 'admin/edit-fields/editor/field_id='.$field_id; }
+        else { $location = 'admin/edit-fields/search/'; }
         redirect_form_action($location);
     }
 
@@ -299,7 +299,7 @@
         $form_data = array();
         $form_success = true;
         $form_action = !empty($_POST['action']) ? trim($_POST['action']) : '';
-        if ($form_action == 'edit_fields'){
+        if ($form_action == 'edit-fields'){
 
             // COLLECT form data from the request and parse out simple rules
 
@@ -518,11 +518,11 @@
     ?>
 
     <div class="breadcrumb">
-        <a href="admin.php">Admin Panel</a>
-        &raquo; <a href="admin.php?action=edit_fields">Edit Fields</a>
+        <a href="admin/">Admin Panel</a>
+        &raquo; <a href="admin/edit-fields/">Edit Fields</a>
         <? if ($sub_action == 'editor' && !empty($field_data)): ?>
             <? if (!$is_backup_data){ ?>
-                &raquo; <a href="admin.php?action=edit_fields&amp;subaction=editor&amp;field_id=<?= $field_data['field_id'] ?>"><?= $field_name_display ?></a>
+                &raquo; <a href="admin/edit-fields/editor/field_id=<?= $field_data['field_id'] ?>"><?= $field_name_display ?></a>
             <? } else { ?>
                 &raquo; <a><?= $field_name_display ?></a>
             <? } ?>
@@ -531,7 +531,7 @@
 
     <?= !empty($this_error_markup) ? '<div style="margin: 0 auto 20px">'.$this_error_markup.'</div>' : '' ?>
 
-    <div class="adminform edit_fields">
+    <div class="adminform edit-fields">
 
         <? if ($sub_action == 'search'): ?>
 
@@ -545,7 +545,7 @@
 
                 <form class="form" method="get">
 
-                    <input type="hidden" name="action" value="edit_fields" />
+                    <input type="hidden" name="action" value="edit-fields" />
                     <input type="hidden" name="subaction" value="search" />
 
                     <? /*
@@ -622,7 +622,7 @@
 
                     <div class="buttons">
                         <input class="button" type="submit" value="Search" />
-                        <input class="button" type="reset" value="Reset" onclick="javascript:window.location.href='admin.php?action=edit_fields';" />
+                        <input class="button" type="reset" value="Reset" onclick="javascript:window.location.href='admin/edit-fields/';" />
                     </div>
 
                 </form>
@@ -713,7 +713,7 @@
                                 $field_flag_complete = !empty($field_data['field_flag_complete']) ? '<i class="fas fa-check-circle"></i>' : '-';
                                 $field_flag_hidden = !empty($field_data['field_flag_hidden']) ? '<i class="fas fa-eye-slash"></i>' : '-';
 
-                                $field_edit_url = 'admin.php?action=edit_fields&subaction=editor&field_id='.$field_id;
+                                $field_edit_url = 'admin/edit-fields/editor/field_id='.$field_id;
                                 $field_name_link = '<a class="link" href="'.$field_edit_url.'">'.$field_name.'</a>';
 
                                 $field_actions = '';
@@ -817,7 +817,7 @@
 
                     <form class="form" method="post">
 
-                        <input type="hidden" name="action" value="edit_fields" />
+                        <input type="hidden" name="action" value="edit-fields" />
                         <input type="hidden" name="subaction" value="editor" />
 
                         <div class="editor-panels" data-tabgroup="field">
@@ -1504,7 +1504,7 @@
                                                     <td class="date"><?= date('Y/m/d', $backup_unix_time) ?></td>
                                                     <td class="time"><?= date('g:i a', $backup_unix_time) ?></td>
                                                     <td class="actions">
-                                                        <a href="admin.php?action=edit_fields&subaction=editor&backup_id=<?= $backup_info['backup_id'] ?>" target="_blank" style="text-decoration: none;">
+                                                        <a href="admin/edit-fields/editor/backup_id=<?= $backup_info['backup_id'] ?>" target="_blank" style="text-decoration: none;">
                                                             <span style="text-decoration: underline;">View Backup</span>
                                                             <i class="fas fa-external-link-square-alt"></i>
                                                         </a>
@@ -1558,7 +1558,7 @@
                             <? if (!$is_backup_data){ ?>
                                 <div class="buttons">
                                     <input class="button save" type="submit" value="Save Changes" />
-                                    <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin.php?action=edit_fields&subaction=editor&field_id=<?= $field_data['field_id'] ?>';" />
+                                    <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin/edit-fields/editor/field_id=<?= $field_data['field_id'] ?>';" />
                                     <? /*
                                     <input class="button delete" type="button" value="Delete Field" data-delete="fields" data-field-id="<?= $field_data['field_id'] ?>" />
                                     */ ?>

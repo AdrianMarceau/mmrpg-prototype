@@ -6,8 +6,8 @@
 
     // Define a function for exiting a user edit action
     function exit_login_action($action = ''){
-        if (!empty($user_id)){ $location = 'admin.php?action='.$action; }
-        else { $location = 'admin.php?action=home'; }
+        if (!empty($user_id)){ $location = 'admin/'.$action.'/'; }
+        else { $location = 'admin/home/'; }
         header('Location: '.$location);
         exit_form_action();
     }
@@ -109,8 +109,8 @@
     ?>
 
     <div class="breadcrumb">
-        <a href="admin.php">Admin Panel</a>
-        &raquo; <a href="admin.php?action=login">Login</a>
+        <a href="admin/">Admin Panel</a>
+        &raquo; <a href="admin/login/">Login</a>
     </div>
 
     <?= !empty($this_error_markup) ? '<div style="margin: 0 auto 20px">'.$this_error_markup.'</div>' : '' ?>

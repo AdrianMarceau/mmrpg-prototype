@@ -14,7 +14,7 @@ class cms_admin {
     // Define a function for generating an href sort link
     public static function get_sort_link_href($name, $dir){
         global $this_page_action, $search_data;
-        $sort_link = 'admin.php?action='.$this_page_action.'&subaction=search';
+        $sort_link = 'admin/'.$this_page_action.'/search/';
         if (!empty($search_data)){
             $arg_strings = array();
             foreach ($search_data AS $n => $v){ if ($v !== ''){ $arg_strings[] = $n.'='.urlencode($v); } }

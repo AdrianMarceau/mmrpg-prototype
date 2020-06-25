@@ -77,11 +77,11 @@ $(document).ready(function(){
             // Define the post URL based on request kind
             var postURL = '';
             if (deleteKind == 'users'){
-                postURL = 'admin.php?action=edit_users&subaction=delete&user_id='+deleteID;
+                postURL = 'admin/edit-users/delete/user_id='+deleteID;
                 } else if (deleteKind == 'challenges'){
-                postURL = 'admin.php?action=edit_challenges&subaction=delete&challenge_id='+deleteID;
+                postURL = 'admin/edit-challenges/delete/challenge_id='+deleteID;
                 } else if (deleteKind == 'stars'){
-                postURL = 'admin.php?action=edit_stars&subaction=delete&star_id='+deleteID;
+                postURL = 'admin/edit-stars/delete/star_id='+deleteID;
                 } else {
                 return false;
                 }

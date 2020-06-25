@@ -4,9 +4,9 @@
 
     // Pre-check access permissions before continuing
     if (!in_array('*', $this_adminaccess)
-        && !in_array('edit_robots', $this_adminaccess)){
+        && !in_array('edit-robots', $this_adminaccess)){
         $form_messages[] = array('error', 'You do not have permission to edit robots!');
-        redirect_form_action('admin.php?action=home');
+        redirect_form_action('admin/home/');
     }
 
     /* -- Collect Dependant Indexes -- */
@@ -70,8 +70,8 @@
 
     // Define a function for exiting a robot edit action
     function exit_robot_edit_action($robot_id = 0){
-        if (!empty($robot_id)){ $location = 'admin.php?action=edit_robots&subaction=editor&robot_id='.$robot_id; }
-        else { $location = 'admin.php?action=edit_robots&subaction=search'; }
+        if (!empty($robot_id)){ $location = 'admin/edit-robots/editor/robot_id='.$robot_id; }
+        else { $location = 'admin/edit-robots/search/'; }
         redirect_form_action($location);
     }
 
@@ -295,7 +295,7 @@
         $form_data = array();
         $form_success = true;
         $form_action = !empty($_POST['action']) ? trim($_POST['action']) : '';
-        if ($form_action == 'edit_robots'){
+        if ($form_action == 'edit-robots'){
 
             // COLLECT form data from the request and parse out simple rules
 
@@ -593,11 +593,11 @@
     ?>
 
     <div class="breadcrumb">
-        <a href="admin.php">Admin Panel</a>
-        &raquo; <a href="admin.php?action=edit_robots">Edit Robots</a>
+        <a href="admin/">Admin Panel</a>
+        &raquo; <a href="admin/edit-robots/">Edit Robots</a>
         <? if ($sub_action == 'editor' && !empty($robot_data)): ?>
             <? if (!$is_backup_data){ ?>
-                &raquo; <a href="admin.php?action=edit_robots&amp;subaction=editor&amp;robot_id=<?= $robot_data['robot_id'] ?>"><?= $robot_name_display ?></a>
+                &raquo; <a href="admin/edit-robots/editor/robot_id=<?= $robot_data['robot_id'] ?>"><?= $robot_name_display ?></a>
             <? } else { ?>
                 &raquo; <a><?= $robot_name_display ?></a>
             <? } ?>
@@ -606,7 +606,7 @@
 
     <?= !empty($this_error_markup) ? '<div style="margin: 0 auto 20px">'.$this_error_markup.'</div>' : '' ?>
 
-    <div class="adminform edit_robots">
+    <div class="adminform edit-robots">
 
         <? if ($sub_action == 'search'): ?>
 
@@ -620,7 +620,7 @@
 
                 <form class="form" method="get">
 
-                    <input type="hidden" name="action" value="edit_robots" />
+                    <input type="hidden" name="action" value="edit-robots" />
                     <input type="hidden" name="subaction" value="search" />
 
                     <? /*
@@ -710,7 +710,7 @@
 
                     <div class="buttons">
                         <input class="button" type="submit" value="Search" />
-                        <input class="button" type="reset" value="Reset" onclick="javascript:window.location.href='admin.php?action=edit_robots';" />
+                        <input class="button" type="reset" value="Reset" onclick="javascript:window.location.href='admin/edit-robots/';" />
                     </div>
 
                 </form>
@@ -805,7 +805,7 @@
                                 $robot_flag_complete = !empty($robot_data['robot_flag_complete']) ? '<i class="fas fa-check-circle"></i>' : '-';
                                 $robot_flag_hidden = !empty($robot_data['robot_flag_hidden']) ? '<i class="fas fa-eye-slash"></i>' : '-';
 
-                                $robot_edit_url = 'admin.php?action=edit_robots&subaction=editor&robot_id='.$robot_id;
+                                $robot_edit_url = 'admin/edit-robots/editor/robot_id='.$robot_id;
                                 $robot_name_link = '<a class="link" href="'.$robot_edit_url.'">'.$robot_name.'</a>';
 
                                 $robot_actions = '';
@@ -911,7 +911,7 @@
 
                     <form class="form" method="post">
 
-                        <input type="hidden" name="action" value="edit_robots" />
+                        <input type="hidden" name="action" value="edit-robots" />
                         <input type="hidden" name="subaction" value="editor" />
 
                         <div class="editor-panels" data-tabgroup="robot">
@@ -1664,7 +1664,7 @@
                                                     <td class="date"><?= date('Y/m/d', $backup_unix_time) ?></td>
                                                     <td class="time"><?= date('g:i a', $backup_unix_time) ?></td>
                                                     <td class="actions">
-                                                        <a href="admin.php?action=edit_robots&subaction=editor&backup_id=<?= $backup_info['backup_id'] ?>" target="_blank" style="text-decoration: none;">
+                                                        <a href="admin/edit-robots/editor/backup_id=<?= $backup_info['backup_id'] ?>" target="_blank" style="text-decoration: none;">
                                                             <span style="text-decoration: underline;">View Backup</span>
                                                             <i class="fas fa-external-link-square-alt"></i>
                                                         </a>
@@ -1746,7 +1746,7 @@
                             <? if (!$is_backup_data){ ?>
                                 <div class="buttons">
                                     <input class="button save" type="submit" value="Save Changes" />
-                                    <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin.php?action=edit_robots&subaction=editor&robot_id=<?= $robot_data['robot_id'] ?>';" />
+                                    <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin/edit-robots/editor/robot_id=<?= $robot_data['robot_id'] ?>';" />
                                     <? /*
                                     <input class="button delete" type="button" value="Delete Robot" data-delete="robots" data-robot-id="<?= $robot_data['robot_id'] ?>" />
                                     */ ?>
