@@ -40,8 +40,8 @@ if (!empty($_REQUEST['patch'])
 
 // Require the update actions file
 $update_patch_tokens = array();
-require_once('includes/update_actions.php');
-require_once('includes/update_patches.php');
+require_once(MMRPG_CONFIG_ROOTDIR.'admin/includes/update_actions.php');
+require_once(MMRPG_CONFIG_ROOTDIR.'admin/includes/update_patches.php');
 
 // Prevent updating if logged into a file
 if ($this_user['userid'] != MMRPG_SETTINGS_GUEST_ID){ die('<strong>FATAL UPDATE ERROR!</strong><br /> You cannot be logged in while updating!');  }

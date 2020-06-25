@@ -131,7 +131,7 @@ if (!empty($this_admininfo)
 // If we're not logged in yet
 if (!MMRPG_CONFIG_ADMIN_MODE){
     // Require the admin home file
-    require(MMRPG_CONFIG_ROOTDIR.'admin/login.php');
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/login.php');
 }
 // Else if we're logging out now
 elseif ($this_page_action == 'exit'){
@@ -144,72 +144,72 @@ elseif ($this_page_action == 'exit'){
 // If this is the HOME request
 elseif ($this_page_action == 'home'){
     // Require the admin home file
-    require(MMRPG_CONFIG_ROOTDIR.'admin/home.php');
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/home.php');
 }
 // Else if this is an REFRESH LEADERBOARD request
 elseif ($this_page_action == 'refresh-leaderboard'){
     // Require the update file
     $_REQUEST['date'] = MMRPG_CONFIG_CACHE_DATE;
     $_REQUEST['patch'] = 'recalculate_all_battle_points';
-    require(MMRPG_CONFIG_ROOTDIR.'admin/update.php');
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/update.php');
 }
 // Else if this is a PRURGE BOGUS USERS request
 elseif ($this_page_action == 'purge-bogus-users'){
     // Require the purge file
     $_REQUEST['date'] = MMRPG_CONFIG_CACHE_DATE;
-    require(MMRPG_CONFIG_ROOTDIR.'admin/purge.php');
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/purge.php');
 }
 // Else if this is an DELETE CACHED FILES request
 elseif ($this_page_action == 'delete-cached-files'){
     // Require the delete cache file
-    require(MMRPG_CONFIG_ROOTDIR.'admin/delete-cache.php');
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/delete-cache.php');
 }
 // Else if this is an CLEAR ACTIVE SESSIONS request
 elseif ($this_page_action == 'clear-active-sessions'){
     // Require the clear sessions file
-    require(MMRPG_CONFIG_ROOTDIR.'admin/clear-sessions.php');
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/clear-sessions.php');
 }
 // Else if this is an EDIT USERS request
 elseif ($this_page_action == 'edit-users'){
     // Require the edit users file
-    require(MMRPG_CONFIG_ROOTDIR.'admin/edit-users.php');
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-users.php');
 }
 // Else if this is an EDIT PAGES request
 elseif ($this_page_action == 'edit-pages'){
     // Require the edit pages file
-    require(MMRPG_CONFIG_ROOTDIR.'admin/edit-pages.php');
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-pages.php');
 }
 // Else if this is an EDIT ROBOT MASTERS request
 elseif ($this_page_action == 'edit-robots'){
     // Require the edit robots file
-    require(MMRPG_CONFIG_ROOTDIR.'admin/edit-robots.php');
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-robots.php');
 }
 // Else if this is an EDIT PLAYER CHARACTERS request
 elseif ($this_page_action == 'edit-players'){
     // Require the edit robots file
-    require(MMRPG_CONFIG_ROOTDIR.'admin/edit-players.php');
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-players.php');
 }
 // Else if this is an EDIT BATTLE FIELDS request
 elseif ($this_page_action == 'edit-fields'){
     // Require the edit robots file
-    require(MMRPG_CONFIG_ROOTDIR.'admin/edit-fields.php');
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-fields.php');
 }
 // Else if this is an EDIT CHALLENGE MISSIONS request
 elseif ($this_page_action == 'edit-challenges'){
     // Require the edit challenges file
-    require(MMRPG_CONFIG_ROOTDIR.'admin/edit-challenges.php');
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-challenges.php');
 }
 // Else if this is an EDIT ROGUE STARS request
 elseif ($this_page_action == 'edit-stars'){
     // Require the edit stars file
-    require(MMRPG_CONFIG_ROOTDIR.'admin/edit-stars.php');
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-stars.php');
 }
 // Otherwise, not a valid page
 else {
     // Define error 404 text to print
     $this_error_markup = '<strong>Error 404</strong><br />Page Not Found<br />invalid action: '.$this_page_action.'<br />';
     // Require the admin home file
-    require(MMRPG_CONFIG_ROOTDIR.'admin/home.php');
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/home.php');
 }
 
 // Unset the database variable

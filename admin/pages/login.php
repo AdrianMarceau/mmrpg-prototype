@@ -6,8 +6,8 @@
 
     // Define a function for exiting a user edit action
     function exit_login_action($action = ''){
-        if (!empty($user_id)){ $location = 'admin/'.$action.'/'; }
-        else { $location = 'admin/home/'; }
+        if (!empty($user_id)){ $location = MMRPG_CONFIG_ROOTURL.'admin/'.$action.'/'; }
+        else { $location = MMRPG_CONFIG_ROOTURL.'admin/home/'; }
         header('Location: '.$location);
         exit_form_action();
     }

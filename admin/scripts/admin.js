@@ -466,7 +466,7 @@ $(document).ready(function(){
     // PAGE EDITOR EVENTS
 
     // Check to make sure we're on the page editor page
-    var $editPages = $('.adminform.edit_pages', thisAdmin);
+    var $editPages = $('.adminform.edit-pages', thisAdmin);
     //console.log('$editPages =', $editPages);
     if ($editPages.length){
 
@@ -478,7 +478,7 @@ $(document).ready(function(){
     // STAR EDITOR EVENTS
 
     // Check to make sure we're on the star editor page
-    var $editStars = $('.adminform.edit_stars', thisAdmin);
+    var $editStars = $('.adminform.edit-stars', thisAdmin);
     var litePickerIndex = {};
     //console.log('$editStars =', $editStars);
     if ($editStars.length){
@@ -538,7 +538,7 @@ $(document).ready(function(){
     // CHALLENGE EDITOR EVENTS
 
     // Check to make sure we're on the challenge editor page
-    var $editChallenges = $('.adminform.edit_challenges', thisAdmin);
+    var $editChallenges = $('.adminform.edit-challenges', thisAdmin);
     //console.log('$editChallenges =', $editChallenges);
     if ($editChallenges.length){
 
@@ -692,7 +692,7 @@ $(document).ready(function(){
     // FIELD EDITOR EVENTS
 
     // Check to make sure we're on the field editor page
-    var $editFields = $('.adminform.edit_fields', thisAdmin);
+    var $editFields = $('.adminform.edit-fields', thisAdmin);
     //console.log('$editFields =', $editFields);
     if ($editFields.length){
 
