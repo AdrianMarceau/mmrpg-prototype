@@ -34,7 +34,7 @@ if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/fields/')){ define('MMRPG_FIELDS_OL
 elseif (file_exists(MMRPG_CONFIG_ROOTDIR.'images/xxx_fields/')){ define('MMRPG_FIELDS_OLD_IMAGES_DIR', MMRPG_CONFIG_ROOTDIR.'images/xxx_fields/'); }
 else { exit('Required directory /images/fields/ does not exist!'); }
 
-// Pre-collect an index of field alts so we don't have to scan each later
+// Pre-collect an index of field images and objects so we don't have to scan each later
 $field_sprites_list = scandir(MMRPG_FIELDS_OLD_IMAGES_DIR);
 $field_sprites_list = array_filter($field_sprites_list, function($s){ if ($s !== '.' && $s !== '..' && substr($s, 0, 1) !== '.'){ return true; } else { return false; } });
 //echo('$field_sprites_list = '.print_r($field_sprites_list, true));
@@ -46,16 +46,16 @@ foreach ($deprecated_fields AS $token){
     if (isset($field_index[$token])){ unset($field_index[$token]); }
 }
 
-// Loop through sprites and pre-collect any alts for later looping
-$field_sprites_alts_list = array();
+// Loop through sprites and pre-collect any objects for later looping
+$field_sprites_objects_list = array();
 foreach ($field_sprites_list AS $key => $token){
     if (strstr($token, '_')){
         list($token1, $token2) = explode('_', $token);
-        if (!isset($field_sprites_alts_list[$token1])){ $field_sprites_alts_list[$token1] = array(); }
-        $field_sprites_alts_list[$token1][] = $token2;
+        if (!isset($field_sprites_objects_list[$token1])){ $field_sprites_objects_list[$token1] = array(); }
+        $field_sprites_objects_list[$token1][] = $token2;
     }
 }
-//echo('$field_sprites_alts_list = '.print_r($field_sprites_alts_list, true));
+//echo('$field_sprites_objects_list = '.print_r($field_sprites_objects_list, true));
 //exit();
 
 // Predefine a whitelist of sprites we can copy over for the fields
@@ -113,6 +113,24 @@ foreach ($field_index AS $field_token => $field_data){
         recurseCopyWithWhitelist($sprite_path, $content_images_path, $field_sprite_whitelist);
         $field_image_directories_copied[] = basename($sprite_path);
     }
+
+    // Loop through and copy any named objects for this sprite as well
+    if (isset($field_sprites_objects_list[$field_token])){
+        $alt_tokens = $field_sprites_objects_list[$field_token];
+        foreach ($alt_tokens AS $akey => $otoken){
+            $sub_sprite_path = rtrim($sprite_path, '/').'_'.$otoken.'/';
+            if (file_exists($sub_sprite_path)){
+                $sub_content_images_path = rtrim($content_images_path, '/').'_'.$otoken.'/';
+                if (file_exists($sub_content_images_path)){ deleteDir($sub_content_images_path); }
+                mkdir($sub_content_images_path);
+                ob_echo('-- copy '.clean_path($sub_sprite_path).'* to '.clean_path($sub_content_images_path));
+                recurseCopy($sub_sprite_path, $sub_content_images_path);
+                $field_image_directories_copied[] = basename($sub_sprite_path);
+                } else {
+                break;
+                }
+            }
+        }
 
     // Ensure the data file exists before attempting to extract functions from it
     if (file_exists($data_path)){
