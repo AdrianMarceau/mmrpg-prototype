@@ -17,7 +17,7 @@ define('MMRPG_CONFIG_DOMAIN', (isset($THIS_DOMAIN[0]) ? $THIS_DOMAIN[0] : false)
 unset($THIS_DOMAIN);
 
 // Define the base cache paths for the system
-define('MMRPG_CONFIG_CACHE_PATH', MMRPG_CONFIG_ROOTDIR.'_cache/');
+define('MMRPG_CONFIG_CACHE_PATH', MMRPG_CONFIG_ROOTDIR.'.cache/');
 
 // Define the directory where all content functions/images/data are stored
 define('MMRPG_CONFIG_CONTENT_PATH', MMRPG_CONFIG_ROOTDIR.'content/');
