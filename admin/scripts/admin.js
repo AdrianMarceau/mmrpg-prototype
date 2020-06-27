@@ -702,6 +702,12 @@ $(document).ready(function(){
         if ($previewContainer.length
             && $inputContainers.length){
 
+            // Collect the base background and foreground tokens
+            var baseFieldImages = {};
+            baseFieldImages['background'] = $previewContainer.attr('data-field-background');
+            baseFieldImages['foreground'] = $previewContainer.attr('data-field-foreground');
+            //console.log('baseFieldImages = ', baseFieldImages);
+
             // Define references to important attachment containers
             var $previewBackgroundAttachments = $('.background_attachments', $previewContainer);
             var $previewForegroundAttachments = $('.foreground_attachments', $previewContainer);
@@ -743,7 +749,10 @@ $(document).ready(function(){
                 //console.log('getAttachmentSpriteMarkup(data, returnArray)', data, returnArray);
                 if (typeof returnArray !== 'boolean'){ returnArray = false; }
                 var spriteSize = data.size+'x'+data.size;
-                var spriteImage = 'images/'+data.class+'s/'+data.token+'/sprite_'+data.direction+'_'+spriteSize+'.png';
+                var spriteClass = data.class;
+                var spriteDir = data.class !== 'object' ? data.class+'s' : 'fields';
+                var spriteToken = data.class !== 'object' ? data.token : baseFieldImages[data.kind]+'_'+data.token;
+                var spriteImage = 'images/'+spriteDir+'/'+spriteToken+'/sprite_'+data.direction+'_'+spriteSize+'.png';
                 var spriteClass = 'sprite sprite_'+spriteSize+' sprite_'+spriteSize+'_'+data.direction+' sprite_'+spriteSize+'_00 ';
                 if (data.frame.length){ var frame = data.frame.split(',')[0]; spriteClass += 'sprite_'+spriteSize+'_'+('00'+frame).substring(frame.length)+' '; }
                 if (data.highlight){ spriteClass += 'highlight '; }

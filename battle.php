@@ -300,12 +300,16 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                             $this_class = $this_info['class'];
                             $this_size = $this_info['size'];
                             $this_boxsize = $this_size.'x'.$this_size;
-                            $this_path = $class_paths[$this_class];
                             $this_offset_x = $this_info['offset_x'];
                             $this_offset_y = $this_info['offset_y'];
                             $this_offset_z = $this_key + 1;
                             $this_token = $this_info[$this_class.'_token'];
+                            $this_path = $class_paths[$this_class];
                             $this_image = !empty($this_info[$this_class.'_image']) ? $this_info[$this_class.'_image'] : $this_token;
+                            if ($this_class === 'object'){
+                                $this_path = $class_paths['field'];
+                                $this_image = $this_field_data['field_background'].'_'.$this_image;
+                            }
                             $this_frames = $this_info[$this_class.'_frame'];
                             if ($this_class == 'robot' && !empty($this_field_data['field_mechas']) && preg_match('/^mecha/i', $this_id)){
                                 $this_token = $this_field_data['field_mechas'][array_rand($this_field_data['field_mechas'])];
@@ -335,6 +339,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                             $this_animate_shift = implode('|', $this_frames_shift);
                             $this_direction = $this_info[$this_class.'_direction'];
                             $this_float = $this_direction == 'left' ? 'right' : 'left';
+                            $this_image_url = 'images/'.$this_path.'/'.$this_image.'/sprite_'.$this_direction.'_'.$this_boxsize.'.png';
                             echo '<div '.
                                 'data-id="background_attachment_'.$this_key.'" '.
                                 'class="sprite sprite_'.$this_boxsize.' sprite_'.$this_boxsize.'_'.$this_direction.' sprite_'.$this_boxsize.'_'.$this_frame.'" '.
@@ -345,7 +350,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                                 'data-frame="'.$this_frame.'" '.
                                 'data-animate="'.$this_animate.'" '.
                                 (!empty($this_animate_shift) ? 'data-animate-shift="'.$this_animate_shift.'" ' : '').
-                                'style="'.$this_float.': '.$this_offset_x.'px; bottom: '.$this_offset_y.'px; z-index: '.$this_offset_z.'; background-image: url(images/'.$this_path.'/'.$this_image.'/sprite_'.$this_direction.'_'.$this_boxsize.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); '.($debug_flag_spriteboxes ? 'background-color: rgba(255, 0, 0, 0.5); opacity: 0.75; ' : '').'" '.
+                                'style="'.$this_float.': '.$this_offset_x.'px; bottom: '.$this_offset_y.'px; z-index: '.$this_offset_z.'; background-image: url('.$this_image_url.'?'.MMRPG_CONFIG_CACHE_DATE.'); '.($debug_flag_spriteboxes ? 'background-color: rgba(255, 0, 0, 0.5); opacity: 0.75; ' : '').'" '.
                                 '>&nbsp;</div>';
                         }
                         echo '</div>';
@@ -457,13 +462,17 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                             $this_class = $this_info['class'];
                             $this_size = $this_info['size'];
                             $this_boxsize = $this_size.'x'.$this_size;
-                            $this_path = $class_paths[$this_class];
                             $this_offset_x = $this_info['offset_x'];
                             $this_offset_y = $this_info['offset_y'];
                             $this_offset_z = isset($this_info['offset_z']) ? $this_info['offset_z'] : $this_key + 1;
                             $this_token = $this_info[$this_class.'_token'];
                             $this_text = !empty($this_info[$this_class.'_text']) ? $this_info[$this_class.'_text'] : '&nbsp;';
+                            $this_path = $class_paths[$this_class];
                             $this_image = !empty($this_info[$this_class.'_image']) ? $this_info[$this_class.'_image'] : $this_token;
+                            if ($this_class === 'object'){
+                                $this_path = $class_paths['field'];
+                                $this_image = $this_field_data['field_foreground'].'_'.$this_image;
+                            }
                             $this_frames = $this_info[$this_class.'_frame'];
                             // We want mechas, but not actual robots replaced
                             if ($this_class == 'robot' && !empty($this_field_data['field_mechas']) && preg_match('/^mecha/i', $this_id)){
@@ -496,6 +505,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                             $this_animate_enabled = count($this_frames) > 1 ? true : false;
                             $this_direction = $this_info[$this_class.'_direction'];
                             $this_float = $this_direction == 'left' ? 'right' : 'left';
+                            $this_image_url = 'images/'.$this_path.'/'.$this_image.'/sprite_'.$this_direction.'_'.$this_boxsize.'.png';
                             echo '<div '.
                                 'data-id="foreground_attachment_'.$this_id.'" '.
                                 'data-type="attachment" '.
@@ -506,7 +516,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                                 ''.(!empty($this_animate_enabled) ? 'data-animate="'.$this_animate.'"' : '').' '.
                                 ''.(!empty($this_animate_shift) ? 'data-animate-shift="'.$this_animate_shift.'"' : '').' '.
                                 'class="sprite sprite_'.$this_boxsize.' sprite_'.$this_boxsize.'_'.$this_direction.' sprite_'.$this_boxsize.'_'.$this_frame.'" '.
-                                'style="'.$this_float.': '.$this_offset_x.'px; bottom: '.$this_offset_y.'px; z-index: '.$this_offset_z.'; background-image: url(images/'.$this_path.'/'.$this_image.'/sprite_'.$this_direction.'_'.$this_boxsize.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); '.($debug_flag_spriteboxes ? 'background-color: rgba(255, 0, 0, 0.5); opacity: 0.75; ' : '').'" '.
+                                'style="'.$this_float.': '.$this_offset_x.'px; bottom: '.$this_offset_y.'px; z-index: '.$this_offset_z.'; background-image: url('.$this_image_url.'?'.MMRPG_CONFIG_CACHE_DATE.'); '.($debug_flag_spriteboxes ? 'background-color: rgba(255, 0, 0, 0.5); opacity: 0.75; ' : '').'" '.
                                 '>'.$this_text.'</div>';
                         }
                         echo '</div>';

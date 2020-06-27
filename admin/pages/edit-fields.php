@@ -1313,7 +1313,7 @@
                                 $foreground_image_url = 'content/fields/'.$field_data['field_foreground'].'/sprites/battle-field_foreground_base.png';
                                 if (!file_exists(MMRPG_CONFIG_ROOTDIR.$foreground_image_url)){ $foreground_image_url = false; }
                                 ?>
-                                <div class="bfg-attachments-preview">
+                                <div class="bfg-attachments-preview" data-field-background="<?= $field_data['field_background'] ?>" data-field-foreground="<?= $field_data['field_foreground'] ?>">
                                     <div class="preview_wrapper">
                                         <div class="background_image" style="<?= !empty($background_image_url) ? 'background-image: url('.$background_image_url.'?'.MMRPG_CONFIG_CACHE_DATE.');' : ''; ?>">&nbsp;</div>
                                         <div class="background_attachments">&nbsp;</div>
