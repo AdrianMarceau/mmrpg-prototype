@@ -26,7 +26,7 @@ function print_return_array($return_array, $return_markup = false){
 // Define a function printing a return array, updating the API cache, and then exiting
 function print_and_update_api_cache($cache_file_path, $return_array, $return_markup = false){
     $cache_file_markup = print_return_array($return_array, true);
-    if (isset($return_array['status']) && $return_array['status'] === 'success'){
+    if (MMRPG_CONFIG_CACHE_INDEXES && isset($return_array['status']) && $return_array['status'] === 'success'){
         $cache_file_handler = fopen($cache_file_path, 'w');
         fwrite($cache_file_handler, $cache_file_markup);
         fclose($cache_file_handler);
