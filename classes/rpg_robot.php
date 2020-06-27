@@ -1517,26 +1517,6 @@ class rpg_robot extends rpg_object {
         $weights = array_values($weights);
         $options = array_values($options);
 
-        /*
-        if (MMRPG_CONFIG_IS_LIVE === false){
-            $debug_text = '----------'.PHP_EOL.PHP_EOL;
-            $debug_text .= 'this_robot('.$this_robot->robot_token.') vs target_robot('.$target_robot->robot_token.')'.PHP_EOL.PHP_EOL;
-            $debug_text .= 'this_abilities = '.print_r($this_robot->robot_abilities, true);
-            $debug_text .= 'this_core_shields = '.print_r($this_core_shields, true);
-            $debug_text .= 'this_other_attachments = '.print_r($this_other_attachments, true);
-            $debug_text .= 'target_core_shields = '.print_r($target_core_shields, true);
-            $debug_text .= 'target_other_attachments = '.print_r($target_other_attachments, true);
-            $debug_text .= '$weights_backup = '.print_r($weights_backup, true);
-            $debug_text .= '$options_backup = '.print_r($options_backup, true);
-            $debug_text .= '$weights = '.print_r($weights, true);
-            $debug_text .= '$options = '.print_r($options, true);
-            $debug_text .= PHP_EOL.PHP_EOL;
-            $debug_file = fopen(MMRPG_CONFIG_ROOTDIR.'_cache/aaaa-debug.txt', 'a');
-            fwrite($debug_file, $debug_text);
-            fclose($debug_file);
-        }
-        */
-
         // This robot doesn't have ANY abilities, automatically charge
         if (empty($options) || empty($weights)){
             if ($this_robot->robot_weapons <= ($this_robot->robot_base_weapons / 2)){ return 'action-chargeweapons';  }
@@ -1547,15 +1527,6 @@ class rpg_robot extends rpg_object {
 
         // Pull a specific ability given waited chance
         $ability_token = $this_battle->weighted_chance($options, $weights);
-
-        /*
-        if (MMRPG_CONFIG_IS_LIVE === false){
-            $debug_text = '$ability_token = '.print_r($ability_token, true).PHP_EOL.PHP_EOL;
-            $debug_file = fopen(MMRPG_CONFIG_ROOTDIR.'_cache/aaaa-debug.txt', 'a');
-            fwrite($debug_file, $debug_text);
-            fclose($debug_file);
-        }
-        */
 
         // Return an ability based on a weighted chance
         return $ability_token;
