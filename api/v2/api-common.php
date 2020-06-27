@@ -26,7 +26,6 @@ if (!empty($_GET['include_all']) && $_GET['include_all'] === 'true'){
 // Define the cache file name and path given everything we've learned
 $cache_file_name = 'cache.api_'.str_replace('/', '-', $api_request_path).'.json';
 $cache_file_path = MMRPG_CONFIG_CACHE_PATH.'api/'.$cache_file_name;
-if (!file_exists(MMRPG_CONFIG_CACHE_PATH.'api/')){ mkdir(MMRPG_CONFIG_CACHE_PATH.'api/'); }
 // Check to see if a file already exists and collect its last-modified date
 if (file_exists($cache_file_path)){ $cache_file_exists = true; $cache_file_date = date('Ymd-Hi', filemtime($cache_file_path)); }
 else { $cache_file_exists = false; $cache_file_date = '00000000-0000'; }
