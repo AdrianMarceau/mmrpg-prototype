@@ -11,111 +11,70 @@ header("Last-Modified: " . gmdate("D, d M Y H:i:s", (time()+$cache_time)) . " GM
 header("Cache-control: public, max-age={$cache_time}, must-revalidate");
 header("Pragma: cache");
 
+// Collect the cache style name from the headers, else die if not set
+$base_style_dir = MMRPG_CONFIG_ROOTDIR.'styles/';
+$base_style_name = !empty($_REQUEST['file']) && preg_match('/^([-_a-z0-9\.]+)\.css$/i', $_REQUEST['file']) ? $_REQUEST['file'] : false;
+if (empty($base_style_name)){ die('/* -- Invalid file name! -- */'); }
 
-// Define a function for saving the style cache
-function mmrpg_save_style_markup($this_cache_filedir, $temp_css_markup){
-    // Generate the save data by serializing the session variable
-    $this_cache_content = $temp_css_markup;
+// Define the cache file name and path given everything we've learned
+$cache_file_name = 'cache.'.$base_style_name;
+$cache_file_path = MMRPG_CONFIG_CACHE_PATH.'styles/'.$cache_file_name;
+// Check to see if a file already exists and collect its last-modified date
+if (file_exists($cache_file_path)){ $cache_file_exists = true; $cache_file_date = date('Ymd-Hi', filemtime($cache_file_path)); }
+else { $cache_file_exists = false; $cache_file_date = '00000000-0000'; }
+
+// LOAD FROM CACHE if data exists and is current, otherwise continue so script can refresh and replace
+if (MMRPG_CONFIG_CACHE_INDEXES === true && $cache_file_exists && $cache_file_date >= MMRPG_CONFIG_CACHE_DATE){
+    $cache_file_markup = file_get_contents($cache_file_path);
+    header('Content-type: text/css; charset=UTF-8');
+    echo($cache_file_markup);
+    exit();
+}
+
+// Define the variable to hold style markup and prepend to append
+$cache_style_markup = '';
+
+// Require the static CSS file if the exists
+ob_start();
+$static_file_path = $base_style_dir.$base_style_name;
+if (file_exists($static_file_path)){ require_once($static_file_path); }
+$cache_style_markup .= ob_get_clean();
+
+// Require the dynamic CSS additions if such a file exists
+ob_start();
+$dynamic_file_path = $base_style_dir.'style_'.str_replace('.css', '.php', $base_style_name);
+if (file_exists($dynamic_file_path)){ require_once($dynamic_file_path); }
+$cache_style_markup .= ob_get_clean();
+
+// If there wasn't any markup collected so far, produce a 404 error
+if (empty($cache_style_markup)){
+    header('HTTP/1.0 404 Not Found');
+    echo('/* -- Stylesheet does not exist! -- */');
+    exit();
+}
+
+// Compress the CSS markup before saving it
+$cache_style_markup = preg_replace('/\s+/', ' ', $cache_style_markup);
+$cache_style_markup = str_replace('; ', ';', $cache_style_markup);
+
+// Generate the stylesheet header comment and prepend to markup
+$cache_style_headers = '';
+$cache_style_headers .= '/* '.PHP_EOL;
+$cache_style_headers .= ' * MMRPG Prototype Stylesheet '.PHP_EOL;
+$cache_style_headers .= ' * Filename: '.$base_style_name.' '.PHP_EOL;
+$cache_style_headers .= ' * Updated: '.($cache_file_exists ? $cache_file_date : date('Ymd-Hi')).' '.PHP_EOL;
+$cache_style_headers .= ' */'.PHP_EOL;
+$cache_style_markup = $cache_style_headers.trim($cache_style_markup);
+
+// Write the index to a cache file, if caching is enabled
+if (MMRPG_CONFIG_CACHE_INDEXES === true){
     // Write the index to a cache file, if caching is enabled
-    $this_cache_file = fopen($this_cache_filedir, 'w');
-    fwrite($this_cache_file, $this_cache_content);
+    $this_cache_file = fopen($cache_file_path, 'w');
+    fwrite($this_cache_file, $cache_style_markup);
     fclose($this_cache_file);
-    // Return true on success
-    return true;
-}
-// Define a function for loading the style cache
-function mmrpg_load_style_markup($this_cache_filedir){
-    // Generate the save data by serializing the session variable
-    $this_cache_content = file_get_contents($this_cache_filedir);
-    $this_cache_content = $this_cache_content;
-    // Return true on success
-    return $this_cache_content;
-}
-
-
-// Loop through the save file directory and generate an index
-$this_cache_stamp = MMRPG_CONFIG_CACHE_DATE; //.'_'.date('Ymd'); //201301012359
-$this_cache_filename = 'cache.style.'.$this_cache_stamp.'.css';
-$this_cache_filedir = $this_cache_dir.$this_cache_filename;
-$this_file_index = array();
-$this_file_count = count($this_file_index);
-$temp_css_markup = array();
-if (MMRPG_CONFIG_CACHE_INDEXES && file_exists($this_cache_filedir)){
-
-    $temp_css_markup = mmrpg_load_style_markup($this_cache_filedir);
-
-} else {
-
-    // Print out the PHP header in a comment
-    $temp_css_markup = '/* -- MMRPG Prototype Stylesheet, Last Updated '.MMRPG_CONFIG_CACHE_DATE.' -- */'."\n";
-
-    // Require the master CSS file without any of the dynamic additions
-    ob_start();
-    require_once('style.css');
-    $temp_css_markup .= ob_get_clean();
-
-    /* -- TYPE STYLES -- */
-
-    // Loop through every type in the database
-    ob_start();
-    $mmrpg_index_types = rpg_type::get_index(true, true, true);
-    foreach ($mmrpg_index_types AS $type_token => $type_info){
-        ?>
-        #mmrpg .type.<?= $type_info['type_token'] ?>,
-        #mmrpg .type_<?= $type_info['type_token'] ?>,
-        #mmrpg .item_type_<?= $type_info['type_token'] ?>,
-        #mmrpg .ability_type_<?= $type_info['type_token'] ?>,
-        #mmrpg .battle_type_<?= $type_info['type_token'] ?>,
-        #mmrpg .field_type_<?= $type_info['type_token'] ?>,
-        #mmrpg .player_type_<?= $type_info['type_token'] ?>,
-        #mmrpg .robot_type_<?= $type_info['type_token'] ?> {
-            border-color: rgb(<?= implode(',', $type_info['type_colour_dark']) ?>) !important;
-            background-color: rgb(<?= implode(',', $type_info['type_colour_light']) ?>) !important;
-        }
-        <?
-        // Loop through all the types again for the dual-type ability styles
-        foreach ($mmrpg_index_types AS $type2_token => $type2_info){
-            ?>
-            #mmrpg .type.<?= $type_info['type_token'] ?>.<?= $type2_info['type_token'] ?>,
-            #mmrpg .type.<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
-            #mmrpg .type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
-            #mmrpg .item_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
-            #mmrpg .ability_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
-            #mmrpg .battle_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
-            #mmrpg .field_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
-            #mmrpg .player_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
-            #mmrpg .robot_type_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?> {
-                border-color: rgb(<?= implode(',', $type_info['type_colour_dark']) ?>) !important;
-                background-color: rgb(<?= implode(',', $type_info['type_colour_light']) ?>) !important;
-                background-image: -webkit-gradient(
-                    linear,
-                    left top,
-                    right top,
-                    color-stop(0, rgb(<?= implode(',', $type_info['type_colour_light']) ?>)),
-                    color-stop(1, rgb(<?= implode(',', $type2_info['type_colour_light']) ?>))
-                ) !important;
-                background-image: -o-linear-gradient(right, rgb(<?= implode(',', $type_info['type_colour_light']) ?>) 0%, rgb(<?= implode(',', $type2_info['type_colour_light']) ?>) 100%) !important;
-                background-image: -moz-linear-gradient(right, rgb(<?= implode(',', $type_info['type_colour_light']) ?>) 0%, rgb(<?= implode(',', $type2_info['type_colour_light']) ?>) 100%) !important;
-                background-image: -webkit-linear-gradient(right, rgb(<?= implode(',', $type_info['type_colour_light']) ?>) 0%, rgb(<?= implode(',', $type2_info['type_colour_light']) ?>) 100%) !important;
-                background-image: -ms-linear-gradient(right, rgb(<?= implode(',', $type_info['type_colour_light']) ?>) 0%, rgb(<?= implode(',', $type2_info['type_colour_light']) ?>) 100%) !important;
-                background-image: linear-gradient(to right, rgb(<?= implode(',', $type_info['type_colour_light']) ?>) 0%, rgb(<?= implode(',', $type2_info['type_colour_light']) ?>) 100%) !important;
-            }
-            <?
-
-        }
-    }
-    $temp_css_markup .= ob_get_clean();
-
-    // Compress the CSS markup before saving it
-    $temp_css_markup = preg_replace('/\s+/', ' ', $temp_css_markup);
-    $temp_css_markup = str_replace('; ', ';', $temp_css_markup);
-
-    // Update the style cache files
-    mmrpg_save_style_markup($this_cache_filedir, $temp_css_markup);
-
 }
 
 // Print out the final generated CSS markup
-echo $temp_css_markup;
+echo $cache_style_markup;
 
 ?>
