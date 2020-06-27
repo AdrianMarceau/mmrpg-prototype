@@ -99,25 +99,35 @@ class rpg_battle extends rpg_object {
 
         // Default the battles index to an empty array
         $mmrpg_battles_index = array();
-        $mmrpg_battles_cache_path = MMRPG_CONFIG_CACHE_PATH.'cache.battles.'.MMRPG_CONFIG_CACHE_DATE.'.json';
 
-        // If caching is turned OFF, or a cache has not been created
-        if (!MMRPG_CONFIG_CACHE_INDEXES || !file_exists($mmrpg_battles_cache_path)){
-            // Start indexing the battle data files
+        // Define the cache file name and path given everything we've learned
+        $cache_file_name = 'cache.battles.json';
+        $cache_file_path = MMRPG_CONFIG_CACHE_PATH.'indexes/'.$cache_file_name;
+        // Check to see if a file already exists and collect its last-modified date
+        if (file_exists($cache_file_path)){ $cache_file_exists = true; $cache_file_date = date('Ymd-Hi', filemtime($cache_file_path)); }
+        else { $cache_file_exists = false; $cache_file_date = '00000000-0000'; }
+
+        // LOAD FROM CACHE if data exists and is current, otherwise continue so index can refresh and replace
+        if (MMRPG_CONFIG_CACHE_INDEXES && $cache_file_exists && $cache_file_date >= MMRPG_CONFIG_CACHE_DATE){
+
+            // Pull the battle index markup from the JSON file and decompress
+            $cache_file_markup = file_get_contents($cache_file_path);
+            $mmrpg_battles_index = json_decode($cache_file_markup, true);
+
+        } else {
+
+            // Indexing the battle data files and collect the generated markup
             $mmrpg_battles_index = rpg_battle::index_battle_data(false);
             $battles_cache_markup = json_encode($mmrpg_battles_index);
+
             // Write the index to a cache file, if caching is enabled
-            $battles_cache_file = @fopen($mmrpg_battles_cache_path, 'w');
-            if (!empty($battles_cache_file)){
-                @fwrite($battles_cache_file, $battles_cache_markup);
-                @fclose($battles_cache_file);
+            if (MMRPG_CONFIG_CACHE_INDEXES === true){
+                // Write the index to a cache file, if caching is enabled
+                $this_cache_file = fopen($cache_file_path, 'w');
+                fwrite($this_cache_file, $battles_cache_markup);
+                fclose($this_cache_file);
             }
-        }
-        // Otherwise pull the cache markup directly from the file
-        else {
-            // Pull the battle index markup from the JSON file and decompress
-            $battles_cache_markup = file_get_contents($mmrpg_battles_cache_path);
-            $mmrpg_battles_index = json_decode($battles_cache_markup, true);
+
         }
 
         // Loop through the battles and index them after serializing
