@@ -73,7 +73,7 @@ Update code for abilities to work with new _actions and _effects directories
 Update fields to pull objects from other places
 -  update steel-mill to incorporate the fire-bolt into the background [DONE]
 -  update industrial-facility to incorporate the gear into the background [DONE]
--  move gentle-countryside's mini-light-lab into field folder, update code somehow
+-  move gentle-countryside's mini-light-lab into field folder, update code somehow [DONE]
 -
 
 Update the admin panel with editors for the final object types
