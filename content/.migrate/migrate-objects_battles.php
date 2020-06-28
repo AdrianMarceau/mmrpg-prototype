@@ -57,6 +57,13 @@ foreach ($battle_index AS $battle_token => $battle_data){
     if (file_exists($content_path)){ deleteDir($content_path); }
     mkdir($content_path);
 
+    // If this is a DEMO battle, skip it all-together
+    if (preg_match('/^demo-/i', $battle_token)){
+        ob_echo('- skipping deprecated demo missions from being migrated');
+        if (file_exists($content_path)){ deleteDir($content_path); }
+        continue;
+    }
+
     $data_path = MMRPG_MIGRATE_OLD_DATA_DIR.$battle_data['battle_functions'];
     //ob_echo('-- $data_path = '.clean_path($data_path));
 
