@@ -1008,6 +1008,21 @@ function mmrpg_community_post_index_fields($implode = false, $table = ''){
 }
 
 
+// Define a function for generating gallery image thumb + link markup
+function mmrpg_get_gallery_thumb_markup($file_info, $file_date = '', $thumb_class = 'image', $thumb_rel = 'images', $base_path = ''){
+    if (empty($file_date)){ $file_date = date('Y/m/d', $file_info['time']); }
+    $markup = '';
+    $markup .= '<a class="'.$thumb_class.'" href="'.$base_path.$file_info['href'].'" target="_blank" rel="'.$thumb_rel.'">';
+        $markup .= '<span class="wrap" style="background-image: url('.$base_path.$file_info['thumb'].');">';
+            $markup .= '<img class="image" src="'.$base_path.$file_info['thumb'].'" alt="Mega Man RPG Prototype | '.$file_info['title'].'" />';
+            $markup .= '<span class="title" title="'.$file_info['title'].'">'.$file_info['title'].'</span>';
+            $markup .= '<span class="date">'.$file_date.'</span>';
+        $markup .= '</span>';
+    $markup .= '</a>'.PHP_EOL;
+    return $markup;
+}
+
+
 // Define a function for deleting a directory
 function deleteDir($dirPath) {
     if (! is_dir($dirPath)) {
@@ -1091,13 +1106,31 @@ function getDirContents($dir, &$results = array()){
     if (!file_exists($dir)){ return $results; }
     $files = scandir($dir);
     foreach($files as $key => $value){
-        $path = realpath($dir.DIRECTORY_SEPARATOR.$value);
+        $path = str_replace('\\', '/', realpath($dir.DIRECTORY_SEPARATOR.$value));
         if(!is_dir($path)) {
             $results[] = $path;
         } else if($value != "." && $value != "..") {
             getDirContents($path, $results);
             $results[] = $path;
         }
+    }
+    return $results;
+}
+
+// Define a function for sorting a list of files given their modified times
+function getSortedDirContents($dir, $method = 'date'){
+    $results = getDirContents($dir);
+    if ($method === 'date'){
+        static $ftimes = array();
+        usort($results, function($f1, $f2) use($ftimes){
+            if (isset($ftimes[$f1])){ $f1_time = $ftimes[$f1]; }
+            else { $f1_time = $ftimes[$f1] = filemtime($f1); }
+            if (isset($ftimes[$f2])){ $f2_time = $ftimes[$f2]; }
+            else { $f2_time = $ftimes[$f2] = filemtime($f2); }
+            if ($f1_time > $f2_time){ return -1; }
+            elseif ($f1_time < $f2_time){ return 1; }
+            else { return 0; }
+            });
     }
     return $results;
 }

@@ -1,192 +1,100 @@
 <?
 
-// Collect and define the display limit if set
-$this_display_limit_default = !empty($this_display_limit_default) ? $this_display_limit_default : 200;
-$this_display_limit = !empty($_GET['limit']) ? trim($_GET['limit']) : $this_display_limit_default;
-$this_start_key = !empty($_GET['start']) ? trim($_GET['start']) : 0;
+// Define the name of the folder we'll be scanning for gallery images
+$this_gallery_kind = isset($this_gallery_kind) ? $this_gallery_kind : 'screenshot';
+$this_gallery_folder = isset($this_gallery_folder) ? $this_gallery_folder : 'screenshots';
 
-// Define a function for saving the gallery cache
-function mmrpg_save_gallery_markup($this_cache_filedir, $this_gallery_markup){
-	// Generate the save data by serializing the session variable
-	$this_cache_content = implode("\n", $this_gallery_markup);
-	// Write the index to a cache file, if caching is enabled
-	$this_cache_file = fopen($this_cache_filedir, 'w');
-	fwrite($this_cache_file, $this_cache_content);
-	fclose($this_cache_file);
-	// Return true on success
-	return true;
-}
-// Define a function for loading the gallery cache
-function mmrpg_load_gallery_markup($this_cache_filedir){
-	// Generate the save data by serializing the session variable
-	$this_cache_content = file_get_contents($this_cache_filedir);
-	$this_cache_content = explode("\n", $this_cache_content);
-	// Return true on success
-	return $this_cache_content;
+// Define the cache file name and path given everything we've learned
+$cache_file_name = 'cache.gallery-'.$this_gallery_folder.'.json';
+$cache_file_path = MMRPG_CONFIG_CACHE_PATH.'indexes/'.$cache_file_name;
+// Check to see if a file already exists and collect its last-modified date
+if (file_exists($cache_file_path)){ $cache_file_exists = true; $cache_file_date = date('Ymd-Hi', filemtime($cache_file_path)); }
+else { $cache_file_exists = false; $cache_file_date = '00000000-0000'; }
+
+// LOAD FROM CACHE if data exists and is current, otherwise continue so JSON can refresh and replace
+if (MMRPG_CONFIG_CACHE_INDEXES && $cache_file_exists && $cache_file_date >= MMRPG_CONFIG_CACHE_DATE){
+    $cache_file_markup = file_get_contents($cache_file_path);
+    $mmrpg_gallery_index = json_decode($cache_file_markup, true);
+    return;
 }
 
-// Loop through the save file directory and generate an index
-$this_cache_stamp = MMRPG_CONFIG_CACHE_DATE; //.'_'.date('Ymd'); //201301012359
-$this_cache_filename = 'cache.gallery.'.$this_cache_stamp.'.php';
-$this_cache_filedir = $this_cache_dir.$this_cache_filename;
-$this_file_index = array();
-$this_file_count = count($this_file_index);
-$this_gallery_markup = array();
-$this_gallery_xml = array();
-$this_screenshots_dir = MMRPG_CONFIG_ROOTDIR.'images/gallery/screenshots/';
-if (MMRPG_CONFIG_CACHE_INDEXES && file_exists($this_cache_filedir)){
+// Define the base directory for gallery images so we can loop through 'em
+$this_gallery_path = 'images/gallery/'.$this_gallery_folder.'/';
+$this_gallery_basedir = MMRPG_CONFIG_ROOTDIR.$this_gallery_path;
+$this_gallery_baseurl = MMRPG_CONFIG_ROOTURL.$this_gallery_path;
 
-	$this_gallery_markup = mmrpg_load_gallery_markup(str_replace('.php', '.html.txt', $this_cache_filedir));
-	$this_gallery_xml = mmrpg_load_gallery_markup(str_replace('.php', '.xml.txt', $this_cache_filedir));
+// Define an empty gallery index to append files to
+$mmrpg_gallery_index = array();
 
-} else {
+// Scan the requested gallery directory to get a list of all files
+$raw_gallery_paths = getDirContents($this_gallery_basedir);
 
-	$this_dir_skip = array('.', '..', 'thumbs');
-	$this_dir_handler = opendir($this_screenshots_dir);
-	while (false !== ($dirname = readdir($this_dir_handler))){
-		if (in_array($dirname, $this_dir_skip)){ continue; }
-		$temp_date_token = $dirname;
-		$this_file_index[$temp_date_token] = array();
-		$temp_gallery_dir = $this_screenshots_dir.$dirname.'/';
-		$temp_dir_handler = opendir($temp_gallery_dir);
-		while (false !== ($filename = readdir($temp_dir_handler))){
-			if (in_array($filename, $this_dir_skip)){ continue; }
-			// Update the temp save dir with the filename
-			$temp_image_path = $this_screenshots_dir.$filename;
-			// Import the game content into the session
-			$this_file_index[$temp_date_token][] = $filename;
-		}
-		$this_file_index[$temp_date_token] = array_reverse($this_file_index[$temp_date_token]);
-		// Close the directory to prevent memory overload
-		closedir($temp_dir_handler);
-		// Shuffle the results to keep the gallery fresh(?)
-		//shuffle($this_file_index[$temp_date_token]);
-	}
-	// Sort the array by date-keys
-	ksort($this_file_index);
-	$this_file_index = array_reverse($this_file_index, true);
+// Sort the full gallery paths with the newest ones first
+sort($raw_gallery_paths, SORT_REGULAR);
+$raw_gallery_paths = array_reverse($raw_gallery_paths); // newest first
 
-	//die('<pre>'.print_r($this_file_index, true).'</pre>');
+// Loop through and filter out only the ones we want that are actual files
+foreach ($raw_gallery_paths AS $key => $full_path){
 
-	// Count the total number of files/players
-	$this_file_count = count($this_file_index);
+    // Clean the path to remove the gallery base directory
+    $rel_path = str_replace($this_gallery_basedir, '', $full_path);
+    // If this is a directory and not a file, continue
+    if (!preg_match('/\.(jpg|png|gif)$/i', $rel_path)){ continue; }
+    // If this is the thumbnail directory, continue
+    if (preg_match('/^thumbs\//i', $rel_path)){ continue; }
 
-	// If there are image files to display
-	if (!empty($this_file_index)){
+    // Break the path apart into folder and filename for categorization
+    list($file_folder, $file_name) = explode('/', $rel_path);
 
-		$image_counter = 0;
-		$column_counter = 1;
-		$num_columns = 5;
+    // Reformat the date into a more readable format
+    $file_date = preg_replace('#^([0-9]{4})([0-9]{2})([0-9]{2})$#', '$1/$2/$3', $file_folder);
 
-		$current_date_group = '';
+    // Collect the unix modified-time for the file
+    $file_time = filemtime($full_path);
 
-		foreach ($this_file_index AS $this_path => $this_images){
+    // Generate the href and thumb path for this file
+    $file_href = str_replace(MMRPG_CONFIG_ROOTURL, '', $this_gallery_baseurl.$rel_path);
+    $file_thumb = str_replace(MMRPG_CONFIG_ROOTURL, '', $this_gallery_baseurl.'thumbs/'.preg_replace('/\.(png|gif|jpg)$/i', '_thumb.jpg', str_replace('/', '_', $rel_path)));
 
-			// Collect date details for this group
-			$this_date_raw = $this_path;
-			$this_date_year = substr($this_date_raw, 0, 4);
-			$this_date_month = substr($this_date_raw, 4, 2);
-			$this_date_month_name = date('F', mktime(0, 0, 0, ((int)($this_date_month)), 1));
-			$this_date_day = substr($this_date_raw, 6, 2);
-			$this_date_group = $this_date_year.'-'.$this_date_month;
+    // Generate the markup for this gallery image
+    $this_title = trim($file_name);
+    $this_title = preg_replace('/.(png|jpg|gif)/i', '', $this_title);
+    $this_title = preg_replace('/^([0-9]+)-/i', '', $this_title);
+    $this_title = str_replace('dr', 'dr.', $this_title);
+    $this_title = trim($this_title, '-');
+    $this_title = ucwords(str_replace('-', ' ', $this_title));
+    // Re-order some title words so they make more sense
+    $this_title = preg_replace('/^Mission\s(.*)$/i', '$1 Mission', $this_title);
+    $this_title = preg_replace('/^(.*)\sMobile$/i', '$1 (Mobile)', $this_title);
 
-			if ($this_current_page != 'home'
-				&& (empty($current_date_group)
-					|| $current_date_group != $this_date_group)){
+    // Create an entry in the index for this date if not exists
+    if (!isset($mmrpg_gallery_index[$file_date])){ $mmrpg_gallery_index[$file_date] = array(); }
 
-				// Append markup for the new row, closing last if one already exists
-				if (!empty($current_date_group)){ $this_gallery_markup[] = '</div>'.PHP_EOL; }
-				$this_gallery_markup[] = '<div class="row">'.PHP_EOL;
+    // Generate the file info array with all this image's details
+    $file_info = array(
+        'name' => $file_name,
+        'title' => $this_title,
+        'time' => $file_time,
+        'href' => $file_href,
+        'thumb' => $file_thumb
+        );
 
-				// Start the output buffer
-				ob_start();
-				echo '<a class="dateblock">'.PHP_EOL;
-					echo '<span class="month">'.$this_date_month_name.'</span>';
-					echo ' <span class="year">'.$this_date_year.'</span>';
-					//echo '<span class="year">'.$this_date_year.'</span>';
-					//echo '-<span class="month">'.$this_date_month.'</span>';
-					//echo '-<span class="day">'.$this_date_day.'</span>'.PHP_EOL;
-				echo '</a>'.PHP_EOL;
-				$this_gallery_markup[] = preg_replace('/\s+/', ' ', ob_get_clean());
-
-				// Update the current date group
-				$current_date_group = $this_date_group;
-
-			}
-
-			// Loop through and print out the images in this folder
-			foreach ($this_images AS $this_key => $this_name){
-
-				// Increment the image counter
-				$image_counter += 1;
-
-				// If this image is over the column count, increment
-				if ($num_columns > $num_columns && $num_columns % $num_columns == 0){ $column_counter++; }
-
-				// Generate the markup for this gallery image
-				$this_href = MMRPG_CONFIG_ROOTURL.'images/gallery/screenshots/'.$this_path.'/'.$this_name;
-				$this_thumb = MMRPG_CONFIG_ROOTURL.'images/gallery/screenshots/thumbs/'.$this_path.'_'.preg_replace('/\.(png|gif|jpg)$/i', '_thumb.jpg', $this_name);
-				$this_count = '#'.str_pad(($image_counter), 2, '0', STR_PAD_LEFT);
-				$this_title = trim($this_name);
-				$this_title = preg_replace('/^([0-9]+)-/i', '', $this_name);
-				$this_title = str_replace('dr', 'dr.', $this_title);
-				$this_title = trim($this_title, '-');
-				$this_title = ucwords(str_replace('-', ' ', $this_title));
-				$this_title = preg_replace('/.(png|jpg|gif)/i', '', $this_title);
-				$temp_date_string = preg_replace('#^([0-9]{4})([0-9]{2})([0-9]{2})$#', '$1/$2/$3', $this_path);
-
-				// -- GALLERY MARKUP -- //
-
-				// Start the output buffer
-				ob_start();
-
-				// Display the user's save file listing
-				echo '<a class="screenshot" style="" href="'.$this_href.'" target="_blank" rel="screenshots">'.PHP_EOL;
-					echo '<img class="image" src="'.$this_thumb.'" alt="Mega Man RPG | '.$this_title.'" />'.PHP_EOL;
-					//echo '<span class="count">'.$this_count.'</span>'.PHP_EOL;
-					echo '<span class="title" title="'.$this_title.'">'.$this_title.'</span>'.PHP_EOL;
-					echo '<span class="date">'.$temp_date_string.'</span>'.PHP_EOL;
-				echo '</a>'.PHP_EOL;
-
-				// Collect the output into the buffer
-				$this_gallery_markup[] = trim(preg_replace('/\s+/', ' ', ob_get_clean()));
-
-				// -- GALLERY XML -- //
-
-				// Start the output buffer
-				ob_start();
-
-				// Display the user's save file listing
-				echo '<screenshot>'.PHP_EOL;
-					echo '<url>'.$this_href.'</url>'.PHP_EOL;
-					echo '<descriptions>'.PHP_EOL;
-						echo '<description lang="en">'.$this_title.'</description>'.PHP_EOL;
-					echo '</descriptions>'.PHP_EOL;
-				echo '</screenshot>'.PHP_EOL;
-
-				// Collect the output into the buffer
-				$this_gallery_xml[] = trim(ob_get_clean());
-
-				// If we're over the limit we should break
-				if ($image_counter >= $this_display_limit_default){ break; }
-
-			}
-
-		}
-
-		if (!empty($current_date_group)){ $this_gallery_markup[] = '</div>'.PHP_EOL; }
-
-	}
-
-	// Update the session cache
-	// $_SESSION['LEADERBOARD'][$this_cache_stamp] = $this_file_index;
-	// Update the gallery cache files
-	mmrpg_save_gallery_markup(str_replace('.php', '.html.txt', $this_cache_filedir), $this_gallery_markup);
-	mmrpg_save_gallery_markup(str_replace('.php', '.xml.txt', $this_cache_filedir), $this_gallery_xml);
+    // Now add this file to the index with its name and other details
+    $mmrpg_gallery_index[$file_date][] = $file_info;
 
 }
 
-// Update the file count number
-$this_file_count = !empty($image_counter) ? $image_counter : (!empty($this_gallery_markup) ? count($this_gallery_markup) : 0); //!empty($this_gallery_markup) ? count($this_gallery_markup) : 0;
+// Write the index to a cache file, if caching is enabled
+if (MMRPG_CONFIG_CACHE_INDEXES === true){
+    // Compress the index into a JSON string for the file
+    $cache_file_markup = json_encode($mmrpg_gallery_index);
+    // Write the index to a cache file, if caching is enabled
+    $this_cache_file = fopen($cache_file_path, 'w');
+    fwrite($this_cache_file, $cache_file_markup);
+    fclose($this_cache_file);
+}
+
+// Count the total number of elements in the gallery index
+$mmrpg_gallery_size = array_sum(array_map("count", $mmrpg_gallery_index));
 
 ?>

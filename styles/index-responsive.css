@@ -39,15 +39,6 @@ body:before {
     #window .page .event .option_this-team-select .chrome label {
         margin-left: 560px !important;
     }
-    #window .page_home .gallery .wrapper {
-
-    }
-    #window .page .gallery .screenshot {
-
-    }
-    #window .page .gallery .screenshot img {
-
-    }
     #window .page .subbody .float_link .sprite,
     #window .page .subbody .float.link .sprite {
         width: 29px;
@@ -312,6 +303,11 @@ body:before {
     #window .page .body .bodytext .type {
         white-space: normal;
     }
+
+    #window .page .gallery .screenshot {
+        width: calc((100% / 5) - 5px);
+    }
+
 
 }
 
@@ -1341,11 +1337,8 @@ body:before {
         margin: 0 auto 9px;
     }
 
-    #window .page_home .gallery .wrapper {
-        text-align: center;
-    }
     #window .page .gallery .screenshot {
-        width: calc((100% / 4) - 5px);
+        width: calc((100% / 5) - 5px);
     }
 
     #mmrpg #credits {
@@ -1649,6 +1642,10 @@ body:before {
         clear: both;
         margin: 2px auto;
         text-indent: -9999px;
+    }
+
+    #window .page .gallery .screenshot {
+        width: calc((100% / 5) - 5px);
     }
 
 
