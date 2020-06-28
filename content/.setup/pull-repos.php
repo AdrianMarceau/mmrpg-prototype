@@ -1,5 +1,8 @@
 <?
 
+// Prevent game-related logic from running
+define('MMRPG_EXCLUDE_GAME_LOGIC', true);
+
 // Require the top file for paths and stuff
 $pull_dir = str_replace('\\', '/', dirname(__FILE__)).'/';
 $base_dir = dirname(dirname($pull_dir)).'/';

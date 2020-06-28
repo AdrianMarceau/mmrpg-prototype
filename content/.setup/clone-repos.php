@@ -1,5 +1,8 @@
 <?
 
+// Prevent game-related logic from running
+define('MMRPG_EXCLUDE_GAME_LOGIC', true);
+
 // Require the top file for paths and stuff
 $clone_dir = str_replace('\\', '/', dirname(__FILE__)).'/';
 $base_dir = dirname(dirname($clone_dir)).'/';

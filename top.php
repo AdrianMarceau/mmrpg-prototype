@@ -180,7 +180,8 @@ require('functions/game.php');
 require('functions/prototype.php');
 
 // Load startup file unless explicitly prevented
-if (!defined('MMRPG_EXTERNAL_TOP_INCLUDE')){
+if (!defined('MMRPG_EXTERNAL_TOP_INCLUDE')
+    && !defined('MMRPG_EXCLUDE_GAME_LOGIC')){
     require('mmrpg.php');
 }
 
