@@ -5,13 +5,14 @@ class cms_database {
     // Define the private variables
     private $LINK = false;
     private $CACHE = array();
+    private $TABLES = array();
     // Define the public variables
     public $CONNECT = true;
     public $HOST;
     public $USERNAME;
     public $PASSWORD;
     public $CHARSET;
-    public $NAME;
+    public $DBNAME;
     public $MYSQL_RESULT;
     public $INDEX;
     public $DEBUG;
@@ -28,7 +29,7 @@ class cms_database {
         $this->USERNAME = MMRPG_CONFIG_DBUSERNAME;
         $this->PASSWORD = MMRPG_CONFIG_DBPASSWORD;
         $this->CHARSET = MMRPG_CONFIG_DBCHARSET;
-        $this->NAME = MMRPG_CONFIG_DBNAME;
+        $this->DBNAME = MMRPG_CONFIG_DBNAME;
         // First initialize the database connection
         $this->CONNECT = $this->db_connect();
         if ($this->CONNECT === false){ $this->CONNECT = false; return $this->CONNECT; }
@@ -75,7 +76,8 @@ class cms_database {
         if (MMRPG_CONFIG_IS_LIVE){
             error_log(date('Y-m-d @ H:i:s').' ('.$_SERVER['REMOTE_ADDR'].') - '.strip_tags(nl2br(htmlspecialchars_decode($message))).PHP_EOL);
         } else {
-            echo('<pre style="display: block; clear: both; float: none; background-color: #f2f2f2; color: #292929; text-shadow: 0 0 0 transparent; white-space: normal; padding: 10px; text-align: left;">'.$message.'</pre>');
+            if (php_sapi_name() === 'cli'){ echo(date('Y-m-d @ H:i:s').' ('.$_SERVER['REMOTE_ADDR'].') - '.strip_tags(nl2br(htmlspecialchars_decode($message))).PHP_EOL); }
+            else { echo('<pre style="display: block; clear: both; float: none; background-color: #f2f2f2; color: #292929; text-shadow: 0 0 0 transparent; white-space: normal; padding: 10px; text-align: left;">'.$message.'</pre>'); }
         }
         return false;
     }
@@ -85,7 +87,9 @@ class cms_database {
         // Clear any leftover data
         $this->clear();
         // Attempt to open the connection to the MySQL database
-        if (!isset($this->LINK) || $this->LINK === false){ $this->LINK = new mysqli($this->HOST, $this->USERNAME, $this->PASSWORD, $this->NAME);    }
+        if (!isset($this->LINK) || $this->LINK === false){
+            $this->LINK = new mysqli($this->HOST, $this->USERNAME, $this->PASSWORD, $this->DBNAME);
+        }
         // If the connection was not successful, return false
         if ($this->LINK === false
             || $this->LINK->connect_errno){
@@ -104,6 +108,9 @@ class cms_database {
             }
             return false;
         }
+        // Assuming we're successfull, immediately get a list of valid tables in this database
+        $raw_table_names = $this->get_array_list("SELECT table_name FROM information_schema.tables WHERE table_schema = '{$this->DBNAME}';");
+        if (!empty($raw_table_names)){ $this->TABLES = array_map(function($a){ return $a['table_name']; }, $raw_table_names); }
         // Set the character set, if possible
         //if (function_exists('mysqli_set_charset')) { mysqli_set_charset($this->LINK, $this->CHARSET); }
         //else { mysqli_query($this->LINK, "SET NAMES 'utf8'");  }
@@ -132,10 +139,10 @@ class cms_database {
         // Return immediately if DB is not available
         if (!$this->CONNECT){ return false; }
         // Attempt to select the database by name
-        $select = mysqli_select_db($this->LINK, $this->NAME);
+        $select = mysqli_select_db($this->LINK, $this->DBNAME);
         // If the select was not successful, return false
         if ($select === false){
-            $this->critical_error("<strong>cms_database::db_select</strong> : Critical error! Unable to select the database &lt;{$this->NAME}&gt;!<br />[MySQL Error ".mysqli_errno($this->LINK)."] : &quot;".mysqli_errno($this->LINK)."&quot;");
+            $this->critical_error("<strong>cms_database::db_select</strong> : Critical error! Unable to select the database &lt;{$this->DBNAME}&gt;!<br />[MySQL Error ".mysqli_errno($this->LINK)."] : &quot;".mysqli_errno($this->LINK)."&quot;");
             return false;
         }
         // Return true
@@ -484,30 +491,14 @@ class cms_database {
 
     // Define a function for pulling the list of database tables
     public function table_list(){
-        // Run the SHOW TABLES query against the database
-        $this->query("SHOW TABLES");
-        // If the result is empty NULL or empty, return false
-        if (!$this->MYSQL_RESULT || mysqli_num_rows($this->LINK, $this->MYSQL_RESULT) < 1) { return false; }
-        // Create the array to hold all table names
-        $all_tables = array();
-        // Loop through the result and add the names to the array
-        while ($row = mysqli_fetch_row($this->LINK, $this->MYSQL_RESULT)){
-            if (!isset($row[0]) || empty($row[0])){ continue; }
-            $all_tables[] = $row[0];
-        }
-        // Free the results of the query
-        $this->clear();
-        // Now return the resulting array of table names
-        return $all_tables;
-
+        // Return the list of cached table names
+        return $this->TABLES;
     }
 
     // Define a function for checking if a database table exists
     public function table_exists($table_name){
-        // First collect all tables from the database into an array
-        $all_tables = $this->table_list();
-        // Return true
-        return in_array($table_name, $all_tables);
+        // Return true if table in cached list
+        return in_array($table_name, $this->TABLES);
     }
 
     // Define a function for collection the maximum field value of a given table

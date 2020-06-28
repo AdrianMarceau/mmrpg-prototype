@@ -2,7 +2,7 @@
 
 // Define the cache timestamp now if not already done so
 if (!defined('MMRPG_CONFIG_CACHE_DATE')){
-    $cache_info = $db->get_array_list("SELECT config_name, config_value FROM mmrpg_config WHERE config_group = 'global' && config_name IN ('cache_date', 'cache_time');", 'config_name');
+    $cache_info = $db->table_exists('mmrpg_config') ? $db->get_array_list("SELECT config_name, config_value FROM mmrpg_config WHERE config_group = 'global' && config_name IN ('cache_date', 'cache_time');", 'config_name') : false;
     //echo('<pre>$cache_info = '.print_r($cache_info, true).'</pre>');
     if (!empty($cache_info)){ define('MMRPG_CONFIG_CACHE_DATE', $cache_info['cache_date']['config_value'].'-'.$cache_info['cache_time']['config_value']); }
     elseif (defined('MMRPG_CONFIG_CACHE_DATE_FALLBACK')){ define('MMRPG_CONFIG_CACHE_DATE', MMRPG_CONFIG_CACHE_DATE_FALLBACK); }
@@ -172,7 +172,7 @@ if (!defined('MMRPG_CONFIG_ADMIN_PERMS_LIST')){
 // Define the last save timestamp now if not already done so
 if (!defined('MMRPG_CONFIG_LAST_SAVE_DATE')){
     $guest_id = MMRPG_SETTINGS_GUEST_ID;
-    $last_save_time = $db->get_value("SELECT MAX(save_date_modified) AS last_save_time FROM mmrpg_saves WHERE user_id <> {$guest_id};", 'last_save_time');
+    $last_save_time = $db->table_exists('mmrpg_saves') ? $db->get_value("SELECT MAX(save_date_modified) AS last_save_time FROM mmrpg_saves WHERE user_id <> {$guest_id};", 'last_save_time') : false;
     //echo('<pre>$last_save_time = '.print_r($last_save_time, true).'</pre>');
     if (!empty($last_save_time)){ define('MMRPG_CONFIG_LAST_SAVE_DATE', $last_save_time); }
     else { define('MMRPG_CONFIG_LAST_SAVE_DATE', time()); }

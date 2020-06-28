@@ -71,7 +71,7 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')
     if (MMRPG_CONFIG_IS_LIVE === false){ $dev_whitelist[] = '127.0.0.1'; }
 
     // Attempt to collect a list of developers from the database
-    $dev_userdata = $db->get_array_list("SELECT
+    $dev_userdata = $db->table_exists('mmrpg_users') ? $db->get_array_list("SELECT
         users.user_id,
         users.user_name_clean,
         users.user_ip_addresses,
@@ -85,7 +85,7 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')
         AND roles.role_level >= 5
         ORDER BY
         user_id ASC
-        ;", 'user_id');
+        ;", 'user_id') : false;
 
     // If developers were found, loop through and collect IPs
     if (!empty($dev_userdata)){
