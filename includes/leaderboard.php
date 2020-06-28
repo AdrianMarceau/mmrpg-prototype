@@ -216,9 +216,6 @@ $temp_leaderboard_query = "SELECT
 $this_leaderboard_index = $db->get_array_list($temp_leaderboard_query);
 
 // Loop through the save file directory and generate an index
-$this_cache_stamp = MMRPG_CONFIG_CACHE_DATE.'_'.substr(date('YmdHi'), 0, 11); //2013 01 01 23 59 (12 length)
-$this_cache_filename = 'cache.leaderboard.'.$this_cache_stamp.'.php';
-$this_cache_filedir = $this_cache_dir.$this_cache_filename;
 $this_leaderboard_count = count($this_leaderboard_index);
 $this_leaderboard_online_count = 0;
 $this_leaderboard_online_players = array();

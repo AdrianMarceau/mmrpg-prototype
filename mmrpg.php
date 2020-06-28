@@ -48,9 +48,6 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
     //ini_set('memory_limit', '128M');
     //ini_set('memory_limit', '-1');
 
-    // Define the game cache location path
-    $this_cache_dir = MMRPG_CONFIG_CACHE_PATH;
-
     // Reset the session completed if user ID not set
     if (empty($_SESSION['GAME']['USER']['userid'])){
 
