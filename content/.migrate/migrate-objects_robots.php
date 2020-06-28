@@ -182,7 +182,7 @@ foreach ($robot_index AS $robot_token => $robot_data){
 
     $function_path = rtrim(dirname($robot_data['robot_functions']), '/').'/';
     //ob_echo('-- $function_path = '.$function_path);
-    $data_path = MMRPG_CONFIG_ROOTDIR.'data/'.$function_path.$robot_token.'.php';
+    $data_path = MMRPG_MIGRATE_OLD_DATA_DIR.$function_path.$robot_token.'.php';
     //ob_echo('-- $data_path = '.clean_path($data_path));
 
     // Ensure the data file exists before attempting to extract functions from it

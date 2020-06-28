@@ -96,7 +96,7 @@ foreach ($field_index AS $field_token => $field_data){
 
     $sprite_path = MMRPG_FIELDS_OLD_IMAGES_DIR.$field_token.'/';
     //ob_echo('-- $sprite_path = '.clean_path($sprite_path));
-    $data_path = MMRPG_CONFIG_ROOTDIR.'data/'.$function_path.$field_token.'.php';
+    $data_path = MMRPG_MIGRATE_OLD_DATA_DIR.$function_path.$field_token.'.php';
     //ob_echo('-- $data_path = '.clean_path($data_path));
 
     $content_path = MMRPG_FIELDS_NEW_CONTENT_DIR.($field_token === 'field' ? '.field' : $field_token).'/';

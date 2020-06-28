@@ -142,7 +142,7 @@ foreach ($player_index AS $player_token => $player_data){
 
     $function_path = rtrim(dirname($player_data['player_functions']), '/').'/';
     //ob_echo('-- $function_path = '.$function_path);
-    $data_path = MMRPG_CONFIG_ROOTDIR.'data/'.$function_path.$player_token.'.php';
+    $data_path = MMRPG_MIGRATE_OLD_DATA_DIR.$function_path.$player_token.'.php';
     //ob_echo('-- $data_path = '.clean_path($data_path));
 
     // Ensure the data file exists before attempting to extract functions from it

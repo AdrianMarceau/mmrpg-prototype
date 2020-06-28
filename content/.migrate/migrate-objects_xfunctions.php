@@ -1,6 +1,10 @@
 <?
 
-
+// Define the common data directory, taking into account possible rename
+$data_dir = MMRPG_CONFIG_ROOTDIR.'data/';
+if (!file_exists($data_dir)){ $data_dir = MMRPG_CONFIG_ROOTDIR.'xxx_data/'; }
+if (!file_exists($data_dir)){ exit('At least one /data/ directory MUST exist to migrate!'.PHP_EOL); }
+define('MMRPG_MIGRATE_OLD_DATA_DIR', $data_dir);
 
 // Define a quick function for immediately printing an echo statement
 function ob_echo($echo, $silent = false){ if (!$silent){ echo($echo.PHP_EOL); } ob_flush(); }

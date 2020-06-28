@@ -55,7 +55,7 @@ foreach ($type_index AS $type_token => $type_data){
     ob_echo('Processing type "'.$type_token.'" '.$count_string);
     ob_flush();
 
-    $data_path = MMRPG_CONFIG_ROOTDIR.'data/types/'.$type_token.'.php';
+    $data_path = MMRPG_MIGRATE_OLD_DATA_DIR.$type_token.'.php';
     //ob_echo('-- $data_path = '.clean_path($data_path));
 
     $content_path = MMRPG_TYPES_NEW_CONTENT_DIR.($type_token === 'type' ? '.type' : $type_token).'/';

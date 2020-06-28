@@ -57,7 +57,7 @@ foreach ($battle_index AS $battle_token => $battle_data){
     if (file_exists($content_path)){ deleteDir($content_path); }
     mkdir($content_path);
 
-    $data_path = MMRPG_CONFIG_ROOTDIR.'data/'.$battle_data['battle_functions'];
+    $data_path = MMRPG_MIGRATE_OLD_DATA_DIR.$battle_data['battle_functions'];
     //ob_echo('-- $data_path = '.clean_path($data_path));
 
     // Ensure the data file exists before adding it to the copied list
@@ -141,7 +141,7 @@ function index_legacy_battle_data($this_path = ''){
     $battles_cache_markup = array();
 
     // Open the type data directory for scanning
-    $battles_index_path = MMRPG_CONFIG_ROOTDIR.'data/battles/';
+    $battles_index_path = MMRPG_MIGRATE_OLD_DATA_DIR.'battles/';
     $data_battles  = opendir($battles_index_path.$this_path);
 
     //echo 'Scanning '.$battles_index_path.$this_path.'<br />';

@@ -89,7 +89,7 @@ foreach ($item_index AS $item_token => $item_data){
 
     $sprite_path = MMRPG_ITEMS_OLD_IMAGES_DIR.$item_token.'/';
     //ob_echo('-- $sprite_path = '.clean_path($sprite_path));
-    $data_path = MMRPG_CONFIG_ROOTDIR.'data/'.$function_path.$item_token.'.php';
+    $data_path = MMRPG_MIGRATE_OLD_DATA_DIR.$function_path.$item_token.'.php';
     //ob_echo('-- $data_path = '.clean_path($data_path));
 
     $content_path = MMRPG_ITEMS_NEW_CONTENT_DIR.($item_token === 'item' ? '.item' : $item_token).'/';

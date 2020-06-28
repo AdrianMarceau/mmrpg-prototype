@@ -116,7 +116,7 @@ foreach ($ability_index AS $ability_token => $ability_data){
 
     $sprite_path = MMRPG_ABILITIES_OLD_IMAGES_DIR.$ability_token.'/';
     //ob_echo('-- $sprite_path = '.clean_path($sprite_path));
-    $data_path = MMRPG_CONFIG_ROOTDIR.'data/'.$function_path.$ability_token.'.php';
+    $data_path = MMRPG_MIGRATE_OLD_DATA_DIR.$function_path.$ability_token.'.php';
     //ob_echo('-- $data_path = '.clean_path($data_path));
 
     if (in_array($ability_token, $special_action_abilities)){
