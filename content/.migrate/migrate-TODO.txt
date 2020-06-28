@@ -40,6 +40,7 @@ Update the admin panel so that saving auto-updates the data.json file
 
 Update code to point to new CONTENT directories (what part of the code?)
 [may be done, try renaming the /data/ directories and see if anyting breaks]
+[appears to be dead EXCEPT for the migration directory, move that maybe]
 -  types
 -  battles
 -  players
