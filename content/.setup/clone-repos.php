@@ -14,9 +14,9 @@ require($clone_dir.'_repo-index.php');
 // Define the header type so it's easier to display stuff
 header('Content-type: text/plain;');
 
-// ONLY allow this file to run locally
-if (defined('MMRPG_CONFIG_IS_LIVE') && MMRPG_CONFIG_IS_LIVE === true){
-    die('This setup script can ONLY be run locally!!!');
+// ONLY allow this file to run in CLI mode
+if (php_sapi_name() !== 'cli'){
+    die('This setup script can ONLY be run in CLI mode!!!');
 }
 
 // Start the output buffer now, we'll flush manually as we go
