@@ -4,12 +4,12 @@
 define('MMRPG_EXCLUDE_GAME_LOGIC', true);
 
 // Require the top file for paths and stuff
-$pull_dir = str_replace('\\', '/', dirname(__FILE__)).'/';
-$base_dir = dirname(dirname($pull_dir)).'/';
+$setup_dir = str_replace('\\', '/', dirname(__FILE__)).'/';
+$base_dir = dirname(dirname($setup_dir)).'/';
 require($base_dir.'top.php');
 
 // Require the repository index for looping
-require($pull_dir.'_repo-index.php');
+require($setup_dir.'_repo-index.php');
 
 // Define the header type so it's easier to display stuff
 header('Content-type: text/plain;');
@@ -24,7 +24,7 @@ ob_implicit_flush(true);
 ob_start();
 
 // Require the function definitions needed for pull stuff
-//require($pull_dir.'pull-objects_xfunctions.php');
+//require($setup_dir.'pull-objects_xfunctions.php');
 
 // Define a quick function for immediately printing an echo statement
 function ob_echo($echo, $silent = false){ if (!$silent){ echo($echo.PHP_EOL); } ob_flush(); }
