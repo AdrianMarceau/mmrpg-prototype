@@ -36,3 +36,7 @@ legacy.mmrpg-world.net/
 mmrpg-world.net/
 prototype.mmrpg-world.net/
 testing.mmrpg-world.net/
+/data/
+/data/*
+/xxx_data/
+/xxx_data/*
