@@ -1,12 +1,28 @@
 <?
 
-// Define the global cache date and settings
-define('MMRPG_CONFIG_CACHE_DATE', '20140830-02');
+// Define approved domains this project can run on
+$approved_domains = array('localhost');
+
+// Require the config helper file to pre-collect data for later
+$config_dir = rtrim(str_replace('\\', '/', dirname(__FILE__)), '/');
+require_once($config_dir.'/config.helper.php');
+
+// Define the global cache date setting (for when DB connection not exists yet)
+define('MMRPG_CONFIG_CACHE_DATE_FALLBACK', '20140830-02');
+
+// Define the debug mode flag (useful for printing extra info, but slow)
 define('MMRPG_CONFIG_DEBUG_MODE', false);
+
+// Define the mainenance mode flag and message (for when you wanna take the site offline)
+define('MMRPG_CONFIG_MAINTENANCE_MODE', false);
+define('MMRPG_CONFIG_MAINTENANCE_MODE_MESSAGE', 'SERVER MAINTENANCE IN PROGRESS!');
+
+// Define whether or not we're current in HTTPS mode
+define('MMRPG_IS_HTTPS', $is_https);
 
 // Define the global path variables for this installation
 define('MMRPG_CONFIG_ROOTDIR', '/var/www/html/');
-define('MMRPG_CONFIG_ROOTURL', 'http://'.$_SERVER['HTTP_HOST'].'/');
+define('MMRPG_CONFIG_ROOTURL', (MMRPG_IS_HTTPS ? 'https' : 'http').'://'.$current_domain.'/');
 define('MMRPG_CONFIG_CACHE_INDEXES', false);
 define('MMRPG_CONFIG_IS_LIVE', false);
 
@@ -27,7 +43,20 @@ define('MMRPG_SETTINGS_OMEGA_SEED', 'omega-seed-salt');
 // Define some SALT for the IMAGEPROXY hash values
 define('MMRPG_SETTINGS_IMAGEPROXY_SALT', 'image-proxy-salt');
 
-// Define the list of administrator-approved remote addresses
-define('MMRPG_CONFIG_ADMIN_LIST', '127.0.0.1,999.999.999.999');
+// Define the COPPA email exceptions based on written permission from guardians
+$temp_coppa_list = array();
+define('MMRPG_CONFIG_COPPA_PERMISSIONS', implode(',', $temp_coppa_list));
+
+// Define the list of user IDs that can log into back-end
+$temp_admin_list = array();
+define('MMRPG_CONFIG_ADMIN_LIST', implode(',', $temp_admin_list));
+
+// Define the list of back-end permissions given user IDs
+$temp_admin_perms_list = array();
+define('MMRPG_CONFIG_ADMIN_PERMS_LIST', json_encode($temp_admin_perms_list));
+
+// Define the list of BANNED remote addresses that cannot access site
+$temp_banned_list = array();
+define('MMRPG_CONFIG_BANNED_LIST', implode(',', $temp_banned_list));
 
 ?>
