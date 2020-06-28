@@ -6,7 +6,7 @@ REPO_PATH="${BASE_PATH}content/${1}/"
 
 if test -d  "${REPO_PATH}"; then
 
-    php "${CONTENT_PATH}/.migrate/migrate-objects.php" kind="${1}"
+    php "${ADMIN_PATH}/.migrate/migrate-objects.php" kind="${1}"
 
 else
 

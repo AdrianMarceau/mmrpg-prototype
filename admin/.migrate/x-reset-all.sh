@@ -8,8 +8,8 @@ for REPO_KIND in "${REPO_KINDS[@]}"
 do
 
     echo "##########################################"
-    "${CONTENT_PATH}.migrate/x-migrate-repo.sh" "${REPO_KIND}"
-    "${CONTENT_PATH}.migrate/x-reset-repo.sh" "${REPO_KIND}"
+    echo ""
+    "${ADMIN_PATH}.migrate/x-reset-repo.sh" "${REPO_KIND}"
 
 done
 

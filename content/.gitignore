@@ -1,6 +1,2 @@
 *
 !.gitignore
-!.migrate/
-!.migrate/*
-!.setup/
-!.setup/*
