@@ -54,12 +54,14 @@ if (!empty($table_sql_files)){
         ob_echo('----------');
         ob_echo('Processing database table "'.$table_name.'" ...');
         if (!$db->table_exists($table_name)){
-            $sql_query = file_get_contents($table_sql_dir.$sql_file);
-            $db->query($sql_query);
-            ob_echo('- new table created!');
+            ob_echo('- '.$db->db_import_file($table_sql_dir.$sql_file));
+            $db->$this->table_list(); // auto-refresh cached table list
         } else {
             ob_echo('- table already exists!');
         }
+
+        ob_echo('EXIT AFTER ONE TABLE FOR NOW');
+
     }
     ob_echo('----------');
     ob_echo('');
