@@ -1,0 +1,12 @@
+[submodule ".libs/codemirror"]
+	path = .libs/codemirror
+	url = https://github.com/codemirror/CodeMirror.git
+[submodule ".libs/cool-php-captcha"]
+	path = .libs/cool-php-captcha
+	url = https://github.com/josecl/cool-php-captcha.git
+[submodule ".libs/colorbox"]
+	path = .libs/colorbox
+	url = https://github.com/jackmoore/colorbox.git
+[submodule ".libs/minify"]
+	path = .libs/minify
+	url = https://github.com/matthiasmullie/minify.git

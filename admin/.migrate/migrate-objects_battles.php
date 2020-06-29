@@ -110,7 +110,7 @@ function load_legacy_battle_index(){
     $db->INDEX['BATTLES'] = array();
     // Default the battles index to an empty array
     $mmrpg_battles_index = array();
-    $mmrpg_battles_cache_path = MMRPG_CONFIG_CACHE_PATH.'cache.legacy-battles.'.MMRPG_CONFIG_CACHE_DATE.'.php';
+    $mmrpg_battles_cache_path = MMRPG_CONFIG_CACHE_PATH.'indexes/cache.legacy-battles.'.MMRPG_CONFIG_CACHE_DATE.'.php';
     // If caching is turned OFF, or a cache has not been created
     if (!MMRPG_CONFIG_CACHE_INDEXES || !file_exists($mmrpg_battles_cache_path)){
         // Start indexing the battle data files
