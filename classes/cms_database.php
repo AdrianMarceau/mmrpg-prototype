@@ -171,6 +171,9 @@ class cms_database {
             $caller['file'] = basename(dirname($caller['file'])).'/'.basename($caller['file']);
             $caller2['file'] = basename(dirname($caller2['file'])).'/'.basename($caller2['file']);
             $caller3['file'] = basename(dirname($caller3['file'])).'/'.basename($caller3['file']);
+            if (!isset($caller['line'])){ $caller['line'] = 0; }
+            if (!isset($caller2['line'])){ $caller2['line'] = 0; }
+            if (!isset($caller3['line'])){ $caller3['line'] = 0; }
             $backtrace = "{$caller['file']}:{$caller['line']} <br /> {$caller2['file']}:{$caller2['line']} <br /> {$caller3['file']}:{$caller3['line']}";
             $this->critical_error("[[cms_database::query]] : Unable to run the requested query. <br /> [Error ".mysqli_errno($this->LINK)." | ".mysqli_error($this->LINK)."]. <br /> The query was &laquo;".htmlentities(preg_replace('/\s+/', ' ', $query_string), ENT_QUOTES, 'UTF-8')."&raquo;. <br /> {$backtrace}");
             return false;
