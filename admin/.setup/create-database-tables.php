@@ -75,6 +75,7 @@ if (!empty($table_sql_files)){
 }
 
 ob_echo('...Done!');
+ob_echo('');
 
 exit();
 
