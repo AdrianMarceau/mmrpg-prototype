@@ -31,36 +31,36 @@ function clean_path($path){ return str_replace(MMRPG_CONFIG_ROOTDIR, '/', $path)
 
 // Print the script header for display purposes
 ob_echo('');
-ob_echo('==========================');
-ob_echo('| CREATE DATABASE TABLES |');
-ob_echo('==========================');
+ob_echo('============================');
+ob_echo('| POPULATE DATABASE TABLES |');
+ob_echo('============================');
 ob_echo('');
 
-// Collect a list of all the database table definitions in the setup directory
-$table_sql_dir = MMRPG_CONFIG_ROOTDIR.'admin/.sql/tables/';
-$table_sql_files = scandir($table_sql_dir);
-$table_sql_files = array_filter($table_sql_files, function($s){ if ($s !== '.' && $s !== '..' && substr($s, -4, 4) === '.sql'){ return true; } else { return false; } });
+// Collect a list of all the seed data for the database tables
+$data_sql_dir = MMRPG_CONFIG_ROOTDIR.'admin/.sql/data/';
+$data_sql_files = scandir($data_sql_dir);
+$data_sql_files = array_filter($data_sql_files, function($s){ if ($s !== '.' && $s !== '..' && substr($s, -4, 4) === '.sql'){ return true; } else { return false; } });
 
-// Check to make sure datbase table definitions were actually collected
-if (!empty($table_sql_files)){
+// Check to make sure seed data for the tables was actually collected
+if (!empty($data_sql_files)){
 
     // Print out the list of tables that will be created
-    ob_echo('The following database table defintions were found:');
-    ob_echo('- '.implode(PHP_EOL.'- ', $table_sql_files));
+    ob_echo('Import data was found for the following database tables:');
+    ob_echo('- '.implode(PHP_EOL.'- ', $data_sql_files));
     ob_echo('');
 
-    // Loop through the table files and run them against the database if not exist
-    ob_echo('Looping through tables and importing into the database:');
-    foreach ($table_sql_files AS $sql_key => $sql_file){
+    // Loop through the data files and import them into the database
+    ob_echo('Looping through data files and importing into database tables:');
+    foreach ($data_sql_files AS $sql_key => $sql_file){
         $table_name = str_replace('.sql', '', $sql_file);
-        $echo_text = '- Importing database table "'.$table_name.'" ... ';
-        if (!$db->table_exists($table_name)){
-            $db->import_sql_file($table_sql_dir.$sql_file); // attempt to import the file
-            $db->table_list(); // auto-refresh cached table list
-            if ($db->table_exists($table_name)){ $echo_text .= 'Table created!'; }
-            else { $echo_text .= 'Table NOT created!'; }
+        $data_check_sql = "SELECT 1 FROM {$table_name} LIMIT 1;";
+        $echo_text = '- Importing seed data for database table "'.$table_name.'" ... ';
+        if (empty($db->get_array($data_check_sql))){
+            $db->import_sql_file($data_sql_dir.$sql_file); // attempt to import the file
+            if (!empty($db->get_array($data_check_sql))){ $echo_text .= 'Data imported!'; }
+            else { $echo_text .= 'Data NOT imported!'; }
         } else {
-            $echo_text .= 'Table already exists!';
+            $echo_text .= 'Data already exists!';
         }
         ob_echo($echo_text);
     }
@@ -69,7 +69,7 @@ if (!empty($table_sql_files)){
 } else {
 
     // Print out an error message as nothing was found
-    ob_echo('Unable to find any table definitions in '.clean_path($table_sql_dir).'...');
+    ob_echo('Unable to find any data files in '.clean_path($data_sql_dir).'...');
     ob_echo('');
 
 }

@@ -108,12 +108,8 @@ class cms_database {
             }
             return false;
         }
-        // Assuming we're successfull, immediately get a list of valid tables in this database
-        $raw_table_names = $this->get_array_list("SELECT table_name FROM information_schema.tables WHERE table_schema = '{$this->DBNAME}';");
-        if (!empty($raw_table_names)){ $this->TABLES = array_map(function($a){ return $a['table_name']; }, $raw_table_names); }
-        // Set the character set, if possible
-        //if (function_exists('mysqli_set_charset')) { mysqli_set_charset($this->LINK, $this->CHARSET); }
-        //else { mysqli_query($this->LINK, "SET NAMES 'utf8'");  }
+        // Automatically refresh the internal list of cached table names
+        $this->table_list();
         // Return true
         return true;
     }
@@ -494,6 +490,9 @@ class cms_database {
 
     // Define a function for pulling the list of database tables
     public function table_list(){
+        // Assuming we're successfull, immediately get a list of valid tables in this database
+        $raw_table_names = $this->get_array_list("SELECT table_name FROM information_schema.tables WHERE table_schema = '{$this->DBNAME}';");
+        if (!empty($raw_table_names)){ $this->TABLES = array_map(function($a){ return $a['table_name']; }, $raw_table_names); }
         // Return the list of cached table names
         return $this->TABLES;
     }
@@ -585,6 +584,23 @@ class cms_database {
             $this->clear();
         }
         return ($success1 + $success2);
+    }
+
+    // Define a function for importing an SQL file directory
+    public function import_sql_file($path){
+        // Return false if file does not exist
+        if (!file_exists($path)){
+            $this->critical_error("<strong>cms_database::db_import_file</strong> : Request error! Provided file path \"{$path}\" does not exist!");
+            return false;
+        }
+        // Return false ifthe file is not an SQL file
+        if (substr($path, -4, 4) !== '.sql'){
+            $this->critical_error("<strong>cms_database::db_import_file</strong> : Request error! Provided path \"{$path}\" is not an sql file!");
+            return false;
+        }
+        // Otherwise attempt to import the file via the system level
+        shell_exec('mysql --user='.$this->USERNAME.' --password='.$this->PASSWORD.' '.$this->DBNAME.' < '.$path.' 2>&1');
+        return;
     }
 
 }
