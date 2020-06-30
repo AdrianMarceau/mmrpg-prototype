@@ -31,6 +31,3 @@
 [submodule "content/battles"]
 	path = content/battles
 	url = git@github.com:AdrianMarceau/mmrpg-prototype_battles.git
-[submodule "content/pages"]
-	path = content/pages
-	url = git@github.com:AdrianMarceau/mmrpg-prototype_pages.git
