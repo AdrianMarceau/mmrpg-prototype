@@ -95,8 +95,6 @@ require($setup_dir.'_content-types-index.php');
 // Loop through the content types one-by-one to check for JSON files
 foreach ($content_types_index AS $content_key => $content_info){
 
-    if ($content_key === 'pages'){ ob_echo('NOT READY FOR PAGES YET!'); ob_echo(''); continue; }
-
     // Collect refs to the content type tokens, table, etc.
     $ctype_token = $content_info['token'];
     $ctype_xtoken = $content_info['xtoken'];
@@ -104,6 +102,12 @@ foreach ($content_types_index AS $content_key => $content_info){
 
     // If this content doesn't have a table, skip it
     if (empty($table_name)){ continue; }
+
+    // Define field names for later usage
+    $id_field_name = $ctype_token.'_id';
+    $token_field_name = $ctype_token.'_token';
+    $parent_id_field_name = 'parent_id';
+    $parent_token_field_name = 'parent_token';
 
     // Collect a list of all the seed data for the database tables
     $json_data_dir = MMRPG_CONFIG_ROOTDIR.$content_info['content_path'];
@@ -118,6 +122,10 @@ foreach ($content_types_index AS $content_key => $content_info){
         ob_echo('- '.implode(PHP_EOL.'- ', $json_data_dirs));
         ob_echo('');
 
+        // Define an index to keep track of which tokens are associated with which IDs
+        $token_to_id_index = array();
+        $child_needs_parent_for_token = array();
+
         // Loop through the data files and import them into the database
         ob_echo('Looping through JSON data files and importing into database table "'.$table_name.'":');
         foreach ($json_data_dirs AS $object_key => $object_token){
@@ -126,17 +134,68 @@ foreach ($content_types_index AS $content_key => $content_info){
             $json_data = json_decode($json_markup, true);
             $real_object_token = $json_data[$ctype_token.'_token'];
             $echo_text = '- Importing '.$ctype_token.' data for "'.$real_object_token.'" into database table "'.$table_name.'" ... ';
-            $data_check_sql = "SELECT {$ctype_token}_token FROM {$table_name} WHERE {$ctype_token}_token = '{$real_object_token}';";
-            if (empty($db->get_array($data_check_sql))){
+            $temp_child_to_parent_info = false;
+            if (isset($json_data[$parent_token_field_name])){
+                $parent_token_field_value = $json_data[$parent_token_field_name];
+                if (!empty($parent_token_field_value)){
+                    $temp_child_to_parent_info = array(
+                        'child_token' => $real_object_token,
+                        'parent_token' => $parent_token_field_value
+                        );
+                }
+                unset($json_data[$parent_token_field_name]);
+            }
+            $data_check_sql = "SELECT {$id_field_name} FROM {$table_name} WHERE {$token_field_name} = '{$real_object_token}';";
+            $data_check_return = $db->get_value($data_check_sql, $id_field_name);
+            if (empty($data_check_return)){
                 $db->insert($table_name, $json_data); // attempt to insert the data
-                if (!empty($db->get_array($data_check_sql))){ $echo_text .= 'Data imported!'; }
-                else { $echo_text .= 'Data NOT imported!'; }
+                $data_check_return = $db->get_value($data_check_sql, $id_field_name);
+                if (!empty($data_check_return)){
+                    $echo_text .= 'Data imported w/ '.$id_field_name.'='.$data_check_return.'!';
+                    $token_to_id_index[$real_object_token] = $data_check_return;
+                    if (!empty($temp_child_to_parent_info)){ $child_needs_parent_for_token[] = $temp_child_to_parent_info; }
+                } else {
+                    $echo_text .= 'Data NOT imported!';
+                }
             } else {
-                $echo_text .= 'Data already exists!';
+                $echo_text .= 'Data already exists w/ '.$id_field_name.'='.$data_check_return.'!';
+                $token_to_id_index[$real_object_token] = $data_check_return;
             }
             ob_echo($echo_text);
         }
         ob_echo('');
+
+        // If there were child-to-parent associations, we need to loop through and update the database
+        if (!empty($child_needs_parent_for_token)){
+            ob_echo('Looping through child-to-parent associations and updating database table rows:');
+            foreach ($child_needs_parent_for_token AS $key => $tokens){
+
+                $child_token = $tokens['child_token'];
+                $child_id = isset($token_to_id_index[$child_token]) ? $token_to_id_index[$child_token] : false;
+                $parent_token = $tokens['parent_token'];
+                $parent_id = isset($token_to_id_index[$parent_token]) ? $token_to_id_index[$parent_token] : false;
+
+                $echo_text = '- Associating child '.$ctype_token.' ';
+                    $echo_text .= '('.$child_token.'/'.($child_id !== false ? $child_id : 'null').') ';
+                    $echo_text .= 'to parent '.$ctype_token.' ';
+                    $echo_text .= '('.$parent_token.'/'.($parent_id !== false ? $parent_id : 'null').') ... ';
+
+                if ($child_id !== false && $parent_id !== false){
+                    $db->update($table_name, array($parent_id_field_name => $parent_id), array($id_field_name => $child_id));
+                    $data_check_sql = "SELECT {$id_field_name} FROM {$table_name} WHERE {$id_field_name} = {$child_id} AND {$parent_id_field_name} = {$parent_id};";
+                    if (!empty($db->get_value($data_check_sql, $id_field_name))){
+                        $echo_text .= 'Data updated!';
+                    } else {
+                        $echo_text .= 'Data NOT updated!';
+                    }
+                } else {
+                    $echo_text .= 'Data missing one or both ID(s)!';
+                }
+
+                ob_echo($echo_text);
+
+            }
+        }
 
     } else {
 
