@@ -8,6 +8,11 @@ if test -d  "${REPO_PATH}"; then
 
     php "${ADMIN_PATH}/.migrate/migrate-objects.php" kind="${1}"
 
+    cd "${REPO_PATH}"
+
+    git add .
+    git reset
+
 else
 
     echo "Unable to migrate objects to new directories!"
