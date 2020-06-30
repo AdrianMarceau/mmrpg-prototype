@@ -9,7 +9,7 @@ do
 
     echo "##########################################"
     "${ADMIN_PATH}.migrate/x-migrate-repo.sh" "${REPO_KIND}"
-    "${ADMIN_PATH}.migrate/x-reset-repo.sh" "${REPO_KIND}"
+    "${ADMIN_PATH}.migrate/x-reset-subrepo.sh" "${REPO_KIND}"
 
 done
 
