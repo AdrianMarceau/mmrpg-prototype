@@ -88,5 +88,17 @@ $content_types_index['battles'] = array(
         'ssh' => 'git@github.com:AdrianMarceau/mmrpg-prototype_battles.git'
         )
     );
+$content_types_index['pages'] = array(
+    'token' => 'page',
+    'xtoken' => 'pages',
+    'object_class' => 'cms_website_page',
+    'database_table' => 'mmrpg_website_pages',
+    'content_path' => 'content/pages/',
+    'github_repo' => array(
+        'name' => 'mmrpg-prototype_pages',
+        'http' => 'https://github.com/AdrianMarceau/mmrpg-prototype_pages.git',
+        'ssh' => 'git@github.com:AdrianMarceau/mmrpg-prototype_pages.git'
+        )
+    );
 
 ?>

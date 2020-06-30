@@ -95,6 +95,8 @@ require($setup_dir.'_content-types-index.php');
 // Loop through the content types one-by-one to check for JSON files
 foreach ($content_types_index AS $content_key => $content_info){
 
+    if ($content_key === 'pages'){ ob_echo('NOT READY FOR PAGES YET!'); ob_echo(''); continue; }
+
     // Collect refs to the content type tokens, table, etc.
     $ctype_token = $content_info['token'];
     $ctype_xtoken = $content_info['xtoken'];
