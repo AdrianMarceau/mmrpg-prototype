@@ -10,27 +10,3 @@
 [submodule ".libs/minify"]
 	path = .libs/minify
 	url = https://github.com/matthiasmullie/minify.git
-[submodule "content/types"]
-	path = content/types
-	url = git@github.com:AdrianMarceau/mmrpg-prototype_types.git
-[submodule "content/players"]
-	path = content/players
-	url = git@github.com:AdrianMarceau/mmrpg-prototype_players.git
-[submodule "content/robots"]
-	path = content/robots
-	url = git@github.com:AdrianMarceau/mmrpg-prototype_robots.git
-[submodule "content/abilities"]
-	path = content/abilities
-	url = git@github.com:AdrianMarceau/mmrpg-prototype_abilities.git
-[submodule "content/items"]
-	path = content/items
-	url = git@github.com:AdrianMarceau/mmrpg-prototype_items.git
-[submodule "content/fields"]
-	path = content/fields
-	url = git@github.com:AdrianMarceau/mmrpg-prototype_fields.git
-[submodule "content/battles"]
-	path = content/battles
-	url = git@github.com:AdrianMarceau/mmrpg-prototype_battles.git
-[submodule "content/pages"]
-	path = content/pages
-	url = git@github.com:AdrianMarceau/mmrpg-prototype_pages.git
