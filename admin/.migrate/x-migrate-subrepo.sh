@@ -2,7 +2,10 @@
 
 source "$(dirname "$0")/x-common.sh"
 
-REPO_PATH="${BASE_PATH}content/${1}/"
+if [ "${REPO_PATHS[$1]}" == "" ]; then echo "Invalid content type '${1}'!"; exit; fi
+
+REPO_DIR="${REPO_PATHS[$1]}"
+REPO_PATH="${BASE_PATH}content/${REPO_DIR}/"
 
 if test -d  "${REPO_PATH}"; then
 

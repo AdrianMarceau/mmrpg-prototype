@@ -4,6 +4,18 @@
 $content_types_index = array();
 
 // Populate the content type index with names, paths, git URLs, etc.
+$content_types_index['sql'] = array(
+    'token' => 'sql',
+    'xtoken' => false,
+    'object_class' => false,
+    'database_table' => false,
+    'content_path' => '.sql/',
+    'github_repo' => array(
+        'name' => 'mmrpg-prototype_sql',
+        'http' => 'https://github.com/AdrianMarceau/mmrpg-prototype_sql.git',
+        'ssh' => 'git@github.com:AdrianMarceau/mmrpg-prototype_sql.git'
+        )
+    );
 $content_types_index['types'] = array(
     'token' => 'type',
     'xtoken' => 'types',
@@ -86,18 +98,6 @@ $content_types_index['battles'] = array(
         'name' => 'mmrpg-prototype_battles',
         'http' => 'https://github.com/AdrianMarceau/mmrpg-prototype_battles.git',
         'ssh' => 'git@github.com:AdrianMarceau/mmrpg-prototype_battles.git'
-        )
-    );
-$content_types_index['pages'] = array(
-    'token' => 'page',
-    'xtoken' => 'pages',
-    'object_class' => 'cms_website_page',
-    'database_table' => 'mmrpg_website_pages',
-    'content_path' => 'pages/',
-    'github_repo' => array(
-        'name' => 'mmrpg-prototype_pages',
-        'http' => 'https://github.com/AdrianMarceau/mmrpg-prototype_pages.git',
-        'ssh' => 'git@github.com:AdrianMarceau/mmrpg-prototype_pages.git'
         )
     );
 

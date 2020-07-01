@@ -23,7 +23,7 @@ require($migrate_dir.'migrate-objects_xfunctions.php');
 
 // Proceed based on the KIND of object we're migrating
 $allowed_modes = array('full', 'update');
-$allowed_migration_kinds = array('abilities', 'battles', 'fields', 'items', 'players', 'robots', 'types', 'pages');
+$allowed_migration_kinds = array('abilities', 'battles', 'fields', 'items', 'players', 'robots', 'types', 'sql');
 $migration_kind = !empty($_REQUEST['kind']) && in_array($_REQUEST['kind'], $allowed_migration_kinds) ? trim($_REQUEST['kind']) : false;
 $migration_limit = !empty($_REQUEST['limit']) && is_numeric($_REQUEST['limit']) && $_REQUEST['limit'] > 0 ? (int)(trim($_REQUEST['limit'])) : 0;
 $migration_filter = !empty($_REQUEST['filter']) && is_string($_REQUEST['filter']) ? explode(',', strtolower(trim($_REQUEST['filter']))) : array();
