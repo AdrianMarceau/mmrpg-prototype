@@ -13,11 +13,28 @@ if test -d  "${REPO_PATH}"; then
     git add .
     git reset
 
+    echo "DONE!"
+    echo ""
+
 else
 
     echo "Unable to migrate objects to new directories!"
     echo "${REPO_PATH} does not exist!"
+
+    echo -n "Create the new directory right now? (yes/no): "
+    read answer
+
+    if [ $answer == "yes" ]; then
+        mkdir "${REPO_PATH}"
+        echo "New directory created!"
+        echo "Cloning mmrpg-prototype_${1}.git into the new directory..."
+        git clone "${GITHUB_BASE}mmrpg-prototype_${1}.git" "${REPO_PATH}"
+        echo "Clone successful!  Restarting migration script..."
+        exec "${ADMIN_PATH}/.migrate/x-migrate-subrepo.sh" "${1}"
+    else
+        echo "FAILED!"
+    fi
+
     echo ""
-    echo "FAILED!"
 
 fi
