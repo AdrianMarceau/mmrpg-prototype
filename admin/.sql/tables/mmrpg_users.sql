@@ -7,6 +7,7 @@
 CREATE TABLE IF NOT EXISTS `mmrpg_users` (
   `user_id` mediumint(8) NOT NULL AUTO_INCREMENT COMMENT 'User ID',
   `role_id` mediumint(8) NOT NULL DEFAULT '3' COMMENT 'Role ID',
+  `contributor_id` mediumint(8) NOT NULL DEFAULT '0' COMMENT 'Contributor ID',
   `user_name` varchar(128) NOT NULL COMMENT 'User Name',
   `user_name_clean` varchar(128) NOT NULL COMMENT 'User Name Clean',
   `user_name_public` varchar(128) NOT NULL COMMENT 'User Name Public',
@@ -44,7 +45,8 @@ CREATE TABLE IF NOT EXISTS `mmrpg_users` (
   KEY `user_flag_postpublic` (`user_flag_postpublic`),
   KEY `user_flag_postprivate` (`user_flag_postprivate`),
   KEY `user_flag_allowchat` (`user_flag_allowchat`),
-  KEY `role_id` (`role_id`)
+  KEY `role_id` (`role_id`),
+  KEY `contributor_id` (`contributor_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
