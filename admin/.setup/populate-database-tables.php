@@ -210,6 +210,18 @@ foreach ($content_types_index AS $content_key => $content_info){
 ob_echo('----------------------------');
 ob_echo('');
 
+
+// -- POST-MIGRATION SETUP QUERIES -- //
+
+ob_echo('POST-MIGRATION SETUP QUERIES:');
+ob_echo('');
+
+ob_echo('Updating global config value for `image_editor_id_field` to "contributor_id"...');
+$db->update('mmrpg_config', array('config_value' => 'contributor_id'), array('config_group' => 'global', 'config_name' => 'image_editor_id_field'));
+
+ob_echo('----------------------------');
+ob_echo('');
+
 ob_echo('...Done!');
 ob_echo('');
 
