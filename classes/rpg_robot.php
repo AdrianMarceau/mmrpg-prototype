@@ -3555,12 +3555,21 @@ class rpg_robot extends rpg_object {
                         if (!empty($robot_info['robot_image_editor2'])){ $editor_ids[] = $robot_info['robot_image_editor2']; }
                         if (!empty($editor_ids)){
                             $editor_ids_string = implode(', ', $editor_ids);
-                            $temp_editor_details = $db->get_array_list("SELECT
-                                user_name, user_name_public, user_name_clean
-                                FROM mmrpg_users
-                                WHERE user_id IN ({$editor_ids_string})
-                                ORDER BY FIELD(user_id, {$editor_ids_string})
-                                ;", 'user_name_clean');
+                            if (MMRPG_CONFIG_IMAGE_EDITOR_ID_FIELD === 'user_id'){
+                                $temp_editor_details = $db->get_array_list("SELECT
+                                    user_name, user_name_public, user_name_clean
+                                    FROM mmrpg_users
+                                    WHERE user_id IN ({$editor_ids_string})
+                                    ORDER BY FIELD(user_id, {$editor_ids_string})
+                                    ;", 'user_name_clean');
+                            } elseif (MMRPG_CONFIG_IMAGE_EDITOR_ID_FIELD === 'contributor_id'){
+                                $temp_editor_details = $db->get_array_list("SELECT
+                                    user_name, user_name_public, user_name_clean
+                                    FROM mmrpg_users_contributors
+                                    WHERE contributor_id IN ({$editor_ids_string})
+                                    ORDER BY FIELD(contributor_id, {$editor_ids_string})
+                                    ;", 'user_name_clean');
+                            }
                             $temp_editor_titles = array();
                             foreach ($temp_editor_details AS $editor_url => $editor_info){
                                 $editor_name = !empty($editor_info['user_name_public']) ? $editor_info['user_name_public'] : $editor_info['user_name'];

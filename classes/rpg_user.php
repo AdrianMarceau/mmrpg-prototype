@@ -157,7 +157,8 @@ class rpg_user {
             'user_credit_text',
             'user_website_address',
             'user_date_created',
-            'user_date_modified'
+            'user_date_modified',
+            'contributor_flag_showcredits'
             );
 
         // Add table name to each field string if requested
