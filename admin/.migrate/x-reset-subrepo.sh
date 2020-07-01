@@ -2,90 +2,68 @@
 
 source "$(dirname "$0")/x-common.sh"
 
-SUBREPO_PATH="${BASE_PATH}content/${1}/"
-SUBREPO_BRANCH="master"
+REPO_PATH="${BASE_PATH}content/${1}/"
+REPO_GIT=".git/"
+REPO_CONFIG="${REPO_GIT}config"
+TEMP_CONFIG="$(mktemp)"
 
-TEMP_SUBREPO_PATH="$(mktemp -d)"
-TEMP_CONFIG_PATH="$(mktemp)"
-
-echo ""
 echo "=================================="
 echo "-- FACTORY RESET ${1^^} SUBREPO --"
 echo "=================================="
 echo ""
 
-if test -d  "${SUBREPO_PATH}"; then
+if test -d  "${REPO_PATH}"; then
 
-    echo "Checking out temp copy of sub-repo into separate path ${TEMP_SUBREPO_PATH} ..."
-    echo ""
-    git clone "${GITHUB_BASE}mmrpg-prototype_${1}.git" "${TEMP_SUBREPO_PATH}"
+    if test -f  "${REPO_PATH}${REPO_CONFIG}"; then
 
-    echo "Making a copy of the temp sub-repo config before deleting ..."
-    echo ""
-    cp "${TEMP_SUBREPO_PATH}/.git/config" "${TEMP_CONFIG_PATH}"
+        echo "Switching to the ${REPO_PATH} sub-repo ..."
+        echo ""
+        cd "${REPO_PATH}"
 
-    echo "Deleting the temp sub-repo directory and recreating as an empty one ..."
-    echo ""
-    rm -rf "${TEMP_SUBREPO_PATH}"
-    mkdir "${TEMP_SUBREPO_PATH}"
+        echo "Copying ${REPO_CONFIG} to ${TEMP_CONFIG} ..."
+        echo ""
+        rm -f "${TEMP_CONFIG}"
+        cp "${REPO_CONFIG}" "${TEMP_CONFIG}"
 
-    echo "Changing to the new empty sub-repo directory ..."
-    echo ""
-    cd "${TEMP_SUBREPO_PATH}"
+        echo "Deleting old ${REPO_GIT} directory ...";
+        echo ""
+        rm -rf "${REPO_GIT}"
 
-    echo "Copying over all folders from actual sub-repo into the temp sub-repo directory ..."
-    echo ""
-    cp -a "${SUBREPO_PATH}/." "${TEMP_SUBREPO_PATH}/"
-    rm -rf "${TEMP_SUBREPO_PATH}/.git"
-    ls -la "${TEMP_SUBREPO_PATH}"
+        echo "Initializing new ${REPO_GIT} directory ..."
+        echo ""
+        git init
 
-    echo "Initializing .git in the new sub-repo directory w/ copied files ..."
-    echo ""
-    git init
+        echo ""
+        echo "Copying ${TEMP_CONFIG} back to ${REPO_CONFIG} ..."
+        echo ""
+        rm -f "${REPO_CONFIG}"
+        cp "${TEMP_CONFIG}" "${REPO_CONFIG}"
 
-    echo ""
-    echo "Copying the temp config file back into temp sub-repo directory ..."
-    echo ""
-    rm -f "${TEMP_SUBREPO_PATH}/.git/config"
-    cp "${TEMP_CONFIG_PATH}" "${TEMP_SUBREPO_PATH}/.git/config"
+        echo "Re-adding all changes and commiting ...";
+        echo ""
+        git add .
+        git commit -m "Initial commit"
 
-    echo "Adding all copied files and directories and commiting ...";
-    echo ""
-    git add .
-    git commit -m "Initial commit"
+        echo "Force-push the changes as if first commit ..."
+        echo ""
+        git push -u --force origin master
 
-    echo "Force-pushing the changes as this was the first commit ..."
-    echo ""
-    git push -u --force origin "${SUBREPO_BRANCH}"
+        echo ""
+        echo "DONE!"
 
-    echo "Changing back to actual sub-repo directory ..."
-    echo ""
-    cd "${SUBREPO_PATH}"
+        start chrome "${GITHUB_BASE}mmrpg-prototype_${1}.git"
 
-    echo "Resetting all the unstaged changes and removing untracked files ..."
-    echo ""
-    git checkout .
-    git clean -fd
+    else
 
-    echo "Pulling down changes that were recently pushed from the temp sub-repo ..."
-    echo ""
-    git fetch --all
-    git reset --hard "origin/${SUBREPO_BRANCH}"
+        echo "${REPO_PATH}${REPO_CONFIG} does not exist!"
+        echo ""
+        echo "FAILED!"
 
-    echo ""
-    echo "Cleaning up temporary directories and files ..."
-    echo ""
-    rm -rf "${TEMP_SUBREPO_PATH}"
-    rm -rf "${TEMP_CONFIG_PATH}"
-
-    echo ""
-    echo "DONE!"
-
-    start chrome "${GITHUB_BASE}mmrpg-prototype_${1}.git"
+    fi
 
 else
 
-    echo "${SUBREPO_PATH} does not exist!"
+    echo "${REPO_PATH} does not exist!"
     echo ""
     echo "FAILED!"
 
