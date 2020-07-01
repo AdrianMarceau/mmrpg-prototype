@@ -32,6 +32,7 @@ class rpg_user {
         $user_fields = array(
             'user_id',
             'role_id',
+            'contributor_id',
             'user_name',
             'user_name_clean',
             'user_name_public',
@@ -130,6 +131,49 @@ class rpg_user {
 
         // Return the table fields, array or string
         return $save_fields;
+
+    }
+
+    /**
+     * Get a list of all user contributor fields as an array or, optionally, imploded into a string
+     * @param bool $implode
+     * @param string $table (optional)
+     * @return mixed
+     */
+    public static function get_contributor_index_fields($implode = false, $table = ''){
+
+        // Define the various table fields for user objects
+        $contributor_fields = array(
+            'contributor_id',
+            'role_id',
+            'user_name',
+            'user_name_clean',
+            'user_name_public',
+            'user_gender',
+            'user_colour_token',
+            'user_image_path',
+            'user_background_path',
+            'user_credit_line',
+            'user_credit_text',
+            'user_website_address',
+            'user_date_created',
+            'user_date_modified'
+            );
+
+        // Add table name to each field string if requested
+        if (!empty($table)){
+            foreach ($contributor_fields AS $key => $field){
+                $contributor_fields[$key] = $table.'.'.$field;
+            }
+        }
+
+        // Implode the table fields into a string if requested
+        if ($implode){
+            $contributor_fields = implode(', ', $contributor_fields);
+        }
+
+        // Return the table fields, array or string
+        return $contributor_fields;
 
     }
 

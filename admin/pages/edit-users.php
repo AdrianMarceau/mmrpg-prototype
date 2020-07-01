@@ -15,6 +15,9 @@
     $mmrpg_roles_fields = rpg_user_role::get_index_fields(true);
     $mmrpg_roles_index = $db->get_array_list("SELECT {$mmrpg_roles_fields} FROM mmrpg_roles WHERE role_level <> 0 ORDER BY role_level ASC", 'role_id');
 
+    // Collect an index of user contributors for options
+    $mmrpg_contributors_fields = rpg_user::get_contributor_index_fields(true);
+    $mmrpg_contributors_index = $db->get_array_list("SELECT {$mmrpg_contributors_fields} FROM mmrpg_users_contributors ORDER BY user_date_created ASC", 'contributor_id');
 
     /* -- Form Setup Actions -- */
 
@@ -247,6 +250,7 @@
 
             $form_data['user_id'] = !empty($_POST['user_id']) && is_numeric($_POST['user_id']) ? trim($_POST['user_id']) : 0;
             $form_data['role_id'] = !empty($_POST['role_id']) && is_numeric($_POST['role_id']) ? trim($_POST['role_id']) : 0;
+            $form_data['contributor_id'] = !empty($_POST['contributor_id']) && (is_numeric($_POST['contributor_id']) || $_POST['contributor_id'] === 'new') ? trim($_POST['contributor_id']) : 0;
 
             $form_data['user_name_clean'] = !empty($_POST['user_name_clean']) && preg_match('/^[-_0-9a-z\.\*]+$/i', $_POST['user_name_clean']) ? trim(strtolower($_POST['user_name_clean'])) : '';
             $form_data['user_name'] = !empty($_POST['user_name']) && preg_match('/^[-_0-9a-z\.\*]+$/i', $_POST['user_name']) ? trim($_POST['user_name']) : '';
@@ -430,11 +434,25 @@
                 $form_data['user_website_address'] = $website;
             }
 
+            // If a NEW contributor ID was requested, create the temp row and collect the ID
+            if ($form_data['contributor_id'] === 'new'){
+                $db->insert('mmrpg_users_contributors', array('user_name_clean' => $form_data['user_name_clean']));
+                $form_data['contributor_id'] = $db->get_value("SELECT contributor_id FROM mmrpg_users_contributors WHERE user_name_clean = '{$form_data['user_name_clean']}';", 'contributor_id');
+            }
+
             // Loop through fields to create an update string
             $update_data = $form_data;
             $update_data['user_date_modified'] = time();
             unset($update_data['user_id']);
             $update_results = $db->update('mmrpg_users', $update_data, array('user_id' => $form_data['user_id']));
+
+            // If this user has a non-zero contributor ID assigned, export relevant data to the other table
+            if (!empty($form_data['contributor_id'])){
+                $temp_export_data = array();
+                $temp_export_fields = rpg_user::get_contributor_index_fields(false);
+                foreach ($temp_export_fields AS $f){ if ($f === 'contributor_id'){ continue; } else { $temp_export_data[$f] = $update_data[$f]; } }
+                $db->update('mmrpg_users_contributors', $temp_export_data, array('contributor_id' => $form_data['contributor_id']));
+            }
 
             // DEBUG
             //$form_messages[] = array('alert', '<pre>$form_data = '.print_r($form_data, true).'</pre>');
@@ -829,22 +847,51 @@
 
                     <hr />
 
-                    <div class="field fullsize">
+                    <div class="field">
                         <div class="label">
-                            <strong>Credit Line</strong>
-                            <em>public, displayed on credits page</em>
+                            <strong>Contributor Profile</strong>
+                            <em>export changes to this credits page profile</em>
                         </div>
-                        <strong class="label"></strong>
-                        <input class="textbox" type="text" name="user_credit_line" value="<?= htmlentities($user_data['user_credit_line'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="32" />
+                        <select class="select" name="contributor_id">
+                            <option value="0"<?= empty($user_data['contributor_id']) ? 'selected="selected"' : '' ?>>- none -</option>
+                            <option disabled="disabled">----------</option>
+                            <?
+                            $last_opt_group = '';
+                            foreach ($mmrpg_contributors_index AS $contributor_id => $contributor_data){
+                                $opt_group = 'Joined '.date('Y', $contributor_data['user_date_created']);
+                                if (empty($last_opt_group) || $last_opt_group !== $opt_group){ echo(!empty($last_opt_group) ? '</optgroup>' : ''); echo('<optgroup label="'.$opt_group.'">'); $last_opt_group = $opt_group; }
+                                $label = (!empty($contributor_data['user_name_public']) ? $contributor_data['user_name_public'].' / ' : '').$contributor_data['user_name'];
+                                if (strtolower($contributor_data['user_name']) !== $contributor_data['user_name_clean']){ $label .= ' / '.$contributor_data['user_name_clean']; }
+                                $selected = !empty($user_data['contributor_id']) && $user_data['contributor_id'] == $contributor_id ? 'selected="selected"' : '';
+                                echo('<option value="'.$contributor_id.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                            }
+                            echo(!empty($last_opt_group) ? '</optgroup>' : '');
+                            ?>
+                            <option disabled="disabled">----------</option>
+                            <option value="new">&laquo; New Profile &raquo;</option>
+                        </select><span></span>
                     </div>
 
-                    <div class="field fullsize">
-                        <div class="label">
-                            <strong>Credit Text</strong>
-                            <em>public, displayed on credits page</em>
+                    <? if (!empty($user_data['contributor_id'])){ ?>
+
+                        <div class="field fullsize">
+                            <div class="label">
+                                <strong>Contributor Credit Line</strong>
+                                <em>public, displayed on credits page profile</em>
+                            </div>
+                            <strong class="label"></strong>
+                            <input class="textbox" type="text" name="user_credit_line" value="<?= htmlentities($user_data['user_credit_line'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="32" />
                         </div>
-                        <textarea class="textarea" name="user_credit_text" rows="10"><?= htmlentities($user_data['user_credit_text'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
-                    </div>
+
+                        <div class="field fullsize">
+                            <div class="label">
+                                <strong>Contributor Credit Text</strong>
+                                <em>public, displayed on credits page profile</em>
+                            </div>
+                            <textarea class="textarea" name="user_credit_text" rows="10"><?= htmlentities($user_data['user_credit_text'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                        </div>
+
+                    <? } ?>
 
                     <hr />
 
