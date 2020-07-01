@@ -181,4 +181,11 @@ if (!defined('MMRPG_CONFIG_LAST_SAVE_DATE')){
     //exit();
 }
 
+// Define the meaning of image editor IDs (changes from 'user_id' to 'contributor_id' post 2020 migration)
+if (!defined('MMRPG_CONFIG_IMAGE_EDITOR_ID_FIELD')){
+    $editor_id_meaning = $db->table_exists('mmrpg_config') ? $db->get_value("SELECT config_value FROM mmrpg_config WHERE config_group = 'global' && config_name = 'image_editor_id_field';", 'config_value') : false;
+    if (!empty($editor_id_meaning)){ define('MMRPG_CONFIG_IMAGE_EDITOR_ID_FIELD', $editor_id_meaning); }
+    else { define('MMRPG_CONFIG_IMAGE_EDITOR_ID_FIELD', 'user_id'); }
+}
+
 ?>
