@@ -450,7 +450,8 @@
             if (!empty($form_data['contributor_id'])){
                 $temp_export_data = array();
                 $temp_export_fields = rpg_user::get_contributor_index_fields(false);
-                foreach ($temp_export_fields AS $f){ if ($f === 'contributor_id'){ continue; } else { $temp_export_data[$f] = $update_data[$f]; } }
+                foreach ($temp_export_fields AS $f){ if ($f === 'contributor_id' || !isset($update_data[$f])){ continue; } else { $temp_export_data[$f] = $update_data[$f]; } }
+                $temp_export_data['contributor_flag_showcredits'] = !empty($_REQUEST['contributor_flag_showcredits']) ? 1 : 0;
                 $db->update('mmrpg_users_contributors', $temp_export_data, array('contributor_id' => $form_data['contributor_id']));
             }
 
@@ -874,6 +875,12 @@
 
                     <? if (!empty($user_data['contributor_id'])){ ?>
 
+                        <?
+                        // Pull contributor data for this user in case we need it
+                        $contributor_fields = rpg_user::get_contributor_index_fields(true);
+                        $contributor_data = $db->get_array("SELECT {$contributor_fields} FROM mmrpg_users_contributors WHERE contributor_id = {$user_data['contributor_id']};");
+                        ?>
+
                         <div class="field fullsize">
                             <div class="label">
                                 <strong>Contributor Credit Line</strong>
@@ -889,6 +896,19 @@
                                 <em>public, displayed on credits page profile</em>
                             </div>
                             <textarea class="textarea" name="user_credit_text" rows="10"><?= htmlentities($user_data['user_credit_text'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                        </div>
+
+                        <div class="options">
+
+                            <div class="field checkwrap rfloat">
+                                <label class="label">
+                                    <strong>Active Contributor</strong>
+                                    <input type="hidden" name="contributor_flag_showcredits" value="0" checked="checked" />
+                                    <input class="checkbox" type="checkbox" name="contributor_flag_showcredits" value="1" <?= !empty($contributor_data['contributor_flag_showcredits']) ? 'checked="checked"' : '' ?> />
+                                </label>
+                                <p class="subtext">Show user on the credits page</p>
+                            </div>
+
                         </div>
 
                     <? } ?>

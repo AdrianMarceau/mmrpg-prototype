@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS `mmrpg_users_contributors` (
   `user_website_address` varchar(255) NOT NULL COMMENT 'User Website Address',
   `user_date_created` int(8) NOT NULL DEFAULT '0' COMMENT 'User Date Created',
   `user_date_modified` int(8) NOT NULL DEFAULT '0' COMMENT 'User Date Modified',
+  `contributor_flag_showcredits` smallint(1) NOT NULL DEFAULT '1' COMMENT 'Contributor Flag Show Credits',
   PRIMARY KEY (`contributor_id`),
   KEY `user_id` (`user_id`),
   KEY `role_id` (`role_id`),
