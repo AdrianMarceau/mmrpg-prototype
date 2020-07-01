@@ -17,7 +17,8 @@ if (defined('MMRPG_CONFIG_IS_LIVE') && MMRPG_CONFIG_IS_LIVE === true){
 ob_implicit_flush(true);
 ob_start();
 
-// Require the function definitions needed for migration stuff
+// Require the data + function definitions needed for migration stuff
+require($migrate_dir.'migrate-objects_xcommon.php');
 require($migrate_dir.'migrate-objects_xfunctions.php');
 
 // Proceed based on the KIND of object we're migrating
