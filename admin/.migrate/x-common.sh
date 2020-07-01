@@ -14,4 +14,5 @@ declare -a REPO_KINDS=(
     "abilities"
     "items"
     "fields"
+    "pages"
     )
