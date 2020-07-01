@@ -8,6 +8,7 @@ SUBREPO_BRANCH="master"
 TEMP_SUBREPO_PATH="$(mktemp -d)"
 TEMP_CONFIG_PATH="$(mktemp)"
 
+echo ""
 echo "=================================="
 echo "-- FACTORY RESET ${1^^} SUBREPO --"
 echo "=================================="
@@ -32,7 +33,13 @@ if test -d  "${SUBREPO_PATH}"; then
     echo ""
     cd "${TEMP_SUBREPO_PATH}"
 
-    echo "Initializing .git in the new empty sub-repo directory ..."
+    echo "Copying over all folders from actual sub-repo into the temp sub-repo directory ..."
+    echo ""
+    cp -a "${SUBREPO_PATH}/." "${TEMP_SUBREPO_PATH}/"
+    rm -rf "${TEMP_SUBREPO_PATH}/.git"
+    ls -la "${TEMP_SUBREPO_PATH}"
+
+    echo "Initializing .git in the new sub-repo directory w/ copied files ..."
     echo ""
     git init
 
@@ -41,11 +48,6 @@ if test -d  "${SUBREPO_PATH}"; then
     echo ""
     rm -f "${TEMP_SUBREPO_PATH}/.git/config"
     cp "${TEMP_CONFIG_PATH}" "${TEMP_SUBREPO_PATH}/.git/config"
-
-    echo "Copying over all folders from actual sub-repo into the temp sub-repo directory ..."
-    echo ""
-    find "${SUBREPO_PATH}" -type d ! -name .git ! -name pages -exec cp -rt "${TEMP_SUBREPO_PATH}" {} +
-    cp "${SUBREPO_PATH}README.md" "${TEMP_SUBREPO_PATH}/README.md"
 
     echo "Adding all copied files and directories and commiting ...";
     echo ""
