@@ -384,6 +384,28 @@ class cms_database {
         }
     }
 
+    // Define a function for generating a bulk insert SQL
+    public function get_bulk_insert_sql($table_name, $insert_rows){
+        if (empty($table_name)){ return false; }
+        if (empty($insert_rows)){ return false; }
+        $insert_rows = array_values($insert_rows);
+        $bulk_insert_sql = '';
+        $bulk_insert_sql .= 'INSERT INTO `'.$table_name.'` (`'.implode('`, `', array_keys($insert_rows[0])).'`) VALUES'.PHP_EOL;
+        foreach ($insert_rows AS $row_key => $row_data){
+            if ($row_key > 0){ $bulk_insert_sql .= ','.PHP_EOL; }
+            $values = array();
+            foreach ($row_data AS $fkey => $fval){
+                $sanitized_fval = $fval;
+                $sanitized_fval = str_replace("'", "\\'", $sanitized_fval);
+                $sanitized_fval = str_replace(PHP_EOL, '\\r\\n', $sanitized_fval);
+                $values[] = is_numeric($fval) ? $fval : "'".$sanitized_fval."'";
+            }
+            $bulk_insert_sql .= '  ('.implode(', ', $values).')';
+        }
+        $bulk_insert_sql .= PHP_EOL.'  ;';
+        return $bulk_insert_sql;
+    }
+
     // Define a function for updating a record in the database
     public function update($table_name, $update_data, $condition_data){
         // Ensure proper data types have been received
