@@ -350,19 +350,11 @@
             if ($update_results !== false){ $form_messages[] = array('success', 'Page details were updated successfully'); }
             else { $form_messages[] = array('error', 'Page details could not be updated'); }
 
-            // If successful, we need to update the JSON file
+            // If successful, we need to update the table data export
             if ($form_success){
-                // Calculate the data file path and then write to the new/recreated file
-                $content_json_path = MMRPG_CONFIG_PAGES_CONTENT_PATH.str_replace('/', '_', trim($update_data['page_url'], '/')).'/data.json';
-                if (file_exists($content_json_path)){ unlink($content_json_path); }
-                $temp_parent_token = !empty($update_data['parent_id']) ? $mmrpg_website_pages_index[$update_data['parent_id']]['page_token'] : '';
-                $temp_parent_data = array('parent_token' => $temp_parent_token);
-                $content_json_data = array_merge($temp_parent_data, $page_data, $update_data);
-                unset($content_json_data['page_id']);
-                unset($content_json_data['parent_id']);
-                $h = fopen($content_json_path, 'w');
-                fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
-                fclose($h);
+
+                // TODO
+
             }
 
             // We're done processing the form, we can exit
