@@ -52,11 +52,25 @@ $temp_admin_list = array();
 define('MMRPG_CONFIG_ADMIN_LIST', implode(',', $temp_admin_list));
 
 // Define the list of back-end permissions given user IDs
-$temp_admin_perms_list = array();
+$temp_admin_perms_list = array(
+    1, // mmrpg_developer
+    2, // mmrpg_admin
+    3, // mmrpg_contributor
+    4  // mmrpg_moderator
+    );
 define('MMRPG_CONFIG_ADMIN_PERMS_LIST', json_encode($temp_admin_perms_list));
 
 // Define the list of BANNED remote addresses that cannot access site
-$temp_banned_list = array();
+$temp_banned_list = array(
+    // mmrpg_developer
+    1 => array('*'),
+    // mmrpg_admin
+    2 => array('edit-pages', 'edit-users', 'edit-players', 'edit-robots', 'edit-fields', 'edit-challenges', 'edit-stars', 'delete-cached-files'),
+    // mmrpg_contributor
+    3 => array('edit-players', 'edit-robots', 'edit-fields'),
+    // mmrpg_moderator
+    4 => array('edit-users')
+    );
 define('MMRPG_CONFIG_BANNED_LIST', implode(',', $temp_banned_list));
 
 ?>
