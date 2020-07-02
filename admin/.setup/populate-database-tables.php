@@ -110,7 +110,7 @@ foreach ($content_types_index AS $content_key => $content_info){
     $parent_token_field_name = 'parent_token';
 
     // Collect a list of all the seed data for the database tables
-    $json_data_dir = MMRPG_BASE_CONTENT_DIR.$content_info['content_path'];
+    $json_data_dir = MMRPG_CONFIG_CONTENT_PATH.$content_info['content_path'];
     $json_data_dirs = scandir($json_data_dir);
     $json_data_dirs = array_filter($json_data_dirs, function($d) use($json_data_dir){ if ($d !== '.' && $d !== '..' && file_exists($json_data_dir.$d.'/data.json')){ return true; } else { return false; } });
 
