@@ -216,8 +216,14 @@ ob_echo('');
 ob_echo('POST-MIGRATION SETUP QUERIES:');
 ob_echo('');
 
-ob_echo('Updating global config value for `image_editor_id_field` to "contributor_id"...');
+ob_echo('Updating global config value for `image_editor_id_field` to "contributor_id" ...');
 $db->update('mmrpg_config', array('config_value' => 'contributor_id'), array('config_group' => 'global', 'config_name' => 'image_editor_id_field'));
+ob_echo('');
+
+ob_echo('Updating global config values for `cache_date` and  `cache_time` to right now ...');
+$db->update('mmrpg_config', array('config_value' => date('Ymd')), array('config_group' => 'global', 'config_name' => 'cache_date'));
+$db->update('mmrpg_config', array('config_value' => date('Hi')), array('config_group' => 'global', 'config_name' => 'cache_time'));
+ob_echo('');
 
 ob_echo('----------------------------');
 ob_echo('');
