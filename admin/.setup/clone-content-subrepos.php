@@ -81,11 +81,8 @@ if (!empty($clone_kind)){
 
     sleep(1);
     ob_echo('');
-    if ($clone_kind === 'all'){ $subtitle =('|  ALL CLONES COMPLETE  |'); }
-    else { $subtitle = ('|  '.strtoupper($clone_kind).' CLONE COMPLETE  |'); }
-    ob_echo(str_repeat('=', strlen($subtitle)));
-    ob_echo($subtitle);
-    ob_echo(str_repeat('=', strlen($subtitle)));
+    ob_echo('...Done!');
+    ob_echo('');
 
 } elseif (!empty($clone_kind)) {
 

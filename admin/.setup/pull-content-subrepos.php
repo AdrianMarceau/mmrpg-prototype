@@ -87,11 +87,8 @@ if (!empty($pull_kind)){
 
     sleep(1);
     ob_echo('');
-    if ($pull_kind === 'all'){ $subtitle =('|  ALL PULLS COMPLETE  |'); }
-    else { $subtitle = ('|  '.strtoupper($pull_kind).' PULL COMPLETE  |'); }
-    ob_echo(str_repeat('=', strlen($subtitle)));
-    ob_echo($subtitle);
-    ob_echo(str_repeat('=', strlen($subtitle)));
+    ob_echo('...Done!');
+    ob_echo('');
 
 } elseif (!empty($pull_kind)) {
 

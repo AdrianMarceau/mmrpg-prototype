@@ -68,6 +68,8 @@ if (!empty($table_sql_files)){
         ob_echo($echo_text);
     }
     ob_echo('');
+    ob_echo('...Done!');
+    ob_echo('');
 
 } else {
 
@@ -76,9 +78,6 @@ if (!empty($table_sql_files)){
     ob_echo('');
 
 }
-
-ob_echo('...Done!');
-ob_echo('');
 
 exit();
 
