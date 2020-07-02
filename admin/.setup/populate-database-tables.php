@@ -46,7 +46,7 @@ ob_echo('IMPORT SQL FILES:');
 ob_echo('');
 
 // Collect a list of all the seed data for the database tables
-$sql_data_dir = MMRPG_CONFIG_ROOTDIR.'admin/.sql/data/';
+$sql_data_dir = MMRPG_CONFIG_SQL_CONTENT_PATH.'data/';
 $sql_data_files = scandir($sql_data_dir);
 $sql_data_files = array_filter($sql_data_files, function($f){ if ($f !== '.' && $f !== '..' && substr($f, -4, 4) === '.sql'){ return true; } else { return false; } });
 

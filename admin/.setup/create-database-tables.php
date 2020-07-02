@@ -40,7 +40,7 @@ ob_echo('==========================');
 ob_echo('');
 
 // Collect a list of all the database table definitions in the setup directory
-$table_sql_dir = MMRPG_CONFIG_ROOTDIR.'admin/.sql/tables/';
+$table_sql_dir = MMRPG_CONFIG_SQL_CONTENT_PATH.'tables/';
 $table_sql_files = scandir($table_sql_dir);
 $table_sql_files = array_filter($table_sql_files, function($s){ if ($s !== '.' && $s !== '..' && substr($s, -4, 4) === '.sql'){ return true; } else { return false; } });
 

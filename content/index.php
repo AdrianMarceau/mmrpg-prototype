@@ -6,7 +6,7 @@ $content_types_index = array();
 // Populate the content type index with names, paths, git URLs, etc.
 $content_types_index['sql'] = array(
     'token' => 'sql',
-    'xtoken' => false,
+    'xtoken' => 'sql',
     'object_class' => false,
     'database_table' => false,
     'content_path' => '.sql/',
