@@ -9,7 +9,7 @@ $base_dir = dirname(dirname($setup_dir)).'/';
 require($base_dir.'top.php');
 
 // Require the repository index for looping
-require($setup_dir.'_content-types-index.php');
+require(MMRPG_CONFIG_ROOTDIR.'content/index.php');
 
 // Define the header type so it's easier to display stuff
 header('Content-type: text/plain;');

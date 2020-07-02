@@ -1,4 +1,6 @@
 # Ignore everything in this directory
 *
-# Except this file
-!.gitignore
+# Except these files
+!/.gitignore
+!/index.php
+!/index.sh

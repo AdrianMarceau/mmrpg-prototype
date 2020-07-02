@@ -8,6 +8,9 @@ $setup_dir = str_replace('\\', '/', dirname(__FILE__)).'/';
 $base_dir = dirname(dirname($setup_dir)).'/';
 require($base_dir.'top.php');
 
+// Require the repository index for looping
+require(MMRPG_CONFIG_ROOTDIR.'content/index.php');
+
 // Define the header type so it's easier to display stuff
 header('Content-type: text/plain;');
 

@@ -8,6 +8,9 @@ $setup_dir = str_replace('\\', '/', dirname(__FILE__)).'/';
 $base_dir = dirname(dirname($setup_dir)).'/';
 require($base_dir.'top.php');
 
+// Require the repository index for looping
+require(MMRPG_CONFIG_ROOTDIR.'content/index.php');
+
 // Define the header type so it's easier to display stuff
 header('Content-type: text/plain;');
 
@@ -88,9 +91,6 @@ ob_echo('');
 
 ob_echo('IMPORT JSON FILES:');
 ob_echo('');
-
-// Require the content type index for looping
-require($setup_dir.'_content-types-index.php');
 
 // Loop through the content types one-by-one to check for JSON files
 foreach ($content_types_index AS $content_key => $content_info){
