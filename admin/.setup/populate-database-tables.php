@@ -83,7 +83,7 @@ if (!empty($sql_data_files)){
         }
     }
     mmrpg_setup_import_sql_files($sql_data_files, $sql_data_dir);
-    mmrpg_setup_import_sql_files($sample_data_files, $sql_data_dir);
+    mmrpg_setup_import_sql_files($sample_data_files, $sample_data_dir);
     ob_echo('');
 
 } else {
@@ -231,7 +231,7 @@ ob_echo('Updating global config value for `image_editor_id_field` to "contributo
 $db->update('mmrpg_config', array('config_value' => 'contributor_id'), array('config_group' => 'global', 'config_name' => 'image_editor_id_field'));
 ob_echo('');
 
-ob_echo('Updating global config values for `cache_date` and  `cache_time` to right now ...');
+ob_echo('Updating global config values for `cache_date` and `cache_time` to right now ...');
 $db->update('mmrpg_config', array('config_value' => date('Ymd')), array('config_group' => 'global', 'config_name' => 'cache_date'));
 $db->update('mmrpg_config', array('config_value' => date('Hi')), array('config_group' => 'global', 'config_name' => 'cache_time'));
 ob_echo('');

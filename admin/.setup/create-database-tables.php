@@ -56,6 +56,16 @@ if (!empty($table_sql_files)){
     ob_echo('Looping through tables and importing into the database:');
     foreach ($table_sql_files AS $sql_key => $sql_file){
         $table_name = str_replace('.sql', '', $sql_file);
+        // Drop if table already exists
+        if ($db->table_exists($table_name)){
+            $echo_text = '- Dropping existing database table "'.$table_name.'" ... ';
+            $db->query("DROP TABLE {$table_name};");
+            $db->table_list(); // auto-refresh cached table list
+            if (!$db->table_exists($table_name)){ $echo_text .= 'Table dropped!'; }
+            else { $echo_text .= 'Table NOT dropped!'; }
+            ob_echo($echo_text);
+        }
+        // Then import table w/ create file
         $echo_text = '- Importing database table "'.$table_name.'" ... ';
         if (!$db->table_exists($table_name)){
             $db->import_sql_file($table_sql_dir.$sql_file); // attempt to import the file
