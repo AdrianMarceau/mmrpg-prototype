@@ -579,7 +579,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
             <div class="event event_details clearback sticky" style="">
                 <?
                 // Display the scanline layer if enabled
-                if ($debug_flag_scanlines){ echo '<div class="foreground scanlines" style="background-image: url(images/gui/canvas-scanlines.png?'.MMRPG_CONFIG_CACHE_DATE.'); opacity: 1;">&nbsp;</div>'; }
+                if ($debug_flag_scanlines){ echo '<div class="foreground scanlines" style="background-image: url(images/assets/canvas-scanlines.png?'.MMRPG_CONFIG_CACHE_DATE.'); opacity: 1;">&nbsp;</div>'; }
                 ?>
             </div>
 
