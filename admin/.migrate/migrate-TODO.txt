@@ -89,4 +89,6 @@ Manually add REQUIRED /images/ directories to the repo
 -  /images/social-icons_32x32.png
 -  /images/viewer.php
 -
+-  MMRPG-Prototype_COPPA-Compliance.pdf  (MUST UPDATE!)
+-
 -  many many many more
