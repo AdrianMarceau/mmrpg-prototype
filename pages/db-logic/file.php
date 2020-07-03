@@ -279,10 +279,10 @@ while ($this_action == 'profile'){
 
             }
             // Else if the password was too long, error out
-            elseif (strlen($_POST['password_new']) > 18){
+            elseif (strlen($_POST['password_new']) > 32){
 
                 // Update the form messages markup text
-                $html_form_messages .= '<span class="error">(!) The new password was too long - must not be more than 18 characters.</span>';
+                $html_form_messages .= '<span class="error">(!) The new password was too long - must not be more than 32 characters.</span>';
                 $_POST['password_new'] = '';
 
             }
@@ -400,8 +400,8 @@ while ($this_action == 'profile'){
         </div>
 
         <div class="field field_password_new">
-            <label class="label label_password" style="width: auto; ">Change Password : <span style="font-size: 10px; padding-left: 6px; position: relative; bottom: 1px; color: #CACACA;">(6 - 18 chars)</span></label>
-            <input class="text text_password" type="text" name="password_new" value="" maxlength="18" />
+            <label class="label label_password" style="width: auto; ">Change Password : <span style="font-size: 10px; padding-left: 6px; position: relative; bottom: 1px; color: #CACACA;">(6 - 32 chars)</span></label>
+            <input class="text text_password" type="text" name="password_new" value="" maxlength="32" />
         </div>
 
         <? if (!empty($this_userinfo['user_flag_postpublic'])){ ?>
@@ -605,8 +605,8 @@ while ($this_action == 'new'){
             if (empty($_REQUEST['password'])){
                 $html_form_messages .= '<span class="error">(!) The password was not provided.</span>';
                 $html_form_verified = false;
-            } elseif (strlen($_REQUEST['password']) < 6 || strlen($_REQUEST['password']) > 18){
-                $html_form_messages .= '<span class="error">(!) The password must be between 6 and 18 characters.</span>';
+            } elseif (strlen($_REQUEST['password']) < 6 || strlen($_REQUEST['password']) > 32){
+                $html_form_messages .= '<span class="error">(!) The password must be between 6 and 32 characters.</span>';
                 $html_form_verified = false;
             }
             // If not verified, break
@@ -666,7 +666,8 @@ while ($this_action == 'new'){
 
     // Update the form messages with notice text
     if (empty($html_form_messages)){
-        $html_form_messages .= '<span class="help">(!) The Username and Password must be from 6 - 18 characters and can <u>only</u> contain letters and numbers!</span>';
+        $html_form_messages .= '<span class="help">(!) The Username must be between 6 - 18 characters and can <u>only</u> contain letters and numbers!</span>';
+        $html_form_messages .= '<span class="help">(!) The Password must be between 6 - 32 characters and should <u>not</u> contain your username!</span>';
         $html_form_messages .= '<span class="help">(!) The Username you select for this file <u>cannot</u> be changed, so please remember it!</span>';
     }
 
@@ -687,7 +688,7 @@ while ($this_action == 'new'){
     </div>
     <div class="field">
         <label class="label label_password" title="This password is used to store and encypt the data in your save file.  This password is important so please remember it.">Password : *</label>
-        <input class="text text_password" type="text" name="password" style="width: 230px; " value="<?= !empty($_REQUEST['password']) ? htmlentities(trim($_REQUEST['password']), ENT_QUOTES, 'UTF-8', true) : '' ?>" maxlength="18" />
+        <input class="text text_password" type="text" name="password" style="width: 230px; " value="<?= !empty($_REQUEST['password']) ? htmlentities(trim($_REQUEST['password']), ENT_QUOTES, 'UTF-8', true) : '' ?>" maxlength="32" />
     </div>
     <div class="field">
         <label class="label label_captcha" title="Type the security code into the box exactly as you see it below.  This is to ensure you are human and not a spam bot.">Security Code : *</label>
@@ -893,11 +894,11 @@ while ($this_action == 'load'){
     $html_form_fields .= '<input type="hidden" name="return" value="'.(!empty($_REQUEST['return']) ? htmlentities(trim($_REQUEST['return']), ENT_QUOTES, 'UTF-8', true) : '').'" />';
     $html_form_fields .= '<div class="field">';
         $html_form_fields .= '<label class="label label_username" style="width: 230px; ">Username : </label>';
-        $html_form_fields .= '<input class="text text_username" type="text" name="username" style="width: 330px; " value="'.(!empty($_REQUEST['username']) ? htmlentities(trim($_REQUEST['username']), ENT_QUOTES, 'UTF-8', true) : '').'" maxlength="18" />';
+        $html_form_fields .= '<input class="text text_username" type="text" name="username" style="width: 330px; " value="'.(!empty($_REQUEST['username']) ? htmlentities(trim($_REQUEST['username']), ENT_QUOTES, 'UTF-8', true) : '').'" maxlength="32" />';
     $html_form_fields .= '</div>';
     $html_form_fields .= '<div class="field">';
         $html_form_fields .= '<label class="label label_password" style="width: 230px; ">Password :</label>';
-        $html_form_fields .= '<input class="text text_password" type="password" name="password" style="width: 330px; " value="'.(!empty($_REQUEST['password']) ? htmlentities(trim($_REQUEST['password']), ENT_QUOTES, 'UTF-8', true) : '').'" maxlength="18" />';
+        $html_form_fields .= '<input class="text text_password" type="password" name="password" style="width: 330px; " value="'.(!empty($_REQUEST['password']) ? htmlentities(trim($_REQUEST['password']), ENT_QUOTES, 'UTF-8', true) : '').'" maxlength="32" />';
     $html_form_fields .= '</div>';
     if ($html_form_show_coppa){
         $html_form_fields .= '<div class="field">';

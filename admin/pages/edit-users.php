@@ -397,7 +397,7 @@
                     if (strlen($user_password_new) < 6){
                         $form_messages[] = array('warning', 'The new password was too short and will not be updated');
                         $update_password = false;
-                    } elseif (strlen($user_password_new) > 18){
+                    } elseif (strlen($user_password_new) > 32){
                         $form_messages[] = array('warning', 'The new password was too long and will not be updated');
                         $update_password = false;
                     }
@@ -947,14 +947,14 @@
                     <div class="field">
                         <div class="label">
                             <strong>Change Password</strong>
-                            <em>6 - 18 characters</em>
+                            <em>6 - 32 characters</em>
                         </div>
-                        <input class="textbox" type="password" name="user_password_new" value="" maxlength="16" />
+                        <input class="textbox" type="password" name="user_password_new" value="" maxlength="32" />
                     </div>
 
                     <div class="field">
                         <strong class="label">Retype Password</strong>
-                        <input class="textbox" type="password" name="user_password_new2" value="" maxlength="16" />
+                        <input class="textbox" type="password" name="user_password_new2" value="" maxlength="32" />
                     </div>
 
                     <hr />
