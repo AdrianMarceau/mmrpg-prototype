@@ -50,29 +50,40 @@ $sql_data_dir = MMRPG_CONFIG_SQL_CONTENT_PATH.'data/';
 $sql_data_files = scandir($sql_data_dir);
 $sql_data_files = array_filter($sql_data_files, function($f){ if ($f !== '.' && $f !== '..' && substr($f, -4, 4) === '.sql'){ return true; } else { return false; } });
 
+// Collect another list of all the sample data for the database tables
+$sample_data_dir = $setup_dir.'sample-data/';
+$sample_data_files = scandir($sample_data_dir);
+$sample_data_files = array_filter($sample_data_files, function($f){ if ($f !== '.' && $f !== '..' && substr($f, -4, 4) === '.sql'){ return true; } else { return false; } });
+
 // Check to make sure seed data for the tables was actually collected
 if (!empty($sql_data_files)){
 
     // Print out the list of tables that will be created
     ob_echo('SQL import data was found for the following database tables:');
     ob_echo('- '.implode(PHP_EOL.'- ', $sql_data_files));
+    ob_echo('- '.implode(PHP_EOL.'- ', $sample_data_files));
     ob_echo('');
 
     // Loop through the data files and import them into the database
     ob_echo('Looping through SQL data files and importing into database tables:');
-    foreach ($sql_data_files AS $sql_key => $sql_file){
-        $table_name = str_replace('.sql', '', $sql_file);
-        $data_check_sql = "SELECT 1 FROM {$table_name} LIMIT 1;";
-        $echo_text = '- Importing seed data for database table "'.$table_name.'" ... ';
-        if (empty($db->get_array($data_check_sql))){
-            $db->import_sql_file($sql_data_dir.$sql_file); // attempt to import the file
-            if (!empty($db->get_array($data_check_sql))){ $echo_text .= 'Data imported!'; }
-            else { $echo_text .= 'Data NOT imported!'; }
-        } else {
-            $echo_text .= 'Data already exists!';
+    function mmrpg_setup_import_sql_files($data_files, $data_dir){
+        global $db;
+        foreach ($data_files AS $sql_key => $sql_file){
+            $table_name = str_replace('.sql', '', $sql_file);
+            $data_check_sql = "SELECT 1 FROM {$table_name} LIMIT 1;";
+            $echo_text = '- Importing seed data for database table "'.$table_name.'" ... ';
+            if (empty($db->get_array($data_check_sql))){
+                $db->import_sql_file($data_dir.$sql_file); // attempt to import the file
+                if (!empty($db->get_array($data_check_sql))){ $echo_text .= 'Data imported!'; }
+                else { $echo_text .= 'Data NOT imported!'; }
+            } else {
+                $echo_text .= 'Data already exists!';
+            }
+            ob_echo($echo_text);
         }
-        ob_echo($echo_text);
     }
+    mmrpg_setup_import_sql_files($sql_data_files, $sql_data_dir);
+    mmrpg_setup_import_sql_files($sample_data_files, $sql_data_dir);
     ob_echo('');
 
 } else {

@@ -14,12 +14,12 @@ if (true){
     $sql_table_list[] = array('name' => 'mmrpg_config');
 
     // users & saves & leaderboard
-    $sql_table_list[] = array('name' => 'mmrpg_users', 'sample_data' => true);
+    $sql_table_list[] = array('name' => 'mmrpg_users', 'export_data' => false);
     $sql_table_list[] = array('name' => 'mmrpg_users_contributors');
     $sql_table_list[] = array('name' => 'mmrpg_roles');
-    $sql_table_list[] = array('name' => 'mmrpg_saves', 'sample_data' => true);
+    $sql_table_list[] = array('name' => 'mmrpg_saves', 'export_data' => false);
     $sql_table_list[] = array('name' => 'mmrpg_sessions', 'export_data' => false);
-    $sql_table_list[] = array('name' => 'mmrpg_leaderboard', 'sample_data' => true);
+    $sql_table_list[] = array('name' => 'mmrpg_leaderboard', 'export_data' => false);
 
     // website & pages
     $sql_table_list[] = array('name' => 'mmrpg_website_pages');
@@ -42,8 +42,8 @@ if (true){
 
     // community
     $sql_table_list[] = array('name' => 'mmrpg_categories');
-    $sql_table_list[] = array('name' => 'mmrpg_threads', 'sample_data' => true);
-    $sql_table_list[] = array('name' => 'mmrpg_posts', 'sample_data' => true);
+    $sql_table_list[] = array('name' => 'mmrpg_threads', 'export_data' => false);
+    $sql_table_list[] = array('name' => 'mmrpg_posts', 'export_data' => false);
 
     // game content
     $sql_table_list[] = array('name' => 'mmrpg_battles', 'export_data' => false);
@@ -63,8 +63,6 @@ foreach ($sql_table_list AS $key => $data){
     $new_data['export_table'] = isset($data['export_table']) ? $data['export_table'] : true;
     $new_data['export_data'] = isset($data['export_data']) ? $data['export_data'] : true;
     $new_data['export_filter'] = isset($data['export_filter']) ? $data['export_filter'] : false;
-    $new_data['sample_data'] = isset($data['sample_data']) ? $data['sample_data'] : false;
-    if (!empty($new_data['sample_data'])){ $new_data['export_data'] = false; }
     $sql_table_index[$new_data['name']] = $new_data;
 }
 unset($sql_table_list);
@@ -134,25 +132,6 @@ foreach ($sql_table_index AS $table_name => $table_settings){
         $is_filtered = !empty($table_settings['export_filter']) ? true : false;
         ob_echo_nobreak('- exporting '.($is_filtered ? 'FILTERED' : 'FULL').' table data to '.clean_path($export_path).' ... ');
         $table_rows_sql = mmrpg_get_insert_table_data_sql($table_name, $table_settings);
-        if (!empty($table_rows_sql)){
-            $f = fopen($export_path, 'w');
-            fwrite($f, $table_rows_sql);
-            fclose($f);
-            if (file_exists($export_path)){ ob_echo('success!'); $success = true; }
-            else { ob_echo('write failure!'); }
-        } else {
-            ob_echo('gen failure!');
-        }
-        if ($success){ $sql_data_exported[] = $table_name; }
-    }
-
-    // Export this table data if explicitly allowed to do so
-    if ($table_settings['sample_data'] === true){
-        $sql_data_required[] = $table_name;
-        $success = false;
-        $export_path = $sql_data_export_dir.$table_name.'.sql';
-        ob_echo_nobreak('- exporting SAMPLE table data to '.clean_path($export_path).' ... ');
-        $table_rows_sql = mmrpg_get_sample_table_data_sql($table_name, $table_settings);
         if (!empty($table_rows_sql)){
             $f = fopen($export_path, 'w');
             fwrite($f, $table_rows_sql);
