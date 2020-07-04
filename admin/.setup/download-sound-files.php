@@ -48,7 +48,7 @@ ob_echo('');
 $download_limit = !empty($_REQUEST['limit']) && is_numeric($_REQUEST['limit']) ? trim($_REQUEST['limit']) : 20;
 
 // Define the local and CDN base paths for sounds
-$cdn_sounds_url = 'https://cdn.mmrpg-world.net/prototype/sounds/';
+$cdn_sounds_url = MMRPG_CONFIG_CDN_ROOTURL.'prototype/sounds/index';
 $local_sounds_dir = MMRPG_CONFIG_ROOTDIR.'sounds/';
 if (!file_exists($local_sounds_dir)){ mkdir($local_sounds_dir); }
 
@@ -57,6 +57,7 @@ ob_echo_nobreak('Requesting list of sound files from the CDN...');
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 curl_setopt($ch, CURLOPT_URL, $cdn_sounds_url);
 $result = curl_exec($ch);
 curl_close($ch);
@@ -68,12 +69,12 @@ ob_echo('');
 //ob_echo('$cdn_sounds_list = '.print_r($cdn_sounds_list, true));
 
 // Now let's loop through the list of folders/files and download them locally
-if (!empty($cdn_sounds_list['sounds'])){
+if (!empty($cdn_sounds_list['data'])){
 
     // Count the number of FILES vs PATHS in the list
     $total_sound_dir_num = 0;
     $total_sound_file_num = 0;
-    foreach ($cdn_sounds_list['sounds'] AS $sound_key => $sound_path){
+    foreach ($cdn_sounds_list['data'] AS $sound_key => $sound_path){
         if (substr($sound_path, -1, 1) === '/'){ $total_sound_dir_num++; }
         else { $total_sound_file_num++; }
     }
@@ -83,7 +84,7 @@ if (!empty($cdn_sounds_list['sounds'])){
     ob_echo('');
 
     // Loop through the data files and import them into the database
-    $num_sound_file_paths = count($cdn_sounds_list['sounds']);
+    $num_sound_file_paths = count($cdn_sounds_list['data']);
     ob_echo('Looping through sound paths list and importing them to local directories:');
     ob_echo('');
     $current_dir_num = 0;
@@ -92,7 +93,7 @@ if (!empty($cdn_sounds_list['sounds'])){
     $current_file_downloaded_num = 0;
     $current_file_downloaded_failed_num = 0;
     $download_limit_reached = false;
-    foreach ($cdn_sounds_list['sounds'] AS $sound_key => $sound_path){
+    foreach ($cdn_sounds_list['data'] AS $sound_key => $sound_path){
         // If this is a folder we must recreate it locally
         if (substr($sound_path, -1, 1) === '/'){
             $current_dir_num++;
