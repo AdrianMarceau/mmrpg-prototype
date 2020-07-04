@@ -17,6 +17,7 @@ var isIE = /*@cc_on!@*/false || document.documentMode;   // At least IE6
 
 // Define the MMRPG global settings variables
 gameSettings.cacheTime = '00000000-00'; // the timestamp of when this game was last updated
+gameSettings.baseHref = 'http://localhost/'; // the base href where this game is running
 gameSettings.wapFlag = false; // whether or not this game is running in mobile mode
 gameSettings.wapFlagIphone = false; // whether or not this game is running in mobile iphone mode
 gameSettings.wapFlagIpad = false; // whether or not this game is running in mobile iphone mode
@@ -33,6 +34,7 @@ gameSettings.autoResizeHeight = true; // allow auto reszing of the game window h
 gameSettings.currentBodyWidth = 0; // collect the current window width and update when necessary
 gameSettings.currentBodyHeight = 0; // collect the current window width and update when necessary
 gameSettings.allowEditing = true; // default to true to allow all editing unless otherwise stated
+gameSettings.audioBaseHref = ''; // the base href where audio comes from (empty if same as baseHref)
 
 // Create the game engine submit timer
 var gameEngineSubmitTimeout = false;
@@ -1744,8 +1746,8 @@ function mmrpg_music_load(newTrack, resartTrack, playOnce){
             //console.log('restarting track '+newTrack);
             }
         mmrpg_music_stop();
-        var newSourceMP3 = '<source src="sounds/'+newTrack+'/audio.mp3?'+gameSettings.cacheTime+'" type="audio/mp3" />';
-        var newSourceOGG = '<source src="sounds/'+newTrack+'/audio.ogg?'+gameSettings.cacheTime+'" type="audio/ogg" />';
+        var newSourceMP3 = '<source src="'+gameSettings.audioBaseHref+'sounds/'+newTrack+'/audio.mp3?'+gameSettings.cacheTime+'" type="audio/mp3" />';
+        var newSourceOGG = '<source src="'+gameSettings.audioBaseHref+'sounds/'+newTrack+'/audio.ogg?'+gameSettings.cacheTime+'" type="audio/ogg" />';
         musicStream.empty();
         if (isIE || isOpera || isSafari){ musicStream.append(newSourceMP3);  }
         else if (isChrome || isFirefox){ musicStream.append(newSourceOGG); }
@@ -1802,8 +1804,8 @@ function mmrpg_music_preload(newTrack){
     // Ensure the new track is not alrady in the list
     if (cacheList.indexOf(newTrack) === -1){
         // Define the two audio objects based on the track
-        var newAudioMP3 = '<audio src="sounds/'+newTrack+'/audio.mp3?'+gameSettings.cacheTime+'" preload></audio>';
-        var newAudioOGG = '<audio src="sounds/'+newTrack+'/audio.ogg?'+gameSettings.cacheTime+'" preload></audio>';
+        var newAudioMP3 = '<audio src="'+gameSettings.audioBaseHref+'sounds/'+newTrack+'/audio.mp3?'+gameSettings.cacheTime+'" preload></audio>';
+        var newAudioOGG = '<audio src="'+gameSettings.audioBaseHref+'sounds/'+newTrack+'/audio.ogg?'+gameSettings.cacheTime+'" preload></audio>';
         cacheList.push(newTrack);
         if (isIE || isOpera || isSafari){ musicCache.push($(newAudioMP3));  }
         else if (isChrome || isFirefox){ musicCache.push($(newAudioOGG)); }
