@@ -163,9 +163,7 @@ function temp_combination_number($k,$n){
 <script type="text/javascript" src="scripts/starforce.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
 // Update game settings for this page
-gameSettings.fadeIn = <?= isset($_GET['fadein']) ? $_GET['fadein'] : 'false' ?>;
-gameSettings.wapFlag = <?= $flag_wap ? 'true' : 'false' ?>;
-gameSettings.cacheTime = '<?= MMRPG_CONFIG_CACHE_DATE ?>';
+<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 gameSettings.autoScrollTop = false;
 </script>
 </head>

@@ -401,9 +401,7 @@ if (true){
     <script type="text/javascript" src="scripts/items.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
     <script type="text/javascript">
     // Update game settings for this page
-    gameSettings.fadeIn = <?= isset($_GET['fadein']) ? $_GET['fadein'] : 'true' ?>;
-    gameSettings.wapFlag = <?= $flag_wap ? 'true' : 'false' ?>;
-    gameSettings.cacheTime = '<?= MMRPG_CONFIG_CACHE_DATE ?>';
+    <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
     gameSettings.autoScrollTop = false;
     gameSettings.allowShopping = true;
     // Define the global arrays to hold the item console markup

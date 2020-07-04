@@ -1676,7 +1676,7 @@ class rpg_game {
     public static function get_sounds_index(){
 
         // Pass the work off to the dedicated CDN index function
-        return self::get_cdn_index('prototype', 'sounds');
+        return self::get_cdn_index(MMRPG_CONFIG_CDN_PROJECT, 'sounds');
 
     }
 

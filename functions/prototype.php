@@ -1723,7 +1723,7 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
                 $rtoken = $trobots[0]['robot_token'];
                 $gtoken = strtolower($temp_robot_index[$rtoken]['robot_game']);
                 $music_path = $atoken.'/boss-theme-'.$gtoken.'/';
-                if (file_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
+                if (rpg_game::sound_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
                     $temp_battle_omega['battle_field_base']['field_music'] = $music_path;
                 }
             }
@@ -1731,7 +1731,7 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
             $atoken = 'sega-remix';
             $mtoken = 'mid-boss-mm08';
             $music_path = $atoken.'/'.$mtoken.'/';
-            if (file_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
+            if (rpg_game::sound_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
                 $temp_battle_omega['battle_field_base']['field_music'] = $music_path;
             }
         }

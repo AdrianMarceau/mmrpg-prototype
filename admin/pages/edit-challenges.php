@@ -122,7 +122,7 @@
     $music_options_markup[] = '<option value="">-</option>';
     foreach ($mmrpg_music_index AS $music_id => $music_info){
         $music_path = $music_info['music_album'].'/'.$music_info['music_token'];
-        if (!file_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path.'/')){ continue; }
+        if (!rpg_game::sound_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path.'/')){ continue; }
         if ($music_info['music_game'] == 'MM085'){ $music_group = 'MM&B'; }
         elseif ($music_info['music_game'] == 'MM01b'){ $music_group = 'MMPU'; }
         else { $music_group = $music_info['music_game']; }

@@ -29,9 +29,8 @@ $session_token = mmrpg_game_token();
 <script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
 // Update game settings for this page
+<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 gameSettings.fadeIn = <?= $this_start_key == 0 ? 'true' : 'false' ?>;
-gameSettings.wapFlag = <?= $flag_wap ? 'true' : 'false' ?>;
-gameSettings.cacheTime = '<?=MMRPG_CONFIG_CACHE_DATE?>';
 // Generate the document ready events for this page
 var thisBody = false;
 var thisPrototype = false;

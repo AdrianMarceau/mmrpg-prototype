@@ -205,9 +205,7 @@ $first_robot_token = $allowed_edit_robots[0];
 <script type="text/javascript" src="scripts/edit_robots.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
 // Update game settings for this page
-gameSettings.fadeIn = <?= isset($_GET['fadein']) ? $_GET['fadein'] : 'true' ?>;
-gameSettings.wapFlag = <?= $flag_wap ? 'true' : 'false' ?>;
-gameSettings.cacheTime = '<?= MMRPG_CONFIG_CACHE_DATE?>';
+<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 gameSettings.autoScrollTop = false;
 gameSettings.userNumber = <?= MMRPG_REMOTE_GAME_ID ?>;
 gameSettings.allowEditing = <?= $global_allow_editing ? 'true' : 'false' ?>;

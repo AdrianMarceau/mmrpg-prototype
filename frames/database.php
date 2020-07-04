@@ -674,9 +674,7 @@ if (true){
 <script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
 // Update game settings for this page
-gameSettings.fadeIn = <?= isset($_GET['fadein']) ? $_GET['fadein'] : 'false' ?>;
-gameSettings.wapFlag = <?= $flag_wap ? 'true' : 'false' ?>;
-gameSettings.cacheTime = '<?=MMRPG_CONFIG_CACHE_DATE?>';
+<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 gameSettings.firstRobot = <?= !empty($temp_current_page_robot_key) ? "'{$temp_current_page_robot_key}'" : 'false' ?>;
 gameSettings.autoScrollTop = false;
 // Generate the document ready events for this page

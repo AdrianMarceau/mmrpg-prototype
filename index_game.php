@@ -200,8 +200,7 @@ if (count($matches)>1){
 <script type="text/javascript" src="<?= MMRPG_CONFIG_ROOTURL ?>scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
 // Define the key client variables
-gameSettings.wapFlag = <?= $flag_wap ? 'true' : 'false' ?>;
-gameSettings.cacheTime = '<?=MMRPG_CONFIG_CACHE_DATE?>';
+<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 var thisScrollbarSettings = {wheelSpeed:0.3};
 </script>
 <script type="text/javascript">

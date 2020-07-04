@@ -561,13 +561,13 @@ class rpg_mission_double extends rpg_mission {
                 $gtoken = strtolower($this_robot_index[$rtoken]['robot_game']);
                 $music_path = $atoken.'/'.$rtoken.'-'.$gtoken.'/';
                 //$temp_battle_omega['battle_description2'] .= '| maybe music:'.$music_path.' ';
-                if (file_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
+                if (rpg_game::sound_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
                     $temp_battle_omega['battle_field_base']['field_music'] = $music_path;
                 } else {
                     $atoken = 'fallbacks';
                     $music_path2 = $atoken.'/'.$rtoken.'-'.$gtoken.'/';
                     //$temp_battle_omega['battle_description2'] .= '| maybe music2:'.$music_path2.' ';
-                    if (file_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path2)){
+                    if (rpg_game::sound_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path2)){
                         $temp_battle_omega['battle_field_base']['field_music'] = $music_path2;
                     }
                 }

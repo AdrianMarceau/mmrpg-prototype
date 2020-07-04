@@ -79,9 +79,7 @@ $this_tooltip_count = !empty($prototype_tooltip_index) ? count($prototype_toolti
 <script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
 // Update game settings for this page
-gameSettings.fadeIn = <?= empty($this_start_key) ? 'true' : 'false' ?>;
-gameSettings.wapFlag = <?= $flag_wap ? 'true' : 'false' ?>;
-gameSettings.cacheTime = '<?= MMRPG_CONFIG_CACHE_DATE ?>';
+<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 // Generate the document ready events for this page
 var thisBody = false;
 var thisPrototype = false;

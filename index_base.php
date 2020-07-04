@@ -562,9 +562,7 @@ if ($this_current_page == 'file' // File sub-pages
     <? endif; ?>
     <script type="text/javascript">
     // Define the key client variables
-    gameSettings.baseHref = '<?= MMRPG_CONFIG_ROOTURL ?>';
-    gameSettings.wapFlag = <?= $flag_wap ? 'true' : 'false' ?>;
-    gameSettings.cacheTime = '<?=MMRPG_CONFIG_CACHE_DATE?>';
+    <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
     gameSettings.autoScrollTop = false;
     gameSettings.autoResizeHeight = false;
     <? if($this_current_page == 'community' && $this_current_cat == 'chat'): ?>

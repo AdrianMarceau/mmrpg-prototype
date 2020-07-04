@@ -620,11 +620,10 @@ if (mmrpg_prototype_item_unlocked('wily-program')){
 <script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
 // Define the game WAP and cache flags/values
-gameSettings.passwordUnlocked = 0;
+<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 gameSettings.fadeIn = true;
-gameSettings.demo = <?= $_SESSION[$session_token]['DEMO'] ?>;
-gameSettings.wapFlag = <?= $flag_wap ? 'true' : 'false' ?>;
-gameSettings.cacheTime = '<?=MMRPG_CONFIG_CACHE_DATE?>';
+gameSettings.demo = false;
+gameSettings.passwordUnlocked = 0;
 gameSettings.startLink = '<?= $prototype_start_link ?>';
 gameSettings.windowEventsCanvas = [];
 gameSettings.windowEventsMessages = [];

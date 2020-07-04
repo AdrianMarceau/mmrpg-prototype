@@ -194,9 +194,7 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
 <script type="text/javascript" src="scripts/battle.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
 // Update game setting flags
-gameSettings.wapFlag = <?= $flag_wap ? 'true' : 'false' ?>;
-gameSettings.eventTimeout = <?= $flag_wap ? 700 : 900 ?>;
-gameSettings.cacheTime = '<?=MMRPG_CONFIG_CACHE_DATE?>';
+<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 gameSettings.idleAnimation = <?= $debug_flag_animation ? 'true' : 'false' ?>;
 gameSettings.fieldMusic = '<?= !strstr($this_field_data['field_music'], '/') ? 'fields/'.$this_field_data['field_music'] : $this_field_data['field_music'] ?>';
 //gameSettings.eventCrossFade = true;

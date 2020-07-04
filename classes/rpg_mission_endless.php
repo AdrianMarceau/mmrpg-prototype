@@ -308,7 +308,7 @@ class rpg_mission_endless extends rpg_mission {
             $moptions = array('special-stage-3-mm10', 'special-stage-2-mm10', 'special-stage-1-mm10', 'wily-fortress-1-mm08', 'wily-fortress-2-mm08', 'wily-fortress-3-mm08', 'wily-fortress-4-mm08');
             $mtoken = select_from_array_with_rollover($moptions, $temp_battle_seed['phase']);
             $music_path = $atoken.'/'.$mtoken.'/';
-            if (file_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
+            if (rpg_game::sound_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
                 $target_field['field_music'] = $music_path;
                 $music_is_customized = true;
             }
@@ -326,14 +326,14 @@ class rpg_mission_endless extends rpg_mission {
             $gtoken = strtolower($mmrpg_robots_index[$rtoken]['robot_game']);
             $music_path = $atoken.'/'.$rtoken.'-'.$gtoken.'/';
             //$temp_battle_omega['battle_description2'] .= '| maybe music:'.$music_path.' ';
-            if (file_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
+            if (rpg_game::sound_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
                 $target_field['field_music'] = $music_path;
                 $music_is_customized = true;
             } else {
                 $atoken = 'fallbacks';
                 $music_path2 = $atoken.'/'.$rtoken.'-'.$gtoken.'/';
                 //$temp_battle_omega['battle_description2'] .= '| maybe music2:'.$music_path2.' ';
-                if (file_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path2)){
+                if (rpg_game::sound_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path2)){
                     $target_field['field_music'] = $music_path2;
                     $music_is_customized = true;
                 }
