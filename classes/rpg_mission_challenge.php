@@ -382,15 +382,21 @@ class rpg_mission_challenge extends rpg_mission {
 
     // -- PRINT FUNCTIONS -- /
 
+    // Define static fields for the indexes required by the print functions
+    static $mmrpg_field_index_for_print;
+    static $mmrpg_robot_index_for_print;
+
     // Define a static function for printing out the challenge's title markup
     public static function print_editor_title_markup($challenge_info, $challenge_victories_index, $mmrpg_field_index = false, $mmrpg_robot_index = false){
 
         // Pull in global variables
         $session_token = rpg_game::session_token();
 
-        // Collect a field index in case we need it later
-        if ($mmrpg_field_index === false){ static $mmrpg_field_index; if (empty($mmrpg_field_index)){ $mmrpg_field_index = rpg_field::get_index(); } }
-        if ($mmrpg_robot_index === false){ static $mmrpg_robot_index; if (empty($mmrpg_robot_index)){ $mmrpg_robot_index = rpg_robot::get_index(); } }
+        // Collect a field and robot indexes in case we need them later
+        if (empty(self::$mmrpg_field_index_for_print)){ self::$mmrpg_field_index_for_print = rpg_field::get_index(true); }
+        if (empty(self::$mmrpg_robot_index_for_print)){ self::$mmrpg_robot_index_for_print = rpg_robot::get_index(true); }
+        $mmrpg_field_index = self::$mmrpg_field_index_for_print;
+        $mmrpg_robot_index = self::$mmrpg_robot_index_for_print;
 
         // Collect data about this challenge mission from the array
         $this_challenge_id = $challenge_info['challenge_id'];
@@ -443,9 +449,11 @@ class rpg_mission_challenge extends rpg_mission {
         // Pull in global variables
         $session_token = rpg_game::session_token();
 
-        // Collect a field index in case we need it later
-        if ($mmrpg_field_index === false){ static $mmrpg_field_index; if (empty($mmrpg_field_index)){ $mmrpg_field_index = rpg_field::get_index(); } }
-        if ($mmrpg_robot_index === false){ static $mmrpg_robot_index; if (empty($mmrpg_robot_index)){ $mmrpg_robot_index = rpg_robot::get_index(); } }
+        // Collect a field and robot indexes in case we need them later
+        if (empty(self::$mmrpg_field_index_for_print)){ self::$mmrpg_field_index_for_print = rpg_field::get_index(true); }
+        if (empty(self::$mmrpg_robot_index_for_print)){ self::$mmrpg_robot_index_for_print = rpg_robot::get_index(true); }
+        $mmrpg_field_index = self::$mmrpg_field_index_for_print;
+        $mmrpg_robot_index = self::$mmrpg_robot_index_for_print;
 
         // Generate the actual title markup given available fields
         $this_challenge_id = $challenge_info['challenge_id'];
