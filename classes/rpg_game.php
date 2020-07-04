@@ -1619,9 +1619,71 @@ class rpg_game {
     }
 
 
+    // -- CDN INDEX FUNCTIONS -- //
+
+    // Define a function for getting (or generating) a CDN file index for a given directory
+    public static function get_cdn_index($project, $content){
+
+        // Return false if either argument is invalid
+        if (!preg_match('/^[-_a-z0-9]+$/i', $project)){ return false; }
+        if (!preg_match('/^[-_a-z0-9\/]+$/i', $content)){ return false; }
+
+        // Define the cache file name and path given everything we've learned
+        $cache_file_name = 'cache.cdn_'.$project.'-'.str_replace('/', '-', $content).'.json';
+        $cache_file_path = MMRPG_CONFIG_CACHE_PATH.'indexes/'.$cache_file_name;
+        // Check to see if a file already exists and collect its last-modified date
+        if (file_exists($cache_file_path)){ $cache_file_exists = true; $cache_file_date = date('Ymd-Hi', filemtime($cache_file_path)); }
+        else { $cache_file_exists = false; $cache_file_date = '00000000-0000'; }
+
+        // LOAD FROM CACHE if data exists and is current, otherwise continue so script can refresh and replace
+        if (MMRPG_CONFIG_CACHE_INDEXES && $cache_file_exists && $cache_file_date >= MMRPG_CONFIG_CACHE_DATE){
+            $cache_file_markup = file_get_contents($cache_file_path);
+            $cache_file_json = json_decode($cache_file_markup, true);
+            return $cache_file_json;
+        }
+
+        // Otherwise we need to collect the list and add it to the local cache
+        $url = MMRPG_CONFIG_CDN_ROOTURL.$project.'/'.rtrim($content, '/').'/index';
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_URL, $url);
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+        // If results were empty, exit now
+        if (empty($result)){ return false; }
+
+        // Otherwise we can decode the data and extract the index
+        $json = json_decode($result, true);
+        $index = !empty($json['data']) ? $json['data'] : array();
+
+        // Write the index to a cache file for later usage
+        if (!empty($index)){
+            if (file_exists($cache_file_path)){ unlink($cache_file_path); }
+            $f = fopen($cache_file_path, 'w');
+            fwrite($f, json_encode($index, JSON_NUMERIC_CHECK));
+            fclose($f);
+        }
+
+        // Return the final index
+        return $index;
+
+    }
+
+    // Define a function for getting (or generating) the sound file index from the defined CDN
+    public static function get_sounds_index(){
+
+        // Pass the work off to the dedicated CDN index function
+        return self::get_cdn_index('prototype', 'sounds');
+
+    }
+
 
     // -- SPRITE FUNCTIONS -- //
 
+    // Define a function for checking to see if a given sprite exists (at its real location)
     public static function sprite_exists($sym_path){
 
         // Define the symlink patterns and replacements for looping
@@ -1650,6 +1712,41 @@ class rpg_game {
         return file_exists(MMRPG_CONFIG_ROOTDIR.$real_path);
 
     }
+
+
+    // -- SOUND FUNCTIONS -- //
+
+    // Define a function for checking to see if a sound file exists (at its real location)
+    public static function sound_exists($sym_path){
+
+        // Clean sym path and remove the rootdir (if present) for easier testing
+        $sym_path = ltrim(str_replace(MMRPG_CONFIG_ROOTDIR, '', $sym_path), '/');
+
+        // If we're using the CDN, we need to check the index
+        if (defined('MMRPG_CONFIG_CDN_ENABLED') && MMRPG_CONFIG_CDN_ENABLED === true){
+
+            // Collect the sounds index for reference
+            static $cdn_sounds_index;
+            if (empty($cdn_sounds_index)){ $cdn_sounds_index = self::get_sounds_index(); }
+
+            // Remove the leading "sounds/" path fragment for testing
+            $rel_sym_path = preg_replace('/^sounds\//', '', $sym_path);
+
+            // Check to see if the given path is in the CDN index
+            return in_array($rel_sym_path, $cdn_sounds_index) ? true : false;
+
+        }
+        // Otherwise we can just check for the file directory
+        else {
+
+            // Check to see if the given path is locally available
+            return file_exists(MMRPG_CONFIG_ROOTDIR.$sym_path) ? true : false;
+
+        }
+
+    }
+
+
 
 
     // -- SESSION FUNCTIONS -- //

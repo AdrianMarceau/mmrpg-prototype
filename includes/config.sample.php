@@ -33,6 +33,10 @@ define('MMRPG_CONFIG_DBPASSWORD', 'password');
 define('MMRPG_CONFIG_DBCHARSET', 'utf8');
 define('MMRPG_CONFIG_DBNAME', 'mmrpg2k11');
 
+// Define the global variables for the CDN (currently used for audio files only)
+define('MMRPG_CONFIG_CDN_ENABLED', true);
+define('MMRPG_CONFIG_CDN_ROOTURL', 'https://cdn.mmrpg-world.net/');
+
 // Define the analytics account ID
 define('LEGACY_MMRPG_GA_ACCOUNTID', 'UA-00000000-0');
 
