@@ -41,13 +41,13 @@ Update the admin panel so that saving auto-updates the data.json file
 Update code to point to new CONTENT directories (what part of the code?)
 [may be done, try renaming the /data/ directories and see if anyting breaks]
 [appears to be dead EXCEPT for the migration directory, move that maybe]
--  types
--  battles
--  players
--  fields
--  robots
--  abilities
--  items
+-  types [DONE]
+-  battles [DONE]
+-  players [DONE]
+-  fields [DONE]
+-  robots [DONE]
+-  abilities [DONE]
+-  items [DONE]
 
 Update code for items to work with new OBJECT image locations
 -  items/attachment-defeat -> objects/defeat-explosion [DONE]
@@ -82,13 +82,29 @@ Update the admin panel with editors for the final object types
 -  items
 
 Manually add REQUIRED /images/ directories to the repo
--  /images/objects/challenge-markers/
--  /images/objects/defeat-explosion/
--  /images/objects/heart-cores/
+-  /images/objects/challenge-markers/ [DONE]
+-  /images/objects/defeat-explosion/ [DONE]
+-  /images/objects/heart-cores/ [DONE]
+-  /images/social-icons_32x32.png [DONE]
+-  /images/viewer.php [DONE]
 -
--  /images/social-icons_32x32.png
--  /images/viewer.php
+-  many many many more (?)
 -
 -  MMRPG-Prototype_COPPA-Compliance.pdf  (MUST UPDATE!)
--
--  many many many more
+
+Update relevant areas of the website/game to pull from the new CDN for faster deploys
+-  Update the AUDIO in the game to pull from the CDN [DONE]
+-  Update the SCREENSHOTS in the gallery to pull from the CDN
+
+Update references to the "_ext/" directory to point to new ".libs/" directory
+-  Update refs to _ext/captcha/ (might be difficult)
+-  Update refs to _ext/codemirror/
+-  Update refs to _ext/colorbox/
+
+Implement the new "minify" library to compress
+-  All styles
+-  All scripts
+
+Update the admin panel to distinguish between DEV and LIVE servers
+-  ?????
+
