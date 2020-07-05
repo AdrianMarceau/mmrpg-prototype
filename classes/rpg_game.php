@@ -1680,6 +1680,14 @@ class rpg_game {
 
     }
 
+    // Define a function for getting (or generating) the gallery screenshots file index from the defined CDN
+    public static function get_gallery_index($folder = ''){
+
+        // Pass the work off to the dedicated CDN index function
+        return self::get_cdn_index(MMRPG_CONFIG_CDN_PROJECT, 'gallery'.(!empty($folder) ? '/'.$folder : ''));
+
+    }
+
 
     // -- SPRITE FUNCTIONS -- //
 

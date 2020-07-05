@@ -1012,6 +1012,7 @@ function mmrpg_community_post_index_fields($implode = false, $table = ''){
 function mmrpg_get_gallery_thumb_markup($file_info, $file_date = '', $thumb_class = 'image', $thumb_rel = 'images', $base_path = ''){
     if (empty($file_date)){ $file_date = date('Y/m/d', $file_info['time']); }
     $markup = '';
+    if (defined('MMRPG_CONFIG_CDN_ENABLED') && MMRPG_CONFIG_CDN_ENABLED === true){ $base_path = MMRPG_CONFIG_CDN_ROOTURL.$base_path; }
     $markup .= '<a class="'.$thumb_class.'" href="'.$base_path.$file_info['href'].'" target="_blank" rel="'.$thumb_rel.'">';
         $markup .= '<span class="wrap" style="background-image: url('.$base_path.$file_info['thumb'].');">';
             $markup .= '<img class="image" src="'.$base_path.$file_info['thumb'].'" alt="Mega Man RPG Prototype | '.$file_info['title'].'" />';
