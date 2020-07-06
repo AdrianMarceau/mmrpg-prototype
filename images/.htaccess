@@ -1,0 +1,8 @@
+Options +Indexes
+IndexOptions FancyIndexing FoldersFirst IconWidth=24 NameWidth=48 SuppressDescription
+IndexIgnore _sfpg_data
+
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule  ^(.*)$  \.legacy/$1  [L,QSA]
