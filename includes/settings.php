@@ -41,7 +41,7 @@ if (!defined('MMRPG_SETTINGS_PASSWORD_SALT')){ define('MMRPG_SETTINGS_PASSWORD_S
 if (!defined('MMRPG_SETTINGS_OMEGA_SEED')){ define('MMRPG_SETTINGS_OMEGA_SEED', 'mmrpg'); }
 
 // Define the global guest ID to prevent confusion
-define('MMRPG_SETTINGS_GUEST_ID', -1); // Doubt we'll ever get this many users
+define('MMRPG_SETTINGS_GUEST_ID', -1); // Make it a negative so it doesn't mess with auto-increment
 
 // Define the global target player ID to prevent overlap
 define('MMRPG_SETTINGS_TARGET_PLAYERID', 999999); // Doubt we'll ever get this many users

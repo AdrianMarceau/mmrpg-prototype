@@ -26,7 +26,7 @@ define('MMRPG_CONFIG_ROOTURL', (MMRPG_IS_HTTPS ? 'https' : 'http').'://'.$curren
 define('MMRPG_CONFIG_CACHE_INDEXES', false);
 define('MMRPG_CONFIG_IS_LIVE', false);
 
-// Define which server environment we're on (local|dev|stage|live)
+// Define which server environment we're on (local|dev|stage|prod)
 define('MMRPG_CONFIG_SERVER_ENV', 'local');
 
 // Define the global database credentials for this installation
