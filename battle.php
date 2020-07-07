@@ -95,13 +95,10 @@ if (!isset($mmrpg_index_robots) || empty($mmrpg_index_robots)){
 
 // Collect this player's index data if available
 if (!empty($this_player_token) && isset($mmrpg_index_players[$this_player_token])){
-    $this_player_data = $mmrpg_index_players[$this_player_token];
 
-    if (empty($this_player_data['player_id'])){
-        $this_player_id = !empty($this_player_id) ? $this_player_id : 1;
-        $this_player_data['player_id'] = $this_player_id;
-    }
-    $this_player_data['user_id'] = $this_player_data['player_id'];
+    $this_player_data = $mmrpg_index_players[$this_player_token];
+    if (!empty($this_player_id)){ $this_player_data['player_id'] = $this_player_id; }
+    $this_player_data['user_id'] = rpg_user::get_current_userid();
 
     if (!empty($this_player_robots)){
         $allowed_robots = strstr($this_player_robots, ',') ? explode(',', $this_player_robots) : array($this_player_robots);
