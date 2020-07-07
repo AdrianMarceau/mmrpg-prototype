@@ -293,7 +293,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                         echo '<div class="'.(!$flag_skip_fadein ? 'animate_fadein ' : '').' background_event event clearback sticky" style="z-index: 30; border-color: transparent;">';
                         $this_key = -1;
                         foreach ($this_field_data['field_background_attachments'] AS $this_id => $this_info){
-                            if ($flag_wap && preg_match('/^(mecha|object)/i', $this_id)){ continue; }
+                            if ($flag_wap && preg_match('/^mecha/i', $this_id)){ continue; }
                             $this_key++;
                             $this_class = $this_info['class'];
                             $this_size = $this_info['size'];
@@ -303,8 +303,9 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                             $this_offset_z = $this_key + 1;
                             $this_token = $this_info[$this_class.'_token'];
                             $this_path = $class_paths[$this_class];
+                            if (isset($this_info['is_shadow']) && $this_info['is_shadow'] === true){ $this_path .= '_shadows'; }
                             $this_image = !empty($this_info[$this_class.'_image']) ? $this_info[$this_class.'_image'] : $this_token;
-                            if ($this_class === 'object'){
+                            if ($this_class === 'object' && (!isset($this_info['subclass']) || $this_info['subclass'] !== 'common_object')){
                                 $this_path = $class_paths['field'];
                                 $this_image = $this_field_data['field_background'].'_'.$this_image;
                             }
@@ -383,7 +384,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                         if (!empty($temp_field_type_2) && $temp_field_type_2 != $temp_field_type_1){ $temp_star_image .= '-'.$temp_field_type_2; }
 
                         // Append the new field star to the foreground attachment array
-                        $this_field_data['field_foreground_attachments']['star-marker'] = array(
+                        $this_field_data['field_foreground_attachments'][$temp_star_kind.'-star'] = array(
                             'class' => 'item',
                             'size' => 80,
                             'offset_x' => 331,
@@ -397,9 +398,10 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                             );
 
                         // Append the new field star to the foreground attachment array
-                        $temp_shadow_image = 'star-marker_shadow';
-                        $this_field_data['field_foreground_attachments']['star-marker_shadow'] = array(
+                        $temp_shadow_image = $temp_star_kind.'-star';
+                        $this_field_data['field_foreground_attachments'][$temp_star_kind.'-star_shadow'] = array(
                             'class' => 'item',
+                            'is_shadow' => true,
                             'size' => 80,
                             'offset_x' => 331,
                             'offset_y' => 75,
@@ -422,6 +424,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                         // Append the new field star to the foreground attachment array
                         $this_field_data['field_foreground_attachments']['challenge-marker'] = array(
                             'class' => 'object',
+                            'subclass' => 'common_object',
                             'size' => 80,
                             'offset_x' => 331,
                             'offset_y' => 90,
@@ -437,6 +440,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                         $temp_shadow_image = 'challenge-markers/shadow';
                         $this_field_data['field_foreground_attachments']['challenge-marker_shadow'] = array(
                             'class' => 'object',
+                            'subclass' => 'common_object',
                             'size' => 80,
                             'offset_x' => 331,
                             'offset_y' => 75,
@@ -455,7 +459,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                         echo '<div class="'.(!$flag_skip_fadein ? 'animate_fadein ' : '').' foreground_event event clearback sticky" style="z-index: 60; border-color: transparent;">';
                         $this_key = -1;
                         foreach ($this_field_data['field_foreground_attachments'] AS $this_id => $this_info){
-                            if ($flag_wap && preg_match('/^(mecha|object)/i', $this_id)){ continue; }
+                            if ($flag_wap && preg_match('/^mecha/i', $this_id)){ continue; }
                             $this_key++;
                             $this_class = $this_info['class'];
                             $this_size = $this_info['size'];
@@ -466,8 +470,9 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
                             $this_token = $this_info[$this_class.'_token'];
                             $this_text = !empty($this_info[$this_class.'_text']) ? $this_info[$this_class.'_text'] : '&nbsp;';
                             $this_path = $class_paths[$this_class];
+                            if (isset($this_info['is_shadow']) && $this_info['is_shadow'] === true){ $this_path .= '_shadows'; }
                             $this_image = !empty($this_info[$this_class.'_image']) ? $this_info[$this_class.'_image'] : $this_token;
-                            if ($this_class === 'object'){
+                            if ($this_class === 'object' && (!isset($this_info['subclass']) || $this_info['subclass'] !== 'common_object')){
                                 $this_path = $class_paths['field'];
                                 $this_image = $this_field_data['field_foreground'].'_'.$this_image;
                             }
