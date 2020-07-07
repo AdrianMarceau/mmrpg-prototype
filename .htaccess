@@ -81,6 +81,13 @@ RewriteRule ^images/(abilities|fields|items|players|robots)_shadows/([-a-z0-9]+)
 
 RewriteRule ^images/(abilities|fields|items|players|robots)/(_effects)/([-_a-z0-9]+)?/(.*)?$ /content/$1/$2/$3/$4 [L]
 
+####################################
+# -- LEGACY IMAGE PATH REWRITES -- #
+####################################
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule  ^images/(_raw|database|gallery|misc|theme|types)/(.*)$  images/.legacy/$1/$2  [L,QSA]
 
 ###################################
 # -- SCRIPT/STYLE/XML REWRITES -- #
