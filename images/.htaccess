@@ -1,3 +1,0 @@
-Options +Indexes
-IndexOptions FancyIndexing FoldersFirst IconWidth=24 NameWidth=48 SuppressDescription
-IndexIgnore _sfpg_data
