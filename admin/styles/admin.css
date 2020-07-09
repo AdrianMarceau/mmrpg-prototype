@@ -211,7 +211,7 @@ a:hover {
     border-bottom: 1px solid #E0E0E0;
 }
 
-.adminform pre {
+.adminform pre:not([class]) {
     max-width: 100%;
     overflow: auto;
     margin: 0 auto 10px;
@@ -222,7 +222,7 @@ a:hover {
     box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.02);
     background-color: #FAFAFA;
 }
-.adminform pre:last-child {
+.adminform pre:not([class]):last-child {
     margin-bottom: 0;
 }
 
