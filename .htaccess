@@ -49,6 +49,7 @@ RewriteEngine on
 RewriteRule ^home/?$ / [R,L]
 RewriteRule ^updates/?$ /community/news/ [R,L]
 RewriteRule ^www\.website\.com$ / [R,L]
+RewriteRule ^admin.php$ /admin/ [R,L]
 
 # Redirect the non-existant or renamed images to better places
 RewriteRule ^images/robots/_disco/(.*)?$ /images/robots/disco_legacy/$1 [R,L]
