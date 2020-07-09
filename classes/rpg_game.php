@@ -1684,7 +1684,7 @@ class rpg_game {
     public static function get_gallery_index($folder = ''){
 
         // Pass the work off to the dedicated CDN index function
-        return self::get_cdn_index(MMRPG_CONFIG_CDN_PROJECT, 'gallery'.(!empty($folder) ? '/'.$folder : ''));
+        return self::get_cdn_index(MMRPG_CONFIG_CDN_PROJECT, 'images/gallery'.(!empty($folder) ? '/'.$folder : ''));
 
     }
 

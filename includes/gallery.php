@@ -19,6 +19,7 @@ else { $cache_file_exists = false; $cache_file_date = '00000000-0000'; }
 if (MMRPG_CONFIG_CACHE_INDEXES && $cache_file_exists && $cache_file_date >= MMRPG_CONFIG_CACHE_DATE){
     $cache_file_markup = file_get_contents($cache_file_path);
     $mmrpg_gallery_index = json_decode($cache_file_markup, true);
+    $mmrpg_gallery_size = array_sum(array_map("count", $mmrpg_gallery_index));
     return;
 }
 
@@ -29,7 +30,7 @@ $mmrpg_gallery_index = array();
 if ($using_gallery_cdn){
 
     // Define the base directory for gallery images so we can loop through 'em
-    $this_gallery_path = MMRPG_CONFIG_CDN_PROJECT.'/gallery/'.$this_gallery_folder.'/';
+    $this_gallery_path = MMRPG_CONFIG_CDN_PROJECT.'/images/gallery/'.$this_gallery_folder.'/';
     $this_gallery_basedir = '';
     $this_gallery_baseurl = MMRPG_CONFIG_CDN_ROOTURL.$this_gallery_path;
 
@@ -109,7 +110,7 @@ foreach ($raw_gallery_paths AS $key => $rel_path){
 }
 
 // Write the index to a cache file, if caching is enabled
-if (MMRPG_CONFIG_CACHE_INDEXES === true){
+if (MMRPG_CONFIG_CACHE_INDEXES === true && !empty($mmrpg_gallery_index)){
     // Compress the index into a JSON string for the file
     $cache_file_markup = json_encode($mmrpg_gallery_index);
     // Write the index to a cache file, if caching is enabled
