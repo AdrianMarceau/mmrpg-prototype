@@ -10,6 +10,3 @@
 [submodule ".libs/minify"]
 	path = .libs/minify
 	url = https://github.com/matthiasmullie/minify.git
-[submodule ".libs/perfect-scrollbar"]
-	path = .libs/perfect-scrollbar
-	url = https://github.com/mdbootstrap/perfect-scrollbar.git
