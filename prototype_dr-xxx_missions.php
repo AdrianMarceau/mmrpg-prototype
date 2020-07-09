@@ -701,6 +701,9 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
         // Loop through any collected event or user challenges and then add them to the list
         if (!empty($temp_challenge_missions)){
+            //echo('<pre>$this_prototype_data = '.print_r($this_prototype_data, true).'</pre>');
+            //echo('<pre>$temp_challenge_missions = '.print_r($temp_challenge_missions, true).'</pre>');
+            //exit();
             foreach ($temp_challenge_missions AS $key => $temp_battle_omega){
                 $temp_challenge_kind = $temp_battle_omega['values']['challenge_battle_kind'];
                 if (!empty($temp_battle_omega['flags']['is_cleared'])){

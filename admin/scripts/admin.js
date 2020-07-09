@@ -39,6 +39,7 @@ $(document).ready(function(){
         // Collect a reference to the object and its attributes
         var deleteLink = $(this);
         var deleteKind = deleteLink.attr('data-delete');
+        var deleteSubKind = false;
         var deleteID = 0;
 
         // Define the object label and ID based on kind
@@ -54,7 +55,10 @@ $(document).ready(function(){
             // If we're deleting CHALLENGES set up the vars
             deleteObject = 'challenge';
             deleteID = deleteLink.attr('data-challenge-id');
+            deleteSubKind = deleteLink.attr('data-challenge-kind');
             if (typeof deleteID == 'undefined'){ return false; }
+            if (typeof deleteSubKind == 'undefined'){ return false; }
+            deleteObject = deleteSubKind+' '+deleteObject;
             deleteID = parseInt(deleteID);
             if (deleteID == 0){ return false; }
             } else if (deleteKind == 'stars'){
@@ -65,6 +69,7 @@ $(document).ready(function(){
             deleteID = parseInt(deleteID);
             if (deleteID == 0){ return false; }
             } else {
+            //console.log('unknown delete entity?');
             return false;
             }
 
@@ -79,10 +84,11 @@ $(document).ready(function(){
             if (deleteKind == 'users'){
                 postURL = 'admin/edit-users/delete/user_id='+deleteID;
                 } else if (deleteKind == 'challenges'){
-                postURL = 'admin/edit-challenges/delete/challenge_id='+deleteID;
+                postURL = 'admin/edit-'+deleteSubKind+'-challenges/delete/challenge_id='+deleteID;
                 } else if (deleteKind == 'stars'){
                 postURL = 'admin/edit-stars/delete/star_id='+deleteID;
                 } else {
+                //console.log('unknown delete postURL?');
                 return false;
                 }
 
@@ -90,7 +96,7 @@ $(document).ready(function(){
             //console.log('we can delete '+objName+'!');
             $.post(postURL, function(data){
                 // Delete successful, let's reload the page
-                window.location.href = window.location.href;
+                window.location.href = window.location.href.replace(location.hash,'');
                 //console.log(data);
                 return true;
                 });

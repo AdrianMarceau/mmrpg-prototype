@@ -46,12 +46,18 @@ if (true){
     $sql_table_list[] = array('name' => 'mmrpg_threads', 'export_data' => false);
     $sql_table_list[] = array('name' => 'mmrpg_posts', 'export_data' => false);
 
-    // game content
+    // rogue stars
+    $sql_table_list[] = array('name' => 'mmrpg_rogue_stars');
+
+    // player battles
     $sql_table_list[] = array('name' => 'mmrpg_battles', 'export_data' => false);
+
+    // challenge missions
     $sql_table_list[] = array('name' => 'mmrpg_challenges', 'export_filter' => array('challenge_kind' => 'event'));
     $sql_table_list[] = array('name' => 'mmrpg_challenges_leaderboard', 'export_data' => false);
     $sql_table_list[] = array('name' => 'mmrpg_challenges_waveboard', 'export_data' => false);
-    $sql_table_list[] = array('name' => 'mmrpg_rogue_stars');
+    $sql_table_list[] = array('name' => 'mmrpg_users_challenges', 'export_data' => false);
+    $sql_table_list[] = array('name' => 'mmrpg_users_challenges_leaderboard', 'export_data' => false);
 
 }
 

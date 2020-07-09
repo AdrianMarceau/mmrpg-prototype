@@ -194,10 +194,15 @@ elseif ($this_page_action == 'edit-fields'){
     // Require the edit robots file
     require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-fields.php');
 }
-// Else if this is an EDIT CHALLENGE MISSIONS request
-elseif ($this_page_action == 'edit-challenges'){
-    // Require the edit challenges file
-    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-challenges.php');
+// Else if this is an EDIT EVENT CHALLENGES request
+elseif ($this_page_action == 'edit-event-challenges'){
+    // Require the edit event challenges file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-challenges_event.php');
+}
+// Else if this is an EDIT USER CHALLENGES request
+elseif ($this_page_action == 'edit-user-challenges'){
+    // Require the edit event challenges file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-challenges_user.php');
 }
 // Else if this is an EDIT ROGUE STARS request
 elseif ($this_page_action == 'edit-stars'){

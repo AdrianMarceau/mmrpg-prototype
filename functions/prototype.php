@@ -334,34 +334,40 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
     // Grant the user points for each unique challenge mission they've completed in a challenge mode
     if (true){
         $temp_db_fields = rpg_mission_challenge::get_index_fields(true, 'challenges');
-        $challenges_completed = $db->get_array_list("SELECT
-        board.challenge_id,
-        board.challenge_turns_used,
-        challenges.challenge_turn_limit,
-        board.challenge_robots_used,
-        challenges.challenge_robot_limit,
-        board.challenge_result,
-        {$temp_db_fields}
-        FROM mmrpg_challenges_leaderboard AS board
-        LEFT JOIN mmrpg_challenges AS challenges ON challenges.challenge_id = board.challenge_id
-        WHERE
-        board.user_id = {$user_id}
-        AND board.challenge_result = 'victory'
-        AND challenges.challenge_kind = 'event'
-        AND challenges.challenge_flag_published = 1
-        AND challenges.challenge_flag_hidden = 0
-        AND challenges.challenge_creator <> {$user_id}
-        ;", 'challenge_id');
+        $temp_challenge_kinds = array();
+        $temp_challenge_kinds['event'] = array('main' => 'mmrpg_challenges', 'leaderboard' => 'mmrpg_challenges_leaderboard');
+        //$temp_challenge_kinds['user'] = array('main' => 'mmrpg_users_challenges', 'leaderboard' => 'mmrpg_users_challenges_leaderboard');
         $points_index['challenges_completed'] = array();
         $points_index['challenges_completed_points'] = 0;
-        if (!empty($challenges_completed)){
-            foreach ($challenges_completed AS $id => $data){
-                $points = rpg_mission_challenge::calculate_challenge_reward_points($data['challenge_kind'], $data, $percent, $rank);
-                $data['challenge_victory_points'] = $points;
-                $data['challenge_victory_percent'] = $percent;
-                $data['challenge_victory_rank'] = $rank;
-                $points_index['challenges_completed'][$id] = $data;
-                $points_index['challenges_completed_points'] += $points;
+        foreach ($temp_challenge_kinds AS $kind => $tables){
+            $challenges_completed = $db->get_array_list("SELECT
+            board.challenge_id,
+            board.challenge_turns_used,
+            challenges.challenge_turn_limit,
+            board.challenge_robots_used,
+            challenges.challenge_robot_limit,
+            board.challenge_result,
+            {$temp_db_fields}
+            FROM {$tables['leaderboard']} AS board
+            LEFT JOIN {$tables['main']} AS challenges ON challenges.challenge_id = board.challenge_id
+            WHERE
+            board.user_id = {$user_id}
+            AND board.challenge_result = 'victory'
+            AND challenges.challenge_kind = '{$kind}'
+            AND challenges.challenge_flag_published = 1
+            AND challenges.challenge_flag_hidden = 0
+            AND challenges.challenge_creator <> {$user_id}
+            ;", 'challenge_id');
+            if (!empty($challenges_completed)){
+                foreach ($challenges_completed AS $id => $data){
+                    $xid = $kind === 'user' ? 'u'.$id : $id;
+                    $points = rpg_mission_challenge::calculate_challenge_reward_points($kind, $data, $percent, $rank);
+                    $data['challenge_victory_points'] = $points;
+                    $data['challenge_victory_percent'] = $percent;
+                    $data['challenge_victory_rank'] = $rank;
+                    $points_index['challenges_completed'][$xid] = $data;
+                    $points_index['challenges_completed_points'] += $points;
+                }
             }
         }
         //$points = rpg_mission_challenge::calculate_challenge_reward_points($data['challenge_kind'], $data, $victory_percent, $victory_rank);

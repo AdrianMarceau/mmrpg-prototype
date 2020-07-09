@@ -2,9 +2,20 @@
 
     <?
 
+    // Ensure global challenge values for this page are set
+    if (!isset($this_challenge_kind)){ exit('$this_challenge_kind was undefined!'); }
+    if (!isset($this_challenge_table)){ exit('$this_challenge_table was undefined!'); }
+    if (!isset($this_challenge_leaderboard_table)){ exit('$this_challenge_leaderboard_table was undefined!'); }
+
+    // Using the above, generate the oft-used titles, baseurls, etc. for the editor
+    $this_challenge_page_token = 'edit-'.$this_challenge_kind.'-challenges';
+    $this_challenge_page_title = 'Edit '.ucfirst($this_challenge_kind).' Challenges';
+    $this_challenge_page_baseurl = 'admin/'.$this_challenge_page_token.'/';
+
     // Pre-check access permissions before continuing
     if (!in_array('*', $this_adminaccess)
-        && !in_array('edit-challenges', $this_adminaccess)){
+        && !in_array('edit-challenges', $this_adminaccess)
+        && !in_array($this_challenge_page_token, $this_adminaccess)){
         $form_messages[] = array('error', 'You do not have permission to edit challenges!');
         redirect_form_action('admin/home/');
     }
@@ -17,7 +28,7 @@
 
     // Collect an index of battle fields for options
     $mmrpg_fields_fields = rpg_field::get_index_fields(true);
-    $mmrpg_fields_index = $db->get_array_list("SELECT {$mmrpg_fields_fields} FROM mmrpg_index_fields WHERE field_token <> 'field' AND field_flag_published = 1  AND field_flag_complete = 1 ORDER BY FIELD(field_token, 'intro-field') DESC, FIELD(field_game, 'MMRPG', 'MM00') DESC, field_game ASC, field_order ASC", 'field_token');
+    $mmrpg_fields_index = $db->get_array_list("SELECT {$mmrpg_fields_fields} FROM mmrpg_index_fields WHERE field_token <> 'field' AND field_flag_published = 1  AND field_flag_complete = 1 AND field_flag_hidden = 0 ORDER BY FIELD(field_token, 'intro-field') DESC, FIELD(field_game, 'MMRPG', 'MM00') DESC, field_game ASC, field_order ASC", 'field_token');
 
     // Collect an index of music tracks for options
     $mmrpg_music_index = $db->get_array_list("SELECT music_id, music_token, music_album, music_game, music_name, music_link FROM mmrpg_index_music ORDER BY music_game ASC, music_order ASC, music_token ASC;", 'music_id');
@@ -54,7 +65,7 @@
         LEFT JOIN (SELECT
                 challenge_creator AS challenge_user_id,
                 COUNT(challenge_creator) AS challenges_created_count
-                FROM mmrpg_challenges
+                FROM {$this_challenge_table}
                 GROUP BY challenge_creator) AS editors ON editors.challenge_user_id = users.user_id
         WHERE
         users.user_id <> 0
@@ -199,8 +210,9 @@
 
     // Define a function for exiting a challenge edit action
     function exit_challenge_edit_action($challenge_id = false){
-        if ($challenge_id !== false){ $location = 'admin/edit-challenges/editor/challenge_id='.$challenge_id; }
-        else { $location = 'admin/edit-challenges/search/'; }
+        global $this_challenge_page_baseurl;
+        if ($challenge_id !== false){ $location = $this_challenge_page_baseurl.'editor/challenge_id='.$challenge_id; }
+        else { $location = $this_challenge_page_baseurl.'search/'; }
         redirect_form_action($location);
     }
 
@@ -211,7 +223,7 @@
     $sub_action =  !empty($_GET['subaction']) ? $_GET['subaction'] : 'search';
 
     // Update the tab name with the page name
-    $this_page_tabtitle = 'Edit Challenges | '.$this_page_tabtitle;
+    $this_page_tabtitle = $this_challenge_page_title.' | '.$this_page_tabtitle;
 
     // If we're in delete mode, we need to remove some data
     $delete_data = array();
@@ -221,7 +233,7 @@
         $delete_data['challenge_id'] = !empty($_GET['challenge_id']) && is_numeric($_GET['challenge_id']) ? trim($_GET['challenge_id']) : '';
 
         // Let's delete all of this challenge's data from the database
-        $db->delete('mmrpg_challenges', array('challenge_id' => $delete_data['challenge_id']));
+        $db->delete($this_challenge_table, array('challenge_id' => $delete_data['challenge_id']));
         $form_messages[] = array('success', 'The requested challenge has been deleted from the database');
         exit_form_action('success');
 
@@ -258,7 +270,7 @@
         $temp_challenge_fields = rpg_mission_challenge::get_index_fields(true, 'challenges');
         $search_query = "SELECT
             {$temp_challenge_fields}
-            FROM mmrpg_challenges AS challenges
+            FROM {$this_challenge_table} AS challenges
             WHERE 1=1
             ";
 
@@ -341,7 +353,7 @@
         $search_results_count = is_array($search_results) ? count($search_results) : 0;
 
         // Collect a total number from the database
-        $search_results_total = $db->get_value("SELECT COUNT(challenge_id) AS total FROM mmrpg_challenges WHERE 1=1;", 'total');
+        $search_results_total = $db->get_value("SELECT COUNT(challenge_id) AS total FROM {$this_challenge_table} WHERE 1=1;", 'total');
 
     }
 
@@ -362,7 +374,7 @@
         $temp_challenge_fields = rpg_mission_challenge::get_index_fields();
         $temp_challenge_fields_string = implode(', ', $temp_challenge_fields);
         if (!empty($editor_data['challenge_id'])){
-            $challenge_data = $db->get_array("SELECT {$temp_challenge_fields_string} FROM mmrpg_challenges WHERE challenge_id = {$editor_data['challenge_id']};");
+            $challenge_data = $db->get_array("SELECT {$temp_challenge_fields_string} FROM {$this_challenge_table} WHERE challenge_id = {$editor_data['challenge_id']};");
         } else {
 
             // Generate temp data structure for the new challenge
@@ -412,12 +424,12 @@
         $form_data = array();
         $form_success = true;
         $form_action = !empty($_POST['action']) ? trim($_POST['action']) : '';
-        if ($form_action == 'edit-challenges'){
+        if ($form_action == $this_challenge_page_token){
 
             // COLLECT form data from the request and parse out simple rules
 
             $form_data['challenge_id'] = !empty($_POST['challenge_id']) && is_numeric($_POST['challenge_id']) ? (int)(trim($_POST['challenge_id'])) : 0;
-            $form_data['challenge_kind'] = !empty($_POST['challenge_kind']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['challenge_kind']) ? trim(strtolower($_POST['challenge_kind'])) : '';
+            $form_data['challenge_kind'] = $this_challenge_kind; // always preset given editor page url
             $form_data['challenge_creator'] = !empty($_POST['challenge_creator']) && is_numeric($_POST['challenge_creator']) ? (int)(trim($_POST['challenge_creator'])) : 0;
             $form_data['challenge_name'] = !empty($_POST['challenge_name']) && !is_numeric($_POST['challenge_name']) && strlen($_POST['challenge_name']) >= 2 ? strip_tags(trim($_POST['challenge_name'])) : '';
             $form_data['challenge_description'] = !empty($_POST['challenge_description']) ? preg_replace('/\s+/', ' ', trim(strip_tags($_POST['challenge_description']))) : '';
@@ -530,7 +542,7 @@
             if ($challenge_data_is_new){
 
                 // Update the main database index with changes to this challenge's data
-                $insert_results = $db->insert('mmrpg_challenges', $update_data);
+                $insert_results = $db->insert($this_challenge_table, $update_data);
 
                 // If we made it this far, the update must have been a success
                 if ($insert_results !== false){ $form_success = true; $form_messages[] = array('success', 'Challenge data was created successfully!'); }
@@ -538,14 +550,14 @@
 
                 // If the form was a success, collect the new ID and redirect
                 if ($form_success){
-                    $new_challenge_id = $db->get_value("SELECT MAX(challenge_id) AS max FROM mmrpg_challenges;", 'max');
+                    $new_challenge_id = $db->get_value("SELECT MAX(challenge_id) AS max FROM {$this_challenge_table};", 'max');
                     $form_data['challenge_id'] = $new_challenge_id;
                 }
 
             } else {
 
                 // Update the main database index with changes to this challenge's data
-                $update_results = $db->update('mmrpg_challenges', $update_data, array('challenge_id' => $form_data['challenge_id']));
+                $update_results = $db->update($this_challenge_table, $update_data, array('challenge_id' => $form_data['challenge_id']));
 
                 // If we made it this far, the update must have been a success
                 if ($update_results !== false){ $form_success = true; $form_messages[] = array('success', 'Challenge data was updated successfully!'); }
@@ -576,15 +588,15 @@
 
     <div class="breadcrumb">
         <a href="admin/">Admin Panel</a>
-        &raquo; <a href="admin/edit-challenges/">Edit Challenges</a>
+        &raquo; <a href="<?= $this_challenge_page_baseurl ?>"><?= $this_challenge_page_title ?></a>
         <? if ($sub_action == 'editor' && !empty($challenge_data)): ?>
-            &raquo; <a href="admin/edit-challenges/editor/challenge_id=<?= $challenge_data['challenge_id'] ?>"><?= !empty($challenge_name_display) ? $challenge_name_display : 'New Challenge';  ?></a>
+            &raquo; <a href="<?= $this_challenge_page_baseurl ?>editor/challenge_id=<?= $challenge_data['challenge_id'] ?>"><?= !empty($challenge_name_display) ? $challenge_name_display : 'New '.ucfirst($this_challenge_kind).' Challenge';  ?></a>
         <? endif; ?>
     </div>
 
     <?= !empty($this_error_markup) ? '<div style="margin: 0 auto 20px">'.$this_error_markup.'</div>' : '' ?>
 
-    <div class="adminform edit-challenges">
+    <div class="adminform edit-challenges <?= $this_challenge_page_token ?>">
 
         <? if ($sub_action == 'search'): ?>
 
@@ -592,13 +604,13 @@
 
             <div class="search">
 
-                <h3 class="header">Search Challenges</h3>
+                <h3 class="header">Search <?= ucfirst($this_challenge_kind) ?> Challenges</h3>
 
                 <? print_form_messages() ?>
 
                 <form class="form" method="get">
 
-                    <input type="hidden" name="action" value="edit-challenges" />
+                    <input type="hidden" name="action" value="<?= $this_challenge_page_token ?>" />
                     <input type="hidden" name="subaction" value="search" />
 
                     <div class="field">
@@ -616,25 +628,18 @@
                         <input class="textbox" type="text" name="challenge_content" placeholder="" value="<?= !empty($search_data['challenge_content']) ? htmlentities($search_data['challenge_content'], ENT_QUOTES, 'UTF-8', true) : '' ?>" />
                     </div>
 
-                    <div class="field">
-                        <strong class="label">By Kind</strong>
-                        <select class="select" name="challenge_kind">
-                            <option value=""></option>
-                            <option value="event"<?= !empty($search_data['challenge_kind']) && $search_data['challenge_kind'] === 'event' ? ' selected="selected"' : '' ?>>Event Challenge</option>
-                            <option value="user"<?= !empty($search_data['challenge_kind']) && $search_data['challenge_kind'] === 'user' ? ' selected="selected"' : '' ?>>User Challenge</option>
-                        </select><span></span>
-                    </div>
-
-                    <div class="field">
-                        <strong class="label">By Creator</strong>
-                        <select class="select" name="challenge_creator"><option value=""></option><?
-                            foreach ($mmrpg_contributors_index AS $user_id => $user_info){
-                                $option_label = $user_info['user_name'];
-                                if (!empty($user_info['user_name_public']) && $user_info['user_name_public'] !== $user_info['user_name']){ $option_label = $user_info['user_name_public'].' ('.$option_label.')'; }
-                                ?><option value="<?= $user_id ?>"<?= !empty($search_data['challenge_creator']) && $search_data['challenge_creator'] === $user_id ? ' selected="selected"' : '' ?>><?= $option_label ?></option><?
-                                } ?>
-                        </select><span></span>
-                    </div>
+                    <? if ($this_challenge_kind === 'user'){ ?>
+                        <div class="field">
+                            <strong class="label">By Creator</strong>
+                            <select class="select" name="challenge_creator"><option value=""></option><?
+                                foreach ($mmrpg_contributors_index AS $user_id => $user_info){
+                                    $option_label = $user_info['user_name'];
+                                    if (!empty($user_info['user_name_public']) && $user_info['user_name_public'] !== $user_info['user_name']){ $option_label = $user_info['user_name_public'].' ('.$option_label.')'; }
+                                    ?><option value="<?= $user_id ?>"<?= !empty($search_data['challenge_creator']) && $search_data['challenge_creator'] === $user_id ? ' selected="selected"' : '' ?>><?= $option_label ?></option><?
+                                    } ?>
+                            </select><span></span>
+                        </div>
+                    <? } ?>
 
                     <div class="field has2cols flags">
                     <?
@@ -661,8 +666,8 @@
 
                     <div class="buttons">
                         <input class="button search" type="submit" value="Search" />
-                        <input class="button reset" type="reset" value="Reset" onclick="javascript:window.location.href='admin/edit-challenges/';" />
-                        <a class="button new" href="admin/edit-challenges/editor/challenge_id=0">Create New</a>
+                        <input class="button reset" type="reset" value="Reset" onclick="javascript:window.location.href='<?= $this_challenge_page_baseurl ?>';" />
+                        <a class="button new" href="<?= $this_challenge_page_baseurl ?>editor/challenge_id=0">Create New</a>
                     </div>
 
                 </form>
@@ -679,8 +684,10 @@
                         <colgroup>
                             <col class="id" width="60" />
                             <col class="name" width="" />
+                            <? if ($this_challenge_kind === 'user'){ ?>
+                                <col class="creator" width="160" />
+                            <? } ?>
                             <col class="kind" width="85" />
-                            <col class="creator" width="160" />
                             <col class="date created" width="90" />
                             <col class="date modified" width="90" />
                             <col class="flag published" width="80" />
@@ -691,8 +698,10 @@
                             <tr>
                                 <th class="id"><?= cms_admin::get_sort_link('challenge_id', 'ID') ?></th>
                                 <th class="name"><?= cms_admin::get_sort_link('challenge_name', 'Name') ?></th>
+                                <? if ($this_challenge_kind === 'user'){ ?>
+                                    <th class="creator"><?= cms_admin::get_sort_link('challenge_creator', 'Creator') ?></th>
+                                <? } ?>
                                 <th class="kind"><?= cms_admin::get_sort_link('challenge_kind', 'Kind') ?></th>
-                                <th class="creator"><?= cms_admin::get_sort_link('challenge_creator', 'Creator') ?></th>
                                 <th class="date created"><?= cms_admin::get_sort_link('challenge_date_created', 'Created') ?></th>
                                 <th class="date modified"><?= cms_admin::get_sort_link('challenge_date_modified', 'Modified') ?></th>
                                 <th class="flag published"><?= cms_admin::get_sort_link('challenge_flag_published', 'Published') ?></th>
@@ -702,8 +711,10 @@
                             <tr>
                                 <th class="head id"></th>
                                 <th class="head name"></th>
+                                <? if ($this_challenge_kind === 'user'){ ?>
+                                    <th class="head creator"></th>
+                                <? } ?>
                                 <th class="head kind"></th>
-                                <th class="head creator"></th>
                                 <th class="head date created"></th>
                                 <th class="head date modified"></th>
                                 <th class="head flag published"></th>
@@ -715,8 +726,10 @@
                             <tr>
                                 <td class="foot id"></td>
                                 <td class="foot name"></td>
+                                <? if ($this_challenge_kind === 'user'){ ?>
+                                    <td class="foot creator"></td>
+                                <? } ?>
                                 <td class="foot kind"></td>
-                                <td class="foot creator"></td>
                                 <td class="foot date created"></td>
                                 <td class="foot date modified"></td>
                                 <td class="foot flag published"></td>
@@ -736,28 +749,32 @@
                                 $challenge_name = $challenge_data['challenge_name'];
                                 $challenge_kind = ucfirst($challenge_data['challenge_kind']);
                                 $challenge_kind_span = '<span class="type_span type_'.$temp_class_colours[$challenge_data['challenge_kind']][0].'">'.$temp_class_colours[$challenge_data['challenge_kind']][1].' '.$challenge_kind.'</span>';
-                                $challenge_creator = !empty($challenge_data['challenge_creator']) ? $mmrpg_contributors_index[$challenge_data['challenge_creator']] : false;
-                                $challenge_creator_name = !empty($challenge_creator['user_name_display']) ? $challenge_creator['user_name_display'] : false;
-                                $challenge_creator_type = !empty($challenge_creator['user_colour_token']) ? $challenge_creator['user_colour_token'] : 'none';
-                                $challenge_creator_span = !empty($challenge_creator_name) ? '<span class="type_span type_'.$challenge_creator_type.'">'.$challenge_creator_name.'</span>' : '-';
+                                if ($this_challenge_kind === 'user'){
+                                    $challenge_creator = !empty($challenge_data['challenge_creator']) ? $mmrpg_contributors_index[$challenge_data['challenge_creator']] : false;
+                                    $challenge_creator_name = !empty($challenge_creator['user_name_display']) ? $challenge_creator['user_name_display'] : false;
+                                    $challenge_creator_type = !empty($challenge_creator['user_colour_token']) ? $challenge_creator['user_colour_token'] : 'none';
+                                    $challenge_creator_span = !empty($challenge_creator_name) ? '<span class="type_span type_'.$challenge_creator_type.'">'.$challenge_creator_name.'</span>' : '-';
+                                }
                                 $challenge_date_created = !empty($challenge_data['challenge_date_created']) ? date('Y-m-d', $challenge_data['challenge_date_created']) : '-';
                                 $challenge_date_modified = !empty($challenge_data['challenge_date_modified']) ? date('Y-m-d', $challenge_data['challenge_date_modified']) : '-';
                                 $challenge_flag_published = !empty($challenge_data['challenge_flag_published']) ? '<i class="fas fa-check-square"></i>' : '-';
                                 $challenge_flag_hidden = !empty($challenge_data['challenge_flag_hidden']) ? '<i class="fas fa-eye-slash"></i>' : '-';
 
-                                $challenge_edit_url = 'admin/edit-challenges/editor/challenge_id='.$challenge_id;
+                                $challenge_edit_url = $this_challenge_page_baseurl.'editor/challenge_id='.$challenge_id;
                                 $challenge_name_link = '<a class="link" href="'.$challenge_edit_url.'">'.$challenge_name.'</a>';
 
                                 $challenge_actions = '';
                                 $challenge_actions .= '<a class="link edit" href="'.$challenge_edit_url.'"><span>edit</span></a>';
                                 //$challenge_actions .= '<span class="link delete disabled"><span>delete</span></span>';
-                                $challenge_actions .= '<a class="link delete" data-delete="challenges" data-challenge-id="'.$challenge_id.'"><span>delete</span></a>';
+                                $challenge_actions .= '<a class="link delete" data-delete="challenges" data-challenge-id="'.$challenge_id.'" data-challenge-kind="'.$this_challenge_kind.'"><span>delete</span></a>';
 
                                 echo '<tr>'.PHP_EOL;
                                     echo '<td class="id"><div>'.$challenge_id.'</div></td>'.PHP_EOL;
                                     echo '<td class="name"><div class="wrap">'.$challenge_name_link.'</div></td>'.PHP_EOL;
+                                    if ($this_challenge_kind === 'user'){
+                                        echo '<td class="creator"><div class="wrap">'.$challenge_creator_span.'</div></td>'.PHP_EOL;
+                                    }
                                     echo '<td class="kind"><div class="wrap">'.$challenge_kind_span.'</div></td>'.PHP_EOL;
-                                    echo '<td class="creator"><div class="wrap">'.$challenge_creator_span.'</div></td>'.PHP_EOL;
                                     echo '<td class="date created"><div>'.$challenge_date_created.'</div></td>'.PHP_EOL;
                                     echo '<td class="date modified"><div>'.$challenge_date_modified.'</div></td>'.PHP_EOL;
                                     echo '<td class="flag published"><div>'.$challenge_flag_published.'</div></td>'.PHP_EOL;
@@ -813,7 +830,7 @@
 
                     <form class="form" method="post">
 
-                        <input type="hidden" name="action" value="edit-challenges" />
+                        <input type="hidden" name="action" value="<?= $this_challenge_page_token ?>" />
                         <input type="hidden" name="subaction" value="editor" />
 
                         <?
@@ -822,29 +839,11 @@
                             ?>
 
                                 <input type="hidden" name="challenge_id" value="0" />
+                                <input type="hidden" name="challenge_kind" value="<?= $this_challenge_kind ?>" />
 
                                 <div class="editor-panels">
 
                                     <div class="panel active">
-
-                                        <div class="field fullsize">
-                                            <strong class="label">Challenge Kind</strong>
-                                            <select class="select" name="challenge_kind">
-                                                <option value="" <?= empty($challenge_data['challenge_kind']) ? 'selected="selected"' : '' ?>>-</option>
-                                                <option value="event" <?= $challenge_data['challenge_kind'] == 'event' ? 'selected="selected"' : '' ?>>Event Challenge</option>
-                                                <option value="user" <?= $challenge_data['challenge_kind'] == 'user' ? 'selected="selected"' : '' ?>>User Challenge</option>
-                                            </select><span></span>
-                                        </div>
-
-                                        <div class="field fullsize">
-                                            <div class="label">
-                                                <strong>Challenge Creator</strong>
-                                                <em>leave blank for events</em>
-                                            </div>
-                                            <select class="select" name="challenge_creator">
-                                                <?= str_replace('value="'.$challenge_data['challenge_creator'].'"', 'value="'.$challenge_data['challenge_creator'].'" selected="selected"', $contributor_options_markup) ?>
-                                            </select><span></span>
-                                        </div>
 
                                         <div class="field fullsize">
                                             <div class="label">
@@ -853,6 +852,17 @@
                                             </div>
                                             <input class="textbox" type="text" name="challenge_name" value="<?= $challenge_data['challenge_name'] ?>" maxlength="64" />
                                         </div>
+
+                                        <? if ($this_challenge_kind === 'user'){ ?>
+                                            <div class="field fullsize">
+                                                <strong class="label">Challenge Creator</strong>
+                                                <select class="select" name="challenge_creator">
+                                                    <?= str_replace('value="'.$challenge_data['challenge_creator'].'"', 'value="'.$challenge_data['challenge_creator'].'" selected="selected"', $contributor_options_markup) ?>
+                                                </select><span></span>
+                                            </div>
+                                        <? } else { ?>
+                                            <input type="hidden" name="challenge_creator" value="0" />
+                                        <? } ?>
 
                                     </div>
 
@@ -883,37 +893,6 @@
                                         </div>
 
                                         <div class="field">
-                                            <strong class="label">Challenge Kind</strong>
-                                            <select class="select" name="challenge_kind">
-                                                <option value="event" <?= $challenge_data['challenge_kind'] == 'event' ? 'selected="selected"' : '' ?>>Event Challenge</option>
-                                                <option value="user" <?= empty($challenge_data['challenge_kind']) || $challenge_data['challenge_kind'] == 'user' ? 'selected="selected"' : '' ?>>User Challenge</option>
-                                            </select><span></span>
-                                        </div>
-
-                                        <div class="field">
-                                            <div class="label">
-                                                <strong>Challenge Creator</strong>
-                                                <em>leave blank for events</em>
-                                            </div>
-                                            <? if ($challenge_data['challenge_kind'] == 'user'){ ?>
-                                                <select class="select" name="challenge_creator">
-                                                    <?= str_replace('value="'.$challenge_data['challenge_creator'].'"', 'value="'.$challenge_data['challenge_creator'].'" selected="selected"', $contributor_options_markup) ?>
-                                                </select><span></span>
-                                            <? } else { ?>
-                                                <input type="hidden" name="challenge_creator" value="<?= $challenge_data['challenge_creator'] ?>" />
-                                                <input class="textbox" type="text" name="challenge_creator" value="-" disabled="disabled" />
-                                            <? } ?>
-                                        </div>
-
-                                        <div class="field">
-                                            <div class="label">
-                                                <strong>Challenge Name <?= $challenge_data_is_new ? '<span class="required" style="color: red; font-weight: bold;">*</span>' : '' ?></strong>
-                                                <em>appears on the button</em>
-                                            </div>
-                                            <input class="textbox" type="text" name="challenge_name" value="<?= $challenge_data['challenge_name'] ?>" maxlength="64" />
-                                        </div>
-
-                                        <div class="field">
                                             <div class="label">
                                                 <strong>Robot Limit</strong>
                                                 <em>use zero for auto</em>
@@ -928,6 +907,25 @@
                                             </div>
                                             <input class="textbox" type="number" name="challenge_turn_limit" value="<?= $challenge_data['challenge_turn_limit'] ?>" min="0" max="99" />
                                         </div>
+
+                                        <div class="field halfsize">
+                                            <div class="label">
+                                                <strong>Challenge Name <?= $challenge_data_is_new ? '<span class="required" style="color: red; font-weight: bold;">*</span>' : '' ?></strong>
+                                                <em>appears on the button, maxlength is 64</em>
+                                            </div>
+                                            <input class="textbox" type="text" name="challenge_name" value="<?= $challenge_data['challenge_name'] ?>" maxlength="64" />
+                                        </div>
+
+                                        <? if ($this_challenge_kind === 'user'){ ?>
+                                            <div class="field halfsize">
+                                                <strong class="label">Challenge Creator</strong>
+                                                <select class="select" name="challenge_creator">
+                                                    <?= str_replace('value="'.$challenge_data['challenge_creator'].'"', 'value="'.$challenge_data['challenge_creator'].'" selected="selected"', $contributor_options_markup) ?>
+                                                </select><span></span>
+                                            </div>
+                                        <? } else { ?>
+                                            <input type="hidden" name="challenge_creator" value="0" />
+                                        <? } ?>
 
                                         <div class="field fullsize">
                                             <div class="label">
@@ -1195,8 +1193,8 @@
 
                                     <div class="buttons">
                                         <input class="button save" type="submit" value="Save Changes" />
-                                        <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin/edit-challenges/editor/challenge_id=<?= $challenge_data['challenge_id'] ?>';" />
-                                        <input class="button delete" type="button" value="Delete Challenge" data-delete="challenges" data-challenge-id="<?= $challenge_data['challenge_id'] ?>" />
+                                        <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='<?= $this_challenge_page_baseurl ?>editor/challenge_id=<?= $challenge_data['challenge_id'] ?>';" />
+                                        <input class="button delete" type="button" value="Delete Challenge" data-delete="challenges" data-challenge-id="<?= $challenge_data['challenge_id'] ?>" data-challenge-kind="<?= $this_challenge_kind ?>" />
                                     </div>
 
                                     <div class="metadata">

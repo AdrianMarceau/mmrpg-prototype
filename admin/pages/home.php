@@ -122,20 +122,31 @@
         $temp_group_name = 'Post-Game Content';
         ob_start();
         if (in_array('*', $this_adminaccess)
-            || in_array('edit-challenges', $this_adminaccess)){
-            ?>
-            <li class="item">
-                <a href="admin/edit-challenges/">Manage Custom Challenges</a>
-                <em>create or modify custom challenge missions for post-game users</em>
-            </li>
-            <?
-        }
-        if (in_array('*', $this_adminaccess)
             || in_array('edit-stars', $this_adminaccess)){
             ?>
             <li class="item">
                 <a href="admin/edit-stars/">Schedule Rogue Stars</a>
                 <em>schedule and manage rogue star appearances in the post-game</em>
+            </li>
+            <?
+        }
+        if (in_array('*', $this_adminaccess)
+            || in_array('edit-challenges', $this_adminaccess)
+            || in_array('edit-event-challenges', $this_adminaccess)){
+            ?>
+            <li class="item">
+                <a href="admin/edit-event-challenges/">Edit Event Challenges</a>
+                <em>create or modify event-based challenge missions for the post-game</em>
+            </li>
+            <?
+        }
+        if (in_array('*', $this_adminaccess)
+            || in_array('edit-challenges', $this_adminaccess)
+            || in_array('edit-user-challenges', $this_adminaccess)){
+            ?>
+            <li class="item">
+                <a href="admin/edit-user-challenges/">Edit User Challenges</a>
+                <em>create or modify user-created challenge missions for the post-game</em>
             </li>
             <?
         }

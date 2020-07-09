@@ -6,7 +6,7 @@
 class rpg_mission_challenge extends rpg_mission {
 
     // Define a function for pulling a specific event mission from the database
-    public static function get_missions($this_prototype_data, $challenge_kind = '', $challenge_limit = 0, $include_hidden = false, $shuffle_list = false){
+    public static function get_missions($this_prototype_data, $challenge_kind = 'event', $challenge_limit = 0, $include_hidden = false, $shuffle_list = false){
         global $db;
         // Collect or define filters for the query
         $challenge_filters = array();
@@ -16,7 +16,6 @@ class rpg_mission_challenge extends rpg_mission {
         $challenge_filters = !empty($challenge_filters) ? implode(' AND ', $challenge_filters) : '1 = 1';
         // Collect or define the order for the query
         $challenge_order = array();
-        $challenge_order[] = "FIELD(challenges.challenge_kind, 'event', 'user')";
         if ($shuffle_list){ $challenge_order[] = 'RAND()'; }
         else { $challenge_order[] = 'challenges.challenge_creator ASC'; $challenge_order[] = 'challenges.challenge_id ASC'; }
         $challenge_order = !empty($challenge_order) ? implode(', ', $challenge_order) : 'challenges.challenge_id ASC';
@@ -24,16 +23,17 @@ class rpg_mission_challenge extends rpg_mission {
         $challenge_limit = !empty($challenge_limit) && is_numeric($challenge_limit) ? 'LIMIT '.$challenge_limit : '';
         // Pull data from the database given filters and ordering
         $challenge_fields = self::get_index_fields(true, 'challenges');
+        $challenge_table = $challenge_kind === 'user' ? 'mmrpg_users_challenges' : 'mmrpg_challenges';
         $raw_data_list = $db->get_array_list("SELECT
             {$challenge_fields},
             (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS challenge_creator_name
-            FROM mmrpg_challenges AS challenges
+            FROM {$challenge_table} AS challenges
             LEFT JOIN mmrpg_users AS users ON users.user_id = challenges.challenge_creator
             WHERE {$challenge_filters}
             ORDER BY {$challenge_order}
             {$challenge_limit}
             ;");
-        //exit("SELECT {$challenge_fields} FROM mmrpg_challenges WHERE {$challenge_filters} ORDER BY {$challenge_order} {$challenge_limit};");
+        //exit("SELECT {$challenge_fields} FROM {$challenge_table} WHERE {$challenge_filters} ORDER BY {$challenge_order} {$challenge_limit};");
         if (empty($raw_data_list)){ return false; }
         $parsed_data_list = array();
         foreach ($raw_data_list AS $key => $raw_data){
@@ -50,32 +50,84 @@ class rpg_mission_challenge extends rpg_mission {
         global $db;
         if (!is_array($custom_mission_ids) || empty($custom_mission_ids)){ return false; }
         $challenge_fields = self::get_index_fields(true, 'challenges');
-        $challenge_ids_string = implode(',', $custom_mission_ids);
-        $raw_list = $db->get_array_list("SELECT
-            {$challenge_fields},
-            (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS challenge_creator_name
-            FROM mmrpg_challenges AS challenges
-            LEFT JOIN mmrpg_users AS users ON users.user_id = challenges.challenge_creator
-            WHERE challenges.challenge_id IN ({$challenge_ids_string})
-            ORDER BY FIELD(challenges.challenge_id, {$challenge_ids_string})
-            ;");
-        if (empty($raw_list)){ return false; }
-        $parsed_data_list = array();
-        foreach ($raw_list AS $key => $raw_data){
-            $parsed_data = self::parse_mission($this_prototype_data, $raw_data);
-            if (empty($parsed_data)){ return false; }
-            $parsed_data_list[] = $parsed_data;
+        $event_challenge_ids = array();
+        $user_challenge_ids = array();
+        foreach ($custom_mission_ids AS $id){
+            if (substr($id, 0, 1) == 'u'){ $user_challenge_ids[] = (int)(substr($id, 1)); }
+            else { $event_challenge_ids[] = (int)($id); }
         }
+        $raw_event_challenges_list = array();
+        if (!empty($event_challenge_ids)){
+            $ids_string = implode(',', $event_challenge_ids);
+            $challenge_table = 'mmrpg_challenges';
+            $raw_event_challenges_list = $db->get_array_list("SELECT
+                {$challenge_fields},
+                (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS challenge_creator_name
+                FROM {$challenge_table} AS challenges
+                LEFT JOIN mmrpg_users AS users ON users.user_id = challenges.challenge_creator
+                WHERE challenges.challenge_id IN ({$ids_string})
+                ORDER BY FIELD(challenges.challenge_id, {$ids_string})
+                ;");
+        }
+        $raw_user_challenges_list = array();
+        if (!empty($user_challenge_ids)){
+            $ids_string = implode(',', $user_challenge_ids);
+            $challenge_table = 'mmrpg_users_challenges';
+            $raw_user_challenges_list = $db->get_array_list("SELECT
+                {$challenge_fields},
+                (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS challenge_creator_name
+                FROM {$challenge_table} AS challenges
+                LEFT JOIN mmrpg_users AS users ON users.user_id = challenges.challenge_creator
+                WHERE challenges.challenge_id IN ({$ids_string})
+                ORDER BY FIELD(challenges.challenge_id, {$ids_string})
+                ;");
+        }
+        if (empty($raw_event_challenges_list) && empty($raw_user_challenges_list)){ return false; }
+        $parsed_data_list = array();
+        foreach ($custom_mission_ids AS $id){ $parsed_data_list[$id] = array(); }
+        if (!empty($raw_event_challenges_list)){
+            foreach ($raw_event_challenges_list AS $key => $raw_data){
+                $parsed_data = self::parse_mission($this_prototype_data, $raw_data);
+                if (empty($parsed_data)){ continue; }
+                $parsed_data_list[$raw_data['challenge_id']] = $parsed_data;
+            }
+        }
+        if (!empty($raw_user_challenges_list)){
+            foreach ($raw_user_challenges_list AS $key => $raw_data){
+                $parsed_data = self::parse_mission($this_prototype_data, $raw_data);
+                if (empty($parsed_data)){ continue; }
+                $parsed_data_list['u'.$raw_data['challenge_id']] = $parsed_data;
+            }
+        }
+
+        /*
+        echo('<pre>$custom_mission_ids = '.print_r($custom_mission_ids, true).'</pre>');
+        echo('<pre>$raw_event_challenges_list = '.print_r($raw_event_challenges_list, true).'</pre>');
+        echo('<pre>$raw_user_challenges_list = '.print_r($raw_user_challenges_list, true).'</pre>');
+        echo('<pre>$parsed_data_list = '.print_r($parsed_data_list, true).'</pre>');
+        exit();
+        */
+
         if (empty($parsed_data_list)){ return false; }
-        else { return $parsed_data_list; }
+        else { return array_values($parsed_data_list); }
+
     }
 
     // Define a function for pulling a specific event mission from the database
-    public static function get_mission($this_prototype_data, $challenge_id = 0){
+    public static function get_mission($this_prototype_data, $challenge_id = 0, $challenge_kind = 'event'){
         global $db;
         if (!is_numeric($challenge_id)){ return false; }
         $challenge_fields = self::get_index_fields(true);
-        $raw_data = $db->get_array("SELECT {$challenge_fields} FROM mmrpg_challenges WHERE challenge_id = {$challenge_id};");
+        if ($challenge_kind === 'user' || substr($challenge_id, 0, 1) === 'u'){
+            if (substr($challenge_id, 0, 1) === 'u'){ $challenge_xid = (int)(substr($challenge_id, 1)); }
+            else { $challenge_xid = (int)($challenge_id); }
+            $challenge_table = 'mmrpg_users_challenges';
+            $raw_data = $db->get_array("SELECT {$challenge_fields} FROM {$challenge_table} WHERE challenge_id = {$challenge_xid};");
+        } else {
+            $challenge_xid = (int)($challenge_id);
+            $challenge_table = 'mmrpg_challenges';
+            $raw_data = $db->get_array("SELECT {$challenge_fields} FROM {$challenge_table} WHERE challenge_id = {$challenge_xid};");
+        }
         if (empty($raw_data)){ return false; }
         $parsed_data = self::parse_mission($this_prototype_data, $raw_data);
         if (empty($parsed_data)){ return false; }
@@ -106,7 +158,8 @@ class rpg_mission_challenge extends rpg_mission {
         $challenge_robot_rewards = array('robot_attack' => 9999, 'robot_defense' => 9999, 'robot_speed' => 9999);
 
         // Generate the challenge token based on available data
-        $challenge_token = $this_prototype_data['phase_battle_token'].'-'.$challenge_data['challenge_kind'].'-'.$challenge_data['challenge_creator'].'-'.$challenge_data['challenge_id'];
+        $challenge_xid = ($challenge_data['challenge_kind'] == 'user' ? 'u' : '').$challenge_data['challenge_id'];
+        $challenge_token = $this_prototype_data['phase_battle_token'].'-'.$challenge_data['challenge_kind'].'-'.$challenge_data['challenge_creator'].'-'.$challenge_xid;
 
         // Automatically expand the field data with all required details given base
         if (empty($challenge_data['challenge_field_data'])){ return false; }
@@ -248,9 +301,9 @@ class rpg_mission_challenge extends rpg_mission {
         $challenge_counters = array();
         $challenge_flags['challenge_battle'] = true;
         if (!empty($challenge_data['challenge_flag_hidden'])){ $challenge_flags['is_hidden'] = true; }
-        if (!empty($challenge_mission_victories[$challenge_data['challenge_id']])){ $challenge_flags['is_cleared'] = true; }
+        if (!empty($challenge_mission_victories[$challenge_xid])){ $challenge_flags['is_cleared'] = true; }
         //$challenge_target_player['player_robots'][0]['robot_token']
-        $challenge_values['challenge_battle_id'] = $challenge_data['challenge_id'];
+        $challenge_values['challenge_battle_id'] = $challenge_xid;
         $challenge_values['challenge_battle_kind'] = $challenge_data['challenge_kind'];
         $challenge_values['challenge_battle_by'] = $challenge_data['challenge_creator_name'];
         //$challenge_values['challenge_marker'] = 'glass';
@@ -260,7 +313,7 @@ class rpg_mission_challenge extends rpg_mission {
         $challenge_values['challenge_records']['concluded'] = (int)($challenge_data['challenge_times_concluded']);
         $challenge_values['challenge_records']['victories'] = (int)($challenge_data['challenge_user_victories']);
         $challenge_values['challenge_records']['defeats'] = (int)($challenge_data['challenge_user_defeats']);
-        $challenge_values['challenge_records']['personal'] = !empty($challenge_mission_victories[$challenge_data['challenge_id']]) ? $challenge_mission_victories[$challenge_data['challenge_id']] : array();
+        $challenge_values['challenge_records']['personal'] = !empty($challenge_mission_victories[$challenge_xid]) ? $challenge_mission_victories[$challenge_xid] : array();
         if ($challenge_data['challenge_kind'] == 'event'){
             $vsrobot = $challenge_target_player['player_robots'][0]['robot_token'];
             $challenge_values['colour_token'] = $mmrpg_index_robots[$vsrobot]['robot_core'];
@@ -343,19 +396,39 @@ class rpg_mission_challenge extends rpg_mission {
         global $db;
         if (!empty($this_userid)
             && $this_userid !== MMRPG_SETTINGS_GUEST_ID){
-            $challenge_mission_victories = $db->get_array_list("SELECT
+            $challenge_table = 'mmrpg_challenges';
+            $challenge_leaderboard_table = 'mmrpg_challenges_leaderboard';
+            $challenge_event_mission_victories = $db->get_array_list("SELECT
                 board.challenge_id,
                 board.challenge_turns_used,
                 challenges.challenge_turn_limit,
                 board.challenge_robots_used,
                 challenges.challenge_robot_limit,
                 board.challenge_result
-                FROM mmrpg_challenges_leaderboard AS board
-                LEFT JOIN mmrpg_challenges AS challenges ON challenges.challenge_id = board.challenge_id
+                FROM {$challenge_leaderboard_table} AS board
+                LEFT JOIN {$challenge_table} AS challenges ON challenges.challenge_id = board.challenge_id
                 WHERE
                 board.user_id = {$this_userid}
                 AND board.challenge_result = 'victory'
                 ;", 'challenge_id');
+            $challenge_table = 'mmrpg_users_challenges';
+            $challenge_leaderboard_table = 'mmrpg_users_challenges_leaderboard';
+            $challenge_user_mission_victories = $db->get_array_list("SELECT
+                CONCAT('u', board.challenge_id) AS challenge_id,
+                board.challenge_turns_used,
+                challenges.challenge_turn_limit,
+                board.challenge_robots_used,
+                challenges.challenge_robot_limit,
+                board.challenge_result
+                FROM {$challenge_leaderboard_table} AS board
+                LEFT JOIN {$challenge_table} AS challenges ON challenges.challenge_id = board.challenge_id
+                WHERE
+                board.user_id = {$this_userid}
+                AND board.challenge_result = 'victory'
+                ;", 'challenge_id');
+            $challenge_mission_victories = array();
+            if (!empty($challenge_event_mission_victories)){ $challenge_mission_victories = array_merge($challenge_mission_victories, $challenge_event_mission_victories); }
+            if (!empty($challenge_user_mission_victories)){ $challenge_mission_victories = array_merge($challenge_mission_victories, $challenge_user_mission_victories); }
             return $challenge_mission_victories;
         } else {
             return false;
@@ -458,6 +531,7 @@ class rpg_mission_challenge extends rpg_mission {
         // Generate the actual title markup given available fields
         $this_challenge_id = $challenge_info['challenge_id'];
         $this_challenge_name = $challenge_info['challenge_name'];
+        $this_challenge_kind = $challenge_info['challenge_kind'];
         $this_field_data = json_decode($challenge_info['challenge_field_data'], true);
         $this_field_info1 = $mmrpg_field_index[$this_field_data['field_background']];
         $this_field_info2 = $mmrpg_field_index[$this_field_data['field_foreground']];
@@ -473,12 +547,12 @@ class rpg_mission_challenge extends rpg_mission {
 
         // Generate the challenge label that shows up in the option
         $this_challenge_label = $challenge_info['challenge_name'];
-        if ($challenge_info['challenge_kind'] == 'event'
+        if ($this_challenge_kind == 'event'
             && !empty($this_target_data['player_robots'])){
             $first_robot_token = $this_target_data['player_robots'][0]['robot_token'];
             $first_robot_info = $mmrpg_robot_index[$first_robot_token];
             $this_challenge_label .= ' | Vs. '.$first_robot_info['robot_name'];
-        } elseif ($challenge_info['challenge_kind'] == 'user'
+        } elseif ($this_challenge_kind == 'user'
             && !empty($challenge_info['challenge_creator_name'])){
             $this_challenge_label .= ' | By '.$challenge_info['challenge_creator_name'];
         }
@@ -490,16 +564,18 @@ class rpg_mission_challenge extends rpg_mission {
         $is_new = $time_online <= $new_theshold ? true : false;
         if ($is_new){ $this_challenge_label = '(New!) '.$this_challenge_label; }
 
-        if (!empty($challenge_victories_index[$this_challenge_id])){
-            $victory_results = $challenge_victories_index[$this_challenge_id];
-            $victory_points = self::calculate_challenge_reward_points($challenge_info['challenge_kind'], $victory_results, $victory_percent, $victory_rank);
+        if (!empty($challenge_victories_index[$this_challenge_kind][$this_challenge_id])){
+            $victory_results = $challenge_victories_index[$this_challenge_kind][$this_challenge_id];
+            $victory_points = self::calculate_challenge_reward_points($this_challenge_kind, $victory_results, $victory_percent, $victory_rank);
             //$this_challenge_label = '&#9733; '.$victory_rank.'-RANK CLEAR! | '.$this_challenge_label;
             $this_challenge_label = '&#9733; '.$this_challenge_label.' | '.$victory_rank.'-RANK CLEAR!';
             $this_challenge_name = '&#9733; '.$this_challenge_name;
         }
 
+        $option_value = $this_challenge_id;
+        if ($this_challenge_kind == 'user'){ $option_value = 'u'.$option_value; }
         $this_challenge_field_option = '<option '.
-            'value="'.$challenge_info['challenge_id'].'" '.
+            'value="'.$option_value.'" '.
             'title="'.$this_challenge_title_plain.'" '.
             'data-label="'.$this_challenge_name.'" '.
             'data-type="'.$this_challenge_field_type1.'" '.
