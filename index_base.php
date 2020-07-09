@@ -349,7 +349,7 @@ if (!empty($db_page_info)){
 <style type="text/css"> html, body { background-color: #262626; } </style>
 
 <? if ($this_current_page == 'home' || $this_current_page == 'gallery'): ?>
-    <link type="text/css" href="_ext/colorbox/jquery.colorbox.css" rel="stylesheet" />
+    <link type="text/css" href=".libs/colorbox/example3/colorbox.css" rel="stylesheet" />
 <? endif; ?>
 
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
@@ -550,7 +550,7 @@ if ($this_current_page == 'file' // File sub-pages
     <script type="text/javascript" src="scripts/jquery.scrollbar.min.js"></script>
     <script async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
     <? if($this_current_page == 'home' || $this_current_page == 'gallery'): ?>
-        <script type="text/javascript" src="_ext/colorbox/jquery.colorbox.js"></script>
+        <script type="text/javascript" src=".libs/colorbox/jquery.colorbox.js"></script>
     <? endif; ?>
     <? if($this_current_page == 'database' && $this_current_sub == 'types'): ?>
         <script type="text/javascript" src="scripts/Chart-2.4.0.min.js"></script>
