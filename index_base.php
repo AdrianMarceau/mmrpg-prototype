@@ -552,7 +552,7 @@ if ($this_current_page == 'file' // File sub-pages
         <script type="text/javascript" src=".libs/colorbox/jquery.colorbox.js"></script>
     <? endif; ?>
     <? if($this_current_page == 'database' && $this_current_sub == 'types'): ?>
-        <script type="text/javascript" src="scripts/Chart-2.4.0.min.js"></script>
+        <script type="text/javascript" src=".libs/chart-js/Chart-2.4.0.min.js"></script>
     <? endif; ?>
     <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
     <script type="text/javascript" src="scripts/index.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
