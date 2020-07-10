@@ -692,7 +692,7 @@ while ($this_action == 'new'){
     </div>
     <div class="field">
         <label class="label label_captcha" title="Type the security code into the box exactly as you see it below.  This is to ensure you are human and not a spam bot.">Security Code : *</label>
-        <img class="captcha captcha_image" src="_ext/captcha/captcha.php?<?= time() ?>" width="200" height="70" alt="Security Code" />
+        <img class="captcha captcha_image" src=".libs/cool-php-captcha/captcha.php?<?= time() ?>" width="200" height="70" alt="Security Code" />
         <input class="text text_captcha" type="text" name="captcha" style="width: 165px; " value="<?= !empty($_REQUEST['captcha']) ? htmlentities(trim($_REQUEST['captcha']), ENT_QUOTES, 'UTF-8', true) : '' ?>" maxlength="18" />
     </div>
     <?
