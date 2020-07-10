@@ -19,7 +19,7 @@ if (!empty($temp_flags['drlight_password_robotgetletsrocknroll'])){
         $unlock_robot_info['robot_level'] = 1;
         $unlock_robot_info['robot_experience'] = 999;
         mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true);
-        header('Location: prototype.php');
+        header('Location: '.MMRPG_CONFIG_ROOTURL.'prototype.php');
         exit();
     }
 }
@@ -34,7 +34,7 @@ if (!empty($temp_flags['drlight_password_abilitygetdemocompletebonus'])){
         // Unlock the Copy Shot for use in battle early
         mmrpg_game_unlock_ability($mmrpg_index_players['dr-light'], false, array('ability_token' => 'copy-shot'), true);
         // Reset and return to the main menu
-        header('Location: prototype.php');
+        header('Location: '.MMRPG_CONFIG_ROOTURL.'prototype.php');
         exit();
     }
 }
@@ -44,7 +44,7 @@ if (!empty($temp_flags['drlight_password_abilitygetbubblebombsaway'])){
     if (!mmrpg_prototype_ability_unlocked('dr-light', false, 'bubble-bomb')){
         // Unlock Bubble Bomb as an equippable ability
         mmrpg_game_unlock_ability($mmrpg_index_players['dr-light'], false, array('ability_token' => 'bubble-bomb'), true);
-        header('Location: prototype.php');
+        header('Location: '.MMRPG_CONFIG_ROOTURL.'prototype.php');
         exit();
     }
 }
@@ -54,7 +54,7 @@ if (!empty($temp_flags['drlight_password_abilitygetcutterofdarkness'])){
     if (!mmrpg_prototype_ability_unlocked('dr-light', false, 'shadow-blade')){
         // Unlock Shadow Blade as an equippable ability
         mmrpg_game_unlock_ability($mmrpg_index_players['dr-light'], false, array('ability_token' => 'shadow-blade'), true);
-        header('Location: prototype.php');
+        header('Location: '.MMRPG_CONFIG_ROOTURL.'prototype.php');
         exit();
     }
 }
@@ -64,7 +64,7 @@ if (!empty($temp_flags['drlight_password_abilitygetnowivegotyourpower'])){
     if (!mmrpg_prototype_ability_unlocked('dr-light', false, 'copy-shot')){
         // Unlock Copy Shot as an equippable ability
         mmrpg_game_unlock_ability($mmrpg_index_players['dr-light'], false, array('ability_token' => 'copy-shot'), true);
-        header('Location: prototype.php');
+        header('Location: '.MMRPG_CONFIG_ROOTURL.'prototype.php');
         exit();
     }
 }
@@ -74,7 +74,7 @@ if (!empty($temp_flags['drlight_password_abilitygetwithallmyheartandsoul'])){
     if (!mmrpg_prototype_ability_unlocked('dr-light', false, 'copy-soul')){
         // Unlock Copy Shot as an equippable ability
         mmrpg_game_unlock_ability($mmrpg_index_players['dr-light'], false, array('ability_token' => 'copy-soul'), true);
-        header('Location: prototype.php');
+        header('Location: '.MMRPG_CONFIG_ROOTURL.'prototype.php');
         exit();
     }
 }

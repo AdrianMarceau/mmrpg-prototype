@@ -188,7 +188,7 @@ if ($is_admin && !empty($temp_password_flags)){
 }
 
 // Include the prototype awards file to check stuff
-require('prototype_awards.php');
+require(MMRPG_CONFIG_ROOTDIR.'prototype/awards.php');
 
 
 // If possible, attempt to save the game to the session
@@ -518,8 +518,8 @@ if (mmrpg_prototype_item_unlocked('wily-program')){
         </span>
         <?
 
-        // Require the prototype missions display file
-        require_once(MMRPG_CONFIG_ROOTDIR.'prototype/missions.php');
+        // Require the prototype campaign chapters display file
+        require_once(MMRPG_CONFIG_ROOTDIR.'prototype/chapters.php');
 
         // If we're NOT in demo mode, maybe add a back button
         if (empty($_SESSION[$session_token]['DEMO'])){

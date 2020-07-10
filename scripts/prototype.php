@@ -51,8 +51,8 @@ switch ($this_data_select){
   // If this was a MISSIONS request type, print out the missions
   case 'this_battle_token': {
 
-    // Require the prototype missions display file
-    require_once(MMRPG_CONFIG_ROOTDIR.'prototype/missions.php');
+    // Require the prototype campaign chapters display file
+    require_once(MMRPG_CONFIG_ROOTDIR.'prototype/chapters.php');
 
     // DEBUG
     //exit('missions-requested:'.print_r($this_data_condition, true));

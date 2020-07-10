@@ -71,17 +71,15 @@ if ($temp_save && rpg_game::is_user()){
 // If there were save file corruptions, reset
 if (!defined('MMRPG_SCRIPT_REQUEST') && empty($this_prototype_data['robots_unlocked'])){
     mmrpg_reset_game_session();
-    header('Location: prototype.php');
+    header('Location: '.MMRPG_CONFIG_ROOTURL.'prototype.php');
     exit();
 }
 
 // Require the PASSWORDS file for this player
-if (!defined('MMRPG_SCRIPT_REQUEST')){
-    require_once('prototype_'.$this_prototype_data['this_player_token'].'_passwords.php');
-}
+if (!defined('MMRPG_SCRIPT_REQUEST')){ require_once(MMRPG_CONFIG_ROOTDIR.'prototype/passwords/'.$this_prototype_data['this_player_token'].'.php'); }
 
-// Require the MISSIONS file for this player
-require('prototype_dr-xxx_missions.php');
+// Require the common MISSIONS file for all players
+require(MMRPG_CONFIG_ROOTDIR.'prototype/missions.php');
 
 // Define the robot options and counter for this mode
 if (empty($_SESSION['PROTOTYPE_TEMP'][$this_prototype_data['this_player_token'].'_robot_options'])){

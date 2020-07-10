@@ -87,8 +87,7 @@ Manually add REQUIRED /images/ directories to the repo
 -  /images/objects/heart-cores/ [DONE]
 -  /images/social-icons_32x32.png [DONE]
 -  /images/viewer.php [DONE]
--
--  many many many more (?)
+-  many many many more (?) [DONE]
 -
 -  MMRPG-Prototype_COPPA-Compliance.pdf  (MUST UPDATE!)
 

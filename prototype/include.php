@@ -33,41 +33,28 @@ if (!defined('MMRPG_SCRIPT_REQUEST')){
 }
 
 /*
- * MENU MARKUP
+ * CAMPAIGN MENU MARKUP
  */
 
-// DEMO MENU OPTIONS
-if (!empty($_SESSION[mmrpg_game_token()]['DEMO'])){
-    // Only print out Light's data if conditions allow or do not exist
-    if (empty($this_data_condition) || in_array('this_player_token=dr-light', $this_data_condition)){
-        // Include the light mode options and markup
-        if ($unlock_flag_light){
-            require(MMRPG_CONFIG_ROOTDIR.'prototype_dr-light_menu.php');
-        }
+// Only print out Light's data if conditions allow or do not exist
+if (empty($this_data_condition) || $this_data_select == 'this_player_token' || in_array('this_player_token=dr-light', $this_data_condition)){
+    // Include the light mode options and markup
+    if ($unlock_flag_light){
+        require(MMRPG_CONFIG_ROOTDIR.'prototype/campaigns/dr-light.php');
     }
 }
-// NORMAL MENU OPTIONS
-else {
-    // Only print out Light's data if conditions allow or do not exist
-    if (empty($this_data_condition) || $this_data_select == 'this_player_token' || in_array('this_player_token=dr-light', $this_data_condition)){
-        // Include the light mode options and markup
-        if ($unlock_flag_light){
-            require(MMRPG_CONFIG_ROOTDIR.'prototype_dr-light_menu.php');
-        }
+// Only print out Wily's data if conditions allow or do not exist
+if (empty($this_data_condition) || $this_data_select == 'this_player_token' || in_array('this_player_token=dr-wily', $this_data_condition)){
+    // Include the wily mode options and markup
+    if ($unlock_flag_wily){
+        require(MMRPG_CONFIG_ROOTDIR.'prototype/campaigns/dr-wily.php');
     }
-    // Only print out Wily's data if conditions allow or do not exist
-    if (empty($this_data_condition) || $this_data_select == 'this_player_token' || in_array('this_player_token=dr-wily', $this_data_condition)){
-        // Include the wily mode options and markup
-        if ($unlock_flag_wily){
-            require(MMRPG_CONFIG_ROOTDIR.'prototype_dr-wily_menu.php');
-        }
-    }
-    // Only print out Cossack's data if conditions allow or do not exist
-    if (empty($this_data_condition) || $this_data_select == 'this_player_token' || in_array('this_player_token=dr-cossack', $this_data_condition)){
-        // Include the cossack mode options and markup
-        if ($unlock_flag_cossack){
-            require(MMRPG_CONFIG_ROOTDIR.'prototype_dr-cossack_menu.php');
-        }
+}
+// Only print out Cossack's data if conditions allow or do not exist
+if (empty($this_data_condition) || $this_data_select == 'this_player_token' || in_array('this_player_token=dr-cossack', $this_data_condition)){
+    // Include the cossack mode options and markup
+    if ($unlock_flag_cossack){
+        require(MMRPG_CONFIG_ROOTDIR.'prototype/campaigns/dr-cossack.php');
     }
 }
 
