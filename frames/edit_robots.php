@@ -197,7 +197,7 @@ $first_robot_token = $allowed_edit_robots[0];
                 </div>
         </div>
     </div>
-<script type="text/javascript" src="scripts/jquery.js"></script>
+<script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
 <script type="text/javascript" src="scripts/jquery.sortable.min.js"></script>
 <script type="text/javascript" src="scripts/jquery.scrollbar.min.js"></script>
 <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>

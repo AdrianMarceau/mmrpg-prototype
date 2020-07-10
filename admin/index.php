@@ -271,7 +271,7 @@ unset($db);
         <?= htmlentities(print_r($_REQUEST), ENT_QUOTES, 'UTF-8', true) ?>
         </pre>
     <? } ?>
-<script type="text/javascript" src="scripts/jquery.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
 <? if (!empty($admin_include_javascript)){ ?>
     <?= $admin_include_javascript ?>
 <? } ?>

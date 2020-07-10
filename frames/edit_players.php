@@ -531,7 +531,7 @@ if (true){
         </div>
 
     </div>
-<script type="text/javascript" src="scripts/jquery.js"></script>
+<script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
 <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/edit_players.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>

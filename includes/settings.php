@@ -30,6 +30,10 @@ define('MMRPG_CONFIG_ITEMS_CONTENT_PATH', MMRPG_CONFIG_CONTENT_PATH.'items/');
 define('MMRPG_CONFIG_FIELDS_CONTENT_PATH', MMRPG_CONFIG_CONTENT_PATH.'fields/');
 define('MMRPG_CONFIG_BATTLES_CONTENT_PATH', MMRPG_CONFIG_CONTENT_PATH.'battles/');
 
+// Define the global settings for external libraries, scripts, and styles
+define('MMRPG_CONFIG_JQUERY_VERSION', '1.6.1');
+
+
 // Define the global timeout variables for online and new status
 define('MMRPG_SETTINGS_ONLINE_TIMEOUT', (60 * 30)); // In seconds (60sec x 30min = 1/2 Hour)
 define('MMRPG_SETTINGS_ACTIVE_TIMEOUT', (60 * 60 * 24 * 90)); // In seconds (60sec x 60min x 24hr x 90days)

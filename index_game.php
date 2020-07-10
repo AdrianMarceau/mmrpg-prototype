@@ -195,9 +195,9 @@ if (count($matches)>1){
     This game is fan-made by <a href="https://plus.google.com/113336469005774860291?rel=author" target="_blank">Adrian Marceau</a>, not affiliated or endorsed by Capcom at all, and is in no way official. Any and all <a href="contact/" target="_blank">feedback</a> is appreciated. :)
 </div>
 <?endif;?>
-<script type="text/javascript" src="<?= MMRPG_CONFIG_ROOTURL ?>scripts/jquery.js"></script>
-<script type="text/javascript" src="<?= MMRPG_CONFIG_ROOTURL ?>scripts/jquery.scrollbar.min.js"></script>
-<script type="text/javascript" src="<?= MMRPG_CONFIG_ROOTURL ?>scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
+<script type="text/javascript" src="scripts/jquery.scrollbar.min.js"></script>
+<script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
 // Define the key client variables
 <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
