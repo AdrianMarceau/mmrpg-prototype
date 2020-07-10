@@ -353,7 +353,7 @@ if (!empty($db_page_info)){
 <? endif; ?>
 
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/jquery.scrollbar.min.css?<?= MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.css" rel="stylesheet" />
 <link type="text/css" href="styles/index.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/index-responsive.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 
@@ -547,8 +547,7 @@ if ($this_current_page == 'file' // File sub-pages
     <a id="topscroll" href="<?= $this_current_url ?>"></a>
 
     <script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
-    <script type="text/javascript" src="scripts/jquery.scrollbar.min.js"></script>
-    <script async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
+    <script type="text/javascript" src=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.js"></script>
     <? if($this_current_page == 'home' || $this_current_page == 'gallery'): ?>
         <script type="text/javascript" src=".libs/colorbox/jquery.colorbox.js"></script>
     <? endif; ?>
