@@ -88,7 +88,7 @@ RewriteRule ^images/(abilities|fields|items|players|robots)/(_effects)/([-_a-z0-
 
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule  ^images/(_raw|database|gallery|misc|theme|types)/(.*)$  images/.legacy/$1/$2  [L,QSA]
+RewriteRule  ^images/(_raw|database|gallery|misc|theme|types)/(.*)$  https://cdn.mmrpg-world.net/prototype/.legacy/images/$1/$2  [L,QSA]
 
 ###################################
 # -- SCRIPT/STYLE/XML REWRITES -- #
