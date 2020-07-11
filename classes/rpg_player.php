@@ -3480,5 +3480,24 @@ class rpg_player extends rpg_object {
 
     }
 
+
+    /* -- MISC PLAYER FUNCTIONS -- */
+
+    // Define a function for calculating the intro field for a given player
+    public static function get_intro_field($player_token, $field_token_only = true){
+        if ($player_token === 'dr-light'){ $intro_field = 'gentle-countryside'; }
+        elseif ($player_token === 'dr-wily'){ $intro_field = 'maniacal-hideaway'; }
+        elseif ($player_token === 'dr-cossack'){ $intro_field = 'wintry-forefront'; }
+        else { $intro_field = 'intro-field'; }
+        if ($field_token_only){
+            return $intro_field;
+        } else {
+            return array(
+                'field_token' => $intro_field,
+                'field_name' => ucwords(str_replace('-', ' ', $intro_field))
+                );
+        }
+    }
+
 }
 ?>
