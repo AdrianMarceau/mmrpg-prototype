@@ -141,15 +141,18 @@ function clean_json_content_array($kind, $content_json_data){
         }
     }
     // If there are an image editor fields, translate them to contributor IDs
-    global $user_ids_to_contributor_ids;
+    global $user_ids_to_contributor_usernames;
     $image_fields = array($kind.'_image_editor', $kind.'_image_editor2');
     foreach ($image_fields AS $image_field){
+        if (!isset($cleaned_json_data[$image_field])){ continue; }
         if (!empty($cleaned_json_data[$image_field])){
             $user_id = $cleaned_json_data[$image_field];
-            if (!empty($user_ids_to_contributor_ids[$user_id])){
-                $contributor_id = $user_ids_to_contributor_ids[$user_id];
-                $cleaned_json_data[$image_field] = $contributor_id;
+            if (!empty($user_ids_to_contributor_usernames[$user_id])){
+                $contributor_name = $user_ids_to_contributor_usernames[$user_id];
+                $cleaned_json_data[$image_field] = $contributor_name;
             }
+        } else {
+            $cleaned_json_data[$image_field] = '';
         }
     }
     // Return the cleaned JSON data
