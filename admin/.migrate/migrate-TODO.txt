@@ -101,6 +101,18 @@ Implement the new "minify" library to compress
 -  All scripts
 
 Update the admin panel with code editor for relevant object types
+-  players [DONE]
+-  robots [DONE]
+-  fields [DONE]
+
+Update migration script to save sprite/image editor IDs as strings instead (contributor's user_name_clean)
+-  fields
+-  players
+-  robots
+-  abilities
+-  items
+
+Update the admin panel so it pulls the right contributors list (mmrpg_users vs mmrpg_users_contributors table)
 -  players
 -  robots
 -  fields
@@ -109,6 +121,15 @@ Update the admin panel with editors for the final object types
 -  abilities
 -  items
 
+Update the admin panel to deal with git functions add/stage/commit for content directories
+-  ?????
+
 Update the admin panel to distinguish between DEV and LIVE servers
 -  ?????
+
+Update live DB with changes to challenges table
+-  Duplicate mmrpg_challenges as mmrpg_users_challenges
+-  Duplicate mmrpg_challenges_leaderboard AS mmrpg_users_challenges_leaderboard
+-  Ensure the base tables only have 'event' kind challenge records
+-  Ensure the user tables only have 'user' kind challenge records
 
