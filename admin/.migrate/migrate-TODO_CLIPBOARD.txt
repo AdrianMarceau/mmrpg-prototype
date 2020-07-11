@@ -1,0 +1,44 @@
+##############################
+MISC MIGRATION DATA CLIPBOARD
+##############################
+
+------------------------------
+
+// Move all user-related challenge data into its own table as well as any related leaderboard records
+ob_echo('Copying user challenges data from `mmrpg_challenges` into `mmrpg_users_challenges` table ...');
+$db->query("INSERT INTO mmrpg_users_challenges (
+    SELECT
+    challenges.* FROM mmrpg_challenges AS challenges
+    WHERE challenges.challenge_kind = 'user'
+    );");
+ob_echo('Copying user challenges leaderboard data from `mmrpg_challenges_leaderboard` into `mmrpg_users_challenges_leaderboard` table ...');
+$db->query("INSERT INTO mmrpg_users_challenges_leaderboard (
+    SELECT
+    leaderboard.* FROM mmrpg_challenges_leaderboard AS leaderboard
+    LEFT JOIN  mmrpg_challenges AS challenges ON challenges.challenge_id = leaderboard.challenge_id
+    WHERE challenges.challenge_kind = 'user'
+    );");
+ob_echo('Removing legacy user challenge data from `mmrpg_challenges` table ...');
+$db->query("DELETE
+    challenges.*
+    FROM mmrpg_challenges AS challenges
+    WHERE challenges.challenge_kind = 'user'
+    ;");
+ob_echo('Removing legacy user challenge leaderboard data from `mmrpg_challenges_leaderboard` table ...');
+$db->query("DELETE
+    leaderboard.*
+    FROM mmrpg_challenges_leaderboard AS leaderboard
+    LEFT JOIN  mmrpg_challenges AS challenges ON challenges.challenge_id = leaderboard.challenge_id
+    WHERE challenges.challenge_kind = 'user'
+    ;");
+ob_echo('');
+
+------------------------------
+
+mmrpg_developer :: 8962 => 1
+mmrpg_admin :: 8960 => 2
+mmrpg_contributor :: 8964 => 3
+mmrpg_moderator :: 8963 => 4
+mmrpg_member :: 8961 => 5
+
+------------------------------
