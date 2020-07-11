@@ -49,5 +49,15 @@ class cms_admin {
         return $totals_markup;
     }
 
+    // Define a function for checking if a given string of PHP code has valid syntax
+    public static function is_valid_php_syntax($fileContent){
+        $filename = tempnam('/tmp', '_');
+        file_put_contents($filename, $fileContent);
+        exec("php -l {$filename}", $output, $return);
+        $output = trim(implode(PHP_EOL, $output));
+        unlink($filename);
+        return $return === 0 ? true : false;
+    }
+
 }
 ?>
