@@ -103,6 +103,13 @@ ob_echo('');
 ob_echo('IMPORT JSON FILES:');
 ob_echo('');
 
+// Pre-collect a list of contributors so we can match usernames to IDs later
+$contributor_fields = rpg_user::get_contributor_index_fields(true);
+$contributor_index = $db->get_array_list("SELECT {$temp_contributor_fields} FROM mmrpg_users_contributors ORDER BY user_id ASC;", 'user_id');
+$contributor_usernames_to_ids = array();
+foreach ($contributor_index AS $key => $data){ $contributor_usernames_to_ids[$data['user_name_clean']] = $data['contributor_id']; }
+$contributor_field_pattern = '/^([a-z0-9]+)_image_editor([0-9]+)?$/i';
+
 // Loop through the content types one-by-one to check for JSON files
 foreach ($content_types_index AS $content_key => $content_info){
 
@@ -140,11 +147,13 @@ foreach ($content_types_index AS $content_key => $content_info){
         // Loop through the data files and import them into the database
         ob_echo('Looping through JSON data files and importing into database table "'.$table_name.'":');
         foreach ($json_data_dirs AS $object_key => $object_token){
+            // Open the json file and decode it's contents to collect details
             $json_file = $object_token.'/data.json';
             $json_markup = file_get_contents($json_data_dir.$json_file);
             $json_data = json_decode($json_markup, true);
             $real_object_token = $json_data[$ctype_token.'_token'];
             $echo_text = '- Importing '.$ctype_token.' data for "'.$real_object_token.'" into database table "'.$table_name.'" ... ';
+            // Check if this the json data has a parent_id set that needs translated to an object ID later
             $temp_child_to_parent_info = false;
             if (isset($json_data[$parent_token_field_name])){
                 $parent_token_field_value = $json_data[$parent_token_field_name];
@@ -156,6 +165,14 @@ foreach ($content_types_index AS $content_key => $content_info){
                 }
                 unset($json_data[$parent_token_field_name]);
             }
+            // Check if there are image editor usernames that need ot be translated to contributor IDs
+            foreach ($json_data AS $jkey => $jvalue){
+                if (preg_match($contributor_field_pattern, $jkey)){
+                    if (!empty($jvalue) && isset($contributor_usernames_to_ids[$jvalue])){ $json_data[$jkey] = $contributor_usernames_to_ids[$jvalue]; }
+                    else { $json_data[$jkey] = 0; }
+                }
+            }
+            // Now check to see if the data exists in the db already and insert if it doesn't exist yet
             $data_check_sql = "SELECT {$id_field_name} FROM {$table_name} WHERE {$token_field_name} = '{$real_object_token}';";
             $data_check_return = $db->get_value($data_check_sql, $id_field_name);
             if (empty($data_check_return)){
