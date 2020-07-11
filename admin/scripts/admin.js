@@ -444,7 +444,8 @@ $(document).ready(function(){
                 if (editorMode === 'html'){
                     editorConfig.mode = 'htmlmixed';
                     editorConfig.lineNumbers = true;
-                    } // custom JSON settings
+                    }
+                // custom JSON settings
                 else if (editorMode === 'json'){
                     //editorConfig.mode = 'javascript';
                     //editorConfig.mode = 'application/ld+json';
@@ -454,6 +455,14 @@ $(document).ready(function(){
                         statementIndent: 2
                         };
                     editorConfig.lineNumbers = false;
+                    editorConfig.matchBrackets = true;
+                    editorConfig.autoCloseBrackets = true;
+                    }
+                // custom PHP settings
+                else if (editorMode === 'php'){
+                    editorConfig.mode = 'application/x-httpd-php';
+                    editorConfig.tabsize = 4;
+                    editorConfig.lineNumbers = true;
                     editorConfig.matchBrackets = true;
                     editorConfig.autoCloseBrackets = true;
                     }

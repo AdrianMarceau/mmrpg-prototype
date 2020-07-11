@@ -349,7 +349,7 @@ a:hover {
 
 .adminform .editor .CodeMirror {
     resize: vertical;
-    height: 500px;
+    height: auto;
     border: 1px solid #E9E9E9;
     /* overflow: auto !important; */
 }
