@@ -53,8 +53,9 @@ require(MMRPG_CONFIG_ROOTDIR.'database/robots.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/mechas.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/bosses.php');
 //require(MMRPG_CONFIG_ROOTDIR.'database/abilities.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/fields.php');
 $mmrpg_database_abilities = rpg_ability::get_index(true);
-require(MMRPG_CONFIG_ROOTDIR.'database/fields.php');
+$mmrpg_database_fields = rpg_field::get_index(true);
 //require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
 
 // Merge the robots and mechas
