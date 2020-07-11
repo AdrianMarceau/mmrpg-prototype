@@ -66,6 +66,24 @@
         ;", 'user_id');
 
 
+    /* -- Page Script/Style Dependencies  -- */
+
+    // Define the extra stylesheets that must be included for this page
+    if (!isset($admin_include_stylesheets)){ $admin_include_stylesheets = ''; }
+    $admin_include_stylesheets .= '<link rel="stylesheet" href=".libs/codemirror/lib/codemirror.css?'.MMRPG_CONFIG_CACHE_DATE.'">'.PHP_EOL;
+
+    // Define the extra javascript that must be included for this page
+    if (!isset($admin_include_javascript)){ $admin_include_javascript = ''; }
+    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/lib/codemirror.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
+    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/addon/edit/matchbrackets.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
+    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/mode/htmlmixed/htmlmixed.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
+    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/mode/xml/xml.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
+    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/mode/javascript/javascript.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
+    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/mode/css/css.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
+    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/mode/clike/clike.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
+    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/mode/php/php.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
+
+
     /* -- Form Setup Actions -- */
 
     // Define a function for exiting a robot edit action
@@ -360,6 +378,8 @@
                 $robot_image_alts_new = '';
             }
 
+            $form_data['robot_functions_markup'] = !empty($_POST['robot_functions_markup']) ? trim($_POST['robot_functions_markup']) : '';
+
             // DEBUG
             //$form_messages[] = array('alert', '<pre>$_POST = '.print_r($_POST, true).'</pre>');
             //$form_messages[] = array('alert', '<pre>$_POST[\'robot_image_alts\']  = '.print_r($_POST['robot_image_alts'] , true).'</pre>');
@@ -517,6 +537,29 @@
                 }
 
             }
+
+            // Ensure the functions code is VALID PHP SYNTAX and save, otherwise do not save but allow user to fix it
+            if (empty($form_data['robot_functions_markup'])){
+                // Functions code is EMPTY and will be ignored
+                $form_messages[] = array('warning', 'Robot functions code was empty and was not saved (reverted to original)');
+            } elseif (!cms_admin::is_valid_php_syntax($form_data['robot_functions_markup'])){
+                // Functions code is INVALID and must be fixed
+                $form_messages[] = array('warning', 'Robot functions code was invalid PHP syntax and was not saved (please fix and try again)');
+                $_SESSION['robot_functions_markup'][$robot_data['robot_id']] = $form_data['robot_functions_markup'];
+            } else {
+                // Functions code is OKAY and can be saved
+                $robot_functions_path = MMRPG_CONFIG_ROBOTS_CONTENT_PATH.$robot_data['robot_token'].'/functions.php';
+                $old_robot_functions_markup = file_exists($robot_functions_path) ? trim(file_get_contents($robot_functions_path)) : '';
+                $new_robot_functions_markup = $form_data['robot_functions_markup'];
+                if (empty($old_robot_functions_markup) || $new_robot_functions_markup !== $old_robot_functions_markup){
+                    $f = fopen($robot_functions_path, 'w');
+                    fwrite($f, $new_robot_functions_markup);
+                    fclose($f);
+                    $form_messages[] = array('alert', 'Robot functions file was updated');
+                }
+            }
+            // Regardless, unset the markup variable so it's not save to the database
+            unset($form_data['robot_functions_markup']);
 
             // DEBUG
             //$form_messages[] = array('alert', '<pre>$_POST = '.print_r($_POST, true).'</pre>');
@@ -907,9 +950,12 @@
                         <a class="tab" data-tab="stats">Stats</a><span></span>
                         <a class="tab" data-tab="flavour">Flavour</a><span></span>
                         <a class="tab" data-tab="abilities">Abilities</a><span></span>
-                        <a class="tab" data-tab="sprites">Sprites</a><span></span>
-                        <? if (!$is_backup_data && !empty($robot_backup_list)){ ?>
-                            <a class="tab" data-tab="backups">Backups</a><span></span>
+                        <? if (!$is_backup_data){ ?>
+                            <a class="tab" data-tab="sprites">Sprites</a><span></span>
+                            <a class="tab" data-tab="functions">Functions</a><span></span>
+                            <? if (!$is_backup_data && !empty($robot_backup_list)){ ?>
+                                <a class="tab" data-tab="backups">Backups</a><span></span>
+                            <? } ?>
                         <? } ?>
                     </div>
 
@@ -1639,6 +1685,52 @@
                                 ?>
 
                             </div>
+
+                            <? if (!$is_backup_data){ ?>
+
+                                <div class="panel" data-tab="functions">
+
+                                    <div class="field fullsize codemirror <?= $is_backup_data ? 'readonly' : '' ?>" data-codemirror-mode="php">
+                                        <div class="label">
+                                            <strong>Robot Functions</strong>
+                                            <em>code is php-format with html allowed in some strings</em>
+                                        </div>
+                                        <?
+                                        // Collect the markup for the robot functions file
+                                        if (!empty($_SESSION['robot_functions_markup'][$robot_data['robot_id']])){
+                                            $robot_functions_markup = $_SESSION['robot_functions_markup'][$robot_data['robot_id']];
+                                            unset($_SESSION['robot_functions_markup'][$robot_data['robot_id']]);
+                                        } else {
+                                            $template_functions_path = MMRPG_CONFIG_ROBOTS_CONTENT_PATH.'.robot/functions.php';
+                                            $robot_functions_path = MMRPG_CONFIG_ROBOTS_CONTENT_PATH.$robot_data['robot_token'].'/functions.php';
+                                            $robot_functions_markup = file_exists($robot_functions_path) ? file_get_contents($robot_functions_path) : file_get_contents($template_functions_path);
+                                        }
+                                        ?>
+                                        <textarea class="textarea" name="robot_functions_markup" rows="<?= min(20, substr_count($robot_functions_markup, PHP_EOL)) ?>"><?= htmlentities($robot_functions_markup, ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                                        <div class="label examples" style="font-size: 80%; padding-top: 4px;">
+                                            <strong>Available Objects</strong>:
+                                            <br />
+                                            <code style="color: #05a;">$this_battle</code>
+                                            &nbsp;&nbsp;<a title="battle data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_BATTLES_CONTENT_PATH).'.battle/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
+                                            <br />
+                                            <code style="color: #05a;">$this_field</code>
+                                            &nbsp;&nbsp;<a title="field data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_FIELDS_CONTENT_PATH).'.field/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
+                                            <br />
+                                            <code style="color: #05a;">$this_player</code>
+                                            &nbsp;/&nbsp;
+                                            <code style="color: #05a;">$target_player</code>
+                                            &nbsp;&nbsp;<a title="player data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_PLAYERS_CONTENT_PATH).'.player/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
+                                            <br />
+                                            <code style="color: #05a;">$this_robot</code>
+                                            &nbsp;/&nbsp;
+                                            <code style="color: #05a;">$target_robot</code>
+                                            &nbsp;&nbsp;<a title="robot data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_ROBOTS_CONTENT_PATH).'.robot/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            <? } ?>
 
                             <? if (!$is_backup_data && !empty($robot_backup_list)){ ?>
                                 <div class="panel" data-tab="backups">

@@ -74,7 +74,20 @@
 
     /* -- Page Script/Style Dependencies  -- */
 
-    // none for now...
+    // Define the extra stylesheets that must be included for this page
+    if (!isset($admin_include_stylesheets)){ $admin_include_stylesheets = ''; }
+    $admin_include_stylesheets .= '<link rel="stylesheet" href=".libs/codemirror/lib/codemirror.css?'.MMRPG_CONFIG_CACHE_DATE.'">'.PHP_EOL;
+
+    // Define the extra javascript that must be included for this page
+    if (!isset($admin_include_javascript)){ $admin_include_javascript = ''; }
+    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/lib/codemirror.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
+    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/addon/edit/matchbrackets.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
+    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/mode/htmlmixed/htmlmixed.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
+    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/mode/xml/xml.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
+    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/mode/javascript/javascript.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
+    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/mode/css/css.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
+    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/mode/clike/clike.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
+    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/mode/php/php.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
 
 
     /* -- Form Setup Actions -- */
@@ -324,6 +337,8 @@
             $form_data['field_flag_complete'] = isset($_POST['field_flag_complete']) && is_numeric($_POST['field_flag_complete']) ? (int)(trim($_POST['field_flag_complete'])) : 0;
             $form_data['field_flag_hidden'] = isset($_POST['field_flag_hidden']) && is_numeric($_POST['field_flag_hidden']) ? (int)(trim($_POST['field_flag_hidden'])) : 0;
 
+            $form_data['field_functions_markup'] = !empty($_POST['field_functions_markup']) ? trim($_POST['field_functions_markup']) : '';
+
             // DEBUG
             //$form_messages[] = array('alert', '<pre>$_POST = '.print_r($_POST, true).'</pre>');
             //$form_messages[] = array('alert', '<pre>$_POST[\'field_image_alts\']  = '.print_r($_POST['field_image_alts'] , true).'</pre>');
@@ -410,6 +425,29 @@
                     $form_data['field_music_link'] = '';
                 }
             }
+
+            // Ensure the functions code is VALID PHP SYNTAX and save, otherwise do not save but allow user to fix it
+            if (empty($form_data['field_functions_markup'])){
+                // Functions code is EMPTY and will be ignored
+                $form_messages[] = array('warning', 'Field functions code was empty and was not saved (reverted to original)');
+            } elseif (!cms_admin::is_valid_php_syntax($form_data['field_functions_markup'])){
+                // Functions code is INVALID and must be fixed
+                $form_messages[] = array('warning', 'Field functions code was invalid PHP syntax and was not saved (please fix and try again)');
+                $_SESSION['field_functions_markup'][$field_data['field_id']] = $form_data['field_functions_markup'];
+            } else {
+                // Functions code is OKAY and can be saved
+                $field_functions_path = MMRPG_CONFIG_FIELDS_CONTENT_PATH.$field_data['field_token'].'/functions.php';
+                $old_field_functions_markup = file_exists($field_functions_path) ? trim(file_get_contents($field_functions_path)) : '';
+                $new_field_functions_markup = $form_data['field_functions_markup'];
+                if (empty($old_field_functions_markup) || $new_field_functions_markup !== $old_field_functions_markup){
+                    $f = fopen($field_functions_path, 'w');
+                    fwrite($f, $new_field_functions_markup);
+                    fclose($f);
+                    $form_messages[] = array('alert', 'Field functions file was updated');
+                }
+            }
+            // Regardless, unset the markup variable so it's not save to the database
+            unset($form_data['field_functions_markup']);
 
             // DEBUG
             //$form_messages[] = array('alert', '<pre>$_POST = '.print_r($_POST, true).'</pre>');
@@ -798,10 +836,13 @@
                     <div class="editor-tabs" data-tabgroup="field">
                         <a class="tab active" data-tab="basic">Basic</a><span></span>
                         <a class="tab" data-tab="flavour">Flavour</a><span></span>
-                        <a class="tab" data-tab="images">Images</a><span></span>
-                        <a class="tab" data-tab="attachments">Attachments</a><span></span>
-                        <? if (!$is_backup_data && !empty($field_backup_list)){ ?>
-                            <a class="tab" data-tab="backups">Backups</a><span></span>
+                        <? if (!$is_backup_data){ ?>
+                            <a class="tab" data-tab="images">Images</a><span></span>
+                            <a class="tab" data-tab="attachments">Attachments</a><span></span>
+                            <a class="tab" data-tab="functions">Functions</a><span></span>
+                            <? if (!$is_backup_data && !empty($field_backup_list)){ ?>
+                                <a class="tab" data-tab="backups">Backups</a><span></span>
+                            <? } ?>
                         <? } ?>
                     </div>
 
@@ -1465,6 +1506,42 @@
                                 */?>
 
                             </div>
+
+                            <? if (!$is_backup_data){ ?>
+
+                                <div class="panel" data-tab="functions">
+
+                                    <div class="field fullsize codemirror <?= $is_backup_data ? 'readonly' : '' ?>" data-codemirror-mode="php">
+                                        <div class="label">
+                                            <strong>Field Functions</strong>
+                                            <em>code is php-format with html allowed in some strings</em>
+                                        </div>
+                                        <?
+                                        // Collect the markup for the field functions file
+                                        if (!empty($_SESSION['field_functions_markup'][$field_data['field_id']])){
+                                            $field_functions_markup = $_SESSION['field_functions_markup'][$field_data['field_id']];
+                                            unset($_SESSION['field_functions_markup'][$field_data['field_id']]);
+                                        } else {
+                                            $template_functions_path = MMRPG_CONFIG_FIELDS_CONTENT_PATH.'.field/functions.php';
+                                            $field_functions_path = MMRPG_CONFIG_FIELDS_CONTENT_PATH.$field_data['field_token'].'/functions.php';
+                                            $field_functions_markup = file_exists($field_functions_path) ? file_get_contents($field_functions_path) : file_get_contents($template_functions_path);
+                                        }
+                                        ?>
+                                        <textarea class="textarea" name="field_functions_markup" rows="<?= min(20, substr_count($field_functions_markup, PHP_EOL)) ?>"><?= htmlentities($field_functions_markup, ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                                        <div class="label examples" style="font-size: 80%; padding-top: 4px;">
+                                            <strong>Available Objects</strong>:
+                                            <br />
+                                            <code style="color: #05a;">$this_battle</code>
+                                            &nbsp;&nbsp;<a title="battle data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_BATTLES_CONTENT_PATH).'.battle/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
+                                            <br />
+                                            <code style="color: #05a;">$this_field</code>
+                                            &nbsp;&nbsp;<a title="field data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_FIELDS_CONTENT_PATH).'.field/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            <? } ?>
 
                             <? if (!$is_backup_data && !empty($field_backup_list)){ ?>
                                 <div class="panel" data-tab="backups">
