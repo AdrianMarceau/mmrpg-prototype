@@ -73,13 +73,12 @@ function mmrpg_save_game_session(){
                 $is_new_user = true;
 
                 // Generate new user, save, and board IDs for this listing
-                $temp_max_uid = MMRPG_SETTINGS_GUEST_ID;
                 $temp_user_id = $db->get_value("
-                    SELECT 'users' AS source, MAX(user_id) AS max_id FROM mmrpg_users WHERE user_id < {$temp_max_uid}
+                    SELECT 'users' AS source, MAX(user_id) AS max_id FROM mmrpg_users WHERE user_id > 0
                     UNION ALL
-                    SELECT 'saves' AS source, MAX(user_id) AS max_id FROM mmrpg_saves WHERE user_id < {$temp_max_uid}
+                    SELECT 'saves' AS source, MAX(user_id) AS max_id FROM mmrpg_saves WHERE user_id > 0
                     UNION ALL
-                    SELECT 'boards' AS source, MAX(user_id) AS max_id FROM mmrpg_leaderboard WHERE user_id < {$temp_max_uid}
+                    SELECT 'boards' AS source, MAX(user_id) AS max_id FROM mmrpg_leaderboard WHERE user_id > 0
                     ORDER BY
                     max_id DESC
                     LIMIT 1
