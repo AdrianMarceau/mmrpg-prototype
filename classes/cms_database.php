@@ -73,9 +73,8 @@ class cms_database {
 
     // Define the error handler for when the database goes bye bye
     private function critical_error($message){
-        if (MMRPG_CONFIG_IS_LIVE){
-            error_log(date('Y-m-d @ H:i:s').' ('.$_SERVER['REMOTE_ADDR'].') - '.strip_tags(nl2br(htmlspecialchars_decode($message))).PHP_EOL);
-        } else {
+        error_log('['.date('Y-m-d @ H:i:s').'] ('.$_SERVER['REMOTE_ADDR'].') - '.PHP_EOL.strip_tags(nl2br(htmlspecialchars_decode($message))).PHP_EOL);
+        if (!MMRPG_CONFIG_IS_LIVE){
             if (php_sapi_name() === 'cli'){ echo(date('Y-m-d @ H:i:s').' ('.$_SERVER['REMOTE_ADDR'].') - '.strip_tags(nl2br(htmlspecialchars_decode($message))).PHP_EOL); }
             else { echo('<pre style="display: block; clear: both; float: none; background-color: #f2f2f2; color: #292929; text-shadow: 0 0 0 transparent; white-space: normal; padding: 10px; text-align: left;">'.$message.'</pre>'); }
         }
