@@ -28,8 +28,8 @@ ob_echo('Removing legacy user challenge leaderboard data from `mmrpg_challenges_
 $db->query("DELETE
     leaderboard.*
     FROM mmrpg_challenges_leaderboard AS leaderboard
-    LEFT JOIN  mmrpg_challenges AS challenges ON challenges.challenge_id = leaderboard.challenge_id
-    WHERE challenges.challenge_kind = 'user'
+    LEFT JOIN  mmrpg_users_challenges AS uchallenges ON uchallenges.challenge_id = leaderboard.challenge_id
+    WHERE uchallenges.challenge_kind = 'user'
     ;");
 ob_echo('');
 

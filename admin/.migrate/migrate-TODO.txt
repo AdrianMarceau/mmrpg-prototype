@@ -128,8 +128,8 @@ Update the admin panel to distinguish between DEV and LIVE servers
 -  ?????
 
 Update live DB with changes to challenges table
--  Duplicate mmrpg_challenges as mmrpg_users_challenges
--  Duplicate mmrpg_challenges_leaderboard AS mmrpg_users_challenges_leaderboard
--  Ensure the base tables only have 'event' kind challenge records
--  Ensure the user tables only have 'user' kind challenge records
+-  Duplicate mmrpg_challenges as mmrpg_users_challenges [DONE]
+-  Duplicate mmrpg_challenges_leaderboard AS mmrpg_users_challenges_leaderboard [DONE]
+-  Ensure the base tables only have 'event' kind challenge records [DONE]
+-  Ensure the user tables only have 'user' kind challenge records [DONE]
 
