@@ -1143,5 +1143,28 @@ function select_from_array_with_rollover($array, $position){
     return $array[$key];
 }
 
+// Define a function that returns a given array after removing specified keys
+function array_remove_keys($array, $keys = array()){
+    if (is_string($keys)){ $keys = array($keys); }
+    $new_array = $array;
+    foreach ($keys AS $key){ unset($new_array[$key]); }
+    return $new_array;
+}
+
+// Define a function checking to see if two arrays have the same keys and values as each other
+function arrays_match($array1, $array2){
+    ksort($array1);
+    ksort($array2);
+    return $array1 == $array2;
+}
+
+// Define a function for comparing two arrays while ignoring specified keys
+function arrays_match_ignore_keys($array1, $array2, $keys = array()){
+    if (is_string($keys)){ $keys = array($keys); }
+    $new_array1 = array_remove_keys($array1, $keys);
+    $new_array2 = array_remove_keys($array2, $keys);
+    return arrays_match($new_array1, $new_array2);
+}
+
 
 ?>
