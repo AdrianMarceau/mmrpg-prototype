@@ -59,5 +59,80 @@ class cms_admin {
         return $return === 0 ? true : false;
     }
 
+    // Define a function for easily getting a contributors index for back-end puruposes
+    public static function get_contributors_index($object_kind){
+        global $db;
+        // Ensure the provided object kind as allowed and determine the plural form
+        $allowed_kinds = array('player', 'robot', 'field', 'ability', 'item');
+        $count_object = in_array($object_kind, $allowed_kinds) ? $object_kind : $allowed_kinds[0];
+        $count_object_plural = preg_match('/y$/i', $count_object) ? substr($count_object, 0, -1).'ies' : $count_object.'s';
+        // Pull the contributor index different depending on the global constant (pre/post migration check)
+        if (MMRPG_CONFIG_IMAGE_EDITOR_ID_FIELD === 'contributor_id'){
+            $mmrpg_contributors_index = $db->get_array_list("SELECT
+                contributors.contributor_id AS contributor_id,
+                contributors.user_name AS user_name,
+                contributors.user_name_public AS user_name_public,
+                contributors.user_name_clean AS user_name_clean,
+                uroles.role_level AS user_role_level,
+                (CASE WHEN editors.{$count_object}_image_count IS NOT NULL THEN editors.{$count_object}_image_count ELSE 0 END) AS user_image_count,
+                (CASE WHEN editors2.{$count_object}_image_count2 IS NOT NULL THEN editors2.{$count_object}_image_count2 ELSE 0 END) AS user_image_count2
+                FROM
+                mmrpg_users_contributors AS contributors
+                LEFT JOIN mmrpg_users AS users ON users.user_name_clean = contributors.user_name_clean
+                LEFT JOIN mmrpg_roles AS uroles ON uroles.role_id = users.role_id
+                LEFT JOIN (SELECT
+                        {$count_object}_image_editor AS {$count_object}_user_id,
+                        COUNT({$count_object}_image_editor) AS {$count_object}_image_count
+                        FROM mmrpg_index_{$count_object_plural}
+                        GROUP BY {$count_object}_image_editor) AS editors ON editors.{$count_object}_user_id = contributors.contributor_id
+                LEFT JOIN (SELECT
+                        {$count_object}_image_editor2 AS {$count_object}_user_id,
+                        COUNT({$count_object}_image_editor2) AS {$count_object}_image_count2
+                        FROM mmrpg_index_{$count_object_plural}
+                        GROUP BY {$count_object}_image_editor2) AS editors2 ON editors2.{$count_object}_user_id = contributors.contributor_id
+                WHERE
+                contributors.contributor_id <> 0
+                ORDER BY
+                uroles.role_level DESC,
+                contributors.user_name_clean ASC
+                ;", 'contributor_id');
+        } else {
+            $mmrpg_contributors_index = $db->get_array_list("SELECT
+                users.user_id AS user_id,
+                users.user_name AS user_name,
+                users.user_name_public AS user_name_public,
+                users.user_name_clean AS user_name_clean,
+                uroles.role_level AS user_role_level,
+                (CASE WHEN editors.{$count_object}_image_count IS NOT NULL THEN editors.{$count_object}_image_count ELSE 0 END) AS user_image_count,
+                (CASE WHEN editors2.{$count_object}_image_count2 IS NOT NULL THEN editors2.{$count_object}_image_count2 ELSE 0 END) AS user_image_count2
+                FROM
+                mmrpg_users AS users
+                LEFT JOIN mmrpg_roles AS uroles ON uroles.role_id = users.role_id
+                LEFT JOIN (SELECT
+                        {$count_object}_image_editor AS {$count_object}_user_id,
+                        COUNT({$count_object}_image_editor) AS {$count_object}_image_count
+                        FROM mmrpg_index_{$count_object_plural}
+                        GROUP BY {$count_object}_image_editor) AS editors ON editors.{$count_object}_user_id = users.user_id
+                LEFT JOIN (SELECT
+                        {$count_object}_image_editor2 AS {$count_object}_user_id,
+                        COUNT({$count_object}_image_editor2) AS {$count_object}_image_count2
+                        FROM mmrpg_index_{$count_object_plural}
+                        GROUP BY {$count_object}_image_editor2) AS editors2 ON editors2.{$count_object}_user_id = users.user_id
+                WHERE
+                users.user_id <> 0
+                AND (uroles.role_level > 3
+                    OR users.user_credit_line <> ''
+                    OR users.user_credit_text <> ''
+                    OR editors.{$count_object}_image_count IS NOT NULL
+                    OR editors2.{$count_object}_image_count2 IS NOT NULL)
+                ORDER BY
+                uroles.role_level DESC,
+                users.user_name_clean ASC
+                ;", 'user_id');
+        }
+        // Return the generated list
+        return $mmrpg_contributors_index;
+    }
+
 }
 ?>

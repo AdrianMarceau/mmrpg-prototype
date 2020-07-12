@@ -32,38 +32,7 @@
     $mmrpg_abilities_index = $db->get_array_list("SELECT {$mmrpg_abilities_fields} FROM mmrpg_index_abilities WHERE ability_token <> 'ability' AND ability_class <> 'system' ORDER BY ability_order ASC", 'ability_token');
 
     // Collect an index of contributors and admins that have made sprites
-    $mmrpg_contributors_index = $db->get_array_list("SELECT
-        users.user_id AS user_id,
-        users.user_name AS user_name,
-        users.user_name_public AS user_name_public,
-        users.user_name_clean AS user_name_clean,
-        uroles.role_level AS user_role_level,
-        (CASE WHEN editors.robot_image_count IS NOT NULL THEN editors.robot_image_count ELSE 0 END) AS user_image_count,
-        (CASE WHEN editors2.robot_image_count2 IS NOT NULL THEN editors2.robot_image_count2 ELSE 0 END) AS user_image_count2
-        FROM
-        mmrpg_users AS users
-        LEFT JOIN mmrpg_roles AS uroles ON uroles.role_id = users.role_id
-        LEFT JOIN (SELECT
-                robot_image_editor AS robot_user_id,
-                COUNT(robot_image_editor) AS robot_image_count
-                FROM mmrpg_index_robots
-                GROUP BY robot_image_editor) AS editors ON editors.robot_user_id = users.user_id
-        LEFT JOIN (SELECT
-                robot_image_editor2 AS robot_user_id,
-                COUNT(robot_image_editor2) AS robot_image_count2
-                FROM mmrpg_index_robots
-                GROUP BY robot_image_editor2) AS editors2 ON editors2.robot_user_id = users.user_id
-        WHERE
-        users.user_id <> 0
-        AND (uroles.role_level > 3
-            OR users.user_credit_line <> ''
-            OR users.user_credit_text <> ''
-            OR editors.robot_image_count IS NOT NULL
-            OR editors2.robot_image_count2 IS NOT NULL)
-        ORDER BY
-        uroles.role_level DESC,
-        users.user_name_clean ASC
-        ;", 'user_id');
+    $mmrpg_contributors_index = cms_admin::get_contributors_index('robot');
 
 
     /* -- Page Script/Style Dependencies  -- */
@@ -1318,10 +1287,10 @@
                                 // Pre-generate a list of all contributors so we can re-use it over and over
                                 $contributor_options_markup = array();
                                 $contributor_options_markup[] = '<option value="0">-</option>';
-                                foreach ($mmrpg_contributors_index AS $user_id => $user_info){
+                                foreach ($mmrpg_contributors_index AS $editor_id => $user_info){
                                     $option_label = $user_info['user_name'];
                                     if (!empty($user_info['user_name_public']) && $user_info['user_name_public'] !== $user_info['user_name']){ $option_label = $user_info['user_name_public'].' ('.$option_label.')'; }
-                                    $contributor_options_markup[] = '<option value="'.$user_id.'">'.$option_label.'</option>';
+                                    $contributor_options_markup[] = '<option value="'.$editor_id.'">'.$option_label.'</option>';
                                 }
                                 $contributor_options_count = count($contributor_options_markup);
                                 $contributor_options_markup = implode(PHP_EOL, $contributor_options_markup);
