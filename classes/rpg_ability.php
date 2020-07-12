@@ -460,6 +460,7 @@ class rpg_ability extends rpg_object {
         $this->ability_results['counter_affinities'] = 0;
         $this->ability_results['counter_immunities'] = 0;
         $this->ability_results['counter_coreboosts'] = 0;
+        $this->ability_results['counter_omegaboosts'] = 0;
         $this->ability_results['flag_critical'] = false;
         $this->ability_results['flag_affinity'] = false;
         $this->ability_results['flag_weakness'] = false;
