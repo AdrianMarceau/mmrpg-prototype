@@ -106,16 +106,16 @@ Update the admin panel with code editor for relevant object types
 -  fields [DONE]
 
 Update migration script to save sprite/image editor IDs as strings instead (contributor's user_name_clean)
--  fields
--  players
--  robots
--  abilities
--  items
+-  fields [DONE]
+-  players [DONE]
+-  robots [DONE]
+-  abilities [DONE]
+-  items [DONE]
 
 Update the admin panel so it pulls the right contributors list (mmrpg_users vs mmrpg_users_contributors table)
--  players
--  robots
--  fields
+-  players [DONE]
+-  robots [DONE]
+-  fields [DONE]
 
 Update the admin panel with editors for the final object types
 -  abilities
