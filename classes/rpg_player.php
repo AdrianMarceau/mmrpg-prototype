@@ -1354,8 +1354,8 @@ class rpg_player extends rpg_object {
     public function print_token(){ return '<span class="player_token">'.$this->player_token.'</span>'; }
     public function print_description(){ return '<span class="player_description">'.$this->player_description.'</span>'; }
     public function print_quote($quote_type, $this_find = array(), $this_replace = array()){
-        global $mmrpg_index_types;
-        if (empty($mmrpg_index_types)){ $mmrpg_index_types = rpg_type::get_index(); }
+        static $mmrpg_index_types;
+        if (empty($mmrpg_index_types)){ $mmrpg_index_types = rpg_type::get_index(true); }
         // Define the quote text variable
         $quote_text = '';
         // If the player is visible and has the requested quote text

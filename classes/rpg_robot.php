@@ -949,8 +949,8 @@ class rpg_robot extends rpg_object {
     }
     public function print_quote($quote_type, $this_find = array(), $this_replace = array()){
 
-        global $mmrpg_index_types;
-        if (empty($mmrpg_index_types)){ $mmrpg_index_types = rpg_type::get_index(); }
+        static $mmrpg_index_types;
+        if (empty($mmrpg_index_types)){ $mmrpg_index_types = rpg_type::get_index(true); }
 
         // Define the quote text variable
         $quote_text = '';
