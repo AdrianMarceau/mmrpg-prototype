@@ -68,7 +68,7 @@ if (!empty($pull_kind)){
 
                 $cmds = '';
                 $cmds .= 'cd '.MMRPG_CONFIG_CONTENT_PATH.$type_details['content_path'].' ';
-                $cmds .= '&& git pull origin '.$pull_branch.' ';
+                $cmds .= '&& git pull origin '.$pull_branch.' --allow-unrelated-histories ';
                 ob_echo_shell_exec($cmds);
 
             } else {
