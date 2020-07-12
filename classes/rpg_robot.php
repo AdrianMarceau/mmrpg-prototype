@@ -213,8 +213,8 @@ class rpg_robot extends rpg_object {
         if (empty($this->flags['calculate_omega_types'])){
 
             // Only apply omega types to human players of either side
-            if ($this->player->player_side == 'left'
-                || ($this->player->player_side == 'right' && !empty($this->battle->flags['player_battle']))){
+            if (($this->player->player_side == 'left' && mmrpg_prototype_item_unlocked('omega-seed'))
+                || ($this->player->player_side == 'right' && !empty($this->battle->flags['player_battle']) && !empty($this->battle->flags['player_battle_with_omega']))){
 
                 // Collect possible hidden power types
                 $hidden_power_types = rpg_type::get_hidden_powers();
@@ -1540,31 +1540,8 @@ class rpg_robot extends rpg_object {
         // Update this robot's history with the triggered ability
         $this->history['triggered_abilities'][] = $this_ability->ability_token;
 
-        // Define a variable to hold the ability results
-        $this_ability->ability_results = array();
-        $this_ability->ability_results['total_result'] = '';
-        $this_ability->ability_results['total_actions'] = 0;
-        $this_ability->ability_results['total_strikes'] = 0;
-        $this_ability->ability_results['total_misses'] = 0;
-        $this_ability->ability_results['total_amount'] = 0;
-        $this_ability->ability_results['total_overkill'] = 0;
-        $this_ability->ability_results['this_result'] = '';
-        $this_ability->ability_results['this_amount'] = 0;
-        $this_ability->ability_results['this_overkill'] = 0;
-        $this_ability->ability_results['this_text'] = '';
-        $this_ability->ability_results['counter_criticals'] = 0;
-        $this_ability->ability_results['counter_affinities'] = 0;
-        $this_ability->ability_results['counter_weaknesses'] = 0;
-        $this_ability->ability_results['counter_resistances'] = 0;
-        $this_ability->ability_results['counter_immunities'] = 0;
-        $this_ability->ability_results['counter_coreboosts'] = 0;
-        $this_ability->ability_results['flag_critical'] = false;
-        $this_ability->ability_results['flag_affinity'] = false;
-        $this_ability->ability_results['flag_weakness'] = false;
-        $this_ability->ability_results['flag_resistance'] = false;
-        $this_ability->ability_results['flag_immunity'] = false;
-
         // Reset the ability options to default
+        $this_ability->ability_results_reset();
         $this_ability->target_options_reset();
         $this_ability->damage_options_reset();
         $this_ability->recovery_options_reset();
@@ -1724,31 +1701,8 @@ class rpg_robot extends rpg_object {
         // Update this robot's history with the triggered item
         $this->history['triggered_items'][] = $this_item->item_token;
 
-        // Define a variable to hold the item results
-        $this_item->item_results = array();
-        $this_item->item_results['total_result'] = '';
-        $this_item->item_results['total_actions'] = 0;
-        $this_item->item_results['total_strikes'] = 0;
-        $this_item->item_results['total_misses'] = 0;
-        $this_item->item_results['total_amount'] = 0;
-        $this_item->item_results['total_overkill'] = 0;
-        $this_item->item_results['this_result'] = '';
-        $this_item->item_results['this_amount'] = 0;
-        $this_item->item_results['this_overkill'] = 0;
-        $this_item->item_results['this_text'] = '';
-        $this_item->item_results['counter_criticals'] = 0;
-        $this_item->item_results['counter_affinities'] = 0;
-        $this_item->item_results['counter_weaknesses'] = 0;
-        $this_item->item_results['counter_resistances'] = 0;
-        $this_item->item_results['counter_immunities'] = 0;
-        $this_item->item_results['counter_coreboosts'] = 0;
-        $this_item->item_results['flag_critical'] = false;
-        $this_item->item_results['flag_affinity'] = false;
-        $this_item->item_results['flag_weakness'] = false;
-        $this_item->item_results['flag_resistance'] = false;
-        $this_item->item_results['flag_immunity'] = false;
-
         // Reset the item options to default
+        $this_item->item_results_reset();
         $this_item->target_options_reset();
         $this_item->damage_options_reset();
         $this_item->recovery_options_reset();
@@ -5445,7 +5399,7 @@ class rpg_robot extends rpg_object {
                         'attachment_token' => $this_attachment_token,
                         'item_token' => $item_token,
                         'item_image' => $this_arrow_index['image'],
-                        'item_frame' => $this_star_index['frame'],
+                        'item_frame' => $this_arrow_index['frame'],
                         'item_frame_animate' => array($this_arrow_index['frame']),
                         'item_frame_offset' => array('x' => 0, 'y' => 0, 'z' => -10)
                         );

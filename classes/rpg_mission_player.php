@@ -44,6 +44,7 @@ class rpg_mission_player extends rpg_mission {
         $temp_player_settings = $temp_player_array['player_settings'];
         $temp_player_starforce = $temp_player_array['player_starforce'];
         $temp_player_favourites = $temp_player_array['player_favourites'];
+        $temp_player_items = $temp_player_array['player_items'];
 
         // Create the empty array for the target player's battle robots
         $temp_player_robots = array();
@@ -149,6 +150,7 @@ class rpg_mission_player extends rpg_mission {
             $temp_battle_token = $this_prototype_data['phase_battle_token'].'-vs-player-'.$temp_battle_usertoken;
             $temp_battle_omega = rpg_battle::get_index_info('bonus-prototype-complete-3');
             $temp_battle_omega['flags']['player_battle'] = true;
+            $temp_battle_omega['flags']['player_battle_with_omega'] = !empty($temp_player_items['omega-seed']) ? true : false;
             $temp_battle_omega['values']['player_battle_vs'] = $temp_battle_username;
             $temp_challenge_type = $temp_max_robots.'-on-'.$temp_max_robots;
             $temp_battle_omega['battle_token'] = $temp_battle_token;

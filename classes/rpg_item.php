@@ -432,12 +432,14 @@ class rpg_item extends rpg_object {
         $this->item_results['counter_affinities'] = 0;
         $this->item_results['counter_immunities'] = 0;
         $this->item_results['counter_coreboosts'] = 0;
+        $this->item_results['counter_omegaboosts'] = 0;
         $this->item_results['flag_critical'] = false;
-        $this->item_results['flag_affinity'] = false;
         $this->item_results['flag_weakness'] = false;
         $this->item_results['flag_resistance'] = false;
+        $this->item_results['flag_affinity'] = false;
         $this->item_results['flag_immunity'] = false;
         $this->item_results['flag_coreboost'] = false;
+        $this->item_results['flag_omegaboost'] = false;
         // Update this item's data
         $this->update_session();
         // Return the resuling array

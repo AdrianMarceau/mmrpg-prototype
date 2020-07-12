@@ -2325,6 +2325,7 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
                 mmrpg_users.user_gender,
                 mmrpg_saves.save_values_battle_rewards AS player_rewards,
                 mmrpg_saves.save_values_battle_settings AS player_settings,
+                mmrpg_saves.save_values_battle_items AS player_items,
                 mmrpg_saves.save_values AS player_values,
                 mmrpg_saves.save_counters AS player_counters
                 FROM mmrpg_leaderboard
@@ -2353,6 +2354,7 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
 
                 $player['player_rewards'] = !empty($player['player_rewards']) ? json_decode($player['player_rewards'], true) : array();
                 $player['player_settings'] = !empty($player['player_settings']) ? json_decode($player['player_settings'], true) : array();
+                $player['player_items'] = !empty($player['player_items']) ? json_decode($player['player_items'], true) : array();
                 $player['values'] = !empty($player['player_values']) ? json_decode($player['player_values'], true) : array();
                 $player['counters'] = !empty($player['player_counters']) ? json_decode($player['player_counters'], true) : array();
                 unset($player['player_values']);
