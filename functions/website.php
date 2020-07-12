@@ -1007,7 +1007,6 @@ function mmrpg_community_post_index_fields($implode = false, $table = ''){
 
 }
 
-
 // Define a function for generating gallery image thumb + link markup
 function mmrpg_get_gallery_thumb_markup($file_info, $file_date = '', $thumb_class = 'image', $thumb_rel = 'images', $base_path = ''){
     if (empty($file_date)){ $file_date = date('Y/m/d', $file_info['time']); }
@@ -1023,6 +1022,13 @@ function mmrpg_get_gallery_thumb_markup($file_info, $file_date = '', $thumb_clas
     return $markup;
 }
 
+// Define a function for getting the current favicon filename given environment
+function mmrpg_get_favicon(){
+    $filename = 'favicon';
+    if (defined('MMRPG_CONFIG_SERVER_ENV') && MMRPG_CONFIG_SERVER_ENV !== 'prod'){ $filename .= '-'.MMRPG_CONFIG_SERVER_ENV; }
+    $filename .= '.ico';
+    return $filename;
+}
 
 // Define a function for deleting a directory
 function deleteDir($dirPath) {

@@ -342,7 +342,7 @@ if (!empty($db_page_info)){
 
 <link rel="browser-game-info" href="<?= MMRPG_CONFIG_ROOTURL ?>mmrpg-info.xml" />
 
-<link rel="shortcut icon" type="image/x-icon" href="images/assets/favicon<?= !MMRPG_CONFIG_IS_LIVE ? '-local' : '' ?>.ico">
+<link rel="shortcut icon" type="image/x-icon" href="images/assets/<?= mmrpg_get_favicon() ?>">
 
 <link type="text/css" href="styles/reset.css" rel="stylesheet" />
 

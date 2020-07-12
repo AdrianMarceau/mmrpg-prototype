@@ -263,7 +263,7 @@ if (mmrpg_prototype_item_unlocked('wily-program')){
 
 <meta name="format-detection" content="telephone=no" />
 
-<link rel="shortcut icon" type="image/x-icon" href="images/assets/favicon<?= !MMRPG_CONFIG_IS_LIVE ? '-local' : '' ?>.ico">
+<link rel="shortcut icon" type="image/x-icon" href="images/assets/<?= mmrpg_get_favicon() ?>">
 
 <link type="text/css" href="styles/reset.css" rel="stylesheet" />
 
