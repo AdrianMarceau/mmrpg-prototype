@@ -79,17 +79,38 @@
             || in_array('edit-players', $this_adminaccess)){
             ?>
             <li class="item">
-                <a href="admin/edit-players/">Update Player Database</a>
+                <a href="admin/edit-players/">Update Player Characters</a>
                 <em>edit the details and images of the in-game player characters</em>
             </li>
             <?
         }
         if (in_array('*', $this_adminaccess)
-            || in_array('edit-robots', $this_adminaccess)){
+            || in_array('edit-robots', $this_adminaccess)
+            || in_array('edit-robot-master', $this_adminaccess)){
             ?>
             <li class="item">
-                <a href="admin/edit-robots/">Update Robot Database</a>
-                <em>edit the details and images of robot masters, mechas, and bosses</em>
+                <a href="admin/edit-robot-masters/">Update Robot Masters</a>
+                <em>edit the details and images of the in-game robot masters</em>
+            </li>
+            <?
+        }
+        if (in_array('*', $this_adminaccess)
+            || in_array('edit-robots', $this_adminaccess)
+            || in_array('edit-support-mechas', $this_adminaccess)){
+            ?>
+            <li class="item">
+                <a href="admin/edit-support-mechas/">Update Support Mechas</a>
+                <em>edit the details and images of the in-game support mechas</em>
+            </li>
+            <?
+        }
+        if (in_array('*', $this_adminaccess)
+            || in_array('edit-robots', $this_adminaccess)
+            || in_array('edit-fortress-bosses', $this_adminaccess)){
+            ?>
+            <li class="item">
+                <a href="admin/edit-fortress-bosses/">Update Fortress Bosses</a>
+                <em>edit the details and images of the in-game fortress bosses</em>
             </li>
             <?
         }
@@ -97,8 +118,8 @@
             || in_array('edit-fields', $this_adminaccess)){
             ?>
             <li class="item">
-                <a href="admin/edit-fields/">Update Field Database</a>
-                <em>edit the details and images of various the in-game battle fields</em>
+                <a href="admin/edit-fields/">Update Battle Fields</a>
+                <em>edit the details and images of the in-game battle fields</em>
             </li>
             <?
         }

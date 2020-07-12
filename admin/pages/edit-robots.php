@@ -2,10 +2,26 @@
 
     <?
 
+    // Ensure global robot values for this page are set
+    if (!isset($this_robot_class)){ exit('$this_robot_class was undefined!'); }
+    if (!isset($this_robot_xclass)){ exit('$this_robot_xclass was undefined!'); }
+    if (!isset($this_robot_class_name)){ exit('$this_robot_class_name was undefined!'); }
+    if (!isset($this_robot_xclass_name)){ exit('$this_robot_xclass_name was undefined!'); }
+
+    // Using the above, generate the oft-used titles, baseurls, etc. for the editor
+    $this_robot_class_name_uc = ucwords($this_robot_class_name);
+    $this_robot_xclass_name_uc = ucwords($this_robot_xclass_name);
+    $this_robot_class_short_name = $this_robot_class !== 'master' ? $this_robot_class : 'robot';
+    $this_robot_class_short_name_uc = ucfirst($this_robot_class_short_name);
+    $this_robot_page_token = 'edit-'.str_replace(' ', '-', $this_robot_xclass_name);
+    $this_robot_page_title = 'Edit '.$this_robot_xclass_name_uc;
+    $this_robot_page_baseurl = 'admin/'.$this_robot_page_token.'/';
+
     // Pre-check access permissions before continuing
     if (!in_array('*', $this_adminaccess)
-        && !in_array('edit-robots', $this_adminaccess)){
-        $form_messages[] = array('error', 'You do not have permission to edit robots!');
+        && !in_array('edit-robots', $this_adminaccess)
+        && !in_array($this_robot_page_token, $this_adminaccess)){
+        $form_messages[] = array('error', 'You do not have permission to edit '.$this_robot_xclass_name.'!');
         redirect_form_action('admin/home/');
     }
 
@@ -57,8 +73,9 @@
 
     // Define a function for exiting a robot edit action
     function exit_robot_edit_action($robot_id = 0){
-        if (!empty($robot_id)){ $location = 'admin/edit-robots/editor/robot_id='.$robot_id; }
-        else { $location = 'admin/edit-robots/search/'; }
+        global $this_robot_page_baseurl;
+        if (!empty($robot_id)){ $location = $this_robot_page_baseurl.'editor/robot_id='.$robot_id; }
+        else { $location = $this_robot_page_baseurl.'search/'; }
         redirect_form_action($location);
     }
 
@@ -69,7 +86,7 @@
     $sub_action =  !empty($_GET['subaction']) ? $_GET['subaction'] : 'search';
 
     // Update the tab name with the page name
-    $this_page_tabtitle = 'Edit Robots | '.$this_page_tabtitle;
+    $this_page_tabtitle = $this_robot_xclass_name_uc.' | '.$this_page_tabtitle;
 
     // If we're in delete mode, we need to remove some data
     $delete_data = array();
@@ -80,7 +97,7 @@
 
         // Let's delete all of this robot's data from the database
         $db->delete('mmrpg_index_robots', array('robot_id' => $delete_data['robot_id']));
-        $form_messages[] = array('success', 'The requested robot has been deleted from the database');
+        $form_messages[] = array('success', 'The requested '.$this_robot_class_name.' has been deleted from the database');
         exit_form_action('success');
 
     }
@@ -94,7 +111,7 @@
     if ($sub_action == 'search'){
 
         // Collect the sorting order and direction
-        $sort_data = array('name' => 'robot_id', 'dir' => 'desc');
+        $sort_data = array('name' => 'robot_id', 'dir' => 'asc');
         if (!empty($_GET['order'])
             && preg_match('/^([-_a-z0-9]+)\:(desc|asc)$/i', $_GET['order'])){
             list($r_name, $r_dir) = explode(':', trim($_GET['order']));
@@ -105,7 +122,7 @@
         $search_data['robot_id'] = !empty($_GET['robot_id']) && is_numeric($_GET['robot_id']) ? trim($_GET['robot_id']) : '';
         $search_data['robot_name'] = !empty($_GET['robot_name']) && preg_match('/[-_0-9a-z\.\*\s]+/i', $_GET['robot_name']) ? trim(strtolower($_GET['robot_name'])) : '';
         $search_data['robot_core'] = !empty($_GET['robot_core']) && preg_match('/[-_0-9a-z]+/i', $_GET['robot_core']) ? trim(strtolower($_GET['robot_core'])) : '';
-        $search_data['robot_class'] = !empty($_GET['robot_class']) && preg_match('/[-_0-9a-z]+/i', $_GET['robot_class']) ? trim(strtolower($_GET['robot_class'])) : '';
+        $search_data['robot_class'] = $this_robot_class; //!empty($_GET['robot_class']) && preg_match('/[-_0-9a-z]+/i', $_GET['robot_class']) ? trim(strtolower($_GET['robot_class'])) : '';
         $search_data['robot_flavour'] = !empty($_GET['robot_flavour']) && preg_match('/[-_0-9a-z\.\*\s\{\}]+/i', $_GET['robot_flavour']) ? trim($_GET['robot_flavour']) : '';
         $search_data['robot_game'] = !empty($_GET['robot_game']) && preg_match('/[-_0-9a-z]+/i', $_GET['robot_game']) ? trim(strtoupper($_GET['robot_game'])) : '';
         $search_data['robot_group'] = !empty($_GET['robot_group']) && preg_match('/[-_0-9a-z\/]+/i', $_GET['robot_group']) ? trim($_GET['robot_group']) : '';
@@ -236,7 +253,7 @@
         $search_results_count = is_array($search_results) ? count($search_results) : 0;
 
         // Collect a total number from the database
-        $search_results_total = $db->get_value("SELECT COUNT(robot_id) AS total FROM mmrpg_index_robots WHERE 1=1 AND robot_token <> 'robot';", 'total');
+        $search_results_total = $db->get_value("SELECT COUNT(robot_id) AS total FROM mmrpg_index_robots WHERE 1=1 AND robot_token <> 'robot' AND robot_class = '{$this_robot_class}';", 'total');
 
     }
 
@@ -276,13 +293,13 @@
         // Collect the robot's name(s) for display
         $robot_name_display = $robot_data['robot_name'];
         $this_page_tabtitle = $robot_name_display.' | '.$this_page_tabtitle;
-        if ($is_backup_data){ $this_page_tabtitle = str_replace('Edit Robots', 'View Backups', $this_page_tabtitle); }
+        if ($is_backup_data){ $this_page_tabtitle = str_replace($this_robot_xclass_name_uc, 'View Backups', $this_page_tabtitle); }
 
         // If form data has been submit for this robot, we should process it
         $form_data = array();
         $form_success = true;
         $form_action = !empty($_POST['action']) ? trim($_POST['action']) : '';
-        if ($form_action == 'edit-robots'){
+        if ($form_action == $this_robot_page_token){
 
             // COLLECT form data from the request and parse out simple rules
 
@@ -291,7 +308,7 @@
             $form_data['robot_id'] = !empty($_POST['robot_id']) && is_numeric($_POST['robot_id']) ? trim($_POST['robot_id']) : 0;
             $form_data['robot_token'] = !empty($_POST['robot_token']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_token']) ? trim(strtolower($_POST['robot_token'])) : '';
             $form_data['robot_name'] = !empty($_POST['robot_name']) && preg_match('/^[-_0-9a-z\.\*\s]+$/i', $_POST['robot_name']) ? trim($_POST['robot_name']) : '';
-            $form_data['robot_class'] = !empty($_POST['robot_class']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['robot_class']) ? trim(strtolower($_POST['robot_class'])) : '';
+            $form_data['robot_class'] = $this_robot_class; //!empty($_POST['robot_class']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['robot_class']) ? trim(strtolower($_POST['robot_class'])) : '';
             $form_data['robot_core'] = !empty($_POST['robot_core']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['robot_core']) ? trim(strtolower($_POST['robot_core'])) : '';
             $form_data['robot_core2'] = !empty($_POST['robot_core2']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['robot_core2']) ? trim(strtolower($_POST['robot_core2'])) : '';
             $form_data['robot_gender'] = !empty($_POST['robot_gender']) && preg_match('/^(male|female|other|none)$/', $_POST['robot_gender']) ? trim(strtolower($_POST['robot_gender'])) : '';
@@ -356,12 +373,12 @@
             //$form_messages[] = array('alert', '<pre>$form_data = '.print_r($form_data, true).'</pre>');
 
             // VALIDATE all of the MANDATORY FIELDS to see if any are invalid and abort the update entirely if necessary
-            if (empty($form_data['robot_id'])){ $form_messages[] = array('error', 'Robot ID was not provided'); $form_success = false; }
-            if (empty($form_data['robot_token']) || empty($old_robot_token)){ $form_messages[] = array('error', 'Robot Token was not provided or was invalid'); $form_success = false; }
-            if (empty($form_data['robot_name'])){ $form_messages[] = array('error', 'Robot Name was not provided or was invalid'); $form_success = false; }
-            if (empty($form_data['robot_class'])){ $form_messages[] = array('error', 'Robot Kind was not provided or was invalid'); $form_success = false; }
+            if (empty($form_data['robot_id'])){ $form_messages[] = array('error', $this_robot_class_short_name_uc.' ID was not provided'); $form_success = false; }
+            if (empty($form_data['robot_token']) || empty($old_robot_token)){ $form_messages[] = array('error', $this_robot_class_short_name_uc.' Token was not provided or was invalid'); $form_success = false; }
+            if (empty($form_data['robot_name'])){ $form_messages[] = array('error', $this_robot_class_short_name_uc.' Name was not provided or was invalid'); $form_success = false; }
+            if (empty($form_data['robot_class'])){ $form_messages[] = array('error', $this_robot_class_short_name_uc.' Kind was not provided or was invalid'); $form_success = false; }
             if (!isset($_POST['robot_core']) || !isset($_POST['robot_core2'])){ $form_messages[] = array('warning', 'Core Types were not provided or were invalid'); $form_success = false; }
-            if (empty($form_data['robot_gender'])){ $form_messages[] = array('error', 'Robot Gender was not provided or was invalid'); $form_success = false; }
+            if (empty($form_data['robot_gender'])){ $form_messages[] = array('error', $this_robot_class_short_name_uc.' Gender was not provided or was invalid'); $form_success = false; }
             if (!$form_success){ exit_robot_edit_action($form_data['robot_id']); }
 
             // VALIDATE all of the SEMI-MANDATORY FIELDS to see if any were not provided and unset them from updating if necessary
@@ -406,16 +423,16 @@
             }
 
             if ($form_data['robot_flag_unlockable']){
-                if (!$form_data['robot_flag_published']){ $form_messages[] = array('warning', 'Robot must be published to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
-                elseif (!$form_data['robot_flag_complete']){ $form_messages[] = array('warning', 'Robot must be complete to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
+                if (!$form_data['robot_flag_published']){ $form_messages[] = array('warning', $this_robot_class_short_name_uc.' must be published to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
+                elseif (!$form_data['robot_flag_complete']){ $form_messages[] = array('warning', $this_robot_class_short_name_uc.' must be complete to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
                 elseif ($form_data['robot_class'] !== 'master'){ $form_messages[] = array('warning', 'Only robot masters can be marked as unlockable'); $form_data['robot_flag_unlockable'] = 0; }
                 elseif (empty($form_data['robot_field']) && empty($form_data['robot_field2'])){ $form_messages[] = array('warning', 'Robot must have battle field to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
-                elseif (empty($form_data['robot_description'])){ $form_messages[] = array('warning', 'Robot must have a flavour class to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
-                elseif (empty($form_data['robot_quotes_start'])){ $form_messages[] = array('warning', 'Robot must have a start quote to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
-                elseif (empty($form_data['robot_quotes_taunt'])){ $form_messages[] = array('warning', 'Robot must have a taunt quote to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
-                elseif (empty($form_data['robot_quotes_victory'])){ $form_messages[] = array('warning', 'Robot must have a victory quote to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
-                elseif (empty($form_data['robot_quotes_defeat'])){ $form_messages[] = array('warning', 'Robot must have a defeat quote to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
-                elseif (empty($form_data['robot_abilities_rewards'])){ $form_messages[] = array('warning', 'Robot must have at least one ability to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
+                elseif (empty($form_data['robot_description'])){ $form_messages[] = array('warning', $this_robot_class_short_name_uc.' must have a flavour class to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
+                elseif (empty($form_data['robot_quotes_start'])){ $form_messages[] = array('warning', $this_robot_class_short_name_uc.' must have a start quote to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
+                elseif (empty($form_data['robot_quotes_taunt'])){ $form_messages[] = array('warning', $this_robot_class_short_name_uc.' must have a taunt quote to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
+                elseif (empty($form_data['robot_quotes_victory'])){ $form_messages[] = array('warning', $this_robot_class_short_name_uc.' must have a victory quote to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
+                elseif (empty($form_data['robot_quotes_defeat'])){ $form_messages[] = array('warning', $this_robot_class_short_name_uc.' must have a defeat quote to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
+                elseif (empty($form_data['robot_abilities_rewards'])){ $form_messages[] = array('warning', $this_robot_class_short_name_uc.' must have at least one ability to be unlockable'); $form_data['robot_flag_unlockable'] = 0; }
             }
 
 
@@ -510,10 +527,10 @@
             // Ensure the functions code is VALID PHP SYNTAX and save, otherwise do not save but allow user to fix it
             if (empty($form_data['robot_functions_markup'])){
                 // Functions code is EMPTY and will be ignored
-                $form_messages[] = array('warning', 'Robot functions code was empty and was not saved (reverted to original)');
+                $form_messages[] = array('warning', $this_robot_class_short_name_uc.' functions code was empty and was not saved (reverted to original)');
             } elseif (!cms_admin::is_valid_php_syntax($form_data['robot_functions_markup'])){
                 // Functions code is INVALID and must be fixed
-                $form_messages[] = array('warning', 'Robot functions code was invalid PHP syntax and was not saved (please fix and try again)');
+                $form_messages[] = array('warning', $this_robot_class_short_name_uc.' functions code was invalid PHP syntax and was not saved (please fix and try again)');
                 $_SESSION['robot_functions_markup'][$robot_data['robot_id']] = $form_data['robot_functions_markup'];
             } else {
                 // Functions code is OKAY and can be saved
@@ -524,7 +541,7 @@
                     $f = fopen($robot_functions_path, 'w');
                     fwrite($f, $new_robot_functions_markup);
                     fclose($f);
-                    $form_messages[] = array('alert', 'Robot functions file was updated');
+                    $form_messages[] = array('alert', $this_robot_class_short_name_uc.' functions file was updated');
                 }
             }
             // Regardless, unset the markup variable so it's not save to the database
@@ -555,8 +572,8 @@
             //$form_messages[] = array('alert', '<pre>$form_data = '.print_r($form_data, true).'</pre>');
 
             // If we made it this far, the update must have been a success
-            if ($update_results !== false){ $form_success = true; $form_messages[] = array('success', 'Robot data was updated successfully!'); }
-            else { $form_success = false; $form_messages[] = array('error', 'Robot data could not be updated...'); }
+            if ($update_results !== false){ $form_success = true; $form_messages[] = array('success', $this_robot_class_short_name_uc.' data was updated successfully!'); }
+            else { $form_success = false; $form_messages[] = array('error', $this_robot_class_short_name_uc.' data could not be updated...'); }
 
             // Update cache timestamp if changes were successful
             if ($form_success){
@@ -587,9 +604,9 @@
                 $new_content_path = MMRPG_CONFIG_ROBOTS_CONTENT_PATH.$update_data['robot_token'].'/';
                 if (rename($old_content_path, $new_content_path)){
                     $path_string = '<strong>'.mmrpg_clean_path($old_content_path).'</strong> &raquo; <strong>'.mmrpg_clean_path($new_content_path).'</strong>';
-                    $form_messages[] = array('alert', 'Robot directory renamed! '.$path_string);
+                    $form_messages[] = array('alert', $this_robot_class_short_name_uc.' directory renamed! '.$path_string);
                 } else {
-                    $form_messages[] = array('error', 'Unable to rename robot directory!');
+                    $form_messages[] = array('error', 'Unable to rename '.$this_robot_class_name.' directory!');
                 }
             }
 
@@ -610,10 +627,10 @@
 
     <div class="breadcrumb">
         <a href="admin/">Admin Panel</a>
-        &raquo; <a href="admin/edit-robots/">Edit Robots</a>
+        &raquo; <a href="<?= $this_robot_page_baseurl ?>"><?= $this_robot_xclass_name_uc ?></a>
         <? if ($sub_action == 'editor' && !empty($robot_data)): ?>
             <? if (!$is_backup_data){ ?>
-                &raquo; <a href="admin/edit-robots/editor/robot_id=<?= $robot_data['robot_id'] ?>"><?= $robot_name_display ?></a>
+                &raquo; <a href="<?= $this_robot_page_baseurl ?>editor/robot_id=<?= $robot_data['robot_id'] ?>"><?= $robot_name_display ?></a>
             <? } else { ?>
                 &raquo; <a><?= $robot_name_display ?></a>
             <? } ?>
@@ -622,7 +639,7 @@
 
     <?= !empty($this_error_markup) ? '<div style="margin: 0 auto 20px">'.$this_error_markup.'</div>' : '' ?>
 
-    <div class="adminform edit-robots">
+    <div class="adminform edit-robots edit-<?= str_replace(' ', '-', $this_robot_xclass_name) ?>">
 
         <? if ($sub_action == 'search'): ?>
 
@@ -630,13 +647,13 @@
 
             <div class="search">
 
-                <h3 class="header">Search Robots</h3>
+                <h3 class="header">Search <?= $this_robot_xclass_name_uc ?></h3>
 
                 <? print_form_messages() ?>
 
                 <form class="form" method="get">
 
-                    <input type="hidden" name="action" value="edit-robots" />
+                    <input type="hidden" name="action" value="<?= $this_robot_page_token ?>" />
                     <input type="hidden" name="subaction" value="search" />
 
                     <? /*
@@ -651,6 +668,7 @@
                         <input class="textbox" type="text" name="robot_name" placeholder="" value="<?= !empty($search_data['robot_name']) ? htmlentities($search_data['robot_name'], ENT_QUOTES, 'UTF-8', true) : '' ?>" />
                     </div>
 
+                    <? /*
                     <div class="field">
                         <strong class="label">By Class</strong>
                         <select class="select" name="robot_class">
@@ -660,6 +678,7 @@
                             <option value="boss"<?= !empty($search_data['robot_class']) && $search_data['robot_class'] === 'boss' ? ' selected="selected"' : '' ?>>Boss</option>
                         </select><span></span>
                     </div>
+                    */ ?>
 
                     <div class="field">
                         <strong class="label">By Type</strong>
@@ -726,7 +745,7 @@
 
                     <div class="buttons">
                         <input class="button" type="submit" value="Search" />
-                        <input class="button" type="reset" value="Reset" onclick="javascript:window.location.href='admin/edit-robots/';" />
+                        <input class="button" type="reset" value="Reset" onclick="javascript:window.location.href='<?= $this_robot_page_baseurl ?>';" />
                     </div>
 
                 </form>
@@ -821,7 +840,7 @@
                                 $robot_flag_complete = !empty($robot_data['robot_flag_complete']) ? '<i class="fas fa-check-circle"></i>' : '-';
                                 $robot_flag_hidden = !empty($robot_data['robot_flag_hidden']) ? '<i class="fas fa-eye-slash"></i>' : '-';
 
-                                $robot_edit_url = 'admin/edit-robots/editor/robot_id='.$robot_id;
+                                $robot_edit_url = $this_robot_page_baseurl.'editor/robot_id='.$robot_id;
                                 $robot_name_link = '<a class="link" href="'.$robot_edit_url.'">'.$robot_name.'</a>';
 
                                 $robot_actions = '';
@@ -874,7 +893,7 @@
                 <div class="editor">
 
                     <h3 class="header type_span type_<?= !empty($robot_data['robot_core']) ? $robot_data['robot_core'].(!empty($robot_data['robot_core2']) ? '_'.$robot_data['robot_core2'] : '') : 'none' ?>" data-auto="field-type" data-field-type="robot_core,robot_core2">
-                        <span class="title"><?= !$is_backup_data ? 'Edit' : 'View' ?> Robot &quot;<?= $robot_name_display ?>&quot;</span>
+                        <span class="title"><?= !$is_backup_data ? 'Edit' : 'View' ?> <?= $this_robot_class_short_name_uc ?> &quot;<?= $robot_name_display ?>&quot;</span>
                         <?
                         // If this is NOT backup data, we can generate links
                         if (!$is_backup_data){
@@ -930,22 +949,24 @@
 
                     <form class="form" method="post">
 
-                        <input type="hidden" name="action" value="edit-robots" />
+                        <input type="hidden" name="action" value="<?= $this_robot_page_token ?>" />
                         <input type="hidden" name="subaction" value="editor" />
+
+                        <input type="hidden" name="robot_class" value="<?= $this_robot_class ?>" />
 
                         <div class="editor-panels" data-tabgroup="robot">
 
                             <div class="panel active" data-tab="basic">
 
                                 <div class="field">
-                                    <strong class="label">Robot ID</strong>
+                                    <strong class="label"><?= $this_robot_class_short_name_uc ?> ID</strong>
                                     <input type="hidden" name="robot_id" value="<?= $robot_data['robot_id'] ?>" />
                                     <input class="textbox" type="text" name="robot_id" value="<?= $robot_data['robot_id'] ?>" disabled="disabled" />
                                 </div>
 
                                 <div class="field">
                                     <div class="label">
-                                        <strong>Robot Token</strong>
+                                        <strong><?= $this_robot_class_short_name_uc ?> Token</strong>
                                         <em>avoid changing</em>
                                     </div>
                                     <input type="hidden" name="old_robot_token" value="<?= $robot_data['robot_token'] ?>" />
@@ -953,18 +974,20 @@
                                 </div>
 
                                 <div class="field">
-                                    <strong class="label">Robot Name</strong>
+                                    <strong class="label"><?= $this_robot_class_short_name_uc ?> Name</strong>
                                     <input class="textbox" type="text" name="robot_name" value="<?= $robot_data['robot_name'] ?>" maxlength="128" />
                                 </div>
 
+                                <? /*
                                 <div class="field">
-                                    <strong class="label">Robot Kind</strong>
+                                    <strong class="label"><?= $this_robot_class_short_name_uc ?> Kind</strong>
                                     <select class="select" name="robot_class">
                                         <option value="mecha" <?= $robot_data['robot_class'] == 'mecha' ? 'selected="selected"' : '' ?>>Support Mecha</option>
                                         <option value="master" <?= empty($robot_data['robot_class']) || $robot_data['robot_class'] == 'master' ? 'selected="selected"' : '' ?>>Robot Master</option>
                                         <option value="boss" <?= $robot_data['robot_class'] == 'boss' ? 'selected="selected"' : '' ?>>Fortress Boss</option>
                                     </select><span></span>
                                 </div>
+                                */ ?>
 
                                 <div class="field has2cols">
                                     <strong class="label">
@@ -1077,7 +1100,7 @@
                                     </select><span></span>
                                 </div>
 
-                                <? if ($robot_data['robot_field'] !== 'mecha'){
+                                <? if ($this_robot_class !== 'mecha'){
                                     ?>
                                     <div class="field disabled">
                                         <strong class="label">Support Mecha</strong>
@@ -1135,7 +1158,7 @@
                                     ?>
                                     <div class="field fullsize has4cols">
                                         <strong class="label">
-                                            Robot <?= ucfirst($matchup_token) ?>
+                                            <?= $this_robot_class_short_name_uc ?> <?= ucfirst($matchup_token) ?>
                                         </strong>
                                         <? for ($i = 0; $i < 4; $i++){ ?>
                                             <div class="subfield">
@@ -1165,7 +1188,7 @@
 
                                 <div class="field halfsize">
                                     <div class="label">
-                                        <strong>Robot Class</strong>
+                                        <strong><?= $this_robot_class_short_name_uc ?> Class</strong>
                                         <em>three word classification</em>
                                     </div>
                                     <input class="textbox" type="text" name="robot_description" value="<?= htmlentities($robot_data['robot_description'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="32" />
@@ -1173,7 +1196,7 @@
 
                                 <div class="field fullsize">
                                     <div class="label">
-                                        <strong>Robot Description</strong>
+                                        <strong><?= $this_robot_class_short_name_uc ?> Description</strong>
                                         <em>short paragraph about robot's design, personality, background, etc.</em>
                                     </div>
                                     <textarea class="textarea" name="robot_description2" rows="10"><?= htmlentities($robot_data['robot_description2'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
@@ -1661,7 +1684,7 @@
 
                                     <div class="field fullsize codemirror <?= $is_backup_data ? 'readonly' : '' ?>" data-codemirror-mode="php">
                                         <div class="label">
-                                            <strong>Robot Functions</strong>
+                                            <strong><?= $this_robot_class_short_name_uc ?> Functions</strong>
                                             <em>code is php-format with html allowed in some strings</em>
                                         </div>
                                         <?
@@ -1695,6 +1718,13 @@
                                             <code style="color: #05a;">$target_robot</code>
                                             &nbsp;&nbsp;<a title="robot data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_ROBOTS_CONTENT_PATH).'.robot/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
                                         </div>
+                                        <? if ($this_robot_class !== 'master'){ ?>
+                                            <div class="label examples" style=" margin: 0 auto 10px; font-size: 80%;">
+                                                <strong>Important Note</strong>:<br />
+                                                <code style="color: #cc0000;">Even though this is a <?= $this_robot_class ?>, it is still referred to as a 'robot' in the code!</code><br />
+                                                <code style="color: #cc0000;">(Use "robot_id" instead of "<?= $this_robot_class ?>_id", "robot_name" instead of "<?= $this_robot_class ?>_name", etc.)</code>
+                                            </div>
+                                        <? } ?>
                                     </div>
 
                                 </div>
@@ -1729,7 +1759,7 @@
                                                     <td class="date"><?= date('Y/m/d', $backup_unix_time) ?></td>
                                                     <td class="time"><?= date('g:i a', $backup_unix_time) ?></td>
                                                     <td class="actions">
-                                                        <a href="admin/edit-robots/editor/backup_id=<?= $backup_info['backup_id'] ?>" target="_blank" style="text-decoration: none;">
+                                                        <a href="<?= $this_robot_page_baseurl ?>editor/backup_id=<?= $backup_info['backup_id'] ?>" target="_blank" style="text-decoration: none;">
                                                             <span style="text-decoration: underline;">View Backup</span>
                                                             <i class="fas fa-external-link-square-alt"></i>
                                                         </a>
@@ -1753,7 +1783,7 @@
                                     <input type="hidden" name="robot_flag_published" value="0" checked="checked" />
                                     <input class="checkbox" type="checkbox" name="robot_flag_published" value="1" <?= !empty($robot_data['robot_flag_published']) ? 'checked="checked"' : '' ?> />
                                 </label>
-                                <p class="subtext">This robot is ready to appear on the site</p>
+                                <p class="subtext">This <?= $this_robot_class_short_name ?> is ready to appear on the site</p>
                             </div>
 
                             <div class="field checkwrap">
@@ -1762,7 +1792,7 @@
                                     <input type="hidden" name="robot_flag_complete" value="0" checked="checked" />
                                     <input class="checkbox" type="checkbox" name="robot_flag_complete" value="1" <?= !empty($robot_data['robot_flag_complete']) ? 'checked="checked"' : '' ?> />
                                 </label>
-                                <p class="subtext">This robot's sprites have been completed</p>
+                                <p class="subtext">This <?= $this_robot_class_short_name ?>'s sprites have been completed</p>
                             </div>
 
                             <div class="field checkwrap">
@@ -1771,7 +1801,7 @@
                                     <input type="hidden" name="robot_flag_hidden" value="0" checked="checked" />
                                     <input class="checkbox" type="checkbox" name="robot_flag_hidden" value="1" <?= !empty($robot_data['robot_flag_hidden']) ? 'checked="checked"' : '' ?> />
                                 </label>
-                                <p class="subtext">This robot's data should stay hidden</p>
+                                <p class="subtext">This <?= $this_robot_class_short_name ?>'s data should stay hidden</p>
                             </div>
 
                             <? if (!empty($robot_data['robot_flag_published'])
@@ -1786,7 +1816,7 @@
                                             <input type="hidden" name="robot_flag_unlockable" value="0" checked="checked" />
                                             <input class="checkbox" type="checkbox" name="robot_flag_unlockable" value="1" <?= !empty($robot_data['robot_flag_unlockable']) ? 'checked="checked"' : '' ?> />
                                         </label>
-                                        <p class="subtext">This robot is ready to be used in the game</p>
+                                        <p class="subtext">This <?= $this_robot_class_short_name ?> is ready to be used in the game</p>
                                     </div>
 
                                     <div class="field checkwrap">
@@ -1811,9 +1841,9 @@
                             <? if (!$is_backup_data){ ?>
                                 <div class="buttons">
                                     <input class="button save" type="submit" value="Save Changes" />
-                                    <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin/edit-robots/editor/robot_id=<?= $robot_data['robot_id'] ?>';" />
+                                    <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='<?= $this_robot_page_baseurl ?>editor/robot_id=<?= $robot_data['robot_id'] ?>';" />
                                     <? /*
-                                    <input class="button delete" type="button" value="Delete Robot" data-delete="robots" data-robot-id="<?= $robot_data['robot_id'] ?>" />
+                                    <input class="button delete" type="button" value="Delete <?= $this_robot_class_short_name_uc ?>" data-delete="robots" data-robot-id="<?= $robot_data['robot_id'] ?>" />
                                     */ ?>
                                 </div>
                             <? } ?>

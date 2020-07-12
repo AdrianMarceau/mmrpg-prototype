@@ -16,7 +16,7 @@
     if (!in_array('*', $this_adminaccess)
         && !in_array('edit-challenges', $this_adminaccess)
         && !in_array($this_challenge_page_token, $this_adminaccess)){
-        $form_messages[] = array('error', 'You do not have permission to edit challenges!');
+        $form_messages[] = array('error', 'You do not have permission to edit '.$this_challenge_kind.' challenges!');
         redirect_form_action('admin/home/');
     }
 
