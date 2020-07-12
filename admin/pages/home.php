@@ -45,13 +45,13 @@
     <?
     /* -- PAGE EDITORS -- */
     if (true){
-        $temp_group_name = 'Website Editors';
+        $temp_group_name = 'Website Editor';
         ob_start();
         if (in_array('*', $this_adminaccess)
             || in_array('edit-pages', $this_adminaccess)){
             ?>
             <li class="item">
-                <a href="admin/edit-pages/">Update Website Pages</a>
+                <a href="admin/edit-pages/">Edit Website Pages</a>
                 <em>edit the text and images on various website pages</em>
             </li>
             <?
@@ -79,7 +79,7 @@
             || in_array('edit-players', $this_adminaccess)){
             ?>
             <li class="item">
-                <a href="admin/edit-players/">Update Player Characters</a>
+                <a href="admin/edit-players/">Edit Player Characters</a>
                 <em>edit the details and images of the in-game player characters</em>
             </li>
             <?
@@ -89,7 +89,7 @@
             || in_array('edit-robot-master', $this_adminaccess)){
             ?>
             <li class="item">
-                <a href="admin/edit-robot-masters/">Update Robot Masters</a>
+                <a href="admin/edit-robot-masters/">Edit Robot Masters</a>
                 <em>edit the details and images of the in-game robot masters</em>
             </li>
             <?
@@ -99,7 +99,7 @@
             || in_array('edit-support-mechas', $this_adminaccess)){
             ?>
             <li class="item">
-                <a href="admin/edit-support-mechas/">Update Support Mechas</a>
+                <a href="admin/edit-support-mechas/">Edit Support Mechas</a>
                 <em>edit the details and images of the in-game support mechas</em>
             </li>
             <?
@@ -109,7 +109,7 @@
             || in_array('edit-fortress-bosses', $this_adminaccess)){
             ?>
             <li class="item">
-                <a href="admin/edit-fortress-bosses/">Update Fortress Bosses</a>
+                <a href="admin/edit-fortress-bosses/">Edit Fortress Bosses</a>
                 <em>edit the details and images of the in-game fortress bosses</em>
             </li>
             <?
@@ -118,7 +118,7 @@
             || in_array('edit-fields', $this_adminaccess)){
             ?>
             <li class="item">
-                <a href="admin/edit-fields/">Update Battle Fields</a>
+                <a href="admin/edit-fields/">Edit Battle Fields</a>
                 <em>edit the details and images of the in-game battle fields</em>
             </li>
             <?
@@ -140,13 +140,13 @@
     <?
     /* -- POST-GAME CONTENT -- */
     if (true){
-        $temp_group_name = 'Post-Game Content';
+        $temp_group_name = 'Post-Game Editor';
         ob_start();
         if (in_array('*', $this_adminaccess)
             || in_array('edit-stars', $this_adminaccess)){
             ?>
             <li class="item">
-                <a href="admin/edit-stars/">Schedule Rogue Stars</a>
+                <a href="admin/edit-stars/">Edit Rogue Stars</a>
                 <em>schedule and manage rogue star appearances in the post-game</em>
             </li>
             <?
