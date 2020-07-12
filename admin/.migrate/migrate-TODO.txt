@@ -117,6 +117,18 @@ Update the admin panel so it pulls the right contributors list (mmrpg_users vs m
 -  robots [DONE]
 -  fields [DONE]
 
+Update live DB with changes to challenges table
+-  Duplicate mmrpg_challenges as mmrpg_users_challenges [DONE]
+-  Duplicate mmrpg_challenges_leaderboard AS mmrpg_users_challenges_leaderboard [DONE]
+-  Ensure the base tables only have 'event' kind challenge records [DONE]
+-  Ensure the user tables only have 'user' kind challenge records [DONE]
+
+Update website/game to use different favicons for different environments
+-  local [DONE]
+-  dev [DONE]
+-  stage [DONE]
+-  live [DONE]
+
 Update the admin panel with editors for the final object types
 -  abilities
 -  items
@@ -124,12 +136,6 @@ Update the admin panel with editors for the final object types
 Update the admin panel to deal with git functions add/stage/commit for content directories
 -  ?????
 
-Update the admin panel to distinguish between DEV and LIVE servers
+Update the admin panel to distinguish between DEV and LIVE servers w/ different push/pull functions
 -  ?????
-
-Update live DB with changes to challenges table
--  Duplicate mmrpg_challenges as mmrpg_users_challenges [DONE]
--  Duplicate mmrpg_challenges_leaderboard AS mmrpg_users_challenges_leaderboard [DONE]
--  Ensure the base tables only have 'event' kind challenge records [DONE]
--  Ensure the user tables only have 'user' kind challenge records [DONE]
 
