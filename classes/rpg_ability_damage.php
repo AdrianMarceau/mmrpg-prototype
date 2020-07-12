@@ -243,36 +243,41 @@ class rpg_ability_damage extends rpg_damage {
                 // Define an array to hold individual omegaboost values
                 $ability_omegaboost_multipliers = array();
 
-                // Check this ability's FIRST type for multiplier matches
-                if (!empty($ability_type_token)){
+                // Only proceed if at least one omega type has been defined
+                if (!empty($omega_type_token) || !empty($omega_type_token2)){
 
-                    // Apply robot omega core multipliers if they exist
-                    if ($ability_type_token == $omega_type_token){
-                        $this_ability->ability_results['counter_omegaboosts']++;
-                        $ability_omegaboost_multipliers[] = MMRPG_SETTINGS_OMEGACOREBOOST_MULTIPLIER;
+                    // Check this ability's FIRST type for multiplier matches
+                    if (!empty($ability_type_token)){
+
+                        // Apply robot omega core multipliers if they exist
+                        if ($ability_type_token == $omega_type_token){
+                            $this_ability->ability_results['counter_omegaboosts']++;
+                            $ability_omegaboost_multipliers[] = MMRPG_SETTINGS_OMEGACOREBOOST_MULTIPLIER;
+                        }
+
+                        // Apply player omega core multipliers if they exist
+                        if ($ability_type_token == $omega_type_token2){
+                            $this_ability->ability_results['counter_omegaboosts']++;
+                            $ability_omegaboost_multipliers[] = MMRPG_SETTINGS_OMEGACOREBOOST_MULTIPLIER;
+                        }
+
                     }
 
-                    // Apply player omega core multipliers if they exist
-                    if ($ability_type_token == $omega_type_token2){
-                        $this_ability->ability_results['counter_omegaboosts']++;
-                        $ability_omegaboost_multipliers[] = MMRPG_SETTINGS_OMEGACOREBOOST_MULTIPLIER;
-                    }
+                    // Check this ability's SECOND type for multiplier matches
+                    if (!empty($ability_type_token2)){
 
-                }
+                        // Apply robot omega core multipliers if they exist
+                        if ($ability_type_token2 == $omega_type_token){
+                            $this_ability->ability_results['counter_omegaboosts']++;
+                            $ability_omegaboost_multipliers[] = MMRPG_SETTINGS_OMEGACOREBOOST_MULTIPLIER;
+                        }
 
-                // Check this ability's SECOND type for multiplier matches
-                if (!empty($ability_type_token2)){
+                        // Apply player omega core multipliers if they exist
+                        if ($ability_type_token2 == $omega_type_token2){
+                            $this_ability->ability_results['counter_omegaboosts']++;
+                            $ability_omegaboost_multipliers[] = MMRPG_SETTINGS_OMEGACOREBOOST_MULTIPLIER;
+                        }
 
-                    // Apply robot omega core multipliers if they exist
-                    if ($ability_type_token2 == $omega_type_token){
-                        $this_ability->ability_results['counter_omegaboosts']++;
-                        $ability_omegaboost_multipliers[] = MMRPG_SETTINGS_OMEGACOREBOOST_MULTIPLIER;
-                    }
-
-                    // Apply player omega core multipliers if they exist
-                    if ($ability_type_token2 == $omega_type_token2){
-                        $this_ability->ability_results['counter_omegaboosts']++;
-                        $ability_omegaboost_multipliers[] = MMRPG_SETTINGS_OMEGACOREBOOST_MULTIPLIER;
                     }
 
                 }
