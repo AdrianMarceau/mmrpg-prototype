@@ -16,14 +16,6 @@ $deprecated_abilities = array(
     'time-stopper',
     );
 
-// Predefine special abilities that should be skipped during the standard normal loop
-$special_action_abilities = array(
-    'action-chargeweapons',
-    'action-devpower-clearmission',
-    'action-noweapons',
-    'action-unequipitem',
-    );
-
 // Collect an index of all valid abilities from the database
 $ability_fields = rpg_ability::get_index_fields(false);
 if (!in_array('ability_functions', $ability_fields)){ $ability_fields[] = 'ability_functions'; }
@@ -76,9 +68,8 @@ foreach ($ability_sprites_list AS $key => $token){
 $icon_sprite_filenames = array('icon_left_40x40.png', 'icon_right_40x40.png', 'icon_left_80x80.png', 'icon_right_80x80.png');
 $sprite_sprite_filenames = array('sprite_left_40x40.png', 'sprite_right_40x40.png', 'sprite_left_80x80.png', 'sprite_right_80x80.png');
 
-// Pre-create special action and effect directories for later
+// Pre-create special effect directory for later
 $special_ability_dirs = array();
-$special_ability_dirs[] = $special_action_abilities_dir = MMRPG_ABILITIES_NEW_CONTENT_DIR.'_actions/';
 $special_ability_dirs[] = $special_effect_abilities_dir = MMRPG_ABILITIES_NEW_CONTENT_DIR.'_effects/';
 foreach ($special_ability_dirs AS $special_ability_dir){
     //ob_echo('-- $special_ability_dir = '.clean_path($special_ability_dir));
@@ -119,11 +110,7 @@ foreach ($ability_index AS $ability_token => $ability_data){
     $data_path = MMRPG_MIGRATE_OLD_DATA_DIR.$function_path.$ability_token.'.php';
     //ob_echo('-- $data_path = '.clean_path($data_path));
 
-    if (in_array($ability_token, $special_action_abilities)){
-        $content_path = $special_action_abilities_dir.str_replace('action-', '', $ability_token).'/';
-    } else {
-        $content_path = MMRPG_ABILITIES_NEW_CONTENT_DIR.($ability_token === 'ability' ? '.ability' : $ability_token).'/';
-    }
+    $content_path = MMRPG_ABILITIES_NEW_CONTENT_DIR.($ability_token === 'ability' ? '.ability' : $ability_token).'/';
     //ob_echo('-- $content_path = '.clean_path($content_path));
     if (file_exists($content_path)){ deleteDir($content_path); }
     mkdir($content_path);

@@ -55,6 +55,7 @@ class rpg_ability extends rpg_object {
     public function ability_load($this_abilityinfo){
 
         // Collect ability index info in case we need it
+        if (!isset($this_abilityinfo['ability_token'])){ return false; }
         $this_indexinfo = self::get_index_info($this_abilityinfo['ability_token']);
 
         // If the ability info was not an array, return false
