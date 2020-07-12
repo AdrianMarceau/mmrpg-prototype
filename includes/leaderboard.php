@@ -133,7 +133,7 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
                 if (!empty($board['user_image_path'])){ list($avatar_class, $avatar_token, $avatar_base_size) = explode('/', $board['user_image_path']); }
                 else { $avatar_class = 'robots'; $avatar_token = 'mega-man'; $avatar_base_size = 40; }
                 if (!empty($board['user_background_path'])){ list($background_class, $background_token) = explode('/', $board['user_background_path']); }
-                else { $background_class = 'fields'; $background_token = 'intro-field'; }
+                else { $background_class = 'fields'; $background_token = rpg_player::get_intro_field('player'); }
                 $avatar_size = $avatar_base_size * 2;
                 $place_frame = 'base';
                 if ($place_counter == 3){ $place_frame = 'taunt'; }

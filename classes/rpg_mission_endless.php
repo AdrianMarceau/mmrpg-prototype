@@ -43,12 +43,13 @@ class rpg_mission_endless extends rpg_mission {
             }
 
             // Sort the robot masters into lists of their core types
+            $temp_intro_fields = array_values(rpg_player::get_intro_fields());
             $mmrpg_fields_index_bytype = array();
             foreach ($mmrpg_fields_index AS $field_token => $field_info){
                 if ($field_token == 'prototype-complete'){ continue; } // we don't want prototype complete
                 if (empty($field_info['field_flag_complete'])){ unset($mmrpg_fields_index[$field_token]); continue; }
                 $field_type = !empty($field_info['field_type']) ? $field_info['field_type'] : 'none';
-                if ($field_token == 'intro-field'){ $field_type = 'copy'; }
+                if (in_array($field_token, $temp_intro_fields)){ $field_type = 'copy'; }
                 elseif (strstr($field_token, 'final-destination')){ $field_type = 'copy'; }
                 if (!isset($mmrpg_fields_index_bytype[$field_type])){ $mmrpg_fields_index_bytype[$field_type] = array(); }
                 $mmrpg_fields_index_bytype[$field_type][] = $field_token;
@@ -217,7 +218,8 @@ class rpg_mission_endless extends rpg_mission {
         $temp_battle_seed = self::generate_endless_mission_seed($mission_number);
 
         // Precollect data about the requested fields
-        $temp_option_field = $mmrpg_fields_index[(!empty($temp_battle_seed['field']) ? $temp_battle_seed['field'] : 'intro-field')];
+        $default_field = rpg_player::get_intro_field($this_prototype_data['this_player_token']);
+        $temp_option_field = $mmrpg_fields_index[(!empty($temp_battle_seed['field']) ? $temp_battle_seed['field'] : $default_field)];
         $temp_option_field2 = $mmrpg_fields_index[(!empty($temp_battle_seed['field2']) ? $temp_battle_seed['field2'] : $temp_option_field['field_token'])];
         $temp_option_multipliers = array();
         $temp_option_field_list = array($temp_option_field, $temp_option_field2);

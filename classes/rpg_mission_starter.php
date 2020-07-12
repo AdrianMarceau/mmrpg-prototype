@@ -6,7 +6,7 @@
 class rpg_mission_starter extends rpg_mission {
 
     // Define a function for generating the STARTER missions
-    public static function generate($this_prototype_data, $this_robot_token = 'met', $this_start_level = 1, $this_rescue_token = 'roll', $this_intro_field = 'intro-field'){
+    public static function generate($this_prototype_data, $this_robot_token = 'met', $this_start_level = 1, $this_rescue_token = 'roll', $this_intro_field = ''){
 
         // Pull in global variables for this function
         global $db;
@@ -28,6 +28,7 @@ class rpg_mission_starter extends rpg_mission {
         $this_robot_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
         $this_robot_data = rpg_robot::parse_index_info($this_robot_index[$this_robot_token]);
         $this_robot_name = $this_robot_data['robot_name'];
+        if (empty($this_intro_field)){ $this_intro_field = rpg_player::get_intro_field($this_prototype_data['this_player_token']); }
         $intro_field_data = rpg_field::get_index_info($this_intro_field);
         // Populate the battle options with the starter battle option
         $temp_target_count = 1;

@@ -847,7 +847,7 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
                 $temp_avatar_direction = $temp_avatar_float == 'left' ? 'right' : 'left';
                 $temp_avatar_frame = $this_thread_info['user_id'] != $this_thread_info['thread_target'] && !empty($this_thread_info['thread_frame']) ? $this_thread_info['thread_frame'] : '00';
                 $temp_avatar_path = !empty($this_thread_info['user_image_path']) ? $this_thread_info['user_image_path'] : 'robots/mega-man/40';
-                $temp_background_path = !empty($this_thread_info['user_background_path']) ? $this_thread_info['user_background_path'] : 'fields/intro-field';
+                $temp_background_path = !empty($this_thread_info['user_background_path']) ? $this_thread_info['user_background_path'] : 'fields/gentle-countryside';
                 if ($is_system_thread){ $temp_avatar_path = 'robots/robot/40'; $temp_background_path = 'fields/field'; }
                 list($temp_avatar_kind, $temp_avatar_token, $temp_avatar_size) = explode('/', $temp_avatar_path);
                 list($temp_background_kind, $temp_background_token) = explode('/', $temp_background_path);
@@ -867,7 +867,7 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
                 $temp_avatar_direction = $temp_avatar_float == 'left' ? 'right' : 'left';
                 $temp_avatar_frame =  $this_thread_info['user_id'] == $this_thread_info['thread_target'] && !empty($this_thread_info['thread_frame']) ? $this_thread_info['thread_frame'] : '00';
                 $temp_avatar_path = !empty($this_thread_info['target_user_image_path']) ? $this_thread_info['target_user_image_path'] : 'robots/mega-man/40';
-                $temp_background_path = !empty($this_thread_info['target_user_background_path']) ? $this_thread_info['target_user_background_path'] : 'fields/intro-field';
+                $temp_background_path = !empty($this_thread_info['target_user_background_path']) ? $this_thread_info['target_user_background_path'] : 'fields/gentle-countryside';
                 //if ($is_system_thread){ $temp_avatar_path = 'robots/robot/40'; $temp_background_path = 'fields/field'; }
                 list($temp_avatar_kind, $temp_avatar_token, $temp_avatar_size) = explode('/', $temp_avatar_path);
                 list($temp_background_kind, $temp_background_token) = explode('/', $temp_background_path);
@@ -889,7 +889,7 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
                 $temp_avatar_direction = 'right';
                 $temp_avatar_frame = !empty($this_thread_info['thread_frame']) ? $this_thread_info['thread_frame'] : '00';
                 $temp_avatar_path = !empty($this_thread_info['user_image_path']) ? $this_thread_info['user_image_path'] : 'robots/mega-man/40';
-                $temp_background_path = !empty($this_thread_info['user_background_path']) ? $this_thread_info['user_background_path'] : 'fields/intro-field';
+                $temp_background_path = !empty($this_thread_info['user_background_path']) ? $this_thread_info['user_background_path'] : 'fields/gentle-countryside';
                 list($temp_avatar_kind, $temp_avatar_token, $temp_avatar_size) = explode('/', $temp_avatar_path);
                 list($temp_background_kind, $temp_background_token) = explode('/', $temp_background_path);
                 $temp_avatar_class = 'avatar avatar_40x40 float float_'.$temp_avatar_float.' ';

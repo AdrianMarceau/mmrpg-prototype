@@ -1819,15 +1819,15 @@ function mmrpg_prototype_generate_mission($this_prototype_data,
     $temp_battle_omega['battle_zenny'] = !empty($battle_info['battle_zenny']) ? $battle_info['battle_zenny'] : 0;
     $temp_battle_omega['battle_turns'] = !empty($battle_info['battle_turns']) ? $battle_info['battle_turns'] : 0;
 
-    // Parse the field info array and fill-in missing fields, then add to battle
-    $field_info['field_id'] = !empty($field_info['field_id']) ? $field_info['field_id'] : 1000;
-    $field_info['field_token'] = !empty($field_info['field_token']) ? $field_info['field_token'] : 'intro-field';
-    $temp_battle_omega['battle_field_base'] = $field_info;
-
     // Parse the target player array and fill-in missing fields, then add to battle
     $target_info['player_id'] = !empty($target_info['player_id']) ? $target_info['player_id'] : MMRPG_SETTINGS_TARGET_PLAYERID;
     $target_info['player_token'] = !empty($target_info['player_token']) ? $target_info['player_token'] : 'player';
     $temp_battle_omega['battle_target_player'] = $target_info;
+
+    // Parse the field info array and fill-in missing fields, then add to battle
+    $field_info['field_id'] = !empty($field_info['field_id']) ? $field_info['field_id'] : 1000;
+    $field_info['field_token'] = !empty($field_info['field_token']) ? $field_info['field_token'] : rpg_player::get_intro_field($target_info['player_token']);
+    $temp_battle_omega['battle_field_base'] = $field_info;
 
     // Parse the target robot array and fill-in missing fields, then add to player and battle
     $auto_battle_zenny = 0;

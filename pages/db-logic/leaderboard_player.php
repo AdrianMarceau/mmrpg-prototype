@@ -9,7 +9,7 @@ $temp_display_points = $this_playerinfo['board_points'];
 $temp_display_zenny = !empty($this_playerinfo['save_counters']['battle_zenny']) ? $this_playerinfo['save_counters']['battle_zenny'] : 0;
 $temp_display_text = !empty($this_playerinfo['user_profile_text']) && !empty($this_playerinfo['user_flag_postpublic']) ? $this_playerinfo['user_profile_text'] : '';
 $temp_avatar_path = !empty($this_playerinfo['user_image_path']) ? $this_playerinfo['user_image_path'] : 'robots/mega-man/40';
-$temp_background_path = !empty($this_playerinfo['user_background_path']) ? $this_playerinfo['user_background_path'] : 'fields/intro-field';
+$temp_background_path = !empty($this_playerinfo['user_background_path']) ? $this_playerinfo['user_background_path'] : 'fields/'.rpg_player::get_intro_field();
 $temp_is_contributor = in_array($this_playerinfo['role_token'], array('developer', 'administrator', 'moderator', 'contributor')) ? true : false;
 if ($temp_is_contributor){
     $temp_item_class = 'sprite sprite_80x80 sprite_80x80_00';

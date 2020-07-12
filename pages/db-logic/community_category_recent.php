@@ -271,7 +271,7 @@ if (strstr($page_content_parsed, $find)){
                         // Define the avatar class and path variables
                         $temp_avatar_frame = !empty($this_post_info['post_frame']) ? $this_post_info['post_frame'] : '00';
                         $temp_avatar_path = !empty($this_post_info['user_image_path']) ? $this_post_info['user_image_path'] : 'robots/mega-man/40';
-                        $temp_background_path = !empty($this_post_info['user_background_path']) ? $this_post_info['user_background_path'] : 'fields/intro-field';
+                        $temp_background_path = !empty($this_post_info['user_background_path']) ? $this_post_info['user_background_path'] : 'fields/'.rpg_player::get_intro_field();
                         list($temp_avatar_kind, $temp_avatar_token, $temp_avatar_size) = explode('/', $temp_avatar_path);
                         list($temp_background_kind, $temp_background_token) = explode('/', $temp_background_path);
                         $temp_avatar_class = 'avatar avatar_40x40 float float_left ';

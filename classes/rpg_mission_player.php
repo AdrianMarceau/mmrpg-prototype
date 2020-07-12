@@ -178,8 +178,9 @@ class rpg_mission_player extends rpg_mission {
             $temp_rand_int = mt_rand(1, 4);
             $temp_rand_start = ($temp_rand_int - 1) * 2;
             $temp_field_info_options = array_slice($temp_field_info_options, $temp_rand_start, 2);
-            $temp_field_token_one = isset($temp_field_info_options[0]) ? $temp_field_info_options[0] : 'intro-field';
-            $temp_field_token_two = isset($temp_field_info_options[1]) ? $temp_field_info_options[1] : 'intro-field';
+            $temp_default_field = rpg_player::get_intro_field($target_player_token);
+            $temp_field_token_one = isset($temp_field_info_options[0]) ? $temp_field_info_options[0] : $temp_default_field;
+            $temp_field_token_two = isset($temp_field_info_options[1]) ? $temp_field_info_options[1] : $temp_default_field;
             $temp_field_info_one = rpg_field::parse_index_info($this_field_index[$temp_field_token_one]);
             $temp_field_info_two = rpg_field::parse_index_info($this_field_index[$temp_field_token_two]);
             $temp_option_multipliers = array();

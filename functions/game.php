@@ -359,8 +359,9 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
         $this_find = array('{this_player}', '{this_robot}', '{target_player}', '{target_robot}');
         $this_replace = array($player_info['player_name'], $robot_info['robot_name'], $player_info['player_name'], ($this_player_token == 'dr-light' ? 'Mega Man' : ($this_player_token == 'dr-wily' ? 'Bass' : ($this_player_token == 'dr-cossack' ? 'Proto Man' : 'Robot'))));
         $this_quote = !empty($robot_info['robot_quotes']['battle_taunt']) ? str_replace($this_find, $this_replace, $robot_info['robot_quotes']['battle_taunt']) : '...';
-        $this_field = rpg_field::get_index_info(!empty($robot_info['robot_field']) ? $robot_info['robot_field'] : (!empty($robot_info['robot_field2']) ? $robot_info['robot_field2'] : 'intro-field'));
-        if (empty($this_field['field_flag_complete'])){ $this_field = rpg_field::get_index_info('intro-field'); }
+        $default_field = rpg_player::get_intro_field($this_player_token);
+        $this_field = rpg_field::get_index_info(!empty($robot_info['robot_field']) ? $robot_info['robot_field'] : (!empty($robot_info['robot_field2']) ? $robot_info['robot_field2'] : $default_field));
+        if (empty($this_field['field_flag_complete'])){ $this_field = rpg_field::get_index_info($default_field); }
         $this_pronoun = 'he'; $this_posessive = 'his';
         $this_congrats = 'Congratulations!';
         if (in_array($robot_info['robot_token'], array('roll', 'disco', 'rhythm'))){ $this_congrats = '<strong>'.$this_name.'</strong> to the rescue!'; }
@@ -792,7 +793,7 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
         $this_description = !empty($ability_info['ability_description']) && $ability_info['ability_description'] != '...' ? $ability_info['ability_description'] : '';
         $this_find = array('{this_player}', '{this_ability}', '{target_player}', '{target_ability}');
         $this_replace = array($player_info['player_name'], $ability_info['ability_name'], $player_info['player_name'], ($this_player_token == 'dr-light' ? 'Mega Man' : ($this_player_token == 'dr-wily' ? 'Bass' : ($this_player_token == 'dr-cossack' ? 'Proto Man' : 'Robot'))));
-        $this_field = array('field_token' => 'intro-field', 'field_name' => 'Intro Field');
+        $this_field = rpg_player::get_intro_field($this_player_token, true);
         $db_ability_fields = rpg_ability::get_index_fields(true);
         $temp_ability_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
         // Generate the window event's canvas and message markup then append to the global array
@@ -923,7 +924,7 @@ function mmrpg_game_unlock_item($item_token, $print_options = array()){
         $shop_info = array('shop_token' => $shop_token, 'shop_name' => ucfirst($shop_token));
 
         // Define basic details about the intro field background
-        $this_field = array('field_token' => 'intro-field', 'field_name' => 'Intro Field');
+        $this_field = rpg_player::get_intro_field($player_token, true);
 
         // Generate the window event's canvas and message markup then append to the global array
         $temp_canvas_markup = '';

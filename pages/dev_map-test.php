@@ -57,7 +57,7 @@ if (!empty($_SESSION['mmrpg_conqest_playlist'])){
 
         // Tutorial Mission
 
-        $this_map_playlist[] = array('scale' => 1, 'field' => 'intro-field', 'boss' => 'trill');
+        $this_map_playlist[] = array('scale' => 1, 'field' => 'gentle-countryside', 'boss' => 'trill');
 
         // Doctor Missions
 
@@ -194,7 +194,7 @@ if (!$current_playlist_key_results){
 
     // Collect a list of battle fields from the database
     $index_field_tokens = $db->get_array_list("SELECT field_token FROM mmrpg_index_fields WHERE field_flag_complete = 1 ORDER BY field_order ASC;");
-    $index_field_tokens = !empty($index_field_tokens) ? array_column($index_field_tokens, 'field_token') : array('intro-field');
+    $index_field_tokens = !empty($index_field_tokens) ? array_column($index_field_tokens, 'field_token') : array('gentle-countryside');
 
     // Collect the field token from the request if set
     $request_field_token = false;

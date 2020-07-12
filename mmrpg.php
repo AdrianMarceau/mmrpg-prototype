@@ -266,7 +266,7 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
     if (rpg_game::is_user()){
 
         // Collect theme settings from the user's profile settings
-        $temp_field_path = !empty($this_userinfo['user_background_path']) ? $this_userinfo['user_background_path'] : 'fields/intro-field';
+        $temp_field_path = !empty($this_userinfo['user_background_path']) ? $this_userinfo['user_background_path'] : 'fields/'.rpg_player::get_intro_field();
         $temp_field_type = !empty($this_userinfo['user_colour_token']) ? $this_userinfo['user_colour_token'] : '';
 
     }
@@ -326,7 +326,7 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
     }
 
     // Collect the info for the chosen temp field
-    if (empty($temp_field_path)){ $temp_field_path = 'fields/intro-field'; }
+    if (empty($temp_field_path)){ $temp_field_path = 'fields/'.rpg_player::get_intro_field(); }
     list($temp_field_kind, $temp_field_token) = explode('/', $temp_field_path);
     $temp_field_data = rpg_field::get_index_info($temp_field_token);
     if (!empty($temp_mecha_tokens) && !empty($temp_field_data)){

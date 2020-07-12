@@ -65,16 +65,16 @@ spanning multiples lines
 
 -----
 
-[align-right][code][foreground-intro-field] [/foreground-intro-field][/code][/align-right]
-[align-right][foreground-intro-field] [/foreground-intro-field][/align-right]
+[align-right][code][foreground-gentle-countryside] [/foreground-gentle-countryside][/code][/align-right]
+[align-right][foreground-gentle-countryside] [/foreground-gentle-countryside][/align-right]
 
-[align-right][code][background-intro-field] [/background-intro-field][/code][/align-right]
-[align-right][background-intro-field] [/background-intro-field][/align-right]
+[align-right][code][background-gentle-countryside] [/background-gentle-countryside][/code][/align-right]
+[align-right][background-gentle-countryside] [/background-gentle-countryside][/align-right]
 
-[align-right][code][background-intro-field-top] [/background-intro-field-top][/code][/align-right]
-[align-right][background-intro-field-top] [/background-intro-field-top][/align-right]
+[align-right][code][background-gentle-countryside-top] [/background-gentle-countryside-top][/code][/align-right]
+[align-right][background-gentle-countryside-top] [/background-gentle-countryside-top][/align-right]
 
-[align-right][code][background-intro-field-bottom] [/background-intro-field-bottom][/code][/align-right]
-[align-right][background-intro-field-bottom] [/background-intro-field-bottom][/align-right]
+[align-right][code][background-gentle-countryside-bottom] [/background-gentle-countryside-bottom][/code][/align-right]
+[align-right][background-gentle-countryside-bottom] [/background-gentle-countryside-bottom][/align-right]
 
 -----

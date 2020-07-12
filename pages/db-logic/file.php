@@ -332,7 +332,7 @@ while ($this_action == 'profile'){
 
                 // Collect and clean the post arguments
                 $post_imagepath = !empty($_POST['imagepath']) && preg_match('/^(players|robots)\/([-_a-z0-9]+)\/([0-9]+)$/i', $_POST['imagepath']) ? $_POST['imagepath'] : 'robots/mega-man/40';
-                $post_backgroundpath = !empty($_POST['backgroundpath']) && preg_match('/^fields\/([-_a-z0-9]+)$/i', $_POST['backgroundpath']) ? $_POST['backgroundpath'] : 'fields/intro-field';
+                $post_backgroundpath = !empty($_POST['backgroundpath']) && preg_match('/^fields\/([-_a-z0-9]+)$/i', $_POST['backgroundpath']) ? $_POST['backgroundpath'] : 'fields/'.rpg_player::get_intro_field('dr-light');
                 $post_colourtoken = !empty($_POST['colourtoken']) && preg_match('/^([-_a-z0-9]+)$/i', $_POST['colourtoken']) ? $_POST['colourtoken'] : '';
                 $post_gender = !empty($_POST['gender']) && preg_match('/^(male|female|none|other)$/i', $_POST['gender']) ? $_POST['gender'] : 'other';
 
