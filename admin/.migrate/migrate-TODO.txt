@@ -129,13 +129,13 @@ Update website/game to use different favicons for different environments
 -  stage [DONE]
 -  live [DONE]
 
-Update the admin panel with editors for the final object types
--  abilities
--  items
-
 Update the admin panel to deal with git functions add/stage/commit for content directories
 -  ?????
 
 Update the admin panel to distinguish between DEV and LIVE servers w/ different push/pull functions
 -  ?????
+
+Update the admin panel with editors for the final object types
+-  abilities
+-  items
 
