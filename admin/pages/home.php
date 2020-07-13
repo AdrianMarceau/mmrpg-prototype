@@ -23,8 +23,18 @@
             || in_array('edit-users', $this_adminaccess)){
             ?>
             <li class="item">
-                <a href="admin/edit-users/">Moderate Users</a>
-                <em>update or modify user account info and permissions</em>
+                <div class="link"><a href="admin/edit-users/">Moderate Users</a></div>
+                <div class="desc"><em>update or modify user account info and permissions</em></div>
+                <? if (MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== false
+                    && MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== MMRPG_CONFIG_SERVER_ENV){
+                    $pull_kind = 'users';
+                    $pull_from = MMRPG_CONFIG_PULL_LIVE_DATA_FROM;
+                    ?>
+                    <div class="buttons">
+                        <a class="button" data-action="scripts/pull-table-data.php?kind=<?= $pull_kind ?>&from=<?= $pull_from ?>">Pull from <?= cms_admin::print_env_name($pull_from, true) ?></a>
+                    </div>
+                    <?
+                } ?>
             </li>
             <?
         }
@@ -33,8 +43,18 @@
             || in_array('edit-user-challenges', $this_adminaccess)){
             ?>
             <li class="item">
-                <a href="admin/edit-user-challenges/">Moderate User Challenges</a>
-                <em>update or modify user-created challenge missions for the post-game</em>
+                <div class="link"><a href="admin/edit-user-challenges/">Moderate User Challenges</a></div>
+                <div class="desc"><em>update or modify user-created challenge missions for the post-game</em></div>
+                <? if (MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== false
+                    && MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== MMRPG_CONFIG_SERVER_ENV){
+                    $pull_kind = 'user-challenges';
+                    $pull_from = MMRPG_CONFIG_PULL_LIVE_DATA_FROM;
+                    ?>
+                    <div class="buttons">
+                        <a class="button" data-action="scripts/pull-table-data.php?kind=<?= $pull_kind ?>&from=<?= $pull_from ?>">Pull from <?= cms_admin::print_env_name($pull_from, true) ?></a>
+                    </div>
+                    <?
+                } ?>
             </li>
             <?
         }
@@ -72,8 +92,8 @@
                     || in_array('edit-stars', $this_adminaccess)){
                     ?>
                     <li class="item">
-                        <a href="admin/edit-stars/">Edit Rogue Stars</a>
-                        <em>schedule and manage rogue star appearances in the post-game</em>
+                        <div class="link"><a href="admin/edit-stars/">Edit Rogue Stars</a></div>
+                        <div class="desc"><em>schedule and manage rogue star appearances in the post-game</em></div>
                     </li>
                     <?
                 }
@@ -82,8 +102,8 @@
                     || in_array('edit-event-challenges', $this_adminaccess)){
                     ?>
                     <li class="item">
-                        <a href="admin/edit-event-challenges/">Edit Event Challenges</a>
-                        <em>create or modify event-based challenge missions for the post-game</em>
+                        <div class="link"><a href="admin/edit-event-challenges/">Edit Event Challenges</a></div>
+                        <div class="desc"><em>create or modify event-based challenge missions for the post-game</em></div>
                     </li>
                     <?
                 }
@@ -110,8 +130,8 @@
                     || in_array('edit-players', $this_adminaccess)){
                     ?>
                     <li class="item">
-                        <a href="admin/edit-players/">Edit Player Characters</a>
-                        <em>edit the details and images of the in-game player characters</em>
+                        <div class="link"><a href="admin/edit-players/">Edit Player Characters</a></div>
+                        <div class="desc"><em>edit the details and images of the in-game player characters</em></div>
                     </li>
                     <?
                 }
@@ -120,8 +140,8 @@
                     || in_array('edit-robot-master', $this_adminaccess)){
                     ?>
                     <li class="item">
-                        <a href="admin/edit-robot-masters/">Edit Robot Masters</a>
-                        <em>edit the details and images of the in-game robot masters</em>
+                        <div class="link"><a href="admin/edit-robot-masters/">Edit Robot Masters</a></div>
+                        <div class="desc"><em>edit the details and images of the in-game robot masters</em></div>
                     </li>
                     <?
                 }
@@ -130,8 +150,8 @@
                     || in_array('edit-support-mechas', $this_adminaccess)){
                     ?>
                     <li class="item">
-                        <a href="admin/edit-support-mechas/">Edit Support Mechas</a>
-                        <em>edit the details and images of the in-game support mechas</em>
+                        <div class="link"><a href="admin/edit-support-mechas/">Edit Support Mechas</a></div>
+                        <div class="desc"><em>edit the details and images of the in-game support mechas</em></div>
                     </li>
                     <?
                 }
@@ -140,8 +160,8 @@
                     || in_array('edit-fortress-bosses', $this_adminaccess)){
                     ?>
                     <li class="item">
-                        <a href="admin/edit-fortress-bosses/">Edit Fortress Bosses</a>
-                        <em>edit the details and images of the in-game fortress bosses</em>
+                        <div class="link"><a href="admin/edit-fortress-bosses/">Edit Fortress Bosses</a></div>
+                        <div class="desc"><em>edit the details and images of the in-game fortress bosses</em></div>
                     </li>
                     <?
                 }
@@ -149,8 +169,8 @@
                     || in_array('edit-fields', $this_adminaccess)){
                     ?>
                     <li class="item">
-                        <a href="admin/edit-fields/">Edit Battle Fields</a>
-                        <em>edit the details and images of the in-game battle fields</em>
+                        <div class="link"><a href="admin/edit-fields/">Edit Battle Fields</a></div>
+                        <div class="desc"><em>edit the details and images of the in-game battle fields</em></div>
                     </li>
                     <?
                 }
@@ -177,8 +197,8 @@
                     || in_array('edit-pages', $this_adminaccess)){
                     ?>
                     <li class="item">
-                        <a href="admin/edit-pages/">Edit Website Pages</a>
-                        <em>edit the text and images on various website pages</em>
+                        <div class="link"><a href="admin/edit-pages/">Edit Website Pages</a></div>
+                        <div class="desc"><em>edit the text and images on various website pages</em></div>
                     </li>
                     <?
                 }
@@ -211,8 +231,8 @@
                     || in_array('edit-stars', $this_adminaccess)){
                     ?>
                     <li class="item">
-                        <a data-action="scripts/pull-content-updates.php?kind=rogue-stars">Update Rogue Stars</a>
-                        <em>pull rogue star appearance data from the <?= MMRPG_CONFIG_PULL_DEV_DATA_FROM ?> server</em>
+                        <div class="link"><a data-action="scripts/pull-content-updates.php?kind=rogue-stars">Update Rogue Stars</a></div>
+                        <div class="desc"><em>pull rogue star appearance data from the <?= MMRPG_CONFIG_PULL_DEV_DATA_FROM ?> server</em></div>
                     </li>
                     <?
                 }
@@ -221,8 +241,8 @@
                     || in_array('edit-event-challenges', $this_adminaccess)){
                     ?>
                     <li class="item">
-                        <a data-action="scripts/pull-content-updates.php?kind=event-challenges">Update Event Challenges</a>
-                        <em>pull event-based challenge missions from the <?= MMRPG_CONFIG_PULL_DEV_DATA_FROM ?> server</em>
+                        <div class="link"><a data-action="scripts/pull-content-updates.php?kind=event-challenges">Update Event Challenges</a></div>
+                        <div class="desc"><em>pull event-based challenge missions from the <?= MMRPG_CONFIG_PULL_DEV_DATA_FROM ?> server</em></div>
                     </li>
                     <?
                 }
@@ -249,8 +269,8 @@
                     || in_array('edit-players', $this_adminaccess)){
                     ?>
                     <li class="item">
-                        <a data-action="scripts/pull-object-updates.php?kind=players">Update Player Characters</a>
-                        <em>pull changes to the in-game player characters from the <?= MMRPG_CONFIG_PULL_DEV_DATA_FROM ?> server</em>
+                        <div class="link"><a data-action="scripts/pull-object-updates.php?kind=players">Update Player Characters</a></div>
+                        <div class="desc"><em>pull changes to the in-game player characters from the <?= MMRPG_CONFIG_PULL_DEV_DATA_FROM ?> server</em></div>
                     </li>
                     <?
                 }
@@ -261,8 +281,8 @@
                     || in_array('edit-fortress-bosses', $this_adminaccess)){
                     ?>
                     <li class="item">
-                        <a data-action="scripts/pull-object-updates.php?kind=robots">Update Robots / Mechas / Bosses</a>
-                        <em>pull changes in-game robots, mechas, and bosses from the <?= MMRPG_CONFIG_PULL_DEV_DATA_FROM ?> server</em>
+                        <div class="link"><a data-action="scripts/pull-object-updates.php?kind=robots">Update Robots / Mechas / Bosses</a></div>
+                        <div class="desc"><em>pull changes in-game robots, mechas, and bosses from the <?= MMRPG_CONFIG_PULL_DEV_DATA_FROM ?> server</em></div>
                     </li>
                     <?
                 }
@@ -270,8 +290,8 @@
                     || in_array('edit-fields', $this_adminaccess)){
                     ?>
                     <li class="item">
-                        <a data-action="scripts/pull-object-updates.php?kind=fields">Update Battle Fields</a>
-                        <em>pull changes to the in-game battle fields from the <?= MMRPG_CONFIG_PULL_DEV_DATA_FROM ?> server</em>
+                        <div class="link"><a data-action="scripts/pull-object-updates.php?kind=fields">Update Battle Fields</a></div>
+                        <div class="desc"><em>pull changes to the in-game battle fields from the <?= MMRPG_CONFIG_PULL_DEV_DATA_FROM ?> server</em></div>
                     </li>
                     <?
                 }
@@ -298,8 +318,8 @@
                     || in_array('edit-pages', $this_adminaccess)){
                     ?>
                     <li class="item">
-                        <a data-action="scripts/pull-content-updates.php?kind=website-pages">Update Website Pages</a>
-                        <em>pull updates to the various website pages from the <?= MMRPG_CONFIG_PULL_DEV_DATA_FROM ?> server</em>
+                        <div class="link"><a data-action="scripts/pull-content-updates.php?kind=website-pages">Update Website Pages</a></div>
+                        <div class="desc"><em>pull updates to the various website pages from the <?= MMRPG_CONFIG_PULL_DEV_DATA_FROM ?> server</em></div>
                     </li>
                     <?
                 }
@@ -331,8 +351,8 @@
             || in_array('delete-cached-files', $this_adminaccess)){
             ?>
             <li class="item">
-                <a href="admin/delete-cached-files/">Delete Cached Files</a>
-                <em>delete cached markup and database objects</em>
+                <div class="link"><a href="admin/delete-cached-files/">Delete Cached Files</a></div>
+                <div class="desc"><em>delete cached markup and database objects</em></div>
             </li>
             <?
         }
@@ -342,8 +362,8 @@
                 || in_array('refresh-leaderboard', $this_adminaccess))){
             ?>
             <li class="item">
-                <a href="admin/refresh-leaderboard/incognito=true&amp;force=true" target="_blank">Refresh Leaderboard</a>
-                <em>recalculate battle points for all idle users</em>
+                <div class="link"><a href="admin/refresh-leaderboard/incognito=true&amp;force=true" target="_blank">Refresh Leaderboard</a></div>
+                <div class="desc"><em>recalculate battle points for all idle users</em></div>
             </li>
             <?
         }
@@ -353,8 +373,8 @@
                 || in_array('purge-bogus-users', $this_adminaccess))){
             ?>
             <li class="item">
-                <a href="admin/purge-bogus-users/limit=10">Purge Bogus Users</a>
-                <em>purge user accounts with zero progress</em>
+                <div class="link"><a href="admin/purge-bogus-users/limit=10">Purge Bogus Users</a></div>
+                <div class="desc"><em>purge user accounts with zero progress</em></div>
             </li>
             <?
         }
@@ -365,8 +385,8 @@
                 || in_array('patch-save-files', $this_adminaccess))){
             ?>
             <li class="item">
-                <a data-href="admin/patch-save-files/"><del>Patch Save Files</del></a>
-                <em><del>apply specific patches to existing save files</del></em>
+                <div class="link"><a data-href="admin/patch-save-files/"><del>Patch Save Files</del></a></div>
+                <div class="desc"><em><del>apply specific patches to existing save files</del></em></div>
             </li>
             <?
         }

@@ -186,6 +186,40 @@ body:before {
     }
     */
 
+    .adminhome {
+        padding-left: 0;
+    }
+
+    .adminhome li {
+        padding-top: 9px;
+        padding-bottom: 9px;
+    }
+    .adminhome li > div.link,
+    .adminhome li > div.desc,
+    .adminhome li > div.buttons {
+        display: block;
+        float: none;
+        clear: both;
+        width: auto;
+        margin: 0 auto 6px 0;
+        text-align: left;
+    }
+    .adminhome li > div.link:last-child,
+    .adminhome li > div.desc:last-child,
+    .adminhome li > div.buttons:last-child {
+        margin-bottom: 0;
+    }
+    .adminhome li > div.buttons .button {
+        margin: 0 3px 3px 0;
+    }
+
+    .adminhome li.top .env-notice {
+        padding-right: 6px;
+    }
+    .adminhome li.top .env-notice br {
+        display: none;
+    }
+
 
 }
 
@@ -218,19 +252,6 @@ body:before {
     }
     .userinfo .link {
         float: right;
-    }
-
-    .adminhome {
-        padding-left: 0;
-    }
-    .adminhome li a {
-        display: block;
-        margin: 0 auto 4px 0;
-    }
-    .adminhome li em {
-        display: block;
-        float: none;
-        width: auto;
     }
 
     .adminform .search .form {

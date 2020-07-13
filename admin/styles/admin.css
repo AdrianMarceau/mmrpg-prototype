@@ -201,6 +201,12 @@ a:hover {
     margin: 0 auto 0 0;
     border-bottom: 1px solid #E0E0E0;
     overflow: hidden;
+    text-align: left;
+}
+.adminhome li:after {
+    content: "";
+    display: block;
+    clear: both;
 }
 .adminhome li.top {
     border-top: 1px solid #E0E0E0;
@@ -220,10 +226,54 @@ a:hover {
 
 }
 .adminhome li em {
-    font-weight: normal;
-    float: right;
-    width: 60%;
+
 }
+
+.adminhome li > div.link,
+.adminhome li > div.desc,
+.adminhome li > div.buttons {
+    display: block;
+    box-sizing: border-box;
+    float: left;
+}
+
+.adminhome li > div.link {
+    width: 25%;
+}
+.adminhome li > div.desc {
+    width: 50%;
+    font-weight: normal;
+}
+.adminhome li > div.buttons {
+    width: 25%;
+    font-weight: normal;
+    text-align: right;
+}
+
+
+.adminhome li > div.buttons .button {
+    display: inline-block;
+    border-style: solid;
+    border-width: 1px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    padding: 2px 6px;
+    margin: 0 0 0 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-size: 11px;
+    line-height: 1;
+    color: #000000;
+    border-color: #c4c4c4;
+    background-color: #e3e3e3;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.3s;
+}
+.adminhome li > div.buttons .button:hover {
+    background-color: #efefef;
+}
+
 
 .adminhome li.top .env-rel {
     display: inline-block;
