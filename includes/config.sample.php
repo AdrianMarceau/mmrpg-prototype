@@ -29,6 +29,10 @@ define('MMRPG_CONFIG_IS_LIVE', false);
 // Define which server environment we're on (local|dev|stage|prod)
 define('MMRPG_CONFIG_SERVER_ENV', 'local');
 
+// Define which servers we should pull dev and/or live data from
+define('MMRPG_CONFIG_PULL_DEV_DATA_FROM', false);
+define('MMRPG_CONFIG_PULL_LIVE_DATA_FROM', 'prod');
+
 // Define the global database credentials for this installation
 define('MMRPG_CONFIG_DBHOST', 'localhost');
 define('MMRPG_CONFIG_DBUSERNAME', 'username');

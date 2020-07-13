@@ -44,6 +44,12 @@
             <ul class="adminhome">
                 <li class="top">
                     <strong><?= $temp_group_name ?></strong>
+                    <?= MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== false
+                        ? '<p class="env-notice" style="color: #e05252;">'.
+                            'Changes made using the pages in this section may be overwritten by '.cms_admin::print_env_name(MMRPG_CONFIG_PULL_LIVE_DATA_FROM).' data at any time. <br /> '.
+                            'It is available in the '.ucfirst(MMRPG_CONFIG_SERVER_ENV).' Admin Panel for testing purposes only, so please be mindful.'.
+                          '</p>'
+                        : '' ?>
                 </li>
                 <?= $temp_item_markup ?>
             </ul>
@@ -54,7 +60,7 @@
 
     <?
     /* -- POST-GAME CONTENT -- */
-    if (true){
+    if (in_array(MMRPG_CONFIG_SERVER_ENV, array('local', 'dev'))){
         $temp_group_name = 'Game Content Editors';
         ob_start();
         if (in_array('*', $this_adminaccess)
@@ -92,7 +98,7 @@
 
     <?
     /* -- GAME EDITORS -- */
-    if (true){
+    if (in_array(MMRPG_CONFIG_SERVER_ENV, array('local', 'dev'))){
         $temp_group_name = 'Game Object Editors';
         ob_start();
         if (in_array('*', $this_adminaccess)
@@ -159,7 +165,7 @@
 
     <?
     /* -- PAGE EDITORS -- */
-    if (true){
+    if (in_array(MMRPG_CONFIG_SERVER_ENV, array('local', 'dev'))){
         $temp_group_name = 'Website Editor';
         ob_start();
         if (in_array('*', $this_adminaccess)
@@ -191,15 +197,6 @@
         $temp_group_name = 'Misc Tools';
         ob_start();
         if (in_array('*', $this_adminaccess)
-            || in_array('refresh-leaderboard', $this_adminaccess)){
-            ?>
-            <li class="item">
-                <a href="admin/refresh-leaderboard/incognito=true&amp;force=true" target="_blank">Refresh Leaderboard</a>
-                <em>recalculate battle points for all idle users</em>
-            </li>
-            <?
-        }
-        if (in_array('*', $this_adminaccess)
             || in_array('delete-cached-files', $this_adminaccess)){
             ?>
             <li class="item">
@@ -208,8 +205,21 @@
             </li>
             <?
         }
-        if (in_array('*', $this_adminaccess)
-            || in_array('purge-bogus-users', $this_adminaccess)){
+        if ((MMRPG_CONFIG_SERVER_ENV === 'local'
+                || MMRPG_CONFIG_PULL_LIVE_DATA_FROM === false)
+            && (in_array('*', $this_adminaccess)
+                || in_array('refresh-leaderboard', $this_adminaccess))){
+            ?>
+            <li class="item">
+                <a href="admin/refresh-leaderboard/incognito=true&amp;force=true" target="_blank">Refresh Leaderboard</a>
+                <em>recalculate battle points for all idle users</em>
+            </li>
+            <?
+        }
+        if ((MMRPG_CONFIG_SERVER_ENV === 'local'
+                || MMRPG_CONFIG_PULL_LIVE_DATA_FROM === false)
+            && (in_array('*', $this_adminaccess)
+                || in_array('purge-bogus-users', $this_adminaccess))){
             ?>
             <li class="item">
                 <a href="admin/purge-bogus-users/limit=10">Purge Bogus Users</a>
@@ -217,8 +227,11 @@
             </li>
             <?
         }
-        if (in_array('*', $this_adminaccess)
-            || in_array('patch-save-files', $this_adminaccess)){
+        /*
+        if ((MMRPG_CONFIG_SERVER_ENV === 'local'
+                || MMRPG_CONFIG_PULL_LIVE_DATA_FROM === false)
+            && (in_array('*', $this_adminaccess)
+                || in_array('patch-save-files', $this_adminaccess))){
             ?>
             <li class="item">
                 <a data-href="admin/patch-save-files/"><del>Patch Save Files</del></a>
@@ -226,6 +239,7 @@
             </li>
             <?
         }
+        */
         $temp_item_markup = trim(ob_get_clean());
         if (!empty($temp_item_markup)){
             ?>

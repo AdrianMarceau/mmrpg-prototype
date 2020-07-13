@@ -150,5 +150,14 @@ class cms_admin {
         return $markup;
     }
 
+    // Define a function for printing the full name of a given environment
+    public static function print_env_name($env, $ucfirst = false){
+        if ($env === 'prod'){ $name = 'production'; }
+        elseif ($env === 'stage'){ $name = 'staging'; }
+        elseif ($env === 'dev'){ $name = 'developer'; }
+        else { $name = $env; }
+        return $ucfirst ? ucfirst($name) : $name;
+    }
+
 }
 ?>

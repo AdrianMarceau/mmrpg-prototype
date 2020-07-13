@@ -240,6 +240,16 @@ a:hover {
     bottom: 0;
 }
 
+.adminhome li.top .env-notice {
+    display: block;
+    float: none;
+    clear: both;
+    margin: 2px auto 0 0;
+    width: auto;
+    font-style: normal;
+    font-size: 80%;
+}
+
 .adminform {
     display: block;
     margin: 0 auto;
