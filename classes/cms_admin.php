@@ -159,5 +159,52 @@ class cms_admin {
         return $ucfirst ? ucfirst($name) : $name;
     }
 
+    // Define a function for printing admin home group options, given the list isn't empty
+    public static function print_admin_home_group_options($this_group_name, $this_group_options = array(), $this_group_name_subtext = ''){
+
+        // If the options were empty, return an empty string now
+        if (empty($this_group_options)){ return ''; }
+
+        // Loop through the option and generate item markup for each of them
+        ob_start();
+        foreach ($this_group_options AS $option_key => $option_info){
+            echo('<li class="item">'.PHP_EOL);
+                $link_url = isset($option_info['link']['url']) ? ' href="'.$option_info['link']['url'].'"' : '';
+                $link_target = isset($option_info['link']['target']) ? ' target="'.$option_info['link']['target'].'"' : '';
+                $link_text = $option_info['link']['text'];
+                echo('<div class="link"><a'.$link_url.$link_target.'>'.$link_text.'</a></div>'.PHP_EOL);
+                $desc_text = $option_info['desc'];
+                echo('<div class="desc"><em>'.$desc_text.'</em></div>'.PHP_EOL);
+                if (!empty($option_info['buttons'])){
+                    echo('<div class="buttons">'.PHP_EOL);
+                    foreach ($option_info['buttons'] AS $button_key => $button_info){
+                        $button_action = $button_info['action'];
+                        $button_text = $button_info['text'];
+                        echo('<a class="button" data-action="'.$button_action.'">'.$button_text.'</a>'.PHP_EOL);
+                    }
+                    echo('</div>'.PHP_EOL);
+                }
+            echo('</li>'.PHP_EOL);
+        }
+        $this_group_items_markup = trim(ob_get_clean());
+
+        // If item markup was generated, wrap it in a list with the title on top
+        ob_start();
+        if (!empty($this_group_items_markup)){
+            echo('<ul class="adminhome">'.PHP_EOL);
+                echo('<li class="top">'.PHP_EOL);
+                    echo('<strong>'.$this_group_name.'</strong>'.PHP_EOL);
+                    if (!empty($this_group_name_subtext)){ echo($this_group_name_subtext.PHP_EOL); }
+                echo('</li>'.PHP_EOL);
+                echo($this_group_items_markup.PHP_EOL);
+            echo('</ul>'.PHP_EOL);
+        }
+        $this_group_list_markup = trim(ob_get_clean());
+
+        // Return generated group list markup, assuming it's not empty
+        return $this_group_list_markup;
+
+    }
+
 }
 ?>
