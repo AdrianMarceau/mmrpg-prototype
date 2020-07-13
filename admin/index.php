@@ -6,12 +6,12 @@ require_once('../top.php');
 require_once(MMRPG_CONFIG_ROOTDIR.'classes/cms_admin.php');
 
 // Define the page title and markup variables
-$this_page_title = 'MMRPG Admin Panel';
+$this_page_title = 'MMRPG '.ucfirst(MMRPG_CONFIG_SERVER_ENV).' Admin Panel';
 $this_page_markup = '';
 
 // Collect the current action from the URL if set
 $this_page_action = !empty($_REQUEST['action']) ? $_REQUEST['action'] : 'home';
-$this_page_tabtitle = 'Admin';
+$this_page_tabtitle = ucfirst(MMRPG_CONFIG_SERVER_ENV).' Admin';
 
 
 /*
@@ -265,7 +265,11 @@ unset($db);
 </head>
 <body id="mmrpg">
     <div id="admin">
-        <h1 class="header"><?= $this_page_title ?></h1>
+        <h1 class="header">
+            <i class="fas fa-cog env <?= MMRPG_CONFIG_SERVER_ENV ?>"></i>
+            <strong><?= $this_page_title ?></strong>
+            <i class="fas fa-cog env <?= MMRPG_CONFIG_SERVER_ENV ?>"></i>
+        </h1>
         <div class="content">
             <? if (!empty($_SESSION['admin_username_display'])): ?>
                 <div class="userinfo">

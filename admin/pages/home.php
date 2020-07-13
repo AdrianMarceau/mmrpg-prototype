@@ -28,6 +28,16 @@
             </li>
             <?
         }
+        if (in_array('*', $this_adminaccess)
+            || in_array('edit-challenges', $this_adminaccess)
+            || in_array('edit-user-challenges', $this_adminaccess)){
+            ?>
+            <li class="item">
+                <a href="admin/edit-user-challenges/">Moderate User Challenges</a>
+                <em>update or modify user-created challenge missions for the post-game</em>
+            </li>
+            <?
+        }
         $temp_item_markup = trim(ob_get_clean());
         if (!empty($temp_item_markup)){
             ?>
@@ -43,16 +53,26 @@
     ?>
 
     <?
-    /* -- PAGE EDITORS -- */
+    /* -- POST-GAME CONTENT -- */
     if (true){
-        $temp_group_name = 'Website Editor';
+        $temp_group_name = 'Game Content Editors';
         ob_start();
         if (in_array('*', $this_adminaccess)
-            || in_array('edit-pages', $this_adminaccess)){
+            || in_array('edit-stars', $this_adminaccess)){
             ?>
             <li class="item">
-                <a href="admin/edit-pages/">Edit Website Pages</a>
-                <em>edit the text and images on various website pages</em>
+                <a href="admin/edit-stars/">Edit Rogue Stars</a>
+                <em>schedule and manage rogue star appearances in the post-game</em>
+            </li>
+            <?
+        }
+        if (in_array('*', $this_adminaccess)
+            || in_array('edit-challenges', $this_adminaccess)
+            || in_array('edit-event-challenges', $this_adminaccess)){
+            ?>
+            <li class="item">
+                <a href="admin/edit-event-challenges/">Edit Event Challenges</a>
+                <em>create or modify event-based challenge missions for the post-game</em>
             </li>
             <?
         }
@@ -73,7 +93,7 @@
     <?
     /* -- GAME EDITORS -- */
     if (true){
-        $temp_group_name = 'Game Editors';
+        $temp_group_name = 'Game Object Editors';
         ob_start();
         if (in_array('*', $this_adminaccess)
             || in_array('edit-players', $this_adminaccess)){
@@ -138,36 +158,16 @@
     ?>
 
     <?
-    /* -- POST-GAME CONTENT -- */
+    /* -- PAGE EDITORS -- */
     if (true){
-        $temp_group_name = 'Post-Game Editor';
+        $temp_group_name = 'Website Editor';
         ob_start();
         if (in_array('*', $this_adminaccess)
-            || in_array('edit-stars', $this_adminaccess)){
+            || in_array('edit-pages', $this_adminaccess)){
             ?>
             <li class="item">
-                <a href="admin/edit-stars/">Edit Rogue Stars</a>
-                <em>schedule and manage rogue star appearances in the post-game</em>
-            </li>
-            <?
-        }
-        if (in_array('*', $this_adminaccess)
-            || in_array('edit-challenges', $this_adminaccess)
-            || in_array('edit-event-challenges', $this_adminaccess)){
-            ?>
-            <li class="item">
-                <a href="admin/edit-event-challenges/">Edit Event Challenges</a>
-                <em>create or modify event-based challenge missions for the post-game</em>
-            </li>
-            <?
-        }
-        if (in_array('*', $this_adminaccess)
-            || in_array('edit-challenges', $this_adminaccess)
-            || in_array('edit-user-challenges', $this_adminaccess)){
-            ?>
-            <li class="item">
-                <a href="admin/edit-user-challenges/">Edit User Challenges</a>
-                <em>create or modify user-created challenge missions for the post-game</em>
+                <a href="admin/edit-pages/">Edit Website Pages</a>
+                <em>edit the text and images on various website pages</em>
             </li>
             <?
         }

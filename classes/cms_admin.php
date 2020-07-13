@@ -134,5 +134,21 @@ class cms_admin {
         return $mmrpg_contributors_index;
     }
 
+    // Define a function for printing the environment relationship header
+    public static function print_env_rel_header($env1, $dir, $env2){
+        if ($dir === '<' || $dir === 'left'){ $icon = 'angle-double-left'; }
+        elseif ($dir === '>' || $dir === 'right'){ $icon = 'angle-double-right'; }
+        else { $icon = 'question-circle'; }
+        $markup = '';
+            $markup .= '<span class="env-rel">'.PHP_EOL;
+                if (true || MMRPG_CONFIG_SERVER_ENV !== 'local'){
+                    $markup .= '<span class="env '.$env1.'">'.strtoupper($env1).'</span>'.PHP_EOL;
+                    $markup .= '<i class="arrow fa fa-'.$icon.'"></i>'.PHP_EOL;
+                    $markup .= '<span class="env '.$env2.'">'.strtoupper($env2).'</span>'.PHP_EOL;
+                }
+            $markup .= '</span>'.PHP_EOL;
+        return $markup;
+    }
+
 }
 ?>

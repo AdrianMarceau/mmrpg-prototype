@@ -49,6 +49,10 @@ a:hover {
     bottom: 0;
     background-position: center -106px;
 }
+#mmrpg #admin > .header .env {
+    font-size: 90%;
+    margin: 0 10px;
+}
 
 #mmrpg #admin > .content {
     display: block;
@@ -58,6 +62,23 @@ a:hover {
     position: relative;
 }
 
+
+#admin .env.local {
+    color: #e74723;
+    text-shadow: 1px 1px 0px #666666;
+}
+#admin .env.dev {
+    color: #ed8a32;
+    text-shadow: 1px 1px 0px #676767;
+}
+#admin .env.stage {
+    color: #edc55a;
+    text-shadow: 1px 1px 0px #2a8d2a;
+}
+#admin .env.prod {
+    color: #00cccc;
+    text-shadow: 1px 1px 0px #0073f7;
+}
 
 .userinfo {
     display: block;
@@ -186,6 +207,15 @@ a:hover {
     background-color: #262626;
     color: #FFFFFF;
 }
+.adminhome li.top > strong {
+
+}
+.adminhome li.top:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
 .adminhome li a {
 
 }
@@ -193,6 +223,21 @@ a:hover {
     font-weight: normal;
     float: right;
     width: 60%;
+}
+
+.adminhome li.top .env-rel {
+    display: inline-block;
+    float: right;
+    padding-right: 10px;
+    width: auto;
+    font-style: normal;
+    font-size: 80%;
+}
+.adminhome li.top .env-rel .arrow {
+    padding: 0 5px;
+    font-size: 80%;
+    position: relative;
+    bottom: 0;
 }
 
 .adminform {
