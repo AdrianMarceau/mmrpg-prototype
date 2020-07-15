@@ -401,7 +401,7 @@
 
                 <form class="form" method="get">
 
-                    <input type="hidden" name="action" value="edit-pages" />
+                    <? /* <input type="hidden" name="action" value="edit-pages" /> */ ?>
                     <input type="hidden" name="subaction" value="search" />
 
                     <div class="field halfsize">

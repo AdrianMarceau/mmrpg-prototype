@@ -653,7 +653,7 @@
 
                 <form class="form" method="get">
 
-                    <input type="hidden" name="action" value="<?= $this_robot_page_token ?>" />
+                    <? /* <input type="hidden" name="action" value="<?= $this_robot_page_token ?>" /> */ ?>
                     <input type="hidden" name="subaction" value="search" />
 
                     <? /*

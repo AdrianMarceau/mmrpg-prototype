@@ -542,7 +542,7 @@
 
                 <form class="form" method="get">
 
-                    <input type="hidden" name="action" value="edit-fields" />
+                    <? /* <input type="hidden" name="action" value="edit-fields" /> */ ?>
                     <input type="hidden" name="subaction" value="search" />
 
                     <? /*

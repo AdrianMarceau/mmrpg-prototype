@@ -501,7 +501,7 @@
 
                 <form class="form" method="get">
 
-                    <input type="hidden" name="action" value="edit-users" />
+                    <? /* <input type="hidden" name="action" value="edit-users" /> */ ?>
                     <input type="hidden" name="subaction" value="search" />
 
                     <div class="field foursize">
