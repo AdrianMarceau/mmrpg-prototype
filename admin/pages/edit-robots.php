@@ -50,6 +50,18 @@
     // Collect an index of contributors and admins that have made sprites
     $mmrpg_contributors_index = cms_admin::get_contributors_index('robot');
 
+    // Collect an index of changes files via git
+    $mmrpg_git_changes = cms_admin::git_get_changes(MMRPG_CONFIG_ROBOTS_CONTENT_PATH);
+    $mmrpg_git_changes = cms_admin::git_filter_list_by_data($mmrpg_git_changes, array(
+        'table' => 'mmrpg_index_robots',
+        'token' => 'robot_token',
+        'extra' => array('robot_class' => $this_robot_class)
+        ));
+    // Now collect relevant robot tokens from the list for matching
+    $mmrpg_git_changes_tokens = array();
+    foreach ($mmrpg_git_changes AS $key => $path){ list($token) = explode('/', $path); $mmrpg_git_changes_tokens[] = $token; }
+    $mmrpg_git_changes_tokens = array_unique($mmrpg_git_changes_tokens);
+
 
     /* -- Page Script/Style Dependencies  -- */
 
@@ -131,6 +143,7 @@
         $search_data['robot_flag_unlockable'] = isset($_GET['robot_flag_unlockable']) && $_GET['robot_flag_unlockable'] !== '' ? (!empty($_GET['robot_flag_unlockable']) ? 1 : 0) : '';
         $search_data['robot_flag_exclusive'] = isset($_GET['robot_flag_exclusive']) && $_GET['robot_flag_exclusive'] !== '' ? (!empty($_GET['robot_flag_exclusive']) ? 1 : 0) : '';
         $search_data['robot_flag_published'] = isset($_GET['robot_flag_published']) && $_GET['robot_flag_published'] !== '' ? (!empty($_GET['robot_flag_published']) ? 1 : 0) : '';
+        $search_data['robot_flag_changed'] = isset($_GET['robot_flag_changed']) && $_GET['robot_flag_changed'] !== '' ? (!empty($_GET['robot_flag_changed']) ? 1 : 0) : '';
 
         /* -- Collect Search Results -- */
 
@@ -251,6 +264,16 @@
         // Collect search results from the database
         $search_results = $db->get_array_list($search_query);
         $search_results_count = is_array($search_results) ? count($search_results) : 0;
+
+        // If the git changed flag was defined
+        if (!empty($search_results) && $search_data['robot_flag_changed'] !== ''){
+            foreach ($search_results AS $key => $data){
+                if ($search_data['robot_flag_changed'] && !in_array($data['robot_token'], $mmrpg_git_changes_tokens)){ unset($search_results[$key]); }
+                elseif (!$search_data['robot_flag_changed'] && in_array($data['robot_token'], $mmrpg_git_changes_tokens)){ unset($search_results[$key]); }
+            }
+            $search_results = array_values($search_results);
+            $search_results_count = count($search_results);
+        }
 
         // Collect a total number from the database
         $search_results_total = $db->get_value("SELECT COUNT(robot_id) AS total FROM mmrpg_index_robots WHERE 1=1 AND robot_token <> 'robot' AND robot_class = '{$this_robot_class}';", 'total');
@@ -724,7 +747,8 @@
                         'complete' => array('icon' => 'fas fa-check-circle', 'yes' => 'Complete', 'no' => 'Incomplete'),
                         'unlockable' => array('icon' => 'fas fa-unlock', 'yes' => 'Unlockable', 'no' => 'Locked'),
                         'exclusive' => array('icon' => 'fas fa-ghost', 'yes' => 'Exclusive', 'no' => 'Standard'),
-                        'hidden' => array('icon' => 'fas fa-eye-slash', 'yes' => 'Hidden', 'no' => 'Visible')
+                        'hidden' => array('icon' => 'fas fa-eye-slash', 'yes' => 'Hidden', 'no' => 'Visible'),
+                        'changed' => array('icon' => 'fas fa-asterisk', 'yes' => 'Uncommitted Changes', 'no' => 'No Uncommitted Changes')
                         );
                     foreach ($flag_names AS $flag_token => $flag_info){
                         $flag_name = 'robot_flag_'.$flag_token;
@@ -843,6 +867,10 @@
                                 $robot_edit_url = $this_robot_page_baseurl.'editor/robot_id='.$robot_id;
                                 $robot_name_link = '<a class="link" href="'.$robot_edit_url.'">'.$robot_name.'</a>';
 
+                                if (in_array($robot_token, $mmrpg_git_changes_tokens)){
+                                    $robot_name_link .= ' <span class="status has_uncommitted_changes" title="Uncommitted Changes"><i class="icon fa fa-asterisk"></i></span>';
+                                }
+
                                 $robot_actions = '';
                                 $robot_actions .= '<a class="link edit" href="'.$robot_edit_url.'"><span>edit</span></a>';
                                 $robot_actions .= '<span class="link delete disabled"><span>delete</span></span>';
@@ -897,6 +925,11 @@
                         <?
                         // If this is NOT backup data, we can generate links
                         if (!$is_backup_data){
+
+                            // If the robot has been changed according to git, show an asterisk
+                            if (in_array($robot_data['robot_token'], $mmrpg_git_changes_tokens)){
+                                echo ' <span class="status has_uncommitted_changes" title="Uncommitted Changes"><i class="fas fa-asterisk"></i></span>'.PHP_EOL;
+                            }
 
                             // If the robot is published, generate and display a preview link
                             if (!empty($robot_data['robot_flag_published'])){
@@ -1841,11 +1874,12 @@
                             <? if (!$is_backup_data){ ?>
                                 <div class="buttons">
                                     <input class="button save" type="submit" value="Save Changes" />
-                                    <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='<?= $this_robot_page_baseurl ?>editor/robot_id=<?= $robot_data['robot_id'] ?>';" />
                                     <? /*
+                                    <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='<?= $this_robot_page_baseurl ?>editor/robot_id=<?= $robot_data['robot_id'] ?>';" />
                                     <input class="button delete" type="button" value="Delete <?= $this_robot_class_short_name_uc ?>" data-delete="robots" data-robot-id="<?= $robot_data['robot_id'] ?>" />
                                     */ ?>
                                 </div>
+                                <?= cms_admin::print_object_editor_git_footer_buttons('robots/'.$this_robot_class, $robot_data['robot_token'], $mmrpg_git_changes, $mmrpg_git_changes_tokens); ?>
                             <? } ?>
 
                             <? /*

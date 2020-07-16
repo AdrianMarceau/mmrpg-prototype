@@ -40,6 +40,17 @@
     // Collect an index of contributors and admins that have made sprites
     $mmrpg_contributors_index = cms_admin::get_contributors_index('field');
 
+    // Collect an index of changes files via git
+    $mmrpg_git_changes = cms_admin::git_get_changes(MMRPG_CONFIG_FIELDS_CONTENT_PATH);
+    $mmrpg_git_changes = cms_admin::git_filter_list_by_data($mmrpg_git_changes, array(
+        'table' => 'mmrpg_index_fields',
+        'token' => 'field_token'
+        ));
+    // Now collect relevant field tokens from the list for matching
+    $mmrpg_git_changes_tokens = array();
+    foreach ($mmrpg_git_changes AS $key => $path){ list($token) = explode('/', $path); $mmrpg_git_changes_tokens[] = $token; }
+    $mmrpg_git_changes_tokens = array_unique($mmrpg_git_changes_tokens);
+
 
     /* -- Page Script/Style Dependencies  -- */
 
@@ -117,6 +128,7 @@
         $search_data['field_flag_hidden'] = isset($_GET['field_flag_hidden']) && $_GET['field_flag_hidden'] !== '' ? (!empty($_GET['field_flag_hidden']) ? 1 : 0) : '';
         $search_data['field_flag_complete'] = isset($_GET['field_flag_complete']) && $_GET['field_flag_complete'] !== '' ? (!empty($_GET['field_flag_complete']) ? 1 : 0) : '';
         $search_data['field_flag_published'] = isset($_GET['field_flag_published']) && $_GET['field_flag_published'] !== '' ? (!empty($_GET['field_flag_published']) ? 1 : 0) : '';
+        $search_data['field_flag_changed'] = isset($_GET['field_flag_changed']) && $_GET['field_flag_changed'] !== '' ? (!empty($_GET['field_flag_changed']) ? 1 : 0) : '';
 
         /* -- Collect Search Results -- */
 
@@ -219,6 +231,16 @@
         // Collect search results from the database
         $search_results = $db->get_array_list($search_query);
         $search_results_count = is_array($search_results) ? count($search_results) : 0;
+
+        // If the git changed flag was defined
+        if (!empty($search_results) && $search_data['field_flag_changed'] !== ''){
+            foreach ($search_results AS $key => $data){
+                if ($search_data['field_flag_changed'] && !in_array($data['field_token'], $mmrpg_git_changes_tokens)){ unset($search_results[$key]); }
+                elseif (!$search_data['field_flag_changed'] && in_array($data['field_token'], $mmrpg_git_changes_tokens)){ unset($search_results[$key]); }
+            }
+            $search_results = array_values($search_results);
+            $search_results_count = count($search_results);
+        }
 
         // Collect a total number from the database
         $search_results_total = $db->get_value("SELECT COUNT(field_id) AS total FROM mmrpg_index_fields WHERE 1=1 AND field_token <> 'field';", 'total');
@@ -598,7 +620,8 @@
                     $flag_names = array(
                         'published' => array('icon' => 'fas fa-check-square', 'yes' => 'Published', 'no' => 'Unpublished'),
                         'complete' => array('icon' => 'fas fa-check-circle', 'yes' => 'Complete', 'no' => 'Incomplete'),
-                        'hidden' => array('icon' => 'fas fa-eye-slash', 'yes' => 'Hidden', 'no' => 'Visible')
+                        'hidden' => array('icon' => 'fas fa-eye-slash', 'yes' => 'Hidden', 'no' => 'Visible'),
+                        'changed' => array('icon' => 'fas fa-asterisk', 'yes' => 'Uncommitted Changes', 'no' => 'No Uncommitted Changes')
                         );
                     foreach ($flag_names AS $flag_token => $flag_info){
                         $flag_name = 'field_flag_'.$flag_token;
@@ -713,6 +736,10 @@
                                 $field_edit_url = 'admin/edit-fields/editor/field_id='.$field_id;
                                 $field_name_link = '<a class="link" href="'.$field_edit_url.'">'.$field_name.'</a>';
 
+                                if (in_array($field_token, $mmrpg_git_changes_tokens)){
+                                    $field_name_link .= ' <span class="status has_uncommitted_changes" title="Uncommitted Changes"><i class="icon fa fa-asterisk"></i></span>';
+                                }
+
                                 $field_actions = '';
                                 $field_actions .= '<a class="link edit" href="'.$field_edit_url.'"><span>edit</span></a>';
                                 $field_actions .= '<span class="link delete disabled"><span>delete</span></span>';
@@ -766,6 +793,11 @@
                         <?
                         // If this is NOT backup data, we can generate links
                         if (!$is_backup_data){
+
+                            // If the field has been changed according to git, show an asterisk
+                            if (in_array($field_data['field_token'], $mmrpg_git_changes_tokens)){
+                                echo ' <span class="status has_uncommitted_changes" title="Uncommitted Changes"><i class="fas fa-asterisk"></i></span>'.PHP_EOL;
+                            }
 
                             // If the field is published, generate and display a preview link
                             if (!empty($field_data['field_flag_published'])){
@@ -1594,11 +1626,12 @@
                             <? if (!$is_backup_data){ ?>
                                 <div class="buttons">
                                     <input class="button save" type="submit" value="Save Changes" />
-                                    <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin/edit-fields/editor/field_id=<?= $field_data['field_id'] ?>';" />
                                     <? /*
+                                    <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin/edit-fields/editor/field_id=<?= $field_data['field_id'] ?>';" />
                                     <input class="button delete" type="button" value="Delete Field" data-delete="fields" data-field-id="<?= $field_data['field_id'] ?>" />
                                     */ ?>
                                 </div>
+                                <?= cms_admin::print_object_editor_git_footer_buttons('fields', $field_data['field_token'], $mmrpg_git_changes, $mmrpg_git_changes_tokens); ?>
                             <? } ?>
 
                             <? /*
