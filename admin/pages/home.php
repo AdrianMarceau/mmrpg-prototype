@@ -61,9 +61,9 @@
         // Define the group name subtext for this section
         $this_group_name_subtext = '';
         if (MMRPG_CONFIG_SERVER_ENV !== MMRPG_CONFIG_PULL_LIVE_DATA_FROM){
-            $this_group_name_subtext = '<p class="env-notice" style="color: #e05252;">'.
-                'Changes made using the pages in this section may be overwritten by '.cms_admin::print_env_name(MMRPG_CONFIG_PULL_LIVE_DATA_FROM).' data at any time. <br /> '.
-                'It is available in the '.ucfirst(MMRPG_CONFIG_SERVER_ENV).' Admin Panel for testing purposes only, so please be mindful.'.
+            $this_group_name_subtext = '<p class="env-notice warning">'.
+                ucfirst(MMRPG_CONFIG_SERVER_ENV).' changes made to user accounts and content may be overwritten by '.cms_admin::print_env_name(MMRPG_CONFIG_PULL_LIVE_DATA_FROM).' data at any time. <br /> '.
+                'This section is available in the '.ucfirst(MMRPG_CONFIG_SERVER_ENV).' Admin Panel for testing purposes only, so please be mindful.'.
             '</p>';
             }
 
@@ -118,7 +118,19 @@
                 || in_array('edit-players', $this_adminaccess)){
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-players/', 'text' => 'Edit Player Characters'),
-                    'desc' => 'edit the details and images of the in-game player characters'
+                    'desc' => 'edit the details and images of the in-game player characters',
+                    'repo' => array(
+                        'name' => 'players',
+                        'data' => array('prefix' => 'player'),
+                        'path' => MMRPG_CONFIG_PLAYERS_CONTENT_PATH
+                        ),
+                    'buttons' => array(
+                        array(
+                            'action' => 'scripts/push-game-content.php?kind=players&source=github',
+                            'text' => 'Publish to GitHub',
+                            'condition' => array('status' => 'uncommitted_changes')
+                            )
+                        )
                     );
                 $this_group_options[] = $this_option;
             }
@@ -127,7 +139,24 @@
                 || in_array('edit-robot-master', $this_adminaccess)){
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-robot-masters/', 'text' => 'Edit Robot Masters'),
-                    'desc' => 'edit the details and images of the in-game robot masters'
+                    'desc' => 'edit the details and images of the in-game robot masters',
+                    'repo' => array(
+                        'name' => 'robots',
+                        'data' => array('prefix' => 'robot'),
+                        'path' => MMRPG_CONFIG_ROBOTS_CONTENT_PATH,
+                        'filter' => array(
+                            'table' => 'mmrpg_index_robots',
+                            'token' => 'robot_token',
+                            'extra' => array('robot_class' => 'master')
+                            )
+                        ),
+                    'buttons' => array(
+                        array(
+                            'action' => 'scripts/push-game-content.php?kind=robots&subkind=masters&source=github',
+                            'text' => 'Publish to GitHub',
+                            'condition' => array('status' => 'uncommitted_changes')
+                            )
+                        )
                     );
                 $this_group_options[] = $this_option;
             }
@@ -136,7 +165,24 @@
                 || in_array('edit-support-mechas', $this_adminaccess)){
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-support-mechas/', 'text' => 'Edit Support Mechas'),
-                    'desc' => 'edit the details and images of the in-game support mechas'
+                    'desc' => 'edit the details and images of the in-game support mechas',
+                    'repo' => array(
+                        'name' => 'robots',
+                        'data' => array('prefix' => 'robot'),
+                        'path' => MMRPG_CONFIG_ROBOTS_CONTENT_PATH,
+                        'filter' => array(
+                            'table' => 'mmrpg_index_robots',
+                            'token' => 'robot_token',
+                            'extra' => array('robot_class' => 'mecha')
+                            )
+                        ),
+                    'buttons' => array(
+                        array(
+                            'action' => 'scripts/push-game-content.php?kind=robots&subkind=mechas&source=github',
+                            'text' => 'Publish to GitHub',
+                            'condition' => array('status' => 'uncommitted_changes')
+                            )
+                        )
                     );
                 $this_group_options[] = $this_option;
             }
@@ -145,7 +191,24 @@
                 || in_array('edit-fortress-bosses', $this_adminaccess)){
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-fortress-bosses/', 'text' => 'Edit Fortress Bosses'),
-                    'desc' => 'edit the details and images of the in-game fortress bosses'
+                    'desc' => 'edit the details and images of the in-game fortress bosses',
+                    'repo' => array(
+                        'name' => 'robots',
+                        'data' => array('prefix' => 'robot'),
+                        'path' => MMRPG_CONFIG_ROBOTS_CONTENT_PATH,
+                        'filter' => array(
+                            'table' => 'mmrpg_index_robots',
+                            'token' => 'robot_token',
+                            'extra' => array('robot_class' => 'boss')
+                            )
+                        ),
+                    'buttons' => array(
+                        array(
+                            'action' => 'scripts/push-game-content.php?kind=robots&subkind=bosses&source=github',
+                            'text' => 'Publish to GitHub',
+                            'condition' => array('status' => 'uncommitted_changes')
+                            )
+                        )
                     );
                 $this_group_options[] = $this_option;
             }
@@ -153,7 +216,19 @@
                 || in_array('edit-fields', $this_adminaccess)){
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-fields/', 'text' => 'Edit Battle Fields'),
-                    'desc' => 'edit the details and images of the in-game battle fields'
+                    'desc' => 'edit the details and images of the in-game battle fields',
+                    'repo' => array(
+                        'name' => 'fields',
+                        'data' => array('prefix' => 'field'),
+                        'path' => MMRPG_CONFIG_FIELDS_CONTENT_PATH
+                        ),
+                    'buttons' => array(
+                        array(
+                            'action' => 'scripts/push-game-content.php?kind=fields&source=github',
+                            'text' => 'Publish to GitHub',
+                            'condition' => array('status' => 'uncommitted_changes')
+                            )
+                        )
                     );
                 $this_group_options[] = $this_option;
             }

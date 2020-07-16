@@ -229,6 +229,13 @@ a:hover {
 
 }
 
+.adminhome .status.has_uncommitted_changes {
+    color: #f58919;
+}
+.adminhome .status.has_committed_changes {
+    color: green;
+}
+
 .adminhome li > div.link,
 .adminhome li > div.desc,
 .adminhome li > div.buttons {
@@ -250,6 +257,33 @@ a:hover {
     text-align: right;
 }
 
+.adminhome li > div.link a {
+    display: inline-block;
+}
+.adminhome li > div.link .status {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 0 4px;
+    text-decoration: none;
+    border: 0 none transparent;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    transition: color 0.3s, background-color 0.3s;
+}
+.adminhome li > div.link .status .icon {
+    font-size: 70%;
+}
+.adminhome li > div.link .status .count {
+    font-size: 90%;
+}
+
+.adminhome li > div.link .status:hover {
+    color: #ffffff;
+}
+.adminhome li > div.link .status.has_uncommitted_changes:hover {
+    background-color: #f58919;
+}
 
 .adminhome li > div.buttons .button {
     display: inline-block;
@@ -268,10 +302,11 @@ a:hover {
     border-color: #c4c4c4;
     background-color: #e3e3e3;
     box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.05);
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, border-color 0.3s;
 }
 .adminhome li > div.buttons .button:hover {
     background-color: #efefef;
+    border-color: #787878;
 }
 
 
@@ -298,6 +333,9 @@ a:hover {
     width: auto;
     font-style: normal;
     font-size: 80%;
+}
+.adminhome li.top .env-notice.warning {
+    color: #e05252;
 }
 
 .adminform {
@@ -358,6 +396,13 @@ a:hover {
 }
 .adminform .editor .header .title {
     display: inline-block;
+}
+.adminform .editor .header .status {
+    font-size: 80%;
+    margin-left: 4px;
+    position: relative;
+    bottom: 2px;
+    color: #ffffff;
 }
 .adminform .editor .header a.view,
 .adminform .editor .header a.preview {
@@ -510,6 +555,23 @@ tr:nth-child(odd) td {
     text-overflow: ellipsis;
 }
 
+
+.adminform table .name .status {
+    display: inline-block;
+    font-size: 10px;
+    margin-left: 3px;
+}
+.adminform table .name .status .icon {
+    font-size: inherit;
+}
+
+.adminform .status.has_uncommitted_changes {
+    color: #f58919;
+}
+.adminform .status.has_committed_changes {
+    color: green;
+}
+
 .adminform table thead th.head.count,
 .adminform table tfoot td.foot.count {
     text-align: right;
@@ -619,6 +681,9 @@ tr:nth-child(odd) td {
     -moz-border-radius: 3px;
     border-radius: 3px;
     background-color: #9e9e9e;
+}
+.adminform .search .field.flags .subfield {
+    margin-bottom: 6px;
 }
 .adminform .search .field.flags .subfield .sublabel {
     width: calc(33% - 6px);
@@ -1046,6 +1111,47 @@ input[type=file] {
     margin: 0 0 0 20px;
 }
 
+.adminform .formfoot .git-buttons {
+    float: right;
+    text-align: right;
+    margin: 0 0 0 10px;
+}
+.adminform .formfoot .git-buttons .button {
+    margin: 0 0 0 5px;
+}
+.adminform .formfoot .git-buttons .git-changes {
+    display: block;
+    margin: 6px 0 0 auto;
+    text-align: right;
+    font-size: 90%;
+    line-height: 1.2;
+    max-width: 500px;
+}
+.adminform .formfoot .git-buttons .git-changes > strong {
+    display: block;
+    text-align: right;
+    margin: 0 0 4px auto;
+    text-decoration: underline;
+}
+.adminform .formfoot .git-buttons .git-changes > ul {
+    display: block;
+    text-align: right;
+    margin: 0 0 0 auto;
+    list-style-type: none;
+}
+.adminform .formfoot .git-buttons .git-changes > ul > li {
+    display: inline-block;
+    margin: 0 0 2px 2px;
+    color: #8a8a8a;
+}
+.adminform .formfoot .git-buttons .git-changes > ul > li:after {
+    content: ",";
+    color: #262626;
+}
+.adminform .formfoot .git-buttons .git-changes > ul > li:last-child:after {
+    content: "";
+}
+
 .adminform .field .label {
     display: block;
     margin: 0 auto 4px 0;
@@ -1442,6 +1548,20 @@ input[type=file] {
 }
 .adminform .editor .buttons .reset:hover {
     background-color: #0e599a;
+}
+.adminform .editor .buttons .commit {
+    background-color: #0b4c84;
+    border-color: #073155;
+}
+.adminform .editor .buttons .commit:hover {
+    background-color: #0e599a;
+}
+.adminform .editor .buttons .revert {
+    background-color: #da7b16;
+    border-color: #b35c00;
+}
+.adminform .editor .buttons .revert:hover {
+    background-color: #f58919;
 }
 
 .adminform .editor .field input[name="user_omega"] {
