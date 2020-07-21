@@ -7,6 +7,7 @@ var thisAdminForm = false;
 var thisAdminSearch = false;
 var thisAdminResults = false;
 var thisAdminEditor = false;
+var thisRootURL = '/';
 var $adminForm = false;
 var $adminAjaxForm = false;
 var $adminAjaxFrame = false;
@@ -475,6 +476,62 @@ $(document).ready(function(){
                 });
             }
 
+
+        // Define events for any git-button areas under editor forms
+        var $editorGitButtons = $('.git-buttons', $adminForm);
+        if ($editorGitButtons.length){
+            var postURLs = {
+                revert: 'admin/scripts/revert-game-content.php',
+                publish: 'admin/scripts/push-game-content.php'
+                };
+            var confirmMessages = {
+                revert: 'Are you absolutely sure you want to revert the changes to this {object}?\n'
+                    + 'This action cannot be undone and any updates will be lost.\n'
+                    + 'Continue anyway?',
+                publish: 'Are you absolutely sure you want to published the changes to this {object}?'
+                }
+            $('input[type="button"]', $editorGitButtons).bind('click', function(){
+                var $thisButton = $(this);
+                var $thisWrapper = $thisButton.closest('.git-buttons');
+                var thisKind = $thisWrapper.attr('data-kind');
+                var thisSubKind = $thisWrapper.attr('data-subkind');
+                var thisToken = $thisWrapper.attr('data-token');
+                var thisSource = $thisWrapper.attr('data-source');
+                var thisAction = $thisButton.attr('data-action');
+                if (typeof postURLs[thisAction] === 'undefined'){ return false; }
+                if (typeof confirmMessages[thisAction] === 'undefined'){ return false; }
+                var postURL = thisRootURL+postURLs[thisAction];
+                var postData = {kind:thisKind,subkind:thisSubKind,token:thisToken,source:thisSource};
+                var confirmMessage = confirmMessages[thisAction];
+                if (thisSubKind.length){ confirmMessage = confirmMessage.replace(/\{object\}/g, thisSubKind.replace(/(ies|es|s)$/, '')); }
+                else { confirmMessage = confirmMessage.replace(/\{object\}/g, thisKind.replace(/(ies|es|s)$/, '')); }
+                //console.log('postURL = ', postURL);
+                //console.log('postData = ', postData);
+                //console.log('confirmMessage = ', confirmMessage);
+                if (confirm(confirmMessage)){
+                    $.post(postURL, postData, function(returnData){
+                        //console.log('returnData = ', returnData);
+                        if (typeof returnData !== 'undefined' && returnData.length){
+                            var lineData = returnData.split('\n');
+                            //console.log('lineData = ', lineData);
+                            var statusLine = lineData[0].split('|');
+                            //console.log('statusLine = ', statusLine);
+                            if (statusLine[0] === 'success'){
+                                var completeFunction = function(){
+                                    $adminForm.css({cursor: 'wait', pointerEvents: 'none'});
+                                    window.location.href = window.location.href.replace(location.hash,'');
+                                    $adminForm.animate({opacity: 0.25}, 500, 'swing');
+                                    };
+                                printStatusMessage(statusLine[0], statusLine[1], completeFunction);
+                                } else {
+                                printStatusMessage(statusLine[0], statusLine[1]);
+                                }
+                            }
+                        });
+                    }
+            });
+        }
+
     }
 
 
@@ -921,6 +978,42 @@ $(document).ready(function(){
     }
 
 });
+
+// Define a common action for printing a status message at the top of the editor
+function printStatusMessage(messageStatus, messageText, onCompleteFunction){
+    if (typeof onCompleteFunction !== 'function'){ onCompleteFunction = function(){}; }
+    var $messagesDiv = $('.messages', thisAdminEditor);
+    if (!$messagesDiv.length){
+        $messagesDiv = $('<div class="messages"><ul class="list"></ul></div>');
+        $messagesDiv.insertBefore(thisAdminEditor.find('.editor-tabs[data-tabgroup]'));
+        }
+    var $messagesList = $('.list', $messagesDiv);
+    var $messagesListItems = $('.message', $messagesList);
+    var printThisMessage = function(){
+        var $newMessage = $('<li class="message '+messageStatus+'">'+messageText+'</li>');
+        $newMessage.css({opacity: 0, height: '1px'}).appendTo($messagesList);
+        $newMessage.animate({opacity: 1, height: '16px'}, 400, 'swing', function(){ $newMessage.css({height: 'auto'}); onCompleteFunction(); });
+        };
+    if ($messagesListItems.length){
+        var numMessages = $messagesListItems.length;
+        var numMessagesRemoved = 0;
+        var removeNextMessage = function(){
+            $nextMessage = $('.message', $messagesList).first();
+            $nextMessage.animate({opacity: 0, height: '1px'}, 200, 'swing', function(){
+                $nextMessage.remove();
+                numMessagesRemoved++;
+                if (numMessagesRemoved >= numMessages){
+                    setTimeout(function(){ printThisMessage() }, 200);
+                    } else {
+                    removeNextMessage();
+                    }
+                });
+            };
+        removeNextMessage();
+        } else {
+        printThisMessage();
+        }
+}
 
 // Helper functions for simple yet annoying tasks
 function upperCaseFirst(string){ return string[0].toUpperCase() + string.substring(1); }

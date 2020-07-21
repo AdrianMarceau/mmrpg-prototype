@@ -1549,19 +1549,19 @@ input[type=file] {
 .adminform .editor .buttons .reset:hover {
     background-color: #0e599a;
 }
-.adminform .editor .buttons .commit {
-    background-color: #0b4c84;
-    border-color: #073155;
-}
-.adminform .editor .buttons .commit:hover {
-    background-color: #0e599a;
-}
 .adminform .editor .buttons .revert {
     background-color: #da7b16;
     border-color: #b35c00;
 }
 .adminform .editor .buttons .revert:hover {
     background-color: #f58919;
+}
+.adminform .editor .buttons .publish {
+    background-color: #0b4c84;
+    border-color: #073155;
+}
+.adminform .editor .buttons .publish:hover {
+    background-color: #0e599a;
 }
 
 .adminform .editor .field input[name="user_omega"] {

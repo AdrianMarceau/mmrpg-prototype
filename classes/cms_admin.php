@@ -60,14 +60,16 @@ class cms_admin {
     }
 
     // Define a function for easily getting a contributors index for back-end puruposes
-    public static function get_contributors_index($object_kind){
+    public static function get_contributors_index($object_kind, $image_editor_id_field = ''){
         global $db;
+        // If not provided, get the image editor ID field from the global constant
+        if (empty($image_editor_id_field)){ $image_editor_id_field = MMRPG_CONFIG_IMAGE_EDITOR_ID_FIELD; }
         // Ensure the provided object kind as allowed and determine the plural form
         $allowed_kinds = array('player', 'robot', 'field', 'ability', 'item');
         $count_object = in_array($object_kind, $allowed_kinds) ? $object_kind : $allowed_kinds[0];
         $count_object_plural = preg_match('/y$/i', $count_object) ? substr($count_object, 0, -1).'ies' : $count_object.'s';
         // Pull the contributor index different depending on the global constant (pre/post migration check)
-        if (MMRPG_CONFIG_IMAGE_EDITOR_ID_FIELD === 'contributor_id'){
+        if ($image_editor_id_field === 'contributor_id'){
             $mmrpg_contributors_index = $db->get_array_list("SELECT
                 contributors.contributor_id AS contributor_id,
                 contributors.user_name AS user_name,
@@ -254,6 +256,10 @@ class cms_admin {
             $mmrpg_git_changes_tokens = array_unique($mmrpg_git_changes_tokens);
         }
 
+        // Break apart the repo kind/subkind if applicable
+        if (strstr($repo_kind, '/')){ list($repo_kind, $repo_subkind) = explode('/', $repo_kind); }
+        else { $repo_subkind = ''; }
+
         // Generate a list of print-friendly items showing the changes
         $print_changes = $mmrpg_git_changes;
         $print_changes = array_filter($print_changes, function($path) use($path_token){ list($token) = explode('/', $path); return $token === $path_token ? true : false; });
@@ -263,9 +269,9 @@ class cms_admin {
         ob_start();
         if (in_array($path_token, $mmrpg_git_changes_tokens)){
             ?>
-            <div class="buttons git-buttons">
-                <input class="button revert" type="button" value="Revert Changes" />
-                <input class="button commit" type="button" value="Commit &amp; Publish Changes" />
+            <div class="buttons git-buttons" data-kind="<?= $repo_kind ?>" data-subkind="<?= $repo_subkind ?>" data-token="<?= $path_token ?>" data-source="github">
+                <input class="button revert" data-action="revert" type="button" value="Revert Changes" />
+                <input class="button publish" data-action="publish" type="button" value="Commit &amp; Publish Changes" />
                 <div class="git-changes">
                     <strong>Uncommitted Changes</strong>
                     <ul><li><?= implode('</li><li>', $print_changes) ?></li></ul>

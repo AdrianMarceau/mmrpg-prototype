@@ -295,6 +295,9 @@ unset($db);
     <?= $admin_include_javascript ?>
 <? } ?>
 <script type="text/javascript" src="admin/scripts/admin.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript">
+    thisRootURL = '<?= MMRPG_CONFIG_ROOTURL ?>';
+</script>
 <? if (!empty($admin_inline_javascript)){ ?>
     <?= $admin_inline_javascript ?>
 <? } ?>

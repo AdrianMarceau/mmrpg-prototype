@@ -1879,7 +1879,7 @@
                                     <input class="button delete" type="button" value="Delete <?= $this_robot_class_short_name_uc ?>" data-delete="robots" data-robot-id="<?= $robot_data['robot_id'] ?>" />
                                     */ ?>
                                 </div>
-                                <?= cms_admin::print_object_editor_git_footer_buttons('robots/'.$this_robot_class, $robot_data['robot_token'], $mmrpg_git_changes, $mmrpg_git_changes_tokens); ?>
+                                <?= cms_admin::print_object_editor_git_footer_buttons('robots/'.$this_robot_xclass, $robot_data['robot_token'], $mmrpg_git_changes, $mmrpg_git_changes_tokens); ?>
                             <? } ?>
 
                             <? /*
