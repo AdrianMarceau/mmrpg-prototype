@@ -103,7 +103,7 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')
 }
 
 // Define whether or not we're being viewed by an admin
-$is_admin_mode = !empty($_SESSION['admin_id']) ? true : false;
+$is_admin_mode = !empty($_SESSION['admin_id']) && is_numeric($_SESSION['admin_id']) ? true : false;
 define('MMRPG_CONFIG_ADMIN_MODE', $is_admin_mode);
 
 // Turn ON error reporting if admin

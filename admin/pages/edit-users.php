@@ -835,7 +835,14 @@
                             <strong>IPv4 Address</strong>
                             <em>0.0.0.0</em>
                         </div>
-                        <input class="textbox" type="text" name="user_ip_addresses" value="<?= $user_data['user_ip_addresses'] ?>" maxlength="256" />
+                        <?
+                        // Only keep the last ten IP addresses to prevent var overflow
+                        $user_ip_addresses = $user_data['user_ip_addresses'];
+                        $user_ip_addresses = !empty($user_ip_addresses) ? explode(',', $user_ip_addresses) : array($user_ip_addresses);
+                        if (count($user_ip_addresses) > 10){ $user_ip_addresses = array_slice($user_ip_addresses, -10, 10); }
+                        $user_ip_addresses = implode(',', $user_ip_addresses);
+                        ?>
+                        <input class="textbox" type="text" name="user_ip_addresses" value="<?= $user_ip_addresses ?>" maxlength="256" />
                     </div>
 
                     <div class="field fullsize">

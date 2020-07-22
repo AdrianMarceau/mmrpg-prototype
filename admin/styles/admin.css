@@ -1119,13 +1119,43 @@ input[type=file] {
 .adminform .formfoot .git-buttons .button {
     margin: 0 0 0 5px;
 }
+.adminform .formfoot .git-buttons .button:after {
+    content: "";
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0;
+    width: 0;
+    height: 16px;
+    opacity: 0;
+    background-image: none;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: auto;
+    transition: width 0.3s, margin 0.3s, opacity 0.3s;
+}
+.adminform .formfoot .git-buttons .button.revert:after {
+    background-image: url(../images/ajax-loader_on-revert.gif);
+}
+.adminform .formfoot .git-buttons .button.publish:after {
+    background-image: url(../images/ajax-loader_on-publish.gif);
+}
+.adminform .formfoot .git-buttons .button.loading:after {
+    width: 16px;
+    margin-left: 8px;
+    opacity: 1;
+}
 .adminform .formfoot .git-buttons .git-changes {
     display: block;
+    float: none;
+    clear: both;
     margin: 6px 0 0 auto;
+    padding: 0;
     text-align: right;
     font-size: 90%;
     line-height: 1.2;
+    width: auto;
     max-width: 500px;
+
 }
 .adminform .formfoot .git-buttons .git-changes > strong {
     display: block;
@@ -1765,3 +1795,19 @@ input[type=file] {
 .adminform .bfg-attachments-preview .foreground_image { z-index: 3; }
 .adminform .bfg-attachments-preview .foreground_attachments { z-index: 4; }
 .adminform .bfg-attachments-preview .preview_wrapper:after { z-index: 5; }
+
+
+.adminform.loading {
+    cursor: not-allowed;
+    pointer-events: none;
+}
+.adminform .editor-tabs,
+.adminform .field,
+.adminform .buttons .button {
+    transition: opacity 0.3s;
+}
+.adminform.loading .editor-tabs,
+.adminform.loading .field,
+.adminform.loading .buttons .button:not(.loading) {
+    opacity: 0.25;
+}

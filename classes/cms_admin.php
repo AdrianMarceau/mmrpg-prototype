@@ -270,9 +270,9 @@ class cms_admin {
         if (in_array($path_token, $mmrpg_git_changes_tokens)){
             ?>
             <div class="buttons git-buttons" data-kind="<?= $repo_kind ?>" data-subkind="<?= $repo_subkind ?>" data-token="<?= $path_token ?>" data-source="github">
-                <input class="button revert" data-action="revert" type="button" value="Revert Changes" />
-                <input class="button publish" data-action="publish" type="button" value="Commit &amp; Publish Changes" />
-                <div class="git-changes">
+                <a class="button revert" data-action="revert" type="button">Revert Changes</a>
+                <a class="button publish" data-action="publish" type="button">Commit &amp; Publish Changes</a>
+                <div class="field git-changes">
                     <strong>Uncommitted Changes</strong>
                     <ul><li><?= implode('</li><li>', $print_changes) ?></li></ul>
                 </div>

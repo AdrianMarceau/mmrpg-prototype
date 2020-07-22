@@ -179,6 +179,8 @@ $(document).ready(function(){
                 var $autoTypeFields = [];
                 var updateFieldTypes = function(){
                     //console.log('updateFieldTypes()');
+                    //console.log('autoTypeFields =', autoTypeFields);
+                    //console.log('$autoTypeFields =', $autoTypeFields);
                     var fieldTypes = [];
                     for (var i = 0; i < $autoTypeFields.length; i++){
                         var val = $autoTypeFields[i].val();
@@ -192,7 +194,7 @@ $(document).ready(function(){
                     };
                 for (var i = 0; i < autoTypeFields.length; i++){
                     var $field = $('select[name="'+autoTypeFields[i]+'"]', thisAdminForm);
-                    if (typeof $field !== 'undefined'){
+                    if (typeof $field !== 'undefined' && $field.length > 0){
                         $autoTypeFields.push($field);
                         $field.bind('keyup keydown change click', function(){ updateFieldTypes(); });
                         }
@@ -488,9 +490,11 @@ $(document).ready(function(){
                 revert: 'Are you absolutely sure you want to revert the changes to this {object}?\n'
                     + 'This action cannot be undone and any updates will be lost.\n'
                     + 'Continue anyway?',
-                publish: 'Are you absolutely sure you want to published the changes to this {object}?'
+                publish: 'Are you absolutely sure you want to publish the changes to this {object}?\n'
+                    + 'This action cannot be undone and will be in the history forever.\n'
+                    + 'Continue anyway? '
                 }
-            $('input[type="button"]', $editorGitButtons).bind('click', function(){
+            $('a[data-action]', $editorGitButtons).bind('click', function(){
                 var $thisButton = $(this);
                 var $thisWrapper = $thisButton.closest('.git-buttons');
                 var thisKind = $thisWrapper.attr('data-kind');
@@ -509,6 +513,8 @@ $(document).ready(function(){
                 //console.log('postData = ', postData);
                 //console.log('confirmMessage = ', confirmMessage);
                 if (confirm(confirmMessage)){
+                    $thisButton.addClass('loading');
+                    thisAdminForm.addClass('loading');
                     $.post(postURL, postData, function(returnData){
                         //console.log('returnData = ', returnData);
                         if (typeof returnData !== 'undefined' && returnData.length){
@@ -518,13 +524,13 @@ $(document).ready(function(){
                             //console.log('statusLine = ', statusLine);
                             if (statusLine[0] === 'success'){
                                 var completeFunction = function(){
-                                    $adminForm.css({cursor: 'wait', pointerEvents: 'none'});
                                     window.location.href = window.location.href.replace(location.hash,'');
-                                    $adminForm.animate({opacity: 0.25}, 500, 'swing');
                                     };
                                 printStatusMessage(statusLine[0], statusLine[1], completeFunction);
                                 } else {
                                 printStatusMessage(statusLine[0], statusLine[1]);
+                                $thisButton.removeClass('loading');
+                                thisAdminForm.removeClass('loading');
                                 }
                             }
                         });
