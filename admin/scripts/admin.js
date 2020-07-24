@@ -8,6 +8,7 @@ var thisAdminSearch = false;
 var thisAdminResults = false;
 var thisAdminEditor = false;
 var thisRootURL = '/';
+var $adminHome = false;
 var $adminForm = false;
 var $adminAjaxForm = false;
 var $adminAjaxFrame = false;
@@ -27,6 +28,7 @@ $(document).ready(function(){
     thisAdminSearch = $('.adminform > .search', thisAdmin);
     thisAdminResults = $('.adminform > .results', thisAdmin);
     thisAdminEditor = $('.adminform > .editor', thisAdmin);
+    $adminHome = $('.adminhome', thisAdmin);
     $adminForm = $('.adminform form.form', thisAdmin);
     $adminAjaxForm = $('.adminform form[name="ajax-form"]', thisAdmin);
     $adminAjaxFrame = $('.adminform iframe[name="ajax-frame"]', thisAdmin);
@@ -421,9 +423,96 @@ $(document).ready(function(){
         }
 
 
+    // COMMON HOME EVENTS
+
+    // Check to make sure we're on the admin home page
+    if ($adminHome.length){
+
+        // Define events for any button areas under admin home
+        var $homeButtons = $('.buttons', $adminHome);
+        if ($homeButtons.length){
+            var postURLs = {
+                revert: 'admin/scripts/revert-game-content.php',
+                publish: 'admin/scripts/push-game-content.php'
+                };
+            var confirmMessages = {
+                revert: 'Are you absolutely sure you want to revert changes to all {object}?\n'
+                    + 'This action cannot be undone and all updates will be lost.\n'
+                    + 'Continue anyway?',
+                publish: 'Are you absolutely sure you want to publish changes to all {object}?\n'
+                    + 'This action cannot be undone and will be in the history forever.\n'
+                    + 'Continue anyway? ',
+                final: 'I\'m sorry but I have to confirm one more time...\n'
+                    + 'Are you absolutely, 100% sure you want to \n'
+                    + '{action} CHANGES TO {object}? '
+                }
+            $('a[data-action]', $homeButtons).bind('click', function(){
+                var $thisButton = $(this);
+                var thisButtonType = $thisButton.attr('data-button');
+                if (typeof thisButtonType === 'undefined'){
+                    //console.log('Undefined button type');
+                    return false;
+                    } else if (thisButtonType === 'git'){
+                    //console.log('Git button type');
+                    var thisKind = $thisButton.attr('data-kind');
+                    var thisSubKind = $thisButton.attr('data-subkind');
+                    var thisToken = $thisButton.attr('data-token');
+                    var thisSource = $thisButton.attr('data-source');
+                    var thisAction = $thisButton.attr('data-action');
+                    if (typeof postURLs[thisAction] === 'undefined'){ return false; }
+                    if (typeof confirmMessages[thisAction] === 'undefined'){ return false; }
+                    if (typeof thisSubKind === 'undefined'){ thisSubKind = ''; }
+                    var postURL = thisRootURL+postURLs[thisAction];
+                    var postData = {kind:thisKind,subkind:thisSubKind,token:thisToken,source:thisSource};
+                    var confirmMessage = confirmMessages[thisAction];
+                    if (thisSubKind.length){ confirmMessage = confirmMessage.replace(/\{object\}/g, thisSubKind); }
+                    else { confirmMessage = confirmMessage.replace(/\{object\}/g, thisKind); }
+                    var confirmMessage2 = confirmMessages['final'];
+                    confirmMessage2 = confirmMessage2.replace(/\{action\}/g, $thisButton.text().toUpperCase());
+                    if (thisSubKind.length){ confirmMessage2 = confirmMessage2.replace(/\{object\}/g, thisSubKind.toUpperCase()); }
+                    else { confirmMessage2 = confirmMessage2.replace(/\{object\}/g, thisKind.toUpperCase()); }
+                    //console.log('postURL = ', postURL);
+                    //console.log('postData = ', postData);
+                    //console.log('confirmMessage = ', confirmMessage);
+                    //console.log('confirmMessage2 = ', confirmMessage2);
+                    if (confirm(confirmMessage) && confirm(confirmMessage2)){
+                        $thisButton.addClass('loading');
+                        $adminHome.addClass('loading');
+                        $.post(postURL, postData, function(returnData){
+                            //console.log('returnData = ', returnData);
+                            if (typeof returnData !== 'undefined' && returnData.length){
+                                var lineData = returnData.split('\n');
+                                //console.log('lineData = ', lineData);
+                                var statusLine = lineData[0].split('|');
+                                //console.log('statusLine = ', statusLine);
+                                if (statusLine[0] === 'success'){
+                                    var completeFunction = function(){
+                                        //console.log('reload window!');
+                                        window.location.href = window.location.href.replace(location.hash,'');
+                                        };
+                                    printStatusMessage(statusLine[0], statusLine[1], completeFunction);
+                                    } else {
+                                    printStatusMessage(statusLine[0], statusLine[1]);
+                                    $thisButton.removeClass('loading');
+                                    $adminHome.removeClass('loading');
+                                    }
+                                }
+                            });
+                        }
+                    return true;
+                    } else if (thisButtonType === 'table'){
+                    //console.log('Table button type');
+                    return false; // not done yet
+                    }
+            });
+        }
+
+        }
+
+
     // COMMON EDITOR EVENTS
 
-    // Check to make sure we're on the admin page
+    // Check to make sure we're on an admin editor page
     var codeEditorIndex = {};
     if ($adminForm.length){
 
@@ -478,7 +567,6 @@ $(document).ready(function(){
                 });
             }
 
-
         // Define events for any git-button areas under editor forms
         var $editorGitButtons = $('.git-buttons', $adminForm);
         if ($editorGitButtons.length){
@@ -504,6 +592,7 @@ $(document).ready(function(){
                 var thisAction = $thisButton.attr('data-action');
                 if (typeof postURLs[thisAction] === 'undefined'){ return false; }
                 if (typeof confirmMessages[thisAction] === 'undefined'){ return false; }
+                if (typeof thisSubKind === 'undefined'){ thisSubKind = ''; }
                 var postURL = thisRootURL+postURLs[thisAction];
                 var postData = {kind:thisKind,subkind:thisSubKind,token:thisToken,source:thisSource};
                 var confirmMessage = confirmMessages[thisAction];
@@ -991,7 +1080,8 @@ function printStatusMessage(messageStatus, messageText, onCompleteFunction){
     var $messagesDiv = $('.messages', thisAdminEditor);
     if (!$messagesDiv.length){
         $messagesDiv = $('<div class="messages"><ul class="list"></ul></div>');
-        $messagesDiv.insertBefore(thisAdminEditor.find('.editor-tabs[data-tabgroup]'));
+        if (thisAdminEditor.length){ $messagesDiv.insertBefore(thisAdminEditor.find('.editor-tabs[data-tabgroup]')); }
+        else if (thisAdmin.length){ $messagesDiv.insertAfter(thisAdmin.find('.breadcrumb')); }
         }
     var $messagesList = $('.list', $messagesDiv);
     var $messagesListItems = $('.message', $messagesList);

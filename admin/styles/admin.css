@@ -197,6 +197,8 @@ a:hover {
     font-weight: bold;
 }
 .adminhome li {
+    font-size: 12px;
+    line-height: 16px;
     padding: 6px;
     margin: 0 auto 0 0;
     border-bottom: 1px solid #E0E0E0;
@@ -242,17 +244,18 @@ a:hover {
     display: block;
     box-sizing: border-box;
     float: left;
+    vertical-align: middle;
 }
 
 .adminhome li > div.link {
     width: 25%;
 }
 .adminhome li > div.desc {
-    width: 50%;
+    width: 46%;
     font-weight: normal;
 }
 .adminhome li > div.buttons {
-    width: 25%;
+    width: 29%;
     font-weight: normal;
     text-align: right;
 }
@@ -287,6 +290,7 @@ a:hover {
 
 .adminhome li > div.buttons .button {
     display: inline-block;
+    vertical-align: middle;
     border-style: solid;
     border-width: 1px;
     -moz-border-radius: 3px;
@@ -296,8 +300,8 @@ a:hover {
     margin: 0 0 0 3px;
     text-transform: uppercase;
     cursor: pointer;
-    font-size: 11px;
-    line-height: 1;
+    font-size: 10px;
+    line-height: 16px;
     color: #000000;
     border-color: #c4c4c4;
     background-color: #e3e3e3;
@@ -307,6 +311,25 @@ a:hover {
 .adminhome li > div.buttons .button:hover {
     background-color: #efefef;
     border-color: #787878;
+}
+.adminhome li > div.buttons .button:after {
+    content: "";
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0;
+    width: 0;
+    height: 16px;
+    opacity: 0;
+    background-image: url(../images/ajax-loader_on-home.gif);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: auto;
+    transition: width 0.3s, margin 0.3s, opacity 0.3s;
+}
+.adminhome li > div.buttons .button.loading:after {
+    width: 16px;
+    margin-left: 8px;
+    opacity: 1;
 }
 
 
@@ -337,6 +360,24 @@ a:hover {
 .adminhome li.top .env-notice.warning {
     color: #e05252;
 }
+
+.adminhome.loading {
+    cursor: not-allowed;
+    pointer-events: none;
+}
+.adminhome li.top,
+.adminhome li.item .link,
+.adminhome li.item .desc,
+.adminhome li.item .buttons .button {
+    transition: opacity 0.3s;
+}
+.adminhome.loading li.top,
+.adminhome.loading li.item .link,
+.adminhome.loading li.item .desc,
+.adminhome.loading li.item .buttons .button:not(.loading) {
+    opacity: 0.25;
+}
+
 
 .adminform {
     display: block;

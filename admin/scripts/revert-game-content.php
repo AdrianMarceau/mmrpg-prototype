@@ -114,6 +114,7 @@ foreach ($revert_tokens  AS $object_key => $object_token){
 $num_reverted = count($revert_tokens);
 $success_kind = !empty($request_subkind) ? $request_subkind : $request_kind;
 $success_kind_singular = !empty($request_subkind_singular) ? $request_subkind_singular : $request_kind_singular;
-exit_action('success|Changes to '.($num_reverted === 1 ? ('this '.$success_kind_singular) : ($num_reverted.' '.$success_kind)).' were reverted!');
+if ($request_token === 'all'){ exit_action('success|Changes to all '.$success_kind.' were reverted!'); }
+else { exit_action('success|Changes to '.($num_reverted === 1 ? ('this '.$success_kind_singular) : ($num_reverted.' '.$success_kind)).' were reverted!'); }
 
 ?>

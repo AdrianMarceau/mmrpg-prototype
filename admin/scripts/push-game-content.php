@@ -136,6 +136,7 @@ foreach ($publish_tokens  AS $object_key => $object_token){
 $num_published = count($publish_tokens);
 $success_kind = !empty($request_subkind) ? $request_subkind : $request_kind;
 $success_kind_singular = !empty($request_subkind_singular) ? $request_subkind_singular : $request_kind_singular;
-exit_action('success|Changes to '.($num_published === 1 ? ('this '.$success_kind_singular) : ($num_published.' '.$success_kind)).' were published!');
+if ($request_token === 'all'){ exit_action('success|Changes to all '.$success_kind.' were commit and published!'); }
+else { exit_action('success|Changes to '.($num_published === 1 ? ('this '.$success_kind_singular) : ($num_published.' '.$success_kind)).' were commit and published!'); }
 
 ?>

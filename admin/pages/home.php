@@ -126,9 +126,26 @@
                         ),
                     'buttons' => array(
                         array(
-                            'action' => 'scripts/push-game-content.php?kind=players&source=github',
-                            'text' => 'Publish to GitHub',
-                            'condition' => array('status' => 'uncommitted_changes')
+                            'text' => 'Revert All',
+                            'condition' => array('status' => 'uncommitted_changes'),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'revert',
+                                'data-kind' => 'players',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            ),
+                        array(
+                            'text' => 'Commit & Publish All',
+                            'condition' => array('status' => 'uncommitted_changes'),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'publish',
+                                'data-kind' => 'players',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
                             )
                         )
                     );
@@ -152,9 +169,28 @@
                         ),
                     'buttons' => array(
                         array(
-                            'action' => 'scripts/push-game-content.php?kind=robots&subkind=masters&source=github',
-                            'text' => 'Publish to GitHub',
-                            'condition' => array('status' => 'uncommitted_changes')
+                            'text' => 'Revert All',
+                            'condition' => array('status' => 'uncommitted_changes'),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'revert',
+                                'data-kind' => 'robots',
+                                'data-subkind' => 'masters',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            ),
+                        array(
+                            'text' => 'Commit & Publish All',
+                            'condition' => array('status' => 'uncommitted_changes'),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'publish',
+                                'data-kind' => 'robots',
+                                'data-subkind' => 'masters',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
                             )
                         )
                     );
@@ -178,9 +214,28 @@
                         ),
                     'buttons' => array(
                         array(
-                            'action' => 'scripts/push-game-content.php?kind=robots&subkind=mechas&source=github',
-                            'text' => 'Publish to GitHub',
-                            'condition' => array('status' => 'uncommitted_changes')
+                            'text' => 'Revert All',
+                            'condition' => array('status' => 'uncommitted_changes'),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'revert',
+                                'data-kind' => 'robots',
+                                'data-subkind' => 'mechas',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            ),
+                        array(
+                            'text' => 'Commit & Publish All',
+                            'condition' => array('status' => 'uncommitted_changes'),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'publish',
+                                'data-kind' => 'robots',
+                                'data-subkind' => 'mechas',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
                             )
                         )
                     );
@@ -204,9 +259,28 @@
                         ),
                     'buttons' => array(
                         array(
-                            'action' => 'scripts/push-game-content.php?kind=robots&subkind=bosses&source=github',
-                            'text' => 'Publish to GitHub',
-                            'condition' => array('status' => 'uncommitted_changes')
+                            'text' => 'Revert All',
+                            'condition' => array('status' => 'uncommitted_changes'),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'revert',
+                                'data-kind' => 'robots',
+                                'data-subkind' => 'bosses',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            ),
+                        array(
+                            'text' => 'Commit & Publish All',
+                            'condition' => array('status' => 'uncommitted_changes'),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'publish',
+                                'data-kind' => 'robots',
+                                'data-subkind' => 'bosses',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
                             )
                         )
                     );
@@ -224,9 +298,26 @@
                         ),
                     'buttons' => array(
                         array(
-                            'action' => 'scripts/push-game-content.php?kind=fields&source=github',
-                            'text' => 'Publish to GitHub',
-                            'condition' => array('status' => 'uncommitted_changes')
+                            'text' => 'Revert All',
+                            'condition' => array('status' => 'uncommitted_changes'),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'revert',
+                                'data-kind' => 'fields',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            ),
+                        array(
+                            'text' => 'Commit & Publish All',
+                            'condition' => array('status' => 'uncommitted_changes'),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'publish',
+                                'data-kind' => 'fields',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
                             )
                         )
                     );

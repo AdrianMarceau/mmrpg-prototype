@@ -205,9 +205,11 @@ class cms_admin {
                     $buttons_markup = array();
                     foreach ($option_info['buttons'] AS $button_key => $button_info){
                         if (isset($button_info['condition']['status']) && $button_info['condition']['status'] !== $repo_status){ continue; }
-                        $button_action = $button_info['action'];
                         $button_text = $button_info['text'];
-                        $buttons_markup[] = '<a class="button" data-action="'.$button_action.'">'.$button_text.'</a>';
+                        $button_attributes = '';
+                        if (isset($button_info['action'])){ $button_attributes .= ' data-action="'.$button_info['action'].'"'; }
+                        if (isset($button_info['attributes'])){ foreach ($button_info['attributes'] AS $a => $v){ $button_attributes .= ' '.$a.'="'.$v.'"'; } }
+                        $buttons_markup[] = '<a class="button"'.$button_attributes.'">'.$button_text.'</a>';
                     }
                     if (!empty($buttons_markup)){
                         echo('<div class="buttons">'.PHP_EOL);
