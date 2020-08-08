@@ -78,7 +78,7 @@ if (!empty($clone_kind)){
         }
 
         $cmds = '';
-        $cmds .= 'cd '.MMRPG_CONFIG_CONTENT_PATH.' ';
+        $cmds .= 'cd '.$repo_content_dir.' ';
         $cmds .= '&& git status ';
         ob_echo_shell_exec($cmds);
 
