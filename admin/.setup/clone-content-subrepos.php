@@ -77,12 +77,6 @@ if (!empty($clone_kind)){
 
         }
 
-        $cmds = '';
-        $cmds .= 'cd '.$repo_content_dir.' ';
-        $cmds .= '&& git config core.fileMode false ';
-        $cmds .= '&& git status ';
-        ob_echo_shell_exec($cmds);
-
     }
 
     sleep(1);
