@@ -39,6 +39,7 @@ function clean_path($path){ return str_replace(MMRPG_CONFIG_ROOTDIR, '/', $path)
 $allowed_clone_types = array_keys($content_types_index);
 $clone_kind = !empty($_REQUEST['kind']) && ($_REQUEST['kind'] === 'all' || in_array($_REQUEST['kind'], $allowed_clone_types)) ? trim($_REQUEST['kind']) : 'all';
 $clone_overwrite = !empty($_REQUEST['overwrite']) && $_REQUEST['overwrite'] === 'true' ? true : false;
+$clone_method = !empty($_REQUEST['method']) && $_REQUEST['method'] === 'ssh' ? 'ssh' : 'http';
 if (!empty($clone_kind)){ $clone_kind_singular = substr($clone_kind, -3, 3) === 'ies' ? str_replace('ies', 'y', $clone_kind) : rtrim($clone_kind, 's'); }
 else { $clone_kind_singular = false; }
 if (!empty($clone_kind)){
@@ -68,7 +69,7 @@ if (!empty($clone_kind)){
             $cmds .= 'cd '.MMRPG_CONFIG_CONTENT_PATH.' ';
             if ($repo_content_exists){ $cmds .= '&& rm -r -f '.rtrim($type_details['content_path'], '/').' '; }
             $cmds .= '&& mkdir '.rtrim($type_details['content_path'], '/').' ';
-            $cmds .= '&& git clone '.$repo_details['http'].' '.$type_details['content_path'].' ';
+            $cmds .= '&& git clone '.$repo_details[$clone_method].' '.$type_details['content_path'].' ';
             ob_echo_shell_exec($cmds);
 
         } else {
