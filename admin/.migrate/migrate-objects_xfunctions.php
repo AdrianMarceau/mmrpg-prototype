@@ -91,15 +91,16 @@ function get_parsed_object_file_markup($object_file_path){
     //ob_echo('- $data_markup_array = '.print_r($data_markup_array, true));
     //ob_echo('- $functions_markup_array = '.print_r($functions_markup_array, true));
     return array(
-        'data' => implode(PHP_EOL, $data_markup_array),
-        'functions' => implode(PHP_EOL, $functions_markup_array)
+        'data' => trim(implode(PHP_EOL, $data_markup_array)).PHP_EOL,
+        'functions' => trim(implode(PHP_EOL, $functions_markup_array)).PHP_EOL
         );
 }
 
 // Define a function for generating empty object data vs functions files
 function get_empty_functions_file_markup($kind){
     $empty_file_markup = $GLOBALS['empty_function_file_markup'];
-    return str_replace('{{kind}}', $kind, $empty_file_markup);
+    $empty_file_markup = str_replace('{{kind}}', $kind, $empty_file_markup);
+    return trim($empty_file_markup).PHP_EOL;
 }
 $empty_function_file_markup = <<<'PHP'
 <?
