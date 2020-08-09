@@ -161,10 +161,18 @@ function clean_json_content_array($kind, $content_json_data){
 }
 
 // Define a function for getting a table definition for export to an SQL file
-function mmrpg_get_create_table_sql($table_name, $table_settings){
+function mmrpg_get_create_table_sql($table_name, $table_settings, $use_prod_if_available = false){
     if (!isset($table_settings['export_table']) || $table_settings['export_table'] !== true){ return false; }
     global $db, $table_def_sql_template;
-    $table_def_sql = $db->get_value("SHOW CREATE TABLE `{$table_name}`;", 'Create Table');
+    $table_name_string = "`{$table_name}`";
+    if ($use_prod_if_available
+        && defined('MMRPG_CONFIG_PULL_LIVE_DATA_FROM')
+        && MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== false){
+        $prod_db_name = 'mmrpg_'.(defined('MMRPG_CONFIG_IS_LIVE') && MMRPG_CONFIG_IS_LIVE === true ? 'live' : 'local');
+        $prod_db_name .= '_'.MMRPG_CONFIG_PULL_LIVE_DATA_FROM;
+        $table_name_string = "`{$prod_db_name}`.{$table_name_string}";
+        }
+    $table_def_sql = $db->get_value("SHOW CREATE TABLE {$table_name_string};", 'Create Table');
     $table_def_sql = preg_replace('/(\s+AUTO_INCREMENT)=(?:[0-9]+)(\s+)/', '$1=0$2', $table_def_sql);
     $table_def_sql = preg_replace('/^CREATE TABLE `/', 'CREATE TABLE IF NOT EXISTS `', $table_def_sql);
     $table_def_sql = rtrim($table_def_sql, ';').';';
@@ -175,10 +183,18 @@ function mmrpg_get_create_table_sql($table_name, $table_settings){
 }
 
 // Define a function for getting a table definition for export to an SQL file
-function mmrpg_get_insert_table_data_sql($table_name, $table_settings){
+function mmrpg_get_insert_table_data_sql($table_name, $table_settings, $use_prod_if_available = false){
     if (!isset($table_settings['export_data']) || $table_settings['export_data'] !== true){ return false; }
     global $db, $table_row_sql_template;
-    $select_query = "SELECT * FROM `{$table_name}`;";
+    $table_name_string = "`{$table_name}`";
+    if ($use_prod_if_available
+        && defined('MMRPG_CONFIG_PULL_LIVE_DATA_FROM')
+        && MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== false){
+        $prod_db_name = 'mmrpg_'.(defined('MMRPG_CONFIG_IS_LIVE') && MMRPG_CONFIG_IS_LIVE === true ? 'live' : 'local');
+        $prod_db_name .= '_'.MMRPG_CONFIG_PULL_LIVE_DATA_FROM;
+        $table_name_string = "`{$prod_db_name}`.{$table_name_string}";
+        }
+    $select_query = "SELECT * FROM {$table_name_string};";
     if (!empty($table_settings['export_filter'])){
         $row_filter = array('1=1');
         $filters = $table_settings['export_filter'];

@@ -118,7 +118,7 @@ foreach ($sql_table_index AS $table_name => $table_settings){
         $success = false;
         $export_path = $sql_tables_export_dir.$table_name.'.sql';
         ob_echo_nobreak('- exporting CREATE table def to '.clean_path($export_path).' ... ');
-        $table_def_sql = mmrpg_get_create_table_sql($table_name, $table_settings);
+        $table_def_sql = mmrpg_get_create_table_sql($table_name, $table_settings, true);
         if (!empty($table_def_sql)){
             $f = fopen($export_path, 'w');
             fwrite($f, $table_def_sql);
@@ -138,7 +138,7 @@ foreach ($sql_table_index AS $table_name => $table_settings){
         $export_path = $sql_data_export_dir.$table_name.'.sql';
         $is_filtered = !empty($table_settings['export_filter']) ? true : false;
         ob_echo_nobreak('- exporting '.($is_filtered ? 'FILTERED' : 'FULL').' table data to '.clean_path($export_path).' ... ');
-        $table_rows_sql = mmrpg_get_insert_table_data_sql($table_name, $table_settings);
+        $table_rows_sql = mmrpg_get_insert_table_data_sql($table_name, $table_settings, true);
         if (!empty($table_rows_sql)){
             $f = fopen($export_path, 'w');
             fwrite($f, $table_rows_sql);
