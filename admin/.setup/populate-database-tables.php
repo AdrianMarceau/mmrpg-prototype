@@ -115,10 +115,13 @@ if ($allow_import_json){
 
     // Pre-collect a list of contributors so we can match usernames to IDs later
     $contributor_fields = rpg_user::get_contributor_index_fields(true);
-    $contributor_index = $db->get_array_list("SELECT {$temp_contributor_fields} FROM mmrpg_users_contributors ORDER BY user_id ASC;", 'user_id');
+    $contributor_index = $db->get_array_list("SELECT {$contributor_fields} FROM mmrpg_users_contributors ORDER BY contributor_id ASC;", 'contributor_id');
     $contributor_usernames_to_ids = array();
     foreach ($contributor_index AS $key => $data){ $contributor_usernames_to_ids[$data['user_name_clean']] = $data['contributor_id']; }
     $contributor_field_pattern = '/^([a-z0-9]+)_image_editor([0-9]+)?$/i';
+    ob_echo('The following contributor usernames-to-IDs will be used:');
+    foreach ($contributor_usernames_to_ids AS $username => $id){ ob_echo($username.' => '.$id); }
+    ob_echo('');
 
     // Loop through the content types one-by-one to check for JSON files
     foreach ($content_types_index AS $content_key => $content_info){
