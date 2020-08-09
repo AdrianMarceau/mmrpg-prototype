@@ -96,10 +96,6 @@ Update references to the "_ext/" directory to point to new ".libs/" directory
 -  Update refs to _ext/codemirror/ [DONE]
 -  Update refs to _ext/colorbox/ [DONE]
 
-Implement the new "minify" library to compress
--  All styles
--  All scripts
-
 Update the admin panel with code editor for relevant object types
 -  players [DONE]
 -  robots [DONE]
@@ -130,12 +126,28 @@ Update website/game to use different favicons for different environments
 -  live [DONE]
 
 Update the admin panel to deal with git functions add/stage/commit for content directories
+and distinguish between LOCAL/DEV/STAGE/PROD servers w/ different push/pull functions
+-  Add revert and publish functionality for rogue stars on local/dev
+-  Add revert and publish functionality for event challenges on local/dev
+-  Add revert and publish functionality for rpg players on local/dev [DONE]
+-  Add revert and publish functionality for rpg robots on local/dev [DONE]
+-  Add revert and publish functionality for rpg fields on local/dev [DONE]
+-  Add revert and publish functionality for web pages on local/dev
+-  Add pull functionality for users on local/dev/stage
+-  Add pull functionality for user_challenges on local/dev/stage
+-  Add pull functionality for rogue stars on stage/prod
+-  Add pull functionality for event challenges on stage/prod
+-  Add pull functionality for rpg players on stage/prod
+-  Add pull functionality for rpg robots on stage/prod
+-  Add pull functionality for rpg fields on stage/prod
+-  Add pull functionality for web pages on stage/prod
 -  ?????
 
-Update the admin panel to distinguish between DEV and LIVE servers w/ different push/pull functions
--  ?????
+Implement the new "minify" library to compress CSS and JS markup
+-  Minify all styles
+-  Minify all scripts
 
-Update the admin panel with editors for the final object types
+Update the admin panel with editors for the final object types (include all new functionality from above)
 -  abilities
 -  items
 
