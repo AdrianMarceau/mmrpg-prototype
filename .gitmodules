@@ -1,6 +1,3 @@
-[submodule ".libs/codemirror"]
-	path = .libs/codemirror
-	url = https://github.com/codemirror/CodeMirror.git
 [submodule ".libs/colorbox"]
 	path = .libs/colorbox
 	url = https://github.com/jackmoore/colorbox.git
