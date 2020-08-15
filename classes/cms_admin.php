@@ -408,15 +408,17 @@ class cms_admin {
     /* -- Git Functions for Admin Home -- */
 
     // Define a function for checking if a given home page option has uncommitted changes or unpulled updates
-    public static function get_admin_home_group_option_status($repo_config, &$git_changes, &$git_updates, &$all_status_tokens){
+    public static function get_admin_home_group_option_status($repo_config, &$git_changes, &$git_updates, &$all_status_tokens, $filter_unique = false){
         if (empty($repo_config['path'])){ return false; }
         $all_status_tokens = array();
         // Check to see if there are changes, filter if necessary, and return if uncommitted
         $git_changes = cms_admin::git_get_changes($repo_config['path']);
         if (!empty($git_changes) && !empty($repo_config['filter'])){ $git_changes = self::git_filter_list_by_data($git_changes, $repo_config['filter']); }
+        if ($filter_unique){ $unique = array(); foreach ($git_changes AS $k => $p){ list($t) = explode('/', $p); if (!in_array($t, $unique)){ $unique[] = $t; }  } $git_changes = $unique; }
         // Check to see if there are any updates, filter if necessary, and return if unpulled
         $git_updates = cms_admin::git_get_updates($repo_config['path']);
         if (!empty($git_updates) && !empty($repo_config['filter'])){ $git_updates = self::git_filter_list_by_data($git_updates, $repo_config['filter']); }
+        if ($filter_unique){ $unique = array(); foreach ($git_updates AS $k => $p){ list($t) = explode('/', $p); if (!in_array($t, $unique)){ $unique[] = $t; }  } $git_updates = $unique; }
         // Return the appropriate states with changes taking priority
         if (!empty($git_changes)){ $all_status_tokens[] = 'uncommitted_changes'; }
         if (!empty($git_updates)){ $all_status_tokens[] = 'unpulled_updates'; }

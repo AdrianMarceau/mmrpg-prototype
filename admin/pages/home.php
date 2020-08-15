@@ -553,6 +553,116 @@
         $this_group_options = array();
 
         // Populate the group options array with relevant pages and buttons
+        if ((MMRPG_CONFIG_SERVER_ENV === 'local'
+                || MMRPG_CONFIG_SERVER_ENV === 'dev')
+            && (in_array('*', $this_adminaccess)
+                || in_array('publish-to-github', $this_adminaccess))){
+            $option_buttons = array();
+
+            // Check for PLAYER updates to be published
+            if (in_array('*', $this_adminaccess)
+                || in_array('edit-players', $this_adminaccess)){
+                // Collect git details for the players repo to see if button necessary
+                cms_admin::get_admin_home_group_option_status(array(
+                    'name' => 'players',
+                    'data' => array('prefix' => 'player'),
+                    'path' => MMRPG_CONFIG_PLAYERS_CONTENT_PATH
+                    ), $player_git_changes, $player_git_updates, $player_status_tokens, true);
+                // If there are player changes to publish, add the appropriate button
+                if (!empty($player_git_changes)){
+                    $option_buttons[] = array(
+                        'text' => 'Publish Players',
+                        'disabled' => !empty($player_git_updates) ? true : false,
+                        'attributes' => empty($player_git_updates)
+                            ? array(
+                                'data-button' => 'git',
+                                'data-action' => 'publish',
+                                'data-kind' => 'players',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            : array(
+                                'disabled' => 'disabled',
+                                'title' => 'Updates must be pulled first!'
+                                )
+                        );
+                }
+            }
+
+            // Check for ROBOT/MECHA/BOSS updates to be published
+            if (in_array('*', $this_adminaccess)
+                || in_array('edit-robots', $this_adminaccess)
+                || in_array('edit-robot-master', $this_adminaccess)
+                || in_array('edit-support-mechas', $this_adminaccess)
+                || in_array('edit-fortress-bosses', $this_adminaccess)){
+                // Collect git details for the robots repo to see if button necessary
+                cms_admin::get_admin_home_group_option_status(array(
+                    'name' => 'robots',
+                    'data' => array('prefix' => 'robot'),
+                    'path' => MMRPG_CONFIG_ROBOTS_CONTENT_PATH
+                    ), $robot_git_changes, $robot_git_updates, $robot_status_tokens, true);
+                // If there are robot changes to publish, add the appropriate button
+                if (!empty($robot_git_changes)){
+                    $option_buttons[] = array(
+                        'text' => 'Publish Robots',
+                        'disabled' => !empty($robot_git_updates) ? true : false,
+                        'attributes' => empty($robot_git_updates)
+                            ? array(
+                                'data-button' => 'git',
+                                'data-action' => 'publish',
+                                'data-kind' => 'robots',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            : array(
+                                'disabled' => 'disabled',
+                                'title' => 'Updates must be pulled first!'
+                                )
+                        );
+                }
+            }
+
+            // Check for FIELD updates to be published
+            if (in_array('*', $this_adminaccess)
+                || in_array('edit-fields', $this_adminaccess)){
+                // Collect git details for the fields repo to see if button necessary
+                cms_admin::get_admin_home_group_option_status(array(
+                    'name' => 'fields',
+                    'data' => array('prefix' => 'field'),
+                    'path' => MMRPG_CONFIG_FIELDS_CONTENT_PATH
+                    ), $field_git_changes, $field_git_updates, $field_status_tokens, true);
+                // If there are field changes to publish, add the appropriate button
+                if (!empty($field_git_changes)){
+                    $option_buttons[] = array(
+                        'text' => 'Publish Fields',
+                        'disabled' => !empty($field_git_updates) ? true : false,
+                        'attributes' => empty($field_git_updates)
+                            ? array(
+                                'data-button' => 'git',
+                                'data-action' => 'publish',
+                                'data-kind' => 'fields',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            : array(
+                                'disabled' => 'disabled',
+                                'title' => 'Updates must be pulled first!'
+                                )
+                        );
+                }
+            }
+
+            // Add the publish option with any relevant buttons
+            $this_option = array(
+                'link' => array('text' => 'Publish to GitHub'),
+                'desc' => 'publish committed changes to applicable github repos',
+                'buttons' => $option_buttons
+                );
+            $this_group_options[] = $this_option;
+
+        }
+
+        // Populate the group options array with relevant pages and buttons
         if (in_array('*', $this_adminaccess)
             || in_array('delete-cached-files', $this_adminaccess)){
             $this_option = array(
