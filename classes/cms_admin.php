@@ -175,22 +175,38 @@ class cms_admin {
             $repo_status_icon = '';
             if (!empty($option_info['repo'])){
                 $repo_config = $option_info['repo'];
-                $repo_status = self::get_admin_home_group_option_status($repo_config, $git_changes);
+                $repo_status = self::get_admin_home_group_option_status($repo_config, $git_changes, $git_updates, $all_status_tokens);
                 if (!empty($repo_status)){
-                    $unique_changes = array();
-                    foreach ($git_changes AS $k => $p){ list($t) = explode('/', $p); if (!in_array($t, $unique_changes)){ $unique_changes[] = $t; }  }
-                    $unique_changes_count = count($unique_changes);
-                    $class = 'status has_'.$repo_status;
-                    $title = $unique_changes_count.' '.ucwords(str_replace('_', ' ', $repo_status));
-                    $count = '<span class="count">('.$unique_changes_count.')</span>';
-                    if ($repo_status === 'uncommitted_changes'){ $icon = '<i class="icon fa fa-asterisk"></i>'; }
-                    elseif ($repo_status === 'committed_changes'){ $icon = '<i class="icon fa fa-check"></i>'; }
-                    else { $icon = '<i class="icon fa fa-question"></i>'; }
-                    if (!empty($option_info['link']['url'])){
-                        $href = $option_info['link']['url'].'?subaction=search&'.$repo_config['data']['prefix'].'_flag_changed=1';
-                        $repo_status_icon .= '<a class="'.$class.'" href="'.$href.'" title="'.$title.'">'.$icon.' '.$count.'</a>';
-                    } else {
-                        $repo_status_icon .= '<span class="'.$class.'" title="'.$title.'">'.$icon.' '.$count.'</span>';
+                    if (!empty($git_changes)){
+                        $unique_changes = array();
+                        foreach ($git_changes AS $k => $p){ list($t) = explode('/', $p); if (!in_array($t, $unique_changes)){ $unique_changes[] = $t; }  }
+                        $unique_changes_count = count($unique_changes);
+                        if (in_array('uncommitted_changes', $all_status_tokens)){ $status = 'uncommitted_changes'; $icon = 'asterisk'; }
+                        elseif (in_array('committed_changes', $all_status_tokens)){ $status = 'committed_changes'; $icon = 'check'; }
+                        else { $status = $repo_status; $icon = 'question'; }
+                        $title = $unique_changes_count.' '.ucwords(str_replace('_', ' ', $status));
+                        $count = '<span class="count">('.$unique_changes_count.')</span>';
+                        if (!empty($option_info['link']['url'])){
+                            $href = $option_info['link']['url'].'?subaction=search&'.$repo_config['data']['prefix'].'_flag_changed=1';
+                            $repo_status_icon .= '<a class="status has_'.$status.'" href="'.$href.'" title="'.$title.'"><i class="icon fa fa-'.$icon.'"></i> '.$count.'</a>';
+                        } else {
+                            $repo_status_icon .= '<span class="status has_'.$status.'" title="'.$title.'"><i class="icon fa fa-'.$icon.'"></i> '.$count.'</span>';
+                        }
+                    }
+                    if (!empty($git_updates)){
+                        $unique_updates = array();
+                        foreach ($git_updates AS $k => $p){ list($t) = explode('/', $p); if (!in_array($t, $unique_updates)){ $unique_updates[] = $t; }  }
+                        $unique_updates_count = count($unique_updates);
+                        if (in_array('unpulled_updates', $all_status_tokens)){ $status = 'unpulled_updates'; $icon = 'sync'; }
+                        else { $status = $repo_status; $icon = 'question'; }
+                        $title = $unique_updates_count.' '.ucwords(str_replace('_', ' ', $repo_status));
+                        $count = '<span class="count">('.$unique_updates_count.')</span>';
+                        if (!empty($option_info['link']['url'])){
+                            $href = $option_info['link']['url'].'?subaction=search&'.$repo_config['data']['prefix'].'_flag_updated=1';
+                            $repo_status_icon .= '<a class="status has_'.$status.'" href="'.$href.'" title="'.$title.'"><i class="icon fa fa-'.$icon.'"></i> '.$count.'</a>';
+                        } else {
+                            $repo_status_icon .= '<span class="status has_'.$status.'" title="'.$title.'"><i class="icon fa fa-'.$icon.'"></i> '.$count.'</span>';
+                        }
                     }
                 }
             }
@@ -239,54 +255,6 @@ class cms_admin {
 
     }
 
-    // Define a function for checking if a given home page option has uncommit (unstage or untracked) changes
-    public static function get_admin_home_group_option_status($repo_config, &$git_changes){
-        if (empty($repo_config['path'])){ return false; }
-        $git_changes = cms_admin::git_get_changes($repo_config['path']);
-        if (!empty($repo_config['filter'])){ $git_changes = self::git_filter_list_by_data($git_changes, $repo_config['filter']); }
-        if (!empty($git_changes)){ return 'uncommitted_changes'; }
-        else { return ''; }
-    }
-
-    // Define a function for printing git change buttons and list status in an object editor form
-    public static function print_object_editor_git_footer_buttons($repo_kind, $path_token, $mmrpg_git_changes, $mmrpg_git_changes_tokens = array()){
-
-        // Compensate if individual tokens were not provided
-        if (empty($mmrpg_git_changes_tokens)){
-            $mmrpg_git_changes_tokens = array();
-            foreach ($mmrpg_git_changes AS $key => $path){ list($token) = explode('/', $path); $mmrpg_git_changes_tokens[] = $token; }
-            $mmrpg_git_changes_tokens = array_unique($mmrpg_git_changes_tokens);
-        }
-
-        // Break apart the repo kind/subkind if applicable
-        if (strstr($repo_kind, '/')){ list($repo_kind, $repo_subkind) = explode('/', $repo_kind); }
-        else { $repo_subkind = ''; }
-
-        // Generate a list of print-friendly items showing the changes
-        $print_changes = $mmrpg_git_changes;
-        $print_changes = array_filter($print_changes, function($path) use($path_token){ list($token) = explode('/', $path); return $token === $path_token ? true : false; });
-        $print_changes = array_map(function($path) use($path_token){ return str_replace($path_token.'/', '', $path); }, $print_changes);
-
-        // Generate button markup if applicable to this object
-        ob_start();
-        if (in_array($path_token, $mmrpg_git_changes_tokens)){
-            ?>
-            <div class="buttons git-buttons" data-kind="<?= $repo_kind ?>" data-subkind="<?= $repo_subkind ?>" data-token="<?= $path_token ?>" data-source="github">
-                <a class="button revert" data-action="revert" type="button">Revert Changes</a>
-                <a class="button publish" data-action="publish" type="button">Commit &amp; Publish Changes</a>
-                <div class="field git-changes">
-                    <strong>Uncommitted Changes</strong>
-                    <ul><li><?= implode('</li><li>', $print_changes) ?></li></ul>
-                </div>
-            </div>
-            <?
-        }
-        $temp_markup = ob_get_clean();
-
-        // Return the generate markup
-        return $temp_markup;
-    }
-
 
     /* -- Git Functions -- */
 
@@ -305,6 +273,22 @@ class cms_admin {
         if (!empty($filter_path)){ $changes = self::git_filter_list_by_path($changes, $filter_path); }
         if (!empty($filter_data)){ $changes = self::git_filter_data($changes, $filter_data); }
         return array_values($changes);
+    }
+
+    // Define a function for checking if there are any remotely updated files in a given repo (w/ optional path filter)
+    public static function git_get_updates($repo_base_path, $filter_path = '', $filter_data = array()){
+        static $index;
+        if (!is_array($index)){ $index = array(); }
+        if (!isset($index[$repo_base_path])){
+            $unpulled = self::git_get_unpulled($repo_base_path);
+            $updates = $unpulled; //array_merge($unpulled, $foobar);
+            $index[$repo_base_path] = $updates;
+        } else {
+            $updates = $index[$repo_base_path];
+        }
+        if (!empty($filter_path)){ $updates = self::git_filter_list_by_path($updates, $filter_path); }
+        if (!empty($filter_data)){ $updates = self::git_filter_data($updates, $filter_data); }
+        return array_values($updates);
     }
 
     // Define a function for checking if there are any unstaged files in a given repo (w/ optional path filter)
@@ -356,6 +340,25 @@ class cms_admin {
         return array_values($committed);
     }
 
+    // Define a function for checking if there are any updated but unpulled files in a given repo (w/ optional path filter)
+    public static function git_get_unpulled($repo_base_path, $filter_path = ''){
+        static $index;
+        if (!is_array($index)){ $index = array(); }
+        if (!isset($index[$repo_base_path])){
+            $remote_update = shell_exec('cd '.$repo_base_path.' && git remote update');
+            //echo('$remote_update = '.print_r($remote_update, true).PHP_EOL);
+            $unpulled = shell_exec('cd '.$repo_base_path.' && git diff --name-only master origin/master');
+            //echo('$unpulled = '.print_r($unpulled, true).PHP_EOL);
+            $unpulled = !empty($unpulled) ? explode("\n", trim($unpulled)) : array();
+            foreach ($unpulled AS $key => $path){ if (strstr($path, ' ')){ unset($unpulled[$key]); } }
+            $index[$repo_base_path] = $unpulled;
+        } else {
+            $unpulled = $index[$repo_base_path];
+        }
+        if (!empty($filter_path)){ $unpulled = self::git_filter_list_by_path($unpulled, $filter_path); }
+        return array_values($unpulled);
+    }
+
     // Define a quick function for filtering a given list of git changes by base path
     public static function git_filter_list_by_path($list, $filter_path){
         if (empty($list)){ return array(); }
@@ -399,6 +402,201 @@ class cms_admin {
         //echo('<pre>$list = '.print_r($list, true).'</pre>'.PHP_EOL);
         //exit();
         return array_values($list);
+    }
+
+
+    /* -- Git Functions for Admin Home -- */
+
+    // Define a function for checking if a given home page option has uncommitted changes or unpulled updates
+    public static function get_admin_home_group_option_status($repo_config, &$git_changes, &$git_updates, &$all_status_tokens){
+        if (empty($repo_config['path'])){ return false; }
+        $all_status_tokens = array();
+        // Check to see if there are changes, filter if necessary, and return if uncommitted
+        $git_changes = cms_admin::git_get_changes($repo_config['path']);
+        if (!empty($git_changes) && !empty($repo_config['filter'])){ $git_changes = self::git_filter_list_by_data($git_changes, $repo_config['filter']); }
+        // Check to see if there are any updates, filter if necessary, and return if unpulled
+        $git_updates = cms_admin::git_get_updates($repo_config['path']);
+        if (!empty($git_updates) && !empty($repo_config['filter'])){ $git_updates = self::git_filter_list_by_data($git_updates, $repo_config['filter']); }
+        // Return the appropriate states with changes taking priority
+        if (!empty($git_changes)){ $all_status_tokens[] = 'uncommitted_changes'; }
+        if (!empty($git_updates)){ $all_status_tokens[] = 'unpulled_updates'; }
+        if (!empty($all_status_tokens)){ return $all_status_tokens[0]; }
+        // Otherwise no special status so we can return nothing
+        return '';
+    }
+
+
+    /* -- Git Functions for Admin Object Indexes -- */
+
+    // Define a function for appending git-related status flags to a given object index flag list
+    public static function object_index_flag_names_append_git_statuses(&$flag_names){
+        $flag_names[] = array('break' => true);
+        $flag_names['changed'] = array('icon' => 'fas fa-asterisk', 'yes' => 'Uncommitted Changes', 'no' => 'No Uncommitted Changes');
+        $flag_names['updated'] = array('icon' => 'fas fa-sync', 'yes' => 'Unpulled Updates', 'no' => 'No Unpulled Changes');
+    }
+
+    // Define a function for appending git-related status icons to a given object index link
+    public static function object_index_links_append_git_statues(&$object_link, $object_token, $git_file_arrays){
+        extract($git_file_arrays);
+        if (in_array($object_token, $mmrpg_git_changes_tokens)){
+            $object_link .= ' <span class="status has_uncommitted_changes" title="Uncommitted Changes"><i class="icon fa fa-asterisk"></i></span>';
+        }
+        if (in_array($object_token, $mmrpg_git_updates_tokens)){
+            $object_link .= ' <span class="status has_unpulled_updates" title="Unpulled Updates"><i class="icon fa fa-sync"></i></span>';
+        }
+    }
+
+    // Define a function for appending git-related status flags to a given object index's search data
+    public static function object_index_search_data_append_git_statuses(&$search_data, $object_kind){
+        $search_data[$object_kind.'_flag_changed'] = isset($_GET[$object_kind.'_flag_changed']) && $_GET[$object_kind.'_flag_changed'] !== '' ? (!empty($_GET[$object_kind.'_flag_changed']) ? 1 : 0) : '';
+        $search_data[$object_kind.'_flag_updated'] = isset($_GET[$object_kind.'_flag_updated']) && $_GET[$object_kind.'_flag_updated'] !== '' ? (!empty($_GET[$object_kind.'_flag_updated']) ? 1 : 0) : '';
+    }
+
+    // Define a function for filtering git-related status flags from a given object index's search result data
+    public static function object_index_search_results_filter_git_statuses(&$search_results, &$search_results_count, $search_data, $object_kind){
+        // If the git changed flag was defined
+        if (!empty($search_results) && $search_data[$object_kind.'_flag_changed'] !== ''){
+            foreach ($search_results AS $key => $data){
+                if ($search_data[$object_kind.'_flag_changed'] && !in_array($data[$object_kind.'_token'], $mmrpg_git_changes_tokens)){ unset($search_results[$key]); }
+                elseif (!$search_data[$object_kind.'_flag_changed'] && in_array($data[$object_kind.'_token'], $mmrpg_git_changes_tokens)){ unset($search_results[$key]); }
+            }
+            $search_results = array_values($search_results);
+            $search_results_count = count($search_results);
+        }
+        // If the git updated flag was defined
+        if (!empty($search_results) && $search_data[$object_kind.'_flag_updated'] !== ''){
+            foreach ($search_results AS $key => $data){
+                if ($search_data[$object_kind.'_flag_updated'] && !in_array($data[$object_kind.'_token'], $mmrpg_git_updates_tokens)){ unset($search_results[$key]); }
+                elseif (!$search_data[$object_kind.'_flag_updated'] && in_array($data[$object_kind.'_token'], $mmrpg_git_updates_tokens)){ unset($search_results[$key]); }
+            }
+            $search_results = array_values($search_results);
+            $search_results_count = count($search_results);
+        }
+    }
+
+
+    /* -- Git Functions for Admin Object Editors -- */
+
+    // Define a function for echoing git-related status flags in the header of a given object editor
+    public static function object_editor_header_echo_git_statues($object_token, $git_file_arrays){
+        extract($git_file_arrays);
+        // If the player has been changed according to git, show an asterisk
+        if (in_array($object_token, $mmrpg_git_changes_tokens)){
+            echo ' <span class="status has_uncommitted_changes" title="Uncommitted Changes"><i class="fas fa-asterisk"></i></span>'.PHP_EOL;
+        }
+        // If the player has been updated according to git, show a sync icon
+        if (in_array($object_token, $mmrpg_git_updates_tokens)){
+            echo ' <span class="status has_unpulled_updates" title="Unpulled Updates"><i class="fas fa-sync"></i></span>'.PHP_EOL;
+        }
+    }
+
+    // Define a function for printing git change buttons and list status in an object editor form
+    public static function object_editor_print_git_footer_buttons($repo_kind, $path_token, $git_file_arrays = array()){
+
+        // Break apart the repo kind/subkind if applicable
+        if (strstr($repo_kind, '/')){ list($repo_kind, $repo_subkind) = explode('/', $repo_kind); }
+        else { $repo_subkind = ''; }
+
+        // Collect variables from the git data array
+        $mmrpg_git_changes = isset($git_file_arrays['mmrpg_git_changes']) ? $git_file_arrays['mmrpg_git_changes'] : array();
+        $mmrpg_git_changes_tokens = isset($git_file_arrays['mmrpg_git_changes_tokens']) ? $git_file_arrays['mmrpg_git_changes_tokens'] : array();
+        $mmrpg_git_updates = isset($git_file_arrays['mmrpg_git_updates']) ? $git_file_arrays['mmrpg_git_updates'] : array();
+        $mmrpg_git_updates_tokens = isset($git_file_arrays['mmrpg_git_updates_tokens']) ? $git_file_arrays['mmrpg_git_updates_tokens'] : array();
+
+        // If there were any git changes
+        if (!empty($mmrpg_git_changes)){
+            // Compensate if individual tokens were not provided
+            if (!empty($mmrpg_git_changes) && empty($mmrpg_git_changes_tokens)){
+                $mmrpg_git_changes_tokens = array();
+                foreach ($mmrpg_git_changes AS $key => $path){ list($token) = explode('/', $path); $mmrpg_git_changes_tokens[] = $token; }
+                $mmrpg_git_changes_tokens = array_unique($mmrpg_git_changes_tokens);
+            }
+            // Generate a list of print-friendly items showing the changes
+            $print_changes = $mmrpg_git_changes;
+            $print_changes = array_filter($print_changes, function($path) use($path_token){ list($token) = explode('/', $path); return $token === $path_token ? true : false; });
+            $print_changes = array_map(function($path) use($path_token){ return str_replace($path_token.'/', '', $path); }, $print_changes);
+        }
+
+        // If there were any git updates
+        if (!empty($mmrpg_git_updates)){
+            // Compensate if individual tokens were not provided
+            if (!empty($mmrpg_git_updates) && empty($mmrpg_git_updates_tokens)){
+                $mmrpg_git_updates_tokens = array();
+                foreach ($mmrpg_git_updates AS $key => $path){ list($token) = explode('/', $path); $mmrpg_git_updates_tokens[] = $token; }
+                $mmrpg_git_updates_tokens = array_unique($mmrpg_git_updates_tokens);
+            }
+            // Generate a list of print-friendly items showing the updates
+            $print_updates = $mmrpg_git_updates;
+            $print_updates = array_filter($print_updates, function($path) use($path_token){ list($token) = explode('/', $path); return $token === $path_token ? true : false; });
+            $print_updates = array_map(function($path) use($path_token){ return str_replace($path_token.'/', '', $path); }, $print_updates);
+        }
+
+        // Generate button markup if applicable to this object
+        ob_start();
+        $has_changes = !empty($mmrpg_git_changes) && in_array($path_token, $mmrpg_git_changes_tokens);
+        $has_updates = !empty($mmrpg_git_updates) && in_array($path_token, $mmrpg_git_updates_tokens);
+        if ($has_changes || $has_updates){
+            ?>
+            <div class="buttons git-buttons" data-kind="<?= $repo_kind ?>" data-subkind="<?= $repo_subkind ?>" data-token="<?= $path_token ?>" data-source="github">
+                <? if (!empty($has_changes)){ ?>
+                    <a class="button revert" data-action="revert" type="button">Revert Changes</a>
+                    <a class="button publish" data-action="publish" type="button">Commit &amp; Publish Changes</a>
+                <? } ?>
+                <? if (!empty($has_updates)){ ?>
+                    <? if (empty($has_changes)){ ?>
+                        <a class="button update" data-action="update" type="button">Pull Updates</a>
+                    <? } else { ?>
+                        <a class="button update disabled" type="button">Pull Updates</a>
+                    <? } ?>
+                <? } ?>
+                <? if (!empty($has_changes)){ ?>
+                    <div class="field git-list git-changes">
+                        <div class="title"><i class="fas fa fa-asterisk"></i> <strong>Uncommitted Changes</strong></div>
+                        <ul><li><?= implode('</li><li>', $print_changes) ?></li></ul>
+                    </div>
+                <? } ?>
+                <? if (!empty($has_updates)){ ?>
+                    <div class="field git-list git-updates">
+                        <div class="title"><i class="fas fa fa-sync"></i> <strong>Unpulled Updates</strong></div>
+                        <ul><li><?= implode('</li><li>', $print_updates) ?></li></ul>
+                    </div>
+                <? } ?>
+            </div>
+            <?
+        }
+        $temp_markup = ob_get_clean();
+
+        // Return the generate markup
+        return $temp_markup;
+    }
+
+    // Define a function for collecting a list of changes and updates for a given git repo
+    public static function object_editor_get_git_file_arrays($repo_path, $repo_filters = array()){
+
+        // Collect an index of changes files via git
+        $mmrpg_git_changes = cms_admin::git_get_changes($repo_path);
+        if (!empty($repo_filters)){ $mmrpg_git_changes = cms_admin::git_filter_list_by_data($mmrpg_git_changes, $repo_filters); }
+        // Now collect relevant player tokens from the list for matching
+        $mmrpg_git_changes_tokens = array();
+        foreach ($mmrpg_git_changes AS $key => $path){ list($token) = explode('/', $path); $mmrpg_git_changes_tokens[] = $token; }
+        $mmrpg_git_changes_tokens = array_unique($mmrpg_git_changes_tokens);
+
+        // Collect an index of updates files via git
+        $mmrpg_git_updates = cms_admin::git_get_updates($repo_path);
+        if (!empty($repo_filters)){ $mmrpg_git_updates = cms_admin::git_filter_list_by_data($mmrpg_git_updates, $repo_filters); }
+        // Now collect relevant player tokens from the list for matching
+        $mmrpg_git_updates_tokens = array();
+        foreach ($mmrpg_git_updates AS $key => $path){ list($token) = explode('/', $path); $mmrpg_git_updates_tokens[] = $token; }
+        $mmrpg_git_updates_tokens = array_unique($mmrpg_git_updates_tokens);
+
+        // Return the git path array to be exploded in the file
+        return array(
+            'mmrpg_git_changes' => $mmrpg_git_changes,
+            'mmrpg_git_changes_tokens' => $mmrpg_git_changes_tokens,
+            'mmrpg_git_updates' => $mmrpg_git_updates,
+            'mmrpg_git_updates_tokens' => $mmrpg_git_updates_tokens
+            );
+
     }
 
 

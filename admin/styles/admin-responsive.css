@@ -92,6 +92,27 @@ body:before {
         width: calc(100% - 20px);
     }
 
+    .adminform .field.has5cols input[type="text"],
+    .adminform .field.has5cols input[type="number"],
+    .adminform .field.has5cols input[type="password"],
+    .adminform .field.has5cols > select,
+    .adminform .field.has5cols > textarea,
+    .adminform .field.has5cols .subfield {
+      width: 32%;
+      margin-right: 5px;
+      margin-bottom: 5px;
+      width: calc(33% - 5px);
+    }
+    .adminform .field.has5cols .subfield .type_span.swatch {
+        float: left;
+        clear: none;
+        position: static;
+        margin: 3px 3px 0 0;
+    }
+    .adminform .field.has5cols .subfield .type_span.swatch + select {
+        width: calc(100% - 20px);
+    }
+
 
     .adminform .formfoot .metadata {
         float: none;

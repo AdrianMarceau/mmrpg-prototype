@@ -530,6 +530,7 @@ $(document).ready(function(){
                 var editorConfig = {
                     mode: editorMode, //'htmlmixed',
                     tabSize: 2,
+                    indentWithTabs: false,
                     lineWrapping: true
                     };
                 // custom HTML settings
@@ -554,6 +555,7 @@ $(document).ready(function(){
                 else if (editorMode === 'php'){
                     editorConfig.mode = 'application/x-httpd-php';
                     editorConfig.tabsize = 4;
+                    editorConfig.indentUnit = 4;
                     editorConfig.lineNumbers = true;
                     editorConfig.matchBrackets = true;
                     editorConfig.autoCloseBrackets = true;

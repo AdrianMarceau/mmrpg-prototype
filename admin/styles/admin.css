@@ -237,6 +237,9 @@ a:hover {
 .adminhome .status.has_committed_changes {
     color: green;
 }
+.adminhome .status.has_unpulled_updates {
+    color: #629c62;
+}
 
 .adminhome li > div.link,
 .adminhome li > div.desc,
@@ -274,6 +277,9 @@ a:hover {
     border-radius: 3px;
     transition: color 0.3s, background-color 0.3s;
 }
+.adminhome li > div.link .status + .status {
+    margin-left: 2px;
+}
 .adminhome li > div.link .status .icon {
     font-size: 70%;
 }
@@ -281,11 +287,14 @@ a:hover {
     font-size: 90%;
 }
 
-.adminhome li > div.link .status:hover {
+.adminhome li > div.link a.status:hover {
     color: #ffffff;
 }
 .adminhome li > div.link .status.has_uncommitted_changes:hover {
     background-color: #f58919;
+}
+.adminhome li > div.link .status.has_unpulled_updates:hover {
+    background-color: #629c62;
 }
 
 .adminhome li > div.buttons .button {
@@ -612,6 +621,9 @@ tr:nth-child(odd) td {
 .adminform .status.has_committed_changes {
     color: green;
 }
+.adminform .status.has_unpulled_updates {
+    color: #629c62;
+}
 
 .adminform table thead th.head.count,
 .adminform table tfoot td.foot.count {
@@ -723,12 +735,50 @@ tr:nth-child(odd) td {
     border-radius: 3px;
     background-color: #9e9e9e;
 }
+
+.adminform .search .field.flags {
+    clear: both;
+    float: none;
+    width: 100%;
+}
+.adminform .search .field.flags:before {
+    content: "";
+    display: block;
+    border-top: 1px dotted #dedede;
+    margin: 5px auto 10px;
+}
 .adminform .search .field.flags .subfield {
     margin-bottom: 6px;
+    font-size: 90%;
 }
 .adminform .search .field.flags .subfield .sublabel {
     width: calc(33% - 6px);
 }
+.adminform .search .field.flags .subfield select,
+.adminform .search .field.flags .subfield textarea,
+.adminform .search .field.flags .subfield input[type="text"],
+.adminform .search .field.flags .subfield input[type="number"]
+.adminform .search .field.flags .subfield input[type="password"] {
+    font-size: inherit;
+}
+.adminform .search .field.flags .subfield select + span {
+    bottom: 1px;
+}
+.adminform .search .field.flags .clear,
+.adminform .search .field.flags .break {
+    display: block;
+    clear: both;
+    width: 100%;
+    height: 0;
+}
+.adminform .search .field.flags .break {
+    border-bottom: 1px dotted #dedede;
+    padding-top: 5px;
+    margin: 0 auto 10px;
+}
+
+
+
 .adminform .search .field .subfield .label .fas,
 .adminform .search .field .subfield .sublabel .fas {
     margin-left: 4px;
@@ -1160,6 +1210,11 @@ input[type=file] {
 .adminform .formfoot .git-buttons .button {
     margin: 0 0 0 5px;
 }
+.adminform .formfoot .git-buttons .button.disabled {
+    cursor: not-allowed;
+    text-decoration: line-through;
+    opacity: 0.6;
+}
 .adminform .formfoot .git-buttons .button:after {
     content: "";
     display: inline-block;
@@ -1185,7 +1240,7 @@ input[type=file] {
     margin-left: 8px;
     opacity: 1;
 }
-.adminform .formfoot .git-buttons .git-changes {
+.adminform .formfoot .git-buttons .git-list {
     display: block;
     float: none;
     clear: both;
@@ -1196,30 +1251,36 @@ input[type=file] {
     line-height: 1.2;
     width: auto;
     max-width: 500px;
-
+    min-height: 0;
 }
-.adminform .formfoot .git-buttons .git-changes > strong {
+.adminform .formfoot .git-buttons .git-list > .title {
     display: block;
     text-align: right;
     margin: 0 0 4px auto;
+}
+.adminform .formfoot .git-buttons .git-list > .title i {
+    font-size: 80%;
+    margin-right: 2px;
+}
+.adminform .formfoot .git-buttons .git-list > .title strong {
     text-decoration: underline;
 }
-.adminform .formfoot .git-buttons .git-changes > ul {
+.adminform .formfoot .git-buttons .git-list > ul {
     display: block;
     text-align: right;
     margin: 0 0 0 auto;
     list-style-type: none;
 }
-.adminform .formfoot .git-buttons .git-changes > ul > li {
+.adminform .formfoot .git-buttons .git-list > ul > li {
     display: inline-block;
     margin: 0 0 2px 2px;
     color: #8a8a8a;
 }
-.adminform .formfoot .git-buttons .git-changes > ul > li:after {
+.adminform .formfoot .git-buttons .git-list > ul > li:after {
     content: ",";
     color: #262626;
 }
-.adminform .formfoot .git-buttons .git-changes > ul > li:last-child:after {
+.adminform .formfoot .git-buttons .git-list > ul > li:last-child:after {
     content: "";
 }
 
@@ -1303,6 +1364,28 @@ input[type=file] {
 .adminform .field.has4cols .subfield input[type="text"],
 .adminform .field.has4cols .subfield input[type="number"],
 .adminform .field.has4cols .subfield input[type="password"] {
+    width: 100%;
+    margin-right: 0;
+}
+
+.adminform .field.has5cols input[type="text"],
+.adminform .field.has5cols input[type="number"],
+.adminform .field.has5cols input[type="password"],
+.adminform .field.has5cols > select,
+.adminform .field.has5cols > textarea,
+.adminform .field.has5cols .subfield {
+    width: 19%;
+    margin-right: 5px;
+    width: calc(20% - 5px);
+}
+.adminform .field.has5cols .subfield {
+    float: left;
+}
+.adminform .field.has5cols .subfield select,
+.adminform .field.has5cols .subfield textarea,
+.adminform .field.has5cols .subfield input[type="text"],
+.adminform .field.has5cols .subfield input[type="number"],
+.adminform .field.has5cols .subfield input[type="password"] {
     width: 100%;
     margin-right: 0;
 }
@@ -1492,6 +1575,13 @@ input[type=file] {
     padding-top: 5px;
     clear: both;
 }
+.adminform .search .buttons:before {
+    content: "";
+    display: block;
+    clear: both;
+    border-top: 1px solid #dedede;
+    margin: 0 auto 10px;
+}
 .adminform .search .buttons .button {
     background-color: #4c8aab;
     border-color: #427794;
@@ -1627,12 +1717,21 @@ input[type=file] {
 .adminform .editor .buttons .revert:hover {
     background-color: #f58919;
 }
-.adminform .editor .buttons .publish {
+.adminform .editor .buttons .publish,
+.adminform .editor .buttons .commit {
     background-color: #0b4c84;
     border-color: #073155;
 }
-.adminform .editor .buttons .publish:hover {
+.adminform .editor .buttons .publish:hover,
+.adminform .editor .buttons .commit:hover {
     background-color: #0e599a;
+}
+.adminform .editor .buttons .update {
+    background-color: #835e9a;
+    border-color: #6b4285;
+}
+.adminform .editor .buttons .update:hover {
+    background-color: #9362b2;
 }
 
 .adminform .editor .field input[name="user_omega"] {
