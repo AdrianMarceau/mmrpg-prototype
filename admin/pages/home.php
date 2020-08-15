@@ -146,17 +146,6 @@
                                 'data-token' => 'all',
                                 'data-source' => 'github'
                                 )
-                            ),
-                        array(
-                            'text' => 'Update All',
-                            'condition' => array('status' => 'unpulled_updates'),
-                            'attributes' => array(
-                                'data-button' => 'git',
-                                'data-action' => 'pull',
-                                'data-kind' => 'players',
-                                'data-token' => 'all',
-                                'data-source' => 'github'
-                                )
                             )
                         )
                     );
@@ -197,18 +186,6 @@
                             'attributes' => array(
                                 'data-button' => 'git',
                                 'data-action' => 'publish',
-                                'data-kind' => 'robots',
-                                'data-subkind' => 'masters',
-                                'data-token' => 'all',
-                                'data-source' => 'github'
-                                )
-                            ),
-                        array(
-                            'text' => 'Update All',
-                            'condition' => array('status' => 'unpulled_updates'),
-                            'attributes' => array(
-                                'data-button' => 'git',
-                                'data-action' => 'pull',
                                 'data-kind' => 'robots',
                                 'data-subkind' => 'masters',
                                 'data-token' => 'all',
@@ -259,18 +236,6 @@
                                 'data-token' => 'all',
                                 'data-source' => 'github'
                                 )
-                            ),
-                        array(
-                            'text' => 'Update All',
-                            'condition' => array('status' => 'unpulled_updates'),
-                            'attributes' => array(
-                                'data-button' => 'git',
-                                'data-action' => 'pull',
-                                'data-kind' => 'robots',
-                                'data-subkind' => 'mechas',
-                                'data-token' => 'all',
-                                'data-source' => 'github'
-                                )
                             )
                         )
                     );
@@ -316,18 +281,6 @@
                                 'data-token' => 'all',
                                 'data-source' => 'github'
                                 )
-                            ),
-                        array(
-                            'text' => 'Update All',
-                            'condition' => array('status' => 'unpulled_updates'),
-                            'attributes' => array(
-                                'data-button' => 'git',
-                                'data-action' => 'pull',
-                                'data-kind' => 'robots',
-                                'data-subkind' => 'bosses',
-                                'data-token' => 'all',
-                                'data-source' => 'github'
-                                )
                             )
                         )
                     );
@@ -361,17 +314,6 @@
                             'attributes' => array(
                                 'data-button' => 'git',
                                 'data-action' => 'publish',
-                                'data-kind' => 'fields',
-                                'data-token' => 'all',
-                                'data-source' => 'github'
-                                )
-                            ),
-                        array(
-                            'text' => 'Update All',
-                            'condition' => array('status' => 'unpulled_updates'),
-                            'attributes' => array(
-                                'data-button' => 'git',
-                                'data-action' => 'pull',
                                 'data-kind' => 'fields',
                                 'data-token' => 'all',
                                 'data-source' => 'github'

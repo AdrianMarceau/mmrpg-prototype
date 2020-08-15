@@ -455,7 +455,8 @@ class cms_admin {
     }
 
     // Define a function for filtering git-related status flags from a given object index's search result data
-    public static function object_index_search_results_filter_git_statuses(&$search_results, &$search_results_count, $search_data, $object_kind){
+    public static function object_index_search_results_filter_git_statuses(&$search_results, &$search_results_count, $search_data, $object_kind, $git_file_arrays = array()){
+        extract($git_file_arrays);
         // If the git changed flag was defined
         if (!empty($search_results) && $search_data[$object_kind.'_flag_changed'] !== ''){
             foreach ($search_results AS $key => $data){
@@ -544,13 +545,13 @@ class cms_admin {
                     <a class="button revert" data-action="revert" type="button">Revert Changes</a>
                     <a class="button publish" data-action="publish" type="button">Commit &amp; Publish Changes</a>
                 <? } ?>
-                <? if (!empty($has_updates)){ ?>
+                <? /* if (!empty($has_updates)){ ?>
                     <? if (empty($has_changes)){ ?>
                         <a class="button update" data-action="update" type="button">Pull Updates</a>
                     <? } else { ?>
                         <a class="button update disabled" type="button">Pull Updates</a>
                     <? } ?>
-                <? } ?>
+                <? } */ ?>
                 <? if (!empty($has_changes)){ ?>
                     <div class="field git-list git-changes">
                         <div class="title"><i class="fas fa fa-asterisk"></i> <strong>Uncommitted Changes</strong></div>

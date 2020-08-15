@@ -244,7 +244,7 @@
         // Collect search results from the database
         $search_results = $db->get_array_list($search_query);
         $search_results_count = is_array($search_results) ? count($search_results) : 0;
-        cms_admin::object_index_search_results_filter_git_statuses($search_results, $search_results_count, $search_data, 'player');
+        cms_admin::object_index_search_results_filter_git_statuses($search_results, $search_results_count, $search_data, 'player', $mmrpg_git_file_arrays);
 
         // Collect a total number from the database
         $search_results_total = $db->get_value("SELECT COUNT(player_id) AS total FROM mmrpg_index_players WHERE 1=1 AND player_token <> 'player';", 'total');

@@ -1740,11 +1740,11 @@ input[type=file] {
     background-color: #0e599a;
 }
 .adminform .editor .buttons .update {
-    background-color: #835e9a;
-    border-color: #6b4285;
+    background-color: #629c62;
+    border-color: #3b913b;
 }
 .adminform .editor .buttons .update:hover {
-    background-color: #9362b2;
+    background-color: #78a178;
 }
 
 .adminform .editor .field input[name="user_omega"] {
