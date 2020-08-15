@@ -137,11 +137,11 @@
                                 )
                             ),
                         array(
-                            'text' => 'Commit & Publish All',
+                            'text' => 'Commit All',
                             'condition' => array('status' => 'uncommitted_changes'),
                             'attributes' => array(
                                 'data-button' => 'git',
-                                'data-action' => 'publish',
+                                'data-action' => 'commit',
                                 'data-kind' => 'players',
                                 'data-token' => 'all',
                                 'data-source' => 'github'
@@ -181,11 +181,11 @@
                                 )
                             ),
                         array(
-                            'text' => 'Commit & Publish All',
+                            'text' => 'Commit All',
                             'condition' => array('status' => 'uncommitted_changes'),
                             'attributes' => array(
                                 'data-button' => 'git',
-                                'data-action' => 'publish',
+                                'data-action' => 'commit',
                                 'data-kind' => 'robots',
                                 'data-subkind' => 'masters',
                                 'data-token' => 'all',
@@ -226,11 +226,11 @@
                                 )
                             ),
                         array(
-                            'text' => 'Commit & Publish All',
+                            'text' => 'Commit All',
                             'condition' => array('status' => 'uncommitted_changes'),
                             'attributes' => array(
                                 'data-button' => 'git',
-                                'data-action' => 'publish',
+                                'data-action' => 'commit',
                                 'data-kind' => 'robots',
                                 'data-subkind' => 'mechas',
                                 'data-token' => 'all',
@@ -271,11 +271,11 @@
                                 )
                             ),
                         array(
-                            'text' => 'Commit & Publish All',
+                            'text' => 'Commit All',
                             'condition' => array('status' => 'uncommitted_changes'),
                             'attributes' => array(
                                 'data-button' => 'git',
-                                'data-action' => 'publish',
+                                'data-action' => 'commit',
                                 'data-kind' => 'robots',
                                 'data-subkind' => 'bosses',
                                 'data-token' => 'all',
@@ -309,11 +309,11 @@
                                 )
                             ),
                         array(
-                            'text' => 'Commit & Publish All',
+                            'text' => 'Commit All',
                             'condition' => array('status' => 'uncommitted_changes'),
                             'attributes' => array(
                                 'data-button' => 'git',
-                                'data-action' => 'publish',
+                                'data-action' => 'commit',
                                 'data-kind' => 'fields',
                                 'data-token' => 'all',
                                 'data-source' => 'github'

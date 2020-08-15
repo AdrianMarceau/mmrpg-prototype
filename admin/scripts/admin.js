@@ -433,12 +433,16 @@ $(document).ready(function(){
         if ($homeButtons.length){
             var postURLs = {
                 revert: 'admin/scripts/revert-game-content.php',
+                commit: 'admin/scripts/commit-game-content.php',
                 publish: 'admin/scripts/push-game-content.php'
                 };
             var confirmMessages = {
                 revert: 'Are you absolutely sure you want to revert changes to all {object}?\n'
                     + 'This action cannot be undone and all updates will be lost.\n'
                     + 'Continue anyway?',
+                commit: 'Are you absolutely sure you want to commit changes to all {object}?\n'
+                    + 'This action cannot be undone and will be in the history forever.\n'
+                    + 'Continue anyway? ',
                 publish: 'Are you absolutely sure you want to publish changes to all {object}?\n'
                     + 'This action cannot be undone and will be in the history forever.\n'
                     + 'Continue anyway? ',
@@ -487,8 +491,8 @@ $(document).ready(function(){
                                 //console.log('statusLine = ', statusLine);
                                 if (statusLine[0] === 'success'){
                                     var completeFunction = function(){
-                                        //console.log('reload window!');
                                         window.location.href = window.location.href.replace(location.hash,'');
+                                        //alert('Reload the window!');
                                         };
                                     printStatusMessage(statusLine[0], statusLine[1], completeFunction);
                                     } else {
@@ -574,12 +578,16 @@ $(document).ready(function(){
         if ($editorGitButtons.length){
             var postURLs = {
                 revert: 'admin/scripts/revert-game-content.php',
+                commit: 'admin/scripts/commit-game-content.php',
                 publish: 'admin/scripts/push-game-content.php'
                 };
             var confirmMessages = {
                 revert: 'Are you absolutely sure you want to revert the changes to this {object}?\n'
                     + 'This action cannot be undone and any updates will be lost.\n'
                     + 'Continue anyway?',
+                commit: 'Are you absolutely sure you want to commit the changes to this {object}?\n'
+                    + 'This action cannot be undone and will be in the history forever.\n'
+                    + 'Continue anyway? ',
                 publish: 'Are you absolutely sure you want to publish the changes to this {object}?\n'
                     + 'This action cannot be undone and will be in the history forever.\n'
                     + 'Continue anyway? '
@@ -616,6 +624,7 @@ $(document).ready(function(){
                             if (statusLine[0] === 'success'){
                                 var completeFunction = function(){
                                     window.location.href = window.location.href.replace(location.hash,'');
+                                    //alert('Reload the window!');
                                     };
                                 printStatusMessage(statusLine[0], statusLine[1], completeFunction);
                                 } else {

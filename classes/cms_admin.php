@@ -543,7 +543,7 @@ class cms_admin {
             <div class="buttons git-buttons" data-kind="<?= $repo_kind ?>" data-subkind="<?= $repo_subkind ?>" data-token="<?= $path_token ?>" data-source="github">
                 <? if (!empty($has_changes)){ ?>
                     <a class="button revert" data-action="revert" type="button">Revert Changes</a>
-                    <a class="button publish" data-action="publish" type="button">Commit &amp; Publish Changes</a>
+                    <a class="button commit" data-action="commit" type="button">Commit Changes</a>
                 <? } ?>
                 <? /* if (!empty($has_updates)){ ?>
                     <? if (empty($has_changes)){ ?>
