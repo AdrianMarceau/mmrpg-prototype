@@ -75,6 +75,28 @@
     /* -- (LOCAL/DEV ONLY) -- */
     if (in_array(MMRPG_CONFIG_SERVER_ENV, array('local', 'dev'))){
 
+        /* -- WEBSITE PAGE EDITORS -- */
+        if (true){
+
+            // Define the group name and options array
+            $this_group_name = 'Website Editor';
+            $this_group_options = array();
+
+            // Populate the group options array with relevant pages and buttons
+            if (in_array('*', $this_adminaccess)
+                || in_array('edit-pages', $this_adminaccess)){
+                $this_option = array(
+                    'link' => array('url' => 'admin/edit-pages/', 'text' => 'Edit Website Pages'),
+                    'desc' => 'edit the text and images on various website pages'
+                    );
+                $this_group_options[] = $this_option;
+            }
+
+            // Print out the group title and options, assuming there are any available
+            echo cms_admin::print_admin_home_group_options($this_group_name, $this_group_options);
+
+        }
+
         /* -- GAME CONTENT EDITORS -- */
         if (true){
 
@@ -127,7 +149,7 @@
                     'buttons' => array(
                         array(
                             'text' => 'Revert All',
-                            'condition' => array('status' => 'uncommitted_changes'),
+                            'condition' => array('uncommitted' => true),
                             'attributes' => array(
                                 'data-button' => 'git',
                                 'data-action' => 'revert',
@@ -138,7 +160,7 @@
                             ),
                         array(
                             'text' => 'Commit All',
-                            'condition' => array('status' => 'uncommitted_changes'),
+                            'condition' => array('uncommitted' => true),
                             'attributes' => array(
                                 'data-button' => 'git',
                                 'data-action' => 'commit',
@@ -170,7 +192,7 @@
                     'buttons' => array(
                         array(
                             'text' => 'Revert All',
-                            'condition' => array('status' => 'uncommitted_changes'),
+                            'condition' => array('uncommitted' => true),
                             'attributes' => array(
                                 'data-button' => 'git',
                                 'data-action' => 'revert',
@@ -182,7 +204,7 @@
                             ),
                         array(
                             'text' => 'Commit All',
-                            'condition' => array('status' => 'uncommitted_changes'),
+                            'condition' => array('uncommitted' => true),
                             'attributes' => array(
                                 'data-button' => 'git',
                                 'data-action' => 'commit',
@@ -215,7 +237,7 @@
                     'buttons' => array(
                         array(
                             'text' => 'Revert All',
-                            'condition' => array('status' => 'uncommitted_changes'),
+                            'condition' => array('uncommitted' => true),
                             'attributes' => array(
                                 'data-button' => 'git',
                                 'data-action' => 'revert',
@@ -227,7 +249,7 @@
                             ),
                         array(
                             'text' => 'Commit All',
-                            'condition' => array('status' => 'uncommitted_changes'),
+                            'condition' => array('uncommitted' => true),
                             'attributes' => array(
                                 'data-button' => 'git',
                                 'data-action' => 'commit',
@@ -260,7 +282,7 @@
                     'buttons' => array(
                         array(
                             'text' => 'Revert All',
-                            'condition' => array('status' => 'uncommitted_changes'),
+                            'condition' => array('uncommitted' => true),
                             'attributes' => array(
                                 'data-button' => 'git',
                                 'data-action' => 'revert',
@@ -272,7 +294,7 @@
                             ),
                         array(
                             'text' => 'Commit All',
-                            'condition' => array('status' => 'uncommitted_changes'),
+                            'condition' => array('uncommitted' => true),
                             'attributes' => array(
                                 'data-button' => 'git',
                                 'data-action' => 'commit',
@@ -299,7 +321,7 @@
                     'buttons' => array(
                         array(
                             'text' => 'Revert All',
-                            'condition' => array('status' => 'uncommitted_changes'),
+                            'condition' => array('uncommitted' => true),
                             'attributes' => array(
                                 'data-button' => 'git',
                                 'data-action' => 'revert',
@@ -310,7 +332,7 @@
                             ),
                         array(
                             'text' => 'Commit All',
-                            'condition' => array('status' => 'uncommitted_changes'),
+                            'condition' => array('uncommitted' => true),
                             'attributes' => array(
                                 'data-button' => 'git',
                                 'data-action' => 'commit',
@@ -320,28 +342,6 @@
                                 )
                             )
                         )
-                    );
-                $this_group_options[] = $this_option;
-            }
-
-            // Print out the group title and options, assuming there are any available
-            echo cms_admin::print_admin_home_group_options($this_group_name, $this_group_options);
-
-        }
-
-        /* -- WEBSITE PAGE EDITORS -- */
-        if (true){
-
-            // Define the group name and options array
-            $this_group_name = 'Website Editors';
-            $this_group_options = array();
-
-            // Populate the group options array with relevant pages and buttons
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-pages', $this_adminaccess)){
-                $this_option = array(
-                    'link' => array('url' => 'admin/edit-pages/', 'text' => 'Edit Website Pages'),
-                    'desc' => 'edit the text and images on various website pages'
                     );
                 $this_group_options[] = $this_option;
             }
@@ -487,122 +487,123 @@
 
     }
 
+    /* -- GITHUB TOOLS (LOCAL/DEV/STAGE/PROD) -- */
+    if (true){
+
+        // Define the group name and options array
+        $this_group_name = 'GitHub Tools';
+        $this_group_options = array();
+
+        // Pull in the content types repo so we don't have to redeclare stuff
+        require_once(MMRPG_CONFIG_ROOTDIR.'content/index.php');
+
+        // Populate the group options array with relevant pages and buttons
+        if ((in_array('*', $this_adminaccess) || in_array('pull-from-github', $this_adminaccess))){
+            $option_buttons = array();
+
+            // Loop through the content types index and append permissible buttons
+            foreach ($content_types_index AS $type_key => $type_info){
+                // Check to see if current user allowed to edit this content type
+                if (in_array('*', $this_adminaccess)
+                    || in_array('edit-'.$type_info['xtoken'], $this_adminaccess)){
+                    $repo_base_path = MMRPG_CONFIG_CONTENT_PATH.$type_info['xtoken'].'/';
+                    $git_pull_required = cms_admin::git_pull_required($repo_base_path);
+                    if (!empty($git_pull_required)){
+                        $git_pull_allowed = cms_admin::git_pull_allowed($repo_base_path);
+                        $option_buttons[] = array(
+                            'text' => 'Update '.ucfirst($type_info['xtoken']),
+                            'disabled' => !$git_pull_allowed ? true : false,
+                            'attributes' => $git_pull_allowed
+                                ? array(
+                                    'data-button' => 'git',
+                                    'data-action' => 'pull',
+                                    'data-kind' => $type_info['xtoken'],
+                                    'data-token' => 'all',
+                                    'data-source' => 'github'
+                                    )
+                                : array(
+                                    'disabled' => 'disabled',
+                                    'title' => ucfirst($type_info['token']).' changes must be committed first!'
+                                    )
+                            );
+                    }
+                }
+            }
+
+            // Add the publish option with any relevant buttons
+            $this_option = array(
+                'link' => array('text' => 'Pull from GitHub', 'icon' => 'cloud-download-alt'),
+                'desc' => 'pull committed changes from github repos and update',
+                'buttons' => $option_buttons
+                );
+            $this_group_options[] = $this_option;
+
+        }
+
+        // Populate the group options array with relevant pages and buttons
+        if ((MMRPG_CONFIG_SERVER_ENV === 'local' || MMRPG_CONFIG_SERVER_ENV === 'dev')
+            && (in_array('*', $this_adminaccess) || in_array('publish-to-github', $this_adminaccess))){
+            $option_buttons = array();
+
+            // Loop through the content types index and append permissible buttons
+            foreach ($content_types_index AS $type_key => $type_info){
+                // Check to see if current user allowed to edit this content type
+                if (in_array('*', $this_adminaccess)
+                    || in_array('edit-'.$type_info['xtoken'], $this_adminaccess)){
+                    // Collect git details for the repo to see if button necessary
+                    $repo_base_path = MMRPG_CONFIG_CONTENT_PATH.$type_info['xtoken'].'/';
+                    $committed_changes = cms_admin::git_get_committed_changes($repo_base_path);
+                    // If there are changes to publish, add the appropriate button
+                    if (!empty($committed_changes)){
+                        $uncommitted_changes = cms_admin::git_get_uncommitted_changes($repo_base_path);
+                        $git_pull_required = cms_admin::git_pull_required($repo_base_path);
+                        $button_allowed = empty($uncommitted_changes) && !$git_pull_required ? true : false;
+                        if (!$button_allowed){
+                            if (!empty($uncommitted_changes) && $git_pull_required){ $disabled_message = ucfirst($type_info['token']).' changes must be committed first, then updates must be pulled!'; }
+                            elseif (!empty($uncommitted_changes)){ $disabled_message = ucfirst($type_info['token']).' changes must be committed first!'; }
+                            elseif ($git_pull_required){ $disabled_message = ucfirst($type_info['token']).' updates must be pulled first!'; }
+                        }
+                        $option_buttons[] = array(
+                            'text' => 'Publish '.ucfirst($type_info['xtoken']),
+                            'disabled' => !$button_allowed ? true : false,
+                            'attributes' => $button_allowed
+                                ? array(
+                                    'data-button' => 'git',
+                                    'data-action' => 'publish',
+                                    'data-kind' => $type_info['xtoken'],
+                                    'data-token' => 'all',
+                                    'data-source' => 'github'
+                                    )
+                                : array(
+                                    'disabled' => 'disabled',
+                                    'title' => $disabled_message
+                                    )
+                            );
+                    }
+                }
+            }
+
+            // Add the publish option with any relevant buttons
+            $this_option = array(
+                'link' => array('text' => 'Push to GitHub', 'icon' => 'cloud-upload-alt'),
+                'desc' => 'push committed changes to github repos and publish',
+                'buttons' => $option_buttons
+                );
+            $this_group_options[] = $this_option;
+
+        }
+
+        // Print out the group title and options, assuming there are any available
+        echo cms_admin::print_admin_home_group_options($this_group_name, $this_group_options);
+
+    }
+
     /* -- MISC TOOLS (LOCAL/DEV/STAGE/PROD) -- */
     if (true){
 
         // Define the group name and options array
         $this_group_name = 'Misc Tools';
         $this_group_options = array();
-
-        // Populate the group options array with relevant pages and buttons
-        if ((MMRPG_CONFIG_SERVER_ENV === 'local'
-                || MMRPG_CONFIG_SERVER_ENV === 'dev')
-            && (in_array('*', $this_adminaccess)
-                || in_array('publish-to-github', $this_adminaccess))){
-            $option_buttons = array();
-
-            // Check for PLAYER updates to be published
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-players', $this_adminaccess)){
-                // Collect git details for the players repo to see if button necessary
-                cms_admin::get_admin_home_group_option_status(array(
-                    'name' => 'players',
-                    'data' => array('prefix' => 'player'),
-                    'path' => MMRPG_CONFIG_PLAYERS_CONTENT_PATH
-                    ), $player_git_changes, $player_git_updates, $player_status_tokens, true);
-                // If there are player changes to publish, add the appropriate button
-                if (!empty($player_git_changes)){
-                    $option_buttons[] = array(
-                        'text' => 'Publish Players',
-                        'disabled' => !empty($player_git_updates) ? true : false,
-                        'attributes' => empty($player_git_updates)
-                            ? array(
-                                'data-button' => 'git',
-                                'data-action' => 'publish',
-                                'data-kind' => 'players',
-                                'data-token' => 'all',
-                                'data-source' => 'github'
-                                )
-                            : array(
-                                'disabled' => 'disabled',
-                                'title' => 'Updates must be pulled first!'
-                                )
-                        );
-                }
-            }
-
-            // Check for ROBOT/MECHA/BOSS updates to be published
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-robots', $this_adminaccess)
-                || in_array('edit-robot-master', $this_adminaccess)
-                || in_array('edit-support-mechas', $this_adminaccess)
-                || in_array('edit-fortress-bosses', $this_adminaccess)){
-                // Collect git details for the robots repo to see if button necessary
-                cms_admin::get_admin_home_group_option_status(array(
-                    'name' => 'robots',
-                    'data' => array('prefix' => 'robot'),
-                    'path' => MMRPG_CONFIG_ROBOTS_CONTENT_PATH
-                    ), $robot_git_changes, $robot_git_updates, $robot_status_tokens, true);
-                // If there are robot changes to publish, add the appropriate button
-                if (!empty($robot_git_changes)){
-                    $option_buttons[] = array(
-                        'text' => 'Publish Robots',
-                        'disabled' => !empty($robot_git_updates) ? true : false,
-                        'attributes' => empty($robot_git_updates)
-                            ? array(
-                                'data-button' => 'git',
-                                'data-action' => 'publish',
-                                'data-kind' => 'robots',
-                                'data-token' => 'all',
-                                'data-source' => 'github'
-                                )
-                            : array(
-                                'disabled' => 'disabled',
-                                'title' => 'Updates must be pulled first!'
-                                )
-                        );
-                }
-            }
-
-            // Check for FIELD updates to be published
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-fields', $this_adminaccess)){
-                // Collect git details for the fields repo to see if button necessary
-                cms_admin::get_admin_home_group_option_status(array(
-                    'name' => 'fields',
-                    'data' => array('prefix' => 'field'),
-                    'path' => MMRPG_CONFIG_FIELDS_CONTENT_PATH
-                    ), $field_git_changes, $field_git_updates, $field_status_tokens, true);
-                // If there are field changes to publish, add the appropriate button
-                if (!empty($field_git_changes)){
-                    $option_buttons[] = array(
-                        'text' => 'Publish Fields',
-                        'disabled' => !empty($field_git_updates) ? true : false,
-                        'attributes' => empty($field_git_updates)
-                            ? array(
-                                'data-button' => 'git',
-                                'data-action' => 'publish',
-                                'data-kind' => 'fields',
-                                'data-token' => 'all',
-                                'data-source' => 'github'
-                                )
-                            : array(
-                                'disabled' => 'disabled',
-                                'title' => 'Updates must be pulled first!'
-                                )
-                        );
-                }
-            }
-
-            // Add the publish option with any relevant buttons
-            $this_option = array(
-                'link' => array('text' => 'Publish to GitHub'),
-                'desc' => 'publish committed changes to applicable github repos',
-                'buttons' => $option_buttons
-                );
-            $this_group_options[] = $this_option;
-
-        }
 
         // Populate the group options array with relevant pages and buttons
         if (in_array('*', $this_adminaccess)

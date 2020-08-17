@@ -235,7 +235,7 @@ a:hover {
     color: #f58919;
 }
 .adminhome .status.has_committed_changes {
-    color: green;
+    color: #068906;
 }
 .adminhome .status.has_unpulled_updates {
     color: #629c62;
@@ -263,6 +263,13 @@ a:hover {
     width: auto;
     font-weight: normal;
     text-align: right;
+}
+.adminhome li > div.buttons.gt3 {
+    float: none;
+    width: auto;
+    clear: both;
+    margin: 3px auto 0;
+    text-align: left;
 }
 
 .adminhome li > div.link a {
@@ -295,8 +302,34 @@ a:hover {
 .adminhome li > div.link .status.has_uncommitted_changes:hover {
     background-color: #f58919;
 }
+.adminhome li > div.link .status.has_committed_changes:hover {
+    background-color: #068906;
+}
 .adminhome li > div.link .status.has_unpulled_updates:hover {
     background-color: #629c62;
+}
+
+
+.adminhome li > div.link > .icon {
+    display: inline-block;
+    margin-left: 6px;
+    position: relative;
+    bottom: 1px;
+    text-decoration: none;
+    border: 0 none transparent;
+    font-size: 80%;
+    color: #ababab;
+}
+
+.adminhome li > pre.repo_debug {
+    display: block;
+    clear: both;
+    font-size: 90%;
+    line-height: 1.4;
+    color: #292929;
+    background-color: #fefefe;
+    margin: 5px auto 10px;
+    padding: 10px;
 }
 
 .adminhome li > div.buttons .button {
@@ -352,6 +385,9 @@ a:hover {
 .adminhome li > div.buttons .button[disabled]:hover {
     border-color: #c4c4c4;
     background-color: #e3e3e3;
+}
+.adminhome li > div.buttons.gt3 .button {
+    margin: 0 3px 0 0;
 }
 
 
