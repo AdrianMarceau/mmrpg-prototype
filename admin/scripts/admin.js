@@ -434,7 +434,8 @@ $(document).ready(function(){
             var postURLs = {
                 revert: 'admin/scripts/revert-game-content.php',
                 commit: 'admin/scripts/commit-game-content.php',
-                publish: 'admin/scripts/push-game-content.php'
+                publish: 'admin/scripts/push-game-content.php',
+                update: 'admin/scripts/pull-game-content.php'
                 };
             var confirmMessages = {
                 revert: 'Are you absolutely sure you want to revert changes to all {object}?\n'
@@ -445,6 +446,9 @@ $(document).ready(function(){
                     + 'Continue anyway? ',
                 publish: 'Are you absolutely sure you want to publish changes to all {object}?\n'
                     + 'This action cannot be undone and will be in the history forever.\n'
+                    + 'Continue anyway? ',
+                update: 'Are you sure you want to update {object} with remote changes?\n'
+                    + 'Updates cannot be reverted once applied.\n'
                     + 'Continue anyway? ',
                 final: 'I\'m sorry but I have to confirm one more time...\n'
                     + 'Are you absolutely, 100% sure you want to \n'
@@ -471,37 +475,43 @@ $(document).ready(function(){
                     var confirmMessage = confirmMessages[thisAction];
                     if (thisSubKind.length){ confirmMessage = confirmMessage.replace(/\{object\}/g, thisSubKind); }
                     else { confirmMessage = confirmMessage.replace(/\{object\}/g, thisKind); }
-                    var confirmMessage2 = confirmMessages['final'];
-                    confirmMessage2 = confirmMessage2.replace(/\{action\}/g, $thisButton.text().toUpperCase());
-                    if (thisSubKind.length){ confirmMessage2 = confirmMessage2.replace(/\{object\}/g, thisSubKind.toUpperCase()); }
-                    else { confirmMessage2 = confirmMessage2.replace(/\{object\}/g, thisKind.toUpperCase()); }
                     //console.log('postURL = ', postURL);
                     //console.log('postData = ', postData);
                     //console.log('confirmMessage = ', confirmMessage);
-                    //console.log('confirmMessage2 = ', confirmMessage2);
-                    if (confirm(confirmMessage) && confirm(confirmMessage2)){
-                        $thisButton.addClass('loading');
-                        $adminHome.addClass('loading');
-                        $.post(postURL, postData, function(returnData){
-                            //console.log('returnData = ', returnData);
-                            if (typeof returnData !== 'undefined' && returnData.length){
-                                var lineData = returnData.split('\n');
-                                //console.log('lineData = ', lineData);
-                                var statusLine = lineData[0].split('|');
-                                //console.log('statusLine = ', statusLine);
-                                if (statusLine[0] === 'success'){
-                                    var completeFunction = function(){
-                                        window.location.href = window.location.href.replace(location.hash,'');
-                                        //alert('Reload the window!');
-                                        };
-                                    printStatusMessage(statusLine[0], statusLine[1], completeFunction);
-                                    } else {
-                                    printStatusMessage(statusLine[0], statusLine[1]);
-                                    $thisButton.removeClass('loading');
-                                    $adminHome.removeClass('loading');
+                    var allowButtonAction = confirm(confirmMessage);
+                    if (allowButtonAction){
+                        if (thisAction !== 'update'){
+                            var confirmMessage2 = confirmMessages['final'];
+                            confirmMessage2 = confirmMessage2.replace(/\{action\}/g, $thisButton.text().toUpperCase());
+                            if (thisSubKind.length){ confirmMessage2 = confirmMessage2.replace(/\{object\}/g, thisSubKind.toUpperCase()); }
+                            else { confirmMessage2 = confirmMessage2.replace(/\{object\}/g, thisKind.toUpperCase()); }
+                            //console.log('confirmMessage2 = ', confirmMessage2);
+                            allowButtonAction = confirm(confirmMessage2);
+                            }
+                        if (allowButtonAction){
+                            $thisButton.addClass('loading');
+                            $adminHome.addClass('loading');
+                            $.post(postURL, postData, function(returnData){
+                                //console.log('returnData = ', returnData);
+                                if (typeof returnData !== 'undefined' && returnData.length){
+                                    var lineData = returnData.split('\n');
+                                    //console.log('lineData = ', lineData);
+                                    var statusLine = lineData[0].split('|');
+                                    //console.log('statusLine = ', statusLine);
+                                    if (statusLine[0] === 'success'){
+                                        var completeFunction = function(){
+                                            window.location.href = window.location.href.replace(location.hash,'');
+                                            //alert('Reload the window!');
+                                            };
+                                        printStatusMessage(statusLine[0], statusLine[1], completeFunction);
+                                        } else {
+                                        printStatusMessage(statusLine[0], statusLine[1]);
+                                        $thisButton.removeClass('loading');
+                                        $adminHome.removeClass('loading');
+                                        }
                                     }
-                                }
-                            });
+                                });
+                            }
                         }
                     return true;
                     } else if (thisButtonType === 'table'){
@@ -579,7 +589,8 @@ $(document).ready(function(){
             var postURLs = {
                 revert: 'admin/scripts/revert-game-content.php',
                 commit: 'admin/scripts/commit-game-content.php',
-                publish: 'admin/scripts/push-game-content.php'
+                publish: 'admin/scripts/push-game-content.php',
+                update: 'admin/scripts/pull-game-content.php'
                 };
             var confirmMessages = {
                 revert: 'Are you absolutely sure you want to revert the changes to this {object}?\n'
@@ -590,6 +601,9 @@ $(document).ready(function(){
                     + 'Continue anyway? ',
                 publish: 'Are you absolutely sure you want to publish the changes to this {object}?\n'
                     + 'This action cannot be undone and will be in the history forever.\n'
+                    + 'Continue anyway? ',
+                update: 'Are you sure you want to this {object} with remote changes?\n'
+                    + 'Updates cannot be reverted once applied.\n'
                     + 'Continue anyway? '
                 }
             $('a[data-action]', $editorGitButtons).bind('click', function(){

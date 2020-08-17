@@ -35,7 +35,7 @@ $allowed_sources = array(
 $request_kind = !empty($_REQUEST['kind']) && preg_match('/^[\.\-_a-z0-9]+$/', $_REQUEST['kind']) ? $_REQUEST['kind'] : false;
 $request_subkind = !empty($_REQUEST['subkind']) && preg_match('/^[\.\-_a-z0-9]+$/', $_REQUEST['subkind']) ? $_REQUEST['subkind'] : false;
 if (empty($request_kind) || !in_array($request_kind, $allowed_kinds)){ exit_action('error|request_kind empty or not valid'); }
-if (isset($allowed_subkinds[$request_kind]) && (empty($request_subkind) || !in_array($request_subkind, $allowed_subkinds[$request_kind]))){ exit_action('error|request_subkind empty or not provided'); }
+if (empty($allow_empty_subkind) && isset($allowed_subkinds[$request_kind]) && (empty($request_subkind) || !in_array($request_subkind, $allowed_subkinds[$request_kind]))){ exit_action('error|request_subkind empty or not provided'); }
 //debug_echo('$request_kind = '.$request_kind);
 //debug_echo('$request_subkind = '.$request_subkind);
 $request_kind_singular = false;

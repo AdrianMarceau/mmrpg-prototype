@@ -516,7 +516,7 @@
                             'attributes' => $git_pull_allowed
                                 ? array(
                                     'data-button' => 'git',
-                                    'data-action' => 'pull',
+                                    'data-action' => 'update',
                                     'data-kind' => $type_info['xtoken'],
                                     'data-token' => 'all',
                                     'data-source' => 'github'

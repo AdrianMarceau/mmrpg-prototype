@@ -372,7 +372,7 @@ class cms_admin {
         if (!is_array($index)){ $index = array(); }
         if (!$use_cache || !isset($index[$repo_base_path])){
             $last_updated = self::git_update_remote_get_time($repo_base_path);
-            $update_timeout = 60 * 60; // one hour
+            $update_timeout = 60 * 5; // ten minutes
             if ((time() - $last_updated) >= $update_timeout){
                 $index[$repo_base_path] = shell_exec('cd '.$repo_base_path.' && git remote update');
                 self::git_update_remote_set_time($repo_base_path);

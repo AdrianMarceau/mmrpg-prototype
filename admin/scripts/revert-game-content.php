@@ -6,6 +6,7 @@ require_once('../../top.php');
 require_once(MMRPG_CONFIG_ROOTDIR.'classes/cms_admin.php');
 
 // Require the common git actions file
+$request_action = 'revert';
 require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/git_common.php');
 //debug_echo('revert-game-content');
 

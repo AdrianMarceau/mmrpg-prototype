@@ -6,6 +6,7 @@ require_once('../../top.php');
 require_once(MMRPG_CONFIG_ROOTDIR.'classes/cms_admin.php');
 
 // Require the common git actions file
+$request_action = 'commit';
 require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/git_common.php');
 //debug_echo('push-game-content'.PHP_EOL);
 
