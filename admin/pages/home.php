@@ -355,108 +355,6 @@
     /* -- (STAGE/PROD ONLY) -- */
     elseif (in_array(MMRPG_CONFIG_SERVER_ENV, array('stage', 'prod'))){
 
-        /* -- UPDATE GAME CONTENT -- */
-        if (true){
-
-            // Define the group name and options array
-            $this_group_name = 'Update Game Content';
-            $this_group_options = array();
-
-            // Populate the group options array with relevant pages and buttons
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-stars', $this_adminaccess)){
-                $this_option = array(
-                    'link' => array('text' => 'Update Rogue Stars'),
-                    'desc' => 'pull rogue star appearance data published to github and update',
-                    'buttons' => array(
-                        array(
-                            'action' => 'scripts/pull-game-content.php?kind=stars&source=github',
-                            'text' => 'Pull from GitHub'
-                            )
-                        )
-                    );
-                $this_group_options[] = $this_option;
-            }
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-challenges', $this_adminaccess)
-                || in_array('edit-event-challenges', $this_adminaccess)){
-                $this_option = array(
-                    'link' => array('text' => 'Update Event Challenges'),
-                    'desc' => 'pull event-based challenge missions published to github and update',
-                    'buttons' => array(
-                        array(
-                            'action' => 'scripts/pull-game-content.php?kind=challenges&source=github',
-                            'text' => 'Pull from GitHub'
-                            )
-                        )
-                    );
-                $this_group_options[] = $this_option;
-            }
-
-            // Print out the group title and options, assuming there are any available
-            echo cms_admin::print_admin_home_group_options($this_group_name, $this_group_options);
-
-        }
-
-        /* -- UPDATE GAME OBJECTS -- */
-        if (true){
-
-            // Define the group name and options array
-            $this_group_name = 'Update Game Objects';
-            $this_group_options = array();
-
-            // Populate the group options array with relevant pages and buttons
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-players', $this_adminaccess)){
-                $this_option = array(
-                    'link' => array('text' => 'Update Player Characters'),
-                    'desc' => 'pull changes to the in-game player characters from github and update',
-                    'buttons' => array(
-                        array(
-                            'action' => 'scripts/pull-game-content.php?kind=players&source=github',
-                            'text' => 'Pull from GitHub'
-                            )
-                        )
-                    );
-                $this_group_options[] = $this_option;
-            }
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-robots', $this_adminaccess)
-                || in_array('edit-robot-master', $this_adminaccess)
-                || in_array('edit-support-mechas', $this_adminaccess)
-                || in_array('edit-fortress-bosses', $this_adminaccess)){
-                $this_option = array(
-                    'link' => array('text' => 'Update Robots / Mechas / Bosses'),
-                    'desc' => 'pull changes in-game robots, mechas, and bosses from github and update',
-                    'buttons' => array(
-                        array(
-                            'action' => 'scripts/pull-game-content.php?kind=robots&source=github',
-                            'text' => 'Pull from GitHub'
-                            )
-                        )
-                    );
-                $this_group_options[] = $this_option;
-            }
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-fields', $this_adminaccess)){
-                $this_option = array(
-                    'link' => array('text' => 'Update Battle Fields'),
-                    'desc' => 'pull changes to the in-game battle fields from github and update',
-                    'buttons' => array(
-                        array(
-                            'action' => 'scripts/pull-game-content.php?kind=fields&source=github',
-                            'text' => 'Pull from GitHub'
-                            )
-                        )
-                    );
-                $this_group_options[] = $this_option;
-            }
-
-            // Print out the group title and options, assuming there are any available
-            echo cms_admin::print_admin_home_group_options($this_group_name, $this_group_options);
-
-        }
-
         /* -- UPDATE WEBSITE PAGES -- */
         if (true){
 
@@ -472,8 +370,51 @@
                     'desc' => 'pull changes to the various website pages from github and update',
                     'buttons' => array(
                         array(
-                            'action' => 'scripts/pull-game-content.php?kind=website-pages&source=github',
-                            'text' => 'Pull from GitHub'
+                            'action' => 'scripts/pull-table-data.php?kind=website-pages&source='.MMRPG_CONFIG_PULL_DEV_DATA_FROM,
+                            'text' => 'Pull from '.cms_admin::print_env_name(MMRPG_CONFIG_PULL_DEV_DATA_FROM)
+                            )
+                        )
+                    );
+                $this_group_options[] = $this_option;
+            }
+
+            // Print out the group title and options, assuming there are any available
+            echo cms_admin::print_admin_home_group_options($this_group_name, $this_group_options);
+
+        }
+
+        /* -- UPDATE GAME CONTENT -- */
+        if (true){
+
+            // Define the group name and options array
+            $this_group_name = 'Update Game Content';
+            $this_group_options = array();
+
+            // Populate the group options array with relevant pages and buttons
+            if (in_array('*', $this_adminaccess)
+                || in_array('edit-stars', $this_adminaccess)){
+                $this_option = array(
+                    'link' => array('text' => 'Update Rogue Stars'),
+                    'desc' => 'pull rogue star appearance data published to github and update',
+                    'buttons' => array(
+                        array(
+                            'action' => 'scripts/pull-table-data.php?kind=rogue-stars&source='.MMRPG_CONFIG_PULL_DEV_DATA_FROM,
+                            'text' => 'Pull from '.cms_admin::print_env_name(MMRPG_CONFIG_PULL_DEV_DATA_FROM)
+                            )
+                        )
+                    );
+                $this_group_options[] = $this_option;
+            }
+            if (in_array('*', $this_adminaccess)
+                || in_array('edit-challenges', $this_adminaccess)
+                || in_array('edit-event-challenges', $this_adminaccess)){
+                $this_option = array(
+                    'link' => array('text' => 'Update Event Challenges'),
+                    'desc' => 'pull event-based challenge missions published to github and update',
+                    'buttons' => array(
+                        array(
+                            'action' => 'scripts/pull-table-data.php?kind=event-challenges&source='.MMRPG_CONFIG_PULL_DEV_DATA_FROM,
+                            'text' => 'Pull from '.cms_admin::print_env_name(MMRPG_CONFIG_PULL_DEV_DATA_FROM)
                             )
                         )
                     );
