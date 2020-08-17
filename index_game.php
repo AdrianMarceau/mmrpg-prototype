@@ -120,7 +120,11 @@ if (count($matches)>1){
 
 <meta name="keywords" content="<?= $this_seo_keywords ?>" />
 <meta name="description" content="<?= $this_seo_description ?>" />
-<meta name="robots" content="index,follow,noodp" />
+<? if (MMRPG_CONFIG_IS_LIVE === true && MMRPG_CONFIG_SERVER_ENV === 'prod'){ ?>
+    <meta name="robots" content="index,follow,noodp" />
+<? } else { ?>
+    <meta name="robots" content="noindex,nofollow,noodp" />
+<? } ?>
 
 <base href="<?= MMRPG_CONFIG_ROOTURL ?>">
 

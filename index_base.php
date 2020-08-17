@@ -332,7 +332,11 @@ if (!empty($db_page_info)){
 
 <meta name="keywords" content="<?= $this_seo_keywords ?>" />
 <meta name="description" content="<?= $this_seo_description ?>" />
-<meta name="robots" content="<?= !defined('MMRPG_CRITICAL_ERROR') && empty($_REQUEST['action']) && !empty($this_seo_robots) ? $this_seo_robots : 'noindex,nofollow' ?>,noodp" />
+<? if (MMRPG_CONFIG_IS_LIVE === true && MMRPG_CONFIG_SERVER_ENV === 'prod'){ ?>
+    <meta name="robots" content="<?= !defined('MMRPG_CRITICAL_ERROR') && empty($_REQUEST['action']) && !empty($this_seo_robots) ? $this_seo_robots : 'noindex,nofollow' ?>,noodp" />
+<? } else { ?>
+    <meta name="robots" content="noindex,nofollow,noodp" />
+<? } ?>
 
 <base href="<?= MMRPG_CONFIG_ROOTURL ?>">
 
