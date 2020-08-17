@@ -35,7 +35,7 @@
                 if (!isset($this_option['buttons'])){ $this_option['buttons'] = array(); }
                 $this_option['buttons'][] = array(
                     'action' => 'scripts/pull-table-data.php?kind=users&source='.MMRPG_CONFIG_PULL_LIVE_DATA_FROM,
-                    'text' => 'Pull from '.cms_admin::print_env_name(MMRPG_CONFIG_PULL_LIVE_DATA_FROM)
+                    'text' => 'Pull from MMRPG-'.ucfirst(MMRPG_CONFIG_PULL_LIVE_DATA_FROM)
                     );
                 }
             $this_group_options[] = $this_option;
@@ -52,7 +52,7 @@
                 if (!isset($this_option['buttons'])){ $this_option['buttons'] = array(); }
                 $this_option['buttons'][] = array(
                     'action' => 'scripts/pull-table-data.php?kind=user-challenges&source='.MMRPG_CONFIG_PULL_LIVE_DATA_FROM,
-                    'text' => 'Pull from '.cms_admin::print_env_name(MMRPG_CONFIG_PULL_LIVE_DATA_FROM)
+                    'text' => 'Pull from MMRPG-'.ucfirst(MMRPG_CONFIG_PULL_LIVE_DATA_FROM)
                     );
                 }
             $this_group_options[] = $this_option;
@@ -371,7 +371,7 @@
                     'buttons' => array(
                         array(
                             'action' => 'scripts/pull-table-data.php?kind=website-pages&source='.MMRPG_CONFIG_PULL_DEV_DATA_FROM,
-                            'text' => 'Pull from '.cms_admin::print_env_name(MMRPG_CONFIG_PULL_DEV_DATA_FROM)
+                            'text' => 'Pull from MMRPG-'.ucfirst(MMRPG_CONFIG_PULL_DEV_DATA_FROM)
                             )
                         )
                     );
@@ -399,7 +399,7 @@
                     'buttons' => array(
                         array(
                             'action' => 'scripts/pull-table-data.php?kind=rogue-stars&source='.MMRPG_CONFIG_PULL_DEV_DATA_FROM,
-                            'text' => 'Pull from '.cms_admin::print_env_name(MMRPG_CONFIG_PULL_DEV_DATA_FROM)
+                            'text' => 'Pull from MMRPG-'.ucfirst(MMRPG_CONFIG_PULL_DEV_DATA_FROM)
                             )
                         )
                     );
@@ -414,7 +414,7 @@
                     'buttons' => array(
                         array(
                             'action' => 'scripts/pull-table-data.php?kind=event-challenges&source='.MMRPG_CONFIG_PULL_DEV_DATA_FROM,
-                            'text' => 'Pull from '.cms_admin::print_env_name(MMRPG_CONFIG_PULL_DEV_DATA_FROM)
+                            'text' => 'Pull from MMRPG-'.ucfirst(MMRPG_CONFIG_PULL_DEV_DATA_FROM)
                             )
                         )
                     );
