@@ -137,9 +137,9 @@ and distinguish between LOCAL/DEV/STAGE/PROD servers w/ different push/pull func
 -  Add pull functionality for user_challenges on local/dev/stage
 -  Add pull functionality for rogue stars on stage/prod
 -  Add pull functionality for event challenges on stage/prod
--  Add pull functionality for rpg players on stage/prod
--  Add pull functionality for rpg robots on stage/prod
--  Add pull functionality for rpg fields on stage/prod
+-  Add pull functionality for rpg players on stage/prod [DONE]
+-  Add pull functionality for rpg robots on stage/prod [DONE]
+-  Add pull functionality for rpg fields on stage/prod [DONE]
 -  Add pull functionality for web pages on stage/prod
 -  ?????
 
