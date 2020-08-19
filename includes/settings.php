@@ -178,6 +178,21 @@ if (!defined('MMRPG_CONFIG_SERVER_ENV')){
     define(MMRPG_CONFIG_SERVER_ENV, 'local');
 }
 
+// Define other server-related variables given the current SERVER ENV
+if (MMRPG_CONFIG_SERVER_ENV === 'local'){
+    define('MMRPG_CONFIG_PULL_DEV_DATA_FROM', false);
+    define('MMRPG_CONFIG_PULL_LIVE_DATA_FROM', 'prod');
+} elseif (MMRPG_CONFIG_SERVER_ENV === 'dev'){
+    define('MMRPG_CONFIG_PULL_DEV_DATA_FROM', false);
+    define('MMRPG_CONFIG_PULL_LIVE_DATA_FROM', 'prod');
+} elseif (MMRPG_CONFIG_SERVER_ENV === 'stage'){
+    define('MMRPG_CONFIG_PULL_DEV_DATA_FROM', 'dev');
+    define('MMRPG_CONFIG_PULL_LIVE_DATA_FROM', 'prod');
+} elseif (MMRPG_CONFIG_SERVER_ENV === 'prod'){
+    define('MMRPG_CONFIG_PULL_DEV_DATA_FROM', 'dev');
+    define('MMRPG_CONFIG_PULL_LIVE_DATA_FROM', false);
+}
+
 // Define the last save timestamp now if not already done so
 if (!defined('MMRPG_CONFIG_LAST_SAVE_DATE')){
     $guest_id = MMRPG_SETTINGS_GUEST_ID;
