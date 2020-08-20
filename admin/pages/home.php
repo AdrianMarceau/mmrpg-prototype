@@ -87,15 +87,18 @@
 
             // Loop through the content types index and append permissible buttons
             foreach ($content_types_index AS $type_key => $type_info){
+                if ($type_info['token'] === 'sql'){ continue; }
                 // Check to see if current user allowed to edit this content type
                 if (in_array('*', $this_adminaccess)
                     || in_array('edit-'.$type_info['xtoken'], $this_adminaccess)){
-                    $repo_base_path = MMRPG_CONFIG_CONTENT_PATH.$type_info['xtoken'].'/';
+                    $repo_base_path = MMRPG_CONFIG_CONTENT_PATH.$type_info['content_path'].'/';
                     $git_pull_required = cms_admin::git_pull_required($repo_base_path);
                     if (!empty($git_pull_required)){
                         $git_pull_allowed = cms_admin::git_pull_allowed($repo_base_path);
+                        if ($type_info['token'] === 'sql'){ $button_text = 'Update Misc'; }
+                        else { $button_text = 'Update '.ucfirst($type_info['xtoken']); }
                         $option_buttons[] = array(
-                            'text' => 'Update '.ucfirst($type_info['xtoken']),
+                            'text' => $button_text,
                             'disabled' => !$git_pull_allowed ? true : false,
                             'attributes' => $git_pull_allowed
                                 ? array(
@@ -131,11 +134,12 @@
 
             // Loop through the content types index and append permissible buttons
             foreach ($content_types_index AS $type_key => $type_info){
+                if ($type_info['token'] === 'sql'){ continue; }
                 // Check to see if current user allowed to edit this content type
                 if (in_array('*', $this_adminaccess)
                     || in_array('edit-'.$type_info['xtoken'], $this_adminaccess)){
                     // Collect git details for the repo to see if button necessary
-                    $repo_base_path = MMRPG_CONFIG_CONTENT_PATH.$type_info['xtoken'].'/';
+                    $repo_base_path = MMRPG_CONFIG_CONTENT_PATH.$type_info['content_path'];
                     $committed_changes = cms_admin::git_get_committed_changes($repo_base_path);
                     // If there are changes to publish, add the appropriate button
                     if (!empty($committed_changes)){
@@ -147,8 +151,10 @@
                             elseif (!empty($uncommitted_changes)){ $disabled_message = ucfirst($type_info['token']).' changes must be committed first!'; }
                             elseif ($git_pull_required){ $disabled_message = ucfirst($type_info['token']).' updates must be pulled first!'; }
                         }
+                        if ($type_info['token'] === 'sql'){ $button_text = 'Publish Misc'; }
+                        else { $button_text = 'Publish '.ucfirst($type_info['xtoken']); }
                         $option_buttons[] = array(
-                            'text' => 'Publish '.ucfirst($type_info['xtoken']),
+                            'text' => $button_text,
                             'disabled' => !$button_allowed ? true : false,
                             'attributes' => $button_allowed
                                 ? array(

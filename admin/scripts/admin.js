@@ -473,7 +473,8 @@ $(document).ready(function(){
                     var postURL = thisRootURL+postURLs[thisAction];
                     var postData = {kind:thisKind,subkind:thisSubKind,token:thisToken,source:thisSource};
                     var confirmMessage = confirmMessages[thisAction];
-                    if (thisSubKind.length){ confirmMessage = confirmMessage.replace(/\{object\}/g, thisSubKind); }
+                    if (thisKind === 'sql'){ confirmMessage = confirmMessage.replace(/\{object\}/g, 'miscellaneous objects (stars, challenges, pages, etc.)'); }
+                    else if (thisSubKind.length){ confirmMessage = confirmMessage.replace(/\{object\}/g, thisSubKind); }
                     else { confirmMessage = confirmMessage.replace(/\{object\}/g, thisKind); }
                     //console.log('postURL = ', postURL);
                     //console.log('postData = ', postData);
@@ -482,8 +483,10 @@ $(document).ready(function(){
                     if (allowButtonAction){
                         if (thisAction !== 'update'){
                             var confirmMessage2 = confirmMessages['final'];
-                            confirmMessage2 = confirmMessage2.replace(/\{action\}/g, $thisButton.text().toUpperCase());
-                            if (thisSubKind.length){ confirmMessage2 = confirmMessage2.replace(/\{object\}/g, thisSubKind.toUpperCase()); }
+                            if (thisAction === 'publish'){ confirmMessage2 = confirmMessage2.replace(/\{action\}/g, 'PUBLISH ALL'); }
+                            else { confirmMessage2 = confirmMessage2.replace(/\{action\}/g, $thisButton.text().toUpperCase()); }
+                            if (thisKind === 'sql'){ confirmMessage2 = confirmMessage2.replace(/\{object\}/g, 'MISC OBJECTS'); }
+                            else if (thisSubKind.length){ confirmMessage2 = confirmMessage2.replace(/\{object\}/g, thisSubKind.toUpperCase()); }
                             else { confirmMessage2 = confirmMessage2.replace(/\{object\}/g, thisKind.toUpperCase()); }
                             //console.log('confirmMessage2 = ', confirmMessage2);
                             allowButtonAction = confirm(confirmMessage2);
