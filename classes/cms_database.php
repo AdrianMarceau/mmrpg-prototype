@@ -624,6 +624,85 @@ class cms_database {
         return;
     }
 
+    // Define a function for getting a table definition for export to an SQL file
+    public static function get_create_table_sql($table_name, $table_settings){
+        if (!isset($table_settings['export_table']) || $table_settings['export_table'] !== true){ return false; }
+        global $db;
+        $table_name_string = "`{$table_name}`";
+        $table_def_sql = $db->get_value("SHOW CREATE TABLE {$table_name_string};", 'Create Table');
+        $table_def_sql = preg_replace('/(\s+AUTO_INCREMENT)=(?:[0-9]+)(\s+)/', '$1=0$2', $table_def_sql);
+        $table_def_sql = preg_replace('/^CREATE TABLE `/', 'CREATE TABLE IF NOT EXISTS `', $table_def_sql);
+        $table_def_sql = rtrim($table_def_sql, ';').';';
+        $final_table_def_sql = self::$table_def_sql_template;
+        $final_table_def_sql = str_replace('{{TABLE_NAME}}', $table_name, $final_table_def_sql);
+        $final_table_def_sql = str_replace('{{TABLE_DEF_SQL}}', $table_def_sql, $final_table_def_sql);
+        return $final_table_def_sql;
+    }
+
+    // Define a function for getting a table definition for export to an SQL file
+    public static function get_insert_table_data_sql($table_name, $table_settings){
+        if (!isset($table_settings['export_data']) || $table_settings['export_data'] !== true){ return false; }
+        global $db;
+        $table_name_string = "`{$table_name}`";
+        $select_query = "SELECT * FROM {$table_name_string};";
+        if (!empty($table_settings['export_filter'])){
+            $row_filter = array('1=1');
+            $filters = $table_settings['export_filter'];
+            foreach ($filters AS $fkey => $fval){ $row_filter[] = "{$fkey} = ".(is_numeric($fval) ? $fval : "'{$fval}'"); }
+            $row_filter = implode(' AND ', $row_filter);
+            $select_query = str_replace(';', " WHERE {$row_filter};", $select_query);
+        }
+        $table_rows = $db->get_array_list($select_query);
+        if (empty($table_rows)){ return false; }
+        $table_rows_sql = $db->get_bulk_insert_sql($table_name, $table_rows);
+        if (empty($table_rows_sql)){ return false; }
+        $final_table_rows_sql = self::$table_row_sql_template;
+        $final_table_rows_sql = str_replace('{{TABLE_NAME}}', $table_name, $final_table_rows_sql);
+        $final_table_rows_sql = str_replace('{{TABLE_ROWS_SQL}}', $table_rows_sql, $final_table_rows_sql);
+        return $final_table_rows_sql;
+    }
+
+    // Define a function for getting sample table data (if exists) for export to an SQL file
+    public static function get_sample_table_data_sql($table_name, $table_settings){
+        if (!isset($table_settings['sample_data']) || $table_settings['sample_data'] !== true){ return false; }
+        $sample_data_dir = MMRPG_CONFIG_ROOTDIR.'admin/.setup/sample-data/';
+        $sample_data_path = $sample_data_dir.$table_name.'.sql';
+        if (!file_exists($sample_data_path)){ return false; }
+        $table_rows_sql = file_get_contents($sample_data_path);
+        return $table_rows_sql;
+    }
+
+// Define templates for use with the SQL export functions
+private static $table_def_sql_template = <<<'XSQL'
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+
+{{TABLE_DEF_SQL}}
+
+/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+XSQL;
+
+private static $table_row_sql_template = <<<'XSQL'
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+
+/*!40000 ALTER TABLE `{{TABLE_NAME}}` DISABLE KEYS */;
+{{TABLE_ROWS_SQL}}
+/*!40000 ALTER TABLE `{{TABLE_NAME}}` ENABLE KEYS */;
+
+/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+XSQL;
+
 }
 
 ?>

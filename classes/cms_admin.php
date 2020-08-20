@@ -690,6 +690,26 @@ class cms_admin {
         return $git_file_arrays;
     }
 
+    /* -- SQL IMPORT / EXPORT FUNCTIONS -- */
+
+    // Define a function for exporting a given database table's data into an SQL file
+    public static function export_table_data_to_sql($table_name, $export_file_path = '', $export_filter = array()){
+        if (empty($export_file_path)){ $export_file_path = MMRPG_CONFIG_ROOTDIR.'content/.sql/data/'.$table_name.'.sql'; }
+        $table_settings = array('name' => $table_name, 'export_table' => false, 'export_data' => true, 'export_filter' => $export_filter);
+        $table_rows_sql = cms_database::get_insert_table_data_sql($table_name, $table_settings, true);
+        //echo('<pre>$table_name = '.print_r($table_name, true).'</pre>');
+        //echo('<pre>$table_rows_sql = '.print_r($table_rows_sql, true).'</pre>');
+        //echo('<pre>$export_file_path = '.print_r($export_file_path, true).'</pre>');
+        if (!empty($table_rows_sql)){
+            $f = fopen($export_file_path, 'w');
+            fwrite($f, $table_rows_sql);
+            fclose($f);
+            if (file_exists($export_file_path)){
+                return true;
+                }
+        }
+        return false;
+    }
 
 }
 ?>
