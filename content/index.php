@@ -100,5 +100,41 @@ $content_types_index['battles'] = array(
         'ssh' => 'git@github.com:AdrianMarceau/mmrpg-prototype_battles.git'
         )
     );
+$content_types_index['stars'] = array(
+    'token' => 'star',
+    'xtoken' => 'stars',
+    'object_class' => false,
+    'database_table' => 'mmrpg_rogue_stars',
+    'content_path' => 'stars/',
+    'github_repo' => array(
+        'name' => 'mmrpg-prototype_stars',
+        'http' => 'https://github.com/AdrianMarceau/mmrpg-prototype_stars.git',
+        'ssh' => 'git@github.com:AdrianMarceau/mmrpg-prototype_stars.git'
+        )
+    );
+$content_types_index['challenges'] = array(
+    'token' => 'challenge',
+    'xtoken' => 'challenges',
+    'object_class' => false,
+    'database_table' => 'mmrpg_challenges',
+    'content_path' => 'challenges/',
+    'github_repo' => array(
+        'name' => 'mmrpg-prototype_challenges',
+        'http' => 'https://github.com/AdrianMarceau/mmrpg-prototype_challenges.git',
+        'ssh' => 'git@github.com:AdrianMarceau/mmrpg-prototype_challenges.git'
+        )
+    );
+$content_types_index['pages'] = array(
+    'token' => 'page',
+    'xtoken' => 'pages',
+    'object_class' => false,
+    'database_table' => 'mmrpg_website_pages',
+    'content_path' => 'pages/',
+    'github_repo' => array(
+        'name' => 'mmrpg-prototype_pages',
+        'http' => 'https://github.com/AdrianMarceau/mmrpg-prototype_pages.git',
+        'ssh' => 'git@github.com:AdrianMarceau/mmrpg-prototype_pages.git'
+        )
+    );
 
 ?>

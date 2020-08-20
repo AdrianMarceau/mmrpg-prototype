@@ -9,6 +9,9 @@ declare -a REPO_KINDS=(
     "abilities"
     "items"
     "fields"
+    "stars"
+    "challenges"
+    "pages"
     )
 
 declare -A REPO_PATHS
@@ -20,3 +23,6 @@ REPO_PATHS[robots]="robots"
 REPO_PATHS[abilities]="abilities"
 REPO_PATHS[items]="items"
 REPO_PATHS[fields]="fields"
+REPO_PATHS[stars]="stars"
+REPO_PATHS[challenges]="challenges"
+REPO_PATHS[pages]="pages"
