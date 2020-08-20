@@ -75,111 +75,133 @@
     /* -- GITHUB TOOLS (common to LOCAL/DEV/STAGE/PROD) -- */
     if (true){
 
-        // Define the common group and options array
-        $common_game_database_group_options = array();
-
         // Pull in the content types repo so we don't have to redeclare stuff
         require_once(MMRPG_CONFIG_ROOTDIR.'content/index.php');
 
-        // Populate the group options array with relevant pages and buttons
-        if ((in_array('*', $this_adminaccess) || in_array('pull-from-github', $this_adminaccess))){
-            $option_buttons = array();
+        // Define the common kind values for each group
+        $common_group_kinds = array();
+        $common_group_kinds['game_database'] = array('types', 'players', 'robots', 'abilities', 'items', 'fields');
+        $common_group_kinds['post_game_content'] = array('stars', 'challenges');
+        $common_group_kinds['website_pages'] = array('pages');
 
-            // Loop through the content types index and append permissible buttons
-            foreach ($content_types_index AS $type_key => $type_info){
-                if ($type_info['token'] === 'sql'){ continue; }
-                // Check to see if current user allowed to edit this content type
-                if (in_array('*', $this_adminaccess)
-                    || in_array('edit-'.$type_info['xtoken'], $this_adminaccess)){
-                    $repo_base_path = MMRPG_CONFIG_CONTENT_PATH.$type_info['content_path'].'/';
-                    $git_pull_required = cms_admin::git_pull_required($repo_base_path);
-                    if (!empty($git_pull_required)){
-                        $git_pull_allowed = cms_admin::git_pull_allowed($repo_base_path);
-                        if ($type_info['token'] === 'sql'){ $button_text = 'Update Misc'; }
-                        else { $button_text = 'Update '.ucfirst($type_info['xtoken']); }
-                        $option_buttons[] = array(
-                            'text' => $button_text,
-                            'disabled' => !$git_pull_allowed ? true : false,
-                            'attributes' => $git_pull_allowed
-                                ? array(
-                                    'data-button' => 'git',
-                                    'data-action' => 'update',
-                                    'data-kind' => $type_info['xtoken'],
-                                    'data-token' => 'all',
-                                    'data-source' => 'github'
-                                    )
-                                : array(
-                                    'disabled' => 'disabled',
-                                    'title' => ucfirst($type_info['token']).' changes must be committed first!'
-                                    )
-                            );
-                    }
-                }
-            }
+        // Create an array to hold the actual options for each group
+        $common_group_kinds_options = array();
 
-            // Add the publish option with any relevant buttons
-            $this_option = array(
-                'link' => array('text' => 'Pull from GitHub', 'icon' => 'cloud-download-alt'),
-                'desc' => 'pull committed changes from github repos and update',
-                'buttons' => $option_buttons
-                );
-            $common_game_database_group_options[] = $this_option;
+        // Loop through the common group kinds one-by-one and generate options
+        foreach ($common_group_kinds AS $kind_token => $allowed_content_types){
 
-        }
+            // Create the sub-array to hold all the options for this specific group
+            if (!isset($common_group_kinds_options[$kind_token])){ $common_group_kinds_options[$kind_token] = array(); }
 
-        // Populate the group options array with relevant pages and buttons
-        if ((MMRPG_CONFIG_SERVER_ENV === 'local' || MMRPG_CONFIG_SERVER_ENV === 'dev')
-            && (in_array('*', $this_adminaccess) || in_array('publish-to-github', $this_adminaccess))){
-            $option_buttons = array();
+            // Populate the group options array with relevant pages and buttons
+            if ((in_array('*', $this_adminaccess) || in_array('pull-from-github', $this_adminaccess))){
+                $option_buttons = array();
 
-            // Loop through the content types index and append permissible buttons
-            foreach ($content_types_index AS $type_key => $type_info){
-                if ($type_info['token'] === 'sql'){ continue; }
-                // Check to see if current user allowed to edit this content type
-                if (in_array('*', $this_adminaccess)
-                    || in_array('edit-'.$type_info['xtoken'], $this_adminaccess)){
-                    // Collect git details for the repo to see if button necessary
-                    $repo_base_path = MMRPG_CONFIG_CONTENT_PATH.$type_info['content_path'];
-                    $committed_changes = cms_admin::git_get_committed_changes($repo_base_path);
-                    // If there are changes to publish, add the appropriate button
-                    if (!empty($committed_changes)){
-                        $uncommitted_changes = cms_admin::git_get_uncommitted_changes($repo_base_path);
+                // Loop through the content types index and append permissible buttons
+                foreach ($content_types_index AS $type_key => $type_info){
+                    if ($type_info['token'] === 'sql'){ continue; }
+                    elseif (!in_array($type_info['xtoken'], $allowed_content_types)){ continue; }
+                    // Check to see if current user allowed to edit this content type
+                    if (in_array('*', $this_adminaccess)
+                        || in_array('edit-'.$type_info['xtoken'], $this_adminaccess)){
+                        $repo_base_path = MMRPG_CONFIG_CONTENT_PATH.$type_info['content_path'].'/';
                         $git_pull_required = cms_admin::git_pull_required($repo_base_path);
-                        $button_allowed = empty($uncommitted_changes) && !$git_pull_required ? true : false;
-                        if (!$button_allowed){
-                            if (!empty($uncommitted_changes) && $git_pull_required){ $disabled_message = ucfirst($type_info['token']).' changes must be committed first, then updates must be pulled!'; }
-                            elseif (!empty($uncommitted_changes)){ $disabled_message = ucfirst($type_info['token']).' changes must be committed first!'; }
-                            elseif ($git_pull_required){ $disabled_message = ucfirst($type_info['token']).' updates must be pulled first!'; }
+                        if (!empty($git_pull_required)){
+                            $git_pull_allowed = cms_admin::git_pull_allowed($repo_base_path);
+                            if ($type_info['token'] === 'sql'){ $button_text = 'Update Misc'; }
+                            else { $button_text = 'Update '.ucfirst($type_info['xtoken']); }
+                            $option_buttons[] = array(
+                                'text' => $button_text,
+                                'disabled' => !$git_pull_allowed ? true : false,
+                                'attributes' => $git_pull_allowed
+                                    ? array(
+                                        'data-button' => 'git',
+                                        'data-action' => 'update',
+                                        'data-kind' => $type_info['xtoken'],
+                                        'data-token' => 'all',
+                                        'data-source' => 'github'
+                                        )
+                                    : array(
+                                        'disabled' => 'disabled',
+                                        'title' => ucfirst($type_info['token']).' changes must be committed first!'
+                                        )
+                                );
                         }
-                        if ($type_info['token'] === 'sql'){ $button_text = 'Publish Misc'; }
-                        else { $button_text = 'Publish '.ucfirst($type_info['xtoken']); }
-                        $option_buttons[] = array(
-                            'text' => $button_text,
-                            'disabled' => !$button_allowed ? true : false,
-                            'attributes' => $button_allowed
-                                ? array(
-                                    'data-button' => 'git',
-                                    'data-action' => 'publish',
-                                    'data-kind' => $type_info['xtoken'],
-                                    'data-token' => 'all',
-                                    'data-source' => 'github'
-                                    )
-                                : array(
-                                    'disabled' => 'disabled',
-                                    'title' => $disabled_message
-                                    )
-                            );
                     }
                 }
+
+                // Generate the pull-from-github option with any relevant buttons
+                $this_option = array(
+                    'link' => array('text' => 'Pull from GitHub', 'icon' => 'cloud-download-alt'),
+                    'desc' => 'pull committed changes from github repos and update',
+                    'buttons' => $option_buttons,
+                    'allowed_content_types' => $allowed_content_types
+                    );
+
+                // Add the option to the appropriate group for later
+                $common_group_kinds_options[$kind_token][] = $this_option;
+
             }
 
-            // Add the publish option with any relevant buttons
-            $this_option = array(
-                'link' => array('text' => 'Push to GitHub', 'icon' => 'cloud-upload-alt'),
-                'desc' => 'push committed changes to github repos and publish',
-                'buttons' => $option_buttons
-                );
-            $common_game_database_group_options[] = $this_option;
+            // Populate the group options array with relevant pages and buttons
+            if ((MMRPG_CONFIG_SERVER_ENV === 'local' || MMRPG_CONFIG_SERVER_ENV === 'dev')
+                && (in_array('*', $this_adminaccess) || in_array('publish-to-github', $this_adminaccess))){
+                $option_buttons = array();
+
+                // Loop through the content types index and append permissible buttons
+                foreach ($content_types_index AS $type_key => $type_info){
+                    if ($type_info['token'] === 'sql'){ continue; }
+                    elseif (!in_array($type_info['xtoken'], $allowed_content_types)){ continue; }
+                    // Check to see if current user allowed to edit this content type
+                    if (in_array('*', $this_adminaccess)
+                        || in_array('edit-'.$type_info['xtoken'], $this_adminaccess)){
+                        // Collect git details for the repo to see if button necessary
+                        $repo_base_path = MMRPG_CONFIG_CONTENT_PATH.$type_info['content_path'];
+                        $committed_changes = cms_admin::git_get_committed_changes($repo_base_path);
+                        // If there are changes to publish, add the appropriate button
+                        if (!empty($committed_changes)){
+                            $uncommitted_changes = cms_admin::git_get_uncommitted_changes($repo_base_path);
+                            $git_pull_required = cms_admin::git_pull_required($repo_base_path);
+                            $button_allowed = empty($uncommitted_changes) && !$git_pull_required ? true : false;
+                            if (!$button_allowed){
+                                if (!empty($uncommitted_changes) && $git_pull_required){ $disabled_message = ucfirst($type_info['token']).' changes must be committed first, then updates must be pulled!'; }
+                                elseif (!empty($uncommitted_changes)){ $disabled_message = ucfirst($type_info['token']).' changes must be committed first!'; }
+                                elseif ($git_pull_required){ $disabled_message = ucfirst($type_info['token']).' updates must be pulled first!'; }
+                            }
+                            if ($type_info['token'] === 'sql'){ $button_text = 'Publish Misc'; }
+                            else { $button_text = 'Publish '.ucfirst($type_info['xtoken']); }
+                            $option_buttons[] = array(
+                                'text' => $button_text,
+                                'disabled' => !$button_allowed ? true : false,
+                                'attributes' => $button_allowed
+                                    ? array(
+                                        'data-button' => 'git',
+                                        'data-action' => 'publish',
+                                        'data-kind' => $type_info['xtoken'],
+                                        'data-token' => 'all',
+                                        'data-source' => 'github'
+                                        )
+                                    : array(
+                                        'disabled' => 'disabled',
+                                        'title' => $disabled_message
+                                        )
+                                );
+                        }
+                    }
+                }
+
+                // Generate the push-to-github option with any relevant buttons
+                $this_option = array(
+                    'link' => array('text' => 'Push to GitHub', 'icon' => 'cloud-upload-alt'),
+                    'desc' => 'push committed changes to github repos and publish',
+                    'buttons' => $option_buttons,
+                    'allowed_content_types' => $allowed_content_types
+                    );
+
+                // Add the option to the appropriate group for later
+                $common_group_kinds_options[$kind_token][] = $this_option;
+
+            }
 
         }
 
@@ -407,7 +429,7 @@
             }
 
             // Merge in the common game database group options to all envs
-            $this_group_options = array_merge($this_group_options, $common_game_database_group_options);
+            $this_group_options = array_merge($this_group_options, $common_group_kinds_options['game_database']);
 
             // Print out the group title and options, assuming there are any available
             echo cms_admin::print_admin_home_group_options($this_group_name, $this_group_options);
@@ -440,6 +462,9 @@
                 $this_group_options[] = $this_option;
             }
 
+            // Merge in the common game database group options to all envs
+            $this_group_options = array_merge($this_group_options, $common_group_kinds_options['post_game_content']);
+
             // Print out the group title and options, assuming there are any available
             echo cms_admin::print_admin_home_group_options($this_group_name, $this_group_options);
 
@@ -462,6 +487,9 @@
                 $this_group_options[] = $this_option;
             }
 
+            // Merge in the common game database group options to all envs
+            $this_group_options = array_merge($this_group_options, $common_group_kinds_options['website_pages']);
+
             // Print out the group title and options, assuming there are any available
             echo cms_admin::print_admin_home_group_options($this_group_name, $this_group_options);
 
@@ -481,7 +509,7 @@
             // ... No options specific to the stage/prod versions....
 
             // Merge in the common game database group options to all envs
-            $this_group_options = array_merge($this_group_options, $common_game_database_group_options);
+            $this_group_options = array_merge($this_group_options, $common_group_kinds_options['game_database']);
 
             // Print out the group title and options, assuming there are any available
             echo cms_admin::print_admin_home_group_options($this_group_name, $this_group_options);
@@ -495,36 +523,10 @@
             $this_group_name = 'Post-Game Content';
             $this_group_options = array();
 
-            // Populate the group options array with relevant pages and buttons
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-stars', $this_adminaccess)){
-                $this_option = array(
-                    'link' => array('text' => 'Update Rogue Stars'),
-                    'desc' => 'pull rogue star appearance data published to github and update',
-                    'buttons' => array(
-                        array(
-                            'action' => 'scripts/pull-table-data.php?kind=rogue-stars&source='.MMRPG_CONFIG_PULL_DEV_DATA_FROM,
-                            'text' => 'Pull from MMRPG-'.ucfirst(MMRPG_CONFIG_PULL_DEV_DATA_FROM)
-                            )
-                        )
-                    );
-                $this_group_options[] = $this_option;
-            }
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-challenges', $this_adminaccess)
-                || in_array('edit-event-challenges', $this_adminaccess)){
-                $this_option = array(
-                    'link' => array('text' => 'Update Event Challenges'),
-                    'desc' => 'pull event-based challenge missions published to github and update',
-                    'buttons' => array(
-                        array(
-                            'action' => 'scripts/pull-table-data.php?kind=event-challenges&source='.MMRPG_CONFIG_PULL_DEV_DATA_FROM,
-                            'text' => 'Pull from MMRPG-'.ucfirst(MMRPG_CONFIG_PULL_DEV_DATA_FROM)
-                            )
-                        )
-                    );
-                $this_group_options[] = $this_option;
-            }
+            // ... No options specific to the stage/prod versions....
+
+            // Merge in the common game database group options to all envs
+            $this_group_options = array_merge($this_group_options, $common_group_kinds_options['post_game_content']);
 
             // Print out the group title and options, assuming there are any available
             echo cms_admin::print_admin_home_group_options($this_group_name, $this_group_options);
@@ -538,21 +540,10 @@
             $this_group_name = 'Website Pages';
             $this_group_options = array();
 
-            // Populate the group options array with relevant pages and buttons
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-pages', $this_adminaccess)){
-                $this_option = array(
-                    'link' => array('text' => 'Update Website Pages'),
-                    'desc' => 'pull changes to the various website pages from github and update',
-                    'buttons' => array(
-                        array(
-                            'action' => 'scripts/pull-table-data.php?kind=website-pages&source='.MMRPG_CONFIG_PULL_DEV_DATA_FROM,
-                            'text' => 'Pull from MMRPG-'.ucfirst(MMRPG_CONFIG_PULL_DEV_DATA_FROM)
-                            )
-                        )
-                    );
-                $this_group_options[] = $this_option;
-            }
+            // ... No options specific to the stage/prod versions....
+
+            // Merge in the common game database group options to all envs
+            $this_group_options = array_merge($this_group_options, $common_group_kinds_options['website_pages']);
 
             // Print out the group title and options, assuming there are any available
             echo cms_admin::print_admin_home_group_options($this_group_name, $this_group_options);
