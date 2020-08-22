@@ -436,6 +436,51 @@ a:hover {
     opacity: 0.25;
 }
 
+.adminhome li.pull-from-github {
+
+}
+.adminhome li.pull-from-github,
+.adminhome li.push-to-github {
+    background-color: #f0f0f0;
+}
+.adminhome li.pull-from-github .link,
+.adminhome li.push-to-github .link {
+
+}
+.adminhome li.pull-from-github .link a,
+.adminhome li.push-to-github .link a {
+    font-weight: normal;
+}
+.adminhome li.pull-from-github .desc,
+.adminhome li.push-to-github .desc {
+    display: none;
+    color: #969696;
+}
+.adminhome li.pull-from-github .buttons,
+.adminhome li.push-to-github .buttons {
+
+}
+/*
+.adminhome li.pull-from-github .buttons .button,
+.adminhome li.push-to-github .buttons .button {
+    border-color: #3d3d3d;
+    background-color: #4d4d4d;
+    color: #efefef;
+}
+.adminhome li.pull-from-github .buttons .button:hover,
+.adminhome li.push-to-github .buttons .button:hover {
+    background-color: #595959;
+    color: #ffffff;
+}
+.adminhome li.pull-from-github > div.buttons .button.disabled:hover,
+.adminhome li.pull-from-github > div.buttons .button[disabled]:hover,
+.adminhome li.push-to-github > div.buttons .button.disabled:hover,
+.adminhome li.push-to-github > div.buttons .button[disabled]:hover {
+    border-color: #3d3d3d;
+    background-color: #4d4d4d;
+}
+*/
+
 
 .adminform {
     display: block;

@@ -182,7 +182,9 @@ class cms_admin {
                     }
                 }
             }
-            echo('<li class="item">'.PHP_EOL);
+            $item_class = 'item';
+            if (isset($option_info['link']['text'])){ $item_class .= ' '.preg_replace('/\s+/', '-', strtolower($option_info['link']['text'])); }
+            echo('<li class="'.$item_class.'">'.PHP_EOL);
                 $link_url = isset($option_info['link']['url']) ? ' href="'.$option_info['link']['url'].'"' : '';
                 $link_target = isset($option_info['link']['target']) ? ' target="'.$option_info['link']['target'].'"' : '';
                 $link_text = $option_info['link']['text'];
