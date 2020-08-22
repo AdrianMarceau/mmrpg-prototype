@@ -47,7 +47,7 @@ if (true){
     $sql_table_list[] = array('name' => 'mmrpg_posts', 'export_data' => false);
 
     // rogue stars
-    $sql_table_list[] = array('name' => 'mmrpg_rogue_stars');
+    $sql_table_list[] = array('name' => 'mmrpg_rogue_stars', 'export_data' => false);
 
     // player battles
     $sql_table_list[] = array('name' => 'mmrpg_battles', 'export_data' => false);
