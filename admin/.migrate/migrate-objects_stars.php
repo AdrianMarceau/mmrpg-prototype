@@ -7,8 +7,7 @@ ob_echo('==================================');
 ob_echo('');
 
 // Collect an index of all valid stars from the database
-// Load the complete star index with the class function
-$star_index = $db->get_array_list("SELECT * FROM mmrpg_rogue_stars ORDER BY star_from_date ASC;", 'star_id');
+$star_index = $db->get_array_list("SELECT * FROM mmrpg_rogue_stars ORDER BY star_id ASC;", 'star_id');
 //echo('<pre>$star_index = '.print_r($star_index, true).'</pre>');
 //exit();
 
@@ -25,13 +24,13 @@ $pseudo_star = array(
     'star_flag_enabled' => 0
     );
 
-// Prepend the empty rogue start to beginning of array
+// Prepend the empty rogue star to beginning of array
 $star_index = array_merge(array(0 => $pseudo_star), $star_index);
 //echo('<pre>$star_index = '.print_r($star_index, true).'</pre>');
 //exit();
 
 // Pre-define the base star content dir
-define('MMRPG_BATTLES_NEW_CONTENT_DIR', MMRPG_CONFIG_ROOTDIR.'content/stars/');
+define('MMRPG_STARS_NEW_CONTENT_DIR', MMRPG_CONFIG_ROOTDIR.'content/stars/');
 
 // Count the number of stars that we'll be looping through
 $star_index_size = count($star_index);
@@ -45,19 +44,20 @@ sleep(1);
 
 $rogue_stars_exported = array();
 
-// MIGRATE ACTUAL BATTLES
+// MIGRATE ACTUAL STARS
 $star_key = -1; $star_num = 0;
-foreach ($star_index AS $star_id => $star_data){
+foreach ($star_index AS $star_data){
     $star_key++; $star_num++;
     $count_string = '('.$star_num.' of '.$star_index_size.')';
 
+    $star_id = $star_data['star_id'];
     $star_token = 'star-'.str_pad($star_id, 4, '0', STR_PAD_LEFT);
 
     ob_echo('----------');
     ob_echo('Processing rogue star ID '.$star_id.' '.$count_string);
     ob_flush();
 
-    $content_path = MMRPG_BATTLES_NEW_CONTENT_DIR.(empty($star_id) ? '.star' : $star_token).'/';
+    $content_path = MMRPG_STARS_NEW_CONTENT_DIR.(empty($star_id) ? '.star' : $star_token).'/';
     ob_echo('-- $content_path = '.clean_path($content_path));
     if (file_exists($content_path)){ deleteDir($content_path); }
     mkdir($content_path);
