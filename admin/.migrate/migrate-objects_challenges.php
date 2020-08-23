@@ -36,17 +36,6 @@ $pseudo_challenge = array(
 // Prepend the empty event challenge to beginning of array
 $challenge_index = array_merge(array(0 => $pseudo_challenge), $challenge_index);
 
-// Loop through and expand the JSON-encoded fields into full arrays
-if (!empty($challenge_index)){
-    $json_fields = array('challenge_field_data', 'challenge_target_data', 'challenge_reward_data');
-    foreach ($challenge_index AS $key => $challenge){
-        foreach ($challenge AS $field => $value){
-            if (!in_array($field, $json_fields)){ continue; }
-            $challenge_index[$key][$field] = !empty($value) ? json_decode($value, true) : array();
-        }
-    }
-}
-
 //echo('<pre>$challenge_index = '.print_r($challenge_index, true).'</pre>');
 //exit();
 
@@ -63,7 +52,10 @@ ob_echo('');
 
 sleep(1);
 
-$rogue_challenges_exported = array();
+$event_challenges_exported = array();
+
+// Manually define challenge fields that are in JSON format
+$json_challenge_fields = array('challenge_field_data', 'challenge_target_data', 'challenge_reward_data');
 
 // MIGRATE ACTUAL CHALLENGES
 $challenge_key = -1; $challenge_num = 0;
@@ -85,12 +77,12 @@ foreach ($challenge_index AS $challenge_data){
 
     // And then write the rest of the non-function data into a json file
     $content_json_path = $content_path.'data.json';
-    $content_json_data = clean_json_content_array('challenge', $challenge_data, false);
+    $content_json_data = clean_json_content_array('challenge', $challenge_data, false, true, $json_challenge_fields);
     ob_echo('- export all challenge data to '.clean_path($content_json_path));
     $h = fopen($content_json_path, 'w');
     fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
     fclose($h);
-    if (file_exists($content_json_path)){ $rogue_challenges_exported[] = basename($content_json_path); }
+    if (file_exists($content_json_path)){ $event_challenges_exported[] = basename($content_json_path); }
 
     if ($migration_limit && $challenge_num >= $migration_limit){ break; }
 
@@ -100,7 +92,7 @@ foreach ($challenge_index AS $challenge_data){
 ob_echo('----------');
 
 ob_echo('');
-ob_echo('Event Challenges Exported: '.count($rogue_challenges_exported).' / '.$challenge_index_size);
+ob_echo('Event Challenges Exported: '.count($event_challenges_exported).' / '.$challenge_index_size);
 
 sleep(1);
 

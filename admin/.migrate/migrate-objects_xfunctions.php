@@ -120,25 +120,25 @@ PHP;
 
 // Define a function for cleaning a JSON array for migration
 // (example: set pseudo-empty fields to empty strings)
-function clean_json_content_array($kind, $content_json_data, $remove_id_field = true, $remove_functions_field = true){
+function clean_json_content_array($kind, $content_json_data, $remove_id_field = true, $remove_functions_field = true, $encoded_sub_fields = array()){
     // Make a copy of the origin al JSON data
     $cleaned_json_data = $content_json_data;
     // Remove any known unnecessary or deprecated fields from the data
     if ($remove_id_field){ unset($cleaned_json_data[$kind.'_id']); }
     if ($remove_functions_field){ unset($cleaned_json_data[$kind.'_functions']); }
     // Loop through fields and set any psudeo-empty fields to actally empty
-    foreach ($cleaned_json_data AS $k => $v){ if ($v === '[]'){ $cleaned_json_data[$k] = ''; } }
-    // If not empty, loop through any encoded sub-fields and re-compress
-    if (method_exists('rpg_'.$kind, 'get_json_index_fields')){
+    //foreach ($cleaned_json_data AS $k => $v){ if ($v === '[]'){ $cleaned_json_data[$k] = ''; } }
+    // If not empty, loop through any encoded sub-fields and auto-expand them
+    if (empty($encoded_sub_fields)
+        && method_exists('rpg_'.$kind, 'get_json_index_fields')){
         $encoded_sub_fields = call_user_func(array('rpg_'.$kind, 'get_json_index_fields'));
-        if (!empty($encoded_sub_fields)){
-            foreach ($encoded_sub_fields AS $sub_field_name){
-                $sub_field_value = $cleaned_json_data[$sub_field_name];
-                if (!empty($sub_field_value)){
-                    $sub_field_value = json_decode($sub_field_value, true);
-                    $cleaned_json_data[$sub_field_name] = json_encode($sub_field_value, JSON_NUMERIC_CHECK);
-                }
-            }
+    }
+    if (!empty($encoded_sub_fields)){
+        foreach ($encoded_sub_fields AS $sub_field_name){
+            $sub_field_value = $cleaned_json_data[$sub_field_name];
+            if (!empty($sub_field_value)){ $sub_field_value = json_decode($sub_field_value, true); }
+            else { $sub_field_value = array(); }
+            $cleaned_json_data[$sub_field_name] = $sub_field_value;
         }
     }
     // If there are an image editor fields, translate them to contributor IDs
