@@ -97,6 +97,7 @@ foreach ($json_data_dirs AS $object_key => $object_token){
     $json_file = $object_token.'/data.json';
     $json_markup = file_get_contents($json_data_dir.$json_file);
     $json_data = json_decode($json_markup, true);
+    foreach ($json_data AS $f => $v){ if (is_array($v)){ $json_data[$f] = !empty($v) ? json_encode($v, JSON_NUMERIC_CHECK) : ''; } }
     $real_object_token = $json_data[$ctype_token.'_token'];
     $echo_text = '- Importing '.$ctype_token.' data for "'.$real_object_token.'" into database table "'.$table_name.'" ... ';
     // Check if this the json data has a parent_id set that needs translated to an object ID later

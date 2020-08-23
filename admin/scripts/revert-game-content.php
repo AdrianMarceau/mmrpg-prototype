@@ -88,6 +88,7 @@ foreach ($revert_tokens  AS $object_key => $object_token){
         //debug_echo('$json_data_markup = '.print_r($json_data_markup, true).'');
         if (!empty($json_data_markup)){
             $json_data_array = json_decode($json_data_markup, true);
+            foreach ($json_data_array AS $f => $v){ if (is_array($v)){ $json_data_array[$f] = !empty($v) ? json_encode($v, JSON_NUMERIC_CHECK) : ''; } }
             //debug_echo('$json_data_array = '.print_r($json_data_array, true).'');
             if (!empty($json_data_array)){
                 // Create an update array from the data, unset the ID, then translate the editor name(s) to IDs
