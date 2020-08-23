@@ -140,17 +140,15 @@ foreach ($player_index AS $player_token => $player_data){
         $player_image_directories_copied[] = basename($shadows_path);
     }
 
-    $function_path = rtrim(dirname($player_data['player_functions']), '/').'/';
-    //ob_echo('-- $function_path = '.$function_path);
-    $data_path = MMRPG_MIGRATE_OLD_DATA_DIR.$function_path.$player_token.'.php';
-    //ob_echo('-- $data_path = '.clean_path($data_path));
+    $data_path = MMRPG_MIGRATE_OLD_DATA_DIR.$player_token.'.php';
+    ob_echo('-- $data_path = '.clean_path($data_path));
 
     // Ensure the data file exists before attempting to extract functions from it
-    if (file_exists($data_path)){
+    if (true){
         $functions_file_markup = get_empty_functions_file_markup('player');
         if (!empty($functions_file_markup)){
             $content_data_path = $content_path.'functions.php';
-            ob_echo('- extract '.clean_path($data_path).' functions into '.clean_path($content_data_path));
+            //ob_echo('- write default functions into '.clean_path($content_data_path));
             $h = fopen($content_data_path, 'w');
             fwrite($h, $functions_file_markup);
             fclose($h);
