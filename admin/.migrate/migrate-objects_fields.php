@@ -91,12 +91,9 @@ foreach ($field_index AS $field_token => $field_data){
     ob_echo('Processing field data and sprites "'.$field_token.'" '.$count_string);
     ob_flush();
 
-    $function_path = rtrim(dirname($field_data['field_functions']), '/').'/';
-    //ob_echo('-- $function_path = '.$function_path);
-
     $sprite_path = MMRPG_FIELDS_OLD_IMAGES_DIR.$field_token.'/';
     //ob_echo('-- $sprite_path = '.clean_path($sprite_path));
-    $data_path = MMRPG_MIGRATE_OLD_DATA_DIR.$function_path.$field_token.'.php';
+    $data_path = MMRPG_MIGRATE_OLD_DATA_DIR.$field_token.'.php';
     //ob_echo('-- $data_path = '.clean_path($data_path));
 
     $content_path = MMRPG_FIELDS_NEW_CONTENT_DIR.($field_token === 'field' ? '.field' : $field_token).'/';
@@ -133,16 +130,16 @@ foreach ($field_index AS $field_token => $field_data){
         }
 
     // Ensure the data file exists before attempting to extract functions from it
-    if (file_exists($data_path)){
+    if (true){
         $functions_file_markup = get_empty_functions_file_markup('field');
         if (!empty($functions_file_markup)){
             $content_data_path = $content_path.'functions.php';
-            ob_echo('- extract '.clean_path($data_path).' functions into '.clean_path($content_data_path));
+            //ob_echo('- write default functions into '.clean_path($content_data_path));
             $h = fopen($content_data_path, 'w');
             fwrite($h, $functions_file_markup);
             fclose($h);
         }
-        $field_data_files_copied[] = basename($data_path); // not actually copied but here for tracking
+        $player_data_files_copied[] = basename($data_path); // not actually copied but here for tracking
     }
 
     // And then write the rest of the non-function data into a json file
