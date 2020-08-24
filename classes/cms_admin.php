@@ -359,6 +359,11 @@ class cms_admin {
         return array_values($committed);
     }
 
+    // Define a function for getting a string-padding git ID token (for folder names)
+    public static function git_get_id_token($kind, $id){
+        return $kind.'-'.str_pad($id, 4, '0', STR_PAD_LEFT);
+    }
+
     // Define a function for updating the git remote status w/ cache to speed up repeat requests
     public static function git_update_remote($repo_base_path, $use_cache = true){
         static $index;
@@ -417,39 +422,59 @@ class cms_admin {
     }
 
     // Define a quick function for filtering a given list of git changes by its data
-    public static function git_filter_list_by_data($list, $filter_data){
+    public static function git_filter_list_by_data($list, $filter_data, $pk_kind = 'token'){
+        //echo('<pre>git_filter_list_by_data($list, $filter_data)</pre>'.PHP_EOL);
+        //echo('<pre>$list = '.print_r($list, true).'</pre>'.PHP_EOL);
+        //echo('<pre>$filter_data = '.print_r($filter_data, true).'</pre>'.PHP_EOL);
+        //echo('<pre>$pk_kind = '.print_r($pk_kind, true).'</pre>'.PHP_EOL);
         if (empty($list)){ return array(); }
         elseif (empty($filter_data)){ return $list; }
-        elseif (empty($filter_data['table']) || empty($filter_data['token'])){ return $list; }
-        global $db;
+        elseif (empty($filter_data['table'])){ return $list; }
+        elseif (empty($filter_data[$pk_kind])){ return $list; }
+
         $filter_by_table = $filter_data['table'];
-        $filter_by_token = $filter_data['token'];
-        $filter_by_extra = !empty($filter_data['extra']) ? $filter_data['extra'] : array();
-        //echo('<pre>git_filter_list_by_data()</pre>'.PHP_EOL);
-        //echo('<pre>$list = '.print_r($list, true).'</pre>'.PHP_EOL);
         //echo('<pre>$filter_by_table = '.print_r($filter_by_table, true).'</pre>'.PHP_EOL);
-        //echo('<pre>$filter_by_token = '.print_r($filter_by_token, true).'</pre>'.PHP_EOL);
+        $filter_by_field = $filter_data[$pk_kind];
+        //echo('<pre>$filter_by_field = '.print_r($filter_by_field, true).'</pre>'.PHP_EOL);
+
+        $filter_values = array();
+        foreach ($list AS $key => $path){
+            list($folder) = explode('/', $path);
+            if ($pk_kind === 'id'){ $value = intval(preg_replace('/^[a-z0-9]+-/i', '', $folder)); }
+            else { $value = $folder; }
+            $filter_values[] = $value;
+        }
+        //echo('<pre>$filter_values = '.print_r($filter_values, true).'</pre>'.PHP_EOL);
+
+        if ($pk_kind === 'id'){ $filter_values_string = implode(", ", array_unique($filter_values)); }
+        else { $filter_values_string = "'".implode("', '", array_unique($filter_values))."'"; }
+        //echo('<pre>$filter_values_string = '.print_r($filter_values_string, true).'</pre>'.PHP_EOL);
+
+        $filter_by_extra = !empty($filter_data['extra']) ? $filter_data['extra'] : array();
         //echo('<pre>$filter_by_extra = '.print_r($filter_by_extra, true).'</pre>'.PHP_EOL);
-        $filter_tokens = array();
-        foreach ($list AS $key => $path){ list($token) = explode('/', $path); $filter_tokens[] = $token; }
-        $filter_tokens_string = "'".implode("', '", array_unique($filter_tokens))."'";
-        //echo('<pre>$filter_tokens = '.print_r($filter_tokens, true).'</pre>'.PHP_EOL);
-        //echo('<pre>$filter_tokens_string = '.print_r($filter_tokens_string, true).'</pre>'.PHP_EOL);
         $filter_extras = array();
         if (!empty($filter_by_extra)){ foreach ($filter_by_extra AS $f => $v){ $filter_extras[] = "{$f} = '".(is_numeric($v) ? $v : str_replace("'", "\\'", $v))."'"; } }
         $filter_extras_string = !empty($filter_extras) ? ' AND '.implode(' AND ', $filter_extras) : '';
         //echo('<pre>$filter_extras = '.print_r($filter_extras, true).'</pre>'.PHP_EOL);
         //echo('<pre>$filter_extras_string = '.print_r($filter_extras_string, true).'</pre>'.PHP_EOL);
-        $filter_query = "SELECT {$filter_by_token} FROM {$filter_by_table} WHERE {$filter_by_token} IN ($filter_tokens_string){$filter_extras_string};";
-        $filter_query_results = $db->get_array_list($filter_query, $filter_by_token);
+
+        global $db;
+        $filter_query = "SELECT {$filter_by_field} FROM {$filter_by_table} WHERE {$filter_by_field} IN ($filter_values_string){$filter_extras_string};";
+        $filter_query_results = $db->get_array_list($filter_query, $filter_by_field);
         //echo('<pre>$filter_query = '.print_r($filter_query, true).'</pre>'.PHP_EOL);
         //echo('<pre>$filter_query_results = '.print_r($filter_query_results, true).'</pre>'.PHP_EOL);
-        $allowed_tokens = is_array($filter_query_results) ? array_keys($filter_query_results) : array();
-        //echo('<pre>$allowed_tokens = '.print_r($allowed_tokens, true).'</pre>'.PHP_EOL);
-        foreach ($list AS $key => $path){ list($token) = explode('/', $path); if (!in_array($token, $allowed_tokens)){ unset($list[$key]); } }
+
+        $allowed_values = is_array($filter_query_results) ? array_keys($filter_query_results) : array();
+        //echo('<pre>$allowed_values = '.print_r($allowed_values, true).'</pre>'.PHP_EOL);
+        $allowed_folder_names = $allowed_values;
+        if ($pk_kind === 'id'){ foreach ($allowed_folder_names AS $key => $id){ $allowed_folder_names[$key] = self::git_get_id_token(substr($filter_by_field, 0, -3), $id); } }
+        //echo('<pre>$allowed_folder_names = '.print_r($allowed_folder_names, true).'</pre>'.PHP_EOL);
+
+        foreach ($list AS $key => $path){ list($folder) = explode('/', $path); if (!in_array($folder, $allowed_folder_names)){ unset($list[$key]); } }
         $list = array_values($list);
         //echo('<pre>$list = '.print_r($list, true).'</pre>'.PHP_EOL);
         //exit();
+
         return array_values($list);
     }
 
@@ -675,7 +700,7 @@ class cms_admin {
     }
 
     // Define a function for collecting a list of changes and updates for a given git repo
-    public static function object_editor_get_git_file_arrays($repo_path, $repo_filters = array()){
+    public static function object_editor_get_git_file_arrays($repo_path, $repo_filters = array(), $pk_kind = 'token'){
         // Define an array to hold the various change lists
         $git_file_arrays = array();
         // Collect the change kinds and loop through to generate lists
@@ -687,7 +712,7 @@ class cms_admin {
             $tokens_array_name = 'mmrpg_git_'.$token.'_changes_tokens';
             // Collect an index of changes files via git
             $changes_array = call_user_func(array(__CLASS__, $func_name), $repo_path);
-            if (!empty($repo_filters)){ $changes_array = self::git_filter_list_by_data($changes_array, $repo_filters); }
+            if (!empty($repo_filters)){ $changes_array = self::git_filter_list_by_data($changes_array, $repo_filters, $pk_kind); }
             // Now collect relevant player tokens from the list for matching
             $changes_array_tokens = array();
             foreach ($changes_array AS $key => $path){ list($token) = explode('/', $path); $changes_array_tokens[] = $token; }
@@ -703,19 +728,29 @@ class cms_admin {
     // Define a function for updating a given json file if the old and new contents are different
     public static function object_editor_update_json_data_file($object_kind, $updated_json_data){
         $object_xkind = substr($object_kind, -1, 1) === 'y' ? substr($object_kind, 0, -1).'ies' : $object_kind.'s';
+        // Define the data base and token directories given object kind then append to form full path
         $json_data_base_dir = constant('MMRPG_CONFIG_'.strtoupper($object_xkind).'_CONTENT_PATH');
         if (in_array($object_kind, array('star', 'challenge'))){ $json_data_token_dir = $object_kind.'-'.str_pad($updated_json_data[$object_kind.'_id'], 4, '0', STR_PAD_LEFT); }
         elseif (in_array($object_kind, array('page'))){ $json_data_token_dir = str_replace('/', '_', trim($updated_json_data[$object_kind.'_url'], '/')); }
         else { $json_data_token_dir = $updated_json_data[$object_kind.'_token']; }
         $json_data_full_path = $json_data_base_dir.$json_data_token_dir.'/data.json';
+        // Clean the new json data with settings specific to the object kind
+        $onclean_remove_id_field = true;
+        $onclean_remove_functions_field = true;
+        $onclean_encoded_sub_fields = array();
+        if ($object_kind === 'star' || $object_kind === 'challenge'){ $onclean_remove_id_field = false; }
+        if ($object_kind === 'challenge'){ $onclean_encoded_sub_fields = array('challenge_field_data', 'challenge_target_data', 'challenge_reward_data'); }
+        $new_json_data = self::object_editor_clean_json_content_array($object_kind, $updated_json_data, $onclean_remove_id_field, $onclean_remove_functions_field, $onclean_encoded_sub_fields);
+        // Pull the old json data for comparrison with the new stuff
         $old_json_data = file_exists($json_data_full_path) ? json_decode(file_get_contents($json_data_full_path), true) : array();
-        $new_json_data = self::object_editor_clean_json_content_array($object_kind, $updated_json_data);
+        // If old json doesn't exist or different than the new, update file
         if (empty($old_json_data) || !arrays_match($old_json_data, $new_json_data)){
             if (file_exists($json_data_full_path)){ unlink($json_data_full_path); }
             $h = fopen($json_data_full_path, 'w');
             fwrite($h, json_encode($new_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
             fclose($h);
         }
+
     }
 
     // Define a function for encoding an object array into json-compatible format for git export
