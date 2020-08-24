@@ -452,7 +452,36 @@
                 || in_array('edit-stars', $this_adminaccess)){
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-stars/', 'text' => 'Edit Rogue Stars'),
-                    'desc' => 'schedule and manage rogue star appearances in the post-game'
+                    'desc' => 'schedule and manage rogue star appearances in the post-game',
+                    'repo' => array(
+                        'name' => 'stars',
+                        'data' => array('prefix' => 'star'),
+                        'path' => MMRPG_CONFIG_STARS_CONTENT_PATH
+                        ),
+                    'buttons' => array(
+                        array(
+                            'text' => 'Revert All',
+                            'condition' => array('uncommitted' => true),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'revert',
+                                'data-kind' => 'stars',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            ),
+                        array(
+                            'text' => 'Commit All',
+                            'condition' => array('uncommitted' => true),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'commit',
+                                'data-kind' => 'stars',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            )
+                        )
                     );
                 $this_group_options[] = $this_option;
             }

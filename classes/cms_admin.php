@@ -359,9 +359,14 @@ class cms_admin {
         return array_values($committed);
     }
 
-    // Define a function for getting a string-padding git ID token (for folder names)
+    // Define a function for getting a string-padded git ID token (for folder names)
     public static function git_get_id_token($kind, $id){
         return $kind.'-'.str_pad($id, 4, '0', STR_PAD_LEFT);
+    }
+
+    // Define a function for getting a string-replaced git URL token (for folder names)
+    public static function git_get_url_token($kind, $url){
+        return str_replace('/', '_', trim($url, '/'));
     }
 
     // Define a function for updating the git remote status w/ cache to speed up repeat requests
@@ -610,8 +615,11 @@ class cms_admin {
                 && !empty($search_results)
                 && $search_data[$flag_name] !== ''){
                 foreach ($search_results AS $key => $data){
-                    if ($search_data[$flag_name] && !in_array($data[$object_kind.'_token'], $git_file_arrays[$array_name])){ unset($search_results[$key]); }
-                    elseif (!$search_data[$flag_name] && in_array($data[$object_kind.'_token'], $git_file_arrays[$array_name])){ unset($search_results[$key]); }
+                    if ($object_kind === 'star' || $object_kind === 'challenge'){ $search_token = self::git_get_id_token($object_kind, $data[$object_kind.'_id']); }
+                    elseif ($object_kind === 'page'){ $search_token = git_get_url_token($object_kind, $data[$object_kind.'_url']); }
+                    else { $search_token = $data[$object_kind.'_token']; }
+                    if ($search_data[$flag_name] && !in_array($search_token, $git_file_arrays[$array_name])){ unset($search_results[$key]); }
+                    elseif (!$search_data[$flag_name] && in_array($search_token, $git_file_arrays[$array_name])){ unset($search_results[$key]); }
                 }
                 $search_results = array_values($search_results);
                 $search_results_count = count($search_results);

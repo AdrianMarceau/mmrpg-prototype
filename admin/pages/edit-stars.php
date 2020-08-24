@@ -4,6 +4,13 @@
 
     //<script src="https://cdn.jsdelivr.net/npm/litepicker/dist/js/main.js"></script>
 
+    // Pre-check access permissions before continuing
+    if (!in_array('*', $this_adminaccess)
+        && !in_array('edit-stars', $this_adminaccess)){
+        $form_messages[] = array('error', 'You do not have permission to edit stars!');
+        redirect_form_action('admin/home/');
+    }
+
     /* -- Collect Dependant Indexes -- */
 
     // Collect an index of type colours for options
@@ -14,12 +21,14 @@
     $mmrpg_stars_fields = rpg_rogue_star::get_index_fields(true);
     $mmrpg_rogue_stars_index = $db->get_array_list("SELECT {$mmrpg_stars_fields} FROM mmrpg_rogue_stars WHERE star_id <> 0;", 'star_id');
 
-    // Pre-check access permissions before continuing
-    if (!in_array('*', $this_adminaccess)
-        && !in_array('edit-stars', $this_adminaccess)){
-        $form_messages[] = array('error', 'You do not have permission to edit stars!');
-        redirect_form_action('admin/home/');
-    }
+    // Collect an index of file changes and updates via git
+    $mmrpg_git_file_arrays = cms_admin::object_editor_get_git_file_arrays(MMRPG_CONFIG_STARS_CONTENT_PATH, array(
+        'table' => 'mmrpg_rogue_stars',
+        'id' => 'star_id'
+        ), 'id');
+
+    // Explode the list of git files into separate array vars
+    extract($mmrpg_git_file_arrays);
 
     // Define the extra stylesheets that must be included for this page
     if (!isset($admin_include_stylesheets)){ $admin_include_stylesheets = ''; }
@@ -88,6 +97,7 @@
         $search_data['star_power'] = !empty($_GET['star_power']) && is_numeric($_GET['star_power']) ? trim($_GET['star_power']) : '';
         $search_data['star_status'] = !empty($_GET['star_status']) && preg_match('/[-_0-9a-z]+/i', $_GET['star_status']) ? trim(strtolower($_GET['star_status'])) : '';
         $search_data['star_flag_enabled'] = isset($_GET['star_flag_enabled']) && $_GET['star_flag_enabled'] !== '' ? (!empty($_GET['star_flag_enabled']) ? 1 : 0) : '';
+        cms_admin::object_index_search_data_append_git_statuses($search_data, 'star');
 
         /* -- Collect Search Results -- */
 
@@ -186,6 +196,7 @@
         // Collect search results from the database
         $search_results = $db->get_array_list($search_query);
         $search_results_count = is_array($search_results) ? count($search_results) : 0;
+        cms_admin::object_index_search_results_filter_git_statuses($search_results, $search_results_count, $search_data, 'star', $mmrpg_git_file_arrays);
 
         // Collect a total number from the database
         $search_results_total = $db->get_value("SELECT COUNT(star_id) AS total FROM mmrpg_rogue_stars WHERE 1=1 AND star_id <> 0;", 'total');
@@ -270,7 +281,6 @@
             $form_data['star_to_date'] = !empty($_POST['star_to_date']) && preg_match('/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/i', $_POST['star_to_date']) ? trim($_POST['star_to_date']) : '';
             $form_data['star_to_date_time'] = !empty($_POST['star_to_date_time']) && preg_match('/^([0-9]{2}):([0-9]{2}):([0-9]{2})$/i', $_POST['star_to_date_time']) ? trim($_POST['star_to_date_time']) : '';
             $form_data['star_power'] = !empty($_POST['star_power']) && is_numeric($_POST['star_power']) ? trim($_POST['star_power']) : 0;
-
             $form_data['star_flag_enabled'] = isset($_POST['star_flag_enabled']) && is_numeric($_POST['star_flag_enabled']) ? trim($_POST['star_flag_enabled']) : 0;
 
             // If we're creating a new star, merge form data with the temp star data
@@ -367,6 +377,9 @@
                 $db->update('mmrpg_config', array('config_value' => $time), "config_group = 'global' AND config_name = 'cache_time'");
             }
 
+            // If successful, we need to update the JSON file
+            if ($form_success){ cms_admin::object_editor_update_json_data_file('star', array_merge($star_data, $update_data)); }
+
             // We're done processing the form, we can exit
             if ($star_data_is_new){ exit_star_edit_action(false); }
             else { exit_star_edit_action($form_data['star_id']); }
@@ -458,12 +471,14 @@
                     </div>
                     */ ?>
 
-                    <div class="field threesize has2cols flags">
+                    <div class="field fullsize has5cols flags">
                     <?
                     $flag_names = array(
                         'enabled' => array('icon' => 'fas fa-check-square', 'yes' => 'Enabled', 'no' => 'Disabled'),
                         );
+                    cms_admin::object_index_flag_names_append_git_statuses($flag_names);
                     foreach ($flag_names AS $flag_token => $flag_info){
+                        if (isset($flag_info['break'])){ echo('<div class="break"></div>'); continue; }
                         $flag_name = 'star_flag_'.$flag_token;
                         $flag_label = isset($flag_info['label']) ? $flag_info['label'] : ucfirst($flag_token);
                         ?>
@@ -592,6 +607,7 @@
 
                                 //$star_range_link = '<a class="link" href="'.$star_edit.'">'.$star_date_range.'</a>';
                                 $star_name_link = '<a class="link" href="'.$star_edit.'">'.$star_name.'</a>';
+                                cms_admin::object_index_links_append_git_statues($star_name_link, cms_admin::git_get_id_token('star', $star_id), $mmrpg_git_file_arrays);
 
                                 if (!empty($star_data['parent_id'])
                                     && $sort_data['name'] == 'star_rel_order'){
@@ -645,6 +661,10 @@
 
                     <h3 class="header type_span type_<?= !empty($star_data['star_type']) ? $star_data['star_type'] : 'none' ?>" data-auto="field-type" data-field-type="star_type">
                         <span class="title"><?= !empty($star_name_display) ? 'Editing &quot;'.$star_name_display.'&quot;' : 'Schedule New Star' ?></span>
+                        <?
+                        // Print out any git-related statues to this header
+                        cms_admin::object_editor_header_echo_git_statues(cms_admin::git_get_id_token('star', $star_data['star_id']), $mmrpg_git_file_arrays);
+                        ?>
                     </h3>
 
                     <? print_form_messages() ?>
@@ -719,9 +739,10 @@
 
                             <div class="buttons">
                                 <input class="button save" type="submit" value="Save Changes" />
-                                <input class="button reset" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin/edit-stars/editor/star_id=<?= $star_data['star_id'] ?>';" />
+                                <? /* <input class="button reset" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin/edit-stars/editor/star_id=<?= $star_data['star_id'] ?>';" /> */ ?>
                                 <input class="button delete" type="button" value="Delete Star" data-delete="stars" data-star-id="<?= $star_data['star_id'] ?>" />
                             </div>
+                            <?= cms_admin::object_editor_print_git_footer_buttons('stars', cms_admin::git_get_id_token('star', $star_data['star_id']), $mmrpg_git_file_arrays) ?>
 
                             <? /*
                             <div class="metadata">
