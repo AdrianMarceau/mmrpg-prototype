@@ -483,20 +483,7 @@
             }
 
             // If successful, we need to update the JSON file
-            if ($form_success){
-                // Calculate the data file path and then write to the new/recreated file
-                $json_data_path = MMRPG_CONFIG_FIELDS_CONTENT_PATH.$update_data['field_token'].'/data.json';
-                $old_json_data = file_exists($json_data_path) ? json_decode(file_get_contents($json_data_path), true) : array();
-                $new_json_data = array_remove_keys(array_merge($field_data, $update_data), 'field_id');
-                $new_json_data['field_image_editor'] = !empty($new_json_data['field_image_editor']) ? $mmrpg_contributors_index[$new_json_data['field_image_editor']]['user_name_clean'] : '';
-                $new_json_data['field_image_editor2'] = !empty($new_json_data['field_image_editor2']) ? $mmrpg_contributors_index[$new_json_data['field_image_editor2']]['user_name_clean'] : '';
-                if (empty($old_json_data) || !arrays_match($old_json_data, $new_json_data)){
-                    if (file_exists($json_data_path)){ unlink($json_data_path); }
-                    $h = fopen($json_data_path, 'w');
-                    fwrite($h, json_encode($new_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
-                    fclose($h);
-                }
-            }
+            if ($form_success){ cms_admin::object_editor_update_json_data_file('field', array_merge($field_data, $update_data)); }
 
             // If the field tokens have changed, we must move the entire folder
             if ($old_field_token !== $update_data['field_token']){

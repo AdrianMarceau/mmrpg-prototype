@@ -62,75 +62,83 @@ class cms_admin {
     // Define a function for easily getting a contributors index for back-end puruposes
     public static function get_contributors_index($object_kind, $image_editor_id_field = ''){
         global $db;
-        // If not provided, get the image editor ID field from the global constant
-        if (empty($image_editor_id_field)){ $image_editor_id_field = MMRPG_CONFIG_IMAGE_EDITOR_ID_FIELD; }
-        // Ensure the provided object kind as allowed and determine the plural form
-        $allowed_kinds = array('player', 'robot', 'field', 'ability', 'item');
-        $count_object = in_array($object_kind, $allowed_kinds) ? $object_kind : $allowed_kinds[0];
-        $count_object_plural = preg_match('/y$/i', $count_object) ? substr($count_object, 0, -1).'ies' : $count_object.'s';
-        // Pull the contributor index different depending on the global constant (pre/post migration check)
-        if ($image_editor_id_field === 'contributor_id'){
-            $mmrpg_contributors_index = $db->get_array_list("SELECT
-                contributors.contributor_id AS contributor_id,
-                contributors.user_name AS user_name,
-                contributors.user_name_public AS user_name_public,
-                contributors.user_name_clean AS user_name_clean,
-                uroles.role_level AS user_role_level,
-                (CASE WHEN editors.{$count_object}_image_count IS NOT NULL THEN editors.{$count_object}_image_count ELSE 0 END) AS user_image_count,
-                (CASE WHEN editors2.{$count_object}_image_count2 IS NOT NULL THEN editors2.{$count_object}_image_count2 ELSE 0 END) AS user_image_count2
-                FROM
-                mmrpg_users_contributors AS contributors
-                LEFT JOIN mmrpg_users AS users ON users.user_name_clean = contributors.user_name_clean
-                LEFT JOIN mmrpg_roles AS uroles ON uroles.role_id = users.role_id
-                LEFT JOIN (SELECT
-                        {$count_object}_image_editor AS {$count_object}_user_id,
-                        COUNT({$count_object}_image_editor) AS {$count_object}_image_count
-                        FROM mmrpg_index_{$count_object_plural}
-                        GROUP BY {$count_object}_image_editor) AS editors ON editors.{$count_object}_user_id = contributors.contributor_id
-                LEFT JOIN (SELECT
-                        {$count_object}_image_editor2 AS {$count_object}_user_id,
-                        COUNT({$count_object}_image_editor2) AS {$count_object}_image_count2
-                        FROM mmrpg_index_{$count_object_plural}
-                        GROUP BY {$count_object}_image_editor2) AS editors2 ON editors2.{$count_object}_user_id = contributors.contributor_id
-                WHERE
-                contributors.contributor_id <> 0
-                ORDER BY
-                uroles.role_level DESC,
-                contributors.user_name_clean ASC
-                ;", 'contributor_id');
+        // Ensure we do not re-collect the same index multiple times in a given run
+        static $index_cache;
+        if (!is_array($index_cache)){ $index_cache = array(); }
+        if (isset($index_cache[$object_kind.'/'.$image_editor_id_field])){
+            $mmrpg_contributors_index = $index_cache[$object_kind.'/'.$image_editor_id_field];
         } else {
-            $mmrpg_contributors_index = $db->get_array_list("SELECT
-                users.user_id AS user_id,
-                users.user_name AS user_name,
-                users.user_name_public AS user_name_public,
-                users.user_name_clean AS user_name_clean,
-                uroles.role_level AS user_role_level,
-                (CASE WHEN editors.{$count_object}_image_count IS NOT NULL THEN editors.{$count_object}_image_count ELSE 0 END) AS user_image_count,
-                (CASE WHEN editors2.{$count_object}_image_count2 IS NOT NULL THEN editors2.{$count_object}_image_count2 ELSE 0 END) AS user_image_count2
-                FROM
-                mmrpg_users AS users
-                LEFT JOIN mmrpg_roles AS uroles ON uroles.role_id = users.role_id
-                LEFT JOIN (SELECT
-                        {$count_object}_image_editor AS {$count_object}_user_id,
-                        COUNT({$count_object}_image_editor) AS {$count_object}_image_count
-                        FROM mmrpg_index_{$count_object_plural}
-                        GROUP BY {$count_object}_image_editor) AS editors ON editors.{$count_object}_user_id = users.user_id
-                LEFT JOIN (SELECT
-                        {$count_object}_image_editor2 AS {$count_object}_user_id,
-                        COUNT({$count_object}_image_editor2) AS {$count_object}_image_count2
-                        FROM mmrpg_index_{$count_object_plural}
-                        GROUP BY {$count_object}_image_editor2) AS editors2 ON editors2.{$count_object}_user_id = users.user_id
-                WHERE
-                users.user_id <> 0
-                AND (uroles.role_level > 3
-                    OR users.user_credit_line <> ''
-                    OR users.user_credit_text <> ''
-                    OR editors.{$count_object}_image_count IS NOT NULL
-                    OR editors2.{$count_object}_image_count2 IS NOT NULL)
-                ORDER BY
-                uroles.role_level DESC,
-                users.user_name_clean ASC
-                ;", 'user_id');
+            // If not provided, get the image editor ID field from the global constant
+            if (empty($image_editor_id_field)){ $image_editor_id_field = MMRPG_CONFIG_IMAGE_EDITOR_ID_FIELD; }
+            // Ensure the provided object kind as allowed and determine the plural form
+            $allowed_kinds = array('player', 'robot', 'field', 'ability', 'item');
+            $count_object = in_array($object_kind, $allowed_kinds) ? $object_kind : $allowed_kinds[0];
+            $count_object_plural = preg_match('/y$/i', $count_object) ? substr($count_object, 0, -1).'ies' : $count_object.'s';
+            // Pull the contributor index different depending on the global constant (pre/post migration check)
+            if ($image_editor_id_field === 'contributor_id'){
+                $mmrpg_contributors_index = $db->get_array_list("SELECT
+                    contributors.contributor_id AS contributor_id,
+                    contributors.user_name AS user_name,
+                    contributors.user_name_public AS user_name_public,
+                    contributors.user_name_clean AS user_name_clean,
+                    uroles.role_level AS user_role_level,
+                    (CASE WHEN editors.{$count_object}_image_count IS NOT NULL THEN editors.{$count_object}_image_count ELSE 0 END) AS user_image_count,
+                    (CASE WHEN editors2.{$count_object}_image_count2 IS NOT NULL THEN editors2.{$count_object}_image_count2 ELSE 0 END) AS user_image_count2
+                    FROM
+                    mmrpg_users_contributors AS contributors
+                    LEFT JOIN mmrpg_users AS users ON users.user_name_clean = contributors.user_name_clean
+                    LEFT JOIN mmrpg_roles AS uroles ON uroles.role_id = users.role_id
+                    LEFT JOIN (SELECT
+                            {$count_object}_image_editor AS {$count_object}_user_id,
+                            COUNT({$count_object}_image_editor) AS {$count_object}_image_count
+                            FROM mmrpg_index_{$count_object_plural}
+                            GROUP BY {$count_object}_image_editor) AS editors ON editors.{$count_object}_user_id = contributors.contributor_id
+                    LEFT JOIN (SELECT
+                            {$count_object}_image_editor2 AS {$count_object}_user_id,
+                            COUNT({$count_object}_image_editor2) AS {$count_object}_image_count2
+                            FROM mmrpg_index_{$count_object_plural}
+                            GROUP BY {$count_object}_image_editor2) AS editors2 ON editors2.{$count_object}_user_id = contributors.contributor_id
+                    WHERE
+                    contributors.contributor_id <> 0
+                    ORDER BY
+                    uroles.role_level DESC,
+                    contributors.user_name_clean ASC
+                    ;", 'contributor_id');
+            } else {
+                $mmrpg_contributors_index = $db->get_array_list("SELECT
+                    users.user_id AS user_id,
+                    users.user_name AS user_name,
+                    users.user_name_public AS user_name_public,
+                    users.user_name_clean AS user_name_clean,
+                    uroles.role_level AS user_role_level,
+                    (CASE WHEN editors.{$count_object}_image_count IS NOT NULL THEN editors.{$count_object}_image_count ELSE 0 END) AS user_image_count,
+                    (CASE WHEN editors2.{$count_object}_image_count2 IS NOT NULL THEN editors2.{$count_object}_image_count2 ELSE 0 END) AS user_image_count2
+                    FROM
+                    mmrpg_users AS users
+                    LEFT JOIN mmrpg_roles AS uroles ON uroles.role_id = users.role_id
+                    LEFT JOIN (SELECT
+                            {$count_object}_image_editor AS {$count_object}_user_id,
+                            COUNT({$count_object}_image_editor) AS {$count_object}_image_count
+                            FROM mmrpg_index_{$count_object_plural}
+                            GROUP BY {$count_object}_image_editor) AS editors ON editors.{$count_object}_user_id = users.user_id
+                    LEFT JOIN (SELECT
+                            {$count_object}_image_editor2 AS {$count_object}_user_id,
+                            COUNT({$count_object}_image_editor2) AS {$count_object}_image_count2
+                            FROM mmrpg_index_{$count_object_plural}
+                            GROUP BY {$count_object}_image_editor2) AS editors2 ON editors2.{$count_object}_user_id = users.user_id
+                    WHERE
+                    users.user_id <> 0
+                    AND (uroles.role_level > 3
+                        OR users.user_credit_line <> ''
+                        OR users.user_credit_text <> ''
+                        OR editors.{$count_object}_image_count IS NOT NULL
+                        OR editors2.{$count_object}_image_count2 IS NOT NULL)
+                    ORDER BY
+                    uroles.role_level DESC,
+                    users.user_name_clean ASC
+                    ;", 'user_id');
+            }
+            $index_cache[$object_kind.'/'.$image_editor_id_field] = $mmrpg_contributors_index;
         }
         // Return the generated list
         return $mmrpg_contributors_index;
@@ -691,6 +699,72 @@ class cms_admin {
         // Return the git path array to be exploded in the file
         return $git_file_arrays;
     }
+
+    // Define a function for updating a given json file if the old and new contents are different
+    public static function object_editor_update_json_data_file($object_kind, $updated_json_data){
+        $object_xkind = substr($object_kind, -1, 1) === 'y' ? substr($object_kind, 0, -1).'ies' : $object_kind.'s';
+        $json_data_base_dir = constant('MMRPG_CONFIG_'.strtoupper($object_xkind).'_CONTENT_PATH');
+        if (in_array($object_kind, array('star', 'challenge'))){ $json_data_token_dir = $object_kind.'-'.str_pad($updated_json_data[$object_kind.'_id'], 4, '0', STR_PAD_LEFT); }
+        elseif (in_array($object_kind, array('page'))){ $json_data_token_dir = str_replace('/', '_', trim($updated_json_data[$object_kind.'_url'], '/')); }
+        else { $json_data_token_dir = $updated_json_data[$object_kind.'_token']; }
+        $json_data_full_path = $json_data_base_dir.$json_data_token_dir.'/data.json';
+        $old_json_data = file_exists($json_data_full_path) ? json_decode(file_get_contents($json_data_full_path), true) : array();
+        $new_json_data = self::object_editor_clean_json_content_array($object_kind, $updated_json_data);
+        if (empty($old_json_data) || !arrays_match($old_json_data, $new_json_data)){
+            if (file_exists($json_data_full_path)){ unlink($json_data_full_path); }
+            $h = fopen($json_data_full_path, 'w');
+            fwrite($h, json_encode($new_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
+            fclose($h);
+        }
+    }
+
+    // Define a function for encoding an object array into json-compatible format for git export
+    public static function object_editor_clean_json_content_array($kind, $src_json_data, $remove_id_field = true, $remove_functions_field = true, $encoded_sub_fields = array()){
+        // Make a copy of the original JSON data
+        $cleaned_json_data = $src_json_data;
+        // Remove any known unnecessary or deprecated fields from the data
+        if ($remove_id_field){ unset($cleaned_json_data[$kind.'_id']); }
+        if ($remove_functions_field){ unset($cleaned_json_data[$kind.'_functions']); }
+        // If not empty, loop through any encoded sub-fields and auto-expand them
+        if (empty($encoded_sub_fields)
+            && method_exists('rpg_'.$kind, 'get_json_index_fields')){
+            $encoded_sub_fields = call_user_func(array('rpg_'.$kind, 'get_json_index_fields'));
+        }
+        if (!empty($encoded_sub_fields)){
+            foreach ($encoded_sub_fields AS $sub_field_name){
+                $sub_field_value = $cleaned_json_data[$sub_field_name];
+                if (!empty($sub_field_value)){ $sub_field_value = json_decode($sub_field_value, true); }
+                else { $sub_field_value = array(); }
+                $cleaned_json_data[$sub_field_name] = $sub_field_value;
+            }
+        }
+        // Collect an index of editor IDs to usernames for translation
+        static $editor_ids_to_usernames;
+        if (empty($editor_ids_to_usernames)){
+            $contributor_index = self::get_contributors_index($kind);
+            $editor_ids_to_usernames = array();
+            foreach ($contributor_index AS $key => $data){
+                $editor_ids_to_usernames[$data[MMRPG_CONFIG_IMAGE_EDITOR_ID_FIELD]] = $data['user_name_clean'];
+            }
+        }
+        // If there are an image editor fields, translate them to contributor IDs
+        $image_fields = array($kind.'_image_editor', $kind.'_image_editor2');
+        foreach ($image_fields AS $image_field){
+            if (!isset($cleaned_json_data[$image_field])){ continue; }
+            if (!empty($cleaned_json_data[$image_field])){
+                $user_id = $cleaned_json_data[$image_field];
+                if (!empty($editor_ids_to_usernames[$user_id])){
+                    $contributor_username = $editor_ids_to_usernames[$user_id];
+                    $cleaned_json_data[$image_field] = $contributor_username;
+                }
+            } else {
+                $cleaned_json_data[$image_field] = '';
+            }
+        }
+        // Return the cleaned JSON data
+        return $cleaned_json_data;
+    }
+
 
     /* -- SQL IMPORT / EXPORT FUNCTIONS -- */
 
