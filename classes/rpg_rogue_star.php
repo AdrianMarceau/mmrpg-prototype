@@ -37,6 +37,7 @@ class rpg_rogue_star {
             'star_to_date',
             'star_to_date_time',
             'star_power',
+            'star_active',
             'star_flag_enabled'
             );
 
