@@ -490,7 +490,36 @@
                 || in_array('edit-event-challenges', $this_adminaccess)){
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-event-challenges/', 'text' => 'Edit Event Challenges'),
-                    'desc' => 'create or modify event-based challenge missions for the post-game'
+                    'desc' => 'create or modify event-based challenge missions for the post-game',
+                    'repo' => array(
+                        'name' => 'challenges',
+                        'data' => array('prefix' => 'challenge'),
+                        'path' => MMRPG_CONFIG_CHALLENGES_CONTENT_PATH
+                        ),
+                    'buttons' => array(
+                        array(
+                            'text' => 'Revert All',
+                            'condition' => array('uncommitted' => true),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'revert',
+                                'data-kind' => 'challenges',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            ),
+                        array(
+                            'text' => 'Commit All',
+                            'condition' => array('uncommitted' => true),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'commit',
+                                'data-kind' => 'challenges',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            )
+                        )
                     );
                 $this_group_options[] = $this_option;
             }
@@ -515,7 +544,36 @@
                 || in_array('edit-pages', $this_adminaccess)){
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-pages/', 'text' => 'Edit Website Pages'),
-                    'desc' => 'edit the text and images on various website pages'
+                    'desc' => 'edit the text and images on various website pages',
+                    'repo' => array(
+                        'name' => 'pages',
+                        'data' => array('prefix' => 'page'),
+                        'path' => MMRPG_CONFIG_PAGES_CONTENT_PATH
+                        ),
+                    'buttons' => array(
+                        array(
+                            'text' => 'Revert All',
+                            'condition' => array('uncommitted' => true),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'revert',
+                                'data-kind' => 'pages',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            ),
+                        array(
+                            'text' => 'Commit All',
+                            'condition' => array('uncommitted' => true),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'commit',
+                                'data-kind' => 'pages',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            )
+                        )
                     );
                 $this_group_options[] = $this_option;
             }
