@@ -82,11 +82,11 @@ define('MMRPG_SQL_NEW_CONTENT_DIR', MMRPG_CONFIG_ROOTDIR.'content/.sql/');
 
 // Delete existing table and data directories so we can start over
 $sql_tables_export_dir = MMRPG_SQL_NEW_CONTENT_DIR.'tables/';
-if (file_exists($sql_tables_export_dir)){ deleteDir($sql_tables_export_dir); }
-if (!file_exists($sql_tables_export_dir)){ mkdir($sql_tables_export_dir); }
+if (file_exists($sql_tables_export_dir)){ deletedir_or_exit($sql_tables_export_dir); }
+if (!file_exists($sql_tables_export_dir)){ mkdir_or_exit($sql_tables_export_dir); }
 $sql_data_export_dir = MMRPG_SQL_NEW_CONTENT_DIR.'data/';
-if (file_exists($sql_data_export_dir)){ deleteDir($sql_data_export_dir); }
-if (!file_exists($sql_data_export_dir)){ mkdir($sql_data_export_dir); }
+if (file_exists($sql_data_export_dir)){ deletedir_or_exit($sql_data_export_dir); }
+if (!file_exists($sql_data_export_dir)){ mkdir_or_exit($sql_data_export_dir); }
 
 // Count the number of pages that we'll be looping through
 $sql_index_size = count($sql_table_index);

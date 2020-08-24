@@ -98,14 +98,14 @@ foreach ($field_index AS $field_token => $field_data){
 
     $content_path = MMRPG_FIELDS_NEW_CONTENT_DIR.($field_token === 'field' ? '.field' : $field_token).'/';
     //ob_echo('-- $content_path = '.clean_path($content_path));
-    if (file_exists($content_path)){ deleteDir($content_path); }
-    mkdir($content_path);
+    if (file_exists($content_path)){ deletedir_or_exit($content_path); }
+    mkdir_or_exit($content_path);
 
     // Ensure the base sprite exists first and copy if so
     if (file_exists($sprite_path)){
         $content_images_path = $content_path.'sprites/';
-        if (file_exists($content_images_path)){ deleteDir($content_images_path); }
-        mkdir($content_images_path);
+        if (file_exists($content_images_path)){ deletedir_or_exit($content_images_path); }
+        mkdir_or_exit($content_images_path);
         ob_echo('- copy '.clean_path($sprite_path).'* to '.clean_path($content_images_path));
         recurseCopyWithWhitelist($sprite_path, $content_images_path, $field_sprite_whitelist);
         $field_image_directories_copied[] = basename($sprite_path);
@@ -118,8 +118,8 @@ foreach ($field_index AS $field_token => $field_data){
             $sub_sprite_path = rtrim($sprite_path, '/').'_'.$otoken.'/';
             if (file_exists($sub_sprite_path)){
                 $sub_content_images_path = rtrim($content_images_path, '/').'_'.$otoken.'/';
-                if (file_exists($sub_content_images_path)){ deleteDir($sub_content_images_path); }
-                mkdir($sub_content_images_path);
+                if (file_exists($sub_content_images_path)){ deletedir_or_exit($sub_content_images_path); }
+                mkdir_or_exit($sub_content_images_path);
                 ob_echo('-- copy '.clean_path($sub_sprite_path).'* to '.clean_path($sub_content_images_path));
                 recurseCopy($sub_sprite_path, $sub_content_images_path);
                 $field_image_directories_copied[] = basename($sub_sprite_path);

@@ -93,8 +93,8 @@ foreach ($player_index AS $player_token => $player_data){
 
     $content_path = MMRPG_PLAYERS_NEW_CONTENT_DIR.($player_token === 'player' ? '.player' : $player_token).'/';
     //ob_echo('-- $content_path = '.clean_path($content_path));
-    if (file_exists($content_path)){ deleteDir($content_path); }
-    mkdir($content_path);
+    if (file_exists($content_path)){ deletedir_or_exit($content_path); }
+    mkdir_or_exit($content_path);
 
     $sprite_path = MMRPG_PLAYERS_OLD_IMAGES_DIR.$player_token.'/';
     //ob_echo('-- $sprite_path = '.clean_path($sprite_path));
@@ -102,8 +102,8 @@ foreach ($player_index AS $player_token => $player_data){
     // Ensure the base sprite exists first and copy if so
     if (file_exists($sprite_path)){
         $content_images_path = $content_path.'sprites/';
-        if (file_exists($content_images_path)){ deleteDir($content_images_path); }
-        mkdir($content_images_path);
+        if (file_exists($content_images_path)){ deletedir_or_exit($content_images_path); }
+        mkdir_or_exit($content_images_path);
         ob_echo('- copy '.clean_path($sprite_path).'* to '.clean_path($content_images_path));
         recurseCopy($sprite_path, $content_images_path, $skip_player_sprite_filenames);
         $player_image_directories_copied[] = basename($sprite_path);
@@ -116,8 +116,8 @@ foreach ($player_index AS $player_token => $player_data){
             $sub_sprite_path = rtrim($sprite_path, '/').'_'.$atoken.'/';
             if (file_exists($sub_sprite_path)){
                 $sub_content_images_path = rtrim($content_images_path, '/').'_'.$atoken.'/';
-                if (file_exists($sub_content_images_path)){ deleteDir($sub_content_images_path); }
-                mkdir($sub_content_images_path);
+                if (file_exists($sub_content_images_path)){ deletedir_or_exit($sub_content_images_path); }
+                mkdir_or_exit($sub_content_images_path);
                 ob_echo('-- copy '.clean_path($sub_sprite_path).'* to '.clean_path($sub_content_images_path));
                 recurseCopy($sub_sprite_path, $sub_content_images_path, $skip_player_sprite_filenames);
                 $player_image_directories_copied[] = basename($sub_sprite_path);
@@ -133,8 +133,8 @@ foreach ($player_index AS $player_token => $player_data){
     // Ensure the shadow sprite exists first and copy if so
     if (file_exists($shadows_path)){
         $content_shadows_path = $content_path.'shadows/';
-        if (file_exists($content_shadows_path)){ deleteDir($content_shadows_path); }
-        mkdir($content_shadows_path);
+        if (file_exists($content_shadows_path)){ deletedir_or_exit($content_shadows_path); }
+        mkdir_or_exit($content_shadows_path);
         ob_echo('- copy '.clean_path($shadows_path).'* to '.clean_path($content_shadows_path));
         recurseCopy($shadows_path, $content_shadows_path, $skip_player_sprite_filenames);
         $player_image_directories_copied[] = basename($shadows_path);

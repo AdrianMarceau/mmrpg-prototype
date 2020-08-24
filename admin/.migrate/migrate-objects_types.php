@@ -60,8 +60,8 @@ foreach ($type_index AS $type_token => $type_data){
 
     $content_path = MMRPG_TYPES_NEW_CONTENT_DIR.($type_token === 'type' ? '.type' : $type_token).'/';
     //ob_echo('-- $content_path = '.clean_path($content_path));
-    if (file_exists($content_path)){ deleteDir($content_path); }
-    mkdir($content_path);
+    if (file_exists($content_path)){ deletedir_or_exit($content_path); }
+    mkdir_or_exit($content_path);
 
 
     // Ensure the data file exists before adding it to the copied list

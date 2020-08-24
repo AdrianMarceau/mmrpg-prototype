@@ -55,8 +55,8 @@ $special_item_dirs[] = $special_action_items_dir = MMRPG_ITEMS_NEW_CONTENT_DIR.'
 $special_item_dirs[] = $special_effect_items_dir = MMRPG_ITEMS_NEW_CONTENT_DIR.'_effects/';
 foreach ($special_item_dirs AS $special_item_dir){
     //ob_echo('-- $special_item_dir = '.clean_path($special_item_dir));
-    if (empty($migration_filter) && file_exists($special_item_dir)){ deleteDir($special_item_dir); }
-    if (!file_exists($special_item_dir)){ mkdir($special_item_dir); }
+    if (empty($migration_filter) && file_exists($special_item_dir)){ deletedir_or_exit($special_item_dir); }
+    if (!file_exists($special_item_dir)){ mkdir_or_exit($special_item_dir); }
 }
 
 // Count the number of items that we'll be looping through
@@ -94,13 +94,13 @@ foreach ($item_index AS $item_token => $item_data){
 
     $content_path = MMRPG_ITEMS_NEW_CONTENT_DIR.($item_token === 'item' ? '.item' : $item_token).'/';
     //ob_echo('-- $content_path = '.clean_path($content_path));
-    if (file_exists($content_path)){ deleteDir($content_path); }
-    mkdir($content_path);
+    if (file_exists($content_path)){ deletedir_or_exit($content_path); }
+    mkdir_or_exit($content_path);
 
     if (file_exists($sprite_path)){
         $content_images_path = $content_path.'sprites/';
-        if (file_exists($content_images_path)){ deleteDir($content_images_path); }
-        mkdir($content_images_path);
+        if (file_exists($content_images_path)){ deletedir_or_exit($content_images_path); }
+        mkdir_or_exit($content_images_path);
         ob_echo('- copy '.clean_path($sprite_path).'* to '.clean_path($content_images_path));
         recurseCopy($sprite_path, $content_images_path);
         $item_image_directories_copied[] = basename($sprite_path);
@@ -110,8 +110,8 @@ foreach ($item_index AS $item_token => $item_data){
         $sub_sprite_path = rtrim($sprite_path, '/').'-'.$i.'/';
         if (file_exists($sub_sprite_path)){
             $sub_content_images_path = rtrim($content_images_path, '/').'_'.$i.'/';
-            if (file_exists($sub_content_images_path)){ deleteDir($sub_content_images_path); }
-            mkdir($sub_content_images_path);
+            if (file_exists($sub_content_images_path)){ deletedir_or_exit($sub_content_images_path); }
+            mkdir_or_exit($sub_content_images_path);
             ob_echo('-- copy '.clean_path($sub_sprite_path).'* to '.clean_path($sub_content_images_path));
             recurseCopy($sub_sprite_path, $sub_content_images_path);
             $item_image_directories_copied[] = basename($sub_sprite_path);
@@ -126,8 +126,8 @@ foreach ($item_index AS $item_token => $item_data){
             $sub_sprite_path = rtrim($sprite_path, '/').'_'.$atoken.'/';
             if (file_exists($sub_sprite_path)){
                 $sub_content_images_path = rtrim($content_images_path, '/').'_'.$atoken.'/';
-                if (file_exists($sub_content_images_path)){ deleteDir($sub_content_images_path); }
-                mkdir($sub_content_images_path);
+                if (file_exists($sub_content_images_path)){ deletedir_or_exit($sub_content_images_path); }
+                mkdir_or_exit($sub_content_images_path);
                 ob_echo('-- copy '.clean_path($sub_sprite_path).'* to '.clean_path($sub_content_images_path));
                 recurseCopy($sub_sprite_path, $sub_content_images_path);
                 $item_image_directories_copied[] = basename($sub_sprite_path);
@@ -140,13 +140,6 @@ foreach ($item_index AS $item_token => $item_data){
     // Ensure the data file exists before attempting to extra functions from it
     if (file_exists($data_path)){
         $split_markup = get_parsed_object_file_markup($data_path);
-        /* if (!empty($split_markup['data'])){
-            $content_data_path = $content_path.'data.php';
-            ob_echo('- extract '.clean_path($data_path).' into '.clean_path($content_data_path));
-            $h = fopen($content_data_path, 'w');
-            fwrite($h, $split_markup['data']);
-            fclose($h);
-        } */
         if (!empty($split_markup['functions'])){
             $content_data_path = $content_path.'functions.php';
             ob_echo('- extract '.clean_path($data_path).' functions into '.clean_path($content_data_path));
@@ -185,8 +178,8 @@ if (empty($migration_filter)){
     $type_index_tokens = array_keys($type_index);
     array_unshift($type_index_tokens, '');
     $this_object_base_path = $object_base_path.'heart-cores/';
-    if (file_exists($this_object_base_path)){ deleteDir($this_object_base_path); }
-    mkdir($this_object_base_path);
+    if (file_exists($this_object_base_path)){ deletedir_or_exit($this_object_base_path); }
+    mkdir_or_exit($this_object_base_path);
     $copy_heart_sprites = array();
     foreach ($type_index_tokens AS $type_token){
         $base_token = !empty($type_token) ? $type_token.'-heart' : 'heart';
@@ -205,8 +198,8 @@ if (empty($migration_filter)){
     ob_echo('----------');
     $marker_kind_tokens = array('base', 'bronze', 'silver', 'gold', 'glass', 'shadow');
     $this_object_base_path = $object_base_path.'challenge-markers/';
-    if (file_exists($this_object_base_path)){ deleteDir($this_object_base_path); }
-    mkdir($this_object_base_path);
+    if (file_exists($this_object_base_path)){ deletedir_or_exit($this_object_base_path); }
+    mkdir_or_exit($this_object_base_path);
     $copy_marker_sprites = array();
     foreach ($marker_kind_tokens AS $kind_token){
         $copy_marker_sprites[] = array('challenge-marker_'.$kind_token, $this_object_base_path.$kind_token.'/');

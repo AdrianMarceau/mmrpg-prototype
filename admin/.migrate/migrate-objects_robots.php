@@ -114,8 +114,8 @@ foreach ($robot_index AS $robot_token => $robot_data){
 
     $content_path = MMRPG_ROBOTS_NEW_CONTENT_DIR.($robot_token === 'robot' ? '.robot' : $robot_token).'/';
     //ob_echo('-- $content_path = '.clean_path($content_path));
-    if (file_exists($content_path)){ deleteDir($content_path); }
-    mkdir($content_path);
+    if (file_exists($content_path)){ deletedir_or_exit($content_path); }
+    mkdir_or_exit($content_path);
 
     // Generate a whitelist of sprites we can copy over for this robot
     $base_size = !empty($robot_data['robot_image_size']) ? $robot_data['robot_image_size'] : 40;
@@ -135,16 +135,16 @@ foreach ($robot_index AS $robot_token => $robot_data){
     // Ensure the base sprite exists first and copy if so
     if (file_exists($sprite_path)){
         $content_images_path = $content_path.'sprites/';
-        if (file_exists($content_images_path)){ deleteDir($content_images_path); }
-        mkdir($content_images_path);
+        if (file_exists($content_images_path)){ deletedir_or_exit($content_images_path); }
+        mkdir_or_exit($content_images_path);
         ob_echo('- copy '.clean_path($sprite_path).'* to '.clean_path($content_images_path));
         recurseCopyWithWhitelist($sprite_path, $content_images_path, $sprite_whitelist);
         $robot_image_directories_copied[] = basename($sprite_path);
         // Ensure the shadow sprite exists first and copy if so
         if (file_exists($shadow_path)){
             $content_shadow_images_path = $content_path.'shadows/';
-            if (file_exists($content_shadow_images_path)){ deleteDir($content_shadow_images_path); }
-            mkdir($content_shadow_images_path);
+            if (file_exists($content_shadow_images_path)){ deletedir_or_exit($content_shadow_images_path); }
+            mkdir_or_exit($content_shadow_images_path);
             ob_echo('- copy '.clean_path($shadow_path).'* to '.clean_path($content_shadow_images_path));
             recurseCopyWithWhitelist($shadow_path, $content_shadow_images_path, $sprite_whitelist);
             $robot_shadow_image_directories_copied[] = basename($shadow_path);
@@ -159,8 +159,8 @@ foreach ($robot_index AS $robot_token => $robot_data){
             $sub_sprite_path = rtrim($sprite_path, '/').'_'.$atoken.'/';
             if (file_exists($sub_sprite_path)){
                 $sub_content_images_path = rtrim($content_images_path, '/').'_'.$atoken.'/';
-                if (file_exists($sub_content_images_path)){ deleteDir($sub_content_images_path); }
-                mkdir($sub_content_images_path);
+                if (file_exists($sub_content_images_path)){ deletedir_or_exit($sub_content_images_path); }
+                mkdir_or_exit($sub_content_images_path);
                 ob_echo('-- copy '.clean_path($sub_sprite_path).'* to '.clean_path($sub_content_images_path));
                 recurseCopyWithWhitelist($sub_sprite_path, $sub_content_images_path, $sprite_whitelist);
                 $robot_image_directories_copied[] = basename($sub_sprite_path);
@@ -168,8 +168,8 @@ foreach ($robot_index AS $robot_token => $robot_data){
                 $sub_shadow_path = rtrim($shadow_path, '/').'_'.$atoken.'/';
                 if (file_exists($sub_shadow_path)){
                     $sub_content_shadow_images_path = rtrim($content_shadow_images_path, '/').'_'.$atoken.'/';
-                    if (file_exists($sub_content_shadow_images_path)){ deleteDir($sub_content_shadow_images_path); }
-                    mkdir($sub_content_shadow_images_path);
+                    if (file_exists($sub_content_shadow_images_path)){ deletedir_or_exit($sub_content_shadow_images_path); }
+                    mkdir_or_exit($sub_content_shadow_images_path);
                     ob_echo('-- copy '.clean_path($sub_shadow_path).'* to '.clean_path($sub_content_shadow_images_path));
                     recurseCopyWithWhitelist($sub_shadow_path, $sub_content_shadow_images_path, $sprite_whitelist);
                     $robot_shadow_image_directories_copied[] = basename($sub_shadow_path);
@@ -212,8 +212,8 @@ foreach ($robot_index AS $robot_token => $robot_data){
 
 // Delete directories that we don't want kept around
 $dot_robot_content_dir = MMRPG_ROBOTS_NEW_CONTENT_DIR.'.robot/';
-if (file_exists($dot_robot_content_dir.'sprites_legacy/')){ deleteDir($dot_robot_content_dir.'sprites_legacy/'); }
-if (file_exists($dot_robot_content_dir.'shadows_legacy/')){ deleteDir($dot_robot_content_dir.'shadows_legacy/'); }
+if (file_exists($dot_robot_content_dir.'sprites_legacy/')){ deletedir_or_exit($dot_robot_content_dir.'sprites_legacy/'); }
+if (file_exists($dot_robot_content_dir.'shadows_legacy/')){ deletedir_or_exit($dot_robot_content_dir.'shadows_legacy/'); }
 
 
 ob_echo('----------');

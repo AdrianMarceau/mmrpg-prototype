@@ -59,8 +59,8 @@ foreach ($star_index AS $star_data){
 
     $content_path = MMRPG_STARS_NEW_CONTENT_DIR.(empty($star_id) ? '.star' : $star_token).'/';
     ob_echo('-- $content_path = '.clean_path($content_path));
-    if (file_exists($content_path)){ deleteDir($content_path); }
-    mkdir($content_path);
+    if (file_exists($content_path)){ deletedir_or_exit($content_path); }
+    mkdir_or_exit($content_path);
 
     // And then write the rest of the non-function data into a json file
     $content_json_path = $content_path.'data.json';

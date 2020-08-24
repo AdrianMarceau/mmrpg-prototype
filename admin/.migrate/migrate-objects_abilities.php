@@ -73,8 +73,8 @@ $special_ability_dirs = array();
 $special_ability_dirs[] = $special_effect_abilities_dir = MMRPG_ABILITIES_NEW_CONTENT_DIR.'_effects/';
 foreach ($special_ability_dirs AS $special_ability_dir){
     //ob_echo('-- $special_ability_dir = '.clean_path($special_ability_dir));
-    if (empty($migration_filter) && file_exists($special_ability_dir)){ deleteDir($special_ability_dir); }
-    if (!file_exists($special_ability_dir)){ mkdir($special_ability_dir); }
+    if (empty($migration_filter) && file_exists($special_ability_dir)){ deletedir_or_exit($special_ability_dir); }
+    if (!file_exists($special_ability_dir)){ mkdir_or_exit($special_ability_dir); }
 }
 
 // Count the number of abilities that we'll be looping through
@@ -112,14 +112,14 @@ foreach ($ability_index AS $ability_token => $ability_data){
 
     $content_path = MMRPG_ABILITIES_NEW_CONTENT_DIR.($ability_token === 'ability' ? '.ability' : $ability_token).'/';
     //ob_echo('-- $content_path = '.clean_path($content_path));
-    if (file_exists($content_path)){ deleteDir($content_path); }
-    mkdir($content_path);
+    if (file_exists($content_path)){ deletedir_or_exit($content_path); }
+    mkdir_or_exit($content_path);
 
     // Ensure the base sprite exists first and copy if so
     if (file_exists($sprite_path)){
         $content_images_path = $content_path.'sprites/';
-        if (file_exists($content_images_path)){ deleteDir($content_images_path); }
-        mkdir($content_images_path);
+        if (file_exists($content_images_path)){ deletedir_or_exit($content_images_path); }
+        mkdir_or_exit($content_images_path);
         ob_echo('- copy '.clean_path($sprite_path).'* to '.clean_path($content_images_path));
         recurseCopy($sprite_path, $content_images_path);
         $ability_image_directories_copied[] = basename($sprite_path);
@@ -129,8 +129,8 @@ foreach ($ability_index AS $ability_token => $ability_data){
     $sub_sprite_path = rtrim($sprite_path, '/').'-b/';
     if (file_exists($sub_sprite_path)){
         $sub_content_images_path = rtrim($content_images_path, '/').'_'.$i.'/';
-        if (file_exists($sub_content_images_path)){ deleteDir($sub_content_images_path); }
-        mkdir($sub_content_images_path);
+        if (file_exists($sub_content_images_path)){ deletedir_or_exit($sub_content_images_path); }
+        mkdir_or_exit($sub_content_images_path);
         ob_echo('-- copy '.clean_path($sub_sprite_path).'* to '.clean_path($sub_content_images_path));
         recurseCopy($sub_sprite_path, $sub_content_images_path);
         $ability_image_directories_copied[] = basename($sub_sprite_path);
@@ -141,8 +141,8 @@ foreach ($ability_index AS $ability_token => $ability_data){
         $sub_sprite_path = rtrim($sprite_path, '/').'-'.$i.'/';
         if (file_exists($sub_sprite_path)){
             $sub_content_images_path = rtrim($content_images_path, '/').'_'.$i.'/';
-            if (file_exists($sub_content_images_path)){ deleteDir($sub_content_images_path); }
-            mkdir($sub_content_images_path);
+            if (file_exists($sub_content_images_path)){ deletedir_or_exit($sub_content_images_path); }
+            mkdir_or_exit($sub_content_images_path);
             ob_echo('-- copy '.clean_path($sub_sprite_path).'* to '.clean_path($sub_content_images_path));
             recurseCopy($sub_sprite_path, $sub_content_images_path);
             $ability_image_directories_copied[] = basename($sub_sprite_path);
@@ -150,8 +150,8 @@ foreach ($ability_index AS $ability_token => $ability_data){
             $sub_sub_sprite_path = rtrim($sub_sprite_path, '/').'-b/';
             if (file_exists($sub_sub_sprite_path)){
                 $sub_sub_content_images_path = rtrim($sub_content_images_path, '/').'-'.$i.'/';
-                if (file_exists($sub_sub_content_images_path)){ deleteDir($sub_sub_content_images_path); }
-                mkdir($sub_sub_content_images_path);
+                if (file_exists($sub_sub_content_images_path)){ deletedir_or_exit($sub_sub_content_images_path); }
+                mkdir_or_exit($sub_sub_content_images_path);
                 ob_echo('-- copy '.clean_path($sub_sub_sprite_path).'* to '.clean_path($sub_sub_content_images_path));
                 recurseCopy($sub_sub_sprite_path, $sub_sub_content_images_path);
                 $ability_image_directories_copied[] = basename($sub_sub_sprite_path);
@@ -168,8 +168,8 @@ foreach ($ability_index AS $ability_token => $ability_data){
             $sub_sprite_path = rtrim($sprite_path, '/').'_'.$atoken.'/';
             if (file_exists($sub_sprite_path)){
                 $sub_content_images_path = rtrim($content_images_path, '/').'_'.$atoken.'/';
-                if (file_exists($sub_content_images_path)){ deleteDir($sub_content_images_path); }
-                mkdir($sub_content_images_path);
+                if (file_exists($sub_content_images_path)){ deletedir_or_exit($sub_content_images_path); }
+                mkdir_or_exit($sub_content_images_path);
                 ob_echo('-- copy '.clean_path($sub_sprite_path).'* to '.clean_path($sub_content_images_path));
                 recurseCopy($sub_sprite_path, $sub_content_images_path);
                 $ability_image_directories_copied[] = basename($sub_sprite_path);
@@ -249,7 +249,7 @@ if (empty($migration_filter)){
             ob_echo('----------');
             ob_echo('Removing redundant sprites for bright-burst ability');
             ob_echo('- delete '.clean_path(MMRPG_ABILITIES_NEW_CONTENT_DIR.'bright-burst/sprites_2/').'*');
-            deleteDir(MMRPG_ABILITIES_NEW_CONTENT_DIR.'bright-burst/sprites_2/'); // delete the original
+            deletedir_or_exit(MMRPG_ABILITIES_NEW_CONTENT_DIR.'bright-burst/sprites_2/'); // delete the original
         }
     }
 
@@ -265,7 +265,7 @@ if (empty($migration_filter)){
                 $flag_print_removed = true;
             }
             ob_echo('- delete '.clean_path(MMRPG_ABILITIES_NEW_CONTENT_DIR.'field-support/'.$sprites_path.'/').'*');
-            deleteDir(MMRPG_ABILITIES_NEW_CONTENT_DIR.'field-support/'.$sprites_path.'/');
+            deletedir_or_exit(MMRPG_ABILITIES_NEW_CONTENT_DIR.'field-support/'.$sprites_path.'/');
         }
         if (!$flag_print_removed){
             ob_echo('----------');

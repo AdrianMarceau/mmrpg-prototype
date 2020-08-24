@@ -54,13 +54,13 @@ foreach ($battle_index AS $battle_token => $battle_data){
 
     $content_path = MMRPG_BATTLES_NEW_CONTENT_DIR.($battle_token === 'battle' ? '.battle' : $battle_token).'/';
     //ob_echo('-- $content_path = '.clean_path($content_path));
-    if (file_exists($content_path)){ deleteDir($content_path); }
-    mkdir($content_path);
+    if (file_exists($content_path)){ deletedir_or_exit($content_path); }
+    mkdir_or_exit($content_path);
 
     // If this is a DEMO battle, skip it all-together
     if (preg_match('/^demo-/i', $battle_token)){
         ob_echo('- skipping deprecated demo missions from being migrated');
-        if (file_exists($content_path)){ deleteDir($content_path); }
+        if (file_exists($content_path)){ deletedir_or_exit($content_path); }
         continue;
     }
 
