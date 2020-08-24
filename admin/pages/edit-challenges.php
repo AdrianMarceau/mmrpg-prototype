@@ -49,34 +49,52 @@
     $mmrpg_items_fields = rpg_item::get_index_fields(true);
     $mmrpg_items_index = $db->get_array_list("SELECT {$mmrpg_items_fields} FROM mmrpg_index_items WHERE item_token <> 'item' AND item_class <> 'system' AND (item_subclass = 'consumable' OR item_subclass = 'holdable') AND item_flag_published = 1 AND item_flag_complete = 1 ORDER BY item_order ASC", 'item_token');
 
-    // Collect an index of contributors and admins that have made challenges
-    $mmrpg_contributors_index = $db->get_array_list("SELECT
-        users.user_id AS user_id,
-        users.user_name AS user_name,
-        users.user_name_public AS user_name_public,
-        users.user_name_clean AS user_name_clean,
-        (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS user_name_display,
-        users.user_colour_token AS user_colour_token,
-        uroles.role_level AS user_role_level,
-        (CASE WHEN editors.challenges_created_count IS NOT NULL THEN editors.challenges_created_count ELSE 0 END) AS user_challenge_count
-        FROM
-        mmrpg_users AS users
-        LEFT JOIN mmrpg_roles AS uroles ON uroles.role_id = users.role_id
-        LEFT JOIN (SELECT
-                challenge_creator AS challenge_user_id,
-                COUNT(challenge_creator) AS challenges_created_count
-                FROM {$this_challenge_table}
-                GROUP BY challenge_creator) AS editors ON editors.challenge_user_id = users.user_id
-        WHERE
-        users.user_id <> 0
-        AND (uroles.role_level > 3
-            OR users.user_credit_line <> ''
-            OR users.user_credit_text <> ''
-            OR editors.challenges_created_count IS NOT NULL)
-        ORDER BY
-        users.user_name_clean ASC,
-        uroles.role_level DESC
-        ;", 'user_id');
+    // Collect an index of contributors and admins that have made sprites
+    if ($this_challenge_kind === 'event'){
+        $mmrpg_contributors_index = cms_admin::get_contributors_index('challenge');
+    } elseif ($this_challenge_kind === 'user'){
+        $mmrpg_contributors_index = $db->get_array_list("SELECT
+            users.user_id AS user_id,
+            users.user_name AS user_name,
+            users.user_name_public AS user_name_public,
+            users.user_name_clean AS user_name_clean,
+            (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS user_name_display,
+            users.user_colour_token AS user_colour_token,
+            uroles.role_level AS user_role_level,
+            (CASE WHEN editors.challenges_created_count IS NOT NULL THEN editors.challenges_created_count ELSE 0 END) AS user_challenge_count
+            FROM
+            mmrpg_users AS users
+            LEFT JOIN mmrpg_roles AS uroles ON uroles.role_id = users.role_id
+            LEFT JOIN (SELECT
+                    challenge_creator AS challenge_user_id,
+                    COUNT(challenge_creator) AS challenges_created_count
+                    FROM {$this_challenge_table}
+                    GROUP BY challenge_creator) AS editors ON editors.challenge_user_id = users.user_id
+            WHERE
+            users.user_id <> 0
+            AND (uroles.role_level > 3
+                OR users.user_credit_line <> ''
+                OR users.user_credit_text <> ''
+                OR editors.challenges_created_count IS NOT NULL)
+            ORDER BY
+            users.user_name_clean ASC,
+            uroles.role_level DESC
+            ;", 'user_id');
+    }
+
+    // Only event challenges use git functionality
+    if ($this_challenge_kind === 'event'){
+
+        // Collect an index of file changes and updates via git
+        $mmrpg_git_file_arrays = cms_admin::object_editor_get_git_file_arrays(MMRPG_CONFIG_CHALLENGES_CONTENT_PATH, array(
+            'table' => 'mmrpg_challenges',
+            'id' => 'challenge_id'
+            ), 'id');
+
+        // Explode the list of git files into separate array vars
+        extract($mmrpg_git_file_arrays);
+
+    }
 
     // Define the various stat mod kinds and value range
     $stat_mod_kinds = array('attack', 'defense', 'speed');
@@ -197,10 +215,10 @@
     // Pre-generate a list of all contributors so we can re-use it over and over
     $contributor_options_markup = array();
     $contributor_options_markup[] = '<option value="0">-</option>';
-    foreach ($mmrpg_contributors_index AS $user_id => $user_info){
-        $option_label = $user_info['user_name'];
-        if (!empty($user_info['user_name_public']) && $user_info['user_name_public'] !== $user_info['user_name']){ $option_label = $user_info['user_name_public'].' ('.$option_label.')'; }
-        $contributor_options_markup[] = '<option value="'.$user_id.'">'.$option_label.'</option>';
+    foreach ($mmrpg_contributors_index AS $creator_id => $creator_info){
+        $option_label = $creator_info['user_name'];
+        if (!empty($creator_info['user_name_public']) && $creator_info['user_name_public'] !== $creator_info['user_name']){ $option_label = $creator_info['user_name_public'].' ('.$option_label.')'; }
+        $contributor_options_markup[] = '<option value="'.$creator_id.'">'.$option_label.'</option>';
     }
     $contributor_options_count = count($contributor_options_markup);
     $contributor_options_markup = implode(PHP_EOL, $contributor_options_markup);
@@ -263,6 +281,7 @@
         $search_data['challenge_creator'] = !empty($_GET['challenge_creator']) && is_numeric($_GET['challenge_creator']) ? (int)($_GET['challenge_creator']) : '';
         $search_data['challenge_flag_hidden'] = isset($_GET['challenge_flag_hidden']) && $_GET['challenge_flag_hidden'] !== '' ? (!empty($_GET['challenge_flag_hidden']) ? 1 : 0) : '';
         $search_data['challenge_flag_published'] = isset($_GET['challenge_flag_published']) && $_GET['challenge_flag_published'] !== '' ? (!empty($_GET['challenge_flag_published']) ? 1 : 0) : '';
+        if ($this_challenge_kind === 'event'){ cms_admin::object_index_search_data_append_git_statuses($search_data, 'challenge'); }
 
         /* -- Collect Search Results -- */
 
@@ -351,6 +370,7 @@
         // Collect search results from the database
         $search_results = $db->get_array_list($search_query);
         $search_results_count = is_array($search_results) ? count($search_results) : 0;
+        if ($this_challenge_kind === 'event'){ cms_admin::object_index_search_results_filter_git_statuses($search_results, $search_results_count, $search_data, 'challenge', $mmrpg_git_file_arrays); }
 
         // Collect a total number from the database
         $search_results_total = $db->get_value("SELECT COUNT(challenge_id) AS total FROM {$this_challenge_table} WHERE 1=1;", 'total');
@@ -572,6 +592,9 @@
                 $db->update('mmrpg_config', array('config_value' => $time), "config_group = 'global' AND config_name = 'cache_time'");
             }
 
+            // If successful, we need to update the JSON file
+            if ($this_challenge_kind === 'event' && $form_success){ cms_admin::object_editor_update_json_data_file('challenge', array_merge($challenge_data, $update_data)); }
+
             // We're done processing the form, we can exit
             exit_challenge_edit_action($form_data['challenge_id']);
 
@@ -632,22 +655,24 @@
                         <div class="field">
                             <strong class="label">By Creator</strong>
                             <select class="select" name="challenge_creator"><option value=""></option><?
-                                foreach ($mmrpg_contributors_index AS $user_id => $user_info){
-                                    $option_label = $user_info['user_name'];
-                                    if (!empty($user_info['user_name_public']) && $user_info['user_name_public'] !== $user_info['user_name']){ $option_label = $user_info['user_name_public'].' ('.$option_label.')'; }
-                                    ?><option value="<?= $user_id ?>"<?= !empty($search_data['challenge_creator']) && $search_data['challenge_creator'] === $user_id ? ' selected="selected"' : '' ?>><?= $option_label ?></option><?
+                                foreach ($mmrpg_contributors_index AS $creator_id => $creator_info){
+                                    $option_label = $creator_info['user_name'];
+                                    if (!empty($creator_info['user_name_public']) && $creator_info['user_name_public'] !== $creator_info['user_name']){ $option_label = $creator_info['user_name_public'].' ('.$option_label.')'; }
+                                    ?><option value="<?= $creator_id ?>"<?= !empty($search_data['challenge_creator']) && $search_data['challenge_creator'] === $creator_id ? ' selected="selected"' : '' ?>><?= $option_label ?></option><?
                                     } ?>
                             </select><span></span>
                         </div>
                     <? } ?>
 
-                    <div class="field has2cols flags">
+                    <div class="field fullsize has5cols flags">
                     <?
                     $flag_names = array(
                         'published' => array('icon' => 'fas fa-check-square', 'yes' => 'Published', 'no' => 'Unpublished'),
                         'hidden' => array('icon' => 'fas fa-eye-slash', 'yes' => 'Hidden', 'no' => 'Visible')
                         );
+                    if ($this_challenge_kind === 'event'){ cms_admin::object_index_flag_names_append_git_statuses($flag_names); }
                     foreach ($flag_names AS $flag_token => $flag_info){
+                        if (isset($flag_info['break'])){ echo('<div class="break"></div>'); continue; }
                         $flag_name = 'challenge_flag_'.$flag_token;
                         $flag_label = ucfirst($flag_token);
                         ?>
@@ -762,6 +787,7 @@
 
                                 $challenge_edit_url = $this_challenge_page_baseurl.'editor/challenge_id='.$challenge_id;
                                 $challenge_name_link = '<a class="link" href="'.$challenge_edit_url.'">'.$challenge_name.'</a>';
+                                if ($this_challenge_kind === 'event'){ cms_admin::object_index_links_append_git_statues($challenge_name_link, cms_admin::git_get_id_token('challenge', $challenge_id), $mmrpg_git_file_arrays); }
 
                                 $challenge_actions = '';
                                 $challenge_actions .= '<a class="link edit" href="'.$challenge_edit_url.'"><span>edit</span></a>';
@@ -816,6 +842,10 @@
 
                     <h3 class="header type_span type_<?= !empty($challenge_data['challenge_core']) ? $challenge_data['challenge_core'].(!empty($challenge_data['challenge_core2']) ? '_'.$challenge_data['challenge_core2'] : '') : 'none' ?>" data-auto="field-type" data-field-type="challenge_core,challenge_core2">
                         <span class="title"><?= !empty($challenge_name_display) ? 'Edit Challenge &quot;'.$challenge_name_display.'&quot;' : 'New Challenge' ?></span>
+                        <?
+                        // Print out any git-related statues to this header
+                        if ($this_challenge_kind === 'event'){ cms_admin::object_editor_header_echo_git_statues(cms_admin::git_get_id_token('challenge', $challenge_data['challenge_id']), $mmrpg_git_file_arrays); }
+                        ?>
                     </h3>
 
                     <? print_form_messages() ?>
@@ -1193,9 +1223,12 @@
 
                                     <div class="buttons">
                                         <input class="button save" type="submit" value="Save Changes" />
-                                        <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='<?= $this_challenge_page_baseurl ?>editor/challenge_id=<?= $challenge_data['challenge_id'] ?>';" />
+                                        <? /* <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='<?= $this_challenge_page_baseurl ?>editor/challenge_id=<?= $challenge_data['challenge_id'] ?>';" /> */ ?>
                                         <input class="button delete" type="button" value="Delete Challenge" data-delete="challenges" data-challenge-id="<?= $challenge_data['challenge_id'] ?>" data-challenge-kind="<?= $this_challenge_kind ?>" />
                                     </div>
+                                    <? if ($this_challenge_kind === 'event'){ ?>
+                                        <?= cms_admin::object_editor_print_git_footer_buttons('challenges', cms_admin::git_get_id_token('challenge', $challenge_data['challenge_id']), $mmrpg_git_file_arrays) ?>
+                                    <? } ?>
 
                                     <div class="metadata">
                                         <div class="date"><strong>Created</strong>: <?= !empty($challenge_data['challenge_date_created']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $challenge_data['challenge_date_created'])): '-' ?></div>

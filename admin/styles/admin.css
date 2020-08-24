@@ -1283,17 +1283,18 @@ input[type=file] {
 }
 .adminform .formfoot .metadata {
     display: block;
-    margin: 0 0 0 10px;
-    padding-right: 20px;
-    float: right;
+    margin: 10px auto 0 0;
+    padding: 0 0 0 2px;
+    float: left;
+    clear: left;
     font-size: 11px;
     line-height: 16px;
-    text-align: right;
+    text-align: left;
     color: #696969;
 }
 .adminform .formfoot .metadata .date {
-    display: inline-block;
-    margin: 0 0 0 20px;
+    display: block;
+    margin: 0 auto 5px 0;
 }
 
 .adminform .formfoot .git-buttons {

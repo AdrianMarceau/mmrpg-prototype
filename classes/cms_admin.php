@@ -791,7 +791,7 @@ class cms_admin {
             }
         }
         // If there are an image editor fields, translate them to contributor IDs
-        $image_fields = array($kind.'_image_editor', $kind.'_image_editor2');
+        $image_fields = array($kind.'_image_editor', $kind.'_image_editor2', $kind.'_creator');
         foreach ($image_fields AS $image_field){
             if (!isset($cleaned_json_data[$image_field])){ continue; }
             if (!empty($cleaned_json_data[$image_field])){
