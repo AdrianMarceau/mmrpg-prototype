@@ -2307,11 +2307,13 @@ class rpg_robot extends rpg_object {
 
         // Define the various json index fields for player objects
         $json_index_fields = array(
+            'robot_image_alts',
             'robot_weaknesses',
             'robot_resistances',
             'robot_affinities',
             'robot_immunities',
-            'robot_image_alts'
+            'robot_abilities_compatible',
+            'robot_abilities_rewards'
             );
 
         // Implode the index fields into a string if requested
@@ -2491,11 +2493,11 @@ class rpg_robot extends rpg_object {
         }
 
         // Explode the abilities into the appropriate array
-        $robot_info['robot_abilities'] = !empty($robot_info['robot_abilities_compatible']) ? json_decode($robot_info['robot_abilities_compatible'], true) : array();
+        $robot_info['robot_abilities'] = !empty($robot_info['robot_abilities_compatible']) ? $robot_info['robot_abilities_compatible'] : array();
         unset($robot_info['robot_abilities_compatible']);
 
         // Explode the abilities into the appropriate array
-        $robot_info['robot_rewards']['abilities'] = !empty($robot_info['robot_abilities_rewards']) ? json_decode($robot_info['robot_abilities_rewards'], true) : array();
+        $robot_info['robot_rewards']['abilities'] = !empty($robot_info['robot_abilities_rewards']) ? $robot_info['robot_abilities_rewards'] : array();
         unset($robot_info['robot_abilities_rewards']);
 
         // Collect the quotes into the proper arrays
