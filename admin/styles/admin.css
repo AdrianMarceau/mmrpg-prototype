@@ -453,7 +453,7 @@ a:hover {
 }
 .adminhome li.pull-from-github .desc,
 .adminhome li.push-to-github .desc {
-    display: none;
+    /* display: none; */
     color: #969696;
 }
 .adminhome li.pull-from-github .buttons,

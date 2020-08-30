@@ -130,18 +130,20 @@
                     }
                 }
 
-                // If there weren't any buttons generated, skip this loop
-                if (empty($option_buttons)){ continue; }
+                // Only add the option if buttons were actually generated
+                if (!empty($option_buttons)){
 
-                // Generate the pull-from-github option with any relevant buttons
-                $this_option = array(
-                    'link' => array('text' => 'Pull from GitHub', 'icon' => 'cloud-download-alt'),
-                    'desc' => 'pull committed changes from github repos and update',
-                    'buttons' => $option_buttons
-                    );
+                    // Generate the pull-from-github option with any relevant buttons
+                    $this_option = array(
+                        'link' => array('text' => 'Pull from GitHub', 'icon' => 'cloud-download-alt'),
+                        'desc' => 'pull committed changes from github repos and update',
+                        'buttons' => $option_buttons
+                        );
 
-                // Add the option to the appropriate group for later
-                $common_group_kinds_options[$kind_token][] = $this_option;
+                    // Add the option to the appropriate group for later
+                    $common_group_kinds_options[$kind_token][] = $this_option;
+
+                }
 
             }
 
@@ -192,18 +194,20 @@
                     }
                 }
 
-                // If there weren't any buttons generated, skip this loop
-                if (empty($option_buttons)){ continue; }
+                // Only add the option if buttons were actually generated
+                if (!empty($option_buttons)){
 
-                // Generate the push-to-github option with any relevant buttons
-                $this_option = array(
-                    'link' => array('text' => 'Push to GitHub', 'icon' => 'cloud-upload-alt'),
-                    'desc' => 'push committed changes to github repos and publish',
-                    'buttons' => $option_buttons
-                    );
+                    // Generate the push-to-github option with any relevant buttons
+                    $this_option = array(
+                        'link' => array('text' => 'Push to GitHub', 'icon' => 'cloud-upload-alt'),
+                        'desc' => 'push committed changes to github repos and publish',
+                        'buttons' => $option_buttons
+                        );
 
-                // Add the option to the appropriate group for later
-                $common_group_kinds_options[$kind_token][] = $this_option;
+                    // Add the option to the appropriate group for later
+                    $common_group_kinds_options[$kind_token][] = $this_option;
+
+                }
 
             }
 
