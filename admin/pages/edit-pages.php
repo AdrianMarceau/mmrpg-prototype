@@ -15,6 +15,15 @@
         redirect_form_action('admin/home/');
     }
 
+    // Collect an index of file changes and updates via git
+    $mmrpg_git_file_arrays = cms_admin::object_editor_get_git_file_arrays(MMRPG_CONFIG_PAGES_CONTENT_PATH, array(
+        'table' => 'mmrpg_website_pages',
+        'url' => 'page_url'
+        ), 'url');
+
+    // Explode the list of git files into separate array vars
+    extract($mmrpg_git_file_arrays);
+
     /* -- Page Script/Style Dependencies  -- */
 
     // Define the extra stylesheets that must be included for this page
@@ -90,7 +99,7 @@
         $search_data['page_content'] = !empty($_GET['page_content']) && preg_match('/[-_0-9a-z\.\*\s\&\!\?\$\/]+/i', $_GET['page_content']) ? trim(strtolower($_GET['page_content'])) : '';
         $search_data['page_flag_published'] = isset($_GET['page_flag_published']) && $_GET['page_flag_published'] !== '' ? (!empty($_GET['page_flag_published']) ? 1 : 0) : '';
         $search_data['page_flag_hidden'] = isset($_GET['page_flag_hidden']) && $_GET['page_flag_hidden'] !== '' ? (!empty($_GET['page_flag_hidden']) ? 1 : 0) : '';
-
+        cms_admin::object_index_search_data_append_git_statuses($search_data, 'page');
 
         /* -- Collect Search Results -- */
 
@@ -199,6 +208,7 @@
         // Collect search results from the database
         $search_results = $db->get_array_list($search_query);
         $search_results_count = is_array($search_results) ? count($search_results) : 0;
+        cms_admin::object_index_search_results_filter_git_statuses($search_results, $search_results_count, $search_data, 'page', $mmrpg_git_file_arrays);
 
         // Collect a total number from the database
         $search_results_total = $db->get_value("SELECT COUNT(page_id) AS total FROM mmrpg_website_pages WHERE 1=1 AND page_id <> 0;", 'total');
@@ -351,12 +361,15 @@
             if ($update_results !== false){ $form_messages[] = array('success', 'Page details were updated successfully'); }
             else { $form_messages[] = array('error', 'Page details could not be updated'); }
 
-            // If successful, we need to update the table data export
+            // Update cache timestamp if changes were successful
             if ($form_success){
-
-                // TODO
-
+                list($date, $time) = explode('-', date('Ymd-Hi'));
+                $db->update('mmrpg_config', array('config_value' => $date), "config_group = 'global' AND config_name = 'cache_date'");
+                $db->update('mmrpg_config', array('config_value' => $time), "config_group = 'global' AND config_name = 'cache_time'");
             }
+
+            // If successful, we need to update the JSON and HTML files
+            if ($form_success){ cms_admin::object_editor_update_json_data_file('page', array_merge($page_data, $update_data)); }
 
             // We're done processing the form, we can exit
             exit_page_edit_action($form_data['page_id']);
@@ -429,13 +442,15 @@
                         <input class="textbox" type="text" name="page_content" value="<?= !empty($search_data['page_content']) ? htmlentities($search_data['page_content'], ENT_QUOTES, 'UTF-8', true) : '' ?>" />
                     </div>
 
-                    <div class="field halfsize has3cols flags">
+                    <div class="field fullsize has5cols flags">
                     <?
                     $flag_names = array(
                         'published' => array('icon' => 'fas fa-check-square', 'yes' => 'Published', 'no' => 'Unpublished'),
                         'hidden' => array('icon' => 'fas fa-eye-slash', 'yes' => 'Hidden', 'no' => 'Visible')
                         );
+                    cms_admin::object_index_flag_names_append_git_statuses($flag_names);
                     foreach ($flag_names AS $flag_token => $flag_info){
+                        if (isset($flag_info['break'])){ echo('<div class="break"></div>'); continue; }
                         $flag_name = 'page_flag_'.$flag_token;
                         $flag_label = isset($flag_info['label']) ? $flag_info['label'] : ucfirst($flag_token);
                         ?>
@@ -561,6 +576,8 @@
 
                                 //$page_name = '<a class="link" href="'.$page_edit.'">'.$page_name_display.'</a>';
                                 $page_name_link = '<a class="link" href="'.$page_edit.'">'.$page_name.'</a>';
+                                cms_admin::object_index_links_append_git_statues($page_name_link, cms_admin::git_get_url_token('page', $page_url), $mmrpg_git_file_arrays);
+
                                 $page_url_link = '<a class="link" href="'.$page_view.'" target="_blank">'.$page_url.'</a>';
 
                                 if (!empty($page_data['parent_id'])
@@ -618,6 +635,9 @@
                         <?
                         // If this is NOT backup data, we can generate links
                         if (!$is_backup_data){
+
+                            // Print out any git-related statues to this header
+                            cms_admin::object_editor_header_echo_git_statues(cms_admin::git_get_url_token('page', $page_data['page_url']), $mmrpg_git_file_arrays);
 
                             // If the page is published, generate and display a preview link
                             if (!empty($page_data['page_flag_published'])){
@@ -727,7 +747,7 @@
                                         <strong>Page Content</strong>
                                         <em>basic html and some psuedo-code allowed</em>
                                     </div>
-                                    <textarea class="textarea" name="page_content" rows="20"><?= htmlentities($page_data['page_content'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                                    <textarea class="textarea" name="page_content" rows="20"><?= htmlentities(trim($page_data['page_content']).PHP_EOL, ENT_QUOTES, 'UTF-8', true) ?></textarea>
                                     <div class="label examples" style="font-size: 80%; padding-top: 4px;">
                                         <strong>Examples</strong>:
                                         <br />
@@ -859,6 +879,7 @@
                                     <input class="button delete" type="button" value="Delete Page" data-delete="pages" data-page-id="<?= $page_data['page_id'] ?>" />
                                     */ ?>
                                 </div>
+                                <?= cms_admin::object_editor_print_git_footer_buttons('pages', cms_admin::git_get_url_token('page', $page_data['page_url']), $mmrpg_git_file_arrays) ?>
                             <? } ?>
 
                             <div class="metadata">

@@ -655,7 +655,7 @@
             || in_array('delete-cached-files', $this_adminaccess)){
             $this_option = array(
                 'link' => array('url' => 'admin/delete-cached-files/', 'text' => 'Delete Cached Files', 'target' => '_blank'),
-                'desc' => 'delete cached markup and database objects'
+                'desc' => 'delete cached markup, objects, timeouts, indexes, and more'
                 );
             $this_group_options[] = $this_option;
         }

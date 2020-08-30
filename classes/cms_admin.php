@@ -375,7 +375,7 @@ class cms_admin {
         if (!is_array($index)){ $index = array(); }
         if (!$use_cache || !isset($index[$repo_base_path])){
             $last_updated = self::git_update_remote_get_time($repo_base_path);
-            $update_timeout = 60 * 5; // five minutes
+            $update_timeout = 60 * 60; // 60 mins (one hour)
             if ((time() - $last_updated) >= $update_timeout){
                 $index[$repo_base_path] = shell_exec('cd '.$repo_base_path.' && git remote update');
                 self::git_update_remote_set_time($repo_base_path);
@@ -446,9 +446,11 @@ class cms_admin {
         foreach ($list AS $key => $path){
             list($folder) = explode('/', $path);
             if ($pk_kind === 'id'){ $value = intval(preg_replace('/^[a-z0-9]+-/i', '', $folder)); }
+            elseif ($pk_kind === 'url'){ $value = trim(str_replace('_', '/', $folder), '/').'/'; }
             else { $value = $folder; }
             $filter_values[] = $value;
         }
+        $filter_values = array_unique($filter_values);
         //echo('<pre>$filter_values = '.print_r($filter_values, true).'</pre>'.PHP_EOL);
 
         if ($pk_kind === 'id'){ $filter_values_string = implode(", ", array_unique($filter_values)); }
@@ -473,6 +475,7 @@ class cms_admin {
         //echo('<pre>$allowed_values = '.print_r($allowed_values, true).'</pre>'.PHP_EOL);
         $allowed_folder_names = $allowed_values;
         if ($pk_kind === 'id'){ foreach ($allowed_folder_names AS $key => $id){ $allowed_folder_names[$key] = self::git_get_id_token(substr($filter_by_field, 0, -3), $id); } }
+        elseif ($pk_kind === 'url'){ foreach ($allowed_folder_names AS $key => $url){ $allowed_folder_names[$key] = self::git_get_url_token(substr($filter_by_field, 0, -3), $url); } }
         //echo('<pre>$allowed_folder_names = '.print_r($allowed_folder_names, true).'</pre>'.PHP_EOL);
 
         foreach ($list AS $key => $path){ list($folder) = explode('/', $path); if (!in_array($folder, $allowed_folder_names)){ unset($list[$key]); } }
@@ -736,27 +739,48 @@ class cms_admin {
     // Define a function for updating a given json file if the old and new contents are different
     public static function object_editor_update_json_data_file($object_kind, $updated_json_data){
         $object_xkind = substr($object_kind, -1, 1) === 'y' ? substr($object_kind, 0, -1).'ies' : $object_kind.'s';
+
         // Define the data base and token directories given object kind then append to form full path
         $json_data_base_dir = constant('MMRPG_CONFIG_'.strtoupper($object_xkind).'_CONTENT_PATH');
         if (in_array($object_kind, array('star', 'challenge'))){ $json_data_token_dir = $object_kind.'-'.str_pad($updated_json_data[$object_kind.'_id'], 4, '0', STR_PAD_LEFT); }
         elseif (in_array($object_kind, array('page'))){ $json_data_token_dir = str_replace('/', '_', trim($updated_json_data[$object_kind.'_url'], '/')); }
         else { $json_data_token_dir = $updated_json_data[$object_kind.'_token']; }
         $json_data_full_path = $json_data_base_dir.$json_data_token_dir.'/data.json';
+
         // Clean the new json data with settings specific to the object kind
         $onclean_remove_id_field = true;
         $onclean_remove_functions_field = true;
         $onclean_encoded_sub_fields = array();
-        if ($object_kind === 'star' || $object_kind === 'challenge'){ $onclean_remove_id_field = false; }
+        if (in_array($object_kind, array('star', 'challenge', 'page'))){ $onclean_remove_id_field = false; }
         if ($object_kind === 'challenge'){ $onclean_encoded_sub_fields = array('challenge_field_data', 'challenge_target_data', 'challenge_reward_data'); }
         $new_json_data = self::object_editor_clean_json_content_array($object_kind, $updated_json_data, $onclean_remove_id_field, $onclean_remove_functions_field, $onclean_encoded_sub_fields);
+
         // Pull the old json data for comparrison with the new stuff
         $old_json_data = file_exists($json_data_full_path) ? json_decode(file_get_contents($json_data_full_path), true) : array();
+
+        // If this is a page request, extract and collect new/old html content separately
+        if ($object_kind === 'page'){
+            $html_content_full_path = $json_data_base_dir.$json_data_token_dir.'/content.html';
+            $new_html_content = trim($new_json_data[$object_kind.'_content']).PHP_EOL; unset($new_json_data[$object_kind.'_content']);
+            $old_html_content = file_exists($html_content_full_path) ? trim(file_get_contents($html_content_full_path)).PHP_EOL : '';
+        }
+
         // If old json doesn't exist or different than the new, update file
         if (empty($old_json_data) || !arrays_match($old_json_data, $new_json_data)){
             if (file_exists($json_data_full_path)){ unlink($json_data_full_path); }
             $h = fopen($json_data_full_path, 'w');
             fwrite($h, json_encode($new_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
             fclose($h);
+        }
+
+        // Again, if this is a page request, we need to compare and update html files separately
+        if ($object_kind === 'page'){
+            if (empty($old_html_content) || !arrays_match($old_html_content, $new_html_content)){
+                if (file_exists($html_content_full_path)){ unlink($html_content_full_path); }
+                $h = fopen($html_content_full_path, 'w');
+                fwrite($h, trim($new_html_content).PHP_EOL);
+                fclose($h);
+            }
         }
 
     }
