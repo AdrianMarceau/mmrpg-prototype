@@ -81,7 +81,14 @@ foreach ($commit_tokens  AS $object_key => $object_token){
             $json_data_array = json_decode($json_data_markup, true);
             //debug_echo('$json_data_array = '.print_r($json_data_array, true).'');
             if (!empty($json_data_array)){
-                $object_name = $json_data_array[$request_kind_singular.'_name'];
+                if (isset($json_data_array[$request_kind_singular.'_name'])){
+                    $object_name = $json_data_array[$request_kind_singular.'_name'];
+                } elseif (isset($json_data_array[$request_kind_singular.'_title'])){
+                    $object_name = $json_data_array[$request_kind_singular.'_title'];
+                } elseif ($object_name_kind_singular === 'star'
+                    && isset($json_data_array[$request_kind_singular.'_from_date'])){
+                    $object_name = $json_data_array[$request_kind_singular.'_from_date'];
+                }
                 //debug_echo('$object_name = '.print_r($object_name, true).'');
             }
         }
@@ -115,10 +122,10 @@ foreach ($commit_tokens  AS $object_key => $object_token){
         $commit_message .= $object_name.'\''.(substr($object_name, -1, 1) !== 's' ? 's' : '').' ';
         $commit_message .= $updating_what_string;
     } else {
-        $commit_message = 'Updated ';
+        $commit_message = 'Updated the ';
         $commit_message .= $updating_what_string;
         $commit_message .= ' for the ';
-        $commit_message .= $object_name.' '.$object_name_kind_singular;
+        $commit_message .= '\''.$object_name.'\' '.$object_name_kind_singular;
     }
     $commit_message = str_replace('"', '\\"', $commit_message);
 
