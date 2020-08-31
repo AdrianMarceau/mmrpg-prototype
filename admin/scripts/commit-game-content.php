@@ -99,6 +99,7 @@ foreach ($commit_tokens  AS $object_key => $object_token){
     foreach ($object_paths AS $key => $path){
         if (strstr($path, '/data.json')){ $updating_what[] = 'data'; }
         elseif (strstr($path, '/functions.php')){ $updating_what[] = 'functions'; }
+        elseif (strstr($path, '/content.html')){ $updating_what[] = 'content'; }
         elseif (strstr($path, '/sprites')){ $updating_what[] = 'sprites'; }
         elseif (strstr($path, '/shadows')){ $updating_what[] = 'shadows'; }
     }
@@ -109,16 +110,24 @@ foreach ($commit_tokens  AS $object_key => $object_token){
     // Define the commit message for these file changes
     $commit_name = str_replace('"', '\\"', $git_publish_name);
     $commit_email = str_replace('"', '\\"', $git_publish_email);
-    $commit_message = 'Updated ';
-    if (in_array($object_name_kind_singular, array('mecha', 'ability', 'item'))){ $commit_message .= 'the '; }
-    $commit_message .= $object_name.'\''.(substr($object_name, -1, 1) !== 's' ? 's' : '').' ';
-    $commit_message .= $updating_what_string;
+    // when [object] is player, master, boss, field = "Updated XXX's data, functions, etc."
+    // else when [object] is mecha, ability, item = "Updated the XXX's data, functions, etc."
+    // else when [object] is other = Updated data, functions, etc. for the XXX [object]
+    if (in_array($object_name_kind_singular, array('player', 'master', 'boss', 'field'))){
+        $commit_message = 'Updated ';
+        $commit_message .= $object_name.'\''.(substr($object_name, -1, 1) !== 's' ? 's' : '').' ';
+        $commit_message .= $updating_what_string;
+    } elseif (in_array($object_name_kind_singular, array('mecha', 'ability', 'item'))){
+        $commit_message = 'Updated the ';
+        $commit_message .= $object_name.'\''.(substr($object_name, -1, 1) !== 's' ? 's' : '').' ';
+        $commit_message .= $updating_what_string;
+    } else {
+        $commit_message = 'Updated ';
+        $commit_message .= $updating_what_string;
+        $commit_message .= ' for the ';
+        $commit_message .= $object_name.' '.$object_name_kind_singular;
+    }
     $commit_message = str_replace('"', '\\"', $commit_message);
-    /* $commit_message = str_replace('"', '\\"', 'Publishing changes to the '.
-        $object_name.' '.
-        $object_name_kind_singular.'\''.(substr($object_name_kind_singular, -1, 1) !== 's' ? 's' : '').' '.
-        $updating_what_string
-        ); */
 
     // Commit the relevant file changes as this user and then push
     $git_commands = '';
