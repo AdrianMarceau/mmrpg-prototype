@@ -477,6 +477,7 @@
                 $new_robot_image_alts = array();
                 foreach ($alt_keys AS $alt_key){
                     $alt_info = $form_data['robot_image_alts'][$alt_key];
+                    $alt_info = array_filter($alt_info);
                     $alt_path = ($alt_key != 'base' ? '_'.$alt_key : '');
                     if (!empty($alt_info['delete_images'])){
                         $delete_sprite_path = 'content/robots/'.$robot_data['robot_image'].'/sprites'.$alt_path.'/';
@@ -493,7 +494,7 @@
                 $form_data['robot_image_alts'] = $new_robot_image_alts;
                 $form_data['robot_image_alts'] = !empty($form_data['robot_image_alts']) ? json_encode($form_data['robot_image_alts'], JSON_NUMERIC_CHECK) : '';
             }
-            //$form_messages[] = array('alert', '<pre>$form_data[\'robot_image_alts\']  = '.print_r($form_data['robot_image_alts'] , true).'</pre>');
+            $form_messages[] = array('alert', '<pre>$form_data[\'robot_image_alts\']  = '.print_r($form_data['robot_image_alts'] , true).'</pre>');
 
             if (!empty($empty_image_folders)){
                 //$form_messages[] = array('alert', '<pre>$empty_image_folders = '.print_r($empty_image_folders, true).'</pre>');
