@@ -93,6 +93,14 @@ foreach ($json_data_dirs AS $object_key => $object_git_token){
     $echo_text = '- Importing '.$ctype_token.' data for "'.$real_object_token.'" ';
     if ($object_git_token !== $real_object_token){ $echo_text .= '('.$object_git_token.') '; }
     $echo_text .= 'into database table "'.$object_table_name.'" ... ';
+    // If there is an html content file, we should import that and include with data
+    if ($request_kind === 'pages'){
+        $html_file = $object_git_token.'/content.html';
+        if (file_exists($json_data_dir.$html_file)){
+            $html_markup = file_get_contents($json_data_dir.$html_file);
+            if (!empty($html_markup)){ $json_data[$request_kind_singular.'_content'] = trim($html_markup).PHP_EOL; }
+        }
+    }
     // Check if this the json data has a parent_id set that needs translated to an object ID later
     $temp_child_to_parent_info = false;
     if (isset($json_data[$parent_token_field_name])){

@@ -111,19 +111,21 @@ foreach ($revert_tokens  AS $object_key => $object_token){
     }
 
     // If an HTML content file exists for this token, overwrite DB info with contents
-    $html_content_path = $mmrpg_git_path.$object_token.'/content.html';
-    //debug_echo('$html_content_path = '.print_r($html_content_path, true).'');
-    if (file_exists($html_content_path)){
-        // Collect the markup from the file and decode it into an array
-        $html_content_markup = file_get_contents($html_content_path);
-        //debug_echo('$html_content_markup = '.print_r($html_content_markup, true).'');
-        if (!empty($html_content_markup)){
-            // Create an update array from the content, unset the PK, then translate the editor name(s) to IDs
-            $object_update_data = array($request_kind_singular.'_content' => $html_content_markup);
-            //debug_echo('$object_update_data = '.print_r($object_update_data, true).'');
-            //debug_echo('condition = '.print_r(array($object_token_field => $object_token_field_value), true).'');
-            // Update the database object with above value given the object token
-            $db->update($object_table_name, $object_update_data, array($object_token_field => $object_token_field_value));
+    if ($request_kind === 'pages'){
+        $html_content_path = $mmrpg_git_path.$object_token.'/content.html';
+        //debug_echo('$html_content_path = '.print_r($html_content_path, true).'');
+        if (file_exists($html_content_path)){
+            // Collect the markup from the file and decode it into an array
+            $html_content_markup = file_get_contents($html_content_path);
+            //debug_echo('$html_content_markup = '.print_r($html_content_markup, true).'');
+            if (!empty($html_content_markup)){
+                // Create an update array from the content, unset the PK, then translate the editor name(s) to IDs
+                $object_update_data = array($request_kind_singular.'_content' => $html_content_markup);
+                //debug_echo('$object_update_data = '.print_r($object_update_data, true).'');
+                //debug_echo('condition = '.print_r(array($object_token_field => $object_token_field_value), true).'');
+                // Update the database object with above value given the object token
+                $db->update($object_table_name, $object_update_data, array($object_token_field => $object_token_field_value));
+            }
         }
     }
 
