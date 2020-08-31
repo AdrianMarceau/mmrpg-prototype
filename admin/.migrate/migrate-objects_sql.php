@@ -22,7 +22,7 @@ if (true){
     $sql_table_list[] = array('name' => 'mmrpg_leaderboard', 'export_data' => false);
 
     // website & pages
-    $sql_table_list[] = array('name' => 'mmrpg_website_pages');
+    $sql_table_list[] = array('name' => 'mmrpg_website_pages', 'export_data' => false);
         $sql_table_list[] = array('name' => 'mmrpg_website_pages_backups', 'export_data' => false);
 
     // content index
