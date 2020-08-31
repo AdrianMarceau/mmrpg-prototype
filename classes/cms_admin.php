@@ -679,6 +679,7 @@ class cms_admin {
                     $has_changes = true;
                     $has_changes_kinds[$token] = true;
                     $print_git_changes[$token] = array_map(function($path) use($path_token){ return str_replace($path_token.'/', '', $path); }, $filtered_git_changes[$token]);
+                    $print_git_changes[$token] = array_unique($print_git_changes[$token]);
                     $print_kind_icons[$token] = $icon;
                 }
             }
