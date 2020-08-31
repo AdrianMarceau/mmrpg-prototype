@@ -45,6 +45,7 @@ $contributor_field_pattern = '/^([a-z0-9]+)_image_editor([0-9]+)?$/i';
 // Collect refs to the content type tokens, table, etc.
 $ctype_token = $content_type_info['token'];
 $ctype_xtoken = $content_type_info['xtoken'];
+$ctype_table_name = $content_type_info['database_table'];
 //debug_echo('$ctype_token = '.print_r($ctype_token, true).'');
 //debug_echo('$ctype_xtoken = '.print_r($ctype_xtoken, true).'');
 
@@ -67,7 +68,7 @@ if (empty($json_data_dirs)){ exit_action('error|Request kind "'.$request_kind.'"
 //debug_echo('$json_data_dirs = '.print_r($json_data_dirs, true).'');
 
 // We made it this far, so let's truncate existing data from the table
-$truncate_sql = "TRUNCATE TABLE {$object_table_name};";
+$truncate_sql = "TRUNCATE TABLE {$ctype_table_name};";
 //debug_echo('$truncate_sql = '.print_r($truncate_sql, true).'');
 $db->query($truncate_sql);
 
@@ -78,7 +79,7 @@ if ($content_type_info['primary_key'] === 'token'){
 }
 
 // Loop through the data files and import them into the database
-//debug_echo('Looping through JSON data files and importing into database table "'.$object_table_name.'":');
+//debug_echo('Looping through JSON data files and importing into database table "'.$ctype_table_name.'":');
 foreach ($json_data_dirs AS $object_key => $object_git_token){
     // Skip if this is just a filler object/file and not token-related
     if ($content_type_info['primary_key'] !== 'token' && substr($object_git_token, 0, 1) === '.'){ continue; }
@@ -92,7 +93,7 @@ foreach ($json_data_dirs AS $object_key => $object_git_token){
     $real_object_token = $json_data[$real_object_pk];
     $echo_text = '- Importing '.$ctype_token.' data for "'.$real_object_token.'" ';
     if ($object_git_token !== $real_object_token){ $echo_text .= '('.$object_git_token.') '; }
-    $echo_text .= 'into database table "'.$object_table_name.'" ... ';
+    $echo_text .= 'into database table "'.$ctype_table_name.'" ... ';
     // If there is an html content file, we should import that and include with data
     if ($request_kind === 'pages'){
         $html_file = $object_git_token.'/content.html';
@@ -122,15 +123,17 @@ foreach ($json_data_dirs AS $object_key => $object_git_token){
         }
     }
     // Now check to see if the data exists in the db already and insert if it doesn't exist yet
-    $data_check_sql = "SELECT {$id_field_name} FROM {$object_table_name} WHERE {$real_object_pk} = '{$real_object_token}';";
+    $data_check_sql = "SELECT {$id_field_name} FROM {$ctype_table_name} WHERE {$real_object_pk} = '{$real_object_token}';";
     $data_check_return = $db->get_value($data_check_sql, $id_field_name);
     if (empty($data_check_return)){
-        $db->insert($object_table_name, $json_data); // attempt to insert the data
+        $db->insert($ctype_table_name, $json_data); // attempt to insert the data
         $data_check_return = $db->get_value($data_check_sql, $id_field_name);
         if (!empty($data_check_return)){
             $echo_text .= 'Data imported w/ '.$id_field_name.'='.$data_check_return.'!';
-            if ($content_type_info['primary_key'] === 'token'){ $token_to_id_index[$real_object_token] = $data_check_return; }
-            if (!empty($temp_child_to_parent_info)){ $child_needs_parent_for_token[] = $temp_child_to_parent_info; }
+            if ($content_type_info['primary_key'] === 'token'){
+                $token_to_id_index[$real_object_token] = $data_check_return;
+                if (!empty($temp_child_to_parent_info)){ $child_needs_parent_for_token[] = $temp_child_to_parent_info; }
+            }
         } else {
             $echo_text .= 'Data NOT imported!';
         }
@@ -160,8 +163,8 @@ if ($content_type_info['primary_key'] === 'token'){
                 $echo_text .= '('.$parent_token.'/'.($parent_id !== false ? $parent_id : 'null').') ... ';
 
             if ($child_id !== false && $parent_id !== false){
-                $db->update($object_table_name, array($parent_id_field_name => $parent_id), array($id_field_name => $child_id));
-                $data_check_sql = "SELECT {$id_field_name} FROM {$object_table_name} WHERE {$id_field_name} = {$child_id} AND {$parent_id_field_name} = {$parent_id};";
+                $db->update($ctype_table_name, array($parent_id_field_name => $parent_id), array($id_field_name => $child_id));
+                $data_check_sql = "SELECT {$id_field_name} FROM {$ctype_table_name} WHERE {$id_field_name} = {$child_id} AND {$parent_id_field_name} = {$parent_id};";
                 if (!empty($db->get_value($data_check_sql, $id_field_name))){
                     $echo_text .= 'Data updated!';
                 } else {
