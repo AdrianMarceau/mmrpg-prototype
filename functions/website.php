@@ -1142,6 +1142,13 @@ function getSortedDirContents($dir, $method = 'date'){
     return $results;
 }
 
+// Define a function for normalizing line endings to unix
+function normalize_line_endings($s){
+    $s = str_replace(array("\r\n", "\r", "\n"), "\n", $s); // Convert all line-endings to UNIX format.
+    $s = preg_replace("/\n{3,}/", "\n\n", $s); // Don't allow out-of-control blank lines.
+    return $s;
+}
+
 // Define a function for selecting an element from an array by number (not key) **with rollover**
 function select_from_array_with_rollover($array, $position){
     $count = count($array);

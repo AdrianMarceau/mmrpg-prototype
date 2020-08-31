@@ -107,8 +107,8 @@ function get_parsed_object_file_markup($object_file_path){
     //ob_echo('- $data_markup_array = '.print_r($data_markup_array, true));
     //ob_echo('- $functions_markup_array = '.print_r($functions_markup_array, true));
     return array(
-        'data' => trim(implode(PHP_EOL, $data_markup_array)).PHP_EOL,
-        'functions' => trim(implode(PHP_EOL, $functions_markup_array)).PHP_EOL
+        'data' => normalize_line_endings(trim(implode(PHP_EOL, $data_markup_array)).PHP_EOL),
+        'functions' => normalize_line_endings(trim(implode(PHP_EOL, $functions_markup_array)).PHP_EOL)
         );
 }
 
@@ -116,7 +116,7 @@ function get_parsed_object_file_markup($object_file_path){
 function get_empty_functions_file_markup($kind){
     $empty_file_markup = $GLOBALS['empty_function_file_markup'];
     $empty_file_markup = str_replace('{{kind}}', $kind, $empty_file_markup);
-    return trim($empty_file_markup).PHP_EOL;
+    return normalize_line_endings(trim($empty_file_markup).PHP_EOL);
 }
 $empty_function_file_markup = <<<'PHP'
 <?
