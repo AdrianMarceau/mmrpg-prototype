@@ -623,8 +623,8 @@ $(document).ready(function(){
                 var postURL = thisRootURL+postURLs[thisAction];
                 var postData = {kind:thisKind,subkind:thisSubKind,token:thisToken,source:thisSource};
                 var confirmMessage = confirmMessages[thisAction];
-                if (thisSubKind.length){ confirmMessage = confirmMessage.replace(/\{object\}/g, thisSubKind.replace(/(ies|es|s)$/, '')); }
-                else { confirmMessage = confirmMessage.replace(/\{object\}/g, thisKind.replace(/(ies|es|s)$/, '')); }
+                if (thisSubKind.length){ confirmMessage = confirmMessage.replace(/\{object\}/g, makeObjectSingular(thisSubKind)); }
+                else { confirmMessage = confirmMessage.replace(/\{object\}/g, makeObjectSingular(thisKind)); }
                 //console.log('postURL = ', postURL);
                 //console.log('postData = ', postData);
                 //console.log('confirmMessage = ', confirmMessage);
@@ -1142,4 +1142,5 @@ function printStatusMessage(messageStatus, messageText, onCompleteFunction){
 // Helper functions for simple yet annoying tasks
 function upperCaseFirst(string){ return string[0].toUpperCase() + string.substring(1); }
 function upperCaseWords(string){ return this.replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); }); }
+function makeObjectSingular(pluralObject){ return pluralObject.replace(/ies$/i, 'y').replace(/ses$/i, 's').replace(/s$/i, ''); }
 
