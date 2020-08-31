@@ -10,13 +10,6 @@ $request_action = 'commit';
 require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/git_common.php');
 //debug_echo('push-game-content'.PHP_EOL);
 
-
-// Define the table name and token field for this object
-$object_table_name = 'mmrpg_index_'.$request_kind;
-$object_token_field = $request_kind_singular.'_token';
-//debug_echo('$object_table_name = '.print_r($object_table_name, true).'');
-//debug_echo('$object_token_field = '.print_r($object_token_field, true).'');
-
 // Collect an index of changes files via git
 $mmrpg_git_path = constant('MMRPG_CONFIG_'.strtoupper($request_kind).'_CONTENT_PATH');
 //debug_echo('$mmrpg_git_path = '.$mmrpg_git_path);

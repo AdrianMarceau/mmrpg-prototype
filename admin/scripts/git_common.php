@@ -87,4 +87,18 @@ $git_publish_email = trim($admin_details['user_email_address']);
 //debug_echo('$git_publish_name = '.print_r($git_publish_name, true).'');
 //debug_echo('$git_publish_email = '.print_r($git_publish_email, true).'');
 
+// Require the global content type index for reference, make sure required data is present
+require_once(MMRPG_CONFIG_CONTENT_PATH.'index.php');
+if (!isset($content_types_index[$request_kind])){ exit_action('error|Request kind "'.$request_kind.'" does not appear in the content types index'); }
+elseif (empty($content_types_index[$request_kind]['database_table'])){ exit_action('error|Request kind "'.$request_kind.'" does not have a database_table set'); }
+elseif (empty($content_types_index[$request_kind]['primary_key'])){ exit_action('error|Request kind "'.$request_kind.'" does not have a primary_key set'); }
+$content_type_info = $content_types_index[$request_kind];
+//debug_echo('$content_type_info = '.print_r($content_type_info, true).'');
+
+// Define the table name and token field for this object
+$object_table_name = $content_type_info['database_table'];
+$object_token_field = $request_kind_singular.'_'.$content_type_info['primary_key'];
+//debug_echo('$object_table_name = '.print_r($object_table_name, true).'');
+//debug_echo('$object_token_field = '.print_r($object_token_field, true).'');
+
 ?>
