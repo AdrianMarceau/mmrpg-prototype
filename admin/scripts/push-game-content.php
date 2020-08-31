@@ -11,12 +11,20 @@ $allow_empty_subkind = true;
 require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/git_common.php');
 //debug_echo('push-game-content'.PHP_EOL);
 
+// Require the global content type index for reference
+require_once(MMRPG_CONFIG_CONTENT_PATH.'index.php');
+$content_type_info = $content_types_index[$request_kind];
+
+// If required fields for this content type are not set, we can't revert
+if (empty($content_type_info['database_table'])){ exit_action('error|This content type does not have a database_table set'); }
+if (empty($content_type_info['primary_key'])){ exit_action('error|This content type does not have a primary_key set'); }
+
 // Only the "all" request is supported for updating
 if ($request_token !== 'all'){ exit_action('error|Only the "all" request type is supported for updates!'); }
 
 // Define the table name and token field for this object
-$object_table_name = 'mmrpg_index_'.$request_kind;
-$object_token_field = $request_kind_singular.'_token';
+$object_table_name = $content_type_info['database_table'];
+$object_token_field = $request_kind_singular.'_'.$content_type_info['primary_key'];
 //debug_echo('$object_table_name = '.print_r($object_table_name, true).'');
 //debug_echo('$object_token_field = '.print_r($object_token_field, true).'');
 
