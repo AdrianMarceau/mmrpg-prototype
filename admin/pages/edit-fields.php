@@ -417,8 +417,8 @@
             } else {
                 // Functions code is OKAY and can be saved
                 $field_functions_path = MMRPG_CONFIG_FIELDS_CONTENT_PATH.$field_data['field_token'].'/functions.php';
-                $old_field_functions_markup = file_exists($field_functions_path) ? trim(file_get_contents($field_functions_path)) : '';
-                $new_field_functions_markup = $form_data['field_functions_markup'];
+                $old_field_functions_markup = file_exists($field_functions_path) ? normalize_file_markup(file_get_contents($field_functions_path)) : '';
+                $new_field_functions_markup = normalize_file_markup($form_data['field_functions_markup']);
                 if (empty($old_field_functions_markup) || $new_field_functions_markup !== $old_field_functions_markup){
                     $f = fopen($field_functions_path, 'w');
                     fwrite($f, $new_field_functions_markup);
@@ -1500,7 +1500,7 @@
                                             $field_functions_markup = file_exists($field_functions_path) ? file_get_contents($field_functions_path) : file_get_contents($template_functions_path);
                                         }
                                         ?>
-                                        <textarea class="textarea" name="field_functions_markup" rows="<?= min(20, substr_count($field_functions_markup, PHP_EOL)) ?>"><?= htmlentities($field_functions_markup, ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                                        <textarea class="textarea" name="field_functions_markup" rows="<?= min(20, substr_count($field_functions_markup, PHP_EOL)) ?>"><?= htmlentities(trim($field_functions_markup), ENT_QUOTES, 'UTF-8', true) ?></textarea>
                                         <div class="label examples" style="font-size: 80%; padding-top: 4px;">
                                             <strong>Available Objects</strong>:
                                             <br />

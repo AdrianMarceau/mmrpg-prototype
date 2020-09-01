@@ -747,7 +747,7 @@
                                         <strong>Page Content</strong>
                                         <em>basic html and some psuedo-code allowed</em>
                                     </div>
-                                    <textarea class="textarea" name="page_content" rows="20"><?= htmlentities(trim($page_data['page_content']).PHP_EOL, ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                                    <textarea class="textarea" name="page_content" rows="20"><?= htmlentities(trim($page_data['page_content']), ENT_QUOTES, 'UTF-8', true) ?></textarea>
                                     <div class="label examples" style="font-size: 80%; padding-top: 4px;">
                                         <strong>Examples</strong>:
                                         <br />

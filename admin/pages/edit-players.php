@@ -529,8 +529,8 @@
             } else {
                 // Functions code is OKAY and can be saved
                 $player_functions_path = MMRPG_CONFIG_PLAYERS_CONTENT_PATH.$player_data['player_token'].'/functions.php';
-                $old_player_functions_markup = file_exists($player_functions_path) ? trim(file_get_contents($player_functions_path)) : '';
-                $new_player_functions_markup = $form_data['player_functions_markup'];
+                $old_player_functions_markup = file_exists($player_functions_path) ? normalize_file_markup(file_get_contents($player_functions_path)) : '';
+                $new_player_functions_markup = normalize_file_markup($form_data['player_functions_markup']);
                 if (empty($old_player_functions_markup) || $new_player_functions_markup !== $old_player_functions_markup){
                     $f = fopen($player_functions_path, 'w');
                     fwrite($f, $new_player_functions_markup);
@@ -1521,7 +1521,7 @@
                                             $player_functions_markup = file_exists($player_functions_path) ? file_get_contents($player_functions_path) : file_get_contents($template_functions_path);
                                         }
                                         ?>
-                                        <textarea class="textarea" name="player_functions_markup" rows="<?= min(20, substr_count($player_functions_markup, PHP_EOL)) ?>"><?= htmlentities($player_functions_markup, ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                                        <textarea class="textarea" name="player_functions_markup" rows="<?= min(20, substr_count($player_functions_markup, PHP_EOL)) ?>"><?= htmlentities(trim($player_functions_markup), ENT_QUOTES, 'UTF-8', true) ?></textarea>
                                         <div class="label examples" style="font-size: 80%; padding-top: 4px;">
                                             <strong>Available Objects</strong>:
                                             <br />

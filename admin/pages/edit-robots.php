@@ -494,7 +494,7 @@
                 $form_data['robot_image_alts'] = $new_robot_image_alts;
                 $form_data['robot_image_alts'] = !empty($form_data['robot_image_alts']) ? json_encode($form_data['robot_image_alts'], JSON_NUMERIC_CHECK) : '';
             }
-            $form_messages[] = array('alert', '<pre>$form_data[\'robot_image_alts\']  = '.print_r($form_data['robot_image_alts'] , true).'</pre>');
+            //$form_messages[] = array('alert', '<pre>$form_data[\'robot_image_alts\']  = '.print_r($form_data['robot_image_alts'] , true).'</pre>');
 
             if (!empty($empty_image_folders)){
                 //$form_messages[] = array('alert', '<pre>$empty_image_folders = '.print_r($empty_image_folders, true).'</pre>');
@@ -548,8 +548,8 @@
             } else {
                 // Functions code is OKAY and can be saved
                 $robot_functions_path = MMRPG_CONFIG_ROBOTS_CONTENT_PATH.$robot_data['robot_token'].'/functions.php';
-                $old_robot_functions_markup = file_exists($robot_functions_path) ? trim(file_get_contents($robot_functions_path)) : '';
-                $new_robot_functions_markup = $form_data['robot_functions_markup'];
+                $old_robot_functions_markup = file_exists($robot_functions_path) ? normalize_file_markup(file_get_contents($robot_functions_path)) : '';
+                $new_robot_functions_markup = normalize_file_markup($form_data['robot_functions_markup']);
                 if (empty($old_robot_functions_markup) || $new_robot_functions_markup !== $old_robot_functions_markup){
                     $f = fopen($robot_functions_path, 'w');
                     fwrite($f, $new_robot_functions_markup);
@@ -1704,7 +1704,7 @@
                                             $robot_functions_markup = file_exists($robot_functions_path) ? file_get_contents($robot_functions_path) : file_get_contents($template_functions_path);
                                         }
                                         ?>
-                                        <textarea class="textarea" name="robot_functions_markup" rows="<?= min(20, substr_count($robot_functions_markup, PHP_EOL)) ?>"><?= htmlentities($robot_functions_markup, ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                                        <textarea class="textarea" name="robot_functions_markup" rows="<?= min(20, substr_count($robot_functions_markup, PHP_EOL)) ?>"><?= htmlentities(trim($robot_functions_markup), ENT_QUOTES, 'UTF-8', true) ?></textarea>
                                         <div class="label examples" style="font-size: 80%; padding-top: 4px;">
                                             <strong>Available Objects</strong>:
                                             <br />

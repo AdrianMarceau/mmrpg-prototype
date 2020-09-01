@@ -762,8 +762,9 @@ class cms_admin {
         // If this is a page request, extract and collect new/old html content separately
         if ($object_kind === 'page'){
             $html_content_full_path = $json_data_base_dir.$json_data_token_dir.'/content.html';
-            $new_html_content = trim($new_json_data[$object_kind.'_content']).PHP_EOL; unset($new_json_data[$object_kind.'_content']);
-            $old_html_content = file_exists($html_content_full_path) ? trim(file_get_contents($html_content_full_path)).PHP_EOL : '';
+            $new_html_content = normalize_file_markup($new_json_data[$object_kind.'_content']);
+            $old_html_content = file_exists($html_content_full_path) ? normalize_file_markup(file_get_contents($html_content_full_path)) : '';
+            unset($new_json_data[$object_kind.'_content']);
         }
 
         // If old json doesn't exist or different than the new, update file

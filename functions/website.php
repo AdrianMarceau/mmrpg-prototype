@@ -1149,6 +1149,13 @@ function normalize_line_endings($s){
     return $s;
 }
 
+// Define a function for forcing a newline at the end of a file
+function normalize_file_markup($code, $normalize_line_endings = true, $force_eof_newline = true){
+    if ($force_eof_newline){ $code = trim($code).PHP_EOL; }
+    if ($normalize_line_endings){ $code = normalize_line_endings($code); }
+    return $code;
+}
+
 // Define a function for selecting an element from an array by number (not key) **with rollover**
 function select_from_array_with_rollover($array, $position){
     $count = count($array);
