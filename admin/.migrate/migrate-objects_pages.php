@@ -72,7 +72,7 @@ foreach ($page_index AS $page_data){
 
     // Export the page content as a separate HTML file as that's what it is
     $content_html_path = $content_path.'content.html';
-    $content_html_markup = $page_data['page_content'];
+    $content_html_markup = normalize_file_markup($page_data['page_content']);
     unset($page_data['page_content']);
     ob_echo('- export page markup to '.clean_path($content_html_path));
     $h = fopen($content_html_path, 'w');
