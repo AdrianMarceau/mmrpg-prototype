@@ -378,7 +378,10 @@
             }
 
             // If successful, we need to update the JSON file
-            if ($form_success){ cms_admin::object_editor_update_json_data_file('star', array_merge($star_data, $update_data)); }
+            if ($form_success){
+                if ($star_data_is_new){ $star_data['star_id'] = $new_star_id; }
+                cms_admin::object_editor_update_json_data_file('star', array_merge($star_data, $update_data));
+            }
 
             // We're done processing the form, we can exit
             if ($star_data_is_new){ exit_star_edit_action(false); }

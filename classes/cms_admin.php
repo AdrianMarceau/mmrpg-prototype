@@ -770,8 +770,11 @@ class cms_admin {
         // If old json doesn't exist or different than the new, update file
         if (empty($old_json_data) || !arrays_match($old_json_data, $new_json_data)){
             if (file_exists($json_data_full_path)){ unlink($json_data_full_path); }
+            if (!file_exists(dirname($json_data_full_path))){ mkdir(dirname($json_data_full_path)); }
             $h = fopen($json_data_full_path, 'w');
-            fwrite($h, json_encode($new_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
+            $new_json_data_markup = json_encode($new_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
+            $new_json_data_markup = normalize_file_markup($new_json_data_markup);
+            fwrite($h, $new_json_data_markup);
             fclose($h);
         }
 
@@ -779,8 +782,11 @@ class cms_admin {
         if ($object_kind === 'page'){
             if (empty($old_html_content) || !arrays_match($old_html_content, $new_html_content)){
                 if (file_exists($html_content_full_path)){ unlink($html_content_full_path); }
+                if (!file_exists(dirname($html_content_full_path))){ mkdir(dirname($html_content_full_path)); }
                 $h = fopen($html_content_full_path, 'w');
-                fwrite($h, trim($new_html_content).PHP_EOL);
+                $new_html_content_markup = trim($new_html_content);
+                $new_html_content_markup = normalize_file_markup($new_html_content_markup);
+                fwrite($h, $new_html_content_markup);
                 fclose($h);
             }
         }

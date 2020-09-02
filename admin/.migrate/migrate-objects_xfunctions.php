@@ -173,6 +173,7 @@ function clean_json_content_array($kind, $content_json_data, $remove_id_field = 
         }
     }
     // Return the cleaned JSON data
+    $cleaned_json_data = normalize_file_markup($cleaned_json_data);
     return $cleaned_json_data;
 }
 
