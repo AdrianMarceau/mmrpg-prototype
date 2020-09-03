@@ -24,6 +24,13 @@ if ($request_kind === 'robots'){
     //debug_echo('$mmrpg_git_changes(B) = '.print_r($mmrpg_git_changes, true).'');
 }
 
+// Collect a separate list of untracked file (just in case) so we can see what's "new"
+$mmrpg_git_untracked = cms_admin::git_get_untracked($mmrpg_git_path);
+$mmrpg_git_untracked_tokens = array();
+foreach ($mmrpg_git_untracked AS $key => $path){ list($token) = explode('/', $path); if (!in_array($token, $mmrpg_git_untracked_tokens)){ $mmrpg_git_untracked_tokens[] = $token; } }
+//debug_echo('$mmrpg_git_untracked = '.print_r($mmrpg_git_untracked, true).'');
+//debug_echo('$mmrpg_git_untracked_tokens = '.print_r($mmrpg_git_untracked_tokens, true).'');
+
 // Define an array to hold all object tokens and file paths to be committed
 $commit_tokens = array();
 $commit_paths = array();
@@ -61,6 +68,14 @@ if (empty($commit_paths)){ exit_action('error|The commit_paths were empty (there
 // Pre-collect object name kinds for later commit messages
 $object_name_kind = !empty($request_subkind) ? $request_subkind : $request_kind;
 $object_name_kind_singular = !empty($request_subkind_singular) ? $request_subkind_singular : $request_kind_singular;
+if ($request_kind === 'robots' && $request_subkind === 'masters'){ $object_full_name_kind_singular = 'robot master'; }
+elseif ($request_kind === 'robots' && $request_subkind === 'mechas'){ $object_full_name_kind_singular = 'support mecha'; }
+elseif ($request_kind === 'robots' && $request_subkind === 'bosses'){ $object_full_name_kind_singular = 'fortress boss'; }
+elseif ($request_kind === 'stars'){ $object_full_name_kind_singular = 'rogue star'; }
+elseif ($request_kind === 'challenges'){ $object_full_name_kind_singular = 'event challenge'; }
+elseif ($request_kind === 'pages'){ $object_full_name_kind_singular = 'website page'; }
+elseif ($request_kind === 'fields'){ $object_full_name_kind_singular = 'battle field'; }
+else { $object_full_name_kind_singular = $object_name_kind_singular; }
 
 // Loop through all the commit tokens to undo relevant file and database changes
 foreach ($commit_tokens  AS $object_key => $object_token){
@@ -94,6 +109,9 @@ foreach ($commit_tokens  AS $object_key => $object_token){
         }
     }
 
+    // Check to see if this is a new object being commited
+    $is_new_object = in_array($object_token, $mmrpg_git_untracked_tokens) ? true : false;
+
     // Check to see which files and/or assets are being updated here
     $updating_what = array();
     foreach ($object_paths AS $key => $path){
@@ -110,24 +128,41 @@ foreach ($commit_tokens  AS $object_key => $object_token){
     // Define the commit message for these file changes
     $commit_name = str_replace('"', '\\"', $git_publish_name);
     $commit_email = str_replace('"', '\\"', $git_publish_email);
-    // when [object] is player, master, boss, field = "Updated XXX's data, functions, etc."
-    // else when [object] is mecha, ability, item = "Updated the XXX's data, functions, etc."
-    // else when [object] is other = Updated data, functions, etc. for the XXX [object]
-    if (in_array($object_name_kind_singular, array('player', 'master', 'boss', 'field'))){
-        $commit_message = 'Updated ';
-        $commit_message .= $object_name.'\''.(substr($object_name, -1, 1) !== 's' ? 's' : '').' ';
-        $commit_message .= $updating_what_string;
-    } elseif (in_array($object_name_kind_singular, array('mecha', 'ability', 'item'))){
-        $commit_message = 'Updated the ';
-        $commit_message .= $object_name.'\''.(substr($object_name, -1, 1) !== 's' ? 's' : '').' ';
-        $commit_message .= $updating_what_string;
+    if ($is_new_object){
+        $commit_message = 'Created new ';
+        $commit_message .= $updating_what_string.' ';
+        $commit_message .= 'for ';
+        $commit_message .= preg_match('/^(a|e|i|o|u)/i', $object_full_name_kind_singular) ? 'an ' : 'a ';
+        $commit_message .= $object_full_name_kind_singular.' ';
+        if ($object_name_kind_singular === 'star'){
+            $commit_message .= 'on \''.$object_name.'\' ';
+        } elseif ($object_name_kind_singular === 'challenge'){
+            $commit_message .= 'titled \''.$object_name.'\' ';
+        } else {
+            $commit_message .= 'named \''.$object_name.'\' ';
+        }
     } else {
-        $commit_message = 'Updated the ';
-        $commit_message .= $updating_what_string;
-        $commit_message .= ' for the ';
-        $commit_message .= '\''.$object_name.'\' '.$object_name_kind_singular;
+        // when [object] is player, master, boss, field = "Updated XXX's data, functions, etc."
+        // else when [object] is mecha, ability, item = "Updated the XXX's data, functions, etc."
+        // else when [object] is other = Updated data, functions, etc. for the XXX [object]
+        $commit_message = 'Updated ';
+        if (in_array($object_name_kind_singular, array('player', 'master', 'boss', 'field'))){
+            $commit_message .= $object_name.'\''.(substr($object_name, -1, 1) !== 's' ? 's' : '').' ';
+            $commit_message .= $updating_what_string;
+        } elseif (in_array($object_name_kind_singular, array('mecha', 'ability', 'item'))){
+            $commit_message .= 'the ';
+            $commit_message .= $object_name.'\''.(substr($object_name, -1, 1) !== 's' ? 's' : '').' ';
+            $commit_message .= $updating_what_string;
+        } else {
+            $commit_message .= 'the ';
+            $commit_message .= $updating_what_string;
+            $commit_message .= ' for the ';
+            $commit_message .= '\''.$object_name.'\' '.$object_full_name_kind_singular;
+        }
     }
+
     $commit_message = str_replace('"', '\\"', $commit_message);
+    //debug_echo('$commit_message = '.print_r($commit_message, true).'');
 
     // Commit the relevant file changes as this user and then push
     $git_commands = '';
