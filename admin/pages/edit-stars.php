@@ -64,6 +64,7 @@
         $delete_data['star_id'] = !empty($_GET['star_id']) && is_numeric($_GET['star_id']) ? trim($_GET['star_id']) : '';
 
         // Let's delete all of this star's data from the database
+        cms_admin::object_editor_delete_json_data_file('star', $delete_data['star_id']);
         $db->delete('mmrpg_rogue_stars', array('star_id' => $delete_data['star_id']));
         $form_messages[] = array('success', 'The requested star has been deleted from the database');
         exit_form_action('success');

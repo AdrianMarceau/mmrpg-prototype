@@ -238,7 +238,7 @@
                         ),
                     'buttons' => array(
                         array(
-                            'text' => 'Revert All',
+                            'text' => 'Revert Uncommitted',
                             'condition' => array('uncommitted' => true),
                             'attributes' => array(
                                 'data-button' => 'git',
@@ -281,7 +281,7 @@
                         ),
                     'buttons' => array(
                         array(
-                            'text' => 'Revert All',
+                            'text' => 'Revert Uncommitted',
                             'condition' => array('uncommitted' => true),
                             'attributes' => array(
                                 'data-button' => 'git',
@@ -326,7 +326,7 @@
                         ),
                     'buttons' => array(
                         array(
-                            'text' => 'Revert All',
+                            'text' => 'Revert Uncommitted',
                             'condition' => array('uncommitted' => true),
                             'attributes' => array(
                                 'data-button' => 'git',
@@ -371,7 +371,7 @@
                         ),
                     'buttons' => array(
                         array(
-                            'text' => 'Revert All',
+                            'text' => 'Revert Uncommitted',
                             'condition' => array('uncommitted' => true),
                             'attributes' => array(
                                 'data-button' => 'git',
@@ -410,7 +410,7 @@
                         ),
                     'buttons' => array(
                         array(
-                            'text' => 'Revert All',
+                            'text' => 'Revert Uncommitted',
                             'condition' => array('uncommitted' => true),
                             'attributes' => array(
                                 'data-button' => 'git',
@@ -464,7 +464,7 @@
                         ),
                     'buttons' => array(
                         array(
-                            'text' => 'Revert All',
+                            'text' => 'Revert Uncommitted',
                             'condition' => array('uncommitted' => true),
                             'attributes' => array(
                                 'data-button' => 'git',
@@ -502,7 +502,7 @@
                         ),
                     'buttons' => array(
                         array(
-                            'text' => 'Revert All',
+                            'text' => 'Revert Uncommitted',
                             'condition' => array('uncommitted' => true),
                             'attributes' => array(
                                 'data-button' => 'git',
@@ -556,7 +556,7 @@
                         ),
                     'buttons' => array(
                         array(
-                            'text' => 'Revert All',
+                            'text' => 'Revert Uncommitted',
                             'condition' => array('uncommitted' => true),
                             'attributes' => array(
                                 'data-button' => 'git',

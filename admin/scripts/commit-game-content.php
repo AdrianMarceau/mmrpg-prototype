@@ -111,6 +111,7 @@ foreach ($commit_tokens  AS $object_key => $object_token){
 
     // Check to see if this is a new object being commited
     $is_new_object = in_array($object_token, $mmrpg_git_untracked_tokens) ? true : false;
+    $is_deleted_object = !file_exists($json_data_path) ? true : false;
 
     // Check to see which files and/or assets are being updated here
     $updating_what = array();
@@ -128,7 +129,10 @@ foreach ($commit_tokens  AS $object_key => $object_token){
     // Define the commit message for these file changes
     $commit_name = str_replace('"', '\\"', $git_publish_name);
     $commit_email = str_replace('"', '\\"', $git_publish_email);
-    if ($is_new_object){
+    if ($is_deleted_object){
+        $commit_message = 'Deleted the ';
+        $commit_message .= '\''.$object_name.'\' '.$object_full_name_kind_singular;
+    } elseif ($is_new_object){
         $commit_message = 'Created new ';
         $commit_message .= $updating_what_string.' ';
         $commit_message .= 'for ';

@@ -438,13 +438,13 @@ $(document).ready(function(){
                 update: 'admin/scripts/pull-game-content.php'
                 };
             var confirmMessages = {
-                revert: 'Are you absolutely sure you want to revert changes to all {object}?\n'
+                revert: 'Are you sure you want to revert uncommitted changes to all {object}?\n'
                     + 'This action cannot be undone and all updates will be lost.\n'
                     + 'Continue anyway?',
-                commit: 'Are you absolutely sure you want to commit changes to all {object}?\n'
+                commit: 'Are you absolutely sure you want to commit all changes to {object}?\n'
                     + 'This action cannot be undone and will be in the history forever.\n'
                     + 'Continue anyway? ',
-                publish: 'Are you absolutely sure you want to publish changes to all {object}?\n'
+                publish: 'Are you absolutely sure you want to publish all changes to {object}?\n'
                     + 'This action cannot be undone and will be in the history forever.\n'
                     + 'Continue anyway? ',
                 update: 'Are you sure you want to update {object} with remote changes?\n'
@@ -596,7 +596,7 @@ $(document).ready(function(){
                 update: 'admin/scripts/pull-game-content.php'
                 };
             var confirmMessages = {
-                revert: 'Are you absolutely sure you want to revert the changes to this {object}?\n'
+                revert: 'Are you sure you want to revert uncommitted changes to this {object}?\n'
                     + 'This action cannot be undone and any updates will be lost.\n'
                     + 'Continue anyway?',
                 commit: 'Are you absolutely sure you want to commit the changes to this {object}?\n'

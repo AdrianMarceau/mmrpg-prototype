@@ -234,6 +234,9 @@ a:hover {
 .adminhome .status.has_uncommitted_changes {
     color: #f58919;
 }
+.adminhome .status.has_uncommitted_deletes {
+    color: #d41616;
+}
 .adminhome .status.has_committed_changes {
     color: #068906;
 }
@@ -274,6 +277,7 @@ a:hover {
 
 .adminhome li > div.link a {
     display: inline-block;
+    cursor: pointer;
 }
 .adminhome li > div.link .status {
     display: inline-block;
@@ -296,11 +300,14 @@ a:hover {
     font-size: 90%;
 }
 
-.adminhome li > div.link a.status:hover {
+.adminhome li > div.link .status:hover {
     color: #ffffff;
 }
 .adminhome li > div.link .status.has_uncommitted_changes:hover {
     background-color: #f58919;
+}
+.adminhome li > div.link .status.has_uncommitted_deletes:hover {
+    background-color: #d41616;
 }
 .adminhome li > div.link .status.has_committed_changes:hover {
     background-color: #068906;
@@ -712,8 +719,11 @@ tr:nth-child(odd) td {
 .adminform .status.has_uncommitted_changes {
     color: #f58919;
 }
+.adminform .status.has_uncommitted_deletes {
+    color: #d41616;
+}
 .adminform .status.has_committed_changes {
-    color: green;
+    color: #068906;
 }
 .adminform .status.has_unpulled_updates {
     color: #629c62;

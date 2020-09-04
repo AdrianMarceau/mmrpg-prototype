@@ -174,18 +174,37 @@ class cms_admin {
                     $token = $kind_info['token'];
                     $icon = $kind_info['icon'];
                     $list = isset($repo_changes[$token]) ? $repo_changes[$token] : false;
-                    if (!empty($list)){
-                        $status = $token.'_changes';
-                        $count = count($list);
-                        $icon_span = '<i class="icon fa fa-'.$icon.'"></i>';
-                        $count_span = ' <span class="count">'.$count.'</span>';
-                        $title_attr = ' title="'.($count.' '.ucfirst($token).' '.($count === 1 ? 'Change' : 'Changes')).'"';
-                        $class_attr = ' class="status has_'.$status.'"';
-                        if (!empty($option_info['link']['url'])){
-                            $href_attr = ' href="'.$option_info['link']['url'].'?subaction=search&'.$repo_config['data']['prefix'].'_flag_'.$token.'_changes=1"';
-                            $repo_icons .= '<a'.$class_attr.$title_attr.$href_attr.'>'.$icon_span.$count_span.'</a>';
-                        } else {
-                            $repo_icons .= '<span'.$class_attr.$title_attr.'>'.$icon_span.$count_span.'</span>';
+                    if ($token === 'uncommitted'){
+                        foreach ($list AS $subkey => $sublist){
+                            if (!empty($sublist)){
+                                $status = $token.'_'.$subkey;
+                                $count = count($sublist);
+                                $icon_span = '<i class="icon fa fa-'.($subkey === 'deletes' ? 'times' : $icon).'"></i>';
+                                $count_span = ' <span class="count">'.$count.'</span>';
+                                $title_attr = ' title="'.($count.' '.ucfirst($token).' '.ucfirst($count === 1 ? rtrim($subkey, 's') : $subkey)).'"';
+                                $class_attr = ' class="status has_'.$status.'"';
+                                if (!empty($option_info['link']['url']) && $subkey !== 'deletes'){
+                                    $href_attr = ' href="'.$option_info['link']['url'].'?subaction=search&'.$repo_config['data']['prefix'].'_flag_'.$token.'_changes=1"';
+                                    $repo_icons .= '<a'.$class_attr.$title_attr.$href_attr.'>'.$icon_span.$count_span.'</a>';
+                                } else {
+                                    $repo_icons .= '<span'.$class_attr.$title_attr.'>'.$icon_span.$count_span.'</span>';
+                                }
+                            }
+                        }
+                    } else {
+                        if (!empty($list)){
+                            $status = $token.'_changes';
+                            $count = count($list);
+                            $icon_span = '<i class="icon fa fa-'.$icon.'"></i>';
+                            $count_span = ' <span class="count">'.$count.'</span>';
+                            $title_attr = ' title="'.($count.' '.ucfirst($token).' '.($count === 1 ? 'Change' : 'Changes')).'"';
+                            $class_attr = ' class="status has_'.$status.'"';
+                            if (!empty($option_info['link']['url']) && $token !== 'committed'){
+                                $href_attr = ' href="'.$option_info['link']['url'].'?subaction=search&'.$repo_config['data']['prefix'].'_flag_'.$token.'_changes=1"';
+                                $repo_icons .= '<a'.$class_attr.$title_attr.$href_attr.'>'.$icon_span.$count_span.'</a>';
+                            } else {
+                                $repo_icons .= '<span'.$class_attr.$title_attr.'>'.$icon_span.$count_span.'</span>';
+                            }
                         }
                     }
                 }
@@ -564,16 +583,31 @@ class cms_admin {
     public static function admin_home_group_get_repo_changes($repo_config, &$repo_changes, $filter_unique = false){
         if (empty($repo_config['path'])){ return false; }
         $repo_changes = array();
-        // Check to see if there are changes, filter if necessary, and return if uncommitted
+
+        // Collect uncommitted changes, uncommitted deletes, and commited changes/deletes
         $uncommitted_changes = cms_admin::git_get_uncommitted_changes($repo_config['path']);
+        $uncommitted_deletes = cms_admin::git_get_deleted($repo_config['path']);
+        $all_committed = cms_admin::git_get_committed_changes($repo_config['path']);
+
+        // If any of the uncommited changes are actually deletes, remove them from the first list
+        if (!empty($uncommitted_deletes)){ $uncommitted_changes = array_diff($uncommitted_changes, $uncommitted_deletes); }
+
+        // Filter each of the result arrays as necessary (if provided)
         if (!empty($uncommitted_changes) && !empty($repo_config['filter'])){ $uncommitted_changes = self::git_filter_list_by_data($uncommitted_changes, $repo_config['filter']); }
-        if ($filter_unique){ $unique = array(); foreach ($uncommitted_changes AS $k => $p){ list($t) = explode('/', $p); if (!in_array($t, $unique)){ $unique[] = $t; }  } $uncommitted_changes = $unique; }
-        $repo_changes['uncommitted'] = $uncommitted_changes;
-        // Check to see if there are any updates, filter if necessary, and return if unpulled
-        $committed_changes = cms_admin::git_get_committed_changes($repo_config['path']);
-        if (!empty($committed_changes) && !empty($repo_config['filter'])){ $committed_changes = self::git_filter_list_by_data($committed_changes, $repo_config['filter']); }
-        if ($filter_unique){ $unique = array(); foreach ($committed_changes AS $k => $p){ list($t) = explode('/', $p); if (!in_array($t, $unique)){ $unique[] = $t; }  } $committed_changes = $unique; }
-        $repo_changes['committed'] = $committed_changes;
+        if (!empty($uncommitted_deletes) && !empty($repo_config['filter'])){ $uncommitted_deletes = self::git_filter_list_by_data($uncommitted_deletes, $repo_config['filter']); }
+        if (!empty($all_committed) && !empty($repo_config['filter'])){ $all_committed = self::git_filter_list_by_data($all_committed, $repo_config['filter']); }
+
+        // Filter out unique values to ensure no duplicates (if requested)
+        if (!empty($uncommitted_changes) && $filter_unique){ $unique = array(); foreach ($uncommitted_changes AS $k => $p){ list($t) = explode('/', $p); if (!in_array($t, $unique)){ $unique[] = $t; }  } $uncommitted_changes = $unique; }
+        if (!empty($uncommitted_deletes) && $filter_unique){ $unique = array(); foreach ($uncommitted_deletes AS $k => $p){ list($t) = explode('/', $p); if (!in_array($t, $unique)){ $unique[] = $t; }  } $uncommitted_deletes = $unique; }
+        if (!empty($all_committed) && $filter_unique){ $unique = array(); foreach ($all_committed AS $k => $p){ list($t) = explode('/', $p); if (!in_array($t, $unique)){ $unique[] = $t; }  } $all_committed = $unique; }
+
+        // Add the results to the repo changes array
+        $repo_changes['uncommitted'] = array();
+        if (!empty($uncommitted_changes)){ $repo_changes['uncommitted']['changes'] = $uncommitted_changes; }
+        if (!empty($uncommitted_deletes)){ $repo_changes['uncommitted']['deletes'] = $uncommitted_deletes; }
+        $repo_changes['committed'] = $all_committed;
+
     }
 
 

@@ -252,6 +252,7 @@
 
         // Let's delete all of this challenge's data from the database
         $db->delete($this_challenge_table, array('challenge_id' => $delete_data['challenge_id']));
+        cms_admin::object_editor_delete_json_data_file('challenge', $delete_data['challenge_id']);
         $form_messages[] = array('success', 'The requested challenge has been deleted from the database');
         exit_form_action('success');
 
