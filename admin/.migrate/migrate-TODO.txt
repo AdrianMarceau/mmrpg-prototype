@@ -127,20 +127,20 @@ Update website/game to use different favicons for different environments
 
 Update the admin panel to deal with git functions add/stage/commit for content directories
 and distinguish between LOCAL/DEV/STAGE/PROD servers w/ different push/pull functions
--  Add revert and publish functionality for rogue stars on local/dev
--  Add revert and publish functionality for event challenges on local/dev
+-  Add revert and publish functionality for rogue stars on local/dev [DONE]
+-  Add revert and publish functionality for event challenges on local/dev [DONE]
 -  Add revert and publish functionality for rpg players on local/dev [DONE]
 -  Add revert and publish functionality for rpg robots on local/dev [DONE]
 -  Add revert and publish functionality for rpg fields on local/dev [DONE]
--  Add revert and publish functionality for web pages on local/dev
--  Add pull functionality for users on local/dev/stage
--  Add pull functionality for user_challenges on local/dev/stage
--  Add pull functionality for rogue stars on stage/prod
--  Add pull functionality for event challenges on stage/prod
+-  Add revert and publish functionality for web pages on local/dev [DONE]
+-  Add pull functionality for rogue stars on stage/prod [DONE]
+-  Add pull functionality for event challenges on stage/prod [DONE]
 -  Add pull functionality for rpg players on stage/prod [DONE]
 -  Add pull functionality for rpg robots on stage/prod [DONE]
 -  Add pull functionality for rpg fields on stage/prod [DONE]
--  Add pull functionality for web pages on stage/prod
+-  Add pull functionality for web pages on stage/prod [DONE]
+-  Add pull functionality for users on local/dev/stage
+-  Add pull functionality for user_challenges on local/dev/stage
 -  ?????
 
 Implement the new "minify" library to compress CSS and JS markup
