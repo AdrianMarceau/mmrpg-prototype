@@ -273,7 +273,7 @@ class cms_admin {
             $changes = $index[$repo_base_path];
         }
         if (!empty($filter_path)){ $changes = self::git_filter_list_by_path($changes, $filter_path); }
-        if (!empty($filter_data)){ $changes = self::git_filter_data($changes, $filter_data); }
+        if (!empty($filter_data)){ $changes = self::git_filter_list_by_data($changes, $filter_data); }
         return array_values($changes);
     }
 
@@ -290,7 +290,7 @@ class cms_admin {
             $changes = $index[$repo_base_path];
         }
         if (!empty($filter_path)){ $changes = self::git_filter_list_by_path($changes, $filter_path); }
-        if (!empty($filter_data)){ $changes = self::git_filter_data($changes, $filter_data); }
+        if (!empty($filter_data)){ $changes = self::git_filter_list_by_data($changes, $filter_data); }
         return array_values($changes);
     }
 
@@ -306,8 +306,24 @@ class cms_admin {
             $changes = $index[$repo_base_path];
         }
         if (!empty($filter_path)){ $changes = self::git_filter_list_by_path($changes, $filter_path); }
-        if (!empty($filter_data)){ $changes = self::git_filter_data($changes, $filter_data); }
+        if (!empty($filter_data)){ $changes = self::git_filter_list_by_data($changes, $filter_data); }
         return array_values($changes);
+    }
+
+    // Define a function for checking if there are any deleted files in a given repo (w/ optional path filter)
+    public static function git_get_deleted($repo_base_path, $filter_path = ''){
+        static $index;
+        if (!is_array($index)){ $index = array(); }
+        if (!isset($index[$repo_base_path])){
+            $deleted = shell_exec('cd '.$repo_base_path.' && git ls-files --deleted');
+            echo('$deleted = '.print_r($deleted, true).PHP_EOL);
+            $deleted = !empty($deleted) ? explode("\n", trim($deleted)) : array();
+            $index[$repo_base_path] = $deleted;
+        } else {
+            $deleted = $index[$repo_base_path];
+        }
+        if (!empty($filter_path)){ $deleted = self::git_filter_list_by_path($deleted, $filter_path); }
+        return array_values($deleted);
     }
 
     // Define a function for checking if there are any unstaged files in a given repo (w/ optional path filter)
@@ -789,6 +805,28 @@ class cms_admin {
                 fwrite($h, $new_html_content_markup);
                 fclose($h);
             }
+        }
+
+    }
+
+    // Define a function for deleting a given json file from the relevant content repo
+    public static function object_editor_delete_json_data_file($object_kind, $git_object_token){
+        $object_xkind = substr($object_kind, -1, 1) === 'y' ? substr($object_kind, 0, -1).'ies' : $object_kind.'s';
+
+        // Define the data base and token directories given object kind then append to form full path
+        $json_data_base_dir = constant('MMRPG_CONFIG_'.strtoupper($object_xkind).'_CONTENT_PATH');
+        if (in_array($object_kind, array('star', 'challenge'))){ $json_data_token_dir = cms_admin::git_get_id_token($object_kind, $git_object_token); }
+        elseif (in_array($object_kind, array('page'))){ $json_data_token_dir = cms_admin::git_get_url_token($object_kind, $git_object_token);  }
+        else { $json_data_token_dir = $git_object_token; }
+        $json_data_full_path = $json_data_base_dir.$json_data_token_dir.'/data.json';
+
+        // Assuming it exists, delete the json data file from the repo
+        if (file_exists($json_data_full_path)){ unlink($json_data_full_path); }
+
+        // If this is a page request, extract and collect new/old html content separately
+        if ($object_kind === 'page'){
+            $html_content_full_path = $json_data_base_dir.$json_data_token_dir.'/content.html';
+            if (file_exists($html_content_full_path)){ unlink($html_content_full_path); }
         }
 
     }
