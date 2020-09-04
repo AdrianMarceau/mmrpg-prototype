@@ -316,7 +316,7 @@ class cms_admin {
         if (!is_array($index)){ $index = array(); }
         if (!isset($index[$repo_base_path])){
             $deleted = shell_exec('cd '.$repo_base_path.' && git ls-files --deleted');
-            echo('$deleted = '.print_r($deleted, true).PHP_EOL);
+            //echo('$deleted = '.print_r($deleted, true).PHP_EOL);
             $deleted = !empty($deleted) ? explode("\n", trim($deleted)) : array();
             $index[$repo_base_path] = $deleted;
         } else {

@@ -63,9 +63,11 @@ foreach ($revert_tokens  AS $object_key => $object_token){
     //debug_echo('processing object-token '.$object_token);
 
     // Collect the object (primary key) token value in case it's different than (folder name) token value
-    if ($content_type_info['primary_key'] === 'id'){ $object_token_field_value = intval(preg_replace('/^(.*)_([0-9]+)$/i', '$2', $object_token)); }
+    if ($content_type_info['primary_key'] === 'id'){ $object_token_field_value = intval(preg_replace('/^(.*?)-([0-9]+)$/i', '$2', $object_token)); }
     elseif ($content_type_info['primary_key'] === 'url'){ $object_token_field_value = trim(str_replace('_', '/', $object_token), '/').'/'; }
     else { $object_token_field_value = $object_token; }
+    //debug_echo('$object_token_field = '.print_r($object_token_field, true).'');
+    //debug_echo('$object_token_field_value = '.print_r($object_token_field_value, true).'');
 
     // Collect the file paths to be reverted
     $object_paths = $revert_paths_bytoken[$object_token];
@@ -102,10 +104,21 @@ foreach ($revert_tokens  AS $object_key => $object_token){
                         $object_update_data[$image_editor_field] = 0;
                     }
                 }
-                //debug_echo('$object_update_data = '.print_r($object_update_data, true).'');
-                //debug_echo('condition = '.print_r(array($object_token_field => $object_token_field_value), true).'');
-                // Update the database object with above values given the object token
-                $db->update($object_table_name, $object_update_data, array($object_token_field => $object_token_field_value));
+                // Check to make sure the object still exists in the database so we know if we should update or insert
+                $object_exists = $db->get_value("SELECT {$object_token_field} FROM {$object_table_name} WHERE {$object_token_field} = {$object_token_field_value};", $object_token_field);
+                //debug_echo('$object_exists = '.print_r($object_exists, true).'');
+                if (!empty($object_exists)){
+                    // Update the database object with above values given the object token
+                    //debug_echo('$object_update_data = '.print_r($object_update_data, true).'');
+                    //debug_echo('condition = '.print_r(array($object_token_field => $object_token_field_value), true).'');
+                    $db->update($object_table_name, $object_update_data, array($object_token_field => $object_token_field_value));
+                } else {
+                    // Re-insert the database object with above values given the object token
+                    $object_insert_data = array_merge($object_update_data, array($object_token_field => $object_token_field_value));
+                    //debug_echo('$object_insert_data = '.print_r($object_insert_data, true).'');
+                    $db->insert($object_table_name, $object_insert_data);
+                }
+
             }
         }
     }
