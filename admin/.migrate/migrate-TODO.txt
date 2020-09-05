@@ -146,7 +146,7 @@ Update the admin panel to remove legacy "backup" tabs & functionality now that w
 -  player editor [DONE]
 -  robot editor
 -  field editor [DONE]
--  page editor
+-  page editor [DONE]
 -  upload script
 
 Implement the new "minify" library to compress CSS and JS markup
