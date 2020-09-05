@@ -105,7 +105,7 @@ foreach ($revert_tokens  AS $object_key => $object_token){
                     }
                 }
                 // Check to make sure the object still exists in the database so we know if we should update or insert
-                $object_exists = $db->get_value("SELECT {$object_token_field} FROM {$object_table_name} WHERE {$object_token_field} = {$object_token_field_value};", $object_token_field);
+                $object_exists = $db->get_value("SELECT {$object_token_field} FROM {$object_table_name} WHERE {$object_token_field} = '{$object_token_field_value}';", $object_token_field);
                 //debug_echo('$object_exists = '.print_r($object_exists, true).'');
                 if (!empty($object_exists)){
                     // Update the database object with above values given the object token
