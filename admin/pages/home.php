@@ -226,10 +226,12 @@
             $this_group_options = array();
 
             // Populate the group options array with relevant pages and buttons
+
             if (in_array('*', $this_adminaccess)
                 || in_array('edit-players', $this_adminaccess)){
+                $option_name = 'Edit Players';
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-players/', 'text' => 'Edit Players'),
+                    'link' => array('url' => 'admin/edit-players/', 'text' => $option_name),
                     'desc' => 'edit the details and images of the in-game player characters',
                     'repo' => array(
                         'name' => 'players',
@@ -263,11 +265,13 @@
                     );
                 $this_group_options[] = $this_option;
             }
+
             if (in_array('*', $this_adminaccess)
                 || in_array('edit-robots', $this_adminaccess)
                 || in_array('edit-robot-master', $this_adminaccess)){
+                $option_name = 'Edit Robot Masters';
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-robot-masters/', 'text' => 'Edit Robots (Masters)'),
+                    'link' => array('url' => 'admin/edit-robot-masters/', 'text' => $option_name),
                     'desc' => 'edit the details and images of the in-game robot masters',
                     'repo' => array(
                         'name' => 'robots',
@@ -309,10 +313,58 @@
                 $this_group_options[] = $this_option;
             }
             if (in_array('*', $this_adminaccess)
+                || in_array('edit-abilities', $this_adminaccess)
+                || in_array('edit-robot-master-abilities', $this_adminaccess)){
+                $option_name = 'Edit Robot Master Abilities';
+                $this_option = array(
+                    'link' => array('url' => 'admin/edit-robot-master-abilities/', 'text' => $option_name),
+                    'desc' => 'edit the details and images of the abilities used by robot masters',
+                    'repo' => array(
+                        'name' => 'abilities',
+                        'data' => array('prefix' => 'ability'),
+                        'path' => MMRPG_CONFIG_ROBOTS_CONTENT_PATH,
+                        'filter' => array(
+                            'table' => 'mmrpg_index_abilities',
+                            'token' => 'ability_token',
+                            'extra' => array('ability_class' => 'master')
+                            )
+                        ),
+                    'buttons' => array(
+                        array(
+                            'text' => 'Revert Uncommitted',
+                            'condition' => array('uncommitted' => true),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'revert',
+                                'data-kind' => 'abilities',
+                                'data-subkind' => 'masters',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            ),
+                        array(
+                            'text' => 'Commit All',
+                            'condition' => array('uncommitted' => true),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'commit',
+                                'data-kind' => 'abilities',
+                                'data-subkind' => 'masters',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            )
+                        )
+                    );
+                $this_group_options[] = $this_option;
+            }
+
+            if (in_array('*', $this_adminaccess)
                 || in_array('edit-robots', $this_adminaccess)
                 || in_array('edit-support-mechas', $this_adminaccess)){
+                $option_name = 'Edit Support Mechas';
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-support-mechas/', 'text' => 'Edit Robots (Mechas)'),
+                    'link' => array('url' => 'admin/edit-support-mechas/', 'text' => $option_name),
                     'desc' => 'edit the details and images of the in-game support mechas',
                     'repo' => array(
                         'name' => 'robots',
@@ -354,10 +406,58 @@
                 $this_group_options[] = $this_option;
             }
             if (in_array('*', $this_adminaccess)
+                || in_array('edit-abilities', $this_adminaccess)
+                || in_array('edit-support-mecha-abilities', $this_adminaccess)){
+                $option_name = 'Edit Support Mecha Abilities';
+                $this_option = array(
+                    'link' => array('url' => 'admin/edit-support-mecha-abilities/', 'text' => $option_name),
+                    'desc' => 'edit the details and images of abilities used by support mechas',
+                    'repo' => array(
+                        'name' => 'abilities',
+                        'data' => array('prefix' => 'ability'),
+                        'path' => MMRPG_CONFIG_ROBOTS_CONTENT_PATH,
+                        'filter' => array(
+                            'table' => 'mmrpg_index_abilities',
+                            'token' => 'ability_token',
+                            'extra' => array('ability_class' => 'mecha')
+                            )
+                        ),
+                    'buttons' => array(
+                        array(
+                            'text' => 'Revert Uncommitted',
+                            'condition' => array('uncommitted' => true),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'revert',
+                                'data-kind' => 'abilities',
+                                'data-subkind' => 'mechas',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            ),
+                        array(
+                            'text' => 'Commit All',
+                            'condition' => array('uncommitted' => true),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'commit',
+                                'data-kind' => 'abilities',
+                                'data-subkind' => 'mechas',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            )
+                        )
+                    );
+                $this_group_options[] = $this_option;
+            }
+
+            if (in_array('*', $this_adminaccess)
                 || in_array('edit-robots', $this_adminaccess)
                 || in_array('edit-fortress-bosses', $this_adminaccess)){
+                $option_name = 'Edit Fortress Bosses';
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-fortress-bosses/', 'text' => 'Edit Robots (Bosses)'),
+                    'link' => array('url' => 'admin/edit-fortress-bosses/', 'text' => $option_name),
                     'desc' => 'edit the details and images of the in-game fortress bosses',
                     'repo' => array(
                         'name' => 'robots',
@@ -399,9 +499,57 @@
                 $this_group_options[] = $this_option;
             }
             if (in_array('*', $this_adminaccess)
-                || in_array('edit-fields', $this_adminaccess)){
+                || in_array('edit-abilities', $this_adminaccess)
+                || in_array('edit-fortress-boss-abilities', $this_adminaccess)){
+                $option_name = 'Edit Fortress Boss Abilities';
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-fields/', 'text' => 'Edit Battle Fields'),
+                    'link' => array('url' => 'admin/edit-fortress-boss-abilities/', 'text' => $option_name),
+                    'desc' => 'edit the details and images of abilities used by fortress bosses',
+                    'repo' => array(
+                        'name' => 'abilities',
+                        'data' => array('prefix' => 'ability'),
+                        'path' => MMRPG_CONFIG_ROBOTS_CONTENT_PATH,
+                        'filter' => array(
+                            'table' => 'mmrpg_index_abilities',
+                            'token' => 'ability_token',
+                            'extra' => array('ability_class' => 'boss')
+                            )
+                        ),
+                    'buttons' => array(
+                        array(
+                            'text' => 'Revert Uncommitted',
+                            'condition' => array('uncommitted' => true),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'revert',
+                                'data-kind' => 'abilities',
+                                'data-subkind' => 'bosses',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            ),
+                        array(
+                            'text' => 'Commit All',
+                            'condition' => array('uncommitted' => true),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'commit',
+                                'data-kind' => 'abilities',
+                                'data-subkind' => 'bosses',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            )
+                        )
+                    );
+                $this_group_options[] = $this_option;
+            }
+
+            if (in_array('*', $this_adminaccess)
+                || in_array('edit-fields', $this_adminaccess)){
+                $option_name = 'Edit Battle Fields';
+                $this_option = array(
+                    'link' => array('url' => 'admin/edit-fields/', 'text' => $option_name),
                     'desc' => 'edit the details and images of the in-game battle fields',
                     'repo' => array(
                         'name' => 'fields',

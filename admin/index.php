@@ -174,15 +174,10 @@ elseif ($this_page_action == 'edit-users'){
     // Require the edit users file
     require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-users.php');
 }
-// Else if this is an EDIT PAGES request
-elseif ($this_page_action == 'edit-pages'){
-    // Require the edit pages file
-    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-pages.php');
-}
-// Else if this is an EDIT ROBOTS request
-elseif ($this_page_action == 'edit-robots'){
+// Else if this is an EDIT PLAYER CHARACTERS request
+elseif ($this_page_action == 'edit-players'){
     // Require the edit robots file
-    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-robots.php');
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-players.php');
 }
 // Else if this is an EDIT ROBOT MASTERS request
 elseif ($this_page_action == 'edit-robot-masters'){
@@ -199,10 +194,20 @@ elseif ($this_page_action == 'edit-fortress-bosses'){
     // Require the edit robots file
     require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-robots_bosses.php');
 }
-// Else if this is an EDIT PLAYER CHARACTERS request
-elseif ($this_page_action == 'edit-players'){
-    // Require the edit robots file
-    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-players.php');
+// Else if this is an EDIT ROBOT MASTER ABILITIES request
+elseif ($this_page_action == 'edit-robot-master-abilities'){
+    // Require the edit abilities file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-abilities_master.php');
+}
+// Else if this is an EDIT SUPPORT MECHA ABILITIES request
+elseif ($this_page_action == 'edit-support-mecha-abilities'){
+    // Require the edit abilities file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-abilities_mecha.php');
+}
+// Else if this is an EDIT FORTRESS BOSS ABILITIES request
+elseif ($this_page_action == 'edit-fortress-boss-abilities'){
+    // Require the edit abilities file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-abilities_boss.php');
 }
 // Else if this is an EDIT BATTLE FIELDS request
 elseif ($this_page_action == 'edit-fields'){
@@ -223,6 +228,11 @@ elseif ($this_page_action == 'edit-user-challenges'){
 elseif ($this_page_action == 'edit-stars'){
     // Require the edit stars file
     require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-stars.php');
+}
+// Else if this is an EDIT WEBSITE PAGES request
+elseif ($this_page_action == 'edit-pages'){
+    // Require the edit pages file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-pages.php');
 }
 // Otherwise, not a valid page
 else {
