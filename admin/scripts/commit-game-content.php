@@ -96,13 +96,13 @@ foreach ($commit_tokens  AS $object_key => $object_token){
             $json_data_array = json_decode($json_data_markup, true);
             //debug_echo('$json_data_array = '.print_r($json_data_array, true).'');
             if (!empty($json_data_array)){
-                if (isset($json_data_array[$request_kind_singular.'_name'])){
-                    $object_name = $json_data_array[$request_kind_singular.'_name'];
-                } elseif (isset($json_data_array[$request_kind_singular.'_title'])){
-                    $object_name = $json_data_array[$request_kind_singular.'_title'];
-                } elseif ($object_name_kind_singular === 'star'
+                if ($object_name_kind_singular === 'star'
                     && isset($json_data_array[$request_kind_singular.'_from_date'])){
                     $object_name = $json_data_array[$request_kind_singular.'_from_date'];
+                } elseif (isset($json_data_array[$request_kind_singular.'_title'])){
+                    $object_name = $json_data_array[$request_kind_singular.'_title'];
+                } elseif (isset($json_data_array[$request_kind_singular.'_name'])){
+                    $object_name = $json_data_array[$request_kind_singular.'_name'];
                 }
                 //debug_echo('$object_name = '.print_r($object_name, true).'');
             }

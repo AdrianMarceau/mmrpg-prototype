@@ -874,8 +874,8 @@
                             <? if (!$is_backup_data){ ?>
                                 <div class="buttons">
                                     <input class="button save" type="submit" value="Save Changes" />
-                                    <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin/edit-pages/editor/page_id=<?= $page_data['page_id'] ?>';" />
                                     <? /*
+                                    <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin/edit-pages/editor/page_id=<?= $page_data['page_id'] ?>';" />
                                     <input class="button delete" type="button" value="Delete Page" data-delete="pages" data-page-id="<?= $page_data['page_id'] ?>" />
                                     */ ?>
                                 </div>
