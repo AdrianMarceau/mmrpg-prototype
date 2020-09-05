@@ -145,7 +145,7 @@ and distinguish between LOCAL/DEV/STAGE/PROD servers w/ different push/pull func
 Update the admin panel to remove legacy "backup" tabs & functionality now that we have git backups
 -  player editor [DONE]
 -  robot editor
--  field editor
+-  field editor [DONE]
 -  page editor
 -  upload script
 

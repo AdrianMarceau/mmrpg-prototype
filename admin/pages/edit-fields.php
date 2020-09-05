@@ -239,32 +239,17 @@
     // If we're in editor mode, we should collect field info from database
     $field_data = array();
     $editor_data = array();
-    $is_backup_data = false;
     if ($sub_action == 'editor'
-        && (!empty($_GET['field_id'])
-            || !empty($_GET['backup_id']))){
+        && !empty($_GET['field_id'])){
 
         // Collect form data for processing
         $editor_data['field_id'] = !empty($_GET['field_id']) && is_numeric($_GET['field_id']) ? trim($_GET['field_id']) : '';
-        if (empty($editor_data['field_id'])
-            && !empty($_GET['backup_id'])
-            && is_numeric($_GET['backup_id'])){
-            $editor_data['backup_id'] = trim($_GET['backup_id']);
-            $is_backup_data = true;
-        }
-
 
         /* -- Collect Field Data -- */
 
         // Collect field details from the database
         $temp_field_fields = rpg_field::get_index_fields(true);
-        if (!$is_backup_data){
-            $field_data = $db->get_array("SELECT {$temp_field_fields} FROM mmrpg_index_fields WHERE field_id = {$editor_data['field_id']};");
-        } else {
-            $temp_field_backup_fields = str_replace('field_id,', 'backup_id AS field_id,', $temp_field_fields);
-            $temp_field_backup_fields .= ', backup_date_time';
-            $field_data = $db->get_array("SELECT {$temp_field_backup_fields} FROM mmrpg_index_fields_backups WHERE backup_id = {$editor_data['backup_id']};");
-        }
+        $field_data = $db->get_array("SELECT {$temp_field_fields} FROM mmrpg_index_fields WHERE field_id = {$editor_data['field_id']};");
 
         // If field data could not be found, produce error and exit
         if (empty($field_data)){ exit_field_edit_action(); }
@@ -272,7 +257,6 @@
         // Collect the field's name(s) for display
         $field_name_display = $field_data['field_name'];
         $this_page_tabtitle = $field_name_display.' | '.$this_page_tabtitle;
-        if ($is_backup_data){ $this_page_tabtitle = str_replace('Edit Fields', 'View Backups', $this_page_tabtitle); }
 
         // If form data has been submit for this field, we should process it
         $form_data = array();
@@ -454,17 +438,6 @@
             $update_data = $form_data;
             unset($update_data['field_id']);
 
-            // If a recent backup of this data doesn't exist, create one now
-            $backup_date_time = date('Ymd-Hi');
-            $backup_exists = $db->get_value("SELECT backup_id FROM mmrpg_index_fields_backups WHERE field_token = '{$update_data['field_token']}' AND backup_date_time = '{$backup_date_time}';", 'backup_id');
-            if (empty($backup_exists)){
-                //$backup_data = $update_data;
-                $backup_data = $field_data;
-                unset($backup_data['field_id']);
-                $backup_data['backup_date_time'] = $backup_date_time;
-                $db->insert('mmrpg_index_fields_backups', $backup_data);
-            }
-
             // Update the main database index with changes to this field's data
             $update_results = $db->update('mmrpg_index_fields', $update_data, array('field_id' => $form_data['field_id']));
 
@@ -516,11 +489,7 @@
         <a href="admin/">Admin Panel</a>
         &raquo; <a href="admin/edit-fields/">Edit Fields</a>
         <? if ($sub_action == 'editor' && !empty($field_data)): ?>
-            <? if (!$is_backup_data){ ?>
-                &raquo; <a href="admin/edit-fields/editor/field_id=<?= $field_data['field_id'] ?>"><?= $field_name_display ?></a>
-            <? } else { ?>
-                &raquo; <a><?= $field_name_display ?></a>
-            <? } ?>
+            &raquo; <a href="admin/edit-fields/editor/field_id=<?= $field_data['field_id'] ?>"><?= $field_name_display ?></a>
         <? endif; ?>
     </div>
 
@@ -751,7 +720,7 @@
 
         <?
         if ($sub_action == 'editor'
-            && (!empty($_GET['field_id']) || !empty($_GET['backup_id']))){
+            && !empty($_GET['field_id'])){
 
             // Capture editor markup in a buffer in case we need to modify
             if (true){
@@ -763,32 +732,21 @@
                 <div class="editor">
 
                     <h3 class="header type_span type_<?= !empty($field_data['field_type']) ? $field_data['field_type'].(!empty($field_data['field_type2']) ? '_'.$field_data['field_type2'] : '') : 'none' ?>" data-auto="field-type" data-field-type="field_type,field_type2">
-                        <span class="title"><?= !$is_backup_data ? 'Edit' : 'View' ?> Field &quot;<?= $field_name_display ?>&quot;</span>
+                        <span class="title">Edit Field &quot;<?= $field_name_display ?>&quot;</span>
                         <?
-                        // If this is NOT backup data, we can generate links
-                        if (!$is_backup_data){
 
-                            // Print out any git-related statues to this header
-                            cms_admin::object_editor_header_echo_git_statues($field_data['field_token'], $mmrpg_git_file_arrays);
+                        // Print out any git-related statues to this header
+                        cms_admin::object_editor_header_echo_git_statues($field_data['field_token'], $mmrpg_git_file_arrays);
 
-                            // If the field is published, generate and display a preview link
-                            if (!empty($field_data['field_flag_published'])){
-                                $preview_link = 'database/';
-                                if ($field_data['field_class'] === 'master'){ $preview_link .= 'fields/'; }
-                                elseif ($field_data['field_class'] === 'mecha'){ $preview_link .= 'mechas/'; }
-                                elseif ($field_data['field_class'] === 'boss'){ $preview_link .= 'bosses/'; }
-                                $preview_link .= $field_data['field_token'].'/';
-                                echo '<a class="view" href="'.$preview_link.'" target="_blank">View <i class="fas fa-external-link-square-alt"></i></a>'.PHP_EOL;
-                                echo '<a class="preview" href="'.$preview_link.'preview=true" target="_blank">Preview <i class="fas fa-external-link-square-alt"></i></a>'.PHP_EOL;
-                            }
-
-                        }
-                        // Otherwise we'll simply show the backup creation date
-                        else {
-
-                            // Print out the creation date in a readable form
-                            echo '<span style="display: block; clear: left; font-size: 90%; font-weight: normal;">Backup Created '.date('Y/m/d @ g:s a', strtotime(preg_replace('/^([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})([0-9]{2})$/', '$1/$2/$3T$4:$5', $field_data['backup_date_time']))).'</span>';
-
+                        // If the field is published, generate and display a preview link
+                        if (!empty($field_data['field_flag_published'])){
+                            $preview_link = 'database/';
+                            if ($field_data['field_class'] === 'master'){ $preview_link .= 'fields/'; }
+                            elseif ($field_data['field_class'] === 'mecha'){ $preview_link .= 'mechas/'; }
+                            elseif ($field_data['field_class'] === 'boss'){ $preview_link .= 'bosses/'; }
+                            $preview_link .= $field_data['field_token'].'/';
+                            echo '<a class="view" href="'.$preview_link.'" target="_blank">View <i class="fas fa-external-link-square-alt"></i></a>'.PHP_EOL;
+                            echo '<a class="preview" href="'.$preview_link.'preview=true" target="_blank">Preview <i class="fas fa-external-link-square-alt"></i></a>'.PHP_EOL;
                         }
 
                         ?>
@@ -796,27 +754,12 @@
 
                     <? print_form_messages() ?>
 
-                    <?
-                    // Collect a list of backups for this field from the database, if any
-                    $field_backup_list = $db->get_array_list("SELECT
-                        backup_id, field_token, field_name, backup_date_time
-                        FROM mmrpg_index_fields_backups
-                        WHERE field_token = '{$field_data['field_token']}'
-                        ORDER BY backup_date_time DESC
-                        ;");
-                    ?>
-
                     <div class="editor-tabs" data-tabgroup="field">
                         <a class="tab active" data-tab="basic">Basic</a><span></span>
                         <a class="tab" data-tab="flavour">Flavour</a><span></span>
-                        <? if (!$is_backup_data){ ?>
-                            <a class="tab" data-tab="images">Images</a><span></span>
-                            <a class="tab" data-tab="attachments">Attachments</a><span></span>
-                            <a class="tab" data-tab="functions">Functions</a><span></span>
-                            <? if (!$is_backup_data && !empty($field_backup_list)){ ?>
-                                <a class="tab" data-tab="backups">Backups</a><span></span>
-                            <? } ?>
-                        <? } ?>
+                        <a class="tab" data-tab="images">Images</a><span></span>
+                        <a class="tab" data-tab="attachments">Attachments</a><span></span>
+                        <a class="tab" data-tab="functions">Functions</a><span></span>
                     </div>
 
                     <form class="form" method="post">
@@ -1204,13 +1147,11 @@
                                                         echo($file_exists ? '<a class="link view" href="'.$file_href.'?'.time().'" target="_blank" data-href="'.$file_href.'">'.$display_path.'/'.$file_name.'</a>' : '<a class="link view disabled" target="_blank" data-href="'.$file_href.'">'.$display_path.'/'.$file_name.'</a>');
                                                         echo('<span class="info size">'.(!empty($sheet_width) ? $sheet_width : '').'w &times; '.(!empty($sheet_height) ? $sheet_height : '').'h</span>');
                                                         echo($file_exists ? '<span class="info status good">&check;</span>' : '<span class="info status bad">&cross;</span>');
-                                                        if (!$is_backup_data){
-                                                            echo('<a class="action delete'.(!$file_exists ? ' disabled' : '').'" data-action="delete" data-file-hash="'.md5('delete/'.$this_sprite_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">Delete</a>');
-                                                            echo('<a class="action upload'.($file_exists ? ' disabled' : '').'" data-action="upload" data-file-hash="'.md5('upload/'.$this_sprite_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">');
-                                                                echo('<span class="text">Upload</span>');
-                                                                echo('<input class="input" type="file" name="file_info" value=""'.($file_exists ? ' disabled="disabled"' : '').' />');
-                                                            echo('</a>');
-                                                        }
+                                                        echo('<a class="action delete'.(!$file_exists ? ' disabled' : '').'" data-action="delete" data-file-hash="'.md5('delete/'.$this_sprite_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">Delete</a>');
+                                                        echo('<a class="action upload'.($file_exists ? ' disabled' : '').'" data-action="upload" data-file-hash="'.md5('upload/'.$this_sprite_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">');
+                                                            echo('<span class="text">Upload</span>');
+                                                            echo('<input class="input" type="file" name="file_info" value=""'.($file_exists ? ' disabled="disabled"' : '').' />');
+                                                        echo('</a>');
                                                     echo('</div>');
                                                 echo('</li>'.PHP_EOL);
 
@@ -1286,13 +1227,11 @@
                                                         echo($file_exists ? '<a class="link view" href="'.$file_href.'?'.time().'" target="_blank" data-href="'.$file_href.'">'.$display_path.'/'.$file_name.'</a>' : '<a class="link view disabled" target="_blank" data-href="'.$file_href.'">'.$display_path.'/'.$file_name.'</a>');
                                                         echo('<span class="info size">'.(!empty($sheet_width) ? $sheet_width : '').'w &times; '.(!empty($sheet_height) ? $sheet_height : '').'h</span>');
                                                         echo($file_exists ? '<span class="info status good">&check;</span>' : '<span class="info status bad">&cross;</span>');
-                                                        if (!$is_backup_data){
-                                                            echo('<a class="action delete'.(!$file_exists ? ' disabled' : '').'" data-action="delete" data-file-hash="'.md5('delete/'.$this_sprite_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">Delete</a>');
-                                                            echo('<a class="action upload'.($file_exists ? ' disabled' : '').'" data-action="upload" data-file-hash="'.md5('upload/'.$this_sprite_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">');
-                                                                echo('<span class="text">Upload</span>');
-                                                                echo('<input class="input" type="file" name="file_info" value=""'.($file_exists ? ' disabled="disabled"' : '').' />');
-                                                            echo('</a>');
-                                                        }
+                                                        echo('<a class="action delete'.(!$file_exists ? ' disabled' : '').'" data-action="delete" data-file-hash="'.md5('delete/'.$this_sprite_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">Delete</a>');
+                                                        echo('<a class="action upload'.($file_exists ? ' disabled' : '').'" data-action="upload" data-file-hash="'.md5('upload/'.$this_sprite_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">');
+                                                            echo('<span class="text">Upload</span>');
+                                                            echo('<input class="input" type="file" name="file_info" value=""'.($file_exists ? ' disabled="disabled"' : '').' />');
+                                                        echo('</a>');
                                                     echo('</div>');
                                                 echo('</li>'.PHP_EOL);
 
@@ -1480,81 +1419,37 @@
 
                             </div>
 
-                            <? if (!$is_backup_data){ ?>
+                            <div class="panel" data-tab="functions">
 
-                                <div class="panel" data-tab="functions">
-
-                                    <div class="field fullsize codemirror <?= $is_backup_data ? 'readonly' : '' ?>" data-codemirror-mode="php">
-                                        <div class="label">
-                                            <strong>Field Functions</strong>
-                                            <em>code is php-format with html allowed in some strings</em>
-                                        </div>
-                                        <?
-                                        // Collect the markup for the field functions file
-                                        if (!empty($_SESSION['field_functions_markup'][$field_data['field_id']])){
-                                            $field_functions_markup = $_SESSION['field_functions_markup'][$field_data['field_id']];
-                                            unset($_SESSION['field_functions_markup'][$field_data['field_id']]);
-                                        } else {
-                                            $template_functions_path = MMRPG_CONFIG_FIELDS_CONTENT_PATH.'.field/functions.php';
-                                            $field_functions_path = MMRPG_CONFIG_FIELDS_CONTENT_PATH.$field_data['field_token'].'/functions.php';
-                                            $field_functions_markup = file_exists($field_functions_path) ? file_get_contents($field_functions_path) : file_get_contents($template_functions_path);
-                                        }
-                                        ?>
-                                        <textarea class="textarea" name="field_functions_markup" rows="<?= min(20, substr_count($field_functions_markup, PHP_EOL)) ?>"><?= htmlentities(trim($field_functions_markup), ENT_QUOTES, 'UTF-8', true) ?></textarea>
-                                        <div class="label examples" style="font-size: 80%; padding-top: 4px;">
-                                            <strong>Available Objects</strong>:
-                                            <br />
-                                            <code style="color: #05a;">$this_battle</code>
-                                            &nbsp;&nbsp;<a title="battle data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_BATTLES_CONTENT_PATH).'.battle/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
-                                            <br />
-                                            <code style="color: #05a;">$this_field</code>
-                                            &nbsp;&nbsp;<a title="field data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_FIELDS_CONTENT_PATH).'.field/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
-                                        </div>
+                                <div class="field fullsize codemirror" data-codemirror-mode="php">
+                                    <div class="label">
+                                        <strong>Field Functions</strong>
+                                        <em>code is php-format with html allowed in some strings</em>
                                     </div>
-
+                                    <?
+                                    // Collect the markup for the field functions file
+                                    if (!empty($_SESSION['field_functions_markup'][$field_data['field_id']])){
+                                        $field_functions_markup = $_SESSION['field_functions_markup'][$field_data['field_id']];
+                                        unset($_SESSION['field_functions_markup'][$field_data['field_id']]);
+                                    } else {
+                                        $template_functions_path = MMRPG_CONFIG_FIELDS_CONTENT_PATH.'.field/functions.php';
+                                        $field_functions_path = MMRPG_CONFIG_FIELDS_CONTENT_PATH.$field_data['field_token'].'/functions.php';
+                                        $field_functions_markup = file_exists($field_functions_path) ? file_get_contents($field_functions_path) : file_get_contents($template_functions_path);
+                                    }
+                                    ?>
+                                    <textarea class="textarea" name="field_functions_markup" rows="<?= min(20, substr_count($field_functions_markup, PHP_EOL)) ?>"><?= htmlentities(trim($field_functions_markup), ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                                    <div class="label examples" style="font-size: 80%; padding-top: 4px;">
+                                        <strong>Available Objects</strong>:
+                                        <br />
+                                        <code style="color: #05a;">$this_battle</code>
+                                        &nbsp;&nbsp;<a title="battle data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_BATTLES_CONTENT_PATH).'.battle/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
+                                        <br />
+                                        <code style="color: #05a;">$this_field</code>
+                                        &nbsp;&nbsp;<a title="field data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_FIELDS_CONTENT_PATH).'.field/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
+                                    </div>
                                 </div>
 
-                            <? } ?>
-
-                            <? if (!$is_backup_data && !empty($field_backup_list)){ ?>
-                                <div class="panel" data-tab="backups">
-                                    <table class="backups">
-                                        <colgroup>
-                                            <col class="id" width="50" />
-                                            <col class="name" width="" />
-                                            <col class="date" width="100" />
-                                            <col class="time" width="75" />
-                                            <col class="actions" width="100" />
-                                        </colgroup>
-                                        <thead>
-                                            <tr>
-                                                <th class="id">ID</th>
-                                                <th class="name">Name</th>
-                                                <th class="date">Date</th>
-                                                <th class="time">Time</th>
-                                                <th class="actions">&nbsp;</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <? foreach ($field_backup_list AS $backup_key => $backup_info){ ?>
-                                                <? $backup_unix_time = strtotime(preg_replace('/^([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})([0-9]{2})$/', '$1/$2/$3T$4:$5', $backup_info['backup_date_time'])); ?>
-                                                <tr>
-                                                    <td class="id"><?= $backup_info['backup_id'] ?></td>
-                                                    <td class="name"><?= $backup_info['field_name'] ?></td>
-                                                    <td class="date"><?= date('Y/m/d', $backup_unix_time) ?></td>
-                                                    <td class="time"><?= date('g:i a', $backup_unix_time) ?></td>
-                                                    <td class="actions">
-                                                        <a href="admin/edit-fields/editor/backup_id=<?= $backup_info['backup_id'] ?>" target="_blank" style="text-decoration: none;">
-                                                            <span style="text-decoration: underline;">View Backup</span>
-                                                            <i class="fas fa-external-link-square-alt"></i>
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            <? } ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            <? } ?>
+                            </div>
 
                         </div>
 
@@ -1595,16 +1490,14 @@
 
                         <div class="formfoot">
 
-                            <? if (!$is_backup_data){ ?>
-                                <div class="buttons">
-                                    <input class="button save" type="submit" value="Save Changes" />
-                                    <? /*
-                                    <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin/edit-fields/editor/field_id=<?= $field_data['field_id'] ?>';" />
-                                    <input class="button delete" type="button" value="Delete Field" data-delete="fields" data-field-id="<?= $field_data['field_id'] ?>" />
-                                    */ ?>
-                                </div>
-                                <?= cms_admin::object_editor_print_git_footer_buttons('fields', $field_data['field_token'], $mmrpg_git_file_arrays); ?>
-                            <? } ?>
+                            <div class="buttons">
+                                <input class="button save" type="submit" value="Save Changes" />
+                                <? /*
+                                <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin/edit-fields/editor/field_id=<?= $field_data['field_id'] ?>';" />
+                                <input class="button delete" type="button" value="Delete Field" data-delete="fields" data-field-id="<?= $field_data['field_id'] ?>" />
+                                */ ?>
+                            </div>
+                            <?= cms_admin::object_editor_print_git_footer_buttons('fields', $field_data['field_token'], $mmrpg_git_file_arrays); ?>
 
                             <? /*
                             <div class="metadata">
@@ -1632,11 +1525,6 @@
 
                 <?
                 $temp_edit_markup = ob_get_clean();
-                if ($is_backup_data){
-                    $temp_edit_markup = str_replace('<input ', '<input readonly="readonly" disabled="disabled" ', $temp_edit_markup);
-                    $temp_edit_markup = str_replace('<select ', '<select readonly="readonly" disabled="disabled" ', $temp_edit_markup);
-                    $temp_edit_markup = str_replace('<textarea ', '<textarea readonly="readonly" ', $temp_edit_markup);
-                }
                 echo($temp_edit_markup).PHP_EOL;
             }
 
