@@ -254,32 +254,18 @@
     // If we're in editor mode, we should collect player info from database
     $player_data = array();
     $editor_data = array();
-    $is_backup_data = false;
     if ($sub_action == 'editor'
-        && (!empty($_GET['player_id'])
-            || !empty($_GET['backup_id']))){
+        && !empty($_GET['player_id'])){
 
         // Collect form data for processing
         $editor_data['player_id'] = !empty($_GET['player_id']) && is_numeric($_GET['player_id']) ? trim($_GET['player_id']) : '';
-        if (empty($editor_data['player_id'])
-            && !empty($_GET['backup_id'])
-            && is_numeric($_GET['backup_id'])){
-            $editor_data['backup_id'] = trim($_GET['backup_id']);
-            $is_backup_data = true;
-        }
 
 
         /* -- Collect Player Data -- */
 
         // Collect player details from the database
         $temp_player_fields = rpg_player::get_index_fields(true);
-        if (!$is_backup_data){
-            $player_data = $db->get_array("SELECT {$temp_player_fields} FROM mmrpg_index_players WHERE player_id = {$editor_data['player_id']};");
-        } else {
-            $temp_player_backup_fields = str_replace('player_id,', 'backup_id AS player_id,', $temp_player_fields);
-            $temp_player_backup_fields .= ', backup_date_time';
-            $player_data = $db->get_array("SELECT {$temp_player_backup_fields} FROM mmrpg_index_players_backups WHERE backup_id = {$editor_data['backup_id']};");
-        }
+        $player_data = $db->get_array("SELECT {$temp_player_fields} FROM mmrpg_index_players WHERE player_id = {$editor_data['player_id']};");
 
         // If player data could not be found, produce error and exit
         if (empty($player_data)){ exit_player_edit_action(); }
@@ -287,7 +273,6 @@
         // Collect the player's name(s) for display
         $player_name_display = $player_data['player_name'];
         $this_page_tabtitle = $player_name_display.' | '.$this_page_tabtitle;
-        if ($is_backup_data){ $this_page_tabtitle = str_replace('Edit Players', 'View Backups', $this_page_tabtitle); }
 
         // If form data has been submit for this player, we should process it
         $form_data = array();
@@ -490,29 +475,12 @@
                     if (empty($empty_files)){ continue; }
                     //$form_messages[] = array('alert', '<pre>$empty_path_key = '.print_r($empty_path_key, true).' | $empty_path = '.print_r($empty_path, true).' | $empty_files = '.print_r($empty_files, true).'</pre>');
 
-                    // Ensure the backup folder is created for this file
-                    $backup_path = str_replace('/content/players/', '/images/backups/players/', MMRPG_CONFIG_ROOTDIR.$empty_path);
-                    if (!file_exists($backup_path)){
-                        recurseMakeDir($backup_path, 'images/backups/');
-                        @chown($backup_path, 'mmrpgworld');
-                    }
-
                     // Loop through empty files and delete one by one
                     foreach ($empty_files AS $empty_file_key => $empty_file_path){
-                        $empty_file = basename($empty_file_path);
-
-                        // Move the file to the backup folder, renaming the file with the timestamp
-                        $bak_append = '.bak'.date('YmdHi');
-                        $old_location = $empty_file_path;
-                        $new_location = $backup_path.preg_replace('/(\.[a-z0-9]{3,})$/i', $bak_append.'$1', $empty_file);
-
-                        // Attempt to copy the image and return the status of the action (remove old file if successful)
-                        $copy_status = copy($old_location, $new_location);
-                        if (file_exists($new_location)){ @unlink($old_location); $form_messages[] = array('alert', str_replace(MMRPG_CONFIG_ROOTDIR, '', $old_location).' was deleted!'); }
-                        else { $form_messages[] = array('warning', str_replace(MMRPG_CONFIG_ROOTDIR, '', $old_location).' could not be deleted! ('.$copy_status.')');  }
-
+                        @unlink($empty_file_path);
+                        if (!file_exists($empty_file_path)){ $form_messages[] = array('alert', str_replace(MMRPG_CONFIG_ROOTDIR, '', $empty_file_path).' was deleted!'); }
+                        else { $form_messages[] = array('warning', str_replace(MMRPG_CONFIG_ROOTDIR, '', $empty_file_path).' could not be deleted!');  }
                     }
-
 
                 }
 
@@ -549,16 +517,6 @@
             // Make a copy of the update data sans the player ID
             $update_data = $form_data;
             unset($update_data['player_id']);
-
-            // If a recent backup of this data doesn't exist, create one now
-            $backup_date_time = date('Ymd-Hi');
-            $backup_exists = $db->get_value("SELECT backup_id FROM mmrpg_index_players_backups WHERE player_token = '{$update_data['player_token']}' AND backup_date_time = '{$backup_date_time}';", 'backup_id');
-            if (empty($backup_exists)){
-                $backup_data = $player_data;
-                unset($backup_data['player_id']);
-                $backup_data['backup_date_time'] = $backup_date_time;
-                $db->insert('mmrpg_index_players_backups', $backup_data);
-            }
 
             // Update the main database index with changes to this player's data
             $update_results = $db->update('mmrpg_index_players', $update_data, array('player_id' => $form_data['player_id']));
@@ -611,11 +569,7 @@
         <a href="admin/">Admin Panel</a>
         &raquo; <a href="admin/edit-players/">Edit Players</a>
         <? if ($sub_action == 'editor' && !empty($player_data)): ?>
-            <? if (!$is_backup_data){ ?>
-                &raquo; <a href="admin/edit-players/editor/player_id=<?= $player_data['player_id'] ?>"><?= $player_name_display ?></a>
-            <? } else { ?>
-                &raquo; <a><?= $player_name_display ?></a>
-            <? } ?>
+            &raquo; <a href="admin/edit-players/editor/player_id=<?= $player_data['player_id'] ?>"><?= $player_name_display ?></a>
         <? endif; ?>
     </div>
 
@@ -805,7 +759,7 @@
 
         <?
         if ($sub_action == 'editor'
-            && (!empty($_GET['player_id']) || !empty($_GET['backup_id']))){
+            && !empty($_GET['player_id'])){
 
             // Capture editor markup in a buffer in case we need to modify
             if (true){
@@ -817,32 +771,21 @@
                 <div class="editor">
 
                     <h3 class="header type_span type_<?= !empty($player_data['player_type']) ? $player_data['player_type'].(!empty($player_data['player_type2']) ? '_'.$player_data['player_type2'] : '') : 'none' ?>" data-auto="field-type" data-field-type="player_type,player_type2">
-                        <span class="title"><?= !$is_backup_data ? 'Edit' : 'View' ?> Player &quot;<?= $player_name_display ?>&quot;</span>
+                        <span class="title">Edit Player &quot;<?= $player_name_display ?>&quot;</span>
                         <?
-                        // If this is NOT backup data, we can generate links
-                        if (!$is_backup_data){
 
-                            // Print out any git-related statues to this header
-                            cms_admin::object_editor_header_echo_git_statues($player_data['player_token'], $mmrpg_git_file_arrays);
+                        // Print out any git-related statues to this header
+                        cms_admin::object_editor_header_echo_git_statues($player_data['player_token'], $mmrpg_git_file_arrays);
 
-                            // If the player is published, generate and display a preview link
-                            if (!empty($player_data['player_flag_published'])){
-                                $preview_link = 'database/';
-                                if ($player_data['player_class'] === 'master'){ $preview_link .= 'players/'; }
-                                elseif ($player_data['player_class'] === 'mecha'){ $preview_link .= 'mechas/'; }
-                                elseif ($player_data['player_class'] === 'boss'){ $preview_link .= 'bosses/'; }
-                                $preview_link .= $player_data['player_token'].'/';
-                                echo '<a class="view" href="'.$preview_link.'" target="_blank">View <i class="fas fa-external-link-square-alt"></i></a>'.PHP_EOL;
-                                echo '<a class="preview" href="'.$preview_link.'preview=true" target="_blank">Preview <i class="fas fa-external-link-square-alt"></i></a>'.PHP_EOL;
-                            }
-
-                        }
-                        // Otherwise we'll simply show the backup creation date
-                        else {
-
-                            // Print out the creation date in a readable form
-                            echo '<span style="display: block; clear: left; font-size: 90%; font-weight: normal;">Backup Created '.date('Y/m/d @ g:s a', strtotime(preg_replace('/^([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})([0-9]{2})$/', '$1/$2/$3T$4:$5', $player_data['backup_date_time']))).'</span>';
-
+                        // If the player is published, generate and display a preview link
+                        if (!empty($player_data['player_flag_published'])){
+                            $preview_link = 'database/';
+                            if ($player_data['player_class'] === 'master'){ $preview_link .= 'players/'; }
+                            elseif ($player_data['player_class'] === 'mecha'){ $preview_link .= 'mechas/'; }
+                            elseif ($player_data['player_class'] === 'boss'){ $preview_link .= 'bosses/'; }
+                            $preview_link .= $player_data['player_token'].'/';
+                            echo '<a class="view" href="'.$preview_link.'" target="_blank">View <i class="fas fa-external-link-square-alt"></i></a>'.PHP_EOL;
+                            echo '<a class="preview" href="'.$preview_link.'preview=true" target="_blank">Preview <i class="fas fa-external-link-square-alt"></i></a>'.PHP_EOL;
                         }
 
                         ?>
@@ -850,28 +793,13 @@
 
                     <? print_form_messages() ?>
 
-                    <?
-                    // Collect a list of backups for this player from the database, if any
-                    $player_backup_list = $db->get_array_list("SELECT
-                        backup_id, player_token, player_name, backup_date_time
-                        FROM mmrpg_index_players_backups
-                        WHERE player_token = '{$player_data['player_token']}'
-                        ORDER BY backup_date_time DESC
-                        ;");
-                    ?>
-
                     <div class="editor-tabs" data-tabgroup="player">
                         <a class="tab active" data-tab="basic">Basic</a><span></span>
                         <a class="tab" data-tab="flavour">Flavour</a><span></span>
                         <a class="tab" data-tab="abilities">Abilities</a><span></span>
                         <a class="tab" data-tab="robots">Robots</a><span></span>
-                        <? if (!$is_backup_data){ ?>
-                            <a class="tab" data-tab="sprites">Sprites</a><span></span>
-                            <a class="tab" data-tab="functions">Functions</a><span></span>
-                            <? if (!empty($player_backup_list)){ ?>
-                                <a class="tab" data-tab="backups">Backups</a><span></span>
-                            <? } ?>
-                        <? } ?>
+                        <a class="tab" data-tab="sprites">Sprites</a><span></span>
+                        <a class="tab" data-tab="functions">Functions</a><span></span>
                     </div>
 
                     <form class="form" method="post">
@@ -1188,8 +1116,7 @@
                                 // Only proceed if all required sprite fields are set
                                 if (!empty($player_data['player_image'])
                                     && !in_array($player_data['player_image'], array('player', 'master', 'boss', 'mecha'))
-                                    && !empty($player_data['player_image_size'])
-                                    && !($is_backup_data && $has_elemental_alts)){
+                                    && !empty($player_data['player_image_size'])){
 
                                     echo('<hr />'.PHP_EOL);
 
@@ -1226,7 +1153,6 @@
                                         foreach ($temp_alts_array AS $alt_key => $alt_info){
 
                                             $is_base_sprite = empty($alt_info['token']) ? true : false;
-                                            if ($is_backup_data && $is_base_sprite){ continue; }
                                             $alt_token = $is_base_sprite ? 'base' : $alt_info['token'];
 
                                             $alt_file_path = rtrim($base_sprite_path, '/').(!$is_base_sprite ? '_'.$alt_info['token'] : '').'/';
@@ -1245,7 +1171,7 @@
 
                                             ?>
 
-                                            <?= (!$is_backup_data && $alt_key > 0) || ($is_backup_data && $alt_key > 1) ? '<hr />' : '' ?>
+                                            <?= ($alt_key > 0) ? '<hr />' : '' ?>
 
                                             <div class="field fullsize" style="margin-bottom: 0; min-height: 0;">
                                                 <strong class="label">
@@ -1288,161 +1214,148 @@
                                                 </div>
                                             <? } ?>
 
-                                            <? if (!$is_backup_data){ ?>
+                                            <div class="field fullsize has2cols widecols multirow sprites has-filebars">
 
-                                                <div class="field fullsize has2cols widecols multirow sprites has-filebars">
+                                                <div class="subfield" style="clear: left;" data-group="shadows" data-size="40">
+                                                    <strong class="sublabel" style="font-size: 90%;">icon @ 100%</strong><br />
+                                                    <ul class="files">
+                                                        <?
+                                                        $this_alt_path = $alt_file_path;
+                                                        $group = 'sprites';
+                                                        $sheet_width = 18;
+                                                        $sheet_height = 19;
+                                                        $file_name = 'chapter-sprite.gif';
+                                                        $file_href = MMRPG_CONFIG_ROOTURL.$this_alt_path.$file_name;
+                                                        $file_exists = in_array($file_name, $alt_files_existing) ? true : false;
+                                                        $file_is_unused = false;
+                                                        $file_is_optional = false;
+                                                        echo('<li>');
+                                                            echo('<div class="filebar" data-auto="file-bar" data-file-path="'.$this_alt_path.'" data-file-name="'.$file_name.'" data-file-kind="image/gif" data-file-width="'.$sheet_width.'" data-file-height="'.$sheet_height.'">');
+                                                                echo($file_exists ? '<a class="link view" href="'.$file_href.'?'.time().'" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>' : '<a class="link view disabled" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>');
+                                                                echo('<span class="info size">'.$sheet_width.'w &times; '.$sheet_height.'h</span>');
+                                                                echo($file_exists ? '<span class="info status good">&check;</span>' : '<span class="info status bad">&cross;</span>');
+                                                                echo('<a class="action delete'.(!$file_exists ? ' disabled' : '').'" data-action="delete" data-file-hash="'.md5('delete/'.$this_alt_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">Delete</a>');
+                                                                echo('<a class="action upload'.($file_exists ? ' disabled' : '').'" data-action="upload" data-file-hash="'.md5('upload/'.$this_alt_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">');
+                                                                    echo('<span class="text">Upload</span>');
+                                                                    echo('<input class="input" type="file" name="file_info" value=""'.($file_exists ? ' disabled="disabled"' : '').' />');
+                                                                echo('</a>');
+                                                            echo('</div>');
+                                                        echo('</li>'.PHP_EOL);
+                                                        ?>
+                                                    </ul>
+                                                </div>
 
-                                                    <div class="subfield" style="clear: left;" data-group="shadows" data-size="40">
-                                                        <strong class="sublabel" style="font-size: 90%;">icon @ 100%</strong><br />
-                                                        <ul class="files">
-                                                            <?
-                                                            $this_alt_path = $alt_file_path;
-                                                            $group = 'sprites';
-                                                            $sheet_width = 18;
-                                                            $sheet_height = 19;
-                                                            $file_name = 'chapter-sprite.gif';
-                                                            $file_href = MMRPG_CONFIG_ROOTURL.$this_alt_path.$file_name;
-                                                            $file_exists = in_array($file_name, $alt_files_existing) ? true : false;
-                                                            $file_is_unused = false;
-                                                            $file_is_optional = false;
-                                                            echo('<li>');
-                                                                echo('<div class="filebar" data-auto="file-bar" data-file-path="'.$this_alt_path.'" data-file-name="'.$file_name.'" data-file-kind="image/gif" data-file-width="'.$sheet_width.'" data-file-height="'.$sheet_height.'">');
-                                                                    echo($file_exists ? '<a class="link view" href="'.$file_href.'?'.time().'" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>' : '<a class="link view disabled" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>');
-                                                                    echo('<span class="info size">'.$sheet_width.'w &times; '.$sheet_height.'h</span>');
-                                                                    echo($file_exists ? '<span class="info status good">&check;</span>' : '<span class="info status bad">&cross;</span>');
-                                                                    if (!$is_backup_data){
-                                                                        echo('<a class="action delete'.(!$file_exists ? ' disabled' : '').'" data-action="delete" data-file-hash="'.md5('delete/'.$this_alt_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">Delete</a>');
-                                                                        echo('<a class="action upload'.($file_exists ? ' disabled' : '').'" data-action="upload" data-file-hash="'.md5('upload/'.$this_alt_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">');
-                                                                            echo('<span class="text">Upload</span>');
-                                                                            echo('<input class="input" type="file" name="file_info" value=""'.($file_exists ? ' disabled="disabled"' : '').' />');
-                                                                        echo('</a>');
-                                                                    }
-                                                                echo('</div>');
-                                                            echo('</li>'.PHP_EOL);
-                                                            ?>
-                                                        </ul>
-                                                    </div>
-
-                                                    <?
-                                                    $sheet_groups = array('sprites', 'shadows');
-                                                    $sheet_kinds = array('mug', 'sprite');
-                                                    $sheet_sizes = array($player_data['player_image_size'], $player_data['player_image_size'] * 2);
-                                                    $sheet_directions = array('left', 'right');
-                                                    $num_frames = count(explode('/', MMRPG_SETTINGS_PLAYER_FRAMEINDEX));
-                                                    foreach ($sheet_groups AS $group_key => $group){
-                                                        if ($group == 'sprites'){ $this_alt_path = $alt_file_path; }
-                                                        elseif ($group == 'shadows'){ $this_alt_path = $alt_shadow_path; }
-                                                        foreach ($sheet_sizes AS $size_key => $size){
-                                                            $sheet_height = $size;
-                                                            $files_are_automatic = false;
-                                                            if ($group == 'shadows' || $size_key != 0){ $files_are_automatic = true; }
-                                                            //if ($size_key > 0){ $files_are_automatic = true; }
-                                                            $subfield_class = 'subfield';
-                                                            if ($files_are_automatic){ $subfield_class .= ' auto-generated'; }
-                                                            $subfield_style = '';
-                                                            if ($size_key == 0){ $subfield_style = 'clear: left; '; }
-                                                            if (!empty($subfield_style)){ $subfield_style = ' style="'.trim($subfield_style).'"'; }
-                                                            $subfield_name = $group.' @ '.(100 + ($size_key * 100)).'%';
-                                                            echo('<div class="'.$subfield_class.'"'.$subfield_style.' data-group="'.$group.'" data-size="'.$size.'">'.PHP_EOL);
-                                                                echo('<strong class="sublabel" style="font-size: 90%;">'.$subfield_name.'</strong>'.PHP_EOL);
-                                                                if ($files_are_automatic){ echo('<span class="sublabel" style="font-size: 90%; color: #969696;">(auto-generated)</span>'.PHP_EOL); }
-                                                                echo('<br />'.PHP_EOL);
-                                                                echo('<ul class="files">'.PHP_EOL);
-                                                                foreach ($sheet_kinds AS $kind_key => $kind){
-                                                                    $sheet_width = $kind != 'mug' ? ($size * $num_frames) : $size;
-                                                                    foreach ($sheet_directions AS $direction_key => $direction){
-                                                                        $file_name = $kind.'_'.$direction.'_'.$size.'x'.$size.'.png';
-                                                                        $file_href = MMRPG_CONFIG_ROOTURL.$this_alt_path.$file_name;
-                                                                        if ($group == 'sprites'){ $file_exists = in_array($file_name, $alt_files_existing) ? true : false; }
-                                                                        elseif ($group == 'shadows'){ $file_exists = in_array($file_name, $alt_shadows_existing) ? true : false; }
-                                                                        $file_is_unused = false;
-                                                                        //if ($group == 'shadows' && ($kind == 'mug' || $size_key == 0)){ $file_is_unused = true; }
-                                                                        //if ($group == 'shadows' && $kind == 'mug'){ $file_is_unused = true; }
-                                                                        $file_is_optional = $group == 'shadows' && !$is_base_sprite ? true : false;
-                                                                        echo('<li>');
-                                                                            echo('<div class="filebar'.($file_is_unused ? ' unused' : '').($file_is_optional ? ' optional' : '').'" data-auto="file-bar" data-file-path="'.$this_alt_path.'" data-file-name="'.$file_name.'" data-file-kind="image/png" data-file-width="'.$sheet_width.'" data-file-height="'.$sheet_height.'" data-file-extras="auto-zoom-x2,auto-shadows">');
-                                                                                echo($file_exists ? '<a class="link view" href="'.$file_href.'?'.time().'" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>' : '<a class="link view disabled" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>');
-                                                                                echo('<span class="info size">'.$sheet_width.'w &times; '.$sheet_height.'h</span>');
-                                                                                echo($file_exists ? '<span class="info status good">&check;</span>' : '<span class="info status bad">&cross;</span>');
-                                                                                if (!$is_backup_data && !$files_are_automatic){
-                                                                                    echo('<a class="action delete'.(!$file_exists ? ' disabled' : '').'" data-action="delete" data-file-hash="'.md5('delete/'.$this_alt_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">Delete</a>');
-                                                                                    echo('<a class="action upload'.($file_exists ? ' disabled' : '').'" data-action="upload" data-file-hash="'.md5('upload/'.$this_alt_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">');
-                                                                                        echo('<span class="text">Upload</span>');
-                                                                                        echo('<input class="input" type="file" name="file_info" value=""'.($file_exists ? ' disabled="disabled"' : '').' />');
-                                                                                    echo('</a>');
-                                                                                }
-                                                                            echo('</div>');
-                                                                            /* echo('<div class="preview">');
-                                                                                echo('<img class="image" src="'.$file_href.'" alt="'.$file_name.'" />');
-                                                                            echo('</div>'); */
-                                                                        echo('</li>'.PHP_EOL);
-                                                                    }
+                                                <?
+                                                $sheet_groups = array('sprites', 'shadows');
+                                                $sheet_kinds = array('mug', 'sprite');
+                                                $sheet_sizes = array($player_data['player_image_size'], $player_data['player_image_size'] * 2);
+                                                $sheet_directions = array('left', 'right');
+                                                $num_frames = count(explode('/', MMRPG_SETTINGS_PLAYER_FRAMEINDEX));
+                                                foreach ($sheet_groups AS $group_key => $group){
+                                                    if ($group == 'sprites'){ $this_alt_path = $alt_file_path; }
+                                                    elseif ($group == 'shadows'){ $this_alt_path = $alt_shadow_path; }
+                                                    foreach ($sheet_sizes AS $size_key => $size){
+                                                        $sheet_height = $size;
+                                                        $files_are_automatic = false;
+                                                        if ($group == 'shadows' || $size_key != 0){ $files_are_automatic = true; }
+                                                        //if ($size_key > 0){ $files_are_automatic = true; }
+                                                        $subfield_class = 'subfield';
+                                                        if ($files_are_automatic){ $subfield_class .= ' auto-generated'; }
+                                                        $subfield_style = '';
+                                                        if ($size_key == 0){ $subfield_style = 'clear: left; '; }
+                                                        if (!empty($subfield_style)){ $subfield_style = ' style="'.trim($subfield_style).'"'; }
+                                                        $subfield_name = $group.' @ '.(100 + ($size_key * 100)).'%';
+                                                        echo('<div class="'.$subfield_class.'"'.$subfield_style.' data-group="'.$group.'" data-size="'.$size.'">'.PHP_EOL);
+                                                            echo('<strong class="sublabel" style="font-size: 90%;">'.$subfield_name.'</strong>'.PHP_EOL);
+                                                            if ($files_are_automatic){ echo('<span class="sublabel" style="font-size: 90%; color: #969696;">(auto-generated)</span>'.PHP_EOL); }
+                                                            echo('<br />'.PHP_EOL);
+                                                            echo('<ul class="files">'.PHP_EOL);
+                                                            foreach ($sheet_kinds AS $kind_key => $kind){
+                                                                $sheet_width = $kind != 'mug' ? ($size * $num_frames) : $size;
+                                                                foreach ($sheet_directions AS $direction_key => $direction){
+                                                                    $file_name = $kind.'_'.$direction.'_'.$size.'x'.$size.'.png';
+                                                                    $file_href = MMRPG_CONFIG_ROOTURL.$this_alt_path.$file_name;
+                                                                    if ($group == 'sprites'){ $file_exists = in_array($file_name, $alt_files_existing) ? true : false; }
+                                                                    elseif ($group == 'shadows'){ $file_exists = in_array($file_name, $alt_shadows_existing) ? true : false; }
+                                                                    $file_is_unused = false;
+                                                                    //if ($group == 'shadows' && ($kind == 'mug' || $size_key == 0)){ $file_is_unused = true; }
+                                                                    //if ($group == 'shadows' && $kind == 'mug'){ $file_is_unused = true; }
+                                                                    $file_is_optional = $group == 'shadows' && !$is_base_sprite ? true : false;
+                                                                    echo('<li>');
+                                                                        echo('<div class="filebar'.($file_is_unused ? ' unused' : '').($file_is_optional ? ' optional' : '').'" data-auto="file-bar" data-file-path="'.$this_alt_path.'" data-file-name="'.$file_name.'" data-file-kind="image/png" data-file-width="'.$sheet_width.'" data-file-height="'.$sheet_height.'" data-file-extras="auto-zoom-x2,auto-shadows">');
+                                                                            echo($file_exists ? '<a class="link view" href="'.$file_href.'?'.time().'" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>' : '<a class="link view disabled" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>');
+                                                                            echo('<span class="info size">'.$sheet_width.'w &times; '.$sheet_height.'h</span>');
+                                                                            echo($file_exists ? '<span class="info status good">&check;</span>' : '<span class="info status bad">&cross;</span>');
+                                                                            if (!$files_are_automatic){
+                                                                                echo('<a class="action delete'.(!$file_exists ? ' disabled' : '').'" data-action="delete" data-file-hash="'.md5('delete/'.$this_alt_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">Delete</a>');
+                                                                                echo('<a class="action upload'.($file_exists ? ' disabled' : '').'" data-action="upload" data-file-hash="'.md5('upload/'.$this_alt_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">');
+                                                                                    echo('<span class="text">Upload</span>');
+                                                                                    echo('<input class="input" type="file" name="file_info" value=""'.($file_exists ? ' disabled="disabled"' : '').' />');
+                                                                                echo('</a>');
+                                                                            }
+                                                                        echo('</div>');
+                                                                        /* echo('<div class="preview">');
+                                                                            echo('<img class="image" src="'.$file_href.'" alt="'.$file_name.'" />');
+                                                                        echo('</div>'); */
+                                                                    echo('</li>'.PHP_EOL);
                                                                 }
-                                                                echo('</ul>'.PHP_EOL);
-                                                            echo('</div>'.PHP_EOL);
-                                                        }
+                                                            }
+                                                            echo('</ul>'.PHP_EOL);
+                                                        echo('</div>'.PHP_EOL);
                                                     }
-                                                    ?>
+                                                }
+                                                ?>
 
-                                                </div>
+                                            </div>
 
-                                                <div class="options" style="margin-top: -5px; padding-top: 0;">
+                                            <div class="options" style="margin-top: -5px; padding-top: 0;">
 
-                                                    <? if ($is_base_sprite){ ?>
+                                                <? if ($is_base_sprite){ ?>
 
-                                                            <div class="field checkwrap rfloat fullsize">
-                                                                <label class="label">
-                                                                    <strong style="color: #da1616;">Delete Base Images?</strong>
-                                                                    <input type="hidden" name="player_image_alts[<?= $alt_token ?>][delete_images]" value="0" checked="checked" />
-                                                                    <input class="checkbox" type="checkbox" name="player_image_alts[<?= $alt_token ?>][delete_images]" value="1" />
-                                                                </label>
-                                                                <p class="subtext" style="color: #da1616;">Empty <strong>base</strong> image folder and remove all sprites/shadows</p>
-                                                                <? if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/backups/players/'.($player_data['player_image']).'/')){ ?>
-                                                                    <p class="subtext" style="color: #da1616;">(<a style="color: inherit; text-decoration: none;" href="images/viewer.php?path=backups/players/<?= $player_data['player_image'] ?>/" target="_blank"><u>view base backups</u> <i class="fas fa-external-link-square-alt"></i></a>)</p>
-                                                                <? } ?>
-                                                            </div>
+                                                        <div class="field checkwrap rfloat fullsize">
+                                                            <label class="label">
+                                                                <strong style="color: #da1616;">Delete Base Images?</strong>
+                                                                <input type="hidden" name="player_image_alts[<?= $alt_token ?>][delete_images]" value="0" checked="checked" />
+                                                                <input class="checkbox" type="checkbox" name="player_image_alts[<?= $alt_token ?>][delete_images]" value="1" />
+                                                            </label>
+                                                            <p class="subtext" style="color: #da1616;">Empty <strong>base</strong> image folder and remove all sprites/shadows</p>
+                                                        </div>
 
-                                                    <? } else { ?>
+                                                <? } else { ?>
 
-                                                            <div class="field checkwrap rfloat">
-                                                                <label class="label">
-                                                                    <strong style="color: #262626;">Auto-Generate Shadows?</strong>
-                                                                    <input class="checkbox" type="checkbox" name="player_image_alts[<?= $alt_token ?>][generate_shadows]" value="1" <?= !empty($alt_shadows_existing) ? 'checked="checked"' : '' ?> />
-                                                                </label>
-                                                                <p class="subtext" style="color: #262626;">Only generate alt shadows if silhouette differs from base</p>
-                                                            </div>
+                                                        <div class="field checkwrap rfloat">
+                                                            <label class="label">
+                                                                <strong style="color: #262626;">Auto-Generate Shadows?</strong>
+                                                                <input class="checkbox" type="checkbox" name="player_image_alts[<?= $alt_token ?>][generate_shadows]" value="1" <?= !empty($alt_shadows_existing) ? 'checked="checked"' : '' ?> />
+                                                            </label>
+                                                            <p class="subtext" style="color: #262626;">Only generate alt shadows if silhouette differs from base</p>
+                                                        </div>
 
-                                                            <div class="field checkwrap rfloat fullsize">
-                                                                <label class="label">
-                                                                    <strong style="color: #da1616;">Delete <?= ucfirst($alt_token) ?> Images?</strong>
-                                                                    <input type="hidden" name="player_image_alts[<?= $alt_token ?>][delete_images]" value="0" checked="checked" />
-                                                                    <input class="checkbox" type="checkbox" name="player_image_alts[<?= $alt_token ?>][delete_images]" value="1" />
-                                                                </label>
-                                                                <p class="subtext" style="color: #da1616;">Empty the <strong><?= $alt_token ?></strong> image folder and remove all sprites/shadows</p>
-                                                                <? if (file_exists(MMRPG_CONFIG_ROOTDIR.'images/backups/players/'.($player_data['player_image'].'_'.$alt_token).'/')){ ?>
-                                                                    <p class="subtext" style="color: #da1616;">(<a style="color: inherit; text-decoration: none;" href="images/viewer.php?path=backups/players/<?= $player_data['player_image'].'_'.$alt_token ?>/" target="_blank"><u>view <?= $alt_token ?> backups</u> <i class="fas fa-external-link-square-alt"></i></a>)</p>
-                                                                <? } ?>
-                                                            </div>
+                                                        <div class="field checkwrap rfloat fullsize">
+                                                            <label class="label">
+                                                                <strong style="color: #da1616;">Delete <?= ucfirst($alt_token) ?> Images?</strong>
+                                                                <input type="hidden" name="player_image_alts[<?= $alt_token ?>][delete_images]" value="0" checked="checked" />
+                                                                <input class="checkbox" type="checkbox" name="player_image_alts[<?= $alt_token ?>][delete_images]" value="1" />
+                                                            </label>
+                                                            <p class="subtext" style="color: #da1616;">Empty the <strong><?= $alt_token ?></strong> image folder and remove all sprites/shadows</p>
+                                                        </div>
 
-                                                            <? if (!$has_elemental_alts){ ?>
+                                                        <? if (!$has_elemental_alts){ ?>
 
-                                                                    <div class="field checkwrap rfloat fullsize">
-                                                                        <label class="label">
-                                                                            <strong style="color: #da1616;">Delete <?= ucfirst($alt_token) ?> Data?</strong>
-                                                                            <input type="hidden" name="player_image_alts[<?= $alt_token ?>][delete]" value="0" checked="checked" />
-                                                                            <input class="checkbox" type="checkbox" name="player_image_alts[<?= $alt_token ?>][delete]" value="1" />
-                                                                        </label>
-                                                                        <p class="subtext" style="color: #da1616;">Remove <strong><?= $alt_token ?></strong> from the list (images will not be deleted)</p>
-                                                                    </div>
+                                                                <div class="field checkwrap rfloat fullsize">
+                                                                    <label class="label">
+                                                                        <strong style="color: #da1616;">Delete <?= ucfirst($alt_token) ?> Data?</strong>
+                                                                        <input type="hidden" name="player_image_alts[<?= $alt_token ?>][delete]" value="0" checked="checked" />
+                                                                        <input class="checkbox" type="checkbox" name="player_image_alts[<?= $alt_token ?>][delete]" value="1" />
+                                                                    </label>
+                                                                    <p class="subtext" style="color: #da1616;">Remove <strong><?= $alt_token ?></strong> from the list (images will not be deleted)</p>
+                                                                </div>
 
-                                                            <? } ?>
+                                                        <? } ?>
 
-                                                    <? } ?>
+                                                <? } ?>
 
-                                                </div>
-
-                                            <? } ?>
-
+                                            </div>
 
                                             <?
 
@@ -1501,86 +1414,42 @@
 
                             </div>
 
-                            <? if (!$is_backup_data){ ?>
+                            <div class="panel" data-tab="functions">
 
-                                <div class="panel" data-tab="functions">
-
-                                    <div class="field fullsize codemirror <?= $is_backup_data ? 'readonly' : '' ?>" data-codemirror-mode="php">
-                                        <div class="label">
-                                            <strong>Player Functions</strong>
-                                            <em>code is php-format with html allowed in some strings</em>
-                                        </div>
-                                        <?
-                                        // Collect the markup for the player functions file
-                                        if (!empty($_SESSION['player_functions_markup'][$player_data['player_id']])){
-                                            $player_functions_markup = $_SESSION['player_functions_markup'][$player_data['player_id']];
-                                            unset($_SESSION['player_functions_markup'][$player_data['player_id']]);
-                                        } else {
-                                            $template_functions_path = MMRPG_CONFIG_PLAYERS_CONTENT_PATH.'.player/functions.php';
-                                            $player_functions_path = MMRPG_CONFIG_PLAYERS_CONTENT_PATH.$player_data['player_token'].'/functions.php';
-                                            $player_functions_markup = file_exists($player_functions_path) ? file_get_contents($player_functions_path) : file_get_contents($template_functions_path);
-                                        }
-                                        ?>
-                                        <textarea class="textarea" name="player_functions_markup" rows="<?= min(20, substr_count($player_functions_markup, PHP_EOL)) ?>"><?= htmlentities(trim($player_functions_markup), ENT_QUOTES, 'UTF-8', true) ?></textarea>
-                                        <div class="label examples" style="font-size: 80%; padding-top: 4px;">
-                                            <strong>Available Objects</strong>:
-                                            <br />
-                                            <code style="color: #05a;">$this_battle</code>
-                                            &nbsp;&nbsp;<a title="battle data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_BATTLES_CONTENT_PATH).'.battle/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
-                                            <br />
-                                            <code style="color: #05a;">$this_field</code>
-                                            &nbsp;&nbsp;<a title="field data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_FIELDS_CONTENT_PATH).'.field/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
-                                            <br />
-                                            <code style="color: #05a;">$this_player</code>
-                                            &nbsp;/&nbsp;
-                                            <code style="color: #05a;">$target_player</code>
-                                            &nbsp;&nbsp;<a title="player data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_PLAYERS_CONTENT_PATH).'.player/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
-                                        </div>
+                                <div class="field fullsize codemirror" data-codemirror-mode="php">
+                                    <div class="label">
+                                        <strong>Player Functions</strong>
+                                        <em>code is php-format with html allowed in some strings</em>
                                     </div>
-
+                                    <?
+                                    // Collect the markup for the player functions file
+                                    if (!empty($_SESSION['player_functions_markup'][$player_data['player_id']])){
+                                        $player_functions_markup = $_SESSION['player_functions_markup'][$player_data['player_id']];
+                                        unset($_SESSION['player_functions_markup'][$player_data['player_id']]);
+                                    } else {
+                                        $template_functions_path = MMRPG_CONFIG_PLAYERS_CONTENT_PATH.'.player/functions.php';
+                                        $player_functions_path = MMRPG_CONFIG_PLAYERS_CONTENT_PATH.$player_data['player_token'].'/functions.php';
+                                        $player_functions_markup = file_exists($player_functions_path) ? file_get_contents($player_functions_path) : file_get_contents($template_functions_path);
+                                    }
+                                    ?>
+                                    <textarea class="textarea" name="player_functions_markup" rows="<?= min(20, substr_count($player_functions_markup, PHP_EOL)) ?>"><?= htmlentities(trim($player_functions_markup), ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                                    <div class="label examples" style="font-size: 80%; padding-top: 4px;">
+                                        <strong>Available Objects</strong>:
+                                        <br />
+                                        <code style="color: #05a;">$this_battle</code>
+                                        &nbsp;&nbsp;<a title="battle data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_BATTLES_CONTENT_PATH).'.battle/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
+                                        <br />
+                                        <code style="color: #05a;">$this_field</code>
+                                        &nbsp;&nbsp;<a title="field data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_FIELDS_CONTENT_PATH).'.field/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
+                                        <br />
+                                        <code style="color: #05a;">$this_player</code>
+                                        &nbsp;/&nbsp;
+                                        <code style="color: #05a;">$target_player</code>
+                                        &nbsp;&nbsp;<a title="player data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_PLAYERS_CONTENT_PATH).'.player/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
+                                    </div>
                                 </div>
 
-                            <? } ?>
-
-                            <? if (!$is_backup_data && !empty($player_backup_list)){ ?>
-                                <div class="panel" data-tab="backups">
-                                    <table class="backups">
-                                        <colgroup>
-                                            <col class="id" width="50" />
-                                            <col class="name" width="" />
-                                            <col class="date" width="100" />
-                                            <col class="time" width="75" />
-                                            <col class="actions" width="100" />
-                                        </colgroup>
-                                        <thead>
-                                            <tr>
-                                                <th class="id">ID</th>
-                                                <th class="name">Name</th>
-                                                <th class="date">Date</th>
-                                                <th class="time">Time</th>
-                                                <th class="actions">&nbsp;</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <? foreach ($player_backup_list AS $backup_key => $backup_info){ ?>
-                                                <? $backup_unix_time = strtotime(preg_replace('/^([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2})([0-9]{2})$/', '$1/$2/$3T$4:$5', $backup_info['backup_date_time'])); ?>
-                                                <tr>
-                                                    <td class="id"><?= $backup_info['backup_id'] ?></td>
-                                                    <td class="name"><?= $backup_info['player_name'] ?></td>
-                                                    <td class="date"><?= date('Y/m/d', $backup_unix_time) ?></td>
-                                                    <td class="time"><?= date('g:i a', $backup_unix_time) ?></td>
-                                                    <td class="actions">
-                                                        <a href="admin/edit-players/editor/backup_id=<?= $backup_info['backup_id'] ?>" target="_blank" style="text-decoration: none;">
-                                                            <span style="text-decoration: underline;">View Backup</span>
-                                                            <i class="fas fa-external-link-square-alt"></i>
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            <? } ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            <? } ?>
+                            </div>
 
                         </div>
 
@@ -1621,16 +1490,14 @@
 
                         <div class="formfoot">
 
-                            <? if (!$is_backup_data){ ?>
-                                <div class="buttons">
-                                    <input class="button save" type="submit" value="Save Changes" />
-                                    <? /*
-                                    <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin/edit-players/editor/player_id=<?= $player_data['player_id'] ?>';" />
-                                    <input class="button delete" type="button" value="Delete Player" data-delete="players" data-player-id="<?= $player_data['player_id'] ?>" />
-                                    */ ?>
-                                </div>
-                                <?= cms_admin::object_editor_print_git_footer_buttons('players', $player_data['player_token'], $mmrpg_git_file_arrays) ?>
-                            <? } ?>
+                            <div class="buttons">
+                                <input class="button save" type="submit" value="Save Changes" />
+                                <? /*
+                                <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin/edit-players/editor/player_id=<?= $player_data['player_id'] ?>';" />
+                                <input class="button delete" type="button" value="Delete Player" data-delete="players" data-player-id="<?= $player_data['player_id'] ?>" />
+                                */ ?>
+                            </div>
+                            <?= cms_admin::object_editor_print_git_footer_buttons('players', $player_data['player_token'], $mmrpg_git_file_arrays) ?>
 
                             <? /*
                             <div class="metadata">
@@ -1658,11 +1525,6 @@
 
                 <?
                 $temp_edit_markup = ob_get_clean();
-                if ($is_backup_data){
-                    $temp_edit_markup = str_replace('<input ', '<input readonly="readonly" disabled="disabled" ', $temp_edit_markup);
-                    $temp_edit_markup = str_replace('<select ', '<select readonly="readonly" disabled="disabled" ', $temp_edit_markup);
-                    $temp_edit_markup = str_replace('<textarea ', '<textarea readonly="readonly" ', $temp_edit_markup);
-                }
                 echo($temp_edit_markup).PHP_EOL;
             }
 
