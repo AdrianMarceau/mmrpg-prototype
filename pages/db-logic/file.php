@@ -823,7 +823,7 @@ while ($this_action == 'load'){
                         $html_form_show_coppa = true;
                         break;
                     } elseif ($_REQUEST['dateofbirth'] > $min_dateofbirth && !$bypass_dateofbirth){
-                        $html_form_messages .= '<span class="error">(!) You must be at least 13 years of age to use this website or have <a href="images/misc/MMRPG-Prototype_COPPA-Compliance.pdf" target="_blank">a parent or guardian\'s permission</a>.</span>';
+                        $html_form_messages .= '<span class="error">(!) You must be at least 13 years of age to use this website or have <a href="images/forms/Mega-Man-RPG-Prototype_COPPA-Registration-Form.pdf" target="_blank">a parent or guardian\'s permission</a>.</span>';
                         $html_form_verified = false;
                         $html_form_show_coppa = true;
                         break;

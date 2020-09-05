@@ -84,8 +84,7 @@ Manually add REQUIRED /images/ directories to the repo
 -  /images/social-icons_32x32.png [DONE]
 -  /images/viewer.php [DONE]
 -  many many many more (?) [DONE]
--
--  MMRPG-Prototype_COPPA-Compliance.pdf  (MUST UPDATE!)
+-  MMRPG-Prototype_COPPA-Compliance.pdf [DONE]
 
 Update relevant areas of the website/game to pull from the new CDN for faster deploys
 -  Update the AUDIO in the game to pull from the CDN [DONE]
