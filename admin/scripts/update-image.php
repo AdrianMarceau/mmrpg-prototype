@@ -208,40 +208,25 @@ if ($image_data['action'] == 'upload'){
 // Else if this is a DELETE request, relocate the file to the backup folder w/ a rename
 elseif ($image_data['action'] == 'delete'){
 
-    // Ensure the backup folder is created for this file
-    $backup_path = preg_replace('/\/content\/(abilities|fields|items|players|robots)\//', '/images/backups/${1}/', MMRPG_CONFIG_ROOTDIR.$image_data['path']);
-    if (!file_exists($backup_path)){
-        recurseMakeDir($backup_path, 'images/backups/');
-        @mkdir($backup_path);
-        @chown($backup_path, 'mmrpgworld');
-    }
-
-    // Move the file to the backup folder, renaming the file with the timestamp
-    $bak_append = '.bak'.date('YmdHi');
+    // Collect a reference to the file path as "old location"
     $old_location = $image_data['dirpath'];
-    $new_location = $backup_path.preg_replace('/(\.[a-z0-9]{3,})$/i', $bak_append.'$1', $image_data['name']);
-
-    //echo('<pre>$bak_append = '.print_r($bak_append, true).'</pre>'.PHP_EOL);
     //echo('<pre>$old_location = '.print_r($old_location, true).'</pre>'.PHP_EOL);
-    //echo('<pre>$new_location = '.print_r($new_location, true).'</pre>'.PHP_EOL);
 
-    // Attempt to copy the image and return the status of the action (remove old file if successful)
-    $copy_status = copy($old_location, $new_location);
-    $copy_success = file_exists($new_location) ? true : false;
-    $unlink_status = $copy_success ? @unlink($old_location) : false;
-    $unlink_success = $copy_success ? (!file_exists($old_location) ? true : false) : false;
-    if ($copy_success && $unlink_success){ index_updated_image_file($old_location, false); }
+    // Collect this image's size (and REAL type details) before we delete it
+    $image_size = getimagesize($old_location);
+    $image_size['width'] = isset($image_size[0]) ? $image_size[0] : 0;
+    $image_size['height'] = isset($image_size[1]) ? $image_size[1] : 0;
+    $image_size['xsize'] = $image_size['height'].'x'.$image_size['height'];
+    //echo('<pre>$image_size = '.print_r($image_size, true).'</pre>'.PHP_EOL);
+
+    // Attempt to unlink the file and return the status of the action
+    @unlink($old_location);
+    $unlink_success = !file_exists($old_location) ? true : false;
+    if ($unlink_success){ index_updated_image_file($old_location, false); }
 
     // Only process extra actions if the copy and unlink were a success
-    if ($copy_success && $unlink_success){
+    if ($unlink_success){
         //echo('<div style="padding:5px;border:1px solid #dedede;">base-image:<br /><img src="'.str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, $old_location).'" /></div>'.PHP_EOL);
-
-        // Collect this image's size (and REAL type details)
-        $image_size = getimagesize($new_location);
-        $image_size['width'] = isset($image_size[0]) ? $image_size[0] : 0;
-        $image_size['height'] = isset($image_size[1]) ? $image_size[1] : 0;
-        $image_size['xsize'] = $image_size['height'].'x'.$image_size['height'];
-        //echo('<pre>$image_size = '.print_r($image_size, true).'</pre>'.PHP_EOL);
 
         // Check to see if the "AUTO-ZOOM-X2" extra has been requested
         if (in_array('auto-zoom-x2', $image_data['req_extras'])){
@@ -255,15 +240,11 @@ elseif ($image_data['action'] == 'delete'){
             $zoom_dirpath = preg_replace($zoom_find_pattern, $zoom_replace_pattern, $image_data['dirpath']);
             //echo('<pre>$zoom_data = '.print_r($zoom_data, true).'</pre>'.PHP_EOL);
             $old_zoom_location = preg_replace($zoom_find_pattern, $zoom_replace_pattern, $old_location);
-            $new_zoom_location = preg_replace($zoom_find_pattern, $zoom_replace_pattern, $new_location);
             //echo('<pre>$old_zoom_location = '.print_r($old_zoom_location, true).'</pre>'.PHP_EOL);
-            //echo('<pre>$new_zoom_location = '.print_r($new_zoom_location, true).'</pre>'.PHP_EOL);
             if (file_exists($old_zoom_location)){
-                $copy_status2 = copy($old_zoom_location, $new_zoom_location);
-                $copy_success2 = file_exists($new_zoom_location) ? true : false;
-                $unlink_status2 = $copy_success2 ? @unlink($old_zoom_location) : false;
-                $unlink_success2 = $copy_success2 ? (!file_exists($old_zoom_location) ? true : false) : false;
-                if ($copy_success2 && $unlink_success2){ index_updated_image_file($old_zoom_location, false); }
+                @unlink($old_zoom_location);
+                $unlink_success2 = !file_exists($old_zoom_location) ? true : false;
+                if ($unlink_success2){ index_updated_image_file($old_zoom_location, false); }
             }
             //echo('<div style="padding:5px;border:1px solid #dedede;">auto-zoom-x2:<br /><img src="'.str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, $old_zoom_location).'" /></div>'.PHP_EOL);
         }
@@ -274,15 +255,11 @@ elseif ($image_data['action'] == 'delete'){
             $shadow_find_pattern = '/\/content\/(abilities|fields|items|players|robots)\/([-_a-z0-9]+)\/sprites(_[-_a-z0-9]+)?\//';
             $shadow_replace_pattern = '/content/${1}/${2}/shadows${3}/';
             $old_shadow_location = preg_replace($shadow_find_pattern, $shadow_replace_pattern, $old_location);
-            $new_shadow_location = preg_replace($shadow_find_pattern, $shadow_replace_pattern, $new_location);
             //echo('<pre>$old_shadow_location = '.print_r($old_shadow_location, true).'</pre>'.PHP_EOL);
-            //echo('<pre>$new_shadow_location = '.print_r($new_shadow_location, true).'</pre>'.PHP_EOL);
             if (file_exists($old_shadow_location)){
-                $copy_status2 = copy($old_shadow_location, $new_shadow_location);
-                $copy_success2 = file_exists($new_shadow_location) ? true : false;
-                $unlink_status2 = $copy_success2 ? @unlink($old_shadow_location) : false;
-                $unlink_success2 = $copy_success2 ? (!file_exists($old_shadow_location) ? true : false) : false;
-                if ($copy_success2 && $unlink_success2){ index_updated_image_file($old_shadow_location, false); }
+                @unlink($old_shadow_location);
+                $unlink_success2 = !file_exists($old_shadow_location) ? true : false;
+                if ($unlink_success2){ index_updated_image_file($old_shadow_location, false); }
             }
             //echo('<div style="padding:5px;border:1px solid #dedede;">auto-shadow:<br /><img src="'.str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, $old_shadow_location).'" /></div>'.PHP_EOL);
         }
@@ -294,15 +271,11 @@ elseif ($image_data['action'] == 'delete'){
             $zoom_shadow_find_pattern = '/\/content\/(abilities|fields|items|players|robots)\/([-_a-z0-9]+)\/sprites(_[-_a-z0-9]+)?\//';
             $zoom_shadow_replace_pattern = '/content/${1}/${2}/shadows${3}/';
             $old_zoom_shadow_location = preg_replace($zoom_shadow_find_pattern, $zoom_shadow_replace_pattern, $old_zoom_location);
-            $new_zoom_shadow_location = preg_replace($zoom_shadow_find_pattern, $zoom_shadow_replace_pattern, $new_zoom_location);
             //echo('<pre>$old_zoom_shadow_location = '.print_r($old_zoom_shadow_location, true).'</pre>'.PHP_EOL);
-            //echo('<pre>$new_zoom_shadow_location = '.print_r($new_zoom_shadow_location, true).'</pre>'.PHP_EOL);
             if (file_exists($old_zoom_shadow_location)){
-                $copy_status2 = copy($old_zoom_shadow_location, $new_zoom_shadow_location);
-                $copy_success2 = file_exists($new_zoom_shadow_location) ? true : false;
-                $unlink_status2 = $copy_success2 ? @unlink($old_zoom_shadow_location) : false;
-                $unlink_success2 = $copy_success2 ? (!file_exists($old_zoom_shadow_location) ? true : false) : false;
-                if ($copy_success2 && $unlink_success2){ index_updated_image_file($old_zoom_shadow_location, false); }
+                @unlink($old_zoom_shadow_location);
+                $unlink_success2 = !file_exists($old_zoom_shadow_location) ? true : false;
+                if ($unlink_success2){ index_updated_image_file($old_zoom_shadow_location, false); }
             }
             //echo('<div style="padding:5px;border:1px solid #dedede;">auto-zoom-x2+auto-shadow:<br /><img src="'.str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, $old_zoom_shadow_location).'" /></div>'.PHP_EOL);
         }
@@ -310,7 +283,7 @@ elseif ($image_data['action'] == 'delete'){
     }
 
     // Return success of error by checking that the file has been added to the destination
-    if ($copy_success && $unlink_success){ js_exit('success','file-removed', json_encode(array('updated' => $updated_image_files))); }
+    if ($unlink_success){ js_exit('success','file-removed', json_encode(array('updated' => $updated_image_files))); }
     else { js_exit('error','remove-error', 'error-code-'.$copy_status);  }
 
 }
