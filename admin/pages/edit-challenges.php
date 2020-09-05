@@ -596,7 +596,7 @@
             // If successful, we need to update the JSON file
             if ($this_challenge_kind === 'event' && $form_success){
                 if ($challenge_data_is_new){ $challenge_data['challenge_id'] = $new_challenge_id; }
-                cms_admin::object_editor_update_json_data_file('challenge', array_merge($challenge_data, $update_data));
+                cms_admin::object_editor_update_json_data_file('challenge', array_merge($challenge_data, $update_data), 'challenge_date_modified');
             }
 
             // We're done processing the form, we can exit

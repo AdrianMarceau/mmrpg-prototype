@@ -345,7 +345,7 @@
             }
 
             // If successful, we need to update the JSON and HTML files
-            if ($form_success){ cms_admin::object_editor_update_json_data_file('page', array_merge($page_data, $update_data)); }
+            if ($form_success){ cms_admin::object_editor_update_json_data_file('page', array_merge($page_data, $update_data), 'page_date_modified'); }
 
             // We're done processing the form, we can exit
             exit_page_edit_action($form_data['page_id']);

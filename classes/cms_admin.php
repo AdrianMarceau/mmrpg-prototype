@@ -788,7 +788,7 @@ class cms_admin {
     }
 
     // Define a function for updating a given json file if the old and new contents are different
-    public static function object_editor_update_json_data_file($object_kind, $updated_json_data){
+    public static function object_editor_update_json_data_file($object_kind, $updated_json_data, $ignore_fields_on_compare = array()){
         $object_xkind = substr($object_kind, -1, 1) === 'y' ? substr($object_kind, 0, -1).'ies' : $object_kind.'s';
 
         // Define the data base and token directories given object kind then append to form full path
@@ -818,7 +818,19 @@ class cms_admin {
         }
 
         // If old json doesn't exist or different than the new, update file
-        if (empty($old_json_data) || !arrays_match($old_json_data, $new_json_data)){
+        $old_and_new_arrays_match = false;
+        if (!empty($old_json_data) && !empty($new_json_data)){
+            if (!empty($ignore_fields_on_compare)){
+                $filtered_old_json_data = $old_json_data;
+                $filtered_new_json_data = $new_json_data;
+                if (is_string($ignore_fields_on_compare)){ $ignore_fields_on_compare = array($ignore_fields_on_compare); }
+                foreach ($ignore_fields_on_compare AS $field){ unset($filtered_old_json_data[$field], $filtered_new_json_data[$field]); }
+                $old_and_new_arrays_match = arrays_match($filtered_old_json_data, $filtered_new_json_data);
+            } else {
+                $old_and_new_arrays_match = arrays_match($old_json_data, $new_json_data);
+            }
+        }
+        if (!$old_and_new_arrays_match){
             if (file_exists($json_data_full_path)){ unlink($json_data_full_path); }
             if (!file_exists(dirname($json_data_full_path))){ mkdir(dirname($json_data_full_path)); }
             $h = fopen($json_data_full_path, 'w');
