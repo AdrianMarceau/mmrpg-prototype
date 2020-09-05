@@ -229,7 +229,7 @@
             if (in_array('*', $this_adminaccess)
                 || in_array('edit-players', $this_adminaccess)){
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-players/', 'text' => 'Edit Player Characters'),
+                    'link' => array('url' => 'admin/edit-players/', 'text' => 'Edit Players'),
                     'desc' => 'edit the details and images of the in-game player characters',
                     'repo' => array(
                         'name' => 'players',
@@ -267,7 +267,7 @@
                 || in_array('edit-robots', $this_adminaccess)
                 || in_array('edit-robot-master', $this_adminaccess)){
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-robot-masters/', 'text' => 'Edit Robot Masters'),
+                    'link' => array('url' => 'admin/edit-robot-masters/', 'text' => 'Edit Robots (Masters)'),
                     'desc' => 'edit the details and images of the in-game robot masters',
                     'repo' => array(
                         'name' => 'robots',
@@ -312,7 +312,7 @@
                 || in_array('edit-robots', $this_adminaccess)
                 || in_array('edit-support-mechas', $this_adminaccess)){
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-support-mechas/', 'text' => 'Edit Support Mechas'),
+                    'link' => array('url' => 'admin/edit-support-mechas/', 'text' => 'Edit Robots (Mechas)'),
                     'desc' => 'edit the details and images of the in-game support mechas',
                     'repo' => array(
                         'name' => 'robots',
@@ -357,7 +357,7 @@
                 || in_array('edit-robots', $this_adminaccess)
                 || in_array('edit-fortress-bosses', $this_adminaccess)){
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-fortress-bosses/', 'text' => 'Edit Fortress Bosses'),
+                    'link' => array('url' => 'admin/edit-fortress-bosses/', 'text' => 'Edit Robots (Bosses)'),
                     'desc' => 'edit the details and images of the in-game fortress bosses',
                     'repo' => array(
                         'name' => 'robots',
