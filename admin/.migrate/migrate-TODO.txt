@@ -142,6 +142,12 @@ and distinguish between LOCAL/DEV/STAGE/PROD servers w/ different push/pull func
 -  Add pull functionality for user_challenges on local/dev/stage
 -  ?????
 
+Update the admin panel to remove legacy "backup" tabs now that we have git backups
+-  players
+-  robots
+-  fields
+-  pages
+
 Implement the new "minify" library to compress CSS and JS markup
 -  Minify all styles
 -  Minify all scripts

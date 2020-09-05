@@ -481,7 +481,8 @@ $(document).ready(function(){
                     //console.log('confirmMessage = ', confirmMessage);
                     var allowButtonAction = confirm(confirmMessage);
                     if (allowButtonAction){
-                        if (thisAction !== 'update'){
+                        if (thisAction !== 'update'
+                            && thisAction !== 'publish'){
                             var confirmMessage2 = confirmMessages['final'];
                             if (thisAction === 'publish'){ confirmMessage2 = confirmMessage2.replace(/\{action\}/g, 'PUBLISH ALL'); }
                             else { confirmMessage2 = confirmMessage2.replace(/\{action\}/g, $thisButton.text().toUpperCase()); }
