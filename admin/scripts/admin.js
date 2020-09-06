@@ -438,16 +438,16 @@ $(document).ready(function(){
                 update: 'admin/scripts/pull-game-content.php'
                 };
             var confirmMessages = {
-                revert: 'Are you sure you want to revert uncommitted changes to all {object}?\n'
+                revert: 'Are you sure you want to revert uncommitted changes to all {object}? '
                     + 'This action cannot be undone and all updates will be lost.\n'
                     + 'Continue anyway?',
-                commit: 'Are you absolutely sure you want to commit all changes to {object}?\n'
+                commit: 'Are you sure you want to commit all changes to {object}? '
                     + 'This action cannot be undone and will be in the history forever.\n'
                     + 'Continue anyway? ',
-                publish: 'Are you absolutely sure you want to publish all changes to {object}?\n'
+                publish: 'Are you sure you want to publish all changes to {object}?\n'
                     + 'This action cannot be undone and will be in the history forever.\n'
                     + 'Continue anyway? ',
-                update: 'Are you sure you want to update {object} with remote changes?\n'
+                update: 'Are you sure you want to update {object} with remote changes? '
                     + 'Updates cannot be reverted once applied.\n'
                     + 'Continue anyway? ',
                 final: 'I\'m sorry but I have to confirm one more time...\n'
@@ -474,7 +474,7 @@ $(document).ready(function(){
                     var postData = {kind:thisKind,subkind:thisSubKind,token:thisToken,source:thisSource};
                     var confirmMessage = confirmMessages[thisAction];
                     if (thisKind === 'sql'){ confirmMessage = confirmMessage.replace(/\{object\}/g, 'miscellaneous objects (stars, challenges, pages, etc.)'); }
-                    else if (thisSubKind.length){ confirmMessage = confirmMessage.replace(/\{object\}/g, thisSubKind); }
+                    else if (thisSubKind.length){ confirmMessage = confirmMessage.replace(/\{object\}/g, makeObjectSingular(thisSubKind)+' '+thisKind); }
                     else { confirmMessage = confirmMessage.replace(/\{object\}/g, thisKind); }
                     //console.log('postURL = ', postURL);
                     //console.log('postData = ', postData);
@@ -487,7 +487,7 @@ $(document).ready(function(){
                             if (thisAction === 'publish'){ confirmMessage2 = confirmMessage2.replace(/\{action\}/g, 'PUBLISH ALL'); }
                             else { confirmMessage2 = confirmMessage2.replace(/\{action\}/g, $thisButton.text().toUpperCase()); }
                             if (thisKind === 'sql'){ confirmMessage2 = confirmMessage2.replace(/\{object\}/g, 'MISC OBJECTS'); }
-                            else if (thisSubKind.length){ confirmMessage2 = confirmMessage2.replace(/\{object\}/g, thisSubKind.toUpperCase()); }
+                            else if (thisSubKind.length){ confirmMessage2 = confirmMessage2.replace(/\{object\}/g, (makeObjectSingular(thisSubKind)+' '+thisKind).toUpperCase()); }
                             else { confirmMessage2 = confirmMessage2.replace(/\{object\}/g, thisKind.toUpperCase()); }
                             //console.log('confirmMessage2 = ', confirmMessage2);
                             allowButtonAction = confirm(confirmMessage2);

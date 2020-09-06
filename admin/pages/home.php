@@ -322,7 +322,7 @@
                     'repo' => array(
                         'name' => 'abilities',
                         'data' => array('prefix' => 'ability'),
-                        'path' => MMRPG_CONFIG_ROBOTS_CONTENT_PATH,
+                        'path' => MMRPG_CONFIG_ABILITIES_CONTENT_PATH,
                         'filter' => array(
                             'table' => 'mmrpg_index_abilities',
                             'token' => 'ability_token',
@@ -415,7 +415,7 @@
                     'repo' => array(
                         'name' => 'abilities',
                         'data' => array('prefix' => 'ability'),
-                        'path' => MMRPG_CONFIG_ROBOTS_CONTENT_PATH,
+                        'path' => MMRPG_CONFIG_ABILITIES_CONTENT_PATH,
                         'filter' => array(
                             'table' => 'mmrpg_index_abilities',
                             'token' => 'ability_token',
@@ -508,7 +508,7 @@
                     'repo' => array(
                         'name' => 'abilities',
                         'data' => array('prefix' => 'ability'),
-                        'path' => MMRPG_CONFIG_ROBOTS_CONTENT_PATH,
+                        'path' => MMRPG_CONFIG_ABILITIES_CONTENT_PATH,
                         'filter' => array(
                             'table' => 'mmrpg_index_abilities',
                             'token' => 'ability_token',
