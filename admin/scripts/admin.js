@@ -731,6 +731,68 @@ $(document).ready(function(){
     // ...none at the moment
 
 
+    // ABILITY EDITOR EVENTS
+
+    // Check to make sure we're on the ability editor page
+    var $editAbilities = $('.adminform.edit-abilities', thisAdmin);
+    var litePickerIndex = {};
+    //console.log('$editAbilities =', $editAbilities);
+    if ($editAbilities.length){
+
+        // Add events for fields with a toggle checkbox inside, allowing them to be disabled/enabled by clicking
+        var $fieldsWithToggleCheckboxes = $('.field.has_toggle .toggle.has_checkbox input[type="checkbox"]', $editAbilities).closest('.field');
+        if ($fieldsWithToggleCheckboxes.length){
+            $fieldsWithToggleCheckboxes.each(function(){
+                var $thisToggleField = $(this);
+                var $thisToggleInput = $thisToggleField.find('.toggle_input');
+                var $thisToggleWrap = $thisToggleField.find('.toggle.has_checkbox');
+                var $thisToggleCheckbox = $thisToggleWrap.find('input[type="checkbox"]');
+                $thisToggleCheckbox.bind('change', function(){
+                    var isChecked = $(this).is(':checked') ? true : false;
+                    if (isChecked){
+                        var defaultValue = '';
+                        if ($thisToggleInput.is('[data-default-value-from]')){
+                            var defaultFromName = $thisToggleInput.attr('data-default-value-from');
+                            defaultValue = $('[name="'+defaultFromName+'"]', $editAbilities).val();
+                        } else if ($thisToggleInput.is('[type="number"]')){
+                            defaultValue = 0;
+                        }
+                        $thisToggleInput.val(defaultValue);
+                        $thisToggleInput.removeAttr('disabled');
+                        $thisToggleInput.prop('disabled', false);
+                        } else {
+                        $thisToggleInput.val('');
+                        $thisToggleInput.attr('disabled', 'disabled');
+                        $thisToggleInput.prop('disabled', true);
+                        }
+                    });
+                });
+            }
+
+        // Add events for fields with units that have checkboxes beside them, toggling the opacity for them
+        var $fieldsWithUnitCheckboxes = $('.field.has_unit .unit.has_checkbox input[type="checkbox"]', $editAbilities).closest('.field');
+        if ($fieldsWithUnitCheckboxes.length){
+            $fieldsWithUnitCheckboxes.each(function(){
+                var $thisUnitField = $(this);
+                var $thisUnitWrap = $thisUnitField.find('.unit.has_checkbox');
+                var $thisUnitCheckbox = $thisUnitWrap.find('input[type="checkbox"]');
+                var $thisUnitSpan = $thisUnitWrap.find('> span');
+                $thisUnitCheckbox.bind('change', function(){
+                    var isChecked = $(this).is(':checked') ? true : false;
+                    if (isChecked){
+                        $thisUnitSpan.addClass('active');
+                        $thisUnitSpan.removeClass('inactive');
+                        } else {
+                        $thisUnitSpan.removeClass('active');
+                        $thisUnitSpan.addClass('inactive');
+                        }
+                    });
+                });
+            }
+
+    }
+
+
     // CHALLENGE EDITOR EVENTS
 
     // Check to make sure we're on the challenge editor page

@@ -1515,6 +1515,59 @@ input[type=file] {
     margin-right: 0;
 }
 
+
+.adminform .field.has_unit input[type="text"],
+.adminform .field.has_unit input[type="number"],
+.adminform .field.has_unit input[type="password"],
+.adminform .field.has_unit select,
+.adminform .field.has_unit textarea,
+.adminform .field.has_toggle input[type="text"],
+.adminform .field.has_toggle input[type="number"],
+.adminform .field.has_toggle input[type="password"],
+.adminform .field.has_toggle select,
+.adminform .field.has_toggle textarea {
+    float: left;
+    width: calc(100% - 50px);
+}
+.adminform .field.has_unit .unit,
+.adminform .field.has_toggle .toggle {
+    display: block;
+    float: left;
+    padding-left: 5px;
+    vertical-align: middle;
+    font-size: 90%;
+    line-height: 1;
+    position: relative;
+    top: 5px;
+}
+.adminform .field.has_unit .unit.has_checkbox,
+.adminform .field.has_toggle .toggle.has_checkbox {
+    top: 0;
+}
+.adminform .field.has_unit .unit.has_checkbox span,
+.adminform .field.has_toggle .toggle.has_checkbox span {
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+    top: -3px;
+    padding-left: 4px;
+    transition: opacity 0.3s;
+}
+.adminform .field.has_unit .unit.has_checkbox input[type="checkbox"],
+.adminform .field.has_toggle .toggle.has_checkbox input[type="checkbox"] {
+    margin: 5px 0 0 0;
+}
+.adminform .field.has_unit .unit.has_checkbox span.inactive,
+.adminform .field.has_toggle .toggle.has_checkbox span.inactive {
+    opacity: 0.3;
+}
+.adminform .field.has_unit .unit.has_checkbox span.active,
+.adminform .field.has_toggle .toggle.has_checkbox span.active,
+.adminform .field.has_unit .unit.has_checkbox:hover span,
+.adminform .field.has_toggle .toggle.has_checkbox:hover span {
+    opacity: 1.0;
+}
+
 .adminform .field.multirow {
 
 }
