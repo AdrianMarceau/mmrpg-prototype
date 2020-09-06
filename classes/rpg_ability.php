@@ -794,6 +794,7 @@ class rpg_ability extends rpg_object {
             'ability_image_sheets',
             'ability_image_size',
             'ability_image_editor',
+            'ability_image_editor2',
             'ability_type',
             'ability_type2',
             'ability_description',
@@ -829,6 +830,7 @@ class rpg_ability extends rpg_object {
             'ability_flag_hidden',
             'ability_flag_complete',
             'ability_flag_published',
+            'ability_flag_unlockable',
             'ability_order'
             );
 

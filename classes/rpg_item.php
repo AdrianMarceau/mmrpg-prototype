@@ -765,6 +765,7 @@ class rpg_item extends rpg_object {
             'item_image_sheets',
             'item_image_size',
             'item_image_editor',
+            'item_image_editor2',
             'item_type',
             'item_type2',
             'item_description',
