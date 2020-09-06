@@ -22,6 +22,9 @@ if (!in_array('ability_functions', $ability_fields)){ $ability_fields[] = 'abili
 $ability_fields = implode(', ', $ability_fields);
 $ability_index = $db->get_array_list("SELECT {$ability_fields} FROM mmrpg_index_abilities ORDER BY ability_token ASC", 'ability_token');
 
+// Collect unnecessary fields to remove from the generated json data file
+$skip_fields_on_json_export = rpg_ability::get_fields_excluded_from_json_export(false);
+
 // If there's a filter present, remove all tokens not in the filter
 if (!empty($migration_filter)){
     $old_ability_index = $ability_index;
@@ -202,6 +205,7 @@ foreach ($ability_index AS $ability_token => $ability_data){
     // And then write the rest of the non-function data into a json file
     $content_json_path = $content_path.'data.json';
     $content_json_data = clean_json_content_array('ability', $ability_data);
+    if (!empty($skip_fields_on_json_export)){ foreach ($skip_fields_on_json_export AS $field){ unset($content_json_data[$field]); } }
     ob_echo('- export all other data to '.clean_path($content_json_path));
     $h = fopen($content_json_path, 'w');
     fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));

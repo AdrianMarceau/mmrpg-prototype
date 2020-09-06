@@ -876,6 +876,40 @@ class rpg_ability extends rpg_object {
     }
 
     /**
+     * Get a list of all fields that can be ignored by JSON-export functions
+     * (aka ones that do not actually need to be saved to the database)
+     * @param bool $implode
+     * @return mixed
+     */
+    public static function get_fields_excluded_from_json_export($implode = false){
+
+        // Define the various json index fields for player objects
+        $json_index_fields = array(
+            'ability_frame',
+            'ability_frame_animate',
+            'ability_frame_index',
+            'ability_frame_offset',
+            'ability_frame_styles',
+            'ability_frame_classes',
+            'attachment_frame',
+            'attachment_frame_animate',
+            'attachment_frame_index',
+            'attachment_frame_offset',
+            'attachment_frame_styles',
+            'attachment_frame_classes'
+            );
+
+        // Implode the index fields into a string if requested
+        if ($implode){
+            $json_index_fields = implode(', ', $json_index_fields);
+        }
+
+        // Return the index fields, array or string
+        return $json_index_fields;
+
+    }
+
+    /**
      * Get the entire ability index array with parsed info
      * @param bool $parse_data
      * @return array

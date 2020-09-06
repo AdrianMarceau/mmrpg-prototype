@@ -809,6 +809,12 @@ class cms_admin {
         // Pull the old json data for comparrison with the new stuff
         $old_json_data = file_exists($json_data_full_path) ? json_decode(file_get_contents($json_data_full_path), true) : array();
 
+        // Check to see if there are fields we need to remove before export
+        if (method_exists('rpg_'.$object_kind, 'get_fields_excluded_from_json_export')){
+            $skip_fields_on_json_export = call_user_func(array('rpg_'.$object_kind, 'get_fields_excluded_from_json_export'));
+            if (!empty($skip_fields_on_json_export)){ foreach ($skip_fields_on_json_export AS $field){ unset($new_json_data[$field], $old_json_data[$field]); } }
+        }
+
         // If this is a page request, extract and collect new/old html content separately
         if ($object_kind === 'page'){
             $html_content_full_path = $json_data_base_dir.$json_data_token_dir.'/content.html';
