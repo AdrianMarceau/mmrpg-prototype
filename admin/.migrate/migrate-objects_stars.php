@@ -67,7 +67,7 @@ foreach ($star_index AS $star_data){
     $content_json_data = clean_json_content_array('star', $star_data, false);
     ob_echo('- export all star data to '.clean_path($content_json_path));
     $h = fopen($content_json_path, 'w');
-    fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
+    fwrite($h, normalize_file_markup(json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK)));
     fclose($h);
     if (file_exists($content_json_path)){ $rogue_stars_exported[] = basename($content_json_path); }
 

@@ -23,18 +23,14 @@ if (true){
 
     // website & pages
     $sql_table_list[] = array('name' => 'mmrpg_website_pages', 'export_data' => false);
-        $sql_table_list[] = array('name' => 'mmrpg_website_pages_backups', 'export_data' => false);
 
     // content index
     $sql_table_list[] = array('name' => 'mmrpg_index_types', 'export_data' => false);
     $sql_table_list[] = array('name' => 'mmrpg_index_players', 'export_data' => false);
-        $sql_table_list[] = array('name' => 'mmrpg_index_players_backups', 'export_data' => false);
     $sql_table_list[] = array('name' => 'mmrpg_index_robots', 'export_data' => false);
-        $sql_table_list[] = array('name' => 'mmrpg_index_robots_backups', 'export_data' => false);
     $sql_table_list[] = array('name' => 'mmrpg_index_abilities', 'export_data' => false);
     $sql_table_list[] = array('name' => 'mmrpg_index_items', 'export_data' => false);
     $sql_table_list[] = array('name' => 'mmrpg_index_fields', 'export_data' => false);
-        $sql_table_list[] = array('name' => 'mmrpg_index_fields_backups', 'export_data' => false);
     $sql_table_list[] = array('name' => 'mmrpg_index_music');
 
     // content records

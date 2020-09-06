@@ -17,7 +17,7 @@ function clean_path($path){ return str_replace(MMRPG_CONFIG_ROOTDIR, '/', $path)
 function deletedir_or_exit($dir, $retry_alllowed = 2){
     deleteDir($dir);
     $retry_used = 0;
-    while (file_exists($dir) && $retry_used < $retry_alllowed){ $retry_used++; deleteDir($dir); }
+    while (file_exists($dir) && $retry_used < $retry_alllowed){ if (!empty($retry_used)){ sleep(1); } $retry_used++; deleteDir($dir); }
     if (file_exists($dir)){ ob_echo('Failed to delete directory '.clean_path($dir).'!'); ob_echo('Force exiting script!'); die(); }
 }
 
@@ -25,7 +25,7 @@ function deletedir_or_exit($dir, $retry_alllowed = 2){
 function mkdir_or_exit($dir, $retry_alllowed = 2){
     mkdir($dir);
     $retry_used = 0;
-    while (!file_exists($dir) && $retry_used < $retry_alllowed){ $retry_used++; mkdir($dir); }
+    while (!file_exists($dir) && $retry_used < $retry_alllowed){ if (!empty($retry_used)){ sleep(1); } $retry_used++; mkdir($dir); }
     if (!file_exists($dir)){ ob_echo('Failed to make directory '.clean_path($dir).'!'); ob_echo('Force exiting script!'); die(); }
 }
 
@@ -173,7 +173,7 @@ function clean_json_content_array($kind, $content_json_data, $remove_id_field = 
         }
     }
     // Return the cleaned JSON data
-    $cleaned_json_data = normalize_file_markup($cleaned_json_data);
+    $cleaned_json_data = $cleaned_json_data;
     return $cleaned_json_data;
 }
 

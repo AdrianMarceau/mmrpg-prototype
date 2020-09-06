@@ -155,7 +155,7 @@ foreach ($item_index AS $item_token => $item_data){
     $content_json_data = clean_json_content_array('item', $item_data);
     ob_echo('- export all other data to '.clean_path($content_json_path));
     $h = fopen($content_json_path, 'w');
-    fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
+    fwrite($h, normalize_file_markup(json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK)));
     fclose($h);
 
     if ($migration_limit && $item_num >= $migration_limit){ break; }

@@ -208,7 +208,7 @@ foreach ($ability_index AS $ability_token => $ability_data){
     if (!empty($skip_fields_on_json_export)){ foreach ($skip_fields_on_json_export AS $field){ unset($content_json_data[$field]); } }
     ob_echo('- export all other data to '.clean_path($content_json_path));
     $h = fopen($content_json_path, 'w');
-    fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
+    fwrite($h, normalize_file_markup(json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK)));
     fclose($h);
 
     if ($migration_limit && $ability_num >= $migration_limit){ break; }

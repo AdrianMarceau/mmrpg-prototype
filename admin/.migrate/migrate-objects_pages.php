@@ -84,7 +84,7 @@ foreach ($page_index AS $page_data){
     $content_json_data = clean_json_content_array('page', $page_data, false, true);
     ob_echo('- export other page data to '.clean_path($content_json_path));
     $h = fopen($content_json_path, 'w');
-    fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
+    fwrite($h, normalize_file_markup(json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK)));
     fclose($h);
     if (file_exists($content_json_path)){ $event_pages_exported[] = basename($content_json_path); }
 

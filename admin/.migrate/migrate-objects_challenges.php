@@ -80,7 +80,7 @@ foreach ($challenge_index AS $challenge_data){
     $content_json_data = clean_json_content_array('challenge', $challenge_data, false, true, $json_challenge_fields);
     ob_echo('- export all challenge data to '.clean_path($content_json_path));
     $h = fopen($content_json_path, 'w');
-    fwrite($h, json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
+    fwrite($h, normalize_file_markup(json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK)));
     fclose($h);
     if (file_exists($content_json_path)){ $event_challenges_exported[] = basename($content_json_path); }
 
