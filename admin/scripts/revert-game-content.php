@@ -76,6 +76,7 @@ foreach ($revert_tokens  AS $object_key => $object_token){
     $git_commands = '';
     $git_commands .= 'cd '.$mmrpg_git_path.' ';
     $git_commands .= '&& git checkout -- "'.$object_token.'/" ';
+    $git_commands .= '&& git clean -fd "'.$object_token.'/" ';
     //debug_echo('$git_commands = '.print_r($git_commands, true).'');
     $git_output = shell_exec($git_commands);
     //debug_echo('$git_output = '.print_r($git_output, true).'');
