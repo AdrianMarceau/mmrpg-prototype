@@ -55,7 +55,7 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
         'title' => 'Mega Man RPG Prototype',
         'type' => 'website',
         'url' => $this_current_url,
-        'image' => MMRPG_CONFIG_ROOTURL.'images/assets/mmrpg-prototype-logo.png?'.MMRPG_CONFIG_CACHE_DATE,
+        'image' => MMRPG_CONFIG_ROOTURL.'images/assets/mmrpg-prototype-logo-2k19.png?'.MMRPG_CONFIG_CACHE_DATE,
         'site_name' => 'Mega Man RPG Prototype',
         'description' => $this_seo_description,
         );
@@ -367,7 +367,7 @@ if (!empty($db_page_info)){
 <? endif; ?>
 
 <meta name="format-detection" content="telephone=no" />
-<link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon_72x72.png" />
+<link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon-2k19_72x72.png" />
 <?
 // Define whether not this page/subpage combination require the legacy viewport settings
 $legacy_viewport_required = false;
@@ -465,7 +465,7 @@ if ($this_current_page == 'file' // File sub-pages
             }
             ?>
             <div class="foreground scanlines" style="background-image: url(images/assets/canvas-scanlines.png?<?=MMRPG_CONFIG_CACHE_DATE?>);">&nbsp;</div>
-            <div class="sprite credits banner_credits" style="background-image: url(images/menus/menu-banner_credits.png?<?=MMRPG_CONFIG_CACHE_DATE?>);">Mega Man RPG Prototype | PlutoLighthouse.NET</div>
+            <div class="sprite credits banner_credits">Mega Man RPG Prototype | PlutoLighthouse.NET</div>
             <div class="sprite overlay banner_overlay" style="">&nbsp;</div>
 
             <div class="header_social_icons x16">

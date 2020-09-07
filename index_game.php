@@ -34,7 +34,7 @@ $this_graph_data = array(
     'title' => 'Mega Man RPG Prototype',
     'type' => 'website',
     'url' => $this_current_url,
-    'image' => MMRPG_CONFIG_ROOTURL.'images/assets/mmrpg-prototype-logo.png?'.MMRPG_CONFIG_CACHE_DATE,
+    'image' => MMRPG_CONFIG_ROOTURL.'images/assets/mmrpg-prototype-logo-2k19.png?'.MMRPG_CONFIG_CACHE_DATE,
     'site_name' => 'Mega Man RPG Prototype',
     'description' => $this_seo_description,
     );
@@ -146,7 +146,7 @@ if (count($matches)>1){
 <link type="text/css" href="styles/prototype-responsive.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 
 <meta name="format-detection" content="telephone=no" />
-<link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon_72x72.png" />
+<link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon-2k19_72x72.png" />
 <meta name="viewport" content="user-scalable=yes, width=768, height=1004">
 
 </head>

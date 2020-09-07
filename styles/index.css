@@ -58,7 +58,7 @@ button {
     margin: 8px 8px 0;
     padding: 0;
     width: 750px;
-    height: 120px;
+    height: 155px;
     font-size: 10px;
     line-height: 120px;
     letter-spacing: 3px;
@@ -310,7 +310,11 @@ button {
 }
 #window .banner .credits {
     z-index: 40;
-    background-position: center -55px;
+    background-image: url(../images/assets/mmrpg-prototype-banner-logo-2k19.png?20200906);
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: center top;
+
 }
 #window .banner .overlay {
     z-index: 30;

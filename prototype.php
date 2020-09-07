@@ -275,7 +275,7 @@ if (mmrpg_prototype_item_unlocked('wily-program')){
 <link type="text/css" href="styles/prototype-responsive.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 
 <meta name="format-detection" content="telephone=no" />
-<link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon_72x72.png" />
+<link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon-2k19_72x72.png" />
 <meta name="viewport" content="user-scalable=yes, width=768, height=1004">
 
 </head>
@@ -286,7 +286,7 @@ if (mmrpg_prototype_item_unlocked('wily-program')){
     <div class="banner">
         <div class="sprite background banner_background" style="background-image: url(images/menus/menu-banner_this-battle-select.png);">&nbsp;</div>
         <div class="sprite foreground banner_foreground banner_dynamic" style="background-image: url(images/menus/prototype-banners_title-screen_01.gif?<?=MMRPG_CONFIG_CACHE_DATE?>); background-position: center -10px;">&nbsp;</div>
-        <div class="sprite credits banner_credits" style="background-image: url(images/menus/menu-banner_credits.png?<?=MMRPG_CONFIG_CACHE_DATE?>);">Mega Man RPG Prototype | PlutoLighthouse.NET</div>
+        <div class="sprite credits banner_credits">Mega Man RPG Prototype | PlutoLighthouse.NET</div>
         <div class="sprite overlay overlay_hidden banner_overlay">&nbsp;</div>
 
         <div class="title">Mega Man RPG Prototype</div>

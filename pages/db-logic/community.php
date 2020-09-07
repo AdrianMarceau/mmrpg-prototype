@@ -14,7 +14,7 @@ $this_seo_description = 'The community forums serve as a place for players and d
 // Define the Open Graph variables for this page
 $this_graph_data['title'] = 'Community Forums';
 $this_graph_data['description'] = 'The community forums serve as a place for players and developers to connect and communicate with each other, providing feedback and relaying ideas in a forum-style bulletin board tied directly to player\'s save files.';
-//$this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/assets/mmrpg-prototype-logo.png';
+//$this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/assets/mmrpg-prototype-logo-2k19.png';
 //$this_graph_data['type'] = 'website';
 
 // Define the MARKUP variables for this page
