@@ -138,9 +138,8 @@ and distinguish between LOCAL/DEV/STAGE/PROD servers w/ different push/pull func
 -  Add pull functionality for rpg robots on stage/prod [DONE]
 -  Add pull functionality for rpg fields on stage/prod [DONE]
 -  Add pull functionality for web pages on stage/prod [DONE]
--  Add pull functionality for users on local/dev/stage
+-  Add pull functionality for users+ on local/dev/stage
 -  Add pull functionality for user_challenges on local/dev/stage
--  ?????
 
 Update the admin panel to remove legacy "backup" tabs & functionality now that we have git backups
 -  player editor [DONE]
@@ -149,11 +148,57 @@ Update the admin panel to remove legacy "backup" tabs & functionality now that w
 -  page editor [DONE]
 -  upload script [DONE]
 
+Update the admin panel with editors for the final object types (include all new functionality from above)
+-  abilities [DONE]
+-  items
+
 Implement the new "minify" library to compress CSS and JS markup
 -  Minify all styles
 -  Minify all scripts
 
-Update the admin panel with editors for the final object types (include all new functionality from above)
--  abilities
--  items
+Write shell scripts for the following situations
+-  setup new copy of dev build [DONE]
+-  setup new copy of stage build [DONE]
+-  safely setup new copy of prod build
+-  safely update master code for any version
+
+
+MAYBE POST-UPDATE(?)
+
+Create "onload" events for items to take advantage of when we eventually update item code
+-  Create onload event for "apply_stat_bonuses" rpg_robot function (energy/weapon-upgrade)
+-  Create onload event for "update_variables" rpg_robot function (energy/weapon-upgrade, battery/sponge/forge/sapling-circuit)
+-  Create onload event for "check_items" rpg_robot function (attack/defense/speed/field-booster)
+-  Create onload event for "trigger_robot_damage" in rpg_ability/rpg_ability_damage function (fortune-module)
+-  Create onload event for "trigger_robot_recovery" in rpg_ability/rpg_ability_recovery function (fortune-module?)
+-  Create onload event for "trigger_robot_damage" in rpg_item/rpg_item_damage function
+-  Create onload event for "trigger_robot_recovery" in rpg_item/rpg_item_recovery function
+-  Create onload event for post-victory reward calculations (fortune-module)
+-  Create onload event for post-failure reward calculations
+-  Create onload event for post-disable stat bonus calculations (growth-module)
+-  Create onload event for post-disable experience point calculations (growth-module)
+-  Create onload event for post-disable item reward calculations (fortune-module)
+-  Create onload event for "ability_function_stat_boost_step1" in rpg_ability (reverse-module, xtreme-module)
+-  Create onload event for "ability_function_stat_boost_step2" in rpg_ability (guard-module)
+-  Create onload event for "ability_function_stat_break_step1" in rpg_ability (reverse-module, xtreme-module)
+-  Create onload event for "ability_function_stat_break_step2" in rpg_ability (guard-module)
+-  Create onload event for "ability_function_shot" in rpg_ability
+-  Create onload event for "ability_function_onload_shot" in rpg_ability (target-module)
+-  Create onload event for "ability_function_buster" in rpg_ability (charge-module)
+-  Create onload event for "ability_function_onload_buster" in rpg_ability (charge-module, target-module)
+-  Create onload event for "ability_function_onload_overdrive" in rpg_ability
+
+Create a "Shop Editor" in the admin back-end that lets admins edit the following
+-  Auto's Shop:
+    -  shop_quote_selling [items, parts]
+    -  shop_quote_buying [items]
+    -  shop_items lists [items_selling (x4) / items_buying (x1)] & levels each tier unlocked at
+    -  shop_parts lists [parts_selling (x4)] & levels each tier unlocked at
+-  Reggae's Shop:
+    - shop_quote_selling [abilities, weapons]
+    - shop_quote_buying [cores]
+    - shop_abilities lists [abilities_selling (x6)] & levels each tier unlocked at
+-  Kalinka's Shop
+    - shop_quote_selling [robots, alts]
+    - shop_quote_buying [stars]
 
