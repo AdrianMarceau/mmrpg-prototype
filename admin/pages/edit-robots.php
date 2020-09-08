@@ -96,7 +96,7 @@
     $sub_action =  !empty($_GET['subaction']) ? $_GET['subaction'] : 'search';
 
     // Update the tab name with the page name
-    $this_page_tabtitle = $this_robot_xclass_name_uc.' | '.$this_page_tabtitle;
+    $this_page_tabtitle = 'Edit '.$this_robot_xclass_name_uc.' | '.$this_page_tabtitle;
 
     // If we're in delete mode, we need to remove some data
     $delete_data = array();
@@ -117,11 +117,11 @@
     $search_query = '';
     $search_results = array();
     $search_results_count = 0;
-    $search_results_limit = 50;
+    $search_results_limit = 500;
     if ($sub_action == 'search'){
 
         // Collect the sorting order and direction
-        $sort_data = array('name' => 'robot_id', 'dir' => 'asc');
+        $sort_data = array('name' => 'robot_order', 'dir' => 'asc');
         if (!empty($_GET['order'])
             && preg_match('/^([-_a-z0-9]+)\:(desc|asc)$/i', $_GET['order'])){
             list($r_name, $r_dir) = explode(':', trim($_GET['order']));
@@ -132,7 +132,7 @@
         $search_data['robot_id'] = !empty($_GET['robot_id']) && is_numeric($_GET['robot_id']) ? trim($_GET['robot_id']) : '';
         $search_data['robot_name'] = !empty($_GET['robot_name']) && preg_match('/[-_0-9a-z\.\*\s]+/i', $_GET['robot_name']) ? trim(strtolower($_GET['robot_name'])) : '';
         $search_data['robot_core'] = !empty($_GET['robot_core']) && preg_match('/[-_0-9a-z]+/i', $_GET['robot_core']) ? trim(strtolower($_GET['robot_core'])) : '';
-        $search_data['robot_class'] = $this_robot_class; //!empty($_GET['robot_class']) && preg_match('/[-_0-9a-z]+/i', $_GET['robot_class']) ? trim(strtolower($_GET['robot_class'])) : '';
+        $search_data['robot_class'] = !empty($_GET['robot_class']) && preg_match('/[-_0-9a-z]+/i', $_GET['robot_class']) ? trim(strtolower($_GET['robot_class'])) : '';
         $search_data['robot_flavour'] = !empty($_GET['robot_flavour']) && preg_match('/[-_0-9a-z\.\*\s\{\}]+/i', $_GET['robot_flavour']) ? trim($_GET['robot_flavour']) : '';
         $search_data['robot_game'] = !empty($_GET['robot_game']) && preg_match('/[-_0-9a-z]+/i', $_GET['robot_game']) ? trim(strtoupper($_GET['robot_game'])) : '';
         $search_data['robot_group'] = !empty($_GET['robot_group']) && preg_match('/[-_0-9a-z\/]+/i', $_GET['robot_group']) ? trim($_GET['robot_group']) : '';
@@ -183,6 +183,8 @@
         if (!empty($search_data['robot_class'])){
             $search_query .= "AND robot_class = '{$search_data['robot_class']}' ";
             $search_results_limit = false;
+        } elseif (!empty($this_robot_class)){
+            $search_query .= "AND robot_class = '{$this_robot_class}' ";
         }
 
         // Else if the robot flavour was provided, we can use wildcards
@@ -248,8 +250,7 @@
         $order_by = array();
         if (!empty($sort_data)){ $order_by[] = $sort_data['name'].' '.strtoupper($sort_data['dir']); }
         $order_by[] = "robot_name ASC";
-        $order_by[] = "FIELD(robot_class, 'mecha', 'master', 'boss')";
-        $order_by[] = "robot_order ASC";
+        $order_by[] = "robot_id ASC";
         $order_by_string = implode(', ', $order_by);
         $search_query .= "ORDER BY {$order_by_string} ";
 
@@ -583,7 +584,7 @@
 
     <div class="breadcrumb">
         <a href="admin/">Admin Panel</a>
-        &raquo; <a href="<?= $this_robot_page_baseurl ?>"><?= $this_robot_xclass_name_uc ?></a>
+        &raquo; <a href="<?= $this_robot_page_baseurl ?>">Edit <?= $this_robot_xclass_name_uc ?></a>
         <? if ($sub_action == 'editor' && !empty($robot_data)): ?>
             &raquo; <a href="<?= $this_robot_page_baseurl ?>editor/robot_id=<?= $robot_data['robot_id'] ?>"><?= $robot_name_display ?></a>
         <? endif; ?>
@@ -675,8 +676,8 @@
                         'published' => array('icon' => 'fas fa-check-square', 'yes' => 'Published', 'no' => 'Unpublished'),
                         'complete' => array('icon' => 'fas fa-check-circle', 'yes' => 'Complete', 'no' => 'Incomplete'),
                         'unlockable' => array('icon' => 'fas fa-unlock', 'yes' => 'Unlockable', 'no' => 'Locked'),
-                        'exclusive' => array('icon' => 'fas fa-ghost', 'yes' => 'Exclusive', 'no' => 'Standard'),
-                        'hidden' => array('icon' => 'fas fa-eye-slash', 'yes' => 'Hidden', 'no' => 'Visible')
+                        'hidden' => array('icon' => 'fas fa-eye-slash', 'yes' => 'Hidden', 'no' => 'Visible'),
+                        'exclusive' => array('icon' => 'fas fa-ghost', 'yes' => 'Exclusive', 'no' => 'Standard')
                         );
                     cms_admin::object_index_flag_names_append_git_statuses($flag_names);
                     foreach ($flag_names AS $flag_token => $flag_info){
@@ -716,12 +717,11 @@
                         <colgroup>
                             <col class="id" width="60" />
                             <col class="name" width="" />
-                            <col class="class" width="100" />
-                            <col class="type" width="120" />
-                            <col class="game" width="80" />
-                            <col class="group" width="80" />
+                            <col class="type" width="100" />
+                            <col class="game" width="100" />
                             <col class="flag published" width="80" />
                             <col class="flag complete" width="75" />
+                            <col class="flag unlockable" width="80" />
                             <col class="flag hidden" width="70" />
                             <col class="actions" width="100" />
                         </colgroup>
@@ -729,24 +729,22 @@
                             <tr>
                                 <th class="id"><?= cms_admin::get_sort_link('robot_id', 'ID') ?></th>
                                 <th class="name"><?= cms_admin::get_sort_link('robot_name', 'Name') ?></th>
-                                <th class="class"><?= cms_admin::get_sort_link('robot_class', 'Class') ?></th>
                                 <th class="type"><?= cms_admin::get_sort_link('robot_core', 'Core(s)') ?></th>
                                 <th class="game"><?= cms_admin::get_sort_link('robot_game', 'Game') ?></th>
-                                <th class="group"><?= cms_admin::get_sort_link('robot_group', 'Group') ?></th>
                                 <th class="flag published"><?= cms_admin::get_sort_link('robot_flag_published', 'Published') ?></th>
                                 <th class="flag complete"><?= cms_admin::get_sort_link('robot_flag_complete', 'Complete') ?></th>
+                                <th class="flag unlockable"><?= cms_admin::get_sort_link('robot_flag_unlockable', 'Unlockable') ?></th>
                                 <th class="flag hidden"><?= cms_admin::get_sort_link('robot_flag_hidden', 'Hidden') ?></th>
                                 <th class="actions">Actions</th>
                             </tr>
                             <tr>
                                 <th class="head id"></th>
                                 <th class="head name"></th>
-                                <th class="head class"></th>
                                 <th class="head type"></th>
                                 <th class="head game"></th>
-                                <th class="head group"></th>
                                 <th class="head flag published"></th>
                                 <th class="head flag complete"></th>
+                                <th class="head flag unlockable"></th>
                                 <th class="head flag hidden"></th>
                                 <th class="head count"><?= cms_admin::get_totals_markup() ?></th>
                             </tr>
@@ -755,12 +753,11 @@
                             <tr>
                                 <td class="foot id"></td>
                                 <td class="foot name"></td>
-                                <td class="foot class"></td>
                                 <td class="foot type"></td>
                                 <td class="foot game"></td>
-                                <td class="foot group"></td>
                                 <td class="foot flag published"></td>
                                 <td class="foot flag complete"></td>
+                                <td class="foot flag unlockable"></td>
                                 <td class="foot flag hidden"></td>
                                 <td class="foot count"><?= cms_admin::get_totals_markup() ?></td>
                             </tr>
@@ -792,6 +789,7 @@
                                 $robot_group_span = '<span class="type_span type_cutter">'.$robot_group.'</span>';
                                 $robot_flag_published = !empty($robot_data['robot_flag_published']) ? '<i class="fas fa-check-square"></i>' : '-';
                                 $robot_flag_complete = !empty($robot_data['robot_flag_complete']) ? '<i class="fas fa-check-circle"></i>' : '-';
+                                $robot_flag_unlockable = !empty($robot_data['robot_flag_unlockable']) ? '<i class="fas fa-unlock"></i>' : '-';
                                 $robot_flag_hidden = !empty($robot_data['robot_flag_hidden']) ? '<i class="fas fa-eye-slash"></i>' : '-';
 
                                 $robot_edit_url = $this_robot_page_baseurl.'editor/robot_id='.$robot_id;
@@ -806,12 +804,11 @@
                                 echo '<tr>'.PHP_EOL;
                                     echo '<td class="id"><div>'.$robot_id.'</div></td>'.PHP_EOL;
                                     echo '<td class="name"><div class="wrap">'.$robot_name_link.'</div></td>'.PHP_EOL;
-                                    echo '<td class="class"><div class="wrap">'.$robot_class_span.'</div></td>'.PHP_EOL;
                                     echo '<td class="type"><div class="wrap">'.$robot_core_span.'</div></td>'.PHP_EOL;
                                     echo '<td class="game"><div class="wrap">'.$robot_game_span.'</div></td>'.PHP_EOL;
-                                    echo '<td class="group"><div class="wrap">'.$robot_group_span.'</div></td>'.PHP_EOL;
                                     echo '<td class="flag published"><div>'.$robot_flag_published.'</div></td>'.PHP_EOL;
                                     echo '<td class="flag complete"><div>'.$robot_flag_complete.'</div></td>'.PHP_EOL;
+                                    echo '<td class="flag unlockable"><div>'.$robot_flag_unlockable.'</div></td>'.PHP_EOL;
                                     echo '<td class="flag hidden"><div>'.$robot_flag_hidden.'</div></td>'.PHP_EOL;
                                     echo '<td class="actions"><div>'.$robot_actions.'</div></td>'.PHP_EOL;
                                 echo '</tr>'.PHP_EOL;

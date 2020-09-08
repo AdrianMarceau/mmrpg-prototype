@@ -111,7 +111,7 @@
     $sub_action =  !empty($_GET['subaction']) ? $_GET['subaction'] : 'search';
 
     // Update the tab name with the page name
-    $this_page_tabtitle = $this_ability_xclass_name_uc.' | '.$this_page_tabtitle;
+    $this_page_tabtitle = 'Edit '.$this_ability_xclass_name_uc.' | '.$this_page_tabtitle;
 
     // If we're in delete mode, we need to remove some data
     $delete_data = array();
@@ -132,11 +132,11 @@
     $search_query = '';
     $search_results = array();
     $search_results_count = 0;
-    $search_results_limit = 50;
+    $search_results_limit = 500;
     if ($sub_action == 'search'){
 
         // Collect the sorting order and direction
-        $sort_data = array('name' => 'ability_id', 'dir' => 'asc');
+        $sort_data = array('name' => 'ability_order', 'dir' => 'asc');
         if (!empty($_GET['order'])
             && preg_match('/^([-_a-z0-9]+)\:(desc|asc)$/i', $_GET['order'])){
             list($r_name, $r_dir) = explode(':', trim($_GET['order']));
@@ -147,7 +147,7 @@
         $search_data['ability_id'] = !empty($_GET['ability_id']) && is_numeric($_GET['ability_id']) ? trim($_GET['ability_id']) : '';
         $search_data['ability_name'] = !empty($_GET['ability_name']) && preg_match('/[-_0-9a-z\.\*\s]+/i', $_GET['ability_name']) ? trim(strtolower($_GET['ability_name'])) : '';
         $search_data['ability_type'] = !empty($_GET['ability_type']) && preg_match('/[-_0-9a-z]+/i', $_GET['ability_type']) ? trim(strtolower($_GET['ability_type'])) : '';
-        $search_data['ability_class'] = $this_ability_class; //!empty($_GET['ability_class']) && preg_match('/[-_0-9a-z]+/i', $_GET['ability_class']) ? trim(strtolower($_GET['ability_class'])) : '';
+        $search_data['ability_class'] = !empty($_GET['ability_class']) && preg_match('/[-_0-9a-z]+/i', $_GET['ability_class']) ? trim(strtolower($_GET['ability_class'])) : '';
         $search_data['ability_flavour'] = !empty($_GET['ability_flavour']) && preg_match('/[-_0-9a-z\.\*\s\{\}]+/i', $_GET['ability_flavour']) ? trim($_GET['ability_flavour']) : '';
         $search_data['ability_game'] = !empty($_GET['ability_game']) && preg_match('/[-_0-9a-z]+/i', $_GET['ability_game']) ? trim(strtoupper($_GET['ability_game'])) : '';
         $search_data['ability_group'] = !empty($_GET['ability_group']) && preg_match('/[-_0-9a-z\/]+/i', $_GET['ability_group']) ? trim($_GET['ability_group']) : '';
@@ -197,6 +197,8 @@
         if (!empty($search_data['ability_class'])){
             $search_query .= "AND ability_class = '{$search_data['ability_class']}' ";
             $search_results_limit = false;
+        } elseif (!empty($this_ability_class)){
+            $search_query .= "AND ability_class = '{$this_ability_class}' ";
         }
 
         // Else if the ability flavour was provided, we can use wildcards
@@ -208,10 +210,6 @@
             $search_query .= "AND (
                 ability_description LIKE '{$ability_flavour}'
                 OR ability_description2 LIKE '{$ability_flavour}'
-                OR ability_quotes_start LIKE '{$ability_flavour}'
-                OR ability_quotes_taunt LIKE '{$ability_flavour}'
-                OR ability_quotes_victory LIKE '{$ability_flavour}'
-                OR ability_quotes_defeat LIKE '{$ability_flavour}'
                 ) ";
             $search_results_limit = false;
         }
@@ -256,8 +254,7 @@
         $order_by = array();
         if (!empty($sort_data)){ $order_by[] = $sort_data['name'].' '.strtoupper($sort_data['dir']); }
         $order_by[] = "ability_name ASC";
-        $order_by[] = "FIELD(ability_class, 'mecha', 'master', 'boss')";
-        $order_by[] = "ability_order ASC";
+        $order_by[] = "ability_id ASC";
         $order_by_string = implode(', ', $order_by);
         $search_query .= "ORDER BY {$order_by_string} ";
 
@@ -391,43 +388,12 @@
                 $form_data['ability_type2'] = isset($types[1]) ? $types[1] : '';
             }
 
-            if (isset($form_data['ability_weaknesses'])){ $form_data['ability_weaknesses'] = !empty($form_data['ability_weaknesses']) ? json_encode($form_data['ability_weaknesses']) : ''; }
-            if (isset($form_data['ability_resistances'])){ $form_data['ability_resistances'] = !empty($form_data['ability_resistances']) ? json_encode($form_data['ability_resistances']) : ''; }
-            if (isset($form_data['ability_affinities'])){ $form_data['ability_affinities'] = !empty($form_data['ability_affinities']) ? json_encode($form_data['ability_affinities']) : ''; }
-            if (isset($form_data['ability_immunities'])){ $form_data['ability_immunities'] = !empty($form_data['ability_immunities']) ? json_encode($form_data['ability_immunities']) : ''; }
-
-            if (!empty($form_data['ability_abilities_rewards'])){
-                $new_rewards = array();
-                $new_rewards_tokens = array();
-                foreach ($form_data['ability_abilities_rewards'] AS $key => $reward){
-                    if (empty($reward) || empty($reward['token'])){ continue; }
-                    elseif (in_array($reward['token'], $new_rewards_tokens)){ continue; }
-                    if (empty($reward['level'])){ $reward['level'] = 0; }
-                    $new_rewards_tokens[] = $reward['token'];
-                    $new_rewards[] = $reward;
-                }
-                usort($new_rewards, function($a, $b) use($mmrpg_abilities_index){
-                    $ax = $mmrpg_abilities_index[$a['token']];
-                    $bx = $mmrpg_abilities_index[$b['token']];
-                    if ($a['level'] < $b['level']){ return -1; }
-                    elseif ($a['level'] > $b['level']){ return 1; }
-                    elseif ($ax['ability_order'] < $bx['ability_order']){ return -1; }
-                    elseif ($ax['ability_order'] > $bx['ability_order']){ return 1; }
-                    else { return 0; }
-                    });
-                $form_data['ability_abilities_rewards'] = $new_rewards;
-            }
-
             if ($form_data['ability_flag_unlockable']){
                 if (!$form_data['ability_flag_published']){ $form_messages[] = array('warning', $this_ability_class_short_name_uc.' must be published to be unlockable'); $form_data['ability_flag_unlockable'] = 0; }
                 elseif (!$form_data['ability_flag_complete']){ $form_messages[] = array('warning', $this_ability_class_short_name_uc.' must be complete to be unlockable'); $form_data['ability_flag_unlockable'] = 0; }
                 elseif ($form_data['ability_class'] !== 'master'){ $form_messages[] = array('warning', 'Only robot master abilities can be marked as unlockable'); $form_data['ability_flag_unlockable'] = 0; }
                 elseif (empty($form_data['ability_description'])){ $form_messages[] = array('warning', $this_ability_class_short_name_uc.' must have a description to be unlockable'); $form_data['ability_flag_unlockable'] = 0; }
             }
-
-
-            if (isset($form_data['ability_abilities_rewards'])){ $form_data['ability_abilities_rewards'] = !empty($form_data['ability_abilities_rewards']) ? json_encode($form_data['ability_abilities_rewards'], JSON_NUMERIC_CHECK) : ''; }
-            if (isset($form_data['ability_abilities_compatible'])){ $form_data['ability_abilities_compatible'] = !empty($form_data['ability_abilities_compatible']) ? json_encode($form_data['ability_abilities_compatible']) : ''; }
 
             $empty_image_folders = array();
 
@@ -447,7 +413,7 @@
             //$form_messages[] = array('alert', '<pre>$ability_image_sheets_actions  = '.print_r($ability_image_sheets_actions, true).'</pre>');
 
             if (!empty($empty_image_folders)){
-                $form_messages[] = array('alert', '<pre>$empty_image_folders = '.print_r($empty_image_folders, true).'</pre>');
+                //$form_messages[] = array('alert', '<pre>$empty_image_folders = '.print_r($empty_image_folders, true).'</pre>');
                 foreach ($empty_image_folders AS $empty_path_key => $empty_path){
 
                     // Continue if this folder doesn't exist
@@ -571,7 +537,7 @@
 
     <div class="breadcrumb">
         <a href="admin/">Admin Panel</a>
-        &raquo; <a href="<?= $this_ability_page_baseurl ?>"><?= $this_ability_xclass_name_uc ?></a>
+        &raquo; <a href="<?= $this_ability_page_baseurl ?>">Edit <?= $this_ability_xclass_name_uc ?></a>
         <? if ($sub_action == 'editor' && !empty($ability_data)): ?>
             &raquo; <a href="<?= $this_ability_page_baseurl ?>editor/ability_id=<?= $ability_data['ability_id'] ?>"><?= $ability_name_display ?></a>
         <? endif; ?>
@@ -663,7 +629,6 @@
                         'published' => array('icon' => 'fas fa-check-square', 'yes' => 'Published', 'no' => 'Unpublished'),
                         'complete' => array('icon' => 'fas fa-check-circle', 'yes' => 'Complete', 'no' => 'Incomplete'),
                         'unlockable' => array('icon' => 'fas fa-unlock', 'yes' => 'Unlockable', 'no' => 'Locked'),
-                        'exclusive' => array('icon' => 'fas fa-ghost', 'yes' => 'Exclusive', 'no' => 'Standard'),
                         'hidden' => array('icon' => 'fas fa-eye-slash', 'yes' => 'Hidden', 'no' => 'Visible')
                         );
                     cms_admin::object_index_flag_names_append_git_statuses($flag_names);
@@ -705,10 +670,10 @@
                             <col class="id" width="60" />
                             <col class="name" width="" />
                             <col class="type" width="120" />
-                            <col class="game" width="80" />
-                            <col class="group" width="<?= $this_ability_class === 'master' ? 175 : 80 ?>" />
+                            <col class="game" width="120" />
                             <col class="flag published" width="80" />
                             <col class="flag complete" width="75" />
+                            <col class="flag unlockable" width="80" />
                             <col class="flag hidden" width="70" />
                             <col class="actions" width="100" />
                         </colgroup>
@@ -718,9 +683,9 @@
                                 <th class="name"><?= cms_admin::get_sort_link('ability_name', 'Name') ?></th>
                                 <th class="type"><?= cms_admin::get_sort_link('ability_type', 'Type(s)') ?></th>
                                 <th class="game"><?= cms_admin::get_sort_link('ability_game', 'Game') ?></th>
-                                <th class="group"><?= cms_admin::get_sort_link('ability_group', 'Group') ?></th>
                                 <th class="flag published"><?= cms_admin::get_sort_link('ability_flag_published', 'Published') ?></th>
                                 <th class="flag complete"><?= cms_admin::get_sort_link('ability_flag_complete', 'Complete') ?></th>
+                                <th class="flag unlockable"><?= cms_admin::get_sort_link('ability_flag_unlockable', 'Unlockable') ?></th>
                                 <th class="flag hidden"><?= cms_admin::get_sort_link('ability_flag_hidden', 'Hidden') ?></th>
                                 <th class="actions">Actions</th>
                             </tr>
@@ -729,9 +694,9 @@
                                 <th class="head name"></th>
                                 <th class="head type"></th>
                                 <th class="head game"></th>
-                                <th class="head group"></th>
                                 <th class="head flag published"></th>
                                 <th class="head flag complete"></th>
+                                <th class="head flag unlockable"></th>
                                 <th class="head flag hidden"></th>
                                 <th class="head count"><?= cms_admin::get_totals_markup() ?></th>
                             </tr>
@@ -742,9 +707,9 @@
                                 <td class="foot name"></td>
                                 <td class="foot type"></td>
                                 <td class="foot game"></td>
-                                <td class="foot group"></td>
                                 <td class="foot flag published"></td>
                                 <td class="foot flag complete"></td>
+                                <td class="foot flag unlockable"></td>
                                 <td class="foot flag hidden"></td>
                                 <td class="foot count"><?= cms_admin::get_totals_markup() ?></td>
                             </tr>
@@ -774,6 +739,7 @@
                                 $ability_group_span = '<span class="type_span type_cutter">'.$ability_group.'</span>';
                                 $ability_flag_published = !empty($ability_data['ability_flag_published']) ? '<i class="fas fa-check-square"></i>' : '-';
                                 $ability_flag_complete = !empty($ability_data['ability_flag_complete']) ? '<i class="fas fa-check-circle"></i>' : '-';
+                                $ability_flag_unlockable = !empty($ability_data['ability_flag_unlockable']) ? '<i class="fas fa-unlock"></i>' : '-';
                                 $ability_flag_hidden = !empty($ability_data['ability_flag_hidden']) ? '<i class="fas fa-eye-slash"></i>' : '-';
 
                                 $ability_edit_url = $this_ability_page_baseurl.'editor/ability_id='.$ability_id;
@@ -790,9 +756,9 @@
                                     echo '<td class="name"><div class="wrap">'.$ability_name_link.'</div></td>'.PHP_EOL;
                                     echo '<td class="type"><div class="wrap">'.$ability_type_span.'</div></td>'.PHP_EOL;
                                     echo '<td class="game"><div class="wrap">'.$ability_game_span.'</div></td>'.PHP_EOL;
-                                    echo '<td class="group"><div class="wrap">'.$ability_group_span.'</div></td>'.PHP_EOL;
                                     echo '<td class="flag published"><div>'.$ability_flag_published.'</div></td>'.PHP_EOL;
                                     echo '<td class="flag complete"><div>'.$ability_flag_complete.'</div></td>'.PHP_EOL;
+                                    echo '<td class="flag unlockable"><div>'.$ability_flag_unlockable.'</div></td>'.PHP_EOL;
                                     echo '<td class="flag hidden"><div>'.$ability_flag_hidden.'</div></td>'.PHP_EOL;
                                     echo '<td class="actions"><div>'.$ability_actions.'</div></td>'.PHP_EOL;
                                 echo '</tr>'.PHP_EOL;
@@ -836,11 +802,9 @@
                         cms_admin::object_editor_header_echo_git_statues($ability_data['ability_token'], $mmrpg_git_file_arrays);
 
                         // If the ability is published, generate and display a preview link
-                        if (!empty($ability_data['ability_flag_published'])){
-                            $preview_link = 'database/';
-                            if ($ability_data['ability_class'] === 'master'){ $preview_link .= 'abilities/'; }
-                            elseif ($ability_data['ability_class'] === 'mecha'){ $preview_link .= 'mechas/'; }
-                            elseif ($ability_data['ability_class'] === 'boss'){ $preview_link .= 'bosses/'; }
+                        if (!empty($ability_data['ability_flag_published'])
+                            && $ability_data['ability_class'] === 'master'){
+                            $preview_link = 'database/abilities/';
                             $preview_link .= $ability_data['ability_token'].'/';
                             echo '<a class="view" href="'.$preview_link.'" target="_blank">View <i class="fas fa-external-link-square-alt"></i></a>'.PHP_EOL;
                             echo '<a class="preview" href="'.$preview_link.'preview=true" target="_blank">Preview <i class="fas fa-external-link-square-alt"></i></a>'.PHP_EOL;
