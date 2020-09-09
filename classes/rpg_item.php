@@ -803,6 +803,7 @@ class rpg_item extends rpg_object {
             'item_flag_hidden',
             'item_flag_complete',
             'item_flag_published',
+            'item_flag_unlockable',
             'item_order'
             );
 
@@ -835,6 +836,45 @@ class rpg_item extends rpg_object {
             'item_frame_animate',
             'item_frame_index',
             'item_frame_offset'
+            );
+
+        // Implode the index fields into a string if requested
+        if ($implode){
+            $json_index_fields = implode(', ', $json_index_fields);
+        }
+
+        // Return the index fields, array or string
+        return $json_index_fields;
+
+    }
+
+    /**
+     * Get a list of all fields that can be ignored by JSON-export functions
+     * (aka ones that do not actually need to be saved to the database)
+     * @param bool $implode
+     * @return mixed
+     */
+    public static function get_fields_excluded_from_json_export($implode = false){
+
+        // Define the various json index fields for player objects
+        $json_index_fields = array(
+            'item_master',
+            'item_number',
+            'item_speed',
+            'item_energy',
+            'item_accuracy',
+            'item_frame',
+            'item_frame_animate',
+            'item_frame_index',
+            'item_frame_offset',
+            'item_frame_styles',
+            'item_frame_classes',
+            'attachment_frame',
+            'attachment_frame_animate',
+            'attachment_frame_index',
+            'attachment_frame_offset',
+            'attachment_frame_styles',
+            'attachment_frame_classes'
             );
 
         // Implode the index fields into a string if requested
@@ -1520,7 +1560,7 @@ class rpg_item extends rpg_object {
                                 </tr>
                                 <tr>
                                     <td  class="right">
-                                        <label style="display: block; float: left;">Type :</label>
+                                        <label style="display: block; float: left;">Kind :</label>
                                         <span class="item_type item_type_"><?= ucfirst($item_info['item_subclass']) ?></span>
                                     </td>
                                 </tr>

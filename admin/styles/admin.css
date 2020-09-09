@@ -938,6 +938,10 @@ tr:nth-child(odd) td {
     height: 1.25em;
     border-width: 1px;
 }
+.adminform table tbody td .type_span i.fas {
+    font-size: 80%;
+    margin: 0 2px;
+}
 .adminform .editor .form .label .floatright {
     float: right;
 }
@@ -1800,7 +1804,9 @@ input[type=file] {
 }
 .adminform .results .list .date,
 .adminform .results .list .flag,
-.adminform .results .list .order {
+.adminform .results .list .order,
+.adminform .results .list .game,
+.adminform .results .list .class {
     text-align: center;
 }
 

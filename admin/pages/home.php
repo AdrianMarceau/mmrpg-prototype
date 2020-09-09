@@ -584,6 +584,45 @@
                 $this_group_options[] = $this_option;
             }
 
+            if (in_array('*', $this_adminaccess)
+                || in_array('edit-items', $this_adminaccess)){
+                $option_name = 'Edit Items';
+                $this_option = array(
+                    'link' => array('url' => 'admin/edit-items/', 'text' => $option_name),
+                    'desc' => 'edit the details and images of the in-game items',
+                    'repo' => array(
+                        'name' => 'items',
+                        'data' => array('prefix' => 'item'),
+                        'path' => MMRPG_CONFIG_ITEMS_CONTENT_PATH
+                        ),
+                    'buttons' => array(
+                        array(
+                            'text' => 'Revert Uncommitted',
+                            'condition' => array('uncommitted' => true),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'revert',
+                                'data-kind' => 'items',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            ),
+                        array(
+                            'text' => 'Commit All',
+                            'condition' => array('uncommitted' => true),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'commit',
+                                'data-kind' => 'items',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            )
+                        )
+                    );
+                $this_group_options[] = $this_option;
+            }
+
             // Merge in the common game database group options to all envs
             $this_group_options = array_merge($this_group_options, $common_group_kinds_options['game_database']);
 

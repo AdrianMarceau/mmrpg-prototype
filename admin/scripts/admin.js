@@ -793,6 +793,56 @@ $(document).ready(function(){
     }
 
 
+    // ITEM EDITOR EVENTS
+
+    // Check to make sure we're on the item editor page
+    var $editItems = $('.adminform.edit-items', thisAdmin);
+    var litePickerIndex = {};
+    //console.log('$editItems =', $editItems);
+    if ($editItems.length){
+
+        // Add either-or events to the item price and value fields (only one should be entered)
+        var $itemPriceField = $('input[type="number"][name="item_price"]', $editItems);
+        var $itemValueField = $('input[type="number"][name="item_value"]', $editItems);
+        if ($itemPriceField.length && $itemValueField.length){
+            var updateItemPriceValueFields = function(){
+                var itemHasPrice = parseInt($itemPriceField.val()) > 0 ? true : false;
+                var itemHasValue = parseInt($itemValueField.val()) > 0 ? true : false;
+                $itemPriceField.removeAttr('disabled').prop('disabled', false);
+                $itemValueField.removeAttr('disabled').prop('disabled', false);
+                if (itemHasPrice){ $itemValueField.attr('disabled', 'disabled').prop('disabled', true); }
+                else if (itemHasValue){ $itemPriceField.attr('disabled', 'disabled').prop('disabled', true); }
+                };
+            $itemPriceField.bind('change', function(){ updateItemPriceValueFields(); });
+            $itemValueField.bind('change', function(){ updateItemPriceValueFields(); });
+            updateItemPriceValueFields();
+            }
+
+
+        // Add events for fields with units that have checkboxes beside them, toggling the opacity for them
+        var $fieldsWithUnitCheckboxes = $('.field.has_unit .unit.has_checkbox input[type="checkbox"]', $editItems).closest('.field');
+        if ($fieldsWithUnitCheckboxes.length){
+            $fieldsWithUnitCheckboxes.each(function(){
+                var $thisUnitField = $(this);
+                var $thisUnitWrap = $thisUnitField.find('.unit.has_checkbox');
+                var $thisUnitCheckbox = $thisUnitWrap.find('input[type="checkbox"]');
+                var $thisUnitSpan = $thisUnitWrap.find('> span');
+                $thisUnitCheckbox.bind('change', function(){
+                    var isChecked = $(this).is(':checked') ? true : false;
+                    if (isChecked){
+                        $thisUnitSpan.addClass('active');
+                        $thisUnitSpan.removeClass('inactive');
+                        } else {
+                        $thisUnitSpan.removeClass('active');
+                        $thisUnitSpan.addClass('inactive');
+                        }
+                    });
+                });
+            }
+
+    }
+
+
     // CHALLENGE EDITOR EVENTS
 
     // Check to make sure we're on the challenge editor page

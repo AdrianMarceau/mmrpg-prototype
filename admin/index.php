@@ -214,6 +214,11 @@ elseif ($this_page_action == 'edit-fields'){
     // Require the edit robots file
     require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-fields.php');
 }
+// Else if this is an EDIT ITEMS request
+elseif ($this_page_action == 'edit-items'){
+    // Require the edit robots file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-items.php');
+}
 // Else if this is an EDIT EVENT CHALLENGES request
 elseif ($this_page_action == 'edit-event-challenges'){
     // Require the edit event challenges file
