@@ -356,12 +356,14 @@
 
             // REFORMAT or OPTIMIZE data for provided fields where necessary
 
+            /*
             if (isset($form_data['item_type'])){
                 // Fix any type ordering problems (like selecting Neutral + anything)
                 $types = array_values(array_filter(array($form_data['item_type'], $form_data['item_type2'])));
                 $form_data['item_type'] = isset($types[0]) ? $types[0] : '';
                 $form_data['item_type2'] = isset($types[1]) ? $types[1] : '';
             }
+            */
 
             if ($form_data['item_flag_unlockable']){
                 if (!$form_data['item_flag_published']){ $form_messages[] = array('warning', 'Item must be published to be unlockable'); $form_data['item_flag_unlockable'] = 0; }
@@ -707,6 +709,7 @@
                                 $item_name = $item_data['item_name'];
                                 $item_type = !empty($item_data['item_type']) ? ucfirst($item_data['item_type']) : 'Neutral';
                                 $item_type_span = '<span class="type_span type_'.(!empty($item_data['item_type']) ? $item_data['item_type'] : 'none').'">'.$item_type.'</span>';
+
                                 if (!empty($item_data['item_type'])
                                     && !empty($item_data['item_type2'])){
                                     $item_type .= ' / '.ucfirst($item_data['item_type2']);

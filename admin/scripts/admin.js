@@ -575,6 +575,7 @@ $(document).ready(function(){
                     editorConfig.tabsize = 4;
                     editorConfig.indentUnit = 4;
                     editorConfig.lineNumbers = true;
+                    editorConfig.lineWrapping = false;
                     editorConfig.matchBrackets = true;
                     editorConfig.autoCloseBrackets = true;
                     }

@@ -324,6 +324,16 @@ body:before {
         min-height: 350px;
     }
 
+    .adminform .field textarea[name="ability_description"],
+    .adminform .field textarea[name="item_description"] {
+        min-height: 100px;
+    }
+    .adminform .field textarea[name="item_description_use"],
+    .adminform .field textarea[name="item_description_hold"],
+    .adminform .field textarea[name="item_description_shop"] {
+        min-height: 60px;
+    }
+
     .adminform .login .field,
     .adminform .options .field {
         width: 100%;
