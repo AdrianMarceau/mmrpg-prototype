@@ -862,6 +862,7 @@ class rpg_item extends rpg_object {
             'item_number',
             'item_speed',
             'item_energy',
+            'item_energy_percent',
             'item_accuracy',
             'item_frame',
             'item_frame_animate',

@@ -12,6 +12,9 @@ if (!in_array('item_functions', $item_fields)){ $item_fields[] = 'item_functions
 $item_fields = implode(', ', $item_fields);
 $item_index = $db->get_array_list("SELECT {$item_fields} FROM mmrpg_index_items ORDER BY item_token ASC", 'item_token');
 
+// Collect unnecessary fields to remove from the generated json data file
+$skip_fields_on_json_export = rpg_item::get_fields_excluded_from_json_export(false);
+
 // If there's a filter present, remove all tokens not in the filter
 if (!empty($migration_filter)){
     $old_item_index = $item_index;
@@ -153,6 +156,7 @@ foreach ($item_index AS $item_token => $item_data){
     // And then write the rest of the non-function data into a json file
     $content_json_path = $content_path.'data.json';
     $content_json_data = clean_json_content_array('item', $item_data);
+    if (!empty($skip_fields_on_json_export)){ foreach ($skip_fields_on_json_export AS $field){ unset($content_json_data[$field]); } }
     ob_echo('- export all other data to '.clean_path($content_json_path));
     $h = fopen($content_json_path, 'w');
     fwrite($h, normalize_file_markup(json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK)));
