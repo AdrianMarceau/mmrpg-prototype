@@ -95,7 +95,7 @@ if (!empty($mmrpg_database_abilities)){
 
         // Do not show incomplete abilities in the link list
         $show_in_link_list = true;
-        if (!$ability_info['ability_flag_complete'] && $ability_info['ability_token'] !== $this_current_token){ $show_in_link_list = false;; }
+        if (!$ability_info['ability_flag_complete'] && $ability_info['ability_token'] !== $this_current_token){ $show_in_link_list = false; }
 
         // If a type filter has been applied to the ability page
         $temp_ability_types = array();
@@ -144,10 +144,10 @@ if (!empty($mmrpg_database_abilities)){
         if (!empty($ability_info['ability_type2'])){ $ability_title_text = str_replace('Type', '/ '.ucfirst($ability_info['ability_type2']).' Type', $ability_title_text); }
         $ability_title_text .= '|| [[';
         if (empty($ability_info['ability_damage']) && empty($ability_info['ability_recovery'])){ $ability_title_text .= 'Special Effects'; }
-        elseif (!empty($ability_info['ability_damage'])){ $ability_title_text .= $ability_info['ability_damage'].' Damage'; }
-        elseif (!empty($ability_info['ability_recovery'])){ $ability_title_text .= $ability_info['ability_recovery'].' Recovery'; }
+        elseif (!empty($ability_info['ability_damage'])){ $ability_title_text .= $ability_info['ability_damage'].(!empty($ability_info['ability_damage_percent']) ? '%' : '').' Damage'; }
+        elseif (!empty($ability_info['ability_recovery'])){ $ability_title_text .= $ability_info['ability_recovery'].(!empty($ability_info['ability_recovery_percent']) ? '%' : '').' Recovery'; }
         if (!empty($ability_info['ability_accuracy'])){ $ability_title_text .= ' | '.$ability_info['ability_accuracy'].'% Accuracy'; }
-        if (isset($ability_info['ability_energy'])){ $ability_title_text .= ' | '.$ability_info['ability_energy'].' Energy'; }
+        if (isset($ability_info['ability_energy'])){ $ability_title_text .= ' | '.$ability_info['ability_energy'].(!empty($ability_info['ability_energy_percent']) ? '%' : '').' Energy'; }
         $ability_title_text .= ']]';
         if (false && !empty($ability_info['ability_description'])){
             $temp_description = $ability_info['ability_description'];

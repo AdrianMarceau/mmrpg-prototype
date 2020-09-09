@@ -322,6 +322,8 @@
             $form_data['ability_order'] = !empty($_POST['ability_order']) && is_numeric($_POST['ability_order']) ? (int)(trim($_POST['ability_order'])) : 0;
 
             $form_data['ability_energy'] = !empty($_POST['ability_energy']) && is_numeric($_POST['ability_energy']) ? (int)(trim($_POST['ability_energy'])) : 0;
+            $form_data['ability_energy_percent'] = isset($_POST['ability_energy_percent']) && is_numeric($_POST['ability_energy_percent']) ? (int)(trim($_POST['ability_energy_percent'])) : 0;
+
             $form_data['ability_accuracy'] = !empty($_POST['ability_accuracy']) && is_numeric($_POST['ability_accuracy']) ? (int)(trim($_POST['ability_accuracy'])) : 0;
             $form_data['ability_speed'] = !empty($_POST['ability_speed']) && is_numeric($_POST['ability_speed']) ? (int)(trim($_POST['ability_speed'])) : 0;
             $form_data['ability_speed2'] = !empty($_POST['ability_speed2']) && is_numeric($_POST['ability_speed2']) ? (int)(trim($_POST['ability_speed2'])) : 0;
@@ -905,11 +907,14 @@
 
                                 <hr />
 
-                                <div class="field foursize has_unit">
-                                    <strong class="label"><span class="type_span type_weapons">Energy</span></strong>
+                                <div class="field foursize has_unit has_unit_checkbox">
+                                    <strong class="label"><span class="type_span type_weapons">Energy</span> <em>WE</em></strong>
                                     <input class="textbox" type="number" name="ability_energy" value="<?= $ability_data['ability_energy'] ?>" maxlength="8" min="0" max="64" step="2" />
-                                    <strong class="unit">
-                                        <span>WE</span>
+                                    <? $is_percent = !empty($ability_data['ability_energy_percent']) ? true : false; ?>
+                                    <strong class="unit has_checkbox" title="Is Percent?">
+                                        <span class="<?= $is_percent ? 'active' : 'inactive' ?>">%</span>
+                                        <input type="hidden" name="ability_energy_percent" value="0" />
+                                        <input type="checkbox" name="ability_energy_percent" value="1" <?= $is_percent ? 'checked="checked"' : '' ?> />
                                     </strong>
                                 </div>
 

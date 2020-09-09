@@ -112,6 +112,7 @@ class rpg_ability extends rpg_object {
         $this->ability_speed = isset($this_abilityinfo['ability_speed']) ? $this_abilityinfo['ability_speed'] : 1;
         $this->ability_speed2 = isset($this_abilityinfo['ability_speed2']) ? $this_abilityinfo['ability_speed2'] : $this->ability_speed;
         $this->ability_energy = isset($this_abilityinfo['ability_energy']) ? $this_abilityinfo['ability_energy'] : 4;
+        $this->ability_energy_percent = isset($this_abilityinfo['ability_energy_percent']) ? $this_abilityinfo['ability_energy_percent'] : false;
         $this->ability_damage = isset($this_abilityinfo['ability_damage']) ? $this_abilityinfo['ability_damage'] : 0;
         $this->ability_damage2 = isset($this_abilityinfo['ability_damage2']) ? $this_abilityinfo['ability_damage2'] : 0;
         $this->ability_damage_percent = isset($this_abilityinfo['ability_damage_percent']) ? $this_abilityinfo['ability_damage_percent'] : false;
@@ -1293,6 +1294,7 @@ class rpg_ability extends rpg_object {
         $ability_info_name = $ability_info['ability_name'];
 
         $ability_info_energy = isset($ability_info['ability_energy']) ? $ability_info['ability_energy'] : 4;
+        $ability_info_energy_percent = !empty($ability_info['ability_energy_percent']) ? true : false;
 
         $ability_info_damage = !empty($ability_info['ability_damage']) ? $ability_info['ability_damage'] : 0;
         $ability_info_damage2 = !empty($ability_info['ability_damage2']) ? $ability_info['ability_damage2'] : 0;
@@ -1403,6 +1405,7 @@ class rpg_ability extends rpg_object {
             'ability_type' => $this->ability_type,
             'ability_type2' => $this->ability_type2,
             'ability_energy' => $this->ability_energy,
+            'ability_energy_percent' => $this->ability_energy_percent,
             'ability_speed' => $this->ability_speed,
             'ability_speed2' => $this->ability_speed2,
             'ability_damage' => $this->ability_damage,
@@ -1725,7 +1728,7 @@ class rpg_ability extends rpg_object {
                                     <tr>
                                         <td  class="right">
                                             <label style="display: block; float: left;">Cost :</label>
-                                            <span class="ability_stat"><?= !empty($ability_info['ability_energy']) ? $ability_info['ability_energy'].' WE' : '-' ?></span>
+                                            <span class="ability_stat"><?= !empty($ability_info['ability_energy']) ? $ability_info['ability_energy'].(!empty($ability_info['ability_energy_percent']) ? '%' : '').' WE' : '-' ?></span>
                                         </td>
                                     </tr>
                                 <? else: ?>
