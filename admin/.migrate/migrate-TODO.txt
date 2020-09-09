@@ -150,7 +150,28 @@ Update the admin panel to remove legacy "backup" tabs & functionality now that w
 
 Update the admin panel with editors for the final object types (include all new functionality from above)
 -  abilities [DONE]
--  items
+-  items [DONE]
+
+Update all objects types with a new "protected" flag to prevent deleting
+- players
+- robots
+- abilities
+- fields
+- items
+
+Update relevant admin panel editors with the option to create new non-protected objects
+- players (?)
+- robots
+- abilities
+- fields (?)
+- items
+
+Update relevant admin panel editors with the option to delete non-protected objects
+- players (?)
+- robots
+- abilities
+- fields (?)
+- items
 
 Implement the new "minify" library to compress CSS and JS markup
 -  Minify all styles
