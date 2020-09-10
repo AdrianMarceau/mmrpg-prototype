@@ -168,6 +168,12 @@ class rpg_item extends rpg_object {
         $this->item_function = isset($functions['item_function']) ? $functions['item_function'] : function(){};
         $this->item_function_onload = isset($functions['item_function_onload']) ? $functions['item_function_onload'] : function(){};
         $this->item_function_attachment = isset($functions['item_function_attachment']) ? $functions['item_function_attachment'] : function(){};
+        $this->item_functions_custom = array();
+        foreach ($functions AS $name => $function){
+            if (strpos($name, 'item_function_') === 0){ continue; }
+            elseif (!is_callable($function)){ continue; }
+            $this->item_functions_custom[$name] = $function;
+        }
         unset($functions);
 
         // Define a the default item results
