@@ -2,6 +2,11 @@
 // Include the TOP file
 require_once('top.php');
 
+// Never try to display errors during the battle loop, always log to file instead
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+ini_set('log_errors', 1);
+
 // If the user is not logged in, don't allow them here
 if (!rpg_game::is_user()){
     ?>
