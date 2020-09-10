@@ -1588,18 +1588,22 @@ class rpg_canvas {
             $this_player_id = !empty($eventinfo['this_player']) ? $eventinfo['this_player']->player_id : false;
 
             // Loop through the players index looking for this player
-            foreach ($this_battle->values['players'] AS $target_player_id => $target_playerinfo){
-                if (empty($this_player_id) || $this_player_id != $target_player_id){
-                    $eventinfo['target_player'] = rpg_game::get_player($this_battle, $target_playerinfo);
-                    break;
+            if (!empty($this_battle->values['players'])){
+                foreach ($this_battle->values['players'] AS $target_player_id => $target_playerinfo){
+                    if (empty($this_player_id) || $this_player_id != $target_player_id){
+                        $eventinfo['target_player'] = rpg_game::get_player($this_battle, $target_playerinfo);
+                        break;
+                    }
                 }
             }
 
             // Now loop through the target player's robots looking for an active one
-            foreach ($eventinfo['target_player']->player_robots AS $target_key => $target_robotinfo){
-                if ($target_robotinfo['robot_position'] == 'active' && $target_robotinfo['robot_status'] != 'disabled'){
-                    $eventinfo['target_robot'] = rpg_game::get_robot($this_battle, $eventinfo['target_player'], $target_robotinfo);
-                    break;
+            if (!empty($eventinfo['target_player']->player_robots)){
+                foreach ($eventinfo['target_player']->player_robots AS $target_key => $target_robotinfo){
+                    if ($target_robotinfo['robot_position'] == 'active' && $target_robotinfo['robot_status'] != 'disabled'){
+                        $eventinfo['target_robot'] = rpg_game::get_robot($this_battle, $eventinfo['target_player'], $target_robotinfo);
+                        break;
+                    }
                 }
             }
 
@@ -1608,10 +1612,10 @@ class rpg_canvas {
         // -- PLAYER SPRITES -- //
 
         // Collect this player's markup data
-        $this_player_data = $eventinfo['this_player']->canvas_markup($options);
+        $this_player_data = !empty($eventinfo['this_player']) ? $eventinfo['this_player']->canvas_markup($options) : array();
 
         // Append this player's markup to the main markup array
-        $this_markup .= $this_player_data['player_markup'];
+        $this_markup .= isset($this_player_data['player_markup']) ? $this_player_data['player_markup'] : '';
 
         // -- PLAYER ROBOT SPRITES -- //
 
@@ -1963,10 +1967,12 @@ class rpg_canvas {
         // -- TARGET PLAYER SPRITES -- //
 
         // Collect the target player's markup data
-        $target_player_data = $eventinfo['target_player']->canvas_markup($options);
+        $target_player_data = !empty($eventinfo['target_player']) ? $eventinfo['target_player']->canvas_markup($options) : array();
 
         // Append the target player's markup to the main markup array
-        $this_markup .= $target_player_data['player_markup'];
+        $this_markup .= isset($target_player_data['player_markup']) ? $target_player_data['player_markup'] : '';
+
+        // -- TARGET PLAYER ROBOT SPRITES -- //
 
         // Loop through and display the target player's robots
         if ($options['canvas_show_target_robots'] && !empty($eventinfo['target_player']->player_robots)){

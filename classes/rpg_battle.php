@@ -2644,7 +2644,7 @@ class rpg_battle extends rpg_object {
             // Define the target robot variable to start
             $target_player = $this->find_target_player($target_side);
             // Ensure the robot array is not empty
-            if (!empty($this->values['robots'])){
+            if (!empty($target_player) && !empty($this->values['robots'])){
                 // Loop through the battle's robot characters one by one
                 foreach ($this->values['robots'] AS $robot_id => $robot_info){
                     // If the robot matches the request side, return the robot
@@ -2667,7 +2667,9 @@ class rpg_battle extends rpg_object {
             // Collect the player info as well
             $target_player = $this->find_target_player($robot_info['player_id']);
             // Create the robot object and return to caller
-            $target_robot = rpg_game::get_robot($this, $target_player, $robot_info);
+            if (!empty($target_player)){
+                $target_robot = rpg_game::get_robot($this, $target_player, $robot_info);
+            }
 
         }
         // Return the final value of the target robot
