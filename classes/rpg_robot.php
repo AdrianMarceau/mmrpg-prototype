@@ -1547,7 +1547,7 @@ class rpg_robot extends rpg_object {
         $this_ability->recovery_options_reset();
 
         // Determine how much weapon energy this should take
-        if (!empty($this_ability['ability_energy_percent'])){ $temp_ability_energy = ceil($this->robot_base_weapons * ($this_ability['ability_energy'] / 100)); }
+        if (!empty($this_ability->ability_energy_percent)){ $temp_ability_energy = ceil($this->robot_base_weapons * ($this_ability->ability_energy / 100)); }
         else { $temp_ability_energy = $this->calculate_weapon_energy($this_ability); }
 
         // Decrease this robot's weapon energy
