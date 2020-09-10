@@ -2628,28 +2628,49 @@ class rpg_battle extends rpg_object {
     }
 
     // Define a function for finding a target robot based on field side
-    public function find_target_robot($side_or_id){
+    public function find_target_robot($side_or_id_or_player){
 
         // If a string argument was provided in left/right, search that way
-        if (is_string($side_or_id) && in_array($side_or_id, array('left', 'right'))){ $target_side = $side_or_id; }
-        elseif (is_numeric($side_or_id) && !empty($side_or_id)){ $target_id = $side_or_id; }
-        else { return false; }
+        if (is_string($side_or_id_or_player) && in_array($side_or_id_or_player, array('left', 'right'))){ $target_side = $side_or_id_or_player; }
+        elseif (is_numeric($side_or_id_or_player) && !empty($side_or_id_or_player)){ $target_id = $side_or_id_or_player; }
+        elseif (is_object($side_or_id_or_player) && !empty($side_or_id_or_player)){
+            $target_player = $side_or_id_or_player;
+            $target_side = $target_player->player_side;
+            $target_id = $target_player->player_id;
+        } else {
+            return false;
+        }
 
         // Define the target robot variable to start
         $target_robot = false;
 
-        // If this search is based on robot side, loop and filter
-        if (isset($target_side)){
+        // If this search is was provided a player object already
+        if (isset($target_player)){
 
-            // Define the target robot variable to start
-            $target_player = $this->find_target_player($target_side);
             // Ensure the robot array is not empty
             if (!empty($target_player) && !empty($this->values['robots'])){
                 // Loop through the battle's robot characters one by one
                 foreach ($this->values['robots'] AS $robot_id => $robot_info){
                     // If the robot matches the request side, return the robot
                     if ($robot_info['player_id'] == $target_player->player_id && $robot_info['robot_position'] == 'active'){
-                        $target_robot = rpg_game::get_robot($this, $target_player, $robot_info);
+                        return rpg_game::get_robot($this, $target_player, $robot_info);
+                    }
+                }
+            }
+
+        }
+        // Else if this search is based on robot side, loop and filter
+        elseif (isset($target_side)){
+
+            // Collect the target player object if not provided by the function
+            if (empty($target_player)){ $target_player = $this->find_target_player($target_side); }
+            // Ensure the robot array is not empty
+            if (!empty($target_player) && !empty($this->values['robots'])){
+                // Loop through the battle's robot characters one by one
+                foreach ($this->values['robots'] AS $robot_id => $robot_info){
+                    // If the robot matches the request side, return the robot
+                    if ($robot_info['player_id'] == $target_player->player_id && $robot_info['robot_position'] == 'active'){
+                        return rpg_game::get_robot($this, $target_player, $robot_info);
                     }
                 }
             }
@@ -2664,16 +2685,15 @@ class rpg_battle extends rpg_object {
             elseif (!isset($this->values['robots'][$target_id])){ return false; }
             // Otherwise collect the robot info from the battle
             $robot_info = $this->values['robots'][$target_id];
-            // Collect the player info as well
-            $target_player = $this->find_target_player($robot_info['player_id']);
+            // Collect the target player object if not provided by the function
+            if (empty($target_player)){ $target_player = $this->find_target_player($robot_info['player_id']); }
             // Create the robot object and return to caller
-            if (!empty($target_player)){
-                $target_robot = rpg_game::get_robot($this, $target_player, $robot_info);
-            }
+            if (!empty($target_player)){ return rpg_game::get_robot($this, $target_player, $robot_info); }
 
         }
-        // Return the final value of the target robot
-        return $target_robot;
+
+        // Return false if nothing was found
+        return false;
     }
 
     // Define a function for generating star console variables
