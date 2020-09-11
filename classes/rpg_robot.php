@@ -802,6 +802,11 @@ class rpg_robot extends rpg_object {
          * public function apply_stat_bonuses(){}
          */
 
+        // Trigger this robot's item function if one has been defined for this context
+        $options = new stdClass;
+        $extra_objects = array('options' => $options);
+        $this->trigger_item_function('rpg-robot_apply-stat-bonuses_before', $extra_objects);
+
         // If this is robot's player is human controlled
         if ($this->player->player_autopilot != true && $this->robot_class == 'master'){
 
@@ -911,6 +916,9 @@ class rpg_robot extends rpg_object {
             }
 
         }
+
+        // Trigger this robot's item function if one has been defined for this context
+        $this->trigger_item_function('rpg-robot_apply-stat-bonuses_after', $extra_objects);
 
         // Create the stat boost flag
         $this->flags['apply_stat_bonuses'] = true;
