@@ -333,6 +333,32 @@ class rpg_robot extends rpg_object {
 
     }
 
+    // Define a public function for triggering an item function if one is being held
+    public function trigger_item_function($function, $extra_objects = array()){
+
+        // Check to make sure this robot has a held item, else return now
+        $item_token = $this->get_item();
+        if (empty($item_token)){ return; }
+
+        // Otherwise, collect this item's object from the game class
+        static $item_info = array();
+        if (empty($item_info[$item_token])){ $item_info[$item_token] = array('item_token' => $item_token); }
+        $this_item = rpg_game::get_item($this->battle, $this->player, $this, $item_info[$item_token]);
+        if (!isset($item_info[$item_token]['item_id'])){ $item_info[$item_token]['item_id'] = $this_item->item_id; }
+
+        // Check to make sure this item has the given function defined, else return now
+        if (!isset($this_item->item_functions_custom[$function])){ return; }
+
+        // Merge in any additional object refs into the array
+        if (!is_array($extra_objects)){ $extra_objects = array(); }
+        $extra_objects = array_merge($extra_objects, array('this_item' => $this_item));
+
+        // Otherwise collect an array of global objects for this robot
+        $objects = $this->get_objects($extra_objects);
+        return $this_item->item_functions_custom[$function]($objects);
+
+    }
+
 
     // Define alias functions for updating specific fields quickly
 
