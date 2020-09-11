@@ -324,13 +324,12 @@ class rpg_robot extends rpg_object {
     public function trigger_onload(){
 
         // Trigger the onload function if it exists
-        $temp_function = $this->robot_function_onload;
-        $temp_result = $temp_function(array(
-            'this_field' => isset($this->battle->battle_field) ? $this->battle->battle_field : false,
-            'this_battle' => $this->battle,
-            'this_player' => $this->player,
-            'this_robot' => $this
-            ));
+        static $onload_triggered;
+        if (empty($onload_triggered)){
+            $onload_triggered = true;
+            $temp_function = $this->robot_function_onload;
+            $temp_result = $temp_function(self::get_objects());
+        }
 
     }
 
@@ -1632,15 +1631,10 @@ class rpg_robot extends rpg_object {
         $this_ability_function = $this_ability->ability_function;
         if (!empty($this_ability_function)
             && is_callable($this_ability_function)){
-            $this_ability_function(array(
-                'this_battle' => $this->battle,
-                'this_field' => $this->field,
-                'this_player' => $this->player,
-                'this_robot' => $this,
-                'target_player' => $target_robot->player,
+            $this_ability_function(self::get_objects(array(
                 'target_robot' => $target_robot,
                 'this_ability' => $this_ability
-                ));
+                )));
         }
 
 
@@ -1791,15 +1785,10 @@ class rpg_robot extends rpg_object {
 
         // Copy the item function to local scope and execute it
         $this_item_function = $this_item->item_function;
-        $this_item_function(array(
-            'this_battle' => $this->battle,
-            'this_field' => $this->field,
-            'this_player' => $this->player,
-            'this_robot' => $this,
-            'target_player' => $target_robot->player,
+        $this_item_function(self::get_objects(array(
             'target_robot' => $target_robot,
             'this_item' => $this_item
-            ));
+            )));
 
 
         // If this robot's image has been changed, reveert it back to what it was
@@ -1951,22 +1940,12 @@ class rpg_robot extends rpg_object {
 
             // Default this and the target robot's frames to their base
             $this->robot_frame = 'base';
-            //$target_robot->robot_frame = 'base';
-
-            // Collect the target robot and player objects
-            //$target_robot_info = $this->battle->values['robots'][];
 
             // Copy the attachment function to local scope and execute it
             $this_attachment_function = $this_ability->ability_function_attachment;
-            $this_attachment_function(array(
-                'this_battle' => $this->battle,
-                'this_field' => $this->field,
-                'this_player' => $this->player,
-                'this_robot' => $this,
-                //'target_player' => $target_robot->player,
-                //'target_robot' => $target_robot,
+            $this_attachment_function(self::get_objects(array(
                 'this_ability' => $this_ability
-                ));
+                )));
 
             // Update this ability's attachment history with the triggered attachment data and results
             $this_ability->history['attachment_results'][] = $this_ability->attachment_results;
@@ -2023,22 +2002,12 @@ class rpg_robot extends rpg_object {
 
             // Default this and the target robot's frames to their base
             $this->robot_frame = 'base';
-            //$target_robot->robot_frame = 'base';
-
-            // Collect the target robot and player objects
-            //$target_robot_info = $this->battle->values['robots'][];
 
             // Copy the attachment function to local scope and execute it
             $this_attachment_function = $this_item->item_function_attachment;
-            $this_attachment_function(array(
-                'this_battle' => $this->battle,
-                'this_field' => $this->field,
-                'this_player' => $this->player,
-                'this_robot' => $this,
-                //'target_player' => $target_robot->player,
-                //'target_robot' => $target_robot,
+            $this_attachment_function(self::get_objects(array(
                 'this_item' => $this_item
-                ));
+                )));
 
             // Update this item's attachment history with the triggered attachment data and results
             $this_item->history['attachment_results'][] = $this_item->attachment_results;
