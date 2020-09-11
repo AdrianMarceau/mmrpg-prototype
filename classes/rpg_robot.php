@@ -712,6 +712,60 @@ class rpg_robot extends rpg_object {
         return $current_attachments;
     }
 
+    // Define a public function for getting all global objects related to this robot
+    private function get_objects($extra_objects = array()){
+
+        // Collect target robot if possible
+        static $target_player, $target_robot;
+        $target_side = $this->player->player_side !== 'left' ? 'left' : 'right';
+        if (empty($target_player)){ $target_player = $this->battle->find_target_player($target_side); }
+        $target_robot = $this->battle->find_target_robot($target_side);
+
+        // Collect refs to all the known objects for this robot
+        $objects = array(
+            'this_battle' => $this->battle,
+            'this_player' => $this->player,
+            'this_robot' => $this
+            );
+
+        // Merge in any additional object refs into the array
+        if (!is_array($extra_objects)){ $extra_objects = array(); }
+        if (!empty($extra_objects)){ $objects = array_merge($objects, $extra_objects); }
+
+        // Attempt to collect the battle field if not already set by the calling method
+        static $default_battle_field;
+        if (empty($objects['this_field'])){
+            if (!empty($this->field)){ $objects['this_field'] = $this->field; }
+            elseif (!empty($this->battle->battle_field)){ $objects['this_field'] = $this->battle->battle_field; }
+            elseif (!empty($default_battle_field)){ $objects['this_field'] = $default_battle_field; }
+            if (!empty($objects['this_field'])){ $default_battle_field = $objects['this_field']; }
+        }
+
+        // Attempt to collect the target player if not already set by the calling method
+        static $default_target_player;
+        if (empty($objects['target_player'])){
+            $target_player_side = $this->player->player_side !== 'left' ? 'left' : 'right';
+            if (!empty($objects['target_robot'])){ $objects['target_player'] = $objects['target_robot']->player; }
+            elseif (!empty($default_target_player)){ $objects['target_player'] = $default_target_player; }
+            else { $objects['target_player'] = $this->battle->find_target_player($target_player_side); }
+            if (!empty($objects['target_player'])){ $default_target_player = $objects['target_player']; }
+        }
+
+        // Attempt to collect the target robot if not already set by the calling method
+        static $default_target_robot;
+        if (empty($objects['target_robot'])){
+            $target_robot_side = $this->player->player_side !== 'left' ? 'left' : 'right';
+            if (!empty($objects['target_player'])){ $objects['target_robot'] = $this->battle->find_target_robot($objects['target_player']);; }
+            elseif (!empty($default_target_robot)){ $objects['target_robot'] = $default_target_robot; }
+            else { $objects['target_robot'] = $this->battle->find_target_robot($target_robot_side); }
+            if (!empty($objects['target_robot'])){ $default_target_robot = $objects['target_robot']; }
+        }
+
+        // Return the full object array for later extracting
+        return $objects;
+
+    }
+
     // Define a public function for applying robot stat bonuses
     public function apply_stat_bonuses(){
 
