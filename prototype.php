@@ -279,7 +279,7 @@ if (mmrpg_prototype_item_unlocked('wily-program')){
 <meta name="viewport" content="user-scalable=yes, width=768, height=1004">
 
 </head>
-<body id="mmrpg" class="prototype">
+<body id="mmrpg" class="prototype <?= 'env_'.MMRPG_CONFIG_SERVER_ENV ?>">
 
 <div id="prototype" class="hidden">
 

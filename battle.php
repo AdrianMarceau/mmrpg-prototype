@@ -226,7 +226,7 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
 
 </script>
 </head>
-<body id="mmrpg" class="battle">
+<body id="mmrpg" class="battle <?= 'env_'.MMRPG_CONFIG_SERVER_ENV ?>">
 <div id="battle" class="hidden <?= $flag_skip_fadein ? 'fastfade' : '' ?>">
 
     <form id="engine" action="battle_loop.php<?= $flag_wap ? '?wap=true' : '' ?>" target="connect" method="post">

@@ -2804,6 +2804,12 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     opacity: 0.10;
     filter: alpha(opacity=10);
 }
+#mmrpg.env_local #actions .actions_resend {
+    opacity: 0.5;
+    border-color: red !important;
+    right: 5px;
+    bottom: 5px;
+}
 
 #actions .actions_loading .main_actions {
     height: auto;
