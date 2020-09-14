@@ -112,12 +112,16 @@ class rpg_player extends rpg_object {
         $this->player_base_switch = isset($this_playerinfo['player_base_switch']) ? $this_playerinfo['player_base_switch'] : $this->player_switch;
 
         // Collect any functions associated with this player
-        $temp_functions_path = MMRPG_CONFIG_PLAYERS_CONTENT_PATH.$this->player_token.'/functions.php';
-        if (file_exists($temp_functions_path)){ require($temp_functions_path); }
-        else { $functions = array(); }
-        $this->player_function = isset($functions['player_function']) ? $functions['player_function'] : function(){};
-        $this->player_function_onload = isset($functions['player_function_onload']) ? $functions['player_function_onload'] : function(){};
-        unset($functions);
+        static $functions_loaded;
+        if (empty($functions_loaded)){
+            $temp_functions_path = MMRPG_CONFIG_PLAYERS_CONTENT_PATH.$this->player_token.'/functions.php';
+            if (file_exists($temp_functions_path)){ require($temp_functions_path); }
+            else { $functions = array(); }
+            $this->player_function = isset($functions['player_function']) ? $functions['player_function'] : function(){};
+            $this->player_function_onload = isset($functions['player_function_onload']) ? $functions['player_function_onload'] : function(){};
+            unset($functions);
+            $functions_loaded = true;
+        }
 
         // Remove any abilities that do not exist in the index
         if (!empty($this->player_abilities)){
@@ -198,16 +202,28 @@ class rpg_player extends rpg_object {
 
     }
 
+    // Define a function for re-loreading the current player from session
+    public function player_reload(){
+        $this->player_load(array(
+            'player_id' => $this->player_id,
+            'player_token' => $this->player_token
+            ));
+    }
+
     // Define a function for refreshing this player and running onload actions
     public function trigger_onload(){
 
-        // Trigger the onload function if it exists
-        $temp_function = $this->player_function_onload;
-        $temp_result = $temp_function(array(
-            'this_field' => isset($this->battle->battle_field) ? $this->battle->battle_field : false,
-            'this_battle' => $this->battle,
-            'this_player' => $this
-            ));
+        // Trigger the onload function if not already called
+        static $onload_triggered;
+        if (empty($onload_triggered)){
+            $onload_triggered = true;
+            $temp_function = $this->player_function_onload;
+            $temp_result = $temp_function(array(
+                'this_field' => isset($this->battle->battle_field) ? $this->battle->battle_field : false,
+                'this_battle' => $this->battle,
+                'this_player' => $this
+                ));
+        }
 
     }
 
@@ -1963,9 +1979,11 @@ class rpg_player extends rpg_object {
                 // Ensure a token an idea are provided at least
                 if (empty($this_robotinfo['robot_id']) || empty($this_robotinfo['robot_token'])){ continue; }
                 // Define the current temp robot object using the loaded robot data
-                $temp_robot = rpg_game::get_robot($this->battle, $this, $this_robotinfo, false);
-                if (!isset($temp_robot->robot_key)){ $temp_robot->robot_key = $this_key; }
-                $temp_robot->update_session();
+                $temp_info = array('robot_id' => $this_robotinfo['robot_id'], 'robot_token' => $this_robotinfo['robot_token']);
+                $temp_robot = rpg_game::get_robot($this->battle, $this, $temp_info, false);
+                if (!isset($temp_robot->robot_key)){ $temp_robot->set_key($this_key); }
+                // Update the player object with the refreshed robot info
+                $this->player_robots[$this_key] = $temp_robot->export_array();
                 // Check if this robot is in the active position
                 if ($temp_robot->robot_position == 'active'){
                     $this->values['current_robot'] = $temp_robot->robot_string;
