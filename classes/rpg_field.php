@@ -92,12 +92,16 @@ class rpg_field extends rpg_object {
         $this->field_base_music = isset($this_fieldinfo['field_base_music']) ? $this_fieldinfo['field_base_music'] : $this->field_music;
 
         // Collect any functions associated with this field
-        $temp_functions_path = MMRPG_CONFIG_FIELDS_CONTENT_PATH.$this->field_token.'/functions.php';
-        if (file_exists($temp_functions_path)){ require($temp_functions_path); }
-        else { $functions = array(); }
-        $this->field_function = isset($functions['field_function']) ? $functions['field_function'] : function(){};
-        $this->field_function_onload = isset($functions['field_function_onload']) ? $functions['field_function_onload'] : function(){};
-        unset($functions);
+        static $functions_loaded;
+        if (empty($functions_loaded)){
+            $functions_loaded = true;
+            $temp_functions_path = MMRPG_CONFIG_FIELDS_CONTENT_PATH.$this->field_token.'/functions.php';
+            if (file_exists($temp_functions_path)){ require($temp_functions_path); }
+            else { $functions = array(); }
+            $this->field_function = isset($functions['field_function']) ? $functions['field_function'] : function(){};
+            $this->field_function_onload = isset($functions['field_function_onload']) ? $functions['field_function_onload'] : function(){};
+            unset($functions);
+        }
 
         // Trigger the onload function if it exists
         $this->trigger_onload();
@@ -110,15 +114,27 @@ class rpg_field extends rpg_object {
 
     }
 
+    // Define a function for re-loreading the current field from session
+    public function field_reload(){
+        $this->field_load(array(
+            'field_id' => $this->field_id,
+            'field_token' => $this->field_token
+            ));
+    }
+
     // Define a function for refreshing this field and running onload actions
     public function trigger_onload(){
 
-        // Trigger the onload function if it exists
-        $temp_function = $this->field_function_onload;
-        $temp_result = $temp_function(array(
-            'this_battle' => isset($this->battle) ? $this->battle : false,
-            'this_field' => $this
-            ));
+        // Trigger the onload function if not already called
+        static $onload_triggered;
+        if (empty($onload_triggered)){
+            $onload_triggered = true;
+            $temp_function = $this->field_function_onload;
+            $temp_result = $temp_function(array(
+                'this_battle' => isset($this->battle) ? $this->battle : false,
+                'this_field' => $this
+                ));
+        }
 
     }
 
