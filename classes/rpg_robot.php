@@ -199,15 +199,19 @@ class rpg_robot extends rpg_object {
         if ($this->robot_base_speed > MMRPG_SETTINGS_STATS_MAX){ $this->robot_base_speed = MMRPG_SETTINGS_STATS_MAX; }
 
         // Collect any functions associated with this robot
-        $temp_functions_path = MMRPG_CONFIG_ROBOTS_CONTENT_PATH.$this->robot_token.'/functions.php';
-        if (file_exists($temp_functions_path)){ require($temp_functions_path); }
-        else { $functions = array(); }
-        $this->robot_function = isset($functions['robot_function']) ? $functions['robot_function'] : function(){};
-        $this->robot_function_onload = isset($functions['robot_function_onload']) ? $functions['robot_function_onload'] : function(){};
-        $this->robot_function_ondamage = isset($functions['robot_function_ondamage']) ? $functions['robot_function_ondamage'] : function(){};
-        $this->robot_function_onrecovery = isset($functions['robot_function_onrecovery']) ? $functions['robot_function_onrecovery'] : function(){};
-        $this->robot_function_ondisabled = isset($functions['robot_function_ondisabled']) ? $functions['robot_function_ondisabled'] : function(){};
-        unset($functions);
+        static $functions_loaded;
+        if (empty($functions_loaded)){
+            $functions_loaded = true;
+            $temp_functions_path = MMRPG_CONFIG_ROBOTS_CONTENT_PATH.$this->robot_token.'/functions.php';
+            if (file_exists($temp_functions_path)){ require($temp_functions_path); }
+            else { $functions = array(); }
+            $this->robot_function = isset($functions['robot_function']) ? $functions['robot_function'] : function(){};
+            $this->robot_function_onload = isset($functions['robot_function_onload']) ? $functions['robot_function_onload'] : function(){};
+            $this->robot_function_ondamage = isset($functions['robot_function_ondamage']) ? $functions['robot_function_ondamage'] : function(){};
+            $this->robot_function_onrecovery = isset($functions['robot_function_onrecovery']) ? $functions['robot_function_onrecovery'] : function(){};
+            $this->robot_function_ondisabled = isset($functions['robot_function_ondisabled']) ? $functions['robot_function_ondisabled'] : function(){};
+            unset($functions);
+        }
 
         // If the omega settings have not been defined yet, do so now
         if (empty($this->flags['calculate_omega_types'])){
@@ -320,10 +324,18 @@ class rpg_robot extends rpg_object {
 
     }
 
+    // Define a function for re-loreading the current robot from session
+    public function robot_reload(){
+        $this->robot_load(array(
+            'robot_id' => $this->robot_id,
+            'robot_token' => $this->robot_token
+            ));
+    }
+
     // Define a function for refreshing this robot and running onload actions
     public function trigger_onload(){
 
-        // Trigger the onload function if it exists
+        // Trigger the onload function if not already called
         static $onload_triggered;
         if (empty($onload_triggered)){
             $onload_triggered = true;
