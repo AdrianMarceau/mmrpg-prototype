@@ -162,19 +162,23 @@ class rpg_item extends rpg_object {
         $this->item_base_target = isset($this_iteminfo['item_base_target']) ? $this_iteminfo['item_base_target'] : $this->item_target;
 
         // Collect any functions associated with this item
-        $temp_functions_path = MMRPG_CONFIG_ITEMS_CONTENT_PATH.$this->item_token.'/functions.php';
-        if (file_exists($temp_functions_path)){ require($temp_functions_path); }
-        else { $functions = array(); }
-        $this->item_function = isset($functions['item_function']) ? $functions['item_function'] : function(){};
-        $this->item_function_onload = isset($functions['item_function_onload']) ? $functions['item_function_onload'] : function(){};
-        $this->item_function_attachment = isset($functions['item_function_attachment']) ? $functions['item_function_attachment'] : function(){};
-        $this->item_functions_custom = array();
-        foreach ($functions AS $name => $function){
-            if (strpos($name, 'item_function_') === 0){ continue; }
-            elseif (!is_callable($function)){ continue; }
-            $this->item_functions_custom[$name] = $function;
+        static $functions_loaded;
+        if (empty($functions_loaded)){
+            $functions_loaded = true;
+            $temp_functions_path = MMRPG_CONFIG_ITEMS_CONTENT_PATH.$this->item_token.'/functions.php';
+            if (file_exists($temp_functions_path)){ require($temp_functions_path); }
+            else { $functions = array(); }
+            $this->item_function = isset($functions['item_function']) ? $functions['item_function'] : function(){};
+            $this->item_function_onload = isset($functions['item_function_onload']) ? $functions['item_function_onload'] : function(){};
+            $this->item_function_attachment = isset($functions['item_function_attachment']) ? $functions['item_function_attachment'] : function(){};
+            $this->item_functions_custom = array();
+            foreach ($functions AS $name => $function){
+                if (strpos($name, 'item_function_') === 0){ continue; }
+                elseif (!is_callable($function)){ continue; }
+                $this->item_functions_custom[$name] = $function;
+            }
+            unset($functions);
         }
-        unset($functions);
 
         // Define a the default item results
         $this->item_results_reset();
@@ -195,22 +199,34 @@ class rpg_item extends rpg_object {
 
     }
 
+    // Define a function for re-loreading the current item from session
+    public function item_reload(){
+        $this->item_load(array(
+            'item_id' => $this->item_id,
+            'item_token' => $this->item_token
+            ));
+    }
+
     // Define a function for refreshing this item and running onload actions
     public function trigger_onload(){
 
-        // Trigger the onload function if it exists
-        $temp_target_player = $this->battle->find_target_player($this->player->player_side != 'right' ? 'right' : 'left');
-        $temp_target_robot = $this->battle->find_target_robot($this->player->player_side != 'right' ? 'right' : 'left');
-        $temp_function = $this->item_function_onload;
-        $temp_result = $temp_function(array(
-            'this_field' => $this->battle->battle_field,
-            'this_battle' => $this->battle,
-            'this_player' => $this->player,
-            'this_robot' => $this->robot,
-            'target_player' => $temp_target_player,
-            'target_robot' => $temp_target_robot,
-            'this_item' => $this
-            ));
+        // Trigger the onload function if not already called
+        static $onload_triggered;
+        if (empty($onload_triggered)){
+            $onload_triggered = true;
+            $temp_target_player = $this->battle->find_target_player($this->player->player_side != 'right' ? 'right' : 'left');
+            $temp_target_robot = $this->battle->find_target_robot($this->player->player_side != 'right' ? 'right' : 'left');
+            $temp_function = $this->item_function_onload;
+            $temp_result = $temp_function(array(
+                'this_field' => $this->battle->battle_field,
+                'this_battle' => $this->battle,
+                'this_player' => $this->player,
+                'this_robot' => $this->robot,
+                'target_player' => $temp_target_player,
+                'target_robot' => $temp_target_robot,
+                'this_item' => $this
+                ));
+        }
 
     }
 
