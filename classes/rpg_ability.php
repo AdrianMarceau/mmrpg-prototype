@@ -164,14 +164,18 @@ class rpg_ability extends rpg_object {
         $this->ability_base_target = isset($this_abilityinfo['ability_base_target']) ? $this_abilityinfo['ability_base_target'] : $this->ability_target;
 
         // Collect any functions associated with this ability
-        $temp_functions_dir = preg_replace('/^action-/', '_actions/', $this->ability_token);
-        $temp_functions_path = MMRPG_CONFIG_ABILITIES_CONTENT_PATH.$temp_functions_dir.'/functions.php';
-        if (file_exists($temp_functions_path)){ require($temp_functions_path); }
-        else { $functions = array(); }
-        $this->ability_function = isset($functions['ability_function']) ? $functions['ability_function'] : function(){};
-        $this->ability_function_onload = isset($functions['ability_function_onload']) ? $functions['ability_function_onload'] : function(){};
-        $this->ability_function_attachment = isset($functions['ability_function_attachment']) ? $functions['ability_function_attachment'] : function(){};
-        unset($functions);
+        static $functions_loaded;
+        if (empty($functions_loaded)){
+            $functions_loaded = true;
+            $temp_functions_dir = preg_replace('/^action-/', '_actions/', $this->ability_token);
+            $temp_functions_path = MMRPG_CONFIG_ABILITIES_CONTENT_PATH.$temp_functions_dir.'/functions.php';
+            if (file_exists($temp_functions_path)){ require($temp_functions_path); }
+            else { $functions = array(); }
+            $this->ability_function = isset($functions['ability_function']) ? $functions['ability_function'] : function(){};
+            $this->ability_function_onload = isset($functions['ability_function_onload']) ? $functions['ability_function_onload'] : function(){};
+            $this->ability_function_attachment = isset($functions['ability_function_attachment']) ? $functions['ability_function_attachment'] : function(){};
+            unset($functions);
+        }
 
         // Define a the default ability results
         $this->ability_results_reset();
@@ -192,22 +196,34 @@ class rpg_ability extends rpg_object {
 
     }
 
+    // Define a function for re-loreading the current ability from session
+    public function ability_reload(){
+        $this->ability_load(array(
+            'ability_id' => $this->ability_id,
+            'ability_token' => $this->ability_token
+            ));
+    }
+
     // Define a function for refreshing this ability and running onload actions
     public function trigger_onload(){
 
-        // Trigger the onload function if it exists
-        $temp_target_player = $this->battle->find_target_player($this->player->player_side != 'right' ? 'right' : 'left');
-        $temp_target_robot = $this->battle->find_target_robot($this->player->player_side != 'right' ? 'right' : 'left');
-        $temp_function = $this->ability_function_onload;
-        $temp_result = $temp_function(array(
-            'this_field' => $this->battle->battle_field,
-            'this_battle' => $this->battle,
-            'this_player' => $this->player,
-            'this_robot' => $this->robot,
-            'target_player' => $temp_target_player,
-            'target_robot' => $temp_target_robot,
-            'this_ability' => $this
-            ));
+        // Trigger the onload function if not already called
+        static $onload_triggered;
+        if (empty($onload_triggered)){
+            $onload_triggered = true;
+            $temp_target_player = $this->battle->find_target_player($this->player->player_side != 'right' ? 'right' : 'left');
+            $temp_target_robot = $this->battle->find_target_robot($this->player->player_side != 'right' ? 'right' : 'left');
+            $temp_function = $this->ability_function_onload;
+            $temp_result = $temp_function(array(
+                'this_field' => $this->battle->battle_field,
+                'this_battle' => $this->battle,
+                'this_player' => $this->player,
+                'this_robot' => $this->robot,
+                'target_player' => $temp_target_player,
+                'target_robot' => $temp_target_robot,
+                'this_ability' => $this
+                ));
+        }
 
     }
 
