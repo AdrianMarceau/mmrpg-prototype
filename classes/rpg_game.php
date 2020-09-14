@@ -63,7 +63,7 @@ class rpg_game {
      * @param array $this_playerinfo
      * @return rpg_player
      */
-    public static function get_player($this_battle, $this_playerinfo){
+    public static function get_player($this_battle, $this_playerinfo, $trigger_onload = true){
 
         // If the player index has not been created, do so
         if (!isset(self::$index['players'])){ self::$index['players'] = array(); }
@@ -89,7 +89,7 @@ class rpg_game {
 
             // Collect the player from the index and return
             $this_player = self::$index['players'][$player_id];
-            $this_player->trigger_onload();
+            if ($trigger_onload){ $this_player->trigger_onload(); }
 
         }
         // Otherwise create a new player object in the index
@@ -112,7 +112,7 @@ class rpg_game {
      * @param array $this_robotinfo
      * @return rpg_robot
      */
-    public static function get_robot($this_battle, $this_player, $this_robotinfo){
+    public static function get_robot($this_battle, $this_player, $this_robotinfo, $trigger_onload = true){
 
         // If the robot index has not been created, do so
         if (!isset(self::$index['robots'])){ self::$index['robots'] = array(); }
@@ -139,7 +139,7 @@ class rpg_game {
 
             // Collect the robot from the index and return
             $this_robot = self::$index['robots'][$robot_id];
-            $this_robot->trigger_onload();
+            if ($trigger_onload){ $this_robot->trigger_onload(); }
 
         }
         // Otherwise create a new robot object in the index
@@ -162,7 +162,7 @@ class rpg_game {
      * @param array $this_abilityinfo
      * @return rpg_ability
      */
-    public static function get_ability($this_battle, $this_player, $this_robot, $this_abilityinfo){
+    public static function get_ability($this_battle, $this_player, $this_robot, $this_abilityinfo, $trigger_onload = true){
 
         // If the ability index has not been created, do so
         if (!isset(self::$index['abilities'])){ self::$index['abilities'] = array(); }
@@ -190,7 +190,7 @@ class rpg_game {
 
             // Collect the ability from the index and return
             $this_ability = self::$index['abilities'][$ability_id];
-            $this_ability->trigger_onload();
+            if ($trigger_onload){ $this_ability->trigger_onload(); }
 
         }
         // Otherwise create a new ability object in the index
@@ -213,7 +213,7 @@ class rpg_game {
      * @param array $this_iteminfo
      * @return rpg_item
      */
-    public static function get_item($this_battle, $this_player, $this_robot, $this_iteminfo){
+    public static function get_item($this_battle, $this_player, $this_robot, $this_iteminfo, $trigger_onload = true){
 
         // If the item index has not been created, do so
         if (!isset(self::$index['items'])){ self::$index['items'] = array(); }
@@ -241,7 +241,7 @@ class rpg_game {
 
             // Collect the item from the index and return
             $this_item = self::$index['items'][$item_id];
-            $this_item->trigger_onload();
+            if ($trigger_onload){ $this_item->trigger_onload(); }
 
         }
         // Otherwise create a new item object in the index
@@ -381,6 +381,26 @@ class rpg_game {
         }
         return $robots;
     }
+
+    /**
+     * Create a new generic options object to be used as in object functions
+     * @return stdClass
+     */
+    public static function new_options_object(){
+        $options = new stdClass;
+        self::reset_options_object($options);
+        return $options;
+    }
+
+    /**
+     * Reset known settings in the generic options object used in for object functions
+     * @return stdClass
+     */
+    public static function reset_options_object($options){
+        $options->return_early = false;
+        $options->return_value = null;
+    }
+
 
 
 
