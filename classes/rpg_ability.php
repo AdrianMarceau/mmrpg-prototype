@@ -3704,7 +3704,7 @@ class rpg_ability extends rpg_object {
             'attachment_token' => $this_attachment_token,
             'attachment_duration' => $this_attachment_duration,
             'attachment_sticky' => true,
-            'attachment_damage_output_breaker' => $static_attachment_multiplier,
+            'attachment_damage_output_breaker' => 0.50,
             'attachment_destroy' => array(
                 'trigger' => 'special',
                 'kind' => '',
