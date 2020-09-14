@@ -336,15 +336,26 @@ class rpg_robot extends rpg_object {
     // Define a public function for triggering an item function if one is being held
     public function trigger_item_function($function, $extra_objects = array()){
 
+        // If provided, reset the options object first
+        if (isset($extra_objects['options'])){
+            rpg_game::reset_options_object($extra_objects['options']);
+        }
+
         // Check to make sure this robot has a held item, else return now
         $item_token = $this->get_item();
         if (empty($item_token)){ return; }
 
         // Otherwise, collect this item's object from the game class
-        static $item_info = array();
-        if (empty($item_info[$item_token])){ $item_info[$item_token] = array('item_token' => $item_token); }
-        $this_item = rpg_game::get_item($this->battle, $this->player, $this, $item_info[$item_token]);
-        if (!isset($item_info[$item_token]['item_id'])){ $item_info[$item_token]['item_id'] = $this_item->item_id; }
+        static $item_cache;
+        if (!isset($item_cache[$item_token]['info'])){
+            $item_cache[$item_token]['info'] = array('item_token' => $item_token);
+            }
+        if (!isset($item_cache[$item_token]['object'])){
+            $item_cache[$item_token]['object'] = rpg_game::get_item($this->battle, $this->player, $this, $item_cache[$item_token]['info']);
+            $item_cache[$item_token]['info']['item_id'] = $item_cache[$item_token]['object']->item_id;
+            }
+        $item_info = $item_cache[$item_token]['info'];
+        $this_item = $item_cache[$item_token]['object'];
 
         // Check to make sure this item has the given function defined, else return now
         if (!isset($this_item->item_functions_custom[$function])){ return; }
@@ -740,12 +751,6 @@ class rpg_robot extends rpg_object {
     // Define a public function for getting all global objects related to this robot
     private function get_objects($extra_objects = array()){
 
-        // Collect target robot if possible
-        static $target_player, $target_robot;
-        $target_side = $this->player->player_side !== 'left' ? 'left' : 'right';
-        if (empty($target_player)){ $target_player = $this->battle->find_target_player($target_side); }
-        $target_robot = $this->battle->find_target_robot($target_side);
-
         // Collect refs to all the known objects for this robot
         $objects = array(
             'this_battle' => $this->battle,
@@ -780,8 +785,8 @@ class rpg_robot extends rpg_object {
         static $default_target_robot;
         if (empty($objects['target_robot'])){
             $target_robot_side = $this->player->player_side !== 'left' ? 'left' : 'right';
-            if (!empty($objects['target_player'])){ $objects['target_robot'] = $this->battle->find_target_robot($objects['target_player']);; }
-            elseif (!empty($default_target_robot)){ $objects['target_robot'] = $default_target_robot; }
+            if (!empty($default_target_robot)){ $objects['target_robot'] = $default_target_robot; }
+            elseif (!empty($objects['target_player'])){ $objects['target_robot'] = $this->battle->find_target_robot($objects['target_player']); }
             else { $objects['target_robot'] = $this->battle->find_target_robot($target_robot_side); }
             if (!empty($objects['target_robot'])){ $default_target_robot = $objects['target_robot']; }
         }
@@ -802,10 +807,13 @@ class rpg_robot extends rpg_object {
          * public function apply_stat_bonuses(){}
          */
 
-        // Trigger this robot's item function if one has been defined for this context
-        $options = new stdClass;
+        // Create an options object for this function and populate
+        $options = rpg_game::new_options_object();
         $extra_objects = array('options' => $options);
+
+        // Trigger this robot's item function if one has been defined for this context
         $this->trigger_item_function('rpg-robot_apply-stat-bonuses_before', $extra_objects);
+        if ($options->return_early){ return $options->return_value; }
 
         // If this is robot's player is human controlled
         if ($this->player->player_autopilot != true && $this->robot_class == 'master'){
@@ -866,6 +874,7 @@ class rpg_robot extends rpg_object {
             $prop_stat = 'robot_'.$stat;
             $prop_stat_base = 'robot_base_'.$stat;
             $prop_stat_max = 'robot_max_'.$stat;
+            $prop_stat_base_backup = $prop_stat_base.'_backup';
             $this->$prop_stat = $this_robot_stats[$stat]['current'];
             $this->$prop_stat_base = $this_robot_stats[$stat]['current'];
             $this->$prop_stat_max = $this_robot_stats[$stat]['max'];
@@ -882,11 +891,9 @@ class rpg_robot extends rpg_object {
                 && !isset($this->counters[$stat.'_mods'])){
                 $this->counters[$stat.'_mods'] = 0;
             }
+            // Create backups for the base stats in case they don't exist
+            $this->values[$prop_stat_base_backup] = $this->$prop_stat_base;
         }
-
-        // Now that we have base amounts, we should backup energy and weapons
-        if (!isset($this->values['robot_base_energy_backup'])){ $this->values['robot_base_energy_backup'] = $this->robot_base_energy; }
-        if (!isset($this->values['robot_base_weapons_backup'])){ $this->values['robot_base_weapons_backup'] = $this->robot_base_weapons; }
 
         // If this robot is holding a relavant item, apply stat upgrades or other effects
         $this_robot_item = $this->get_item();
@@ -2572,6 +2579,14 @@ class rpg_robot extends rpg_object {
     // Define a public function for recalculating internal counters
     public function update_variables(){
 
+        // Create an options object for this function and populate
+        $options = rpg_game::new_options_object();
+        $extra_objects = array('options' => $options);
+        $options->energy_tokens = array('energy', 'weapons');
+        $options->stat_tokens = array('attack', 'defense', 'speed');
+        $options->element_stats = array('weaknesses', 'resistances', 'affinities', 'immunities');
+        $options->element_stats_mods = array();
+
         // Create variables that don't exist if necessary
         if (!isset($this->history['turns_active'])){ $this->history['turns_active'] = array(); }
         if (!isset($this->history['turns_benched'])){ $this->history['turns_benched'] = array(); }
@@ -2579,25 +2594,55 @@ class rpg_robot extends rpg_object {
         // Calculate this robot's count variables
         $this->counters['abilities_total'] = count($this->robot_abilities);
 
+        // Loop through energy and stat tokens, then reset from backup if exists
+        $all_stat_tokens = array_merge($options->energy_tokens, $options->stat_tokens);
+        foreach ($all_stat_tokens AS $stat_token){
+            $stat_prop_name = 'robot_base_'.$stat_token;
+            $stat_prop_backup_name = $stat_prop_name.'_backup';
+            if (isset($this->values[$stat_prop_backup_name])){
+                $this->$stat_prop_name = $this->values[$stat_prop_backup_name];
+            }
+        }
+
+        // Trigger this robot's item function if one has been defined for this context
+        $this->trigger_item_function('rpg-robot_update-variables_before', $extra_objects);
+        if ($options->return_early){ return $options->return_value; }
+
         // If this robot is holding an ENERGY UPGRADE, double the base amount for now
-        if (isset($this->values['robot_base_energy_backup'])){
-            if (!empty($this->robot_item) && $this->robot_item == 'energy-upgrade'){ $this->robot_base_energy = $this->values['robot_base_energy_backup'] * 2; }
-            else { $this->robot_base_energy = $this->values['robot_base_energy_backup']; }
-            if ($this->robot_energy > $this->robot_base_energy){ $this->robot_energy = $this->robot_base_energy; }
+        if (!empty($this->robot_item)
+            && $this->robot_item == 'energy-upgrade'
+            && isset($this->values['robot_base_energy_backup'])){
+            $this->robot_base_energy = $this->values['robot_base_energy_backup'] * 2;
         }
 
         // If this robot is holding an WEAPON UPGRADE, double the base amount for now
-        if (isset($this->values['robot_base_weapons_backup'])){
-            if (!empty($this->robot_item) && $this->robot_item == 'weapon-upgrade'){ $this->robot_base_weapons = $this->values['robot_base_weapons_backup'] * 2; }
-            else { $this->robot_base_weapons = $this->values['robot_base_weapons_backup']; }
-            if ($this->robot_weapons > $this->robot_base_weapons){ $this->robot_weapons = $this->robot_base_weapons; }
+        if (!empty($this->robot_item)
+            && $this->robot_item == 'weapon-upgrade'
+            && isset($this->values['robot_base_weapons_backup'])){
+            $this->robot_base_weapons = $this->values['robot_base_weapons_backup'] * 2;
         }
 
+        // If this robot is holding an ELEMENTAL CIRCUIT, apply elemental stat mods
+        if (!empty($this->robot_item)){
+            if ($this->robot_item === 'battery-circuit'){
+                $options->element_stats_mods[] = array('add' => array('affinity/electric', 'weakness/nature'));
+            } elseif ($this->robot_item === 'sponge-circuit'){
+                $options->element_stats_mods[] = array('add' => array('affinity/water', 'weakness/electric'));
+            } elseif ($this->robot_item === 'forge-circuit'){
+                $options->element_stats_mods[] = array('add' => array('affinity/flame', 'weakness/water'));
+            } elseif ($this->robot_item === 'sapling-circuit'){
+                $options->element_stats_mods[] = array('add' => array('affinity/nature', 'weakness/flame'));
+            }
+        }
+
+        // If the robot's current life or weapon energy is higher than base, make sure we level it off
+        if ($this->robot_energy > $this->robot_base_energy){ $this->robot_energy = $this->robot_base_energy; }
+        if ($this->robot_weapons > $this->robot_base_weapons){ $this->robot_weapons = $this->robot_base_weapons; }
+
         // Recalculate this robot's effective stats based on modifiers
-        $stat_tokens = array('attack', 'defense', 'speed');
         $mod_numerator = 2;
         $mod_denominator = 2;
-        foreach ($stat_tokens AS $key => $stat){
+        foreach ($options->stat_tokens AS $key => $stat){
             // Collect prop names and base value
             $prop_stat = 'robot_'.$stat;
             $prop_stat_base = 'robot_base_'.$stat;
@@ -2628,45 +2673,62 @@ class rpg_robot extends rpg_object {
         }
 
         // Reset this robot's elemental properties back to base
-        $element_stats = array('weaknesses', 'resistances', 'affinities', 'immunities');
-        foreach ($element_stats AS $key => $stat){
+        foreach ($options->element_stats AS $key => $stat){
             $prop_stat = 'robot_'.$stat;
             $prop_stat_base = 'robot_base_'.$stat;
             $this->$prop_stat = $this->$prop_stat_base;
         }
 
-        // Apply any affinities granted by hold items
-        $elemental_items = array(
-            'battery-circuit' => array('electric', 'nature'),
-            'sponge-circuit' => array('water', 'electric'),
-            'forge-circuit' => array('flame', 'water'),
-            'sapling-circuit' => array('nature', 'flame')
-            );
-        if (!empty($this->robot_item)
-            && !empty($elemental_items[$this->robot_item])){
-            // Collect the element associated with this item
-            $elemental_item = $elemental_items[$this->robot_item];
-            // First we process the AFFINITY mods for this robot
-            if (!empty($elemental_item[0])){
-                $item_affinity = $elemental_item[0];
-                // Add the element as an affinity if not already there
-                if (!in_array($item_affinity, $this->robot_affinities)){ $this->robot_affinities[] = $item_affinity; }
-                // Remove the element from other lists if applicable
-                if (in_array($item_affinity, $this->robot_weaknesses)){ unset($this->robot_weaknesses[array_search($item_affinity, $this->robot_weaknesses)]); }
-                if (in_array($item_affinity, $this->robot_resistances)){ unset($this->robot_resistances[array_search($item_affinity, $this->robot_resistances)]); }
-                if (in_array($item_affinity, $this->robot_immunities)){ unset($this->robot_immunities[array_search($item_affinity, $this->robot_immunities)]); }
-            }
-            // First we process the WEAKNESS mods for this robot
-            if (!empty($elemental_item[1])){
-                $item_weakness = $elemental_item[1];
-                // Add the element as an weakness if not already there
-                if (!in_array($item_weakness, $this->robot_weaknesses)){ $this->robot_weaknesses[] = $item_weakness; }
-                // Remove the element from other lists if applicable
-                if (in_array($item_weakness, $this->robot_affinities)){ unset($this->robot_affinities[array_search($item_weakness, $this->robot_affinities)]); }
-                if (in_array($item_weakness, $this->robot_resistances)){ unset($this->robot_resistances[array_search($item_weakness, $this->robot_resistances)]); }
-                if (in_array($item_weakness, $this->robot_immunities)){ unset($this->robot_immunities[array_search($item_weakness, $this->robot_immunities)]); }
+        // If there are any elemental stat mods, we need to apply them now
+        if (!empty($options->element_stats_mods)){
+            foreach ($options->element_stats_mods AS $mods){
+                // If there are any elements to ADD, loop through and add them
+                if (!empty($mods['add'])){
+                    foreach ($mods['add'] AS $add){
+                        list($kind, $type) = explode('/', $add);
+                        if ($kind === 'affinity'){
+                            if (!in_array($type, $this->robot_affinities)){ $this->robot_affinities[] = $type; }
+                            if (in_array($type, $this->robot_weaknesses)){ unset($this->robot_weaknesses[array_search($type, $this->robot_weaknesses)]); }
+                            if (in_array($type, $this->robot_resistances)){ unset($this->robot_resistances[array_search($type, $this->robot_resistances)]); }
+                            if (in_array($type, $this->robot_immunities)){ unset($this->robot_immunities[array_search($type, $this->robot_immunities)]); }
+                        } elseif ($kind === 'weakness'){
+                            if (!in_array($type, $this->robot_weaknesses)){ $this->robot_weaknesses[] = $type; }
+                            if (in_array($type, $this->robot_affinities)){ unset($this->robot_affinities[array_search($type, $this->robot_affinities)]); }
+                            if (in_array($type, $this->robot_resistances)){ unset($this->robot_resistances[array_search($type, $this->robot_resistances)]); }
+                            if (in_array($type, $this->robot_immunities)){ unset($this->robot_immunities[array_search($type, $this->robot_immunities)]); }
+                        } elseif ($kind === 'resistance'){
+                            if (!in_array($type, $this->robot_resistances)){ $this->robot_resistances[] = $type; }
+                            if (in_array($type, $this->robot_weaknesses)){ unset($this->robot_weaknesses[array_search($type, $this->robot_weaknesses)]); }
+                            if (in_array($type, $this->robot_affinities)){ unset($this->robot_affinities[array_search($type, $this->robot_affinities)]); }
+                            if (in_array($type, $this->robot_immunities)){ unset($this->robot_immunities[array_search($type, $this->robot_immunities)]); }
+                        } elseif ($kind === 'immunity'){
+                            if (!in_array($type, $this->robot_immunities)){ $this->robot_immunities[] = $type; }
+                            if (in_array($type, $this->robot_weaknesses)){ unset($this->robot_weaknesses[array_search($type, $this->robot_weaknesses)]); }
+                            if (in_array($type, $this->robot_affinities)){ unset($this->robot_affinities[array_search($type, $this->robot_affinities)]); }
+                            if (in_array($type, $this->robot_resistances)){ unset($this->robot_resistances[array_search($type, $this->robot_resistances)]); }
+                        }
+                    }
+                }
+                // If there are any elements to REMOVE, loop through and remove them
+                if (!empty($mods['remove'])){
+                    foreach ($mods['remove'] AS $remove){
+                        list($kind, $type) = explode('/', $remove);
+                        if ($kind === 'affinity'){
+                            if (in_array($type, $this->robot_affinities)){ unset($this->robot_affinities[array_search($type, $this->robot_affinities)]); }
+                        } elseif ($kind === 'weakness'){
+                            if (in_array($type, $this->robot_weaknesses)){ unset($this->robot_weaknesses[array_search($type, $this->robot_weaknesses)]); }
+                        } elseif ($kind === 'resistance'){
+                            if (in_array($type, $this->robot_resistances)){ unset($this->robot_affinities[array_search($type, $this->robot_resistances)]); }
+                        } elseif ($kind === 'immunity'){
+                            if (in_array($type, $this->robot_immunities)){ unset($this->robot_immunities[array_search($type, $this->robot_immunities)]); }
+                        }
+                    }
+                }
             }
         }
+
+        // Trigger this robot's item function if one has been defined for this context
+        $this->trigger_item_function('rpg-robot_update-variables_after', $extra_objects);
 
         // Now collect an export array for this object
         $this_data = $this->export_array();
