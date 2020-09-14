@@ -162,9 +162,7 @@ class rpg_item extends rpg_object {
         $this->item_base_target = isset($this_iteminfo['item_base_target']) ? $this_iteminfo['item_base_target'] : $this->item_target;
 
         // Collect any functions associated with this item
-        static $functions_loaded;
-        if (empty($functions_loaded)){
-            $functions_loaded = true;
+        if (!isset($this->item_function)){
             $temp_functions_path = MMRPG_CONFIG_ITEMS_CONTENT_PATH.$this->item_token.'/functions.php';
             if (file_exists($temp_functions_path)){ require($temp_functions_path); }
             else { $functions = array(); }

@@ -199,9 +199,7 @@ class rpg_robot extends rpg_object {
         if ($this->robot_base_speed > MMRPG_SETTINGS_STATS_MAX){ $this->robot_base_speed = MMRPG_SETTINGS_STATS_MAX; }
 
         // Collect any functions associated with this robot
-        static $functions_loaded;
-        if (empty($functions_loaded)){
-            $functions_loaded = true;
+        if (!isset($this->robot_function)){
             $temp_functions_path = MMRPG_CONFIG_ROBOTS_CONTENT_PATH.$this->robot_token.'/functions.php';
             if (file_exists($temp_functions_path)){ require($temp_functions_path); }
             else { $functions = array(); }

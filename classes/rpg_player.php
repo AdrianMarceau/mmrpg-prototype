@@ -112,15 +112,13 @@ class rpg_player extends rpg_object {
         $this->player_base_switch = isset($this_playerinfo['player_base_switch']) ? $this_playerinfo['player_base_switch'] : $this->player_switch;
 
         // Collect any functions associated with this player
-        static $functions_loaded;
-        if (empty($functions_loaded)){
+        if (!isset($this->player_function)){
             $temp_functions_path = MMRPG_CONFIG_PLAYERS_CONTENT_PATH.$this->player_token.'/functions.php';
             if (file_exists($temp_functions_path)){ require($temp_functions_path); }
             else { $functions = array(); }
             $this->player_function = isset($functions['player_function']) ? $functions['player_function'] : function(){};
             $this->player_function_onload = isset($functions['player_function_onload']) ? $functions['player_function_onload'] : function(){};
             unset($functions);
-            $functions_loaded = true;
         }
 
         // Remove any abilities that do not exist in the index

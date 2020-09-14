@@ -92,9 +92,7 @@ class rpg_field extends rpg_object {
         $this->field_base_music = isset($this_fieldinfo['field_base_music']) ? $this_fieldinfo['field_base_music'] : $this->field_music;
 
         // Collect any functions associated with this field
-        static $functions_loaded;
-        if (empty($functions_loaded)){
-            $functions_loaded = true;
+        if (!isset($this->field_function)){
             $temp_functions_path = MMRPG_CONFIG_FIELDS_CONTENT_PATH.$this->field_token.'/functions.php';
             if (file_exists($temp_functions_path)){ require($temp_functions_path); }
             else { $functions = array(); }
