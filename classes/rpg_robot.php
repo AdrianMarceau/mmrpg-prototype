@@ -899,20 +899,6 @@ class rpg_robot extends rpg_object {
         $this_robot_item = $this->get_item();
         if (!empty($this_robot_item)){
 
-            // If this robot is holding an Energy Upgrade, double the life energy stat
-            if ($this_robot_item == 'energy-upgrade'){
-                $new_start_energy = $this->values['robot_base_energy_backup'] * 2;
-                $this->robot_energy = $new_start_energy;
-                $this->robot_base_energy = $new_start_energy;
-            }
-
-            // Else if this robot is holding a Weapon Upgrade, double the weapon energy stat
-            if ($this_robot_item == 'weapon-upgrade'){
-                $new_start_weapons = $this->values['robot_base_weapons_backup'] * 2;
-                $this->robot_weapons = $new_start_weapons;
-                $this->robot_base_weapons = $new_start_weapons;
-            }
-
             // Else if this robot is holding an Elemental Core, apply a temp core shield
             if (preg_match('/^([a-z]+)-core$/', $this_robot_item)){
                 list($item_type, $item_kind) = explode('-', $this_robot_item);
@@ -2607,20 +2593,6 @@ class rpg_robot extends rpg_object {
         // Trigger this robot's item function if one has been defined for this context
         $this->trigger_item_function('rpg-robot_update-variables_before', $extra_objects);
         if ($options->return_early){ return $options->return_value; }
-
-        // If this robot is holding an ENERGY UPGRADE, double the base amount for now
-        if (!empty($this->robot_item)
-            && $this->robot_item == 'energy-upgrade'
-            && isset($this->values['robot_base_energy_backup'])){
-            $this->robot_base_energy = $this->values['robot_base_energy_backup'] * 2;
-        }
-
-        // If this robot is holding an WEAPON UPGRADE, double the base amount for now
-        if (!empty($this->robot_item)
-            && $this->robot_item == 'weapon-upgrade'
-            && isset($this->values['robot_base_weapons_backup'])){
-            $this->robot_base_weapons = $this->values['robot_base_weapons_backup'] * 2;
-        }
 
         // If this robot is holding an ELEMENTAL CIRCUIT, apply elemental stat mods
         if (!empty($this->robot_item)){
