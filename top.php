@@ -115,6 +115,8 @@ if (MMRPG_CONFIG_ADMIN_MODE){
 }
 
 // Turn OFF error reporting if live
+ini_set('log_errors', 1);
+ini_set('ignore_repeated_errors', 1);
 if (!MMRPG_CONFIG_ADMIN_MODE && MMRPG_CONFIG_IS_LIVE){
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
