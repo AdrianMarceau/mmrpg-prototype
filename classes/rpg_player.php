@@ -39,7 +39,7 @@ class rpg_player extends rpg_object {
 
         // Pull in the global index
         global $mmrpg_index_players;
-        if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(); }
+        if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
 
         // Pull in global variables
         $db = cms_database::get_database();
@@ -50,7 +50,7 @@ class rpg_player extends rpg_object {
             $this_playerinfo = $_SESSION['PLAYERS'][$this_playerinfo['player_id']];
         }
         // Otherwise, collect player data from the index
-        else {
+        elseif (isset($mmrpg_index_players[$this_playerinfo['player_token']])){
             // Copy over the base contents from the players index
             $this_playerinfo = $mmrpg_index_players[$this_playerinfo['player_token']];
         }
@@ -175,14 +175,14 @@ class rpg_player extends rpg_object {
             $this->user_omega = 'mmrpg';
 
             // If this is the currently logged-in user, collect their username token
-            if ($this->player_id == $_SESSION['GAME']['USER']['userid']){
+            if ($this->user_id == $_SESSION['GAME']['USER']['userid']){
                 $this->user_token = $_SESSION['GAME']['USER']['username_clean'];
                 $this->user_omega = $_SESSION['GAME']['USER']['omega'];
                 $this->player_controller = 'human';
             }
             // Otherwise if different human player, collect username token from db
-            elseif ($this->player_id != MMRPG_SETTINGS_TARGET_PLAYERID){
-                $db_info = $db->get_array("SELECT user_name_clean AS username_clean, user_omega AS omega FROM mmrpg_users WHERE user_id = {$this->player_id};");
+            elseif ($this->user_id != MMRPG_SETTINGS_TARGET_PLAYERID){
+                $db_info = $db->get_array("SELECT user_name_clean AS username_clean, user_omega AS omega FROM mmrpg_users WHERE user_id = {$this->user_id};");
                 $this->user_token = $db_info['username_clean'];
                 $this->user_omega = $db_info['omega'];
             }
@@ -212,9 +212,9 @@ class rpg_player extends rpg_object {
     public function trigger_onload(){
 
         // Trigger the onload function if not already called
-        static $onload_triggered;
-        if (empty($onload_triggered)){
-            $onload_triggered = true;
+        if (!rpg_game::onload_triggered('player', $this->player_id)){
+            rpg_game::onload_triggered('player', $this->player_id, true);
+            //error_log('trigger_onload() for player '.$this->player_id.PHP_EOL);
             $temp_function = $this->player_function_onload;
             $temp_result = $temp_function(array(
                 'this_field' => isset($this->battle->battle_field) ? $this->battle->battle_field : false,

@@ -1926,5 +1926,24 @@ class rpg_game {
 
     }
 
+    // Define a function for optimizing an export error for the session (aka removing unchanged values)
+    public static function optimize_export_array_for_session($export_data, $indexed_data){
+        $diff_only = array();
+        foreach ($export_data AS $key => $export_value){
+            if (!isset($indexed_data[$key])
+                || $indexed_data[$key] !== $export_value){
+                if (strstr($key, '_base_')){
+                    $skey = str_replace('_base_', '_', $key);
+                    if (isset($indexed_data[$skey])
+                        && $indexed_data[$skey] === $export_value){
+                        continue;
+                    }
+                }
+                $diff_only[$key] = $export_value;
+            }
+        }
+        return $diff_only;
+    }
+
 
 }

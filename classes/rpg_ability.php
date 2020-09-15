@@ -73,10 +73,11 @@ class rpg_ability extends rpg_object {
         }
         // Otherwise base the ID off of the robot
         else {
-            $ability_id = $this->robot_id.str_pad($this_indexinfo['ability_id'], 3, '0', STR_PAD_LEFT);
+            //$ability_id = $this->robot_id.str_pad($this_indexinfo['ability_id'], 3, '0', STR_PAD_LEFT);
+            $ability_id = rpg_game::unique_ability_id($this->robot_id, $this_indexinfo['ability_id']);
             if (!empty($this_abilityinfo['flags']['is_attachment']) || isset($this_abilityinfo['attachment_token'])){
-                if (isset($this_abilityinfo['attachment_token'])){ $ability_id .= 'x'.strtoupper(substr(md5($this_abilityinfo['attachment_token']), 0, 3)); }
-                else { $ability_id .= substr(md5($this_abilityinfo['ability_token']), 0, 3); }
+                if (isset($this_abilityinfo['attachment_token'])){ $ability_id .= 'y'.strtoupper(substr(md5($this_abilityinfo['attachment_token']), 0, 3)); }
+                else { $ability_id .= 'z'.strtoupper(substr(md5($this_abilityinfo['ability_token']), 0, 3)); }
             }
             $this_abilityinfo['ability_id'] = $ability_id;
         }
@@ -206,9 +207,9 @@ class rpg_ability extends rpg_object {
     public function trigger_onload(){
 
         // Trigger the onload function if not already called
-        static $onload_triggered;
-        if (empty($onload_triggered)){
-            $onload_triggered = true;
+        if (!rpg_game::onload_triggered('ability', $this->ability_id)){
+            rpg_game::onload_triggered('ability', $this->ability_id, true);
+            //error_log('trigger_onload() for ability '.$this->ability_id.PHP_EOL);
             $temp_target_player = $this->battle->find_target_player($this->player->player_side != 'right' ? 'right' : 'left');
             $temp_target_robot = $this->battle->find_target_robot($this->player->player_side != 'right' ? 'right' : 'left');
             $temp_function = $this->ability_function_onload;

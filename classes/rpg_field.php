@@ -124,9 +124,9 @@ class rpg_field extends rpg_object {
     public function trigger_onload(){
 
         // Trigger the onload function if not already called
-        static $onload_triggered;
-        if (empty($onload_triggered)){
-            $onload_triggered = true;
+        if (!rpg_game::onload_triggered('field', $this->field_id)){
+            rpg_game::onload_triggered('field', $this->field_id, true);
+            //error_log('trigger_onload() for field '.$this->field_id.PHP_EOL);
             $temp_function = $this->field_function_onload;
             $temp_result = $temp_function(array(
                 'this_battle' => isset($this->battle) ? $this->battle : false,

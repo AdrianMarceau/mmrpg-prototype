@@ -334,9 +334,9 @@ class rpg_robot extends rpg_object {
     public function trigger_onload(){
 
         // Trigger the onload function if not already called
-        static $onload_triggered;
-        if (empty($onload_triggered)){
-            $onload_triggered = true;
+        if (!rpg_game::onload_triggered('robot', $this->robot_id)){
+            rpg_game::onload_triggered('robot', $this->robot_id, true);
+            //error_log('trigger_onload() for robot '.$this->robot_id.PHP_EOL);
             $temp_function = $this->robot_function_onload;
             $temp_result = $temp_function(self::get_objects());
         }
@@ -346,26 +346,25 @@ class rpg_robot extends rpg_object {
     // Define a public function for triggering an item function if one is being held
     public function trigger_item_function($function, $extra_objects = array()){
 
+        // Collect and cache an item index for reference
+        static $mmrpg_index_items;
+        if (empty($mmrpg_index_items)){ $mmrpg_index_items = rpg_item::get_index(); }
+
         // If provided, reset the options object first
-        if (isset($extra_objects['options'])){
-            rpg_game::reset_options_object($extra_objects['options']);
-        }
+        if (isset($extra_objects['options'])){ rpg_game::reset_options_object($extra_objects['options']); }
 
         // Check to make sure this robot has a held item, else return now
         $item_token = $this->get_item();
         if (empty($item_token)){ return; }
 
-        // Otherwise, collect this item's object from the game class
-        static $item_cache;
-        if (!isset($item_cache[$item_token]['info'])){
-            $item_cache[$item_token]['info'] = array('item_token' => $item_token);
-            }
-        if (!isset($item_cache[$item_token]['object'])){
-            $item_cache[$item_token]['object'] = rpg_game::get_item($this->battle, $this->player, $this, $item_cache[$item_token]['info']);
-            $item_cache[$item_token]['info']['item_id'] = $item_cache[$item_token]['object']->item_id;
-            }
-        $item_info = $item_cache[$item_token]['info'];
-        $this_item = $item_cache[$item_token]['object'];
+        // Collect the item's index info if exists, else return now
+        if (!isset($mmrpg_index_items[$item_token])){ return; }
+        $item_index_info = $mmrpg_index_items[$item_token];
+        $item_id = $this->robot_id.str_pad($item_index_info['item_id'], 3, '0', STR_PAD_LEFT);
+        $item_info = array('item_id' => $item_id, 'item_token' => $item_token);
+
+        // Collect this item's object from the game class
+        $this_item = rpg_game::get_item($this->battle, $this->player, $this, $item_info);
 
         // Check to make sure this item has the given function defined, else return now
         if (!isset($this_item->item_functions_custom[$function])){ return; }
@@ -773,32 +772,19 @@ class rpg_robot extends rpg_object {
         if (!empty($extra_objects)){ $objects = array_merge($objects, $extra_objects); }
 
         // Attempt to collect the battle field if not already set by the calling method
-        static $default_battle_field;
         if (empty($objects['this_field'])){
             if (!empty($this->field)){ $objects['this_field'] = $this->field; }
             elseif (!empty($this->battle->battle_field)){ $objects['this_field'] = $this->battle->battle_field; }
-            elseif (!empty($default_battle_field)){ $objects['this_field'] = $default_battle_field; }
-            if (!empty($objects['this_field'])){ $default_battle_field = $objects['this_field']; }
         }
 
         // Attempt to collect the target player if not already set by the calling method
-        static $default_target_player;
         if (empty($objects['target_player'])){
-            $target_player_side = $this->player->player_side !== 'left' ? 'left' : 'right';
             if (!empty($objects['target_robot'])){ $objects['target_player'] = $objects['target_robot']->player; }
-            elseif (!empty($default_target_player)){ $objects['target_player'] = $default_target_player; }
-            else { $objects['target_player'] = $this->battle->find_target_player($target_player_side); }
-            if (!empty($objects['target_player'])){ $default_target_player = $objects['target_player']; }
         }
 
         // Attempt to collect the target robot if not already set by the calling method
-        static $default_target_robot;
         if (empty($objects['target_robot'])){
-            $target_robot_side = $this->player->player_side !== 'left' ? 'left' : 'right';
-            if (!empty($default_target_robot)){ $objects['target_robot'] = $default_target_robot; }
-            elseif (!empty($objects['target_player'])){ $objects['target_robot'] = $this->battle->find_target_robot($objects['target_player']); }
-            else { $objects['target_robot'] = $this->battle->find_target_robot($target_robot_side); }
-            if (!empty($objects['target_robot'])){ $default_target_robot = $objects['target_robot']; }
+            if (!empty($objects['target_player'])){ $objects['target_robot'] = $this->battle->find_target_robot($objects['target_player']); }
         }
 
         // Return the full object array for later extracting

@@ -72,13 +72,14 @@ class rpg_item extends rpg_object {
         }
         // Otherwise base the ID off of the robot
         else {
-            $item_id = $this->robot_id.str_pad($this_indexinfo['item_id'], 3, '0', STR_PAD_LEFT);
-            if (!empty($this_iteminfo['flags']['is_part'])){
-                if (isset($this_iteminfo['part_token'])){ $item_id .= 'x'.strtoupper(substr(md5($this_iteminfo['part_token']), 0, 3)); }
-                else { $item_id .= substr(md5($this_iteminfo['item_token']), 0, 3); }
-            } elseif (!empty($this_iteminfo['flags']['is_attachment'])){
-                if (isset($this_iteminfo['attachment_token'])){ $item_id .= 'x'.strtoupper(substr(md5($this_iteminfo['attachment_token']), 0, 3)); }
-                else { $item_id .= substr(md5($this_iteminfo['item_token']), 0, 3); }
+            //$item_id = $this->robot_id.str_pad($this_indexinfo['item_id'], 3, '0', STR_PAD_LEFT);
+            $item_id = rpg_game::unique_item_id($this->robot_id, $this_indexinfo['item_id']);
+            if (!empty($this_iteminfo['flags']['is_attachment'])){
+                if (isset($this_iteminfo['attachment_token'])){ $item_id .= 'y'.strtoupper(substr(md5($this_iteminfo['attachment_token']), 0, 3)); }
+                else { $item_id .= 'z'.strtoupper(substr(md5($this_iteminfo['item_token']), 0, 3)); }
+            } elseif (!empty($this_iteminfo['flags']['is_part'])){
+                if (isset($this_iteminfo['part_token'])){ $item_id .= 'yy'.strtoupper(substr(md5($this_iteminfo['part_token']), 0, 3)); }
+                else { $item_id .= 'zz'.strtoupper(substr(md5($this_iteminfo['item_token']), 0, 3)); }
             }
             $this_iteminfo['item_id'] = $item_id;
         }
@@ -209,9 +210,9 @@ class rpg_item extends rpg_object {
     public function trigger_onload(){
 
         // Trigger the onload function if not already called
-        static $onload_triggered;
-        if (empty($onload_triggered)){
-            $onload_triggered = true;
+        if (!rpg_game::onload_triggered('item', $this->item_id)){
+            rpg_game::onload_triggered('item', $this->item_id, true);
+            //error_log('trigger_onload() for item '.$this->item_id.PHP_EOL);
             $temp_target_player = $this->battle->find_target_player($this->player->player_side != 'right' ? 'right' : 'left');
             $temp_target_robot = $this->battle->find_target_robot($this->player->player_side != 'right' ? 'right' : 'left');
             $temp_function = $this->item_function_onload;
