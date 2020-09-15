@@ -666,6 +666,7 @@ function prototype_menu_click_option(thisContext, thisOption){
     var thisStep = parseInt(thisParent.attr('data-step'));
     var thisSelect = thisParent.attr('data-select');
     var thisToken = thisOption.attr('data-token');
+    var thisTokenID = thisOption.attr('data-token-id');
     var thisComplete = function(){};
     var nextStep = $('.menu[data-step="'+(thisStep + 1)+'"]', thisContext);
     var nextFlag = true;
@@ -677,7 +678,8 @@ function prototype_menu_click_option(thisContext, thisOption){
     //console.log('thisStep', thisStep);
     //console.log('thisSelect', thisSelect);
     //console.log('thisToken', thisToken);
-    //console.log('nextStep', nextStep);
+    //console.log('thisTokenID', thisTokenID);
+    //console.log('nextStep', nextStep, nextStep.length);
     //console.log('nextFlag', nextFlag);
     //console.log('nextLimit', nextLimit);
 
@@ -770,7 +772,11 @@ function prototype_menu_click_option(thisContext, thisOption){
 
         // Update the battleOptions object with the current selection
         battleOptions[thisSelect] = thisToken;
-        //alert('battleOptions['+thisSelect+'] = '+thisToken+';');
+        //console.log('battleOptions['+thisSelect+'] = '+thisToken+';');
+        if (typeof thisTokenID !== 'undefined'){
+            battleOptions[thisSelect.replace(/_token$/, '_id')] = thisTokenID;
+            //console.log('battleOptions['+thisSelect.replace(/_token$/, '_id')+'] = '+thisTokenID+';');
+            }
 
         }
 

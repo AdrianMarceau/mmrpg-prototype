@@ -631,19 +631,14 @@ gameSettings.totalPlayerOptions = <?= $unlock_count_players ?>;
 gameSettings.prototypeBannerKey = 0;
 gameSettings.prototypeBanners = ['prototype-banners_title-screen_01.gif'];
 // Define any preset menu selections
-battleOptions['this_player_id'] = <?= $this_userid ?>;
-<? if(!empty($_SESSION[$session_token]['DEMO'])): ?>
+battleOptions['this_user_id'] = <?= $this_userid ?>;
+<? if (!empty($_SESSION[$session_token]['battle_settings']['this_player_token'])){ ?>
+    battleOptions['this_player_id'] = <?= $mmrpg_index_players[$_SESSION[$session_token]['battle_settings']['this_player_token']]['player_id'] ?>;
+    battleOptions['this_player_token'] = '<?= $_SESSION[$session_token]['battle_settings']['this_player_token'] ?>';
+<? } elseif($unlock_count_players < 2){ ?>
+    battleOptions['this_player_id'] = <?= $mmrpg_index_players['dr-light']['player_id'] ?>;
     battleOptions['this_player_token'] = 'dr-light';
-    <? if(mmrpg_prototype_robots_unlocked('dr-light') == 3): ?>
-        battleOptions['this_player_robots'] = '103_mega-man,104_bass,105_proto-man';
-    <?endif;?>
-<? else: ?>
-    <? if(!empty($_SESSION[$session_token]['battle_settings']['this_player_token'])): ?>
-        battleOptions['this_player_token'] = '<?=$_SESSION[$session_token]['battle_settings']['this_player_token']?>';
-    <? elseif($unlock_count_players < 2): ?>
-        battleOptions['this_player_token'] = 'dr-light';
-    <? endif; ?>
-<? endif; ?>
+<? } ?>
 // Create the document ready events
 $(document).ready(function(){
 
