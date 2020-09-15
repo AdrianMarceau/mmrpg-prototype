@@ -56,7 +56,7 @@ else {
 }
 
 // Collect the field index if available
-$mmrpg_index_fields = rpg_field::get_index();
+$mmrpg_index_fields = rpg_field::get_index(true);
 // Collect the field index data if available
 if (!empty($this_field_token) && isset($mmrpg_index_fields[$this_field_token])){
     $this_field_data = rpg_field::parse_index_info($mmrpg_index_fields[$this_field_token]);
@@ -68,10 +68,7 @@ if (!empty($this_field_token) && isset($mmrpg_index_fields[$this_field_token])){
 elseif (!empty($this_battle_data['battle_field_base']['field_token']) && isset($mmrpg_index_fields[$this_battle_data['battle_field_base']['field_token']])){
     $this_field_data1 = rpg_field::parse_index_info($mmrpg_index_fields[$this_battle_data['battle_field_base']['field_token']]);
     $this_field_data2 = $this_battle_data['battle_field_base'];
-    //die('test1 = $this_field_data = <pre>'.print_r($this_field_data, true).'</pre> $this_field_data2 = <pre>'.print_r($this_field_data2, true).'</pre>');
     $this_field_data = array_merge($this_field_data1, $this_field_data2);
-    //$this_field_data = rpg_field::parse_index_info($this_field_merged);
-    //die('test2 = $this_field_data = <pre>'.print_r($this_field_data, true).'</pre>');
     if (empty($this_field_data['field_id'])){
         $this_field_id = !empty($this_field_id) ? $this_field_id : 1;
         $this_field_data['field_id'] = $this_field_id;
@@ -95,28 +92,27 @@ if (!isset($mmrpg_index_robots) || empty($mmrpg_index_robots)){
 
 // Collect this player's index data if available
 if (!empty($this_player_token) && isset($mmrpg_index_players[$this_player_token])){
-
     $this_player_data = $mmrpg_index_players[$this_player_token];
-    if (!empty($this_player_id)){ $this_player_data['player_id'] = $this_player_id; }
-    $this_player_data['user_id'] = rpg_user::get_current_userid();
-
+    $temp_user_id = rpg_user::get_current_userid();
+    $temp_player_id = rpg_game::unique_player_id($temp_user_id, $this_player_data['player_id']);
+    $this_player_data['user_id'] = $temp_user_id;
+    $this_player_data['player_id'] = $temp_player_id;
     if (!empty($this_player_robots)){
         $allowed_robots = strstr($this_player_robots, ',') ? explode(',', $this_player_robots) : array($this_player_robots);
+        $allowed_robots_parsed = array();
         $this_player_data['player_robots'] = array();
         foreach ($allowed_robots AS $key => $robot_string){
             list($robot_id, $robot_token) = explode('_', $robot_string);
             if (mmrpg_prototype_robot_unlocked($this_player_token, $robot_token)){
-                $this_player_data['player_robots'][] = array('robot_id' => $robot_id, 'robot_token' => $robot_token);
+                $temp_robot_data = $mmrpg_index_robots[$robot_token];
+                $temp_robot_id = rpg_game::unique_robot_id($temp_player_id, $temp_robot_data['robot_id'], ($key + 1));
+                $this_player_data['player_robots'][] = array('robot_id' => $temp_robot_id, 'robot_token' => $robot_token);
+                $allowed_robots_parsed[] = $temp_robot_id.'_'.$robot_token;
             }
         }
-        $this_player_robots = implode(',', $allowed_robots);
+        $this_player_robots = implode(',', $allowed_robots_parsed);
         $this_player_data['player_robots'] = array_values($this_player_data['player_robots']);
-        //echo('<pre>'.print_r($this_player_robots, true).'</pre>');
-        //echo('<pre>'.print_r($allowed_robots, true).'</pre>');
-        //echo('<pre>'.print_r($this_player_data, true).'</pre>');
-        //exit();
     }
-
 }
 else {
     $this_player_data = false;
@@ -125,40 +121,24 @@ else {
 // Collect the target player's index data if available
 if (!empty($target_player_token) && isset($mmrpg_index_players[$target_player_token])){
     $target_player_data = $mmrpg_index_players[$target_player_token];
-
-    if (empty($target_player_data['player_id'])){
-        $target_player_id = !empty($target_player_id) ? $target_player_id : 2;
-        $target_player_data['player_id'] = $target_player_id;
-    }
-    $target_player_data['user_id'] = $target_player_data['player_id'];
-    //echo('<pre>'.print_r($this_player_robots, true).'</pre>');
-    //echo('<pre>'.print_r($allowed_robots, true).'</pre>');
-    //echo('<pre>'.print_r($target_player_data, true).'</pre>');
-    //exit();
-
+    $temp_user_id = MMRPG_SETTINGS_TARGET_PLAYERID;
+    $temp_player_id = rpg_game::unique_player_id($temp_user_id, ($target_player_data['player_token'] !== 'player' ? $target_player_data['player_id'] : 0));
+    $target_player_data['user_id'] = $temp_user_id;
+    $target_player_data['player_id'] = $temp_player_id;
 }
 elseif (!empty($this_battle_data['battle_target_player']['player_token']) && isset($mmrpg_index_players[$this_battle_data['battle_target_player']['player_token']])){
-    $target_player_data = array_merge($mmrpg_index_players[$this_battle_data['battle_target_player']['player_token']], $this_battle_data['battle_target_player']);
-
-    if (empty($target_player_data['player_id'])){
-        $target_player_id = !empty($target_player_id) ? $target_player_id : 2;
-        $target_player_data['player_id'] = $target_player_id;
-    }
-    $target_player_data['user_id'] = $target_player_data['player_id'];
-
+    $indexed_target_player_data = $mmrpg_index_players[$this_battle_data['battle_target_player']['player_token']];
+    $target_player_data = array_merge($indexed_target_player_data, $this_battle_data['battle_target_player']);
+    $temp_user_id = !empty($target_player_data['user_id']) ? $target_player_data['user_id'] : MMRPG_SETTINGS_TARGET_PLAYERID;
+    $temp_player_id = rpg_game::unique_player_id($temp_user_id, ($indexed_target_player_data['player_token'] !== 'player' ? $indexed_target_player_data['player_id'] : 0));
+    $target_player_data['user_id'] = $temp_user_id;
+    $target_player_data['player_id'] = $temp_player_id;
     if (empty($target_player_robots) && !empty($this_battle_data['battle_target_player'])){
-        //die('<pre>'.print_r($this_battle_data, true).'</pre>');
         $target_player_data['player_robots'] = array();
         foreach ($this_battle_data['battle_target_player']['player_robots'] AS $key => $data){
             $target_player_data['player_robots'][] = $data;
         }
-        //die('<pre>'.print_r($target_player_data, true).'</pre>');
     }
-    //echo('<pre>'.print_r($target_player_robots, true).'</pre>');
-    //echo('<pre>'.print_r($this_battle_data, true).'</pre>');
-    //echo('<pre>'.print_r($target_player_data, true).'</pre>');
-    //exit();
-
 }
 else {
     $target_player_id = 0;
@@ -234,24 +214,24 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
         <input type="hidden" name="this_action" value="" />
         <input type="hidden" name="next_action" value="loading" />
 
-        <input type="hidden" name="this_battle_id" value="<?=$this_battle_data['battle_id']?>" />
-        <input type="hidden" name="this_battle_token" value="<?=$this_battle_data['battle_token']?>" />
+        <input type="hidden" name="this_battle_id" value="<?= $this_battle_data['battle_id'] ?>" />
+        <input type="hidden" name="this_battle_token" value="<?= $this_battle_data['battle_token'] ?>" />
         <input type="hidden" name="this_battle_status" value="active" />
         <input type="hidden" name="this_battle_result" value="pending" />
 
-        <input type="hidden" name="this_field_id" value="<?=$this_field_data['field_id']?>" />
-        <input type="hidden" name="this_field_token" value="<?=$this_field_data['field_token']?>" />
+        <input type="hidden" name="this_field_id" value="<?= $this_field_data['field_id'] ?>" />
+        <input type="hidden" name="this_field_token" value="<?= $this_field_data['field_token'] ?>" />
 
-        <input type="hidden" name="this_user_id" value="<?=$this_player_data['user_id']?>" />
-        <input type="hidden" name="this_player_id" value="<?=$this_player_data['player_id']?>" />
-        <input type="hidden" name="this_player_token" value="<?=$this_player_data['player_token']?>" />
-        <input type="hidden" name="this_player_robots" value="<?=$this_player_robots?>" />
+        <input type="hidden" name="this_user_id" value="<?= $this_player_data['user_id'] ?>" />
+        <input type="hidden" name="this_player_id" value="<?= $this_player_data['player_id'] ?>" />
+        <input type="hidden" name="this_player_token" value="<?= $this_player_data['player_token'] ?>" />
+        <input type="hidden" name="this_player_robots" value="<?= $this_player_robots ?>" />
         <input type="hidden" name="this_robot_id" value="auto" />
         <input type="hidden" name="this_robot_token" value="auto" />
 
-        <input type="hidden" name="target_user_id" value="<?=$target_player_data['user_id']?>" />
-        <input type="hidden" name="target_player_id" value="<?=$target_player_data['player_id']?>" />
-        <input type="hidden" name="target_player_token" value="<?=$target_player_data['player_token']?>" />
+        <input type="hidden" name="target_user_id" value="<?= $target_player_data['user_id'] ?>" />
+        <input type="hidden" name="target_player_id" value="<?= $target_player_data['player_id'] ?>" />
+        <input type="hidden" name="target_player_token" value="<?= $target_player_data['player_token'] ?>" />
         <input type="hidden" name="target_robot_id" value="auto" />
         <input type="hidden" name="target_robot_token" value="auto" />
 
