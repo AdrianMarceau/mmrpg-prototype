@@ -20,8 +20,22 @@ class rpg_mission_endless extends rpg_mission {
             // Collect a list of unlocked RMs, types, etc. from the database
             $mmrpg_types_index = rpg_type::get_index();
             $mmrpg_robots_index = rpg_robot::get_index(false, false, 'master');
-            $mmrpg_items_index = rpg_item::get_index(false, false, array('consumable', 'holdable'));
             $mmrpg_fields_index = rpg_field::get_index();
+            $mmrpg_items_index = rpg_item::get_index(false, false, array('consumable', 'holdable'));
+
+            // Make sure the types are sorted how we want them (manually move copy to the front)
+            uasort($mmrpg_types_index, function($t1, $t2){ return $t1['type_order'] < $t2['type_order'] ? -1 : 1; });
+            $mmrpg_types_index = array_merge(array('copy' => null), $mmrpg_types_index);
+            $mmrpg_types_order = array_keys($mmrpg_types_index);
+
+            // Make sure the robots are sorted how we want them
+            uasort($mmrpg_robots_index, function($r1, $r2){ return $r1['robot_order'] < $r2['robot_order'] ? -1 : 1; });
+
+            // Make sure the fields are sorted how we want them
+            uasort($mmrpg_fields_index, function($f1, $f2){ return $f1['field_order'] < $f2['field_order'] ? -1 : 1; });
+
+            // Make sure the items are sorted how we want them
+            uasort($mmrpg_items_index, function($i1, $i2){ return $i1['item_order'] < $i2['item_order'] ? -1 : 1; });
 
             // Sort the robot masters into lists of their core types
             $mmrpg_robots_index_bycore = array();
@@ -31,6 +45,7 @@ class rpg_mission_endless extends rpg_mission {
                 if (!isset($mmrpg_robots_index_bycore[$robot_core])){ $mmrpg_robots_index_bycore[$robot_core] = array(); }
                 $mmrpg_robots_index_bycore[$robot_core][] = $robot_token;
             }
+            $mmrpg_robots_index_bycore = array_filter(array_merge(array_flip($mmrpg_types_order), $mmrpg_robots_index_bycore), function($a){ return is_array($a); });
 
             // Sort the robot masters into lists of their core types
             $mmrpg_items_index_bykind = array();
@@ -54,9 +69,12 @@ class rpg_mission_endless extends rpg_mission {
                 if (!isset($mmrpg_fields_index_bytype[$field_type])){ $mmrpg_fields_index_bytype[$field_type] = array(); }
                 $mmrpg_fields_index_bytype[$field_type][] = $field_token;
             }
+            $mmrpg_fields_index_bytype = array_filter(array_merge(array_flip($mmrpg_types_order), $mmrpg_fields_index_bytype), function($a){ return is_array($a); });
 
-            //echo('<pre>$mmrpg_items_index_bykind = '.print_r($mmrpg_items_index_bykind, true).'</pre>');
-            //echo('<pre>$mmrpg_fields_index_bytype = '.print_r($mmrpg_fields_index_bytype, true).'</pre>');
+            //error_log('<pre>$mmrpg_types_index = '.print_r($mmrpg_types_index, true).'</pre>');
+            //error_log('<pre>$mmrpg_robots_index_bycore = '.print_r($mmrpg_robots_index_bycore, true).'</pre>');
+            //error_log('<pre>$mmrpg_items_index_bykind = '.print_r($mmrpg_items_index_bykind, true).'</pre>');
+            //error_log('<pre>$mmrpg_fields_index_bytype = '.print_r($mmrpg_fields_index_bytype, true).'</pre>');
 
             // Collect and count the number of core types represented
             $mmrpg_robots_cores = array_keys($mmrpg_robots_index_bycore);
