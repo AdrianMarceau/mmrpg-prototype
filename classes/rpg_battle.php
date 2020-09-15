@@ -1748,166 +1748,171 @@ class rpg_battle extends rpg_object {
                     $this_player->update_session();
                     $active_robot_count = count($this_player->values['robots_active']);
                     if ($active_robot_count == 1){
-                        $this_robotinfo = $this_player->values['robots_active'][0];
+                        $new_robotinfo = $this_player->values['robots_active'][0];
                     } elseif ($active_robot_count > 1){
                         $this_last_switch = !empty($this_recent_switches) ? array_slice($this_recent_switches, -1, 1, false) : array('');
                         $this_last_switch = $this_last_switch[0];
                         $this_current_token = $this_robot->robot_id.'_'.$this_robot->robot_token;
                         do {
-                            $this_robotinfo = $this_player->values['robots_active'][mt_rand(0, ($active_robot_count - 1))];
-                            if ($this_robotinfo['robot_id'] == $this_robot->robot_id){ continue; }
-                            elseif ($this_robotinfo['robot_token'] == 'robot'){ continue; }
-                            $this_temp_token = $this_robotinfo['robot_id'].'_'.$this_robotinfo['robot_token'];
+                            $new_robotinfo = $this_player->values['robots_active'][mt_rand(0, ($active_robot_count - 1))];
+                            if ($new_robotinfo['robot_id'] == $this_robot->robot_id){ continue; }
+                            elseif ($new_robotinfo['robot_token'] == 'robot'){ continue; }
+                            $this_temp_token = $new_robotinfo['robot_id'].'_'.$new_robotinfo['robot_token'];
                             //$this->events_create(false, false, 'DEBUG', '!empty('.$this_last_switch.') && '.$this_temp_token.' == '.$this_last_switch);
                         } while(empty($this_temp_token));
                     } else {
-                        $this_robotinfo = array('robot_id' => 0, 'robot_token' => 'robot');
+                        $new_robotinfo = array('robot_id' => 0, 'robot_token' => 'robot');
                         return false;
                     }
-                    //$this->events_create(false, false, 'DEBUG', 'auto switch picked ['.print_r($this_robotinfo['robot_name'], true).'] | recent : ['.preg_replace('#\s+#', ' ', print_r($this_recent_switches, true)).']');
+                    //$this->events_create(false, false, 'DEBUG', 'auto switch picked ['.print_r($new_robotinfo['robot_name'], true).'] | recent : ['.preg_replace('#\s+#', ' ', print_r($this_recent_switches, true)).']');
                 }
                 // Otherwise, parse the token for data
                 else {
                     list($temp_id, $temp_token) = explode('_', $this_token);
-                    $this_robotinfo = array('robot_id' => $temp_id, 'robot_token' => $temp_token);
+                    $new_robotinfo = array('robot_id' => $temp_id, 'robot_token' => $temp_token);
                 }
 
-                //$this->events_create(false, false, 'DEBUG', 'switch picked ['.print_r($this_robotinfo['robot_token'], true).'] | other : []');
+                //$this->events_create(false, false, 'DEBUG', 'switch picked ['.print_r($new_robotinfo['robot_token'], true).'] | other : []');
 
                 // Update this player and robot's session data before switching
                 $this_player->update_session();
                 $this_robot->update_session();
 
-                // Define the switch reason based on if this robot is disabled
-                $this_switch_reason = $this_robot->robot_status != 'disabled' ? 'withdrawn' : 'removed';
-                //if ($this_robot->robot_position == 'bench'){ $this_switch_reason = 'auto'; }
+                // Define a closure function for switching and return the new robot object
+                $switch_function = function($this_battle, $this_player, $old_robot, $new_robotinfo) use ($target_player, $target_robot) {
 
-                /*
-                $this->events_create(false, false, 'DEBUG',
-                    '$this_switch_reason = '.$this_switch_reason.'<br />'.
-                    '$this_player->values[\'current_robot\'] = '.$this_player->values['current_robot'].'<br />'.
-                    '$this_player->values[\'current_robot_enter\'] = '.$this_player->values['current_robot_enter'].'<br />'.
-                    '');
-                */
+                    // Define the switch reason based on if this robot is disabled
+                    $this_switch_reason = $old_robot->robot_status != 'disabled' ? 'withdrawn' : 'removed';
+                    //if ($old_robot->robot_position == 'bench'){ $this_switch_reason = 'auto'; }
 
-                // Collect a temp version of the new robot for key reading
-                $temp_new_robot = rpg_game::get_robot($this, $this_player, $this_robotinfo);
-                $temp_new_robot_key = $temp_new_robot->robot_key;
+                    /*
+                    $this_battle->events_create(false, false, 'DEBUG',
+                        '$this_switch_reason = '.$this_switch_reason.'<br />'.
+                        '$this_player->values[\'current_robot\'] = '.$this_player->values['current_robot'].'<br />'.
+                        '$this_player->values[\'current_robot_enter\'] = '.$this_player->values['current_robot_enter'].'<br />'.
+                        '');
+                    */
 
-                // If the new robot is not valid for some reason, return false
-                if ($temp_new_robot->robot_token == 'robot'){ return false; }
+                    // Collect a temp version of the new robot for key reading
+                    $temp_new_robot = rpg_game::get_robot($this_battle, $this_player, $new_robotinfo);
+                    $temp_new_robot_key = $temp_new_robot->robot_key;
 
-                // If this robot is being withdrawn on the same turn it entered, return false
-                if ($this_player->player_side == 'right' && $this_switch_reason == 'withdrawn' && $this_player->values['current_robot_enter'] == $this->counters['battle_turn']){
-                    // Return false to cancel the switch action
-                    return false;
-                }
+                    // If the new robot is not valid for some reason, return false
+                    if ($temp_new_robot->robot_token == 'robot'){ return false; }
 
-                // If the switch reason was removal, make sure this robot stays hidden
-                if ($this_switch_reason == 'removed' && $this_player->player_side == 'right'){
-                    $this_robot->flags['hidden'] = true;
-                    $this_robot->update_session();
-                }
-
-                // Define the horizontal shift amount for the benched robot switch animation
-                $temp_shift_amount = $this_player->player_side == 'left' ? 50 : -50;
-
-                // Withdraw the player's robot and display an event for it
-                if ($this_robot->robot_position != 'bench'){
-                    $this_robot->robot_frame = $this_robot->robot_status != 'disabled' ? 'base' : 'defeat';
-                    $this_robot->robot_position = 'bench';
-                    $this_robot->robot_key = $temp_new_robot_key;
-                    $this_robot->robot_frame_styles = 'transform: translate('.$temp_shift_amount.'%, 0); -webkit-transform: translate('.$temp_shift_amount.'%, 0); ';
-                    $this_player->player_frame = 'base';
-                    $this_player->values['current_robot'] = false;
-                    $this_player->values['current_robot_enter'] = false;
-                    $this_robot->update_session();
-                    $this_player->update_session();
-                    $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
-                    $event_body = $this_robot->print_name().' is '.$this_switch_reason.' from battle!';
-                    if ($this_robot->robot_status != 'disabled' && isset($this_robot->robot_quotes['battle_retreat'])){
-                        $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
-                        $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
-                        $event_body .= $this_robot->print_quote('battle_retreat', $this_find, $this_replace);
-                        //$this_quote_text = str_replace($this_find, $this_replace, $this_robot->robot_quotes['battle_retreat']);
-                        //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
-                    }
-                    // Only show the removed event or the withdraw event if there's more than one robot
-                    if ($this_switch_reason == 'removed' || $this_player->counters['robots_active'] > 1){
-                        $this->events_create($this_robot, false, $event_header, $event_body, array('canvas_show_disabled_bench' => $this_robot->robot_id.'_'.$this_robot->robot_token));
-                    }
-                    $this_robot->robot_frame_styles = '';
-                    $this_robot->update_session();
-
-                }
-
-                // If the switch reason was removal, hide the robot from view
-                if ($this_switch_reason == 'removed'){
-                    $this_robot->flags['hidden'] = true;
-                    $this_robot->update_session();
-                }
-
-                // Ensure all robots have been withdrawn to the bench at this point
-                if (!empty($this_player->player_robots)){
-                    foreach ($this_player->player_robots AS $temp_key => $temp_robotinfo){
-                        $temp_robot = rpg_game::get_robot($this, $this_player, $temp_robotinfo);
-                        $temp_robot->robot_position = 'bench';
-                        $temp_robot->update_session();
-                    }
-                }
-
-                // Switch in the player's new robot and display an event for it
-                if ($temp_new_robot->robot_position != 'active'){
-                    $temp_new_robot->robot_position = 'active';
-                    $temp_new_robot->robot_key = 0;
-                    $this_player->player_frame = 'command';
-                    $this_player->values['current_robot'] = $temp_new_robot->robot_string;
-                    $this_player->values['current_robot_enter'] = $this->counters['battle_turn'];
-                    $temp_new_robot->update_session();
-                    $this_player->update_session();
-                    $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$temp_new_robot->robot_name;
-                    $event_body = "{$temp_new_robot->print_name()} joins the battle!<br />";
-                    if (isset($temp_new_robot->robot_quotes['battle_start'])){
-                        $temp_new_robot->robot_frame = 'taunt';
-                        $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
-                        $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $temp_new_robot->robot_name);
-                        $event_body .= $temp_new_robot->print_quote('battle_start', $this_find, $this_replace);
+                    // If this robot is being withdrawn on the same turn it entered, return false
+                    if ($this_player->player_side == 'right' && $this_switch_reason == 'withdrawn' && $this_player->values['current_robot_enter'] == $this_battle->counters['battle_turn']){
+                        // Return false to cancel the switch action
+                        return false;
                     }
 
-                    // Only show the enter event if the switch reason was removed or if there is more then one robot
-                    if ($this_switch_reason == 'removed' || $this_player->counters['robots_active'] > 1){
-                        $this->events_create($temp_new_robot, false, $event_header, $event_body);
+                    // If the switch reason was removal, make sure this robot stays hidden
+                    if ($this_switch_reason == 'removed' && $this_player->player_side == 'right'){
+                        $old_robot->set_flag('hidden', true);
                     }
 
-                }
+                    // Define the horizontal shift amount for the benched robot switch animation
+                    $temp_shift_amount = $this_player->player_side == 'left' ? 50 : -50;
 
-                // Ensure this robot has abilities to loop through
-                if (!isset($temp_new_robot->flags['ability_startup']) && !empty($temp_new_robot->robot_abilities)){
-                    // Loop through each of this robot's abilities and trigger the start event
-                    $temp_abilities_index = rpg_ability::get_index(true);
-                    foreach ($temp_new_robot->robot_abilities AS $this_key => $this_token){
-                        if (!isset($temp_abilities_index[$this_token])){ continue; }
-                        // Define the current ability object using the loaded ability data
-                        $temp_abilityinfo = $temp_abilities_index[$this_token];
-                        $temp_ability = rpg_game::get_ability($this, $this_player, $this_robot, $temp_abilityinfo);
+                    // Withdraw the player's robot and display an event for it
+                    if ($old_robot->robot_position != 'bench'){
+                        $old_robot->set_frame($old_robot->robot_status != 'disabled' ? 'base' : 'defeat');
+                        $old_robot->set_position('bench');
+                        $old_robot->set_key($temp_new_robot_key);
+                        $old_robot->set_frame_styles('transform: translate('.$temp_shift_amount.'%, 0); -webkit-transform: translate('.$temp_shift_amount.'%, 0); ');
+                        $this_player->set_frame('base');
+                        $this_player->set_value('current_robot', false);
+                        $this_player->set_value('current_robot_enter', false);
+                        $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$old_robot->robot_name;
+                        $event_body = $old_robot->print_name().' is '.$this_switch_reason.' from battle!';
+                        if ($old_robot->robot_status != 'disabled' && isset($old_robot->robot_quotes['battle_retreat'])){
+                            $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
+                            $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $old_robot->robot_name);
+                            $event_body .= $old_robot->print_quote('battle_retreat', $this_find, $this_replace);
+                            //$this_quote_text = str_replace($this_find, $this_replace, $old_robot->robot_quotes['battle_retreat']);
+                            //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
+                        }
+                        // Only show the removed event or the withdraw event if there's more than one robot
+                        if ($this_switch_reason == 'removed' || $this_player->counters['robots_active'] > 1){
+                            $this_battle->events_create($old_robot, false, $event_header, $event_body, array('canvas_show_disabled_bench' => $old_robot->robot_id.'_'.$old_robot->robot_token));
+                        }
+                        $old_robot->set_frame_styles('');
                     }
-                    // And now update the robot with the flag
-                    $temp_new_robot->flags['ability_startup'] = true;
-                    $temp_new_robot->update_session();
-                }
 
-                // Now we can update the current robot's frame regardless of what happened
-                $temp_new_robot->robot_frame = $temp_new_robot->robot_status != 'disabled' ? 'base' : 'defeat';
-                $temp_new_robot->update_session();
+                    // If the switch reason was removal, hide the robot from view
+                    if ($this_switch_reason == 'removed'){
+                        $old_robot->set_flag('hidden', true);
+                    }
 
-                // Set this token to the ID and token of the switched robot
-                $this_token = $this_robotinfo['robot_id'].'_'.$this_robotinfo['robot_token'];
+                    // Ensure all robots have been withdrawn to the bench at this point
+                    if (!empty($this_player->player_robots)){
+                        foreach ($this_player->player_robots AS $temp_key => $temp_robotinfo){
+                            $temp_robot = rpg_game::get_robot($this_battle, $this_player, $temp_robotinfo);
+                            $temp_robot->set_position('bench');
+                        }
+                    }
+
+                    // Switch in the player's new robot and display an event for it
+                    if ($temp_new_robot->robot_position != 'active'){
+                        $temp_new_robot->set_position('active');
+                        $temp_new_robot->set_key(0);
+                        $this_player->set_frame('command');
+                        $this_player->set_value('current_robot', $temp_new_robot->robot_string);
+                        $this_player->set_value('current_robot_enter', $this_battle->counters['battle_turn']);
+                        $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$temp_new_robot->robot_name;
+                        $event_body = "{$temp_new_robot->print_name()} joins the battle!<br />";
+                        if (isset($temp_new_robot->robot_quotes['battle_start'])){
+                            $temp_new_robot->set_frame('taunt');
+                            $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
+                            $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $temp_new_robot->robot_name);
+                            $event_body .= $temp_new_robot->print_quote('battle_start', $this_find, $this_replace);
+                        }
+
+                        // Only show the enter event if the switch reason was removed or if there is more then one robot
+                        if ($this_switch_reason == 'removed' || $this_player->counters['robots_active'] > 1){
+                            $this_battle->events_create($temp_new_robot, false, $event_header, $event_body);
+                        }
+
+                    }
+
+                    // Ensure this robot has abilities to loop through
+                    if (!isset($temp_new_robot->flags['ability_startup']) && !empty($temp_new_robot->robot_abilities)){
+                        // Loop through each of this robot's abilities and trigger the start event
+                        $temp_abilities_index = rpg_ability::get_index(true);
+                        foreach ($temp_new_robot->robot_abilities AS $this_key => $this_token){
+                            if (!isset($temp_abilities_index[$this_token])){ continue; }
+                            // Define the current ability object using the loaded ability data
+                            $temp_abilityinfo = $temp_abilities_index[$this_token];
+                            $temp_ability = rpg_game::get_ability($this_battle, $this_player, $temp_new_robot, $temp_abilityinfo);
+                        }
+                        // And now update the robot with the flag
+                        $temp_new_robot->set_flag('ability_startup', true);
+                    }
+
+                    // Now we can update the current robot's frame regardless of what happened
+                    $temp_new_robot->set_frame($temp_new_robot->robot_status != 'disabled' ? 'base' : 'defeat');
+
+                    // Update the owning player's session variables with the change
+                    $this_player->update_variables();
+
+                    // Return the new robot we've switched to
+                    return $temp_new_robot;
+
+                    };
+
+                // Switch the old robot for the new one and collect the reference
+                $this_robot = $switch_function($this, $this_player, $this_robot, $new_robotinfo);
+                if ($this_player->player_side == 'left'){ $GLOBALS['this_robot'] = $this_robot; }
+                elseif ($this_player->player_side == 'right'){ $GLOBALS['target_robot'] = $this_robot; }
+
+                // Set this token to the ID and token of the newly switched robot
+                //$this_token = $new_robotinfo['robot_id'].'_'.$new_robotinfo['robot_token'];
+                $this_token = $this_robot->robot_id.'_'.$this_robot->robot_token;
 
                 //$this->events_create(false, false, 'DEBUG', 'checkpoint ['.$this_token.'] | other : []');
 
                 // Set a flag on this player so they don't switch again
-                $this_player->flags['switched_this_turn'] = true;
-                $this_player->update_session();
+                $this_player->set_flag('switched_this_turn', true);
 
                 // Return from the battle function
                 $this_return = true;
@@ -1940,8 +1945,7 @@ class rpg_battle extends rpg_object {
                 //die('<pre>'.print_r($temp_target_robot, true).'</pre>');
 
                 // Ensure the target robot's frame is set to its base
-                $temp_target_robot->robot_frame = 'base';
-                $temp_target_robot->update_session();
+                $temp_target_robot->set_frame('base');
 
                 // Collect the weakness, resistsance, affinity, and immunity text
                 $temp_target_robot_weaknesses = $temp_target_robot->print_weaknesses();
@@ -1951,11 +1955,10 @@ class rpg_battle extends rpg_object {
                 $temp_target_robot_abilities = $temp_target_robot->print_abilities();
 
                 // Change the target robot's frame to defend base and save
-                $temp_target_robot->robot_frame = 'taunt';
-                $temp_target_robot->update_session();
+                $temp_target_robot->set_frame('taunt');
 
                 // Now change the target robot's frame is set to its mugshot
-                $temp_target_robot->robot_frame = 'taunt'; //taunt';
+                $temp_target_robot->set_frame('taunt');
 
                 $temp_stat_padding_total = 300;
                 $temp_stat_counter_total = $temp_target_robot->robot_energy + $temp_target_robot->robot_attack + $temp_target_robot->robot_defense + $temp_target_robot->robot_speed;

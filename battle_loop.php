@@ -5,6 +5,7 @@ require_once('top.php');
 // Never try to display errors during the battle loop, always log to file instead
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
+ini_set('ignore_repeated_errors', 1);
 ini_set('log_errors', 1);
 
 // If the user is not logged in, don't allow them here
@@ -143,11 +144,20 @@ $this_field->update_session();
 
 // Define the current player object using the loaded player data
 $this_user_id = rpg_user::get_current_userid();
-$this_playerinfo = array('user_id' => $this_user_id, 'player_id' => $this_player_id, 'player_token' => $this_player_token, 'player_autopilot' => false);
+$this_playerinfo = array(
+    'user_id' => $this_user_id,
+    'player_id' => $this_player_id,
+    'player_token' => $this_player_token,
+    'player_autopilot' => false
+    );
 $this_playerinfo['player_autopilot'] = false;
 $this_playerinfo['player_side'] = 'left';
 // Define the target player object using the loaded player data
-$target_playerinfo = array('user_id' => $target_user_id, 'player_id' => $target_player_id, 'player_token' => $target_player_token);
+$target_playerinfo = array(
+    'user_id' => $target_user_id,
+    'player_id' => $target_player_id,
+    'player_token' => $target_player_token
+    );
 $target_playerinfo['player_autopilot'] = true;
 $target_playerinfo['player_side'] = 'right';
 
@@ -212,17 +222,20 @@ elseif ($this_action == 'start'){
 //echo 'memory_get_peak_usage() = '.round((memory_get_peak_usage() / 1024) / 1024, 2).'M'."\n";
 //exit();
 
-if (!isset($mmrpg_index_players) || empty($mmrpg_index_players)){
-    $mmrpg_index_players = rpg_player::get_index(true);
-}
+// Collect an index of all players so we can use later
+$db_player_fields = rpg_player::get_index_fields(true);
+$battle_players_index = $db->get_array_list("SELECT {$db_player_fields} FROM mmrpg_index_players WHERE player_flag_complete = 1;", 'player_token');
+$mmrpg_index_players = &$battle_players_index;
 
 // Collect an index of all types so we can user later
 $db_type_fields = rpg_type::get_index_fields(true);
 $battle_types_index = $db->get_array_list("SELECT {$db_type_fields} FROM mmrpg_index_types WHERE type_class <> 'systen';", 'type_token');
+$mmrpg_index_types = &$battle_types_index;
 
 // Collect an index of all complete robots so we can use later
 $db_robot_fields = rpg_robot::get_index_fields(true);
 $battle_robots_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+$mmrpg_index_robots = &$battle_robots_index;
 
 // If this is the START action, update objects with preset battle data fields
 if ($this_action == 'start'){
@@ -442,7 +455,7 @@ elseif ($this_action == 'restart'){
     require_once('battle/actions/restart.php');
 
 }
-// Else if the player is has requested to restart the battle
+// Else if the player is has requested the next battle in sequence
 elseif ($this_action == 'next'){
 
     // Require the next action file
@@ -484,23 +497,34 @@ elseif ($this_action == 'item'){
     require_once('battle/actions/ability_item.php');
 
 }
-/*
-// Else if the player's robot is using an ability-item
-elseif ($this_action == 'item' && strstr($this_action_token, '-core')){
 
-    // Require the ability-item action file
-    require_once('battle/actions/ability_item.php');
-
+// Re-collect this robot if different from the "current" one in this player's values
+$this_player->player_reload();
+if (!empty($this_player->values['current_robot'])){
+    //$this_battle->events_create(false, false, 'debug', 'battle-loop on line '.__LINE__.' our $this_player->values[\'current_robot\'] = '.$this_player->values['current_robot']);
+    list($id, $token) = explode('_', $this_player->values['current_robot']);
+    if ($this_robot->robot_id !== $id){
+        unset($this_robot);
+        $this_robot = rpg_game::get_robot($this_battle, $this_player, array(
+            'robot_id' => $id,
+            'robot_token' => $token
+            ));
+    }
 }
-// Else if the player's robot is using an item
-elseif ($this_action == 'item'){
 
-    // Require the item action file
-    require_once('battle/actions/item.php');
-
+// Re-collect target robot if different from the "current" one in target player's values
+$target_player->player_reload();
+if (!empty($target_player->values['current_robot'])){
+    //$this_battle->events_create(false, false, 'debug', 'battle-loop on line '.__LINE__.' our $target_player->values[\'current_robot\'] = '.$target_player->values['current_robot']);
+    list($id, $token) = explode('_', $target_player->values['current_robot']);
+    if ($target_robot->robot_id !== $id){
+        unset($target_robot);
+        $target_robot = rpg_game::get_robot($this_battle, $target_player, array(
+            'robot_id' => $id,
+            'robot_token' => $token
+            ));
+    }
 }
-
-*/
 
 // Now execute the stored actions (and any created in the process of executing them!)
 $this_battle->actions_execute();
@@ -527,7 +551,7 @@ if ($target_robot->robot_status == 'disabled' || $target_robot->robot_energy < 1
 if (!isset($_SESSION['GAME']['values']['battle_items'])){
     // Loop through player index if not empty
     $temp_items_array = array();
-    foreach ($mmrpg_index_players AS $player_token => $player_info){
+    foreach ($battle_players_index AS $player_token => $player_info){
         if (!empty($_SESSION['GAME']['values']['battle_rewards'][$player_token]['player_items'])){
             foreach ($_SESSION['GAME']['values']['battle_rewards'][$player_token]['player_items'] AS $token => $count){
                 if (!isset($temp_items_array[$token])){ $temp_items_array[$token] = 0; }
@@ -542,7 +566,6 @@ if (!isset($_SESSION['GAME']['values']['battle_items'])){
 
 // Define the array to hold action panel markup
 $actions_markup = array();
-
 
 // Define the default this and target ids and tokens to reload
 $temp_this_reload_robot = array('robot_id' => $this_robot->robot_id, 'robot_token' => $this_robot->robot_token);
@@ -560,9 +583,12 @@ if ($this_robot->robot_position != 'active'){
     }
     // If something was found, upload the reload for this robot
     if (!empty($temp_active_info)){
+        $temp_this_reload_robot = array();
         $temp_this_reload_robot['robot_id'] = $temp_active_info['robot_id'];
         $temp_this_reload_robot['robot_token'] = $temp_active_info['robot_token'];
     }
+    // Refresh the settings for this robot with recent changes
+    $this_robot = rpg_game::get_robot($this_battle, $this_player, $temp_this_reload_robot);
 }
 
 // If target robot is not active, check to see if there's one that is
@@ -577,16 +603,15 @@ if ($target_robot->robot_position != 'active'){
     }
     // If something was found, upload the reload for this robot
     if (!empty($temp_active_info)){
+        $temp_target_reload_robot = array();
         $temp_target_reload_robot['robot_id'] = $temp_active_info['robot_id'];
         $temp_target_reload_robot['robot_token'] = $temp_active_info['robot_token'];
     }
     // Update the player session
     $target_player->update_session();
+    // Refresh the settings for target robot with recent changes
+    $target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_target_reload_robot);
 }
-
-// Refresh the settings for both robots with recent changes
-$this_robot = rpg_game::get_robot($this_battle, $this_player, $temp_this_reload_robot);
-$target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_target_reload_robot);
 
 // Ensure the battle is still in progress
 if (empty($this_redirect) && $this_battle->battle_status != 'complete'){
@@ -661,30 +686,33 @@ $canvas_refresh = false;
 
 // Search for an active target robot to update the engine with
 $active_target_robot = false;
-foreach ($target_player->player_robots AS $temp_robotinfo){
-    if (empty($active_target_robot) && $temp_robotinfo['robot_position'] == 'active'){
-        $active_target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_robotinfo);
-        if ($active_target_robot->robot_energy < 1){
-            $active_target_robot->flags['apply_disabled_state'] = true;
-            $active_target_robot->flags['hidden'] = true;
-            $active_target_robot->robot_status = 'disabled';
-            $active_target_robot->update_session();
-            $canvas_refresh = true;
-        }
-    } elseif (!empty($active_target_robot) && $temp_robotinfo['robot_position'] == 'active'){
-        $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_robotinfo);
-        $temp_target_robot->robot_position = 'bench';
-        $temp_target_robot->update_session();
-        $canvas_refresh = true;
-        if ($temp_target_robot->robot_energy < 1){
-            $temp_target_robot->flags['apply_disabled_state'] = true;
-            $temp_target_robot->flags['hidden'] = true;
-            $temp_target_robot->robot_status = 'disabled';
+if ($target_robot->robot_position !== 'active'){
+    foreach ($target_player->player_robots AS $temp_robotinfo){
+        if (empty($active_target_robot) && $temp_robotinfo['robot_position'] == 'active'){
+            $active_target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_robotinfo);
+            if ($active_target_robot->robot_energy < 1){
+                $active_target_robot->flags['apply_disabled_state'] = true;
+                $active_target_robot->flags['hidden'] = true;
+                $active_target_robot->robot_status = 'disabled';
+                $active_target_robot->update_session();
+                $canvas_refresh = true;
+            }
+        } elseif (!empty($active_target_robot) && $temp_robotinfo['robot_position'] == 'active'){
+            $temp_target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_robotinfo);
+            $temp_target_robot->robot_position = 'bench';
             $temp_target_robot->update_session();
             $canvas_refresh = true;
+            if ($temp_target_robot->robot_energy < 1){
+                $temp_target_robot->flags['apply_disabled_state'] = true;
+                $temp_target_robot->flags['hidden'] = true;
+                $temp_target_robot->robot_status = 'disabled';
+                $temp_target_robot->update_session();
+                $canvas_refresh = true;
+            }
         }
     }
-
+} else {
+    $active_target_robot = $target_robot;
 }
 if (empty($active_target_robot)){
     $temp_robots_active_array = $target_player->values['robots_active'];
@@ -1026,7 +1054,7 @@ if (window != window.top){
 
     // Redirect the parent window if necessary
     <?if(!empty($this_redirect)):?>
-    parent.window.location.href = '<?=$this_redirect?>';
+        parent.window.location.href = '<?=$this_redirect?>';
     <?else:?>
 
     // Update the global battle engine variables
