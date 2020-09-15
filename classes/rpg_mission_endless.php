@@ -269,6 +269,8 @@ class rpg_mission_endless extends rpg_mission {
         $rel_star_force = $max_star_force;
         foreach ($rel_star_force AS $type => $val){ $rel_star_force[$type] = round($val * $rel_multiplier); }
         $target_player = array(
+            'user_id' => MMRPG_SETTINGS_TARGET_PLAYERID,
+            'player_id' => rpg_game::unique_player_id(MMRPG_SETTINGS_TARGET_PLAYERID, 0),
             'player_token' => 'player',
             'player_starforce' => $rel_star_force
             );

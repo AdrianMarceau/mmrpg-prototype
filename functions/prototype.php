@@ -1572,9 +1572,9 @@ function mmrpg_prototype_option_message_markup($player_token, $subject, $lineone
 function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototype_data){
 
     // Collect a temporary object indexes for reference
-    static $temp_robot_index, $temp_field_index;
-    if (empty($temp_robot_index)){ $temp_robot_index = rpg_robot::get_index(); }
-    if (empty($temp_field_index)){ $temp_field_index = rpg_field::get_index(); }
+    static $mmrpg_index_robots, $mmrpg_index_fields;
+    if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = rpg_robot::get_index(); }
+    if (empty($mmrpg_index_fields)){ $mmrpg_index_fields = rpg_field::get_index(); }
 
     // DEBUG DEBUG DEBUG
     //$temp_battle_omega['values']['debug']['target_robots_backup'] = json_encode($temp_battle_omega['battle_target_player']['player_robots']);
@@ -1617,8 +1617,8 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
     }
 
     // Collect details about this battle field
-    $field1_info = !empty($battle_field['field_background']) ? $temp_field_index[$battle_field['field_background']] : $temp_field_index[$battle_field['field_token']];
-    $field2_info = !empty($battle_field['field_foreground']) ? $temp_field_index[$battle_field['field_foreground']] : $temp_field_index[$battle_field['field_token']];
+    $field1_info = !empty($battle_field['field_background']) ? $mmrpg_index_fields[$battle_field['field_background']] : $mmrpg_index_fields[$battle_field['field_token']];
+    $field2_info = !empty($battle_field['field_foreground']) ? $mmrpg_index_fields[$battle_field['field_foreground']] : $mmrpg_index_fields[$battle_field['field_token']];
 
 
     /* REMOVE DEFAULT MECHAS */
@@ -1627,7 +1627,7 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
     $temp_player_robots = $temp_battle_omega['battle_target_player']['player_robots'];
     foreach ($temp_player_robots AS $key => $robot_info){
         $robot_token = $robot_info['robot_token'];
-        $index_info = $temp_robot_index[$robot_token];
+        $index_info = $mmrpg_index_robots[$robot_token];
         if ($index_info['robot_class'] == 'mecha'){
             unset($temp_player_robots[$key]);
             continue;
@@ -1661,7 +1661,7 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
         if ($temp_mecha_options_maxkey > 0){ $option_key = (($i + 1) % $temp_mecha_options_num); }
         else { $option_key = 0; }
         $mecha_token = $temp_mecha_options[$option_key];
-        $index_info = $temp_robot_index[$mecha_token];
+        $index_info = $mmrpg_index_robots[$mecha_token];
         $robot_info = array();
         $robot_info['robot_id'] = rpg_game::unique_robot_id($temp_player_id, $index_info['robot_id'], ($i + 1));
         $robot_info['robot_token'] = $index_info['robot_token'];
@@ -1712,7 +1712,7 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
     $temp_player_robots = $temp_battle_omega['battle_target_player']['player_robots'];
     foreach ($temp_player_robots AS $key => $robot_info){
         $robot_token = $robot_info['robot_token'];
-        $index_info = $temp_robot_index[$robot_token];
+        $index_info = $mmrpg_index_robots[$robot_token];
         $best_stat = rpg_robot::get_best_stat($index_info);
         $robot_info['counters'][$best_stat.'_mods'] = $master_boost_power;
         $worst_stat = rpg_robot::get_worst_stat($index_info);
@@ -1729,7 +1729,7 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
             if (!empty($trobots)){
                 $atoken = 'sega-remix';
                 $rtoken = $trobots[0]['robot_token'];
-                $gtoken = strtolower($temp_robot_index[$rtoken]['robot_game']);
+                $gtoken = strtolower($mmrpg_index_robots[$rtoken]['robot_game']);
                 $music_path = $atoken.'/boss-theme-'.$gtoken.'/';
                 if (rpg_game::sound_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
                     $temp_battle_omega['battle_field_base']['field_music'] = $music_path;
@@ -1800,9 +1800,10 @@ function mmrpg_prototype_generate_mission($this_prototype_data,
     if (empty($target_robots) || !is_array($target_robots)){ $target_robots = array(); }
 
     // Collect a temporary object indexes for reference
-    static $temp_robot_index, $temp_field_index;
-    if (empty($temp_robot_index)){ $temp_robot_index = rpg_robot::get_index(true); }
-    if (empty($temp_field_index)){ $temp_field_index = rpg_field::get_index(); }
+    static $mmrpg_index_players, $mmrpg_index_robots, $mmrpg_index_fields;
+    if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
+    if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = rpg_robot::get_index(true); }
+    if (empty($mmrpg_index_fields)){ $mmrpg_index_fields = rpg_field::get_index(true); }
 
     // Pre-count the number of target robots
     $num_target_robots = count($target_robots);
@@ -1822,8 +1823,10 @@ function mmrpg_prototype_generate_mission($this_prototype_data,
     $temp_battle_omega['battle_turns'] = !empty($battle_info['battle_turns']) ? $battle_info['battle_turns'] : 0;
 
     // Parse the target player array and fill-in missing fields, then add to battle
-    $target_info['player_id'] = !empty($target_info['player_id']) ? $target_info['player_id'] : MMRPG_SETTINGS_TARGET_PLAYERID;
+    $target_info['user_id'] = !empty($target_info['user_id']) ? $target_info['user_id'] : MMRPG_SETTINGS_TARGET_PLAYERID;
+    $target_info['player_id'] = !empty($target_info['player_id']) ? $target_info['player_id'] : rpg_game::unique_player_id($target_info['user_id'], 0);
     $target_info['player_token'] = !empty($target_info['player_token']) ? $target_info['player_token'] : 'player';
+    if ($target_info['player_token'] !== 'player'){ $target_info['player_id'] = rpg_game::unique_player_id($target_info['user_id'], $mmrpg_index_players[$target_info['player_token']]['player_id']); }
     $temp_battle_omega['battle_target_player'] = $target_info;
 
     // Parse the field info array and fill-in missing fields, then add to battle
@@ -1839,8 +1842,8 @@ function mmrpg_prototype_generate_mission($this_prototype_data,
     foreach ($target_robots AS $key => $robot_info){ if (!isset($robot_info['robot_token'])){ unset($target_robots); continue; } }
     if (empty($target_robots)){ $target_robots[] = array('robot_token' => 'met'); }
     foreach ($target_robots AS $key => $robot_info){
-        $index_info = $temp_robot_index[$robot_info['robot_token']];
-        $robot_info['robot_id'] = !empty($robot_info['robot_id']) ? $robot_info['robot_id'] : (MMRPG_SETTINGS_TARGET_PLAYERID + $key + 1);
+        $index_info = $mmrpg_index_robots[$robot_info['robot_token']];
+        $robot_info['robot_id'] = !empty($robot_info['robot_id']) ? $robot_info['robot_id'] : rpg_game::unique_robot_id($target_info['player_id'], $index_info['robot_id'], ($key + 1));
         $robot_info['robot_level'] = !empty($robot_info['robot_level']) ? $robot_info['robot_level'] : $temp_battle_omega['battle_level'];
         $robot_info['robot_item'] = !empty($robot_info['robot_item']) ? $robot_info['robot_item'] : '';
         $robot_info['robot_abilities'] = !empty($robot_info['robot_abilities']) ? $robot_info['robot_abilities'] : 'auto';
@@ -2423,13 +2426,13 @@ function mmrpg_prototype_get_player_music($player_token, $session_token = 'GAME'
     $temp_session_key = $player_token.'_target-robot-omega_prototype';
     $temp_robot_omega = !empty($_SESSION[$session_token]['values'][$temp_session_key]) ? $_SESSION[$session_token]['values'][$temp_session_key] : array();
     $db_robot_fields = rpg_robot::get_index_fields(true);
-    $temp_robot_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+    $mmrpg_index_robots = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
 
     // Count the games representaed and order by count
     $temp_game_counters = array();
     foreach ($temp_robot_omega AS $omega){
         if (empty($omega['robot'])){ continue; }
-        $index = rpg_robot::parse_index_info($temp_robot_index[$omega['robot']]);
+        $index = rpg_robot::parse_index_info($mmrpg_index_robots[$omega['robot']]);
         $game = strtolower($index['robot_game']);
         if (!isset($temp_game_counters[$game])){ $temp_game_counters[$game] = 0; }
         $temp_game_counters[$game] += 1;
@@ -2556,7 +2559,7 @@ function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token 
     $temp_player_robots = $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'];
     $temp_db_tokens = "'".implode("','", array_keys($temp_player_robots))."'";
     $temp_db_fields = rpg_robot::get_index_fields(true, 'robots');
-    $temp_robot_index = $db->get_array_list("SELECT
+    $mmrpg_index_robots = $db->get_array_list("SELECT
         {$temp_db_fields}
         FROM mmrpg_index_robots AS robots
         WHERE robots.robot_flag_complete = 1
@@ -2564,8 +2567,8 @@ function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token 
         ;", 'robot_token');
     $sprites_displayed = 0;
     foreach ($temp_player_robots AS $token => $info){
-        if (!isset($temp_robot_index[$token])){ continue; }
-        $index = rpg_robot::parse_index_info($temp_robot_index[$token]);
+        if (!isset($mmrpg_index_robots[$token])){ continue; }
+        $index = rpg_robot::parse_index_info($mmrpg_index_robots[$token]);
         $info = array_merge($index, $info);
         if (mmrpg_prototype_robot_unlocked($player_token, $token)){
             $temp_size = !empty($info['robot_image_size']) ? $info['robot_image_size'] : 40;

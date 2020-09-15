@@ -202,12 +202,16 @@ class rpg_mission_challenge extends rpg_mission {
 
         // Automatically expand the target data with all required details given base
         if (empty($challenge_data['challenge_target_data'])){ return false; }
+        $temp_user_id = MMRPG_SETTINGS_TARGET_PLAYERID;
+        $temp_player_id = rpg_game::unique_player_id($temp_user_id, 0);
         $challenge_target_player = json_decode($challenge_data['challenge_target_data'], true);
-        $challenge_target_player['player_id'] = MMRPG_SETTINGS_TARGET_PLAYERID;
+        $challenge_target_player = array_merge(array('user_id' => 0, 'player_id' => 0), $challenge_target_player);
+        $challenge_target_player['user_id'] = $temp_user_id;
+        $challenge_target_player['player_id'] = $temp_player_id;
         if (!isset($challenge_target_player['player_token'])){ $challenge_target_player['player_token'] = 'player'; }
         if (!isset($challenge_target_player['player_name'])){ $challenge_target_player['player_name'] = ucwords(str_replace('-', '. ', $challenge_target_player['player_token'])); }
         foreach ($challenge_target_player['player_robots'] AS $k => $r){
-            $challenge_target_player['player_robots'][$k]['robot_id'] = MMRPG_SETTINGS_TARGET_PLAYERID + ($k + 1);
+            $challenge_target_player['player_robots'][$k]['robot_id'] = rpg_game::unique_robot_id($temp_player_id, $mmrpg_index_robots[$r['robot_token']]['robot_id'], ($k + 1));
             $challenge_target_player['player_robots'][$k]['robot_level'] = $challenge_robot_level;
             $challenge_target_player['player_robots'][$k]['values']['robot_rewards'] = $challenge_robot_rewards;
         }
