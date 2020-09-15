@@ -7,6 +7,7 @@ class rpg_game {
 
     // Define global class variables
     public static $index = array();
+    public static $flags = array();
 
 
     /**
@@ -17,6 +18,53 @@ class rpg_game {
     public function __construct(){ }
 
 
+
+    // -- COMMON FLAG FUNCTIONS -- //
+
+
+    // Define some quick static flag functions for optimizing purposes
+    public static function has_flag($flag_name){
+        if (isset(self::$flags[$flag_name])){ return true; }
+        else { return false; }
+    }
+    public static function get_flag($flag_name){
+        if (isset(self::$flags[$flag_name])){ return self::$flags[$flag_name]; }
+        else { return null; }
+    }
+    public static function set_flag($flag_name, $flag_value){
+        self::$flags[$flag_name] = $flag_value;
+    }
+    public static function unset_flag($flag_name){
+        unset(self::$flags[$flag_name]);
+    }
+
+    // Define some quick functions for testing if onload triggered or setting the value
+    public static function onload_triggered($object_type, $object_id, $trigger = false){
+        $flag_name = 'onload_triggered/'.$object_type.'/'.$object_id;
+        if ($trigger === true){
+            //error_log('set '.$flag_name.' to true!'.PHP_EOL);
+            self::set_flag($flag_name, true);
+        } else {
+            //error_log('return '.$flag_name.' ('.(self::has_flag($flag_name) ? 'true' : 'false').')!'.PHP_EOL);
+            return self::has_flag($flag_name);
+        }
+    }
+
+
+    // -- COMMON ID FUNCTIONS -- //
+
+    public static function unique_player_id($user_id, $player_index_id){
+        return $user_id.'x'.$player_index_id;
+    }
+    public static function unique_robot_id($player_id, $robot_index_id, $key = 0){
+        return $player_id.'x'.$robot_index_id.'x'.$key;
+    }
+    public static function unique_ability_id($player_or_robot_id, $ability_index_id){
+        return $player_or_robot_id.'x'.$ability_index_id;
+    }
+    public static function unique_item_id($player_or_robot_id, $item_index_id){
+        return $player_or_robot_id.'x'.$item_index_id;
+    }
 
     // -- BATTLE OBJECT FUNCTIONS -- //
 
@@ -420,6 +468,14 @@ class rpg_game {
         // If we're not in demo mode, we must be user mode
         $session_token = self::session_token();
         return !empty($_SESSION[$session_token]['USER']['userid']) && $_SESSION[$session_token]['USER']['userid'] != MMRPG_SETTINGS_GUEST_ID ? true : false;
+    }
+
+
+    // Define a function for checking if we're in user mode
+    public static function get_userid(){
+        // If we're not in demo mode, we must be user mode
+        $session_token = self::session_token();
+        return !empty($_SESSION[$session_token]['USER']['userid']) ? $_SESSION[$session_token]['USER']['userid'] : MMRPG_SETTINGS_GUEST_ID;
     }
 
 
