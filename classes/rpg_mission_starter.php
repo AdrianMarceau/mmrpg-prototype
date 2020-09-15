@@ -33,6 +33,8 @@ class rpg_mission_starter extends rpg_mission {
         // Populate the battle options with the starter battle option
         $temp_target_count = 1;
         $temp_battle_token = $this_prototype_data['phase_battle_token'].'-'.$this_robot_token;
+        $temp_user_id = MMRPG_SETTINGS_TARGET_PLAYERID;
+        $temp_player_id = rpg_game::unique_player_id($temp_user_id, 0);
         $temp_battle_omega = array();
         $temp_battle_omega['battle_field_base']['field_id'] = 100;
         $temp_battle_omega['battle_field_base']['field_token'] = $this_intro_field;
@@ -51,9 +53,10 @@ class rpg_mission_starter extends rpg_mission {
         $temp_battle_omega['battle_zenny'] = ceil(($this_prototype_data['battles_complete'] > 1 ? MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL2 : MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL) * $temp_target_count * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER);
         if ($temp_battle_omega_complete['battle_count'] > 0){ $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * (2 / (2 + $temp_battle_omega_complete['battle_count']))); }
         //$temp_battle_omega['battle_field_base']['field_music'] = mmrpg_prototype_get_player_boss_music($this_prototype_data['this_player_token']);
-        $temp_battle_omega['battle_target_player']['player_id'] = MMRPG_SETTINGS_TARGET_PLAYERID;
+        $temp_battle_omega['battle_target_player']['user_id'] = $temp_user_id;
+        $temp_battle_omega['battle_target_player']['player_id'] = $temp_player_id;
         $temp_battle_omega['battle_target_player']['player_token'] = 'player';
-        $temp_battle_omega['battle_target_player']['player_robots'][0] = array('robot_id' => (MMRPG_SETTINGS_TARGET_PLAYERID + 1), 'robot_token' => $this_robot_token);
+        $temp_battle_omega['battle_target_player']['player_robots'][0] = array('robot_id' => rpg_game::unique_robot_id($temp_player_id, $this_robot_data['robot_id'], 0), 'robot_token' => $this_robot_token);
         $temp_mook_robot = $temp_battle_omega['battle_target_player']['player_robots'][0];
         $temp_battle_omega['battle_target_player']['player_robots'] = array();
         $temp_name_index = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H');
@@ -61,7 +64,7 @@ class rpg_mission_starter extends rpg_mission {
         /// Loop through and add other robots to the battle
         for ($i = 0; $i < $temp_target_count; $i++){
             $temp_clone_robot = $temp_mook_robot;
-            $temp_clone_robot['robot_id'] = MMRPG_SETTINGS_TARGET_PLAYERID + $i;
+            $temp_clone_robot['robot_id'] = rpg_game::unique_robot_id($temp_player_id, $this_robot_data['robot_id'], ($i + 1));
             $temp_clone_robot['robot_level'] = $this_start_level;
             $temp_clone_robot['robot_token'] = $this_robot_token;
             $temp_robot_name = $this_robot_name;

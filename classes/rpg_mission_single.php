@@ -32,6 +32,8 @@ class rpg_mission_single extends rpg_mission {
         $this_field_index = rpg_field::get_index();
 
         // Define the array to hold this omega battle and populate with base varaibles
+        $temp_user_id = MMRPG_SETTINGS_TARGET_PLAYERID;
+        $temp_player_id = rpg_game::unique_player_id($temp_user_id, 0);
         $temp_option_robot = is_array($this_robot_token) ? $this_robot_token : rpg_robot::parse_index_info($this_robot_index[$this_robot_token]);
         $temp_option_field = rpg_field::parse_index_info($this_field_index[$this_field_token]);
         $temp_battle_omega = array();
@@ -45,12 +47,13 @@ class rpg_mission_single extends rpg_mission {
         $temp_battle_omega['battle_phase'] = $this_prototype_data['battle_phase'];
         $temp_battle_omega['battle_field_base']['field_id'] = 100;
         $temp_battle_omega['battle_field_base']['field_token'] = $temp_option_field['field_token'];
-        $temp_battle_omega['battle_target_player']['player_id'] = MMRPG_SETTINGS_TARGET_PLAYERID;
+        $temp_battle_omega['battle_target_player']['user_id'] = $temp_user_id;
+        $temp_battle_omega['battle_target_player']['player_id'] = $temp_player_id;
         $temp_battle_omega['battle_target_player']['player_token'] = 'player';
         $temp_battle_omega['battle_target_player']['player_robots'] = array();
         $temp_robot_master_tokens = array();
         if (!$starfield_mission){
-            $temp_battle_omega['battle_target_player']['player_robots'][0]['robot_id'] = MMRPG_SETTINGS_TARGET_PLAYERID + 1;
+            $temp_battle_omega['battle_target_player']['player_robots'][0]['robot_id'] = rpg_game::unique_robot_id($temp_player_id, $temp_option_robot['robot_id'], 1);
             $temp_battle_omega['battle_target_player']['player_robots'][0]['robot_token'] = $this_robot_token;
             $temp_robot_master_tokens[] = $this_robot_token;
         }
@@ -232,7 +235,7 @@ class rpg_mission_single extends rpg_mission {
             //shuffle($temp_battle_omega['battle_target_player']['player_robots']);
             foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $info){
                 // Update the robot ID to prevent collisions
-                $info['robot_id'] = MMRPG_SETTINGS_TARGET_PLAYERID + $key + 1;
+                $info['robot_id'] = rpg_game::unique_robot_id($temp_player_id, $this_robot_index[$info['robot_token']]['robot_id'], ($key + 1));
                 // Append the appropriate letters to all the robot name tokens
                 if (isset($info['robot_class']) && $info['robot_class'] == 'mecha'){
                     $temp_name_token = isset($info['robot_name_token']) ? $info['robot_name_token'] : $info['robot_token'];

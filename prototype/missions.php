@@ -123,36 +123,34 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             );
 
         // Unlock the first fortress battle
-        $temp_battle_token = $this_prototype_data['this_player_token'].'-fortress-i';
-        $temp_index_battle = rpg_battle::get_index_info($temp_battle_token, true);
-        $temp_battle_omega = $temp_index_battle;
-        $temp_battle_omega['battle_phase'] = $this_prototype_data['battle_phase'];
-        $temp_battle_omega['battle_level'] = $this_prototype_data['this_chapter_levels'][2];
-        $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
+        $temp_rival_option_token = $this_prototype_data['this_player_token'].'-fortress-i';
+        $temp_rival_option = rpg_battle::get_index_info($temp_rival_option_token, true);
+        $temp_rival_option['battle_phase'] = $this_prototype_data['battle_phase'];
+        $temp_rival_option['battle_level'] = $this_prototype_data['this_chapter_levels'][2];
+        $temp_rival_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
 
         // If the battle is complete, remove the player from the description
-        $temp_battle_complete = mmrpg_prototype_battle_complete($this_prototype_data['this_player_token'], $temp_battle_token);
+        $temp_battle_complete = mmrpg_prototype_battle_complete($this_prototype_data['this_player_token'], $temp_rival_option_token);
         if ($temp_battle_complete){
-            $temp_battle_omega['battle_target_player'] = $temp_index_battle['battle_target_player'];
-            $temp_battle_omega['battle_target_player']['player_token'] = 'player';
-            $temp_battle_omega['battle_description'] = $temp_index_battle['battle_description'];
-            $temp_battle_omega['battle_description'] = preg_replace('/^Defeat (Dr. (Wily|Light|Cossack)\'s)/i', 'Defeat', $temp_battle_omega['battle_description']);
+            $temp_rival_option['battle_target_player']['player_token'] = 'player';
+            $temp_rival_option['battle_description'] = preg_replace('/^Defeat (Dr. (Wily|Light|Cossack)\'s)/i', 'Defeat', $temp_rival_option['battle_description']);
             // Also make sure any unlocked robots appear in greyscale on the button
-            foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $rm_key => $rm_robot){
+            foreach ($temp_rival_option['battle_target_player']['player_robots'] AS $rm_key => $rm_robot){
                 if (mmrpg_prototype_robot_unlocked(false, $rm_robot['robot_token'])){
                     //$rm_robot['flags']['hide_from_mission_select'] = true;
                     $rm_robot['flags']['shadow_on_mission_select'] = true;
-                    $temp_battle_omega['battle_target_player']['player_robots'][$rm_key] = $rm_robot;
+                    $temp_rival_option['battle_target_player']['player_robots'][$rm_key] = $rm_robot;
                 }
             }
         }
 
         // Recalculate zenny and turns for this fortress mission
-        rpg_mission::calculate_mission_zenny_and_turns($temp_battle_omega, $this_prototype_data, $mmrpg_robots_index);
+        rpg_mission_fortress::prepare($temp_rival_option, $this_prototype_data);
+        //rpg_mission::calculate_mission_zenny_and_turns($temp_rival_option, $this_prototype_data, $mmrpg_robots_index);
 
         // Add the omega battle to the battle options
-        $this_prototype_data['battle_options'][] = $temp_battle_omega;
-        rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+        $this_prototype_data['battle_options'][] = $temp_rival_option;
+        rpg_battle::update_index_info($temp_rival_option['battle_token'], $temp_rival_option);
 
     }
 
@@ -247,7 +245,8 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $temp_final_option['battle_phase'] = $this_prototype_data['battle_phase'];
             $temp_final_option['battle_level'] = $this_prototype_data['this_chapter_levels'][4];
             $temp_final_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
-            rpg_mission::calculate_mission_zenny_and_turns($temp_final_option, $this_prototype_data, $mmrpg_robots_index);
+            rpg_mission_fortress::prepare($temp_final_option, $this_prototype_data);
+            //rpg_mission::calculate_mission_zenny_and_turns($temp_final_option, $this_prototype_data, $mmrpg_robots_index);
             $this_prototype_data['battle_options'][] = $temp_final_option;
             rpg_battle::update_index_info($temp_final_option['battle_token'], $temp_final_option);
 
@@ -263,7 +262,8 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $temp_final_option['battle_phase'] = $this_prototype_data['battle_phase'];
             $temp_final_option['battle_level'] = $this_prototype_data['this_chapter_levels'][4];
             $temp_final_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
-            rpg_mission::calculate_mission_zenny_and_turns($temp_final_option, $this_prototype_data, $mmrpg_robots_index);
+            rpg_mission_fortress::prepare($temp_final_option, $this_prototype_data);
+            //rpg_mission::calculate_mission_zenny_and_turns($temp_final_option, $this_prototype_data, $mmrpg_robots_index);
             $this_prototype_data['battle_options'][] = $temp_final_option;
             rpg_battle::update_index_info($temp_final_option['battle_token'], $temp_final_option);
 
@@ -323,7 +323,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 //if ($info['robot_level'] > $temp_final_option['battle_level']){ $temp_final_option['battle_level'] = $info['robot_level']; }
                 $index = rpg_robot::parse_index_info($mmrpg_robots_index[$token]);
                 $info = array();
-                $info['robot_id'] = (MMRPG_SETTINGS_TARGET_PLAYERID + $key + 1);
+                $info['robot_id'] = ($key + 1); // temp, is changed later
                 $info['robot_token'] = $token;
                 $info['robot_name'] = $index['robot_name'].' Σ';
                 $info['robot_image'] = $token.'_alt9';
@@ -332,10 +332,6 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 if (!empty($item_options)){ $info['robot_item'] = $item_options[mt_rand(0, $item_max_key)]; }
                 $info['robot_abilities'] = array();
                 $info['robot_abilities'] = mmrpg_prototype_generate_abilities($index, $info['robot_level'], 8);
-                //$info['values']['robot_rewards'] = array();
-                //$info['values']['robot_rewards']['robot_attack'] = 1000;
-                //$info['values']['robot_rewards']['robot_defense'] = 1000;
-                //$info['values']['robot_rewards']['robot_speed'] = 1000;
                 $temp_final_option['battle_target_player']['player_robots'][] = $info;
             }
 
@@ -343,7 +339,8 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $temp_final_option['battle_field_base']['field_mechas'] = $temp_support_mechas;
             shuffle($temp_final_option['battle_target_player']['player_robots']);
             //die('<pre>'.print_r($temp_final_option, true).'</pre>');
-            rpg_mission::calculate_mission_zenny_and_turns($temp_final_option, $this_prototype_data, $mmrpg_robots_index);
+            rpg_mission_fortress::prepare($temp_final_option, $this_prototype_data);
+            //rpg_mission::calculate_mission_zenny_and_turns($temp_final_option, $this_prototype_data, $mmrpg_robots_index);
             $this_prototype_data['battle_options'][] = $temp_final_option;
             rpg_battle::update_index_info($temp_final_option['battle_token'], $temp_final_option);
 

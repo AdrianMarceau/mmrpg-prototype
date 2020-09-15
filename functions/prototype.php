@@ -1650,6 +1650,8 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
     $temp_battle_alpha['battle_counts'] = false;
     $temp_battle_alpha['battle_field_base']['values']['hazards'] = array();
     $temp_battle_alpha['battle_field_base']['field_music']  = $field1_info['field_token'];
+    $temp_user_id = $temp_battle_alpha['battle_target_player']['user_id'];
+    $temp_player_id = $temp_battle_alpha['battle_target_player']['player_id'];
     $temp_player_robots = array();
     $temp_mecha_options = $temp_battle_omega['battle_field_base']['field_mechas'];
     $temp_mecha_options_num = count($temp_mecha_options);
@@ -1661,7 +1663,7 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
         $mecha_token = $temp_mecha_options[$option_key];
         $index_info = $temp_robot_index[$mecha_token];
         $robot_info = array();
-        $robot_info['robot_id'] = MMRPG_SETTINGS_TARGET_PLAYERID + $i + 1;
+        $robot_info['robot_id'] = rpg_game::unique_robot_id($temp_player_id, $index_info['robot_id'], ($i + 1));
         $robot_info['robot_token'] = $index_info['robot_token'];
         $robot_info['robot_level'] = $omega_robot_level > 1 ? ($omega_robot_level - 1) : 1;
         $robot_info['robot_abilities'] = mmrpg_prototype_generate_abilities($index_info, $robot_info['robot_level'], $num_mecha_abilities, '');

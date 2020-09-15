@@ -82,6 +82,11 @@ class rpg_mission_bonus extends rpg_mission {
         $session_robot_database = !empty($_SESSION[$session_token]['values']['robot_database']) ? $_SESSION[$session_token]['values']['robot_database'] : array();
 
         // Populate the player's target robots with compatible class matches
+        $temp_user_id = MMRPG_SETTINGS_TARGET_PLAYERID;
+        $temp_player_id = rpg_game::unique_player_id($temp_user_id, 0);
+        $temp_battle_omega['battle_target_player'] = array_merge(array('user_id' => 0, 'player_id' => 0), $temp_battle_omega['battle_target_player']);
+        $temp_battle_omega['battle_target_player']['user_id'] = $temp_user_id;
+        $temp_battle_omega['battle_target_player']['player_id'] = $temp_player_id;
         $temp_battle_omega['battle_target_player']['player_robots'] = array();
         $temp_counter = 0;
         foreach ($this_robot_index AS $token => $info){
@@ -89,7 +94,7 @@ class rpg_mission_bonus extends rpg_mission {
             if (!isset($session_robot_database[$token]) || empty($session_robot_database[$token]['robot_encountered'])){ continue; }
             $temp_counter++;
             $temp_robot_info = array();
-            $temp_robot_info['robot_id'] = MMRPG_SETTINGS_TARGET_PLAYERID + $temp_counter;
+            $temp_robot_info['robot_id'] = rpg_game::unique_robot_id($temp_player_id, $info['robot_id'], $temp_counter);
             $temp_robot_info['robot_token'] = $info['robot_token'];
             $temp_robot_info['robot_core'] = $info['robot_core'];
             $temp_robot_info['robot_core2'] = $info['robot_core2'];

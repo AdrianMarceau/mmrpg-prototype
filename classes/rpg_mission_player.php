@@ -23,7 +23,10 @@ class rpg_mission_player extends rpg_mission {
         global $this_omega_factors_ten;
         global $this_omega_factors_eleven;
 
-        $this_field_index = rpg_field::get_index();
+        static $this_field_index, $this_player_index, $this_robot_index;
+        if (empty($this_field_index)){ $this_field_index = rpg_field::get_index(true); }
+        if (empty($this_player_index)){ $this_player_index = rpg_player::get_index(true); }
+        if (empty($this_robot_index)){ $this_robot_index = rpg_robot::get_index(true); }
 
         // Define the omega battle and default to empty
         $temp_battle_omega = array();
@@ -38,6 +41,10 @@ class rpg_mission_player extends rpg_mission {
 
         // Add this player data to the omage array
         $temp_battle_omega_player = $temp_player_array;
+
+        // Collect the user and player ID from the data array
+        $temp_user_id = $temp_battle_omega_player['user_id'];
+        $temp_player_id = rpg_game::unique_player_id($temp_user_id, $this_player_index[$target_player_token]['player_id']);
 
         // Collect the player values and decode the rewards and settings arrays
         $temp_player_rewards = $temp_player_array['player_rewards'];
@@ -93,7 +100,7 @@ class rpg_mission_player extends rpg_mission {
                 if (!empty($temp_player_robots_rewards[$temp_robotinfo['robot_token']])){ $temp_rewards_array = $temp_player_robots_rewards[$temp_robotinfo['robot_token']]; }
                 else { $temp_rewards_array = $temp_robotinfo; }
                 // Collect the basic details of this robot like ID, token, and level
-                $temp_robot_id = MMRPG_SETTINGS_TARGET_PLAYERID + $temp_counter;
+                $temp_robot_id = rpg_game::unique_robot_id($temp_player_id, $this_robot_index[$temp_robotinfo['robot_token']]['robot_id'], $temp_counter);
                 $temp_robot_token = $temp_robotinfo['robot_token'];
                 $temp_robot_level = $this_flat_level; //!empty($temp_robotinfo['robot_level']) ? $temp_robotinfo['robot_level'] : 1;
                 $temp_robot_favourite = in_array($temp_robot_token, $temp_player_favourites) ? 1 : 0;
@@ -213,7 +220,9 @@ class rpg_mission_player extends rpg_mission {
             $temp_battle_omega['battle_field_base']['field_foreground_attachments'] = $temp_field_info_two['field_foreground_attachments'];
 
             // Define the final details for the player
-            $temp_battle_omega['battle_target_player']['player_id'] = $temp_battle_userid;
+            $temp_battle_omega['battle_target_player'] = array_merge(array('user_id' => 0, 'player_id' => 0), $temp_battle_omega['battle_target_player']);
+            $temp_battle_omega['battle_target_player']['user_id'] = $temp_user_id;
+            $temp_battle_omega['battle_target_player']['player_id'] = $temp_player_id;
             $temp_battle_omega['battle_target_player']['player_token'] = $target_player_token_backup;
             $temp_battle_omega['battle_target_player']['player_name'] = ucfirst($temp_battle_username);
             $temp_battle_omega['battle_target_player']['player_robots'] = $temp_battle_omega_robots;

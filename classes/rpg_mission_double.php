@@ -32,13 +32,15 @@ class rpg_mission_double extends rpg_mission {
         $this_field_index = rpg_field::get_index();
 
         // Define the omega battle option and default to empty
+        $temp_user_id = MMRPG_SETTINGS_TARGET_PLAYERID;
+        $temp_player_id = rpg_game::unique_player_id($temp_user_id, 0);
         $temp_battle_omega = array();
         $temp_option_battle = array();
         $temp_option_battle2 = array();
         $temp_option_field = rpg_field::parse_index_info($this_field_index[$this_field_tokens[0]]);
         $temp_option_field2 = rpg_field::parse_index_info($this_field_index[$this_field_tokens[1]]);
-        $temp_option_robot = is_array($this_robot_tokens[0]) ? $this_robot_tokens[0] : array('robot_token' => $this_robot_tokens[0]);
-        $temp_option_robot2 = is_array($this_robot_tokens[1]) ? $this_robot_tokens[1] : array('robot_token' => $this_robot_tokens[1]);
+        $temp_option_robot = $this_robot_index[(is_array($this_robot_tokens[0]) ? $this_robot_tokens[0]['robot_token'] : $this_robot_tokens[0])];
+        $temp_option_robot2 = $this_robot_index[(is_array($this_robot_tokens[1]) ? $this_robot_tokens[1]['robot_token'] : $this_robot_tokens[1])];
         $temp_battle_omega['flags']['double_battle'] = true;
         $temp_battle_omega['values']['double_battle_masters'] = $this_robot_tokens;
         $temp_option_multipliers = array();
@@ -90,7 +92,8 @@ class rpg_mission_double extends rpg_mission {
             }
         }
 
-        $temp_option_battle['battle_target_player']['player_id'] = MMRPG_SETTINGS_TARGET_PLAYERID;
+        $temp_option_battle['battle_target_player']['user_id'] = $temp_user_id;
+        $temp_option_battle['battle_target_player']['player_id'] = $temp_player_id;
         $temp_option_battle['battle_target_player']['player_token'] = 'player';
         $temp_option_battle['battle_field_base']['field_token'] = $temp_option_field['field_token'];
         $temp_option_battle['battle_field_base']['field_name'] = preg_replace('/^([-_a-z0-9\s]+)\s+([-_a-z0-9]+)$/i', '$1', $temp_option_field['field_name']).' '.preg_replace('/^([-_a-z0-9\s]+)\s+([-_a-z0-9]+)$/i', '$2', $temp_option_field2['field_name']);
@@ -105,8 +108,8 @@ class rpg_mission_double extends rpg_mission {
         $temp_option_battle['battle_target_player']['player_robots'] = array(); //array_merge($temp_option_battle['battle_target_player']['player_robots'], $temp_option_battle2['battle_target_player']['player_robots']);
         $temp_robot_master_tokens = array();
         if (!$starfield_mission){
-            $temp_option_battle['battle_target_player']['player_robots'][0]['robot_id'] = MMRPG_SETTINGS_TARGET_PLAYERID + 1;
-            $temp_option_battle['battle_target_player']['player_robots'][1]['robot_id'] = MMRPG_SETTINGS_TARGET_PLAYERID + 2;
+            $temp_option_battle['battle_target_player']['player_robots'][0]['robot_id'] = rpg_game::unique_robot_id($temp_player_id, $temp_option_robot['robot_id'], 1);
+            $temp_option_battle['battle_target_player']['player_robots'][1]['robot_id'] = rpg_game::unique_robot_id($temp_player_id, $temp_option_robot2['robot_id'], 2);
             $temp_option_battle['battle_target_player']['player_robots'][0]['robot_token'] = $this_robot_tokens[0];
             $temp_option_battle['battle_target_player']['player_robots'][1]['robot_token'] = $this_robot_tokens[1];
             $temp_robot_master_tokens[] = $this_robot_tokens[0];
@@ -262,7 +265,9 @@ class rpg_mission_double extends rpg_mission {
         }
 
         // Reassign robot IDs to prevent errors
-        foreach ($temp_option_battle['battle_target_player']['player_robots'] AS $key => $info){ $temp_option_battle['battle_target_player']['player_robots'][$key]['robot_id'] = MMRPG_SETTINGS_TARGET_PLAYERID + $key + 1; }
+        foreach ($temp_option_battle['battle_target_player']['player_robots'] AS $key => $info){
+            $temp_option_battle['battle_target_player']['player_robots'][$key]['robot_id'] = rpg_game::unique_robot_id($temp_player_id, $this_robot_index[$info['robot_token']]['robot_id'], ($key + 1));
+        }
         $temp_option_battle['battle_rewards']['robots'] = array();
         $temp_option_battle['battle_rewards']['abilities'] = array();
         $temp_battle_omega = $temp_option_battle;
@@ -375,10 +380,6 @@ class rpg_mission_double extends rpg_mission {
         // If this is a starfield mission, it will give slightly more zenny than usual
         if ($starfield_mission){ $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * 0.1); }
         if ($starfield_mission && !$temp_fusion_star_present){ $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * 0.1); }
-
-        // Update the option robots
-        $temp_option_robot = $this_robot_index[$temp_option_robot['robot_token']];
-        $temp_option_robot2 = $this_robot_index[$temp_option_robot2['robot_token']];
 
         // Reverse the order of the robots in battle
         $temp_first_robot = array_shift($temp_battle_omega['battle_target_player']['player_robots']);
