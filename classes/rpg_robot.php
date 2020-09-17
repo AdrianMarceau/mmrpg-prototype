@@ -787,6 +787,18 @@ class rpg_robot extends rpg_object {
             if (!empty($objects['target_player'])){ $objects['target_robot'] = $this->battle->find_target_robot($objects['target_player']); }
         }
 
+        /*
+        // Reload any objects that have that option
+        foreach ($objects AS $name => $object){
+            if (substr($name, 0, 5) === 'this_'){
+                $reload_func = substr($name, 5).'_reload';
+                if (method_exists($object, $reload_func)){
+                    $object->$reload_func();
+                }
+            }
+        }
+        */
+
         // Return the full object array for later extracting
         return $objects;
 
