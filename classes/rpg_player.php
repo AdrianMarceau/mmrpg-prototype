@@ -1358,7 +1358,10 @@ class rpg_player extends rpg_object {
         ////if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG']['checkpoint_queries'][] = "CHECKPOINT on line ".__LINE__." in ".__FILE__;  }
         $this_export_array = $robot_object->export_array();
         ////if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG']['checkpoint_queries'][] = "CHECKPOINT on line ".__LINE__." in ".__FILE__;  }
-        $this->player_robots[$this_key] = $this_export_array;
+        $new_robots_array = $this->player_robots;
+        $new_robots_array[] = $this_export_array;
+        $this->set_robots($new_robots_array);
+        $this->update_session();
         if ($return_robot){ return $robot_object; }
         else { return true; }
     }
@@ -1950,8 +1953,6 @@ class rpg_player extends rpg_object {
         $this->values['current_robot'] = false;
         $this->values['current_robot_enter'] = isset($this->values['current_robot_enter']) ? $this->values['current_robot_enter'] : false;
 
-        // Create the flag variables if they don't exist
-
         // Create the counter variables and defeault to zero
         $this->counters['robots_total'] = 0;
         $this->counters['robots_active'] = 0;
@@ -1973,6 +1974,7 @@ class rpg_player extends rpg_object {
         if (!empty($this->player_robots)){
 
             // Loop through each of the player's robots and check status
+            $new_player_robots = array();
             foreach ($this->player_robots AS $this_key => $this_robotinfo){
                 // Ensure a token an idea are provided at least
                 if (empty($this_robotinfo['robot_id']) || empty($this_robotinfo['robot_token'])){ continue; }
@@ -1981,7 +1983,7 @@ class rpg_player extends rpg_object {
                 $temp_robot = rpg_game::get_robot($this->battle, $this, $temp_info, false);
                 if (!isset($temp_robot->robot_key)){ $temp_robot->set_key($this_key); }
                 // Update the player object with the refreshed robot info
-                $this->player_robots[$this_key] = $temp_robot->export_array();
+                $new_player_robots[$temp_robot->robot_id] = $temp_robot->export_array();
                 // Check if this robot is in the active position
                 if ($temp_robot->robot_position == 'active'){
                     $this->values['current_robot'] = $temp_robot->robot_string;
@@ -1991,20 +1993,20 @@ class rpg_player extends rpg_object {
                     // Increment the active robot counter
                     $this->counters['robots_active']++;
                     // Add this robot to the active robots array
-                    $this->values['robots_active'][] = $this->player_robots[$this_key]; //$this_info;
+                    $this->values['robots_active'][] = $new_player_robots[$temp_robot->robot_id];
                     // Check if this robot is in the active position
                     if ($temp_robot->robot_position == 'active'){
                         // Increment the active robot counter
                         $this->counters['robots_positions']['active']++;
                         // Add this robot to the active robots array
-                        $this->values['robots_positions']['active'][] = $this->player_robots[$this_key]; //$this_info;
+                        $this->values['robots_positions']['active'][] = $new_player_robots[$temp_robot->robot_id];
                     }
                     // Otherwise, if this robot is in benched position
                     elseif ($temp_robot->robot_position == 'bench'){
                         // Increment the bench robot counter
                         $this->counters['robots_positions']['bench']++;
                         // Add this robot to the bench robots array
-                        $this->values['robots_positions']['bench'][] = $this->player_robots[$this_key]; //$this_info;
+                        $this->values['robots_positions']['bench'][] = $new_player_robots[$temp_robot->robot_id];
                     }
                 }
                 // Otherwise, if this robot is in disabled status
@@ -2012,7 +2014,7 @@ class rpg_player extends rpg_object {
                     // Increment the disabled robot counter
                     $this->counters['robots_disabled']++;
                     // Add this robot to the disabled robots array
-                    $this->values['robots_disabled'][] = $this->player_robots[$this_key]; //$this_info;
+                    $this->values['robots_disabled'][] = $new_player_robots[$temp_robot->robot_id];
                 }
 
                 // Increment the robot total by default
@@ -2021,6 +2023,21 @@ class rpg_player extends rpg_object {
                 //$temp_robot->update_session();
                 unset($temp_robot);
             }
+
+            // Now sort the array by position and then key
+            usort($new_player_robots, function($a, $b){
+                if ($a['robot_position'] == 'active'){ return -1; }
+                elseif ($b['robot_position'] == 'active'){ return 1; }
+                elseif ($a['robot_key'] < $b['robot_key']){ return -1; }
+                elseif ($a['robot_key'] > $b['robot_key']){ return 1; }
+                else { return 0; }
+                });
+
+            // Update the position keys for all robots after above
+            foreach ($new_player_robots AS $k => $r){ $new_player_robots[$k]['robot_key'] = $k; }
+
+            // Update the internal robots array with new data
+            $this->player_robots = array_values($new_player_robots);
 
         }
 
