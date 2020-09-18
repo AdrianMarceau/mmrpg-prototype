@@ -42,10 +42,8 @@ class rpg_game {
     public static function onload_triggered($object_type, $object_id, $trigger = false){
         $flag_name = 'onload_triggered/'.$object_type.'/'.$object_id;
         if ($trigger === true){
-            //error_log('set '.$flag_name.' to true!'.PHP_EOL);
             self::set_flag($flag_name, true);
         } else {
-            //error_log('return '.$flag_name.' ('.(self::has_flag($flag_name) ? 'true' : 'false').')!'.PHP_EOL);
             return self::has_flag($flag_name);
         }
     }
