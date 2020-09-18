@@ -1337,6 +1337,13 @@ class rpg_robot extends rpg_object {
         $num_this_robots_active = $this_player->counters['robots_active'];
         $num_target_robots_active = $target_player->counters['robots_active'];
 
+        // Define the intelligence of this robot based on its level
+        $intelligence_mod = 0;
+        if ($this_robot->robot_level >= 25){ $intelligence_mod += 1; }
+        if ($this_robot->robot_level >= 50){ $intelligence_mod += 1; }
+        if ($this_robot->robot_level >= 75){ $intelligence_mod += 1; }
+        if ($this_robot->robot_level >= 100){ $intelligence_mod += 1; }
+
         // Define the support multiplier for this robot
         $support_multiplier = 1;
         if (in_array($this_robot->robot_token, array('roll', 'disco', 'rhythm'))){ $support_multiplier += 1; }
@@ -1559,11 +1566,11 @@ class rpg_robot extends rpg_object {
 
                     // Increase chance if the target is weak to this ability's types
                     foreach ($ability_types AS $key2 => $type){
-                        if ($target_robot->has_weakness($type)){ $value *= 2; }
-                        if ($target_robot->has_resistance($type)){ $value *= 0.5; }
-                        if ($target_robot->has_affinity($type)){ $value *= 0; }
-                        if ($target_robot->has_immunity($type)){ $value *= 0; }
-                        if (in_array($type, $target_core_shields)){ $value *= 0; }
+                        if ($target_robot->has_weakness($type)){ $value *= (1.5 + ($intelligence_mod * 0.5)); }
+                        if ($target_robot->has_resistance($type)){ $value *= (0.5 - ($intelligence_mod * 0.1)); }
+                        if ($target_robot->has_affinity($type)){ $value *= (0.4 - ($intelligence_mod * 0.1)); }
+                        if ($target_robot->has_immunity($type)){ $value *= (0.4 - ($intelligence_mod * 0.1)); }
+                        if (in_array($type, $target_core_shields)){ $value *= (0.4 - ($intelligence_mod * 0.1)); }
                     }
 
                 }
