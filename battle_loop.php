@@ -183,10 +183,10 @@ elseif ($this_action == 'start'){
     $temp_this_player_robots = strstr($this_player_robots, ',') ? explode(',', $this_player_robots) : array($this_player_robots);
     foreach ($temp_this_player_robots AS $temp_string){
         list($temp_id, $temp_token) = explode('_', $temp_string);
-        $temp_rewards = mmrpg_prototype_robot_settings($this_playerinfo['player_token'], $temp_token);
-        $temp_abilities = !empty($temp_rewards['robot_abilities']) ? array_keys($temp_rewards['robot_abilities']) : array();
+        $temp_settings = mmrpg_prototype_robot_settings($this_playerinfo['player_token'], $temp_token);
+        $temp_abilities = !empty($temp_settings['robot_abilities']) ? array_keys($temp_settings['robot_abilities']) : array();
         $this_playerinfo['player_robots'][] = array('robot_id' => $temp_id, 'robot_token' => $temp_token, 'robot_abilities' => $temp_abilities);
-        unset($temp_rewards, $temp_abilities);
+        unset($temp_settings, $temp_abilities);
     }
 
     // Collect any important player details over
