@@ -2609,19 +2609,6 @@ class rpg_robot extends rpg_object {
         $this->trigger_item_function('rpg-robot_update-variables_before', $extra_objects);
         if ($options->return_early){ return $options->return_value; }
 
-        // If this robot is holding an ELEMENTAL CIRCUIT, apply elemental stat mods
-        if (!empty($this->robot_item)){
-            if ($this->robot_item === 'battery-circuit'){
-                $options->element_stats_mods[] = array('add' => array('affinity/electric', 'weakness/nature'));
-            } elseif ($this->robot_item === 'sponge-circuit'){
-                $options->element_stats_mods[] = array('add' => array('affinity/water', 'weakness/electric'));
-            } elseif ($this->robot_item === 'forge-circuit'){
-                $options->element_stats_mods[] = array('add' => array('affinity/flame', 'weakness/water'));
-            } elseif ($this->robot_item === 'sapling-circuit'){
-                $options->element_stats_mods[] = array('add' => array('affinity/nature', 'weakness/flame'));
-            }
-        }
-
         // If the robot's current life or weapon energy is higher than base, make sure we level it off
         if ($this->robot_energy > $this->robot_base_energy){ $this->robot_energy = $this->robot_base_energy; }
         if ($this->robot_weapons > $this->robot_base_weapons){ $this->robot_weapons = $this->robot_base_weapons; }
