@@ -1343,12 +1343,18 @@ class rpg_player extends rpg_object {
 
         // Attempt to collect the target player if not already set by the calling method
         if (empty($objects['target_player'])){
-            if (!empty($objects['target_robot'])){ $objects['target_player'] = $objects['target_robot']->player; }
+            if (!empty($this->other_player)){ $objects['target_player'] = $this->other_player; }
+            elseif (!empty($objects['target_robot'])){ $objects['target_player'] = $objects['target_robot']->player; }
         }
 
         // Attempt to collect the target robot if not already set by the calling method
         if (empty($objects['target_robot'])){
-            if (!empty($objects['target_player'])){ $objects['target_robot'] = $this->battle->find_target_robot($objects['target_player']); }
+            if (!empty($objects['target_player'])){
+                if (!empty($objects['target_player']->values['current_robot'])){
+                    $target_by_id = rpg_game::get_robot_by_id($objects['target_player']->values['current_robot']);
+                    if (!empty($target_by_id)){ $objects['target_robot'] = $target_by_id; }
+                }
+            }
         }
 
         // Return the full object array for later extracting

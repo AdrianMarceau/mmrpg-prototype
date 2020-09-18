@@ -170,6 +170,10 @@ if ($this_action != 'start'){
     // Define the target player object using the loaded player data and update session
     $target_player = rpg_game::get_player($this_battle, $target_playerinfo);
 
+    // Make sure the two players reference each other internally
+    $this_player->other_player = $target_player;
+    $target_player->other_player = $this_player;
+
     // Remove temporary flags that might prevent actions
     unset($this_player->flags['switched_this_turn']);
     unset($target_player->flags['switched_this_turn']);
@@ -376,6 +380,10 @@ if ($this_action == 'start'){
         // Update the session with the item changes
         $target_player->update_session();
     }
+
+    // Make sure the two players reference each other internally
+    $this_player->other_player = $target_player;
+    $target_player->other_player = $this_player;
 
 }
 

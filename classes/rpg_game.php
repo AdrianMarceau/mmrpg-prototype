@@ -154,6 +154,16 @@ class rpg_game {
     }
 
     /**
+     * Retrieve a player object from the session by a known ID
+     * @param integer $player_id
+     * @return rpg_player
+     */
+    public static function get_player_by_id($player_id){
+        if (isset(self::$index['players'][$player_id])){ return self::$index['players'][$player_id]; }
+        else { return false; }
+    }
+
+    /**
      * Create or retrive a robot object from the session
      * @param array $this_robotinfo
      * @return rpg_robot
@@ -201,6 +211,16 @@ class rpg_game {
         $this_robot->update_session();
         return $this_robot;
 
+    }
+
+    /**
+     * Retrieve a robot object from the session by a known ID
+     * @param integer $robot_id
+     * @return rpg_robot
+     */
+    public static function get_robot_by_id($robot_id){
+        if (isset(self::$index['robots'][$robot_id])){ return self::$index['robots'][$robot_id]; }
+        else { return false; }
     }
 
     /**
@@ -255,6 +275,16 @@ class rpg_game {
     }
 
     /**
+     * Retrieve an ability object from the session by a known ID
+     * @param integer $ability_id
+     * @return rpg_ability
+     */
+    public static function get_ability_by_id($ability_id){
+        if (isset(self::$index['abilities'][$ability_id])){ return self::$index['abilities'][$ability_id]; }
+        else { return false; }
+    }
+
+    /**
      * Create or retrive a item object from the session
      * @param array $this_iteminfo
      * @return rpg_item
@@ -303,6 +333,16 @@ class rpg_game {
         $this_item->update_session();
         return $this_item;
 
+    }
+
+    /**
+     * Retrieve an item object from the session by a known ID
+     * @param integer $item_id
+     * @return rpg_item
+     */
+    public static function get_item_by_id($item_id){
+        if (isset(self::$index['items'][$item_id])){ return self::$index['items'][$item_id]; }
+        else { return false; }
     }
 
     /**
