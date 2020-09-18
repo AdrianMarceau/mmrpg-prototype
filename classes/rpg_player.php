@@ -214,13 +214,9 @@ class rpg_player extends rpg_object {
         // Trigger the onload function if not already called
         if (!rpg_game::onload_triggered('player', $this->player_id)){
             rpg_game::onload_triggered('player', $this->player_id, true);
-            //error_log('trigger_onload() for player '.$this->player_id.PHP_EOL);
+            //error_log('- trigger_onload() for player '.$this->player_id.PHP_EOL);
             $temp_function = $this->player_function_onload;
-            $temp_result = $temp_function(array(
-                'this_field' => isset($this->battle->battle_field) ? $this->battle->battle_field : false,
-                'this_battle' => $this->battle,
-                'this_player' => $this
-                ));
+            $temp_result = $temp_function(self::get_objects());
         }
 
     }
@@ -1325,6 +1321,40 @@ class rpg_player extends rpg_object {
     }
 
     */
+
+    // Define a public function for getting all global objects related to this player
+    private function get_objects($extra_objects = array()){
+
+        // Collect refs to all the known objects for this player
+        $objects = array(
+            'this_battle' => $this->battle,
+            'this_player' => $this
+            );
+
+        // Merge in any additional object refs into the array
+        if (!is_array($extra_objects)){ $extra_objects = array(); }
+        if (!empty($extra_objects)){ $objects = array_merge($objects, $extra_objects); }
+
+        // Attempt to collect the battle field if not already set by the calling method
+        if (empty($objects['this_field'])){
+            if (!empty($this->field)){ $objects['this_field'] = $this->field; }
+            elseif (!empty($this->battle->battle_field)){ $objects['this_field'] = $this->battle->battle_field; }
+        }
+
+        // Attempt to collect the target player if not already set by the calling method
+        if (empty($objects['target_player'])){
+            if (!empty($objects['target_robot'])){ $objects['target_player'] = $objects['target_robot']->player; }
+        }
+
+        // Attempt to collect the target robot if not already set by the calling method
+        if (empty($objects['target_robot'])){
+            if (!empty($objects['target_player'])){ $objects['target_robot'] = $this->battle->find_target_robot($objects['target_player']); }
+        }
+
+        // Return the full object array for later extracting
+        return $objects;
+
+    }
 
 
     // -- ACTION FUNCTIONS -- //

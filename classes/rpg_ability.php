@@ -209,19 +209,9 @@ class rpg_ability extends rpg_object {
         // Trigger the onload function if not already called
         if (!rpg_game::onload_triggered('ability', $this->ability_id)){
             rpg_game::onload_triggered('ability', $this->ability_id, true);
-            //error_log('trigger_onload() for ability '.$this->ability_id.PHP_EOL);
-            $temp_target_player = $this->battle->find_target_player($this->player->player_side != 'right' ? 'right' : 'left');
-            $temp_target_robot = $this->battle->find_target_robot($this->player->player_side != 'right' ? 'right' : 'left');
+            //error_log('---- trigger_onload() for ability '.$this->ability_id.PHP_EOL);
             $temp_function = $this->ability_function_onload;
-            $temp_result = $temp_function(array(
-                'this_field' => $this->battle->battle_field,
-                'this_battle' => $this->battle,
-                'this_player' => $this->player,
-                'this_robot' => $this->robot,
-                'target_player' => $temp_target_player,
-                'target_robot' => $temp_target_robot,
-                'this_ability' => $this
-                ));
+            $temp_result = $temp_function(self::get_objects());
         }
 
     }
@@ -415,6 +405,42 @@ class rpg_ability extends rpg_object {
 
     public function get_attachment_options(){ return $this->get_info('attachment_options'); }
     public function set_attachment_options($value){ $this->set_info('attachment_options', $value); }
+
+    // Define a public function for getting all global objects related to this ability
+    private function get_objects($extra_objects = array()){
+
+        // Collect refs to all the known objects for this ability
+        $objects = array(
+            'this_battle' => $this->battle,
+            'this_player' => $this->player,
+            'this_robot' => $this->robot,
+            'this_ability' => $this
+            );
+
+        // Merge in any additional object refs into the array
+        if (!is_array($extra_objects)){ $extra_objects = array(); }
+        if (!empty($extra_objects)){ $objects = array_merge($objects, $extra_objects); }
+
+        // Attempt to collect the battle field if not already set by the calling method
+        if (empty($objects['this_field'])){
+            if (!empty($this->field)){ $objects['this_field'] = $this->field; }
+            elseif (!empty($this->battle->battle_field)){ $objects['this_field'] = $this->battle->battle_field; }
+        }
+
+        // Attempt to collect the target player if not already set by the calling method
+        if (empty($objects['target_player'])){
+            if (!empty($objects['target_robot'])){ $objects['target_player'] = $objects['target_robot']->player; }
+        }
+
+        // Attempt to collect the target robot if not already set by the calling method
+        if (empty($objects['target_robot'])){
+            if (!empty($objects['target_player'])){ $objects['target_robot'] = $this->battle->find_target_robot($objects['target_player']); }
+        }
+
+        // Return the full object array for later extracting
+        return $objects;
+
+    }
 
     // Define public print functions for markup generation
     public function print_name($plural = false, $pseudo_name = ''){
