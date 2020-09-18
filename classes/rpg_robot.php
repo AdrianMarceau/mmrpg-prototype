@@ -336,7 +336,7 @@ class rpg_robot extends rpg_object {
         // Trigger the onload function if not already called
         if (!rpg_game::onload_triggered('robot', $this->robot_id)){
             rpg_game::onload_triggered('robot', $this->robot_id, true);
-            //error_log('trigger_onload() for robot '.$this->robot_id.PHP_EOL);
+            //error_log('-- trigger_onload() for robot '.$this->robot_id.PHP_EOL);
             $temp_function = $this->robot_function_onload;
             $temp_result = $temp_function(self::get_objects());
         }
@@ -354,7 +354,7 @@ class rpg_robot extends rpg_object {
         if (isset($extra_objects['options'])){ rpg_game::reset_options_object($extra_objects['options']); }
 
         // Check to make sure this robot has a held item, else return now
-        $item_token = $this->get_item();
+        $item_token = $this->robot_item;
         if (empty($item_token)){ return; }
 
         // Collect the item's index info if exists, else return now
@@ -2717,12 +2717,14 @@ class rpg_robot extends rpg_object {
         $this->battle->values['robots'][$this->robot_id] = $this_data;
 
         // Find and update the parent's robot variable
-        foreach ($this->player->player_robots AS $this_key => $this_robotinfo){
+        $player_robots = $this->player->player_robots;
+        foreach ($player_robots AS $key => $this_robotinfo){
             if ($this_robotinfo['robot_id'] == $this->robot_id){
-                $this->player->player_robots[$this_key] = $this_data;
+                $player_robots[$key] = $this_data;
                 break;
             }
         }
+        $this->player->set_robots($player_robots);
 
         // Return true on success
         return true;
