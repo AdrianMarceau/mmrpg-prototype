@@ -186,28 +186,77 @@ Write shell scripts for the following situations
 
 MAYBE POST-UPDATE(?)
 
-Create "onload" events for items to take advantage of when we eventually update item code
--  Create onload event for "apply_stat_bonuses" rpg_robot function (energy/weapon-upgrade)
--  Create onload event for "update_variables" rpg_robot function (energy/weapon-upgrade, battery/sponge/forge/sapling-circuit)
--  Create onload event for "check_items" rpg_robot function (attack/defense/speed/field-booster)
--  Create onload event for "trigger_robot_damage" in rpg_ability/rpg_ability_damage function (fortune-module)
--  Create onload event for "trigger_robot_recovery" in rpg_ability/rpg_ability_recovery function (fortune-module?)
--  Create onload event for "trigger_robot_damage" in rpg_item/rpg_item_damage function
--  Create onload event for "trigger_robot_recovery" in rpg_item/rpg_item_recovery function
--  Create onload event for post-victory reward calculations (fortune-module)
--  Create onload event for post-failure reward calculations
--  Create onload event for post-disable stat bonus calculations (growth-module)
--  Create onload event for post-disable experience point calculations (growth-module)
--  Create onload event for post-disable item reward calculations (fortune-module)
--  Create onload event for "ability_function_stat_boost_step1" in rpg_ability (reverse-module, xtreme-module)
--  Create onload event for "ability_function_stat_boost_step2" in rpg_ability (guard-module)
--  Create onload event for "ability_function_stat_break_step1" in rpg_ability (reverse-module, xtreme-module)
--  Create onload event for "ability_function_stat_break_step2" in rpg_ability (guard-module)
--  Create onload event for "ability_function_shot" in rpg_ability
--  Create onload event for "ability_function_onload_shot" in rpg_ability (target-module)
--  Create onload event for "ability_function_buster" in rpg_ability (charge-module)
--  Create onload event for "ability_function_onload_buster" in rpg_ability (charge-module, target-module)
--  Create onload event for "ability_function_onload_overdrive" in rpg_ability
+Create "onload" events (or other event hooks) for items to take advantage of when we eventually update item code
+
+-  Create event hook for "apply_stat_bonuses" rpg_robot function (energy/weapon-upgrade)
+    - rpg-robot_apply-stat-bonuses_before [DONE]
+    - rpg-robot_apply-stat-bonuses_after [DONE]
+
+-  Create event hook for "update_variables" rpg_robot function (energy/weapon-upgrade, battery/sponge/forge/sapling-circuit)
+    - rpg-robot_update-variables_before [DONE]
+    - rpg-robot_update-variables_after [DONE]
+
+-  Create event hook for "check_items" rpg_robot function (attack/defense/speed/field-booster)
+    - rpg-robot_check-items_before
+    - rpg-robot_check-items_after
+
+-  Create event hook for "trigger_robot_damage" in rpg_ability/rpg_ability_damage function (fortune-module [crits])
+    - rpg-ability_trigger-damage_before
+    - rpg-ability_trigger-damage_after
+
+-  Create event hook for "trigger_robot_recovery" in rpg_ability/rpg_ability_recovery function (fortune-module? [crits])
+    - rpg-ability_trigger-recovery_before
+    - rpg-ability_trigger-recovery_after
+
+-  Create event hook for "trigger_robot_damage" in rpg_item/rpg_item_damage function
+    - rpg-item_trigger-damage_before
+    - rpg-item_trigger-damage_after
+
+-  Create event hook for "trigger_robot_recovery" in rpg_item/rpg_item_recovery function
+    - rpg-item_trigger-recovery_before
+    - rpg-item_trigger-recovery_after
+
+-  Create event hook for post-victory reward calculations (fortune-module)
+    - rpg-battle_complete-trigger_victory
+-  Create event hook for post-failure reward calculations
+    - rpg-battle_complete-trigger_failure
+
+-  Create event hook for post-disable stat bonus calculations (growth-module)
+    - rpg-robot_trigger-disabled_stat-rewards
+-  Create event hook for post-disable experience point calculations (growth-module)
+    - rpg-robot_trigger-disabled_experience-rewards
+-  Create event hook for post-disable item reward calculations (fortune-module)
+    - rpg-robot_trigger-disabled_item-rewards
+
+-  Create event hook for "ability_function_stat_boost_step1" in rpg_ability (reverse-module, xtreme-module)
+    - rpg-ability_stat-boost_before
+-  Create event hook for "ability_function_stat_boost_step2" in rpg_ability (guard-module)
+    - rpg-ability_stat-boost_after
+-  Create event hook for "ability_function_stat_break_step1" in rpg_ability (reverse-module, xtreme-module)
+    - rpg-ability_stat-break_before
+-  Create event hook for "ability_function_stat_break_step2" in rpg_ability (guard-module)
+    - rpg-ability_stat-break_after
+
+-  Create event hook for "ability_function_shot" in rpg_ability
+    - rpg-ability_elemental-shot_before
+    - rpg-ability_elemental-shot_after
+-  Create event hook for "ability_function_onload_shot" in rpg_ability (target-module)
+    - rpg-ability_elemental-shot_onload_before
+    - rpg-ability_elemental-shot_onload_after
+
+-  Create event hook for "ability_function_buster" in rpg_ability (charge-module)
+    - rpg-ability_elemental-buster_before
+    - rpg-ability_elemental-buster_after
+-  Create event hook for "ability_function_onload_buster" in rpg_ability (charge-module, target-module)
+    - rpg-ability_elemental-buster_onload_before
+    - rpg-ability_elemental-buster_onload_after
+
+-  Create event hook for "ability_function_overdrive" in rpg_ability
+    - rpg-ability_elemental-overdrive_before
+    - rpg-ability_elemental-overdrive_after
+-  Create event hook for "ability_function_onload_overdrive" in rpg_ability
+    - rpg-ability_elemental-overdrive_onload_before
+    - rpg-ability_elemental-overdrive_onload_after
 
 Create a "Shop Editor" in the admin back-end that lets admins edit the following
 -  Auto's Shop:
