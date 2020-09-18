@@ -344,7 +344,7 @@ class rpg_robot extends rpg_object {
     }
 
     // Define a public function for triggering an item function if one is being held
-    public function trigger_item_function($function, $extra_objects = array()){
+    public function trigger_item_function($function, $extra_objects = array(), $extra_item_info = array()){
 
         // Collect and cache an item index for reference
         static $mmrpg_index_items;
@@ -362,9 +362,18 @@ class rpg_robot extends rpg_object {
         $item_index_info = $mmrpg_index_items[$item_token];
         $item_id = $this->robot_id.str_pad($item_index_info['item_id'], 3, '0', STR_PAD_LEFT);
         $item_info = array('item_id' => $item_id, 'item_token' => $item_token);
+        if (!empty($extra_item_info)){ $item_info = array_merge($item_info, $extra_item_info); }
 
         // Collect this item's object from the game class
         $this_item = rpg_game::get_item($this->battle, $this->player, $this, $item_info);
+        /*
+        if (!empty($extra_item_info)){
+            foreach ($extra_item_info AS $extra_field => $extra_value){
+                if (in_array($extra_field, array('counters', 'flags', 'values'))){ $this_item->$extra_field = array_merge($this_item->$extra_field, $extra_value); }
+                else { $this_item->$extra_field = $extra_value; }
+            }
+        }
+        */
 
         // Check to make sure this item has the given function defined, else return now
         if (!isset($this_item->item_functions_custom[$function])){ return; }
@@ -5471,6 +5480,23 @@ class rpg_robot extends rpg_object {
             return;
         }
 
+        // If this robot does not have an item, we can return now
+        if (empty($this->robot_item)){ return; }
+
+        // Create an options object for this function and populate
+        $options = rpg_game::new_options_object();
+        $extra_objects = array('options' => $options);
+
+        // Define the extra item fields to pass to the trigger function
+        $extra_item_info = array(
+            'flags' => array('is_part' => true),
+            'part_token' => 'item_'.$this->robot_item
+            );
+
+        // Trigger this robot's item function if one has been defined for this context
+        $this->trigger_item_function('rpg-robot_check-items_before', $extra_objects, $extra_item_info);
+        if ($options->return_early){ return $options->return_value; }
+
         // If this robot has an item attached, process actions
         if ($this_robot->has_item()){
 
@@ -5482,63 +5508,10 @@ class rpg_robot extends rpg_object {
                 'item_token' => $item_token
                 );
             $this_item = rpg_game::get_item($this_battle, $this_player, $this_robot, $item_info);
-            $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' checkpoint has item '.$item_token);
+            $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' checkpoint has item '.$this->robot_item);
 
-            // If the robot is holding a Field Booster item, increase multiplier
-            if ($item_token == 'field-booster'){
-
-                // Define the item object and trigger info
-                $temp_core_type = $this_robot->get_core();
-                $temp_field_type = $this_field->field_type;
-                if (empty($temp_core_type)){ $temp_boost_type = 'recovery'; }
-                elseif ($temp_core_type == 'copy' || $temp_core_type == 'empty'){ $temp_boost_type = 'damage'; }
-                else { $temp_boost_type = $temp_core_type; }
-                if (!isset($this_field->field_multipliers[$temp_boost_type]) || $this_field->field_multipliers[$temp_boost_type] < MMRPG_SETTINGS_MULTIPLIER_MAX){
-
-                    // Define this item's attachment token
-                    $this_arrow_index = rpg_prototype::type_arrow_image('boost', !empty($temp_boost_type) ? $temp_boost_type : 'none');
-                    $this_attachment_token = 'item_effects_field-booster';
-                    $this_attachment_info = array(
-                        'class' => 'item',
-                        'attachment_token' => $this_attachment_token,
-                        'item_token' => $item_token,
-                        'item_image' => $this_arrow_index['image'],
-                        'item_frame' => $this_arrow_index['frame'],
-                        'item_frame_animate' => array($this_arrow_index['frame']),
-                        'item_frame_offset' => array('x' => 0, 'y' => 0, 'z' => -10)
-                        );
-
-                    // Attach this item attachment to this robot temporarily
-                    $this_robot->set_frame('taunt');
-                    $this_robot->set_attachment($this_attachment_token, $this_attachment_info);
-
-                    // Create or increase the elemental booster for this field
-                    $temp_change_percent = round($this_item->get_recovery2() / 100, 1);
-                    $new_multiplier_value = (isset($this_field->field_multipliers[$temp_boost_type]) ? $this_field->field_multipliers[$temp_boost_type] : 1) + $temp_change_percent;
-                    if ($new_multiplier_value >= MMRPG_SETTINGS_MULTIPLIER_MAX){
-                        $temp_change_percent = $new_multiplier_value - MMRPG_SETTINGS_MULTIPLIER_MAX;
-                        $new_multiplier_value = MMRPG_SETTINGS_MULTIPLIER_MAX;
-                    }
-                    $this_field->field_multipliers[$temp_boost_type] = $new_multiplier_value;
-                    $this_field->update_session();
-
-                    // Create the event to show this element boost
-                    if ($temp_change_percent > 0){
-                        $this_battle->events_create($this_robot, false, $this_field->field_name.' Multipliers',
-                            $this_robot->print_name().' triggers '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!<br />'.
-                            'The <span class="item_name item_type item_type_'.$temp_boost_type.'">'.ucfirst($temp_boost_type).'</span> field multiplier rose to <span class="item_name item_type item_type_none">'.$new_multiplier_value.'</span>!',
-                            array('canvas_show_this_item_overlay' => true)
-                            );
-                    }
-
-                    // Remove this item attachment from this robot
-                    $this_robot->unset_attachment($this_attachment_token);
-
-                }
-
-            }
-            // Else the robot is holding an Energy Capsule or Energy Pellet item, apply recovery
-            elseif ($item_token == 'energy-pellet' || $item_token == 'energy-capsule' || $item_token == 'energy-tank'){
+            // If the robot is holding an Energy Capsule or Energy Pellet item, apply recovery
+            if ($item_token == 'energy-pellet' || $item_token == 'energy-capsule' || $item_token == 'energy-tank'){
 
                 // Collect the base stat for this robot and the item
                 $temp_energy = $this_robot->get_energy();
@@ -5721,39 +5694,6 @@ class rpg_robot extends rpg_object {
                         }
                     }
 
-                }
-
-            }
-            // Else the robot is holding an Attack Booster item, apply boosts
-            elseif ($item_token == 'attack-booster'){
-
-                // Ensure this robot's stat isn't already at max value
-                if ($this_robot->counters['attack_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' boosts attack by one stage');
-                    // Call the global stat boost function with customized options
-                    rpg_ability::ability_function_stat_boost($this_robot, 'attack', 1, false, null, null, $this_robot->print_name().' triggers '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!');
-                }
-
-            }
-            // Else if the robot is holding an Defense Booster item, apply boosts
-            elseif ($item_token == 'defense-booster'){
-
-                // Ensure this robot's stat isn't already at max value
-                if ($this_robot->counters['defense_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' boosts defense by one stage');
-                    // Call the global stat boost function with customized options
-                    rpg_ability::ability_function_stat_boost($this_robot, 'defense', 1, false, null, null, $this_robot->print_name().' triggers '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!');
-                }
-
-            }
-            // Else if the robot is holding an Defense Booster item, apply boosts
-            elseif ($item_token == 'speed-booster'){
-
-                // Ensure this robot's stat isn't already at max value
-                if ($this_robot->counters['speed_mods'] < MMRPG_SETTINGS_STATS_MOD_MAX){
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' boosts speed by one stage');
-                    // Call the global stat boost function with customized options
-                    rpg_ability::ability_function_stat_boost($this_robot, 'speed', 1, false, null, null, $this_robot->print_name().' triggers '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!');
                 }
 
             }
@@ -5945,6 +5885,9 @@ class rpg_robot extends rpg_object {
 
 
         }
+
+        // Trigger this robot's item function if one has been defined for this context
+        $this->trigger_item_function('rpg-robot_check-items_after', $extra_objects);
 
     }
 
