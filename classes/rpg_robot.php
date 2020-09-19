@@ -5510,55 +5510,8 @@ class rpg_robot extends rpg_object {
             $this_item = rpg_game::get_item($this_battle, $this_player, $this_robot, $item_info);
             $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' checkpoint has item '.$this->robot_item);
 
-            // If the robot is holding an Energy Capsule or Energy Pellet item, apply recovery
-            if ($item_token == 'energy-pellet' || $item_token == 'energy-capsule' || $item_token == 'energy-tank'){
-
-                // Collect the base stat for this robot and the item
-                $temp_energy = $this_robot->get_energy();
-                $temp_base_energy = $this_robot->get_base_energy();
-                $temp_item_recovery = $this_item->get_recovery();
-
-                // Calculate this robot's current damage percent
-                $temp_damage_required = ceil($temp_item_recovery - 10);
-                $temp_damage_taken = round((($temp_base_energy - $temp_energy) / $temp_base_energy) * 100);
-                $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' triggers when energy lowered by '.$temp_damage_required.'% (currently at '.$temp_damage_taken.'%)');
-
-                // If the user has token enough damage, we can trigger the ability
-                if ($temp_damage_taken >= $temp_damage_required){
-
-                    // Remove the robot's current item now that it's used up in battle
-                    $this_robot->set_item('');
-
-                    // Define the item object and trigger info
-                    $temp_recovery_amount = round($temp_base_energy * ($temp_item_recovery / 100));
-                    $this_item->recovery_options_update(array(
-                        'kind' => 'energy',
-                        'frame' => 'taunt',
-                        'percent' => true,
-                        'modifiers' => false,
-                        'frame' => 'taunt',
-                        'success' => array(9, 0, 0, -9999, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!'),
-                        'failure' => array(9, 0, 0, -9999, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!')
-                        ));
-
-                    // Trigger stat recovery for the holding robot
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores energy by '.$temp_recovery_amount.' ('.$temp_item_recovery.'%)');
-                    if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
-
-                    // Also remove this robot's item from the session, we're done with it
-                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle']) && empty($this_battle->flags['challenge_battle'])){
-                        $ptoken = $this_player->player_token;
-                        $rtoken = $this_robot->robot_token;
-                        if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
-                            $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
-                        }
-                    }
-
-                }
-
-            }
             // Else the robot is holding an Weapon Capsule or Weapon Pellet item, apply recovery
-            elseif ($item_token == 'weapon-pellet' || $item_token == 'weapon-capsule' || $item_token == 'weapon-tank'){
+            if ($item_token == 'weapon-pellet' || $item_token == 'weapon-capsule' || $item_token == 'weapon-tank'){
 
                 // Collect the base stat for this robot and the item
                 $temp_weapons = $this_robot->get_weapons();
@@ -5948,6 +5901,25 @@ class rpg_robot extends rpg_object {
                 $this_robot->robot_speed += $recovery;
             }
 
+        }
+
+    }
+
+    // Define a function for triggering a robot to "consume" their item, which is to say remove it in the right context
+    public function consume_held_item(){
+
+        // First, set this robot's current item to an empty string
+        $this->set_item('');
+
+        // Also remove this robot's item from the session, we're done with it, if human character and appropriate to do so
+        if ($this->player->player_side == 'left'
+            && empty($this->battle->flags['player_battle'])
+            && empty($this->battle->flags['challenge_battle'])){
+            $ptoken = $this->player->player_token;
+            $rtoken = $this->robot_token;
+            if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
+                $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
+            }
         }
 
     }
