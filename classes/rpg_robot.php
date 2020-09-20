@@ -5479,11 +5479,7 @@ class rpg_robot extends rpg_object {
             );
 
         // Trigger this robot's item function if one has been defined for this context
-        $this->trigger_item_function('rpg-robot_check-items_before', $extra_objects, $extra_item_info);
-        if ($options->return_early){ return $options->return_value; }
-
-        // Trigger this robot's item function if one has been defined for this context
-        $this->trigger_item_function('rpg-robot_check-items_after', $extra_objects);
+        $this->trigger_item_function('rpg-robot_check-items', $extra_objects, $extra_item_info);
 
     }
 
