@@ -247,25 +247,28 @@ Create "onload" events (or other event hooks) for items to take advantage of whe
     - rpg-ability_stat-break_after
 
 -  Create event hook for "ability_function_shot" in rpg_ability
-    - rpg-ability_elemental-shot_before
-    - rpg-ability_elemental-shot_after
+    - rpg-ability_elemental-shot_before [DONE]
+    - rpg-ability_elemental-shot_after [DONE]
 -  Create event hook for "ability_function_onload_shot" in rpg_ability (target-module)
-    - rpg-ability_elemental-shot_onload_before
-    - rpg-ability_elemental-shot_onload_after
+    - rpg-ability_elemental-shot_onload_before [DONE]
+    - rpg-ability_elemental-shot_onload_after [DONE]
 
 -  Create event hook for "ability_function_buster" in rpg_ability (charge-module)
-    - rpg-ability_elemental-buster_before
-    - rpg-ability_elemental-buster_after
+    - rpg-ability_elemental-buster_before [DONE]
+    - rpg-ability_elemental-buster_after [DONE]
 -  Create event hook for "ability_function_onload_buster" in rpg_ability (charge-module, target-module)
-    - rpg-ability_elemental-buster_onload_before
-    - rpg-ability_elemental-buster_onload_after
+    - rpg-ability_elemental-buster_onload_before [DONE]
+    - rpg-ability_elemental-buster_onload_after [DONE]
 
 -  Create event hook for "ability_function_overdrive" in rpg_ability
-    - rpg-ability_elemental-overdrive_before
-    - rpg-ability_elemental-overdrive_after
+    - rpg-ability_elemental-overdrive_before [DONE]
+    - rpg-ability_elemental-overdrive_after [DONE]
 -  Create event hook for "ability_function_onload_overdrive" in rpg_ability
-    - rpg-ability_elemental-overdrive_onload_before
-    - rpg-ability_elemental-overdrive_onload_after
+    - rpg-ability_elemental-overdrive_onload_before [DONE]
+    - rpg-ability_elemental-overdrive_onload_after [DONE]
+
+
+
 
 Create a "Shop Editor" in the admin back-end that lets admins edit the following
 -  Auto's Shop:
