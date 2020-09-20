@@ -1955,56 +1955,80 @@ class rpg_item extends rpg_object {
     // Define a static function to use as the common action for all _____-core items
     public static function item_function_core($objects){
 
-        // Extract all objects into the current scope
-        extract($objects);
-
-        // Update this item's damage amount based on the active robot's level
-        $this_item->item_damage = $this_robot->robot_level;
-        $this_item->update_session();
-
-        // Target the opposing robot
-        $this_item->target_options_update(array(
-            'frame' => 'throw',
-            'kickback' => array(0, 0, 0),
-            'success' => array(0, 85, 35, 10, $this_robot->print_name().' throws a '.$this_item->print_name().'!'),
-            ));
-        $this_robot->trigger_target($target_robot, $this_item);
-
-        // Inflict damage on the opposing robot
-        $this_item->damage_options_update(array(
-            'kind' => 'energy',
-            'modifiers' => true,
-            'frame' => 'damage',
-            'kickback' => array(30, 5, 0),
-            'success' => array(0, -40, 0, 10, 'The '.$this_item->print_name().' damaged the target!'),
-            'failure' => array(0, -60, 0, -10, 'The '.$this_item->print_name().' missed&hellip;')
-            ));
-        $this_item->recovery_options_update(array(
-            'kind' => 'energy',
-            'modifiers' => true,
-            'frame' => 'taunt',
-            'kickback' => array(15, 0, 0),
-            'success' => array(0, -30, 0, 10, 'The '.$this_item->print_name().' recovered the target!'),
-            'failure' => array(0, -50, 0, -10, 'The '.$this_item->print_name().' missed&hellip;')
-            ));
-        $energy_damage_amount = $this_item->item_damage;
-        $trigger_options = array('apply_modifiers' => true, 'apply_type_modifiers' => true, 'apply_core_modifiers' => true, 'apply_field_modifiers' => true, 'apply_stat_modifiers' => true, 'apply_position_modifiers' => true);
-        $target_robot->trigger_damage($this_robot, $this_item, $energy_damage_amount, true, $trigger_options);
-
-        // Return true on success
-        return true;
+        // This function isn't used anymore
+        return false;
 
     }
 
     // Define a static function to use as the common action for all _____-core items
     public static function item_function_onload_core($objects){
 
+        // This function isn't used anymore
+        return false;
+
+    }
+
+    // Define a static function to use as the common startup action for all _____-core items
+    public static function item_function_elemental_core_startup($objects){
+
         // Extract all objects into the current scope
         extract($objects);
 
-        // Update this item's damage amount based on the active robot's level
-        $this_item->item_damage = $this_robot->robot_level;
-        $this_item->update_session();
+        // Apply a temp core shield relative to this elemental core's type
+        list($core_type) = explode('-', $this_item->item_token);
+        if ($core_type != 'none' && $core_type != 'empty'){
+            $shield_info = rpg_ability::get_static_core_shield($core_type, 3, 0);
+            $this_robot->set_attachment($shield_info['attachment_token'], $shield_info);
+        }
+
+        // Return true on success
+        return true;
+
+    }
+
+    // Define a static function to use as the common refresh action for all _____-core items
+    public static function item_function_elemental_core_refresh($objects){
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // Collect the elemental type for this core
+        list($core_type) = explode('-', $this_item->item_token);
+        $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_item->item_token.' extends '.$core_type.'-type core shield');
+
+        // If there's a timer, decrement and then move on
+        if (!empty($this_robot->counters['core-shield_'.$core_type.'_cooldown_timer'])){
+            $this_robot->counters['core-shield_'.$core_type.'_cooldown_timer'] -= 1;
+            if (empty($this_robot->counters['core-shield_'.$core_type.'_cooldown_timer'])){
+                unset($this_robot->counters['core-shield_'.$core_type.'_cooldown_timer']);
+            }
+        }
+        // Otherwise we can regenerate the core shield
+        else {
+            // If a core shield already exists, we only need to extend the duration
+            $base_core_duration = 3;
+            $core_shield_token = 'ability_core-shield_'.$core_type;
+            if (!empty($this_robot->robot_attachments[$core_shield_token])){
+                $core_shield_info = $this_robot->robot_attachments[$core_shield_token];
+                if (empty($core_shield_info['attachment_duration'])
+                    || $core_shield_info['attachment_duration'] < $base_core_duration){
+                    $core_shield_info['attachment_duration'] = $base_core_duration;
+                }
+                $core_shield_info['attachment_duration'] += 1;
+                $this_robot->set_attachment($core_shield_token, $core_shield_info);
+            }
+            // otherwise, if not exists, we should create a new shield and attach it
+            else {
+                $existing_shields = !empty($this_robot->robot_attachments) ? substr_count(implode('|', array_keys($this_robot->robot_attachments)), 'ability_core-shield_') : 0;
+                $core_shield_info = rpg_ability::get_static_core_shield($core_type, $base_core_duration, $existing_shields);
+                $this_robot->set_attachment($core_shield_token, $core_shield_info);
+                $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_item->item_name,
+                    $this_robot->print_name().' triggers '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!<br />'.
+                    'The held item generated a new '.rpg_type::print_span($core_type, 'Core Shield').'!',
+                    array('canvas_show_this_item_overlay' => true)
+                    );
+            }
+        }
 
         // Return true on success
         return true;
