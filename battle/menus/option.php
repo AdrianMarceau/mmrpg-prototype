@@ -1,26 +1,27 @@
 <?
 // Generate the markup for the action option panel
 ob_start();
+
 	// Define the markup for the option buttons
 
 	$temp_options = array();
 	$block_num = 0;
 
-	// Display the option for SKIP TURN
-	$block_num++;
-	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-action="ability_8_action-noweapons"><label><span class="multi">Skip<br />Turn</span></label></a>';
-
 	// Display the option for CHARGE WEAPONS
 	$block_num++;
-	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-action="ability_9_action-chargeweapons"><label><span class="multi">Charge<br />Weapons</span></label></a>';
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_defense" type="button" data-action="ability_9_action-chargeweapons"><label><span class="multi">Charge<br />Weapons</span></label></a>';
+
+	// Display the option for SKIP TURN
+	$block_num++;
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_speed" type="button" data-action="ability_8_action-noweapons"><label><span class="multi">Skip<br />Turn</span></label></a>';
 
 	// Display the option for RESTART BATTLE
 	$block_num++;
-	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-action="restart"><label><span class="multi">Restart<br />Battle</span></label></a>';
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_attack" type="button" data-action="restart"><label><span class="multi">Restart<br />Battle</span></label></a>';
 
 	// Display the option for RETURN TO MAIN MENU
 	$block_num++;
-	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-action="prototype"><label><span class="multi">Return&nbsp;To<br />Main&nbsp;Menu</span></label></a>';
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_shield" type="button" data-action="prototype"><label><span class="multi">Return&nbsp;To<br />Main&nbsp;Menu</span></label></a>';
 
 	// Display the option for MESSAGE SPEED
 	$block_num++;
@@ -30,42 +31,52 @@ ob_start();
 	$block_num++;
 	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" onclick="parent.mmrpg_music_load(\''.(!strstr($this_field->field_music, '/') ? 'fields/'.$this_field->field_music : $this_field->field_music).'\', true);"><label><span class="multi">Restart<br />Music</span></label></a>';
 
-	// Display the option for DEBUG MODE
-	$block_num++;
-	$current_debug_value = !empty($_SESSION['GAME']['debug_mode']) ? 1 : 0;
-	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" onclick="mmrpg_toggle_debug_mode(this);" data-value="'.$current_debug_value.'"><label><span class="multi"><span class="title">Debug Mode</span><br /><span class="value type type_'.($current_debug_value ? 'nature' : 'flame').'">'.($current_debug_value ? 'ON' : 'OFF').'</span></span></label></a>';
+	// If we're on the LOCAL or DEV build, display exrta options
+	if (MMRPG_CONFIG_SERVER_ENV === 'local' || MMRPG_CONFIG_SERVER_ENV === 'dev'){
 
-	// Display the DEVPOWER option for CLEAR MISSION
-	if (MMRPG_CONFIG_IS_LIVE === false){
+		// Add enough padding to push these options to another page
+		if ($block_num < 8){
+			for ($block_num++; $block_num <= 8; $block_num++){
+				$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option button_disabled block_'.$block_num.'" type="button">&nbsp;</a>';
+			}
+		}
+
+		// Display the option for DEBUG MODE
 		$block_num++;
-		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_nature_shield" type="button" data-action="ability_10_action-devpower-clearmission"><label><span class="multi">Clear<br />Mission</span></label></a>';
+		$current_debug_value = !empty($_SESSION['GAME']['debug_mode']) ? 1 : 0;
+		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" onclick="mmrpg_toggle_debug_mode(this);" data-value="'.$current_debug_value.'"><label><span class="multi"><span class="title">Debug Mode</span><br /><span class="value type type_'.($current_debug_value ? 'nature' : 'flame').'">'.($current_debug_value ? 'ON' : 'OFF').'</span></span></label></a>';
+
+		// Display the DEVPOWER option for CLEAR MISSION
+		$block_num++;
+		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-action="ability_10_action-devpower-clearmission"><label><span class="multi"><span class="title">Dev Power</span><br /><span class="value type type_shield">Clear Mission</span></span></label></a>';
+
 	}
 
-	/*
-	// Display the toggle options for perspective mode and stuff
-	$current_perspective_value = isset($_SESSION['GAME']['perspective_mode']) && empty($_SESSION['GAME']['perspective_mode']) ? 0 : 1;
-	$temp_options[] = '<a data-order="5" class="button action_option block_5 ability_type_space" type="button" onclick="mmrpg_toggle_perspective_mode(this);" data-value="'.$current_perspective_value.'"><label><span class="multi"><span class="title">Perspective Mode</span><br /><span class="value type type_'.($current_perspective_value ? 'nature' : 'flame').'">'.($current_perspective_value ? 'ON' : 'OFF').'</span></span></label></a>';
-	*/
-
-	/*
-	if (empty($_SESSION['GAME']['DEMO'])
-		&& $this_battle->battle_status != 'complete'
-		&& $target_player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID
-		&& isset($_SESSION['GAME']['values']['battle_items'])
-		){
-		$temp_options[] = '<a data-order="5" class="button action_option block_5 ability_type_electric" type="button" data-panel="item"><label><span class="multi">Item<br />Inventory</span></label></a>';
-		//$temp_options[] = '<a data-order="6" class="button action_option block_6 ability_type_nature" type="button" data-action="ability_8_action-recharge-energy"><label><span class="multi">Recharge<br />Energy</span></label></a>';
-		//$temp_options[] = '<a data-order="7" class="button action_option block_7 ability_type_water" type="button" data-action="ability_9_action-recharge-weapons"><label><span class="multi">Recharge<br />Weapons</span></label></a>';
-		//$temp_options[] = '<a data-order="8" class="button button_disabled action_option block_8 ability_type_swift" type="button" data-panel="item"><label><span class="multi">Call For<br />Help!</span></label></a>';
-		//$temp_options[] = '<a class="button action_option block_5" type="button" onclick="mmrpg_toggle_animation();"><label><span class="multi">Toggle<br />Animation</span></label></a>';
-		//$temp_options[] = '<a class="button action_option block_3" type="button" data-panel="settings_volumeControl"><label><span class="multi">Volume<br />Control</span></label></a>';
-		//$temp_options[] = '<a class="button action_option block_3" type="button" data-panel="settings_autoScan"><label><span class="multi">Auto<br />Scan</span></label></a>';
-	}
-	*/
-
+	// Count the number of items the player has and determine pages
+	$current_options_count = count($temp_options);
+	$current_options_pages = ceil($current_options_count / 8);
 
 	// Display container for the main actions
-	?><div class="main_actions main_actions_hastitle"><span class="main_actions_title">Select Option</span><?
+	?>
+	<div class="main_actions main_actions_hastitle">
+		<span class="main_actions_title">
+            <?
+            // If there were more than eight items, print the page numbers
+            if ($current_options_count > 8){
+                $temp_selected_page = 1;
+                echo '<span class="float_title">Select Option</span> ';
+                echo '<span class="float_links">';
+                    echo '<span class="page">Page</span>';
+                    for ($i = 1; $i <= $current_options_pages; $i++){ echo '<a class="num'.($i == $temp_selected_page ? ' active' : '').'" href="#'.$i.'">'.$i.'</a>'; }
+                echo '</span> ';
+            }
+            // Otherwise, simply print the item select text label
+            else {
+                echo 'Select Option';
+            }
+            ?>
+		</span>
+	<?
 	// Ensure there are options to display
 	if (!empty($temp_options)){
 		// Count the total number of options
@@ -75,13 +86,15 @@ ob_start();
 			// Display the option button's generated markup
 			echo $option_markup;
 		}
-		// If there were less than 6 options, fill in the empty spaces
-		if ($num_options < 8){
-			for ($i = $num_options; $i < 8; $i++){
-				// Display an empty button placeholder
-				?><a class="button action_option button_disabled block_<?= $i + 1 ?>" type="button">&nbsp;</a><?
-			}
-		}
+        // If there were less than 8 items, fill in the empty spaces
+        if ($num_options % 8 != 0){
+            $temp_padding_amount = 8 - ($num_options % 8);
+            $temp_last_key = $num_options + $temp_padding_amount;
+            for ($i = $num_options; $i < $temp_last_key; $i++){
+                // Display an empty button placeholder
+                ?><a class="button action_option button_disabled block_<?= $i + 1 ?>" type="button">&nbsp;</a><?
+            }
+        }
 	}
 	// End the main action container tag
 	?></div><?

@@ -1299,6 +1299,11 @@ function mmrpg_action_panel(thisPanel, currentPanel){
     var floatLinkContainer = $('.float_links', mainActionsTitle);
     if (floatLinkContainer.length){
 
+        // Collect the parent wraper ID and generate the option class name
+        var parentActionsWrapper = floatLinkContainer.closest('#actions > .wrapper');
+        var actionWrapperID = parentActionsWrapper.attr('id');
+        var optionClass = actionWrapperID.replace(/^actions_/, 'action_');
+
         // Assign events to any of the page links here
         $('.num[href]', floatLinkContainer).click(function(e){
             e.preventDefault();
@@ -1321,8 +1326,8 @@ function mmrpg_action_panel(thisPanel, currentPanel){
             //console.log('first key should be '+firstElementKey+' and last should be '+lastElementKey+'!');
 
             // Hide all item buttons in the current view and then show only relevant
-            $('.action_ability, .action_item', newWrapper).css({display:'none'});
-            var activeButtons = $('.action_ability, .action_item', newWrapper).slice(firstElementKey, lastElementKey);
+            $('.'+optionClass, newWrapper).css({display:'none'});
+            var activeButtons = $('.'+optionClass, newWrapper).slice(firstElementKey, lastElementKey);
             //console.log('we have selected a total of '+activeButtons.length+' elements');
             activeButtons.css({display:'block'});
 
@@ -1332,9 +1337,10 @@ function mmrpg_action_panel(thisPanel, currentPanel){
             $('.action_back', newWrapper).attr('data-order', tempOrder);
 
             // Update the session with the last page click
-            var thisRequestType = 'session';
-            var thisRequestData = 'battle_settings,action_ability_page_num,'+thisNum;
-            $.post('scripts/script.php',{requestType:thisRequestType,requestData:thisRequestData});
+            //var thisRequestType = 'session';
+            //var thisRequestData = 'battle_settings,'+optionClass+'_page_num,'+thisNum;
+            //$.post('scripts/script.php',{requestType:thisRequestType,requestData:thisRequestData});
+            //(disabled for now)
 
             // Return true on success
             return true;
@@ -1347,6 +1353,7 @@ function mmrpg_action_panel(thisPanel, currentPanel){
         else if (firstLink.length){ firstLink.trigger('click'); }
 
         }
+
     // If there are buttons in the new wrapper
     var hoverButton = $('.button_hover', newWrapper);
     var currentButtons = $('.button:not(.button_disabled)', newWrapper);
