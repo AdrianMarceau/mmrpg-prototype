@@ -5505,42 +5505,34 @@ class rpg_robot extends rpg_object {
             return;
         }
 
+        // Create an options object for this function and populate
+        $options = rpg_game::new_options_object();
+        $options->recover_weapons = true;
+        $options->recover_weapons_multiplier = $this_robot->robot_position == 'bench' ? 2 : 1;
+        $extra_objects = array('options' => $options);
+
+        // Trigger this robot's item function if one has been defined for this context
+        $this->trigger_item_function('rpg-robot_check-weapons_before', $extra_objects);
+        if ($options->return_early){ return $options->return_value; }
+
         // If this robot is not at full weapon energy, increase it by one
-        $temp_weapons = $this_robot->get_weapons();
-        $temp_base_weapons = $this_robot->get_base_weapons();
-        if ($temp_weapons < $temp_base_weapons){
-            // Ensure the regen weapons flag has been set to true
-            if ($regen_weapons){
-                // Define the multiplier based on position
-                $temp_multiplier = $this_robot->get_position() == 'bench' ? 2 : 1;
-                // Increment this robot's weapons by one point and update
-                $temp_weapons += MMRPG_SETTINGS_RECHARGE_WEAPONS * $temp_multiplier;
-                $this_robot->set_weapons($temp_weapons);
+        if ($options->recover_weapons){
+            $temp_weapons = $this_robot->get_weapons();
+            $temp_base_weapons = $this_robot->get_base_weapons();
+            if ($temp_weapons < $temp_base_weapons){
+                // Ensure the regen weapons flag has been set to true
+                if ($regen_weapons){
+                    // Define the multiplier based on position
+                    $temp_multiplier = $options->recover_weapons_multiplier;
+                    // Increment this robot's weapons by one point and update
+                    $temp_weapons += MMRPG_SETTINGS_RECHARGE_WEAPONS * $temp_multiplier;
+                    $this_robot->set_weapons($temp_weapons);
+                }
             }
         }
 
-        // If this robot is on the bench, slowly recovery any lowered stats
-        if ($this_robot->get_position() == 'bench'){
-
-            // If this robot's attack is less than base, recover by 1%
-            if ($this_robot->robot_attack < $this_robot->robot_base_attack){
-                $recovery = ceil($this_robot->robot_base_attack * 0.01);
-                $this_robot->robot_attack += $recovery;
-            }
-
-            // If this robot's defense is less than base, recover by 1%
-            if ($this_robot->robot_defense < $this_robot->robot_base_defense){
-                $recovery = ceil($this_robot->robot_base_defense * 0.01);
-                $this_robot->robot_defense += $recovery;
-            }
-
-            // If this robot's speed is less than base, recover by 1%
-            if ($this_robot->robot_speed < $this_robot->robot_base_speed){
-                $recovery = ceil($this_robot->robot_base_speed * 0.01);
-                $this_robot->robot_speed += $recovery;
-            }
-
-        }
+        // Trigger this robot's item function if one has been defined for this context
+        $this->trigger_item_function('rpg-robot_check-weapons_after', $extra_objects);
 
     }
 
