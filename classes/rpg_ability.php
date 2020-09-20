@@ -2780,7 +2780,7 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function to use as the common action for all ____-shot abilities
-    public static function ability_function_shot($objects, $shot_text = 'energy', $damage_text = 'damaged', $recovery_text = 'recovered'){
+    public static function ability_function_elemental_shot($objects, $shot_text = 'energy', $damage_text = 'damaged', $recovery_text = 'recovered'){
 
         // Extract all objects into the current scope
         extract($objects);
@@ -2814,7 +2814,7 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static onload function to use as the common action for all ____-shot abilities
-    public static function ability_function_onload_shot($objects){
+    public static function ability_function_elemental_shot_onload($objects){
 
         // Extract all objects into the current scope
         extract($objects);
@@ -2840,7 +2840,7 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function to use as the common action for all ____-buster abilities
-    public static function ability_function_buster($objects, $shot_text = 'energy', $damage_text = 'damaged', $recovery_text = 'recovered'){
+    public static function ability_function_elemental_buster($objects, $shot_text = 'energy', $damage_text = 'damaged', $recovery_text = 'recovered'){
 
         // Extract all objects into the current scope
         extract($objects);
@@ -2939,7 +2939,7 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static onload function to use as the common action for all ____-buster abilities
-    public static function ability_function_onload_buster($objects){
+    public static function ability_function_elemental_buster_onload($objects){
 
         // Extract all objects into the current scope
         extract($objects);
@@ -2973,7 +2973,7 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function to use as the common action for all ____-overdrive abilities
-    public static function ability_function_overdrive($objects, $shot_text = 'energy', $damage_text = 'damaged', $recovery_text = 'recovered'){
+    public static function ability_function_elemental_overdrive($objects, $shot_text = 'energy', $damage_text = 'damaged', $recovery_text = 'recovered'){
 
         // Extract all objects into the current scope
         extract($objects);
@@ -3096,7 +3096,7 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static onload function to use as the common action for all ____-overdrive abilities
-    public static function ability_function_onload_overdrive($objects){
+    public static function ability_function_elemental_overdrive_onload($objects){
 
         // Extract all objects into the current scope
         extract($objects);
@@ -3114,6 +3114,27 @@ class rpg_ability extends rpg_object {
 
         // Return true on success
         return true;
+
+    }
+
+    // Define alias functions for the elemental shots until we can remove all legacy references
+    public static function ability_function_shot($objects, $shot_text = 'energy', $damage_text = 'damaged', $recovery_text = 'recovered'){
+        return self::ability_function_elemental_shot($objects, $shot_text, $damage_text, $recovery_text);
+    }
+    public static function ability_function_onload_shot($objects){
+        return self::ability_function_elemental_shot_onload($objects);
+    }
+    public static function ability_function_buster($objects, $shot_text = 'energy', $damage_text = 'damaged', $recovery_text = 'recovered'){
+        return self::ability_function_elemental_buster($objects, $shot_text, $damage_text, $recovery_text);
+    }
+    public static function ability_function_onload_buster($objects){
+        return self::ability_function_elemental_buster_onload($objects);
+    }
+    public static function ability_function_overdrive($objects, $shot_text = 'energy', $damage_text = 'damaged', $recovery_text = 'recovered'){
+        return self::ability_function_elemental_overdrive($objects, $shot_text, $damage_text, $recovery_text);
+    }
+    public static function ability_function_onload_overdrive($objects){
+        return self::ability_function_elemental_overdrive_onload($objects);
 
     }
 
