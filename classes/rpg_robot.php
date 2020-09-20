@@ -331,10 +331,10 @@ class rpg_robot extends rpg_object {
     }
 
     // Define a function for refreshing this robot and running onload actions
-    public function trigger_onload(){
+    public function trigger_onload($force = false){
 
         // Trigger the onload function if not already called
-        if (!rpg_game::onload_triggered('robot', $this->robot_id)){
+        if ($force || !rpg_game::onload_triggered('robot', $this->robot_id)){
             rpg_game::onload_triggered('robot', $this->robot_id, true);
             //error_log('-- trigger_onload() for robot '.$this->robot_id.PHP_EOL);
             $temp_function = $this->robot_function_onload;

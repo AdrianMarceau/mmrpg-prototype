@@ -115,6 +115,7 @@ ob_start();
                 //$temp_iteminfo = rpg_item::parse_index_info($temp_iteminfo);
                 //$temp_iteminfo['item_id'] = $this_player->player_id.str_pad($temp_iteminfo['item_id'], 3, '0', STR_PAD_LEFT);
                 $temp_item = rpg_game::get_item($this_battle, $this_player, $this_robot, $temp_iteminfo);
+                $temp_item->trigger_onload(true);
                 $temp_type = $temp_item->item_type;
                 $temp_type2 = $temp_item->item_type2;
                 $temp_damage = $temp_item->item_damage;

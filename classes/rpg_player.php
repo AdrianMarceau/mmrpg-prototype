@@ -209,10 +209,10 @@ class rpg_player extends rpg_object {
     }
 
     // Define a function for refreshing this player and running onload actions
-    public function trigger_onload(){
+    public function trigger_onload($force = false){
 
         // Trigger the onload function if not already called
-        if (!rpg_game::onload_triggered('player', $this->player_id)){
+        if ($force || !rpg_game::onload_triggered('player', $this->player_id)){
             rpg_game::onload_triggered('player', $this->player_id, true);
             //error_log('- trigger_onload() for player '.$this->player_id.PHP_EOL);
             $temp_function = $this->player_function_onload;
