@@ -2785,6 +2785,14 @@ class rpg_ability extends rpg_object {
         // Extract all objects into the current scope
         extract($objects);
 
+        // Create an options object for this function and populate
+        $options = rpg_game::new_options_object();
+        $extra_objects = array('this_ability' => $this_ability, 'options' => $options);
+
+        // Trigger this robot's item function if one has been defined for this context
+        $this_robot->trigger_item_function('rpg-ability_elemental-shot_before', $extra_objects);
+        if ($options->return_early){ return $options->return_value; }
+
         // Update the ability's target options and trigger
         $this_ability->target_options_update(array(
             'frame' => 'shoot',
@@ -2808,6 +2816,9 @@ class rpg_ability extends rpg_object {
         $energy_damage_amount = $this_ability->ability_damage;
         $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount);
 
+        // Trigger this robot's item function if one has been defined for this context
+        $this_robot->trigger_item_function('rpg-ability_elemental-shot_after', $extra_objects);
+
         // Return true on success
         return true;
 
@@ -2819,20 +2830,31 @@ class rpg_ability extends rpg_object {
         // Extract all objects into the current scope
         extract($objects);
 
+        // Reset the ability target (unless otherwise stated later)
+        $this_ability->reset_target();
+
+        // Create an options object for this function and populate
+        $options = rpg_game::new_options_object();
+        $options->buster_charge_boost = 2;
+        $extra_objects = array('this_ability' => $this_ability, 'options' => $options);
+
+        // Trigger this robot's item function if one has been defined for this context
+        $this_robot->trigger_item_function('rpg-ability_elemental-shot_onload_before', $extra_objects);
+        if ($options->return_early){ return $options->return_value; }
+
         // Loop through any attachments and boost power for each buster charge
         $temp_new_damage = $this_ability->ability_base_damage;
         $this_robot_attachments = $this_robot->get_current_attachments();
         foreach ($this_robot_attachments AS $this_attachment_token => $this_attachment_info){
             if ($this_attachment_token == 'ability_'.$this_ability->ability_type.'-buster'){
-                $temp_new_damage += 2;
+                $temp_new_damage += $options->buster_charge_boost;
             }
         }
         // Update the ability's damage with the new amount
         $this_ability->set_damage($temp_new_damage);
 
-        // If this robot is holding a Target Module, allow target selection
-        if ($this_robot->has_item('target-module')){ $this_ability->set_target('select_target'); }
-        else { $this_ability->reset_target(); }
+        // Trigger this robot's item function if one has been defined for this context
+        $this_robot->trigger_item_function('rpg-ability_elemental-shot_onload_after', $extra_objects);
 
         // Return true on success
         return true;
@@ -2876,13 +2898,17 @@ class rpg_ability extends rpg_object {
             $this_attachment_info['ability_frame_offset'] = $this_attachment_offset;
         }
 
-        // Define the charge required flag based on existing attachments of this ability
-        $this_charge_required = !isset($this_robot_attachments[$this_attachment_token]) ? true : false;
-        // If this robot is holding a charge module, bypass changing and set to false
-        if ($this_robot->has_item('charge-module')){ $this_charge_required = false; }
+        // Create an options object for this function and populate
+        $options = rpg_game::new_options_object();
+        $options->buster_charge_required = !isset($this_robot_attachments[$this_attachment_token]) ? true : false;
+        $extra_objects = array('this_ability' => $this_ability, 'options' => $options);
+
+        // Trigger this robot's item function if one has been defined for this context
+        $this_robot->trigger_item_function('rpg-ability_elemental-buster_before', $extra_objects);
+        if ($options->return_early){ return $options->return_value; }
 
         // If the ability flag was not set, this ability begins charging
-        if ($this_charge_required){
+        if ($options->buster_charge_required){
 
             // Target this robot's self
             $this_ability->target_options_update(array(
@@ -2898,6 +2924,13 @@ class rpg_ability extends rpg_object {
         // Else if the ability flag was set, the ability is released at the target
         else {
 
+            // Remove this ability attachment to the robot using it
+            $existing_attachment_info = $this_robot->get_attachment($this_attachment_token);
+            $new_attachment_info = !empty($existing_attachment_info) ? $existing_attachment_info : $this_attachment_info;
+            $new_attachment_info['ability_frame'] = 0;
+            $new_attachment_info['ability_frame_animate'] = array(1, 0);
+            $this_robot->set_attachment($this_attachment_token, $new_attachment_info);
+
             // Update this ability's target options and trigger
             $this_ability->target_options_update(array(
                 'frame' => 'shoot',
@@ -2905,12 +2938,6 @@ class rpg_ability extends rpg_object {
                 'success' => array(3, 100, -15, 10, $this_robot->print_name().' fires the '.$this_ability->print_name().'!'),
                 ));
             $this_robot->trigger_target($target_robot, $this_ability);
-
-            // Remove this ability attachment to the robot using it
-            $this_attachment_info = $this_robot->get_attachment($this_attachment_token);
-            $this_attachment_info['ability_frame'] = 0;
-            $this_attachment_info['ability_frame_animate'] = array(1, 0);
-            $this_robot->set_attachment($this_attachment_token, $this_attachment_info);
 
             // Inflict damage on the opposing robot
             $this_ability->damage_options_update(array(
@@ -2933,6 +2960,9 @@ class rpg_ability extends rpg_object {
 
         }
 
+        // Trigger this robot's item function if one has been defined for this context
+        $this_robot->trigger_item_function('rpg-ability_elemental-buster_after', $extra_objects);
+
         // Return true on success
         return true;
 
@@ -2949,23 +2979,25 @@ class rpg_ability extends rpg_object {
 
         // Define the charge required flag based on existing attachments of this ability
         $this_robot_attachments = $this_robot->get_current_attachments();
-        $this_charge_required = !isset($this_robot_attachments[$this_attachment_token]) ? true : false;
+
+        // Reset this ability's energy cost and target select unless otherwise stated
+        $this_ability->reset_energy();
+        $this_ability->reset_target();
+
+        // Create an options object for this function and populate
+        $options = rpg_game::new_options_object();
+        $options->buster_charge_required = !isset($this_robot_attachments[$this_attachment_token]) ? true : false;
+        $extra_objects = array('this_ability' => $this_ability, 'options' => $options);
+
+        // Trigger this robot's item function if one has been defined for this context
+        $this_robot->trigger_item_function('rpg-ability_elemental-buster_onload_before', $extra_objects);
+        if ($options->return_early){ return $options->return_value; }
 
         // If the ability flag had already been set, reduce the weapon energy to zero
-        if (!$this_charge_required){ $this_ability->set_energy(0); }
-        // Otherwise, return the weapon energy back to default
-        else { $this_ability->reset_energy(); }
+        if (!$options->buster_charge_required){ $this_ability->set_energy(0); }
 
-        // If this robot is holding a Charge Module, bypass changing and set to false
-        if ($this_robot->has_item('charge-module')){ $this_charge_required = false; }
-
-        // If this robot is holding a Target Module, allow target selection
-        if ($this_robot->has_item('target-module')){
-            if (!$this_charge_required){ $this_ability->set_target('select_target'); }
-            else { $this_ability->reset_target(); }
-        } else {
-            $this_ability->reset_target();
-        }
+        // Trigger this robot's item function if one has been defined for this context
+        $this_robot->trigger_item_function('rpg-ability_elemental-buster_onload_after', $extra_objects);
 
         // Return true on success
         return true;
@@ -2977,6 +3009,14 @@ class rpg_ability extends rpg_object {
 
         // Extract all objects into the current scope
         extract($objects);
+
+        // Create an options object for this function and populate
+        $options = rpg_game::new_options_object();
+        $extra_objects = array('this_ability' => $this_ability, 'options' => $options);
+
+        // Trigger this robot's item function if one has been defined for this context
+        $this_robot->trigger_item_function('rpg-ability_elemental-overdrive_before', $extra_objects);
+        if ($options->return_early){ return $options->return_value; }
 
         // Decrease this robot's weapon energy to zero
         $this_robot->set_weapons(0);
@@ -3007,7 +3047,6 @@ class rpg_ability extends rpg_object {
         // Add the ability crest attachment
         $this_robot->set_frame('summon');
         $this_robot->set_attachment($crest_attachment_token, $crest_attachment_info);
-
 
         // Define this ability's attachment token
         $overlay_attachment_token = 'effect_'.$this_ability->ability_token;
@@ -3090,6 +3129,9 @@ class rpg_ability extends rpg_object {
             }
         }
 
+        // Trigger this robot's item function if one has been defined for this context
+        $this_robot->trigger_item_function('rpg-ability_elemental-overdrive_after', $extra_objects);
+
         // Return true on success
         return true;
 
@@ -3101,6 +3143,14 @@ class rpg_ability extends rpg_object {
         // Extract all objects into the current scope
         extract($objects);
 
+        // Create an options object for this function and populate
+        $options = rpg_game::new_options_object();
+        $extra_objects = array('this_ability' => $this_ability, 'options' => $options);
+
+        // Trigger this robot's item function if one has been defined for this context
+        $this_robot->trigger_item_function('rpg-ability_elemental-overdrive_onload_before', $extra_objects);
+        if ($options->return_early){ return $options->return_value; }
+
         // Update this abilities weapon energy to whatever the user's max is
         $this_ability->set_energy($this_robot->robot_base_weapons);
 
@@ -3111,6 +3161,9 @@ class rpg_ability extends rpg_object {
         // Multiply the user's damage by the remaining weapon energy for damage total
         $ability_damage_amount = $robot_energy_damage_percent + 1;
         $this_ability->set_damage($ability_damage_amount);
+
+        // Trigger this robot's item function if one has been defined for this context
+        $this_robot->trigger_item_function('rpg-ability_elemental-overdrive_onload_after', $extra_objects);
 
         // Return true on success
         return true;
