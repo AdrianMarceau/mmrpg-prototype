@@ -199,13 +199,14 @@ Create "onload" events (or other event hooks) for items to take advantage of whe
 -  Create event hook for "check_items" rpg_robot function (attack/defense/speed/field-booster)
     - rpg-robot_check-items_before [DONE]
     - rpg-robot_check-items_after [DONE]
-    - update energy pellet/capsule/tank items to work with above
-    - update weapon pellet/capsule/tank items to work with above
-    - update yashichi item to work with above
-    - update attack pellet/capsule items to work with above
-    - update defense pellet/capsule items to work with above
-    - update speed pellet/capsule items to work with above
-    - update super pellet/capsule items to work with above
+    - update energy pellet/capsule/tank items to work with above [DONE]
+    - update weapon pellet/capsule/tank items to work with above [DONE]
+    - update yashichi item to work with above [DONE]
+    - update attack pellet/capsule items to work with above [DONE]
+    - update defense pellet/capsule items to work with above [DONE]
+    - update speed pellet/capsule items to work with above [DONE]
+    - update super pellet/capsule items to work with above [DONE]
+    - update elemental cores to work with above
 
 -  Create event hook for "trigger_robot_damage" in rpg_ability/rpg_ability_damage function (fortune-module [crits])
     - rpg-ability_trigger-damage_before
