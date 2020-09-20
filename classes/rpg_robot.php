@@ -918,21 +918,6 @@ class rpg_robot extends rpg_object {
             $this->values[$prop_stat_base_backup] = $this->$prop_stat_base;
         }
 
-        // If this robot is holding a relavant item, apply stat upgrades or other effects
-        $this_robot_item = $this->get_item();
-        if (!empty($this_robot_item)){
-
-            // Else if this robot is holding an Elemental Core, apply a temp core shield
-            if (preg_match('/^([a-z]+)-core$/', $this_robot_item)){
-                list($item_type, $item_kind) = explode('-', $this_robot_item);
-                if ($item_type != 'none' && $item_type != 'empty'){
-                    $shield_info = rpg_ability::get_static_core_shield($item_type, 3, 0);
-                    $this->robot_attachments[$shield_info['attachment_token']] = $shield_info;
-                }
-            }
-
-        }
-
         // Trigger this robot's item function if one has been defined for this context
         $this->trigger_item_function('rpg-robot_apply-stat-bonuses_after', $extra_objects);
 
@@ -5496,67 +5481,6 @@ class rpg_robot extends rpg_object {
         // Trigger this robot's item function if one has been defined for this context
         $this->trigger_item_function('rpg-robot_check-items_before', $extra_objects, $extra_item_info);
         if ($options->return_early){ return $options->return_value; }
-
-        // If this robot has an item attached, process actions
-        if ($this_robot->has_item()){
-
-            // Define the item info based on token and load into memory
-            $item_token = $this_robot->get_item();
-            $item_info = array(
-                'flags' => array('is_part' => true),
-                'part_token' => 'item_'.$item_token,
-                'item_token' => $item_token
-                );
-            $this_item = rpg_game::get_item($this_battle, $this_player, $this_robot, $item_info);
-            $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' checkpoint has item '.$this->robot_item);
-
-            // If the robot is holding an elemental ROBOT CORE item, extend shield duration
-            if (substr($item_token, -5, 5) === '-core'){
-
-                // If there's a timer, decrement and then move on
-                if (!empty($this_robot->counters['core-shield_cooldown_timer'])){
-                    $this_robot->counters['core-shield_cooldown_timer'] -= 1;
-                    if (empty($this_robot->counters['core-shield_cooldown_timer'])){
-                        unset($this_robot->counters['core-shield_cooldown_timer']);
-                    }
-                }
-                // Otherwise we can regenerate the core shield
-                else {
-
-                    // Collect the elemental type for this core
-                    list($held_core_type) = explode('-', $item_token);
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' extends '.$held_core_type.'-type core shield');
-
-                    // If a core shield already exists, we only need to extend the duration
-                    $base_core_duration = 3;
-                    $core_shield_token = 'ability_core-shield_'.$held_core_type;
-                    if (!empty($this_robot->robot_attachments[$core_shield_token])){
-                        $core_shield_info = $this_robot->robot_attachments[$core_shield_token];
-                        if (empty($core_shield_info['attachment_duration'])
-                            || $core_shield_info['attachment_duration'] < $base_core_duration){
-                            $core_shield_info['attachment_duration'] = $base_core_duration;
-                        }
-                        $core_shield_info['attachment_duration'] += 1;
-                        $this_robot->set_attachment($core_shield_token, $core_shield_info);
-                    }
-                    // otherwise, if not exists, we should create a new shield and attach it
-                    else {
-                        $existing_shields = !empty($this_robot->robot_attachments) ? substr_count(implode('|', array_keys($this_robot->robot_attachments)), 'ability_core-shield_') : 0;
-                        $core_shield_info = rpg_ability::get_static_core_shield($held_core_type, $base_core_duration, $existing_shields);
-                        $this_robot->set_attachment($core_shield_token, $core_shield_info);
-                        $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_item->item_name,
-                            $this_robot->print_name().' triggers '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!<br />'.
-                            'The held item generated a new '.rpg_type::print_span($held_core_type, 'Core Shield').'!',
-                            array('canvas_show_this_item_overlay' => true)
-                            );
-                    }
-
-                }
-
-            }
-
-
-        }
 
         // Trigger this robot's item function if one has been defined for this context
         $this->trigger_item_function('rpg-robot_check-items_after', $extra_objects);
