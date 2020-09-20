@@ -5510,56 +5510,8 @@ class rpg_robot extends rpg_object {
             $this_item = rpg_game::get_item($this_battle, $this_player, $this_robot, $item_info);
             $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' checkpoint has item '.$this->robot_item);
 
-            // If the robot is holding an Super Capsule or Super Pellet item, apply recovery
-            if ($item_token == 'super-pellet' || $item_token == 'super-capsule'){
-
-                // Define the three stat types that can be increased
-                $temp_stat_tokens = array('attack', 'defense', 'speed');
-
-                // Only use this item if the robot is active and turns have passed
-                $item_restore_value = strstr($item_token, 'pellet') ? 1 : 2;
-                $item_restore_trigger = $item_restore_value;
-                if ((!empty($this_robot->counters['attack_breaks_applied']) && $this_robot->counters['attack_breaks_applied'] >= $item_restore_trigger)
-                    || (!empty($this_robot->counters['defense_breaks_applied']) && $this_robot->counters['defense_breaks_applied'] >= $item_restore_trigger)
-                    || (!empty($this_robot->counters['speed_breaks_applied']) && $this_robot->counters['speed_breaks_applied'] >= $item_restore_trigger)){
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_robot->robot_token.' '.$this_robot->get_item().' restores attack/defense/speed by '.$item_restore_value.' stages');
-
-                    // Remove the robot's current item now that it's used up in battle
-                    $this_robot->set_item('');
-
-                    // Call the global stat boost function with customized options
-                    rpg_ability::ability_function_stat_boost($this_robot, $temp_stat_tokens[0], $item_restore_value, false, null, null, $this_robot->print_name().' uses '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!');
-                    foreach ($temp_stat_tokens AS $temp_stat){
-                        if ($temp_stat === $temp_stat_tokens[0]){ continue; }
-                        rpg_ability::ability_function_stat_boost($this_robot, $temp_stat, $item_restore_value);
-                    }
-
-                    // Also remove this robot's item from the session, we're done with it
-                    if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle']) && empty($this_battle->flags['challenge_battle'])){
-                        $ptoken = $this_player->player_token;
-                        $rtoken = $this_robot->robot_token;
-                        if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
-                            $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
-                        }
-                    }
-
-                    // Reset the applied breaks variable relative to restore amount
-                    $this_robot->counters['attack_breaks_applied'] -= $item_restore_value;
-                    if ($this_robot->counters['attack_breaks_applied'] < 0){ unset($this_robot->counters['attack_breaks_applied']); }
-
-                    // Reset the applied breaks variable relative to restore amount
-                    $this_robot->counters['defense_breaks_applied'] -= $item_restore_value;
-                    if ($this_robot->counters['defense_breaks_applied'] < 0){ unset($this_robot->counters['defense_breaks_applied']); }
-
-                    // Reset the applied breaks variable relative to restore amount
-                    $this_robot->counters['speed_breaks_applied'] -= $item_restore_value;
-                    if ($this_robot->counters['speed_breaks_applied'] < 0){ unset($this_robot->counters['speed_breaks_applied']); }
-
-                }
-
-            }
-            // Else if the robot is holding an elemental ROBOT CORE item, extend shield duration
-            elseif (substr($item_token, -5, 5) === '-core'){
+            // If the robot is holding an elemental ROBOT CORE item, extend shield duration
+            if (substr($item_token, -5, 5) === '-core'){
 
                 // If there's a timer, decrement and then move on
                 if (!empty($this_robot->counters['core-shield_cooldown_timer'])){
