@@ -238,13 +238,13 @@ Create "onload" events (or other event hooks) for items to take advantage of whe
     - rpg-robot_trigger-disabled_item-rewards
 
 -  Create event hook for "ability_function_stat_boost_step1" in rpg_ability (reverse-module, xtreme-module)
-    - rpg-ability_stat-boost_before
+    - rpg-ability_stat-boost_before [DONE]
 -  Create event hook for "ability_function_stat_boost_step2" in rpg_ability (guard-module)
-    - rpg-ability_stat-boost_after
+    - rpg-ability_stat-boost_after [DONE]
 -  Create event hook for "ability_function_stat_break_step1" in rpg_ability (reverse-module, xtreme-module)
-    - rpg-ability_stat-break_before
+    - rpg-ability_stat-break_before [DONE]
 -  Create event hook for "ability_function_stat_break_step2" in rpg_ability (guard-module)
-    - rpg-ability_stat-break_after
+    - rpg-ability_stat-break_after [DONE]
 
 -  Create event hook for "ability_function_shot" in rpg_ability
     - rpg-ability_elemental-shot_before [DONE]
