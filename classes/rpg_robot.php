@@ -366,14 +366,6 @@ class rpg_robot extends rpg_object {
 
         // Collect this item's object from the game class
         $this_item = rpg_game::get_item($this->battle, $this->player, $this, $item_info);
-        /*
-        if (!empty($extra_item_info)){
-            foreach ($extra_item_info AS $extra_field => $extra_value){
-                if (in_array($extra_field, array('counters', 'flags', 'values'))){ $this_item->$extra_field = array_merge($this_item->$extra_field, $extra_value); }
-                else { $this_item->$extra_field = $extra_value; }
-            }
-        }
-        */
 
         // Check to make sure this item has the given function defined, else return now
         if (!isset($this_item->item_functions_custom[$function])){ return; }
