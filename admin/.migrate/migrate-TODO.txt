@@ -231,9 +231,9 @@ Create "onload" events (or other event hooks) for items to take advantage of whe
     - rpg-battle_complete-trigger_failure
 
 -  Create event hook for post-disable stat bonus calculations (growth-module)
-    - rpg-robot_trigger-disabled_stat-rewards
+    - rpg-robot_trigger-disabled_stat-rewards [DONE]
 -  Create event hook for post-disable experience point calculations (growth-module)
-    - rpg-robot_trigger-disabled_experience-rewards
+    - rpg-robot_trigger-disabled_experience-rewards [DONE]
 -  Create event hook for post-disable item reward calculations (fortune-module)
     - rpg-robot_trigger-disabled_item-rewards
 
