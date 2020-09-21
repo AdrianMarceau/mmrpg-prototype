@@ -238,6 +238,10 @@ body:before {
         content: "05";
     }
 
+    #window .banner .credits {
+        transform: translate(-30px, 0);
+    }
+
     #window .menu .link {
         padding-left: 3px;
         padding-right: 3px;
@@ -318,6 +322,10 @@ body:before {
         content: "05B";
     }
 
+    #window .banner .credits {
+        transform: translate(-60px, 0);
+    }
+
     #window .banner .userinfo .info .file_view {
         opacity: 0.3;
         text-decoration: line-through;
@@ -356,13 +364,19 @@ body:before {
     }
 
     #window .banner {
-        height: 164px;
+        /* height: 164px; */
+        height: 204px;
         border-top: 0 none transparent;
         border-left: 0 none transparent;
         border-right: 0 none transparent;
         -moz-border-radius: 0;
         -webkit-border-radius: 0;
         border-radius: 0;
+    }
+
+    #window .banner .credits {
+        transform: none;
+        background-position: center 6px;
     }
 
     #window .banner .userinfo {
