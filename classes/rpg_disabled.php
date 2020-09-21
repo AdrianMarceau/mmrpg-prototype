@@ -174,9 +174,9 @@ class rpg_disabled {
         $event_options['this_ability_results']['total_actions'] = 0;
 
         // Calculate the bonus boosts from defeating the target robot (if NOT player battle)
-        if ($target_player->player_side == 'left'
-            && $target_robot->robot_class == 'master'
-            && $target_robot->robot_status != 'disabled'
+        if ($target_player->player_side === 'left'
+            && $target_robot->robot_class === 'master'
+            && $target_robot->robot_status !== 'disabled'
             && empty($this_battle->flags['player_battle'])
             && empty($this_battle->flags['challenge_battle'])
             ){
@@ -194,6 +194,12 @@ class rpg_disabled {
             // Define the temporary boost actions counter
             $temp_boost_actions = 1;
 
+            // Create an options object for this function and populate
+            $options = rpg_game::new_options_object();
+            $options->victim_robot = $this_robot;
+            $options->assailant_robot = $target_robot;
+            $extra_objects = array('options' => $options);
+
             // Loop through the stats applying STAT BONUSES to any that apply
             foreach ($stat_tokens AS $stat){
 
@@ -202,38 +208,47 @@ class rpg_disabled {
                 $prop_stat_base = "robot_base_{$stat}";
                 $prop_stat_pending = "robot_{$stat}_pending";
                 $prop_stat_max = "robot_max_{$stat}";
-                $this_stat_boost = $this_robot->$prop_stat_base / 100;
-                if ($this_robot->robot_class == 'mecha'){ $this_stat_boost = $this_stat_boost / 2; }
-                if ($target_player->player_side == 'left' && $target_robot->robot_class == 'mecha'){ $this_stat_boost = $this_stat_boost * 2; }
+                $options->allow_stat_boost = true;
+                $options->this_stat_type = $stat;
+                $options->this_stat_boost = $this_robot->$prop_stat_base / 100;
+
+                // If the robot who disabled this one is already at max bonus, they get no stat boosts
                 if ($temp_robot_stats[$stat]['bonus'] >= $temp_robot_stats[$stat]['bonus_max']){
+
+                    // Hard-code the stat boost to zero
                     $this_stat_overboost = 0;
-                    $this_stat_boost = 0;
+                    $options->this_stat_boost = 0;
+                    $options->allow_stat_boost = false;
+
+                }
+                // Otherwise check to see if any bonuses apply to the boost amount
+                else {
+
+                    // If the disabled robot was a mecha, it only gives half the stat boosts
+                    if ($this_robot->robot_class == 'mecha'){  $options->this_stat_boost = $options->this_stat_boost / 2; }
+                    // If the robot who disabled this one was a mecha, however, it gets double stat boosts
+                    if ($target_player->player_side == 'left' && $target_robot->robot_class == 'mecha'){  $options->this_stat_boost = $options->this_stat_boost * 2;  }
+                    // If the robot who disabled this one is at max level, dramatically boost stat bonuses
+                    if ($target_robot->robot_level >= 100){ $options->this_stat_boost *= $target_robot->robot_level; }
+
                 }
 
-                // If the target robot is holding a Growth Module, double the stat bonuses
-                if ($target_robot->has_item() && $target_robot->get_item() == 'growth-module'){
-                    $this_stat_boost *= 2;
-                }
-
-                // If the target robot has hit max level, dramatically boost stat bonuses
-                if ($target_robot->robot_level >= 100){
-                    $this_stat_boost *= $target_robot->robot_level;
-                }
-
-                // Round the stat boost to get an int value
-                $this_stat_boost = round($this_stat_boost);
+                // Trigger this and target robot's item functions if they have been defined for this context
+                $this_robot->trigger_item_function('rpg-robot_trigger-disabled_stat-rewards', $extra_objects);
+                $target_robot->trigger_item_function('rpg-robot_trigger-disabled_stat-rewards', $extra_objects);
 
                 // If the stat was not empty, process it
-                if ($this_stat_boost > 0
-                    && $target_player->player_side === 'left'
-                    && $target_robot->robot_class === 'master'){
+                if ($options->this_stat_boost > 0){
+
+                    // Round the stat boost to get an int value
+                    $options->this_stat_boost = ceil($options->this_stat_boost);
 
                     // If the robot is under level 100, stat boosts are pending
                     if ($target_robot->robot_level < 100){
 
                         // Update the session variables with the pending stat boost
                         if (empty($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat_pending])){ $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat_pending] = 0; }
-                        $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat_pending] += $this_stat_boost;
+                        $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat_pending] += $options->this_stat_boost;
 
                     }
                     // If the robot is at level 100 or a mecha, stat boosts are immediately rewarded
@@ -247,7 +262,7 @@ class rpg_disabled {
                         if ($current_bonus_amount >= $temp_robot_stats[$stat]['bonus_max']){ continue; }
 
                         // Define the base stat boost based on robot base stats
-                        $temp_stat_base_boost = ceil($this_stat_boost);
+                        $temp_stat_base_boost = ceil($options->this_stat_boost);
                         if (($target_robot->$prop_stat_base + $temp_stat_base_boost) > MMRPG_SETTINGS_STATS_MAX){ $temp_stat_base_boost = MMRPG_SETTINGS_STATS_MAX - $target_robot->$prop_stat_base; }
                         if (($current_bonus_amount + $temp_stat_base_boost) > $temp_robot_stats[$stat]['bonus_max']){ $temp_stat_base_boost = $temp_robot_stats[$stat]['bonus_max'] - $current_bonus_amount; }
 
@@ -260,7 +275,7 @@ class rpg_disabled {
                         $stat_is_maxed = false;
                         if ($target_robot->robot_class == 'master'){
                             $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat] = ceil($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat]);
-                            $temp_stat_session_boost = round($this_stat_boost);
+                            $temp_stat_session_boost = round($options->this_stat_boost);
                             if ($temp_stat_session_boost < 1){ $temp_stat_session_boost = 1; }
                             $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat] += $temp_stat_session_boost;
                             $new_bonus_amount = $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat] >= $temp_robot_stats[$stat]['bonus_max'] ? true : false;
@@ -290,7 +305,6 @@ class rpg_disabled {
                         elseif ($stat == 'speed'){ $frame = 'slide'; }
                         $target_robot->set_frame($frame);
                         $this_battle->events_create($target_robot, $this_robot, $event_header, $event_body, $event_options);
-
 
                     }
 
@@ -332,8 +346,8 @@ class rpg_disabled {
 
             // Filter out robots who were active in this battle in at least some way
             $target_player->update_session();
-            $temp_robots_active = $target_player->values['robots_active'];
-            usort($temp_robots_active, array('rpg_player','robot_sort_by_active'));
+            $temp_target_robots_active = $target_player->values['robots_active'];
+            usort($temp_target_robots_active, array('rpg_player','robot_sort_by_active'));
 
             // Define the boost multiplier and start out at zero
             $temp_boost_multiplier = 0;
@@ -387,153 +401,146 @@ class rpg_disabled {
             //$event_body = preg_replace('/\s+/', ' ', $this_robot->robot_token.' : $temp_target_experience = <pre>'.print_r($temp_target_experience, true).'</pre>');
             //$this_battle->events_create(false, false, 'DEBUG', $event_body);
 
-            // Define the robot experience level and start at zero
-            $target_robot_experience = 0;
-
             // Sort the active robots based on active or not
             /*
             function mmrpg_sort_temp_active_robots($info1, $info2){
                 if ($info1['robot_position'] == 'active'){ return -1; }
                 else { return 1; }
             }
-            usort($temp_robots_active, 'mmrpg_sort_temp_active_robots');
+            usort($temp_target_robots_active, 'mmrpg_sort_temp_active_robots');
             */
 
             // Increment each of this player's robots
-            $temp_robots_active_num = count($temp_robots_active);
-            $temp_robots_active_num2 = $temp_robots_active_num; // This will be decremented for each non-experience gaining level 100 robots
-            $temp_robots_active = array_reverse($temp_robots_active, true);
-            usort($temp_robots_active, array('rpg_player', 'robot_sort_by_active'));
+            $temp_target_robots_active_num = count($temp_target_robots_active);
+            $temp_target_robots_active_num2 = $temp_target_robots_active_num; // This will be decremented for each non-experience gaining level 100 robots
+            $temp_target_robots_active = array_reverse($temp_target_robots_active, true);
+            usort($temp_target_robots_active, array('rpg_player', 'robot_sort_by_active'));
             $temp_robot_active_position = false;
-            foreach ($temp_robots_active AS $temp_id => $temp_info){
-                $temp_robot = $target_robot->robot_id == $temp_info['robot_id'] ? $target_robot : rpg_game::get_robot($this_robot, $target_player, $temp_info);
-                if ($temp_robot->robot_class != 'master'){ $temp_robots_active_num2--; }
-                if ($temp_robot->robot_position == 'active'){
-                    $temp_robot_active_position = $temp_robots_active[$temp_id];
-                    unset($temp_robots_active[$temp_id]);
+            foreach ($temp_target_robots_active AS $temp_id => $temp_info){
+                $temp_target_robot = $target_robot->robot_id == $temp_info['robot_id'] ? $target_robot : rpg_game::get_robot($this_robot, $target_player, $temp_info);
+                if ($temp_target_robot->robot_class != 'master'){ $temp_target_robots_active_num2--; }
+                if ($temp_target_robot->robot_position == 'active'){
+                    $temp_robot_active_position = $temp_target_robots_active[$temp_id];
+                    unset($temp_target_robots_active[$temp_id]);
                 }
             }
-            $temp_unshift = array_unshift($temp_robots_active, $temp_robot_active_position);
+            $temp_unshift = array_unshift($temp_target_robots_active, $temp_robot_active_position);
 
             // DEBUG
-            //$event_body = preg_replace('/\s+/', ' ', $this_robot->robot_token.' : $temp_robots_active = <pre>'.count($temp_robots_active).'</pre>');
+            //$event_body = preg_replace('/\s+/', ' ', $this_robot->robot_token.' : $temp_target_robots_active = <pre>'.count($temp_target_robots_active).'</pre>');
             //$this_battle->events_create(false, false, 'DEBUG', $event_body);
 
-            foreach ($temp_robots_active AS $temp_id => $temp_info){
+            // Create an options object for this function and populate
+            $options = rpg_game::new_options_object();
+            $options->victim_robot = $this_robot;
+            $options->assailant_robot = $target_robot;
+            $options->beneficiary_robot = false;
+            $extra_objects = array('options' => $options);
+
+            foreach ($temp_target_robots_active AS $temp_id => $temp_info){
 
                 // Collect or define the robot points and robot rewards variables
-                $temp_robot = $target_robot->robot_id == $temp_info['robot_id'] ? $target_robot : rpg_game::get_robot($this_robot, $target_player, $temp_info);
-                if ($temp_robot->robot_class !== 'master'){ continue; }
+                $temp_target_robot = $target_robot->robot_id == $temp_info['robot_id'] ? $target_robot : rpg_game::get_robot($this_robot, $target_player, $temp_info);
+                if ($temp_target_robot->robot_class !== 'master'){ continue; }
                 $temp_robot_token = $temp_info['robot_token'];
                 if ($temp_robot_token == 'robot'){ continue; }
                 $temp_robot_experience = mmrpg_prototype_robot_experience($target_player->player_token, $temp_info['robot_token']);
                 $temp_robot_rewards = !empty($temp_info['robot_rewards']) ? $temp_info['robot_rewards'] : array();
-                if (empty($temp_robots_active_num2)){ break; }
-
-                // Continue if over already at level 100
-                //if ($temp_robot->robot_level >= 100){ continue; }
+                if (empty($temp_target_robots_active_num2)){ break; }
+                $options->beneficiary_robot = $temp_target_robot;
 
                 // Reset the robot experience points to zero
-                $target_robot_experience = 0;
+                $options->start_experience = 0;
+                $options->divided_experience = 0;
+                $options->earned_experience = 0;
+                $options->this_experience_boost = 0;
+                $options->this_experience_boost_word = 'boosted';
+                $options->this_experience_boost_kinds = array();
 
                 // Continue with experience mods only if under level 100
-                if ($temp_robot->robot_level < 100){
+                if ($temp_target_robot->robot_level < 100){
 
+                    //$debug_text = 'START EXPERIENCE | ';
+                    //$debug_text .= '(for '.$temp_target_robot->robot_token.' via '.$this_robot->robot_token.') <br /> ';
                     // Give a proportionate amount of experience based on this and the target robot's levels
-                    if ($temp_robot->robot_level == $temp_target_experience['level']){
-                        $temp_experience_boost = $temp_target_experience['experience'];
-                    } elseif ($temp_robot->robot_level < $temp_target_experience['level']){
-                        $temp_experience_boost = $temp_target_experience['experience'] + round((($temp_target_experience['level'] - $temp_robot->robot_level) / 100)  * $temp_target_experience['experience']);
-                        //$temp_experience_boost = $temp_target_experience['experience'] + ((($temp_target_experience['level']) / $temp_robot->robot_level) * $temp_target_experience['experience']);
-                    } elseif ($temp_robot->robot_level > $temp_target_experience['level']){
-                        $temp_experience_boost = $temp_target_experience['experience'] - round((($temp_robot->robot_level - $temp_target_experience['level']) / 100)  * $temp_target_experience['experience']);
-                        //$temp_experience_boost = $temp_target_experience['experience'] - ((($temp_robot->robot_level - $temp_target_experience['level']) / 100) * $temp_target_experience['experience']);
+                    if ($temp_target_robot->robot_level == $temp_target_experience['level']){
+                        $options->start_experience = $temp_target_experience['experience'];
+                    } elseif ($temp_target_robot->robot_level < $temp_target_experience['level']){
+                        $options->start_experience = $temp_target_experience['experience'] + round((($temp_target_experience['level'] - $temp_target_robot->robot_level) / 100)  * $temp_target_experience['experience']);
+                    } elseif ($temp_target_robot->robot_level > $temp_target_experience['level']){
+                        $options->start_experience = $temp_target_experience['experience'] - round((($temp_target_robot->robot_level - $temp_target_experience['level']) / 100)  * $temp_target_experience['experience']);
                     }
+                    //$debug_text .= 'start_experience = '.$options->start_experience.' | ';
+                    //$debug_text .= '(start) earned_experience = '.$options->earned_experience.' ';
+                    //$this_battle->events_create(false, false, 'DEBUG', $debug_text);
 
-                    // DEBUG
-                    //$event_body = 'START EXPERIENCE | ';
-                    //$event_body .= preg_replace('/\s+/', ' ', $this_robot->robot_token.' : $temp_experience_boost = '.$temp_experience_boost.'; $target_robot_experience = '.$target_robot_experience.'; ');
-                    //$this_battle->events_create(false, false, 'DEBUG', $event_body);
+                    //$debug_text = 'ACTIVE ROBOT DIVISION | ';
+                    //$debug_text .= '(for '.$temp_target_robot->robot_token.' via '.$this_robot->robot_token.') <br /> ';
+                    $options->divided_experience = ceil($options->start_experience / $temp_target_robots_active_num);
+                    if ($options->divided_experience > MMRPG_SETTINGS_STATS_MAX){ $options->divided_experience = MMRPG_SETTINGS_STATS_MAX; }
+                    $options->earned_experience += $options->divided_experience;
+                    //$debug_text .= 'divided_experience = '.$options->divided_experience.' | ';
+                    //$debug_text .= '(new) earned_experience = '.$options->earned_experience.' ';
+                    //$this_battle->events_create(false, false, 'DEBUG', $debug_text);
 
-                    //$temp_experience_boost = ceil($temp_experience_boost / 10);
-                    $temp_experience_boost = ceil($temp_experience_boost / $temp_robots_active_num);
-                    //$temp_experience_boost = ceil($temp_experience_boost / ($temp_robots_active_num * 2));
-                    //$temp_experience_boost = ceil($temp_experience_boost / ($temp_robots_active_num2 * 2));
-                    //$temp_experience_boost = ceil(($temp_experience_boost / $temp_robots_active_num2) * 1.00);
-
-                    if ($temp_experience_boost > MMRPG_SETTINGS_STATS_MAX){ $temp_experience_boost = MMRPG_SETTINGS_STATS_MAX; }
-                    $target_robot_experience += $temp_experience_boost;
-
-                    // DEBUG
-                    //$event_body = 'ACTIVE ROBOT DIVISION | ';
-                    //$event_body .= preg_replace('/\s+/', ' ', $this_robot->robot_token.' : $temp_experience_boost = '.$temp_experience_boost.'; $target_robot_experience = '.$target_robot_experience.'; $temp_robots_active_num = '.$temp_robots_active_num.'; $temp_robots_active_num2 = '.$temp_robots_active_num2.'; ');
-                    //$this_battle->events_create(false, false, 'DEBUG', $event_body);
-
+                    //$debug_text = 'PLAYER BOOSTED | ';
+                    //$debug_text .= '(for '.$temp_target_robot->robot_token.' via '.$this_robot->robot_token.') <br /> ';
                     // If this robot has been traded, give it an additional experience boost
-                    $temp_experience_boost = 0;
-                    $temp_robot_boosted_word = 'boosted';
-                    $temp_robot_boost_kinds = array();
-                    $temp_robot_boost_text = $temp_boost_text;
-                    $temp_player_boosted = false;
-                    if ($temp_robot->player_token != $temp_robot->robot_original_player){
-                        $temp_robot_boost_kinds[] = 'player';
-                        $temp_player_boosted = true;
-                        $temp_experience_bak = $target_robot_experience;
-                        $target_robot_experience = $target_robot_experience * 2;
-                        $temp_experience_boost = $target_robot_experience - $temp_experience_bak;
+                    $options->this_experience_boost = 0;
+                    $options->is_player_boosted = false;
+                    if ($temp_target_robot->player_token != $temp_target_robot->robot_original_player){
+                        $options->this_experience_boost_kinds[] = 'player';
+                        $options->is_player_boosted = true;
+                        $temp_experience_bak = $options->earned_experience;
+                        $options->earned_experience *= 2;
+                        $options->this_experience_boost = $options->earned_experience - $temp_experience_bak;
                     }
+                    //$debug_text .= 'this_experience_boost = '.$options->this_experience_boost.' | ';
+                    //$debug_text .= '(new) earned_experience = '.$options->earned_experience.' ';
+                    //$this_battle->events_create(false, false, 'DEBUG', $debug_text);
 
-                    // DEBUG
-                    //$event_body = 'PLAYER BOOSTED | ';
-                    //$event_body .= preg_replace('/\s+/', ' ', $this_robot->robot_token.' : $temp_experience_boost = '.$temp_experience_boost.'; $target_robot_experience = '.$target_robot_experience.'; ');
-                    //$this_battle->events_create(false, false, 'DEBUG', $event_body);
-
-                    // If the target robot is holding a Growth Module, double the experience bonus
-                    $temp_experience_boost = 0;
-                    if ($temp_robot->has_item() && $temp_robot->get_item() == 'growth-module'){
-                        $temp_robot_boost_kinds[] = 'module';
-                        $temp_experience_bak = $target_robot_experience;
-                        $target_robot_experience = $target_robot_experience * 2;
-                        $temp_experience_boost = $target_robot_experience - $temp_experience_bak;
-                    }
-
-                    // DEBUG
-                    //$event_body = 'MODULE BOOSTED | ';
-                    //$event_body .= preg_replace('/\s+/', ' ', $this_robot->robot_token.' : $temp_experience_boost = '.$temp_experience_boost.'; $target_robot_experience = '.$target_robot_experience.'; $temp_robot->robot_item = '.$temp_robot->robot_item.'; ');
-                    //$this_battle->events_create(false, false, 'DEBUG', $event_body);
-
+                    //$debug_text = 'FIELD MULTIPLIERS | ';
+                    //$debug_text .= '(for '.$temp_target_robot->robot_token.' via '.$this_robot->robot_token.') <br /> ';
                     // If there are field multipliers in place, apply them now
-                    $temp_experience_boost = 0;
+                    $options->this_experience_boost = 0;
+                    $options->is_field_boosted = false;
                     if (isset($this_robot->field->field_multipliers['experience']) && $this_robot->field->field_multipliers['experience'] != 1){
-                        $temp_robot_boost_kinds[] = 'field';
-                        if ($this_robot->field->field_multipliers['experience'] < 1){ $temp_robot_boosted_word = 'modified'; }
-                        $temp_experience_bak = $target_robot_experience;
-                        $target_robot_experience = ceil($target_robot_experience * $this_robot->field->field_multipliers['experience']);
-                        $temp_experience_boost = $target_robot_experience - $temp_experience_bak;
+                        $options->this_experience_boost_kinds[] = 'field';
+                        $options->is_field_boosted = true;
+                        if ($this_robot->field->field_multipliers['experience'] < 1){ $options->this_experience_boost_word = 'modified'; }
+                        $temp_experience_bak = $options->earned_experience;
+                        $options->earned_experience = ceil($options->earned_experience * $this_robot->field->field_multipliers['experience']);
+                        $options->this_experience_boost = $options->earned_experience - $temp_experience_bak;
                     }
+                    //$debug_text .= 'this_experience_boost = '.$options->this_experience_boost.' | ';
+                    //$debug_text .= '(new) earned_experience = '.$options->earned_experience.' ';
+                    //$this_battle->events_create(false, false, 'DEBUG', $debug_text);
 
-                    // DEBUG
-                    //$event_body = 'FIELD MULTIPLIERS | ';
-                    //$event_body .= preg_replace('/\s+/', ' ', $this_robot->robot_token.' : $temp_experience_boost = '.$temp_experience_boost.'; $target_robot_experience = '.$target_robot_experience.'; ');
-                    //$this_battle->events_create(false, false, 'DEBUG', $event_body);
+                    // Trigger this and target robot's item functions if they have been defined for this context
+                    $this_robot->trigger_item_function('rpg-robot_trigger-disabled_experience-rewards', $extra_objects);
+                    $temp_target_robot->trigger_item_function('rpg-robot_trigger-disabled_experience-rewards', $extra_objects);
+
+                    //$debug_text = 'MIN/MAX ROUNDING | ';
+                    //$debug_text .= '(for '.$temp_target_robot->robot_token.' via '.$this_robot->robot_token.') <br /> ';
+                    // If the experience is greater then the max, level it off at the max (sorry guys!)
+                    if ($options->earned_experience > MMRPG_SETTINGS_STATS_MAX){ $options->earned_experience = MMRPG_SETTINGS_STATS_MAX; }
+                    if ($options->earned_experience < MMRPG_SETTINGS_STATS_MIN){ $options->earned_experience = MMRPG_SETTINGS_STATS_MIN; }
+                    //$debug_text .= '(final) earned_experience = '.$options->earned_experience.' ';
+                    //$this_battle->events_create(false, false, 'DEBUG', $debug_text);
 
                     // Update the boost text based on applied multiplier kinds
-                    if (!empty($temp_robot_boost_kinds)){
-                        $temp_robot_boost_text = implode(', ', $temp_robot_boost_kinds);
+                    if (!empty($options->this_experience_boost_kinds)){
+                        $temp_robot_boost_text = implode(', ', $options->this_experience_boost_kinds);
                         $temp_robot_boost_text = preg_replace('/,\s([a-z]+)$/i', ', and $1', $temp_robot_boost_text);
-                        $temp_robot_boost_text = (preg_match('/^(a|e|i|o|y)/', $temp_robot_boost_text) ? 'an ' : 'a ').$temp_robot_boost_text.' '.$temp_robot_boosted_word.' ';
+                        $temp_robot_boost_text = (preg_match('/^(a|e|i|o|y)/', $temp_robot_boost_text) ? 'an ' : 'a ').$temp_robot_boost_text.' '.$options->this_experience_boost_word.' ';
                     }
-
-                    // If the experience is greater then the max, level it off at the max (sorry guys!)
-                    if ($target_robot_experience > MMRPG_SETTINGS_STATS_MAX){ $target_robot_experience = MMRPG_SETTINGS_STATS_MAX; }
-                    if ($target_robot_experience < MMRPG_SETTINGS_STATS_MIN){ $target_robot_experience = MMRPG_SETTINGS_STATS_MIN; }
 
                     // Collect the robot's current experience and level for reference later
                     $temp_start_experience = mmrpg_prototype_robot_experience($target_player->player_token, $temp_robot_token);
                     $temp_start_level = mmrpg_prototype_robot_level($target_player->player_token, $temp_robot_token);
 
                     // Increment this robots's points total with the battle points
-                    $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot_token]['robot_experience'] += $target_robot_experience;
+                    $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot_token]['robot_experience'] += $options->earned_experience;
 
                     // Define the new experience for this robot
                     $temp_new_experience = mmrpg_prototype_robot_experience($target_player->player_token, $temp_info['robot_token']);// If the new experience is over 1000, level up the robot
@@ -549,7 +556,7 @@ class rpg_disabled {
                     }
 
                     // Define the new level for this robot
-                    $temp_new_level = mmrpg_prototype_robot_level($target_player->player_token, $temp_robot_token); //floor($temp_new_experience / 1000) + 1;
+                    $temp_new_level = mmrpg_prototype_robot_level($target_player->player_token, $temp_robot_token);
 
                 }
                 // Otherwise if this is a level 100 robot already
@@ -570,53 +577,52 @@ class rpg_disabled {
                 $event_options['this_ability_results']['trigger_kind'] = 'recovery';
                 $event_options['this_ability_results']['recovery_kind'] = 'experience';
                 $event_options['this_ability_results']['recovery_type'] = '';
-                $event_options['this_ability_results']['this_amount'] = $target_robot_experience;
+                $event_options['this_ability_results']['this_amount'] = $options->earned_experience;
                 $event_options['this_ability_results']['this_result'] = 'success';
                 $event_options['this_ability_results']['flag_affinity'] = true;
                 $event_options['this_ability_results']['total_actions'] = 1;
-                $event_options['this_ability_target'] = $temp_robot->robot_id.'_'.$temp_robot->robot_token;
+                $event_options['this_ability_target'] = $temp_target_robot->robot_id.'_'.$temp_target_robot->robot_token;
 
                 // Update player/robot frames and points for the victory
-                $temp_robot->robot_frame = 'victory';
-                $temp_robot->robot_level = $temp_new_level;
-                $temp_robot->robot_experience = $temp_new_experience;
+                $temp_target_robot->robot_frame = 'victory';
+                $temp_target_robot->robot_level = $temp_new_level;
+                $temp_target_robot->robot_experience = $temp_new_experience;
                 $target_player->player_frame = 'victory';
-                $temp_robot->update_session();
+                $temp_target_robot->update_session();
                 $target_player->update_session();
 
                 // Only display the event if the player is under level 100
-                if ($temp_robot->robot_level < 100 && $temp_robot->robot_class == 'master'){
+                if ($temp_target_robot->robot_level < 100 && $temp_target_robot->robot_class == 'master'){
                     // Display the win message for this robot with battle points
-                    $temp_robot->robot_frame = 'taunt';
-                    $temp_robot->robot_level = $temp_new_level;
-                    if ($temp_start_level != $temp_new_level){ $temp_robot->robot_experience = 1000; }
+                    $temp_target_robot->robot_frame = 'taunt';
+                    $temp_target_robot->robot_level = $temp_new_level;
+                    if ($temp_start_level != $temp_new_level){ $temp_target_robot->robot_experience = 1000; }
                     $target_player->player_frame = 'victory';
-                    $event_header = $temp_robot->robot_name.'&#39;s Rewards';
+                    $event_header = $temp_target_robot->robot_name.'&#39;s Rewards';
                     $event_multiplier_text = !empty($temp_robot_boost_text) ? $temp_robot_boost_text : '';
-                    $event_body = $temp_robot->print_name().' collects '.$event_multiplier_text.'<span class="recovery_amount ability_type ability_type_cutter">'.number_format($target_robot_experience, 0, '.', ',').'</span> experience points! ';
+                    $event_body = $temp_target_robot->print_name().' collects '.$event_multiplier_text.'<span class="recovery_amount ability_type ability_type_cutter">'.number_format($options->earned_experience, 0, '.', ',').'</span> experience points! ';
                     $event_body .= '<br />';
-                    if (isset($temp_robot->robot_quotes['battle_victory'])){
+                    if (isset($temp_target_robot->robot_quotes['battle_victory'])){
                         $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
-                        $this_replace = array($this_player->player_name, $this_robot->robot_name, $target_player->player_name, $temp_robot->robot_name);
-                        $event_body .= $temp_robot->print_quote('battle_victory', $this_find, $this_replace);
+                        $this_replace = array($this_player->player_name, $this_robot->robot_name, $target_player->player_name, $temp_target_robot->robot_name);
+                        $event_body .= $temp_target_robot->print_quote('battle_victory', $this_find, $this_replace);
                     }
-                    //$event_options = array();
                     $event_options['console_show_target'] = false;
                     $event_options['this_header_float'] = $event_options['this_body_float'] = $target_player->player_side;
-                    $temp_robot->update_session();
+                    $temp_target_robot->update_session();
                     $target_player->update_session();
-                    $this_battle->events_create($temp_robot, $this_robot, $event_header, $event_body, $event_options);
-                    if ($temp_start_level != $temp_new_level){ $temp_robot->robot_experience = $temp_new_experience; }
-                    $temp_robot->update_session();
+                    $this_battle->events_create($temp_target_robot, $this_robot, $event_header, $event_body, $event_options);
+                    if ($temp_start_level != $temp_new_level){ $temp_target_robot->robot_experience = $temp_new_experience; }
+                    $temp_target_robot->update_session();
                     $target_player->update_session();
                 }
 
                 // Floor the robot's experience with or without the event
                 $target_player->player_frame = 'victory';
                 $target_player->update_session();
-                $temp_robot->robot_frame = 'base';
-                if ($temp_start_level != $temp_new_level){ $temp_robot->robot_experience = 0; }
-                $temp_robot->update_session();
+                $temp_target_robot->robot_frame = 'base';
+                if ($temp_start_level != $temp_new_level){ $temp_target_robot->robot_experience = 0; }
+                $temp_target_robot->update_session();
 
                 // If the level has been boosted, display the stat increases
                 if ($temp_start_level != $temp_new_level){
@@ -634,28 +640,27 @@ class rpg_disabled {
                     $event_options['this_ability_results']['this_amount'] = $temp_new_level - $temp_start_level;
                     $event_options['this_ability_results']['this_result'] = 'success';
                     $event_options['this_ability_results']['total_actions'] = 2;
-                    $event_options['this_ability_target'] = $temp_robot->robot_id.'_'.$temp_robot->robot_token;
+                    $event_options['this_ability_target'] = $temp_target_robot->robot_id.'_'.$temp_target_robot->robot_token;
 
                     // Display the win message for this robot with battle points
-                    $temp_robot->robot_frame = 'taunt';
-                    $temp_robot->robot_level = $temp_new_level;
-                    if ($temp_start_level != $temp_new_level){ $temp_robot->robot_experience = 1000; }
-                    else { $temp_robot->robot_experience = $temp_new_experience; }
+                    $temp_target_robot->robot_frame = 'taunt';
+                    $temp_target_robot->robot_level = $temp_new_level;
+                    if ($temp_start_level != $temp_new_level){ $temp_target_robot->robot_experience = 1000; }
+                    else { $temp_target_robot->robot_experience = $temp_new_experience; }
                     $target_player->player_frame = 'victory';
-                    $event_header = $temp_robot->robot_name.'&#39;s Rewards';
-                    $event_body = $temp_robot->print_name().' grew to <span class="recovery_amount ability_type ability_type_level">Level '.$temp_new_level.($temp_is_max_level ? ' &#9733;' : '').'</span>!<br /> ';
-                    $event_body .= $temp_robot->robot_name.'&#39;s energy, weapons, shields, and mobility were upgraded!';
-                    //$event_options = array();
+                    $event_header = $temp_target_robot->robot_name.'&#39;s Rewards';
+                    $event_body = $temp_target_robot->print_name().' grew to <span class="recovery_amount ability_type ability_type_level">Level '.$temp_new_level.($temp_is_max_level ? ' &#9733;' : '').'</span>!<br /> ';
+                    $event_body .= $temp_target_robot->robot_name.'&#39;s energy, weapons, shields, and mobility were upgraded!';
                     $event_options['console_show_target'] = false;
                     $event_options['this_header_float'] = $event_options['this_body_float'] = $target_player->player_side;
-                    $temp_robot->update_session();
+                    $temp_target_robot->update_session();
                     $target_player->update_session();
-                    $this_battle->events_create($temp_robot, $this_robot, $event_header, $event_body, $event_options);
-                    $temp_robot->robot_experience = 0;
-                    $temp_robot->update_session();
+                    $this_battle->events_create($temp_target_robot, $this_robot, $event_header, $event_body, $event_options);
+                    $temp_target_robot->robot_experience = 0;
+                    $temp_target_robot->update_session();
 
                     // Collect the base robot template from the index for calculations
-                    $temp_index_robot = rpg_robot::get_index_info($temp_robot->robot_token);
+                    $temp_index_robot = rpg_robot::get_index_info($temp_target_robot->robot_token);
 
                     // Define the event options
                     $event_options['this_ability_results']['trigger_kind'] = 'recovery';
@@ -663,14 +668,14 @@ class rpg_disabled {
                     $event_options['this_ability_results']['this_amount'] = $level_boost;
                     $event_options['this_ability_results']['this_result'] = 'success';
                     $event_options['this_ability_results']['total_actions'] = 0;
-                    $event_options['this_ability_target'] = $temp_robot->robot_id.'_'.$temp_robot->robot_token;
+                    $event_options['this_ability_target'] = $temp_target_robot->robot_id.'_'.$temp_target_robot->robot_token;
 
                     // Update the robot rewards array with any recent info
-                    $temp_robot_rewards = mmrpg_prototype_robot_rewards($target_player->player_token, $temp_robot->robot_token);
+                    $temp_robot_rewards = mmrpg_prototype_robot_rewards($target_player->player_token, $temp_target_robot->robot_token);
                     //$this_battle->events_create(false, false, 'DEBUG', '<pre>'.preg_replace('/\s+/', ' ', print_r($temp_robot_rewards, true)).'</pre>', $event_options);
 
                     // If this robot has reached level 100, the max level, create the flag in their session
-                    if ($temp_is_max_level){ $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot->robot_token]['flags']['reached_max_level'] = true; }
+                    if ($temp_is_max_level){ $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_target_robot->robot_token]['flags']['reached_max_level'] = true; }
 
                     // Define the base energy boost based on robot base stats
                     $temp_energy_boost = ceil($level_boost * (0.01 * $temp_index_robot['robot_energy']));
@@ -679,26 +684,26 @@ class rpg_disabled {
                     if (!empty($temp_robot_rewards['robot_energy_pending'])){
                         $temp_robot_rewards['robot_energy_pending'] = round($temp_robot_rewards['robot_energy_pending']);
                         $temp_energy_boost += $temp_robot_rewards['robot_energy_pending'];
-                        if (!empty($temp_robot_rewards['robot_energy'])){ $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot->robot_token]['robot_energy'] += $temp_robot_rewards['robot_energy_pending']; }
-                        else { $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot->robot_token]['robot_energy'] = $temp_robot_rewards['robot_energy_pending']; }
-                        $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot->robot_token]['robot_energy_pending'] = 0;
+                        if (!empty($temp_robot_rewards['robot_energy'])){ $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_target_robot->robot_token]['robot_energy'] += $temp_robot_rewards['robot_energy_pending']; }
+                        else { $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_target_robot->robot_token]['robot_energy'] = $temp_robot_rewards['robot_energy_pending']; }
+                        $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_target_robot->robot_token]['robot_energy_pending'] = 0;
                     }
 
                     // Increment this robot's energy by the calculated amount and display an event
-                    $temp_robot->robot_energy += $temp_energy_boost;
+                    $temp_target_robot->robot_energy += $temp_energy_boost;
                     $temp_base_energy_boost = ceil($level_boost * (0.01 * $temp_index_robot['robot_energy']));
-                    $temp_robot->robot_base_energy += $temp_base_energy_boost;
-                    $temp_robot->update_session();
+                    $temp_target_robot->robot_base_energy += $temp_base_energy_boost;
+                    $temp_target_robot->update_session();
                     $target_player->update_session();
-                    if ($temp_robot->robot_position == 'active'){
+                    if ($temp_target_robot->robot_position == 'active'){
                         $event_options['this_ability_results']['recovery_kind'] = 'energy';
                         $event_options['this_ability_results']['this_amount'] = $temp_energy_boost;
                         $event_options['this_ability_results']['total_actions']++;
-                        $event_body = $temp_robot->print_name().'&#39;s health improved! ';
+                        $event_body = $temp_target_robot->print_name().'&#39;s health improved! ';
                         $event_body .= '<br />';
-                        $event_body .= $temp_robot->print_name().'&#39;s base energy grew by <span class="recovery_amount">'.$temp_energy_boost.'</span>! ';
-                        $temp_robot->set_frame('summon');
-                        $this_battle->events_create($temp_robot, $this_robot, $event_header, $event_body, $event_options);
+                        $event_body .= $temp_target_robot->print_name().'&#39;s base energy grew by <span class="recovery_amount">'.$temp_energy_boost.'</span>! ';
+                        $temp_target_robot->set_frame('summon');
+                        $this_battle->events_create($temp_target_robot, $this_robot, $event_header, $event_body, $event_options);
                     }
 
 
@@ -709,25 +714,25 @@ class rpg_disabled {
                     if (!empty($temp_robot_rewards['robot_attack_pending'])){
                         $temp_robot_rewards['robot_attack_pending'] = round($temp_robot_rewards['robot_attack_pending']);
                         $temp_attack_boost += $temp_robot_rewards['robot_attack_pending'];
-                        if (!empty($temp_robot_rewards['robot_attack'])){ $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot->robot_token]['robot_attack'] += $temp_robot_rewards['robot_attack_pending']; }
-                        else { $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot->robot_token]['robot_attack'] = $temp_robot_rewards['robot_attack_pending']; }
-                        $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot->robot_token]['robot_attack_pending'] = 0;
+                        if (!empty($temp_robot_rewards['robot_attack'])){ $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_target_robot->robot_token]['robot_attack'] += $temp_robot_rewards['robot_attack_pending']; }
+                        else { $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_target_robot->robot_token]['robot_attack'] = $temp_robot_rewards['robot_attack_pending']; }
+                        $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_target_robot->robot_token]['robot_attack_pending'] = 0;
                     }
 
                     // Increment this robot's attack by the calculated amount and display an event
                     $temp_base_attack_boost = ceil($level_boost * (0.05 * $temp_index_robot['robot_attack']));
-                    $temp_robot->robot_base_attack += $temp_base_attack_boost;
-                    $temp_robot->update_session();
+                    $temp_target_robot->robot_base_attack += $temp_base_attack_boost;
+                    $temp_target_robot->update_session();
                     $target_player->update_session();
-                    if ($temp_robot->robot_position == 'active'){
+                    if ($temp_target_robot->robot_position == 'active'){
                         $event_options['this_ability_results']['recovery_kind'] = 'attack';
                         $event_options['this_ability_results']['this_amount'] = $temp_base_attack_boost;
                         $event_options['this_ability_results']['total_actions']++;
-                        $event_body = $temp_robot->print_name().'&#39;s weapons improved! ';
+                        $event_body = $temp_target_robot->print_name().'&#39;s weapons improved! ';
                         $event_body .= '<br />';
-                        $event_body .= $temp_robot->print_name().'&#39;s base attack grew by <span class="recovery_amount">'.$temp_base_attack_boost.'</span>! ';
-                        $temp_robot->set_frame('shoot');
-                        $this_battle->events_create($temp_robot, $this_robot, $event_header, $event_body, $event_options);
+                        $event_body .= $temp_target_robot->print_name().'&#39;s base attack grew by <span class="recovery_amount">'.$temp_base_attack_boost.'</span>! ';
+                        $temp_target_robot->set_frame('shoot');
+                        $this_battle->events_create($temp_target_robot, $this_robot, $event_header, $event_body, $event_options);
                     }
 
 
@@ -738,25 +743,25 @@ class rpg_disabled {
                     if (!empty($temp_robot_rewards['robot_defense_pending'])){
                         $temp_robot_rewards['robot_defense_pending'] = round($temp_robot_rewards['robot_defense_pending']);
                         $temp_defense_boost += $temp_robot_rewards['robot_defense_pending'];
-                        if (!empty($temp_robot_rewards['robot_defense'])){ $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot->robot_token]['robot_defense'] += $temp_robot_rewards['robot_defense_pending']; }
-                        else { $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot->robot_token]['robot_defense'] = $temp_robot_rewards['robot_defense_pending']; }
-                        $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot->robot_token]['robot_defense_pending'] = 0;
+                        if (!empty($temp_robot_rewards['robot_defense'])){ $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_target_robot->robot_token]['robot_defense'] += $temp_robot_rewards['robot_defense_pending']; }
+                        else { $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_target_robot->robot_token]['robot_defense'] = $temp_robot_rewards['robot_defense_pending']; }
+                        $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_target_robot->robot_token]['robot_defense_pending'] = 0;
                     }
 
                     // Increment this robot's defense by the calculated amount and display an event
                     $temp_base_defense_boost = ceil($level_boost * (0.05 * $temp_index_robot['robot_defense']));
-                    $temp_robot->robot_base_defense += $temp_base_defense_boost;
-                    $temp_robot->update_session();
+                    $temp_target_robot->robot_base_defense += $temp_base_defense_boost;
+                    $temp_target_robot->update_session();
                     $target_player->update_session();
-                    if ($temp_robot->robot_position == 'active'){
+                    if ($temp_target_robot->robot_position == 'active'){
                         $event_options['this_ability_results']['recovery_kind'] = 'defense';
                         $event_options['this_ability_results']['this_amount'] = $temp_base_defense_boost;
                         $event_options['this_ability_results']['total_actions']++;
-                        $event_body = $temp_robot->print_name().'&#39;s shields improved! ';
+                        $event_body = $temp_target_robot->print_name().'&#39;s shields improved! ';
                         $event_body .= '<br />';
-                        $event_body .= $temp_robot->print_name().'&#39;s base defense grew by <span class="recovery_amount">'.$temp_base_defense_boost.'</span>! ';
-                        $temp_robot->set_frame('defend');
-                        $this_battle->events_create($temp_robot, $this_robot, $event_header, $event_body, $event_options);
+                        $event_body .= $temp_target_robot->print_name().'&#39;s base defense grew by <span class="recovery_amount">'.$temp_base_defense_boost.'</span>! ';
+                        $temp_target_robot->set_frame('defend');
+                        $this_battle->events_create($temp_target_robot, $this_robot, $event_header, $event_body, $event_options);
                     }
 
 
@@ -767,39 +772,39 @@ class rpg_disabled {
                     if (!empty($temp_robot_rewards['robot_speed_pending'])){
                         $temp_robot_rewards['robot_speed_pending'] = round($temp_robot_rewards['robot_speed_pending']);
                         $temp_speed_boost += $temp_robot_rewards['robot_speed_pending'];
-                        if (!empty($temp_robot_rewards['robot_speed'])){ $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot->robot_token]['robot_speed'] += $temp_robot_rewards['robot_speed_pending']; }
-                        else { $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot->robot_token]['robot_speed'] = $temp_robot_rewards['robot_speed_pending']; }
+                        if (!empty($temp_robot_rewards['robot_speed'])){ $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_target_robot->robot_token]['robot_speed'] += $temp_robot_rewards['robot_speed_pending']; }
+                        else { $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_target_robot->robot_token]['robot_speed'] = $temp_robot_rewards['robot_speed_pending']; }
                         $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot_token]['robot_speed_pending'] = 0;
                     }
 
                     // Increment this robot's speed by the calculated amount and display an event
                     $temp_base_speed_boost = ceil($level_boost * (0.05 * $temp_index_robot['robot_speed']));
-                    $temp_robot->robot_base_speed += $temp_base_speed_boost;
-                    $temp_robot->update_session();
+                    $temp_target_robot->robot_base_speed += $temp_base_speed_boost;
+                    $temp_target_robot->update_session();
                     $target_player->update_session();
-                    if ($temp_robot->robot_position == 'active'){
+                    if ($temp_target_robot->robot_position == 'active'){
                         $event_options['this_ability_results']['recovery_kind'] = 'speed';
                         $event_options['this_ability_results']['this_amount'] = $temp_base_speed_boost;
                         $event_options['this_ability_results']['total_actions']++;
-                        $event_body = $temp_robot->print_name().'&#39;s mobility improved! ';
+                        $event_body = $temp_target_robot->print_name().'&#39;s mobility improved! ';
                         $event_body .= '<br />';
-                        $event_body .= $temp_robot->print_name().'&#39;s base speed grew by <span class="recovery_amount">'.$temp_base_speed_boost.'</span>! ';
-                        $temp_robot->set_frame('slide');
-                        $this_battle->events_create($temp_robot, $this_robot, $event_header, $event_body, $event_options);
+                        $event_body .= $temp_target_robot->print_name().'&#39;s base speed grew by <span class="recovery_amount">'.$temp_base_speed_boost.'</span>! ';
+                        $temp_target_robot->set_frame('slide');
+                        $this_battle->events_create($temp_target_robot, $this_robot, $event_header, $event_body, $event_options);
                     }
 
                     // Update the robot frame
-                    $temp_robot->robot_frame = 'base';
-                    $temp_robot->update_session();
+                    $temp_target_robot->robot_frame = 'base';
+                    $temp_target_robot->update_session();
 
                 }
 
                 // Update the experience level for real this time
-                $temp_robot->robot_experience = $temp_new_experience;
-                $temp_robot->update_session();
+                $temp_target_robot->robot_experience = $temp_new_experience;
+                $temp_target_robot->update_session();
 
                 // Collect the robot info array
-                $temp_robot_info = $temp_robot->export_array();
+                $temp_robot_info = $temp_target_robot->export_array();
 
                 // Collect the indexed robot rewards for new abilities
                 $index_robot_rewards = $temp_robot_info['robot_rewards'];
@@ -807,7 +812,7 @@ class rpg_disabled {
                 //$this_battle->events_create(false, false, 'DEBUG', $event_body);
 
                 // Loop through the ability rewards for this robot if set
-                if ($temp_robot->robot_class != 'mecha' && ($temp_start_level == 100 || ($temp_start_level != $temp_new_level && !empty($index_robot_rewards['abilities'])))){
+                if ($temp_target_robot->robot_class != 'mecha' && ($temp_start_level == 100 || ($temp_start_level != $temp_new_level && !empty($index_robot_rewards['abilities'])))){
                     $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
                     foreach ($index_robot_rewards['abilities'] AS $ability_reward_key => $ability_reward_info){
 
@@ -822,7 +827,7 @@ class rpg_disabled {
                             // Collect the ability info from the index
                             $ability_info = rpg_ability::parse_index_info($temp_abilities_index[$ability_reward_info['token']]);
                             // Create the temporary ability object for event creation
-                            $temp_ability = rpg_game::get_ability($this_robot->battle, $target_player, $temp_robot, $ability_info);
+                            $temp_ability = rpg_game::get_ability($this_robot->battle, $target_player, $temp_target_robot, $ability_info);
 
                             // Collect or define the ability variables
                             $temp_ability_token = $ability_info['ability_token'];
@@ -842,13 +847,13 @@ class rpg_disabled {
                                 $event_options['console_show_this_robot'] = false;
                                 $event_options['console_show_this_ability'] = true;
                                 $event_options['canvas_show_this_ability'] = false;
-                                $temp_robot->robot_frame = $ability_reward_key % 2 == 2 ? 'taunt' : 'victory';
-                                $temp_robot->update_session();
+                                $temp_target_robot->robot_frame = $ability_reward_key % 2 == 2 ? 'taunt' : 'victory';
+                                $temp_target_robot->update_session();
                                 $temp_ability->ability_frame = 'base';
                                 $temp_ability->update_session();
-                                $this_battle->events_create($temp_robot, false, $event_header, $event_body, $event_options);
-                                $temp_robot->robot_frame = 'base';
-                                $temp_robot->update_session();
+                                $this_battle->events_create($temp_target_robot, false, $event_header, $event_body, $event_options);
+                                $temp_target_robot->robot_frame = 'base';
+                                $temp_target_robot->update_session();
                             }
 
                             // Automatically unlock this ability for use in battle
