@@ -1521,8 +1521,7 @@ class rpg_battle extends rpg_object {
                 // Double-check this ability's target if switching has occured to prevent issues
                 if ($target_robot->player->player_id != $this_robot->player->player_id
                     && $target_robot->robot_position == 'bench'
-                    && $this_ability->ability_target != 'select_target'
-                    && $this_robot->robot_item != 'target-module'){
+                    && $this_ability->ability_target != 'select_target'){
                     //$this->events_create(false, false, 'debug', 'we should correct the target...');
                     $actual_target_robot = $target_player->get_active_robot();
                 } else {
