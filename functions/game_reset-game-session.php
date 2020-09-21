@@ -79,74 +79,11 @@ function mmrpg_reset_game_session(){
     // -- DEMO MODE UNLOCKS -- //
     if (!empty($_SESSION[$session_token]['DEMO'])){
 
-        // Only unlock Dr. Light as a playable character
-        $unlock_player_info = $mmrpg_index_players['dr-light'];
-        mmrpg_game_unlock_player($unlock_player_info, false, true);
-        $_SESSION[$session_token]['values']['battle_rewards']['dr-light']['player_points'] = 0;
-        $_SESSION[$session_token]['values']['battle_items'] = array('energy-pellet' => 3, 'energy-capsule' => 2, 'weapon-pellet' => 3, 'weapon-capsule' => 2);
-        $_SESSION[$session_token]['values']['battle_abilities'] = array('buster-shot');
-
-        // Auto-select Dr. Light as the current playable character
+        // Only unlock Dr. Light + Mega Man as a playable characters
+        // (demo doesn't exist anymore so this doesn't actually do anything)
+        mmrpg_game_unlock_player('dr-light', false, true);
+        mmrpg_game_unlock_robot('dr-light', 'mega-man', true, false);
         $_SESSION[$session_token]['battle_settings']['this_player_token'] = 'dr-light';
-
-        // Collect the robot index for calculation purposes
-        $db_robots_fields = rpg_robot::get_index_fields(true);
-        $this_robot_index = $db->get_array_list("SELECT
-            {$db_robots_fields}
-            FROM mmrpg_index_robots
-            WHERE robot_flag_complete = 1
-            ;", 'robot_token');
-
-        // Unlock Mega Man as a playable character
-        $unlock_robot_info = $this_robot_index['mega-man'];
-        $unlock_robot_info['robot_level'] = 1;
-        $unlock_robot_info['robot_rewards']['abilities'] = array(
-                array('level' => 0, 'token' => 'super-throw'),
-                array('level' => 0, 'token' => 'fire-storm'),
-                array('level' => 0, 'token' => 'hyper-bomb'),
-                array('level' => 0, 'token' => 'ice-breath'),
-                array('level' => 0, 'token' => 'buster-shot'),
-                array('level' => 0, 'token' => 'mega-buster'),
-                array('level' => 0, 'token' => 'mega-ball'),
-                array('level' => 0, 'token' => 'mega-slide')
-                );
-        //$unlock_robot_info['robot_level'] = 5;
-        //echo __LINE__.print_r($_SESSION[$session_token]['values']['battle_rewards']['dr-light'], true);
-        mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, false);
-
-        // Unlock Bass as a playable character
-        $unlock_robot_info = $this_robot_index['bass'];
-        $unlock_robot_info['robot_level'] = 1;
-        $unlock_robot_info['robot_rewards']['abilities'] = array(
-                array('level' => 0, 'token' => 'air-shooter'),
-                array('level' => 0, 'token' => 'leaf-shield'),
-                array('level' => 0, 'token' => 'bubble-spray'),
-                array('level' => 0, 'token' => 'quick-boomerang'),
-                array('level' => 0, 'token' => 'buster-shot'),
-                array('level' => 0, 'token' => 'bass-buster'),
-                array('level' => 0, 'token' => 'bass-crush'),
-                array('level' => 0, 'token' => 'bass-baroque')
-                );
-        //$unlock_robot_info['robot_level'] = 99;
-        //$unlock_robot_info['robot_experience'] = 999;
-        mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, false);
-
-        // Unlock Proto Man as a playable character
-        $unlock_robot_info = $this_robot_index['proto-man'];
-        $unlock_robot_info['robot_level'] = 1;
-        $unlock_robot_info['robot_rewards']['abilities'] = array(
-                array('level' => 0, 'token' => 'drill-blitz'),
-                array('level' => 0, 'token' => 'bright-burst'),
-                array('level' => 0, 'token' => 'dive-torpedo'),
-                array('level' => 0, 'token' => 'skull-barrier'),
-                array('level' => 0, 'token' => 'buster-shot'),
-                array('level' => 0, 'token' => 'proto-buster'),
-                array('level' => 0, 'token' => 'proto-shield'),
-                array('level' => 0, 'token' => 'proto-strike')
-                );
-        //$unlock_robot_info['robot_level'] = 99;
-        //$unlock_robot_info['robot_experience'] = 999;
-        mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, false);
 
     }
     // -- NORMAL MODE UNLOCKS -- //

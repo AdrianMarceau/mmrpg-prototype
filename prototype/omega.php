@@ -4,9 +4,6 @@
  * DEFINE OMEGA FACTORS
  */
 
-// Define the base omega factors for ITEMS
-$this_omega_factors_items = array('energy-pellet','energy-capsule','weapon-pellet','weapon-capsule', 'energy-tank', 'weapon-tank', 'yashichi', 'extra-life');
-
 // Define the base omega factors for MEGA MAN 0 (BASE)
 $this_omega_factors_system = array();
 $this_omega_factors_system[] = array('robot' => 'mega-man', 'field' => 'light-laboratory', 'type' => '');
