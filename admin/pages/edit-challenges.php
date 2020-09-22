@@ -696,7 +696,7 @@
                     <div class="buttons">
                         <input class="button search" type="submit" value="Search" />
                         <input class="button reset" type="reset" value="Reset" onclick="javascript:window.location.href='<?= $this_challenge_page_baseurl ?>';" />
-                        <a class="button new" href="<?= $this_challenge_page_baseurl ?>editor/challenge_id=0">Create New</a>
+                        <a class="button new" href="<?= $this_challenge_page_baseurl ?>editor/challenge_id=0">Create New Challenge</a>
                     </div>
 
                 </form>
@@ -795,8 +795,9 @@
 
                                 $challenge_actions = '';
                                 $challenge_actions .= '<a class="link edit" href="'.$challenge_edit_url.'"><span>edit</span></a>';
-                                //$challenge_actions .= '<span class="link delete disabled"><span>delete</span></span>';
-                                $challenge_actions .= '<a class="link delete" data-delete="challenges" data-challenge-id="'.$challenge_id.'" data-challenge-kind="'.$this_challenge_kind.'"><span>delete</span></a>';
+                                if (empty($challenge_data['challenge_flag_protected'])){
+                                    $challenge_actions .= '<a class="link delete" data-delete="challenges" data-challenge-id="'.$challenge_id.'" data-challenge-kind="'.$this_challenge_kind.'"><span>delete</span></a>';
+                                }
 
                                 echo '<tr>'.PHP_EOL;
                                     echo '<td class="id"><div>'.$challenge_id.'</div></td>'.PHP_EOL;
@@ -1227,8 +1228,9 @@
 
                                     <div class="buttons">
                                         <input class="button save" type="submit" value="Save Changes" />
-                                        <? /* <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='<?= $this_challenge_page_baseurl ?>editor/challenge_id=<?= $challenge_data['challenge_id'] ?>';" /> */ ?>
-                                        <input class="button delete" type="button" value="Delete Challenge" data-delete="challenges" data-challenge-id="<?= $challenge_data['challenge_id'] ?>" data-challenge-kind="<?= $this_challenge_kind ?>" />
+                                        <? if (empty($challenge_data['challenge_flag_protected'])){ ?>
+                                            <input class="button delete" type="button" value="Delete Challenge" data-delete="challenges" data-challenge-id="<?= $challenge_data['challenge_id'] ?>" data-challenge-kind="<?= $this_challenge_kind ?>" />
+                                        <? } ?>
                                     </div>
                                     <? if ($this_challenge_kind === 'event'){ ?>
                                         <?= cms_admin::object_editor_print_git_footer_buttons('challenges', cms_admin::git_get_id_token('challenge', $challenge_data['challenge_id']), $mmrpg_git_file_arrays) ?>
