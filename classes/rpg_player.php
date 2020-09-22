@@ -38,7 +38,7 @@ class rpg_player extends rpg_object {
     public function player_load($this_playerinfo){
 
         // Pull in the global index
-        global $mmrpg_index_players;
+        static $mmrpg_index_players;
         if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
 
         // Pull in global variables
