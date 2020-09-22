@@ -457,7 +457,9 @@ class cms_admin {
         static $index;
         if (!is_array($index)){ $index = array(); }
         if (!isset($index[$repo_base_path])){
-            $unstaged = self::git_content_cache('path', $repo_base_path, 'modified');
+            $modified = self::git_content_cache('path', $repo_base_path, 'modified');
+            $new = self::git_content_cache('path', $repo_base_path, 'new');
+            $unstaged = array_merge($modified, $new);
             $index[$repo_base_path] = $unstaged;
         } else {
             $unstaged = $index[$repo_base_path];
