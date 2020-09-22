@@ -15,6 +15,8 @@ $mmrpg_git_path = constant('MMRPG_CONFIG_'.strtoupper($request_kind).'_CONTENT_P
 //debug_echo('$mmrpg_git_path = '.$mmrpg_git_path);
 $mmrpg_git_changes = cms_admin::git_get_changes($mmrpg_git_path);
 //debug_echo('$mmrpg_git_changes = '.print_r($mmrpg_git_changes, true).'');
+$mmrpg_git_newfiles = cms_admin::git_content_cache('token', $request_kind, 'new');
+//debug_echo('$mmrpg_git_newfiles = '.print_r($mmrpg_git_newfiles, true).'');
 if ($request_kind === 'robots'){
     $mmrpg_git_changes = cms_admin::git_filter_list_by_data($mmrpg_git_changes, array(
         'table' => $object_table_name,
@@ -71,6 +73,17 @@ foreach ($revert_tokens  AS $object_key => $object_token){
 
     // Collect the file paths to be reverted
     $object_paths = $revert_paths_bytoken[$object_token];
+    //debug_echo('$object_paths = '.print_r($object_paths, true).'');
+
+    // If any items in the object path are new files, remove them
+    foreach ($object_paths AS $key => $path){
+        if (in_array($path, $mmrpg_git_newfiles)){
+            $unlink_file = $mmrpg_git_path.$path;
+            //debug_echo('$unlink_file = '.print_r($unlink_file, true).'');
+            unlink($unlink_file);
+            unset($object_paths[$key]);
+        }
+    }
 
     // First, revert the actual changes with git
     $git_commands = '';
@@ -85,6 +98,8 @@ foreach ($revert_tokens  AS $object_key => $object_token){
     $json_data_path = $mmrpg_git_path.$object_token.'/data.json';
     //debug_echo('$json_data_path = '.print_r($json_data_path, true).'');
     if (file_exists($json_data_path)){
+        // JSON data exists so set the flag to true
+        $json_data_exists = true;
         // Collect the markup from the file and decode it into an array
         $json_data_markup = file_get_contents($json_data_path);
         //debug_echo('$json_data_markup = '.print_r($json_data_markup, true).'');
@@ -123,9 +138,20 @@ foreach ($revert_tokens  AS $object_key => $object_token){
             }
         }
     }
+    // Otherwise, if the JSON data file no longer exists, we should delete the DB object
+    else {
+        // JSON data doesn't exist so set the flag to false
+        $json_data_exists = false;
+        // Delete the now-orphaned database object without data
+        //debug_echo('JSON doesn\'t exist anymore!');
+        $delete_query = "DELETE FROM {$object_table_name} WHERE {$object_token_field} = '{$object_token_field_value}';";
+        //debug_echo('$delete_query = '.$delete_query);
+        $db->query($delete_query);
+    }
 
     // If an HTML content file exists for this token, overwrite DB info with contents
-    if ($request_kind === 'pages'){
+    if ($json_data_exists
+        && $request_kind === 'pages'){
         $html_content_path = $mmrpg_git_path.$object_token.'/content.html';
         //debug_echo('$html_content_path = '.print_r($html_content_path, true).'');
         if (file_exists($html_content_path)){
