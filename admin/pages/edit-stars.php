@@ -387,7 +387,7 @@
             }
 
             // We're done processing the form, we can exit
-            if ($star_data_is_new){ exit_star_edit_action(false); }
+            if (empty($form_data['star_id'])){ exit_star_edit_action(false); }
             else { exit_star_edit_action($form_data['star_id']); }
 
             //echo('<pre>$form_action = '.print_r($form_action, true).'</pre>');
