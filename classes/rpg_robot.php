@@ -2343,6 +2343,7 @@ class rpg_robot extends rpg_object {
             'robot_flag_unlockable',
             'robot_flag_exclusive',
             'robot_flag_published',
+            'robot_flag_protected',
             'robot_order'
             );
 

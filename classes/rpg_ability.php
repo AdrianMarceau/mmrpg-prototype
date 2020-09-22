@@ -879,6 +879,7 @@ class rpg_ability extends rpg_object {
             'ability_flag_complete',
             'ability_flag_published',
             'ability_flag_unlockable',
+            'ability_flag_protected',
             'ability_order'
             );
 

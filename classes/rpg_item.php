@@ -855,6 +855,7 @@ class rpg_item extends rpg_object {
             'item_flag_complete',
             'item_flag_published',
             'item_flag_unlockable',
+            'item_flag_protected',
             'item_order'
             );
 

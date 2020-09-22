@@ -190,6 +190,7 @@ class rpg_field extends rpg_object {
             'field_flag_hidden',
             'field_flag_complete',
             'field_flag_published',
+            'field_flag_protected',
             'field_order'
             );
 

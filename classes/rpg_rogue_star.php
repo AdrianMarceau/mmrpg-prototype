@@ -38,7 +38,8 @@ class rpg_rogue_star {
             'star_to_date_time',
             'star_power',
             'star_active',
-            'star_flag_enabled'
+            'star_flag_enabled',
+            'star_flag_protected'
             );
 
         // Add table name to each field string if requested

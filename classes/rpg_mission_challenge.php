@@ -370,6 +370,7 @@ class rpg_mission_challenge extends rpg_mission {
             'challenge_reward_data',
             'challenge_flag_published',
             'challenge_flag_hidden',
+            'challenge_flag_protected',
             'challenge_times_accessed',
             'challenge_times_concluded',
             'challenge_user_victories',

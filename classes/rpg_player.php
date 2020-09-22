@@ -1757,6 +1757,7 @@ class rpg_player extends rpg_object {
             'player_flag_hidden',
             'player_flag_complete',
             'player_flag_published',
+            'player_flag_protected',
             'player_order'
             );
 
