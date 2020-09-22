@@ -210,32 +210,30 @@ Create "onload" events (or other event hooks) for items to take advantage of whe
     - update elemental cores to work with above [DONE]
 
 -  Create event hook for "trigger_robot_damage" in rpg_ability/rpg_ability_damage function (fortune-module [crits])
-    - rpg-ability_trigger-damage_before
-    - rpg-ability_trigger-damage_after
+    - rpg-ability_trigger-damage_before [DONE]
+    - rpg-ability_trigger-damage_after [DONE]
 
 -  Create event hook for "trigger_robot_recovery" in rpg_ability/rpg_ability_recovery function (fortune-module? [crits])
-    - rpg-ability_trigger-recovery_before
-    - rpg-ability_trigger-recovery_after
+    - rpg-ability_trigger-recovery_before [DONE]
+    - rpg-ability_trigger-recovery_after [DONE]
 
 -  Create event hook for "trigger_robot_damage" in rpg_item/rpg_item_damage function
-    - rpg-item_trigger-damage_before
-    - rpg-item_trigger-damage_after
+    - rpg-item_trigger-damage_before [DONE]
+    - rpg-item_trigger-damage_after [DONE]
 
 -  Create event hook for "trigger_robot_recovery" in rpg_item/rpg_item_recovery function
-    - rpg-item_trigger-recovery_before
-    - rpg-item_trigger-recovery_after
+    - rpg-item_trigger-recovery_before [DONE]
+    - rpg-item_trigger-recovery_after [DONE]
 
 -  Create event hook for post-victory reward calculations (fortune-module)
-    - rpg-battle_complete-trigger_victory
--  Create event hook for post-failure reward calculations
-    - rpg-battle_complete-trigger_failure
+    - rpg-battle_complete-trigger_victory [DONE]
 
 -  Create event hook for post-disable stat bonus calculations (growth-module)
     - rpg-robot_trigger-disabled_stat-rewards [DONE]
 -  Create event hook for post-disable experience point calculations (growth-module)
     - rpg-robot_trigger-disabled_experience-rewards [DONE]
 -  Create event hook for post-disable item reward calculations (fortune-module)
-    - rpg-robot_trigger-disabled_item-rewards
+    - rpg-robot_trigger-disabled_item-rewards [DONE]
 
 -  Create event hook for "ability_function_stat_boost_step1" in rpg_ability (reverse-module, xtreme-module)
     - rpg-ability_stat-boost_before [DONE]
