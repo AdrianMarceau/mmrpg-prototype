@@ -57,13 +57,6 @@ class rpg_functions {
         $temp_flag_critical = $temp_level_digit == $temp_turn_digit ? true : false;
         $temp_flag_lucky = false;
 
-        // If the robot is holding a chance module, also look at the first digit of their level
-        if ($robot_item == 'fortune-module' && $temp_flag_critical == false){
-            $temp_level_digit2 = substr($robot_level, 0, 1);
-            $temp_flag_critical = $temp_level_digit2 == $temp_turn_digit ? true : false;
-            $temp_flag_lucky = true;
-        }
-
         // Return the final critical result
         if (MMRPG_CONFIG_DEBUG_MODE){ $this->events_create(false, false, 'DEBUG_'.__LINE__, ' critical_turn | fortune_module = '.($temp_flag_lucky ? 'true' : 'false').' <br /> turn '.$battle_turn.' vs. level '.$robot_level.' | turn_digit '.$temp_turn_digit.' vs level_digit '.$temp_level_digit.(isset($temp_level_digit2) ? ' | level_digit2 = '.$temp_level_digit2 : '').' | critical = '.($temp_flag_critical ? 'true' : 'false')); }
         return $temp_flag_critical;

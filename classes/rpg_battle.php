@@ -1155,18 +1155,28 @@ class rpg_battle extends rpg_object {
                 $this_star_rating += 1;
             }
 
-            // If any of this players robots are holding a FORTUNE MODULE item
-            $total_zenny_rewards_base = $total_zenny_rewards;
+            // Create an options object for this function and populate
+            $options = rpg_game::new_options_object();
+            $options->total_zenny_rewards_base = $total_zenny_rewards;
+            $options->total_zenny_rewards = &$total_zenny_rewards;
+            $options->item_bonuses = array();
+            $extra_objects = array('options' => $options);
+
+            // Trigger any robot's item functions if they have been defined for this context
             $active_robots = $this_player->get_robots_active();
-            $total_fortune_modules = 0;
-            foreach ($active_robots AS $key => $robot){
-                if ($robot->has_item('fortune-module')){
-                    $total_zenny_rewards += $total_zenny_rewards_base;
-                    $total_fortune_modules++;
-                }
+            foreach ($active_robots AS $key => $temp_robot){
+                $temp_robot->trigger_item_function('rpg-battle_complete-trigger_victory', $extra_objects);
             }
-            if ($total_fortune_modules > 0){
-                $first_event_body_details .= ' <span style="opacity:0.25;">|</span> Module Bonus'.($total_fortune_modules > 1 ? 'es' : '').': +'.($total_fortune_modules * 100).'%';
+
+            // If there were any item bonuses, loop through and display their details now
+            if (!empty($options->item_bonuses)){
+                foreach ($options->item_bonuses AS $kind => $info){
+                    if (!empty($info['count']) && !empty($info['amount'])){
+                        $label = ucfirst($kind).' Bonus'.($info['count'] > 1 ? 'es' : '');
+                        $percent = ceil(($info['amount'] / $options->total_zenny_rewards_base) * 100);
+                        $first_event_body_details .= ' <span style="opacity:0.25;">|</span> '.$label.': +'.$percent.'%';
+                    }
+                }
             }
 
             // Print out the current vs allowed turns for this mission and the penalty or bonus, if any
