@@ -76,7 +76,7 @@
     if (true){
 
         // Pull in the content types repo so we don't have to redeclare stuff
-        require_once(MMRPG_CONFIG_ROOTDIR.'content/index.php');
+        require(MMRPG_CONFIG_ROOTDIR.'content/index.php');
 
         // Define the common kind values for each group
         $common_group_kinds = array();
@@ -104,7 +104,7 @@
                     // Check to see if current user allowed to edit this content type
                     if (in_array('*', $this_adminaccess)
                         || in_array('edit-'.$type_info['xtoken'], $this_adminaccess)){
-                        $repo_base_path = MMRPG_CONFIG_CONTENT_PATH.$type_info['content_path'].'/';
+                        $repo_base_path = MMRPG_CONFIG_CONTENT_PATH.rtrim($type_info['content_path'], '/').'/';
                         $git_pull_required = cms_admin::git_pull_required($repo_base_path);
                         if (!empty($git_pull_required)){
                             $git_pull_allowed = cms_admin::git_pull_allowed($repo_base_path);
@@ -160,7 +160,7 @@
                     if (in_array('*', $this_adminaccess)
                         || in_array('edit-'.$type_info['xtoken'], $this_adminaccess)){
                         // Collect git details for the repo to see if button necessary
-                        $repo_base_path = MMRPG_CONFIG_CONTENT_PATH.$type_info['content_path'];
+                        $repo_base_path = MMRPG_CONFIG_CONTENT_PATH.rtrim($type_info['content_path'], '/').'/';
                         $committed_changes = cms_admin::git_get_committed_changes($repo_base_path);
                         // If there are changes to publish, add the appropriate button
                         if (!empty($committed_changes)){

@@ -265,8 +265,108 @@ class cms_admin {
 
     }
 
+    // Define functions for starting/stopping shell-exec timers
+    static $shell_exec_total_time = 0;
+    public static function shell_exec_total_time($flush = true){
+        $total_time = self::$shell_exec_total_time;
+        if ($flush){ self::$shell_exec_total_time = 0; }
+        return $total_time;
+    }
+
+    // Define an abstraction function for running shell commands and returning input
+    private static function shell_exec($command, $as_per_function){
+        static $init_counter = array();
+        if (!isset($init_counter[$as_per_function])){ $init_counter[$as_per_function] = 0; }
+        $init_counter[$as_per_function]++;
+        $start_time = microtime(true);
+        $output = shell_exec($command);
+        $end_time = microtime(true);
+        $exec_time = (($end_time - $start_time) * 1000);
+        self::$shell_exec_total_time += $exec_time;
+        //$log = PHP_EOL.$as_per_function.' [call #'.$init_counter[$as_per_function].'] ['.ceil($exec_time).' ms]';
+        //$log .= PHP_EOL.'shell_exec(\''.$command.'\')';
+        //if (!empty($output)){ $log .= PHP_EOL.$output; }
+        //error_log($log);
+        return $output;
+    }
+
 
     /* -- Git Functions -- */
+
+    // Define a function for looping through all content directories and scanning for changes
+    public static function git_scan_content_directories($index_by = 'token', $force_refresh = false){
+        static $content_cache = array();
+        static $content_cache_by_token = array();
+        static $content_cache_by_path = array();
+        if (empty($content_cache) || $force_refresh === true){
+            require(MMRPG_CONFIG_CONTENT_PATH.'index.php');
+            foreach ($content_types_index AS $content_token => $content_info){
+                if (empty($content_info['content_path'])){ continue; }
+                $content_path = MMRPG_CONFIG_CONTENT_PATH.rtrim($content_info['content_path'], '/').'/';
+
+                // Predefine arrays to hold all file statues
+                $cache_data = array();
+                $cache_data['modified'] = array();
+                $cache_data['deleted'] = array();
+                $cache_data['new'] = array();
+                $cache_data['committed'] = array();
+
+                // Define the cd prefix for all shell commands
+                $src_func = 'git_scan_content_directories()';
+
+                // Collect all MODIFIED and DELETED and NEW files in this directory
+                $diff_cmd = 'cd '.$content_path.' ';
+                $diff_cmd .= '&& echo "#MODIFIED" 2>&1 ';
+                $diff_cmd .= '&& git diff --name-status ';
+                $diff_cmd .= '&& echo "#UNTRACKED" 2>&1 ';
+                $diff_cmd .= '&& git ls-files --others --exclude-standard ';
+                $diff_cmd .= '&& echo "#COMMITTED" 2>&1 ';
+                $diff_cmd .= '&& git log origin/master..HEAD --name-only --oneline ';
+                $diff_return = self::shell_exec($diff_cmd, $src_func);
+                if (!empty($diff_return)){
+                    $diff_list = array_filter(explode("\n", normalize_line_endings($diff_return)));
+                    $diff_list = array_map(function($str){ return trim($str, '" '); }, $diff_list);
+                    if (!empty($diff_list)){
+                        $mode = false;
+                        foreach ($diff_list AS $str){
+                            if (substr($str, 0, 1) === '#'){ $mode = trim($str, '#'); continue; }
+                            if ($mode === 'MODIFIED'){
+                                list($stat, $path) = explode('||', preg_replace('/^([a-z])\s+(.*)$/i', '$1||$2', $str));
+                                if (strtoupper($stat) === 'M'){ $cache_data['modified'][] = $path; }
+                                elseif (strtoupper($stat) === 'D'){ $cache_data['deleted'][] = $path; }
+                            } elseif ($mode === 'UNTRACKED'){
+                                $cache_data['new'][] = $str;
+                            } elseif ($mode === 'COMMITTED'){
+                                if (preg_match('/([^\.]+)\.([a-z0-9]{3,})$/i', $str)){
+                                    $cache_data['committed'][] = $str;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Make sure there aren't any duplicates in each array
+                foreach ($cache_data AS $k => $a){ $cache_data[$k] = array_unique($a); }
+
+                // Add the completed array to the content cache
+                $content_cache[$content_token] = $cache_data;
+                $content_cache_by_token[$content_token] = &$content_cache[$content_token];
+                $content_cache_by_path[$content_path] = &$content_cache[$content_token];
+
+            }
+        }
+        if ($index_by === 'token'){ return $content_cache_by_token; }
+        elseif ($index_by === 'path'){ return $content_cache_by_path; }
+        else { return $content_cache; }
+    }
+
+    // Define a function for collecting the content cache for a given token, path, etc.
+    public static function git_content_cache($index_by = 'token', $index_key = '', $index_subkey = ''){
+        $indexed_content_cache = self::git_scan_content_directories($index_by);
+        $this_content_cache = !empty($indexed_content_cache[$index_key]) ? $indexed_content_cache[$index_key] : array();
+        if (!empty($index_subkey)){ return !empty($this_content_cache[$index_subkey]) ? $this_content_cache[$index_subkey] : array(); }
+        else { return $this_content_cache; }
+    }
 
     // Define a function for returning the types of
     public static function git_get_change_kinds(){
@@ -334,9 +434,7 @@ class cms_admin {
         static $index;
         if (!is_array($index)){ $index = array(); }
         if (!isset($index[$repo_base_path])){
-            $deleted = shell_exec('cd '.$repo_base_path.' && git ls-files --deleted');
-            //echo('$deleted = '.print_r($deleted, true).PHP_EOL);
-            $deleted = !empty($deleted) ? explode("\n", trim($deleted)) : array();
+            $deleted = self::git_content_cache('path', $repo_base_path, 'deleted');
             $index[$repo_base_path] = $deleted;
         } else {
             $deleted = $index[$repo_base_path];
@@ -350,9 +448,7 @@ class cms_admin {
         static $index;
         if (!is_array($index)){ $index = array(); }
         if (!isset($index[$repo_base_path])){
-            $unstaged = shell_exec('cd '.$repo_base_path.' && git diff --name-only');
-            //echo('$unstaged = '.print_r($unstaged, true).PHP_EOL);
-            $unstaged = !empty($unstaged) ? explode("\n", trim($unstaged)) : array();
+            $unstaged = self::git_content_cache('path', $repo_base_path, 'modified');
             $index[$repo_base_path] = $unstaged;
         } else {
             $unstaged = $index[$repo_base_path];
@@ -366,9 +462,7 @@ class cms_admin {
         static $index;
         if (!is_array($index)){ $index = array(); }
         if (!isset($index[$repo_base_path])){
-            $untracked = shell_exec('cd '.$repo_base_path.' && git ls-files --others --exclude-standard');
-            //echo('$untracked = '.print_r($untracked, true).PHP_EOL);
-            $untracked = !empty($untracked) ? explode("\n", trim($untracked)) : array();
+            $untracked = self::git_content_cache('path', $repo_base_path, 'untracked');
             $index[$repo_base_path] = $untracked;
         } else {
             $untracked = $index[$repo_base_path];
@@ -377,15 +471,12 @@ class cms_admin {
         return array_values($untracked);
     }
 
-    // Define a function for checking if there are any commited (but unpushed) files in a given repo (w/ optional path filter)
+    // Define a function for checking if there are any committed (but unpushed) files in a given repo (w/ optional path filter)
     public static function git_get_committed($repo_base_path, $filter_path = ''){
         static $index;
         if (!is_array($index)){ $index = array(); }
         if (!isset($index[$repo_base_path])){
-            $committed = shell_exec('cd '.$repo_base_path.' && git log origin/master..HEAD --name-only --oneline');
-            //echo('$committed = '.print_r($committed, true).PHP_EOL);
-            $committed = !empty($committed) ? explode("\n", trim($committed)) : array();
-            foreach ($committed AS $key => $path){ if (strstr($path, ' ')){ unset($committed[$key]); } }
+            $committed = self::git_content_cache('path', $repo_base_path, 'committed');
             $index[$repo_base_path] = $committed;
         } else {
             $committed = $index[$repo_base_path];
@@ -412,7 +503,7 @@ class cms_admin {
             $last_updated = self::git_update_remote_get_time($repo_base_path);
             $update_timeout = 60 * 60; // 60 mins (one hour)
             if ((time() - $last_updated) >= $update_timeout){
-                $index[$repo_base_path] = shell_exec('cd '.$repo_base_path.' && git remote update');
+                $index[$repo_base_path] = self::shell_exec('cd '.$repo_base_path.' && git remote update', 'git_update_remote()');
                 self::git_update_remote_set_time($repo_base_path);
             } else {
                 $index[$repo_base_path] = true;
@@ -532,7 +623,7 @@ class cms_admin {
             // Update the branch with any changes on remote
             self::git_update_remote($repo_base_path);
             // Check the branch status so we can parse info
-            $status_output = shell_exec('cd '.$repo_base_path.' && git status -uno');
+            $status_output = self::shell_exec('cd '.$repo_base_path.' && git status -uno', 'git_pull_required()');
             // If the status was empty, assume up-to-date and return false (no pull required)
             if (empty($status_output)){ return false; }
             // Otherwise, we can explode the branch status in lines for parsing
@@ -565,7 +656,7 @@ class cms_admin {
             // Collect the allowed flag from the cache array
             $pull_allowed = $index[$repo_base_path];
         } else {
-            // Check to make sure this branch does NOT have an uncommited changes pending
+            // Check to make sure this branch does NOT have an uncommitted changes pending
             $unstaged = self::git_get_unstaged($repo_base_path);
             $untracked = self::git_get_untracked($repo_base_path);
             $pull_allowed = empty($unstaged) && empty($untracked) ? true : false;
@@ -584,12 +675,12 @@ class cms_admin {
         if (empty($repo_config['path'])){ return false; }
         $repo_changes = array();
 
-        // Collect uncommitted changes, uncommitted deletes, and commited changes/deletes
+        // Collect uncommitted changes, uncommitted deletes, and committed changes/deletes
         $uncommitted_changes = cms_admin::git_get_uncommitted_changes($repo_config['path']);
         $uncommitted_deletes = cms_admin::git_get_deleted($repo_config['path']);
         $all_committed = cms_admin::git_get_committed_changes($repo_config['path']);
 
-        // If any of the uncommited changes are actually deletes, remove them from the first list
+        // If any of the uncommitted changes are actually deletes, remove them from the first list
         if (!empty($uncommitted_deletes)){ $uncommitted_changes = array_diff($uncommitted_changes, $uncommitted_deletes); }
 
         // Filter each of the result arrays as necessary (if provided)
