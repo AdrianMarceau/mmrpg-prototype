@@ -903,6 +903,7 @@ class cms_admin {
         // Clean the new json data with settings specific to the object kind
         $onclean_remove_id_field = true;
         $onclean_remove_functions_field = true;
+        $onclean_remove_protected_field = true;
         $onclean_encoded_sub_fields = array();
         if (in_array($object_kind, array('star', 'challenge', 'page'))){ $onclean_remove_id_field = false; }
         if ($object_kind === 'challenge'){ $onclean_encoded_sub_fields = array('challenge_field_data', 'challenge_target_data', 'challenge_reward_data'); }
@@ -915,6 +916,12 @@ class cms_admin {
         if (method_exists('rpg_'.$object_kind, 'get_fields_excluded_from_json_export')){
             $skip_fields_on_json_export = call_user_func(array('rpg_'.$object_kind, 'get_fields_excluded_from_json_export'));
             if (!empty($skip_fields_on_json_export)){ foreach ($skip_fields_on_json_export AS $field){ unset($new_json_data[$field], $old_json_data[$field]); } }
+        }
+
+        // Always remove the "protected" flag fields as those are environment-specific
+        if ($onclean_remove_protected_field){
+            unset($new_json_data[$object_kind.'_flag_protected']);
+            unset($old_json_data[$object_kind.'_flag_protected']);
         }
 
         // If this is a page request, extract and collect new/old html content separately

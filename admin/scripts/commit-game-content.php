@@ -81,6 +81,13 @@ else { $object_full_name_kind_singular = $object_name_kind_singular; }
 foreach ($commit_tokens  AS $object_key => $object_token){
     //debug_echo('processing object-token '.$object_token);
 
+    // Collect the object (primary key) token value in case it's different than (folder name) token value
+    if ($content_type_info['primary_key'] === 'id'){ $object_token_field_value = intval(preg_replace('/^(.*?)-([0-9]+)$/i', '$2', $object_token)); }
+    elseif ($content_type_info['primary_key'] === 'url'){ $object_token_field_value = trim(str_replace('_', '/', $object_token), '/').'/'; }
+    else { $object_token_field_value = $object_token; }
+    //debug_echo('$object_token_field = '.print_r($object_token_field, true).'');
+    //debug_echo('$object_token_field_value = '.print_r($object_token_field_value, true).'');
+
     // Collect the file paths to be committed
     $object_paths = $commit_paths_bytoken[$object_token];
 
@@ -167,6 +174,16 @@ foreach ($commit_tokens  AS $object_key => $object_token){
 
     $commit_message = str_replace('"', '\\"', $commit_message);
     //debug_echo('$commit_message = '.print_r($commit_message, true).'');
+
+    // If this database table is protected, we need to update the DB flag for this object
+    if (!empty($content_type_info['database_table_protected'])){
+        //debug_echo('Mark this object as protected now!');
+        $update_data = array($request_kind_singular.'_flag_protected' => 1);
+        $update_condition = array($object_token_field => $object_token_field_value);
+        //debug_echo('$update_data = '.print_r($update_data, true).'');
+        //debug_echo('$update_condition = '.print_r($update_condition, true).'');
+        $db->update($object_table_name, $update_data, $update_condition);
+    }
 
     // Commit the relevant file changes as this user and then push
     $git_commands = '';
