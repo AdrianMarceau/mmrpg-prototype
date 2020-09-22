@@ -234,7 +234,8 @@
                 'star_to_date' => '',
                 'star_to_date_time' => '',
                 'star_power' => 0,
-                'star_flag_enabled' => 1
+                'star_flag_enabled' => 1,
+                'star_flag_protected' => 0
                 );
 
             // Overwrite temp data with any backup data provided
@@ -348,6 +349,7 @@
             if ($star_data_is_new){
 
                 // Update the main database index with changes to this star's data
+                $update_data['star_flag_protected'] = 0;
                 $insert_results = $db->insert('mmrpg_rogue_stars', $update_data);
 
                 // If we made it this far, the update must have been a success
@@ -607,7 +609,9 @@
 
                                 $star_actions = '';
                                 $star_actions .= '<a class="link edit" href="'.$star_edit.'"><span>edit</span></a>';
-                                $star_actions .= '<a class="link delete" data-delete="stars" data-star-id="'.$star_id.'"><span>delete</span></a>';
+                                if (empty($star_data['star_flag_protected'])){
+                                    $star_actions .= '<a class="link delete" data-delete="stars" data-star-id="'.$star_id.'"><span>delete</span></a>';
+                                }
 
                                 //$star_range_link = '<a class="link" href="'.$star_edit.'">'.$star_date_range.'</a>';
                                 $star_name_link = '<a class="link" href="'.$star_edit.'">'.$star_name.'</a>';
@@ -712,7 +716,7 @@
                                     $value = $type_info['type_token'];
                                     $selected = $type_info['type_token'] == $star_data['star_type'] ? 'selected="selected"' : '';
                                     $label = $type_info['type_name'];
-                                    echo('<option value="'.$value.'" title="'.$title.'" '.$selected.'>'.$label.'</option>');
+                                    echo('<option value="'.$value.'" title="'.$label.'" '.$selected.'>'.$label.'</option>');
                                 } ?>
                             </select><span></span>
                         </div>
@@ -743,8 +747,9 @@
 
                             <div class="buttons">
                                 <input class="button save" type="submit" value="Save Changes" />
-                                <? /* <input class="button reset" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin/edit-stars/editor/star_id=<?= $star_data['star_id'] ?>';" /> */ ?>
-                                <input class="button delete" type="button" value="Delete Star" data-delete="stars" data-star-id="<?= $star_data['star_id'] ?>" />
+                                <? if (empty($star_data['star_flag_protected'])){ ?>
+                                    <input class="button delete" type="button" value="Delete Star" data-delete="stars" data-star-id="<?= $star_data['star_id'] ?>" />
+                                <? } ?>
                             </div>
                             <?= cms_admin::object_editor_print_git_footer_buttons('stars', cms_admin::git_get_id_token('star', $star_data['star_id']), $mmrpg_git_file_arrays) ?>
 
