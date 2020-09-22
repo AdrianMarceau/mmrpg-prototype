@@ -19,8 +19,8 @@ class rpg_item_recovery extends rpg_recovery {
         if (!isset($trigger_options['apply_modifiers'])){ $trigger_options['apply_modifiers'] = true; }
         if (!isset($trigger_options['apply_type_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_type_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['apply_core_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_core_modifiers'] = $trigger_options['apply_modifiers']; }
-        if (!isset($trigger_options['apply_field_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_field_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['apply_position_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_position_modifiers'] = $trigger_options['apply_modifiers']; }
+        if (!isset($trigger_options['apply_field_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_field_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['apply_stat_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_stat_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['referred_recovery'])){ $trigger_options['referred_recovery'] = false; }
         if (!isset($trigger_options['referred_recovery_id'])){ $trigger_options['referred_recovery_id'] = 0; }
@@ -60,19 +60,33 @@ class rpg_item_recovery extends rpg_recovery {
         // Define the event console options
         $event_options = array();
         $event_options['console_container_height'] = 1;
-        $event_options['this_item'] = $this_item;
+        $event_options['this_other_item'] = $this_item;
         $event_options['this_item_results'] = array();
+
+        // Create an options object for this function and populate
+        $options = rpg_game::new_options_object();
+        $options->recovery_target = $this_robot;
+        $options->recovery_initiator = $target_robot;
+        $options->recovery_amount = $recovery_amount;
+        $options->trigger_options = &$trigger_options;
+        $options->event_options = &$event_options;
+        $extra_objects = array('this_item' => $this_item, 'options' => $options);
 
         // Empty any text from the previous item result
         $this_item->item_results['this_text'] = '';
 
         // Update the recovery to whatever was supplied in the argument
-        //if ($this_item->recovery_options['recovery_percent'] && $recovery_amount > 100){ $recovery_amount = 100; }
-        $this_item->recovery_options['recovery_amount'] = $recovery_amount;
+        //if ($this_item->recovery_options['recovery_percent'] && $options->recovery_amount > 100){ $options->recovery_amount = 100; }
+        $this_item->recovery_options['recovery_amount'] = $options->recovery_amount;
 
         // Collect the recovery amount argument from the function
-        $this_item->item_results['this_amount'] = $recovery_amount;
+        $this_item->item_results['this_amount'] = $options->recovery_amount;
         $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | to('.$this_robot->robot_id.':'.$this_robot->robot_token.') vs from('.$target_robot->robot_id.':'.$target_robot->robot_token.') | recovery_start_amount |<br /> '.'amount:'.$this_item->item_results['this_amount'].' | '.'percent:'.($this_item->recovery_options['recovery_percent'] ? 'true' : 'false').' | '.'kind:'.$this_item->recovery_options['recovery_kind'].' | type1:'.(!empty($this_item->recovery_options['recovery_type']) ? $this_item->recovery_options['recovery_type'] : 'none').' | type2:'.(!empty($this_item->recovery_options['recovery_type2']) ? $this_item->recovery_options['recovery_type2'] : 'none').'');
+
+        // Trigger this robot's item function if one has been defined for this context
+        $this_robot->trigger_item_function('rpg-item_trigger-recovery_before', $extra_objects);
+        $target_robot->trigger_item_function('rpg-item_trigger-recovery_before', $extra_objects);
+        if ($options->return_early){ return $options->return_value; }
 
         // DEBUG
         if (!empty($debug)){ $debug .= ' <br /> '; }
@@ -95,7 +109,7 @@ class rpg_item_recovery extends rpg_recovery {
                 if ($this_robot->has_weakness($this_item->recovery_options['recovery_type']) && !$this_robot->has_affinity($this_item->recovery_options['recovery_type2'])){
                     //$this_item->item_results['counter_weaknesses'] += 1;
                     //$this_item->item_results['flag_weakness'] = true;
-                    return $this_robot->trigger_damage($target_robot, $this_item, $recovery_amount);
+                    return $this_robot->trigger_damage($target_robot, $this_item, $options->recovery_amount);
                 } else {
                     $this_item->item_results['flag_weakness'] = false;
                 }
@@ -104,7 +118,7 @@ class rpg_item_recovery extends rpg_recovery {
                 if ($this_robot->has_weakness($this_item->recovery_options['recovery_type2']) && !$this_robot->has_affinity($this_item->recovery_options['recovery_type'])){
                     $this_item->item_results['counter_weaknesses'] += 1;
                     $this_item->item_results['flag_weakness'] = true;
-                    return $this_robot->trigger_damage($target_robot, $this_item, $recovery_amount);
+                    return $this_robot->trigger_damage($target_robot, $this_item, $options->recovery_amount);
                 }
 
                 // If target robot has affinity to the item (based on type)
@@ -233,9 +247,9 @@ class rpg_item_recovery extends rpg_recovery {
                     // Collect the current key of the robot and apply recovery mods
                     $temp_recovery_key = $this_robot->robot_key + 1;
                     $temp_recovery_resistor = (10 - $temp_recovery_key) / 10;
-                    $new_recovery_amount = rpg_functions::round_ceil($recovery_amount * $temp_recovery_resistor);
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | position_modifier_recovery | '.$recovery_amount.' = rpg_functions::round_ceil('.$recovery_amount.' * '.$temp_recovery_resistor.') = '.$new_recovery_amount.'');
-                    $recovery_amount = $new_recovery_amount;
+                    $new_recovery_amount = rpg_functions::round_ceil($options->recovery_amount * $temp_recovery_resistor);
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | position_modifier_recovery | '.$options->recovery_amount.' = rpg_functions::round_ceil('.$options->recovery_amount.' * '.$temp_recovery_resistor.') = '.$new_recovery_amount.'');
+                    $options->recovery_amount = $new_recovery_amount;
                 }
 
             }
@@ -254,9 +268,9 @@ class rpg_item_recovery extends rpg_recovery {
 
             // If there's a recovery booster, apply that first
             if (isset($field_multipliers['recovery'])){
-                $new_recovery_amount = rpg_functions::round_ceil($recovery_amount * $field_multipliers['recovery']);
-                $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | field_multiplier_recovery | '.$recovery_amount.' = rpg_functions::round_ceil('.$recovery_amount.' * '.$field_multipliers['recovery'].') = '.$new_recovery_amount.'');
-                $recovery_amount = $new_recovery_amount;
+                $new_recovery_amount = rpg_functions::round_ceil($options->recovery_amount * $field_multipliers['recovery']);
+                $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | field_multiplier_recovery | '.$options->recovery_amount.' = rpg_functions::round_ceil('.$options->recovery_amount.' * '.$field_multipliers['recovery'].') = '.$new_recovery_amount.'');
+                $options->recovery_amount = $new_recovery_amount;
             }
 
             // Loop through all the other type multipliers one by one if this item has a type
@@ -266,15 +280,15 @@ class rpg_item_recovery extends rpg_recovery {
                 if (in_array($temp_type, $skip_types)){ continue; }
                 // If this item's type matches the multiplier, apply it
                 if ($temp_item_recovery_type == $temp_type){
-                    $new_recovery_amount = rpg_functions::round_ceil($recovery_amount * $temp_multiplier);
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | field_multiplier_'.$temp_type.' | '.$recovery_amount.' = rpg_functions::round_ceil('.$recovery_amount.' * '.$temp_multiplier.') = '.$new_recovery_amount.'');
-                    $recovery_amount = $new_recovery_amount;
+                    $new_recovery_amount = rpg_functions::round_ceil($options->recovery_amount * $temp_multiplier);
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | field_multiplier_'.$temp_type.' | '.$options->recovery_amount.' = rpg_functions::round_ceil('.$options->recovery_amount.' * '.$temp_multiplier.') = '.$new_recovery_amount.'');
+                    $options->recovery_amount = $new_recovery_amount;
                 }
                 // If this item's type2 matches the multiplier, apply it
                 if ($temp_item_recovery_type2 == $temp_type){
-                    $new_recovery_amount = rpg_functions::round_ceil($recovery_amount * $temp_multiplier);
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | field_multiplier_'.$temp_type.' | '.$recovery_amount.' = rpg_functions::round_ceil('.$recovery_amount.' * '.$temp_multiplier.') = '.$new_recovery_amount.'');
-                    $recovery_amount = $new_recovery_amount;
+                    $new_recovery_amount = rpg_functions::round_ceil($options->recovery_amount * $temp_multiplier);
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | field_multiplier_'.$temp_type.' | '.$options->recovery_amount.' = rpg_functions::round_ceil('.$options->recovery_amount.' * '.$temp_multiplier.') = '.$new_recovery_amount.'');
+                    $options->recovery_amount = $new_recovery_amount;
                 }
             }
 
@@ -463,7 +477,7 @@ class rpg_item_recovery extends rpg_recovery {
             }
 
             // Collect the recovery amount argument from the function
-            $this_item->item_results['this_amount'] = $recovery_amount;
+            $this_item->item_results['this_amount'] = $options->recovery_amount;
 
             // Only apply core modifiers if allowed to
             if ($trigger_options['apply_core_modifiers'] != false){
@@ -527,8 +541,6 @@ class rpg_item_recovery extends rpg_recovery {
 
                 // If this is a critical hit (random chance)
                 $critical_rate = $this_item->recovery_options['critical_rate'];
-                // Double the critical hit ratio if the target is holding a Fortune Module
-                if ($target_robot->has_item() && $target_robot->get_item() == 'fortune-module'){ $critical_rate = $critical_rate * 2; }
                 if ($this_robot->battle->critical_chance($critical_rate)){
                     $this_item->item_results['this_amount'] = $this_item->item_results['this_amount'] * $this_item->recovery_options['critical_multiplier'];
                     $this_item->item_results['flag_critical'] = true;
@@ -1004,14 +1016,25 @@ class rpg_item_recovery extends rpg_recovery {
         $this_robot->update_session();
         $this_robot->player->update_session();
 
+        // Trigger this robot's item function if one has been defined for this context
+        $this_robot->trigger_item_function('rpg-item_trigger-recovery_middle', $extra_objects);
+        $target_robot->trigger_item_function('rpg-item_trigger-recovery_middle', $extra_objects);
+        if ($options->return_early){ return $options->return_value; }
+
         // Generate an event with the collected recovery results based on recovery type
-        if ($this_robot->robot_id == $target_robot->robot_id){ //$this_item->recovery_options['recovery_kind'] == 'energy'
+        $temp_event_header = $this_item->recovery_options['recovery_header'];
+        $temp_event_body = $this_item->item_results['this_text'];
+        if ($this_robot->robot_id == $target_robot->robot_id){
             $event_options['console_show_target'] = false;
             $event_options['this_item_target'] = $this_robot->robot_id.'_'.$this_robot->robot_token;
+            $temp_event_body = str_replace('{this_robot}', $this_robot->print_name(), $temp_event_body);
+            $temp_event_body = str_replace('{target_robot}', $target_robot->print_name(), $temp_event_body);
             $this_robot->battle->events_create($target_robot, $this_robot, $this_item->recovery_options['recovery_header'], $this_item->item_results['this_text'], $event_options);
         } else {
             $event_options['console_show_target'] = false;
-            $event_options['this_item_target'] = $this_robot->robot_id.'_'.$this_robot->robot_token;;
+            $event_options['this_item_target'] = $this_robot->robot_id.'_'.$this_robot->robot_token;
+            $temp_event_body = str_replace('{this_robot}', $target_robot->print_name(), $temp_event_body);
+            $temp_event_body = str_replace('{target_robot}', $this_robot->print_name(), $temp_event_body);
             $this_robot->battle->events_create($this_robot, $target_robot, $this_item->recovery_options['recovery_header'], $this_item->item_results['this_text'], $event_options);
         }
 
@@ -1140,6 +1163,10 @@ class rpg_item_recovery extends rpg_recovery {
             'target_robot' => $target_robot,
             'this_item' => $this_item
             ));
+
+        // Trigger this robot's item function if one has been defined for this context
+        $this_robot->trigger_item_function('rpg-item_trigger-recovery_after', $extra_objects);
+        $target_robot->trigger_item_function('rpg-item_trigger-recovery_after', $extra_objects);
 
         // Return the final recovery results
         return $this_item->item_results;

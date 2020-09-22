@@ -68,16 +68,30 @@ class rpg_ability_damage extends rpg_damage {
         $event_options['this_ability'] = $this_ability;
         $event_options['this_ability_results'] = array();
 
+        // Create an options object for this function and populate
+        $options = rpg_game::new_options_object();
+        $options->damage_target = $this_robot;
+        $options->damage_initiator = $target_robot;
+        $options->damage_amount = $damage_amount;
+        $options->trigger_options = &$trigger_options;
+        $options->event_options = &$event_options;
+        $extra_objects = array('this_ability' => $this_ability, 'options' => $options);
+
         // Empty any text from the previous ability result
         $this_ability->ability_results['this_text'] = '';
 
         // Update the damage to whatever was supplied in the argument
-        //if ($this_ability->damage_options['damage_percent'] && $damage_amount > 100){ $damage_amount = 100; }
-        $this_ability->damage_options['damage_amount'] = $damage_amount;
+        //if ($this_ability->damage_options['damage_percent'] && $options->damage_amount > 100){ $options->damage_amount = 100; }
+        $this_ability->damage_options['damage_amount'] = $options->damage_amount;
 
         // Collect the damage amount argument from the function
-        $this_ability->ability_results['this_amount'] = $damage_amount;
+        $this_ability->ability_results['this_amount'] = $options->damage_amount;
         $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | to('.$this_robot->robot_id.':'.$this_robot->robot_token.') vs from('.$target_robot->robot_id.':'.$target_robot->robot_token.') | damage_start_amount |<br /> '.'amount:'.$this_ability->ability_results['this_amount'].' | '.'percent:'.($this_ability->damage_options['damage_percent'] ? 'true' : 'false').' | '.'kind:'.$this_ability->damage_options['damage_kind'].' | type1:'.(!empty($this_ability->damage_options['damage_type']) ? $this_ability->damage_options['damage_type'] : 'none').' | type2:'.(!empty($this_ability->damage_options['damage_type2']) ? $this_ability->damage_options['damage_type2'] : 'none').'');
+
+        // Trigger this robot's item function if one has been defined for this context
+        $this_robot->trigger_item_function('rpg-ability_trigger-damage_before', $extra_objects);
+        $target_robot->trigger_item_function('rpg-ability_trigger-damage_before', $extra_objects);
+        if ($options->return_early){ return $options->return_value; }
 
         // DEBUG
         if (!empty($debug)){ $debug .= ' <br /> '; }
@@ -100,7 +114,7 @@ class rpg_ability_damage extends rpg_damage {
                 if ($this_robot->has_affinity($this_ability->damage_options['damage_type']) && !$this_robot->has_weakness($this_ability->damage_options['damage_type2'])){
                     //$this_ability->ability_results['counter_affinities'] += 1;
                     //$this_ability->ability_results['flag_affinity'] = true;
-                    return $this_robot->trigger_recovery($target_robot, $this_ability, $damage_amount);
+                    return $this_robot->trigger_recovery($target_robot, $this_ability, $options->damage_amount);
                 } else {
                     $this_ability->ability_results['flag_affinity'] = false;
                 }
@@ -109,7 +123,7 @@ class rpg_ability_damage extends rpg_damage {
                 if ($this_robot->has_affinity($this_ability->damage_options['damage_type2']) && !$this_robot->has_weakness($this_ability->damage_options['damage_type'])){
                     $this_ability->ability_results['counter_affinities'] += 1;
                     $this_ability->ability_results['flag_affinity'] = true;
-                    return $this_robot->trigger_recovery($target_robot, $this_ability, $damage_amount);
+                    return $this_robot->trigger_recovery($target_robot, $this_ability, $options->damage_amount);
                 }
 
                 // If this robot has weakness to the ability (based on type)
@@ -296,9 +310,9 @@ class rpg_ability_damage extends rpg_damage {
                 if ($this_robot->robot_position != 'active'){
                     // Collect the current key of the robot and apply damage mods
                     $temp_damage_resistor = 1 /2;
-                    $new_damage_amount = rpg_functions::round_ceil($damage_amount * $temp_damage_resistor);
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | position_modifier_damage | '.$damage_amount.' = rpg_functions::round_ceil('.$damage_amount.' * '.$temp_damage_resistor.') = '.$new_damage_amount.'');
-                    $damage_amount = $new_damage_amount;
+                    $new_damage_amount = rpg_functions::round_ceil($options->damage_amount * $temp_damage_resistor);
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | position_modifier_damage | '.$options->damage_amount.' = rpg_functions::round_ceil('.$options->damage_amount.' * '.$temp_damage_resistor.') = '.$new_damage_amount.'');
+                    $options->damage_amount = $new_damage_amount;
                 }
 
             }
@@ -317,9 +331,9 @@ class rpg_ability_damage extends rpg_damage {
 
             // If there's a damage booster, apply that first
             if (isset($field_multipliers['damage'])){
-                $new_damage_amount = rpg_functions::round_ceil($damage_amount * $field_multipliers['damage']);
-                $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | field_multiplier_damage | '.$damage_amount.' = rpg_functions::round_ceil('.$damage_amount.' * '.$field_multipliers['damage'].') = '.$new_damage_amount.'');
-                $damage_amount = $new_damage_amount;
+                $new_damage_amount = rpg_functions::round_ceil($options->damage_amount * $field_multipliers['damage']);
+                $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | field_multiplier_damage | '.$options->damage_amount.' = rpg_functions::round_ceil('.$options->damage_amount.' * '.$field_multipliers['damage'].') = '.$new_damage_amount.'');
+                $options->damage_amount = $new_damage_amount;
             }
 
             // Loop through all the other type multipliers one by one if this ability has a type
@@ -329,15 +343,15 @@ class rpg_ability_damage extends rpg_damage {
                 if (in_array($temp_type, $skip_types)){ continue; }
                 // If this ability's type matches the multiplier, apply it
                 if ($temp_ability_damage_type == $temp_type){
-                    $new_damage_amount = rpg_functions::round_ceil($damage_amount * $temp_multiplier);
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | field_multiplier_'.$temp_type.' | '.$damage_amount.' = rpg_functions::round_ceil('.$damage_amount.' * '.$temp_multiplier.') = '.$new_damage_amount.'');
-                    $damage_amount = $new_damage_amount;
+                    $new_damage_amount = rpg_functions::round_ceil($options->damage_amount * $temp_multiplier);
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | field_multiplier_'.$temp_type.' | '.$options->damage_amount.' = rpg_functions::round_ceil('.$options->damage_amount.' * '.$temp_multiplier.') = '.$new_damage_amount.'');
+                    $options->damage_amount = $new_damage_amount;
                 }
                 // If this ability's type2 matches the multiplier, apply it
                 if ($temp_ability_damage_type2 == $temp_type){
-                    $new_damage_amount = rpg_functions::round_ceil($damage_amount * $temp_multiplier);
-                    $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | field_multiplier_'.$temp_type.' | '.$damage_amount.' = rpg_functions::round_ceil('.$damage_amount.' * '.$temp_multiplier.') = '.$new_damage_amount.'');
-                    $damage_amount = $new_damage_amount;
+                    $new_damage_amount = rpg_functions::round_ceil($options->damage_amount * $temp_multiplier);
+                    $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | field_multiplier_'.$temp_type.' | '.$options->damage_amount.' = rpg_functions::round_ceil('.$options->damage_amount.' * '.$temp_multiplier.') = '.$new_damage_amount.'');
+                    $options->damage_amount = $new_damage_amount;
                 }
             }
 
@@ -529,7 +543,7 @@ class rpg_ability_damage extends rpg_damage {
             }
 
             // Collect the damage amount argument from the function
-            $this_ability->ability_results['this_amount'] = $damage_amount;
+            $this_ability->ability_results['this_amount'] = $options->damage_amount;
 
             // Only apply core modifiers if allowed to
             if ($trigger_options['apply_core_modifiers'] != false){
@@ -619,8 +633,6 @@ class rpg_ability_damage extends rpg_damage {
 
                 // If this is a critical hit (random chance)
                 $critical_rate = $this_ability->damage_options['critical_rate'];
-                // Double the critical hit ratio if the target is holding a Fortune Module
-                if ($target_robot->has_item() && $target_robot->get_item() == 'fortune-module'){ $critical_rate = $critical_rate * 2; }
                 if ($this_battle->critical_chance($critical_rate)){
                     $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] * $this_ability->damage_options['critical_multiplier'];
                     $this_ability->ability_results['flag_critical'] = true;
@@ -1135,18 +1147,19 @@ class rpg_ability_damage extends rpg_damage {
         $this_robot->player->update_session();
 
         // If this robot was at full energy but is now at zero, it's a OHKO
-        $this_robot_energy_ohko = false;
+        $this_ability->ability_results['energy_ohko'] = false;
         if ($this_robot->robot_energy <= 0 && $this_robot_energy_start_max){
             $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | damage_result_OHKO! | Start:'.$this_robot_energy_start.' '.($this_robot_energy_start_max ? '(MAX!)' : '-').' | Finish:'.$this_robot->robot_energy);
             // Ensure the attacking player was a human
             if ($this_robot->player->player_side == 'right'){
-                $this_robot_energy_ohko = true;
-                // Increment the field multipliers for items
-                //if (!isset($this_robot->field->field_multipliers['items'])){ $this_robot->field->field_multipliers['items'] = 1; }
-                //$this_robot->field->field_multipliers['items'] += 0.1;
-                //$this_robot->field->update_session();
+                $this_ability->ability_results['energy_ohko'] = true;
             }
         }
+
+        // Trigger this robot's item function if one has been defined for this context
+        $this_robot->trigger_item_function('rpg-ability_trigger-damage_middle', $extra_objects);
+        $target_robot->trigger_item_function('rpg-ability_trigger-damage_middle', $extra_objects);
+        if ($options->return_early){ return $options->return_value; }
 
         // Generate an event with the collected damage results based on damage type
         $temp_event_header = $this_ability->damage_options['damage_header'];
@@ -1193,9 +1206,9 @@ class rpg_ability_damage extends rpg_damage {
 
         // If this robot was disabled, process experience for the target
         if ($this_robot->robot_status == 'disabled' && $trigger_disabled){
-            $trigger_options = array();
-            if ($this_robot_energy_ohko){ $trigger_options['item_multiplier'] = 2.0; }
-            $this_robot->trigger_disabled($target_robot, $trigger_options);
+            $disabled_trigger_options = array();
+            if ($this_ability->ability_results['energy_ohko']){ $disabled_trigger_options['item_multiplier'] = 2.0; }
+            $this_robot->trigger_disabled($target_robot, $disabled_trigger_options);
         }
         // Otherwise, if the target robot was not disabled
         elseif ($this_robot->robot_status != 'disabled'){
@@ -1305,6 +1318,10 @@ class rpg_ability_damage extends rpg_damage {
             'target_robot' => $target_robot,
             'this_ability' => $this_ability
             ));
+
+        // Trigger this robot's item function if one has been defined for this context
+        $this_robot->trigger_item_function('rpg-ability_trigger-damage_after', $extra_objects);
+        $target_robot->trigger_item_function('rpg-ability_trigger-damage_after', $extra_objects);
 
         // Return the final damage results
         return $this_ability->ability_results;
