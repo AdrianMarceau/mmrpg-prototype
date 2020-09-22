@@ -294,15 +294,24 @@ class cms_admin {
     /* -- Git Functions -- */
 
     // Define a function for looping through all content directories and scanning for changes
-    public static function git_scan_content_directories($index_by = 'token', $force_refresh = false){
+    public static function git_scan_content_directories($index_by = 'token', $index_key = '', $force_refresh = false){
         static $content_cache = array();
-        static $content_cache_by_token = array();
-        static $content_cache_by_path = array();
-        if (empty($content_cache) || $force_refresh === true){
+        static $content_cache_by = array();
+        $allowed_index_by = array('token', 'path');
+        if (!in_array($index_by, $allowed_index_by)){ $index_by = $allowed_index_by[0]; }
+        if (empty($content_cache)
+            || (!empty($index_key) && empty($content_cache_by[$index_by]))
+            || $force_refresh === true){
             require(MMRPG_CONFIG_CONTENT_PATH.'index.php');
             foreach ($content_types_index AS $content_token => $content_info){
                 if (empty($content_info['content_path'])){ continue; }
                 $content_path = MMRPG_CONFIG_CONTENT_PATH.rtrim($content_info['content_path'], '/').'/';
+
+                // If we're only scanning for a certain key, skip all others
+                if (!empty($index_key)){
+                    if ($index_by === 'token' && $index_key !== $content_token){ continue; }
+                    elseif ($index_by === 'path' && $index_key !== $content_path){ continue; }
+                }
 
                 // Predefine arrays to hold all file statues
                 $cache_data = array();
@@ -350,19 +359,18 @@ class cms_admin {
 
                 // Add the completed array to the content cache
                 $content_cache[$content_token] = $cache_data;
-                $content_cache_by_token[$content_token] = &$content_cache[$content_token];
-                $content_cache_by_path[$content_path] = &$content_cache[$content_token];
+                $content_cache_by['token'][$content_token] = &$content_cache[$content_token];
+                $content_cache_by['path'][$content_path] = &$content_cache[$content_token];
 
             }
         }
-        if ($index_by === 'token'){ return $content_cache_by_token; }
-        elseif ($index_by === 'path'){ return $content_cache_by_path; }
+        if (isset($content_cache_by[$index_by])){ return $content_cache_by[$index_by]; }
         else { return $content_cache; }
     }
 
     // Define a function for collecting the content cache for a given token, path, etc.
     public static function git_content_cache($index_by = 'token', $index_key = '', $index_subkey = ''){
-        $indexed_content_cache = self::git_scan_content_directories($index_by);
+        $indexed_content_cache = self::git_scan_content_directories($index_by, $index_key);
         $this_content_cache = !empty($indexed_content_cache[$index_key]) ? $indexed_content_cache[$index_key] : array();
         if (!empty($index_subkey)){ return !empty($this_content_cache[$index_subkey]) ? $this_content_cache[$index_subkey] : array(); }
         else { return $this_content_cache; }
@@ -386,7 +394,8 @@ class cms_admin {
         if (!isset($index[$repo_base_path])){
             $unstaged = self::git_get_unstaged($repo_base_path);
             $untracked = self::git_get_untracked($repo_base_path);
-            $changes = array_merge($unstaged, $untracked);
+            $deleted = self::git_get_deleted($repo_base_path);
+            $changes = array_merge($unstaged, $untracked, $deleted);
             $index[$repo_base_path] = $changes;
         } else {
             $changes = $index[$repo_base_path];
