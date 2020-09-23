@@ -957,7 +957,7 @@ class cms_admin {
 
         // Again, if this is a page request, we need to compare and update html files separately
         if ($object_kind === 'page'){
-            if (empty($old_html_content) || !arrays_match($old_html_content, $new_html_content)){
+            if (empty($old_html_content) || (trim($old_html_content) !== trim($new_html_content))){
                 if (file_exists($html_content_full_path)){ unlink($html_content_full_path); }
                 if (!file_exists(dirname($html_content_full_path))){ mkdir(dirname($html_content_full_path)); }
                 $h = fopen($html_content_full_path, 'w');
