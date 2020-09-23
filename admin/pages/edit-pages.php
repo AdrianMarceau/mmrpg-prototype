@@ -42,8 +42,8 @@
     /* -- Form Setup Actions -- */
 
     // Define a function for exiting a page edit action
-    function exit_page_edit_action($page_id = 0){
-        if (!empty($page_id)){ $location = 'admin/edit-pages/editor/page_id='.$page_id; }
+    function exit_page_edit_action($page_id = false){
+        if ($page_id !== false){ $location = 'admin/edit-pages/editor/page_id='.$page_id; }
         else { $location = 'admin/edit-pages/search/'; }
         redirect_form_action($location);
     }
@@ -59,13 +59,14 @@
 
     // If we're in delete mode, we need to remove some data
     $delete_data = array();
-    if (false && $sub_action == 'delete' && !empty($_GET['page_id'])){
+    if ($sub_action == 'delete' && !empty($_GET['page_id'])){
 
         // Collect form data for processing
         $delete_data['page_id'] = !empty($_GET['page_id']) && is_numeric($_GET['page_id']) ? trim($_GET['page_id']) : '';
 
         // Let's delete all of this page's data from the database
-        $db->delete('mmrpg_website_pages', array('page_id' => $delete_data['page_id']));
+        cms_admin::object_editor_delete_json_data_file('page', $delete_data['page_id']);
+        $db->delete('mmrpg_website_pages', array('page_id' => $delete_data['page_id'], 'page_flag_protected' => 0));
         $form_messages[] = array('success', 'The requested page has been deleted from the database');
         exit_form_action('success');
 
@@ -204,9 +205,10 @@
 
     // If we're in editor mode, we should collect page info from database
     $page_data = array();
+    $page_data_is_new = false;
     $editor_data = array();
     if ($sub_action == 'editor'
-        && !empty($_GET['page_id'])){
+        && isset($_GET['page_id'])){
 
         // Collect form data for processing
         $editor_data['page_id'] = !empty($_GET['page_id']) && is_numeric($_GET['page_id']) ? trim($_GET['page_id']) : '';
@@ -214,15 +216,61 @@
         /* -- Collect Page Data -- */
 
         // Collect page details from the database
-        $temp_page_fields = cms_website_page::get_fields(true);
-        $page_data = $db->get_array("SELECT {$temp_page_fields} FROM mmrpg_website_pages WHERE page_id = {$editor_data['page_id']};");
+        $temp_page_fields = cms_website_page::get_index_fields(true);
+        if (!empty($editor_data['page_id'])){
+            $page_data = $db->get_array("SELECT {$temp_page_fields} FROM mmrpg_website_pages WHERE page_id = {$editor_data['page_id']};");
+        } else {
+
+            // Generate temp data structure for the new challenge
+            $page_data_is_new = true;
+            $admin_id = $_SESSION['admin_id'];
+            $page_data = array(
+                'parent_id' => 0,
+                'page_id' => 0,
+                'page_token' => '',
+                'page_name' => '',
+                'page_url' => '',
+                'page_title' => '',
+                'page_content' => '',
+                'page_seo_title' => '',
+                'page_seo_keywords' => '',
+                'page_seo_description' => '',
+                'page_date_created' => time(),
+                'page_date_modified' => 0,
+                'page_flag_hidden' => 0,
+                'page_flag_published' => 0,
+                'page_flag_protected' => 0,
+                'page_order' => 0
+                );
+
+            // Pre-populate the new page with sample code
+            $page_data['page_content'] .= '<h2 class="subheader field_type_<!-- MMRPG_CURRENT_FIELD_TYPE -->">My Sub Header</h2>'.PHP_EOL;
+            $page_data['page_content'] .= '<div class="subbody">'.PHP_EOL;
+            $page_data['page_content'] .= PHP_EOL;
+            $page_data['page_content'] .= '  <p>My page content.</p>'.PHP_EOL;
+            $page_data['page_content'] .= PHP_EOL;
+            $page_data['page_content'] .= '</div>'.PHP_EOL;
+
+            // Pre-populate the order as next-in-line
+            $max_page_order = $db->get_value("SELECT MAX(page_order) AS max FROM mmrpg_website_pages;", 'max');
+            $page_data['page_order'] = $max_page_order + 1;
+
+            // Overwrite temp data with any backup data provided
+            if (!empty($backup_form_data)){
+                foreach ($backup_form_data AS $f => $v){
+                    $page_data[$f] = $v;
+                }
+            }
+
+        }
 
         // If page data could not be found, produce error and exit
         if (empty($page_data)){ exit_page_edit_action(); }
 
         // Collect the page's name(s) for display
         $page_name_display = $page_data['page_name'];
-        $this_page_tabtitle = $page_name_display.' | '.$this_page_tabtitle;
+        if ($page_data_is_new){ $this_page_tabtitle = 'New Page | '.$this_page_tabtitle; }
+        else { $this_page_tabtitle = $page_name_display.' | '.$this_page_tabtitle; }
 
         // If form data has been submit for this page, we should process it
         $form_data = array();
@@ -232,8 +280,8 @@
 
             // Collect form data from the request and parse out simple rules
 
-            $form_data['page_id'] = !empty($_POST['page_id']) && is_numeric($_POST['page_id']) ? trim($_POST['page_id']) : 0;
-            $form_data['parent_id'] = !empty($_POST['parent_id']) && is_numeric($_POST['parent_id']) ? trim($_POST['parent_id']) : 0;
+            $form_data['page_id'] = !empty($_POST['page_id']) && is_numeric($_POST['page_id']) ? (int)(trim($_POST['page_id'])) : 0;
+            $form_data['parent_id'] = !empty($_POST['parent_id']) && is_numeric($_POST['parent_id']) ? (int)(trim($_POST['parent_id'])) : 0;
 
             $form_data['page_token'] = !empty($_POST['page_token']) && preg_match('/^[-_0-9a-z\.]+$/i', $_POST['page_token']) ? trim(strtolower($_POST['page_token'])) : '';
             //$form_data['page_url'] = !empty($_POST['page_url']) && preg_match('/^[-_0-9a-z\.\/]+$/i', $_POST['page_url']) ? trim(strtolower($_POST['page_url'])) : '';
@@ -254,7 +302,7 @@
             //$form_messages[] = array('alert', '<pre>$_POST = '.print_r($_POST, true).'</pre>');
 
             // If the required USER ID field was empty, complete form failure
-            if (empty($form_data['page_id'])){
+            if (!$page_data_is_new && empty($form_data['page_id'])){
                 $form_messages[] = array('error', 'Page ID was not provided');
                 $form_success = false;
             }
@@ -312,17 +360,41 @@
 
             // Loop through fields to create an update string
             $update_data = $form_data;
+            if ($page_data_is_new){ $update_data['page_date_created'] = time(); }
             $update_data['page_date_modified'] = time();
             unset($update_data['page_id']);
-            $update_results = $db->update('mmrpg_website_pages', $update_data, array('page_id' => $form_data['page_id']));
 
             // DEBUG
             //$form_messages[] = array('alert', '<pre>$form_data = '.print_r($form_data, true).'</pre>');
             //$form_messages[] = array('alert', '<pre>$update_data = '.print_r($update_data, true).'</pre>');
 
-            // If we made it this far, the update must have been a success
-            if ($update_results !== false){ $form_messages[] = array('success', 'Page details were updated successfully'); }
-            else { $form_messages[] = array('error', 'Page details could not be updated'); }
+            // If this is a new page we insert, otherwise we update the existing
+            if ($page_data_is_new){
+
+                // Update the main database index with changes to this page's data
+                $update_data['page_flag_protected'] = 0;
+                $insert_results = $db->insert('mmrpg_website_pages', $update_data);
+
+                // If we made it this far, the update must have been a success
+                if ($insert_results !== false){ $form_success = true; $form_messages[] = array('success', 'Page data was created successfully!'); }
+                else { $form_success = false; $form_messages[] = array('error', 'Page data could not be created...'); }
+
+                // If the form was a success, collect the new ID and redirect
+                if ($form_success){
+                    $new_page_id = $db->get_value("SELECT MAX(page_id) AS max FROM mmrpg_website_pages;", 'max');
+                    $form_data['page_id'] = $new_page_id;
+                }
+
+            } else {
+
+                // Update the main database index with changes to this page's data
+                $update_results = $db->update('mmrpg_website_pages', $update_data, array('page_id' => $form_data['page_id']));
+
+                // If we made it this far, the update must have been a success
+                if ($update_results !== false){ $form_success = true; $form_messages[] = array('success', 'Page data was updated successfully!'); }
+                else { $form_success = false; $form_messages[] = array('error', 'Page data could not be updated...'); }
+
+            }
 
             // Update cache timestamp if changes were successful
             if ($form_success){
@@ -332,28 +404,30 @@
             }
 
             // If successful, we need to update the JSON and HTML files
-            if ($form_success){ cms_admin::object_editor_update_json_data_file('page', array_merge($page_data, $update_data), 'page_date_modified'); }
+            if ($form_success){
+                if ($page_data_is_new){ $page_data['page_id'] = $new_page_id; }
+                cms_admin::object_editor_update_json_data_file('page', array_merge($page_data, $update_data), 'page_date_modified');
+            }
 
             // We're done processing the form, we can exit
-            exit_page_edit_action($form_data['page_id']);
+            if (empty($form_data['page_id'])){ exit_page_edit_action(false); }
+            else { exit_page_edit_action($form_data['page_id']); }
 
             //echo('<pre>$form_action = '.print_r($form_action, true).'</pre>');
             //echo('<pre>$_POST = '.print_r($_POST, true).'</pre>');
             //exit();
 
-
         }
 
     }
-
 
     ?>
 
     <div class="breadcrumb">
         <a href="admin/">Admin Panel</a>
-        &raquo; <a href="admin/edit-pages/">Edit Pages</a>
+        &raquo; <a href="admin/edit-pages/">Edit Website Pages</a>
         <? if ($sub_action == 'editor' && !empty($page_data)): ?>
-            &raquo; <a href="admin/edit-pages/editor/page_id=<?= $page_data['page_id'] ?>"><?= $page_name_display ?></a>
+            &raquo; <a href="admin/edit-pages/editor/page_id=<?= $page_data['page_id'] ?>"><?= !empty($page_name_display) ? $page_name_display : 'Create New' ?></a>
         <? endif; ?>
     </div>
 
@@ -427,8 +501,9 @@
                     </div>
 
                     <div class="buttons">
-                        <input class="button" type="submit" value="Search" />
-                        <input class="button" type="reset" value="Reset" onclick="javascript:window.location.href='admin/edit-pages/';" />
+                        <input class="button search" type="submit" value="Search" />
+                        <input class="button reset" type="reset" value="Reset" onclick="javascript:window.location.href='<?= 'admin/edit-pages/' ?>';" />
+                        <a class="button new" href="<?= 'admin/edit-pages/editor/page_id=0' ?>">Create New Page</a>
                     </div>
 
                 </form>
@@ -579,7 +654,8 @@
         <? endif; ?>
 
         <? if ($sub_action == 'editor'
-            && !empty($_GET['page_id'])){
+                && isset($_GET['page_id'])
+                ){
 
             // Capture editor markup in a buffer in case we need to modify
             if (true){
@@ -591,7 +667,7 @@
                 <div class="editor">
 
                     <h3 class="header">
-                        <span class="title">Edit Page &quot;<?= $page_name_display ?>&quot;</span>
+                        <span class="title"><?= !empty($page_name_display) ? 'Editing &quot;'.$page_name_display.'&quot;' : 'New Page' ?></span>
                         <?
 
                         // Print out any git-related statues to this header
@@ -608,10 +684,12 @@
 
                     <? print_form_messages() ?>
 
-                    <div class="editor-tabs" data-tabgroup="page">
-                        <a class="tab active" data-tab="basic">Basic</a><span></span>
-                        <a class="tab" data-tab="seo">SEO</a><span></span>
-                    </div>
+                    <? if (!$page_data_is_new){ ?>
+                        <div class="editor-tabs" data-tabgroup="page">
+                            <a class="tab active" data-tab="basic">Basic</a><span></span>
+                            <a class="tab" data-tab="seo">SEO</a><span></span>
+                        </div>
+                    <? } ?>
 
                     <form class="form" method="post">
 
@@ -629,15 +707,21 @@
                                 </div>
 
                                 <div class="field halfsize">
-                                    <strong class="label">Page Token</strong>
+                                    <div class="label">
+                                        <strong>Page Token</strong>
+                                        <?= !empty($page_data['page_flag_locked']) ? '<em>page structure is locked</em>' : '' ?>
+                                    </div>
                                     <input type="hidden" name="page_token" value="<?= $page_data['page_token'] ?>" />
-                                    <input class="textbox" type="text" name="page_token" value="<?= $page_data['page_token'] ?>" maxlength="64" disabled="disabled" />
+                                    <input class="textbox" type="text" name="page_token" value="<?= $page_data['page_token'] ?>" maxlength="64" <?= !empty($page_data['page_flag_locked']) ? 'disabled="disabled"' : '' ?> />
                                 </div>
 
                                 <div class="field halfsize">
-                                    <strong class="label">Page Parent</strong>
+                                    <div class="label">
+                                        <strong>Page Parent</strong>
+                                        <?= !empty($page_data['page_flag_locked']) ? '<em>page structure is locked</em>' : '' ?>
+                                    </div>
                                     <input type="hidden" name="parent_id" value="<?= $page_data['parent_id'] ?>" />
-                                    <select class="select" name="parent_id" disabled="disabled">
+                                    <select class="select" name="parent_id" <?= !empty($page_data['page_flag_locked']) ? 'disabled="disabled"' : '' ?>>
                                         <option value="0" <?= empty($page_data['parent_id']) ? 'selected="selected"' : '' ?>>-</option>
                                         <? foreach ($mmrpg_website_pages_index AS $key => $parent_data){
                                             if (!empty($parent_data['parent_id'])){ continue; }
@@ -698,33 +782,35 @@
 
                             </div>
 
-                            <div class="panel" data-tab="seo">
+                            <? if (!$page_data_is_new){ ?>
+                                <div class="panel" data-tab="seo">
 
-                                <div class="field fullsize">
-                                    <div class="label">
-                                        <strong>Page SEO Title</strong>
-                                        <em>page title used by search engines</em>
+                                    <div class="field fullsize">
+                                        <div class="label">
+                                            <strong>Page SEO Title</strong>
+                                            <em>page title used by search engines</em>
+                                        </div>
+                                        <input class="textbox" type="text" name="page_seo_title" value="<?= $page_data['page_seo_title'] ?>" maxlength="64" />
                                     </div>
-                                    <input class="textbox" type="text" name="page_seo_title" value="<?= $page_data['page_seo_title'] ?>" maxlength="64" />
-                                </div>
 
-                                <div class="field fullsize">
-                                    <div class="label">
-                                        <strong>Page SEO Keywords</strong>
-                                        <em>page keywords considered by search engines</em>
+                                    <div class="field fullsize">
+                                        <div class="label">
+                                            <strong>Page SEO Keywords</strong>
+                                            <em>page keywords considered by search engines</em>
+                                        </div>
+                                        <input class="textbox" type="text" name="page_seo_keywords" value="<?= $page_data['page_seo_keywords'] ?>" maxlength="128" />
                                     </div>
-                                    <input class="textbox" type="text" name="page_seo_keywords" value="<?= $page_data['page_seo_keywords'] ?>" maxlength="128" />
-                                </div>
 
-                                <div class="field fullsize">
-                                    <div class="label">
-                                        <strong>Page SEO Description</strong>
-                                        <em>page description displayed in search engine results</em>
+                                    <div class="field fullsize">
+                                        <div class="label">
+                                            <strong>Page SEO Description</strong>
+                                            <em>page description displayed in search engine results</em>
+                                        </div>
+                                        <textarea class="textarea" name="page_seo_description" rows="3" maxlength="256"><?= htmlentities($page_data['page_seo_description'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
                                     </div>
-                                    <textarea class="textarea" name="page_seo_description" rows="3" maxlength="256"><?= htmlentities($page_data['page_seo_description'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
-                                </div>
 
-                            </div>
+                                </div>
+                            <? } ?>
 
                         </div>
 
@@ -765,17 +851,21 @@
                         <div class="formfoot">
 
                             <div class="buttons">
-                                <input class="button save" type="submit" value="Save Changes" />
-                                <? if (empty($page_data['page_flag_protected'])){ ?>
+                                <input class="button save" type="submit" value="<?= $page_data_is_new ? 'Create Page' : 'Save Changes' ?>" />
+                                <? if (!$page_data_is_new && empty($page_data['page_flag_protected'])){ ?>
                                     <input class="button delete" type="button" value="Delete Page" data-delete="pages" data-page-id="<?= $page_data['page_id'] ?>" />
                                 <? } ?>
                             </div>
-                            <?= cms_admin::object_editor_print_git_footer_buttons('pages', cms_admin::git_get_url_token('page', $page_data['page_url']), $mmrpg_git_file_arrays) ?>
+                            <? if (!$page_data_is_new){ ?>
+                                <?= cms_admin::object_editor_print_git_footer_buttons('pages', cms_admin::git_get_url_token('page', $page_data['page_url']), $mmrpg_git_file_arrays) ?>
+                            <? } ?>
 
-                            <div class="metadata">
-                                <div class="date"><strong>Created</strong>: <?= !empty($page_data['page_date_created']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $page_data['page_date_created'])): '-' ?></div>
-                                <div class="date"><strong>Modified</strong>: <?= !empty($page_data['page_date_modified']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $page_data['page_date_modified'])) : '-' ?></div>
-                            </div>
+                            <? if (!$page_data_is_new){ ?>
+                                <div class="metadata">
+                                    <div class="date"><strong>Created</strong>: <?= !empty($page_data['page_date_created']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $page_data['page_date_created'])): '-' ?></div>
+                                    <div class="date"><strong>Modified</strong>: <?= !empty($page_data['page_date_modified']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $page_data['page_date_modified'])) : '-' ?></div>
+                                </div>
+                            <? } ?>
 
                         </div>
 

@@ -48,13 +48,25 @@ $(document).ready(function(){
         // Define the object label and ID based on kind
         var deleteObject = 'object';
         if (deleteKind == 'users'){
+
             // If we're deleting USERS set up the vars
             deleteObject = 'user';
             deleteID = deleteLink.attr('data-user-id');
             if (typeof deleteID == 'undefined'){ return false; }
             deleteID = parseInt(deleteID);
             if (deleteID == 0){ return false; }
+
+            } else if (deleteKind == 'pages'){
+
+            // If we're deleting PAGES set up the vars
+            deleteObject = 'page';
+            deleteID = deleteLink.attr('data-page-id');
+            if (typeof deleteID == 'undefined'){ return false; }
+            deleteID = parseInt(deleteID);
+            if (deleteID == 0){ return false; }
+
             } else if (deleteKind == 'challenges'){
+
             // If we're deleting CHALLENGES set up the vars
             deleteObject = 'challenge';
             deleteID = deleteLink.attr('data-challenge-id');
@@ -64,16 +76,21 @@ $(document).ready(function(){
             deleteObject = deleteSubKind+' '+deleteObject;
             deleteID = parseInt(deleteID);
             if (deleteID == 0){ return false; }
+
             } else if (deleteKind == 'stars'){
+
             // If we're deleting STARS set up the vars
             deleteObject = 'star';
             deleteID = deleteLink.attr('data-star-id');
             if (typeof deleteID == 'undefined'){ return false; }
             deleteID = parseInt(deleteID);
             if (deleteID == 0){ return false; }
+
             } else {
+
             //console.log('unknown delete entity?');
             return false;
+
             }
 
         // Parse the confirm text and prompt the user
@@ -86,6 +103,8 @@ $(document).ready(function(){
             var postURL = '';
             if (deleteKind == 'users'){
                 postURL = 'admin/edit-users/delete/user_id='+deleteID;
+                } else if (deleteKind == 'pages'){
+                postURL = 'admin/edit-pages/delete/page_id='+deleteID;
                 } else if (deleteKind == 'challenges'){
                 postURL = 'admin/edit-'+deleteSubKind+'-challenges/delete/challenge_id='+deleteID;
                 } else if (deleteKind == 'stars'){

@@ -562,6 +562,7 @@
             if ($challenge_data_is_new){
 
                 // Update the main database index with changes to this challenge's data
+                $update_data['challenge_flag_protected'] = 0;
                 $insert_results = $db->insert($this_challenge_table, $update_data);
 
                 // If we made it this far, the update must have been a success
