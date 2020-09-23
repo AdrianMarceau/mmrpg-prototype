@@ -254,6 +254,102 @@ class cms_website_page {
         return $page_info;
     }
 
+    /**
+     * Collect an array of items to be displayed on the front-end navbar
+     * @return array
+     */
+    public static function get_frontend_menu_links(){
+        global $db;
+
+        // Collect an array of published, non-hidden pages for the navbar
+        $raw_pages_array = $db->get_array_list("SELECT
+            pages.parent_id,
+            pages.page_id,
+            pages.page_token,
+            pages.page_name,
+            pages.page_url,
+            pages.page_flag_hidden,
+            pages.page_flag_published,
+            pages.page_order,
+            (CASE
+                WHEN pages2.page_order IS NOT NULL
+                    THEN CONCAT(pages2.page_order, '_', pages.page_order)
+                ELSE pages.page_order
+            END) AS page_rel_order
+            FROM mmrpg_website_pages AS pages
+            LEFT JOIN mmrpg_website_pages AS pages2 ON pages2.page_id = pages.parent_id
+            WHERE 1=1
+            AND pages.page_id <> 0
+            AND pages.page_flag_published = 1
+            AND pages.page_flag_hidden = 0
+            ORDER BY page_rel_order ASC
+            ", 'page_id');
+
+        // Loop through above pages and sort into a more structured array
+        $main_menu_links = array();
+        if (!empty($raw_pages_array)){
+            foreach ($raw_pages_array AS $raw_key => $raw_data){
+                $page_token = $raw_data['page_token'];
+                $page_data = array();
+                $page_data['name'] = $raw_data['page_name'];
+                $page_data['url'] = $page_token !== 'home' ? $raw_data['page_url'] : '/';
+                if (empty($raw_data['parent_id'])){
+                    $main_menu_links[$page_token] = $page_data;
+                } else {
+                    $raw_parent_data = $raw_pages_array[$raw_data['parent_id']];
+                    $parent_token = $raw_parent_data['page_token'];
+                    if (!isset($main_menu_links[$parent_token]['subs'])){ $main_menu_links[$parent_token]['subs'] = array(); }
+                    $main_menu_links[$parent_token]['subs'][$page_token] = $page_data;
+                }
+            }
+        }
+
+        // If the "community" page exists, make sure we show/hide appropriate subs based on login status
+        if (!empty($main_menu_links['community'])){
+            if (!isset($main_menu_links['community']['subs'])){ $main_menu_links['community']['subs'] = array(); }
+            $old_subs_list = $main_menu_links['community']['subs'];
+            $new_subs_list = array();
+            $is_guest = rpg_user::is_guest();
+            $this_userinfo = rpg_user::get_current_userinfo();
+            $this_categories_index = mmrpg_website_community_index();
+            $temp_new_threads = !empty($_SESSION['COMMUNITY']['threads_new']) ? $_SESSION['COMMUNITY']['threads_new'] : array();
+            $temp_new_threads_categories = !empty($_SESSION['COMMUNITY']['threads_new_categories']) ? $_SESSION['COMMUNITY']['threads_new_categories'] : array();
+            if (!empty($this_categories_index)){
+                foreach ($this_categories_index AS $temp_token => $temp_category){
+                    $temp_id = $temp_category['category_id'];
+                    if (($temp_id == 0) && $is_guest){ continue; }
+                    if ($temp_token == 'personal' && ($is_guest || empty($this_userinfo['user_flag_postprivate']))){ continue; }
+                    $temp_update_count = !empty($temp_new_threads_categories[$temp_id]) ? $temp_new_threads_categories[$temp_id] : 0;
+                    $temp_viewing_list = $temp_token != 'personal' ? mmrpg_website_sessions_active('community/'.$temp_category['category_token'].'/', 3, true) : array();
+                    if ($temp_token == 'chat' && !empty($chat_online)){ $temp_viewing_list = $chat_online; }
+                    $temp_viewing_count = !empty($temp_viewing_list) ? count($temp_viewing_list) : 0;
+                    $after = '';
+                    if ($temp_update_count > 0){ $after .= '<sup class="sup field_type field_type_electric" title="'.($temp_update_count == 1 ? '1 Updated Thread' : $temp_update_count.' Updated Threads').'">'.$temp_update_count.'</sup>'; }
+                    if ($temp_viewing_count > 0){ $after .= '<sup class="sup field_type field_type_nature" title="'.($temp_viewing_count == 1 ? '1 Member Viewing' : $temp_viewing_count.' Members Viewing').'" style="'.($temp_viewing_count > 0 ? 'margin-left: -3px;' : '').'">'.$temp_viewing_count.'</sup>'; }
+                    $sub_link = array('name' => ucfirst($temp_token), 'after' => $after);
+                    if (isset($old_subs_list[$temp_token])){ $sub_link = array_merge($old_subs_list[$temp_token], $sub_link); }
+                    $new_subs_list[$temp_token] = $sub_link;
+                }
+            }
+            $main_menu_links['community']['subs'] = $new_subs_list;
+        }
+
+        // Loop through and add an "overview" link for any parent's with sub-pages (where applicable)
+        $skip_pages = array('community');
+        foreach ($main_menu_links AS $page_token => $page_data){
+            if (in_array($page_token, $skip_pages)){ continue; }
+            elseif (!empty($page_data['subs'])){
+                $old_subs_list = $page_data['subs'];
+                $new_subs_list = array('overview' => array('name' => 'Overview', 'url' => $page_data['url']));
+                $main_menu_links[$page_token]['subs'] = array_merge($new_subs_list, $old_subs_list);
+            }
+        }
+
+        // Return the parsed menu links array
+        return $main_menu_links;
+
+    }
+
 
 }
 ?>

@@ -408,6 +408,21 @@ class rpg_user {
 
     }
 
+    /**
+     * Define a function for getting the current USER INFO, returning empty if not exists
+     * @return bool
+     */
+    public static function get_current_userinfo(){
+
+        // Check if there is a logged in session user
+        if (!empty($_SESSION['GAME']['USER']['userinfo'])){
+            return $_SESSION['GAME']['USER']['userinfo'];
+        } else {
+            return array();
+        }
+
+    }
+
 
 }
 ?>

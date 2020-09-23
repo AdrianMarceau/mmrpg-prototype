@@ -102,35 +102,8 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
     // Start the output buffer to collect content
     ob_start();
 
-    // Define the basic array of pages to show in the main menu (we'll do more subs later)
-    $main_menu_links = array();
-    $main_menu_links['home'] = array('name' => 'Home', 'url' => '/');
-    $main_menu_links['about'] = array('name' => 'About');
-    $main_menu_links['gallery'] = array('name' => 'Gallery');
-    $main_menu_links['database'] = array('name' => 'Database');
-    if (rpg_game::is_user()){ $main_menu_links['prototype'] = array('name' => 'Play the Prototype', 'target' => '_blank'); }
-    $main_menu_links['community'] = array('name' => 'Community');
-    $main_menu_links['leaderboard'] = array('name' => 'Leaderboard');
-    $main_menu_links['credits'] = array('name' => 'Credits');
-    //$main_menu_links['contact'] = array('name' => 'Contact');
-
-    // Hard-code some sub-pages we know about beforehand
-    $database_subs = array();
-    $database_subs['home'] = array('name' => 'Overview');
-    $database_subs['players'] = array('name' => 'Players');
-    $database_subs['robots'] = array('name' => 'Robots');
-    $database_subs['mechas'] = array('name' => 'Mechas');
-    $database_subs['bosses'] = array('name' => 'Bosses');
-    $database_subs['abilities'] = array('name' => 'Abilities');
-    $database_subs['items'] = array('name' => 'Items');
-    $database_subs['fields'] = array('name' => 'Fields');
-    $database_subs['types'] = array('name' => 'Types');
-    $main_menu_links['database']['subs'] = $database_subs;
-
-    // Hard-code some sub-pages we know about beforehand
-    $community_subs = array();
-    //$community_subs['home'] = array('name' => 'Overview');
-    $main_menu_links['community']['subs'] = $community_subs;
+    // Collect the main menu links from the database to be displayed below
+    $main_menu_links = cms_website_page::get_frontend_menu_links();
 
     ?>
     <ul class="main">
@@ -142,7 +115,7 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
 
             // Collect basic info about this link
             $name = !empty($parent_info['name']) ? $parent_info['name'] : ucfirst($parent_token);
-            $url = !empty($parent_info['url']) ? MMRPG_CONFIG_ROOTURL.ltrim($parent_info['url'], '/') : $parent_token.'/';
+            $url = !empty($parent_info['url']) ? $parent_info['url'] : $parent_token.'/';
             $target = !empty($parent_info['target']) ? $parent_info['target'] : '_self';
             $active = $this_current_page == $parent_token ? true : false;
             $before = !empty($parent_info['before']) ? $parent_info['before'] : '';
@@ -187,28 +160,6 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
                 </a>
                 <?
 
-                // If this the COMMUNITY link, dynamically collect sub-pages
-                if ($parent_token == 'community'){
-                    // Loop through the community index and print out links
-                    $this_categories_index = mmrpg_website_community_index();
-                    if (!empty($this_categories_index)){
-                        foreach ($this_categories_index AS $temp_token => $temp_category){
-                            $temp_id = $temp_category['category_id'];
-                            if (($temp_id == 0) && $this_userid == MMRPG_SETTINGS_GUEST_ID){ continue; }
-                            if (($temp_token == 'personal' || $temp_token == 'chat') && empty($this_userinfo['user_flag_postprivate'])){ continue; }
-                            $temp_update_count = !empty($temp_new_threads_categories[$temp_id]) ? $temp_new_threads_categories[$temp_id] : 0;
-                            $temp_viewing_list = $temp_token != 'personal' ? mmrpg_website_sessions_active('community/'.$temp_category['category_token'].'/', 3, true) : array();
-                            if ($temp_token == 'chat' && !empty($chat_online)){ $temp_viewing_list = $chat_online; }
-                            $temp_viewing_count = !empty($temp_viewing_list) ? count($temp_viewing_list) : 0;
-                            $after = '';
-                            if ($temp_update_count > 0){ $after .= '<sup class="sup field_type field_type_electric" title="'.($temp_update_count == 1 ? '1 Updated Thread' : $temp_update_count.' Updated Threads').'">'.$temp_update_count.'</sup>'; }
-                            if ($temp_viewing_count > 0){ $after .= '<sup class="sup field_type field_type_nature" title="'.($temp_viewing_count == 1 ? '1 Member Viewing' : $temp_viewing_count.' Members Viewing').'" style="'.($temp_viewing_count > 0 ? 'margin-left: -3px;' : '').'">'.$temp_viewing_count.'</sup>'; }
-                            $sub_link = array('name' => ucfirst($temp_token), 'after' => $after);
-                            $sub_menu_links[$temp_token] = $sub_link;
-                        }
-                    }
-                }
-
                 // If there were sub-pages to display, loop through and generate markup
                 if (!empty($sub_menu_links)){
                     $base_url = $url;
@@ -220,7 +171,7 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
 
                             // Collect basic info about this link
                             $name = !empty($sub_info['name']) ? $sub_info['name'] : ucfirst($sub_token);
-                            $url = !empty($sub_info['url']) ? MMRPG_CONFIG_ROOTURL.ltrim($sub_info['url'], '/') : $base_url.($sub_token != 'home' ? $sub_token.'/' : '');
+                            $url = !empty($sub_info['url']) ? $sub_info['url'] : $parent_token.'/'.$sub_token.'/';
                             $target = !empty($sub_info['target']) ? $sub_info['target'] : '_self';
                             $before = !empty($sub_info['before']) ? $sub_info['before'] : '';
                             $after = !empty($sub_info['after']) ? $sub_info['after'] : '';
