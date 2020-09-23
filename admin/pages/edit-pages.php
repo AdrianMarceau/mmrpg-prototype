@@ -104,31 +104,18 @@
         /* -- Collect Search Results -- */
 
         // Define the search query to use
+        $temp_page_fields = cms_website_page::get_index_fields(true, 'pages');
         $search_query = "SELECT
-            page.parent_id,
-            page.page_id,
-            page.page_token,
-            page.page_name,
-            page.page_url,
-            page.page_title,
-            page.page_content,
-            page.page_seo_title,
-            page.page_seo_description,
-            page.page_seo_keywords,
-            page.page_date_created,
-            page.page_date_modified,
-            page.page_flag_hidden,
-            page.page_flag_published,
-            page.page_order,
+            {$temp_page_fields},
             (CASE
-                WHEN page2.page_order IS NOT NULL
-                    THEN CONCAT(page2.page_order, '_', page.page_order)
-                ELSE page.page_order
+                WHEN pages2.page_order IS NOT NULL
+                    THEN CONCAT(pages2.page_order, '_', pages.page_order)
+                ELSE pages.page_order
             END) AS page_rel_order
-            FROM mmrpg_website_pages AS page
-            LEFT JOIN mmrpg_website_pages AS page2 ON page2.page_id = page.parent_id
+            FROM mmrpg_website_pages AS pages
+            LEFT JOIN mmrpg_website_pages AS pages2 ON pages2.page_id = pages.parent_id
             WHERE 1=1
-            AND page.page_id <> 0
+            AND pages.page_id <> 0
             ";
 
         // If the page ID was provided, we can search by exact match
@@ -543,8 +530,9 @@
 
                                 $page_actions = '';
                                 $page_actions .= '<a class="link edit" href="'.$page_edit.'"><span>edit</span></a>';
-                                $page_actions .= '<span class="link delete disabled"><span>delete</span></span>';
-                                //$page_actions .= '<a class="link delete" data-delete="pages" data-page-id="'.$page_id.'"><span>delete</span></a>';
+                                if (empty($page_data['page_flag_protected'])){
+                                    $page_actions .= '<a class="link delete" data-delete="pages" data-page-id="'.$page_id.'"><span>delete</span></a>';
+                                }
 
                                 //$page_name = '<a class="link" href="'.$page_edit.'">'.$page_name_display.'</a>';
                                 $page_name_link = '<a class="link" href="'.$page_edit.'">'.$page_name.'</a>';
@@ -778,10 +766,9 @@
 
                             <div class="buttons">
                                 <input class="button save" type="submit" value="Save Changes" />
-                                <? /*
-                                <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin/edit-pages/editor/page_id=<?= $page_data['page_id'] ?>';" />
-                                <input class="button delete" type="button" value="Delete Page" data-delete="pages" data-page-id="<?= $page_data['page_id'] ?>" />
-                                */ ?>
+                                <? if (empty($page_data['page_flag_protected'])){ ?>
+                                    <input class="button delete" type="button" value="Delete Page" data-delete="pages" data-page-id="<?= $page_data['page_id'] ?>" />
+                                <? } ?>
                             </div>
                             <?= cms_admin::object_editor_print_git_footer_buttons('pages', cms_admin::git_get_url_token('page', $page_data['page_url']), $mmrpg_git_file_arrays) ?>
 

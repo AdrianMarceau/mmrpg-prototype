@@ -44,6 +44,7 @@ class cms_website_page {
             'page_date_modified',
             'page_flag_hidden',
             'page_flag_published',
+            'page_flag_protected',
             'page_order'
             );
 
