@@ -668,7 +668,7 @@
                 <div class="editor">
 
                     <h3 class="header type_span type_<?= !empty($star_data['star_type']) ? $star_data['star_type'] : 'none' ?>" data-auto="field-type" data-field-type="star_type">
-                        <span class="title"><?= !empty($star_name_display) ? 'Editing &quot;'.$star_name_display.'&quot;' : 'Schedule New Star' ?></span>
+                        <span class="title"><?= !empty($star_name_display) ? 'Edit Star &quot;'.$star_name_display.'&quot;' : 'Schedule New Star' ?></span>
                         <?
                         // Print out any git-related statues to this header
                         cms_admin::object_editor_header_echo_git_statues(cms_admin::git_get_id_token('star', $star_data['star_id']), $mmrpg_git_file_arrays);

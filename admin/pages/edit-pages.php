@@ -667,7 +667,7 @@
                 <div class="editor">
 
                     <h3 class="header">
-                        <span class="title"><?= !empty($page_name_display) ? 'Editing &quot;'.$page_name_display.'&quot;' : 'New Page' ?></span>
+                        <span class="title"><?= !empty($page_name_display) ? 'Edit Page &quot;'.$page_name_display.'&quot;' : 'Create New Page' ?></span>
                         <?
 
                         // Print out any git-related statues to this header

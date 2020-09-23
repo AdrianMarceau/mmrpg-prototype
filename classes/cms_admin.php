@@ -1006,7 +1006,7 @@ class cms_admin {
         }
         if (!empty($encoded_sub_fields)){
             foreach ($encoded_sub_fields AS $sub_field_name){
-                $sub_field_value = $cleaned_json_data[$sub_field_name];
+                $sub_field_value = isset($cleaned_json_data[$sub_field_name]) ? $cleaned_json_data[$sub_field_name] : '';
                 if (!empty($sub_field_value)){ $sub_field_value = json_decode($sub_field_value, true); }
                 else { $sub_field_value = array(); }
                 $cleaned_json_data[$sub_field_name] = $sub_field_value;

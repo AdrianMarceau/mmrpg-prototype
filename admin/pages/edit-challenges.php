@@ -846,7 +846,7 @@
                 <div class="editor">
 
                     <h3 class="header type_span type_<?= !empty($challenge_data['challenge_core']) ? $challenge_data['challenge_core'].(!empty($challenge_data['challenge_core2']) ? '_'.$challenge_data['challenge_core2'] : '') : 'none' ?>" data-auto="field-type" data-field-type="challenge_core,challenge_core2">
-                        <span class="title"><?= !empty($challenge_name_display) ? 'Edit Challenge &quot;'.$challenge_name_display.'&quot;' : 'New Challenge' ?></span>
+                        <span class="title"><?= !empty($challenge_name_display) ? 'Edit Challenge &quot;'.$challenge_name_display.'&quot;' : 'Create New Challenge' ?></span>
                         <?
                         // Print out any git-related statues to this header
                         if ($this_challenge_kind === 'event'){ cms_admin::object_editor_header_echo_git_statues(cms_admin::git_get_id_token('challenge', $challenge_data['challenge_id']), $mmrpg_git_file_arrays); }
@@ -983,21 +983,33 @@
                                         <div class="field">
                                             <strong class="label">Field Background</strong>
                                             <select class="select" name="challenge_field_data[field_background]">
-                                                <?= str_replace('value="'.$challenge_field_data['field_background'].'"', 'value="'.$challenge_field_data['field_background'].'" selected="selected"', $field_options_markup) ?>
+                                                <? if (!empty($challenge_field_data)){ ?>
+                                                    <?= str_replace('value="'.$challenge_field_data['field_background'].'"', 'value="'.$challenge_field_data['field_background'].'" selected="selected"', $field_options_markup) ?>
+                                                <? } else { ?>
+                                                    <?= $field_options_markup ?>
+                                                <? } ?>
                                             </select><span></span>
                                         </div>
 
                                         <div class="field">
                                             <strong class="label">Field Foreground</strong>
                                             <select class="select" name="challenge_field_data[field_foreground]">
-                                                <?= str_replace('value="'.$challenge_field_data['field_foreground'].'"', 'value="'.$challenge_field_data['field_foreground'].'" selected="selected"', $field_options_markup) ?>
+                                                <? if (!empty($challenge_field_data)){ ?>
+                                                    <?= str_replace('value="'.$challenge_field_data['field_foreground'].'"', 'value="'.$challenge_field_data['field_foreground'].'" selected="selected"', $field_options_markup) ?>
+                                                <? } else { ?>
+                                                    <?= $field_options_markup ?>
+                                                <? } ?>
                                             </select><span></span>
                                         </div>
 
                                         <div class="field">
                                             <strong class="label">Field Music</strong>
                                             <select class="select" name="challenge_field_data[field_music]">
-                                                <?= str_replace('value="'.$challenge_field_data['field_music'].'"', 'value="'.$challenge_field_data['field_music'].'" selected="selected"', $music_options_markup) ?>
+                                                <? if (!empty($challenge_field_data)){ ?>
+                                                    <?= str_replace('value="'.$challenge_field_data['field_music'].'"', 'value="'.$challenge_field_data['field_music'].'" selected="selected"', $music_options_markup) ?>
+                                                <? } else { ?>
+                                                    <?= $field_options_markup ?>
+                                                <? } ?>
                                             </select><span></span>
                                         </div>
 
