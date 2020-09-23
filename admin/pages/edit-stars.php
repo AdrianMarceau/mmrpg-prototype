@@ -65,7 +65,7 @@
 
         // Let's delete all of this star's data from the database
         cms_admin::object_editor_delete_json_data_file('star', $delete_data['star_id']);
-        $db->delete('mmrpg_rogue_stars', array('star_id' => $delete_data['star_id']));
+        $db->delete('mmrpg_rogue_stars', array('star_id' => $delete_data['star_id'], 'star_flag_protected' => 0));
         $form_messages[] = array('success', 'The requested star has been deleted from the database');
         exit_form_action('success');
 
@@ -746,19 +746,14 @@
                         <div class="formfoot">
 
                             <div class="buttons">
-                                <input class="button save" type="submit" value="Save Changes" />
-                                <? if (empty($star_data['star_flag_protected'])){ ?>
+                                <input class="button save" type="submit" value="<?= $star_data_is_new ? 'Schedule Star' : 'Save Changes' ?>" />
+                                <? if (!$star_data_is_new && empty($star_data['star_flag_protected'])){ ?>
                                     <input class="button delete" type="button" value="Delete Star" data-delete="stars" data-star-id="<?= $star_data['star_id'] ?>" />
                                 <? } ?>
                             </div>
-                            <?= cms_admin::object_editor_print_git_footer_buttons('stars', cms_admin::git_get_id_token('star', $star_data['star_id']), $mmrpg_git_file_arrays) ?>
-
-                            <? /*
-                            <div class="metadata">
-                                <div class="date"><strong>Created</strong>: <?= !empty($star_data['star_date_created']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $star_data['star_date_created'])): '-' ?></div>
-                                <div class="date"><strong>Modified</strong>: <?= !empty($star_data['star_date_modified']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $star_data['star_date_modified'])) : '-' ?></div>
-                            </div>
-                            */ ?>
+                            <? if (!$star_data_is_new){ ?>
+                                <?= cms_admin::object_editor_print_git_footer_buttons('stars', cms_admin::git_get_id_token('star', $star_data['star_id']), $mmrpg_git_file_arrays) ?>
+                            <? } ?>
 
                         </div>
 

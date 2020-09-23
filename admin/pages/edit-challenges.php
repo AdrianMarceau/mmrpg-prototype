@@ -251,8 +251,8 @@
         $delete_data['challenge_id'] = !empty($_GET['challenge_id']) && is_numeric($_GET['challenge_id']) ? trim($_GET['challenge_id']) : '';
 
         // Let's delete all of this challenge's data from the database
-        $db->delete($this_challenge_table, array('challenge_id' => $delete_data['challenge_id']));
         cms_admin::object_editor_delete_json_data_file('challenge', $delete_data['challenge_id']);
+        $db->delete($this_challenge_table, array('challenge_id' => $delete_data['challenge_id'], 'challenge_flag_protected' => 0));
         $form_messages[] = array('success', 'The requested challenge has been deleted from the database');
         exit_form_action('success');
 
@@ -439,7 +439,6 @@
         $challenge_name_display = $challenge_data['challenge_name'];
         if ($challenge_data_is_new){ $this_page_tabtitle = 'New Challenge | '.$this_page_tabtitle; }
         else { $this_page_tabtitle = $challenge_name_display.' | '.$this_page_tabtitle; }
-
 
         // If form data has been submit for this challenge, we should process it
         $form_data = array();
@@ -1227,19 +1226,21 @@
                                 <div class="formfoot">
 
                                     <div class="buttons">
-                                        <input class="button save" type="submit" value="Save Changes" />
-                                        <? if (empty($challenge_data['challenge_flag_protected'])){ ?>
+                                        <input class="button save" type="submit" value="<?= $challenge_data_is_new ? 'Create Challenge' : 'Save Challenge' ?>" />
+                                        <? if (!$challenge_data_is_new && empty($challenge_data['challenge_flag_protected'])){ ?>
                                             <input class="button delete" type="button" value="Delete Challenge" data-delete="challenges" data-challenge-id="<?= $challenge_data['challenge_id'] ?>" data-challenge-kind="<?= $this_challenge_kind ?>" />
                                         <? } ?>
                                     </div>
-                                    <? if ($this_challenge_kind === 'event'){ ?>
+                                    <? if (!$challenge_data_is_new && $this_challenge_kind === 'event'){ ?>
                                         <?= cms_admin::object_editor_print_git_footer_buttons('challenges', cms_admin::git_get_id_token('challenge', $challenge_data['challenge_id']), $mmrpg_git_file_arrays) ?>
                                     <? } ?>
 
-                                    <div class="metadata">
-                                        <div class="date"><strong>Created</strong>: <?= !empty($challenge_data['challenge_date_created']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $challenge_data['challenge_date_created'])): '-' ?></div>
-                                        <div class="date"><strong>Modified</strong>: <?= !empty($challenge_data['challenge_date_modified']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $challenge_data['challenge_date_modified'])) : '-' ?></div>
-                                    </div>
+                                    <? if (!$challenge_data_is_new){ ?>
+                                        <div class="metadata">
+                                            <div class="date"><strong>Created</strong>: <?= !empty($challenge_data['challenge_date_created']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $challenge_data['challenge_date_created'])): '-' ?></div>
+                                            <div class="date"><strong>Modified</strong>: <?= !empty($challenge_data['challenge_date_modified']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $challenge_data['challenge_date_modified'])) : '-' ?></div>
+                                        </div>
+                                    <? } ?>
 
                                 </div>
 
