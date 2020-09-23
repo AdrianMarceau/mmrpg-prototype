@@ -623,7 +623,7 @@
 
     <?= !empty($this_error_markup) ? '<div style="margin: 0 auto 20px">'.$this_error_markup.'</div>' : '' ?>
 
-    <div class="adminform edit-challenges <?= $this_challenge_page_token ?>">
+    <div class="adminform edit-challenges <?= $this_challenge_page_token ?>" data-baseurl="<?= $this_challenge_page_baseurl ?>" data-object="challenge" data-xobject="challenges">
 
         <? if ($sub_action == 'search'): ?>
 

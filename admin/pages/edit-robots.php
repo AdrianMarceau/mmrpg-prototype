@@ -592,7 +592,7 @@
 
     <?= !empty($this_error_markup) ? '<div style="margin: 0 auto 20px">'.$this_error_markup.'</div>' : '' ?>
 
-    <div class="adminform edit-robots edit-<?= str_replace(' ', '-', $this_robot_xclass_name) ?>">
+    <div class="adminform edit-robots edit-<?= str_replace(' ', '-', $this_robot_xclass_name) ?>" data-baseurl="<?= $this_robot_page_baseurl ?>" data-object="robot" data-xobject="robots">
 
         <? if ($sub_action == 'search'): ?>
 

@@ -412,7 +412,7 @@
 
     <?= !empty($this_error_markup) ? '<div style="margin: 0 auto 20px">'.$this_error_markup.'</div>' : '' ?>
 
-    <div class="adminform edit-stars">
+    <div class="adminform edit-stars" data-baseurl="admin/edit-stars/" data-object="star" data-xobject="stars">
 
         <? if ($sub_action == 'search'): ?>
 

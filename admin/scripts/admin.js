@@ -46,76 +46,50 @@ $(document).ready(function(){
         var deleteID = 0;
 
         // Define the object label and ID based on kind
-        var deleteObject = 'object';
-        if (deleteKind == 'users'){
+        var deleteBaseURL = thisAdminForm.attr('data-baseurl');
+        var deleteObject = thisAdminForm.attr('data-object');
+        var deleteXObject = thisAdminForm.attr('data-xobject');
+        var deleteObjectName = '';
+        //console.log('deleteBaseURL = ', deleteBaseURL);
+        //console.log('deleteObject = ', deleteObject);
+        //console.log('deleteXObject = ', deleteXObject);
+        if (typeof deleteBaseURL !== 'undefined'
+            && typeof deleteObject !== 'undefined'
+            && typeof deleteXObject !== 'undefined'
+            && deleteKind === deleteXObject){
 
-            // If we're deleting USERS set up the vars
-            deleteObject = 'user';
-            deleteID = deleteLink.attr('data-user-id');
+            // If we're deleting a valid object, set up the vars
+            deleteID = deleteLink.attr('data-'+deleteObject+'-id');
+            deleteSubKind = deleteLink.attr('data-'+deleteObject+'-kind');
             if (typeof deleteID == 'undefined'){ return false; }
+            if (typeof deleteSubKind != 'undefined'){ deleteObjectName += deleteSubKind+' '; }
+            else { deleteSubKind = false; }
+            deleteObjectName += deleteObject+' ';
             deleteID = parseInt(deleteID);
             if (deleteID == 0){ return false; }
-
-            } else if (deleteKind == 'pages'){
-
-            // If we're deleting PAGES set up the vars
-            deleteObject = 'page';
-            deleteID = deleteLink.attr('data-page-id');
-            if (typeof deleteID == 'undefined'){ return false; }
-            deleteID = parseInt(deleteID);
-            if (deleteID == 0){ return false; }
-
-            } else if (deleteKind == 'challenges'){
-
-            // If we're deleting CHALLENGES set up the vars
-            deleteObject = 'challenge';
-            deleteID = deleteLink.attr('data-challenge-id');
-            deleteSubKind = deleteLink.attr('data-challenge-kind');
-            if (typeof deleteID == 'undefined'){ return false; }
-            if (typeof deleteSubKind == 'undefined'){ return false; }
-            deleteObject = deleteSubKind+' '+deleteObject;
-            deleteID = parseInt(deleteID);
-            if (deleteID == 0){ return false; }
-
-            } else if (deleteKind == 'stars'){
-
-            // If we're deleting STARS set up the vars
-            deleteObject = 'star';
-            deleteID = deleteLink.attr('data-star-id');
-            if (typeof deleteID == 'undefined'){ return false; }
-            deleteID = parseInt(deleteID);
-            if (deleteID == 0){ return false; }
+            deleteObjectName += 'ID '+deleteID;
 
             } else {
 
-            //console.log('unknown delete entity?');
+            alert('Unknown delete entity! Contact the admin!');
+            console.log('deleteBaseURL = ', deleteBaseURL);
+            console.log('deleteObject = ', deleteObject);
+            console.log('deleteXObject = ', deleteXObject);
             return false;
 
             }
 
         // Parse the confirm text and prompt the user
-        var objName = deleteObject+' ID '+deleteID;
-        var confirmText1 = confirmTemplate1.replace('{object}', objName);
-        var confirmText2 = confirmTemplate2.replace('{object}', objName);
+        var confirmText1 = confirmTemplate1.replace('{object}', deleteObjectName);
+        var confirmText2 = confirmTemplate2.replace('{object}', deleteObjectName);
         if (confirm(confirmText1) && confirm(confirmText2)){
 
-            // Define the post URL based on request kind
-            var postURL = '';
-            if (deleteKind == 'users'){
-                postURL = 'admin/edit-users/delete/user_id='+deleteID;
-                } else if (deleteKind == 'pages'){
-                postURL = 'admin/edit-pages/delete/page_id='+deleteID;
-                } else if (deleteKind == 'challenges'){
-                postURL = 'admin/edit-'+deleteSubKind+'-challenges/delete/challenge_id='+deleteID;
-                } else if (deleteKind == 'stars'){
-                postURL = 'admin/edit-stars/delete/star_id='+deleteID;
-                } else {
-                //console.log('unknown delete postURL?');
-                return false;
-                }
+            // Generate the post URL given known URLs and information
+            var postURL = deleteBaseURL+'delete/'+deleteObject+'_id='+deleteID;
 
             // Send the request to the server for delete
-            //console.log('we can delete '+objName+'!');
+            //console.log('we can delete '+deleteObjectName+'!');
+            //console.log('using the URL ', postURL);
             $.post(postURL, function(data){
                 // Delete successful, let's reload the page
                 window.location.href = window.location.href.replace(location.hash,'');

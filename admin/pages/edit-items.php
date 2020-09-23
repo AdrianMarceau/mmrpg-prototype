@@ -523,7 +523,7 @@
 
     <?= !empty($this_error_markup) ? '<div style="margin: 0 auto 20px">'.$this_error_markup.'</div>' : '' ?>
 
-    <div class="adminform edit-items edit-items">
+    <div class="adminform edit-items edit-items" data-baseurl="<?= $this_item_page_baseurl ?>" data-object="item" data-xobject="items">
 
         <? if ($sub_action == 'search'): ?>
 

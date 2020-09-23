@@ -547,7 +547,7 @@
 
     <?= !empty($this_error_markup) ? '<div style="margin: 0 auto 20px">'.$this_error_markup.'</div>' : '' ?>
 
-    <div class="adminform edit-abilities edit-<?= str_replace(' ', '-', $this_ability_xclass_name) ?>">
+    <div class="adminform edit-abilities edit-<?= str_replace(' ', '-', $this_ability_xclass_name) ?>" data-baseurl="<?= $this_ability_page_baseurl ?>" data-object="ability" data-xobject="abilities">
 
         <? if ($sub_action == 'search'): ?>
 

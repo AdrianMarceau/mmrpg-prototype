@@ -575,7 +575,7 @@
 
     <?= !empty($this_error_markup) ? '<div style="margin: 0 auto 20px">'.$this_error_markup.'</div>' : '' ?>
 
-    <div class="adminform edit-players">
+    <div class="adminform edit-players" data-baseurl="admin/edit-players/" data-object="player" data-xobject="players">
 
         <? if ($sub_action == 'search'): ?>
 
@@ -726,8 +726,9 @@
 
                                 $player_actions = '';
                                 $player_actions .= '<a class="link edit" href="'.$player_edit_url.'"><span>edit</span></a>';
-                                $player_actions .= '<span class="link delete disabled"><span>delete</span></span>';
-                                //$player_actions .= '<a class="link delete" data-delete="players" data-player-id="'.$player_id.'"><span>delete</span></a>';
+                                if (empty($player_data['player_flag_protected'])){
+                                    $player_actions .= '<a class="link delete" data-delete="players" data-player-id="'.$player_id.'"><span>delete</span></a>';
+                                }
 
                                 echo '<tr>'.PHP_EOL;
                                     echo '<td class="id"><div>'.$player_id.'</div></td>'.PHP_EOL;
@@ -1492,10 +1493,9 @@
 
                             <div class="buttons">
                                 <input class="button save" type="submit" value="Save Changes" />
-                                <? /*
-                                <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin/edit-players/editor/player_id=<?= $player_data['player_id'] ?>';" />
-                                <input class="button delete" type="button" value="Delete Player" data-delete="players" data-player-id="<?= $player_data['player_id'] ?>" />
-                                */ ?>
+                                <? if (empty($player_data['player_flag_protected'])){ ?>
+                                    <input class="button delete" type="button" value="Delete Player" data-delete="players" data-player-id="<?= $player_data['player_id'] ?>" />
+                                <? } ?>
                             </div>
                             <?= cms_admin::object_editor_print_git_footer_buttons('players', $player_data['player_token'], $mmrpg_git_file_arrays) ?>
 
