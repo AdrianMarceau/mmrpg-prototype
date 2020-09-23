@@ -82,13 +82,13 @@
 
     // If we're in delete mode, we need to remove some data
     $delete_data = array();
-    if (false && $sub_action == 'delete' && !empty($_GET['player_id'])){
+    if ($sub_action == 'delete' && !empty($_GET['player_id'])){
 
         // Collect form data for processing
         $delete_data['player_id'] = !empty($_GET['player_id']) && is_numeric($_GET['player_id']) ? trim($_GET['player_id']) : '';
 
         // Let's delete all of this player's data from the database
-        $db->delete('mmrpg_index_players', array('player_id' => $delete_data['player_id']));
+        $db->delete('mmrpg_index_players', array('player_id' => $delete_data['player_id'], 'player_flag_protected' => 0));
         $form_messages[] = array('success', 'The requested player has been deleted from the database');
         exit_form_action('success');
 

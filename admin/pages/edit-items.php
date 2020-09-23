@@ -96,13 +96,13 @@
 
     // If we're in delete mode, we need to remove some data
     $delete_data = array();
-    if (false && $sub_action == 'delete' && !empty($_GET['item_id'])){
+    if ($sub_action == 'delete' && !empty($_GET['item_id'])){
 
         // Collect form data for processing
         $delete_data['item_id'] = !empty($_GET['item_id']) && is_numeric($_GET['item_id']) ? trim($_GET['item_id']) : '';
 
         // Let's delete all of this item's data from the database
-        $db->delete('mmrpg_index_items', array('item_id' => $delete_data['item_id']));
+        $db->delete('mmrpg_index_items', array('item_id' => $delete_data['item_id'], 'item_flag_protected' => 0));
         $form_messages[] = array('success', 'The requested item has been deleted from the database');
         exit_form_action('success');
 
@@ -730,8 +730,9 @@
 
                                 $item_actions = '';
                                 $item_actions .= '<a class="link edit" href="'.$item_edit_url.'"><span>edit</span></a>';
-                                $item_actions .= '<span class="link delete disabled"><span>delete</span></span>';
-                                //$item_actions .= '<a class="link delete" data-delete="items" data-item-id="'.$item_id.'"><span>delete</span></a>';
+                                if (empty($item_data['item_flag_protected'])){
+                                    $item_actions .= '<a class="link delete" data-delete="items" data-item-id="'.$item_id.'"><span>delete</span></a>';
+                                }
 
                                 echo '<tr>'.PHP_EOL;
                                     echo '<td class="id"><div>'.$item_id.'</div></td>'.PHP_EOL;
@@ -1337,18 +1338,11 @@
 
                             <div class="buttons">
                                 <input class="button save" type="submit" value="Save Changes" />
-                                <? /*
-                                <input class="button delete" type="button" value="Delete Item" data-delete="items" data-item-id="<?= $item_data['item_id'] ?>" />
-                                */ ?>
+                                <? if (empty($item_data['item_flag_protected'])){ ?>
+                                    <input class="button delete" type="button" value="Delete Item" data-delete="items" data-item-id="<?= $item_data['item_id'] ?>" />
+                                <? } ?>
                             </div>
                             <?= cms_admin::object_editor_print_git_footer_buttons('items', $item_data['item_token'], $mmrpg_git_file_arrays); ?>
-
-                            <? /*
-                            <div class="metadata">
-                                <div class="date"><strong>Created</strong>: <?= !empty($item_data['item_date_created']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $item_data['item_date_created'])): '-' ?></div>
-                                <div class="date"><strong>Modified</strong>: <?= !empty($item_data['item_date_modified']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $item_data['item_date_modified'])) : '-' ?></div>
-                            </div>
-                            */ ?>
 
                         </div>
 

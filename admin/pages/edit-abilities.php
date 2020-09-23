@@ -115,13 +115,13 @@
 
     // If we're in delete mode, we need to remove some data
     $delete_data = array();
-    if (false && $sub_action == 'delete' && !empty($_GET['ability_id'])){
+    if ($sub_action == 'delete' && !empty($_GET['ability_id'])){
 
         // Collect form data for processing
         $delete_data['ability_id'] = !empty($_GET['ability_id']) && is_numeric($_GET['ability_id']) ? trim($_GET['ability_id']) : '';
 
         // Let's delete all of this ability's data from the database
-        $db->delete('mmrpg_index_abilities', array('ability_id' => $delete_data['ability_id']));
+        $db->delete('mmrpg_index_abilities', array('ability_id' => $delete_data['ability_id'], 'ability_flag_protected' => 0));
         $form_messages[] = array('success', 'The requested '.$this_ability_class_name.' has been deleted from the database');
         exit_form_action('success');
 
@@ -750,8 +750,9 @@
 
                                 $ability_actions = '';
                                 $ability_actions .= '<a class="link edit" href="'.$ability_edit_url.'"><span>edit</span></a>';
-                                $ability_actions .= '<span class="link delete disabled"><span>delete</span></span>';
-                                //$ability_actions .= '<a class="link delete" data-delete="abilities" data-ability-id="'.$ability_id.'"><span>delete</span></a>';
+                                if (empty($ability_data['ability_flag_protected'])){
+                                    $ability_actions .= '<a class="link delete" data-delete="abilities" data-ability-id="'.$ability_id.'"><span>delete</span></a>';
+                                }
 
                                 echo '<tr>'.PHP_EOL;
                                     echo '<td class="id"><div>'.$ability_id.'</div></td>'.PHP_EOL;
@@ -1384,19 +1385,11 @@
 
                             <div class="buttons">
                                 <input class="button save" type="submit" value="Save Changes" />
-                                <? /*
-                                <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='<?= $this_ability_page_baseurl ?>editor/ability_id=<?= $ability_data['ability_id'] ?>';" />
-                                <input class="button delete" type="button" value="Delete <?= $this_ability_class_short_name_uc ?>" data-delete="abilities" data-ability-id="<?= $ability_data['ability_id'] ?>" />
-                                */ ?>
+                                <? if (empty($ability_data['ability_flag_protected'])){ ?>
+                                    <input class="button delete" type="button" value="Delete <?= $this_ability_class_short_name_uc ?>" data-delete="abilities" data-ability-id="<?= $ability_data['ability_id'] ?>" />
+                                <? } ?>
                             </div>
                             <?= cms_admin::object_editor_print_git_footer_buttons('abilities/'.$this_ability_xclass, $ability_data['ability_token'], $mmrpg_git_file_arrays); ?>
-
-                            <? /*
-                            <div class="metadata">
-                                <div class="date"><strong>Created</strong>: <?= !empty($ability_data['ability_date_created']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $ability_data['ability_date_created'])): '-' ?></div>
-                                <div class="date"><strong>Modified</strong>: <?= !empty($ability_data['ability_date_modified']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $ability_data['ability_date_modified'])) : '-' ?></div>
-                            </div>
-                            */ ?>
 
                         </div>
 

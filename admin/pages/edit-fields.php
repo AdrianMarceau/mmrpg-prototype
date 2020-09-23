@@ -88,13 +88,13 @@
 
     // If we're in delete mode, we need to remove some data
     $delete_data = array();
-    if (false && $sub_action == 'delete' && !empty($_GET['field_id'])){
+    if ($sub_action == 'delete' && !empty($_GET['field_id'])){
 
         // Collect form data for processing
         $delete_data['field_id'] = !empty($_GET['field_id']) && is_numeric($_GET['field_id']) ? trim($_GET['field_id']) : '';
 
         // Let's delete all of this field's data from the database
-        $db->delete('mmrpg_index_fields', array('field_id' => $delete_data['field_id']));
+        $db->delete('mmrpg_index_fields', array('field_id' => $delete_data['field_id'], 'field_flag_protected' => 0));
         $form_messages[] = array('success', 'The requested field has been deleted from the database');
         exit_form_action('success');
 
@@ -685,8 +685,9 @@
 
                                 $field_actions = '';
                                 $field_actions .= '<a class="link edit" href="'.$field_edit_url.'"><span>edit</span></a>';
-                                $field_actions .= '<span class="link delete disabled"><span>delete</span></span>';
-                                //$field_actions .= '<a class="link delete" data-delete="fields" data-field-id="'.$field_id.'"><span>delete</span></a>';
+                                if (empty($field_data['field_flag_protected'])){
+                                    $field_actions .= '<a class="link delete" data-delete="fields" data-field-id="'.$field_id.'"><span>delete</span></a>';
+                                }
 
                                 echo '<tr>'.PHP_EOL;
                                     echo '<td class="id"><div>'.$field_id.'</div></td>'.PHP_EOL;
@@ -1492,10 +1493,9 @@
 
                             <div class="buttons">
                                 <input class="button save" type="submit" value="Save Changes" />
-                                <? /*
-                                <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='admin/edit-fields/editor/field_id=<?= $field_data['field_id'] ?>';" />
-                                <input class="button delete" type="button" value="Delete Field" data-delete="fields" data-field-id="<?= $field_data['field_id'] ?>" />
-                                */ ?>
+                                <? if (empty($field_data['field_flag_protected'])){ ?>
+                                    <input class="button delete" type="button" value="Delete Field" data-delete="fields" data-field-id="<?= $field_data['field_id'] ?>" />
+                                <? } ?>
                             </div>
                             <?= cms_admin::object_editor_print_git_footer_buttons('fields', $field_data['field_token'], $mmrpg_git_file_arrays); ?>
 

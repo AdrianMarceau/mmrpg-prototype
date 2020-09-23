@@ -100,13 +100,13 @@
 
     // If we're in delete mode, we need to remove some data
     $delete_data = array();
-    if (false && $sub_action == 'delete' && !empty($_GET['robot_id'])){
+    if ($sub_action == 'delete' && !empty($_GET['robot_id'])){
 
         // Collect form data for processing
         $delete_data['robot_id'] = !empty($_GET['robot_id']) && is_numeric($_GET['robot_id']) ? trim($_GET['robot_id']) : '';
 
         // Let's delete all of this robot's data from the database
-        $db->delete('mmrpg_index_robots', array('robot_id' => $delete_data['robot_id']));
+        $db->delete('mmrpg_index_robots', array('robot_id' => $delete_data['robot_id'], 'robot_flag_protected' => 0));
         $form_messages[] = array('success', 'The requested '.$this_robot_class_name.' has been deleted from the database');
         exit_form_action('success');
 
@@ -798,8 +798,9 @@
 
                                 $robot_actions = '';
                                 $robot_actions .= '<a class="link edit" href="'.$robot_edit_url.'"><span>edit</span></a>';
-                                $robot_actions .= '<span class="link delete disabled"><span>delete</span></span>';
-                                //$robot_actions .= '<a class="link delete" data-delete="robots" data-robot-id="'.$robot_id.'"><span>delete</span></a>';
+                                if (empty($robot_data['robot_flag_protected'])){
+                                    $robot_actions .= '<a class="link delete" data-delete="robots" data-robot-id="'.$robot_id.'"><span>delete</span></a>';
+                                }
 
                                 echo '<tr>'.PHP_EOL;
                                     echo '<td class="id"><div>'.$robot_id.'</div></td>'.PHP_EOL;
@@ -1712,10 +1713,9 @@
 
                             <div class="buttons">
                                 <input class="button save" type="submit" value="Save Changes" />
-                                <? /*
-                                <input class="button cancel" type="button" value="Reset Changes" onclick="javascript:window.location.href='<?= $this_robot_page_baseurl ?>editor/robot_id=<?= $robot_data['robot_id'] ?>';" />
-                                <input class="button delete" type="button" value="Delete <?= $this_robot_class_short_name_uc ?>" data-delete="robots" data-robot-id="<?= $robot_data['robot_id'] ?>" />
-                                */ ?>
+                                <? if (empty($robot_data['robot_flag_protected'])){ ?>
+                                    <input class="button delete" type="button" value="Delete <?= $this_robot_class_short_name_uc ?>" data-delete="robots" data-robot-id="<?= $robot_data['robot_id'] ?>" />
+                                <? } ?>
                             </div>
                             <?= cms_admin::object_editor_print_git_footer_buttons('robots/'.$this_robot_xclass, $robot_data['robot_token'], $mmrpg_git_file_arrays); ?>
 
