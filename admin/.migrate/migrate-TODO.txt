@@ -228,12 +228,12 @@ Update all objects types with a new "protected" flag to prevent deleting
 - challenges [DONE]
 - pages [DONE]
 
-Update relevant admin panel editors with the option to delete non-protected objects
-- players (?)
-- robots
-- abilities
-- fields (?)
-- items
+Update relevant admin panel editors with the option to delete only non-protected objects
+- players [DONE]
+- robots [DONE]
+- abilities [DONE]
+- fields [DONE]
+- items [DONE]
 - stars [DONE]
 - challenges [DONE]
 - pages [DONE]
