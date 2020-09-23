@@ -243,13 +243,20 @@ Update relevant admin panel editors with the option to create new non-protected 
 - robots
 - abilities
 - fields (?)
-- items
+- items [DONE]
 - stars [DONE]
 - challenges [DONE]
 - pages [DONE]
 
 Add the following misc new features to the admin panel
 -  Add an error-log watcher for debug on local/dev builds (maybe more?)
+
+Make grouping/ordering items in the admin panel more straight-forward
+-  players (?)
+-  robots
+-  abilities
+-  fields
+-  items
 
 Implement the new "minify" library to compress CSS and JS markup
 -  Minify all styles
