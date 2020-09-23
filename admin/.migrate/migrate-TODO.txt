@@ -152,51 +152,14 @@ Update the admin panel with editors for the final object types (include all new 
 -  abilities [DONE]
 -  items [DONE]
 
-Update all objects types with a new "protected" flag to prevent deleting
-- players
-- robots
-- abilities
-- fields
-- items
-
-Update relevant admin panel editors with the option to create new non-protected objects
-- players (?)
-- robots
-- abilities
-- fields (?)
-- items
-
-Update relevant admin panel editors with the option to delete non-protected objects
-- players (?)
-- robots
-- abilities
-- fields (?)
-- items
-
-Implement the new "minify" library to compress CSS and JS markup
--  Minify all styles
--  Minify all scripts
-
-Write shell scripts for the following situations
--  setup new copy of dev build [DONE]
--  setup new copy of stage build [DONE]
--  safely setup new copy of prod build
--  safely update master code for any version
-
-
-MAYBE POST-UPDATE(?)
-
 Create "onload" events (or other event hooks) for items to take advantage of when we eventually update item code
-
 -  Create event hook for "apply_stat_bonuses" rpg_robot function (energy/weapon-upgrade)
     - rpg-robot_apply-stat-bonuses_before [DONE]
     - rpg-robot_apply-stat-bonuses_after [DONE]
     - update elemental cores to work with above [DONE]
-
 -  Create event hook for "update_variables" rpg_robot function (energy/weapon-upgrade, battery/sponge/forge/sapling-circuit)
     - rpg-robot_update-variables_before [DONE]
     - rpg-robot_update-variables_after [DONE]
-
 -  Create event hook for "check_items" rpg_robot function (attack/defense/speed/field-booster)
     - rpg-robot_check-items_before [DONE]
     - rpg-robot_check-items_after [DONE]
@@ -208,33 +171,26 @@ Create "onload" events (or other event hooks) for items to take advantage of whe
     - update speed pellet/capsule items to work with above [DONE]
     - update super pellet/capsule items to work with above [DONE]
     - update elemental cores to work with above [DONE]
-
 -  Create event hook for "trigger_robot_damage" in rpg_ability/rpg_ability_damage function (fortune-module [crits])
     - rpg-ability_trigger-damage_before [DONE]
     - rpg-ability_trigger-damage_after [DONE]
-
 -  Create event hook for "trigger_robot_recovery" in rpg_ability/rpg_ability_recovery function (fortune-module? [crits])
     - rpg-ability_trigger-recovery_before [DONE]
     - rpg-ability_trigger-recovery_after [DONE]
-
 -  Create event hook for "trigger_robot_damage" in rpg_item/rpg_item_damage function
     - rpg-item_trigger-damage_before [DONE]
     - rpg-item_trigger-damage_after [DONE]
-
 -  Create event hook for "trigger_robot_recovery" in rpg_item/rpg_item_recovery function
     - rpg-item_trigger-recovery_before [DONE]
     - rpg-item_trigger-recovery_after [DONE]
-
 -  Create event hook for post-victory reward calculations (fortune-module)
     - rpg-battle_complete-trigger_victory [DONE]
-
 -  Create event hook for post-disable stat bonus calculations (growth-module)
     - rpg-robot_trigger-disabled_stat-rewards [DONE]
 -  Create event hook for post-disable experience point calculations (growth-module)
     - rpg-robot_trigger-disabled_experience-rewards [DONE]
 -  Create event hook for post-disable item reward calculations (fortune-module)
     - rpg-robot_trigger-disabled_item-rewards [DONE]
-
 -  Create event hook for "ability_function_stat_boost_step1" in rpg_ability (reverse-module, xtreme-module)
     - rpg-ability_stat-boost_before [DONE]
 -  Create event hook for "ability_function_stat_boost_step2" in rpg_ability (guard-module)
@@ -243,21 +199,18 @@ Create "onload" events (or other event hooks) for items to take advantage of whe
     - rpg-ability_stat-break_before [DONE]
 -  Create event hook for "ability_function_stat_break_step2" in rpg_ability (guard-module)
     - rpg-ability_stat-break_after [DONE]
-
 -  Create event hook for "ability_function_shot" in rpg_ability
     - rpg-ability_elemental-shot_before [DONE]
     - rpg-ability_elemental-shot_after [DONE]
 -  Create event hook for "ability_function_onload_shot" in rpg_ability (target-module)
     - rpg-ability_elemental-shot_onload_before [DONE]
     - rpg-ability_elemental-shot_onload_after [DONE]
-
 -  Create event hook for "ability_function_buster" in rpg_ability (charge-module)
     - rpg-ability_elemental-buster_before [DONE]
     - rpg-ability_elemental-buster_after [DONE]
 -  Create event hook for "ability_function_onload_buster" in rpg_ability (charge-module, target-module)
     - rpg-ability_elemental-buster_onload_before [DONE]
     - rpg-ability_elemental-buster_onload_after [DONE]
-
 -  Create event hook for "ability_function_overdrive" in rpg_ability
     - rpg-ability_elemental-overdrive_before [DONE]
     - rpg-ability_elemental-overdrive_after [DONE]
@@ -265,8 +218,59 @@ Create "onload" events (or other event hooks) for items to take advantage of whe
     - rpg-ability_elemental-overdrive_onload_before [DONE]
     - rpg-ability_elemental-overdrive_onload_after [DONE]
 
+Update all objects types with a new "protected" flag to prevent deleting
+- players [DONE]
+- robots [DONE]
+- abilities [DONE]
+- fields [DONE]
+- items [DONE]
+- stars [DONE]
+- challenges [DONE]
+- pages [DONE]
+
+Update relevant admin panel editors with the option to delete non-protected objects
+- players (?)
+- robots
+- abilities
+- fields (?)
+- items
+- stars [DONE]
+- challenges [DONE]
+- pages [DONE]
+
+Update relevant admin panel editors with the option to create new non-protected objects
+- players (?)
+- robots
+- abilities
+- fields (?)
+- items
+- stars [DONE]
+- challenges [DONE]
+- pages [DONE]
+
+Add the following misc new features to the admin panel
+-  Add an error-log watcher for debug on local/dev builds (maybe more?)
+
+Implement the new "minify" library to compress CSS and JS markup
+-  Minify all styles
+-  Minify all scripts
+
+Write shell scripts for the following situations
+-  setup new copy of dev build [DONE]
+-  setup new copy of stage build [DONE]
+-  safely setup new copy of prod build
+-  safely update master code for any version
+
+Update in-battle idle animations to include base2 frames for
+-  robots
+-  players (?)
+
+Fix the following bugs brought up in chat
+-  80x80 sized mechas don't display properly in battle backgrounds/foregrounds
 
 
+MAYBE POST-UPDATE(?)
+--------------------
 
 Create a "Shop Editor" in the admin back-end that lets admins edit the following
 -  Auto's Shop:
