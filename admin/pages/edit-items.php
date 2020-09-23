@@ -2,22 +2,9 @@
 
     <?
 
-    // Using the above, generate the oft-used titles, baseurls, etc. for the editor
-    $this_item_page_token = 'edit-items';
-    $this_item_page_title = 'Edit Items';
-    $this_item_page_baseurl = 'admin/'.$this_item_page_token.'/';
-
-    /*
-    echo('<pre>$this_item_page_token = '.print_r($this_item_page_token, true).'</pre>'.PHP_EOL);
-    echo('<pre>$this_item_page_title = '.print_r($this_item_page_title, true).'</pre>'.PHP_EOL);
-    echo('<pre>$this_item_page_baseurl = '.print_r($this_item_page_baseurl, true).'</pre>'.PHP_EOL);
-    exit();
-    */
-
     // Pre-check access permissions before continuing
     if (!in_array('*', $this_adminaccess)
-        && !in_array('edit-items', $this_adminaccess)
-        && !in_array($this_item_page_token, $this_adminaccess)){
+        && !in_array('edit-items', $this_adminaccess)){
         $form_messages[] = array('error', 'You do not have permission to edit items!');
         redirect_form_action('admin/home/');
     }
@@ -78,10 +65,9 @@
     /* -- Form Setup Actions -- */
 
     // Define a function for exiting a item edit action
-    function exit_item_edit_action($item_id = 0){
-        global $this_item_page_baseurl;
-        if (!empty($item_id)){ $location = $this_item_page_baseurl.'editor/item_id='.$item_id; }
-        else { $location = $this_item_page_baseurl.'search/'; }
+    function exit_item_edit_action($item_id = false){
+        if ($item_id === false){ $location = 'admin/edit-items/editor/item_id='.$item_id; }
+        else { $location = 'admin/edit-items/search/'; }
         redirect_form_action($location);
     }
 
@@ -283,7 +269,7 @@
         $form_data = array();
         $form_success = true;
         $form_action = !empty($_POST['action']) ? trim($_POST['action']) : '';
-        if ($form_action == $this_item_page_token){
+        if ($form_action == 'edit-items'){
 
             // COLLECT form data from the request and parse out simple rules
 
@@ -515,15 +501,15 @@
 
     <div class="breadcrumb">
         <a href="admin/">Admin Panel</a>
-        &raquo; <a href="<?= $this_item_page_baseurl ?>">Edit Items</a>
+        &raquo; <a href="admin/edit-items/">Edit Items</a>
         <? if ($sub_action == 'editor' && !empty($item_data)): ?>
-            &raquo; <a href="<?= $this_item_page_baseurl ?>editor/item_id=<?= $item_data['item_id'] ?>"><?= $item_name_display ?></a>
+            &raquo; <a href="admin/edit-items/editor/item_id=<?= $item_data['item_id'] ?>"><?= $item_name_display ?></a>
         <? endif; ?>
     </div>
 
     <?= !empty($this_error_markup) ? '<div style="margin: 0 auto 20px">'.$this_error_markup.'</div>' : '' ?>
 
-    <div class="adminform edit-items edit-items" data-baseurl="<?= $this_item_page_baseurl ?>" data-object="item" data-xobject="items">
+    <div class="adminform edit-items edit-items" data-baseurl="admin/edit-items/" data-object="item" data-xobject="items">
 
         <? if ($sub_action == 'search'): ?>
 
@@ -537,7 +523,6 @@
 
                 <form class="form" method="get">
 
-                    <? /* <input type="hidden" name="action" value="<?= $this_item_page_token ?>" /> */ ?>
                     <input type="hidden" name="subaction" value="search" />
 
                     <? /*
@@ -630,7 +615,7 @@
 
                     <div class="buttons">
                         <input class="button" type="submit" value="Search" />
-                        <input class="button" type="reset" value="Reset" onclick="javascript:window.location.href='<?= $this_item_page_baseurl ?>';" />
+                        <input class="button" type="reset" value="Reset" onclick="javascript:window.location.href='admin/edit-items/';" />
                     </div>
 
                 </form>
@@ -724,7 +709,7 @@
                                 $item_flag_unlockable = !empty($item_data['item_flag_unlockable']) ? '<i class="fas fa-unlock"></i>' : '-';
                                 $item_flag_hidden = !empty($item_data['item_flag_hidden']) ? '<i class="fas fa-eye-slash"></i>' : '-';
 
-                                $item_edit_url = $this_item_page_baseurl.'editor/item_id='.$item_id;
+                                $item_edit_url = 'admin/edit-items/editor/item_id='.$item_id;
                                 $item_name_link = '<a class="link" href="'.$item_edit_url.'">'.$item_name.'</a>';
                                 cms_admin::object_index_links_append_git_statues($item_name_link, $item_token, $mmrpg_git_file_arrays);
 
@@ -805,7 +790,7 @@
 
                     <form class="form" method="post">
 
-                        <input type="hidden" name="action" value="<?= $this_item_page_token ?>" />
+                        <input type="hidden" name="action" value="edit-items" />
                         <input type="hidden" name="subaction" value="editor" />
 
                         <input type="hidden" name="item_class" value="item" />
