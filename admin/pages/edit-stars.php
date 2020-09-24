@@ -655,8 +655,8 @@
         <? endif; ?>
 
         <? if ($sub_action == 'editor'
-                && isset($_GET['star_id'])
-                ){
+            && isset($_GET['star_id'])
+            ){
 
             // Capture editor markup in a buffer in case we need to modify
             if (true){

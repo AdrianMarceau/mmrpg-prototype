@@ -248,8 +248,8 @@
     $item_data_is_new = false;
     $editor_data = array();
     if ($sub_action == 'editor'
-            && isset($_GET['item_id'])
-            ){
+        && isset($_GET['item_id'])
+        ){
 
         // Collect form data for processing
         $editor_data['item_id'] = !empty($_GET['item_id']) && is_numeric($_GET['item_id']) ? trim($_GET['item_id']) : '';
@@ -509,10 +509,10 @@
                 $insert_results = $db->insert('mmrpg_index_items', $update_data);
 
                 // If we made it this far, the update must have been a success
-                if ($insert_results !== false){ $form_success = true; $form_messages[] = array('success', 'item data was created successfully!'); }
+                if ($insert_results !== false){ $form_success = true; $form_messages[] = array('success', 'Item data was created successfully!'); }
                 else { $form_success = false; $form_messages[] = array('error', 'Item data could not be created...'); }
 
-                // If the form was a success, collect the new ID and redirect
+                // If the form was a success, collect the new ID for the redirect
                 if ($form_success){
                     $new_item_id = $db->get_value("SELECT MAX(item_id) AS max FROM mmrpg_index_items;", 'max');
                     $form_data['item_id'] = $new_item_id;
@@ -825,8 +825,8 @@
 
         <?
         if ($sub_action == 'editor'
-                && isset($_GET['item_id'])
-                ){
+            && isset($_GET['item_id'])
+            ){
 
             // Capture editor markup in a buffer in case we need to modify
             if (true){
