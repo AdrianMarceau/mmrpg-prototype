@@ -97,9 +97,9 @@
     /* -- Form Setup Actions -- */
 
     // Define a function for exiting a ability edit action
-    function exit_ability_edit_action($ability_id = 0){
+    function exit_ability_edit_action($ability_id = false){
         global $this_ability_page_baseurl;
-        if (!empty($ability_id)){ $location = $this_ability_page_baseurl.'editor/ability_id='.$ability_id; }
+        if ($ability_id !== false){ $location = $this_ability_page_baseurl.'editor/ability_id='.$ability_id; }
         else { $location = $this_ability_page_baseurl.'search/'; }
         redirect_form_action($location);
     }
@@ -276,9 +276,11 @@
 
     // If we're in editor mode, we should collect ability info from database
     $ability_data = array();
+    $ability_data_is_new = false;
     $editor_data = array();
     if ($sub_action == 'editor'
-        && !empty($_GET['ability_id'])){
+        && isset($_GET['ability_id'])
+        ){
 
         // Collect form data for processing
         $editor_data['ability_id'] = !empty($_GET['ability_id']) && is_numeric($_GET['ability_id']) ? trim($_GET['ability_id']) : '';
@@ -287,14 +289,46 @@
 
         // Collect ability details from the database
         $temp_ability_fields = rpg_ability::get_index_fields(true);
-        $ability_data = $db->get_array("SELECT {$temp_ability_fields} FROM mmrpg_index_abilities WHERE ability_id = {$editor_data['ability_id']};");
+        if (!empty($editor_data['ability_id'])){
+            $ability_data = $db->get_array("SELECT {$temp_ability_fields} FROM mmrpg_index_abilities WHERE ability_id = {$editor_data['ability_id']};");
+        } else {
+
+            // Generate temp data structure for the new challenge
+            $ability_data_is_new = true;
+            $admin_id = $_SESSION['admin_id'];
+            $ability_data = array(
+                'ability_id' => 0,
+                'ability_token' => '',
+                'ability_name' => '',
+                'ability_class' => $this_ability_class,
+                'ability_subclass' => '',
+                'ability_type' => '',
+                'ability_type2' => '',
+                'ability_target' => '',
+                'ability_flag_hidden' => 0,
+                'ability_flag_complete' => 0,
+                'ability_flag_published' => 0,
+                'ability_flag_unlockable' => 0,
+                'ability_flag_protected' => 0,
+                'ability_order' => 0
+                );
+
+            // Overwrite temp data with any backup data provided
+            if (!empty($backup_form_data)){
+                foreach ($backup_form_data AS $f => $v){
+                    $ability_data[$f] = $v;
+                }
+            }
+
+        }
 
         // If ability data could not be found, produce error and exit
         if (empty($ability_data)){ exit_ability_edit_action(); }
 
         // Collect the ability's name(s) for display
         $ability_name_display = $ability_data['ability_name'];
-        $this_page_tabtitle = $ability_name_display.' | '.$this_page_tabtitle;
+        if ($ability_data_is_new){ $this_page_tabtitle = 'New Ability | '.$this_page_tabtitle; }
+        else { $this_page_tabtitle = $ability_name_display.' | '.$this_page_tabtitle; }
 
         // If form data has been submit for this ability, we should process it
         $form_data = array();
@@ -357,30 +391,36 @@
             //$form_messages[] = array('alert', '<pre>$_POST = '.print_r($_POST, true).'</pre>');
             //$form_messages[] = array('alert', '<pre>$form_data = '.print_r($form_data, true).'</pre>');
 
+            // If this is a NEW ability, auto-generate the token when not provided
+            if ($ability_data_is_new
+                && empty($form_data['ability_token'])
+                && !empty($form_data['ability_name'])){
+                $auto_token = strtolower($form_data['ability_name']);
+                $auto_token = preg_replace('/\s+/', '-', $auto_token);
+                $auto_token = preg_replace('/[^-a-z0-9]+/i', '', $auto_token);
+                $form_data['ability_token'] = $auto_token;
+            }
+
             // VALIDATE all of the MANDATORY FIELDS to see if any are invalid and abort the update entirely if necessary
-            if (empty($form_data['ability_id'])){ $form_messages[] = array('error', $this_ability_class_short_name_uc.' ID was not provided'); $form_success = false; }
-            if (empty($form_data['ability_token']) || empty($old_ability_token)){ $form_messages[] = array('error', $this_ability_class_short_name_uc.' Token was not provided or was invalid'); $form_success = false; }
+            if (!$ability_data_is_new && empty($form_data['ability_id'])){ $form_messages[] = array('error', $this_ability_class_short_name_uc.' ID was not provided'); $form_success = false; }
+            if (empty($form_data['ability_token']) || (!$ability_data_is_new && empty($old_ability_token))){ $form_messages[] = array('error', $this_ability_class_short_name_uc.' Token was not provided or was invalid'); $form_success = false; }
             if (empty($form_data['ability_name'])){ $form_messages[] = array('error', $this_ability_class_short_name_uc.' Name was not provided or was invalid'); $form_success = false; }
             if (empty($form_data['ability_class'])){ $form_messages[] = array('error', $this_ability_class_short_name_uc.' Kind was not provided or was invalid'); $form_success = false; }
             if (!isset($_POST['ability_type']) || !isset($_POST['ability_type2'])){ $form_messages[] = array('warning', 'Types were not provided or were invalid'); $form_success = false; }
             if (!$form_success){ exit_ability_edit_action($form_data['ability_id']); }
 
             // VALIDATE all of the SEMI-MANDATORY FIELDS to see if any were not provided and unset them from updating if necessary
-            if (empty($form_data['ability_game'])){ $form_messages[] = array('warning', 'Source Game was not provided and may cause issues on the front-end'); }
+            if (!$ability_data_is_new && empty($form_data['ability_game'])){ $form_messages[] = array('warning', 'Source Game was not provided and may cause issues on the front-end'); }
             //if (empty($form_data['ability_master'])){ $form_messages[] = array('warning', 'Source Robot was not provided and may cause issues on the front-end'); }
-            if (empty($form_data['ability_group'])){ $form_messages[] = array('warning', 'Sorting Group was not provided and may cause issues on the front-end'); }
+            if (!$ability_data_is_new && empty($form_data['ability_group'])){ $form_messages[] = array('warning', 'Sorting Group was not provided and may cause issues on the front-end'); }
 
             // REFORMAT or OPTIMIZE data for provided fields where necessary
 
-            $ability_speed2_defined = isset($_POST['ability_speed2_defined']) && is_numeric($_POST['ability_speed2_defined']) ? (int)(trim($_POST['ability_speed2_defined'])) : 0;
-            if (!$ability_speed2_defined){ $form_data['ability_speed2'] = $form_data['ability_speed']; }
-
-            if (!empty($form_data['ability_master'])){
-                $ability_master_info = $mmrpg_robots_index[$form_data['ability_master']];
-                $form_data['ability_number'] = $ability_master_info['robot_number'];
-            } else {
-                $form_data['ability_master'] = '';
-                $form_data['ability_number'] = '';
+            if ($form_data['ability_flag_unlockable']){
+                if (!$form_data['ability_flag_published']){ $form_messages[] = array('warning', $this_ability_class_short_name_uc.' must be published to be unlockable'); $form_data['ability_flag_unlockable'] = 0; }
+                elseif (!$form_data['ability_flag_complete']){ $form_messages[] = array('warning', $this_ability_class_short_name_uc.' must be complete to be unlockable'); $form_data['ability_flag_unlockable'] = 0; }
+                elseif ($form_data['ability_class'] !== 'master'){ $form_messages[] = array('warning', 'Only robot master abilities can be marked as unlockable'); $form_data['ability_flag_unlockable'] = 0; }
+                elseif (empty($form_data['ability_description'])){ $form_messages[] = array('warning', $this_ability_class_short_name_uc.' must have a description to be unlockable'); $form_data['ability_flag_unlockable'] = 0; }
             }
 
             if (isset($form_data['ability_type'])){
@@ -390,73 +430,94 @@
                 $form_data['ability_type2'] = isset($types[1]) ? $types[1] : '';
             }
 
-            if ($form_data['ability_flag_unlockable']){
-                if (!$form_data['ability_flag_published']){ $form_messages[] = array('warning', $this_ability_class_short_name_uc.' must be published to be unlockable'); $form_data['ability_flag_unlockable'] = 0; }
-                elseif (!$form_data['ability_flag_complete']){ $form_messages[] = array('warning', $this_ability_class_short_name_uc.' must be complete to be unlockable'); $form_data['ability_flag_unlockable'] = 0; }
-                elseif ($form_data['ability_class'] !== 'master'){ $form_messages[] = array('warning', 'Only robot master abilities can be marked as unlockable'); $form_data['ability_flag_unlockable'] = 0; }
-                elseif (empty($form_data['ability_description'])){ $form_messages[] = array('warning', $this_ability_class_short_name_uc.' must have a description to be unlockable'); $form_data['ability_flag_unlockable'] = 0; }
-            }
+            // Only parse the following fields if NOT new object data
+            if (!$ability_data_is_new){
 
-            $empty_image_folders = array();
+                $ability_speed2_defined = isset($_POST['ability_speed2_defined']) && is_numeric($_POST['ability_speed2_defined']) ? (int)(trim($_POST['ability_speed2_defined'])) : 0;
+                if (!$ability_speed2_defined){ $form_data['ability_speed2'] = $form_data['ability_speed']; }
 
-            $ability_image_sheets_actions = !empty($_POST['ability_image_sheets_actions']) && is_array($_POST['ability_image_sheets_actions']) ? array_filter($_POST['ability_image_sheets_actions']) : array();
-            foreach ($ability_image_sheets_actions AS $sheet_num => $sheet_actions){ $ability_image_sheets_actions[$sheet_num] = array_filter($sheet_actions); }
-            $ability_image_sheets_actions = array_filter($ability_image_sheets_actions);
-            if (!empty($ability_image_sheets_actions)){
-                foreach ($ability_image_sheets_actions AS $sheet_num => $sheet_actions){
-                    if (!empty($sheet_actions['delete_images'])){
-                        $sheet_path = ($sheet_num > 1 ? '_'.$sheet_num : '');
-                        $delete_sprite_path = 'content/abilities/'.$ability_data['ability_image'].'/sprites'.$sheet_path.'/';
-                        $empty_image_folders[] = $delete_sprite_path;
+                if (!empty($form_data['ability_master'])){
+                    $ability_master_info = $mmrpg_robots_index[$form_data['ability_master']];
+                    $form_data['ability_number'] = $ability_master_info['robot_number'];
+                } else {
+                    $form_data['ability_master'] = '';
+                    $form_data['ability_number'] = '';
+                }
+
+                $empty_image_folders = array();
+
+                $ability_image_sheets_actions = !empty($_POST['ability_image_sheets_actions']) && is_array($_POST['ability_image_sheets_actions']) ? array_filter($_POST['ability_image_sheets_actions']) : array();
+                foreach ($ability_image_sheets_actions AS $sheet_num => $sheet_actions){ $ability_image_sheets_actions[$sheet_num] = array_filter($sheet_actions); }
+                $ability_image_sheets_actions = array_filter($ability_image_sheets_actions);
+                if (!empty($ability_image_sheets_actions)){
+                    foreach ($ability_image_sheets_actions AS $sheet_num => $sheet_actions){
+                        if (!empty($sheet_actions['delete_images'])){
+                            $sheet_path = ($sheet_num > 1 ? '_'.$sheet_num : '');
+                            $delete_sprite_path = 'content/abilities/'.$ability_data['ability_image'].'/sprites'.$sheet_path.'/';
+                            $empty_image_folders[] = $delete_sprite_path;
+                        }
+
                     }
-
                 }
-            }
-            //$form_messages[] = array('alert', '<pre>$ability_image_sheets_actions  = '.print_r($ability_image_sheets_actions, true).'</pre>');
+                //$form_messages[] = array('alert', '<pre>$ability_image_sheets_actions  = '.print_r($ability_image_sheets_actions, true).'</pre>');
 
-            if (!empty($empty_image_folders)){
-                //$form_messages[] = array('alert', '<pre>$empty_image_folders = '.print_r($empty_image_folders, true).'</pre>');
-                foreach ($empty_image_folders AS $empty_path_key => $empty_path){
+                if (!empty($empty_image_folders)){
+                    //$form_messages[] = array('alert', '<pre>$empty_image_folders = '.print_r($empty_image_folders, true).'</pre>');
+                    foreach ($empty_image_folders AS $empty_path_key => $empty_path){
 
-                    // Continue if this folder doesn't exist
-                    if (!file_exists(MMRPG_CONFIG_ROOTDIR.$empty_path)){ continue; }
+                        // Continue if this folder doesn't exist
+                        if (!file_exists(MMRPG_CONFIG_ROOTDIR.$empty_path)){ continue; }
 
-                    // Otherwise, collect directory contents (continue if empty)
-                    $empty_files = getDirContents(MMRPG_CONFIG_ROOTDIR.$empty_path);
-                    $empty_files = !empty($empty_files) ? array_map(function($s){ return str_replace('\\', '/', $s); }, $empty_files) : array();
-                    if (empty($empty_files)){ continue; }
-                    $form_messages[] = array('alert', '<pre>$empty_path_key = '.print_r($empty_path_key, true).' | $empty_path = '.print_r($empty_path, true).' | $empty_files = '.print_r($empty_files, true).'</pre>');
+                        // Otherwise, collect directory contents (continue if empty)
+                        $empty_files = getDirContents(MMRPG_CONFIG_ROOTDIR.$empty_path);
+                        $empty_files = !empty($empty_files) ? array_map(function($s){ return str_replace('\\', '/', $s); }, $empty_files) : array();
+                        if (empty($empty_files)){ continue; }
+                        $form_messages[] = array('alert', '<pre>$empty_path_key = '.print_r($empty_path_key, true).' | $empty_path = '.print_r($empty_path, true).' | $empty_files = '.print_r($empty_files, true).'</pre>');
 
-                    // Loop through empty files and delete one by one
-                    foreach ($empty_files AS $empty_file_key => $empty_file_path){
-                        @unlink($empty_file_path);
-                        if (!file_exists($empty_file_path)){ $form_messages[] = array('alert', str_replace(MMRPG_CONFIG_ROOTDIR, '', $empty_file_path).' was deleted!'); }
-                        else { $form_messages[] = array('warning', str_replace(MMRPG_CONFIG_ROOTDIR, '', $empty_file_path).' could not be deleted!');  }
+                        // Loop through empty files and delete one by one
+                        foreach ($empty_files AS $empty_file_key => $empty_file_path){
+                            @unlink($empty_file_path);
+                            if (!file_exists($empty_file_path)){ $form_messages[] = array('alert', str_replace(MMRPG_CONFIG_ROOTDIR, '', $empty_file_path).' was deleted!'); }
+                            else { $form_messages[] = array('warning', str_replace(MMRPG_CONFIG_ROOTDIR, '', $empty_file_path).' could not be deleted!');  }
+                        }
+
                     }
-
                 }
+
+                // Ensure the functions code is VALID PHP SYNTAX and save, otherwise do not save but allow user to fix it
+                if (empty($form_data['ability_functions_markup'])){
+                    // Functions code is EMPTY and will be ignored
+                    $form_messages[] = array('warning', $this_ability_class_short_name_uc.' functions code was empty and was not saved (reverted to original)');
+                } elseif (!cms_admin::is_valid_php_syntax($form_data['ability_functions_markup'])){
+                    // Functions code is INVALID and must be fixed
+                    $form_messages[] = array('warning', $this_ability_class_short_name_uc.' functions code was invalid PHP syntax and was not saved (please fix and try again)');
+                    $_SESSION['ability_functions_markup'][$ability_data['ability_id']] = $form_data['ability_functions_markup'];
+                } else {
+                    // Functions code is OKAY and can be saved
+                    $ability_functions_path = MMRPG_CONFIG_ABILITIES_CONTENT_PATH.$ability_data['ability_token'].'/functions.php';
+                    $old_ability_functions_markup = file_exists($ability_functions_path) ? normalize_file_markup(file_get_contents($ability_functions_path)) : '';
+                    $new_ability_functions_markup = normalize_file_markup($form_data['ability_functions_markup']);
+                    if (empty($old_ability_functions_markup) || $new_ability_functions_markup !== $old_ability_functions_markup){
+                        $f = fopen($ability_functions_path, 'w');
+                        fwrite($f, $new_ability_functions_markup);
+                        fclose($f);
+                        $form_messages[] = array('alert', $this_ability_class_short_name_uc.' functions file was updated');
+                    }
+                }
+
+            }
+            // Otherwise, if NEW data, pre-populate certain fields
+            else {
+
+                $form_data['ability_accuracy'] = 4;
+                $form_data['ability_accuracy'] = 100;
+
+                $form_data['ability_game'] = 'MMRPG';
+                $form_data['ability_group'] = 'MMRPG/Weapons/Misc';
+                $form_data['ability_order'] = 1 + $db->get_value("SELECT MAX(ability_order) AS max FROM mmrpg_index_abilities WHERE ability_class = '{$this_ability_class}';", 'max');
+
             }
 
-            // Ensure the functions code is VALID PHP SYNTAX and save, otherwise do not save but allow user to fix it
-            if (empty($form_data['ability_functions_markup'])){
-                // Functions code is EMPTY and will be ignored
-                $form_messages[] = array('warning', $this_ability_class_short_name_uc.' functions code was empty and was not saved (reverted to original)');
-            } elseif (!cms_admin::is_valid_php_syntax($form_data['ability_functions_markup'])){
-                // Functions code is INVALID and must be fixed
-                $form_messages[] = array('warning', $this_ability_class_short_name_uc.' functions code was invalid PHP syntax and was not saved (please fix and try again)');
-                $_SESSION['ability_functions_markup'][$ability_data['ability_id']] = $form_data['ability_functions_markup'];
-            } else {
-                // Functions code is OKAY and can be saved
-                $ability_functions_path = MMRPG_CONFIG_ABILITIES_CONTENT_PATH.$ability_data['ability_token'].'/functions.php';
-                $old_ability_functions_markup = file_exists($ability_functions_path) ? normalize_file_markup(file_get_contents($ability_functions_path)) : '';
-                $new_ability_functions_markup = normalize_file_markup($form_data['ability_functions_markup']);
-                if (empty($old_ability_functions_markup) || $new_ability_functions_markup !== $old_ability_functions_markup){
-                    $f = fopen($ability_functions_path, 'w');
-                    fwrite($f, $new_ability_functions_markup);
-                    fclose($f);
-                    $form_messages[] = array('alert', $this_ability_class_short_name_uc.' functions file was updated');
-                }
-            }
             // Regardless, unset the markup variable so it's not save to the database
             unset($form_data['ability_functions_markup']);
 
@@ -490,15 +551,33 @@
             $update_data = $form_data;
             unset($update_data['ability_id']);
 
-            // Update the main database index with changes to this ability's data
-            $update_results = $db->update('mmrpg_index_abilities', $update_data, array('ability_id' => $form_data['ability_id']));
+            // If this is a new ability we insert, otherwise we update the existing
+            if ($ability_data_is_new){
 
-            // DEBUG
-            //$form_messages[] = array('alert', '<pre>$form_data = '.print_r($form_data, true).'</pre>');
+                // Update the main database index with changes to this ability's data
+                $update_data['ability_flag_protected'] = 0;
+                $insert_results = $db->insert('mmrpg_index_abilities', $update_data);
 
-            // If we made it this far, the update must have been a success
-            if ($update_results !== false){ $form_success = true; $form_messages[] = array('success', $this_ability_class_short_name_uc.' data was updated successfully!'); }
-            else { $form_success = false; $form_messages[] = array('error', $this_ability_class_short_name_uc.' data could not be updated...'); }
+                // If we made it this far, the update must have been a success
+                if ($insert_results !== false){ $form_success = true; $form_messages[] = array('success', $this_ability_class_short_name_uc.' data was created successfully!'); }
+                else { $form_success = false; $form_messages[] = array('error', $this_ability_class_short_name_uc.' data could not be created...'); }
+
+                // If the form was a success, collect the new ID for the redirect
+                if ($form_success){
+                    $new_ability_id = $db->get_value("SELECT MAX(ability_id) AS max FROM mmrpg_index_abilities;", 'max');
+                    $form_data['ability_id'] = $new_ability_id;
+                }
+
+            } else {
+
+                // Update the main database index with changes to this ability's data
+                $update_results = $db->update('mmrpg_index_abilities', $update_data, array('ability_id' => $form_data['ability_id']));
+
+                // If we made it this far, the update must have been a success
+                if ($update_results !== false){ $form_messages[] = array('success', $this_ability_class_short_name_uc.' data was updated successfully!'); }
+                else { $form_messages[] = array('error', $this_ability_class_short_name_uc.' data could not be updated...'); }
+
+            }
 
             // Update cache timestamp if changes were successful
             if ($form_success){
@@ -508,10 +587,15 @@
             }
 
             // If successful, we need to update the JSON file
-            if ($form_success){ cms_admin::object_editor_update_json_data_file('ability', array_merge($ability_data, $update_data)); }
+            if ($form_success){
+                if ($ability_data_is_new){ $ability_data['ability_id'] = $new_ability_id; }
+                cms_admin::object_editor_update_json_data_file('ability', array_merge($ability_data, $update_data));
+            }
 
             // If the ability tokens have changed, we must move the entire folder
-            if ($old_ability_token !== $update_data['ability_token']){
+            if ($form_success
+                && !$ability_data_is_new
+                && $old_ability_token !== $update_data['ability_token']){
                 $old_content_path = MMRPG_CONFIG_ABILITIES_CONTENT_PATH.$old_ability_token.'/';
                 $new_content_path = MMRPG_CONFIG_ABILITIES_CONTENT_PATH.$update_data['ability_token'].'/';
                 if (rename($old_content_path, $new_content_path)){
@@ -523,7 +607,8 @@
             }
 
             // We're done processing the form, we can exit
-            exit_ability_edit_action($form_data['ability_id']);
+            if (empty($form_data['ability_id'])){ exit_ability_edit_action(false); }
+            else { exit_ability_edit_action($form_data['ability_id']); }
 
             //echo('<pre>$form_action = '.print_r($form_action, true).'</pre>');
             //echo('<pre>$_POST = '.print_r($_POST, true).'</pre>');
@@ -541,7 +626,7 @@
         <a href="admin/">Admin Panel</a>
         &raquo; <a href="<?= $this_ability_page_baseurl ?>">Edit <?= $this_ability_xclass_name_uc ?></a>
         <? if ($sub_action == 'editor' && !empty($ability_data)): ?>
-            &raquo; <a href="<?= $this_ability_page_baseurl ?>editor/ability_id=<?= $ability_data['ability_id'] ?>"><?= $ability_name_display ?></a>
+            &raquo; <a href="<?= $this_ability_page_baseurl ?>editor/ability_id=<?= $ability_data['ability_id'] ?>"><?= !empty($ability_name_display) ? $ability_name_display : 'New Ability' ?></a>
         <? endif; ?>
     </div>
 
@@ -653,8 +738,9 @@
                     </div>
 
                     <div class="buttons">
-                        <input class="button" type="submit" value="Search" />
-                        <input class="button" type="reset" value="Reset" onclick="javascript:window.location.href='<?= $this_ability_page_baseurl ?>';" />
+                        <input class="button search" type="submit" value="Search" />
+                        <input class="button reset" type="reset" value="Reset" onclick="javascript:window.location.href='<?= $this_ability_page_baseurl ?>';" />
+                        <a class="button new" href="<?= $this_ability_page_baseurl.'editor/ability_id=0' ?>">Create New <?= ucfirst($this_ability_class) ?> Ability</a>
                     </div>
 
                 </form>
@@ -786,7 +872,8 @@
 
         <?
         if ($sub_action == 'editor'
-            && !empty($_GET['ability_id'])){
+            && isset($_GET['ability_id'])
+            ){
 
             // Capture editor markup in a buffer in case we need to modify
             if (true){
@@ -798,7 +885,7 @@
                 <div class="editor">
 
                     <h3 class="header type_span type_<?= !empty($ability_data['ability_type']) ? $ability_data['ability_type'].(!empty($ability_data['ability_type2']) ? '_'.$ability_data['ability_type2'] : '') : 'none' ?>" data-auto="field-type" data-field-type="ability_type,ability_type2">
-                        <span class="title">Edit <?= $this_ability_class_short_name_uc ?> &quot;<?= $ability_name_display ?>&quot;</span>
+                        <span class="title"><?= !empty($ability_name_display) ? 'Edit '.$this_ability_class_short_name_uc.' &quot;'.$ability_name_display.'&quot;' : 'Create New '.$this_ability_class_short_name_uc ?></span>
                         <?
 
                         // Print out any git-related statues to this header
@@ -818,11 +905,13 @@
 
                     <? print_form_messages() ?>
 
-                    <div class="editor-tabs" data-tabgroup="ability">
-                        <a class="tab active" data-tab="basic">Basic</a><span></span>
-                        <a class="tab" data-tab="sprites">Sprites</a><span></span>
-                        <a class="tab" data-tab="functions">Functions</a><span></span>
-                    </div>
+                    <? if (!$ability_data_is_new){ ?>
+                        <div class="editor-tabs" data-tabgroup="ability">
+                            <a class="tab active" data-tab="basic">Basic</a><span></span>
+                            <a class="tab" data-tab="sprites">Sprites</a><span></span>
+                            <a class="tab" data-tab="functions">Functions</a><span></span>
+                        </div>
+                    <? } ?>
 
                     <form class="form" method="post">
 
@@ -844,10 +933,11 @@
                                 <div class="field">
                                     <div class="label">
                                         <strong><?= $this_ability_class_short_name_uc ?> Token</strong>
-                                        <em>avoid changing</em>
+                                        <?= !empty($ability_data['ability_flag_protected']) ? '<em>cannot be changed</em>' : '' ?>
                                     </div>
                                     <input type="hidden" name="old_ability_token" value="<?= $ability_data['ability_token'] ?>" />
-                                    <input class="textbox" type="text" name="ability_token" value="<?= $ability_data['ability_token'] ?>" maxlength="64" />
+                                    <input type="hidden" name="ability_token" value="<?= $ability_data['ability_token'] ?>" />
+                                    <input class="textbox" type="text" name="ability_token" value="<?= $ability_data['ability_token'] ?>" maxlength="64" <?= !empty($ability_data['ability_flag_protected']) ? 'disabled="disabled"' : '' ?> />
                                 </div>
 
                                 <div class="field">
@@ -890,506 +980,518 @@
                                     </div>
                                 </div>
 
-                                <div class="field">
-                                    <strong class="label">Target</strong>
-                                    <select class="select" name="ability_target">
-                                        <option value="auto" <?= empty($ability_data['ability_target']) || $ability_data['ability_target'] == 'auto' ? 'selected="selected"' : '' ?>>Auto</option>
-                                        <option value="select_target" <?= $ability_data['ability_target'] == 'select_target' ? 'selected="selected"' : '' ?>>Select Target (Enemy Side)</option>
-                                        <option value="select_this" <?= $ability_data['ability_target'] == 'select_this' ? 'selected="selected"' : '' ?>>Select Target (Player Side)</option>
-                                        <option value="select_this_ally" <?= $ability_data['ability_target'] == 'select_this_ally' ? 'selected="selected"' : '' ?>>Select Ally (Player Side)</option>
-                                        <option value="select_this_disabled" <?= $ability_data['ability_target'] == 'select_this_disabled' ? 'selected="selected"' : '' ?>>Select Disabled (Player Side)</option>
-                                    </select><span></span>
-                                </div>
+                                <? if (!$ability_data_is_new){ ?>
 
-                                <div class="field disabled">
-                                    <strong class="label">Price <em>not ready yet</em></strong>
-                                    <input class="textbox" type="number" name="ability_price" value="<?= $ability_data['ability_price'] ?>" maxlength="8" disabled="disabled" />
-                                </div>
-
-                                <hr />
-
-                                <div class="field foursize has_unit has_unit_checkbox">
-                                    <strong class="label"><span class="type_span type_weapons">Energy</span> <em>WE</em></strong>
-                                    <input class="textbox" type="number" name="ability_energy" value="<?= $ability_data['ability_energy'] ?>" maxlength="8" min="0" max="64" step="2" />
-                                    <? $is_percent = !empty($ability_data['ability_energy_percent']) ? true : false; ?>
-                                    <strong class="unit has_checkbox" title="Is Percent?">
-                                        <span class="<?= $is_percent ? 'active' : 'inactive' ?>">%</span>
-                                        <input type="hidden" name="ability_energy_percent" value="0" />
-                                        <input type="checkbox" name="ability_energy_percent" value="1" <?= $is_percent ? 'checked="checked"' : '' ?> />
-                                    </strong>
-                                </div>
-
-                                <div class="field foursize has_unit">
-                                    <strong class="label"><span class="type_span type_shield">Accuracy</span></strong>
-                                    <input class="textbox" type="number" name="ability_accuracy" value="<?= $ability_data['ability_accuracy'] ?>" maxlength="8" min="1" max="100" step="1" />
-                                    <strong class="unit">
-                                        <span>%</span>
-                                    </strong>
-                                </div>
-
-                                <div class="field foursize has_toggle">
-                                    <strong class="label"><span class="type_span type_speed">Speed</span> <em>displayed value</em></strong>
-                                    <input class="textbox" type="number" name="ability_speed" value="<?= $ability_data['ability_speed'] ?>" maxlength="8" min="-10" max="10" step="1" />
-                                </div>
-
-                                <? $ability_speed2_defined = ($ability_data['ability_speed2'] !== $ability_data['ability_speed']) ? true : false;  ?>
-                                <div class="field foursize has_toggle has_toggle_checkbox <?= !$ability_speed2_defined ? 'disabled' : '' ?>">
-                                    <strong class="label"><span class="type_span type_speed">Speed2</span> <em>hidden value</em></strong>
-                                    <input type="hidden" name="ability_speed2" value="auto" />
-                                    <input class="textbox toggle_input" type="number" name="ability_speed2" value="<?= $ability_speed2_defined ? $ability_data['ability_speed2'] : '' ?>" data-default-value-from="ability_speed" maxlength="8" min="-10" max="10" step="1" <?= !$ability_speed2_defined ? 'disabled="disabled"' : '' ?> />
-                                    <strong class="toggle has_checkbox">
-                                        <input type="hidden" name="ability_speed2_defined" value="0" />
-                                        <input type="checkbox" name="ability_speed2_defined" value="1" <?= $ability_speed2_defined ? 'checked="checked"' : '' ?> />
-                                    </strong>
-                                </div>
-
-                                <hr />
-
-                                <?
-                                // Define the "power" stats and loop through them, generating field markup
-                                $power_fields = array('damage' => 'attack', 'recovery' => 'energy');
-                                foreach ($power_fields AS $power_field => $power_colour){
-                                    for ($i = 1; $i <= 2; $i++){
-                                        $token = $power_field.($i > 1 ? $i : '');
-                                        $name = ucfirst($power_field).($i > 1 ? $i : '');
-                                        $note = $i === 1 ? 'displayed value' : 'hidden value';
-                                        $field_name = 'ability_'.$token;
-                                        $field_percent_name = $field_name.'_percent';
-                                        $is_percent = !empty($ability_data[$field_percent_name]) ? true : false;
-                                        ?>
-                                        <div class="field foursize has_unit has_unit_checkbox">
-                                            <strong class="label"><span class="type_span type_<?= $power_colour ?>"><?= $name ?></span> <em><?= $note ?></em></strong>
-                                            <input class="textbox" type="number" name="<?= $field_name ?>" value="<?= $ability_data[$field_name] ?>" maxlength="8" min="0" step="1" />
-                                            <strong class="unit has_checkbox" title="Is Percent?">
-                                                <span class="<?= $is_percent ? 'active' : 'inactive' ?>">%</span>
-                                                <input type="hidden" name="<?= $field_percent_name ?>" value="0" />
-                                                <input type="checkbox" name="<?= $field_percent_name ?>" value="1" <?= $is_percent ? 'checked="checked"' : '' ?> />
-                                            </strong>
-                                        </div>
-                                        <?
-                                    }
-                                }
-                                ?>
-
-                                <hr />
-
-                                <div class="field fullsize" style="margin-bottom: 0; padding-bottom: 0;">
-                                    <div class="label">
-                                        <strong><?= $this_ability_class_short_name_uc ?> Description</strong>
-                                        <em>short paragraph describing what this ability does and its effects</em>
-                                    </div>
-                                    <textarea class="textarea" name="ability_description" rows="4"><?= htmlentities($ability_data['ability_description'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
-                                    <div class="label examples" style="font-size: 80%; padding-top: 4px; margin-bottom: 0;">
-                                        <strong>Dynamic Values</strong>:
-                                        <br />
-                                        <code style="color: green;">{DAMAGE}</code>, <code style="color: green;">{DAMAGE2}</code>,
-                                        <code style="color: green;">{RECOVERY}</code>, <code style="color: green;">{RECOVERY2}</code>
-                                    </div>
-                                </div>
-
-                                <hr />
-
-                                <div class="field foursize">
-                                    <strong class="label">Source Game</strong>
-                                    <select class="select" name="ability_game">
-                                        <?
-                                        $ability_games_tokens = $db->get_array_list("SELECT DISTINCT (ability_game) AS game_token FROM mmrpg_index_abilities WHERE ability_game <> '' ORDER BY ability_game ASC;", 'game_token');
-                                        echo('<option value=""'.(empty($ability_data['ability_game']) ? 'selected="selected"' : '').'>- none -</option>');
-                                        foreach ($ability_games_tokens AS $game_token => $game_data){
-                                            $label = $game_token;
-                                            $selected = !empty($ability_data['ability_game']) && $ability_data['ability_game'] == $game_token ? 'selected="selected"' : '';
-                                            echo('<option value="'.$game_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                        }
-                                        ?>
-                                    </select><span></span>
-                                </div>
-
-                                <div class="field foursize">
-                                    <strong class="label">Source Robot</strong>
-                                    <select class="select" name="ability_master">
-                                        <?
-                                        echo('<option value=""'.(empty($ability_data['ability_master']) ? 'selected="selected"' : '').'>- none -</option>');
-                                        $last_robot_group = '';
-                                        foreach ($mmrpg_robots_index AS $robot_token => $robot_info){
-                                            if ($robot_info['robot_class'] !== $this_ability_class){ continue; }
-                                            if ($last_robot_group !== $robot_info['robot_game']){
-                                                if (!empty($last_robot_group)){ echo('</optgroup>'.PHP_EOL); }
-                                                $last_robot_group = $robot_info['robot_game'];
-                                                echo('<optgroup label="'.$last_robot_group.' '.ucfirst($this_ability_xclass).'">'.PHP_EOL);
-                                            }
-                                            $types = !empty($robot_info['robot_core']) ? ucfirst($robot_info['robot_core']) : 'Neutral';
-                                            if (!empty($robot_info['robot_core']) && !empty($robot_info['robot_core2'])){ $types .= ' / '.ucfirst($robot_info['robot_core2']); }
-                                            $label = $robot_info['robot_name'].' ('.$types.')';
-                                            $selected = !empty($ability_data['ability_master']) && $ability_data['ability_master'] == $robot_token ? 'selected="selected"' : '';
-                                            echo('<option value="'.$robot_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                        }
-                                        if (!empty($last_robot_group)){ echo('</optgroup>'.PHP_EOL); }
-                                        ?>
-                                    </select><span></span>
-                                </div>
-
-                                <div class="field foursize">
-                                    <strong class="label">Sort Group</strong>
-                                    <input class="textbox" type="text" name="ability_group" value="<?= $ability_data['ability_group'] ?>" maxlength="64" />
-                                </div>
-
-                                <div class="field foursize">
-                                    <strong class="label">Sort Order</strong>
-                                    <input class="textbox" type="number" name="ability_order" value="<?= $ability_data['ability_order'] ?>" maxlength="8" />
-                                </div>
-
-                            </div>
-
-                            <div class="panel" data-tab="sprites">
-
-                                <?
-
-                                // Pre-generate a list of all contributors so we can re-use it over and over
-                                $contributor_options_markup = array();
-                                $contributor_options_markup[] = '<option value="0">-</option>';
-                                foreach ($mmrpg_contributors_index AS $editor_id => $user_info){
-                                    $option_label = $user_info['user_name'];
-                                    if (!empty($user_info['user_name_public']) && $user_info['user_name_public'] !== $user_info['user_name']){ $option_label = $user_info['user_name_public'].' ('.$option_label.')'; }
-                                    $contributor_options_markup[] = '<option value="'.$editor_id.'">'.$option_label.'</option>';
-                                }
-                                $contributor_options_count = count($contributor_options_markup);
-                                $contributor_options_markup = implode(PHP_EOL, $contributor_options_markup);
-
-                                ?>
-
-                                <? $placeholder_folder = $ability_data['ability_class'] != 'master' ? $ability_data['ability_class'] : 'ability'; ?>
-                                <div class="field halfsize">
-                                    <div class="label">
-                                        <strong>Sprite Path</strong>
-                                        <em>base image path for sprites</em>
-                                    </div>
-                                    <select class="select" name="ability_image">
-                                        <option value="<?= $placeholder_folder ?>" <?= $ability_data['ability_image'] == $placeholder_folder ? 'selected="selected"' : '' ?>>-</option>
-                                        <option value="<?= $ability_data['ability_token'] ?>" <?= $ability_data['ability_image'] == $ability_data['ability_token'] ? 'selected="selected"' : '' ?>>content/abilities/<?= $ability_data['ability_token'] ?>/</option>
-                                    </select><span></span>
-                                </div>
-
-                                <div class="field halfsize">
-                                    <div class="label">
-                                        <strong>Sprite Size</strong>
-                                        <em>base frame size for each sprite</em>
-                                    </div>
-                                    <select class="select" name="ability_image_size">
-                                        <? if ($ability_data['ability_image'] == $placeholder_folder){ ?>
-                                            <option value="<?= $ability_data['ability_image_size'] ?>" selected="selected">-</option>
-                                            <option value="40">40x40</option>
-                                            <option value="80">80x80</option>
-                                            <option disabled="disabled" value="160">160x160</option>
-                                        <? } else { ?>
-                                            <option value="40" <?= $ability_data['ability_image_size'] == 40 ? 'selected="selected"' : '' ?>>40x40</option>
-                                            <option value="80" <?= $ability_data['ability_image_size'] == 80 ? 'selected="selected"' : '' ?>>80x80</option>
-                                            <option disabled="disabled" value="160" <?= $ability_data['ability_image_size'] == 160 ? 'selected="selected"' : '' ?>>160x160</option>
-                                        <? } ?>
-                                    </select><span></span>
-                                </div>
-
-                                <div class="field halfsize">
-                                    <div class="label">
-                                        <strong>Sprite Editor #1</strong>
-                                        <em>user who edited or created this sprite</em>
-                                    </div>
-                                    <? if ($ability_data['ability_image'] != $placeholder_folder){ ?>
-                                        <select class="select" name="ability_image_editor">
-                                            <?= str_replace('value="'.$ability_data['ability_image_editor'].'"', 'value="'.$ability_data['ability_image_editor'].'" selected="selected"', $contributor_options_markup) ?>
+                                    <div class="field">
+                                        <strong class="label">Target</strong>
+                                        <select class="select" name="ability_target">
+                                            <option value="auto" <?= empty($ability_data['ability_target']) || $ability_data['ability_target'] == 'auto' ? 'selected="selected"' : '' ?>>Auto</option>
+                                            <option value="select_target" <?= $ability_data['ability_target'] == 'select_target' ? 'selected="selected"' : '' ?>>Select Target (Enemy Side)</option>
+                                            <option value="select_this" <?= $ability_data['ability_target'] == 'select_this' ? 'selected="selected"' : '' ?>>Select Target (Player Side)</option>
+                                            <option value="select_this_ally" <?= $ability_data['ability_target'] == 'select_this_ally' ? 'selected="selected"' : '' ?>>Select Ally (Player Side)</option>
+                                            <option value="select_this_disabled" <?= $ability_data['ability_target'] == 'select_this_disabled' ? 'selected="selected"' : '' ?>>Select Disabled (Player Side)</option>
                                         </select><span></span>
-                                    <? } else { ?>
-                                        <input type="hidden" name="ability_image_editor" value="<?= $ability_data['ability_image_editor'] ?>" />
-                                        <input class="textbox" type="text" name="ability_image_editor" value="-" disabled="disabled" />
-                                    <? } ?>
-                                </div>
-
-                                <div class="field halfsize">
-                                    <div class="label">
-                                        <strong>Sprite Editor #2</strong>
-                                        <em>another user who collaborated on this sprite</em>
                                     </div>
-                                    <? if ($ability_data['ability_image'] != $placeholder_folder){ ?>
-                                        <select class="select" name="ability_image_editor2">
-                                            <?= str_replace('value="'.$ability_data['ability_image_editor2'].'"', 'value="'.$ability_data['ability_image_editor2'].'" selected="selected"', $contributor_options_markup) ?>
-                                        </select><span></span>
-                                    <? } else { ?>
-                                        <input type="hidden" name="ability_image_editor2" value="<?= $ability_data['ability_image_editor2'] ?>" />
-                                        <input class="textbox" type="text" name="ability_image_editor2" value="-" disabled="disabled" />
-                                    <? } ?>
-                                </div>
 
-                                <div class="field halfsize">
-                                    <div class="label">
-                                        <strong>Sprite Sheets</strong>
-                                        <em>number of sheets this sprite requires</em>
+                                    <div class="field disabled">
+                                        <strong class="label">Price <em>not ready yet</em></strong>
+                                        <input class="textbox" type="number" name="ability_price" value="<?= $ability_data['ability_price'] ?>" maxlength="8" disabled="disabled" />
                                     </div>
-                                    <input class="textbox" type="number" name="ability_image_sheets" value="<?= $ability_data['ability_image_sheets'] ?>" maxlength="8" min="0" step="1" />
-                                </div>
 
-                                <?
+                                    <hr />
 
-                                // Only proceed if all required sprite fields are set
-                                if (!empty($ability_data['ability_image'])
-                                    && $ability_data['ability_image'] != $placeholder_folder
-                                    && !empty($ability_data['ability_image_size'])
-                                    && !empty($ability_data['ability_image_sheets'])){
-
-                                    echo('<hr />'.PHP_EOL);
-
-                                    // Define the base sprite paths for this ability given its image token
-                                    $base_sprite_path = 'content/abilities/'.$ability_data['ability_image'].'/sprites/';
-
-                                    // Loop through the defined sheets for this ability and display image lists
-                                    for ($sheet_key = 0; $sheet_key < $ability_data['ability_image_sheets']; $sheet_key++){
-
-                                        $sheet_num = $sheet_key + 1;
-                                        $is_base_sprite = $sheet_key === 0 ? true : false;
-
-                                        $sheet_file_path = rtrim($base_sprite_path, '/').(!$is_base_sprite ? '_'.$sheet_num : '').'/';
-                                        $sheet_file_dir = MMRPG_CONFIG_ROOTDIR.$sheet_file_path;
-                                        $sheet_files_existing = getDirContents($sheet_file_dir);
-
-                                        if (!empty($sheet_files_existing)){ $sheet_files_existing = array_map(function($s)use($sheet_file_dir){ return str_replace($sheet_file_dir, '', str_replace('\\', '/', $s)); }, $sheet_files_existing); }
-
-                                        //echo('<pre>$sheet_files_existing = '.(!empty($sheet_files_existing) ? htmlentities(print_r($sheet_files_existing, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
-
-                                        ?>
-
-                                        <?= ($sheet_key > 0) ? '<hr />' : '' ?>
-
-                                        <div class="field fullsize" style="margin-bottom: 0; min-height: 0;">
-                                            <strong class="label">
-                                                <? if ($is_base_sprite){ ?>
-                                                    Base Sprite Sheets
-                                                    <em>Main sprites used for ability. Zoom sprites are auto-generated.</em>
-                                                <? } else { ?>
-                                                    <?= 'Sprite Sheet #'.$sheet_num  ?>
-                                                    <em>Additional sprite sheet used for this ability. Zoom sprites are auto-generated.</em>
-                                                <? } ?>
-                                            </strong>
-                                        </div>
-                                        <div class="field fullsize has2cols widecols multirow sprites has-filebars">
-                                            <?
-                                            $sheet_groups = array('sprites');
-                                            $sheet_kinds = array('icon', 'sprite');
-                                            $sheet_sizes = array($ability_data['ability_image_size'], $ability_data['ability_image_size'] * 2);
-                                            $sheet_directions = array('left', 'right');
-                                            $num_frames = count(explode('/', MMRPG_SETTINGS_ABILITY_FRAMEINDEX));
-                                            foreach ($sheet_groups AS $group_key => $group){
-                                                if ($group == 'sprites'){ $this_sheet_path = $sheet_file_path; }
-                                                foreach ($sheet_sizes AS $size_key => $size){
-                                                    $sheet_height = $size;
-                                                    $files_are_automatic = false;
-                                                    if ($size_key != 0){ $files_are_automatic = true; }
-                                                    //if ($size_key > 0){ $files_are_automatic = true; }
-                                                    $subfield_class = 'subfield';
-                                                    if ($files_are_automatic){ $subfield_class .= ' auto-generated'; }
-                                                    $subfield_style = '';
-                                                    if ($size_key == 0){ $subfield_style = 'clear: left; '; }
-                                                    if (!empty($subfield_style)){ $subfield_style = ' style="'.trim($subfield_style).'"'; }
-                                                    $subfield_name = $group.' @ '.(100 + ($size_key * 100)).'%';
-                                                    echo('<div class="'.$subfield_class.'"'.$subfield_style.' data-group="'.$group.'" data-size="'.$size.'">'.PHP_EOL);
-                                                        echo('<strong class="sublabel" style="font-size: 90%;">'.$subfield_name.'</strong>'.PHP_EOL);
-                                                        if ($files_are_automatic){ echo('<span class="sublabel" style="font-size: 90%; color: #969696;">(auto-generated)</span>'.PHP_EOL); }
-                                                        echo('<br />'.PHP_EOL);
-                                                        echo('<ul class="files">'.PHP_EOL);
-                                                        foreach ($sheet_kinds AS $kind_key => $kind){
-                                                            $sheet_width = $kind != 'icon' ? ($size * $num_frames) : $size;
-                                                            foreach ($sheet_directions AS $direction_key => $direction){
-                                                                $file_name = $kind.'_'.$direction.'_'.$size.'x'.$size.'.png';
-                                                                $file_href = MMRPG_CONFIG_ROOTURL.$this_sheet_path.$file_name;
-                                                                $file_exists = in_array($file_name, $sheet_files_existing) ? true : false;
-                                                                $file_is_unused = false;
-                                                                $file_is_optional = false;
-                                                                echo('<li>');
-                                                                    echo('<div class="filebar'.($file_is_unused ? ' unused' : '').($file_is_optional ? ' optional' : '').'" data-auto="file-bar" data-file-path="'.$this_sheet_path.'" data-file-name="'.$file_name.'" data-file-kind="image/png" data-file-width="'.$sheet_width.'" data-file-height="'.$sheet_height.'" data-file-extras="auto-zoom-x2">');
-                                                                        echo($file_exists ? '<a class="link view" href="'.$file_href.'?'.time().'" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>' : '<a class="link view disabled" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>');
-                                                                        echo('<span class="info size">'.$sheet_width.'w &times; '.$sheet_height.'h</span>');
-                                                                        echo($file_exists ? '<span class="info status good">&check;</span>' : '<span class="info status bad">&cross;</span>');
-                                                                        if (!$files_are_automatic){
-                                                                            echo('<a class="action delete'.(!$file_exists ? ' disabled' : '').'" data-action="delete" data-file-hash="'.md5('delete/'.$this_sheet_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">Delete</a>');
-                                                                            echo('<a class="action upload'.($file_exists ? ' disabled' : '').'" data-action="upload" data-file-hash="'.md5('upload/'.$this_sheet_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">');
-                                                                                echo('<span class="text">Upload</span>');
-                                                                                echo('<input class="input" type="file" name="file_info" value=""'.($file_exists ? ' disabled="disabled"' : '').' />');
-                                                                            echo('</a>');
-                                                                        }
-                                                                    echo('</div>');
-                                                                    /* echo('<div class="preview">');
-                                                                        echo('<img class="image" src="'.$file_href.'" sheet="'.$file_name.'" />');
-                                                                    echo('</div>'); */
-                                                                echo('</li>'.PHP_EOL);
-                                                            }
-                                                        }
-                                                        echo('</ul>'.PHP_EOL);
-                                                    echo('</div>'.PHP_EOL);
-                                                }
-                                            }
-                                            ?>
-
-                                        </div>
-
-                                        <div class="options" style="margin-top: -5px; padding-top: 0;">
-
-                                            <? if ($is_base_sprite){ ?>
-
-                                                    <div class="field checkwrap rfloat fullsize">
-                                                        <label class="label">
-                                                            <strong style="color: #da1616;">Delete Base Images?</strong>
-                                                            <input type="hidden" name="ability_image_sheets_actions[<?= $sheet_num ?>][delete_images]" value="0" checked="checked" />
-                                                            <input class="checkbox" type="checkbox" name="ability_image_sheets_actions[<?= $sheet_num ?>][delete_images]" value="1" />
-                                                        </label>
-                                                        <p class="subtext" style="color: #da1616;">Empty base <strong>/sprites/</strong> folder and remove all images</p>
-                                                    </div>
-
-                                            <? } else { ?>
-
-                                                    <div class="field checkwrap rfloat fullsize">
-                                                        <label class="label">
-                                                            <strong style="color: #da1616;">Delete Sheet #<?= $sheet_num ?> Images?</strong>
-                                                            <input type="hidden" name="ability_image_sheets_actions[<?= $sheet_num ?>][delete_images]" value="0" checked="checked" />
-                                                            <input class="checkbox" type="checkbox" name="ability_image_sheets_actions[<?= $sheet_num ?>][delete_images]" value="1" />
-                                                        </label>
-                                                        <p class="subtext" style="color: #da1616;">Empty extra <strong>/sprites_<?= $sheet_num ?>/</strong> folder and remove all images</p>
-                                                    </div>
-
-                                            <? } ?>
-
-                                        </div>
-
-                                        <?
-
-                                    }
-
-                                    //$base_sprite_list = getDirContents(MMRPG_CONFIG_ROOTDIR.$base_sprite_path);
-                                    //echo('<pre>$base_sprite_path = '.print_r($base_sprite_path, true).'</pre>');
-                                    //echo('<pre>$base_sprite_list = '.(!empty($base_sprite_list) ? htmlentities(print_r($base_sprite_list, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
-                                    //echo('<pre>$temp_sheets_array = '.(!empty($temp_sheets_array) ? htmlentities(print_r($temp_sheets_array, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
-
-                                }
-
-                                ?>
-
-                            </div>
-
-                            <div class="panel" data-tab="functions">
-
-                                <div class="field fullsize codemirror" data-codemirror-mode="php">
-                                    <div class="label">
-                                        <strong><?= $this_ability_class_short_name_uc ?> Functions</strong>
-                                        <em>code is php-format with html allowed in some strings</em>
+                                    <div class="field foursize has_unit has_unit_checkbox">
+                                        <strong class="label"><span class="type_span type_weapons">Energy</span> <em>WE</em></strong>
+                                        <input class="textbox" type="number" name="ability_energy" value="<?= $ability_data['ability_energy'] ?>" maxlength="8" min="0" max="64" step="2" />
+                                        <? $is_percent = !empty($ability_data['ability_energy_percent']) ? true : false; ?>
+                                        <strong class="unit has_checkbox" title="Is Percent?">
+                                            <span class="<?= $is_percent ? 'active' : 'inactive' ?>">%</span>
+                                            <input type="hidden" name="ability_energy_percent" value="0" />
+                                            <input type="checkbox" name="ability_energy_percent" value="1" <?= $is_percent ? 'checked="checked"' : '' ?> />
+                                        </strong>
                                     </div>
+
+                                    <div class="field foursize has_unit">
+                                        <strong class="label"><span class="type_span type_shield">Accuracy</span></strong>
+                                        <input class="textbox" type="number" name="ability_accuracy" value="<?= $ability_data['ability_accuracy'] ?>" maxlength="8" min="1" max="100" step="1" />
+                                        <strong class="unit">
+                                            <span>%</span>
+                                        </strong>
+                                    </div>
+
+                                    <div class="field foursize has_toggle">
+                                        <strong class="label"><span class="type_span type_speed">Speed</span> <em>displayed value</em></strong>
+                                        <input class="textbox" type="number" name="ability_speed" value="<?= $ability_data['ability_speed'] ?>" maxlength="8" min="-10" max="10" step="1" />
+                                    </div>
+
+                                    <? $ability_speed2_defined = ($ability_data['ability_speed2'] !== $ability_data['ability_speed']) ? true : false;  ?>
+                                    <div class="field foursize has_toggle has_toggle_checkbox <?= !$ability_speed2_defined ? 'disabled' : '' ?>">
+                                        <strong class="label"><span class="type_span type_speed">Speed2</span> <em>hidden value</em></strong>
+                                        <input type="hidden" name="ability_speed2" value="auto" />
+                                        <input class="textbox toggle_input" type="number" name="ability_speed2" value="<?= $ability_speed2_defined ? $ability_data['ability_speed2'] : '' ?>" data-default-value-from="ability_speed" maxlength="8" min="-10" max="10" step="1" <?= !$ability_speed2_defined ? 'disabled="disabled"' : '' ?> />
+                                        <strong class="toggle has_checkbox">
+                                            <input type="hidden" name="ability_speed2_defined" value="0" />
+                                            <input type="checkbox" name="ability_speed2_defined" value="1" <?= $ability_speed2_defined ? 'checked="checked"' : '' ?> />
+                                        </strong>
+                                    </div>
+
+                                    <hr />
+
                                     <?
-                                    // Collect the markup for the ability functions file
-                                    if (!empty($_SESSION['ability_functions_markup'][$ability_data['ability_id']])){
-                                        $ability_functions_markup = $_SESSION['ability_functions_markup'][$ability_data['ability_id']];
-                                        unset($_SESSION['ability_functions_markup'][$ability_data['ability_id']]);
-                                    } else {
-                                        $template_functions_path = MMRPG_CONFIG_ABILITIES_CONTENT_PATH.'.ability/functions.php';
-                                        $ability_functions_path = MMRPG_CONFIG_ABILITIES_CONTENT_PATH.$ability_data['ability_token'].'/functions.php';
-                                        $ability_functions_markup = file_exists($ability_functions_path) ? file_get_contents($ability_functions_path) : file_get_contents($template_functions_path);
+                                    // Define the "power" stats and loop through them, generating field markup
+                                    $power_fields = array('damage' => 'attack', 'recovery' => 'energy');
+                                    foreach ($power_fields AS $power_field => $power_colour){
+                                        for ($i = 1; $i <= 2; $i++){
+                                            $token = $power_field.($i > 1 ? $i : '');
+                                            $name = ucfirst($power_field).($i > 1 ? $i : '');
+                                            $note = $i === 1 ? 'displayed value' : 'hidden value';
+                                            $field_name = 'ability_'.$token;
+                                            $field_percent_name = $field_name.'_percent';
+                                            $is_percent = !empty($ability_data[$field_percent_name]) ? true : false;
+                                            ?>
+                                            <div class="field foursize has_unit has_unit_checkbox">
+                                                <strong class="label"><span class="type_span type_<?= $power_colour ?>"><?= $name ?></span> <em><?= $note ?></em></strong>
+                                                <input class="textbox" type="number" name="<?= $field_name ?>" value="<?= $ability_data[$field_name] ?>" maxlength="8" min="0" step="1" />
+                                                <strong class="unit has_checkbox" title="Is Percent?">
+                                                    <span class="<?= $is_percent ? 'active' : 'inactive' ?>">%</span>
+                                                    <input type="hidden" name="<?= $field_percent_name ?>" value="0" />
+                                                    <input type="checkbox" name="<?= $field_percent_name ?>" value="1" <?= $is_percent ? 'checked="checked"' : '' ?> />
+                                                </strong>
+                                            </div>
+                                            <?
+                                        }
                                     }
                                     ?>
-                                    <textarea class="textarea" name="ability_functions_markup" rows="<?= min(20, substr_count($ability_functions_markup, PHP_EOL)) ?>"><?= htmlentities(trim($ability_functions_markup), ENT_QUOTES, 'UTF-8', true) ?></textarea>
-                                    <div class="label examples" style="font-size: 80%; padding-top: 4px;">
-                                        <strong>Available Objects</strong>:
-                                        <br />
-                                        <code style="color: #05a;">$this_battle</code>
-                                        &nbsp;&nbsp;<a title="battle data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_BATTLES_CONTENT_PATH).'.battle/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
-                                        <br />
-                                        <code style="color: #05a;">$this_field</code>
-                                        &nbsp;&nbsp;<a title="field data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_FIELDS_CONTENT_PATH).'.field/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
-                                        <br />
-                                        <code style="color: #05a;">$this_player</code>
-                                        &nbsp;/&nbsp;
-                                        <code style="color: #05a;">$target_player</code>
-                                        &nbsp;&nbsp;<a title="player data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_PLAYERS_CONTENT_PATH).'.player/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
-                                        <br />
-                                        <code style="color: #05a;">$this_robot</code>
-                                        &nbsp;/&nbsp;
-                                        <code style="color: #05a;">$target_robot</code>
-                                        &nbsp;&nbsp;<a title="robot data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_ROBOTS_CONTENT_PATH).'.robot/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
-                                        <br />
-                                        <code style="color: #05a;">$this_ability</code>
-                                        &nbsp;/&nbsp;
-                                        <code style="color: #05a;">$target_ability</code>
-                                        &nbsp;&nbsp;<a title="ability data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_ABILITIES_CONTENT_PATH).'.ability/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
-                                    </div>
-                                    <? if ($this_ability_class !== 'master'){ ?>
-                                        <div class="label examples" style=" margin: 0 auto 10px; font-size: 80%;">
-                                            <strong>Important Note</strong>:<br />
-                                            <code style="color: #cc0000;">Even though this is a <?= $this_ability_class ?>, it is still referred to as a 'ability' in the code!</code><br />
-                                            <code style="color: #cc0000;">(Use "ability_id" instead of "<?= $this_ability_class ?>_id", "ability_name" instead of "<?= $this_ability_class ?>_name", etc.)</code>
+
+                                    <hr />
+
+                                    <div class="field fullsize" style="margin-bottom: 0; padding-bottom: 0;">
+                                        <div class="label">
+                                            <strong><?= $this_ability_class_short_name_uc ?> Description</strong>
+                                            <em>short paragraph describing what this ability does and its effects</em>
                                         </div>
-                                    <? } ?>
+                                        <textarea class="textarea" name="ability_description" rows="4"><?= htmlentities($ability_data['ability_description'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                                        <div class="label examples" style="font-size: 80%; padding-top: 4px; margin-bottom: 0;">
+                                            <strong>Dynamic Values</strong>:
+                                            <br />
+                                            <code style="color: green;">{DAMAGE}</code>, <code style="color: green;">{DAMAGE2}</code>,
+                                            <code style="color: green;">{RECOVERY}</code>, <code style="color: green;">{RECOVERY2}</code>
+                                        </div>
+                                    </div>
+
+                                    <hr />
+
+                                    <div class="field foursize">
+                                        <strong class="label">Source Game</strong>
+                                        <select class="select" name="ability_game">
+                                            <?
+                                            $ability_games_tokens = $db->get_array_list("SELECT DISTINCT (ability_game) AS game_token FROM mmrpg_index_abilities WHERE ability_game <> '' ORDER BY ability_game ASC;", 'game_token');
+                                            echo('<option value=""'.(empty($ability_data['ability_game']) ? 'selected="selected"' : '').'>- none -</option>');
+                                            foreach ($ability_games_tokens AS $game_token => $game_data){
+                                                $label = $game_token;
+                                                $selected = !empty($ability_data['ability_game']) && $ability_data['ability_game'] == $game_token ? 'selected="selected"' : '';
+                                                echo('<option value="'.$game_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                            }
+                                            ?>
+                                        </select><span></span>
+                                    </div>
+
+                                    <div class="field foursize">
+                                        <strong class="label">Source Robot</strong>
+                                        <select class="select" name="ability_master">
+                                            <?
+                                            echo('<option value=""'.(empty($ability_data['ability_master']) ? 'selected="selected"' : '').'>- none -</option>');
+                                            $last_robot_group = '';
+                                            foreach ($mmrpg_robots_index AS $robot_token => $robot_info){
+                                                if ($robot_info['robot_class'] !== $this_ability_class){ continue; }
+                                                if ($last_robot_group !== $robot_info['robot_game']){
+                                                    if (!empty($last_robot_group)){ echo('</optgroup>'.PHP_EOL); }
+                                                    $last_robot_group = $robot_info['robot_game'];
+                                                    echo('<optgroup label="'.$last_robot_group.' '.ucfirst($this_ability_xclass).'">'.PHP_EOL);
+                                                }
+                                                $types = !empty($robot_info['robot_core']) ? ucfirst($robot_info['robot_core']) : 'Neutral';
+                                                if (!empty($robot_info['robot_core']) && !empty($robot_info['robot_core2'])){ $types .= ' / '.ucfirst($robot_info['robot_core2']); }
+                                                $label = $robot_info['robot_name'].' ('.$types.')';
+                                                $selected = !empty($ability_data['ability_master']) && $ability_data['ability_master'] == $robot_token ? 'selected="selected"' : '';
+                                                echo('<option value="'.$robot_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                            }
+                                            if (!empty($last_robot_group)){ echo('</optgroup>'.PHP_EOL); }
+                                            ?>
+                                        </select><span></span>
+                                    </div>
+
+                                    <div class="field foursize">
+                                        <strong class="label">Sort Group</strong>
+                                        <input class="textbox" type="text" name="ability_group" value="<?= $ability_data['ability_group'] ?>" maxlength="64" />
+                                    </div>
+
+                                    <div class="field foursize">
+                                        <strong class="label">Sort Order</strong>
+                                        <input class="textbox" type="number" name="ability_order" value="<?= $ability_data['ability_order'] ?>" maxlength="8" />
+                                    </div>
+
+                                <? } ?>
+
+                            </div>
+
+                            <? if (!$ability_data_is_new){ ?>
+                                <div class="panel" data-tab="sprites">
+
+                                    <?
+
+                                    // Pre-generate a list of all contributors so we can re-use it over and over
+                                    $contributor_options_markup = array();
+                                    $contributor_options_markup[] = '<option value="0">-</option>';
+                                    foreach ($mmrpg_contributors_index AS $editor_id => $user_info){
+                                        $option_label = $user_info['user_name'];
+                                        if (!empty($user_info['user_name_public']) && $user_info['user_name_public'] !== $user_info['user_name']){ $option_label = $user_info['user_name_public'].' ('.$option_label.')'; }
+                                        $contributor_options_markup[] = '<option value="'.$editor_id.'">'.$option_label.'</option>';
+                                    }
+                                    $contributor_options_count = count($contributor_options_markup);
+                                    $contributor_options_markup = implode(PHP_EOL, $contributor_options_markup);
+
+                                    ?>
+
+                                    <? $placeholder_folder = $ability_data['ability_class'] != 'master' ? $ability_data['ability_class'] : 'ability'; ?>
+                                    <div class="field halfsize">
+                                        <div class="label">
+                                            <strong>Sprite Path</strong>
+                                            <em>base image path for sprites</em>
+                                        </div>
+                                        <select class="select" name="ability_image">
+                                            <option value="<?= $placeholder_folder ?>" <?= $ability_data['ability_image'] == $placeholder_folder ? 'selected="selected"' : '' ?>>-</option>
+                                            <option value="<?= $ability_data['ability_token'] ?>" <?= $ability_data['ability_image'] == $ability_data['ability_token'] ? 'selected="selected"' : '' ?>>content/abilities/<?= $ability_data['ability_token'] ?>/</option>
+                                        </select><span></span>
+                                    </div>
+
+                                    <div class="field halfsize">
+                                        <div class="label">
+                                            <strong>Sprite Size</strong>
+                                            <em>base frame size for each sprite</em>
+                                        </div>
+                                        <select class="select" name="ability_image_size">
+                                            <? if ($ability_data['ability_image'] == $placeholder_folder){ ?>
+                                                <option value="<?= $ability_data['ability_image_size'] ?>" selected="selected">-</option>
+                                                <option value="40">40x40</option>
+                                                <option value="80">80x80</option>
+                                                <option disabled="disabled" value="160">160x160</option>
+                                            <? } else { ?>
+                                                <option value="40" <?= $ability_data['ability_image_size'] == 40 ? 'selected="selected"' : '' ?>>40x40</option>
+                                                <option value="80" <?= $ability_data['ability_image_size'] == 80 ? 'selected="selected"' : '' ?>>80x80</option>
+                                                <option disabled="disabled" value="160" <?= $ability_data['ability_image_size'] == 160 ? 'selected="selected"' : '' ?>>160x160</option>
+                                            <? } ?>
+                                        </select><span></span>
+                                    </div>
+
+                                    <div class="field halfsize">
+                                        <div class="label">
+                                            <strong>Sprite Editor #1</strong>
+                                            <em>user who edited or created this sprite</em>
+                                        </div>
+                                        <? if ($ability_data['ability_image'] != $placeholder_folder){ ?>
+                                            <select class="select" name="ability_image_editor">
+                                                <?= str_replace('value="'.$ability_data['ability_image_editor'].'"', 'value="'.$ability_data['ability_image_editor'].'" selected="selected"', $contributor_options_markup) ?>
+                                            </select><span></span>
+                                        <? } else { ?>
+                                            <input type="hidden" name="ability_image_editor" value="<?= $ability_data['ability_image_editor'] ?>" />
+                                            <input class="textbox" type="text" name="ability_image_editor" value="-" disabled="disabled" />
+                                        <? } ?>
+                                    </div>
+
+                                    <div class="field halfsize">
+                                        <div class="label">
+                                            <strong>Sprite Editor #2</strong>
+                                            <em>another user who collaborated on this sprite</em>
+                                        </div>
+                                        <? if ($ability_data['ability_image'] != $placeholder_folder){ ?>
+                                            <select class="select" name="ability_image_editor2">
+                                                <?= str_replace('value="'.$ability_data['ability_image_editor2'].'"', 'value="'.$ability_data['ability_image_editor2'].'" selected="selected"', $contributor_options_markup) ?>
+                                            </select><span></span>
+                                        <? } else { ?>
+                                            <input type="hidden" name="ability_image_editor2" value="<?= $ability_data['ability_image_editor2'] ?>" />
+                                            <input class="textbox" type="text" name="ability_image_editor2" value="-" disabled="disabled" />
+                                        <? } ?>
+                                    </div>
+
+                                    <div class="field halfsize">
+                                        <div class="label">
+                                            <strong>Sprite Sheets</strong>
+                                            <em>number of sheets this sprite requires</em>
+                                        </div>
+                                        <input class="textbox" type="number" name="ability_image_sheets" value="<?= $ability_data['ability_image_sheets'] ?>" maxlength="8" min="0" step="1" />
+                                    </div>
+
+                                    <?
+
+                                    // Only proceed if all required sprite fields are set
+                                    if (!empty($ability_data['ability_image'])
+                                        && $ability_data['ability_image'] != $placeholder_folder
+                                        && !empty($ability_data['ability_image_size'])
+                                        && !empty($ability_data['ability_image_sheets'])){
+
+                                        echo('<hr />'.PHP_EOL);
+
+                                        // Define the base sprite paths for this ability given its image token
+                                        $base_sprite_path = 'content/abilities/'.$ability_data['ability_image'].'/sprites/';
+
+                                        // Loop through the defined sheets for this ability and display image lists
+                                        for ($sheet_key = 0; $sheet_key < $ability_data['ability_image_sheets']; $sheet_key++){
+
+                                            $sheet_num = $sheet_key + 1;
+                                            $is_base_sprite = $sheet_key === 0 ? true : false;
+
+                                            $sheet_file_path = rtrim($base_sprite_path, '/').(!$is_base_sprite ? '_'.$sheet_num : '').'/';
+                                            $sheet_file_dir = MMRPG_CONFIG_ROOTDIR.$sheet_file_path;
+                                            $sheet_files_existing = getDirContents($sheet_file_dir);
+
+                                            if (!empty($sheet_files_existing)){ $sheet_files_existing = array_map(function($s)use($sheet_file_dir){ return str_replace($sheet_file_dir, '', str_replace('\\', '/', $s)); }, $sheet_files_existing); }
+
+                                            //echo('<pre>$sheet_files_existing = '.(!empty($sheet_files_existing) ? htmlentities(print_r($sheet_files_existing, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
+
+                                            ?>
+
+                                            <?= ($sheet_key > 0) ? '<hr />' : '' ?>
+
+                                            <div class="field fullsize" style="margin-bottom: 0; min-height: 0;">
+                                                <strong class="label">
+                                                    <? if ($is_base_sprite){ ?>
+                                                        Base Sprite Sheets
+                                                        <em>Main sprites used for ability. Zoom sprites are auto-generated.</em>
+                                                    <? } else { ?>
+                                                        <?= 'Sprite Sheet #'.$sheet_num  ?>
+                                                        <em>Additional sprite sheet used for this ability. Zoom sprites are auto-generated.</em>
+                                                    <? } ?>
+                                                </strong>
+                                            </div>
+                                            <div class="field fullsize has2cols widecols multirow sprites has-filebars">
+                                                <?
+                                                $sheet_groups = array('sprites');
+                                                $sheet_kinds = array('icon', 'sprite');
+                                                $sheet_sizes = array($ability_data['ability_image_size'], $ability_data['ability_image_size'] * 2);
+                                                $sheet_directions = array('left', 'right');
+                                                $num_frames = count(explode('/', MMRPG_SETTINGS_ABILITY_FRAMEINDEX));
+                                                foreach ($sheet_groups AS $group_key => $group){
+                                                    if ($group == 'sprites'){ $this_sheet_path = $sheet_file_path; }
+                                                    foreach ($sheet_sizes AS $size_key => $size){
+                                                        $sheet_height = $size;
+                                                        $files_are_automatic = false;
+                                                        if ($size_key != 0){ $files_are_automatic = true; }
+                                                        //if ($size_key > 0){ $files_are_automatic = true; }
+                                                        $subfield_class = 'subfield';
+                                                        if ($files_are_automatic){ $subfield_class .= ' auto-generated'; }
+                                                        $subfield_style = '';
+                                                        if ($size_key == 0){ $subfield_style = 'clear: left; '; }
+                                                        if (!empty($subfield_style)){ $subfield_style = ' style="'.trim($subfield_style).'"'; }
+                                                        $subfield_name = $group.' @ '.(100 + ($size_key * 100)).'%';
+                                                        echo('<div class="'.$subfield_class.'"'.$subfield_style.' data-group="'.$group.'" data-size="'.$size.'">'.PHP_EOL);
+                                                            echo('<strong class="sublabel" style="font-size: 90%;">'.$subfield_name.'</strong>'.PHP_EOL);
+                                                            if ($files_are_automatic){ echo('<span class="sublabel" style="font-size: 90%; color: #969696;">(auto-generated)</span>'.PHP_EOL); }
+                                                            echo('<br />'.PHP_EOL);
+                                                            echo('<ul class="files">'.PHP_EOL);
+                                                            foreach ($sheet_kinds AS $kind_key => $kind){
+                                                                $sheet_width = $kind != 'icon' ? ($size * $num_frames) : $size;
+                                                                foreach ($sheet_directions AS $direction_key => $direction){
+                                                                    $file_name = $kind.'_'.$direction.'_'.$size.'x'.$size.'.png';
+                                                                    $file_href = MMRPG_CONFIG_ROOTURL.$this_sheet_path.$file_name;
+                                                                    $file_exists = in_array($file_name, $sheet_files_existing) ? true : false;
+                                                                    $file_is_unused = false;
+                                                                    $file_is_optional = false;
+                                                                    echo('<li>');
+                                                                        echo('<div class="filebar'.($file_is_unused ? ' unused' : '').($file_is_optional ? ' optional' : '').'" data-auto="file-bar" data-file-path="'.$this_sheet_path.'" data-file-name="'.$file_name.'" data-file-kind="image/png" data-file-width="'.$sheet_width.'" data-file-height="'.$sheet_height.'" data-file-extras="auto-zoom-x2">');
+                                                                            echo($file_exists ? '<a class="link view" href="'.$file_href.'?'.time().'" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>' : '<a class="link view disabled" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>');
+                                                                            echo('<span class="info size">'.$sheet_width.'w &times; '.$sheet_height.'h</span>');
+                                                                            echo($file_exists ? '<span class="info status good">&check;</span>' : '<span class="info status bad">&cross;</span>');
+                                                                            if (!$files_are_automatic){
+                                                                                echo('<a class="action delete'.(!$file_exists ? ' disabled' : '').'" data-action="delete" data-file-hash="'.md5('delete/'.$this_sheet_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">Delete</a>');
+                                                                                echo('<a class="action upload'.($file_exists ? ' disabled' : '').'" data-action="upload" data-file-hash="'.md5('upload/'.$this_sheet_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">');
+                                                                                    echo('<span class="text">Upload</span>');
+                                                                                    echo('<input class="input" type="file" name="file_info" value=""'.($file_exists ? ' disabled="disabled"' : '').' />');
+                                                                                echo('</a>');
+                                                                            }
+                                                                        echo('</div>');
+                                                                        /* echo('<div class="preview">');
+                                                                            echo('<img class="image" src="'.$file_href.'" sheet="'.$file_name.'" />');
+                                                                        echo('</div>'); */
+                                                                    echo('</li>'.PHP_EOL);
+                                                                }
+                                                            }
+                                                            echo('</ul>'.PHP_EOL);
+                                                        echo('</div>'.PHP_EOL);
+                                                    }
+                                                }
+                                                ?>
+
+                                            </div>
+
+                                            <div class="options" style="margin-top: -5px; padding-top: 0;">
+
+                                                <? if ($is_base_sprite){ ?>
+
+                                                        <div class="field checkwrap rfloat fullsize">
+                                                            <label class="label">
+                                                                <strong style="color: #da1616;">Delete Base Images?</strong>
+                                                                <input type="hidden" name="ability_image_sheets_actions[<?= $sheet_num ?>][delete_images]" value="0" checked="checked" />
+                                                                <input class="checkbox" type="checkbox" name="ability_image_sheets_actions[<?= $sheet_num ?>][delete_images]" value="1" />
+                                                            </label>
+                                                            <p class="subtext" style="color: #da1616;">Empty base <strong>/sprites/</strong> folder and remove all images</p>
+                                                        </div>
+
+                                                <? } else { ?>
+
+                                                        <div class="field checkwrap rfloat fullsize">
+                                                            <label class="label">
+                                                                <strong style="color: #da1616;">Delete Sheet #<?= $sheet_num ?> Images?</strong>
+                                                                <input type="hidden" name="ability_image_sheets_actions[<?= $sheet_num ?>][delete_images]" value="0" checked="checked" />
+                                                                <input class="checkbox" type="checkbox" name="ability_image_sheets_actions[<?= $sheet_num ?>][delete_images]" value="1" />
+                                                            </label>
+                                                            <p class="subtext" style="color: #da1616;">Empty extra <strong>/sprites_<?= $sheet_num ?>/</strong> folder and remove all images</p>
+                                                        </div>
+
+                                                <? } ?>
+
+                                            </div>
+
+                                            <?
+
+                                        }
+
+                                        //$base_sprite_list = getDirContents(MMRPG_CONFIG_ROOTDIR.$base_sprite_path);
+                                        //echo('<pre>$base_sprite_path = '.print_r($base_sprite_path, true).'</pre>');
+                                        //echo('<pre>$base_sprite_list = '.(!empty($base_sprite_list) ? htmlentities(print_r($base_sprite_list, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
+                                        //echo('<pre>$temp_sheets_array = '.(!empty($temp_sheets_array) ? htmlentities(print_r($temp_sheets_array, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
+
+                                    }
+
+                                    ?>
+
                                 </div>
+                            <? } ?>
 
-                            </div>
+                            <? if (!$ability_data_is_new){ ?>
+                                <div class="panel" data-tab="functions">
 
-                        </div>
-
-                        <hr />
-
-                        <div class="options">
-
-                            <div class="field checkwrap">
-                                <label class="label">
-                                    <strong>Published</strong>
-                                    <input type="hidden" name="ability_flag_published" value="0" checked="checked" />
-                                    <input class="checkbox" type="checkbox" name="ability_flag_published" value="1" <?= !empty($ability_data['ability_flag_published']) ? 'checked="checked"' : '' ?> />
-                                </label>
-                                <p class="subtext">This <?= $this_ability_class_short_name ?> is ready to appear on the site</p>
-                            </div>
-
-                            <div class="field checkwrap">
-                                <label class="label">
-                                    <strong>Complete</strong>
-                                    <input type="hidden" name="ability_flag_complete" value="0" checked="checked" />
-                                    <input class="checkbox" type="checkbox" name="ability_flag_complete" value="1" <?= !empty($ability_data['ability_flag_complete']) ? 'checked="checked"' : '' ?> />
-                                </label>
-                                <p class="subtext">This <?= $this_ability_class_short_name ?>'s sprites have been completed</p>
-                            </div>
-
-                            <div class="field checkwrap">
-                                <label class="label">
-                                    <strong>Hidden</strong>
-                                    <input type="hidden" name="ability_flag_hidden" value="0" checked="checked" />
-                                    <input class="checkbox" type="checkbox" name="ability_flag_hidden" value="1" <?= !empty($ability_data['ability_flag_hidden']) ? 'checked="checked"' : '' ?> />
-                                </label>
-                                <p class="subtext">This <?= $this_ability_class_short_name ?>'s data should stay hidden</p>
-                            </div>
-
-                            <? if (!empty($ability_data['ability_flag_published'])
-                                && !empty($ability_data['ability_flag_complete'])
-                                && $ability_data['ability_class'] == 'master'){ ?>
-
-                                <div style="clear: both; padding-top: 20px;">
-
-                                    <div class="field checkwrap">
-                                        <label class="label">
-                                            <strong>Unlockable</strong>
-                                            <input type="hidden" name="ability_flag_unlockable" value="0" checked="checked" />
-                                            <input class="checkbox" type="checkbox" name="ability_flag_unlockable" value="1" <?= !empty($ability_data['ability_flag_unlockable']) ? 'checked="checked"' : '' ?> />
-                                        </label>
-                                        <p class="subtext">This <?= $this_ability_class_short_name ?> is ready to be used in the game</p>
+                                    <div class="field fullsize codemirror" data-codemirror-mode="php">
+                                        <div class="label">
+                                            <strong><?= $this_ability_class_short_name_uc ?> Functions</strong>
+                                            <em>code is php-format with html allowed in some strings</em>
+                                        </div>
+                                        <?
+                                        // Collect the markup for the ability functions file
+                                        if (!empty($_SESSION['ability_functions_markup'][$ability_data['ability_id']])){
+                                            $ability_functions_markup = $_SESSION['ability_functions_markup'][$ability_data['ability_id']];
+                                            unset($_SESSION['ability_functions_markup'][$ability_data['ability_id']]);
+                                        } else {
+                                            $template_functions_path = MMRPG_CONFIG_ABILITIES_CONTENT_PATH.'.ability/functions.php';
+                                            $ability_functions_path = MMRPG_CONFIG_ABILITIES_CONTENT_PATH.$ability_data['ability_token'].'/functions.php';
+                                            $ability_functions_markup = file_exists($ability_functions_path) ? file_get_contents($ability_functions_path) : file_get_contents($template_functions_path);
+                                        }
+                                        ?>
+                                        <textarea class="textarea" name="ability_functions_markup" rows="<?= min(20, substr_count($ability_functions_markup, PHP_EOL)) ?>"><?= htmlentities(trim($ability_functions_markup), ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                                        <div class="label examples" style="font-size: 80%; padding-top: 4px;">
+                                            <strong>Available Objects</strong>:
+                                            <br />
+                                            <code style="color: #05a;">$this_battle</code>
+                                            &nbsp;&nbsp;<a title="battle data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_BATTLES_CONTENT_PATH).'.battle/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
+                                            <br />
+                                            <code style="color: #05a;">$this_field</code>
+                                            &nbsp;&nbsp;<a title="field data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_FIELDS_CONTENT_PATH).'.field/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
+                                            <br />
+                                            <code style="color: #05a;">$this_player</code>
+                                            &nbsp;/&nbsp;
+                                            <code style="color: #05a;">$target_player</code>
+                                            &nbsp;&nbsp;<a title="player data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_PLAYERS_CONTENT_PATH).'.player/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
+                                            <br />
+                                            <code style="color: #05a;">$this_robot</code>
+                                            &nbsp;/&nbsp;
+                                            <code style="color: #05a;">$target_robot</code>
+                                            &nbsp;&nbsp;<a title="robot data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_ROBOTS_CONTENT_PATH).'.robot/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
+                                            <br />
+                                            <code style="color: #05a;">$this_ability</code>
+                                            &nbsp;/&nbsp;
+                                            <code style="color: #05a;">$target_ability</code>
+                                            &nbsp;&nbsp;<a title="ability data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_ABILITIES_CONTENT_PATH).'.ability/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
+                                        </div>
+                                        <? if ($this_ability_class !== 'master'){ ?>
+                                            <div class="label examples" style=" margin: 0 auto 10px; font-size: 80%;">
+                                                <strong>Important Note</strong>:<br />
+                                                <code style="color: #cc0000;">Even though this is a <?= $this_ability_class ?>, it is still referred to as a 'ability' in the code!</code><br />
+                                                <code style="color: #cc0000;">(Use "ability_id" instead of "<?= $this_ability_class ?>_id", "ability_name" instead of "<?= $this_ability_class ?>_name", etc.)</code>
+                                            </div>
+                                        <? } ?>
                                     </div>
 
                                 </div>
-
                             <? } ?>
 
                         </div>
 
                         <hr />
 
+                        <? if (!$ability_data_is_new){ ?>
+                            <div class="options">
+
+                                <div class="field checkwrap">
+                                    <label class="label">
+                                        <strong>Published</strong>
+                                        <input type="hidden" name="ability_flag_published" value="0" checked="checked" />
+                                        <input class="checkbox" type="checkbox" name="ability_flag_published" value="1" <?= !empty($ability_data['ability_flag_published']) ? 'checked="checked"' : '' ?> />
+                                    </label>
+                                    <p class="subtext">This <?= $this_ability_class_short_name ?> is ready to appear on the site</p>
+                                </div>
+
+                                <div class="field checkwrap">
+                                    <label class="label">
+                                        <strong>Complete</strong>
+                                        <input type="hidden" name="ability_flag_complete" value="0" checked="checked" />
+                                        <input class="checkbox" type="checkbox" name="ability_flag_complete" value="1" <?= !empty($ability_data['ability_flag_complete']) ? 'checked="checked"' : '' ?> />
+                                    </label>
+                                    <p class="subtext">This <?= $this_ability_class_short_name ?>'s sprites have been completed</p>
+                                </div>
+
+                                <div class="field checkwrap">
+                                    <label class="label">
+                                        <strong>Hidden</strong>
+                                        <input type="hidden" name="ability_flag_hidden" value="0" checked="checked" />
+                                        <input class="checkbox" type="checkbox" name="ability_flag_hidden" value="1" <?= !empty($ability_data['ability_flag_hidden']) ? 'checked="checked"' : '' ?> />
+                                    </label>
+                                    <p class="subtext">This <?= $this_ability_class_short_name ?>'s data should stay hidden</p>
+                                </div>
+
+                                <? if (!empty($ability_data['ability_flag_published'])
+                                    && !empty($ability_data['ability_flag_complete'])
+                                    && $ability_data['ability_class'] == 'master'){ ?>
+
+                                    <div style="clear: both; padding-top: 20px;">
+
+                                        <div class="field checkwrap">
+                                            <label class="label">
+                                                <strong>Unlockable</strong>
+                                                <input type="hidden" name="ability_flag_unlockable" value="0" checked="checked" />
+                                                <input class="checkbox" type="checkbox" name="ability_flag_unlockable" value="1" <?= !empty($ability_data['ability_flag_unlockable']) ? 'checked="checked"' : '' ?> />
+                                            </label>
+                                            <p class="subtext">This <?= $this_ability_class_short_name ?> is ready to be used in the game</p>
+                                        </div>
+
+                                    </div>
+
+                                <? } ?>
+
+                            </div>
+
+                            <hr />
+                        <? } ?>
+
                         <div class="formfoot">
 
                             <div class="buttons">
-                                <input class="button save" type="submit" value="Save Changes" />
-                                <? if (empty($ability_data['ability_flag_protected'])){ ?>
+                                <input class="button save" type="submit" value="<?= $ability_data_is_new ? 'Create Ability' : 'Save Changes' ?>" />
+                                <? if (!$ability_data_is_new && empty($ability_data['ability_flag_protected'])){ ?>
                                     <input class="button delete" type="button" value="Delete <?= $this_ability_class_short_name_uc ?>" data-delete="abilities" data-ability-id="<?= $ability_data['ability_id'] ?>" />
                                 <? } ?>
                             </div>
-                            <?= cms_admin::object_editor_print_git_footer_buttons('abilities/'.$this_ability_xclass, $ability_data['ability_token'], $mmrpg_git_file_arrays); ?>
+                            <? if (!$ability_data_is_new){ ?>
+                                <?= cms_admin::object_editor_print_git_footer_buttons('abilities/'.$this_ability_xclass, $ability_data['ability_token'], $mmrpg_git_file_arrays); ?>
+                            <? } ?>
 
                         </div>
 
@@ -1403,7 +1505,7 @@
                 <?
 
                 $debug_ability_data = $ability_data;
-                $debug_ability_data['ability_description2'] = str_replace(PHP_EOL, '\\n', $debug_ability_data['ability_description2']);
+                if (isset($debug_ability_data['ability_description2'])){ $debug_ability_data['ability_description2'] = str_replace(PHP_EOL, '\\n', $debug_ability_data['ability_description2']); }
                 echo('<pre style="display: none;">$ability_data = '.(!empty($debug_ability_data) ? htmlentities(print_r($debug_ability_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
 
                 ?>
