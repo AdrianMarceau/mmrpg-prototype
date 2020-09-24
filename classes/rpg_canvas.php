@@ -62,9 +62,10 @@ class rpg_canvas {
             // Generate the final markup for the canvas player
             ob_start();
 
-                // Display this player's sprite in the active position
+                // Display this player's shadow sprite in the active position
                 global $flag_wap, $flag_ipad, $flag_iphone;
-                if (!$flag_wap && !$flag_ipad && !$flag_iphone){
+                //if (!$flag_wap && !$flag_ipad && !$flag_iphone){
+                if (!$flag_iphone){
                     $shadow_offset_z = $this_data['canvas_offset_z'] - 1;
                     $shadow_scale = array(1.5, 0.25);
                     $shadow_skew = $this_data['player_direction'] == 'right' ? 30 : -30;
@@ -410,7 +411,8 @@ class rpg_canvas {
 
             // Display the robot's shadow sprite if allowed sprite
             global $flag_wap, $flag_ipad, $flag_iphone;
-            if (!$flag_wap && !$flag_ipad && !$flag_iphone){
+            //if (!$flag_wap && !$flag_ipad && !$flag_iphone){
+            if (!$flag_iphone){
                 $shadow_offset_z = $this_data['canvas_offset_z'] - 4;
                 $shadow_scale = array(1.5, 0.25);
                 $shadow_skew = $this_data['robot_direction'] == 'right' ? 30 : -30;
