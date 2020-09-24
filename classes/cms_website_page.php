@@ -304,13 +304,21 @@ class cms_website_page {
             }
         }
 
+        // Collect the user's login status so we can adjust links
+        $is_guest = rpg_user::is_guest();
+        $this_userinfo = rpg_user::get_current_userinfo();
+
+        // If there's a "prototype" link, we may need to hide or adjust it
+        if (!empty($main_menu_links['prototype'])){
+            if ($is_guest){ unset($main_menu_links['prototype']); }
+            else { $main_menu_links['prototype']['target'] = '_blank'; }
+        }
+
         // If the "community" page exists, make sure we show/hide appropriate subs based on login status
         if (!empty($main_menu_links['community'])){
             if (!isset($main_menu_links['community']['subs'])){ $main_menu_links['community']['subs'] = array(); }
             $old_subs_list = $main_menu_links['community']['subs'];
             $new_subs_list = array();
-            $is_guest = rpg_user::is_guest();
-            $this_userinfo = rpg_user::get_current_userinfo();
             $this_categories_index = mmrpg_website_community_index();
             $temp_new_threads = !empty($_SESSION['COMMUNITY']['threads_new']) ? $_SESSION['COMMUNITY']['threads_new'] : array();
             $temp_new_threads_categories = !empty($_SESSION['COMMUNITY']['threads_new_categories']) ? $_SESSION['COMMUNITY']['threads_new_categories'] : array();
