@@ -147,7 +147,8 @@ if (count($matches)>1){
 
 <meta name="format-detection" content="telephone=no" />
 <link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon-2k19_72x72.png" />
-<meta name="viewport" content="user-scalable=yes, width=768, height=1004">
+<? /* <meta name="viewport" content="user-scalable=yes, width=768, height=1004"> */ ?>
+<meta name="viewport" content="user-scalable=yes, width=device-width, min-width=768, initial-scale=1">
 
 </head>
 <? $temp_window_flag = !empty($_SESSION['GAME']['index_settings']['windowFlag']) ? $_SESSION['GAME']['index_settings']['windowFlag'] : false; ?>

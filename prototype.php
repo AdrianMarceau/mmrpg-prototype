@@ -276,7 +276,8 @@ if (mmrpg_prototype_item_unlocked('wily-program')){
 
 <meta name="format-detection" content="telephone=no" />
 <link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon-2k19_72x72.png" />
-<meta name="viewport" content="user-scalable=yes, width=768, height=1004">
+<? /* <meta name="viewport" content="user-scalable=yes, width=768, height=1004"> */ ?>
+<meta name="viewport" content="user-scalable=yes, width=device-width, min-width=768, initial-scale=1">
 
 </head>
 <body id="mmrpg" class="prototype <?= 'env_'.MMRPG_CONFIG_SERVER_ENV ?>">

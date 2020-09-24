@@ -483,9 +483,76 @@ $(document).ready(function(){
 });
 
 // Define a function for updating the window sizes
+var lastOrientation = false;
+var defaultViewportSettings = false;
+var defaultViewportUpdated = false;
 var windowResizeUpdateTimeout = false;
 function windowResizeUpdate(updateType){
-    //alert('windowResizeUpdate('+updateType+')');
+    //console.log('windowResizeUpdate('+updateType+')');
+
+    /*
+    // Collect the actual screen sizes for reference
+    var screenWidth = window.innerWidth
+        || document.documentElement.clientWidth
+        || document.body.clientWidth;
+    var screenHeight = window.innerHeight
+        || document.documentElement.clientHeight
+        || document.body.clientHeight;
+    //console.log('screenWidth =', screenWidth, '| screenHeight =', screenHeight);
+    */
+
+    // Collect viewport settings in case we have to adjust
+    if (!defaultViewportSettings){
+        var $metaViewport = $('head meta[name="viewport"]');
+        var viewportContent = $metaViewport.attr('content');
+        if (typeof viewportContent !== 'undefined'
+            && viewportContent.length){
+            viewportContent = viewportContent.replace(/\s+/g, '').split(',');
+            //console.log('viewportContent =', viewportContent);
+            defaultViewportSettings = {};
+            for (var i = 0; i < viewportContent.length; i++){
+                var setting = viewportContent[i].split('=');
+                var settingName = setting[0];
+                var settingValue = setting[1];
+                if (settingValue.match(/^[0-9]+$/)){ settingValue = parseInt(settingValue); }
+                defaultViewportSettings[settingName] = settingValue;
+                }
+            //console.log('defaultViewportSettings =', defaultViewportSettings);
+            }
+        }
+
+    // Re-generate the viewport settings, skipping any unsupported settings
+    var windowWidth = $(window).width();
+    var windowHeight = $(window).height();
+    if (windowWidth >= windowHeight){ var newOrientation = 'landscape'; }
+    else { var newOrientation = 'portrait'; }
+    if (window === window.top && (updateType === 'startup' || lastOrientation !== newOrientation)){
+        var newViewportSettings = $.extend(true,{},defaultViewportSettings);
+        if (typeof newViewportSettings['min-width'] !== 'undefined'){
+            var minWidth = newViewportSettings['min-width'];
+            delete newViewportSettings['min-width'];
+            if (windowWidth < minWidth){
+                newViewportSettings['width'] = minWidth;
+                newViewportSettings['initial-scale'] = windowWidth / minWidth;
+                //if (typeof newViewportSettings['initial-scale'] !== 'undefined'){
+                //    delete newViewportSettings['initial-scale'];
+                //    }
+                }
+            }
+        var newViewportContent = [];
+        var newViewportSettingsKeys = Object.keys(newViewportSettings);
+        for (var i = 0; i < newViewportSettingsKeys.length; i++){
+            var settingName = newViewportSettingsKeys[i];
+            var settingValue = newViewportSettings[settingName];
+            newViewportContent.push(settingName+'='+settingValue);
+            }
+        //console.log('newViewportContent =', newViewportContent.join(', '));
+        $('head meta[name="viewport"]').remove();
+        var $metaViewport = $('<meta name="viewport" />');
+        $metaViewport.attr('content', newViewportContent.join(', '));
+        $metaViewport.appendTo('head');
+        lastOrientation = newOrientation;
+        }
 
     // Define the base values to resize from
     var canvasHeight = 267;
@@ -512,7 +579,7 @@ function windowResizeUpdate(updateType){
         }
 
     var bodyInnerHeight = mmrpgBody.innerHeight();
-    //alert('windowType = '+windowType+' \nwindowWidth = '+windowWidth+' \nwindowHeight = '+windowHeight+' \nbodyInnerHeight = '+bodyInnerHeight);
+    //console.log('windowType = '+windowType+' \nwindowWidth = '+windowWidth+' \nwindowHeight = '+windowHeight+' \nbodyInnerHeight = '+bodyInnerHeight);
     if (bodyInnerHeight < windowHeight){ windowHeight = bodyInnerHeight; }
 
     /*
