@@ -459,7 +459,7 @@
                         $f = fopen($item_functions_path, 'w');
                         fwrite($f, $new_item_functions_markup);
                         fclose($f);
-                        $form_messages[] = array('alert', 'Item functions file was updated');
+                        $form_messages[] = array('alert', 'Item functions file was '.(!empty($old_field_functions_markup) ? 'updated' : 'created'));
                     }
                 }
 

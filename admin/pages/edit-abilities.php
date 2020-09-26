@@ -508,7 +508,7 @@
                         $f = fopen($ability_functions_path, 'w');
                         fwrite($f, $new_ability_functions_markup);
                         fclose($f);
-                        $form_messages[] = array('alert', $this_ability_class_short_name_uc.' functions file was updated');
+                        $form_messages[] = array('alert', $this_ability_class_short_name_uc.' functions file was '.(!empty($old_ability_functions_markup) ? 'updated' : 'created'));
                     }
                 }
 
