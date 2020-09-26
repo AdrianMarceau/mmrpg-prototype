@@ -677,7 +677,7 @@
                     <div class="buttons">
                         <input class="button search" type="submit" value="Search" />
                         <input class="button reset" type="reset" value="Reset" onclick="javascript:window.location.href='admin/edit-fields/';" />
-                        <a class="button new" href="<?= 'admin/edit-fields/editor/field_id=0' ?>">Create New Field</a>
+                        <a class="button new pending" href="<?= 'admin/edit-fields/editor/field_id=0' ?>">Create New Field</a>
                     </div>
 
                 </form>
@@ -1617,7 +1617,7 @@
                         <div class="formfoot">
 
                             <div class="buttons">
-                                <input class="button save" type="submit" value="Save Changes" />
+                                <input class="button save" type="submit" value="<?= $field_data_is_new ? 'Create Field' : 'Save Changes' ?>" />
                                 <? if (!$field_data_is_new && empty($field_data['field_flag_protected'])){ ?>
                                     <input class="button delete" type="button" value="Delete Field" data-delete="fields" data-field-id="<?= $field_data['field_id'] ?>" />
                                 <? } ?>

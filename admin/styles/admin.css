@@ -1761,6 +1761,17 @@ input[type=file] {
     background-color: #4aa559;
 }
 
+
+.adminform .search .buttons .button.pending {
+    opacity: 0.1;
+    background-color: #bb9713;
+    border-color: #b5910c;
+}
+.adminform .search .buttons .button.pending:hover {
+    opacity: 1.0;
+    background-color: #c8a114;
+}
+
 .adminform .login {
     margin-bottom: 10px;
     padding: 0;

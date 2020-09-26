@@ -65,8 +65,8 @@
     /* -- Form Setup Actions -- */
 
     // Define a function for exiting a player edit action
-    function exit_player_edit_action($player_id = 0){
-        if (!empty($player_id)){ $location = 'admin/edit-players/editor/player_id='.$player_id; }
+    function exit_player_edit_action($player_id = false){
+        if ($player_id !== false){ $location = 'admin/edit-players/editor/player_id='.$player_id; }
         else { $location = 'admin/edit-players/search/'; }
         redirect_form_action($location);
     }
@@ -88,9 +88,16 @@
         $delete_data['player_id'] = !empty($_GET['player_id']) && is_numeric($_GET['player_id']) ? trim($_GET['player_id']) : '';
 
         // Let's delete all of this player's data from the database
-        $db->delete('mmrpg_index_players', array('player_id' => $delete_data['player_id'], 'player_flag_protected' => 0));
-        $form_messages[] = array('success', 'The requested player has been deleted from the database');
-        exit_form_action('success');
+        if (!empty($delete_data['player_id'])){
+            $delete_data['player_token'] = $db->get_value("SELECT player_token FROM mmrpg_index_players WHERE player_id = {$delete_data['player_id']};", 'player_token');
+            if (!empty($delete_data['player_token'])){ $files_deleted = cms_admin::object_editor_delete_json_data_file('player', $delete_data['player_token'], true); }
+            $db->delete('mmrpg_index_players', array('player_id' => $delete_data['player_id'], 'player_flag_protected' => 0));
+            $form_messages[] = array('success', 'The requested player has been deleted from the database'.(!empty($files_deleted) ? ' and file system' : ''));
+            exit_form_action('success');
+        } else {
+            $form_messages[] = array('success', 'The requested player does not exist in the database');
+            exit_form_action('error');
+        }
 
     }
 
@@ -253,9 +260,11 @@
 
     // If we're in editor mode, we should collect player info from database
     $player_data = array();
+    $player_data_is_new = false;
     $editor_data = array();
     if ($sub_action == 'editor'
-        && !empty($_GET['player_id'])){
+        && isset($_GET['player_id'])
+        ){
 
         // Collect form data for processing
         $editor_data['player_id'] = !empty($_GET['player_id']) && is_numeric($_GET['player_id']) ? trim($_GET['player_id']) : '';
@@ -264,15 +273,45 @@
         /* -- Collect Player Data -- */
 
         // Collect player details from the database
-        $temp_player_fields = rpg_player::get_index_fields(true);
-        $player_data = $db->get_array("SELECT {$temp_player_fields} FROM mmrpg_index_players WHERE player_id = {$editor_data['player_id']};");
+        $temp_player_players = rpg_player::get_index_fields(true);
+        if (!empty($editor_data['player_id'])){
+            $player_data = $db->get_array("SELECT {$temp_player_players} FROM mmrpg_index_players WHERE player_id = {$editor_data['player_id']};");
+        } else {
+
+            // Generate temp data structure for the new challenge
+            $player_data_is_new = true;
+            $admin_id = $_SESSION['admin_id'];
+            $player_data = array(
+                'player_id' => 0,
+                'player_token' => '',
+                'player_name' => '',
+                'player_class' => 'player',
+                'player_type' => '',
+                'player_type2' => '',
+                'player_number' => 0,
+                'player_flag_hidden' => 0,
+                'player_flag_complete' => 0,
+                'player_flag_published' => 0,
+                'player_flag_protected' => 0,
+                'player_order' => 0
+                );
+
+            // Overwrite temp data with any backup data provided
+            if (!empty($backup_form_data)){
+                foreach ($backup_form_data AS $f => $v){
+                    $player_data[$f] = $v;
+                }
+            }
+
+        }
 
         // If player data could not be found, produce error and exit
         if (empty($player_data)){ exit_player_edit_action(); }
 
         // Collect the player's name(s) for display
         $player_name_display = $player_data['player_name'];
-        $this_page_tabtitle = $player_name_display.' | '.$this_page_tabtitle;
+        if ($player_data_is_new){ $this_page_tabtitle = 'New Player | '.$this_page_tabtitle; }
+        else { $this_page_tabtitle = $player_name_display.' | '.$this_page_tabtitle; }
 
         // If form data has been submit for this player, we should process it
         $form_data = array();
@@ -339,173 +378,201 @@
             //$form_messages[] = array('alert', '<pre>$_POST[\'player_image_alts_new\']  = '.print_r($_POST['player_image_alts_new'] , true).'</pre>');
             //$form_messages[] = array('alert', '<pre>$form_data = '.print_r($form_data, true).'</pre>');
 
+            // If this is a NEW player, auto-generate the token when not provided
+            if ($player_data_is_new
+                && empty($form_data['player_token'])
+                && !empty($form_data['player_name'])){
+                $auto_token = strtolower($form_data['player_name']);
+                $auto_token = preg_replace('/\s+/', '-', $auto_token);
+                $auto_token = preg_replace('/[^-a-z0-9]+/i', '', $auto_token);
+                $form_data['player_token'] = $auto_token;
+            }
+
             // VALIDATE all of the MANDATORY FIELDS to see if any are invalid and abort the update entirely if necessary
-            if (empty($form_data['player_id'])){ $form_messages[] = array('error', 'Player ID was not provided'); $form_success = false; }
-            if (empty($form_data['player_token']) || empty($old_player_token)){ $form_messages[] = array('error', 'Player Token was not provided or was invalid'); $form_success = false; }
+            if (!$player_data_is_new && empty($form_data['player_id'])){ $form_messages[] = array('error', 'Player ID was not provided'); $form_success = false; }
+            if (empty($form_data['player_token']) || (!$player_data_is_new && empty($old_player_token))){ $form_messages[] = array('error', 'Player Token was not provided or was invalid'); $form_success = false; }
             if (empty($form_data['player_name'])){ $form_messages[] = array('error', 'Player Name was not provided or was invalid'); $form_success = false; }
             if (empty($form_data['player_class'])){ $form_messages[] = array('error', 'Player Kind was not provided or was invalid'); $form_success = false; }
-            if (empty($_POST['player_type'])){ $form_messages[] = array('warning', 'Player Type was not provided or were invalid'); $form_success = false; }
+            if (empty($_POST['player_type'])){ $form_messages[] = array('error', 'Player Type was not provided or was invalid'); $form_success = false; }
             if (!$form_success){ exit_player_edit_action($form_data['player_id']); }
 
             // VALIDATE all of the SEMI-MANDATORY FIELDS to see if any were not provided and unset them from updating if necessary
             if (empty($form_data['player_game'])){ $form_messages[] = array('warning', 'Source Game was not provided and may cause issues on the front-end'); }
             if (empty($form_data['player_group'])){ $form_messages[] = array('warning', 'Sorting Group was not provided and may cause issues on the front-end'); }
-            if (empty($form_data['player_number'])){ $form_messages[] = array('warning', 'Serial Number was not provided and may cause issues on the front-end'); }
+            if (!$player_data_is_new && empty($form_data['player_number'])){ $form_messages[] = array('warning', 'Serial Number was not provided and may cause issues on the front-end'); }
 
             // REFORMAT or OPTIMIZE data for provided fields where necessary
 
-            if (!empty($form_data['player_abilities_rewards'])){
-                $new_rewards = array();
-                $new_rewards_tokens = array();
-                foreach ($form_data['player_abilities_rewards'] AS $key => $reward){
-                    if (empty($reward) || empty($reward['token'])){ continue; }
-                    elseif (in_array($reward['token'], $new_rewards_tokens)){ continue; }
-                    if (empty($reward['points'])){ $reward['points'] = 0; }
-                    $new_rewards_tokens[] = $reward['token'];
-                    $new_rewards[] = $reward;
-                }
-                usort($new_rewards, function($a, $b) use($mmrpg_abilities_index){
-                    $ax = $mmrpg_abilities_index[$a['token']];
-                    $bx = $mmrpg_abilities_index[$b['token']];
-                    if ($a['points'] < $b['points']){ return -1; }
-                    elseif ($a['points'] > $b['points']){ return 1; }
-                    elseif ($ax['ability_order'] < $bx['ability_order']){ return -1; }
-                    elseif ($ax['ability_order'] > $bx['ability_order']){ return 1; }
-                    else { return 0; }
-                    });
-                $form_data['player_abilities_rewards'] = $new_rewards;
-            }
+            // Only parse the following fields if NOT new object data
+            if (!$player_data_is_new){
 
-            if (!empty($form_data['player_robots_rewards'])){
-                $new_rewards = array();
-                $new_rewards_tokens = array();
-                foreach ($form_data['player_robots_rewards'] AS $key => $reward){
-                    if (empty($reward) || empty($reward['token'])){ continue; }
-                    elseif (in_array($reward['token'], $new_rewards_tokens)){ continue; }
-                    if (empty($reward['points'])){ $reward['points'] = 0; }
-                    if (empty($reward['level'])){ $reward['level'] = 1; }
-                    $new_rewards_tokens[] = $reward['token'];
-                    $new_rewards[] = $reward;
-                }
-                usort($new_rewards, function($a, $b) use($mmrpg_robots_index){
-                    $ax = $mmrpg_robots_index[$a['token']];
-                    $bx = $mmrpg_robots_index[$b['token']];
-                    if ($a['points'] < $b['points']){ return -1; }
-                    elseif ($a['points'] > $b['points']){ return 1; }
-                    elseif ($a['level'] < $b['level']){ return -1; }
-                    elseif ($a['level'] > $b['level']){ return 1; }
-                    elseif ($ax['robot_order'] < $bx['robot_order']){ return -1; }
-                    elseif ($ax['robot_order'] > $bx['robot_order']){ return 1; }
-                    else { return 0; }
-                    });
-                $form_data['player_robots_rewards'] = $new_rewards;
-            }
-
-            if (!empty($form_data['player_robots_compatible'])){
-                $new_compatible = $form_data['player_robots_compatible'];
-                usort($new_compatible, function($a, $b) use($mmrpg_robots_index){
-                    $ax = $mmrpg_robots_index[$a];
-                    $bx = $mmrpg_robots_index[$b];
-                    if ($ax['robot_order'] < $bx['robot_order']){ return -1; }
-                    elseif ($ax['robot_order'] > $bx['robot_order']){ return 1; }
-                    else { return 0; }
-                    });
-                $form_data['player_robots_compatible'] = $new_compatible;
-            }
-
-            if (isset($form_data['player_abilities_rewards'])){ $form_data['player_abilities_rewards'] = !empty($form_data['player_abilities_rewards']) ? json_encode($form_data['player_abilities_rewards'], JSON_NUMERIC_CHECK) : ''; }
-            if (isset($form_data['player_abilities_compatible'])){ $form_data['player_abilities_compatible'] = !empty($form_data['player_abilities_compatible']) ? json_encode($form_data['player_abilities_compatible']) : ''; }
-
-            if (isset($form_data['player_robots_rewards'])){ $form_data['player_robots_rewards'] = !empty($form_data['player_robots_rewards']) ? json_encode($form_data['player_robots_rewards'], JSON_NUMERIC_CHECK) : ''; }
-            if (isset($form_data['player_robots_compatible'])){ $form_data['player_robots_compatible'] = !empty($form_data['player_robots_compatible']) ? json_encode($form_data['player_robots_compatible']) : ''; }
-
-            $empty_image_folders = array();
-
-            if (isset($form_data['player_image_alts'])){
-                if (!empty($player_image_alts_new)){
-                    $alt_num = $player_image_alts_new != 'alt' ? (int)(str_replace('alt', '', $player_image_alts_new)) : 1;
-                    $alt_name = ucfirst($player_image_alts_new);
-                    if ($alt_num == 9){ $alt_name = 'Darkness Alt'; }
-                    $form_data['player_image_alts'][$player_image_alts_new] = array(
-                        'token' => $player_image_alts_new,
-                        'name' => $form_data['player_name'].' ('.$alt_name.')',
-                        'summons' => ($alt_num * 100),
-                        'colour' => ($alt_num == 9 ? 'empty' : 'none')
-                        );
-                }
-                $alt_keys = array_keys($form_data['player_image_alts']);
-                usort($alt_keys, function($a, $b){
-                    $a = strstr($a, 'alt') ? (int)(str_replace('alt', '', $a)) : 0;
-                    $b = strstr($b, 'alt') ? (int)(str_replace('alt', '', $b)) : 0;
-                    if ($a < $b){ return -1; }
-                    elseif ($a > $b){ return 1; }
-                    else { return 0; }
-                    });
-                $new_player_image_alts = array();
-                foreach ($alt_keys AS $alt_key){
-                    $alt_info = $form_data['player_image_alts'][$alt_key];
-                    $alt_path = ($alt_key != 'base' ? '_'.$alt_key : '');
-                    if (!empty($alt_info['delete_images'])){
-                        $delete_sprite_path = 'content/players/'.$player_data['player_image'].'/sprites'.$alt_path.'/';
-                        $delete_shadow_path = 'content/players/'.$player_data['player_image'].'/shadows'.$alt_path.'/';
-                        $empty_image_folders[] = $delete_sprite_path;
-                        $empty_image_folders[] = $delete_shadow_path;
+                if (!empty($form_data['player_abilities_rewards'])){
+                    $new_rewards = array();
+                    $new_rewards_tokens = array();
+                    foreach ($form_data['player_abilities_rewards'] AS $key => $reward){
+                        if (empty($reward) || empty($reward['token'])){ continue; }
+                        elseif (in_array($reward['token'], $new_rewards_tokens)){ continue; }
+                        if (empty($reward['points'])){ $reward['points'] = 0; }
+                        $new_rewards_tokens[] = $reward['token'];
+                        $new_rewards[] = $reward;
                     }
-                    if (!empty($alt_info['delete'])){ continue; }
-                    elseif ($alt_key == 'base'){ continue; }
-                    unset($alt_info['delete_images'], $alt_info['delete']);
-                    unset($alt_info['generate_shadows']);
-                    $new_player_image_alts[] = $alt_info;
+                    usort($new_rewards, function($a, $b) use($mmrpg_abilities_index){
+                        $ax = $mmrpg_abilities_index[$a['token']];
+                        $bx = $mmrpg_abilities_index[$b['token']];
+                        if ($a['points'] < $b['points']){ return -1; }
+                        elseif ($a['points'] > $b['points']){ return 1; }
+                        elseif ($ax['ability_order'] < $bx['ability_order']){ return -1; }
+                        elseif ($ax['ability_order'] > $bx['ability_order']){ return 1; }
+                        else { return 0; }
+                        });
+                    $form_data['player_abilities_rewards'] = $new_rewards;
                 }
-                $form_data['player_image_alts'] = $new_player_image_alts;
-                $form_data['player_image_alts'] = !empty($form_data['player_image_alts']) ? json_encode($form_data['player_image_alts'], JSON_NUMERIC_CHECK) : '';
-            }
-            //$form_messages[] = array('alert', '<pre>$form_data[\'player_image_alts\']  = '.print_r($form_data['player_image_alts'] , true).'</pre>');
 
-            if (!empty($empty_image_folders)){
-                //$form_messages[] = array('alert', '<pre>$empty_image_folders = '.print_r($empty_image_folders, true).'</pre>');
-                foreach ($empty_image_folders AS $empty_path_key => $empty_path){
+                if (!empty($form_data['player_robots_rewards'])){
+                    $new_rewards = array();
+                    $new_rewards_tokens = array();
+                    foreach ($form_data['player_robots_rewards'] AS $key => $reward){
+                        if (empty($reward) || empty($reward['token'])){ continue; }
+                        elseif (in_array($reward['token'], $new_rewards_tokens)){ continue; }
+                        if (empty($reward['points'])){ $reward['points'] = 0; }
+                        if (empty($reward['level'])){ $reward['level'] = 1; }
+                        $new_rewards_tokens[] = $reward['token'];
+                        $new_rewards[] = $reward;
+                    }
+                    usort($new_rewards, function($a, $b) use($mmrpg_robots_index){
+                        $ax = $mmrpg_robots_index[$a['token']];
+                        $bx = $mmrpg_robots_index[$b['token']];
+                        if ($a['points'] < $b['points']){ return -1; }
+                        elseif ($a['points'] > $b['points']){ return 1; }
+                        elseif ($a['level'] < $b['level']){ return -1; }
+                        elseif ($a['level'] > $b['level']){ return 1; }
+                        elseif ($ax['robot_order'] < $bx['robot_order']){ return -1; }
+                        elseif ($ax['robot_order'] > $bx['robot_order']){ return 1; }
+                        else { return 0; }
+                        });
+                    $form_data['player_robots_rewards'] = $new_rewards;
+                }
 
-                    // Continue if this folder doesn't exist
-                    if (!file_exists(MMRPG_CONFIG_ROOTDIR.$empty_path)){ continue; }
+                if (!empty($form_data['player_robots_compatible'])){
+                    $new_compatible = $form_data['player_robots_compatible'];
+                    usort($new_compatible, function($a, $b) use($mmrpg_robots_index){
+                        $ax = $mmrpg_robots_index[$a];
+                        $bx = $mmrpg_robots_index[$b];
+                        if ($ax['robot_order'] < $bx['robot_order']){ return -1; }
+                        elseif ($ax['robot_order'] > $bx['robot_order']){ return 1; }
+                        else { return 0; }
+                        });
+                    $form_data['player_robots_compatible'] = $new_compatible;
+                }
 
-                    // Otherwise, collect directory contents (continue if empty)
-                    $empty_files = getDirContents(MMRPG_CONFIG_ROOTDIR.$empty_path);
-                    $empty_files = !empty($empty_files) ? array_map(function($s){ return str_replace('\\', '/', $s); }, $empty_files) : array();
-                    if (empty($empty_files)){ continue; }
-                    //$form_messages[] = array('alert', '<pre>$empty_path_key = '.print_r($empty_path_key, true).' | $empty_path = '.print_r($empty_path, true).' | $empty_files = '.print_r($empty_files, true).'</pre>');
+                if (isset($form_data['player_abilities_rewards'])){ $form_data['player_abilities_rewards'] = !empty($form_data['player_abilities_rewards']) ? json_encode($form_data['player_abilities_rewards'], JSON_NUMERIC_CHECK) : ''; }
+                if (isset($form_data['player_abilities_compatible'])){ $form_data['player_abilities_compatible'] = !empty($form_data['player_abilities_compatible']) ? json_encode($form_data['player_abilities_compatible']) : ''; }
 
-                    // Loop through empty files and delete one by one
-                    foreach ($empty_files AS $empty_file_key => $empty_file_path){
-                        @unlink($empty_file_path);
-                        if (!file_exists($empty_file_path)){ $form_messages[] = array('alert', str_replace(MMRPG_CONFIG_ROOTDIR, '', $empty_file_path).' was deleted!'); }
-                        else { $form_messages[] = array('warning', str_replace(MMRPG_CONFIG_ROOTDIR, '', $empty_file_path).' could not be deleted!');  }
+                if (isset($form_data['player_robots_rewards'])){ $form_data['player_robots_rewards'] = !empty($form_data['player_robots_rewards']) ? json_encode($form_data['player_robots_rewards'], JSON_NUMERIC_CHECK) : ''; }
+                if (isset($form_data['player_robots_compatible'])){ $form_data['player_robots_compatible'] = !empty($form_data['player_robots_compatible']) ? json_encode($form_data['player_robots_compatible']) : ''; }
+
+                $empty_image_folders = array();
+
+                if (isset($form_data['player_image_alts'])){
+                    if (!empty($player_image_alts_new)){
+                        $alt_num = $player_image_alts_new != 'alt' ? (int)(str_replace('alt', '', $player_image_alts_new)) : 1;
+                        $alt_name = ucfirst($player_image_alts_new);
+                        if ($alt_num == 9){ $alt_name = 'Darkness Alt'; }
+                        $form_data['player_image_alts'][$player_image_alts_new] = array(
+                            'token' => $player_image_alts_new,
+                            'name' => $form_data['player_name'].' ('.$alt_name.')',
+                            'summons' => ($alt_num * 100),
+                            'colour' => ($alt_num == 9 ? 'empty' : 'none')
+                            );
+                    }
+                    $alt_keys = array_keys($form_data['player_image_alts']);
+                    usort($alt_keys, function($a, $b){
+                        $a = strstr($a, 'alt') ? (int)(str_replace('alt', '', $a)) : 0;
+                        $b = strstr($b, 'alt') ? (int)(str_replace('alt', '', $b)) : 0;
+                        if ($a < $b){ return -1; }
+                        elseif ($a > $b){ return 1; }
+                        else { return 0; }
+                        });
+                    $new_player_image_alts = array();
+                    foreach ($alt_keys AS $alt_key){
+                        $alt_info = $form_data['player_image_alts'][$alt_key];
+                        $alt_path = ($alt_key != 'base' ? '_'.$alt_key : '');
+                        if (!empty($alt_info['delete_images'])){
+                            $delete_sprite_path = 'content/players/'.$player_data['player_image'].'/sprites'.$alt_path.'/';
+                            $delete_shadow_path = 'content/players/'.$player_data['player_image'].'/shadows'.$alt_path.'/';
+                            $empty_image_folders[] = $delete_sprite_path;
+                            $empty_image_folders[] = $delete_shadow_path;
+                        }
+                        if (!empty($alt_info['delete'])){ continue; }
+                        elseif ($alt_key == 'base'){ continue; }
+                        unset($alt_info['delete_images'], $alt_info['delete']);
+                        unset($alt_info['generate_shadows']);
+                        $new_player_image_alts[] = $alt_info;
+                    }
+                    $form_data['player_image_alts'] = $new_player_image_alts;
+                    $form_data['player_image_alts'] = !empty($form_data['player_image_alts']) ? json_encode($form_data['player_image_alts'], JSON_NUMERIC_CHECK) : '';
+                }
+                //$form_messages[] = array('alert', '<pre>$form_data[\'player_image_alts\']  = '.print_r($form_data['player_image_alts'] , true).'</pre>');
+
+                if (!empty($empty_image_folders)){
+                    //$form_messages[] = array('alert', '<pre>$empty_image_folders = '.print_r($empty_image_folders, true).'</pre>');
+                    foreach ($empty_image_folders AS $empty_path_key => $empty_path){
+
+                        // Continue if this folder doesn't exist
+                        if (!file_exists(MMRPG_CONFIG_ROOTDIR.$empty_path)){ continue; }
+
+                        // Otherwise, collect directory contents (continue if empty)
+                        $empty_files = getDirContents(MMRPG_CONFIG_ROOTDIR.$empty_path);
+                        $empty_files = !empty($empty_files) ? array_map(function($s){ return str_replace('\\', '/', $s); }, $empty_files) : array();
+                        if (empty($empty_files)){ continue; }
+                        //$form_messages[] = array('alert', '<pre>$empty_path_key = '.print_r($empty_path_key, true).' | $empty_path = '.print_r($empty_path, true).' | $empty_files = '.print_r($empty_files, true).'</pre>');
+
+                        // Loop through empty files and delete one by one
+                        foreach ($empty_files AS $empty_file_key => $empty_file_path){
+                            @unlink($empty_file_path);
+                            if (!file_exists($empty_file_path)){ $form_messages[] = array('alert', str_replace(MMRPG_CONFIG_ROOTDIR, '', $empty_file_path).' was deleted!'); }
+                            else { $form_messages[] = array('warning', str_replace(MMRPG_CONFIG_ROOTDIR, '', $empty_file_path).' could not be deleted!');  }
+                        }
+
                     }
 
                 }
 
+                // Ensure the functions code is VALID PHP SYNTAX and save, otherwise do not save but allow user to fix it
+                if (empty($form_data['player_functions_markup'])){
+                    // Functions code is EMPTY and will be ignored
+                    $form_messages[] = array('warning', 'Player functions code was empty and was not saved (reverted to original)');
+                } elseif (!cms_admin::is_valid_php_syntax($form_data['player_functions_markup'])){
+                    // Functions code is INVALID and must be fixed
+                    $form_messages[] = array('warning', 'Player functions code was invalid PHP syntax and was not saved (please fix and try again)');
+                    $_SESSION['player_functions_markup'][$player_data['player_id']] = $form_data['player_functions_markup'];
+                } else {
+                    // Functions code is OKAY and can be saved
+                    $player_functions_path = MMRPG_CONFIG_PLAYERS_CONTENT_PATH.$player_data['player_token'].'/functions.php';
+                    $old_player_functions_markup = file_exists($player_functions_path) ? normalize_file_markup(file_get_contents($player_functions_path)) : '';
+                    $new_player_functions_markup = normalize_file_markup($form_data['player_functions_markup']);
+                    if (empty($old_player_functions_markup) || $new_player_functions_markup !== $old_player_functions_markup){
+                        $f = fopen($player_functions_path, 'w');
+                        fwrite($f, $new_player_functions_markup);
+                        fclose($f);
+                        $form_messages[] = array('alert', 'Player functions file was updated');
+                    }
+                }
+
+            }
+            // Otherwise, if NEW data, pre-populate certain fields
+            else {
+
+                $temp_json_players = rpg_player::get_json_index_fields();
+                foreach ($temp_json_players AS $player){ $form_data[$player] = ''; }
+                $form_data['player_game'] = 'MMRPG';
+                $form_data['player_group'] = 'MMRPG';
+                $form_data['player_class'] = 'master';
+                $form_data['player_number'] = 1 + $db->get_value("SELECT MAX(player_number) AS max FROM mmrpg_index_players;", 'max');
+                $form_data['player_order'] = 1 + $db->get_value("SELECT MAX(player_order) AS max FROM mmrpg_index_players;", 'max');
+
             }
 
-            // Ensure the functions code is VALID PHP SYNTAX and save, otherwise do not save but allow user to fix it
-            if (empty($form_data['player_functions_markup'])){
-                // Functions code is EMPTY and will be ignored
-                $form_messages[] = array('warning', 'Player functions code was empty and was not saved (reverted to original)');
-            } elseif (!cms_admin::is_valid_php_syntax($form_data['player_functions_markup'])){
-                // Functions code is INVALID and must be fixed
-                $form_messages[] = array('warning', 'Player functions code was invalid PHP syntax and was not saved (please fix and try again)');
-                $_SESSION['player_functions_markup'][$player_data['player_id']] = $form_data['player_functions_markup'];
-            } else {
-                // Functions code is OKAY and can be saved
-                $player_functions_path = MMRPG_CONFIG_PLAYERS_CONTENT_PATH.$player_data['player_token'].'/functions.php';
-                $old_player_functions_markup = file_exists($player_functions_path) ? normalize_file_markup(file_get_contents($player_functions_path)) : '';
-                $new_player_functions_markup = normalize_file_markup($form_data['player_functions_markup']);
-                if (empty($old_player_functions_markup) || $new_player_functions_markup !== $old_player_functions_markup){
-                    $f = fopen($player_functions_path, 'w');
-                    fwrite($f, $new_player_functions_markup);
-                    fclose($f);
-                    $form_messages[] = array('alert', 'Player functions file was updated');
-                }
-            }
             // Regardless, unset the markup variable so it's not save to the database
             unset($form_data['player_functions_markup']);
 
@@ -518,15 +585,33 @@
             $update_data = $form_data;
             unset($update_data['player_id']);
 
-            // Update the main database index with changes to this player's data
-            $update_results = $db->update('mmrpg_index_players', $update_data, array('player_id' => $form_data['player_id']));
+            // If this is a new player we insert, otherwise we update the existing
+            if ($player_data_is_new){
 
-            // DEBUG
-            //$form_messages[] = array('alert', '<pre>$form_data = '.print_r($form_data, true).'</pre>');
+                // Update the main database index with changes to this player's data
+                $update_data['player_flag_protected'] = 0;
+                $insert_results = $db->insert('mmrpg_index_players', $update_data);
 
-            // If we made it this far, the update must have been a success
-            if ($update_results !== false){ $form_success = true; $form_messages[] = array('success', 'Player data was updated successfully!'); }
-            else { $form_success = false; $form_messages[] = array('error', 'Player data could not be updated...'); }
+                // If we made it this far, the update must have been a success
+                if ($insert_results !== false){ $form_success = true; $form_messages[] = array('success', 'Player data was created successfully!'); }
+                else { $form_success = false; $form_messages[] = array('error', 'Player data could not be created...'); }
+
+                // If the form was a success, collect the new ID for the redirect
+                if ($form_success){
+                    $new_player_id = $db->get_value("SELECT MAX(player_id) AS max FROM mmrpg_index_players;", 'max');
+                    $form_data['player_id'] = $new_player_id;
+                }
+
+            } else {
+
+                // Update the main database index with changes to this player's data
+                $update_results = $db->update('mmrpg_index_players', $update_data, array('player_id' => $form_data['player_id']));
+
+                // If we made it this far, the update must have been a success
+                if ($update_results !== false){ $form_messages[] = array('success', 'Player data was updated successfully!'); }
+                else { $form_messages[] = array('error', 'Player data could not be updated...'); }
+
+            }
 
             // Update cache timestamp if changes were successful
             if ($form_success){
@@ -536,10 +621,15 @@
             }
 
             // If successful, we need to update the JSON file
-            if ($form_success){ cms_admin::object_editor_update_json_data_file('player', array_merge($player_data, $update_data)); }
+            if ($form_success){
+                if ($player_data_is_new){ $player_data['player_id'] = $new_player_id; }
+                cms_admin::object_editor_update_json_data_file('player', array_merge($player_data, $update_data));
+            }
 
             // If the player tokens have changed, we must move the entire folder
-            if ($old_player_token !== $update_data['player_token']){
+            if ($form_success
+                && !$player_data_is_new
+                && $old_player_token !== $update_data['player_token']){
                 $old_content_path = MMRPG_CONFIG_PLAYERS_CONTENT_PATH.$old_player_token.'/';
                 $new_content_path = MMRPG_CONFIG_PLAYERS_CONTENT_PATH.$update_data['player_token'].'/';
                 if (rename($old_content_path, $new_content_path)){
@@ -551,7 +641,8 @@
             }
 
             // We're done processing the form, we can exit
-            exit_player_edit_action($form_data['player_id']);
+            if (empty($form_data['player_id'])){ exit_player_edit_action(false); }
+            else { exit_player_edit_action($form_data['player_id']); }
 
             //echo('<pre>$form_action = '.print_r($form_action, true).'</pre>');
             //echo('<pre>$_POST = '.print_r($_POST, true).'</pre>');
@@ -569,7 +660,7 @@
         <a href="admin/">Admin Panel</a>
         &raquo; <a href="admin/edit-players/">Edit Players</a>
         <? if ($sub_action == 'editor' && !empty($player_data)): ?>
-            &raquo; <a href="admin/edit-players/editor/player_id=<?= $player_data['player_id'] ?>"><?= $player_name_display ?></a>
+            &raquo; <a href="admin/edit-players/editor/player_id=<?= $player_data['player_id'] ?>"><?= !empty($player_name_display) ? $player_name_display : 'New Player' ?></a>
         <? endif; ?>
     </div>
 
@@ -642,8 +733,9 @@
                     </div>
 
                     <div class="buttons">
-                        <input class="button" type="submit" value="Search" />
-                        <input class="button" type="reset" value="Reset" onclick="javascript:window.location.href='admin/edit-players/';" />
+                        <input class="button search" type="submit" value="Search" />
+                        <input class="button reset" type="reset" value="Reset" onclick="javascript:window.location.href='admin/edit-players/';" />
+                        <a class="button new pending" href="<?= 'admin/edit-players/editor/player_id=0' ?>">Create New Player</a>
                     </div>
 
                 </form>
@@ -760,7 +852,8 @@
 
         <?
         if ($sub_action == 'editor'
-            && !empty($_GET['player_id'])){
+            && isset($_GET['player_id'])
+            ){
 
             // Capture editor markup in a buffer in case we need to modify
             if (true){
@@ -772,7 +865,7 @@
                 <div class="editor">
 
                     <h3 class="header type_span type_<?= !empty($player_data['player_type']) ? $player_data['player_type'].(!empty($player_data['player_type2']) ? '_'.$player_data['player_type2'] : '') : 'none' ?>" data-auto="field-type" data-field-type="player_type,player_type2">
-                        <span class="title">Edit Player &quot;<?= $player_name_display ?>&quot;</span>
+                        <span class="title"><?= !empty($player_name_display) ? 'Edit Player &quot;'.$player_name_display.'&quot;' : 'Create New Player' ?></span>
                         <?
 
                         // Print out any git-related statues to this header
@@ -794,14 +887,16 @@
 
                     <? print_form_messages() ?>
 
-                    <div class="editor-tabs" data-tabgroup="player">
-                        <a class="tab active" data-tab="basic">Basic</a><span></span>
-                        <a class="tab" data-tab="flavour">Flavour</a><span></span>
-                        <a class="tab" data-tab="abilities">Abilities</a><span></span>
-                        <a class="tab" data-tab="robots">Robots</a><span></span>
-                        <a class="tab" data-tab="sprites">Sprites</a><span></span>
-                        <a class="tab" data-tab="functions">Functions</a><span></span>
-                    </div>
+                    <? if (!$player_data_is_new){ ?>
+                        <div class="editor-tabs" data-tabgroup="player">
+                            <a class="tab active" data-tab="basic">Basic</a><span></span>
+                            <a class="tab" data-tab="flavour">Flavour</a><span></span>
+                            <a class="tab" data-tab="abilities">Abilities</a><span></span>
+                            <a class="tab" data-tab="robots">Robots</a><span></span>
+                            <a class="tab" data-tab="sprites">Sprites</a><span></span>
+                            <a class="tab" data-tab="functions">Functions</a><span></span>
+                        </div>
+                    <? } ?>
 
                     <form class="form" method="post">
 
@@ -840,6 +935,7 @@
                                     </strong>
                                     <div class="subfield">
                                         <select class="select" name="player_type">
+                                            <option value="">-</option>
                                             <?
                                             $stat_types = rpg_type::get_stat_types();
                                             foreach ($mmrpg_types_index AS $type_token => $type_info){
@@ -854,657 +950,664 @@
                                     </div>
                                 </div>
 
-                                <div class="field">
-                                    <strong class="label">Player Number</strong>
-                                    <input class="textbox" type="number" name="player_number" value="<?= $player_data['player_number'] ?>" maxlength="64" />
-                                </div>
+                                <? if (!$player_data_is_new){ ?>
 
-                                <div class="field">
-                                    <strong class="label">Sort Order</strong>
-                                    <input class="textbox" type="number" name="player_order" value="<?= $player_data['player_order'] ?>" maxlength="8" />
-                                </div>
+                                    <div class="field">
+                                        <strong class="label">Player Number</strong>
+                                        <input class="textbox" type="number" name="player_number" value="<?= $player_data['player_number'] ?>" maxlength="64" />
+                                    </div>
+
+                                    <div class="field">
+                                        <strong class="label">Sort Order</strong>
+                                        <input class="textbox" type="number" name="player_order" value="<?= $player_data['player_order'] ?>" maxlength="8" />
+                                    </div>
+
+                                <? } ?>
 
                             </div>
 
-                            <div class="panel" data-tab="flavour">
+                            <? if (!$player_data_is_new){ ?>
 
-                                <div class="field fullsize">
-                                    <div class="label">
-                                        <strong>Player Description</strong>
-                                        <em>short paragraph about player's design, personality, background, etc.</em>
-                                    </div>
-                                    <textarea class="textarea" name="player_description2" rows="10"><?= htmlentities($player_data['player_description2'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
-                                </div>
+                                <div class="panel" data-tab="flavour">
 
-                                <hr />
-
-                                <?
-                                $player_quote_kinds = array('start', 'taunt', 'victory', 'defeat');
-                                foreach ($player_quote_kinds AS $kind_key => $kind_token){
-                                    ?>
-                                    <div class="field halfsize">
+                                    <div class="field fullsize">
                                         <div class="label">
-                                            <strong><?= ucfirst($kind_token) ?> Quote</strong>
+                                            <strong>Player Description</strong>
+                                            <em>short paragraph about player's design, personality, background, etc.</em>
                                         </div>
-                                        <input class="textbox" type="text" name="player_quotes_<?= $kind_token ?>" value="<?= htmlentities($player_data['player_quotes_'.$kind_token], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="256" />
+                                        <textarea class="textarea" name="player_description2" rows="10"><?= htmlentities($player_data['player_description2'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
                                     </div>
+
+                                    <hr />
+
                                     <?
-                                }
-                                ?>
-
-                                <div class="field fullsize" style="min-height: 0; margin-bottom: 0; padding-bottom: 0;">
-                                    <div class="label">
-                                        <em class="nowrap" style="margin-left: 0;">(!) You can use <strong>{this_player}</strong>, <strong>{this_robot}</strong>, <strong>{target_player}</strong>, and <strong>{target_robot}</strong> variables for dynamic text</em>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            <div class="panel" data-tab="abilities">
-
-                                <?
-
-                                // Collect global abilities so we can skip them
-                                $global_ability_tokens = rpg_ability::get_global_abilities();
-
-                                // Pre-generate a list of all abilities so we can re-use it over and over
-                                $ability_options_markup = array();
-                                $ability_options_markup[] = '<option value="">-</option>';
-                                foreach ($mmrpg_abilities_index AS $ability_token => $ability_info){
-                                    //if (in_array($ability_token, $global_ability_tokens)){ continue; }
-                                    if ($ability_info['ability_class'] === 'mecha' && $player_data['player_class'] !== 'mecha'){ continue; }
-                                    elseif ($ability_info['ability_class'] === 'boss' && $player_data['player_class'] !== 'boss'){ continue; }
-                                    $ability_name = $ability_info['ability_name'];
-                                    $ability_types = ucwords(implode(' / ', array_values(array_filter(array($ability_info['ability_type'], $ability_info['ability_type2'])))));
-                                    if (empty($ability_types)){ $ability_types = 'Neutral'; }
-                                    $ability_options_markup[] = '<option value="'.$ability_token.'">'.$ability_name.' ('.$ability_types.')</option>';
-                                }
-                                $ability_options_count = count($ability_options_markup);
-                                $ability_options_markup = implode(PHP_EOL, $ability_options_markup);
-
-                                ?>
-
-                                <div class="field fullsize multirow">
-                                    <strong class="label">
-                                        Native Abilities
-                                        <em>These abilities are available to the player at the start and can be equipped to their robots</em>
-                                    </strong>
-                                    <?
-                                    $current_ability_list = !empty($player_data['player_abilities_rewards']) ? json_decode($player_data['player_abilities_rewards'], true) : array();
-                                    $select_limit = max(2, count($current_ability_list));
-                                    $select_limit += 2;
-                                    for ($i = 0; $i < $select_limit; $i++){
-                                        $current_value = isset($current_ability_list[$i]) ? $current_ability_list[$i] : array();
-                                        $current_value_points = 0; //!empty($current_value) ? $current_value['points'] : '';
-                                        $current_value_token = !empty($current_value) ? $current_value['token'] : '';
-                                        ?>
-                                        <div class="subfield pointsup">
-                                            <input class="hidden" type="hidden" name="player_abilities_rewards[<?= $i ?>][points]" value="<?= $current_value_points ?>" maxlength="3" placeholder="0" />
-                                            <select class="select" name="player_abilities_rewards[<?= $i ?>][token]">
-                                                <?= str_replace('value="'.$current_value_token.'"', 'value="'.$current_value_token.'" selected="selected"', $ability_options_markup) ?>
-                                            </select><span></span>
-                                        </div>
-                                        <?
-                                    }
-                                    ?>
-                                </div>
-
-                            </div>
-
-                            <div class="panel" data-tab="robots">
-
-                                <?
-
-                                // Pre-generate a list of all robots so we can re-use it over and over
-                                $robot_options_markup = array();
-                                $robot_options_markup[] = '<option value="">-</option>';
-                                foreach ($mmrpg_robots_index AS $robot_token => $robot_info){
-                                    if ($robot_info['robot_class'] === 'mecha' && $player_data['player_class'] !== 'mecha'){ continue; }
-                                    elseif ($robot_info['robot_class'] === 'boss' && $player_data['player_class'] !== 'boss'){ continue; }
-                                    $robot_name = $robot_info['robot_name'];
-                                    $robot_cores = ucwords(implode(' / ', array_values(array_filter(array($robot_info['robot_core'], $robot_info['robot_core2'])))));
-                                    if (empty($robot_cores)){ $robot_cores = 'Neutral'; }
-                                    $robot_options_markup[] = '<option value="'.$robot_token.'">'.$robot_name.' ('.$robot_cores.')</option>';
-                                }
-                                $robot_options_count = count($robot_options_markup);
-                                $robot_options_markup = implode(PHP_EOL, $robot_options_markup);
-
-                                ?>
-
-                                <div class="field fullsize multirow">
-                                    <strong class="label">
-                                        Starter Robot
-                                        <em>This is the robot that the player starts at the beginning of their campaign</em>
-                                    </strong>
-                                    <?
-                                    $current_robot_list = !empty($player_data['player_robots_rewards']) ? json_decode($player_data['player_robots_rewards'], true) : array();
-                                    $select_limit = 1;
-                                    for ($i = 0; $i < $select_limit; $i++){
-                                        $current_value = isset($current_robot_list[$i]) ? $current_robot_list[$i] : array();
-                                        $current_value_points = 0; //!empty($current_value) ? $current_value['points'] : '';
-                                        $current_value_level = 1; //!empty($current_value) ? $current_value['level'] : '';
-                                        $current_value_token = !empty($current_value) ? $current_value['token'] : '';
-                                        ?>
-                                        <div class="subfield pointsup">
-                                            <input class="hidden" type="hidden" name="player_robots_rewards[<?= $i ?>][points]" value="<?= $current_value_points ?>" maxlength="3" placeholder="0" />
-                                            <select class="select" name="player_robots_rewards[<?= $i ?>][token]">
-                                                <?= str_replace('value="'.$current_value_token.'"', 'value="'.$current_value_token.'" selected="selected"', $robot_options_markup) ?>
-                                            </select><span></span>
-                                            <input class="hidden" type="hidden" name="player_robots_rewards[<?= $i ?>][level]" value="<?= $current_value_level ?>" maxlength="3" placeholder="1" />
-                                        </div>
-                                        <?
-                                    }
-                                    ?>
-                                </div>
-
-                                <hr />
-
-                                <div class="field fullsize has2cols multirow">
-                                    <strong class="label">
-                                        Campaign Robots
-                                        <em>These are the robots that appear as the main targets in the player's campaign</em>
-                                    </strong>
-                                    <?
-                                    $current_robot_list = !empty($player_data['player_robots_compatible']) ? json_decode($player_data['player_robots_compatible'], true) : array();
-                                    $select_limit = max(10, count($current_robot_list));
-                                    //$select_limit += 4 - ($select_limit % 4);
-                                    for ($i = 0; $i < $select_limit; $i++){
-                                        $current_value = isset($current_robot_list[$i]) ? $current_robot_list[$i] : '';
-                                        ?>
-                                        <div class="subfield">
-                                            <select class="select" name="player_robots_compatible[<?= $i ?>]">
-                                                <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $robot_options_markup) ?>
-                                            </select><span></span>
-                                        </div>
-                                        <?
-                                    }
-                                    ?>
-                                </div>
-
-                            </div>
-
-                            <div class="panel" data-tab="sprites">
-
-                                <?
-
-                                // Pre-generate a list of all contributors so we can re-use it over and over
-                                $contributor_options_markup = array();
-                                $contributor_options_markup[] = '<option value="0">-</option>';
-                                foreach ($mmrpg_contributors_index AS $editor_id => $user_info){
-                                    $option_label = $user_info['user_name'];
-                                    if (!empty($user_info['user_name_public']) && $user_info['user_name_public'] !== $user_info['user_name']){ $option_label = $user_info['user_name_public'].' ('.$option_label.')'; }
-                                    $contributor_options_markup[] = '<option value="'.$editor_id.'">'.$option_label.'</option>';
-                                }
-                                $contributor_options_count = count($contributor_options_markup);
-                                $contributor_options_markup = implode(PHP_EOL, $contributor_options_markup);
-
-                                ?>
-
-                                <? $placeholder_folder = $player_data['player_class'] != 'master' ? $player_data['player_class'] : 'player'; ?>
-                                <div class="field halfsize">
-                                    <div class="label">
-                                        <strong>Sprite Path</strong>
-                                        <em>base image path for sprites</em>
-                                    </div>
-                                    <select class="select" name="player_image">
-                                        <option value="<?= $placeholder_folder ?>" <?= $player_data['player_image'] == $placeholder_folder ? 'selected="selected"' : '' ?>>-</option>
-                                        <option value="<?= $player_data['player_token'] ?>" <?= $player_data['player_image'] == $player_data['player_token'] ? 'selected="selected"' : '' ?>>content/players/<?= $player_data['player_token'] ?>/</option>
-                                    </select><span></span>
-                                </div>
-
-                                <div class="field halfsize">
-                                    <div class="label">
-                                        <strong>Sprite Size</strong>
-                                        <em>base frame size for each sprite</em>
-                                    </div>
-                                    <select class="select" name="player_image_size">
-                                        <? if ($player_data['player_image'] == $placeholder_folder){ ?>
-                                            <option value="<?= $player_data['player_image_size'] ?>" selected="selected">-</option>
-                                            <option value="40">40x40</option>
-                                            <option value="80">80x80</option>
-                                            <option disabled="disabled" value="160">160x160</option>
-                                        <? } else { ?>
-                                            <option value="40" <?= $player_data['player_image_size'] == 40 ? 'selected="selected"' : '' ?>>40x40</option>
-                                            <option value="80" <?= $player_data['player_image_size'] == 80 ? 'selected="selected"' : '' ?>>80x80</option>
-                                            <option disabled="disabled" value="160" <?= $player_data['player_image_size'] == 160 ? 'selected="selected"' : '' ?>>160x160</option>
-                                        <? } ?>
-                                    </select><span></span>
-                                </div>
-
-                                <div class="field halfsize">
-                                    <div class="label">
-                                        <strong>Sprite Editor #1</strong>
-                                        <em>user who edited or created this sprite</em>
-                                    </div>
-                                    <? if ($player_data['player_image'] != $placeholder_folder){ ?>
-                                        <select class="select" name="player_image_editor">
-                                            <?= str_replace('value="'.$player_data['player_image_editor'].'"', 'value="'.$player_data['player_image_editor'].'" selected="selected"', $contributor_options_markup) ?>
-                                        </select><span></span>
-                                    <? } else { ?>
-                                        <input type="hidden" name="player_image_editor" value="<?= $player_data['player_image_editor'] ?>" />
-                                        <input class="textbox" type="text" name="player_image_editor" value="-" disabled="disabled" />
-                                    <? } ?>
-                                </div>
-
-                                <div class="field halfsize">
-                                    <div class="label">
-                                        <strong>Sprite Editor #2</strong>
-                                        <em>another user who collaborated on this sprite</em>
-                                    </div>
-                                    <? if ($player_data['player_image'] != $placeholder_folder){ ?>
-                                        <select class="select" name="player_image_editor2">
-                                            <?= str_replace('value="'.$player_data['player_image_editor2'].'"', 'value="'.$player_data['player_image_editor2'].'" selected="selected"', $contributor_options_markup) ?>
-                                        </select><span></span>
-                                    <? } else { ?>
-                                        <input type="hidden" name="player_image_editor2" value="<?= $player_data['player_image_editor2'] ?>" />
-                                        <input class="textbox" type="text" name="player_image_editor2" value="-" disabled="disabled" />
-                                    <? } ?>
-                                </div>
-
-                                <?
-
-                                // Decompress existing image alts pulled from the database
-                                $player_image_alts = !empty($player_data['player_image_alts']) ? json_decode($player_data['player_image_alts'], true) : array();
-
-                                // Collect the alt tokens from all defined alts so far
-                                $player_image_alts_tokens = array();
-                                foreach ($player_image_alts AS $alt){ if (!empty($alt['token'])){ $player_image_alts_tokens[] = $alt['token'];  } }
-
-                                // Define a variable to toggle allowance of new alt creation
-                                $has_elemental_alts = $player_data['player_type'] == 'copy' ? true : false;
-                                $allow_new_alt_creation = !$has_elemental_alts ? true : false;
-
-                                // Only proceed if all required sprite fields are set
-                                if (!empty($player_data['player_image'])
-                                    && !in_array($player_data['player_image'], array('player', 'master', 'boss', 'mecha'))
-                                    && !empty($player_data['player_image_size'])){
-
-                                    echo('<hr />'.PHP_EOL);
-
-                                    // Define the base sprite and shadow paths for this player given its image token
-                                    $base_sprite_path = 'content/players/'.$player_data['player_image'].'/sprites/';
-                                    $base_shadow_path = 'content/players/'.$player_data['player_image'].'/shadows/';
-
-                                    // Define the alts we'll be looping through for this player
-                                    $temp_alts_array = array();
-                                    $temp_alts_array[] = array('token' => '', 'name' => $player_data['player_name'], 'summons' => 0);
-
-                                    // Append predefined alts automatically, based on the player image alt array
-                                    if (!empty($player_data['player_image_alts'])){
-                                        $temp_alts_array = array_merge($temp_alts_array, $player_image_alts);
-                                    }
-
-                                    // Otherwise, if this is a copy player, append based on all the types in the index
-                                    if ($has_elemental_alts){
-                                        foreach ($mmrpg_types_index AS $type_token => $type_info){
-                                            if (empty($type_token) || $type_token == 'none' || $type_token == 'copy' || $type_info['type_class'] == 'special'){ continue; }
-                                            $temp_alts_array[] = array('token' => $type_token, 'name' => $player_data['player_name'].' ('.ucfirst($type_token).' Type)', 'summons' => 0, 'colour' => $type_token);
-                                        }
-                                    }
-
-                                    // Otherwise, if this player has multiple sheets, add them as alt options
-                                    if (!empty($player_data['player_image_sheets'])){
-                                        for ($i = 2; $i <= $player_data['player_image_sheets']; $i++){
-                                            $temp_alts_array[] = array('sheet' => $i, 'name' => $player_data['player_name'].' (Sheet #'.$i.')', 'summons' => 0);
-                                        }
-                                    }
-
-                                    // Loop through the defined alts for this player and display image lists
-                                    if (!empty($temp_alts_array)){
-                                        foreach ($temp_alts_array AS $alt_key => $alt_info){
-
-                                            $is_base_sprite = empty($alt_info['token']) ? true : false;
-                                            $alt_token = $is_base_sprite ? 'base' : $alt_info['token'];
-
-                                            $alt_file_path = rtrim($base_sprite_path, '/').(!$is_base_sprite ? '_'.$alt_info['token'] : '').'/';
-                                            $alt_file_dir = MMRPG_CONFIG_ROOTDIR.$alt_file_path;
-                                            $alt_files_existing = getDirContents($alt_file_dir);
-
-                                            $alt_shadow_path = rtrim($base_shadow_path, '/').(!$is_base_sprite ? '_'.$alt_info['token'] : '').'/';
-                                            $alt_shadow_dir = MMRPG_CONFIG_ROOTDIR.$alt_shadow_path;
-                                            $alt_shadows_existing = getDirContents($alt_shadow_dir);
-
-                                            if (!empty($alt_files_existing)){ $alt_files_existing = array_map(function($s)use($alt_file_dir){ return str_replace($alt_file_dir, '', str_replace('\\', '/', $s)); }, $alt_files_existing); }
-                                            if (!empty($alt_shadows_existing)){ $alt_shadows_existing = array_map(function($s)use($alt_shadow_dir){ return str_replace($alt_shadow_dir, '', str_replace('\\', '/', $s)); }, $alt_shadows_existing); }
-
-                                            //echo('<pre>$alt_files_existing = '.(!empty($alt_files_existing) ? htmlentities(print_r($alt_files_existing, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
-                                            //echo('<pre>$alt_shadows_existing = '.(!empty($alt_shadows_existing) ? htmlentities(print_r($alt_shadows_existing, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
-
-                                            ?>
-
-                                            <?= ($alt_key > 0) ? '<hr />' : '' ?>
-
-                                            <div class="field fullsize" style="margin-bottom: 0; min-height: 0;">
-                                                <strong class="label">
-                                                    <? if ($is_base_sprite){ ?>
-                                                        Base Sprite Sheets
-                                                        <em>Main sprites used for player. Zoom and shadow sprites are auto-generated.</em>
-                                                    <? } else { ?>
-                                                        <?= ucfirst($alt_token).' Sprite Sheets'  ?>
-                                                        <em>Sprites used for player's <strong><?= $alt_token ?></strong> skin. Zoom and shadow sprites are auto-generated.</em>
-                                                    <? } ?>
-                                                </strong>
-                                            </div>
-                                            <? if (!$is_base_sprite){ ?>
-                                                <input class="hidden" type="hidden" name="player_image_alts[<?= $alt_token ?>][token]" value="<?= $alt_info['token'] ?>" maxlength="64" <?= $has_elemental_alts ? 'disabled="disabled"' : '' ?> />
-                                                <div class="field">
-                                                    <div class="label"><strong>Name</strong></div>
-                                                    <input class="textbox" type="text" name="player_image_alts[<?= $alt_token ?>][name]" value="<?= $alt_info['name'] ?>" maxlength="64" <?= $has_elemental_alts ? 'disabled="disabled"' : '' ?> />
-                                                </div>
-                                                <div class="field">
-                                                    <div class="label"><strong>Summons</strong></div>
-                                                    <input class="textbox" type="number" name="player_image_alts[<?= $alt_token ?>][summons]" value="<?= $alt_info['summons'] ?>" maxlength="3" <?= $has_elemental_alts ? 'disabled="disabled"' : '' ?> />
-                                                </div>
-                                                <div class="field">
-                                                    <div class="label">
-                                                        <strong>Colour</strong>
-                                                        <span class="type_span type_<?= (!empty($alt_info['colour']) ? $alt_info['colour'] : 'none') ?> swatch floatright" data-auto="field-type" data-field-type="player_image_alts[<?= $alt_token ?>][colour]">&nbsp;</span>
-                                                    </div>
-                                                    <select class="select" name="player_image_alts[<?= $alt_token ?>][colour]" <?= $has_elemental_alts ? 'disabled="disabled"' : '' ?>>
-                                                        <option value=""<?= empty($alt_info['colour']) ? ' selected="selected"' : '' ?>>-</option>
-                                                        <?
-                                                        foreach ($mmrpg_types_index AS $type_token => $type_info){
-                                                            //if ($type_info['type_class'] === 'special'){ continue; }
-                                                            $label = $type_info['type_name'];
-                                                            if (!empty($alt_info['colour']) && $alt_info['colour'] === $type_token){ $selected = 'selected="selected"'; }
-                                                            else { $selected = ''; }
-                                                            echo('<option value="'.$type_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                                        }
-                                                        ?>
-                                                    </select><span></span>
-                                                </div>
-                                            <? } ?>
-
-                                            <div class="field fullsize has2cols widecols multirow sprites has-filebars">
-
-                                                <div class="subfield" style="clear: left;" data-group="shadows" data-size="40">
-                                                    <strong class="sublabel" style="font-size: 90%;">icon @ 100%</strong><br />
-                                                    <ul class="files">
-                                                        <?
-                                                        $this_alt_path = $alt_file_path;
-                                                        $group = 'sprites';
-                                                        $sheet_width = 18;
-                                                        $sheet_height = 19;
-                                                        $file_name = 'chapter-sprite.gif';
-                                                        $file_href = MMRPG_CONFIG_ROOTURL.$this_alt_path.$file_name;
-                                                        $file_exists = in_array($file_name, $alt_files_existing) ? true : false;
-                                                        $file_is_unused = false;
-                                                        $file_is_optional = false;
-                                                        echo('<li>');
-                                                            echo('<div class="filebar" data-auto="file-bar" data-file-path="'.$this_alt_path.'" data-file-name="'.$file_name.'" data-file-kind="image/gif" data-file-width="'.$sheet_width.'" data-file-height="'.$sheet_height.'">');
-                                                                echo($file_exists ? '<a class="link view" href="'.$file_href.'?'.time().'" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>' : '<a class="link view disabled" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>');
-                                                                echo('<span class="info size">'.$sheet_width.'w &times; '.$sheet_height.'h</span>');
-                                                                echo($file_exists ? '<span class="info status good">&check;</span>' : '<span class="info status bad">&cross;</span>');
-                                                                echo('<a class="action delete'.(!$file_exists ? ' disabled' : '').'" data-action="delete" data-file-hash="'.md5('delete/'.$this_alt_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">Delete</a>');
-                                                                echo('<a class="action upload'.($file_exists ? ' disabled' : '').'" data-action="upload" data-file-hash="'.md5('upload/'.$this_alt_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">');
-                                                                    echo('<span class="text">Upload</span>');
-                                                                    echo('<input class="input" type="file" name="file_info" value=""'.($file_exists ? ' disabled="disabled"' : '').' />');
-                                                                echo('</a>');
-                                                            echo('</div>');
-                                                        echo('</li>'.PHP_EOL);
-                                                        ?>
-                                                    </ul>
-                                                </div>
-
-                                                <?
-                                                $sheet_groups = array('sprites', 'shadows');
-                                                $sheet_kinds = array('mug', 'sprite');
-                                                $sheet_sizes = array($player_data['player_image_size'], $player_data['player_image_size'] * 2);
-                                                $sheet_directions = array('left', 'right');
-                                                $num_frames = count(explode('/', MMRPG_SETTINGS_PLAYER_FRAMEINDEX));
-                                                foreach ($sheet_groups AS $group_key => $group){
-                                                    if ($group == 'sprites'){ $this_alt_path = $alt_file_path; }
-                                                    elseif ($group == 'shadows'){ $this_alt_path = $alt_shadow_path; }
-                                                    foreach ($sheet_sizes AS $size_key => $size){
-                                                        $sheet_height = $size;
-                                                        $files_are_automatic = false;
-                                                        if ($group == 'shadows' || $size_key != 0){ $files_are_automatic = true; }
-                                                        //if ($size_key > 0){ $files_are_automatic = true; }
-                                                        $subfield_class = 'subfield';
-                                                        if ($files_are_automatic){ $subfield_class .= ' auto-generated'; }
-                                                        $subfield_style = '';
-                                                        if ($size_key == 0){ $subfield_style = 'clear: left; '; }
-                                                        if (!empty($subfield_style)){ $subfield_style = ' style="'.trim($subfield_style).'"'; }
-                                                        $subfield_name = $group.' @ '.(100 + ($size_key * 100)).'%';
-                                                        echo('<div class="'.$subfield_class.'"'.$subfield_style.' data-group="'.$group.'" data-size="'.$size.'">'.PHP_EOL);
-                                                            echo('<strong class="sublabel" style="font-size: 90%;">'.$subfield_name.'</strong>'.PHP_EOL);
-                                                            if ($files_are_automatic){ echo('<span class="sublabel" style="font-size: 90%; color: #969696;">(auto-generated)</span>'.PHP_EOL); }
-                                                            echo('<br />'.PHP_EOL);
-                                                            echo('<ul class="files">'.PHP_EOL);
-                                                            foreach ($sheet_kinds AS $kind_key => $kind){
-                                                                $sheet_width = $kind != 'mug' ? ($size * $num_frames) : $size;
-                                                                foreach ($sheet_directions AS $direction_key => $direction){
-                                                                    $file_name = $kind.'_'.$direction.'_'.$size.'x'.$size.'.png';
-                                                                    $file_href = MMRPG_CONFIG_ROOTURL.$this_alt_path.$file_name;
-                                                                    if ($group == 'sprites'){ $file_exists = in_array($file_name, $alt_files_existing) ? true : false; }
-                                                                    elseif ($group == 'shadows'){ $file_exists = in_array($file_name, $alt_shadows_existing) ? true : false; }
-                                                                    $file_is_unused = false;
-                                                                    //if ($group == 'shadows' && ($kind == 'mug' || $size_key == 0)){ $file_is_unused = true; }
-                                                                    //if ($group == 'shadows' && $kind == 'mug'){ $file_is_unused = true; }
-                                                                    $file_is_optional = $group == 'shadows' && !$is_base_sprite ? true : false;
-                                                                    echo('<li>');
-                                                                        echo('<div class="filebar'.($file_is_unused ? ' unused' : '').($file_is_optional ? ' optional' : '').'" data-auto="file-bar" data-file-path="'.$this_alt_path.'" data-file-name="'.$file_name.'" data-file-kind="image/png" data-file-width="'.$sheet_width.'" data-file-height="'.$sheet_height.'" data-file-extras="auto-zoom-x2,auto-shadows">');
-                                                                            echo($file_exists ? '<a class="link view" href="'.$file_href.'?'.time().'" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>' : '<a class="link view disabled" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>');
-                                                                            echo('<span class="info size">'.$sheet_width.'w &times; '.$sheet_height.'h</span>');
-                                                                            echo($file_exists ? '<span class="info status good">&check;</span>' : '<span class="info status bad">&cross;</span>');
-                                                                            if (!$files_are_automatic){
-                                                                                echo('<a class="action delete'.(!$file_exists ? ' disabled' : '').'" data-action="delete" data-file-hash="'.md5('delete/'.$this_alt_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">Delete</a>');
-                                                                                echo('<a class="action upload'.($file_exists ? ' disabled' : '').'" data-action="upload" data-file-hash="'.md5('upload/'.$this_alt_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">');
-                                                                                    echo('<span class="text">Upload</span>');
-                                                                                    echo('<input class="input" type="file" name="file_info" value=""'.($file_exists ? ' disabled="disabled"' : '').' />');
-                                                                                echo('</a>');
-                                                                            }
-                                                                        echo('</div>');
-                                                                        /* echo('<div class="preview">');
-                                                                            echo('<img class="image" src="'.$file_href.'" alt="'.$file_name.'" />');
-                                                                        echo('</div>'); */
-                                                                    echo('</li>'.PHP_EOL);
-                                                                }
-                                                            }
-                                                            echo('</ul>'.PHP_EOL);
-                                                        echo('</div>'.PHP_EOL);
-                                                    }
-                                                }
-                                                ?>
-
-                                            </div>
-
-                                            <div class="options" style="margin-top: -5px; padding-top: 0;">
-
-                                                <? if ($is_base_sprite){ ?>
-
-                                                        <div class="field checkwrap rfloat fullsize">
-                                                            <label class="label">
-                                                                <strong style="color: #da1616;">Delete Base Images?</strong>
-                                                                <input type="hidden" name="player_image_alts[<?= $alt_token ?>][delete_images]" value="0" checked="checked" />
-                                                                <input class="checkbox" type="checkbox" name="player_image_alts[<?= $alt_token ?>][delete_images]" value="1" />
-                                                            </label>
-                                                            <p class="subtext" style="color: #da1616;">Empty <strong>base</strong> image folder and remove all sprites/shadows</p>
-                                                        </div>
-
-                                                <? } else { ?>
-
-                                                        <div class="field checkwrap rfloat">
-                                                            <label class="label">
-                                                                <strong style="color: #262626;">Auto-Generate Shadows?</strong>
-                                                                <input class="checkbox" type="checkbox" name="player_image_alts[<?= $alt_token ?>][generate_shadows]" value="1" <?= !empty($alt_shadows_existing) ? 'checked="checked"' : '' ?> />
-                                                            </label>
-                                                            <p class="subtext" style="color: #262626;">Only generate alt shadows if silhouette differs from base</p>
-                                                        </div>
-
-                                                        <div class="field checkwrap rfloat fullsize">
-                                                            <label class="label">
-                                                                <strong style="color: #da1616;">Delete <?= ucfirst($alt_token) ?> Images?</strong>
-                                                                <input type="hidden" name="player_image_alts[<?= $alt_token ?>][delete_images]" value="0" checked="checked" />
-                                                                <input class="checkbox" type="checkbox" name="player_image_alts[<?= $alt_token ?>][delete_images]" value="1" />
-                                                            </label>
-                                                            <p class="subtext" style="color: #da1616;">Empty the <strong><?= $alt_token ?></strong> image folder and remove all sprites/shadows</p>
-                                                        </div>
-
-                                                        <? if (!$has_elemental_alts){ ?>
-
-                                                                <div class="field checkwrap rfloat fullsize">
-                                                                    <label class="label">
-                                                                        <strong style="color: #da1616;">Delete <?= ucfirst($alt_token) ?> Data?</strong>
-                                                                        <input type="hidden" name="player_image_alts[<?= $alt_token ?>][delete]" value="0" checked="checked" />
-                                                                        <input class="checkbox" type="checkbox" name="player_image_alts[<?= $alt_token ?>][delete]" value="1" />
-                                                                    </label>
-                                                                    <p class="subtext" style="color: #da1616;">Remove <strong><?= $alt_token ?></strong> from the list (images will not be deleted)</p>
-                                                                </div>
-
-                                                        <? } ?>
-
-                                                <? } ?>
-
-                                            </div>
-
-                                            <?
-
-                                        }
-                                    }
-
-                                    //$base_sprite_list = getDirContents(MMRPG_CONFIG_ROOTDIR.$base_sprite_path);
-                                    //echo('<pre>$base_sprite_path = '.print_r($base_sprite_path, true).'</pre>');
-                                    //echo('<pre>$base_sprite_list = '.(!empty($base_sprite_list) ? htmlentities(print_r($base_sprite_list, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
-                                    //echo('<pre>$temp_alts_array = '.(!empty($temp_alts_array) ? htmlentities(print_r($temp_alts_array, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
-
-                                    // Only if we're allowed to create new alts for this player
-                                    if (false && $allow_new_alt_creation){
-                                        echo('<hr />'.PHP_EOL);
-
+                                    $player_quote_kinds = array('start', 'taunt', 'victory', 'defeat');
+                                    foreach ($player_quote_kinds AS $kind_key => $kind_token){
                                         ?>
                                         <div class="field halfsize">
                                             <div class="label">
-                                                <strong>Add Another Alt</strong>
-                                                <em>select the alt you want to add and then save</em>
+                                                <strong><?= ucfirst($kind_token) ?> Quote</strong>
                                             </div>
-                                            <select class="select" name="player_image_alts_new">
-                                                <option value="">-</option>
-                                                <?
-                                                $alt_limit = 10;
-                                                if ($alt_limit < count($player_image_alts)){ $alt_limit = count($player_image_alts) + 1; }
-                                                foreach ($player_image_alts AS $info){ if (!empty($info['token'])){
-                                                    $num = (int)(str_replace('alt', '', $info['token']));
-                                                    if ($alt_limit < $num){ $alt_limit = $num + 1; }
-                                                    } }
-                                                for ($i = 1; $i <= $alt_limit; $i++){
-                                                    $alt_token = 'alt'.($i > 1 ? $i : '');
-                                                    ?>
-                                                    <option value="<?= $alt_token ?>"<?= in_array($alt_token, $player_image_alts_tokens) ? ' disabled="disabled"' : '' ?>>
-                                                        <?= $player_data['player_name'] ?>
-                                                        (<?= ucfirst($alt_token) ?> / <?
-                                                            if ($i == 9){
-                                                                echo('Darkness');
-                                                            } elseif ($i == 3){
-                                                                echo('Weapon');
-                                                            } elseif ($i < 9){
-                                                                echo('Standard');
-                                                            } elseif ($i > 9){
-                                                                echo('Custom');
-                                                            } ?>)
-                                                    </option>
-                                                <? } ?>
-                                            </select><span></span>
+                                            <input class="textbox" type="text" name="player_quotes_<?= $kind_token ?>" value="<?= htmlentities($player_data['player_quotes_'.$kind_token], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="256" />
                                         </div>
                                         <?
                                     }
-
-                                }
-
-                                ?>
-
-                            </div>
-
-                            <div class="panel" data-tab="functions">
-
-                                <div class="field fullsize codemirror" data-codemirror-mode="php">
-                                    <div class="label">
-                                        <strong>Player Functions</strong>
-                                        <em>code is php-format with html allowed in some strings</em>
-                                    </div>
-                                    <?
-                                    // Collect the markup for the player functions file
-                                    if (!empty($_SESSION['player_functions_markup'][$player_data['player_id']])){
-                                        $player_functions_markup = $_SESSION['player_functions_markup'][$player_data['player_id']];
-                                        unset($_SESSION['player_functions_markup'][$player_data['player_id']]);
-                                    } else {
-                                        $template_functions_path = MMRPG_CONFIG_PLAYERS_CONTENT_PATH.'.player/functions.php';
-                                        $player_functions_path = MMRPG_CONFIG_PLAYERS_CONTENT_PATH.$player_data['player_token'].'/functions.php';
-                                        $player_functions_markup = file_exists($player_functions_path) ? file_get_contents($player_functions_path) : file_get_contents($template_functions_path);
-                                    }
                                     ?>
-                                    <textarea class="textarea" name="player_functions_markup" rows="<?= min(20, substr_count($player_functions_markup, PHP_EOL)) ?>"><?= htmlentities(trim($player_functions_markup), ENT_QUOTES, 'UTF-8', true) ?></textarea>
-                                    <div class="label examples" style="font-size: 80%; padding-top: 4px;">
-                                        <strong>Available Objects</strong>:
-                                        <br />
-                                        <code style="color: #05a;">$this_battle</code>
-                                        &nbsp;&nbsp;<a title="battle data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_BATTLES_CONTENT_PATH).'.battle/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
-                                        <br />
-                                        <code style="color: #05a;">$this_field</code>
-                                        &nbsp;&nbsp;<a title="field data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_FIELDS_CONTENT_PATH).'.field/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
-                                        <br />
-                                        <code style="color: #05a;">$this_player</code>
-                                        &nbsp;/&nbsp;
-                                        <code style="color: #05a;">$target_player</code>
-                                        &nbsp;&nbsp;<a title="player data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_PLAYERS_CONTENT_PATH).'.player/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
+
+                                    <div class="field fullsize" style="min-height: 0; margin-bottom: 0; padding-bottom: 0;">
+                                        <div class="label">
+                                            <em class="nowrap" style="margin-left: 0;">(!) You can use <strong>{this_player}</strong>, <strong>{this_robot}</strong>, <strong>{target_player}</strong>, and <strong>{target_robot}</strong> variables for dynamic text</em>
+                                        </div>
                                     </div>
+
+                                </div>
+
+                                <div class="panel" data-tab="abilities">
+
+                                    <?
+
+                                    // Collect global abilities so we can skip them
+                                    $global_ability_tokens = rpg_ability::get_global_abilities();
+
+                                    // Pre-generate a list of all abilities so we can re-use it over and over
+                                    $ability_options_markup = array();
+                                    $ability_options_markup[] = '<option value="">-</option>';
+                                    foreach ($mmrpg_abilities_index AS $ability_token => $ability_info){
+                                        //if (in_array($ability_token, $global_ability_tokens)){ continue; }
+                                        if ($ability_info['ability_class'] === 'mecha' && $player_data['player_class'] !== 'mecha'){ continue; }
+                                        elseif ($ability_info['ability_class'] === 'boss' && $player_data['player_class'] !== 'boss'){ continue; }
+                                        $ability_name = $ability_info['ability_name'];
+                                        $ability_types = ucwords(implode(' / ', array_values(array_filter(array($ability_info['ability_type'], $ability_info['ability_type2'])))));
+                                        if (empty($ability_types)){ $ability_types = 'Neutral'; }
+                                        $ability_options_markup[] = '<option value="'.$ability_token.'">'.$ability_name.' ('.$ability_types.')</option>';
+                                    }
+                                    $ability_options_count = count($ability_options_markup);
+                                    $ability_options_markup = implode(PHP_EOL, $ability_options_markup);
+
+                                    ?>
+
+                                    <div class="field fullsize multirow">
+                                        <strong class="label">
+                                            Native Abilities
+                                            <em>These abilities are available to the player at the start and can be equipped to their robots</em>
+                                        </strong>
+                                        <?
+                                        $current_ability_list = !empty($player_data['player_abilities_rewards']) ? json_decode($player_data['player_abilities_rewards'], true) : array();
+                                        $select_limit = max(2, count($current_ability_list));
+                                        $select_limit += 2;
+                                        for ($i = 0; $i < $select_limit; $i++){
+                                            $current_value = isset($current_ability_list[$i]) ? $current_ability_list[$i] : array();
+                                            $current_value_points = 0; //!empty($current_value) ? $current_value['points'] : '';
+                                            $current_value_token = !empty($current_value) ? $current_value['token'] : '';
+                                            ?>
+                                            <div class="subfield pointsup">
+                                                <input class="hidden" type="hidden" name="player_abilities_rewards[<?= $i ?>][points]" value="<?= $current_value_points ?>" maxlength="3" placeholder="0" />
+                                                <select class="select" name="player_abilities_rewards[<?= $i ?>][token]">
+                                                    <?= str_replace('value="'.$current_value_token.'"', 'value="'.$current_value_token.'" selected="selected"', $ability_options_markup) ?>
+                                                </select><span></span>
+                                            </div>
+                                            <?
+                                        }
+                                        ?>
+                                    </div>
+
+                                </div>
+
+                                <div class="panel" data-tab="robots">
+
+                                    <?
+
+                                    // Pre-generate a list of all robots so we can re-use it over and over
+                                    $robot_options_markup = array();
+                                    $robot_options_markup[] = '<option value="">-</option>';
+                                    foreach ($mmrpg_robots_index AS $robot_token => $robot_info){
+                                        if ($robot_info['robot_class'] === 'mecha' && $player_data['player_class'] !== 'mecha'){ continue; }
+                                        elseif ($robot_info['robot_class'] === 'boss' && $player_data['player_class'] !== 'boss'){ continue; }
+                                        $robot_name = $robot_info['robot_name'];
+                                        $robot_cores = ucwords(implode(' / ', array_values(array_filter(array($robot_info['robot_core'], $robot_info['robot_core2'])))));
+                                        if (empty($robot_cores)){ $robot_cores = 'Neutral'; }
+                                        $robot_options_markup[] = '<option value="'.$robot_token.'">'.$robot_name.' ('.$robot_cores.')</option>';
+                                    }
+                                    $robot_options_count = count($robot_options_markup);
+                                    $robot_options_markup = implode(PHP_EOL, $robot_options_markup);
+
+                                    ?>
+
+                                    <div class="field fullsize multirow">
+                                        <strong class="label">
+                                            Starter Robot
+                                            <em>This is the robot that the player starts at the beginning of their campaign</em>
+                                        </strong>
+                                        <?
+                                        $current_robot_list = !empty($player_data['player_robots_rewards']) ? json_decode($player_data['player_robots_rewards'], true) : array();
+                                        $select_limit = 1;
+                                        for ($i = 0; $i < $select_limit; $i++){
+                                            $current_value = isset($current_robot_list[$i]) ? $current_robot_list[$i] : array();
+                                            $current_value_points = 0; //!empty($current_value) ? $current_value['points'] : '';
+                                            $current_value_level = 1; //!empty($current_value) ? $current_value['level'] : '';
+                                            $current_value_token = !empty($current_value) ? $current_value['token'] : '';
+                                            ?>
+                                            <div class="subfield pointsup">
+                                                <input class="hidden" type="hidden" name="player_robots_rewards[<?= $i ?>][points]" value="<?= $current_value_points ?>" maxlength="3" placeholder="0" />
+                                                <select class="select" name="player_robots_rewards[<?= $i ?>][token]">
+                                                    <?= str_replace('value="'.$current_value_token.'"', 'value="'.$current_value_token.'" selected="selected"', $robot_options_markup) ?>
+                                                </select><span></span>
+                                                <input class="hidden" type="hidden" name="player_robots_rewards[<?= $i ?>][level]" value="<?= $current_value_level ?>" maxlength="3" placeholder="1" />
+                                            </div>
+                                            <?
+                                        }
+                                        ?>
+                                    </div>
+
+                                    <hr />
+
+                                    <div class="field fullsize has2cols multirow">
+                                        <strong class="label">
+                                            Campaign Robots
+                                            <em>These are the robots that appear as the main targets in the player's campaign</em>
+                                        </strong>
+                                        <?
+                                        $current_robot_list = !empty($player_data['player_robots_compatible']) ? json_decode($player_data['player_robots_compatible'], true) : array();
+                                        $select_limit = max(10, count($current_robot_list));
+                                        //$select_limit += 4 - ($select_limit % 4);
+                                        for ($i = 0; $i < $select_limit; $i++){
+                                            $current_value = isset($current_robot_list[$i]) ? $current_robot_list[$i] : '';
+                                            ?>
+                                            <div class="subfield">
+                                                <select class="select" name="player_robots_compatible[<?= $i ?>]">
+                                                    <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $robot_options_markup) ?>
+                                                </select><span></span>
+                                            </div>
+                                            <?
+                                        }
+                                        ?>
+                                    </div>
+
+                                </div>
+
+                                <div class="panel" data-tab="sprites">
+
+                                    <?
+
+                                    // Pre-generate a list of all contributors so we can re-use it over and over
+                                    $contributor_options_markup = array();
+                                    $contributor_options_markup[] = '<option value="0">-</option>';
+                                    foreach ($mmrpg_contributors_index AS $editor_id => $user_info){
+                                        $option_label = $user_info['user_name'];
+                                        if (!empty($user_info['user_name_public']) && $user_info['user_name_public'] !== $user_info['user_name']){ $option_label = $user_info['user_name_public'].' ('.$option_label.')'; }
+                                        $contributor_options_markup[] = '<option value="'.$editor_id.'">'.$option_label.'</option>';
+                                    }
+                                    $contributor_options_count = count($contributor_options_markup);
+                                    $contributor_options_markup = implode(PHP_EOL, $contributor_options_markup);
+
+                                    ?>
+
+                                    <? $placeholder_folder = $player_data['player_class'] != 'master' ? $player_data['player_class'] : 'player'; ?>
+                                    <div class="field halfsize">
+                                        <div class="label">
+                                            <strong>Sprite Path</strong>
+                                            <em>base image path for sprites</em>
+                                        </div>
+                                        <select class="select" name="player_image">
+                                            <option value="<?= $placeholder_folder ?>" <?= $player_data['player_image'] == $placeholder_folder ? 'selected="selected"' : '' ?>>-</option>
+                                            <option value="<?= $player_data['player_token'] ?>" <?= $player_data['player_image'] == $player_data['player_token'] ? 'selected="selected"' : '' ?>>content/players/<?= $player_data['player_token'] ?>/</option>
+                                        </select><span></span>
+                                    </div>
+
+                                    <div class="field halfsize">
+                                        <div class="label">
+                                            <strong>Sprite Size</strong>
+                                            <em>base frame size for each sprite</em>
+                                        </div>
+                                        <select class="select" name="player_image_size">
+                                            <? if ($player_data['player_image'] == $placeholder_folder){ ?>
+                                                <option value="<?= $player_data['player_image_size'] ?>" selected="selected">-</option>
+                                                <option value="40">40x40</option>
+                                                <option value="80">80x80</option>
+                                                <option disabled="disabled" value="160">160x160</option>
+                                            <? } else { ?>
+                                                <option value="40" <?= $player_data['player_image_size'] == 40 ? 'selected="selected"' : '' ?>>40x40</option>
+                                                <option value="80" <?= $player_data['player_image_size'] == 80 ? 'selected="selected"' : '' ?>>80x80</option>
+                                                <option disabled="disabled" value="160" <?= $player_data['player_image_size'] == 160 ? 'selected="selected"' : '' ?>>160x160</option>
+                                            <? } ?>
+                                        </select><span></span>
+                                    </div>
+
+                                    <div class="field halfsize">
+                                        <div class="label">
+                                            <strong>Sprite Editor #1</strong>
+                                            <em>user who edited or created this sprite</em>
+                                        </div>
+                                        <? if ($player_data['player_image'] != $placeholder_folder){ ?>
+                                            <select class="select" name="player_image_editor">
+                                                <?= str_replace('value="'.$player_data['player_image_editor'].'"', 'value="'.$player_data['player_image_editor'].'" selected="selected"', $contributor_options_markup) ?>
+                                            </select><span></span>
+                                        <? } else { ?>
+                                            <input type="hidden" name="player_image_editor" value="<?= $player_data['player_image_editor'] ?>" />
+                                            <input class="textbox" type="text" name="player_image_editor" value="-" disabled="disabled" />
+                                        <? } ?>
+                                    </div>
+
+                                    <div class="field halfsize">
+                                        <div class="label">
+                                            <strong>Sprite Editor #2</strong>
+                                            <em>another user who collaborated on this sprite</em>
+                                        </div>
+                                        <? if ($player_data['player_image'] != $placeholder_folder){ ?>
+                                            <select class="select" name="player_image_editor2">
+                                                <?= str_replace('value="'.$player_data['player_image_editor2'].'"', 'value="'.$player_data['player_image_editor2'].'" selected="selected"', $contributor_options_markup) ?>
+                                            </select><span></span>
+                                        <? } else { ?>
+                                            <input type="hidden" name="player_image_editor2" value="<?= $player_data['player_image_editor2'] ?>" />
+                                            <input class="textbox" type="text" name="player_image_editor2" value="-" disabled="disabled" />
+                                        <? } ?>
+                                    </div>
+
+                                    <?
+
+                                    // Decompress existing image alts pulled from the database
+                                    $player_image_alts = !empty($player_data['player_image_alts']) ? json_decode($player_data['player_image_alts'], true) : array();
+
+                                    // Collect the alt tokens from all defined alts so far
+                                    $player_image_alts_tokens = array();
+                                    foreach ($player_image_alts AS $alt){ if (!empty($alt['token'])){ $player_image_alts_tokens[] = $alt['token'];  } }
+
+                                    // Define a variable to toggle allowance of new alt creation
+                                    $has_elemental_alts = $player_data['player_type'] == 'copy' ? true : false;
+                                    $allow_new_alt_creation = !$has_elemental_alts ? true : false;
+
+                                    // Only proceed if all required sprite fields are set
+                                    if (!empty($player_data['player_image'])
+                                        && !in_array($player_data['player_image'], array('player', 'master', 'boss', 'mecha'))
+                                        && !empty($player_data['player_image_size'])){
+
+                                        echo('<hr />'.PHP_EOL);
+
+                                        // Define the base sprite and shadow paths for this player given its image token
+                                        $base_sprite_path = 'content/players/'.$player_data['player_image'].'/sprites/';
+                                        $base_shadow_path = 'content/players/'.$player_data['player_image'].'/shadows/';
+
+                                        // Define the alts we'll be looping through for this player
+                                        $temp_alts_array = array();
+                                        $temp_alts_array[] = array('token' => '', 'name' => $player_data['player_name'], 'summons' => 0);
+
+                                        // Append predefined alts automatically, based on the player image alt array
+                                        if (!empty($player_data['player_image_alts'])){
+                                            $temp_alts_array = array_merge($temp_alts_array, $player_image_alts);
+                                        }
+
+                                        // Otherwise, if this is a copy player, append based on all the types in the index
+                                        if ($has_elemental_alts){
+                                            foreach ($mmrpg_types_index AS $type_token => $type_info){
+                                                if (empty($type_token) || $type_token == 'none' || $type_token == 'copy' || $type_info['type_class'] == 'special'){ continue; }
+                                                $temp_alts_array[] = array('token' => $type_token, 'name' => $player_data['player_name'].' ('.ucfirst($type_token).' Type)', 'summons' => 0, 'colour' => $type_token);
+                                            }
+                                        }
+
+                                        // Otherwise, if this player has multiple sheets, add them as alt options
+                                        if (!empty($player_data['player_image_sheets'])){
+                                            for ($i = 2; $i <= $player_data['player_image_sheets']; $i++){
+                                                $temp_alts_array[] = array('sheet' => $i, 'name' => $player_data['player_name'].' (Sheet #'.$i.')', 'summons' => 0);
+                                            }
+                                        }
+
+                                        // Loop through the defined alts for this player and display image lists
+                                        if (!empty($temp_alts_array)){
+                                            foreach ($temp_alts_array AS $alt_key => $alt_info){
+
+                                                $is_base_sprite = empty($alt_info['token']) ? true : false;
+                                                $alt_token = $is_base_sprite ? 'base' : $alt_info['token'];
+
+                                                $alt_file_path = rtrim($base_sprite_path, '/').(!$is_base_sprite ? '_'.$alt_info['token'] : '').'/';
+                                                $alt_file_dir = MMRPG_CONFIG_ROOTDIR.$alt_file_path;
+                                                $alt_files_existing = getDirContents($alt_file_dir);
+
+                                                $alt_shadow_path = rtrim($base_shadow_path, '/').(!$is_base_sprite ? '_'.$alt_info['token'] : '').'/';
+                                                $alt_shadow_dir = MMRPG_CONFIG_ROOTDIR.$alt_shadow_path;
+                                                $alt_shadows_existing = getDirContents($alt_shadow_dir);
+
+                                                if (!empty($alt_files_existing)){ $alt_files_existing = array_map(function($s)use($alt_file_dir){ return str_replace($alt_file_dir, '', str_replace('\\', '/', $s)); }, $alt_files_existing); }
+                                                if (!empty($alt_shadows_existing)){ $alt_shadows_existing = array_map(function($s)use($alt_shadow_dir){ return str_replace($alt_shadow_dir, '', str_replace('\\', '/', $s)); }, $alt_shadows_existing); }
+
+                                                //echo('<pre>$alt_files_existing = '.(!empty($alt_files_existing) ? htmlentities(print_r($alt_files_existing, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
+                                                //echo('<pre>$alt_shadows_existing = '.(!empty($alt_shadows_existing) ? htmlentities(print_r($alt_shadows_existing, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
+
+                                                ?>
+
+                                                <?= ($alt_key > 0) ? '<hr />' : '' ?>
+
+                                                <div class="field fullsize" style="margin-bottom: 0; min-height: 0;">
+                                                    <strong class="label">
+                                                        <? if ($is_base_sprite){ ?>
+                                                            Base Sprite Sheets
+                                                            <em>Main sprites used for player. Zoom and shadow sprites are auto-generated.</em>
+                                                        <? } else { ?>
+                                                            <?= ucfirst($alt_token).' Sprite Sheets'  ?>
+                                                            <em>Sprites used for player's <strong><?= $alt_token ?></strong> skin. Zoom and shadow sprites are auto-generated.</em>
+                                                        <? } ?>
+                                                    </strong>
+                                                </div>
+                                                <? if (!$is_base_sprite){ ?>
+                                                    <input class="hidden" type="hidden" name="player_image_alts[<?= $alt_token ?>][token]" value="<?= $alt_info['token'] ?>" maxlength="64" <?= $has_elemental_alts ? 'disabled="disabled"' : '' ?> />
+                                                    <div class="field">
+                                                        <div class="label"><strong>Name</strong></div>
+                                                        <input class="textbox" type="text" name="player_image_alts[<?= $alt_token ?>][name]" value="<?= $alt_info['name'] ?>" maxlength="64" <?= $has_elemental_alts ? 'disabled="disabled"' : '' ?> />
+                                                    </div>
+                                                    <div class="field">
+                                                        <div class="label"><strong>Summons</strong></div>
+                                                        <input class="textbox" type="number" name="player_image_alts[<?= $alt_token ?>][summons]" value="<?= $alt_info['summons'] ?>" maxlength="3" <?= $has_elemental_alts ? 'disabled="disabled"' : '' ?> />
+                                                    </div>
+                                                    <div class="field">
+                                                        <div class="label">
+                                                            <strong>Colour</strong>
+                                                            <span class="type_span type_<?= (!empty($alt_info['colour']) ? $alt_info['colour'] : 'none') ?> swatch floatright" data-auto="field-type" data-field-type="player_image_alts[<?= $alt_token ?>][colour]">&nbsp;</span>
+                                                        </div>
+                                                        <select class="select" name="player_image_alts[<?= $alt_token ?>][colour]" <?= $has_elemental_alts ? 'disabled="disabled"' : '' ?>>
+                                                            <option value=""<?= empty($alt_info['colour']) ? ' selected="selected"' : '' ?>>-</option>
+                                                            <?
+                                                            foreach ($mmrpg_types_index AS $type_token => $type_info){
+                                                                //if ($type_info['type_class'] === 'special'){ continue; }
+                                                                $label = $type_info['type_name'];
+                                                                if (!empty($alt_info['colour']) && $alt_info['colour'] === $type_token){ $selected = 'selected="selected"'; }
+                                                                else { $selected = ''; }
+                                                                echo('<option value="'.$type_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                                            }
+                                                            ?>
+                                                        </select><span></span>
+                                                    </div>
+                                                <? } ?>
+
+                                                <div class="field fullsize has2cols widecols multirow sprites has-filebars">
+
+                                                    <div class="subfield" style="clear: left;" data-group="shadows" data-size="40">
+                                                        <strong class="sublabel" style="font-size: 90%;">icon @ 100%</strong><br />
+                                                        <ul class="files">
+                                                            <?
+                                                            $this_alt_path = $alt_file_path;
+                                                            $group = 'sprites';
+                                                            $sheet_width = 18;
+                                                            $sheet_height = 19;
+                                                            $file_name = 'chapter-sprite.gif';
+                                                            $file_href = MMRPG_CONFIG_ROOTURL.$this_alt_path.$file_name;
+                                                            $file_exists = in_array($file_name, $alt_files_existing) ? true : false;
+                                                            $file_is_unused = false;
+                                                            $file_is_optional = false;
+                                                            echo('<li>');
+                                                                echo('<div class="filebar" data-auto="file-bar" data-file-path="'.$this_alt_path.'" data-file-name="'.$file_name.'" data-file-kind="image/gif" data-file-width="'.$sheet_width.'" data-file-height="'.$sheet_height.'">');
+                                                                    echo($file_exists ? '<a class="link view" href="'.$file_href.'?'.time().'" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>' : '<a class="link view disabled" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>');
+                                                                    echo('<span class="info size">'.$sheet_width.'w &times; '.$sheet_height.'h</span>');
+                                                                    echo($file_exists ? '<span class="info status good">&check;</span>' : '<span class="info status bad">&cross;</span>');
+                                                                    echo('<a class="action delete'.(!$file_exists ? ' disabled' : '').'" data-action="delete" data-file-hash="'.md5('delete/'.$this_alt_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">Delete</a>');
+                                                                    echo('<a class="action upload'.($file_exists ? ' disabled' : '').'" data-action="upload" data-file-hash="'.md5('upload/'.$this_alt_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">');
+                                                                        echo('<span class="text">Upload</span>');
+                                                                        echo('<input class="input" type="file" name="file_info" value=""'.($file_exists ? ' disabled="disabled"' : '').' />');
+                                                                    echo('</a>');
+                                                                echo('</div>');
+                                                            echo('</li>'.PHP_EOL);
+                                                            ?>
+                                                        </ul>
+                                                    </div>
+
+                                                    <?
+                                                    $sheet_groups = array('sprites', 'shadows');
+                                                    $sheet_kinds = array('mug', 'sprite');
+                                                    $sheet_sizes = array($player_data['player_image_size'], $player_data['player_image_size'] * 2);
+                                                    $sheet_directions = array('left', 'right');
+                                                    $num_frames = count(explode('/', MMRPG_SETTINGS_PLAYER_FRAMEINDEX));
+                                                    foreach ($sheet_groups AS $group_key => $group){
+                                                        if ($group == 'sprites'){ $this_alt_path = $alt_file_path; }
+                                                        elseif ($group == 'shadows'){ $this_alt_path = $alt_shadow_path; }
+                                                        foreach ($sheet_sizes AS $size_key => $size){
+                                                            $sheet_height = $size;
+                                                            $files_are_automatic = false;
+                                                            if ($group == 'shadows' || $size_key != 0){ $files_are_automatic = true; }
+                                                            //if ($size_key > 0){ $files_are_automatic = true; }
+                                                            $subfield_class = 'subfield';
+                                                            if ($files_are_automatic){ $subfield_class .= ' auto-generated'; }
+                                                            $subfield_style = '';
+                                                            if ($size_key == 0){ $subfield_style = 'clear: left; '; }
+                                                            if (!empty($subfield_style)){ $subfield_style = ' style="'.trim($subfield_style).'"'; }
+                                                            $subfield_name = $group.' @ '.(100 + ($size_key * 100)).'%';
+                                                            echo('<div class="'.$subfield_class.'"'.$subfield_style.' data-group="'.$group.'" data-size="'.$size.'">'.PHP_EOL);
+                                                                echo('<strong class="sublabel" style="font-size: 90%;">'.$subfield_name.'</strong>'.PHP_EOL);
+                                                                if ($files_are_automatic){ echo('<span class="sublabel" style="font-size: 90%; color: #969696;">(auto-generated)</span>'.PHP_EOL); }
+                                                                echo('<br />'.PHP_EOL);
+                                                                echo('<ul class="files">'.PHP_EOL);
+                                                                foreach ($sheet_kinds AS $kind_key => $kind){
+                                                                    $sheet_width = $kind != 'mug' ? ($size * $num_frames) : $size;
+                                                                    foreach ($sheet_directions AS $direction_key => $direction){
+                                                                        $file_name = $kind.'_'.$direction.'_'.$size.'x'.$size.'.png';
+                                                                        $file_href = MMRPG_CONFIG_ROOTURL.$this_alt_path.$file_name;
+                                                                        if ($group == 'sprites'){ $file_exists = in_array($file_name, $alt_files_existing) ? true : false; }
+                                                                        elseif ($group == 'shadows'){ $file_exists = in_array($file_name, $alt_shadows_existing) ? true : false; }
+                                                                        $file_is_unused = false;
+                                                                        //if ($group == 'shadows' && ($kind == 'mug' || $size_key == 0)){ $file_is_unused = true; }
+                                                                        //if ($group == 'shadows' && $kind == 'mug'){ $file_is_unused = true; }
+                                                                        $file_is_optional = $group == 'shadows' && !$is_base_sprite ? true : false;
+                                                                        echo('<li>');
+                                                                            echo('<div class="filebar'.($file_is_unused ? ' unused' : '').($file_is_optional ? ' optional' : '').'" data-auto="file-bar" data-file-path="'.$this_alt_path.'" data-file-name="'.$file_name.'" data-file-kind="image/png" data-file-width="'.$sheet_width.'" data-file-height="'.$sheet_height.'" data-file-extras="auto-zoom-x2,auto-shadows">');
+                                                                                echo($file_exists ? '<a class="link view" href="'.$file_href.'?'.time().'" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>' : '<a class="link view disabled" target="_blank" data-href="'.$file_href.'">'.$group.'/'.$file_name.'</a>');
+                                                                                echo('<span class="info size">'.$sheet_width.'w &times; '.$sheet_height.'h</span>');
+                                                                                echo($file_exists ? '<span class="info status good">&check;</span>' : '<span class="info status bad">&cross;</span>');
+                                                                                if (!$files_are_automatic){
+                                                                                    echo('<a class="action delete'.(!$file_exists ? ' disabled' : '').'" data-action="delete" data-file-hash="'.md5('delete/'.$this_alt_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">Delete</a>');
+                                                                                    echo('<a class="action upload'.($file_exists ? ' disabled' : '').'" data-action="upload" data-file-hash="'.md5('upload/'.$this_alt_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">');
+                                                                                        echo('<span class="text">Upload</span>');
+                                                                                        echo('<input class="input" type="file" name="file_info" value=""'.($file_exists ? ' disabled="disabled"' : '').' />');
+                                                                                    echo('</a>');
+                                                                                }
+                                                                            echo('</div>');
+                                                                            /* echo('<div class="preview">');
+                                                                                echo('<img class="image" src="'.$file_href.'" alt="'.$file_name.'" />');
+                                                                            echo('</div>'); */
+                                                                        echo('</li>'.PHP_EOL);
+                                                                    }
+                                                                }
+                                                                echo('</ul>'.PHP_EOL);
+                                                            echo('</div>'.PHP_EOL);
+                                                        }
+                                                    }
+                                                    ?>
+
+                                                </div>
+
+                                                <div class="options" style="margin-top: -5px; padding-top: 0;">
+
+                                                    <? if ($is_base_sprite){ ?>
+
+                                                            <div class="field checkwrap rfloat fullsize">
+                                                                <label class="label">
+                                                                    <strong style="color: #da1616;">Delete Base Images?</strong>
+                                                                    <input type="hidden" name="player_image_alts[<?= $alt_token ?>][delete_images]" value="0" checked="checked" />
+                                                                    <input class="checkbox" type="checkbox" name="player_image_alts[<?= $alt_token ?>][delete_images]" value="1" />
+                                                                </label>
+                                                                <p class="subtext" style="color: #da1616;">Empty <strong>base</strong> image folder and remove all sprites/shadows</p>
+                                                            </div>
+
+                                                    <? } else { ?>
+
+                                                            <div class="field checkwrap rfloat">
+                                                                <label class="label">
+                                                                    <strong style="color: #262626;">Auto-Generate Shadows?</strong>
+                                                                    <input class="checkbox" type="checkbox" name="player_image_alts[<?= $alt_token ?>][generate_shadows]" value="1" <?= !empty($alt_shadows_existing) ? 'checked="checked"' : '' ?> />
+                                                                </label>
+                                                                <p class="subtext" style="color: #262626;">Only generate alt shadows if silhouette differs from base</p>
+                                                            </div>
+
+                                                            <div class="field checkwrap rfloat fullsize">
+                                                                <label class="label">
+                                                                    <strong style="color: #da1616;">Delete <?= ucfirst($alt_token) ?> Images?</strong>
+                                                                    <input type="hidden" name="player_image_alts[<?= $alt_token ?>][delete_images]" value="0" checked="checked" />
+                                                                    <input class="checkbox" type="checkbox" name="player_image_alts[<?= $alt_token ?>][delete_images]" value="1" />
+                                                                </label>
+                                                                <p class="subtext" style="color: #da1616;">Empty the <strong><?= $alt_token ?></strong> image folder and remove all sprites/shadows</p>
+                                                            </div>
+
+                                                            <? if (!$has_elemental_alts){ ?>
+
+                                                                    <div class="field checkwrap rfloat fullsize">
+                                                                        <label class="label">
+                                                                            <strong style="color: #da1616;">Delete <?= ucfirst($alt_token) ?> Data?</strong>
+                                                                            <input type="hidden" name="player_image_alts[<?= $alt_token ?>][delete]" value="0" checked="checked" />
+                                                                            <input class="checkbox" type="checkbox" name="player_image_alts[<?= $alt_token ?>][delete]" value="1" />
+                                                                        </label>
+                                                                        <p class="subtext" style="color: #da1616;">Remove <strong><?= $alt_token ?></strong> from the list (images will not be deleted)</p>
+                                                                    </div>
+
+                                                            <? } ?>
+
+                                                    <? } ?>
+
+                                                </div>
+
+                                                <?
+
+                                            }
+                                        }
+
+                                        //$base_sprite_list = getDirContents(MMRPG_CONFIG_ROOTDIR.$base_sprite_path);
+                                        //echo('<pre>$base_sprite_path = '.print_r($base_sprite_path, true).'</pre>');
+                                        //echo('<pre>$base_sprite_list = '.(!empty($base_sprite_list) ? htmlentities(print_r($base_sprite_list, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
+                                        //echo('<pre>$temp_alts_array = '.(!empty($temp_alts_array) ? htmlentities(print_r($temp_alts_array, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
+
+                                        // Only if we're allowed to create new alts for this player
+                                        if (false && $allow_new_alt_creation){
+                                            echo('<hr />'.PHP_EOL);
+
+                                            ?>
+                                            <div class="field halfsize">
+                                                <div class="label">
+                                                    <strong>Add Another Alt</strong>
+                                                    <em>select the alt you want to add and then save</em>
+                                                </div>
+                                                <select class="select" name="player_image_alts_new">
+                                                    <option value="">-</option>
+                                                    <?
+                                                    $alt_limit = 10;
+                                                    if ($alt_limit < count($player_image_alts)){ $alt_limit = count($player_image_alts) + 1; }
+                                                    foreach ($player_image_alts AS $info){ if (!empty($info['token'])){
+                                                        $num = (int)(str_replace('alt', '', $info['token']));
+                                                        if ($alt_limit < $num){ $alt_limit = $num + 1; }
+                                                        } }
+                                                    for ($i = 1; $i <= $alt_limit; $i++){
+                                                        $alt_token = 'alt'.($i > 1 ? $i : '');
+                                                        ?>
+                                                        <option value="<?= $alt_token ?>"<?= in_array($alt_token, $player_image_alts_tokens) ? ' disabled="disabled"' : '' ?>>
+                                                            <?= $player_data['player_name'] ?>
+                                                            (<?= ucfirst($alt_token) ?> / <?
+                                                                if ($i == 9){
+                                                                    echo('Darkness');
+                                                                } elseif ($i == 3){
+                                                                    echo('Weapon');
+                                                                } elseif ($i < 9){
+                                                                    echo('Standard');
+                                                                } elseif ($i > 9){
+                                                                    echo('Custom');
+                                                                } ?>)
+                                                        </option>
+                                                    <? } ?>
+                                                </select><span></span>
+                                            </div>
+                                            <?
+                                        }
+
+                                    }
+
+                                    ?>
+
+                                </div>
+
+                                <div class="panel" data-tab="functions">
+
+                                    <div class="field fullsize codemirror" data-codemirror-mode="php">
+                                        <div class="label">
+                                            <strong>Player Functions</strong>
+                                            <em>code is php-format with html allowed in some strings</em>
+                                        </div>
+                                        <?
+                                        // Collect the markup for the player functions file
+                                        if (!empty($_SESSION['player_functions_markup'][$player_data['player_id']])){
+                                            $player_functions_markup = $_SESSION['player_functions_markup'][$player_data['player_id']];
+                                            unset($_SESSION['player_functions_markup'][$player_data['player_id']]);
+                                        } else {
+                                            $template_functions_path = MMRPG_CONFIG_PLAYERS_CONTENT_PATH.'.player/functions.php';
+                                            $player_functions_path = MMRPG_CONFIG_PLAYERS_CONTENT_PATH.$player_data['player_token'].'/functions.php';
+                                            $player_functions_markup = file_exists($player_functions_path) ? file_get_contents($player_functions_path) : file_get_contents($template_functions_path);
+                                        }
+                                        ?>
+                                        <textarea class="textarea" name="player_functions_markup" rows="<?= min(20, substr_count($player_functions_markup, PHP_EOL)) ?>"><?= htmlentities(trim($player_functions_markup), ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                                        <div class="label examples" style="font-size: 80%; padding-top: 4px;">
+                                            <strong>Available Objects</strong>:
+                                            <br />
+                                            <code style="color: #05a;">$this_battle</code>
+                                            &nbsp;&nbsp;<a title="battle data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_BATTLES_CONTENT_PATH).'.battle/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
+                                            <br />
+                                            <code style="color: #05a;">$this_field</code>
+                                            &nbsp;&nbsp;<a title="field data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_FIELDS_CONTENT_PATH).'.field/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
+                                            <br />
+                                            <code style="color: #05a;">$this_player</code>
+                                            &nbsp;/&nbsp;
+                                            <code style="color: #05a;">$target_player</code>
+                                            &nbsp;&nbsp;<a title="player data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_PLAYERS_CONTENT_PATH).'.player/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            <? } ?>
+
+                        </div>
+
+                        <hr />
+
+                        <? if (!$player_data_is_new){ ?>
+
+                            <div class="options">
+
+                                <div class="field checkwrap">
+                                    <label class="label">
+                                        <strong>Published</strong>
+                                        <input type="hidden" name="player_flag_published" value="0" checked="checked" />
+                                        <input class="checkbox" type="checkbox" name="player_flag_published" value="1" <?= !empty($player_data['player_flag_published']) ? 'checked="checked"' : '' ?> />
+                                    </label>
+                                    <p class="subtext">This player is ready to appear on the site</p>
+                                </div>
+
+                                <div class="field checkwrap">
+                                    <label class="label">
+                                        <strong>Complete</strong>
+                                        <input type="hidden" name="player_flag_complete" value="0" checked="checked" />
+                                        <input class="checkbox" type="checkbox" name="player_flag_complete" value="1" <?= !empty($player_data['player_flag_complete']) ? 'checked="checked"' : '' ?> />
+                                    </label>
+                                    <p class="subtext">This player's sprites have been completed</p>
+                                </div>
+
+                                <div class="field checkwrap">
+                                    <label class="label">
+                                        <strong>Hidden</strong>
+                                        <input type="hidden" name="player_flag_hidden" value="0" checked="checked" />
+                                        <input class="checkbox" type="checkbox" name="player_flag_hidden" value="1" <?= !empty($player_data['player_flag_hidden']) ? 'checked="checked"' : '' ?> />
+                                    </label>
+                                    <p class="subtext">This player's data should stay hidden</p>
                                 </div>
 
                             </div>
 
-                        </div>
+                            <hr />
 
-                        <hr />
-
-                        <div class="options">
-
-                            <div class="field checkwrap">
-                                <label class="label">
-                                    <strong>Published</strong>
-                                    <input type="hidden" name="player_flag_published" value="0" checked="checked" />
-                                    <input class="checkbox" type="checkbox" name="player_flag_published" value="1" <?= !empty($player_data['player_flag_published']) ? 'checked="checked"' : '' ?> />
-                                </label>
-                                <p class="subtext">This player is ready to appear on the site</p>
-                            </div>
-
-                            <div class="field checkwrap">
-                                <label class="label">
-                                    <strong>Complete</strong>
-                                    <input type="hidden" name="player_flag_complete" value="0" checked="checked" />
-                                    <input class="checkbox" type="checkbox" name="player_flag_complete" value="1" <?= !empty($player_data['player_flag_complete']) ? 'checked="checked"' : '' ?> />
-                                </label>
-                                <p class="subtext">This player's sprites have been completed</p>
-                            </div>
-
-                            <div class="field checkwrap">
-                                <label class="label">
-                                    <strong>Hidden</strong>
-                                    <input type="hidden" name="player_flag_hidden" value="0" checked="checked" />
-                                    <input class="checkbox" type="checkbox" name="player_flag_hidden" value="1" <?= !empty($player_data['player_flag_hidden']) ? 'checked="checked"' : '' ?> />
-                                </label>
-                                <p class="subtext">This player's data should stay hidden</p>
-                            </div>
-
-                        </div>
-
-                        <hr />
+                        <? } ?>
 
                         <div class="formfoot">
 
                             <div class="buttons">
-                                <input class="button save" type="submit" value="Save Changes" />
-                                <? if (empty($player_data['player_flag_protected'])){ ?>
+                                <input class="button save" type="submit" value="<?= $player_data_is_new ? 'Create Player' : 'Save Changes' ?>" />
+                                <? if (!$player_data_is_new && empty($player_data['player_flag_protected'])){ ?>
                                     <input class="button delete" type="button" value="Delete Player" data-delete="players" data-player-id="<?= $player_data['player_id'] ?>" />
                                 <? } ?>
                             </div>
-                            <?= cms_admin::object_editor_print_git_footer_buttons('players', $player_data['player_token'], $mmrpg_git_file_arrays) ?>
-
-                            <? /*
-                            <div class="metadata">
-                                <div class="date"><strong>Created</strong>: <?= !empty($player_data['player_date_created']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $player_data['player_date_created'])): '-' ?></div>
-                                <div class="date"><strong>Modified</strong>: <?= !empty($player_data['player_date_modified']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $player_data['player_date_modified'])) : '-' ?></div>
-                            </div>
-                            */ ?>
+                            <? if (!$player_data_is_new){ ?>
+                                <?= cms_admin::object_editor_print_git_footer_buttons('players', $player_data['player_token'], $mmrpg_git_file_arrays) ?>
+                            <? } ?>
 
                         </div>
 
@@ -1518,7 +1621,7 @@
                 <?
 
                 $debug_player_data = $player_data;
-                $debug_player_data['player_description2'] = str_replace(PHP_EOL, '\\n', $debug_player_data['player_description2']);
+                if (isset($debug_player_data['player_description2'])){ $debug_player_data['player_description2'] = str_replace(PHP_EOL, '\\n', $debug_player_data['player_description2']); }
                 echo('<pre style="display: none;">$player_data = '.(!empty($debug_player_data) ? htmlentities(print_r($debug_player_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
 
                 ?>
