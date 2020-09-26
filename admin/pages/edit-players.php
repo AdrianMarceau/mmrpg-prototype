@@ -332,8 +332,8 @@
             $form_data['player_class'] = 'master'; //!empty($_POST['player_class']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['player_class']) ? trim(strtolower($_POST['player_class'])) : '';
             $form_data['player_gender'] = !empty($_POST['player_gender']) && preg_match('/^(male|female|other|none)$/', $_POST['player_gender']) ? trim(strtolower($_POST['player_gender'])) : '';
             $form_data['player_type'] = !empty($_POST['player_type']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['player_type']) ? trim(strtolower($_POST['player_type'])) : '';
-            $form_data['player_game'] = 'MMRPG'; //!empty($_POST['player_game']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['player_game']) ? trim($_POST['player_game']) : '';
-            $form_data['player_group'] = 'MMRPG'; //!empty($_POST['player_group']) && preg_match('/^[-_a-z0-9\/]+$/i', $_POST['player_group']) ? trim($_POST['player_group']) : '';
+            $form_data['player_game'] = !empty($_POST['player_game']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['player_game']) ? trim($_POST['player_game']) : '';
+            $form_data['player_group'] = !empty($_POST['player_group']) && preg_match('/^[-_a-z0-9\/]+$/i', $_POST['player_group']) ? trim($_POST['player_group']) : '';
             $form_data['player_number'] = !empty($_POST['player_number']) && is_numeric($_POST['player_number']) ? (int)(trim($_POST['player_number'])) : 0;
             $form_data['player_order'] = !empty($_POST['player_order']) && is_numeric($_POST['player_order']) ? (int)(trim($_POST['player_order'])) : 0;
 
@@ -357,8 +357,11 @@
             $form_data['player_robot_hero'] = !empty($_POST['player_robot_hero']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['player_robot_hero']) ? trim(strtolower($_POST['player_robot_hero'])) : '';
             $form_data['player_robot_support'] = !empty($_POST['player_robot_support']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['player_robot_support']) ? trim(strtolower($_POST['player_robot_support'])) : '';
 
+            $form_data['player_field_intro'] = !empty($_POST['player_field_intro']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['player_field_intro']) ? trim(strtolower($_POST['player_field_intro'])) : '';
+            $form_data['player_field_home'] = !empty($_POST['player_field_home']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['player_field_home']) ? trim(strtolower($_POST['player_field_home'])) : '';
+
             $form_data['player_robots_rewards'] = array(); //!empty($_POST['player_robots_rewards']) ? array_values(array_filter($_POST['player_robots_rewards'])) : array();
-            $form_data['player_robots_compatible'] = !empty($_POST['player_robots_compatible']) && is_array($_POST['player_robots_compatible']) ? array_values(array_unique(array_filter($_POST['player_robots_compatible']))) : array();
+            $form_data['player_robots_compatible'] = array(); //!empty($_POST['player_robots_compatible']) && is_array($_POST['player_robots_compatible']) ? array_values(array_unique(array_filter($_POST['player_robots_compatible']))) : array();
 
             $form_data['player_image'] = !empty($_POST['player_image']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['player_image']) ? trim(strtolower($_POST['player_image'])) : '';
             $form_data['player_image_size'] = !empty($_POST['player_image_size']) && is_numeric($_POST['player_image_size']) ? (int)(trim($_POST['player_image_size'])) : 0;
@@ -404,11 +407,12 @@
             if (!$form_success){ exit_player_edit_action($form_data['player_id']); }
 
             // VALIDATE all of the SEMI-MANDATORY FIELDS to see if any were not provided and unset them from updating if necessary
-            if (empty($form_data['player_game'])){ $form_messages[] = array('warning', 'Source Game was not provided and may cause issues on the front-end'); }
-            if (empty($form_data['player_group'])){ $form_messages[] = array('warning', 'Sorting Group was not provided and may cause issues on the front-end'); }
-            if (!$player_data_is_new && empty($form_data['player_number'])){ $form_messages[] = array('warning', 'Serial Number was not provided and may cause issues on the front-end'); }
+            if (!$player_data_is_new && empty($form_data['player_number'])){ $form_messages[] = array('warning', 'Campaign Number was not provided and may cause issues on the front-end'); }
+            if (!$player_data_is_new && empty($form_data['player_game'])){ $form_messages[] = array('warning', 'Campaign Game was not provided and may cause issues on the front-end'); }
             if (!$player_data_is_new && empty($form_data['player_robot_hero'])){ $form_messages[] = array('warning', 'Hero Robot was not provided and will cause issues on the front-end'); }
             if (!$player_data_is_new && empty($form_data['player_robot_support'])){ $form_messages[] = array('warning', 'Support Robot was not provided and will cause issues on the front-end'); }
+            if (!$player_data_is_new && empty($form_data['player_field_intro'])){ $form_messages[] = array('warning', 'Intro Field was not provided and will cause issues on the front-end'); }
+            if (!$player_data_is_new && empty($form_data['player_field_home'])){ $form_messages[] = array('warning', 'Home Field was not provided and will cause issues on the front-end'); }
 
             // REFORMAT or OPTIMIZE data for provided fields where necessary
 
@@ -437,24 +441,33 @@
                     $form_data['player_abilities_rewards'] = $new_rewards;
                 }
 
-                $new_robot_rewards = array();
+                $new_robots_rewards = array();
                 if (!empty($form_data['player_robot_hero'])){
                     $temp_level = ($form_data['player_number'] * 10) - 9;
-                    $new_robot_rewards[] = array('points' => 0, 'token' => $form_data['player_robot_hero'], 'level' => $temp_level);
+                    $new_robots_rewards[] = array('points' => 0, 'token' => $form_data['player_robot_hero'], 'level' => $temp_level);
                 }
-                $form_data['player_robots_rewards'] = $new_robot_rewards;
+                $form_data['player_robots_rewards'] = $new_robots_rewards;
 
-                if (!empty($form_data['player_robots_compatible'])){
-                    $new_compatible = $form_data['player_robots_compatible'];
-                    usort($new_compatible, function($a, $b) use($mmrpg_robots_index){
-                        $ax = $mmrpg_robots_index[$a];
-                        $bx = $mmrpg_robots_index[$b];
-                        if ($ax['robot_order'] < $bx['robot_order']){ return -1; }
-                        elseif ($ax['robot_order'] > $bx['robot_order']){ return 1; }
-                        else { return 0; }
-                        });
-                    $form_data['player_robots_compatible'] = $new_compatible;
+                $new_robots_compatible = array();
+                if (!empty($form_data['player_robot_hero'])){ $new_robots_compatible[] = $form_data['player_robot_hero']; }
+                if (!empty($form_data['player_robot_support'])){ $new_robots_compatible[] = $form_data['player_robot_support']; }
+                if (!empty($form_data['player_game'])){
+                    $temp_campaign_robots = $db->get_array_list("SELECT
+                        robot_token FROM mmrpg_index_robots
+                        WHERE
+                            robot_flag_hidden = 0
+                            AND robot_flag_complete = 1
+                            AND robot_flag_unlockable = 1
+                            AND robot_flag_published = 1
+                            AND robot_game = '{$form_data['player_game']}'
+                            AND robot_class = 'master'
+                        ORDER BY robot_number ASC
+                        ;", 'robot_token');
+                    if (!empty($temp_campaign_robots)){
+                        $new_robots_compatible = array_merge($new_robots_compatible, array_keys($temp_campaign_robots));
+                    }
                 }
+                $form_data['player_robots_compatible'] = $new_robots_compatible;
 
                 if (isset($form_data['player_abilities_rewards'])){ $form_data['player_abilities_rewards'] = !empty($form_data['player_abilities_rewards']) ? json_encode($form_data['player_abilities_rewards'], JSON_NUMERIC_CHECK) : ''; }
                 if (isset($form_data['player_abilities_compatible'])){ $form_data['player_abilities_compatible'] = !empty($form_data['player_abilities_compatible']) ? json_encode($form_data['player_abilities_compatible']) : ''; }
@@ -546,7 +559,7 @@
                         $f = fopen($player_functions_path, 'w');
                         fwrite($f, $new_player_functions_markup);
                         fclose($f);
-                        $form_messages[] = array('alert', 'Player functions file was updated');
+                        $form_messages[] = array('alert', 'Player functions file was '.(!empty($old_player_functions_markup) ? 'updated' : 'created'));
                     }
                 }
 
@@ -554,8 +567,9 @@
             // Otherwise, if NEW data, pre-populate certain fields
             else {
 
-                $temp_json_players = rpg_player::get_json_index_fields();
-                foreach ($temp_json_players AS $player){ $form_data[$player] = ''; }
+                $form_data['player_abilities_rewards'] = array(array('points' => 0, 'token' => 'buster-shot'));
+                $temp_json_fields = rpg_player::get_json_index_fields();
+                foreach ($temp_json_fields AS $field){ $form_data[$field] = !empty($form_data[$field]) ? json_encode($form_data[$field]) : ''; }
                 $form_data['player_game'] = 'MMRPG';
                 $form_data['player_group'] = 'MMRPG';
                 $form_data['player_class'] = 'master';
@@ -846,6 +860,51 @@
             && isset($_GET['player_id'])
             ){
 
+            // Collect global abilities so we can skip them
+            $global_ability_tokens = rpg_ability::get_global_abilities();
+
+            // Pre-generate a list of all abilities so we can re-use it over and over
+            $ability_options_markup = array();
+            $ability_options_markup[] = '<option value="">-</option>';
+            foreach ($mmrpg_abilities_index AS $ability_token => $ability_info){
+                //if (in_array($ability_token, $global_ability_tokens)){ continue; }
+                if ($ability_info['ability_class'] === 'mecha' && $player_data['player_class'] !== 'mecha'){ continue; }
+                elseif ($ability_info['ability_class'] === 'boss' && $player_data['player_class'] !== 'boss'){ continue; }
+                $ability_name = $ability_info['ability_name'];
+                $ability_types = ucwords(implode(' / ', array_values(array_filter(array($ability_info['ability_type'], $ability_info['ability_type2'])))));
+                if (empty($ability_types)){ $ability_types = 'Neutral'; }
+                $ability_options_markup[] = '<option value="'.$ability_token.'">'.$ability_name.' ('.$ability_types.')</option>';
+            }
+            $ability_options_count = count($ability_options_markup);
+            $ability_options_markup = implode(PHP_EOL, $ability_options_markup);
+
+            // Pre-generate a list of all robots so we can re-use it over and over
+            $robot_options_markup = array();
+            $robot_options_markup[] = '<option value="">-</option>';
+            foreach ($mmrpg_robots_index AS $robot_token => $robot_info){
+                if ($robot_info['robot_class'] === 'mecha' && $player_data['player_class'] !== 'mecha'){ continue; }
+                elseif ($robot_info['robot_class'] === 'boss' && $player_data['player_class'] !== 'boss'){ continue; }
+                $robot_name = $robot_info['robot_name'];
+                $robot_cores = ucwords(implode(' / ', array_values(array_filter(array($robot_info['robot_core'], $robot_info['robot_core2'])))));
+                if (empty($robot_cores)){ $robot_cores = 'Neutral'; }
+                $robot_options_markup[] = '<option value="'.$robot_token.'">'.$robot_name.' ('.$robot_cores.')</option>';
+            }
+            $robot_options_count = count($robot_options_markup);
+            $robot_options_markup = implode(PHP_EOL, $robot_options_markup);
+
+            // Pre-generate a list of all fields so we can re-use it over and over
+            $field_options_markup = array();
+            $field_options_markup[] = '<option value="">-</option>';
+            foreach ($mmrpg_fields_index AS $field_token => $field_info){
+                if ($field_info['field_class'] === 'system' || $field_info['field_class'] === 'master'){ continue; }
+                $field_name = $field_info['field_name'];
+                $field_types = ucwords(implode(' / ', array_values(array_filter(array($field_info['field_type'], $field_info['field_type2'])))));
+                if (empty($field_types)){ $field_types = 'Neutral'; }
+                $field_options_markup[] = '<option value="'.$field_token.'">'.$field_name.' ('.$field_types.')</option>';
+            }
+            $field_options_count = count($field_options_markup);
+            $field_options_markup = implode(PHP_EOL, $field_options_markup);
+
             // Capture editor markup in a buffer in case we need to modify
             if (true){
                 ob_start();
@@ -882,8 +941,6 @@
                         <div class="editor-tabs" data-tabgroup="player">
                             <a class="tab active" data-tab="basic">Basic</a><span></span>
                             <a class="tab" data-tab="flavour">Flavour</a><span></span>
-                            <a class="tab" data-tab="abilities">Abilities</a><span></span>
-                            <a class="tab" data-tab="robots">Robots</a><span></span>
                             <a class="tab" data-tab="sprites">Sprites</a><span></span>
                             <a class="tab" data-tab="functions">Functions</a><span></span>
                         </div>
@@ -960,13 +1017,116 @@
 
                                 <? if (!$player_data_is_new){ ?>
 
-                                    <div class="field">
-                                        <strong class="label">Number</strong>
+                                    <hr />
+
+                                    <div class="field halfsize">
+                                        <div class="label">
+                                            <strong>Campaign Number</strong>
+                                            <em>appearance order in campaign</em>
+                                        </div>
                                         <input class="textbox" type="number" name="player_number" value="<?= $player_data['player_number'] ?>" maxlength="64" />
                                     </div>
 
+                                    <div class="field halfsize">
+                                        <div class="label">
+                                            <strong>Campaign Game</strong>
+                                            <em>where campaign robots come from</em>
+                                        </div>
+                                        <select class="select" name="player_game">
+                                            <?
+                                            $player_games_tokens = $db->get_array_list("SELECT DISTINCT (robot_game) AS game_token FROM mmrpg_index_robots WHERE robot_game <> '' ORDER BY robot_game ASC;", 'game_token');
+                                            echo('<option value=""'.(empty($player_data['player_game']) ? 'selected="selected"' : '').'>- none -</option>');
+                                            foreach ($player_games_tokens AS $game_token => $game_data){
+                                                $label = $game_token;
+                                                $selected = !empty($player_data['player_game']) && $player_data['player_game'] == $game_token ? 'selected="selected"' : '';
+                                                echo('<option value="'.$game_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                            }
+                                            ?>
+                                        </select><span></span>
+                                    </div>
+
+                                    <hr />
+
+                                    <div class="field halfsize multirow">
+                                        <strong class="label">
+                                            Hero Robot
+                                            <em>first robot at the beginning of their campaign</em>
+                                        </strong>
+                                        <? $current_value = !empty($player_data['player_robot_hero']) ? $player_data['player_robot_hero'] : ''; ?>
+                                        <div class="subfield">
+                                            <select class="select" name="player_robot_hero">
+                                                <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $robot_options_markup) ?>
+                                            </select><span></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="field halfsize multirow">
+                                        <strong class="label">
+                                            Support Robot
+                                            <em>hidden support robot unlocked in the first chapter</em>
+                                        </strong>
+                                        <? $current_value = !empty($player_data['player_robot_support']) ? $player_data['player_robot_support'] : ''; ?>
+                                        <div class="subfield">
+                                            <select class="select" name="player_robot_support">
+                                                <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $robot_options_markup) ?>
+                                            </select><span></span>
+                                        </div>
+                                    </div>
+
+                                    <hr />
+
+                                    <div class="field halfsize">
+                                        <strong class="label">Intro Field</strong>
+                                        <? $current_value = !empty($player_data['player_field_intro']) ? $player_data['player_field_intro'] : ''; ?>
+                                        <select class="select" name="player_field_intro">
+                                            <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $field_options_markup) ?>
+                                        </select><span></span>
+                                    </div>
+
+                                    <div class="field halfsize">
+                                        <strong class="label">Home Field</strong>
+                                        <? $current_value = !empty($player_data['player_field_home']) ? $player_data['player_field_home'] : ''; ?>
+                                        <select class="select" name="player_field_home">
+                                            <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $field_options_markup) ?>
+                                        </select><span></span>
+                                    </div>
+
+                                    <hr />
+
+                                    <div class="field fullsize multirow">
+                                        <strong class="label">
+                                            Native Abilities
+                                            <em>These abilities are available to the player at the start and can be equipped to their robots</em>
+                                        </strong>
+                                        <?
+                                        $current_ability_list = !empty($player_data['player_abilities_rewards']) ? json_decode($player_data['player_abilities_rewards'], true) : array();
+                                        $select_limit = max(2, count($current_ability_list));
+                                        $select_limit += 1;
+                                        for ($i = 0; $i < $select_limit; $i++){
+                                            $current_value = isset($current_ability_list[$i]) ? $current_ability_list[$i] : array();
+                                            $current_value_points = 0; //!empty($current_value) ? $current_value['points'] : '';
+                                            $current_value_token = !empty($current_value) ? $current_value['token'] : '';
+                                            ?>
+                                            <div class="subfield pointsup">
+                                                <input class="hidden" type="hidden" name="player_abilities_rewards[<?= $i ?>][points]" value="<?= $current_value_points ?>" maxlength="3" placeholder="0" />
+                                                <select class="select" name="player_abilities_rewards[<?= $i ?>][token]">
+                                                    <?= str_replace('value="'.$current_value_token.'"', 'value="'.$current_value_token.'" selected="selected"', $ability_options_markup) ?>
+                                                </select><span></span>
+                                            </div>
+                                            <?
+                                        }
+                                        ?>
+                                    </div>
+
+                                    <hr />
+
                                     <div class="field">
-                                        <strong class="label">Order</strong>
+                                        <strong class="label">Sort Group</strong>
+                                        <input class="textbox" type="text" name="player_group" value="<?= $player_data['player_group'] ?>" maxlength="64" />
+                                    </div>
+
+                                    <div class="field">
+                                        <strong class="label">Sort Order</strong>
                                         <input class="textbox" type="number" name="player_order" value="<?= $player_data['player_order'] ?>" maxlength="8" />
                                     </div>
 
@@ -1006,129 +1166,6 @@
                                         <div class="label">
                                             <em class="nowrap" style="margin-left: 0;">(!) You can use <strong>{this_player}</strong>, <strong>{this_robot}</strong>, <strong>{target_player}</strong>, and <strong>{target_robot}</strong> variables for dynamic text</em>
                                         </div>
-                                    </div>
-
-                                </div>
-
-                                <div class="panel" data-tab="abilities">
-
-                                    <?
-
-                                    // Collect global abilities so we can skip them
-                                    $global_ability_tokens = rpg_ability::get_global_abilities();
-
-                                    // Pre-generate a list of all abilities so we can re-use it over and over
-                                    $ability_options_markup = array();
-                                    $ability_options_markup[] = '<option value="">-</option>';
-                                    foreach ($mmrpg_abilities_index AS $ability_token => $ability_info){
-                                        //if (in_array($ability_token, $global_ability_tokens)){ continue; }
-                                        if ($ability_info['ability_class'] === 'mecha' && $player_data['player_class'] !== 'mecha'){ continue; }
-                                        elseif ($ability_info['ability_class'] === 'boss' && $player_data['player_class'] !== 'boss'){ continue; }
-                                        $ability_name = $ability_info['ability_name'];
-                                        $ability_types = ucwords(implode(' / ', array_values(array_filter(array($ability_info['ability_type'], $ability_info['ability_type2'])))));
-                                        if (empty($ability_types)){ $ability_types = 'Neutral'; }
-                                        $ability_options_markup[] = '<option value="'.$ability_token.'">'.$ability_name.' ('.$ability_types.')</option>';
-                                    }
-                                    $ability_options_count = count($ability_options_markup);
-                                    $ability_options_markup = implode(PHP_EOL, $ability_options_markup);
-
-                                    ?>
-
-                                    <div class="field fullsize multirow">
-                                        <strong class="label">
-                                            Native Abilities
-                                            <em>These abilities are available to the player at the start and can be equipped to their robots</em>
-                                        </strong>
-                                        <?
-                                        $current_ability_list = !empty($player_data['player_abilities_rewards']) ? json_decode($player_data['player_abilities_rewards'], true) : array();
-                                        $select_limit = max(2, count($current_ability_list));
-                                        $select_limit += 2;
-                                        for ($i = 0; $i < $select_limit; $i++){
-                                            $current_value = isset($current_ability_list[$i]) ? $current_ability_list[$i] : array();
-                                            $current_value_points = 0; //!empty($current_value) ? $current_value['points'] : '';
-                                            $current_value_token = !empty($current_value) ? $current_value['token'] : '';
-                                            ?>
-                                            <div class="subfield pointsup">
-                                                <input class="hidden" type="hidden" name="player_abilities_rewards[<?= $i ?>][points]" value="<?= $current_value_points ?>" maxlength="3" placeholder="0" />
-                                                <select class="select" name="player_abilities_rewards[<?= $i ?>][token]">
-                                                    <?= str_replace('value="'.$current_value_token.'"', 'value="'.$current_value_token.'" selected="selected"', $ability_options_markup) ?>
-                                                </select><span></span>
-                                            </div>
-                                            <?
-                                        }
-                                        ?>
-                                    </div>
-
-                                </div>
-
-                                <div class="panel" data-tab="robots">
-
-                                    <?
-
-                                    // Pre-generate a list of all robots so we can re-use it over and over
-                                    $robot_options_markup = array();
-                                    $robot_options_markup[] = '<option value="">-</option>';
-                                    foreach ($mmrpg_robots_index AS $robot_token => $robot_info){
-                                        if ($robot_info['robot_class'] === 'mecha' && $player_data['player_class'] !== 'mecha'){ continue; }
-                                        elseif ($robot_info['robot_class'] === 'boss' && $player_data['player_class'] !== 'boss'){ continue; }
-                                        $robot_name = $robot_info['robot_name'];
-                                        $robot_cores = ucwords(implode(' / ', array_values(array_filter(array($robot_info['robot_core'], $robot_info['robot_core2'])))));
-                                        if (empty($robot_cores)){ $robot_cores = 'Neutral'; }
-                                        $robot_options_markup[] = '<option value="'.$robot_token.'">'.$robot_name.' ('.$robot_cores.')</option>';
-                                    }
-                                    $robot_options_count = count($robot_options_markup);
-                                    $robot_options_markup = implode(PHP_EOL, $robot_options_markup);
-
-                                    ?>
-
-                                    <div class="field fullsize multirow">
-                                        <strong class="label">
-                                            Hero Robot
-                                            <em>This is the player's first robot at the beginning of their campaign</em>
-                                        </strong>
-                                        <? $current_value = !empty($player_data['player_robot_hero']) ? $player_data['player_robot_hero'] : ''; ?>
-                                        <div class="subfield">
-                                            <select class="select" name="player_robot_hero">
-                                                <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $robot_options_markup) ?>
-                                            </select><span></span>
-                                        </div>
-                                    </div>
-
-                                    <div class="field fullsize multirow">
-                                        <strong class="label">
-                                            Support Robot
-                                            <em>This is the player's hidden support robot unlocked in the first chapter</em>
-                                        </strong>
-                                        <? $current_value = !empty($player_data['player_robot_support']) ? $player_data['player_robot_support'] : ''; ?>
-                                        <div class="subfield">
-                                            <select class="select" name="player_robot_support">
-                                                <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $robot_options_markup) ?>
-                                            </select><span></span>
-                                        </div>
-                                    </div>
-
-                                    <hr />
-
-                                    <div class="field fullsize has2cols multirow">
-                                        <strong class="label">
-                                            Campaign Robots
-                                            <em>These are the unlockable robots that appear natively in this player's campaign</em>
-                                        </strong>
-                                        <?
-                                        $current_robot_list = !empty($player_data['player_robots_compatible']) ? json_decode($player_data['player_robots_compatible'], true) : array();
-                                        $select_limit = max(10, count($current_robot_list));
-                                        //$select_limit += 4 - ($select_limit % 4);
-                                        for ($i = 0; $i < $select_limit; $i++){
-                                            $current_value = isset($current_robot_list[$i]) ? $current_robot_list[$i] : '';
-                                            ?>
-                                            <div class="subfield">
-                                                <select class="select" name="player_robots_compatible[<?= $i ?>]">
-                                                    <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $robot_options_markup) ?>
-                                                </select><span></span>
-                                            </div>
-                                            <?
-                                        }
-                                        ?>
                                     </div>
 
                                 </div>
