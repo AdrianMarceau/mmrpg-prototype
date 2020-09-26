@@ -65,10 +65,16 @@
         $delete_data['page_id'] = !empty($_GET['page_id']) && is_numeric($_GET['page_id']) ? trim($_GET['page_id']) : '';
 
         // Let's delete all of this page's data from the database
-        cms_admin::object_editor_delete_json_data_file('page', $delete_data['page_id']);
-        $db->delete('mmrpg_website_pages', array('page_id' => $delete_data['page_id'], 'page_flag_protected' => 0));
-        $form_messages[] = array('success', 'The requested page has been deleted from the database');
-        exit_form_action('success');
+        if (!empty($delete_data['page_id'])){
+            $delete_data['page_url'] = $db->get_value("SELECT page_url FROM mmrpg_website_pages WHERE page_id = {$delete_data['page_id']};", 'page_url');
+            if (!empty($delete_data['page_url'])){ $files_deleted = cms_admin::object_editor_delete_json_data_file('page', $delete_data['page_url'], true); }
+            $db->delete('mmrpg_index_pages', array('page_id' => $delete_data['page_id'], 'page_flag_protected' => 0));
+            $form_messages[] = array('success', 'The requested page has been deleted from the database'.(!empty($files_deleted) ? ' and file system' : ''));
+            exit_form_action('success');
+        } else {
+            $form_messages[] = array('success', 'The requested page does not exist in the database');
+            exit_form_action('error');
+        }
 
     }
 

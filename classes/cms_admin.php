@@ -970,8 +970,11 @@ class cms_admin {
     }
 
     // Define a function for deleting a given json file from the relevant content repo
-    public static function object_editor_delete_json_data_file($object_kind, $git_object_token){
+    public static function object_editor_delete_json_data_file($object_kind, $git_object_token, $delete_sibling_files = true){
         $object_xkind = substr($object_kind, -1, 1) === 'y' ? substr($object_kind, 0, -1).'ies' : $object_kind.'s';
+
+        // Define a counter for the files deleted by this action
+        $files_deleted = 0;
 
         // Define the data base and token directories given object kind then append to form full path
         $json_data_base_dir = constant('MMRPG_CONFIG_'.strtoupper($object_xkind).'_CONTENT_PATH');
@@ -981,13 +984,43 @@ class cms_admin {
         $json_data_full_path = $json_data_base_dir.$json_data_token_dir.'/data.json';
 
         // Assuming it exists, delete the json data file from the repo
-        if (file_exists($json_data_full_path)){ unlink($json_data_full_path); }
+        if (file_exists($json_data_full_path)){
+            //error_log('delete '.$json_data_full_path);
+            unlink($json_data_full_path);
+            $files_deleted++;
+        }
 
         // If this is a page request, extract and collect new/old html content separately
-        if ($object_kind === 'page'){
+        if ($delete_sibling_files
+            && $object_kind === 'page'){
             $html_content_full_path = $json_data_base_dir.$json_data_token_dir.'/content.html';
-            if (file_exists($html_content_full_path)){ unlink($html_content_full_path); }
+            if (file_exists($html_content_full_path)){
+                //error_log('delete '.$html_content_full_path);
+                unlink($html_content_full_path);
+                $files_deleted++;
+            }
         }
+
+        // If allowed, check for and delete any other files in this directory
+        if ($delete_sibling_files){
+            $other_files = getDirContents($json_data_base_dir.$json_data_token_dir);
+            if (!empty($other_files)){
+                foreach ($other_files AS $path){
+                    if (is_dir($path)){
+                        //error_log('delete '.$path);
+                        deleteDir($path);
+                        $files_deleted++;
+                    } elseif (is_file($path)) {
+                        //error_log('delete '.$path);
+                        unlink($path);
+                        $files_deleted++;
+                    }
+                }
+            }
+        }
+
+        // Return the number of files deleted by this action
+        return $files_deleted;
 
     }
 

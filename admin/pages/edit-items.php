@@ -88,9 +88,16 @@
         $delete_data['item_id'] = !empty($_GET['item_id']) && is_numeric($_GET['item_id']) ? trim($_GET['item_id']) : '';
 
         // Let's delete all of this item's data from the database
-        $db->delete('mmrpg_index_items', array('item_id' => $delete_data['item_id'], 'item_flag_protected' => 0));
-        $form_messages[] = array('success', 'The requested item has been deleted from the database');
-        exit_form_action('success');
+        if (!empty($delete_data['item_id'])){
+            $delete_data['item_token'] = $db->get_value("SELECT item_token FROM mmrpg_index_items WHERE item_id = {$delete_data['item_id']};", 'item_token');
+            if (!empty($delete_data['item_token'])){ $files_deleted = cms_admin::object_editor_delete_json_data_file('item', $delete_data['item_token'], true); }
+            $db->delete('mmrpg_index_items', array('item_id' => $delete_data['item_id'], 'item_flag_protected' => 0));
+            $form_messages[] = array('success', 'The requested item has been deleted from the database'.(!empty($files_deleted) ? ' and file system' : ''));
+            exit_form_action('success');
+        } else {
+            $form_messages[] = array('success', 'The requested item does not exist in the database');
+            exit_form_action('error');
+        }
 
     }
 

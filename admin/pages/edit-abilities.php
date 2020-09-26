@@ -121,9 +121,16 @@
         $delete_data['ability_id'] = !empty($_GET['ability_id']) && is_numeric($_GET['ability_id']) ? trim($_GET['ability_id']) : '';
 
         // Let's delete all of this ability's data from the database
-        $db->delete('mmrpg_index_abilities', array('ability_id' => $delete_data['ability_id'], 'ability_flag_protected' => 0));
-        $form_messages[] = array('success', 'The requested '.$this_ability_class_name.' has been deleted from the database');
-        exit_form_action('success');
+        if (!empty($delete_data['ability_id'])){
+            $delete_data['ability_token'] = $db->get_value("SELECT ability_token FROM mmrpg_index_abilities WHERE ability_id = {$delete_data['ability_id']};", 'ability_token');
+            if (!empty($delete_data['ability_token'])){ $files_deleted = cms_admin::object_editor_delete_json_data_file('ability', $delete_data['ability_token'], true); }
+            $db->delete('mmrpg_index_abilities', array('ability_id' => $delete_data['ability_id'], 'ability_flag_protected' => 0));
+            $form_messages[] = array('success', 'The requested ability has been deleted from the database'.(!empty($files_deleted) ? ' and file system' : ''));
+            exit_form_action('success');
+        } else {
+            $form_messages[] = array('success', 'The requested ability does not exist in the database');
+            exit_form_action('error');
+        }
 
     }
 
