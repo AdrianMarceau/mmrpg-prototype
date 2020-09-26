@@ -16,6 +16,9 @@
 
     <?
 
+    // Pre-scan all content directories as we'll need them all eventually
+    cms_admin::git_scan_content_directories();
+
     /* -- USER CONTROLS (LOCAL/DEV/STAGE/PROD) -- */
     if (true){
 

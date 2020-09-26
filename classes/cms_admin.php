@@ -294,86 +294,85 @@ class cms_admin {
     /* -- Git Functions -- */
 
     // Define a function for looping through all content directories and scanning for changes
-    public static function git_scan_content_directories($index_by = 'token', $index_key = '', $force_refresh = false){
-        static $content_cache = array();
-        static $content_cache_by = array();
-        $allowed_index_by = array('token', 'path');
-        if (!in_array($index_by, $allowed_index_by)){ $index_by = $allowed_index_by[0]; }
-        if (empty($content_cache)
-            || (!empty($index_key) && empty($content_cache_by[$index_by]))
-            || $force_refresh === true){
-            require(MMRPG_CONFIG_CONTENT_PATH.'index.php');
-            foreach ($content_types_index AS $content_token => $content_info){
-                if (empty($content_info['content_path'])){ continue; }
-                $content_path = MMRPG_CONFIG_CONTENT_PATH.rtrim($content_info['content_path'], '/').'/';
-
-                // If we're only scanning for a certain key, skip all others
-                if (!empty($index_key)){
-                    if ($index_by === 'token' && $index_key !== $content_token){ continue; }
-                    elseif ($index_by === 'path' && $index_key !== $content_path){ continue; }
-                }
-
-                // Predefine arrays to hold all file statues
-                $cache_data = array();
-                $cache_data['modified'] = array();
-                $cache_data['deleted'] = array();
-                $cache_data['new'] = array();
-                $cache_data['committed'] = array();
-
-                // Define the cd prefix for all shell commands
-                $src_func = 'git_scan_content_directories()';
-
-                // Collect all MODIFIED and DELETED and NEW files in this directory
-                $diff_cmd = 'cd '.$content_path.' ';
-                $diff_cmd .= '&& echo "#MODIFIED" 2>&1 ';
-                $diff_cmd .= '&& git diff --name-status ';
-                $diff_cmd .= '&& echo "#UNTRACKED" 2>&1 ';
-                $diff_cmd .= '&& git ls-files --others --exclude-standard ';
-                $diff_cmd .= '&& echo "#COMMITTED" 2>&1 ';
-                $diff_cmd .= '&& git log origin/master..HEAD --name-only --oneline ';
-                $diff_return = self::shell_exec($diff_cmd, $src_func);
-                if (!empty($diff_return)){
-                    $diff_list = array_filter(explode("\n", normalize_line_endings($diff_return)));
-                    $diff_list = array_map(function($str){ return trim($str, '" '); }, $diff_list);
-                    if (!empty($diff_list)){
-                        $mode = false;
-                        foreach ($diff_list AS $str){
-                            if (substr($str, 0, 1) === '#'){ $mode = trim($str, '#'); continue; }
-                            if ($mode === 'MODIFIED'){
-                                list($stat, $path) = explode('||', preg_replace('/^([a-z])\s+(.*)$/i', '$1||$2', $str));
-                                if (strtoupper($stat) === 'M'){ $cache_data['modified'][] = $path; }
-                                elseif (strtoupper($stat) === 'D'){ $cache_data['deleted'][] = $path; }
-                            } elseif ($mode === 'UNTRACKED'){
-                                $cache_data['new'][] = $str;
-                            } elseif ($mode === 'COMMITTED'){
-                                if (preg_match('/([^\.]+)\.([a-z0-9]{3,})$/i', $str)){
-                                    $cache_data['committed'][] = $str;
-                                }
+    public static function git_scan_content_directory($content_path, $return_subkey = '', $use_cache = true){
+        static $cache = array();
+        if (isset($cache[$content_path]) && $use_cache){
+            $cache_data = $cache[$content_path];
+        } else {
+            // Predefine arrays to hold all file statues
+            $cache_data = array();
+            $cache_data['modified'] = array();
+            $cache_data['deleted'] = array();
+            $cache_data['new'] = array();
+            $cache_data['committed'] = array();
+            // Define the cd prefix for all shell commands
+            $src_func = 'git_scan_content_directories()';
+            // Collect all MODIFIED and DELETED and NEW files in this directory
+            $diff_cmd = 'cd '.$content_path.' ';
+            $diff_cmd .= '&& echo "#MODIFIED" 2>&1 ';
+            $diff_cmd .= '&& git diff --name-status ';
+            $diff_cmd .= '&& echo "#UNTRACKED" 2>&1 ';
+            $diff_cmd .= '&& git ls-files --others --exclude-standard ';
+            $diff_cmd .= '&& echo "#COMMITTED" 2>&1 ';
+            $diff_cmd .= '&& git log origin/master..HEAD --name-only --oneline ';
+            $diff_return = self::shell_exec($diff_cmd, $src_func);
+            if (!empty($diff_return)){
+                $diff_list = array_filter(explode("\n", normalize_line_endings($diff_return)));
+                $diff_list = array_map(function($str){ return trim($str, '" '); }, $diff_list);
+                if (!empty($diff_list)){
+                    $mode = false;
+                    foreach ($diff_list AS $str){
+                        if (substr($str, 0, 1) === '#'){ $mode = trim($str, '#'); continue; }
+                        if ($mode === 'MODIFIED'){
+                            list($stat, $path) = explode('||', preg_replace('/^([a-z])\s+(.*)$/i', '$1||$2', $str));
+                            if (strtoupper($stat) === 'M'){ $cache_data['modified'][] = $path; }
+                            elseif (strtoupper($stat) === 'D'){ $cache_data['deleted'][] = $path; }
+                        } elseif ($mode === 'UNTRACKED'){
+                            $cache_data['new'][] = $str;
+                        } elseif ($mode === 'COMMITTED'){
+                            if (preg_match('/([^\.]+)\.([a-z0-9]{3,})$/i', $str)){
+                                $cache_data['committed'][] = $str;
                             }
                         }
                     }
                 }
+            }
+            // Make sure there aren't any duplicates in each array
+            foreach ($cache_data AS $k => $a){ $cache_data[$k] = array_unique($a); }
+            // Cache the data that we've collected
+            if ($use_cache){ $cache[$content_path] = $cache_data; }
+        }
+        // Return the cached data (or the sub-array if requested)
+        if (!empty($return_subkey)){
+            return !empty($cache_data[$return_subkey]) ? $cache_data[$return_subkey] : array();
+        } else {
+            return $cache_data;
+        }
+    }
 
-                // Make sure there aren't any duplicates in each array
-                foreach ($cache_data AS $k => $a){ $cache_data[$k] = array_unique($a); }
-
-                // Add the completed array to the content cache
+    // Define a function for looping through all content directories and scanning for changes
+    public static function git_scan_content_directories($index_by = '', $index_key = '', $force_refresh = false){
+        static $content_cache = array();
+        static $content_cache_by = array();
+        static $content_types_index = array();
+        if (empty($content_types_index)){ require(MMRPG_CONFIG_CONTENT_PATH.'index.php'); }
+        if (empty($content_cache) || $force_refresh === true){
+            foreach ($content_types_index AS $content_token => $content_info){
+                if (empty($content_info['content_path'])){ continue; }
+                $content_path = MMRPG_CONFIG_CONTENT_PATH.rtrim($content_info['content_path'], '/').'/';
+                $cache_data = self::git_scan_content_directory($content_path);
                 $content_cache[$content_token] = $cache_data;
                 $content_cache_by['token'][$content_token] = &$content_cache[$content_token];
                 $content_cache_by['path'][$content_path] = &$content_cache[$content_token];
-
             }
         }
-        if (isset($content_cache_by[$index_by])){ return $content_cache_by[$index_by]; }
-        else { return $content_cache; }
-    }
-
-    // Define a function for collecting the content cache for a given token, path, etc.
-    public static function git_content_cache($index_by = 'token', $index_key = '', $index_subkey = ''){
-        $indexed_content_cache = self::git_scan_content_directories($index_by, $index_key);
-        $this_content_cache = !empty($indexed_content_cache[$index_key]) ? $indexed_content_cache[$index_key] : array();
-        if (!empty($index_subkey)){ return !empty($this_content_cache[$index_subkey]) ? $this_content_cache[$index_subkey] : array(); }
-        else { return $this_content_cache; }
+        if (!empty($index_by) && !empty($index_key)){
+            return !empty($content_cache_by[$index_by][$index_key]) ? $content_cache_by[$index_by][$index_key] : array();
+        } elseif (!empty($index_by)){
+            return !empty($content_cache_by[$index_by]) ? $content_cache_by[$index_by] : array();
+        } else {
+            return !empty($content_cache) ? $content_cache : array();
+        }
     }
 
     // Define a function for returning the types of
@@ -443,7 +442,7 @@ class cms_admin {
         static $index;
         if (!is_array($index)){ $index = array(); }
         if (!isset($index[$repo_base_path])){
-            $deleted = self::git_content_cache('path', $repo_base_path, 'deleted');
+            $deleted = self::git_scan_content_directory($repo_base_path, 'deleted');
             $index[$repo_base_path] = $deleted;
         } else {
             $deleted = $index[$repo_base_path];
@@ -457,8 +456,8 @@ class cms_admin {
         static $index;
         if (!is_array($index)){ $index = array(); }
         if (!isset($index[$repo_base_path])){
-            $modified = self::git_content_cache('path', $repo_base_path, 'modified');
-            $new = self::git_content_cache('path', $repo_base_path, 'new');
+            $modified = self::git_scan_content_directory($repo_base_path, 'modified');
+            $new = self::git_scan_content_directory($repo_base_path, 'new');
             $unstaged = array_merge($modified, $new);
             $index[$repo_base_path] = $unstaged;
         } else {
@@ -473,7 +472,7 @@ class cms_admin {
         static $index;
         if (!is_array($index)){ $index = array(); }
         if (!isset($index[$repo_base_path])){
-            $untracked = self::git_content_cache('path', $repo_base_path, 'untracked');
+            $untracked = self::git_scan_content_directory($repo_base_path, 'untracked');
             $index[$repo_base_path] = $untracked;
         } else {
             $untracked = $index[$repo_base_path];
@@ -487,7 +486,7 @@ class cms_admin {
         static $index;
         if (!is_array($index)){ $index = array(); }
         if (!isset($index[$repo_base_path])){
-            $committed = self::git_content_cache('path', $repo_base_path, 'committed');
+            $committed = self::git_scan_content_directory($repo_base_path, 'committed');
             $index[$repo_base_path] = $committed;
         } else {
             $committed = $index[$repo_base_path];
