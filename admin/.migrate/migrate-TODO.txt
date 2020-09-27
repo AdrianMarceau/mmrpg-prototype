@@ -239,10 +239,10 @@ Update relevant admin panel editors with the option to delete only non-protected
 - pages [DONE]
 
 Update relevant admin panel editors with the option to create new non-protected objects
-- players (?)
-- robots
-- abilities
-- fields (?)
+- players [DONE*]
+- robots [DONE]
+- abilities [DONE]
+- fields [DONE*]
 - items [DONE]
 - stars [DONE]
 - challenges [DONE]
