@@ -8,6 +8,8 @@ ob_echo('');
 
 // Predefine any deprecated robots or robot sprites so we can ignore them
 $deprecated_robots = array(
+    'test-man', 'test-woman',
+    'ageman20xx', 'megabossman', 'rhythmbca'
     );
 
 // Collect an index of all valid robots from the database
