@@ -466,11 +466,12 @@
             // Otherwise, if NEW data, pre-populate certain fields
             else {
 
-                $temp_json_fields = rpg_field::get_json_index_fields();
-                foreach ($temp_json_fields AS $field){ $form_data[$field] = ''; }
                 $form_data['field_game'] = 'MMRPG';
                 $form_data['field_group'] = '';
                 $form_data['field_order'] = 1 + $db->get_value("SELECT MAX(field_order) AS max FROM mmrpg_index_fields;", 'max');
+
+                $temp_json_fields = rpg_field::get_json_index_fields();
+                foreach ($temp_json_fields AS $field){ $form_data[$field] = !empty($form_data[$field]) ? json_encode($form_data[$field], JSON_NUMERIC_CHECK) : ''; }
 
             }
 

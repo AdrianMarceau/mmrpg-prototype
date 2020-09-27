@@ -471,6 +471,9 @@
                 $form_data['item_group'] = 'MMRPG/Items/Misc';
                 $form_data['item_order'] = 1 + $db->get_value("SELECT MAX(item_order) AS max FROM mmrpg_index_items;", 'max');
 
+                $temp_json_fields = rpg_item::get_json_index_fields();
+                foreach ($temp_json_fields AS $field){ $form_data[$field] = !empty($form_data[$field]) ? json_encode($form_data[$field], JSON_NUMERIC_CHECK) : ''; }
+
             }
 
             // Regardless, unset the markup variable so it's not save to the database

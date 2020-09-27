@@ -334,7 +334,7 @@
 
         // Collect the ability's name(s) for display
         $ability_name_display = $ability_data['ability_name'];
-        if ($ability_data_is_new){ $this_page_tabtitle = 'New Ability | '.$this_page_tabtitle; }
+        if ($ability_data_is_new){ $this_page_tabtitle = 'New '.$this_ability_class_name_uc.' | '.$this_page_tabtitle; }
         else { $this_page_tabtitle = $ability_name_display.' | '.$this_page_tabtitle; }
 
         // If form data has been submit for this ability, we should process it
@@ -523,6 +523,9 @@
                 $form_data['ability_group'] = 'MMRPG/Weapons/Misc';
                 $form_data['ability_order'] = 1 + $db->get_value("SELECT MAX(ability_order) AS max FROM mmrpg_index_abilities WHERE ability_class = '{$this_ability_class}';", 'max');
 
+                $temp_json_fields = rpg_ability::get_json_index_fields();
+                foreach ($temp_json_fields AS $field){ $form_data[$field] = !empty($form_data[$field]) ? json_encode($form_data[$field], JSON_NUMERIC_CHECK) : ''; }
+
             }
 
             // Regardless, unset the markup variable so it's not save to the database
@@ -633,7 +636,7 @@
         <a href="admin/">Admin Panel</a>
         &raquo; <a href="<?= $this_ability_page_baseurl ?>">Edit <?= $this_ability_xclass_name_uc ?></a>
         <? if ($sub_action == 'editor' && !empty($ability_data)): ?>
-            &raquo; <a href="<?= $this_ability_page_baseurl ?>editor/ability_id=<?= $ability_data['ability_id'] ?>"><?= !empty($ability_name_display) ? $ability_name_display : 'New Ability' ?></a>
+            &raquo; <a href="<?= $this_ability_page_baseurl ?>editor/ability_id=<?= $ability_data['ability_id'] ?>"><?= !empty($ability_name_display) ? $ability_name_display : 'New '.$this_ability_class_name_uc ?></a>
         <? endif; ?>
     </div>
 
@@ -1142,6 +1145,7 @@
                             </div>
 
                             <? if (!$ability_data_is_new){ ?>
+
                                 <div class="panel" data-tab="sprites">
 
                                     <?
@@ -1372,9 +1376,7 @@
                                     ?>
 
                                 </div>
-                            <? } ?>
 
-                            <? if (!$ability_data_is_new){ ?>
                                 <div class="panel" data-tab="functions">
 
                                     <div class="field fullsize codemirror" data-codemirror-mode="php">
@@ -1428,6 +1430,7 @@
                                     </div>
 
                                 </div>
+
                             <? } ?>
 
                         </div>
@@ -1435,6 +1438,7 @@
                         <hr />
 
                         <? if (!$ability_data_is_new){ ?>
+
                             <div class="options">
 
                                 <div class="field checkwrap">
@@ -1486,12 +1490,13 @@
                             </div>
 
                             <hr />
+
                         <? } ?>
 
                         <div class="formfoot">
 
                             <div class="buttons">
-                                <input class="button save" type="submit" value="<?= $ability_data_is_new ? 'Create Ability' : 'Save Changes' ?>" />
+                                <input class="button save" type="submit" value="<?= $ability_data_is_new ? 'Create '.$this_ability_class_short_name_uc : 'Save Changes' ?>" />
                                 <? if (!$ability_data_is_new && empty($ability_data['ability_flag_protected'])){ ?>
                                     <input class="button delete" type="button" value="Delete <?= $this_ability_class_short_name_uc ?>" data-delete="abilities" data-ability-id="<?= $ability_data['ability_id'] ?>" />
                                 <? } ?>

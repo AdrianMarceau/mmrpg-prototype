@@ -568,13 +568,14 @@
             else {
 
                 $form_data['player_abilities_rewards'] = array(array('points' => 0, 'token' => 'buster-shot'));
-                $temp_json_fields = rpg_player::get_json_index_fields();
-                foreach ($temp_json_fields AS $field){ $form_data[$field] = !empty($form_data[$field]) ? json_encode($form_data[$field]) : ''; }
                 $form_data['player_game'] = 'MMRPG';
                 $form_data['player_group'] = 'MMRPG';
                 $form_data['player_class'] = 'master';
                 $form_data['player_number'] = 1 + $db->get_value("SELECT MAX(player_number) AS max FROM mmrpg_index_players;", 'max');
                 $form_data['player_order'] = 1 + $db->get_value("SELECT MAX(player_order) AS max FROM mmrpg_index_players;", 'max');
+
+                $temp_json_fields = rpg_player::get_json_index_fields();
+                foreach ($temp_json_fields AS $field){ $form_data[$field] = !empty($form_data[$field]) ? json_encode($form_data[$field], JSON_NUMERIC_CHECK) : ''; }
 
             }
 
