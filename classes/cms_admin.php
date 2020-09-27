@@ -1072,6 +1072,146 @@ class cms_admin {
     }
 
 
+    /* -- OBJECT GROUPING FUNCTIONS -- */
+
+    // Define a function for generating object group arrays from index data (will only by used during migration)
+    public static function generate_object_groups_from_index($object_index, $kind){
+
+        // Generate the plural form of the provided kind token
+        if (substr($kind, -1, 1) === 'y'){ $xkind = substr($kind, 0, -1).'ies'; }
+        elseif (substr($kind, -2, 2) === 'ss'){ $xkind = $kind.'es'; }
+        else { $xkind = $kind.'s'; }
+
+        // Sort the provided index by object order field (assuming it's there)
+        uasort($object_index, function($a1, $a2) use($kind){
+            if (empty($a1[$kind.'_flag_hidden']) && !empty($a2[$kind.'_flag_hidden'])){ return -1; }
+            elseif (!empty($a1[$kind.'_flag_hidden']) && empty($a2[$kind.'_flag_hidden'])){ return 1; }
+            else { return $a1[$kind.'_order'] < $a2[$kind.'_order'] ? -1 : 1; }
+            });
+
+        // If object of a specific type, user different class/group values
+        $class_field = $kind.'_class';
+        $group_field = $kind.'_group';
+        if ($kind === 'player' || $kind === 'item' || $kind === 'field'){ $class_field = false; }
+        if ($kind === 'field'){ $group_field = $kind.'_game'; }
+
+        // Filter object data for known sorting issues (for migration, I guess)
+        $group_append = '';
+        $group_overrides = array();
+        if ($kind === 'field'){
+            // Re-group the various non-master fields in the game
+            $group = 'MMRPG/Intro';
+            $tokens = array('gentle-countryside', 'maniacal-hideaway', 'wintry-forefront');
+            foreach ($tokens AS $token){ $group_overrides[$token] = $group; }
+            $group = 'MMRPG/Home';
+            $tokens = array('light-laboratory', 'wily-castle', 'cossack-citadel');
+            foreach ($tokens AS $token){ $group_overrides[$token] = $group; }
+            $group = 'MMRPG/Finale';
+            $tokens = array('final-destination', 'final-destination-2', 'final-destination-3');
+            foreach ($tokens AS $token){ $group_overrides[$token] = $group; }
+            $group = 'MMRPG/Bonus';
+            $tokens = array('prototype-complete');
+            foreach ($tokens AS $token){ $group_overrides[$token] = $group; }
+            // Append a string to end of all master fields in the game
+            $group_append = '/Master';
+        }
+
+        // Loop through and generate the different groups given existing object data
+        $object_groups = array();
+        foreach ($object_index AS $object_key => $object_info){
+            if ($object_info[$kind.'_class'] === 'system'){ continue; }
+            // Collect token for this object
+            $token = $object_info[$kind.'_token'];
+            // Collect group for this object, mod if necessary
+            $group = !empty($group_field) && isset($object_info[$group_field]) ? $object_info[$group_field] : 'MMRPG';
+            if (!empty($object_info[$kind.'_flag_hidden'])){ $group = 'Hidden'; }
+            elseif (isset($group_overrides[$token])){ $group = $group_overrides[$token]; }
+            elseif (isset($group_append)){ $group .= $group_append; }
+            // Collect class for this object, mod if necessary
+            $class = !empty($class_field) && isset($object_info[$class_field]) ? $object_info[$class_field] : $xkind;
+            if (!isset($object_groups[$class])){ $object_groups[$class] = array(); }
+            // Add group w/ info to array if not already there
+            if (!isset($object_groups[$class][$group])){
+                $group_info = array();
+                $group_info['group_class'] = $class;
+                $group_info['group_token'] = $group;
+                $group_info['group_order'] = count($object_groups[$class]);
+                $group_info['group_child_tokens'] = array();
+                $object_groups[$class][$group] = $group_info;
+                } else {
+                $group_info = $object_groups[$class][$group];
+                }
+            // Append this object's token to the list of child tokens
+            $group_info['group_child_tokens'][] = $token;
+            // Update this group's data in the parent array w/ changes
+            $object_groups[$class][$group] = $group_info;
+        }
+
+        // Return the generated object groups
+        return $object_groups;
+
+    }
+
+    // Define a function for saving generated object groups to the database (will be used post-migration as well)
+    public static function save_object_groups_to_database($object_groups, $kind){
+
+        // Generate the plural form of the provided kind token
+        if (substr($kind, -1, 1) === 'y'){ $xkind = substr($kind, 0, -1).'ies'; }
+        elseif (substr($kind, -2, 2) === 'ss'){ $xkind = $kind.'es'; }
+        else { $xkind = $kind.'s'; }
+
+        // Truncate existing data for relevant group database tables
+        global $db;
+        $db->query('TRUNCATE mmrpg_index_'.$xkind.'_groups;');
+        $db->query('TRUNCATE mmrpg_index_'.$xkind.'_groups_tokens;');
+
+        // Loop through provided groups and insert data in database tables
+        foreach ($object_groups AS $group_class => $group_list){
+            foreach ($group_list AS $group_key => $group_data){
+                $group_child_tokens = !empty($group_data['group_child_tokens']) ? $group_data['group_child_tokens'] : array();
+                unset($group_data['group_child_tokens']);
+                $db->insert('mmrpg_index_'.$xkind.'_groups', $group_data);
+                foreach ($group_child_tokens AS $child_key => $child_token){
+                    $token_data = array();
+                    $token_data['group_token'] = $group_data['group_token'];
+                    $token_data[$kind.'_token'] = $child_token;
+                    $token_data['token_order'] = $child_key;
+                    $db->insert('mmrpg_index_'.$xkind.'_groups_tokens', $token_data);
+                }
+            }
+        }
+
+        // Return true on success
+        return true;
+
+    }
+
+    // Define a function for saving generated object groups to the database (will be used post-migration as well)
+    public static function save_object_groups_to_json($object_groups, $kind){
+
+        // Generate the plural form of the provided kind token
+        if (substr($kind, -1, 1) === 'y'){ $xkind = substr($kind, 0, -1).'ies'; }
+        elseif (substr($kind, -2, 2) === 'ss'){ $xkind = $kind.'es'; }
+        else { $xkind = $kind.'s'; }
+
+        // Define the base path and file name for the data JSON file
+        $object_groups_path = MMRPG_CONFIG_CONTENT_PATH.$xkind.'/_groups/';
+        $object_groups_json_path = $object_groups_path.'data.json';
+
+        // Remove if already exists then create the new directory
+        if (file_exists($object_groups_path)){ deleteDir($object_groups_path); }
+        mkdir($object_groups_path);
+
+        // Write the provided groups to a new JSON file and close
+        $h = fopen($object_groups_json_path, 'w');
+        fwrite($h, normalize_file_markup(json_encode($object_groups, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK)));
+        fclose($h);
+
+        // Return true on success, false on failure
+        return file_exists($object_groups_json_path);
+
+    }
+
     /* -- SQL IMPORT / EXPORT FUNCTIONS -- */
 
     // Define a function for exporting a given database table's data into an SQL file
