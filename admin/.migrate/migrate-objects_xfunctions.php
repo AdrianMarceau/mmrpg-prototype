@@ -144,6 +144,11 @@ function clean_json_content_array($kind, $content_json_data, $remove_id_field = 
     if ($remove_functions_field){ unset($cleaned_json_data[$kind.'_functions']); }
     // Loop through fields and set any psudeo-empty fields to actally empty
     //foreach ($cleaned_json_data AS $k => $v){ if ($v === '[]'){ $cleaned_json_data[$k] = ''; } }
+    // Check to see if there are fields we need to remove before export
+    if (method_exists('rpg_'.$kind, 'get_fields_excluded_from_json_export')){
+        $skip_fields_on_json_export = call_user_func(array('rpg_'.$kind, 'get_fields_excluded_from_json_export'));
+        if (!empty($skip_fields_on_json_export)){ foreach ($skip_fields_on_json_export AS $field){ unset($cleaned_json_data[$field]); } }
+    }
     // If not empty, loop through any encoded sub-fields and auto-expand them
     if (empty($encoded_sub_fields)
         && method_exists('rpg_'.$kind, 'get_json_index_fields')){
