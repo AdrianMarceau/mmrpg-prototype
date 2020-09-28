@@ -1125,8 +1125,9 @@ class cms_admin {
             // Collect group for this object, mod if necessary
             $group = !empty($group_field) && isset($object_info[$group_field]) ? $object_info[$group_field] : 'MMRPG';
             if (!empty($object_info[$kind.'_flag_hidden'])){ $group = 'Hidden'; }
-            elseif (isset($group_overrides[$token])){ $group = $group_overrides[$token]; }
-            elseif (isset($group_append)){ $group .= $group_append; }
+            elseif (!empty($group_overrides[$token])){ $group = $group_overrides[$token]; }
+            elseif (!empty($group_append)){ $group .= $group_append; }
+            if (empty($group)){ $group = 'MMRPG'; }
             // Collect class for this object, mod if necessary
             $class = !empty($class_field) && isset($object_info[$class_field]) ? $object_info[$class_field] : $kind;
             if (!isset($object_groups[$class])){ $object_groups[$class] = array(); }
@@ -1137,7 +1138,6 @@ class cms_admin {
                 $group_info['group_token'] = $group;
                 $group_info['group_order'] = count($object_groups[$class]);
                 $group_info['group_child_tokens'] = array();
-                $object_groups[$class][$group] = $group_info;
                 } else {
                 $group_info = $object_groups[$class][$group];
                 }
@@ -1205,7 +1205,7 @@ class cms_admin {
         // Loop through the various object group categories (we create files for each)
         $new_files_attempted = 0;
         $new_files_created = 0;
-        foreach ($object_groups AS $group_class => $group_list){
+        foreach ($object_groups AS $group_class => $group_data){
 
             // Define the base path and file name for the data JSON file
             $object_group_class_path = $object_groups_path.$group_class.'/';
@@ -1217,7 +1217,7 @@ class cms_admin {
 
             // Write the provided groups to a new JSON file and close
             $h = fopen($object_group_class_json_path, 'w');
-            fwrite($h, normalize_file_markup(json_encode($group_list, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK)));
+            fwrite($h, normalize_file_markup(json_encode($group_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK)));
             fclose($h);
 
             // Increment the return variable if exists
