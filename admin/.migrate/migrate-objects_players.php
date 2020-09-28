@@ -156,6 +156,9 @@ foreach ($player_index AS $player_token => $player_data){
         $player_data_files_copied[] = basename($data_path); // not actually copied but here for tracking
     }
 
+    // Manually rewrite the player class if necessary
+    if ($player_data['player_class'] === 'master'){ $player_data['player_class'] = 'player'; }
+
     // And then write the rest of the non-function data into a json file
     $content_json_path = $content_path.'data.json';
     $content_json_data = clean_json_content_array('player', $player_data);
