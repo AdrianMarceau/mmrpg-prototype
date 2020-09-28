@@ -9,6 +9,7 @@ $base_dir = dirname(dirname($setup_dir)).'/';
 require($base_dir.'top.php');
 
 // Require the repository index for looping
+require(MMRPG_CONFIG_ROOTDIR.'classes/cms_admin.php');
 require(MMRPG_CONFIG_ROOTDIR.'content/index.php');
 
 // Define the header type so it's easier to display stuff
@@ -43,6 +44,7 @@ ob_echo('');
 $allow_import_sql = isset($_REQUEST['import_sql']) && $_REQUEST['import_sql'] === 'false' ? false : true;
 $allow_import_json = isset($_REQUEST['import_json']) && $_REQUEST['import_json'] === 'false' ? false : true;
 $allow_post_setup = isset($_REQUEST['post_setup']) && $_REQUEST['post_setup'] === 'false' ? false : true;
+$allow_content_type = isset($_REQUEST['content_type']) && isset($content_types_index[$_REQUEST['content_type']]) ? $_REQUEST['content_type'] : false;
 
 // -- IMPORT SQL FILES -- //
 
@@ -131,6 +133,9 @@ if ($allow_import_json){
         $ctype_xtoken = $content_info['xtoken'];
         $ctype_table_name = $content_info['database_table'];
 
+        // Only we're only populating a specific content type, skip all others
+        if (!empty($allow_content_type) && $allow_content_type !== $content_key){ continue; }
+
         // If this content doesn't have a table, skip it
         if (empty($ctype_table_name)){ continue; }
 
@@ -146,14 +151,13 @@ if ($allow_import_json){
         $json_data_dirs = array_filter($json_data_dirs, function($d) use($json_data_dir){ if ($d !== '.' && $d !== '..' && file_exists($json_data_dir.$d.'/data.json')){ return true; } else { return false; } });
 
         // We made it this far, so let's truncate existing data from the table
-        $truncate_sql = "TRUNCATE TABLE {$ctype_table_name};";
-        $db->query($truncate_sql);
+        $db->query("TRUNCATE TABLE {$ctype_table_name};");
 
         // Check to make sure seed data for the tables was actually collected
         if (!empty($json_data_dirs)){
 
             // Print out the list of tables that will be created
-            ob_echo('JSON import data was found for the following '.$ctype_xtoken.':');
+            ob_echo('JSON object import data was found for the following '.$ctype_xtoken.':');
             ob_echo('- '.implode(PHP_EOL.'- ', $json_data_dirs));
             ob_echo('');
 
@@ -271,6 +275,47 @@ if ($allow_import_json){
             ob_echo('');
 
         }
+
+        // Check to see if a groups folder exists and has data
+        $groups_data_dir = $json_data_dir.'_groups/';
+        $groups_data_dirs = file_exists($groups_data_dir) ? scandir($groups_data_dir) : array();
+        $groups_data_dirs = array_filter($groups_data_dirs, function($d) use($groups_data_dir){ if ($d !== '.' && $d !== '..' && file_exists($groups_data_dir.$d.'/data.json')){ return true; } else { return false; } });
+
+        // Check to make sure group data was actually collected
+        if (!empty($groups_data_dirs)){
+
+            // Print out the list of tables that will be created
+            ob_echo('JSON object group import data was found for the following classes:');
+            ob_echo('- '.implode(PHP_EOL.'- ', $groups_data_dirs));
+            ob_echo('');
+
+            // Define the group/token table names to populate
+            $ctype_group_table_name = $ctype_table_name.'_groups';
+            $ctype_group_token_table_name = $ctype_table_name.'_groups_tokens';
+
+            // We made it this far, so let's truncate existing group/token from the tables
+            $db->query("TRUNCATE TABLE {$ctype_group_table_name};");
+            $db->query("TRUNCATE TABLE {$ctype_group_token_table_name};");
+
+            // Loop through the data files and import them into the database
+            ob_echo('Looping through JSON group data files and importing into database tables "'.$ctype_group_table_name.'" and "'.$ctype_group_token_table_name.'":');
+            $object_groups = array();
+            foreach ($groups_data_dirs AS $group_class){
+                // Open the json file and decode it's contents to collect details
+                $json_file = $group_class.'/data.json';
+                $json_markup = file_get_contents($groups_data_dir.$json_file);
+                $json_data = json_decode($json_markup, true);
+                // Append this group list to the parent array
+                $group_list = $json_data;
+                $object_groups[$group_class] = $group_list;
+                ob_echo('- Importing data and tokens for "'.$group_class.'" sort groups');
+            }
+            // If not empty, save the groups to the database
+            if (!empty($object_groups)){ cms_admin::save_object_groups_to_database($object_groups, $ctype_token); }
+            ob_echo('');
+
+        }
+
 
     }
 
