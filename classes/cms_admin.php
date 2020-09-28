@@ -1196,19 +1196,38 @@ class cms_admin {
 
         // Define the base path and file name for the data JSON file
         $object_groups_path = MMRPG_CONFIG_CONTENT_PATH.$xkind.'/_groups/';
-        $object_groups_json_path = $object_groups_path.'data.json';
+        //$object_groups_json_path = $object_groups_path.'data.json';
 
         // Remove if already exists then create the new directory
         if (file_exists($object_groups_path)){ deleteDir($object_groups_path); }
         mkdir($object_groups_path);
 
-        // Write the provided groups to a new JSON file and close
-        $h = fopen($object_groups_json_path, 'w');
-        fwrite($h, normalize_file_markup(json_encode($object_groups, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK)));
-        fclose($h);
+        // Loop through the various object group categories (we create files for each)
+        $new_files_attempted = 0;
+        $new_files_created = 0;
+        foreach ($object_groups AS $group_class => $group_list){
+
+            // Define the base path and file name for the data JSON file
+            $object_group_class_path = $object_groups_path.$group_class.'/';
+            $object_group_class_json_path = $object_group_class_path.'data.json';
+
+            // Remove if already exists then create the new directory
+            if (file_exists($object_group_class_path)){ deleteDir($object_group_class_path); }
+            mkdir($object_group_class_path);
+
+            // Write the provided groups to a new JSON file and close
+            $h = fopen($object_group_class_json_path, 'w');
+            fwrite($h, normalize_file_markup(json_encode($group_list, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK)));
+            fclose($h);
+
+            // Increment the return variable if exists
+            $new_files_attempted += 1;
+            $new_files_created += (file_exists($object_group_class_json_path) ? 1 : 0);
+
+        }
 
         // Return true on success, false on failure
-        return file_exists($object_groups_json_path);
+        return $new_files_created === $new_files_attempted ? true : false;
 
     }
 
