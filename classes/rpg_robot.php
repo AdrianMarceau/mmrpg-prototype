@@ -2386,6 +2386,30 @@ class rpg_robot extends rpg_object {
     }
 
     /**
+     * Get a list of all fields that can be ignored by JSON-export functions
+     * (aka ones that do not actually need to be saved to the database)
+     * @param bool $implode
+     * @return mixed
+     */
+    public static function get_fields_excluded_from_json_export($implode = false){
+
+        // Define the various json index fields for player objects
+        $json_index_fields = array(
+            'robot_group',
+            'robot_order'
+            );
+
+        // Implode the index fields into a string if requested
+        if ($implode){
+            $json_index_fields = implode(', ', $json_index_fields);
+        }
+
+        // Return the index fields, array or string
+        return $json_index_fields;
+
+    }
+
+    /**
      * Get the entire robot index array with parsed info
      * @param bool $parse_data
      * @return array

@@ -945,7 +945,9 @@ class rpg_ability extends rpg_object {
             'attachment_frame_index',
             'attachment_frame_offset',
             'attachment_frame_styles',
-            'attachment_frame_classes'
+            'attachment_frame_classes',
+            'ability_group',
+            'ability_order'
             );
 
         // Implode the index fields into a string if requested
