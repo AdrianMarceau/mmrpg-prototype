@@ -168,6 +168,14 @@ foreach ($player_index AS $player_token => $player_data){
 
 }
 
+ob_echo('----------');
+
+ob_echo('');
+ob_echo_nobreak('Generating player groups data file... ');
+$object_groups = cms_admin::generate_object_groups_from_index($player_index, 'player');
+cms_admin::save_object_groups_to_json($object_groups, 'player');
+ob_echo('...done!');
+ob_echo('');
 
 ob_echo('----------');
 

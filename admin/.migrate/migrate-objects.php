@@ -18,6 +18,7 @@ ob_implicit_flush(true);
 ob_start();
 
 // Require the data + function definitions needed for migration stuff
+require_once(MMRPG_CONFIG_ROOTDIR.'classes/cms_admin.php');
 require($migrate_dir.'migrate-objects_xcommon.php');
 require($migrate_dir.'migrate-objects_xfunctions.php');
 

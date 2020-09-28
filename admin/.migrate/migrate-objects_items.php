@@ -250,6 +250,14 @@ if (empty($migration_filter)){
 
 }
 
+ob_echo('----------');
+
+ob_echo('');
+ob_echo_nobreak('Generating item groups data file... ');
+$object_groups = cms_admin::generate_object_groups_from_index($ability_index, 'item');
+cms_admin::save_object_groups_to_json($object_groups, 'item');
+ob_echo('...done!');
+ob_echo('');
 
 ob_echo('----------');
 

@@ -154,6 +154,14 @@ foreach ($field_index AS $field_token => $field_data){
 
 }
 
+ob_echo('----------');
+
+ob_echo('');
+ob_echo_nobreak('Generating field groups data file... ');
+$object_groups = cms_admin::generate_object_groups_from_index($ability_index, 'field');
+cms_admin::save_object_groups_to_json($object_groups, 'field');
+ob_echo('...done!');
+ob_echo('');
 
 ob_echo('----------');
 

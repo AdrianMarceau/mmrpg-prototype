@@ -217,6 +217,14 @@ $dot_robot_content_dir = MMRPG_ROBOTS_NEW_CONTENT_DIR.'.robot/';
 if (file_exists($dot_robot_content_dir.'sprites_legacy/')){ deletedir_or_exit($dot_robot_content_dir.'sprites_legacy/'); }
 if (file_exists($dot_robot_content_dir.'shadows_legacy/')){ deletedir_or_exit($dot_robot_content_dir.'shadows_legacy/'); }
 
+ob_echo('----------');
+
+ob_echo('');
+ob_echo_nobreak('Generating robot groups data file... ');
+$object_groups = cms_admin::generate_object_groups_from_index($ability_index, 'robot');
+cms_admin::save_object_groups_to_json($object_groups, 'robot');
+ob_echo('...done!');
+ob_echo('');
 
 ob_echo('----------');
 
