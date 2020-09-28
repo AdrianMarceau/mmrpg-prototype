@@ -1128,7 +1128,7 @@ class cms_admin {
             elseif (isset($group_overrides[$token])){ $group = $group_overrides[$token]; }
             elseif (isset($group_append)){ $group .= $group_append; }
             // Collect class for this object, mod if necessary
-            $class = !empty($class_field) && isset($object_info[$class_field]) ? $object_info[$class_field] : $xkind;
+            $class = !empty($class_field) && isset($object_info[$class_field]) ? $object_info[$class_field] : $kind;
             if (!isset($object_groups[$class])){ $object_groups[$class] = array(); }
             // Add group w/ info to array if not already there
             if (!isset($object_groups[$class][$group])){
