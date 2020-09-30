@@ -22,32 +22,15 @@
 
     /* -- Collect Dependant Indexes -- */
 
-    // Collect an index of type colours for options
-    $mmrpg_types_fields = rpg_type::get_index_fields(true);
-    $mmrpg_types_index = $db->get_array_list("SELECT {$mmrpg_types_fields} FROM mmrpg_index_types ORDER BY type_order ASC", 'type_token');
-
-    // Collect an index of battle fields for options
-    $mmrpg_fields_fields = rpg_field::get_index_fields(true);
-    $mmrpg_fields_index = $db->get_array_list("SELECT {$mmrpg_fields_fields} FROM mmrpg_index_fields WHERE field_token <> 'field' AND field_flag_published = 1  AND field_flag_complete = 1 AND field_flag_hidden = 0 ORDER BY FIELD(field_token, 'intro-field') DESC, FIELD(field_game, 'MMRPG', 'MM00') DESC, field_game ASC, field_order ASC", 'field_token');
-
-    // Collect an index of music tracks for options
-    $mmrpg_music_index = $db->get_array_list("SELECT music_id, music_token, music_album, music_game, music_name, music_link FROM mmrpg_index_music ORDER BY music_game ASC, music_order ASC, music_token ASC;", 'music_id');
-
-    // Collect an index of player colours for options
-    $mmrpg_players_fields = rpg_player::get_index_fields(true);
-    $mmrpg_players_index = $db->get_array_list("SELECT {$mmrpg_players_fields} FROM mmrpg_index_players WHERE player_token <> 'player' AND player_flag_published = 1 AND player_flag_complete = 1  ORDER BY player_order ASC", 'player_token');
-
-    // Collect an index of robot colours for options
-    $mmrpg_robots_fields = rpg_robot::get_index_fields(true);
-    $mmrpg_robots_index = $db->get_array_list("SELECT {$mmrpg_robots_fields} FROM mmrpg_index_robots WHERE robot_token <> 'robot' AND robot_class <> 'boss' AND robot_flag_published = 1 AND robot_flag_complete = 1 ORDER BY FIELD(robot_class, 'master', 'mecha', 'boss'), robot_name ASC", 'robot_token');
-
-    // Collect an index of challenge colours for options
-    $mmrpg_abilities_fields = rpg_ability::get_index_fields(true);
-    $mmrpg_abilities_index = $db->get_array_list("SELECT {$mmrpg_abilities_fields} FROM mmrpg_index_abilities WHERE ability_token <> 'ability' AND ability_class <> 'system' AND ability_flag_published = 1 AND ability_flag_complete = 1 ORDER BY FIELD(ability_class, 'master', 'mecha', 'boss'), ability_name ASC, ability_order ASC", 'ability_token');
-
-    // Collect an index of challenge colours for options
-    $mmrpg_items_fields = rpg_item::get_index_fields(true);
-    $mmrpg_items_index = $db->get_array_list("SELECT {$mmrpg_items_fields} FROM mmrpg_index_items WHERE item_token <> 'item' AND item_class <> 'system' AND (item_subclass = 'consumable' OR item_subclass = 'holdable') AND item_flag_published = 1 AND item_flag_complete = 1 ORDER BY item_order ASC", 'item_token');
+    // Collect indexes for required object types
+    $mmrpg_types_index = cms_admin::get_types_index();
+    $mmrpg_players_index = cms_admin::get_players_index();
+    $mmrpg_robots_index = cms_admin::get_robots_index();
+    $mmrpg_abilities_index = cms_admin::get_abilities_index();
+    $mmrpg_items_index = cms_admin::get_items_index();
+    $mmrpg_fields_index = cms_admin::get_fields_index();
+    $mmrpg_music_index = cms_admin::get_music_index();
+    $mmrpg_contributors_index = cms_admin::get_contributors_index('player');
 
     // Collect an index of contributors and admins that have made sprites
     if ($this_challenge_kind === 'event'){
@@ -149,8 +132,7 @@
     $music_options_group = '';
     $music_options_markup = array();
     $music_options_markup[] = '<option value="">-</option>';
-    foreach ($mmrpg_music_index AS $music_id => $music_info){
-        $music_path = $music_info['music_album'].'/'.$music_info['music_token'];
+    foreach ($mmrpg_music_index AS $music_path => $music_info){
         if (!rpg_game::sound_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path.'/')){ continue; }
         if ($music_info['music_game'] == 'MM085'){ $music_group = 'MM&B'; }
         elseif ($music_info['music_game'] == 'MM01b'){ $music_group = 'MMPU'; }
@@ -193,6 +175,9 @@
     $item_options_markup[] = '<option value="">-</option>';
     $item_options_group = '';
     foreach ($mmrpg_items_index AS $item_token => $item_info){
+        if (empty($item_info['item_flag_published'])){ continue; }
+        elseif (empty($item_info['item_flag_complete'])){ continue; }
+        elseif (!in_array($item_info['item_subclass'], array('consumable', 'holdable'))){ continue; }
         $item_label = $item_info['item_name'];
         if (strstr($item_token, '-core')){ $item_group = 'Elemental Cores'; }
         elseif (strstr($item_token, '-upgrade')){ $item_group = 'Upgrade Parts'; }

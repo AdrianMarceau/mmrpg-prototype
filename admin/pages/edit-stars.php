@@ -13,9 +13,8 @@
 
     /* -- Collect Dependant Indexes -- */
 
-    // Collect an index of type colours for options
-    $mmrpg_types_fields = rpg_type::get_index_fields(true);
-    $mmrpg_types_index = $db->get_array_list("SELECT {$mmrpg_types_fields} FROM mmrpg_index_types ORDER BY type_order ASC", 'type_token');
+    // Collect indexes for required object types
+    $mmrpg_types_index = cms_admin::get_types_index();
 
     // Collect an index of all existing stars for reference
     $mmrpg_stars_fields = rpg_rogue_star::get_index_fields(true);

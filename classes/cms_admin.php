@@ -59,6 +59,14 @@ class cms_admin {
         return $return === 0 ? true : false;
     }
 
+    // Define a function for collecting the types index, sorted, for admin use
+    public static function get_roles_index(){
+        global $db;
+        $mmrpg_roles_fields = rpg_user_role::get_index_fields(true);
+        $mmrpg_roles_index = $db->get_array_list("SELECT {$mmrpg_roles_fields} FROM mmrpg_roles WHERE role_level <> 0 ORDER BY role_level ASC", 'role_id');
+        return $mmrpg_roles_index;
+    }
+
     // Define a function for easily getting a contributors index for back-end puruposes
     public static function get_contributors_index($object_kind, $image_editor_id_field = ''){
         global $db;
@@ -81,6 +89,10 @@ class cms_admin {
                     contributors.user_name AS user_name,
                     contributors.user_name_public AS user_name_public,
                     contributors.user_name_clean AS user_name_clean,
+                    users.user_date_created,
+                    users.user_date_accessed,
+                    users.user_date_modified,
+                    users.user_last_login,
                     uroles.role_level AS user_role_level,
                     (CASE WHEN editors.{$count_object}_image_count IS NOT NULL THEN editors.{$count_object}_image_count ELSE 0 END) AS user_image_count,
                     (CASE WHEN editors2.{$count_object}_image_count2 IS NOT NULL THEN editors2.{$count_object}_image_count2 ELSE 0 END) AS user_image_count2
@@ -110,6 +122,10 @@ class cms_admin {
                     users.user_name AS user_name,
                     users.user_name_public AS user_name_public,
                     users.user_name_clean AS user_name_clean,
+                    users.user_date_created,
+                    users.user_date_accessed,
+                    users.user_date_modified,
+                    users.user_last_login,
                     uroles.role_level AS user_role_level,
                     (CASE WHEN editors.{$count_object}_image_count IS NOT NULL THEN editors.{$count_object}_image_count ELSE 0 END) AS user_image_count,
                     (CASE WHEN editors2.{$count_object}_image_count2 IS NOT NULL THEN editors2.{$count_object}_image_count2 ELSE 0 END) AS user_image_count2
@@ -142,6 +158,61 @@ class cms_admin {
         }
         // Return the generated list
         return $mmrpg_contributors_index;
+    }
+
+    // Define a function for collecting the types index, sorted, for admin use
+    public static function get_types_index(){
+        global $db;
+        $mmrpg_types_fields = rpg_type::get_index_fields(true);
+        $mmrpg_types_index = $db->get_array_list("SELECT {$mmrpg_types_fields} FROM mmrpg_index_types ORDER BY type_order ASC", 'type_token');
+        return $mmrpg_types_index;
+    }
+
+    // Define a function for collecting the players index, sorted, for admin use
+    public static function get_players_index(){
+        global $db;
+        $mmrpg_players_fields = rpg_player::get_index_fields(true);
+        $mmrpg_players_index = $db->get_array_list("SELECT {$mmrpg_players_fields} FROM mmrpg_index_players WHERE player_token <> 'player' ORDER BY player_order ASC", 'player_token');
+        return $mmrpg_players_index;
+    }
+
+    // Define a function for collecting the robots index, sorted, for admin use
+    public static function get_robots_index(){
+        global $db;
+        $mmrpg_robots_fields = rpg_robot::get_index_fields(true);
+        $mmrpg_robots_index = $db->get_array_list("SELECT {$mmrpg_robots_fields} FROM mmrpg_index_robots WHERE robot_token <> 'robot' ORDER BY robot_order ASC", 'robot_token');
+        return $mmrpg_robots_index;
+    }
+
+    // Define a function for collecting the abilities index, sorted, for admin use
+    public static function get_abilities_index(){
+        global $db;
+        $mmrpg_abilities_fields = rpg_ability::get_index_fields(true);
+        $mmrpg_abilities_index = $db->get_array_list("SELECT {$mmrpg_abilities_fields} FROM mmrpg_index_abilities WHERE ability_token <> 'ability' AND ability_class <> 'system' ORDER BY ability_order ASC", 'ability_token');
+        return $mmrpg_abilities_index;
+    }
+
+    // Define a function for collecting the items index, sorted, for admin use
+    public static function get_items_index(){
+        global $db;
+        $mmrpg_items_fields = rpg_item::get_index_fields(true);
+        $mmrpg_items_index = $db->get_array_list("SELECT {$mmrpg_items_fields} FROM mmrpg_index_items WHERE item_token <> 'item' AND item_class <> 'system' ORDER BY item_order ASC", 'item_token');
+        return $mmrpg_items_index;
+    }
+
+    // Define a function for collecting the fields index, sorted, for admin use
+    public static function get_fields_index(){
+        global $db;
+        $mmrpg_fields_fields = rpg_field::get_index_fields(true);
+        $mmrpg_fields_index = $db->get_array_list("SELECT {$mmrpg_fields_fields} FROM mmrpg_index_fields WHERE field_token <> 'field' ORDER BY field_order ASC", 'field_token');
+        return $mmrpg_fields_index;
+    }
+
+    // Define a function for collecting the music index, sorted, for admin use
+    public static function get_music_index(){
+        global $db;
+        $mmrpg_music_index = $db->get_array_list("SELECT music_id, music_token, music_album, music_game, music_name, music_link, CONCAT(music_album, '/', music_token) AS music_path FROM mmrpg_index_music ORDER BY music_game ASC, music_order ASC, music_token ASC;", 'music_path');
+        return $mmrpg_music_index;
     }
 
     // Define a function for printing the full name of a given environment

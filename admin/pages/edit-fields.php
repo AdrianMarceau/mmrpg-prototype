@@ -11,24 +11,15 @@
 
     /* -- Collect Dependant Indexes -- */
 
-    // Collect an index of type colours for options
-    $mmrpg_types_fields = rpg_type::get_index_fields(true);
-    $mmrpg_types_index = $db->get_array_list("SELECT {$mmrpg_types_fields} FROM mmrpg_index_types ORDER BY type_order ASC", 'type_token');
+    // Collect indexes for required object types
+    $mmrpg_types_index = cms_admin::get_types_index();
+    $mmrpg_robots_index = cms_admin::get_robots_index();
+    $mmrpg_abilities_index = cms_admin::get_abilities_index();
+    $mmrpg_fields_index = cms_admin::get_fields_index();
+    $mmrpg_music_index = cms_admin::get_music_index();
+    $mmrpg_contributors_index = cms_admin::get_contributors_index('field');
 
-    // Collect an index of battle fields for options
-    $mmrpg_fields_fields = rpg_field::get_index_fields(true);
-    $mmrpg_fields_index = $db->get_array_list("SELECT {$mmrpg_fields_fields} FROM mmrpg_index_fields WHERE field_token <> 'field' ORDER BY field_order ASC", 'field_token');
-
-    // Collect an index of player colours for options
-    //$mmrpg_players_fields = rpg_player::get_index_fields(true);
-    //$mmrpg_players_index = $db->get_array_list("SELECT {$mmrpg_players_fields} FROM mmrpg_index_players WHERE player_token <> 'player' ORDER BY player_order ASC", 'player_token');
-
-    // Collect an index of music tracks for options
-    $mmrpg_music_index = $db->get_array_list("SELECT music_id, music_token, music_album, music_game, music_name, music_link, CONCAT(music_album, '/', music_token) AS music_source FROM mmrpg_index_music ORDER BY music_game ASC, music_order ASC, music_token ASC;", 'music_source');
-
-    // Collect an index of robot colours for options
-    $mmrpg_robots_fields = rpg_robot::get_index_fields(true);
-    $mmrpg_robots_index = $db->get_array_list("SELECT {$mmrpg_robots_fields} FROM mmrpg_index_robots WHERE robot_token <> 'robot' ORDER BY robot_class DESC, robot_order ASC", 'robot_token');
+    // Generate a reference index of robot classes for options
     $mmrpg_robots_index_byclass = array();
     if (!empty($mmrpg_robots_index)){
         foreach ($mmrpg_robots_index AS $token => $data){
@@ -425,7 +416,8 @@
                 if (isset($form_data['field_music'])){
                     if (!empty($form_data['field_music'])){
                         if (strstr($form_data['field_music'], '/')){
-                            $music_data = $mmrpg_music_index[$form_data['field_music']];
+                            $music_path = $form_data['field_music'];
+                            $music_data = $mmrpg_music_index[$music_path];
                             $form_data['field_music_name'] = $music_data['music_name'];
                             $form_data['field_music_link'] = json_encode($music_data['music_link']);
                         } else {
@@ -1119,8 +1111,8 @@
                                     // Pre-generate a list of all music so we can re-use it over and over
                                     $music_options_markup = array();
                                     $music_options_markup[] = '<option value="">-</option>';
-                                    foreach ($mmrpg_music_index AS $music_source => $music_info){
-                                        $music_options_markup[] = '<option value="'.$music_source.'">'.$music_info['music_name'].'</option>';
+                                    foreach ($mmrpg_music_index AS $music_path => $music_info){
+                                        $music_options_markup[] = '<option value="'.$music_path.'">'.$music_info['music_name'].'</option>';
                                     }
                                     $music_options_count = count($music_options_markup);
                                     $music_options_markup = implode(PHP_EOL, $music_options_markup);

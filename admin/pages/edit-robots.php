@@ -27,27 +27,12 @@
 
     /* -- Collect Dependant Indexes -- */
 
-    // Collect an index of type colours for options
-    $mmrpg_types_fields = rpg_type::get_index_fields(true);
-    $mmrpg_types_index = $db->get_array_list("SELECT {$mmrpg_types_fields} FROM mmrpg_index_types ORDER BY type_order ASC", 'type_token');
-
-    // Collect an index of battle fields for options
-    $mmrpg_fields_fields = rpg_field::get_index_fields(true);
-    $mmrpg_fields_index = $db->get_array_list("SELECT {$mmrpg_fields_fields} FROM mmrpg_index_fields WHERE field_token <> 'field' ORDER BY field_order ASC", 'field_token');
-
-    // Collect an index of player colours for options
-    $mmrpg_players_fields = rpg_player::get_index_fields(true);
-    $mmrpg_players_index = $db->get_array_list("SELECT {$mmrpg_players_fields} FROM mmrpg_index_players WHERE player_token <> 'player' ORDER BY player_order ASC", 'player_token');
-
-    // Collect an index of robot colours for options
-    $mmrpg_robots_fields = rpg_robot::get_index_fields(true);
-    $mmrpg_robots_index = $db->get_array_list("SELECT {$mmrpg_robots_fields} FROM mmrpg_index_robots WHERE robot_token <> 'robot' ORDER BY robot_order ASC", 'robot_token');
-
-    // Collect an index of robot colours for options
-    $mmrpg_abilities_fields = rpg_ability::get_index_fields(true);
-    $mmrpg_abilities_index = $db->get_array_list("SELECT {$mmrpg_abilities_fields} FROM mmrpg_index_abilities WHERE ability_token <> 'ability' AND ability_class <> 'system' ORDER BY ability_order ASC", 'ability_token');
-
-    // Collect an index of contributors and admins that have made sprites
+    // Collect indexes for required object types
+    $mmrpg_types_index = cms_admin::get_types_index();
+    $mmrpg_players_index = cms_admin::get_players_index();
+    $mmrpg_robots_index = cms_admin::get_robots_index();
+    $mmrpg_abilities_index = cms_admin::get_abilities_index();
+    $mmrpg_fields_index = cms_admin::get_fields_index();
     $mmrpg_contributors_index = cms_admin::get_contributors_index('robot');
 
     // Collect an index of file changes and updates via git

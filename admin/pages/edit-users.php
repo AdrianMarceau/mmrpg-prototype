@@ -11,13 +11,9 @@
 
     /* -- Collect Editor Indexes -- */
 
-    // Collect an index of user roles for options
-    $mmrpg_roles_fields = rpg_user_role::get_index_fields(true);
-    $mmrpg_roles_index = $db->get_array_list("SELECT {$mmrpg_roles_fields} FROM mmrpg_roles WHERE role_level <> 0 ORDER BY role_level ASC", 'role_id');
-
-    // Collect an index of user contributors for options
-    $mmrpg_contributors_fields = rpg_user::get_contributor_index_fields(true);
-    $mmrpg_contributors_index = $db->get_array_list("SELECT {$mmrpg_contributors_fields} FROM mmrpg_users_contributors ORDER BY user_date_created ASC", 'contributor_id');
+    // Collect indexes relevant to this script
+    $mmrpg_roles_index = cms_admin::get_roles_index();
+    $mmrpg_contributors_index = cms_admin::get_contributors_index('player', 'contributor_id');
 
     /* -- Form Setup Actions -- */
 
