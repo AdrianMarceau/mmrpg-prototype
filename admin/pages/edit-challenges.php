@@ -86,15 +86,16 @@
     /* -- Generate Select Option Markup -- */
 
     // Pre-generate a list of all robots so we can re-use it over and over
+    $last_option_group = false;
     $robot_options_count = 0;
-    $robot_options_group = '';
     $robot_options_markup = array();
     $robot_options_markup[] = '<option value="">-</option>';
     foreach ($mmrpg_robots_index AS $robot_token => $robot_info){
-        if ($robot_info['robot_class'] != $robot_options_group){
-            if (!empty($robot_options_group)){ $robot_options_markup[] = '</optgroup>'; }
-            $robot_options_group = $robot_info['robot_class'];
-            $robot_options_markup[] = '<optgroup label="'.ucfirst($robot_info['robot_class']).' Robots">';
+        $class_group = (ucfirst($robot_info['robot_class']).(substr($robot_info['robot_class'], -2, 2) === 'ss' ? 'es' : 's')).' | '.$robot_info['robot_group'];
+        if ($last_option_group !== $class_group){
+            if (!empty($last_option_group)){ $robot_options_markup[] = '</optgroup>'; }
+            $last_option_group = $class_group;
+            $robot_options_markup[] = '<optgroup label="'.$class_group.'">';
         }
         $robot_name = $robot_info['robot_name'];
         $robot_types = ucwords(implode(' / ', array_values(array_filter(array($robot_info['robot_core'], $robot_info['robot_core2'])))));
@@ -102,7 +103,7 @@
         $robot_options_markup[] = '<option value="'.$robot_token.'">'.$robot_name.' ('.$robot_types.')</option>';
         $robot_options_count++;
     }
-    if (!empty($robot_options_group)){ $robot_options_markup[] = '</optgroup>'; }
+    if (!empty($last_option_group)){ $robot_options_markup[] = '</optgroup>'; }
     $robot_options_markup = implode(PHP_EOL, $robot_options_markup);
 
     // Pre-generate a list of all fields so we can re-use it over and over

@@ -177,10 +177,11 @@ class cms_admin {
             groups.group_token AS player_group,
             tokens.token_order AS player_order
             FROM mmrpg_index_players AS players
-            LEFT JOIN mmrpg_index_players_groups AS groups ON groups.group_class = players.player_class
-            LEFT JOIN mmrpg_index_players_groups_tokens AS tokens ON tokens.group_token = groups.group_token
+            LEFT JOIN mmrpg_index_players_groups_tokens AS tokens ON tokens.player_token = players.player_token
+            LEFT JOIN mmrpg_index_players_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = players.player_class
             WHERE players.player_token <> 'player'
             ORDER BY
+            players.player_class ASC,
             groups.group_order ASC,
             tokens.token_order ASC
             ;", 'player_token');
@@ -190,8 +191,20 @@ class cms_admin {
     // Define a function for collecting the robots index, sorted, for admin use
     public static function get_robots_index(){
         global $db;
-        $mmrpg_robots_fields = rpg_robot::get_index_fields(true);
-        $mmrpg_robots_index = $db->get_array_list("SELECT {$mmrpg_robots_fields} FROM mmrpg_index_robots WHERE robot_token <> 'robot' ORDER BY robot_order ASC", 'robot_token');
+        $mmrpg_robots_fields = rpg_robot::get_index_fields(true, 'robots');
+        $mmrpg_robots_index = $db->get_array_list("SELECT
+            {$mmrpg_robots_fields},
+            groups.group_token AS robot_group,
+            tokens.token_order AS robot_order
+            FROM mmrpg_index_robots AS robots
+            LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
+            LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = robots.robot_class
+            WHERE robots.robot_token <> 'robot'
+            ORDER BY
+            FIELD(robot_class, 'master', 'mecha', 'boss'),
+            groups.group_order ASC,
+            tokens.token_order ASC
+            ;", 'robot_token');
         return $mmrpg_robots_index;
     }
 

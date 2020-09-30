@@ -29,7 +29,6 @@
 
     // Collect indexes for required object types
     $mmrpg_types_index = cms_admin::get_types_index();
-    $mmrpg_robots_index = cms_admin::get_robots_index();
     $mmrpg_abilities_index = cms_admin::get_abilities_index();
     $mmrpg_fields_index = cms_admin::get_fields_index();
     $mmrpg_contributors_index = cms_admin::get_contributors_index('robot');
@@ -112,7 +111,7 @@
     if ($sub_action == 'search'){
 
         // Collect the sorting order and direction
-        $sort_data = array('name' => 'robot_order', 'dir' => 'asc');
+        $sort_data = array('name' => 'robot_id', 'dir' => 'desc');
         if (!empty($_GET['order'])
             && preg_match('/^([-_a-z0-9]+)\:(desc|asc)$/i', $_GET['order'])){
             list($r_name, $r_dir) = explode(':', trim($_GET['order']));
@@ -137,12 +136,16 @@
         /* -- Collect Search Results -- */
 
         // Define the search query to use
-        $temp_robot_fields = rpg_robot::get_index_fields(true, 'robot');
+        $temp_robot_fields = rpg_robot::get_index_fields(true, 'robots');
         $search_query = "SELECT
-            {$temp_robot_fields}
-            FROM mmrpg_index_robots AS robot
+            {$temp_robot_fields},
+            groups.group_token AS robot_group,
+            tokens.token_order AS robot_order
+            FROM mmrpg_index_robots AS robots
+            LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
+            LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = robots.robot_class
             WHERE 1=1
-            AND robot_token <> 'robot'
+            AND robots.robot_token <> 'robot'
             ";
 
         // If the robot ID was provided, we can search by exact match
@@ -158,7 +161,7 @@
             $robot_name = str_replace(array(' ', '*', '%'), '%', $robot_name);
             $robot_name = preg_replace('/%+/', '%', $robot_name);
             $robot_name = '%'.$robot_name.'%';
-            $search_query .= "AND (robot_name LIKE '{$robot_name}' OR robot_token LIKE '{$robot_name}') ";
+            $search_query .= "AND (robot_name LIKE '{$robot_name}' OR robots.robot_token LIKE '{$robot_name}') ";
             $search_results_limit = false;
         }
 
@@ -203,7 +206,7 @@
 
         // If the robot group was provided
         if (!empty($search_data['robot_group'])){
-            $search_query .= "AND robot_group = '{$search_data['robot_group']}' ";
+            $search_query .= "AND groups.group_token = '{$search_data['robot_group']}' ";
             $search_results_limit = false;
         }
 
@@ -240,8 +243,8 @@
         // Append sorting parameters to the end of the query
         $order_by = array();
         if (!empty($sort_data)){ $order_by[] = $sort_data['name'].' '.strtoupper($sort_data['dir']); }
-        $order_by[] = "robot_name ASC";
-        $order_by[] = "robot_id ASC";
+        $order_by[] = "groups.group_order ASC";
+        $order_by[] = "tokens.token_order ASC";
         $order_by_string = implode(', ', $order_by);
         $search_query .= "ORDER BY {$order_by_string} ";
 
@@ -295,8 +298,7 @@
                 'robot_flag_complete' => 0,
                 'robot_flag_published' => 0,
                 'robot_flag_unlockable' => 0,
-                'robot_flag_protected' => 0,
-                'robot_order' => 0
+                'robot_flag_protected' => 0
                 );
 
             // Overwrite temp data with any backup data provided
@@ -335,9 +337,7 @@
             $form_data['robot_gender'] = !empty($_POST['robot_gender']) && preg_match('/^(male|female|other|none)$/', $_POST['robot_gender']) ? trim(strtolower($_POST['robot_gender'])) : '';
 
             $form_data['robot_game'] = !empty($_POST['robot_game']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['robot_game']) ? trim($_POST['robot_game']) : '';
-            $form_data['robot_group'] = !empty($_POST['robot_group']) && preg_match('/^[-_a-z0-9\/]+$/i', $_POST['robot_group']) ? trim($_POST['robot_group']) : '';
             $form_data['robot_number'] = !empty($_POST['robot_number']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['robot_number']) ? trim($_POST['robot_number']) : '';
-            $form_data['robot_order'] = !empty($_POST['robot_order']) && is_numeric($_POST['robot_order']) ? (int)(trim($_POST['robot_order'])) : 0;
 
             $form_data['robot_field'] = !empty($_POST['robot_field']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_field']) ? trim(strtolower($_POST['robot_field'])) : '';
             $form_data['robot_field2'] = !empty($_POST['robot_field2']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_field2']) ? trim(strtolower($_POST['robot_field2'])) : '';
@@ -414,7 +414,6 @@
 
             // VALIDATE all of the SEMI-MANDATORY FIELDS to see if any were not provided and unset them from updating if necessary
             if (!$robot_data_is_new && empty($form_data['robot_game'])){ $form_messages[] = array('warning', 'Source Game was not provided and may cause issues on the front-end'); }
-            if (!$robot_data_is_new && empty($form_data['robot_group'])){ $form_messages[] = array('warning', 'Sorting Group was not provided and may cause issues on the front-end'); }
             if (!$robot_data_is_new && empty($form_data['robot_number'])){ $form_messages[] = array('warning', 'Serial Number was not provided and may cause issues on the front-end'); }
 
             // REFORMAT or OPTIMIZE data for provided fields where necessary
@@ -581,9 +580,7 @@
                 elseif (($bst_split * 4) < $bst){ $form_data['robot_energy'] += ($bst - ($bst_split * 4)); }
 
                 $form_data['robot_game'] = 'MMRPG';
-                $form_data['robot_group'] = 'MMRPG';
                 $form_data['robot_number'] = 'RPG-000';
-                $form_data['robot_order'] = 1 + $db->get_value("SELECT MAX(robot_order) AS max FROM mmrpg_index_robots WHERE robot_class = '{$this_robot_class}';", 'max');
 
                 $temp_json_fields = rpg_robot::get_json_index_fields();
                 foreach ($temp_json_fields AS $field){ $form_data[$field] = !empty($form_data[$field]) ? json_encode($form_data[$field], JSON_NUMERIC_CHECK) : ''; }
@@ -752,7 +749,7 @@
                     <div class="field">
                         <strong class="label">By Group</strong>
                         <select class="select" name="robot_group"><option value=""></option><?
-                            $robot_groups_tokens = $db->get_array_list("SELECT DISTINCT (robot_group) AS group_token FROM mmrpg_index_robots ORDER BY robot_group ASC;");
+                            $robot_groups_tokens = $db->get_array_list("SELECT group_token FROM mmrpg_index_robots_groups AS groups WHERE group_class = '{$this_robot_class}' ORDER BY group_order ASC;");
                             foreach ($robot_groups_tokens AS $group_key => $group_info){
                                 $group_token = $group_info['group_token'];
                                 ?><option value="<?= $group_token ?>"<?= !empty($search_data['robot_group']) && $search_data['robot_group'] === $group_token ? ' selected="selected"' : '' ?>><?= $group_token ?></option><?
@@ -1117,18 +1114,6 @@
                                         </div>
                                         <?
                                     } ?>
-
-                                    <hr />
-
-                                    <div class="field">
-                                        <strong class="label">Sort Group</strong>
-                                        <input class="textbox" type="text" name="robot_group" value="<?= $robot_data['robot_group'] ?>" maxlength="64" />
-                                    </div>
-
-                                    <div class="field">
-                                        <strong class="label">Sort Order</strong>
-                                        <input class="textbox" type="number" name="robot_order" value="<?= $robot_data['robot_order'] ?>" maxlength="8" />
-                                    </div>
 
                                 <? } ?>
 

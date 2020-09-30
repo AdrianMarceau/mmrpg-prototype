@@ -304,7 +304,7 @@
             $form_data['player_token'] = !empty($_POST['player_token']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['player_token']) ? trim(strtolower($_POST['player_token'])) : '';
             $form_data['player_name'] = !empty($_POST['player_name']) && preg_match('/^[-_0-9a-z\.\*\s]+$/i', $_POST['player_name']) ? trim($_POST['player_name']) : '';
             $form_data['player_name_full'] = !empty($_POST['player_name_full']) && preg_match('/^[-_0-9a-z\.\*\s]+$/i', $_POST['player_name_full']) ? trim($_POST['player_name_full']) : '';
-            $form_data['player_class'] = 'master'; //!empty($_POST['player_class']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['player_class']) ? trim(strtolower($_POST['player_class'])) : '';
+            $form_data['player_class'] = 'player'; //!empty($_POST['player_class']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['player_class']) ? trim(strtolower($_POST['player_class'])) : '';
             $form_data['player_gender'] = !empty($_POST['player_gender']) && preg_match('/^(male|female|other|none)$/', $_POST['player_gender']) ? trim(strtolower($_POST['player_gender'])) : '';
             $form_data['player_type'] = !empty($_POST['player_type']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['player_type']) ? trim(strtolower($_POST['player_type'])) : '';
             $form_data['player_game'] = !empty($_POST['player_game']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['player_game']) ? trim($_POST['player_game']) : '';
@@ -851,16 +851,24 @@
             $ability_options_markup = implode(PHP_EOL, $ability_options_markup);
 
             // Pre-generate a list of all robots so we can re-use it over and over
+            $last_option_group = false;
             $robot_options_markup = array();
             $robot_options_markup[] = '<option value="">-</option>';
             foreach ($mmrpg_robots_index AS $robot_token => $robot_info){
                 if ($robot_info['robot_class'] === 'mecha' && $player_data['player_class'] !== 'mecha'){ continue; }
                 elseif ($robot_info['robot_class'] === 'boss' && $player_data['player_class'] !== 'boss'){ continue; }
+                $class_group = (ucfirst($robot_info['robot_class']).(substr($robot_info['robot_class'], -2, 2) === 'ss' ? 'es' : 's')).' | '.$robot_info['robot_group'];
+                if ($last_option_group !== $class_group){
+                    if (!empty($last_option_group)){ $robot_options_markup[] = '</optgroup>'; }
+                    $last_option_group = $class_group;
+                    $robot_options_markup[] = '<optgroup label="'.$class_group.'">';
+                }
                 $robot_name = $robot_info['robot_name'];
                 $robot_cores = ucwords(implode(' / ', array_values(array_filter(array($robot_info['robot_core'], $robot_info['robot_core2'])))));
                 if (empty($robot_cores)){ $robot_cores = 'Neutral'; }
                 $robot_options_markup[] = '<option value="'.$robot_token.'">'.$robot_name.' ('.$robot_cores.')</option>';
             }
+            if (!empty($last_option_group)){ $robot_options_markup[] = '</optgroup>'; }
             $robot_options_count = count($robot_options_markup);
             $robot_options_markup = implode(PHP_EOL, $robot_options_markup);
 
@@ -895,10 +903,7 @@
 
                         // If the player is published, generate and display a preview link
                         if (!empty($player_data['player_flag_published'])){
-                            $preview_link = 'database/';
-                            if ($player_data['player_class'] === 'master'){ $preview_link .= 'players/'; }
-                            elseif ($player_data['player_class'] === 'mecha'){ $preview_link .= 'mechas/'; }
-                            elseif ($player_data['player_class'] === 'boss'){ $preview_link .= 'bosses/'; }
+                            $preview_link = 'database/players/';
                             $preview_link .= $player_data['player_token'].'/';
                             echo '<a class="view" href="'.$preview_link.'" target="_blank">View <i class="fas fa-external-link-square-alt"></i></a>'.PHP_EOL;
                             echo '<a class="preview" href="'.$preview_link.'preview=true" target="_blank">Preview <i class="fas fa-external-link-square-alt"></i></a>'.PHP_EOL;
@@ -1147,7 +1152,7 @@
 
                                     ?>
 
-                                    <? $placeholder_folder = $player_data['player_class'] != 'master' ? $player_data['player_class'] : 'player'; ?>
+                                    <? $placeholder_folder = 'player'; ?>
                                     <div class="field halfsize">
                                         <div class="label">
                                             <strong>Sprite Path</strong>

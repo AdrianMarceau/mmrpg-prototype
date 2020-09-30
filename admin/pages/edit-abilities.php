@@ -428,7 +428,8 @@
                 if (!$ability_speed2_defined){ $form_data['ability_speed2'] = $form_data['ability_speed']; }
 
                 if (!empty($form_data['ability_master'])){
-                    $ability_master_info = $mmrpg_robots_index[$form_data['ability_master']];
+                    $master_token = $form_data['ability_master'];
+                    $ability_master_info = $mmrpg_robots_index[$master_token];
                     $form_data['ability_number'] = $ability_master_info['robot_number'];
                 } else {
                     $form_data['ability_master'] = '';
@@ -1095,13 +1096,14 @@
                                         <select class="select" name="ability_master">
                                             <?
                                             echo('<option value=""'.(empty($ability_data['ability_master']) ? 'selected="selected"' : '').'>- none -</option>');
-                                            $last_robot_group = '';
+                                            $last_option_group = false;
                                             foreach ($mmrpg_robots_index AS $robot_token => $robot_info){
                                                 if ($robot_info['robot_class'] !== $this_ability_class){ continue; }
-                                                if ($last_robot_group !== $robot_info['robot_game']){
-                                                    if (!empty($last_robot_group)){ echo('</optgroup>'.PHP_EOL); }
-                                                    $last_robot_group = $robot_info['robot_game'];
-                                                    echo('<optgroup label="'.$last_robot_group.' '.ucfirst($this_ability_xclass).'">'.PHP_EOL);
+                                                $class_group = (ucfirst($robot_info['robot_class']).(substr($robot_info['robot_class'], -2, 2) === 'ss' ? 'es' : 's')).' | '.$robot_info['robot_group'];
+                                                if ($last_option_group !== $class_group){
+                                                    if (!empty($last_option_group)){ $robot_options_markup[] = '</optgroup>'; }
+                                                    $last_option_group = $class_group;
+                                                    echo('<optgroup label="'.$class_group.'">');
                                                 }
                                                 $types = !empty($robot_info['robot_core']) ? ucfirst($robot_info['robot_core']) : 'Neutral';
                                                 if (!empty($robot_info['robot_core']) && !empty($robot_info['robot_core2'])){ $types .= ' / '.ucfirst($robot_info['robot_core2']); }
@@ -1109,7 +1111,7 @@
                                                 $selected = !empty($ability_data['ability_master']) && $ability_data['ability_master'] == $robot_token ? 'selected="selected"' : '';
                                                 echo('<option value="'.$robot_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
                                             }
-                                            if (!empty($last_robot_group)){ echo('</optgroup>'.PHP_EOL); }
+                                            if (!empty($last_option_group)){ echo('</optgroup>'.PHP_EOL); }
                                             ?>
                                         </select><span></span>
                                     </div>

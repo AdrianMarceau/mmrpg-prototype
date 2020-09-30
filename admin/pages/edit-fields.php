@@ -925,23 +925,24 @@
                                 <?
 
                                 // Pre-generate a list of all robots so we can re-use it over and over
-                                $temp_class_group = '';
+                                $last_option_group = false;
                                 $robot_options_markup = array();
                                 $robot_options_markup[] = '<option value="">-</option>';
                                 foreach ($mmrpg_robots_index AS $robot_token => $robot_info){
                                     if ($field_data['field_class'] === 'master' && $robot_info['robot_class'] !== 'master'){ continue; }
                                     elseif ($field_data['field_class'] !== 'master' && $robot_info['robot_class'] === 'mecha'){ continue; }
-                                    if ($temp_class_group !== $robot_info['robot_class']){
-                                        if (!empty($temp_class_group)){ $robot_options_markup[] = '</optgroup>'; }
-                                        $temp_class_group = $robot_info['robot_class'];
-                                        $robot_options_markup[] = '<optgroup label="'.ucfirst($temp_class_group).(substr($temp_class_group, -1, 1) === 's' ? 'es' : 's').'">';
+                                    $class_group = (ucfirst($robot_info['robot_class']).(substr($robot_info['robot_class'], -2, 2) === 'ss' ? 'es' : 's')).' | '.$robot_info['robot_group'];
+                                    if ($last_option_group !== $class_group){
+                                        if (!empty($last_option_group)){ $robot_options_markup[] = '</optgroup>'; }
+                                        $last_option_group = $class_group;
+                                        $robot_options_markup[] = '<optgroup label="'.$class_group.'">';
                                     }
                                     $robot_name = $robot_info['robot_name'];
                                     $robot_cores = ucwords(implode(' / ', array_values(array_filter(array($robot_info['robot_core'], $robot_info['robot_core2'])))));
                                     if (empty($robot_cores)){ $robot_cores = 'Neutral'; }
                                     $robot_options_markup[] = '<option value="'.$robot_token.'">'.$robot_name.' ('.$robot_cores.')</option>';
                                 }
-                                if (!empty($temp_class_group)){ $robot_options_markup[] = '</optgroup>'; }
+                                if (!empty($last_option_group)){ $robot_options_markup[] = '</optgroup>'; }
                                 $robot_options_count = count($robot_options_markup);
                                 $robot_options_markup = implode(PHP_EOL, $robot_options_markup);
 
@@ -972,22 +973,23 @@
                                     <?
 
                                     // Pre-generate a list of all mechas so we can re-use it over and over
-                                    $temp_class_group = '';
+                                    $last_option_group = false;
                                     $mecha_options_markup = array();
                                     $mecha_options_markup[] = '<option value="">-</option>';
                                     foreach ($mmrpg_robots_index AS $robot_token => $robot_info){
                                         if ($robot_info['robot_class'] !== 'mecha'){ continue; }
-                                        if ($temp_class_group !== $robot_info['robot_class']){
-                                            if (!empty($temp_class_group)){ $mecha_options_markup[] = '</optgroup>'; }
-                                            $temp_class_group = $robot_info['robot_class'];
-                                            $mecha_options_markup[] = '<optgroup label="'.ucfirst($temp_class_group).(substr($temp_class_group, -1, 1) === 's' ? 'es' : 's').'">';
+                                        $class_group = (ucfirst($robot_info['robot_class']).(substr($robot_info['robot_class'], -2, 2) === 'ss' ? 'es' : 's')).' | '.$robot_info['robot_group'];
+                                        if ($last_option_group !== $class_group){
+                                            if (!empty($last_option_group)){ $mecha_options_markup[] = '</optgroup>'; }
+                                            $last_option_group = $class_group;
+                                            $mecha_options_markup[] = '<optgroup label="'.$class_group.'">';
                                         }
                                         $robot_name = $robot_info['robot_name'];
                                         $robot_cores = ucwords(implode(' / ', array_values(array_filter(array($robot_info['robot_core'], $robot_info['robot_core2'])))));
                                         if (empty($robot_cores)){ $robot_cores = 'Neutral'; }
                                         $mecha_options_markup[] = '<option value="'.$robot_token.'">'.$robot_name.' ('.$robot_cores.')</option>';
                                     }
-                                    if (!empty($temp_class_group)){ $mecha_options_markup[] = '</optgroup>'; }
+                                    if (!empty($last_option_group)){ $mecha_options_markup[] = '</optgroup>'; }
                                     $robot_options_count = count($mecha_options_markup);
                                     $mecha_options_markup = implode(PHP_EOL, $mecha_options_markup);
 
