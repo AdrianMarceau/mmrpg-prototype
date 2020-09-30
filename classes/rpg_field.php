@@ -157,7 +157,7 @@ class rpg_field extends rpg_object {
      * @param bool $implode
      * @return mixed
      */
-    public static function get_index_fields($implode = false){
+    public static function get_index_fields($implode = false, $table = ''){
 
         // Define the various index fields for field objects
         $index_fields = array(
@@ -193,6 +193,13 @@ class rpg_field extends rpg_object {
             'field_flag_protected',
             'field_order'
             );
+
+        // Add table name to each field string if requested
+        if (!empty($table)){
+            foreach ($index_fields AS $key => $field){
+                $index_fields[$key] = $table.'.'.$field;
+            }
+        }
 
         // Implode the index fields into a string if requested
         if ($implode){

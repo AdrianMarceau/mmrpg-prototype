@@ -1721,7 +1721,7 @@ class rpg_player extends rpg_object {
      * @param bool $implode
      * @return mixed
      */
-    public static function get_index_fields($implode = false){
+    public static function get_index_fields($implode = false, $table = ''){
 
         // Define the various index fields for player objects
         $index_fields = array(
@@ -1766,6 +1766,13 @@ class rpg_player extends rpg_object {
             'player_flag_protected',
             'player_order'
             );
+
+        // Add table name to each field string if requested
+        if (!empty($table)){
+            foreach ($index_fields AS $key => $field){
+                $index_fields[$key] = $table.'.'.$field;
+            }
+        }
 
         // Implode the index fields into a string if requested
         if ($implode){
