@@ -749,7 +749,7 @@
                     <div class="field">
                         <strong class="label">By Group</strong>
                         <select class="select" name="robot_group"><option value=""></option><?
-                            $robot_groups_tokens = $db->get_array_list("SELECT group_token FROM mmrpg_index_robots_groups AS groups WHERE group_class = '{$this_robot_class}' ORDER BY group_order ASC;");
+                            $robot_groups_tokens = $db->get_array_list("SELECT group_token FROM mmrpg_index_robots_groups WHERE group_class = '{$this_robot_class}' ORDER BY group_order ASC;");
                             foreach ($robot_groups_tokens AS $group_key => $group_info){
                                 $group_token = $group_info['group_token'];
                                 ?><option value="<?= $group_token ?>"<?= !empty($search_data['robot_group']) && $search_data['robot_group'] === $group_token ? ' selected="selected"' : '' ?>><?= $group_token ?></option><?
@@ -1242,37 +1242,51 @@
                                     $global_ability_tokens = rpg_ability::get_global_abilities();
 
                                     // Pre-generate a list of all abilities so we can re-use it over and over
+                                    $last_option_group = false;
                                     $ability_options_markup = array();
                                     $ability_options_markup[] = '<option value="">-</option>';
-                                    $class_order = array('mecha', 'boss', 'master');
-                                    uasort($mmrpg_abilities_index, function($a1, $a2) use($class_order){
-                                        $a1co = array_search($a1['ability_class'], $class_order);
-                                        $a2co = array_search($a2['ability_class'], $class_order);
-                                        $a1t = $a1['ability_token'];
-                                        $a2t = $a2['ability_token'];
-                                        if ($a1co < $a2co){ return -1; }
-                                        elseif ($a1co > $a2co){ return 1; }
-                                        elseif ($a1t < $a2t){ return -1; }
-                                        elseif ($a1t > $a2t){ return 1; }
-                                        else { return 0; }
-                                        });
-                                    $last_class = false;
+
+                                    $levelup_last_option_group = false;
+                                    $levelup_ability_options_markup = array();
+                                    $levelup_ability_options_markup[] = '<option value="">-</option>';
+
                                     foreach ($mmrpg_abilities_index AS $ability_token => $ability_info){
                                         if ($ability_info['ability_class'] === 'mecha' && $robot_data['robot_class'] !== 'mecha'){ continue; }
                                         elseif ($ability_info['ability_class'] === 'boss' && $robot_data['robot_class'] !== 'boss'){ continue; }
-                                        if ($ability_info['ability_class'] !== $last_class){
-                                            if (!empty($last_class)){ $ability_options_markup[] = '</optgroup>'; }
-                                            $last_class = $ability_info['ability_class'];
-                                            $ability_options_markup[] = '<optgroup label="'.ucfirst($last_class).' Abilities">';
-                                        }
+
+                                        $option_group = $robot_data['robot_class'] !== 'master' ? ucfirst($ability_info['ability_class']).' | ' : '';
+                                        $option_group .= str_replace('/', ' | ', $ability_info['ability_group']);
                                         $ability_name = $ability_info['ability_name'];
                                         $ability_types = ucwords(implode(' / ', array_values(array_filter(array($ability_info['ability_type'], $ability_info['ability_type2'])))));
                                         if (empty($ability_types)){ $ability_types = 'Neutral'; }
-                                        $ability_options_markup[] = '<option value="'.$ability_token.'">'.$ability_name.' ('.$ability_types.')</option>';
+                                        $option_markup = '<option value="'.$ability_token.'">'.$ability_name.' ('.$ability_types.')</option>';
+
+                                        if ($last_option_group !== $option_group){
+                                            if (!empty($last_option_group)){ $ability_options_markup[] = '</optgroup>'; }
+                                            $last_option_group = $option_group;
+                                            $ability_options_markup[] = '<optgroup label="'.$option_group.'">';
+                                        }
+                                        $ability_options_markup[] = $option_markup;
+
+                                        $levelup_compatible = false;
+                                        if ($robot_data['robot_class'] === 'boss' && $ability_info['ability_class'] !== 'mecha'){ $levelup_compatible = true; }
+                                        elseif ($ability_info['ability_class'] === $robot_data['robot_class']){ $levelup_compatible = true; }
+                                        if ($levelup_compatible){
+                                            if ($levelup_last_option_group !== $option_group){
+                                                if (!empty($levelup_last_option_group)){ $levelup_ability_options_markup[] = '</optgroup>'; }
+                                                $levelup_last_option_group = $option_group;
+                                                $levelup_ability_options_markup[] = '<optgroup label="'.$option_group.'">';
+                                            }
+                                            $levelup_ability_options_markup[] = $option_markup;
+                                        }
+
                                     }
-                                    if (!empty($last_class)){ $ability_options_markup[] = '</optgroup>'; }
+
+                                    if (!empty($last_option_group)){ $ability_options_markup[] = '</optgroup>'; }
                                     $ability_options_markup = implode(PHP_EOL, $ability_options_markup);
 
+                                    if (!empty($levelup_last_option_group)){ $levelup_ability_options_markup[] = '</optgroup>'; }
+                                    $levelup_ability_options_markup = implode(PHP_EOL, $levelup_ability_options_markup);
                                     ?>
 
                                     <div class="field fullsize multirow">
@@ -1292,7 +1306,7 @@
                                             <div class="subfield levelup">
                                                 <input class="textarea" type="number" name="robot_abilities_rewards[<?= $i ?>][level]" value="<?= $current_value_level ?>" maxlength="3" placeholder="0" />
                                                 <select class="select" name="robot_abilities_rewards[<?= $i ?>][token]">
-                                                    <?= str_replace('value="'.$current_value_token.'"', 'value="'.$current_value_token.'" selected="selected"', $ability_options_markup) ?>
+                                                    <?= str_replace('value="'.$current_value_token.'"', 'value="'.$current_value_token.'" selected="selected"', $levelup_ability_options_markup) ?>
                                                 </select><span></span>
                                             </div>
                                             <?

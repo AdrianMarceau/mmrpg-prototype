@@ -150,15 +150,16 @@
     $music_options_markup = implode(PHP_EOL, $music_options_markup);
 
     // Pre-generate a list of all abilities so we can re-use it over and over
+    $last_option_group = false;
     $ability_options_count = 0;
-    $ability_options_group = '';
     $ability_options_markup = array();
     $ability_options_markup[] = '<option value="">-</option>';
     foreach ($mmrpg_abilities_index AS $ability_token => $ability_info){
-        if ($ability_info['ability_class'] != $ability_options_group){
-            if (!empty($ability_options_group)){ $ability_options_markup[] = '</optgroup>'; }
-            $ability_options_group = $ability_info['ability_class'];
-            $ability_options_markup[] = '<optgroup label="'.ucfirst($ability_info['ability_class']).' Abilities">';
+        $class_group = ucfirst($ability_info['ability_class']).' | '.str_replace('/', ' | ', $ability_info['ability_group']);
+        if ($last_option_group !== $class_group){
+            if (!empty($last_option_group)){ $ability_options_markup[] = '</optgroup>'; }
+            $last_option_group = $class_group;
+            $ability_options_markup[] = '<optgroup label="'.$class_group.'">';
         }
         $ability_name = $ability_info['ability_name'];
         $ability_types = ucwords(implode(' / ', array_values(array_filter(array($ability_info['ability_type'], $ability_info['ability_type2'])))));
@@ -166,7 +167,7 @@
         $ability_options_markup[] = '<option value="'.$ability_token.'">'.$ability_name.' ('.$ability_types.')</option>';
         $ability_options_count++;
     }
-    if (!empty($ability_options_group)){ $ability_options_markup[] = '</optgroup>'; }
+    if (!empty($last_option_group)){ $ability_options_markup[] = '</optgroup>'; }
     $ability_options_markup = implode(PHP_EOL, $ability_options_markup);
 
     // Pre-generate a list of all items so we can re-use it over and over

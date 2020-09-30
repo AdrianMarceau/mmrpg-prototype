@@ -211,8 +211,21 @@ class cms_admin {
     // Define a function for collecting the abilities index, sorted, for admin use
     public static function get_abilities_index(){
         global $db;
-        $mmrpg_abilities_fields = rpg_ability::get_index_fields(true);
-        $mmrpg_abilities_index = $db->get_array_list("SELECT {$mmrpg_abilities_fields} FROM mmrpg_index_abilities WHERE ability_token <> 'ability' AND ability_class <> 'system' ORDER BY ability_order ASC", 'ability_token');
+        $mmrpg_abilities_fields = rpg_ability::get_index_fields(true, 'abilities');
+        $mmrpg_abilities_index = $db->get_array_list("
+            SELECT
+            {$mmrpg_abilities_fields},
+            groups.group_token AS ability_group,
+            tokens.token_order AS ability_order
+            FROM mmrpg_index_abilities AS abilities
+            LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
+            LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = abilities.ability_class
+            WHERE abilities.ability_token <> 'ability' AND abilities.ability_class <> 'system'
+            ORDER BY
+            FIELD(ability_class, 'master', 'mecha', 'boss'),
+            groups.group_order ASC,
+            tokens.token_order ASC
+            ;", 'ability_token');
         return $mmrpg_abilities_index;
     }
 

@@ -836,17 +836,25 @@
             $global_ability_tokens = rpg_ability::get_global_abilities();
 
             // Pre-generate a list of all abilities so we can re-use it over and over
+            $last_option_group = false;
             $ability_options_markup = array();
             $ability_options_markup[] = '<option value="">-</option>';
             foreach ($mmrpg_abilities_index AS $ability_token => $ability_info){
                 //if (in_array($ability_token, $global_ability_tokens)){ continue; }
-                if ($ability_info['ability_class'] === 'mecha' && $player_data['player_class'] !== 'mecha'){ continue; }
-                elseif ($ability_info['ability_class'] === 'boss' && $player_data['player_class'] !== 'boss'){ continue; }
+                if ($ability_info['ability_class'] !== 'master'){ continue; }
+                //$option_group = ucfirst($ability_info['ability_class']).' | '.str_replace('/', ' | ', $ability_info['ability_group']);
+                $option_group = str_replace('/', ' | ', $ability_info['ability_group']);
+                if ($last_option_group !== $option_group){
+                    if (!empty($last_option_group)){ $ability_options_markup[] = '</optgroup>'; }
+                    $last_option_group = $option_group;
+                    $ability_options_markup[] = '<optgroup label="'.$option_group.'">';
+                }
                 $ability_name = $ability_info['ability_name'];
                 $ability_types = ucwords(implode(' / ', array_values(array_filter(array($ability_info['ability_type'], $ability_info['ability_type2'])))));
                 if (empty($ability_types)){ $ability_types = 'Neutral'; }
                 $ability_options_markup[] = '<option value="'.$ability_token.'">'.$ability_name.' ('.$ability_types.')</option>';
             }
+            if (!empty($last_option_group)){ $ability_options_markup[] = '</optgroup>'; }
             $ability_options_count = count($ability_options_markup);
             $ability_options_markup = implode(PHP_EOL, $ability_options_markup);
 

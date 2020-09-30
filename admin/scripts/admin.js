@@ -876,7 +876,7 @@ $(document).ready(function(){
             var newOptions = '<option value="">-</option>';
             var mmrpgAbilityTokens = Object.keys(window.mmrpgAbilitiesIndex);
             if (mmrpgAbilityTokens.length){
-                var optionsGroup = '';
+                var lastOptionsGroup = '';
                 for (var i = 0; i < mmrpgAbilityTokens.length; i++){
                     var abilityToken = mmrpgAbilityTokens[i];
                     var abilityInfo = window.mmrpgAbilitiesIndex[abilityToken];
@@ -888,17 +888,20 @@ $(document).ready(function(){
                     if (abilityInfo['ability_class'] == 'mecha' && robotInfo['robot_class'] != 'mecha'){ var abilityIsCompatible = false; }
                     else if (abilityInfo['ability_class'] == 'boss' && robotInfo['robot_class'] != 'boss'){ var abilityIsCompatible = false; }
                     else { var abilityIsCompatible = robotHasCompatibility(robotToken, abilityToken, robotItem); }
-                    if (!abilityIsCompatible){ continue; }
-                    if (abilityInfo['ability_class'] != optionsGroup){
-                        if (optionsGroup.length){ newOptions += '</optgroup>'; }
-                        optionsGroup = abilityInfo['ability_class'];
-                        newOptions += '<optgroup label="'+ upperCaseFirst(abilityInfo['ability_class']) +' Abilities">';
+                    var abilityIsComplete = parseInt(abilityInfo['ability_flag_complete']) === 1 ? true : false;
+                    if (!abilityIsCompatible || !abilityIsComplete){ continue; }
+                    //var optionsGroup = upperCaseFirst(abilityInfo['ability_class'])+' | '+abilityInfo['ability_group'];
+                    var optionsGroup = upperCaseFirst(abilityInfo['ability_class'])+' | '+(abilityInfo['ability_group'].split('/').slice(0, 2).join(' | '));
+                    if (lastOptionsGroup !== optionsGroup){
+                        if (lastOptionsGroup.length){ newOptions += '</optgroup>'; }
+                        lastOptionsGroup = optionsGroup;
+                        newOptions += '<optgroup label="'+ optionsGroup +'">';
                     }
-                    newOptions += '<option value="'+ abilityToken +'"'+ (!abilityIsCompatible ? 'disabled="disabled"' : '') +'>';
+                    newOptions += '<option value="'+ abilityToken +'"'+ (!abilityIsCompatible || !abilityIsComplete ? 'disabled="disabled"' : '') +'>';
                         newOptions += abilityName +' ('+ abilityTypes  +')';
                     newOptions += '</option>';
                     }
-                if (optionsGroup.length){ newOptions += '</optgroup>'; }
+                if (lastOptionsGroup.length){ newOptions += '</optgroup>'; }
                 }
             $abilitySelects.each(function(){
                 $abilitySelect = $(this);

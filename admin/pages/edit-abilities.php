@@ -45,7 +45,6 @@
     // Collect indexes for required object types
     $mmrpg_types_index = cms_admin::get_types_index();
     $mmrpg_robots_index = cms_admin::get_robots_index();
-    $mmrpg_abilities_index = cms_admin::get_abilities_index();
     $mmrpg_fields_index = cms_admin::get_fields_index();
     $mmrpg_contributors_index = cms_admin::get_contributors_index('ability');
 
@@ -127,7 +126,7 @@
     if ($sub_action == 'search'){
 
         // Collect the sorting order and direction
-        $sort_data = array('name' => 'ability_order', 'dir' => 'asc');
+        $sort_data = array('name' => 'ability_id', 'dir' => 'desc');
         if (!empty($_GET['order'])
             && preg_match('/^([-_a-z0-9]+)\:(desc|asc)$/i', $_GET['order'])){
             list($r_name, $r_dir) = explode(':', trim($_GET['order']));
@@ -151,12 +150,16 @@
         /* -- Collect Search Results -- */
 
         // Define the search query to use
-        $temp_ability_fields = rpg_ability::get_index_fields(true, 'ability');
+        $temp_ability_fields = rpg_ability::get_index_fields(true, 'abilities');
         $search_query = "SELECT
-            {$temp_ability_fields}
-            FROM mmrpg_index_abilities AS ability
+            {$temp_ability_fields},
+            groups.group_token AS ability_group,
+            tokens.token_order AS ability_order
+            FROM mmrpg_index_abilities AS abilities
+            LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
+            LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = abilities.ability_class
             WHERE 1=1
-            AND ability_token <> 'ability'
+            AND abilities.ability_token <> 'ability'
             ";
 
         // If the ability ID was provided, we can search by exact match
@@ -213,7 +216,7 @@
 
         // If the ability group was provided
         if (!empty($search_data['ability_group'])){
-            $search_query .= "AND ability_group = '{$search_data['ability_group']}' ";
+            $search_query .= "AND groups.group_token = '{$search_data['ability_group']}' ";
             $search_results_limit = false;
         }
 
@@ -244,8 +247,8 @@
         // Append sorting parameters to the end of the query
         $order_by = array();
         if (!empty($sort_data)){ $order_by[] = $sort_data['name'].' '.strtoupper($sort_data['dir']); }
-        $order_by[] = "ability_name ASC";
-        $order_by[] = "ability_id ASC";
+        $order_by[] = "groups.group_order ASC";
+        $order_by[] = "tokens.token_order ASC";
         $order_by_string = implode(', ', $order_by);
         $search_query .= "ORDER BY {$order_by_string} ";
 
@@ -300,8 +303,7 @@
                 'ability_flag_complete' => 0,
                 'ability_flag_published' => 0,
                 'ability_flag_unlockable' => 0,
-                'ability_flag_protected' => 0,
-                'ability_order' => 0
+                'ability_flag_protected' => 0
                 );
 
             // Overwrite temp data with any backup data provided
@@ -343,8 +345,6 @@
 
             $form_data['ability_game'] = !empty($_POST['ability_game']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['ability_game']) ? trim($_POST['ability_game']) : '';
             $form_data['ability_master'] = !empty($_POST['ability_master']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['ability_master']) ? trim($_POST['ability_master']) : '';
-            $form_data['ability_group'] = !empty($_POST['ability_group']) && preg_match('/^[-_a-z0-9\/]+$/i', $_POST['ability_group']) ? trim($_POST['ability_group']) : '';
-            $form_data['ability_order'] = !empty($_POST['ability_order']) && is_numeric($_POST['ability_order']) ? (int)(trim($_POST['ability_order'])) : 0;
 
             $form_data['ability_energy'] = !empty($_POST['ability_energy']) && is_numeric($_POST['ability_energy']) ? (int)(trim($_POST['ability_energy'])) : 0;
             $form_data['ability_energy_percent'] = isset($_POST['ability_energy_percent']) && is_numeric($_POST['ability_energy_percent']) ? (int)(trim($_POST['ability_energy_percent'])) : 0;
@@ -403,7 +403,6 @@
             // VALIDATE all of the SEMI-MANDATORY FIELDS to see if any were not provided and unset them from updating if necessary
             if (!$ability_data_is_new && empty($form_data['ability_game'])){ $form_messages[] = array('warning', 'Source Game was not provided and may cause issues on the front-end'); }
             //if (empty($form_data['ability_master'])){ $form_messages[] = array('warning', 'Source Robot was not provided and may cause issues on the front-end'); }
-            if (!$ability_data_is_new && empty($form_data['ability_group'])){ $form_messages[] = array('warning', 'Sorting Group was not provided and may cause issues on the front-end'); }
 
             // REFORMAT or OPTIMIZE data for provided fields where necessary
 
@@ -505,8 +504,6 @@
                 $form_data['ability_accuracy'] = 100;
 
                 $form_data['ability_game'] = 'MMRPG';
-                $form_data['ability_group'] = 'MMRPG/Weapons/Misc';
-                $form_data['ability_order'] = 1 + $db->get_value("SELECT MAX(ability_order) AS max FROM mmrpg_index_abilities WHERE ability_class = '{$this_ability_class}';", 'max');
 
                 $temp_json_fields = rpg_ability::get_json_index_fields();
                 foreach ($temp_json_fields AS $field){ $form_data[$field] = !empty($form_data[$field]) ? json_encode($form_data[$field], JSON_NUMERIC_CHECK) : ''; }
@@ -697,7 +694,7 @@
                     <div class="field">
                         <strong class="label">By Group</strong>
                         <select class="select" name="ability_group"><option value=""></option><?
-                            $ability_groups_tokens = $db->get_array_list("SELECT DISTINCT (ability_group) AS group_token FROM mmrpg_index_abilities ORDER BY ability_group ASC;");
+                            $ability_groups_tokens = $db->get_array_list("SELECT group_token FROM mmrpg_index_abilities_groups WHERE group_class = '{$this_ability_class}' ORDER BY group_order ASC;");
                             foreach ($ability_groups_tokens AS $group_key => $group_info){
                                 $group_token = $group_info['group_token'];
                                 ?><option value="<?= $group_token ?>"<?= !empty($search_data['ability_group']) && $search_data['ability_group'] === $group_token ? ' selected="selected"' : '' ?>><?= $group_token ?></option><?
@@ -1114,16 +1111,6 @@
                                             if (!empty($last_option_group)){ echo('</optgroup>'.PHP_EOL); }
                                             ?>
                                         </select><span></span>
-                                    </div>
-
-                                    <div class="field foursize">
-                                        <strong class="label">Sort Group</strong>
-                                        <input class="textbox" type="text" name="ability_group" value="<?= $ability_data['ability_group'] ?>" maxlength="64" />
-                                    </div>
-
-                                    <div class="field foursize">
-                                        <strong class="label">Sort Order</strong>
-                                        <input class="textbox" type="number" name="ability_order" value="<?= $ability_data['ability_order'] ?>" maxlength="8" />
                                     </div>
 
                                 <? } ?>
