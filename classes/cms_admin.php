@@ -171,8 +171,19 @@ class cms_admin {
     // Define a function for collecting the players index, sorted, for admin use
     public static function get_players_index(){
         global $db;
-        $mmrpg_players_fields = rpg_player::get_index_fields(true);
-        $mmrpg_players_index = $db->get_array_list("SELECT {$mmrpg_players_fields} FROM mmrpg_index_players WHERE player_token <> 'player' ORDER BY player_order ASC", 'player_token');
+        $mmrpg_players_fields = rpg_player::get_index_fields(true, 'players');
+        $mmrpg_players_index = $db->get_array_list("SELECT
+            {$mmrpg_players_fields},
+            groups.group_token AS player_group,
+            tokens.token_order AS player_order
+            FROM mmrpg_index_players AS players
+            LEFT JOIN mmrpg_index_players_groups AS groups ON groups.group_class = players.player_class
+            LEFT JOIN mmrpg_index_players_groups_tokens AS tokens ON tokens.group_token = groups.group_token
+            WHERE players.player_token <> 'player'
+            ORDER BY
+            groups.group_order ASC,
+            tokens.token_order ASC
+            ;", 'player_token');
         return $mmrpg_players_index;
     }
 

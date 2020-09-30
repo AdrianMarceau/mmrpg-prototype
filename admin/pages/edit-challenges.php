@@ -24,7 +24,6 @@
 
     // Collect indexes for required object types
     $mmrpg_types_index = cms_admin::get_types_index();
-    $mmrpg_players_index = cms_admin::get_players_index();
     $mmrpg_robots_index = cms_admin::get_robots_index();
     $mmrpg_abilities_index = cms_admin::get_abilities_index();
     $mmrpg_items_index = cms_admin::get_items_index();

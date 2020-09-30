@@ -13,7 +13,6 @@
 
     // Collect indexes for required object types
     $mmrpg_types_index = cms_admin::get_types_index();
-    $mmrpg_players_index = cms_admin::get_players_index();
     $mmrpg_robots_index = cms_admin::get_robots_index();
     $mmrpg_abilities_index = cms_admin::get_abilities_index();
     $mmrpg_fields_index = cms_admin::get_fields_index();
@@ -109,7 +108,6 @@
         $search_data['player_class'] = !empty($_GET['player_class']) && preg_match('/[-_0-9a-z]+/i', $_GET['player_class']) ? trim(strtolower($_GET['player_class'])) : '';
         $search_data['player_flavour'] = !empty($_GET['player_flavour']) && preg_match('/[-_0-9a-z\.\*\s\{\}]+/i', $_GET['player_flavour']) ? trim($_GET['player_flavour']) : '';
         $search_data['player_game'] = !empty($_GET['player_game']) && preg_match('/[-_0-9a-z]+/i', $_GET['player_game']) ? trim(strtoupper($_GET['player_game'])) : '';
-        $search_data['player_group'] = !empty($_GET['player_group']) && preg_match('/[-_0-9a-z\/]+/i', $_GET['player_group']) ? trim($_GET['player_group']) : '';
         $search_data['player_flag_hidden'] = isset($_GET['player_flag_hidden']) && $_GET['player_flag_hidden'] !== '' ? (!empty($_GET['player_flag_hidden']) ? 1 : 0) : '';
         $search_data['player_flag_complete'] = isset($_GET['player_flag_complete']) && $_GET['player_flag_complete'] !== '' ? (!empty($_GET['player_flag_complete']) ? 1 : 0) : '';
         $search_data['player_flag_unlockable'] = isset($_GET['player_flag_unlockable']) && $_GET['player_flag_unlockable'] !== '' ? (!empty($_GET['player_flag_unlockable']) ? 1 : 0) : '';
@@ -182,12 +180,6 @@
             $search_results_limit = false;
         }
 
-        // If the player group was provided
-        if (!empty($search_data['player_group'])){
-            $search_query .= "AND player_group = '{$search_data['player_group']}' ";
-            $search_results_limit = false;
-        }
-
         // If the player hidden flag was provided
         if ($search_data['player_flag_hidden'] !== ''){
             $search_query .= "AND player_flag_hidden = {$search_data['player_flag_hidden']} ";
@@ -223,7 +215,6 @@
         if (!empty($sort_data)){ $order_by[] = $sort_data['name'].' '.strtoupper($sort_data['dir']); }
         $order_by[] = "player_name ASC";
         $order_by[] = "FIELD(player_class, 'mecha', 'master', 'boss')";
-        $order_by[] = "player_order ASC";
         $order_by_string = implode(', ', $order_by);
         $search_query .= "ORDER BY {$order_by_string} ";
 
@@ -279,8 +270,7 @@
                 'player_flag_hidden' => 0,
                 'player_flag_complete' => 0,
                 'player_flag_published' => 0,
-                'player_flag_protected' => 0,
-                'player_order' => 0
+                'player_flag_protected' => 0
                 );
 
             // Overwrite temp data with any backup data provided
@@ -318,9 +308,7 @@
             $form_data['player_gender'] = !empty($_POST['player_gender']) && preg_match('/^(male|female|other|none)$/', $_POST['player_gender']) ? trim(strtolower($_POST['player_gender'])) : '';
             $form_data['player_type'] = !empty($_POST['player_type']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['player_type']) ? trim(strtolower($_POST['player_type'])) : '';
             $form_data['player_game'] = !empty($_POST['player_game']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['player_game']) ? trim($_POST['player_game']) : '';
-            $form_data['player_group'] = !empty($_POST['player_group']) && preg_match('/^[-_a-z0-9\/]+$/i', $_POST['player_group']) ? trim($_POST['player_group']) : '';
             $form_data['player_number'] = !empty($_POST['player_number']) && is_numeric($_POST['player_number']) ? (int)(trim($_POST['player_number'])) : 0;
-            $form_data['player_order'] = !empty($_POST['player_order']) && is_numeric($_POST['player_order']) ? (int)(trim($_POST['player_order'])) : 0;
 
             $form_data['player_energy'] = $form_data['player_type'] === 'energy' ? 25 : 0; //!empty($_POST['player_energy']) && is_numeric($_POST['player_energy']) ? (int)(trim($_POST['player_energy'])) : 0;
             $form_data['player_weapons'] = $form_data['player_type'] === 'weapons' ? 25 : 0; //!empty($_POST['player_weapons']) && is_numeric($_POST['player_weapons']) ? (int)(trim($_POST['player_weapons'])) : 0;
@@ -554,10 +542,8 @@
 
                 $form_data['player_abilities_rewards'] = array(array('points' => 0, 'token' => 'buster-shot'));
                 $form_data['player_game'] = 'MMRPG';
-                $form_data['player_group'] = 'MMRPG';
                 $form_data['player_class'] = 'master';
                 $form_data['player_number'] = 1 + $db->get_value("SELECT MAX(player_number) AS max FROM mmrpg_index_players;", 'max');
-                $form_data['player_order'] = 1 + $db->get_value("SELECT MAX(player_order) AS max FROM mmrpg_index_players;", 'max');
 
                 $temp_json_fields = rpg_player::get_json_index_fields();
                 foreach ($temp_json_fields AS $field){ $form_data[$field] = !empty($form_data[$field]) ? json_encode($form_data[$field], JSON_NUMERIC_CHECK) : ''; }
@@ -1102,18 +1088,6 @@
                                             <?
                                         }
                                         ?>
-                                    </div>
-
-                                    <hr />
-
-                                    <div class="field">
-                                        <strong class="label">Sort Group</strong>
-                                        <input class="textbox" type="text" name="player_group" value="<?= $player_data['player_group'] ?>" maxlength="64" />
-                                    </div>
-
-                                    <div class="field">
-                                        <strong class="label">Sort Order</strong>
-                                        <input class="textbox" type="number" name="player_order" value="<?= $player_data['player_order'] ?>" maxlength="8" />
                                     </div>
 
                                 <? } ?>
