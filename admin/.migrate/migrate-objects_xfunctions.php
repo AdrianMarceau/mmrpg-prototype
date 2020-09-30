@@ -142,6 +142,7 @@ function clean_json_content_array($kind, $content_json_data, $remove_id_field = 
     // Remove any known unnecessary or deprecated fields from the data
     if ($remove_id_field){ unset($cleaned_json_data[$kind.'_id']); }
     if ($remove_functions_field){ unset($cleaned_json_data[$kind.'_functions']); }
+    if (true){ unset($cleaned_json_data[$kind.'_flag_protected']); }
     // Loop through fields and set any psudeo-empty fields to actally empty
     //foreach ($cleaned_json_data AS $k => $v){ if ($v === '[]'){ $cleaned_json_data[$k] = ''; } }
     // Check to see if there are fields we need to remove before export
