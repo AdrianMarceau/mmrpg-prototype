@@ -171,10 +171,10 @@
     $ability_options_markup = implode(PHP_EOL, $ability_options_markup);
 
     // Pre-generate a list of all items so we can re-use it over and over
+    $item_options_group = false;
     $item_options_count = 0;
     $item_options_markup = array();
     $item_options_markup[] = '<option value="">-</option>';
-    $item_options_group = '';
     foreach ($mmrpg_items_index AS $item_token => $item_info){
         if (empty($item_info['item_flag_published'])){ continue; }
         elseif (empty($item_info['item_flag_complete'])){ continue; }
@@ -188,6 +188,7 @@
         elseif ($item_token == 'extra-life' || $item_token == 'yashichi'){ $item_group = 'Restorative Items'; }
         elseif (preg_match('/^(energy|weapon)-(pellet|capsule|tank)$/i', $item_token)){ $item_group = 'Restorative Items'; }
         elseif (preg_match('/^(attack|defense|speed|super)-(pellet|capsule)$/i', $item_token)){ $item_group = 'Boosting Items'; }
+        else { $item_group = 'Other Items'; }
         if ($item_group != $item_options_group){
             if (!empty($item_options_group)){ $item_options_markup[] = '</optgroup>'; }
             $item_options_markup[] = '<optgroup label="'.$item_group.'">';
@@ -196,6 +197,7 @@
         $item_options_markup[] = '<option value="'.$item_token.'">'.$item_label.'</option>';
         $item_options_count++;
     }
+    if (!empty($item_options_group)){ $item_options_markup[] = '</optgroup>'; }
     $item_options_markup = implode(PHP_EOL, $item_options_markup);
 
     // Pre-generate a list of all contributors so we can re-use it over and over

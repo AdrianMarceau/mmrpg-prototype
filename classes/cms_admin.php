@@ -232,8 +232,19 @@ class cms_admin {
     // Define a function for collecting the items index, sorted, for admin use
     public static function get_items_index(){
         global $db;
-        $mmrpg_items_fields = rpg_item::get_index_fields(true);
-        $mmrpg_items_index = $db->get_array_list("SELECT {$mmrpg_items_fields} FROM mmrpg_index_items WHERE item_token <> 'item' AND item_class <> 'system' ORDER BY item_order ASC", 'item_token');
+        $mmrpg_items_fields = rpg_item::get_index_fields(true, 'items');
+        $mmrpg_items_index = $db->get_array_list("SELECT
+            {$mmrpg_items_fields},
+            groups.group_token AS item_group,
+            tokens.token_order AS item_order
+            FROM mmrpg_index_items AS items
+            LEFT JOIN mmrpg_index_items_groups_tokens AS tokens ON tokens.item_token = items.item_token
+            LEFT JOIN mmrpg_index_items_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = items.item_class
+            WHERE items.item_token <> 'item' AND items.item_class <> 'system'
+            ORDER BY
+            groups.group_order ASC,
+            tokens.token_order ASC
+            ;", 'item_token');
         return $mmrpg_items_index;
     }
 
