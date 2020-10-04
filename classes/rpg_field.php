@@ -269,7 +269,7 @@ class rpg_field extends rpg_object {
      * @param bool $parse_data
      * @return array
      */
-    public static function get_index($include_hidden = false, $include_unpublished = false, $include_incomplete = false){
+    public static function get_index($include_hidden = false, $include_unpublished = false, $filter_class = '', $include_tokens = array()){
 
         // Pull in global variables
         $db = cms_database::get_database();
@@ -278,7 +278,13 @@ class rpg_field extends rpg_object {
         $temp_where = '';
         if (!$include_hidden){ $temp_where .= 'AND field_flag_hidden = 0 '; }
         if (!$include_unpublished){ $temp_where .= 'AND field_flag_published = 1 '; }
-        if (!$include_incomplete){ $temp_where .= 'AND field_flag_complete = 1 '; }
+        if (!empty($filter_class)){ $temp_where .= "AND field_class = '{$filter_class}' "; }
+        if (!empty($include_tokens)){
+            $include_string = $include_tokens;
+            array_walk($include_string, function(&$s){ $s = "'{$s}'"; });
+            $include_tokens = implode(', ', $include_string);
+            $temp_where .= 'OR field_token IN ('.$include_tokens.') ';
+        }
 
         // Define a static array for cached queries
         static $index_cache = array();
