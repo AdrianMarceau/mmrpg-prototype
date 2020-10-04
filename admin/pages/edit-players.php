@@ -881,16 +881,27 @@
             $robot_options_markup = implode(PHP_EOL, $robot_options_markup);
 
             // Pre-generate a list of all fields so we can re-use it over and over
+            $field_options_group = false;
+            $field_options_count = 0;
             $field_options_markup = array();
             $field_options_markup[] = '<option value="">-</option>';
             foreach ($mmrpg_fields_index AS $field_token => $field_info){
-                if ($field_info['field_class'] === 'system' || $field_info['field_class'] === 'master'){ continue; }
+                if ($field_token === 'intro-field'){ continue; }
+                elseif (empty($field_info['field_flag_complete'])){ continue; }
+                elseif ($field_info['field_class'] === 'system' || $field_info['field_class'] === 'master'){ continue; }
+                $class_group = str_replace('/', ' | ', $field_info['field_group']);
+                if ($class_group != $field_options_group){
+                    if (!empty($field_options_group)){ $field_options_markup[] = '</optgroup>'; }
+                    $field_options_group = $class_group;
+                    $field_options_markup[] = '<optgroup label="'.ucfirst($class_group).'">';
+                }
                 $field_name = $field_info['field_name'];
                 $field_types = ucwords(implode(' / ', array_values(array_filter(array($field_info['field_type'], $field_info['field_type2'])))));
                 if (empty($field_types)){ $field_types = 'Neutral'; }
                 $field_options_markup[] = '<option value="'.$field_token.'">'.$field_name.' ('.$field_types.')</option>';
+                $field_options_count++;
             }
-            $field_options_count = count($field_options_markup);
+            if (!empty($field_options_group)){ $field_options_markup[] = '</optgroup>'; }
             $field_options_markup = implode(PHP_EOL, $field_options_markup);
 
             // Capture editor markup in a buffer in case we need to modify

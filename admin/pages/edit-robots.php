@@ -925,6 +925,80 @@
             && isset($_GET['robot_id'])
             ){
 
+            // Collect global abilities so we can skip them
+            $global_ability_tokens = rpg_ability::get_global_abilities();
+
+            // Pre-generate a list of all abilities so we can re-use it over and over
+            $last_option_group = false;
+            $ability_options_markup = array();
+            $ability_options_markup[] = '<option value="">-</option>';
+
+            $levelup_last_option_group = false;
+            $levelup_ability_options_markup = array();
+            $levelup_ability_options_markup[] = '<option value="">-</option>';
+
+            foreach ($mmrpg_abilities_index AS $ability_token => $ability_info){
+                if ($ability_info['ability_class'] === 'mecha' && $robot_data['robot_class'] !== 'mecha'){ continue; }
+                elseif ($ability_info['ability_class'] === 'boss' && $robot_data['robot_class'] !== 'boss'){ continue; }
+
+                $option_group = $robot_data['robot_class'] !== 'master' ? ucfirst($ability_info['ability_class']).' | ' : '';
+                $option_group .= str_replace('/', ' | ', $ability_info['ability_group']);
+                $ability_name = $ability_info['ability_name'];
+                $ability_types = ucwords(implode(' / ', array_values(array_filter(array($ability_info['ability_type'], $ability_info['ability_type2'])))));
+                if (empty($ability_types)){ $ability_types = 'Neutral'; }
+                $option_markup = '<option value="'.$ability_token.'">'.$ability_name.' ('.$ability_types.')</option>';
+
+                if ($last_option_group !== $option_group){
+                    if (!empty($last_option_group)){ $ability_options_markup[] = '</optgroup>'; }
+                    $last_option_group = $option_group;
+                    $ability_options_markup[] = '<optgroup label="'.$option_group.'">';
+                }
+                $ability_options_markup[] = $option_markup;
+
+                $levelup_compatible = false;
+                if ($robot_data['robot_class'] === 'boss' && $ability_info['ability_class'] !== 'mecha'){ $levelup_compatible = true; }
+                elseif ($ability_info['ability_class'] === $robot_data['robot_class']){ $levelup_compatible = true; }
+                if ($levelup_compatible){
+                    if ($levelup_last_option_group !== $option_group){
+                        if (!empty($levelup_last_option_group)){ $levelup_ability_options_markup[] = '</optgroup>'; }
+                        $levelup_last_option_group = $option_group;
+                        $levelup_ability_options_markup[] = '<optgroup label="'.$option_group.'">';
+                    }
+                    $levelup_ability_options_markup[] = $option_markup;
+                }
+
+            }
+
+            if (!empty($last_option_group)){ $ability_options_markup[] = '</optgroup>'; }
+            $ability_options_markup = implode(PHP_EOL, $ability_options_markup);
+
+            if (!empty($levelup_last_option_group)){ $levelup_ability_options_markup[] = '</optgroup>'; }
+            $levelup_ability_options_markup = implode(PHP_EOL, $levelup_ability_options_markup);
+
+            // Pre-generate a list of all fields so we can re-use it over and over
+            $field_options_group = false;
+            $field_options_count = 0;
+            $field_options_markup = array();
+            $field_options_markup[] = '<option value="">-</option>';
+            foreach ($mmrpg_fields_index AS $field_token => $field_info){
+                if ($field_token === 'intro-field'){ continue; }
+                elseif (empty($field_info['field_flag_complete'])){ continue; }
+                elseif ($field_info['field_class'] === 'system'){ continue; }
+                $class_group = str_replace('/', ' | ', $field_info['field_group']);
+                if ($class_group != $field_options_group){
+                    if (!empty($field_options_group)){ $field_options_markup[] = '</optgroup>'; }
+                    $field_options_group = $class_group;
+                    $field_options_markup[] = '<optgroup label="'.ucfirst($class_group).'">';
+                }
+                $field_name = $field_info['field_name'];
+                $field_types = ucwords(implode(' / ', array_values(array_filter(array($field_info['field_type'], $field_info['field_type2'])))));
+                if (empty($field_types)){ $field_types = 'Neutral'; }
+                $field_options_markup[] = '<option value="'.$field_token.'">'.$field_name.' ('.$field_types.')</option>';
+                $field_options_count++;
+            }
+            if (!empty($field_options_group)){ $field_options_markup[] = '</optgroup>'; }
+            $field_options_markup = implode(PHP_EOL, $field_options_markup);
+
             // Capture editor markup in a buffer in case we need to modify
             if (true){
                 ob_start();
@@ -1076,31 +1150,17 @@
 
                                     <div class="field">
                                         <strong class="label">Home Field</strong>
+                                        <? $current_value = !empty($robot_data['robot_field']) ? $robot_data['robot_field'] : ''; ?>
                                         <select class="select" name="robot_field">
-                                            <?
-                                            echo('<option value=""'.(empty($robot_data['robot_field']) ? 'selected="selected"' : '').'>- none -</option>');
-                                            foreach ($mmrpg_fields_index AS $field_token => $field_data){
-                                                $label = $field_data['field_name'];
-                                                $label .= ' ('.(!empty($field_data['field_type']) ? ucfirst($field_data['field_type']) : 'Neutral').')';
-                                                $selected = !empty($robot_data['robot_field']) && $robot_data['robot_field'] == $field_token ? 'selected="selected"' : '';
-                                                echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                            }
-                                            ?>
+                                            <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $field_options_markup) ?>
                                         </select><span></span>
                                     </div>
 
                                     <div class="field">
                                         <strong class="label">Echo Field</strong>
+                                        <? $current_value = !empty($robot_data['robot_field2']) ? $robot_data['robot_field2'] : ''; ?>
                                         <select class="select" name="robot_field2">
-                                            <?
-                                            echo('<option value=""'.(empty($robot_data['robot_field2']) ? 'selected="selected"' : '').'>- none -</option>');
-                                            foreach ($mmrpg_fields_index AS $field_token => $field_data){
-                                                $label = $field_data['field_name'];
-                                                $label .= ' ('.(!empty($field_data['field_type']) ? ucfirst($field_data['field_type']) : 'Neutral').')';
-                                                $selected = !empty($robot_data['robot_field2']) && $robot_data['robot_field2'] == $field_token ? 'selected="selected"' : '';
-                                                echo('<option value="'.$field_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                            }
-                                            ?>
+                                            <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $field_options_markup) ?>
                                         </select><span></span>
                                     </div>
 
@@ -1235,59 +1295,6 @@
                                 </div>
 
                                 <div class="panel" data-tab="abilities">
-
-                                    <?
-
-                                    // Collect global abilities so we can skip them
-                                    $global_ability_tokens = rpg_ability::get_global_abilities();
-
-                                    // Pre-generate a list of all abilities so we can re-use it over and over
-                                    $last_option_group = false;
-                                    $ability_options_markup = array();
-                                    $ability_options_markup[] = '<option value="">-</option>';
-
-                                    $levelup_last_option_group = false;
-                                    $levelup_ability_options_markup = array();
-                                    $levelup_ability_options_markup[] = '<option value="">-</option>';
-
-                                    foreach ($mmrpg_abilities_index AS $ability_token => $ability_info){
-                                        if ($ability_info['ability_class'] === 'mecha' && $robot_data['robot_class'] !== 'mecha'){ continue; }
-                                        elseif ($ability_info['ability_class'] === 'boss' && $robot_data['robot_class'] !== 'boss'){ continue; }
-
-                                        $option_group = $robot_data['robot_class'] !== 'master' ? ucfirst($ability_info['ability_class']).' | ' : '';
-                                        $option_group .= str_replace('/', ' | ', $ability_info['ability_group']);
-                                        $ability_name = $ability_info['ability_name'];
-                                        $ability_types = ucwords(implode(' / ', array_values(array_filter(array($ability_info['ability_type'], $ability_info['ability_type2'])))));
-                                        if (empty($ability_types)){ $ability_types = 'Neutral'; }
-                                        $option_markup = '<option value="'.$ability_token.'">'.$ability_name.' ('.$ability_types.')</option>';
-
-                                        if ($last_option_group !== $option_group){
-                                            if (!empty($last_option_group)){ $ability_options_markup[] = '</optgroup>'; }
-                                            $last_option_group = $option_group;
-                                            $ability_options_markup[] = '<optgroup label="'.$option_group.'">';
-                                        }
-                                        $ability_options_markup[] = $option_markup;
-
-                                        $levelup_compatible = false;
-                                        if ($robot_data['robot_class'] === 'boss' && $ability_info['ability_class'] !== 'mecha'){ $levelup_compatible = true; }
-                                        elseif ($ability_info['ability_class'] === $robot_data['robot_class']){ $levelup_compatible = true; }
-                                        if ($levelup_compatible){
-                                            if ($levelup_last_option_group !== $option_group){
-                                                if (!empty($levelup_last_option_group)){ $levelup_ability_options_markup[] = '</optgroup>'; }
-                                                $levelup_last_option_group = $option_group;
-                                                $levelup_ability_options_markup[] = '<optgroup label="'.$option_group.'">';
-                                            }
-                                            $levelup_ability_options_markup[] = $option_markup;
-                                        }
-
-                                    }
-
-                                    if (!empty($last_option_group)){ $ability_options_markup[] = '</optgroup>'; }
-                                    $ability_options_markup = implode(PHP_EOL, $ability_options_markup);
-
-                                    if (!empty($levelup_last_option_group)){ $levelup_ability_options_markup[] = '</optgroup>'; }
-                                    $levelup_ability_options_markup = implode(PHP_EOL, $levelup_ability_options_markup);
-                                    ?>
 
                                     <div class="field fullsize multirow">
                                         <strong class="label">

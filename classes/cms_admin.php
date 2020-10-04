@@ -178,7 +178,7 @@ class cms_admin {
             tokens.token_order AS player_order
             FROM mmrpg_index_players AS players
             LEFT JOIN mmrpg_index_players_groups_tokens AS tokens ON tokens.player_token = players.player_token
-            LEFT JOIN mmrpg_index_players_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = players.player_class
+            LEFT JOIN mmrpg_index_players_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = 'player'
             WHERE players.player_token <> 'player'
             ORDER BY
             players.player_class ASC,
@@ -251,8 +251,19 @@ class cms_admin {
     // Define a function for collecting the fields index, sorted, for admin use
     public static function get_fields_index(){
         global $db;
-        $mmrpg_fields_fields = rpg_field::get_index_fields(true);
-        $mmrpg_fields_index = $db->get_array_list("SELECT {$mmrpg_fields_fields} FROM mmrpg_index_fields WHERE field_token <> 'field' ORDER BY field_order ASC", 'field_token');
+        $mmrpg_fields_fields = rpg_field::get_index_fields(true, 'fields');
+        $mmrpg_fields_index = $db->get_array_list("SELECT
+            {$mmrpg_fields_fields},
+            groups.group_token AS field_group,
+            tokens.token_order AS field_order
+            FROM mmrpg_index_fields AS fields
+            LEFT JOIN mmrpg_index_fields_groups_tokens AS tokens ON tokens.field_token = fields.field_token
+            LEFT JOIN mmrpg_index_fields_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = 'field'
+            WHERE fields.field_token <> 'field' AND fields.field_class <> 'system'
+            ORDER BY
+            groups.group_order ASC,
+            tokens.token_order ASC
+            ;", 'field_token');
         return $mmrpg_fields_index;
     }
 
@@ -1230,6 +1241,9 @@ class cms_admin {
             foreach ($tokens AS $token){ $group_overrides[$token] = $group; }
             $group = 'MMRPG/Bonus';
             $tokens = array('prototype-complete');
+            foreach ($tokens AS $token){ $group_overrides[$token] = $group; }
+            $group = 'MM99/Master';
+            $tokens = array('crystal-catacombs', 'gemstone-cavern');
             foreach ($tokens AS $token){ $group_overrides[$token] = $group; }
             // Append a string to end of all master fields in the game
             $group_append = '/Master';

@@ -45,7 +45,6 @@
     // Collect indexes for required object types
     $mmrpg_types_index = cms_admin::get_types_index();
     $mmrpg_robots_index = cms_admin::get_robots_index();
-    $mmrpg_fields_index = cms_admin::get_fields_index();
     $mmrpg_contributors_index = cms_admin::get_contributors_index('ability');
 
     // Collect an index of file changes and updates via git

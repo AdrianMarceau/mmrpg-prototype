@@ -107,16 +107,18 @@
     $robot_options_markup = implode(PHP_EOL, $robot_options_markup);
 
     // Pre-generate a list of all fields so we can re-use it over and over
+    $field_options_group = false;
     $field_options_count = 0;
-    $field_options_group = '';
     $field_options_markup = array();
     $field_options_markup[] = '<option value="">-</option>';
     foreach ($mmrpg_fields_index AS $field_token => $field_info){
-        $game_to_cateory = strstr($field_info['field_game'], 'MMRPG') || strstr($field_info['field_game'], 'MM00') ? 'Misc' : ucfirst($field_info['field_game']);
-        if ($game_to_cateory != $field_options_group){
+        if ($field_token === 'intro-field'){ continue; }
+        elseif (empty($field_info['field_flag_complete'])){ continue; }
+        $class_group = str_replace('/', ' | ', $field_info['field_group']);
+        if ($class_group != $field_options_group){
             if (!empty($field_options_group)){ $field_options_markup[] = '</optgroup>'; }
-            $field_options_group = $game_to_cateory;
-            $field_options_markup[] = '<optgroup label="'.ucfirst($game_to_cateory).' Fields">';
+            $field_options_group = $class_group;
+            $field_options_markup[] = '<optgroup label="'.ucfirst($class_group).'">';
         }
         $field_name = $field_info['field_name'];
         $field_types = ucwords(implode(' / ', array_values(array_filter(array($field_info['field_type'], $field_info['field_type2'])))));
