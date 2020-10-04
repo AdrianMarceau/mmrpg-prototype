@@ -14,7 +14,7 @@ declare -a REPO_KINDS=(
     "pages"
     )
 
-declare -A REPO_PATHS
+declare -a REPO_PATHS
 REPO_PATHS[sql]=".sql"
 REPO_PATHS[types]="types"
 REPO_PATHS[battles]="battles"

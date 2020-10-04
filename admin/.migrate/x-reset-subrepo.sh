@@ -55,7 +55,7 @@ if test -d  "${REPO_PATH}"; then
         echo ""
         echo "DONE!"
 
-        start chrome "${GITHUB_BASE}mmrpg-prototype_${1}.git"
+        open "${GITHUB_BASE}mmrpg-prototype_${1}.git"
 
     else
 

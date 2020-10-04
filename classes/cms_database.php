@@ -25,7 +25,10 @@ class cms_database {
     // Define the constructor for the class
     public function __construct(){
         // Collect the initializer arguments
-        $this->HOST = MMRPG_CONFIG_DBHOST; //MMRPG_CONFIG_IS_LIVE ? MMRPG_CONFIG_DBHOST : '127.0.0.1';
+        if (php_sapi_name() === 'cli'){ $this->HOST = MMRPG_CONFIG_IS_LIVE ? MMRPG_CONFIG_DBHOST : '127.0.0.1'; }
+        else { $this->HOST = MMRPG_CONFIG_DBHOST; }
+        //$this->HOST = MMRPG_CONFIG_IS_LIVE ? MMRPG_CONFIG_DBHOST : '127.0.0.1';
+        //$this->HOST = MMRPG_CONFIG_DBHOST;
         $this->USERNAME = MMRPG_CONFIG_DBUSERNAME;
         $this->PASSWORD = MMRPG_CONFIG_DBPASSWORD;
         $this->CHARSET = MMRPG_CONFIG_DBCHARSET;
@@ -93,16 +96,16 @@ class cms_database {
         if ($this->LINK === false
             || $this->LINK->connect_errno){
             if (MMRPG_CONFIG_IS_LIVE && (!defined('MMRPG_CONFIG_ADMIN_MODE') || MMRPG_CONFIG_ADMIN_MODE !== true)){
-                $this->critical_error("<strong>cms_database::db_connect</strong> : '.
-                    'Critical error! Unable to connect to the database &lt;".("{$this->USERNAME}:******@")."{$this->HOST}&gt;!<br />'.
-                    '[MySQL Error ".$this->LINK->connect_errno."] : '.
-                    '&quot;".htmlentities($this->LINK->connect_error, ENT_QUOTES, 'UTF-8', true)."&quot;"
+                $this->critical_error("<strong>cms_database::db_connect</strong> : Critical error! \n".
+                    "Unable to connect to the database!  \n".
+                    "[MySQLi Error {$this->LINK->connect_errno}] : ".
+                    "&quot;".htmlentities($this->LINK->connect_error, ENT_QUOTES, 'UTF-8', true)."&quot;"
                     );
             } else {
-                $this->critical_error("<strong>cms_database::db_connect</strong> : '.
-                    'Critical error! Unable to connect to the database &lt;".("{$this->USERNAME}:******@")."{$this->HOST}&gt;!<br />'.
-                    '[MySQL Error ".$this->LINK->connect_errno."] : '.
-                    '&quot;".htmlentities($this->LINK->connect_error, ENT_QUOTES, 'UTF-8', true)."&quot;"
+                $this->critical_error("<strong>cms_database::db_connect</strong> : Critical error!  \n".
+                    "Unable to connect to the database (".$this->USERNAME.":******@".$this->HOST.")!  \n".
+                    "[MySQLi Error {$this->LINK->connect_errno}] : ".
+                    "&quot;".htmlentities($this->LINK->connect_error, ENT_QUOTES, 'UTF-8', true)."&quot;"
                     );
             }
             return false;
