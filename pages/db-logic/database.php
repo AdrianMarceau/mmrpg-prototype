@@ -30,8 +30,8 @@ if ($this_current_sub != 'abilities'){
 // Define ITEM preview fields if we're not in a specific sub-index
 if ($this_current_sub != 'items'){
     // If we're not on the full item index, only show preview items
-    $mmrpg_database_items_filter = "AND (item_token IN ('small-screw', 'large-screw') OR (
-        (item_game = 'MM00' AND item_group LIKE 'MM00/%')
+    $mmrpg_database_items_filter = "AND (items.item_token IN ('small-screw', 'large-screw') OR (
+        (items.item_game = 'MM00' AND items.item_group LIKE 'MM00/%')
         )) ";
 }
 

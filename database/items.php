@@ -19,11 +19,11 @@ $hidden_database_items_count = !empty($hidden_database_items) ? count($hidden_da
 
 // Define the hidden item query condition
 $temp_condition = '';
-$temp_condition .= "AND item_class <> 'system' ";
+$temp_condition .= "AND items.item_class <> 'system' ";
 if (!empty($hidden_database_items)){
     $temp_tokens = array();
     foreach ($hidden_database_items AS $token){ $temp_tokens[] = "'".$token."'"; }
-    $temp_condition .= 'AND item_token NOT IN ('.implode(',', $temp_tokens).') ';
+    $temp_condition .= 'AND items.item_token NOT IN ('.implode(',', $temp_tokens).') ';
 }
 // If additional database filters were provided
 $temp_condition_unfiltered = $temp_condition;
@@ -33,11 +33,39 @@ if (isset($mmrpg_database_items_filter)){
 }
 
 // Collect the database items
-$item_fields = rpg_item::get_index_fields(true);
+$item_fields = rpg_item::get_index_fields(true, 'items');
+$mmrpg_database_items = $db->get_array_list("SELECT
+    {$item_fields},
+    groups.group_token AS item_group,
+    tokens.token_order AS item_order
+    FROM mmrpg_index_items AS items
+    LEFT JOIN mmrpg_index_items_groups_tokens AS tokens ON tokens.item_token = items.item_token
+    LEFT JOIN mmrpg_index_items_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = items.item_class
+    WHERE item_id <> 0
+    AND items.item_flag_published = 1 AND (items.item_flag_hidden = 0 OR items.item_token = '{$this_current_token}') {$temp_condition}
+    ORDER BY
+    groups.group_order ASC,
+    tokens.token_order ASC
+    ;", 'item_token');
+
+// Count the database items and collect their row numbers
 $db->query("SET @item_row_number = 0;");
-$mmrpg_database_items = $db->get_array_list("SELECT {$item_fields} FROM mmrpg_index_items WHERE item_flag_published = 1 AND (item_flag_hidden = 0 OR item_token = '{$this_current_token}') {$temp_condition} ORDER BY item_order ASC", 'item_token');
-$mmrpg_database_items_count = $db->get_value("SELECT COUNT(item_id) AS item_count FROM mmrpg_index_items WHERE item_flag_published = 1 AND item_flag_hidden = 0 {$temp_condition_unfiltered};", 'item_count');
-$mmrpg_database_items_numbers = $db->get_array_list("SELECT item_token, (@item_row_number:=@item_row_number + 1) AS item_key FROM mmrpg_index_items WHERE item_flag_published = 1 {$temp_condition_unfiltered} ORDER BY item_flag_hidden ASC, item_order ASC;", 'item_token');
+$mmrpg_database_items_count = $db->get_value("SELECT
+    COUNT(items.item_id) AS item_count
+    FROM mmrpg_index_items AS items
+    WHERE items.item_flag_published = 1 AND items.item_flag_hidden = 0 {$temp_condition_unfiltered}
+    ;", 'item_count');
+$mmrpg_database_items_numbers = $db->get_array_list("SELECT
+    items.item_token, (@item_row_number:=@item_row_number + 1) AS item_key
+    FROM mmrpg_index_items AS items
+    LEFT JOIN mmrpg_index_items_groups_tokens AS tokens ON tokens.item_token = items.item_token
+    LEFT JOIN mmrpg_index_items_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = items.item_class
+    WHERE item_id <> 0
+    AND items.item_flag_published = 1 {$temp_condition_unfiltered}
+    ORDER BY
+    groups.group_order ASC,
+    tokens.token_order ASC
+    ;", 'item_token');
 
 // Remove unallowed items from the database, and increment counters
 if (!empty($mmrpg_database_items)){
