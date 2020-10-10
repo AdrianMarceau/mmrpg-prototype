@@ -2309,7 +2309,6 @@ class rpg_robot extends rpg_object {
             'robot_number',
             'robot_name',
             'robot_game',
-            'robot_group',
             'robot_field',
             'robot_field2',
             'robot_class',
@@ -2343,8 +2342,7 @@ class rpg_robot extends rpg_object {
             'robot_flag_unlockable',
             'robot_flag_exclusive',
             'robot_flag_published',
-            'robot_flag_protected',
-            'robot_order'
+            'robot_flag_protected'
             );
 
         // Add table name to each field string if requested
@@ -2452,9 +2450,21 @@ class rpg_robot extends rpg_object {
 
         }
 
-        // Collect every type's info from the database index
-        $robot_fields = self::get_index_fields(true);
-        $robot_index = $db->get_array_list("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_id <> 0 {$temp_where};", 'robot_token');
+        // Collect every robot's info from the database index
+        $robot_fields = rpg_robot::get_index_fields(true, 'robots');
+        $robot_index = $db->get_array_list("SELECT
+            {$robot_fields},
+            groups.group_token AS robot_group,
+            tokens.token_order AS robot_order
+            FROM mmrpg_index_robots AS robots
+            LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
+            LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = robots.robot_class
+            WHERE robots.robot_token <> 'robot' {$temp_where}
+            ORDER BY
+            FIELD(robot_class, 'master', 'mecha', 'boss'),
+            groups.group_order ASC,
+            tokens.token_order ASC
+            ;", 'robot_token');
 
         // Parse and return the data if not empty, else nothing
         if (!empty($robot_index)){ $robot_index = self::parse_index($robot_index); }
