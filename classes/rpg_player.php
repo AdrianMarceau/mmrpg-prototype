@@ -1731,7 +1731,6 @@ class rpg_player extends rpg_object {
             'player_name',
             'player_name_full',
             'player_game',
-            'player_group',
             'player_class',
             'player_gender',
             'player_image',
@@ -1763,8 +1762,7 @@ class rpg_player extends rpg_object {
             'player_flag_hidden',
             'player_flag_complete',
             'player_flag_published',
-            'player_flag_protected',
-            'player_order'
+            'player_flag_protected'
             );
 
         // Add table name to each field string if requested
@@ -1863,9 +1861,21 @@ class rpg_player extends rpg_object {
 
         }
 
-        // Collect every type's info from the database index
-        $player_fields = self::get_index_fields(true);
-        $player_index = $db->get_array_list("SELECT {$player_fields} FROM mmrpg_index_players WHERE player_id <> 0 {$temp_where};", 'player_token');
+        // Collect every player's info from the database index
+        $player_fields = rpg_player::get_index_fields(true, 'players');
+        $player_index = $db->get_array_list("SELECT
+            {$player_fields},
+            groups.group_token AS player_group,
+            tokens.token_order AS player_order
+            FROM mmrpg_index_players AS players
+            LEFT JOIN mmrpg_index_players_groups_tokens AS tokens ON tokens.player_token = players.player_token
+            LEFT JOIN mmrpg_index_players_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = 'player'
+            WHERE players.player_token <> 'player' {$temp_where}
+            ORDER BY
+            players.player_class ASC,
+            groups.group_order ASC,
+            tokens.token_order ASC
+            ;", 'player_token');
 
         // Parse and return the data if not empty, else nothing
         if (!empty($player_index)){ $player_index = self::parse_index($player_index); }
