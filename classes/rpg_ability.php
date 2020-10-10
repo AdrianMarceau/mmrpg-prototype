@@ -833,7 +833,6 @@ class rpg_ability extends rpg_object {
             'ability_token',
             'ability_name',
             'ability_game',
-            'ability_group',
             'ability_class',
             'ability_subclass',
             'ability_master',
@@ -879,8 +878,7 @@ class rpg_ability extends rpg_object {
             'ability_flag_complete',
             'ability_flag_published',
             'ability_flag_unlockable',
-            'ability_flag_protected',
-            'ability_order'
+            'ability_flag_protected'
             );
 
         // Add table name to each field string if requested
@@ -972,14 +970,14 @@ class rpg_ability extends rpg_object {
 
         // Define the query condition based on args
         $temp_where = '';
-        if (!$include_hidden){ $temp_where .= 'AND ability_flag_hidden = 0 '; }
-        if (!$include_unpublished){ $temp_where .= 'AND ability_flag_published = 1 '; }
-        if (!empty($filter_class)){ $temp_where .= "AND ability_class = '{$filter_class}' "; }
+        if (!$include_hidden){ $temp_where .= 'AND abilities.ability_flag_hidden = 0 '; }
+        if (!$include_unpublished){ $temp_where .= 'AND abilities.ability_flag_published = 1 '; }
+        if (!empty($filter_class)){ $temp_where .= "AND abilities.ability_class = '{$filter_class}' "; }
         if (!empty($include_tokens)){
             $include_string = $include_tokens;
             array_walk($include_string, function(&$s){ $s = "'{$s}'"; });
             $include_tokens = implode(', ', $include_string);
-            $temp_where .= 'OR ability_token IN ('.$include_tokens.') ';
+            $temp_where .= 'OR abilities.ability_token IN ('.$include_tokens.') ';
         }
 
         // Define a static array for cached queries
@@ -997,8 +995,21 @@ class rpg_ability extends rpg_object {
         }
 
         // Collect every type's info from the database index
-        $ability_fields = self::get_index_fields(true);
-        $ability_index = $db->get_array_list("SELECT {$ability_fields} FROM mmrpg_index_abilities WHERE ability_id <> 0 {$temp_where};", 'ability_token');
+        $ability_fields = rpg_ability::get_index_fields(true, 'abilities');
+        $ability_index = $db->get_array_list("
+            SELECT
+            {$ability_fields},
+            groups.group_token AS ability_group,
+            tokens.token_order AS ability_order
+            FROM mmrpg_index_abilities AS abilities
+            LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
+            LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = abilities.ability_class
+            WHERE ability_id <> 0 AND abilities.ability_token <> 'ability' AND abilities.ability_class <> 'system' {$temp_where}
+            ORDER BY
+            FIELD(abilities.ability_class, 'master', 'mecha', 'boss'),
+            groups.group_order ASC,
+            tokens.token_order ASC
+            ;", 'ability_token');
 
         // Parse and return the data if not empty, else nothing
         if (!empty($ability_index)){ $ability_index = self::parse_index($ability_index); }
