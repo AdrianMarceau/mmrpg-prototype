@@ -41,20 +41,9 @@
 
     /* -- Page Script/Style Dependencies  -- */
 
-    // Define the extra stylesheets that must be included for this page
-    if (!isset($admin_include_stylesheets)){ $admin_include_stylesheets = ''; }
-    $admin_include_stylesheets .= '<link rel="stylesheet" href=".libs/codemirror/lib/codemirror.css?'.MMRPG_CONFIG_CACHE_DATE.'">'.PHP_EOL;
-
-    // Define the extra javascript that must be included for this page
-    if (!isset($admin_include_javascript)){ $admin_include_javascript = ''; }
-    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/lib/codemirror.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
-    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/addon/edit/matchbrackets.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
-    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/mode/htmlmixed/htmlmixed.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
-    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/mode/xml/xml.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
-    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/mode/javascript/javascript.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
-    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/mode/css/css.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
-    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/mode/clike/clike.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
-    $admin_include_javascript .= '<script type="text/javascript" src=".libs/codemirror/mode/php/php.js?'.MMRPG_CONFIG_CACHE_DATE.'"></script>'.PHP_EOL;
+    // Require codemirror scripts and styles for this page
+    $admin_include_common_styles[] = 'codemirror';
+    $admin_include_common_scripts[] = 'codemirror';
 
 
     /* -- Form Setup Actions -- */

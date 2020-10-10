@@ -13,6 +13,14 @@ $this_page_markup = '';
 $this_page_action = !empty($_REQUEST['action']) ? $_REQUEST['action'] : 'home';
 $this_page_tabtitle = cms_admin::print_env_name(MMRPG_CONFIG_SERVER_ENV, true).' Admin';
 
+// Define strings to hold custom script and style links and/or markup
+$admin_include_stylesheets = '';
+$admin_include_javascript = '';
+
+// Define arrays to hold any common scripts or styles to be included later
+$admin_include_common_styles = array();
+$admin_include_common_scripts = array();
+
 
 /*
  * SAVE UPDATES REQUEST
@@ -268,6 +276,9 @@ unset($db);
 <? if (!empty($admin_include_stylesheets)){ ?>
     <?= $admin_include_stylesheets ?>
 <? } ?>
+<? if (in_array('codemirror', $admin_include_common_styles)){ ?>
+    <link rel="stylesheet" href=".libs/codemirror/lib/codemirror.css?<?= MMRPG_CONFIG_CACHE_DATE ?>">
+<? } ?>
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/file.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
@@ -309,7 +320,17 @@ unset($db);
 <? if (!empty($admin_include_javascript)){ ?>
     <?= $admin_include_javascript ?>
 <? } ?>
-<script type="text/javascript" src="admin/scripts/admin.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<? if (in_array('codemirror', $admin_include_common_scripts)){ ?>
+    <script type="text/javascript" src=".libs/codemirror/lib/codemirror.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
+    <script type="text/javascript" src=".libs/codemirror/addon/edit/matchbrackets.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
+    <script type="text/javascript" src=".libs/codemirror/mode/htmlmixed/htmlmixed.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
+    <script type="text/javascript" src=".libs/codemirror/mode/xml/xml.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
+    <script type="text/javascript" src=".libs/codemirror/mode/javascript/javascript.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
+    <script type="text/javascript" src=".libs/codemirror/mode/css/css.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
+    <script type="text/javascript" src=".libs/codemirror/mode/clike/clike.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
+    <script type="text/javascript" src=".libs/codemirror/mode/php/php.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
+<? } ?>
+<script type="text/javascript" src="admin/scripts/admin.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
 <script type="text/javascript">
     thisRootURL = '<?= MMRPG_CONFIG_ROOTURL ?>';
 </script>
