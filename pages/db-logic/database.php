@@ -21,9 +21,9 @@ if ($this_current_sub != 'bosses'){
 // Define ABILITY preview fields if we're not in a specific sub-index
 if ($this_current_sub != 'abilities'){
     // If we're not on the full ability index, only show preview abilities
-    $mmrpg_database_abilities_filter = "AND (ability_token IN ('buster-shot') OR (
-        (ability_master IN ('mega-man', 'bass', 'proto-man') AND ability_energy = 2) OR
-        (ability_game = 'MM01' AND ability_energy = 4)
+    $mmrpg_database_abilities_filter = "AND (abilities.ability_token IN ('buster-shot') OR (
+        (abilities.ability_master IN ('mega-man', 'bass', 'proto-man') AND abilities.ability_energy = 2) OR
+        (abilities.ability_game = 'MM01' AND abilities.ability_energy = 4)
         )) ";
 }
 

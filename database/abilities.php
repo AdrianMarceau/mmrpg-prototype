@@ -14,17 +14,17 @@ $hidden_database_abilities_count = !empty($hidden_database_abilities) ? count($h
 
 // Define the hidden ability query condition
 $temp_condition = '';
-$temp_condition .= "AND ability_class <> 'system' ";
+$temp_condition .= "AND abilities.ability_class <> 'system' ";
 if (!defined('DATA_DATABASE_SHOW_MECHAS')){
-    $temp_condition .= "AND ability_class <> 'mecha' ";
+    $temp_condition .= "AND abilities.ability_class <> 'mecha' ";
 }
 if (!defined('DATA_DATABASE_SHOW_BOSSES')){
-    $temp_condition .= "AND ability_class <> 'boss' ";
+    $temp_condition .= "AND abilities.ability_class <> 'boss' ";
 }
 if (!empty($hidden_database_abilities)){
     $temp_tokens = array();
     foreach ($hidden_database_abilities AS $token){ $temp_tokens[] = "'".$token."'"; }
-    $temp_condition .= 'AND ability_token NOT IN ('.implode(',', $temp_tokens).') ';
+    $temp_condition .= 'AND abilities.ability_token NOT IN ('.implode(',', $temp_tokens).') ';
 }
 // If additional database filters were provided
 $temp_condition_unfiltered = $temp_condition;
@@ -34,11 +34,41 @@ if (isset($mmrpg_database_abilities_filter)){
 }
 
 // Collect the database abilities
-$ability_fields = rpg_ability::get_index_fields(true);
+$ability_fields = rpg_ability::get_index_fields(true, 'abilities');
+$mmrpg_database_abilities = $db->get_array_list("SELECT
+    {$ability_fields},
+    groups.group_token AS ability_group,
+    tokens.token_order AS ability_order
+    FROM mmrpg_index_abilities AS abilities
+    LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
+    LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = abilities.ability_class
+    WHERE abilities.ability_token <> 'ability'
+    AND abilities.ability_flag_published = 1 AND (abilities.ability_flag_hidden = 0 OR abilities.ability_token = '{$this_current_token}')  {$temp_condition}
+    ORDER BY
+    FIELD(abilities.ability_class, 'master', 'mecha', 'boss'),
+    groups.group_order ASC,
+    tokens.token_order ASC
+    ;", 'ability_token');
+
+// Count the database abilities and collect their row numbers
 $db->query("SET @ability_row_number = 0;");
-$mmrpg_database_abilities = $db->get_array_list("SELECT {$ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_published = 1 AND (ability_flag_hidden = 0 OR ability_token = '{$this_current_token}')  {$temp_condition} ORDER BY ability_order ASC", 'ability_token');
-$mmrpg_database_abilities_count = $db->get_value("SELECT COUNT(ability_id) AS ability_count FROM mmrpg_index_abilities WHERE ability_flag_published = 1 AND ability_flag_hidden = 0 {$temp_condition_unfiltered};", 'ability_count');
-$mmrpg_database_abilities_numbers = $db->get_array_list("SELECT ability_token, (@ability_row_number:=@ability_row_number + 1) AS ability_key FROM mmrpg_index_abilities WHERE ability_flag_published = 1 {$temp_condition_unfiltered} ORDER BY ability_flag_hidden ASC, ability_order ASC;", 'ability_token');
+$mmrpg_database_abilities_count = $db->get_value("SELECT
+    COUNT(abilities.ability_id) AS ability_count
+    FROM mmrpg_index_abilities AS abilities
+    WHERE abilities.ability_flag_published = 1 AND abilities.ability_flag_hidden = 0 {$temp_condition_unfiltered}
+    ;", 'ability_count');
+$mmrpg_database_abilities_numbers = $db->get_array_list("SELECT
+    abilities.ability_token, (@ability_row_number:=@ability_row_number + 1) AS ability_key
+    FROM mmrpg_index_abilities AS abilities
+    LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
+    LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = abilities.ability_class
+    WHERE abilities.ability_token <> 'ability'
+    AND abilities.ability_flag_published = 1 AND (abilities.ability_flag_hidden = 0 OR abilities.ability_token = '{$this_current_token}')  {$temp_condition}
+    ORDER BY
+    FIELD(abilities.ability_class, 'master', 'mecha', 'boss'),
+    groups.group_order ASC,
+    tokens.token_order ASC
+    ;", 'ability_token');
 
 // Remove unallowed abilities from the database, and increment counters
 if (!empty($mmrpg_database_abilities)){
