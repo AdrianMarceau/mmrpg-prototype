@@ -61,13 +61,24 @@ $mmrpg_database_fields = rpg_field::get_index(true);
 // Merge the robots and mechas
 $mmrpg_database_robots = array_merge($mmrpg_database_robots, $mmrpg_database_mechas, $mmrpg_database_bosses);
 
+// Define a quick function for getting group token for a given robot/mecha/boss
+function temp_get_group_token($robot_info){
+    if ($robot_info['robot_class'] === 'boss'){
+        if (in_array($robot_info['robot_game'], array('MM30', 'MMEXE'))){ $group_token = 'MMBOSS2'; }
+        else { $group_token = 'MMBOSS1'; }
+    } else {
+        $group_token = $robot_info['robot_game'];
+    }
+    return $group_token;
+}
+
 // Preloop through all of the robots in the database session and count the games
 $session_robot_database = !empty($_SESSION[$session_token]['values']['robot_database']) ? $_SESSION[$session_token]['values']['robot_database'] : array();
 $database_game_counters = array();
 foreach ($session_robot_database AS $temp_token => $temp_info){
     if (!isset($mmrpg_database_robots[$temp_token])){ continue; }
     $temp_info = $mmrpg_database_robots[$temp_token];
-    $group_token = !empty($temp_info['robot_group']) ? $temp_info['robot_group'] : $temp_info['robot_game'];
+    $group_token = temp_get_group_token($temp_info);
     if (!isset($database_game_counters[$group_token])){ $database_game_counters[$group_token] = array($temp_token); }
     elseif (!in_array($temp_token, $database_game_counters[$group_token])){ $database_game_counters[$group_token][] = $temp_token; }
     else { continue; }
@@ -78,7 +89,7 @@ $allowed_database_robots = array();
 $allowed_database_robots[] = 'mega-man';
 $temp_skip_games = array();
 foreach ($mmrpg_database_robots AS $temp_token => $temp_info){
-    $group_token = !empty($temp_info['robot_group']) ? $temp_info['robot_group'] : $temp_info['robot_game'];
+    $group_token = temp_get_group_token($temp_info);
     if (in_array($group_token, $temp_skip_games)){ continue; }
     $allowed_database_robots[] = $temp_token;
 }
@@ -88,7 +99,7 @@ $allowed_database_robots_count = !empty($allowed_database_robots) ? count($allow
 $visible_database_robots = array();
 $temp_skip_games = array();
 foreach ($mmrpg_database_robots AS $temp_token => $temp_info){
-    $group_token = !empty($temp_info['robot_group']) ? $temp_info['robot_group'] : $temp_info['robot_game'];
+    $group_token = temp_get_group_token($temp_info);
     if (in_array($group_token, $temp_skip_games)){ continue; }
     $visible_database_robots[] = $temp_token;
 }
@@ -103,7 +114,7 @@ foreach ($mmrpg_database_robots AS $temp_key => $temp_info){
 
 // Count the robots groups for each page
 $database_page_groups = array();
-$database_page_groups[0] = array('MM00', 'MM20', 'MMRPG');
+$database_page_groups[0] = array('MM00');
 $database_page_groups[1] = array('MM01');
 $database_page_groups[2] = array('MM02');
 $database_page_groups[3] = array('MM03');
@@ -115,8 +126,8 @@ $database_page_groups[8] = array('MM08', 'MM085');
 $database_page_groups[9] = array('MM09');
 $database_page_groups[10] = array('MM10');
 $database_page_groups[11] = array('MM11');
-$database_page_groups[12] = array('MM30');
-$database_page_groups[13] = array('MMEXE', 'MM21', 'MMRPG2');
+$database_page_groups[12] = array('MMBOSS1', 'MM20', 'MM21', 'MM30');
+$database_page_groups[13] = array('MMBOSS2', 'MMEXE', 'MMRPG', 'MMRPG2');
 
 // Count the robots for each page
 $database_page_counters = array();
@@ -175,7 +186,7 @@ if (true){
             // Define the page token based on this robot's game of origin
             if (!isset($robot_info['robot_page_token'])){
                 $temp_this_page_token = '?';
-                $robot_group_token = !empty($robot_info['robot_group']) ? $robot_info['robot_group'] : $robot_info['robot_game'];
+                $robot_group_token = temp_get_group_token($robot_info);
                 foreach ($database_page_groups AS $page_key => $group_array){
                     if (in_array($robot_group_token, $group_array)){ $temp_this_page_token = $page_key; break; }
                     else { continue; }
@@ -289,7 +300,7 @@ if (true){
                         ?>
                     </div>
                     <strong class="wrapper_header wrapper_header_bosses">Fortress Bosses</strong>
-                    <div class="wrapper wrapper_robots wrapper_robots_smaller wrapper_robots_bosses" data-select="robots" data-kind="bosses">
+                    <div class="wrapper wrapper_robots wrapper_robots_bosses" data-select="robots" data-kind="bosses">
                         <?
                         // Loop through all of the robots, one by one, displaying their buttons
                         //$key_counter = 0;
