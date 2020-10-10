@@ -3,19 +3,19 @@
 // Define ROBOT preview fields if we're not in a specific sub-index
 if ($this_current_sub != 'robots'){
     // If we're not on the full robot index, only show preview robots
-    $mmrpg_database_robots_filter = "AND (robot_token IN ('mega-man', 'bass', 'proto-man') OR robot_game IN ('MM01')) ";
+    $mmrpg_database_robots_filter = "AND (robots.robot_token IN ('mega-man', 'bass', 'proto-man') OR robots.robot_game IN ('MM01')) ";
 }
 
 // Define MECHA preview fields if we're not in a specific sub-index
 if ($this_current_sub != 'mechas'){
     // If we're not on the full mecha index, only show preview mechas
-    $mmrpg_database_mechas_filter = "AND robot_game IN ('MM00', 'MM01') ";
+    $mmrpg_database_mechas_filter = "AND robots.robot_game IN ('MM00', 'MM01') ";
 }
 
 // Define BOSS preview fields if we're not in a specific sub-index
 if ($this_current_sub != 'bosses'){
     // If we're not on the full boss index, only show preview bosses
-    $mmrpg_database_bosses_filter = "AND (robot_token IN ('doc-robot', 'trill') OR robot_game IN ('MM20')) ";
+    $mmrpg_database_bosses_filter = "AND (robots.robot_token IN ('doc-robot', 'trill') OR robots.robot_game IN ('MM20')) ";
 }
 
 // Define ABILITY preview fields if we're not in a specific sub-index

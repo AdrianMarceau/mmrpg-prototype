@@ -18,11 +18,11 @@ $hidden_database_mechas_count = !empty($hidden_database_mechas) ? count($hidden_
 
 // Define the hidden mecha query condition
 $temp_condition = '';
-$temp_condition .= "AND robot_class = 'mecha' ";
+$temp_condition .= "AND robots.robot_class = 'mecha' ";
 if (!empty($hidden_database_mechas)){
     $temp_tokens = array();
     foreach ($hidden_database_mechas AS $token){ $temp_tokens[] = "'".$token."'"; }
-    $temp_condition .= 'AND robot_token NOT IN ('.implode(',', $temp_tokens).') ';
+    $temp_condition .= 'AND robots.robot_token NOT IN ('.implode(',', $temp_tokens).') ';
 }
 // If additional database filters were provided
 $temp_condition_unfiltered = $temp_condition;
@@ -31,15 +31,45 @@ if (isset($mmrpg_database_mechas_filter)){
     $temp_condition .= $mmrpg_database_mechas_filter;
 }
 
+// Collect the database fields
+$mmrpg_database_fields = rpg_field::get_index(true, false);
 
-// Collect the database mechas and fields
-$field_fields = rpg_field::get_index_fields(true);
-$robot_fields = rpg_robot::get_index_fields(true);
+// Collect the database robots
+$mecha_fields = rpg_robot::get_index_fields(true, 'robots');
+$mmrpg_database_mechas = $db->get_array_list("SELECT
+    {$mecha_fields},
+    groups.group_token AS robot_group,
+    tokens.token_order AS robot_order
+    FROM mmrpg_index_robots AS robots
+    LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
+    LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = robots.robot_class
+    WHERE robots.robot_token <> 'robot'
+    AND robots.robot_flag_published = 1 AND (robots.robot_flag_hidden = 0 OR robots.robot_token = '{$this_current_token}') {$temp_condition}
+    ORDER BY
+    FIELD(robot_class, 'master', 'mecha', 'boss'),
+    groups.group_order ASC,
+    tokens.token_order ASC
+    ;", 'robot_token');
+
+// Count the database robots and collect their row numbers
 $db->query("SET @robot_row_number = 0;");
-$mmrpg_database_fields = $db->get_array_list("SELECT {$field_fields} FROM mmrpg_index_fields WHERE field_flag_published = 1;", 'field_token');
-$mmrpg_database_mechas = $db->get_array_list("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND (robot_flag_hidden = 0 OR robot_token = '{$this_current_token}') {$temp_condition} ORDER BY robot_order ASC;", 'robot_token');
-$mmrpg_database_mechas_count = $db->get_value("SELECT COUNT(robot_id) AS robot_count FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND robot_flag_hidden = 0 {$temp_condition_unfiltered};", 'robot_count');
-$mmrpg_database_mechas_numbers = $db->get_array_list("SELECT robot_token, (@robot_row_number:=@robot_row_number + 1) AS robot_key FROM mmrpg_index_robots WHERE robot_flag_published = 1 {$temp_condition_unfiltered} ORDER BY robot_flag_hidden ASC, robot_order ASC;", 'robot_token');
+$mmrpg_database_mechas_count = $db->get_value("SELECT
+    COUNT(robots.robot_id) AS robot_count
+    FROM mmrpg_index_robots AS robots
+    WHERE robots.robot_flag_published = 1 AND robots.robot_flag_hidden = 0 {$temp_condition_unfiltered}
+    ;", 'robot_count');
+$mmrpg_database_mechas_numbers = $db->get_array_list("SELECT
+    robots.robot_token,
+    (@robot_row_number:=@robot_row_number + 1) AS robot_key
+    FROM mmrpg_index_robots AS robots
+    LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
+    LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = robots.robot_class
+    WHERE robots.robot_flag_published = 1 {$temp_condition_unfiltered}
+    ORDER BY
+    FIELD(robot_class, 'master', 'mecha', 'boss'),
+    groups.group_order ASC,
+    tokens.token_order ASC
+    ;", 'robot_token');
 
 // Remove unallowed mechas from the database, and increment type counters
 if (!empty($mmrpg_database_mechas)){
