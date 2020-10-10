@@ -1006,6 +1006,13 @@ button {
 #window .page .body .subbody_databaselinks[data-class="items"] .iconwrap {
     padding-right: 5%;
 }
+#window .page .body .subbody_databaselinks[data-class="robots"] .float.link[data-anchor]:not(.unlockable) {
+    opacity: 0.4;
+    transition: opacity 0.3s;
+}
+#window .page .body .subbody_databaselinks[data-class="robots"] .group:hover .float.link[data-anchor]:not(.unlockable) {
+    opacity: 1.0;
+}
 #window .page .body .subbody .text {
     display: block;
     margin: 0 0 6px;
