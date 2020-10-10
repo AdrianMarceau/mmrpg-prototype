@@ -201,7 +201,7 @@ class cms_admin {
             LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = robots.robot_class
             WHERE robots.robot_token <> 'robot'
             ORDER BY
-            FIELD(robot_class, 'master', 'mecha', 'boss'),
+            FIELD(robots.robot_class, 'master', 'mecha', 'boss'),
             groups.group_order ASC,
             tokens.token_order ASC
             ;", 'robot_token');
@@ -222,7 +222,7 @@ class cms_admin {
             LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = abilities.ability_class
             WHERE abilities.ability_token <> 'ability' AND abilities.ability_class <> 'system'
             ORDER BY
-            FIELD(ability_class, 'master', 'mecha', 'boss'),
+            FIELD(abilities.ability_class, 'master', 'mecha', 'boss'),
             groups.group_order ASC,
             tokens.token_order ASC
             ;", 'ability_token');
