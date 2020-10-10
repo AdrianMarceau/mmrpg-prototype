@@ -807,7 +807,6 @@ class rpg_item extends rpg_object {
             'item_token',
             'item_name',
             'item_game',
-            'item_group',
             'item_class',
             'item_subclass',
             'item_master',
@@ -855,8 +854,7 @@ class rpg_item extends rpg_object {
             'item_flag_complete',
             'item_flag_published',
             'item_flag_unlockable',
-            'item_flag_protected',
-            'item_order'
+            'item_flag_protected'
             );
 
         // Add table name to each field string if requested
@@ -954,18 +952,18 @@ class rpg_item extends rpg_object {
 
         // Define the query condition based on args
         $temp_where = '';
-        $temp_where .= "AND item_class = 'item' ";
-        if (!$include_hidden){ $temp_where .= 'AND item_flag_hidden = 0 '; }
-        if (!$include_unpublished){ $temp_where .= 'AND item_flag_published = 1 '; }
+        $temp_where .= "AND items.item_class = 'item' ";
+        if (!$include_hidden){ $temp_where .= 'AND items.item_flag_hidden = 0 '; }
+        if (!$include_unpublished){ $temp_where .= 'AND items.item_flag_published = 1 '; }
         if (!empty($filter_subclasses)){
-            if (is_array($filter_subclasses)){ $temp_where .= "AND item_subclass IN ('".implode("','", $filter_subclasses)."') "; }
-            elseif (is_string($filter_subclasses)){ $temp_where .= "AND item_subclass = '{$filter_subclasses}' "; }
+            if (is_array($filter_subclasses)){ $temp_where .= "AND items.item_subclass IN ('".implode("','", $filter_subclasses)."') "; }
+            elseif (is_string($filter_subclasses)){ $temp_where .= "AND items.item_subclass = '{$filter_subclasses}' "; }
             }
         if (!empty($include_tokens)){
             $include_string = $include_tokens;
             array_walk($include_string, function(&$s){ $s = "'{$s}'"; });
             $include_tokens = implode(', ', $include_string);
-            $temp_where .= 'OR item_token IN ('.$include_tokens.') ';
+            $temp_where .= 'OR items.item_token IN ('.$include_tokens.') ';
         }
 
         // Define a static array for cached queries
@@ -983,8 +981,19 @@ class rpg_item extends rpg_object {
         }
 
         // Collect every type's info from the database index
-        $item_fields = self::get_index_fields(true);
-        $item_index = $db->get_array_list("SELECT {$item_fields} FROM mmrpg_index_items WHERE item_id <> 0 {$temp_where};", 'item_token');
+        $item_fields = rpg_item::get_index_fields(true, 'items');
+        $item_index = $db->get_array_list("SELECT
+            {$item_index},
+            groups.group_token AS item_group,
+            tokens.token_order AS item_order
+            FROM mmrpg_index_items AS items
+            LEFT JOIN mmrpg_index_items_groups_tokens AS tokens ON tokens.item_token = items.item_token
+            LEFT JOIN mmrpg_index_items_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = items.item_class
+            WHERE item_id <> 0 AND items.item_token <> 'item' AND items.item_class <> 'system' {$temp_where}
+            ORDER BY
+            groups.group_order ASC,
+            tokens.token_order ASC
+            ;", 'item_token');
 
         // Parse and return the data if not empty, else nothing
         if (!empty($item_index)){ $item_index = self::parse_index($item_index); }
