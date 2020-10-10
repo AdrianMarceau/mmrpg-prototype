@@ -12,7 +12,7 @@ $temp_condition = '';
 if (!empty($hidden_database_robots)){
     $temp_tokens = array();
     foreach ($hidden_database_robots AS $token){ $temp_tokens[] = "'".$token."'"; }
-    $temp_condition .= 'AND player_token NOT IN ('.implode(',', $temp_tokens).') ';
+    $temp_condition .= 'AND players.player_token NOT IN ('.implode(',', $temp_tokens).') ';
 }
 // If additional database filters were provided
 $temp_condition_unfiltered = $temp_condition;
@@ -21,12 +21,42 @@ if (isset($mmrpg_database_players_filter)){
     $temp_condition .= $mmrpg_database_players_filter;
 }
 
-// Collect the database players and fields
-$player_fields = rpg_player::get_index_fields(true);
+// Collect the database players
+$player_fields = rpg_player::get_index_fields(true, 'players');
+$mmrpg_database_players = $db->get_array_list("SELECT
+    {$player_fields},
+    groups.group_token AS player_group,
+    tokens.token_order AS player_order
+    FROM mmrpg_index_players AS players
+    LEFT JOIN mmrpg_index_players_groups_tokens AS tokens ON tokens.player_token = players.player_token
+    LEFT JOIN mmrpg_index_players_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = 'player'
+    WHERE players.player_token <> 'player'
+    AND players.player_flag_published = 1 AND (players.player_flag_hidden = 0 OR players.player_token = '{$this_current_token}') {$temp_condition}
+    ORDER BY
+    players.player_class ASC,
+    groups.group_order ASC,
+    tokens.token_order ASC
+    ;", 'player_token');
+
+// Count the database players and collect their row numbers
 $db->query("SET @player_row_number = 0;");
-$mmrpg_database_players = $db->get_array_list("SELECT {$player_fields} FROM mmrpg_index_players WHERE player_flag_published = 1 AND (player_flag_hidden = 0 OR player_token = '{$this_current_token}') {$temp_condition} ORDER BY player_flag_hidden ASC, player_order ASC;", 'player_token');
-$mmrpg_database_players_count = $db->get_value("SELECT COUNT(player_id) AS player_count FROM mmrpg_index_players WHERE player_flag_published = 1 AND player_flag_hidden = 0 {$temp_condition_unfiltered};", 'player_count');
-$mmrpg_database_players_numbers = $db->get_array_list("SELECT player_token, (@player_row_number:=@player_row_number + 1) AS player_key FROM mmrpg_index_players WHERE player_flag_published = 1 {$temp_condition_unfiltered} ORDER BY player_flag_hidden ASC, player_order ASC;", 'player_token');
+$mmrpg_database_players_count = $db->get_value("SELECT
+    COUNT(players.player_id) AS player_count
+    FROM mmrpg_index_players AS players
+    WHERE players.player_flag_published = 1 AND players.player_flag_hidden = 0 {$temp_condition_unfiltered}
+    ;", 'player_count');
+$mmrpg_database_players_numbers = $db->get_array_list("SELECT
+    players.player_token, (@player_row_number:=@player_row_number + 1) AS player_key
+    FROM mmrpg_index_players AS players
+    LEFT JOIN mmrpg_index_players_groups_tokens AS tokens ON tokens.player_token = players.player_token
+    LEFT JOIN mmrpg_index_players_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = 'player'
+    WHERE players.player_token <> 'player'
+    AND players.player_flag_published = 1 {$temp_condition_unfiltered}
+    ORDER BY
+    players.player_class ASC,
+    groups.group_order ASC,
+    tokens.token_order ASC
+    ;", 'player_token');
 
 // Remove unallowed players from the database
 if (!empty($mmrpg_database_players)){
