@@ -179,7 +179,7 @@ class cms_admin {
             FROM mmrpg_index_players AS players
             LEFT JOIN mmrpg_index_players_groups_tokens AS tokens ON tokens.player_token = players.player_token
             LEFT JOIN mmrpg_index_players_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = 'player'
-            WHERE players.player_token <> 'player'
+            WHERE players.player_id <> 0 AND players.player_token <> 'player'
             ORDER BY
             players.player_class ASC,
             groups.group_order ASC,
@@ -199,7 +199,7 @@ class cms_admin {
             FROM mmrpg_index_robots AS robots
             LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
             LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = robots.robot_class
-            WHERE robots.robot_token <> 'robot'
+            WHERE robots.robot_id <> 0 AND robots.robot_token <> 'robot'
             ORDER BY
             FIELD(robots.robot_class, 'master', 'mecha', 'boss'),
             groups.group_order ASC,
@@ -220,7 +220,7 @@ class cms_admin {
             FROM mmrpg_index_abilities AS abilities
             LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
             LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = abilities.ability_class
-            WHERE abilities.ability_token <> 'ability' AND abilities.ability_class <> 'system'
+            WHERE abilities.ability_id <> 0 AND abilities.ability_token <> 'ability' AND abilities.ability_class <> 'system'
             ORDER BY
             FIELD(abilities.ability_class, 'master', 'mecha', 'boss'),
             groups.group_order ASC,
@@ -240,7 +240,7 @@ class cms_admin {
             FROM mmrpg_index_items AS items
             LEFT JOIN mmrpg_index_items_groups_tokens AS tokens ON tokens.item_token = items.item_token
             LEFT JOIN mmrpg_index_items_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = items.item_class
-            WHERE items.item_token <> 'item' AND items.item_class <> 'system'
+            WHERE items.item_id <> 0 AND items.item_token <> 'item' AND items.item_class <> 'system'
             ORDER BY
             groups.group_order ASC,
             tokens.token_order ASC
@@ -259,7 +259,7 @@ class cms_admin {
             FROM mmrpg_index_fields AS fields
             LEFT JOIN mmrpg_index_fields_groups_tokens AS tokens ON tokens.field_token = fields.field_token
             LEFT JOIN mmrpg_index_fields_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = 'field'
-            WHERE fields.field_token <> 'field' AND fields.field_class <> 'system'
+            WHERE fields.field_id <> 0 AND fields.field_token <> 'field' AND fields.field_class <> 'system'
             ORDER BY
             groups.group_order ASC,
             tokens.token_order ASC

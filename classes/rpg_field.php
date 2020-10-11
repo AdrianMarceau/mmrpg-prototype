@@ -68,7 +68,6 @@ class rpg_field extends rpg_object {
         $this->field_name = isset($this_fieldinfo['field_name']) ? $this_fieldinfo['field_name'] : 'Field';
         $this->field_token = isset($this_fieldinfo['field_token']) ? $this_fieldinfo['field_token'] : 'field';
         $this->field_type = isset($this_fieldinfo['field_type']) ? $this_fieldinfo['field_type'] : '';
-        $this->field_group = isset($this_fieldinfo['field_group']) ? $this_fieldinfo['field_group'] : '';
         $this->field_multipliers = isset($this_fieldinfo['field_multipliers']) ? $this_fieldinfo['field_multipliers'] : array();
         $this->field_overlays = isset($this_fieldinfo['field_overlays']) ? $this_fieldinfo['field_overlays'] : array();
         $this->field_mechas = isset($this_fieldinfo['field_mechas']) ? $this_fieldinfo['field_mechas'] : array();
@@ -141,10 +140,6 @@ class rpg_field extends rpg_object {
     //public function print_field_name(){ return '<span class="field_name field_type field_type_'.(!empty($this->field_type) ? $this->field_type : 'none').'">'.$this->field_name.'</span>'; }
     public function print_field_token(){ return '<span class="field_token">'.$this->field_token.'</span>'; }
     public function print_field_type(){ return '<span class="field_type field_type_'.(!empty($this->field_type) ? $this->field_type : 'none').'">'.!empty($this->field_type) ? ucfirst($this->field_type) : 'Neutral'.'</span>'; }
-    public function print_field_group(){
-        $temp_index = array('MMRPG' => 'Mega Man RPG Fields', 'MM00' => 'Mega Man 0 Fields', 'MM01' => 'Mega Man 1 Fields', 'MM02' => 'Mega Man 2 Fields', 'MM03' => 'Mega Man 3 Fields', 'MM04' => 'Mega Man 4 Fields');
-        return '<span class="field_group field_group_'.(!empty($this->field_group) ? $this->field_group : 'MMRPG').'">'.!empty($this->field_group) ? $temp_index[$this->field_group] : 'Unknown'.'</span>';
-    }
     public function print_field_description(){ return '<span class="field_description">'.$this->field_description.'</span>'; }
     public function print_field_background(){ return '<span class="field_background">'.$this->field_background.'</span>'; }
     public function print_field_foreground(){ return '<span class="field_foreground">'.$this->field_foreground.'</span>'; }
@@ -165,7 +160,6 @@ class rpg_field extends rpg_object {
             'field_token',
             'field_name',
             'field_game',
-            'field_group',
             'field_class',
             'field_master',
             'field_master2',
@@ -190,8 +184,7 @@ class rpg_field extends rpg_object {
             'field_flag_hidden',
             'field_flag_complete',
             'field_flag_published',
-            'field_flag_protected',
-            'field_order'
+            'field_flag_protected'
             );
 
         // Add table name to each field string if requested
@@ -276,14 +269,14 @@ class rpg_field extends rpg_object {
 
         // Define the query condition based on args
         $temp_where = '';
-        if (!$include_hidden){ $temp_where .= 'AND field_flag_hidden = 0 '; }
-        if (!$include_unpublished){ $temp_where .= 'AND field_flag_published = 1 '; }
-        if (!empty($filter_class)){ $temp_where .= "AND field_class = '{$filter_class}' "; }
+        if (!$include_hidden){ $temp_where .= 'AND fields.field_flag_hidden = 0 '; }
+        if (!$include_unpublished){ $temp_where .= 'AND fields.field_flag_published = 1 '; }
+        if (!empty($filter_class)){ $temp_where .= "AND fields.field_class = '{$filter_class}' "; }
         if (!empty($include_tokens)){
             $include_string = $include_tokens;
             array_walk($include_string, function(&$s){ $s = "'{$s}'"; });
             $include_tokens = implode(', ', $include_string);
-            $temp_where .= 'OR field_token IN ('.$include_tokens.') ';
+            $temp_where .= 'OR fields.field_token IN ('.$include_tokens.') ';
         }
 
         // Define a static array for cached queries
@@ -300,9 +293,20 @@ class rpg_field extends rpg_object {
 
         }
 
-        // Collect every type's info from the database index
-        $field_fields = self::get_index_fields(true);
-        $field_index = $db->get_array_list("SELECT {$field_fields} FROM mmrpg_index_fields WHERE field_id <> 0 {$temp_where};", 'field_token');
+        // Collect every field's info from the database index
+        $field_fields = rpg_field::get_index_fields(true, 'fields');
+        $field_index = $db->get_array_list("SELECT
+            {$field_fields},
+            groups.group_token AS field_group,
+            tokens.token_order AS field_order
+            FROM mmrpg_index_fields AS fields
+            LEFT JOIN mmrpg_index_fields_groups_tokens AS tokens ON tokens.field_token = fields.field_token
+            LEFT JOIN mmrpg_index_fields_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = 'field'
+            WHERE field_id <> 0 AND fields.field_token <> 'field' AND fields.field_class <> 'system' {$temp_where}
+            ORDER BY
+            groups.group_order ASC,
+            tokens.token_order ASC
+            ;", 'field_token');
 
         // Parse and return the data if not empty, else nothing
         if (!empty($field_index)){ $field_index = self::parse_index($field_index); }
@@ -475,7 +479,6 @@ class rpg_field extends rpg_object {
             'field_name' => $this->field_name,
             'field_token' => $this->field_token,
             'field_type' => $this->field_type,
-            'field_group' => $this->field_group,
             'field_multipliers' => $this->field_multipliers,
             'field_mechas' => $this->field_mechas,
             'field_description' => $this->field_description,
@@ -674,25 +677,6 @@ class rpg_field extends rpg_object {
      */
     public function set_base_type2($type2){
         $this->set_info('field_base_type2', $type2);
-    }
-
-
-    // -- GROUP FUNCTIONS -- //
-
-    /**
-     * Get the group token of this field object
-     * @return string
-     */
-    public function get_group(){
-        return $this->get_info('field_group');
-    }
-
-    /**
-     * Set the group token of this field object
-     * @param string $type2
-     */
-    public function set_group($token){
-        $this->set_info('field_group', $token);
     }
 
     // -- MULTIPLIER FUNCTIONS -- //
