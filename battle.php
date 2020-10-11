@@ -152,49 +152,11 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
 <link rel="shortcut icon" type="image/x-icon" href="images/assets/<?= mmrpg_get_favicon() ?>">
 <link type="text/css" href="styles/reset.css" rel="stylesheet" />
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.css" rel="stylesheet" />
 <link type="text/css" href="styles/battle.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?if($flag_wap):?>
 <link type="text/css" href="styles/style-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?endif;?>
-<script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
-<script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<script type="text/javascript" src="scripts/battle.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<script type="text/javascript">
-// Update game setting flags
-<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
-gameSettings.idleAnimation = <?= $debug_flag_animation ? 'true' : 'false' ?>;
-gameSettings.fieldMusic = '<?= !strstr($this_field_data['field_music'], '/') ? 'fields/'.$this_field_data['field_music'] : $this_field_data['field_music'] ?>';
-//gameSettings.eventCrossFade = true;
-<?
-// Update the event timeout setting if set
-$event_timeout = !empty($_SESSION['GAME']['battle_settings']['eventTimeout']) ? $_SESSION['GAME']['battle_settings']['eventTimeout'] : 0;
-if (!empty($event_timeout)){ echo 'gameSettings.eventTimeout ='.$event_timeout.";\n"; }
-?>
-// Create the document ready events
-$(document).ready(function(){
-<?
-// Preload battle related image files
-if (!empty($this_battle_data)){
-    echo "  mmrpg_preload_field_sprites('background', '{$this_field_data['field_background']}');\n";
-    echo "  mmrpg_preload_field_sprites('foreground', '{$this_field_data['field_foreground']}');\n";
-}
-if (!empty($this_player_data) && !empty($this_player_data['player_robots'])){
-    // Preload this player robot sprites
-    foreach ($this_player_data['player_robots'] AS $temp_key => $temp_robotinfo){
-        echo "  mmrpg_preload_robot_sprites('{$temp_robotinfo['robot_token']}', 'right', 80);\n";
-    }
-}
-if (!empty($target_player_data) && !empty($target_player_data['player_robots'])){
-    // Preload the target player robot sprites
-    foreach ($target_player_data['player_robots'] AS $temp_key => $temp_robotinfo){
-        echo "  mmrpg_preload_robot_sprites('{$temp_robotinfo['robot_token']}', 'left', 80);\n";
-    }
-}
-?>
-
-});
-
-</script>
 </head>
 <body id="mmrpg" class="battle <?= 'env_'.MMRPG_CONFIG_SERVER_ENV ?>">
 <div id="battle" class="hidden <?= $flag_skip_fadein ? 'fastfade' : '' ?>">
@@ -631,6 +593,46 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
     </div>
 
 </div>
+<script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
+<script type="text/javascript" src=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.js"></script>
+<script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/battle.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript">
+// Update game setting flags
+<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
+gameSettings.idleAnimation = <?= $debug_flag_animation ? 'true' : 'false' ?>;
+gameSettings.fieldMusic = '<?= !strstr($this_field_data['field_music'], '/') ? 'fields/'.$this_field_data['field_music'] : $this_field_data['field_music'] ?>';
+//gameSettings.eventCrossFade = true;
+<?
+// Update the event timeout setting if set
+$event_timeout = !empty($_SESSION['GAME']['battle_settings']['eventTimeout']) ? $_SESSION['GAME']['battle_settings']['eventTimeout'] : 0;
+if (!empty($event_timeout)){ echo 'gameSettings.eventTimeout ='.$event_timeout.";\n"; }
+?>
+// Create the document ready events
+$(document).ready(function(){
+<?
+// Preload battle related image files
+if (!empty($this_battle_data)){
+    echo "  mmrpg_preload_field_sprites('background', '{$this_field_data['field_background']}');\n";
+    echo "  mmrpg_preload_field_sprites('foreground', '{$this_field_data['field_foreground']}');\n";
+}
+if (!empty($this_player_data) && !empty($this_player_data['player_robots'])){
+    // Preload this player robot sprites
+    foreach ($this_player_data['player_robots'] AS $temp_key => $temp_robotinfo){
+        echo "  mmrpg_preload_robot_sprites('{$temp_robotinfo['robot_token']}', 'right', 80);\n";
+    }
+}
+if (!empty($target_player_data) && !empty($target_player_data['player_robots'])){
+    // Preload the target player robot sprites
+    foreach ($target_player_data['player_robots'] AS $temp_key => $temp_robotinfo){
+        echo "  mmrpg_preload_robot_sprites('{$temp_robotinfo['robot_token']}', 'left', 80);\n";
+    }
+}
+?>
+
+});
+
+</script>
 <?
 // Require the remote bottom in case we're in viewer mode
 require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php');

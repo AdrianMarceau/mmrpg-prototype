@@ -36,6 +36,9 @@ gameSettings.currentBodyHeight = 0; // collect the current window width and upda
 gameSettings.allowEditing = true; // default to true to allow all editing unless otherwise stated
 gameSettings.audioBaseHref = ''; // the base href where audio comes from (empty if same as baseHref)
 
+// Define the perfect scrollbar settings
+var thisScrollbarSettings = {wheelSpeed:0.3};
+
 // Create the game engine submit timer
 var gameEngineSubmitTimeout = false;
 var gameEngineSubmitReturn = false;
@@ -631,7 +634,10 @@ function windowResizeUpdate(updateType){
     if (gameConsole.length && !gameConsole.hasClass('noresize')){
         //console.log('gameConsole.length && !gameConsole.hasClass(\'noresize\');\ngameConsole.height('+newConsoleHeight+' - 3); ');
         gameConsole.height(newConsoleHeight - 3);
-        gameConsole.find('.wrapper').css({overflow:'scroll',width:(gameConsole.width() + 18)+'px',height:(gameConsole.height() + 18)+'px'})
+        var gameConsoleWrapper = gameConsole.find('.wrapper');
+        //gameConsoleWrapper.css({overflow:'scroll',width:(gameConsole.width() + 18)+'px',height:(gameConsole.height() + 18)+'px'});
+        gameConsoleWrapper.css({width:(gameConsole.width() + 18)+'px',height:(gameConsole.height() + 0)+'px'});
+        gameConsoleWrapper.perfectScrollbar(thisScrollbarSettings);
         }
 
     // If height reszing is allowed, update the window height
