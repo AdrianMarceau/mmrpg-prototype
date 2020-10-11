@@ -9,6 +9,8 @@ ob_echo('');
 // Collect an index of all valid items from the database
 $item_fields = rpg_item::get_index_fields(false);
 if (!in_array('item_functions', $item_fields)){ $item_fields[] = 'item_functions'; }
+if (!in_array('item_group', $item_fields)){ $item_fields[] = 'item_group'; }
+if (!in_array('item_order', $item_fields)){ $item_fields[] = 'item_order'; }
 $item_fields = implode(', ', $item_fields);
 $item_index = $db->get_array_list("SELECT {$item_fields} FROM mmrpg_index_items ORDER BY item_token ASC", 'item_token');
 
@@ -254,7 +256,7 @@ ob_echo('----------');
 
 ob_echo('');
 ob_echo_nobreak('Generating item groups data file... ');
-$object_groups = cms_admin::generate_object_groups_from_index($ability_index, 'item');
+$object_groups = cms_admin::generate_object_groups_from_index($item_index, 'item');
 cms_admin::save_object_groups_to_json($object_groups, 'item');
 ob_echo('...done!');
 ob_echo('');

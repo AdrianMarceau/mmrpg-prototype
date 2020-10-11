@@ -19,6 +19,8 @@ $deprecated_abilities = array(
 // Collect an index of all valid abilities from the database
 $ability_fields = rpg_ability::get_index_fields(false);
 if (!in_array('ability_functions', $ability_fields)){ $ability_fields[] = 'ability_functions'; }
+if (!in_array('ability_group', $ability_fields)){ $ability_fields[] = 'ability_group'; }
+if (!in_array('ability_order', $ability_fields)){ $ability_fields[] = 'ability_order'; }
 $ability_fields = implode(', ', $ability_fields);
 $ability_index = $db->get_array_list("SELECT {$ability_fields} FROM mmrpg_index_abilities ORDER BY ability_token ASC", 'ability_token');
 

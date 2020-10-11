@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 declare -a REPO_KINDS=(
     "sql"
@@ -14,7 +14,7 @@ declare -a REPO_KINDS=(
     "pages"
     )
 
-declare -a REPO_PATHS
+declare -A REPO_PATHS
 REPO_PATHS[sql]=".sql"
 REPO_PATHS[types]="types"
 REPO_PATHS[battles]="battles"
