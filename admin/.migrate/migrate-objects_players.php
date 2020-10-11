@@ -13,6 +13,8 @@ $deprecated_players = array(
 // Collect an index of all valid players from the database
 $player_fields = rpg_player::get_index_fields(false);
 if (!in_array('player_functions', $player_fields)){ $player_fields[] = 'player_functions'; }
+if (!in_array('player_group', $player_fields)){ $player_fields[] = 'player_group'; }
+if (!in_array('player_order', $player_fields)){ $player_fields[] = 'player_order'; }
 $player_fields = implode(', ', $player_fields);
 $player_index = $db->get_array_list("SELECT {$player_fields} FROM mmrpg_index_players ORDER BY player_token ASC", 'player_token');
 

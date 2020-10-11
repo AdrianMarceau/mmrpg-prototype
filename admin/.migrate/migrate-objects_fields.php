@@ -13,6 +13,8 @@ $deprecated_fields = array(
 // Collect an index of all valid fields from the database
 $field_fields = rpg_field::get_index_fields();
 if (!in_array('field_functions', $field_fields)){ $field_fields[] = 'field_functions'; }
+if (!in_array('field_group', $field_fields)){ $field_fields[] = 'field_group'; }
+if (!in_array('field_order', $field_fields)){ $field_fields[] = 'field_order'; }
 $field_fields = implode(', ', $field_fields);
 $field_index = $db->get_array_list("SELECT {$field_fields} FROM mmrpg_index_fields ORDER BY field_token ASC", 'field_token');
 
@@ -158,7 +160,7 @@ ob_echo('----------');
 
 ob_echo('');
 ob_echo_nobreak('Generating field groups data file... ');
-$object_groups = cms_admin::generate_object_groups_from_index($ability_index, 'field');
+$object_groups = cms_admin::generate_object_groups_from_index($field_index, 'field');
 cms_admin::save_object_groups_to_json($object_groups, 'field');
 ob_echo('...done!');
 ob_echo('');

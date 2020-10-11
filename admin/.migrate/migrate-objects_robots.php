@@ -8,6 +8,7 @@ ob_echo('');
 
 // Predefine any deprecated robots or robot sprites so we can ignore them
 $deprecated_robots = array(
+    'robot2',
     'test-man', 'test-woman',
     'ageman20xx', 'megabossman', 'rhythmbca'
     );
@@ -15,6 +16,8 @@ $deprecated_robots = array(
 // Collect an index of all valid robots from the database
 $robot_fields = rpg_robot::get_index_fields(false);
 if (!in_array('robot_functions', $robot_fields)){ $robot_fields[] = 'robot_functions'; }
+if (!in_array('robot_group', $robot_fields)){ $robot_fields[] = 'robot_group'; }
+if (!in_array('robot_order', $robot_fields)){ $robot_fields[] = 'robot_order'; }
 $robot_fields = implode(', ', $robot_fields);
 $robot_index = $db->get_array_list("SELECT {$robot_fields} FROM mmrpg_index_robots ORDER BY robot_token ASC", 'robot_token');
 
@@ -54,6 +57,9 @@ foreach ($deprecated_robots AS $token){
     $rm_key = array_search($token, $robot_shadows_list);
     if ($rm_key !== false){ unset($robot_shadows_list[$rm_key]); }
     if (isset($robot_index[$token])){ unset($robot_index[$token]); }
+    if (file_exists(MMRPG_ROBOTS_NEW_CONTENT_DIR.$token.'/')){
+        deletedir_or_exit(MMRPG_ROBOTS_NEW_CONTENT_DIR.$token.'/');
+    }
 }
 
 // Loop through sprites and pre-collect any alts for later looping
@@ -221,7 +227,7 @@ ob_echo('----------');
 
 ob_echo('');
 ob_echo_nobreak('Generating robot groups data file... ');
-$object_groups = cms_admin::generate_object_groups_from_index($ability_index, 'robot');
+$object_groups = cms_admin::generate_object_groups_from_index($robot_index, 'robot');
 cms_admin::save_object_groups_to_json($object_groups, 'robot');
 ob_echo('...done!');
 ob_echo('');
