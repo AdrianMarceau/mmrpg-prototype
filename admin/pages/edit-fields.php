@@ -253,8 +253,7 @@
                 'field_flag_complete' => 0,
                 'field_flag_published' => 0,
                 'field_flag_unlockable' => 0,
-                'field_flag_protected' => 0,
-                'field_order' => 0
+                'field_flag_protected' => 0
                 );
 
             // Overwrite temp data with any backup data provided
@@ -291,8 +290,6 @@
             $form_data['field_type'] = !empty($_POST['field_type']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['field_type']) ? trim(strtolower($_POST['field_type'])) : '';
 
             $form_data['field_game'] = !empty($_POST['field_game']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['field_game']) ? trim($_POST['field_game']) : '';
-            $form_data['field_group'] = ''; //!empty($_POST['field_group']) && preg_match('/^[-_a-z0-9\/]+$/i', $_POST['field_group']) ? trim($_POST['field_group']) : '';
-            $form_data['field_order'] = !empty($_POST['field_order']) && is_numeric($_POST['field_order']) ? (int)(trim($_POST['field_order'])) : 0;
 
             $form_data['field_master'] = !empty($_POST['field_master']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['field_master']) ? trim(strtolower($_POST['field_master'])) : '';
             $form_data['field_master2'] = !empty($_POST['field_master2']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['field_master2']) ? trim(strtolower($_POST['field_master2'])) : '';
@@ -347,7 +344,6 @@
 
             // VALIDATE all of the SEMI-MANDATORY FIELDS to see if any were not provided and unset them from updating if necessary
             if (!$field_data_is_new && empty($form_data['field_game'])){ $form_messages[] = array('warning', 'Source Game was not provided and may cause issues on the front-end'); }
-            //if (empty($form_data['field_group'])){ $form_messages[] = array('warning', 'Sorting Group was not provided and may cause issues on the front-end'); }
 
             // REFORMAT or OPTIMIZE data for provided fields where necessary
 
@@ -446,8 +442,6 @@
             else {
 
                 $form_data['field_game'] = 'MMRPG';
-                $form_data['field_group'] = '';
-                $form_data['field_order'] = 1 + $db->get_value("SELECT MAX(field_order) AS max FROM mmrpg_index_fields;", 'max');
 
                 $temp_json_fields = rpg_field::get_json_index_fields();
                 foreach ($temp_json_fields AS $field){ $form_data[$field] = !empty($form_data[$field]) ? json_encode($form_data[$field], JSON_NUMERIC_CHECK) : ''; }
@@ -1067,11 +1061,6 @@
                                         </select><span></span>
                                     </div>
 
-                                    <div class="field foursize">
-                                        <strong class="label">Sort Order</strong>
-                                        <input class="textbox" type="number" name="field_order" value="<?= $field_data['field_order'] ?>" maxlength="8" />
-                                    </div>
-
                                 <? } ?>
 
                             </div>
@@ -1082,7 +1071,7 @@
                                     <div class="field halfsize">
                                         <div class="label">
                                             <strong>Field Class</strong>
-                                            <em>three-four word classification</em>
+                                            <em>three-to-four word classification</em>
                                         </div>
                                         <input class="textbox" type="text" name="field_description" value="<?= htmlentities($field_data['field_description'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="32" />
                                     </div>

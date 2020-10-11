@@ -1071,9 +1071,9 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
     global $star_shake_delay;
     if (empty($star_shake_delay)){ $star_shake_delay = array(); }
     if (empty($star_shake_delay[$player_token])){ $star_shake_delay[$player_token] = 0; }
-    global $mmrpg_index_fields, $mmrpg_index_players;
+    static $mmrpg_index_fields, $mmrpg_index_players;
     if (empty($mmrpg_index_fields)){ $mmrpg_index_fields = rpg_field::get_index(true); }
-    if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
+    if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true, false, '', array('player')); }
 
     // Define the variable to collect option markup
     $this_markup = '';

@@ -983,7 +983,7 @@ class rpg_item extends rpg_object {
         // Collect every type's info from the database index
         $item_fields = rpg_item::get_index_fields(true, 'items');
         $item_index = $db->get_array_list("SELECT
-            {$item_index},
+            {$item_fields},
             groups.group_token AS item_group,
             tokens.token_order AS item_order
             FROM mmrpg_index_items AS items

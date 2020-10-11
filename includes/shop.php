@@ -772,17 +772,21 @@ if (!empty($this_shop_index['kalinka'])){
 
         // Collect a list of robot masters that we're allowed to sell
         $buyable_robots = $db->get_array_list("SELECT
-            robot_token
-            FROM mmrpg_index_robots
+            robots.robot_token
+            FROM mmrpg_index_robots AS robots
+            LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
+            LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = robots.robot_class
             WHERE
-            robot_flag_published = 1
-            AND robot_flag_complete = 1
-            AND robot_flag_unlockable = 1
-            AND robot_number NOT LIKE 'RPG-%'
-            AND robot_number NOT LIKE 'PCR-%'
-            AND robot_game NOT IN ('MM00')
+            robots.robot_flag_published = 1
+            AND robots.robot_flag_complete = 1
+            AND robots.robot_flag_unlockable = 1
+            AND robots.robot_number NOT LIKE 'RPG-%'
+            AND robots.robot_number NOT LIKE 'PCR-%'
+            AND robots.robot_game NOT IN ('MM00')
             ORDER BY
-            robot_order ASC
+            FIELD(robots.robot_class, 'master', 'mecha', 'boss'),
+            groups.group_order ASC,
+            tokens.token_order ASC
             ;", 'robot_token');
 
         // Ensure there are robots to see before showing them

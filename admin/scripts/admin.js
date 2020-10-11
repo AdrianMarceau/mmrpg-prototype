@@ -890,7 +890,6 @@ $(document).ready(function(){
                     else { var abilityIsCompatible = robotHasCompatibility(robotToken, abilityToken, robotItem); }
                     var abilityIsComplete = parseInt(abilityInfo['ability_flag_complete']) === 1 ? true : false;
                     if (!abilityIsCompatible || !abilityIsComplete){ continue; }
-                    //var optionsGroup = upperCaseFirst(abilityInfo['ability_class'])+' | '+abilityInfo['ability_group'];
                     var optionsGroup = upperCaseFirst(abilityInfo['ability_class'])+' | '+(abilityInfo['ability_group'].split('/').slice(0, 2).join(' | '));
                     if (lastOptionsGroup !== optionsGroup){
                         if (lastOptionsGroup.length){ newOptions += '</optgroup>'; }

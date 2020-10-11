@@ -28,15 +28,6 @@ class rpg_mission_endless extends rpg_mission {
             $mmrpg_types_index = array_merge(array('copy' => null), $mmrpg_types_index);
             $mmrpg_types_order = array_keys($mmrpg_types_index);
 
-            // Make sure the robots are sorted how we want them
-            uasort($mmrpg_robots_index, function($r1, $r2){ return $r1['robot_order'] < $r2['robot_order'] ? -1 : 1; });
-
-            // Make sure the fields are sorted how we want them
-            uasort($mmrpg_fields_index, function($f1, $f2){ return $f1['field_order'] < $f2['field_order'] ? -1 : 1; });
-
-            // Make sure the items are sorted how we want them
-            uasort($mmrpg_items_index, function($i1, $i2){ return $i1['item_order'] < $i2['item_order'] ? -1 : 1; });
-
             // Sort the robot masters into lists of their core types
             $mmrpg_robots_index_bycore = array();
             foreach ($mmrpg_robots_index AS $robot_token => $robot_info){

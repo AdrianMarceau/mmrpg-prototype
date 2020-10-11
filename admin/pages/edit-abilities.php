@@ -803,8 +803,6 @@
                                 }
                                 $ability_game = ucfirst($ability_data['ability_game']);
                                 $ability_game_span = '<span class="type_span type_none">'.$ability_game.'</span>';
-                                $ability_group = ucfirst($ability_data['ability_group']);
-                                $ability_group_span = '<span class="type_span type_cutter">'.$ability_group.'</span>';
                                 $ability_flag_published = !empty($ability_data['ability_flag_published']) ? '<i class="fas fa-check-square"></i>' : '-';
                                 $ability_flag_complete = !empty($ability_data['ability_flag_complete']) ? '<i class="fas fa-check-circle"></i>' : '-';
                                 $ability_flag_unlockable = !empty($ability_data['ability_flag_unlockable']) ? '<i class="fas fa-unlock"></i>' : '-';

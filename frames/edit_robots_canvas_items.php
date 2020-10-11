@@ -2,11 +2,6 @@
 
 // CANVAS MARKUP : ITEMS
 
-// Collect the players index if not already populated
-if (!isset($mmrpg_index_players) || empty($mmrpg_index_players)){
-    $mmrpg_index_players = rpg_player::get_index(true);
-}
-
 // Include the necessary database files
 require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
@@ -33,7 +28,7 @@ echo '<div class="wrapper no_sort">';
             else { $player_item_rewards = array(); }
 
             // Create a fake player and robot to pass the info check
-            $player_info = $mmrpg_index_players['player'];
+            $player_info = rpg_player::get_index_info('player');
             $robot_info = rpg_robot::get_index_info('robot');
 
             // Sort the item rewards based on item number and such
@@ -42,6 +37,7 @@ echo '<div class="wrapper no_sort">';
             // Collect the item reward options to be used on all selects
             $item_rewards_options = $global_allow_editing ? rpg_item::print_editor_options_list_markup($player_item_rewards, null, $player_info, $robot_info) : '';
 
+            // Loop through collected item reward options and display markup for 'em
             foreach ($mmrpg_database_items AS $item_token => $item_info){
                 if (!isset($player_item_rewards[$item_token])){ continue; }
                 if ($item_info['item_subclass'] != 'holdable' && $item_info['item_subclass'] != 'consumable'){ continue; }
@@ -52,6 +48,7 @@ echo '<div class="wrapper no_sort">';
 
                 $key_counter++;
             }
+
         }
     echo '</div>';
     if ($global_allow_editing){

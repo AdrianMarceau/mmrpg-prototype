@@ -1029,15 +1029,6 @@ class rpg_field extends rpg_object {
     }
 
     /**
-     * Get the formatted type of this field object
-     * @return string
-     */
-    public function print_group(){
-        $temp_index = array('MMRPG' => 'Mega Man RPG Fields', 'MM00' => 'Mega Man 0 Fields', 'MM01' => 'Mega Man 1 Fields', 'MM02' => 'Mega Man 2 Fields', 'MM03' => 'Mega Man 3 Fields', 'MM04' => 'Mega Man 4 Fields');
-        return '<span class="field_group field_group_'.(!empty($this->field_group) ? $this->field_group : 'MMRPG').'">'.!empty($this->field_group) ? $temp_index[$this->field_group] : 'Unknown'.'</span>';
-    }
-
-    /**
      * Get the formatted description of this field object
      * @return string
      */

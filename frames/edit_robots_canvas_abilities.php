@@ -4,7 +4,7 @@
 
 // Collect the players index if not already populated
 if (!isset($mmrpg_index_players) || empty($mmrpg_index_players)){
-    $mmrpg_index_players = rpg_player::get_index(true);
+    $mmrpg_index_players = rpg_player::get_index(true, false, '', array('player'));
 }
 
 // Include the necessary database files
@@ -39,8 +39,8 @@ echo '<div class="wrapper">';
             }
 
             // Create a fake player and robot to pass the info check
-            $player_info = $mmrpg_index_players['player']; //rpg_player::get_index_info('player'); //array('player_token' => 'player', 'player_name' => 'Player');
-            $robot_info = rpg_robot::get_index_info('robot'); //array('robot_token' => 'robot', 'robot_name' => 'Robot');
+            $player_info = rpg_player::get_index_info('player');
+            $robot_info = rpg_robot::get_index_info('robot');
 
             // Sort the ability rewards based on ability number and such
             uasort($player_ability_rewards, array('rpg_functions', 'abilities_sort_for_editor'));
@@ -49,6 +49,7 @@ echo '<div class="wrapper">';
             // Collect the ability reward options to be used on all selects
             $ability_rewards_options = $global_allow_editing ? rpg_ability::print_editor_options_list_markup($player_ability_rewards, $robot_ability_rewards, $player_info, $robot_info) : '';
 
+            // Loop through collected ability reward options and display markup for 'em
             foreach ($mmrpg_database_abilities AS $ability_token => $ability_info){
                 if (!rpg_game::ability_unlocked('', '', $ability_token)){ continue; }
                 //if ($key_counter > 0 && $key_counter % 5 == 0){ echo '</tr><tr>'; }
@@ -63,6 +64,7 @@ echo '<div class="wrapper">';
                 //echo '</td>';
                 $key_counter++;
             }
+
         }
 
         //echo '</tr></table>';

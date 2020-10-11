@@ -829,9 +829,7 @@
             $ability_options_markup = array();
             $ability_options_markup[] = '<option value="">-</option>';
             foreach ($mmrpg_abilities_index AS $ability_token => $ability_info){
-                //if (in_array($ability_token, $global_ability_tokens)){ continue; }
                 if ($ability_info['ability_class'] !== 'master'){ continue; }
-                //$option_group = ucfirst($ability_info['ability_class']).' | '.str_replace('/', ' | ', $ability_info['ability_group']);
                 $option_group = str_replace('/', ' | ', $ability_info['ability_group']);
                 if ($last_option_group !== $option_group){
                     if (!empty($last_option_group)){ $ability_options_markup[] = '</optgroup>'; }

@@ -862,8 +862,6 @@
                                 }
                                 $robot_game = ucfirst($robot_data['robot_game']);
                                 $robot_game_span = '<span class="type_span type_none">'.$robot_game.'</span>';
-                                $robot_group = ucfirst($robot_data['robot_group']);
-                                $robot_group_span = '<span class="type_span type_cutter">'.$robot_group.'</span>';
                                 $robot_flag_published = !empty($robot_data['robot_flag_published']) ? '<i class="fas fa-check-square"></i>' : '-';
                                 $robot_flag_complete = !empty($robot_data['robot_flag_complete']) ? '<i class="fas fa-check-circle"></i>' : '-';
                                 $robot_flag_unlockable = !empty($robot_data['robot_flag_unlockable']) ? '<i class="fas fa-unlock"></i>' : '-';

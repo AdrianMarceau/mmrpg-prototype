@@ -50,7 +50,7 @@ class rpg_mission_bonus extends rpg_mission {
         }
         $robot_index_query .= "AND robot_flag_published = 1 ";
         $robot_index_query .= "AND robot_flag_exclusive = 0 ";
-        $robot_index_query .= "ORDER BY robot_order ASC ";
+        $robot_index_query .= "ORDER BY robot_id ASC ";
         $this_robot_index = $db->get_array_list($robot_index_query, 'robot_token');
 
         // Populate the battle options with the starter battle option

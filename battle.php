@@ -80,19 +80,9 @@ else {
     $this_field_data = array();
 }
 
-// Collect the players index if not already populated
-if (!isset($mmrpg_index_players) || empty($mmrpg_index_players)){
-    $mmrpg_index_players = rpg_player::get_index(true);
-}
-
-// Collect the robots index if not already populated
-if (!isset($mmrpg_index_robots) || empty($mmrpg_index_robots)){
-    $mmrpg_index_robots = rpg_robot::get_index(true);
-}
-
 // Collect this player's index data if available
-if (!empty($this_player_token) && isset($mmrpg_index_players[$this_player_token])){
-    $this_player_data = $mmrpg_index_players[$this_player_token];
+if (!empty($this_player_token)){
+    $this_player_data = rpg_player::get_index_info($this_player_token);
     $temp_user_id = rpg_user::get_current_userid();
     $temp_player_id = rpg_game::unique_player_id($temp_user_id, $this_player_data['player_id']);
     $this_player_data['user_id'] = $temp_user_id;
@@ -104,7 +94,7 @@ if (!empty($this_player_token) && isset($mmrpg_index_players[$this_player_token]
         foreach ($allowed_robots AS $key => $robot_string){
             list($robot_id, $robot_token) = explode('_', $robot_string);
             if (mmrpg_prototype_robot_unlocked($this_player_token, $robot_token)){
-                $temp_robot_data = $mmrpg_index_robots[$robot_token];
+                $temp_robot_data = rpg_robot::get_index_info($robot_token);
                 $temp_robot_id = rpg_game::unique_robot_id($temp_player_id, $temp_robot_data['robot_id'], ($key + 1));
                 $this_player_data['player_robots'][] = array('robot_id' => $temp_robot_id, 'robot_token' => $robot_token);
                 $allowed_robots_parsed[] = $temp_robot_id.'_'.$robot_token;
@@ -119,15 +109,15 @@ else {
 }
 
 // Collect the target player's index data if available
-if (!empty($target_player_token) && isset($mmrpg_index_players[$target_player_token])){
-    $target_player_data = $mmrpg_index_players[$target_player_token];
+if (!empty($target_player_token)){
+    $target_player_data = rpg_player::get_index_info($target_player_token);
     $temp_user_id = MMRPG_SETTINGS_TARGET_PLAYERID;
     $temp_player_id = rpg_game::unique_player_id($temp_user_id, ($target_player_data['player_token'] !== 'player' ? $target_player_data['player_id'] : 0));
     $target_player_data['user_id'] = $temp_user_id;
     $target_player_data['player_id'] = $temp_player_id;
 }
-elseif (!empty($this_battle_data['battle_target_player']['player_token']) && isset($mmrpg_index_players[$this_battle_data['battle_target_player']['player_token']])){
-    $indexed_target_player_data = $mmrpg_index_players[$this_battle_data['battle_target_player']['player_token']];
+elseif (!empty($this_battle_data['battle_target_player']['player_token'])){
+    $indexed_target_player_data = rpg_player::get_index_info($this_battle_data['battle_target_player']['player_token']);
     $target_player_data = array_merge($indexed_target_player_data, $this_battle_data['battle_target_player']);
     $temp_user_id = !empty($target_player_data['user_id']) ? $target_player_data['user_id'] : MMRPG_SETTINGS_TARGET_PLAYERID;
     $temp_player_id = rpg_game::unique_player_id($temp_user_id, ($indexed_target_player_data['player_token'] !== 'player' ? $indexed_target_player_data['player_id'] : 0));

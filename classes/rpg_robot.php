@@ -2426,14 +2426,14 @@ class rpg_robot extends rpg_object {
 
         // Define the query condition based on args
         $temp_where = '';
-        if (!$include_hidden){ $temp_where .= 'AND robot_flag_hidden = 0 '; }
-        if (!$include_unpublished){ $temp_where .= 'AND robot_flag_published = 1 '; }
-        if (!empty($filter_class)){ $temp_where .= "AND robot_class = '{$filter_class}' "; }
+        if (!$include_hidden){ $temp_where .= 'AND robots.robot_flag_hidden = 0 '; }
+        if (!$include_unpublished){ $temp_where .= 'AND robots.robot_flag_published = 1 '; }
+        if (!empty($filter_class)){ $temp_where .= "AND robots.robot_class = '{$filter_class}' "; }
         if (!empty($include_tokens)){
             $include_string = $include_tokens;
             array_walk($include_string, function(&$s){ $s = "'{$s}'"; });
             $include_tokens = implode(', ', $include_string);
-            $temp_where .= 'OR robot_token IN ('.$include_tokens.') ';
+            $temp_where .= 'OR robots.robot_token IN ('.$include_tokens.') ';
         }
 
         // Define a static array for cached queries
@@ -2537,6 +2537,18 @@ class rpg_robot extends rpg_object {
 
         // If empty, return nothing
         if (empty($robot_token)){ return false; };
+
+        // If the template robot was requested
+        if ($robot_token === 'robot'){
+            static $template_robot_info;
+            if (empty($template_robot_info)){
+                global $db;
+                $fields = self::get_index_fields(true);
+                $template_robot_info = $db->get_array("SELECT {$fields} FROM mmrpg_index_robots WHERE robot_token = 'robot';");
+                $template_robot_info = self::parse_index_info($template_robot_info);
+            }
+            return $template_robot_info;
+        }
 
         // Collect a local copy of the robot index
         static $robot_index = false;

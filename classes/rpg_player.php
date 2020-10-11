@@ -1837,15 +1837,22 @@ class rpg_player extends rpg_object {
      * @param bool $parse_data
      * @return array
      */
-    public static function get_index($include_hidden = false, $include_unpublished = false){
+    public static function get_index($include_hidden = false, $include_unpublished = false, $filter_class = '', $include_tokens = array()){
 
         // Pull in global variables
         $db = cms_database::get_database();
 
         // Define the query condition based on args
         $temp_where = '';
-        if (!$include_hidden){ $temp_where .= 'AND player_flag_hidden = 0 '; }
-        if (!$include_unpublished){ $temp_where .= 'AND player_flag_published = 1 '; }
+        if (!$include_hidden){ $temp_where .= 'AND players.player_flag_hidden = 0 '; }
+        if (!$include_unpublished){ $temp_where .= 'AND players.player_flag_published = 1 '; }
+        if (!empty($filter_class)){ $temp_where .= "AND players.player_class = '{$filter_class}' "; }
+        if (!empty($include_tokens)){
+            $include_string = $include_tokens;
+            array_walk($include_string, function(&$s){ $s = "'{$s}'"; });
+            $include_tokens = implode(', ', $include_string);
+            $temp_where .= 'OR players.player_token IN ('.$include_tokens.') ';
+        }
 
         // Define a static array for cached queries
         static $index_cache = array();
@@ -1944,6 +1951,18 @@ class rpg_player extends rpg_object {
 
         // If empty, return nothing
         if (empty($player_token)){ return false; };
+
+        // If the template player was requested
+        if ($player_token === 'player'){
+            static $template_player_info;
+            if (empty($template_player_info)){
+                global $db;
+                $fields = self::get_index_fields(true);
+                $template_player_info = $db->get_array("SELECT {$fields} FROM mmrpg_index_players WHERE player_token = 'player';");
+                $template_player_info = self::parse_index_info($template_player_info);
+            }
+            return $template_player_info;
+        }
 
         // Collect a local copy of the player index
         static $player_index = false;

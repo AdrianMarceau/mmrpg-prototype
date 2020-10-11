@@ -299,8 +299,6 @@
             $form_data['item_value'] = !empty($_POST['item_value']) && is_numeric($_POST['item_value']) ? (int)(trim($_POST['item_value'])) : 0;
 
             $form_data['item_game'] = !empty($_POST['item_game']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['item_game']) ? trim($_POST['item_game']) : '';
-            $form_data['item_group'] = !empty($_POST['item_group']) && preg_match('/^[-_a-z0-9\/]+$/i', $_POST['item_group']) ? trim($_POST['item_group']) : '';
-            $form_data['item_order'] = !empty($_POST['item_order']) && is_numeric($_POST['item_order']) ? (int)(trim($_POST['item_order'])) : 0;
 
             $form_data['item_energy'] = 0;
             $form_data['item_speed'] = 10;
@@ -358,8 +356,6 @@
 
             // VALIDATE all of the SEMI-MANDATORY FIELDS to see if any were not provided and unset them from updating if necessary
             if (!$item_data_is_new && empty($form_data['item_game'])){ $form_messages[] = array('warning', 'Source Game was not provided and may cause issues on the front-end'); }
-            //if (empty($form_data['item_master'])){ $form_messages[] = array('warning', 'Source Robot was not provided and may cause issues on the front-end'); }
-            if (!$item_data_is_new && empty($form_data['item_group'])){ $form_messages[] = array('warning', 'Sorting Group was not provided and may cause issues on the front-end'); }
 
             // REFORMAT or OPTIMIZE data for provided fields where necessary
 
@@ -438,8 +434,6 @@
             else {
 
                 $form_data['item_game'] = 'MMRPG';
-                $form_data['item_group'] = 'MMRPG/Items/Misc';
-                $form_data['item_order'] = 1 + $db->get_value("SELECT MAX(item_order) AS max FROM mmrpg_index_items;", 'max');
 
                 $temp_json_fields = rpg_item::get_json_index_fields();
                 foreach ($temp_json_fields AS $field){ $form_data[$field] = !empty($form_data[$field]) ? json_encode($form_data[$field], JSON_NUMERIC_CHECK) : ''; }
@@ -1032,16 +1026,6 @@
                                             }
                                             ?>
                                         </select><span></span>
-                                    </div>
-
-                                    <div class="field foursize">
-                                        <strong class="label">Sort Group</strong>
-                                        <input class="textbox" type="text" name="item_group" value="<?= $item_data['item_group'] ?>" maxlength="64" />
-                                    </div>
-
-                                    <div class="field foursize">
-                                        <strong class="label">Sort Order</strong>
-                                        <input class="textbox" type="number" name="item_order" value="<?= $item_data['item_order'] ?>" maxlength="8" />
                                     </div>
 
                                 <? } ?>

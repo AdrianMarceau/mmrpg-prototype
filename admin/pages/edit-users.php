@@ -202,23 +202,13 @@
         $editor_data['user_id'] = !empty($_GET['user_id']) && is_numeric($_GET['user_id']) ? trim($_GET['user_id']) : '';
 
 
-        /* -- Collect Editor Indexes -- */
+        /* -- Collect Dependant Indexes -- */
 
-        // Collect an index of type colours for options
-        $mmrpg_types_fields = rpg_type::get_index_fields(true);
-        $mmrpg_types_index = $db->get_array_list("SELECT {$mmrpg_types_fields} FROM mmrpg_index_types ORDER BY type_order ASC", 'type_token');
-
-        // Collect an index of battle fields for options
-        $mmrpg_fields_fields = rpg_field::get_index_fields(true);
-        $mmrpg_fields_index = $db->get_array_list("SELECT {$mmrpg_fields_fields} FROM mmrpg_index_fields ORDER BY field_order ASC", 'field_token');
-
-        // Collect an index of player colours for options
-        $mmrpg_players_fields = rpg_player::get_index_fields(true);
-        $mmrpg_players_index = $db->get_array_list("SELECT {$mmrpg_players_fields} FROM mmrpg_index_players ORDER BY player_order ASC", 'player_token');
-
-        // Collect an index of robot colours for options
-        $mmrpg_robots_fields = rpg_robot::get_index_fields(true);
-        $mmrpg_robots_index = $db->get_array_list("SELECT {$mmrpg_robots_fields} FROM mmrpg_index_robots WHERE robot_class = 'master' ORDER BY robot_order ASC", 'robot_token');
+        // Collect indexes for required object types
+        $mmrpg_types_index = cms_admin::get_types_index();
+        $mmrpg_fields_index = cms_admin::get_fields_index();
+        $mmrpg_players_index = cms_admin::get_players_index();
+        $mmrpg_robots_index = cms_admin::get_robots_index();
 
 
         /* -- Collect User Data -- */
