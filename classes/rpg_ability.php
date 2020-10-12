@@ -1004,7 +1004,7 @@ class rpg_ability extends rpg_object {
             FROM mmrpg_index_abilities AS abilities
             LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
             LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = abilities.ability_class
-            WHERE ability_id <> 0 AND abilities.ability_token <> 'ability' AND abilities.ability_class <> 'system' {$temp_where}
+            WHERE ability_id <> 0 {$temp_where}
             ORDER BY
             FIELD(abilities.ability_class, 'master', 'mecha', 'boss'),
             groups.group_order ASC,

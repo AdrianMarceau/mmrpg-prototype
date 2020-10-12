@@ -16,13 +16,23 @@ $deprecated_abilities = array(
     'time-stopper',
     );
 
+// Define the table name we'll be using to pull this data
+$table_name = 'mmrpg_index_abilities';
+$table_name_string = "`{$table_name}`";
+if (defined('MMRPG_CONFIG_PULL_LIVE_DATA_FROM')
+    && MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== false){
+    $prod_db_name = 'mmrpg_'.(defined('MMRPG_CONFIG_IS_LIVE') && MMRPG_CONFIG_IS_LIVE === true ? 'live' : 'local');
+    $prod_db_name .= '_'.MMRPG_CONFIG_PULL_LIVE_DATA_FROM;
+    $table_name_string = "`{$prod_db_name}`.{$table_name_string}";
+    }
+
 // Collect an index of all valid abilities from the database
 $ability_fields = rpg_ability::get_index_fields(false);
 if (!in_array('ability_functions', $ability_fields)){ $ability_fields[] = 'ability_functions'; }
 if (!in_array('ability_group', $ability_fields)){ $ability_fields[] = 'ability_group'; }
 if (!in_array('ability_order', $ability_fields)){ $ability_fields[] = 'ability_order'; }
 $ability_fields = implode(', ', $ability_fields);
-$ability_index = $db->get_array_list("SELECT {$ability_fields} FROM mmrpg_index_abilities ORDER BY ability_token ASC", 'ability_token');
+$ability_index = $db->get_array_list("SELECT {$ability_fields} FROM {$table_name_string} ORDER BY ability_token ASC", 'ability_token');
 
 // Collect unnecessary fields to remove from the generated json data file
 $skip_fields_on_json_export = rpg_ability::get_fields_excluded_from_json_export(false);

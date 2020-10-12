@@ -10,13 +10,23 @@ ob_echo('');
 $deprecated_fields = array(
     );
 
+// Define the table name we'll be using to pull this data
+$table_name = 'mmrpg_index_fields';
+$table_name_string = "`{$table_name}`";
+if (defined('MMRPG_CONFIG_PULL_LIVE_DATA_FROM')
+    && MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== false){
+    $prod_db_name = 'mmrpg_'.(defined('MMRPG_CONFIG_IS_LIVE') && MMRPG_CONFIG_IS_LIVE === true ? 'live' : 'local');
+    $prod_db_name .= '_'.MMRPG_CONFIG_PULL_LIVE_DATA_FROM;
+    $table_name_string = "`{$prod_db_name}`.{$table_name_string}";
+    }
+
 // Collect an index of all valid fields from the database
 $field_fields = rpg_field::get_index_fields();
 if (!in_array('field_functions', $field_fields)){ $field_fields[] = 'field_functions'; }
 if (!in_array('field_group', $field_fields)){ $field_fields[] = 'field_group'; }
 if (!in_array('field_order', $field_fields)){ $field_fields[] = 'field_order'; }
 $field_fields = implode(', ', $field_fields);
-$field_index = $db->get_array_list("SELECT {$field_fields} FROM mmrpg_index_fields ORDER BY field_token ASC", 'field_token');
+$field_index = $db->get_array_list("SELECT {$field_fields} FROM {$table_name_string} ORDER BY field_token ASC", 'field_token');
 
 // If there's a filter present, remove all tokens not in the filter
 if (!empty($migration_filter)){

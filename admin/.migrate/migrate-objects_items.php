@@ -6,13 +6,23 @@ ob_echo('|   START ITEM MIGRATION   |');
 ob_echo('============================');
 ob_echo('');
 
+// Define the table name we'll be using to pull this data
+$table_name = 'mmrpg_index_items';
+$table_name_string = "`{$table_name}`";
+if (defined('MMRPG_CONFIG_PULL_LIVE_DATA_FROM')
+    && MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== false){
+    $prod_db_name = 'mmrpg_'.(defined('MMRPG_CONFIG_IS_LIVE') && MMRPG_CONFIG_IS_LIVE === true ? 'live' : 'local');
+    $prod_db_name .= '_'.MMRPG_CONFIG_PULL_LIVE_DATA_FROM;
+    $table_name_string = "`{$prod_db_name}`.{$table_name_string}";
+    }
+
 // Collect an index of all valid items from the database
 $item_fields = rpg_item::get_index_fields(false);
 if (!in_array('item_functions', $item_fields)){ $item_fields[] = 'item_functions'; }
 if (!in_array('item_group', $item_fields)){ $item_fields[] = 'item_group'; }
 if (!in_array('item_order', $item_fields)){ $item_fields[] = 'item_order'; }
 $item_fields = implode(', ', $item_fields);
-$item_index = $db->get_array_list("SELECT {$item_fields} FROM mmrpg_index_items ORDER BY item_token ASC", 'item_token');
+$item_index = $db->get_array_list("SELECT {$item_fields} FROM {$table_name_string} ORDER BY item_token ASC", 'item_token');
 
 // Collect unnecessary fields to remove from the generated json data file
 $skip_fields_on_json_export = rpg_item::get_fields_excluded_from_json_export(false);

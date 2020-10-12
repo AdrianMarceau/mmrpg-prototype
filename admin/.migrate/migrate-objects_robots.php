@@ -13,13 +13,23 @@ $deprecated_robots = array(
     'ageman20xx', 'megabossman', 'rhythmbca'
     );
 
+// Define the table name we'll be using to pull this data
+$table_name = 'mmrpg_index_robots';
+$table_name_string = "`{$table_name}`";
+if (defined('MMRPG_CONFIG_PULL_LIVE_DATA_FROM')
+    && MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== false){
+    $prod_db_name = 'mmrpg_'.(defined('MMRPG_CONFIG_IS_LIVE') && MMRPG_CONFIG_IS_LIVE === true ? 'live' : 'local');
+    $prod_db_name .= '_'.MMRPG_CONFIG_PULL_LIVE_DATA_FROM;
+    $table_name_string = "`{$prod_db_name}`.{$table_name_string}";
+    }
+
 // Collect an index of all valid robots from the database
 $robot_fields = rpg_robot::get_index_fields(false);
 if (!in_array('robot_functions', $robot_fields)){ $robot_fields[] = 'robot_functions'; }
 if (!in_array('robot_group', $robot_fields)){ $robot_fields[] = 'robot_group'; }
 if (!in_array('robot_order', $robot_fields)){ $robot_fields[] = 'robot_order'; }
 $robot_fields = implode(', ', $robot_fields);
-$robot_index = $db->get_array_list("SELECT {$robot_fields} FROM mmrpg_index_robots ORDER BY robot_token ASC", 'robot_token');
+$robot_index = $db->get_array_list("SELECT {$robot_fields} FROM {$table_name_string} ORDER BY robot_token ASC", 'robot_token');
 
 // If there's a filter present, remove all tokens not in the filter
 if (!empty($migration_filter)){
