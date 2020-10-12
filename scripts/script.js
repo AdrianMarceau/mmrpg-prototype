@@ -37,7 +37,11 @@ gameSettings.allowEditing = true; // default to true to allow all editing unless
 gameSettings.audioBaseHref = ''; // the base href where audio comes from (empty if same as baseHref)
 
 // Define the perfect scrollbar settings
-var thisScrollbarSettings = {wheelSpeed:0.3};
+var thisScrollbarSettings = {
+    wheelSpeed: 0.3,
+    useBothWheelAxes: false,
+    suppressScrollX: true
+    };
 
 // Create the game engine submit timer
 var gameEngineSubmitTimeout = false;
