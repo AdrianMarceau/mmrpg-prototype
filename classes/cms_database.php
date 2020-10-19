@@ -16,6 +16,8 @@ class cms_database {
     public $MYSQL_RESULT;
     public $INDEX;
     public $DEBUG;
+    // DEfine the public settings
+    public $log_queries = false;
 
 
     /*
@@ -159,6 +161,7 @@ class cms_database {
 
         // Execute the query against the database
         $this->MYSQL_RESULT = mysqli_query($this->LINK, $query_string);
+        if ($this->log_queries){ error_log('QUERY:'.PHP_EOL.$query_string); }
 
         // If a result was not found, produce an error message and return false
         if ($this->MYSQL_RESULT === false){
