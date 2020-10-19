@@ -544,6 +544,14 @@
 
     }
 
+    // If we're in groups mode, we need to preset vars and then include common file
+    $object_group_kind = 'field';
+    $object_group_class = 'field';
+    $object_group_editor_url = 'admin/edit-fields/groups/';
+    $object_group_editor_name = 'Field Groups';
+    if ($sub_action == 'groups'){
+        require('edit-groups_actions.php');
+    }
 
     ?>
 
@@ -552,6 +560,8 @@
         &raquo; <a href="admin/edit-fields/">Edit Fields</a>
         <? if ($sub_action == 'editor' && !empty($field_data)): ?>
             &raquo; <a href="admin/edit-fields/editor/field_id=<?= $field_data['field_id'] ?>"><?= !empty($field_name_display) ? $field_name_display : 'New Field' ?></a>
+        <? elseif ($sub_action == 'groups'): ?>
+            &raquo; <a href="<?= $object_group_editor_url ?>"><?= $object_group_editor_name ?></a>
         <? endif; ?>
     </div>
 
@@ -652,6 +662,7 @@
                         <input class="button search" type="submit" value="Search" />
                         <input class="button reset" type="reset" value="Reset" onclick="javascript:window.location.href='admin/edit-fields/';" />
                         <a class="button new pending" href="<?= 'admin/edit-fields/editor/field_id=0' ?>">Create New Field</a>
+                        <a class="button groups pending" href="<?= $object_group_editor_url ?>">Edit <?= $object_group_editor_name ?></a>
                     </div>
 
                 </form>
@@ -1619,6 +1630,12 @@
                 echo($temp_edit_markup).PHP_EOL;
             }
 
+        }
+        ?>
+
+        <?
+        if ($sub_action == 'groups'){
+            require('edit-groups_markup.php');
         }
         ?>
 

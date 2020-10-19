@@ -655,6 +655,14 @@
 
     }
 
+    // If we're in groups mode, we need to preset vars and then include common file
+    $object_group_kind = 'robot';
+    $object_group_class = $this_robot_class;
+    $object_group_editor_url = $this_robot_page_baseurl.'groups/';
+    $object_group_editor_name = $this_robot_class_name_uc.' Groups';
+    if ($sub_action == 'groups'){
+        require('edit-groups_actions.php');
+    }
 
     ?>
 
@@ -663,6 +671,8 @@
         &raquo; <a href="<?= $this_robot_page_baseurl ?>">Edit <?= $this_robot_xclass_name_uc ?></a>
         <? if ($sub_action == 'editor' && !empty($robot_data)): ?>
             &raquo; <a href="<?= $this_robot_page_baseurl ?>editor/robot_id=<?= $robot_data['robot_id'] ?>"><?= !empty($robot_name_display) ? $robot_name_display : 'New '.$this_robot_class_name_uc ?></a>
+        <? elseif ($sub_action == 'groups'): ?>
+            &raquo; <a href="<?= $object_group_editor_url ?>"><?= $object_group_editor_name ?></a>
         <? endif; ?>
     </div>
 
@@ -778,6 +788,7 @@
                         <input class="button search" type="submit" value="Search" />
                         <input class="button reset" type="reset" value="Reset" onclick="javascript:window.location.href='<?= $this_robot_page_baseurl ?>';" />
                         <a class="button new" href="<?= $this_robot_page_baseurl.'editor/robot_id=0' ?>">Create New <?= ucfirst($this_robot_class_short_name_uc) ?></a>
+                        <a class="button groups" href="<?= $object_group_editor_url ?>">Edit <?= $object_group_editor_name ?></a>
                     </div>
 
                 </form>
@@ -1852,6 +1863,12 @@
                 echo($temp_edit_markup).PHP_EOL;
             }
 
+        }
+        ?>
+
+        <?
+        if ($sub_action == 'groups'){
+            require('edit-groups_markup.php');
         }
         ?>
 

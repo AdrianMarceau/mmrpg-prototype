@@ -599,6 +599,14 @@
 
     }
 
+    // If we're in groups mode, we need to preset vars and then include common file
+    $object_group_kind = 'ability';
+    $object_group_class = $this_ability_class;
+    $object_group_editor_url = $this_ability_page_baseurl.'groups/';
+    $object_group_editor_name = preg_replace('/^[^\s]+\s+/i', '', $this_ability_class_name_uc).' Groups';
+    if ($sub_action == 'groups'){
+        require('edit-groups_actions.php');
+    }
 
     ?>
 
@@ -607,6 +615,8 @@
         &raquo; <a href="<?= $this_ability_page_baseurl ?>">Edit <?= $this_ability_xclass_name_uc ?></a>
         <? if ($sub_action == 'editor' && !empty($ability_data)): ?>
             &raquo; <a href="<?= $this_ability_page_baseurl ?>editor/ability_id=<?= $ability_data['ability_id'] ?>"><?= !empty($ability_name_display) ? $ability_name_display : 'New '.$this_ability_class_name_uc ?></a>
+        <? elseif ($sub_action == 'groups'): ?>
+            &raquo; <a href="<?= $object_group_editor_url ?>"><?= $object_group_editor_name ?></a>
         <? endif; ?>
     </div>
 
@@ -721,6 +731,7 @@
                         <input class="button search" type="submit" value="Search" />
                         <input class="button reset" type="reset" value="Reset" onclick="javascript:window.location.href='<?= $this_ability_page_baseurl ?>';" />
                         <a class="button new" href="<?= $this_ability_page_baseurl.'editor/ability_id=0' ?>">Create New <?= ucfirst($this_ability_class) ?> Ability</a>
+                        <a class="button groups" href="<?= $object_group_editor_url ?>">Edit <?= $object_group_editor_name ?></a>
                     </div>
 
                 </form>
@@ -1486,6 +1497,12 @@
                 echo($temp_edit_markup).PHP_EOL;
             }
 
+        }
+        ?>
+
+        <?
+        if ($sub_action == 'groups'){
+            require('edit-groups_markup.php');
         }
         ?>
 
