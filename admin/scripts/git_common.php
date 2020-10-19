@@ -61,7 +61,7 @@ if (empty($request_source) || !in_array($request_source, $allowed_sources)){ exi
 //debug_echo('$request_source = '.$request_source);
 
 // Collect the required token from the query headers
-$request_token = !empty($_REQUEST['token']) && preg_match('/^[\.\-_a-z0-9]+$/', $_REQUEST['token']) ? $_REQUEST['token'] : false;
+$request_token = !empty($_REQUEST['token']) && preg_match('/^[\.\-_a-z0-9\/]+$/', $_REQUEST['token']) ? $_REQUEST['token'] : false;
 if (empty($request_token)){ exit_action('error|request_token empty or not valid'); }
 //debug_echo('$request_token = '.$request_token);
 
