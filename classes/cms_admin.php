@@ -738,16 +738,27 @@ class cms_admin {
         //echo('<pre>$filter_query_results = '.print_r($filter_query_results, true).'</pre>'.PHP_EOL);
 
         $allowed_values = is_array($filter_query_results) ? array_keys($filter_query_results) : array();
+        if (!empty($filter_by_extra)){ $allowed_values[] = '_groups/'.implode('', array_slice(array_values($filter_by_extra), 0, 1)); }
+        else { $allowed_values[] = '_groups/'.str_replace('_token', '', $filter_data['token']); }
         //echo('<pre>$allowed_values = '.print_r($allowed_values, true).'</pre>'.PHP_EOL);
         $allowed_folder_names = $allowed_values;
         if ($pk_kind === 'id'){ foreach ($allowed_folder_names AS $key => $id){ $allowed_folder_names[$key] = self::git_get_id_token(substr($filter_by_field, 0, -3), $id); } }
         elseif ($pk_kind === 'url'){ foreach ($allowed_folder_names AS $key => $url){ $allowed_folder_names[$key] = self::git_get_url_token(substr($filter_by_field, 0, -3), $url); } }
         //echo('<pre>$allowed_folder_names = '.print_r($allowed_folder_names, true).'</pre>'.PHP_EOL);
 
-        foreach ($list AS $key => $path){ list($folder) = explode('/', $path); if (!in_array($folder, $allowed_folder_names)){ unset($list[$key]); } }
+        foreach ($list AS $key => $path){
+            $folders = array_slice(explode('/', $path), 0, -1);
+            $folder = $folders[0];
+            $folder2 = isset($folders[1]) ? $folders[0].'/'.$folders[1] : false;
+            if (!in_array($folder, $allowed_folder_names)
+                && !in_array($folder2, $allowed_folder_names)){
+                unset($list[$key]);
+                }
+        }
         $list = array_values($list);
         //echo('<pre>$list = '.print_r($list, true).'</pre>'.PHP_EOL);
         //exit();
+        //echo('--------------------'.PHP_EOL);
 
         return array_values($list);
     }
@@ -953,8 +964,10 @@ class cms_admin {
             $array_tokens_name = 'mmrpg_git_'.$token.'_changes_tokens';
             if (!empty($git_file_arrays[$array_name])){
                 $filtered_git_changes[$token] = array_filter($git_file_arrays[$array_name], function($path) use($path_token){
-                    list($token) = explode('/', $path);
-                    return $token === $path_token ? true : false;
+                    $folders = array_slice(explode('/', $path), 0, -1);
+                    $folder = $folders[0];
+                    $folder2 = isset($folders[1]) ? $folders[0].'/'.$folders[1] : false;
+                    return ($folder === $path_token || $folder2 === $path_token) ? true : false;
                     });
                 if (!empty($filtered_git_changes[$token])){
                     $has_changes = true;
