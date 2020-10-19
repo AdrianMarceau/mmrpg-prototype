@@ -1285,8 +1285,182 @@ class cms_admin {
 
     }
 
+    // Define a function for pulling object groups from the database (will be used post-migration)
+    public static function get_object_groups_from_database($kind, $class = '', $filter_empty = false){
+
+        // Generate the plural form of the provided kind token
+        if (substr($kind, -1, 1) === 'y'){ $xkind = substr($kind, 0, -1).'ies'; }
+        elseif (substr($kind, -2, 2) === 'ss'){ $xkind = $kind.'es'; }
+        else { $xkind = $kind.'s'; }
+
+        // Pull in the global database object
+        global $db;
+
+        // Check to see whether we should respect sub-classes for this type
+        $force_kind_as_class = !in_array($kind, array('robot', 'ability')) ? true : false;
+
+        // Collect the group and group tokens from the database
+        $select_where = !empty($class) ? "WHERE groups.group_class = '{$class}'" : '';
+        $raw_groups = $db->get_array_list("SELECT
+            groups.group_id, groups.group_class, groups.group_token, groups.group_order
+            FROM mmrpg_index_{$xkind}_groups AS groups
+            {$select_where}
+            ORDER BY groups.group_order ASC
+            ;", 'group_id');
+        $join_on = "groups.group_token = tokens.group_token ";
+        $join_on .= "AND ".(!$force_kind_as_class ? "groups.group_class = {$xkind}.{$kind}_class" : "groups.group_class = '{$class}'");
+        $raw_groups_tokens = $db->get_array_list("SELECT
+            tokens.token_id, groups.group_class, tokens.group_token, tokens.{$kind}_token, tokens.token_order
+            FROM mmrpg_index_{$xkind}_groups_tokens AS tokens
+            LEFT JOIN mmrpg_index_{$xkind} AS {$xkind} ON {$xkind}.{$kind}_token = tokens.{$kind}_token
+            LEFT JOIN mmrpg_index_{$xkind}_groups AS groups ON {$join_on}
+            {$select_where}
+            ORDER BY groups.group_order ASC, tokens.token_order ASC
+            ;", 'token_id');
+
+        // Collect a list of all relevant object tokens from the database
+        $select_where = '';
+        if (!empty($class) && !$force_kind_as_class){ $select_where = "AND {$xkind}.{$kind}_class = '{$class}'"; }
+        $select_as_class = !$force_kind_as_class ? "{$xkind}.{$kind}_class" : "'{$kind}'";
+        $raw_tokens_list = $db->get_array_list("SELECT
+            {$xkind}.{$kind}_token AS token,
+            {$select_as_class} AS class
+            FROM mmrpg_index_{$xkind} AS {$xkind}
+            WHERE {$xkind}.{$kind}_class <> 'system' {$select_where}
+            ORDER BY {$xkind}.{$kind}_class ASC, {$xkind}.{$kind}_token ASC
+            ;");
+
+        // Collect the official index of all objects for name, flag, etc. values
+        $object_index = call_user_func(array('rpg_'.$kind, 'get_index'), true, true);
+
+        // Define arrays for existing tokens vs used ones so we can keep track
+        $existing_tokens_list = array();
+        $parsed_tokens_list = array();
+        if (!empty($raw_tokens_list)){
+            foreach ($raw_tokens_list AS $info){
+                $info_class = !$force_kind_as_class ? $info['class'] : $kind;
+                if (!isset($existing_tokens_list[$info_class])){ $existing_tokens_list[$info_class] = array(); }
+                if (!isset($parsed_tokens_list[$info_class])){ $parsed_tokens_list[$info_class] = array(); }
+                $existing_tokens_list[$info_class][] = $info['token'];
+            }
+        }
+
+        // Define an array to hold all the parsed group details
+        $object_groups = array();
+
+        // Loop through raw groups and add them to the final array one-by-one
+        if (!empty($raw_groups)){
+            $group_order = 0;
+            foreach ($raw_groups AS $group_id => $group_info){
+                $group_class = $group_info['group_class'];
+                $group_token = $group_info['group_token'];
+                $object_groups[$group_class][$group_token] = array(
+                    'group_class' => $group_class,
+                    'group_token' => $group_token,
+                    'group_order' => $group_order++,
+                    'group_child_tokens' => array()
+                    );
+            }
+        }
+
+        // Loop through parent array to create any missing required groups
+        if (!empty($object_groups)){
+            foreach ($object_groups AS $group_class => $group_data){
+
+                // Create an array to hold the required groups at end of list
+                $required_groups = array();
+
+                // Define the next "order" value for the required groups
+                $next_order = count($object_groups[$group_class]) - 1;
+
+                // Create missing "hidden" group if not exists for orphan tokens if not exists
+                if (!isset($object_groups[$group_class]['Hidden'])){
+                    $object_groups[$group_class]['Hidden'] = array(
+                        'group_class' => $group_class,
+                        'group_token' => 'Hidden',
+                        'group_order' => 0,
+                        'group_child_tokens' => array()
+                        );
+                }
+                $group_data = $object_groups[$group_class]['Hidden'];
+                $group_data['group_order'] = $next_order++;
+                unset($object_groups[$group_class]['Hidden']);
+                $required_groups['Hidden'] = $group_data;
+
+                // Create missing "unsorted" group if not exists for orphan tokens if not exists
+                if (!isset($object_groups[$group_class]['Unsorted'])){
+                    $object_groups[$group_class]['Unsorted'] = array(
+                        'group_class' => $group_class,
+                        'group_token' => 'Unsorted',
+                        'group_order' => 0,
+                        'group_child_tokens' => array()
+                        );
+                }
+                $group_data = $object_groups[$group_class]['Unsorted'];
+                $group_data['group_order'] = $next_order++;
+                unset($object_groups[$group_class]['Unsorted']);
+                $required_groups['Unsorted'] = $group_data;
+
+                // Merge in the required groups at the bottom of the parent list
+                $object_groups[$group_class] = array_merge($object_groups[$group_class], $required_groups);
+
+            }
+        }
+
+        // Loop through the raw group tokens and add them to the parent arrays one-by-one
+        if (!empty($raw_groups_tokens)){
+            foreach ($raw_groups_tokens AS $token_id => $token_info){
+                $group_class = !$force_kind_as_class ? $token_info['group_class'] : $kind;
+                $group_token = $token_info['group_token'];
+                $object_token = $token_info[$kind.'_token'];
+                $object_data = isset($object_index[$object_token]) ? $object_index[$object_token] : false;
+                if (!isset($object_groups[$group_class][$group_token])){
+                    if (!empty($object_data[$kind.'_flag_hidden'])){ $group_token = 'Hidden'; }
+                    else { $group_token = 'Unsorted'; }
+                }
+                $object_groups[$group_class][$group_token]['group_child_tokens'][] = $object_token;
+                if (!in_array($object_token, $parsed_tokens_list[$group_class])){
+                    $parsed_tokens_list[$group_class][] = $object_token;
+                }
+            }
+        }
+
+        // If there were any tokens not accounted for, add them to an "unsorted" group
+        if (!empty($existing_tokens_list)){
+            foreach ($existing_tokens_list AS $class => $tokens){
+                foreach ($tokens AS $token){
+                    if (!in_array($token, $parsed_tokens_list[$class])){
+                        $object_groups[$class]['Unsorted']['group_child_tokens'][] = $token;
+                    }
+                }
+            }
+        }
+
+        // If requested, remove any groups that are empty
+        if ($filter_empty){
+            foreach ($object_groups AS $group_class => $group_list){
+                // If the group list is empty, remove by class and continue
+                if (empty($group_list)){
+                    unset($object_groups[$group_class]);
+                    continue;
+                }
+                // Loop through group list and if children empty, remove by token and continue
+                foreach ($group_list AS $group_token => $group_info){
+                    if (empty($group_info['group_child_tokens'])){
+                        unset($object_groups[$group_class][$group_token]);
+                        continue;
+                    }
+                }
+            }
+        }
+
+        // Return generated object groups array
+        return $object_groups;
+
+    }
+
     // Define a function for saving generated object groups to the database (will be used post-migration as well)
-    public static function save_object_groups_to_database($object_groups, $kind){
+    public static function save_object_groups_to_database($object_groups, $kind, $class = ''){
 
         // Generate the plural form of the provided kind token
         if (substr($kind, -1, 1) === 'y'){ $xkind = substr($kind, 0, -1).'ies'; }
@@ -1295,17 +1469,30 @@ class cms_admin {
 
         // Truncate existing data for relevant group database tables
         global $db;
-        $db->query('TRUNCATE mmrpg_index_'.$xkind.'_groups;');
-        $db->query('TRUNCATE mmrpg_index_'.$xkind.'_groups_tokens;');
+        if (empty($class)){
+            $db->query('TRUNCATE mmrpg_index_'.$xkind.'_groups;');
+            $db->query('TRUNCATE mmrpg_index_'.$xkind.'_groups_tokens;');
+        } else {
+            $db->query("DELETE groups
+                FROM mmrpg_index_{$xkind}_groups AS groups
+                WHERE groups.group_class = '{$class}'
+                ;");
+            $db->query("DELETE tokens
+                FROM mmrpg_index_{$xkind}_groups_tokens AS tokens
+                WHERE tokens.group_class = '{$class}'
+                ;");
+        }
 
         // Loop through provided groups and insert data in database tables
         foreach ($object_groups AS $group_class => $group_list){
             foreach ($group_list AS $group_key => $group_data){
+                if ($group_key === 'Unsorted'){ continue; }
                 $group_child_tokens = !empty($group_data['group_child_tokens']) ? $group_data['group_child_tokens'] : array();
                 unset($group_data['group_child_tokens']);
                 $db->insert('mmrpg_index_'.$xkind.'_groups', $group_data);
                 foreach ($group_child_tokens AS $child_key => $child_token){
                     $token_data = array();
+                    $token_data['group_class'] = $group_class;
                     $token_data['group_token'] = $group_data['group_token'];
                     $token_data[$kind.'_token'] = $child_token;
                     $token_data['token_order'] = $child_key;
@@ -1320,7 +1507,7 @@ class cms_admin {
     }
 
     // Define a function for saving generated object groups to the database (will be used post-migration as well)
-    public static function save_object_groups_to_json($object_groups, $kind){
+    public static function save_object_groups_to_json($object_groups, $kind, $class = ''){
 
         // Generate the plural form of the provided kind token
         if (substr($kind, -1, 1) === 'y'){ $xkind = substr($kind, 0, -1).'ies'; }
@@ -1332,8 +1519,11 @@ class cms_admin {
         //$object_groups_json_path = $object_groups_path.'data.json';
 
         // Remove if already exists then create the new directory
-        if (file_exists($object_groups_path)){ deleteDir($object_groups_path); }
-        mkdir($object_groups_path);
+        if (empty($class) && file_exists($object_groups_path)){ deleteDir($object_groups_path); }
+        if (!file_exists($object_groups_path)){ mkdir($object_groups_path); }
+
+        // If a class was defined, nest the provided groups array one level
+        if (!empty($class) && !isset($object_groups[$class])){ $object_groups = array($class => $object_groups); }
 
         // Loop through the various object group categories (we create files for each)
         $new_files_attempted = 0;
@@ -1346,7 +1536,7 @@ class cms_admin {
 
             // Remove if already exists then create the new directory
             if (file_exists($object_group_class_path)){ deleteDir($object_group_class_path); }
-            mkdir($object_group_class_path);
+            if (!file_exists($object_group_class_path)){ mkdir($object_group_class_path); }
 
             // Write the provided groups to a new JSON file and close
             $h = fopen($object_group_class_json_path, 'w');
