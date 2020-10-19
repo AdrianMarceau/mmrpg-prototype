@@ -1164,7 +1164,7 @@ tr:nth-child(odd) td {
     color: #696969;
 }
 .adminform .editor.groups .formfoot {
-    padding-top: 20px;
+    padding-top: 30px;
     position: relative;
     overflow: visible;
 }
