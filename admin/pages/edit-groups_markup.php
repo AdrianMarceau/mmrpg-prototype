@@ -6,6 +6,16 @@ if (!isset($object_group_class)){ exit('$object_group_class was undefined!'); }
 if (!isset($object_group_editor_url)){ exit('$object_group_editor_url was undefined!'); }
 if (!isset($object_group_editor_name)){ exit('$object_group_editor_name was undefined!'); }
 
+// Generate the plural form of the provided kind token
+if (substr($object_group_kind, -1, 1) === 'y'){ $object_group_xkind = substr($object_group_kind, 0, -1).'ies'; }
+elseif (substr($object_group_kind, -2, 2) === 'ss'){ $object_group_xkind = $object_group_kind.'es'; }
+else { $object_group_xkind = $object_group_kind.'s'; }
+
+// Generate the plural form of the provided class token
+if (substr($object_group_class, -1, 1) === 'y'){ $object_group_xclass = substr($object_group_class, 0, -1).'ies'; }
+elseif (substr($object_group_class, -2, 2) === 'ss'){ $object_group_xclass = $object_group_class.'es'; }
+else { $object_group_xclass = $object_group_class.'s'; }
+
 // Require sortable script for drag-n-drop
 $admin_include_common_scripts[] = 'sortable';
 
@@ -22,7 +32,7 @@ $object_index = call_user_func(array('rpg_'.$object_group_kind, 'get_index'), tr
 
     <? print_form_messages() ?>
 
-    <form method="post">
+    <form class="form" method="post">
         <input type="hidden" name="formaction" value="edit_groups" />
         <ul class="groups">
             <?
@@ -125,6 +135,17 @@ $object_index = call_user_func(array('rpg_'.$object_group_kind, 'get_index'), tr
                 </a>
                 <input class="button save" type="submit" value="Save Changes">
             </div>
+            <?
+            // Add git buttons if appropriate (we need special args for this context)
+            $repo_kind = $object_group_xkind;
+            if ($object_group_xclass !== $object_group_xkind){ $repo_kind .= '/'.$object_group_xclass; }
+            $path_token = '_groups/'.$object_group_class;
+            //echo('<pre>$repo_kind = '.print_r($repo_kind, true).'</pre>');
+            //echo('<pre>$path_token = '.print_r($path_token, true).'</pre>');
+            //echo('<pre>$mmrpg_git_file_arrays = '.print_r($mmrpg_git_file_arrays, true).'</pre>');
+            $editor_buttons = cms_admin::object_editor_print_git_footer_buttons($repo_kind, $path_token, $mmrpg_git_file_arrays);
+            echo($editor_buttons.PHP_EOL);
+            ?>
         </div>
     </form>
 
