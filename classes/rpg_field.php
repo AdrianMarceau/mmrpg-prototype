@@ -301,7 +301,7 @@ class rpg_field extends rpg_object {
             tokens.token_order AS field_order
             FROM mmrpg_index_fields AS fields
             LEFT JOIN mmrpg_index_fields_groups_tokens AS tokens ON tokens.field_token = fields.field_token
-            LEFT JOIN mmrpg_index_fields_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = 'field'
+            LEFT JOIN mmrpg_index_fields_groups AS groups ON groups.group_class = tokens.group_class AND groups.group_token = tokens.group_token
             WHERE field_id <> 0 {$temp_where}
             ORDER BY
             groups.group_order ASC,

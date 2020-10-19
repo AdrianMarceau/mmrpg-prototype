@@ -1876,7 +1876,7 @@ class rpg_player extends rpg_object {
             tokens.token_order AS player_order
             FROM mmrpg_index_players AS players
             LEFT JOIN mmrpg_index_players_groups_tokens AS tokens ON tokens.player_token = players.player_token
-            LEFT JOIN mmrpg_index_players_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = 'player'
+            LEFT JOIN mmrpg_index_players_groups AS groups ON groups.group_class = tokens.group_class AND groups.group_token = tokens.group_token
             WHERE players.player_id <> 0 {$temp_where}
             ORDER BY
             players.player_class ASC,

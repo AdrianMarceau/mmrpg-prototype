@@ -988,7 +988,7 @@ class rpg_item extends rpg_object {
             tokens.token_order AS item_order
             FROM mmrpg_index_items AS items
             LEFT JOIN mmrpg_index_items_groups_tokens AS tokens ON tokens.item_token = items.item_token
-            LEFT JOIN mmrpg_index_items_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = items.item_class
+            LEFT JOIN mmrpg_index_items_groups AS groups ON groups.group_class = tokens.group_class AND groups.group_token = tokens.group_token
             WHERE item_id <> 0 {$temp_where}
             ORDER BY
             groups.group_order ASC,

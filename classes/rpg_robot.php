@@ -2458,7 +2458,7 @@ class rpg_robot extends rpg_object {
             tokens.token_order AS robot_order
             FROM mmrpg_index_robots AS robots
             LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
-            LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = robots.robot_class
+            LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_class = tokens.group_class AND groups.group_token = tokens.group_token
             WHERE robots.robot_id <> 0 {$temp_where}
             ORDER BY
             FIELD(robots.robot_class, 'master', 'mecha', 'boss'),
