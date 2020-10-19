@@ -330,6 +330,9 @@ unset($db);
     <script type="text/javascript" src=".libs/codemirror/mode/clike/clike.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
     <script type="text/javascript" src=".libs/codemirror/mode/php/php.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
 <? } ?>
+<? if (in_array('sortable', $admin_include_common_scripts)){ ?>
+    <script type="text/javascript" src=".libs/jquery-ui-sortable/jquery.sortable.min.js"></script>
+<? } ?>
 <script type="text/javascript" src="admin/scripts/admin.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
 <script type="text/javascript">
     thisRootURL = '<?= MMRPG_CONFIG_ROOTURL ?>';
