@@ -659,6 +659,10 @@ a:hover {
 }
 
 
+
+
+
+
 .adminform table {
     margin: 0 auto 10px;
     border-spacing: 0;
@@ -957,6 +961,236 @@ tr:nth-child(odd) td {
 .adminform .editor .form .has2cols .subfield .floatright,
 .adminform .editor .form .has4cols .subfield .floatright {
     right: 5px;
+}
+
+.adminform .editor.groups {
+
+}
+.adminform .editor.groups ul.groups {
+    list-style-type: none;
+    margin: 0 auto;
+    padding: 0 5px 5px;
+}
+.adminform .editor.groups ul.groups li.group {
+    display: block;
+    border: 1px solid #d1d1d1;
+    background-color: #fafafa;
+    margin: 0 auto 20px;
+    padding: 10px 35px 10px 10px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+    transform: translate(0, 0);
+    transition: background-color 0.6s, box-shadow 0.6s;
+}
+.adminform .editor.groups ul.groups.shifting li.group {
+    transition: transform 0.3s, background-color 0.6s, box-shadow 0.6s;
+}
+.adminform .editor.groups ul.groups li.group.moving {
+    background-color: #ffffff;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+}
+.adminform .editor.groups ul.groups li.group .field {
+    width: 100%;
+    clear: both;
+    float: none;
+    margin: 0 auto;
+    padding: 0;
+    overflow: visible;
+}
+.adminform .editor.groups ul.groups li.group input.group_name {
+    display: block;
+    margin: 0 auto 5px;
+    padding: 5px;
+    font-size: 110%;
+    font-weight: bold;
+    border-width: 0 0 2px;
+    background-color: transparent;
+    transition: background-color 0.3s;
+}
+.adminform .editor.groups ul.groups li.group:not(.readonly) input.group_name:hover,
+.adminform .editor.groups ul.groups li.group:not(.readonly) input.group_name:focus {
+    background-color: #ffffff;
+}
+.adminform .editor.groups ul.groups li.group a.move-handle {
+    display: block;
+    position: absolute;
+    right: -28px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    text-align: center;
+    color: #e6e6e6;
+    transition: color 0.3s;
+}
+.adminform .editor.groups ul.groups li.group a.move-handle:hover {
+    color: #696969;
+}
+.adminform .editor.groups ul.groups li.group a.move-handle:after {
+    content: "";
+    display: block;
+    position: relative;
+    width: auto;
+    height: auto;
+    background-color: transparent;
+
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    font-size: 15px;
+
+    content: "\f338";
+}
+.adminform .editor.groups ul.groups li.group a.move-handle[data-direction="up"] {
+    top: 0;
+}
+.adminform .editor.groups ul.groups li.group a.move-handle[data-direction="down"] {
+    bottom: -4px;
+}
+.adminform .editor.groups ul.groups li.group a.move-handle[data-direction="up"]:after {
+    content: "\f062";
+}
+.adminform .editor.groups ul.groups li.group a.move-handle[data-direction="down"]:after {
+    content: "\f063";
+}
+.adminform .editor.groups ul.groups li.group.readonly a.move-handle,
+.adminform .editor.groups ul.groups li.group a.move-handle.hidden {
+    display: none;
+}
+.adminform .editor.groups ul.groups li.group.template {
+    display: none;
+}
+.adminform .editor.groups ul.groups li.group ul.children {
+    display: block;
+    margin: 0 auto;
+    padding: 4px;
+    min-height: 20px;
+    font-size: 90%;
+    min-height: 10px;
+    border: 1px dotted #efefef;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+.adminform .editor.groups ul.groups li.group ul.children li.spacer {
+    display: block;
+    margin: 0 auto;
+    min-height: 5px;
+    padding: 0;
+    border: 0 none transparent;
+    background-color: transparent;
+    pointer-events: none;
+}
+.adminform .editor.groups ul.groups li.group ul.children li.spacer:after {
+    content: "";
+    display: none;
+}
+.adminform .editor.groups li.group_child_token {
+    display: block;
+    margin: 0 auto 5px;
+    padding: 5px 25px 5px 5px;
+    border: 1px solid #dedede;
+    cursor: pointer;
+    background-color: #fcfcfc;
+    transition: background-color 0.3s;
+    position: relative;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+.adminform .editor.groups li.group_child_token:hover {
+    background-color: #ffffff;
+}
+.adminform .editor.groups li.group_child_token .token {
+    display: inline-block;
+    margin: 0 3px 0 0;
+    font-weight: bold;
+}
+.adminform .editor.groups li.group_child_token .number {
+    display: inline-block;
+    margin: 0 auto 0 0;
+    font-style: normal;
+    color: #a6a6a6;
+}
+.adminform .editor.groups li.group_child_token .number:before {
+    content: "(";
+}
+.adminform .editor.groups li.group_child_token .number:after {
+    content: ")";
+}
+.adminform .editor.groups li.group_child_token .visibility {
+    display: inline-block;
+    margin: 0 auto 0 3px;
+    font-style: normal;
+    color: #c6c6c6;
+}
+.adminform .editor.groups li.group_child_token:after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    bottom: 5px;
+    width: auto;
+    height: auto;
+    background-color: transparent;
+    color: #e6e6e6;
+    transition: color 0.3s;
+
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    font-size: 16px;
+
+    content: "\f58e";
+}
+.adminform .editor.groups li.group_child_token:hover:after {
+    color: #696969;
+}
+.adminform .editor.groups .formfoot {
+    padding-top: 20px;
+    position: relative;
+    overflow: visible;
+}
+.adminform .editor.groups .formfoot .buttons .button.new {
+    position: absolute;
+    top: -10px;
+    right: 0;
+    margin: 0;
+    background-color: transparent;
+    border: 0 none transparent;
+    color: #008aab;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+.adminform .editor.groups .formfoot .buttons .button.new:hover {
+    background-color: #ffffff;
+    color: #009fc7;
+}
+.adminform .editor.groups .formfoot .buttons .button.new i {
+    margin-right: 4px;
+}
+.adminform .editor.groups .formfoot .buttons .button.new span {
+    text-decoration: none;
+}
+.adminform .editor.groups .formfoot .buttons .button.new:hover span {
+    text-decoration: underline;
 }
 
 
@@ -1755,21 +1989,27 @@ input[type=file] {
 .adminform .search .buttons .button.new {
     float: right;
     background-color: #479e56;
-    border-color: #41904e;
+    border-color: #3a8847;
 }
 .adminform .search .buttons .button.new:hover {
     background-color: #4aa559;
 }
 
+.adminform .search .buttons .button.groups {
+    float: right;
+    background-color: #319689;
+    border-color: #24756a;
+}
+.adminform .search .buttons .button.groups:hover {
+    background-color: #32a495;
+}
+
 
 .adminform .search .buttons .button.pending {
     opacity: 0.1;
-    background-color: #bb9713;
-    border-color: #b5910c;
 }
 .adminform .search .buttons .button.pending:hover {
     opacity: 1.0;
-    background-color: #c8a114;
 }
 
 .adminform .login {

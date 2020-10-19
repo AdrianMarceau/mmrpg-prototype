@@ -72,9 +72,9 @@ $(document).ready(function(){
             } else {
 
             alert('Unknown delete entity! Contact the admin!');
-            console.log('deleteBaseURL = ', deleteBaseURL);
-            console.log('deleteObject = ', deleteObject);
-            console.log('deleteXObject = ', deleteXObject);
+            //console.log('deleteBaseURL = ', deleteBaseURL);
+            //console.log('deleteObject = ', deleteObject);
+            //console.log('deleteXObject = ', deleteXObject);
             return false;
 
             }
@@ -1208,6 +1208,147 @@ $(document).ready(function(){
         }
 
     }
+
+    // GROUP EDITOR EVENTS
+
+    // Check to make sure we're on the page editor page
+    var $editGroups = $('.adminform .editor.groups', thisAdmin);
+    //console.log('$editGroups =', $editGroups);
+    if ($editGroups.length){
+        //console.log('group editor is present!');
+
+        // Collect a reference to the parent groups list
+        var $groupsList = $editGroups.find('ul.groups');
+        //console.log('$groupsList.length = ', $groupsList.length);
+
+        // Destroy existing sortable events if already bound
+        if ($groupsList.is('ui-sortable')){ $groupsList.sortable('destroy'); }
+
+        // Allow group tokens to be re-ordered and moved between parent groups
+        $groupsList.sortable({
+            items: 'li.child',
+            cancel: 'li.child.spacer',
+            containment: 'ul.groups',
+            connectWidth: 'ul.groups li.group ul.children',
+            appendTo: $editGroups,
+            helper: 'clone',
+            opacity: 0.7,
+            //axis: 'y',
+            //handle: '.sprite',
+            start: function(event, ui) {
+                //console.log('start drag');
+                },
+            stop: function(event, ui) {
+                //console.log('stop drag');
+                var $tokenRow = ui.item;
+                var $newParentGroup = $tokenRow.closest('li.group[data-key]');
+                var newParentKey = $newParentGroup.attr('data-key');
+                var $hiddenInput = $tokenRow.find('input[type="hidden"]');
+                var hiddenInputName = $hiddenInput.attr('name');
+                var newHiddenInputName = hiddenInputName.replace(/\[([-_a-z0-9]+)\]\[([-_a-z0-9]+)\]\[\]$/, '['+newParentKey+'][$2][]');
+                //console.log('newParentKey =', newParentKey);
+                //console.log('hiddenInputName =', hiddenInputName);
+                //console.log('newHiddenInputName =', newHiddenInputName);
+                $hiddenInput.attr('name', newHiddenInputName);
+                },
+            update: function(event, ui) {
+                //console.log('update drag');
+                }
+            });
+
+        // Define events for the move up/down arrows for the parent groups
+        var moveTimeout = false;
+        var coolDownTimeout = false;
+        var resetGroupStyles = function($groupList, $thisGroup, $otherGroup){
+            $groupList.removeClass('shifting');
+            $thisGroup.css({transform:''});
+            $otherGroup.css({transform:''});
+            coolDownTimeout = setTimeout(function(){
+                $thisGroup.removeClass('moving');
+                }, 100);
+            };
+        $('ul.groups li.group .move-handle', $editGroups).live('click', function(e){
+            e.preventDefault();
+            if (moveTimeout !== false){ return false; }
+            var $thisHandle = $(this);
+            var $thisGroup = $thisHandle.closest('li.group[data-key]');
+            var $thisGroupList = $thisGroup.closest('ul.groups');
+            var thisGroupHeight = $thisGroup.outerHeight(true);
+            var thisDirection = $thisHandle.attr('data-direction');
+            //console.log('move ', thisDirection);
+            $thisGroupList.addClass('shifting');
+            if (thisDirection === 'up'){
+                var $prevGroup = $thisGroup.prev('li.group[data-key]');
+                var prevGroupHeight = $prevGroup.outerHeight(true);
+                //console.log('thisGroupHeight = ', thisGroupHeight, '| prevGroupHeight =', prevGroupHeight);
+                $thisGroup.addClass('moving').css({transform:'translate(0,'+(-1 * prevGroupHeight)+'px)'});
+                $prevGroup.css({transform:'translate(0,'+(thisGroupHeight)+'px)'});
+                moveTimeout = setTimeout(function(){
+                    moveTimeout = false;
+                    resetGroupStyles($thisGroupList, $thisGroup, $prevGroup);
+                    $thisGroup.insertBefore($prevGroup);
+                    updateParentGroupDivs();
+                    }, 400);
+                } else if (thisDirection === 'down'){
+                var $nextGroup = $thisGroup.next('li.group[data-key]');
+                var nextGroupHeight = $nextGroup.outerHeight(true);
+                //console.log('thisGroupHeight = ', thisGroupHeight, '| nextGroupHeight =', nextGroupHeight);
+                $thisGroup.addClass('moving').css({transform:'translate(0,'+(nextGroupHeight)+'px)'});
+                $nextGroup.css({transform:'translate(0,'+(-1 * thisGroupHeight)+'px)'});
+                moveTimeout = setTimeout(function(){
+                    moveTimeout = false;
+                    resetGroupStyles($thisGroupList, $thisGroup, $nextGroup);
+                    $thisGroup.insertAfter($nextGroup);
+                    updateParentGroupDivs();
+                    }, 400);
+                }
+            });
+
+        // Define an event for adding new groups to the list
+        var $addGroupButton = $editGroups.find('.button.new');
+        var $templateGroupDiv = $groupsList.find('li.group.template');
+        $addGroupButton.bind('click', function(e){
+            e.preventDefault();
+            //console.log('add new group!');
+            var $otherGroups = $groupsList.find('li.group:not(.readonly)');
+            var $lastOtherGroup = $otherGroups.last();
+            var newGroupMarkup = $('<div>').append($templateGroupDiv.clone()).html();
+            var newKey = 'obj-'+($otherGroups.length);
+            var newToken = 'Group'+($otherGroups.length);
+            //console.log('newKey = ', newKey, '| newToken = ', newToken);
+            newGroupMarkup = newGroupMarkup.replace(/\{group-key\}/g, newKey);
+            newGroupMarkup = newGroupMarkup.replace(/\{group-token\}/g, newToken);
+            newGroupMarkup = newGroupMarkup.replace(/readonly="readonly"/g, '');
+            newGroupMarkup = newGroupMarkup.replace(/disabled="disabled"/g, '');
+            //console.log('newGroupMarkup = ', newGroupMarkup);
+            var $newGroup = $(newGroupMarkup);
+            $newGroup.removeClass('readonly template');
+            //console.log('$newGroup = ', $newGroup);
+            $newGroup.insertAfter($lastOtherGroup);
+            updateParentGroupDivs();
+            });
+
+        // Define an event for whenever groups are reordered
+        var updateParentGroupDivs = function(){
+            //console.log('updateParentGroupDivs()');
+            var $moveableObjectGroups = $groupsList.find('li.group:not(.readonly)');
+            $moveableObjectGroups.css({border:''});
+            var $firstGroup = $moveableObjectGroups.first();
+            var $lastGroup = $moveableObjectGroups.last();
+            $groupsList.find('li.group').each(function(){
+                var $thisGroup = $(this);
+                var $moveHandles = $thisGroup.find('.move-handle[data-direction]');
+                $moveHandles.removeClass('hidden');
+                if ($thisGroup.is($firstGroup)){ $moveHandles.filter('[data-direction="up"]').addClass('hidden'); }
+                else if ($thisGroup.is($lastGroup)){ $moveHandles.filter('[data-direction="down"]').addClass('hidden'); }
+                });
+            };
+
+        // Automatically update parent group divs onload
+        updateParentGroupDivs();
+
+    }
+
 
 });
 
