@@ -95,7 +95,8 @@ foreach ($commit_tokens  AS $object_key => $object_token){
     $object_name = ucwords(str_replace('-', ' ', $object_token));
     $json_data_path = $mmrpg_git_path.$object_token.'/data.json';
     //debug_echo('$json_data_path = '.print_r($json_data_path, true).'');
-    if (file_exists($json_data_path)){
+    if (file_exists($json_data_path)
+        && !strstr($object_token, '/')){
         // Collect the markup from the file and decode it into an array
         $json_data_markup = file_get_contents($json_data_path);
         //debug_echo('$json_data_markup = '.print_r($json_data_markup, true).'');
@@ -157,7 +158,11 @@ foreach ($commit_tokens  AS $object_key => $object_token){
         // else when [object] is mecha, ability, item = "Updated the XXX's data, functions, etc."
         // else when [object] is other = Updated data, functions, etc. for the XXX [object]
         $commit_message = 'Updated ';
-        if (in_array($object_name_kind_singular, array('player', 'master', 'boss', 'field'))){
+        if (strstr($object_token, '_groups/')){
+            $commit_message .= 'sorting groups for ';
+            if ($request_kind === 'abilities'){ $commit_message .= $request_subkind_singular.' '.$request_kind; }
+            else { $commit_message .= !empty($request_subkind) ? $request_subkind : $request_kind; }
+        } elseif (in_array($object_name_kind_singular, array('player', 'master', 'boss', 'field'))){
             $commit_message .= $object_name.'\''.(substr($object_name, -1, 1) !== 's' ? 's' : '').' ';
             $commit_message .= $updating_what_string;
         } elseif (in_array($object_name_kind_singular, array('mecha', 'ability', 'item'))){
@@ -176,7 +181,8 @@ foreach ($commit_tokens  AS $object_key => $object_token){
     //debug_echo('$commit_message = '.print_r($commit_message, true).'');
 
     // If this database table is protected, we need to update the DB flag for this object
-    if (!empty($content_type_info['database_table_protected'])){
+    if (!empty($content_type_info['database_table_protected'])
+        && !strstr($object_token, '/')){
         //debug_echo('Mark this object as protected now!');
         $update_data = array($request_kind_singular.'_flag_protected' => 1);
         $update_condition = array($object_token_field => $object_token_field_value);
@@ -201,6 +207,7 @@ $num_committed = count($commit_tokens);
 $success_kind = !empty($request_subkind) ? $request_subkind : $request_kind;
 $success_kind_singular = !empty($request_subkind_singular) ? $request_subkind_singular : $request_kind_singular;
 if ($request_token === 'all'){ exit_action('success|Changes to all '.$success_kind.' were committed!'); }
+elseif (strstr($request_token, '_groups/')){ exit_action('success|Sort group changes for '.$success_kind.' were committed!'); }
 else { exit_action('success|Changes to '.($num_committed === 1 ? ('this '.$success_kind_singular) : ($num_committed.' '.$success_kind)).' were committed!'); }
 
 ?>
