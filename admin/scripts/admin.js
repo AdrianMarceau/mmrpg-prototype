@@ -497,8 +497,10 @@ $(document).ready(function(){
                                     //console.log('statusLine = ', statusLine);
                                     if (statusLine[0] === 'success'){
                                         var completeFunction = function(){
-                                            window.location.href = window.location.href.replace(location.hash,'');
-                                            //alert('Reload the window!');
+                                            $('html, body').animate({ scrollTop: 0 }, 'fast', function(){
+                                                window.location.href = window.location.href.replace(location.hash,'');
+                                                //alert('Reload the window!');
+                                                });
                                             };
                                         printStatusMessage(statusLine[0], statusLine[1], completeFunction);
                                         } else {
@@ -591,16 +593,16 @@ $(document).ready(function(){
                 update: 'admin/scripts/pull-game-content.php'
                 };
             var confirmMessages = {
-                revert: 'Are you sure you want to revert uncommitted changes to this {object}?\n'
+                revert: 'Are you sure you want to revert uncommitted changes to this {object}? '
                     + 'This action cannot be undone and any updates will be lost.\n'
                     + 'Continue anyway?',
-                commit: 'Are you absolutely sure you want to commit the changes to this {object}?\n'
+                commit: 'Are you absolutely sure you want to commit the changes to this {object}? '
                     + 'This action cannot be undone and will be in the history forever.\n'
                     + 'Continue anyway? ',
-                publish: 'Are you absolutely sure you want to publish the changes to this {object}?\n'
+                publish: 'Are you absolutely sure you want to publish the changes to this {object}? '
                     + 'This action cannot be undone and will be in the history forever.\n'
                     + 'Continue anyway? ',
-                update: 'Are you sure you want to this {object} with remote changes?\n'
+                update: 'Are you sure you want to this {object} with remote changes?  '
                     + 'Updates cannot be reverted once applied.\n'
                     + 'Continue anyway? '
                 }
@@ -618,7 +620,8 @@ $(document).ready(function(){
                 var postURL = thisRootURL+postURLs[thisAction];
                 var postData = {kind:thisKind,subkind:thisSubKind,token:thisToken,source:thisSource};
                 var confirmMessage = confirmMessages[thisAction];
-                if (thisSubKind.length){ confirmMessage = confirmMessage.replace(/\{object\}/g, makeObjectSingular(thisSubKind)); }
+                if (thisToken.indexOf('_groups/') !== -1){ confirmMessage = confirmMessage.replace(/\{object\}/g, 'list'); }
+                else if (thisSubKind.length){ confirmMessage = confirmMessage.replace(/\{object\}/g, makeObjectSingular(thisSubKind)); }
                 else { confirmMessage = confirmMessage.replace(/\{object\}/g, makeObjectSingular(thisKind)); }
                 //console.log('postURL = ', postURL);
                 //console.log('postData = ', postData);
@@ -635,8 +638,10 @@ $(document).ready(function(){
                             //console.log('statusLine = ', statusLine);
                             if (statusLine[0] === 'success'){
                                 var completeFunction = function(){
-                                    window.location.href = window.location.href.replace(location.hash,'');
-                                    //alert('Reload the window!');
+                                    $('html, body').animate({ scrollTop: 0 }, 'fast', function(){
+                                        window.location.href = window.location.href.replace(location.hash,'');
+                                        //alert('Reload the window!');
+                                        });
                                     };
                                 printStatusMessage(statusLine[0], statusLine[1], completeFunction);
                                 } else {
