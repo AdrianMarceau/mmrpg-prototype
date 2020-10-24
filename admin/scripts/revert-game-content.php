@@ -15,9 +15,9 @@ $mmrpg_git_path = constant('MMRPG_CONFIG_'.strtoupper($request_kind).'_CONTENT_P
 //debug_echo('$mmrpg_git_path = '.$mmrpg_git_path);
 $mmrpg_git_changes = cms_admin::git_get_changes($mmrpg_git_path);
 //debug_echo('$mmrpg_git_changes = '.print_r($mmrpg_git_changes, true).'');
-$mmrpg_git_newfiles = cms_admin::git_content_cache('token', $request_kind, 'new');
+$mmrpg_git_newfiles = cms_admin::git_scan_content_directory($mmrpg_git_path, '');
 //debug_echo('$mmrpg_git_newfiles = '.print_r($mmrpg_git_newfiles, true).'');
-if ($request_kind === 'robots'){
+if ($request_kind === 'robots' || $request_kind === 'abilities'){
     $mmrpg_git_changes = cms_admin::git_filter_list_by_data($mmrpg_git_changes, array(
         'table' => $object_table_name,
         'token' => $object_token_field,
@@ -105,34 +105,64 @@ foreach ($revert_tokens  AS $object_key => $object_token){
         //debug_echo('$json_data_markup = '.print_r($json_data_markup, true).'');
         if (!empty($json_data_markup)){
             $json_data_array = json_decode($json_data_markup, true);
-            foreach ($json_data_array AS $f => $v){ if (is_array($v)){ $json_data_array[$f] = !empty($v) ? json_encode($v, JSON_NUMERIC_CHECK) : ''; } }
-            //debug_echo('$json_data_array = '.print_r($json_data_array, true).'');
+            //debug_echo('$json_data_array(A) = '.print_r($json_data_array, true).'');
             if (!empty($json_data_array)){
-                // Create an update array from the data, unset the PK, then translate the editor name(s) to IDs
-                $object_update_data = $json_data_array;
-                unset($object_update_data[$object_token_field]);
-                foreach ($image_editor_fields AS $image_editor_field){
-                    if (!isset($object_update_data[$image_editor_field])){ continue; }
-                    $editor_name_value = $object_update_data[$image_editor_field];
-                    if (!empty($editor_name_value) && !empty($mmrpg_contributors_name_to_id[$editor_name_value])){
-                        $object_update_data[$image_editor_field] = $mmrpg_contributors_name_to_id[$editor_name_value];
-                    } else {
-                        $object_update_data[$image_editor_field] = 0;
+
+                // If this is a normal object file, process based on PK
+                if (!strstr($object_token, '/')){
+
+                    // Automatically re-encode any array fields into JSON format
+                    foreach ($json_data_array AS $f => $v){ if (is_array($v)){ $json_data_array[$f] = !empty($v) ? json_encode($v, JSON_NUMERIC_CHECK) : ''; } }
+                    //debug_echo('$json_data_array(B) = '.print_r($json_data_array, true).'');
+
+                    // Create an update array from the data, unset the PK, then translate the editor name(s) to IDs
+                    $object_update_data = $json_data_array;
+                    unset($object_update_data[$object_token_field]);
+                    foreach ($image_editor_fields AS $image_editor_field){
+                        if (!isset($object_update_data[$image_editor_field])){ continue; }
+                        $editor_name_value = $object_update_data[$image_editor_field];
+                        if (!empty($editor_name_value) && !empty($mmrpg_contributors_name_to_id[$editor_name_value])){
+                            $object_update_data[$image_editor_field] = $mmrpg_contributors_name_to_id[$editor_name_value];
+                        } else {
+                            $object_update_data[$image_editor_field] = 0;
+                        }
                     }
+                    // Check to make sure the object still exists in the database so we know if we should update or insert
+                    $object_exists = $db->get_value("SELECT {$object_token_field} FROM {$object_table_name} WHERE {$object_token_field} = '{$object_token_field_value}';", $object_token_field);
+                    //debug_echo('$object_exists = '.print_r($object_exists, true).'');
+                    if (!empty($object_exists)){
+                        // Update the database object with above values given the object token
+                        //debug_echo('$object_update_data = '.print_r($object_update_data, true).'');
+                        //debug_echo('condition = '.print_r(array($object_token_field => $object_token_field_value), true).'');
+                        $db->update($object_table_name, $object_update_data, array($object_token_field => $object_token_field_value));
+                    } else {
+                        // Re-insert the database object with above values given the object token
+                        $object_insert_data = array_merge($object_update_data, array($object_token_field => $object_token_field_value));
+                        //debug_echo('$object_insert_data = '.print_r($object_insert_data, true).'');
+                        $db->insert($object_table_name, $object_insert_data);
+                    }
+
                 }
-                // Check to make sure the object still exists in the database so we know if we should update or insert
-                $object_exists = $db->get_value("SELECT {$object_token_field} FROM {$object_table_name} WHERE {$object_token_field} = '{$object_token_field_value}';", $object_token_field);
-                //debug_echo('$object_exists = '.print_r($object_exists, true).'');
-                if (!empty($object_exists)){
-                    // Update the database object with above values given the object token
-                    //debug_echo('$object_update_data = '.print_r($object_update_data, true).'');
-                    //debug_echo('condition = '.print_r(array($object_token_field => $object_token_field_value), true).'');
-                    $db->update($object_table_name, $object_update_data, array($object_token_field => $object_token_field_value));
-                } else {
-                    // Re-insert the database object with above values given the object token
-                    $object_insert_data = array_merge($object_update_data, array($object_token_field => $object_token_field_value));
-                    //debug_echo('$object_insert_data = '.print_r($object_insert_data, true).'');
-                    $db->insert($object_table_name, $object_insert_data);
+                // Otherwise, if this is not a standard object, special revert functionality
+                else {
+
+                    // If this is a sort group, we need to re-import the entire list
+                    if (strstr($object_token, '_groups/')){
+                        //debug_echo('re-import the sort groups into the database');
+
+                        // Collect information we'll need to recreate object groups
+                        $object_group_kind = $request_kind_singular;
+                        list($foo, $object_group_class) = explode('/', $object_token);
+                        $reverted_object_groups = array($object_group_kind => $json_data_array);
+                        //debug_echo('$object_group_kind = '.print_r($object_group_kind, true).'');
+                        //debug_echo('$object_group_class = '.print_r($object_group_class, true).'');
+                        //debug_echo('$reverted_object_groups = '.print_r($reverted_object_groups, true).'');
+
+                        // Re-import the groups into the database as they were before
+                        cms_admin::save_object_groups_to_database($reverted_object_groups, $object_group_kind, $object_group_class);
+
+                    }
+
                 }
 
             }
@@ -143,10 +173,12 @@ foreach ($revert_tokens  AS $object_key => $object_token){
         // JSON data doesn't exist so set the flag to false
         $json_data_exists = false;
         // Delete the now-orphaned database object without data
-        //debug_echo('JSON doesn\'t exist anymore!');
-        $delete_query = "DELETE FROM {$object_table_name} WHERE {$object_token_field} = '{$object_token_field_value}';";
-        //debug_echo('$delete_query = '.$delete_query);
-        $db->query($delete_query);
+        if (!strstr($object_token, '/')){
+            //debug_echo('JSON doesn\'t exist anymore!');
+            $delete_query = "DELETE FROM {$object_table_name} WHERE {$object_token_field} = '{$object_token_field_value}';";
+            //debug_echo('$delete_query = '.$delete_query);
+            $db->query($delete_query);
+        }
     }
 
     // If an HTML content file exists for this token, overwrite DB info with contents
@@ -176,6 +208,7 @@ $num_reverted = count($revert_tokens);
 $success_kind = !empty($request_subkind) ? $request_subkind : $request_kind;
 $success_kind_singular = !empty($request_subkind_singular) ? $request_subkind_singular : $request_kind_singular;
 if ($request_token === 'all'){ exit_action('success|Changes to all '.$success_kind.' were reverted!'); }
+elseif (strstr($request_token, '_groups/')){ exit_action('success|Sort group changes for '.$success_kind.' were reverted!'); }
 else { exit_action('success|Changes to '.($num_reverted === 1 ? ('this '.$success_kind_singular) : ($num_reverted.' '.$success_kind)).' were reverted!'); }
 
 ?>
