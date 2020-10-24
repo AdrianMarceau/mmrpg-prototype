@@ -50,6 +50,12 @@ $object_index = call_user_func(array('rpg_'.$object_group_kind, 'get_index'), tr
                 $readonly = false;
                 $disabled = false;
 
+                // If this is NOT a template but is empty, skip it now
+                if ($group_token !== 'Template'
+                    && empty($group_data['group_child_tokens'])){
+                    continue;
+                }
+
                 // If this is the unsorted group, adjust the settings appropriately
                 if ($group_token === 'Unsorted'){
                     $readonly = true;
