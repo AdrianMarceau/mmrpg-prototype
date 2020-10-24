@@ -39,7 +39,7 @@ function clean_path($path){ return str_replace(MMRPG_CONFIG_ROOTDIR, '/', $path)
 $allowed_clone_types = array_keys($content_types_index);
 $clone_kind = !empty($_REQUEST['kind']) && ($_REQUEST['kind'] === 'all' || in_array($_REQUEST['kind'], $allowed_clone_types)) ? trim($_REQUEST['kind']) : 'all';
 $clone_overwrite = !empty($_REQUEST['overwrite']) && $_REQUEST['overwrite'] === 'true' ? true : false;
-$clone_method = !empty($_REQUEST['method']) && $_REQUEST['method'] === 'ssh' ? 'ssh' : 'http';
+$clone_method = !empty($_REQUEST['method']) && $_REQUEST['method'] === 'http' ? 'http' : 'ssh';
 if (!empty($clone_kind)){ $clone_kind_singular = substr($clone_kind, -3, 3) === 'ies' ? str_replace('ies', 'y', $clone_kind) : rtrim($clone_kind, 's'); }
 else { $clone_kind_singular = false; }
 if (!empty($clone_kind)){
