@@ -24,7 +24,7 @@ if (!cms_admin::git_pull_allowed($mmrpg_git_path)){ exit_action('error|'.ucfirst
 // Collect an index of changes files via git and filter
 $mmrpg_git_committed_changes = cms_admin::git_get_committed_changes($mmrpg_git_path);
 //debug_echo('$mmrpg_git_committed_changes = '.print_r($mmrpg_git_committed_changes, true).'');
-if (empty($mmrpg_git_committed_changes)){ exit_action('error|There are no committed '.ucfirst($request_kind).' changes to publish'); }
+if (empty($mmrpg_git_committed_changes)){ exit_action('error|There are no committed '.strtolower($request_kind_singular).' changes to publish'); }
 
 // Pull and merge any remove changes first just-in-case
 $git_commands = '';
