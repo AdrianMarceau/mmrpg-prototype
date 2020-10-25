@@ -9,7 +9,7 @@ require_once(MMRPG_CONFIG_ROOTDIR.'classes/cms_admin.php');
 require_once(MMRPG_CONFIG_CONTENT_PATH.'index.php');
 
 // Require common git functions and variables if not exist already
-require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/git_common_allowed.php');
+require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/git_common_variables.php');
 require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/git_common_functions.php');
 
 // Ensure the user is actually logged in as an admin
@@ -78,13 +78,13 @@ foreach ($content_types_index AS $content_key => $content_info){
 // Loop through request feedback and generate a response for this script
 $has_success = !empty($request_feedback['success']) ? true : false;
 $has_errors = !empty($request_feedback['error']) ? true : false;
-$sub_details = implode(PHP_EOL, $request_feedback['all']);
+echo(implode(PHP_EOL, $request_feedback['all']));
 if ($has_success && !$has_errors){
-    exit_action('success|Changes to game content was pulled and updated successfully!'.PHP_EOL.$sub_details);
+    exit_action('success|Changes to game content was pulled and updated successfully!');
 } elseif (!$has_success && $has_errors){
-    exit_action('error|Changes to game content could not be pulled or there were problems updating!'.PHP_EOL.$sub_details);
+    exit_action('error|Changes to game content could not be pulled or there were problems updating!');
 } else {
-    exit_action('success|Some changes to game content were pulled and updated successfully, otherwise not so much!'.PHP_EOL.$sub_details);
+    exit_action('success|Some changes to game content were pulled and updated successfully, otherwise not so much!');
 }
 
 ?>

@@ -857,7 +857,7 @@
             if (in_array('*', $this_adminaccess)
                 || in_array('edit-users', $this_adminaccess)){
                 $this_option = array(
-                    'link' => array('url' => 'admin/scripts/pull-user-data.php', 'text' => 'Pull Live User Data', 'target' => '_blank', 'class' => 'disabled'),
+                    'link' => array('url' => 'admin/scripts/pull-user-data.php?return=html', 'text' => 'Pull Live User Data', 'target' => '_blank', 'class' => 'disabled'),
                     'desc' => 'pull user data from live build for testing and overwrite existing'
                     );
                 $this_group_options[] = $this_option;
@@ -866,7 +866,7 @@
         if (in_array('*', $this_adminaccess)
             || in_array('pull-content', $this_adminaccess)){
             $this_option = array(
-                'link' => array('url' => 'admin/scripts/pull-all-game-content.php', 'text' => 'Pull Content Updates', 'target' => '_blank'),
+                'link' => array('url' => 'admin/scripts/pull-all-game-content.php?return=html', 'text' => 'Pull Content Updates', 'target' => '_blank'),
                 'desc' => 'pull published updates to game content and apply to this build'
                 );
             $this_group_options[] = $this_option;
