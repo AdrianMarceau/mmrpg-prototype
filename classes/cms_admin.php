@@ -344,13 +344,14 @@ class cms_admin {
             echo('<li class="'.$item_class.'">'.PHP_EOL);
                 $link_url = isset($option_info['link']['url']) ? ' href="'.$option_info['link']['url'].'"' : '';
                 $link_target = isset($option_info['link']['target']) ? ' target="'.$option_info['link']['target'].'"' : '';
+                $link_class = isset($option_info['link']['class']) ? ' class="'.$option_info['link']['class'].'"' : '';
                 $link_text = $option_info['link']['text'];
                 $link_icons = '';
                 $icon_tokens = array();
                 if (isset($option_info['link']['icon'])){ $icon_tokens = array($option_info['link']['icon']); }
                 elseif (isset($option_info['link']['icons'])){ $icon_tokens = $option_info['link']['icons']; }
                 if (!empty($icon_tokens)){ foreach ($icon_tokens AS $token){ $link_icons .= '<i class="icon fa fa-'.$token.'"></i>'; } }
-                echo('<div class="link"><a'.$link_url.$link_target.'>'.$link_text.'</a>'.$link_icons.$repo_icons.'</div>'.PHP_EOL);
+                echo('<div class="link"><a'.$link_url.$link_target.$link_class.'>'.$link_text.'</a>'.$link_icons.$repo_icons.'</div>'.PHP_EOL);
                 $desc_text = $option_info['desc'];
                 echo('<div class="desc"><em>'.$desc_text.'</em></div>'.PHP_EOL);
                 if (!empty($option_info['buttons'])){

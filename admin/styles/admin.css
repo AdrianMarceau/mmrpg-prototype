@@ -279,6 +279,10 @@ a:hover {
     display: inline-block;
     cursor: pointer;
 }
+.adminhome li > div.link a.disabled {
+    text-decoration: line-through;
+    cursor: not-allowed;
+}
 .adminhome li > div.link .status {
     display: inline-block;
     margin-left: 6px;

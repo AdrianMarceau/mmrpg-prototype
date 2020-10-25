@@ -33,31 +33,16 @@
                 'link' => array('url' => 'admin/edit-users/', 'text' => 'Moderate Users'),
                 'desc' => 'update or modify user account info and permissions'
                 );
-            if (MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== false
-                && MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== MMRPG_CONFIG_SERVER_ENV){
-                if (!isset($this_option['buttons'])){ $this_option['buttons'] = array(); }
-                $this_option['buttons'][] = array(
-                    'action' => 'scripts/pull-table-data.php?kind=users&source='.MMRPG_CONFIG_PULL_LIVE_DATA_FROM,
-                    'text' => 'Pull from MMRPG-'.ucfirst(MMRPG_CONFIG_PULL_LIVE_DATA_FROM)
-                    );
-                }
             $this_group_options[] = $this_option;
         }
         if (in_array('*', $this_adminaccess)
+            || in_array('edit-content', $this_adminaccess)
             || in_array('edit-challenges', $this_adminaccess)
             || in_array('edit-user-challenges', $this_adminaccess)){
             $this_option = array(
                 'link' => array('url' => 'admin/edit-user-challenges/', 'text' => 'Moderate User Challenges'),
                 'desc' => 'update or modify user-created challenge missions for the post-game'
                 );
-            if (MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== false
-                && MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== MMRPG_CONFIG_SERVER_ENV){
-                if (!isset($this_option['buttons'])){ $this_option['buttons'] = array(); }
-                $this_option['buttons'][] = array(
-                    'action' => 'scripts/pull-table-data.php?kind=user-challenges&source='.MMRPG_CONFIG_PULL_LIVE_DATA_FROM,
-                    'text' => 'Pull from MMRPG-'.ucfirst(MMRPG_CONFIG_PULL_LIVE_DATA_FROM)
-                    );
-                }
             $this_group_options[] = $this_option;
         }
 
@@ -65,7 +50,7 @@
         $this_group_name_subtext = '';
         if (MMRPG_CONFIG_SERVER_ENV !== MMRPG_CONFIG_PULL_LIVE_DATA_FROM){
             $this_group_name_subtext = '<p class="env-notice warning">'.
-                'Changes made to user accounts and content on the '.MMRPG_CONFIG_SERVER_ENV.'-build may be overwritten by '.cms_admin::print_env_name(MMRPG_CONFIG_PULL_LIVE_DATA_FROM).' data at any time. <br /> '.
+                'Changes made to user accounts and content on the '.MMRPG_CONFIG_SERVER_ENV.'-build may be overwritten at any time. <br /> '.
                 'This section is available in the '.ucfirst(MMRPG_CONFIG_SERVER_ENV).' Admin Panel for testing purposes only, so please be mindful.'.
             '</p>';
             }
@@ -97,7 +82,9 @@
             if (!isset($common_group_kinds_options[$kind_token])){ $common_group_kinds_options[$kind_token] = array(); }
 
             // Populate the group options array with relevant pages and buttons
-            if ((in_array('*', $this_adminaccess) || in_array('pull-from-github', $this_adminaccess))){
+            if ((in_array('*', $this_adminaccess)
+                || in_array('pull-content', $this_adminaccess)
+                || in_array('pull-from-github', $this_adminaccess))){
                 $option_buttons = array();
 
                 // Loop through the content types index and append permissible buttons
@@ -106,6 +93,7 @@
                     elseif (!in_array($type_info['xtoken'], $allowed_content_types)){ continue; }
                     // Check to see if current user allowed to edit this content type
                     if (in_array('*', $this_adminaccess)
+                        || in_array('edit-content', $this_adminaccess)
                         || in_array('edit-'.$type_info['xtoken'], $this_adminaccess)){
                         $repo_base_path = MMRPG_CONFIG_CONTENT_PATH.rtrim($type_info['content_path'], '/').'/';
                         $git_pull_required = cms_admin::git_pull_required($repo_base_path);
@@ -152,7 +140,9 @@
 
             // Populate the group options array with relevant pages and buttons
             if ((MMRPG_CONFIG_SERVER_ENV === 'local' || MMRPG_CONFIG_SERVER_ENV === 'dev')
-                && (in_array('*', $this_adminaccess) || in_array('publish-to-github', $this_adminaccess))){
+                && (in_array('*', $this_adminaccess)
+                    || in_array('push-content', $this_adminaccess)
+                    || in_array('publish-to-github', $this_adminaccess))){
                 $option_buttons = array();
 
                 // Loop through the content types index and append permissible buttons
@@ -161,6 +151,7 @@
                     elseif (!in_array($type_info['xtoken'], $allowed_content_types)){ continue; }
                     // Check to see if current user allowed to edit this content type
                     if (in_array('*', $this_adminaccess)
+                        || in_array('edit-content', $this_adminaccess)
                         || in_array('edit-'.$type_info['xtoken'], $this_adminaccess)){
                         // Collect git details for the repo to see if button necessary
                         $repo_base_path = MMRPG_CONFIG_CONTENT_PATH.rtrim($type_info['content_path'], '/').'/';
@@ -231,6 +222,7 @@
             // Populate the group options array with relevant pages and buttons
 
             if (in_array('*', $this_adminaccess)
+                || in_array('edit-content', $this_adminaccess)
                 || in_array('edit-players', $this_adminaccess)){
                 $option_name = 'Edit Players';
                 $this_option = array(
@@ -270,6 +262,7 @@
             }
 
             if (in_array('*', $this_adminaccess)
+                || in_array('edit-content', $this_adminaccess)
                 || in_array('edit-robots', $this_adminaccess)
                 || in_array('edit-robot-master', $this_adminaccess)){
                 $option_name = 'Edit Robot Masters';
@@ -316,6 +309,7 @@
                 $this_group_options[] = $this_option;
             }
             if (in_array('*', $this_adminaccess)
+                || in_array('edit-content', $this_adminaccess)
                 || in_array('edit-abilities', $this_adminaccess)
                 || in_array('edit-robot-master-abilities', $this_adminaccess)){
                 $option_name = 'Edit Robot Master Abilities';
@@ -363,6 +357,7 @@
             }
 
             if (in_array('*', $this_adminaccess)
+                || in_array('edit-content', $this_adminaccess)
                 || in_array('edit-robots', $this_adminaccess)
                 || in_array('edit-support-mechas', $this_adminaccess)){
                 $option_name = 'Edit Support Mechas';
@@ -409,6 +404,7 @@
                 $this_group_options[] = $this_option;
             }
             if (in_array('*', $this_adminaccess)
+                || in_array('edit-content', $this_adminaccess)
                 || in_array('edit-abilities', $this_adminaccess)
                 || in_array('edit-support-mecha-abilities', $this_adminaccess)){
                 $option_name = 'Edit Support Mecha Abilities';
@@ -456,6 +452,7 @@
             }
 
             if (in_array('*', $this_adminaccess)
+                || in_array('edit-content', $this_adminaccess)
                 || in_array('edit-robots', $this_adminaccess)
                 || in_array('edit-fortress-bosses', $this_adminaccess)){
                 $option_name = 'Edit Fortress Bosses';
@@ -502,6 +499,7 @@
                 $this_group_options[] = $this_option;
             }
             if (in_array('*', $this_adminaccess)
+                || in_array('edit-content', $this_adminaccess)
                 || in_array('edit-abilities', $this_adminaccess)
                 || in_array('edit-fortress-boss-abilities', $this_adminaccess)){
                 $option_name = 'Edit Fortress Boss Abilities';
@@ -549,6 +547,7 @@
             }
 
             if (in_array('*', $this_adminaccess)
+                || in_array('edit-content', $this_adminaccess)
                 || in_array('edit-fields', $this_adminaccess)){
                 $option_name = 'Edit Battle Fields';
                 $this_option = array(
@@ -588,6 +587,7 @@
             }
 
             if (in_array('*', $this_adminaccess)
+                || in_array('edit-content', $this_adminaccess)
                 || in_array('edit-items', $this_adminaccess)){
                 $option_name = 'Edit Items';
                 $this_option = array(
@@ -643,6 +643,7 @@
 
             // Populate the group options array with relevant pages and buttons
             if (in_array('*', $this_adminaccess)
+                || in_array('edit-content', $this_adminaccess)
                 || in_array('edit-stars', $this_adminaccess)){
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-stars/', 'text' => 'Edit Rogue Stars'),
@@ -680,6 +681,7 @@
                 $this_group_options[] = $this_option;
             }
             if (in_array('*', $this_adminaccess)
+                || in_array('edit-content', $this_adminaccess)
                 || in_array('edit-challenges', $this_adminaccess)
                 || in_array('edit-event-challenges', $this_adminaccess)){
                 $this_option = array(
@@ -735,6 +737,7 @@
 
             // Populate the group options array with relevant pages and buttons
             if (in_array('*', $this_adminaccess)
+                || in_array('edit-content', $this_adminaccess)
                 || in_array('edit-pages', $this_adminaccess)){
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-pages/', 'text' => 'Edit Website Pages'),
@@ -784,7 +787,9 @@
     /* -- (STAGE/PROD ONLY) -- */
     elseif (in_array(MMRPG_CONFIG_SERVER_ENV, array('stage', 'prod'))){
 
-        /* -- GAME DATABASE -- */
+        /*
+
+        /* -- GAME DATABASE -- * /
         if (true){
 
             // Define the group name and options array
@@ -801,7 +806,7 @@
 
         }
 
-        /* -- POST-GAME CONTENT -- */
+        /* -- POST-GAME CONTENT -- * /
         if (true){
 
             // Define the group name and options array
@@ -818,7 +823,7 @@
 
         }
 
-        /* -- WEBSITE PAGES -- */
+        /* -- WEBSITE PAGES -- * /
         if (true){
 
             // Define the group name and options array
@@ -835,6 +840,8 @@
 
         }
 
+        */
+
     }
 
     /* -- MISC TOOLS (LOCAL/DEV/STAGE/PROD) -- */
@@ -845,6 +852,25 @@
         $this_group_options = array();
 
         // Populate the group options array with relevant pages and buttons
+        if (MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== false
+            && MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== MMRPG_CONFIG_SERVER_ENV){
+            if (in_array('*', $this_adminaccess)
+                || in_array('edit-users', $this_adminaccess)){
+                $this_option = array(
+                    'link' => array('url' => 'admin/scripts/pull-user-data.php', 'text' => 'Pull Live User Data', 'target' => '_blank', 'class' => 'disabled'),
+                    'desc' => 'pull user data from live build for testing and overwrite existing'
+                    );
+                $this_group_options[] = $this_option;
+            }
+        }
+        if (in_array('*', $this_adminaccess)
+            || in_array('pull-content', $this_adminaccess)){
+            $this_option = array(
+                'link' => array('url' => 'admin/scripts/pull-all-game-content.php', 'text' => 'Pull Content Updates', 'target' => '_blank'),
+                'desc' => 'pull published updates to game content and apply to this build'
+                );
+            $this_group_options[] = $this_option;
+        }
         if (in_array('*', $this_adminaccess)
             || in_array('delete-cached-files', $this_adminaccess)){
             $this_option = array(
