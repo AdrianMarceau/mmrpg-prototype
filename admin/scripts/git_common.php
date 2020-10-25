@@ -1,36 +1,14 @@
 <?
 
-// Start the output buffer to ensure stuff is printed in the right order
-ob_start();
-
-// Define a function for echoing debug info with a quick toggle var
-$is_debug = true;
-function debug_echo($echo){ global $is_debug; if ($is_debug){ echo($echo.PHP_EOL); } }
-
-// Define a function for exiting the script with status first, debug last
-function exit_action($status_line){ $output = trim(ob_get_clean()); echo(trim($status_line).PHP_EOL); echo(!empty($output) ? str_repeat('-', 50).PHP_EOL.$output : ''); exit(); }
-
 // Ensure the user is actually logged in as an admin
 if (!defined('MMRPG_CONFIG_ADMIN_MODE')
     || MMRPG_CONFIG_ADMIN_MODE !== true){
     exit_action('error|user not logged in or not admin');
 }
 
-// Define the allowed request kinds for game content actions
-$allowed_kinds = array(
-    'players', 'robots', 'fields', 'abilities', 'items',
-    'stars', 'challenges',
-    'pages'
-    );
-// Define the allowed request subkinds where applicable
-$allowed_subkinds = array(
-    'robots' => array('masters', 'mechas', 'bosses')
-    );
-
-// Define the allowed request sources for game content actions
-$allowed_sources = array(
-    'github'
-    );
+// Require common git functions and variables if not exist already
+require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/git_common_allowed.php');
+require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/git_common_functions.php');
 
 // Collect the required kind and subkind details from the query headers
 //debug_echo('$_REQUEST = '.print_r($_REQUEST, true));
