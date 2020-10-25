@@ -1,14 +1,14 @@
 <?
 
+// Require common git functions and variables if not exist already
+require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/git_common_allowed.php');
+require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/git_common_functions.php');
+
 // Ensure the user is actually logged in as an admin
 if (!defined('MMRPG_CONFIG_ADMIN_MODE')
     || MMRPG_CONFIG_ADMIN_MODE !== true){
     exit_action('error|user not logged in or not admin');
 }
-
-// Require common git functions and variables if not exist already
-require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/git_common_allowed.php');
-require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/git_common_functions.php');
 
 // Collect the required kind and subkind details from the query headers
 //debug_echo('$_REQUEST = '.print_r($_REQUEST, true));
