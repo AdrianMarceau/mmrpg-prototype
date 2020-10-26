@@ -247,6 +247,11 @@ elseif ($this_page_action == 'edit-pages'){
     // Require the edit pages file
     require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-pages.php');
 }
+// Else if this is an VIEW ERROR LOG request
+elseif ($this_page_action == 'watch-error-log'){
+    // Require the edit pages file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/error-log.php');
+}
 // Otherwise, not a valid page
 else {
     // Define error 404 text to print

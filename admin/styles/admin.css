@@ -1,6 +1,10 @@
 
 /* -- BASE STYLESHEET (ADMIN) -- */
 
+html, body {
+    min-height: 0;
+}
+
 #mmrpg {
     width: auto;
     margin-left: auto;
@@ -1198,6 +1202,95 @@ tr:nth-child(odd) td {
 }
 
 
+.adminform.error-log .editor {
+
+}
+.adminform.error-log .editor .header {
+
+}
+.adminform.error-log .editor .header .loading {
+    float: right;
+    display: inline-block;
+    margin: 0 4px 0 0;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.adminform.error-log .editor .header .loading img {
+    display: block;
+    transform: scale(1, 1);
+    transition: transform 0.3s;
+}
+.adminform.error-log[data-state="play"] .editor .header .loading {
+    opacity: 1;
+}
+.adminform.error-log .editor > .field {
+    padding: 0;
+}
+.adminform.error-log .editor .textarea.log {
+    width: 100%;
+    height: 600px;
+    max-height: calc(100vh - 40px);
+    font-size: 11px;
+    line-height: 1.6;
+}
+.adminform.error-log .editor ul.log-list {
+    display: block;
+    margin: 0 auto;
+    padding: 0;
+    width: auto;
+    height: calc(100vh - 280px);
+    min-height: 600px;
+    font-size: 12px;
+    line-height: 1.6;
+    border: 1px solid #DEDEDE;
+    background-color: #FEFEFE;
+    list-style-type: none;
+    overflow: hidden;
+    overflow-y: scroll;
+}
+.adminform.error-log .editor ul.log-list li.line {
+    display: block;
+    margin: 0 auto;
+    padding: 10px;
+    list-style-type: none;
+}
+.adminform.error-log .editor ul.log-list li.line.trace {
+    font-size: 10px;
+    padding: 5px 10px 5px 30px;
+    color: #b8150a;
+    font-family: "Courier New", sans-serif;
+}
+.adminform.error-log .editor ul.log-list li.line:nth-child(even) {
+    background-color: #FEFEFE;
+}
+.adminform.error-log .editor ul.log-list li.line:nth-child(odd) {
+    background-color: #F0F0F0;
+}
+.adminform.error-log .editor .buttons {
+    text-align: center;
+}
+.adminform.error-log .editor .buttons .button {
+    margin: 0 0 5px 5px;
+}
+.adminform.error-log .editor .buttons .button span {
+    display: inline-block;
+    margin-right: 6px;
+}
+.adminform.error-log .editor .buttons .button.play {
+    background-color: #005d07;
+    border-color: #003d05;
+}
+.adminform.error-log .editor .buttons .button.play:hover {
+    background-color: #007a0a;
+}
+.adminform.error-log .editor .buttons .button.pause {
+    background-color: #8c2525;
+    border-color: #751f1f;
+}
+.adminform.error-log .editor .buttons .button.pause:hover {
+    background-color: #a52c2c;
+}
+
 .adminform.edit_players table .type,
 .adminform.edit_players table .flag,
 .adminform.edit_players table .flag {
@@ -1890,7 +1983,19 @@ input[type=file] {
    text-decoration: none;
    text-align: center;
 }
-
+.adminform .buttons a.button.disabled,
+.adminform .buttons input[type="button"].disabled,
+.adminform .buttons input[type="submit"].disabled,
+.adminform .buttons input[type="reset"].disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+.adminform .buttons a.button.hidden,
+.adminform .buttons input[type="button"].hidden,
+.adminform .buttons input[type="submit"].hidden,
+.adminform .buttons input[type="reset"].hidden {
+    display: none;
+}
 
 .adminform .options .field {
     width: 25%;

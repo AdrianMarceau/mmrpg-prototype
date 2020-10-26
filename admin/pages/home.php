@@ -899,6 +899,14 @@
                 );
             $this_group_options[] = $this_option;
         }
+        if (in_array('*', $this_adminaccess)
+            || in_array('view-logs', $this_adminaccess)){
+            $this_option = array(
+                'link' => array('url' => 'admin/watch-error-log/', 'text' => 'Watch Error Log', 'target' => '_blank'),
+                'desc' => 'watch the error log to help with dev, debug, and testing'
+                );
+            $this_group_options[] = $this_option;
+        }
 
         // Print out the group title and options, assuming there are any available
         echo cms_admin::print_admin_home_group_options($this_group_name, $this_group_options);

@@ -1355,6 +1355,101 @@ $(document).ready(function(){
     }
 
 
+    // ERROR LOG EVENTS
+
+    // Check to make sure we're on the page editor page
+    var $errorLog = $('.adminform.error-log', thisAdmin);
+    //console.log('$editPages =', $editPages);
+    if ($errorLog.length){
+        (function(){
+
+            // Collect references to key elements on the page
+            var $logList = $('ul.log-list', $errorLog);
+            var $playButton = $('.buttons .button.play', $errorLog);
+            var $pauseButton = $('.buttons .button.pause', $errorLog);
+            var $loadImage = $('.header .loading img', $errorLog);
+
+            // Define a function for scrolling to the last item in the list
+            var scrollToLastItem = function(animateScroll){
+                //console.log('scrollToLastItem(', animateScroll, ')');
+                if (typeof animateScroll === 'undefined'){ animateScroll = true; }
+                var bottom = $('li:last-child', $logList).offset().top;
+                if (animateScroll){ $logList.animate({scrollTop: bottom+'px'}, 200); }
+                else { $logList.scrollTop(bottom); }
+                };
+
+            // Define a function for updating the state of the watcher
+            var currentWatchState = 'pause';
+            var changeWatchState = function(newState){
+                //console.log('changeWatchState(', newState, ')');
+                if (newState === changeWatchState){ return true; }
+                currentWatchState = newState;
+                $errorLog.attr('data-state', currentWatchState);
+                if (newState === 'play'){
+                    $playButton.addClass('hidden');
+                    $pauseButton.removeClass('hidden');
+                    if (updateTimeout === false){ startUpdateTimeout(); }
+                    } else if (newState === 'pause'){
+                    $playButton.removeClass('hidden');
+                    $pauseButton.addClass('hidden');
+                    if (updateTimeout !== false){ clearTimeout(updateTimeout); }
+                    }
+                };
+
+            // Define a function that checks for updates to the error log
+            var logUpdateBaseURL = thisRootURL+'admin/watch-error-log/get-lines/';
+            var waitingForUpdates = false;
+            var checkForLogUpdates = function(){
+                //console.log('checkForLogUpdates()');
+                var lastLine = parseInt($('li:last-child', $logList).attr('data-line'));
+                var postURL = logUpdateBaseURL+'since='+lastLine;
+                waitingForUpdates = true;
+                $loadImage.css({transform:'scale(1.5, 1.5)'});
+                $.post(postURL, {}, function(returnData){
+                    //console.log('returnData = ', returnData.length, returnData);
+                    if (returnData.length){ appendNewLinesToLog(returnData); }
+                    waitingForUpdates = false;
+                    $loadImage.css({transform:''});
+                    });
+
+                };
+
+            // Define a function for appending to the error log given data
+            var appendNewLinesToLog = function(newLines){
+                //console.log('appendNewLinesToLog(', newLines, ')');
+                var numNewLines = newLines.length;
+                for (var i = 0; i < numNewLines; i++){
+                    var logString = newLines[i];
+                    $logList.append(logString);
+                    scrollToLastItem(true);
+                    }
+                };
+
+            // Set up an interval to check for updates every X seconds
+            var timeoutSleep = 3 * 1000; // seconds
+            var updateTimeout = false;
+            var startUpdateTimeout = function(){
+                updateTimeout = setTimeout(function(){
+                    //console.log('updateTimeout');
+                    if (currentWatchState === 'play'
+                        && !waitingForUpdates){
+                        checkForLogUpdates();
+                        }
+                    startUpdateTimeout();
+                    }, timeoutSleep);
+                };
+
+            // Bind actions to the two state buttons
+            $playButton.bind('click', function(e){ e.preventDefault(); return changeWatchState('play'); });
+            $pauseButton.bind('click', function(e){ e.preventDefault(); return changeWatchState('pause'); });
+
+            // Automatically scroll log to the bottom
+            scrollToLastItem(false);
+
+        })();
+    }
+
+
 });
 
 // Define a common action for printing a status message at the top of the editor
