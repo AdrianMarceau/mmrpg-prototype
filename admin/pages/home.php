@@ -871,6 +871,14 @@
             }
         }
         if (in_array('*', $this_adminaccess)
+            || in_array('pull-core', $this_adminaccess)){
+            $this_option = array(
+                'link' => array('url' => 'admin/scripts/update-core.php?return=html', 'text' => 'Pull Core Updates', 'target' => '_blank', 'bullet' => 'caret-square-down'),
+                'desc' => 'pull updates to the master code, typically used only by the lead dev'
+                );
+            $this_group_options[] = $this_option;
+        }
+        if (in_array('*', $this_adminaccess)
             || in_array('delete-cached-files', $this_adminaccess)){
             $this_option = array(
                 'link' => array('url' => 'admin/delete-cached-files/', 'text' => 'Delete Cached Files', 'target' => '_blank', 'bullet' => 'trash'),
