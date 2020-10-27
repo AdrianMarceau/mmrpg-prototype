@@ -225,7 +225,7 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                             if ($flag_wap && preg_match('/^mecha/i', $this_id)){ continue; }
                             $this_key++;
                             $this_class = $this_info['class'];
-                            $this_size = $this_info['size'];
+                            $this_size = intval($this_info['size']);
                             $this_boxsize = $this_size.'x'.$this_size;
                             $this_offset_x = $this_info['offset_x'];
                             $this_offset_y = $this_info['offset_y'];
@@ -253,6 +253,13 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                                     }
                                     shuffle($images);
                                     $this_image = array_shift($images);
+                                }
+                                $temp_size = intval($this_index['robot_image_size']);
+                                if ($temp_size !== $this_size){
+                                    $tmp_diff = $temp_size - $this_size;
+                                    $this_size = $temp_size;
+                                    $this_boxsize = $temp_size.'x'.$temp_size;
+                                    $this_offset_x -= round($tmp_diff / 2);
                                 }
                                 $this_frames = array();
                                 $temp_frames = mt_rand(1, 20);
@@ -391,7 +398,7 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                             if ($flag_wap && preg_match('/^mecha/i', $this_id)){ continue; }
                             $this_key++;
                             $this_class = $this_info['class'];
-                            $this_size = $this_info['size'];
+                            $this_size = intval($this_info['size']);
                             $this_boxsize = $this_size.'x'.$this_size;
                             $this_offset_x = $this_info['offset_x'];
                             $this_offset_y = $this_info['offset_y'];
@@ -421,6 +428,13 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                                     }
                                     shuffle($images);
                                     $this_image = array_shift($images);
+                                }
+                                $temp_size = (intval($this_index['robot_image_size']) * 2);
+                                if ($temp_size !== $this_size){
+                                    $tmp_diff = $temp_size - $this_size;
+                                    $this_size = $temp_size;
+                                    $this_boxsize = $temp_size.'x'.$temp_size;
+                                    $this_offset_x -= round($tmp_diff / 2);
                                 }
                                 $this_frames = array();
                                 $temp_frames = mt_rand(1, 20);

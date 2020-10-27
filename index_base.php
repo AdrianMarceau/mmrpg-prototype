@@ -383,10 +383,11 @@ if ($this_current_page == 'file' // File sub-pages
                 if (!empty($temp_field_data['field_background_attachments']) && !empty($temp_field_data['field_mechas'])){
                     echo '<div class="background_event event clearback sticky" style="z-index: 15; border-color: transparent;">';
                     $this_key = -1;
+                    $cached_robot_info = array();
                     foreach ($temp_field_data['field_background_attachments'] AS $this_info){
                         $this_key++;
                         $this_class = $this_info['class'];
-                        $this_size = $this_info['size'];
+                        $this_size = intval($this_info['size']);
                         $this_boxsize = $this_size.'x'.$this_size;
                         $this_path = $class_paths[$this_class];
                         $this_offset_x = $this_info['offset_x'];
@@ -394,6 +395,15 @@ if ($this_current_page == 'file' // File sub-pages
                         $this_offset_z = $this_key + 1;
                         if ($this_class == 'robot'){
                             $this_token = $temp_field_data['field_mechas'][array_rand($temp_field_data['field_mechas'])]; //$this_info[$this_class.'_token'];
+                            if (!isset($cached_robot_info[$this_token])){ $cached_robot_info[$this_token] = rpg_robot::get_index_info($this_token); }
+                            $this_data = $cached_robot_info[$this_token];
+                            $temp_size = intval($this_data['robot_image_size']);
+                            if ($temp_size !== $this_size){
+                                $tmp_diff = $temp_size - $this_size;
+                                $this_size = $temp_size;
+                                $this_boxsize = $temp_size.'x'.$temp_size;
+                                $this_offset_x -= round($tmp_diff / 2);
+                            }
                             $temp_sprite_frame = array('base', 'defend', 'taunt', 'victory');
                             $temp_sprite_frame = $temp_sprite_frame[array_rand($temp_sprite_frame)];
                             $this_frames = array($temp_sprite_frame); //$this_info[$this_class.'_frame'];
