@@ -335,6 +335,12 @@ a:hover {
     font-size: 80%;
     color: #ababab;
 }
+.adminhome li > div.link > .bullet {
+    margin: 0 8px 0 0;
+    font-size: 100%;
+    color: #595959;
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.9);
+}
 
 .adminhome li > pre.repo_debug {
     display: block;

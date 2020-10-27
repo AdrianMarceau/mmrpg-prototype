@@ -203,17 +203,20 @@ elseif ($this_page_action == 'edit-fortress-bosses'){
     require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-robots_bosses.php');
 }
 // Else if this is an EDIT ROBOT MASTER ABILITIES request
-elseif ($this_page_action == 'edit-robot-master-abilities'){
+elseif ($this_page_action == 'edit-master-abilities'
+    || $this_page_action == 'edit-robot-master-abilities'){
     // Require the edit abilities file
     require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-abilities_master.php');
 }
 // Else if this is an EDIT SUPPORT MECHA ABILITIES request
-elseif ($this_page_action == 'edit-support-mecha-abilities'){
+elseif ($this_page_action == 'edit-mecha-abilities'
+    || $this_page_action == 'edit-support-mecha-abilities'){
     // Require the edit abilities file
     require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-abilities_mecha.php');
 }
 // Else if this is an EDIT FORTRESS BOSS ABILITIES request
-elseif ($this_page_action == 'edit-fortress-boss-abilities'){
+elseif ($this_page_action == 'edit-boss-abilities'
+    || $this_page_action == 'edit-fortress-boss-abilities'){
     // Require the edit abilities file
     require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-abilities_boss.php');
 }

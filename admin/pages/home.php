@@ -30,7 +30,7 @@
         if (in_array('*', $this_adminaccess)
             || in_array('edit-users', $this_adminaccess)){
             $this_option = array(
-                'link' => array('url' => 'admin/edit-users/', 'text' => 'Moderate Users'),
+                'link' => array('url' => 'admin/edit-users/', 'text' => 'Moderate Users', 'bullet' => 'users'),
                 'desc' => 'update or modify user account info and permissions'
                 );
             $this_group_options[] = $this_option;
@@ -40,7 +40,7 @@
             || in_array('edit-challenges', $this_adminaccess)
             || in_array('edit-user-challenges', $this_adminaccess)){
             $this_option = array(
-                'link' => array('url' => 'admin/edit-user-challenges/', 'text' => 'Moderate User Challenges'),
+                'link' => array('url' => 'admin/edit-user-challenges/', 'text' => 'Moderate User Challenges', 'bullet' => 'users-cog'),
                 'desc' => 'update or modify user-created challenge missions for the post-game'
                 );
             $this_group_options[] = $this_option;
@@ -226,7 +226,7 @@
                 || in_array('edit-players', $this_adminaccess)){
                 $option_name = 'Edit Players';
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-players/', 'text' => $option_name),
+                    'link' => array('url' => 'admin/edit-players/', 'text' => $option_name, 'bullet' => 'mask'),
                     'desc' => 'edit the details and images of the in-game player characters',
                     'repo' => array(
                         'name' => 'players',
@@ -267,7 +267,7 @@
                 || in_array('edit-robot-master', $this_adminaccess)){
                 $option_name = 'Edit Robot Masters';
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-robot-masters/', 'text' => $option_name),
+                    'link' => array('url' => 'admin/edit-robot-masters/', 'text' => $option_name, 'bullet' => 'robot'),
                     'desc' => 'edit the details and images of the in-game robot masters',
                     'repo' => array(
                         'name' => 'robots',
@@ -310,59 +310,11 @@
             }
             if (in_array('*', $this_adminaccess)
                 || in_array('edit-content', $this_adminaccess)
-                || in_array('edit-abilities', $this_adminaccess)
-                || in_array('edit-robot-master-abilities', $this_adminaccess)){
-                $option_name = 'Edit Robot Master Abilities';
-                $this_option = array(
-                    'link' => array('url' => 'admin/edit-robot-master-abilities/', 'text' => $option_name),
-                    'desc' => 'edit the details and images of the abilities used by robot masters',
-                    'repo' => array(
-                        'name' => 'abilities',
-                        'data' => array('prefix' => 'ability'),
-                        'path' => MMRPG_CONFIG_ABILITIES_CONTENT_PATH,
-                        'filter' => array(
-                            'table' => 'mmrpg_index_abilities',
-                            'token' => 'ability_token',
-                            'extra' => array('ability_class' => 'master')
-                            )
-                        ),
-                    'buttons' => array(
-                        array(
-                            'text' => 'Revert Uncommitted',
-                            'condition' => array('uncommitted' => true),
-                            'attributes' => array(
-                                'data-button' => 'git',
-                                'data-action' => 'revert',
-                                'data-kind' => 'abilities',
-                                'data-subkind' => 'masters',
-                                'data-token' => 'all',
-                                'data-source' => 'github'
-                                )
-                            ),
-                        array(
-                            'text' => 'Commit All',
-                            'condition' => array('uncommitted' => true),
-                            'attributes' => array(
-                                'data-button' => 'git',
-                                'data-action' => 'commit',
-                                'data-kind' => 'abilities',
-                                'data-subkind' => 'masters',
-                                'data-token' => 'all',
-                                'data-source' => 'github'
-                                )
-                            )
-                        )
-                    );
-                $this_group_options[] = $this_option;
-            }
-
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-content', $this_adminaccess)
                 || in_array('edit-robots', $this_adminaccess)
                 || in_array('edit-support-mechas', $this_adminaccess)){
                 $option_name = 'Edit Support Mechas';
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-support-mechas/', 'text' => $option_name),
+                    'link' => array('url' => 'admin/edit-support-mechas/', 'text' => $option_name, 'bullet' => 'ghost'),
                     'desc' => 'edit the details and images of the in-game support mechas',
                     'repo' => array(
                         'name' => 'robots',
@@ -405,59 +357,11 @@
             }
             if (in_array('*', $this_adminaccess)
                 || in_array('edit-content', $this_adminaccess)
-                || in_array('edit-abilities', $this_adminaccess)
-                || in_array('edit-support-mecha-abilities', $this_adminaccess)){
-                $option_name = 'Edit Support Mecha Abilities';
-                $this_option = array(
-                    'link' => array('url' => 'admin/edit-support-mecha-abilities/', 'text' => $option_name),
-                    'desc' => 'edit the details and images of abilities used by support mechas',
-                    'repo' => array(
-                        'name' => 'abilities',
-                        'data' => array('prefix' => 'ability'),
-                        'path' => MMRPG_CONFIG_ABILITIES_CONTENT_PATH,
-                        'filter' => array(
-                            'table' => 'mmrpg_index_abilities',
-                            'token' => 'ability_token',
-                            'extra' => array('ability_class' => 'mecha')
-                            )
-                        ),
-                    'buttons' => array(
-                        array(
-                            'text' => 'Revert Uncommitted',
-                            'condition' => array('uncommitted' => true),
-                            'attributes' => array(
-                                'data-button' => 'git',
-                                'data-action' => 'revert',
-                                'data-kind' => 'abilities',
-                                'data-subkind' => 'mechas',
-                                'data-token' => 'all',
-                                'data-source' => 'github'
-                                )
-                            ),
-                        array(
-                            'text' => 'Commit All',
-                            'condition' => array('uncommitted' => true),
-                            'attributes' => array(
-                                'data-button' => 'git',
-                                'data-action' => 'commit',
-                                'data-kind' => 'abilities',
-                                'data-subkind' => 'mechas',
-                                'data-token' => 'all',
-                                'data-source' => 'github'
-                                )
-                            )
-                        )
-                    );
-                $this_group_options[] = $this_option;
-            }
-
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-content', $this_adminaccess)
                 || in_array('edit-robots', $this_adminaccess)
                 || in_array('edit-fortress-bosses', $this_adminaccess)){
                 $option_name = 'Edit Fortress Bosses';
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-fortress-bosses/', 'text' => $option_name),
+                    'link' => array('url' => 'admin/edit-fortress-bosses/', 'text' => $option_name, 'bullet' => 'skull'),
                     'desc' => 'edit the details and images of the in-game fortress bosses',
                     'repo' => array(
                         'name' => 'robots',
@@ -498,13 +402,108 @@
                     );
                 $this_group_options[] = $this_option;
             }
+
             if (in_array('*', $this_adminaccess)
                 || in_array('edit-content', $this_adminaccess)
                 || in_array('edit-abilities', $this_adminaccess)
-                || in_array('edit-fortress-boss-abilities', $this_adminaccess)){
-                $option_name = 'Edit Fortress Boss Abilities';
+                || in_array('edit-master-abilities', $this_adminaccess)){
+                $option_name = 'Edit Master Abilities';
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-fortress-boss-abilities/', 'text' => $option_name),
+                    'link' => array('url' => 'admin/edit-master-abilities/', 'text' => $option_name, 'bullet' => 'fire-alt'),
+                    'desc' => 'edit the details and images of the abilities used by robot masters',
+                    'repo' => array(
+                        'name' => 'abilities',
+                        'data' => array('prefix' => 'ability'),
+                        'path' => MMRPG_CONFIG_ABILITIES_CONTENT_PATH,
+                        'filter' => array(
+                            'table' => 'mmrpg_index_abilities',
+                            'token' => 'ability_token',
+                            'extra' => array('ability_class' => 'master')
+                            )
+                        ),
+                    'buttons' => array(
+                        array(
+                            'text' => 'Revert Uncommitted',
+                            'condition' => array('uncommitted' => true),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'revert',
+                                'data-kind' => 'abilities',
+                                'data-subkind' => 'masters',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            ),
+                        array(
+                            'text' => 'Commit All',
+                            'condition' => array('uncommitted' => true),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'commit',
+                                'data-kind' => 'abilities',
+                                'data-subkind' => 'masters',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            )
+                        )
+                    );
+                $this_group_options[] = $this_option;
+            }
+            if (in_array('*', $this_adminaccess)
+                || in_array('edit-content', $this_adminaccess)
+                || in_array('edit-abilities', $this_adminaccess)
+                || in_array('edit-mecha-abilities', $this_adminaccess)){
+                $option_name = 'Edit Mecha Abilities';
+                $this_option = array(
+                    'link' => array('url' => 'admin/edit-mecha-abilities/', 'text' => $option_name, 'bullet' => 'fire'),
+                    'desc' => 'edit the details and images of abilities used by support mechas',
+                    'repo' => array(
+                        'name' => 'abilities',
+                        'data' => array('prefix' => 'ability'),
+                        'path' => MMRPG_CONFIG_ABILITIES_CONTENT_PATH,
+                        'filter' => array(
+                            'table' => 'mmrpg_index_abilities',
+                            'token' => 'ability_token',
+                            'extra' => array('ability_class' => 'mecha')
+                            )
+                        ),
+                    'buttons' => array(
+                        array(
+                            'text' => 'Revert Uncommitted',
+                            'condition' => array('uncommitted' => true),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'revert',
+                                'data-kind' => 'abilities',
+                                'data-subkind' => 'mechas',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            ),
+                        array(
+                            'text' => 'Commit All',
+                            'condition' => array('uncommitted' => true),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'commit',
+                                'data-kind' => 'abilities',
+                                'data-subkind' => 'mechas',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            )
+                        )
+                    );
+                $this_group_options[] = $this_option;
+            }
+            if (in_array('*', $this_adminaccess)
+                || in_array('edit-content', $this_adminaccess)
+                || in_array('edit-abilities', $this_adminaccess)
+                || in_array('edit-boss-abilities', $this_adminaccess)){
+                $option_name = 'Edit Boss Abilities';
+                $this_option = array(
+                    'link' => array('url' => 'admin/edit-boss-abilities/', 'text' => $option_name, 'bullet' => 'meteor'),
                     'desc' => 'edit the details and images of abilities used by fortress bosses',
                     'repo' => array(
                         'name' => 'abilities',
@@ -548,50 +547,10 @@
 
             if (in_array('*', $this_adminaccess)
                 || in_array('edit-content', $this_adminaccess)
-                || in_array('edit-fields', $this_adminaccess)){
-                $option_name = 'Edit Battle Fields';
-                $this_option = array(
-                    'link' => array('url' => 'admin/edit-fields/', 'text' => $option_name),
-                    'desc' => 'edit the details and images of the in-game battle fields',
-                    'repo' => array(
-                        'name' => 'fields',
-                        'data' => array('prefix' => 'field'),
-                        'path' => MMRPG_CONFIG_FIELDS_CONTENT_PATH
-                        ),
-                    'buttons' => array(
-                        array(
-                            'text' => 'Revert Uncommitted',
-                            'condition' => array('uncommitted' => true),
-                            'attributes' => array(
-                                'data-button' => 'git',
-                                'data-action' => 'revert',
-                                'data-kind' => 'fields',
-                                'data-token' => 'all',
-                                'data-source' => 'github'
-                                )
-                            ),
-                        array(
-                            'text' => 'Commit All',
-                            'condition' => array('uncommitted' => true),
-                            'attributes' => array(
-                                'data-button' => 'git',
-                                'data-action' => 'commit',
-                                'data-kind' => 'fields',
-                                'data-token' => 'all',
-                                'data-source' => 'github'
-                                )
-                            )
-                        )
-                    );
-                $this_group_options[] = $this_option;
-            }
-
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-content', $this_adminaccess)
                 || in_array('edit-items', $this_adminaccess)){
                 $option_name = 'Edit Items';
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-items/', 'text' => $option_name),
+                    'link' => array('url' => 'admin/edit-items/', 'text' => $option_name, 'bullet' => 'flask'),
                     'desc' => 'edit the details and images of the in-game items',
                     'repo' => array(
                         'name' => 'items',
@@ -626,6 +585,46 @@
                 $this_group_options[] = $this_option;
             }
 
+            if (in_array('*', $this_adminaccess)
+                || in_array('edit-content', $this_adminaccess)
+                || in_array('edit-fields', $this_adminaccess)){
+                $option_name = 'Edit Fields';
+                $this_option = array(
+                    'link' => array('url' => 'admin/edit-fields/', 'text' => $option_name, 'bullet' => 'map'),
+                    'desc' => 'edit the details and images of the in-game battle fields',
+                    'repo' => array(
+                        'name' => 'fields',
+                        'data' => array('prefix' => 'field'),
+                        'path' => MMRPG_CONFIG_FIELDS_CONTENT_PATH
+                        ),
+                    'buttons' => array(
+                        array(
+                            'text' => 'Revert Uncommitted',
+                            'condition' => array('uncommitted' => true),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'revert',
+                                'data-kind' => 'fields',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            ),
+                        array(
+                            'text' => 'Commit All',
+                            'condition' => array('uncommitted' => true),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'commit',
+                                'data-kind' => 'fields',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            )
+                        )
+                    );
+                $this_group_options[] = $this_option;
+            }
+
             // Merge in the common game database group options to all envs
             $this_group_options = array_merge($this_group_options, $common_group_kinds_options['game_database']);
 
@@ -646,7 +645,7 @@
                 || in_array('edit-content', $this_adminaccess)
                 || in_array('edit-stars', $this_adminaccess)){
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-stars/', 'text' => 'Edit Rogue Stars'),
+                    'link' => array('url' => 'admin/edit-stars/', 'text' => 'Edit Rogue Stars', 'bullet' => 'star'),
                     'desc' => 'schedule and manage rogue star appearances in the post-game',
                     'repo' => array(
                         'name' => 'stars',
@@ -685,7 +684,7 @@
                 || in_array('edit-challenges', $this_adminaccess)
                 || in_array('edit-event-challenges', $this_adminaccess)){
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-event-challenges/', 'text' => 'Edit Event Challenges'),
+                    'link' => array('url' => 'admin/edit-event-challenges/', 'text' => 'Edit Event Challenges', 'bullet' => 'trophy'),
                     'desc' => 'create or modify event-based challenge missions for the post-game',
                     'repo' => array(
                         'name' => 'challenges',
@@ -740,7 +739,7 @@
                 || in_array('edit-content', $this_adminaccess)
                 || in_array('edit-pages', $this_adminaccess)){
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-pages/', 'text' => 'Edit Website Pages'),
+                    'link' => array('url' => 'admin/edit-pages/', 'text' => 'Edit Website Pages', 'bullet' => 'sitemap'),
                     'desc' => 'edit the text and images on various website pages',
                     'repo' => array(
                         'name' => 'pages',
@@ -852,29 +851,29 @@
         $this_group_options = array();
 
         // Populate the group options array with relevant pages and buttons
+        if (in_array('*', $this_adminaccess)
+            || in_array('pull-content', $this_adminaccess)){
+            $this_option = array(
+                'link' => array('url' => 'admin/scripts/pull-all-game-content.php?return=html', 'text' => 'Pull Content Updates', 'target' => '_blank', 'bullet' => 'cloud-download-alt'),
+                'desc' => 'pull published updates to game content and apply to this build'
+                );
+            $this_group_options[] = $this_option;
+        }
         if (MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== false
             && MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== MMRPG_CONFIG_SERVER_ENV){
             if (in_array('*', $this_adminaccess)
                 || in_array('edit-users', $this_adminaccess)){
                 $this_option = array(
-                    'link' => array('url' => 'admin/scripts/pull-user-data.php?return=html', 'text' => 'Pull Live User Data', 'target' => '_blank', 'class' => 'disabled'),
-                    'desc' => 'pull user data from live build for testing and overwrite existing'
+                    'link' => array('url' => 'admin/scripts/pull-user-data.php?return=html', 'text' => 'Pull Live User Data', 'target' => '_blank', 'class' => 'disabled', 'bullet' => 'arrow-alt-circle-down'),
+                    'desc' => 'pull current users and their data from live build to overwrite existing'
                     );
                 $this_group_options[] = $this_option;
             }
         }
         if (in_array('*', $this_adminaccess)
-            || in_array('pull-content', $this_adminaccess)){
-            $this_option = array(
-                'link' => array('url' => 'admin/scripts/pull-all-game-content.php?return=html', 'text' => 'Pull Content Updates', 'target' => '_blank'),
-                'desc' => 'pull published updates to game content and apply to this build'
-                );
-            $this_group_options[] = $this_option;
-        }
-        if (in_array('*', $this_adminaccess)
             || in_array('delete-cached-files', $this_adminaccess)){
             $this_option = array(
-                'link' => array('url' => 'admin/delete-cached-files/', 'text' => 'Delete Cached Files', 'target' => '_blank'),
+                'link' => array('url' => 'admin/delete-cached-files/', 'text' => 'Delete Cached Files', 'target' => '_blank', 'bullet' => 'trash'),
                 'desc' => 'delete cached markup, objects, timeouts, indexes, and more'
                 );
             $this_group_options[] = $this_option;
@@ -884,7 +883,7 @@
             && (in_array('*', $this_adminaccess)
                 || in_array('refresh-leaderboard', $this_adminaccess))){
             $this_option = array(
-                'link' => array('url' => 'admin/refresh-leaderboard/incognito=true&amp;force=true', 'text' => 'Refresh Leaderboard', 'target' => '_blank'),
+                'link' => array('url' => 'admin/refresh-leaderboard/incognito=true&amp;force=true', 'text' => 'Refresh Leaderboard', 'target' => '_blank', 'bullet' => 'sync-alt'),
                 'desc' => 'recalculate battle points for all idle users and refresh leaderboard'
                 );
             $this_group_options[] = $this_option;
@@ -894,7 +893,7 @@
             && (in_array('*', $this_adminaccess)
                 || in_array('purge-bogus-users', $this_adminaccess))){
             $this_option = array(
-                'link' => array('url' => 'admin/purge-bogus-users/limit=10', 'text' => 'Purge Bogus Users', 'target' => '_blank'),
+                'link' => array('url' => 'admin/purge-bogus-users/limit=10', 'text' => 'Purge Bogus Users', 'target' => '_blank', 'bullet' => 'bomb'),
                 'desc' => 'purge user accounts with zero progress and no login history'
                 );
             $this_group_options[] = $this_option;
@@ -902,7 +901,7 @@
         if (in_array('*', $this_adminaccess)
             || in_array('view-logs', $this_adminaccess)){
             $this_option = array(
-                'link' => array('url' => 'admin/watch-error-log/', 'text' => 'Watch Error Log', 'target' => '_blank'),
+                'link' => array('url' => 'admin/watch-error-log/', 'text' => 'Watch Error Log', 'target' => '_blank', 'bullet' => 'bug'),
                 'desc' => 'watch the error log to help with dev, debug, and testing'
                 );
             $this_group_options[] = $this_option;

@@ -603,7 +603,7 @@
     $object_group_kind = 'ability';
     $object_group_class = $this_ability_class;
     $object_group_editor_url = $this_ability_page_baseurl.'groups/';
-    $object_group_editor_name = preg_replace('/^[^\s]+\s+/i', '', $this_ability_class_name_uc).' Groups';
+    $object_group_editor_name = $this_ability_class_name_uc.' Groups';
     if ($sub_action == 'groups'){
         require('edit-groups_actions.php');
     }
