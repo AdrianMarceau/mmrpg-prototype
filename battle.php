@@ -95,7 +95,7 @@ if (!empty($this_player_token)){
             list($robot_id, $robot_token) = explode('_', $robot_string);
             if (mmrpg_prototype_robot_unlocked($this_player_token, $robot_token)){
                 $temp_robot_data = rpg_robot::get_index_info($robot_token);
-                $temp_robot_id = rpg_game::unique_robot_id($temp_player_id, $temp_robot_data['robot_id'], ($key + 1));
+                $temp_robot_id = strstr($robot_id, $temp_player_id) ? $robot_id : rpg_game::unique_robot_id($temp_player_id, $temp_robot_data['robot_id'], ($key + 1));
                 $this_player_data['player_robots'][] = array('robot_id' => $temp_robot_id, 'robot_token' => $robot_token);
                 $allowed_robots_parsed[] = $temp_robot_id.'_'.$robot_token;
             }
