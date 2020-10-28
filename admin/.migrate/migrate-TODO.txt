@@ -138,8 +138,8 @@ and distinguish between LOCAL/DEV/STAGE/PROD servers w/ different push/pull func
 -  Add pull functionality for rpg robots on stage/prod [DONE]
 -  Add pull functionality for rpg fields on stage/prod [DONE]
 -  Add pull functionality for web pages on stage/prod [DONE]
--  Add pull functionality for users+ on local/dev/stage
--  Add pull functionality for user_challenges on local/dev/stage
+-  Add pull functionality for users+ on local/dev/stage [DONE]
+-  Add pull functionality for user_challenges on local/dev/stage [DONE]
 
 Update the admin panel to remove legacy "backup" tabs & functionality now that we have git backups
 -  player editor [DONE]
@@ -256,13 +256,13 @@ Make grouping/ordering items in the admin panel more straight-forward
 -  items [DONE]
 
 Add the following misc new features to the admin panel
--  Add an error-log watcher for debug on local/dev builds (maybe more?)
+-  Add an error-log watcher for debug on local/dev builds (maybe more?) [DONE]
 
 Write shell scripts for the following situations
 -  setup new copy of dev build [DONE]
 -  setup new copy of stage build [DONE]
 -  safely setup new copy of prod build
--  safely update master code for any version
+-  safely update master code for any version [DONE]
 
 Implement the new "minify" library to compress CSS and JS markup
 -  Minify all styles
@@ -273,7 +273,7 @@ Update in-battle idle animations to include base2 frames for
 -  players (?)
 
 Fix the following bugs brought up in chat
--  80x80 sized mechas don't display properly in battle backgrounds/foregrounds
+-  80x80 sized mechas don't display properly in battle backgrounds/foregrounds [DONE]
 
 
 MAYBE POST-UPDATE(?)
