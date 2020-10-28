@@ -1,13 +1,11 @@
 <?
 
-// Require the application top file
-define('MMRPG_ADMIN_PANEL', true);
-require_once('../../top.php');
-require_once(MMRPG_CONFIG_ROOTDIR.'classes/cms_admin.php');
+// Require the top file for all admin scripts
+require_once('common/top.php');
 
-// Require the common git actions file
+// Require the top file for all admin git scripts
 $request_action = 'commit';
-require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/common_git_header.php');
+require_once('common/git-top.php');
 //debug_echo('push-game-content'.PHP_EOL);
 
 // Collect an index of changes files via git

@@ -1,22 +1,13 @@
 <?
 
-// Require the application top file
-define('MMRPG_ADMIN_PANEL', true);
-require_once('../../top.php');
-require_once(MMRPG_CONFIG_ROOTDIR.'classes/cms_admin.php');
+// Require the top file for all admin scripts
+require_once('common/top.php');
+
+// Require the git parameters file so we know which pulls are allowed
+require_once('common/git-params.php');
 
 // Require the global content type index for reference
 require_once(MMRPG_CONFIG_CONTENT_PATH.'index.php');
-
-// Require common git functions and variables if not exist already
-require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/common_functions.php');
-require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/common_git_variables.php');
-
-// Ensure the user is actually logged in as an admin
-if (!defined('MMRPG_CONFIG_ADMIN_MODE')
-    || MMRPG_CONFIG_ADMIN_MODE !== true){
-    exit_action('error|user not logged in or not admin');
-}
 
 // Cache a string of current cookies before we continue
 $cookie_args = array();
@@ -80,7 +71,7 @@ $has_success = !empty($request_feedback['success']) ? true : false;
 $has_errors = !empty($request_feedback['error']) ? true : false;
 echo(implode(PHP_EOL, $request_feedback['all']));
 if ($has_success && !$has_errors){
-    exit_action('success|Changes to game content was pulled and updated successfully!');
+    exit_action('success|Changes to game content were pulled and updated successfully!');
 } elseif (!$has_success && $has_errors){
     exit_action('error|Changes to game content could not be pulled or there were problems updating!');
 } else {
