@@ -7,7 +7,7 @@ require_once(MMRPG_CONFIG_ROOTDIR.'classes/cms_admin.php');
 
 // Require the common git files
 require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/common_functions.php');
-require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/git_common_variables.php');
+require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/common_git_variables.php');
 
 // Navigate to the git repo and run a git pull to collect updates
 $git_commands = '';
