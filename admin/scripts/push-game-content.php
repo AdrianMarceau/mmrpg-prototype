@@ -8,7 +8,7 @@ require_once(MMRPG_CONFIG_ROOTDIR.'classes/cms_admin.php');
 // Require the common git actions file
 $request_action = 'publish';
 $allow_empty_subkind = true;
-require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/git_common.php');
+require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/common_git_header.php');
 //debug_echo('push-game-content'.PHP_EOL);
 
 // Only the "all" request is supported for updating
