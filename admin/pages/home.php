@@ -864,7 +864,7 @@
             if (in_array('*', $this_adminaccess)
                 || in_array('edit-users', $this_adminaccess)){
                 $this_option = array(
-                    'link' => array('url' => 'admin/scripts/pull-user-data.php?return=html', 'text' => 'Pull Live User Data', 'target' => '_blank', 'class' => 'disabled', 'bullet' => 'arrow-alt-circle-down'),
+                    'link' => array('url' => 'admin/scripts/pull-live-user-data.php?return=html', 'text' => 'Pull Live User Data', 'target' => '_blank', 'bullet' => 'arrow-alt-circle-down'),
                     'desc' => 'pull current users and their data from live build to overwrite existing'
                     );
                 $this_group_options[] = $this_option;

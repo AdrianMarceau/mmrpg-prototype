@@ -107,6 +107,7 @@ function exit_form_action($output = ''){
 // Collect details for this admin user from the database
 $this_admininfo = array();
 if (!empty($_SESSION['admin_id'])){
+    $this_admin_id = intval($_SESSION['admin_id']);
     $this_admininfo = $db->get_array("SELECT
         users.user_id,
         users.user_name,
@@ -119,7 +120,7 @@ if (!empty($_SESSION['admin_id'])){
         FROM mmrpg_users AS users
         LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
         WHERE
-        users.user_id = '{$_SESSION['admin_id']}'
+        users.user_id = '{$this_admin_id}'
         ORDER BY
         user_id ASC
         ;");
