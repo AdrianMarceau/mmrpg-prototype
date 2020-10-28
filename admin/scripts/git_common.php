@@ -1,8 +1,8 @@
 <?
 
 // Require common git functions and variables if not exist already
+require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/common_functions.php');
 require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/git_common_variables.php');
-require_once(MMRPG_CONFIG_ROOTDIR.'admin/scripts/git_common_functions.php');
 
 // Ensure the user is actually logged in as an admin
 if (!defined('MMRPG_CONFIG_ADMIN_MODE')
