@@ -49,6 +49,10 @@ foreach ($copy_db_tables AS $key => $table_name){
     echo(" done!".PHP_EOL);
 }
 
+// Fix the legacy user_id problem for the guest pseudo-account
+$guest_id = MMRPG_SETTINGS_GUEST_ID;
+$db->("UPDATE `{$this_db_name}`.mmrpg_users SET user_id = {$guest_id} WHERE user_name_clean = 'guest';");
+
 // Refresh the logged-in user's accountin case anything changed
 $this_admin_id = intval($_SESSION['admin_id']);
 $this_admin_data = $db->get_array("SELECT user_id, user_name, user_name_public, user_name_clean FROM mmrpg_users WHERE user_id = '{$this_admin_id}';");                // Save account credentials to the session
