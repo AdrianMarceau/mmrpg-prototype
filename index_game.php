@@ -59,7 +59,7 @@ elseif (
     ){
 
     // Ensure there is a save file to load
-    if (!empty($_SESSION['GAME']['USER']['userid']) && $_SESSION['GAME']['USER']['userid'] != MMRPG_SETTINGS_GUEST_ID){
+    if (!rpg_user::is_guest()){
 
         // Load the save file into memory and overwrite the session
         mmrpg_load_game_session();

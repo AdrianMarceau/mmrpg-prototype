@@ -56,7 +56,7 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
     $this_username = !empty($board['user_name_public']) && !empty($board['user_flag_postpublic']) ? $board['user_name_public'] : $board['user_name'];
     $this_username = htmlentities($this_username, ENT_QUOTES, 'UTF-8', true);
     $this_user_id = !empty($board['user_id']) ? $board['user_id'] : 0;
-    if ($this_userid != MMRPG_SETTINGS_GUEST_ID && $this_user_id == $_SESSION['GAME']['USER']['userid']){
+    if (rpg_user::is_guest() && $this_user_id == $_SESSION['GAME']['USER']['userid']){
         $this_boardinfo['board_rank'] = $place_counter;
         $_SESSION['GAME']['BOARD']['boardrank'] = $this_boardinfo['board_rank'];
     }

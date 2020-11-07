@@ -3126,7 +3126,10 @@ class rpg_player extends rpg_object {
                         $include_user_challenges = false;
                         $include_hidden_challenges = false;
                         if (MMRPG_USER_IS_ADMIN === true
-                            && (in_array('*', $this_admin_permissions) || in_array('edit_challenges', $this_admin_permissions))){
+                            && (in_array('*', $this_admin_permissions)
+                                || in_array('edit-content', $this_admin_permissions)
+                                || in_array('edit-challenges', $this_admin_permissions)
+                                )){
                             $include_user_challenges = true;
                             $include_hidden_challenges = true;
                         }
@@ -3141,7 +3144,7 @@ class rpg_player extends rpg_object {
                         $query_conditions .= 'AND challenges.challenge_flag_published = 1 ';
                         $query_conditions .= 'AND challenges.challenge_kind = \'event\' ';
                         if (!$include_hidden_challenges){
-                            if (!empty($this_userid) && $this_userid !== MMRPG_SETTINGS_GUEST_ID){ $query_conditions .= 'AND (challenges.challenge_flag_hidden = 0 OR challenges.challenge_creator = '.$this_userid.')'; }
+                            if (!rpg_user::is_guest()){ $query_conditions .= 'AND (challenges.challenge_flag_hidden = 0 OR challenges.challenge_creator = '.$this_userid.')'; }
                             else { $query_conditions .= 'AND challenges.challenge_flag_hidden = 0'; }
                         }
                         $challenge_table = 'mmrpg_challenges';
@@ -3163,7 +3166,7 @@ class rpg_player extends rpg_object {
                         $query_conditions .= 'AND challenges.challenge_flag_published = 1 ';
                         $query_conditions .= 'AND challenges.challenge_kind = \'user\' ';
                         if (!$include_hidden_challenges){
-                            if (!empty($this_userid) && $this_userid !== MMRPG_SETTINGS_GUEST_ID){ $query_conditions .= 'AND (challenges.challenge_flag_hidden = 0 OR challenges.challenge_creator = '.$this_userid.')'; }
+                            if (!rpg_user::is_guest()){ $query_conditions .= 'AND (challenges.challenge_flag_hidden = 0 OR challenges.challenge_creator = '.$this_userid.')'; }
                             else { $query_conditions .= 'AND challenges.challenge_flag_hidden = 0'; }
                         }
                         $challenge_table = 'mmrpg_users_challenges';
@@ -3186,7 +3189,7 @@ class rpg_player extends rpg_object {
                         $challenge_mission_victories['user'] = array();
                         if ($global_allow_editing
                             && !empty($this_userid)
-                            && $this_userid !== MMRPG_SETTINGS_GUEST_ID){
+                            && !rpg_user::is_guest()){
                             $challenge_table = 'mmrpg_challenges';
                             $challenge_leaderboard_table = 'mmrpg_challenges_leaderboard';
                             $challenge_mission_victories['event'] = $db->get_array_list("SELECT

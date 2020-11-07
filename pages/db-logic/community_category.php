@@ -59,7 +59,7 @@ $find = '<!-- MMRPG_COMMUNITY_CATEGORY_CREATE_THREAD_LINK -->';
 if (strstr($page_content_parsed, $find)){
     ob_start();
         if ($this_category_info['category_id'] != 0){
-            if ($this_userid != MMRPG_SETTINGS_GUEST_ID
+            if (!rpg_user::is_guest()
                 && $this_userinfo['role_level'] >= $this_category_info['category_level']
                 && $community_battle_points >= 10000
                 && !empty($this_userinfo['user_flag_postpublic'])

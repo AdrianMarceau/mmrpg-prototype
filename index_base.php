@@ -18,7 +18,7 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
         $ping_text = $_POST['ping'];
         $ping_page = !empty($_POST['page']) && preg_match('/^[-_a-z0-9\/]+$/i', $_POST['page']) ? $_POST['page'] : '';
         // If the ping page is not empty and we're logged in
-        if (!empty($ping_page) && $this_userid != MMRPG_SETTINGS_GUEST_ID){
+        if (!empty($ping_page) && !rpg_user::is_guest()){
             // Update the database with the user's last page so we can keep track
             mmrpg_website_session_update($ping_page);
             //echo 'ping_page='.$ping_page."\n";
@@ -27,7 +27,7 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
         exit($ping_text);
     }
     // Otherwise, if this is a regular request and we're logged in
-    elseif ($this_userid != MMRPG_SETTINGS_GUEST_ID){
+    elseif (!rpg_user::is_guest()){
         // Update the database with the user's last page so we can keep track
         mmrpg_website_session_update($this_current_uri);
     }
@@ -61,9 +61,10 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
         );
 
     // Collect the recently updated posts for this player / guest
-    if ($this_userinfo['user_id'] != MMRPG_SETTINGS_GUEST_ID && !empty($this_userinfo['user_backup_login'])){ $temp_last_login = $this_userinfo['user_backup_login']; }
+    if (!rpg_user::is_guest() && !empty($this_userinfo['user_backup_login'])){ $temp_last_login = $this_userinfo['user_backup_login']; }
     else { $temp_last_login = time() - MMRPG_SETTINGS_UPDATE_TIMEOUT; }
-    $temp_new_threads = $db->get_array_list("SELECT category_id, CONCAT(thread_id, '_', thread_mod_date) AS thread_session_token FROM mmrpg_threads WHERE thread_locked = 0 AND (thread_target = 0 OR thread_target = {$this_userinfo['user_id']} OR user_id = {$this_userinfo['user_id']}) AND thread_mod_date > {$temp_last_login}".($this_userid != MMRPG_SETTINGS_GUEST_ID ? "  AND thread_mod_user <> {$this_userid}" : ''));
+    $temp_user_id = !rpg_user::is_guest() ? rpg_user::get_current_userid() : MMRPG_SETTINGS_GUEST_ID;
+    $temp_new_threads = $db->get_array_list("SELECT category_id, CONCAT(thread_id, '_', thread_mod_date) AS thread_session_token FROM mmrpg_threads WHERE thread_locked = 0 AND (thread_target = 0 OR thread_target = {$temp_user_id} OR user_id = {$temp_user_id}) AND thread_mod_date > {$temp_last_login}".(!rpg_user::is_guest() ? "  AND thread_mod_user <> {$temp_user_id}" : ''));
     if (empty($_SESSION['COMMUNITY']['threads_viewed'])){ $_SESSION['COMMUNITY']['threads_viewed'] = array(); }
     if (!empty($temp_new_threads)){ foreach ($temp_new_threads AS $key => $array){
         if (in_array($array['thread_session_token'], $_SESSION['COMMUNITY']['threads_viewed'])){ unset($temp_new_threads[$key]); }  }
@@ -348,7 +349,7 @@ if ($this_current_page == 'file' // File sub-pages
 
             <?
             // Define variables based on login status
-            if (!defined('MMRPG_CRITICAL_ERROR') && $this_userid != MMRPG_SETTINGS_GUEST_ID){
+            if (!defined('MMRPG_CRITICAL_ERROR') && !rpg_user::is_guest()){
                 // Define the avatar class and path variables
                 $temp_avatar_path = !empty($this_userinfo['user_image_path']) ? $this_userinfo['user_image_path'] : 'robots/mega-man/40';
                 $temp_background_path = !empty($this_userinfo['user_background_path']) ? $this_userinfo['user_background_path'] : 'fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN;
@@ -442,7 +443,7 @@ if ($this_current_page == 'file' // File sub-pages
                     <span class="xcounters"><?= $responsive_nav_counters ?></span>
                     <div class="xover field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="">&nbsp;</div>
 
-                    <? if($this_userid == MMRPG_SETTINGS_GUEST_ID): ?>
+                    <? if(rpg_user::is_guest()): ?>
                         <div class="avatar avatar_40x40" style=""><div class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/robots/robot/sprite_left_40x40.png);">Guest</div></div>
                         <div class="info" style="">
                             <strong class="username" style="">Welcome, Guest</strong>

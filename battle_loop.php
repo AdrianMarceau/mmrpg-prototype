@@ -382,8 +382,8 @@ if ($this_action == 'start'){
     }
 
     // Make sure the two players reference each other internally
-    $this_player->other_player = $target_player;
-    $target_player->other_player = $this_player;
+    $this_player->other_player = isset($target_player) ? $target_player : false;
+    $target_player->other_player = isset($this_player) ? $this_player : false;
 
 }
 

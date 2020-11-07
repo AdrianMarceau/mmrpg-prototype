@@ -1,7 +1,7 @@
 <?
 
 // Prevent updating if logged into a file
-if ($this_user['userid'] != MMRPG_SETTINGS_GUEST_ID){ die('<strong>FATAL UPDATE ERROR!</strong><br /> You cannot be logged in while updating!');  }
+if (!rpg_user::is_guest()){ die('<strong>FATAL UPDATE ERROR!</strong><br /> You cannot be logged in while updating!');  }
 
 // Print out the menu header so we know where we are
 ob_start();

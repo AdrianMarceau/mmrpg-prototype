@@ -404,7 +404,7 @@ class rpg_user {
 
         // Check if there is a logged in session user
         if (!empty($_SESSION['GAME']['USER']['userid'])
-            && $_SESSION['GAME']['USER']['userid'] != MMRPG_SETTINGS_GUEST_ID){
+            && !rpg_user::is_guest()){
             return $_SESSION['GAME']['USER']['userid'];
         } else {
             return false;

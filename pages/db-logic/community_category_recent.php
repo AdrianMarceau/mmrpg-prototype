@@ -10,7 +10,7 @@ if ($this_category_info['category_id'] == 0){
 $this_seo_title = 'New Comments | '.$this_seo_title;
 
 // Collect the recently updated posts for this player / guest
-if ($this_userinfo['user_id'] != MMRPG_SETTINGS_GUEST_ID){ $temp_last_login = $this_userinfo['user_backup_login']; }
+if (!rpg_user::is_guest()){ $temp_last_login = $this_userinfo['user_backup_login']; }
 else { $temp_last_login = time() - MMRPG_SETTINGS_UPDATE_TIMEOUT; }
 
 // Remove any threads that have been viewed from the array
@@ -169,7 +169,7 @@ if (strstr($page_content_parsed, $find)){
 $find = '<!-- MMRPG_COMMUNITY_CATEGORY_CREATE_THREAD_LINK -->';
 if (strstr($page_content_parsed, $find)){
     ob_start();
-        if($this_userid != MMRPG_SETTINGS_GUEST_ID && $this_userinfo['role_level'] >= $this_category_info['category_level'] && $community_battle_points >= 10000){
+        if(!rpg_user::is_guest() && $this_userinfo['role_level'] >= $this_category_info['category_level'] && $community_battle_points >= 10000){
             ?>
             <div class="subheader thread_name" style="float: right; clear: right; margin: 0; overflow: hidden; text-align: center; border: 1px solid rgba(0, 0, 0, 0.30); ">
                 <a class="link" href="community/<?= $this_category_info['category_token'] ?>/0/new/" style="margin-top: 0;">Create New Discussion &raquo;</a>
@@ -234,7 +234,7 @@ if (strstr($page_content_parsed, $find)){
                         }
 
                         // Define the temporary display variables
-                        $temp_post_guest = $this_post_info['user_id'] == MMRPG_SETTINGS_GUEST_ID ? true : false;
+                        $temp_post_guest = rpg_user::is_guest() ? true : false;
                         $temp_post_author = !empty($this_post_info['user_name_public']) && !empty($this_post_info['user_flag_postpublic']) ? $this_post_info['user_name_public'] : $this_post_info['user_name'];
                         $temp_reply_name = $temp_post_author;
                         $temp_reply_colour = !empty($this_post_info['user_colour_token']) ? $this_post_info['user_colour_token'] : 'none';
@@ -251,11 +251,11 @@ if (strstr($page_content_parsed, $find)){
                         // Define if this post is new to the logged in user or not
                         $temp_is_new = false;
                         // Supress the new flag if thread has already been viewed
-                        if ($this_userinfo['user_id'] != MMRPG_SETTINGS_GUEST_ID
+                        if (!rpg_user::is_guest()
                             && $this_post_info['user_id'] != $this_userinfo['user_id']
                             && $temp_post_timestamp > $this_userinfo['user_backup_login']){
                             $temp_is_new = true;
-                        } elseif ($this_userinfo['user_id'] == MMRPG_SETTINGS_GUEST_ID
+                        } elseif (rpg_user::is_guest()
                             && (($this_time - $temp_post_timestamp) <= MMRPG_SETTINGS_UPDATE_TIMEOUT)){
                             $temp_is_new = true;
                         }
@@ -295,10 +295,10 @@ if (strstr($page_content_parsed, $find)){
                         foreach ($temp_leaderboard_online AS $key => $info){ if ($info['id'] == $this_post_info['user_id']){ $temp_is_online = true; break; } }
 
                         // Collect the thread count for this user
-                        if ($this_post_info['user_id'] != MMRPG_SETTINGS_GUEST_ID){ $this_post_info['thread_count'] = !empty($this_user_threadcount[$this_post_info['user_id']]) ? $this_user_threadcount[$this_post_info['user_id']]['thread_count'] : 0; }
+                        if (!rpg_user::is_guest()){ $this_post_info['thread_count'] = !empty($this_user_threadcount[$this_post_info['user_id']]) ? $this_user_threadcount[$this_post_info['user_id']]['thread_count'] : 0; }
                         else { $this_post_info['thread_count'] = false; }
                         // Collect the post count for this user
-                        if ($this_post_info['user_id'] != MMRPG_SETTINGS_GUEST_ID){ $this_post_info['post_count'] = !empty($this_user_postcount[$this_post_info['user_id']]) ? $this_user_postcount[$this_post_info['user_id']]['post_count'] : 0; }
+                        if (!rpg_user::is_guest()){ $this_post_info['post_count'] = !empty($this_user_postcount[$this_post_info['user_id']]) ? $this_user_postcount[$this_post_info['user_id']]['post_count'] : 0; }
                         else { $this_post_info['post_count'] = false; }
 
                         // Collect the reply data for this user
@@ -358,7 +358,7 @@ if (strstr($page_content_parsed, $find)){
                                     </div>
                                     <div class="bodytext"><?= mmrpg_formatting_decode($temp_post_body) ?></div>
                                 </div>
-                                <? if($this_userid != MMRPG_SETTINGS_GUEST_ID && empty($this_thread_info['thread_locked']) && $community_battle_points > 5000): ?>
+                                <? if(!rpg_user::is_guest() && empty($this_thread_info['thread_locked']) && $community_battle_points > 5000): ?>
                                     <a class="postreply right" rel="nofollow" href="<?= 'community/'.$this_category_info['category_token'].'/'.$this_thread_info['thread_id'].'/'.$this_thread_info['thread_token'].'/#comment-form:'.$temp_reply_name.':'.$temp_reply_colour ?>">@ Reply</a>
                                 <? endif; ?>
                                 <a class="postscroll right" href="#top">^ Top</a>

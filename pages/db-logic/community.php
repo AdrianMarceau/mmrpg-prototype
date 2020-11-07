@@ -143,8 +143,7 @@ if ($this_current_view == 'thread'){
 elseif ($this_current_view == 'category' && empty($this_current_sub)){
 
     // Prevent logged-out users from viewing personal messages
-    //if ($this_userid == MMRPG_SETTINGS_GUEST_ID && ($this_current_cat == 'personal' || $this_current_cat == 'chat')){
-    if ($this_userid == MMRPG_SETTINGS_GUEST_ID && ($this_current_cat == 'personal')){
+    if (rpg_user::is_guest() && ($this_current_cat == 'personal')){
         header('Location: '.MMRPG_CONFIG_ROOTURL.'community/');
         exit();
     }

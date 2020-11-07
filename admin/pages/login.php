@@ -117,7 +117,7 @@
 
     <div class="adminform">
 
-        <? if ($this_user['userid'] == MMRPG_SETTINGS_GUEST_ID): ?>
+        <? if (rpg_user::is_guest()): ?>
 
             <h3 class="header">Please Log in</h3>
 

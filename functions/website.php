@@ -463,8 +463,9 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
     global $db, $this_userinfo;
 
     // Collect the recently updated posts for this player / guest
-    if ($this_userinfo['user_id'] != MMRPG_SETTINGS_GUEST_ID){ $temp_last_login = $this_userinfo['user_backup_login']; }
+    if (!rpg_user::is_guest()){ $temp_last_login = $this_userinfo['user_backup_login']; }
     else { $temp_last_login = time() - MMRPG_SETTINGS_UPDATE_TIMEOUT; }
+    $temp_user_id = !rpg_user::is_guest() ? rpg_user::get_current_userid() : MMRPG_SETTINGS_GUEST_ID;
 
     // Define the ORDER BY string based on category key
     if ($this_category_info['category_token'] != 'news'){ $temp_order_by = 'threads.thread_sticky DESC, threads.thread_mod_date DESC, threads.thread_date DESC'; }
@@ -488,7 +489,7 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
     // Append to where query if filtering by recent threads only
     if ($filter_recent == true){
         $temp_where_filter[] = "threads.thread_mod_date > {$temp_last_login}";
-        $temp_where_filter[] = "threads.thread_mod_user <> {$this_userinfo['user_id']}";
+        $temp_where_filter[] = "threads.thread_mod_user <> {$temp_user_id}";
     }
 
     // Append a default to the where query if empty
@@ -594,8 +595,8 @@ function mmrpg_website_community_category_threads($this_category_info, $filter_l
         WHERE
             {$temp_where_filter} AND
             (threads.thread_target = 0 OR
-                threads.thread_target = {$this_userinfo['user_id']} OR
-                threads.user_id = {$this_userinfo['user_id']}
+                threads.thread_target = {$temp_user_id} OR
+                threads.user_id = {$temp_user_id}
                 )
 
         ORDER BY
@@ -622,8 +623,9 @@ function mmrpg_website_community_category_threads_count($this_category_info, $fi
     global $db, $this_userinfo;
 
     // Collect the recently updated posts for this player / guest
-    if ($this_userinfo['user_id'] != MMRPG_SETTINGS_GUEST_ID){ $temp_last_login = $this_userinfo['user_backup_login']; }
+    if (!rpg_user::is_guest()){ $temp_last_login = $this_userinfo['user_backup_login']; }
     else { $temp_last_login = time() - MMRPG_SETTINGS_UPDATE_TIMEOUT; }
+    $temp_user_id = !rpg_user::is_guest() ? rpg_user::get_current_userid() : MMRPG_SETTINGS_GUEST_ID;
 
     // Define the ORDER BY string based on category key
     if ($this_category_info['category_token'] != 'news'){ $temp_order_by = 'threads.thread_sticky DESC, threads.thread_mod_date DESC, threads.thread_date DESC'; }
@@ -639,7 +641,7 @@ function mmrpg_website_community_category_threads_count($this_category_info, $fi
     // Append to where query if filtering by recent threads only
     if ($filter_recent == true){
         $temp_where_filter[] = "threads.thread_mod_date > {$temp_last_login}";
-        $temp_where_filter[] = "threads.thread_mod_user <> {$this_userinfo['user_id']}";
+        $temp_where_filter[] = "threads.thread_mod_user <> {$temp_user_id}";
     }
     // Append to where query if a list of filter IDs has been provided
     if (!empty($filter_ids)){
@@ -705,8 +707,8 @@ function mmrpg_website_community_category_threads_count($this_category_info, $fi
             threads.category_id = {$this_category_info['category_id']} AND
             threads.thread_published = 1 AND
             (threads.thread_target = 0 OR
-                threads.thread_target = {$this_userinfo['user_id']} OR
-                threads.user_id = {$this_userinfo['user_id']}
+                threads.thread_target = {$temp_user_id} OR
+                threads.user_id = {$temp_user_id}
                 ) AND
             {$temp_where_filter}
 
@@ -825,12 +827,12 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
         $temp_is_new = false;
         // Supress the new flag if thread has already been viewed
         if (!$temp_session_viewed){
-            if ($this_userinfo['user_id'] != MMRPG_SETTINGS_GUEST_ID
+            if (!rpg_user::is_guest()
                 //&& $this_thread_info['user_id'] != $this_userinfo['user_id']
                 && $this_thread_info['thread_mod_user'] != $this_userinfo['user_id']
                 && $temp_thread_timestamp > $this_userinfo['user_backup_login']){
                 $temp_is_new = true;
-            } elseif ($this_userinfo['user_id'] == MMRPG_SETTINGS_GUEST_ID
+            } elseif (rpg_user::is_guest()
                 && (($this_time - $temp_thread_timestamp) <= MMRPG_SETTINGS_UPDATE_TIMEOUT)){
                 $temp_is_new = true;
             }

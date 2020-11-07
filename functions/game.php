@@ -16,7 +16,7 @@ function mmrpg_game_token(){
 // Define a function for checking if we're in demo mode
 function mmrpg_game_demo(){
     if (!empty($_SESSION[$session_token]['DEMO'])){ return true; } // Demo flag exists, so true
-    elseif ($_SESSION[$session_token]['USER']['userid'] == MMRPG_SETTINGS_GUEST_ID){ return true; } // User ID is guest, so true
+    elseif (rpg_user::is_guest()){ return true; } // User ID is guest, so true
     else { return false; }  // Demo flag doesn't exist, must be logged in
 }
 

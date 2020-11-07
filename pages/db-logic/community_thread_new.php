@@ -118,7 +118,7 @@ ob_start();
                 <? if (!defined('DISCUSSION_POST_SUCCESSFUL') || (defined('DISCUSSION_POST_SUCCESSFUL') && DISCUSSION_POST_SUCCESSFUL === false)): ?>
                     <?
                     // Define and display the avatar variables
-                    $temp_avatar_guest = $this_userid == MMRPG_SETTINGS_GUEST_ID ? true : false;
+                    $temp_avatar_guest = rpg_user::is_guest() ? true : false;
                     $temp_avatar_name = (!empty($this_userinfo['user_name_public']) ? $this_userinfo['user_name_public'] : $this_userinfo['user_name']);
                     $temp_avatar_title = '#'.$this_userid.' : '.$temp_avatar_name;
 

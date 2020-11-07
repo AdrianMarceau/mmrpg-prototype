@@ -494,18 +494,13 @@ class rpg_game {
 
     // Define a function for checking if we're in demo mode
     public static function is_demo(){
-        $session_token = self::session_token();
-        if (!empty($_SESSION[$session_token]['DEMO'])){ return true; } // Demo flag exists, so true
-        elseif (!empty($_SESSION[$session_token]['USER']['userid']) && $_SESSION[$session_token]['USER']['userid'] == MMRPG_SETTINGS_GUEST_ID){ return true; } // User ID is guest, so true
-        else { return false; }  // Demo flag doesn't exist, must be logged in
+        return rpg_user::is_guest() ? true : false;
     }
 
 
     // Define a function for checking if we're in user mode
     public static function is_user(){
-        // If we're not in demo mode, we must be user mode
-        $session_token = self::session_token();
-        return !empty($_SESSION[$session_token]['USER']['userid']) && $_SESSION[$session_token]['USER']['userid'] != MMRPG_SETTINGS_GUEST_ID ? true : false;
+        return !rpg_user::is_guest() ? true : false;
     }
 
 

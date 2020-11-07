@@ -1180,7 +1180,7 @@ class rpg_disabled {
 
                     // Create the temp new robot for the player
                     $temp_unlock_robot_data = array();
-                    $temp_unlock_robot_data['robot_id'] = MMRPG_SETTINGS_GUEST_ID + $robot_reward_index['robot_id'] + 1;
+                    $temp_unlock_robot_data['robot_id'] = rpg_game::unique_robot_id($target_player->player_id, $robot_reward_index['robot_id'], 99);
                     $temp_unlock_robot_data['robot_token'] = $this_robot_token;
                     $temp_unlock_robot_data['robot_level'] = $this_robot_level;
                     $temp_unlock_robot_data['robot_experience'] = $this_robot_experience;

@@ -8,7 +8,7 @@ if (!in_array('*', $this_adminaccess)
 }
 
 // Prevent updating if logged into a file
-if ($this_user['userid'] != MMRPG_SETTINGS_GUEST_ID){ die('<strong>FATAL UPDATE ERROR!</strong><br /> You cannot be logged in while updating!');  }
+if (!rpg_user::is_guest()){ die('<strong>FATAL UPDATE ERROR!</strong><br /> You cannot be logged in while updating!');  }
 
 // Collect any extra request variables for the purge
 $this_cache_date = !empty($_REQUEST['date']) && preg_match('/^([0-9]{8})-([0-9]{2})$/', $_REQUEST['date']) ? $_REQUEST['date'] : MMRPG_CONFIG_CACHE_DATE;

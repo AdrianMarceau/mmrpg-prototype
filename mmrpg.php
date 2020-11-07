@@ -187,7 +187,7 @@ $this_userid = MMRPG_SETTINGS_GUEST_ID;
 if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
 
     // If the user session is already in progress, collect the details
-    if (!empty($_SESSION['GAME']['USER']['userid']) && $_SESSION['GAME']['USER']['userid'] != MMRPG_SETTINGS_GUEST_ID){
+    if (!rpg_user::is_guest()){
 
         // Collect this userinfo from the database
         $this_userid = (int)($_SESSION['GAME']['USER']['userid']);

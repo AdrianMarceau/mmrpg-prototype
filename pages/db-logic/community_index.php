@@ -39,7 +39,7 @@ exit();
         $temp_header_links = array();
 
         // If this user has the necessary permissions, show the new thread link
-        if ($this_userid != MMRPG_SETTINGS_GUEST_ID
+        if (!rpg_user::is_guest()
             && $community_battle_points >= 10000
             && $this_userinfo['role_level'] >= $this_category_info['category_level']
             && !empty($this_userinfo['user_flag_postpublic'])){

@@ -44,7 +44,7 @@ require_once(MMRPG_CONFIG_ROOTDIR.'admin/includes/update_actions.php');
 require_once(MMRPG_CONFIG_ROOTDIR.'admin/includes/update_patches.php');
 
 // Prevent updating if logged into a file
-if ($this_user['userid'] != MMRPG_SETTINGS_GUEST_ID){ die('<strong>FATAL UPDATE ERROR!</strong><br /> You cannot be logged in while updating!');  }
+if (!rpg_user::is_guest()){ die('<strong>FATAL UPDATE ERROR!</strong><br /> You cannot be logged in while updating!');  }
 
 // Generate the base href for the update links
 if ($this_request_force){ $base_update_href .= (strstr($base_update_href, '=') ? '&' : '').'force=true'; }

@@ -7,7 +7,7 @@ $this_online_timeout = MMRPG_SETTINGS_ONLINE_TIMEOUT;
 // If this is a PERSONAL thread, we have to do some security
 if ($this_category_info['category_token'] == 'personal'){
     // Ensure the user is logged in, else redirect to login
-    if ($_SESSION['GAME']['USER']['userid'] == MMRPG_SETTINGS_GUEST_ID){
+    if (rpg_user::is_guest()){
         header('Location: '.MMRPG_CONFIG_ROOTURL.'file/load/');
         exit();
     }
@@ -181,7 +181,7 @@ if (!empty($temp_user_ids)){
 }
 
 // Define the temporary display variables
-$temp_thread_guest = $this_thread_info['user_id'] == MMRPG_SETTINGS_GUEST_ID ? true : false;
+$temp_thread_guest = rpg_user::is_guest() ? true : false;
 $temp_thread_name = $this_thread_info['thread_name'];
 $temp_thread_author = !empty($this_thread_info['user_name_public']) && !empty($this_thread_info['user_flag_postpublic']) ? $this_thread_info['user_name_public'] : $this_thread_info['user_name'];
 $temp_thread_date = !empty($this_thread_info['thread_date']) ? $this_thread_info['thread_date'] : mktime(0, 0, 1, 1, 1, 2011);
@@ -221,10 +221,10 @@ $temp_leaderboard_online = mmrpg_prototype_leaderboard_online();
 foreach ($temp_leaderboard_online AS $key => $info){ if ($info['id'] == $this_thread_info['user_id']){ $temp_is_online = true; break; } }
 
 // Collect the thread count for this user
-if ($this_thread_info['user_id'] != MMRPG_SETTINGS_GUEST_ID){ $this_thread_info['thread_count'] = !empty($this_user_countindex[$this_thread_info['user_id']]['thread_count']) ? $this_user_countindex[$this_thread_info['user_id']]['thread_count'] : 0; }
+if (!rpg_user::is_guest()){ $this_thread_info['thread_count'] = !empty($this_user_countindex[$this_thread_info['user_id']]['thread_count']) ? $this_user_countindex[$this_thread_info['user_id']]['thread_count'] : 0; }
 else { $this_thread_info['thread_count'] = false; }
 // Collect the thread count for this user
-if ($this_thread_info['user_id'] != MMRPG_SETTINGS_GUEST_ID){ $this_thread_info['post_count'] = !empty($this_user_countindex[$this_thread_info['user_id']]['post_count']) ? $this_user_countindex[$this_thread_info['user_id']]['post_count'] : 0; }
+if (!rpg_user::is_guest()){ $this_thread_info['post_count'] = !empty($this_user_countindex[$this_thread_info['user_id']]['post_count']) ? $this_user_countindex[$this_thread_info['user_id']]['post_count'] : 0; }
 else { $this_thread_info['post_count'] = false; }
 
 //die('<pre>'.print_r($this_thread_info, true).'</pre>');
@@ -419,7 +419,7 @@ ob_start();
                     }
 
                     // Define the temporary display variables
-                    $temp_post_guest = $this_post_info['user_id'] == MMRPG_SETTINGS_GUEST_ID ? true : false;
+                    $temp_post_guest = rpg_user::is_guest() ? true : false;
                     $temp_post_author = !empty($this_post_info['user_name_public']) && !empty($this_post_info['user_flag_postpublic']) ? $this_post_info['user_name_public'] : $this_post_info['user_name'];
                     $temp_post_date = !empty($this_post_info['post_date']) ? $this_post_info['post_date'] : mktime(0, 0, 1, 1, 1, 2011);
                     $temp_post_date_full = 'Posted on '.date('F jS, Y', $temp_post_date).' at '.date('g:ia', $temp_post_date);
@@ -461,20 +461,20 @@ ob_start();
                     $temp_is_new = false;
                     // Supress the new flag if thread has already been viewed
                     if (!$thread_session_viewed && $this_category_info['category_id'] != 0){
-                        if ($this_userinfo['user_id'] != MMRPG_SETTINGS_GUEST_ID
+                        if (!rpg_user::is_guest()
                             && $this_post_info['user_id'] != $this_userinfo['user_id']
                             && $temp_post_timestamp > $this_userinfo['user_backup_login']){
                             $temp_is_new = true;
-                        } elseif ($this_userinfo['user_id'] == MMRPG_SETTINGS_GUEST_ID
+                        } elseif (rpg_user::is_guest()
                             && (($this_time - $temp_post_timestamp) <= MMRPG_SETTINGS_UPDATE_TIMEOUT)){
                             $temp_is_new = true;
                         }
                     }
                     // Collect the thread count for this user
-                    if ($this_post_info['user_id'] != MMRPG_SETTINGS_GUEST_ID){ $this_post_info['thread_count'] = !empty($this_user_countindex[$this_post_info['user_id']]['thread_count']) ? $this_user_countindex[$this_post_info['user_id']]['thread_count'] : 0; }
+                    if (!rpg_user::is_guest()){ $this_post_info['thread_count'] = !empty($this_user_countindex[$this_post_info['user_id']]['thread_count']) ? $this_user_countindex[$this_post_info['user_id']]['thread_count'] : 0; }
                     else { $this_post_info['thread_count'] = false; }
                     // Collect the post count for this user
-                    if ($this_post_info['user_id'] != MMRPG_SETTINGS_GUEST_ID){ $this_post_info['post_count'] = !empty($this_user_countindex[$this_post_info['user_id']]['thread_count']) ? $this_user_countindex[$this_post_info['user_id']]['post_count'] : 0; }
+                    if (!rpg_user::is_guest()){ $this_post_info['post_count'] = !empty($this_user_countindex[$this_post_info['user_id']]['thread_count']) ? $this_user_countindex[$this_post_info['user_id']]['post_count'] : 0; }
                     else { $this_post_info['post_count'] = false; }
 
                     // Collect the reply data for this user
@@ -541,7 +541,7 @@ ob_start();
                                 </div>
                                 <div class="bodytext" style="<?= $is_system_post ? 'padding-left: 0; ' : '' ?>"><?= mmrpg_formatting_decode($temp_post_body) ?></div>
                             </div>
-                            <? if($this_userid != MMRPG_SETTINGS_GUEST_ID && empty($this_thread_info['thread_locked']) && $community_battle_points > MMRPG_SETTINGS_POST_MINPOINTS && $this_category_info['category_token'] != 'personal'): ?>
+                            <? if(!rpg_user::is_guest() && empty($this_thread_info['thread_locked']) && $community_battle_points > MMRPG_SETTINGS_POST_MINPOINTS && $this_category_info['category_token'] != 'personal'): ?>
                                 <a class="postreply <?= $this_post_direction ?>" rel="nofollow" href="<?= 'community/'.$this_category_info['category_token'].'/'.$this_thread_info['thread_id'].'/'.$this_thread_info['thread_token'].'/#comment-form:'.$temp_reply_name.':'.$temp_reply_colour ?>">@ Reply</a>
                             <? endif; ?>
                             <a class="postscroll <?= $this_post_direction ?>" href="#top">^ Top</a>
@@ -577,7 +577,7 @@ ob_start();
 
                 <h2 id="comment-form" class="subheader thread_posts_count" style="opacity: 0.5; filter: alpha(opacity = 50);">- comments disabled -</h2>
 
-            <? } elseif ($this_userid == MMRPG_SETTINGS_GUEST_ID){ ?>
+            <? } elseif (rpg_user::is_guest()){ ?>
 
                 <h2 id="comment-form" class="subheader thread_posts_count" style="opacity: 0.5; filter: alpha(opacity = 50);">- <a href="file/load/return=<?= htmlentities($_GET['this_current_uri'].(!empty($_REQUEST['post_id']) ? 'post_id='.$_REQUEST['post_id'] : '').(!empty($_REQUEST['post_id']) ? '#comment-listing' : '')) ?>" rel="noindex,nofollow" style="color: #FFFFFF;">login to comment</a> -</h2>
 
@@ -596,7 +596,7 @@ ob_start();
                         <? if (!defined('COMMENT_POST_SUCCESSFUL') || (defined('COMMENT_POST_SUCCESSFUL') && COMMENT_POST_SUCCESSFUL === false)): ?>
                             <?
                             // Define and display the avatar variables
-                            $temp_avatar_guest = $this_userid == MMRPG_SETTINGS_GUEST_ID ? true : false;
+                            $temp_avatar_guest = rpg_user::is_guest() ? true : false;
                             $temp_avatar_name = (!empty($this_userinfo['user_name_public']) && !empty($this_userinfo['user_flag_postpublic']) ? $this_userinfo['user_name_public'] : $this_userinfo['user_name']);
                             $temp_avatar_title = '#'.$this_userid.' : '.$temp_avatar_name;
 

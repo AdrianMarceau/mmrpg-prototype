@@ -372,7 +372,7 @@ if (true || strstr($page_content_parsed, $find)){
                         <a class="link_button field_type field_type_<?= $temp_colour_token ?>" href="<?= $this_playerinfo['user_website_address'] ?>" target="_blank">Website</a>
                     <? endif; ?>
 
-                    <? if ($this_userid != MMRPG_SETTINGS_GUEST_ID && $this_userid != $this_playerinfo['user_id'] && !empty($this_userinfo['user_flag_postprivate'])): ?>
+                    <? if (!rpg_user::is_guest() && $this_userid != $this_playerinfo['user_id'] && !empty($this_userinfo['user_flag_postprivate'])): ?>
                         <a class="link_button message field_type field_type_<?= $temp_colour_token ?>" href="community/personal/0/new/<?= $this_playerinfo['user_name_clean'] ?>/">Message</a>
                     <? endif; ?>
 
