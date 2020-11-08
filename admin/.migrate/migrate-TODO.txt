@@ -261,7 +261,7 @@ Add the following misc new features to the admin panel
 Write shell scripts for the following situations
 -  setup new copy of dev build [DONE]
 -  setup new copy of stage build [DONE]
--  safely setup new copy of prod build
+-  safely setup new copy of prod build [DONE]
 -  safely update master code for any version [DONE]
 
 Implement the new "minify" library to compress CSS and JS markup
@@ -275,21 +275,13 @@ Update in-battle idle animations to include base2 frames for
 Fix the following bugs brought up in chat
 -  80x80 sized mechas don't display properly in battle backgrounds/foregrounds [DONE]
 
-
-MAYBE POST-UPDATE(?)
---------------------
-
-Create a "Shop Editor" in the admin back-end that lets admins edit the following
--  Auto's Shop:
-    -  shop_quote_selling [items, parts]
-    -  shop_quote_buying [items]
-    -  shop_items lists [items_selling (x4) / items_buying (x1)] & levels each tier unlocked at
-    -  shop_parts lists [parts_selling (x4)] & levels each tier unlocked at
--  Reggae's Shop:
-    - shop_quote_selling [abilities, weapons]
-    - shop_quote_buying [cores]
-    - shop_abilities lists [abilities_selling (x6)] & levels each tier unlocked at
--  Kalinka's Shop
-    - shop_quote_selling [robots, alts]
-    - shop_quote_buying [stars]
+Make shop items and abilities editable in some way
+    -  Add shop tab and level unlocked to item editor
+    -  Add shop tab and level unlocked to ability editor
+    -  Update item migration script to include new shop tab and level values
+    -  Update ability migration script to include new shop tab, level, and price values
+    -  Update shop to respect new item tab and level fields, auto-generate inventory etc.
+    -  Update shop to respect new ability tab, level, and price fields, auto-generate inventory etc.
+    -  Update Reggae's core tab to use dynamic "max" limit instead of hard-coding at "9" (check max DB value)
+    -  Update battle point calculator to respect new ability value/price fields
 
