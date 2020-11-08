@@ -738,6 +738,45 @@ $(document).ready(function(){
     //console.log('$editAbilities =', $editAbilities);
     if ($editAbilities.length){
 
+        // Add a toggle for the shop tab dropdown to show/hide or enable/disable sub-fields
+        var $abilityShopTabSelect = $('select[name="ability_shop_tab"]', $editAbilities);
+        var $abilityShopLevelInput = $('input[type="number"][name="ability_shop_level"]', $editAbilities);
+        if ($abilityShopTabSelect.length && $abilityShopLevelInput.length){
+            var $abilityShopTabField = $abilityShopTabSelect.closest('.field');
+            var $abilityShopLevelField = $abilityShopLevelInput.closest('.field');
+            var updateAbilityShopFields = function(){
+                //console.log('updateAbilityShopFields()');
+                var abilityShopTab = $abilityShopTabSelect.val();
+                //console.log('abilityShopTab =', abilityShopTab);
+                $('.label[data-shop-tab]', $abilityShopLevelField).addClass('hidden');
+                $('.label[data-shop-tab="'+abilityShopTab+'"]', $abilityShopLevelField).removeClass('hidden');
+                if (abilityShopTab === ''){ $abilityShopLevelInput.attr('disabled', 'disabled'); }
+                else { $abilityShopLevelInput.removeAttr('disabled', 'disabled'); }
+                if (abilityShopTab === 'abilities'){ $abilityShopLevelInput.attr('step', 10).attr('max', 100); }
+                else if (abilityShopTab === 'weapons'){ $abilityShopLevelInput.attr('step', 3).attr('max', 99); }
+                else { $abilityShopLevelInput.attr('step', 1).attr('max', 100); }
+                };
+            $abilityShopTabSelect.bind('change', function(){ updateAbilityShopFields(); });
+            updateAbilityShopFields();
+            }
+
+        // Add either-or events to the ability price and value fields (only one should be entered)
+        var $abilityPriceField = $('input[type="number"][name="ability_price"]', $editAbilities);
+        var $abilityValueField = $('input[type="number"][name="ability_value"]', $editAbilities);
+        if ($abilityPriceField.length && $abilityValueField.length){
+            var updateAbilityPriceValueFields = function(){
+                var abilityHasPrice = parseInt($abilityPriceField.val()) > 0 ? true : false;
+                var abilityHasValue = parseInt($abilityValueField.val()) > 0 ? true : false;
+                $abilityPriceField.removeAttr('disabled').prop('disabled', false);
+                $abilityValueField.removeAttr('disabled').prop('disabled', false);
+                if (abilityHasPrice){ $abilityValueField.attr('disabled', 'disabled').prop('disabled', true); }
+                else if (abilityHasValue){ $abilityPriceField.attr('disabled', 'disabled').prop('disabled', true); }
+                };
+            $abilityPriceField.bind('change', function(){ updateAbilityPriceValueFields(); });
+            $abilityValueField.bind('change', function(){ updateAbilityPriceValueFields(); });
+            updateAbilityPriceValueFields();
+            }
+
         // Add events for fields with a toggle checkbox inside, allowing them to be disabled/enabled by clicking
         var $fieldsWithToggleCheckboxes = $('.field.has_toggle .toggle.has_checkbox input[type="checkbox"]', $editAbilities).closest('.field');
         if ($fieldsWithToggleCheckboxes.length){
@@ -800,6 +839,23 @@ $(document).ready(function(){
     //console.log('$editItems =', $editItems);
     if ($editItems.length){
 
+        // Add a toggle for the shop tab dropdown to show/hide or enable/disable sub-fields
+        var $itemShopTabSelect = $('select[name="item_shop_tab"]', $editItems);
+        var $itemShopLevelInput = $('input[type="number"][name="item_shop_level"]', $editItems);
+        if ($itemShopTabSelect.length && $itemShopLevelInput.length){
+            var $itemShopTabField = $itemShopTabSelect.closest('.field');
+            var $itemShopLevelField = $itemShopLevelInput.closest('.field');
+            var updateItemShopFields = function(){
+                //console.log('updateItemShopFields()');
+                var itemShopTab = $itemShopTabSelect.val();
+                //console.log('itemShopTab =', itemShopTab);
+                if (itemShopTab === ''){ $itemShopLevelInput.attr('disabled', 'disabled'); }
+                else { $itemShopLevelInput.removeAttr('disabled', 'disabled'); }
+                };
+            $itemShopTabSelect.bind('change', function(){ updateItemShopFields(); });
+            updateItemShopFields();
+            }
+
         // Add either-or events to the item price and value fields (only one should be entered)
         var $itemPriceField = $('input[type="number"][name="item_price"]', $editItems);
         var $itemValueField = $('input[type="number"][name="item_value"]', $editItems);
@@ -816,7 +872,6 @@ $(document).ready(function(){
             $itemValueField.bind('change', function(){ updateItemPriceValueFields(); });
             updateItemPriceValueFields();
             }
-
 
         // Add events for fields with units that have checkboxes beside them, toggling the opacity for them
         var $fieldsWithUnitCheckboxes = $('.field.has_unit .unit.has_checkbox input[type="checkbox"]', $editItems).closest('.field');

@@ -330,6 +330,10 @@
             $form_data['ability_target'] = !empty($_POST['ability_target']) && preg_match('/^[-_a-z0-9\/]+$/i', $_POST['ability_target']) ? trim($_POST['ability_target']) : '';
 
             $form_data['ability_price'] = !empty($_POST['ability_price']) && is_numeric($_POST['ability_price']) ? (int)(trim($_POST['ability_price'])) : 0;
+            $form_data['ability_value'] = !empty($_POST['ability_value']) && is_numeric($_POST['ability_value']) ? (int)(trim($_POST['ability_value'])) : 0;
+
+            $form_data['ability_shop_tab'] = !empty($_POST['ability_shop_tab']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['ability_shop_tab']) ? trim(strtolower($_POST['ability_shop_tab'])) : '';
+            $form_data['ability_shop_level'] = !empty($_POST['ability_shop_level']) && is_numeric($_POST['ability_shop_level']) ? (int)(trim($_POST['ability_shop_level'])) : 0;
 
             $form_data['ability_game'] = !empty($_POST['ability_game']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['ability_game']) ? trim($_POST['ability_game']) : '';
             $form_data['ability_master'] = !empty($_POST['ability_master']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['ability_master']) ? trim($_POST['ability_master']) : '';
@@ -982,11 +986,6 @@
                                         </select><span></span>
                                     </div>
 
-                                    <div class="field disabled">
-                                        <strong class="label">Price <em>not ready yet</em></strong>
-                                        <input class="textbox" type="number" name="ability_price" value="<?= $ability_data['ability_price'] ?>" maxlength="8" disabled="disabled" />
-                                    </div>
-
                                     <hr />
 
                                     <div class="field foursize has_unit has_unit_checkbox">
@@ -1067,6 +1066,41 @@
                                             <code style="color: green;">{RECOVERY}</code>, <code style="color: green;">{RECOVERY2}</code>
                                         </div>
                                     </div>
+
+                                    <? if ($this_ability_class === 'master'){ ?>
+
+                                        <hr />
+
+                                        <div class="field halfsize">
+                                            <strong class="label">Shop Availability <em>leave blank if not available in shop</em></strong>
+                                            <select class="select" name="ability_shop_tab">
+                                                <option value="" <?= empty($ability_data['ability_shop_tab']) ? 'selected="selected"' : '' ?>>- none -</option>
+                                                <option value="abilities" <?= !empty($ability_data['ability_shop_tab']) && $ability_data['ability_shop_tab'] === 'abilities' ? 'selected="selected"' : '' ?> data-level-step="10">Reggae's Ability Shop</option>
+                                                <option value="weapons" <?= !empty($ability_data['ability_shop_tab']) && $ability_data['ability_shop_tab'] === 'weapons' ? 'selected="selected"' : '' ?> data-level-step="1">Reggae's Weapon Shop</option>
+                                            </select><span></span>
+                                        </div>
+
+                                        <div class="field halfsize">
+                                            <strong class="label" data-shop-tab="">Required Level <em>shop level for abilities / core level for weapons</em></strong>
+                                            <strong class="label" data-shop-tab="abilities">Required Shop Level <em>min shop level attained before available</em></strong>
+                                            <strong class="label" data-shop-tab="weapons">Required Core Level <em>min elemental cores sold before available</em></strong>
+                                            <input class="hidden" type="hidden" name="ability_shop_level" value="0" />
+                                            <input class="textbox" type="number" name="ability_shop_level" value="<?= !empty($ability_data['ability_shop_level']) ? $ability_data['ability_shop_level'] : 0 ?>" maxlength="3" min="0" max="100" step="1" />
+                                        </div>
+
+                                        <div class="field halfsize">
+                                            <strong class="label">Base Price <em>zenny price if purchased in shop / point value auto-calculated if applicable</em></strong>
+                                            <input class="hidden" type="hidden" name="ability_price" value="0" />
+                                            <input class="textbox" type="number" name="ability_price" value="<?= !empty($ability_data['ability_price']) ? $ability_data['ability_price'] : 0 ?>" maxlength="8" min="0" step="50" />
+                                        </div>
+
+                                        <div class="field halfsize">
+                                            <strong class="label">Base Value <em>battle point value on leaderboard / sell price auto-calculated if applicable</strong>
+                                            <input class="hidden" type="hidden" name="ability_value" value="0" />
+                                            <input class="textbox" type="number" name="ability_value" value="<?= !empty($ability_data['ability_value']) ? $ability_data['ability_value'] : 0 ?>" maxlength="8" min="0" step="50" />
+                                        </div>
+
+                                    <? } ?>
 
                                     <hr />
 

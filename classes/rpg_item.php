@@ -837,6 +837,8 @@ class rpg_item extends rpg_object {
             'item_accuracy',
             'item_price',
             'item_value',
+            'item_shop_tab',
+            'item_shop_level',
             'item_target',
             'item_frame',
             'item_frame_animate',

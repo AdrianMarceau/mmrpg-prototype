@@ -1754,6 +1754,9 @@ input[type=file] {
 .adminform .subfield .sublabel em:not(.nowrap):after {
     content: ")";
 }
+.adminform .field .label.hidden {
+    display: none;
+}
 .adminform .field input[type="text"],
 .adminform .field input[type="number"],
 .adminform .field input[type="password"],

@@ -298,6 +298,9 @@
             $form_data['item_price'] = !empty($_POST['item_price']) && is_numeric($_POST['item_price']) ? (int)(trim($_POST['item_price'])) : 0;
             $form_data['item_value'] = !empty($_POST['item_value']) && is_numeric($_POST['item_value']) ? (int)(trim($_POST['item_value'])) : 0;
 
+            $form_data['item_shop_tab'] = !empty($_POST['item_shop_tab']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['item_shop_tab']) ? trim(strtolower($_POST['item_shop_tab'])) : '';
+            $form_data['item_shop_level'] = !empty($_POST['item_shop_level']) && is_numeric($_POST['item_shop_level']) ? (int)(trim($_POST['item_shop_level'])) : 0;
+
             $form_data['item_game'] = !empty($_POST['item_game']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['item_game']) ? trim($_POST['item_game']) : '';
 
             $form_data['item_energy'] = 0;
@@ -942,18 +945,6 @@
                                         </select><span></span>
                                     </div>
 
-                                    <div class="field halfsize">
-                                        <strong class="label">Price <em>zenny price when purchased in shop / point value will be auto-calculated</em></strong>
-                                        <input class="hidden" type="hidden" name="item_price" value="0" />
-                                        <input class="textbox" type="number" name="item_price" value="<?= $item_data['item_price'] ?>" maxlength="8" min="0" step="100" />
-                                    </div>
-
-                                    <div class="field halfsize">
-                                        <strong class="label">Value <em>battle point value on leaderboard / sell price will be auto-calculated</strong>
-                                        <input class="hidden" type="hidden" name="item_value" value="0" />
-                                        <input class="textbox" type="number" name="item_value" value="<?= $item_data['item_value'] ?>" maxlength="8" min="0" step="100" />
-                                    </div>
-
                                     <hr />
 
                                     <?
@@ -1020,6 +1011,35 @@
                                             <em>appended to item description in database or when viewed from inside the shop</em>
                                         </div>
                                         <textarea class="textarea" name="item_description_shop" rows="2"><?= htmlentities($item_data['item_description_shop'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                                    </div>
+
+                                    <hr />
+
+                                    <div class="field halfsize">
+                                        <strong class="label">Shop Availability <em>leave blank if not available in shop</em></strong>
+                                        <select class="select" name="item_shop_tab">
+                                            <option value="" <?= empty($item_data['item_shop_tab']) ? 'selected="selected"' : '' ?>>- none -</option>
+                                            <option value="items" <?= !empty($item_data['item_shop_tab']) && $item_data['item_shop_tab'] === 'items' ? 'selected="selected"' : '' ?>>Auto's Item Shop</option>
+                                            <option value="parts" <?= !empty($item_data['item_shop_tab']) && $item_data['item_shop_tab'] === 'parts' ? 'selected="selected"' : '' ?>>Auto's Part Shop</option>
+                                        </select><span></span>
+                                    </div>
+
+                                    <div class="field halfsize">
+                                        <strong class="label">Required Shop Level <em>min shop level attained before available</em></strong>
+                                        <input class="hidden" type="hidden" name="ability_shop_level" value="0" />
+                                        <input class="textbox" type="number" name="item_shop_level" value="<?= !empty($item_data['item_shop_level']) ? $item_data['item_shop_level'] : 0 ?>" maxlength="3" min="0" max="100" step="10" />
+                                    </div>
+
+                                    <div class="field halfsize">
+                                        <strong class="label">Base Price <em>zenny price if purchased in shop / point value auto-calculated if applicable</em></strong>
+                                        <input class="hidden" type="hidden" name="item_price" value="0" />
+                                        <input class="textbox" type="number" name="item_price" value="<?= !empty($item_data['item_price']) ? $item_data['item_price'] : 0 ?>" maxlength="8" min="0" step="50" />
+                                    </div>
+
+                                    <div class="field halfsize">
+                                        <strong class="label">Base Value <em>battle point value on leaderboard / sell price auto-calculated if applicable</strong>
+                                        <input class="hidden" type="hidden" name="item_value" value="0" />
+                                        <input class="textbox" type="number" name="item_value" value="<?= !empty($item_data['item_value']) ? $item_data['item_value'] : 0 ?>" maxlength="8" min="0" step="50" />
                                     </div>
 
                                     <hr />
