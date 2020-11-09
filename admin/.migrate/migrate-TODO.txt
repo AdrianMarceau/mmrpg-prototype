@@ -276,10 +276,10 @@ Fix the following bugs brought up in chat
 -  80x80 sized mechas don't display properly in battle backgrounds/foregrounds [DONE]
 
 Make shop items and abilities editable in some way
-    -  Add shop tab and level unlocked to item editor
-    -  Add shop tab and level unlocked to ability editor
-    -  Update item migration script to include new shop tab and level values
-    -  Update ability migration script to include new shop tab, level, and price values
+    -  Add shop tab and level unlocked to item editor [DONE]
+    -  Add shop tab and level unlocked to ability editor [DONE]
+    -  Update item migration script to include new shop tab and level values [DONE]
+    -  Update ability migration script to include new shop tab, level, and price values [DONE]
     -  Update shop to respect new item tab and level fields, auto-generate inventory etc.
     -  Update shop to respect new ability tab, level, and price fields, auto-generate inventory etc.
     -  Update Reggae's core tab to use dynamic "max" limit instead of hard-coding at "9" (check max DB value)
