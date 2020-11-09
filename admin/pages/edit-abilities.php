@@ -332,7 +332,7 @@
             $form_data['ability_price'] = !empty($_POST['ability_price']) && is_numeric($_POST['ability_price']) ? (int)(trim($_POST['ability_price'])) : 0;
             $form_data['ability_value'] = !empty($_POST['ability_value']) && is_numeric($_POST['ability_value']) ? (int)(trim($_POST['ability_value'])) : 0;
 
-            $form_data['ability_shop_tab'] = !empty($_POST['ability_shop_tab']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['ability_shop_tab']) ? trim(strtolower($_POST['ability_shop_tab'])) : '';
+            $form_data['ability_shop_tab'] = !empty($_POST['ability_shop_tab']) && preg_match('/^[-_a-z0-9\/]+$/i', $_POST['ability_shop_tab']) ? trim(strtolower($_POST['ability_shop_tab'])) : '';
             $form_data['ability_shop_level'] = !empty($_POST['ability_shop_level']) && is_numeric($_POST['ability_shop_level']) ? (int)(trim($_POST['ability_shop_level'])) : 0;
 
             $form_data['ability_game'] = !empty($_POST['ability_game']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['ability_game']) ? trim($_POST['ability_game']) : '';
@@ -1075,8 +1075,8 @@
                                             <strong class="label">Shop Availability <em>leave blank if not available in shop</em></strong>
                                             <select class="select" name="ability_shop_tab">
                                                 <option value="" <?= empty($ability_data['ability_shop_tab']) ? 'selected="selected"' : '' ?>>- none -</option>
-                                                <option value="abilities" <?= !empty($ability_data['ability_shop_tab']) && $ability_data['ability_shop_tab'] === 'abilities' ? 'selected="selected"' : '' ?> data-level-step="10">Reggae's Ability Shop</option>
-                                                <option value="weapons" <?= !empty($ability_data['ability_shop_tab']) && $ability_data['ability_shop_tab'] === 'weapons' ? 'selected="selected"' : '' ?> data-level-step="1">Reggae's Weapon Shop</option>
+                                                <option value="reggae/abilities" <?= !empty($ability_data['ability_shop_tab']) && $ability_data['ability_shop_tab'] === 'reggae/abilities' ? 'selected="selected"' : '' ?> data-level-step="10">Reggae's Ability Shop</option>
+                                                <option value="reggae/weapons" <?= !empty($ability_data['ability_shop_tab']) && $ability_data['ability_shop_tab'] === 'reggae/weapons' ? 'selected="selected"' : '' ?> data-level-step="1">Reggae's Weapon Shop</option>
                                             </select><span></span>
                                         </div>
 

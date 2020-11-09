@@ -298,7 +298,7 @@
             $form_data['item_price'] = !empty($_POST['item_price']) && is_numeric($_POST['item_price']) ? (int)(trim($_POST['item_price'])) : 0;
             $form_data['item_value'] = !empty($_POST['item_value']) && is_numeric($_POST['item_value']) ? (int)(trim($_POST['item_value'])) : 0;
 
-            $form_data['item_shop_tab'] = !empty($_POST['item_shop_tab']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['item_shop_tab']) ? trim(strtolower($_POST['item_shop_tab'])) : '';
+            $form_data['item_shop_tab'] = !empty($_POST['item_shop_tab']) && preg_match('/^[-_a-z0-9\/]+$/i', $_POST['item_shop_tab']) ? trim(strtolower($_POST['item_shop_tab'])) : '';
             $form_data['item_shop_level'] = !empty($_POST['item_shop_level']) && is_numeric($_POST['item_shop_level']) ? (int)(trim($_POST['item_shop_level'])) : 0;
 
             $form_data['item_game'] = !empty($_POST['item_game']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['item_game']) ? trim($_POST['item_game']) : '';
@@ -621,7 +621,7 @@
 
                     <div class="field">
                         <strong class="label">By Kind</strong>
-                        <select class="select" name="item_subclass"><?
+                        <select class="select" name="item_subclass"><option value=""></option><?
                             $item_subclasses_tokens = $db->get_array_list("SELECT DISTINCT (item_subclass) AS subclass_token FROM mmrpg_index_items WHERE item_subclass <> '' ORDER BY item_subclass ASC;");
                             foreach ($item_subclasses_tokens AS $subclass_key => $subclass_info){
                                 $subclass_token = $subclass_info['subclass_token'];
@@ -1019,8 +1019,8 @@
                                         <strong class="label">Shop Availability <em>leave blank if not available in shop</em></strong>
                                         <select class="select" name="item_shop_tab">
                                             <option value="" <?= empty($item_data['item_shop_tab']) ? 'selected="selected"' : '' ?>>- none -</option>
-                                            <option value="items" <?= !empty($item_data['item_shop_tab']) && $item_data['item_shop_tab'] === 'items' ? 'selected="selected"' : '' ?>>Auto's Item Shop</option>
-                                            <option value="parts" <?= !empty($item_data['item_shop_tab']) && $item_data['item_shop_tab'] === 'parts' ? 'selected="selected"' : '' ?>>Auto's Part Shop</option>
+                                            <option value="auto/items" <?= !empty($item_data['item_shop_tab']) && $item_data['item_shop_tab'] === 'auto/items' ? 'selected="selected"' : '' ?>>Auto's Item Shop</option>
+                                            <option value="auto/parts" <?= !empty($item_data['item_shop_tab']) && $item_data['item_shop_tab'] === 'auto/parts' ? 'selected="selected"' : '' ?>>Auto's Part Shop</option>
                                         </select><span></span>
                                     </div>
 
