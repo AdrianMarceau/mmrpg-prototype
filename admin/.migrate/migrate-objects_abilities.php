@@ -34,6 +34,9 @@ if (!in_array('ability_order', $ability_fields)){ $ability_fields[] = 'ability_o
 $ability_fields = implode(', ', $ability_fields);
 $ability_index = $db->get_array_list("SELECT {$ability_fields} FROM {$table_name_string} ORDER BY ability_token ASC", 'ability_token');
 
+// Pull shop migration data from a separate file
+require_once(MMRPG_CONFIG_ROOTDIR.'admin/.migrate/migrate-objects_shops.php');
+
 // Collect unnecessary fields to remove from the generated json data file
 $skip_fields_on_json_export = rpg_ability::get_fields_excluded_from_json_export(false);
 
@@ -212,6 +215,12 @@ foreach ($ability_index AS $ability_token => $ability_data){
             fclose($h);
         }
         $ability_data_files_copied[] = basename($data_path);
+    }
+
+    // Merge in shop data if it exists for this ability
+    if (isset($shop_migration_data['abilities'][$ability_token])){
+        $shop_data = $shop_migration_data['abilities'][$ability_token];
+        $ability_data = array_merge($ability_data, $shop_data);
     }
 
     // And then write the rest of the non-function data into a json file

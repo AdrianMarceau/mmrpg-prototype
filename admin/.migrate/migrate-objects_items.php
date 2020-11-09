@@ -24,6 +24,9 @@ if (!in_array('item_order', $item_fields)){ $item_fields[] = 'item_order'; }
 $item_fields = implode(', ', $item_fields);
 $item_index = $db->get_array_list("SELECT {$item_fields} FROM {$table_name_string} ORDER BY item_token ASC", 'item_token');
 
+// Pull shop migration data from a separate file
+require_once(MMRPG_CONFIG_ROOTDIR.'admin/.migrate/migrate-objects_shops.php');
+
 // Collect unnecessary fields to remove from the generated json data file
 $skip_fields_on_json_export = rpg_item::get_fields_excluded_from_json_export(false);
 
@@ -163,6 +166,12 @@ foreach ($item_index AS $item_token => $item_data){
             fclose($h);
         }
         $item_data_files_copied[] = basename($data_path);
+    }
+
+    // Merge in shop data if it exists for this item
+    if (isset($shop_migration_data['items'][$item_token])){
+        $shop_data = $shop_migration_data['items'][$item_token];
+        $item_data = array_merge($item_data, $shop_data);
     }
 
     // And then write the rest of the non-function data into a json file

@@ -59,7 +59,7 @@ function copy_sprites_to_new_dir($base_token, $count_string, $new_sprite_path, $
     global $$global_image_directories_copied;
     ${$global_image_directories_copied}[] = basename($base_sprite_path);
     return true;
-    };
+}
 
 // Define a function for parsing an object file's markup into actual data vs functions
 function get_parsed_object_file_markup($object_file_path){
