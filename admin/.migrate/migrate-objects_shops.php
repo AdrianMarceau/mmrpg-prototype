@@ -5,6 +5,25 @@ $mmrpg_database_types = rpg_type::get_index();
 $mmrpg_database_abilities = rpg_ability::get_index();
 $mmrpg_database_items = rpg_item::get_index();
 
+// Pull the unaltered prices and values for items/abilities
+$raw_item_prices = array();
+$raw_ability_prices = array();
+if (defined('MMRPG_CONFIG_PULL_LIVE_DATA_FROM')
+    && MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== false){
+    $prod_db_name = 'mmrpg_'.(defined('MMRPG_CONFIG_IS_LIVE') && MMRPG_CONFIG_IS_LIVE === true ? 'live' : 'local');
+    $prod_db_name .= '_'.MMRPG_CONFIG_PULL_LIVE_DATA_FROM;
+    $raw_item_prices = $db->get_array_list("SELECT
+        item_token, item_price, item_value
+        FROM {$prod_db_name}.mmrpg_index_items
+        WHERE 1 = 1
+        ;", 'item_token');
+    $raw_ability_prices = $db->get_array_list("SELECT
+        ability_token, ability_price, 0 AS ability_value
+        FROM {$prod_db_name}.mmrpg_index_abilities
+        WHERE 1 = 1
+        ;", 'ability_token');
+    }
+
 // -- DEFINE SHOP INDEXES -- //
 // Below data copy/pasted from "includes/shop.php" on 2020/11/08 before
 // the structure of the file is changed and can no longer be used for
@@ -14,11 +33,12 @@ $mmrpg_database_items = rpg_item::get_index();
 function get_items_with_prices(){
     $item_tokens = func_get_args();
     if (empty($item_tokens)){ return array(); }
-    global $mmrpg_database_items;
+    global $mmrpg_database_items, $raw_item_prices;
     $item_prices = array();
     foreach ($item_tokens AS $item_token){
         if (!isset($mmrpg_database_items[$item_token])){ continue; }
         $item_info = $mmrpg_database_items[$item_token];
+        if (isset($raw_item_prices[$item_token])){ $item_info = array_merge($item_info, $raw_item_prices[$item_token]); }
         $item_price = 0;
         if (!empty($item_info['item_price'])){ $item_price = $item_info['item_price']; }
         if (empty($item_price)){ continue; }
@@ -30,11 +50,12 @@ function get_items_with_prices(){
 function get_items_with_values(){
     $item_tokens = func_get_args();
     if (empty($item_tokens)){ return array(); }
-    global $mmrpg_database_items;
+    global $mmrpg_database_items, $raw_item_prices;
     $item_values = array();
     foreach ($item_tokens AS $item_token){
         if (!isset($mmrpg_database_items[$item_token])){ continue; }
         $item_info = $mmrpg_database_items[$item_token];
+        if (isset($raw_item_prices[$item_token])){ $item_info = array_merge($item_info, $raw_item_prices[$item_token]); }
         $item_value = 0;
         if (!empty($item_info['item_value'])){ $item_value = ceil($item_info['item_value'] / 2); }
         elseif (!empty($item_info['item_price'])){ $item_value = ceil($item_info['item_price'] / 2); }
@@ -48,11 +69,12 @@ function get_items_with_values(){
 function get_abilities_with_prices(){
     $ability_tokens = func_get_args();
     if (empty($ability_tokens)){ return array(); }
-    global $mmrpg_database_abilities;
+    global $mmrpg_database_abilities, $raw_ability_prices;
     $ability_prices = array();
     foreach ($ability_tokens AS $ability_token){
         if (!isset($mmrpg_database_abilities[$ability_token])){ continue; }
         $ability_info = $mmrpg_database_abilities[$ability_token];
+        if (isset($raw_ability_prices[$ability_token])){ $ability_info = array_merge($ability_info, $raw_ability_prices[$ability_token]); }
         $ability_price = 0;
         if (!empty($ability_info['ability_energy'])){ $ability_price = ceil($ability_info['ability_energy'] * MMRPG_SETTINGS_SHOP_ABILITY_PRICE); }
         else { $ability_price = MMRPG_SETTINGS_SHOP_ABILITY_PRICE; }
