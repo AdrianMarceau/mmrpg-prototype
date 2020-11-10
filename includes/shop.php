@@ -146,93 +146,14 @@ $this_shop_index['auto'] = array(
         'shop_kind_selling' => array('items'),
         'shop_kind_buying' => array('items'),
         'shop_quote_selling' => array(
-            'items' => 'Welcome to Auto\'s Shop! I\'ve got lots of useful items for sale, so let me know if you need anything.',
-            'parts' => 'Great news! I\'ve cracked the code on holdable items and created new parts! See anything you like?'
+            'items' => 'Welcome to Auto\'s Shop! I\'ve got lots of useful items for sale, so let me know if you need anything.'
             ),
         'shop_quote_buying' => array(
             'items' => 'So you wanna sell something, eh? Let\'s see what you\'ve collected so far! Hopefully lots of screws!'
             ),
         'shop_items' => array(
-            'items_selling' => get_items_with_prices(
-                'energy-pellet', 'weapon-pellet',
-                'energy-capsule', 'weapon-capsule',
-                'energy-tank', 'weapon-tank'
-                ),
-            'items_selling2' => get_items_with_prices(
-                'energy-pellet', 'weapon-pellet',
-                'energy-capsule', 'weapon-capsule',
-                'energy-tank', 'weapon-tank',
-                'attack-pellet', 'defense-pellet',
-                'attack-capsule', 'defense-capsule',
-                'speed-pellet', 'super-pellet',
-                'speed-capsule', 'super-capsule'
-                ),
-            'items_selling3' => get_items_with_prices(
-                'energy-pellet', 'weapon-pellet',
-                'energy-capsule', 'weapon-capsule',
-                'energy-tank', 'weapon-tank',
-                'attack-pellet', 'defense-pellet',
-                'attack-capsule', 'defense-capsule',
-                'speed-pellet', 'super-pellet',
-                'speed-capsule', 'super-capsule',
-                'extra-life', 'yashichi'
-                ),
-            'items_selling4' => get_items_with_prices(
-                'energy-pellet', 'weapon-pellet',
-                'energy-capsule', 'weapon-capsule',
-                'energy-tank', 'weapon-tank',
-                'attack-pellet', 'defense-pellet',
-                'attack-capsule', 'defense-capsule',
-                'speed-pellet', 'super-pellet',
-                'speed-capsule', 'super-capsule',
-                'extra-life', 'yashichi'
-                ),
-            'items_buying' => get_items_with_values(
-                'small-screw', 'large-screw',
-                'energy-pellet', 'weapon-pellet',
-                'energy-capsule', 'weapon-capsule',
-                'energy-tank', 'weapon-tank',
-                'attack-pellet', 'defense-pellet',
-                'attack-capsule', 'defense-capsule',
-                'speed-pellet', 'super-pellet',
-                'speed-capsule', 'super-capsule',
-                'extra-life', 'yashichi',
-                'speed-booster'
-                )
-            ),
-        'shop_parts' => array(
-            'parts_selling' => get_items_with_values(
-                'energy-upgrade', 'weapon-upgrade',
-                'attack-booster', 'defense-booster',
-                'growth-module', 'fortune-module'
-                ),
-            'parts_selling2' => get_items_with_values(
-                'energy-upgrade', 'weapon-upgrade',
-                'attack-booster', 'defense-booster',
-                'speed-booster', 'field-booster',
-                'target-module', 'charge-module',
-                'growth-module', 'fortune-module'
-                ),
-            'parts_selling3' => get_items_with_values(
-                'energy-upgrade', 'weapon-upgrade',
-                'attack-booster', 'defense-booster',
-                'speed-booster', 'field-booster',
-                'target-module', 'charge-module',
-                'guard-module', 'reverse-module',
-                'xtreme-module', 'growth-module',
-                'fortune-module'
-                ),
-            'parts_selling4' => get_items_with_values(
-                'energy-upgrade', 'weapon-upgrade',
-                'attack-booster', 'defense-booster',
-                'speed-booster', 'field-booster',
-                'target-module', 'charge-module',
-                'guard-module', 'reverse-module',
-                'xtreme-module', 'growth-module',
-                'fortune-module', 'battery-circuit',
-                'sponge-circuit', 'forge-circuit',
-                'sapling-circuit'
-                )
+            'items_selling' => array(),
+            'items_buying' => array()
             )
         );
 
@@ -462,29 +383,99 @@ foreach ($this_shop_index AS $shop_token => $shop_info){
 // Only continue if the shop has been unlocked
 if (!empty($this_shop_index['auto'])){
 
-    // If Auto's Shop has reached sufficient levels, expand the Item Shop inventory
-    if ($this_shop_index['auto']['shop_level'] >= 10){
-        $this_shop_index['auto']['shop_items']['items_selling'] = $this_shop_index['auto']['shop_items']['items_selling2'];
-        unset($this_shop_index['auto']['shop_items']['items_selling2']);
-    }
-    if ($this_shop_index['auto']['shop_level'] >= 20){
-        $this_shop_index['auto']['shop_items']['items_selling'] = $this_shop_index['auto']['shop_items']['items_selling3'];
-        unset($this_shop_index['auto']['shop_items']['items_selling3']);
-    }
-    if ($this_shop_index['auto']['shop_level'] >= 30){
-        $this_shop_index['auto']['shop_items']['items_selling'] = $this_shop_index['auto']['shop_items']['items_selling4'];
-        unset($this_shop_index['auto']['shop_items']['items_selling4']);
+    // Define base lists for sellable and buyable items
+    $base_items_selling = array();
+    $base_items_buying = array('small-screw', 'large-screw');
+
+    // Create arrays to hold combined sellable and buyable items
+    $auto_items_selling = $base_items_selling;
+    $auto_items_buying = $base_items_buying;
+
+    // Collect the list of items Auto is selling based on his level
+    $unlocked_items = $db->get_array_list("SELECT
+        items.item_token
+        FROM mmrpg_index_items AS items
+        LEFT JOIN mmrpg_index_items_groups_tokens AS tokens ON tokens.item_token = items.item_token
+        LEFT JOIN mmrpg_index_items_groups AS groups ON groups.group_class = 'item' AND groups.group_token = tokens.group_token
+        WHERE
+        items.item_flag_published = 1
+        AND items.item_flag_complete = 1
+        AND items.item_flag_unlockable = 1
+        AND items.item_shop_tab = 'auto/items'
+        AND items.item_shop_level <= {$this_shop_index['auto']['shop_level']}
+        AND items.item_price > 0
+        ORDER BY
+        groups.group_order ASC,
+        tokens.token_order ASC,
+        items.item_token ASC
+        ;", 'item_token');
+
+    // Use the pulled list of unlocked items to expand Auto's shop
+    if (!empty($unlocked_items)){
+        $unlocked_items_tokens = array_keys($unlocked_items);
+        $auto_items_selling = array_merge($auto_items_selling, $unlocked_items_tokens);
+        $auto_items_buying = array_merge($auto_items_buying, $unlocked_items_tokens);
     }
 
-    // Loop through the Item Shop and remove items you do not yet own from the buying list
-    $key_items = array('small-screw', 'large-screw');
-    if (!empty($this_shop_index['auto']['shop_items']['items_buying'])){
-        foreach ($this_shop_index['auto']['shop_items']['items_buying'] AS $token => $price){
-            if (!in_array($token, $key_items) && !in_array($token, $global_unlocked_items_tokens)){
-                unset($this_shop_index['auto']['shop_items']['items_buying'][$token]);
+    // Update the actual shop index with our finalized items we're selling
+    $this_shop_index['auto']['shop_items']['items_selling'] = call_user_func_array('get_items_with_prices', $auto_items_selling);
+
+    // If the player has unlocked the Equip Codes, Auto's kiosk also has a Part Shop tab
+    if (mmrpg_prototype_item_unlocked('equip-codes')){
+
+        // Add parts to the list of selling kinds and define the quote shown at the top
+        $this_shop_index['auto']['shop_kind_selling'][] = 'parts';
+        $this_shop_index['auto']['shop_quote_selling']['parts'] = 'Great news! I\'ve cracked the code on holdable items and created new parts! See anything you like?';
+
+        // Define base lists for sellable parts
+        $base_parts_selling = array();
+
+        // Create arrays to hold combined sellable parts
+        $auto_parts_selling = $base_parts_selling;
+
+        // Collect the list of items Auto is selling based on his level
+        $unlocked_parts = $db->get_array_list("SELECT
+            items.item_token
+            FROM mmrpg_index_items AS items
+            LEFT JOIN mmrpg_index_items_groups_tokens AS tokens ON tokens.item_token = items.item_token
+            LEFT JOIN mmrpg_index_items_groups AS groups ON groups.group_class = 'item' AND groups.group_token = tokens.group_token
+            WHERE
+            items.item_flag_published = 1
+            AND items.item_flag_complete = 1
+            AND items.item_flag_unlockable = 1
+            AND items.item_shop_tab = 'auto/parts'
+            AND items.item_shop_level <= {$this_shop_index['auto']['shop_level']}
+            AND items.item_price > 0
+            ORDER BY
+            groups.group_order ASC,
+            tokens.token_order ASC,
+            items.item_token ASC
+            ;", 'item_token');
+
+        // Use the pulled list of unlocked items to expand Auto's shop
+        if (!empty($unlocked_parts)){
+            $unlocked_parts_tokens = array_keys($unlocked_parts);
+            $auto_parts_selling = array_merge($auto_parts_selling, $unlocked_parts_tokens);
+            $auto_items_buying = array_merge($auto_items_buying, $unlocked_parts_tokens);
+        }
+
+        // Update the actual shop index with our finalized parts we're selling
+        $this_shop_index['auto']['shop_parts']['parts_selling'] = call_user_func_array('get_items_with_prices', $auto_parts_selling);
+
+    }
+
+    // Loop through the buyable items and remove those that the player hasn't unlocked yet
+    if (!empty($auto_items_buying)){
+        foreach ($auto_items_buying AS $token => $price){
+            if (!in_array($token, $base_items_buying)
+                && !in_array($token, $global_unlocked_items_tokens)){
+                unset($auto_items_buying[$token]);
             }
         }
     }
+
+    // Update the actual shop index with our finalized items and/or parts we're buying
+    $this_shop_index['auto']['shop_items']['items_buying'] = call_user_func_array('get_items_with_values', $auto_items_buying);
 
     // If this shop has a hidden power, loop through and increase sell prices
     if (!empty($this_shop_index['auto']['shop_hidden_power'])){
@@ -499,30 +490,6 @@ if (!empty($this_shop_index['auto'])){
                 $this_shop_index['auto']['shop_items']['items_buying'][$item_token] = $item_price;
             }
         }
-    }
-
-    // If the player has unlocked the Equip Codes, Auto's kiosk also has a Part Shop tab
-    if (mmrpg_prototype_item_unlocked('equip-codes')){
-
-        // Add the Parts Shop token to the selling array if not there already
-        if (!in_array('parts', $this_shop_index['auto']['shop_kind_selling'])){ $this_shop_index['auto']['shop_kind_selling'][] = 'parts'; }
-
-        // If Auto's  Shop has reached sufficient levels, expand the Parts Shop inventory
-        if ($this_shop_index['auto']['shop_level'] >= 40){ $this_shop_index['auto']['shop_parts']['parts_selling'] = $this_shop_index['auto']['shop_parts']['parts_selling2']; }
-        if ($this_shop_index['auto']['shop_level'] >= 50){ $this_shop_index['auto']['shop_parts']['parts_selling'] = $this_shop_index['auto']['shop_parts']['parts_selling3']; }
-        if ($this_shop_index['auto']['shop_level'] >= 60){ $this_shop_index['auto']['shop_parts']['parts_selling'] = $this_shop_index['auto']['shop_parts']['parts_selling4']; }
-        unset($this_shop_index['auto']['shop_parts']['parts_selling2'], $this_shop_index['auto']['shop_parts']['parts_selling3'], $this_shop_index['auto']['shop_parts']['parts_selling4']);
-
-        // Collect parts for the Parts Shop so we can add them to Kalinka's kiosk
-        $auto_part_values = call_user_func_array('get_items_with_values', array_keys($this_shop_index['auto']['shop_parts']['parts_selling']));
-        if (!empty($auto_part_values)){
-            foreach ($auto_part_values AS $token => $value){
-                if (isset($this_shop_index['auto']['shop_items']['items_buying'][$token])){ continue; }
-                elseif (empty($value)){ continue; }
-                $this_shop_index['auto']['shop_items']['items_buying'][$token] = $value;
-            }
-        }
-
     }
 
 }
