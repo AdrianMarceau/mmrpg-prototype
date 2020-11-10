@@ -466,7 +466,7 @@ if (!empty($this_shop_index['auto'])){
 
     // Loop through the buyable items and remove those that the player hasn't unlocked yet
     if (!empty($auto_items_buying)){
-        foreach ($auto_items_buying AS $token => $price){
+        foreach ($auto_items_buying AS $key => $token){
             if (!in_array($token, $base_items_buying)
                 && !in_array($token, $global_unlocked_items_tokens)){
                 unset($auto_items_buying[$token]);
