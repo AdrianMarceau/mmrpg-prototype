@@ -167,16 +167,24 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
 
     // Loop through and grant the user battle points for each ability unlocked
     if (true){
+        $ability_points = 0;
         $abilities_unlocked = array();
         foreach ($user_battle_abilities As $ability_key => $ability_token){
             if (!isset($mmrpg_abilities[$ability_token])){ continue; }
             elseif (in_array($ability_token, $abilities_unlocked)){ continue; }
-            elseif (!$mmrpg_abilities[$ability_token]['ability_flag_complete']){ continue; }
-            elseif ($mmrpg_abilities[$ability_token]['ability_flag_hidden']){ continue; }
+            $ability_info = $mmrpg_abilities[$ability_token];
+            if (!$ability_info['ability_flag_published']){ continue; }
+            elseif (!$ability_info['ability_flag_complete']){ continue; }
+            elseif (!$ability_info['ability_flag_unlockable']){ continue; }
+            elseif ($ability_info['ability_flag_hidden']){ continue; }
+            $ability_value = 0;
+            if (!empty($ability_info['ability_value'])){ $ability_value = $ability_info['ability_value']; }
+            elseif (!empty($ability_info['ability_price'])){ $ability_value = ceil($ability_info['ability_price']); }
+            $ability_points += $ability_value;
             $abilities_unlocked[] = $ability_token;
         }
         $points_index['abilities_unlocked'] = $abilities_unlocked;
-        $points_index['abilities_unlocked_points'] = count($abilities_unlocked) * 2000;
+        $points_index['abilities_unlocked_points'] = $ability_points;
         $total_battle_points += $points_index['abilities_unlocked_points'];
     }
 
