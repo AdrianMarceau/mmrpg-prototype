@@ -631,14 +631,23 @@ if (!empty($this_shop_index['kalinka'])){
             // Generate the allowed token string and pull alt data from the database
             $allowed_tokens_string = "'".implode("', '", $allowed_tokens)."'";
             $unlocked_robot_data = $db->get_array_list("SELECT
-                robot_token,
-                robot_image_alts
-                FROM mmrpg_index_robots
+                robots.robot_token,
+                robots.robot_image_alts
+                FROM mmrpg_index_robots AS robots
+                LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
+                LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_class = 'master' AND groups.group_token = tokens.group_token
                 WHERE
-                robot_token IN ({$allowed_tokens_string})
-                AND robot_image_alts <> ''
-                AND robot_image_alts <> '[]'
-                ORDER BY robot_order ASC
+                robots.robot_flag_published = 1
+                AND robots.robot_flag_complete = 1
+                AND robots.robot_flag_unlockable = 1
+                AND robots.robot_class = 'master'
+                AND robots.robot_image_alts <> ''
+                AND robots.robot_image_alts <> '[]'
+                AND robots.robot_token IN ({$allowed_tokens_string})
+                ORDER BY
+                groups.group_order ASC,
+                tokens.token_order ASC,
+                robots.robot_order ASC
                 ;");
 
             // If alts were found, loop through and collect their details

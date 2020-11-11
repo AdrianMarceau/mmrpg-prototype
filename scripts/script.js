@@ -105,7 +105,9 @@ $(document).ready(function(){
         //console.log('assigning event for '+document.URL+';\n gameSettings.currentBodyWidth = '+gameSettings.currentBodyWidth+';\n gameSettings.currentBodyHeight = '+gameSettings.currentBodyHeight+'; ');
 
         // Only attach hover tooltips if NOT in mobile mode
-        if (!gameSettings.wapFlag && !gameSettings.wapFlagIphone && !gameSettings.wapFlagIpad){
+        //if (!gameSettings.wapFlag && !gameSettings.wapFlagIphone && !gameSettings.wapFlagIpad){
+        // Attempt to attach tooltips regardless of device
+        if (true){
 
             // Define the function for showing the tooltip
             var showTooltipFunction = function(e){

@@ -110,9 +110,17 @@
                     //echo("\$alt_info_unlocked = ".($alt_info_unlocked ? 'true' : 'fakse')."\n");
                     //exit();
 
+                    $alt_image_size = $robot_info['robot_image_size'];
+                    $alt_image_xsize = $alt_image_size.'x'.$alt_image_size;
+                    $alt_image_url = 'images/robots/'.$alt_info_token.'/sprite_right_'.$alt_image_xsize.'.png';
+                    $alt_image_class = 'sprite sprite_'.$alt_image_xsize;
+                    $alt_image_style = 'background-image: url('.$alt_image_url.'); ';
+                    $alt_image_markup = '<span class="'.$alt_image_class.'" style="'.$alt_image_style.'"></span>';
+
                     $global_item_quantities['alt-'.$alt_info_token] = $alt_info_unlocked ? 1 : 0;
                     $global_item_prices['buy']['alt-'.$alt_info_token] = $alt_info_unlocked ? 0 : $alt_info_price;
-                    $temp_info_tooltip = $alt_info['name'];
+                    //$temp_info_tooltip = $alt_info['name'];
+                    $temp_info_tooltip = '<div class="alt-preview-wrap"><span class="alt-wrap">'.$alt_image_markup.'</span> || <span class="alt-name">'.$alt_info['name'].'</span></div>';
                     $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
 
                     if ($alt_info_unlocked){ $alt_info_price = 0; }

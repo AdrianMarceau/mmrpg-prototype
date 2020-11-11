@@ -25,6 +25,7 @@
     -webkit-border-radius: 0.5em;
     min-height: 78px;
     width: auto;
+    max-width: 58px;
     padding: 4px;
     margin: 0 0 4px;
     top: auto;
@@ -487,6 +488,12 @@
     color: #FFFFFF;
     text-decoration: none;
     cursor: default;
+}
+#shop #console .event .item_name:hover,
+#shop #console .event .ability_name:hover,
+#shop #console .event .robot_name:hover,
+#shop #console .event .field_name:hover {
+    display: block;
 }
 #shop #console .event .item_cell_confirm .item_name {
     float: right;

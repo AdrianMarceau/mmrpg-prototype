@@ -168,6 +168,35 @@ body.index #header {
     color: #969696;
 }
 
+
+#mmrpg .tooltip .alt-preview-wrap {
+    display: block;
+    padding: 5px;
+    text-align: center;
+}
+#mmrpg .tooltip .alt-preview-wrap .alt-wrap {
+    display: inline-block;
+    width: 100%;
+    min-width: 100px;
+    height: 40px;
+    position: relative;
+    border-bottom: 1px solid #363636;
+    margin: 0 auto 5px 0;
+    padding-bottom: 5px;
+}
+#mmrpg .tooltip .alt-preview-wrap .alt-wrap .sprite {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translate(-50%, 0);
+}
+#mmrpg .tooltip .alt-preview-wrap .alt-name {
+    display: inline-block;
+    margin: 0 auto;
+}
+
+
+
 #mmrpg .animate_fadein {
     display: none !important;
 }
