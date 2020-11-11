@@ -283,7 +283,10 @@ Make shop items and abilities editable in some way
     -  Update shop to respect new item tab and level fields, auto-generate inventory etc. [DONE]
     -  Update shop to respect new ability tab, level, and price fields, auto-generate inventory etc. [DONE]
     -  Update Reggae's core tab to use dynamic "max" limit instead of hard-coding at "9" (check max DB value) [DONE]
-    -  Update battle point calculator to respect new ability value/price fields
+    -  Update battle point calculator to respect new ability value/price fields [DONE]
+
+Update the BP recalculator script to be more effecient and run way faster
+    -  Optionally write a shell version of the script or a shell-based wrapper
 
 Add the damn cookie policy to the damn website so I can remove it from my email dammit
 
