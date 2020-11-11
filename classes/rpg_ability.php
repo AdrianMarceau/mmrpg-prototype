@@ -1795,10 +1795,23 @@ class rpg_ability extends rpg_object {
                                             <span class="ability_stat"><?= !empty($ability_info['ability_energy']) ? $ability_info['ability_energy'].(!empty($ability_info['ability_energy_percent']) ? '%' : '').' WE' : '-' ?></span>
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td  class="right">
+                                            <? $temp_target_index = json_decode(MMRPG_SETTINGS_ABILITY_TARGETINDEX, true); ?>
+                                            <label style="display: block; float: left;">Target :</label>
+                                            <span class="ability_stat"><?= !empty($ability_info['ability_target']) && isset($temp_target_index[$ability_info['ability_target']]) ? $temp_target_index[$ability_info['ability_target']] : 'Auto' ?></span>
+                                        </td>
+                                    </tr>
                                 <? else: ?>
                                     <tr>
                                         <td  class="right">
                                             <label style="display: block; float: left;">Cost :</label>
+                                            <span class="ability_stat">-</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td  class="right">
+                                            <label style="display: block; float: left;">Target :</label>
                                             <span class="ability_stat">-</span>
                                         </td>
                                     </tr>
@@ -1810,7 +1823,7 @@ class rpg_ability extends rpg_object {
                             <tbody>
                                 <? if($ability_image_token != 'ability'): ?>
                                     <tr>
-                                        <td  class="right">
+                                        <td class="right">
                                             <label style="display: block; float: left;">Power :</label>
                                             <? if(!empty($ability_info['ability_damage']) || !empty($ability_info['ability_recovery'])): ?>
                                                 <? if(!empty($ability_info['ability_damage'])){ ?><span class="ability_stat"><?= $ability_info['ability_damage'].(!empty($ability_info['ability_damage_percent']) ? '%' : '') ?> Damage</span><? } ?>
@@ -1838,6 +1851,26 @@ class rpg_ability extends rpg_object {
                                             <span class="ability_stat"><?= $ability_info['ability_accuracy'].'%' ?></span>
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td class="right">
+                                            <label style="display: block; float: left;">Value :</label>
+                                            <?
+                                            // Collect this ability's price and/or BP value where applicable
+                                            $value_rows = array();
+                                            if (true){
+                                                if (!empty($ability_info['ability_price'])){
+                                                    $value_rows[] = '<span class="ability_stat">'.number_format($ability_info['ability_price'], 0, '.', ',').' z</span>';
+                                                    $value_rows[] = '<span class="ability_stat">'.number_format(ceil($ability_info['ability_price'] / 2), 0, '.', ',').' BP</span>';
+                                                } elseif (!empty($ability_info['ability_value'])){
+                                                    $value_rows[] = '<span class="ability_stat">'.number_format($ability_info['ability_value'], 0, '.', ',').' BP</span>';
+                                                }
+                                            }
+                                            if (empty($value_rows)){ $value_rows = '<span class="ability_stat">-</span>'; }
+                                            else { $value_rows = implode(' / ', $value_rows); }
+                                            echo $value_rows.PHP_EOL;
+                                            ?>
+                                        </td>
+                                    </tr>
                                 <? else: ?>
                                     <tr>
                                         <td  class="right">
@@ -1854,6 +1887,12 @@ class rpg_ability extends rpg_object {
                                     <tr>
                                         <td class="right">
                                             <label style="display: block; float: left;">Speed :</label>
+                                            <span class="ability_stat">-</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="right">
+                                            <label style="display: block; float: left;">Value :</label>
                                             <span class="ability_stat">-</span>
                                         </td>
                                     </tr>
