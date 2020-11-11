@@ -178,86 +178,7 @@ $this_shop_index['reggae'] = array(
         'cores' => 'Reggae wants robot cores, robot cores! Squawk! No other items will do, will do! Squaaaaawk!'
         ),
     'shop_abilities' => array(
-        'abilities_selling' => get_abilities_with_prices(
-            'buster-charge', 'buster-relay',
-            'energy-boost', 'attack-boost',
-            'defense-boost', 'speed-boost',
-            'energy-break', 'attack-break',
-            'defense-break', 'speed-break'
-            ),
-        'abilities_selling2' => get_abilities_with_prices(
-            'buster-charge', 'buster-relay',
-            'energy-boost', 'attack-boost',
-            'defense-boost', 'speed-boost',
-            'energy-break', 'attack-break',
-            'defense-break', 'speed-break',
-            'energy-swap', 'attack-swap',
-            'defense-swap', 'speed-swap'
-            ),
-        'abilities_selling3' => get_abilities_with_prices(
-            'buster-charge', 'buster-relay',
-            'energy-boost', 'attack-boost',
-            'defense-boost', 'speed-boost',
-            'energy-break', 'attack-break',
-            'defense-break', 'speed-break',
-            'energy-swap', 'attack-swap',
-            'defense-swap', 'speed-swap',
-            'attack-support', 'defense-support',
-            'speed-support', 'energy-support',
-            'attack-assault', 'defense-assault',
-            'speed-assault', 'energy-assault'
-            ),
-        'abilities_selling4' => get_abilities_with_prices(
-            'buster-charge', 'buster-relay',
-            'energy-boost', 'attack-boost',
-            'defense-boost', 'speed-boost',
-            'energy-break', 'attack-break',
-            'defense-break', 'speed-break',
-            'energy-swap', 'attack-swap',
-            'defense-swap', 'speed-swap',
-            'attack-support', 'defense-support',
-            'speed-support', 'energy-support',
-            'attack-assault', 'defense-assault',
-            'speed-assault', 'energy-assault',
-            'attack-mode', 'defense-mode',
-            'speed-mode', 'energy-mode'
-            ),
-        'abilities_selling5' => get_abilities_with_prices(
-            'buster-charge', 'buster-relay',
-            'energy-boost', 'attack-boost',
-            'defense-boost', 'speed-boost',
-            'energy-break', 'attack-break',
-            'defense-break', 'speed-break',
-            'energy-swap', 'attack-swap',
-            'defense-swap', 'speed-swap',
-            'attack-support', 'defense-support',
-            'speed-support', 'energy-support',
-            'attack-assault', 'defense-assault',
-            'speed-assault', 'energy-assault',
-            'attack-mode', 'defense-mode',
-            'speed-mode', 'energy-mode',
-            'field-support', 'mecha-support'
-            ),
-        'abilities_selling6' => get_abilities_with_prices(
-            'buster-charge', 'buster-relay',
-            'energy-boost', 'attack-boost',
-            'defense-boost', 'speed-boost',
-            'energy-break', 'attack-break',
-            'defense-break', 'speed-break',
-            'energy-swap', 'attack-swap',
-            'defense-swap', 'speed-swap',
-            'attack-support', 'defense-support',
-            'speed-support', 'energy-support',
-            'attack-assault', 'defense-assault',
-            'speed-assault', 'energy-assault',
-            'attack-mode', 'defense-mode',
-            'speed-mode', 'energy-mode',
-            'field-support', 'mecha-support',
-            'experience-booster', 'experience-breaker',
-            'recovery-booster', 'recovery-breaker',
-            'damage-booster', 'damage-breaker',
-            'item-swap'
-            )
+        'abilities_selling' => array()
         ),
     'shop_items' => array(
         'items_buying' => get_items_with_values(
@@ -501,17 +422,28 @@ if (!empty($this_shop_index['auto'])){
 $core_level_index = array();
 if (!empty($this_shop_index['reggae'])){
 
-        // If Reggae's Shop has reached sufficient levels, expand the inventory
-        if ($this_shop_index['reggae']['shop_level'] >= 20){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling2']; }
-        if ($this_shop_index['reggae']['shop_level'] >= 30){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling3']; }
-        if ($this_shop_index['reggae']['shop_level'] >= 40){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling4']; }
-        if ($this_shop_index['reggae']['shop_level'] >= 50){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling5']; }
-        if ($this_shop_index['reggae']['shop_level'] >= 60){ $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = $this_shop_index['reggae']['shop_abilities']['abilities_selling6']; }
-        unset($this_shop_index['reggae']['shop_abilities']['abilities_selling2']);
-        unset($this_shop_index['reggae']['shop_abilities']['abilities_selling3']);
-        unset($this_shop_index['reggae']['shop_abilities']['abilities_selling4']);
-        unset($this_shop_index['reggae']['shop_abilities']['abilities_selling5']);
-        unset($this_shop_index['reggae']['shop_abilities']['abilities_selling6']);
+        // Collect the list of abilities Reggae is selling based on his level
+        $unlocked_abilities = $db->get_array_list("SELECT
+            abilities.ability_token
+            FROM mmrpg_index_abilities AS abilities
+            LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
+            LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_class = 'master' AND groups.group_token = tokens.group_token
+            WHERE
+            abilities.ability_flag_published = 1
+            AND abilities.ability_flag_complete = 1
+            AND abilities.ability_flag_unlockable = 1
+            AND abilities.ability_shop_tab = 'reggae/abilities'
+            AND abilities.ability_shop_level <= {$this_shop_index['reggae']['shop_level']}
+            AND abilities.ability_price > 0
+            ORDER BY
+            groups.group_order ASC,
+            tokens.token_order ASC,
+            abilities.ability_token ASC
+            ;", 'ability_token');
+
+        // Update the actual shop index with our finalized parts we're selling
+        $reggae_abilities_selling = array_keys($unlocked_abilities);
+        $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = call_user_func_array('get_abilities_with_prices', $reggae_abilities_selling);
 
         // If the player has unlocked the Weapon Codes, Reggae's Shop also sells weapons
         if (mmrpg_prototype_item_unlocked('weapon-codes')){
