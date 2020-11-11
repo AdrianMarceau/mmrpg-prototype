@@ -978,11 +978,13 @@
                                     <div class="field">
                                         <strong class="label">Target</strong>
                                         <select class="select" name="ability_target">
-                                            <option value="auto" <?= empty($ability_data['ability_target']) || $ability_data['ability_target'] == 'auto' ? 'selected="selected"' : '' ?>>Auto</option>
-                                            <option value="select_target" <?= $ability_data['ability_target'] == 'select_target' ? 'selected="selected"' : '' ?>>Select Target (Enemy Side)</option>
-                                            <option value="select_this" <?= $ability_data['ability_target'] == 'select_this' ? 'selected="selected"' : '' ?>>Select Target (Player Side)</option>
-                                            <option value="select_this_ally" <?= $ability_data['ability_target'] == 'select_this_ally' ? 'selected="selected"' : '' ?>>Select Ally (Player Side)</option>
-                                            <option value="select_this_disabled" <?= $ability_data['ability_target'] == 'select_this_disabled' ? 'selected="selected"' : '' ?>>Select Disabled (Player Side)</option>
+                                            <?
+                                            $temp_target_index = json_decode(MMRPG_SETTINGS_ABILITY_TARGETINDEX, true);
+                                            if (empty($ability_data['ability_target'])){ $ability_data['ability_target'] = 'auto'; }
+                                            foreach ($temp_target_index AS $value => $label){
+                                                ?><option value="select_this_disabled" <?= $ability_data['ability_target'] == $value ? 'selected="selected"' : '' ?>><?= $label ?></option><?
+                                            }
+                                            ?>
                                         </select><span></span>
                                     </div>
 

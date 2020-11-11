@@ -131,6 +131,15 @@ define('MMRPG_SETTINGS_ABILITY_FRAMEINDEX', '00/01/02/03/04/05/06/07/08/09'); //
 define('MMRPG_SETTINGS_ITEM_FRAMEINDEX', '00/01/02/03/04/05/06/07/08/09'); // Define the sprite index
 define('MMRPG_SETTINGS_ATTACHMENT_FRAMEINDEX', '00/01/02/03/04/05/06/07/08/09'); // Define the sprite index
 
+// Define the global ability target index for looping through in editors/database
+define('MMRPG_SETTINGS_ABILITY_TARGETINDEX', '{
+    "auto":"Auto",
+    "select_target":"Select Target (Enemy Side)",
+    "select_this":"Select Target (Player Side)",
+    "select_this_ally":"Select Ally (Player Side)",
+    "select_this_disabled":"Select Disabled (Player Side)"
+    }');
+
 // Define the global battle point requirements for posting
 define('MMRPG_SETTINGS_THREAD_MINPOINTS', 5000); // Prevent spam comments
 define('MMRPG_SETTINGS_POST_MINPOINTS', 1000); // Prevent wordy comments
