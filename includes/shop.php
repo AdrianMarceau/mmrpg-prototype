@@ -441,7 +441,7 @@ if (!empty($this_shop_index['reggae'])){
             abilities.ability_token ASC
             ;", 'ability_token');
 
-        // Update the actual shop index with our finalized parts we're selling
+        // Update the actual shop index with our finalized abilities we're selling
         $reggae_abilities_selling = array_keys($unlocked_abilities);
         $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = call_user_func_array('get_abilities_with_prices', $reggae_abilities_selling);
 
@@ -470,157 +470,63 @@ if (!empty($this_shop_index['reggae'])){
             // Collect a list of all abilities already unlocked
             $unlocked_ability_tokens = rpg_game::ability_tokens_unlocked();
 
-            // Unlock the Copy Abilities when the user has maxed out their Copy Gauge in Reggae's Shop
-            if (!empty($core_level_index['copy']) && $core_level_index['copy'] >= 9){
-                $prices = get_abilities_with_prices('copy-shot', 'copy-soul');
-                foreach ($prices AS $token => $price){ $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$token] = $price; }
+            // Collect the list of weapons Reggae is selling based on his level
+            $conditions = array();
+            foreach ($core_level_index AS $type_token => $core_level){
+                if ($type_token === 'none'){ $type_token = ''; }
+                $conditions[] = "(abilities.ability_type = '{$type_token}' AND abilities.ability_shop_level <= {$core_level})";
+            }
+            $conditions = implode(PHP_EOL.'OR ', $conditions);
+            $unlocked_weapons = $db->get_array_list("SELECT
+                abilities.ability_token,
+                abilities.ability_type,
+                abilities.ability_type2,
+                abilities.ability_shop_tab,
+                abilities.ability_shop_level
+                FROM mmrpg_index_abilities AS abilities
+                LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
+                LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_class = 'master' AND groups.group_token = tokens.group_token
+                LEFT JOIN mmrpg_index_types AS types ON (types.type_token = abilities.ability_type OR types.type_token = 'none' AND abilities.ability_type = '')
+                LEFT JOIN mmrpg_index_types AS types2 ON (types2.type_token = abilities.ability_type2 OR types2.type_token = 'none' AND abilities.ability_type2 = '')
+                WHERE
+                abilities.ability_flag_published = 1
+                AND abilities.ability_flag_complete = 1
+                AND abilities.ability_flag_unlockable = 1
+                AND abilities.ability_shop_tab = 'reggae/weapons'
+                AND (
+                    {$conditions}
+                    )
+                AND abilities.ability_price > 0
+                ORDER BY
+                types.type_order ASC,
+                abilities.ability_token LIKE '%-shot' DESC,
+                abilities.ability_token LIKE '%-buster' DESC,
+                abilities.ability_token LIKE '%-overdrive' DESC,
+                -- abilities.ability_token LIKE 'core-%' ASC,
+                abilities.ability_shop_level ASC,
+                groups.group_order ASC,
+                tokens.token_order ASC,
+                abilities.ability_token ASC
+                ;", 'ability_token');
+
+            // Update the actual shop index with our finalized weapons we're selling
+            $reggae_weapons_selling = array_keys($unlocked_weapons);
+            $this_shop_index['reggae']['shop_weapons']['weapons_selling'] = call_user_func_array('get_abilities_with_prices', $reggae_weapons_selling);
+
+            // If the Omega Seed is not unlocked yet, prevent those abilities from being purchased
+            if (!mmrpg_prototype_item_unlocked('omega-seed')){
+                unset($this_shop_index['reggae']['shop_weapons']['weapons_selling']['omega-pulse']);
+                unset($this_shop_index['reggae']['shop_weapons']['weapons_selling']['omega-wave']);
             }
 
-            // Unlock the Core Abilities when the user has maxed out their Neutral Gauge in Reggae's Shop
-            if (!empty($core_level_index['none']) && $core_level_index['none'] >= 9){
-                $prices = get_abilities_with_prices('core-shield', 'core-laser');
-                foreach ($prices AS $token => $price){ $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$token] = $price; }
+            // Loop through unlocked abilities and apply the level discount, if any
+            if (!empty($level_discount)){
+                foreach ($this_shop_index['reggae']['shop_weapons']['weapons_selling'] AS $token => $price){
+                    $new_price = $price - floor(($price / 2) * $level_discount);
+                    $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$token] = $new_price;
+                }
             }
 
-            // Unlock the Omega Abilities as soon as the player has unlocked the Omega Seed item
-            if (mmrpg_prototype_item_unlocked('omega-seed')){
-                $prices = get_abilities_with_prices('omega-pulse', 'omega-wave');
-                foreach ($prices AS $token => $price){ $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$token] = $price; }
-            }
-
-            /*
-            echo('<pre>$core_level_index = '.print_r($core_level_index, true).'</pre><hr />');
-            echo('<pre>rpg_game::robots_unlocked(dr-light) = '.print_r(rpg_game::robots_unlocked('dr-light', true), true).'</pre><hr />');
-            echo('<pre>rpg_game::robots_unlocked(dr-wily) = '.print_r(rpg_game::robots_unlocked('dr-wily', true), true).'</pre><hr />');
-            echo('<pre>rpg_game::robots_unlocked(dr-cossack) = '.print_r(rpg_game::robots_unlocked('dr-cossack', true), true).'</pre><hr />');
-            echo('<pre>$this_shop_index[reggae][shop_weapons][weapons_selling] = '.print_r($this_shop_index['reggae']['shop_weapons']['weapons_selling'], true).'</pre><hr />');
-            exit();
-            */
-
-            // Define an array to keep track of all relevant ability types
-            $temp_ability_types = array();
-            $temp_ability_order = array_keys($mmrpg_database_abilities);
-            $temp_core_abilities = array();
-            $temp_other_abilities = array();
-
-            // Loop through and add any SHOT/BUSTER/OVERDRIVE abilities that have the required cores
-            foreach ($mmrpg_database_abilities AS $ability_token => $ability_info){
-
-                // Index the typing for this ability for later reference
-                $temp_ability_types[$ability_token] = array($ability_info['ability_type'], $ability_info['ability_type2']);
-
-                // Skip if this ability is incomplete
-                if (!$ability_info['ability_flag_complete']){ continue; }
-                // Skip if this ability is not of the master class
-                elseif ($ability_info['ability_class'] != 'master'){ continue; }
-                // Skip if this ability has no primary type or its copy
-                elseif (empty($ability_info['ability_type']) || $ability_info['ability_type'] == 'copy'){ continue; }
-                // Skip if this is a hero ability from MM00 group
-                elseif (strstr($ability_info['ability_group'], 'MM00/')){ continue; }
-                // Skip if this is not a shot/buster/overdrive ability from the MMRPG/Weapons/ group
-                elseif (!strstr($ability_info['ability_group'], 'MMRPG/Weapons/')){ continue; }
-
-                // Calculate this ability's tier based on weapon energy
-                if (strstr($ability_token, '-shot')){ $ability_tier = 1; }
-                elseif (strstr($ability_token, '-buster')){ $ability_tier = 2; }
-                elseif (strstr($ability_token, '-overdrive')){ $ability_tier = 3; }
-                else { continue; }
-
-                // Add this ability to the core list
-                $temp_core_abilities[] = $ability_token;
-
-                // Define the price based on its weapon energy
-                $ability_price = $ability_info['ability_energy'] * MMRPG_SETTINGS_SHOP_ABILITY_PRICE;
-                if (empty($ability_price)){ $ability_price = MMRPG_SETTINGS_SHOP_ABILITY_PRICE; }
-
-                // Define the cores required based on its tier
-                $cores_required = $ability_tier * 3;
-
-                // If the user has not sold enough cores, skip this ability
-                $cores_sold = !empty($core_level_index[$ability_info['ability_type']]) ? $core_level_index[$ability_info['ability_type']] : 0;
-                if ($cores_sold < $cores_required){ continue; }
-
-                // Apply a discount to the price if the shop is a high enough level
-                if (!empty($level_discount)){ $ability_price -= floor(($ability_price / 2) * $level_discount); }
-
-                // Append this ability to the parent weapon selling array
-                $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$ability_token] = $ability_price;
-
-            }
-
-            // Loop through abilities again and add any remaining elemental abilities
-            foreach ($mmrpg_database_abilities AS $ability_token => $ability_info){
-
-                // Index the typing for this ability for later reference
-                $temp_ability_types[$ability_token] = array($ability_info['ability_type'], $ability_info['ability_type2']);
-
-                // Skip if this ability is incomplete
-                if (!$ability_info['ability_flag_complete']){ continue; }
-                // Skip if this ability is not of the master class
-                elseif ($ability_info['ability_class'] != 'master'){ continue; }
-                // Skip if this ability has no primary type
-                elseif (empty($ability_info['ability_type']) || $ability_info['ability_type'] == 'copy'){ continue; }
-                // Skip if this is a hero ability from MM00 group
-                elseif (strstr($ability_info['ability_group'], 'MM00/')){ continue; }
-                // Skip if this is a shot/buster/overdrive ability from the MMRPG/Weapons/ group
-                elseif (strstr($ability_info['ability_group'], 'MMRPG/Weapons/')){ continue; }
-
-                // Add this ability to the other list
-                $temp_other_abilities[] = $ability_token;
-
-                // Calculate this ability's tier based on weapon energy
-                $ability_tier = 1;
-                if ($ability_info['ability_energy'] > 4){ $ability_tier += 1; }
-                if ($ability_info['ability_energy'] > 8){ $ability_tier += 1; }
-
-                // Define the price based on its weapon energy
-                $ability_price = $ability_info['ability_energy'] * MMRPG_SETTINGS_SHOP_ABILITY_PRICE;
-                if (empty($ability_price)){ $ability_price = MMRPG_SETTINGS_SHOP_ABILITY_PRICE; }
-
-                // Define the cores required based on its tier
-                $cores_required = $ability_tier * 3;
-
-                // If the user has not sold enough cores, skip this ability
-                $cores_sold = !empty($core_level_index[$ability_info['ability_type']]) ? $core_level_index[$ability_info['ability_type']] : 0;
-                if ($cores_sold < $cores_required){ continue; }
-
-                // Apply a discount to the price if the shop is a high enough level
-                if (!empty($level_discount)){ $ability_price -= floor($level_discount * $ability_price); }
-
-                // Append this ability to the parent weapon selling array
-                $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$ability_token] = $ability_price;
-
-            }
-
-        }
-
-        // If not empty, always sort the weapons by their core type so it matches sidebar
-        if (!empty($this_shop_index['reggae']['shop_weapons']['weapons_selling'])){
-            $new_weapons_selling = array();
-            $old_weapons_selling = $this_shop_index['reggae']['shop_weapons']['weapons_selling'];
-            $ordered_type_tokens = array_keys($mmrpg_database_types);
-            $weapons_selling_tokens = array_keys($old_weapons_selling);
-            usort($weapons_selling_tokens, function($a, $b) use($ordered_type_tokens, $temp_ability_types, $temp_ability_order, $temp_core_abilities){
-                $atpos1 = array_search($temp_ability_types[$a][0], $ordered_type_tokens);
-                $btpos1 = array_search($temp_ability_types[$b][0], $ordered_type_tokens);
-                $acore = in_array($a, $temp_core_abilities) ? true : false;
-                $bcore = in_array($b, $temp_core_abilities) ? true : false;
-                $apos1 = array_search($a, $temp_ability_order);
-                $bpos1 = array_search($b, $temp_ability_order);
-                if ($atpos1 < $btpos1){ return -1; }
-                elseif ($atpos1 > $btpos1){ return 1; }
-                elseif ($acore && !$bcore){ return -1; }
-                elseif (!$acore && $bcore){ return 1; }
-                if ($apos1 < $bpos1){ return -1; }
-                elseif ($apos1 > $bpos1){ return 1; }
-                else { return 0; }
-                });
-            foreach ($weapons_selling_tokens AS $key => $token){ $new_weapons_selling[$token] = $old_weapons_selling[$token]; }
-            $this_shop_index['reggae']['shop_weapons']['weapons_selling'] = $new_weapons_selling;
-            //echo('<pre>$ordered_type_tokens = '.implode(', ', $ordered_type_tokens).'</pre>');
-            //echo('<pre>$old_weapons_selling = '.implode(', ', array_keys($old_weapons_selling)).'</pre>');
-            //echo('<pre>$new_weapons_selling = '.implode(', ', array_keys($new_weapons_selling)).'</pre>');
-            //exit();
         }
 
         // If Robots or Abilities have been unlocked, increase the core selling prices
