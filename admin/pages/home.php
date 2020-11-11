@@ -843,9 +843,13 @@
             && (in_array('*', $this_adminaccess)
                 || in_array('refresh-leaderboard', $this_adminaccess))){
             $this_option = array(
+                'link' => array('url' => 'admin/scripts/refresh-battle-points.php?limit=10&offset=0&return=html', 'text' => 'Refresh Leaderboard', 'target' => '_blank', 'bullet' => 'sync-alt'),
+                'desc' => 'recalculate battle points for X number of users and refresh leaderboard'
+                );
+            /* $this_option = array(
                 'link' => array('url' => 'admin/refresh-leaderboard/incognito=true&amp;force=true', 'text' => 'Refresh Leaderboard', 'target' => '_blank', 'bullet' => 'sync-alt'),
                 'desc' => 'recalculate battle points for all idle users and refresh leaderboard'
-                );
+                ); */
             $this_group_options[] = $this_option;
         }
         if ((MMRPG_CONFIG_SERVER_ENV === 'local'
