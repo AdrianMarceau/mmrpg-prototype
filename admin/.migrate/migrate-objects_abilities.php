@@ -222,6 +222,16 @@ foreach ($ability_index AS $ability_token => $ability_data){
         $shop_data = $shop_migration_data['abilities'][$ability_token];
         $ability_data = array_merge($ability_data, $shop_data);
     }
+    // Otherwise if this ability has no price OR value we might need to define one
+    elseif (empty($ability_data['ability_price'])
+        && empty($ability_data['ability_value'])
+        && !empty($ability_data['ability_flag_published'])
+        && !empty($ability_data['ability_flag_complete'])
+        && $ability_data['ability_class'] === 'master'){
+        $base_value = (MMRPG_SETTINGS_SHOP_ABILITY_PRICE / 2);
+        $ability_data['ability_value'] = $base_value * $ability_data['ability_energy'];
+        if (empty($ability_data['ability_value'])){ $ability_data['ability_value'] = $base_value; }
+    }
 
     // And then write the rest of the non-function data into a json file
     $content_json_path = $content_path.'data.json';
