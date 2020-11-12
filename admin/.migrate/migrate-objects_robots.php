@@ -102,6 +102,36 @@ $robot_sprite_whitelist = array(
     'sprite_left_{{size}}.png', 'sprite_right_{{size}}.png'
     );
 
+// Collect an index of mechas that can be assigned to the robot_support field
+$tbl_prefix = !empty($prod_db_name) ? $prod_db_name.'.' : '';
+$mecha_support_index = $db->get_array_list("SELECT
+    robots.robot_token,
+    IF(robots.robot_field <> '', robots.robot_field, robots.robot_field2) AS robot_field,
+    IF(robots.robot_field <> '', fields.field_mechas, fields2.field_mechas) AS robot_mechas
+    FROM {$tbl_prefix}mmrpg_index_robots AS robots
+    LEFT JOIN {$tbl_prefix}mmrpg_index_fields AS fields ON fields.field_token = robots.robot_field
+    LEFT JOIN {$tbl_prefix}mmrpg_index_fields AS fields2 ON fields2.field_token = robots.robot_field2
+    WHERE
+    robots.robot_class = 'master'
+    AND robots.robot_core NOT IN ('copy', '')
+    AND (
+        (robots.robot_field <> '' AND robots.robot_field <> 'field')
+        OR (robots.robot_field2 <> '' AND robots.robot_field2 <> 'field')
+        )
+
+    ORDER BY
+    robots.robot_number ASC,
+    robots.robot_token ASC
+    ;", 'robot_token');
+
+// Parse the support mecha index so we don't have to later
+if (!empty($mecha_support_index)){
+    foreach ($mecha_support_index AS $robot_token => $robot_info){
+        $mechas = !empty($robot_info['robot_mechas']) ? json_decode($robot_info['robot_mechas']) : array();
+        $mecha_support_index[$robot_token]['robot_mecha'] = !empty($mechas) ? $mechas[0] : '';
+    }
+}
+
 // Count the number of robots that we'll be looping through
 $robot_index_size = count($robot_index);
 $robot_sprite_directories_total = count($robot_sprites_list);
@@ -214,6 +244,12 @@ foreach ($robot_index AS $robot_token => $robot_data){
             fclose($h);
         }
         $robot_data_files_copied[] = basename($data_path); // not actually copied but here for tracking
+    }
+
+    // If this is a master and there's a support mecha defined, include it in data
+    if ($robot_data['robot_class'] === 'master'
+        && !empty($mecha_support_index[$robot_token]['robot_mecha'])){
+        $robot_data['robot_support'] = $mecha_support_index[$robot_token]['robot_mecha'];
     }
 
     // And then write the rest of the non-function data into a json file
