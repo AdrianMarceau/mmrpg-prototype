@@ -275,7 +275,7 @@ Update in-battle idle animations to include base2 frames for
 Fix the following bugs brought up in chat
 -  80x80 sized mechas don't display properly in battle backgrounds/foregrounds [DONE]
 
-Make shop items and abilities editable in some way
+Make shop items and abilities editable in some way [DONE]
     -  Add shop tab and level unlocked to item editor [DONE]
     -  Add shop tab and level unlocked to ability editor [DONE]
     -  Update item migration script to include new shop tab and level values [DONE]
@@ -287,6 +287,15 @@ Make shop items and abilities editable in some way
 
 Update the BP recalculator script to be more effecient and run way faster [DONE]
     -  Optionally write a shell version of the script or a shell-based wrapper [DONE]
+
+Update the way Mecha Support determines which mecha to summon [DONE]
+    -  Update the robot object and DB table to have a "robot_support" field [DONE]
+    -  Update the admin panel to allow manually defining support mechas [DONE]
+    -  Make sure the robot_support field is loaded in battle [DONE]
+    -  Update Mecha Support ability to pull from robot_support field if set, else use prev functionality [DONE]
+    -  Update robot migration script to auto-assign robot's a default mecha given their home field [DONE]
+
+Make a proper "game" index that all relevant objects to reference against (likely DB-based)
 
 Add the damn cookie policy to the damn website so I can remove it from my email dammit
 
