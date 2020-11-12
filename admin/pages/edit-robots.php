@@ -31,6 +31,7 @@
     $mmrpg_types_index = cms_admin::get_types_index();
     $mmrpg_abilities_index = cms_admin::get_abilities_index();
     $mmrpg_fields_index = cms_admin::get_fields_index();
+    $mmrpg_robots_index = cms_admin::get_robots_index();
     $mmrpg_contributors_index = cms_admin::get_contributors_index('robot');
 
     // Collect an index of file changes and updates via git
@@ -42,6 +43,31 @@
 
     // Explode the list of git files into separate array vars
     extract($mmrpg_git_file_arrays);
+
+
+    /* -- Generate Select Option Markup -- */
+
+    // Pre-generate a list of all robots so we can re-use it over and over
+    $last_option_group = false;
+    $mecha_options_count = 0;
+    $mecha_options_markup = array();
+    $mecha_options_markup[] = '<option value="">-</option>';
+    foreach ($mmrpg_robots_index AS $robot_token => $robot_info){
+        if ($robot_info['robot_class'] !== 'mecha'){ continue; }
+        $class_group = (ucfirst($robot_info['robot_class']).(substr($robot_info['robot_class'], -2, 2) === 'ss' ? 'es' : 's')).' | '.$robot_info['robot_group'];
+        if ($last_option_group !== $class_group){
+            if (!empty($last_option_group)){ $mecha_options_markup[] = '</optgroup>'; }
+            $last_option_group = $class_group;
+            $mecha_options_markup[] = '<optgroup label="'.$class_group.'">';
+        }
+        $robot_name = $robot_info['robot_name'];
+        $robot_types = ucwords(implode(' / ', array_values(array_filter(array($robot_info['robot_core'], $robot_info['robot_core2'])))));
+        if (empty($robot_types)){ $robot_types = 'Neutral'; }
+        $mecha_options_markup[] = '<option value="'.$robot_token.'">'.$robot_name.' ('.$robot_types.')</option>';
+        $mecha_options_count++;
+    }
+    if (!empty($last_option_group)){ $mecha_options_markup[] = '</optgroup>'; }
+    $mecha_options_markup = implode(PHP_EOL, $mecha_options_markup);
 
 
     /* -- Page Script/Style Dependencies  -- */
@@ -330,7 +356,8 @@
 
             $form_data['robot_field'] = !empty($_POST['robot_field']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_field']) ? trim(strtolower($_POST['robot_field'])) : '';
             $form_data['robot_field2'] = !empty($_POST['robot_field2']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_field2']) ? trim(strtolower($_POST['robot_field2'])) : '';
-            //$form_data['robot_mecha'] = !empty($_POST['robot_mecha']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_mecha']) ? trim(strtolower($_POST['robot_mecha'])) : '';
+
+            $form_data['robot_support'] = !empty($_POST['robot_support']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_support']) ? trim(strtolower($_POST['robot_support'])) : '';
 
             $form_data['robot_energy'] = !empty($_POST['robot_energy']) && is_numeric($_POST['robot_energy']) ? (int)(trim($_POST['robot_energy'])) : 0;
             $form_data['robot_weapons'] = !empty($_POST['robot_weapons']) && is_numeric($_POST['robot_weapons']) ? (int)(trim($_POST['robot_weapons'])) : 0;
@@ -1166,8 +1193,9 @@
                                         ?>
                                         <div class="field disabled">
                                             <strong class="label">Support Mecha</strong>
-                                            <select class="select disabled" name="robot_mecha" disabled="disabled">
-                                                <option value="">-</option>
+                                            <? $current_value = !empty($robot_data['robot_support']) ? $robot_data['robot_support'] : ''; ?>
+                                            <select class="select" name="robot_support">
+                                                <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $mecha_options_markup) ?>
                                             </select><span></span>
                                         </div>
                                         <?
