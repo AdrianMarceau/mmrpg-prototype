@@ -12,16 +12,16 @@ $this_omega_factors_system[] = array('robot' => 'proto-man', 'field' => 'cossack
 
 // Define an index of games keys vs the omega factor vars they represent
 $omega_game_index = array(
-    'MM01' => 'this_omega_factors_one',
-    'MM02' => 'this_omega_factors_two',
-    'MM04' => 'this_omega_factors_three',
-    'MM03' => 'this_omega_factors_four',
-    'MM05' => 'this_omega_factors_five',
-    'MM06' => 'this_omega_factors_six',
-    'MM07' => 'this_omega_factors_seven',
-    'MM08' => 'this_omega_factors_eight',
-    'MM085' => 'this_omega_factors_eight_two',
-    'MM09' => 'this_omega_factors_nine',
+    'MM1' => 'this_omega_factors_one',
+    'MM2' => 'this_omega_factors_two',
+    'MM4' => 'this_omega_factors_three',
+    'MM3' => 'this_omega_factors_four',
+    'MM5' => 'this_omega_factors_five',
+    'MM6' => 'this_omega_factors_six',
+    'MM7' => 'this_omega_factors_seven',
+    'MM8' => 'this_omega_factors_eight',
+    'RnF' => 'this_omega_factors_eight_two',
+    'MM9' => 'this_omega_factors_nine',
     'MM10' => 'this_omega_factors_ten',
     'MM11' => 'this_omega_factors_eleven'
     );
