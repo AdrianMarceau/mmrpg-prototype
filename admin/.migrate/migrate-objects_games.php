@@ -72,12 +72,12 @@ $game_conversion_table['robots']['trio-3'] = 'MMRPGPR';
 $game_conversion_table['robots']['cosmo-man'] = 'MMRPGPR/MMBN5';
 $game_conversion_table['robots']['planet-man'] = 'MMRPGPR/MMBN2';
 
-$game_conversion_table['robots']['trill'] = 'MMRPGPR/MMBNTV4';
-$game_conversion_table['robots']['slur'] = 'MMRPGPR/MMBNTV3';
+$game_conversion_table['robots']['trill'] = 'MMRPGP/MMBNTV4';
+$game_conversion_table['robots']['slur'] = 'MMRPGP/MMBNTV3';
 
-$game_conversion_table['robots']['mega-man-ds'] = 'MMRPGPR/MM1';
-$game_conversion_table['robots']['proto-man-ds'] = 'MMRPGPR/MM3';
-$game_conversion_table['robots']['bass-ds'] = 'MMRPGPR/MM7';
+$game_conversion_table['robots']['mega-man-ds'] = 'MMRPGP/MM1';
+$game_conversion_table['robots']['proto-man-ds'] = 'MMRPGP/MM3';
+$game_conversion_table['robots']['bass-ds'] = 'MMRPGP/MM7';
 
 $game_conversion_table['robots']['doc-robot'] = 'MM3';
 $game_conversion_table['robots']['fake-man'] = 'MM9';
@@ -88,6 +88,9 @@ $game_conversion_table['robots']['dark-man-3'] = 'MM5';
 $game_conversion_table['robots']['dark-man-4'] = 'MM5';
 
 $game_conversion_table['robots']['bond-man'] = 'MM1';
+
+$game_conversion_table['robots']['flutter-fly'] = 'MMRPGP';
+$game_conversion_table['robots']['beetle-borg'] = 'RnFWS';
 
 
 // By ABILITY TOKEN

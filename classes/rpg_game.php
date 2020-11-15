@@ -1730,6 +1730,55 @@ class rpg_game {
     }
 
 
+    // -- SOURCE/GAME INDEX FUNCTIONS -- //
+
+    // Define a function for getting a game name given a source code for that game
+    public static function get_source_index(){
+        global $db;
+        static $source_index;
+        if (empty($source_index)){
+            $source_index = $db->get_array_list("SELECT
+                source_token,
+                source_kind,
+                source_name,
+                source_name_aka,
+                source_series,
+                source_subseries,
+                source_systems,
+                source_year,
+                source_flag_published,
+                source_flag_hidden,
+                source_flag_canon,
+                source_flag_fanon,
+                source_order
+                FROM mmrpg_index_sources
+                WHERE source_flag_published = 1
+                ORDER BY source_order
+                ;", 'source_token');
+        }
+        return $source_index;
+    }
+
+    // Define a function for getting a game name given a source code for that game
+    public static function get_source_name($source_token, $allow_html = true){
+        global $db;
+        $source_index = self::get_source_index();
+        if (!isset($source_index[$source_token])){ return 'Unknown'; }
+        $source_info = $source_index[$source_token];
+        $source_name = !empty($source_info['source_name']) ? $source_info['source_name'] : $source_info['source_name_aka'];
+        if ($allow_html){
+            $title = $source_name;
+            if (!empty($source_info['source_name_aka'])
+                && $source_name !== $source_info['source_name_aka']){
+                $title .= ' / '.$source_info['source_name_aka'];
+            }
+            $title .= ' ('.$source_info['source_systems'].')';
+            $source_name = '<span title="'.htmlspecialchars($title, ENT_QUOTES, 'UTF-8', true).'">'.$source_name.'</span>';
+        }
+        return $source_name;
+    }
+
+
     // -- CDN INDEX FUNCTIONS -- //
 
     // Define a function for getting (or generating) a CDN file index for a given directory
