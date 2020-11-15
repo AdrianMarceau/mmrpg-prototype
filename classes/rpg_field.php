@@ -1172,17 +1172,10 @@ class rpg_field extends rpg_object {
                                     <td class="right">
                                         <?
                                         // Define the source game string
-                                        if (in_array($field_info['field_token'], array('gentle-countryside', 'maniacal-hideaway', 'wintry-forefront'))){ $temp_source_string = 'Misc Mega Man'; }
-                                        elseif ($field_info['field_token'] == 'light-laboratory' || $field_info['field_token'] == 'wily-castle'){ $temp_source_string = 'Mega Man'; }
-                                        elseif ($field_info['field_token'] == 'cossack-citadel'){ $temp_source_string = 'Mega Man 4'; }
-                                        elseif ($field_info['field_token'] == 'oil-wells' || $field_info['field_token'] == 'clock-citadel'){ $temp_source_string = 'Mega Man Powered Up'; }
-                                        elseif ($field_info['field_game'] == 'MM01'){ $temp_source_string = 'Mega Man'; }
-                                        elseif ($field_info['field_game'] == 'MM00' || $field_info['field_game'] == 'MMRPG'){ $temp_source_string = 'Mega Man RPG Prototype'; }
-                                        elseif (preg_match('/^MM([0-9]{2})$/', $field_info['field_game'])){ $temp_source_string = 'Mega Man '.ltrim(str_replace('MM', '', $field_info['field_game']), '0'); }
-                                        else { $temp_source_string = '&hellip;'; }
+                                        $temp_source_string = rpg_game::get_source_name($field_info['field_game'], true);
                                         ?>
                                         <label style="display: block; float: left;">Source :</label>
-                                        <span class="field_type"><?= $temp_source_string ?></span>
+                                        <span class="source_game field_type"><?= $temp_source_string ?></span>
                                     </td>
                                 </tr>
                             </tbody>
