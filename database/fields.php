@@ -37,15 +37,17 @@ $mmrpg_database_fields = $db->get_array_list("SELECT
     tokens.token_order ASC
     ;", 'field_token');
 
-// Count the database fields and collect their row numbers
-$db->query("SET @field_row_number = 0;");
+// Count the database fields in total (without filters)
 $mmrpg_database_fields_count = $db->get_value("SELECT
     COUNT(fields.field_id) AS field_count
     FROM mmrpg_index_fields AS fields
     WHERE fields.field_flag_published = 1 AND fields.field_flag_hidden = 0 {$temp_condition_unfiltered}
     ;", 'field_count');
+
+// Select an ordered list of all fields and then assign row numbers to them
 $mmrpg_database_fields_numbers = $db->get_array_list("SELECT
-    fields.field_token, (@field_row_number:=@field_row_number + 1) AS field_key
+    fields.field_token,
+    0 AS field_key
     FROM mmrpg_index_fields AS fields
     LEFT JOIN mmrpg_index_fields_groups_tokens AS tokens ON tokens.field_token = fields.field_token
     LEFT JOIN mmrpg_index_fields_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = 'field'
@@ -55,6 +57,10 @@ $mmrpg_database_fields_numbers = $db->get_array_list("SELECT
     groups.group_order ASC,
     tokens.token_order ASC
     ;", 'field_token');
+$field_key = 1;
+foreach ($mmrpg_database_fields_numbers AS $token => $info){
+    $mmrpg_database_fields_numbers[$token]['field_key'] = $field_key++;
+}
 
 // Remove unallowed fields from the database
 if (!empty($mmrpg_database_fields)){

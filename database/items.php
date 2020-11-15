@@ -48,15 +48,17 @@ $mmrpg_database_items = $db->get_array_list("SELECT
     tokens.token_order ASC
     ;", 'item_token');
 
-// Count the database items and collect their row numbers
-$db->query("SET @item_row_number = 0;");
+// Count the database items in total (without filters)
 $mmrpg_database_items_count = $db->get_value("SELECT
     COUNT(items.item_id) AS item_count
     FROM mmrpg_index_items AS items
     WHERE items.item_flag_published = 1 AND items.item_flag_hidden = 0 {$temp_condition_unfiltered}
     ;", 'item_count');
+
+// Select an ordered list of all items and then assign row numbers to them
 $mmrpg_database_items_numbers = $db->get_array_list("SELECT
-    items.item_token, (@item_row_number:=@item_row_number + 1) AS item_key
+    items.item_token,
+    0 AS item_key
     FROM mmrpg_index_items AS items
     LEFT JOIN mmrpg_index_items_groups_tokens AS tokens ON tokens.item_token = items.item_token
     LEFT JOIN mmrpg_index_items_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = items.item_class
@@ -66,6 +68,10 @@ $mmrpg_database_items_numbers = $db->get_array_list("SELECT
     groups.group_order ASC,
     tokens.token_order ASC
     ;", 'item_token');
+$item_key = 1;
+foreach ($mmrpg_database_items_numbers AS $token => $info){
+    $mmrpg_database_items_numbers[$token]['item_key'] = $item_key++;
+}
 
 // Remove unallowed items from the database, and increment counters
 if (!empty($mmrpg_database_items)){

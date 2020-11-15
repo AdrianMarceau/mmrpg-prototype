@@ -35,7 +35,7 @@ if (isset($mmrpg_database_bosses_filter)){
 // Collect the database fields
 $mmrpg_database_fields = rpg_field::get_index(true, false);
 
-// Collect the database robots
+// Collect the database bosses
 $mecha_fields = rpg_robot::get_index_fields(true, 'robots');
 $mmrpg_database_bosses = $db->get_array_list("SELECT
     {$mecha_fields},
@@ -52,16 +52,17 @@ $mmrpg_database_bosses = $db->get_array_list("SELECT
     tokens.token_order ASC
     ;", 'robot_token');
 
-// Count the database robots and collect their row numbers
-$db->query("SET @robot_row_number = 0;");
+// Count the database bosses in total (without filters)
 $mmrpg_database_bosses_count = $db->get_value("SELECT
     COUNT(robots.robot_id) AS robot_count
     FROM mmrpg_index_robots AS robots
     WHERE robots.robot_flag_published = 1 AND robots.robot_flag_hidden = 0 {$temp_condition_unfiltered}
     ;", 'robot_count');
+
+// Select an ordered list of all bosses and then assign row numbers to them
 $mmrpg_database_bosses_numbers = $db->get_array_list("SELECT
     robots.robot_token,
-    (@robot_row_number:=@robot_row_number + 1) AS robot_key
+    0 AS robot_key
     FROM mmrpg_index_robots AS robots
     LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
     LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = robots.robot_class
@@ -71,6 +72,10 @@ $mmrpg_database_bosses_numbers = $db->get_array_list("SELECT
     groups.group_order ASC,
     tokens.token_order ASC
     ;", 'robot_token');
+$boss_key = 1;
+foreach ($mmrpg_database_bosses_numbers AS $token => $info){
+    $mmrpg_database_bosses_numbers[$token]['robot_key'] = $boss_key++;
+}
 
 // Remove unallowed bosses from the database, and increment type counters
 if (!empty($mmrpg_database_bosses)){

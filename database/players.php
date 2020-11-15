@@ -38,15 +38,17 @@ $mmrpg_database_players = $db->get_array_list("SELECT
     tokens.token_order ASC
     ;", 'player_token');
 
-// Count the database players and collect their row numbers
-$db->query("SET @player_row_number = 0;");
+// Count the database players in total (without filters)
 $mmrpg_database_players_count = $db->get_value("SELECT
     COUNT(players.player_id) AS player_count
     FROM mmrpg_index_players AS players
     WHERE players.player_flag_published = 1 AND players.player_flag_hidden = 0 {$temp_condition_unfiltered}
     ;", 'player_count');
+
+// Select an ordered list of all players and then assign row numbers to them
 $mmrpg_database_players_numbers = $db->get_array_list("SELECT
-    players.player_token, (@player_row_number:=@player_row_number + 1) AS player_key
+    players.player_token,
+    0 AS player_key
     FROM mmrpg_index_players AS players
     LEFT JOIN mmrpg_index_players_groups_tokens AS tokens ON tokens.player_token = players.player_token
     LEFT JOIN mmrpg_index_players_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = 'player'
@@ -57,6 +59,10 @@ $mmrpg_database_players_numbers = $db->get_array_list("SELECT
     groups.group_order ASC,
     tokens.token_order ASC
     ;", 'player_token');
+$player_key = 1;
+foreach ($mmrpg_database_players_numbers AS $token => $info){
+    $mmrpg_database_players_numbers[$token]['player_key'] = $player_key++;
+}
 
 // Remove unallowed players from the database
 if (!empty($mmrpg_database_players)){

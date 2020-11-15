@@ -50,15 +50,17 @@ $mmrpg_database_abilities = $db->get_array_list("SELECT
     tokens.token_order ASC
     ;", 'ability_token');
 
-// Count the database abilities and collect their row numbers
-$db->query("SET @ability_row_number = 0;");
+// Count the database abilities in total (without filters)
 $mmrpg_database_abilities_count = $db->get_value("SELECT
     COUNT(abilities.ability_id) AS ability_count
     FROM mmrpg_index_abilities AS abilities
     WHERE abilities.ability_flag_published = 1 AND abilities.ability_flag_hidden = 0 {$temp_condition_unfiltered}
     ;", 'ability_count');
+
+// Select an ordered list of all abilities and then assign row numbers to them
 $mmrpg_database_abilities_numbers = $db->get_array_list("SELECT
-    abilities.ability_token, (@ability_row_number:=@ability_row_number + 1) AS ability_key
+    abilities.ability_token,
+    0 AS ability_key
     FROM mmrpg_index_abilities AS abilities
     LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
     LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = abilities.ability_class
@@ -69,6 +71,10 @@ $mmrpg_database_abilities_numbers = $db->get_array_list("SELECT
     groups.group_order ASC,
     tokens.token_order ASC
     ;", 'ability_token');
+$ability_key = 1;
+foreach ($mmrpg_database_abilities_numbers AS $token => $info){
+    $mmrpg_database_abilities_numbers[$token]['ability_key'] = $ability_key++;
+}
 
 // Remove unallowed abilities from the database, and increment counters
 if (!empty($mmrpg_database_abilities)){
