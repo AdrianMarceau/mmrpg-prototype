@@ -63,9 +63,23 @@ $mmrpg_database_robots = array_merge($mmrpg_database_robots, $mmrpg_database_mec
 
 // Define a quick function for getting group token for a given robot/mecha/boss
 function temp_get_group_token($robot_info){
+    static $first_page_robots = array(
+        'mega-man', 'bass', 'proto-man', 'roll', 'disco', 'rhythm',
+        'bond-man', 'fake-man', 'pulse-man', 'rock',
+        'met', 'sniper-joe', 'skeleton-joe', 'crystal-joe',
+        'rush', 'beat', 'tango', 'eddie', 'reggae', 'mariachi'
+        );
+    static $hard_coded_group_tokens = array(
+        'flutter-fly' => 'MM1',
+        'beetle-borg' => 'MM1'
+        );
     if ($robot_info['robot_class'] === 'boss'){
-        if (in_array($robot_info['robot_game'], array('MM30', 'MMEXE'))){ $group_token = 'MMBOSS2'; }
+        if (in_array($robot_info['robot_game'], array('MMV', 'MMEXE'))){ $group_token = 'MMBOSS2'; }
         else { $group_token = 'MMBOSS1'; }
+    } elseif (isset($hard_coded_group_tokens[$robot_info['robot_token']])){
+        $group_token = $hard_coded_group_tokens[$robot_info['robot_token']];
+    } elseif (in_array($robot_info['robot_token'], $first_page_robots)){
+        $group_token = 'MM0';
     } else {
         $group_token = $robot_info['robot_game'];
     }
@@ -114,20 +128,20 @@ foreach ($mmrpg_database_robots AS $temp_key => $temp_info){
 
 // Count the robots groups for each page
 $database_page_groups = array();
-$database_page_groups[0] = array('MM00');
-$database_page_groups[1] = array('MM01');
-$database_page_groups[2] = array('MM02');
-$database_page_groups[3] = array('MM03');
-$database_page_groups[4] = array('MM04');
-$database_page_groups[5] = array('MM05');
-$database_page_groups[6] = array('MM06');
-$database_page_groups[7] = array('MM07');
-$database_page_groups[8] = array('MM08', 'MM085');
-$database_page_groups[9] = array('MM09');
+$database_page_groups[0] = array('MM0');
+$database_page_groups[1] = array('MM1');
+$database_page_groups[2] = array('MM2');
+$database_page_groups[3] = array('MM3');
+$database_page_groups[4] = array('MM4');
+$database_page_groups[5] = array('MM5');
+$database_page_groups[6] = array('MM6');
+$database_page_groups[7] = array('MM7');
+$database_page_groups[8] = array('MM8', 'RnF');
+$database_page_groups[9] = array('MM9');
 $database_page_groups[10] = array('MM10');
 $database_page_groups[11] = array('MM11');
-$database_page_groups[12] = array('MMBOSS1', 'MM20', 'MM21', 'MM30');
-$database_page_groups[13] = array('MMBOSS2', 'MMEXE', 'MMRPG', 'MMRPG2');
+$database_page_groups[12] = array('MMBOSS1', 'MMI', 'MMII', 'MMIII', 'MMIV', 'MMV', 'MMWW');
+$database_page_groups[13] = array('MMBOSS2', 'MMRPG', 'MMRPGP', 'MMRPGPR');
 
 // Count the robots for each page
 $database_page_counters = array();
@@ -164,15 +178,16 @@ if (true){
     $global_robots_counters['unlocked'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
 
     // Define a function for looping through the robots and counting/updating them
+    //$temp_process_debug = array();
     function temp_process_robots(&$mmrpg_database_robots, &$database_game_counters, &$database_page_groups, &$global_robots_counters, $session_token){
 
         // Loop through all of the robots, one by one, formatting their info
         foreach($mmrpg_database_robots AS $robot_key => &$robot_info){
 
             // Update the global game counters
-            $temp_token = $robot_info['robot_token'];
-            if (!isset($database_game_counters[$robot_info['robot_game']])){ $database_game_counters[$robot_info['robot_game']] = array($temp_token); }
-            elseif (!in_array($temp_token, $database_game_counters[$robot_info['robot_game']])){ $database_game_counters[$robot_info['robot_game']][] = $temp_token; }
+            $robot_token = $robot_info['robot_token'];
+            if (!isset($database_game_counters[$robot_info['robot_game']])){ $database_game_counters[$robot_info['robot_game']] = array($robot_token); }
+            elseif (!in_array($robot_token, $database_game_counters[$robot_info['robot_game']])){ $database_game_counters[$robot_info['robot_game']][] = $robot_token; }
 
             // Update and/or define the encountered, scanned, summoned, and unlocked flags
             //die('dance <pre>'.print_r($_SESSION[$session_token]['values']['robot_database'], true).'</pre>');
@@ -189,10 +204,15 @@ if (true){
                 $robot_group_token = temp_get_group_token($robot_info);
                 foreach ($database_page_groups AS $page_key => $group_array){
                     if (in_array($robot_group_token, $group_array)){ $temp_this_page_token = $page_key; break; }
+                    if (in_array($robot_token, $group_array)){ $temp_this_page_token = $page_key; break; }
                     else { continue; }
                 }
                 $robot_info['robot_page_token'] = $temp_this_page_token;
             }
+
+            //global $temp_process_debug;
+            //if (!isset($temp_process_debug[$robot_info['robot_page_token']])){ $temp_process_debug[$robot_info['robot_page_token']] = array(); }
+            //$temp_process_debug[$robot_info['robot_page_token']][] = $robot_token;
 
             // Increment the global robots counters
             $global_robots_counters['total']++;
@@ -207,6 +227,7 @@ if (true){
     }
     // Now to call upon the temp function, passing in appropriate variables
     temp_process_robots($mmrpg_database_robots, $database_game_counters, $database_page_groups, $global_robots_counters, $session_token);
+    //error_log('$temp_process_debug = '.print_r($temp_process_debug, true));
 
     //die('<pre>$global_robots_counters : '.print_r($global_robots_counters, true).'</pre>');
 
