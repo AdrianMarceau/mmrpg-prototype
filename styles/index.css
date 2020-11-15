@@ -1156,6 +1156,17 @@ button {
     width: 35px;
 }
 
+#window .page .database_container .subbody table td.left .source_game,
+#window .page .database_container .subbody table td.right .source_game {
+    display: inline-block;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: -6px;
+}
+
 #window .page .database_container .subbody .body_left {
     margin-right: 0;
     margin-bottom: 5px;
