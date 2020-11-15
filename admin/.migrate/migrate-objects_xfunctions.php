@@ -178,6 +178,12 @@ function clean_json_content_array($kind, $content_json_data, $remove_id_field = 
             $cleaned_json_data[$image_field] = '';
         }
     }
+    // If there is game field, convert it to the newer format
+    if (isset($cleaned_json_data[$kind.'_game'])){
+        $xkind = preg_match('/y$/i', $kind) ? substr($kind, 0, -1).'ies' : $kind.'s';
+        $new_game_data = migrate_object_game_settings_to_new_format($kind, $xkind, $cleaned_json_data);
+        $cleaned_json_data[$kind.'_game'] = $new_game_data[$kind.'_game'];
+    }
     // Return the cleaned JSON data
     $cleaned_json_data = $cleaned_json_data;
     return $cleaned_json_data;

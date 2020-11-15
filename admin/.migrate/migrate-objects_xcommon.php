@@ -19,6 +19,7 @@ foreach ($contributor_index AS $key => $data){
     $user_ids_to_contributor_usernames[$data['user_id']] = $data['user_name_clean'];
 }
 
-
+// Include the game migration data here so we don't have to later
+require_once(MMRPG_CONFIG_ROOTDIR.'admin/.migrate/migrate-objects_games.php');
 
 ?>
