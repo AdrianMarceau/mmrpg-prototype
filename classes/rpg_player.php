@@ -3403,26 +3403,26 @@ class rpg_player extends rpg_object {
                                         // Don't bother generating the option markup if disabled editing
                                         if ($global_allow_editing){
 
-                                            // Define the field group index for displau
-                                            $temp_group_index = array('MMRPG' => 'Mega Man RPG Fields', 'MM00' => 'Mega Man 0 Fields', 'MM01' => 'Mega Man 1 Fields', 'MM02' => 'Mega Man 2 Fields', 'MM03' => 'Mega Man 3 Fields', 'MM04' => 'Mega Man 4 Fields', 'MM05' => 'Mega Man 5 Fields', 'MM06' => 'Mega Man 6 Fields', 'MM07' => 'Mega Man 7 Fields', 'MM08' => 'Mega Man 8 Fields', 'MM09' => 'Mega Man 9 Fields', 'MM10' => 'Mega Man 10 Fields');
-                                            // Loop through the group index and display any fields that match
-                                            $player_field_rewards_backup = $player_field_rewards;
-                                            foreach ($temp_group_index AS $group_key => $group_name){
-                                                $player_field_rewards_options = array();
-                                                foreach ($player_field_rewards_backup AS $temp_field_key => $temp_field_info){
-                                                    if ($temp_field_info['field_game'] != $group_key){ continue; }
-                                                    $temp_option_markup = rpg_field::print_editor_option_markup($player_info, $temp_field_info);
-                                                    if (!empty($temp_option_markup)){ $player_field_rewards_options[] = $temp_option_markup; }
-                                                    unset($player_field_rewards_backup[$temp_field_key]);
+                                            // Loop through and create an index of unlocked fields
+                                            $temp_unlocked_field_tokens = array();
+                                            if (!empty($player_field_rewards)){ foreach ($player_field_rewards AS $key => $info){ $temp_unlocked_field_tokens[] = $info['field_token']; } }
+
+                                            // Loop through index fields and print out any that have been unlocked
+                                            $last_field_group = false;
+                                            foreach ($mmrpg_index_fields AS $field_token => $field_info){
+                                                if (!in_array($field_token, $temp_unlocked_field_tokens)){ continue; }
+                                                $field_group = $field_info['field_game'];
+                                                if ($field_group !== $last_field_group){
+                                                    if (!empty($last_field_group)){ $field_rewards_options .= '</optgroup>'; }
+                                                    $field_group_name = rpg_game::get_source_name($field_group, false).' Fields';
+                                                    $field_rewards_options .= '<optgroup label="'.$field_group_name.'">';
+                                                    $last_field_group = $field_group;
                                                 }
-                                                if (empty($player_field_rewards_options)){ continue; }
-                                                $player_field_rewards_options = '<optgroup label="'.$group_name.'">'.implode('', $player_field_rewards_options).'</optgroup>';
-                                                $field_rewards_options .= $player_field_rewards_options;
+                                                $field_rewards_options .= rpg_field::print_editor_option_markup($player_info, $field_info);
                                             }
+                                            if (!empty($last_field_group)){ $field_rewards_options .= '</optgroup>'; }
 
                                         }
-
-
 
                                         // Add an option at the bottom to remove the field
                                         //$field_rewards_options .= '<optgroup label="Field Actions">';
