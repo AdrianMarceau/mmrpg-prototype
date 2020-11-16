@@ -153,7 +153,7 @@
         // If the ability ID was provided, we can search by exact match
         if (!empty($search_data['ability_id'])){
             $ability_id = $search_data['ability_id'];
-            $search_query .= "AND ability_id = {$ability_id} ";
+            $search_query .= "AND abilities.ability_id = {$ability_id} ";
             $search_results_limit = false;
         }
 
@@ -163,24 +163,24 @@
             $ability_name = str_replace(array(' ', '*', '%'), '%', $ability_name);
             $ability_name = preg_replace('/%+/', '%', $ability_name);
             $ability_name = '%'.$ability_name.'%';
-            $search_query .= "AND (ability_name LIKE '{$ability_name}' OR ability_token LIKE '{$ability_name}') ";
+            $search_query .= "AND (abilities.ability_name LIKE '{$ability_name}' OR abilities.ability_token LIKE '{$ability_name}') ";
             $search_results_limit = false;
         }
 
         // Else if the ability type was provided, we can use wildcards
         if (!empty($search_data['ability_type'])){
             $ability_type = $search_data['ability_type'];
-            if ($ability_type !== 'none'){ $search_query .= "AND (ability_type LIKE '{$ability_type}' OR ability_type2 LIKE '{$ability_type}') "; }
-            else { $search_query .= "AND ability_type = '' "; }
+            if ($ability_type !== 'none'){ $search_query .= "AND (abilities.ability_type LIKE '{$ability_type}' OR abilities.ability_type2 LIKE '{$ability_type}') "; }
+            else { $search_query .= "AND abilities.ability_type = '' "; }
             $search_results_limit = false;
         }
 
         // If the ability class was provided
         if (!empty($search_data['ability_class'])){
-            $search_query .= "AND ability_class = '{$search_data['ability_class']}' ";
+            $search_query .= "AND abilities.ability_class = '{$search_data['ability_class']}' ";
             $search_results_limit = false;
         } elseif (!empty($this_ability_class)){
-            $search_query .= "AND ability_class = '{$this_ability_class}' ";
+            $search_query .= "AND abilities.ability_class = '{$this_ability_class}' ";
         }
 
         // Else if the ability flavour was provided, we can use wildcards
@@ -190,15 +190,15 @@
             $ability_flavour = preg_replace('/%+/', '%', $ability_flavour);
             $ability_flavour = '%'.$ability_flavour.'%';
             $search_query .= "AND (
-                ability_description LIKE '{$ability_flavour}'
-                OR ability_description2 LIKE '{$ability_flavour}'
+                abilities.ability_description LIKE '{$ability_flavour}'
+                OR abilities.ability_description2 LIKE '{$ability_flavour}'
                 ) ";
             $search_results_limit = false;
         }
 
         // If the ability game was provided
         if (!empty($search_data['ability_game'])){
-            $search_query .= "AND ability_game = '{$search_data['ability_game']}' ";
+            $search_query .= "AND abilities.ability_game = '{$search_data['ability_game']}' ";
             $search_results_limit = false;
         }
 
@@ -210,25 +210,25 @@
 
         // If the ability hidden flag was provided
         if ($search_data['ability_flag_hidden'] !== ''){
-            $search_query .= "AND ability_flag_hidden = {$search_data['ability_flag_hidden']} ";
+            $search_query .= "AND abilities.ability_flag_hidden = {$search_data['ability_flag_hidden']} ";
             $search_results_limit = false;
         }
 
         // If the ability complete flag was provided
         if ($search_data['ability_flag_complete'] !== ''){
-            $search_query .= "AND ability_flag_complete = {$search_data['ability_flag_complete']} ";
+            $search_query .= "AND abilities.ability_flag_complete = {$search_data['ability_flag_complete']} ";
             $search_results_limit = false;
         }
 
         // If the ability unlockable flag was provided
         if ($search_data['ability_flag_unlockable'] !== ''){
-            $search_query .= "AND ability_flag_unlockable = {$search_data['ability_flag_unlockable']} ";
+            $search_query .= "AND abilities.ability_flag_unlockable = {$search_data['ability_flag_unlockable']} ";
             $search_results_limit = false;
         }
 
         // If the ability published flag was provided
         if ($search_data['ability_flag_published'] !== ''){
-            $search_query .= "AND ability_flag_published = {$search_data['ability_flag_published']} ";
+            $search_query .= "AND abilities.ability_flag_published = {$search_data['ability_flag_published']} ";
             $search_results_limit = false;
         }
 
