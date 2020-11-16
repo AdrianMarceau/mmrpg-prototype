@@ -3279,29 +3279,30 @@ class rpg_ability extends rpg_object {
 
         // Collect a list of relevant abilities from the database
         $temp_tier_one_abilities = $db->get_array_list("SELECT
-            ability_token
-            -- , ability_energy
-            -- , mmrpg_index_abilities.*
-            FROM mmrpg_index_abilities
+            abilities.ability_token
+            -- , abilities.ability_energy
+            -- , abilities.*
+            FROM mmrpg_index_abilities AS abilities
+            LEFT JOIN mmrpg_index_robots AS robots ON robots.robot_token = abilities.ability_master
             WHERE
-            ability_flag_published = 1
-            AND ability_flag_complete = 1
+            abilities.ability_flag_published = 1
+            AND abilities.ability_flag_complete = 1
             AND (
                 -- elemental T1 abilities
-                (ability_type <> ''
-                AND ability_type <> 'empty'
-                AND ability_group NOT LIKE 'MM00/Weapons/%'
+                (abilities.ability_type <> ''
+                AND abilities.ability_type <> 'empty'
+                AND (robots.robot_token IS NULL OR robots.robot_core NOT IN ('copy', ''))
                 AND (
-                    (ability_energy = 4 AND ability_token NOT LIKE '%-buster')
-                    OR (ability_energy = 0 AND ability_token LIKE '%-shot')
+                    (abilities.ability_energy = 4 AND abilities.ability_token NOT LIKE '%-buster')
+                    OR (abilities.ability_energy = 0 AND abilities.ability_token LIKE '%-shot')
                 ))
                 OR
                 -- neutral T1 abilities
-                ability_token IN ('buster-shot')
+                abilities.ability_token IN ('buster-shot')
             )
-            AND ability_class = 'master'
+            AND abilities.ability_class = 'master'
             ORDER BY
-            ability_token ASC
+            abilities.ability_token ASC
             ;", 'ability_token');
 
         // Return the keys for the requested abilities
@@ -3315,26 +3316,27 @@ class rpg_ability extends rpg_object {
 
         // Collect a list of relevant abilities from the database
         $temp_tier_two_abilities = $db->get_array_list("SELECT
-            ability_token
-            -- , ability_energy
-            -- , mmrpg_index_abilities.*
-            FROM mmrpg_index_abilities
+            abilities.ability_token
+            -- , abilities.ability_energy
+            -- , abilities.*
+            FROM mmrpg_index_abilities AS abilities
+            LEFT JOIN mmrpg_index_robots AS robots ON robots.robot_token = abilities.ability_master
             WHERE
-            ability_flag_published = 1
-            AND ability_flag_complete = 1
+            abilities.ability_flag_published = 1
+            AND abilities.ability_flag_complete = 1
             AND (
                 -- elemental T2 abilities
-                (ability_type <> ''
-                AND ability_type <> 'empty'
+                (abilities.ability_type <> ''
+                AND abilities.ability_type <> 'empty'
                 AND (
-                    (ability_energy = 8)
-                    OR (ability_energy = 4 AND ability_group LIKE 'MM00/Weapons/%')
-                    OR (ability_energy = 4 AND ability_token LIKE '%-buster')
+                    (abilities.ability_energy = 8)
+                    OR (abilities.ability_energy = 4 AND robots.robot_core IN ('copy', ''))
+                    OR (abilities.ability_energy = 4 AND abilities.ability_token LIKE '%-buster')
                 ))
             )
-            AND ability_class = 'master'
+            AND abilities.ability_class = 'master'
             ORDER BY
-            ability_token ASC
+            abilities.ability_token ASC
             ;", 'ability_token');
 
         // Return the keys for the requested abilities
@@ -3348,22 +3350,23 @@ class rpg_ability extends rpg_object {
 
         // Collect a list of relevant abilities from the database
         $temp_tier_three_abilities = $db->get_array_list("SELECT
-            ability_token
-            -- , ability_energy
-            -- , mmrpg_index_abilities.*
-            FROM mmrpg_index_abilities
+            abilities.ability_token
+            -- , abilities.ability_energy
+            -- , abilities.*
+            FROM mmrpg_index_abilities AS abilities
+            LEFT JOIN mmrpg_index_robots AS robots ON robots.robot_token = abilities.ability_master
             WHERE
-            ability_flag_published = 1
-            AND ability_flag_complete = 1
+            abilities.ability_flag_published = 1
+            AND abilities.ability_flag_complete = 1
             AND (
                 -- elemental T3 abilities
-                (ability_type <> ''
-                AND ability_type <> 'empty'
-                AND ability_energy = 10)
+                (abilities.ability_type <> ''
+                AND abilities.ability_type <> 'empty'
+                AND abilities.ability_energy > 10)
             )
-            AND ability_class = 'master'
+            AND abilities.ability_class = 'master'
             ORDER BY
-            ability_token ASC
+            abilities.ability_token ASC
             ;", 'ability_token');
 
         // Return the keys for the requested abilities
