@@ -34,6 +34,9 @@ if (!in_array('ability_order', $ability_fields)){ $ability_fields[] = 'ability_o
 $ability_fields = implode(', ', $ability_fields);
 $ability_index = $db->get_array_list("SELECT {$ability_fields} FROM {$table_name_string} ORDER BY ability_token ASC", 'ability_token');
 
+// Fix known issues with certain fields
+if (!isset($ability_index['buster-shot'])){ $ability_index['buster-shot']['ability_master'] = ''; }
+
 // Pull shop migration data from a separate file
 require_once(MMRPG_CONFIG_ROOTDIR.'admin/.migrate/migrate-objects_shops.php');
 
