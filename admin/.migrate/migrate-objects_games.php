@@ -45,6 +45,9 @@ $game_conversion_table['robots']['rhythm'] = 'MMRPGP';
 $game_conversion_table['robots']['rock'] = 'MM1';
 $game_conversion_table['robots']['roll'] = 'MM1';
 
+$game_conversion_table['robots']['time-man'] = 'MMPU';
+$game_conversion_table['robots']['oil-man'] = 'MMPU';
+
 $game_conversion_table['robots']['enker'] = 'MMI';
 $game_conversion_table['robots']['quint'] = 'MMII';
 $game_conversion_table['robots']['punk'] = 'MMIII';
