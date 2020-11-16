@@ -955,8 +955,11 @@ class rpg_robot extends rpg_object {
     */
 
     public function get_pronoun($form = 'subject'){
-        $gender = $this->get_gender();
-        $is_mecha = $this->robot_class === 'mecha';
+        return self::get_robot_pronoun($this->robot_class, $this->get_gender(), $form);
+    }
+
+    public static function get_robot_pronoun($class, $gender, $form = 'subject'){
+        $is_mecha = $class === 'mecha' ? true : false;
         if ($form === 'subject'){
             if ($gender === 'male'){ return 'he'; }
             elseif ($gender === 'female'){ return 'she'; }

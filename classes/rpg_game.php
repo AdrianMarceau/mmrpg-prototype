@@ -867,49 +867,40 @@ class rpg_game {
             $this_quote = !empty($robot_info['robot_quotes']['battle_taunt']) ? str_replace($this_find, $this_replace, $robot_info['robot_quotes']['battle_taunt']) : '...';
             $default_field = rpg_player::get_intro_field($this_player_token);
             $this_field = rpg_field::get_index_info(!empty($robot_info['robot_field']) ? $robot_info['robot_field'] : $default_field);
-            $this_pronoun = 'he'; $this_posessive = 'his';
+
+            $this_pronoun = rpg_robot::get_robot_pronoun($robot_info['robot_class'], $robot_info['robot_gender'], 'subject');
+            $this_posessive2 = rpg_robot::get_robot_pronoun($robot_info['robot_class'], $robot_info['robot_gender'], 'possessive2');
+
             $this_congrats = 'Congratulations!';
-            if (in_array($robot_info['robot_token'], array('roll', 'disco', 'rhythm'))){ $this_congrats = '<strong>'.$this_name.'</strong> to the rescue!'; }
-            if (in_array($robot_info['robot_token'], array('roll', 'disco', 'rhythm', 'splash-woman'))){ $this_pronoun = 'she'; $this_posessive = 'her'; }
-            elseif (in_array($robot_info['robot_token'], array('met'))){ $this_pronoun = 'it'; $this_posessive = 'its'; }
+            if ($robot_info['robot_core'] === '' && $robot_info['robot_gender'] === 'female'){ $this_congrats = '<strong>'.$this_name.'</strong> to the rescue!'; }
+
             $this_best_stat = $robot_info['robot_energy'];
             $this_best_attribute = 'a support';
             if ($robot_info['robot_attack'] > $this_best_stat){ $this_best_stat = $robot_info['robot_attack']; $this_best_attribute = 'a powerful'; }
             elseif ($robot_info['robot_defense'] > $this_best_stat){ $this_best_stat = $robot_info['robot_defense']; $this_best_attribute = 'a defensive'; }
             elseif ($robot_info['robot_speed'] > $this_best_stat){ $this_best_stat = $robot_info['robot_speed']; $this_best_attribute = 'a speedy'; }
             if ($robot_info['robot_token'] == 'met'){ $this_best_attribute = 'bonus'; }
+
+            $source_game_name = self::get_source_name($robot_info['robot_game'], true);
+            $source_game_info = self::get_source_info($robot_info['robot_game']);
+            if (in_array($robot_info['robot_token'], array('bond-man'))){
+                $this_first_appearance = 'making '.$this_posessive2.' first playable debut in the <em>'.$source_game_name.'</em>';
+            } elseif (strstr($robot_info['robot_game'], 'MMRPG')){
+                $this_first_appearance = 'making '.$this_posessive2.' debut in the <em>'.$source_game_name.'</em>';
+            } else {
+                if ($source_game_info['source_kind'] !== 'game'){ $this_first_appearance = 'that first appeared in the <em>'.$source_game_name.'</em> '.$source_game_info['source_kind']; }
+                else { $this_first_appearance = 'that first appeared in <em>'.$source_game_name.'</em> for the '.$source_game_info['source_systems']; }
+            }
+
+
             $this_first_ability = array('level' => 0, 'token' => 'buster-shot');
             $this_count_abilities = count($robot_info['robot_rewards']['abilities']);
             //die('<pre>'.print_r($robot_info['robot_rewards']['abilities'], true).'</pre>');
             foreach ($robot_info['robot_rewards']['abilities'] AS $temp_key => $temp_reward){ if ($temp_reward['token'] != 'buster-shot' && $temp_reward['level'] > 0){ $this_first_ability = $temp_reward; break; } }
-            $temp_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
-            $this_first_ability_name = $temp_ability_index[$this_first_ability['token']]['ability_name'];
             //die('<pre>'.print_r($this_first_ability, true).'</pre>');
-            if ($robot_info['robot_token'] == 'oil-man' || $robot_info['robot_token'] == 'time-man'){ $this_first_appearance = 'that first appeared in <em>Mega Man Powered Up</em> for the Sony PlayStation Portable'; }
-            elseif ($robot_info['robot_game'] == 'MM01' || $robot_info['robot_token'] == 'mega-man' || $robot_info['robot_token'] == 'roll'){ $this_first_appearance = 'that first appeared in the original <em>Mega Man</em> on the Nintendo Entertainment System'; }
-            elseif ($robot_info['robot_game'] == 'MM02'){ $this_first_appearance = 'that first appeared in <em>Mega Man 2</em> for the Nintendo Entertainment System'; }
-            elseif ($robot_info['robot_game'] == 'MM03' || $robot_info['robot_token'] == 'proto-man'){ $this_first_appearance = 'that first appeared in <em>Mega Man 3</em> for the Nintendo Entertainment System'; }
-            elseif ($robot_info['robot_game'] == 'MM04'){ $this_first_appearance = 'that first appeared in <em>Mega Man 4</em> for the Nintendo Entertainment System'; }
-            elseif ($robot_info['robot_game'] == 'MM05'){ $this_first_appearance = 'that first appeared in <em>Mega Man 5</em> for the Nintendo Entertainment System'; }
-            elseif ($robot_info['robot_game'] == 'MM06'){ $this_first_appearance = 'that first appeared in <em>Mega Man 6</em> for the Nintendo Entertainment System'; }
-            elseif ($robot_info['robot_game'] == 'MM07' || $robot_info['robot_token'] == 'bass'){ $this_first_appearance = 'that first appeared in <em>Mega Man 7</em> for the Super Nintendo Entertainment System'; }
-            elseif ($robot_info['robot_game'] == 'MM08' || $robot_info['robot_token'] == 'duo'){ $this_first_appearance = 'that first appeared in <em>Mega Man 8</em> for the Sega Saturn and Sony PlayStation'; }
-            elseif ($robot_info['robot_game'] == 'MM085'){ $this_first_appearance = 'that first appeared in <em title="Rockman &amp; Forte in Japan">Mega Man &amp; Bass</em> for the Super Nintendo Entertainment System and Nintendo Game Boy Advance'; }
-            elseif ($robot_info['robot_game'] == 'MM09'){ $this_first_appearance = 'that first appeared in <em>Mega Man 9</em> for Nintendo Wii, Sony PlayStation 3, and Xbox 360'; }
-            elseif ($robot_info['robot_game'] == 'MM10'){ $this_first_appearance = 'that first appeared in <em>Mega Man 10</em> for Nintendo Wii, Sony PlayStation 3, and Xbox 360'; }
-            elseif ($robot_info['robot_game'] == 'MM21'){ $this_first_appearance = 'that first appeared in <em>Mega Man : The Wily Wars</em> for Sega Mega Drive'; }
-            elseif ($robot_info['robot_game'] == 'MM30'){ $this_first_appearance = 'that first appeared in <em>Mega Man V</em> for Nintendo Game Boy'; }
-            elseif ($robot_info['robot_token'] == 'disco' || $robot_info['robot_token'] == 'rhythm'){ $this_first_appearance = 'making her debut in the <em>Mega Man RPG Prototype</em>'; }
-            elseif ($robot_info['robot_token'] == 'bond-man'){ $this_first_appearance = 'making his first playable debut in the <em>Mega Man RPG Prototype</em>'; }
-            elseif ($robot_info['robot_token'] == 'enker'){ $this_first_appearance = 'that first appeared in <em>Mega Man : Dr. Wily\'s Revenge</em> for the Nintendo Game Boy'; }
-            elseif ($robot_info['robot_token'] == 'punk'){ $this_first_appearance = 'that first appeared in <em>Mega Man III</em> for the Nintendo Game Boy'; }
-            elseif ($robot_info['robot_token'] == 'ballade'){ $this_first_appearance = 'that first appeared in <em>Mega Man IV</em> for the Nintendo Game Boy'; }
-            elseif ($robot_info['robot_token'] == 'quint'){ $this_first_appearance = 'that first appeared in <em>Mega Man II</em> for the Nintendo Game Boy'; }
-            elseif ($robot_info['robot_token'] == 'solo'){ $this_first_appearance = 'that first appeared in <em>Mega Man Star Force 3</em> for the Nintendo DS'; }
-            elseif (preg_match('/^duo/i', $robot_info['robot_token'])){ $this_first_appearance = 'that first appeared in <em>Mega Man 7</em> for the Super Nintendo Entertainment System'; }
-            elseif (preg_match('/^trio/i', $robot_info['robot_token'])){ $this_first_appearance = 'making their debut in the <em>Mega Man RPG Prototype</em>'; }
             if ($this_first_ability['level'] == 0){ $this_level = 1; }
             else { $this_level = $this_first_ability['level']; }
+
             $this_weaknesses = !empty($robot_info['robot_weaknesses']) ? $robot_info['robot_weaknesses'] : array();
             $this_resistances = !empty($robot_info['robot_resistances']) ? $robot_info['robot_resistances'] : array();
             $this_affinities = !empty($robot_info['robot_affinities']) ? $robot_info['robot_affinities'] : array();
@@ -1278,8 +1269,6 @@ class rpg_game {
             $this_find = array('{this_player}', '{this_ability}', '{target_player}', '{target_ability}');
             $this_replace = array($player_info['player_name'], $ability_info['ability_name'], $player_info['player_name'], ($this_player_token == 'dr-light' ? 'Mega Man' : ($this_player_token == 'dr-wily' ? 'Bass' : ($this_player_token == 'dr-cossack' ? 'Proto Man' : 'Robot'))));
             $this_field = rpg_player::get_intro_field($this_player_token, true);
-            $temp_ability_fields = rpg_ability::get_index_fields(true);
-            $temp_ability_index = $db->get_array_list("SELECT {$temp_ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
             // Generate the window event's canvas and message markup then append to the global array
             $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">'.$this_field['field_name'].'</div>';
             $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">'.$this_field['field_name'].'</div>';
@@ -1760,6 +1749,14 @@ class rpg_game {
     }
 
     // Define a function for getting a game name given a source code for that game
+    public static function get_source_info($source_token){
+        global $db;
+        $source_index = self::get_source_index();
+        if (!isset($source_index[$source_token])){ return false; }
+        else { return $source_index[$source_token]; }
+    }
+
+    // Define a function for getting a game name given a source code for that game
     public static function get_source_name($source_token, $allow_html = true){
         global $db;
         $source_index = self::get_source_index();
@@ -1776,6 +1773,16 @@ class rpg_game {
             $source_name = '<span title="'.htmlspecialchars($title, ENT_QUOTES, 'UTF-8', true).'">'.$source_name.'</span>';
         }
         return $source_name;
+    }
+
+    // Define a function for getting a game name given a source code for that game
+    public static function get_source_systems($source_token, $allow_html = true){
+        global $db;
+        $source_index = self::get_source_index();
+        if (!isset($source_index[$source_token])){ return 'Unknown'; }
+        $source_info = $source_index[$source_token];
+        $source_systems = !empty($source_info['source_systems']) ? $source_info['source_systems'] : '???';
+        return $source_systems;
     }
 
 
