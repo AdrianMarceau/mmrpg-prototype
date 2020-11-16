@@ -29,17 +29,22 @@ $omega_game_index = array(
 // Collect a list of all "omega" field robots (basically everyone from MM01-MM11) and format them
 if (!isset($db)){ global $db; }
 $raw_game_string = "'".implode("', '", array_keys($omega_game_index))."'";
+$raw_game_string .= ", 'MMPU'";
 $raw_omega_factors = $db->get_array_list("SELECT
     robots.robot_token AS `robot`,
     robots.robot_field AS `field`,
     robots.robot_core AS `type`,
-    robots.robot_game AS `game`
+    (CASE WHEN robots.robot_game = 'MMPU' THEN 'MM1' ELSE robots.robot_game END) AS `game`
     FROM
     mmrpg_index_robots AS robots
+    LEFT JOIN mmrpg_index_players AS players1 ON players1.player_robot_hero = robots.robot_token
+    LEFT JOIN mmrpg_index_players AS players2 ON players2.player_robot_support = robots.robot_token
     WHERE
     robots.robot_game IN ({$raw_game_string})
     AND robots.robot_class = 'master'
     AND robots.robot_flag_complete = 1
+    AND players1.player_robot_hero IS NULL
+    AND players2.player_robot_support IS NULL
     ORDER BY
     robots.robot_game ASC,
     robots.robot_order ASC
@@ -51,5 +56,6 @@ if (!empty($raw_omega_factors)){
         array_push($$factor_varname, array('robot' => $omega['robot'], 'field' => $omega['field'], 'type' => $omega['type']));
     }
 }
+
 
 ?>
