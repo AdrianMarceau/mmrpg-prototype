@@ -90,7 +90,7 @@ if (!empty($mmrpg_database_players)){
 $key_counter = 0;
 $mmrpg_database_players_links = '';
 $mmrpg_database_players_links_index = array();
-$mmrpg_database_players_links .= '<div class="float link group" data-game="MM00">';
+$mmrpg_database_players_links .= '<div class="float link group" data-game="MMRPG">';
 $mmrpg_database_players_links_counter = 0;
 $mmrpg_database_players_count_complete = 0;
 

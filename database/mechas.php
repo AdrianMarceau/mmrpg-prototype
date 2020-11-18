@@ -43,6 +43,7 @@ $mmrpg_database_mechas = $db->get_array_list("SELECT
     FROM mmrpg_index_robots AS robots
     LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
     LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = robots.robot_class
+    LEFT JOIN mmrpg_index_fields AS fields ON fields.field_token = robots.robot_field
     WHERE robots.robot_token <> 'robot'
     AND robots.robot_flag_published = 1 AND (robots.robot_flag_hidden = 0 OR robots.robot_token = '{$this_current_token}') {$temp_condition}
     ORDER BY

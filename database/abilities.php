@@ -142,30 +142,12 @@ if (!empty($mmrpg_database_abilities)){
 
         // If this is the first in a new group
         $game_code = !empty($ability_info['ability_group']) ? $ability_info['ability_group'] : (!empty($ability_info['ability_game']) ? $ability_info['ability_game'] : 'MMRPG');
-        if (empty($this_current_sub)){
-            $game_code = str_replace('MM00/Weapons/T0', 'MMRPG/Weapons/T0', $game_code);
-            $game_code = preg_replace('/^([a-z0-9]+)\/Weapons\/([a-z0-9]+)$/i', '$1/Weapons', $game_code);
+        if (empty($this_current_sub) && preg_match('/^(mega|proto|bass)-/i', $ability_info['ability_token'])){
+            $game_code = 'HERO/Weapons/T0';
         }
         if ($show_in_link_list && $game_code != $last_game_code){
             if ($key_counter != 0){ $mmrpg_database_abilities_links .= '</div>'; }
-            //if (!empty($this_current_sub) && $game_code == 'MM01/Weapons/003'){ $mmrpg_database_abilities_links .= '<span class="break"></span>'; }
             $mmrpg_database_abilities_links .= '<div class="float_link float_link_group" data-game="'.$game_code.'">';
-            /*
-            $game_code_label = explode('/', $game_code);
-            $game_code_label = array_merge(array_slice($game_code_label, 0, 1), array_slice($game_code_label, -1, 1));
-            $game_code_label = implode(' ', $game_code_label);
-            $mmrpg_database_abilities_links .= '<div class="float_link_label" style="
-                display: block;
-                clear: both;
-                margin: 0 auto;
-                font-size: 8px;
-                line-height: 1;
-                padding: 2px 2px 0;
-                letter-spacing: 1px;
-                color: #cacaca;
-                min-width: 110px;
-                ">'.$game_code_label.'</div>';
-            */
             $last_game_code = $game_code;
         }
 
