@@ -182,10 +182,10 @@ while ($this_action == 'profile'){
         // Collect player background omega options
         require('prototype/omega.php');
         $temp_omega_factor_options = array();
-        $temp_omega_factor_options['MM01'] = $this_omega_factors_one;
-        $temp_omega_factor_options['MM02'] = $this_omega_factors_two;
-        $temp_omega_factor_options['MM04'] = $this_omega_factors_three;
-        $temp_omega_factor_options['MM03'] = $this_omega_factors_four;
+        $temp_omega_factor_options['MM1'] = $this_omega_factors_one;
+        $temp_omega_factor_options['MM2'] = $this_omega_factors_two;
+        $temp_omega_factor_options['MM4'] = $this_omega_factors_three;
+        $temp_omega_factor_options['MM3'] = $this_omega_factors_four;
 
         // Loop through and remove any fields who's robots haven't been encountered yet
         $session_robot_database = !empty($_SESSION['GAME']['values']['robot_database']) ? $_SESSION['GAME']['values']['robot_database'] : array();
@@ -205,7 +205,7 @@ while ($this_action == 'profile'){
         $allowed_background_options = array();
         $html_background_options = array();
         $html_background_options[] = '<option value="">- Select Field -</option>';
-        $html_background_options[] = '<optgroup label="Mega Man Fields">';
+        $html_background_options[] = '<optgroup label="Intro Fields">';
         $html_background_options[] = '<option value="fields/gentle-countryside">Gentle Countryside (Neutral Type)</option>';
         $html_background_options[] = '<option value="fields/maniacal-hideaway">Maniacal Hideaway (Neutral Type)</option>';
         $html_background_options[] = '<option value="fields/wintry-forefront">Wintry Forefront (Neutral Type)</option>';
@@ -218,8 +218,7 @@ while ($this_action == 'profile'){
             // If the game has changed print the new optgroup
             if ($omega_game != $temp_optgroup_token){
                 $temp_optgroup_token = $omega_game;
-                if ($temp_optgroup_token == 'MM20'){ $temp_optgroup_name = 'Mega Man Killers'; }
-                elseif (preg_match('/^MM([0-9]+)$/', $temp_optgroup_token)){ $temp_optgroup_name = 'Mega Man '.ltrim(str_replace('MM', '', $temp_optgroup_token), '0').' Fields'; }
+                if (preg_match('/^MM([0-9]+)$/', $temp_optgroup_token)){ $temp_optgroup_name = 'Mega Man '.ltrim(str_replace('MM', '', $temp_optgroup_token), '01').' Fields'; }
                 else { $temp_optgroup_name = 'Mega Man '.str_replace('MM', '', $temp_optgroup_token).' Fields'; }
                 $html_background_options[] = '</optgroup>';
                 $html_background_options[] = '<optgroup label="'.$temp_optgroup_name.'">';
