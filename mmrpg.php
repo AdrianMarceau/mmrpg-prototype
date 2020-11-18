@@ -295,7 +295,7 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
                     CONCAT('fields/', field_token) AS field_path,
                     field_type
                     FROM mmrpg_index_fields
-                    WHERE field_flag_complete = 1 AND field_flag_published = 1 AND field_flag_hidden = 0 AND field_game IN ('MM01', 'MM02', 'MM03', 'MM04')
+                    WHERE field_flag_complete = 1 AND field_flag_published = 1 AND field_flag_hidden = 0 AND field_game IN ('MM1', 'MM2', 'MM3', 'MM4') AND field_type <> ''
                     ORDER BY RAND() LIMIT 1
                     ;");
                 $temp_field_type = $temp_field_info['field_type'];
@@ -303,7 +303,7 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
                 $temp_mecha_tokens = $db->get_array_list("SELECT
                     robot_token AS mecha_token
                     FROM mmrpg_index_robots
-                    WHERE robot_flag_complete = 1 AND robot_flag_published = 1 AND robot_flag_hidden = 0 AND robot_class = 'mecha' AND robot_core = '{$temp_field_type}' AND robot_game IN ('MM01', 'MM02', 'MM03', 'MM04')
+                    WHERE robot_flag_complete = 1 AND robot_flag_published = 1 AND robot_flag_hidden = 0 AND robot_class = 'mecha' AND robot_core = '{$temp_field_type}' AND robot_game IN ('MM1', 'MM2', 'MM3', 'MM4')
                     ORDER BY RAND()
                     ;", 'mecha_token');
                 $temp_mecha_tokens = !empty($temp_mecha_tokens) ? array_keys($temp_mecha_tokens) : array();
