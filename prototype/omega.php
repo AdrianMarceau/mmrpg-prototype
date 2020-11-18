@@ -26,7 +26,7 @@ $omega_game_index = array(
     'MM11' => 'this_omega_factors_eleven'
     );
 
-// Collect a list of all "omega" field robots (basically everyone from MM01-MM11) and format them
+// Collect a list of all "omega" field robots (basically everyone from MM1-MM11) and format them
 if (!isset($db)){ global $db; }
 $raw_game_string = "'".implode("', '", array_keys($omega_game_index))."'";
 $raw_game_string .= ", 'MMPU'";

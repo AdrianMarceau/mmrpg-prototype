@@ -201,7 +201,7 @@ while ($this_action == 'profile'){
         ksort($temp_omega_factor_options);
 
         // Generate allowed background options and their select markup
-        $temp_optgroup_token = 'MM00';
+        $temp_optgroup_token = 'MMRPG';
         $allowed_background_options = array();
         $html_background_options = array();
         $html_background_options[] = '<option value="">- Select Field -</option>';
