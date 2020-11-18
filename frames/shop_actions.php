@@ -289,17 +289,17 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
             && !empty($unlock_robot_info['robot_flag_unlockable'])){
 
             // Hard-code this robot's player if from specific games
-            if ($unlock_robot_info['robot_game'] == 'MM01'){
+            if ($unlock_robot_info['robot_game'] == 'MM1'){
 
                 // All MM01 robot masters go to Dr. Light
                 $unlock_player_token = 'dr-light';
 
-            } elseif ($unlock_robot_info['robot_game'] == 'MM02'){
+            } elseif ($unlock_robot_info['robot_game'] == 'MM2'){
 
                 // All MM02 robot masters go to Dr. Wily
                 $unlock_player_token = 'dr-wily';
 
-            } elseif ($unlock_robot_info['robot_game'] == 'MM04'){
+            } elseif ($unlock_robot_info['robot_game'] == 'MM4'){
 
                 // All MM04 robot masters go to Dr. Cossack
                 $unlock_player_token = 'dr-cossack';
