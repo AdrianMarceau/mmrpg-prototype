@@ -5615,5 +5615,24 @@ class rpg_robot extends rpg_object {
         return $desc;
     }
 
+    // Define a function for translating a robot class to its proper nound
+    public static function robot_class_to_noun($class, $full = true, $plural = false){
+        if ($plural){
+            if ($class === 'master'){ return $full ? 'robot masters' : 'robots'; }
+            elseif ($class === 'mecha'){ return $full ? 'support mechas' : 'mechas'; }
+            elseif ($class === 'boss'){ return $full ? 'fortress bosses' : 'bosses'; }
+            else {
+                if (substr($class, -1, 1) === 'y'){ return substr($class, 0, -1).'ies'; }
+                elseif (substr($class, -1, 1) === 's'){ return substr($class, 0, -1).'es'; }
+                else { return $class.'s'; }
+            }
+        } else {
+            if ($class === 'master'){ return $full ? 'robot master' : 'robot'; }
+            elseif ($class === 'mecha'){ return $full ? 'support mecha' : 'mecha'; }
+            elseif ($class === 'boss'){ return $full ? 'fortress boss' : 'boss'; }
+            else { return $class; }
+        }
+    }
+
 }
 ?>

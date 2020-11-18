@@ -34,22 +34,6 @@ $temp_serial_ordering = array(
 // Create the has updated flag and default to false
 $file_has_updated = false;
 
-// Sort the robot index based on robot number
-function mmrpg_index_sort_robots($robot_one, $robot_two){
-    global $temp_serial_ordering;
-    $robot_one['robot_game'] = !empty($robot_one['robot_game']) ? $robot_one['robot_game'] : 'MM00';
-    $robot_two['robot_game'] = !empty($robot_two['robot_game']) ? $robot_two['robot_game'] : 'MM00';
-    //$robot_one['robot_number_position'] = array_search(substr($robot_one['robot_number'], 0, 3), $temp_serial_ordering);
-    //$robot_two['robot_number_position'] = array_search(substr($robot_two['robot_number'], 0, 3), $temp_serial_ordering);
-    if ($robot_one['robot_game'] > $robot_two['robot_game']){ return 1; }
-    elseif ($robot_one['robot_game'] < $robot_two['robot_game']){ return -1; }
-    //elseif ($robot_one['robot_number_position'] > $robot_two['robot_number_position']){ return 1; }
-    //elseif ($robot_one['robot_number_position'] < $robot_two['robot_number_position']){ return -1; }
-    elseif ($robot_one['robot_number'] > $robot_two['robot_number']){ return 1; }
-    elseif ($robot_one['robot_number'] < $robot_two['robot_number']){ return -1; }
-    else { return 0; }
-}
-
 // If the PROFILE action was requested
 while ($this_action == 'profile'){
 
@@ -59,11 +43,8 @@ while ($this_action == 'profile'){
         // Collect the types index for use later in the script
         $mmrpg_database_types = rpg_type::get_index(true, true, true);
 
-        // Sort the robot index based on robot number
-        $db_robot_fields = rpg_robot::get_index_fields(true);
-        $mmrpg_database_robots = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_published = 1 AND robot_flag_complete = 1 AND robot_flag_hidden = 0;", 'robot_token');
-        uasort($mmrpg_database_robots, 'mmrpg_index_sort_robots');
-        //die('<pre>$mmrpg_database_robots = '.print_r($mmrpg_database_robots, true).'</pre>');
+        // Collect a list of robots for use later in the script
+        $mmrpg_database_robots = rpg_robot::get_index();
 
         // Define an array to hold all the allowed avatar options
         $allowed_avatar_options = array();
@@ -72,11 +53,8 @@ while ($this_action == 'profile'){
         $html_avatar_options = array();
         $html_avatar_options[] = '<option value="">- Select Robot -</option>';
 
-        // Print the optgroup opening tag
-        $temp_optgroup_token = 'MM00';
-        $html_avatar_options[] = '<optgroup label="Mega Man Robots">';
-
         // Add all the robot avatars to the list
+        $last_group_token = false;
         foreach ($mmrpg_database_robots AS $token => $info){
 
             if ($token == 'robot' || strstr($token, 'copy')){ continue; }
@@ -87,14 +65,14 @@ while ($this_action == 'profile'){
             if (!mmrpg_prototype_robot_unlocked(false, $token) && $this_userinfo['role_id'] != 1){ continue; }
 
             // If the game has changed print the new optgroup
-            if ($info['robot_game'] != $temp_optgroup_token){
-                $temp_optgroup_token = $info['robot_game'];
-                if ($temp_optgroup_token == 'MM20'){ $temp_optgroup_name = 'Mega Man Killers'; }
-                elseif ($temp_optgroup_token == 'MM085'){ $temp_optgroup_name = 'Mega Man & Bass Robots'; }
-                elseif (preg_match('/^MM([0-9]+)$/', $temp_optgroup_token)){ $temp_optgroup_name = 'Mega Man '.ltrim(str_replace('MM', '', $temp_optgroup_token), '0').' Robots'; }
-                else { $temp_optgroup_name = 'Mega Man '.str_replace('MM', '', $temp_optgroup_token).' Robots'; }
-                $html_avatar_options[] = '</optgroup>';
-                $html_avatar_options[] = '<optgroup label="'.$temp_optgroup_name.'">';
+            $robot_game_token = $info['robot_game'];
+            if (preg_match('/^(mega-man|proto-man|bass|roll|disco|rhythm)$/i', $token)){ $robot_game_token = 'HEROES'; }
+            if ($robot_game_token != $last_group_token){
+                if (!empty($last_group_token)){ $html_avatar_options[] = '</optgroup>'; }
+                $last_group_token = $robot_game_token;
+                if ($robot_game_token === 'HEROES'){ $last_group_name = 'Mega Man Heroes'; }
+                else { $last_group_name = rpg_game::get_source_name($last_group_token, false).' '.ucfirst(rpg_robot::robot_class_to_noun($info['robot_class'], false, true)); }
+                $html_avatar_options[] = '<optgroup label="'.$last_group_name.'">';
             }
 
             $size = isset($info['robot_image_size']) ? $info['robot_image_size'] : 40;
@@ -117,7 +95,6 @@ while ($this_action == 'profile'){
             // Otherwise, if this ROBOT MASTER alt skin has been inlocked
             elseif (!empty($info['robot_image_alts'])){
                 // Loop through each of the available alts and print if unlocked
-                $info['robot_image_alts'] = json_decode($info['robot_image_alts'], true);
                 foreach ($info['robot_image_alts'] AS $key => $this_altinfo){
                     // Define the unlocked flag as false to start
                     $alt_unlocked = false;
@@ -134,11 +111,12 @@ while ($this_action == 'profile'){
             }
 
         }
+        if (!empty($last_group_token)){ $html_avatar_options[] = '</optgroup>'; }
 
         // Add player avatars if this is the developer
         if ($this_userinfo['role_id'] == 1 || $this_userinfo['role_id'] == 6){
             $html_avatar_options[] = '</optgroup>';
-            $html_avatar_options[] = '<optgroup label="Mega Man Players">';
+            $html_avatar_options[] = '<optgroup label="Player Characters">';
             $html_avatar_options[] = '<option value="players/dr-light/40">PLAYER : Dr. Light</option>';
             $html_avatar_options[] = '<option value="players/dr-wily/40">PLAYER : Dr. Wily</option>';
             $html_avatar_options[] = '<option value="players/dr-cossack/40">PLAYER : Dr. Cossack</option>';
