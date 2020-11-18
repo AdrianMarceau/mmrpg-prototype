@@ -65,10 +65,10 @@ $temp_omega_factors_unlocked_total = count($temp_omega_factors_unlocked);
 
 // Collect the omega groups that we should be printing links for
 $temp_omega_groups_unlocked = array();
-if ($unlocked_factor_one_robots){ $temp_omega_groups_unlocked[] = array('token' => 'MM01', 'omega' => $this_omega_factors_one); }
-if ($unlocked_factor_two_robots){ $temp_omega_groups_unlocked[] = array('token' => 'MM02', 'omega' => $this_omega_factors_two); }
-if ($unlocked_factor_four_robots){ $temp_omega_groups_unlocked[] = array('token' => 'MM04', 'omega' => $this_omega_factors_four); }
-if ($unlocked_factor_three_robots){ $temp_omega_groups_unlocked[] = array('token' => 'MM03', 'omega' => $this_omega_factors_three); }
+if ($unlocked_factor_one_robots){ $temp_omega_groups_unlocked[] = array('token' => 'MM1', 'omega' => $this_omega_factors_one); }
+if ($unlocked_factor_two_robots){ $temp_omega_groups_unlocked[] = array('token' => 'MM2', 'omega' => $this_omega_factors_two); }
+if ($unlocked_factor_four_robots){ $temp_omega_groups_unlocked[] = array('token' => 'MM4', 'omega' => $this_omega_factors_four); }
+if ($unlocked_factor_three_robots){ $temp_omega_groups_unlocked[] = array('token' => 'MM3', 'omega' => $this_omega_factors_three); }
 
 // Define a function for printing out the robot links
 function print_starchart_omega($info, $key, $kind){
