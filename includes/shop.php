@@ -581,13 +581,16 @@ if (!empty($this_shop_index['kalinka'])){
             FROM mmrpg_index_robots AS robots
             LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
             LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = robots.robot_class
+            LEFT JOIN mmrpg_index_players AS players1 ON players1.player_robot_hero = robots.robot_token
+            LEFT JOIN mmrpg_index_players AS players2 ON players2.player_robot_support = robots.robot_token
             WHERE
             robots.robot_flag_published = 1
             AND robots.robot_flag_complete = 1
             AND robots.robot_flag_unlockable = 1
             AND robots.robot_number NOT LIKE 'RPG-%'
             AND robots.robot_number NOT LIKE 'PCR-%'
-            AND robots.robot_game NOT IN ('MM00')
+            AND players1.player_robot_hero IS NULL
+            AND players2.player_robot_support IS NULL
             ORDER BY
             FIELD(robots.robot_class, 'master', 'mecha', 'boss'),
             groups.group_order ASC,
