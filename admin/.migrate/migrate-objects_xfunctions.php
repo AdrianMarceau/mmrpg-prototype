@@ -158,8 +158,17 @@ function clean_json_content_array($kind, $content_json_data, $remove_id_field = 
     if (!empty($encoded_sub_fields)){
         foreach ($encoded_sub_fields AS $sub_field_name){
             $sub_field_value = $cleaned_json_data[$sub_field_name];
-            if (!empty($sub_field_value)){ $sub_field_value = json_decode($sub_field_value, true); }
-            else { $sub_field_value = array(); }
+            if (!empty($sub_field_value)){
+                $fchar = substr($sub_field_value, 0, 1);
+                $lchar = substr($sub_field_value, -1, 1);
+                if (($fchar === '{' && $lchar === '}') || ($fchar === '[' && $lchar === ']')){
+                    $sub_field_value = json_decode($sub_field_value, true);
+                } else {
+                    $sub_field_value = array(trim($sub_field_value));
+                }
+            } else {
+                $sub_field_value = array();
+            }
             $cleaned_json_data[$sub_field_name] = $sub_field_value;
         }
     }

@@ -75,6 +75,18 @@ foreach ($challenge_index AS $challenge_data){
     if (file_exists($content_path)){ deletedir_or_exit($content_path); }
     mkdir_or_exit($content_path);
 
+    // If this challenge has music defined, attempt to translate to new format
+    if (!empty($challenge_data['challenge_field_data'])){
+        $challenge_field_data = json_decode($challenge_data['challenge_field_data'], true);
+        if (!empty($challenge_field_data['field_music'])){
+            $challenge_field_music = $challenge_field_data['field_music'];
+            if (isset($music_paths_legacy_to_new[$challenge_field_music])){
+                $challenge_field_data['field_music'] = $music_paths_legacy_to_new[$challenge_field_music];
+                $challenge_data['challenge_field_data'] = json_encode($challenge_field_data, JSON_NUMERIC_CHECK);
+            }
+        }
+    }
+
     // And then write the rest of the non-function data into a json file
     $content_json_path = $content_path.'data.json';
     $content_json_data = clean_json_content_array('challenge', $challenge_data, false, true, $json_challenge_fields);

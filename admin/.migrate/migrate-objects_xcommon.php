@@ -22,4 +22,19 @@ foreach ($contributor_index AS $key => $data){
 // Include the game migration data here so we don't have to later
 require_once(MMRPG_CONFIG_ROOTDIR.'admin/.migrate/migrate-objects_games.php');
 
+// Collect a music index from the CDN so we can translate legacy paths to new ones
+$raw_music_index = rpg_game::get_music_index();
+$music_data_index = array();
+$music_paths_legacy_to_new = array();
+if (!empty($raw_music_index['index'])){
+    foreach ($raw_music_index['index'] AS $key => $info){
+        $legacy_path = $info['legacy_music_path'];
+        $new_path = $info['music_path'];
+        $music_data_index[$new_path] = $info;
+        if (!empty($legacy_path) && !empty($new_path)){
+            $music_paths_legacy_to_new[$legacy_path] = $new_path;
+        }
+    }
+}
+
 ?>

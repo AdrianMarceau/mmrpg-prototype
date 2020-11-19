@@ -78,6 +78,26 @@ $field_sprite_whitelist = array(
     'battle-field_preview.png'
     );
 
+// Predefine a conversion array for legacy-to-new music tokens
+$music_conversation_table = array(
+    'field' => '', // (Unknown)
+    // ---
+    'intro-field' => 'sega-remix/boss-theme-mm1', // (Boss Theme (Sega Genesis))
+    // ---
+    'clock-citadel' => 'sega-remix/time-man-mmpu', // (MM&B Astro Man (Sega Genesis))
+    'oil-wells' => 'sega-remix/tengu-man-rnf', // (MM&B Tengu Man (Sega Genesis))
+    // ---
+    'light-laboratory' => 'sega-remix/special-stage-mm9', // (MM9 Special Stage (Sega Genesis))
+    'wily-castle' => 'sega-remix/wily-fortress-1-mm1', // (MM1 Wily Fortress 1 (Sega Genesis))
+    'cossack-citadel' => 'sega-remix/cossack-fortress-2-mm4', // (MM4 Cossack Fortess 2 (Sega Genesis))
+    // ---
+    'final-destination' => 'sega-remix/special-stage-mm9', // (MM10 Special (Sega Genesis))
+    'final-destination-2' => 'sega-remix/wily-fortress-1-mm9', // (MM9 Wily Fortress (Sega Genesis))
+    'final-destination-3' => 'sega-remix/wily-fortress-2-mm9', // (MM9 Wily Fortress 2 (Sega Genesis))
+    // ---
+    'prototype-complete' => '', // (Unknown)
+    );
+
 // Count the number of fields that we'll be looping through
 $field_index_size = count($field_index);
 $field_sprite_directories_total = count($field_sprites_list);
@@ -154,9 +174,47 @@ foreach ($field_index AS $field_token => $field_data){
         $player_data_files_copied[] = basename($data_path); // not actually copied but here for tracking
     }
 
+    // If this field has music defined, we may need to update its token
+    if (!empty($field_data['field_music'])){
+        // If the defined music has had a name change, apply it now
+        if (isset($music_paths_legacy_to_new[$field_data['field_music']])){
+            $field_data['field_music'] = $music_paths_legacy_to_new[$field_data['field_music']];
+        } elseif (isset($music_conversation_table[$field_data['field_token']])){
+            $field_data['field_music'] = $music_conversation_table[$field_data['field_token']];
+            $field_data['field_music_name'] = '';
+            $field_data['field_music_link'] = '';
+        }
+        // If this music is in legacy format, attempt to upgrade to new
+        if (!strstr($field_data['field_music'], '/')){
+            if (!empty($field_data['field_master'])
+                && !empty($field_data['field_game'])){
+                $temp_master = $field_data['field_master'];
+                $temp_game = isset($game_conversion_table[$field_data['field_game']]) ? $game_conversion_table[$field_data['field_game']] : $field_data['field_game'];
+                $temp_new_music_path = 'sega-remix/'.$temp_master.'-'.strtolower($temp_game);
+                if (isset($music_data_index[$temp_new_music_path])){
+                    $field_data['field_music'] = $temp_new_music_path;
+                }
+            }
+        }
+        // If the defined music has associated link/name data, apply it now
+        if (isset($music_data_index[$field_data['field_music']])){
+            $temp_music_data = $music_data_index[$field_data['field_music']];
+            if (!empty($temp_music_data['music_name'])){ $field_data['field_music_name'] = $temp_music_data['music_name']; }
+            if (!empty($temp_music_data['music_link'])){ $field_data['field_music_link'] = $temp_music_data['music_link']; }
+        }
+    }
+    // If the music path was empty, clear the other two related fields
+    if (empty($field_data['field_music'])){
+        $field_data['field_music_name'] = '';
+        $field_data['field_music_link'] = '';
+    }
+    // Clean the field music field if it's weird
+    $field_data['field_music_link'] = trim($field_data['field_music_link'], '"');
+
     // And then write the rest of the non-function data into a json file
     $content_json_path = $content_path.'data.json';
     $content_json_data = clean_json_content_array('field', $field_data);
+    if (!empty($content_json_data['field_music_link']) && count($content_json_data['field_music_link']) === 1){ $content_json_data['field_music_link'] = implode('', $content_json_data['field_music_link']); }
     ob_echo('- export all other data to '.clean_path($content_json_path));
     $h = fopen($content_json_path, 'w');
     fwrite($h, normalize_file_markup(json_encode($content_json_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK)));
