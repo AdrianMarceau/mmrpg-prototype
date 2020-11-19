@@ -269,8 +269,34 @@ class cms_admin {
 
     // Define a function for collecting the music index, sorted, for admin use
     public static function get_music_index(){
-        global $db;
-        $mmrpg_music_index = $db->get_array_list("SELECT music_id, music_token, music_album, music_game, music_name, music_link, CONCAT(music_album, '/', music_token) AS music_path FROM mmrpg_index_music ORDER BY music_game ASC, music_order ASC, music_token ASC;", 'music_path');
+        static $mmrpg_music_index;
+        if (empty($mmrpg_music_index)){
+            $mmrpg_music_index = array();
+            $cdn_music_index = rpg_game::get_music_index();
+            //error_log('$cdn_music_index = '.print_r($cdn_music_index, true));
+            if (!empty($cdn_music_index['index'])){
+                // Collect the raw music index from cdn data before sorting
+                $raw_index_music = $cdn_music_index['index'];
+                // Collect the raw source index and make a ref for ordering
+                $source_orders = array();
+                $raw_source_index = rpg_game::get_source_index();
+                foreach ($raw_source_index AS $info){ $source_orders[$info['source_token']] = $info['source_order']; }
+                // Sort the data by its source game first, then default to provided
+                usort($raw_index_music, function($a, $b) use($source_orders){
+                    $a_order = $source_orders[$a['music_game']];
+                    $b_order = $source_orders[$b['music_game']];
+                    if ($a_order < $b_order){ return -1; }
+                    elseif ($a_order > $b_order){ return 1; }
+                    else { return 0; }
+                    });
+                // Now loop through the index and create a new one w/ path as key
+                foreach ($raw_index_music AS $key => $info){
+                    $path = $info['music_path'];
+                    $mmrpg_music_index[$path] = $info;
+                }
+            }
+        }
+        //error_log('$mmrpg_music_index = '.print_r($mmrpg_music_index, true));
         return $mmrpg_music_index;
     }
 
@@ -741,7 +767,7 @@ class cms_admin {
 
         $allowed_values = is_array($filter_query_results) ? array_keys($filter_query_results) : array();
         if (!empty($filter_by_extra)){ $allowed_values[] = '_groups/'.implode('', array_slice(array_values($filter_by_extra), 0, 1)); }
-        else { $allowed_values[] = '_groups/'.str_replace('_token', '', $filter_data['token']); }
+        elseif (isset($filter_data['token'])){ $allowed_values[] = '_groups/'.str_replace('_token', '', $filter_data['token']); }
         //echo('<pre>$allowed_values = '.print_r($allowed_values, true).'</pre>'.PHP_EOL);
         $allowed_folder_names = $allowed_values;
         if ($pk_kind === 'id'){ foreach ($allowed_folder_names AS $key => $id){ $allowed_folder_names[$key] = self::git_get_id_token(substr($filter_by_field, 0, -3), $id); } }
