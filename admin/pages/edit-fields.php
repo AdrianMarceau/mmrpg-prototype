@@ -39,6 +39,31 @@
     extract($mmrpg_git_file_arrays);
 
 
+    /* -- Generate Select Option Markup -- */
+
+    // Pre-generate a list of all fields so we can re-use it over and over
+    $music_options_count = 0;
+    $music_options_group = '';
+    $music_options_markup = array();
+    $music_options_markup[] = '<option value="">-</option>';
+    foreach ($mmrpg_music_index AS $music_path => $music_info){
+        if (!rpg_game::sound_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path.'/')){ continue; }
+        $music_group = $music_info['music_game'];
+        if ($music_group != $music_options_group){
+            if (!empty($music_options_group)){ $music_options_markup[] = '</optgroup>'; }
+            $music_options_group = $music_group;
+            $music_group_name = rpg_game::get_source_name($music_group, false);
+            $music_options_markup[] = '<optgroup label="'.$music_group_name.' Music">';
+        }
+        $music_name = $music_info['music_name'];
+        $legacy_music_path = $music_info['legacy_music_path'];
+        $music_options_markup[] = '<option value="'.$music_path.'" data-legacy-value="'.$legacy_music_path.'">'.$music_name.'</option>';
+        $music_options_count++;
+    }
+    if (!empty($music_options_group)){ $music_options_markup[] = '</optgroup>'; }
+    $music_options_markup = implode(PHP_EOL, $music_options_markup);
+
+
     /* -- Page Script/Style Dependencies  -- */
 
     // Require codemirror scripts and styles for this page
@@ -1095,19 +1120,6 @@
                                         <textarea class="textarea" name="field_description2" rows="10"><?= htmlentities($field_data['field_description2'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
                                     </div>
 
-                                    <?
-
-                                    // Pre-generate a list of all music so we can re-use it over and over
-                                    $music_options_markup = array();
-                                    $music_options_markup[] = '<option value="">-</option>';
-                                    foreach ($mmrpg_music_index AS $music_path => $music_info){
-                                        $music_options_markup[] = '<option value="'.$music_path.'">'.$music_info['music_name'].'</option>';
-                                    }
-                                    $music_options_count = count($music_options_markup);
-                                    $music_options_markup = implode(PHP_EOL, $music_options_markup);
-
-                                    ?>
-
                                     <div class="field halfsize">
                                         <div class="label">
                                             <strong>Field Music</strong>
@@ -1122,9 +1134,7 @@
                                                 <optgroup label="Legacy Support">
                                                     <option value="<?= $field_data['field_music'] ?>" selected="selected"><?= ucwords(str_replace('-', ' ', $field_data['field_music'])).' (Legacy)' ?></option>
                                                 </optgroup>
-                                                <optgroup label="Modern Standard">
-                                                    <?= str_replace('value="'.$field_data['field_music'].'"', 'value="'.$field_data['field_music'].'" selected="selected"', str_replace('<option value="">-</option>', '', $music_options_markup)) ?>
-                                                </optgroup>
+                                                <?= str_replace('value="'.$field_data['field_music'].'"', 'value="'.$field_data['field_music'].'" selected="selected"', str_replace('<option value="">-</option>', '', $music_options_markup)) ?>
                                                 <?
                                             } else {
                                                 ?>

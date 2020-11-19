@@ -136,16 +136,16 @@
     $music_options_markup[] = '<option value="">-</option>';
     foreach ($mmrpg_music_index AS $music_path => $music_info){
         if (!rpg_game::sound_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path.'/')){ continue; }
-        if ($music_info['music_game'] == 'MM085'){ $music_group = 'MM&B'; }
-        elseif ($music_info['music_game'] == 'MM01b'){ $music_group = 'MMPU'; }
-        else { $music_group = $music_info['music_game']; }
+        $music_group = $music_info['music_game'];
         if ($music_group != $music_options_group){
             if (!empty($music_options_group)){ $music_options_markup[] = '</optgroup>'; }
             $music_options_group = $music_group;
-            $music_options_markup[] = '<optgroup label="'.ucfirst($music_group).' Music">';
+            $music_group_name = rpg_game::get_source_name($music_group, false);
+            $music_options_markup[] = '<optgroup label="'.$music_group_name.' Music">';
         }
         $music_name = $music_info['music_name'];
-        $music_options_markup[] = '<option value="'.$music_path.'">'.$music_name.'</option>';
+        $legacy_music_path = $music_info['legacy_music_path'];
+        $music_options_markup[] = '<option value="'.$music_path.'" data-legacy-value="'.$legacy_music_path.'">'.$music_name.'</option>';
         $music_options_count++;
     }
     if (!empty($music_options_group)){ $music_options_markup[] = '</optgroup>'; }
@@ -998,7 +998,7 @@
                                                 <? if (!empty($challenge_field_data)){ ?>
                                                     <?= str_replace('value="'.$challenge_field_data['field_music'].'"', 'value="'.$challenge_field_data['field_music'].'" selected="selected"', $music_options_markup) ?>
                                                 <? } else { ?>
-                                                    <?= $field_options_markup ?>
+                                                    <?= $music_options_markup ?>
                                                 <? } ?>
                                             </select><span></span>
                                         </div>
