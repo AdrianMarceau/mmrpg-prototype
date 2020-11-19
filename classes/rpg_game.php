@@ -1839,11 +1839,13 @@ class rpg_game {
 
     }
 
-    // Define a function for getting (or generating) the sound file index from the defined CDN
-    public static function get_sounds_index(){
+    // Define a function for getting (or generating) the music/sound file index from the defined CDN
+    public static function get_music_index(){
 
         // Pass the work off to the dedicated CDN index function
-        return self::get_cdn_index(MMRPG_CONFIG_CDN_PROJECT, 'sounds');
+        static $music_index;
+        if (empty($music_index)){ $music_index = self::get_cdn_index(MMRPG_CONFIG_CDN_PROJECT, 'music'); }
+        return $music_index;
 
     }
 
@@ -1851,7 +1853,9 @@ class rpg_game {
     public static function get_gallery_index($folder = ''){
 
         // Pass the work off to the dedicated CDN index function
-        return self::get_cdn_index(MMRPG_CONFIG_CDN_PROJECT, 'images/gallery'.(!empty($folder) ? '/'.$folder : ''));
+        static $gallery_index;
+        if (empty($gallery_index)){ $gallery_index = self::get_cdn_index(MMRPG_CONFIG_CDN_PROJECT, 'images/gallery'.(!empty($folder) ? '/'.$folder : '')); }
+        return $gallery_index;
 
     }
 
@@ -1901,14 +1905,17 @@ class rpg_game {
         if (defined('MMRPG_CONFIG_CDN_ENABLED') && MMRPG_CONFIG_CDN_ENABLED === true){
 
             // Collect the sounds index for reference
-            static $cdn_sounds_index;
-            if (empty($cdn_sounds_index)){ $cdn_sounds_index = self::get_sounds_index(); }
+            static $sound_files_list;
+            if (empty($sound_files_list)){
+                $cdn_music_index = self::get_music_index();
+                $sound_files_list = !empty($cdn_music_index['files']) ? $cdn_music_index['files'] : array();
+            }
 
             // Remove the leading "sounds/" path fragment for testing
             $rel_sym_path = preg_replace('/^sounds\//', '', $sym_path);
 
             // Check to see if the given path is in the CDN index
-            return in_array($rel_sym_path, $cdn_sounds_index) ? true : false;
+            return in_array($rel_sym_path, $sound_files_list) ? true : false;
 
         }
         // Otherwise we can just check for the file directory
