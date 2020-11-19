@@ -41,7 +41,6 @@ if (true){
     $sql_table_list[] = array('name' => 'mmrpg_index_fields', 'export_data' => false);
         $sql_table_list[] = array('name' => 'mmrpg_index_fields_groups', 'export_data' => false, 'export_using_prod' => false);
         $sql_table_list[] = array('name' => 'mmrpg_index_fields_groups_tokens', 'export_data' => false, 'export_using_prod' => false);
-    $sql_table_list[] = array('name' => 'mmrpg_index_music');
     $sql_table_list[] = array('name' => 'mmrpg_index_sources', 'export_using_prod' => false);
 
     // content records
