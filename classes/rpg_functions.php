@@ -466,5 +466,29 @@ class rpg_functions {
 
     }
 
+    // Define a function that shuffles an array, preserving keys if requested
+    public static function shuffle_array($array, $preserve_keys = false){
+        if (!is_array($array)){ return $array; }
+        if ($preserve_keys){
+            $keys = array_keys($array);
+            shuffle($keys);
+            $shuffled_array = array();
+            foreach ($keys as $key){ $shuffled_array[$key] = $array[$key]; }
+        } else {
+            $shuffled_array = $array;
+            shuffle($shuffled_array);
+        }
+        return $shuffled_array;
+    }
+
+    // Define a function for performing a reversed array sort
+    public static function reverse_sort_array($array, $preserve_keys = false){
+        $reversed_array = $array;
+        if ($preserve_keys){ asort($reversed_array); }
+        else { sort($reversed_array); }
+        $reversed_array = array_reverse($reversed_array, $preserve_keys);
+        return $reversed_array;
+    }
+
 }
 ?>

@@ -150,11 +150,15 @@ class rpg_mission_bonus extends rpg_mission {
         }
 
         // Loop through each of the bonus robots and update their levels
+        $temp_games_counter = array();
         $temp_battle_omega['battle_zenny'] = 0;
         $temp_battle_omega['battle_turns'] = 0;
         foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $info){
             $info['robot_level'] = mt_rand($temp_bonus_level_min, $temp_bonus_level_max);
             $index = rpg_robot::parse_index_info($this_robot_index[$info['robot_token']]);
+            // Keep track of which game this robot/mecha/etc. is from
+            if (!isset($temp_games_counter[$index['robot_game']])){ $temp_games_counter[$index['robot_game']] = 0; }
+            $temp_games_counter[$index['robot_game']] += 1;
             // Randomly attach a hold or consumable item to this bot
             if (mt_rand(0, 100) >= 75){ $info['robot_item'] = $hold_item_list[mt_rand(0, (count($hold_item_list) - 1))]; }
             // Generate a number of abilities based on robot class
@@ -212,10 +216,23 @@ class rpg_mission_bonus extends rpg_mission {
         $temp_battle_omega['battle_field_base']['field_type'] = array_pop($temp_multipliers);
         $temp_battle_omega['battle_field_base']['field_type2'] = array_pop($temp_multipliers);
 
-        // Update the field music to a random boss theme from MM1-10 + MM&B
-        $temp_music_number = mt_rand(1, 11);
-        $temp_music_name = 'boss-theme-mm'.str_pad($temp_music_number, 2, '0', STR_PAD_LEFT);
-        $temp_battle_omega['battle_field_base']['field_music'] = $temp_music_name;
+        // Sort the games counter by highest-count at the top
+        $temp_games_counter = rpg_functions::shuffle_array($temp_games_counter, true);
+        $temp_games_counter = rpg_functions::reverse_sort_array($temp_games_counter, true);
+        // Update the field music to a random boss theme best-representing combatants
+        $temp_music_path = false;
+        $temp_music_index = rpg_game::get_music_paths_index();
+        foreach ($temp_games_counter AS $game_code => $target_counter){
+            $temp_path = 'sega-remix/boss-theme-'.strtolower($game_code);
+            if (isset($temp_music_index[$temp_path])){
+                $temp_music_path = $temp_path;
+                break;
+            }
+        }
+        // If an appropriate track count not be found, just pick a random one from MM1-11
+        if (empty($temp_music_path)){ $temp_music_path = 'sega-remix/boss-theme-mm'.mt_rand(1, 11); }
+        // Update the battle with the selected music path
+        $temp_battle_omega['battle_field_base']['field_music'] = $temp_music_path;
 
         // Add some random item drops to the starter battle
         $temp_battle_omega['battle_rewards']['items'] = array(
