@@ -318,7 +318,7 @@ class rpg_mission_endless extends rpg_mission {
 
             // Define the music for the relevant stages based on phase
             $atoken = 'sega-remix';
-            $moptions = array('special-stage-3-mm10', 'special-stage-2-mm10', 'special-stage-1-mm10', 'wily-fortress-1-mm08', 'wily-fortress-2-mm08', 'wily-fortress-3-mm08', 'wily-fortress-4-mm08');
+            $moptions = array('special-stage-3-mm10', 'special-stage-2-mm10', 'special-stage-1-mm10', 'wily-fortress-1-mm8', 'wily-fortress-2-mm8', 'wily-fortress-3-mm8', 'wily-fortress-4-mm8');
             $mtoken = select_from_array_with_rollover($moptions, $temp_battle_seed['phase']);
             $music_path = $atoken.'/'.$mtoken.'/';
             if (rpg_game::sound_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
@@ -328,36 +328,31 @@ class rpg_mission_endless extends rpg_mission {
 
         } elseif ($temp_battle_seed['types'][0] == 'none'){
 
-            // Do not interfere with music for support-bot stages
-            // ...yet?
-
-        } elseif (!empty($target_robots)){
-
-            // For all other types, collect first robot and theme after them
+            // Define the music for the relevant stages based on phase
             $atoken = 'sega-remix';
-            $rtoken = $target_robots[0]['robot_token'];
-            $gtoken = strtolower($mmrpg_robots_index[$rtoken]['robot_game']);
-            $music_path = $atoken.'/'.$rtoken.'-'.$gtoken.'/';
-            //$temp_battle_omega['battle_description2'] .= '| maybe music:'.$music_path.' ';
+            $moptions = array('wily-fortress-1-mm8', 'wily-fortress-2-mm8', 'wily-fortress-3-mm8', 'wily-fortress-4-mm8', 'special-stage-3-mm10', 'special-stage-2-mm10', 'special-stage-1-mm10');
+            $mtoken = select_from_array_with_rollover($moptions, $temp_battle_seed['phase']);
+            $music_path = $atoken.'/'.$mtoken.'/';
             if (rpg_game::sound_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
                 $target_field['field_music'] = $music_path;
                 $music_is_customized = true;
-            } else {
-                $atoken = 'fallbacks';
-                $music_path2 = $atoken.'/'.$rtoken.'-'.$gtoken.'/';
-                //$temp_battle_omega['battle_description2'] .= '| maybe music2:'.$music_path2.' ';
-                if (rpg_game::sound_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path2)){
-                    $target_field['field_music'] = $music_path2;
-                    $music_is_customized = true;
-                }
+            }
+
+        } elseif (!empty($target_robots)){
+
+            // Attempt to collect custom music for the first robot
+            $custom_music_path = rpg_robot::get_custom_music_path($target_robots[0]['robot_token']);
+            if (!empty($custom_music_path)){
+                $target_field['field_music'] = $custom_music_path;
+                $music_is_customized = true;
             }
 
         }
 
         // If custom music was not assigned, we should at least check the default exists
         if (!$music_is_customized){
+
             $boss_theme_num = 10 - ($mission_number > 10 ? ($mission_number % 10) : $mission_number);
-            $boss_theme_num = str_pad($boss_theme_num, 2, '0', STR_PAD_LEFT);
             $target_field['field_music'] = 'sega-remix/boss-theme-mm'.$boss_theme_num;
             $music_is_customized = true;
         }
