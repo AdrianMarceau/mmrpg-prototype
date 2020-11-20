@@ -1403,63 +1403,56 @@ class rpg_battle extends rpg_object {
                     // Create the enter event for this robot
                     $event_header = $this_robot->robot_name;
                     $event_body = "{$this_robot->print_name()} wants to fight!<br />";
-                    $this_robot->robot_frame = 'defend';
-                    $this_robot->robot_frame_styles = '';
-                    $this_robot->robot_detail_styles = '';
-                    $this_robot->robot_position = 'active';
+                    $this_robot->set_frame('defend');
+                    $this_robot->set_frame_styles('');
+                    $this_robot->set_detail_styles('');
+                    $this_robot->set_position('active');
                     if (isset($this_robot->robot_quotes['battle_start'])){
                         $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                         $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
                         $event_body .= $this_robot->print_quote('battle_start', $this_find, $this_replace);
-                        //$this_quote_text = str_replace($this_find, $this_replace, $this_robot->robot_quotes['battle_start']);
-                        //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
                     }
-                    $this_robot->update_session();
-                    $this_player->update_session();
+                    $this_player->update_variables();
                     $this->events_create($this_robot, false, $event_header, $event_body, array('canvas_show_target' => false, 'console_show_target' => false));
 
                     // Create an event for this robot teleporting in
                     if ($this_player->counters['robots_active'] == 1){
-                        $this_robot->robot_frame = 'taunt';
-                        $this_robot->update_session();
+                        $this_robot->set_frame('taunt');
                         $this->events_create(false, false, '', '');
                     }
-                    $this_robot->robot_frame = 'base';
-                    $this_robot->robot_frame_styles = '';
-                    $this_robot->robot_detail_styles = '';
-                    $this_robot->update_session();
+                    $this_robot->set_frame('base');
+                    $this_robot->set_frame_styles('');
+                    $this_robot->set_detail_styles('');
 
                 }
 
-                // Change all this player's robot sprite to their taunt, then show 'em
+                // Change all this player's robot sprite to their taunt
                 foreach ($this_player->values['robots_active'] AS $key => $info){
                     if (!preg_match('/display:\s?none;/i', $info['robot_frame_styles'])){ continue; }
                     if ($this_robot->robot_id == $info['robot_id']){
-                        $this_robot->robot_frame = 'taunt';
-                        $this_robot->robot_frame_styles = '';
-                        $this_robot->robot_detail_styles = '';
-                        $this_robot->update_session();
+                        $this_robot->set_frame('taunt');
+                        $this_robot->set_frame_styles('');
+                        $this_robot->set_detail_styles('');
                     } else {
                         $temp_robot = rpg_game::get_robot($this, $this_player, $info);
-                        $temp_robot->robot_frame = 'taunt';
-                        $temp_robot->robot_frame_styles = '';
-                        $temp_robot->robot_detail_styles = '';
-                        $temp_robot->update_session();
+                        $temp_robot->set_frame('taunt');
+                        $temp_robot->set_frame_styles('');
+                        $temp_robot->set_detail_styles('');
                     }
-                } $this->events_create(false, false, '', '');
+                }
+
+                // Create an event to show the robots in their taunt sprites
+                $this->events_create(false, false, '', '');
 
                 // Change all this player's robot sprite back to their base, then update
                 foreach ($this_player->values['robots_active'] AS $key => $info){
-                    if (!preg_match('/display:\s?none;/i', $info['robot_frame_styles'])){ continue; }
                     if ($this_robot->robot_id == $info['robot_id']){
-                        $this_robot->robot_frame = 'base';
-                        $this_robot->update_session();
+                        $this_robot->set_frame('base');
                     } else {
                         $temp_robot = rpg_game::get_robot($this, $this_player, $info);
-                        $temp_robot->robot_frame = 'base';
-                        $temp_robot->update_session();
+                        $temp_robot->set_frame('base');
                     }
-                } // $this->events_create(false, false, '', '');
+                }
 
                 // Ensure this robot has abilities to loop through
                 if (!isset($this_robot->flags['ability_startup']) && !empty($this_robot->robot_abilities)){
@@ -1471,8 +1464,7 @@ class rpg_battle extends rpg_object {
                         $temp_ability = rpg_game::get_ability($this, $this_player, $this_robot, $temp_abilityinfo);
                     }
                     // And now update the robot with the flag
-                    $this_robot->flags['ability_startup'] = true;
-                    $this_robot->update_session();
+                    $this_robot->set_flag('ability_startup', true);
                 }
 
                 // Set this token to the ID and token of the starting robot
@@ -1560,12 +1552,12 @@ class rpg_battle extends rpg_object {
                         $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : '').$this_robot->print_name().' taunts the opponent!<br />';
                         $event_body .= $this_robot->print_quote('battle_taunt', $this_find, $this_replace);
                         //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
-                        $this_robot->robot_frame = 'taunt';
-                        $actual_target_robot->robot_frame = 'base';
+                        $this_robot->set_frame('taunt');
+                        $actual_target_robot->set_frame('base');
                         $this->events_create($this_robot, $actual_target_robot, $event_header, $event_body, array('console_show_target' => false));
-                        $this_robot->robot_frame = 'base';
+                        $this_robot->set_frame('base');
                         // Create the quote flag to ensure robots don't repeat themselves
-                        $this_robot->flags['robot_quotes']['battle_taunt'] = true;
+                        $this_robot->set_flag('robot_quotes', 'battle_taunt', true);
                     }
 
                 }
@@ -1607,12 +1599,12 @@ class rpg_battle extends rpg_object {
                             $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : '').$this_robot->print_name().' taunts the opponent!<br />';
                             $event_body .= $this_robot->print_quote('battle_taunt', $this_find, $this_replace);
                             //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
-                            $this_robot->robot_frame = 'taunt';
-                            $actual_target_robot->robot_frame = 'base';
+                            $this_robot->set_frame('taunt');
+                            $actual_target_robot->set_frame('base');
                             $this->events_create($this_robot, $actual_target_robot, $event_header, $event_body, array('console_show_target' => false));
-                            $this_robot->robot_frame = 'base';
+                            $this_robot->set_frame('base');
                             // Create the quote flag to ensure robots don't repeat themselves
-                            $this_robot->flags['robot_quotes']['battle_taunt'] = true;
+                            $this_robot->set_flag('robot_quotes', 'battle_taunt', true);
                         }
 
                     }
@@ -1694,12 +1686,12 @@ class rpg_battle extends rpg_object {
                         $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : '').$this_robot->print_name().' taunts the opponent!<br />';
                         $event_body .= $this_robot->print_quote('battle_taunt', $this_find, $this_replace);
                         //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
-                        $this_robot->robot_frame = 'taunt';
-                        $target_robot->robot_frame = 'base';
+                        $this_robot->set_frame('taunt');
+                        $target_robot->set_frame('base');
                         $this->events_create($this_robot, $target_robot, $event_header, $event_body, array('console_show_target' => false));
-                        $this_robot->robot_frame = 'base';
+                        $this_robot->set_frame('base');
                         // Create the quote flag to ensure robots don't repeat themselves
-                        $this_robot->flags['robot_quotes']['battle_taunt'] = true;
+                        $this_robot->set_flag('robot_quotes', 'battle_taunt', true);
                     }
 
                 }
@@ -1962,10 +1954,7 @@ class rpg_battle extends rpg_object {
                 $temp_target_robot_immunities = $temp_target_robot->print_immunities();
                 $temp_target_robot_abilities = $temp_target_robot->print_abilities();
 
-                // Change the target robot's frame to defend base and save
-                $temp_target_robot->set_frame('taunt');
-
-                // Now change the target robot's frame is set to its mugshot
+                // Now change the target robot's frame is set to its taunt
                 $temp_target_robot->set_frame('taunt');
 
                 $temp_stat_padding_total = 300;
@@ -2114,8 +2103,7 @@ class rpg_battle extends rpg_object {
                 $this->events_create($temp_target_robot, false, $event_header, $event_body, array('console_container_height' => 2, 'canvas_show_this' => false)); //, 'event_flag_autoplay' => false
 
                 // Ensure the target robot's frame is set to its base
-                $temp_target_robot->robot_frame = 'base';
-                $temp_target_robot->update_session();
+                $temp_target_robot->set_frame('base');
 
                 // Add this robot to the global robot database array
                 if (!isset($_SESSION['GAME']['values']['robot_database'][$temp_target_robot->robot_token])){ $_SESSION['GAME']['values']['robot_database'][$temp_target_robot->robot_token] = array('robot_token' => $temp_target_robot->robot_token); }

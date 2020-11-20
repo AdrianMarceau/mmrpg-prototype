@@ -566,10 +566,10 @@ class rpg_disabled {
                 // Only display the event if the player is under level 100
                 if ($temp_target_robot->robot_level < 100 && $temp_target_robot->robot_class == 'master'){
                     // Display the win message for this robot with battle points
-                    $temp_target_robot->robot_frame = 'taunt';
-                    $temp_target_robot->robot_level = $temp_new_level;
-                    if ($temp_start_level != $temp_new_level){ $temp_target_robot->robot_experience = 1000; }
-                    $target_player->player_frame = 'victory';
+                    $temp_target_robot->set_frame('taunt');
+                    $temp_target_robot->set_level($temp_new_level);
+                    if ($temp_start_level != $temp_new_level){ $temp_target_robot->set_experience(1000); }
+                    $target_player->set_frame('victory');
                     $event_header = $temp_target_robot->robot_name.'&#39;s Rewards';
                     $event_multiplier_text = !empty($temp_robot_boost_text) ? $temp_robot_boost_text : '';
                     $event_body = $temp_target_robot->print_name().' collects '.$event_multiplier_text.'<span class="recovery_amount ability_type ability_type_cutter">'.number_format($options->earned_experience, 0, '.', ',').'</span> experience points! ';
@@ -584,17 +584,15 @@ class rpg_disabled {
                     $temp_target_robot->update_session();
                     $target_player->update_session();
                     $this_battle->events_create($temp_target_robot, $this_robot, $event_header, $event_body, $event_options);
-                    if ($temp_start_level != $temp_new_level){ $temp_target_robot->robot_experience = $temp_new_experience; }
+                    if ($temp_start_level != $temp_new_level){ $temp_target_robot->set_experience($temp_new_experience); }
                     $temp_target_robot->update_session();
                     $target_player->update_session();
                 }
 
                 // Floor the robot's experience with or without the event
-                $target_player->player_frame = 'victory';
-                $target_player->update_session();
-                $temp_target_robot->robot_frame = 'base';
-                if ($temp_start_level != $temp_new_level){ $temp_target_robot->robot_experience = 0; }
-                $temp_target_robot->update_session();
+                $target_player->set_frame('victory');
+                $temp_target_robot->set_frame('base');
+                if ($temp_start_level != $temp_new_level){ $temp_target_robot->set_experience(0); }
 
                 // If the level has been boosted, display the stat increases
                 if ($temp_start_level != $temp_new_level){
@@ -615,11 +613,11 @@ class rpg_disabled {
                     $event_options['this_ability_target'] = $temp_target_robot->robot_id.'_'.$temp_target_robot->robot_token;
 
                     // Display the win message for this robot with battle points
-                    $temp_target_robot->robot_frame = 'taunt';
-                    $temp_target_robot->robot_level = $temp_new_level;
-                    if ($temp_start_level != $temp_new_level){ $temp_target_robot->robot_experience = 1000; }
-                    else { $temp_target_robot->robot_experience = $temp_new_experience; }
-                    $target_player->player_frame = 'victory';
+                    $temp_target_robot->set_frame('taunt');
+                    $temp_target_robot->set_level($temp_new_level);
+                    if ($temp_start_level != $temp_new_level){ $temp_target_robot->set_experience(1000); }
+                    else { $temp_target_robot->set_experience($temp_new_experience); }
+                    $target_player->set_frame('victory');
                     $event_header = $temp_target_robot->robot_name.'&#39;s Rewards';
                     $event_body = $temp_target_robot->print_name().' grew to <span class="recovery_amount ability_type ability_type_level">Level '.$temp_new_level.($temp_is_max_level ? ' &#9733;' : '').'</span>!<br /> ';
                     $event_body .= $temp_target_robot->robot_name.'&#39;s energy, weapons, shields, and mobility were upgraded!';
@@ -628,7 +626,7 @@ class rpg_disabled {
                     $temp_target_robot->update_session();
                     $target_player->update_session();
                     $this_battle->events_create($temp_target_robot, $this_robot, $event_header, $event_body, $event_options);
-                    $temp_target_robot->robot_experience = 0;
+                    $temp_target_robot->set_experience(0);
                     $temp_target_robot->update_session();
 
                     // Collect the base robot template from the index for calculations

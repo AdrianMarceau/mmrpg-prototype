@@ -207,18 +207,14 @@ if ($target_player->player_token != 'player'){
     $event_options['console_show_this_player'] = true;
     $event_options['console_show_target'] = false;
     $event_options['console_show_target_player'] = false;
-    $target_player->player_frame = 'taunt';
-    $target_player->update_session();
-    $target_robot->robot_frame = 'taunt';
-    $target_robot->robot_frame_styles = '';
-    $target_robot->robot_detail_styles = '';
-    $target_robot->robot_position = 'active';
-    $target_robot->update_session();
+    $target_player->set_frame('taunt');
+    $target_robot->set_frame('taunt');
+    $target_robot->set_frame_styles('');
+    $target_robot->set_detail_styles('');
+    $target_robot->set_position('active');
     $this_battle->events_create($target_robot, $this_robot, $event_header, $event_body, $event_options);
-    $target_player->player_frame = 'base';
-    $target_player->update_session();
-    $target_robot->robot_frame = 'base';
-    $target_robot->update_session();
+    $target_player->set_frame('base');
+    $target_robot->set_frame('base');
     //if ($this_player->counters['robots_active'] == 1){ $this_battle->events_create(false, false, __LINE__.'', __LINE__.'', $event_options); }
 
     // Then queue up an the target robot's startup action
@@ -243,18 +239,14 @@ if ($target_player->player_token != 'player'){
     $event_options['console_show_this_player'] = true;
     $event_options['console_show_target_player'] = false;
     $event_options['canvas_show_target_robots'] = true;
-    $this_player->player_frame = 'taunt';
-    $this_player->update_session();
-    $this_robot->robot_frame = 'taunt';
-    $this_robot->robot_frame_styles = '';
-    $this_robot->robot_detail_styles = '';
-    $this_robot->robot_position = 'active';
-    $this_robot->update_session();
+    $this_player->set_frame('taunt');
+    $this_robot->set_frame('taunt');
+    $this_robot->set_frame_styles('');
+    $this_robot->set_detail_styles('');
+    $this_robot->set_position('active');
     $this_battle->events_create($this_robot, $target_robot, $event_header, $event_body, $event_options);
-    $this_player->player_frame = 'base';
-    $this_player->update_session();
-    $this_robot->robot_frame = 'base';
-    $this_robot->update_session();
+    $this_player->set_frame('base');
+    $this_robot->set_frame('base');
     //if ($this_player->counters['robots_active'] == 1){ $this_battle->events_create(false, false, __LINE__.'', __LINE__.'', $event_options); }
 
     // Queue up this robot's startup action first
@@ -331,57 +323,49 @@ elseif ($target_player->player_token == 'player'){
     }
 
     // Update player and robot frames then show the event
-    $this_player->player_frame = 'taunt';
-    $this_player->update_session();
-    $this_robot->robot_frame = 'taunt';
-    $this_robot->robot_frame_styles = '';
-    $this_robot->robot_detail_styles = '';
-    $this_robot->robot_position = 'active';
-    $this_robot->update_session();
+    $this_player->set_frame('taunt');
+    $this_robot->set_frame('taunt');
+    $this_robot->set_frame_styles('');
+    $this_robot->set_detail_styles('');
+    $this_robot->set_position('active');
     $this_battle->events_create($this_robot, $target_robot, $event_header, $event_body, $event_options);
-    $this_player->player_frame = 'base';
-    $this_player->update_session();
-    $this_robot->robot_frame = 'base';
-    $this_robot->update_session();
+    $this_player->set_frame('base');
+    $this_robot->set_frame('base');
 
 }
 
 // Execute the battle actions
 $this_battle->actions_execute();
 
-// Change all this player's robot sprite to their taunt, then show 'em
+// Change all this player's robot sprite to their taunt
 foreach ($this_player->values['robots_active'] AS $key => $info){
     if (!preg_match('/display:\s?none;/i', $info['robot_frame_styles'])){ continue; }
     if ($this_robot->robot_id == $info['robot_id']){
-        $this_robot->robot_frame = 'taunt';
-        $this_robot->robot_frame_styles = '';
-        $this_robot->robot_detail_styles = '';
-        $this_robot->update_session();
+        $this_robot->set_frame('taunt');
+        $this_robot->set_frame_styles('');
+        $this_robot->set_detail_styles('');
     } else {
         $temp_robot = rpg_game::get_robot($this_battle, $this_player, $info);
-        $temp_robot->robot_frame = 'taunt';
-        $temp_robot->robot_frame_styles = '';
-        $temp_robot->robot_detail_styles = '';
-        $temp_robot->update_session();
+        $temp_robot->set_frame('taunt');
+        $temp_robot->set_frame_styles('');
+        $temp_robot->set_detail_styles('');
     }
-} $this_battle->events_create(false, false, '', '');
+}
 
-// Change all this player's robot sprite back to their base, then update
+// Create an event to show the robots in their taunt sprites
+$this_battle->events_create(false, false, '', '');
+
+// Change all this player's robot sprite back to their base sprites
 foreach ($this_player->values['robots_active'] AS $key => $info){
-    if (!preg_match('/display:\s?none;/i', $info['robot_frame_styles'])){ continue; }
     if ($this_robot->robot_id == $info['robot_id']){
-        $this_robot->robot_frame = 'base';
-        $this_robot->update_session();
+        $this_robot->set_frame('base');
     } else {
         $temp_robot = rpg_game::get_robot($this_battle, $this_player, $info);
-        $temp_robot->robot_frame = 'base';
-        $temp_robot->update_session();
+        $temp_robot->set_frame('base');
     }
-} // $this_battle->events_create(false, false, '', '');
+}
 
 // Create a final frame before giving control to the user
 $this_battle->events_create(false, false, '', '');
-
-
 
 ?>

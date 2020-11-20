@@ -178,15 +178,21 @@ class rpg_canvas {
             */
 
         // If this robot is on the bench and inactive, override default sprite frames
-        if ($this_data['robot_position'] == 'bench' && $this_data['robot_frame'] == 'base' && $this_data['robot_status'] != 'disabled'){
-            // Define a randomly generated integer value
-            $random_int = mt_rand(1, 10);
-            // If the random number was one, show an attack frame
-            if ($random_int == 1){ $this_data['robot_frame'] = 'taunt'; }
-            // Else if the random number was two, show a defense frame
-            elseif ($random_int == 2){ $this_data['robot_frame'] = 'defend'; }
-            // Else if the random number was anything else, show the base frame
-            else { $this_data['robot_frame'] = 'base'; }
+        if ($this_data['robot_position'] == 'bench'
+            && $this_data['robot_status'] != 'disabled'){
+            // Only override sprite if this robot is in the default/base frame
+            if ($this_data['robot_frame'] == 'base'){
+                // Define a randomly generated integer value
+                $random_int = mt_rand(1, 100);
+                // Use the random int to decide which frame to show this benched robot in
+                if ($random_int >= 90){ $this_data['robot_frame'] = 'base2'; }
+                elseif ($random_int >= 80){ $this_data['robot_frame'] = 'taunt'; }
+                elseif ($random_int >= 70){ $this_data['robot_frame'] = 'defend'; }
+                else { $this_data['robot_frame'] = 'base'; }
+                //error_log('robot = '.$this_data['robot_token'].' | int = '.$random_int.' | frame = '.$this_data['robot_frame']);
+            } else {
+                //error_log('robot = '.$this_data['robot_token'].' | stuck in frame = '.$this_data['robot_frame']);
+            }
         }
 
         // If this robot is being damaged of is defending

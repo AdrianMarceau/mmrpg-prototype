@@ -776,7 +776,7 @@ function mmrpg_canvas_animate(){
 
 
     // Loop through all players on the field
-    $('.sprite[data-type=player]', gameCanvas).each(function(){
+    $('.sprite[data-type="player"]', gameCanvas).each(function(){
 
         // Collect a reference to the current player
         var thisPlayer = $(this);
@@ -819,7 +819,7 @@ function mmrpg_canvas_animate(){
 
 
     // Loop through all robots on the field
-    $('.sprite[data-type=robot]', gameCanvas).each(function(){
+    $('.sprite[data-type="robot"]', gameCanvas).each(function(){
 
         // Collect a reference to the current robot
         var thisRobot = $(this);
@@ -847,8 +847,10 @@ function mmrpg_canvas_animate(){
                         // Animation freqency based on position
                         if (thisRobot.attr('data-position') != 'active'){
                             // Higher animation freqency if not active (BENCH)
-                            if (battleStatus == 'complete' && thisRandom >= 60){
+                            if (battleStatus == 'complete' && thisRandom >= 50){
                                 newFrame = relativeResult;
+                                } else if (thisRandom >= 80){
+                                newFrame = 'base2';
                                 } else if (thisRandom >= 50){
                                 newFrame = 'taunt';
                                 } else if (thisRandom >= 40){
@@ -858,6 +860,8 @@ function mmrpg_canvas_animate(){
                             // Lower animation freqency if active (ACTIVE)
                             if (battleStatus == 'complete' && thisRandom >= 50){
                                 newFrame = relativeResult;
+                                } else if (thisRandom >= 90){
+                                newFrame = 'base2';
                                 } else if (thisRandom >= 30){
                                 newFrame = 'defend';
                                 } else if (thisRandom >= 20){
@@ -962,7 +966,7 @@ function mmrpg_canvas_field_frame(thisField, newFrame){
 var spriteFrameIndex = {};
 
 // Define a function for updating a robot's frame with animation
-spriteFrameIndex.robots = ['base','taunt','victory','defeat','shoot','throw','summon','slide','defend','damage'];
+spriteFrameIndex.robots = ['base','taunt','victory','defeat','shoot','throw','summon','slide','defend','damage','base2'];
 function mmrpg_canvas_robot_frame(thisRobot, newFrame){
     // Collect this robot's data fields
     var thisSize = thisRobot.attr('data-size');

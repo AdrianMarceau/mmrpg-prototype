@@ -262,28 +262,7 @@ body.index #header {
 #mmrpg .sprite_40x40_slide { background-position: -280px 0; }
 #mmrpg .sprite_40x40_defend { background-position: -320px 0; }
 #mmrpg .sprite_40x40_damage { background-position: -360px 0; }
-#mmrpg .sprite_40x40_left_mugshot { background-position: 0 0; }
-#mmrpg .sprite_40x40_left_base { background-position: -40px 0; }
-#mmrpg .sprite_40x40_left_taunt { background-position: -80px 0; }
-#mmrpg .sprite_40x40_left_victory { background-position: -120px 0; }
-#mmrpg .sprite_40x40_left_defeat { background-position: -160px 0; }
-#mmrpg .sprite_40x40_left_shoot { background-position: -200px 0; }
-#mmrpg .sprite_40x40_left_throw { background-position: -240px 0; }
-#mmrpg .sprite_40x40_left_summon { background-position: -280px 0; }
-#mmrpg .sprite_40x40_left_slide { background-position: -320px 0; }
-#mmrpg .sprite_40x40_left_defend { background-position: -360px 0; }
-#mmrpg .sprite_40x40_left_damage { background-position: -400px 0; }
-#mmrpg .sprite_40x40_right_mugshot { background-position: 0 -40px; }
-#mmrpg .sprite_40x40_right_base { background-position: -40px -40px; }
-#mmrpg .sprite_40x40_right_taunt { background-position: -80px -40px; }
-#mmrpg .sprite_40x40_right_victory { background-position: -120px -40px; }
-#mmrpg .sprite_40x40_right_defeat { background-position: -160px -40px; }
-#mmrpg .sprite_40x40_right_shoot { background-position: -200px -40px; }
-#mmrpg .sprite_40x40_right_throw { background-position: -240px -40px; }
-#mmrpg .sprite_40x40_right_summon { background-position: -280px -40px; }
-#mmrpg .sprite_40x40_right_slide { background-position: -320px -40px; }
-#mmrpg .sprite_40x40_right_defend { background-position: -360px -40px; }
-#mmrpg .sprite_40x40_right_damage { background-position: -400px -40px; }
+#mmrpg .sprite_40x40_base2 { background-position: -400px 0; }
 
 #mmrpg .sprite_40x40_ { display: none; }
 #mmrpg .sprite_40x40_00 { background-position: 0 0; }
@@ -297,6 +276,7 @@ body.index #header {
 #mmrpg .sprite_40x40_08 { background-position: -320px 0; }
 #mmrpg .sprite_40x40_09 { background-position: -360px 0; }
 #mmrpg .sprite_40x40_10 { background-position: -400px 0; }
+#mmrpg .sprite_40x40_11 { background-position: -440px 0; }
 #mmrpg .sprite_40x40_left_ { display: none; }
 #mmrpg .sprite_40x40_left_00 { background-position: 0 0; }
 #mmrpg .sprite_40x40_left_01 { background-position: -40px 0; }
@@ -309,6 +289,7 @@ body.index #header {
 #mmrpg .sprite_40x40_left_08 { background-position: -320px 0; }
 #mmrpg .sprite_40x40_left_09 { background-position: -360px 0; }
 #mmrpg .sprite_40x40_left_10 { background-position: -400px 0; }
+#mmrpg .sprite_40x40_left_11 { background-position: -440px 0; }
 #mmrpg .sprite_40x40_right_ { display: none; }
 #mmrpg .sprite_40x40_right_00 { background-position: 0 -40px; }
 #mmrpg .sprite_40x40_right_01 { background-position: -40px -40px; }
@@ -321,6 +302,7 @@ body.index #header {
 #mmrpg .sprite_40x40_right_08 { background-position: -320px -40px; }
 #mmrpg .sprite_40x40_right_09 { background-position: -360px -40px; }
 #mmrpg .sprite_40x40_right_10 { background-position: -400px -40px; }
+#mmrpg .sprite_40x40_right_11 { background-position: -440px -40px; }
 
 #mmrpg .sprite_40x40_focus {
     z-index: 9999 !important;
@@ -342,28 +324,7 @@ body.index #header {
 #mmrpg .sprite_80x80_slide { background-position: -560px 0; }
 #mmrpg .sprite_80x80_defend { background-position: -640px 0; }
 #mmrpg .sprite_80x80_damage { background-position: -720px 0; }
-#mmrpg .sprite_80x80_left_mugshot { background-position: 0 0; }
-#mmrpg .sprite_80x80_left_base { background-position: -80px 0; }
-#mmrpg .sprite_80x80_left_taunt { background-position: -160px 0; }
-#mmrpg .sprite_80x80_left_victory { background-position: -240px 0; }
-#mmrpg .sprite_80x80_left_defeat { background-position: -320px 0; }
-#mmrpg .sprite_80x80_left_shoot { background-position: -400px 0; }
-#mmrpg .sprite_80x80_left_throw { background-position: -480px 0; }
-#mmrpg .sprite_80x80_left_summon { background-position: -560px 0; }
-#mmrpg .sprite_80x80_left_slide { background-position: -640px 0; }
-#mmrpg .sprite_80x80_left_defend { background-position: -720px 0; }
-#mmrpg .sprite_80x80_left_damage { background-position: -800px 0; }
-#mmrpg .sprite_80x80_right_mugshot { background-position: 0 -80px; }
-#mmrpg .sprite_80x80_right_base { background-position: -80px -80px; }
-#mmrpg .sprite_80x80_right_taunt { background-position: -160px -80px; }
-#mmrpg .sprite_80x80_right_victory { background-position: -240px -80px; }
-#mmrpg .sprite_80x80_right_defeat { background-position: -320px -80px; }
-#mmrpg .sprite_80x80_right_shoot { background-position: -400px -80px; }
-#mmrpg .sprite_80x80_right_throw { background-position: -480px -80px; }
-#mmrpg .sprite_80x80_right_summon { background-position: -560px -80px; }
-#mmrpg .sprite_80x80_right_slide { background-position: -640px -80px; }
-#mmrpg .sprite_80x80_right_defend { background-position: -720px -80px; }
-#mmrpg .sprite_80x80_right_damage { background-position: -800px -80px; }
+#mmrpg .sprite_80x80_base2 { background-position: -800px 0; }
 
 #mmrpg .sprite_80x80_ { display: none; }
 #mmrpg .sprite_80x80_00 { background-position: 0 0; }
@@ -377,6 +338,7 @@ body.index #header {
 #mmrpg .sprite_80x80_08 { background-position: -640px 0; }
 #mmrpg .sprite_80x80_09 { background-position: -720px 0; }
 #mmrpg .sprite_80x80_10 { background-position: -800px 0; }
+#mmrpg .sprite_80x80_11 { background-position: -880px 0; }
 #mmrpg .sprite_80x80_left_ { display: none; }
 #mmrpg .sprite_80x80_left_00 { background-position: 0 0; }
 #mmrpg .sprite_80x80_left_01 { background-position: -80px 0; }
@@ -389,6 +351,7 @@ body.index #header {
 #mmrpg .sprite_80x80_left_08 { background-position: -640px 0; }
 #mmrpg .sprite_80x80_left_09 { background-position: -720px 0; }
 #mmrpg .sprite_80x80_left_10 { background-position: -800px 0; }
+#mmrpg .sprite_80x80_left_11 { background-position: -880px 0; }
 #mmrpg .sprite_80x80_right_ { display: none; }
 #mmrpg .sprite_80x80_right_00 { background-position: 0 -80px; }
 #mmrpg .sprite_80x80_right_01 { background-position: -80px -80px; }
@@ -401,6 +364,7 @@ body.index #header {
 #mmrpg .sprite_80x80_right_08 { background-position: -640px -80px; }
 #mmrpg .sprite_80x80_right_09 { background-position: -720px -80px; }
 #mmrpg .sprite_80x80_right_10 { background-position: -800px -80px; }
+#mmrpg .sprite_80x80_right_11 { background-position: -880px -80px; }
 
 #mmrpg .sprite_80x80_focus {
     z-index: 9999 !important;
@@ -422,28 +386,7 @@ body.index #header {
 #mmrpg .sprite_160x160_slide { background-position: -1120px 0; }
 #mmrpg .sprite_160x160_defend { background-position: -1280px 0; }
 #mmrpg .sprite_160x160_damage { background-position: -1440px 0; }
-#mmrpg .sprite_160x160_left_mugshot { background-position: 0 0; }
-#mmrpg .sprite_160x160_left_base { background-position: -80px 0; }
-#mmrpg .sprite_160x160_left_taunt { background-position: -160px 0; }
-#mmrpg .sprite_160x160_left_victory { background-position: -240px 0; }
-#mmrpg .sprite_160x160_left_defeat { background-position: -320px 0; }
-#mmrpg .sprite_160x160_left_shoot { background-position: -400px 0; }
-#mmrpg .sprite_160x160_left_throw { background-position: -480px 0; }
-#mmrpg .sprite_160x160_left_summon { background-position: -560px 0; }
-#mmrpg .sprite_160x160_left_slide { background-position: -640px 0; }
-#mmrpg .sprite_160x160_left_defend { background-position: -720px 0; }
-#mmrpg .sprite_160x160_left_damage { background-position: -800px 0; }
-#mmrpg .sprite_160x160_right_mugshot { background-position: 0 -80px; }
-#mmrpg .sprite_160x160_right_base { background-position: -80px -80px; }
-#mmrpg .sprite_160x160_right_taunt { background-position: -160px -80px; }
-#mmrpg .sprite_160x160_right_victory { background-position: -240px -80px; }
-#mmrpg .sprite_160x160_right_defeat { background-position: -320px -80px; }
-#mmrpg .sprite_160x160_right_shoot { background-position: -400px -80px; }
-#mmrpg .sprite_160x160_right_throw { background-position: -480px -80px; }
-#mmrpg .sprite_160x160_right_summon { background-position: -560px -80px; }
-#mmrpg .sprite_160x160_right_slide { background-position: -640px -80px; }
-#mmrpg .sprite_160x160_right_defend { background-position: -720px -80px; }
-#mmrpg .sprite_160x160_right_damage { background-position: -800px -80px; }
+#mmrpg .sprite_160x160_base2 { background-position: -1600px 0; }
 
 #mmrpg .sprite_160x160_ { display: none; }
 #mmrpg .sprite_160x160_00 { background-position: 0 0; }
@@ -457,6 +400,7 @@ body.index #header {
 #mmrpg .sprite_160x160_08 { background-position: -1280px 0; }
 #mmrpg .sprite_160x160_09 { background-position: -1440px 0; }
 #mmrpg .sprite_160x160_10 { background-position: -1600px 0; }
+#mmrpg .sprite_160x160_11 { background-position: -1760px 0; }
 #mmrpg .sprite_160x160_left_ { display: none; }
 #mmrpg .sprite_160x160_left_00 { background-position: 0 0; }
 #mmrpg .sprite_160x160_left_01 { background-position: -160px 0; }
@@ -469,6 +413,7 @@ body.index #header {
 #mmrpg .sprite_160x160_left_08 { background-position: -1280px 0; }
 #mmrpg .sprite_160x160_left_09 { background-position: -1440px 0; }
 #mmrpg .sprite_160x160_left_10 { background-position: -1600px 0; }
+#mmrpg .sprite_160x160_left_11 { background-position: -1760px 0; }
 #mmrpg .sprite_160x160_right_ { display: none; }
 #mmrpg .sprite_160x160_right_00 { background-position: 0 -160px; }
 #mmrpg .sprite_160x160_right_01 { background-position: -160px -160px; }
@@ -481,6 +426,7 @@ body.index #header {
 #mmrpg .sprite_160x160_right_08 { background-position: -1280px -160px; }
 #mmrpg .sprite_160x160_right_09 { background-position: -1440px -160px; }
 #mmrpg .sprite_160x160_right_10 { background-position: -1600px -160px; }
+#mmrpg .sprite_160x160_right_11 { background-position: -1760px -160px; }
 
 #mmrpg .sprite_160x160_focus {
     z-index: 9999 !important;
