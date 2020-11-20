@@ -1312,6 +1312,14 @@ button {
 
 }
 
+#window .page .database_container .subbody .body table td.music a span.album {
+    display: none;
+    font-size: 9px;
+    line-height: 100%;
+    position: relative;
+    bottom: 2px;
+}
+
 #window .page .database_container .subbody .link_top,
 #window .page .database_container .subbody .link_permalink {
     margin-bottom: 4px;

@@ -1840,13 +1840,45 @@ class rpg_game {
     }
 
     // Define a function for getting (or generating) the music/sound file index from the defined CDN
-    public static function get_music_index(){
+    public static function get_music_index($subkey = false){
 
         // Pass the work off to the dedicated CDN index function
-        static $music_index;
-        if (empty($music_index)){ $music_index = self::get_cdn_index(MMRPG_CONFIG_CDN_PROJECT, 'music'); }
-        return $music_index;
+        static $raw_music_index;
+        if (empty($raw_music_index)){ $raw_music_index = self::get_cdn_index(MMRPG_CONFIG_CDN_PROJECT, 'music'); }
+        if (!empty($subkey) && isset($raw_music_index[$subkey])){ return $raw_music_index[$subkey]; }
+        return $raw_music_index;
 
+    }
+
+    // Define a function for getting (or generating) an index of music paths and info from the CDN
+    public static function get_music_paths_index(){
+        static $music_paths_index;
+        if (empty($music_paths_index)){
+            $music_paths_index = array();
+            $raw_index = self::get_music_index('index');
+            if (!empty($raw_index)){
+                foreach ($raw_index AS $key => $info){
+                $music_paths_index[$info['music_path']] = $info;
+                }
+            }
+        }
+        return $music_paths_index;
+    }
+
+    // Define a function for getting (or generating) an index of music/sound files from the CDN
+    public static function get_music_files_index(){
+        static $music_files_index;
+        if (empty($music_files_index)){
+            $music_files_index = self::get_music_index('files');
+        }
+        return $music_files_index;
+    }
+
+    // Define a function for getting (or generating) the music/sound file index from the defined CDN
+    public static function get_music_info_by_path($music_path){
+        $music_paths_index = self::get_music_paths_index();
+        if (isset($music_paths_index[$music_path])){ return $music_paths_index[$music_path]; }
+        else { return false; }
     }
 
     // Define a function for getting (or generating) the gallery screenshots file index from the defined CDN

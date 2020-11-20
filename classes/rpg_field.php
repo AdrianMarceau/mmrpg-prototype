@@ -1199,34 +1199,41 @@ class rpg_field extends rpg_object {
                                     <td class="right music" data-count="<?= count($field_info['field_music_link']) ?>">
                                         <label style="display: block; float: left;">Music :</label>
                                         <?
-                                        if (!empty($field_info['field_music_name'])){
-                                            // Break up the field name for responsive styles
-                                            $name = $field_info['field_music_name'];
+                                        // If the field music is NOT empty, attempt to gather info from the index
+                                        $field_music_info = false;
+                                        if (!empty($field_info['field_music'])){
+                                            $field_music_info = rpg_game::get_music_info_by_path($field_info['field_music']);
+                                        }
+                                        // If info for this music was pulled, display it, otherwise display ???
+                                        if (!empty($field_music_info)){
+
+                                            // Collect the music link if available
+                                            $link = !empty($field_music_info['music_link']) ? $field_music_info['music_link'] : '';
+
+                                            // Break up the music name for responsive styles
+                                            $name = $field_music_info['music_name'];
                                             if (!strstr($name, '(')){
                                                 $name1 = $name;
                                                 $name2 = '';
                                             } else {
                                                 list($name1, $name2) = explode(' (', trim($field_info['field_music_name'], ')'));
                                                 $name1 = '<span>'.$name1.'</span>';
-                                                $name2 = '<span> ('.$name2.')</span>';
+                                                $name2 = '<span class="album"> ('.$name2.')</span>';
                                             }
+
+                                            // Print out the generated name and link if available
+                                            echo('<a class="field_type field_type_none"'.(!empty($link) ? ' href="'.$link.'" target="_blank"' : '').' title="'.$name.'">');
+                                                echo($name1.$name2);
+                                                if (!empty($link)){ echo(' <img src="images/external-link_icon.gif" alt="" />'); }
+                                            echo('</a>'.PHP_EOL);
+
+                                        } else {
+
+                                            // Print out an enigmatic ???
+                                            echo('<span class="field_type">???</span>'.PHP_EOL);
+
                                         }
                                         ?>
-                                        <? if(!empty($field_info['field_music_name']) && !empty($field_info['field_music_link'])): ?>
-                                            <?
-                                            ?>
-                                            <? if(is_array($field_info['field_music_link'])):?>
-                                                <? foreach($field_info['field_music_link'] AS $key => $link): ?>
-                                                    <a href="<?= $link ?>" target="_blank" class="field_type field_type_none"><?= $key == 0 ? $name1.$name2 : $key + 1 ?> <img src="images/external-link_icon.gif" alt="" /></a>
-                                                <? endforeach; ?>
-                                            <? else: ?>
-                                                <a href="<?= $field_info['field_music_link'] ?>" target="_blank" class="field_type field_type_none"><?= $name1.$name2 ?> <img src="images/external-link_icon.gif" alt="" /></a>
-                                            <? endif; ?>
-                                        <? elseif(!empty($field_info['field_music_name'])): ?>
-                                            <span class="field_type field_type_none"><?= $name1.$name2 ?></span>
-                                        <? else: ?>
-                                            <span class="field_type">???</span>
-                                        <? endif; ?>
                                     </td>
                                 </tr>
                                 <tr>

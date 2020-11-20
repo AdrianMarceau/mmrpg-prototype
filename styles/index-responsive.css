@@ -216,7 +216,7 @@ body:before {
     #window .page .database_container .subbody .body table td.music a > span:first-child {
         padding: 0 3px;
     }
-    #window .page .database_container .subbody .body table td.music a > span:last-child {
+    #window .page .database_container .subbody .body table td.music a span.album {
         display: none;
     }
 
