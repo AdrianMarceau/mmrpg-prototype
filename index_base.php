@@ -273,6 +273,19 @@ if (!empty($db_page_info)){
 //echo('<pre>$db_page_info = '.print_r($db_page_info, true).'</pre><br />'.PHP_EOL);
 //exit();
 
+// If no body markup was generated, there must be an error
+if (empty($this_markup_body)){
+    http_response_code(404);
+    $this_markup_body = '';
+    $this_markup_body .= '<div class="header"><div class="header_wrapper"><h1 class="title">404 Page Not Found</h1></div></div>';
+    $this_markup_body .= '<div class="subbody">';
+        $this_markup_body .= '<p class="text" style="text-align: center; padding: 20px; font-size: 120%; line-height: 1.6;">';
+        $this_markup_body .= 'The page you were looking for could not be found. <br /> ';
+        $this_markup_body .= 'Please return to <a class="link_inline" href="'.MMRPG_CONFIG_ROOTURL.'">the home page</a> and try again. ';
+        $this_markup_body .= '</p>';
+    $this_markup_body .= '</div>';
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en" xmlns:og="http://opengraphprotocol.org/schema/">
@@ -504,6 +517,7 @@ if ($this_current_page == 'file' // File sub-pages
             <a href="<?= MMRPG_CONFIG_ROOTURL ?>">&laquo; Back to Home</a> |
         <? endif; ?>
         Mega Man and all related names and characters are &copy; <a href="http://www.capcom.com/" target="_blank" rel="nofollow">Capcom</a> 1986 - <?= date('Y') ?>.
+        | <a href="<?= MMRPG_CONFIG_ROOTURL ?>cookies/">Cookie Policy</a>
         | <a href="<?= MMRPG_CONFIG_ROOTURL ?>contact/">Contact &amp; Feedback</a>
         | <a rel="nofollow" href="<?= MMRPG_CONFIG_ROOTURL ?>api/" target="_blank">Data API</a>
         <?= !$flag_iphone ? '<br />' : '' ?>
