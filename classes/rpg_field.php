@@ -427,8 +427,19 @@ class rpg_field extends rpg_object {
         // Explode json encoded fields into expanded array objects
         $temp_field_names = self::get_json_index_fields();
         foreach ($temp_field_names AS $field_name){
-            if (!empty($field_info[$field_name])){ $field_info[$field_name] = json_decode($field_info[$field_name], true); }
-            else { $field_info[$field_name] = array(); }
+            $field_value = $field_info[$field_name];
+            if (!empty($field_info[$field_name])){
+                $fchar = substr($field_value, 0, 1);
+                $lchar = substr($field_value, -1, 1);
+                if (($fchar === '{' && $lchar === '}')
+                    || ($fchar === '[' && $lchar === ']')){
+                    $field_info[$field_name] = json_decode($field_value, true);
+                } else {
+                    $field_info[$field_name] = array(trim($field_value, '" '));
+                }
+            } else {
+                $field_info[$field_name] = array();
+            }
         }
 
         // Return the parsed field info
@@ -1206,10 +1217,10 @@ class rpg_field extends rpg_object {
                                             ?>
                                             <? if(is_array($field_info['field_music_link'])):?>
                                                 <? foreach($field_info['field_music_link'] AS $key => $link): ?>
-                                                    <a href="<?= $link ?>" target="_blank" class="field_type field_type_none"><?= $key == 0 ? $name1.$name2 : $key + 1 ?></a>
+                                                    <a href="<?= $link ?>" target="_blank" class="field_type field_type_none"><?= $key == 0 ? $name1.$name2 : $key + 1 ?> <img src="images/external-link_icon.gif" alt="" /></a>
                                                 <? endforeach; ?>
                                             <? else: ?>
-                                                <a href="<?= $field_info['field_music_link'] ?>" target="_blank" class="field_type field_type_none"><?= $name1.$name2 ?></a>
+                                                <a href="<?= $field_info['field_music_link'] ?>" target="_blank" class="field_type field_type_none"><?= $name1.$name2 ?> <img src="images/external-link_icon.gif" alt="" /></a>
                                             <? endif; ?>
                                         <? elseif(!empty($field_info['field_music_name'])): ?>
                                             <span class="field_type field_type_none"><?= $name1.$name2 ?></span>
