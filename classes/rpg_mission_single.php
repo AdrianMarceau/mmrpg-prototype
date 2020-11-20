@@ -507,23 +507,9 @@ class rpg_mission_single extends rpg_mission {
         if ($starfield_mission){
             $trobots = array_values($temp_battle_omega['battle_target_player']['player_robots']);
             if (!empty($trobots)){
-                $atoken = 'sega-remix';
-                $rtoken = $trobots[0]['robot_token'];
-                $gtoken = strtolower($this_robot_index[$rtoken]['robot_game']);
-                $music_path = $atoken.'/'.$rtoken.'-'.$gtoken.'/';
-                //$temp_battle_omega['battle_description2'] .= '| maybe music:'.$music_path.' ';
-                if (rpg_game::sound_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
-                    $temp_battle_omega['battle_field_base']['field_music'] = $music_path;
-                } else {
-                    $atoken = 'fallbacks';
-                    $music_path2 = $atoken.'/'.$rtoken.'-'.$gtoken.'/';
-                    //$temp_battle_omega['battle_description2'] .= '| maybe music2:'.$music_path2.' ';
-                    if (rpg_game::sound_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path2)){
-                        $temp_battle_omega['battle_field_base']['field_music'] = $music_path2;
-                    }
-                }
+                $custom_music = rpg_robot::get_custom_music_path($trobots[0]['robot_token']);
+                if (!empty($custom_music)){ $temp_battle_omega['battle_field_base']['field_music'] = $custom_music; }
             }
-            //$temp_battle_omega['battle_description2'] .= '| final music:'.$temp_battle_omega['battle_field_base']['field_music'].' ';
         }
 
         // Return the generated battle data

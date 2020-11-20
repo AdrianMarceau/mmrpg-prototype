@@ -1839,6 +1839,19 @@ class rpg_game {
 
     }
 
+    // Define a function for getting (or generating) the gallery screenshots file index from the defined CDN
+    public static function get_gallery_index($folder = ''){
+
+        // Pass the work off to the dedicated CDN index function
+        static $gallery_index;
+        if (empty($gallery_index)){ $gallery_index = self::get_cdn_index(MMRPG_CONFIG_CDN_PROJECT, 'images/gallery'.(!empty($folder) ? '/'.$folder : '')); }
+        return $gallery_index;
+
+    }
+
+
+    // -- GAME GALLERY FUNCTIONS -- //
+
     // Define a function for getting (or generating) the music/sound file index from the defined CDN
     public static function get_music_index($subkey = false){
 
@@ -1849,6 +1862,9 @@ class rpg_game {
         return $raw_music_index;
 
     }
+
+
+    // -- GAME MUSIC FUNCTIONS -- //
 
     // Define a function for getting (or generating) an index of music paths and info from the CDN
     public static function get_music_paths_index(){
@@ -1879,16 +1895,6 @@ class rpg_game {
         $music_paths_index = self::get_music_paths_index();
         if (isset($music_paths_index[$music_path])){ return $music_paths_index[$music_path]; }
         else { return false; }
-    }
-
-    // Define a function for getting (or generating) the gallery screenshots file index from the defined CDN
-    public static function get_gallery_index($folder = ''){
-
-        // Pass the work off to the dedicated CDN index function
-        static $gallery_index;
-        if (empty($gallery_index)){ $gallery_index = self::get_cdn_index(MMRPG_CONFIG_CDN_PROJECT, 'images/gallery'.(!empty($folder) ? '/'.$folder : '')); }
-        return $gallery_index;
-
     }
 
 

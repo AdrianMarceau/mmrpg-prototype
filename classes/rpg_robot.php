@@ -5634,5 +5634,37 @@ class rpg_robot extends rpg_object {
         }
     }
 
+    // Define a function for determining this robot's music track if possible
+    public static function get_custom_music_path($robot_token, $album_name = ''){
+        // Collect the game token for this robot given its token
+        $robot_info = self::get_index_info($robot_token);
+        $robot_game = $robot_info['robot_game'];
+        // If the album was not provided, use the default game album
+        if (empty($album_name)){ $album_name = 'sega-remix'; }
+        // Try to use it's default album track for this robot master
+        $atoken = $album_name;
+        $rtoken = $robot_token;
+        $gtoken = strtolower($robot_game);
+        $music_path = $atoken.'/'.$rtoken.'-'.$gtoken.'/';
+        if (rpg_game::sound_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
+            return $music_path;
+        } else {
+            // Else if that doesn't work, try using the OST track for this robot master
+            $atoken = $gtoken.'-ost';
+            $music_path2 = $atoken.'/'.$rtoken.'/';
+            if (rpg_game::sound_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path2)){
+                return $music_path2;
+            } else {
+                // Else if that doesn't work, try using the fallback track for this robot master
+                $atoken = 'fallbacks';
+                $music_path3 = $atoken.'/'.$rtoken.'-'.$gtoken.'/';
+                if (rpg_game::sound_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path3)){
+                    return $music_path3;
+                }
+            }
+        }
+        return false;
+    }
+
 }
 ?>
