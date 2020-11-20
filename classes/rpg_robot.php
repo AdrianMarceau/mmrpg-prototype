@@ -2342,6 +2342,7 @@ class rpg_robot extends rpg_object {
             'robot_quotes_taunt',
             'robot_quotes_victory',
             'robot_quotes_defeat',
+            'robot_quotes_custom',
             'robot_flag_hidden',
             'robot_flag_complete',
             'robot_flag_unlockable',
@@ -2382,7 +2383,8 @@ class rpg_robot extends rpg_object {
             'robot_affinities',
             'robot_immunities',
             'robot_abilities_compatible',
-            'robot_abilities_rewards'
+            'robot_abilities_rewards',
+            'robot_quotes_custom'
             );
 
         // Implode the index fields into a string if requested

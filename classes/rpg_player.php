@@ -1757,6 +1757,7 @@ class rpg_player extends rpg_object {
             'player_quotes_taunt',
             'player_quotes_victory',
             'player_quotes_defeat',
+            'player_quotes_custom',
             'player_flag_hidden',
             'player_flag_complete',
             'player_flag_published',
@@ -1793,7 +1794,8 @@ class rpg_player extends rpg_object {
             'player_abilities_compatible',
             'player_robots_rewards',
             'player_robots_compatible',
-            'player_image_alts'
+            'player_image_alts',
+            'player_quotes_custom'
             );
 
         // Implode the index fields into a string if requested
