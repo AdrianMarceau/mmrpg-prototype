@@ -548,8 +548,6 @@ class rpg_battle extends rpg_object {
             $this->update_session();
         }
         $event_options = array();
-        if ($this->battle_result == 'victory'){ $event_options['event_flag_victory'] = true; }
-        elseif ($this->battle_result == 'defeat'){ $event_options['event_flag_defeat'] = true; }
         $this->events_create(false, false, '', '', $event_options);
 
         // Define variables for the human's rewards in this scenario
@@ -809,7 +807,6 @@ class rpg_battle extends rpg_object {
             $event_options = array();
             $event_options['console_show_this_player'] = true;
             $event_options['console_show_target'] = false;
-            $event_options['event_flag_victory'] = true;
             $event_options['this_header_float'] = $event_options['this_body_float'] = $this_player->player_side;
             if ($this_player->player_token != 'player'
                 && isset($this_player->player_quotes['battle_victory'])){
@@ -1332,6 +1329,8 @@ class rpg_battle extends rpg_object {
         $event_options['this_event_class'] = false;
         $event_options['console_show_this'] = false;
         $event_options['console_show_target'] = false;
+        if ($this->battle_result === 'victory'){ $event_options['event_flag_victory'] = true; }
+        elseif ($this->battle_result === 'defeat'){ $event_options['event_flag_defeat'] = true; }
         $event_options['console_container_classes'] = 'field_type field_type_event field_type_'.($this->battle_result == 'victory' ? 'nature' : 'flame');
         $this->events_create($target_robot, $this_robot, $first_event_header, $first_event_body, $event_options);
 

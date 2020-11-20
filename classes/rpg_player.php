@@ -1612,7 +1612,6 @@ class rpg_player extends rpg_object {
         $event_options['this_item'] = $temp_item;
         $event_options['this_item_image'] = 'icon';
         $event_options['this_item_quantity'] = $item_quantity_dropped;
-        $event_options['event_flag_victory'] = true;
         $event_options['console_show_this_player'] = false;
         $event_options['console_show_this_robot'] = false;
         $event_options['console_show_this_item'] = true;
@@ -1689,7 +1688,6 @@ class rpg_player extends rpg_object {
             $event_options['this_body_float'] = $target_player->player_side;
             $event_options['this_item'] = $temp_core;
             $event_options['this_item_image'] = 'icon';
-            $event_options['event_flag_victory'] = true;
             $event_options['console_show_this_player'] = false;
             $event_options['console_show_this_robot'] = false;
             $event_options['console_show_this_item'] = true;
