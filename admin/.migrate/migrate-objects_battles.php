@@ -28,6 +28,30 @@ if (!empty($migration_filter)){
 // Pre-define the base battle content dir
 define('MMRPG_BATTLES_NEW_CONTENT_DIR', MMRPG_CONFIG_ROOTDIR.'content/battles/');
 
+// Predefine a conversion array for legacy-to-new music tokens
+$music_conversation_table = array(
+    'field' => '', // (Unknown)
+    // ---
+    'intro-field' => 'sega-remix/boss-theme-mm1', // (Boss Theme (Sega Genesis))
+    // ---
+    'clock-citadel' => 'sega-remix/time-man-mmpu', // (MM&B Astro Man (Sega Genesis))
+    'oil-wells' => 'sega-remix/tengu-man-rnf', // (MM&B Tengu Man (Sega Genesis))
+    // ---
+    'light-laboratory' => 'sega-remix/special-stage-mm9', // (MM9 Special Stage (Sega Genesis))
+    'wily-castle' => 'sega-remix/wily-fortress-1-mm1', // (MM1 Wily Fortress 1 (Sega Genesis))
+    'cossack-citadel' => 'sega-remix/cossack-fortress-2-mm4', // (MM4 Cossack Fortess 2 (Sega Genesis))
+    // ---
+    'final-destination' => 'sega-remix/special-stage-mm9', // (MM10 Special (Sega Genesis))
+    'final-destination-2' => 'sega-remix/wily-fortress-1-mm9', // (MM9 Wily Fortress (Sega Genesis))
+    'final-destination-3' => 'sega-remix/wily-fortress-2-mm9', // (MM9 Wily Fortress 2 (Sega Genesis))
+    // ---
+    'final-destination-enker' => 'sega-remix/special-stage-1-mm10', // (MM10 Special Stage 1 - Enker (Sega Genesis))
+    'final-destination-ballade' => 'sega-remix/special-stage-3-mm10', // (MM10 Special Stage 3 - Ballade (Sega Genesis))
+    'final-destination-punk' => 'sega-remix/special-stage-2-mm10', // (MM10 Special Stage 2 - Punk (Sega Genesis))
+    // ---
+    'prototype-complete' => '', // (Unknown)
+    );
+
 // Count the number of battles that we'll be looping through
 $battle_index_size = count($battle_index);
 $count_pad_length = strlen($battle_index_size);
@@ -71,6 +95,19 @@ foreach ($battle_index AS $battle_token => $battle_data){
     // (we don't actually copy it though, this is just for tracking)
     if (file_exists($data_path)){
         $battle_data_files_copied[] = basename($data_path);
+    }
+
+    // If field music has been defined, make sure it's converted to newer versions
+    $backup_field_music = false;
+    if (!empty($battle_data['battle_field_base']['field_music'])){
+        $temp_field_music = $battle_data['battle_field_base']['field_music'];
+        $backup_field_music = $temp_field_music;
+        // If the defined music has had a name change, apply it now
+        if (isset($music_paths_legacy_to_new[$temp_field_music])){
+            $battle_data['battle_field_base']['field_music'] = $music_paths_legacy_to_new[$temp_field_music];
+        } elseif (isset($music_conversation_table[$temp_field_music])){
+            $battle_data['battle_field_base']['field_music'] = $music_conversation_table[$temp_field_music];
+        }
     }
 
     // And then write the rest of the non-function data into a json file
