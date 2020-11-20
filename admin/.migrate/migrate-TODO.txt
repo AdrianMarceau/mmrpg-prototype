@@ -269,8 +269,8 @@ Implement the new "minify" library to compress CSS and JS markup
 -  Minify all scripts
 
 Update in-battle idle animations to include base2 frames for
--  robots
--  players (?)
+-  robots [DONE]
+-  players [NO]
 
 Fix the following bugs brought up in chat
 -  80x80 sized mechas don't display properly in battle backgrounds/foregrounds [DONE]
@@ -295,7 +295,9 @@ Update the way Mecha Support determines which mecha to summon [DONE]
     -  Update Mecha Support ability to pull from robot_support field if set, else use prev functionality [DONE]
     -  Update robot migration script to auto-assign robot's a default mecha given their home field [DONE]
 
-Make a proper "game" index that all relevant objects to reference against (likely DB-based)
+Make a proper "game" index that all relevant objects to reference against (likely DB-based) [DONE]
+
+Update the music so that EVERYTHING is pulled from the CDN, both the files and the index itself [DONE]
 
 Add the damn cookie policy to the damn website so I can remove it from my email dammit
 
