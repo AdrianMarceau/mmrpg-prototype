@@ -1422,15 +1422,19 @@ $(document).ready(function(){
             var $logList = $('ul.log-list', $errorLog);
             var $playButton = $('.buttons .button.play', $errorLog);
             var $pauseButton = $('.buttons .button.pause', $errorLog);
+            var $clearButton = $('.buttons .button.clear', $errorLog);
             var $loadImage = $('.header .loading img', $errorLog);
 
             // Define a function for scrolling to the last item in the list
-            var scrollToLastItem = function(animateScroll){
+            var scrollToLastItem = function(animateScroll, numItemsAdded){
                 //console.log('scrollToLastItem(', animateScroll, ')');
                 if (typeof animateScroll === 'undefined'){ animateScroll = true; }
-                var bottom = $('li:last-child', $logList).offset().top;
-                if (animateScroll){ $logList.animate({scrollTop: bottom+'px'}, 200); }
-                else { $logList.scrollTop(bottom); }
+                if (typeof numItemsAdded === 'undefined'){ numItemsAdded = 1; }
+                var animateDuration = 200 * numItemsAdded;
+                var scrollHeight = $logList[0].scrollHeight;
+                //console.log('scrollHeight = ', scrollHeight);
+                if (animateScroll){ $logList.stop().animate({scrollTop: scrollHeight+'px'}, animateDuration); }
+                else { $logList.scrollTop(scrollHeight); }
                 };
 
             // Define a function for updating the state of the watcher
@@ -1440,14 +1444,14 @@ $(document).ready(function(){
                 if (newState === changeWatchState){ return true; }
                 currentWatchState = newState;
                 $errorLog.attr('data-state', currentWatchState);
+                if (updateTimeout !== false){ clearTimeout(updateTimeout); }
                 if (newState === 'play'){
                     $playButton.addClass('hidden');
                     $pauseButton.removeClass('hidden');
-                    if (updateTimeout === false){ startUpdateTimeout(); }
+                    startUpdateTimeout();
                     } else if (newState === 'pause'){
                     $playButton.removeClass('hidden');
                     $pauseButton.addClass('hidden');
-                    if (updateTimeout !== false){ clearTimeout(updateTimeout); }
                     }
                 };
 
@@ -1456,7 +1460,7 @@ $(document).ready(function(){
             var waitingForUpdates = false;
             var checkForLogUpdates = function(){
                 //console.log('checkForLogUpdates()');
-                var lastLine = parseInt($('li:last-child', $logList).attr('data-line'));
+                var lastLine = parseInt($logList.attr('data-last-line'));
                 var postURL = logUpdateBaseURL+'since='+lastLine;
                 waitingForUpdates = true;
                 $loadImage.css({transform:'scale(1.5, 1.5)'});
@@ -1476,8 +1480,16 @@ $(document).ready(function(){
                 for (var i = 0; i < numNewLines; i++){
                     var logString = newLines[i];
                     $logList.append(logString);
-                    scrollToLastItem(true);
                     }
+                var lastLine = parseInt($('li:last-child', $logList).attr('data-line'));
+                $logList.attr('data-last-line', lastLine);
+                scrollToLastItem(true, numNewLines);
+                };
+
+            // Define a function for clearing all existing items in the log list
+            var clearLogList = function(){
+                //console.log('clearLogList()');
+                $logList.empty();
                 };
 
             // Set up an interval to check for updates every X seconds
@@ -1497,6 +1509,7 @@ $(document).ready(function(){
             // Bind actions to the two state buttons
             $playButton.bind('click', function(e){ e.preventDefault(); return changeWatchState('play'); });
             $pauseButton.bind('click', function(e){ e.preventDefault(); return changeWatchState('pause'); });
+            $clearButton.bind('click', function(e){ e.preventDefault(); return clearLogList(); });
 
             // Automatically scroll log to the bottom
             scrollToLastItem(false);

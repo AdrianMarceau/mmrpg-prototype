@@ -1290,11 +1290,18 @@ tr:nth-child(odd) td {
     background-color: #007a0a;
 }
 .adminform.error-log .editor .buttons .button.pause {
-    background-color: #8c2525;
-    border-color: #751f1f;
+    background-color: #d6850a;
+    border-color: #b97309;
 }
 .adminform.error-log .editor .buttons .button.pause:hover {
-    background-color: #a52c2c;
+    background-color: #e58e0b;
+}
+.adminform.error-log .editor .buttons .button.clear {
+    background-color: #ba3b3b;
+    border-color: #973030;
+}
+.adminform.error-log .editor .buttons .button.clear:hover {
+    background-color: #c73838;
 }
 
 .adminform.edit_players table .type,

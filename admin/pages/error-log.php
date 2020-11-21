@@ -94,14 +94,23 @@ $error_log_markup = cms_admin::get_last_lines_of_file($error_log_path, $error_lo
             <?
             // Break apart the error log lines and print them in a list for scrolling
             $error_log_lines = explode(PHP_EOL, $error_log_markup);
-            echo('<ul class="log-list" data-size-total="'.$error_log_size.'" data-size-visible="'.$error_log_slice.'">'.PHP_EOL);
-                if (!empty($error_log_lines)){
-                    $line_number = $error_log_size - count($error_log_lines);
-                    foreach ($error_log_lines AS $key => $log_string){
-                        $line_number++;
-                        echo(log_string_to_list_item($line_number, $log_string).PHP_EOL);
-                    }
+            ob_start();
+            $last_line_number = 0;
+            if (!empty($error_log_lines)){
+                $line_number = $error_log_size - count($error_log_lines);
+                foreach ($error_log_lines AS $key => $log_string){
+                    $line_number++;
+                    echo(log_string_to_list_item($line_number, $log_string).PHP_EOL);
+                    $last_line_number = $line_number;
                 }
+            }
+            $error_log_lines_markup = ob_get_clean();
+            echo('<ul class="log-list" '.
+                'data-size-total="'.$error_log_size.'" '.
+                'data-size-visible="'.$error_log_slice.'" '.
+                'data-last-line="'.$last_line_number.'" '.
+                '>'.PHP_EOL);
+                echo($error_log_lines_markup.PHP_EOL);
             echo('</ul>'.PHP_EOL);
 
             ?>
@@ -110,7 +119,8 @@ $error_log_markup = cms_admin::get_last_lines_of_file($error_log_path, $error_lo
 
         <div class="buttons">
             <a class="button pause hidden" title="Pause"><span>Pause</span><i class="fas fa-pause"></i></a>
-            <a class="button play" title="Play"><span>Watch Live</span><i class="fas fa-play"></i></a>
+            <a class="button play" title="Play"><span>Watch</span><i class="fas fa-play"></i></a>
+            <a class="button clear" title="Clear"><span>Clear</span><i class="fas fa-eraser"></i></a>
         </div>
 
     </div>
