@@ -299,5 +299,5 @@ Make a proper "game" index that all relevant objects to reference against (likel
 
 Update the music so that EVERYTHING is pulled from the CDN, both the files and the index itself [DONE]
 
-Add the damn cookie policy to the damn website so I can remove it from my email dammit
+Add the damn cookie policy to the damn website so I can remove it from my email dammit [DONE]
 
