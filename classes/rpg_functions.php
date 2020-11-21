@@ -466,6 +466,9 @@ class rpg_functions {
 
     }
 
+
+    // -- MISC FUNCTIONS -- //
+
     // Define a function that shuffles an array, preserving keys if requested
     public static function shuffle_array($array, $preserve_keys = false){
         if (!is_array($array)){ return $array; }

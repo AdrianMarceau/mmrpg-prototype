@@ -899,12 +899,40 @@ tr:nth-child(odd) td {
     margin: 0 auto 10px;
 }
 
-
-
 .adminform .search .field .subfield .label .fas,
 .adminform .search .field .subfield .sublabel .fas {
     margin-left: 4px;
 }
+
+
+.adminform .search .field.has-date-range {
+    display: block;
+}
+.adminform .search .field.has-date-range .arrow,
+.adminform .search .field.has-date-range input[type="text"] {
+    display: block;
+    float: left;
+    clear: none;
+}
+.adminform .search .field.has-date-range .arrow {
+    font-size: 11px;
+    line-height: 1;
+    width: 10px;
+    margin: 0 2px;
+    text-align: center;
+    position: relative;
+    top: 3px;
+    color: #ababab;
+}
+.adminform .search .field.has-date-range input[type="text"] {
+    margin: 0;
+    width: calc(50% - 8px);
+}
+.adminform .search .field.has-date-range .label + input[type="text"] {
+    clear: left;
+}
+
+
 .adminform .field .subfield select + span {
     bottom: 3px;
 }
@@ -2182,6 +2210,7 @@ input[type=file] {
 .adminform .results .list .flag,
 .adminform .results .list .order,
 .adminform .results .list .game,
+.adminform .results .list .points,
 .adminform .results .list .class {
     text-align: center;
 }

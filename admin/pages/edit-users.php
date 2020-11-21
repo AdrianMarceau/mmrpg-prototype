@@ -43,6 +43,11 @@
         // Let's delete all of this user's data from the database
         $db->delete('mmrpg_users', array('user_id' => $delete_data['user_id']));
         $db->delete('mmrpg_saves', array('user_id' => $delete_data['user_id']));
+        $db->delete('mmrpg_leaderboard', array('user_id' => $delete_data['user_id']));
+        $db->delete('mmrpg_posts', array('user_id' => $delete_data['user_id']));
+        $db->delete('mmrpg_posts', array('post_target' => $delete_data['user_id']));
+        $db->update('mmrpg_threads', array('user_id' => MMRPG_SETTINGS_GUEST_ID), array('user_id' => $delete_data['user_id']));
+        $db->update('mmrpg_threads', array('thread_mod_user' => MMRPG_SETTINGS_GUEST_ID), array('thread_mod_user' => $delete_data['user_id']));
         $form_messages[] = array('success', 'The requested user has been deleted from the database');
         exit_form_action('success');
 
@@ -53,13 +58,13 @@
     $search_query = '';
     $search_results = array();
     $search_results_count = 0;
-    $search_results_limit = 50;
+    $search_results_limit = 200;
     if ($sub_action == 'search'){
 
         // Collect the sorting order and direction
-        $sort_data = array('name' => 'user_id', 'dir' => 'desc');
+        $sort_data = array('name' => 'users.user_id', 'dir' => 'desc');
         if (!empty($_GET['order'])
-            && preg_match('/^([-_a-z0-9]+)\:(desc|asc)$/i', $_GET['order'])){
+            && preg_match('/^([-_a-z0-9\.]+)\:(desc|asc)$/i', $_GET['order'])){
             list($r_name, $r_dir) = explode(':', trim($_GET['order']));
             $sort_data = array('name' => $r_name, 'dir' => $r_dir);
         }
@@ -75,6 +80,17 @@
         $search_data['user_flag_postpublic'] = isset($_GET['user_flag_postpublic']) && $_GET['user_flag_postpublic'] !== '' ? (!empty($_GET['user_flag_postpublic']) ? 1 : 0) : '';
         $search_data['user_flag_postprivate'] = isset($_GET['user_flag_postprivate']) && $_GET['user_flag_postprivate'] !== '' ? (!empty($_GET['user_flag_postprivate']) ? 1 : 0) : '';
 
+        $search_data['user_date_created'] = array();
+        if (!empty($_GET['user_date_created']) && is_array($_GET['user_date_created'])){ $search_data['user_date_created'] = array_filter($_GET['user_date_created']); }
+        elseif (!empty($_GET['user_date_created']) && is_string($_GET['user_date_created'])){ $search_data['user_date_created'] = explode(',', trim($_GET['user_date_created'])); }
+        foreach ($search_data['user_date_created'] AS $k => $v){ if (!preg_match('/^([0-9]{4})(-[0-9]{1,2})?(-[0-9]{1,2})?$/', $v)){ unset($search_data['user_date_created'][$k]); } }
+        $search_data['user_date_created'] = array_filter($search_data['user_date_created']);
+
+        $search_data['user_last_login'] = array();
+        if (!empty($_GET['user_last_login']) && is_array($_GET['user_last_login'])){ $search_data['user_last_login'] = array_filter($_GET['user_last_login']); }
+        elseif (!empty($_GET['user_last_login']) && is_string($_GET['user_last_login'])){ $search_data['user_last_login'] = explode(',', trim($_GET['user_last_login'])); }
+        foreach ($search_data['user_last_login'] AS $k => $v){ if (!preg_match('/^([0-9]{4})(-[0-9]{1,2})?(-[0-9]{1,2})?$/', $v)){ unset($search_data['user_last_login'][$k]); } }
+        $search_data['user_last_login'] = array_filter($search_data['user_last_login']);
 
         /* -- Collect Search Results -- */
 
@@ -82,36 +98,36 @@
         $exclude_guest_id = MMRPG_SETTINGS_GUEST_ID;
 
         // Define the search query to use
+        $user_fields = rpg_user::get_fields(true, 'users');
         $search_query = "SELECT
-            user.user_id,
-            user.user_name,
-            user.user_name_clean,
-            user.user_name_public,
-            user.user_email_address,
-            user.user_date_created,
-            user.user_date_modified,
-            role.role_id,
-            role.role_name,
-            role.role_level,
-            role.role_colour
-            FROM mmrpg_users AS user
-            LEFT JOIN mmrpg_roles AS role ON role.role_id = user.role_id
+            {$user_fields},
+            (users.user_date_accessed - users.user_date_created) AS user_account_age,
+            roles.role_id,
+            roles.role_name,
+            roles.role_level,
+            roles.role_colour,
+            leaderboard.board_points
+            FROM mmrpg_users AS users
+            LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
+            LEFT JOIN mmrpg_leaderboard AS leaderboard ON leaderboard.user_id = users.user_id
             WHERE 1=1
-            AND user_id <> {$exclude_guest_id}
+            AND users.user_id <> {$exclude_guest_id}
+            AND users.user_name_clean <> 'guest'
+            AND leaderboard.board_points > 0
             ";
 
         // If the user ID was provided, we can search by exact match
         if (!empty($search_data['user_id'])){
             $user_id = $search_data['user_id'];
-            $search_query .= "AND user_id = {$user_id} ";
+            $search_query .= "AND users.user_id = {$user_id} ";
             $search_results_limit = false;
         }
 
         // If the role ID was provided, we can search by exact match
         if (!empty($search_data['role_id'])){
             $role_id = $search_data['role_id'];
-            if ($role_id < 0){ $not_role_id = $role_id * -1; $search_query .= "AND user.role_id <> {$not_role_id} "; }
-            else { $search_query .= "AND user.role_id = {$role_id} "; }
+            if ($role_id < 0){ $not_role_id = $role_id * -1; $search_query .= "AND users.role_id <> {$not_role_id} "; }
+            else { $search_query .= "AND users.role_id = {$role_id} "; }
             $search_results_limit = false;
         }
 
@@ -121,7 +137,7 @@
             $user_name = str_replace(array(' ', '*', '%'), '%', $user_name);
             $user_name = preg_replace('/%+/', '%', $user_name);
             $user_name = '%'.$user_name.'%';
-            $search_query .= "AND (user_name LIKE '{$user_name}' OR user_name_public LIKE '{$user_name}') ";
+            $search_query .= "AND (users.user_name LIKE '{$user_name}' OR users.user_name_public LIKE '{$user_name}') ";
             $search_results_limit = false;
         }
 
@@ -131,14 +147,14 @@
             $user_email = str_replace(array(' ', '*', '%'), '%', $user_email);
             $user_email = preg_replace('/%+/', '%', $user_email);
             $user_email = '%'.$user_email.'%';
-            $search_query .= "AND user_email_address LIKE '{$user_email}' ";
+            $search_query .= "AND users.user_email_address LIKE '{$user_email}' ";
             $search_results_limit = false;
         }
 
         // If the user gender was provided, we can search by exact match
         if (!empty($search_data['user_gender'])){
             $user_gender = $search_data['user_gender'];
-            $search_query .= "AND user_gender = '{$user_gender}' ";
+            $search_query .= "AND users.user_gender = '{$user_gender}' ";
             $search_results_limit = false;
         }
 
@@ -148,33 +164,75 @@
             $user_ip = str_replace(array(' ', '*', '%'), '%', $user_ip);
             $user_ip = preg_replace('/%+/', '%', $user_ip);
             $user_ip = '%'.$user_ip.'%';
-            $search_query .= "AND user_ip_addresses LIKE '{$user_ip}' ";
+            $search_query .= "AND users.user_ip_addresses LIKE '{$user_ip}' ";
             $search_results_limit = false;
         }
 
         // If the user approved flag was provided
         if ($search_data['user_flag_approved'] !== ''){
-            $search_query .= "AND user_flag_approved = {$search_data['user_flag_approved']} ";
+            $search_query .= "AND users.user_flag_approved = {$search_data['user_flag_approved']} ";
             $search_results_limit = false;
         }
 
         // If the user post public flag was provided
         if ($search_data['user_flag_postpublic'] !== ''){
-            $search_query .= "AND user_flag_postpublic = {$search_data['user_flag_postpublic']} ";
+            $search_query .= "AND users.user_flag_postpublic = {$search_data['user_flag_postpublic']} ";
             $search_results_limit = false;
         }
 
         // If the user post private flag was provided
         if ($search_data['user_flag_postprivate'] !== ''){
-            $search_query .= "AND user_flag_postprivate = {$search_data['user_flag_postprivate']} ";
+            $search_query .= "AND users.user_flag_postprivate = {$search_data['user_flag_postprivate']} ";
+            $search_results_limit = false;
+        }
+
+        // Define a quick function for parsing a given date range string
+        $from_auto_fill = '1970-01-01-00-00';
+        $to_auto_fill = date('Y').'-12-31-59-59';
+        $parse_date = function($date_string, $auto_fill){
+            $values = explode('-', $date_string);
+            $auto = explode('-', $auto_fill);
+            $yyyy = intval(isset($values[0]) ? $values[0] : $auto[0]);
+            $mm = intval(isset($values[1]) ? $values[1] : $auto[1]);
+            $dd = intval(isset($values[2]) ? $values[2] : $auto[2]);
+            $h = intval($auto_fill[3]);
+            $m = intval($auto_fill[4]);
+            return mktime($h, $m, 0, $mm, $dd, $yyyy);
+            };
+
+        // If a user creation date range was provided
+        if (!empty($search_data['user_date_created'])){
+            if (count($search_data['user_date_created']) > 1){
+                $from_time = $parse_date($search_data['user_date_created'][0], $from_auto_fill);
+                $to_time = $parse_date($search_data['user_date_created'][1], $to_auto_fill);
+                $search_query .= "AND users.user_date_created >= {$from_time} ";
+                $search_query .= "AND users.user_date_created <= {$to_time} ";
+            } else {
+                $from_time = $parse_date($search_data['user_date_created'][0], $from_auto_fill);
+                $search_query .= "AND users.user_date_created >= {$from_time} ";
+            }
+            $search_results_limit = false;
+        }
+
+        // If a last login date range was provided
+        if (!empty($search_data['user_last_login'])){
+            if (count($search_data['user_last_login']) > 1){
+                $from_time = $parse_date($search_data['user_last_login'][0], $from_auto_fill);
+                $to_time = $parse_date($search_data['user_last_login'][1], $to_auto_fill);
+                $search_query .= "AND users.user_last_login >= {$from_time} ";
+                $search_query .= "AND users.user_last_login <= {$to_time} ";
+            } else {
+                $from_time = $parse_date($search_data['user_last_login'][0], $from_auto_fill);
+                $search_query .= "AND users.user_last_login >= {$from_time} ";
+            }
             $search_results_limit = false;
         }
 
         // Append sorting parameters to the end of the query
         $order_by = array();
-        if (!empty($sort_data) && $sort_data['name'] == 'role_id'){ $order_by[] = 'role_level '.strtoupper($sort_data['dir']); $order_by[] = 'role_id '.strtoupper($sort_data['dir'] != 'asc' ? 'asc' : 'desc'); }
+        if (!empty($sort_data) && $sort_data['name'] == 'roles.role_id'){ $order_by[] = 'rolesrole_level '.strtoupper($sort_data['dir']); $order_by[] = 'roles.role_id '.strtoupper($sort_data['dir'] != 'asc' ? 'asc' : 'desc'); }
         elseif (!empty($sort_data)){ $order_by[] = $sort_data['name'].' '.strtoupper($sort_data['dir']); }
-        $order_by[] = "user_name ASC";
+        $order_by[] = "users.user_name ASC";
         $order_by_string = implode(', ', $order_by);
         $search_query .= "ORDER BY {$order_by_string} ";
 
@@ -214,8 +272,21 @@
         /* -- Collect User Data -- */
 
         // Collect user details from the database
-        $user_fields = rpg_user::get_fields(true);
-        $user_data = $db->get_array("SELECT {$user_fields} FROM mmrpg_users WHERE user_id = {$editor_data['user_id']};");
+        $user_fields = rpg_user::get_fields(true, 'users');
+        $user_data = $db->get_array("SELECT
+            {$user_fields},
+            (users.user_date_accessed - users.user_date_created) AS user_account_age,
+            roles.role_id,
+            roles.role_name,
+            roles.role_level,
+            roles.role_colour,
+            leaderboard.board_points
+            FROM mmrpg_users AS users
+            LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
+            LEFT JOIN mmrpg_leaderboard AS leaderboard ON leaderboard.user_id = users.user_id
+            WHERE
+            users.user_id = {$editor_data['user_id']}
+            ;");
 
         // If user data could not be found, produce error and exit
         if (empty($user_data)){ exit_user_edit_action(); }
@@ -473,7 +544,7 @@
 
     <?= !empty($this_error_markup) ? '<div style="margin: 0 auto 20px">'.$this_error_markup.'</div>' : '' ?>
 
-    <div class="adminform edit-users">
+    <div class="adminform edit-users" data-baseurl="admin/edit-users/" data-object="user" data-xobject="users">
 
         <? if ($sub_action == 'search'): ?>
 
@@ -538,6 +609,20 @@
                         <input class="textbox" type="text" name="user_ip" value="<?= !empty($search_data['user_ip']) ? htmlentities($search_data['user_ip'], ENT_QUOTES, 'UTF-8', true) : '' ?>" />
                     </div>
 
+                    <div class="field foursize has2cols has-date-range">
+                        <strong class="label">By Creation Date</strong>
+                        <input class="textbox" type="text" name="user_date_created[]" value="<?= !empty($search_data['user_date_created'][0]) ? htmlentities($search_data['user_date_created'][0], ENT_QUOTES, 'UTF-8', true) : '' ?>" placeholder="YYYY-MM-DD" maxlength="10" />
+                        <span class="arrow">&raquo;</span>
+                        <input class="textbox" type="text" name="user_date_created[]" value="<?= !empty($search_data['user_date_created'][1]) ? htmlentities($search_data['user_date_created'][1], ENT_QUOTES, 'UTF-8', true) : '' ?>" placeholder="YYYY-MM-DD" maxlength="10" />
+                    </div>
+
+                    <div class="field foursize has2cols has-date-range">
+                        <strong class="label">By Last Login</strong>
+                        <input class="textbox" type="text" name="user_last_login[]" value="<?= !empty($search_data['user_last_login'][0]) ? htmlentities($search_data['user_last_login'][0], ENT_QUOTES, 'UTF-8', true) : '' ?>" placeholder="YYYY-MM-DD" maxlength="10" />
+                        <span class="arrow">&raquo;</span>
+                        <input class="textbox" type="text" name="user_last_login[]" value="<?= !empty($search_data['user_last_login'][1]) ? htmlentities($search_data['user_last_login'][1], ENT_QUOTES, 'UTF-8', true) : '' ?>" placeholder="YYYY-MM-DD" maxlength="10" />
+                    </div>
+
                     <div class="field halfsize has3cols flags">
                     <?
                     $flag_names = array(
@@ -582,28 +667,34 @@
                             <col class="id" width="60" />
                             <col class="name" width="" />
                             <col class="email" width="" />
-                            <col class="role" width="100" />
+                            <col class="points" width="120" />
+                            <col class="role" width="110" />
                             <col class="date created" width="90" />
-                            <col class="date modified" width="90" />
+                            <col class="date last-login" width="90" />
+                            <col class="date account-age" width="90" />
                             <col class="actions" width="100" />
                         </colgroup>
                         <thead>
                             <tr>
-                                <th class="id"><?= cms_admin::get_sort_link('user_id', 'ID') ?></th>
-                                <th class="name"><?= cms_admin::get_sort_link('user_name_clean', 'Name') ?></th>
-                                <th class="email"><?= cms_admin::get_sort_link('user_email_address', 'Email') ?></th>
-                                <th class="role"><?= cms_admin::get_sort_link('role_id', 'Role') ?></th>
-                                <th class="date created"><?= cms_admin::get_sort_link('user_date_created', 'Created') ?></th>
-                                <th class="date modified"><?= cms_admin::get_sort_link('user_date_modified', 'Modified') ?></th>
+                                <th class="id"><?= cms_admin::get_sort_link('users.user_id', 'ID') ?></th>
+                                <th class="name"><?= cms_admin::get_sort_link('users.user_name_clean', 'Name') ?></th>
+                                <th class="email"><?= cms_admin::get_sort_link('users.user_email_address', 'Email') ?></th>
+                                <th class="points"><?= cms_admin::get_sort_link('leaderboard.board_points', 'Points') ?></th>
+                                <th class="role"><?= cms_admin::get_sort_link('roles.role_id', 'Role') ?></th>
+                                <th class="date created"><?= cms_admin::get_sort_link('users.user_date_created', 'Created') ?></th>
+                                <th class="date last-login"><?= cms_admin::get_sort_link('users.user_last_login', 'Last Login') ?></th>
+                                <th class="date account-age"><?= cms_admin::get_sort_link('user_account_age', 'Active For') ?></th>
                                 <th class="actions">Actions</th>
                             </tr>
                             <tr>
                                 <th class="head id"></th>
                                 <th class="head name"></th>
                                 <th class="head email"></th>
+                                <th class="head points"></th>
                                 <th class="head role"></th>
                                 <th class="head date created"></th>
-                                <th class="head date modified"></th>
+                                <th class="head date last-login"></th>
+                                <th class="head date account-age"></th>
                                 <th class="head count"><?= cms_admin::get_totals_markup() ?></th>
                             </tr>
                         </thead>
@@ -612,9 +703,11 @@
                                 <td class="foot id"></td>
                                 <td class="foot name"></td>
                                 <td class="foot email"></td>
+                                <td class="foot points"></td>
                                 <td class="foot role"></td>
                                 <td class="foot date created"></td>
-                                <td class="foot date modified"></td>
+                                <td class="foot date last-login"></td>
+                                <td class="foot date account-age"></td>
                                 <td class="foot count"><?= cms_admin::get_totals_markup() ?></td>
                             </tr>
                         </tfoot>
@@ -634,7 +727,28 @@
                                 $user_role_span = '<span class="type_span type_'.$user_data['role_colour'].'"><i class="fas fa-user"></i> '.$user_data['role_name'].'</span>';
                                 $user_created = !empty($user_data['user_date_created']) ? date('Y-m-d', $user_data['user_date_created']) : '-';
                                 $user_modified = !empty($user_data['user_date_modified']) ? date('Y-m-d', $user_data['user_date_modified']) : '-';
+                                $user_lastlogin = !empty($user_data['user_last_login']) ? date('Y-m-d', $user_data['user_last_login']) : '-';
+                                $user_board_points = !empty($user_data['board_points']) ? number_format($user_data['board_points'], 0, '.', ',') : 0;
+                                $user_account_age = !empty($user_data['user_account_age']) ? $user_data['user_account_age'] : '-';
 
+                                if ($user_account_age > 0){
+                                    $date1 = new DateTime();
+                                    $date2 = new DateTime();
+                                    $date1->setTimestamp($user_data['user_date_created']);
+                                    $date2->setTimestamp($user_data['user_date_accessed']);
+                                    $interval = $date1->diff($date2);
+                                    $years = $interval->y;
+                                    $months = $interval->m;
+                                    $days = $interval->d;
+                                    $print_user_account_age = array();
+                                    if (!empty($years)){ $print_user_account_age[] = $years.'y'; }
+                                    if (!empty($months)){ $print_user_account_age[] = $months.'m'; }
+                                    if (!empty($days)){ $print_user_account_age[] = $days.'d'; }
+                                    if (empty($print_user_account_age)){ $print_user_account_age[] = '1d'; }
+                                    $print_user_account_age = implode('-', $print_user_account_age);
+                                } else {
+                                    $print_user_account_age = '-';
+                                }
 
                                 // Collect the user's name(s) for display
                                 $user_name_display = $user_data['user_name'];
@@ -643,10 +757,12 @@
                                 }
 
                                 $user_edit = 'admin/edit-users/editor/user_id='.$user_id;
+                                $user_view = !empty($user_data['board_points']) ? 'leaderboard/'.$user_data['user_name_clean'].'/' : false;
 
                                 $user_actions = '';
                                 $user_actions .= '<a class="link edit" href="'.$user_edit.'"><span>edit</span></a>';
-                                $user_actions .= '<a class="link delete" data-delete="users" data-user-id="'.$user_id.'"><span>delete</span></a>';
+                                //$user_actions .= '<a class="link delete" data-delete="users" data-user-id="'.$user_id.'"><span>delete</span></a>';
+                                if (!empty($user_view)){ $user_actions .= '<a class="link view" href="'.$user_view.'" target="_blank"><span>view</span></a>'; }
 
                                 $user_name = '<a class="link" href="'.$user_edit.'">'.$user_name_display.'</a>';
 
@@ -654,9 +770,12 @@
                                     echo '<td class="id"><div>'.$user_id.'</div></td>'.PHP_EOL;
                                     echo '<td class="name"><div class="wrap">'.$user_name.'</div></td>'.PHP_EOL;
                                     echo '<td class="email"><div class="wrap">'.$user_email.'</div></td>'.PHP_EOL;
+                                    echo '<td class="points"><div class="wrap">'.$user_board_points.'</div></td>'.PHP_EOL;
                                     echo '<td class="role"><div class="wrap">'.$user_role_span.'</div></td>'.PHP_EOL;
                                     echo '<td class="date created"><div>'.$user_created.'</div></td>'.PHP_EOL;
-                                    echo '<td class="date modified"><div>'.$user_modified.'</div></td>'.PHP_EOL;
+                                    //echo '<td class="date modified"><div>'.$user_modified.'</div></td>'.PHP_EOL;
+                                    echo '<td class="date last-login"><div>'.$user_lastlogin.'</div></td>'.PHP_EOL;
+                                    echo '<td class="date account-age"><div>'.$print_user_account_age.'</div></td>'.PHP_EOL;
                                     echo '<td class="actions"><div>'.$user_actions.'</div></td>'.PHP_EOL;
                                 echo '</tr>'.PHP_EOL;
 
@@ -684,7 +803,16 @@
 
             <div class="editor">
 
-                <h3 class="header">Edit User &quot;<?= $user_name_display ?>&quot;</h3>
+                <h3 class="header">
+                    <span class="title">Edit User &quot;<?= $user_name_display ?>&quot;</span>
+                    <?
+                    // If the page is published, generate and display a preview link
+                    if (!empty($user_data['board_points'])){
+                        $preview_link = 'leaderboard/'.$user_data['user_name_clean'].'/';
+                        echo '<a class="view" href="'.$preview_link.'" target="_blank">View <i class="fas fa-external-link-square-alt"></i></a>'.PHP_EOL;
+                    }
+                    ?>
+                </h3>
 
                 <? print_form_messages() ?>
 
@@ -996,6 +1124,25 @@
                             <div class="date"><strong>Last Login</strong>: <?= !empty($user_data['user_last_login']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $user_data['user_last_login'])) : '-' ?></div>
                             <div class="date"><strong>Created</strong>: <?= !empty($user_data['user_date_created']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $user_data['user_date_created'])): '-' ?></div>
                             <div class="date"><strong>Modified</strong>: <?= !empty($user_data['user_date_modified']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $user_data['user_date_modified'])) : '-' ?></div>
+                            <?
+                            if ($user_data['user_account_age'] > 0){
+                                $date1 = new DateTime();
+                                $date2 = new DateTime();
+                                $date1->setTimestamp($user_data['user_date_created']);
+                                $date2->setTimestamp($user_data['user_date_accessed']);
+                                $interval = $date1->diff($date2);
+                                $years = $interval->y;
+                                $months = $interval->m;
+                                $days = $interval->d;
+                                $print_user_account_age = array();
+                                if (!empty($years)){ $print_user_account_age[] = $years.' '.($years === 1 ? 'Year' : 'Years'); }
+                                if (!empty($months)){ $print_user_account_age[] = $months.' '.($months === 1 ? 'Month' : 'Months'); }
+                                if (!empty($days)){ $print_user_account_age[] = $days.' '.($days === 1 ? 'Day' : 'Days'); }
+                                if (empty($print_user_account_age)){ $print_user_account_age[] = '1 Day'; }
+                                $print_user_account_age = implode(', ', $print_user_account_age);
+                                echo('<div class="date"><strong>Active For</strong>: '.$print_user_account_age.'</div>');
+                            }
+                            ?>
                         </div>
 
                     </div>

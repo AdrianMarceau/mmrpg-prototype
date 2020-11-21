@@ -17,7 +17,10 @@ class cms_admin {
         $sort_link = 'admin/'.$this_page_action.'/search/';
         if (!empty($search_data)){
             $arg_strings = array();
-            foreach ($search_data AS $n => $v){ if ($v !== ''){ $arg_strings[] = $n.'='.urlencode($v); } }
+            foreach ($search_data AS $n => $v){
+                if (is_array($v)){ if (!empty($v)){ $arg_strings[] = $n.'='.urlencode(implode(',',$v)); } }
+                else { if ($v !== ''){ $arg_strings[] = $n.'='.urlencode($v); } }
+            }
             $sort_link .= '&'.implode('&', $arg_strings);
         }
         $sort_link .= '&order='.$name.':'.$dir;
