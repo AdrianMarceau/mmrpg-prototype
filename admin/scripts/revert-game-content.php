@@ -13,7 +13,7 @@ $mmrpg_git_path = constant('MMRPG_CONFIG_'.strtoupper($request_kind).'_CONTENT_P
 //debug_echo('$mmrpg_git_path = '.$mmrpg_git_path);
 $mmrpg_git_changes = cms_admin::git_get_changes($mmrpg_git_path);
 //debug_echo('$mmrpg_git_changes = '.print_r($mmrpg_git_changes, true).'');
-$mmrpg_git_newfiles = cms_admin::git_scan_content_directory($mmrpg_git_path, '');
+$mmrpg_git_newfiles = cms_admin::git_scan_content_directory($mmrpg_git_path, 'new');
 //debug_echo('$mmrpg_git_newfiles = '.print_r($mmrpg_git_newfiles, true).'');
 if ($request_kind === 'robots' || $request_kind === 'abilities'){
     $mmrpg_git_changes = cms_admin::git_filter_list_by_data($mmrpg_git_changes, array(
