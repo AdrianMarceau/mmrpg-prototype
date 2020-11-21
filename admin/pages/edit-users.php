@@ -265,7 +265,7 @@
 
         // Append sorting parameters to the end of the query
         $order_by = array();
-        if (!empty($sort_data) && $sort_data['name'] == 'roles.role_id'){ $order_by[] = 'rolesrole_level '.strtoupper($sort_data['dir']); $order_by[] = 'roles.role_id '.strtoupper($sort_data['dir'] != 'asc' ? 'asc' : 'desc'); }
+        if (!empty($sort_data) && $sort_data['name'] == 'roles.role_id'){ $order_by[] = 'roles.role_level '.strtoupper($sort_data['dir']); $order_by[] = 'roles.role_id '.strtoupper($sort_data['dir'] != 'asc' ? 'asc' : 'desc'); }
         elseif (!empty($sort_data)){ $order_by[] = $sort_data['name'].' '.strtoupper($sort_data['dir']); }
         $order_by[] = "users.user_name ASC";
         $order_by_string = implode(', ', $order_by);
