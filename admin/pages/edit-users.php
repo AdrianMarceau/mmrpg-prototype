@@ -92,6 +92,9 @@
         foreach ($search_data['user_last_login'] AS $k => $v){ if (!preg_match('/^([0-9]{4})(-[0-9]{1,2})?(-[0-9]{1,2})?$/', $v)){ unset($search_data['user_last_login'][$k]); } }
         $search_data['user_last_login'] = array_filter($search_data['user_last_login']);
 
+        $search_data['user_profile_text'] = !empty($_GET['user_profile_text']) ? trim(strtolower(strip_tags($_GET['user_profile_text']))) : '';
+        $search_data['user_admin_text'] = !empty($_GET['user_admin_text']) ? trim(strtolower(strip_tags($_GET['user_admin_text']))) : '';
+
         /* -- Collect Search Results -- */
 
         // Define the guest ID to exclude
@@ -144,10 +147,14 @@
         // Else if the user email was provided, we can use wildcards
         if (!empty($search_data['user_email'])){
             $user_email = $search_data['user_email'];
-            $user_email = str_replace(array(' ', '*', '%'), '%', $user_email);
-            $user_email = preg_replace('/%+/', '%', $user_email);
-            $user_email = '%'.$user_email.'%';
-            $search_query .= "AND users.user_email_address LIKE '{$user_email}' ";
+            if ($user_email === '*'){
+                $search_query .= "AND users.user_email_address <> '' ";
+            } else {
+                $user_email = str_replace(array(' ', '*', '%'), '%', $user_email);
+                $user_email = preg_replace('/%+/', '%', $user_email);
+                $user_email = '%'.$user_email.'%';
+                $search_query .= "AND users.user_email_address LIKE '{$user_email}' ";
+            }
             $search_results_limit = false;
         }
 
@@ -224,6 +231,34 @@
             } else {
                 $from_time = $parse_date($search_data['user_last_login'][0], $from_auto_fill);
                 $search_query .= "AND users.user_last_login >= {$from_time} ";
+            }
+            $search_results_limit = false;
+        }
+
+        // Else if the user profile text was provided, we can use wildcards
+        if (!empty($search_data['user_profile_text'])){
+            $user_text = $search_data['user_profile_text'];
+            if ($user_text === '*'){
+                $search_query .= "AND users.user_profile_text <> '' ";
+            } else {
+                $user_text = str_replace(array(' ', '*', '%'), '%', $user_text);
+                $user_text = preg_replace('/%+/', '%', $user_text);
+                $user_text = '%'.str_replace("'", "\\'", $user_text).'%';
+                $search_query .= "AND users.user_profile_text LIKE '{$user_text}' ";
+            }
+            $search_results_limit = false;
+        }
+
+        // Else if the user admin text was provided, we can use wildcards
+        if (!empty($search_data['user_admin_text'])){
+            $user_text = $search_data['user_admin_text'];
+            if ($user_text === '*'){
+                $search_query .= "AND users.user_admin_text <> '' ";
+            } else {
+                $user_text = str_replace(array(' ', '*', '%'), '%', $user_text);
+                $user_text = preg_replace('/%+/', '%', $user_text);
+                $user_text = '%'.str_replace("'", "\\'", $user_text).'%';
+                $search_query .= "AND users.user_admin_text LIKE '{$user_text}' ";
             }
             $search_results_limit = false;
         }
@@ -621,6 +656,16 @@
                         <input class="textbox" type="text" name="user_last_login[]" value="<?= !empty($search_data['user_last_login'][0]) ? htmlentities($search_data['user_last_login'][0], ENT_QUOTES, 'UTF-8', true) : '' ?>" placeholder="YYYY-MM-DD" maxlength="10" />
                         <span class="arrow">&raquo;</span>
                         <input class="textbox" type="text" name="user_last_login[]" value="<?= !empty($search_data['user_last_login'][1]) ? htmlentities($search_data['user_last_login'][1], ENT_QUOTES, 'UTF-8', true) : '' ?>" placeholder="YYYY-MM-DD" maxlength="10" />
+                    </div>
+
+                    <div class="field halfsize">
+                        <strong class="label">By Profile Text</strong>
+                        <input class="textbox" type="text" name="user_profile_text" value="<?= !empty($search_data['user_profile_text']) ? htmlentities($search_data['user_profile_text'], ENT_QUOTES, 'UTF-8', true) : '' ?>" />
+                    </div>
+
+                    <div class="field halfsize">
+                        <strong class="label">By Moderator Notes</strong>
+                        <input class="textbox" type="text" name="user_admin_text" value="<?= !empty($search_data['user_admin_text']) ? htmlentities($search_data['user_admin_text'], ENT_QUOTES, 'UTF-8', true) : '' ?>" />
                     </div>
 
                     <div class="field halfsize has3cols flags">
