@@ -1678,9 +1678,18 @@ input[type=file] {
     text-align: left;
     color: #696969;
 }
+.adminform .formfoot .metadata:after {
+    content: "";
+    display: block;
+    clear: both;
+}
 .adminform .formfoot .metadata .date {
     display: block;
     margin: 0 auto 5px 0;
+}
+.adminform.edit-users .formfoot .metadata .date {
+    float: left;
+    margin: 0 20px 10px 0;
 }
 
 .adminform .formfoot .git-buttons {

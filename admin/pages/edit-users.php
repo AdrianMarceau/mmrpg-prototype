@@ -861,266 +861,294 @@
 
                 <? print_form_messages() ?>
 
+                <div class="editor-tabs" data-tabgroup="user">
+                    <a class="tab active" data-tab="basic">Basic</a><span></span>
+                    <a class="tab" data-tab="profile">Profile</a><span></span>
+                    <a class="tab" data-tab="credits">Credits</a><span></span>
+                    <a class="tab" data-tab="notes">Notes</a><span></span>
+                </div>
+
                 <form class="form" method="post">
 
                     <input type="hidden" name="action" value="edit-users" />
                     <input type="hidden" name="subaction" value="editor" />
 
-                    <div class="field">
-                        <strong class="label">User ID</strong>
-                        <input type="hidden" name="user_id" value="<?= $user_data['user_id'] ?>" />
-                        <input class="textbox" type="text" name="user_id" value="<?= $user_data['user_id'] ?>" disabled="disabled" />
-                    </div>
+                    <div class="editor-panels" data-tabgroup="user">
 
-                    <div class="field">
-                        <div class="label">
-                            <strong>Login Username</strong>
-                            <em>avoid changing</em>
-                        </div>
-                        <input type="hidden" name="user_name_clean" value="<?= $user_data['user_name_clean'] ?>" />
-                        <input class="textbox" type="text" name="user_name" value="<?= $user_data['user_name'] ?>" maxlength="64" />
-                    </div>
+                        <div class="panel active" data-tab="basic">
 
-                    <div class="field">
-                        <strong class="label">Public Username</strong>
-                        <input class="textbox" type="text" name="user_name_public" value="<?= $user_data['user_name_public'] ?>" maxlength="64" />
-                    </div>
+                            <div class="field">
+                                <strong class="label">User ID</strong>
+                                <input type="hidden" name="user_id" value="<?= $user_data['user_id'] ?>" />
+                                <input class="textbox" type="text" name="user_id" value="<?= $user_data['user_id'] ?>" disabled="disabled" />
+                            </div>
 
-                    <div class="field">
-                        <div class="label">
-                            <strong>Date of Birth</strong>
-                            <em>yyyy-mm-dd</em>
-                        </div>
-                        <input class="textbox" type="text" name="user_date_birth" value="<?= !empty($user_data['user_date_birth']) ? date('Y-m-d', $user_data['user_date_birth']) : '' ?>" maxlength="10" placeholder="YYYY-MM-DD" />
-                    </div>
-
-                    <div class="field">
-                        <strong class="label">Gender Identity</strong>
-                        <select class="select" name="user_gender">
-                            <option value="" <?= empty($user_data['user_gender']) ? 'selected="selected"' : '' ?>>- none -</option>
-                            <option value="male" <?= $user_data['user_gender'] == 'male' ? 'selected="selected"' : '' ?>>Male</option>
-                            <option value="female" <?= $user_data['user_gender'] == 'female' ? 'selected="selected"' : '' ?>>Female</option>
-                            <option value="other" <?= $user_data['user_gender'] == 'other' ? 'selected="selected"' : '' ?>>Other</option>
-                        </select><span></span>
-                    </div>
-
-                    <div class="field">
-                        <strong class="label">Account Type</strong>
-                        <select class="select" name="role_id">
-                            <?
-                            foreach ($mmrpg_roles_index AS $role_id => $role_data){
-                                $label = $role_data['role_name'];
-                                $selected = !empty($user_data['role_id']) && $user_data['role_id'] == $role_id ? 'selected="selected"' : '';
-                                echo('<option value="'.$role_id.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                            }
-                            ?>
-                        </select><span></span>
-                    </div>
-
-                    <div class="field">
-                        <strong class="label">Player Colour</strong>
-                        <select class="select" name="user_colour_token">
-                            <?
-                            echo('<option value=""'.(empty($user_data['user_colour_token']) ? 'selected="selected"' : '').'>- none -</option>');
-                            foreach ($mmrpg_types_index AS $type_token => $type_data){
-                                $label = $type_data['type_name'];
-                                $selected = !empty($user_data['user_colour_token']) && $user_data['user_colour_token'] == $type_token ? 'selected="selected"' : '';
-                                echo('<option value="'.$type_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                            }
-                            ?>
-                        </select><span></span>
-                    </div>
-
-                    <div class="field">
-                        <strong class="label">Player Background</strong>
-                        <select class="select" name="user_background_path">
-                            <?
-                            echo('<option value=""'.(empty($user_data['user_background_path']) ? 'selected="selected"' : '').'>- none -</option>');
-                            foreach ($mmrpg_fields_index AS $field_token => $field_data){
-                                $field_path = 'fields/'.$field_token;
-                                $label = $field_data['field_name'];
-                                $selected = !empty($user_data['user_background_path']) && $user_data['user_background_path'] == $field_path ? 'selected="selected"' : '';
-                                echo('<option value="'.$field_path.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                            }
-                            ?>
-                        </select><span></span>
-                    </div>
-
-                    <div class="field">
-                        <strong class="label">Player Avatar</strong>
-                        <select class="select" name="user_image_path">
-                            <?
-                            echo('<option value=""'.(empty($user_data['user_image_path']) ? 'selected="selected"' : '').'>- none -</option>');
-                            foreach ($mmrpg_robots_index AS $robot_token => $robot_data){
-                                if (!rpg_game::sprite_exists(MMRPG_CONFIG_ROOTDIR.'images/robots/'.$robot_token.'/')){ continue; }
-                                $robot_path = 'robots/'.$robot_token.'/'.$robot_data['robot_image_size'];
-                                $label = $robot_data['robot_number'].' '.$robot_data['robot_name'];
-                                $selected = !empty($user_data['user_image_path']) && $user_data['user_image_path'] == $robot_path ? 'selected="selected"' : '';
-                                echo('<option value="'.$robot_path.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                if (!empty($robot_data['robot_image_alts'])){
-                                    $image_alts = json_decode($robot_data['robot_image_alts'], true);
-                                    foreach ($image_alts AS $alt_data){
-                                        $alt_token = $alt_data['token'];
-                                        $alt_path = 'robots/'.$robot_token.'_'.$alt_token.'/'.$robot_data['robot_image_size'];
-                                        $label = $robot_data['robot_number'].' '.$alt_data['name'];
-                                        $selected = !empty($user_data['user_image_path']) && $user_data['user_image_path'] == $alt_path ? 'selected="selected"' : '';
-                                        echo('<option value="'.$alt_path.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                            <div class="field">
+                                <strong class="label">Account Type</strong>
+                                <select class="select" name="role_id">
+                                    <?
+                                    foreach ($mmrpg_roles_index AS $role_id => $role_data){
+                                        $label = $role_data['role_name'];
+                                        $selected = !empty($user_data['role_id']) && $user_data['role_id'] == $role_id ? 'selected="selected"' : '';
+                                        echo('<option value="'.$role_id.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
                                     }
-                                }
-                            }
-                            foreach ($mmrpg_players_index AS $player_token => $player_data){
-                                if (!rpg_game::sprite_exists(MMRPG_CONFIG_ROOTDIR.'images/players/'.$player_token.'/')){ continue; }
-                                $player_path = 'players/'.$player_token.'/'.$player_data['player_image_size'];
-                                $label = $player_data['player_name'];
-                                $selected = !empty($user_data['user_image_path']) && $user_data['user_image_path'] == $player_path ? 'selected="selected"' : '';
-                                echo('<option value="'.$player_path.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                            }
-                            ?>
-                        </select><span></span>
-                    </div>
-
-                    <div class="field">
-                        <strong class="label">Email Address</strong>
-                        <input class="textbox" type="text" name="user_email_address" value="<?= $user_data['user_email_address'] ?>" maxlength="128" />
-                    </div>
-
-                    <div class="field">
-                        <strong class="label">Website Address</strong>
-                        <input class="textbox" type="text" name="user_website_address" value="<?= $user_data['user_website_address'] ?>" maxlength="128" />
-                    </div>
-
-                    <div class="field">
-                        <div class="label">
-                            <strong>IPv4 Address</strong>
-                            <em>0.0.0.0</em>
-                        </div>
-                        <?
-                        // Only keep the last ten IP addresses to prevent var overflow
-                        $user_ip_addresses = $user_data['user_ip_addresses'];
-                        $user_ip_addresses = !empty($user_ip_addresses) ? explode(',', $user_ip_addresses) : array($user_ip_addresses);
-                        if (count($user_ip_addresses) > 10){ $user_ip_addresses = array_slice($user_ip_addresses, -10, 10); }
-                        $user_ip_addresses = implode(',', $user_ip_addresses);
-                        ?>
-                        <input class="textbox" type="text" name="user_ip_addresses" value="<?= $user_ip_addresses ?>" maxlength="256" />
-                    </div>
-
-                    <div class="field fullsize">
-                        <div class="label">
-                            <strong>Profile Text</strong>
-                            <em>public, displayed on leaderboard page</em>
-                        </div>
-                        <textarea class="textarea" name="user_profile_text" rows="10"><?= htmlentities($user_data['user_profile_text'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
-                    </div>
-
-                    <hr />
-
-                    <div class="field">
-                        <div class="label">
-                            <strong>Contributor Profile</strong>
-                            <em>export changes to this credits page profile</em>
-                        </div>
-                        <select class="select" name="contributor_id">
-                            <option value="0"<?= empty($user_data['contributor_id']) ? 'selected="selected"' : '' ?>>- none -</option>
-                            <option disabled="disabled">----------</option>
-                            <?
-                            $last_opt_group = '';
-                            foreach ($mmrpg_contributors_index AS $contributor_id => $contributor_data){
-                                $opt_group = 'Joined '.date('Y', $contributor_data['user_date_created']);
-                                if (empty($last_opt_group) || $last_opt_group !== $opt_group){ echo(!empty($last_opt_group) ? '</optgroup>' : ''); echo('<optgroup label="'.$opt_group.'">'); $last_opt_group = $opt_group; }
-                                $label = (!empty($contributor_data['user_name_public']) ? $contributor_data['user_name_public'].' / ' : '').$contributor_data['user_name'];
-                                if (strtolower($contributor_data['user_name']) !== $contributor_data['user_name_clean']){ $label .= ' / '.$contributor_data['user_name_clean']; }
-                                $selected = !empty($user_data['contributor_id']) && $user_data['contributor_id'] == $contributor_id ? 'selected="selected"' : '';
-                                echo('<option value="'.$contributor_id.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                            }
-                            echo(!empty($last_opt_group) ? '</optgroup>' : '');
-                            ?>
-                            <option disabled="disabled">----------</option>
-                            <option value="new">&laquo; New Profile &raquo;</option>
-                        </select><span></span>
-                    </div>
-
-                    <? if (!empty($user_data['contributor_id'])){ ?>
-
-                        <?
-                        // Pull contributor data for this user in case we need it
-                        $contributor_fields = rpg_user::get_contributor_index_fields(true);
-                        $contributor_data = $db->get_array("SELECT {$contributor_fields} FROM mmrpg_users_contributors WHERE contributor_id = {$user_data['contributor_id']};");
-                        ?>
-
-                        <div class="field fullsize">
-                            <div class="label">
-                                <strong>Contributor Credit Line</strong>
-                                <em>public, displayed on credits page profile</em>
+                                    ?>
+                                </select><span></span>
                             </div>
-                            <strong class="label"></strong>
-                            <input class="textbox" type="text" name="user_credit_line" value="<?= htmlentities($user_data['user_credit_line'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="32" />
-                        </div>
 
-                        <div class="field fullsize">
-                            <div class="label">
-                                <strong>Contributor Credit Text</strong>
-                                <em>public, displayed on credits page profile</em>
+                            <div class="field">
+                                <div class="label">
+                                    <strong>Login Username</strong>
+                                    <em>avoid changing</em>
+                                </div>
+                                <input type="hidden" name="user_name_clean" value="<?= $user_data['user_name_clean'] ?>" />
+                                <input class="textbox" type="text" name="user_name" value="<?= $user_data['user_name'] ?>" maxlength="64" />
                             </div>
-                            <textarea class="textarea" name="user_credit_text" rows="10"><?= htmlentities($user_data['user_credit_text'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
-                        </div>
 
-                        <div class="options">
+                            <div class="field">
+                                <strong class="label">Public Username</strong>
+                                <input class="textbox" type="text" name="user_name_public" value="<?= $user_data['user_name_public'] ?>" maxlength="64" />
+                            </div>
 
-                            <div class="field checkwrap rfloat">
-                                <label class="label">
-                                    <strong>Active Contributor</strong>
-                                    <input type="hidden" name="contributor_flag_showcredits" value="0" checked="checked" />
-                                    <input class="checkbox" type="checkbox" name="contributor_flag_showcredits" value="1" <?= !empty($contributor_data['contributor_flag_showcredits']) ? 'checked="checked"' : '' ?> />
-                                </label>
-                                <p class="subtext">Show user on the credits page</p>
+                            <div class="field">
+                                <strong class="label">Gender Identity</strong>
+                                <select class="select" name="user_gender">
+                                    <option value="" <?= empty($user_data['user_gender']) ? 'selected="selected"' : '' ?>>- none -</option>
+                                    <option value="male" <?= $user_data['user_gender'] == 'male' ? 'selected="selected"' : '' ?>>Male</option>
+                                    <option value="female" <?= $user_data['user_gender'] == 'female' ? 'selected="selected"' : '' ?>>Female</option>
+                                    <option value="other" <?= $user_data['user_gender'] == 'other' ? 'selected="selected"' : '' ?>>Other</option>
+                                </select><span></span>
+                            </div>
+
+                            <div class="field">
+                                <div class="label">
+                                    <strong>Date of Birth</strong>
+                                    <em>yyyy-mm-dd</em>
+                                </div>
+                                <input class="textbox" type="text" name="user_date_birth" value="<?= !empty($user_data['user_date_birth']) ? date('Y-m-d', $user_data['user_date_birth']) : '' ?>" maxlength="10" placeholder="YYYY-MM-DD" />
+                            </div>
+
+                            <div class="field">
+                                <strong class="label">Email Address</strong>
+                                <input class="textbox" type="text" name="user_email_address" value="<?= $user_data['user_email_address'] ?>" maxlength="128" />
+                            </div>
+
+                            <div class="field">
+                                <strong class="label">Website Address</strong>
+                                <input class="textbox" type="text" name="user_website_address" value="<?= $user_data['user_website_address'] ?>" maxlength="128" />
+                            </div>
+
+                            <div class="field fullsize">
+                                <div class="label">
+                                    <strong>IPv4 Address</strong>
+                                    <em>0.0.0.0</em>
+                                </div>
+                                <?
+                                // Only keep the last ten IP addresses to prevent var overflow
+                                $user_ip_addresses = $user_data['user_ip_addresses'];
+                                $user_ip_addresses = !empty($user_ip_addresses) ? explode(',', $user_ip_addresses) : array($user_ip_addresses);
+                                $user_ip_addresses = !empty($user_ip_addresses) ? array_map('trim', $user_ip_addresses) : array();
+                                if (count($user_ip_addresses) > 10){ $user_ip_addresses = array_slice($user_ip_addresses, -10, 10); }
+                                $print_user_ip_addresses = implode(', ', $user_ip_addresses);
+                                $save_user_ip_addresses = implode(',', $user_ip_addresses);
+                                ?>
+                                <input class="hidden" type="hidden" name="user_ip_addresses" value="<?= $save_user_ip_addresses ?>" maxlength="256" />
+                                <textarea class="textarea" name="user_ip_addresses" rows="3" maxlength="256" disabled="disabled"><?= htmlentities($print_user_ip_addresses, ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                            </div>
+
+                            <hr />
+
+                            <div class="field">
+                                <div class="label">
+                                    <strong>Change Password</strong>
+                                    <em>6 - 32 characters</em>
+                                </div>
+                                <input class="textbox" type="password" name="user_password_new" value="" maxlength="32" />
+                            </div>
+
+                            <div class="field">
+                                <strong class="label">Retype Password</strong>
+                                <input class="textbox" type="password" name="user_password_new2" value="" maxlength="32" />
                             </div>
 
                         </div>
 
-                    <? } ?>
+                        <div class="panel" data-tab="profile">
 
-                    <hr />
+                            <div class="field">
+                                <strong class="label">Player Colour</strong>
+                                <select class="select" name="user_colour_token">
+                                    <?
+                                    echo('<option value=""'.(empty($user_data['user_colour_token']) ? 'selected="selected"' : '').'>- none -</option>');
+                                    foreach ($mmrpg_types_index AS $type_token => $type_data){
+                                        $label = $type_data['type_name'];
+                                        $selected = !empty($user_data['user_colour_token']) && $user_data['user_colour_token'] == $type_token ? 'selected="selected"' : '';
+                                        echo('<option value="'.$type_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                    }
+                                    ?>
+                                </select><span></span>
+                            </div>
 
-                    <div class="field fullsize">
-                        <div class="label">
-                            <strong>Moderates Notes</strong>
-                            <em>private, only visible to staff</em>
+                            <div class="field">
+                                <strong class="label">Player Background</strong>
+                                <select class="select" name="user_background_path">
+                                    <?
+                                    echo('<option value=""'.(empty($user_data['user_background_path']) ? 'selected="selected"' : '').'>- none -</option>');
+                                    foreach ($mmrpg_fields_index AS $field_token => $field_data){
+                                        $field_path = 'fields/'.$field_token;
+                                        $label = $field_data['field_name'];
+                                        $selected = !empty($user_data['user_background_path']) && $user_data['user_background_path'] == $field_path ? 'selected="selected"' : '';
+                                        echo('<option value="'.$field_path.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                    }
+                                    ?>
+                                </select><span></span>
+                            </div>
+
+                            <div class="field">
+                                <strong class="label">Player Avatar</strong>
+                                <select class="select" name="user_image_path">
+                                    <?
+                                    echo('<option value=""'.(empty($user_data['user_image_path']) ? 'selected="selected"' : '').'>- none -</option>');
+                                    foreach ($mmrpg_robots_index AS $robot_token => $robot_data){
+                                        if (!rpg_game::sprite_exists(MMRPG_CONFIG_ROOTDIR.'images/robots/'.$robot_token.'/')){ continue; }
+                                        $robot_path = 'robots/'.$robot_token.'/'.$robot_data['robot_image_size'];
+                                        $label = $robot_data['robot_number'].' '.$robot_data['robot_name'];
+                                        $selected = !empty($user_data['user_image_path']) && $user_data['user_image_path'] == $robot_path ? 'selected="selected"' : '';
+                                        echo('<option value="'.$robot_path.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                        if (!empty($robot_data['robot_image_alts'])){
+                                            $image_alts = json_decode($robot_data['robot_image_alts'], true);
+                                            foreach ($image_alts AS $alt_data){
+                                                $alt_token = $alt_data['token'];
+                                                $alt_path = 'robots/'.$robot_token.'_'.$alt_token.'/'.$robot_data['robot_image_size'];
+                                                $label = $robot_data['robot_number'].' '.$alt_data['name'];
+                                                $selected = !empty($user_data['user_image_path']) && $user_data['user_image_path'] == $alt_path ? 'selected="selected"' : '';
+                                                echo('<option value="'.$alt_path.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                            }
+                                        }
+                                    }
+                                    foreach ($mmrpg_players_index AS $player_token => $player_data){
+                                        if (!rpg_game::sprite_exists(MMRPG_CONFIG_ROOTDIR.'images/players/'.$player_token.'/')){ continue; }
+                                        $player_path = 'players/'.$player_token.'/'.$player_data['player_image_size'];
+                                        $label = $player_data['player_name'];
+                                        $selected = !empty($user_data['user_image_path']) && $user_data['user_image_path'] == $player_path ? 'selected="selected"' : '';
+                                        echo('<option value="'.$player_path.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                    }
+                                    ?>
+                                </select><span></span>
+                            </div>
+
+                            <hr />
+
+                            <div class="field fullsize">
+                                <div class="label">
+                                    <strong>Profile Text</strong>
+                                    <em>public, displayed on leaderboard page</em>
+                                </div>
+                                <textarea class="textarea" name="user_profile_text" rows="20"><?= htmlentities($user_data['user_profile_text'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                            </div>
+
+                            <hr />
+
+                            <div class="field">
+                                <div class="label">
+                                    <strong>Omega Sequence</strong>
+                                    <em>procedural generation string</em>
+                                </div>
+                                <input type="hidden" name="user_omega" value="<?= $user_data['user_omega'] ?>" />
+                                <input class="textbox" type="text" name="user_omega" value="<?= $user_data['user_omega'] ?>" disabled="disabled" maxlength="32" />
+                            </div>
+
+                            <div class="field">
+                                <div class="label">
+                                    <strong>Regenerate Sequence</strong>
+                                    <em>enter new seed value</em>
+                                </div>
+                                <input class="textbox" type="text" name="user_omega_seed" value="" maxlength="32" />
+                            </div>
+
                         </div>
-                        <textarea class="textarea" name="user_admin_text" rows="10"><?= htmlentities($user_data['user_admin_text'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
-                    </div>
 
-                    <hr />
+                        <div class="panel" data-tab="credits">
 
-                    <div class="field">
-                        <div class="label">
-                            <strong>Omega Sequence</strong>
-                            <em>procedural generation string</em>
+                            <div class="field">
+                                <div class="label">
+                                    <strong>Contributor Profile</strong>
+                                    <em>export changes to this credits page profile</em>
+                                </div>
+                                <select class="select" name="contributor_id">
+                                    <option value="0"<?= empty($user_data['contributor_id']) ? 'selected="selected"' : '' ?>>- none -</option>
+                                    <option disabled="disabled">----------</option>
+                                    <?
+                                    $last_opt_group = '';
+                                    foreach ($mmrpg_contributors_index AS $contributor_id => $contributor_data){
+                                        $opt_group = 'Joined '.date('Y', $contributor_data['user_date_created']);
+                                        if (empty($last_opt_group) || $last_opt_group !== $opt_group){ echo(!empty($last_opt_group) ? '</optgroup>' : ''); echo('<optgroup label="'.$opt_group.'">'); $last_opt_group = $opt_group; }
+                                        $label = (!empty($contributor_data['user_name_public']) ? $contributor_data['user_name_public'].' / ' : '').$contributor_data['user_name'];
+                                        if (strtolower($contributor_data['user_name']) !== $contributor_data['user_name_clean']){ $label .= ' / '.$contributor_data['user_name_clean']; }
+                                        $selected = !empty($user_data['contributor_id']) && $user_data['contributor_id'] == $contributor_id ? 'selected="selected"' : '';
+                                        echo('<option value="'.$contributor_id.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                    }
+                                    echo(!empty($last_opt_group) ? '</optgroup>' : '');
+                                    ?>
+                                    <option disabled="disabled">----------</option>
+                                    <option value="new">&laquo; New Profile &raquo;</option>
+                                </select><span></span>
+                            </div>
+
+                            <? if (!empty($user_data['contributor_id'])){ ?>
+
+                                <?
+                                // Pull contributor data for this user in case we need it
+                                $contributor_fields = rpg_user::get_contributor_index_fields(true);
+                                $contributor_data = $db->get_array("SELECT {$contributor_fields} FROM mmrpg_users_contributors WHERE contributor_id = {$user_data['contributor_id']};");
+                                ?>
+
+                                <div class="field fullsize">
+                                    <div class="label">
+                                        <strong>Contributor Credit Line</strong>
+                                        <em>public, displayed on credits page profile</em>
+                                    </div>
+                                    <strong class="label"></strong>
+                                    <input class="textbox" type="text" name="user_credit_line" value="<?= htmlentities($user_data['user_credit_line'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="32" />
+                                </div>
+
+                                <div class="field fullsize">
+                                    <div class="label">
+                                        <strong>Contributor Credit Text</strong>
+                                        <em>public, displayed on credits page profile</em>
+                                    </div>
+                                    <textarea class="textarea" name="user_credit_text" rows="20"><?= htmlentities($user_data['user_credit_text'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                                </div>
+
+                                <div class="options">
+
+                                    <div class="field checkwrap rfloat">
+                                        <label class="label">
+                                            <strong>Active Contributor</strong>
+                                            <input type="hidden" name="contributor_flag_showcredits" value="0" checked="checked" />
+                                            <input class="checkbox" type="checkbox" name="contributor_flag_showcredits" value="1" <?= !empty($contributor_data['contributor_flag_showcredits']) ? 'checked="checked"' : '' ?> />
+                                        </label>
+                                        <p class="subtext">Show user on the credits page</p>
+                                    </div>
+
+                                </div>
+
+                            <? } ?>
+
                         </div>
-                        <input type="hidden" name="user_omega" value="<?= $user_data['user_omega'] ?>" />
-                        <input class="textbox" type="text" name="user_omega" value="<?= $user_data['user_omega'] ?>" disabled="disabled" maxlength="32" />
-                    </div>
 
-                    <div class="field">
-                        <div class="label">
-                            <strong>Regenerate Sequence</strong>
-                            <em>enter new seed value</em>
+                        <div class="panel" data-tab="notes">
+
+                            <div class="field fullsize">
+                                <div class="label">
+                                    <strong>Moderates Notes</strong>
+                                    <em>private, only visible to staff</em>
+                                </div>
+                                <textarea class="textarea" name="user_admin_text" rows="20"><?= htmlentities($user_data['user_admin_text'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                            </div>
+
                         </div>
-                        <input class="textbox" type="text" name="user_omega_seed" value="" maxlength="32" />
-                    </div>
 
-                    <hr />
-
-                    <div class="field">
-                        <div class="label">
-                            <strong>Change Password</strong>
-                            <em>6 - 32 characters</em>
-                        </div>
-                        <input class="textbox" type="password" name="user_password_new" value="" maxlength="32" />
-                    </div>
-
-                    <div class="field">
-                        <strong class="label">Retype Password</strong>
-                        <input class="textbox" type="password" name="user_password_new2" value="" maxlength="32" />
                     </div>
 
                     <hr />
@@ -1166,9 +1194,9 @@
                         </div>
 
                         <div class="metadata">
-                            <div class="date"><strong>Last Login</strong>: <?= !empty($user_data['user_last_login']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $user_data['user_last_login'])) : '-' ?></div>
-                            <div class="date"><strong>Created</strong>: <?= !empty($user_data['user_date_created']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $user_data['user_date_created'])): '-' ?></div>
-                            <div class="date"><strong>Modified</strong>: <?= !empty($user_data['user_date_modified']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $user_data['user_date_modified'])) : '-' ?></div>
+                            <div class="date last-login"><strong>Last Login</strong>: <?= !empty($user_data['user_last_login']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $user_data['user_last_login'])) : '-' ?></div>
+                            <div class="date created"><strong>Created</strong>: <?= !empty($user_data['user_date_created']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $user_data['user_date_created'])): '-' ?></div>
+                            <div class="date modified"><strong>Modified</strong>: <?= !empty($user_data['user_date_modified']) ? str_replace('@', 'at', date('Y-m-d @ H:i', $user_data['user_date_modified'])) : '-' ?></div>
                             <?
                             if ($user_data['user_account_age'] > 0){
                                 $date1 = new DateTime();
@@ -1185,7 +1213,7 @@
                                 if (!empty($days)){ $print_user_account_age[] = $days.' '.($days === 1 ? 'Day' : 'Days'); }
                                 if (empty($print_user_account_age)){ $print_user_account_age[] = '1 Day'; }
                                 $print_user_account_age = implode(', ', $print_user_account_age);
-                                echo('<div class="date"><strong>Active For</strong>: '.$print_user_account_age.'</div>');
+                                echo('<div class="date account-age"><strong>Active For</strong>: '.$print_user_account_age.'</div>');
                             }
                             ?>
                         </div>
