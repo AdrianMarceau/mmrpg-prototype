@@ -16,7 +16,7 @@ if (true){
     // users & saves & leaderboard
     $sql_table_list[] = array('name' => 'mmrpg_users', 'export_data' => false);
     $sql_table_list[] = array('name' => 'mmrpg_users_contributors');
-    $sql_table_list[] = array('name' => 'mmrpg_users_permissions', 'export_data' => false);
+    $sql_table_list[] = array('name' => 'mmrpg_users_permissions', 'export_data' => false, 'export_using_prod' => false);
     $sql_table_list[] = array('name' => 'mmrpg_roles');
     $sql_table_list[] = array('name' => 'mmrpg_saves', 'export_data' => false);
     $sql_table_list[] = array('name' => 'mmrpg_sessions', 'export_data' => false);
