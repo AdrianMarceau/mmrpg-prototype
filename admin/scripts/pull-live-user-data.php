@@ -20,6 +20,7 @@ $copy_db_tables = array(
     // user tables
     'mmrpg_users',
     'mmrpg_users_contributors',
+    'mmrpg_users_permissions',
     'mmrpg_saves',
     'mmrpg_leaderboard',
     'mmrpg_sessions',
