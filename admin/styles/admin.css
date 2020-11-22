@@ -1687,10 +1687,6 @@ input[type=file] {
     display: block;
     margin: 0 auto 5px 0;
 }
-.adminform.edit-users .formfoot .metadata .date {
-    float: left;
-    margin: 0 20px 10px 0;
-}
 
 .adminform .formfoot .git-buttons {
     float: right;
@@ -2514,6 +2510,113 @@ input[type=file] {
 .adminform .bfg-attachments-preview .foreground_attachments { z-index: 4; }
 .adminform .bfg-attachments-preview .preview_wrapper:after { z-index: 5; }
 
+.adminform.edit-users .formfoot .metadata .date {
+    float: left;
+    margin: 0 20px 10px 0;
+}
+
+.adminform.edit-users .field.permissions-table {
+    display: block;
+    margin: 0 auto;
+}
+.adminform.edit-users .field.permissions-table ul {
+    display: block;
+    margin: 0 auto;
+    padding: 0;
+    list-style-type: none;
+}
+.adminform.edit-users .field.permissions-table li {
+    display: block;
+    margin: 0 auto 0 0;
+    padding: 0;
+}
+.adminform.edit-users .field.permissions-table li.odd {
+    background-color: #f0f0f0;
+}
+.adminform.edit-users .field.permissions-table li.even {
+    background-color: #fafafa;
+}
+.adminform.edit-users .field.permissions-table .field {
+    display: block;
+    float: none;
+    width: auto;
+    margin: 0;
+    padding: 2px;
+    min-height: 0;
+    font-size: 11px;
+    line-height: 1;
+}
+.adminform.edit-users .field.permissions-table .field .label {
+    cursor: pointer;
+    margin: 0 auto 0 0;
+    padding: 2px;
+    background-color: transparent;
+    transition: background-color 0.3s;
+}
+.adminform.edit-users .field.permissions-table .field .label strong {
+    font-weight: normal;
+}
+.adminform.edit-users .field.permissions-table .field .label strong,
+.adminform.edit-users .field.permissions-table .field .label input {
+    vertical-align: middle;
+}
+.adminform.edit-users .field.permissions-table .field .label:hover {
+    background-color: rgba(220, 240, 255, 0.9);
+}
+.adminform.edit-users .field.permissions-table .field .label:hover strong {
+    font-weight: bold;
+}
+
+.adminform.edit-users .field.permissions-table ul ul .field {
+    padding-left: 20px;
+}
+.adminform.edit-users .field.permissions-table ul ul ul .field {
+    padding-left: 40px;
+}
+
+.adminform.edit-users .field.permissions-table ul ul {
+    position: relative;
+    overflow: visible;
+}
+.adminform.edit-users .field.permissions-table ul ul:before {
+    content: "";
+    display: block;
+    position: absolute;
+    z-index: 1;
+    top: -5px;
+    left: 13px;
+    bottom: 15px;
+    height: auto;
+    width: 2px;
+    border-left: 2px solid transparent;
+}
+
+.adminform.edit-users .field.permissions-table ul ul li {
+    position: relative;
+    overflow: visible;
+}
+.adminform.edit-users .field.permissions-table ul ul li:before {
+    content: "";
+    display: block;
+    position: absolute;
+    z-index: 1;
+    top: 9px;
+    left: 13px;
+    height: 2px;
+    width: 10px;
+    border-bottom: 2px solid transparent;
+}
+.adminform.edit-users .field.permissions-table ul ul ul li:before {
+    width: 30px;
+}
+.adminform.edit-users .field.permissions-table ul ul ul ul li:before {
+    width: 50px;
+}
+.adminform.edit-users .field.permissions-table ul ul:before,
+.adminform.edit-users .field.permissions-table ul ul li:before {
+    border-width: 1px;
+    border-color: #cacaca;
+}
 
 .adminform.loading {
     cursor: not-allowed;

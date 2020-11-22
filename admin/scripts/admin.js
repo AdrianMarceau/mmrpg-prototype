@@ -725,6 +725,57 @@ $(document).ready(function(){
     }
 
 
+    // USER EDITOR EVENTS
+
+    // Check to make sure we're on the user editor page
+    var $editUsers = $('.adminform.edit-users', thisAdmin);
+    //console.log('$editUsers.length =', $editUsers.length);
+    if ($editUsers.length){
+        (function(){
+            //console.log('we can edit users!');
+
+            // Check to see if a permissions table is on the page
+            var $permissionsTable = $('.field.permissions-table', $editUsers);
+            if ($permissionsTable.length){
+                //console.log('we can edit permissions!!');
+
+                // Define a function for gracefully unchecking parent checkboxes
+                var uncheckParentCheckboxes = function($thisListItem){
+                    var $parentListItem = $thisListItem.closest('ul').closest('li');
+                    //console.log('this list item has ', $parentListItem.length, 'parent');
+                    if ($parentListItem.length){
+                        var $parentCheckbox = $parentListItem.find('input[type="checkbox"]').first();
+                        var parentIsChecked = $parentCheckbox.is(':checked') ? true : false;
+                        if (parentIsChecked){ $parentCheckbox.prop('checked', false); }
+                        uncheckParentCheckboxes($parentListItem);
+                        }
+                    };
+
+                // Add click events to add the checkboxes in the table
+                $('input[type="checkbox"]', $permissionsTable).bind('change', function(){
+                    var $thisCheckbox = $(this);
+                    var $thisListItem = $thisCheckbox.closest('li');
+                    var thisIsChecked = $thisCheckbox.is(':checked') ? true : false;
+                    //console.log('thisIsChecked = ', thisIsChecked);
+                    var $childCheckboxes = $thisListItem.find('ul li input[type="checkbox"]');
+                    //console.log('this checkbox has ', $childCheckboxes.length, 'children');
+                    if ($childCheckboxes.length){
+                        $childCheckboxes.each(function(){
+                            var $childCheckbox = $(this);
+                            var childIsChecked = $childCheckbox.is(':checked') ? true : false;
+                            //if (childIsChecked !== thisIsChecked){ $childCheckbox.get(0).click(); }
+                            if (childIsChecked !== thisIsChecked){ $childCheckbox.prop('checked', thisIsChecked); }
+                            });
+                        }
+                    if (!thisIsChecked){ uncheckParentCheckboxes($thisListItem); }
+                    });
+
+                }
+
+        })();
+    }
+
+
     // ROBOT EDITOR EVENTS
 
     // ...none at the moment

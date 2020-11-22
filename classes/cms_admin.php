@@ -1699,5 +1699,38 @@ class cms_admin {
         return $linecount;
     }
 
+
+    // -- PERMISSIONS FUNCTIONS -- //
+
+    // Define a recusive function for printing a user permissions table for the admin panel user-editor
+    public static function print_user_permissions_table($permissions_table, $user_permission_tokens){
+        static $row_odd_even;
+        static $admin_permission_tokens;
+        if (empty($permissions_table)){ return ''; }
+        if (empty($current_user_permission_tokens)){ $current_user_permission_tokens = rpg_user::current_user_permission_tokens(); }
+        $permissions_markup = '';
+        $permissions_markup .= '<ul>';
+        foreach ($permissions_table AS $perm_token => $sub_permissions_table){
+            if (!in_array($perm_token, $current_user_permission_tokens)){ continue; }
+            $row_odd_even = $row_odd_even !== 'odd' ? 'odd' : 'even';
+            $label = ucwords(str_replace('-', ' ', $perm_token));
+            $checked = in_array($perm_token, $user_permission_tokens) ? 'checked="checked" ' : '';
+            $permissions_markup .= '<li class="'.$row_odd_even.'">'.PHP_EOL;
+                $permissions_markup .= '<div class="field checkwrap">'.PHP_EOL;
+                    $permissions_markup .= '<label class="label">'.PHP_EOL;
+                        $permissions_markup .= '<input class="hidden" type="hidden" name="user_access_permissions['.$perm_token.']" value="0" />'.PHP_EOL;
+                        $permissions_markup .= '<input class="checkbox" type="checkbox" name="user_access_permissions['.$perm_token.']" value="1" '.$checked.'/>'.PHP_EOL;
+                        $permissions_markup .= '<strong>'.$label.'</strong>'.PHP_EOL;
+                    $permissions_markup .= '</label>'.PHP_EOL;
+                $permissions_markup .= '</div>'.PHP_EOL;
+                if (!empty($sub_permissions_table)){
+                    $permissions_markup .= self::print_user_permissions_table($sub_permissions_table, $user_permission_tokens);
+                }
+            $permissions_markup .= '</li>'.PHP_EOL;
+        }
+        $permissions_markup .= '</ul>';
+        return $permissions_markup;
+    }
+
 }
 ?>
