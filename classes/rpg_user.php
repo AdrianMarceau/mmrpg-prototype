@@ -554,7 +554,7 @@ class rpg_user {
     public static function current_user_has_all_permissions($permission_tokens){
         $user_id = self::get_current_userid();
         if (empty($user_id)){ $user_id = MMRPG_SETTINGS_GUEST_ID; }
-        return self::user_has_all_permissions($user_id, $permission$permission_tokens_token);
+        return self::user_has_all_permissions($user_id, $permission_tokens);
     }
 
     // Define a function for checking if a given user has any of the permissions listed in a a given array
@@ -563,7 +563,7 @@ class rpg_user {
         if (in_array('all', $user_permission_tokens)){ return true; }
         else { foreach ($permission_tokens AS $permission_token){
             if ($permission_token === '*'){ $permission_token = 'all'; }
-            if (!in_array($permission_token, $user_permission_tokens)){ return true; }
+            if (in_array($permission_token, $user_permission_tokens)){ return true; }
         } }
         return false;
     }

@@ -1707,12 +1707,26 @@ class cms_admin {
         static $row_odd_even;
         static $admin_permission_tokens;
         if (empty($permissions_table)){ return ''; }
-        if (empty($current_user_permission_tokens)){ $current_user_permission_tokens = rpg_user::current_user_permission_tokens(); }
+        static $current_user_permission_tokens;
+        if (empty($current_user_permission_tokens)){
+            $current_user_permission_tokens = rpg_user::current_user_permission_tokens();
+        }
         $permissions_markup = '';
         $permissions_markup .= '<ul>';
         foreach ($permissions_table AS $perm_token => $sub_permissions_table){
-            if ($perm_token === 'all' && !in_array($perm_token, $current_user_permission_tokens)){ continue; }
             $full_perm_token = (!empty($base_perm_token) ? $base_perm_token.'_' : '').$perm_token;
+            if (!in_array($perm_token, $current_user_permission_tokens)){
+                if (empty($sub_permissions_table)){ continue; }
+                $sub_permissions_tokens = rpg_user::get_permission_tokens_from_table(array($perm_token => $sub_permissions_table));
+                if (!rpg_user::current_user_has_any_permissions($sub_permissions_tokens)){
+                    continue;
+                } else {
+                    $sub_permissions_markup = self::print_user_permissions_table($sub_permissions_table, $user_permission_tokens, $full_perm_token);
+                    $sub_permissions_markup = substr(trim($sub_permissions_markup), 4, -5);
+                    $permissions_markup .= $sub_permissions_markup;
+                    continue;
+                }
+            }
             $row_odd_even = $row_odd_even !== 'odd' ? 'odd' : 'even';
             $label = ucwords(str_replace('-', ' ', $perm_token));
             $is_checked = in_array($perm_token, $user_permission_tokens) ? true : false;
