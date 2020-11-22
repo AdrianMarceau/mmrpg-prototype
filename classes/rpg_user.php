@@ -406,6 +406,8 @@ class rpg_user {
         if (!empty($_SESSION['GAME']['USER']['userid'])
             && !rpg_user::is_guest()){
             return $_SESSION['GAME']['USER']['userid'];
+        } elseif (!empty($_SESSION['admin_id'])){
+            return $_SESSION['admin_id'];
         } else {
             return false;
         }
@@ -428,132 +430,113 @@ class rpg_user {
     }
 
 
-    // -- PERMISSIONS FUNCTIONS -- //
+    // -- USER PERMISSIONS FUNCTIONS -- //
 
     // Define a function for building a permissions table given current table structure
-    public static function build_permissions_table($table_columns = array()){
+    public static function get_permissions_table(){
         global $db;
-
-        // Pull all the column names from the permissions tables
-        if (empty($table_columns)){
+        static $permissions_table;
+        if (empty($permissions_table)){
             $db_name = MMRPG_CONFIG_DBNAME;
             $tbl_name = 'mmrpg_users_permissions';
             $table_columns = $db->get_array_list("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
                 WHERE TABLE_SCHEMA = '{$db_name}' AND TABLE_NAME = '{$tbl_name}'
                 ;", 'COLUMN_NAME');
-        }
-        if (isset($table_columns['user_id'])){ unset($table_columns['user_id']); }
-        $table_columns = !empty($table_columns) ? array_keys($table_columns) : array();
-        //error_log('$table_columns = '.print_r($table_columns, true));
-
-        // If the table columns were empty, return now with false
-        if (empty($table_columns)){ return false; }
-
-        // Generate the permissions table given above column names
-        $permissions_table = array();
-        foreach ($table_columns AS $column_name){
-            $frags = explode('_', preg_replace('/^allow_/i', '', $column_name));
-            foreach ($frags AS $key => $frag){
-                if (!isset($permissions_table[$frag])){
-                    $permissions_table[$frag] = array();
-                }
-                if ($key > 0){
-                    $frag0 = $frags[0];
-                    if (!isset($permissions_table[$frag0][$frag])){
-                        $permissions_table[$frag0][$frag] = array();
-                    }
-                }
-                if ($key > 1){
-                    $frag1 = $frags[1];
-                    if (!isset($permissions_table[$frag0][$frag1][$frag])){
-                        $permissions_table[$frag0][$frag1][$frag] = array();
-                    }
-                }
-                if ($key > 2){
-                    $frag2 = $frags[2];
-                    if (!isset($permissions_table[$frag0][$frag1][$frag2][$frag])){
-                        $permissions_table[$frag0][$frag1][$frag2][$frag] = array();
-                    }
-                }
-                if ($key > 3){
-                    $frag3 = $frags[3];
-                    if (!isset($permissions_table[$frag0][$frag1][$frag2][$frag3][$frag])){
-                        $permissions_table[$frag0][$frag1][$frag2][$frag3][$frag] = array();
-                    }
-                }
+            if (isset($table_columns['user_id'])){ unset($table_columns['user_id']); }
+            $table_columns = !empty($table_columns) ? array_keys($table_columns) : array();
+            if (empty($table_columns)){ return false; }
+            $permissions_table = array();
+            foreach ($table_columns AS $column_name){
+                $temp_table = array();
+                $parts = explode('_', preg_replace('/^allow_/i', '', $column_name));
+                while ($bottom = array_pop($parts)){ $temp_table = array($bottom => $temp_table); }
+                $permissions_table = array_merge_recursive($permissions_table, $temp_table);
             }
         }
-        //error_log('$permissions_table = '.print_r($permissions_table, true));
-
-        // Return the generated permissions table
         return $permissions_table;
-
     }
 
-    // Define a function for getting the permissions table for reference
-    public static function get_permissions_table($refresh = false){
-        static $permissions_table;
-        if (empty($permissions_table) || $refresh){
-            $permissions_table = self::build_permissions_table();
+    // Define a function for getting all permission tokens in a given a permissions table
+    public static function get_permission_tokens_from_table($permissions_table, &$permissions_tokens = array()){
+        foreach ($permissions_table AS $key => $sub_permissions_table){
+            if (!in_array($key, $permissions_tokens)){ $permissions_tokens[] = $key; }
+            if (!empty($sub_permissions_table)){ self::get_permission_tokens_from_table($sub_permissions_table, $permissions_tokens); }
         }
-        return $permissions_table;
+        return $permissions_tokens;
+    }
+
+    // Define a function for getting inherited child permission tokens given a list of (possible) parents
+    public static function inherit_permission_tokens_from_table(&$user_permission_tokens, $permissions_table = array()){
+        if (empty($permissions_table)){ return; }
+        foreach ($permissions_table AS $parent_token => $child_permissions_table){
+            if (empty($child_permissions_table)){ continue; }
+            if (in_array($parent_token, $user_permission_tokens)){
+                $child_permission_tokens = array_keys($child_permissions_table);
+                $user_permission_tokens = array_merge($user_permission_tokens, $child_permission_tokens);
+            }
+            self::inherit_permission_tokens_from_table($user_permission_tokens, $child_permissions_table);
+        }
     }
 
     // Define a function for getting the permissions of a specific user
-    public static function get_user_permissions_table($user_id, $refresh = false){
+    private static $default_guest_permissions = array('allow_view-website' => 1);
+    private static $default_member_permissions = array('allow_view-website' => 1, 'allow_play-game' => 1);
+    public static function get_user_permission_tokens($user_id, $refresh = false){
         global $db;
         static $user_permissions_index = array();
-        static $default_member_permissions = array('allow_view-website', 'allow_play-game');
-        static $default_guest_permissions = array('allow_view-website');
         // Check to see if we need to (re)generate now of if there's already a cached version
         if (empty($user_permissions_index[$user_id]) || $refresh){
             // Pull raw permission if available, else assign default based on member vs guest
             $raw_user_permissions = $db->get_array("SELECT * FROM mmrpg_users_permissions WHERE user_id = {$user_id};");
+            //error_log('$raw_user_permissions('.$user_id.') = '.print_r($raw_user_permissions, true));
             if (!empty($raw_user_permissions)){
                 unset($raw_user_permissions['user_id']);
                 foreach ($raw_user_permissions AS $key => $value){ if (empty($value)){ unset($raw_user_permissions[$key]); } }
             } else {
-                if (self::is_member()){ $raw_user_permissions = $default_member_permissions; }
-                else { $raw_user_permissions = $default_guest_permissions; }
+                if ($user_id === MMRPG_SETTINGS_GUEST_ID){ $raw_user_permissions = self::$default_guest_permissions; }
+                else { $raw_user_permissions = self::$default_member_permissions; }
             }
-            // Copy over any inherited permissions from base table in case of updates/changes
+            //error_log('$raw_user_permissions('.$user_id.') = '.print_r($raw_user_permissions, true));
+            // Loop through raw permissions and collect allowed tokens from the end of each string
+            $user_permission_tokens = array();
+            $raw_permission_tokens = array_keys($raw_user_permissions);
+            foreach ($raw_permission_tokens AS $raw_token){
+                $token_frags = explode('_', $raw_token);
+                $user_permission_tokens[] = array_pop($token_frags);
+            }
+            //error_log('$user_permission_tokens('.$user_id.')(base) = '.print_r($user_permission_tokens, true));
+            // Auto-inherit permissions of any child tokens based on the collected parents above
             $base_permissions_table = self::get_permissions_table();
-            $user_permissions_table = self::build_permissions_table($raw_user_permissions);
-            self::inherit_user_permissions($user_permissions_table, $base_permissions_table);
+            self::inherit_permission_tokens_from_table($user_permission_tokens, $base_permissions_table);
+            //error_log('$user_permission_tokens('.$user_id.')(+inherited) = '.print_r($user_permission_tokens, true));
             // Assign the finalized permissions to the static index
-            $user_permissions_index[$user_id] = $user_permissions_table;
+            $user_permissions_index[$user_id] = $user_permission_tokens;
         }
         // Return the generated/cached permissions table for this user
         return $user_permissions_index[$user_id];
     }
 
-    // Define a function for inheriting permissions from a permissions table
-    public static function inherit_user_permissions(&$user_permissions_table, $base_permissions_table = array()){
-        if (empty($base_permissions_table)){ return; }
-        foreach ($user_permissions_table AS $perm_key => $perm_values){
-            if (!empty($base_permissions_table[$perm_key])){
-                $base_values = $base_permissions_table[$perm_key];
-                $user_permissions_table[$perm_key] = $base_values;
-                foreach ($base_values AS $base_subkey => $base_subkey_values){
-                    $user_permissions_table[$base_subkey] = $base_subkey_values;
-                    self::inherit_user_permissions($user_permissions_table, $base_subkey_values);
-                }
-            }
-        }
-    }
-
-    // Define a function for getting all of a user's permission tokens without the tree structure
-    public static function user_get_permissions_tokens($user_id){
-        $user_permissions_table = self::get_user_permissions_table($user_id);
-        return array_keys($user_permissions_table);
+    // Define a function for checking if a given user has permissions to do something
+    public static function current_user_permission_tokens(){
+        $user_id = self::get_current_userid();
+        if (empty($user_id)){ $user_id = MMRPG_SETTINGS_GUEST_ID; }
+        return self::get_user_permission_tokens($user_id);
     }
 
     // Define a function for checking if a given user has permissions to do something
     public static function user_has_permission($user_id, $permission_token){
+        $user_permission_tokens = self::get_user_permission_tokens($user_id);
         if ($permission_token === '*'){ $permission_token = 'all'; }
-        $user_permissions_tokens = self::user_get_permissions_tokens($user_id);
-        if (in_array($permission_token, $user_permissions_tokens)){ return true; }
+        if (in_array('all', $user_permission_tokens)){ return true; }
+        elseif (in_array($permission_token, $user_permission_tokens)){ return true; }
         else { return false; }
+    }
+
+    // Define a function for checking if a given user has permissions to do something
+    public static function current_user_has_permission($permission_token){
+        $user_id = self::get_current_userid();
+        if (empty($user_id)){ $user_id = MMRPG_SETTINGS_GUEST_ID; }
+        return self::user_has_permission($user_id, $permission_token);
     }
 
 }
