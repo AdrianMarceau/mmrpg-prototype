@@ -367,7 +367,7 @@ class cms_database {
                 // Skip fields that aren't named or have empty keys
                 if (empty($field) || !is_string($field)) { continue; }
                 // Otherwise, add to the insert_field and the insert_value lists
-                $insert_fields[] = $field;
+                $insert_fields[] = "`{$field}`";
                 $insert_values[] = "'".str_replace("'", "\'", $value)."'";
             }
             // Implode into an the insert strings
@@ -379,7 +379,7 @@ class cms_database {
             $insert_string = $insert_data;
         }
         // Create the insert query to run against the database
-        $insert_query = "INSERT INTO {$table_name} {$insert_string}";
+        $insert_query = "INSERT INTO `{$table_name}` {$insert_string}";
         // Execute the insert query against the database
         $affected_rows = 0;
         $return = $this->query($insert_query, $affected_rows);
@@ -433,7 +433,7 @@ class cms_database {
                 // Skip fields that aren't named or have empty keys
                 if (empty($field) || !is_string($field)) { continue; }
                 // Otherwise, add to the update_blocks list
-                $update_blocks[] = "$field = '".str_replace($find, $replace, $value)."'";
+                $update_blocks[] = "`{$field}` = '".str_replace($find, $replace, $value)."'";
                 }
             // Clear the update data to free memory
             unset($update_data, $field, $value);
@@ -459,7 +459,7 @@ class cms_database {
                 // Skip fields that aren't named or have empty keys
                 if (empty($field) || !is_string($field)) { continue; }
                 // Otherwise, add to the condition_blocks list
-                $condition_blocks[] = "$field = '".str_replace("'", "\'", $value)."'";
+                $condition_blocks[] = "`{$field}` = '".str_replace("'", "\'", $value)."'";
                 }
             // Clear the condition data to free memory
             unset($condition_data, $field, $value);
@@ -474,7 +474,7 @@ class cms_database {
             unset($condition_data);
             }
         // Now put together the update query to run against the database
-        $update_query = "UPDATE {$table_name} SET {$update_string} WHERE {$condition_string}";
+        $update_query = "UPDATE `{$table_name}` SET {$update_string} WHERE {$condition_string}";
         unset($update_string, $condition_string);
         // Execute the update query against the database
         $affected_rows = 0;
@@ -500,7 +500,7 @@ class cms_database {
                 // Skip fields that aren't named or have empty keys
                 if (empty($field) || !is_string($field)) { continue; }
                 // Otherwise, add to the condition_blocks list
-                $condition_blocks[] = "$field = '".str_replace("'", "\'", $value)."'";
+                $condition_blocks[] = "`{$field}` = '".str_replace("'", "\'", $value)."'";
             }
             // Implode into an condition string
             $condition_string = implode(' AND ', $condition_blocks);
@@ -510,7 +510,7 @@ class cms_database {
             $condition_string = $condition_data;
         }
         // Now put together the delete query to run against the database
-        $delete_query = "DELETE FROM {$table_name} WHERE {$condition_string}";
+        $delete_query = "DELETE FROM `{$table_name}` WHERE {$condition_string}";
         // Execute the delete query against the database
         $affected_rows = 0;
         $this->query($delete_query, $affected_rows);
