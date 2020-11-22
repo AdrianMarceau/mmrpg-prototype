@@ -9,8 +9,7 @@
     $mmrpg_website_pages_index = $db->get_array_list("SELECT {$mmrpg_pages_fields} FROM mmrpg_website_pages WHERE page_id <> 0;", 'page_id');
 
     // Pre-check access permissions before continuing
-    if (!in_array('*', $this_adminaccess)
-        && !in_array('edit-pages', $this_adminaccess)){
+    if (!rpg_user::current_user_has_permission('edit-pages')){
         $form_messages[] = array('error', 'You do not have permission to edit pages!');
         redirect_form_action('admin/home/');
     }

@@ -3,8 +3,7 @@
     <?
 
     // Pre-check access permissions before continuing
-    if (!in_array('*', $this_adminaccess)
-        && !in_array('edit-fields', $this_adminaccess)){
+    if (!rpg_user::current_user_has_permission('edit-fields')){
         $form_messages[] = array('error', 'You do not have permission to edit fields!');
         redirect_form_action('admin/home/');
     }

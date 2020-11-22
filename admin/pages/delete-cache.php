@@ -1,7 +1,9 @@
 <?
 
-// Prevent updating if logged into a file
-if (!rpg_user::is_guest()){ die('<strong>FATAL UPDATE ERROR!</strong><br /> You cannot be logged in while updating!');  }
+// Prevent delete cache if logged into a file
+if (!rpg_user::is_guest()){ die('<strong>FATAL ERROR!</strong><br /> You cannot be logged in while deleting cached files!');  }
+// Prevent delete cache if not allowed to do so
+if (!rpg_user::current_user_has_permission('delete-cached-files')){ die('<strong>FATAL ERROR!</strong><br /> You do not have permission to delete cached files!'); }
 
 // Print out the menu header so we know where we are
 ob_start();

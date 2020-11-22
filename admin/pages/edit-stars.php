@@ -5,8 +5,7 @@
     //<script src="https://cdn.jsdelivr.net/npm/litepicker/dist/js/main.js"></script>
 
     // Pre-check access permissions before continuing
-    if (!in_array('*', $this_adminaccess)
-        && !in_array('edit-stars', $this_adminaccess)){
+    if (!rpg_user::current_user_has_permission('edit-stars')){
         $form_messages[] = array('error', 'You do not have permission to edit stars!');
         redirect_form_action('admin/home/');
     }

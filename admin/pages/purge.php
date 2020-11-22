@@ -1,8 +1,7 @@
 <?
 
 // Pre-check access permissions before continuing
-if (!in_array('*', $this_adminaccess)
-    && !in_array('purge_bogus', $this_adminaccess)){
+if (!rpg_user::current_user_has_permission('purge-bogus-users')){
     $form_messages[] = array('error', 'You do not have permission to purge bogus users!');
     redirect_form_action('admin/home/');
 }

@@ -18,9 +18,7 @@
     $this_robot_page_baseurl = 'admin/'.$this_robot_page_token.'/';
 
     // Pre-check access permissions before continuing
-    if (!in_array('*', $this_adminaccess)
-        && !in_array('edit-robots', $this_adminaccess)
-        && !in_array($this_robot_page_token, $this_adminaccess)){
+    if (!rpg_user::current_user_has_permission($this_robot_page_token)){
         $form_messages[] = array('error', 'You do not have permission to edit '.$this_robot_xclass_name.'!');
         redirect_form_action('admin/home/');
     }

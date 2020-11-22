@@ -1,5 +1,8 @@
 <?
 
+// SCRIPT NOT USED ANYMORE?
+die('I do not believe this script is used anymore');
+
 // Collect any extra request variables for the update
 $this_cache_date = !empty($_REQUEST['date']) && preg_match('/^([0-9]{8})-([0-9]{2})$/', $_REQUEST['date']) ? $_REQUEST['date'] : MMRPG_CONFIG_CACHE_DATE;
 $this_update_limit = !empty($_REQUEST['limit']) && is_numeric($_REQUEST['limit']) ? $_REQUEST['limit'] : 10;
@@ -21,8 +24,7 @@ if (!empty($_REQUEST['patch'])
     // Pre-check access permissions before continuing
     $is_battlepoint_refresh = true;
     $base_update_href = 'admin/refresh-leaderboard/';
-    if (!in_array('*', $this_adminaccess)
-        && !in_array('refresh-leaderboard', $this_adminaccess)){
+    if (!rpg_user::current_user_has_permission('refresh-leaderboard')){
         $form_messages[] = array('error', 'You do not have permission to refresh the leaderboard!');
         redirect_form_action('admin/home/');
     }
@@ -30,8 +32,7 @@ if (!empty($_REQUEST['patch'])
 } else {
 
     // Pre-check access permissions before continuing
-    if (!in_array('*', $this_adminaccess)
-        && !in_array('patch-saves', $this_adminaccess)){
+    if (!rpg_user::current_user_has_permission('patch-save-files')){
         $form_messages[] = array('error', 'You do not have permission to patch save files!');
         redirect_form_action('admin/home/');
     }

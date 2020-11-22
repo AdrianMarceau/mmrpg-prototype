@@ -126,17 +126,6 @@ if (!empty($_SESSION['admin_id'])){
         ;");
 }
 
-// Define which pages this specific user has access to
-$this_adminaccess = array();
-$this_adminaccess[] = 'home';
-if (!empty($this_admininfo)
-    && MMRPG_CONFIG_ADMIN_PERMS_LIST !== ''){
-    $temp_admin_perms = json_decode(MMRPG_CONFIG_ADMIN_PERMS_LIST, true);
-    if (isset($temp_admin_perms[$this_admininfo['user_id']])){
-        $this_adminaccess = array_merge($this_adminaccess, $temp_admin_perms[$this_admininfo['user_id']]);
-    }
-}
-
 // If we're not logged in yet
 if (!MMRPG_CONFIG_ADMIN_MODE){
     // Require the admin home file

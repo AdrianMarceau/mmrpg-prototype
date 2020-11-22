@@ -33,9 +33,7 @@
     */
 
     // Pre-check access permissions before continuing
-    if (!in_array('*', $this_adminaccess)
-        && !in_array('edit-abilities', $this_adminaccess)
-        && !in_array($this_ability_page_token, $this_adminaccess)){
+    if (!rpg_user::current_user_has_permission($this_ability_page_token)){
         $form_messages[] = array('error', 'You do not have permission to edit '.$this_ability_xclass_name.'!');
         redirect_form_action('admin/home/');
     }

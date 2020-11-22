@@ -13,9 +13,7 @@
     $this_challenge_page_baseurl = 'admin/'.$this_challenge_page_token.'/';
 
     // Pre-check access permissions before continuing
-    if (!in_array('*', $this_adminaccess)
-        && !in_array('edit-challenges', $this_adminaccess)
-        && !in_array($this_challenge_page_token, $this_adminaccess)){
+    if (!rpg_user::current_user_has_permission($this_challenge_page_token)){
         $form_messages[] = array('error', 'You do not have permission to edit '.$this_challenge_kind.' challenges!');
         redirect_form_action('admin/home/');
     }

@@ -170,14 +170,9 @@ define('MMRPG_SETTINGS_CHAPTER3_STARLOCK', MMRPG_SETTINGS_CHAPTER2_STARLOCK + 0)
 define('MMRPG_SETTINGS_CHAPTER4_STARLOCK', MMRPG_SETTINGS_CHAPTER3_STARLOCK + (3 * 8));       // 24  (Fusions)
 define('MMRPG_SETTINGS_CHAPTER5_STARLOCK', MMRPG_SETTINGS_CHAPTER4_STARLOCK + (3 * 4));       // 36  (Finals)
 
-// Back-up definiation in case COPPA is not defined
+// Back-up definition in case COPPA is not defined
 if (!defined('MMRPG_CONFIG_COPPA_PERMISSIONS')){
     define(MMRPG_CONFIG_COPPA_PERMISSIONS, '');
-}
-
-// Back-up definition in case ADMIN PERMS are not defined
-if (!defined('MMRPG_CONFIG_ADMIN_PERMS_LIST')){
-    define(MMRPG_CONFIG_ADMIN_PERMS_LIST, '');
 }
 
 // Back-up definition in case SERVER ENV are not defined

@@ -11,7 +11,6 @@
 
     <? /*
     <pre>$this_admininfo = <?= print_r($this_admininfo, true) ?></pre>
-    <pre>$this_adminaccess = <?= print_r($this_adminaccess, true) ?></pre>
     */ ?>
 
     <?
@@ -30,7 +29,7 @@
         $this_group_options = array();
 
         // Populate the group options array with relevant pages and buttons
-        if (rpg_user::current_user_has_permission('edit-users')){
+        if (rpg_user::current_user_has_permission('edit-user-accounts')){
             $this_option = array(
                 'link' => array('url' => 'admin/edit-users/', 'text' => 'Moderate Users', 'bullet' => 'users'),
                 'desc' => 'update or modify user account info and permissions'

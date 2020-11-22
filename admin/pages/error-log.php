@@ -1,5 +1,11 @@
 <?
 
+// Pre-check access permissions before continuing
+if (!rpg_user::current_user_has_permission('watch-error-logs')){
+    $form_messages[] = array('error', 'You do not have permission to watch error logs!');
+    redirect_form_action('admin/home/');
+}
+
 // Update the title for this error log page
 $this_page_tabtitle = 'Error Log | '.$this_page_tabtitle;
 
@@ -30,7 +36,10 @@ function log_string_to_list_item($line_number, $log_string){
         $is_trace_string = true;
         $log_string = preg_replace($trace_pattern_two, '$2', $log_string);
     }
-    $item_markup = '<li class="line'.($is_trace_string ? ' trace' : '').'" data-line="'.$line_number.'">'.$log_string.'</li>';
+    $item_markup = '';
+    $item_markup .= '<li class="line'.($is_trace_string ? ' trace' : '').'" data-line="'.$line_number.'">';
+        $item_markup .= htmlspecialchars($log_string, ENT_QUOTES, 'UTF-8', true);
+    $item_markup .= '</li>';
     return $item_markup;
 }
 
