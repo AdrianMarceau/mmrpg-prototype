@@ -30,18 +30,14 @@
         $this_group_options = array();
 
         // Populate the group options array with relevant pages and buttons
-        if (in_array('*', $this_adminaccess)
-            || in_array('edit-users', $this_adminaccess)){
+        if (rpg_user::current_user_has_permission('edit-users')){
             $this_option = array(
                 'link' => array('url' => 'admin/edit-users/', 'text' => 'Moderate Users', 'bullet' => 'users'),
                 'desc' => 'update or modify user account info and permissions'
                 );
             $this_group_options[] = $this_option;
         }
-        if (in_array('*', $this_adminaccess)
-            || in_array('edit-content', $this_adminaccess)
-            || in_array('edit-challenges', $this_adminaccess)
-            || in_array('edit-user-challenges', $this_adminaccess)){
+        if (rpg_user::current_user_has_permission('edit-user-challenges')){
             $this_option = array(
                 'link' => array('url' => 'admin/edit-user-challenges/', 'text' => 'Moderate User Challenges', 'bullet' => 'users-cog'),
                 'desc' => 'update or modify user-created challenge missions for the post-game'
@@ -88,9 +84,7 @@
                 if (!isset($common_group_kinds_options[$kind_token])){ $common_group_kinds_options[$kind_token] = array(); }
 
                 // Populate the group options array with relevant pages and buttons
-                if ((in_array('*', $this_adminaccess)
-                    || in_array('pull-content', $this_adminaccess)
-                    || in_array('pull-from-github', $this_adminaccess))){
+                if (rpg_user::current_user_has_permission('pull-game-content')){
                     $option_buttons = array();
 
                     // Loop through the content types index and append permissible buttons
@@ -98,9 +92,7 @@
                         if ($type_info['token'] === 'sql'){ continue; }
                         elseif (!in_array($type_info['xtoken'], $allowed_content_types)){ continue; }
                         // Check to see if current user allowed to edit this content type
-                        if (in_array('*', $this_adminaccess)
-                            || in_array('edit-content', $this_adminaccess)
-                            || in_array('edit-'.$type_info['xtoken'], $this_adminaccess)){
+                        if (rpg_user::current_user_has_permission('edit-'.$type_info['xtoken'])){
                             $repo_base_path = MMRPG_CONFIG_CONTENT_PATH.rtrim($type_info['content_path'], '/').'/';
                             $git_pull_required = cms_admin::git_pull_required($repo_base_path);
                             if (!empty($git_pull_required)){
@@ -146,9 +138,7 @@
 
                 // Populate the group options array with relevant pages and buttons
                 if ((MMRPG_CONFIG_SERVER_ENV === 'local' || MMRPG_CONFIG_SERVER_ENV === 'dev')
-                    && (in_array('*', $this_adminaccess)
-                        || in_array('push-content', $this_adminaccess)
-                        || in_array('publish-to-github', $this_adminaccess))){
+                    && rpg_user::current_user_has_permission('push-content')){
                     $option_buttons = array();
 
                     // Loop through the content types index and append permissible buttons
@@ -156,9 +146,7 @@
                         if ($type_info['token'] === 'sql'){ continue; }
                         elseif (!in_array($type_info['xtoken'], $allowed_content_types)){ continue; }
                         // Check to see if current user allowed to edit this content type
-                        if (in_array('*', $this_adminaccess)
-                            || in_array('edit-content', $this_adminaccess)
-                            || in_array('edit-'.$type_info['xtoken'], $this_adminaccess)){
+                        if (rpg_user::current_user_has_permission('edit-'.$type_info['xtoken'])){
                             // Collect git details for the repo to see if button necessary
                             $repo_base_path = MMRPG_CONFIG_CONTENT_PATH.rtrim($type_info['content_path'], '/').'/';
                             $committed_changes = cms_admin::git_get_committed_changes($repo_base_path);
@@ -224,9 +212,7 @@
 
             // Populate the group options array with relevant pages and buttons
 
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-content', $this_adminaccess)
-                || in_array('edit-players', $this_adminaccess)){
+            if (rpg_user::current_user_has_permission('edit-players')){
                 $option_name = 'Edit Players';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-players/', 'text' => $option_name, 'bullet' => 'mask'),
@@ -264,10 +250,7 @@
                 $this_group_options[] = $this_option;
             }
 
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-content', $this_adminaccess)
-                || in_array('edit-robots', $this_adminaccess)
-                || in_array('edit-robot-master', $this_adminaccess)){
+            if (rpg_user::current_user_has_permission('edit-robot-masters')){
                 $option_name = 'Edit Robot Masters';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-robot-masters/', 'text' => $option_name, 'bullet' => 'robot'),
@@ -311,10 +294,7 @@
                     );
                 $this_group_options[] = $this_option;
             }
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-content', $this_adminaccess)
-                || in_array('edit-robots', $this_adminaccess)
-                || in_array('edit-support-mechas', $this_adminaccess)){
+            if (rpg_user::current_user_has_permission('edit-support-mechas')){
                 $option_name = 'Edit Support Mechas';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-support-mechas/', 'text' => $option_name, 'bullet' => 'ghost'),
@@ -358,10 +338,7 @@
                     );
                 $this_group_options[] = $this_option;
             }
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-content', $this_adminaccess)
-                || in_array('edit-robots', $this_adminaccess)
-                || in_array('edit-fortress-bosses', $this_adminaccess)){
+            if (rpg_user::current_user_has_permission('edit-fortress-bosses')){
                 $option_name = 'Edit Fortress Bosses';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-fortress-bosses/', 'text' => $option_name, 'bullet' => 'skull'),
@@ -406,10 +383,7 @@
                 $this_group_options[] = $this_option;
             }
 
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-content', $this_adminaccess)
-                || in_array('edit-abilities', $this_adminaccess)
-                || in_array('edit-master-abilities', $this_adminaccess)){
+            if (rpg_user::current_user_has_permission('edit-master-abilities')){
                 $option_name = 'Edit Master Abilities';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-master-abilities/', 'text' => $option_name, 'bullet' => 'fire-alt'),
@@ -453,10 +427,7 @@
                     );
                 $this_group_options[] = $this_option;
             }
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-content', $this_adminaccess)
-                || in_array('edit-abilities', $this_adminaccess)
-                || in_array('edit-mecha-abilities', $this_adminaccess)){
+            if (rpg_user::current_user_has_permission('edit-mecha-abilities')){
                 $option_name = 'Edit Mecha Abilities';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-mecha-abilities/', 'text' => $option_name, 'bullet' => 'fire'),
@@ -500,10 +471,7 @@
                     );
                 $this_group_options[] = $this_option;
             }
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-content', $this_adminaccess)
-                || in_array('edit-abilities', $this_adminaccess)
-                || in_array('edit-boss-abilities', $this_adminaccess)){
+            if (rpg_user::current_user_has_permission('edit-boss-abilities')){
                 $option_name = 'Edit Boss Abilities';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-boss-abilities/', 'text' => $option_name, 'bullet' => 'meteor'),
@@ -548,9 +516,7 @@
                 $this_group_options[] = $this_option;
             }
 
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-content', $this_adminaccess)
-                || in_array('edit-items', $this_adminaccess)){
+            if (rpg_user::current_user_has_permission('edit-items')){
                 $option_name = 'Edit Items';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-items/', 'text' => $option_name, 'bullet' => 'flask'),
@@ -588,9 +554,7 @@
                 $this_group_options[] = $this_option;
             }
 
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-content', $this_adminaccess)
-                || in_array('edit-fields', $this_adminaccess)){
+            if (rpg_user::current_user_has_permission('edit-fields')){
                 $option_name = 'Edit Fields';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-fields/', 'text' => $option_name, 'bullet' => 'map'),
@@ -644,9 +608,7 @@
             $this_group_options = array();
 
             // Populate the group options array with relevant pages and buttons
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-content', $this_adminaccess)
-                || in_array('edit-stars', $this_adminaccess)){
+            if (rpg_user::current_user_has_permission('edit-stars')){
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-stars/', 'text' => 'Edit Rogue Stars', 'bullet' => 'star'),
                     'desc' => 'schedule and manage rogue star appearances in the post-game',
@@ -682,10 +644,7 @@
                     );
                 $this_group_options[] = $this_option;
             }
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-content', $this_adminaccess)
-                || in_array('edit-challenges', $this_adminaccess)
-                || in_array('edit-event-challenges', $this_adminaccess)){
+            if (rpg_user::current_user_has_permission('edit-event-challenges')){
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-event-challenges/', 'text' => 'Edit Event Challenges', 'bullet' => 'trophy'),
                     'desc' => 'create or modify event-based challenge missions for the post-game',
@@ -738,9 +697,7 @@
             $this_group_options = array();
 
             // Populate the group options array with relevant pages and buttons
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-content', $this_adminaccess)
-                || in_array('edit-pages', $this_adminaccess)){
+            if (rpg_user::current_user_has_permission('edit-pages')){
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-pages/', 'text' => 'Edit Website Pages', 'bullet' => 'sitemap'),
                     'desc' => 'edit the text and images on various website pages',
@@ -803,8 +760,7 @@
         $this_group_options = array();
 
         // Populate the group options array with relevant pages and buttons
-        if (in_array('*', $this_adminaccess)
-            || in_array('pull-content', $this_adminaccess)){
+        if (rpg_user::current_user_has_permission('pull-content-updates')){
             $this_option = array(
                 'link' => array('url' => 'admin/scripts/pull-all-game-content.php?return=html', 'text' => 'Pull Content Updates', 'target' => '_blank', 'bullet' => 'cloud-download-alt'),
                 'desc' => 'pull published updates to game content and apply to this build'
@@ -813,8 +769,7 @@
         }
         if (MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== false
             && MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== MMRPG_CONFIG_SERVER_ENV){
-            if (in_array('*', $this_adminaccess)
-                || in_array('edit-users', $this_adminaccess)){
+            if (rpg_user::current_user_has_permission('pull-user-data')){
                 $this_option = array(
                     'link' => array('url' => 'admin/scripts/pull-live-user-data.php?return=html', 'text' => 'Pull Live User Data', 'target' => '_blank', 'bullet' => 'arrow-alt-circle-down'),
                     'desc' => 'pull current users and their data from live build to overwrite existing'
@@ -822,16 +777,14 @@
                 $this_group_options[] = $this_option;
             }
         }
-        if (in_array('*', $this_adminaccess)
-            || in_array('pull-core', $this_adminaccess)){
+        if (rpg_user::current_user_has_permission('pull-core-updates')){
             $this_option = array(
                 'link' => array('url' => 'admin/scripts/update-core.php?return=html', 'text' => 'Pull Core Updates', 'target' => '_blank', 'bullet' => 'caret-square-down'),
                 'desc' => 'pull updates to the master code, typically used only by the lead dev'
                 );
             $this_group_options[] = $this_option;
         }
-        if (in_array('*', $this_adminaccess)
-            || in_array('delete-cached-files', $this_adminaccess)){
+        if (rpg_user::current_user_has_permission('delete-cached-files')){
             $this_option = array(
                 'link' => array('url' => 'admin/delete-cached-files/', 'text' => 'Delete Cached Files', 'target' => '_blank', 'bullet' => 'trash'),
                 'desc' => 'delete cached markup, objects, timeouts, indexes, and more'
@@ -840,8 +793,7 @@
         }
         if ((MMRPG_CONFIG_SERVER_ENV === 'local'
                 || MMRPG_CONFIG_PULL_LIVE_DATA_FROM === false)
-            && (in_array('*', $this_adminaccess)
-                || in_array('refresh-leaderboard', $this_adminaccess))){
+            && rpg_user::current_user_has_permission('refresh-leaderboard')){
             $this_option = array(
                 'link' => array('url' => 'admin/scripts/refresh-battle-points.php?limit=10&offset=0&return=html', 'text' => 'Refresh Leaderboard', 'target' => '_blank', 'bullet' => 'sync-alt'),
                 'desc' => 'recalculate battle points for X number of users and refresh leaderboard'
@@ -854,16 +806,14 @@
         }
         if ((MMRPG_CONFIG_SERVER_ENV === 'local'
                 || MMRPG_CONFIG_PULL_LIVE_DATA_FROM === false)
-            && (in_array('*', $this_adminaccess)
-                || in_array('purge-bogus-users', $this_adminaccess))){
+            && rpg_user::current_user_has_permission('purge-bogus-users')){
             $this_option = array(
                 'link' => array('url' => 'admin/purge-bogus-users/limit=10', 'text' => 'Purge Bogus Users', 'target' => '_blank', 'bullet' => 'bomb'),
                 'desc' => 'purge user accounts with zero progress and no login history'
                 );
             $this_group_options[] = $this_option;
         }
-        if (in_array('*', $this_adminaccess)
-            || in_array('view-logs', $this_adminaccess)){
+        if (rpg_user::current_user_has_permission('watch-error-logs')){
             $this_option = array(
                 'link' => array('url' => 'admin/watch-error-log/', 'text' => 'Watch Error Log', 'target' => '_blank', 'bullet' => 'bug'),
                 'desc' => 'watch the error log to help with dev, debug, and testing'
