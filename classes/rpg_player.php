@@ -3117,20 +3117,14 @@ class rpg_player extends rpg_object {
                         $temp_prototype_data['this_current_chapter'] = '0';
                         $temp_prototype_data['phase_battle_token'] = '0';
 
-                        // Collect the admin permissions in case we need them
-                        $temp_admin_permissions = MMRPG_CONFIG_ADMIN_PERMS_LIST != '' ? json_decode(MMRPG_CONFIG_ADMIN_PERMS_LIST, true) : array();
-                        $this_admin_permissions = !empty($temp_admin_permissions[$this_userid]) ? $temp_admin_permissions[$this_userid] : array();
-
                         // Decide which types of missions we can show here
                         $include_event_challenges = true;
                         $include_user_challenges = false;
                         $include_hidden_challenges = false;
-                        if (MMRPG_USER_IS_ADMIN === true
-                            && (in_array('*', $this_admin_permissions)
-                                || in_array('edit-content', $this_admin_permissions)
-                                || in_array('edit-challenges', $this_admin_permissions)
-                                )){
+                        if (rpg_user::current_user_has_permission('edit-user-challenges')){
                             $include_user_challenges = true;
+                        }
+                        if (rpg_user::current_user_has_permission('edit-challenges')){
                             $include_hidden_challenges = true;
                         }
 
@@ -3140,48 +3134,52 @@ class rpg_player extends rpg_object {
                         $available_challenge_missions['user'] = array();
 
                         // Pull EVENT CHALLENGE data from the database given filters and ordering
-                        $query_conditions = '';
-                        $query_conditions .= 'AND challenges.challenge_flag_published = 1 ';
-                        $query_conditions .= 'AND challenges.challenge_kind = \'event\' ';
-                        if (!$include_hidden_challenges){
-                            if (!rpg_user::is_guest()){ $query_conditions .= 'AND (challenges.challenge_flag_hidden = 0 OR challenges.challenge_creator = '.$this_userid.')'; }
-                            else { $query_conditions .= 'AND challenges.challenge_flag_hidden = 0'; }
+                        if ($include_event_challenges){
+                            $query_conditions = '';
+                            $query_conditions .= 'AND challenges.challenge_flag_published = 1 ';
+                            $query_conditions .= 'AND challenges.challenge_kind = \'event\' ';
+                            if (!$include_hidden_challenges){
+                                if (!rpg_user::is_guest()){ $query_conditions .= 'AND (challenges.challenge_flag_hidden = 0 OR challenges.challenge_creator = '.$this_userid.')'; }
+                                else { $query_conditions .= 'AND challenges.challenge_flag_hidden = 0'; }
+                            }
+                            $challenge_table = 'mmrpg_challenges';
+                            $challenge_fields = rpg_mission_challenge::get_index_fields(true, 'challenges');
+                            $available_challenge_missions['event'] = $db->get_array_list("SELECT
+                                {$challenge_fields},
+                                (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS challenge_creator_name
+                                FROM {$challenge_table} AS challenges
+                                LEFT JOIN mmrpg_users AS users ON users.user_id = challenges.challenge_creator
+                                WHERE 1 = 1 {$query_conditions}
+                                ORDER BY
+                                challenges.challenge_creator ASC,
+                                challenges.challenge_id ASC
+                                LIMIT 100
+                                ;", 'challenge_id');
                         }
-                        $challenge_table = 'mmrpg_challenges';
-                        $challenge_fields = rpg_mission_challenge::get_index_fields(true, 'challenges');
-                        $available_challenge_missions['event'] = $db->get_array_list("SELECT
-                            {$challenge_fields},
-                            (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS challenge_creator_name
-                            FROM {$challenge_table} AS challenges
-                            LEFT JOIN mmrpg_users AS users ON users.user_id = challenges.challenge_creator
-                            WHERE 1 = 1 {$query_conditions}
-                            ORDER BY
-                            challenges.challenge_creator ASC,
-                            challenges.challenge_id ASC
-                            LIMIT 100
-                            ;", 'challenge_id');
 
                         // Pull USER CHALLENGE data from the database given filters and ordering
-                        $query_conditions = '';
-                        $query_conditions .= 'AND challenges.challenge_flag_published = 1 ';
-                        $query_conditions .= 'AND challenges.challenge_kind = \'user\' ';
-                        if (!$include_hidden_challenges){
-                            if (!rpg_user::is_guest()){ $query_conditions .= 'AND (challenges.challenge_flag_hidden = 0 OR challenges.challenge_creator = '.$this_userid.')'; }
-                            else { $query_conditions .= 'AND challenges.challenge_flag_hidden = 0'; }
+                        if ($include_user_challenges){
+                            $query_conditions = '';
+                            $query_conditions .= 'AND challenges.challenge_flag_published = 1 ';
+                            $query_conditions .= 'AND challenges.challenge_kind = \'user\' ';
+                            if (!$include_hidden_challenges){
+                                if (!rpg_user::is_guest()){ $query_conditions .= 'AND (challenges.challenge_flag_hidden = 0 OR challenges.challenge_creator = '.$this_userid.')'; }
+                                else { $query_conditions .= 'AND challenges.challenge_flag_hidden = 0'; }
+                            }
+                            $challenge_table = 'mmrpg_users_challenges';
+                            $challenge_fields = rpg_mission_challenge::get_index_fields(true, 'challenges');
+                            $available_challenge_missions['user'] = $db->get_array_list("SELECT
+                                {$challenge_fields},
+                                (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS challenge_creator_name
+                                FROM {$challenge_table} AS challenges
+                                LEFT JOIN mmrpg_users AS users ON users.user_id = challenges.challenge_creator
+                                WHERE 1 = 1 {$query_conditions}
+                                ORDER BY
+                                challenges.challenge_creator ASC,
+                                challenges.challenge_id ASC
+                                LIMIT 100
+                                ;", 'challenge_id');
                         }
-                        $challenge_table = 'mmrpg_users_challenges';
-                        $challenge_fields = rpg_mission_challenge::get_index_fields(true, 'challenges');
-                        $available_challenge_missions['user'] = $db->get_array_list("SELECT
-                            {$challenge_fields},
-                            (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS challenge_creator_name
-                            FROM {$challenge_table} AS challenges
-                            LEFT JOIN mmrpg_users AS users ON users.user_id = challenges.challenge_creator
-                            WHERE 1 = 1 {$query_conditions}
-                            ORDER BY
-                            challenges.challenge_creator ASC,
-                            challenges.challenge_id ASC
-                            LIMIT 100
-                            ;", 'challenge_id');
 
                         // Pull any challenge records this player has from the leaderboard
                         $challenge_mission_victories = array();
@@ -3190,36 +3188,40 @@ class rpg_player extends rpg_object {
                         if ($global_allow_editing
                             && !empty($this_userid)
                             && !rpg_user::is_guest()){
-                            $challenge_table = 'mmrpg_challenges';
-                            $challenge_leaderboard_table = 'mmrpg_challenges_leaderboard';
-                            $challenge_mission_victories['event'] = $db->get_array_list("SELECT
-                                board.challenge_id,
-                                board.challenge_turns_used,
-                                challenges.challenge_turn_limit,
-                                board.challenge_robots_used,
-                                challenges.challenge_robot_limit,
-                                board.challenge_result
-                                FROM {$challenge_leaderboard_table} AS board
-                                LEFT JOIN {$challenge_table} AS challenges ON challenges.challenge_id = board.challenge_id
-                                WHERE
-                                board.user_id = {$this_userid}
-                                AND board.challenge_result = 'victory'
-                                ;", 'challenge_id');
-                            $challenge_table = 'mmrpg_users_challenges';
-                            $challenge_leaderboard_table = 'mmrpg_users_challenges_leaderboard';
-                            $challenge_mission_victories['user'] = $db->get_array_list("SELECT
-                                board.challenge_id,
-                                board.challenge_turns_used,
-                                challenges.challenge_turn_limit,
-                                board.challenge_robots_used,
-                                challenges.challenge_robot_limit,
-                                board.challenge_result
-                                FROM {$challenge_leaderboard_table} AS board
-                                LEFT JOIN {$challenge_table} AS challenges ON challenges.challenge_id = board.challenge_id
-                                WHERE
-                                board.user_id = {$this_userid}
-                                AND board.challenge_result = 'victory'
-                                ;", 'challenge_id');
+                            if ($include_event_challenges){
+                                $challenge_table = 'mmrpg_challenges';
+                                $challenge_leaderboard_table = 'mmrpg_challenges_leaderboard';
+                                $challenge_mission_victories['event'] = $db->get_array_list("SELECT
+                                    board.challenge_id,
+                                    board.challenge_turns_used,
+                                    challenges.challenge_turn_limit,
+                                    board.challenge_robots_used,
+                                    challenges.challenge_robot_limit,
+                                    board.challenge_result
+                                    FROM {$challenge_leaderboard_table} AS board
+                                    LEFT JOIN {$challenge_table} AS challenges ON challenges.challenge_id = board.challenge_id
+                                    WHERE
+                                    board.user_id = {$this_userid}
+                                    AND board.challenge_result = 'victory'
+                                    ;", 'challenge_id');
+                            }
+                            if ($include_user_challenges){
+                                $challenge_table = 'mmrpg_users_challenges';
+                                $challenge_leaderboard_table = 'mmrpg_users_challenges_leaderboard';
+                                $challenge_mission_victories['user'] = $db->get_array_list("SELECT
+                                    board.challenge_id,
+                                    board.challenge_turns_used,
+                                    challenges.challenge_turn_limit,
+                                    board.challenge_robots_used,
+                                    challenges.challenge_robot_limit,
+                                    board.challenge_result
+                                    FROM {$challenge_leaderboard_table} AS board
+                                    LEFT JOIN {$challenge_table} AS challenges ON challenges.challenge_id = board.challenge_id
+                                    WHERE
+                                    board.user_id = {$this_userid}
+                                    AND board.challenge_result = 'victory'
+                                    ;", 'challenge_id');
+                            }
                         }
 
                         // If challenge missions have not been selected yet, padd-out with recent items
