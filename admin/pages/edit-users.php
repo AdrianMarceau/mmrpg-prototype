@@ -861,10 +861,29 @@
 
                 <? print_form_messages() ?>
 
+                <?
+                // Check to see if we're allowed to edit this user's role
+                $allow_edit_role = false;
+                if ($user_data['role_level'] <= $this_admininfo['role_level']){
+                    $allow_edit_role = true;
+                }
+                // Check to see if we're allowed to edit this user's permissions
+                $allow_edit_permissions = false;
+                if (rpg_user::current_user_has_permission('edit-user-permissions')
+                    && $user_data['user_id'] !== rpg_user::get_current_userid()
+                    && $user_data['role_level'] < $this_admininfo['role_level']
+                    && $user_data['role_level'] > 3){
+                    $allow_edit_permissions = true;
+                }
+                ?>
+
                 <div class="editor-tabs" data-tabgroup="user">
                     <a class="tab active" data-tab="basic">Basic</a><span></span>
                     <a class="tab" data-tab="profile">Profile</a><span></span>
                     <a class="tab" data-tab="credits">Credits</a><span></span>
+                    <? if ($allow_edit_permissions){ ?>
+                        <a class="tab" data-tab="access">Access</a><span></span>
+                    <? } ?>
                     <a class="tab" data-tab="notes">Notes</a><span></span>
                 </div>
 
@@ -885,12 +904,14 @@
 
                             <div class="field">
                                 <strong class="label">Account Type</strong>
-                                <select class="select" name="role_id">
+                                <input type="hidden" name="role_id" value="<?= $user_data['role_id'] ?>" />
+                                <select class="select" name="role_id" <?= !$allow_edit_role ? 'disabled="disabled"' : '' ?>>
                                     <?
                                     foreach ($mmrpg_roles_index AS $role_id => $role_data){
                                         $label = $role_data['role_name'];
-                                        $selected = !empty($user_data['role_id']) && $user_data['role_id'] == $role_id ? 'selected="selected"' : '';
-                                        echo('<option value="'.$role_id.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                        $selected = !empty($user_data['role_id']) && $user_data['role_id'] == $role_id ? ' selected="selected"' : '';
+                                        $disabled = $role_data['role_level'] > $this_admininfo['role_level'] ? ' disabled="disabled"' : '';
+                                        echo('<option value="'.$role_id.'"'.$selected.$disabled.'>'.$label.'</option>'.PHP_EOL);
                                     }
                                     ?>
                                 </select><span></span>
@@ -1136,6 +1157,32 @@
                             <? } ?>
 
                         </div>
+
+                        <? if ($allow_edit_permissions){ ?>
+
+                            <div class="panel" data-tab="access">
+
+                                <div class="field fullsize" style="min-height: 0;">
+                                    <strong class="label">User Access Permissions</strong>
+                                    <input type="hidden" name="update_access_permissions" value="true" />
+                                </div>
+
+                                <div class="field fullsize permissions-table">
+                                    <?
+                                    // Collect a list of all permissions so we can print out a proper list
+                                    $user_permission_tokens = rpg_user::get_user_permission_tokens($user_data['user_id']);
+                                    $user_permissions_table = rpg_user::get_permissions_table();
+                                    $permissions_table_markup = cms_admin::print_user_permissions_table($user_permissions_table, $user_permission_tokens);
+                                    echo($permissions_table_markup.PHP_EOL);
+                                    //echo('<pre>get_permissions_table: '.print_r(rpg_user::get_permissions_table(), true).'</pre>');
+                                    //echo('<pre>'.$user_data['user_name_clean'].'_user_permissions_tokens: '.print_r(rpg_user::get_user_permissions_tokens($user_data['user_id']), true).'</pre>');
+                                    //echo('<pre>(admin) current_user_permissions_tokens: '.print_r(rpg_user::current_user_permissions_tokens(), true).'</pre>');
+                                    ?>
+                                </div>
+
+                            </div>
+
+                        <? } ?>
 
                         <div class="panel" data-tab="notes">
 

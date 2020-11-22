@@ -479,8 +479,8 @@ class rpg_user {
     }
 
     // Define a function for getting the permissions of a specific user
-    private static $default_guest_permissions = array('allow_view-website' => 1);
-    private static $default_member_permissions = array('allow_view-website' => 1, 'allow_play-game' => 1);
+    private static $default_guest_permissions = array();
+    private static $default_member_permissions = array();
     public static function get_user_permission_tokens($user_id, $refresh = false){
         global $db;
         static $user_permissions_index = array();
