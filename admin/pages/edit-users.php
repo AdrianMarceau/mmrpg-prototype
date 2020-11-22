@@ -547,6 +547,30 @@
                 $db->update('mmrpg_users_contributors', $temp_export_data, array('contributor_id' => $form_data['contributor_id']));
             }
 
+            // If this user has fallen below the threshold for admin permissions, delete their permissions row
+            if ($mmrpg_roles_index[$form_data['role_id']]['role_level'] <= 3){
+                $db->query("DELETE FROM mmrpg_users_permissions WHERE user_id = {$form_data['user_id']};");
+            }
+            // Otherwise, if this user had access permissions provided, make sure we update that table as well
+            elseif (!empty($_POST['update_access_permissions']) && $_POST['update_access_permissions'] === 'true'){
+                $allowed_admin_permissions = rpg_user::current_user_permission_tokens();
+                $raw_access_permissions = !empty($_POST['user_access_permissions']) && is_array($_POST['user_access_permissions']) ? $_POST['user_access_permissions'] : array();
+                //error_log('$raw_access_permissions = '.print_r($raw_access_permissions, true));
+                if (!empty($raw_access_permissions)){
+                    $new_access_permissions = array();
+                    foreach ($raw_access_permissions AS $key => $value){
+                        $key_frags = explode('_', $key);
+                        $last_frag = array_pop($key_frags);
+                        if (!in_array($last_frag, $allowed_admin_permissions)){ continue; }
+                        $new_access_permissions[$key] = intval($value);
+                    }
+                    //error_log('$new_access_permissions = '.print_r($new_access_permissions, true));
+                    $perm_data_exists = $db->get_value("SELECT user_id FROM mmrpg_users_permissions WHERE user_id = {$form_data['user_id']};", 'user_id');
+                    if (!empty($perm_data_exists)){ $db->update('mmrpg_users_permissions', $new_access_permissions, array('user_id' => $form_data['user_id'])); }
+                    else { $db->insert('mmrpg_users_permissions', array_merge($new_access_permissions, array('user_id' => $form_data['user_id']))); }
+                }
+            }
+
             // DEBUG
             //$form_messages[] = array('alert', '<pre>$form_data = '.print_r($form_data, true).'</pre>');
 
@@ -1176,7 +1200,7 @@
                                     echo($permissions_table_markup.PHP_EOL);
                                     //echo('<pre>get_permissions_table: '.print_r(rpg_user::get_permissions_table(), true).'</pre>');
                                     //echo('<pre>'.$user_data['user_name_clean'].'_user_permissions_tokens: '.print_r(rpg_user::get_user_permissions_tokens($user_data['user_id']), true).'</pre>');
-                                    //echo('<pre>(admin) current_user_permissions_tokens: '.print_r(rpg_user::current_user_permissions_tokens(), true).'</pre>');
+                                    //echo('<pre>(admin) current_user_permission_tokens: '.print_r(rpg_user::current_user_permission_tokens(), true).'</pre>');
                                     ?>
                                 </div>
 

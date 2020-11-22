@@ -1703,7 +1703,7 @@ class cms_admin {
     // -- PERMISSIONS FUNCTIONS -- //
 
     // Define a recusive function for printing a user permissions table for the admin panel user-editor
-    public static function print_user_permissions_table($permissions_table, $user_permission_tokens){
+    public static function print_user_permissions_table($permissions_table, $user_permission_tokens, $base_perm_token = 'allow'){
         static $row_odd_even;
         static $admin_permission_tokens;
         if (empty($permissions_table)){ return ''; }
@@ -1711,20 +1711,25 @@ class cms_admin {
         $permissions_markup = '';
         $permissions_markup .= '<ul>';
         foreach ($permissions_table AS $perm_token => $sub_permissions_table){
-            if (!in_array($perm_token, $current_user_permission_tokens)){ continue; }
+            if ($perm_token === 'all' && !in_array($perm_token, $current_user_permission_tokens)){ continue; }
+            $full_perm_token = (!empty($base_perm_token) ? $base_perm_token.'_' : '').$perm_token;
             $row_odd_even = $row_odd_even !== 'odd' ? 'odd' : 'even';
             $label = ucwords(str_replace('-', ' ', $perm_token));
-            $checked = in_array($perm_token, $user_permission_tokens) ? 'checked="checked" ' : '';
-            $permissions_markup .= '<li class="'.$row_odd_even.'">'.PHP_EOL;
+            $is_checked = in_array($perm_token, $user_permission_tokens) ? true : false;
+            $is_disabled = !in_array($perm_token, $current_user_permission_tokens) ? true : false;
+            $attr_checked = !$is_disabled && $is_checked ? ' checked="checked"' : '';
+            $attr_disabled = $is_disabled ? ' disabled="disabled"' : '';
+            $cls_disabled = $is_disabled ? ' disabled' : '';
+            $permissions_markup .= '<li class="'.$row_odd_even.$cls_disabled.'">'.PHP_EOL;
                 $permissions_markup .= '<div class="field checkwrap">'.PHP_EOL;
                     $permissions_markup .= '<label class="label">'.PHP_EOL;
-                        $permissions_markup .= '<input class="hidden" type="hidden" name="user_access_permissions['.$perm_token.']" value="0" />'.PHP_EOL;
-                        $permissions_markup .= '<input class="checkbox" type="checkbox" name="user_access_permissions['.$perm_token.']" value="1" '.$checked.'/>'.PHP_EOL;
+                        $permissions_markup .= '<input class="hidden" type="hidden" name="user_access_permissions['.$full_perm_token.']" value="0"'.$attr_disabled.' />'.PHP_EOL;
+                        $permissions_markup .= '<input class="checkbox" type="checkbox" name="user_access_permissions['.$full_perm_token.']" value="1"'.$attr_checked.$attr_disabled.' />'.PHP_EOL;
                         $permissions_markup .= '<strong>'.$label.'</strong>'.PHP_EOL;
                     $permissions_markup .= '</label>'.PHP_EOL;
                 $permissions_markup .= '</div>'.PHP_EOL;
                 if (!empty($sub_permissions_table)){
-                    $permissions_markup .= self::print_user_permissions_table($sub_permissions_table, $user_permission_tokens);
+                    $permissions_markup .= self::print_user_permissions_table($sub_permissions_table, $user_permission_tokens, $full_perm_token);
                 }
             $permissions_markup .= '</li>'.PHP_EOL;
         }

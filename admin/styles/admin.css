@@ -2553,6 +2553,12 @@ input[type=file] {
     background-color: transparent;
     transition: background-color 0.3s;
 }
+.adminform.edit-users .field.permissions-table li.disabled > .field > .label {
+    cursor: default;
+}
+.adminform.edit-users .field.permissions-table li.disabled > .field > .label strong {
+    color: #dedede;
+}
 .adminform.edit-users .field.permissions-table .field .label strong {
     font-weight: normal;
 }
@@ -2560,10 +2566,10 @@ input[type=file] {
 .adminform.edit-users .field.permissions-table .field .label input {
     vertical-align: middle;
 }
-.adminform.edit-users .field.permissions-table .field .label:hover {
+.adminform.edit-users .field.permissions-table li:not(.disabled) > .field > .label:hover {
     background-color: rgba(220, 240, 255, 0.9);
 }
-.adminform.edit-users .field.permissions-table .field .label:hover strong {
+.adminform.edit-users .field.permissions-table li:not(.disabled) > .field > .label:hover strong {
     font-weight: bold;
 }
 
