@@ -55,9 +55,11 @@
                 users.user_name_clean,
                 roles.role_id,
                 roles.role_name,
-                roles.role_level
+                roles.role_level,
+                permissions.user_id AS permissions_id
                 FROM mmrpg_users AS users
                 LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
+                LEFT JOIN mmrpg_users_permissions AS permissions ON permissions.user_id = users.user_id
                 WHERE
                 users.user_name_clean = '{$user_name_clean}'
                 AND users.user_password_encoded = '{$user_password_encoded}'
@@ -74,11 +76,8 @@
             // If there were no errors, we can contiue
             if ($form_success){
 
-                // Check to see what the allowable admin IDs are
-                $allowed_admin_ids = defined('MMRPG_CONFIG_ADMIN_LIST') && MMRPG_CONFIG_ADMIN_LIST !== '' ? explode(',', MMRPG_CONFIG_ADMIN_LIST) : array();
-
                 // Check to ensure the user is of the appropriate admin level
-                if ($login_data['role_level'] < 4 || !in_array($login_data['user_id'], $allowed_admin_ids)){
+                if (empty($login_data['permissions_id']) || $login_data['role_level'] < 4){
                     $form_messages[] = array('error', 'Your account does not have required access permissions');
                     $form_success = false;
                 }

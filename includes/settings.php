@@ -175,11 +175,6 @@ if (!defined('MMRPG_CONFIG_COPPA_PERMISSIONS')){
     define(MMRPG_CONFIG_COPPA_PERMISSIONS, '');
 }
 
-// Back-up definition in case ADMIN is not defined
-if (!defined('MMRPG_CONFIG_ADMIN_LIST')){
-    define(MMRPG_CONFIG_ADMIN_LIST, '');
-}
-
 // Back-up definition in case ADMIN PERMS are not defined
 if (!defined('MMRPG_CONFIG_ADMIN_PERMS_LIST')){
     define(MMRPG_CONFIG_ADMIN_PERMS_LIST, '');

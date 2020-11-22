@@ -59,10 +59,6 @@ define('MMRPG_SETTINGS_IMAGEPROXY_SALT', 'image-proxy-salt');
 $temp_coppa_list = array();
 define('MMRPG_CONFIG_COPPA_PERMISSIONS', implode(',', $temp_coppa_list));
 
-// Define the list of user IDs that can log into back-end
-$temp_admin_list = array();
-define('MMRPG_CONFIG_ADMIN_LIST', implode(',', $temp_admin_list));
-
 // Define the list of back-end permissions given user IDs
 $temp_admin_perms_list = array(
     1, // mmrpg_developer
