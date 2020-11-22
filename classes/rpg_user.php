@@ -516,7 +516,7 @@ class rpg_user {
         return $user_permissions_index[$user_id];
     }
 
-    // Define a function for checking if a given user has permissions to do something
+    // Define a function for checking if the logged-in user has permissions to do something
     public static function current_user_permission_tokens(){
         $user_id = self::get_current_userid();
         if (empty($user_id)){ $user_id = MMRPG_SETTINGS_GUEST_ID; }
@@ -532,11 +532,47 @@ class rpg_user {
         else { return false; }
     }
 
-    // Define a function for checking if a given user has permissions to do something
+    // Define a function for checking if the logged-in user has permissions to do something
     public static function current_user_has_permission($permission_token){
         $user_id = self::get_current_userid();
         if (empty($user_id)){ $user_id = MMRPG_SETTINGS_GUEST_ID; }
         return self::user_has_permission($user_id, $permission_token);
+    }
+
+    // Define a function for checking if a given user has all the permissions listed in a a given array
+    public static function user_has_all_permissions($user_id, $permission_tokens){
+        $user_permission_tokens = self::get_user_permission_tokens($user_id);
+        if (in_array('all', $user_permission_tokens)){ return true; }
+        else { foreach ($permission_tokens AS $permission_token){
+            if ($permission_token === '*'){ $permission_token = 'all'; }
+            if (!in_array($permission_token, $user_permission_tokens)){ return false; }
+        } }
+        return true;
+    }
+
+    // Define a function for checking if the logged-in user has all the permissions listed in a a given array
+    public static function current_user_has_all_permissions($permission_tokens){
+        $user_id = self::get_current_userid();
+        if (empty($user_id)){ $user_id = MMRPG_SETTINGS_GUEST_ID; }
+        return self::user_has_all_permissions($user_id, $permission$permission_tokens_token);
+    }
+
+    // Define a function for checking if a given user has any of the permissions listed in a a given array
+    public static function user_has_any_permissions($user_id, $permission_tokens){
+        $user_permission_tokens = self::get_user_permission_tokens($user_id);
+        if (in_array('all', $user_permission_tokens)){ return true; }
+        else { foreach ($permission_tokens AS $permission_token){
+            if ($permission_token === '*'){ $permission_token = 'all'; }
+            if (!in_array($permission_token, $user_permission_tokens)){ return true; }
+        } }
+        return false;
+    }
+
+    // Define a function for checking if the logged-in user has any of the permissions listed in a a given array
+    public static function current_user_has_any_permissions($permission_tokens){
+        $user_id = self::get_current_userid();
+        if (empty($user_id)){ $user_id = MMRPG_SETTINGS_GUEST_ID; }
+        return self::user_has_any_permissions($user_id, $permission_tokens);
     }
 
 }
