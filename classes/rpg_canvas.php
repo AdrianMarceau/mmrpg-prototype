@@ -27,13 +27,11 @@ class rpg_canvas {
             $this_data['player_direction'] = $this_player->player_side == 'left' ? 'right' : 'left';
             $this_data['player_position'] = 'active';
             $this_data['player_size'] = 80;
+
             $this_data['image_type'] = !empty($options['this_player_image']) ? $options['this_player_image'] : 'sprite';
-            /*
-            $this_data['player_image'] = 'images/players/'.$this_data['player_token'].'/sprite_'.$this_data['player_direction'].'_'.$this_data['player_size'].'x'.$this_data['player_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE;
-            $this_data['player_class'] = 'sprite sprite_player sprite_player_'.$this_data['image_type'].' sprite_80x80 sprite_80x80_'.$this_data['player_frame'];
-            $this_data['player_styles'] = '';
-            */
-            $this_data['player_image'] = 'images/players/'.$this_data['player_token'].'/sprite_'.$this_data['player_direction'].'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
+            $this_data['image_token'] = !empty($this_player->player_image) ? $this_player->player_image : $this_player->player_token;
+
+            $this_data['player_image'] = 'images/players/'.$this_data['image_token'].'/sprite_'.$this_data['player_direction'].'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
             $this_data['player_class'] = 'sprite sprite_player sprite_player_'.$this_data['image_type'].' sprite_75x75 sprite_75x75_'.$this_data['player_frame'];
 
             // Calculate the canvas offset variables for this robot

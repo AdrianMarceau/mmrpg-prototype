@@ -2332,7 +2332,7 @@ class rpg_player extends rpg_object {
                 <? if($print_options['show_basics']): ?>
                     <h2 class="header header_left player_type_<?= $player_type_token ?>" style="margin-right: 0;">
                         <? if($print_options['layout_style'] == 'website_compact'): ?>
-                            <a href="database/players/<?= $player_info['player_token'] ?>/"><?= $player_info['player_name'] ?></a>
+                            <a href="database/players/<?= !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'] ?>/"><?= $player_info['player_name'] ?></a>
                         <? else: ?>
                             <?= $player_info['player_name'] ?>
                         <? endif; ?>
@@ -3603,6 +3603,7 @@ class rpg_player extends rpg_object {
 
         // Collect basic info about this player
         $player_info_token = $player_info['player_token'];
+        $player_image_token = !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'];
         $player_info_name = $player_info['player_name'];
         $player_info_type = !empty($player_info['player_type']) ? $mmrpg_types[$player_info['player_type']] : false;
         $player_info_class_type = !empty($player_info['player_type']) ? $player_info['player_type'] : 'none';
@@ -3612,7 +3613,7 @@ class rpg_player extends rpg_object {
         $player_info_title_plain = strip_tags(str_replace('<br />', '//', $player_info_title));
         $player_info_title_tooltip = htmlentities($player_info_title, ENT_QUOTES, 'UTF-8');
         $player_info_title_html = str_replace(' ', '&nbsp;', $player_info_name);
-        $player_info_title_html = '<label style="background-image: url(images/players/'.$player_info_token.'/mug_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$player_info_title_html.'</label>';
+        $player_info_title_html = '<label style="background-image: url(images/players/'.$player_image_token.'/mug_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$player_info_title_html.'</label>';
         $this_select_markup = '<a class="player_name type type_'.$player_info_class_type.'" style="'.(!$global_allow_editing ? 'cursor: default; ' : '').'" data-key="'.$player_key.'" data-player="'.$player_info['player_token'].'" title="'.$player_info_title_plain.'" data-tooltip="'.$player_info_title_tooltip.'">'.$player_info_title_html.'</a>';
 
         // Return the generated select markup

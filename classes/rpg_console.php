@@ -26,7 +26,7 @@ class rpg_console {
         $this_data['player_class'] = 'sprite ';
         $this_data['player_style'] = '';
         $this_data['player_size'] = $this_player->player_image_size;
-        $this_data['player_image'] = 'images/players/'.$this_data['player_token'].'/'.(!empty($options['this_player_image']) ? $options['this_player_image'] : 'sprite').'_'.$this_data['player_direction'].'_'.$this_data['player_size'].'x'.$this_data['player_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE;
+        $this_data['player_image'] = 'images/players/'.(!empty($this_player->player_image) ? $this_player->player_image : $this_player->player_token).'/'.(!empty($options['this_player_image']) ? $options['this_player_image'] : 'sprite').'_'.$this_data['player_direction'].'_'.$this_data['player_size'].'x'.$this_data['player_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE;
         $this_data['player_class'] .= 'sprite_'.$this_data['player_size'].'x'.$this_data['player_size'].' sprite_'.$this_data['player_size'].'x'.$this_data['player_size'].'_'.$this_data['player_frame'].' ';
         $this_data['player_class'] .= 'player_position_'.$this_data['player_position'].' ';
         $this_data['player_style'] .= 'background-image: url('.$this_data['player_image'].'); ';
