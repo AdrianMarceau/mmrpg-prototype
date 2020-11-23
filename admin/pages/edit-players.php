@@ -390,13 +390,14 @@
                         $new_rewards_tokens[] = $reward['token'];
                         $new_rewards[] = $reward;
                     }
-                    usort($new_rewards, function($a, $b) use($mmrpg_abilities_index){
-                        $ax = $mmrpg_abilities_index[$a['token']];
-                        $bx = $mmrpg_abilities_index[$b['token']];
+                    $mmrpg_abilities_index_tokens = array_keys($mmrpg_abilities_index);
+                    usort($new_rewards, function($a, $b) use($mmrpg_abilities_index_tokens){
+                        $ax = array_search($a['token'], $mmrpg_abilities_index_tokens);
+                        $bx = array_search($b['token'], $mmrpg_abilities_index_tokens);
                         if ($a['points'] < $b['points']){ return -1; }
                         elseif ($a['points'] > $b['points']){ return 1; }
-                        elseif ($ax['ability_order'] < $bx['ability_order']){ return -1; }
-                        elseif ($ax['ability_order'] > $bx['ability_order']){ return 1; }
+                        elseif ($ax < $bx){ return -1; }
+                        elseif ($ax > $bx){ return 1; }
                         else { return 0; }
                         });
                     $form_data['player_abilities_rewards'] = $new_rewards;
@@ -413,6 +414,8 @@
                 if (!empty($form_data['player_robot_hero'])){ $new_robots_compatible[] = $form_data['player_robot_hero']; }
                 if (!empty($form_data['player_robot_support'])){ $new_robots_compatible[] = $form_data['player_robot_support']; }
                 if (!empty($form_data['player_game'])){
+                    if ($form_data['player_game'] === 'MM1'){ $game_condition = "robot_game = 'MM1' OR robot_game = 'MMPU'"; }
+                    else { $game_condition = "robot_game = '{$form_data['player_game']}'"; }
                     $temp_campaign_robots = $db->get_array_list("SELECT
                         robot_token FROM mmrpg_index_robots
                         WHERE
@@ -420,12 +423,13 @@
                             AND robot_flag_complete = 1
                             AND robot_flag_unlockable = 1
                             AND robot_flag_published = 1
-                            AND robot_game = '{$form_data['player_game']}'
+                            AND {$game_condition}
                             AND robot_class = 'master'
                         ORDER BY robot_number ASC
                         ;", 'robot_token');
                     if (!empty($temp_campaign_robots)){
                         $new_robots_compatible = array_merge($new_robots_compatible, array_keys($temp_campaign_robots));
+                        $new_robots_compatible = array_values(array_unique($new_robots_compatible));
                     }
                 }
                 $form_data['player_robots_compatible'] = $new_robots_compatible;
