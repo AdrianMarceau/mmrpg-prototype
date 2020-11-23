@@ -541,6 +541,7 @@ class rpg_user {
 
     // Define a function for checking if a given user has all the permissions listed in a a given array
     public static function user_has_all_permissions($user_id, $permission_tokens){
+        if (is_string($permission_tokens)){ $permission_tokens = explode(',', $permission_tokens); }
         $user_permission_tokens = self::get_user_permission_tokens($user_id);
         if (in_array('all', $user_permission_tokens)){ return true; }
         else { foreach ($permission_tokens AS $permission_token){
@@ -559,6 +560,7 @@ class rpg_user {
 
     // Define a function for checking if a given user has any of the permissions listed in a a given array
     public static function user_has_any_permissions($user_id, $permission_tokens){
+        if (is_string($permission_tokens)){ $permission_tokens = explode(',', $permission_tokens); }
         $user_permission_tokens = self::get_user_permission_tokens($user_id);
         if (in_array('all', $user_permission_tokens)){ return true; }
         else { foreach ($permission_tokens AS $permission_token){

@@ -389,6 +389,7 @@ class cms_admin {
                     foreach ($option_info['buttons'] AS $button_key => $button_info){
                         if (isset($button_info['condition']['uncommitted']) && $button_info['condition']['uncommitted'] !== !empty($repo_changes['uncommitted'])){ continue; }
                         if (isset($button_info['condition']['committed']) && $button_info['condition']['committed'] !== !empty($repo_changes['committed'])){ continue; }
+                        if (isset($button_info['condition']['permissions']) && !rpg_user::current_user_has_all_permissions($button_info['condition']['permissions'])){ continue; }
                         $button_text = $button_info['text'];
                         $button_attributes = '';
                         if (isset($button_info['action'])){ $button_attributes .= ' data-action="'.$button_info['action'].'"'; }
@@ -1016,8 +1017,12 @@ class cms_admin {
             ?>
             <div class="buttons git-buttons" data-kind="<?= $repo_kind ?>" data-subkind="<?= $repo_subkind ?>" data-token="<?= $path_token ?>" data-source="github">
                 <? if (!empty($has_changes_kinds['uncommitted'])){ ?>
-                    <a class="button revert" data-action="revert" type="button">Revert Changes</a>
-                    <a class="button commit" data-action="commit" type="button">Commit Changes</a>
+                    <? if (rpg_user::current_user_has_permission('revert-changes')){ ?>
+                        <a class="button revert" data-action="revert" type="button">Revert Changes</a>
+                    <? } ?>
+                    <? if (rpg_user::current_user_has_permission('commit-changes')){ ?>
+                        <a class="button commit" data-action="commit" type="button">Commit Changes</a>
+                    <? } ?>
                 <? } ?>
                 <? if (!empty($print_git_changes)){ ?>
                     <? foreach ($print_git_changes AS $kind => $list){ ?>
