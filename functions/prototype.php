@@ -1183,7 +1183,12 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             $this_option_max_level = false;
             $this_battleinfo['battle_sprite'] = array();
             $this_targetinfo = !empty($mmrpg_index_players[$this_targetinfo['player_token']]) ? array_merge($mmrpg_index_players[$this_targetinfo['player_token']], $this_targetinfo) : $mmrpg_index_players['player'];
-            if ($this_targetinfo['player_token'] != 'player'){  $this_battleinfo['battle_sprite'][] = array('path' => 'players/'.$this_targetinfo['player_token'], 'size' => !empty($this_targetinfo['player_image_size']) ? $this_targetinfo['player_image_size'] : 40);  }
+            if ($this_targetinfo['player_token'] != 'player'){
+                $this_battleinfo['battle_sprite'][] = array(
+                    'path' => 'players/'.(!empty($this_targetinfo['player_image']) ? $this_targetinfo['player_image'] : $this_targetinfo['player_token']),
+                    'size' => !empty($this_targetinfo['player_image_size']) ? $this_targetinfo['player_image_size'] : 40
+                    );
+            }
             if (!empty($this_targetinfo['player_robots'])){
 
                 // Count the number of masters in this battle
