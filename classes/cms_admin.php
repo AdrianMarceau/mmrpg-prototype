@@ -485,6 +485,7 @@ class cms_admin {
                     $mode = false;
                     foreach ($diff_list AS $str){
                         if (substr($str, 0, 1) === '#'){ $mode = trim($str, '#'); continue; }
+                        elseif (strstr($str, '.DS_Store') || strstr($str, 'Thumbs.db')){ continue; }
                         if ($mode === 'MODIFIED'){
                             list($stat, $path) = explode('||', preg_replace('/^([a-z])\s+(.*)$/i', '$1||$2', $str));
                             if (strtoupper($stat) === 'M'){ $cache_data['modified'][] = $path; }
