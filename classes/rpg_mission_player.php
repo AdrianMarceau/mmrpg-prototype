@@ -225,6 +225,7 @@ class rpg_mission_player extends rpg_mission {
             $temp_battle_omega['battle_target_player']['player_id'] = $temp_player_id;
             $temp_battle_omega['battle_target_player']['player_token'] = $target_player_token_backup;
             $temp_battle_omega['battle_target_player']['player_name'] = ucfirst($temp_battle_username);
+            //$temp_battle_omega['battle_target_player']['player_image'] = 'custom_***';
             $temp_battle_omega['battle_target_player']['player_robots'] = $temp_battle_omega_robots;
             $temp_battle_omega['battle_target_player']['player_starforce'] = $temp_player_starforce;
             $temp_battle_omega['battle_robot_limit'] = count($temp_battle_omega_robots);
