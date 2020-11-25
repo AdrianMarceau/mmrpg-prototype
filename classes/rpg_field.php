@@ -244,7 +244,9 @@ class rpg_field extends rpg_object {
         // Define the various json index fields for player objects
         $json_index_fields = array(
             'field_group',
-            'field_order'
+            'field_order',
+            'field_music_name',
+            'field_music_link'
             );
 
         // Implode the index fields into a string if requested
