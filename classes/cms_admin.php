@@ -160,7 +160,7 @@ class cms_admin {
             $index_cache[$object_kind.'/'.$image_editor_id_field] = $mmrpg_contributors_index;
         }
         // Return the generated list
-        return $mmrpg_contributors_index;
+        return !empty($mmrpg_contributors_index) ? $mmrpg_contributors_index : array();
     }
 
     // Define a function for collecting the types index, sorted, for admin use
@@ -168,7 +168,7 @@ class cms_admin {
         global $db;
         $mmrpg_types_fields = rpg_type::get_index_fields(true);
         $mmrpg_types_index = $db->get_array_list("SELECT {$mmrpg_types_fields} FROM mmrpg_index_types ORDER BY type_order ASC", 'type_token');
-        return $mmrpg_types_index;
+        return !empty($mmrpg_types_index) ? $mmrpg_types_index : array();
     }
 
     // Define a function for collecting the players index, sorted, for admin use
@@ -188,7 +188,7 @@ class cms_admin {
             groups.group_order ASC,
             tokens.token_order ASC
             ;", 'player_token');
-        return $mmrpg_players_index;
+        return !empty($mmrpg_players_index) ? $mmrpg_players_index : array();
     }
 
     // Define a function for collecting the robots index, sorted, for admin use
@@ -208,7 +208,7 @@ class cms_admin {
             groups.group_order ASC,
             tokens.token_order ASC
             ;", 'robot_token');
-        return $mmrpg_robots_index;
+        return !empty($mmrpg_robots_index) ? $mmrpg_robots_index : array();
     }
 
     // Define a function for collecting the abilities index, sorted, for admin use
@@ -229,7 +229,7 @@ class cms_admin {
             groups.group_order ASC,
             tokens.token_order ASC
             ;", 'ability_token');
-        return $mmrpg_abilities_index;
+        return !empty($mmrpg_abilities_index) ? $mmrpg_abilities_index : array();
     }
 
     // Define a function for collecting the items index, sorted, for admin use
@@ -248,7 +248,26 @@ class cms_admin {
             groups.group_order ASC,
             tokens.token_order ASC
             ;", 'item_token');
-        return $mmrpg_items_index;
+        return !empty($mmrpg_items_index) ? $mmrpg_items_index : array();
+    }
+
+    // Define a function for collecting the skills index, sorted, for admin use
+    public static function get_skills_index(){
+        global $db;
+        $mmrpg_skills_fields = rpg_skill::get_index_fields(true, 'skills');
+        $mmrpg_skills_index = $db->get_array_list("SELECT
+            {$mmrpg_skills_fields},
+            groups.group_token AS skill_group,
+            tokens.token_order AS skill_order
+            FROM mmrpg_index_skills AS skills
+            LEFT JOIN mmrpg_index_skills_groups_tokens AS tokens ON tokens.skill_token = skills.skill_token
+            LEFT JOIN mmrpg_index_skills_groups AS groups ON groups.group_class = tokens.group_class AND groups.group_token = tokens.group_token
+            WHERE skills.skill_id <> 0 AND skills.skill_token <> 'skill' AND skills.skill_class <> 'system'
+            ORDER BY
+            groups.group_order ASC,
+            tokens.token_order ASC
+            ;", 'skill_token');
+        return !empty($mmrpg_skills_index) ? $mmrpg_skills_index : array();
     }
 
     // Define a function for collecting the fields index, sorted, for admin use
@@ -267,7 +286,7 @@ class cms_admin {
             groups.group_order ASC,
             tokens.token_order ASC
             ;", 'field_token');
-        return $mmrpg_fields_index;
+        return !empty($mmrpg_fields_index) ? $mmrpg_fields_index : array();
     }
 
     // Define a function for collecting the music index, sorted, for admin use
@@ -300,7 +319,7 @@ class cms_admin {
             }
         }
         //error_log('$mmrpg_music_index = '.print_r($mmrpg_music_index, true));
-        return $mmrpg_music_index;
+        return !empty($mmrpg_music_index) ? $mmrpg_music_index : array();
     }
 
     // Define a function for printing the full name of a given environment
