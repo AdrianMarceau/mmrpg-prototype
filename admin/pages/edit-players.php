@@ -16,6 +16,7 @@
     $mmrpg_abilities_index = cms_admin::get_abilities_index();
     $mmrpg_fields_index = cms_admin::get_fields_index();
     $mmrpg_contributors_index = cms_admin::get_contributors_index('player');
+    $mmrpg_sources_index = rpg_game::get_source_index();
 
     // Collect an index of file changes and updates via git
     $mmrpg_git_file_arrays = cms_admin::object_editor_get_git_file_arrays(MMRPG_CONFIG_PLAYERS_CONTENT_PATH, array(
@@ -25,6 +26,28 @@
 
     // Explode the list of git files into separate array vars
     extract($mmrpg_git_file_arrays);
+
+
+    /* -- Generate Select Option Markup -- */
+
+    // Pre-generate a list of all sources so we can re-use it over and over
+    $last_option_group = false;
+    $source_options_markup = array();
+    $source_options_markup[] = '<option value="">-</option>';
+    foreach ($mmrpg_sources_index AS $source_token => $source_info){
+        $class_group = ucfirst($source_info['source_series']).' Series';
+        if ($last_option_group !== $class_group){
+            if (!empty($last_option_group)){ $source_options_markup[] = '</optgroup>'; }
+            $last_option_group = $class_group;
+            $source_options_markup[] = '<optgroup label="'.$class_group.'">';
+        }
+        $source_name = !empty($source_info['source_name']) ? $source_info['source_name'] : $source_info['source_name_aka'];
+        $source_systems = !empty($source_info['source_systems']) ? $source_info['source_systems'] : 'Unknown';
+        $source_options_markup[] = '<option value="'.$source_token.'">'.$source_name.' ('.$source_systems.')</option>';
+    }
+    if (!empty($last_option_group)){ $source_options_markup[] = '</optgroup>'; }
+    $source_options_count = count($source_options_markup);
+    $source_options_markup = implode(PHP_EOL, $source_options_markup);
 
 
     /* -- Page Script/Style Dependencies  -- */
@@ -1029,16 +1052,9 @@
                                             <strong>Campaign Game</strong>
                                             <em>where campaign robots come from</em>
                                         </div>
+                                        <? $current_value = !empty($player_data['player_game']) ? $player_data['player_game'] : ''; ?>
                                         <select class="select" name="player_game">
-                                            <?
-                                            $player_games_tokens = $db->get_array_list("SELECT DISTINCT (robot_game) AS game_token FROM mmrpg_index_robots WHERE robot_game <> '' ORDER BY robot_game ASC;", 'game_token');
-                                            echo('<option value=""'.(empty($player_data['player_game']) ? 'selected="selected"' : '').'>- none -</option>');
-                                            foreach ($player_games_tokens AS $game_token => $game_data){
-                                                $label = $game_token;
-                                                $selected = !empty($player_data['player_game']) && $player_data['player_game'] == $game_token ? 'selected="selected"' : '';
-                                                echo('<option value="'.$game_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                            }
-                                            ?>
+                                            <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $source_options_markup) ?>
                                         </select><span></span>
                                     </div>
 

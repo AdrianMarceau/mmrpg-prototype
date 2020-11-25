@@ -15,6 +15,7 @@
     $mmrpg_robots_index = cms_admin::get_robots_index();
     $mmrpg_music_index = cms_admin::get_music_index();
     $mmrpg_contributors_index = cms_admin::get_contributors_index('field');
+    $mmrpg_sources_index = rpg_game::get_source_index();
 
     // Generate a reference index of robot classes for options
     $mmrpg_robots_index_byclass = array();
@@ -61,6 +62,25 @@
     }
     if (!empty($music_options_group)){ $music_options_markup[] = '</optgroup>'; }
     $music_options_markup = implode(PHP_EOL, $music_options_markup);
+
+    // Pre-generate a list of all sources so we can re-use it over and over
+    $last_option_group = false;
+    $source_options_markup = array();
+    $source_options_markup[] = '<option value="">-</option>';
+    foreach ($mmrpg_sources_index AS $source_token => $source_info){
+        $class_group = ucfirst($source_info['source_series']).' Series';
+        if ($last_option_group !== $class_group){
+            if (!empty($last_option_group)){ $source_options_markup[] = '</optgroup>'; }
+            $last_option_group = $class_group;
+            $source_options_markup[] = '<optgroup label="'.$class_group.'">';
+        }
+        $source_name = !empty($source_info['source_name']) ? $source_info['source_name'] : $source_info['source_name_aka'];
+        $source_systems = !empty($source_info['source_systems']) ? $source_info['source_systems'] : 'Unknown';
+        $source_options_markup[] = '<option value="'.$source_token.'">'.$source_name.' ('.$source_systems.')</option>';
+    }
+    if (!empty($last_option_group)){ $source_options_markup[] = '</optgroup>'; }
+    $source_options_count = count($source_options_markup);
+    $source_options_markup = implode(PHP_EOL, $source_options_markup);
 
 
     /* -- Page Script/Style Dependencies  -- */
@@ -1082,17 +1102,9 @@
 
                                     <div class="field foursize">
                                         <strong class="label">Source Game</strong>
+                                        <? $current_value = !empty($field_data['field_game']) ? $field_data['field_game'] : ''; ?>
                                         <select class="select" name="field_game">
-                                            <?
-                                            //$field_games_tokens = $db->get_array_list("SELECT DISTINCT (field_game) AS game_token FROM mmrpg_index_fields WHERE field_game <> '' ORDER BY field_game ASC;", 'game_token');
-                                            $field_games_tokens = $db->get_array_list("SELECT DISTINCT (robot_game) AS game_token FROM mmrpg_index_robots WHERE robot_game <> '' ORDER BY robot_game ASC;", 'game_token');
-                                            echo('<option value=""'.(empty($field_data['field_game']) ? 'selected="selected"' : '').'>- none -</option>');
-                                            foreach ($field_games_tokens AS $game_token => $game_data){
-                                                $label = $game_token;
-                                                $selected = !empty($field_data['field_game']) && $field_data['field_game'] == $game_token ? 'selected="selected"' : '';
-                                                echo('<option value="'.$game_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                            }
-                                            ?>
+                                            <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $source_options_markup) ?>
                                         </select><span></span>
                                     </div>
 
