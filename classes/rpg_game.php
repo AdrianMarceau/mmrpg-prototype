@@ -63,6 +63,9 @@ class rpg_game {
     public static function unique_item_id($player_or_robot_id, $item_index_id){
         return $player_or_robot_id.'x'.$item_index_id;
     }
+    public static function unique_skill_id($player_or_robot_id, $skill_index_id){
+        return $player_or_robot_id.'x'.$skill_index_id;
+    }
 
     // -- BATTLE OBJECT FUNCTIONS -- //
 
@@ -342,6 +345,67 @@ class rpg_game {
      */
     public static function get_item_by_id($item_id){
         if (isset(self::$index['items'][$item_id])){ return self::$index['items'][$item_id]; }
+        else { return false; }
+    }
+
+    /**
+     * Create or retrive a skill object from the session
+     * @param array $this_skillinfo
+     * @return rpg_skill
+     */
+    public static function get_skill($this_battle, $this_player, $this_robot, $this_skillinfo, $trigger_onload = true){
+
+        // If the skill index has not been created, do so
+        if (!isset(self::$index['skills'])){ self::$index['skills'] = array(); }
+
+        // Check if a skill ID has been defined
+        if (isset($this_skillinfo['skill_id'])){
+            $skill_id = $this_skillinfo['skill_id'];
+        }
+        // Otherwise if only a skill token was defined
+        elseif (isset($this_skillinfo['skill_token'])){
+            $skill_id = 0;
+            $skill_token = $this_skillinfo['skill_token'];
+            foreach (self::$index['skills'] AS $skill){
+                if ($skill_token == $skill->skill_token
+                    && $this_robot->robot_id == $skill->robot_id
+                    && $this_player->player_id == $skill->player_id){
+                    $skill_id = $skill->skill_id;
+                    break;
+                }
+            }
+        }
+
+        // If this skill has already been created, retrieve it
+        if (!empty($skill_id) && !empty(self::$index['skills'][$skill_id])){
+
+            // Collect the skill from the index and return
+            $this_skill = self::$index['skills'][$skill_id];
+            if ($trigger_onload){ $this_skill->trigger_onload(); }
+
+        }
+        // Otherwise create a new skill object in the index
+        else {
+
+            // Create and return the skill object
+            $this_skill = new rpg_skill($this_battle, $this_player, $this_robot, $this_skillinfo);
+            self::$index['skills'][$this_skill->skill_id] = $this_skill;
+
+        }
+
+        // Return the collect skill object
+        $this_skill->update_session();
+        return $this_skill;
+
+    }
+
+    /**
+     * Retrieve an skill object from the session by a known ID
+     * @param integer $skill_id
+     * @return rpg_skill
+     */
+    public static function get_skill_by_id($skill_id){
+        if (isset(self::$index['skills'][$skill_id])){ return self::$index['skills'][$skill_id]; }
         else { return false; }
     }
 
