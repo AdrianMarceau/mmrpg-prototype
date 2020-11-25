@@ -2621,7 +2621,7 @@ class rpg_player extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td class="right">
-                                        <div class="player_description" style="text-align: justify; padding: 0 4px;"><?= $player_info['player_description2'] ?></div>
+                                        <div class="player_description" style="text-align: justify; padding: 0 4px;"><?= preg_replace('/[\r\n]+/', '<br />', $player_info['player_description2']) ?></div>
                                     </td>
                                 </tr>
                             </tbody>

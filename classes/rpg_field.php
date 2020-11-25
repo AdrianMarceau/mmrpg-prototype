@@ -1435,7 +1435,7 @@ class rpg_field extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td class="right">
-                                        <div class="field_description" style="text-align: justify; padding: 0 4px;"><?= $field_info['field_description2'] ?></div>
+                                        <div class="field_description" style="text-align: justify; padding: 0 4px;"><?= preg_replace('/[\r\n]+/', '<br />', $field_info['field_description2']) ?></div>
                                     </td>
                                 </tr>
                             </tbody>

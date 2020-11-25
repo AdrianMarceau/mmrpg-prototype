@@ -3739,7 +3739,7 @@ class rpg_robot extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td class="right">
-                                        <div class="robot_description" style="text-align: left; padding: 0 4px;"><?= $robot_info['robot_description2'] ?></div>
+                                        <div class="robot_description" style="text-align: left; padding: 0 4px;"><?= preg_replace('/[\r\n]+/', '<br />', $robot_info['robot_description2']) ?></div>
                                     </td>
                                 </tr>
                             </tbody>
