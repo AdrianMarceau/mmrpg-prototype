@@ -1105,8 +1105,8 @@
 
                                         <div class="field halfsize">
                                             <strong class="label" data-shop-tab="">Required Level <em>shop level for abilities / core level for weapons</em></strong>
-                                            <strong class="label" data-shop-tab="abilities">Required Shop Level <em>min shop level attained before available</em></strong>
-                                            <strong class="label" data-shop-tab="weapons">Required Core Level <em>min elemental cores sold before available</em></strong>
+                                            <strong class="label" data-shop-tab="reggae/abilities">Required Shop Level <em>min shop level attained before available</em></strong>
+                                            <strong class="label" data-shop-tab="reggae/weapons">Required Core Level <em>min elemental cores sold before available</em></strong>
                                             <input class="hidden" type="hidden" name="ability_shop_level" value="0" />
                                             <input class="textbox" type="number" name="ability_shop_level" value="<?= !empty($ability_data['ability_shop_level']) ? $ability_data['ability_shop_level'] : 0 ?>" maxlength="3" min="0" max="100" step="1" />
                                         </div>
