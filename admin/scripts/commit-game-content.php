@@ -129,7 +129,7 @@ foreach ($commit_tokens  AS $object_key => $object_token){
         elseif (strstr($path, '/shadows')){ $updating_what[] = 'shadows'; }
     }
     $updating_what = array_unique($updating_what);
-    if (count($updating_what) >= 3){ $updating_what_string = implode(', ', array_slice($updating_what, 0, -1)).', and '.array_slice($updating_what, -1, 1); }
+    if (count($updating_what) >= 3){ $updating_what_string = implode(', ', array_slice($updating_what, 0, -1)).', and '.implode('', array_slice($updating_what, -1, 1)); }
     else { $updating_what_string = implode(' and ', $updating_what);  }
 
     // Define the commit message for these file changes
