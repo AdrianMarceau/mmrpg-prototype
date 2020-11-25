@@ -87,6 +87,19 @@ $content_types_index['items'] = array(
         'ssh' => 'git@github.com:AdrianMarceau/mmrpg-prototype_items.git'
         )
     );
+$content_types_index['skills'] = array(
+    'token' => 'skill',
+    'xtoken' => 'skills',
+    'object_class' => 'rpg_skill',
+    'primary_key' => 'token',
+    'database_table' => 'mmrpg_index_skills',
+    'content_path' => 'skills/',
+    'github_repo' => array(
+        'name' => 'mmrpg-prototype_skills',
+        'http' => 'https://github.com/AdrianMarceau/mmrpg-prototype_skills.git',
+        'ssh' => 'git@github.com:AdrianMarceau/mmrpg-prototype_skills.git'
+        )
+    );
 $content_types_index['fields'] = array(
     'token' => 'field',
     'xtoken' => 'fields',
