@@ -69,7 +69,7 @@
 
             // Define the common kind values for each group
             $common_group_kinds = array();
-            $common_group_kinds['game_database'] = array('types', 'players', 'robots', 'abilities', 'items', 'fields');
+            $common_group_kinds['game_database'] = array('types', 'players', 'robots', 'abilities', 'skills', 'items', 'fields');
             $common_group_kinds['post_game_content'] = array('stars', 'challenges');
             $common_group_kinds['website_pages'] = array('pages');
 

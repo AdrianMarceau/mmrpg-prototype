@@ -160,7 +160,7 @@ foreach ($commit_tokens  AS $object_key => $object_token){
             $commit_message .= 'sorting groups for ';
             if ($request_kind === 'abilities'){ $commit_message .= $request_subkind_singular.' '.$request_kind; }
             else { $commit_message .= !empty($request_subkind) ? $request_subkind : $request_kind; }
-        } elseif (in_array($object_name_kind_singular, array('player', 'master', 'boss', 'field'))){
+        } elseif (in_array($object_name_kind_singular, array('player', 'master', 'boss', 'field', 'skill'))){
             $commit_message .= $object_name.'\''.(substr($object_name, -1, 1) !== 's' ? 's' : '').' ';
             $commit_message .= $updating_what_string;
         } elseif (in_array($object_name_kind_singular, array('mecha', 'ability', 'item'))){

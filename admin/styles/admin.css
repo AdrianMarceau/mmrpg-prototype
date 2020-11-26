@@ -643,6 +643,17 @@ a:hover {
     border-right: 24px solid transparent;
 }
 
+.adminform .editor .editor-tabs .tab[data-tab="spacer"] {
+    width: 5px;
+    overflow: hidden;
+    text-indent: -9999px;
+    pointer-events: none;
+    background-color: transparent;
+    border-top: 1px solid transparent;
+    border-left: 1px solid transparent;
+    border-right: 1px solid transparent;
+}
+
 .adminform .editor .editor-panels {
 
 }
