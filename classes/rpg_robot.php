@@ -130,6 +130,8 @@ class rpg_robot extends rpg_object {
         $this->robot_resistances = isset($this_robotinfo['robot_resistances']) ? $this_robotinfo['robot_resistances'] : array();
         $this->robot_affinities = isset($this_robotinfo['robot_affinities']) ? $this_robotinfo['robot_affinities'] : array();
         $this->robot_immunities = isset($this_robotinfo['robot_immunities']) ? $this_robotinfo['robot_immunities'] : array();
+        $this->robot_skill = isset($this_robotinfo['robot_skill']) ? $this_robotinfo['robot_skill'] : '';
+        $this->robot_skill_name = isset($this_robotinfo['robot_skill_name']) ? $this_robotinfo['robot_skill_name'] : '';
         $this->robot_item = isset($this_robotinfo['robot_item']) ? $this_robotinfo['robot_item'] : '';
         $this->robot_abilities = isset($this_robotinfo['robot_abilities']) ? $this_robotinfo['robot_abilities'] : array();
         $this->robot_attachments = isset($this_robotinfo['robot_attachments']) ? $this_robotinfo['robot_attachments'] : array();
@@ -181,6 +183,11 @@ class rpg_robot extends rpg_object {
         $this->robot_base_resistances = isset($this_robotinfo['robot_base_resistances']) ? $this_robotinfo['robot_base_resistances'] : $this->robot_resistances;
         $this->robot_base_affinities = isset($this_robotinfo['robot_base_affinities']) ? $this_robotinfo['robot_base_affinities'] : $this->robot_affinities;
         $this->robot_base_immunities = isset($this_robotinfo['robot_base_immunities']) ? $this_robotinfo['robot_base_immunities'] : $this->robot_immunities;
+
+        $this->robot_base_item = isset($this_robotinfo['robot_base_item']) ? $this_robotinfo['robot_base_item'] : $this->robot_item;
+
+        $this->robot_base_skill = isset($this_robotinfo['robot_base_skill']) ? $this_robotinfo['robot_base_skill'] : $this->robot_skill;
+        $this->robot_base_skill_name = isset($this_robotinfo['robot_base_skill_name']) ? $this_robotinfo['robot_base_skill_name'] : $this->robot_skill_name;
 
         //$this->robot_base_abilities = isset($this_robotinfo['robot_base_abilities']) ? $this_robotinfo['robot_base_abilities'] : $this->robot_abilities;
         $this->robot_base_attachments = isset($this_robotinfo['robot_base_attachments']) ? $this_robotinfo['robot_base_attachments'] : $this->robot_attachments;
@@ -2336,6 +2343,8 @@ class rpg_robot extends rpg_object {
             'robot_resistances',
             'robot_affinities',
             'robot_immunities',
+            'robot_skill',
+            'robot_skill_name',
             'robot_abilities_rewards',
             'robot_abilities_compatible',
             'robot_quotes_start',
@@ -2864,6 +2873,8 @@ class rpg_robot extends rpg_object {
             'robot_resistances' => $this->robot_resistances,
             'robot_affinities' => $this->robot_affinities,
             'robot_immunities' => $this->robot_immunities,
+            'robot_skill' => $this->robot_skill,
+            'robot_skill_name' => $this->robot_skill_name,
             'robot_abilities' => $this->robot_abilities,
             'robot_attachments' => $this->robot_attachments,
             'robot_quotes' => $this->robot_quotes,
@@ -2892,6 +2903,8 @@ class rpg_robot extends rpg_object {
             'robot_base_resistances' => $this->robot_base_resistances,
             'robot_base_affinities' => $this->robot_base_affinities,
             'robot_base_immunities' => $this->robot_base_immunities,
+            'robot_base_skill' => $this->robot_base_skill,
+            'robot_base_skill_name' => $this->robot_base_skill_name,
             //'robot_base_abilities' => $this->robot_base_abilities,
             'robot_base_attachments' => $this->robot_base_attachments,
             'robot_base_quotes' => $this->robot_base_quotes,
