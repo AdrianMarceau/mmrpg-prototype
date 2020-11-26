@@ -515,11 +515,49 @@
                 $this_group_options[] = $this_option;
             }
 
+            if (rpg_user::current_user_has_permission('edit-skills')){
+                $option_name = 'Edit Passive Skills';
+                $this_option = array(
+                    'link' => array('url' => 'admin/edit-skills/', 'text' => $option_name, 'bullet' => 'dna'),
+                    'desc' => 'edit the details and effects of the various in-game passive skills',
+                    'repo' => array(
+                        'name' => 'skills',
+                        'data' => array('prefix' => 'skill'),
+                        'path' => MMRPG_CONFIG_SKILLS_CONTENT_PATH
+                        ),
+                    'buttons' => array(
+                        array(
+                            'text' => 'Revert Uncommitted',
+                            'condition' => array('uncommitted' => true, 'permissions' => 'revert-changes'),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'revert',
+                                'data-kind' => 'skills',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            ),
+                        array(
+                            'text' => 'Commit All',
+                            'condition' => array('uncommitted' => true, 'permissions' => 'commit-changes'),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'commit',
+                                'data-kind' => 'skills',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            )
+                        )
+                    );
+                $this_group_options[] = $this_option;
+            }
+
             if (rpg_user::current_user_has_permission('edit-items')){
                 $option_name = 'Edit Items';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-items/', 'text' => $option_name, 'bullet' => 'flask'),
-                    'desc' => 'edit the details and images of the in-game items',
+                    'desc' => 'edit the details and images of the various in-game items',
                     'repo' => array(
                         'name' => 'items',
                         'data' => array('prefix' => 'item'),

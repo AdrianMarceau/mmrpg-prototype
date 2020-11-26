@@ -212,13 +212,18 @@ elseif ($this_page_action == 'edit-boss-abilities'
 }
 // Else if this is an EDIT BATTLE FIELDS request
 elseif ($this_page_action == 'edit-fields'){
-    // Require the edit robots file
+    // Require the edit fields file
     require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-fields.php');
 }
 // Else if this is an EDIT ITEMS request
 elseif ($this_page_action == 'edit-items'){
-    // Require the edit robots file
+    // Require the edit players file
     require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-items.php');
+}
+// Else if this is an EDIT PASSIVE SKILLS request
+elseif ($this_page_action == 'edit-skills'){
+    // Require the edit skills file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-skills.php');
 }
 // Else if this is an EDIT EVENT CHALLENGES request
 elseif ($this_page_action == 'edit-event-challenges'){
