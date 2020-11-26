@@ -1218,7 +1218,7 @@ class rpg_field extends rpg_object {
                                                 $name1 = $name;
                                                 $name2 = '';
                                             } else {
-                                                list($name1, $name2) = explode(' (', trim($field_info['field_music_name'], ')'));
+                                                list($name1, $name2) = explode(' (', trim($field_music_info['music_name'], ')'));
                                                 $name1 = '<span>'.$name1.'</span>';
                                                 $name2 = '<span class="album"> ('.$name2.')</span>';
                                             }
