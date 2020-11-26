@@ -1435,7 +1435,8 @@ $(document).ready(function(){
             var $newGroup = $(newGroupMarkup);
             $newGroup.removeClass('readonly template');
             //console.log('$newGroup = ', $newGroup);
-            $newGroup.insertAfter($lastOtherGroup);
+            if ($lastOtherGroup.length){ $newGroup.insertAfter($lastOtherGroup); }
+            else { $newGroup.prependTo($groupsList); }
             updateParentGroupDivs();
             });
 
