@@ -253,6 +253,7 @@ class rpg_skill extends rpg_object {
             'skill_name',
             'skill_class',
             'skill_description',
+            'skill_description2',
             'skill_flag_hidden',
             'skill_flag_complete',
             'skill_flag_published',
