@@ -1176,13 +1176,16 @@ class rpg_robot extends rpg_object {
         if (empty($robot_info) || empty($ability_info)){ return false; }
         $ability_token = !empty($ability_info) ? $ability_info['ability_token'] : '';
         $item_token = !empty($item_info) ? $item_info['item_token'] : '';
+        $skill_token = !empty($robot_info['robot_skill']) ? $robot_info['robot_skill'] : '';
         $robot_token = $robot_info['robot_token'];
         $robot_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
         $robot_base_core = !empty($robot_info['robot_base_core']) ? $robot_info['robot_base_core'] : '';
         $robot_core2 = !empty($robot_info['robot_core2']) ? $robot_info['robot_core2'] : '';
         $robot_base_core2 = !empty($robot_info['robot_base_core2']) ? $robot_info['robot_base_core2'] : '';
         $item_core = !empty($item_token) && preg_match('/-core$/i', $item_token) ? preg_replace('/-core$/i', '', $item_token) : '';
+        $skill_core = !empty($skill_token) && preg_match('/-subcore$/i', $skill_token) ? preg_replace('/-subcore$/i', '', $skill_token) : '';
         if ($item_core == 'none' || $item_core == 'copy'){ $item_core = ''; }
+        if ($skill_core == 'none' || $skill_core == 'copy'){ $skill_core = ''; }
         //echo 'has_ability_compatibility('.$robot_token.', '.$ability_token.', '.$robot_core.', '.$robot_core2.')'."\n";
 
         // Define the compatibility flag and default to false
@@ -1196,7 +1199,7 @@ class rpg_robot extends rpg_object {
         // Else if this ability has a type, check it against this robot
         elseif (!empty($ability_info['ability_type']) || !empty($ability_info['ability_type2'])){
             //$debug_fragment .= 'has-type '; // DEBUG
-            if (!empty($robot_core) || !empty($robot_core2) || !empty($item_core)){
+            if (!empty($robot_core) || !empty($robot_core2) || !empty($item_core) || !empty($skill_core)){
             //$debug_fragment .= 'has-core '; // DEBUG
                 if ($robot_core == 'copy' || $robot_base_core == 'copy'){
                     //$debug_fragment .= 'copy-core '; // DEBUG
@@ -1206,6 +1209,7 @@ class rpg_robot extends rpg_object {
                     && ($ability_info['ability_type'] == $robot_core
                         || $ability_info['ability_type'] == $robot_core2
                         || $ability_info['ability_type'] == $item_core
+                        || $ability_info['ability_type'] == $skill_core
                         )){
                     //$debug_fragment .= 'core-match1 '; // DEBUG
                     $temp_compatible = true;
@@ -1214,6 +1218,7 @@ class rpg_robot extends rpg_object {
                     && ($ability_info['ability_type2'] == $robot_core
                         || $ability_info['ability_type2'] == $robot_core2
                         || $ability_info['ability_type2'] == $item_core
+                        || $ability_info['ability_type2'] == $skill_core
                         )){
                     //$debug_fragment .= 'core-match2 '; // DEBUG
                     $temp_compatible = true;
@@ -2192,6 +2197,7 @@ class rpg_robot extends rpg_object {
             $robot_info['robot_core'] = $this->robot_core;
             $robot_info['robot_core2'] = $this->robot_core2;
             $robot_info['robot_item'] = $this->robot_item;
+            $robot_info['robot_skill'] = $this->robot_skill;
             $robot_info['robot_rewards'] = $this->robot_rewards;
 
             // If this was the noweapons/chargeweapons action, everything is zero
@@ -2239,6 +2245,12 @@ class rpg_robot extends rpg_object {
             $core_type_token3 = str_replace('-core', '', $this_robot['robot_item']);
         }
 
+        // Collect this robot's skill-based subcore if it exists
+        $core_type_token4 = '';
+        if (!empty($this_robot['robot_skill']) && strstr($this_robot['robot_skill'], '-subcore')){
+            $core_type_token4 = str_replace('-subcore', '', $this_robot['robot_skill']);
+        }
+
         // Check this ability's FIRST type for multiplier matches
         if (!empty($ability_type_token)){
 
@@ -2246,6 +2258,8 @@ class rpg_robot extends rpg_object {
             if ($ability_type_token == $core_type_token){ $energy_new = ceil($energy_new * MMRPG_SETTINGS_COREBONUS_MULTIPLIER); $energy_mods++; }
             // Apply secondary robot core multipliers if they exist
             elseif ($ability_type_token == $core_type_token2){ $energy_new = ceil($energy_new * MMRPG_SETTINGS_COREBONUS_MULTIPLIER); $energy_mods++; }
+            // Apply held robot skill multipliers if they exist
+            if ($ability_type_token == $core_type_token4){ $energy_new = ceil($energy_new * MMRPG_SETTINGS_COREBONUS_MULTIPLIER); $energy_mods++; }
 
             // Apply held robot core multipliers if they exist
             if ($ability_type_token == $core_type_token3){ $energy_new = ceil($energy_new * MMRPG_SETTINGS_SUBCOREBONUS_MULTIPLIER); $energy_mods++; }
@@ -2259,6 +2273,8 @@ class rpg_robot extends rpg_object {
             if ($ability_type_token2 == $core_type_token){ $energy_new = ceil($energy_new * MMRPG_SETTINGS_COREBONUS_MULTIPLIER); $energy_mods++; }
             // Apply secondary robot core multipliers if they exist
             elseif ($ability_type_token2 == $core_type_token2){ $energy_new = ceil($energy_new * MMRPG_SETTINGS_COREBONUS_MULTIPLIER); $energy_mods++; }
+            // Apply held robot core multipliers if they exist
+            if ($ability_type_token2 == $core_type_token4){ $energy_new = ceil($energy_new * MMRPG_SETTINGS_COREBONUS_MULTIPLIER); $energy_mods++; }
 
             // Apply held robot core multipliers if they exist
             if ($ability_type_token2 == $core_type_token3){ $energy_new = ceil($energy_new * MMRPG_SETTINGS_SUBCOREBONUS_MULTIPLIER); $energy_mods++; }
@@ -3431,10 +3447,9 @@ class rpg_robot extends rpg_object {
                             </tbody>
                         </table>
 
-                        <table class="full quote">
-                            <tbody>
-                                <? if($print_options['layout_style'] == 'event'): ?>
-
+                        <? if($print_options['layout_style'] == 'event'): ?>
+                            <table class="full quote">
+                                <tbody>
                                     <?
                                     // Define the search and replace arrays for the robot quotes
                                     $temp_find = array('{this_player}', '{this_robot}', '{target_player}', '{target_robot}');
@@ -3445,12 +3460,28 @@ class rpg_robot extends rpg_object {
                                             <span class="robot_quote">&quot;<?= !empty($robot_info['robot_quotes']['battle_taunt']) ? str_replace($temp_find, $temp_replace, $robot_info['robot_quotes']['battle_taunt']) : '&hellip;' ?>&quot;</span>
                                         </td>
                                     </tr>
-
-                                <? endif; ?>
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        <? endif; ?>
 
                     </div>
+
+                    <? if($print_options['layout_style'] == 'website' && !empty($robot_info['robot_skill'])): ?>
+                        <? $skill_info = rpg_skill::get_index_info($robot_info['robot_skill']); ?>
+                        <div class="body body_left <?= !$print_options['show_mugshot'] ? 'fullsize' : '' ?> body_onerow skill_bubble" style="margin-top: 15px;">
+                            <table class="full skill">
+                                <tbody>
+                                    <tr>
+                                        <td  class="center">
+                                            <label>Passive Skill :</label>
+                                            <strong><?= !empty($robot_info['robot_skill_name']) ? $robot_info['robot_skill_name'] : $skill_info['skill_name'] ?></strong>
+                                            <p><?= $skill_info['skill_description2'] ?></p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    <? endif; ?>
 
                 <? endif; ?>
 

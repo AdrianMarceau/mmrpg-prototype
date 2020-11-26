@@ -1756,6 +1756,21 @@ button {
 #window .page .event .body_right table {
     margin: 0 0 0 auto;
 }
+#window .page .event .body_onerow {
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    border-radius: 0.5em;
+}
+#window .page .event .body.skill_bubble {
+   margin-top: 15px;
+}
+#window .page .event .body.skill_bubble td.center {
+   padding: 10px;
+   background-color: #282828;
+}
+#window .page .event .body.skill_bubble td.center label {
+   display: inline;
+}
 #window .page .event .sprite {
     margin-bottom: 2px;
     position: static;
