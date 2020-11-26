@@ -2,7 +2,7 @@
 
 // Define the allowed request kinds for game content actions
 $allowed_kinds = array(
-    'players', 'robots', 'fields', 'abilities', 'items',
+    'players', 'robots', 'fields', 'abilities', 'items', 'skills',
     'stars', 'challenges',
     'pages'
     );
