@@ -309,7 +309,8 @@ class rpg_skill extends rpg_object {
 
         // Define the various json index fields for player objects
         $json_index_fields = array(
-            // ...
+            'skill_group',
+            'skill_order'
             );
 
         // Implode the index fields into a string if requested
