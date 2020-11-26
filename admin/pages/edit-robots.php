@@ -30,6 +30,7 @@
     $mmrpg_abilities_index = cms_admin::get_abilities_index();
     $mmrpg_fields_index = cms_admin::get_fields_index();
     $mmrpg_robots_index = cms_admin::get_robots_index();
+    $mmrpg_skills_index = cms_admin::get_skills_index();
     $mmrpg_contributors_index = cms_admin::get_contributors_index('robot');
     $mmrpg_sources_index = rpg_game::get_source_index();
 
@@ -67,6 +68,28 @@
     }
     if (!empty($last_option_group)){ $mecha_options_markup[] = '</optgroup>'; }
     $mecha_options_markup = implode(PHP_EOL, $mecha_options_markup);
+
+    // Pre-generate a list of all skills so we can re-use it over and over
+    $last_option_group = false;
+    $skill_options_markup = array();
+    $skill_options_markup[] = '<option value="">-</option>';
+    foreach ($mmrpg_skills_index AS $skill_token => $skill_info){
+        $class_group = (!empty($skill_info['skill_group']) ? ucfirst($skill_info['skill_group']) : 'Misc').' Skills';
+        if ($last_option_group !== $class_group){
+            if (!empty($last_option_group)){ $skill_options_markup[] = '</optgroup>'; }
+            $last_option_group = $class_group;
+            $skill_options_markup[] = '<optgroup label="'.$class_group.'">';
+        }
+        $skill_name = !empty($skill_info['skill_name']) ? $skill_info['skill_name'] : '';
+        $skill_description = !empty($skill_info['skill_description']) ? $skill_info['skill_description'] : '';
+        $skill_description2 = !empty($skill_info['skill_description2']) ? $skill_info['skill_description2'] : '';
+        $option_label = $skill_name;
+        $option_title = htmlspecialchars($skill_description2, ENT_QUOTES, 'UTF-8', true);
+        $skill_options_markup[] = '<option value="'.$skill_token.'" title="'.$option_title.'">'.$option_label.'</option>';
+    }
+    if (!empty($last_option_group)){ $skill_options_markup[] = '</optgroup>'; }
+    $skill_options_count = count($skill_options_markup);
+    $skill_options_markup = implode(PHP_EOL, $skill_options_markup);
 
     // Pre-generate a list of all sources so we can re-use it over and over
     $last_option_group = false;
@@ -156,6 +179,7 @@
         $search_data['robot_name'] = !empty($_GET['robot_name']) && preg_match('/[-_0-9a-z\.\*\s]+/i', $_GET['robot_name']) ? trim(strtolower($_GET['robot_name'])) : '';
         $search_data['robot_core'] = !empty($_GET['robot_core']) && preg_match('/[-_0-9a-z]+/i', $_GET['robot_core']) ? trim(strtolower($_GET['robot_core'])) : '';
         $search_data['robot_class'] = !empty($_GET['robot_class']) && preg_match('/[-_0-9a-z]+/i', $_GET['robot_class']) ? trim(strtolower($_GET['robot_class'])) : '';
+        $search_data['robot_skill'] = !empty($_GET['robot_skill']) && preg_match('/[-_0-9a-z]+/i', $_GET['robot_skill']) ? trim(strtolower($_GET['robot_skill'])) : '';
         $search_data['robot_flavour'] = !empty($_GET['robot_flavour']) && preg_match('/[-_0-9a-z\.\*\s\{\}]+/i', $_GET['robot_flavour']) ? trim($_GET['robot_flavour']) : '';
         $search_data['robot_game'] = !empty($_GET['robot_game']) && preg_match('/[-_0-9a-z]+/i', $_GET['robot_game']) ? trim(strtoupper($_GET['robot_game'])) : '';
         $search_data['robot_group'] = !empty($_GET['robot_group']) && preg_match('/[-_0-9a-z\/]+/i', $_GET['robot_group']) ? trim($_GET['robot_group']) : '';
@@ -212,6 +236,12 @@
             $search_results_limit = false;
         } elseif (!empty($this_robot_class)){
             $search_query .= "AND robot_class = '{$this_robot_class}' ";
+        }
+
+        // If the robot skill was provided
+        if (!empty($search_data['robot_skill'])){
+            $search_query .= "AND robot_skill = '{$search_data['robot_skill']}' ";
+            $search_results_limit = false;
         }
 
         // Else if the robot flavour was provided, we can use wildcards
@@ -382,6 +412,9 @@
             $form_data['robot_attack'] = !empty($_POST['robot_attack']) && is_numeric($_POST['robot_attack']) ? (int)(trim($_POST['robot_attack'])) : 0;
             $form_data['robot_defense'] = !empty($_POST['robot_defense']) && is_numeric($_POST['robot_defense']) ? (int)(trim($_POST['robot_defense'])) : 0;
             $form_data['robot_speed'] = !empty($_POST['robot_speed']) && is_numeric($_POST['robot_speed']) ? (int)(trim($_POST['robot_speed'])) : 0;
+
+            $form_data['robot_skill'] = !empty($_POST['robot_skill']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_skill']) ? trim(strtolower($_POST['robot_skill'])) : '';
+            $form_data['robot_skill_name'] = !empty($form_data['robot_skill']) && !empty($_POST['robot_skill_name']) && preg_match('/^[-_0-9a-z\.\*\s]+$/i', $_POST['robot_skill_name']) ? trim($_POST['robot_skill_name']) : '';
 
             $form_data['robot_weaknesses'] = !empty($_POST['robot_weaknesses']) && is_array($_POST['robot_weaknesses']) ? array_values(array_unique(array_filter($_POST['robot_weaknesses']))) : array();
             $form_data['robot_resistances'] = !empty($_POST['robot_resistances']) && is_array($_POST['robot_resistances']) ? array_values(array_unique(array_filter($_POST['robot_resistances']))) : array();
@@ -775,18 +808,39 @@
                     </div>
 
                     <div class="field">
+                        <strong class="label">By Skill</strong>
+                        <?
+                        $current_value = !empty($search_data['robot_skill']) ? $search_data['robot_skill'] : '';
+                        $temp_options_markup = $skill_options_markup;
+                        $temp_options_markup = str_replace('<option value="', '<option disabled value="', $temp_options_markup);
+                        $temp_options_markup = str_replace('<option disabled value=""', '<option value=""', $temp_options_markup);
+                        $temp_allowed_options = $db->get_array_list("SELECT DISTINCT (robot_skill) AS skill_token FROM mmrpg_index_robots WHERE robot_class = '{$this_robot_class}' ORDER BY robot_skill ASC;", 'skill_token');
+                        $temp_allowed_options = !empty($temp_allowed_options) ? array_keys($temp_allowed_options) : array();
+                        foreach ($temp_allowed_options AS $value){ $temp_options_markup = str_replace('<option disabled value="'.$value.'"', '<option value="'.$value.'"', $temp_options_markup); }
+                        ?>
+                        <select class="select" name="robot_skill">
+                            <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $temp_options_markup) ?>
+                        </select><span></span>
+                    </div>
+
+                    <div class="field">
                         <strong class="label">By Flavour</strong>
                         <input class="textbox" type="text" name="robot_flavour" placeholder="" value="<?= !empty($search_data['robot_flavour']) ? htmlentities($search_data['robot_flavour'], ENT_QUOTES, 'UTF-8', true) : '' ?>" />
                     </div>
 
                     <div class="field">
                         <strong class="label">By Game</strong>
-                        <select class="select" name="robot_game"><option value=""></option><?
-                            $robot_games_tokens = $db->get_array_list("SELECT DISTINCT (robot_game) AS game_token FROM mmrpg_index_robots ORDER BY robot_game ASC;");
-                            foreach ($robot_games_tokens AS $game_key => $game_info){
-                                $game_token = $game_info['game_token'];
-                                ?><option value="<?= $game_token ?>"<?= !empty($search_data['robot_game']) && $search_data['robot_game'] === $game_token ? ' selected="selected"' : '' ?>><?= $game_token ?></option><?
-                                } ?>
+                        <?
+                        $current_value = !empty($search_data['robot_game']) ? $search_data['robot_game'] : '';
+                        $temp_options_markup = $source_options_markup;
+                        $temp_options_markup = str_replace('<option value="', '<option disabled value="', $temp_options_markup);
+                        $temp_options_markup = str_replace('<option disabled value=""', '<option value=""', $temp_options_markup);
+                        $temp_allowed_options = $db->get_array_list("SELECT DISTINCT (robot_game) AS game_token FROM mmrpg_index_robots WHERE robot_class = '{$this_robot_class}' ORDER BY robot_game ASC;", 'game_token');
+                        $temp_allowed_options = !empty($temp_allowed_options) ? array_keys($temp_allowed_options) : array();
+                        foreach ($temp_allowed_options AS $value){ $temp_options_markup = str_replace('<option disabled value="'.$value.'"', '<option value="'.$value.'"', $temp_options_markup); }
+                        ?>
+                        <select class="select" name="robot_game">
+                            <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $temp_options_markup) ?>
                         </select><span></span>
                     </div>
 
@@ -1220,6 +1274,10 @@
 
                                 <div class="panel" data-tab="stats">
 
+                                    <div class="field fullsize" style="min-height: 0;">
+                                        <strong class="label">Robot Stats</strong>
+                                    </div>
+
                                     <div class="field foursize">
                                         <strong class="label"><span class="type_span type_energy">Energy</span> <em>LE</em></strong>
                                         <input class="textbox" type="number" name="robot_energy" value="<?= $robot_data['robot_energy'] ?>" maxlength="8" />
@@ -1252,6 +1310,30 @@
                                         <? $bst_value = $robot_data['robot_energy'] + $robot_data['robot_attack'] + $robot_data['robot_defense'] + $robot_data['robot_speed']; ?>
                                         <input class="textbox disabled" type="text" name="robot_bst" value="<?= $bst_value ?>" maxlength="8" disabled="disabled" data-auto="field-sum" data-field-sum="robot_energy,robot_attack,robot_defense,robot_speed" />
                                     </div>
+
+                                    <? if ($this_robot_class !== 'mecha'){
+                                        ?>
+
+                                        <hr />
+
+                                        <div class="field halfsize">
+                                            <strong class="label"><?= $this_robot_class_short_name_uc ?> Skill</strong>
+                                            <? $current_value = !empty($robot_data['robot_skill']) ? $robot_data['robot_skill'] : ''; ?>
+                                            <select class="select" name="robot_skill">
+                                                <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $skill_options_markup) ?>
+                                            </select><span></span>
+                                        </div>
+
+                                        <div class="field halfsize">
+                                            <div class="label">
+                                                <strong><?= $this_robot_class_short_name_uc ?> Skill Name</strong>
+                                                <em>optional alias of default name</em>
+                                            </div>
+                                            <input class="textbox" type="text" name="robot_skill_name" value="<?= htmlentities($robot_data['robot_skill_name'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="100" />
+                                        </div>
+
+                                        <?
+                                    } ?>
 
                                     <hr />
 
