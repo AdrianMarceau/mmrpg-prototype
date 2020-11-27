@@ -8,6 +8,9 @@ require($base_dir.'top.php');
 // Define the header type so it's easier to display stuff
 header('Content-type: text/plain;');
 
+// Do not allow this script to run anymore
+die('We are past the point of migration, my friend');
+
 // ONLY allow this file to run locally
 if (defined('MMRPG_CONFIG_IS_LIVE') && MMRPG_CONFIG_IS_LIVE === true){
     die('This migration script can ONLY be run locally!!!');
