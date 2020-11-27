@@ -1162,7 +1162,7 @@ class rpg_battle extends rpg_object {
             // Trigger any robot's item functions if they have been defined for this context
             $active_robots = $this_player->get_robots_active();
             foreach ($active_robots AS $key => $temp_robot){
-                $temp_robot->trigger_item_function('rpg-battle_complete-trigger_victory', $extra_objects);
+                $temp_robot->trigger_custom_function('rpg-battle_complete-trigger_victory', $extra_objects);
             }
 
             // If there were any item bonuses, loop through and display their details now

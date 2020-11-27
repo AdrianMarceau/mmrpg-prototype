@@ -85,8 +85,8 @@ class rpg_ability_recovery extends rpg_recovery {
         $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | to('.$this_robot->robot_id.':'.$this_robot->robot_token.') vs from('.$target_robot->robot_id.':'.$target_robot->robot_token.') | recovery_start_amount |<br /> '.'amount:'.$this_ability->ability_results['this_amount'].' | '.'percent:'.($this_ability->recovery_options['recovery_percent'] ? 'true' : 'false').' | '.'kind:'.$this_ability->recovery_options['recovery_kind'].' | type1:'.(!empty($this_ability->recovery_options['recovery_type']) ? $this_ability->recovery_options['recovery_type'] : 'none').' | type2:'.(!empty($this_ability->recovery_options['recovery_type2']) ? $this_ability->recovery_options['recovery_type2'] : 'none').'');
 
         // Trigger this robot's item function if one has been defined for this context
-        $this_robot->trigger_item_function('rpg-ability_trigger-recovery_before', $extra_objects);
-        $target_robot->trigger_item_function('rpg-ability_trigger-recovery_before', $extra_objects);
+        $this_robot->trigger_custom_function('rpg-ability_trigger-recovery_before', $extra_objects);
+        $target_robot->trigger_custom_function('rpg-ability_trigger-recovery_before', $extra_objects);
         if ($options->return_early){ return $options->return_value; }
 
         // DEBUG
@@ -1101,8 +1101,8 @@ class rpg_ability_recovery extends rpg_recovery {
         $this_robot->player->update_session();
 
         // Trigger this robot's item function if one has been defined for this context
-        $this_robot->trigger_item_function('rpg-ability_trigger-recovery_middle', $extra_objects);
-        $target_robot->trigger_item_function('rpg-ability_trigger-recovery_middle', $extra_objects);
+        $this_robot->trigger_custom_function('rpg-ability_trigger-recovery_middle', $extra_objects);
+        $target_robot->trigger_custom_function('rpg-ability_trigger-recovery_middle', $extra_objects);
         if ($options->return_early){ return $options->return_value; }
 
         // Generate an event with the collected recovery results based on recovery type
@@ -1262,8 +1262,8 @@ class rpg_ability_recovery extends rpg_recovery {
             ));
 
         // Trigger this robot's item function if one has been defined for this context
-        $this_robot->trigger_item_function('rpg-ability_trigger-recovery_after', $extra_objects);
-        $target_robot->trigger_item_function('rpg-ability_trigger-recovery_after', $extra_objects);
+        $this_robot->trigger_custom_function('rpg-ability_trigger-recovery_after', $extra_objects);
+        $target_robot->trigger_custom_function('rpg-ability_trigger-recovery_after', $extra_objects);
 
         // Return the final recovery results
         return $this_ability->ability_results;

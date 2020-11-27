@@ -922,7 +922,7 @@ class rpg_robot extends rpg_object {
         $extra_objects = array('options' => $options);
 
         // Trigger this robot's item function if one has been defined for this context
-        $this->trigger_item_function('rpg-robot_apply-stat-bonuses_before', $extra_objects);
+        $this->trigger_custom_function('rpg-robot_apply-stat-bonuses_before', $extra_objects);
         if ($options->return_early){ return $options->return_value; }
 
         // If this is robot's player is human controlled
@@ -1006,7 +1006,7 @@ class rpg_robot extends rpg_object {
         }
 
         // Trigger this robot's item function if one has been defined for this context
-        $this->trigger_item_function('rpg-robot_apply-stat-bonuses_after', $extra_objects);
+        $this->trigger_custom_function('rpg-robot_apply-stat-bonuses_after', $extra_objects);
 
         // Create the stat boost flag
         $this->flags['apply_stat_bonuses'] = true;
@@ -2778,7 +2778,7 @@ class rpg_robot extends rpg_object {
         }
 
         // Trigger this robot's item function if one has been defined for this context
-        $this->trigger_item_function('rpg-robot_update-variables_before', $extra_objects);
+        $this->trigger_custom_function('rpg-robot_update-variables_before', $extra_objects);
         if ($options->return_early){ return $options->return_value; }
 
         // If the robot's current life or weapon energy is higher than base, make sure we level it off
@@ -2874,7 +2874,7 @@ class rpg_robot extends rpg_object {
         }
 
         // Trigger this robot's item function if one has been defined for this context
-        $this->trigger_item_function('rpg-robot_update-variables_after', $extra_objects);
+        $this->trigger_custom_function('rpg-robot_update-variables_after', $extra_objects);
 
         // Now collect an export array for this object
         $this_data = $this->export_array();
@@ -5641,7 +5641,7 @@ class rpg_robot extends rpg_object {
             );
 
         // Trigger this robot's item function if one has been defined for this context
-        $this->trigger_item_function('rpg-robot_check-items', $extra_objects, $extra_item_info);
+        $this->trigger_custom_function('rpg-robot_check-items', $extra_objects, $extra_item_info);
 
     }
 
@@ -5674,7 +5674,7 @@ class rpg_robot extends rpg_object {
         $extra_objects = array('options' => $options);
 
         // Trigger this robot's item function if one has been defined for this context
-        $this->trigger_item_function('rpg-robot_check-weapons_before', $extra_objects);
+        $this->trigger_custom_function('rpg-robot_check-weapons_before', $extra_objects);
         if ($options->return_early){ return $options->return_value; }
 
         // If this robot is not at full weapon energy, increase it by one
@@ -5694,7 +5694,7 @@ class rpg_robot extends rpg_object {
         }
 
         // Trigger this robot's item function if one has been defined for this context
-        $this->trigger_item_function('rpg-robot_check-weapons_after', $extra_objects);
+        $this->trigger_custom_function('rpg-robot_check-weapons_after', $extra_objects);
 
     }
 

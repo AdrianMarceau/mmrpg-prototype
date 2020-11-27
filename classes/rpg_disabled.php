@@ -234,8 +234,8 @@ class rpg_disabled {
                 }
 
                 // Trigger this and target robot's item functions if they have been defined for this context
-                $this_robot->trigger_item_function('rpg-robot_trigger-disabled_stat-rewards', $extra_objects);
-                $target_robot->trigger_item_function('rpg-robot_trigger-disabled_stat-rewards', $extra_objects);
+                $this_robot->trigger_custom_function('rpg-robot_trigger-disabled_stat-rewards', $extra_objects);
+                $target_robot->trigger_custom_function('rpg-robot_trigger-disabled_stat-rewards', $extra_objects);
 
                 // If the stat was not empty, process it
                 if ($options->this_stat_boost > 0){
@@ -489,8 +489,8 @@ class rpg_disabled {
                     //$this_battle->events_create(false, false, 'DEBUG', $debug_text);
 
                     // Trigger this and target robot's item functions if they have been defined for this context
-                    $this_robot->trigger_item_function('rpg-robot_trigger-disabled_experience-rewards', $extra_objects);
-                    $temp_target_robot->trigger_item_function('rpg-robot_trigger-disabled_experience-rewards', $extra_objects);
+                    $this_robot->trigger_custom_function('rpg-robot_trigger-disabled_experience-rewards', $extra_objects);
+                    $temp_target_robot->trigger_custom_function('rpg-robot_trigger-disabled_experience-rewards', $extra_objects);
 
                     //$debug_text = 'MIN/MAX ROUNDING | ';
                     //$debug_text .= '(for '.$temp_target_robot->robot_token.' via '.$this_robot->robot_token.') <br /> ';
@@ -874,8 +874,8 @@ class rpg_disabled {
             $options->force_elemental_drop = !empty($this_robot->flags['triggered_weakness']) ? true : false;
 
             // Trigger this and target robot's item functions if they have been defined for this context
-            $this_robot->trigger_item_function('rpg-robot_trigger-disabled_item-rewards_before', $extra_objects);
-            $target_robot->trigger_item_function('rpg-robot_trigger-disabled_item-rewards_before', $extra_objects);
+            $this_robot->trigger_custom_function('rpg-robot_trigger-disabled_item-rewards_before', $extra_objects);
+            $target_robot->trigger_custom_function('rpg-robot_trigger-disabled_item-rewards_before', $extra_objects);
 
             // Increase the item chance multiplier if one is set for the stage
             if (isset($this_battle->field->field_multipliers['items'])){ $options->item_chance_multiplier = ($options->item_chance_multiplier * $this_battle->field->field_multipliers['items']); }
@@ -950,8 +950,8 @@ class rpg_disabled {
             }
 
             // Trigger this and target robot's item functions if they have been defined for this context
-            $this_robot->trigger_item_function('rpg-robot_trigger-disabled_item-rewards_after', $extra_objects);
-            $target_robot->trigger_item_function('rpg-robot_trigger-disabled_item-rewards_after', $extra_objects);
+            $this_robot->trigger_custom_function('rpg-robot_trigger-disabled_item-rewards_after', $extra_objects);
+            $target_robot->trigger_custom_function('rpg-robot_trigger-disabled_item-rewards_after', $extra_objects);
 
             // Shuffle the rewards so it doesn't look to formulaic
             shuffle($options->item_rewards_array);

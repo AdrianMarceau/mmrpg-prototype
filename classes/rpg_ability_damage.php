@@ -89,8 +89,8 @@ class rpg_ability_damage extends rpg_damage {
         $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | to('.$this_robot->robot_id.':'.$this_robot->robot_token.') vs from('.$target_robot->robot_id.':'.$target_robot->robot_token.') | damage_start_amount |<br /> '.'amount:'.$this_ability->ability_results['this_amount'].' | '.'percent:'.($this_ability->damage_options['damage_percent'] ? 'true' : 'false').' | '.'kind:'.$this_ability->damage_options['damage_kind'].' | type1:'.(!empty($this_ability->damage_options['damage_type']) ? $this_ability->damage_options['damage_type'] : 'none').' | type2:'.(!empty($this_ability->damage_options['damage_type2']) ? $this_ability->damage_options['damage_type2'] : 'none').'');
 
         // Trigger this robot's item function if one has been defined for this context
-        $this_robot->trigger_item_function('rpg-ability_trigger-damage_before', $extra_objects);
-        $target_robot->trigger_item_function('rpg-ability_trigger-damage_before', $extra_objects);
+        $this_robot->trigger_custom_function('rpg-ability_trigger-damage_before', $extra_objects);
+        $target_robot->trigger_custom_function('rpg-ability_trigger-damage_before', $extra_objects);
         if ($options->return_early){ return $options->return_value; }
 
         // DEBUG
@@ -1157,8 +1157,8 @@ class rpg_ability_damage extends rpg_damage {
         }
 
         // Trigger this robot's item function if one has been defined for this context
-        $this_robot->trigger_item_function('rpg-ability_trigger-damage_middle', $extra_objects);
-        $target_robot->trigger_item_function('rpg-ability_trigger-damage_middle', $extra_objects);
+        $this_robot->trigger_custom_function('rpg-ability_trigger-damage_middle', $extra_objects);
+        $target_robot->trigger_custom_function('rpg-ability_trigger-damage_middle', $extra_objects);
         if ($options->return_early){ return $options->return_value; }
 
         // Generate an event with the collected damage results based on damage type
@@ -1320,8 +1320,8 @@ class rpg_ability_damage extends rpg_damage {
             ));
 
         // Trigger this robot's item function if one has been defined for this context
-        $this_robot->trigger_item_function('rpg-ability_trigger-damage_after', $extra_objects);
-        $target_robot->trigger_item_function('rpg-ability_trigger-damage_after', $extra_objects);
+        $this_robot->trigger_custom_function('rpg-ability_trigger-damage_after', $extra_objects);
+        $target_robot->trigger_custom_function('rpg-ability_trigger-damage_after', $extra_objects);
 
         // Return the final damage results
         return $this_ability->ability_results;
