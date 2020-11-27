@@ -351,6 +351,17 @@ class rpg_robot extends rpg_object {
 
     }
 
+    // Define a public function for triggering an customs function for applicable items/skills/etc.
+    public function trigger_custom_function($function, $extra_objects = array(), $extra_info = array()){
+
+        // Create an array to hold return values
+        $return_values = array();
+        $return_values['item'] = self::trigger_item_function($function, $extra_objects, $extra_info);
+        $return_values['skill'] = self::trigger_skill_function($function, $extra_objects, $extra_info);
+        return $return_values;
+
+    }
+
     // Define a public function for triggering an item function if one is being held
     public function trigger_item_function($function, $extra_objects = array(), $extra_item_info = array()){
 
@@ -385,6 +396,44 @@ class rpg_robot extends rpg_object {
         // Otherwise collect an array of global objects for this robot
         $objects = $this->get_objects($extra_objects);
         return $this_item->item_functions_custom[$function]($objects);
+
+    }
+
+    // Define a public function for triggering an skill function if one is being held
+    public function trigger_skill_function($function, $extra_objects = array(), $extra_skill_info = array()){
+
+        // Collect and cache an skill index for reference
+        static $mmrpg_index_skills;
+        if (empty($mmrpg_index_skills)){ $mmrpg_index_skills = rpg_skill::get_index(); }
+
+        // If provided, reset the options object first
+        if (isset($extra_objects['options'])){ rpg_game::reset_options_object($extra_objects['options']); }
+
+        // Check to make sure this robot has a held skill, else return now
+        $skill_token = $this->robot_skill;
+        if (empty($skill_token)){ return; }
+
+        // Collect the skill's index info if exists, else return now
+        if (!isset($mmrpg_index_skills[$skill_token])){ return; }
+        $skill_index_info = $mmrpg_index_skills[$skill_token];
+        $skill_id = $this->robot_id.str_pad($skill_index_info['skill_id'], 3, '0', STR_PAD_LEFT);
+        $skill_info = array('skill_id' => $skill_id, 'skill_token' => $skill_token);
+        if (!empty($this->robot_skill_name)){ $skill_info['skill_name'] = $this->robot_skill_name; }
+        if (!empty($extra_skill_info)){ $skill_info = array_merge($skill_info, $extra_skill_info); }
+
+        // Collect this skill's object from the game class
+        $this_skill = rpg_game::get_skill($this->battle, $this->player, $this, $skill_info);
+
+        // Check to make sure this skill has the given function defined, else return now
+        if (!isset($this_skill->skill_functions_custom[$function])){ return; }
+
+        // Merge in any additional object refs into the array
+        if (!is_array($extra_objects)){ $extra_objects = array(); }
+        $extra_objects = array_merge($extra_objects, array('this_skill' => $this_skill));
+
+        // Otherwise collect an array of global objects for this robot
+        $objects = $this->get_objects($extra_objects);
+        return $this_skill->skill_functions_custom[$function]($objects);
 
     }
 
