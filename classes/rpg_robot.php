@@ -641,11 +641,6 @@ class rpg_robot extends rpg_object {
     public function set_base_item($value){ $this->set_info('robot_base_item', $value); }
     public function unset_base_item(){ $this->set_info('robot_base_item', ''); }
 
-    /**
-     * Check if this robot is holding a base item, optionally checking for a specific one
-     * @param string $item_token (optional)
-     * @return bool
-     */
     public function has_base_item(){
         $args = func_get_args();
         $item = $this->get_info('robot_base_item');
@@ -654,6 +649,49 @@ class rpg_robot extends rpg_object {
     }
 
     public function reset_item(){ $this->set_info('robot_item', $this->get_info('robot_base_item')); }
+
+    /**
+     * Check if this robot is holding an skill, optionally checking for a specific one
+     * @param string $skill_token (optional)
+     * @return bool
+     */
+    public function has_skill(){
+        $args = func_get_args();
+        $skill = $this->get_info('robot_skill');
+        if (!empty($args[0])){ return $skill == $args[0] ? true : false; }
+        else { return !empty($skill) ? true : false; }
+    }
+
+    public function get_base_skill(){ return $this->get_info('robot_base_skill'); }
+    public function set_base_skill($value){ $this->set_info('robot_base_skill', $value); }
+    public function unset_base_skill(){ $this->set_info('robot_base_skill', ''); }
+
+    public function has_base_skill(){
+        $args = func_get_args();
+        $skill = $this->get_info('robot_base_skill');
+        if (!empty($args[0])){ return $skill == $args[0] ? true : false; }
+        else { return !empty($skill) ? true : false; }
+    }
+
+    public function reset_skill(){ $this->set_info('robot_skill', $this->get_info('robot_base_skill')); }
+
+    /**
+     * Check if this robot has a particular attribute, either via item, skill, etc.
+     * @param string $item_token (optional)
+     * @return bool
+     */
+    public function has_attribute($attr){
+        $item = $this->get_info('robot_item');
+        $skill = $this->get_info('robot_skill');
+        if ($attr === 'quick-charge'){
+            if ($item === 'charge-module'){ return true; }
+            elseif ($skill === 'charge-submodule'){ return true; }
+        } elseif ($attr === 'extended-range'){
+            if ($item === 'target-module'){ return true; }
+            elseif ($skill === 'target-submodule'){ return true; }
+        }
+        return false;
+    }
 
     public function get_abilities(){ return $this->get_info('robot_abilities'); }
     public function set_abilities($value){ $this->set_info('robot_abilities', $value); }
