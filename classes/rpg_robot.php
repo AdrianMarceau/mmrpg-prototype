@@ -356,8 +356,14 @@ class rpg_robot extends rpg_object {
 
         // Create an array to hold return values
         $return_values = array();
-        $return_values['item'] = self::trigger_item_function($function, $extra_objects, $extra_info);
+
+        // Trigger the skill function if it exists and return early if the effect requires it
         $return_values['skill'] = self::trigger_skill_function($function, $extra_objects, $extra_info);
+
+        // Trigger the skill function if it exists and return early if the effect requires it
+        $return_values['item'] = self::trigger_item_function($function, $extra_objects, $extra_info);
+
+        // Return an array of all the values from the above effect, if any were provided
         return $return_values;
 
     }
@@ -388,6 +394,7 @@ class rpg_robot extends rpg_object {
 
         // Check to make sure this item has the given function defined, else return now
         if (!isset($this_item->item_functions_custom[$function])){ return; }
+        //error_log('triggering '.$this->robot_token.' '.$this->robot_item.' via '.$function);
 
         // Merge in any additional object refs into the array
         if (!is_array($extra_objects)){ $extra_objects = array(); }
@@ -426,6 +433,7 @@ class rpg_robot extends rpg_object {
 
         // Check to make sure this skill has the given function defined, else return now
         if (!isset($this_skill->skill_functions_custom[$function])){ return; }
+        //error_log('triggering '.$this->robot_token.' '.$this->robot_skill.' via '.$function);
 
         // Merge in any additional object refs into the array
         if (!is_array($extra_objects)){ $extra_objects = array(); }
