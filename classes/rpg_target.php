@@ -192,5 +192,80 @@ class rpg_target {
 
     }
 
+    // Define a trigger for using one of this robot's skills in battle
+    public static function trigger_skill_target($this_robot, $target_robot, $this_skill, $trigger_options = array()){
+        global $db;
+
+        // Define the event console options
+        $event_options = array();
+        $event_options['console_container_height'] = 1;
+        $event_options['this_skill'] = $this_skill;
+        $event_options['this_skill_target'] = $target_robot->robot_id.'_'.$target_robot->robot_token;
+        $event_options['this_skill_target_key'] = $target_robot->robot_key;
+        $event_options['this_skill_target_position'] = $target_robot->robot_position;
+        $event_options['this_skill_results'] = array();
+        $event_options['console_show_target'] = false;
+        $event_options['console_show_this'] = true;
+        $event_options['console_show_this_player'] = false;
+        $event_options['console_show_this_robot'] = true;
+
+        // Empty any text from the previous skill result
+        $this_skill->skill_results['this_text'] = '';
+
+        // Update this robot's history with the triggered skill
+        $this_robot->history['triggered_targets'][] = $target_robot->robot_token;
+
+        // Backup this and the target robot's frames to revert later
+        $this_robot_backup_frame = $this_robot->robot_frame;
+        $this_player_backup_frame = $this_robot->player->player_frame;
+        $target_robot_backup_frame = $target_robot->robot_frame;
+        $target_player_backup_frame = $target_robot->player->player_frame;
+
+        // Update this robot's frames using the target options
+        $this_robot->robot_frame = $this_skill->target_options['target_frame'];
+        if ($this_robot->robot_id != $target_robot->robot_id){ $target_robot->robot_frame = 'defend'; }
+        $this_robot->player->player_frame = 'command';
+        $this_robot->player->update_session();
+
+        // Create a message to show the initial targeting action
+        if ($this_robot->robot_id != $target_robot->robot_id && empty($trigger_options['prevent_default_text'])){
+            $this_skill->skill_results['this_text'] .= "{$this_robot->print_name()} targets {$target_robot->print_name()}!<br />";
+        }
+
+        // Append the targetting text to the event body
+        $this_skill->skill_results['this_text'] .= $this_skill->target_options['target_text'];
+
+        // Update the skill results with the the trigger kind
+        $this_skill->skill_results['trigger_kind'] = 'target';
+        $this_skill->skill_results['this_result'] = 'success';
+
+        // Update the event options with the skill results
+        $event_options['this_skill_results'] = $this_skill->skill_results;
+        $event_options['canvas_show_this_skill'] = false;
+
+        // Create a new entry in the event log for the targeting event
+        $this_robot->battle->events_create($this_robot, $target_robot, $this_skill->target_options['target_header'], $this_skill->skill_results['this_text'], $event_options);
+
+        // Update this skill's history with the triggered skill data and results
+        $this_skill->history['skill_results'][] = $this_skill->skill_results;
+
+        // restore this and the target robot's frames to their backed up state
+        $this_robot->robot_frame = $this_robot_backup_frame;
+        $this_robot->player->player_frame = $this_player_backup_frame;
+        $target_robot->robot_frame = $target_robot_backup_frame;
+        $target_robot->player->player_frame = $target_player_backup_frame;
+        $this_skill->target_options_reset();
+
+        // Update internal variables
+        $this_robot->update_session();
+        $this_robot->player->update_session();
+        $target_robot->update_session();
+        $this_skill->update_session();
+
+        // Return the skill results
+        return $this_skill->skill_results;
+
+    }
+
 }
 ?>

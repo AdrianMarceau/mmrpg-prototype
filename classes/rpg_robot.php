@@ -2087,12 +2087,19 @@ class rpg_robot extends rpg_object {
 
         // Check to see which object type has been provided
         if (isset($this_object->ability_token)){
+
             // This was an ability so delegate to the ability function
             return rpg_target::trigger_ability_target($this, $target_robot, $this_object, $trigger_options);
 
         } elseif (isset($this_object->item_token)){
+
             // This was an item so delegate to the item function
             return rpg_target::trigger_item_target($this, $target_robot, $this_object, $trigger_options);
+
+        } elseif (isset($this_object->skill_token)){
+
+            // This was an item so delegate to the skill function
+            return rpg_target::trigger_skill_target($this, $target_robot, $this_object, $trigger_options);
         }
 
     }

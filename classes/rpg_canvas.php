@@ -1130,6 +1130,13 @@ class rpg_canvas {
 
     }
 
+    // Define a function for generating skill canvas variables
+    public static function skill_markup($this_skill, $options, $player_data, $robot_data){
+
+        // Skills do not have any markup... right?
+
+    }
+
     // Define a function for generating item canvas variables
     public static function static_item_markup($this_item, $options, $player_data, $robot_data){
 

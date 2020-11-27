@@ -105,6 +105,13 @@ class rpg_skill extends rpg_object {
         $this->skill_token = isset($this_skillinfo['skill_token']) ? $this_skillinfo['skill_token'] : 'skill';
         $this->skill_class = isset($this_skillinfo['skill_class']) ? $this_skillinfo['skill_class'] : 'master';
         $this->skill_description = isset($this_skillinfo['skill_description']) ? $this_skillinfo['skill_description'] : '';
+        $this->skill_results = array();
+        $this->attachment_results = array();
+        $this->skill_options = array();
+        $this->target_options = array();
+        $this->damage_options = array();
+        $this->recovery_options = array();
+        $this->attachment_options = array();
 
         // Define the internal robot base values using the robots index array
         $this->skill_base_name = isset($this_skillinfo['skill_base_name']) ? $this_skillinfo['skill_base_name'] : $this->skill_name;
@@ -120,8 +127,22 @@ class rpg_skill extends rpg_object {
             $this->skill_function = isset($functions['skill_function']) ? $functions['skill_function'] : function(){};
             $this->skill_function_onload = isset($functions['skill_function_onload']) ? $functions['skill_function_onload'] : function(){};
             $this->skill_function_attachment = isset($functions['skill_function_attachment']) ? $functions['skill_function_attachment'] : function(){};
+            $this->skill_functions_custom = array();
+            foreach ($functions AS $name => $function){
+                if (strpos($name, 'skill_function_') === 0){ continue; }
+                elseif (!is_callable($function)){ continue; }
+                $this->skill_functions_custom[$name] = $function;
+            }
             unset($functions);
         }
+
+        // Define a the default skill results
+        $this->skill_results_reset();
+
+        // Reset the skill options to default
+        $this->target_options_reset();
+        $this->damage_options_reset();
+        $this->recovery_options_reset();
 
         // Trigger the onload function if it exists
         $this->trigger_onload();
@@ -180,6 +201,15 @@ class rpg_skill extends rpg_object {
     public function get_functions(){ return $this->get_info('skill_functions'); }
     public function set_functions($value){ $this->set_info('skill_functions', $value); }
 
+    public function get_results(){ return $this->get_info('skill_results'); }
+    public function set_results($value){ $this->set_info('skill_results', $value); }
+
+    public function get_options(){ return $this->get_info('skill_options'); }
+    public function set_options($value){ $this->set_info('skill_options', $value); }
+
+    public function get_target_options(){ return $this->get_info('target_options'); }
+    public function set_target_options($value){ $this->set_info('target_options', $value); }
+
     // Define a public function for getting all global objects related to this skill
     private function get_objects($extra_objects = array()){
 
@@ -233,6 +263,344 @@ class rpg_skill extends rpg_object {
     }
     public function print_description(){
         return '<span class="skill_description">'.$this->skill_description.'</span>';
+    }
+
+    // Define a trigger for using one of this robot's skills
+    public function reset_skill($target_robot, $this_skill){
+
+        // Update internal variables
+        $this_skill->update_session();
+
+        // Return the skill results
+        return $this_skill->skill_results;
+    }
+
+    // Define a public function for easily resetting result options
+    public function skill_results_reset(){
+        // Redfine the result options as an empty array
+        $this->skill_results = array();
+        // Populate the array with defaults
+        $this->skill_results['total_result'] = '';
+        $this->skill_results['total_actions'] = 0;
+        $this->skill_results['total_strikes'] = 0;
+        $this->skill_results['total_misses'] = 0;
+        $this->skill_results['total_amount'] = 0;
+        $this->skill_results['total_overkill'] = 0;
+        $this->skill_results['this_result'] = '';
+        $this->skill_results['this_amount'] = 0;
+        $this->skill_results['this_overkill'] = 0;
+        $this->skill_results['this_text'] = '';
+        $this->skill_results['counter_criticals'] = 0;
+        $this->skill_results['counter_weaknesses'] = 0;
+        $this->skill_results['counter_resistances'] = 0;
+        $this->skill_results['counter_affinities'] = 0;
+        $this->skill_results['counter_immunities'] = 0;
+        $this->skill_results['counter_coreboosts'] = 0;
+        $this->skill_results['counter_omegaboosts'] = 0;
+        $this->skill_results['flag_critical'] = false;
+        $this->skill_results['flag_weakness'] = false;
+        $this->skill_results['flag_resistance'] = false;
+        $this->skill_results['flag_affinity'] = false;
+        $this->skill_results['flag_immunity'] = false;
+        $this->skill_results['flag_coreboost'] = false;
+        $this->skill_results['flag_omegaboost'] = false;
+        // Update this skill's data
+        $this->update_session();
+        // Return the resuling array
+        return $this->skill_results;
+    }
+
+    // Define a public function for easily resetting target options
+    public function target_options_reset(){
+        // Redfine the options variables as an empty array
+        $this->target_options = array();
+        // Populate the array with defaults
+        $this->target_options['target_kind'] = 'energy';
+        $this->target_options['target_frame'] = 'shoot';
+        $this->target_options['skill_success_frame'] = 1;
+        $this->target_options['skill_success_frame_span'] = 1;
+        $this->target_options['skill_success_frame_offset'] = array('x' => 0, 'y' => 0, 'z' => 1);
+        $this->target_options['skill_failure_frame'] = 1;
+        $this->target_options['skill_failure_frame_span'] = 1;
+        $this->target_options['skill_failure_frame_offset'] = array('x' => 0, 'y' => 0, 'z' => 1);
+        $this->target_options['target_kickback'] = array('x' => 0, 'y' => 0, 'z' => 0);
+        $this->target_options['target_header'] = $this->robot->robot_name.'&#39;s '.$this->skill_name;
+        $this->target_options['target_text'] = "{$this->robot->print_name()} uses {$this->print_name()}!";
+        // Update this skill's data
+        $this->update_session();
+        // Return the resuling array
+        return $this->target_options;
+    }
+
+
+    // Define a public function for easily updating target options
+    public function target_options_update($target_options = array()){
+        // Update internal variables with basic target options, if set
+        if (isset($target_options['header'])){ $this->target_options['target_header'] = $target_options['header'];  }
+        if (isset($target_options['text'])){ $this->target_options['target_text'] = $target_options['text'];  }
+        if (isset($target_options['frame'])){ $this->target_options['target_frame'] = $target_options['frame'];  }
+        if (isset($target_options['kind'])){ $this->target_options['target_kind'] = $target_options['kind'];  }
+        // Update internal variables with kickback options, if set
+        if (isset($target_options['kickback'])){
+            $this->target_options['target_kickback']['x'] = $target_options['kickback'][0];
+            $this->target_options['target_kickback']['y'] = $target_options['kickback'][1];
+            $this->target_options['target_kickback']['z'] = $target_options['kickback'][2];
+        }
+        // Update internal variabels with success options, if set
+        if (isset($target_options['success'])){
+            $this->target_options['skill_success_frame'] = $target_options['success'][0];
+            $this->target_options['skill_success_frame_offset']['x'] = $target_options['success'][1];
+            $this->target_options['skill_success_frame_offset']['y'] = $target_options['success'][2];
+            $this->target_options['skill_success_frame_offset']['z'] = $target_options['success'][3];
+            $this->target_options['target_text'] = $target_options['success'][4];
+            $this->target_options['skill_success_frame_span'] = isset($target_options['success'][5]) ? $target_options['success'][5] : 1;
+        }
+        // Update internal variabels with failure options, if set
+        if (isset($target_options['failure'])){
+            $this->target_options['skill_failure_frame'] = $target_options['failure'][0];
+            $this->target_options['skill_failure_frame_offset']['x'] = $target_options['failure'][1];
+            $this->target_options['skill_failure_frame_offset']['y'] = $target_options['failure'][2];
+            $this->target_options['skill_failure_frame_offset']['z'] = $target_options['failure'][3];
+            $this->target_options['target_text'] = $target_options['failure'][4];
+            $this->target_options['skill_failure_frame_span'] = isset($target_options['success'][5]) ? $target_options['success'][5] : 1;
+        }
+        // Return the new array
+        return $this->target_options;
+    }
+
+    // Define a public function for easily resetting damage options
+    public function damage_options_reset(){
+        // Redfine the options variables as an empty array
+        $this->damage_options = array();
+        // Populate the array with defaults
+        $this->damage_options = array();
+        $this->damage_options['damage_header'] = $this->robot->robot_name.'&#39;s '.$this->skill_name;
+        $this->damage_options['damage_frame'] = 'damage';
+        $this->damage_options['skill_success_frame'] = 1;
+        $this->damage_options['skill_success_frame_span'] = 1;
+        $this->damage_options['skill_success_frame_offset'] = array('x' => 0, 'y' => 0, 'z' => 1);
+        $this->damage_options['skill_failure_frame'] = 1;
+        $this->damage_options['skill_failure_frame_span'] = 1;
+        $this->damage_options['skill_failure_frame_offset'] = array('x' => 0, 'y' => 0, 'z' => 1);
+        $this->damage_options['damage_kind'] = 'energy';
+        $this->damage_options['damage_type'] = '';
+        $this->damage_options['damage_type2'] = '';
+        $this->damage_options['damage_amount'] = '';
+        $this->damage_options['damage_amount2'] = '';
+        $this->damage_options['damage_kickback'] = array('x' => 5, 'y' => 0, 'z' => 0);
+        $this->damage_options['damage_percent'] = false;
+        $this->damage_options['damage_percent2'] = false;
+        $this->damage_options['damage_modifiers'] = true;
+        $this->damage_options['success_rate'] = 'auto';
+        $this->damage_options['failure_rate'] = 'auto';
+        $this->damage_options['critical_rate'] = 10;
+        $this->damage_options['critical_multiplier'] = 2;
+        $this->damage_options['weakness_multiplier'] = 2;
+        $this->damage_options['resistance_multiplier'] = 0.5;
+        $this->damage_options['immunity_multiplier'] = 0;
+        $this->damage_options['success_text'] = 'The skill hit!';
+        $this->damage_options['failure_text'] = 'The skill missed&hellip;';
+        $this->damage_options['immunity_text'] = 'The skill had no effect&hellip;';
+        $this->damage_options['critical_text'] = 'It&#39;s a critical hit!';
+        $this->damage_options['weakness_text'] = 'It&#39;s super effective!';
+        $this->damage_options['resistance_text'] = 'It&#39;s not very effective&hellip;';
+        $this->damage_options['weakness_resistance_text'] = ''; //"It's a super effective resisted hit!';
+        $this->damage_options['weakness_critical_text'] = 'It&#39;s a super effective critical hit!';
+        $this->damage_options['resistance_critical_text'] = 'It&#39;s a critical hit, but not very effective&hellip;';
+        // Update this skill's data
+        $this->update_session();
+        // Return the resuling array
+        return $this->damage_options;
+    }
+
+    // Define a public function for easily updating damage options
+    public function damage_options_update($damage_options = array(), $update_session = false){
+        // Update internal variables with basic damage options, if set
+        if (isset($damage_options['header'])){ $this->damage_options['damage_header'] = $damage_options['header'];  }
+        if (isset($damage_options['frame'])){ $this->damage_options['damage_frame'] = $damage_options['frame'];  }
+        if (isset($damage_options['kind'])){ $this->damage_options['damage_kind'] = $damage_options['kind'];  }
+        if (isset($damage_options['type'])){ $this->damage_options['damage_type'] = $damage_options['type'];  }
+        if (isset($damage_options['type2'])){ $this->damage_options['damage_type2'] = $damage_options['type2'];  }
+        if (isset($damage_options['amount'])){ $this->damage_options['damage_amount'] = $damage_options['amount'];  }
+        if (isset($damage_options['percent'])){ $this->damage_options['damage_percent'] = $damage_options['percent'];  }
+        if (isset($damage_options['modifiers'])){ $this->damage_options['damage_modifiers'] = $damage_options['modifiers'];  }
+        // Update internal variables with rate options, if set
+        if (isset($damage_options['rates'])){
+            $this->damage_options['success_rate'] = $damage_options['rates'][0];
+            $this->damage_options['failure_rate'] = $damage_options['rates'][1];
+            $this->damage_options['critical_rate'] = $damage_options['rates'][2];
+        }
+        // Update internal variables with multipier options, if set
+        if (isset($damage_options['multipliers'])){
+            $this->damage_options['critical_multiplier'] = $damage_options['multipliers'][0];
+            $this->damage_options['weakness_multiplier'] = $damage_options['multipliers'][1];
+            $this->damage_options['resistance_multiplier'] = $damage_options['multipliers'][2];
+            $this->damage_options['immunity_multiplier'] = $damage_options['multipliers'][3];
+        }
+        // Update internal variables with kickback options, if set
+        if (isset($damage_options['kickback'])){
+            $this->damage_options['damage_kickback']['x'] = $damage_options['kickback'][0];
+            $this->damage_options['damage_kickback']['y'] = $damage_options['kickback'][1];
+            $this->damage_options['damage_kickback']['z'] = $damage_options['kickback'][2];
+        }
+        // Update internal variables with success options, if set
+        if (isset($damage_options['success'])){
+            $this->damage_options['skill_success_frame'] = $damage_options['success'][0];
+            $this->damage_options['skill_success_frame_offset']['x'] = $damage_options['success'][1];
+            $this->damage_options['skill_success_frame_offset']['y'] = $damage_options['success'][2];
+            $this->damage_options['skill_success_frame_offset']['z'] = $damage_options['success'][3];
+            $this->damage_options['success_text'] = $damage_options['success'][4];
+            $this->damage_options['skill_success_frame_span'] = isset($damage_options['success'][5]) ? $damage_options['success'][5] : 1;
+        }
+        // Update internal variables with failure options, if set
+        if (isset($damage_options['failure'])){
+            $this->damage_options['skill_failure_frame'] = $damage_options['failure'][0];
+            $this->damage_options['skill_failure_frame_offset']['x'] = $damage_options['failure'][1];
+            $this->damage_options['skill_failure_frame_offset']['y'] = $damage_options['failure'][2];
+            $this->damage_options['skill_failure_frame_offset']['z'] = $damage_options['failure'][3];
+            $this->damage_options['failure_text'] = $damage_options['failure'][4];
+            $this->damage_options['skill_failure_frame_span'] = isset($damage_options['failure'][5]) ? $damage_options['failure'][5] : 1;
+        }
+        // If session update was requested, do it
+        if ($update_session){ $this->update_session(); }
+        // Return the new array
+        return $this->damage_options;
+    }
+
+    // Define a public function for easily resetting recovery options
+    public function recovery_options_reset(){
+        // Redfine the options variables as an empty array
+        $this->recovery_options = array();
+        // Populate the array with defaults
+        $this->recovery_options = array();
+        $this->recovery_options['recovery_header'] = $this->robot->robot_name.'&#39;s '.$this->skill_name;
+        $this->recovery_options['recovery_frame'] = 'defend';
+        $this->recovery_options['skill_success_frame'] = 1;
+        $this->recovery_options['skill_success_frame_span'] = 1;
+        $this->recovery_options['skill_success_frame_offset'] = array('x' => 0, 'y' => 0, 'z' => 1);
+        $this->recovery_options['skill_failure_frame'] = 1;
+        $this->recovery_options['skill_failure_frame_span'] = 1;
+        $this->recovery_options['skill_failure_frame_offset'] = array('x' => 0, 'y' => 0, 'z' => 1);
+        $this->recovery_options['recovery_kind'] = 'energy';
+        $this->recovery_options['recovery_type'] = '';
+        $this->recovery_options['recovery_type2'] = '';
+        $this->recovery_options['recovery_amount'] = '';
+        $this->recovery_options['recovery_amount2'] = '';
+        $this->recovery_options['recovery_kickback'] = array('x' => 0, 'y' => 0, 'z' => 0);
+        $this->recovery_options['recovery_percent'] = false;
+        $this->recovery_options['recovery_percent2'] = false;
+        $this->recovery_options['recovery_modifiers'] = true;
+        $this->recovery_options['success_rate'] = 'auto';
+        $this->recovery_options['failure_rate'] = 'auto';
+        $this->recovery_options['critical_rate'] = 10;
+        $this->recovery_options['critical_multiplier'] = 2;
+        $this->recovery_options['affinity_multiplier'] = 2;
+        $this->recovery_options['resistance_multiplier'] = 0.5;
+        $this->recovery_options['immunity_multiplier'] = 0;
+        $this->recovery_options['recovery_type'] = '';
+        $this->recovery_options['recovery_type2'] = '';
+        $this->recovery_options['success_text'] = 'The skill worked!';
+        $this->recovery_options['failure_text'] = 'The skill failed&hellip;';
+        $this->recovery_options['immunity_text'] = 'The skill had no effect&hellip;';
+        $this->recovery_options['critical_text'] = 'It&#39;s a lucky boost!';
+        $this->recovery_options['affinity_text'] = 'It&#39;s super effective!';
+        $this->recovery_options['resistance_text'] = 'It&#39;s not very effective&hellip;';
+        $this->recovery_options['affinity_resistance_text'] = ''; //'It&#39;s a super effective resisted hit!';
+        $this->recovery_options['affinity_critical_text'] = 'It&#39;s a super effective lucky boost!';
+        $this->recovery_options['resistance_critical_text'] = 'It&#39;s a lucky boost, but not very effective&hellip;';
+        // Update this skill's data
+        $this->update_session();
+        // Return the resuling array
+        return $this->recovery_options;
+    }
+
+    // Define a public function for easily updating recovery options
+    public function recovery_options_update($recovery_options = array(), $update_session = false){
+        // Update internal variables with basic recovery options, if set
+        if (isset($recovery_options['header'])){ $this->recovery_options['recovery_header'] = $recovery_options['header'];  }
+        if (isset($recovery_options['frame'])){ $this->recovery_options['recovery_frame'] = $recovery_options['frame'];  }
+        if (isset($recovery_options['kind'])){ $this->recovery_options['recovery_kind'] = $recovery_options['kind'];  }
+        if (isset($recovery_options['type'])){ $this->recovery_options['recovery_type'] = $recovery_options['type'];  }
+        if (isset($recovery_options['type2'])){ $this->recovery_options['recovery_type2'] = $recovery_options['type2'];  }
+        if (isset($recovery_options['amount'])){ $this->recovery_options['recovery_amount'] = $recovery_options['amount'];  }
+        if (isset($recovery_options['percent'])){ $this->recovery_options['recovery_percent'] = $recovery_options['percent'];  }
+        if (isset($recovery_options['modifiers'])){ $this->recovery_options['recovery_modifiers'] = $recovery_options['modifiers'];  }
+        // Update internal variables with rate options, if set
+        if (isset($recovery_options['rates'])){
+            $this->recovery_options['success_rate'] = $recovery_options['rates'][0];
+            $this->recovery_options['failure_rate'] = $recovery_options['rates'][1];
+            $this->recovery_options['critical_rate'] = $recovery_options['rates'][2];
+        }
+        // Update internal variables with multipier options, if set
+        if (isset($recovery_options['multipliers'])){
+            $this->recovery_options['critical_multiplier'] = $recovery_options['multipliers'][0];
+            $this->recovery_options['weakness_multiplier'] = $recovery_options['multipliers'][1];
+            $this->recovery_options['resistance_multiplier'] = $recovery_options['multipliers'][2];
+            $this->recovery_options['immunity_multiplier'] = $recovery_options['multipliers'][3];
+        }
+        // Update internal variables with kickback options, if set
+        if (isset($recovery_options['kickback'])){
+            $this->recovery_options['recovery_kickback']['x'] = $recovery_options['kickback'][0];
+            $this->recovery_options['recovery_kickback']['y'] = $recovery_options['kickback'][1];
+            $this->recovery_options['recovery_kickback']['z'] = $recovery_options['kickback'][2];
+        }
+        // Update internal variabels with success options, if set
+        if (isset($recovery_options['success'])){
+            $this->recovery_options['skill_success_frame'] = $recovery_options['success'][0];
+            $this->recovery_options['skill_success_frame_offset']['x'] = $recovery_options['success'][1];
+            $this->recovery_options['skill_success_frame_offset']['y'] = $recovery_options['success'][2];
+            $this->recovery_options['skill_success_frame_offset']['z'] = $recovery_options['success'][3];
+            $this->recovery_options['success_text'] = $recovery_options['success'][4];
+            $this->recovery_options['skill_success_frame_span'] = isset($recovery_options['success'][5]) ? $recovery_options['success'][5] : 1;
+        }
+        // Update internal variabels with failure options, if set
+        if (isset($recovery_options['failure'])){
+            $this->recovery_options['skill_failure_frame'] = $recovery_options['failure'][0];
+            $this->recovery_options['skill_failure_frame_offset']['x'] = $recovery_options['failure'][1];
+            $this->recovery_options['skill_failure_frame_offset']['y'] = $recovery_options['failure'][2];
+            $this->recovery_options['skill_failure_frame_offset']['z'] = $recovery_options['failure'][3];
+            $this->recovery_options['failure_text'] = $recovery_options['failure'][4];
+            $this->recovery_options['skill_failure_frame_span'] = isset($recovery_options['failure'][5]) ? $recovery_options['failure'][5] : 1;
+        }
+        // If session update was requested, do it
+        if ($update_session){ $this->update_session(); }
+        // Return the new array
+        return $this->recovery_options;
+    }
+
+    // Define a public function for easily resetting attachment options
+    public function attachment_options_reset(){
+        // Redfine the options variables as an empty array
+        $this->attachment_options = array();
+        // Update this skill's data
+        $this->update_session();
+        // Return the resuling array
+        return $this->attachment_options;
+    }
+
+
+    // Define a public function for easily updating attachment options
+    public function attachment_options_update($attachment_options = array()){
+        // Update this skill's data
+        $this->update_session();
+        // Return the new array
+        return $this->attachment_options;
+    }
+
+    // Define a function for generating skill canvas variables
+    public function canvas_markup($options, $player_data, $robot_data){
+
+        // Delegate markup generation to the canvas class
+        return rpg_canvas::skill_markup($this, $options, $player_data, $robot_data);
+
+    }
+
+    // Define a function for generating skill console variables
+    public function console_markup($options, $player_data, $robot_data){
+
+        // Delegate markup generation to the console class
+        return rpg_console::skill_markup($this, $options, $player_data, $robot_data);
+
     }
 
 

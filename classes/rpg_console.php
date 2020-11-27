@@ -257,6 +257,13 @@ class rpg_console {
 
     }
 
+    // Define a function for generating skill canvas variables
+    public static function skill_markup($this_skill, $options, $player_data, $robot_data){
+
+        // Skills do not have any markup... right?
+
+    }
+
     // Define a function for generating console message markup
     public static function battle_markup($this_battle, $eventinfo, $options){
 

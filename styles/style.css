@@ -1482,7 +1482,8 @@ body.index #header {
     -webkit-border-radius: 0 5px 5px 0;
 }
 #canvas .canvas_ability_details .ability_name,
-#canvas .canvas_item_details .item_name {
+#canvas .canvas_item_details .item_name,
+#canvas .canvas_item_details .skill_name {
     text-indent: 0;
     color: #FFFFFF;
     font-size: 12px;
@@ -2447,6 +2448,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #console .event .ability_stat,
 #console .event .item_name,
 #console .event .item_stat,
+#console .event .skill_name,
+#console .event .skill_stat,
 #console .event .damage_strikes,
 #console .event .damage_misses,
 #console .event .damage_result,
@@ -2474,6 +2477,7 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #canvas .links .challenge_name,
 #canvas .links .ability_name,
 #canvas .links .item_name,
+#canvas .links .skill_name,
 #canvas .links .ability_stat,
 #canvas .links .damage_strikes,
 #canvas .links .damage_misses,
@@ -2506,7 +2510,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 
 }
 #console .event .ability_name,
-#console .event .item_name {
+#console .event .item_name,
+#console .event .skill_name {
 
 }
 #console .event .damage_amount {
