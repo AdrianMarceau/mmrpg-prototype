@@ -2434,6 +2434,7 @@ class rpg_ability extends rpg_object {
         // Do not boost stats if the battle is over
         if ($target_robot->battle->battle_status === 'complete'){ return false; }
         elseif ($target_robot->robot_status === 'disabled' || $target_robot->robot_energy <= 0){ return false; }
+        if (empty($boost_amount)){ return false; }
 
         // Create an options object for this function and populate
         $options = rpg_game::new_options_object();
@@ -2532,6 +2533,7 @@ class rpg_ability extends rpg_object {
         // Do not boost stats if the battle is over
         if ($target_robot->battle->battle_status === 'complete'){ return false; }
         elseif ($target_robot->robot_status === 'disabled' || $target_robot->robot_energy <= 0){ return false; }
+        if (empty($break_amount)){ return false; }
 
         // Create an options object for this function and populate
         $options = rpg_game::new_options_object();
