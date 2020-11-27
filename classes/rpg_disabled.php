@@ -691,6 +691,7 @@ class rpg_disabled {
 
                     // Increment this robot's attack by the calculated amount and display an event
                     $temp_base_attack_boost = ceil($level_boost * (0.05 * $temp_index_robot['robot_attack']));
+                    if (isset($temp_target_robot->values['robot_base_attack_backup'])){ $temp_target_robot->values['robot_base_attack_backup'] += $temp_base_attack_boost; }
                     $temp_target_robot->robot_base_attack += $temp_base_attack_boost;
                     $temp_target_robot->update_session();
                     $target_player->update_session();
@@ -720,6 +721,7 @@ class rpg_disabled {
 
                     // Increment this robot's defense by the calculated amount and display an event
                     $temp_base_defense_boost = ceil($level_boost * (0.05 * $temp_index_robot['robot_defense']));
+                    if (isset($temp_target_robot->values['robot_base_defense_backup'])){ $temp_target_robot->values['robot_base_defense_backup'] += $temp_base_defense_boost; }
                     $temp_target_robot->robot_base_defense += $temp_base_defense_boost;
                     $temp_target_robot->update_session();
                     $target_player->update_session();
@@ -749,6 +751,7 @@ class rpg_disabled {
 
                     // Increment this robot's speed by the calculated amount and display an event
                     $temp_base_speed_boost = ceil($level_boost * (0.05 * $temp_index_robot['robot_speed']));
+                    if (isset($temp_target_robot->values['robot_base_speed_backup'])){ $temp_target_robot->values['robot_base_speed_backup'] += $temp_base_speed_boost; }
                     $temp_target_robot->robot_base_speed += $temp_base_speed_boost;
                     $temp_target_robot->update_session();
                     $target_player->update_session();
