@@ -686,9 +686,13 @@ class rpg_robot extends rpg_object {
         if ($attr === 'quick-charge'){
             if ($item === 'charge-module'){ return true; }
             elseif ($skill === 'charge-submodule'){ return true; }
+            elseif ($this->has_flag('has_quick-charge')){ return $this->get_flag('has_quick-charge'); }
+            elseif ($this->has_counter('has_quick-charge')){ return $this->get_counter('has_quick-charge') ? true : false; }
         } elseif ($attr === 'extended-range'){
             if ($item === 'target-module'){ return true; }
             elseif ($skill === 'target-submodule'){ return true; }
+            elseif ($this->has_flag('has_extended-range')){ return $this->get_flag('has_extended-range'); }
+            elseif ($this->has_counter('has_extended-range')){ return $this->get_counter('has_extended-range') ? true : false; }
         }
         return false;
     }
