@@ -256,7 +256,7 @@ class rpg_skill extends rpg_object {
     public function print_name($pseudo_name = ''){
         $print_name = $this->skill_name;
         $print_type = 'none';
-        if (substr($this->skill_token, '-subcore')){ $print_type = str_replace('-subcore', '', $this->skill_token); }
+        if (strstr($this->skill_token, '-subcore')){ $print_type = str_replace('-subcore', '', $this->skill_token); }
         elseif (!empty($this->robot->robot_core)){ $print_type = $this->robot->robot_core; }
         if (!empty($pseudo_name)){ $print_name = $pseudo_name; }
         return '<span class="skill_name skill_type type_'.$print_type.'">'.$print_name.'</span>';
