@@ -2433,7 +2433,7 @@ function mmrpg_prototype_leaderboard_targets_sort($player1, $player2){
 
 
 // Define a function for determining a player's battle music
-function mmrpg_prototype_get_player_game_counters($player_token, $session_token = 'GAME'){
+function mmrpg_prototype_get_player_game_counters($player_token, $include = 'all', $session_token = 'GAME'){
 
     global $db;
 
@@ -2459,7 +2459,8 @@ function mmrpg_prototype_get_player_game_counters($player_token, $session_token 
         //error_log(PHP_EOL.'$temp_player_robot_tokens = '.print_r($temp_player_robot_tokens, true));
 
         // If this player has robots (they better), loop through and collect compatible game tokens
-        if (!empty($temp_player_robot_tokens) && count($temp_player_robot_tokens) > 1){
+        if (!empty($temp_player_robot_tokens)
+            && ($include === 'all' || $include === 'robots')){
             foreach ($temp_player_robot_tokens AS $key => $token){
                 if (!isset($mmrpg_robots_index[$token])){ continue; }
                 if (in_array($token, $temp_robots_parsed)){ continue; }
@@ -2470,10 +2471,11 @@ function mmrpg_prototype_get_player_game_counters($player_token, $session_token 
                 if (!isset($temp_game_counters[$game])){ $temp_game_counters[$game] = 0; }
                 $temp_game_counters[$game] += 1;
             }
+            //error_log('<pre>$temp_game_counters(B) = '.print_r($temp_game_counters, true).'</pre>');
         }
-        //error_log('<pre>$temp_game_counters(B) = '.print_r($temp_game_counters, true).'</pre>');
         // Otherwise count robots represented by the current omega fields in the campaign if not already represented
-        else {
+        if (!empty($temp_robot_omega)
+            && ($include === 'all' || $include === 'fields')){
             foreach ($temp_robot_omega AS $omega){
                 if (empty($omega['robot'])){ continue; }
                 else { $token = $omega['robot']; }
@@ -2488,20 +2490,41 @@ function mmrpg_prototype_get_player_game_counters($player_token, $session_token 
             }
             //error_log('<pre>$temp_game_counters(B) = '.print_r($temp_game_counters, true).'</pre>');
         }
+        //error_log('<pre>$temp_robots_parsed = '.print_r($temp_robots_parsed, true).'</pre>');
 
-        // If the game counters were somehow empty, populate with defaults
+        // Define player game prefs for backup purposes
+        static $player_base_games = array('dr-light' => 'mm1', 'dr-wily' => 'mm2', 'dr-cossack' => 'mm4' );
+        $this_player_game = !empty($player_base_games[$player_token]) ? $player_base_games[$player_token] : 'mm1';
+
+        // If the game counters were somehow empty, populate with default
         if (empty($temp_game_counters)){
-            if ($player_token == 'dr-light'){ $temp_game_counters['mm1'] = 1; }
-            if ($player_token == 'dr-wily'){ $temp_game_counters['mm2'] = 1; }
-            if ($player_token == 'dr-cossack'){ $temp_game_counters['mm4'] = 1; }
+            $temp_game_counters[$this_player_game] = 1;
         }
 
         // Sort the game counters so the highest represented game appears last
         $temp_game_counters = rpg_functions::reverse_sort_array($temp_game_counters, true);
-        //error_log("\n".'-------'.$player_token.'-------'."\n".'<pre>$temp_game_counters = '.print_r($temp_game_counters, true).'</pre>'."\n");
+        //error_log("\n".'-------'.$player_token.' (pref:'.$this_player_game.')-------'."\n".'<pre>$temp_game_counters = '.print_r($temp_game_counters, true).'</pre>'."\n");
+
+        // Sort again in case there are duplicate values
+        $new_game_keys = array_keys($temp_game_counters);
+        usort($new_game_keys, function($a, $b) use($temp_game_counters, $this_player_game){
+            $a_val = $temp_game_counters[$a];
+            $b_val = $temp_game_counters[$b];
+            if ($a_val > $b_val){ return -1; }
+            elseif ($a_val < $b_val){ return 1; }
+            elseif ($a === $this_player_game){ return -1; }
+            elseif ($b === $this_player_game){ return 1; }
+            else { return strnatcmp($a, $b); }
+            });
+        //error_log('<pre>$new_game_keys = '.print_r($new_game_keys, true).'</pre>');
+
+        // And re-build the array given the re-sorted keys
+        $new_game_counters = array();
+        foreach ($new_game_keys AS $game){ $new_game_counters[$game] = $temp_game_counters[$game]; }
+        //error_log('<pre>$new_game_counters = '.print_r($new_game_counters, true).'</pre>');
 
         // Assign collected game counters to the static index
-        $game_counters_index[$player_token] = $temp_game_counters;
+        $game_counters_index[$player_token] = $new_game_counters;
 
     }
 
@@ -2516,7 +2539,7 @@ function mmrpg_prototype_get_player_music($player_token, $session_token = 'GAME'
     global $db;
 
     // Collect game counters from the other functions
-    $temp_game_counters = mmrpg_prototype_get_player_game_counters($player_token, $session_token);
+    $temp_game_counters = mmrpg_prototype_get_player_game_counters($player_token, 'fields', $session_token);
 
     // Get the first element in the array
     reset($temp_game_counters);
@@ -2536,7 +2559,7 @@ function mmrpg_prototype_get_player_music($player_token, $session_token = 'GAME'
 
 // Define a function for determining a player's battle music
 function mmrpg_prototype_get_player_mission_music($player_token, $session_token = 'GAME'){
-    $game_counters = mmrpg_prototype_get_player_game_counters($player_token, $session_token);
+    $game_counters = mmrpg_prototype_get_player_game_counters($player_token, 'fields', $session_token);
     //error_log(PHP_EOL.'---------'.PHP_EOL.'get_player_mission_music('.$player_token.') w/ '.print_r($game_counters, true));
     foreach ($game_counters AS $game => $count){
         $music_path = 'sega-remix/stage-select-'.$game;
@@ -2549,7 +2572,7 @@ function mmrpg_prototype_get_player_mission_music($player_token, $session_token 
 
 // Define a function for determining a player's boss music
 function mmrpg_prototype_get_player_boss_music($player_token, $session_token = 'GAME'){
-    $game_counters = mmrpg_prototype_get_player_game_counters($player_token, $session_token);
+    $game_counters = mmrpg_prototype_get_player_game_counters($player_token, 'fields', $session_token);
     //error_log(PHP_EOL.'---------'.PHP_EOL.'get_player_boss_music('.$player_token.') w/ '.print_r($game_counters, true));
     foreach ($game_counters AS $game => $count){
         $music_path = 'sega-remix/boss-theme-'.$game;
