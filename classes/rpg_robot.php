@@ -357,6 +357,9 @@ class rpg_robot extends rpg_object {
         // Create an array to hold return values
         $return_values = array();
 
+        // If provided, reset the options object first
+        if (isset($extra_objects['options'])){ rpg_game::reset_options_object($extra_objects['options']); }
+
         // Trigger the skill function if it exists and return early if the effect requires it
         $return_values['skill'] = self::trigger_skill_function($function, $extra_objects, $extra_info);
 
@@ -374,9 +377,6 @@ class rpg_robot extends rpg_object {
         // Collect and cache an item index for reference
         static $mmrpg_index_items;
         if (empty($mmrpg_index_items)){ $mmrpg_index_items = rpg_item::get_index(); }
-
-        // If provided, reset the options object first
-        if (isset($extra_objects['options'])){ rpg_game::reset_options_object($extra_objects['options']); }
 
         // Check to make sure this robot has a held item, else return now
         $item_token = $this->robot_item;
@@ -402,7 +402,10 @@ class rpg_robot extends rpg_object {
 
         // Otherwise collect an array of global objects for this robot
         $objects = $this->get_objects($extra_objects);
-        return $this_item->item_functions_custom[$function]($objects);
+        $return_value = $this_item->item_functions_custom[$function]($objects);
+
+        // Return the return value
+        return $return_value;
 
     }
 
@@ -412,9 +415,6 @@ class rpg_robot extends rpg_object {
         // Collect and cache an skill index for reference
         static $mmrpg_index_skills;
         if (empty($mmrpg_index_skills)){ $mmrpg_index_skills = rpg_skill::get_index(); }
-
-        // If provided, reset the options object first
-        if (isset($extra_objects['options'])){ rpg_game::reset_options_object($extra_objects['options']); }
 
         // Check to make sure this robot has a held skill, else return now
         $skill_token = $this->robot_skill;
@@ -441,7 +441,10 @@ class rpg_robot extends rpg_object {
 
         // Otherwise collect an array of global objects for this robot
         $objects = $this->get_objects($extra_objects);
-        return $this_skill->skill_functions_custom[$function]($objects);
+        $return_value = $this_skill->skill_functions_custom[$function]($objects);
+
+        // Return the return value
+        return $return_value;
 
     }
 
