@@ -549,7 +549,6 @@ class rpg_game {
     public static function reset_options_object($options){
         $options->return_early = false;
         $options->return_value = null;
-        if (isset($options->extra_text)){ $options->extra_text = ''; }
     }
 
 
