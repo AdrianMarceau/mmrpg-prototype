@@ -95,6 +95,14 @@ class rpg_skill extends rpg_object {
             }
         }
 
+        // If this skill's robot owner has an alias for it's name, apply it now
+        if ($this->robot->robot_skill === $this_skillinfo['skill_token']
+            && !empty($this->robot->robot_skill_name)){
+            $this_skillinfo['skill_name'] = $this->robot->robot_skill_name;
+        } else {
+            $this_skillinfo['skill_name'] = $this_indexinfo['skill_name'];
+        }
+
         // Define the internal skill values using the provided array
         $this->flags = isset($this_skillinfo['flags']) ? $this_skillinfo['flags'] : array();
         $this->counters = isset($this_skillinfo['counters']) ? $this_skillinfo['counters'] : array();
