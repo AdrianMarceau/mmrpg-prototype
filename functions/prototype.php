@@ -1750,7 +1750,7 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
             }
         } elseif ($battle_kind === 'double'){
             $atoken = 'sega-remix';
-            $mtoken = 'mid-boss-mm08';
+            $mtoken = 'mid-boss-mm8';
             $music_path = $atoken.'/'.$mtoken.'/';
             if (rpg_game::sound_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
                 $temp_battle_omega['battle_field_base']['field_music'] = $music_path;
@@ -2432,51 +2432,102 @@ function mmrpg_prototype_leaderboard_targets_sort($player1, $player2){
 
 
 // Define a function for determining a player's battle music
+function mmrpg_prototype_get_player_game_counters($player_token, $session_token = 'GAME'){
+
+    global $db;
+
+    static $game_counters_index = array();
+
+    // Check to see if there's already a cached copy of the game counters for this player
+    if (empty($game_counters_index[$player_token])){
+
+        // Collect the robot index as we'll need it later
+        $mmrpg_robots_index = rpg_robot::get_index();
+
+        // Define a counter to hold all the game tokens represented
+        $temp_robots_parsed = array();
+        $temp_game_counters = array();
+
+        // Collect omega factors for this player in case we need 'em
+        $temp_session_key = $player_token.'_target-robot-omega_prototype';
+        $temp_robot_omega = !empty($_SESSION[$session_token]['values'][$temp_session_key]) ? $_SESSION[$session_token]['values'][$temp_session_key] : array();
+
+        // Collect robots currently under this doctor's control
+        $temp_player_robots = $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'];
+        $temp_player_robot_tokens = !empty($temp_player_robots) ? array_keys($temp_player_robots) : array();
+        //error_log(PHP_EOL.'$temp_player_robot_tokens = '.print_r($temp_player_robot_tokens, true));
+
+        // If this player has robots (they better), loop through and collect compatible game tokens
+        if (!empty($temp_player_robot_tokens) && count($temp_player_robot_tokens) > 1){
+            foreach ($temp_player_robot_tokens AS $key => $token){
+                if (!isset($mmrpg_robots_index[$token])){ continue; }
+                if (in_array($token, $temp_robots_parsed)){ continue; }
+                else { $temp_robots_parsed[] = $token; }
+                $info = $mmrpg_robots_index[$token];
+                $game = strtolower($info['robot_game']);
+                if ($game === 'mmpu'){ $game = 'mm1'; }
+                if (!isset($temp_game_counters[$game])){ $temp_game_counters[$game] = 0; }
+                $temp_game_counters[$game] += 1;
+            }
+        }
+        //error_log('<pre>$temp_game_counters(B) = '.print_r($temp_game_counters, true).'</pre>');
+        // Otherwise count robots represented by the current omega fields in the campaign if not already represented
+        else {
+            foreach ($temp_robot_omega AS $omega){
+                if (empty($omega['robot'])){ continue; }
+                else { $token = $omega['robot']; }
+                if (!isset($mmrpg_robots_index[$token])){ continue; }
+                if (in_array($token, $temp_robots_parsed)){ continue; }
+                else { $temp_robots_parsed[] = $token; }
+                $info = $mmrpg_robots_index[$token];
+                $game = strtolower($info['robot_game']);
+                if ($game === 'mmpu'){ $game = 'mm1'; }
+                if (!isset($temp_game_counters[$game])){ $temp_game_counters[$game] = 0; }
+                $temp_game_counters[$game] += 1;
+            }
+            //error_log('<pre>$temp_game_counters(B) = '.print_r($temp_game_counters, true).'</pre>');
+        }
+
+        // If the game counters were somehow empty, populate with defaults
+        if (empty($temp_game_counters)){
+            if ($player_token == 'dr-light'){ $temp_game_counters['mm1'] = 1; }
+            if ($player_token == 'dr-wily'){ $temp_game_counters['mm2'] = 1; }
+            if ($player_token == 'dr-cossack'){ $temp_game_counters['mm4'] = 1; }
+        }
+
+        // Sort the game counters so the highest represented game appears last
+        $temp_game_counters = rpg_functions::reverse_sort_array($temp_game_counters, true);
+        //error_log("\n".'-------'.$player_token.'-------'."\n".'<pre>$temp_game_counters = '.print_r($temp_game_counters, true).'</pre>'."\n");
+
+        // Assign collected game counters to the static index
+        $game_counters_index[$player_token] = $temp_game_counters;
+
+    }
+
+    // Return the list of games counters for each player
+    return $game_counters_index[$player_token];
+
+}
+
+// Define a function for determining a player's battle music
 function mmrpg_prototype_get_player_music($player_token, $session_token = 'GAME'){
 
     global $db;
 
-    $temp_session_key = $player_token.'_target-robot-omega_prototype';
-    $temp_robot_omega = !empty($_SESSION[$session_token]['values'][$temp_session_key]) ? $_SESSION[$session_token]['values'][$temp_session_key] : array();
-    $db_robot_fields = rpg_robot::get_index_fields(true);
-    $mmrpg_index_robots = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+    // Collect game counters from the other functions
+    $temp_game_counters = mmrpg_prototype_get_player_game_counters($player_token, $session_token);
 
-    // Count the games representaed and order by count
-    $temp_game_counters = array();
-    foreach ($temp_robot_omega AS $omega){
-        if (empty($omega['robot'])){ continue; }
-        $index = rpg_robot::parse_index_info($mmrpg_index_robots[$omega['robot']]);
-        $game = strtolower($index['robot_game']);
-        if (!isset($temp_game_counters[$game])){ $temp_game_counters[$game] = 0; }
-        $temp_game_counters[$game] += 1;
-    }
-
-    //die('<pre>$temp_game_counters = '.print_r($temp_game_counters, true).'</pre>');
-
-    if (empty($temp_game_counters)){
-        if ($player_token == 'dr-light'){ $temp_game_counters['mm01'] = 1; }
-        if ($player_token == 'dr-wily'){ $temp_game_counters['mm02'] = 1; }
-        if ($player_token == 'dr-cossack'){ $temp_game_counters['mm04'] = 1; }
-    }
-
-    asort($temp_game_counters, SORT_NUMERIC);
-
-    //echo("\n".'-------'.$player_token.'-------'."\n".'<pre>$temp_game_counters = '.print_r($temp_game_counters, true).'</pre>'."\n");
-
-    // Get the last element in the array
-    end($temp_game_counters);
+    // Get the first element in the array
+    reset($temp_game_counters);
     $most_key = key($temp_game_counters);
     $most_count = $temp_game_counters[$most_key];
-
-    //echo("\n".'<pre>$most_key = '.print_r($most_key, true).'; $most_count = '.print_r($most_count, true).'</pre>'."\n");
+    //error_log("\n".'<pre>highest key = '.print_r($most_key, true).' w/ count = '.print_r($most_count, true).'</pre>'."\n");
 
     $most_options = array($most_key);
     foreach ($temp_game_counters AS $key => $count){ if ($key != $most_key && $count >= $most_count){ $most_options[] = $key; } }
     if (count($most_options) > 1){ $most_key = $most_options[array_rand($most_options, 1)];  }
-
-    //echo("\n".'<pre>$most_options = '.print_r($most_options, true).'</pre>'."\n");
-
-    //echo("\n".'<pre>$most_key = '.print_r($most_key, true).'; $most_count = '.print_r($most_count, true).'</pre>'."\n");
+    //error_log("\n".'<pre>$most_options = '.print_r($most_options, true).'</pre>'."\n");
+    //error_log("\n".'<pre>$most_key = '.print_r($most_key, true).'; $most_count = '.print_r($most_count, true).'</pre>'."\n");
 
     return $most_key;
 
@@ -2484,19 +2535,29 @@ function mmrpg_prototype_get_player_music($player_token, $session_token = 'GAME'
 
 // Define a function for determining a player's battle music
 function mmrpg_prototype_get_player_mission_music($player_token, $session_token = 'GAME'){
-    $most_key = mmrpg_prototype_get_player_music($player_token, $session_token);
-    return 'stage-select-'.$most_key;
+    $game_counters = mmrpg_prototype_get_player_game_counters($player_token, $session_token);
+    //error_log(PHP_EOL.'---------'.PHP_EOL.'get_player_mission_music('.$player_token.') w/ '.print_r($game_counters, true));
+    foreach ($game_counters AS $game => $count){
+        $music_path = 'sega-remix/stage-select-'.$game;
+        if (rpg_game::sound_exists('sounds/'.$music_path)){
+            return $music_path;
+        }
+    }
+    return 'sega-remix/stage-select-mm1';
 }
-
 
 // Define a function for determining a player's boss music
 function mmrpg_prototype_get_player_boss_music($player_token, $session_token = 'GAME'){
-    $most_key = mmrpg_prototype_get_player_music($player_token, $session_token);
-    $most_key_int = preg_replace('/^mm0?/i', '', $most_key);
-    return 'boss-theme-mm'.str_pad($most_key_int, 2, '0', STR_PAD_LEFT);
-
+    $game_counters = mmrpg_prototype_get_player_game_counters($player_token, $session_token);
+    //error_log(PHP_EOL.'---------'.PHP_EOL.'get_player_boss_music('.$player_token.') w/ '.print_r($game_counters, true));
+    foreach ($game_counters AS $game => $count){
+        $music_path = 'sega-remix/boss-theme-'.$game;
+        if (rpg_game::sound_exists('sounds/'.$music_path)){
+            return $music_path;
+        }
+    }
+    return 'sega-remix/boss-theme-mm1';
 }
-
 
 // Define a function for determining a player's boss music
 function mmrpg_prototype_get_current_rogue_star(){

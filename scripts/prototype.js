@@ -1207,7 +1207,8 @@ function prototype_menu_switch(switchOptions){
         } else if (switchOptions.stepNumber == 2){
         var newMusicToken = $('.select_this_player .option_this-player-select[data-token="'+battleOptions['this_player_token']+'"]', thisContext).attr('data-music-token');
         //console.log('newMusicToken = '+newMusicToken);
-        parent.mmrpg_music_load('misc/'+newMusicToken, true, false);
+        var newMusicPath = newMusicToken.indexOf('/') === -1 ? 'misc/'+newMusicToken : newMusicToken;
+        parent.mmrpg_music_load(newMusicPath, true, false);
         }
     //
 

@@ -2001,7 +2001,7 @@ class rpg_game {
     public static function sound_exists($sym_path){
 
         // Clean sym path and remove the rootdir (if present) for easier testing
-        $sym_path = ltrim(str_replace(MMRPG_CONFIG_ROOTDIR, '', $sym_path), '/');
+        $sym_path = trim(str_replace(MMRPG_CONFIG_ROOTDIR, '', $sym_path), '/').'/';
 
         // If we're using the CDN, we need to check the index
         if (defined('MMRPG_CONFIG_CDN_ENABLED') && MMRPG_CONFIG_CDN_ENABLED === true){
