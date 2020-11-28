@@ -1662,7 +1662,7 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
     $temp_battle_alpha['battle_description'] = 'Defeat the support mechas blocking your path to the robot master'.($battle_phase > 1 ? 's' : '').'!';
     $temp_battle_alpha['battle_counts'] = false;
     $temp_battle_alpha['battle_field_base']['values']['hazards'] = array();
-    $temp_battle_alpha['battle_field_base']['field_music']  = $field1_info['field_token'];
+    $temp_battle_alpha['battle_field_base']['field_music']  = !empty($field1_info['field_music']) ? $field1_info['field_music'] : $field1_info['field_token'];
     $temp_user_id = $temp_battle_alpha['battle_target_player']['user_id'];
     $temp_player_id = $temp_battle_alpha['battle_target_player']['player_id'];
     $temp_player_robots = array();
@@ -1719,7 +1719,7 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
     // Add super block protection on the target robot side of the field
     $temp_battle_omega['battle_name'] = $battle_name.' (2/2)';
     if (!empty($super_block_position)){ $temp_battle_omega['battle_field_base']['values']['hazards']['super_blocks'] = $super_block_position; }
-    $temp_battle_omega['battle_field_base']['field_music']  = $field1_info['field_token'];
+    $temp_battle_omega['battle_field_base']['field_music']  = !empty($field1_info['field_music']) ? $field1_info['field_music'] : $field1_info['field_token'];
 
     // Update the omega battle with a new token, then remove all support mechas, boost robot master
     $temp_player_robots = $temp_battle_omega['battle_target_player']['player_robots'];
@@ -1743,6 +1743,7 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
                 $atoken = 'sega-remix';
                 $rtoken = $trobots[0]['robot_token'];
                 $gtoken = strtolower($mmrpg_index_robots[$rtoken]['robot_game']);
+                if ($gtoken === 'mmpu'){ $gtoken = 'mm1'; }
                 $music_path = $atoken.'/boss-theme-'.$gtoken.'/';
                 if (rpg_game::sound_exists(MMRPG_CONFIG_ROOTDIR.'sounds/'.$music_path)){
                     $temp_battle_omega['battle_field_base']['field_music'] = $music_path;
