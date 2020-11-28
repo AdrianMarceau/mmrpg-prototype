@@ -1153,7 +1153,7 @@
                                         <em>public, displayed on credits page profile</em>
                                     </div>
                                     <strong class="label"></strong>
-                                    <input class="textbox" type="text" name="user_credit_line" value="<?= htmlentities($user_data['user_credit_line'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="32" />
+                                    <input class="textbox" type="text" name="user_credit_line" value="<?= htmlentities($user_data['user_credit_line'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="255" />
                                 </div>
 
                                 <div class="field fullsize">
