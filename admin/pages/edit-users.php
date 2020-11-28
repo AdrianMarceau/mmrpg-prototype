@@ -542,6 +542,7 @@
                 $temp_export_data = array();
                 $temp_export_fields = rpg_user::get_contributor_index_fields(false);
                 foreach ($temp_export_fields AS $f){ if ($f === 'contributor_id' || !isset($update_data[$f])){ continue; } else { $temp_export_data[$f] = $update_data[$f]; } }
+                $temp_export_data['user_date_created'] = $db->get_value("SELECT user_date_created FROM mmrpg_users WHERE user_id = {$form_data['user_id']};", 'user_date_created');
                 $temp_export_data['contributor_flag_showcredits'] = !empty($_REQUEST['contributor_flag_showcredits']) ? 1 : 0;
                 $db->update('mmrpg_users_contributors', $temp_export_data, array('contributor_id' => $form_data['contributor_id']));
             }

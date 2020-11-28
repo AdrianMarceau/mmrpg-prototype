@@ -7,6 +7,11 @@ $contributor_index = $db->get_array_list("SELECT
     {$contributor_fields},
     {$user_roles_fields},
     users.user_id,
+    (CASE
+        WHEN contributors.user_date_created <> 0
+        THEN contributors.user_date_created
+        ELSE users.user_date_created
+        END) AS user_date_created,
     users.user_last_login
     FROM mmrpg_users_contributors AS contributors
     LEFT JOIN mmrpg_roles AS uroles ON contributors.role_id = uroles.role_id
