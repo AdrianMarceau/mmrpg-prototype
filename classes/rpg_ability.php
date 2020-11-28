@@ -2429,12 +2429,34 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function to use as a common action for all stat boosting
-    public static function ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = '', $item_redirect = false, $allow_item_effects = true, $is_fixed_amount = false){
+    public static function ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_object = false, $success_frame = 0, $failure_frame = 9, $extra_text = '', $item_redirect = false, $allow_item_effects = true, $is_fixed_amount = false){
+
+        // Exit or redirect if amount doesn't make sense here
+        if (empty($boost_amount)){
+            return false;
+        } elseif ($boost_amount < 0){
+            return self::ability_function_stat_break(
+                $target_robot,
+                $stat_type,
+                ($boost_amount * -1),
+                $trigger_object,
+                $success_frame,
+                $failure_frame,
+                $extra_text,
+                $item_redirect,
+                $allow_item_effects,
+                $is_fixed_amount
+                );
+        }
 
         // Do not boost stats if the battle is over
         if ($target_robot->battle->battle_status === 'complete'){ return false; }
         elseif ($target_robot->robot_status === 'disabled' || $target_robot->robot_energy <= 0){ return false; }
-        if (empty($boost_amount)){ return false; }
+
+        // Collect the trigger ability or object from the args
+        $trigger_ability = !empty($trigger_object) && isset($trigger_object->ability_token) ? $trigger_object : false;
+        $trigger_item = !empty($trigger_object) && isset($trigger_object->item_token) ? $trigger_object : false;
+        $trigger_skill = !empty($trigger_object) && isset($trigger_object->skill_token) ? $trigger_object : false;
 
         // Create an options object for this function and populate
         $options = rpg_game::new_options_object();
@@ -2446,7 +2468,10 @@ class rpg_ability extends rpg_object {
         $options->item_redirect = $item_redirect;
         $options->allow_item_effects = $allow_item_effects;
         $options->is_fixed_amount = $is_fixed_amount;
-        $extra_objects = array('this_ability' => $trigger_ability, 'options' => $options);
+        $extra_objects = array('options' => $options);
+        $extra_objects['this_ability'] = $trigger_ability;
+        $extra_objects['this_item'] = $trigger_item;
+        $extra_objects['this_skill'] = $trigger_skill;
 
         // Trigger this robot's item function if one has been defined for this context
         if ($options->allow_item_effects && !$options->item_redirect){
@@ -2455,7 +2480,6 @@ class rpg_ability extends rpg_object {
         }
 
         // Compensate for malformed arguments
-        if (empty($trigger_ability)){ $trigger_ability = false; }
         if (!is_numeric($options->success_frame)){ $options->success_frame = 0; }
         if (!is_numeric($options->failure_frame)){ $options->failure_frame = 9; }
         if (!is_string($options->extra_text)){ $options->extra_text = ''; }
@@ -2480,7 +2504,8 @@ class rpg_ability extends rpg_object {
         }
 
         // Increase the target's stat modifier only if it's not already at max
-        if ($target_robot->counters[$mods_token] < MMRPG_SETTINGS_STATS_MOD_MAX){
+        if (($options->boost_amount > 0 && $target_robot->counters[$mods_token] < MMRPG_SETTINGS_STATS_MOD_MAX)
+            || ($options->boost_amount < 0 && $target_robot->counters[$mods_token] > MMRPG_SETTINGS_STATS_MOD_MIN)){
 
             // Increase the stat by X stages and then floor if too high
             $old_mod_value = $target_robot->counters[$mods_token];
@@ -2500,9 +2525,16 @@ class rpg_ability extends rpg_object {
 
             // Target this robot's self to show the success message
             $amount_text = ''; //' (old:'.$old_mod_value.', amount:'.$options->boost_amount.', rel-amount:'.$rel_boost_amount.', result:'.$target_robot->counters[$mods_token].')';
-            $trigger_ability->set_flag('skip_canvas_header', true);
-            $trigger_ability->target_options_update(array('frame' => 'taunt', 'success' => array($options->success_frame, -2, 0, -10, $options->extra_text.$target_robot->print_name().'&#39;s '.$options->stat_type.' '.$boost_text.$amount_text.'!')));
-            $target_robot->trigger_target($target_robot, $trigger_ability);
+            $target_options = array('frame' => 'taunt', 'success' => array($options->success_frame, -2, 0, -10, $options->extra_text.$target_robot->print_name().'&#39;s '.$options->stat_type.' '.$boost_text.$amount_text.'!'));
+            if ($trigger_item || $trigger_skill){
+                $trigger_object->set_flag('skip_canvas_header', true);
+                $trigger_object->target_options_update($target_options);
+                $target_robot->trigger_target($target_robot, $trigger_object);
+            } else {
+                $trigger_ability->set_flag('skip_canvas_header', true);
+                $trigger_ability->target_options_update($target_options);
+                $target_robot->trigger_target($target_robot, $trigger_ability);
+            }
 
             // Update the robot's counter for applied mods
             if (!isset($target_robot->counters[$options->stat_type.'_boosts_applied'])){ $target_robot->counters[$options->stat_type.'_boosts_applied'] = 0; }
@@ -2512,9 +2544,16 @@ class rpg_ability extends rpg_object {
 
             // Target this robot's self to show the failure message
             $amount_text = ''; //' ('.($target_robot->counters[$mods_token] > 0 ? '+'.$target_robot->counters[$mods_token] : $target_robot->counters[$mods_token]).')';
-            $trigger_ability->set_flag('skip_canvas_header', true);
-            $trigger_ability->target_options_update(array('frame' => 'defend', 'success' => array($options->failure_frame, -2, 0, -10, $options->extra_text.$target_robot->print_name().'&#39;s '.$options->stat_type.' won\'t go any higher'.$amount_text.'&hellip;')));
-            $target_robot->trigger_target($target_robot, $trigger_ability);
+            $target_options = array('frame' => 'defend', 'success' => array($options->failure_frame, -2, 0, -10, $options->extra_text.$target_robot->print_name().'&#39;s '.$options->stat_type.' won\'t go any higher'.$amount_text.'&hellip;'));
+            if ($trigger_item || $trigger_skill){
+                $trigger_object->set_flag('skip_canvas_header', true);
+                $trigger_object->target_options_update($target_options);
+                $target_robot->trigger_target($target_robot, $trigger_object);
+            } else {
+                $trigger_ability->set_flag('skip_canvas_header', true);
+                $trigger_ability->target_options_update($target_options);
+                $target_robot->trigger_target($target_robot, $trigger_ability);
+            }
             $target_robot->counters[$mods_token] = MMRPG_SETTINGS_STATS_MOD_MAX;
             $target_robot->update_session();
 
@@ -2528,12 +2567,33 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function to use as a common action for all stat breaking
-    public static function ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = '', $item_redirect = false, $allow_item_effects = true, $is_fixed_amount = false){
+    public static function ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_object = false, $success_frame = 0, $failure_frame = 9, $extra_text = '', $item_redirect = false, $allow_item_effects = true, $is_fixed_amount = false){
+
+        // Exit or redirect if amount doesn't make sense here
+        if (empty($break_amount)){ return false; }
+        elseif ($break_amount < 0){
+            return self::ability_function_stat_boost(
+                $target_robot,
+                $stat_type,
+                ($break_amount * -1),
+                $trigger_object,
+                $success_frame,
+                $failure_frame,
+                $extra_text,
+                $item_redirect,
+                $allow_item_effects,
+                $is_fixed_amount
+                );
+            }
 
         // Do not boost stats if the battle is over
         if ($target_robot->battle->battle_status === 'complete'){ return false; }
         elseif ($target_robot->robot_status === 'disabled' || $target_robot->robot_energy <= 0){ return false; }
-        if (empty($break_amount)){ return false; }
+
+        // Collect the trigger ability or object from the args
+        $trigger_ability = !empty($trigger_object) && isset($trigger_object->ability_token) ? $trigger_object : false;
+        $trigger_item = !empty($trigger_object) && isset($trigger_object->item_token) ? $trigger_object : false;
+        $trigger_skill = !empty($trigger_object) && isset($trigger_object->skill_token) ? $trigger_object : false;
 
         // Create an options object for this function and populate
         $options = rpg_game::new_options_object();
@@ -2545,7 +2605,10 @@ class rpg_ability extends rpg_object {
         $options->item_redirect = $item_redirect;
         $options->allow_item_effects = $allow_item_effects;
         $options->is_fixed_amount = $is_fixed_amount;
-        $extra_objects = array('this_ability' => $trigger_ability, 'options' => $options);
+        $extra_objects = array('options' => $options);
+        $extra_objects['this_ability'] = $trigger_ability;
+        $extra_objects['this_item'] = $trigger_item;
+        $extra_objects['this_skill'] = $trigger_skill;
 
         // Trigger this robot's item function if one has been defined for this context
         if ($options->allow_item_effects && !$options->item_redirect){
@@ -2554,7 +2617,6 @@ class rpg_ability extends rpg_object {
         }
 
         // Compensate for malformed arguments
-        if (empty($trigger_ability)){ $trigger_ability = false; }
         if (!is_numeric($options->success_frame)){ $options->success_frame = 0; }
         if (!is_numeric($options->failure_frame)){ $options->failure_frame = 9; }
         if (!is_string($options->extra_text)){ $options->extra_text = ''; }
@@ -2579,7 +2641,8 @@ class rpg_ability extends rpg_object {
         }
 
         // Increase the target's stat modifier only if it's not already at min
-        if ($target_robot->counters[$mods_token] > MMRPG_SETTINGS_STATS_MOD_MIN){
+        if (($options->break_amount > 0 && $target_robot->counters[$mods_token] > MMRPG_SETTINGS_STATS_MOD_MIN)
+            || ($options->break_amount < 0 && $target_robot->counters[$mods_token] < MMRPG_SETTINGS_STATS_MOD_MAX)){
 
             // Decrease the stat by X stages and then ceil if too low
             $old_mod_value = $target_robot->counters[$mods_token];
@@ -2599,9 +2662,16 @@ class rpg_ability extends rpg_object {
 
             // Target this robot's self to show the success message
             $amount_text = ''; //' (old:'.$old_mod_value.', amount:'.$options->break_amount.', rel-amount:'.$rel_break_amount.', result:'.$target_robot->counters[$mods_token].')';
-            $trigger_ability->set_flag('skip_canvas_header', true);
-            $trigger_ability->target_options_update(array('frame' => 'defend', 'success' => array($options->success_frame, -2, 0, -10, $options->extra_text.$target_robot->print_name().'&#39;s '.$options->stat_type.' '.$break_text.$amount_text.'!')));
-            $target_robot->trigger_target($target_robot, $trigger_ability);
+            $target_options = array('frame' => 'defend', 'success' => array($options->success_frame, -2, 0, -10, $options->extra_text.$target_robot->print_name().'&#39;s '.$options->stat_type.' '.$break_text.$amount_text.'!'));
+            if ($trigger_item || $trigger_skill){
+                $trigger_object->set_flag('skip_canvas_header', true);
+                $trigger_object->target_options_update($target_options);
+                $target_robot->trigger_target($target_robot, $trigger_object);
+            } else {
+                $trigger_ability->set_flag('skip_canvas_header', true);
+                $trigger_ability->target_options_update($target_options);
+                $target_robot->trigger_target($target_robot, $trigger_ability);
+            }
 
             // Update the robot's counter for applied mods
             if (!isset($target_robot->counters[$options->stat_type.'_breaks_applied'])){ $target_robot->counters[$options->stat_type.'_breaks_applied'] = 0; }
@@ -2612,9 +2682,16 @@ class rpg_ability extends rpg_object {
 
             // Target this robot's self to show the failure message
             $amount_text = ''; //' ('.($target_robot->counters[$mods_token] > 0 ? '+'.$target_robot->counters[$mods_token] : $target_robot->counters[$mods_token]).')';
-            $trigger_ability->set_flag('skip_canvas_header', true);
-            $trigger_ability->target_options_update(array('frame' => 'base', 'success' => array($options->failure_frame, -2, 0, -10, $options->extra_text.$target_robot->print_name().'&#39;s '.$options->stat_type.' won\'t go any lower'.$amount_text.'&hellip;')));
-            $target_robot->trigger_target($target_robot, $trigger_ability);
+            $target_options = array('frame' => 'base', 'success' => array($options->failure_frame, -2, 0, -10, $options->extra_text.$target_robot->print_name().'&#39;s '.$options->stat_type.' won\'t go any lower'.$amount_text.'&hellip;'));
+            if ($trigger_item || $trigger_skill){
+                $trigger_object->set_flag('skip_canvas_header', true);
+                $trigger_object->target_options_update($target_options);
+                $target_robot->trigger_target($target_robot, $trigger_object);
+            } else {
+                $trigger_ability->set_flag('skip_canvas_header', true);
+                $trigger_ability->target_options_update($target_options);
+                $target_robot->trigger_target($target_robot, $trigger_ability);
+            }
             $target_robot->counters[$mods_token] = MMRPG_SETTINGS_STATS_MOD_MIN;
             $target_robot->update_session();
 
