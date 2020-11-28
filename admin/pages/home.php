@@ -46,7 +46,8 @@
 
         // Define the group name subtext for this section
         $this_group_name_subtext = '';
-        if (MMRPG_CONFIG_SERVER_ENV !== MMRPG_CONFIG_PULL_LIVE_DATA_FROM){
+        if (MMRPG_CONFIG_SERVER_ENV !== MMRPG_CONFIG_PULL_LIVE_DATA_FROM
+            && MMRPG_CONFIG_SERVER_ENV !== 'prod'){
             $this_group_name_subtext = '<p class="env-notice warning">'.
                 'Changes made to user accounts and content on the '.MMRPG_CONFIG_SERVER_ENV.'-build may be overwritten at any time. <br /> '.
                 'This section is available in the '.ucfirst(MMRPG_CONFIG_SERVER_ENV).' Admin Panel for testing purposes only, so please be mindful.'.
