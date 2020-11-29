@@ -225,6 +225,11 @@ elseif ($this_page_action == 'edit-skills'){
     // Require the edit skills file
     require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-skills.php');
 }
+// Else if this is an EDIT MUSIC TRACKS request
+elseif ($this_page_action == 'edit-music'){
+    // Require the edit fields file
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-music.php');
+}
 // Else if this is an EDIT EVENT CHALLENGES request
 elseif ($this_page_action == 'edit-event-challenges'){
     // Require the edit event challenges file
