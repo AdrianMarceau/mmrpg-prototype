@@ -8,13 +8,13 @@
 define('MMRPG_INDEX_COMPACT_MODE', true);
 
 // Define the SEO variables for this page
-$this_seo_title = 'Map Generator | Dev Tests | '.$this_seo_title;
-$this_seo_description = 'An experimental map generator for the MMRPG.';
+$this_seo_title = 'MMRPG Conquest | Dev Tests | '.$this_seo_title;
+$this_seo_description = 'An experimental tile-based minigame for the MMRPG.';
 $this_seo_robots = 'noindex,nofollow';
 
 // Define the Open Graph variables for this page
-$this_graph_data['title'] = 'Map Generator';
-$this_graph_data['description'] = 'An experimental map generator for the MMRPG.';
+$this_graph_data['title'] = 'MMRPG Conquest';
+$this_graph_data['description'] = 'An experimental tile-based minigame for the MMRPG.';
 
 // Empty cached session playlist if reset requested
 if (!empty($_REQUEST['reset'])){
@@ -518,7 +518,7 @@ $debug_variable_text = ob_get_clean();
 
 <div class="header">
     <div class="header_wrapper">
-        <h1 class="title"><span class="brand">Mega Man RPG Conquest</span></h1>
+        <h1 class="title"><span class="brand">Mega Man RPG</span> Conquest</h1>
     </div>
 </div>
 
