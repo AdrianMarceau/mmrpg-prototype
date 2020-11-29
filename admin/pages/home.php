@@ -630,6 +630,14 @@
                 $this_group_options[] = $this_option;
             }
 
+            if (rpg_user::current_user_has_permission('edit-music')){
+                $this_option = array(
+                    'link' => array('url' => 'admin/edit-music/', 'text' => 'Edit Music', 'bullet' => 'music'),
+                    'desc' => 'edit the details and sound files of the in-game music tracks',
+                    );
+                $this_group_options[] = $this_option;
+            }
+
             // Merge in the common game database group options to all envs
             $this_group_options = array_merge($this_group_options, $common_group_kinds_options['game_database']);
 
