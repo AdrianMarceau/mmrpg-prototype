@@ -53,7 +53,7 @@ ob_start();
                 $this_seo_description .= 'is a '.rpg_robot::get_best_stat_desc($boss_info).' ';
                 $this_seo_description .= !empty($boss_info['robot_core']) ? ucwords($boss_info['robot_core']).' ' : 'Neutral ';
                 if (!empty($boss_info['robot_core2'])){ $this_seo_description .= '/ '.ucfirst($boss_info['robot_core2']).' '; }
-                $this_seo_description .= 'Core foretress boss from the Mega Man RPG Prototype. ';
+                $this_seo_description .= 'Core fortress boss from the Mega Man RPG Prototype. ';
 
                 // Define the Open Graph variables for this page
                 $this_graph_data['title'] .= ' | '.$boss_info['robot_name'];
