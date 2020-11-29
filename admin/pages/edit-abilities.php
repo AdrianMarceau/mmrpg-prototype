@@ -1003,7 +1003,7 @@
                                             $temp_target_index = json_decode(MMRPG_SETTINGS_ABILITY_TARGETINDEX, true);
                                             if (empty($ability_data['ability_target'])){ $ability_data['ability_target'] = 'auto'; }
                                             foreach ($temp_target_index AS $value => $label){
-                                                ?><option value="select_this_disabled" <?= $ability_data['ability_target'] == $value ? 'selected="selected"' : '' ?>><?= $label ?></option><?
+                                                ?><option value="<?= $value ?>" <?= $ability_data['ability_target'] == $value ? 'selected="selected"' : '' ?>><?= $label ?></option><?
                                             }
                                             ?>
                                         </select><span></span>
