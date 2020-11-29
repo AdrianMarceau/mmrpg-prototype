@@ -18,7 +18,7 @@ $this_graph_data['description'] = 'An experimental map generator for the MMRPG.'
 
 // Empty cached session playlist if reset requested
 if (!empty($_REQUEST['reset'])){
-    unset($_SESSION['mmrpg_conqest_playlist']);
+    unset($_SESSION['mmrpg_conquest_playlist']);
     header('Location: '.MMRPG_CONFIG_ROOTURL.'dev/map-test/');
     exit();
 }
@@ -36,16 +36,16 @@ if (!function_exists('array_column')){
 if (!isset($_REQUEST['debug'])
     && !isset($_REQUEST['key'])){
     $_REQUEST['key'] = 0;
-    $_SESSION['mmrpg_conqest_playlist'] = array();
-    $_SESSION['mmrpg_conqest_playlist_progress'] = array();
+    $_SESSION['mmrpg_conquest_playlist'] = array();
+    $_SESSION['mmrpg_conquest_playlist_progress'] = array();
 }
 
 // Define a playlist of map configurations to go through
 $this_map_playlist = array();
-if (!empty($_SESSION['mmrpg_conqest_playlist'])){
+if (!empty($_SESSION['mmrpg_conquest_playlist'])){
 
     // Collect existing playlist from session
-    $this_map_playlist = $_SESSION['mmrpg_conqest_playlist'];
+    $this_map_playlist = $_SESSION['mmrpg_conquest_playlist'];
 
 } else {
 
@@ -122,7 +122,7 @@ if (!empty($_SESSION['mmrpg_conqest_playlist'])){
     $this_map_playlist = generate_conquest_playlist();
 
     // Update the session with the newly generated playlist
-    if (!empty($this_map_playlist)){ $_SESSION['mmrpg_conqest_playlist'] =  $this_map_playlist; }
+    if (!empty($this_map_playlist)){ $_SESSION['mmrpg_conquest_playlist'] =  $this_map_playlist; }
 
 }
 
@@ -133,15 +133,15 @@ foreach ($this_map_playlist AS $entry){
 }
 
 // If a completion request was specifically posted, save it as progress
-if (!isset($_SESSION['mmrpg_conqest_playlist_progress'])){
-    $_SESSION['mmrpg_conqest_playlist_progress'] = array();
+if (!isset($_SESSION['mmrpg_conquest_playlist_progress'])){
+    $_SESSION['mmrpg_conquest_playlist_progress'] = array();
 }
 if (!empty($_POST['mission_complete'])
     && is_array($_POST['mission_complete'])
     && isset($_POST['mission_complete']['mission_key'])){
     $mission_complete = $_POST['mission_complete'];
     $mission_key = $mission_complete['mission_key'];
-    $_SESSION['mmrpg_conqest_playlist_progress'][$mission_key] = $mission_complete;
+    $_SESSION['mmrpg_conquest_playlist_progress'][$mission_key] = $mission_complete;
 }
 /*
 if (isset($_POST['mission_complete_key'])
@@ -150,7 +150,7 @@ if (isset($_POST['mission_complete_key'])
     && is_numeric($_POST['mission_complete_score'])
     && !empty($_POST['mission_complete_possible'])
     && is_numeric($_POST['mission_complete_possible'])){
-    $_SESSION['mmrpg_conqest_playlist_progress'][] = array(
+    $_SESSION['mmrpg_conquest_playlist_progress'][] = array(
         'key' => $_POST['mission_complete_key'],
         'score' => $_POST['mission_complete_score'],
         'possible' => $_POST['mission_complete_possible']
@@ -159,7 +159,7 @@ if (isset($_POST['mission_complete_key'])
 */
 
 // Collect the progress array from the session
-$this_map_progress = $_SESSION['mmrpg_conqest_playlist_progress'];
+$this_map_progress = $_SESSION['mmrpg_conquest_playlist_progress'];
 
 // If a specific playlist key was requested, load it now
 $current_playlist_key = false;
