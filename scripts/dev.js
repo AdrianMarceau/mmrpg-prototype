@@ -244,12 +244,13 @@ $(document).ready(function(){
             if (bossValue.length){ redirectURL.push('boss='+bossValue); }
             //console.log('redirectURL', redirectURL);
 
+            redirectURL = redirectURL.join('&');
+            //console.log('redirectURL', redirectURL);
+
+            window.location.href = redirectURL;
+
             }
 
-        redirectURL = redirectURL.join('&');
-        //console.log('redirectURL', redirectURL);
-
-        window.location.href = redirectURL;
         return true;
 
         });
