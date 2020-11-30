@@ -379,7 +379,8 @@ class cms_database {
             $insert_string = $insert_data;
         }
         // Create the insert query to run against the database
-        $insert_query = "INSERT INTO `{$table_name}` {$insert_string}";
+        $table_name_string = self::wrap_table_name($table_name);
+        $insert_query = "INSERT INTO {$table_name_string} {$insert_string}";
         // Execute the insert query against the database
         $affected_rows = 0;
         $return = $this->query($insert_query, $affected_rows);
@@ -474,7 +475,8 @@ class cms_database {
             unset($condition_data);
             }
         // Now put together the update query to run against the database
-        $update_query = "UPDATE `{$table_name}` SET {$update_string} WHERE {$condition_string}";
+        $table_name_string = self::wrap_table_name($table_name);
+        $update_query = "UPDATE {$table_name_string} SET {$update_string} WHERE {$condition_string}";
         unset($update_string, $condition_string);
         // Execute the update query against the database
         $affected_rows = 0;
@@ -510,7 +512,8 @@ class cms_database {
             $condition_string = $condition_data;
         }
         // Now put together the delete query to run against the database
-        $delete_query = "DELETE FROM `{$table_name}` WHERE {$condition_string}";
+        $table_name_string = self::wrap_table_name($table_name);
+        $delete_query = "DELETE FROM {$table_name_string} WHERE {$condition_string}";
         // Execute the delete query against the database
         $affected_rows = 0;
         $this->query($delete_query, $affected_rows);
@@ -561,7 +564,8 @@ class cms_database {
             $condition_string = "WHERE ".$condition_data;
         }
         // Pull the max valued array from the database
-        $max_array = $this->get_array("SELECT MAX({$field_name}) as max_value FROM {$table_name} {$condition_string} ORDER BY {$field_name} DESC LIMIT 1");
+        $table_name_string = self::wrap_table_name($table_name);
+        $max_array = $this->get_array("SELECT MAX({$field_name}) as max_value FROM {$table_name_string} {$condition_string} ORDER BY {$field_name} DESC LIMIT 1");
         // Return the value for the $max_array
         return !empty($max_array['max_value']) ? $max_array['max_value'] : 0;
     }
@@ -593,7 +597,8 @@ class cms_database {
             $condition_string = "WHERE ".$condition_data;
         }
         // Pull the min valued array from the database
-        $min_array = $this->get_array("SELECT MIN({$field_name}) as min_value FROM {$table_name} {$condition_string} ORDER BY {$field_name} ASC LIMIT 1");
+        $table_name_string = self::wrap_table_name($table_name);
+        $min_array = $this->get_array("SELECT MIN({$field_name}) as min_value FROM {$table_name_string} {$condition_string} ORDER BY {$field_name} ASC LIMIT 1");
         // Return the value for the $min_array
         return $min_array['min_value'];
     }
@@ -604,17 +609,25 @@ class cms_database {
         if (empty($table_name) || !is_string($table_name)) { return false; }
         if (empty($auto_increment) && empty($order_by)) { return false; }
         // Execute the alter table queries against the database and collect the successes or failures
+        $table_name_string = self::wrap_table_name($table_name);
         if (is_numeric($auto_increment)){
-            $this->query("ALTER TABLE {$table_name} AUTO_INCREMENT = {$auto_increment}");
+            $this->query("ALTER TABLE {$table_name_string} AUTO_INCREMENT = {$auto_increment}");
             $success1 = $this->MYSQL_RESULT ? 1 : 0;
             $this->clear();
         }
         if (is_string($order_by)){
-            $this->query("ALTER TABLE {$table_name} ORDER BY {$order_by}");
+            $this->query("ALTER TABLE {$table_name_string} ORDER BY {$order_by}");
             $success2 = $this->MYSQL_RESULT ? 1 : 0;
             $this->clear();
         }
         return ($success1 + $success2);
+    }
+
+    // Define a function for safely wrapping a table name string in backquotes for query use
+    public static function wrap_table_name($table_name){
+        if (strstr($table_name, '`')){ return $table_name; }
+        elseif (strstr($table_name, '.')){ return '`'.implode('`.`', explode('.', $table_name)).'`'; }
+        else { return '`'.$table_name.'`'; }
     }
 
     // Define a function for importing an SQL file directory
@@ -638,7 +651,7 @@ class cms_database {
     public static function get_create_table_sql($table_name, $table_settings){
         if (!isset($table_settings['export_table']) || $table_settings['export_table'] !== true){ return false; }
         global $db;
-        $table_name_string = "`{$table_name}`";
+        $table_name_string = self::wrap_table_name($table_name);
         $table_def_sql = $db->get_value("SHOW CREATE TABLE {$table_name_string};", 'Create Table');
         $table_def_sql = preg_replace('/(\s+AUTO_INCREMENT)=(?:[0-9]+)(\s+)/', '$1=0$2', $table_def_sql);
         $table_def_sql = preg_replace('/^CREATE TABLE `/', 'CREATE TABLE IF NOT EXISTS `', $table_def_sql);
@@ -653,7 +666,7 @@ class cms_database {
     public static function get_insert_table_data_sql($table_name, $table_settings){
         if (!isset($table_settings['export_data']) || $table_settings['export_data'] !== true){ return false; }
         global $db;
-        $table_name_string = "`{$table_name}`";
+        $table_name_string = self::wrap_table_name($table_name);
         $select_query = "SELECT * FROM {$table_name_string};";
         if (!empty($table_settings['export_filter'])){
             $row_filter = array('1=1');
