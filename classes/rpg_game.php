@@ -1903,6 +1903,9 @@ class rpg_game {
 
     }
 
+
+    // -- GAME GALLERY FUNCTIONS -- //
+
     // Define a function for getting (or generating) the gallery screenshots file index from the defined CDN
     public static function get_gallery_index($folder = ''){
 
@@ -1914,7 +1917,7 @@ class rpg_game {
     }
 
 
-    // -- GAME GALLERY FUNCTIONS -- //
+    // -- GAME MUSIC FUNCTIONS -- //
 
     // Define a function for getting (or generating) the music/sound file index from the defined CDN
     public static function get_music_index($subkey = false){
@@ -1926,9 +1929,6 @@ class rpg_game {
         return $raw_music_index;
 
     }
-
-
-    // -- GAME MUSIC FUNCTIONS -- //
 
     // Define a function for getting (or generating) an index of music paths and info from the CDN
     public static function get_music_paths_index(){
