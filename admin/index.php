@@ -226,7 +226,9 @@ elseif ($this_page_action == 'edit-skills'){
     require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-skills.php');
 }
 // Else if this is an EDIT MUSIC TRACKS request
-elseif ($this_page_action == 'edit-music'){
+elseif ($this_page_action == 'edit-music'
+    && defined('MMRPG_CONFIG_CDN_ROOTDIR')
+    && file_exists(MMRPG_CONFIG_CDN_ROOTDIR)){
     // Require the edit fields file
     require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-music.php');
 }

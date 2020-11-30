@@ -630,7 +630,9 @@
                 $this_group_options[] = $this_option;
             }
 
-            if (rpg_user::current_user_has_permission('edit-music')){
+            if (rpg_user::current_user_has_permission('edit-music')
+                && defined('MMRPG_CONFIG_CDN_ROOTDIR')
+                && file_exists(MMRPG_CONFIG_CDN_ROOTDIR)){
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-music/', 'text' => 'Edit Music', 'bullet' => 'music'),
                     'desc' => 'edit the details and sound files of the in-game music tracks',
