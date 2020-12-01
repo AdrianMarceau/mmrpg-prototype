@@ -835,7 +835,9 @@ class rpg_battle extends rpg_object {
                 $temp_this_player_robots = !empty($temp_this_player_robots) ? implode(',', $temp_this_player_robots) : '';
                 $temp_target_player_robots = !empty($temp_target_player_robots) ? implode(',', $temp_target_player_robots) : '';
                 // Collect the userinfo for the target player
-                $target_player_userinfo = $db->get_array("SELECT user_name, user_name_clean, user_name_public FROM mmrpg_users WHERE user_id = {$target_player->player_id};");
+                $target_user_id = $target_player->player_id;
+                if (strstr($target_user_id, 'x')){ list($target_user_id) = explode('x', $target_user_id); }
+                $target_player_userinfo = $db->get_array("SELECT user_name, user_name_clean, user_name_public FROM mmrpg_users WHERE user_id = {$target_user_id};");
                 if (!isset($_SESSION['LEADERBOARD']['player_targets_defeated'])){ $_SESSION['LEADERBOARD']['player_targets_defeated'] = array(); }
                 $_SESSION['LEADERBOARD']['player_targets_defeated'][] = $target_player_userinfo['user_name_clean'];
                 // Update the database with these pending rewards for each player
