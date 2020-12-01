@@ -126,6 +126,13 @@ elseif (!empty($this_current_id) && !empty($this_current_token)){
 // If the current view is a specific thread
 if ($this_current_view == 'thread'){
 
+    // If the category or thread were empty, this is a 404 Not Found
+    if (empty($this_category_info)
+        || empty($this_thread_info)){
+        define('MMRPG_PAGE_NOT_FOUND', true);
+        return;
+    }
+
     // Check if we're creating a new thread or not
     if (
     (empty($this_current_id) && $this_current_token == 'new') ||
@@ -148,7 +155,13 @@ elseif ($this_current_view == 'category' && empty($this_current_sub)){
         exit();
     }
 
-    //die(print_r($this_category_info, true));
+    //error_log(print_r($this_category_info, true));
+
+    // If the category or thread was empty, this is a 404 Not Found
+    if (empty($this_category_info)){
+        define('MMRPG_PAGE_NOT_FOUND', true);
+        return;
+    }
 
     // If this if chat specifically, include separate file
     if ($this_current_cat == 'chat'){
@@ -168,6 +181,12 @@ elseif ($this_current_view == 'category' && empty($this_current_sub)){
 }
 // Else if the current view is the category listing
 elseif ($this_current_view == 'category' && $this_current_sub == 'new'){
+
+    // If the category or thread was empty, this is a 404 Not Found
+    if (empty($this_category_info)){
+        define('MMRPG_PAGE_NOT_FOUND', true);
+        return;
+    }
 
     // Require the community category recent view
     require_once(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/community_category_recent.php');
