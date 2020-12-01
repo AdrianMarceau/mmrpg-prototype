@@ -190,6 +190,8 @@ $temp_thread_body = $this_thread_info['thread_body'];
 $temp_thread_views = !empty($this_thread_info['thread_views']) ? $this_thread_info['thread_views'] : 0;
 
 // If this is a PM, collect the target's info
+$temp_thread_targetinfo = array();
+$temp_thread_target = false;
 if ($is_personal_message){
     $temp_thread_targetinfo = $db->get_array("SELECT user_id, user_name, user_name_public, user_name_clean, user_flag_postpublic FROM mmrpg_users WHERE user_id = {$this_thread_info['thread_target']} LIMIT 1");
     $temp_thread_target = !empty($temp_thread_targetinfo['user_name_public']) && !empty($temp_thread_targetinfo['user_flag_postpublic']) ? $temp_thread_targetinfo['user_name_public'] : $temp_thread_targetinfo['user_name'];
