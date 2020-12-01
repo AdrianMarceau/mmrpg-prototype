@@ -18,7 +18,7 @@ $this_robot->update_session();
 $target_robot->update_session();
 
 // If this item was an ITEM, decrease it's quantity in the player's session
-if (preg_match('/^([0-9]+)_/i', $this_action_token)){
+if (preg_match('/^([x0-9]+)_/i', $this_action_token)){
     // Decrease the quantity of this item from the player's inventory
     list($temp_item_id, $temp_item_token) = explode('_', $this_action_token);
     if (!empty($_SESSION['GAME']['values']['battle_items'][$temp_item_token])){
