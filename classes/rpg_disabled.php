@@ -419,7 +419,7 @@ class rpg_disabled {
                 $temp_robot_experience = mmrpg_prototype_robot_experience($target_player->player_token, $temp_info['robot_token']);
                 $temp_robot_rewards = !empty($temp_info['robot_rewards']) ? $temp_info['robot_rewards'] : array();
                 if (empty($temp_target_robots_active_num2)){ break; }
-                $options->disable_beneficiary = $temp_target_robot;
+                $options->disabled_beneficiary = $temp_target_robot;
 
                 // Reset the robot experience points to zero
                 $options->start_experience = 0;
