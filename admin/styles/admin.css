@@ -1805,6 +1805,20 @@ input[type=file] {
 .adminform .subfield .sublabel em:not(.nowrap):after {
     content: ")";
 }
+.adminform .field .label i {
+
+}
+.adminform .field .label .status {
+    display: inline-block;
+    margin-left: 3px;
+    text-decoration: none;
+}
+.adminform .field .label .status.yes {
+    color: #007a0a;
+}
+.adminform .field .label .status.no {
+    color: #a52c2c;
+}
 .adminform .field .label.hidden {
     display: none;
 }
@@ -2111,6 +2125,19 @@ input[type=file] {
 .adminform .options .field.checkwrap.rfloat.fullsize {
     width: 100%;
     clear: both;
+}
+
+
+.adminform .field .filewrap {
+    display: block;
+    float: left;
+    margin: 0 auto 0 0;
+    padding: 9px;
+    background-color: #ffffff;
+    border: 1px solid #E0E0E0;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
 }
 
 .adminform .search,
