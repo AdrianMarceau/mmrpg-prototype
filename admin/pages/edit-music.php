@@ -19,7 +19,7 @@
     $mmrpg_sources_index = rpg_game::get_source_index();
 
     // Collect an index of all existing music from the database for reference
-    $mmrpg_music_dbname = rpg_music_track::get_dbname();
+    $mmrpg_music_dbname = MMRPG_CONFIG_CDN_DBNAME;
     $mmrpg_music_fields = rpg_music_track::get_index_fields(true);
     $mmrpg_music_index = $db->get_array_list("SELECT {$mmrpg_music_fields} FROM {$mmrpg_music_dbname}.mmrpg_index_music WHERE music_id <> 0;", 'music_id');
 

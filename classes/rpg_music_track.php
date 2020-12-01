@@ -17,13 +17,6 @@ class rpg_music_track {
 
     }
 
-    // Define a function for getting the appropriate DB name
-    public static function get_dbname(){
-        $master_dbname = MMRPG_CONFIG_DBNAME;
-        $music_dbname = $master_dbname.'_cdn';
-        return $music_dbname;
-    }
-
 
     // -- MUSIC INDEX FUNCTIONS -- //
 
