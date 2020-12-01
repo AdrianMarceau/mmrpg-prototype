@@ -560,9 +560,13 @@ class rpg_battle extends rpg_object {
 
         // Check to see if this is a player battle
         $this_is_player_battle = false;
-        if ($this_player->player_side == 'right' && $this_player->player_id != MMRPG_SETTINGS_TARGET_PLAYERID){
+        $this_user_id = $this_player->player_id;
+        $target_user_id = $target_player->player_id;
+        if (strstr($this_user_id, 'x')){ list($this_user_id) = explode('x', $this_user_id); }
+        if (strstr($target_user_id, 'x')){ list($target_user_id) = explode('x', $target_user_id); }
+        if ($this_player->player_side == 'right' && $this_user_id != MMRPG_SETTINGS_TARGET_PLAYERID){
             $this_is_player_battle = true;
-        } elseif ($target_player->player_side == 'right' && $target_player->player_id != MMRPG_SETTINGS_TARGET_PLAYERID){
+        } elseif ($target_player->player_side == 'right' && $target_user_id != MMRPG_SETTINGS_TARGET_PLAYERID){
             $this_is_player_battle = true;
         }
 
@@ -608,7 +612,7 @@ class rpg_battle extends rpg_object {
         }
         // (GHOST/COMPUTER) TARGET DEFEATED
         // Otherwise if the target was a computer-controlled human character
-        elseif ($target_player->player_id != MMRPG_SETTINGS_TARGET_PLAYERID){
+        elseif ($target_user_id != MMRPG_SETTINGS_TARGET_PLAYERID){
 
             // Calculate the battle zenny based on how many turns they lasted
             $target_battle_zenny = ceil($this->counters['battle_turn'] * 100 * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER);
@@ -633,7 +637,7 @@ class rpg_battle extends rpg_object {
 
             // (HUMAN) TARGET DEFEATED BY (INVISIBLE/COMPUTER)
             // If this was a player battle and the human user lost against the ghost target (this/computer/victory | target/human/defeat)
-            if ($this_player->player_id == MMRPG_SETTINGS_TARGET_PLAYERID && $target_player->player_side == 'left' && $this_robot->robot_class != 'mecha'){
+            if ($this_user_id == MMRPG_SETTINGS_TARGET_PLAYERID && $target_player->player_side == 'left' && $this_robot->robot_class != 'mecha'){
 
                 // Calculate how many zenny the other player is rewarded for winning
                 $target_player_robots = $target_player->values['robots_disabled'];
@@ -691,7 +695,7 @@ class rpg_battle extends rpg_object {
 
             // (HUMAN) TARGET DEFEATED BY (GHOST/COMPUTER)
             // If this was a player battle and the human user lost against the ghost target (this/computer/victory | target/human/defeat)
-            if ($this_player->player_id != MMRPG_SETTINGS_TARGET_PLAYERID && $target_player->player_side == 'left'){
+            if ($this_user_id != MMRPG_SETTINGS_TARGET_PLAYERID && $target_player->player_side == 'left'){
 
                 // Calculate how many zenny the other player is rewarded for winning
                 $target_player_robots = $target_player->values['robots_disabled'];
@@ -745,13 +749,13 @@ class rpg_battle extends rpg_object {
                     'battle_field_background' => $this->battle_field->field_background,
                     'battle_field_foreground' => $this->battle_field->field_foreground,
                     'battle_turns' => $this->counters['battle_turn'],
-                    'this_user_id' => $target_player->player_id,
+                    'this_user_id' => $target_user_id,
                     'this_player_token' => $target_player->player_token,
                     'this_player_robots' => $temp_this_player_robots,
                     'this_player_zenny' => $target_battle_zenny,
                     'this_player_result' => 'defeat',
                     'this_reward_pending' => 0,
-                    'target_user_id' => $this_player->player_id,
+                    'target_user_id' => $this_user_id,
                     'target_player_token' => $this_player->player_token,
                     'target_player_robots' => $temp_target_player_robots,
                     'target_player_zenny' => $other_battle_zenny_modded,
@@ -819,7 +823,9 @@ class rpg_battle extends rpg_object {
             $this->events_create($this_robot, $target_robot, $event_header, $event_body, $event_options);
 
             // If this was a PLAYER BATTLE and the human user won against them (this/human/victory | target/computer/defeat)
-            if ($target_player->player_id != MMRPG_SETTINGS_TARGET_PLAYERID && $this_player->player_side == 'left'){
+            $target_user_id = $target_player->player_id;
+            if (strstr($target_user_id, 'x')){ list($target_user_id) = explode('x', $target_user_id); }
+            if ($target_user_id != MMRPG_SETTINGS_TARGET_PLAYERID && $this_player->player_side == 'left'){
 
                 // DEBUG
                 //$temp_human_rewards['checkpoint'] .= '; '.__LINE__;
@@ -835,8 +841,6 @@ class rpg_battle extends rpg_object {
                 $temp_this_player_robots = !empty($temp_this_player_robots) ? implode(',', $temp_this_player_robots) : '';
                 $temp_target_player_robots = !empty($temp_target_player_robots) ? implode(',', $temp_target_player_robots) : '';
                 // Collect the userinfo for the target player
-                $target_user_id = $target_player->player_id;
-                if (strstr($target_user_id, 'x')){ list($target_user_id) = explode('x', $target_user_id); }
                 $target_player_userinfo = $db->get_array("SELECT user_name, user_name_clean, user_name_public FROM mmrpg_users WHERE user_id = {$target_user_id};");
                 if (!isset($_SESSION['LEADERBOARD']['player_targets_defeated'])){ $_SESSION['LEADERBOARD']['player_targets_defeated'] = array(); }
                 $_SESSION['LEADERBOARD']['player_targets_defeated'][] = $target_player_userinfo['user_name_clean'];
@@ -847,13 +851,13 @@ class rpg_battle extends rpg_object {
                     'battle_field_background' => $this->battle_field->field_background,
                     'battle_field_foreground' => $this->battle_field->field_foreground,
                     'battle_turns' => $this->counters['battle_turn'],
-                    'this_user_id' => $this_player->player_id,
+                    'this_user_id' => $this_user_id,
                     'this_player_token' => $this_player->player_token,
                     'this_player_robots' => $temp_this_player_robots,
                     'this_player_zenny' => $this_player_zenny,
                     'this_player_result' => 'victory',
                     'this_reward_pending' => 0,
-                    'target_user_id' => $target_player->player_id,
+                    'target_user_id' => $target_user_id,
                     'target_player_token' => $target_player->player_token,
                     'target_player_robots' => $temp_target_player_robots,
                     'target_player_zenny' => $target_battle_zenny,
