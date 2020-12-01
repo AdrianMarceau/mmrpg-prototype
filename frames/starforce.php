@@ -89,8 +89,9 @@ function print_starchart_omega($info, $key, $kind){
         $title .= '</div>';
         $title = htmlentities($title, ENT_QUOTES, 'UTF-8');
 
+        $mug_dir = $kind == 'side' ? 'right' : 'left';
         $sprite_class = 'sprite sprite_'.$size.'x'.$size.' robot_type robot_type_empty';
-        $sprite_style = 'background-image: url(images/robots/'.$robot.'/mug_left_'.$size.'x'.$size.'.png); ';
+        $sprite_style = 'background-image: url(images/robots/'.$robot.'/mug_'.$mug_dir.'_'.$size.'x'.$size.'.png); ';
         $sprite_markup = '<span class="'.$sprite_class.'" style="'.$sprite_style.'">&nbsp;</span>';
 
         $icon_class = 'icon robot_type robot_type_'.$type.' ';

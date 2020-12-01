@@ -39,6 +39,8 @@ $raw_omega_factors = $db->get_array_list("SELECT
     mmrpg_index_robots AS robots
     LEFT JOIN mmrpg_index_players AS players1 ON players1.player_robot_hero = robots.robot_token
     LEFT JOIN mmrpg_index_players AS players2 ON players2.player_robot_support = robots.robot_token
+    LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
+    LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_class = tokens.group_class AND groups.group_token = tokens.group_token
     WHERE
     robots.robot_game IN ({$raw_game_string})
     AND robots.robot_class = 'master'
@@ -47,7 +49,8 @@ $raw_omega_factors = $db->get_array_list("SELECT
     AND players2.player_robot_support IS NULL
     ORDER BY
     robots.robot_game ASC,
-    robots.robot_order ASC
+    groups.group_order ASC,
+    tokens.token_order ASC
     ;");
 if (!empty($raw_omega_factors)){
     foreach ($raw_omega_factors AS $key => $omega){

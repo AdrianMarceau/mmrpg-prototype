@@ -136,26 +136,33 @@
 
 #prototype .stars .starchart .corner:before,
 #prototype .stars .starchart .corner:after {
-    content: "\1f7c4";
+    content: "";
     display: inline-block;
-    font-size: 30px;
-    line-height: 30px;
+    font-size: 40px;
+    line-height: 40px;
+    width: 40px;
+    height: 40px;
     position: absolute;
-    top: 16px;
-    left: 16px;
+    top: 6px;
+    left: 6px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    background-image: none;
+    background-position: 0 0;
+    opacity: 0.3;
+    -webkit-animation:pulse 9s linear infinite;
+    -moz-animation:pulse 9s linear infinite;
+    animation:pulse 9s linear infinite;
 }
 #prototype .stars .starchart .corner:before {
-    color: #9E9E9E;
-    z-index: 100;
-    -ms-transform: rotate(45deg); /* IE 9 */
-    -webkit-transform: rotate(45deg); /* Chrome, Safari, Opera */
-    transform: rotate(45deg);
+    background-image: url(/images/items_shadows/field-star/sprite_left_40x40.png);
+    top: 4px;
 }
 #prototype .stars .starchart .corner:after {
-    color: #DEDEDE;
-    z-index: 200;
+    background-image: url(/images/items/field-star/icon_left_40x40.png);
 }
+@-moz-keyframes pulse { 50% { opacity: 1.0; } 100% { opacity: 0.3; } }
+@-webkit-keyframes pulse { 50% { opacity: 1.0; } 100% { opacity: 0.3; } }
+@keyframes pulse { 50% { opacity: 1.0; } 100% { opacity: 0.3; } }
 
 #prototype .stars .starchart .corner .bullets {
     display: block;
