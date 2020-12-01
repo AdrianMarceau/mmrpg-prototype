@@ -455,6 +455,10 @@ if (!empty($this_shop_index['reggae'])){
             // Define the weapon selling array and start it empty
             $this_shop_index['reggae']['shop_weapons']['weapons_selling'] = array();
 
+            // Preset the level of all core types to zero before continuing
+            $mmrpg_index_types = rpg_type::get_index(false, false, false, true);
+            foreach ($mmrpg_index_types AS $type_token => $type_info){ $core_level_index[$type_token] = 0; }
+
             // If the player has sold any cores, loop through them and add associated abilities
             $level_discount = $this_battle_shops['reggae']['shop_level'] > 1 ? $this_battle_shops['reggae']['shop_level'] / 101 : 0;
             if (!empty($this_battle_shops['reggae']['cores_bought'])){
@@ -502,7 +506,6 @@ if (!empty($this_shop_index['reggae'])){
                 abilities.ability_token LIKE '%-shot' DESC,
                 abilities.ability_token LIKE '%-buster' DESC,
                 abilities.ability_token LIKE '%-overdrive' DESC,
-                -- abilities.ability_token LIKE 'core-%' ASC,
                 abilities.ability_shop_level ASC,
                 groups.group_order ASC,
                 tokens.token_order ASC,
@@ -510,7 +513,7 @@ if (!empty($this_shop_index['reggae'])){
                 ;", 'ability_token');
 
             // Update the actual shop index with our finalized weapons we're selling
-            $reggae_weapons_selling = array_keys($unlocked_weapons);
+            $reggae_weapons_selling = !empty($unlocked_weapons) ? array_keys($unlocked_weapons) : array();
             $this_shop_index['reggae']['shop_weapons']['weapons_selling'] = call_user_func_array('get_abilities_with_prices', $reggae_weapons_selling);
 
             // If the Omega Seed is not unlocked yet, prevent those abilities from being purchased
@@ -520,7 +523,8 @@ if (!empty($this_shop_index['reggae'])){
             }
 
             // Loop through unlocked abilities and apply the level discount, if any
-            if (!empty($level_discount)){
+            if (!empty($level_discount)
+                && isset($this_shop_index['reggae']['shop_weapons']['weapons_selling'])){
                 foreach ($this_shop_index['reggae']['shop_weapons']['weapons_selling'] AS $token => $price){
                     $new_price = $price - floor(($price / 2) * $level_discount);
                     $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$token] = $new_price;
