@@ -274,7 +274,9 @@ if (!empty($db_page_info)){
 //exit();
 
 // If no body markup was generated, there must be an error
-if (empty($this_markup_body)){
+if (empty($this_markup_body)
+    || (defined('MMRPG_PAGE_NOT_FOUND')
+        && MMRPG_PAGE_NOT_FOUND === true)){
     http_response_code(404);
     $this_markup_body = '';
     $this_markup_body .= '<div class="header"><div class="header_wrapper"><h1 class="title">404 Page Not Found</h1></div></div>';
