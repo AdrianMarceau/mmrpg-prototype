@@ -562,7 +562,7 @@
         <a href="admin/">Admin Panel</a>
         &raquo; <a href="admin/edit-music/">Edit Music Tracks</a>
         <? if ($sub_action == 'editor' && !empty($music_data)): ?>
-            &raquo; <a href="admin/edit-music/editor/music_id=<?= $music_data['music_id'] ?>"><?= !empty($music_name_display) ? $music_name_display : 'Schedule New' ?></a>
+            &raquo; <a href="admin/edit-music/editor/music_id=<?= $music_data['music_id'] ?>"><?= !empty($music_name_display) ? $music_name_display : 'Add New Track' ?></a>
         <? endif; ?>
     </div>
 
