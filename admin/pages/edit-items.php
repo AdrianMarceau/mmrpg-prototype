@@ -236,6 +236,7 @@
         $temp_item_fields = rpg_item::get_index_fields(true);
         if (!empty($editor_data['item_id'])){
             $item_data = $db->get_array("SELECT {$temp_item_fields} FROM mmrpg_index_items WHERE item_id = {$editor_data['item_id']};");
+            if (!empty($_GET['override_protected'])){ $item_data['item_flag_protected'] = 0; }
         } else {
 
             // Generate temp data structure for the new challenge
@@ -477,6 +478,27 @@
             $update_data = $form_data;
             unset($update_data['item_id']);
 
+            // If the item tokens have changed, we must move the entire folder
+            $rename_content_path = false;
+            if (!$item_data_is_new
+                && $old_item_token !== $update_data['item_token']){
+                $rename_content_path = true;
+                $old_content_path = MMRPG_CONFIG_ITEMS_CONTENT_PATH.$old_item_token.'/';
+                $new_content_path = MMRPG_CONFIG_ITEMS_CONTENT_PATH.$update_data['item_token'].'/';
+                if (file_exists($new_content_path)){
+                    $temp_exists = $db->get_value("SELECT item_id FROM mmrpg_index_items WHERE item_token = '{$update_data['item_token']}';", 'item_id');
+                    if (!$temp_exists){
+                        $shell_cmd = 'rm -rf "'.$new_content_path.'"';
+                        $shell_output = shell_exec($shell_cmd);
+                        //error_log('$shell_output = '.print_r($shell_output, true));
+                    } else {
+                        $form_messages[] = array('error', 'New item path '.mmrpg_clean_path($new_content_path).' already exists!');
+                        $update_data['item_token'] = $old_item_token;
+                        $rename_content_path = false;
+                    }
+                }
+            }
+
             // If this is a new item we insert, otherwise we update the existing
             if ($item_data_is_new){
 
@@ -512,24 +534,29 @@
                 $db->update('mmrpg_config', array('config_value' => $time), "config_group = 'global' AND config_name = 'cache_time'");
             }
 
+            // If the item tokens have changed, we must move the entire folder
+            if ($form_success
+                && $rename_content_path === true
+                && !empty($old_content_path)
+                && !empty($new_content_path)){
+                if (file_exists($old_content_path)){
+                    $shell_cmd = 'mv "'.$old_content_path.'" "'.$new_content_path.'"';
+                    $shell_output = shell_exec($shell_cmd);
+                    //error_log('$shell_output = '.print_r($shell_output, true));
+                    if (!file_exists($old_content_path) && file_exists($new_content_path)){
+                        $path_string = '<strong>'.mmrpg_clean_path($old_content_path).'</strong> &raquo; <strong>'.mmrpg_clean_path($new_content_path).'</strong>';
+                        $form_messages[] = array('alert', $this_item_class_short_name_uc.' directory renamed! '.$path_string);
+                        $db->update('mmrpg_index_items_groups_tokens', array('item_token' => $update_data['item_token']), array('item_token' => $old_item_token));
+                    } else {
+                        $form_messages[] = array('error', 'Unable to rename '.$this_item_class_name.' directory!');
+                    }
+                }
+            }
+
             // If successful, we need to update the JSON file
             if ($form_success){
                 if ($item_data_is_new){ $item_data['item_id'] = $new_item_id; }
                 cms_admin::object_editor_update_json_data_file('item', array_merge($item_data, $update_data));
-            }
-
-            // If the item tokens have changed, we must move the entire folder
-            if ($form_success
-                && !$item_data_is_new
-                && $old_item_token !== $update_data['item_token']){
-                $old_content_path = MMRPG_CONFIG_ITEMS_CONTENT_PATH.$old_item_token.'/';
-                $new_content_path = MMRPG_CONFIG_ITEMS_CONTENT_PATH.$update_data['item_token'].'/';
-                if (rename($old_content_path, $new_content_path)){
-                    $path_string = '<strong>'.mmrpg_clean_path($old_content_path).'</strong> &raquo; <strong>'.mmrpg_clean_path($new_content_path).'</strong>';
-                    $form_messages[] = array('alert', 'Item directory renamed! '.$path_string);
-                } else {
-                    $form_messages[] = array('error', 'Unable to rename item directory!');
-                }
             }
 
             // We're done processing the form, we can exit
