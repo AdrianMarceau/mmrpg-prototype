@@ -25,6 +25,7 @@
     $mmrpg_robots_index = cms_admin::get_robots_index();
     $mmrpg_abilities_index = cms_admin::get_abilities_index();
     $mmrpg_items_index = cms_admin::get_items_index();
+    $mmrpg_skills_index = cms_admin::get_skills_index();
     $mmrpg_fields_index = cms_admin::get_fields_index();
     $mmrpg_music_index = cms_admin::get_music_index();
     $mmrpg_contributors_index = cms_admin::get_contributors_index('player');
@@ -1283,6 +1284,7 @@
             window.mmrpgAbilitiesIndex = <?= json_encode(rpg_ability::parse_index($mmrpg_abilities_index)) ?>;
             window.mmrpgAbilitiesGlobal = <?= json_encode(rpg_ability::get_global_abilities()) ?>;
             window.mmrpgItemsIndex = <?= json_encode(rpg_item::parse_index($mmrpg_items_index)) ?>;
+            window.mmrpgSkillsIndex = <?= json_encode(rpg_skill::parse_index($mmrpg_skills_index)) ?>;
         </script>
     <?
     if (!isset($admin_inline_javascript)){ $admin_inline_javascript = '';}

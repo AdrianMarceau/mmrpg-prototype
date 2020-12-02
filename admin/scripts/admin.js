@@ -1032,14 +1032,18 @@ $(document).ready(function(){
             var robotInfo = typeof window.mmrpgRobotsIndex[robotToken] !== 'undefined' ? window.mmrpgRobotsIndex[robotToken] : false;
             var abilityInfo = typeof window.mmrpgAbilitiesIndex[abilityToken] !== 'undefined' ? window.mmrpgAbilitiesIndex[abilityToken] : false;
             var itemInfo = itemToken.length && typeof window.mmrpgItemsIndex[itemToken] !== 'undefined' ? window.mmrpgItemsIndex[itemToken] : false;
-            //console.log('robotInfo = ', robotInfo, 'abilityInfo = ', abilityInfo, 'itemInfo = ', itemInfo);
+            var skillToken = typeof robotInfo['robot_skill'] !== 'undefined' && robotInfo['robot_skill'].length ? robotInfo['robot_skill'] : false;
+            var skillInfo = skillToken.length && typeof window.mmrpgSkillsIndex[skillToken] !== 'undefined' ? window.mmrpgSkillsIndex[skillToken] : false;
+            //console.log('robotInfo = ', robotInfo, 'abilityInfo = ', abilityInfo, 'itemInfo = ', itemInfo, 'skillToken = ', skillToken, 'skillInfo = ', skillInfo);
             if (!robotInfo || !abilityInfo){ return false; }
             if (!itemInfo){ itemToken = ''; }
             var robotCore = robotInfo['robot_core'].length ? robotInfo['robot_core'] : '';
             var robotCore2 = robotInfo['robot_core2'].length ? robotInfo['robot_core2'] : '';
             var itemCore = itemToken.length && itemToken.match(/-core$/i) ? itemToken.replace(/-core$/i, '') : '';
             if (itemCore == 'none' || itemCore == 'copy'){ itemCore = ''; }
-            //console.log('robotCore = ', robotCore, 'robotCore2 = ', robotCore2, 'itemCore = ', itemCore);
+            var skillCore = skillToken.length && skillToken.match(/-subcore$/i) ? skillToken.replace(/-subcore$/i, '') : '';
+            if (skillCore == 'none' || skillCore == 'copy'){ skillCore = ''; }
+            //console.log('robotCore = ', robotCore, 'robotCore2 = ', robotCore2, 'itemCore = ', itemCore, 'skillCore = ', skillCore);
             var globalAbilities = typeof window.mmrpgAbilitiesGlobal !== 'undefined' ? window.mmrpgAbilitiesGlobal : [];
             if (mmrpgAbilitiesGlobal.indexOf(abilityToken) !== -1){
                 return true;
@@ -1048,6 +1052,7 @@ $(document).ready(function(){
                 if (robotCore.length){ allowTypes.push(robotCore); }
                 if (robotCore2.length){ allowTypes.push(robotCore2); }
                 if (itemCore.length){ allowTypes.push(itemCore); }
+                if (skillCore.length){ allowTypes.push(skillCore); }
                 if (allowTypes.length){
                     if (robotCore == 'copy'){ return true; }
                     else if (abilityInfo['ability_type'].length && allowTypes.indexOf(abilityInfo['ability_type']) !== -1){ return true; }
