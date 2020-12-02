@@ -130,6 +130,10 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
         // Check if this robot is holding a core
         $robot_item_core = !empty($robot_item) && preg_match('/-core$/i', $robot_item) ? preg_replace('/-core$/i', '', $robot_item) : '';
 
+        // Check if this robot has a subcore skill
+        $robot_skill = !empty($robot_index_info['robot_skill']) ? $robot_index_info['robot_skill'] : '';
+        $robot_skill_core = !empty($robot_skill) && preg_match('/-subcore$/i', $robot_skill) ? preg_replace('/-subcore$/i', '', $robot_skill) : '';
+
         // Define the number of core and support abilities for the robot
         if ($robot_index_info['robot_class'] == 'master' || $robot_index_info['robot_class'] == 'boss'){
             foreach ($mmrpg_prototype_core_abilities AS $group_key => $group_abilities){
@@ -150,6 +154,11 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                         if ($robot_item_core == 'copy' && $ability_info['ability_type'] == 'copy'){ $is_compatible = true; }
                         elseif (!empty($ability_info['ability_type']) && $robot_item_core == $ability_info['ability_type']){ $is_compatible = true; }
                         elseif (!empty($ability_info['ability_type2']) && $robot_item_core == $ability_info['ability_type2']){ $is_compatible = true; }
+                    }
+                    if (!$is_compatible && !empty($robot_skill_core)){
+                        if ($robot_skill_core == 'copy' && $ability_info['ability_type'] == 'copy'){ $is_compatible = true; }
+                        elseif (!empty($ability_info['ability_type']) && $robot_skill_core == $ability_info['ability_type']){ $is_compatible = true; }
+                        elseif (!empty($ability_info['ability_type2']) && $robot_skill_core == $ability_info['ability_type2']){ $is_compatible = true; }
                     }
                     if ($is_compatible){ $this_robot_abilities_addons['weapons'][] = $ability_token; }
                 }
@@ -190,6 +199,12 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                             elseif (!empty($ability_info['ability_type']) && $robot_item_core == $ability_info['ability_type']){ $is_compatible = true; }
                             elseif (!empty($ability_info['ability_type2']) && $robot_item_core == $ability_info['ability_type2']){ $is_compatible = true; }
                         }
+                        if (!$is_compatible
+                            && !empty($robot_skill_core)){
+                            if ($robot_skill_core == 'copy' && $ability_info['ability_type'] == 'copy'){ $is_compatible = true; }
+                            elseif (!empty($ability_info['ability_type']) && $robot_skill_core == $ability_info['ability_type']){ $is_compatible = true; }
+                            elseif (!empty($ability_info['ability_type2']) && $robot_skill_core == $ability_info['ability_type2']){ $is_compatible = true; }
+                        }
                         if ($is_compatible){
                             $this_robot_abilities_addons['support'][] = $ability_token;
                         }
@@ -221,6 +236,11 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                             elseif (!empty($ability_info['ability_type']) && $robot_item_core == $ability_info['ability_type']){ $is_compatible = true; }
                             elseif (!empty($ability_info['ability_type2']) && $robot_item_core == $ability_info['ability_type2']){ $is_compatible = true; }
                         }
+                        if (!$is_compatible && !empty($robot_skill_core)){
+                            if ($robot_skill_core == 'copy' && $ability_info['ability_type'] == 'copy'){ $is_compatible = true; }
+                            elseif (!empty($ability_info['ability_type']) && $robot_skill_core == $ability_info['ability_type']){ $is_compatible = true; }
+                            elseif (!empty($ability_info['ability_type2']) && $robot_skill_core == $ability_info['ability_type2']){ $is_compatible = true; }
+                        }
                         if ($is_compatible){ $this_robot_abilities_addons['support'][] = $ability_token; }
                     }
                     unset($ability_info);
@@ -250,6 +270,11 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                         if ($robot_item_core == 'copy' && $ability_info['ability_type'] == 'copy'){ $is_compatible = true; }
                         elseif (!empty($ability_info['ability_type']) && $robot_item_core == $ability_info['ability_type']){ $is_compatible = true; }
                         elseif (!empty($ability_info['ability_type2']) && $robot_item_core == $ability_info['ability_type2']){ $is_compatible = true; }
+                    }
+                    if (!$is_compatible && !empty($robot_skill_core)){
+                        if ($robot_skill_core == 'copy' && $ability_info['ability_type'] == 'copy'){ $is_compatible = true; }
+                        elseif (!empty($ability_info['ability_type']) && $robot_skill_core == $ability_info['ability_type']){ $is_compatible = true; }
+                        elseif (!empty($ability_info['ability_type2']) && $robot_skill_core == $ability_info['ability_type2']){ $is_compatible = true; }
                     }
                     if ($is_compatible){ $this_robot_abilities_addons['support'][] = $ability_token; }
                 }
