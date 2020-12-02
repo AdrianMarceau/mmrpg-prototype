@@ -4790,86 +4790,83 @@ class rpg_robot extends rpg_object {
                     $right_column_markup[] = ob_get_clean();
                 }
 
-                /*
+                // If this robot has a skill, display it before energy/weapons
+                if (!empty($robot_info['robot_skill'])){
 
-                // Define the markup for the level
-                if (true){
-                    ob_start();
-                    ?>
-                    <td  class="right">
-                        <label style="display: block; float: left;">Level :</label>
-                        <? if($robot_info['robot_level'] >= 100){ ?>
-                            <a data-tooltip-align="center" data-tooltip="<?= htmlentities(('Congratulations! '.$robot_info['robot_name'].' has reached Level 100!<br /> <span style="font-size: 90%;">Stat bonuses will now be awarded immediately when this robot lands the finishing blow on a target! Try to max out each stat to its full potential!</span>'), ENT_QUOTES, 'UTF-8') ?>" class="robot_stat robot_type_electric"><?= $robot_info['robot_level'] ?> <span>&#9733;</span></a>
-                        <? } else { ?>
-                            <span class="robot_stat robot_level_reset robot_type_<?= !empty($robot_rewards['flags']['reached_max_level']) ? 'electric' : 'none' ?>"><?= !empty($robot_rewards['flags']['reached_max_level']) ? '<span>&#9733;</span>' : '' ?> <?= $robot_info['robot_level'] ?></span>
-                        <? } ?>
-                    </td>
-                    <?
-                    $right_column_markup[] = ob_get_clean();
-                }
+                    // Collect the skills index for display
+                    $temp_skill_token = $robot_info['robot_skill'];
+                    $temp_skill_info = rpg_skill::get_index_info($temp_skill_token);
+                    $temp_skill_name = !empty($robot_info['robot_skill_name']) ? $robot_info['robot_skill_name'] : $temp_skill_info['skill_name'];
+                    $temp_skill_description = !empty($temp_skill_info['skill_description']) ? $temp_skill_info['skill_description'] : '???';
+                    $temp_skill_type = strstr($temp_skill_token, '-subcore') ? str_replace('-subcore', '', $temp_skill_token) : 'none';
 
-                // Define the markup for the experience
-                if (true){
-                    ob_start();
-                    ?>
-                    <td  class="right">
-                        <label style="display: block; float: left;">Exp :</label>
-                        <? if($robot_info['robot_level'] >= 100): ?>
-                            <span class="robot_stat robot_type_experience" title="Max Experience!"><span>&#8734;</span> / 1000</span>
-                        <? else: ?>
-                            <span class="robot_stat"><?= $robot_info['robot_experience'] ?> / 1000</span>
-                        <? endif; ?>
-                    </td>
-                    <?
-                    $right_column_markup[] = ob_get_clean();
-                }
-
-                // Define the markup for the energy
-                if (true){
-                    ob_start();
-                    ?>
-                    <td class="right">
-                        <label class="<?= !empty($player_info['player_energy']) ? 'statboost_player_'.$player_info['player_token'] : '' ?>" style="display: block; float: left;">Energy :</label>
-                        <?
-                        // Print out the energy stat breakdown
-                        $print_robot_stat_function('energy');
-                        $print_robot_stat_function('weapons');
+                    // Define the markup for the this robot's skill
+                    if (true){
+                        ob_start();
                         ?>
-                    </td>
-                    <?
-                    $right_column_markup[] = ob_get_clean();
-                }
-
-                */
-
-                // Define the markup for the energy
-                if (true){
-                    ob_start();
-                    ?>
-                    <td class="right">
-                        <label class="<?= !empty($player_info['player_energy']) ? 'statboost_player_'.$player_info['player_token'] : '' ?>" style="display: block; float: left;">Energy :</label>
+                        <td class="right">
+                            <label class="skill" style="display: block; float: left;">Skill :</label>
+                            <span class="skill_name type type_<?= $temp_skill_type ?>" title="<?= htmlspecialchars($temp_skill_description, ENT_QUOTES, 'UTF-8', true) ?>"><?= $temp_skill_name ?></span>
+                        </td>
                         <?
-                        // Print out the energy stat breakdown
-                        $print_robot_stat_function('energy');
-                        ?>
-                    </td>
-                    <?
-                    $right_column_markup[] = ob_get_clean();
-                }
+                        $right_column_markup[] = ob_get_clean();
+                    }
 
-                // Define the markup for the weapons
-                if (true){
-                    ob_start();
-                    ?>
-                    <td class="right">
-                        <label class="<?= !empty($player_info['player_energy']) ? 'statboost_player_'.$player_info['player_token'] : '' ?>" style="display: block; float: left;">Weapons :</label>
-                        <?
-                        // Print out the energy stat breakdown
-                        $print_robot_stat_function('weapons');
+                    // Define the markup for the energy and life
+                    if (true){
+                        ob_start();
                         ?>
-                    </td>
-                    <?
-                    $right_column_markup[] = ob_get_clean();
+                        <td class="right">
+                            <label class="<?=
+                                (!empty($player_info['player_energy']) ? 'statboost_player_'.$player_info['player_token'] : '').
+                                (!empty($player_info['player_weapons']) ? 'statboost_player_'.$player_info['player_token'] : '')
+                                ?>" style="display: block; float: left;">Energy :</label>
+                            <?
+                            // Print out the energy stat breakdown
+                            $print_robot_stat_function('energy');
+                            // Print out the weaons stat breakdown
+                            $print_robot_stat_function('weapons');
+                            ?>
+                        </td>
+                        <?
+                        $right_column_markup[] = ob_get_clean();
+                    }
+
+                }
+                // Otherwise, display Energy and Weapons on separate lines
+                else {
+
+                    // Define the markup for the energy
+                    if (true){
+                        ob_start();
+                        ?>
+                        <td class="right">
+                            <label class="<?= !empty($player_info['player_energy']) ? 'statboost_player_'.$player_info['player_token'] : '' ?>" style="display: block; float: left;">Energy :</label>
+                            <?
+                            // Print out the energy stat breakdown
+                            $print_robot_stat_function('energy');
+                            ?>
+                        </td>
+                        <?
+                        $right_column_markup[] = ob_get_clean();
+                    }
+
+                    // Define the markup for the weapons
+                    if (true){
+                        ob_start();
+                        ?>
+                        <td class="right">
+                            <label class="<?= !empty($player_info['player_energy']) ? 'statboost_player_'.$player_info['player_token'] : '' ?>" style="display: block; float: left;">Weapons :</label>
+                            <?
+                            // Print out the energy stat breakdown
+                            $print_robot_stat_function('weapons');
+                            ?>
+                        </td>
+                        <?
+                        $right_column_markup[] = ob_get_clean();
+                    }
+
+
                 }
 
                 // Define the markup for the attack

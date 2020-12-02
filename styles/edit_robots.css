@@ -544,7 +544,8 @@ body.windowFlag_landscapeMode #prototype {
 
 
 #edit #console .event a.player_name,
-#edit #console .event a.item_name {
+#edit #console .event a.item_name,
+#edit #console .event span.skill_name {
     display: block;
     float: right;
     padding: 1px 0;
@@ -560,6 +561,12 @@ body.windowFlag_landscapeMode #prototype {
 }
 #edit #console .event a.item_name {
 
+}
+#edit #console .event span.skill_name {
+    width: auto;
+    cursor: default;
+    padding-left: 6px;
+    padding-right: 6px;
 }
 #edit #console .event a.player_name:hover,
 #edit #console .event a.item_name:hover {
