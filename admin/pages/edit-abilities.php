@@ -294,6 +294,7 @@
         $temp_ability_fields = rpg_ability::get_index_fields(true);
         if (!empty($editor_data['ability_id'])){
             $ability_data = $db->get_array("SELECT {$temp_ability_fields} FROM mmrpg_index_abilities WHERE ability_id = {$editor_data['ability_id']};");
+            if (!empty($_GET['override_protected'])){ $ability_data['ability_flag_protected'] = 0; }
         } else {
 
             // Generate temp data structure for the new challenge
@@ -556,6 +557,27 @@
             $update_data = $form_data;
             unset($update_data['ability_id']);
 
+            // If the ability tokens have changed, we must move the entire folder
+            $rename_content_path = false;
+            if (!$ability_data_is_new
+                && $old_ability_token !== $update_data['ability_token']){
+                $rename_content_path = true;
+                $old_content_path = MMRPG_CONFIG_ABILITIES_CONTENT_PATH.$old_ability_token.'/';
+                $new_content_path = MMRPG_CONFIG_ABILITIES_CONTENT_PATH.$update_data['ability_token'].'/';
+                if (file_exists($new_content_path)){
+                    $temp_exists = $db->get_value("SELECT ability_id FROM mmrpg_index_abilities WHERE ability_token = '{$update_data['ability_token']}';", 'ability_id');
+                    if (!$temp_exists){
+                        $shell_cmd = 'rm -rf "'.$new_content_path.'"';
+                        $shell_output = shell_exec($shell_cmd);
+                        //error_log('$shell_output = '.print_r($shell_output, true));
+                    } else {
+                        $form_messages[] = array('error', 'New ability path '.mmrpg_clean_path($new_content_path).' already exists!');
+                        $update_data['ability_token'] = $old_ability_token;
+                        $rename_content_path = false;
+                    }
+                }
+            }
+
             // If this is a new ability we insert, otherwise we update the existing
             if ($ability_data_is_new){
 
@@ -591,24 +613,29 @@
                 $db->update('mmrpg_config', array('config_value' => $time), "config_group = 'global' AND config_name = 'cache_time'");
             }
 
+            // If the ability tokens have changed, we must move the entire folder
+            if ($form_success
+                && $rename_content_path === true
+                && !empty($old_content_path)
+                && !empty($new_content_path)){
+                if (file_exists($old_content_path)){
+                    $shell_cmd = 'mv "'.$old_content_path.'" "'.$new_content_path.'"';
+                    $shell_output = shell_exec($shell_cmd);
+                    //error_log('$shell_output = '.print_r($shell_output, true));
+                    if (!file_exists($old_content_path) && file_exists($new_content_path)){
+                        $path_string = '<strong>'.mmrpg_clean_path($old_content_path).'</strong> &raquo; <strong>'.mmrpg_clean_path($new_content_path).'</strong>';
+                        $form_messages[] = array('alert', $this_ability_class_short_name_uc.' directory renamed! '.$path_string);
+                        $db->update('mmrpg_index_abilities_groups_tokens', array('ability_token' => $update_data['ability_token']), array('ability_token' => $old_ability_token));
+                    } else {
+                        $form_messages[] = array('error', 'Unable to rename '.$this_ability_class_name.' directory!');
+                    }
+                }
+            }
+
             // If successful, we need to update the JSON file
             if ($form_success){
                 if ($ability_data_is_new){ $ability_data['ability_id'] = $new_ability_id; }
                 cms_admin::object_editor_update_json_data_file('ability', array_merge($ability_data, $update_data));
-            }
-
-            // If the ability tokens have changed, we must move the entire folder
-            if ($form_success
-                && !$ability_data_is_new
-                && $old_ability_token !== $update_data['ability_token']){
-                $old_content_path = MMRPG_CONFIG_ABILITIES_CONTENT_PATH.$old_ability_token.'/';
-                $new_content_path = MMRPG_CONFIG_ABILITIES_CONTENT_PATH.$update_data['ability_token'].'/';
-                if (rename($old_content_path, $new_content_path)){
-                    $path_string = '<strong>'.mmrpg_clean_path($old_content_path).'</strong> &raquo; <strong>'.mmrpg_clean_path($new_content_path).'</strong>';
-                    $form_messages[] = array('alert', $this_ability_class_short_name_uc.' directory renamed! '.$path_string);
-                } else {
-                    $form_messages[] = array('error', 'Unable to rename '.$this_ability_class_name.' directory!');
-                }
             }
 
             // We're done processing the form, we can exit
