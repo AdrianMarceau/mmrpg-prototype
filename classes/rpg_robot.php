@@ -80,7 +80,9 @@ class rpg_robot extends rpg_object {
         else {
             if (empty($this_robotinfo_backup['_parsed'])){
                 if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG']['checkpoint_queries'][] = "\$this_robotinfo = rpg_robot::get_index_info({$this_robotinfo['robot_token']}); on line ".__LINE__;  }
-                $this_robotinfo = rpg_robot::get_index_info($this_robotinfo['robot_token']);
+                $token = $this_robotinfo['robot_token'];
+                $this_robotinfo = rpg_robot::get_index_info($token);
+                if (!is_array($this_robotinfo)){ error_log('$this_robotinfo is not an array! robot token was: '.$token.' (from '.__FILE__.' on line '.__LINE__.')'); }
                 $this_robotinfo = array_replace($this_robotinfo, $this_robotinfo_backup);
             }
         }
@@ -100,7 +102,7 @@ class rpg_robot extends rpg_object {
         $this->counters = isset($this_robotinfo['counters']) ? $this_robotinfo['counters'] : array();
         $this->values = isset($this_robotinfo['values']) ? $this_robotinfo['values'] : array();
         $this->history = isset($this_robotinfo['history']) ? $this_robotinfo['history'] : array();
-        $this->robot_key = isset($this_robotinfo['robot_key']) ? $this_robotinfo['robot_key'] : 0;
+        $this->robot_key = isset($this_robotinfo['robot_key']) ? intval($this_robotinfo['robot_key']) : 0;
         $this->robot_id = isset($this_robotinfo['robot_id']) ? $this_robotinfo['robot_id'] : false;
         $this->robot_number = isset($this_robotinfo['robot_number']) ? $this_robotinfo['robot_number'] : 'RPG000';
         $this->robot_name = isset($this_robotinfo['robot_name']) ? $this_robotinfo['robot_name'] : 'Robot';
