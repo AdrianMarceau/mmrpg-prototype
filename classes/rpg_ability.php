@@ -3573,6 +3573,7 @@ class rpg_ability extends rpg_object {
                 array('token' => 'woolly_cloud', 'source' => 'thunder-wool', 'noun' => 'woolly cloud', 'where' => 'above'),
                 array('token' => 'acid_globs', 'source' => 'acid-glob', 'noun' => 'acid glob', 'where' => 'below'),
                 array('token' => 'gravity_well', 'source' => 'gravity-hold', 'noun' => 'gravity well', 'where' => 'below'),
+                array('token' => 'remote_mine', 'source' => 'remote-mine', 'noun' => 'remote mine', 'where' => 'in front of'),
                 );
             }
         return $field_hazard_index;
@@ -4121,6 +4122,47 @@ class rpg_ability extends rpg_object {
                 'x' => (5 + ($existing_attachments * 2)),
                 'y' => (0 + ($existing_attachments * 1)),
                 'z' => (10 - $existing_attachments)
+                )
+            );
+        return $this_attachment_info;
+    }
+
+    // Define a static function for generating a static field attachment of "remote mine" (from the Remote Mine ability)
+    public static function get_static_remote_mine($static_attachment_key, $this_attachment_duration = 99, $this_attachment_created = 0){
+        $this_battle = rpg_battle::get_battle();
+        $existing_attachments = isset($this_battle->battle_attachments[$static_attachment_key]) ? count($this_battle->battle_attachments[$static_attachment_key]) : 0;
+        $this_ability_token = 'remote-mine';
+        $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
+        $this_attachment_image = $this_ability_token;
+        $this_attachment_destroy_text = 'The <span class="ability_name ability_type ability_type_explode">Remote Mine</span> below {this_robot} was defused... ';
+        $this_attachment_info = array(
+            'class' => 'ability',
+            'sticky' => true,
+            'ability_token' => $this_ability_token,
+            'ability_image' => $this_attachment_image,
+            'attachment_token' => $this_attachment_token,
+            'attachment_duration' => $this_attachment_duration,
+            'attachment_created' => $this_attachment_created,
+            'attachment_sticky' => true,
+            'attachment_weaknesses' => array('flame'),
+            'attachment_weaknesses_trigger' => 'user',
+            'attachment_destroy' => array(
+                'trigger' => 'special',
+                'kind' => '',
+                'type' => '',
+                'percent' => true,
+                'modifiers' => false,
+                'frame' => 'defend',
+                'rates' => array(100, 0, 0),
+                'success' => array(8, 0, -10, 10, $this_attachment_destroy_text),
+                'failure' => array(8, 0, -10, 10, $this_attachment_destroy_text)
+                ),
+            'ability_frame' => 6,
+            'ability_frame_animate' => array(6, 7),
+            'ability_frame_offset' => array(
+                'x' => (30 + ($existing_attachments * 8)),
+                'y' => (-5),
+                'z' => (6 + $existing_attachments)
                 )
             );
         return $this_attachment_info;
