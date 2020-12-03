@@ -650,6 +650,20 @@ class rpg_player extends rpg_object {
         return $player_robots;
     }
 
+    /**
+     * Get a robot from this player given a specific key
+     * @return array
+     */
+    public function get_robot_by_key($robot_key, $include_active = false){
+        $filters = array('player_id' => $this->player_id);
+        $player_robots = rpg_game::find_robots($filters);
+        foreach ($player_robots AS $key => $robot){
+            if ($robot->robot_position === 'active' && !$include_active){ continue; }
+            if ($robot->robot_key === $robot_key){ return $robot; }
+        }
+        return false;
+    }
+
 
     // -- ABILITY FUNCTIONS -- //
 
