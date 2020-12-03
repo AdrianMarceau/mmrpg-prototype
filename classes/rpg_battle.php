@@ -266,6 +266,14 @@ class rpg_battle extends rpg_object {
 
     }
 
+    public function get_attachment($key, $token){ return $this->get_info('battle_attachments', $key, $token); }
+    public function set_attachment($key, $token, $value){ $this->set_info('battle_attachments', $key, $token, $value); }
+    public function unset_attachment($key, $token){ return $this->unset_info('battle_attachments', $key, $token); }
+
+    public function get_attachments(){ return $this->get_info('battle_attachments'); }
+    public function set_attachments($value){ $this->set_info('battle_attachments', $value); }
+    public function has_attachments(){ return $this->get_info('battle_attachments') ? true : false; }
+
     // Define public print functions for markup generation
     //public function print_name(){ return '<span class="battle_name battle_type battle_type_none">'.$this->battle_name.'</span>'; }
     public function print_name(){ return '<span class="battle_name battle_type">'.$this->battle_name.'</span>'; }
