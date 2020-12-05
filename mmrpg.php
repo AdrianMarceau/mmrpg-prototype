@@ -274,7 +274,7 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
 
         // From December through January, force a Freeze-type theme for the holidays
         if ($date_month === 12 || $date_month === 1){
-            $temp_field_path = 'fields/arctic-jungle';
+            $temp_field_path = 'fields/wintry-forefront';
             $temp_field_type = 'freeze';
             $temp_mecha_tokens = array('peng');
         }
