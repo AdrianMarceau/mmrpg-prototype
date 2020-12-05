@@ -3976,6 +3976,7 @@ class rpg_robot extends rpg_object {
                                         $robot_ability_class = !empty($robot_info['robot_class']) ? $robot_info['robot_class'] : 'master';
                                         $robot_ability_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : false;
                                         $robot_ability_core2 = !empty($robot_info['robot_core2']) ? $robot_info['robot_core2'] : false;
+                                        $robot_ability_subcore = !empty($robot_info['robot_skill']) && strstr($robot_info['robot_skill'], '-subcore') ? str_replace('-subcore', '', $robot_info['robot_skill']) : false;
                                         $robot_ability_list = !empty($robot_info['robot_abilities']) ? $robot_info['robot_abilities'] : array();
                                         $robot_ability_rewards = !empty($robot_info['robot_rewards']['abilities']) ? $robot_info['robot_rewards']['abilities'] : array();
 
@@ -3990,6 +3991,7 @@ class rpg_robot extends rpg_object {
                                         // Make sure only unique abilities are included
                                         $robot_ability_list = array_unique($robot_ability_list);
 
+                                        //error_log('$robot_ability_subcore = '.print_r($robot_ability_subcore, true));
                                         //echo('<pre>$global_abilities = '.print_r($global_abilities, true).'</pre>');
                                         //echo('<pre>$robot_ability_rewards = '.print_r($robot_ability_rewards, true).'</pre>');
                                         //echo('<pre>$robot_ability_list = '.print_r($robot_ability_list, true).'</pre>');
@@ -4008,6 +4010,7 @@ class rpg_robot extends rpg_object {
                                         $robot_copy_program = $robot_ability_core == 'copy' || $robot_ability_core2 == 'copy' ? true : false;
                                         //if ($robot_copy_program){ $robot_ability_list = $temp_all_ability_tokens; }
                                         $robot_ability_core_list = array();
+                                        $robot_ability_subcore_list = array();
                                         if ((!empty($robot_ability_core) || !empty($robot_ability_core2))
                                             && $robot_ability_class != 'mecha'){ // only robot masters can core match abilities
                                             foreach ($temp_abilities_index AS $token => $info){
@@ -4017,6 +4020,12 @@ class rpg_robot extends rpg_object {
                                                     ){
                                                     $robot_ability_list[] = $info['ability_token'];
                                                     $robot_ability_core_list[] = $info['ability_token'];
+                                                } elseif (
+                                                    (!empty($info['ability_type']) && $info['ability_type'] == $robot_ability_subcore) ||
+                                                    (!empty($info['ability_type2']) && $info['ability_type2'] == $robot_ability_subcore)
+                                                    ){
+                                                    $robot_ability_list[] = $info['ability_token'];
+                                                    $robot_ability_subcore_list[] = $info['ability_token'];
                                                 }
                                             }
                                         }
@@ -4024,6 +4033,7 @@ class rpg_robot extends rpg_object {
                                             if ($this_token == '*'){ continue; }
                                             if (!isset($new_ability_rewards[$this_token])){
                                                 if (in_array($this_token, $robot_ability_core_list)){ $new_ability_rewards[$this_token] = array('level' => 'Core', 'token' => $this_token); }
+                                                elseif (in_array($this_token, $robot_ability_subcore_list)){ $new_ability_rewards[$this_token] = array('level' => 'Subcore', 'token' => $this_token); }
                                                 else { $new_ability_rewards[$this_token] = array('level' => 'Player', 'token' => $this_token); }
 
                                             }
@@ -4031,7 +4041,7 @@ class rpg_robot extends rpg_object {
                                         $robot_ability_rewards = $new_ability_rewards;
 
                                         //echo('<pre>$global_abilities = '.print_r($global_abilities, true).'</pre>');
-                                        //echo('<pre>$robot_ability_rewards = '.print_r($robot_ability_rewards, true).'</pre>');
+                                        //error_log('<pre>$robot_ability_rewards = '.print_r($robot_ability_rewards, true).'</pre>');
                                         //exit();
 
                                         if (!empty($robot_ability_rewards)){
@@ -4039,7 +4049,7 @@ class rpg_robot extends rpg_object {
                                             $ability_key = 0;
                                             $ability_method_key = 0;
                                             $ability_method = '';
-                                            $method_order = array('level', 'core', 'player');
+                                            $method_order = array('level', 'core', 'subcore', 'player');
                                             foreach ($method_order AS $current_method){
                                                 foreach ($robot_ability_rewards AS $this_info){
                                                     if (!isset($temp_abilities_index[$this_info['token']])){ continue; }
@@ -4093,6 +4103,10 @@ class rpg_robot extends rpg_object {
 
                                                     } elseif ($this_ability_method == 'core'){
                                                         $this_ability_method_text = 'Core Match';
+                                                        $this_ability_title_html .= '<span class="level">&nbsp;</span>';
+
+                                                    } elseif ($this_ability_method == 'subcore'){
+                                                        $this_ability_method_text = 'Skill Match';
                                                         $this_ability_title_html .= '<span class="level">&nbsp;</span>';
 
                                                     }
