@@ -193,6 +193,7 @@ if (!empty($mmrpg_database_robots)){
         // Collect the robot sprite dimensions
         $robot_flag_complete = !empty($robot_info['robot_flag_complete']) ? true : false;
         $robot_flag_unlockable = !empty($robot_info['robot_flag_unlockable']) ? true : false;
+        $robot_flag_has_skill = !empty($robot_info['robot_skill']) ? true : false;
         $robot_image_size = !empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40;
         $robot_image_size_text = $robot_image_size.'x'.$robot_image_size;
         $robot_image_token = !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'];
@@ -208,7 +209,7 @@ if (!empty($mmrpg_database_robots)){
         // Start the output buffer and collect the generated markup
         ob_start();
         ?>
-        <div title="<?= $robot_title_text ?>" data-token="<?= $robot_info['robot_token'] ?>" class="float left link type <?= ($robot_image_incomplete ? 'inactive ' : '').($robot_flag_unlockable ? 'unlockable ' : '').(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none').(!empty($robot_info['robot_core2']) ? '_'.$robot_info['robot_core2'] : '') ?>">
+        <div title="<?= $robot_title_text ?>" data-token="<?= $robot_info['robot_token'] ?>" class="float left link type <?= ($robot_image_incomplete ? 'inactive ' : '').($robot_flag_unlockable ? 'unlockable ' : '').($robot_flag_has_skill ? 'has-skill ' : '').(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none').(!empty($robot_info['robot_core2']) ? '_'.$robot_info['robot_core2'] : '') ?>">
             <a class="sprite robot link mugshot size<?= $robot_image_size.($robot_key == $first_robot_token ? ' current' : '') ?>" href="<?= 'database/robots/'.$robot_info['robot_token']?>/" rel="<?= $robot_image_incomplete ? 'nofollow' : 'follow' ?>">
                 <?php if($robot_image_token != 'robot'): ?>
                     <img src="<?= $robot_image_path ?>" width="<?= $robot_image_size ?>" height="<?= $robot_image_size ?>" alt="<?= $robot_title_text ?>" />

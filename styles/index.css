@@ -1013,6 +1013,26 @@ button {
 #window .page .body .subbody_databaselinks[data-class="robots"] .group:hover .float.link[data-anchor]:not(.unlockable) {
     opacity: 1.0;
 }
+#window .page .body .subbody_databaselinks[data-class="robots"] .float.link[data-anchor].has-skill {
+    position: relative;
+}
+#window .page .body .subbody_databaselinks[data-class="robots"] .float.link[data-anchor].has-skill:after {
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 5px;
+    height: 5px;
+    font-size: 5px;
+    line-height: 5px;
+    background-color: inherit;
+    border: 1px solid #000000;
+    border-color: rgba(0, 0, 0, 0.66);
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+}
 #window .page .body .subbody .text {
     display: block;
     margin: 0 0 6px;
