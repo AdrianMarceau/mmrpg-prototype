@@ -1791,6 +1791,13 @@ button {
 #window .page .event .body.skill_bubble td.center label {
    display: inline;
 }
+#window .page .layout_compact .event .body.skill_bubble {
+   margin-top: 10px;
+}
+#window .page .layout_compact .event .body.skill_bubble td.center {
+   font-size: 11px;
+   line-height: 1.4;
+}
 #window .page .event .sprite {
     margin-bottom: 2px;
     position: static;

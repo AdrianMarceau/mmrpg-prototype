@@ -3624,9 +3624,9 @@ class rpg_robot extends rpg_object {
 
                     </div>
 
-                    <? if($print_options['layout_style'] == 'website' && !empty($robot_info['robot_skill'])): ?>
+                    <? if($print_options['layout_style'] != 'event' && !empty($robot_info['robot_skill'])): ?>
                         <? $skill_info = rpg_skill::get_index_info($robot_info['robot_skill']); ?>
-                        <div class="body body_left <?= !$print_options['show_mugshot'] ? 'fullsize' : '' ?> body_onerow skill_bubble" style="margin-top: 15px;">
+                        <div class="body body_left <?= !$print_options['show_mugshot'] ? 'fullsize' : '' ?> body_onerow skill_bubble">
                             <table class="full skill">
                                 <tbody>
                                     <tr>
