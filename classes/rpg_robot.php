@@ -1503,6 +1503,15 @@ class rpg_robot extends rpg_object {
         if ($this_robot->robot_level >= 75){ $intelligence_mod += 1; }
         if ($this_robot->robot_level >= 100){ $intelligence_mod += 1; }
 
+        // Pre-collect attack/defense/speed mod values if set
+        $this_stat_mods = array();
+        $this_stat_mods['attack'] = !empty($this_robot->counters['attack_mods']) ? $this_robot->counters['attack_mods'] : 0;
+        $this_stat_mods['defense'] = !empty($this_robot->counters['defense_mods']) ? $this_robot->counters['defense_mods'] : 0;
+        $this_stat_mods['speed'] = !empty($this_robot->counters['speed_mods']) ? $this_robot->counters['speed_mods'] : 0;
+
+        // Pre-collect a string with the robot's attachments if any
+        $this_attachment_string = !empty($this_robot->robot_attachments) ? json_encode($this_robot->robot_attachments) : '';
+
         // Define the support multiplier for this robot
         $support_multiplier = 1;
         if (in_array($this_robot->robot_token, array('roll', 'disco', 'rhythm'))){ $support_multiplier += 1; }
@@ -1516,7 +1525,13 @@ class rpg_robot extends rpg_object {
         // Define the freency of the default buster ability if set
         if ($this_robot->has_ability('buster-relay')){
             $options[] = 'buster-relay';
-            if ($num_this_robots_active > 1){ $weights[] = 3; }
+            $temp_weight = 0;
+            if ($this_stat_mods['attack'] >= 1){ $weight += 1; }
+            if ($this_stat_mods['defense'] >= 1){ $weight += 1; }
+            if ($this_stat_mods['speed'] >= 1){ $weight += 1; }
+            if (preg_match_all('/("ability_(?:[a-z]+)-buster")/i', $this_attachment_string, $matches)){ $weight += count($matches[0]); }
+            if (preg_match_all('/("ability_core-shield_(?:[a-z]+)")/i', $this_attachment_string, $matches)){ $weight += count($matches[0]); }
+            if ($num_this_robots_active > 1){ $weights[] = $temp_weight; }
             else { $weights[] = 0; }
         }
 
