@@ -105,10 +105,10 @@ define('MMRPG_SETTINGS_IMMUNITY_MULTIPLIER', 0.0); // Core boosted abilites shou
 define('MMRPG_SETTINGS_COREBOOST_MULTIPLIER', 1.50); // Core matched abilites should recive a 50% damage/recovery boost
 define('MMRPG_SETTINGS_SUBCOREBOOST_MULTIPLIER', 1.25); // Sub-Core matched abilites should recive a 25% damage/recovery boost
 define('MMRPG_SETTINGS_OMEGACOREBOOST_MULTIPLIER', 1.10); // Omega-Core matched abilites should recive a 10% damage/recovery boost
-define('MMRPG_SETTINGS_COREBONUS_MULTIPLIER', 0.50); // Core matched abilites should recive a 50% weapon enery reduction
+define('MMRPG_SETTINGS_COREBONUS_MULTIPLIER', 0.50); // Core matched abilites should recive a 50% weapon energy reduction
 define('MMRPG_SETTINGS_SUBCOREBONUS_MULTIPLIER', 0.75); // Sub-Core matched abilites should recive a 25% weapon energy reduction
-define('MMRPG_SETTINGS_NATIVEBONUS_MULTIPLIER', 0.50); // Level-up abilites should recive a 50% weapon enery reduction
-define('MMRPG_SETTINGS_MECHABONUS_MULTIPLIER', 0.50); // support mechas should receive a 50% weapon enery reduction
+define('MMRPG_SETTINGS_NATIVEBONUS_MULTIPLIER', 0.50); // Level-up abilites should recive a 50% weapon energy reduction
+define('MMRPG_SETTINGS_MECHABONUS_MULTIPLIER', 0.50); // support mechas should receive a 50% weapon energy reduction
 
 // Define the global values for shop prices and multipliers
 define('MMRPG_SETTINGS_SHOP_ABILITY_PRICE', 1500);  // use as (PRICE * ENERGY)
