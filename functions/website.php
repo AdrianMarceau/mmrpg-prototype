@@ -64,6 +64,10 @@ function mmrpg_formatting_decode($string){
         if (!empty($temp_robots_index)){ foreach ($temp_robots_index AS $token => $info){ if ($info['robot_image_size'] == 80){ $mmrpg_large_robot_images[] = $info['robot_token']; } } }
         if (!empty($temp_abilities_index)){ foreach ($temp_abilities_index AS $token => $info){ if ($info['ability_image_size'] == 80){ $mmrpg_large_ability_images[] = $info['ability_token']; } } }
 
+        // Fix any instances of objects that used to be items for our users' convenience
+        $string = preg_replace('/\[item([\:a-z0-9]+)?\]\{challenge-marker_([-_a-z0-9]+)?\}/i', '[object$1]{challenge-markers/$2}', $string);
+        $string = preg_replace('/\[item([\:a-z0-9]+)?\]\{challenge-marker?\}/i', '[object$1]{challenge-markers}', $string);
+
         // Pull in the global index formatting variables
         $mmrpg_formatting_array = array();
 
@@ -186,6 +190,12 @@ function mmrpg_formatting_decode($string){
             '/\[shop\]\{(.*?)\}/i' => '<span class="sprite_image shop sprite_image_40x40"><img src="images/shops/$1/mug_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
             '/\[shop:(left|right)\]\{(.*?)\}/i' => '<span class="sprite_image shop sprite_image_40x40"><img src="images/shops/$2/mug_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
             '/\[shop:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|command|01|02|03|04|05|06|07|08|09|10)\]\{(.*?)\}/i' => '<span class="sprite_image shop sprite_image_40x40 sprite_image_40x40_$2"><span><img src="images/shops/$3/sprite_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
+            );
+        $mmrpg_formatting_array += array(
+            // object 40x40
+            '/\[object\]\{(.*?)\}/i' => '<span class="sprite_image object sprite_image_40x40"><img src="images/objects/$1/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
+            '/\[object:(left|right)\]\{(.*?)\}/i' => '<span class="sprite_image object sprite_image_40x40"><img src="images/objects/$2/icon_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
+            '/\[object:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|command|01|02|03|04|05|06|07|08|09|10)\]\{(.*?)\}/i' => '<span class="sprite_image object sprite_image_40x40 sprite_image_40x40_$2"><span><img src="images/objects/$3/sprite_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
             );
         $mmrpg_formatting_array += array(
 
