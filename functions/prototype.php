@@ -1120,6 +1120,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 : $this_battleinfo['battle_field_base'];
             $this_targetinfo = !empty($mmrpg_index_players[$this_battleinfo['battle_target_player']['player_token']]) ? array_replace($mmrpg_index_players[$this_battleinfo['battle_target_player']['player_token']], $this_battleinfo['battle_target_player']) : $this_battleinfo['battle_target_player'];
 
+            $is_starter_battle = !empty($this_battleinfo['flags']['starter_battle']) ? true : false;
             $is_player_battle = !empty($this_battleinfo['flags']['player_battle']) ? true : false;
             $is_challenge_battle = !empty($this_battleinfo['flags']['challenge_battle']) ? true : false;
             $is_endless_battle = !empty($this_battleinfo['flags']['endless_battle']) ? true : false;
@@ -1220,9 +1221,11 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 foreach ($this_targetinfo['player_robots'] AS $this_robotinfo){
 
                     // HIDE MECHAS
-                    if (empty($this_battleinfo['flags']['starter_battle']) && empty($this_battleinfo['flags']['player_battle']) && empty($this_battleinfo['flags']['challenge_battle'])
+                    if (!$is_starter_battle && !$is_player_battle && !$is_challenge_battle
                         && !empty($this_robotinfo['robot_class']) && $this_robotinfo['robot_class'] == 'mecha'
-                        && $temp_robot_tokens_count > 1 && $this_master_count > 0){ continue; }
+                        && $temp_robot_tokens_count > 1 && $this_master_count > 0){
+                        continue;
+                    }
 
                     // Update min/max level indicators
                     $this_robot_level = !empty($this_robotinfo['robot_level']) ? $this_robotinfo['robot_level'] : 1;
