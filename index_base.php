@@ -523,7 +523,7 @@ if ($this_current_page == 'file' // File sub-pages
         | <a href="<?= MMRPG_CONFIG_ROOTURL ?>contact/">Contact &amp; Feedback</a>
         | <a rel="nofollow" href="<?= MMRPG_CONFIG_ROOTURL ?>api/" target="_blank">Data API</a>
         <?= !$flag_iphone ? '<br />' : '' ?>
-        This game is fan-made by <a href="https://plus.google.com/113336469005774860291?rel=author" target="_blank">Adrian Marceau</a>, not affiliated or endorsed by Capcom at all, and is in no way official. Any and all <a href="contact/" target="_blank">feedback</a> is appreciated. :)
+        This game is fan-made by <a href="https://github.com/AdrianMarceau" target="_blank" rel="author">Adrian Marceau</a>, not affiliated or endorsed by Capcom at all, and is in no way official. Any and all <a href="contact/" target="_blank">feedback</a> is appreciated. :)
     </div>
 
     <a id="topscroll" href="<?= $this_current_url ?>"></a>
