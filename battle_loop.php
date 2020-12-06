@@ -813,14 +813,15 @@ if (!empty($this_battle->flags['challenge_battle'])
     //$this_battle->events_create(false, false, 'debug', '$this_battle->battle_result = '.preg_replace('/\s+/', ' ', print_r($this_battle->battle_result, true)).'<br />');
 
     // Update the "accessed" count if we're at the battle start action
-    if ($this_action == 'start'
+    if ($this_action === 'start'
         && empty($this_battle->flags['challenge_battle_accessed'])){
         $db->query("UPDATE {$challenge_table} SET challenge_times_accessed = (challenge_times_accessed + 1) WHERE challenge_id = {$challenge_xid};");
         $this_battle->flags['challenge_battle_accessed'] = true;
     }
 
     // Update the "concluded" count if we're at the end of the mission (regardless of result)
-    if ($this_battle->battle_status == 'complete'
+    if ($this_action !== 'restart'
+        && $this_battle->battle_status == 'complete'
         && empty($this_battle->flags['challenge_battle_concluded'])){
 
         // Update the concluded flag regardless and count of the actual result
