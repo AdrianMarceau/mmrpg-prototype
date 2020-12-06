@@ -939,7 +939,7 @@ class rpg_game {
             if ($robot_info['robot_core'] === '' && $robot_info['robot_gender'] === 'female'){ $this_congrats = '<strong>'.$this_name.'</strong> to the rescue!'; }
 
             $this_best_stat = $robot_info['robot_energy'];
-            $this_best_attribute = 'a support';
+            $this_best_attribute = empty($robot_info['robot_core']) ? 'a support' : 'a hardy';
             if ($robot_info['robot_attack'] > $this_best_stat){ $this_best_stat = $robot_info['robot_attack']; $this_best_attribute = 'a powerful'; }
             elseif ($robot_info['robot_defense'] > $this_best_stat){ $this_best_stat = $robot_info['robot_defense']; $this_best_attribute = 'a defensive'; }
             elseif ($robot_info['robot_speed'] > $this_best_stat){ $this_best_stat = $robot_info['robot_speed']; $this_best_attribute = 'a speedy'; }

@@ -383,7 +383,7 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
         elseif ($robot_info['robot_token'] == 'roll'){ $this_best_attribute = 'a support'; }
         elseif ($robot_info['robot_token'] == 'disco'){ $this_best_attribute = 'an assault'; }
         elseif ($robot_info['robot_token'] == 'rhythm'){ $this_best_attribute = 'a technical'; }
-        elseif ($this_best_stat_kind == 'energy'){ $this_best_attribute = 'a support'; }
+        elseif ($this_best_stat_kind == 'energy'){ $this_best_attribute = empty($robot_info['robot_core']) ? 'a support' : 'a hardy'; }
         elseif ($this_best_stat_kind == 'attack'){ $this_best_attribute = 'a powerful'; }
         elseif ($this_best_stat_kind == 'defense'){ $this_best_attribute = 'a defensive'; }
         elseif ($this_best_stat_kind == 'speed'){ $this_best_attribute = 'a speedy'; }
