@@ -206,7 +206,7 @@ class rpg_mission_player extends rpg_mission {
 
             $temp_battle_omega['battle_field_base']['field_type'] = !empty($temp_field_info_one['field_type']) ? $temp_field_info_one['field_type'] : '';
             $temp_battle_omega['battle_field_base']['field_type2'] = !empty($temp_field_info_two['field_type']) ? $temp_field_info_two['field_type'] : '';
-            $temp_battle_omega['battle_field_base']['field_music'] = $temp_field_token_two;
+            $temp_battle_omega['battle_field_base']['field_music'] = !empty($temp_field_info_two['field_music']) ? $temp_field_info_two['field_music'] : $temp_field_token_two;
             $temp_battle_omega['battle_field_base']['field_background'] = $temp_field_token_one;
             $temp_battle_omega['battle_field_base']['field_foreground'] = $temp_field_token_two;
             $temp_battle_omega['battle_field_base']['field_multipliers'] = $temp_option_multipliers;
