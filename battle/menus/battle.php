@@ -8,6 +8,10 @@ ob_start();
     elseif (rpg_game::is_demo()){ $items_unlocked = true; }
     else { $items_unlocked = false; }
 
+    // Check to see whether or not switching is allowed right now
+    $switch_allowed = true;
+    if ($this_battle->counters['battle_turn'] < 1){ $switch_allowed = false; }
+
     // If the current robot is not disabled and is active
     if ($this_robot->robot_energy > 0 && $this_robot->robot_position == 'active'){
 
@@ -24,7 +28,7 @@ ob_start();
         ?></div><?
 
         // Display the available sub options
-        ?><div class="sub_actions" data-size="<?= $items_unlocked ? 4 : 3 ?>"><?
+        ?><div class="sub_actions" data-size="<?= $items_unlocked && $switch_allowed ? 4 : 3 ?>"><?
 
             // Display the SCAN option
             if ($target_player->counters['robots_active'] > 1){
@@ -50,8 +54,11 @@ ob_start();
             $dataOrder++;
 
             // Display the SWITCH option
-            ?><a class="button action_switch" type="button" data-panel="switch" data-order="<?= $dataOrder ?>"><label>Switch</label></a><?
-            $dataOrder++;
+            if ($switch_allowed){
+                $temp_disabled = false;
+                ?><a class="button action_switch <?= $temp_disabled ? 'button_disabled' : '' ?>" type="button" <?= !$temp_disabled ? 'data-panel="switch"' : '' ?> <?= !$temp_disabled ? 'data-order="'.$dataOrder.'"' : '' ?>><label>Switch</label></a><?
+                $dataOrder++;
+            }
 
         ?></div><?
     }

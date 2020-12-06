@@ -2901,6 +2901,9 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .sub_actions[data-size="3"] .button {
     width: 244px;
 }
+#actions .sub_actions[data-size="3"] .button:last-child {
+    margin-right: 0;
+}
 #actions .sub_actions .button label,
 #actions .actions_battle .action_target label {
     width: auto;
