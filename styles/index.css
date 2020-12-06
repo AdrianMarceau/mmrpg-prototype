@@ -4939,6 +4939,54 @@ body.windowFlag_landscapeMode #window .page .type_block {
 #window .page .body .community .sprite_image_40x40_base2 span img,
 #window .page .body .community .sprite_image_40x40_11 span img { margin-left: -400px; }
 
+
+#window .page .body .community .player.sprite_image_40x40_base span img,
+#window .page .body .community .player.sprite_image_40x40_01 span img { margin-left: 0; }
+#window .page .body .community .player.sprite_image_40x40_taunt span img,
+#window .page .body .community .player.sprite_image_40x40_02 span img { margin-left: -40px; }
+#window .page .body .community .player.sprite_image_40x40_victory span img,
+#window .page .body .community .player.sprite_image_40x40_03 span img { margin-left: -80px; }
+#window .page .body .community .player.sprite_image_40x40_defeat span img,
+#window .page .body .community .player.sprite_image_40x40_04 span img { margin-left: -120px; }
+#window .page .body .community .player.sprite_image_40x40_command span img,
+#window .page .body .community .player.sprite_image_40x40_05 span img { margin-left: -160px; }
+#window .page .body .community .player.sprite_image_40x40_damage span img,
+#window .page .body .community .player.sprite_image_40x40_06 span img { margin-left: -200px; }
+#window .page .body .community .player.sprite_image_40x40_base2 span img,
+#window .page .body .community .player.sprite_image_40x40_07 span img { margin-left: -240px; }
+#window .page .body .community .player.sprite_image_40x40_xxx span img,
+#window .page .body .community .player.sprite_image_40x40_08 span img { margin-left: -280px; }
+#window .page .body .community .player.sprite_image_40x40_xxx span img,
+#window .page .body .community .player.sprite_image_40x40_09 span img { margin-left: -320px; }
+#window .page .body .community .player.sprite_image_40x40_xxx span img,
+#window .page .body .community .player.sprite_image_40x40_10 span img { margin-left: -360px; }
+#window .page .body .community .player.sprite_image_40x40_xxx span img,
+#window .page .body .community .player.sprite_image_40x40_11 span img { margin-left: -400px; }
+
+
+#window .page .body .community .shop.sprite_image_40x40_base span img,
+#window .page .body .community .shop.sprite_image_40x40_01 span img { margin-left: 0; }
+#window .page .body .community .shop.sprite_image_40x40_base2 span img,
+#window .page .body .community .shop.sprite_image_40x40_02 span img { margin-left: -40px; }
+#window .page .body .community .shop.sprite_image_40x40_xxx span img,
+#window .page .body .community .shop.sprite_image_40x40_03 span img { margin-left: -80px; }
+#window .page .body .community .shop.sprite_image_40x40_xxx span img,
+#window .page .body .community .shop.sprite_image_40x40_04 span img { margin-left: -120px; }
+#window .page .body .community .shop.sprite_image_40x40_xxx span img,
+#window .page .body .community .shop.sprite_image_40x40_05 span img { margin-left: -160px; }
+#window .page .body .community .shop.sprite_image_40x40_xxx span img,
+#window .page .body .community .shop.sprite_image_40x40_06 span img { margin-left: -200px; }
+#window .page .body .community .shop.sprite_image_40x40_xxx span img,
+#window .page .body .community .shop.sprite_image_40x40_07 span img { margin-left: -240px; }
+#window .page .body .community .shop.sprite_image_40x40_xxx span img,
+#window .page .body .community .shop.sprite_image_40x40_08 span img { margin-left: -280px; }
+#window .page .body .community .shop.sprite_image_40x40_xxx span img,
+#window .page .body .community .shop.sprite_image_40x40_09 span img { margin-left: -320px; }
+#window .page .body .community .shop.sprite_image_40x40_xxx span img,
+#window .page .body .community .shop.sprite_image_40x40_10 span img { margin-left: -360px; }
+#window .page .body .community .shop.sprite_image_40x40_xxx span img,
+#window .page .body .community .shop.sprite_image_40x40_11 span img { margin-left: -400px; }
+
 #window .page .body .community .sprite_image_80x80 img {
     display: inline-block;
     margin-top: -24px;
