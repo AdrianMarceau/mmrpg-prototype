@@ -1217,6 +1217,7 @@ class rpg_battle extends rpg_object {
                 else { $this_star_rating -= 1; $reward_mod_strings[] = 'Team Penalty: x'.$temp_bonus_multiplier.''; }
                 $total_zenny_rewards = ceil($total_zenny_rewards * $temp_bonus_multiplier);
             } else {
+                if ($temp_target_robot_limit == 1 && $this_player->counters['robots_start_total'] == 1){ $this_star_rating += 1; }
                 $reward_mod_strings[] = 'Team Bonus: ---';
             }
             if (!empty($reward_mod_strings)){
