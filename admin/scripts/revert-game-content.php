@@ -32,7 +32,13 @@ $revert_paths_bytoken = array();
 // If the "all" token was explicitly provided, we're going to revert everything
 if ($request_token === 'all'){
     // All all git changes to the list of revert paths
-    foreach ($mmrpg_git_changes AS $key => $path){ list($token) = explode('/', $path); if (!in_array($token, $revert_tokens)){ $revert_tokens[] = $token; } }
+    foreach ($mmrpg_git_changes AS $key => $path){
+        list($token, $file_or_subtoken) = explode('/', $path);
+        if ($token === '_groups'){ $token .= '/'.$file_or_subtoken; }
+        if (!in_array($token, $revert_tokens)){
+            $revert_tokens[] = $token;
+        }
+    }
     foreach ($revert_tokens AS $key => $token){
         $filtered_paths = cms_admin::git_filter_list_by_path($mmrpg_git_changes, $token.'/');
         $revert_paths = array_merge($revert_paths, $filtered_paths);

@@ -37,7 +37,13 @@ $commit_paths_bytoken = array();
 // If the "all" token was explicitly provided, we're going to commit everything
 if ($request_token === 'all'){
     // All all git changes to the list of commit paths
-    foreach ($mmrpg_git_changes AS $key => $path){ list($token) = explode('/', $path); if (!in_array($token, $commit_tokens)){ $commit_tokens[] = $token; } }
+    foreach ($mmrpg_git_changes AS $key => $path){
+        list($token, $file_or_subtoken) = explode('/', $path);
+        if ($token === '_groups'){ $token .= '/'.$file_or_subtoken; }
+        if (!in_array($token, $commit_tokens)){
+            $commit_tokens[] = $token;
+        }
+    }
     foreach ($commit_tokens AS $key => $token){
         $filtered_paths = cms_admin::git_filter_list_by_path($mmrpg_git_changes, $token.'/');
         $commit_paths = array_merge($commit_paths, $filtered_paths);
