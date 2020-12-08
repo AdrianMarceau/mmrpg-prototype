@@ -820,7 +820,11 @@ if (!empty($this_battle->flags['challenge_battle'])
     }
 
     // Update the "concluded" count if we're at the end of the mission (regardless of result)
-    if ($this_action !== 'restart'
+    if (empty($this_redirect)
+        && $this_action !== 'start'
+        && $this_action !== 'restart'
+        && $this_action !== 'prototype'
+        && $this_action !== 'next'
         && $this_battle->battle_status == 'complete'
         && empty($this_battle->flags['challenge_battle_concluded'])){
 
@@ -871,12 +875,12 @@ if (!empty($this_battle->flags['challenge_battle'])
                 ), $new_percent, $new_rank);
 
             /*
-            $this_battle->events_create(false, false, 'DEBUG', 'NEW results = '.print_r(array(
+            error_log('NEW results = '.print_r(array(
                 'challenge_turns_used' => $temp_player_turns_used,
                 'challenge_turn_limit' => $temp_target_turn_limit,
                 'challenge_robots_used' => $temp_player_robots_used,
                 'challenge_robot_limit' => $temp_target_robot_limit
-                ), true).' <br /> '.
+                ), true).' '.PHP_EOL.
                 ' $new_points = '.$new_points.
                 ' | $new_percent = '.$new_percent.
                 ' | $new_rank = '.$new_rank
@@ -895,12 +899,12 @@ if (!empty($this_battle->flags['challenge_battle'])
                     ), $old_percent, $old_rank);
 
                 /*
-                $this_battle->events_create(false, false, 'DEBUG', 'OLD results = '.print_r(array(
+                error_log('OLD results = '.print_r(array(
                     'challenge_turns_used' => $existing_db_row['challenge_turns_used'],
                     'challenge_turn_limit' => $temp_target_turn_limit,
                     'challenge_robots_used' => $existing_db_row['challenge_robots_used'],
                     'challenge_robot_limit' => $temp_target_robot_limit
-                    ), true).' <br /> '.
+                    ), true).' '.PHP_EOL.
                     ' $old_points = '.$old_points.
                     ' | $old_percent = '.$old_percent.
                     ' | $old_rank = '.$old_rank
@@ -915,7 +919,7 @@ if (!empty($this_battle->flags['challenge_battle'])
                 $condition_data['user_id'] = $this_user_id;
                 $condition_data['challenge_id'] = $challenge_xid;
                 $db->update($challenge_leaderboard_table, $update_fields, $condition_data);
-                //$this_battle->events_create(false, false, 'DEBUG', '$update_fields = '.print_r($update_fields, true).'<br />'.'$condition_data = '.print_r($condition_data, true));
+                //error_log('$update_fields = '.print_r($update_fields, true).'<br />'.'$condition_data = '.print_r($condition_data, true));
 
             } else {
 
@@ -926,7 +930,7 @@ if (!empty($this_battle->flags['challenge_battle'])
                 $insert_fields['challenge_result'] = 'victory';
                 $insert_fields['challenge_date_firstclear'] = time();
                 $db->insert($challenge_leaderboard_table, $insert_fields);
-                //$this_battle->events_create(false, false, 'DEBUG', '$insert_fields = '.print_r($insert_fields, true));
+                //error_log('$insert_fields = '.print_r($insert_fields, true));
 
             }
 
