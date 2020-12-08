@@ -1016,8 +1016,7 @@ button {
 #window .page .body .subbody_databaselinks[data-class="robots"] .float.link[data-anchor].has-skill {
     position: relative;
 }
-#window .page .body .subbody_databaselinks[data-class="robots"] .float.link[data-anchor].has-skill:after {
-    content: "";
+#window .page .body .subbody_databaselinks[data-class="robots"] .float.link[data-anchor].has-skill i.skill {
     display: block;
     position: absolute;
     bottom: -2px;
@@ -1027,8 +1026,8 @@ button {
     font-size: 5px;
     line-height: 5px;
     background-color: inherit;
-    border: 1px solid #ffffff;
-    border-color: rgba(255, 255, 255, 0.66);
+    border: 1px solid #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.33) !important;
     -moz-border-radius: 50%;
     -webkit-border-radius: 50%;
     border-radius: 50%;

@@ -39,6 +39,7 @@ if (isset($mmrpg_database_robots_filter)){
 }
 
 // Collect the database fields
+$mmrpg_database_skills = rpg_skill::get_index();
 $mmrpg_database_fields = rpg_field::get_index(true, false);
 
 // Collect the database robots
@@ -194,13 +195,18 @@ if (!empty($mmrpg_database_robots)){
         $robot_flag_complete = !empty($robot_info['robot_flag_complete']) ? true : false;
         $robot_flag_unlockable = !empty($robot_info['robot_flag_unlockable']) ? true : false;
         $robot_flag_has_skill = !empty($robot_info['robot_skill']) ? true : false;
+        $robot_core_type = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none';
+        $robot_core_type2 = !empty($robot_info['robot_core']) && !empty($robot_info['robot_core2']) ? $robot_info['robot_core2'] : '';
+        $robot_core_class = $robot_core_type.(!empty($robot_core_type2) ? '_'.$robot_core_type2 : '');
+        $robot_flag_has_skill_type = $robot_flag_has_skill && strstr($robot_info['robot_skill'], '-subcore') ? str_replace('-subcore', '', $robot_info['robot_skill']) : $robot_core_type;
         $robot_image_size = !empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40;
         $robot_image_size_text = $robot_image_size.'x'.$robot_image_size;
         $robot_image_token = !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'];
         $robot_image_incomplete = $robot_image_token == 'robot' ? true : false;
         $robot_is_active = !empty($this_current_token) && $this_current_token == $robot_info['robot_token'] ? true : false;
         $robot_title_text = $robot_info['robot_name'].$robot_info['robot_name_append'].' | '.$robot_info['robot_number'].' | '.(!empty($robot_info['robot_core']) ? ucwords($robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? ' / '.$robot_info['robot_core2'] : '')) : 'Neutral').' Core';
-        $robot_title_text .= '|| [[E:'.$robot_info['robot_energy'].' | W:'.$robot_info['robot_weapons'].' | A:'.$robot_info['robot_attack'].' | D:'.$robot_info['robot_defense'].' | S:'.$robot_info['robot_speed'].']]';
+        $robot_title_text .= '|| [[E:'.$robot_info['robot_energy'].' | W:'.$robot_info['robot_weapons'].' | A:'.$robot_info['robot_attack'].' | D:'.$robot_info['robot_defense'].' | S:'.$robot_info['robot_speed'].']] ';
+        if ($robot_flag_has_skill){ $robot_title_text .= '|| [[Passive Skill : '.(!empty($robot_info['robot_skill_name']) ? $robot_info['robot_skill_name'] : $mmrpg_database_skills[$robot_info['robot_skill']]['skill_name']).']] '; }
         //$robot_title_text .= ' | game:'.$robot_info['robot_game'].' | group:'.$robot_info['robot_group'];
         $robot_image_path = 'images/robots/'.$robot_image_token.'/mug_right_'.$robot_image_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
         $robot_stat_max = $robot_info['robot_energy'] + $robot_info['robot_attack'] + $robot_info['robot_defense'] + $robot_info['robot_speed'];
@@ -209,7 +215,7 @@ if (!empty($mmrpg_database_robots)){
         // Start the output buffer and collect the generated markup
         ob_start();
         ?>
-        <div title="<?= $robot_title_text ?>" data-token="<?= $robot_info['robot_token'] ?>" class="float left link type <?= ($robot_image_incomplete ? 'inactive ' : '').($robot_flag_unlockable ? 'unlockable ' : '').($robot_flag_has_skill ? 'has-skill ' : '').(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none').(!empty($robot_info['robot_core2']) ? '_'.$robot_info['robot_core2'] : '') ?>">
+        <div title="<?= $robot_title_text ?>" data-token="<?= $robot_info['robot_token'] ?>" class="float left link type <?= $robot_core_class ?> <?= ($robot_image_incomplete ? 'inactive ' : '').($robot_flag_unlockable ? 'unlockable ' : '').($robot_flag_has_skill ? 'has-skill ' : '') ?>">
             <a class="sprite robot link mugshot size<?= $robot_image_size.($robot_key == $first_robot_token ? ' current' : '') ?>" href="<?= 'database/robots/'.$robot_info['robot_token']?>/" rel="<?= $robot_image_incomplete ? 'nofollow' : 'follow' ?>">
                 <?php if($robot_image_token != 'robot'): ?>
                     <img src="<?= $robot_image_path ?>" width="<?= $robot_image_size ?>" height="<?= $robot_image_size ?>" alt="<?= $robot_title_text ?>" />
@@ -217,6 +223,7 @@ if (!empty($mmrpg_database_robots)){
                     <span><?= $robot_info['robot_name'].$robot_info['robot_name_append'] ?></span>
                 <?php endif; ?>
             </a>
+            <?= $robot_flag_has_skill ? '<i class="skill type '.$robot_flag_has_skill_type.'"></i>' : '' ?>
         </div>
         <?php
         if ($robot_flag_complete){ $mmrpg_database_robots_count_complete++; }
