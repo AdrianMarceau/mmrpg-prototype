@@ -521,7 +521,7 @@ if ($this_current_page == 'file' // File sub-pages
         Mega Man and all related names and characters are &copy; <a href="http://www.capcom.com/" target="_blank" rel="nofollow">Capcom</a> 1986 - <?= date('Y') ?>.
         | <a href="<?= MMRPG_CONFIG_ROOTURL ?>cookies/">Cookie Policy</a>
         | <a href="<?= MMRPG_CONFIG_ROOTURL ?>contact/">Contact &amp; Feedback</a>
-        | <a rel="nofollow" href="<?= MMRPG_CONFIG_ROOTURL ?>api/" target="_blank">Data API</a>
+        | <a rel="nofollow" href="<?= MMRPG_CONFIG_ROOTURL ?>api/v2/" target="_blank">Data API</a>
         <?= !$flag_iphone ? '<br />' : '' ?>
         This game is fan-made by <a href="https://github.com/AdrianMarceau" target="_blank" rel="author">Adrian Marceau</a>, not affiliated or endorsed by Capcom at all, and is in no way official. Any and all <a href="contact/" target="_blank">feedback</a> is appreciated. :)
     </div>
