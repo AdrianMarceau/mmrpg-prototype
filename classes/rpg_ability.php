@@ -2404,7 +2404,6 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function to use as a common action for all stat boosting without any mods
-    //ability_function_fixed_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = '')
     public static function ability_function_fixed_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_object = false, $trigger_options = array()){
         $trigger_options['is_fixed_amount'] = true;
         self::ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_object, $trigger_options);
@@ -2412,7 +2411,6 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function to use as a common action for all stat breaking without any mods
-    //ability_function_fixed_stat_break($target_robot, $stat_type, $break_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = '')
     public static function ability_function_fixed_stat_break($target_robot, $stat_type, $break_amount, $trigger_object = false, $trigger_options = array()){
         $trigger_options['is_fixed_amount'] = true;
         self::ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_object, $trigger_options);
@@ -2434,7 +2432,6 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function to use as a common action for all stat boosting
-    //ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_object = false, $success_frame = 0, $failure_frame = 9, $extra_text = '', $item_redirect = false, $allow_item_effects = true, $is_fixed_amount = false)
     public static function ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_object = false, $trigger_options = array()){
 
         // Collect or defined required variables from the trigger options
@@ -2588,7 +2585,6 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function to use as a common action for all stat breaking
-    //ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_object = false, $success_frame = 0, $failure_frame = 9, $extra_text = '', $item_redirect = false, $allow_item_effects = true, $is_fixed_amount = false)
     public static function ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_object = false, $trigger_options = array()){
 
         // Collect or defined required variables from the trigger options
