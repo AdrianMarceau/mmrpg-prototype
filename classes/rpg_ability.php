@@ -2404,32 +2404,47 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function to use as a common action for all stat boosting without any mods
-    public static function ability_function_fixed_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = ''){
-        self::ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_ability, $success_frame, $failure_frame, $extra_text, false, true, true);
+    //ability_function_fixed_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = '')
+    public static function ability_function_fixed_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_object = false, $trigger_options = array()){
+        $trigger_options['is_fixed_amount'] = true;
+        self::ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_object, $trigger_options);
         return true;
     }
 
     // Define a static function to use as a common action for all stat breaking without any mods
-    public static function ability_function_fixed_stat_break($target_robot, $stat_type, $break_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = ''){
-        self::ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_ability, $success_frame, $failure_frame, $extra_text, false, true, true);
+    //ability_function_fixed_stat_break($target_robot, $stat_type, $break_amount, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = '')
+    public static function ability_function_fixed_stat_break($target_robot, $stat_type, $break_amount, $trigger_object = false, $trigger_options = array()){
+        $trigger_options['is_fixed_amount'] = true;
+        self::ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_object, $trigger_options);
         return true;
     }
 
     // Define a static function to use as a common action for all stat resetting
-    public static function ability_function_stat_reset($target_robot, $stat_type, $trigger_ability = false, $success_frame = 0, $failure_frame = 9, $extra_text = ''){
+    public static function ability_function_stat_reset($target_robot, $stat_type, $trigger_object = false, $trigger_options = array()){
+        $trigger_options['is_fixed_amount'] = true;
         if ($target_robot->counters[$stat_type.'_mods'] < 0){
             $boost_amount = $target_robot->counters[$stat_type.'_mods'] * -1;
-            self::ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_ability, $success_frame, $failure_frame, $extra_text, false, true, true);
+            self::ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_object, $trigger_options);
         } elseif ($target_robot->counters[$stat_type.'_mods'] > 0){
             $break_amount = $target_robot->counters[$stat_type.'_mods'];
-            self::ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_ability, $success_frame, $failure_frame, $extra_text, false, true, true);
+            self::ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_object, $trigger_options);
         } else {
             return false;
         }
     }
 
     // Define a static function to use as a common action for all stat boosting
-    public static function ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_object = false, $success_frame = 0, $failure_frame = 9, $extra_text = '', $item_redirect = false, $allow_item_effects = true, $is_fixed_amount = false){
+    //ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_object = false, $success_frame = 0, $failure_frame = 9, $extra_text = '', $item_redirect = false, $allow_item_effects = true, $is_fixed_amount = false)
+    public static function ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_object = false, $trigger_options = array()){
+
+        // Collect or defined required variables from the trigger options
+        $initiator_robot = isset($trigger_options['initiator_robot']) ? $trigger_options['initiator_robot'] : false;
+        $success_frame = isset($trigger_options['success_frame']) ? $trigger_options['success_frame'] : 0;
+        $failure_frame = isset($trigger_options['failure_frame']) ? $trigger_options['failure_frame'] : 9;
+        $extra_text = isset($trigger_options['extra_text']) ? $trigger_options['extra_text'] : '';
+        $is_redirect = isset($trigger_options['is_redirect']) ? $trigger_options['is_redirect'] : false;
+        $allow_custom_effects = isset($trigger_options['allow_custom_effects']) ? $trigger_options['allow_custom_effects'] : true;
+        $is_fixed_amount = isset($trigger_options['is_fixed_amount']) ? $trigger_options['is_fixed_amount'] : false;
 
         // Exit or redirect if amount doesn't make sense here
         if (empty($boost_amount)){
@@ -2440,12 +2455,7 @@ class rpg_ability extends rpg_object {
                 $stat_type,
                 ($boost_amount * -1),
                 $trigger_object,
-                $success_frame,
-                $failure_frame,
-                $extra_text,
-                $item_redirect,
-                $allow_item_effects,
-                $is_fixed_amount
+                $trigger_options
                 );
         }
 
@@ -2465,16 +2475,22 @@ class rpg_ability extends rpg_object {
         $options->success_frame = $success_frame;
         $options->failure_frame = $failure_frame;
         $options->extra_text = $extra_text;
-        $options->item_redirect = $item_redirect;
-        $options->allow_item_effects = $allow_item_effects;
+        $options->is_redirect = $is_redirect;
+        $options->allow_custom_effects = $allow_custom_effects;
         $options->is_fixed_amount = $is_fixed_amount;
         $extra_objects = array('options' => $options);
         $extra_objects['this_ability'] = $trigger_ability;
         $extra_objects['this_item'] = $trigger_item;
         $extra_objects['this_skill'] = $trigger_skill;
+        $extra_objects['initiator_robot'] = !empty($initiator_robot) ? $initiator_robot : $target_robot;
+        $extra_objects['recipient_robot'] = $target_robot;
 
         // Trigger this robot's item function if one has been defined for this context
-        if ($options->allow_item_effects && !$options->item_redirect){
+        if ($options->allow_custom_effects && !$options->is_redirect){
+            if (!empty($initiator_robot) && $initiator_robot !== $target_robot){
+                $initiator_robot->trigger_custom_function('rpg-ability_stat-boost_before', $extra_objects);
+                if ($options->return_early){ return $options->return_value; }
+            }
             $target_robot->trigger_custom_function('rpg-ability_stat-boost_before', $extra_objects);
             if ($options->return_early){ return $options->return_value; }
         }
@@ -2498,7 +2514,11 @@ class rpg_ability extends rpg_object {
         }
 
         // Trigger this robot's item function if one has been defined for this context
-        if ($options->allow_item_effects && !$options->item_redirect){
+        if ($options->allow_custom_effects && !$options->is_redirect){
+            if (!empty($initiator_robot) && $initiator_robot !== $target_robot){
+                $initiator_robot->trigger_custom_function('rpg-ability_stat-boost_middle', $extra_objects);
+                if ($options->return_early){ return $options->return_value; }
+            }
             $target_robot->trigger_custom_function('rpg-ability_stat-boost_middle', $extra_objects);
             if ($options->return_early){ return $options->return_value; }
         }
@@ -2560,29 +2580,37 @@ class rpg_ability extends rpg_object {
         }
 
         // Trigger this robot's item function if one has been defined for this context
-        if ($options->allow_item_effects && !$options->item_redirect){
+        if ($options->allow_custom_effects && !$options->is_redirect){
+            if (!empty($initiator_robot) && $initiator_robot !== $target_robot){ $initiator_robot->trigger_custom_function('rpg-ability_stat-boost_after', $extra_objects); }
             $target_robot->trigger_custom_function('rpg-ability_stat-boost_after', $extra_objects);
         }
 
     }
 
     // Define a static function to use as a common action for all stat breaking
-    public static function ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_object = false, $success_frame = 0, $failure_frame = 9, $extra_text = '', $item_redirect = false, $allow_item_effects = true, $is_fixed_amount = false){
+    //ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_object = false, $success_frame = 0, $failure_frame = 9, $extra_text = '', $item_redirect = false, $allow_item_effects = true, $is_fixed_amount = false)
+    public static function ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_object = false, $trigger_options = array()){
+
+        // Collect or defined required variables from the trigger options
+        $initiator_robot = isset($trigger_options['initiator_robot']) ? $trigger_options['initiator_robot'] : false;
+        $success_frame = isset($trigger_options['success_frame']) ? $trigger_options['success_frame'] : 0;
+        $failure_frame = isset($trigger_options['failure_frame']) ? $trigger_options['failure_frame'] : 9;
+        $extra_text = isset($trigger_options['extra_text']) ? $trigger_options['extra_text'] : '';
+        $is_redirect = isset($trigger_options['is_redirect']) ? $trigger_options['is_redirect'] : false;
+        $allow_custom_effects = isset($trigger_options['allow_custom_effects']) ? $trigger_options['allow_custom_effects'] : true;
+        $is_fixed_amount = isset($trigger_options['is_fixed_amount']) ? $trigger_options['is_fixed_amount'] : false;
 
         // Exit or redirect if amount doesn't make sense here
-        if (empty($break_amount)){ return false; }
-        elseif ($break_amount < 0){
+        if (empty($break_amount)){
+            return false;
+        } elseif ($break_amount < 0){
             return self::ability_function_stat_boost(
+                $this_robot,
                 $target_robot,
                 $stat_type,
                 ($break_amount * -1),
                 $trigger_object,
-                $success_frame,
-                $failure_frame,
-                $extra_text,
-                $item_redirect,
-                $allow_item_effects,
-                $is_fixed_amount
+                $trigger_options
                 );
             }
 
@@ -2602,16 +2630,22 @@ class rpg_ability extends rpg_object {
         $options->success_frame = $success_frame;
         $options->failure_frame = $failure_frame;
         $options->extra_text = $extra_text;
-        $options->item_redirect = $item_redirect;
-        $options->allow_item_effects = $allow_item_effects;
+        $options->is_redirect = $is_redirect;
+        $options->allow_custom_effects = $allow_custom_effects;
         $options->is_fixed_amount = $is_fixed_amount;
         $extra_objects = array('options' => $options);
         $extra_objects['this_ability'] = $trigger_ability;
         $extra_objects['this_item'] = $trigger_item;
         $extra_objects['this_skill'] = $trigger_skill;
+        $extra_objects['initiator_robot'] = !empty($initiator_robot) ? $initiator_robot : $target_robot;
+        $extra_objects['recipient_robot'] = $target_robot;
 
         // Trigger this robot's item function if one has been defined for this context
-        if ($options->allow_item_effects && !$options->item_redirect){
+        if ($options->allow_custom_effects && !$options->is_redirect){
+            if (!empty($initiator_robot) && $initiator_robot !== $target_robot){
+                $initiator_robot->trigger_custom_function('rpg-ability_stat-break_before', $extra_objects);
+                if ($options->return_early){ return $options->return_value; }
+            }
             $target_robot->trigger_custom_function('rpg-ability_stat-break_before', $extra_objects);
             if ($options->return_early){ return $options->return_value; }
         }
@@ -2635,7 +2669,11 @@ class rpg_ability extends rpg_object {
         }
 
         // Trigger this robot's item function if one has been defined for this context
-        if ($options->allow_item_effects && !$options->item_redirect){
+        if ($options->allow_custom_effects && !$options->is_redirect){
+            if (!empty($initiator_robot) && $initiator_robot !== $target_robot){
+                $initiator_robot->trigger_custom_function('rpg-ability_stat-break_middle', $extra_objects);
+                if ($options->return_early){ return $options->return_value; }
+            }
             $target_robot->trigger_custom_function('rpg-ability_stat-break_middle', $extra_objects);
             if ($options->return_early){ return $options->return_value; }
         }
@@ -2698,7 +2736,8 @@ class rpg_ability extends rpg_object {
         }
 
         // Trigger this robot's item function if one has been defined for this context
-        if ($options->allow_item_effects && !$options->item_redirect){
+        if ($options->allow_custom_effects && !$options->is_redirect){
+            if (!empty($initiator_robot) && $initiator_robot !== $target_robot){ $initiator_robot->trigger_custom_function('rpg-ability_stat-break_after', $extra_objects); }
             $target_robot->trigger_custom_function('rpg-ability_stat-break_after', $extra_objects);
         }
 
