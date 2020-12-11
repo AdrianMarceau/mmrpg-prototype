@@ -769,6 +769,11 @@ class rpg_robot extends rpg_object {
     public function get_attachment($token){ return $this->get_info('robot_attachments', $token); }
     public function set_attachment($token, $value){ $this->set_info('robot_attachments', $token, $value); }
     public function unset_attachment($token){ return $this->unset_info('robot_attachments', $token); }
+    public function update_attachment($token, $key, $value){
+        $args = func_get_args();
+        array_unshift($args, 'robot_attachments');
+        call_user_func_array(array($this, 'set_info'), $args);
+    }
 
     public function get_attachments(){ return $this->get_info('robot_attachments'); }
     public function set_attachments($value){ $this->set_info('robot_attachments', $value); }

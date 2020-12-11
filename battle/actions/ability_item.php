@@ -380,6 +380,138 @@ if ($target_action == 'switch'){
 
 }
 
+// Now execute the stored actions
+$this_battle->actions_execute();
+
+// If the target has been disabled but for some reason hasn't switched
+$active_target_robot = $target_player->get_active_robot();
+if (!empty($active_target_robot)
+    && ($active_target_robot->robot_status == 'disabled'
+        || $active_target_robot->robot_energy == 0)){
+
+    // Prepend a switch action for the target robot
+    $this_battle->actions_append(
+        $target_player,
+        $active_target_robot,
+        $this_player,
+        $this_robot,
+        'switch',
+        ''
+        );
+
+    // Now execute the stored actions
+    $this_battle->actions_execute();
+
+}
+
+// Execute any remaining end-of-turn actions that were queued
+$this_battle->actions_execute(true);
+
+// DEBUG
+if (empty($this_robot)){
+    die('<pre>$this_robot is empty on line '.__LINE__.'! :'.print_r($this_robot, true).'</pre>');
+} elseif (empty($target_robot)){
+    die('<pre>$target_robot is empty on line '.__LINE__.'! :'.print_r($target_robot, true).'</pre>');
+}
+
+// If empty, replace active target robot
+if (empty($active_target_robot)){ $active_target_robot = $target_player->get_active_robot(); }
+
+// Refresh the backed up target robot
+$target_robot = rpg_game::get_robot($this_battle, $target_player, array('robot_id' => $backup_target_robot_id, 'robot_token' => $backup_target_robot_token));
+if ($target_robot->robot_status == 'disabled'
+    && !empty($active_target_robot)){
+
+    // Recollect the active target robot for the sake of auto targetting
+    $target_robot = rpg_game::get_robot($this_battle, $target_player, array('robot_id' => $active_target_robot->robot_id, 'robot_token' => $active_target_robot->robot_token));
+
+}
+
+// Loop through the target robots and hide any disabled robots
+foreach ($target_player->player_robots AS $temp_robotinfo){
+    if ($temp_robotinfo['robot_status'] == 'disabled'){
+        $temp_robot = rpg_game::get_robot($this_battle, $target_player, array('robot_id' => $temp_robotinfo['robot_id'], 'robot_token' => $temp_robotinfo['robot_token']));
+        $temp_robot->flags['apply_disabled_state'] = true;
+        $temp_robot->update_session();
+    }
+}
+
+// DEBUG
+if (empty($this_robot)){
+    die('<pre>$this_robot is empty on line '.__LINE__.'! :'.print_r($this_robot, true).'</pre>');
+} elseif (empty($target_robot)){
+    die('<pre>$target_robot is empty on line '.__LINE__.'! :'.print_r($target_robot, true).'</pre>');
+}
+
+// If the target's was a switch action, also queue up an ability
+if ($target_action == 'switch'){
+
+    // Now execute the stored actions
+    $this_battle->actions_execute();
+
+    // Update the active robot reference just in case it has changed
+    foreach ($target_player->player_robots AS $temp_robotinfo){
+        if ($temp_robotinfo['robot_position'] == 'active'){
+            $active_target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_robotinfo);
+            $active_target_robot->robot_position = 'active';
+            $active_target_robot->update_session();
+        } else {
+            $temp_robot = rpg_game::get_robot($this_battle, $target_player, $temp_robotinfo);
+            $temp_robot->robot_position = 'bench';
+            $temp_robot->update_session();
+        }
+    }
+
+    // Use the first target robot as active if one could not be found
+    if (empty($active_target_robot)){
+        $active_target_robot = rpg_game::get_robot($this_battle, $target_player, $target_player->player_robots[0]);
+        $active_target_robot->robot_position = 'active';
+        $active_target_robot->update_session();
+    }
+
+    // Collect the ability choice from the robot
+    $temp_token = rpg_robot::robot_choices_abilities(array(
+        'this_battle' => $this_battle,
+        'this_field' => $this_field,
+        'this_player' => $target_player,
+        'this_robot' => $active_target_robot,
+        'target_player' => $this_player,
+        'target_robot' => $this_robot
+        ));
+    $temp_id = array_search($temp_token, $active_target_robot->robot_abilities);
+    $target_action_token = $temp_id.'_'.$temp_token;
+
+    // If this robot was targetting itself
+    if ($this_robot->robot_id == $target_robot->robot_id){
+
+        // And when the switch is done, queue up an ability for this new target robot to use
+        if ($active_target_robot->robot_status != 'disabled' && $active_target_robot->robot_position != 'bench'){
+            $this_battle->actions_append($target_player, $active_target_robot, $this_player, $this_robot, 'ability', $target_action_token);
+        }
+
+    }
+    // Else if this robot was tartetting a team mate
+    elseif ($temp_ability_info['ability_target'] == 'select_this'
+        || $temp_ability_info['ability_target'] == 'select_this_ally'){
+
+        // And when the switch is done, queue up an ability for this new target robot to use
+        if ($active_target_robot->robot_status != 'disabled' && $active_target_robot->robot_position != 'bench'){
+            $this_battle->actions_append($target_player, $active_target_robot, $this_player, $this_robot, 'ability', $target_action_token);
+        }
+
+    }
+    // Otherwise if this was a normal switch by the target
+    else {
+
+        // And when the switch is done, queue up an ability for this new target robot to use
+        if ($target_robot->robot_status != 'disabled' && $target_robot->robot_position != 'bench'){
+            $this_battle->actions_append($target_player, $target_robot, $this_player, $this_robot, 'ability', $target_action_token);
+        }
+
+    }
+
+}
+
 // DEBUG
 if (empty($this_robot)){
     die('<pre>$this_robot is empty on line '.__LINE__.'! :'.print_r($this_robot, true).'</pre>');
@@ -395,6 +527,12 @@ $this_battle->actions_execute();
 
 // Require the common end-of-turn action file
 require(MMRPG_CONFIG_ROOTDIR.'battle/actions/action_endofturn.php');
+
+// Unset any item use flags for this player, so they can use one again next turn
+if (isset($this_player->flags['item_used_this_turn'])){
+    unset($this_player->flags['item_used_this_turn']);
+    $this_player->update_session();
+}
 
 // Unset any switch use flags for this player, so they can use one again next turn
 if (isset($this_player->flags['switch_used_this_turn'])){
