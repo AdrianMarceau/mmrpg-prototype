@@ -317,7 +317,7 @@ if (strstr($page_content_parsed, $find)){
                 }
                 elseif ($category_token == 'affinity'){
                     $chart_class = 'affinities';
-                    $chart_title = $title_prefix.' Affiities';
+                    $chart_title = $title_prefix.' Affinities';
                 }
                 elseif ($category_token == 'immunity'){
                     $chart_class = 'immunities';
