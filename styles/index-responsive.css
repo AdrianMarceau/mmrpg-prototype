@@ -906,10 +906,13 @@ body:before {
         margin: 0 auto 4px;
     }
 
+    #mmrpg #game_buttons .row {
+        padding-bottom: 0;
+    }
     #mmrpg #game_buttons .link_button {
-        width: calc((100% / 4) - 10px);
+        width: calc((100% / 3) - 10px);
         max-width: none;
-        margin-bottom: 4px;
+        margin-bottom: 10px;
         font-size: 11px;
     }
 

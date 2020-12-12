@@ -433,7 +433,9 @@ if ($temp_filter_data['display'] == 'posts'){
         // Add the searched for posts to the main array
         if (!empty($post_search_array)){
             foreach ($post_search_array AS $key => $info){
-                $this_posts_array[] = $post_index_array[$info['post_id']];
+                $new_post_array = $post_index_array[$info['post_id']];
+                $new_post_array['post_is_thread'] = 1;
+                $this_posts_array[] = $new_post_array;
                 $this_posts_count++;
             }
         }

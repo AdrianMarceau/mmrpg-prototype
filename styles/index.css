@@ -6042,14 +6042,24 @@ body.windowFlag_landscapeMode #window .page_file .form .field_post_body .textare
 
 #mmrpg #game_buttons {
     padding-bottom: 10px;
-    overflow: hidden;
+}
+#mmrpg #game_buttons .row {
+    display: block;
+    padding: 0 0 10px;
+    margin: 0 auto 10px;
+    border-bottom: 1px solid #1a1a1a;
+}
+#mmrpg #game_buttons:after,
+#mmrpg #game_buttons .row:after {
+    content: "";
+    display: block;
+    clear: both;
 }
 #mmrpg #game_buttons .link_button {
     display: block;
     float: left;
     width: 65px;
-    width: calc((100% / 9) - 10px);
-    max-width: 110px;
+    width: calc((100% / 6) - 10px);
     font-size: 13px;
     line-height: 19px;
     text-align: center;
@@ -6065,6 +6075,17 @@ body.windowFlag_landscapeMode #window .page_file .form .field_post_body .textare
 }
 #mmrpg #game_buttons .active {
     text-decoration: none;
+}
+#mmrpg #game_buttons .row.bottom .link_button {
+    font-size: 12px;
+}
+#mmrpg #game_buttons .row .link_button i.fa,
+#mmrpg #game_buttons .row .link_button i.fas {
+    margin-left: 6px;
+    font-size: 80%;
+    position: relative;
+    bottom: 2px;
+    opacity: 0.6;
 }
 
 #mmrpg #game_buttons .link_button:not(.active):not(:hover) {

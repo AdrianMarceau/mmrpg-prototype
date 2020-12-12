@@ -1099,7 +1099,7 @@ function mmrpg_website_community_postblock($this_post_key, $this_post_info, $thi
             <div class="postblock">
 
                 <? if (!empty($this_post_info['post_is_thread'])): ?>
-                    <div class="subheader field_type field_type_<?= !empty($this_thread_info['thread_colour']) ? $this_thread_info['thread_colour'] : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" title="<?= $this_thread_info['thread_name'] ?>">
+                    <div class="subheader field_type field_type_<?= !empty($this_thread_info['thread_colour']) ? $this_thread_info['thread_colour'] : 'none' ?>" title="<?= $this_thread_info['thread_name'] ?>">
                         <a class="link" style="display: inline; float: none;" href="community/<?= $this_thread_info['category_token'] ?>/<?= $this_thread_info['thread_id'] ?>/<?= $this_thread_info['thread_token'] ?>/"><?= $this_thread_info['thread_name'] ?></a>
                     </div>
                 <? endif; ?>

@@ -206,6 +206,8 @@ $temp_remote_session = $this_playerinfo['user_id'] != $_SESSION['GAME']['USER'][
 $temp_show_players = true;
 $temp_show_items = !empty($this_playerinfo['save_values_battle_items']) ? true : false;
 $temp_show_stars = !empty($this_playerinfo['save_values_battle_stars']) ? true : false;
+$temp_show_threads = !empty($this_playerinfo['thread_count']) ? true : false;
+$temp_show_posts = !empty($this_playerinfo['post_count']) ? true : false;
 
 // Define the prototype complete flags for this player
 $this_playerinfo['board_battles_dr_light'] = !empty($this_playerinfo['board_battles_dr_light']) ? explode(',', $this_playerinfo['board_battles_dr_light']) : array();
@@ -326,6 +328,38 @@ if (true || strstr($page_content_parsed, $find)){
                     }
                     ?>
                 </div>
+                <div class="bodytext community_stats" style="clear: both; border-top: 1px solid rgba(0, 0, 0, 0.3); padding-top: 10px;">
+                    <div class="text player_stats">
+                        <strong class="label">Community Forum Stats</strong>
+                        <ul class="records">
+                            <li class="stat"><span class="counter thread_counter" style=""><?= $this_playerinfo['thread_count'] == 1 ? '1 Thread' : $this_playerinfo['thread_count'].' Threads' ?></span></li>
+                            <li class="stat"><span class="counter post_counter"><?= $this_playerinfo['post_count'] == 1 ? '1 Post' : $this_playerinfo['post_count'].' Posts' ?></span></li>
+                            <?/*<li class="stat"><span class="counter like_counter"><?= $this_playerinfo['like_count'] == 1 ? '1 Like' : $this_playerinfo['like_count'].' Likes' ?></span></li>*/?>
+                            <? $this_playerinfo['comment_count'] = $this_playerinfo['post_count'] + $this_playerinfo['thread_count']; ?>
+                            <? $this_playerinfo['comment_rating'] = round(($this_playerinfo['post_count'] * 2) - ($this_playerinfo['thread_count'] / 2)); ?>
+                            <? if($this_playerinfo['comment_rating'] != 0): ?>
+                                <li class="stat"><span class="counter rating_counter"><?= ($this_playerinfo['comment_rating'] > 0 ? '+' : '-').$this_playerinfo['comment_rating'] ?> Rating</span></li>
+                            <? else: ?>
+                                <li class="stat"><span class="counter rating_counter">0 Rating</span></li>
+                            <? endif; ?>
+                        </ul>
+                    </div>
+                    <div class="text player_stats">
+                        <strong class="label">Robot Database Stats</strong>
+                        <ul class="records">
+                            <? $temp_unlocked_summoned_total = $temp_counter_database['unlocked']['total'] + $temp_counter_database['summoned']['total']; ?>
+                            <? if(!empty($temp_counter_database['total'])): ?>
+                                <li class="stat"><span class="counter summoned_counter"><?= $temp_counter_database['unlocked']['total'] ?> Unlocked</span></li>
+                                <li class="stat"><span class="counter scanned_counter"><?= $temp_counter_database['scanned']['total'] ?> Scanned</span></li>
+                                <li class="stat"><span class="counter encountered_counter"><?= $temp_counter_database['encountered']['total'] ?> Encountered</span></li>
+                            <? else: ?>
+                                <li class="stat"><span class="counter summoned_counter">0 Summoned</span></li>
+                                <li class="stat"><span class="counter scanned_counter">0 Scanned</span></li>
+                                <li class="stat"><span class="counter encountered_counter">0 Encountered</span></li>
+                            <? endif; ?>
+                        </ul>
+                    </div>
+                </div>
             </div>
 
             <? $temp_colour_token = !empty($this_playerinfo['user_colour_token']) ? $this_playerinfo['user_colour_token'] : 'none'; ?>
@@ -345,36 +379,52 @@ if (true || strstr($page_content_parsed, $find)){
 
                 <div id="game_buttons" data-fieldtype="<?= !empty($this_playerinfo['user_colour_token']) ? $this_playerinfo['user_colour_token'] : 'none' ?>" class="field">
 
-                    <a class="link_button profile field_type field_type_<?= $temp_colour_token ?> <?= empty($this_current_token) ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/' ?>">Profile</a>
+                    <div class="row top">
 
-                    <? if(!empty($temp_display_points)): ?>
-                        <a class="link_button points field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'points' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/points/' ?>">Points</a>
-                    <? endif; ?>
+                        <a class="link_button profile field_type field_type_<?= $temp_colour_token ?> <?= empty($this_current_token) ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/' ?>">View Profile</a>
 
-                    <a class="link_button robots field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'robots' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/robots/' ?>">Robots</a>
+                        <? if(!empty($temp_show_threads)): ?>
+                            <a class="link_button threads field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'threads' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'community/search/&player='.$this_playerinfo['user_name_clean'].'&player_strict=true&display=threads&limit=threads' ?>">View Threads</a>
+                        <? endif; ?>
 
-                    <? if(!empty($temp_show_players)): ?>
-                        <a class="link_button players field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'players' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/players/' ?>">Players</a>
-                    <? endif; ?>
+                        <? if(!empty($temp_show_posts)): ?>
+                            <a class="link_button posts field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'posts' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'community/search/&player='.$this_playerinfo['user_name_clean'].'&player_strict=true&display=posts&limit=posts' ?>">View Posts</a>
+                        <? endif; ?>
 
-                    <a class="link_button database field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'database' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/database/' ?>">Database</a>
+                        <? if (!rpg_user::is_guest() && $this_userid != $this_playerinfo['user_id'] && !empty($this_userinfo['user_flag_postprivate'])): ?>
+                            <a class="link_button message field_type field_type_<?= $temp_colour_token ?>" href="community/personal/0/new/<?= $this_playerinfo['user_name_clean'] ?>/">Send Message</a>
+                        <? endif; ?>
 
-                    <? if(!empty($temp_show_items)): ?>
-                        <a class="link_button items field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'items' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/items/' ?>">Items</a>
-                    <? endif; ?>
-                    <? if(!empty($temp_show_stars)): ?>
-                        <a class="link_button stars field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'stars' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/stars/' ?>">Stars</a>
-                    <? endif; ?>
+                        <? if (!empty($this_playerinfo['user_website_address']) && preg_match('/^([^@]+)@([^@]+)$/i', $this_playerinfo['user_website_address'])): ?>
+                            <a class="link_button website field_type field_type_<?= $temp_colour_token ?>" href="mailto:<?= $this_playerinfo['user_website_address'] ?>" target="_blank">Send Email</a>
+                        <? elseif (!empty($this_playerinfo['user_website_address'])): ?>
+                            <a class="link_button field_type field_type_<?= $temp_colour_token ?>" href="<?= $this_playerinfo['user_website_address'] ?>" target="_blank">Visit Website <i class="fas fa fa-external-link-alt"></i></a>
+                        <? endif; ?>
 
-                    <? if (!empty($this_playerinfo['user_website_address']) && preg_match('/^([^@]+)@([^@]+)$/i', $this_playerinfo['user_website_address'])): ?>
-                        <a class="link_button website field_type field_type_<?= $temp_colour_token ?>" href="mailto:<?= $this_playerinfo['user_website_address'] ?>" target="_blank">Email</a>
-                    <? elseif (!empty($this_playerinfo['user_website_address'])): ?>
-                        <a class="link_button field_type field_type_<?= $temp_colour_token ?>" href="<?= $this_playerinfo['user_website_address'] ?>" target="_blank">Website</a>
-                    <? endif; ?>
+                    </div>
 
-                    <? if (!rpg_user::is_guest() && $this_userid != $this_playerinfo['user_id'] && !empty($this_userinfo['user_flag_postprivate'])): ?>
-                        <a class="link_button message field_type field_type_<?= $temp_colour_token ?>" href="community/personal/0/new/<?= $this_playerinfo['user_name_clean'] ?>/">Message</a>
-                    <? endif; ?>
+                    <div class="row bottom">
+
+                        <? if(!empty($temp_display_points)): ?>
+                            <a class="link_button points field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'points' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/points/' ?>">Points</a>
+                        <? endif; ?>
+
+                        <a class="link_button robots field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'robots' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/robots/' ?>">Robots</a>
+
+                        <? if(!empty($temp_show_players)): ?>
+                            <a class="link_button players field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'players' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/players/' ?>">Players</a>
+                        <? endif; ?>
+
+                        <a class="link_button database field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'database' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/database/' ?>">Database</a>
+
+                        <? if(!empty($temp_show_items)): ?>
+                            <a class="link_button items field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'items' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/items/' ?>">Items</a>
+                        <? endif; ?>
+                        <? if(!empty($temp_show_stars)): ?>
+                            <a class="link_button stars field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'stars' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/stars/' ?>">Stars</a>
+                        <? endif; ?>
+
+                    </div>
 
                 </div>
 
@@ -389,13 +439,14 @@ if (true || strstr($page_content_parsed, $find)){
                 if (empty($this_current_token) || !in_array($this_current_token, $temp_allowed_pages)){
                     ?>
 
+                        <? /*
                         <div class="bodytext community_stats">
                             <div class="text player_stats">
                                 <strong class="label">Community Forum Stats</strong>
                                 <ul class="records">
                                     <li class="stat"><span class="counter thread_counter" style=""><?= $this_playerinfo['thread_count'] == 1 ? '1 Thread' : $this_playerinfo['thread_count'].' Threads' ?></span></li>
                                     <li class="stat"><span class="counter post_counter"><?= $this_playerinfo['post_count'] == 1 ? '1 Post' : $this_playerinfo['post_count'].' Posts' ?></span></li>
-                                    <?/*<li class="stat"><span class="counter like_counter"><?= $this_playerinfo['like_count'] == 1 ? '1 Like' : $this_playerinfo['like_count'].' Likes' ?></span></li>*/?>
+                                    <?/ *<li class="stat"><span class="counter like_counter"><?= $this_playerinfo['like_count'] == 1 ? '1 Like' : $this_playerinfo['like_count'].' Likes' ?></span></li>* /?>
                                     <? $this_playerinfo['comment_count'] = $this_playerinfo['post_count'] + $this_playerinfo['thread_count']; ?>
                                     <? $this_playerinfo['comment_rating'] = round(($this_playerinfo['post_count'] * 2) - ($this_playerinfo['thread_count'] / 2)); ?>
                                     <? if($this_playerinfo['comment_rating'] != 0): ?>
@@ -420,23 +471,8 @@ if (true || strstr($page_content_parsed, $find)){
                                     <? endif; ?>
                                 </ul>
                             </div>
-                            <? /*
-                            <div class="text player_stats">
-                                <strong class="label">Star Force Stats</strong>
-                                <ul class="records">
-                                    <? if(!empty($temp_counter_stars['total'])): ?>
-                                        <li class="stat"><span class="counter field_counter"><?= $temp_counter_stars['field'] == 1 ? '1 Field Star' : $temp_counter_stars['field'].' Field Stars' ?></span></li>
-                                        <li class="stat"><span class="counter fusion_counter"><?= $temp_counter_stars['fusion'] == 1 ? '1 Fusion Star' : $temp_counter_stars['fusion'].' Fusion Stars' ?></span></li>
-                                        <li class="stat"><span class="counter boost_counter">+<?= number_format((($temp_counter_stars['field'] * 10) + ($temp_counter_stars['fusion'] * 20)), 0, '.', ',') ?>% Boost</span></li>
-                                    <? else: ?>
-                                        <li class="stat"><span class="counter field_counter">0 Field Stars</span></li>
-                                        <li class="stat"><span class="counter fusion_counter">0 Fusion Stars</span></li>
-                                        <li class="stat"><span class="counter boost_counter">0% Boost</span></li>
-                                    <? endif; ?>
-                                </ul>
-                            </div>
-                            */ ?>
                         </div>
+                        */ ?>
 
                         <div class="bodytext" style="margin-top: 15px;">
                             <? if(!empty($temp_display_text)): ?>
