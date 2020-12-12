@@ -1614,6 +1614,22 @@ body:before {
         width: auto;
         margin-bottom: 20px;
     }
+    #window .page .body .community .search_results .count,
+    #window .page .body .community .search_results .pages {
+        float: none;
+        clear: both;
+        width: auto;
+        max-width: none;
+        margin: 0 auto;
+        text-align: left;
+    }
+    #window .page .body .community .search_results .count {
+        margin-bottom: 10px;
+    }
+    #window .page .body .community .search_results .pages .link {
+        margin-left: 0;
+        margin-right: 6px;
+    }
 
 
 }

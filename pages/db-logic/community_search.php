@@ -641,48 +641,60 @@ if (strstr($page_content_parsed, $find)){
                 <a class="button reset" href="<?= $_GET['this_current_url'] ?>">Reset</a>
             </div>
 
-            <? if (!empty($search_page_result_count)): ?>
-                <div class="results" style="font-size: 120%; ">
-                    <div class="count"><?
-                        echo 'Found ';
-                        if ($temp_filter_data['limit'] == 'threads'){ echo $thread_search_count.' Threads'; }
-                        elseif ($temp_filter_data['limit'] == 'posts'){ echo $post_search_count.' Posts'; }
-                        else {
-                            if (!empty($thread_search_count)){ echo $thread_search_count.' Threads'; }
-                            if (!empty($thread_search_count) && !empty($post_search_count)){ echo ', '; }
-                            if (!empty($post_search_count)){ echo $post_search_count.' Posts'; }
-                        }
-                        echo ' <span class="total">'.$search_page_result_count.' Results Total</span>';
-                    ?></div>
-                    <? if($search_page_link_count > 1): ?>
-                        <div class="pages">
-                            <span class="label">Pages</span>
-                            <?
-                            // Gather all the other fields into a single query string
-                            $temp_query_string = array();
-                            if (isset($temp_filter_data['text'])){ $temp_query_string[] = 'text='.$temp_filter_data['text']; }
-                            if (isset($temp_filter_data['text_limit'])){ $temp_query_string[] = 'text_limit='.$temp_filter_data['text_limit']; }
-                            if (isset($temp_filter_data['player'])){ $temp_query_string[] = 'player='.$temp_filter_data['player']; }
-                            if (isset($temp_filter_data['category'])){ $temp_query_string[] = 'category='.(is_array($temp_filter_data['category']) ? implode(',', $temp_filter_data['category']) : $temp_filter_data['category']); }
-                            if (isset($temp_filter_data['display'])){ $temp_query_string[] = 'display='.$temp_filter_data['display']; }
-                            if (isset($temp_filter_data['sort'])){ $temp_query_string[] = 'sort='.$temp_filter_data['sort']; }
-                            if (isset($temp_filter_data['limit'])){ $temp_query_string[] = 'limit='.$temp_filter_data['limit']; }
-                            $temp_query_string = implode('&amp;', $temp_query_string);
-                            // Loop through and print links for page nums
-                            for ($num = 1; $num <= $search_page_link_count; $num++){
-                                $class = 'link'.($num == $search_page_num ? ' active' : '');
-                                $href = $_GET['this_current_url'].'?'.$temp_query_string.'&amp;pg='.$num;
-                                echo '<a class="'.$class.'" href="'.$href.'">'.$num.'</a>';
-                            }
-                            ?>
-                        </div>
-                    <? endif; ?>
-                </div>
-            <? endif; ?>
-
         </form>
     </div>
+
     <?
+
+    // Generate and display the results headers if applicable
+    if (!empty($search_page_result_count)){
+        ob_start();
+        ?>
+        <a name="results"></a>
+        <div class="subbody">
+            <div class="search_results">
+                <div class="count"><?
+                    echo 'Found ';
+                    if ($temp_filter_data['limit'] == 'threads'){ echo $thread_search_count.' Threads'; }
+                    elseif ($temp_filter_data['limit'] == 'posts'){ echo $post_search_count.' Posts'; }
+                    else {
+                        if (!empty($thread_search_count)){ echo $thread_search_count.' Threads'; }
+                        if (!empty($thread_search_count) && !empty($post_search_count)){ echo ', '; }
+                        if (!empty($post_search_count)){ echo $post_search_count.' Posts'; }
+                    }
+                    echo ' <span class="total">'.$search_page_result_count.' Results Total</span>';
+                ?></div>
+                <? if($search_page_link_count > 1): ?>
+                    <div class="pages">
+                        <span class="label">Pages</span>
+                        <?
+                        // Gather all the other fields into a single query string
+                        $temp_query_string = array();
+                        if (isset($temp_filter_data['text'])){ $temp_query_string[] = 'text='.$temp_filter_data['text']; }
+                        if (isset($temp_filter_data['text_limit'])){ $temp_query_string[] = 'text_limit='.$temp_filter_data['text_limit']; }
+                        if (isset($temp_filter_data['player'])){ $temp_query_string[] = 'player='.$temp_filter_data['player']; }
+                        if (isset($temp_filter_data['category'])){ $temp_query_string[] = 'category='.(is_array($temp_filter_data['category']) ? implode(',', $temp_filter_data['category']) : $temp_filter_data['category']); }
+                        if (isset($temp_filter_data['display'])){ $temp_query_string[] = 'display='.$temp_filter_data['display']; }
+                        if (isset($temp_filter_data['sort'])){ $temp_query_string[] = 'sort='.$temp_filter_data['sort']; }
+                        if (isset($temp_filter_data['limit'])){ $temp_query_string[] = 'limit='.$temp_filter_data['limit']; }
+                        $temp_query_string = implode('&amp;', $temp_query_string);
+                        // Loop through and print links for page nums
+                        for ($num = 1; $num <= $search_page_link_count; $num++){
+                            $class = 'link'.($num == $search_page_num ? ' active' : '');
+                            $href = $_GET['this_current_url'].'?'.$temp_query_string.'&amp;pg='.$num;
+                            $href .= '#results';
+                            echo '<a class="'.$class.'" href="'.$href.'">'.$num.'</a>';
+                        }
+                        ?>
+                    </div>
+                <? endif; ?>
+            </div>
+        </div>
+        <?
+        $search_results_markup = trim(ob_get_clean());
+        $search_results_markup_before = str_replace('"subbody"', '"subbody search_results_before"', $search_results_markup);
+        echo($search_results_markup_before.PHP_EOL);
+    }
 
     // If there are results to display from the search, show them now
     if (!empty($_REQUEST['display'])){
@@ -836,6 +848,14 @@ if (strstr($page_content_parsed, $find)){
         }
 
     }
+
+    // Generate and display the results headers if applicable
+    if (!empty($search_page_result_count)){
+        $search_results_markup_after = str_replace('"subbody"', '"subbody search_results_after"', $search_results_markup);
+        echo($search_results_markup_after.PHP_EOL);
+    }
+
+
 
     $replace = ob_get_clean();
     $page_content_parsed = str_replace($find, $replace, $page_content_parsed);
