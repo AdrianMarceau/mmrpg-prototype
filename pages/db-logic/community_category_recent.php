@@ -159,7 +159,7 @@ $find = '<!-- MMRPG_COMMUNITY_CATEGORY_SUBHEADER_THREAD_COUNT -->';
 if (strstr($page_content_parsed, $find)){
     ob_start();
     ?>
-        <span style="float: right; opacity: 0.25;"><?= $this_threads_count == '1' ? '1 Updated Thread' : $this_threads_count.' Updated Threads'  ?></span>
+        <span class="count float"><?= $this_threads_count == '1' ? '1 Updated Thread' : $this_threads_count.' Updated Threads'  ?></span>
     <?
     $replace = ob_get_clean();
     $page_content_parsed = str_replace($find, $replace, $page_content_parsed);
