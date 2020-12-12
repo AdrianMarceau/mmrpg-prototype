@@ -2366,6 +2366,17 @@ class rpg_robot extends rpg_object {
         // Otherwise if ability then we have to calculate
         elseif (isset($this_object->ability_token)){
 
+            // Create an options object for this function and populate
+            $options = rpg_game::new_options_object();
+            $extra_objects = array('options' => $options, 'this_ability' => $this_object);
+            $options->energy_base = &$energy_base;
+            $options->energy_mods = &$energy_mods;
+            $options->energy_new = $energy_base;
+
+            // Trigger this robot's item function if one has been defined for this context
+            $this->trigger_custom_function('rpg-robot_calculate-weapon-energy_before', $extra_objects);
+            if ($options->return_early){ return $options->return_value; }
+
             // Define the return to the ability variable
             $this_ability = $this_object;
             $ability_info = $this_ability->export_array();
@@ -2382,17 +2393,24 @@ class rpg_robot extends rpg_object {
 
             // If this was the noweapons/chargeweapons action, everything is zero
             if (in_array($this_ability->ability_token, array('action-noweapons', 'action-chargeweapons', 'action-devpower-clearmission'))){
-                $energy_new = 0;
-                $energy_base = 0;
-                $energy_mods = 0;
+                $options->energy_new = 0;
+                $options->energy_base = 0;
+                $options->energy_mods = 0;
                 return 0;
             }
 
             // Pass along variables to the static function and return
-            $energy_new = self::calculate_weapon_energy_static($robot_info, $ability_info, $energy_base, $energy_mods);
-            return $energy_new;
+            $options->energy_new = self::calculate_weapon_energy_static($robot_info, $ability_info, $options->energy_base, $options->energy_mods);
+
+            // Trigger this robot's custom function if one has been defined for this context
+            $this->trigger_custom_function('rpg-robot_calculate-weapon-energy_after', $extra_objects);
+            if ($options->return_early){ return $options->return_value; }
+
+            // Return the new energy value, whatever it is
+            return $options->energy_new;
 
         }
+
     }
 
     // Define a function for calculating required weapon energy without using objects
