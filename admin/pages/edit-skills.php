@@ -328,6 +328,27 @@
             $update_data = $form_data;
             unset($update_data['skill_id']);
 
+            // If the skill tokens have changed, we must move the entire folder
+            $rename_content_path = false;
+            if (!$skill_data_is_new
+                && $old_skill_token !== $update_data['skill_token']){
+                $rename_content_path = true;
+                $old_content_path = MMRPG_CONFIG_SKILLS_CONTENT_PATH.$old_skill_token.'/';
+                $new_content_path = MMRPG_CONFIG_SKILLS_CONTENT_PATH.$update_data['skill_token'].'/';
+                if (file_exists($new_content_path)){
+                    $temp_exists = $db->get_value("SELECT skill_id FROM mmrpg_index_skills WHERE skill_token = '{$update_data['skill_token']}';", 'skill_id');
+                    if (!$temp_exists){
+                        $shell_cmd = 'rm -rf "'.$new_content_path.'"';
+                        $shell_output = shell_exec($shell_cmd);
+                        //error_log('$shell_output = '.print_r($shell_output, true));
+                    } else {
+                        $form_messages[] = array('error', 'New skill path '.mmrpg_clean_path($new_content_path).' already exists!');
+                        $update_data['skill_token'] = $old_skill_token;
+                        $rename_content_path = false;
+                    }
+                }
+            }
+
             // If this is a new skill we insert, otherwise we update the existing
             if ($skill_data_is_new){
 
@@ -363,24 +384,29 @@
                 $db->update('mmrpg_config', array('config_value' => $time), "config_group = 'global' AND config_name = 'cache_time'");
             }
 
+            // If the skill tokens have changed, we must move the entire folder
+            if ($form_success
+                && $rename_content_path === true
+                && !empty($old_content_path)
+                && !empty($new_content_path)){
+                if (file_exists($old_content_path)){
+                    $shell_cmd = 'mv "'.$old_content_path.'" "'.$new_content_path.'"';
+                    $shell_output = shell_exec($shell_cmd);
+                    //error_log('$shell_output = '.print_r($shell_output, true));
+                    if (!file_exists($old_content_path) && file_exists($new_content_path)){
+                        $path_string = '<strong>'.mmrpg_clean_path($old_content_path).'</strong> &raquo; <strong>'.mmrpg_clean_path($new_content_path).'</strong>';
+                        $form_messages[] = array('alert', 'Skill directory renamed! '.$path_string);
+                        $db->update('mmrpg_index_skills_groups_tokens', array('skill_token' => $update_data['skill_token']), array('skill_token' => $old_skill_token));
+                    } else {
+                        $form_messages[] = array('error', 'Unable to rename skill directory!');
+                    }
+                }
+            }
+
             // If successful, we need to update the JSON file
             if ($form_success){
                 if ($skill_data_is_new){ $skill_data['skill_id'] = $new_skill_id; }
                 cms_admin::object_editor_update_json_data_file('skill', array_merge($skill_data, $update_data));
-            }
-
-            // If the skill tokens have changed, we must move the entire folder
-            if ($form_success
-                && !$skill_data_is_new
-                && $old_skill_token !== $update_data['skill_token']){
-                $old_content_path = MMRPG_CONFIG_SKILLS_CONTENT_PATH.$old_skill_token.'/';
-                $new_content_path = MMRPG_CONFIG_SKILLS_CONTENT_PATH.$update_data['skill_token'].'/';
-                if (rename($old_content_path, $new_content_path)){
-                    $path_string = '<strong>'.mmrpg_clean_path($old_content_path).'</strong> &raquo; <strong>'.mmrpg_clean_path($new_content_path).'</strong>';
-                    $form_messages[] = array('alert', 'Skill directory renamed! '.$path_string);
-                } else {
-                    $form_messages[] = array('error', 'Unable to rename skill directory!');
-                }
             }
 
             // We're done processing the form, we can exit
