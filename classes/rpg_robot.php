@@ -5862,8 +5862,9 @@ class rpg_robot extends rpg_object {
     public static function get_best_stat_desc($robot_info){
         // Decide which word best describes this robot based on stat
         $best = self::get_best_stat($robot_info);
-        if ($best == 'all'){ $desc = 'balanced'; }
-        elseif ($best == 'energy'){ $desc = 'support'; }
+        if ($robot_info['robot_core'] == ''){ $desc = 'support'; }
+        elseif ($best == 'all'){ $desc = 'balanced'; }
+        elseif ($best == 'energy'){ $desc = 'hardy'; }
         elseif ($best == 'attack'){ $desc = 'powerful'; }
         elseif ($best == 'defense'){ $desc = 'defensive'; }
         elseif ($best == 'speed'){ $desc = 'speedy'; }
