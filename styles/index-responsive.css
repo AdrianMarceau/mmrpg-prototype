@@ -592,6 +592,9 @@ body:before {
     #window .menu .item:last-child {
         border-bottom: 0 none transparent;
     }
+    #window .menu .item.has_subs > a {
+        pointer-events: none;
+    }
     #window .menu .sub {
         display: none;
     }

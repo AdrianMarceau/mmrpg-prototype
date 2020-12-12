@@ -153,6 +153,10 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
                 }
             }
 
+            // Check to see if this page has sub-links in it
+            $has_sub_links = !empty($sub_menu_links) ? true : false;
+            if ($has_sub_links){ $item_class .= 'has_subs'; }
+
             // Print out the menu item markup
             ?>
             <li class="<?= $item_class ?>" data-token="<?= $parent_token ?>">
