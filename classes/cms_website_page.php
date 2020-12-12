@@ -339,6 +339,13 @@ class cms_website_page {
                     $new_subs_list[$temp_token] = $sub_link;
                 }
             }
+            if (!empty($old_subs_list)){
+                foreach ($old_subs_list AS $page_token => $page_data){
+                    if (!isset($new_subs_list[$page_token])){
+                        $new_subs_list[$page_token] = $page_data;
+                    }
+                }
+            }
             $main_menu_links['community']['subs'] = $new_subs_list;
         }
 
