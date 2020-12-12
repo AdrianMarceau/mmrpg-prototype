@@ -854,6 +854,16 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
             }
         }
 
+        // If this thread is excessivly old, is not sticky, and has not been replied to for a while, lock it
+        if (!$this_thread_info['thread_sticky']){
+            if ($this_category_info['category_token'] === 'news'){ $last_mod_date = $this_thread_info['thread_date']; }
+            else { $last_mod_date = !empty($this_thread_info['thread_mod_date']) ? $this_thread_info['thread_mod_date'] : $this_thread_info['thread_date']; }
+            $thread_time_inactive = time() - $last_mod_date;
+            if ($thread_time_inactive >= MMRPG_SETTINGS_LEGACY_TIMEOUT){
+                $this_thread_info['thread_locked'] = true;
+            }
+        }
+
         ?>
         <div id="thread-<?= $temp_thread_id ?>" data-group="<?= $temp_date_group ?>" class="subbody thread_subbody thread_subbody_small <?= $header_mode ? 'thread_subbody_small_nohover' : '' ?> <?= $temp_date_group == 'sticky' ? 'thread_is_sticky' : '' ?> <?= $compact_mode ? 'thread_subbody_compact' : '' ?> thread_right field_type_<?= !empty($this_thread_info['thread_colour']) ? $this_thread_info['thread_colour'] : 'none' ?>">
             <?
@@ -923,6 +933,8 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
             }
 
             ?>
+            <?= !empty($this_thread_info['thread_sticky']) ? '<i class="icon sticky fa fas fa-thumbtack" title="Thread is Sticky"></i>' : '' ?>
+            <?= !empty($this_thread_info['thread_locked']) ? '<i class="icon locked fa fas fa-lock" title="Thread is Locked"></i>' : '' ?>
             <div class="text thread_linkblock thread_linkblock_<?= $this_thread_info['thread_target'] != 0 && $this_thread_info['user_id'] != $this_userinfo['user_id'] ? 'right' : 'left' ?>">
                 <a class="link" href="<?= $temp_thread_link ?>"><span><?= $temp_thread_name ?></span></a>
                 <div class="info">

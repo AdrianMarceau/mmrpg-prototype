@@ -4569,18 +4569,21 @@ body.windowFlag_landscapeMode #window .page .type_block {
     right: -52px;
     margin-left: -52px;
 }
-#window .page .body .community .thread_subbody_small.thread_is_sticky {
+#window .page .body .community .thread_subbody_small {
     position: relative;
 }
-#window .page .body .community .thread_subbody_small.thread_is_sticky:after {
-    content: "\01f588";
-    display: block;
+#window .page .body .community .thread_subbody_small .icon {
     position: absolute;
-    top: 6px;
-    right: 4px;
-    font-size: 20px;
+    top: 10px;
+    right: 10px;
+    font-size: 14px;
     color: #ffffff;
-    transform: scaleX(-1);
+}
+#window .page .body .community .thread_subbody_small .icon.sticky {
+    transform: rotate(20deg);
+}
+#window .page .body .community .thread_subbody_small .icon.locked {
+    opacity: 0.5;
 }
 
 
