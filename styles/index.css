@@ -4805,6 +4805,16 @@ body.windowFlag_landscapeMode #window .page .type_block {
     padding-bottom: 20px;
     overflow: hidden;
 }
+#window .page .body .community .post_subbody .postblock > .subheader {
+    margin-bottom: 6px;
+    padding: 10px;
+}
+#window .page .body .community .post_subbody_left .postblock > .subheader {
+    margin-left: 96px;
+}
+#window .page .body .community .post_subbody_right .postblock > .subheader {
+    margin-right: 96px;
+}
 #window .page .body .community .post_subbody .postreply {
     color: #565656;
     position: absolute;
@@ -5082,11 +5092,13 @@ body.windowFlag_landscapeMode #window .page .type_block {
     text-overflow: ellipsis;
     cursor: default;
 }
-#window .page .body .community .thread_subbody .thread_linkblock .link span {
+#window .page .body .community .thread_subbody .thread_linkblock .link span,
+#window .page .body .community .thread_subbody .thread_linkblock .link a {
     text-decoration: none;
     cursor: pointer;
 }
-#window .page .body .community .thread_subbody .thread_linkblock .link span:hover {
+#window .page .body .community .thread_subbody .thread_linkblock .link span:hover,
+#window .page .body .community .thread_subbody .thread_linkblock .link a:hover {
     text-decoration: underline;
 }
 #window .page .body .community .thread_path,
@@ -5333,6 +5345,187 @@ body.windowFlag_landscapeMode #window .page .type_block {
     padding-left: 0;
     padding-right: 100px;
 }
+
+#window .page .body .community .search_form {
+  display: block;
+  margin: 0 auto 10px;
+  padding-top: 4px;
+}
+#window .page .body .community .search_form:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+#window .page .body .community .search_form .divider {
+  display: block;
+  margin: 10px 5px;
+  clear: both;
+  color: transparent;
+  background-color: transparent;
+  border: 0 none transparent;
+  height: 1px;
+  border-bottom: 1px solid #1A1A1A;
+}
+#window .page .body .community .search_form .section {
+  display: block;
+  margin: 0 1% 1% 0;
+  width: 49%;
+  float: left;
+}
+#window .page .body .community .search_form .section.left {
+  clear: left;
+}
+#window .page .body .community .search_form .subheader {
+  display: block;
+  margin: 0 auto 10px;
+}
+#window .page .body .community .search_form .field {
+  display: block;
+  margin: 0 auto 4px;
+  padding: 0;
+}
+#window .page .body .community .search_form .label {
+  display: block;
+  margin: 0 0 5px;
+  font-size: 13px;
+  line-height: 13px;
+}
+#window .page .body .community .search_form .textinput,
+#window .page .body .community .search_form .textarea,
+#window .page .body .community .search_form .select {
+  display: block;
+  margin: 0 0 5px;
+  padding: 3px;
+  font-size: 13px;
+  line-height: 16px;
+  width: 96%;
+  color: #F2F2F2;
+  border: 1px solid rgba(0, 0, 0, 0.20);
+  background-color: rgba(0, 0, 0, 0.10);
+  border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
+}
+#window .page .body .community .search_form .textinput:focus,
+#window .page .body .community .search_form .textarea:focus {
+  color: #FFFFFF;
+}
+#window .page .body .community .search_form .textarea {
+  width: 98%;
+}
+#window .page .body .community .search_form .button {
+  display: block;
+  margin: 0;
+  padding: 4px 50px;
+  font-size: 13px;
+  line-height: 16px;
+  width: auto;
+  color: #F2F2F2;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  background-color: rgba(255, 255, 255, 0.050);
+  border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
+  cursor: pointer;
+  _cursor: hand;
+  -webkit-appearance: none;
+}
+#window .page .body .community .search_form .button:hover {
+  border: 1px solid rgba(255, 255, 255, 0.100);
+  background-color: rgba(255, 255, 255, 0.075);
+}
+
+
+#window .page .body .community .search_form .textinput {
+
+}
+#window .page .body .community .search_form .textarea {
+
+}
+#window .page .body .community .search_form .select {
+  overflow: hidden;
+  padding-right: 3px;
+}
+#window .page .body .community .search_form .select option {
+  padding: 3px 6px;
+}
+#window .page .body .community .search_form .option {
+
+}
+#window .page .body .community .search_form .option .radio {
+
+}
+#window .page .body .community .search_form .option .checkbox {
+
+}
+#window .page .body .community .search_form .option .label {
+  display: inline-block;
+  vertical-align: middle;
+}
+#window .page .body .community .search_form .buttons {
+    float: none;
+    clear: left;
+    text-align: center;
+    margin-top: 20px;
+}
+#window .page .body .community .search_form .buttons .button {
+    float: left;
+    font-size: 120%;
+    margin: 0 10px 10px 0;
+    text-decoration: none;
+}
+#window .page .body .community .search_form .buttons .submit {
+
+}
+#window .page .body .community .search_form .results {
+  display: block;
+  clear: both;
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid #1A1A1A;
+  overflow: hidden;
+}
+#window .page .body .community .search_form .results .count {
+  display: block;
+  float: left;
+}
+#window .page .body .community .search_form .results .count .total {
+  display: block;
+  font-size: 90%;
+}
+#window .page .body .community .search_form .results .pages {
+  display: block;
+  float: right;
+  text-align: right;
+}
+#window .page .body .community .search_form .results .pages .label {
+  display: block;
+  margin: 0;
+  padding: 0;
+  float: none;
+  clear: none;
+  font-size: inherit;
+  line-height: inherit;
+  text-align: right;
+}
+#window .page .body .community .search_form .results .pages .link {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  float: none;
+  clear: none;
+  font-size: 90%;
+  line-height: inherit;
+  margin-left: 6px;
+  color: #EFEFEF;
+  text-decoration: none;
+}
+#window .page .body .community .search_form .results .pages .link:hover,
+#window .page .body .community .search_form .results .pages .link.active {
+  color: #FFFFFF;
+  text-decoration: underline;
+}
+
 #window .page .body .bodytext p,
 #window .page .body .bodytext div {
     margin: 0 0 13px;

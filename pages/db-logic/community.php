@@ -51,7 +51,7 @@ require_once(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/community_actions.php');
 
 // Define the view based on available data
 $this_current_view = 'index';
-if (!empty($this_current_cat)){ $this_current_view = 'category'; }
+if (!empty($this_current_cat)){ $this_current_view = $this_current_cat === 'search' ? 'search' : 'category'; }
 if ($this_current_id !== false && !empty($this_current_token)){ $this_current_view = 'thread'; }
 
 // If a specific category has been requested, collect its info
@@ -197,6 +197,13 @@ elseif ($this_current_view == 'index'){
 
     // Require the community thread view
     require_once(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/community_index.php');
+
+}
+// Else if the current view is the community search page
+elseif ($this_current_view == 'search'){
+
+    // Require the community thread view
+    require_once(MMRPG_CONFIG_ROOTDIR.'pages/db-logic/community_search.php');
 
 }
 

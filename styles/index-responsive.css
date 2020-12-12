@@ -1605,6 +1605,13 @@ body:before {
         right: 0;
     }
 
+    #window .page .body .community .search_form .section {
+        float: none;
+        clear: both;
+        width: auto;
+        margin-bottom: 20px;
+    }
+
 
 }
 
