@@ -231,6 +231,15 @@ else { $this_thread_info['post_count'] = false; }
 
 //die('<pre>'.print_r($this_thread_info, true).'</pre>');
 
+// If this thread is excessivly old, is not sticky, and has not been replied to for a while, lock it
+if (!$this_thread_info['thread_sticky']){
+    $last_mod_date = !empty($this_thread_info['thread_mod_date']) ? $this_thread_info['thread_mod_date'] : $this_thread_info['thread_date'];
+    $thread_time_inactive = time() - $last_mod_date;
+    if ($thread_time_inactive >= MMRPG_SETTINGS_LEGACY_TIMEOUT){
+        $this_thread_info['thread_locked'] = true;
+    }
+}
+
 // Start an output buffer to collect page contents for later
 ob_start();
 
