@@ -15,6 +15,10 @@ if (strstr($page_content_parsed, $find)){
     $page_content_parsed = str_replace($find, $replace, $page_content_parsed);
 }
 
+// Collect indexes for things we'll need later
+$user_roles_index = rpg_user_role::get_index();
+$thread_categories_index = cms_thread_category::get_index();
+
 // Define the global variables for posts
 $this_posts_array = array();
 $this_posts_count = 0;
@@ -44,6 +48,11 @@ $thread_index_query = '';
 $thread_index_array = array();
 $thread_index_array_required = array();
 $thread_index_count = 0;
+
+// Define the empty index variables for users
+$user_index_array = array();
+$user_index_array_required = array();
+$user_index_count = 0;
 
 // Define the temp filter by labale and default to empty
 $temp_filter_data = array();
@@ -112,8 +121,16 @@ if (true){
             $temp_player = str_replace(' ', '%', $temp_player);
             $temp_strict = !empty($_REQUEST['player_strict']) ? true : false;
             $temp_filter_data['player_strict'] = $temp_strict;
-            if ($temp_strict == true){ $temp_filter_by .= 'AND (users.user_name LIKE \''.$temp_player.'\' OR users.user_name_public LIKE \''.$temp_player.'\') '; }
-            elseif ($temp_strict == false){ $temp_filter_by .= 'AND (users.user_name LIKE \'%'.$temp_player.'%\' OR users.user_name_public LIKE \'%'.$temp_player.'%\') '; }
+            if ($temp_strict == true){
+                $temp_user_id = $db->get_value("SELECT user_id FROM mmrpg_users WHERE user_name LIKE '{$temp_player}' OR user_name_public LIKE '{$temp_player}';", 'user_id');
+                if (empty($temp_user_id)){ $temp_user_id = -1; }
+                $temp_filter_by .= 'AND users.user_id = '.$temp_user_id.' ';
+            } elseif ($temp_strict == false){
+                $temp_user_ids = $db->get_array_list("SELECT user_id FROM mmrpg_users WHERE user_name LIKE '%{$temp_player}%' OR user_name_public LIKE '%{$temp_player}%';", 'user_id');
+                if (!empty($temp_user_ids)){ $temp_user_ids = array_keys($temp_user_ids); }
+                else { $temp_user_ids = array(-1); }
+                $temp_filter_by .= 'AND users.user_id IN ('.implode(',', $temp_user_ids).') ';
+            }
         }
     }
 
@@ -137,9 +154,9 @@ if (true){
         $temp_order_by = 'posts.post_date '.strtoupper($temp_filter_data['sort']);
         $post_search_query = "SELECT
             {$temp_thread_post_fields},
-            {$temp_user_fields},
-            {$temp_user_role_fields},
-            {$temp_thread_category_fields}
+            users.user_id,
+            roles.role_id,
+            categories.category_id
             FROM mmrpg_posts AS posts
             LEFT JOIN mmrpg_users AS users ON posts.user_id = users.user_id
             LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
@@ -152,6 +169,14 @@ if (true){
             ;";
         $post_search_array = $db->get_array_list($post_search_query);
         $post_search_count = !empty($post_search_array) ? count($post_search_array) : 0;
+        if (!empty($post_search_array)){
+            foreach ($post_search_array AS $key => $info){
+                $user_index_array_required[] = $info['user_id'];
+                if (!empty($info['thread_mod_user'])){ $user_index_array_required[] = $info['thread_mod_user']; }
+                if (!empty($info['thread_target'])){ $user_index_array_required[] = $info['thread_target']; }
+                if (!empty($info['post_target'])){ $user_index_array_required[] = $info['post_target']; }
+            }
+        }
     }
 
     // Loop through the posts results and collect required IDs
@@ -198,8 +223,16 @@ if (true){
             $temp_player = str_replace(' ', '%', $temp_player);
             $temp_strict = !empty($_REQUEST['player_strict']) ? true : false;
             $temp_filter_data['player_strict'] = $temp_strict;
-            if ($temp_strict == true){ $temp_filter_by .= 'AND (users.user_name LIKE \''.$temp_player.'\' OR users.user_name_public LIKE \''.$temp_player.'\') '; }
-            elseif ($temp_strict == false){ $temp_filter_by .= 'AND (users.user_name LIKE \'%'.$temp_player.'%\' OR users.user_name_public LIKE \'%'.$temp_player.'%\') '; }
+            if ($temp_strict == true){
+                $temp_user_id = $db->get_value("SELECT user_id FROM mmrpg_users WHERE user_name LIKE '{$temp_player}' OR user_name_public LIKE '{$temp_player}';", 'user_id');
+                if (empty($temp_user_id)){ $temp_user_id = -1; }
+                $temp_filter_by .= 'AND users.user_id = '.$temp_user_id.' ';
+            } elseif ($temp_strict == false){
+                $temp_user_ids = $db->get_array_list("SELECT user_id FROM mmrpg_users WHERE user_name LIKE '%{$temp_player}%' OR user_name_public LIKE '%{$temp_player}%';", 'user_id');
+                if (!empty($temp_user_ids)){ $temp_user_ids = array_keys($temp_user_ids); }
+                else { $temp_user_ids = array(-1); }
+                $temp_filter_by .= 'AND users.user_id IN ('.implode(',', $temp_user_ids).') ';
+            }
         }
     }
 
@@ -224,40 +257,12 @@ if (true){
         $thread_search_query = "SELECT
             {$temp_thread_fields},
             {$temp_thread_category_fields},
-            {$temp_user_fields},
-            {$temp_user_role_fields},
-            users2.mod_user_id,
-                users2.mod_user_name,
-                users2.mod_user_name_public,
-                users2.mod_user_name_clean,
-                users2.mod_user_colour_token,
-            users3.target_user_id,
-                users3.target_user_name,
-                users3.target_user_name_public,
-                users3.target_user_name_clean,
-                users3.target_user_colour_token,
-                users3.target_user_image_path,
-                users3.target_user_background_path,
+            users.user_id,
+            roles.role_id,
             posts.post_count
             FROM mmrpg_threads AS threads
             LEFT JOIN mmrpg_users AS users ON threads.user_id = users.user_id
             LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
-            LEFT JOIN (SELECT
-                user_id AS mod_user_id,
-                user_name AS mod_user_name,
-                user_name_public AS mod_user_name_public,
-                user_name_clean AS mod_user_name_clean,
-                user_colour_token AS mod_user_colour_token
-                FROM mmrpg_users) AS users2 ON threads.thread_mod_user = users2.mod_user_id
-            LEFT JOIN (SELECT
-                user_id AS target_user_id,
-                user_name AS target_user_name,
-                user_name_public AS target_user_name_public,
-                user_name_clean AS target_user_name_clean,
-                user_colour_token AS target_user_colour_token,
-                user_image_path AS target_user_image_path,
-                user_background_path AS target_user_background_path
-                FROM mmrpg_users) AS users3 ON threads.thread_target = users3.target_user_id
             LEFT JOIN mmrpg_categories AS categories ON threads.category_id = categories.category_id
             LEFT JOIN (
                 SELECT posts.thread_id, count(1) AS post_count
@@ -270,6 +275,14 @@ if (true){
             ;";
         $thread_search_array = $db->get_array_list($thread_search_query);
         $thread_search_count = !empty($thread_search_array) ? count($thread_search_array) : 0;
+        if (!empty($thread_search_array)){
+            foreach ($thread_search_array AS $key => $info){
+                $user_index_array_required[] = $info['user_id'];
+                if (!empty($info['thread_mod_user'])){ $user_index_array_required[] = $info['thread_mod_user']; }
+                if (!empty($info['thread_target'])){ $user_index_array_required[] = $info['thread_target']; }
+                if (!empty($info['post_target'])){ $user_index_array_required[] = $info['post_target']; }
+            }
+        }
     }
 
     // Loop through the threads results and collect required IDs
@@ -296,40 +309,12 @@ if (count($thread_index_array) < count($thread_index_array_required)){
     $temp_index_query = "SELECT
         {$temp_thread_fields},
         {$temp_thread_category_fields},
-        {$temp_user_fields},
-        {$temp_user_role_fields},
-        users2.mod_user_id,
-            users2.mod_user_name,
-            users2.mod_user_name_public,
-            users2.mod_user_name_clean,
-            users2.mod_user_colour_token,
-        users3.target_user_id,
-            users3.target_user_name,
-            users3.target_user_name_public,
-            users3.target_user_name_clean,
-            users3.target_user_colour_token,
-            users3.target_user_image_path,
-            users3.target_user_background_path,
+        users.user_id,
+        roles.role_id,
         posts.post_count
         FROM mmrpg_threads AS threads
         LEFT JOIN mmrpg_users AS users ON threads.user_id = users.user_id
         LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
-        LEFT JOIN (SELECT
-            user_id AS mod_user_id,
-            user_name AS mod_user_name,
-            user_name_public AS mod_user_name_public,
-            user_name_clean AS mod_user_name_clean,
-            user_colour_token AS mod_user_colour_token
-            FROM mmrpg_users) AS users2 ON threads.thread_mod_user = users2.mod_user_id
-        LEFT JOIN (SELECT
-            user_id AS target_user_id,
-            user_name AS target_user_name,
-            user_name_public AS target_user_name_public,
-            user_name_clean AS target_user_name_clean,
-            user_colour_token AS target_user_colour_token,
-            user_image_path AS target_user_image_path,
-            user_background_path AS target_user_background_path
-            FROM mmrpg_users) AS users3 ON threads.thread_target = users3.target_user_id
         LEFT JOIN mmrpg_categories AS categories ON threads.category_id = categories.category_id
         LEFT JOIN (
             SELECT posts.thread_id, count(1) AS post_count
@@ -342,6 +327,14 @@ if (count($thread_index_array) < count($thread_index_array_required)){
         ;";
     $temp_index_array = $db->get_array_list($temp_index_query);
     $temp_index_count = !empty($temp_index_array) ? count($temp_index_array) : 0;
+    if (!empty($temp_index_array)){
+        foreach ($temp_index_array AS $key => $info){
+            $user_index_array_required[] = $info['user_id'];
+            if (!empty($info['thread_mod_user'])){ $user_index_array_required[] = $info['thread_mod_user']; }
+            if (!empty($info['thread_target'])){ $user_index_array_required[] = $info['thread_target']; }
+            if (!empty($info['post_target'])){ $user_index_array_required[] = $info['post_target']; }
+        }
+    }
 
     // If the thread indexes were found, add to main index
     if (!empty($temp_index_array)){
@@ -353,51 +346,30 @@ if (count($thread_index_array) < count($thread_index_array_required)){
 
 }
 
-// -- COLLECT USER COUNTS -- //
+// -- POPULATE USER INDEX -- //
 
-// Define the array to hold user IDs
-$this_user_ids_array = array();
+// Make sure only unique user IDs exist in the required list
+$user_index_array_required = array_values(array_unique($user_index_array_required));
 
-// If the there were posts, loop through and collect users
-if (!empty($post_index_array)){
-  foreach ($post_index_array AS $key => $info){
-    if (!in_array($info['user_id'], $this_user_ids_array)){
-      $this_user_ids_array[] = $info['user_id'];
-    }
-  }
-}
-
-// If the there were threads, loop through and collect users
-if (!empty($thread_index_array)){
-  foreach ($thread_index_array AS $key => $info){
-    if (!in_array($info['user_id'], $this_user_ids_array)){
-      $this_user_ids_array[] = $info['user_id'];
-    }
-  }
-}
-
-// Collect the user post and thread count index plus leaderboard points for display
-$temp_id_includes = !empty($this_user_ids_array) ? 'AND mmrpg_users.user_id IN ('.implode(', ', $this_user_ids_array).')' : '';
-if (!empty($temp_id_includes)){
-  $this_user_countindex = $db->get_array_list("SELECT
-    mmrpg_users.user_id,
-    mmrpg_leaderboard.board_points,
-    mmrpg_threads.thread_count,
-    mmrpg_posts.post_count
-    FROM mmrpg_users
-    LEFT JOIN mmrpg_leaderboard ON mmrpg_leaderboard.user_id = mmrpg_users.user_id
-    LEFT JOIN (
-        SELECT user_id, COUNT(thread_id) AS thread_count FROM mmrpg_threads WHERE mmrpg_threads.thread_target = 0 AND thread_published = 1 GROUP BY mmrpg_threads.user_id
-        ) mmrpg_threads ON mmrpg_threads.user_id = mmrpg_users.user_id
-    LEFT JOIN (
-        SELECT user_id, COUNT(post_id) AS post_count FROM mmrpg_posts WHERE mmrpg_posts.post_target = 0 AND post_deleted = 0 GROUP BY mmrpg_posts.user_id
-        ) mmrpg_posts ON mmrpg_posts.user_id = mmrpg_users.user_id
-    WHERE
-    mmrpg_leaderboard.board_points > 0
-    {$temp_id_includes}
-    ;", 'user_id');
-} else {
-  $this_user_countindex = array();
+// Pull data for all required users to form an index we can re-use
+if (!empty($user_index_array_required)){
+    $temp_ids_string = implode(', ', $user_index_array_required);
+    $user_index_array = $db->get_array_list("SELECT
+        {$temp_user_fields},
+        leaderboard.board_points AS user_board_points,
+        threads.thread_count AS user_thread_count,
+        posts.post_count AS user_post_count
+        FROM mmrpg_users AS users
+        LEFT JOIN mmrpg_leaderboard AS leaderboard ON leaderboard.user_id = users.user_id
+        LEFT JOIN (
+            SELECT user_id, COUNT(thread_id) AS thread_count FROM mmrpg_threads WHERE mmrpg_threads.thread_target = 0 AND thread_published = 1 GROUP BY mmrpg_threads.user_id
+            ) AS threads ON threads.user_id = users.user_id
+        LEFT JOIN (
+            SELECT user_id, COUNT(post_id) AS post_count FROM mmrpg_posts WHERE mmrpg_posts.post_target = 0 AND post_deleted = 0 GROUP BY mmrpg_posts.user_id
+            ) AS posts ON posts.user_id = users.user_id
+        WHERE
+        users.user_id IN ({$temp_ids_string})
+        ;", 'user_id');
 }
 
 
@@ -715,23 +687,92 @@ if (strstr($page_content_parsed, $find)){
     // If there are results to display from the search, show them now
     if (!empty($_REQUEST['display'])){
 
+        // Define an inline function for pulling relevant user details from the index
+        $get_user_data_from_index = function($user_id, $prefix = '') use ($user_index_array) {
+            $temp_user = $user_index_array[$user_id];
+            $return_data = array();
+            $return_data[$prefix.'user_id'] = $temp_user['user_id'];
+            $return_data[$prefix.'user_name'] = $temp_user['user_name'];
+            $return_data[$prefix.'user_name_public'] = $temp_user['user_name_public'];
+            $return_data[$prefix.'user_name_clean'] = $temp_user['user_name_clean'];
+            $return_data[$prefix.'user_colour_token'] = $temp_user['user_colour_token'];
+            $return_data[$prefix.'user_image_path'] = $temp_user['user_image_path'];
+            $return_data[$prefix.'user_background_path'] = $temp_user['user_background_path'];
+            $return_data[$prefix.'user_backup_login'] = $temp_user['user_backup_login'];
+            $return_data[$prefix.'user_date_modified'] = $temp_user['user_date_modified'];
+            $return_data[$prefix.'user_flag_postpublic'] = $temp_user['user_flag_postpublic'];
+            $return_data[$prefix.'user_flag_postprivate'] = $temp_user['user_flag_postprivate'];
+            $return_data[$prefix.'user_board_points'] = $temp_user['user_board_points'];
+            $return_data[$prefix.'user_thread_count'] = $temp_user['user_thread_count'];
+            $return_data[$prefix.'user_post_count'] = $temp_user['user_post_count'];
+            return $return_data;
+            };
+
+        // Define a function for pulling pulling extended info for a given thread given it's base data
+        $get_full_thread_info = function($this_thread_info) use ($thread_categories_index, $user_roles_index, $get_user_data_from_index) {
+                $full_thread_info = $this_thread_info;
+                $full_thread_info = array_merge($full_thread_info, $thread_categories_index[$this_thread_info['category_id']]);
+                if (!empty($this_thread_info['user_id'])){
+                    $temp_user_info = $get_user_data_from_index($this_thread_info['user_id']);
+                    $full_thread_info = array_merge($full_thread_info, $temp_user_info);
+                }
+                if (!empty($this_thread_info['role_id'])){
+                    $temp_user_role_info = $user_roles_index[$this_thread_info['role_id']];
+                    $full_thread_info = array_merge($full_thread_info, $temp_user_role_info);
+                }
+                if (!empty($this_thread_info['thread_mod_user'])){
+                    $temp_mod_user_info = $get_user_data_from_index($this_thread_info['thread_mod_user'], 'mod_');
+                    $full_thread_info = array_merge($full_thread_info, $temp_mod_user_info);
+                }
+                if (!empty($this_thread_info['thread_target'])){
+                    $temp_target_user_info = $get_user_data_from_index($this_thread_info['thread_target'], 'target_');
+                    $full_thread_info = array_merge($full_thread_info, $temp_target_user_info);
+                }
+                return $full_thread_info;
+            };
+
+        // Define a function for pulling pulling extended info for a given post given it's base data
+        $get_full_thread_post_info = function($this_thread_info, $this_post_info) use ($thread_categories_index, $user_roles_index, $get_user_data_from_index) {
+                $full_post_info = $this_post_info;
+                $full_post_info = array_merge($full_post_info, $thread_categories_index[$this_thread_info['category_id']]);
+                if (!empty($this_post_info['user_id'])){
+                    $temp_user_info = $get_user_data_from_index($this_post_info['user_id']);
+                    $full_post_info = array_merge($full_post_info, $temp_user_info);
+                }
+                if (!empty($this_post_info['role_id'])){
+                    $temp_user_role_info = $user_roles_index[$this_post_info['role_id']];
+                    $full_post_info = array_merge($full_post_info, $temp_user_role_info);
+                }
+                if (!empty($this_post_info['post_mod_user'])){
+                    $temp_mod_user_info = $get_user_data_from_index($this_post_info['post_mod_user'], 'mod_');
+                    $full_post_info = array_merge($full_post_info, $temp_mod_user_info);
+                }
+                if (!empty($this_post_info['post_target'])){
+                    $temp_target_user_info = $get_user_data_from_index($this_post_info['post_target'], 'target_');
+                    $full_post_info = array_merge($full_post_info, $temp_target_user_info);
+                }
+                return $full_post_info;
+            };
+
         // Else if the display filter is set to display threads
         if ($temp_filter_data['display'] == 'threads'){
-
 
             // Loop through the thread array and display its contents
             if (!empty($this_threads_array)){
                 foreach ($this_threads_array AS $this_thread_key => $this_thread_info){
 
-                    //error_log('$this_thread_info = '.print_r($this_thread_info, true));
-
                     // Check the key to see if we should display this result
                     if ($this_thread_key < $search_page_result_key_start){ continue; }
                     elseif ($this_thread_key >= $search_page_result_key_break){ break; }
 
-                    // Collect markup for this thread from the function
+                    // Merge in relevant info from the thread user, category, and role indexes
+                    $full_thread_info = $get_full_thread_info($this_thread_info);
+
+                    // Collect category info to prevent function errors w/ requiring global var
                     $this_category_info = $this_categories_index[$this_thread_info['category_token']];
-                    $temp_markup = mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread_info, false, false, true);
+
+                    // Collect markup for this thread from the function
+                    $temp_markup = mmrpg_website_community_thread_linkblock($this_thread_key, $full_thread_info, false, false, true);
                     echo $temp_markup."\n";
 
                 }
@@ -761,10 +802,20 @@ if (strstr($page_content_parsed, $find)){
                     if ($this_post_key < $search_page_result_key_start){ continue; }
                     elseif ($this_post_key >= $search_page_result_key_break){ break; }
 
+                    // Collect parent thread info for this post so we can use it later
+                    $this_thread_info = $thread_index_array[$this_post_info['thread_id']];
+                    $full_thread_info = $get_full_thread_info($this_thread_info);
+
+                    // Merge in relevant info from the post user, category, and role indexes
+                    $full_post_info = $get_full_thread_post_info($full_thread_info, $this_post_info);
+
+                    // Collect category info to prevent function errors w/ requiring global var
+                    $this_category_info = $this_categories_index[$this_thread_info['category_token']];
+
                     // Collect markup for this post from the function
                     $temp_thread_info = $thread_index_array[$this_post_info['thread_id']];
                     $this_category_info = $this_categories_index[$temp_thread_info['category_token']];
-                    $temp_markup = mmrpg_website_community_postblock($this_post_key, $this_post_info, $temp_thread_info, $this_category_info);
+                    $temp_markup = mmrpg_website_community_postblock($this_post_key, $full_post_info, $full_thread_info, $this_category_info);
                     echo $temp_markup."\n";
 
                 }

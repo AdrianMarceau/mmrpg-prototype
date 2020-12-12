@@ -975,7 +975,7 @@ function mmrpg_website_community_postblock($this_post_key, $this_post_info, $thi
     // Pull in global variables
     global $this_userid, $this_userinfo;
     global $this_date_group, $this_time, $this_online_timeout, $community_battle_points;
-    global $this_user_countindex, $temp_leaderboard_online, $thread_session_viewed, $this_post_key;
+    global $temp_leaderboard_online, $thread_session_viewed, $this_post_key;
     if (empty($community_battle_points)){ $community_battle_points = 0; }
 
     // Start the output buffer
@@ -1056,12 +1056,6 @@ function mmrpg_website_community_postblock($this_post_key, $this_post_info, $thi
             $temp_is_new = true;
         }
     }
-    // Collect the thread count for this user
-    if ($this_post_info['user_id'] != MMRPG_SETTINGS_GUEST_ID){ $this_post_info['thread_count'] = !empty($this_user_countindex[$this_post_info['user_id']]['thread_count']) ? $this_user_countindex[$this_post_info['user_id']]['thread_count'] : 0; }
-    else { $this_post_info['thread_count'] = false; }
-    // Collect the post count for this user
-    if ($this_post_info['user_id'] != MMRPG_SETTINGS_GUEST_ID){ $this_post_info['post_count'] = !empty($this_user_countindex[$this_post_info['user_id']]['thread_count']) ? $this_user_countindex[$this_post_info['user_id']]['post_count'] : 0; }
-    else { $this_post_info['post_count'] = false; }
 
     // Collect the reply data for this user
     $temp_reply_name = $temp_post_author;
@@ -1086,12 +1080,12 @@ function mmrpg_website_community_postblock($this_post_key, $this_post_info, $thi
                     <div class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>);"><?= $temp_post_author ?></div>
                 </div>
 
-                <? $temp_stat = !empty($this_user_countindex[$this_post_info['user_id']]['board_points']) ? $this_user_countindex[$this_post_info['user_id']]['board_points'] : 0; ?>
+                <? $temp_stat = !empty($this_post_info['user_board_points']) ? $this_post_info['user_board_points'] : 0; ?>
                 <div class="counter points_counter"><?= number_format($temp_stat, 0, '.', ',').' BP' ?></div>
                 <div class="counter community_counters">
-                    <? $temp_stat = !empty($this_user_countindex[$this_post_info['user_id']]['thread_count']) ? $this_user_countindex[$this_post_info['user_id']]['thread_count'] : 0; ?>
+                    <? $temp_stat = !empty($this_post_info['user_thread_count']) ? $this_post_info['user_thread_count'] : 0; ?>
                     <span class="thread_counter"><?= $temp_stat.' TP' ?></span> <span class="pipe">|</span>
-                    <? $temp_stat = !empty($this_user_countindex[$this_post_info['user_id']]['post_count']) ? $this_user_countindex[$this_post_info['user_id']]['post_count'] : 0; ?>
+                    <? $temp_stat = !empty($this_post_info['user_post_count']) ? $this_post_info['user_post_count'] : 0; ?>
                     <span class="post_counter"><?= $temp_stat.' PP' ?></span>
                 </div>
 
