@@ -70,8 +70,8 @@ function temp_get_group_token($robot_info){
         'rush', 'beat', 'tango', 'eddie', 'reggae', 'mariachi'
         );
     static $hard_coded_group_tokens = array(
-        'flutter-fly' => 'MM1',
-        'beetle-borg' => 'MM1'
+        'time-man' => 'MM1', 'oil-man' => 'MM1',
+        'flutter-fly' => 'MM1', 'beetle-borg' => 'MM1'
         );
     if ($robot_info['robot_class'] === 'boss'){
         if (in_array($robot_info['robot_game'], array('MMV', 'MMEXE'))){ $group_token = 'MMBOSS2'; }
