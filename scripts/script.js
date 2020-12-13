@@ -1664,24 +1664,67 @@ function mmrpg_canvas_event(thisMarkup){ //, flagsMarkup
         thisContext.prepend(thisEvent);
         // Wait for all the event's assets to finish loading
         thisEvent.waitForImages(function(){
-            // Animate a fade out of the other events
-            if (gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold){
-                // We're at a normal speed, so we can animate normally
-                $('.event:not(.sticky):gt(0)', thisContext).animate({opacity:0},{
-                    duration: Math.ceil(gameSettings.eventTimeout / 2),
-                    easing: 'linear',
-                    queue: false
-                    });
+
+            // Find all the details in this event markup and move them to the sticky
+            $(this).find('.details').addClass('hidden').css({opacity:0}).appendTo('.event_details', gameCanvas);
+
+            // If we're allowed to cross-fade transition the normal way, otherwise straight-up replace the event
+            if (gameSettings.eventCrossFade === true){
+
+                // Animate a fade out of the other events
+                if (gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold){
+                    // We're at a normal speed, so we can animate normally
+                    $('.event:not(.sticky):gt(0)', thisContext).animate({opacity:0},{
+                        duration: Math.ceil(gameSettings.eventTimeout / 2),
+                        easing: 'linear',
+                        queue: false
+                        });
+                    } else {
+                    // We're at a super-fast speed, so we should NOT cross-fade
+                    $('.event:not(.sticky):gt(0)', thisContext).css({opacity:0});
+                    }
+
+                // Animate a fade in, and the remove the old images
+                if (gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold){
+                    // We're at a normal speed, so we can animate normally
+                    $(this).animate({opacity:1.0}, {
+                        duration: Math.ceil(gameSettings.eventTimeout / 2),
+                        easing: 'linear',
+                        complete: function(){
+                            $('.details:not(.hidden)', thisContext).remove();
+                            $('.details', thisContext).css({opacity:1}).removeClass('hidden');
+                            $('.event:not(.sticky):gt(0)', thisContext).remove();
+                            $(this).css({zIndex:500});
+                            },
+                        queue: false
+                        });
+                    } else {
+                    // We're at a super-fast speed, so we should NOT cross-fade
+                    $(this).css({opacity:1.0});
+                    $('.details:not(.hidden)', thisContext).remove();
+                    $('.details', thisContext).css({opacity:1}).removeClass('hidden');
+                    $('.event:not(.sticky):gt(0)', thisContext).remove();
+                    $(this).css({zIndex:500});
+                    }
+
                 } else {
-                // We're at a super-fast speed, so we should NOT cross-fade
-                $('.event:not(.sticky):gt(0)', thisContext).css({opacity:0});
+
+                    // Make sure the new event is visible then remove the old ones
+                    $(this).css({opacity:1.0,zIndex:500});
+                    $('.event:not(.sticky):gt(0)', thisContext).css({opacity:0});
+                    $('.details:not(.hidden)', thisContext).remove();
+                    $('.details', thisContext).css({opacity:1}).removeClass('hidden');
+                    $('.event:not(.sticky):gt(0)', thisContext).remove();
+
                 }
+
             // Loop through all field layers on the canvas and trigger animations
             $('.background[data-animate],.foreground[data-animate]', gameCanvas).each(function(){
                 // Trigger an animation frame change for this field
                 var thisField = $(this);
                 mmrpg_canvas_field_frame(thisField, '');
                 });
+
             // Loop through all field layers on the canvas and trigger animations
             $('.sprite[data-type=attachment][data-animate]', gameCanvas).each(function(){
                 // Trigger an animation frame change for this field
@@ -1692,30 +1735,6 @@ function mmrpg_canvas_event(thisMarkup){ //, flagsMarkup
                     mmrpg_canvas_attachment_frame(thisAttachment, '');
                     }
                 });
-            // Find all the details in this event markup and move them to the sticky
-            $(this).find('.details').addClass('hidden').css({opacity:0}).appendTo('.event_details', gameCanvas);
-            // Animate a fade in, and the remove the old images
-            if (gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold){
-                // We're at a normal speed, so we can animate normally
-                $(this).animate({opacity:1.0}, {
-                    duration: Math.ceil(gameSettings.eventTimeout / 2),
-                    easing: 'linear',
-                    complete: function(){
-                        $('.details:not(.hidden)', thisContext).remove();
-                        $('.details', thisContext).css({opacity:1}).removeClass('hidden');
-                        $('.event:not(.sticky):gt(0)', thisContext).remove();
-                        $(this).css({zIndex:500});
-                        },
-                    queue: false
-                    });
-                } else {
-                // We're at a super-fast speed, so we should NOT cross-fade
-                $(this).css({opacity:1.0});
-                $('.details:not(.hidden)', thisContext).remove();
-                $('.details', thisContext).css({opacity:1}).removeClass('hidden');
-                $('.event:not(.sticky):gt(0)', thisContext).remove();
-                $(this).css({zIndex:500});
-                }
 
             });
         }
