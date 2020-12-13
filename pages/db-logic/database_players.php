@@ -99,8 +99,8 @@ ob_start();
                 $current_key_position = array_search($this_current_key, $key_index);
                 $prev_key_position = $current_key_position - 1;
                 $next_key_position = $current_key_position + 1;
-                $find = array('href="', '<a ', '</a>', '<div ', '</div>');
-                $replace = array('data-href="', '<span ', '</span>', '<span ', '</span>');
+                $find = array('href="', '<a ', '</a>', '<div ', '</div>', 'class="sprite ');
+                $replace = array('data-href="', '<span ', '</span>', '<span ', '</span>', 'class="sprite scaled ');
                 // If prev key was in range, generate
                 if ($prev_key_position >= $min_key){
                     $prev_key = $key_index[$prev_key_position];

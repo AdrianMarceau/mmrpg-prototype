@@ -1425,7 +1425,6 @@ button {
 #window .page .subbody .link_nav .float.link .sprite {
     height: 20px;
     width: 20px;
-    image-rendering: auto;
 }
 #window .page .subbody .link_nav .float.link .sprite.size40 img {
     margin-top: -5px;
