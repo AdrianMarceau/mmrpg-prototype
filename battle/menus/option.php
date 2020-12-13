@@ -27,6 +27,10 @@ ob_start();
 	$block_num++;
 	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-panel="settings_eventTimeout"><label><span class="multi">Message<br />Speed</span></label></a>';
 
+    // Display the option for RENDER MODE
+    $block_num++;
+    $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-panel="settings_spriteRenderMode"><label><span class="multi">Render<br />Mode</span></label></a>';
+
 	// Display the option for RESTART MUSIC
 	$block_num++;
 	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" onclick="parent.mmrpg_music_load(\''.(!strstr($this_field->field_music, '/') ? 'fields/'.$this_field->field_music : $this_field->field_music).'\', true);"><label><span class="multi">Restart<br />Music</span></label></a>';

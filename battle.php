@@ -593,6 +593,19 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
             </div>
             <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="option"><label>Back</label></a></div>
         </div>
+        <div id="actions_settings_spriteRenderMode" class="actions_settings actions_settings_spriteRenderMode wrapper">
+            <div class="main_actions">
+                <a data-order="1" class="button action_setting block_1" type="button" data-action="settings_spriteRenderMode_default"><label><span>Default</span></label></a>
+                <a data-order="2" class="button action_setting block_2" type="button" data-action="settings_spriteRenderMode_auto"><label><span class="multi">Browser<br />&quot;Auto&quot;</span></label></a>
+                <a data-order="3" class="button action_setting block_3" type="button" data-action="settings_spriteRenderMode_smooth"><label><span class="multi">Browser<br />&quot;Smooth&quot;</span></label></a>
+                <a data-order="4" class="button action_setting block_4" type="button" data-action="settings_spriteRenderMode_pixelated"><label><span class="multi">Browser<br />&quot;Pixelated&quot;</span></label></a>
+                <a data-order="5" class="button action_setting block_5" type="button" data-action="settings_spriteRenderMode_high-quality"><label><span class="multi">Browser<br />&quot;High-Quality&quot;</span></label></a>
+                <a data-order="6" class="button action_setting block_6" type="button" data-action="settings_spriteRenderMode_crisp-edges"><label><span class="multi">Browser<br />&quot;Crisp-Edges&quot;</span></label></a>
+                <a class="button action_setting button_disabled block_7" type="button">&nbsp;</a>
+                <a class="button action_setting button_disabled block_8" type="button">&nbsp;</a>
+            </div>
+            <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="option"><label>Back</label></a></div>
+        </div>
         <div id="actions_event" class="actions_event wrapper">
             <div class="main_actions">
                 <a data-order="1" class="button action_continue" type="button" data-action="continue"><label>Continue</label></a>
@@ -620,7 +633,10 @@ gameSettings.fieldMusic = '<?= !strstr($this_field_data['field_music'], '/') ? '
 <?
 // Update the event timeout setting if set
 $event_timeout = !empty($_SESSION['GAME']['battle_settings']['eventTimeout']) ? $_SESSION['GAME']['battle_settings']['eventTimeout'] : 0;
-if (!empty($event_timeout)){ echo 'gameSettings.eventTimeout ='.$event_timeout.";\n"; }
+if (!empty($event_timeout)){ echo "gameSettings.eventTimeout = {$event_timeout};\n"; }
+// Update the sprite render mode setting if set
+$sprite_render_mode = !empty($_SESSION['GAME']['battle_settings']['spriteRenderMode']) ? $_SESSION['GAME']['battle_settings']['spriteRenderMode'] : 0;
+if (!empty($sprite_render_mode)){ echo "gameSettings.spriteRenderMode = '{$sprite_render_mode}';\n"; }
 ?>
 // Create the document ready events
 $(document).ready(function(){

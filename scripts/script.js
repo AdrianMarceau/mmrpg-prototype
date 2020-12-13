@@ -26,6 +26,7 @@ gameSettings.eventTimeout = 1250; // default animation frame base internal
 gameSettings.eventTimeoutThreshold = 250; // timeout theshold for when frames stop cross-fading
 gameSettings.eventAutoPlay = true; // whether or not to automatically advance events
 gameSettings.eventCrossFade = true; // whether or not to canvas events have crossfade animation
+gameSettings.spriteRenderMode = 'default'; // the render mode we should be using for sprites
 gameSettings.idleAnimation = true; // default to allow idle animations
 gameSettings.indexLoaded = false; // default to false until the index is loaded
 gameSettings.autoScrollTop = false; // default to true to prevent too much scrolling
@@ -35,6 +36,9 @@ gameSettings.currentBodyWidth = 0; // collect the current window width and updat
 gameSettings.currentBodyHeight = 0; // collect the current window width and update when necessary
 gameSettings.allowEditing = true; // default to true to allow all editing unless otherwise stated
 gameSettings.audioBaseHref = ''; // the base href where audio comes from (empty if same as baseHref)
+
+// Define an object to hold change events for settings when/if they happen
+var gameSettingsChangeEvents = {};
 
 // Define the perfect scrollbar settings
 var thisScrollbarSettings = {
@@ -90,6 +94,7 @@ $(document).ready(function(){
     // Check if iPhone or iPad detected
     gameSettings.wapFlagIphone = (navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)) ? true : false;
     gameSettings.wapFlagIpad = navigator.userAgent.match(/iPad/i) ? true : false;
+
 
     /*
      * INDEX EVENTS
@@ -283,6 +288,42 @@ $(document).ready(function(){
 
     // Ensure this is the battle document
     if (gameEngine.length){
+
+        // Define a list of valid render modes we can use
+        var allowedRenderModes = ['default', 'auto', 'smooth', 'pixelated', 'high-quality', 'crisp-edges'];
+
+        // If a localStorage value has been set, load that instead
+        if (typeof window.localStorage !== 'undefined'){
+            var spriteRenderMode = window.localStorage.getItem('spriteRenderMode');
+            if (typeof spriteRenderMode !== 'undefined' && allowedRenderModes.indexOf(spriteRenderMode) !== -1){
+                gameSettings['spriteRenderMode'] = spriteRenderMode;
+            }
+        }
+
+        // Update the body to use the requested sprite rendering mode
+        //console.log('setting data-render-mode to ', gameSettings['spriteRenderMode']);
+        mmrpgBody.attr('data-render-mode', gameSettings['spriteRenderMode']);
+
+        // Define a change event for whenever this game setting is altered
+        gameSettingsChangeEvents['spriteRenderMode'] = function(newValue){
+            //console.log('setting data-render-mode to ', newValue);
+            mmrpgBody.attr('data-render-mode', newValue);
+            if (typeof window.localStorage !== 'undefined'){
+                window.localStorage.setItem('spriteRenderMode', newValue);
+                }
+            };
+
+        // Auto-highlight settings buttons that are "active"
+        var settingsWithActiveStates = ['eventTimeout', 'spriteRenderMode'];
+        for (var i = 0; i < settingsWithActiveStates.length; i++){
+            var settingsKey = settingsWithActiveStates[i];
+            var settingsValue = gameSettings[settingsKey];
+            if (typeof settingsValue === 'undefined'){ continue; }
+            var settingsButtonWrapper = $('.wrapper.actions_settings_'+settingsKey, gameActions);
+            var activeSettingsButton = settingsButtonWrapper.find('a[data-action="settings_'+settingsKey+'_'+settingsValue+'"]');
+            settingsButtonWrapper.find('a[data-action]').removeClass('active');
+            activeSettingsButton.addClass('active');
+            }
 
         // Attach a submit event for tracking timestaps
         gameEngine.submit(function(){
@@ -1146,6 +1187,7 @@ function mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel){
     // Set the submitEngine flag to true by default
     var submitEngine = true;
     var nextPanel = false;
+
     // Switch to the loading screen
     mmrpg_action_panel('loading');
 
@@ -1158,6 +1200,7 @@ function mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel){
 
     // Parse any actions with subtokens in their string
     if (thisAction.match(/^ability_([-a-z0-9_]+)$/i)){
+
         // Parse the ability token and clean the main action token
         var thisAbility = thisAction.replace(/^ability_([-a-z0-9_]+)$/i, '$1');
         // If this ability's target is not set to auto
@@ -1184,7 +1227,9 @@ function mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel){
             }
         mmrpg_engine_update({this_action_token:thisAbility});
         thisAction = 'ability';
+
         } else if (thisAction.match(/^item_([-a-z0-9_]+)$/i)){
+
         // Parse the item token and clean the main action token
         var thisItem = thisAction.replace(/^item_([-a-z0-9_]+)$/i, '$1');
         // If this item's target is not set to auto
@@ -1211,17 +1256,23 @@ function mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel){
             }
         mmrpg_engine_update({this_action_token:thisItem});
         thisAction = 'item';
+
         } else if (thisAction.match(/^switch_([-a-z0-9_]+)$/i)){
+
         // Parse the switch token and clean the main action token
         var thisSwitch = thisAction.replace(/^switch_([-a-z0-9_]+)$/i, '$1');
         mmrpg_engine_update({this_action_token:thisSwitch});
         thisAction = 'switch';
+
         } else if (thisAction.match(/^scan_([-a-z0-9_]+)$/i)){
+
         // Parse the scan token and clean the main action token
         var thisScan = thisAction.replace(/^scan_([-a-z0-9_]+)$/i, '$1');
         mmrpg_engine_update({this_action_token:thisScan});
         thisAction = 'scan';
+
         } else if (thisAction.match(/^target_([-a-z0-9_]+)$/i)){
+
         // Parse the target token and clean the main action token
         var thisTarget = thisAction.replace(/^target_([-a-z0-9_]+)$/i, '$1');
         //alert('thisTarget '+thisTarget);
@@ -1229,7 +1280,9 @@ function mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel){
         mmrpg_engine_update({target_robot_id:thisTarget[0]});
         mmrpg_engine_update({target_robot_token:thisTarget[1]});
         thisAction = '';
+
         } else if (thisAction.match(/^settings_([-a-z0-9]+)_([-a-z0-9_]+)$/i)){
+
         // Parse the settings token and value, then clean the action token
         var thisSettingToken = thisAction.replace(/^settings_([-a-z0-9]+)_([-a-z0-9_]+)$/i, '$1');
         var thisSettingValue = thisAction.replace(/^settings_([-a-z0-9]+)_([-a-z0-9_]+)$/i, '$2');
@@ -1237,11 +1290,25 @@ function mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel){
         var thisRequestType = 'session';
         var thisRequestData = 'battle_settings,'+thisSettingToken+','+thisSettingValue;
         $.post('scripts/script.php',{requestType: 'session',requestData: 'battle_settings,'+thisSettingToken+','+thisSettingValue});
+        if (typeof gameSettingsChangeEvents[thisSettingToken] === 'function'){ gameSettingsChangeEvents[thisSettingToken](thisSettingValue); }
+
+        // Make sure this setting button has the "active" class, remove any others
+        var thisActionButton = $('a[data-action="'+thisAction+'"]', gameActions);
+        var thisActionButtonWrapper = thisActionButton.closest('.main_actions');
+        thisActionButtonWrapper.find('a[data-action]').removeClass('active');
+        thisActionButton.addClass('active');
+
         thisAction = 'settings';
-        var nextAction = $('input[name=next_action]', gameEngine).val();
-        if (nextAction.length){ mmrpg_action_panel(nextAction, thisPanel); }
+        nextAction = 'settings_'+thisSettingToken;
+        if (nextAction.length){ mmrpg_action_panel(nextAction); }
+
+        //var nextAction = $('input[name=next_action]', gameEngine).val();
+        //if (nextAction.length){ mmrpg_action_panel(nextAction, thisPanel); }
+
         return true;
+
         }
+
     // Check if image preloading was requested
     if (thisPreload.length){
         // Preload the requested image
