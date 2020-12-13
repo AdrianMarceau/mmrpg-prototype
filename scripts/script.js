@@ -314,11 +314,12 @@ $(document).ready(function(){
             };
 
         // Auto-highlight settings buttons that are "active"
-        var settingsWithActiveStates = ['eventTimeout', 'spriteRenderMode'];
+        var settingsWithActiveStates = ['eventTimeout', 'eventCrossFade', 'spriteRenderMode'];
         for (var i = 0; i < settingsWithActiveStates.length; i++){
             var settingsKey = settingsWithActiveStates[i];
             var settingsValue = gameSettings[settingsKey];
             if (typeof settingsValue === 'undefined'){ continue; }
+            if (typeof settingsValue === 'boolean'){ settingsValue = settingsValue ? 'true' : 'false'; }
             var settingsButtonWrapper = $('.wrapper.actions_settings_'+settingsKey, gameActions);
             var activeSettingsButton = settingsButtonWrapper.find('a[data-action="settings_'+settingsKey+'_'+settingsValue+'"]');
             settingsButtonWrapper.find('a[data-action]').removeClass('active');
@@ -1286,6 +1287,8 @@ function mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel){
         // Parse the settings token and value, then clean the action token
         var thisSettingToken = thisAction.replace(/^settings_([-a-z0-9]+)_([-a-z0-9_]+)$/i, '$1');
         var thisSettingValue = thisAction.replace(/^settings_([-a-z0-9]+)_([-a-z0-9_]+)$/i, '$2');
+        if (thisSettingValue === 'true'){ thisSettingValue = true; }
+        else if (thisSettingValue === 'false'){ thisSettingValue = false; }
         gameSettings[thisSettingToken] = thisSettingValue;
         var thisRequestType = 'session';
         var thisRequestData = 'battle_settings,'+thisSettingToken+','+thisSettingValue;

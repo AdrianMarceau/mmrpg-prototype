@@ -606,6 +606,19 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
             </div>
             <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="option"><label>Back</label></a></div>
         </div>
+        <div id="actions_settings_eventCrossFade" class="actions_settings actions_settings_eventCrossFade wrapper">
+            <div class="main_actions">
+                <a data-order="1" class="button action_setting block_1" type="button" data-action="settings_eventCrossFade_false"><label><span>None</span></label></a>
+                <a data-order="2" class="button action_setting block_2" type="button" data-action="settings_eventCrossFade_true"><label><span class="multi">Cross-Fade<br />Frames</span></label></a>
+                <a class="button action_setting button_disabled block_3" type="button">&nbsp;</a>
+                <a class="button action_setting button_disabled block_4" type="button">&nbsp;</a>
+                <a class="button action_setting button_disabled block_5" type="button">&nbsp;</a>
+                <a class="button action_setting button_disabled block_6" type="button">&nbsp;</a>
+                <a class="button action_setting button_disabled block_7" type="button">&nbsp;</a>
+                <a class="button action_setting button_disabled block_8" type="button">&nbsp;</a>
+            </div>
+            <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="option"><label>Back</label></a></div>
+        </div>
         <div id="actions_event" class="actions_event wrapper">
             <div class="main_actions">
                 <a data-order="1" class="button action_continue" type="button" data-action="continue"><label>Continue</label></a>
@@ -629,7 +642,6 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
 <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 gameSettings.idleAnimation = <?= $debug_flag_animation ? 'true' : 'false' ?>;
 gameSettings.fieldMusic = '<?= !strstr($this_field_data['field_music'], '/') ? 'fields/'.$this_field_data['field_music'] : $this_field_data['field_music'] ?>';
-//gameSettings.eventCrossFade = true;
 <?
 // Update the event timeout setting if set
 $event_timeout = !empty($_SESSION['GAME']['battle_settings']['eventTimeout']) ? $_SESSION['GAME']['battle_settings']['eventTimeout'] : 0;
@@ -637,6 +649,9 @@ if (!empty($event_timeout)){ echo "gameSettings.eventTimeout = {$event_timeout};
 // Update the sprite render mode setting if set
 $sprite_render_mode = !empty($_SESSION['GAME']['battle_settings']['spriteRenderMode']) ? $_SESSION['GAME']['battle_settings']['spriteRenderMode'] : 0;
 if (!empty($sprite_render_mode)){ echo "gameSettings.spriteRenderMode = '{$sprite_render_mode}';\n"; }
+// Update the event cross fade setting if set
+$event_cross_fade = !empty($_SESSION['GAME']['battle_settings']['eventCrossFade']) ? $_SESSION['GAME']['battle_settings']['eventCrossFade'] : 0;
+if (!empty($event_cross_fade)){ echo "gameSettings.eventCrossFade = {$event_cross_fade};\n"; }
 ?>
 // Create the document ready events
 $(document).ready(function(){
