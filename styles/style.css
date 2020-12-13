@@ -219,22 +219,68 @@ body.index #header {
     color: transparent;
     position: absolute;
     background: transparent none scroll no-repeat 0 0;
+    -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
     image-rendering: -moz-crisp-edges;         /* Firefox */
     image-rendering:   -o-crisp-edges;         /* Opera */
     image-rendering: -webkit-optimize-contrast;/* Webkit (non-standard naming) */
-    image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
-    -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
+    image-rendering: pixelated;
 }
-#mmrpg #canvas .sprite {
-    image-rendering: auto;
-    /* image-rendering: -moz-crisp-edges;   NOT Firefox */
-    image-rendering:   -o-crisp-edges;         /* Opera */
-    image-rendering: -webkit-optimize-contrast;/* Webkit (non-standard naming) */
-    image-rendering: crisp-edges;
-    -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
+#mmrpg .sprite.scaled {
+    -ms-interpolation-mode: bicubic;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: optimizeQuality;
+    image-rendering: smooth;
+    image-rendering: high-quality;
 }
+
+/* -- Sprite Modes -- */
+
+#mmrpg[data-render-mode="auto"] .sprite,
+#mmrpg[data-render-mode="auto"] .sprite.scaled,
+#mmrpg[data-render-mode="auto"] #canvas .sprite,
+#mmrpg[data-render-mode="auto"] img.has_pixels {
+    image-rendering: auto !important;
+}
+
+#mmrpg[data-render-mode="smooth"] .sprite,
+#mmrpg[data-render-mode="smooth"] .sprite.scaled,
+#mmrpg[data-render-mode="smooth"] #canvas .sprite,
+#mmrpg[data-render-mode="smooth"] img.has_pixels {
+    -ms-interpolation-mode: bicubic !important;
+    image-rendering: optimizeQuality !important;
+    image-rendering: smooth !important;
+}
+
+#mmrpg[data-render-mode="pixelated"] .sprite,
+#mmrpg[data-render-mode="pixelated"] .sprite.scaled,
+#mmrpg[data-render-mode="pixelated"] #canvas .sprite,
+#mmrpg[data-render-mode="pixelated"] img.has_pixels {
+    -ms-interpolation-mode: nearest-neighbor !important;
+    image-rendering: optimizeSpeed !important;
+    image-rendering: pixelated !important;
+}
+
+#mmrpg[data-render-mode="high-quality"] .sprite,
+#mmrpg[data-render-mode="high-quality"] .sprite.scaled,
+#mmrpg[data-render-mode="high-quality"] #canvas .sprite,
+#mmrpg[data-render-mode="high-quality"] img.has_pixels {
+    image-rendering: high-quality !important;
+}
+
+#mmrpg[data-render-mode="crisp-edges"] .sprite,
+#mmrpg[data-render-mode="crisp-edges"] .sprite.scaled,
+#mmrpg[data-render-mode="crisp-edges"] #canvas .sprite,
+#mmrpg[data-render-mode="crisp-edges"] img.has_pixels {
+    -ms-interpolation-mode: nearest-neighbor !important;
+    image-rendering: -webkit-optimize-contrast !important;
+    image-rendering: -moz-crisp-edges !important;
+    image-rendering:   -o-crisp-edges !important;
+    image-rendering: crisp-edges !important;
+}
+
+
 #mmrpg .sprite_fullscreen {
     width: auto !important;
     height: auto !important;
@@ -950,6 +996,13 @@ body.index #header {
     background-position: -66px 0;
     margin: 0 0 -7px auto;
     right: 57px;
+}
+
+#mmrpg #canvas .robot_mugshot_type .sprite.robot_mugshot,
+#mmrpg #canvas .robot_details .robot_item .wrap .sprite {
+    -ms-interpolation-mode: nearest-neighbor;
+    image-rendering: optimizeSpeed;
+    image-rendering: pixelated;
 }
 
 #mmrpg .ability_damage,
@@ -2734,6 +2787,14 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     text-decoration: none;
     cursor: pointer;
     _cursor: hand;
+}
+
+#actions .main_actions .button .label {
+
+}
+#actions .main_actions .button.active > label {
+    background-color: #3b3b3b;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 #actions .actions_item .main_actions_hastitle .main_actions_title .float_title {
