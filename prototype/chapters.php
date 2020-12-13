@@ -105,7 +105,7 @@ function temp_generate_player_mission_markup($player_token, &$chapters_unlocked,
         $battle_star_counter = mmrpg_prototype_stars_unlocked();
 
         // Define markup for the player's current chapter marker
-        $chapter_sprite_markup = '<img class="marker" src="images/players/'.$player_token.'/chapter-sprite.gif" />';
+        $chapter_sprite_markup = '<img class="sprite marker" src="images/players/'.$player_token.'/chapter-sprite.gif" />';
 
         // CHAPTER ONE(0) Intro
         if ($chapters_unlocked['0']){
