@@ -236,6 +236,11 @@
     left: -50px;
     top: -112px;
 }
+#prototype .leaderboard .file .avatar .sprite_shadow {
+    opacity: 0.3;
+    -webkit-filter: brightness(0) blur(2px);
+    filter: brightness(0) blur(2px);
+}
 #prototype .leaderboard .file .place {
     display: block;
     float: left;
