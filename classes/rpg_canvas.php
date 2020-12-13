@@ -26,13 +26,16 @@ class rpg_canvas {
             $this_data['player_float'] = $this_player->player_side;
             $this_data['player_direction'] = $this_player->player_side == 'left' ? 'right' : 'left';
             $this_data['player_position'] = 'active';
-            $this_data['player_size'] = 80;
+            $this_data['player_sprite_size'] = $this_player->player_image_size;
+            $this_data['player_sprite_zoom_size'] = $this_data['player_sprite_size'] * 2;
 
             $this_data['image_type'] = !empty($options['this_player_image']) ? $options['this_player_image'] : 'sprite';
             $this_data['image_token'] = !empty($this_player->player_image) ? $this_player->player_image : $this_player->player_token;
 
             $this_data['player_image'] = 'images/players/'.$this_data['image_token'].'/sprite_'.$this_data['player_direction'].'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
-            $this_data['player_class'] = 'sprite sprite_player sprite_player_'.$this_data['image_type'].' sprite_75x75 sprite_75x75_'.$this_data['player_frame'];
+
+            $player_frame_index = explode('/', MMRPG_SETTINGS_PLAYER_FRAMEINDEX);
+            $player_frame_index_size = count($player_frame_index);
 
             // Calculate the canvas offset variables for this robot
             $temp_data = $this_player->battle->canvas_markup_offset(0, 'active', 40, $this_player->counters['robots_total']);
@@ -41,21 +44,28 @@ class rpg_canvas {
             $this_data['canvas_offset_y'] = ($this_data['player_scale'] * 10) + $temp_data['canvas_offset_y'] + round($this_player->player_frame_offset['y'] * $temp_data['canvas_scale']);
             $this_data['canvas_offset_z'] = -1 + $temp_data['canvas_offset_z'] + round($this_player->player_frame_offset['z'] * $temp_data['canvas_scale']);
 
-            $this_data['player_sprite_size'] = ceil($this_data['player_scale'] * 80);
-            $this_data['player_sprite_width'] = ceil($this_data['player_scale'] * 80);
-            $this_data['player_sprite_height'] = ceil($this_data['player_scale'] * 80);
-            $this_data['player_image_width'] = ceil($this_data['player_scale'] * 880);
-            $this_data['player_image_height'] = ceil($this_data['player_scale'] * 80);
+            $this_data['player_sprite_size'] = ceil($this_data['player_scale'] * $this_data['player_sprite_zoom_size']);
+            $this_data['player_sprite_width'] = ceil($this_data['player_scale'] * $this_data['player_sprite_zoom_size']);
+            $this_data['player_sprite_height'] = ceil($this_data['player_scale'] * $this_data['player_sprite_zoom_size']);
+            $this_data['player_image_width'] = ceil($this_data['player_scale'] * ($this_data['player_sprite_zoom_size'] * $player_frame_index_size));
+            $this_data['player_image_height'] = ceil($this_data['player_scale'] * $this_data['player_sprite_zoom_size']);
             //$this_data['canvas_offset_z'] = 4900;
             //$this_data['canvas_offset_x'] = 200;
             //$this_data['canvas_offset_y'] = 60;
 
+            $sprite_xsize = $this_data['player_sprite_size'].'x'.$this_data['player_sprite_size'];
+            $this_data['player_markup_class'] = 'sprite sprite_player sprite_player_'.$this_data['image_type'].' sprite_'.$sprite_xsize.' sprite_'.$sprite_xsize.'_'.$this_data['player_frame'].' ';
+
+            if ($this_player->player_image_size !== $this_data['player_sprite_size']){
+                $this_data['player_markup_class'] .= 'scaled ';
+            }
+
             $frame_position = array_search($this_data['player_frame'], $this_data['player_frame_index']);
             if ($frame_position === false){ $frame_position = 0; }
             $frame_background_offset = -1 * ceil(($this_data['player_sprite_size'] * $frame_position));
-            $this_data['player_style'] = 'background-position: '.$frame_background_offset.'px 0; ';
-            $this_data['player_style'] .= 'z-index: '.$this_data['canvas_offset_z'].'; '.$this_data['player_float'].': '.$this_data['canvas_offset_x'].'px; bottom: '.$this_data['canvas_offset_y'].'px; ';
-            $this_data['player_style'] .= 'background-image: url('.$this_data['player_image'].'); width: '.$this_data['player_sprite_size'].'px; height: '.$this_data['player_sprite_size'].'px; background-size: '.$this_data['player_image_width'].'px '.$this_data['player_image_height'].'px; ';
+            $this_data['player_markup_style'] = 'background-position: '.$frame_background_offset.'px 0; ';
+            $this_data['player_markup_style'] .= 'z-index: '.$this_data['canvas_offset_z'].'; '.$this_data['player_float'].': '.$this_data['canvas_offset_x'].'px; bottom: '.$this_data['canvas_offset_y'].'px; ';
+            $this_data['player_markup_style'] .= 'background-image: url('.$this_data['player_image'].'); width: '.$this_data['player_sprite_size'].'px; height: '.$this_data['player_sprite_size'].'px; background-size: '.$this_data['player_image_width'].'px '.$this_data['player_image_height'].'px; ';
 
             // Generate the final markup for the canvas player
             ob_start();
@@ -73,9 +83,9 @@ class rpg_canvas {
                         );
                     $shadow_translate[0] = $shadow_translate[0] * ($this_data['player_direction'] == 'right' ? -1 : 1);
                     $shadow_styles = 'z-index: '.$shadow_offset_z.'; transform: scale('.$shadow_scale[0].','.$shadow_scale[1].') skew('.$shadow_skew.'deg) translate('.$shadow_translate[0].'px,'.$shadow_translate[1].'px);  -webkit-transform: scale('.$shadow_scale[0].','.$shadow_scale[1].') skew('.$shadow_skew.'deg) translate('.$shadow_translate[0].'px,'.$shadow_translate[1].'px);  -moz-transform: scale('.$shadow_scale[0].','.$shadow_scale[1].') skew('.$shadow_skew.'deg) translate('.$shadow_translate[0].'px,'.$shadow_translate[1].'px);';
-                    echo '<div data-shadowid="'.$this_data['player_id'].'" class="'.str_replace($this_data['player_token'], 'player', $this_data['player_class']).'" style="'.str_replace('players/', 'players_shadows/', $this_data['player_style']).$shadow_styles.'" data-type="'.$this_data['data_type'].'_shadow" data-size="'.$this_data['player_sprite_size'].'" data-direction="'.$this_data['player_direction'].'" data-frame="'.$this_data['player_frame'].'">'.$this_data['player_token'].'_shadow</div>';
+                    echo '<div data-shadowid="'.$this_data['player_id'].'" class="'.str_replace($this_data['player_token'], 'player', $this_data['player_markup_class']).'" style="'.str_replace('players/', 'players_shadows/', $this_data['player_markup_style']).$shadow_styles.'" data-type="'.$this_data['data_type'].'_shadow" data-size="'.$this_data['player_sprite_size'].'" data-direction="'.$this_data['player_direction'].'" data-frame="'.$this_data['player_frame'].'">'.$this_data['player_token'].'_shadow</div>';
                 }
-                echo '<div data-playerid="'.$this_data['player_id'].'" class="'.$this_data['player_class'].'" style="'.$this_data['player_style'].'" data-type="'.$this_data['data_type'].'" data-size="'.$this_data['player_sprite_size'].'" data-direction="'.$this_data['player_direction'].'" data-frame="'.$this_data['player_frame'].'" data-position="'.$this_data['player_position'].'">'.$this_data['player_title'].'</div>';
+                echo '<div data-playerid="'.$this_data['player_id'].'" class="'.$this_data['player_markup_class'].'" style="'.$this_data['player_markup_style'].'" data-type="'.$this_data['data_type'].'" data-size="'.$this_data['player_sprite_size'].'" data-direction="'.$this_data['player_direction'].'" data-frame="'.$this_data['player_frame'].'" data-position="'.$this_data['player_position'].'">'.$this_data['player_title'].'</div>';
 
             // Collect the generated player markup
             $this_data['player_markup'] = trim(ob_get_clean());
@@ -348,6 +358,11 @@ class rpg_canvas {
             $frame_position = is_numeric($this_robot_frame) ? (int)($this_robot_frame) : array_search($this_robot_frame, $this_data['robot_frame_index']);
             if ($frame_position === false){ $frame_position = 0; }
             $this_data['robot_markup_class'] .= $this_data['robot_frame_classes'];
+
+            if ($this_robot->robot_image_size !== $this_data['robot_sprite_size']){
+                $this_data['robot_markup_class'] .= 'scaled ';
+            }
+
             $frame_background_offset = -1 * ceil(($this_data['robot_sprite_size'] * $frame_position));
             $this_data['robot_markup_style'] = 'background-position: '.(!empty($frame_background_offset) ? $frame_background_offset.'px' : '0').' 0; ';
             $this_data['robot_markup_style'] .= 'z-index: '.$this_data['canvas_offset_z'].'; '.$this_data['robot_float'].': '.$this_robot_offset_x.'px; bottom: '.$this_robot_offset_y.'px; ';
@@ -808,6 +823,11 @@ class rpg_canvas {
         $this_data['ability_markup_class'] = 'sprite sprite_ability ';
         $this_data['ability_markup_class'] .= 'sprite_'.$this_data['ability_sprite_size'].'x'.$this_data['ability_sprite_size'].' sprite_'.$this_data['ability_sprite_size'].'x'.$this_data['ability_sprite_size'].'_'.$this_data['ability_frame'].' ';
         $this_data['ability_markup_class'] .= 'ability_status_'.$this_data['ability_status'].' ability_position_'.$this_data['ability_position'].' ';
+
+        if ($this_data['ability_scale'] !== 1){
+            $this_data['ability_markup_class'] .= 'scaled ';
+        }
+
         $frame_position = is_numeric($this_data['ability_frame']) ? (int)($this_data['ability_frame']) : array_search($this_data['ability_frame'], $this_data['ability_frame_index']);
         if ($frame_position === false){ $frame_position = 0; }
         $frame_background_offset = -1 * ceil(($this_data['ability_sprite_size'] * $frame_position));
@@ -1114,6 +1134,10 @@ class rpg_canvas {
                         $canvas_offset_y -= 3;
                         $canvas_offset_z += 1;
                     }
+                }
+
+                if ($this_data['item_scale'] !== 1){
+                    $this_data['item_markup_class'] .= 'scaled ';
                 }
 
                 $this_data['item_markup_style'] = 'background-position: '.$frame_background_offset.'px 0; ';
