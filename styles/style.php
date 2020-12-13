@@ -25,7 +25,8 @@ if (file_exists($cache_file_path)){ $cache_file_exists = true; $cache_file_date 
 else { $cache_file_exists = false; $cache_file_date = '00000000-0000'; }
 
 // LOAD FROM CACHE if data exists and is current, otherwise continue so script can refresh and replace
-if (MMRPG_CONFIG_CACHE_INDEXES === true && $cache_file_exists && $cache_file_date >= MMRPG_CONFIG_CACHE_DATE){
+$flag_cache_styles = defined('MMRPG_CONFIG_CACHE_STYLES') ? MMRPG_CONFIG_CACHE_STYLES : MMRPG_CONFIG_CACHE_INDEXES;
+if ($flag_cache_styles === true && $cache_file_exists && $cache_file_date >= MMRPG_CONFIG_CACHE_DATE){
     $cache_file_markup = file_get_contents($cache_file_path);
     header('Content-type: text/css; charset=UTF-8');
     echo($cache_file_markup);
@@ -73,7 +74,7 @@ $cache_style_headers .= ' */'.PHP_EOL;
 $cache_style_markup = $cache_style_headers.trim($cache_style_markup);
 
 // Write the index to a cache file, if caching is enabled
-if (MMRPG_CONFIG_CACHE_INDEXES === true){
+if ($flag_cache_styles === true){
     // Write the index to a cache file, if caching is enabled
     $this_cache_file = fopen($cache_file_path, 'w');
     fwrite($this_cache_file, $cache_style_markup);
