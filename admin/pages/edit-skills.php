@@ -242,9 +242,9 @@
             $form_data['skill_token'] = !empty($_POST['skill_token']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['skill_token']) ? trim(strtolower($_POST['skill_token'])) : '';
             $form_data['skill_name'] = !empty($_POST['skill_name']) && preg_match('/^[-_0-9a-z\.\*\s]+$/i', $_POST['skill_name']) ? trim($_POST['skill_name']) : '';
             $form_data['skill_class'] = 'skill'; //!empty($_POST['skill_class']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['skill_class']) ? trim(strtolower($_POST['skill_class'])) : '';
-
             $form_data['skill_description'] = !empty($_POST['skill_description']) && preg_match('/^[-_0-9a-z\.\*\s\']+$/i', $_POST['skill_description']) ? trim($_POST['skill_description']) : '';
             $form_data['skill_description2'] = !empty($_POST['skill_description2']) ? trim(strip_tags($_POST['skill_description2'])) : '';
+            $form_data['skill_parameters'] = !empty($_POST['skill_parameters']) ? trim($_POST['skill_parameters']) : '';
 
             $form_data['skill_flag_published'] = isset($_POST['skill_flag_published']) && is_numeric($_POST['skill_flag_published']) ? (int)(trim($_POST['skill_flag_published'])) : 0;
             $form_data['skill_flag_complete'] = isset($_POST['skill_flag_complete']) && is_numeric($_POST['skill_flag_complete']) ? (int)(trim($_POST['skill_flag_complete'])) : 0;
@@ -301,6 +301,15 @@
                         fclose($f);
                         $form_messages[] = array('alert', 'Skill functions file was '.(!empty($old_skill_functions_markup) ? 'updated' : 'created'));
                     }
+                }
+
+                // Ensure the parameters are VALID JSON SYNTAX and save, otherwise do not save but allow user to fix it
+                if (!empty($form_data['skill_parameters'])
+                    && !cms_admin::is_valid_json_syntax($form_data['skill_parameters'])){
+                    // Functions code is INVALID and must be fixed
+                    $form_messages[] = array('warning', 'Skill parameters were invalid JSON and were not saved (please fix and try again)');
+                    $_SESSION['skill_parameters'][$skill_data['skill_id']] = $form_data['skill_parameters'];
+                    unset($form_data['skill_parameters']);
                 }
 
             }
@@ -686,7 +695,7 @@
                                             <strong>Skill Description (Short)</strong>
                                             <em>tooltip describing skill effect</em>
                                         </div>
-                                    <input class="textbox" type="text" name="skill_description" value="<?= htmlentities($skill_data['skill_description'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="256" />
+                                        <input class="textbox" type="text" name="skill_description" value="<?= htmlentities($skill_data['skill_description'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="256" />
                                     </div>
 
                                     <div class="field fullsize">
@@ -695,6 +704,23 @@
                                             <em>short paragraph describing skill effect in more detail</em>
                                         </div>
                                         <textarea class="textarea" name="skill_description2" rows="4"><?= htmlentities($skill_data['skill_description2'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                                    </div>
+
+                                    <div class="field fullsize">
+                                        <?
+                                        // Collect the the skill paramaters string from session of data
+                                        if (!empty($_SESSION['skill_parameters'][$skill_data['skill_id']])){
+                                            $skill_parameters_string = $_SESSION['skill_parameters'][$skill_data['skill_id']];
+                                            unset($_SESSION['skill_parameters'][$skill_data['skill_id']]);
+                                        } else {
+                                            $skill_parameters_string = $skill_data['skill_parameters'];
+                                        }
+                                        ?>
+                                        <div class="label">
+                                            <strong>Skill Parameters</strong>
+                                            <em>optional defaults parameters in json-format</em>
+                                        </div>
+                                        <input class="textbox" type="text" name="skill_parameters" value="<?= htmlentities($skill_parameters_string, ENT_QUOTES, 'UTF-8', true) ?>" />
                                     </div>
 
                                 <? } ?>
