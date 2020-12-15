@@ -415,6 +415,9 @@
 
             $form_data['robot_skill'] = !empty($_POST['robot_skill']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_skill']) ? trim(strtolower($_POST['robot_skill'])) : '';
             $form_data['robot_skill_name'] = !empty($form_data['robot_skill']) && !empty($_POST['robot_skill_name']) && preg_match('/^[-_0-9a-z\.\*\s]+$/i', $_POST['robot_skill_name']) ? trim($_POST['robot_skill_name']) : '';
+            $form_data['robot_skill_description'] = !empty($_POST['robot_skill_description']) && preg_match('/^[-_0-9a-z\.\*\s\']+$/i', $_POST['robot_skill_description']) ? trim($_POST['robot_skill_description']) : '';
+            $form_data['robot_skill_description2'] = !empty($_POST['robot_skill_description2']) ? trim(strip_tags($_POST['robot_skill_description2'])) : '';
+            $form_data['robot_skill_parameters'] = !empty($_POST['robot_skill_parameters']) ? trim($_POST['robot_skill_parameters']) : '';
 
             $form_data['robot_weaknesses'] = !empty($_POST['robot_weaknesses']) && is_array($_POST['robot_weaknesses']) ? array_values(array_unique(array_filter($_POST['robot_weaknesses']))) : array();
             $form_data['robot_resistances'] = !empty($_POST['robot_resistances']) && is_array($_POST['robot_resistances']) ? array_values(array_unique(array_filter($_POST['robot_resistances']))) : array();
@@ -626,6 +629,15 @@
                         fclose($f);
                         $form_messages[] = array('alert', $this_robot_class_short_name_uc.' functions file was '.(!empty($old_robot_functions_markup) ? 'updated' : 'created'));
                     }
+                }
+
+                // Ensure the parameters are VALID JSON SYNTAX and save, otherwise do not save but allow user to fix it
+                if (!empty($form_data['robot_skill_parameters'])
+                    && !cms_admin::is_valid_json_syntax($form_data['robot_skill_parameters'])){
+                    // Functions code is INVALID and must be fixed
+                    $form_messages[] = array('warning', 'Custom skill parameters were invalid JSON and were not saved (please fix and try again)');
+                    $_SESSION['robot_skill_parameters'][$robot_data['robot_id']] = $form_data['robot_skill_parameters'];
+                    unset($form_data['robot_skill_parameters']);
                 }
 
             }
@@ -1311,30 +1323,6 @@
                                         <input class="textbox disabled" type="text" name="robot_bst" value="<?= $bst_value ?>" maxlength="8" disabled="disabled" data-auto="field-sum" data-field-sum="robot_energy,robot_attack,robot_defense,robot_speed" />
                                     </div>
 
-                                    <? if ($this_robot_class !== 'mecha'){
-                                        ?>
-
-                                        <hr />
-
-                                        <div class="field halfsize">
-                                            <strong class="label"><?= $this_robot_class_short_name_uc ?> Skill</strong>
-                                            <? $current_value = !empty($robot_data['robot_skill']) ? $robot_data['robot_skill'] : ''; ?>
-                                            <select class="select" name="robot_skill">
-                                                <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $skill_options_markup) ?>
-                                            </select><span></span>
-                                        </div>
-
-                                        <div class="field halfsize">
-                                            <div class="label">
-                                                <strong><?= $this_robot_class_short_name_uc ?> Skill Name</strong>
-                                                <em>optional alias of default name</em>
-                                            </div>
-                                            <input class="textbox" type="text" name="robot_skill_name" value="<?= htmlentities($robot_data['robot_skill_name'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="100" />
-                                        </div>
-
-                                        <?
-                                    } ?>
-
                                     <hr />
 
                                     <?
@@ -1368,6 +1356,63 @@
                                         <?
                                     }
                                     ?>
+
+                                    <? if ($this_robot_class !== 'mecha'){
+                                        ?>
+
+                                        <hr />
+
+                                        <div class="field halfsize">
+                                            <strong class="label"><?= $this_robot_class_short_name_uc ?> Skill</strong>
+                                            <? $current_value = !empty($robot_data['robot_skill']) ? $robot_data['robot_skill'] : ''; ?>
+                                            <select class="select" name="robot_skill">
+                                                <?= str_replace('value="'.$current_value.'"', 'value="'.$current_value.'" selected="selected"', $skill_options_markup) ?>
+                                            </select><span></span>
+                                        </div>
+
+                                        <div class="field halfsize">
+                                            <div class="label">
+                                                <strong>Custom Skill Name</strong>
+                                                <em>optional alias of default name</em>
+                                            </div>
+                                            <input class="textbox" type="text" name="robot_skill_name" value="<?= htmlentities($robot_data['robot_skill_name'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="100" />
+                                        </div>
+
+                                        <div class="field fullsize">
+                                            <div class="label">
+                                                <strong>Custom Skill Description (Short)</strong>
+                                                <em>optional customized version of default short description</em>
+                                            </div>
+                                            <input class="textbox" type="text" name="robot_skill_description" value="<?= htmlentities($robot_data['robot_skill_description'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="256" />
+                                        </div>
+
+                                        <div class="field fullsize">
+                                            <div class="label">
+                                                <strong>Custom Skill Description (Full)</strong>
+                                                <em>optional customized version of default long description</em>
+                                            </div>
+                                            <textarea class="textarea" name="robot_skill_description2" rows="4"><?= htmlentities($robot_data['robot_skill_description2'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                                        </div>
+
+                                        <div class="field fullsize">
+                                            <?
+                                            // Collect the the skill paramaters string from session of data
+                                            if (!empty($_SESSION['robot_skill_parameters'][$robot_data['robot_id']])){
+                                                $skill_parameters_string = $_SESSION['robot_skill_parameters'][$robot_data['robot_id']];
+                                                unset($_SESSION['robot_skill_parameters'][$robot_data['robot_id']]);
+                                            } else {
+                                                $skill_parameters_string = $robot_data['robot_skill_parameters'];
+                                            }
+                                            ?>
+                                            <div class="label">
+                                                <strong>Custom Skill Parameters</strong>
+                                                <em>optional customized parameters for skill in json-format</em>
+                                            </div>
+                                            <input class="textbox" type="text" name="robot_skill_parameters" value="<?= htmlentities($skill_parameters_string, ENT_QUOTES, 'UTF-8', true) ?>" />
+                                        </div>
+
+                                        <?
+                                    } ?>
 
                                 </div>
 
