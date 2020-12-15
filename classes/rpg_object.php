@@ -589,7 +589,22 @@ class rpg_object {
         if (!isset($this->$key)){ return false; }
         else { $key_array = &$this->$key; }
 
-        if (count($args) == 2){
+        if (count($args) == 3){
+            $key2 = array_shift($args);
+            $key3 = array_shift($args);
+            $key4 = array_shift($args);
+            $key_array[$key2][$key3][$key4] = $value;
+            $_SESSION[$session_key][$this->$session_id][$key][$key2][$key3][$key4] = $value;
+            /* echo("\$_SESSION[$session_key]".
+                "[".print_r($this->$session_id, true)."]".
+                "[".print_r($key, true)."]".
+                "[".print_r($key2, true)."]".
+                "[".print_r($key3, true)."]".
+                "[".print_r($key4, true)."]".
+                " = ".
+                print_r($_SESSION[$session_key][$this->$session_id][$key][$key2][$key3][$key4], true).
+                ";"); */
+        } elseif (count($args) == 2){
             $key2 = array_shift($args);
             $key3 = array_shift($args);
             $key_array[$key2][$key3] = $value;
