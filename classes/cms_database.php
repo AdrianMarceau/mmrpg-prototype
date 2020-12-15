@@ -531,6 +531,12 @@ class cms_database {
         return $this->TABLES;
     }
 
+    // Define a function for pulling a list of columns for a given database table
+    public function table_column_list($table_name){
+        $raw_column_names = $this->get_array_list("SELECT column_name FROM information_schema.columns WHERE table_schema = '{$this->DBNAME}' AND table_name = '{$table_name}';", 'column_name');
+        return !empty($raw_column_names) ? array_keys($raw_column_names) : array();
+    }
+
     // Define a function for checking if a database table exists
     public function table_exists($table_name){
         // Return true if table in cached list
