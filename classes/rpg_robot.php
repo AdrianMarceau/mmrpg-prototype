@@ -134,6 +134,7 @@ class rpg_robot extends rpg_object {
         $this->robot_immunities = isset($this_robotinfo['robot_immunities']) ? $this_robotinfo['robot_immunities'] : array();
         $this->robot_skill = isset($this_robotinfo['robot_skill']) ? $this_robotinfo['robot_skill'] : '';
         $this->robot_skill_name = isset($this_robotinfo['robot_skill_name']) ? $this_robotinfo['robot_skill_name'] : '';
+        $this->robot_skill_parameters = isset($this_robotinfo['robot_skill_parameters']) ? $this_robotinfo['robot_skill_parameters'] : '';
         $this->robot_item = isset($this_robotinfo['robot_item']) ? $this_robotinfo['robot_item'] : '';
         $this->robot_abilities = isset($this_robotinfo['robot_abilities']) ? $this_robotinfo['robot_abilities'] : array();
         $this->robot_attachments = isset($this_robotinfo['robot_attachments']) ? $this_robotinfo['robot_attachments'] : array();
@@ -190,6 +191,7 @@ class rpg_robot extends rpg_object {
 
         $this->robot_base_skill = isset($this_robotinfo['robot_base_skill']) ? $this_robotinfo['robot_base_skill'] : $this->robot_skill;
         $this->robot_base_skill_name = isset($this_robotinfo['robot_base_skill_name']) ? $this_robotinfo['robot_base_skill_name'] : $this->robot_skill_name;
+        $this->robot_base_skill_parameters = isset($this_robotinfo['robot_base_skill_parameters']) ? $this_robotinfo['robot_base_skill_parameters'] : $this->robot_skill_parameters;
 
         //$this->robot_base_abilities = isset($this_robotinfo['robot_base_abilities']) ? $this_robotinfo['robot_base_abilities'] : $this->robot_abilities;
         $this->robot_base_attachments = isset($this_robotinfo['robot_base_attachments']) ? $this_robotinfo['robot_base_attachments'] : $this->robot_attachments;
@@ -441,6 +443,7 @@ class rpg_robot extends rpg_object {
         $skill_id = rpg_game::unique_skill_id($this->robot_id, $skill_index_info['skill_id']);
         $skill_info = array('skill_id' => $skill_id, 'skill_token' => $skill_token);
         if (!empty($this->robot_skill_name)){ $skill_info['skill_name'] = $this->robot_skill_name; }
+        if (!empty($this->robot_skill_parameters)){ $skill_info['skill_parameters'] = $this->robot_skill_parameters; }
         if (!empty($extra_skill_info)){ $skill_info = array_merge($skill_info, $extra_skill_info); }
 
         // Collect this skill's object from the game class
@@ -2559,6 +2562,9 @@ class rpg_robot extends rpg_object {
             'robot_immunities',
             'robot_skill',
             'robot_skill_name',
+            'robot_skill_description',
+            'robot_skill_description2',
+            'robot_skill_parameters',
             'robot_abilities_rewards',
             'robot_abilities_compatible',
             'robot_quotes_start',
@@ -2607,7 +2613,8 @@ class rpg_robot extends rpg_object {
             'robot_immunities',
             'robot_abilities_compatible',
             'robot_abilities_rewards',
-            'robot_quotes_custom'
+            'robot_quotes_custom',
+            'robot_skill_parameters'
             );
 
         // Implode the index fields into a string if requested
@@ -3089,6 +3096,7 @@ class rpg_robot extends rpg_object {
             'robot_immunities' => $this->robot_immunities,
             'robot_skill' => $this->robot_skill,
             'robot_skill_name' => $this->robot_skill_name,
+            'robot_skill_parameters' => $this->robot_skill_parameters,
             'robot_abilities' => $this->robot_abilities,
             'robot_attachments' => $this->robot_attachments,
             'robot_quotes' => $this->robot_quotes,
