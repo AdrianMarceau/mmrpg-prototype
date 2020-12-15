@@ -95,12 +95,18 @@ class rpg_skill extends rpg_object {
             }
         }
 
-        // If this skill's robot owner has an alias for it's name, apply it now
-        if ($this->robot->robot_skill === $this_skillinfo['skill_token']
-            && !empty($this->robot->robot_skill_name)){
-            $this_skillinfo['skill_name'] = $this->robot->robot_skill_name;
-        } else {
-            $this_skillinfo['skill_name'] = $this_indexinfo['skill_name'];
+        // If this skill's robot has customizations, apply them now
+        if ($this->robot->robot_skill === $this_skillinfo['skill_token']){
+            $customizable_fields = array('skill_name', 'skill_description', 'skill_description2', 'skill_parameters');
+            foreach ($customizable_fields AS $field_name){
+                $robot_field_name = 'robot_'.$field_name;
+                if (!empty($this->robot->$robot_field_name)){
+                    $this_skillinfo[$field_name] = $this->robot->$robot_field_name;
+                } else {
+                    $this_skillinfo[$field_name] = $this_indexinfo[$field_name];
+                }
+
+            }
         }
 
         // Define the internal skill values using the provided array
@@ -109,10 +115,12 @@ class rpg_skill extends rpg_object {
         $this->values = isset($this_skillinfo['values']) ? $this_skillinfo['values'] : array();
         $this->history = isset($this_skillinfo['history']) ? $this_skillinfo['history'] : array();
         $this->skill_id = isset($this_skillinfo['skill_id']) ? $this_skillinfo['skill_id'] : 0;
-        $this->skill_name = isset($this_skillinfo['skill_name']) ? $this_skillinfo['skill_name'] : 'Skill';
         $this->skill_token = isset($this_skillinfo['skill_token']) ? $this_skillinfo['skill_token'] : 'skill';
         $this->skill_class = isset($this_skillinfo['skill_class']) ? $this_skillinfo['skill_class'] : 'master';
+        $this->skill_name = isset($this_skillinfo['skill_name']) ? $this_skillinfo['skill_name'] : 'Skill';
         $this->skill_description = isset($this_skillinfo['skill_description']) ? $this_skillinfo['skill_description'] : '';
+        $this->skill_description2 = isset($this_skillinfo['skill_description2']) ? $this_skillinfo['skill_description2'] : '';
+        $this->skill_parameters = isset($this_skillinfo['skill_parameters']) ? $this_skillinfo['skill_parameters'] : '';
         $this->skill_results = array();
         $this->attachment_results = array();
         $this->skill_options = array();
@@ -125,6 +133,8 @@ class rpg_skill extends rpg_object {
         $this->skill_base_name = isset($this_skillinfo['skill_base_name']) ? $this_skillinfo['skill_base_name'] : $this->skill_name;
         $this->skill_base_token = isset($this_skillinfo['skill_base_token']) ? $this_skillinfo['skill_base_token'] : $this->skill_token;
         $this->skill_base_description = isset($this_skillinfo['skill_base_description']) ? $this_skillinfo['skill_base_description'] : $this->skill_description;
+        $this->skill_base_description2 = isset($this_skillinfo['skill_base_description2']) ? $this_skillinfo['skill_base_description2'] : $this->skill_description2;
+        $this->skill_base_parameters = isset($this_skillinfo['skill_base_parameters']) ? $this_skillinfo['skill_base_parameters'] : $this->skill_parameters;
 
         // Collect any functions associated with this skill
         if (!isset($this->skill_function)){
@@ -632,6 +642,7 @@ class rpg_skill extends rpg_object {
             'skill_class',
             'skill_description',
             'skill_description2',
+            'skill_parameters',
             'skill_flag_hidden',
             'skill_flag_complete',
             'skill_flag_published',
@@ -664,7 +675,7 @@ class rpg_skill extends rpg_object {
 
         // Define the various json index fields for player objects
         $json_index_fields = array(
-            // ...
+            'skill_parameters'
             );
 
         // Implode the index fields into a string if requested
