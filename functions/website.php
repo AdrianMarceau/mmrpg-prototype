@@ -1371,6 +1371,8 @@ function getSortedDirContents($dir, $method = 'date'){
             elseif ($f1_time < $f2_time){ return 1; }
             else { return 0; }
             });
+    } elseif ($method === 'name'){
+        natsort($results);
     }
     return $results;
 }
