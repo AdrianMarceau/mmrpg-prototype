@@ -62,6 +62,16 @@ class cms_admin {
         return $return === 0 ? true : false;
     }
 
+    // Define a function for checking if a given string of JSON code has valid syntax (array or object only)
+    public static function is_valid_json_syntax($string){
+        if (empty($string)){ return false; }
+        elseif (strlen($string) < 2){ return false; }
+        $fchar = substr($string, 0, 1); $lchar = substr($string, -1, 1);
+        if (!($fchar === '[' && $lchar === ']') && !($fchar === '{' && $lchar === '}')){ return false; }
+        json_decode($string);
+        return (json_last_error() == JSON_ERROR_NONE);
+    }
+
     // Define a function for collecting the types index, sorted, for admin use
     public static function get_roles_index(){
         global $db;
