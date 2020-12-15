@@ -132,19 +132,20 @@ foreach ($revert_tokens  AS $object_key => $object_token){
                         }
                     }
                     // Check to make sure the object still exists in the database so we know if we should update or insert
-                    $object_exists = $db->get_value("SELECT {$object_token_field} FROM {$object_table_name} WHERE {$object_token_field} = '{$object_token_field_value}';", $object_token_field);
+                    $object_id_field = $request_kind_singular.'_id';
+                    $object_exists = $db->get_array("SELECT {$object_id_field}, {$object_token_field} FROM {$object_table_name} WHERE {$object_token_field} = '{$object_token_field_value}';");
                     //debug_echo('$object_exists = '.print_r($object_exists, true).'');
                     if (!empty($object_exists)){
-                        // Update the database object with above values given the object token
-                        //debug_echo('$object_update_data = '.print_r($object_update_data, true).'');
-                        //debug_echo('condition = '.print_r(array($object_token_field => $object_token_field_value), true).'');
-                        $db->update($object_table_name, $object_update_data, array($object_token_field => $object_token_field_value));
-                    } else {
-                        // Re-insert the database object with above values given the object token
-                        $object_insert_data = array_merge($object_update_data, array($object_token_field => $object_token_field_value));
-                        //debug_echo('$object_insert_data = '.print_r($object_insert_data, true).'');
-                        $db->insert($object_table_name, $object_insert_data);
+                        // Delete the existing object from the database so we can re-insert as a new one
+                        //debug_echo('object exists w/ ID '.$object_exists[$object_id_field].' must delete and re-insert');
+                        $db->delete($object_table_name, array($object_token_field => $object_token_field_value));
+                        $object_update_data[$object_id_field] = $object_exists[$object_id_field];
                     }
+
+                    // Re-insert the database object with above values given the object token
+                    $object_insert_data = array_merge($object_update_data, array($object_token_field => $object_token_field_value));
+                    //debug_echo('$object_insert_data = '.print_r($object_insert_data, true).'');
+                    $db->insert($object_table_name, $object_insert_data);
 
                 }
                 // Otherwise, if this is not a standard object, special revert functionality
