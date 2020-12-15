@@ -24,6 +24,24 @@ if (!strstr($git_output, 'Already up to date')){
     echo('Cache timestamp updated to '.$date.'-'.$time.PHP_EOL);
 }
 
+// Check for patch files and run them one-by-one
+$patch_dir = MMRPG_CONFIG_ROOTDIR.'admin/.patches/';
+$patch_files = getSortedDirContents($patch_dir, 'name');
+if (!empty($patch_files)){ foreach ($patch_files AS $path){ include_patch_file($path); } }
+function include_patch_file($path){
+    global $db;
+    ob_start();
+    require_once($path);
+    $output = ob_get_clean();
+    if (!empty($output)){
+        list($date, $name) = explode('_', str_replace('.php', '', basename($path)));
+        echo(PHP_EOL);
+        echo('<strong>patch name</strong>: '.$name.''.PHP_EOL);
+        echo('<strong>patch date</strong>: '.$date.''.PHP_EOL);
+        echo(trim($output).PHP_EOL);
+    }
+}
+
 // Print the success message with the returned output
 exit_action('success|Pulled Git Updates to MMRPG Core');
 
