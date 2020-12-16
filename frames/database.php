@@ -542,10 +542,7 @@ if (true){
 
                                     // Collect the robot skill info if not empty
                                     $skill_info = !empty($robot_info['robot_skill']) ? rpg_robot::get_robot_skill_info($robot_info['robot_skill'], $robot_info) : array();
-                                    if (!empty($skill_info)){
-                                        if (strstr($skill_info['skill_token'], '-subcore')){ $skill_info_type = str_replace('-subcore', '', $skill_info['skill_token']); }
-                                        else { $skill_info_type = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none'; }
-                                    }
+                                    $skill_info_type = !empty($skill_info) ? (!empty($skill_info['skill_display_type']) ? $skill_info['skill_display_type'] : 'none') : false;
 
                                     // Collect the robot field if not empty
                                     $temp_robot_field = '';

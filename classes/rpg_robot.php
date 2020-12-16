@@ -1151,10 +1151,11 @@ class rpg_robot extends rpg_object {
         }
     }
 
-    public function get_skill_info(){
-        if (empty($this->robot_skill)){ return false; }
+    public function get_skill_info($robot_skill = ''){
+        if (empty($robot_skill)){ $robot_skill = $this->robot_skill; }
+        if (empty($robot_skill)){ return false; }
         $robot_info = self::get_index_info($this->robot_token);
-        return self::get_robot_skill_info($this->robot_skill, $robot_info);
+        return self::get_robot_skill_info($robot_skill, $robot_info);
     }
 
     public static function get_robot_skill_info($skill_token, $robot_info){
@@ -3141,6 +3142,7 @@ class rpg_robot extends rpg_object {
             'robot_base_immunities' => $this->robot_base_immunities,
             'robot_base_skill' => $this->robot_base_skill,
             'robot_base_skill_name' => $this->robot_base_skill_name,
+            'robot_base_skill_parameters' => $this->robot_base_skill_parameters,
             //'robot_base_abilities' => $this->robot_base_abilities,
             'robot_base_attachments' => $this->robot_base_attachments,
             'robot_base_quotes' => $this->robot_base_quotes,
@@ -4873,10 +4875,8 @@ class rpg_robot extends rpg_object {
 
                     // Collect the skills index for display
                     $temp_skill_token = $robot_info['robot_skill'];
-                    $temp_skill_info = rpg_skill::get_index_info($temp_skill_token);
-                    $temp_skill_name = !empty($robot_info['robot_skill_name']) ? $robot_info['robot_skill_name'] : $temp_skill_info['skill_name'];
-                    $temp_skill_description = !empty($temp_skill_info['skill_description']) ? $temp_skill_info['skill_description'] : '???';
-                    $temp_skill_type = strstr($temp_skill_token, '-subcore') ? str_replace('-subcore', '', $temp_skill_token) : 'none';
+                    $temp_skill_info = self::get_robot_skill_info($temp_skill_token, $robot_info);
+                    $temp_skill_type = !empty($temp_skill_info['skill_display_type']) ? $temp_skill_info['skill_display_type'] : 'none';
 
                     // Define the markup for the this robot's skill
                     if (true){
@@ -4884,7 +4884,7 @@ class rpg_robot extends rpg_object {
                         ?>
                         <td class="right">
                             <label class="skill" style="display: block; float: left;">Skill :</label>
-                            <span class="skill_name type type_<?= $temp_skill_type ?>" title="<?= htmlspecialchars($temp_skill_description, ENT_QUOTES, 'UTF-8', true) ?>"><?= $temp_skill_name ?></span>
+                            <span class="skill_name type type_<?= $temp_skill_type ?>" title="<?= htmlspecialchars($temp_skill_info['skill_description'], ENT_QUOTES, 'UTF-8', true) ?>"><?= $temp_skill_info['skill_name'] ?></span>
                         </td>
                         <?
                         $right_column_markup[] = ob_get_clean();
