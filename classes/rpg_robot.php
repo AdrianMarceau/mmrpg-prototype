@@ -3687,14 +3687,14 @@ class rpg_robot extends rpg_object {
                     </div>
 
                     <? if($print_options['layout_style'] != 'event' && !empty($robot_info['robot_skill'])): ?>
-                        <? $skill_info = rpg_skill::get_index_info($robot_info['robot_skill']); ?>
+                        <? $skill_info = self::get_robot_skill_info($robot_info['robot_skill'], $robot_info); ?>
                         <div class="body body_left <?= !$print_options['show_mugshot'] ? 'fullsize' : '' ?> body_onerow skill_bubble">
                             <table class="full skill">
                                 <tbody>
                                     <tr>
                                         <td  class="center">
                                             <label>Passive Skill :</label>
-                                            <strong><?= !empty($robot_info['robot_skill_name']) ? $robot_info['robot_skill_name'] : $skill_info['skill_name'] ?></strong>
+                                            <strong><?= $skill_info['skill_name'] ?></strong>
                                             <p><?= $skill_info['skill_description2'] ?></p>
                                         </td>
                                     </tr>
