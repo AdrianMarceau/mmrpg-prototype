@@ -539,6 +539,14 @@ if (true){
                                         </tbody>
                                     </table>
                                     <?
+
+                                    // Collect the robot skill info if not empty
+                                    $skill_info = !empty($robot_info['robot_skill']) ? rpg_robot::get_robot_skill_info($robot_info['robot_skill'], $robot_info) : array();
+                                    if (!empty($skill_info)){
+                                        if (strstr($skill_info['skill_token'], '-subcore')){ $skill_info_type = str_replace('-subcore', '', $skill_info['skill_token']); }
+                                        else { $skill_info_type = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none'; }
+                                    }
+
                                     // Collect the robot field if not empty
                                     $temp_robot_field = '';
                                     if (!empty($robot_info['robot_field']) && $robot_info['robot_field'] != 'field'){ $temp_robot_field = $robot_info['robot_field']; }
@@ -558,26 +566,61 @@ if (true){
                                             }
                                         }
                                     }
+
+                                    // Generate table data for the skill and field (if applicable) and display if at least one is visible
+                                    $table_data = array();
+                                    if (!empty($skill_info)){
+                                        ob_start();
+                                        ?>
+                                        <div class="wrap">
+                                            <label style="display: block; float: left;">Skill :</label>
+                                            <div class="skill_container">
+                                                <span class="skill_name type type_<?= $skill_info_type ?>" title="<?= htmlentities($skill_info['skill_description'], ENT_QUOTES, 'UTF-8', true) ?>">
+                                                    <?= $skill_info['skill_name'] ?>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <?
+                                        $table_data[] = ob_get_clean();
+                                    }
+                                    if (!empty($temp_robot_field)){
+                                        ob_start();
+                                        ?>
+                                        <div class="wrap">
+                                            <label style="display: block; float: left;">Field :</label>
+                                            <div class="field_container">
+                                                <? if($robot_info['robot_unlocked'] || $robot_info['robot_summoned']): ?>
+                                                    <span class="ability_name ability_type ability_type_<?= !empty($temp_robot_field['field_type']) ? $temp_robot_field['field_type'] : 'none' ?> field_name" title="<?= $temp_field_title ?>"><?= $temp_robot_field['field_name'] ?></span>
+                                                <? else: ?>
+                                                    <span class="ability_name ability_type ability_type_empty field_name">???</span>
+                                                <? endif; ?>
+                                            </div>
+                                        </div>
+                                        <?
+                                        $table_data[] = ob_get_clean();
+                                    }
+
+                                    // If at least one is visible, we can display them
+                                    if (!empty($table_data)){
+                                        ?>
+                                        <table class="full">
+                                            <colgroup>
+                                                <col width="100%" />
+                                            </colgroup>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="right has3cols">
+                                                        <? foreach ($table_data AS $key => $data){
+                                                            echo(trim($data).PHP_EOL);
+                                                        } ?>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <?
+                                    }
+
                                     ?>
-                                    <table class="full">
-                                        <colgroup>
-                                            <col width="100%" />
-                                        </colgroup>
-                                        <tbody>
-                                            <tr>
-                                                <td class="right">
-                                                    <label style="display: block; float: left;">Field :</label>
-                                                    <div class="field_container">
-                                                        <? if(!empty($temp_robot_field) && ($robot_info['robot_unlocked'] || $robot_info['robot_summoned'])): ?>
-                                                            <span class="ability_name ability_type ability_type_<?= !empty($temp_robot_field['field_type']) ? $temp_robot_field['field_type'] : 'none' ?> field_name" title="<?= $temp_field_title ?>"><?= $temp_robot_field['field_name'] ?></span>
-                                                        <? else: ?>
-                                                            <span class="ability_name ability_type ability_type_empty field_name">???</span>
-                                                        <? endif; ?>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
                                     <table class="full">
                                         <colgroup>
                                             <col width="100%" />
@@ -648,9 +691,11 @@ if (true){
                                                         <span class="ability_name ability_type ability_empty record_name" title="Number of times this robot has been encountered as a target in battle">Encountered : <?= $robot_info['robot_encountered'] == 1 ? '1 Times' : number_format($robot_info['robot_encountered'], 0, '.', ',').' Times' ?></span>
                                                         <span class="ability_name ability_type ability_empty record_name" title="Number of times this robot has been defeated as a target in battle">Defeated : <?= $robot_info['robot_defeated'] == 1 ? '1 Times' :number_format( $robot_info['robot_defeated'], 0, '.', ',').' Times' ?></span>
                                                         <? /* <span class="ability_name ability_type ability_empty record_name" title="Highest overkill damage inflicted on this robot as a target in battle">Overkill : <?= (isset($robot_info['max_overkill_damage']) ? number_format($robot_info['max_overkill_damage'], 0, '.', ',').' Damage' : '---') ?></span> */ ?>
+                                                        <? /*
                                                         <span class="ability_name ability_type ability_empty record_name">&nbsp;</span>
                                                         <span class="ability_name ability_type ability_empty record_name">&nbsp;</span>
                                                         <span class="ability_name ability_type ability_empty record_name">&nbsp;</span>
+                                                        */ ?>
                                                     </div>
                                                 </td>
                                             </tr>

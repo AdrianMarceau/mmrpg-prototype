@@ -312,11 +312,30 @@
 #database #console .event_visible {
 
 }
+
+#database #console .event .body table {
+  table-layout: fixed;
+}
+
 #database #console .event table td.right {
   line-height: 21px;
 }
 
+#database #console .event table td.right.has3cols > .wrap {
+  display: block;
+  float: left;
+  box-sizing: border-box;
+  padding: 0;
+  margin-right: 10px;
+  margin-bottom: 0;
+  width: 33%;
+  width: calc((100% / 3) - 10px);
+  text-align: left;
+  overflow: hidden;
+}
+
 #database #console .event .field_container,
+#database #console .event .skill_container,
 #database #console .event .ability_container,
 #database #console .event .record_container {
   display: block;
@@ -324,25 +343,40 @@
   padding-top: 2px;
   width: 100%;
   text-align: left;
-  overflow: hidden;
   height: auto;
   min-height: 24px;
   white-space: normal;
 }
+#database #console .event .field_container:after,
+#database #console .event .skill_container:after,
+#database #console .event .ability_container:after,
+#database #console .event .record_container:after {
+  content: "";
+  display: block;
+  clear: both;
+}
 
 #database #console .event .field_name,
+#database #console .event .skill_name,
 #database #console .event .ability_name,
 #database #console .event .record_name {
-  display: inline-block;
+  display: block;
+  float: left;
+  box-sizing: border-box;
   padding: 2px 10px;
-  width: 28%;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  width: 33%;
+  width: calc((100% / 3) - 10px);
   text-align: left;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-#database #console .event .field_name {
-
+#database #console .event .field_name,
+#database #console .event .skill_name {
+  width: 100%;
+  margin: 0;
 }
 #database #console .event .record_name {
   font-weight: normal;
