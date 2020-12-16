@@ -3520,7 +3520,7 @@ class rpg_robot extends rpg_object {
                                         // Otherwise, print an empty field
                                         else {
                                             ?>
-                                                <span class="field_type">&hellip;</span>
+                                                <span class="field_type type empty" style="font-weight: normal;">???</span>
                                             <?
                                         }
                                         ?>

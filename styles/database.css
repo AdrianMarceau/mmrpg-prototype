@@ -372,11 +372,18 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  line-height: 1.3;
 }
 #database #console .event .field_name,
 #database #console .event .skill_name {
   width: 100%;
   margin: 0;
+}
+#database #console .event .field_name:hover,
+#database #console .event .skill_name:hover,
+#database #console .event .ability_name:hover,
+#database #console .event .record_name:hover {
+  display: block;
 }
 #database #console .event .record_name {
   font-weight: normal;
@@ -384,6 +391,15 @@
   line-height: 10px;
   border-color: #383636 !important;
   background-color: rgb(44, 44, 44) !important;
+}
+
+#database #console .event .ability_name .level,
+#database #console .event .ability_name .name {
+  display: block;
+}
+#database #console .event .ability_name .level {
+  font-size: 9px;
+  opacity: 0.8;
 }
 
 #database #console .header {

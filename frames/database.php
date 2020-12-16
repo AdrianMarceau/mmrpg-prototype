@@ -549,7 +549,8 @@ if (true){
 
                                     // Collect the robot field if not empty
                                     $temp_robot_field = '';
-                                    if (!empty($robot_info['robot_field']) && $robot_info['robot_field'] != 'field'){ $temp_robot_field = $robot_info['robot_field']; }
+                                    $temp_show_robot_field = false;
+                                    if (!empty($robot_info['robot_field']) && $robot_info['robot_field'] != 'field'){ $temp_robot_field = $robot_info['robot_field']; $temp_show_robot_field = true; }
                                     elseif (!empty($robot_info['robot_field2']) && $robot_info['robot_field2'] != 'field'){ $temp_robot_field = $robot_info['robot_field2']; }
                                     if (!empty($temp_robot_field)){
                                         //echo $robot_info['robot_field'];
@@ -589,7 +590,7 @@ if (true){
                                         <div class="wrap">
                                             <label style="display: block; float: left;">Field :</label>
                                             <div class="field_container">
-                                                <? if($robot_info['robot_unlocked'] || $robot_info['robot_summoned']): ?>
+                                                <? if($temp_show_robot_field && ($robot_info['robot_unlocked'] || $robot_info['robot_summoned'])): ?>
                                                     <span class="ability_name ability_type ability_type_<?= !empty($temp_robot_field['field_type']) ? $temp_robot_field['field_type'] : 'none' ?> field_name" title="<?= $temp_field_title ?>"><?= $temp_robot_field['field_name'] ?></span>
                                                 <? else: ?>
                                                     <span class="ability_name ability_type ability_type_empty field_name">???</span>
@@ -659,7 +660,7 @@ if (true){
                                                             //if (!empty($this_ability_accuracy)){ $this_ability_title_plain .= ' | '.$this_ability_accuracy.'% Accuracy'; }
                                                             //if (!empty($this_ability_description)){ $this_ability_title_plain .= ' | '.$this_ability_description; }
                                                             $this_ability_title_html = str_replace(' ', '&nbsp;', $this_ability_name);
-                                                            $this_ability_title_html = ($this_level > 1 ? 'Lv '.str_pad($this_level, 2, '0', STR_PAD_LEFT).' : ' : 'Start : ').$this_ability_title_html;
+                                                            $this_ability_title_html = '<span class="level">'.($this_level > 1 ? 'Lv '.str_pad($this_level, 2, '0', STR_PAD_LEFT) : 'Start').'</span> <span class="name">'.$this_ability_title_html.'</span>';
                                                             $this_ability_title = rpg_ability::print_editor_title_markup($robot_info, $this_ability);
                                                             $this_ability_title_plain = strip_tags(str_replace('<br />', '&#10;', $this_ability_title));
                                                             $this_ability_title_tooltip = htmlentities($this_ability_title, ENT_QUOTES, 'UTF-8');
