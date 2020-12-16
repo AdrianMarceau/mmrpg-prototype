@@ -242,7 +242,7 @@
             $form_data['skill_token'] = !empty($_POST['skill_token']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['skill_token']) ? trim(strtolower($_POST['skill_token'])) : '';
             $form_data['skill_name'] = !empty($_POST['skill_name']) && preg_match('/^[-_0-9a-z\.\*\s]+$/i', $_POST['skill_name']) ? trim($_POST['skill_name']) : '';
             $form_data['skill_class'] = 'skill'; //!empty($_POST['skill_class']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['skill_class']) ? trim(strtolower($_POST['skill_class'])) : '';
-            $form_data['skill_description'] = !empty($_POST['skill_description']) && preg_match('/^[-_0-9a-z\.\*\s\']+$/i', $_POST['skill_description']) ? trim($_POST['skill_description']) : '';
+            $form_data['skill_description'] = !empty($_POST['skill_description']) ? trim(strip_tags($_POST['skill_description'])) : '';
             $form_data['skill_description2'] = !empty($_POST['skill_description2']) ? trim(strip_tags($_POST['skill_description2'])) : '';
             $form_data['skill_parameters'] = !empty($_POST['skill_parameters']) ? trim($_POST['skill_parameters']) : '';
 

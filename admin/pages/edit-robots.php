@@ -415,7 +415,7 @@
 
             $form_data['robot_skill'] = !empty($_POST['robot_skill']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_skill']) ? trim(strtolower($_POST['robot_skill'])) : '';
             $form_data['robot_skill_name'] = !empty($form_data['robot_skill']) && !empty($_POST['robot_skill_name']) && preg_match('/^[-_0-9a-z\.\*\s]+$/i', $_POST['robot_skill_name']) ? trim($_POST['robot_skill_name']) : '';
-            $form_data['robot_skill_description'] = !empty($_POST['robot_skill_description']) && preg_match('/^[-_0-9a-z\.\*\s\']+$/i', $_POST['robot_skill_description']) ? trim($_POST['robot_skill_description']) : '';
+            $form_data['robot_skill_description'] = !empty($_POST['robot_skill_description']) ? trim(strip_tags($_POST['robot_skill_description'])) : '';
             $form_data['robot_skill_description2'] = !empty($_POST['robot_skill_description2']) ? trim(strip_tags($_POST['robot_skill_description2'])) : '';
             $form_data['robot_skill_parameters'] = !empty($_POST['robot_skill_parameters']) ? trim($_POST['robot_skill_parameters']) : '';
 
@@ -1378,6 +1378,7 @@
                                             <input class="textbox" type="text" name="robot_skill_name" value="<?= htmlentities($robot_data['robot_skill_name'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="100" />
                                         </div>
 
+                                        <? /*
                                         <div class="field fullsize">
                                             <div class="label">
                                                 <strong>Custom Skill Description (Short)</strong>
@@ -1393,6 +1394,7 @@
                                             </div>
                                             <textarea class="textarea" name="robot_skill_description2" rows="4"><?= htmlentities($robot_data['robot_skill_description2'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
                                         </div>
+                                        */ ?>
 
                                         <div class="field fullsize">
                                             <?
