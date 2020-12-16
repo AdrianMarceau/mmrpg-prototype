@@ -890,6 +890,39 @@ class rpg_skill extends rpg_object {
         return $skill_info;
     }
 
+    // Define a public function for parsing skill parameters w/ optional robot-based customizations
+    public static function parse_skill_details($skill_info, $robot_info = array()){
+        $details = array();
+        $details['skill_name'] = !empty($robot_info['robot_skill_name']) ? $robot_info['robot_skill_name'] : $skill_info['skill_name'];
+        $details['skill_description'] = !empty($robot_info['robot_skill_description']) ? $robot_info['robot_skill_description'] : $skill_info['skill_description'];
+        $details['skill_description2'] = !empty($robot_info['robot_skill_description2']) ? $robot_info['robot_skill_description2'] : $skill_info['skill_description2'];
+        return $details;
+    }
+
+    // Define a public function for parsing skill parameters w/ optional robot-based customizations
+    public static function parse_skill_parameters($skill_info, $robot_info = array()){
+        $base_parameters = !empty($skill_info['skill_parameters']) ? $skill_info['skill_parameters'] : array();
+        $robot_parameters = !empty($robot_info['robot_skill_parameters']) ? $robot_info['robot_skill_parameters'] : array();
+        $parameters = array_merge($base_parameters, $robot_parameters);
+        return $parameters;
+    }
+
+    // Define a public function for updating a given skill info array with customized parameters
+    public static function update_skill_with_customizations(&$skill_info, $custom_details, $custom_parameters){
+        $param_find = $param_replace = array();
+        foreach ($custom_parameters AS $key => $value){
+            $param_find[] = '{'.$key.'}'; $param_replace[] = $value;
+            $param_find[] = '{^'.$key.'}'; $param_replace[] = ucfirst($value);
+            $param_find[] = '{^^'.$key.'}'; $param_replace[] = strtoupper($value);
+        }
+        foreach ($skill_info AS $key => $value){
+            if (!isset($custom_details[$key])){ continue; }
+            $value = str_replace($param_find, $param_replace, $custom_details[$key]);
+            $skill_info[$key] = $value;
+        }
+        $skill_info['skill_parameters'] = $custom_parameters;
+    }
+
 
     // -- PRINT FUNCTIONS -- /
 
