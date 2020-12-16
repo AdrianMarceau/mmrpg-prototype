@@ -1151,6 +1151,20 @@ class rpg_robot extends rpg_object {
         }
     }
 
+    public function get_skill_info(){
+        if (empty($this->robot_skill)){ return false; }
+        $robot_info = self::get_index_info($this->robot_token);
+        return self::get_robot_skill_info($this->robot_skill, $robot_info);
+    }
+
+    public static function get_robot_skill_info($skill_token, $robot_info){
+        $skill_info = rpg_skill::get_index_info($skill_token);
+        $custom_skill_details = rpg_skill::parse_skill_details($skill_info, $robot_info);
+        $custom_skill_parameters = rpg_skill::parse_skill_parameters($skill_info, $robot_info);
+        rpg_skill::update_skill_with_customizations($skill_info, $custom_skill_details, $custom_skill_parameters);
+        return $skill_info;
+    }
+
     public function print_weaknesses(){
         $this_markup = array();
         foreach ($this->robot_weaknesses AS $this_type){
