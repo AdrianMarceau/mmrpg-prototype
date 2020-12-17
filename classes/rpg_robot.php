@@ -1547,11 +1547,11 @@ class rpg_robot extends rpg_object {
         if ($this_robot->has_ability('buster-relay')){
             $options[] = 'buster-relay';
             $temp_weight = 0;
-            if ($this_stat_mods['attack'] >= 1){ $weight += 1; }
-            if ($this_stat_mods['defense'] >= 1){ $weight += 1; }
-            if ($this_stat_mods['speed'] >= 1){ $weight += 1; }
-            if (preg_match_all('/("ability_(?:[a-z]+)-buster")/i', $this_attachment_string, $matches)){ $weight += count($matches[0]); }
-            if (preg_match_all('/("ability_core-shield_(?:[a-z]+)")/i', $this_attachment_string, $matches)){ $weight += count($matches[0]); }
+            if ($this_stat_mods['attack'] >= 1){ $temp_weight += 1; }
+            if ($this_stat_mods['defense'] >= 1){ $temp_weight += 1; }
+            if ($this_stat_mods['speed'] >= 1){ $temp_weight += 1; }
+            if (preg_match_all('/("ability_(?:[a-z]+)-buster")/i', $this_attachment_string, $matches)){ $temp_weight += count($matches[0]); }
+            if (preg_match_all('/("ability_core-shield_(?:[a-z]+)")/i', $this_attachment_string, $matches)){ $temp_weight += count($matches[0]); }
             if ($num_this_robots_active > 1){ $weights[] = $temp_weight; }
             else { $weights[] = 0; }
         }
