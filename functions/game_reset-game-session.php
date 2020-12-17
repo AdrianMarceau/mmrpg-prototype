@@ -41,6 +41,7 @@ function mmrpg_reset_game_session(){
         $_SESSION['ROBOTS'],
         $_SESSION['ABILITIES'],
         $_SESSION['ITEMS'],
+        $_SESSION['SKILLS'],
         $_SESSION['TEMP'],
         $_SESSION['DEBUG']
         );

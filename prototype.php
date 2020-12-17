@@ -24,6 +24,7 @@ $_SESSION['ROBOTS'] = array();
 $_SESSION['ROBOTS_PRELOAD'] = array();
 $_SESSION['ABILITIES'] = array();
 $_SESSION['ITEMS'] = array();
+$_SESSION['SKILLS'] = array();
 $_SESSION['PROTOTYPE_TEMP'] = array();
 
 // Collect the prototype start link if provided

@@ -17,6 +17,7 @@ if (!isset($_SESSION['PLAYERS'])){ $_SESSION['PLAYERS'] = array(); }
 if (!isset($_SESSION['ROBOTS'])){ $_SESSION['ROBOTS'] = array(); }
 if (!isset($_SESSION['ABILITIES'])){ $_SESSION['ABILITIES'] = array(); }
 if (!isset($_SESSION['ITEMS'])){ $_SESSION['ITEMS'] = array(); }
+if (!isset($_SESSION['SKILLS'])){ $_SESSION['SKILLS'] = array(); }
 // Define the COMMUNITY session trackers if they do not exist
 if (!isset($_SESSION['COMMUNITY'])){ $_SESSION['COMMUNITY']['threads_viewed'] = array(); }
 
