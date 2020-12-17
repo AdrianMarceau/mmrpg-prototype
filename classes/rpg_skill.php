@@ -91,21 +91,8 @@ class rpg_skill extends rpg_object {
         elseif (!in_array($this_skillinfo['skill_token'], $temp_system_skills)){
             $temp_backup_id = $this_skillinfo['skill_id'];
             if (empty($this_skillinfo_backup['_parsed']) && !empty($this_indexinfo)){
-                $this_skillinfo = array_replace($this_indexinfo, $this_skillinfo_backup);
-            }
-        }
-
-        // If this skill's robot has customizations, apply them now
-        if ($this->robot->robot_skill === $this_skillinfo['skill_token']){
-            $customizable_fields = array('skill_name', 'skill_description', 'skill_description2', 'skill_parameters');
-            foreach ($customizable_fields AS $field_name){
-                $robot_field_name = 'robot_'.$field_name;
-                if (!empty($this->robot->$robot_field_name)){
-                    $this_skillinfo[$field_name] = $this->robot->$robot_field_name;
-                } else {
-                    $this_skillinfo[$field_name] = $this_indexinfo[$field_name];
-                }
-
+                $robot_skillinfo = $this->robot->get_skill_info($this->robot->robot_skill);
+                $this_skillinfo = array_replace($this_indexinfo, $robot_skillinfo, $this_skillinfo_backup);
             }
         }
 
@@ -987,6 +974,8 @@ class rpg_skill extends rpg_object {
             'skill_token' => $this->skill_token,
             'skill_class' => $this->skill_class,
             'skill_description' => $this->skill_description,
+            'skill_description2' => $this->skill_description2,
+            'skill_parameters' => $this->skill_parameters,
             'flags' => $this->flags,
             'counters' => $this->counters,
             'values' => $this->values,

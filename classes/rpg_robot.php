@@ -441,9 +441,7 @@ class rpg_robot extends rpg_object {
         if (!isset($mmrpg_index_skills[$skill_token])){ return; }
         $skill_index_info = $mmrpg_index_skills[$skill_token];
         $skill_id = rpg_game::unique_skill_id($this->robot_id, $skill_index_info['skill_id']);
-        $skill_info = array('skill_id' => $skill_id, 'skill_token' => $skill_token);
-        if (!empty($this->robot_skill_name)){ $skill_info['skill_name'] = $this->robot_skill_name; }
-        if (!empty($this->robot_skill_parameters)){ $skill_info['skill_parameters'] = $this->robot_skill_parameters; }
+        $skill_info = array_merge($this->get_skill_info($skill_token), array('skill_id' => $skill_id));
         if (!empty($extra_skill_info)){ $skill_info = array_merge($skill_info, $extra_skill_info); }
 
         // Collect this skill's object from the game class
@@ -5779,6 +5777,47 @@ class rpg_robot extends rpg_object {
 
         // Trigger this robot's item function if one has been defined for this context
         $this->trigger_custom_function('rpg-robot_check-items', $extra_objects, $extra_item_info);
+
+    }
+
+    // Define a function for checking ttem status
+    public function check_skills(rpg_player $target_player, rpg_robot $target_robot){
+
+        // Collect references to global objects
+        $db = cms_database::get_database();
+        $this_battle = rpg_battle::get_battle();
+        $this_field = rpg_field::get_field();
+        $session_token = rpg_game::session_token();
+
+        // If the battle has ended, don't do this
+        if ($this_battle->battle_status == 'complete'){ return false; }
+
+        // Collect references to relative player and robot objects
+        $this_player = $this->player;
+        $this_robot = $this;
+
+        // Hide any disabled robots and return
+        if ($this_robot->get_status() == 'disabled'){
+            $this_robot->set_flag('apply_disabled_state', true);
+            $this_battle->events_create();
+            return;
+        }
+
+        // If this robot does not have an skill, we can return now
+        if (empty($this->robot_skill)){ return; }
+
+        // Create an options object for this function and populate
+        $options = rpg_game::new_options_object();
+        $extra_objects = array('options' => $options);
+
+        // Define the extra skill fields to pass to the trigger function
+        $extra_skill_info = array(
+            'flags' => array('is_part' => true),
+            'part_token' => 'skill_'.$this->robot_skill
+            );
+
+        // Trigger this robot's skill function if one has been defined for this context
+        $this->trigger_custom_function('rpg-robot_check-skills', $extra_objects, $extra_skill_info);
 
     }
 
