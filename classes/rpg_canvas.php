@@ -503,6 +503,10 @@ class rpg_canvas {
                 $temp_clone_class .= $this_data['robot_frame_classes'];
                 $frame_background_offset = -1 * ceil(($this_data['robot_sprite_size'] * $frame_position));
 
+                if ($this_robot->robot_image_size !== $this_data['robot_sprite_size']){
+                    $temp_clone_class .= 'scaled ';
+                }
+
                 $temp_clone_style = 'background-position: '.(!empty($frame_background_offset) ? $frame_background_offset.'px' : '0').' 0; ';
                 $temp_clone_style .= 'z-index: '.($this_data['canvas_offset_z'] + 1).'; '.$this_data['robot_float'].': '.($gemini_clone_offset_x - ceil($this_data['robot_scale'] * (40 + ($this_robot->robot_image_size > 40 ? 10 : 0)))).'px; bottom: '.($gemini_clone_offset_y - 2).'px; ';
                 if ($gemini_clone_frame == 'damage'){
