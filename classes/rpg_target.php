@@ -63,7 +63,7 @@ class rpg_target {
         $this_ability->ability_results['this_text'] .= $this_ability->target_options['target_text'];
 
         // Update the ability results with the the trigger kind
-        $this_ability->ability_results['trigger_kind'] = 'target';
+        $this_ability->ability_results['trigger_kind'] = isset($trigger_options['override_trigger_kind']) ? $trigger_options['override_trigger_kind'] : 'target';
         $this_ability->ability_results['this_result'] = 'success';
 
         // Update the event options with the ability results
@@ -157,7 +157,7 @@ class rpg_target {
         $this_item->item_results['this_text'] .= $this_item->target_options['target_text'];
 
         // Update the item results with the the trigger kind
-        $this_item->item_results['trigger_kind'] = 'target';
+        $this_item->item_results['trigger_kind'] = isset($trigger_options['override_trigger_kind']) ? $trigger_options['override_trigger_kind'] : 'target';
         $this_item->item_results['this_result'] = 'success';
 
         // Update the event options with the item results
@@ -236,7 +236,7 @@ class rpg_target {
         $this_skill->skill_results['this_text'] .= $this_skill->target_options['target_text'];
 
         // Update the skill results with the the trigger kind
-        $this_skill->skill_results['trigger_kind'] = 'target';
+        $this_skill->skill_results['trigger_kind'] = isset($trigger_options['override_trigger_kind']) ? $trigger_options['override_trigger_kind'] : 'target';
         $this_skill->skill_results['this_result'] = 'success';
 
         // Update the event options with the skill results

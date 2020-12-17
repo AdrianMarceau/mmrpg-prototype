@@ -2461,12 +2461,17 @@ class rpg_battle extends rpg_object {
         $options['this_item_target_key'] = isset($eventinfo['event_options']['this_item_target_key']) ? $eventinfo['event_options']['this_item_target_key'] : 0;
         $options['this_item_target_position'] = isset($eventinfo['event_options']['this_item_target_position']) ? $eventinfo['event_options']['this_item_target_position'] : 'active';
         $options['this_item_results'] = isset($eventinfo['event_options']['this_item_results']) ? $eventinfo['event_options']['this_item_results'] : false;
+        $options['this_skill'] = isset($eventinfo['event_options']['this_skill']) ? $eventinfo['event_options']['this_skill'] : false;
+        $options['this_skill_quantity'] = isset($eventinfo['event_options']['this_skill_quantity']) ? $eventinfo['event_options']['this_skill_quantity'] : 0;
+        $options['this_skill_target'] = isset($eventinfo['event_options']['this_skill_target']) ? $eventinfo['event_options']['this_skill_target'] : false;
+        $options['this_skill_target_key'] = isset($eventinfo['event_options']['this_skill_target_key']) ? $eventinfo['event_options']['this_skill_target_key'] : 0;
+        $options['this_skill_target_position'] = isset($eventinfo['event_options']['this_skill_target_position']) ? $eventinfo['event_options']['this_skill_target_position'] : 'active';
+        $options['this_skill_results'] = isset($eventinfo['event_options']['this_skill_results']) ? $eventinfo['event_options']['this_skill_results'] : false;
         $options['this_star'] = isset($eventinfo['event_options']['this_star']) ? $eventinfo['event_options']['this_star'] : false;
         $options['this_player_image'] = isset($eventinfo['event_options']['this_player_image']) ? $eventinfo['event_options']['this_player_image'] : 'sprite';
         $options['this_robot_image'] = isset($eventinfo['event_options']['this_robot_image']) ? $eventinfo['event_options']['this_robot_image'] : 'sprite';
         $options['this_ability_image'] = isset($eventinfo['event_options']['this_ability_image']) ? $eventinfo['event_options']['this_ability_image'] : 'sprite';
         $options['this_item_image'] = isset($eventinfo['event_options']['this_item_image']) ? $eventinfo['event_options']['this_item_image'] : 'sprite';
-        $options['this_item_quantity'] = isset($eventinfo['event_options']['this_item_quantity']) ? $eventinfo['event_options']['this_item_quantity'] : 1;
 
         // Define the variable to collect markup
         $this_markup = array();

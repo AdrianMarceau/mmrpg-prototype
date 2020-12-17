@@ -1580,6 +1580,8 @@ class rpg_canvas {
             $results_type = 'item';
         } elseif (!empty($options['this_ability']) || !empty($options['this_ability_results'])){
             $results_type = 'ability';
+        } elseif (!empty($options['this_skill']) || !empty($options['this_skill_results'])){
+            $results_type = 'skill';
         }
 
         // If this robot was not provided or allowed by the function
@@ -1684,23 +1686,26 @@ class rpg_canvas {
                 $this_robot_id_token = $this_robot_data['robot_id'].'_'.$this_robot_data['robot_token'];
 
                 // OVERLAY STUFF
-                if (!empty($this_options['this_'.$results_type.'_results']) && $this_options['this_'.$results_type.'_target'] == $this_robot_id_token){
-                    $this_markup .= '<div class="'.$results_type.'_overlay overlay1" data-target="'.$this_options['this_'.$results_type.'_target'].'" data-key="'.$this_robot_data['robot_key'].'" style="z-index: '.(($this_robot_data['robot_position'] == 'active' ? 5050 : (4900 - ($this_robot_data['robot_key'] * 100)))).';">&nbsp;</div>';
-                }
-                elseif ($this_robot_data['robot_position'] != 'bench' && !empty($this_options['this_'.$results_type]) && !empty($options['canvas_show_this_'.$results_type])){
-                    $this_markup .= '<div class="'.$results_type.'_overlay overlay2" data-target="'.$this_options['this_'.$results_type.'_target'].'" data-key="'.$this_robot_data['robot_key'].'" style="z-index: 5050;">&nbsp;</div>';
-                }
-                elseif ($this_robot_data['robot_position'] != 'bench' && !empty($options['canvas_show_this_'.$results_type.'_overlay'])){
-                    $this_markup .= '<div class="'.$results_type.'_overlay overlay3" style="z-index: 100;">&nbsp;</div>';
+                if (!empty($results_type)){
+                    if (!empty($this_options['this_'.$results_type.'_results']) && $this_options['this_'.$results_type.'_target'] == $this_robot_id_token){
+                        $this_markup .= '<div class="'.$results_type.'_overlay overlay1" data-target="'.$this_options['this_'.$results_type.'_target'].'" data-key="'.$this_robot_data['robot_key'].'" style="z-index: '.(($this_robot_data['robot_position'] == 'active' ? 5050 : (4900 - ($this_robot_data['robot_key'] * 100)))).';">&nbsp;</div>';
+                    }
+                    elseif ($this_robot_data['robot_position'] != 'bench' && !empty($this_options['this_'.$results_type]) && !empty($options['canvas_show_this_'.$results_type])){
+                        $this_markup .= '<div class="'.$results_type.'_overlay overlay2" data-target="'.$this_options['this_'.$results_type.'_target'].'" data-key="'.$this_robot_data['robot_key'].'" style="z-index: 5050;">&nbsp;</div>';
+                    }
+                    elseif ($this_robot_data['robot_position'] != 'bench' && !empty($options['canvas_show_this_'.$results_type.'_overlay'])){
+                        $this_markup .= '<div class="'.$results_type.'_overlay overlay3" style="z-index: 100;">&nbsp;</div>';
+                    }
                 }
 
                 // RESULTS ANIMATION STUFF
-                if (!empty($this_options['this_'.$results_type.'_results'])
+                if (!empty($results_type)
+                    && !empty($this_options['this_'.$results_type.'_results'])
                     && $this_options['this_'.$results_type.'_target'] == $this_robot_id_token
                     ){
 
                     /*
-                     * ABILITY/ITEM EFFECT OFFSETS
+                     * ABILITY/ITEM/SKILL EFFECT OFFSETS
                      * Frame 01 : Energy +
                      * Frame 02 : Energy -
                      * Frame 03 : Attack +
@@ -1755,13 +1760,13 @@ class rpg_canvas {
                     }
                     $this_results_data['results_amount_canvas_opacity'] = 1.00;
                     if ($this_robot_data['robot_position'] == 'bench'){
-                        $this_results_data['results_amount_canvas_offset_x'] += 105; //$this_results_data['results_amount_canvas_offset_x'] * -1;
+                        $this_results_data['results_amount_canvas_offset_x'] += 105 - 10; //$this_results_data['results_amount_canvas_offset_x'] * -1;
                         $this_results_data['results_amount_canvas_offset_y'] += 5; //10;
                         $this_results_data['results_amount_canvas_offset_z'] = $this_robot_data['canvas_offset_z'] + 1000;
                         $this_results_data['results_amount_canvas_opacity'] -= 0.10;
                     } else {
-                        $this_results_data['canvas_offset_x'] += mt_rand(0, 10); //jitter
-                        $this_results_data['canvas_offset_y'] += mt_rand(0, 10); //jitter
+                        $this_results_data['canvas_offset_x'] += mt_rand(0, 5) - 10; //jitter
+                        $this_results_data['canvas_offset_y'] += mt_rand(0, 5); //jitter
                     }
                     $this_results_data['results_amount_style'] = 'bottom: '.$this_results_data['results_amount_canvas_offset_y'].'px; '.$this_robot_data['robot_float'].': '.$this_results_data['results_amount_canvas_offset_x'].'px; z-index: '.$this_results_data['results_amount_canvas_offset_z'].'; opacity: '.$this_results_data['results_amount_canvas_opacity'].'; ';
                     $this_results_data['results_effect_class'] = 'sprite sprite_'.$this_results_data[$results_type.'_sprite_size'].'x'.$this_results_data[$results_type.'_sprite_size'].' '.$results_type.'_status_active '.$results_type.'_position_active ';
@@ -1998,6 +2003,19 @@ class rpg_canvas {
 
                         // Append this object's markup to the main markup array
                         $this_markup .= $this_item_data['item_markup'];
+
+                    }
+                    // Else if this is an skill, collect its markup
+                    elseif ($results_type == 'skill'){
+
+                        // Define the object data array and generate markup data
+                        $attachment_options['data_type'] = 'skill';
+
+                        // Display the object's mugshot sprite
+                        if (empty($this_options['this_skill_results']['total_actions'])){
+                            $this_mugshot_markup_combined = '<div class="sprite skill_sprite canvas_skill_details skill_type skill_type_none" style=""><div class="skill_name" style="">'.$this_skill_data['skill_title'].'</div></div>';
+                            $this_markup .= $this_mugshot_markup_combined;
+                        }
 
                     }
 

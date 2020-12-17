@@ -2544,14 +2544,19 @@ class rpg_ability extends rpg_object {
             // Target this robot's self to show the success message
             $amount_text = ''; //' (old:'.$old_mod_value.', amount:'.$options->boost_amount.', rel-amount:'.$rel_boost_amount.', result:'.$target_robot->counters[$mods_token].')';
             $target_options = array('frame' => 'taunt', 'success' => array($options->success_frame, -2, 0, -10, $options->extra_text.$target_robot->print_name().'&#39;s '.$options->stat_type.' '.$boost_text.$amount_text.'!'));
+            $target_results = array('total_actions' => 1, 'total_strikes' => 1, 'recovery_kind' => $options->stat_type, 'this_amount' => $rel_boost_amount);
+            $trigger_options = array('override_trigger_kind' => 'recovery');
             if ($trigger_item || $trigger_skill){
                 $trigger_object->set_flag('skip_canvas_header', true);
+                if ($trigger_item){ $trigger_object->item_results = $target_results; }
+                elseif ($trigger_skill){ $trigger_object->skill_results = $target_results; }
                 $trigger_object->target_options_update($target_options);
-                $target_robot->trigger_target($target_robot, $trigger_object);
+                $target_robot->trigger_target($target_robot, $trigger_object, $trigger_options);
             } else {
                 $trigger_ability->set_flag('skip_canvas_header', true);
+                $trigger_ability->ability_results = $target_results;
                 $trigger_ability->target_options_update($target_options);
-                $target_robot->trigger_target($target_robot, $trigger_ability);
+                $target_robot->trigger_target($target_robot, $trigger_ability, $trigger_options);
             }
 
             // Update the robot's counter for applied mods
@@ -2698,14 +2703,19 @@ class rpg_ability extends rpg_object {
             // Target this robot's self to show the success message
             $amount_text = ''; //' (old:'.$old_mod_value.', amount:'.$options->break_amount.', rel-amount:'.$rel_break_amount.', result:'.$target_robot->counters[$mods_token].')';
             $target_options = array('frame' => 'defend', 'success' => array($options->success_frame, -2, 0, -10, $options->extra_text.$target_robot->print_name().'&#39;s '.$options->stat_type.' '.$break_text.$amount_text.'!'));
+            $target_results = array('total_actions' => 1, 'total_strikes' => 1, 'damage_kind' => $options->stat_type, 'this_amount' => $rel_break_amount);
+            $trigger_options = array('override_trigger_kind' => 'damage');
             if ($trigger_item || $trigger_skill){
                 $trigger_object->set_flag('skip_canvas_header', true);
+                if ($trigger_item){ $trigger_object->item_results = $target_results; }
+                elseif ($trigger_skill){ $trigger_object->skill_results = $target_results; }
                 $trigger_object->target_options_update($target_options);
-                $target_robot->trigger_target($target_robot, $trigger_object);
+                $target_robot->trigger_target($target_robot, $trigger_object, $trigger_options);
             } else {
                 $trigger_ability->set_flag('skip_canvas_header', true);
+                $trigger_ability->ability_results = $target_results;
                 $trigger_ability->target_options_update($target_options);
-                $target_robot->trigger_target($target_robot, $trigger_ability);
+                $target_robot->trigger_target($target_robot, $trigger_ability, $trigger_options);
             }
 
             // Update the robot's counter for applied mods
