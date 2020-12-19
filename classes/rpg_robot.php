@@ -5740,7 +5740,7 @@ class rpg_robot extends rpg_object {
     }
 
     // Define a function for checking ttem status
-    public function check_items(rpg_player $target_player, rpg_robot $target_robot){
+    public function check_items(rpg_player $target_player, rpg_robot $target_robot, $phase = ''){
 
         // Collect references to global objects
         $db = cms_database::get_database();
@@ -5776,12 +5776,13 @@ class rpg_robot extends rpg_object {
             );
 
         // Trigger this robot's item function if one has been defined for this context
-        $this->trigger_custom_function('rpg-robot_check-items', $extra_objects, $extra_item_info);
+        $function_name = 'rpg-robot_check-items'.(!empty($phase) ? '_'.$phase : '');
+        $this->trigger_custom_function($function_name, $extra_objects, $extra_item_info);
 
     }
 
     // Define a function for checking ttem status
-    public function check_skills(rpg_player $target_player, rpg_robot $target_robot){
+    public function check_skills(rpg_player $target_player, rpg_robot $target_robot, $phase = ''){
 
         // Collect references to global objects
         $db = cms_database::get_database();
@@ -5817,7 +5818,8 @@ class rpg_robot extends rpg_object {
             );
 
         // Trigger this robot's skill function if one has been defined for this context
-        $this->trigger_custom_function('rpg-robot_check-skills', $extra_objects, $extra_skill_info);
+        $function_name = 'rpg-robot_check-skills'.(!empty($phase) ? '_'.$phase : '');
+        $this->trigger_custom_function($function_name, $extra_objects, $extra_skill_info);
 
     }
 
