@@ -50,10 +50,10 @@ if ($this_battle->battle_status != 'complete'){
     // Loop through this player's robots and apply end-turn checks
     foreach ($this_robots_active AS $key => $active_robot){
         $active_robot->check_history($target_player, $target_robot);
-        $active_robot->check_items($target_player, $target_robot);
-        $active_robot->check_skills($target_player, $target_robot);
         $active_robot->check_attachments($target_player, $target_robot);
         $active_robot->check_weapons($target_player, $target_robot);
+        $active_robot->check_skills($target_player, $target_robot);
+        $active_robot->check_items($target_player, $target_robot);
         $this_robot_keys_active[] = 'left_'.$active_robot->robot_key;
         if ($active_robot->robot_position == 'active'){ $this_robot_keys_active[] = 'left_-1'; }
         if ($active_robot->robot_id === $this_robot->robot_id){ $this_robot->robot_reload(); }
@@ -62,10 +62,10 @@ if ($this_battle->battle_status != 'complete'){
     // Loop through the target player's robots and apply end-turn checks
     foreach ($target_robots_active AS $key => $active_robot){
         $active_robot->check_history($this_player, $this_robot);
-        $active_robot->check_items($this_player, $this_robot);
-        $active_robot->check_skills($this_player, $this_robot);
         $active_robot->check_attachments($this_player, $this_robot);
         $active_robot->check_weapons($this_player, $this_robot);
+        $active_robot->check_skills($this_player, $this_robot);
+        $active_robot->check_items($this_player, $this_robot);
         $this_robot_keys_active[] = 'right_'.$active_robot->robot_key;
         if ($active_robot->robot_position == 'active'){ $this_robot_keys_active[] = 'right_-1'; }
         if ($active_robot->robot_id === $target_robot->robot_id){ $target_robot->robot_reload(); }
