@@ -365,6 +365,9 @@ foreach ($this_player->values['robots_active'] AS $key => $info){
     }
 }
 
+// Require the common battle-start action file
+require(MMRPG_CONFIG_ROOTDIR.'battle/actions/action_battlestart.php');
+
 // Create a final frame before giving control to the user
 $this_battle->events_create(false, false, '', '');
 
