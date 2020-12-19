@@ -5876,6 +5876,31 @@ class rpg_robot extends rpg_object {
 
     }
 
+    // Define a function for checking if a given "condition" has been satisfied for this robot
+    public function check_battle_condition_is_true($condition_parameters){
+
+        // Break apart the parameters into stat/operator/value variables
+        list($c_stat, $c_operator, $c_value) = array_values($condition_parameters);
+
+        // Assuming this is a stat-based condition, collect stat values to compare
+        $is_percent_based = in_array($c_stat, array('energy', 'weapons')) ? true : false;
+        $boost_stat_value_required = intval($c_value);
+        $boost_stat_value_current = $this->get_info('robot_'.$c_stat);
+        // If the stat is percent-based, collect that instead of the raw value
+        if ($is_percent_based){
+            $base_stat_value = $this->get_info('robot_base_'.$c_stat);
+            $boost_stat_value_current = ($boost_stat_value_current / $base_stat_value) * 100;
+        }
+        // Compare the required stat with the actual one and return false if they don't match
+        if (!version_compare($boost_stat_value_current, $boost_stat_value_required, $c_operator)){
+            return false;
+        }
+
+        // Return true by default
+        return true;
+
+    }
+
     // Define a function for triggering a robot to "consume" their item, which is to say remove it in the right context
     public function consume_held_item(){
 
