@@ -2144,4 +2144,65 @@ class rpg_game {
     }
 
 
+    // -- MISC ABILITY/ITEM/SKILL FUNCTIONS -- //
+
+    // Define a function for checking if a given "condition" is valid and return the parsed values if true
+    public static function check_battle_condition_is_valid($condition, $this_object = false){
+
+        // Collect the object token for error-logging purposes
+        $this_object_token = 'undefined'; $this_object_kind = 'unknown';
+        if (isset($this_object->ability_token)){ $this_object_token = $this_object->ability_token; $this_object_kind = 'ability'; }
+        elseif (isset($this_object->item_token)){ $this_object_token = $this_object->item_token; $this_object_kind = 'item'; }
+        elseif (isset($this_object->skill_token)){ $this_object_token = $this_object->skill_token; $this_object_kind = 'skill'; }
+
+        // First check to ensure it matches the established condition format
+        // examples: "attack < 3" or "defense >= 2" or "energy < 50%"
+        if (!preg_match('/^([a-z]+)\s?([\<\>\=\!]+)\s?(\-?[0-9]+\%?)$/i', $condition, $matches)){
+            error_log('skill parameter "condition" was set but was invalid ('.$this_object_token.':'.__LINE__.')');
+            error_log('$condition = '.print_r($condition, true));
+            return false;
+        }
+        // Now check to make sure the individual parts of the condition are allowed
+        $allowed_condition_stats = array('energy', 'weapons', 'attack', 'defense', 'speed');
+        $allowed_condition_operators = array('=', '<=', '>=', '<', '>', '<>');
+        list($x, $c_stat, $c_operator, $c_value) = $matches;
+        if (!in_array($c_stat, $allowed_condition_stats)){
+            error_log('skill parameter "condition" stat was set but was invalid ('.$this_object_token.':'.__LINE__.')');
+            error_log('$c_stat = '.print_r($c_stat, true));
+            return false;
+        } elseif (!in_array($c_operator, $allowed_condition_operators)){
+            error_log('skill parameter "condition" operator was set but was invalid ('.$this_object_token.':'.__LINE__.')');
+            error_log('$c_operator = '.print_r($c_operator, true));
+            return false;
+        } else {
+            // Validate the value parameter differently for energy/weapons vs attack/defense/speed stats
+            if ($c_stat === 'energy' || $c_stat === 'weapons'){
+                if (!strstr($c_value, '%')){
+                    error_log('skill parameter "condition" value must be percent for energy/weapons stat ('.$this_object_token.':'.__LINE__.')');
+                    error_log('$c_value = '.print_r($c_value, true));
+                    return false;
+                } elseif (intval($c_value) <= 0 || intval($c_value) > 100){
+                    error_log('skill parameter "condition" value must be > 0% and <= 100% for energy/weapons stat ('.$this_object_token.':'.__LINE__.')');
+                    error_log('$c_value = '.print_r($c_value, true));
+                    return false;
+                }
+            } else {
+                if (intval($c_value) < MMRPG_SETTINGS_STATS_MOD_MIN || intval($c_value) > MMRPG_SETTINGS_STATS_MOD_MAX){
+                    error_log('skill parameter "condition" value must be > '.MMRPG_SETTINGS_STATS_MOD_MIN.' and < '.MMRPG_SETTINGS_STATS_MOD_MAX.' for attack/defense/speed stat ('.$this_object_token.':'.__LINE__.')');
+                    error_log('$c_value = '.print_r($c_value, true));
+                    return false;
+                }
+            }
+        }
+
+        // If we made it this far it must be valid, return the broken-up parameter details
+        return array(
+            'stat' => $c_stat,
+            'operator' => $c_operator,
+            'value' => $c_value,
+            );
+
+    }
+
+
 }
