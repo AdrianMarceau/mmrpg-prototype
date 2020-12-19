@@ -1378,7 +1378,6 @@
                                             <input class="textbox" type="text" name="robot_skill_name" value="<?= htmlentities($robot_data['robot_skill_name'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="100" />
                                         </div>
 
-                                        <? /*
                                         <div class="field fullsize">
                                             <div class="label">
                                                 <strong>Custom Skill Description (Short)</strong>
@@ -1394,7 +1393,6 @@
                                             </div>
                                             <textarea class="textarea" name="robot_skill_description2" rows="4"><?= htmlentities($robot_data['robot_skill_description2'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
                                         </div>
-                                        */ ?>
 
                                         <div class="field fullsize">
                                             <?
