@@ -2693,4 +2693,48 @@ function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token 
     return $text_sprites_markup;
 
 }
+
+
+// Define a function for restoring any dropped items to their owners assuming they haven't picked up a new one
+function mmrpg_prototype_restore_dropped_items($options = array()){
+
+    // Collect session token for later
+    $session_token = rpg_game::session_token();
+
+    // If a battle token was provided, collect it
+    $this_battle_token = isset($options['this_battle_token']) ? $options['this_battle_token'] : false;
+    $this_preload_keys = array();
+    if (!empty($this_battle_token) && !empty($_SESSION['ROBOTS_PRELOAD'][$this_battle_token])){
+        foreach ($_SESSION['ROBOTS_PRELOAD'][$this_battle_token] AS $robot_string => $robot_preload){
+            list($id, $token) = explode('_', $robot_string);
+            $this_preload_keys[$token] = $robot_string;
+        }
+    }
+
+    // Check to see if there are any dropped items we should re-equip
+    if (!empty($_SESSION['ITEMS_DROPPED'])){
+        foreach ($_SESSION['ITEMS_DROPPED'] AS $key => $item){
+            $ptoken = $item['player'];
+            $rtoken = $item['robot'];
+            $itoken = $item['item'];
+            // Re-equip this item to the robot via battle settings and remove from inventory if we did
+            if (!empty($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken])
+                && empty($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
+                $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = $itoken;
+                if (!empty($_SESSION[$session_token]['values']['battle_items'][$itoken])){
+                    $_SESSION[$session_token]['values']['battle_items'][$itoken] -= 1;
+                }
+            }
+            // If there's any preload data, make sure we re-equip the item there too
+            if (isset($this_preload_keys[$rtoken])){
+                $rstring = $this_preload_keys[$rtoken];
+                $_SESSION['ROBOTS_PRELOAD'][$this_battle_token][$rstring]['robot_item'] = $itoken;
+            }
+            // And finally, we can unset the item from the dropped array so it doesn't persist
+            unset($_SESSION['ITEMS_DROPPED'][$key]);
+        }
+    }
+
+}
+
 ?>

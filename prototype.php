@@ -15,6 +15,9 @@ $session_token = mmrpg_game_token();
 // Pull in necessary indexes in case we need them later
 if (!isset($mmrpg_index_players) || empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
 
+// Restore any dropped items to their owners if able to
+mmrpg_prototype_restore_dropped_items();
+
 // Automatically empty all temporary battle variables
 $_SESSION['BATTLES'] = array();
 $_SESSION['BATTLES_CHAIN'] = array();
@@ -24,6 +27,7 @@ $_SESSION['ROBOTS'] = array();
 $_SESSION['ROBOTS_PRELOAD'] = array();
 $_SESSION['ABILITIES'] = array();
 $_SESSION['ITEMS'] = array();
+$_SESSION['ITEMS_DROPPED'] = array();
 $_SESSION['SKILLS'] = array();
 $_SESSION['PROTOTYPE_TEMP'] = array();
 

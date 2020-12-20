@@ -16,8 +16,8 @@ action_battlestart_check_actions($this_player, $target_player, $target_robot);
 action_battlestart_check_actions($target_player, $this_player, $this_robot);
 
 // Reload both active robots in case anything has changed
-$this_robot->robot_reload();
-$target_robot->robot_reload();
+$this_robot = rpg_game::get_robot_by_id($this_robot->robot_id);
+$target_robot = rpg_game::get_robot_by_id($target_robot->robot_id);
 
 // Create an empty field to remove any leftover frames
 //$this_battle->events_create();

@@ -122,6 +122,11 @@ if ($this_action == 'start'){
     $_SESSION['ITEMS'] = array();
     $_SESSION['SKILLS'] = array();
 
+    // Restore any dropped items to their owners if able to
+    mmrpg_prototype_restore_dropped_items(array(
+        'this_battle_token' => $this_battle_token
+        ));
+
 }
 
 /*
