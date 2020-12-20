@@ -108,6 +108,19 @@ class rpg_skill extends rpg_object {
         $this->skill_description = isset($this_skillinfo['skill_description']) ? $this_skillinfo['skill_description'] : '';
         $this->skill_description2 = isset($this_skillinfo['skill_description2']) ? $this_skillinfo['skill_description2'] : '';
         $this->skill_parameters = isset($this_skillinfo['skill_parameters']) ? $this_skillinfo['skill_parameters'] : '';
+        $this->skill_frame = isset($this_skillinfo['skill_frame']) ? $this_skillinfo['skill_frame'] : 'base';
+        $this->skill_frame_span = isset($this_skillinfo['skill_frame_span']) ? $this_skillinfo['skill_frame_span'] : 1;
+        $this->skill_frame_animate = isset($this_skillinfo['skill_frame_animate']) ? $this_skillinfo['skill_frame_animate'] : array($this->skill_frame);
+        $this->skill_frame_index = isset($this_skillinfo['skill_frame_index']) ? $this_skillinfo['skill_frame_index'] : array('00');
+        $this->skill_frame_offset = isset($this_skillinfo['skill_frame_offset']) ? $this_skillinfo['skill_frame_offset'] : array('x' => 0, 'y' => 0, 'z' => 1);
+        $this->skill_frame_styles = isset($this_skillinfo['skill_frame_styles']) ? $this_skillinfo['skill_frame_styles'] : '';
+        $this->skill_frame_classes = isset($this_skillinfo['skill_frame_classes']) ? $this_skillinfo['skill_frame_classes'] : '';
+        $this->skill_image = isset($this_skillinfo['skill_image']) ? $this_skillinfo['skill_image'] : false;
+        $this->skill_image_size = isset($this_skillinfo['skill_image_size']) ? $this_skillinfo['skill_image_size'] : 40;
+        $this->attachment_frame = isset($this_skillinfo['attachment_frame']) ? $this_skillinfo['attachment_frame'] : 'base';
+        $this->attachment_frame_animate = isset($this_skillinfo['attachment_frame_animate']) ? $this_skillinfo['attachment_frame_animate'] : array($this->attachment_frame);
+        $this->attachment_frame_index = isset($this_skillinfo['attachment_frame_index']) ? $this_skillinfo['attachment_frame_index'] : array('base');
+        $this->attachment_frame_offset = isset($this_skillinfo['attachment_frame_offset']) ? $this_skillinfo['attachment_frame_offset'] : array('x' => 0, 'y' => 0, 'z' => 1);
         $this->skill_results = array();
         $this->attachment_results = array();
         $this->skill_options = array();
@@ -122,6 +135,8 @@ class rpg_skill extends rpg_object {
         $this->skill_base_description = isset($this_skillinfo['skill_base_description']) ? $this_skillinfo['skill_base_description'] : $this->skill_description;
         $this->skill_base_description2 = isset($this_skillinfo['skill_base_description2']) ? $this_skillinfo['skill_base_description2'] : $this->skill_description2;
         $this->skill_base_parameters = isset($this_skillinfo['skill_base_parameters']) ? $this_skillinfo['skill_base_parameters'] : $this->skill_parameters;
+        $this->skill_base_image = isset($this_skillinfo['skill_base_image']) ? $this_skillinfo['skill_base_image'] : $this->skill_image;
+        $this->skill_base_image_size = isset($this_skillinfo['skill_base_image_size']) ? $this_skillinfo['skill_base_image_size'] : $this->skill_image_size;
 
         // Collect any functions associated with this skill
         if (!isset($this->skill_function)){
@@ -205,6 +220,49 @@ class rpg_skill extends rpg_object {
 
     public function get_functions(){ return $this->get_info('skill_functions'); }
     public function set_functions($value){ $this->set_info('skill_functions', $value); }
+
+    public function get_image(){ return $this->get_info('skill_image'); }
+    public function set_image($value){ $this->set_info('skill_image', $value); }
+    public function get_base_image(){ return $this->get_info('skill_base_image'); }
+    public function set_base_image($value){ $this->set_info('skill_base_image', $value); }
+    public function reset_image(){ $this->set_info('skill_image', $this->get_base_image()); }
+
+    public function get_image_size(){ return $this->get_info('skill_image_size'); }
+    public function set_image_size($value){ $this->set_info('skill_image_size', $value); }
+    public function get_base_image_size(){ return $this->get_info('skill_base_image_size'); }
+    public function set_base_image_size($value){ $this->set_info('skill_base_image_size', $value); }
+    public function reset_image_size(){ $this->set_info('skill_image_size', $this->get_base_image_size()); }
+
+    public function get_frame(){ return $this->get_info('skill_frame'); }
+    public function set_frame($value){ $this->set_info('skill_frame', $value); }
+
+    public function get_frame_span(){ return $this->get_info('skill_frame_span'); }
+    public function set_frame_span($value){ $this->set_info('skill_frame_span', $value); }
+
+    public function get_frame_animate(){ return $this->get_info('skill_frame_animate'); }
+    public function set_frame_animate($value){ $this->set_info('skill_frame_animate', $value); }
+
+    public function get_frame_index(){ return $this->get_info('skill_frame_index'); }
+    public function set_frame_index($value){ $this->set_info('skill_frame_index', $value); }
+
+    public function get_frame_offset(){
+        $args = func_get_args();
+        if (isset($args[0])){ return $this->get_info('skill_frame_offset', $args[0]); }
+        else { return $this->get_info('skill_frame_offset'); }
+    }
+    public function set_frame_offset($value){
+        $args = func_get_args();
+        if (isset($args[1])){ $this->set_info('skill_frame_offset', $args[0], $args[1]); }
+        else { $this->set_info('skill_frame_offset', $value); }
+    }
+
+    public function get_frame_styles(){ return $this->get_info('skill_frame_styles'); }
+    public function set_frame_styles($value){ $this->set_info('skill_frame_styles', $value); }
+    public function reset_frame_styles(){ $this->set_info('skill_frame_styles', ''); }
+
+    public function get_frame_classes(){ return $this->get_info('skill_frame_classes'); }
+    public function set_frame_classes($value){ $this->set_info('skill_frame_classes', $value); }
+    public function reset_frame_classes(){ $this->set_info('skill_frame_classes', ''); }
 
     public function get_results(){ return $this->get_info('skill_results'); }
     public function set_results($value){ $this->set_info('skill_results', $value); }
@@ -976,6 +1034,24 @@ class rpg_skill extends rpg_object {
             'skill_description' => $this->skill_description,
             'skill_description2' => $this->skill_description2,
             'skill_parameters' => $this->skill_parameters,
+            'skill_image' => $this->skill_image,
+            'skill_image_size' => $this->skill_image_size,
+            'skill_results' => $this->skill_results,
+            'skill_base_name' => $this->skill_base_name,
+            'skill_base_token' => $this->skill_base_token,
+            'skill_base_parameters' => $this->skill_base_parameters,
+            'skill_base_image' => $this->skill_base_image,
+            'skill_base_image_size' => $this->skill_base_image_size,
+            'skill_frame' => $this->skill_frame,
+            'skill_frame_span' => $this->skill_frame_span,
+            'skill_frame_animate' => $this->skill_frame_animate,
+            'skill_frame_offset' => $this->skill_frame_offset,
+            'skill_frame_classes' => $this->skill_frame_classes,
+            'skill_frame_styles' => $this->skill_frame_styles,
+            'attachment_frame' => $this->attachment_frame,
+            'attachment_frame_animate' => $this->attachment_frame_animate,
+            'attachment_frame_offset' => $this->attachment_frame_offset,
+            'attachment_results' => $this->attachment_results,
             'flags' => $this->flags,
             'counters' => $this->counters,
             'values' => $this->values,
