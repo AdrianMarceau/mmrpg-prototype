@@ -651,6 +651,28 @@ class rpg_player extends rpg_object {
     }
 
     /**
+     * Get the list of IDs representing active status robots owned by this player object
+     * @return array
+     */
+    public function get_active_robot_ids($sort = false){
+        $active_robots = $this->get_robots_active($sort);
+        $active_ids = array();
+        if (!empty($active_robots)){ foreach ($active_robots AS $k => $r){ $active_ids[] = $r->robot_id; } }
+        return $active_ids;
+    }
+
+    /**
+     * Get the list of IDs representing active status robots owned by this player object
+     * @return array
+     */
+    public function get_disabled_robot_ids($sort = false){
+        $disabled_robots = $this->get_robots_disabled($sort);
+        $disabled_ids = array();
+        if (!empty($disabled_robots)){ foreach ($disabled_robots AS $k => $r){ $disabled_ids[] = $r->robot_id; } }
+        return $disabled_ids;
+    }
+
+    /**
      * Get a robot from this player given a specific key
      * @return array
      */
