@@ -1607,7 +1607,7 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
     $omega_robot_level = $temp_battle_omega['battle_level'];
 
     // Define the stat boost power based on phase alone
-    $master_boost_power = $battle_phase > 1 ? 4 : 2;
+    //$master_boost_power = $battle_phase > 1 ? 4 : 2;
 
     // Define the battle kind, default to 'other'
     $battle_kind = 'other';
@@ -1700,8 +1700,8 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
                 $temp_alt = $index_info['robot_image_alts'][$temp_alt_key];
                 $temp_image = $robot_info['robot_token'].'_'.$temp_alt['token'];
                 $robot_info['robot_image'] = $temp_image;
-                $best_stat = rpg_robot::get_best_stat($index_info);
-                $robot_info['counters'][$best_stat.'_mods'] = ($temp_alt_key + 2);
+                //$best_stat = rpg_robot::get_best_stat($index_info);
+                //$robot_info['counters'][$best_stat.'_mods'] = ($temp_alt_key + 2);
                 $robot_info['robot_name'] = $index_info['robot_name'].' '.($temp_alt_key + 2);
                 $robot_info['robot_name'] = preg_replace('/\s([a-z0-9])\s([a-z0-9])$/i', ' $1$2', $robot_info['robot_name']);
             }
@@ -1730,10 +1730,10 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
     foreach ($temp_player_robots AS $key => $robot_info){
         $robot_token = $robot_info['robot_token'];
         $index_info = $mmrpg_index_robots[$robot_token];
-        $best_stat = rpg_robot::get_best_stat($index_info);
-        $robot_info['counters'][$best_stat.'_mods'] = $master_boost_power;
-        $worst_stat = rpg_robot::get_worst_stat($index_info);
-        $robot_info['counters'][$worst_stat.'_mods'] = floor($master_boost_power / 2);
+        //$best_stat = rpg_robot::get_best_stat($index_info);
+        //$robot_info['counters'][$best_stat.'_mods'] = $master_boost_power;
+        //$worst_stat = rpg_robot::get_worst_stat($index_info);
+        //$robot_info['counters'][$worst_stat.'_mods'] = floor($master_boost_power / 2);
         $temp_player_robots[$key] = $robot_info;
     }
     $temp_player_robots = array_values($temp_player_robots);
