@@ -778,7 +778,40 @@ $(document).ready(function(){
 
     // ROBOT EDITOR EVENTS
 
-    // ...none at the moment
+    // Check to make sure we're on the robot editor page
+    var $editRobots = $('.adminform.edit-robots', thisAdmin);
+    //console.log('$editRobots =', $editRobots);
+    if ($editRobots.length){
+
+        // If there are any skill dropdowns on the page, bind events to them
+        var $robotSkill = $('select[name="robot_skill"]', $editRobots);
+        var $robotSkillParams = $('input[name="robot_skill_parameters"]', $editRobots);
+        var $robotSkillParamsLabel = $robotSkillParams.parent().find('> .label');
+        var $robotSkillParamsRequired = $robotSkill.closest('.panel').find('.requires-skill-params');
+        if ($robotSkill.length && $robotSkillParams.length){
+            var prevSkillValue = $robotSkill.val();
+            $robotSkill.bind('change', function(){
+                var skillValue = $('option:selected', $robotSkill).val();
+                $robotSkillParamsLabel.find('.link').remove();
+                if (skillValue !== prevSkillValue){
+                    $robotSkillParamsRequired.addClass('hidden');
+                    $robotSkillParamsRequired.find('input,textarea').attr('disabled', 'disabled');
+                    }
+                if (skillValue.length){
+                    var skillID = $('option:selected', $robotSkill).attr('data-skill-id');
+                    var skillParams = $('option:selected', $robotSkill).attr('data-skill-params');
+                    if (typeof skillParams !== 'undefined' && skillParams.length){
+                        var helpLink = 'admin/edit-skills/editor/skill_id='+skillID+'#functions';
+                        $robotSkillParamsLabel.append('<em class="link"><a href="'+helpLink+'" target="_blank">need help?</a></em>');
+                        $robotSkillParamsRequired.removeClass('hidden');
+                    $robotSkillParamsRequired.find('input,textarea').removeAttr('disabled', 'disabled');
+                        }
+                    }
+                prevSkillValue = skillValue;
+                }).trigger('change');
+            }
+
+    }
 
 
     // ABILITY EDITOR EVENTS

@@ -74,7 +74,7 @@
     $skill_options_markup = array();
     $skill_options_markup[] = '<option value="">-</option>';
     foreach ($mmrpg_skills_index AS $skill_token => $skill_info){
-        $class_group = (!empty($skill_info['skill_group']) ? ucfirst($skill_info['skill_group']) : 'Misc').' Skills';
+        $class_group = (!empty($skill_info['skill_group']) ? $skill_info['skill_group'] : 'Misc Skills');
         if ($last_option_group !== $class_group){
             if (!empty($last_option_group)){ $skill_options_markup[] = '</optgroup>'; }
             $last_option_group = $class_group;
@@ -85,7 +85,13 @@
         $skill_description2 = !empty($skill_info['skill_description2']) ? $skill_info['skill_description2'] : '';
         $option_label = $skill_name;
         $option_title = htmlspecialchars($skill_description2, ENT_QUOTES, 'UTF-8', true);
-        $skill_options_markup[] = '<option value="'.$skill_token.'" title="'.$option_title.'">'.$option_label.'</option>';
+        $option_data_attrs = array();
+        $option_data_attrs[] = 'data-skill-id="'.$skill_info['skill_id'].'"';
+        if (!empty($skill_info['skill_parameters'])){
+            $option_data_attrs[] = 'data-skill-params="'.htmlentities($skill_info['skill_parameters'], ENT_QUOTES, 'UTF-8', true).'"';
+        }
+        $option_data_attrs = (!empty($option_data_attrs) ? ' ' : '').implode(' ', $option_data_attrs);
+        $skill_options_markup[] = '<option value="'.$skill_token.'" title="'.$option_title.'"'.$option_data_attrs.'>'.$option_label.'</option>';
     }
     if (!empty($last_option_group)){ $skill_options_markup[] = '</optgroup>'; }
     $skill_options_count = count($skill_options_markup);
@@ -1378,23 +1384,19 @@
                                             <input class="textbox" type="text" name="robot_skill_name" value="<?= htmlentities($robot_data['robot_skill_name'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="100" />
                                         </div>
 
-                                        <div class="field fullsize">
-                                            <div class="label">
-                                                <strong>Custom Skill Description (Short)</strong>
-                                                <em>optional customized version of default short description</em>
-                                            </div>
-                                            <input class="textbox" type="text" name="robot_skill_description" value="<?= htmlentities($robot_data['robot_skill_description'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="256" />
-                                        </div>
+                                        <?
+                                        // Check if the robot's current skill has parameters and thus needs custom text
+                                        $current_skill_is_customizable = false;
+                                        if (!empty($robot_data['robot_skill'])
+                                            && isset($mmrpg_skills_index[$robot_data['robot_skill']])){
+                                            $robot_skill_info = $mmrpg_skills_index[$robot_data['robot_skill']];
+                                            if (!empty($robot_skill_info['skill_parameters'])){
+                                                $current_skill_is_customizable = true;
+                                            }
+                                        }
+                                        ?>
 
-                                        <div class="field fullsize">
-                                            <div class="label">
-                                                <strong>Custom Skill Description (Full)</strong>
-                                                <em>optional customized version of default long description</em>
-                                            </div>
-                                            <textarea class="textarea" name="robot_skill_description2" rows="4"><?= htmlentities($robot_data['robot_skill_description2'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
-                                        </div>
-
-                                        <div class="field fullsize">
+                                        <div class="field fullsize requires-skill-params <?= !$current_skill_is_customizable ? 'hidden' : '' ?>">
                                             <?
                                             // Collect the the skill paramaters string from session of data
                                             if (!empty($_SESSION['robot_skill_parameters'][$robot_data['robot_id']])){
@@ -1409,6 +1411,22 @@
                                                 <em>optional customized parameters for skill in json-format</em>
                                             </div>
                                             <input class="textbox" type="text" name="robot_skill_parameters" value="<?= htmlentities($skill_parameters_string, ENT_QUOTES, 'UTF-8', true) ?>" />
+                                        </div>
+
+                                        <div class="field fullsize requires-skill-params <?= !$current_skill_is_customizable ? 'hidden' : '' ?>">
+                                            <div class="label">
+                                                <strong>Custom Skill Description (Short)</strong>
+                                                <em>optional customized version of default short description</em>
+                                            </div>
+                                            <input class="textbox" type="text" name="robot_skill_description" value="<?= htmlentities($robot_data['robot_skill_description'], ENT_QUOTES, 'UTF-8', true) ?>" maxlength="256" />
+                                        </div>
+
+                                        <div class="field fullsize requires-skill-params <?= !$current_skill_is_customizable ? 'hidden' : '' ?>">
+                                            <div class="label">
+                                                <strong>Custom Skill Description (Full)</strong>
+                                                <em>optional customized version of default long description</em>
+                                            </div>
+                                            <textarea class="textarea" name="robot_skill_description2" rows="4"><?= htmlentities($robot_data['robot_skill_description2'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
                                         </div>
 
                                         <?

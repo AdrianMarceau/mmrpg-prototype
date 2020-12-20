@@ -841,6 +841,11 @@ tr:nth-child(odd) td {
     clear: both;
 }
 
+.adminform .field.hidden,
+.adminform .field .subfield.hidden {
+    display: none;
+}
+
 .adminform .field .subfield {
     position: relative;
 }
@@ -1804,6 +1809,10 @@ input[type=file] {
 .adminform .field .label em:not(.nowrap):after,
 .adminform .subfield .sublabel em:not(.nowrap):after {
     content: ")";
+}
+.adminform .field .label em + em,
+.adminform .subfield .sublabel em + em {
+    margin-left: 5px;
 }
 .adminform .field .label i {
 
