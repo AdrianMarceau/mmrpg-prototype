@@ -264,7 +264,9 @@ if ($this_action == 'start'){
 
     // Update applicable fieldinfo fields with preset battle data
     if (!empty($this_battle->battle_field_base)){
+        $backup_field_id = $this_fieldinfo['field_id'];
         $this_fieldinfo = array_replace($this_fieldinfo, $this_battle->battle_field_base);
+        $this_fieldinfo['field_id'] = $backup_field_id;
         $this_field = rpg_game::get_field($this_battle, $this_fieldinfo);
         $this_field->update_session();
     }
