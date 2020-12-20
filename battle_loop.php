@@ -487,13 +487,6 @@ elseif ($this_action == 'start'){
     require_once('battle/actions/start.php');
 
 }
-// Else if the player is switching robots, they go first
-elseif ($this_action == 'switch'){
-
-    // Require the switch action file
-    require_once('battle/actions/switch.php');
-
-}
 // Else if the player's robot is using a scan
 elseif ($this_action == 'scan'){
 
@@ -513,6 +506,13 @@ elseif ($this_action == 'item'){
 
     // Require the ability-item action file
     require_once('battle/actions/ability_item.php');
+
+}
+// Else if the player is switching robots, they go first
+elseif ($this_action == 'switch'){
+
+    // Require the ability-switch action file
+    require_once('battle/actions/ability_switch.php');
 
 }
 

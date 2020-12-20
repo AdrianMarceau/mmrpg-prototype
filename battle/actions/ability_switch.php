@@ -1,6 +1,6 @@
 <?
 
-// -- ABILITY-ITEM BATTLE ACTION -- //
+// -- SWITCH BATTLE ACTION -- //
 
 // Increment the battle's turn counter by 1
 $this_battle->counters['battle_turn'] += 1;
@@ -14,41 +14,44 @@ if (empty($this_battle->flags['player_battle'])
 }
 
 
-// -- This Item Action -- //
+// -- This Switch Action -- //
 
-// Create the temporary item object for this player's robot
-$temp_iteminfo = array();
-list($temp_iteminfo['item_id'], $temp_iteminfo['item_token']) = explode('_', $this_action_token); //array('item_token' => $this_action_token);
-$temp_thisitem = rpg_game::get_item($this_battle, $this_player, $this_robot, $temp_iteminfo);
+// Switching should not take a turn - let's encourage it!
+$skip_target_turn = true;
+// Queue up this robot's switch action first
+$this_battle->actions_append($this_player, $this_robot, $target_player, $target_robot, 'switch', $this_action_token);
 
-// Queue up an this robot's action first, because it's using an item
-$this_battle->actions_append($this_player, $this_robot, $target_player, $target_robot, $this_action, $this_action_token);
-
-// Now execute the stored actions (and any created in the process of executing them!)
+// Execute the battle actions
 $this_battle->actions_execute();
 
-// Update the sesions I guess
-$this_robot->update_session();
-$target_robot->update_session();
-
-// If this item was an ITEM, decrease it's quantity in the player's session
-if (preg_match('/^([x0-9]+)_/i', $this_action_token)){
-    // Decrease the quantity of this item from the player's inventory
-    list($temp_item_id, $temp_item_token) = explode('_', $this_action_token);
-    if (!empty($_SESSION['GAME']['values']['battle_items'][$temp_item_token])){
-        $temp_quantity = $_SESSION['GAME']['values']['battle_items'][$temp_item_token];
-        $temp_quantity -= 1;
-        if ($temp_quantity < 0){ $temp_quantity = 0; }
-        $_SESSION['GAME']['values']['battle_items'][$temp_item_token] = $temp_quantity;
-    }
+// Now loop through the player's active robot to collect the new active robot
+list($temp_robot_id, $temp_robot_token) = explode('_', $this_action_token);
+foreach ($this_player->values['robots_active'] AS $key => $info){
+    if ($info['robot_id'] == $temp_robot_id){
+        $this_info = array('robot_id' => $info['robot_id'], 'robot_token' => $info['robot_token']);
+        $this_robot = rpg_game::get_robot($this_battle, $this_player, $this_info);
+        break;
+     }
 }
 
-// Create a flag on this player, preventing multiple items per turn
-$this_player->flags['item_used_this_turn'] = true;
+
+// Otherwise if the target robot is disabled we have no choice
+if ($target_robot->robot_energy < 1 || $target_robot->robot_status == 'disabled'){
+    // Then queue up an the target robot's action first, because it's faster and/or switching
+    $this_battle->actions_append($target_player, $target_robot, $this_player, $this_robot, 'switch', '');
+    // Now execute the stored actions
+    $this_battle->actions_execute();
+    $this_battle->update_session();
+}
+
+// Create a flag on this player, preventing multiple switches per turn
+$this_player->flags['switch_used_this_turn'] = true;
 $this_player->update_session();
 
 // Now execute the stored actions (and any created in the process of executing them!)
 $this_battle->actions_execute();
+
+
 
 
 // -- Target Ability Actions -- //

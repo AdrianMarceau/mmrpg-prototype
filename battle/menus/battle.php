@@ -10,7 +10,7 @@ ob_start();
 
     // Check to see whether or not switching is allowed right now
     $switch_allowed = true;
-    if ($this_battle->counters['battle_turn'] < 1){ $switch_allowed = false; }
+    //if ($this_battle->counters['battle_turn'] < 1){ $switch_allowed = false; }
 
     // If the current robot is not disabled and is active
     if ($this_robot->robot_energy > 0 && $this_robot->robot_position == 'active'){
