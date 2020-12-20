@@ -1739,9 +1739,8 @@ class rpg_robot extends rpg_object {
                 $info = rpg_ability::parse_index_info($temp_ability_index[$token]);
                 $value = 3;
 
-                // If this is their first ability and it's the first turn, high chance
+                // If this is their first ability and it's the first turn, very high chance
                 if ($key == 0 && $this_battle->counters['battle_turn'] == 1){ $value *= 100; }
-                elseif ($key == 0){ $value += 10; }
 
                 // If this ability has a type, we can use it to alter chance values
                 if (!empty($info['ability_type'])){
@@ -1752,9 +1751,9 @@ class rpg_robot extends rpg_object {
                     if (!empty($info['ability_type2'])){ $ability_types[] = $info['ability_type2']; }
 
                     // Increase chance for abilities with type that matches user's core
-                    if (empty($this_robot->robot_core)){ $value *= 10; }
-                    elseif ($this_robot->robot_core == 'copy'){ $value *= 12; }
-                    elseif (in_array($this_robot->robot_core, $ability_types)){ $value *= 16; }
+                    if (empty($this_robot->robot_core)){ $value *= 2; }
+                    elseif ($this_robot->robot_core == 'copy'){ $value *= 4; }
+                    elseif (in_array($this_robot->robot_core, $ability_types)){ $value *= 6; }
 
                     // Increase chance for abilities with type that matches user's held core
                     if (!empty($this_robot->robot_item) && in_array(str_replace('-core', '', $this_robot->robot_item), $ability_types)){ $value *= 8; }
@@ -1769,6 +1768,9 @@ class rpg_robot extends rpg_object {
                     }
 
                 }
+
+                // If this is their first ability and after the first turn, higher chance
+                if ($key == 0 && $this_battle->counters['battle_turn'] > 1){ $value += 10;  }
 
                 // If this ability has already been summoned, reduce/increase the chance of using again
                 if (in_array($info['ability_token'], $this_other_attachments)){
@@ -1816,6 +1818,7 @@ class rpg_robot extends rpg_object {
         }
 
         // Pull a specific ability given waited chance
+        //error_log('weighted options = '.print_r(array_combine($options, $weights), true));
         $ability_token = $this_battle->weighted_chance($options, $weights);
 
         // Return an ability based on a weighted chance
