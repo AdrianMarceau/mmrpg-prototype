@@ -7,9 +7,10 @@ require('includes/config.php');
 
 // Update the timezone before starting the session
 @date_default_timezone_set('Canada/Eastern');
-//@ini_set('session.gc_maxlifetime', 24*60*60);
-//@ini_set('session.gc_probability', 1);
-//@ini_set('session.gc_divisor', 1);
+@session_set_cookie_params(24*60*60);
+@ini_set('session.gc_maxlifetime', 24*60*60);
+@ini_set('session.gc_probability', 1);
+@ini_set('session.gc_divisor', 1);
 session_start();
 
 // Turn off magic quotes before it causes and problems
