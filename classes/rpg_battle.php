@@ -1967,7 +1967,6 @@ class rpg_battle extends rpg_object {
                 $temp_target_robot_resistances = $temp_target_robot->print_resistances();
                 $temp_target_robot_affinities = $temp_target_robot->print_affinities();
                 $temp_target_robot_immunities = $temp_target_robot->print_immunities();
-                $temp_target_robot_abilities = $temp_target_robot->print_abilities();
 
                 // Now change the target robot's frame is set to its taunt
                 $temp_target_robot->set_frame('taunt');
@@ -2010,12 +2009,25 @@ class rpg_battle extends rpg_object {
                 $temp_speed_mod_icon = $temp_target_robot->counters['speed_mods'] > 0 ? '&#x25b2;' : ($temp_target_robot->counters['speed_mods'] < 0 ? '&#x25bc;' : '');
                 if (!empty($temp_speed_mod_icon)){ $temp_speed_mod_icon = '<sub style="display:inline-block;font-size:60%;transform:translate(0,-2px);">'.$temp_speed_mod_icon.'</sub>'; }
 
+                // Create an options object for this function and populate
+                $options = rpg_game::new_options_object();
+                $options->show_skills = $this_player->get_flag('hyperscan_enabled') ? true : false;
+                $options->show_abilities = $this_player->get_flag('hyperscan_enabled') ? true : false;
+                $extra_objects = array('options' => $options);
+                $extra_objects['initiator_robot'] = $this_robot;
+                $extra_objects['recipient_robot'] = $temp_target_robot;
+
+                // Trigger this and/or the target robot's custom function if one has been defined for this context
+                $this_robot->trigger_custom_function('rpg-battle_scan-target_before', $extra_objects);
+                $temp_target_robot->trigger_custom_function('rpg-battle_scan-target_before', $extra_objects);
+
                 // Create an event showing the scanned robot's data
                 $event_header = ($temp_target_player->player_token != 'player' ? $temp_target_player->player_name.'&#39;s ' : '').$temp_target_robot->robot_name;
                 if (empty($_SESSION['GAME']['values']['robot_database'][$temp_target_robot->robot_token]['robot_scanned'])){ $event_header .= '  <span class="robot_stat robot_type robot_type_electric" style="font-size: 90%; top: -1px;">New!</span>'; }
                 $event_body = '';
                 ob_start();
                 ?>
+                    <div class="target_scan_table">
                         <table class="full">
                             <colgroup>
                                 <col width="20%" />
@@ -2060,25 +2072,46 @@ class rpg_battle extends rpg_object {
                                     <td class="left">Speed : </td>
                                     <td  class="right"><span title="<?= floor(($temp_target_robot->robot_speed / $temp_target_robot->robot_base_speed) * 100).'% | '.$temp_target_robot->robot_speed.' / '.$temp_target_robot->robot_base_speed ?>"data-tooltip-type="robot_type robot_type_speed" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_speed_base_padding ?>px;"><span class="robot_stat robot_type robot_type_speed" style="padding-left: <?= $temp_speed_padding ?>px;"><?= $temp_speed_mod_icon.' '.$temp_target_robot->robot_speed ?></span></span></td>
                                 </tr>
-                                <? if (MMRPG_CONFIG_DEBUG_MODE){ ?>
-                                    <? $pre_styles = 'float: left; clear: both; box-sizing: border-box; padding: 10px; text-align: left; width: 100%; border: 0 none transparent; background-color: rgba(0, 0, 0, 0.1); color: #efefef; margin-bottom: 4px;'; ?>
+                                <? if (($options->show_skills || MMRPG_CONFIG_DEBUG_MODE) && !empty($temp_target_robot->robot_skill)){ ?>
+                                    <?
+                                    $temp_target_robot_skill = $temp_target_robot->get_skill_info();
+                                    ?>
+                                    <tr>
+                                        <td class="right" colspan="5">
+                                            <span style="float: left;">Skill :</span>
+                                            <div class="skill_bubble">
+                                                <strong class="skill_name type type_<?= $temp_target_robot_skill['skill_display_type'] ?>"><?= $temp_target_robot_skill['skill_name'] ?></strong>
+                                                <p class="skill_stat skill_desc type type_empty"><?= $temp_target_robot_skill['skill_description'] ?></p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <? } ?>
+                                <? if ($options->show_abilities || MMRPG_CONFIG_DEBUG_MODE){ ?>
+                                    <?
+                                    $temp_target_robot_abilities = $temp_target_robot->print_abilities(false);
+                                    while (count($temp_target_robot_abilities) < 8){ $temp_target_robot_abilities[] = '<span class="ability_name type type_empty">&nbsp;</span>'; }
+                                    $temp_target_robot_abilities = '<div class="ability_cell">'.implode('</div><div class="ability_cell">', $temp_target_robot_abilities).'</div>';
+                                    ?>
                                     <tr>
                                         <td class="right" colspan="5">
                                             <span style="float: left;">Abilities :</span>
-                                            <?= !empty($temp_target_robot_abilities) ? '<span style="display:block;white-space:normal;overflow:hidden;max-width:500px;float:right;padding:  5px;">'.$temp_target_robot_abilities.'</span>' : '<span class="robot_ability">None</span>' ?>
+                                            <?= !empty($temp_target_robot_abilities) ? '<div class="ability_list">'.$temp_target_robot_abilities.'</div>' : '<span class="robot_ability">None</span>' ?>
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td class="right" colspan="5">
-                                            <span style="float: left;">Robot Export Array :</span>
-                                            <input type="text"
-                                                readonly="readonly"
-                                                style="<?= $pre_styles ?>"
-                                                value="<?= str_replace('"', '&quot;', json_encode( $temp_target_robot->export_array() )) ?>"
-                                                />
-                                        </td>
-                                    </tr>
+                                <? } ?>
+                                <? if (MMRPG_CONFIG_DEBUG_MODE){ ?>
+                                    <? $pre_styles = 'float: left; clear: both; box-sizing: border-box; padding: 10px; text-align: left; width: 100%; border: 0 none transparent; background-color: rgba(0, 0, 0, 0.1); color: #efefef; margin-bottom: 4px;'; ?>
                                     <? if (MMRPG_CONFIG_IS_LIVE === false){ ?>
+                                        <tr>
+                                            <td class="right" colspan="5">
+                                                <span style="float: left;">Robot Export Array :</span>
+                                                <input type="text"
+                                                    readonly="readonly"
+                                                    style="<?= $pre_styles ?>"
+                                                    value="<?= str_replace('"', '&quot;', json_encode( $temp_target_robot->export_array() )) ?>"
+                                                    />
+                                            </td>
+                                        </tr>
                                         <tr>
                                             <td class="right" colspan="5">
                                             <span style="float: left;">Target Player Counters Array :</span>
@@ -2113,6 +2146,7 @@ class rpg_battle extends rpg_object {
                                 <? } ?>
                             </tbody>
                         </table>
+                    </div>
                 <?
                 $event_body .= preg_replace('#\s+#', ' ', trim(ob_get_clean()));
                 $this->events_create($temp_target_robot, false, $event_header, $event_body, array('console_container_height' => 2, 'canvas_show_this' => false)); //, 'event_flag_autoplay' => false
@@ -2124,6 +2158,10 @@ class rpg_battle extends rpg_object {
                 if (!isset($_SESSION['GAME']['values']['robot_database'][$temp_target_robot->robot_token])){ $_SESSION['GAME']['values']['robot_database'][$temp_target_robot->robot_token] = array('robot_token' => $temp_target_robot->robot_token); }
                 if (!isset($_SESSION['GAME']['values']['robot_database'][$temp_target_robot->robot_token]['robot_scanned'])){ $_SESSION['GAME']['values']['robot_database'][$temp_target_robot->robot_token]['robot_scanned'] = 0; }
                 $_SESSION['GAME']['values']['robot_database'][$temp_target_robot->robot_token]['robot_scanned']++;
+
+                // Trigger this and/or the target robot's custom function if one has been defined for this context
+                $this_robot->trigger_custom_function('rpg-battle_scan-target_after', $extra_objects);
+                $temp_target_robot->trigger_custom_function('rpg-battle_scan-target_after', $extra_objects);
 
                 // Set this token to the ID and token of the triggered ability
                 $this_token = $this_token['robot_id'].'_'.$this_token['robot_token'];

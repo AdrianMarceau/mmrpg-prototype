@@ -2596,6 +2596,56 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     color: #E4A3FF;
 }
 
+#console .event .target_scan_table {
+    display: block;
+    margin: 0 auto;
+}
+#console .event .target_scan_table .ability_list,
+#console .event .target_scan_table .skill_bubble {
+    display: block;
+    box-sizing: border-box;
+    white-space: normal;
+    overflow: hidden;
+    width: 500px;
+    float: right;
+    padding: 5px;
+}
+#console .event .target_scan_table .ability_list:after,
+#console .event .target_scan_table .skill_bubble:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+#console .event .target_scan_table .ability_list .ability_cell {
+    display: block;
+    box-sizing: border-box;
+    float: left;
+    width: 25%;
+    padding: 0 6px 3px 0;
+}
+#console .event .target_scan_table .ability_list .ability_name {
+    display: inline-block;
+    line-height: 1.2;
+    box-sizing: border-box;
+    width: 100%;
+    text-align: center;
+}
+#console .event .target_scan_table .skill_bubble .skill_name {
+    display: inline-block;
+    line-height: 1.4;
+    float: left;
+    margin-right: 9px;
+}
+#console .event .target_scan_table .skill_bubble .skill_desc {
+    display: inline-block;
+    float: left;
+    margin: 0 auto 0 0;
+    line-height: 1.4;
+    width: calc(100% - 124px);
+    white-space: normal;
+    font-weight: normal;
+    text-align: left;
+}
 
 #actions {
     margin: 0 auto;

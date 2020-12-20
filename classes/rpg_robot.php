@@ -1196,7 +1196,7 @@ class rpg_robot extends rpg_object {
         $this_markup = implode(', ', $this_markup);
         return $this_markup;
     }
-    public function print_abilities(){
+    public function print_abilities($implode = true){
         $this_markup = array();
         if (empty($this->robot_abilities)){ return false; }
         $ability_index = rpg_ability::get_index_custom($this->robot_abilities);
@@ -1207,7 +1207,7 @@ class rpg_robot extends rpg_object {
             if (empty($ability_type)){ $ability_type = 'none'; }
             $this_markup[] = '<span class="ability_name ability_type type_'.$ability_type.'">'.$ability_info['ability_name'].'</span>';
         }
-        $this_markup = implode(', ', $this_markup);
+        if ($implode){ $this_markup = implode(', ', $this_markup); }
         return $this_markup;
     }
     public function print_quote($quote_type, $this_find = array(), $this_replace = array()){
