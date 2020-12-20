@@ -2629,6 +2629,9 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     box-sizing: border-box;
     width: 100%;
     text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 #console .event .target_scan_table .skill_bubble .skill_name {
     display: inline-block;

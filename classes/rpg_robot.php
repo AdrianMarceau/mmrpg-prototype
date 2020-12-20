@@ -1205,7 +1205,7 @@ class rpg_robot extends rpg_object {
             $ability_type = !empty($ability_info['ability_type']) ? $ability_info['ability_type'] : '';
             if (!empty($ability_type) && !empty($ability_info['ability_type2'])){ $ability_type .= '_'.$ability_info['ability_type2']; }
             if (empty($ability_type)){ $ability_type = 'none'; }
-            $this_markup[] = '<span class="ability_name ability_type type_'.$ability_type.'">'.$ability_info['ability_name'].'</span>';
+            $this_markup[] = '<span class="ability_name ability_type type_'.$ability_type.'" title="'.$ability_info['ability_name'].'">'.$ability_info['ability_name'].'</span>';
         }
         if ($implode){ $this_markup = implode(', ', $this_markup); }
         return $this_markup;
