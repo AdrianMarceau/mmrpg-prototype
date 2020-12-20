@@ -2483,7 +2483,7 @@ class rpg_ability extends rpg_object {
         $extra_objects['initiator_robot'] = !empty($initiator_robot) ? $initiator_robot : $target_robot;
         $extra_objects['recipient_robot'] = $target_robot;
 
-        // Trigger this robot's item function if one has been defined for this context
+        // Trigger this robot's custom function if one has been defined for this context
         if ($options->allow_custom_effects && !$options->is_redirect){
             if (!empty($initiator_robot) && $initiator_robot !== $target_robot){
                 $initiator_robot->trigger_custom_function('rpg-ability_stat-boost_before', $extra_objects);
@@ -2511,7 +2511,7 @@ class rpg_ability extends rpg_object {
             $trigger_ability = rpg_game::get_ability($target_robot->battle, $target_robot->player, $target_robot, array('ability_token' => $options->stat_type.'-boost'));
         }
 
-        // Trigger this robot's item function if one has been defined for this context
+        // Trigger this robot's custom function if one has been defined for this context
         if ($options->allow_custom_effects && !$options->is_redirect){
             if (!empty($initiator_robot) && $initiator_robot !== $target_robot){
                 $initiator_robot->trigger_custom_function('rpg-ability_stat-boost_middle', $extra_objects);
@@ -2582,7 +2582,7 @@ class rpg_ability extends rpg_object {
 
         }
 
-        // Trigger this robot's item function if one has been defined for this context
+        // Trigger this robot's custom function if one has been defined for this context
         if ($options->allow_custom_effects && !$options->is_redirect){
             if (!empty($initiator_robot) && $initiator_robot !== $target_robot){ $initiator_robot->trigger_custom_function('rpg-ability_stat-boost_after', $extra_objects); }
             $target_robot->trigger_custom_function('rpg-ability_stat-boost_after', $extra_objects);
@@ -2642,7 +2642,7 @@ class rpg_ability extends rpg_object {
         $extra_objects['initiator_robot'] = !empty($initiator_robot) ? $initiator_robot : $target_robot;
         $extra_objects['recipient_robot'] = $target_robot;
 
-        // Trigger this robot's item function if one has been defined for this context
+        // Trigger this robot's custom function if one has been defined for this context
         if ($options->allow_custom_effects && !$options->is_redirect){
             if (!empty($initiator_robot) && $initiator_robot !== $target_robot){
                 $initiator_robot->trigger_custom_function('rpg-ability_stat-break_before', $extra_objects);
@@ -2670,7 +2670,7 @@ class rpg_ability extends rpg_object {
             $trigger_ability = rpg_game::get_ability($target_robot->battle, $target_robot->player, $target_robot, array('ability_token' => $options->stat_type.'-break'));
         }
 
-        // Trigger this robot's item function if one has been defined for this context
+        // Trigger this robot's custom function if one has been defined for this context
         if ($options->allow_custom_effects && !$options->is_redirect){
             if (!empty($initiator_robot) && $initiator_robot !== $target_robot){
                 $initiator_robot->trigger_custom_function('rpg-ability_stat-break_middle', $extra_objects);
@@ -2742,7 +2742,7 @@ class rpg_ability extends rpg_object {
 
         }
 
-        // Trigger this robot's item function if one has been defined for this context
+        // Trigger this robot's custom function if one has been defined for this context
         if ($options->allow_custom_effects && !$options->is_redirect){
             if (!empty($initiator_robot) && $initiator_robot !== $target_robot){ $initiator_robot->trigger_custom_function('rpg-ability_stat-break_after', $extra_objects); }
             $target_robot->trigger_custom_function('rpg-ability_stat-break_after', $extra_objects);
@@ -2964,7 +2964,7 @@ class rpg_ability extends rpg_object {
             $options->num_buster_shots = floor($this_robot->robot_speed / $target_robot->robot_speed);
         }
 
-        // Trigger this robot's item function if one has been defined for this context
+        // Trigger this robot's custom function if one has been defined for this context
         $this_robot->trigger_custom_function('rpg-ability_elemental-shot_before', $extra_objects);
         if ($options->return_early){ return $options->return_value; }
 
@@ -3010,7 +3010,7 @@ class rpg_ability extends rpg_object {
 
         }
 
-        // Trigger this robot's item function if one has been defined for this context
+        // Trigger this robot's custom function if one has been defined for this context
         $this_robot->trigger_custom_function('rpg-ability_elemental-shot_after', $extra_objects);
 
         // Return true on success
@@ -3032,7 +3032,7 @@ class rpg_ability extends rpg_object {
         $options->buster_charge_boost = 2;
         $extra_objects = array('this_ability' => $this_ability, 'options' => $options);
 
-        // Trigger this robot's item function if one has been defined for this context
+        // Trigger this robot's custom function if one has been defined for this context
         $this_robot->trigger_custom_function('rpg-ability_elemental-shot_onload_before', $extra_objects);
         if ($options->return_early){ return $options->return_value; }
 
@@ -3047,7 +3047,7 @@ class rpg_ability extends rpg_object {
         // Update the ability's damage with the new amount
         $this_ability->set_damage($temp_new_damage);
 
-        // Trigger this robot's item function if one has been defined for this context
+        // Trigger this robot's custom function if one has been defined for this context
         $this_robot->trigger_custom_function('rpg-ability_elemental-shot_onload_after', $extra_objects);
 
         // Return true on success
@@ -3097,7 +3097,7 @@ class rpg_ability extends rpg_object {
         $options->buster_charge_required = !isset($this_robot_attachments[$this_attachment_token]) ? true : false;
         $extra_objects = array('this_ability' => $this_ability, 'options' => $options);
 
-        // Trigger this robot's item function if one has been defined for this context
+        // Trigger this robot's custom function if one has been defined for this context
         $this_robot->trigger_custom_function('rpg-ability_elemental-buster_before', $extra_objects);
         if ($options->return_early){ return $options->return_value; }
 
@@ -3154,7 +3154,7 @@ class rpg_ability extends rpg_object {
 
         }
 
-        // Trigger this robot's item function if one has been defined for this context
+        // Trigger this robot's custom function if one has been defined for this context
         $this_robot->trigger_custom_function('rpg-ability_elemental-buster_after', $extra_objects);
 
         // Return true on success
@@ -3183,14 +3183,14 @@ class rpg_ability extends rpg_object {
         $options->buster_charge_required = !isset($this_robot_attachments[$this_attachment_token]) ? true : false;
         $extra_objects = array('this_ability' => $this_ability, 'options' => $options);
 
-        // Trigger this robot's item function if one has been defined for this context
+        // Trigger this robot's custom function if one has been defined for this context
         $this_robot->trigger_custom_function('rpg-ability_elemental-buster_onload_before', $extra_objects);
         if ($options->return_early){ return $options->return_value; }
 
         // If the ability flag had already been set, reduce the weapon energy to zero
         if (!$options->buster_charge_required){ $this_ability->set_energy(0); }
 
-        // Trigger this robot's item function if one has been defined for this context
+        // Trigger this robot's custom function if one has been defined for this context
         $this_robot->trigger_custom_function('rpg-ability_elemental-buster_onload_after', $extra_objects);
 
         // Return true on success
@@ -3208,7 +3208,7 @@ class rpg_ability extends rpg_object {
         $options = rpg_game::new_options_object();
         $extra_objects = array('this_ability' => $this_ability, 'options' => $options);
 
-        // Trigger this robot's item function if one has been defined for this context
+        // Trigger this robot's custom function if one has been defined for this context
         $this_robot->trigger_custom_function('rpg-ability_elemental-overdrive_before', $extra_objects);
         if ($options->return_early){ return $options->return_value; }
 
@@ -3323,7 +3323,7 @@ class rpg_ability extends rpg_object {
             }
         }
 
-        // Trigger this robot's item function if one has been defined for this context
+        // Trigger this robot's custom function if one has been defined for this context
         $this_robot->trigger_custom_function('rpg-ability_elemental-overdrive_after', $extra_objects);
 
         // Return true on success
@@ -3341,7 +3341,7 @@ class rpg_ability extends rpg_object {
         $options = rpg_game::new_options_object();
         $extra_objects = array('this_ability' => $this_ability, 'options' => $options);
 
-        // Trigger this robot's item function if one has been defined for this context
+        // Trigger this robot's custom function if one has been defined for this context
         $this_robot->trigger_custom_function('rpg-ability_elemental-overdrive_onload_before', $extra_objects);
         if ($options->return_early){ return $options->return_value; }
 
@@ -3356,7 +3356,7 @@ class rpg_ability extends rpg_object {
         $ability_damage_amount = $robot_energy_damage_percent + 1;
         $this_ability->set_damage($ability_damage_amount);
 
-        // Trigger this robot's item function if one has been defined for this context
+        // Trigger this robot's custom function if one has been defined for this context
         $this_robot->trigger_custom_function('rpg-ability_elemental-overdrive_onload_after', $extra_objects);
 
         // Return true on success
