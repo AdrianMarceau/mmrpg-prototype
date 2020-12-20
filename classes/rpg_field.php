@@ -40,6 +40,7 @@ class rpg_field extends rpg_object {
      */
     public static function get_field(){
         $this_battle = rpg_battle::get_battle();
+        if (!empty($this_battle->battle_field)){ return $this_battle->battle_field; }
         $this_field = isset($GLOBALS['this_field']) ? $GLOBALS['this_field'] : new rpg_field($this_battle);
         $this_field->trigger_onload();
         return $this_field;
@@ -50,8 +51,8 @@ class rpg_field extends rpg_object {
 
         // Collect current field data from the session if available
         $this_fieldinfo_backup = $this_fieldinfo;
-        if (isset($_SESSION['FIELDS'][$this->battle->battle_id][$this_fieldinfo['field_id']])){
-            $this_fieldinfo = $_SESSION['FIELDS'][$this->battle->battle_id][$this_fieldinfo['field_id']];
+        if (isset($_SESSION['FIELDS'][$this_fieldinfo['field_id']])){
+            $this_fieldinfo = $_SESSION['FIELDS'][$this_fieldinfo['field_id']];
         }
         // Otherwise, collect field data from the index
         else {
@@ -473,7 +474,8 @@ class rpg_field extends rpg_object {
 
         // Update the session with the export array
         $this_data = $this->export_array();
-        $_SESSION['FIELDS'][$this->battle->battle_id][$this->field_id] = $this_data;
+        $_SESSION['FIELDS'][$this->field_id] = $this_data;
+        $this->battle->values['fields'][$this->field_id] = $this_data;
         $this->battle->battle_field = $this;
 
         // Return true on success

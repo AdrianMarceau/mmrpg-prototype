@@ -73,7 +73,7 @@ if (substr($this_action, 0, 5) == 'next_'){ list($this_action, $this_action_toke
 $this_verified = true;
 $this_errors = array();
 
-// Ensure all madatory variables were set, and create errors for missing fields
+// Ensure all madatory variables were set, and create errors for missing parameters
 if (empty($this_battle_id) || empty($this_battle_token)){
     $this_verified = false;
     $this_errors[] = 'This battle token was not received! '.
@@ -87,7 +87,7 @@ if (empty($this_field_id) || empty($this_field_token)){
 if (empty($this_player_id) || empty($this_player_token)){
     $this_verified = false;
     $this_errors[] = 'This player token was not received! '.
-        '$this_field_id = '.$this_field_id.'; $this_field_token = '.$this_field_token.';';
+        '$this_player_id = '.$this_player_id.'; $this_player_token = '.$this_player_token.';';
 }
 if (empty($target_player_id) || empty($target_player_token)){
     $this_verified = false;
@@ -132,6 +132,7 @@ if ($this_action == 'start'){
 $this_battleinfo = array('battle_id' => $this_battle_id, 'battle_token' => $this_battle_token);
 
 // Define the current field object using the loaded field data
+if (!strstr($this_field_id, 'x')){ $this_field_id = rpg_game::unique_field_id($this_battle_id, $this_field_id); }
 $this_fieldinfo = array('field_id' => $this_field_id, 'field_token' => $this_field_token);
 
 // Define the battle object using the loaded battle data and update session
@@ -140,8 +141,10 @@ $this_battle->flags['wap'] = $flag_wap ? true : false;
 $this_battle->update_session();
 
 // Define the current field object using the loaded field data and update session
-$this_field = new rpg_field($this_battle, $this_fieldinfo);
-$this_field->update_session();
+if ($this_action !== 'start'){
+    $this_field = rpg_game::get_field($this_battle, $this_fieldinfo);
+    $this_field->update_session();
+}
 
 // Define the current player object using the loaded player data
 $this_user_id = rpg_user::get_current_userid();
@@ -257,7 +260,7 @@ if ($this_action == 'start'){
     // Update applicable fieldinfo fields with preset battle data
     if (!empty($this_battle->battle_field_base)){
         $this_fieldinfo = array_replace($this_fieldinfo, $this_battle->battle_field_base);
-        $this_field = new rpg_field($this_battle, $this_fieldinfo);
+        $this_field = rpg_game::get_field($this_battle, $this_fieldinfo);
         $this_field->update_session();
     }
 

@@ -51,6 +51,9 @@ class rpg_game {
 
     // -- COMMON ID FUNCTIONS -- //
 
+    public static function unique_field_id($battle_id, $field_index_id){
+        return $battle_id.'x'.$field_index_id;
+    }
     public static function unique_player_id($user_id, $player_index_id){
         return $user_id.'x'.$player_index_id;
     }
@@ -104,6 +107,44 @@ class rpg_game {
         // Return the collect battle object
         $this_battle->update_session();
         return $this_battle;
+
+    }
+
+    /**
+     * Create or retrive a field object from the session
+     * @param array $this_fieldinfo
+     * @return rpg_field
+     */
+    public static function get_field($this_battle, $this_fieldinfo){
+
+        // If the field index has not been created, do so
+        if (!isset(self::$index['fields'])){ self::$index['fields'] = array(); }
+
+        // Check if a field ID has been defined
+        if (isset($this_fieldinfo['field_id'])){
+            $field_id = $this_fieldinfo['field_id'];
+        }
+
+        // If this field has already been created, retrieve it
+        if (!empty($field_id) && !empty(self::$index['fields'][$field_id])){
+
+            // Collect the field from the index and return
+            $this_field = self::$index['fields'][$field_id];
+            $this_field->trigger_onload();
+
+        }
+        // Otherwise create a new field object in the index
+        else {
+
+            // Create and return the field object
+            $this_field = new rpg_field($this_battle, $this_fieldinfo);
+            self::$index['fields'][$this_field->field_id] = $this_field;
+
+        }
+
+        // Return the collect field object
+        $this_field->update_session();
+        return $this_field;
 
     }
 
