@@ -288,7 +288,8 @@ class rpg_robot extends rpg_object {
             if ($this->player->player_side == 'right'){
                 if (!empty($this->battle->battle_rewards['robots'])){
                     foreach ($this->battle->battle_rewards['robots'] AS $reward){
-                        if ($this->robot_token == $reward['token']){
+                        if ($this->robot_token == $reward['token']
+                            && $this->robot_image == $reward['token']){
                             $is_unlockable = true;
                             if (mmrpg_prototype_robot_unlocked(false, $reward['token'])){
                                 $is_unlockable = false;
