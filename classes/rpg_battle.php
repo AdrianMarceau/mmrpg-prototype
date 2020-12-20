@@ -2017,6 +2017,18 @@ class rpg_battle extends rpg_object {
                 $extra_objects['initiator_robot'] = $this_robot;
                 $extra_objects['recipient_robot'] = $temp_target_robot;
 
+                // Check to see if this player has any hyperscan robots still active on the field
+                $hyperscan_robots = $this_player->get_value('hyperscan_robots');
+                if (!empty($hyperscan_robots)){
+                    $active_ids = $this_player->get_active_robot_ids();
+                    foreach ($hyperscan_robots AS $rid){
+                        if (in_array($rid, $active_ids)){
+                            $options->show_skills = true;
+                            $options->show_abilities = true;
+                        }
+                    }
+                }
+
                 // Trigger this and/or the target robot's custom function if one has been defined for this context
                 $this_robot->trigger_custom_function('rpg-battle_scan-target_before', $extra_objects);
                 $temp_target_robot->trigger_custom_function('rpg-battle_scan-target_before', $extra_objects);
