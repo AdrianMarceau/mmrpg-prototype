@@ -16,8 +16,19 @@ if (empty($this_battle->flags['player_battle'])
 
 // -- This Switch Action -- //
 
-// Switching should not take a turn - let's encourage it!
-$skip_target_turn = true;
+// Switching should not take a turn if we're replacing a robot
+$skip_target_turn = false;
+if (true){
+    $has_active_robot = rpg_game::find_robot(array(
+        'player_id' => $this_player->player_id,
+        'robot_position' => 'active',
+        'robot_status' => 'active'
+        ));
+    if ((!$has_active_robot || $this_robot->robot_status == 'disabled' || $this_robot->robot_position != 'active')){
+        $skip_target_turn = true;
+    }
+}
+
 // Queue up this robot's switch action first
 $this_battle->actions_append($this_player, $this_robot, $target_player, $target_robot, 'switch', $this_action_token);
 
@@ -51,7 +62,8 @@ $this_player->update_session();
 // Now execute the stored actions (and any created in the process of executing them!)
 $this_battle->actions_execute();
 
-
+// If we're skipping the target's turn, return now
+if ($skip_target_turn){ return; }
 
 
 // -- Target Ability Actions -- //
