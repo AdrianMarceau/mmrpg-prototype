@@ -71,10 +71,10 @@
         // Collect form data for processing
         $search_data['user_id'] = !empty($_GET['user_id']) && is_numeric($_GET['user_id']) ? trim($_GET['user_id']) : '';
         $search_data['role_id'] = !empty($_GET['role_id']) && is_numeric($_GET['role_id']) ? trim($_GET['role_id']) : '';
-        $search_data['user_name'] = !empty($_GET['user_name']) && preg_match('/[-_0-9a-z\.\*]+/i', $_GET['user_name']) ? trim(strtolower($_GET['user_name'])) : '';
-        $search_data['user_email'] = !empty($_GET['user_email']) && preg_match('/[-_0-9a-z\.@\*]+/i', $_GET['user_email']) ? trim(strtolower($_GET['user_email'])) : '';
-        $search_data['user_gender'] = !empty($_GET['user_gender']) && preg_match('/[a-z]+/i', $_GET['user_gender']) ? trim(strtolower($_GET['user_gender'])) : '';
-        $search_data['user_ip'] = !empty($_GET['user_ip']) && preg_match('/[0-9\.\*]+/i', $_GET['user_ip']) ? trim(strtolower($_GET['user_ip'])) : '';
+        $search_data['user_name'] = !empty($_GET['user_name']) && preg_match('/^[-_0-9a-z\.\*]+$/i', $_GET['user_name']) ? trim(strtolower($_GET['user_name'])) : '';
+        $search_data['user_email'] = !empty($_GET['user_email']) && preg_match('/^[-_0-9a-z\.@\*]+$/i', $_GET['user_email']) ? trim(strtolower($_GET['user_email'])) : '';
+        $search_data['user_gender'] = !empty($_GET['user_gender']) && preg_match('/^[a-z]+$/i', $_GET['user_gender']) ? trim(strtolower($_GET['user_gender'])) : '';
+        $search_data['user_ip'] = !empty($_GET['user_ip']) && preg_match('/^[0-9\.\*]+$/i', $_GET['user_ip']) ? trim(strtolower($_GET['user_ip'])) : '';
         $search_data['user_flag_approved'] = isset($_GET['user_flag_approved']) && $_GET['user_flag_approved'] !== '' ? (!empty($_GET['user_flag_approved']) ? 1 : 0) : '';
         $search_data['user_flag_postpublic'] = isset($_GET['user_flag_postpublic']) && $_GET['user_flag_postpublic'] !== '' ? (!empty($_GET['user_flag_postpublic']) ? 1 : 0) : '';
         $search_data['user_flag_postprivate'] = isset($_GET['user_flag_postprivate']) && $_GET['user_flag_postprivate'] !== '' ? (!empty($_GET['user_flag_postprivate']) ? 1 : 0) : '';
