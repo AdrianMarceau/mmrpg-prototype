@@ -2437,7 +2437,7 @@ class rpg_ability extends rpg_object {
 
         // Collect or defined required variables from the trigger options
         $initiator_robot = isset($trigger_options['initiator_robot']) ? $trigger_options['initiator_robot'] : false;
-        $success_frame = isset($trigger_options['success_frame']) ? $trigger_options['success_frame'] : 0;
+        $success_frame = isset($trigger_options['success_frame']) ? $trigger_options['success_frame'] : 9;
         $failure_frame = isset($trigger_options['failure_frame']) ? $trigger_options['failure_frame'] : 9;
         $extra_text = isset($trigger_options['extra_text']) ? $trigger_options['extra_text'] : '';
         $is_redirect = isset($trigger_options['is_redirect']) ? $trigger_options['is_redirect'] : false;
@@ -2595,7 +2595,7 @@ class rpg_ability extends rpg_object {
 
         // Collect or defined required variables from the trigger options
         $initiator_robot = isset($trigger_options['initiator_robot']) ? $trigger_options['initiator_robot'] : false;
-        $success_frame = isset($trigger_options['success_frame']) ? $trigger_options['success_frame'] : 0;
+        $success_frame = isset($trigger_options['success_frame']) ? $trigger_options['success_frame'] : 9;
         $failure_frame = isset($trigger_options['failure_frame']) ? $trigger_options['failure_frame'] : 9;
         $extra_text = isset($trigger_options['extra_text']) ? $trigger_options['extra_text'] : '';
         $is_redirect = isset($trigger_options['is_redirect']) ? $trigger_options['is_redirect'] : false;
