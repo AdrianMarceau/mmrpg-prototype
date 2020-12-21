@@ -1255,39 +1255,40 @@ class rpg_ability_damage extends rpg_damage {
                                 unset($this_battle->battle_attachments[$static_attachment_key][$attachment_token]);
                                 $this_robot->update_session();
                                 $this_battle->update_session();
-                                if ($attachment_info['attachment_destroy'] !== false){
+                                $attachment_destroy_info = isset($attachment_info['attachment_destroy_via_weaknesses']) ? $attachment_info['attachment_destroy_via_weaknesses'] : $attachment_info['attachment_destroy'];
+                                if ($attachment_destroy_info !== false){
                                     $attachment_info['flags']['is_attachment'] = true;
                                     if (!isset($attachment_info['attachment_token'])){ $attachment_info['attachment_token'] = $attachment_token; }
                                     if (isset($attachment_info['ability_token'])){ $temp_attachment = rpg_game::get_ability($this_robot->battle, $this_robot->player, $this_robot, array('ability_token' => $attachment_info['ability_token'])); }
                                     elseif (isset($attachment_info['item_token'])){ $temp_attachment = rpg_game::get_item($this_robot->battle, $this_robot->player, $this_robot, array('item_token' => $attachment_info['item_token'])); }
                                     else { continue; }
-                                    $temp_trigger_type = !empty($attachment_info['attachment_destroy']['trigger']) ? $attachment_info['attachment_destroy']['trigger'] : 'damage';
+                                    $temp_trigger_type = !empty($attachment_destroy_info['trigger']) ? $attachment_destroy_info['trigger'] : 'damage';
                                     //$this_battle->events_create(false, false, 'DEBUG', 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.'!');
-                                    //$this_battle->events_create(false, false, 'DEBUG', 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.' info:<br />'.preg_replace('/\s+/', ' ', htmlentities(print_r($attachment_info['attachment_destroy'], true), ENT_QUOTES, 'UTF-8', true)));
+                                    //$this_battle->events_create(false, false, 'DEBUG', 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.' info:<br />'.preg_replace('/\s+/', ' ', htmlentities(print_r($attachment_destroy_info, true), ENT_QUOTES, 'UTF-8', true)));
                                     if ($temp_trigger_type == 'damage'){
-                                        $temp_attachment->damage_options_update($attachment_info['attachment_destroy']);
-                                        $temp_attachment->recovery_options_update($attachment_info['attachment_destroy']);
+                                        $temp_attachment->damage_options_update($attachment_destroy_info);
+                                        $temp_attachment->recovery_options_update($attachment_destroy_info);
                                         $temp_attachment->update_session();
-                                        $temp_damage_kind = $attachment_info['attachment_destroy']['kind'];
+                                        $temp_damage_kind = $attachment_destroy_info['kind'];
                                         if (isset($attachment_info['attachment_'.$temp_damage_kind])){
                                             $temp_damage_amount = $attachment_info['attachment_'.$temp_damage_kind];
                                             $temp_trigger_options = array('apply_modifiers' => false);
                                             $this_robot->trigger_damage($target_robot, $temp_attachment, $temp_damage_amount, false, $temp_trigger_options);
                                         }
                                     } elseif ($temp_trigger_type == 'recovery'){
-                                        $temp_attachment->recovery_options_update($attachment_info['attachment_destroy']);
-                                        $temp_attachment->damage_options_update($attachment_info['attachment_destroy']);
+                                        $temp_attachment->recovery_options_update($attachment_destroy_info);
+                                        $temp_attachment->damage_options_update($attachment_destroy_info);
                                         $temp_attachment->update_session();
-                                        $temp_recovery_kind = $attachment_info['attachment_destroy']['kind'];
+                                        $temp_recovery_kind = $attachment_destroy_info['kind'];
                                         if (isset($attachment_info['attachment_'.$temp_recovery_kind])){
                                             $temp_recovery_amount = $attachment_info['attachment_'.$temp_recovery_kind];
                                             $temp_trigger_options = array('apply_modifiers' => false);
                                             $this_robot->trigger_recovery($target_robot, $temp_attachment, $temp_recovery_amount, false, $temp_trigger_options);
                                         }
                                     } elseif ($temp_trigger_type == 'special'){
-                                        $temp_attachment->target_options_update($attachment_info['attachment_destroy']);
-                                        $temp_attachment->recovery_options_update($attachment_info['attachment_destroy']);
-                                        $temp_attachment->damage_options_update($attachment_info['attachment_destroy']);
+                                        $temp_attachment->target_options_update($attachment_destroy_info);
+                                        $temp_attachment->recovery_options_update($attachment_destroy_info);
+                                        $temp_attachment->damage_options_update($attachment_destroy_info);
                                         $temp_attachment->update_session();
                                         //$this_robot->trigger_damage($target_robot, $temp_attachment, 0, false);
                                         $this_robot->trigger_target($target_robot, $temp_attachment, array('canvas_show_this_ability' => false, 'prevent_default_text' => true));
