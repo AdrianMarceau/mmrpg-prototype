@@ -59,12 +59,17 @@ class rpg_target {
             $this_ability->ability_results['this_text'] .= "{$this_robot->print_name()} targets {$target_robot->print_name()}!<br />";
         }
 
-        // Append the targetting text to the event body
-        $this_ability->ability_results['this_text'] .= $this_ability->target_options['target_text'];
-
         // Update the ability results with the the trigger kind
         $this_ability->ability_results['trigger_kind'] = isset($trigger_options['override_trigger_kind']) ? $trigger_options['override_trigger_kind'] : 'target';
         $this_ability->ability_results['this_result'] = 'success';
+
+        // Append the targetting text to the event body
+        $result_text_field = 'target_'.$this_ability->ability_results['this_result'].'_text';
+        if (isset($this_ability->target_options[$result_text_field])){
+            $this_ability->ability_results['this_text'] .= $this_ability->target_options[$result_text_field];
+        } else {
+            $this_ability->ability_results['this_text'] .= $this_ability->target_options['target_text'];
+        }
 
         // Update the event options with the ability results
         $event_options['this_ability_results'] = $this_ability->ability_results;

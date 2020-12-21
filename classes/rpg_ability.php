@@ -565,7 +565,7 @@ class rpg_ability extends rpg_object {
             $this->target_options['ability_success_frame_offset']['x'] = $target_options['success'][1];
             $this->target_options['ability_success_frame_offset']['y'] = $target_options['success'][2];
             $this->target_options['ability_success_frame_offset']['z'] = $target_options['success'][3];
-            $this->target_options['target_text'] = $target_options['success'][4];
+            $this->target_options['target_success_text'] = $target_options['success'][4];
             $this->target_options['ability_success_frame_span'] = isset($target_options['success'][5]) ? $target_options['success'][5] : 1;
         }
         // Update internal variabels with failure options, if set
@@ -574,7 +574,7 @@ class rpg_ability extends rpg_object {
             $this->target_options['ability_failure_frame_offset']['x'] = $target_options['failure'][1];
             $this->target_options['ability_failure_frame_offset']['y'] = $target_options['failure'][2];
             $this->target_options['ability_failure_frame_offset']['z'] = $target_options['failure'][3];
-            $this->target_options['target_text'] = $target_options['failure'][4];
+            $this->target_options['target_failure_text'] = $target_options['failure'][4];
             $this->target_options['ability_failure_frame_span'] = isset($target_options['success'][5]) ? $target_options['success'][5] : 1;
         }
         // Return the new array
