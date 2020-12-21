@@ -633,7 +633,7 @@ ob_start();
                             }
                             list($temp_avatar_kind, $temp_avatar_token, $temp_avatar_size) = explode('/', $temp_avatar_path);
                             $temp_avatar_size = $temp_avatar_size * 2;
-                            $temp_avatar_frames_count = $temp_avatar_kind == 'players' ? 6 : 10;
+                            $temp_avatar_frames_count = $temp_avatar_kind == 'players' ? 7 : 11;
                             $temp_avatar_frames = array();
                             for ($i = 0; $i < $temp_avatar_frames_count; $i++){ $temp_avatar_frames[] = str_pad($i, 2, '0', STR_PAD_LEFT); }
                             $temp_avatar_frames = implode(',', $temp_avatar_frames);
