@@ -5893,21 +5893,62 @@ class rpg_robot extends rpg_object {
         // Break apart the parameters into stat/operator/value variables
         list($c_stat, $c_operator, $c_value) = array_values($condition_parameters);
 
-        // Assuming this is a stat-based condition, collect stat values to compare
-        $is_percent_based = in_array($c_stat, array('energy', 'weapons')) ? true : false;
-        $boost_stat_value_required = intval($c_value);
-        $boost_stat_value_current = $this->get_info('robot_'.$c_stat);
-        // If the stat is percent-based, collect that instead of the raw value
-        if ($is_percent_based){
-            $base_stat_value = $this->get_info('robot_base_'.$c_stat);
-            $boost_stat_value_current = ($boost_stat_value_current / $base_stat_value) * 100;
+        // If we're comparing STANDARD STAT VALUES of the current robot
+        if (preg_match('/^(energy|weapons|attack|defense|speed)$/', $c_stat)){
+
+            // Assuming this is a stat-based condition, collect stat values to compare
+            $is_percent_based = in_array($c_stat, array('energy', 'weapons')) ? true : false;
+            $boost_stat_value_required = intval($c_value);
+            $boost_stat_value_current = $this->get_info('robot_'.$c_stat);
+            // If the stat is percent-based, collect that instead of the raw value
+            if ($is_percent_based){
+                $base_stat_value = $this->get_info('robot_base_'.$c_stat);
+                $boost_stat_value_current = ($boost_stat_value_current / $base_stat_value) * 100;
+            }
+            // Compare the required value with the actual one and return true if they match
+            if (version_compare($boost_stat_value_current, $boost_stat_value_required, $c_operator)){
+                return true;
+            }
+
         }
-        // Compare the required stat with the actual one and return false if they don't match
-        if (!version_compare($boost_stat_value_current, $boost_stat_value_required, $c_operator)){
-            return false;
+        // Else if we're comparing FIELD TYPE VALUES of the current field
+        elseif ($c_stat === 'field-type'){
+
+            // Get a reference to the current field
+            $this_field = $this->battle->battle_field;
+
+            // Collect the current multiplier for the requested type
+            $field_type_required = $c_value;
+            $field_types_current = array();
+            if (!empty($this_field->field_type)){ $field_types_current[] = $this_field->field_type; }
+            if (!empty($this_field->field_type) && !empty($this_field->field_type2)){ $field_types_current[] = $this_field->field_type2; }
+            if (empty($field_types_current)){ $field_types_current[] = 'none'; }
+            // Check to see if required type is in list of current types and return true if they match
+            if (in_array($field_type_required, $field_types_current)){
+                return true;
+            }
+
+        }
+        // Else if we're comparing FIELD MULTIPLIER VALUES of the current field
+        elseif (preg_match('/^field-multiplier-([a-z]+)$/', $c_stat, $matches)){
+
+            // Get a reference to the current field
+            $this_field = $this->battle->battle_field;
+
+            // Collect the current multiplier for the requested type
+            $c_stat_type = $matches[1];
+            $multi_stat_value_required = floatval($c_value);
+            $multi_stat_value_current = $this_field->get_info('field_multipliers', $c_stat_type);
+            if (empty($multi_stat_value_current)){ $multi_stat_value_current = 1; }
+
+            // Compare the required value with the actual one and return true if they match
+            if (version_compare($multi_stat_value_current, $multi_stat_value_required, $c_operator)){
+                return true;
+            }
+
         }
 
-        // Return true by default
+        // Return false by default
         return true;
 
     }

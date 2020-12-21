@@ -2198,7 +2198,7 @@ class rpg_game {
 
         // First check to ensure it matches the established condition format
         // examples: "attack < 3" or "defense >= 2" or "energy < 50%"
-        if (!preg_match('/^([a-z]+)\s?([\<\>\=\!]+)\s?(\-?[0-9]+\%?)$/i', $condition, $matches)){
+        if (!preg_match('/^([-_a-z]+)\s?([\<\>\=\!\%]+)\s?(\-?[0-9]+\%?)$/i', $condition, $matches)){
             error_log('skill parameter "condition" was set but was invalid ('.$this_object_token.':'.__LINE__.')');
             error_log('$condition = '.print_r($condition, true));
             return false;
@@ -2207,7 +2207,9 @@ class rpg_game {
         $allowed_condition_stats = array('energy', 'weapons', 'attack', 'defense', 'speed');
         $allowed_condition_operators = array('=', '<=', '>=', '<', '>', '<>');
         list($x, $c_stat, $c_operator, $c_value) = $matches;
-        if (!in_array($c_stat, $allowed_condition_stats)){
+        if (!in_array($c_stat, $allowed_condition_stats)
+            && $c_stat !== 'field-type'
+            && !preg_match('/^field-multiplier-([a-z]+)$/', $c_stat)){
             error_log('skill parameter "condition" stat was set but was invalid ('.$this_object_token.':'.__LINE__.')');
             error_log('$c_stat = '.print_r($c_stat, true));
             return false;
@@ -2217,13 +2219,29 @@ class rpg_game {
             return false;
         } else {
             // Validate the value parameter differently for energy/weapons vs attack/defense/speed stats
-            if ($c_stat === 'energy' || $c_stat === 'weapons'){
+            $is_energy_c_stat = $c_stat === 'energy' || $c_stat === 'weapons' ? true : false;
+            $is_field_type_c_stat = $c_stat === 'field-type' ? true : false;
+            $is_field_multiplier_c_stat = preg_match('/^field-multiplier-([a-z]+)$/', $c_stat) ? true : false;
+            if ($is_energy_c_stat){
                 if (!strstr($c_value, '%')){
                     error_log('skill parameter "condition" value must be percent for energy/weapons stat ('.$this_object_token.':'.__LINE__.')');
                     error_log('$c_value = '.print_r($c_value, true));
                     return false;
                 } elseif (intval($c_value) <= 0 || intval($c_value) > 100){
                     error_log('skill parameter "condition" value must be > 0% and <= 100% for energy/weapons stat ('.$this_object_token.':'.__LINE__.')');
+                    error_log('$c_value = '.print_r($c_value, true));
+                    return false;
+                }
+            } elseif ($is_field_type_c_stat) {
+                $allowed_field_types = array_keys(rpg_type::get_index(false, false, false, false));
+                if (!in_array($c_value, $allowed_field_types)){
+                    error_log('skill parameter "condition" value must be a valid type for field types ('.$this_object_token.':'.__LINE__.')');
+                    error_log('$c_value = '.print_r($c_value, true));
+                    return false;
+                }
+            } elseif ($is_field_multiplier_c_stat) {
+                if (floatval($c_value) < MMRPG_SETTINGS_MULTIPLIER_MIN || floatval($c_value) > MMRPG_SETTINGS_MULTIPLIER_MAX){
+                    error_log('skill parameter "condition" value must be > '.MMRPG_SETTINGS_MULTIPLIER_MIN.' and < '.MMRPG_SETTINGS_MULTIPLIER_MAX.' for multipliers ('.$this_object_token.':'.__LINE__.')');
                     error_log('$c_value = '.print_r($c_value, true));
                     return false;
                 }
