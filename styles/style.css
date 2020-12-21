@@ -2635,19 +2635,30 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 }
 #console .event .target_scan_table .skill_bubble .skill_name {
     display: inline-block;
+    box-sizing: border-box;
     line-height: 1.4;
-    float: left;
-    margin-right: 9px;
+    float: right;
+    margin: 0 0 6px 9px;
+    padding: 0 9px;
+    width: auto;
+    min-width: 116px;
+    max-width: 99%;
+    overflow: hidden;
+    text-overflow: hidden;
+    white-space: nowrap;
 }
 #console .event .target_scan_table .skill_bubble .skill_desc {
     display: inline-block;
-    float: left;
+    float: right;
     margin: 0 auto 0 0;
+    padding: 3px 9px;
     line-height: 1.4;
-    width: calc(100% - 124px);
+    width: auto;
+    max-width: calc(100% - 15px);
     white-space: normal;
     font-weight: normal;
-    text-align: left;
+    text-align: right;
+    clear: both;
 }
 
 #actions {
