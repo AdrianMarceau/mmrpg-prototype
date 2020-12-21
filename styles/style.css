@@ -2608,7 +2608,7 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     overflow: hidden;
     width: 500px;
     float: right;
-    padding: 5px;
+    padding: 10px 0 0;
 }
 #console .event .target_scan_table .ability_list:after,
 #console .event .target_scan_table .skill_bubble:after {
@@ -2621,7 +2621,7 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     box-sizing: border-box;
     float: left;
     width: 25%;
-    padding: 0 6px 3px 0;
+    padding: 0 0 3px 6px;
 }
 #console .event .target_scan_table .ability_list .ability_name {
     display: inline-block;
