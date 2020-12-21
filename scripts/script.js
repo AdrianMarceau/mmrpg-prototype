@@ -844,12 +844,16 @@ function mmrpg_canvas_animate(){
                         newFrame = relativeResult;
                         } else if (thisRandom >= 30){
                         newFrame = 'taunt';
+                        } else if (thisRandom >= 10){
+                        newFrame = 'base2';
                         }
                     } else {
                     if (battleStatus == 'complete' && thisRandom >= 60){
                         newFrame = relativeResult;
                         } else if (thisRandom >= 30){
                         newFrame = 'taunt';
+                        } else if (thisRandom >= 10){
+                        newFrame = 'base2';
                         }
                     }
                 }
@@ -1051,7 +1055,7 @@ function mmrpg_canvas_robot_frame(thisRobot, newFrame){
 //function mmrpg_canvas_robot_frame_
 
 // Define a function for updating a player's frame with animation
-spriteFrameIndex.players = ['base','taunt','victory','defeat','command','damage'];
+spriteFrameIndex.players = ['base','taunt','victory','defeat','command','damage','base2'];
 function mmrpg_canvas_player_frame(thisPlayer, newFrame){
     // Collect this player's data fields
     var thisSize = thisPlayer.attr('data-size');
