@@ -1505,10 +1505,11 @@ class rpg_robot extends rpg_object {
 
     // Define a function for checking if this robot is in speed break status
     public static function robot_choices_abilities($objects){
+        global $db;
 
         // Extract all objects into the current scope
         extract($objects);
-        global $db;
+        //error_log('$this_robot->robot_abilities = '.print_r($this_robot->robot_abilities, true));
 
         // Create the ability options and weights variables
         $options = array();
@@ -1734,6 +1735,7 @@ class rpg_robot extends rpg_object {
         $temp_ability_tokens = "'".implode("','", array_values($this_robot->robot_abilities))."'";
         $temp_ability_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_token IN ({$temp_ability_tokens});", 'ability_token');
         foreach ($this_robot->robot_abilities AS $key => $token){
+            //error_log('checking ability '.$token);
             if (!in_array($token, $options)){
 
                 // Collect ability info and define base chance
@@ -1761,11 +1763,11 @@ class rpg_robot extends rpg_object {
 
                     // Increase chance if the target is weak to this ability's types
                     foreach ($ability_types AS $key2 => $type){
-                        if ($target_robot->has_weakness($type)){ $value *= (1.5 + ($intelligence_mod * 0.5)); }
-                        if ($target_robot->has_resistance($type)){ $value *= (0.5 - ($intelligence_mod * 0.1)); }
-                        if ($target_robot->has_affinity($type)){ $value *= (0.4 - ($intelligence_mod * 0.1)); }
-                        if ($target_robot->has_immunity($type)){ $value *= (0.4 - ($intelligence_mod * 0.1)); }
-                        if (in_array($type, $target_core_shields)){ $value *= (0.4 - ($intelligence_mod * 0.1)); }
+                        if ($target_robot->has_weakness($type)){ $value *= (1.6 + ($intelligence_mod * 0.5)); }
+                        if ($target_robot->has_resistance($type)){ $value *= (0.6 - ($intelligence_mod * 0.1)); }
+                        if ($target_robot->has_affinity($type)){ $value *= (0.5 - ($intelligence_mod * 0.1)); }
+                        if ($target_robot->has_immunity($type)){ $value *= (0.5 - ($intelligence_mod * 0.1)); }
+                        if (in_array($type, $target_core_shields)){ $value *= (0.5 - ($intelligence_mod * 0.1)); }
                     }
 
                 }
@@ -1787,6 +1789,7 @@ class rpg_robot extends rpg_object {
                 }
 
                 // Append this option and its weight to the parent arrays
+                //error_log('value is '.$value.' on line '.__LINE__);
                 if ($value > 0){
                     $options[] = $token;
                     $weights[] = ceil($value);
@@ -1798,6 +1801,7 @@ class rpg_robot extends rpg_object {
         // Remove any options that have absolute zero values
         $weights_backup = $weights = array_values($weights);
         $options_backup = $options = array_values($options);
+        //error_log('weighted options (before) = '.print_r(array_combine($options, $weights), true));
         foreach ($weights AS $key => $value){
             if (empty($value)){
                 unset($weights[$key]);
@@ -1819,8 +1823,9 @@ class rpg_robot extends rpg_object {
         }
 
         // Pull a specific ability given waited chance
-        //error_log('weighted options = '.print_r(array_combine($options, $weights), true));
+        //error_log('weighted options (after) = '.print_r(array_combine($options, $weights), true));
         $ability_token = $this_battle->weighted_chance($options, $weights);
+        //error_log('$ability_token = '.print_r($ability_token, true));
 
         // Return an ability based on a weighted chance
         return $ability_token;
