@@ -5940,6 +5940,10 @@ class rpg_robot extends rpg_object {
             $multi_stat_value_required = floatval($c_value);
             $multi_stat_value_current = $this_field->get_info('field_multipliers', $c_stat_type);
             if (empty($multi_stat_value_current)){ $multi_stat_value_current = 1; }
+            //error_log('$c_stat_type = '.print_r($c_stat_type, true));
+            //error_log('$c_operator = '.print_r($c_operator, true));
+            //error_log('$multi_stat_value_required = '.print_r($multi_stat_value_required, true));
+            //error_log('$multi_stat_value_current = '.print_r($multi_stat_value_current, true));
 
             // Compare the required value with the actual one and return true if they match
             if (version_compare($multi_stat_value_current, $multi_stat_value_required, $c_operator)){
@@ -5949,7 +5953,7 @@ class rpg_robot extends rpg_object {
         }
 
         // Return false by default
-        return true;
+        return false;
 
     }
 
