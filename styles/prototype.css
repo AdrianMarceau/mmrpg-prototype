@@ -246,9 +246,6 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .banner .points[data-step] * {
     cursor: pointer;
 }
-#prototype .banner .points[data-step] {
-    transition: background 0.3s, filter 0.3s;
-}
 #prototype .banner .points[data-step] .label,
 #prototype .banner .points[data-step] .amount {
     transform: translate(0, 0);
@@ -424,6 +421,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     float: left;
     color: #70D580;
     font-size: 13px;
+    padding: 0 5px;
 }
 #prototype .banner .options_userinfo .info {
     padding: 0 5px;
@@ -437,20 +435,24 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .banner .options_userinfo .config {
     color: #ffffff;
 }
-#prototype .banner .options_userinfo .config a {
+#prototype .banner .options_userinfo .config i {
     display: inline-block;
-    padding: 0 5px;
+    font-size: 120%;
     opacity: 0.6;
     transition: opacity 0.3s;
-    cursor: pointer;
     color: #ffffff;
 }
-#prototype .banner .options_userinfo .config a.link_active,
-#prototype .banner .options_userinfo .config a:hover {
-    opacity: 1.0;
+#prototype .banner .options_userinfo[data-step],
+#prototype .banner .options_userinfo[data-step] * {
+    cursor: pointer;
 }
-#prototype .banner .options_userinfo .config a i {
-    font-size: 120%;
+#prototype .banner .options_userinfo[data-step]:hover .config,
+#prototype .banner .options_userinfo[data-step].link_active .config {
+
+}
+#prototype .banner .options_userinfo[data-step]:hover .config i,
+#prototype .banner .options_userinfo[data-step].link_active .config i {
+    opacity: 1.0;
 }
 
 #prototype .banner .options_userinfo .sprite_40x40_00 {
@@ -511,6 +513,9 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     background-image: linear-gradient(to bottom,  rgba(0,0,0,0.40) 0%,rgba(0,0,0,0.50) 100%) !important; /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0CFFFFFF', endColorstr='#0C000000',GradientType=0 ) !important; /* IE6-9 */
 }
+#prototype .banner .points[data-step] .wrapper {
+    transition: background 0.3s, filter 0.3s;
+}
 #prototype .banner .points[data-step]:hover .wrapper,
 #prototype .banner .points[data-step].link_active .wrapper {
     background-image: -moz-linear-gradient(top,  rgba(0,0,0,0.30) 0%, rgba(0,0,0,0.40) 100%) !important; /* FF3.6+ */
@@ -550,12 +555,25 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     -moz-border-radius: 26px 0 0 0;
     -webkit-border-radius: 26px 0 0 0;
     border-radius: 26px 0 0 0;
-    background-image: -moz-linear-gradient(top,  rgba(0,0,0,0.50) 0%, rgba(0,0,0,0.50) 100%) !important; /* FF3.6+ */
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0.40)), color-stop(100%,rgba(0,0,0,0.50))) !important; /* Chrome,Safari4+ */
-    background-image: -webkit-linear-gradient(top,  rgba(0,0,0,0.50) 0%,rgba(0,0,0,0.50) 100%) !important; /* Chrome10+,Safari5.1+ */
-    background-image: -o-linear-gradient(top,  rgba(0,0,0,0.50) 0%,rgba(0,0,0,0.50) 100%) !important; /* Opera 11.10+ */
-    background-image: -ms-linear-gradient(top,  rgba(0,0,0,0.50) 0%,rgba(0,0,0,0.50) 100%) !important; /* IE10+ */
-    background-image: linear-gradient(to bottom,  rgba(0,0,0,0.50) 0%,rgba(0,0,0,0.50) 100%) !important; /* W3C */
+    background-image: -moz-linear-gradient(top,  rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.50) 100%) !important; /* FF3.6+ */
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0.45)), color-stop(100%,rgba(0,0,0,0.50))) !important; /* Chrome,Safari4+ */
+    background-image: -webkit-linear-gradient(top,  rgba(0,0,0,0.45) 0%,rgba(0,0,0,0.50) 100%) !important; /* Chrome10+,Safari5.1+ */
+    background-image: -o-linear-gradient(top,  rgba(0,0,0,0.45) 0%,rgba(0,0,0,0.50) 100%) !important; /* Opera 11.10+ */
+    background-image: -ms-linear-gradient(top,  rgba(0,0,0,0.45) 0%,rgba(0,0,0,0.50) 100%) !important; /* IE10+ */
+    background-image: linear-gradient(to bottom,  rgba(0,0,0,0.45) 0%,rgba(0,0,0,0.50) 100%) !important; /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0CFFFFFF', endColorstr='#0C000000',GradientType=0 ) !important; /* IE6-9 */
+}
+#prototype .banner .options_userinfo[data-step] .wrapper {
+    transition: background 0.3s, filter 0.3s;
+}
+#prototype .banner .options_userinfo[data-step]:hover .wrapper,
+#prototype .banner .options_userinfo[data-step].link_active .wrapper {
+    background-image: -moz-linear-gradient(top,  rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.40) 100%) !important; /* FF3.6+ */
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0.35)), color-stop(100%,rgba(0,0,0,0.40))) !important; /* Chrome,Safari4+ */
+    background-image: -webkit-linear-gradient(top,  rgba(0,0,0,0.35) 0%,rgba(0,0,0,0.40) 100%) !important; /* Chrome10+,Safari5.1+ */
+    background-image: -o-linear-gradient(top,  rgba(0,0,0,0.35) 0%,rgba(0,0,0,0.40) 100%) !important; /* Opera 11.10+ */
+    background-image: -ms-linear-gradient(top,  rgba(0,0,0,0.35) 0%,rgba(0,0,0,0.40) 100%) !important; /* IE10+ */
+    background-image: linear-gradient(to bottom,  rgba(0,0,0,0.35) 0%,rgba(0,0,0,0.40) 100%) !important; /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0CFFFFFF', endColorstr='#0C000000',GradientType=0 ) !important; /* IE6-9 */
 }
 #prototype .banner .options_fullmenu .wrapper {

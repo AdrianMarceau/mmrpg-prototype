@@ -564,7 +564,7 @@ function prototype_menu_click_step(thisContext, thisLink, thisCallback, thisSlid
     // Return false if clicking self
     if (currentActiveIndex == nextActiveIndex){ return false; }
     // Remove all the other active classes and then make this one active
-    $('.banner .link[data-step]', thisContext).removeClass('link_active');
+    $('.banner [data-step].link_active', thisContext).removeClass('link_active');
     thisLink.addClass('link_active');
     // Collect the requested step name
     var stepName = thisLink.attr('data-step');
