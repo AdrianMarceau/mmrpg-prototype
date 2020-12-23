@@ -386,12 +386,20 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 }
 #prototype .banner .options .link_active,
 #prototype .banner .options .link:hover {
+    text-decoration: none;
+}
+#prototype .banner .options .link_active label,
+#prototype .banner .options .link:hover label {
     text-decoration: underline;
 }
 #prototype .banner .options .link,
-#prototype .banner .options .link label {
+#prototype .banner .options .link * {
     cursor: pointer;
-    _cursor: hand;
+    text-align: center;
+}
+#prototype .banner .options .link i {
+    margin-right: -2px;
+    font-size: 80%;
 }
 #prototype .banner .options .pipe {
     padding: 0 4px;
