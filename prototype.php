@@ -365,43 +365,45 @@ foreach ($this_menu_tooltips AS $token => $text){
         }
         ?>
 
-        <? if (empty($_SESSION[$session_token]['DEMO'])){
-            ?>
-            <div class="points field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-                <div class="wrapper">
-                    <label class="label">Battle Points</label>
-                    <span class="amount">
-                        <span class="value"><?= !empty($_SESSION[$session_token]['counters']['battle_points']) ? number_format($_SESSION[$session_token]['counters']['battle_points'], 0, '.', ',') : 0 ?></span>
-                        <? if(empty($_SESSION[$session_token]['DEMO']) && !empty($this_boardinfo['board_rank'])): ?>
-                            <span class="pipe">|</span>
-                            <span class="place"><?= mmrpg_number_suffix($this_boardinfo['board_rank']) ?></span>
-                        <? endif; ?>
-                    </span>
-                </div>
-            </div>
-            <? $battle_zenny_count = isset($_SESSION[$session_token]['counters']['battle_zenny']) ? $_SESSION[$session_token]['counters']['battle_zenny'] : 0; ?>
-            <div class="subpoints field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?> <?= $battle_zenny_count >= 999999999 ? 'overflow' : '' ?>">
-                <div class="wrapper">
-                    <span class="amount zenny">
-                        <?= (!empty($battle_zenny_count) ? number_format($_SESSION[$session_token]['counters']['battle_zenny'], 0, '.', ',') : 0).'z' ?>
-                    </span>
-                    <? if (!empty($_SESSION[$session_token]['values']['battle_stars'])){ ?>
+        <?
+        $battle_points_count = isset($_SESSION[$session_token]['counters']['battle_points']) ? $_SESSION[$session_token]['counters']['battle_points'] : 0;
+        $battle_zenny_count = isset($_SESSION[$session_token]['counters']['battle_zenny']) ? $_SESSION[$session_token]['counters']['battle_zenny'] : 0;
+        $battle_stars_count = isset($_SESSION[$session_token]['values']['battle_stars']) ? count($_SESSION[$session_token]['values']['battle_stars']) : 0;
+        $has_points_overflow = $battle_points_count >= 999999999999 ? true : false;
+        $has_zenny_overflow = $battle_zenny_count >= 999999999 ? true : false;
+        ?>
+        <div class="points field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?> <?= $has_points_overflow || $has_zenny_overflow ? 'overflow' : '' ?>">
+            <div class="wrapper">
+                <label class="label">Battle Points</label>
+                <span class="amount">
+                    <span class="value"><?= number_format($battle_points_count, 0, '.', ',') ?></span>
+                    <? if(!empty($this_boardinfo['board_rank'])): ?>
                         <span class="pipe">|</span>
-                        <span class="amount stars"><?=
-                            '<span class="num">'.number_format(count($_SESSION[$session_token]['values']['battle_stars']), 0, '.', ',').'</span>'.
-                            '<i class="fa fas fa-star"></i>'
-                            ?></span>
-                    <? } ?>
-                    <? if (mmrpg_prototype_item_unlocked('omega-seed')){ ?>
-                        <span class="pipe">|</span>
-                        <span class="amount omega">
-                            <i class="fa fas fa-greek-omega"></i>
-                        </span>
-                    <? } ?>
-                </div>
+                        <span class="place"><?= mmrpg_number_suffix($this_boardinfo['board_rank']) ?></span>
+                    <? endif; ?>
+                </span>
             </div>
-            <?
-        } ?>
+        </div>
+        <div class="subpoints field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?> <?= $has_zenny_overflow ? 'overflow' : '' ?>">
+            <div class="wrapper">
+                <span class="amount zenny">
+                    <?= (!empty($battle_zenny_count) ? number_format($battle_zenny_count, 0, '.', ',') : 0).'&#438;' ?>
+                </span>
+                <? if (!empty($_SESSION[$session_token]['values']['battle_stars'])){ ?>
+                    <span class="pipe">|</span>
+                    <span class="amount stars"><?=
+                        '<span class="num">'.number_format($battle_stars_count, 0, '.', ',').'</span>'.
+                        '<i class="fa fas fa-star"></i>'
+                        ?></span>
+                <? } ?>
+                <? if (mmrpg_prototype_item_unlocked('omega-seed')){ ?>
+                    <span class="pipe">|</span>
+                    <span class="amount omega">
+                        <i class="fa fas fa-greek-omega"></i>
+                    </span>
+                <? } ?>
+            </div>
+        </div>
 
         <div class="options options_userinfo field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
             <div class="wrapper">
