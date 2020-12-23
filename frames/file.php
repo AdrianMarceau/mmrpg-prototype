@@ -208,7 +208,7 @@ while ($this_action == 'save'){
     }
 
     // Update the header markup title
-    $html_header_title .= 'Update Game Settings';
+    $html_header_title .= 'Game Settings';
     // Update the header markup text
     $html_header_text .= 'Your game is saved automatically whenever you return to the main menu, shop, or customize your characters.<br /> ';
     $html_header_text .= 'Make changes to your game using the form below or <a href="'.MMRPG_CONFIG_ROOTURL.'file/profile/" target="_blank">click here</a> to update account settings. ';
@@ -579,6 +579,8 @@ while ($this_action == 'load'){
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="robots" content="noindex,nofollow" />
 <meta name="format-detection" content="telephone=no" />
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/solid.css" integrity="sha384-+0VIRx+yz1WBcCTXBkVQYIBVNEFH1eP6Zknm16roZCyeNg2maWEpk/l/KsyFKs7G" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/fontawesome.css" integrity="sha384-jLuaxTTBR42U2qJ/pm4JRouHkEDHkVqH0T1nyQXn1mZ7Snycpf6Rl25VBNthU4z0" crossorigin="anonymous">
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/file.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
@@ -695,6 +697,7 @@ function windowResizeFrame(){
             <? if(!empty($html_header_text)): ?>
                 <span class="header block_1 header_types type_<?= defined('MMRPG_SETTINGS_REMOTE_FIELDTYPE') ? MMRPG_SETTINGS_REMOTE_FIELDTYPE : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                     <span class="count">
+                        <i class="fa fas fa-cogs"></i>
                         <?= str_replace(' & ', ' &amp; ', $html_header_title) ?>
                     </span>
                 </span>

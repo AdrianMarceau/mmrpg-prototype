@@ -236,8 +236,9 @@ if (true){
 
     <span class="header block_1 header_types type_<?= defined('MMRPG_SETTINGS_REMOTE_FIELDTYPE') ? MMRPG_SETTINGS_REMOTE_FIELDTYPE : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
         <span class="count">
+            <i class="fa fas fa-book"></i>
             Robot Database
-            <span style="opacity: 0.25;">(
+            <span class="progress">(
                 <?= $global_robots_counters['encountered']['total'] == 1 ? '<span title="1 Robot Encountered">1</span>' : '<span title="'.$global_robots_counters['encountered']['total'].' Robots Encountered">'.$global_robots_counters['encountered']['total'].'</span>' ?>
                 / <?= $global_robots_counters['total'] == 1 ? '<span title="1 Robot">1 Robot Total</span>' : '<span title="'.$global_robots_counters['total'].' Robots Total">'.$global_robots_counters['total'].' Robots</span>' ?>
             )</span>
@@ -738,6 +739,8 @@ if (true){
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="robots" content="noindex,nofollow" />
 <meta name="format-detection" content="telephone=no" />
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/solid.css" integrity="sha384-+0VIRx+yz1WBcCTXBkVQYIBVNEFH1eP6Zknm16roZCyeNg2maWEpk/l/KsyFKs7G" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/fontawesome.css" integrity="sha384-jLuaxTTBR42U2qJ/pm4JRouHkEDHkVqH0T1nyQXn1mZ7Snycpf6Rl25VBNthU4z0" crossorigin="anonymous">
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/database.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />

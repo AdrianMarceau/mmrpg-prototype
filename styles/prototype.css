@@ -770,6 +770,18 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
     -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
 }
+#prototype .header_types .count i {
+    font-size: 80%;
+    position: relative;
+    bottom: 1px;
+}
+#prototype .header_types .count .progress {
+
+}
+#prototype .header_types .count i,
+#prototype .header_types .count .progress {
+    color: #bababa;
+}
 
 #prototype .option_wrapper {
     display: block;
