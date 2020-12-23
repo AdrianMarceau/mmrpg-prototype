@@ -100,6 +100,14 @@ $(document).ready(function(){
             prototype_menu_click_step(thisContext, this);
             });
 
+        // Define the action for the banner step divs
+        $('.banner div[data-step]', thisContext).live('click', function(e){
+            // Prevent the default click action
+            e.preventDefault();
+            // Trigger the prototype step function
+            prototype_menu_click_step(thisContext, this);
+            });
+
         // Define the confirmation event for the exit action
         $('.banner .link_exit', thisContext).live('click', function(e){
             // Prevent the default click action
@@ -562,6 +570,8 @@ function prototype_menu_click_step(thisContext, thisLink, thisCallback, thisSlid
     var stepName = thisLink.attr('data-step');
     var stepMenu = $('.menu[data-step="'+stepName+'"]', thisContext);
     var slideDirection = currentActiveIndex > nextActiveIndex ? 'right' : 'left';
+    //console.log('currentActiveIndex =', currentActiveIndex, '| nextActiveIndex =', nextActiveIndex);
+    //console.log('slideDirection =', slideDirection);
     // Collect the requested music if set
     var stepMusic = thisLink.attr('data-music') != undefined ? thisLink.attr('data-music') : false;
     var stepSource = thisLink.attr('data-source') != undefined ? thisLink.attr('data-source') : false;

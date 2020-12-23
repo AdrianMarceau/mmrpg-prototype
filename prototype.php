@@ -266,8 +266,8 @@ $this_menu_tooltips['players'] = '&laquo; Player Editor &raquo; &lt;br /&gt;Revi
 $this_menu_tooltips['database'] = '&laquo; Robot Database &raquo; &lt;br /&gt;A comprehensive list of all robots encountered in battle so far including their name and basic details. Scanning robots adds their stats and weaknesses to the database and unlocking them adds a complete list of their level-up abilities.';
 $this_menu_tooltips['stars'] = '&laquo; Star Collection &raquo; &lt;br /&gt;A detailed list of all the Field and Fusion Stars collected on your journey so far. Collect many different stars to advance in the prototype!';
 $this_menu_tooltips['items'] = '&laquo; Item Inventory &raquo; &lt;br /&gt;View your inventory of collected items thus far, including quantities, descriptions, and images.';
-$this_menu_tooltips['leaderboard'] = '&laquo; Player Leaderboard &raquo; &lt;br /&gt;Live leaderboards ranking all players by their total Battle Point scores from highest to lowest. Keep an eye on your Battle Points by checking the top-right of the main menu and try to work your way up to the first page!';
 $this_menu_tooltips['save'] = '&laquo; Game Settings &raquo; &lt;br /&gt;Update your game settings and profile options including username, password, profile colour, and more.';
+$this_menu_tooltips['leaderboard'] = '&laquo; Player Leaderboard &raquo; &lt;br /&gt;Live leaderboards ranking all players by their total Battle Point scores from highest to lowest. Keep an eye on your Battle Points by checking the top-right of the main menu and try to work your way up to the first page!';
 
 // Generate a list of data-index values based on predefined menu option order
 $temp_data_index = 0;
@@ -366,13 +366,26 @@ foreach ($this_menu_tooltips AS $token => $text){
         ?>
 
         <?
+        // Collect the current points, zenny, and star counts to determine if overflow is needed
         $battle_points_count = isset($_SESSION[$session_token]['counters']['battle_points']) ? $_SESSION[$session_token]['counters']['battle_points'] : 0;
         $battle_zenny_count = isset($_SESSION[$session_token]['counters']['battle_zenny']) ? $_SESSION[$session_token]['counters']['battle_zenny'] : 0;
         $battle_stars_count = isset($_SESSION[$session_token]['values']['battle_stars']) ? count($_SESSION[$session_token]['values']['battle_stars']) : 0;
+        $battle_points_rank = !empty($this_boardinfo['board_rank']) ? $this_boardinfo['board_rank'] : 0;
         $has_points_overflow = $battle_points_count >= 999999999999 ? true : false;
         $has_zenny_overflow = $battle_zenny_count >= 999999999 ? true : false;
+        // If the user has collected any points, turn the points counter into a leaderboard link
+        $battle_points_container_attrs = array();
+        if ($battle_points_count > 0 && $battle_points_rank > 0){
+            $battle_points_container_attrs[] = 'data-step="leaderboard"';
+            $battle_points_container_attrs[] = 'data-index="'.$this_menu_indexes['leaderboard'].'"';
+            $battle_points_container_attrs[] = 'data-source="frames/leaderboard.php"';
+            $battle_points_container_attrs[] = 'data-music="misc/leader-board"';
+            $battle_points_container_attrs[] = 'data-tooltip="'.$this_menu_tooltips['leaderboard'].'"';
+            $battle_points_container_attrs[] = 'data-tooltip-type="field_type field_type_'.MMRPG_SETTINGS_CURRENT_FIELDTYPE.'"';
+        }
+        $battle_points_container_attrs = implode(' ', $battle_points_container_attrs);
         ?>
-        <div class="points field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?> <?= $has_points_overflow || $has_zenny_overflow ? 'overflow' : '' ?>">
+        <div class="points field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?> <?= $has_points_overflow || $has_zenny_overflow ? 'overflow' : '' ?>" <?= $battle_points_container_attrs ?>>
             <div class="wrapper">
                 <label class="label">Battle Points</label>
                 <span class="amount">
@@ -464,22 +477,18 @@ foreach ($this_menu_tooltips AS $token => $text){
                 <a class="link link_data" data-step="database" data-index="<?= $this_menu_indexes['database'] ?>" data-source="frames/database.php" data-music="misc/data-base" data-tooltip="<?= $this_menu_tooltips['database'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                     <label>database</label>
                 </a>
-                <span class="pipe">|</span>
                 <? if (mmrpg_prototype_stars_unlocked() > 0): ?>
+                    <span class="pipe">|</span>
                     <a class="link link_stars" data-step="stars" data-index="<?= $this_menu_indexes['stars'] ?>" data-source="frames/starforce.php" data-music="misc/star-force" data-tooltip="<?= $this_menu_tooltips['stars'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <label>stars</label>
                     </a>
-                    <span class="pipe">|</span>
                 <? endif; ?>
                 <? if (mmrpg_prototype_items_unlocked() > 0): ?>
+                    <span class="pipe">|</span>
                     <a class="link link_items" data-step="items" data-index="<?= $this_menu_indexes['items'] ?>" data-source="frames/items.php" data-music="misc/item-viewer" data-tooltip="<?= $this_menu_tooltips['items'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <label>items</label>
                     </a>
-                    <span class="pipe">|</span>
                 <? endif; ?>
-                <a class="link link_leaderboard" data-step="leaderboard" data-index="<?= $this_menu_indexes['leaderboard'] ?>" data-source="frames/leaderboard.php" data-music="misc/leader-board" data-tooltip="<?= $this_menu_tooltips['leaderboard'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-                    <label>ranks</label>
-                </a>
             </div>
         </div>
 

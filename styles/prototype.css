@@ -242,6 +242,24 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     overflow: hidden;
     z-index: 30;
 }
+#prototype .banner .points[data-step],
+#prototype .banner .points[data-step] * {
+    cursor: pointer;
+}
+#prototype .banner .points[data-step] {
+    transition: background 0.3s, filter 0.3s;
+}
+#prototype .banner .points[data-step] .label,
+#prototype .banner .points[data-step] .amount {
+    transform: translate(0, 0);
+    transition: transform 0.3s;
+}
+#prototype .banner .points[data-step]:hover .label,
+#prototype .banner .points[data-step]:hover .amount,
+#prototype .banner .points[data-step].link_active .label,
+#prototype .banner .points[data-step].link_active .amount {
+    transform: translate(-3px, 0);
+}
 #prototype .banner .subpoints {
     top: 43px;
     width: 190px;
@@ -491,6 +509,16 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     background-image: -o-linear-gradient(top,  rgba(0,0,0,0.40) 0%,rgba(0,0,0,0.50) 100%) !important; /* Opera 11.10+ */
     background-image: -ms-linear-gradient(top,  rgba(0,0,0,0.40) 0%,rgba(0,0,0,0.50) 100%) !important; /* IE10+ */
     background-image: linear-gradient(to bottom,  rgba(0,0,0,0.40) 0%,rgba(0,0,0,0.50) 100%) !important; /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0CFFFFFF', endColorstr='#0C000000',GradientType=0 ) !important; /* IE6-9 */
+}
+#prototype .banner .points[data-step]:hover .wrapper,
+#prototype .banner .points[data-step].link_active .wrapper {
+    background-image: -moz-linear-gradient(top,  rgba(0,0,0,0.30) 0%, rgba(0,0,0,0.40) 100%) !important; /* FF3.6+ */
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0.30)), color-stop(100%,rgba(0,0,0,0.40))) !important; /* Chrome,Safari4+ */
+    background-image: -webkit-linear-gradient(top,  rgba(0,0,0,0.30) 0%,rgba(0,0,0,0.40) 100%) !important; /* Chrome10+,Safari5.1+ */
+    background-image: -o-linear-gradient(top,  rgba(0,0,0,0.30) 0%,rgba(0,0,0,0.40) 100%) !important; /* Opera 11.10+ */
+    background-image: -ms-linear-gradient(top,  rgba(0,0,0,0.30) 0%,rgba(0,0,0,0.40) 100%) !important; /* IE10+ */
+    background-image: linear-gradient(to bottom,  rgba(0,0,0,0.30) 0%,rgba(0,0,0,0.40) 100%) !important; /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0CFFFFFF', endColorstr='#0C000000',GradientType=0 ) !important; /* IE6-9 */
 }
 #prototype .banner .subpoints .wrapper {
