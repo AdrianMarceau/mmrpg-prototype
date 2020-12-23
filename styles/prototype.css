@@ -364,17 +364,43 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     -webkit-border-radius: 27px 0 0 0;
     border-radius: 27px 0 0 0;
 }
-#prototype .banner .options_userinfo .info {
-    float: right;
+#prototype .banner .options_userinfo:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+#prototype .banner .options_userinfo .info,
+#prototype .banner .options_userinfo .config {
+    float: left;
     color: #70D580;
     font-size: 13px;
 }
+#prototype .banner .options_userinfo .info {
+    padding: 0 5px;
+}
 #prototype .banner .options_userinfo .info_username {
-    padding-right: 34px;
-    padding-left: 10px;
+
 }
 #prototype .banner .options_userinfo .info_demo {
     color: #F75656;
+}
+#prototype .banner .options_userinfo .config {
+    color: #ffffff;
+}
+#prototype .banner .options_userinfo .config a {
+    display: inline-block;
+    padding: 0 5px;
+    opacity: 0.6;
+    transition: opacity 0.3s;
+    cursor: pointer;
+    color: #ffffff;
+}
+#prototype .banner .options_userinfo .config a.link_active,
+#prototype .banner .options_userinfo .config a:hover {
+    opacity: 1.0;
+}
+#prototype .banner .options_userinfo .config a i {
+    font-size: 120%;
 }
 
 #prototype .banner .options_userinfo .sprite_40x40_00 {
@@ -458,7 +484,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .banner .options_userinfo .wrapper {
     display: block;
     margin: 0;
-    padding: 1px 10px 1px 16px;
+    padding: 1px 44px 1px 16px;
     min-width: 140px;
     height: 26px;
     -moz-border-radius: 26px 0 0 0;

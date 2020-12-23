@@ -208,7 +208,7 @@ while ($this_action == 'save'){
     }
 
     // Update the header markup title
-    $html_header_title .= 'Save Current Game File';
+    $html_header_title .= 'Update Game Settings';
     // Update the header markup text
     $html_header_text .= 'Your game is saved automatically whenever you return to the main menu, shop, or customize your characters.<br /> ';
     $html_header_text .= 'Make changes to your game using the form below or <a href="'.MMRPG_CONFIG_ROOTURL.'file/profile/" target="_blank">click here</a> to update account settings. ';
@@ -695,7 +695,7 @@ function windowResizeFrame(){
             <? if(!empty($html_header_text)): ?>
                 <span class="header block_1 header_types type_<?= defined('MMRPG_SETTINGS_REMOTE_FIELDTYPE') ? MMRPG_SETTINGS_REMOTE_FIELDTYPE : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                     <span class="count">
-                        <?= $html_header_title ?>
+                        <?= str_replace(' & ', ' &amp; ', $html_header_title) ?>
                     </span>
                 </span>
             <? endif; ?>

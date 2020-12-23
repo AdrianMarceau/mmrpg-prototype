@@ -1410,7 +1410,7 @@ function prototype_menu_switch(switchOptions){
                     var thisMenuTitle = thisMenu.attr('data-title');
 
                     // Update the banner text with this menu subtitle
-                    $('.title', thisBanner).html(thisBannerTitle+' : '+thisMenuTitle);
+                    //$('.title', thisBanner).html(thisBannerTitle+' : '+thisMenuTitle);
                     // Check how many choices are available
                     var thisMenuChoices = $('.option[data-token]:not(.option_disabled):not(.option[data-parent])', thisMenu);
                     //alert('Menu choices : '+thisMenuChoices.length);
@@ -1434,7 +1434,7 @@ function prototype_menu_switch(switchOptions){
                     var thisMenu = $('.menu[data-step="'+switchOptions.stepName+'"]', thisContext);
                     var thisMenuTitle = thisMenu.attr('data-title');
                     // Update the banner text with this menu subtitle
-                    $('.title', thisBanner).html(thisBannerTitle+' : '+thisMenuTitle);
+                    //$('.title', thisBanner).html(thisBannerTitle+' : '+thisMenuTitle);
                     // Unhide the current menu so the user can pick
                     thisMenu.css(slideInAnimation).removeClass('menu_hide').animate({opacity:1.0,marginLeft:'0',marginRight:'0'}, 400, 'swing');
 
