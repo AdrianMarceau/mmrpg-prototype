@@ -213,7 +213,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     top: 0;
     right: 0;
     padding: 0;
-    width: 325px;
+    width: 290px;
     height: 42px;
     border: 1px solid #090909;
     border-color: #090909 !important;
@@ -244,7 +244,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 }
 #prototype .banner .subpoints {
     top: 43px;
-    width: 287px;
+    width: 252px;
     height: 19px;
     font-size: 9px;
 }
@@ -280,6 +280,28 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .banner .points .amount .padding {
     color: #4F4F4F;
     color: rgba(255, 255, 255, 0.25);
+}
+#prototype .banner .subpoints .amount > span,
+#prototype .banner .subpoints .amount > i {
+    vertical-align: middle;
+}
+#prototype .banner .subpoints .amount .num {
+    display: inline-block;
+}
+#prototype .banner .subpoints .amount i {
+    margin-left: 2px;
+    line-height: 1;
+    font-size: 100%;
+    position: relative;
+    bottom: 1px;
+}
+#prototype .banner .subpoints .amount.omega i {
+    margin-left: 0;
+    font-size: 120%;
+}
+#prototype .banner .subpoints .amount.omega i:after {
+    font-weight: 700;
+    content: "\0003a9";
 }
 #prototype .banner .points .pipe,
 #prototype .banner .subpoints .pipe {

@@ -254,25 +254,27 @@ if (mmrpg_prototype_item_unlocked('wily-program')){
     }
 }
 
+// Check to see if the prototype is "complete" for display purposes
+$temp_prototype_complete = mmrpg_prototype_complete();
+
 // Define tooltips for the game options that appear in the main menu and surrounding UI
 $this_menu_tooltips = array();
-$this_menu_tooltips['leaderboard'] = '&laquo; Player Leaderboard &raquo; &lt;br /&gt;Live leaderboards ranking all players by their total Battle Point scores from highest to lowest. Keep an eye on your Battle Points by checking the top-right of the main menu and try to work your way up to the first page!';
-$this_menu_tooltips['database'] = '&laquo; Robot Database &raquo; &lt;br /&gt;A comprehensive list of all robots encountered in battle so far including their name and basic details. Scanning robots adds their stats and weaknesses to the database and unlocking them adds a complete list of their level-up abilities.';
-$this_menu_tooltips['stars'] = '&laquo; Star Collection &raquo; &lt;br /&gt;A detailed list of all the Field and Fusion Stars collected on your journey so far. Collect many different stars to advance in the prototype!';
-$this_menu_tooltips['help'] = '&laquo; Battle Tips &raquo; &lt;br /&gt;A bullet-point list covering both basic and advanced battle tips to help you progress through the game and level up faster.';
-$this_menu_tooltips['demo'] = '&laquo; Demo Menu &raquo; &lt;br /&gt;Select your mission from the demo menu and prepare for battle! Please note that progress cannot be saved in this mode.';
 $this_menu_tooltips['home'] = '&laquo; Home Menu &raquo; &lt;br /&gt;Select your mission from the home menu and prepare for battle! Complete missions in fewer turns to earn more zenny!';
-$this_menu_tooltips['reset'] = '&laquo; Reset Game &raquo; &lt;br /&gt;Reset the demo mode back to the beginning and restart your adventure over from the first level.';
-$this_menu_tooltips['load'] = '&laquo; Load Game &raquo; &lt;br /&gt;Load an existing game file into memory and pick up where you left off during your last save.';
-$this_menu_tooltips['new'] = '&laquo; New Game &raquo; &lt;br /&gt;Create a new game file with a username and password to save progress and access the full version of the game.';
-$this_menu_tooltips['exit'] = '&laquo; Exit Game &raquo; &lt;br /&gt;Exit your save game and unload it from memory to return to the login screen.';
-$this_menu_tooltips['save'] = '&laquo; Game Settings &raquo; &lt;br /&gt;Update your game settings and profile options including username, password, profile colour, and more.';
+$this_menu_tooltips['shop'] = '&laquo; Item Shop &raquo; &lt;br /&gt;Trade in your extra inventory for zenny in the shop and then put your earnings towards new items, new abilities, and new battle fields.';
 $this_menu_tooltips['robots'] = '&laquo; Robot Editor &raquo; &lt;br /&gt;Review detailed stats about your battle robots, equip them with new abilities, and transfer them to other players in your save file.';
 $this_menu_tooltips['players'] = '&laquo; Player Editor &raquo; &lt;br /&gt;Review detailed stats about your player characters and reconfigure chapter two battle fields to generate new field and fusion stars.';
-$this_menu_tooltips['shop'] = '&laquo; Item Shop &raquo; &lt;br /&gt;Trade in your extra inventory for zenny in the shop and then put your earnings towards new items, new abilities, and new battle fields.';
+$this_menu_tooltips['database'] = '&laquo; Robot Database &raquo; &lt;br /&gt;A comprehensive list of all robots encountered in battle so far including their name and basic details. Scanning robots adds their stats and weaknesses to the database and unlocking them adds a complete list of their level-up abilities.';
+$this_menu_tooltips['stars'] = '&laquo; Star Collection &raquo; &lt;br /&gt;A detailed list of all the Field and Fusion Stars collected on your journey so far. Collect many different stars to advance in the prototype!';
 $this_menu_tooltips['items'] = '&laquo; Item Inventory &raquo; &lt;br /&gt;View your inventory of collected items thus far, including quantities, descriptions, and images.';
-$temp_prototype_complete = mmrpg_prototype_complete();
+$this_menu_tooltips['leaderboard'] = '&laquo; Player Leaderboard &raquo; &lt;br /&gt;Live leaderboards ranking all players by their total Battle Point scores from highest to lowest. Keep an eye on your Battle Points by checking the top-right of the main menu and try to work your way up to the first page!';
+$this_menu_tooltips['save'] = '&laquo; Game Settings &raquo; &lt;br /&gt;Update your game settings and profile options including username, password, profile colour, and more.';
+
+// Generate a list of data-index values based on predefined menu option order
 $temp_data_index = 0;
+$this_menu_indexes = array();
+foreach ($this_menu_tooltips AS $token => $text){
+    $this_menu_indexes[$token] = $temp_data_index++;
+}
 
 ?>
 <!DOCTYPE html>
@@ -385,14 +387,15 @@ $temp_data_index = 0;
                     </span>
                     <? if (!empty($_SESSION[$session_token]['values']['battle_stars'])){ ?>
                         <span class="pipe">|</span>
-                        <span class="amount stars">
-                            <?= number_format(count($_SESSION[$session_token]['values']['battle_stars']), 0, '.', ',') ?> &#9733;
-                        </span>
+                        <span class="amount stars"><?=
+                            '<span class="num">'.number_format(count($_SESSION[$session_token]['values']['battle_stars']), 0, '.', ',').'</span>'.
+                            '<i class="fa fas fa-star"></i>'
+                            ?></span>
                     <? } ?>
                     <? if (mmrpg_prototype_item_unlocked('omega-seed')){ ?>
                         <span class="pipe">|</span>
                         <span class="amount omega">
-                            &#937;
+                            <i class="fa fas fa-greek-omega"></i>
                         </span>
                     <? } ?>
                 </div>
@@ -402,21 +405,15 @@ $temp_data_index = 0;
 
         <div class="options options_userinfo field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
             <div class="wrapper">
-                <? if(empty($_SESSION[$session_token]['DEMO'])): ?>
-                    <? $temp_user_name = !empty($this_userinfo['user_name_public']) && !empty($this_userinfo['user_flag_postpublic']) ? $this_userinfo['user_name_public'] : $this_userinfo['user_name']; ?>
-                    <div class="info info_username">
-                        <label><?= $temp_user_name ?></label>
-                    </div>
-                    <div class="config">
-                        <a class="link link_save" data-step="file_save" data-index="8" data-source="frames/file.php?action=save" data-music="misc/file-menu" data-tooltip="<?= $this_menu_tooltips['save'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-                            <i class="fa fas fa-cogs"></i>
-                        </a>
-                    </div>
-                <? else: ?>
-                    <span class="info info_username info_demo">
-                        <label title="Demo Mode : Progess cannot be saved!">Demo Mode</label>
-                    </span>
-                <? endif; ?>
+                <? $temp_user_name = !empty($this_userinfo['user_name_public']) && !empty($this_userinfo['user_flag_postpublic']) ? $this_userinfo['user_name_public'] : $this_userinfo['user_name']; ?>
+                <div class="info info_username">
+                    <label><?= $temp_user_name ?></label>
+                </div>
+                <div class="config">
+                    <a class="link link_save" data-step="file_save" data-index="<?= $this_menu_indexes['save'] ?>" data-source="frames/file.php?action=save" data-music="misc/file-menu" data-tooltip="<?= $this_menu_tooltips['save'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                        <i class="fa fas fa-cogs"></i>
+                    </a>
+                </div>
             </div>
             <?
             // Define the avatar class and path variables
@@ -438,47 +435,47 @@ $temp_data_index = 0;
         ?>
         <div class="options options_fullmenu field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
             <div class="wrapper">
-                <a class="link link_home link_active" data-step="<?= $unlock_count_players == 1 ? 2 : 1 ?>" data-index="<?= $temp_data_index++ ?>" data-music="misc/<?= $unlock_count_players == 1 ? 'stage-select-dr-light' : 'player-select' ?>" data-tooltip="<?= $this_menu_tooltips['home'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                <a class="link link_home link_active" data-step="<?= $unlock_count_players == 1 ? 2 : 1 ?>" data-index="<?= $this_menu_indexes['home'] ?>" data-music="misc/<?= $unlock_count_players == 1 ? 'stage-select-dr-light' : 'player-select' ?>" data-tooltip="<?= $this_menu_tooltips['home'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                     <label>home</label>
                 </a>
                 <span class="pipe">|</span>
                 <? if (mmrpg_prototype_item_unlocked('auto-link')
                     || mmrpg_prototype_item_unlocked('reggae-link')
                     || mmrpg_prototype_item_unlocked('kalinka-link')): ?>
-                    <a class="link link_shop" data-step="shop" data-index="<?= $temp_data_index++ ?>" data-source="frames/shop.php" data-music="misc/shop-music" data-tooltip="<?= $this_menu_tooltips['shop'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                    <a class="link link_shop" data-step="shop" data-index="<?= $this_menu_indexes['shop'] ?>" data-source="frames/shop.php" data-music="misc/shop-music" data-tooltip="<?= $this_menu_tooltips['shop'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <label>shop</label>
                     </a>
                     <span class="pipe">|</span>
                 <? endif; ?>
                 <? if (mmrpg_prototype_battles_complete('dr-light') >= 1): ?>
-                    <a class="link link_robots" data-step="edit_robots" data-index="<?= $temp_data_index++ ?>" data-source="frames/edit_robots.php?action=robots" data-music="misc/robot-editor" data-tooltip="<?= $this_menu_tooltips['robots'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                    <a class="link link_robots" data-step="edit_robots" data-index="<?= $this_menu_indexes['robots'] ?>" data-source="frames/edit_robots.php?action=robots" data-music="misc/robot-editor" data-tooltip="<?= $this_menu_tooltips['robots'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <label>robots</label>
                     </a>
                     <span class="pipe">|</span>
                 <? endif; ?>
                 <? if (mmrpg_prototype_players_unlocked() > 1): ?>
-                    <a class="link link_players" data-step="edit_players" data-index="<?= $temp_data_index++ ?>" data-source="frames/edit_players.php?action=players" data-music="misc/player-editor" data-tooltip="<?= $this_menu_tooltips['players'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                    <a class="link link_players" data-step="edit_players" data-index="<?= $this_menu_indexes['players'] ?>" data-source="frames/edit_players.php?action=players" data-music="misc/player-editor" data-tooltip="<?= $this_menu_tooltips['players'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <label>players</label>
                     </a>
                     <span class="pipe">|</span>
                 <? endif; ?>
-                <a class="link link_data" data-step="database" data-index="<?= $temp_data_index++ ?>" data-source="frames/database.php" data-music="misc/data-base" data-tooltip="<?= $this_menu_tooltips['database'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                <a class="link link_data" data-step="database" data-index="<?= $this_menu_indexes['database'] ?>" data-source="frames/database.php" data-music="misc/data-base" data-tooltip="<?= $this_menu_tooltips['database'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                     <label>database</label>
                 </a>
                 <span class="pipe">|</span>
                 <? if (mmrpg_prototype_stars_unlocked() > 0): ?>
-                    <a class="link link_stars" data-step="stars" data-index="<?= $temp_data_index++ ?>" data-source="frames/starforce.php" data-music="misc/star-force" data-tooltip="<?= $this_menu_tooltips['stars'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                    <a class="link link_stars" data-step="stars" data-index="<?= $this_menu_indexes['stars'] ?>" data-source="frames/starforce.php" data-music="misc/star-force" data-tooltip="<?= $this_menu_tooltips['stars'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <label>stars</label>
                     </a>
                     <span class="pipe">|</span>
                 <? endif; ?>
                 <? if (mmrpg_prototype_items_unlocked() > 0): ?>
-                    <a class="link link_items" data-step="items" data-index="<?= $temp_data_index++ ?>" data-source="frames/items.php" data-music="misc/item-viewer" data-tooltip="<?= $this_menu_tooltips['items'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                    <a class="link link_items" data-step="items" data-index="<?= $this_menu_indexes['items'] ?>" data-source="frames/items.php" data-music="misc/item-viewer" data-tooltip="<?= $this_menu_tooltips['items'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <label>items</label>
                     </a>
                     <span class="pipe">|</span>
                 <? endif; ?>
-                <a class="link link_leaderboard" data-step="leaderboard" data-index="<?= $temp_data_index++ ?>" data-source="frames/leaderboard.php" data-music="misc/leader-board" data-tooltip="<?= $this_menu_tooltips['leaderboard'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                <a class="link link_leaderboard" data-step="leaderboard" data-index="<?= $this_menu_indexes['leaderboard'] ?>" data-source="frames/leaderboard.php" data-music="misc/leader-board" data-tooltip="<?= $this_menu_tooltips['leaderboard'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                     <label>ranks</label>
                 </a>
             </div>
