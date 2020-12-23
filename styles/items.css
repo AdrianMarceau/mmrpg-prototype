@@ -22,6 +22,24 @@ body.windowFlag_landscapeMode #prototype {
     width: 100% !important;
 }
 
+#item {
+    position: relative;
+}
+
+#item_overlay {
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    border-radius: 0.5em;
+    background-color: rgba(0, 0, 0, 0.75);
+    position: absolute;
+    top: 50px;
+    left: 6px;
+    right: 4px;
+    height: 340px;
+    z-index: 9999;
+    display: none;
+}
+
 
 #item .header {
     width: 100%;

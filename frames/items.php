@@ -393,8 +393,8 @@ if (true){
 </head>
 <body id="mmrpg" class="iframe" data-mode="<?= $global_allow_editing ? 'editor' : 'viewer' ?>" data-source="<?= $global_frame_source ?>">
     <div id="prototype" class="hidden" style="opacity: 0;">
-        <div id="item" class="menu" style="position: relative;">
-            <div id="item_overlay" style="border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background-color: rgba(0, 0, 0, 0.75); position: absolute; top: 50px; left: 6px; right: 4px; height: 340px; z-index: 9999; display: none;">&nbsp;</div>
+        <div id="item" class="menu">
+            <div id="item_overlay">&nbsp;</div>
             <?= $this_item_markup ?>
         </div>
     </div>
