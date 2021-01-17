@@ -2887,7 +2887,7 @@ function mmrpg_prototype_get_profile_background_options($this_userinfo, &$allowe
     $this_fields_index = rpg_field::get_index();
 
     // Collect player background omega options
-    require('prototype/omega.php');
+    require(MMRPG_CONFIG_ROOTDIR.'prototype/omega.php');
     $temp_omega_factor_options = array();
     $temp_omega_factor_options['MM1'] = $this_omega_factors_one;
     $temp_omega_factor_options['MM2'] = $this_omega_factors_two;
