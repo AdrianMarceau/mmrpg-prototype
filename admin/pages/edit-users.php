@@ -351,6 +351,7 @@
             $form_data['user_gender'] = !empty($_POST['user_gender']) && preg_match('/^(male|female|other)$/', $_POST['user_gender']) ? trim(strtolower($_POST['user_gender'])) : '';
 
             $form_data['user_colour_token'] = !empty($_POST['user_colour_token']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['user_colour_token']) ? trim(strtolower($_POST['user_colour_token'])) : '';
+            $form_data['user_colour_token2'] = !empty($_POST['user_colour_token2']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['user_colour_token2']) ? trim(strtolower($_POST['user_colour_token2'])) : '';
             $form_data['user_background_path'] = !empty($_POST['user_background_path']) && preg_match('/^[-_a-z0-9\/]+$/i', $_POST['user_background_path']) ? trim(strtolower($_POST['user_background_path'])) : '';
             $form_data['user_image_path'] = !empty($_POST['user_image_path']) && preg_match('/^[-_a-z0-9\/]+$/i', $_POST['user_image_path']) ? trim(strtolower($_POST['user_image_path'])) : '';
 
@@ -427,6 +428,12 @@
             if (empty($form_data['user_colour_token']) && !empty($_POST['user_colour_token'])){
                 $form_messages[] = array('warning', 'Player colour was invalid and will not be updated');
                 unset($form_data['user_colour_token']);
+            }
+
+            // If trying to update the PLAYER COLOUR 2 but it was invalid, do not update
+            if (empty($form_data['user_colour_token2']) && !empty($_POST['user_colour_token2'])){
+                $form_messages[] = array('warning', 'Secondary player colour was invalid and will not be updated');
+                unset($form_data['user_colour_token2']);
             }
 
             // If trying to update the PLAYER BACKGROUND but it was invalid, do not update
@@ -1020,36 +1027,7 @@
 
                         <div class="panel" data-tab="profile">
 
-                            <div class="field">
-                                <strong class="label">Player Colour</strong>
-                                <select class="select" name="user_colour_token">
-                                    <?
-                                    echo('<option value=""'.(empty($user_data['user_colour_token']) ? 'selected="selected"' : '').'>- none -</option>');
-                                    foreach ($mmrpg_types_index AS $type_token => $type_data){
-                                        $label = $type_data['type_name'];
-                                        $selected = !empty($user_data['user_colour_token']) && $user_data['user_colour_token'] == $type_token ? 'selected="selected"' : '';
-                                        echo('<option value="'.$type_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                    }
-                                    ?>
-                                </select><span></span>
-                            </div>
-
-                            <div class="field">
-                                <strong class="label">Player Background</strong>
-                                <select class="select" name="user_background_path">
-                                    <?
-                                    echo('<option value=""'.(empty($user_data['user_background_path']) ? 'selected="selected"' : '').'>- none -</option>');
-                                    foreach ($mmrpg_fields_index AS $field_token => $field_data){
-                                        $field_path = 'fields/'.$field_token;
-                                        $label = $field_data['field_name'];
-                                        $selected = !empty($user_data['user_background_path']) && $user_data['user_background_path'] == $field_path ? 'selected="selected"' : '';
-                                        echo('<option value="'.$field_path.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
-                                    }
-                                    ?>
-                                </select><span></span>
-                            </div>
-
-                            <div class="field">
+                            <div class="field halfsize">
                                 <strong class="label">Player Avatar</strong>
                                 <select class="select" name="user_image_path">
                                     <?
@@ -1077,6 +1055,49 @@
                                         $label = $player_data['player_name'];
                                         $selected = !empty($user_data['user_image_path']) && $user_data['user_image_path'] == $player_path ? 'selected="selected"' : '';
                                         echo('<option value="'.$player_path.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                    }
+                                    ?>
+                                </select><span></span>
+                            </div>
+
+                            <div class="field halfsize">
+                                <strong class="label">Player Background</strong>
+                                <select class="select" name="user_background_path">
+                                    <?
+                                    echo('<option value=""'.(empty($user_data['user_background_path']) ? 'selected="selected"' : '').'>- none -</option>');
+                                    foreach ($mmrpg_fields_index AS $field_token => $field_data){
+                                        $field_path = 'fields/'.$field_token;
+                                        $label = $field_data['field_name'];
+                                        $selected = !empty($user_data['user_background_path']) && $user_data['user_background_path'] == $field_path ? 'selected="selected"' : '';
+                                        echo('<option value="'.$field_path.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                    }
+                                    ?>
+                                </select><span></span>
+                            </div>
+
+                            <div class="field halfsize">
+                                <strong class="label">Player Colour #1</strong>
+                                <select class="select" name="user_colour_token">
+                                    <?
+                                    echo('<option value=""'.(empty($user_data['user_colour_token']) ? 'selected="selected"' : '').'>- none -</option>');
+                                    foreach ($mmrpg_types_index AS $type_token => $type_data){
+                                        $label = $type_data['type_name'];
+                                        $selected = !empty($user_data['user_colour_token']) && $user_data['user_colour_token'] == $type_token ? 'selected="selected"' : '';
+                                        echo('<option value="'.$type_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
+                                    }
+                                    ?>
+                                </select><span></span>
+                            </div>
+
+                            <div class="field halfsize">
+                                <strong class="label">Player Colour #2</strong>
+                                <select class="select" name="user_colour_token2">
+                                    <?
+                                    echo('<option value=""'.(empty($user_data['user_colour_token2']) ? 'selected="selected"' : '').'>- none -</option>');
+                                    foreach ($mmrpg_types_index AS $type_token => $type_data){
+                                        $label = $type_data['type_name'];
+                                        $selected = !empty($user_data['user_colour_token2']) && $user_data['user_colour_token2'] == $type_token ? 'selected="selected"' : '';
+                                        echo('<option value="'.$type_token.'" '.$selected.'>'.$label.'</option>'.PHP_EOL);
                                     }
                                     ?>
                                 </select><span></span>
