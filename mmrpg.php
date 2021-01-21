@@ -264,6 +264,7 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
         // Collect theme settings from the user's profile settings
         $temp_field_path = !empty($this_userinfo['user_background_path']) ? $this_userinfo['user_background_path'] : 'fields/'.rpg_player::get_intro_field();
         $temp_field_type = !empty($this_userinfo['user_colour_token']) ? $this_userinfo['user_colour_token'] : '';
+        if (!empty($temp_field_type) && !empty($this_userinfo['user_colour_token2'])){ $temp_field_type .= '_'.$this_userinfo['user_colour_token2']; }
 
     }
     // Otherwise if guest we need to select a randomized field background for a time interval
