@@ -3,6 +3,7 @@
 require_once('../top.php');
 
 // Require the leaderboard data file
+$this_current_page = 'prototype';
 require_once(MMRPG_CONFIG_ROOTDIR.'includes/leaderboard.php');
 
 // Collect the session token
@@ -13,7 +14,7 @@ $session_token = mmrpg_game_token();
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>Mega Man RPG Prototype | Leaderboard | Last Updated <?= mmrpg_print_cache_date() ?></title>
+<title>Leaderboard | Mega Man RPG Prototype | Last Updated <?= mmrpg_print_cache_date() ?></title>
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="robots" content="noindex,nofollow" />
 <meta name="format-detection" content="telephone=no" />
@@ -123,7 +124,8 @@ function windowResizeLeaderboard(){
 
                 // Print out the generated leaderboard markup
                 //echo $this_leaderboard_markup;
-                //die('<pre>'.print_r($this_leaderboard_markup, true).'</pre>');
+                //error_log('$this_leaderboard_markup('.count($this_leaderboard_markup).') = '.print_r($this_leaderboard_markup, true));
+                //error_log('$this_leaderboard_index('.count($this_leaderboard_index).') = [...]');
                 if (!empty($this_leaderboard_markup)){
                     $last_key = 0;
                     foreach ($this_leaderboard_markup AS $key => $leaderboard_markup){

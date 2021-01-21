@@ -1,9 +1,9 @@
 <?
 
 // Collect and define the display limit if set
+$this_start_key = !empty($_GET['start']) ? trim($_GET['start']) : 0;
 if (!isset($this_display_limit_default)){ $this_display_limit_default = 50; }
 $this_display_limit = !empty($_GET['limit']) ? trim($_GET['limit']) : $this_display_limit_default;
-$this_start_key = !empty($_GET['start']) ? trim($_GET['start']) : 0;
 
 // Define a function for parsing the leaderboard data
 function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
@@ -67,8 +67,6 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
         // Only generate markup if we're withing the viewing range
         if ($board_key >= $this_start_key && $board_key < $this_display_limit || defined('MMRPG_SHOW_MARKUP_'.$this_user_id)){
 
-
-
             $this_robots_count = $this_robots === 1 ? '1 Robot' : $this_robots.' Robots';
             $this_abilities_count = $this_abilities === 1 ? '1 Ability' : $this_abilities.' Abilities';
             $this_items_count = $this_items === 1 ? '1 Item' : $this_items.' Items';
@@ -122,8 +120,11 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
 
             // Display the user's save file listing
             $this_place = mmrpg_number_suffix($place_counter, true, true);
+            $this_colour = !empty($board['user_colour_token']) ? $board['user_colour_token'] : '';
+            if (!empty($this_colour) && !empty($board['user_colour_token2'])){ $this_colour .= '_'.$board['user_colour_token2']; }
+            if (empty($this_colour)){ $this_colour = 'none'; }
             echo '<a data-id="'.$board['user_id'].'" data-player="'.$board['user_name_clean'].'" class="file file_'.strip_tags($this_place).'" name="file_'.$key.'" style="'.$this_style.'" href="leaderboard/'.$board['user_name_clean'].'/">'."\n";
-                echo '<div class="inset player_type_'.(!empty($board['user_colour_token']) ? $board['user_colour_token'] : 'none').'">'."\n";
+                echo '<div class="inset player_type type_'.$this_colour.'">'."\n";
                     echo '<span class="place">'.$this_place.'</span>'."\n";
                     echo '<span class="userinfo"><span class="username">'.$this_username.$this_user_awards.'</span><span class="details">'.$this_details.'</span></span>'."\n";
                     echo '<span class="points">'.$this_points_html.'</span>'."\n";
@@ -167,6 +168,7 @@ $temp_leaderboard_query = "SELECT
     users.user_name_clean,
     users.user_name_public,
     users.user_colour_token,
+    users.user_colour_token2,
     users.user_image_path,
     users.user_background_path,
     users.user_date_accessed,
@@ -214,6 +216,8 @@ $temp_leaderboard_query = "SELECT
 
 // Query the database and collect the array list of all non-bogus players
 $this_leaderboard_index = $db->get_array_list($temp_leaderboard_query);
+//error_log('$temp_leaderboard_query = '.print_r($temp_leaderboard_query, true));
+//error_log('$this_leaderboard_index('.count($this_leaderboard_index).') = [...]');
 
 // Loop through the save file directory and generate an index
 $this_leaderboard_count = count($this_leaderboard_index);
@@ -277,12 +281,12 @@ if (!empty($this_leaderboard_index)){
         // If this user was requested specifically, generate markup
         if (defined('MMRPG_SHOW_MARKUP_'.$board['user_id'])){
             //echo("<!-- defined('MMRPG_SHOW_MARKUP_{$board['user_id']}') -->\n");
-            $this_leaderboard_markup[] = mmrpg_leaderboard_parse_index($key, $board, $place_counter);
+            $this_markup = mmrpg_leaderboard_parse_index($key, $board, $place_counter);
         }
         // Otherwise if the page is in range and can be shown normally
         elseif (!defined('MMRPG_SKIP_MARKUP') && $key >= $this_start_key && $key < $this_display_limit){
             //echo("<!-- !defined('MMRPG_SKIP_MARKUP') && {$key} >= {$this_start_key} && {$key} < {$this_display_limit} -->\n");
-            $this_leaderboard_markup[] = mmrpg_leaderboard_parse_index($key, $board, $place_counter);
+            $this_markup = mmrpg_leaderboard_parse_index($key, $board, $place_counter);
         }
 
         // Add this markup to the leaderboard array

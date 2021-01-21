@@ -269,6 +269,10 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     font-size: 16px;
     line-height: 20px;
     color: #DFDFDF;
+    padding-left: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 #prototype .banner .points .amount,
 #prototype .banner .subpoints .amount {
@@ -725,6 +729,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .header_types {
     background-image: url(../images/menus/menu-options_header-gradient.png?4);
     border-color: #1A1A1A !important;
+    position: relative;
 }
 #prototype .header_types[data-player="dr-light"] {
     background-image: url(../images/menus/menu-options_this-dr-light-player-select.gif);
@@ -735,6 +740,30 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .header_types[data-player="dr-cossack"] {
     background-image: url(../images/menus/menu-options_this-dr-cossack-player-select.gif);
 }
+
+#prototype .header_types {
+    overflow: hidden;
+    background-image: none;
+}
+#prototype .header_types:before {
+    content: "";
+    display: block;
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url(../images/menus/menu-options_header-gradient.png?2020);
+    background-position: center center;
+    background-repeat: repeat;
+    background-size: auto;
+}
+#prototype .header_types .count {
+    position: relative;
+    z-index: 2;
+}
+
 
 #prototype .header_types .count,
 #prototype .header_dr-light .count,
