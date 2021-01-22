@@ -2949,4 +2949,32 @@ function mmrpg_prototype_get_profile_background_options($this_userinfo, &$allowe
 
 }
 
+// Define a function for formatting user data into session-format for later reference
+function mmrpg_prototype_format_user_data_for_session($this_userinfo){
+    $session_user = array();
+    $session_user['userid'] = $this_userinfo['user_id'];
+    $session_user['roleid'] = $this_userinfo['role_id'];
+    $session_user['username'] = $this_userinfo['user_name'];
+    $session_user['username_clean'] = $this_userinfo['user_name_clean'];
+    $session_user['password'] = '';
+    $session_user['password_encoded'] = '';
+    $session_user['omega'] = $this_userinfo['user_omega'];
+    $session_user['profiletext'] = $this_userinfo['user_profile_text'];
+    $session_user['creditstext'] = $this_userinfo['user_credit_text'];
+    $session_user['creditsline'] = $this_userinfo['user_credit_line'];
+    $session_user['imagepath'] = $this_userinfo['user_image_path'];
+    $session_user['backgroundpath'] = $this_userinfo['user_background_path'];
+    $session_user['colourtoken'] = $this_userinfo['user_colour_token'];
+    $session_user['gender'] = $this_userinfo['user_gender'];
+    $session_user['displayname'] = $this_userinfo['user_name_public'];
+    $session_user['emailaddress'] = $this_userinfo['user_email_address'];
+    $session_user['websiteaddress'] = $this_userinfo['user_website_address'];
+    $session_user['dateofbirth'] = $this_userinfo['user_date_birth'];
+    $session_user['approved'] = $this_userinfo['user_flag_approved'];
+    $session_user['userinfo'] = $this_userinfo;
+    unset($session_user['userinfo']['user_password']);
+    unset($session_user['userinfo']['user_password_encoded']);
+    return $session_user;
+}
+
 ?>
