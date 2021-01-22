@@ -418,7 +418,7 @@ foreach ($this_menu_tooltips AS $token => $text){
             </div>
         </div>
 
-        <div class="options options_userinfo field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" data-step="file_save" data-index="<?= $this_menu_indexes['save'] ?>" data-source="frames/file.php?action=save" data-music="misc/file-menu" data-tooltip="<?= $this_menu_tooltips['save'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+        <div class="options options_userinfo field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" data-step="file_save" data-index="<?= $this_menu_indexes['save'] ?>" data-source="frames/settings.php" data-music="misc/file-menu" data-tooltip="<?= $this_menu_tooltips['save'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
             <div class="wrapper">
                 <? $temp_user_name = !empty($this_userinfo['user_name_public']) && !empty($this_userinfo['user_flag_postpublic']) ? $this_userinfo['user_name_public'] : $this_userinfo['user_name']; ?>
                 <div class="info info_username">
@@ -438,8 +438,10 @@ foreach ($this_menu_tooltips AS $token => $text){
             $temp_sprite_path = 'images/'.$temp_avatar_kind.'/'.$temp_avatar_token.'/sprite_left_'.$temp_avatar_size.'x'.$temp_avatar_size.'.png?'.MMRPG_CONFIG_CACHE_DATE;
             $temp_shadow_path = 'images/'.$temp_avatar_kind.'_shadows/'.preg_replace('/_(.*?)$/i', '', $temp_avatar_token).'/sprite_left_'.$temp_avatar_size.'x'.$temp_avatar_size.'.png?'.MMRPG_CONFIG_CACHE_DATE;
             ?>
-            <span class="sprite sprite_40x40" style="bottom: 6px; right: 4px; z-index: 100; "><span class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>); <?= $temp_sprite_offset ?>"></span></span>
-            <span class="sprite sprite_40x40" style="bottom: 5px; right: 3px; z-index: 99; "><span class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_shadow_path ?>); <?= $temp_sprite_offset ?>"></span></span>
+            <div class="sprite_wrapper">
+                <span class="sprite base sprite_40x40"><span class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>); <?= $temp_sprite_offset ?>"></span></span>
+                <span class="sprite shadow sprite_40x40"><span class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>); <?= $temp_sprite_offset ?>"></span></span>
+            </div>
         </div>
 
         <?
@@ -577,11 +579,7 @@ foreach ($this_menu_tooltips AS $token => $text){
         }
     ?>
 
-    <div class="menu menu_hide menu_file_new" data-step="file_new" data-source="frames/file.php?action=new"></div>
-
-    <div class="menu menu_hide menu_file_load" data-step="file_load" data-source="frames/file.php?action=load"></div>
-
-    <div class="menu menu_hide menu_file_save" data-step="file_save" data-source="frames/file.php?action=save"></div>
+    <div class="menu menu_hide menu_file_save" data-step="file_save" data-source="frames/settings.php"></div>
 
     <div class="menu menu_hide menu_items" data-step="items" data-source="frames/items.php"></div>
 
