@@ -40,10 +40,15 @@ function mmrpg_load_game_session(){
         // LOAD DATABASE INFO
 
         // Collect the user and save info from the database
+
         $this_database_save = $db->get_array("SELECT * FROM mmrpg_saves WHERE user_id = {$login_user_id} LIMIT 1");
-        $this_database_user = $db->get_array("SELECT * FROM mmrpg_users WHERE user_id = {$login_user_id} LIMIT 1");
         if (empty($this_database_save)){ die('could not load save for file '.$temp_matches[2].' and path '.$temp_matches[1].' on line '.__LINE__); }
+
+        $temp_user_fields = rpg_user::get_index_fields(true, 'users');
+        $temp_user_role_fields = rpg_user_role::get_index_fields(true, 'roles');
+        $this_database_user = $db->get_array("SELECT {$temp_user_fields}, {$temp_user_role_fields} FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$login_user_id}' LIMIT 1");
         if (empty($this_database_user)){ die('could not load user for '.$this_database_save['user_id'].' on line '.__LINE__); }
+
 
         // Update the game session with database extracted variables
         $new_game_data = array();
