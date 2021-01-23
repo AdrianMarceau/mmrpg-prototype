@@ -252,11 +252,13 @@ ob_start();
             </div>
         </div>
         <div class="subheader thread_title field_type_<?= !empty($this_thread_info['thread_colour']) ? $this_thread_info['thread_colour'] : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="">
-            <h2 class="name">
-                <a class="link title" style="" href="<?= $_GET['this_current_url'] ?>" title="<?= $temp_thread_name ?>"><?= $temp_thread_name ?></a>
-            </h2>
-            <div class="date">
-                <?= $temp_thread_date ?>
+            <div class="subheader_typewrapper">
+                <h2 class="name">
+                    <a class="link title" style="" href="<?= $_GET['this_current_url'] ?>" title="<?= $temp_thread_name ?>"><?= $temp_thread_name ?></a>
+                </h2>
+                <div class="date">
+                    <?= $temp_thread_date ?>
+                </div>
             </div>
         </div>
         <div class="subbody thread_subbody thread_subbody_full thread_subbody_full_<?= $is_personal_message_creator ? 'left' : 'right' ?> thread_<?= $is_personal_message_creator ? 'left' : 'right' ?>" style="text-align: left; position: relative; padding-bottom: 60px;">

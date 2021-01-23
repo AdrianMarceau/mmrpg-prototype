@@ -156,8 +156,10 @@ ob_start();
     if (empty($this_current_token)){
         ?>
         <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">
-            Boss Listing
-            <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?>
+            <span class="subheader_typewrapper">
+                Boss Listing
+                <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?>
+            </span>
         </h2>
         <?php
     }
