@@ -514,7 +514,7 @@ foreach ($this_menu_tooltips AS $token => $text){
     </div>
 
     <div class="menu menu_hide select_this_battle" data-step="2" data-title="Battle Select" data-select="this_battle_token">
-        <span class="header block_1 header_types type_none">
+        <span class="header block_1 header_types type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
             <span class="count"><?= !empty($_SESSION[$session_token]['DEMO']) ? 'Mega Man RPG Prototype' : 'Mission Select' ?></span>
         </span>
         <?

@@ -482,6 +482,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .banner .options_userinfo .sprite_wrapper .sprite .sprite {
     bottom: 0;
     right: 0;
+    pointer-events: none;
 }
 #prototype .banner .options_userinfo .sprite_wrapper .sprite.base {
     bottom: 2px;
@@ -795,6 +796,10 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     position: relative;
     z-index: 2;
 }
+#prototype .header_types[data-player]:before {
+    display: none;
+}
+
 
 
 #prototype .header_types .count,
