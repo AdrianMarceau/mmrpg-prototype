@@ -263,9 +263,10 @@ $this_menu_tooltips['home'] = '&laquo; Home Menu &raquo; &lt;br /&gt;Select your
 $this_menu_tooltips['shop'] = '&laquo; Item Shop &raquo; &lt;br /&gt;Trade in your extra inventory for zenny in the shop and then put your earnings towards new items, new abilities, and new battle fields.';
 $this_menu_tooltips['robots'] = '&laquo; Robot Editor &raquo; &lt;br /&gt;Review detailed stats about your battle robots, equip them with new abilities, and transfer them to other players in your save file.';
 $this_menu_tooltips['players'] = '&laquo; Player Editor &raquo; &lt;br /&gt;Review detailed stats about your player characters and reconfigure chapter two battle fields to generate new field and fusion stars.';
-$this_menu_tooltips['database'] = '&laquo; Robot Database &raquo; &lt;br /&gt;A comprehensive list of all robots encountered in battle so far including their name and basic details. Scanning robots adds their stats and weaknesses to the database and unlocking them adds a complete list of their level-up abilities.';
-$this_menu_tooltips['stars'] = '&laquo; Star Collection &raquo; &lt;br /&gt;A detailed list of all the Field and Fusion Stars collected on your journey so far. Collect many different stars to advance in the prototype!';
+$this_menu_tooltips['abilities'] = '&laquo; Ability Archive &raquo; &lt;br /&gt;View your archive of abilities unlocked so far, including types, power, descriptions, and images.';
 $this_menu_tooltips['items'] = '&laquo; Item Inventory &raquo; &lt;br /&gt;View your inventory of collected items thus far, including quantities, descriptions, and images.';
+$this_menu_tooltips['stars'] = '&laquo; Star Collection &raquo; &lt;br /&gt;A detailed list of all the Field and Fusion Stars collected on your journey so far. Collect many different stars to advance in the prototype!';
+$this_menu_tooltips['database'] = '&laquo; Robot Database &raquo; &lt;br /&gt;A comprehensive list of all robots encountered in battle so far including their name and basic details. Scanning robots adds their stats and weaknesses to the database and unlocking them adds a complete list of their level-up abilities.';
 $this_menu_tooltips['save'] = '&laquo; Game Settings &raquo; &lt;br /&gt;Update your game settings and profile options including username, password, profile colour, and more.';
 $this_menu_tooltips['leaderboard'] = '&laquo; Battle Points Leaderboard &raquo; &lt;br /&gt;Live leaderboards ranking all players by their total Battle Point scores from highest to lowest. Keep an eye on your Battle Points by checking the top-right of the main menu and try to work your way up to the first page!';
 
@@ -453,39 +454,34 @@ foreach ($this_menu_tooltips AS $token => $text){
                     <i class="fa fas fa-home"></i>
                     <label>home</label>
                 </a>
-                <span class="pipe">|</span>
                 <? if (mmrpg_prototype_item_unlocked('auto-link')
                     || mmrpg_prototype_item_unlocked('reggae-link')
                     || mmrpg_prototype_item_unlocked('kalinka-link')): ?>
+                    <span class="pipe">|</span>
                     <a class="link link_shop" data-step="shop" data-index="<?= $this_menu_indexes['shop'] ?>" data-source="frames/shop.php" data-music="misc/shop-music" data-tooltip="<?= $this_menu_tooltips['shop'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <i class="fa fas fa-shopping-cart"></i>
                         <label>shop</label>
                     </a>
-                    <span class="pipe">|</span>
-                <? endif; ?>
-                <? if (mmrpg_prototype_battles_complete('dr-light') >= 1): ?>
-                    <a class="link link_robots" data-step="edit_robots" data-index="<?= $this_menu_indexes['robots'] ?>" data-source="frames/edit_robots.php?action=robots" data-music="misc/robot-editor" data-tooltip="<?= $this_menu_tooltips['robots'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-                        <i class="fa fas fa-robot"></i>
-                        <label>robots</label>
-                    </a>
-                    <span class="pipe">|</span>
                 <? endif; ?>
                 <? if (mmrpg_prototype_players_unlocked() > 1): ?>
+                    <span class="pipe">|</span>
                     <a class="link link_players" data-step="edit_players" data-index="<?= $this_menu_indexes['players'] ?>" data-source="frames/edit_players.php?action=players" data-music="misc/player-editor" data-tooltip="<?= $this_menu_tooltips['players'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <i class="fa fas fa-mask"></i>
                         <label>players</label>
                     </a>
-                    <span class="pipe">|</span>
                 <? endif; ?>
-                <a class="link link_data" data-step="database" data-index="<?= $this_menu_indexes['database'] ?>" data-source="frames/database.php" data-music="misc/data-base" data-tooltip="<?= $this_menu_tooltips['database'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-                    <i class="fa fas fa-book"></i>
-                    <label>database</label>
-                </a>
-                <? if (mmrpg_prototype_stars_unlocked() > 0): ?>
+                <? if (mmrpg_prototype_battles_complete('dr-light') >= 1): ?>
                     <span class="pipe">|</span>
-                    <a class="link link_stars" data-step="stars" data-index="<?= $this_menu_indexes['stars'] ?>" data-source="frames/starforce.php" data-music="misc/star-force" data-tooltip="<?= $this_menu_tooltips['stars'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-                        <i class="fa fas fa-star"></i>
-                        <label>stars</label>
+                    <a class="link link_robots" data-step="edit_robots" data-index="<?= $this_menu_indexes['robots'] ?>" data-source="frames/edit_robots.php?action=robots" data-music="misc/robot-editor" data-tooltip="<?= $this_menu_tooltips['robots'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                        <i class="fa fas fa-robot"></i>
+                        <label>robots</label>
+                    </a>
+                <? endif; ?>
+                <? if (mmrpg_prototype_abilities_unlocked() > 0): ?>
+                    <span class="pipe">|</span>
+                    <a class="link link_abilities" data-step="abilities" data-index="<?= $this_menu_indexes['abilities'] ?>" data-source="frames/abilities.php" data-music="misc/item-viewer" data-tooltip="<?= $this_menu_tooltips['abilities'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                        <i class="fa fas fa-fire-alt"></i>
+                        <label>abilities</label>
                     </a>
                 <? endif; ?>
                 <? if (mmrpg_prototype_items_unlocked() > 0): ?>
@@ -495,6 +491,18 @@ foreach ($this_menu_tooltips AS $token => $text){
                         <label>items</label>
                     </a>
                 <? endif; ?>
+                <? if (mmrpg_prototype_stars_unlocked() > 0): ?>
+                    <span class="pipe">|</span>
+                    <a class="link link_stars" data-step="stars" data-index="<?= $this_menu_indexes['stars'] ?>" data-source="frames/starforce.php" data-music="misc/star-force" data-tooltip="<?= $this_menu_tooltips['stars'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                        <i class="fa fas fa-star"></i>
+                        <label>stars</label>
+                    </a>
+                <? endif; ?>
+                <span class="pipe">|</span>
+                <a class="link link_data" data-step="database" data-index="<?= $this_menu_indexes['database'] ?>" data-source="frames/database.php" data-music="misc/data-base" data-tooltip="<?= $this_menu_tooltips['database'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                    <i class="fa fas fa-book"></i>
+                    <label>database</label>
+                </a>
             </div>
         </div>
 
@@ -581,6 +589,8 @@ foreach ($this_menu_tooltips AS $token => $text){
     <div class="menu menu_hide menu_file_save" data-step="file_save" data-source="frames/settings.php"></div>
 
     <div class="menu menu_hide menu_items" data-step="items" data-source="frames/items.php"></div>
+
+    <div class="menu menu_hide menu_abilites" data-step="abilities" data-source="frames/abilities.php"></div>
 
     <div class="menu menu_hide menu_shop" data-step="shop" data-source="frames/shop.php"></div>
 

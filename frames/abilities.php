@@ -62,7 +62,7 @@ if (true){
                 <div class="sprite sprite_player sprite_player_sprite sprite_40x40 sprite_40x40_00" style="margin-top: -4px; margin-left: -2px; background-image: url(images/shops/reggae/sprite_right_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE?>); "></div>
             </div>
             <div class="header header_left ability_type ability_type_none" style="margin-right: 0;">
-                Unlocked Abilities
+                Ability Archive
             </div>
 
             <div class="body body_left" style="margin-right: 0; padding: 2px 3px; height: auto;">
@@ -221,8 +221,8 @@ if (true){
 
     <span class="header block_1 header_types type_<?= defined('MMRPG_SETTINGS_REMOTE_FIELDTYPE') ? MMRPG_SETTINGS_REMOTE_FIELDTYPE : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
         <span class="count">
-            <i class="fa fas fa-flask"></i>
-            Unlocked Abilities
+            <i class="fa fas fa-fire-alt"></i>
+            Ability Archive
             <span class="progress">(<span id="ability_counter">
                 <?= number_format(count($global_battle_abilities), 0, '.', ',') ?> /
                 <?= number_format(count($mmrpg_database_abilities), 0, '.', ',') ?>
