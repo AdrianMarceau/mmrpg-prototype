@@ -4130,6 +4130,7 @@ class rpg_robot extends rpg_object {
                                                     $this_ability_method = !is_numeric($this_level) ? strtolower($this_level) : 'level';
                                                     if ($this_ability_method != $current_method){ continue; }
                                                     $this_ability = $temp_abilities_index[$this_info['token']];
+                                                    if (empty($this_ability['ability_flag_published'])){ continue; }
                                                     $this_ability_token = $this_ability['ability_token'];
                                                     $this_ability_name = $this_ability['ability_name'];
                                                     $this_ability_class = !empty($this_ability['ability_class']) ? $this_ability['ability_class'] : 'master';
