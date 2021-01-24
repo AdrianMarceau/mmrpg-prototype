@@ -1163,7 +1163,6 @@ class rpg_ability extends rpg_object {
         if (empty($ability_info)){ return false; }
 
         $print_options['show_accuracy'] = isset($print_options['show_accuracy']) ? $print_options['show_accuracy'] : true;
-        $print_options['show_quantity'] = isset($print_options['show_quantity']) ? $print_options['show_quantity'] : true;
 
         $robot_flag_copycore = !empty($robot_info['robot_core']) && $robot_info['robot_core'] == 'copy' ? true : false;
         $temp_ability_token = $ability_info['ability_token'];
@@ -1201,7 +1200,7 @@ class rpg_ability extends rpg_object {
         elseif (!empty($ability_info['ability_recovery'])){ $temp_ability_title .= $ability_info['ability_recovery'].' Recovery '; }
         if (!empty($ability_info['ability_damage']) || !empty($ability_info['ability_recovery'])){ $temp_ability_title .= '  | '; }
 
-        // If show accuracy or quantity
+        // If show accuracy
         if ($print_options['show_accuracy']){
 
             if (preg_match('/(damage|recovery)/i', $temp_ability_title)){ $temp_ability_title .= '  | '; }
