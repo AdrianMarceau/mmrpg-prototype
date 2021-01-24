@@ -59,7 +59,8 @@ if (true){
         <div class="event event_double event_visible">
 
             <div class="this_sprite sprite_left" style="top: 4px; left: 4px; width: 36px; height: 36px; background-image: url(images/fields/prototype-complete/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center center; border: 1px solid #1A1A1A;">
-                <div class="sprite sprite_player sprite_player_sprite sprite_40x40 sprite_40x40_00" style="margin-top: -4px; margin-left: -2px; background-image: url(images/shops/reggae/sprite_right_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE?>); "></div>
+                <? $ability_sprite_path = mmrpg_prototype_item_unlocked('reggae-link') ? 'shops/reggae' : 'robots/met'; ?>
+                <div class="sprite sprite_player sprite_player_sprite sprite_40x40 sprite_40x40_00" style="margin-top: -4px; margin-left: -2px; background-image: url(images/<?= $ability_sprite_path ?>/sprite_right_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE?>); "></div>
             </div>
             <div class="header header_left ability_type ability_type_none" style="margin-right: 0;">
                 Ability Archive
