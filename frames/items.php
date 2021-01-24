@@ -37,68 +37,35 @@ $global_battle_items = !empty($_SESSION[$session_token]['values']['battle_items'
 $global_battle_item_categories = array();
 $global_battle_item_categories['all'] = array('category_name' => 'All Items', 'category_quote' => 'The prototype is home to many different items.  Which ones have you collected so far?');
 
-//echo('<pre>$global_battle_items = '.print_r($global_battle_items, true).'</pre>'."\n");
-//echo('<pre>$mmrpg_database_items = '.print_r($mmrpg_database_items, true).'</pre>'."\n");
-//exit();
+// Filter out items that are not complete or otherwise attainable yet
+$mmrpg_database_items = array_filter($mmrpg_database_items, function($item_info){
+    if (empty($item_info['item_flag_published'])){ return false; }
+    elseif (empty($item_info['item_flag_complete'])){ return false; }
+    return true;
+    });
+$global_battle_items = array_filter($global_battle_items, function($item_token) use ($mmrpg_database_items){
+    if (!isset($mmrpg_database_items[$item_token])){ return false; }
+    return true;
+    }, ARRAY_FILTER_USE_KEY);
 
-// -- PROCESS SHOP SELL ACTION -- //
+/*
+error_log("\n---------------------------");
 
-// Check if an action request has been sent with an sell type
-if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'use-item'){
+error_log('$global_battle_items(count) = '.print_r(count($global_battle_items), true));
+error_log('$mmrpg_database_items(count) = '.print_r(count($mmrpg_database_items), true));
 
-    // Collect the action variables from the request header, if they exist
-    $temp_action = !empty($_REQUEST['action']) ? $_REQUEST['action'] : '';
-    $temp_token = !empty($_REQUEST['token']) ? $_REQUEST['token'] : '';
-    $temp_quantity = !empty($_REQUEST['quantity']) ? $_REQUEST['quantity'] : 0;
-    $temp_target_player = !empty($_REQUEST['target_player']) ? $_REQUEST['target_player'] : '';
-    $temp_target_robot = !empty($_REQUEST['target_robot']) ? $_REQUEST['target_robot'] : '';
+error_log('$global_battle_items vs $mmrpg_database_items = '.print_r(array_diff(
+    array_keys($global_battle_items),
+    array_keys($mmrpg_database_items)
+    ), true));
+error_log('$mmrpg_database_items vs $global_battle_items = '.print_r(array_diff(
+    array_keys($mmrpg_database_items),
+    array_keys($global_battle_items)
+    ), true));
 
-    // If key variables are not provided, kill the script in error
-    if (empty($temp_action)){ die('error|request-error|action-missing'); }
-    elseif (empty($temp_token)){ die('error|request-error|token-missing'); }
-    elseif (empty($temp_quantity)){ die('error|request-error|quantity-missing'); }
-
-    // Check to ensure the provided item actually exists
-    if (isset($mmrpg_database_items[$temp_token]) && isset($global_battle_items[$temp_token])){
-
-        // Collect the current count for this item
-        $temp_current_quantity = $global_battle_items[$temp_token];
-
-        // Check to ensure the provided item quantity is not exceeded
-        if ($temp_current_quantity >= $temp_quantity){
-
-            // Use the item and run its code
-            // ...
-            // ...
-
-            // Subtrack this item's quantity from current and update parent
-            $temp_current_quantity -= $temp_quantity;
-            $global_battle_items[$temp_token] = $temp_current_quantity;
-            $_SESSION[$session_token]['values']['battle_items'][$temp_token] = $temp_current_quantity;
-
-            // Save, produce the success message with the new field order
-            mmrpg_save_game_session();
-            exit('success|item-used|'.$temp_quantity.'|'.$temp_current_quantity);
-
-        }
-        // Otherwise if undefined kind
-        else {
-
-            // Print an error message and kill the script
-            exit('error|invalid-quantity|'.$temp_quantity.'|'.$temp_current_quantity);
-
-        }
-
-    }
-    // Otherwise if undefined kind
-    else {
-
-        // Print an error message and kill the script
-        exit('error|invalid-item|'.$temp_token);
-
-    }
-
-}
+error_log('$global_battle_items = '.print_r($global_battle_items, true));
+error_log('$mmrpg_database_items = '.print_r($mmrpg_database_items, true));
+*/
 
 
 // CONSOLE MARKUP

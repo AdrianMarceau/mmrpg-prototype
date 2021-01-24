@@ -18,7 +18,6 @@ require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/players.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/robots.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/abilities.php');
-require(MMRPG_CONFIG_ROOTDIR.'includes/starforce.php');
 
 // Collect the editor flag if set
 $global_allow_editing = !defined('MMRPG_REMOTE_GAME') ? true : false;
@@ -33,10 +32,36 @@ $global_battle_abilities = !empty($_SESSION[$session_token]['values']['battle_ab
 $global_battle_ability_categories = array();
 $global_battle_ability_categories['all'] = array('category_name' => 'All Abilities', 'category_quote' => 'Many different abilities! Squawk! How many have you unlocked so far? Squaaaawk!');
 
-//echo('<pre>$global_battle_abilities = '.print_r($global_battle_abilities, true).'</pre>'."\n");
-//echo('<pre>$mmrpg_database_abilities = '.print_r($mmrpg_database_abilities, true).'</pre>'."\n");
-//exit();
+// Filter out abilities that are not complete or otherwise attainable yet
+$mmrpg_database_abilities = array_filter($mmrpg_database_abilities, function($ability_info){
+    if (empty($ability_info['ability_flag_published'])){ return false; }
+    elseif (empty($ability_info['ability_flag_complete'])){ return false; }
+    return true;
+    });
+$global_battle_abilities = array_filter($global_battle_abilities, function($ability_token) use ($mmrpg_database_abilities){
+    if (!isset($mmrpg_database_abilities[$ability_token])){ return false; }
+    return true;
+    });
+$global_battle_abilities = array_values(array_unique($global_battle_abilities));
 
+/*
+error_log("\n---------------------------");
+
+error_log('$global_battle_abilities(count) = '.print_r(count($global_battle_abilities), true));
+error_log('$mmrpg_database_abilities(count) = '.print_r(count($mmrpg_database_abilities), true));
+
+error_log('$global_battle_abilities vs $mmrpg_database_abilities = '.print_r(array_diff(
+    array_values($global_battle_abilities),
+    array_keys($mmrpg_database_abilities)
+    ), true));
+error_log('$mmrpg_database_abilities vs $global_battle_abilities = '.print_r(array_diff(
+    array_keys($mmrpg_database_abilities),
+    array_values($global_battle_abilities)
+    ), true));
+
+error_log('$global_battle_abilities = '.print_r($global_battle_abilities, true));
+error_log('$mmrpg_database_abilities = '.print_r($mmrpg_database_abilities, true));
+*/
 
 // CONSOLE MARKUP
 
@@ -130,11 +155,6 @@ if (true){
                                             $temp_is_disabled = false;
                                             $temp_is_comingsoon = false;
                                             $temp_is_complete = !empty($ability_info['ability_flag_complete']) ? $ability_info['ability_flag_complete'] : false;
-
-                                            // Check to see if this is a special ability type
-                                            $ability_is_shard = strstr($ability_token, '-shard') ? true : false;
-                                            $ability_is_core = strstr($ability_token, '-core') ? true : false;
-                                            $ability_is_star = strstr($ability_token, '-star') ? true : false;
 
                                             // Define the editor title markup print options
                                             $ability_print_options = array('show_accuracy' => false);
