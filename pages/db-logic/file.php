@@ -41,10 +41,12 @@ while ($this_action == 'profile'){
     if (true){
         $allowed_gender_options = array();
         $html_gender_options = array();
+            $html_gender_options[] = '<option value="">-</option>';
             $html_gender_options[] = '<option value="male">Male</option>';
             $html_gender_options[] = '<option value="female">Female</option>';
             $html_gender_options[] = '<option value="other">Other</option>';
             $html_gender_options[] = '<option value="none">None</option>';
+            $allowed_gender_options[] = '';
             $allowed_gender_options[] = 'male';
             $allowed_gender_options[] = 'female';
             $allowed_gender_options[] = 'other';
@@ -57,8 +59,9 @@ while ($this_action == 'profile'){
     $temp_avatar_select_options = str_replace('value="'.$_SESSION['GAME']['USER']['imagepath'].'"', 'value="'.$_SESSION['GAME']['USER']['imagepath'].'" selected="selected"', $temp_avatar_select_options);
 
     // -- COLLECT COLOUR OPTIONS -- //
-    $temp_colour_select_options = mmrpg_prototype_get_profile_colour_options($this_userinfo, $allowed_colour_options);
-    $temp_colour_select_options = str_replace('value="'.$_SESSION['GAME']['USER']['colourtoken'].'"', 'value="'.$_SESSION['GAME']['USER']['colourtoken'].'" selected="selected"', $temp_colour_select_options);
+    $temp_colour_select_options_raw = mmrpg_prototype_get_profile_colour_options($this_userinfo, $allowed_colour_options);
+    $temp_colour_select_options = str_replace('value="'.$_SESSION['GAME']['USER']['colourtoken'].'"', 'value="'.$_SESSION['GAME']['USER']['colourtoken'].'" selected="selected"', $temp_colour_select_options_raw);
+    $temp_colour_select_options2 = str_replace('value="'.$_SESSION['GAME']['USER']['colourtoken2'].'"', 'value="'.$_SESSION['GAME']['USER']['colourtoken2'].'" selected="selected"', $temp_colour_select_options_raw);
 
     // -- COLLECT BACKGROUND OPTIONS -- //
     $temp_select_background_options = mmrpg_prototype_get_profile_background_options($this_userinfo, $allowed_background_options);
@@ -71,14 +74,16 @@ while ($this_action == 'profile'){
         if (!empty($_POST['password_new'])){
 
             // Trim any whitespace from the passwords
+            $password_validated = true;
             $_POST['password_new'] = trim($_POST['password_new']);
+            $_POST['password_new2'] = trim($_POST['password_new2']);
 
             // If the password was too short, error out
             if (strlen($_POST['password_new']) < 6){
 
                 // Update the form messages markup text
                 $html_form_messages .= '<span class="error">(!) The new password was too short - must be at least 6 characters.</span>';
-                $_POST['password_new'] = '';
+                $password_validated = false;
 
             }
             // Else if the password was too long, error out
@@ -86,11 +91,19 @@ while ($this_action == 'profile'){
 
                 // Update the form messages markup text
                 $html_form_messages .= '<span class="error">(!) The new password was too long - must not be more than 32 characters.</span>';
-                $_POST['password_new'] = '';
+                $password_validated = false;
+
+            }
+            // Else if the password did not match the repeat field
+            elseif ($_POST['password_new'] !== $_POST['password_new2']){
+
+                // Update the form messages markup text
+                $html_form_messages .= '<span class="error">(!) The new password must be retyped exactly the same to validate the change.</span>';
+                $password_validated = false;
 
             }
             // Otherwise update the user's password in the database directory
-            else {
+            if ($password_validated){
 
                 // Update this user's accont password in the db
                 $html_form_messages .= '<span class="success">(!) Your account password has been changed.</span>';
@@ -99,9 +112,12 @@ while ($this_action == 'profile'){
                 $db->update('mmrpg_users', array(
                     'user_password_encoded' => $temp_password_encoded
                     ), "user_id = {$this_userid}");
-                $_POST['password_new'] = '';
 
             }
+
+            // Clear the two password fields
+            $_POST['password_new'] = '';
+            $_POST['password_new2'] = '';
 
         }
 
@@ -137,11 +153,13 @@ while ($this_action == 'profile'){
                 $post_imagepath = !empty($_POST['imagepath']) && preg_match('/^(players|robots)\/([-_a-z0-9]+)\/([0-9]+)$/i', $_POST['imagepath']) ? $_POST['imagepath'] : 'robots/mega-man/40';
                 $post_backgroundpath = !empty($_POST['backgroundpath']) && preg_match('/^fields\/([-_a-z0-9]+)$/i', $_POST['backgroundpath']) ? $_POST['backgroundpath'] : 'fields/'.rpg_player::get_intro_field('dr-light');
                 $post_colourtoken = !empty($_POST['colourtoken']) && preg_match('/^([-_a-z0-9]+)$/i', $_POST['colourtoken']) ? $_POST['colourtoken'] : '';
+                $post_colourtoken2 = !empty($_POST['colourtoken2']) && preg_match('/^([-_a-z0-9]+)$/i', $_POST['colourtoken2']) ? $_POST['colourtoken2'] : '';
                 $post_gender = !empty($_POST['gender']) && preg_match('/^(male|female|none|other)$/i', $_POST['gender']) ? $_POST['gender'] : 'other';
 
                 if (!in_array($post_imagepath, $allowed_avatar_options)){ $post_imagepath = $allowed_avatar_options[0]; }
                 if (!in_array($post_backgroundpath, $allowed_background_options)){ $post_backgroundpath = $allowed_background_options[0]; }
                 if (!in_array($post_colourtoken, $allowed_colour_options)){ $post_colourtoken = $allowed_colour_options[0]; }
+                if (!in_array($post_colourtoken2, $allowed_colour_options)){ $post_colourtoken2 = ''; }
                 if (!in_array($post_gender, $allowed_gender_options)){ $post_gender = $allowed_gender_options[0]; }
 
                 // Update the current game's user and file info using the new password
@@ -159,6 +177,7 @@ while ($this_action == 'profile'){
                 $_SESSION['GAME']['USER']['imagepath'] = $post_imagepath;
                 $_SESSION['GAME']['USER']['backgroundpath'] = $post_backgroundpath;
                 $_SESSION['GAME']['USER']['colourtoken'] = $post_colourtoken;
+                $_SESSION['GAME']['USER']['colourtoken2'] = $post_colourtoken2;
                 $_SESSION['GAME']['USER']['gender'] = $post_gender;
                 if (!empty($user_omega_seed)){
                     $_SESSION['GAME']['USER']['omega'] = md5(MMRPG_SETTINGS_OMEGA_SEED.$user_omega_seed);
@@ -197,106 +216,154 @@ while ($this_action == 'profile'){
 
         ?>
 
-        <div class="field field_username">
-            <label class="label label_username">Username : <span style="color: red;">*</span></label>
-            <input class="text text_username" type="text" name="username" value="<?= htmlentities(trim($_SESSION['GAME']['USER']['username']), ENT_QUOTES, 'UTF-8', true) ?>" disabled="disabled" />
-        </div>
+        <h3 class="field_subheader">Account Settings</h3>
 
-        <div class="field field_password_new">
-            <label class="label label_password" style="width: auto; ">Change Password : <span style="font-size: 10px; padding-left: 6px; position: relative; bottom: 1px; color: #CACACA;">(6 - 32 chars)</span></label>
-            <input class="text text_password" type="text" name="password_new" value="" maxlength="32" />
-        </div>
+        <div class="section">
 
-        <? if (!empty($this_userinfo['user_flag_postpublic'])){ ?>
-            <div class="field field_displayname">
-                <label class="label label_displayname">Display Name :</label>
-                <input class="text text_displayname" type="text" name="displayname" maxlength="18" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['displayname']) ? $_SESSION['GAME']['USER']['displayname'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
-            </div>
-        <? } else { ?>
-            <input type="hidden" name="displayname" maxlength="18" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['displayname']) ? $_SESSION['GAME']['USER']['displayname'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
-        <? } ?>
-
-        <div class="field field_emailaddress">
-            <label class="label label_emailaddress">Email Address : <span style="color: red;">*</span></label>
-            <input class="text text_emailaddress" type="text" name="emailaddress" maxlength="128" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['emailaddress']) ? $_SESSION['GAME']['USER']['emailaddress'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" required="required" />
-        </div>
-
-        <? if (!empty($this_userinfo['user_flag_postpublic'])){ ?>
-            <div class="field field_websiteaddress">
-                <label class="label label_websiteaddress">Website Address :</label>
-                <input class="text text_websiteaddress" type="text" name="websiteaddress" maxlength="128" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['websiteaddress']) ? $_SESSION['GAME']['USER']['websiteaddress'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
-            </div>
-        <? } else { ?>
-            <input type="hidden" name="websiteaddress" maxlength="128" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['websiteaddress']) ? $_SESSION['GAME']['USER']['websiteaddress'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
-        <? } ?>
-
-        <div class="field field_gender">
-            <label class="label label_gender">Player Gender :</label>
-            <select class="select select_gender" name="gender"><?= $temp_select_gender_options ?></select>
-        </div>
-
-        <div class="field field_roleid">
-            <label class="label label_roleid">Member Type :</label>
-            <input class="text text_roleid" type="text" name="role_id" disabled="disabled" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['roleid']) ? $this_roles_index[$_SESSION['GAME']['USER']['roleid']]['role_name'] : 'Unknown'), ENT_QUOTES, 'UTF-8', true) ?>" />
-        </div>
-
-        <div class="field field_colourtoken">
-            <label class="label label_colourtoken">Profile Colour :</label>
-            <select class="select select_colourtoken" name="colourtoken"><?= $temp_colour_select_options ?></select>
-        </div>
-
-        <div class="field field_imagepath">
-            <label class="label label_imagepath">Robot Avatar :</label>
-            <select class="select select_imagepath" name="imagepath"><?= $temp_avatar_select_options ?></select>
-        </div>
-
-        <div class="field field_backgroundpath">
-            <label class="label label_backgroundpath">Field Background :</label>
-            <select class="select select_backgroundpath" name="backgroundpath"><?= $temp_select_background_options ?></select>
-        </div>
-
-        <?
-        // Only show omega sequence fields if unlocked by the player
-        if (mmrpg_prototype_item_unlocked('omega-seed')){
-            ?>
-            <div class="field field_omega">
-                <label class="label label_omega">Omega Sequence :</label>
-                <input class="text text_omega" type="text" name="omega" maxlength="32" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['omega']) ? $_SESSION['GAME']['USER']['omega'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" disabled="disabled" />
+            <div class="field field_username required">
+                <label class="label label_username">Login Username</label>
+                <input class="text text_username" type="text" name="username" value="<?= htmlentities(trim($_SESSION['GAME']['USER']['username']), ENT_QUOTES, 'UTF-8', true) ?>" disabled="disabled" />
             </div>
 
-            <div class="field field_omega_seed">
-                <label class="label label_omega_seed">Regenerate Sequence :</label>
-                <input class="text text_omega_seed" type="text" name="omega_seed" maxlength="32" value="" />
+            <? if (!empty($this_userinfo['user_flag_postpublic'])){ ?>
+                <div class="field field_displayname">
+                    <label class="label label_displayname">Display Username</label>
+                    <input class="text text_displayname" type="text" name="displayname" maxlength="18" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['displayname']) ? $_SESSION['GAME']['USER']['displayname'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
+                </div>
+            <? } else { ?>
+                <input type="hidden" name="displayname" maxlength="18" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['displayname']) ? $_SESSION['GAME']['USER']['displayname'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
+            <? } ?>
+
+            <div class="field field_emailaddress required">
+                <label class="label label_emailaddress">Email Address</label>
+                <input class="text text_emailaddress" type="text" name="emailaddress" maxlength="128" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['emailaddress']) ? $_SESSION['GAME']['USER']['emailaddress'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" required="required" />
             </div>
+
+            <div class="field field_gender">
+                <label class="label label_gender">Gender Identity</label>
+                <select class="select select_gender" name="gender"><?= $temp_select_gender_options ?></select>
+            </div>
+
+        </div>
+
+        <h3 class="field_subheader">Profile Settings</h3>
+
+        <div class="section">
+
+            <div class="field field_imagepath">
+                <label class="label label_imagepath">Profile Avatar</label>
+                <select class="select select_imagepath" name="imagepath"><?= $temp_avatar_select_options ?></select>
+            </div>
+
+            <div class="field field_backgroundpath">
+                <label class="label label_backgroundpath">Profile Background</label>
+                <select class="select select_backgroundpath" name="backgroundpath"><?= $temp_select_background_options ?></select>
+            </div>
+
             <?
-        }
-        ?>
+            $prototype_complete = mmrpg_prototype_complete();
+            $profile_colour_two_unlocked = $prototype_complete >= 3 ? true : false;
+            ?>
+
+            <div class="field field_colourtoken">
+                <label class="label label_colourtoken">Profile Colour <?= $profile_colour_two_unlocked ? '#1' : '' ?></label>
+                <select class="select select_colourtoken" name="colourtoken"><?= $temp_colour_select_options ?></select>
+            </div>
+
+            <? if ($profile_colour_two_unlocked){ ?>
+                <div class="field field_colourtoken">
+                    <label class="label label_colourtoken">Profile Colour #2</label>
+                    <select class="select select_colourtoken" name="colourtoken2"><?= $temp_colour_select_options2 ?></select>
+                </div>
+            <? } ?>
+
+            <? if (!empty($this_userinfo['user_flag_postpublic'])){ ?>
+                <div class="field field_websiteaddress">
+                    <label class="label label_websiteaddress">Website Address</label>
+                    <input class="text text_websiteaddress" type="text" name="websiteaddress" maxlength="128" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['websiteaddress']) ? $_SESSION['GAME']['USER']['websiteaddress'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
+                </div>
+            <? } else { ?>
+                <input type="hidden" name="websiteaddress" maxlength="128" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['websiteaddress']) ? $_SESSION['GAME']['USER']['websiteaddress'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
+            <? } ?>
+
+            <? if (!empty($this_userinfo['user_flag_postpublic'])){ ?>
+                <div class="field field_profiletext full">
+                    <label class="label label_profiletext">Profile Page Text</label>
+                    <textarea class="textarea textarea_profiletext" style="height: 250px; " name="profiletext"><?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['profiletext']) ? $_SESSION['GAME']['USER']['profiletext'] : ''), ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                    <?= mmrpg_formatting_help() ?>
+                </div>
+            <? } ?>
+
+        </div>
 
         <?
         // IF CONTRIBUTOR OR ADMIN
         if (in_array($_SESSION['GAME']['USER']['roleid'], array(1, 6, 2, 7))){
             $member_role_name = trim(!empty($_SESSION['GAME']['USER']['roleid']) ? $this_roles_index[$_SESSION['GAME']['USER']['roleid']]['role_name'] : 'Unknown');
             ?>
-            <div class="field field_creditsline full">
-                <label class="label label_creditsline"><?= $member_role_name.' Credits :' ?></label>
-                <input class="text text_creditsline" name="creditsline" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['creditsline']) ? $_SESSION['GAME']['USER']['creditsline'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
+
+            <h3 class="field_subheader">Contributor Settings</h3>
+
+            <div class="section">
+
+                <div class="field field_creditsline full">
+                    <label class="label label_creditsline"><?= $member_role_name.' Credits :' ?></label>
+                    <input class="text text_creditsline" name="creditsline" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['creditsline']) ? $_SESSION['GAME']['USER']['creditsline'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" />
+                </div>
+
+                <div class="field field_creditstext full">
+                    <label class="label label_creditstext"><?= $member_role_name.' Description : '?></label>
+                    <textarea class="textarea textarea_creditstext" style="height: 150px; " name="creditstext"><?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['creditstext']) ? $_SESSION['GAME']['USER']['creditstext'] : ''), ENT_QUOTES, 'UTF-8', true) ?></textarea>
+                </div>
+
             </div>
 
-            <div class="field field_creditstext full">
-                <label class="label label_creditstext"><?= $member_role_name.' Description : '?></label>
-                <textarea class="textarea textarea_creditstext" style="height: 150px; " name="creditstext"><?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['creditstext']) ? $_SESSION['GAME']['USER']['creditstext'] : ''), ENT_QUOTES, 'UTF-8', true) ?></textarea>
-            </div>
             <?
         }
         ?>
 
-        <? if (!empty($this_userinfo['user_flag_postpublic'])){ ?>
-            <div class="field field_profiletext full">
-                <label class="label label_profiletext">Profile Description :</label>
-                <textarea class="textarea textarea_profiletext" style="height: 250px; " name="profiletext"><?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['profiletext']) ? $_SESSION['GAME']['USER']['profiletext'] : ''), ENT_QUOTES, 'UTF-8', true) ?></textarea>
-                <?= mmrpg_formatting_help() ?>
+        <?
+        /*
+        // Only show omega sequence fields if unlocked by the player
+        if (mmrpg_prototype_item_unlocked('omega-seed')){
+            ?>
+
+            <h3 class="field_subheader">Omega Settings</h3>
+
+            <div class="section">
+
+                <div class="field field_omega">
+                    <label class="label label_omega">Omega Sequence :</label>
+                    <input class="text text_omega" type="text" name="omega" maxlength="32" value="<?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['omega']) ? $_SESSION['GAME']['USER']['omega'] : ''), ENT_QUOTES, 'UTF-8', true) ?>" disabled="disabled" />
+                </div>
+
+                <div class="field field_omega_seed">
+                    <label class="label label_omega_seed">Regenerate Sequence :</label>
+                    <input class="text text_omega_seed" type="text" name="omega_seed" maxlength="32" value="" />
+                </div>
+
             </div>
-        <? } ?>
+
+            <?
+        }
+        */
+        ?>
+
+        <h3 class="field_subheader" style="margin-top: 35px;">Password Settings</h3>
+
+        <div class="section">
+
+            <div class="field field_password_new">
+                <label class="label label_password" style="width: auto; ">Change Password <em>6 - 32 chars</em></label>
+                <input class="text text_password" type="password" name="password_new" value="" minlength="6" maxlength="32" autocomplete="new-password" />
+            </div>
+
+            <div class="field field_password_new2">
+                <label class="label label_password2" style="width: auto; ">Retype Password <em>if changing</em></label>
+                <input class="text text_password" type="password" name="password_new2" value="" minlength="6" maxlength="32" autocomplete="new-password" />
+            </div>
+
+        </div>
 
         <?
 
@@ -308,7 +375,7 @@ while ($this_action == 'profile'){
     if (!$file_has_updated){
 
         // Update the form markup buttons
-        echo '<input class="button button_submit" type="submit" value="Save Changes" />';
+        echo '<input class="button button_submit field_type field_type_nature" type="submit" value="Save Changes" />';
         //echo '<input class="button button_reset" type="button" value="Reset Game" onclick="javascript:parent.window.mmrpg_trigger_reset();" />';
         //echo '<input class="button button_cancel" type="button" value="Cancel" onclick="javascript:parent.window.location.href=\'prototype.php\';" />';
 
@@ -441,6 +508,7 @@ while ($this_action == 'new'){
         $this_user['imagepath'] = '';
         $this_user['backgroundpath'] = '';
         $this_user['colourtoken'] = '';
+        $this_user['colourtoken2'] = '';
         $this_user['gender'] = '';
         $this_user['password'] = trim($_REQUEST['password']);
         $this_user['password_encoded'] = md5(MMRPG_SETTINGS_PASSWORD_SALT.$this_user['password']);
@@ -824,7 +892,7 @@ if (strstr($page_content_parsed, $find)){
                         <?= !empty($html_form_fields) ? $html_form_fields : '' ?>
                     </div>
                     <? if(!empty($html_form_buttons)): ?>
-                        <div class="buttons_wrapper" style="padding-top: 10px;">
+                        <div class="buttons_wrapper" style="padding-top: 20px;">
                             <div class="buttons">
                                 <?= $html_form_buttons ?>
                             </div>

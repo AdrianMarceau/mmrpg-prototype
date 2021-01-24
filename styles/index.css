@@ -4966,6 +4966,10 @@ body.windowFlag_landscapeMode #window .page .type_block {
     line-height: 14px;
 }
 
+#window .page .body .form .community .formatting {
+    margin-bottom: 0;
+}
+
 #window .page .body .community .sprite_image {
     display: inline-block;
     zoom: 1;
@@ -5837,7 +5841,7 @@ body.windowFlag_landscapeMode #window .page .body .bodytext .field_panel_foregro
     clear: both;
     width: 100%;
     min-height: 50px;
-    margin: 0 auto 20px;
+    margin: 0 auto 10px;
 }
 #window .page_community .form .button,
 #window .page_file .form .button {
@@ -5864,6 +5868,38 @@ body.windowFlag_landscapeMode #window .page .body .bodytext .field_panel_foregro
     margin: 0 0 5px;
     font-size: 13px;
     line-height: 13px;
+}
+#window .page_file .form .field.required label.label:after,
+#window .page_file .form .field.required strong.label:after,
+#window .page_file .form .field.required div.label strong:after {
+    content: "*";
+    float: right;
+    color: red;
+    margin-left: 5px;
+}
+#window .page_file .form .field.required label.label:after,
+#window .page_file .form .field.required strong.label:after {
+    float: none;
+}
+#window .page_file .form .field .label strong,
+#window .page_file .form .field .label em {
+    display: inline-block;
+    margin: 0 5px 0 0;
+}
+#window .page_file .form .field .label em {
+    color: #808080;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 80%;
+    margin-left: 5px;
+    position: relative;
+    bottom: 1px;
+}
+#window .page_file .form .field .label em:before {
+    content: "(";
+}
+#window .page_file .form .field .label em:after {
+    content: ")";
 }
 #window .page_community .form .field .text,
 #window .page_community .form .field .textarea,
@@ -6034,6 +6070,32 @@ body.windowFlag_landscapeMode #window .page_file .form .field_post_body .textare
 #window .page .form .messages_wrapper .help,
 #window .page .form .messages_wrapper .help a {
     color: #FDD56D;
+}
+
+#window .page_file .form .field_subheader {
+    display: block;
+    clear: both;
+    padding-bottom: 10px;
+    margin: 0 auto 15px;
+    font-weight: bold;
+    font-size: 100%;
+    line-height: 1.4;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+    border-right: 10px solid transparent;
+}
+
+#window .page_file .form .section {
+    display: block;
+    clear: both;
+    margin: 0 auto 20px;
+}
+#window .page_file .form .section:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+#window .page_file .form .section .field:last-child {
+    margin-bottom: 0;
 }
 
 #window .page .body .community .thread_subbody .form .avatar_selector,

@@ -39,11 +39,8 @@ $current_user_info = $db->get_array("SELECT
 
 // Collect options markup for various dropdowns later
 $profile_avatar_options_markup = mmrpg_prototype_get_profile_avatar_options($current_user_info, $allowed_avatar_options);
-//$temp_avatar_select_options = str_replace('value="'.$_SESSION['GAME']['USER']['imagepath'].'"', 'value="'.$_SESSION['GAME']['USER']['imagepath'].'" selected="selected"', $temp_avatar_select_options);
 $profile_colour_options_markup = mmrpg_prototype_get_profile_colour_options($current_user_info, $allowed_colour_options);
-//$temp_colour_select_options = str_replace('value="'.$_SESSION['GAME']['USER']['colourtoken'].'"', 'value="'.$_SESSION['GAME']['USER']['colourtoken'].'" selected="selected"', $temp_colour_select_options);
 $profile_background_options_markup = mmrpg_prototype_get_profile_background_options($current_user_info, $allowed_background_options);
-//$temp_select_background_options = str_replace('value="'.$_SESSION['GAME']['USER']['backgroundpath'].'"', 'value="'.$_SESSION['GAME']['USER']['backgroundpath'].'" selected="selected"', $temp_select_background_options);
 
 
 // -- PROCESS FORM ACTIONS -- //
@@ -81,7 +78,7 @@ if (!empty($form_actions)){
         $form_data['user_email_address'] = !empty($_POST['user_email_address']) && preg_match('/^[-_0-9a-z\.]+@[-_0-9a-z\.]+\.[-_0-9a-z\.]+$/i', $_POST['user_email_address']) ? trim(strtolower($_POST['user_email_address'])) : '';
 
         if (empty($form_data['user_name_public']) && !empty($_POST['user_name_public'])){
-            $form_messages[] = array('warning', 'Public username was invalid and will not be updated');
+            $form_messages[] = array('warning', 'Display username was invalid and will not be updated');
             unset($form_data['user_name_public']);
         }
         /*
@@ -321,7 +318,7 @@ if (true){
 
         <div class="field">
             <div class="label">
-                <strong>Public Username</strong>
+                <strong>Display Username</strong>
             </div>
             <input class="textbox" type="text" name="user_name_public" value="<?= encode_form_value($current_user_info['user_name_public']) ?>" maxlength="64" />
         </div>

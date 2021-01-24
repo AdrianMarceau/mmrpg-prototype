@@ -2108,6 +2108,7 @@ class rpg_game {
         $this_user['imagepath'] = '';
         $this_user['backgroundpath'] = '';
         $this_user['colourtoken'] = '';
+        $this_user['colourtoken2'] = '';
         $this_user['gender'] = '';
         $this_user['password'] = '';
         $this_user['password_encoded'] = '';

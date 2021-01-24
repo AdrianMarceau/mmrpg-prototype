@@ -431,7 +431,6 @@ foreach ($this_menu_tooltips AS $token => $text){
             <?
             // Define the avatar class and path variables
             $temp_avatar_path = !empty($_SESSION[$session_token]['USER']['imagepath']) ? $_SESSION[$session_token]['USER']['imagepath'] : 'robots/mega-man/40';
-            $temp_colour_token = !empty($_SESSION[$session_token]['USER']['colourtoken']) ? $_SESSION[$session_token]['USER']['colourtoken'] : '';
             list($temp_avatar_kind, $temp_avatar_token, $temp_avatar_size) = explode('/', $temp_avatar_path);
             $temp_sprite_class = 'sprite sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.' sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.'_00';
             $temp_sprite_offset = $temp_avatar_size == 80 ? 'margin-left: -20px; margin-top: -40px; ' : '';

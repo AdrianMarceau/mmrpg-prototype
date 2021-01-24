@@ -92,6 +92,7 @@ function mmrpg_save_game_session(){
                 $this_user_array['user_image_path'] = !empty($this_user['imagepath']) ? $this_user['imagepath'] : '';
                 $this_user_array['user_background_path'] = !empty($this_user['backgroundpath']) ? $this_user['backgroundpath'] : '';
                 $this_user_array['user_colour_token'] = !empty($this_user['colourtoken']) ? $this_user['colourtoken'] : '';
+                $this_user_array['user_colour_token2'] = !empty($this_user['colourtoken2']) ? $this_user['colourtoken2'] : '';
                 $this_user_array['user_gender'] = !empty($this_user['gender']) ? $this_user['gender'] : '';
                 $this_user_array['user_email_address'] = !empty($this_user['emailaddress']) ? $this_user['emailaddress'] : '';
                 $this_user_array['user_website_address'] = !empty($this_user['websiteaddress']) ? $this_user['websiteaddress'] : '';
@@ -259,6 +260,7 @@ function mmrpg_save_game_session(){
         $this_user_array['user_image_path'] = !empty($this_user['imagepath']) ? $this_user['imagepath'] : '';
         $this_user_array['user_background_path'] = !empty($this_user['backgroundpath']) ? $this_user['backgroundpath'] : '';
         $this_user_array['user_colour_token'] = !empty($this_user['colourtoken']) ? $this_user['colourtoken'] : '';
+        $this_user_array['user_colour_token2'] = !empty($this_user['colourtoken2']) ? $this_user['colourtoken2'] : '';
         $this_user_array['user_gender'] = !empty($this_user['gender']) ? $this_user['gender'] : '';
         $this_user_array['user_omega'] = !empty($this_user['omega']) ? $this_user['omega'] : md5(MMRPG_SETTINGS_OMEGA_SEED.$this_user['username_clean']);
         $this_user_array['user_email_address'] = !empty($this_user['emailaddress']) ? $this_user['emailaddress'] : '';

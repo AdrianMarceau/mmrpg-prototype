@@ -141,6 +141,7 @@ function generate_prototype_complete_message($player_token){
     // Generate the console markup with the congratulations message and the records text
     $temp_user_name = !empty($_SESSION[$session_token]['USER']['displayname']) ? $_SESSION[$session_token]['USER']['displayname'] : $_SESSION[$session_token]['USER']['username'];
     $temp_user_colour = !empty($_SESSION[$session_token]['USER']['colourtoken']) ? $_SESSION[$session_token]['USER']['colourtoken'] : $player_info['player_type'];
+    if (!empty($_SESSION[$session_token]['USER']['colourtoken2'])){ $temp_user_colour .= '_'.$_SESSION[$session_token]['USER']['colourtoken2']; }
     if ($player_token === 'dr-light'){ $temp_icon_code = '<span class="sprite achievement_icon achievement_dr-light-complete" style="display: inline-block; position: relative; bottom: 6px;" title="Light Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>'; }
     elseif ($player_token === 'dr-wily'){ $temp_icon_code = '<span class="sprite achievement_icon achievement_dr-wily-complete" style="display: inline-block; position: relative; bottom: 6px;" title="Wily Campaign Complete!" data-tooltip-type="player_type player_type_attack">&clubs;</span>'; }
     elseif ($player_token === 'dr-cossack'){ $temp_icon_code = '<span class="sprite achievement_icon achievement_dr-cossack-complete" style="display: inline-block; position: relative; bottom: 6px;" title="Cossack Campaign Complete!" data-tooltip-type="player_type player_type_speed">&diams;</span>'; }

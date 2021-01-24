@@ -2965,6 +2965,7 @@ function mmrpg_prototype_format_user_data_for_session($this_userinfo){
     $session_user['imagepath'] = $this_userinfo['user_image_path'];
     $session_user['backgroundpath'] = $this_userinfo['user_background_path'];
     $session_user['colourtoken'] = $this_userinfo['user_colour_token'];
+    $session_user['colourtoken2'] = $this_userinfo['user_colour_token2'];
     $session_user['gender'] = $this_userinfo['user_gender'];
     $session_user['displayname'] = $this_userinfo['user_name_public'];
     $session_user['emailaddress'] = $this_userinfo['user_email_address'];
