@@ -192,6 +192,7 @@
         $search_data['robot_flag_hidden'] = isset($_GET['robot_flag_hidden']) && $_GET['robot_flag_hidden'] !== '' ? (!empty($_GET['robot_flag_hidden']) ? 1 : 0) : '';
         $search_data['robot_flag_complete'] = isset($_GET['robot_flag_complete']) && $_GET['robot_flag_complete'] !== '' ? (!empty($_GET['robot_flag_complete']) ? 1 : 0) : '';
         $search_data['robot_flag_unlockable'] = isset($_GET['robot_flag_unlockable']) && $_GET['robot_flag_unlockable'] !== '' ? (!empty($_GET['robot_flag_unlockable']) ? 1 : 0) : '';
+        $search_data['robot_flag_fightable'] = isset($_GET['robot_flag_fightable']) && $_GET['robot_flag_fightable'] !== '' ? (!empty($_GET['robot_flag_fightable']) ? 1 : 0) : '';
         $search_data['robot_flag_exclusive'] = isset($_GET['robot_flag_exclusive']) && $_GET['robot_flag_exclusive'] !== '' ? (!empty($_GET['robot_flag_exclusive']) ? 1 : 0) : '';
         $search_data['robot_flag_published'] = isset($_GET['robot_flag_published']) && $_GET['robot_flag_published'] !== '' ? (!empty($_GET['robot_flag_published']) ? 1 : 0) : '';
         cms_admin::object_index_search_data_append_git_statuses($search_data, 'robot');
@@ -297,6 +298,12 @@
             $search_results_limit = false;
         }
 
+        // If the robot fightable flag was provided
+        if ($search_data['robot_flag_fightable'] !== ''){
+            $search_query .= "AND robot_flag_fightable = {$search_data['robot_flag_fightable']} ";
+            $search_results_limit = false;
+        }
+
         // If the robot exclusive flag was provided
         if ($search_data['robot_flag_exclusive'] !== ''){
             $search_query .= "AND robot_flag_exclusive = {$search_data['robot_flag_exclusive']} ";
@@ -367,6 +374,7 @@
                 'robot_flag_complete' => 0,
                 'robot_flag_published' => 0,
                 'robot_flag_unlockable' => 0,
+                'robot_flag_fightable' => 0,
                 'robot_flag_protected' => 0
                 );
 
@@ -450,8 +458,11 @@
             $form_data['robot_flag_complete'] = isset($_POST['robot_flag_complete']) && is_numeric($_POST['robot_flag_complete']) ? (int)(trim($_POST['robot_flag_complete'])) : 0;
             $form_data['robot_flag_hidden'] = isset($_POST['robot_flag_hidden']) && is_numeric($_POST['robot_flag_hidden']) ? (int)(trim($_POST['robot_flag_hidden'])) : 0;
 
+            $form_data['robot_flag_fightable'] = isset($_POST['robot_flag_fightable']) && is_numeric($_POST['robot_flag_fightable']) ? (int)(trim($_POST['robot_flag_fightable'])) : 0;
+
             $form_data['robot_flag_unlockable'] = isset($_POST['robot_flag_unlockable']) && is_numeric($_POST['robot_flag_unlockable']) ? (int)(trim($_POST['robot_flag_unlockable'])) : 0;
             $form_data['robot_flag_exclusive'] = isset($_POST['robot_flag_exclusive']) && is_numeric($_POST['robot_flag_exclusive']) ? (int)(trim($_POST['robot_flag_exclusive'])) : 0;
+
 
             if ($form_data['robot_core'] != 'copy'){
                 $form_data['robot_image_alts'] = !empty($_POST['robot_image_alts']) && is_array($_POST['robot_image_alts']) ? array_filter($_POST['robot_image_alts']) : array();
@@ -529,6 +540,16 @@
                         else { return 0; }
                         });
                     $form_data['robot_abilities_rewards'] = $new_rewards;
+                }
+
+                if ($form_data['robot_flag_fightable']){
+                    if (!$form_data['robot_flag_published']){ $form_messages[] = array('warning', $this_robot_class_short_name_uc.' must be published to be fightable'); $form_data['robot_flag_fightable'] = 0; }
+                    elseif (!$form_data['robot_flag_complete']){ $form_messages[] = array('warning', $this_robot_class_short_name_uc.' must be complete to be fightable'); $form_data['robot_flag_fightable'] = 0; }
+                    elseif (empty($form_data['robot_description'])){ $form_messages[] = array('warning', $this_robot_class_short_name_uc.' must have a flavour class to be fightable'); $form_data['robot_flag_fightable'] = 0; }
+                    elseif (empty($form_data['robot_quotes_start'])){ $form_messages[] = array('warning', $this_robot_class_short_name_uc.' must have a start quote to be fightable'); $form_data['robot_flag_fightable'] = 0; }
+                    elseif (empty($form_data['robot_quotes_taunt'])){ $form_messages[] = array('warning', $this_robot_class_short_name_uc.' must have a taunt quote to be fightable'); $form_data['robot_flag_fightable'] = 0; }
+                    elseif (empty($form_data['robot_quotes_victory'])){ $form_messages[] = array('warning', $this_robot_class_short_name_uc.' must have a victory quote to be fightable'); $form_data['robot_flag_fightable'] = 0; }
+                    elseif (empty($form_data['robot_quotes_defeat'])){ $form_messages[] = array('warning', $this_robot_class_short_name_uc.' must have a defeat quote to be fightable'); $form_data['robot_flag_fightable'] = 0; }
                 }
 
                 if ($form_data['robot_flag_unlockable']){
@@ -873,15 +894,17 @@
                         </select><span></span>
                     </div>
 
-                    <div class="field fullsize has5cols flags">
+                    <div class="field fullsize has4cols flags">
                     <?
                     $flag_names = array(
                         'published' => array('icon' => 'fas fa-check-square', 'yes' => 'Published', 'no' => 'Unpublished'),
                         'complete' => array('icon' => 'fas fa-check-circle', 'yes' => 'Complete', 'no' => 'Incomplete'),
-                        'unlockable' => array('icon' => 'fas fa-unlock', 'yes' => 'Unlockable', 'no' => 'Locked'),
+                        'fightable' => array('icon' => 'fas fa-fist-raised', 'yes' => 'Fightable', 'no' => 'Unfightable'),
                         'hidden' => array('icon' => 'fas fa-eye-slash', 'yes' => 'Hidden', 'no' => 'Visible'),
+                        'unlockable' => array('icon' => 'fas fa-unlock', 'yes' => 'Unlockable', 'no' => 'Locked'),
                         'exclusive' => array('icon' => 'fas fa-ghost', 'yes' => 'Exclusive', 'no' => 'Standard')
                         );
+                    if ($this_robot_class !== 'master'){ unset($flag_names['unlockable'], $flag_names['exclusive']); }
                     cms_admin::object_index_flag_names_append_git_statuses($flag_names);
                     foreach ($flag_names AS $flag_token => $flag_info){
                         if (isset($flag_info['break'])){ echo('<div class="break"></div>'); continue; }
@@ -926,7 +949,10 @@
                             <col class="game" width="100" />
                             <col class="flag published" width="80" />
                             <col class="flag complete" width="75" />
-                            <col class="flag unlockable" width="80" />
+                            <col class="flag fightable" width="80" />
+                            <? if ($this_robot_class === 'master'){ ?>
+                                <col class="flag unlockable" width="80" />
+                            <? } ?>
                             <col class="flag hidden" width="70" />
                             <col class="actions" width="100" />
                         </colgroup>
@@ -938,7 +964,10 @@
                                 <th class="game"><?= cms_admin::get_sort_link('robot_game', 'Game') ?></th>
                                 <th class="flag published"><?= cms_admin::get_sort_link('robot_flag_published', 'Published') ?></th>
                                 <th class="flag complete"><?= cms_admin::get_sort_link('robot_flag_complete', 'Complete') ?></th>
-                                <th class="flag unlockable"><?= cms_admin::get_sort_link('robot_flag_unlockable', 'Unlockable') ?></th>
+                                <th class="flag fightable"><?= cms_admin::get_sort_link('robot_flag_fightable', 'Fightable') ?></th>
+                                <? if ($this_robot_class === 'master'){ ?>
+                                    <th class="flag unlockable"><?= cms_admin::get_sort_link('robot_flag_unlockable', 'Unlockable') ?></th>
+                                <? } ?>
                                 <th class="flag hidden"><?= cms_admin::get_sort_link('robot_flag_hidden', 'Hidden') ?></th>
                                 <th class="actions">Actions</th>
                             </tr>
@@ -949,7 +978,10 @@
                                 <th class="head game"></th>
                                 <th class="head flag published"></th>
                                 <th class="head flag complete"></th>
-                                <th class="head flag unlockable"></th>
+                                <th class="head flag fightable"></th>
+                                <? if ($this_robot_class === 'master'){ ?>
+                                    <th class="head flag unlockable"></th>
+                                <? } ?>
                                 <th class="head flag hidden"></th>
                                 <th class="head count"><?= cms_admin::get_totals_markup() ?></th>
                             </tr>
@@ -962,7 +994,10 @@
                                 <td class="foot game"></td>
                                 <td class="foot flag published"></td>
                                 <td class="foot flag complete"></td>
-                                <td class="foot flag unlockable"></td>
+                                <td class="foot flag fightable"></td>
+                                <? if ($this_robot_class === 'master'){ ?>
+                                    <td class="foot flag unlockable"></td>
+                                <? } ?>
                                 <td class="foot flag hidden"></td>
                                 <td class="foot count"><?= cms_admin::get_totals_markup() ?></td>
                             </tr>
@@ -992,6 +1027,7 @@
                                 $robot_game_span = '<span class="type_span type_none">'.$robot_game.'</span>';
                                 $robot_flag_published = !empty($robot_data['robot_flag_published']) ? '<i class="fas fa-check-square"></i>' : '-';
                                 $robot_flag_complete = !empty($robot_data['robot_flag_complete']) ? '<i class="fas fa-check-circle"></i>' : '-';
+                                $robot_flag_fightable = !empty($robot_data['robot_flag_fightable']) ? '<i class="fas fa-fist-raised"></i>' : '-';
                                 $robot_flag_unlockable = !empty($robot_data['robot_flag_unlockable']) ? '<i class="fas fa-unlock"></i>' : '-';
                                 $robot_flag_hidden = !empty($robot_data['robot_flag_hidden']) ? '<i class="fas fa-eye-slash"></i>' : '-';
 
@@ -1012,7 +1048,10 @@
                                     echo '<td class="game"><div class="wrap">'.$robot_game_span.'</div></td>'.PHP_EOL;
                                     echo '<td class="flag published"><div>'.$robot_flag_published.'</div></td>'.PHP_EOL;
                                     echo '<td class="flag complete"><div>'.$robot_flag_complete.'</div></td>'.PHP_EOL;
-                                    echo '<td class="flag unlockable"><div>'.$robot_flag_unlockable.'</div></td>'.PHP_EOL;
+                                    echo '<td class="flag fightable"><div>'.$robot_flag_fightable.'</div></td>'.PHP_EOL;
+                                    if ($this_robot_class === 'master'){
+                                        echo '<td class="flag unlockable"><div>'.$robot_flag_unlockable.'</div></td>'.PHP_EOL;
+                                    }
                                     echo '<td class="flag hidden"><div>'.$robot_flag_hidden.'</div></td>'.PHP_EOL;
                                     echo '<td class="actions"><div>'.$robot_actions.'</div></td>'.PHP_EOL;
                                 echo '</tr>'.PHP_EOL;
@@ -1972,6 +2011,15 @@
 
                                 <div class="field checkwrap">
                                     <label class="label">
+                                        <strong>Fightable</strong>
+                                        <input type="hidden" name="robot_flag_fightable" value="0" checked="checked" />
+                                        <input class="checkbox" type="checkbox" name="robot_flag_fightable" value="1" <?= !empty($robot_data['robot_flag_fightable']) ? 'checked="checked"' : '' ?> />
+                                    </label>
+                                    <p class="subtext">This <?= $this_robot_class_short_name ?> can be encountered in game</p>
+                                </div>
+
+                                <div class="field checkwrap">
+                                    <label class="label">
                                         <strong>Hidden</strong>
                                         <input type="hidden" name="robot_flag_hidden" value="0" checked="checked" />
                                         <input class="checkbox" type="checkbox" name="robot_flag_hidden" value="1" <?= !empty($robot_data['robot_flag_hidden']) ? 'checked="checked"' : '' ?> />
@@ -1991,7 +2039,7 @@
                                                 <input type="hidden" name="robot_flag_unlockable" value="0" checked="checked" />
                                                 <input class="checkbox" type="checkbox" name="robot_flag_unlockable" value="1" <?= !empty($robot_data['robot_flag_unlockable']) ? 'checked="checked"' : '' ?> />
                                             </label>
-                                            <p class="subtext">This <?= $this_robot_class_short_name ?> is ready to be used in the game</p>
+                                            <p class="subtext">This <?= $this_robot_class_short_name ?> is ready to be used in game</p>
                                         </div>
 
                                         <div class="field checkwrap">

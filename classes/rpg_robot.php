@@ -2599,6 +2599,7 @@ class rpg_robot extends rpg_object {
             'robot_flag_hidden',
             'robot_flag_complete',
             'robot_flag_unlockable',
+            'robot_flag_fightable',
             'robot_flag_exclusive',
             'robot_flag_published',
             'robot_flag_protected'
