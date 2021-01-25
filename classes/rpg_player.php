@@ -167,6 +167,22 @@ class rpg_player extends rpg_object {
             }
         }
 
+        // If this is a player battle, we should collect user data for both sides
+        if (!empty($this->battle->flags['player_battle'])){
+            //error_log('this is a player battle');
+            if (empty($this->flags['player_userinfo_applied'])){
+                $temp_user_fields = rpg_user::get_index_fields(true);
+                $this_userinfo = $db->get_array("SELECT {$temp_user_fields} FROM mmrpg_users WHERE user_id = {$this->user_id};");
+                if (!empty($this_userinfo)){
+                    $this->player_name = !empty($this_userinfo['user_name_public']) ? $this_userinfo['user_name_public'] : $this_userinfo['user_name'];
+                    $this->player_name_full = $this->player_name;
+                    $this->values['colour_token'] = !empty($this_userinfo['user_colour_token']) ? $this_userinfo['user_colour_token'] : 'none';
+                    $this->values['colour_token2'] = !empty($this_userinfo['user_colour_token2']) ? $this_userinfo['user_colour_token2'] : '';
+                }
+                $this->flags['player_userinfo_applied'] = true;
+            }
+        }
+
         // If the user token is empty, collect from data
         if (empty($this->user_token)){
 
@@ -1439,7 +1455,14 @@ class rpg_player extends rpg_object {
     }
 
     // Define public print functions for markup generation
-    public function print_name(){ return '<span class="player_name player_type">'.$this->player_name.'</span>'; }
+    public function print_name($use_colour = false){
+        $type_class = '';
+        if ($use_colour){
+            if (!empty($this->values['colour_token'])){ $type_class .= 'type_'.$this->values['colour_token']; }
+            if (!empty($type_class) && !empty($this->values['colour_token2'])){ $type_class .= '_'.$this->values['colour_token2']; }
+        }
+        return '<span class="player_name player_type'.(!empty($type_class) ? ' '.$type_class : '').'">'.$this->player_name.'</span>';
+    }
     public function print_token(){ return '<span class="player_token">'.$this->player_token.'</span>'; }
     public function print_description(){ return '<span class="player_description">'.$this->player_description.'</span>'; }
     public function print_quote($quote_type, $this_find = array(), $this_replace = array()){

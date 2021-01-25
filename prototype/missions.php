@@ -598,6 +598,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     // If this user is defeated, update the battle button with details
                     if (!empty($temp_player_array['values']['flag_defeated'])){
                         $victory_token_colour = !empty($temp_player_array['values']['colour_token']) ? $temp_player_array['values']['colour_token'] : 'none';
+                        if (!empty($temp_player_array['values']['colour_token2'])){ $victory_token_colour .= $temp_player_array['values']['colour_token2']; }
                         $temp_battle_omega['battle_button'] = (!empty($temp_battle_omega['battle_button']) ? $temp_battle_omega['battle_button'] : $temp_battle_omega['battle_name']).' <sup class="special_type player_type player_type_'.$victory_token_colour.'">&#9733;</sup>';
                         $temp_battle_omega['battle_description2'] .= 'This player\'s victory token has already been collected...';
                         $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * 0.10);

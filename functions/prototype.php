@@ -419,7 +419,8 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
             DISTINCT(battles.target_user_id) AS target_user_id,
             (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS target_user_name,
             users.user_name_clean AS target_user_token,
-            users.user_colour_token AS target_user_colour
+            users.user_colour_token AS target_user_colour,
+            users.user_colour_token2 AS target_user_colour2
             FROM mmrpg_battles AS battles
             LEFT JOIN mmrpg_users AS users ON battles.target_user_id = users.user_id
             WHERE
@@ -2277,7 +2278,8 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
             $defeated_leaderboard_players_index =  $db->get_array_list("SELECT
                 DISTINCT(battles.target_user_id) AS target_user_id,
                 users.user_name_clean AS target_user_name,
-                users.user_colour_token As target_user_colour
+                users.user_colour_token As target_user_colour,
+                users.user_colour_token2 As target_user_colour2
                 FROM mmrpg_battles AS battles
                 LEFT JOIN mmrpg_users AS users ON battles.target_user_id = users.user_id
                 WHERE
@@ -2345,6 +2347,7 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
                 mmrpg_users.user_name_clean,
                 mmrpg_users.user_name_public,
                 mmrpg_users.user_colour_token,
+                mmrpg_users.user_colour_token2,
                 mmrpg_users.user_gender,
                 mmrpg_saves.save_values_battle_rewards AS player_rewards,
                 mmrpg_saves.save_values_battle_settings AS player_settings,
@@ -2389,6 +2392,7 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
                 $player['values']['flag_online'] = in_array($player['user_name_clean'], $this_leaderboard_online_usernames) ? 1 : 0;
                 $player['values']['flag_defeated'] = in_array($player['user_name_clean'], $this_leaderboard_defeated_players) ? 1 : 0;
                 $player['values']['colour_token'] = !empty($player['user_colour_token']) ? $player['user_colour_token'] : '';
+                $player['values']['colour_token2'] = !empty($player['user_colour_token2']) ? $player['user_colour_token2'] : '';
 
                 unset($player['values']['battle_shops'], $player['values']['prototype_awards']);
                 unset($player['values']['player_this-item-omega_prototype'], $player['values']['dr-light_this-item-omega_prototype'], $player['values']['dr-wily_this-item-omega_prototype'], $player['values']['dr-cossack_this-item-omega_prototype']);
