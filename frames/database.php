@@ -61,6 +61,14 @@ $mmrpg_database_fields = rpg_field::get_index(true);
 // Merge the robots and mechas
 $mmrpg_database_robots = array_merge($mmrpg_database_robots, $mmrpg_database_mechas, $mmrpg_database_bosses);
 
+// Filter out any robots that are not yet fightable given flag values
+$mmrpg_database_robots = array_filter($mmrpg_database_robots, function($robot_info){
+    if (empty($robot_info['robot_flag_published'])){ return false; }
+    elseif (empty($robot_info['robot_flag_complete'])){ return false; }
+    elseif (empty($robot_info['robot_flag_fightable'])){ return false; }
+    return true;
+    });
+
 // Define a quick function for getting group token for a given robot/mecha/boss
 function temp_get_group_token($robot_info){
     static $first_page_robots = array(
