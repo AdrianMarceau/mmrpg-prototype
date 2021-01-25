@@ -23,6 +23,7 @@ elseif (!empty($this_current_sub) && preg_match('/^([-_a-z0-9]+)$/i', $this_curr
     mmrpg_users.user_image_path,
     mmrpg_users.user_background_path,
     mmrpg_users.user_colour_token,
+    mmrpg_users.user_colour_token2,
     mmrpg_users.user_email_address,
     mmrpg_users.user_date_created,
     mmrpg_users.user_date_accessed,
