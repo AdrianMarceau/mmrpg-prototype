@@ -77,7 +77,11 @@ ob_start();
         <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
             <span class="subheader_typewrapper">
                 <a class="inline_link" href="database/mechas/">Mecha Database</a>
-                <span class="count">( <?= $mmrpg_database_mechas_count_complete ?> / <?= $mmrpg_database_mechas_count == 1 ? '1 Mecha' : $mmrpg_database_mechas_count.' Mechas' ?> )</span>
+                <span class="count">(
+                    <span data-tooltip-type="type type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" title="<?= $mmrpg_database_mechas_count_fightable.' Fightable '.($mmrpg_database_mechas_count_fightable == 1 ? 'Mecha' : 'Mechas') ?>"><?= $mmrpg_database_mechas_count_fightable ?></span>
+                    / <span data-tooltip-type="type type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" title="<?= $mmrpg_database_mechas_count_complete.' Completed '.($mmrpg_database_mechas_count_complete == 1 ? 'Mecha' : 'Mechas') ?>"><?= $mmrpg_database_mechas_count_complete ?></span>
+                    / <span data-tooltip-type="type type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" title="<?= $mmrpg_database_mechas_count.' '.($mmrpg_database_mechas_count == 1 ? 'Mecha' : 'Mechas').' Total' ?>"><?= $mmrpg_database_mechas_count.' '.($mmrpg_database_mechas_count == 1 ? 'Mecha' : 'Mechas') ?></span>
+                )</span>
                 <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Core )</span>' : '' ?>
             </span>
         </h2>

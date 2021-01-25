@@ -163,6 +163,7 @@ $mmrpg_database_robots_links = '';
 $mmrpg_database_robots_links_index = array();
 $mmrpg_database_robots_links_counter = 0;
 $mmrpg_database_robots_count_complete = 0;
+$mmrpg_database_robots_count_fightable = 0;
 $mmrpg_database_robots_count_unlockable = 0;
 
 // Loop through the results and generate the links for these robots
@@ -198,6 +199,7 @@ if (!empty($mmrpg_database_robots)){
 
         // Collect the robot sprite dimensions
         $robot_flag_complete = !empty($robot_info['robot_flag_complete']) ? true : false;
+        $robot_flag_fightable = !empty($robot_info['robot_flag_fightable']) ? true : false;
         $robot_flag_unlockable = !empty($robot_info['robot_flag_unlockable']) ? true : false;
         $robot_core_type = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none';
         $robot_core_type2 = !empty($robot_info['robot_core']) && !empty($robot_info['robot_core2']) ? $robot_info['robot_core2'] : '';
@@ -218,7 +220,13 @@ if (!empty($mmrpg_database_robots)){
         // Start the output buffer and collect the generated markup
         ob_start();
         ?>
-        <div title="<?= $robot_title_text ?>" data-token="<?= $robot_info['robot_token'] ?>" class="float left link type <?= $robot_core_class ?> <?= ($robot_image_incomplete ? 'inactive ' : '').($robot_flag_unlockable ? 'unlockable ' : '').($robot_flag_has_skill ? 'has-skill ' : '') ?>">
+        <div title="<?= $robot_title_text ?>" data-token="<?= $robot_info['robot_token'] ?>" class="float left link type <?=
+            ($robot_core_class.' ').
+            ($robot_image_incomplete ? 'inactive ' : '').
+            ($robot_flag_fightable ? 'fightable ' : '').
+            ($robot_flag_unlockable ? 'unlockable ' : '').
+            ($robot_flag_has_skill ? 'has-skill ' : '')
+            ?>">
             <a class="sprite robot link mugshot size<?= $robot_image_size.($robot_key == $first_robot_token ? ' current' : '') ?>" href="<?= 'database/robots/'.$robot_info['robot_token']?>/" rel="<?= $robot_image_incomplete ? 'nofollow' : 'follow' ?>">
                 <?php if($robot_image_token != 'robot'): ?>
                     <img src="<?= $robot_image_path ?>" width="<?= $robot_image_size ?>" height="<?= $robot_image_size ?>" alt="<?= $robot_title_text ?>" />
@@ -230,6 +238,7 @@ if (!empty($mmrpg_database_robots)){
         </div>
         <?php
         if ($robot_flag_complete){ $mmrpg_database_robots_count_complete++; }
+        if ($robot_flag_fightable){ $mmrpg_database_robots_count_fightable++; }
         if ($robot_flag_unlockable){ $mmrpg_database_robots_count_unlockable++; }
         $temp_markup = ob_get_clean();
         $mmrpg_database_robots_links_index[$robot_key] = $temp_markup;

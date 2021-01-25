@@ -154,6 +154,7 @@ $mmrpg_database_bosses_links = '';
 $mmrpg_database_bosses_links_index = array();
 $mmrpg_database_bosses_links_counter = 0;
 $mmrpg_database_bosses_count_complete = 0;
+$mmrpg_database_bosses_count_fightable = 0;
 
 // Loop through the results and generate the links for these bosses
 if (!empty($mmrpg_database_bosses)){
@@ -183,6 +184,10 @@ if (!empty($mmrpg_database_bosses)){
 
         // Collect the boss sprite dimensions
         $boss_flag_complete = !empty($boss_info['robot_flag_complete']) ? true : false;
+        $boss_flag_fightable = !empty($boss_info['robot_flag_fightable']) ? true : false;
+        $boss_core_type = !empty($boss_info['robot_core']) ? $boss_info['robot_core'] : 'none';
+        $boss_core_type2 = !empty($boss_info['robot_core']) && !empty($boss_info['robot_core2']) ? $boss_info['robot_core2'] : '';
+        $boss_core_class = $boss_core_type.(!empty($boss_core_type2) ? '_'.$boss_core_type2 : '');
         $boss_image_size = !empty($boss_info['robot_image_size']) ? $boss_info['robot_image_size'] : 40;
         $boss_image_size_text = $boss_image_size.'x'.$boss_image_size;
         $boss_image_token = !empty($boss_info['robot_image']) ? $boss_info['robot_image'] : $boss_info['robot_token'];
@@ -197,7 +202,11 @@ if (!empty($mmrpg_database_bosses)){
         // Start the output buffer and collect the generated markup
         ob_start();
         ?>
-        <div title="<?= $boss_title_text ?>" data-token="<?= $boss_info['robot_token'] ?>" class="float left link type <?= ($boss_image_incomplete  ? 'inactive ' : '').(!empty($boss_info['robot_core']) ? $boss_info['robot_core'] : 'none').(!empty($boss_info['robot_core2']) ? '_'.$boss_info['robot_core2'] : '') ?>">
+        <div title="<?= $boss_title_text ?>" data-token="<?= $boss_info['robot_token'] ?>" class="float left link type <?=
+            ($boss_core_class.' ').
+            ($boss_image_incomplete  ? 'inactive ' : '').
+            ($boss_flag_fightable ? 'fightable ' : '')
+            ?>">
             <a class="sprite robot link mugshot size<?= $boss_image_size.($boss_key == $first_boss_token ? ' current' : '') ?>" href="<?= 'database/bosses/'.$boss_info['robot_token']?>/" rel="<?= $boss_image_incomplete ? 'nofollow' : 'follow' ?>">
                 <?php if($boss_image_token != 'boss'): ?>
                     <img src="<?= $boss_image_path ?>" width="<?= $boss_image_size ?>" height="<?= $boss_image_size ?>" alt="<?= $boss_title_text ?>" />
@@ -208,6 +217,7 @@ if (!empty($mmrpg_database_bosses)){
         </div>
         <?php
         if ($boss_flag_complete){ $mmrpg_database_bosses_count_complete++; }
+        if ($boss_flag_fightable){ $mmrpg_database_bosses_count_fightable++; }
         $temp_markup = ob_get_clean();
         $mmrpg_database_bosses_links_index[$boss_key] = $temp_markup;
         if ($show_in_link_list){ $mmrpg_database_bosses_links .= $temp_markup; }

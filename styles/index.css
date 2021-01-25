@@ -1059,11 +1059,15 @@ button {
 #window .page .body .subbody_databaselinks[data-class="items"] .iconwrap {
     padding-right: 5%;
 }
-#window .page .body .subbody_databaselinks[data-class="robots"] .float.link[data-anchor]:not(.unlockable) {
+#window .page .body .subbody_databaselinks[data-class="robots"] .float.link[data-anchor]:not(.unlockable),
+#window .page .body .subbody_databaselinks[data-class="mechas"] .float.link[data-anchor]:not(.fightable),
+#window .page .body .subbody_databaselinks[data-class="bosses"] .float.link[data-anchor]:not(.fightable) {
     opacity: 0.4;
     transition: opacity 0.3s;
 }
-#window .page .body .subbody_databaselinks[data-class="robots"] .group:hover .float.link[data-anchor]:not(.unlockable) {
+#window .page .body .subbody_databaselinks[data-class="robots"] .group:hover .float.link[data-anchor]:not(.unlockable),
+#window .page .body .subbody_databaselinks[data-class="mechas"] .group:hover .float.link[data-anchor]:not(.fightable),
+#window .page .body .subbody_databaselinks[data-class="bosses"] .group:hover .float.link[data-anchor]:not(.fightable) {
     opacity: 1.0;
 }
 #window .page .body .subbody_databaselinks[data-class="robots"] .float.link[data-anchor].has-skill {

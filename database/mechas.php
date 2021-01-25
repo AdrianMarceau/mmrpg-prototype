@@ -159,6 +159,7 @@ $mmrpg_database_mechas_links = '';
 $mmrpg_database_mechas_links_index = array();
 $mmrpg_database_mechas_links_counter = 0;
 $mmrpg_database_mechas_count_complete = 0;
+$mmrpg_database_mechas_count_fightable = 0;
 
 // Loop through the results and generate the links for these mechas
 if (!empty($mmrpg_database_mechas)){
@@ -188,6 +189,10 @@ if (!empty($mmrpg_database_mechas)){
 
         // Collect the mecha sprite dimensions
         $mecha_flag_complete = !empty($mecha_info['robot_flag_complete']) ? true : false;
+        $mecha_flag_fightable = !empty($mecha_info['robot_flag_fightable']) ? true : false;
+        $mecha_core_type = !empty($mecha_info['robot_core']) ? $mecha_info['robot_core'] : 'none';
+        $mecha_core_type2 = !empty($mecha_info['robot_core']) && !empty($mecha_info['robot_core2']) ? $mecha_info['robot_core2'] : '';
+        $mecha_core_class = $mecha_core_type.(!empty($mecha_core_type2) ? '_'.$mecha_core_type2 : '');
         $mecha_image_size = !empty($mecha_info['robot_image_size']) ? $mecha_info['robot_image_size'] : 40;
         $mecha_image_size_text = $mecha_image_size.'x'.$mecha_image_size;
         $mecha_image_token = !empty($mecha_info['robot_image']) ? $mecha_info['robot_image'] : $mecha_info['robot_token'];
@@ -203,7 +208,11 @@ if (!empty($mmrpg_database_mechas)){
         // Start the output buffer and collect the generated markup
         ob_start();
         ?>
-        <div title="<?= $mecha_title_text ?>" data-token="<?= $mecha_info['robot_token'] ?>" class="float left link type <?= ($mecha_image_incomplete  ? 'inactive ' : '').(!empty($mecha_info['robot_core']) ? $mecha_info['robot_core'] : 'none') ?>">
+        <div title="<?= $mecha_title_text ?>" data-token="<?= $mecha_info['robot_token'] ?>" class="float left link type <?=
+            ($mecha_core_class.' ').
+            ($mecha_image_incomplete  ? 'inactive ' : '').
+            ($mecha_flag_fightable ? 'fightable ' : '')
+            ?>">
             <a class="sprite robot link mugshot size<?= $mecha_image_size.($mecha_key == $first_mecha_token ? ' current' : '') ?>" href="<?= 'database/mechas/'.$mecha_info['robot_token']?>/" rel="<?= $mecha_image_incomplete ? 'nofollow' : 'follow' ?>">
                 <?php if($mecha_image_token != 'mecha'): ?>
                     <img src="<?= $mecha_image_path ?>" width="<?= $mecha_image_size ?>" height="<?= $mecha_image_size ?>" alt="<?= $mecha_title_text ?>" />
@@ -214,6 +223,7 @@ if (!empty($mmrpg_database_mechas)){
         </div>
         <?php
         if ($mecha_flag_complete){ $mmrpg_database_mechas_count_complete++; }
+        if ($mecha_flag_fightable){ $mmrpg_database_mechas_count_fightable++; }
         $temp_markup = ob_get_clean();
         $mmrpg_database_mechas_links_index[$mecha_key] = $temp_markup;
         if ($show_in_link_list){ $mmrpg_database_mechas_links .= $temp_markup; }
