@@ -273,6 +273,7 @@ if (!empty($this_leaderboard_index)){
                 'place' => mmrpg_number_suffix($place_counter, true, true),
                 'placeint' => $place_counter,
                 'colour' => $board['user_colour_token'],
+                'colour2' => $board['user_colour_token2'],
                 'image' => $board['user_image_path'],
                 'page' => $this_current_page_number
                 );

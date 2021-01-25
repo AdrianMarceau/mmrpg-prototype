@@ -27,7 +27,8 @@ if (strstr($page_content_parsed, $find)){
 $find = '<!-- MMRPG_LEADERBOARD_ONLINE_PLAYERS -->';
 if (strstr($page_content_parsed, $find)){
     ob_start();
-    if(!empty($this_leaderboard_online_players)):?>
+    if (!empty($this_leaderboard_online_players)){
+        ?>
         <p class="event text" style="min-height: 1px; text-align: right; font-size: 10px; line-height: 13px; margin-top: 30px; padding-bottom: 5px;">
                 <span><strong style="display: block; text-decoration: underline; margin-bottom: 6px;">Online Players</strong></span>
                 <? foreach ($this_leaderboard_online_players AS $key => $info){
@@ -42,7 +43,8 @@ if (strstr($page_content_parsed, $find)){
                         echo '</a>';
                 } ?>
         </p>
-    <? endif;
+        <?
+    }
     $replace = ob_get_clean();
     $page_content_parsed = str_replace($find, $replace, $page_content_parsed);
 }
