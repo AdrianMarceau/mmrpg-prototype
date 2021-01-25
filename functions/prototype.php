@@ -1057,22 +1057,28 @@ function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '
     // If a specific robot token was provided
     if (!empty($player_token) && !empty($robot_token)){
         // Check if this battle has been completed and return true is it was
-        return isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_abilities']) ? count($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_abilities']) : 0;
+        $ability_tokens = isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_abilities']) ? ($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_abilities']) : array();
     } elseif (!empty($player_token)){
         // Check if this ability has been unlocked by the player and return true if it was
-        return isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_abilities']) ? count($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_abilities']) : 0;
+        $ability_tokens = isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_abilities']) ? ($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_abilities']) : array();
     } else {
         // Define the ability counter and token tracker
         $ability_tokens = $_SESSION[$session_token]['values']['battle_abilities'];
-        foreach ($ability_tokens AS $key => $token){
-            if (!isset($mmrpg_index_abilities[$token])
-                || $mmrpg_index_abilities[$token]['ability_class'] != 'master'){
-                unset($ability_tokens[$key]);
-            }
-        }
-        // Return the total amount of ability tokens pulled
-        return !empty($ability_tokens) ? count($ability_tokens) : 0;
     }
+
+    // Filter the ability tokens to make sure they're actually valid
+    $ability_tokens = array_unique($ability_tokens);
+    foreach ($ability_tokens AS $key => $token){
+        if (!isset($mmrpg_index_abilities[$token])){ unset($ability_tokens[$key]); continue; }
+        $info = $mmrpg_index_abilities[$token];
+        if ($info['ability_class'] != 'master'){ unset($ability_tokens[$key]); }
+        elseif (empty($info['ability_flag_published'])){ unset($ability_tokens[$key]); }
+        elseif (empty($info['ability_flag_complete'])){ unset($ability_tokens[$key]); }
+        elseif (!empty($info['ability_flag_hidden'])){ unset($ability_tokens[$key]); }
+    }
+    // Return the total amount of ability tokens pulled
+    return !empty($ability_tokens) ? count($ability_tokens) : 0;
+
 }
 // Define a function for displaying prototype battle option markup
 function mmrpg_prototype_options_markup(&$battle_options, $player_token){

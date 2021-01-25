@@ -277,6 +277,7 @@ if (!empty($form_actions)){
     $temp_user_role_fields = rpg_user_role::get_index_fields(true, 'roles');
     $this_userinfo = $db->get_array("SELECT {$temp_user_fields}, {$temp_user_role_fields} FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
     $_SESSION['GAME']['USER'] = mmrpg_prototype_format_user_data_for_session($this_userinfo);
+    mmrpg_save_game_session();
     mmrpg_redirect_form_action(MMRPG_CONFIG_ROOTURL.'frames/settings.php');
 
 
