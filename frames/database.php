@@ -291,14 +291,19 @@ if (true){
                             if ($robot_info['robot_class'] != 'master'){ continue; }
                             $robot_info['robot_image_size'] = !empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40;
                             $temp_robot_type_class = 'robot_type robot_type_'.(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none');
+                            $temp_robot_name_span = '<span>'.$robot_info['robot_name'].'</span>';
                             // If this robot is visible, display normally
                             if ($robot_info['robot_visible'] && in_array($robot_info['robot_token'], $visible_database_robots)){
+                                $temp_robot_image_path = 'images/robots/'.(!empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token']).'/mug_right_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE;
+                                $temp_robot_link_class = 'sprite sprite_robot sprite_robot_sprite sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].' sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'_mugshot robot_status_active robot_position_active '.($robot_key == $first_robot_token ? 'sprite_robot_current ' : '').' '.$temp_robot_type_class;
+                                if (empty($robot_info['robot_flag_unlockable'])){ $temp_robot_link_class .= ' not-unlockable'; }
                                 $robot_complete_markup = $robot_info['robot_unlocked'] ? '<span class="complete '.$temp_robot_type_class.'">&#10022;</span>' : '';
-                                echo '<a data-token="'.$robot_info['robot_token'].'" data-kind="'.$robot_info['robot_class'].'" data-game="'.$robot_info['robot_page_token'].'" data-size="'.$robot_info['robot_image_size'].'" title="'.$robot_info['robot_number'].' '.$robot_info['robot_name'].'" style="background-image: url(images/robots/'.(!empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token']).'/mug_right_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE.');" class="sprite sprite_robot sprite_robot_sprite sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].' sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'_mugshot robot_status_active robot_position_active '.($robot_key == $first_robot_token ? 'sprite_robot_current ' : '').' '.$temp_robot_type_class.'">'.$robot_info['robot_name'].$robot_complete_markup.'</a>';
+                                echo '<a data-token="'.$robot_info['robot_token'].'" data-kind="'.$robot_info['robot_class'].'" data-game="'.$robot_info['robot_page_token'].'" data-size="'.$robot_info['robot_image_size'].'" title="'.$robot_info['robot_number'].' '.$robot_info['robot_name'].'" style="background-image: url('.$temp_robot_image_path.');" class="'.$temp_robot_link_class.'">'.$temp_robot_name_span.$robot_complete_markup.'</a>';
                             }
                             // Otherwise, show a placeholder box for later
                             else {
-                                echo '<a data-token-locked="'.$robot_info['robot_token'].'" data-kind="'.$robot_info['robot_class'].'" data-game="'.$robot_info['robot_page_token'].'" data-size="'.$robot_info['robot_image_size'].'" title="'.$robot_info['robot_number'].' ???" style="background-color: #202020; background-image: none;" class="sprite sprite_robot sprite_robot_sprite sprite_40x40 sprite_40x40_mugshot robot_status_active robot_position_active">???</a>';
+                                $temp_robot_link_class = 'sprite sprite_robot sprite_robot_sprite sprite_40x40 sprite_40x40_mugshot robot_status_active robot_position_active';
+                                echo '<a data-token-locked="'.$robot_info['robot_token'].'" data-kind="'.$robot_info['robot_class'].'" data-game="'.$robot_info['robot_page_token'].'" data-size="'.$robot_info['robot_image_size'].'" title="'.$robot_info['robot_number'].' ???" style="background-color: #202020; background-image: none;" class="'.$temp_robot_link_class.'">???</a>';
                             }
                             // Increment the key counter
                             $key_counter++;
@@ -376,20 +381,34 @@ if (true){
                             // Define the default image size if empty
                             if (empty($robot_info['robot_image_size'])){ $robot_info['robot_image_size'] = 40; }
 
+                            $core_type_class = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none';
+                            if (!empty($robot_info['robot_core2'])){ $core_type_class .= '_'.$robot_info['robot_core2']; }
+
+                            $data_tooltip_type = 'data-tooltip-type="robot_type robot_type_'.$core_type_class.'"';
+
+                            $robot_is_unlockable = $robot_info['robot_class'] == 'master' && $robot_info['robot_flag_unlockable'] ? true : false;
+                            $robot_is_unlocked = !empty($robot_info['robot_unlocked']);
+
                             ?>
-                            <div class="event event_triple event_<?= $robot_key == $first_robot_token ? 'visible' : 'hidden' ?>" data-token="<?=$robot_info['robot_token']?>">
-                                <div class="this_sprite sprite_left" style="height: 40px;">
-                                    <? $temp_margin = -1 * ceil(($robot_info['robot_image_size'] - 40) * 0.5); ?>
-                                    <div style="margin-top: <?= $temp_margin ?>px; margin-bottom: <?= $temp_margin * 3 ?>px; background-image: url(images/robots/<?= !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'] ?>/mug_right_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>.png?<?=MMRPG_CONFIG_CACHE_DATE?>); " class="sprite sprite_robot sprite_robot_sprite sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?> sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>_mug robot_status_active robot_position_active"><?=$robot_info['robot_name']?></div>
+                            <div class="event event_triple event_<?= $robot_key == $first_robot_token ? 'visible' : 'hidden' ?> <?= $robot_is_unlockable ? 'robot_is_unlockable' : '' ?>" data-token="<?=$robot_info['robot_token']?>">
+                                <div class="this_sprite sprite_left mugshot sx<?= $robot_info['robot_image_size'] ?> robot_type robot_type_<?= $core_type_class ?>">
+                                    <div class="wrap">
+                                        <div style="background-image: url(images/robots/<?= !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'] ?>/mug_right_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>.png?<?=MMRPG_CONFIG_CACHE_DATE?>); " class="sprite sprite_robot sprite_robot_sprite sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?> sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>_mug robot_status_active robot_position_active"><?=$robot_info['robot_name']?></div>
+                                    </div>
                                 </div>
-                                <div class="header header_left robot_type robot_type_<?= !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none' ?>" style="margin-right: 0;">
+                                <div class="header header_left robot_type robot_type_<?= $core_type_class ?>" style="margin-right: 0;">
                                     <?=$robot_info['robot_name']?>&#39;s Data
+                                    <? if ($robot_is_unlockable){ ?>
+                                        <span class="this_unlockable" <?= $data_tooltip_type ?> title="<?= $robot_is_unlocked ? 'Robot Master Unlocked!' : 'Robot Is Unlockable' ?>">
+                                            <i class="unlocked fa fas <?= $robot_is_unlocked ? 'fa-lock-open' : 'fa-lock' ?>"></i>
+                                        </span>
+                                    <? } ?>
                                     <?
-                                    if ($robot_info['robot_class'] == 'master' && $robot_info['robot_unlocked']){ echo '<span data-tooltip-type="robot_type robot_type_'.(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none').'" title="Database Entry Complete!" style="font-weight: normal; position: relative; bottom: 1px; padding-left: 2px; ">&#10022;</span>'; }
-                                    elseif ($robot_info['robot_class'] == 'mecha' && $robot_info['robot_summoned']){ echo '<span data-tooltip-type="robot_type robot_type_'.(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none').'" title="Database Entry Complete!" style="font-weight: normal; position: relative; bottom: 1px; padding-left: 2px; ">&#10023;</span>'; }
+                                    if ($robot_info['robot_class'] == 'master' && $robot_info['robot_unlocked']){ echo '<span class="this_complete" '.$data_tooltip_type.' title="Database Entry Complete!">&#10022;</span>'; }
+                                    elseif ($robot_info['robot_class'] == 'mecha' && $robot_info['robot_summoned']){ echo '<span class="this_complete" '.$data_tooltip_type.' title="Database Entry Complete!">&#10023;</span>'; }
                                     ?>
                                     <? if(!empty($robot_info['robot_core'])): ?>
-                                        <span class="robot_type robot_core"><?=ucfirst($robot_info['robot_core'])?> Core</span>
+                                        <span class="robot_type robot_core"><?= ucfirst($robot_info['robot_core']) ?> Core</span>
                                     <? else: ?>
                                         <span class="robot_type robot_core">Neutral Core</span>
                                     <? endif; ?>
@@ -410,7 +429,9 @@ if (true){
                                                 <td class="center">&nbsp;</td>
                                                 <td  class="right">
                                                     <label style="display: block; float: left;">Name :</label>
-                                                    <span class="robot_name robot_type"><?=$robot_info['robot_name']?></span>
+                                                    <span class="robot_name robot_type">
+                                                        <?=$robot_info['robot_name']?>
+                                                    </span>
                                                 </td>
                                             </tr>
                                             <tr>
