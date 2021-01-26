@@ -1058,9 +1058,11 @@ function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '
     if (!empty($player_token) && !empty($robot_token)){
         // Check if this battle has been completed and return true is it was
         $ability_tokens = isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_abilities']) ? ($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_abilities']) : array();
+        $ability_tokens = array_keys($ability_tokens);
     } elseif (!empty($player_token)){
         // Check if this ability has been unlocked by the player and return true if it was
         $ability_tokens = isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_abilities']) ? ($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_abilities']) : array();
+        $ability_tokens = array_keys($ability_tokens);
     } else {
         // Define the ability counter and token tracker
         $ability_tokens = $_SESSION[$session_token]['values']['battle_abilities'];
@@ -1076,6 +1078,7 @@ function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '
         elseif (empty($info['ability_flag_complete'])){ unset($ability_tokens[$key]); }
         elseif (!empty($info['ability_flag_hidden'])){ unset($ability_tokens[$key]); }
     }
+
     // Return the total amount of ability tokens pulled
     return !empty($ability_tokens) ? count($ability_tokens) : 0;
 
