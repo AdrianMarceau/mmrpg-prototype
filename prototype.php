@@ -486,7 +486,7 @@ foreach ($this_menu_tooltips AS $token => $text){
                 <? if (mmrpg_prototype_items_unlocked() > 0): ?>
                     <span class="pipe">|</span>
                     <a class="link link_items" data-step="items" data-index="<?= $this_menu_indexes['items'] ?>" data-source="frames/items.php" data-music="misc/item-viewer" data-tooltip="<?= $this_menu_tooltips['items'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-                        <i class="fa fas fa-flask"></i>
+                        <i class="fa fas fa-briefcase"></i>
                         <label>inventory</label>
                     </a>
                 <? endif; ?>
