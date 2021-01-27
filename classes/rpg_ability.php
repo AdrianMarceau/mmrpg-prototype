@@ -1189,35 +1189,31 @@ class rpg_ability extends rpg_object {
             break;
         }
 
-        $temp_ability_title = $ability_info['ability_name'];
-        if (!empty($temp_ability_type)){ $temp_ability_title .= ' ('.$temp_ability_type['type_name'].' Type)'; }
-        if (!empty($temp_ability_type2)){ $temp_ability_title = str_replace('Type', '/ '.$temp_ability_type2['type_name'].' Type', $temp_ability_title); }
+        $temp_ability_title1 = $ability_info['ability_name'];
+        if (!empty($temp_ability_type)){ $temp_ability_title1 .= ' ('.$temp_ability_type['type_name'].' Type)'; }
+        if (!empty($temp_ability_type2)){ $temp_ability_title1 = str_replace('Type', '/ '.$temp_ability_type2['type_name'].' Type', $temp_ability_title1); }
 
-        if (!empty($ability_info['ability_damage']) || !empty($ability_info['ability_recovery'])){ $temp_ability_title .= '  // '; }
-        elseif (empty($ability_info['ability_damage']) && empty($ability_info['ability_recovery'])){ $temp_ability_title .= '  // '; }
-        if (!empty($ability_info['ability_damage']) && !empty($ability_info['ability_recovery'])){ $temp_ability_title .= $ability_info['ability_damage'].' Damage | '.$ability_info['ability_recovery'].' Recovery'; }
-        elseif (!empty($ability_info['ability_damage'])){ $temp_ability_title .= $ability_info['ability_damage'].' Damage'; }
-        elseif (!empty($ability_info['ability_recovery'])){ $temp_ability_title .= $ability_info['ability_recovery'].' Recovery '; }
-        if (!empty($ability_info['ability_damage']) || !empty($ability_info['ability_recovery'])){ $temp_ability_title .= '  | '; }
+        $temp_ability_title2 = array();
+        if (!empty($ability_info['ability_damage'])){ $temp_ability_title2[] = $ability_info['ability_damage'].' Damage'; }
+        if (!empty($ability_info['ability_recovery'])){ $temp_ability_title2[] = $ability_info['ability_recovery'].' Recovery '; }
+        if ($print_options['show_accuracy'] && !empty($ability_info['ability_accuracy'])){ $temp_ability_title2[] = $ability_info['ability_accuracy'].'% Accuracy'; }
+        if (!empty($temp_ability_energy)){ $temp_ability_title2[] = $temp_ability_energy.' Energy'; }
+        if ($temp_ability_target != 'auto'){ $temp_ability_title2[] = 'Select Target'; }
+        $temp_ability_title2 = implode(' | ', $temp_ability_title2);
 
-        // If show accuracy
-        if ($print_options['show_accuracy']){
-
-            if (preg_match('/(damage|recovery)/i', $temp_ability_title)){ $temp_ability_title .= '  | '; }
-            if (!empty($ability_info['ability_accuracy'])){ $temp_ability_title .= ' '.$ability_info['ability_accuracy'].'% Accuracy'; }
-
-        }
-
-        if (!empty($temp_ability_energy)){ $temp_ability_title .= ' | '.$temp_ability_energy.' Energy'; }
-        if ($temp_ability_target != 'auto'){ $temp_ability_title .= ' | Select Target'; }
-        //if (!empty($temp_ability_speed)){ $temp_ability_title .= ' | '.$temp_ability_speed.' Speed'; }
-
+        $temp_ability_title3 = '';
         if (!empty($ability_info['ability_description'])){
             $temp_find = array('{RECOVERY}', '{RECOVERY2}', '{DAMAGE}', '{DAMAGE2}');
             $temp_replace = array($temp_ability_recovery, $temp_ability_recovery2, $temp_ability_damage, $temp_ability_damage2);
             $temp_description = str_replace($temp_find, $temp_replace, $ability_info['ability_description']);
-            $temp_ability_title .= ' // '.$temp_description;
+            $temp_ability_title3 = $temp_description;
         }
+
+        $temp_ability_title = implode(' // ', array_filter(array(
+            $temp_ability_title1,
+            $temp_ability_title2,
+            $temp_ability_title3
+            )));
 
         // Return the generated option markup
         return $temp_ability_title;
