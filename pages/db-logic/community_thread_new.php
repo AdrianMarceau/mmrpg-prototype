@@ -97,11 +97,13 @@ ob_start();
         </div>
     </div>
     <div class="subheader thread_title field_type_<?= !empty($this_thread_info['thread_colour']) ? $this_thread_info['thread_colour'] : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="">
-        <h2 class="name">
-            <a class="link title" style="" href="<?= $_GET['this_current_url'] ?>" title="<?= $temp_thread_name ?>"><?= $temp_thread_name ?></a>
-        </h2>
-        <div class="date">
-            <?= $temp_thread_date ?>
+        <div class="subheader_typewrapper">
+            <h2 class="name">
+                <a class="link title" style="" href="<?= $_GET['this_current_url'] ?>" title="<?= $temp_thread_name ?>"><?= $temp_thread_name ?></a>
+            </h2>
+            <div class="date">
+                <?= $temp_thread_date ?>
+            </div>
         </div>
     </div>
 

@@ -92,6 +92,7 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
             'imagepath' => $this_playerinfo['user_image_path'],
             'backgroundpath' => $this_playerinfo['user_background_path'],
             'colourtoken' => $this_playerinfo['user_colour_token'],
+            'colourtoken2' => $this_playerinfo['user_colour_token2'],
             'gender' => $this_playerinfo['user_gender']
             );
         $temp_remote_session['counters'] = $this_playerinfo['counters'];

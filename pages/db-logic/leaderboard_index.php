@@ -27,21 +27,24 @@ if (strstr($page_content_parsed, $find)){
 $find = '<!-- MMRPG_LEADERBOARD_ONLINE_PLAYERS -->';
 if (strstr($page_content_parsed, $find)){
     ob_start();
-    if(!empty($this_leaderboard_online_players)):?>
+    if (!empty($this_leaderboard_online_players)){
+        ?>
         <p class="event text" style="min-height: 1px; text-align: right; font-size: 10px; line-height: 13px; margin-top: 30px; padding-bottom: 5px;">
                 <span><strong style="display: block; text-decoration: underline; margin-bottom: 6px;">Online Players</strong></span>
                 <? foreach ($this_leaderboard_online_players AS $key => $info){
                         if (empty($info['image'])){ $info['image'] = 'robots/mega-man/40'; }
                         list($path, $token, $size) = explode('/', $info['image']);
                         $frame = $info['placeint'] <= 3 ? 'victory' : 'base';
+                        $colour = $info['colour'].(!empty($info['colour']) && !empty($info['colour2']) ? '_'.$info['colour2'] : '');
                         if ($key > 0 && $key % 5 == 0){ echo '<br />'; }
-                        echo ' <a data-playerid="'.$info['id'].'" class="player_type player_type_'.$info['colour'].'" href="leaderboard/'.$info['token'].'/" style="text-decoration: none; line-height: 20px; padding-right: 12px; margin: 0 0 0 6px; white-space: nowrap;">';
+                        echo ' <a data-playerid="'.$info['id'].'" class="player_type player_type_'.$colour.'" href="leaderboard/'.$info['token'].'/" style="text-decoration: none; line-height: 20px; padding-right: 12px; margin: 0 0 0 6px; white-space: nowrap;">';
                                 echo '<span style="pointer-events: none; display: inline-block; width: 34px; height: 14px; position: relative;"><span class="sprite sprite_'.$size.'x'.$size.' sprite_'.$size.'x'.$size.'_'.$frame.'" style="margin: 0; position: absolute; left: '.($size == 40 ? -4 : -26).'px; bottom: 0; background-image: url(images/'.$path.'/'.$token.'/sprite_left_'.$size.'x'.$size.'.png?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</span></span>';
                                 echo '<span style="vertical-align: top; line-height: 18px; white-space: nowrap;">'.strip_tags($info['place']).' : '.$info['name'].'</span>';
                         echo '</a>';
                 } ?>
         </p>
-    <? endif;
+        <?
+    }
     $replace = ob_get_clean();
     $page_content_parsed = str_replace($find, $replace, $page_content_parsed);
 }

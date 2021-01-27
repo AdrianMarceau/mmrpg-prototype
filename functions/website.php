@@ -1263,6 +1263,64 @@ function mmrpg_get_favicon(){
     return $filename;
 }
 
+// Define a function for initializing form messages
+function mmrpg_init_form_messages(){
+    $form_messages = array();
+    if (!empty($_SESSION['mmrpg_forms']['form_messages'])){
+        $form_messages = $_SESSION['mmrpg_forms']['form_messages'];
+    }
+    return $form_messages;
+}
+
+// Define a function for saving form messages to session
+function mmrpg_backup_form_messages(){
+    global $form_messages;
+    $_SESSION['mmrpg_forms']['form_messages'] = $form_messages;
+}
+
+// Define a function for initializing form messages
+function mmrpg_clear_form_messages(){
+    global $form_messages;
+    $form_messages = array();
+    $_SESSION['mmrpg_forms']['form_messages'] = array();
+}
+
+// Define a function for generating form messages
+function mmrpg_print_form_messages($print = true, $clear = true){
+    global $form_messages;
+    $this_message_markup = '';
+    if (!empty($form_messages)){
+        $this_message_markup .= '<ul class="list">'.PHP_EOL;
+        foreach ($form_messages AS $key => $message){
+            list($type, $text) = $message;
+            $this_message_markup .= '<li class="message '.$type.'">';
+                //$this_message_markup .= ucfirst($type).' : ';
+                $this_message_markup .= $text;
+            $this_message_markup .= '</li>'.PHP_EOL;
+        }
+        $this_message_markup .= '</ul>'.PHP_EOL;
+    }
+    if (!empty($this_message_markup)){
+        $this_message_markup = '<div class="messages">'.$this_message_markup.'</div>';
+    }
+    if ($clear){ mmrpg_clear_form_messages(); }
+    if ($print){ echo $this_message_markup; }
+    else { return $this_message_markup; }
+}
+
+// Define a function for exiting a form action
+function mmrpg_redirect_form_action($location){
+    mmrpg_backup_form_messages();
+    if (!empty($location)){
+        if (!preg_match('/^https?:\/\//', $location)
+            && !strstr($location, MMRPG_CONFIG_ROOTURL)){
+            $location = MMRPG_CONFIG_ROOTURL.ltrim($location, '/');
+        }
+        header('Location: '.$location);
+    }
+    exit();
+}
+
 // Define a function for deleting a directory
 function deleteDir($dirPath) {
     if (! is_dir($dirPath)) {
@@ -1419,6 +1477,11 @@ function arrays_match_ignore_keys($array1, $array2, $keys = array()){
     $new_array1 = array_remove_keys($array1, $keys);
     $new_array2 = array_remove_keys($array2, $keys);
     return arrays_match($new_array1, $new_array2);
+}
+
+// Define an alias function for htmlentities that automatically fills defaults
+function encode_form_value($string, $double_encode = true){
+    return htmlentities($string, ENT_QUOTES, 'UTF-8', $double_encode);
 }
 
 

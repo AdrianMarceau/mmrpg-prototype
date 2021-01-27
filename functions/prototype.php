@@ -419,7 +419,8 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
             DISTINCT(battles.target_user_id) AS target_user_id,
             (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS target_user_name,
             users.user_name_clean AS target_user_token,
-            users.user_colour_token AS target_user_colour
+            users.user_colour_token AS target_user_colour,
+            users.user_colour_token2 AS target_user_colour2
             FROM mmrpg_battles AS battles
             LEFT JOIN mmrpg_users AS users ON battles.target_user_id = users.user_id
             WHERE
@@ -1056,22 +1057,31 @@ function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '
     // If a specific robot token was provided
     if (!empty($player_token) && !empty($robot_token)){
         // Check if this battle has been completed and return true is it was
-        return isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_abilities']) ? count($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_abilities']) : 0;
+        $ability_tokens = isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_abilities']) ? ($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_abilities']) : array();
+        $ability_tokens = array_keys($ability_tokens);
     } elseif (!empty($player_token)){
         // Check if this ability has been unlocked by the player and return true if it was
-        return isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_abilities']) ? count($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_abilities']) : 0;
+        $ability_tokens = isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_abilities']) ? ($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_abilities']) : array();
+        $ability_tokens = array_keys($ability_tokens);
     } else {
         // Define the ability counter and token tracker
         $ability_tokens = $_SESSION[$session_token]['values']['battle_abilities'];
-        foreach ($ability_tokens AS $key => $token){
-            if (!isset($mmrpg_index_abilities[$token])
-                || $mmrpg_index_abilities[$token]['ability_class'] != 'master'){
-                unset($ability_tokens[$key]);
-            }
-        }
-        // Return the total amount of ability tokens pulled
-        return !empty($ability_tokens) ? count($ability_tokens) : 0;
     }
+
+    // Filter the ability tokens to make sure they're actually valid
+    $ability_tokens = array_unique($ability_tokens);
+    foreach ($ability_tokens AS $key => $token){
+        if (!isset($mmrpg_index_abilities[$token])){ unset($ability_tokens[$key]); continue; }
+        $info = $mmrpg_index_abilities[$token];
+        if ($info['ability_class'] != 'master'){ unset($ability_tokens[$key]); }
+        elseif (empty($info['ability_flag_published'])){ unset($ability_tokens[$key]); }
+        elseif (empty($info['ability_flag_complete'])){ unset($ability_tokens[$key]); }
+        elseif (!empty($info['ability_flag_hidden'])){ unset($ability_tokens[$key]); }
+    }
+
+    // Return the total amount of ability tokens pulled
+    return !empty($ability_tokens) ? count($ability_tokens) : 0;
+
 }
 // Define a function for displaying prototype battle option markup
 function mmrpg_prototype_options_markup(&$battle_options, $player_token){
@@ -2277,7 +2287,8 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
             $defeated_leaderboard_players_index =  $db->get_array_list("SELECT
                 DISTINCT(battles.target_user_id) AS target_user_id,
                 users.user_name_clean AS target_user_name,
-                users.user_colour_token As target_user_colour
+                users.user_colour_token As target_user_colour,
+                users.user_colour_token2 As target_user_colour2
                 FROM mmrpg_battles AS battles
                 LEFT JOIN mmrpg_users AS users ON battles.target_user_id = users.user_id
                 WHERE
@@ -2345,6 +2356,7 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
                 mmrpg_users.user_name_clean,
                 mmrpg_users.user_name_public,
                 mmrpg_users.user_colour_token,
+                mmrpg_users.user_colour_token2,
                 mmrpg_users.user_gender,
                 mmrpg_saves.save_values_battle_rewards AS player_rewards,
                 mmrpg_saves.save_values_battle_settings AS player_settings,
@@ -2389,6 +2401,7 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
                 $player['values']['flag_online'] = in_array($player['user_name_clean'], $this_leaderboard_online_usernames) ? 1 : 0;
                 $player['values']['flag_defeated'] = in_array($player['user_name_clean'], $this_leaderboard_defeated_players) ? 1 : 0;
                 $player['values']['colour_token'] = !empty($player['user_colour_token']) ? $player['user_colour_token'] : '';
+                $player['values']['colour_token2'] = !empty($player['user_colour_token2']) ? $player['user_colour_token2'] : '';
 
                 unset($player['values']['battle_shops'], $player['values']['prototype_awards']);
                 unset($player['values']['player_this-item-omega_prototype'], $player['values']['dr-light_this-item-omega_prototype'], $player['values']['dr-wily_this-item-omega_prototype'], $player['values']['dr-cossack_this-item-omega_prototype']);
@@ -2735,6 +2748,247 @@ function mmrpg_prototype_restore_dropped_items($options = array()){
         }
     }
 
+}
+
+// Define a function for collecting a list of allowed avatar options for a given user profile
+function mmrpg_prototype_get_profile_avatar_options($this_userinfo, &$allowed_avatar_options = array()){
+
+    // Collect session token for later
+    $session_token = rpg_game::session_token();
+
+    // Collect the types index for use later in the script
+    $mmrpg_database_types = rpg_type::get_index(true, true, true);
+
+    // Collect a list of robots for use later in the script
+    $mmrpg_database_robots = rpg_robot::get_index();
+
+    // Define an array to hold all the allowed avatar options
+    $allowed_avatar_options = array();
+
+    // Define an array to hold all the HTML avatar options
+    $html_avatar_options = array();
+    $html_avatar_options[] = '<option value="">- Select Robot -</option>';
+
+    // Add all the robot avatars to the list
+    $last_group_token = false;
+    foreach ($mmrpg_database_robots AS $token => $info){
+
+        if ($token == 'robot' || strstr($token, 'copy')){ continue; }
+        elseif (isset($info['robot_image']) && $info['robot_image'] == 'robot'){ continue; }
+        elseif (isset($info['robot_class']) && $info['robot_class'] == 'mecha'){ continue; }
+        elseif (preg_match('/^(DLM)/i', $info['robot_number'])){ continue; }
+        elseif (!rpg_game::sprite_exists(MMRPG_CONFIG_ROOTDIR.'images/robots/'.$token.'/')){ continue; }
+        if (!mmrpg_prototype_robot_unlocked(false, $token) && $this_userinfo['role_id'] != 1){ continue; }
+
+        // If the game has changed print the new optgroup
+        $robot_game_token = $info['robot_game'];
+        if (preg_match('/^(mega-man|proto-man|bass|roll|disco|rhythm)$/i', $token)){ $robot_game_token = 'HEROES'; }
+        if ($robot_game_token != $last_group_token){
+            if (!empty($last_group_token)){ $html_avatar_options[] = '</optgroup>'; }
+            $last_group_token = $robot_game_token;
+            if ($robot_game_token === 'HEROES'){ $last_group_name = 'Mega Man Heroes'; }
+            else { $last_group_name = rpg_game::get_source_name($last_group_token, false).' '.ucfirst(rpg_robot::robot_class_to_noun($info['robot_class'], false, true)); }
+            $html_avatar_options[] = '<optgroup label="'.$last_group_name.'">';
+        }
+
+        $size = isset($info['robot_image_size']) ? $info['robot_image_size'] : 40;
+        $html_avatar_options[] = '<option value="robots/'.$token.'/'.$size.'">'.$info['robot_number'].' : '.$info['robot_name'].'</option>';
+        $allowed_avatar_options[] = 'robots/'.$token.'/'.$size;
+
+        // Collect the summon count for this robot and unlocked alts
+        $temp_summon_count = mmrpg_prototype_database_summoned($token);
+        $temp_alts_unlocked = mmrpg_prototype_altimage_unlocked($token);
+
+        // If this is a copy core, add it's type alts
+        if (isset($info['robot_core']) && $info['robot_core'] == 'copy'){
+            foreach ($mmrpg_database_types AS $type_token => $type_info){
+                if ($type_token == 'none' || $type_token == 'copy' || (isset($type_info['type_class']) && $type_info['type_class'] == 'special')){ continue; }
+                if (!isset($_SESSION[$session_token]['values']['battle_items'][$type_token.'-core']) && $this_userinfo['role_id'] != 1){ continue; }
+                $html_avatar_options[] = '<option value="robots/'.$token.'_'.$type_token.'/'.$size.'">'.$info['robot_number'].' : '.$info['robot_name'].' ('.$type_info['type_name'].' Core)</option>';
+                $allowed_avatar_options[] = 'robots/'.$token.'_'.$type_token.'/'.$size;
+            }
+        }
+        // Otherwise, if this ROBOT MASTER alt skin has been inlocked
+        elseif (!empty($info['robot_image_alts'])){
+            // Loop through each of the available alts and print if unlocked
+            foreach ($info['robot_image_alts'] AS $key => $this_altinfo){
+                // Define the unlocked flag as false to start
+                $alt_unlocked = false;
+                // If this alt is unlocked via summon and we have enough
+                if (!empty($this_altinfo['summons']) && $temp_summon_count >= $this_altinfo['summons']){ $alt_unlocked = true; }
+                // Else if this alt is unlocked via the shop and has been purchased
+                elseif (in_array($this_altinfo['token'], $temp_alts_unlocked)){ $alt_unlocked = true; }
+                // Print the alt option markup if unlocked
+                if ($alt_unlocked){
+                    $html_avatar_options[] = '<option value="robots/'.$token.'_'.$this_altinfo['token'].'/'.$size.'">'.$info['robot_number'].' : '.$this_altinfo['name'].'</option>';
+                    $allowed_avatar_options[] = 'robots/'.$token.'_'.$this_altinfo['token'].'/'.$size;
+                }
+            }
+        }
+
+    }
+    if (!empty($last_group_token)){ $html_avatar_options[] = '</optgroup>'; }
+
+    // Add player avatars if this is the developer
+    if ($this_userinfo['role_id'] == 1 || $this_userinfo['role_id'] == 6){
+        $html_avatar_options[] = '</optgroup>';
+        $html_avatar_options[] = '<optgroup label="Player Characters">';
+        $html_avatar_options[] = '<option value="players/dr-light/40">PLAYER : Dr. Light</option>';
+        $html_avatar_options[] = '<option value="players/dr-wily/40">PLAYER : Dr. Wily</option>';
+        $html_avatar_options[] = '<option value="players/dr-cossack/40">PLAYER : Dr. Cossack</option>';
+        $allowed_avatar_options[] = 'players/dr-light/40';
+        $allowed_avatar_options[] = 'players/dr-wily/40';
+        $allowed_avatar_options[] = 'players/dr-cossack/40';
+    }
+
+    // Add the optgroup closing tag
+    $html_avatar_options[] = '</optgroup>';
+
+    // Return the generated options
+    return implode(PHP_EOL, $html_avatar_options);
+
+}
+
+// Define a function for collecting a list of allowed colour options for a given user profile
+function mmrpg_prototype_get_profile_colour_options($this_userinfo, &$allowed_colour_options = array()){
+
+    // Collect the types index for use later in the script
+    $mmrpg_database_types = rpg_type::get_index(true, true, true);
+
+    // Collect the type index and generate colour option html
+    $sorted_database_types = $mmrpg_database_types;
+    sort($sorted_database_types);
+    $allowed_colour_options = array();
+    $html_colour_options = array();
+    $html_colour_options[] = '<option value="">- Select Type -</option>';
+    $html_colour_options[] = '<option value="none">Neutral Type</option>';
+
+    // Add all the robot avatars to the list
+    foreach ($sorted_database_types AS $token => $info){
+        if ($token == 'none'){ continue; }
+        $html_colour_options[] = '<option value="'.$info['type_token'].'">'.$info['type_name'].' Type</option>';
+        $allowed_colour_options[] = $info['type_token'];
+    }
+
+    // Add player avatars if this is the developer
+    if ($this_userinfo['role_id'] == 1){
+        $html_colour_options[] = '<option value="energy">Energy Type</option>';
+        $html_colour_options[] = '<option value="attack">Attack Type</option>';
+        $html_colour_options[] = '<option value="defense">Defense Type</option>';
+        $html_colour_options[] = '<option value="speed">Speed Type</option>';
+        $allowed_colour_options[] = 'energy';
+        $allowed_colour_options[] = 'attack';
+        $allowed_colour_options[] = 'defense';
+        $allowed_colour_options[] = 'speed';
+    }
+
+    // Return the generated options
+    return implode(PHP_EOL, $html_colour_options);
+
+}
+
+// Define a function for collecting a list of allowed background options for a given user profile
+function mmrpg_prototype_get_profile_background_options($this_userinfo, &$allowed_background_options = array()){
+
+    // Collect session token for later
+    $session_token = rpg_game::session_token();
+
+    // Collect a list of robots for use later in the script
+    $mmrpg_database_robots = rpg_robot::get_index();
+
+    // Collect a list of fields for use later in the script
+    $this_fields_index = rpg_field::get_index();
+
+    // Collect player background omega options
+    require(MMRPG_CONFIG_ROOTDIR.'prototype/omega.php');
+    $temp_omega_factor_options = array();
+    $temp_omega_factor_options['MM1'] = $this_omega_factors_one;
+    $temp_omega_factor_options['MM2'] = $this_omega_factors_two;
+    $temp_omega_factor_options['MM4'] = $this_omega_factors_three;
+    $temp_omega_factor_options['MM3'] = $this_omega_factors_four;
+
+    // Loop through and remove any fields who's robots haven't been encountered yet
+    $session_robot_database = !empty($_SESSION[$session_token]['values']['robot_database']) ? $_SESSION[$session_token]['values']['robot_database'] : array();
+    foreach($temp_omega_factor_options AS $game => $options){
+        foreach($options AS $key => $option){
+            $rtoken = $option['robot'];
+            if (!isset($session_robot_database[$rtoken])
+                || empty($session_robot_database[$rtoken]['robot_unlocked'])){
+                unset($temp_omega_factor_options[$game][$key]);
+            }
+        }
+    }
+    ksort($temp_omega_factor_options);
+
+    // Generate allowed background options and their select markup
+    $temp_optgroup_token = 'MMRPG';
+    $allowed_background_options = array();
+    $html_background_options = array();
+    $html_background_options[] = '<option value="">- Select Field -</option>';
+    $html_background_options[] = '<optgroup label="Intro Fields">';
+    $html_background_options[] = '<option value="fields/gentle-countryside">Gentle Countryside (Neutral Type)</option>';
+    $html_background_options[] = '<option value="fields/maniacal-hideaway">Maniacal Hideaway (Neutral Type)</option>';
+    $html_background_options[] = '<option value="fields/wintry-forefront">Wintry Forefront (Neutral Type)</option>';
+    if (mmrpg_prototype_player_unlocked('dr-light')){ $allowed_background_options[] = 'fields/gentle-countryside'; }
+    if (mmrpg_prototype_player_unlocked('dr-wily')){ $allowed_background_options[] = 'fields/maniacal-hideaway'; }
+    if (mmrpg_prototype_player_unlocked('dr-cossack')){ $allowed_background_options[] = 'fields/wintry-forefront'; }
+
+    // Add all the robot avatars to the list
+    //die('<pre>'.print_r($temp_omega_factor_options, true).'</pre>');
+    foreach ($temp_omega_factor_options AS $omega_game => $omega_array){
+        // If the game has changed print the new optgroup
+        if ($omega_game != $temp_optgroup_token){
+            $temp_optgroup_token = $omega_game;
+            if (preg_match('/^MM([0-9]+)$/', $temp_optgroup_token)){ $temp_optgroup_name = 'Mega Man '.ltrim(str_replace('MM', '', $temp_optgroup_token), '01').' Fields'; }
+            else { $temp_optgroup_name = 'Mega Man '.str_replace('MM', '', $temp_optgroup_token).' Fields'; }
+            $html_background_options[] = '</optgroup>';
+            $html_background_options[] = '<optgroup label="'.$temp_optgroup_name.'">';
+        }
+        foreach ($omega_array AS $omega_key => $omega_info){
+            if (empty($this_fields_index[$omega_info['field']])){ continue; }
+            $robot_info = $mmrpg_database_robots[$omega_info['robot']];
+            $field_info = $this_fields_index[$omega_info['field']];
+            $html_background_options[] = '<option value="fields/'.$field_info['field_token'].'">'.
+                $field_info['field_name'].
+                (!empty($field_info['field_type']) ? ' ('.ucfirst($field_info['field_type']).' Type)' : '').
+                '</option>';
+            $allowed_background_options[] = 'fields/'.$field_info['field_token'];
+        }
+    }
+    $html_background_options[] = '</optgroup>';
+
+    // Return the generated options
+    return implode(PHP_EOL, $html_background_options);
+
+}
+
+// Define a function for formatting user data into session-format for later reference
+function mmrpg_prototype_format_user_data_for_session($this_userinfo){
+    $session_user = array();
+    $session_user['userid'] = $this_userinfo['user_id'];
+    $session_user['roleid'] = $this_userinfo['role_id'];
+    $session_user['username'] = $this_userinfo['user_name'];
+    $session_user['username_clean'] = $this_userinfo['user_name_clean'];
+    $session_user['password'] = '';
+    $session_user['password_encoded'] = '';
+    $session_user['omega'] = $this_userinfo['user_omega'];
+    $session_user['profiletext'] = $this_userinfo['user_profile_text'];
+    $session_user['creditstext'] = $this_userinfo['user_credit_text'];
+    $session_user['creditsline'] = $this_userinfo['user_credit_line'];
+    $session_user['imagepath'] = $this_userinfo['user_image_path'];
+    $session_user['backgroundpath'] = $this_userinfo['user_background_path'];
+    $session_user['colourtoken'] = $this_userinfo['user_colour_token'];
+    $session_user['colourtoken2'] = $this_userinfo['user_colour_token2'];
+    $session_user['gender'] = $this_userinfo['user_gender'];
+    $session_user['displayname'] = $this_userinfo['user_name_public'];
+    $session_user['emailaddress'] = $this_userinfo['user_email_address'];
+    $session_user['websiteaddress'] = $this_userinfo['user_website_address'];
+    $session_user['dateofbirth'] = $this_userinfo['user_date_birth'];
+    $session_user['approved'] = $this_userinfo['user_flag_approved'];
+    $session_user['userinfo'] = $this_userinfo;
+    unset($session_user['userinfo']['user_password']);
+    unset($session_user['userinfo']['user_password_encoded']);
+    return $session_user;
 }
 
 ?>

@@ -1559,3 +1559,70 @@ function prototype_update_leaderboard_rank(newRank){
     var thisRankContainer = $('.banner .points .amount .place', thisPrototype);
     thisRankContainer.html(newRank);
 }
+
+// Define a function for updating profile settings (name, avatar, etc.) in the prototype banner
+function prototype_update_profile_settings(newSettings){
+    if (typeof newSettings === 'undefined'){ return false; }
+    //console.log('prototype_update_profile_settings(newSettings)', newSettings);
+    // Collect references to profile-affected elements in the prototype banner
+    var $protoBanner = $('.banner', thisPrototype);
+    var $userInfo = $('.options_userinfo', $protoBanner);
+    var $userNameDisplay = $('.info_username label', $userInfo);
+    var $userImageSprite = $('.sprite_wrapper .sprite.base', $userInfo);
+    var $userImageShadow = $('.sprite_wrapper .sprite.shadow', $userInfo);
+    var $fieldTypeElements = $('.field_type', $protoBanner);
+    var $headerTypeElements = $('.menu .header.header_types', thisPrototype);
+    //console.log('$userInfo.length = ', $userInfo.length);
+    //console.log('$userNameDisplay.length = ', $userNameDisplay.length);
+    //console.log('$userImageSprite.length = ', $userImageSprite.length);
+    //console.log('$userImageShadow.length = ', $userImageShadow.length);
+    //console.log('$fieldTypeElements.length = ', $fieldTypeElements.length);
+    //console.log('$headerTypeElements.length = ', $headerTypeElements.length);
+    // If a new display name was provided, update it in the banner
+    if (typeof newSettings['user_name_display'] !== 'undefined'
+        && newSettings['user_name_display'].length
+        && $userNameDisplay.length){
+        var displayName = newSettings['user_name_display'];
+        $userNameDisplay.html(displayName);
+        }
+    // If a new avatar image was provided, update it in the banner
+    if (typeof newSettings['user_image_path'] !== 'undefined'
+        && newSettings['user_image_path'].length
+        && $userImageSprite.length
+        && $userImageShadow.length){
+        var imageParts = newSettings['user_image_path'].split('/');
+        var imageSize = imageParts[2] + 'x' + imageParts[2];
+        var imagePath = 'images/' + imageParts[0] + '/' + imageParts[1] + '/';
+        var imageName = 'sprite_left_' + imageSize + '.png';
+        var spriteMarkup = '<span class="sprite sprite_'+imageSize+' sprite_'+imageSize+'_00" style="background-image: url('+imagePath+imageName+'?'+gameSettings.cacheTime+');"></span>';
+        $userImageSprite.empty().append(spriteMarkup);
+        $userImageShadow.empty().append(spriteMarkup);
+        }
+    // If new profile colour/colours were provided, update them in the banner
+    if (typeof newSettings['user_colour_token'] !== 'undefined'
+        && $fieldTypeElements.length){
+        var newColourToken = newSettings['user_colour_token'];
+        if (newColourToken.length){
+            if (typeof newSettings['user_colour_token2'] !== 'undefined'
+                && newSettings['user_colour_token2'].length){
+                newColourToken += '_'+newSettings['user_colour_token2'];
+                }
+            } else {
+            newColourToken = 'none';
+            }
+        $fieldTypeElements.each(function(){
+            var $thisElement = $(this);
+            $thisElement.attr('class', function(i, c){
+                return c.replace(/(^|\s)field_type_[-_a-z]+($|\s)+/g, '$1$2');
+                }).addClass('field_type_'+newColourToken);
+            });
+        $headerTypeElements.each(function(){
+            var $thisElement = $(this);
+            $thisElement.attr('class', function(i, c){
+                return c.replace(/(^|\s)type_[-_a-z]+($|\s)+/g, '$1$2');
+                }).addClass('type_'+newColourToken);
+            });
+        }
+    // Return true on success
+    return true;
+}

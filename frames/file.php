@@ -1,4 +1,9 @@
 <?
+
+// Deprecate this old page (remove it completed later)
+echo('Legacy "file" frame is no longer used!');
+die();
+
 // Require the application top file
 require_once('../top.php');
 

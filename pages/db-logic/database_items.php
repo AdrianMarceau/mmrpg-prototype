@@ -74,7 +74,7 @@ ob_start();
         <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
             <span class="subheader_typewrapper">
                 <a class="inline_link" href="database/items/">Item Database</a>
-                <span class="count">( <?= $mmrpg_database_items_count_complete ?> / <?= $mmrpg_database_items_count == 1 ? '1 Item' : $mmrpg_database_items_count.' Items' ?> )</span>
+                <span class="count">( <?= $mmrpg_database_items_count_complete != $mmrpg_database_items_count ? $mmrpg_database_items_count_complete.' / ' : '' ?><?= $mmrpg_database_items_count == 1 ? '1 Item' : $mmrpg_database_items_count.' Items' ?> )</span>
                 <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?>
             </span>
         </h2>
@@ -151,8 +151,10 @@ ob_start();
     if (empty($this_current_token)){
         ?>
         <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">
-            Item Listing
-            <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?>
+            <span class="subheader_typewrapper">
+                Item Listing
+                <?= isset($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Type )</span>' : '' ?>
+            </span>
         </h2>
         <?php
     }

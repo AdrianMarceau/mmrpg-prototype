@@ -38,6 +38,14 @@ elseif ($temp_display_points > 0 && $temp_last_login_diff >= MMRPG_SETTINGS_LEGA
 elseif ($temp_display_points > 0 && $temp_last_login_diff >= MMRPG_SETTINGS_ACTIVE_TIMEOUT){ $temp_display_active = 'an inactive player'; }
 elseif ($temp_display_points > 0 && $temp_last_login_diff < MMRPG_SETTINGS_ACTIVE_TIMEOUT){ $temp_display_active = 'an active player'; }
 
+// Determine the header colour(s) to show for this leaderboard page
+$temp_header_colour_token = !empty($this_playerinfo['user_colour_token']) ? $this_playerinfo['user_colour_token'] : 'none';
+if (!empty($this_playerinfo['user_colour_token2'])){ $temp_header_colour_token .= '_'.$this_playerinfo['user_colour_token2']; }
+
+// Determine the subheader colour(s) to show for this leaderboard page
+$temp_subheader_colour_token = !empty($this_playerinfo['user_colour_token']) ? $this_playerinfo['user_colour_token'] : 'none';
+$temp_subheader_colour_token2 = !empty($this_playerinfo['user_colour_token2']) ? $this_playerinfo['user_colour_token2'] : $temp_subheader_colour_token;
+
 // Collect the robot index for later use
 $hidden_database_robots = array('robot', 'mega-man-ds', 'proto-man-ds', 'bass-ds', 'rock', 'cache', 'bond-man', 'fake-man');
 foreach ($hidden_database_robots AS $key => $token){ $hidden_database_robots[$key] = "'".$token."'"; }
@@ -280,12 +288,12 @@ if (true || strstr($page_content_parsed, $find)){
 
         <div class="community leaderboard">
             <div class="subbody thread_subbody thread_subbody_full thread_subbody_full_right thread_right" style="text-align: left; position: relative; padding-bottom: 0; margin-bottom: 4px;">
-                <div class="<?= $temp_avatar_class ?> avatar_fieldback player_type_<?= !empty($this_playerinfo['user_colour_token']) ? $this_playerinfo['user_colour_token'] : 'none' ?>" style="border-width: 1px; margin-top: 0; margin-right: 0;">
+                <div class="<?= $temp_avatar_class ?> avatar_fieldback player_type_<?= $temp_header_colour_token ?>" style="border-width: 1px; margin-top: 0; margin-right: 0;">
                     <div class="<?= $temp_avatar_class ?> avatar_fieldback" style="background-image: url(<?= !empty($temp_background_path) ? $temp_background_path : 'images/fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN.'/battle-field_preview.png' ?>?<?=MMRPG_CONFIG_CACHE_DATE?>); background-size: 80px 80px;">
                         &nbsp;
                     </div>
                 </div>
-                <div class="<?= $temp_avatar_class ?> avatar_userimage" style="margin-top: 0;"  title="<?= isset($temp_item_title) ? $temp_item_title : 'Member' ?>" data-tooltip-type="type player_type_<?= !empty($this_playerinfo['user_colour_token']) ? $this_playerinfo['user_colour_token'] : 'none' ?>">
+                <div class="<?= $temp_avatar_class ?> avatar_userimage" style="margin-top: 0;"  title="<?= isset($temp_item_title) ? $temp_item_title : 'Member' ?>" data-tooltip-type="type player_type_<?= $temp_header_colour_token ?>">
                     <? if($temp_is_contributor): ?><div class="<?= $temp_item_class ?>" style="background-image: url(<?= $temp_item_path ?>); background-size: auto 80px; position: absolute; top: -22px; right: -30px;" alt="<?= $temp_item_title ?>"><?= $temp_item_title ?></div><? endif; ?>
                     <div class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>); background-size: auto <?= $temp_avatar_size ?>px;"><?= $temp_display_name ?></div>
                 </div>
@@ -362,8 +370,7 @@ if (true || strstr($page_content_parsed, $find)){
                 </div>
             </div>
 
-            <? $temp_colour_token = !empty($this_playerinfo['user_colour_token']) ? $this_playerinfo['user_colour_token'] : 'none'; ?>
-            <h2 class="subheader field_type_<?= $temp_colour_token ?>" style="margin: 10px 0 4px; text-align: left;">
+            <h2 class="subheader field_type_<?= $temp_header_colour_token ?>" style="margin: 10px 0 4px; text-align: left;">
                 <?=$temp_display_name?>&#39;s Leaderboard
                 <? /*<span class="count" style="position: relative; bottom: 1px;"><?
                     // Add the prototype complete flags if applicable
@@ -377,28 +384,28 @@ if (true || strstr($page_content_parsed, $find)){
 
             <div id="game_container" class="subbody thread_subbody thread_subbody_full thread_subbody_full_right thread_right event event_triple event_visible <?= in_array($this_current_token, array('robots', 'players', 'database', 'items', 'stars')) ? 'has_iframe' : '' ?>" style="text-align: left; position: relative; padding-bottom: 6px; margin-bottom: 4px;">
 
-                <div id="game_buttons" data-fieldtype="<?= !empty($this_playerinfo['user_colour_token']) ? $this_playerinfo['user_colour_token'] : 'none' ?>" class="field">
+                <div id="game_buttons" data-fieldtype="<?= $temp_header_colour_token ?>" class="field">
 
                     <div class="row top">
 
-                        <a class="link_button profile field_type field_type_<?= $temp_colour_token ?> <?= empty($this_current_token) ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/' ?>">View Profile</a>
+                        <a class="link_button profile field_type field_type_<?= $temp_subheader_colour_token ?> <?= empty($this_current_token) ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/' ?>">View Profile</a>
 
                         <? if(!empty($temp_show_threads)): ?>
-                            <a class="link_button threads field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'threads' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'community/search/&player='.$this_playerinfo['user_name_clean'].'&player_strict=true&display=threads&limit=threads' ?>">View Threads</a>
+                            <a class="link_button threads field_type field_type_<?= $temp_subheader_colour_token ?> <?= $this_current_token == 'threads' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'community/search/&player='.$this_playerinfo['user_name_clean'].'&player_strict=true&display=threads&limit=threads' ?>">View Threads</a>
                         <? endif; ?>
 
                         <? if(!empty($temp_show_posts)): ?>
-                            <a class="link_button posts field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'posts' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'community/search/&player='.$this_playerinfo['user_name_clean'].'&player_strict=true&display=posts&limit=posts' ?>">View Posts</a>
+                            <a class="link_button posts field_type field_type_<?= $temp_subheader_colour_token ?> <?= $this_current_token == 'posts' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'community/search/&player='.$this_playerinfo['user_name_clean'].'&player_strict=true&display=posts&limit=posts' ?>">View Posts</a>
                         <? endif; ?>
 
                         <? if (!rpg_user::is_guest() && $this_userid != $this_playerinfo['user_id'] && !empty($this_userinfo['user_flag_postprivate'])): ?>
-                            <a class="link_button message field_type field_type_<?= $temp_colour_token ?>" href="community/personal/0/new/<?= $this_playerinfo['user_name_clean'] ?>/">Send Message</a>
+                            <a class="link_button message field_type field_type_<?= $temp_subheader_colour_token ?>" href="community/personal/0/new/<?= $this_playerinfo['user_name_clean'] ?>/">Send Message</a>
                         <? endif; ?>
 
                         <? if (!empty($this_playerinfo['user_website_address']) && preg_match('/^([^@]+)@([^@]+)$/i', $this_playerinfo['user_website_address'])): ?>
-                            <a class="link_button website field_type field_type_<?= $temp_colour_token ?>" href="mailto:<?= $this_playerinfo['user_website_address'] ?>" target="_blank">Send Email</a>
+                            <a class="link_button website field_type field_type_<?= $temp_subheader_colour_token ?>" href="mailto:<?= $this_playerinfo['user_website_address'] ?>" target="_blank">Send Email</a>
                         <? elseif (!empty($this_playerinfo['user_website_address'])): ?>
-                            <a class="link_button field_type field_type_<?= $temp_colour_token ?>" href="<?= $this_playerinfo['user_website_address'] ?>" target="_blank">Visit Website <i class="fas fa fa-external-link-alt"></i></a>
+                            <a class="link_button field_type field_type_<?= $temp_subheader_colour_token ?>" href="<?= $this_playerinfo['user_website_address'] ?>" target="_blank">Visit Website <i class="fas fa fa-external-link-alt"></i></a>
                         <? endif; ?>
 
                     </div>
@@ -406,22 +413,22 @@ if (true || strstr($page_content_parsed, $find)){
                     <div class="row bottom">
 
                         <? if(!empty($temp_display_points)): ?>
-                            <a class="link_button points field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'points' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/points/' ?>">Points</a>
+                            <a class="link_button points field_type field_type_<?= $temp_subheader_colour_token2 ?> <?= $this_current_token == 'points' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/points/' ?>">Points</a>
                         <? endif; ?>
 
-                        <a class="link_button robots field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'robots' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/robots/' ?>">Robots</a>
+                        <a class="link_button robots field_type field_type_<?= $temp_subheader_colour_token2 ?> <?= $this_current_token == 'robots' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/robots/' ?>">Robots</a>
 
                         <? if(!empty($temp_show_players)): ?>
-                            <a class="link_button players field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'players' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/players/' ?>">Players</a>
+                            <a class="link_button players field_type field_type_<?= $temp_subheader_colour_token2 ?> <?= $this_current_token == 'players' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/players/' ?>">Players</a>
                         <? endif; ?>
 
-                        <a class="link_button database field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'database' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/database/' ?>">Database</a>
+                        <a class="link_button database field_type field_type_<?= $temp_subheader_colour_token2 ?> <?= $this_current_token == 'database' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/database/' ?>">Database</a>
 
                         <? if(!empty($temp_show_items)): ?>
-                            <a class="link_button items field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'items' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/items/' ?>">Items</a>
+                            <a class="link_button items field_type field_type_<?= $temp_subheader_colour_token2 ?> <?= $this_current_token == 'items' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/items/' ?>">Items</a>
                         <? endif; ?>
                         <? if(!empty($temp_show_stars)): ?>
-                            <a class="link_button stars field_type field_type_<?= $temp_colour_token ?> <?= $this_current_token == 'stars' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/stars/' ?>">Stars</a>
+                            <a class="link_button stars field_type field_type_<?= $temp_subheader_colour_token2 ?> <?= $this_current_token == 'stars' ? 'active' : '' ?>" href="<?= MMRPG_CONFIG_ROOTURL.'leaderboard/'.$this_playerinfo['user_name_clean'].'/stars/' ?>">Stars</a>
                         <? endif; ?>
 
                     </div>
@@ -578,7 +585,7 @@ if (true || strstr($page_content_parsed, $find)){
                             <thead>
                                 <tr>
                                     <th colspan="3">
-                                        <h3 class="table_head field_type field_type_<?= $temp_colour_token ?>">
+                                        <h3 class="table_head field_type field_type_<?= $temp_header_colour_token ?>">
                                             <span>Battle Points Overview</span>
                                         </h3>
                                         <a class="toggle"><span>+ / -</span></a>
@@ -588,7 +595,7 @@ if (true || strstr($page_content_parsed, $find)){
                             <tfoot>
                                 <tr>
                                     <td colspan="3">
-                                        <h4 class="table_foot field_type field_type_<?= $temp_colour_token ?>">
+                                        <h4 class="table_foot field_type field_type_<?= $temp_header_colour_token ?>">
                                             <span>
                                                 <span class="label">Total Battle Points</span>
                                                 <span class="total"><?= number_format($battle_points_index['total_battle_points'], 0, '.', ',') ?> BP</span>

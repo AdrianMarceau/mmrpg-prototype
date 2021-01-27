@@ -40,35 +40,22 @@ function mmrpg_load_game_session(){
         // LOAD DATABASE INFO
 
         // Collect the user and save info from the database
+
         $this_database_save = $db->get_array("SELECT * FROM mmrpg_saves WHERE user_id = {$login_user_id} LIMIT 1");
-        $this_database_user = $db->get_array("SELECT * FROM mmrpg_users WHERE user_id = {$login_user_id} LIMIT 1");
         if (empty($this_database_save)){ die('could not load save for file '.$temp_matches[2].' and path '.$temp_matches[1].' on line '.__LINE__); }
+
+        $temp_user_fields = rpg_user::get_index_fields(true, 'users');
+        $temp_user_role_fields = rpg_user_role::get_index_fields(true, 'roles');
+        $this_database_user = $db->get_array("SELECT {$temp_user_fields}, {$temp_user_role_fields} FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$login_user_id}' LIMIT 1");
         if (empty($this_database_user)){ die('could not load user for '.$this_database_save['user_id'].' on line '.__LINE__); }
+
 
         // Update the game session with database extracted variables
         $new_game_data = array();
 
         $new_game_data['CACHE_DATE'] = $this_database_save['save_cache_date'];
 
-        $new_game_data['USER']['userid'] = $this_database_user['user_id'];
-        $new_game_data['USER']['roleid'] = $this_database_user['role_id'];
-        $new_game_data['USER']['username'] = $this_database_user['user_name'];
-        $new_game_data['USER']['username_clean'] = $this_database_user['user_name_clean'];
-        $new_game_data['USER']['password'] = '';
-        $new_game_data['USER']['password_encoded'] = '';
-        $new_game_data['USER']['omega'] = $this_database_user['user_omega'];
-        $new_game_data['USER']['profiletext'] = $this_database_user['user_profile_text'];
-        $new_game_data['USER']['creditstext'] = $this_database_user['user_credit_text'];
-        $new_game_data['USER']['creditsline'] = $this_database_user['user_credit_line'];
-        $new_game_data['USER']['imagepath'] = $this_database_user['user_image_path'];
-        $new_game_data['USER']['backgroundpath'] = $this_database_user['user_background_path'];
-        $new_game_data['USER']['colourtoken'] = $this_database_user['user_colour_token'];
-        $new_game_data['USER']['gender'] = $this_database_user['user_gender'];
-        $new_game_data['USER']['displayname'] = $this_database_user['user_name_public'];
-        $new_game_data['USER']['emailaddress'] = $this_database_user['user_email_address'];
-        $new_game_data['USER']['websiteaddress'] = $this_database_user['user_website_address'];
-        $new_game_data['USER']['dateofbirth'] = $this_database_user['user_date_birth'];
-        $new_game_data['USER']['approved'] = $this_database_user['user_flag_approved'];
+        $new_game_data['USER'] = mmrpg_prototype_format_user_data_for_session($this_database_user);
 
         $new_game_data['counters'] = !empty($this_database_save['save_counters']) ? json_decode($this_database_save['save_counters'], true) : array();
         $new_game_data['values'] = !empty($this_database_save['save_values']) ? json_decode($this_database_save['save_values'], true) : array();

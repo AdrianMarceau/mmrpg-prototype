@@ -94,6 +94,13 @@ $flag_battle_counts = $this_battle->battle_counts ? true : false;
 // Define the first event body markup, regardless of player type
 $first_event_header = $this_battle->battle_name.' <span style="opacity:0.25;">|</span> '.$this_battle->battle_field->field_name;
 $first_event_body = $this_battle->battle_description.'<br />';
+if (!empty($this_battle->flags['player_battle'])){
+    $first_event_body = str_replace(
+        'Defeat '.$target_player->player_name,
+        'Defeat '.$target_player->print_name(true),
+        $first_event_body
+        );
+}
 
 // If this is an ENDLESS ATTACK MODE mission, display the counter
 if (!empty($this_battle->flags['challenge_battle'])

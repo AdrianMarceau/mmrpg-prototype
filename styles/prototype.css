@@ -269,6 +269,10 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     font-size: 16px;
     line-height: 20px;
     color: #DFDFDF;
+    padding-left: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 #prototype .banner .points .amount,
 #prototype .banner .subpoints .amount {
@@ -399,7 +403,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 }
 #prototype .banner .options .link i {
     margin-right: -2px;
-    font-size: 80%;
+    font-size: 90%;
 }
 #prototype .banner .options .pipe {
     padding: 0 4px;
@@ -463,8 +467,41 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     opacity: 1.0;
 }
 
-#prototype .banner .options_userinfo .sprite_40x40_00 {
+#prototype .banner .options_userinfo .sprite_wrapper {
+    display: block;
+    position: absolute;
+    bottom: 6px;
+    right: 4px;
+    z-index: 100;
+    width: 40px;
+    height: 40px;
+}
+#prototype .banner .options_userinfo .sprite_wrapper .sprite {
 
+}
+#prototype .banner .options_userinfo .sprite_wrapper .sprite .sprite {
+    bottom: 0;
+    right: 0;
+    pointer-events: none;
+}
+#prototype .banner .options_userinfo .sprite_wrapper .sprite.base {
+    bottom: 2px;
+    right: 2px;
+    z-index: 2;
+}
+#prototype .banner .options_userinfo .sprite_wrapper .sprite.shadow {
+    bottom: 0;
+    right: 0;
+    z-index: 1;
+    -webkit-filter: brightness(0);
+    -moz-filter: brightness(0);
+    -o-filter: brightness(0);
+    -ms-filter: brightness(0);
+    filter: brightness(0);
+    opacity: 0.2;
+}
+#prototype .banner .options_userinfo .sprite_wrapper .sprite_40x40 .sprite_80x80 {
+    right: -20px;
 }
 #prototype .banner .options_userinfo:hover .sprite_40x40_00 {
     background-position: -80px 0;
@@ -557,7 +594,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .banner .options_userinfo .wrapper {
     display: block;
     margin: 0;
-    padding: 1px 44px 1px 16px;
+    padding: 1px 38px 1px 16px;
     min-width: 140px;
     height: 26px;
     -moz-border-radius: 26px 0 0 0;
@@ -725,6 +762,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .header_types {
     background-image: url(../images/menus/menu-options_header-gradient.png?4);
     border-color: #1A1A1A !important;
+    position: relative;
 }
 #prototype .header_types[data-player="dr-light"] {
     background-image: url(../images/menus/menu-options_this-dr-light-player-select.gif);
@@ -735,6 +773,34 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .header_types[data-player="dr-cossack"] {
     background-image: url(../images/menus/menu-options_this-dr-cossack-player-select.gif);
 }
+
+#prototype .header_types {
+    overflow: hidden;
+    background-image: none;
+}
+#prototype .header_types:before {
+    content: "";
+    display: block;
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url(../images/menus/menu-options_header-gradient.png?2020);
+    background-position: center center;
+    background-repeat: repeat;
+    background-size: auto;
+}
+#prototype .header_types .count {
+    position: relative;
+    z-index: 2;
+}
+#prototype .header_types[data-player]:before {
+    display: none;
+}
+
+
 
 #prototype .header_types .count,
 #prototype .header_dr-light .count,
