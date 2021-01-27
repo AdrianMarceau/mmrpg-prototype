@@ -594,7 +594,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .banner .options_userinfo .wrapper {
     display: block;
     margin: 0;
-    padding: 1px 44px 1px 16px;
+    padding: 1px 38px 1px 16px;
     min-width: 140px;
     height: 26px;
     -moz-border-radius: 26px 0 0 0;

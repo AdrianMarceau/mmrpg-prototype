@@ -626,7 +626,7 @@ if (!empty($_REQUEST['current_tab']) && in_array($_REQUEST['current_tab'], $allo
 
             <span class="header block_1 header_types type_<?= defined('MMRPG_SETTINGS_REMOTE_FIELDTYPE') ? MMRPG_SETTINGS_REMOTE_FIELDTYPE : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                 <span class="count">
-                    <i class="fa fas fa-cogs"></i>
+                    <i class="fa fas fa-cog"></i>
                     Game Settings
                 </span>
             </span>
