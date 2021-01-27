@@ -50,15 +50,17 @@ if (!in_array('robot_flag_fightable', $robots_table_columns)){
         ;");
 
     // Manually update the JSON data for all the robots (masters, mechas, bosses) that have had their data updates
-    echo('- updating JSON data for all robots that have had `robot_flag_fightable` set to true'.PHP_EOL);
-    $temp_robot_fields = rpg_robot::get_index_fields(true);
-    $updated_robots_list = $db->get_array_list("SELECT
-        {$temp_robot_fields}
-        FROM `{$robots_table}`
-        WHERE `robot_flag_fightable` = 1
-        ;", 'robot_token');
-    foreach ($updated_robots_list AS $robot_token => $robot_info){
-        cms_admin::object_editor_update_json_data_file('robot', $robot_info);
+    if (MMRPG_CONFIG_SERVER_ENV === 'local' || MMRPG_CONFIG_SERVER_ENV === 'dev'){
+        echo('- updating JSON data for all robots that have had `robot_flag_fightable` set to true'.PHP_EOL);
+        $temp_robot_fields = rpg_robot::get_index_fields(true);
+        $updated_robots_list = $db->get_array_list("SELECT
+            {$temp_robot_fields}
+            FROM `{$robots_table}`
+            WHERE `robot_flag_fightable` = 1
+            ;", 'robot_token');
+        foreach ($updated_robots_list AS $robot_token => $robot_info){
+            cms_admin::object_editor_update_json_data_file('robot', $robot_info);
+        }
     }
 
 }
