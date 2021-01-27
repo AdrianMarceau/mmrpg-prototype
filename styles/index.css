@@ -1009,7 +1009,7 @@ button {
         color-stop(1, rgba(0,0,0,0.25))
     );
     background-position: 0 0;
-
+    pointer-events: none;
 }
 #window .page .body .subheader[class*="field_type_"] .subheader_typewrapper {
     display: block;
