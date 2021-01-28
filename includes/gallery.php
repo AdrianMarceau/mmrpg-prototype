@@ -80,7 +80,8 @@ foreach ($raw_gallery_paths AS $key => $rel_path){
     // Generate the href and thumb path for this file
     $replace_rooturl = $using_gallery_cdn ? MMRPG_CONFIG_CDN_ROOTURL : MMRPG_CONFIG_ROOTURL;
     $file_href = str_replace($replace_rooturl, '', $this_gallery_baseurl.$rel_path);
-    $file_thumb = str_replace($replace_rooturl, '', $this_gallery_baseurl.'thumbs/'.preg_replace('/\.(png|gif|jpg)$/i', '_thumb.jpg', str_replace('/', '_', $rel_path)));
+    //$file_thumb = str_replace($replace_rooturl, '', $this_gallery_baseurl.'thumbs/'.preg_replace('/\.(png|gif|jpg)$/i', '_thumb.jpg', str_replace('/', '_', $rel_path)));
+    $file_thumb = 'thumbs/300x0/'.str_replace($replace_rooturl, '', $this_gallery_baseurl.$rel_path);
 
     // Generate the markup for this gallery image
     $this_title = trim($file_name);

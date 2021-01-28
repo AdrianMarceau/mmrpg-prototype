@@ -1917,7 +1917,7 @@ class rpg_game {
         // Otherwise we need to collect the list and add it to the local cache
         $url = MMRPG_CONFIG_CDN_ROOTURL.$project.'/'.rtrim($content, '/').'/index';
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, (MMRPG_CONFIG_IS_LIVE ? true : false));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_URL, $url);
