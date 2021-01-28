@@ -3445,7 +3445,9 @@ class rpg_robot extends rpg_object {
                             <?= $robot_info['robot_name'].$robot_info['robot_name_append'] ?>
                         <? } ?>
                         <? if ($robot_info['robot_class'] == 'master' && empty($robot_info['robot_flag_unlockable'])){ ?>
-                            <span class="not_unlockable" data-tooltip-type="<?= $robot_header_types ?>" title="* This robot cannot be unlocked right now">*</span>
+                            <span class="not_unlockable" data-tooltip-type="<?= $robot_header_types ?>" title="* This robot can be encountered in-game but cannot be unlocked yet">*</span>
+                        <? } elseif ($robot_info['robot_class'] != 'master' && empty($robot_info['robot_flag_fightable'])){ ?>
+                            <span class="not_fightable" data-tooltip-type="<?= $robot_header_types ?>" title="* This <?= $robot_info['robot_class'] ?> cannot be encountered in-game yet">*</span>
                         <? } ?>
                         <div class="header_core robot_type"><?= !empty($robot_info['robot_core']) ? ucwords($robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? ' / '.$robot_info['robot_core2'] : '')) : 'Neutral' ?><?= $robot_info['robot_class'] == 'mecha' ? ' Type' : ' Core' ?></div>
                     </h2>
