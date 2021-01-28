@@ -1020,6 +1020,10 @@ button {
     line-height: 17px;
     right: 0;
 }
+#window .page .body .subheader.subheader_button:before,
+#window .page .body .subheader.thread_posts_count:before {
+    display: none;
+}
 
 #window .page .body .subbody {
     display: block;

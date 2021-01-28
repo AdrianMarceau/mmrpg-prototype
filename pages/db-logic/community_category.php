@@ -44,7 +44,7 @@ if (strstr($page_content_parsed, $find)){
             $this_threads_count_new = !empty($_SESSION['COMMUNITY']['threads_new_categories'][$this_category_info['category_id']]) ? $_SESSION['COMMUNITY']['threads_new_categories'][$this_category_info['category_id']] : 0;
             if ($this_threads_count_new > 0){
                 ?>
-                <div class="subheader thread_name field_type field_type_electric" style="float: right; margin: 0 0 0 10px; overflow: hidden; text-align: center; border: 1px solid rgba(0, 0, 0, 0.30); ">
+                <div class="subheader subheader_button thread_name field_type field_type_electric" style="float: right; margin: 0 0 0 10px; overflow: hidden; text-align: center; border: 1px solid rgba(0, 0, 0, 0.30); ">
                     <a class="link" href="community/<?= $this_category_info['category_token'] ?>/new/" style="margin-top: 0;"><?= $this_threads_count_new == 1 ? 'View 1 Updated Thread' : 'View '.$this_threads_count_new.' Updated Threads' ?> &raquo;</a>
                 </div>
                 <?
@@ -65,7 +65,7 @@ if (strstr($page_content_parsed, $find)){
                 && !empty($this_userinfo['user_flag_postpublic'])
                 ){
                 ?>
-                <div class="subheader thread_name" style="float: right; margin: 0 0 0 10px; overflow: hidden; text-align: center; border: 1px solid rgba(0, 0, 0, 0.30); ">
+                <div class="subheader subheader_button thread_name" style="float: right; margin: 0 0 0 10px; overflow: hidden; text-align: center; border: 1px solid rgba(0, 0, 0, 0.30); ">
                     <a class="link" href="community/<?= $this_category_info['category_token'] ?>/0/new/" style="margin-top: 0;">Create New Discussion &raquo;</a>
                 </div>
                 <?
