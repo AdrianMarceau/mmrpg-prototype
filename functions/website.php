@@ -305,21 +305,23 @@ function mmrpg_formatting_encode($string){
 }
 
 // Define a function for printing out the formatting options in text
-function mmrpg_formatting_help(){
+function mmrpg_formatting_help_markup(){
 
     // Start the output buffer and prepare to collect contents
     ob_start();
     // Include the website formatting text file for reference
-    require(MMRPG_CONFIG_ROOTDIR.'functions/website_formatting.php');
+    require(MMRPG_CONFIG_ROOTDIR.'functions/website_formatting.v2.php');
     // Collect the output buffer contents into a variable
-    $this_formatting = nl2br(mmrpg_formatting_decode(ob_get_clean()));
+    $this_formatting = ob_get_clean();
+    $this_formatting = normalize_line_endings($this_formatting);
+    $this_formatting = nl2br(mmrpg_formatting_decode($this_formatting));
 
     // Start the output buffer and prepare to collect contents
     ob_start();
     ?>
     <div class="community bodytext">
-        <div class="formatting formatting_expanded">
-            <a class="link_inline toggle" href="#">- Hide Formatting Options</a>
+        <div class="formatting">
+            <h3>Community Formatting Guide</h3>
             <div class="wrapper">
                 <?= $this_formatting ?>
             </div>
@@ -330,6 +332,23 @@ function mmrpg_formatting_help(){
     $this_markup = ob_get_clean();
 
     // Return the collected output buffer contents
+    return $this_markup;
+
+}
+
+// Define a function for printing out the formatting options in text
+function mmrpg_formatting_help(){
+
+    // Generate and return markup for a community formatting link// Start the output buffer and prepare to collect contents
+    ob_start();
+    ?>
+    <div class="community bodytext">
+        <div class="formatting">
+            <a class="link_inline" data-popup="community-formatting-help">+ Show Formatting Guide</a>
+        </div>
+    </div>
+    <?
+    $this_markup = ob_get_clean();
     return $this_markup;
 
 }

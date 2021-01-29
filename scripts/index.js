@@ -222,68 +222,122 @@ $(document).ready(function(){
 
 
     /*
-     * COMMUNITY EVENTS
+     * WEBSITE POPUPS
      */
 
-    // Create a reference to any community container
-    var thisCommunity = $('.community');
-    // Ensure there is a community block to work with
-    if (thisCommunity.length){
+    // Define functionality for showing custom popups on the website
+    (function(){
 
-        // Define a toggle event for any community formatter wrappers
-        var formattingToggleFirstClick = true;
-        var formattingToggleFunction = function(e){
-            e.preventDefault();
+        var $window = $('#window');
 
-            //console.log('formattingToggleFunction');
+        var $popupOverlay = false;
+        var $popupWrapper = false;
+        var $popupBody = false;
+        var $popupContent = false;
 
-            // Collect a reference to this link and the parent and wrapper
-            var thisLink = $(this);
-            var thisParent = thisLink.parents('.formatting');
-            var thisWrapper = $('.wrapper', thisParent);
+        var popupVisible = false;
 
-            // If this is the first time the element was clicked
-            if (formattingToggleFirstClick){
-                //console.log('formattingToggleFunction first click, let\'s hide');
-                thisParent.removeClass('formatting_expanded');
-                thisWrapper.css({display:'none',height:'',opacity:1});
-                thisLink.html('+ Show Formatting Options');
-                formattingToggleFirstClick = false;
-                return true;
-                }
+        // Define a function for initializing the popup markup/events
+        var initPopups = function(){
 
-            // If the wrapper is already expanded, let's collapse it
-            if (thisParent.hasClass('formatting_expanded')){
-                //console.log('formattingToggleFunction is expanded, closing now... to 0 height');
-                thisWrapper.stop().animate({height:0,opacity:0},600,'swing',function(){
-                    thisParent.removeClass('formatting_expanded');
-                    thisLink.html('+ Show Formatting Options');
-                    thisWrapper.css({display:'none',height:'',opacity:1});
-                    return true;
-                    });
-                }
-            // Otherwise if the wrapper is not yet expanded, let's do so now
-            else {
-                var maxHeight = thisWrapper.attr('data-maxheight');
-                //console.log('formattingToggleFunction is collapsed, opening now... to '+maxHeight+' height');
-                thisWrapper.css({display:'',height:0,opacity:0});
-                thisWrapper.stop().animate({height:maxHeight+'px',opacity:1},600,'swing',function(){
-                    thisParent.addClass('formatting_expanded');
-                    thisLink.html('- Hide Formatting Options');
-                    thisWrapper.css({height:''});
-                    return true;
-                    });
+            // Generate the basic skelton markup for the popup overlay
+            $popupOverlay = $('<div class="popup_overlay"></div>');
+            $popupWrapper = $('<div class="popup_wrapper"></div>');
+            $popupBody = $('<div class="popup_body"></div>');
+            $popupContent = $('<div class="popup_content"></div>');
+            $popupContent.appendTo($popupBody);
+            $popupBody.appendTo($popupWrapper);
+            $popupWrapper.appendTo($popupOverlay);
+            $popupOverlay.appendTo($window);
 
-                }
+            // Append a close button to the body for closing the popup
+            var $closeButton = $('<a class="button close"><i class="fa fas fa-window-close"></i></a>');
+            $closeButton.bind('click', function(e){
+                e.preventDefault();
+                hidePopup();
+                }).appendTo($popupBody);
+
+            // Make sure scrolling the window keeps the popup anchored
+            $(window).bind('scroll', function(){
+                if (popupVisible){
+                    var wrapTop = (getWinPos().top + 50) + 'px';
+                    $popupWrapper.css({top:wrapTop});
+                    }
+                });
 
             };
 
-        // Backup the maximum height for the formatting wrapper for use later
-        $('.formatting .wrapper', thisCommunity).attr('data-maxheight', $(this).height());
+        // Define a function for quickly getting the window scroll position
+        var getWinPos = function(){
+            var doc = document.documentElement;
+            var left = (window.pageXOffset || doc.scrollLeft) - (doc.clientLeft || 0);
+            var top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
+            var winPos = {left:left,top:top};
+            return winPos;
+            };
 
-        // Attach the toggle function to the link's click event
-        $('.formatting .toggle', thisCommunity).click(formattingToggleFunction);
-        $('.formatting .toggle', thisCommunity).trigger('click');
+        // Define a function for actually showing a popup
+        var showPopup = function(markup, options){
+            if (typeof markup !== 'string'){ return false; }
+            if (typeof options !== 'object'){ options = {}; }
+            var wrapTop = (getWinPos().top + 50) + 'px';
+            $popupOverlay.css({opacity:0});
+            $popupWrapper.css({top:wrapTop});
+            $popupContent.empty().append(markup);
+            $popupOverlay.addClass('visible').animate({opacity:1},300,'swing',function(){
+                popupVisible = true;
+                });
+            };
+
+        // Define a function for hiding an existing popup
+        var hidePopup = function(){
+            $popupOverlay.css({opacity:1});
+            $popupOverlay.animate({opacity:0},300,'swing',function(){
+                $popupOverlay.removeClass('visible');
+                popupVisible = false;
+                });
+            };
+
+        // Automatically init the popup engine
+        initPopups();
+
+        // Explose the show/hide popup methods globally
+        window.mmrpgShowPopup = showPopup;
+        window.mmrpgHidePopup = hidePopup;
+
+        })();
+
+
+    /*
+     * COMMUNITY EVENTS
+     */
+
+    // Regardless of current page, make sure community formatting popup works
+    $formattingPopupLinks = $('a[data-popup="community-formatting-help"]');
+    if ($formattingPopupLinks.length){
+
+        // Collect the formatting markup into a variable for later
+        var formattingMarkup = '';
+        var markupScriptURL = 'scripts/get-markup.php?kind=community-formatting-help';
+        $.ajax({url: markupScriptURL, success: function(result){
+            formattingMarkup = result;
+            } });
+
+        // Define a function for showing the community formatting markup as a popup
+        var formattingMarkup = '';
+        var showFormattingPopup = function(){
+            if (!formattingMarkup.length){ return false; }
+            var markup = formattingMarkup;
+            markup = '<div class="subbody">' + markup + '</div>';
+            markup = '<div class="body">' + markup + '</div>';
+            markup = '<div class="page">' + markup + '</div>';
+            mmrpgShowPopup(markup);
+            };
+
+        $formattingPopupLinks.bind('click', function(e){
+            e.preventDefault();
+            showFormattingPopup();
+            });
 
         }
 

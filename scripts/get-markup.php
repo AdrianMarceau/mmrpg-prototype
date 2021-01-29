@@ -8,7 +8,7 @@ $request_kind = !empty($_REQUEST['kind']) ? $_REQUEST['kind'] : false;
 if ($request_kind === 'community-formatting-help'){
 
     // Return the markup for the community formatting guide
-    header('Content-type: text/html; charset=UTF-8');
+    header('Content-type: text/plain; charset=UTF-8');
     echo(mmrpg_formatting_help_markup());
     exit();
 
