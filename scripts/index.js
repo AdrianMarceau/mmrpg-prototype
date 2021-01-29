@@ -312,33 +312,73 @@ $(document).ready(function(){
      * COMMUNITY EVENTS
      */
 
+    // Define a quick function for showing a formatting-based popup
+    var showFormattingPopup = function(markup){
+        markup = '<div class="subbody">' + markup + '</div>';
+        markup = '<div class="body">' + markup + '</div>';
+        markup = '<div class="page">' + markup + '</div>';
+        mmrpgShowPopup(markup);
+        };
+
     // Regardless of current page, make sure community formatting popup works
     $formattingPopupLinks = $('a[data-popup="community-formatting-help"]');
     if ($formattingPopupLinks.length){
+        (function(){
+            // Collect the formatting markup into a variable for later
+            var formattingMarkup = '';
+            var markupScriptURL = 'scripts/get-markup.php?kind=community-formatting-help';
+            $.ajax({
+                url: markupScriptURL,
+                success: function(result){
+                    formattingMarkup = result;
+                    }
+                });
+            // Bind a click event to the actual button for showing the guide
+            $formattingPopupLinks.bind('click', function(e){
+                e.preventDefault();
+                if (!formattingMarkup.length){ return false; }
+                showFormattingPopup(formattingMarkup);
+                });
+            })();
+        }
 
-        // Collect the formatting markup into a variable for later
-        var formattingMarkup = '';
-        var markupScriptURL = 'scripts/get-markup.php?kind=community-formatting-help';
-        $.ajax({url: markupScriptURL, success: function(result){
-            formattingMarkup = result;
-            } });
+    // Regardless of current page, make sure community formatting popup works
+    $formattingPopupLinks = $('a[data-popup="community-formatting-preview"]');
+    if ($formattingPopupLinks.length){
+        (function(){
+            // Define the URL we'll be posting preview requests to
+            var markupScriptURL = 'scripts/get-markup.php?kind=community-formatting-preview';
+            // Define a function for getting a post/thread textarea given a preview button
+            var getPostTextarea = function($button){
+                var $form = $button.closest('form');
+                var $textarea = $form.find('textarea[name$="_body"]');
+                return $textarea;
+                };
+            // Loop through each of the preview buttons on-page and define events for 'em
+            $formattingPopupLinks.each(function(){
+                // Collect a ref to the button and the textarea
+                var $button = $(this);
+                var $textarea = getPostTextarea($button);
+                // Bind a keyup event to the textarea to show/hide the button
+                $textarea.bind('keyup', function(){
+                    var rawMarkup = $textarea.val();
+                    if (rawMarkup.length){ $button.removeClass('hidden'); }
+                    else { $button.addClass('hidden'); }
+                    }).trigger('keyup');
+                // Bind a click event to the button that generates the post preview
+                $button.bind('click', function(e){
+                    e.preventDefault();
+                    var rawMarkup = $textarea.val();
+                    if (!rawMarkup.length){ return false; }
+                    $.post(markupScriptURL, {
+                        rawMarkup:rawMarkup
+                        }, function(result){
+                        showFormattingPopup(result);
+                        });
+                    });
+                });
 
-        // Define a function for showing the community formatting markup as a popup
-        var formattingMarkup = '';
-        var showFormattingPopup = function(){
-            if (!formattingMarkup.length){ return false; }
-            var markup = formattingMarkup;
-            markup = '<div class="subbody">' + markup + '</div>';
-            markup = '<div class="body">' + markup + '</div>';
-            markup = '<div class="page">' + markup + '</div>';
-            mmrpgShowPopup(markup);
-            };
-
-        $formattingPopupLinks.bind('click', function(e){
-            e.preventDefault();
-            showFormattingPopup();
-            });
-
+            })();
         }
 
     // Create a reference to this form

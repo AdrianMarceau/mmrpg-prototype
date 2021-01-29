@@ -337,7 +337,7 @@ function mmrpg_formatting_help_markup(){
 }
 
 // Define a function for printing out the formatting options in text
-function mmrpg_formatting_help(){
+function mmrpg_formatting_help($context = 'post'){
 
     // Generate and return markup for a community formatting link// Start the output buffer and prepare to collect contents
     ob_start();
@@ -345,6 +345,7 @@ function mmrpg_formatting_help(){
     <div class="community bodytext">
         <div class="formatting">
             <a class="link_inline" data-popup="community-formatting-help">+ Show Formatting Guide</a>
+            <a class="link_inline" data-popup="community-formatting-preview">+ Preview <?= ucfirst($context) ?> Formatting</a>
         </div>
     </div>
     <?

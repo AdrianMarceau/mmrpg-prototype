@@ -235,8 +235,8 @@ ob_start();
                         <input type="text" class="text" name="thread_name" value="<?= $temp_thread_name ?>" />
                         <textarea class="textarea" name="thread_body" rows="15"><?= str_replace('\\n', "\n", $temp_thread_body) ?></textarea>
                     </div>
-                    <div class="field field_thread_info" style="clear: left; overflow: hidden; font-size: 11px; margin-top: -10px;">
-                        <?= mmrpg_formatting_help() ?>
+                    <div class="field field_thread_info" style="clear: left; overflow: hidden; font-size: 11px; margin-right: 10px;">
+                        <?= mmrpg_formatting_help('thread') ?>
                     </div>
                     <div class="buttons buttons_active" data-submit="<?= !empty($_REQUEST['thread_id']) ? 'Edit' : 'Create' ?> Discussion">
                         <label class="counter"><span class="current">0</span> / <span class="maximum"><?= MMRPG_SETTINGS_DISCUSSION_MAXLENGTH ?></span> Characters</label>

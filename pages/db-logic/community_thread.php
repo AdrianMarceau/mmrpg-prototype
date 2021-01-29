@@ -670,7 +670,7 @@ ob_start();
                                 <textarea class="textarea" name="post_body" rows="10"><?= str_replace('\\n', "\n", $temp_post_body) ?></textarea>
                             </div>
                             <div class="field field_post_info" style="clear: left; overflow: hidden; font-size: 11px; margin-top: -10px;">
-                                <?= mmrpg_formatting_help() ?>
+                                <?= mmrpg_formatting_help('post') ?>
                             </div>
                             <div class="buttons buttons_active" data-submit="<?= !empty($_REQUEST['post_id']) ? 'Edit' : 'Post' ?> Comment">
                                 <label class="counter"><span class="current">0</span> / <span class="maximum"><?= MMRPG_SETTINGS_COMMENT_MAXLENGTH ?></span> Characters</label>

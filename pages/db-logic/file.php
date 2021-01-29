@@ -290,7 +290,7 @@ while ($this_action == 'profile'){
                 <div class="field field_profiletext full">
                     <label class="label label_profiletext">Profile Page Text</label>
                     <textarea class="textarea textarea_profiletext" style="height: 250px; " name="profiletext"><?= htmlentities(trim(!empty($_SESSION['GAME']['USER']['profiletext']) ? $_SESSION['GAME']['USER']['profiletext'] : ''), ENT_QUOTES, 'UTF-8', true) ?></textarea>
-                    <?= mmrpg_formatting_help() ?>
+                    <?= mmrpg_formatting_help('text') ?>
                 </div>
             <? } ?>
 
