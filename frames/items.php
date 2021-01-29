@@ -48,6 +48,11 @@ $global_battle_items = array_filter($global_battle_items, function($item_token) 
     return true;
     }, ARRAY_FILTER_USE_KEY);
 
+// If the user has collected any stars, make sure those contribute to the count
+if (!empty($this_battle_stars_field_count)){ $global_battle_items['field-star'] = $this_battle_stars_field_count; }
+if (!empty($this_battle_stars_fusion_count)){ $global_battle_items['fusion-star'] = $this_battle_stars_fusion_count; }
+
+
 /*
 error_log("\n---------------------------");
 
