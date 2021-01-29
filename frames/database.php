@@ -184,6 +184,7 @@ if (true){
     $global_robots_counters['scanned'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
     $global_robots_counters['summoned'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
     $global_robots_counters['unlocked'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
+    $global_robots_counters['fightable'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
 
     // Define a function for looping through the robots and counting/updating them
     //$temp_process_debug = array();
@@ -205,6 +206,13 @@ if (true){
             if (!isset($robot_info['robot_summoned'])){ $robot_info['robot_summoned'] = !empty($_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_summoned']) ? $_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_summoned'] : 0; }
             if (!isset($robot_info['robot_unlocked'])){ $robot_info['robot_unlocked'] = !empty($_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_unlocked']) ? $_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_unlocked'] : 0; }
             if (!isset($robot_info['robot_defeated'])){ $robot_info['robot_defeated'] = !empty($_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_defeated']) ? $_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_defeated'] : 0; }
+
+            // If this robot was summoned but not enountered, let's fix that
+            if (empty($robot_info['robot_encountered'])
+                && !empty($robot_info['robot_summoned'])){
+                $robot_info['robot_encountered'] = $robot_info['robot_summoned'];
+                $_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_encountered'] = $robot_info['robot_encountered'];
+            }
 
             // Define the page token based on this robot's game of origin
             if (!isset($robot_info['robot_page_token'])){
@@ -228,6 +236,7 @@ if (true){
             if ($robot_info['robot_scanned']){ $global_robots_counters['scanned']['total']++; $global_robots_counters['scanned'][$robot_info['robot_class']]++; }
             if ($robot_info['robot_unlocked']){ $global_robots_counters['unlocked']['total']++; $global_robots_counters['unlocked'][$robot_info['robot_class']]++; }
             elseif ($robot_info['robot_summoned']){ $global_robots_counters['summoned']['total']++; $global_robots_counters['summoned'][$robot_info['robot_class']]++; }
+            if ($robot_info['robot_flag_fightable']){ $global_robots_counters['fightable']['total']++; $global_robots_counters['fightable'][$robot_info['robot_class']]++; }
 
         }
         // Return true on success
@@ -237,7 +246,7 @@ if (true){
     temp_process_robots($mmrpg_database_robots, $database_game_counters, $database_page_groups, $global_robots_counters, $session_token);
     //error_log('$temp_process_debug = '.print_r($temp_process_debug, true));
 
-    //die('<pre>$global_robots_counters : '.print_r($global_robots_counters, true).'</pre>');
+    //error_log('<pre>$global_robots_counters : '.print_r($global_robots_counters, true).'</pre>');
 
     // Start generating the database markup
     ?>
