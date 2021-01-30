@@ -966,14 +966,14 @@
                             <div class="panel active" data-tab="basic">
 
                                 <div class="field">
-                                    <strong class="label"><?= $this_ability_class_short_name_uc ?> ID</strong>
+                                    <strong class="label">Ability ID</strong>
                                     <input type="hidden" name="ability_id" value="<?= $ability_data['ability_id'] ?>" />
                                     <input class="textbox" type="text" name="ability_id" value="<?= $ability_data['ability_id'] ?>" disabled="disabled" />
                                 </div>
 
                                 <div class="field">
                                     <div class="label">
-                                        <strong><?= $this_ability_class_short_name_uc ?> Token</strong>
+                                        <strong>Ability Token</strong>
                                         <?= !empty($ability_data['ability_flag_protected']) ? '<em>cannot be changed</em>' : '' ?>
                                     </div>
                                     <input type="hidden" name="old_ability_token" value="<?= $ability_data['ability_token'] ?>" />
@@ -982,7 +982,7 @@
                                 </div>
 
                                 <div class="field">
-                                    <strong class="label"><?= $this_ability_class_short_name_uc ?> Name</strong>
+                                    <strong class="label">Ability Name</strong>
                                     <input class="textbox" type="text" name="ability_name" value="<?= $ability_data['ability_name'] ?>" maxlength="128" />
                                 </div>
 
@@ -1105,7 +1105,7 @@
 
                                     <div class="field fullsize" style="margin-bottom: 0; padding-bottom: 0;">
                                         <div class="label">
-                                            <strong><?= $this_ability_class_short_name_uc ?> Description</strong>
+                                            <strong>Ability Description</strong>
                                             <em>short paragraph describing what this ability does and its effects</em>
                                         </div>
                                         <textarea class="textarea" name="ability_description" rows="4"><?= htmlentities($ability_data['ability_description'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
@@ -1428,7 +1428,7 @@
 
                                     <div class="field fullsize codemirror" data-codemirror-mode="php">
                                         <div class="label">
-                                            <strong><?= $this_ability_class_short_name_uc ?> Functions</strong>
+                                            <strong>Ability Functions</strong>
                                             <em>code is php-format with html allowed in some strings</em>
                                         </div>
                                         <?
@@ -1545,7 +1545,7 @@
                             <div class="buttons">
                                 <input class="button save" type="submit" value="<?= $ability_data_is_new ? 'Create '.$this_ability_class_short_name_uc : 'Save Changes' ?>" />
                                 <? if (!$ability_data_is_new && empty($ability_data['ability_flag_protected'])){ ?>
-                                    <input class="button delete" type="button" value="Delete <?= $this_ability_class_short_name_uc ?>" data-delete="abilities" data-ability-id="<?= $ability_data['ability_id'] ?>" />
+                                    <input class="button delete" type="button" value="Delete Ability" data-delete="abilities" data-ability-id="<?= $ability_data['ability_id'] ?>" />
                                 <? } ?>
                             </div>
                             <? if (!$ability_data_is_new){ ?>
