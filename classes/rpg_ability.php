@@ -489,6 +489,41 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a public function for easily resetting result options
+    public function ability_results_init(){
+        // Redfine the result options as an empty array
+        if (!isset($this->ability_results)){ $this->ability_results = array(); }
+        // Populate the array with defaults
+        if (!isset($this->ability_results['total_result'])){ $this->ability_results['total_result'] = ''; }
+        if (!isset($this->ability_results['total_actions'])){ $this->ability_results['total_actions'] = 0; }
+        if (!isset($this->ability_results['total_strikes'])){ $this->ability_results['total_strikes'] = 0; }
+        if (!isset($this->ability_results['total_misses'])){ $this->ability_results['total_misses'] = 0; }
+        if (!isset($this->ability_results['total_amount'])){ $this->ability_results['total_amount'] = 0; }
+        if (!isset($this->ability_results['total_overkill'])){ $this->ability_results['total_overkill'] = 0; }
+        if (!isset($this->ability_results['this_result'])){ $this->ability_results['this_result'] = ''; }
+        if (!isset($this->ability_results['this_amount'])){ $this->ability_results['this_amount'] = 0; }
+        if (!isset($this->ability_results['this_overkill'])){ $this->ability_results['this_overkill'] = 0; }
+        if (!isset($this->ability_results['this_text'])){ $this->ability_results['this_text'] = ''; }
+        if (!isset($this->ability_results['counter_criticals'])){ $this->ability_results['counter_criticals'] = 0; }
+        if (!isset($this->ability_results['counter_weaknesses'])){ $this->ability_results['counter_weaknesses'] = 0; }
+        if (!isset($this->ability_results['counter_resistances'])){ $this->ability_results['counter_resistances'] = 0; }
+        if (!isset($this->ability_results['counter_affinities'])){ $this->ability_results['counter_affinities'] = 0; }
+        if (!isset($this->ability_results['counter_immunities'])){ $this->ability_results['counter_immunities'] = 0; }
+        if (!isset($this->ability_results['counter_coreboosts'])){ $this->ability_results['counter_coreboosts'] = 0; }
+        if (!isset($this->ability_results['counter_omegaboosts'])){ $this->ability_results['counter_omegaboosts'] = 0; }
+        if (!isset($this->ability_results['flag_critical'])){ $this->ability_results['flag_critical'] = false; }
+        if (!isset($this->ability_results['flag_weakness'])){ $this->ability_results['flag_weakness'] = false; }
+        if (!isset($this->ability_results['flag_resistance'])){ $this->ability_results['flag_resistance'] = false; }
+        if (!isset($this->ability_results['flag_affinity'])){ $this->ability_results['flag_affinity'] = false; }
+        if (!isset($this->ability_results['flag_immunity'])){ $this->ability_results['flag_immunity'] = false; }
+        if (!isset($this->ability_results['flag_coreboost'])){ $this->ability_results['flag_coreboost'] = false; }
+        if (!isset($this->ability_results['flag_omegaboost'])){ $this->ability_results['flag_omegaboost'] = false; }
+        // Update this ability's data
+        $this->update_session();
+        // Return the resuling array
+        return $this->ability_results;
+    }
+
+    // Define a public function for easily resetting result options
     public function ability_results_reset(){
         // Redfine the result options as an empty array
         $this->ability_results = array();
