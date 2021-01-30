@@ -2111,5 +2111,71 @@ class rpg_item extends rpg_object {
 
     }
 
+    // Define a static function for adding a new shard to the player's inventory (and maybe generating a new core)
+    public static function add_new_shard_to_inventory($shard_token, $objects = array(), $event_options = array()){
+
+        // Extract objects into the global scope
+        extract($objects);
+
+        // Parse the type and token details for this shard and potential core
+        //error_log('returned '.$shard_token.' to inventory');
+        $type_token = str_replace('-shard', '', $shard_token);
+        $shard_name = ucfirst($type_token).' Shard';
+        $core_token = $type_token.'-core';
+        $core_name = ucfirst($type_token).' Core';
+        $num_shards = mmrpg_prototype_get_battle_item_count($shard_token);
+        $num_cores = mmrpg_prototype_get_battle_item_count($core_token);
+        //error_log('$num_'.$type_token.'_shards = '.$num_shards);
+        //error_log('$num_'.$type_token.'_cores = '.$num_cores);
+        if ($num_shards >= MMRPG_SETTINGS_SHARDS_MAXQUANTITY){
+            $cores_generated = 0;
+            while ($num_shards >= MMRPG_SETTINGS_SHARDS_MAXQUANTITY){
+                //error_log('create new '.$type_token.' core from '.$type_token.' shards...');
+                mmrpg_prototype_dec_battle_item_count($shard_token, MMRPG_SETTINGS_SHARDS_MAXQUANTITY);
+                mmrpg_prototype_inc_battle_item_count($core_token, 1);
+                $cores_generated += 1;
+                $num_shards = mmrpg_prototype_get_battle_item_count($shard_token);
+                $num_cores = mmrpg_prototype_get_battle_item_count($core_token);
+                //error_log('$num_'.$type_token.'shards = '.$num_shards);
+                //error_log('$num_'.$type_token.'cores = '.$num_cores);
+                // Create the temporary item object for event creation using above parameters
+                $item_index_info = rpg_item::get_index_info($core_token);
+                $item_core_info = array('item_token' => $core_token, 'item_name' => $core_name, 'item_type' => $type_token);
+                $item_core_info['item_id'] = rpg_game::unique_item_id($this_robot->robot_id, $item_index_info['item_id']);
+                $item_core_info['item_token'] = $core_token;
+                $temp_core = rpg_game::get_item($this_battle, $this_player, $this_robot, $item_core_info);
+                $temp_core->set_name($item_core_info['item_name']);
+                $temp_core->set_image($item_core_info['item_token']);
+                // Collect or define the item variables
+                $temp_type_name = !empty($temp_core->item_type) ? ucfirst($temp_core->item_type) : 'Neutral';
+                $temp_core_colour = !empty($temp_core->item_type) ? $temp_core->item_type : 'none';
+                // Display the robot reward message markup
+                $all_shards_merged = empty($num_shards) ? true : false;
+                $event_header = $core_name.' Item Fusion';
+                $event_body = ($all_shards_merged ? 'The other' : 'Some of the other').' <span class="item_name item_type item_type_'.$type_token.'">'.$temp_type_name.' Shards</span> from the inventory started glowing&hellip;<br /> ';
+                $event_body .= rpg_battle::random_positive_word().' The glowing shards fused to create a new '.$temp_core->print_name().'! ';
+                $event_body .= ' <span class="item_stat item_type item_type_none">'.($num_cores - 1).' <sup style="bottom: 2px;">&raquo;</sup> '.($num_cores).'</span>';
+                $event_options = array();
+                $event_options['console_show_target'] = false;
+                $event_options['this_header_float'] = $this_player->player_side;
+                $event_options['this_body_float'] = $this_player->player_side;
+                $event_options['this_item'] = $temp_core;
+                $event_options['this_item_image'] = 'icon';
+                $event_options['console_show_this_player'] = false;
+                $event_options['console_show_this_robot'] = false;
+                $event_options['console_show_this_item'] = true;
+                $event_options['canvas_show_this_item'] = true;
+                $this_player->set_frame(!empty($event_options['player_frame']) ? $event_options['player_frame'] : ($cores_generated % 2 == 0 ? 'taunt' : 'victory'));
+                $this_robot->set_frame(!empty($event_options['robot_frame']) ? $event_options['robot_frame'] : ($cores_generated % 2 == 0 ? 'taunt' : 'defend'));
+                $temp_core->set_frame('base');
+                $temp_core->set_frame_offset(array('x' => 80, 'y' => 0, 'z' => 10));
+                $this_battle->events_create($this_robot, false, $event_header, $event_body, $event_options);
+                $this_player->reset_frame();
+                $this_robot->reset_frame();
+            }
+        }
+
+    }
+
 }
 ?>
