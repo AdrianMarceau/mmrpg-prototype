@@ -1752,12 +1752,10 @@ class rpg_player extends rpg_object {
             $event_options['console_show_this_item'] = true;
             $event_options['canvas_show_this_item'] = true;
             $target_player->set_frame(($item_reward_key + 1 % 3 == 0 ? 'taunt' : 'victory'));
-            $target_robot->robot_frame = $item_reward_key % 2 == 0 ? 'base' : 'taunt';
-            $target_robot->update_session();
-            $temp_core->item_frame = 'base';
-            $temp_core->item_frame_offset = array('x' => 220, 'y' => 0, 'z' => 10);
-            $temp_core->update_session();
-            $this_battle->events_create($target_robot, $target_robot, $event_header, $event_body, $event_options);
+            $target_robot->set_frame($item_reward_key % 2 == 0 ? 'base' : 'taunt');
+            $temp_core->set_frame('base');
+            $temp_core->set_frame_offset(array('x' => 220, 'y' => 0, 'z' => 10));
+            $this_battle->events_create($target_robot, false, $event_header, $event_body, $event_options);
 
             // Set the old shard counter back to zero now that they've fused
             $_SESSION['GAME']['values']['battle_items'][$temp_item_token] = 0;

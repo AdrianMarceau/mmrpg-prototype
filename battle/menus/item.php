@@ -56,7 +56,7 @@ ob_start();
                             echo '<span class="sprite sprite_40x40 sprite_40x40_base sprite_40x40_item" style="background-image: url(images/items/'.$this_robot->robot_item.'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span>';
                             if ($temp_allowed){ echo 'Unequip '.$temp_iteminfo['item_name'].''; }
                             else { echo '<del>Unequip '.$temp_iteminfo['item_name'].'</del>'; }
-                            echo ' (x'.$temp_owned.')';
+                            echo ' ('.$temp_owned.' &rsaquo; '.($temp_owned + 1).')';
                             //echo 'Send to Inventory?';
                         echo '</a>';
                     }
