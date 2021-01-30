@@ -1253,6 +1253,14 @@ class rpg_player extends rpg_object {
     }
 
     /**
+     * Reset the current frame of this player object's sprite
+     * @param string $frame
+     */
+    public function reset_frame(){
+        $this->set_info('player_frame', 'base');
+    }
+
+    /**
      * Get the frame index for this player object's sprite
      * @return array
      */
