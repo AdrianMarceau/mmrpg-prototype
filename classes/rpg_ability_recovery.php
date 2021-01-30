@@ -58,6 +58,18 @@ class rpg_ability_recovery extends rpg_recovery {
             $target_robot_stats = array_merge($target_robot_stats, $trigger_options['referred_recovery_stats']);
         }
 
+        // If stat substitution was requested, process any transfers now
+        if (!empty($trigger_options['this_stat_substitution'])){
+            $stat_substitutes = array();
+            foreach ($trigger_options['this_stat_substitution'] AS $base => $source){ $stat_substitutes[$base] = $this_robot_stats[$source]; }
+            $this_robot_stats = array_merge($this_robot_stats, $stat_substitutes);
+        }
+        if (!empty($trigger_options['target_stat_substitution'])){
+            $stat_substitutes = array();
+            foreach ($trigger_options['target_stat_substitution'] AS $base => $source){ $stat_substitutes[$base] = $target_robot_stats[$source]; }
+            $target_robot_stats = array_merge($target_robot_stats, $stat_substitutes);
+        }
+
         // Define the event console options
         $event_options = array();
         $event_options['console_container_height'] = 1;
