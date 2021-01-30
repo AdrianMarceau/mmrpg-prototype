@@ -44,6 +44,9 @@ class rpg_ability_recovery extends rpg_recovery {
             }
         }
 
+        // Make sure this ability has all the required result variables
+        $this_ability->ability_results_init();
+
         // Backup this and the target robot's frames to revert later
         $this_robot_backup_frame = $this_robot->robot_frame;
         $this_player_backup_frame = $this_robot->player->player_frame;
@@ -197,6 +200,7 @@ class rpg_ability_recovery extends rpg_recovery {
 
                 // Define the coreboost flag and default to false
                 $this_ability->ability_results['flag_coreboost'] = false;
+                $this_ability->ability_results['counter_coreboosts'] = 0;
 
                 // Define an array to hold individual coreboost values
                 $ability_coreboost_multipliers = array();
@@ -261,6 +265,7 @@ class rpg_ability_recovery extends rpg_recovery {
 
                 // Define the omegaboost flag and default to false
                 $this_ability->ability_results['flag_omegaboost'] = false;
+                $this_ability->ability_results['counter_omegaboosts'] = 0;
 
                 // Define an array to hold individual omegaboost values
                 $ability_omegaboost_multipliers = array();
