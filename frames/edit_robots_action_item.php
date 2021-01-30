@@ -7,56 +7,10 @@ require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/abilities.php');
 
-// Define quick functions for getting or setting battle item quantities
+// Make sure the battle items array has been set before continuing
 if (!isset($_SESSION[$session_token]['values']['battle_items'])){
     $_SESSION[$session_token]['values']['battle_items'] = array();
 }
-function init_battle_item_count($item_token){
-    global $session_token;
-    if (!isset($_SESSION[$session_token]['values']['battle_items'][$item_token])){
-        $_SESSION[$session_token]['values']['battle_items'][$item_token] = 0;
-    }
-}
-function get_battle_item_count($item_token){
-    global $session_token;
-    init_battle_item_count($item_token);
-    return $_SESSION[$session_token]['values']['battle_items'][$item_token];
-}
-function set_battle_item_count($item_token, $new_count){
-    global $session_token;
-    init_battle_item_count($item_token);
-    $_SESSION[$session_token]['values']['battle_items'][$item_token] = $new_count;
-}
-function inc_battle_item_count($item_token, $inc_amount = 1){
-    global $session_token;
-    init_battle_item_count($item_token);
-    $_SESSION[$session_token]['values']['battle_items'][$item_token] += $inc_amount;
-    return get_battle_item_count($item_token);
-}
-function dec_battle_item_count($item_token, $dec_amount = 1){
-    global $session_token;
-    init_battle_item_count($item_token);
-    $_SESSION[$session_token]['values']['battle_items'][$item_token] -= $dec_amount;
-    return get_battle_item_count($item_token);
-}
-
-// Define quick functions for getting or setting battle setting items for robots
-function get_robot_battle_item($player_token, $robot_token){
-    global $session_token;
-    if (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['robot_item'])){
-        return $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['robot_item'];
-    }
-    return '';
-}
-function set_robot_battle_item($player_token, $robot_token, $item_token){
-    global $session_token;
-    $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['robot_item'] = $item_token;
-}
-function unset_robot_battle_item($player_token, $robot_token){
-    global $session_token;
-    $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['robot_item'] = '';
-}
-
 
 // Collect the item variables from the request header, if they exist
 $temp_player = !empty($_REQUEST['player']) ? $_REQUEST['player'] : '';
@@ -74,26 +28,26 @@ $temp_robot_info = $allowed_edit_data[$temp_player]['player_robots'][$temp_robot
 if (empty($temp_player_info) || empty($temp_robot_info)){ die('error|request-notfound|'.preg_replace('/\s+/', ' ', print_r($_REQUEST, true))); }
 
 // If the robot is already holding an item, remove previous and add back to inventory
-$temp_item_current = get_robot_battle_item($temp_player, $temp_robot);
+$temp_item_current = mmrpg_prototype_get_robot_battle_item($temp_player, $temp_robot);
 if (!empty($temp_item_current)){
-    inc_battle_item_count($temp_item_current, 1);
-    unset_robot_battle_item($temp_player, $temp_robot);
+    mmrpg_prototype_inc_battle_item_count($temp_item_current, 1);
+    mmrpg_prototype_unset_robot_battle_item($temp_player, $temp_robot);
     // If the item we added to the inventory was a shard, we may need to generate a new core
     if (strstr($temp_item_current, '-shard')){
         //error_log('returned '.$temp_item_current.' to inventory');
         $type_token = str_replace('-shard', '', $temp_item_current);
         $shard_token = $type_token.'-shard';
         $core_token = $type_token.'-core';
-        $num_shards = get_battle_item_count($shard_token);
-        $num_cores = get_battle_item_count($core_token);
+        $num_shards = mmrpg_prototype_get_battle_item_count($shard_token);
+        $num_cores = mmrpg_prototype_get_battle_item_count($core_token);
         //error_log('$num_'.$type_token.'_shards = '.$num_shards);
         //error_log('$num_'.$type_token.'cores = '.$num_cores);
         while ($num_shards >= MMRPG_SETTINGS_SHARDS_MAXQUANTITY){
             //error_log('create new '.$type_token.' core from '.$type_token.' shards...');
-            dec_battle_item_count($shard_token, MMRPG_SETTINGS_SHARDS_MAXQUANTITY);
-            inc_battle_item_count($core_token, 1);
-            $num_shards = get_battle_item_count($shard_token);
-            $num_cores = get_battle_item_count($core_token);
+            mmrpg_prototype_dec_battle_item_count($shard_token, MMRPG_SETTINGS_SHARDS_MAXQUANTITY);
+            mmrpg_prototype_inc_battle_item_count($core_token, 1);
+            $num_shards = mmrpg_prototype_get_battle_item_count($shard_token);
+            $num_cores = mmrpg_prototype_get_battle_item_count($core_token);
             //error_log('$num_'.$type_token.'shards = '.$num_shards);
             //error_log('$num_'.$type_token.'cores = '.$num_cores);
         }
@@ -102,8 +56,8 @@ if (!empty($temp_item_current)){
 
 // If the new hold item was not empty, remove from inventory and attach to robot
 if (!empty($temp_item)){
-    dec_battle_item_count($temp_item, 1);
-    set_robot_battle_item($temp_player, $temp_robot, $temp_item);
+    mmrpg_prototype_dec_battle_item_count($temp_item, 1);
+    mmrpg_prototype_set_robot_battle_item($temp_player, $temp_robot, $temp_item);
 }
 
 // Now that we have a new item attached, we should re-evaluate compatibile abilities

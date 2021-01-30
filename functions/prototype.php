@@ -814,6 +814,53 @@ function mmrpg_prototype_items_unlocked($unique = true){
 
 }
 
+// Define quick functions for getting or setting battle item quantities
+function mmrpg_prototype_init_battle_item_count($item_token){
+    $session_token = mmrpg_game_token();
+    if (!isset($_SESSION[$session_token]['values']['battle_items'][$item_token])){
+        $_SESSION[$session_token]['values']['battle_items'][$item_token] = 0;
+    }
+}
+function mmrpg_prototype_get_battle_item_count($item_token){
+    $session_token = mmrpg_game_token();
+    mmrpg_prototype_init_battle_item_count($item_token);
+    return $_SESSION[$session_token]['values']['battle_items'][$item_token];
+}
+function mmrpg_prototype_set_battle_item_count($item_token, $new_count){
+    $session_token = mmrpg_game_token();
+    mmrpg_prototype_init_battle_item_count($item_token);
+    $_SESSION[$session_token]['values']['battle_items'][$item_token] = $new_count;
+}
+function mmrpg_prototype_inc_battle_item_count($item_token, $inc_amount = 1){
+    $session_token = mmrpg_game_token();
+    mmrpg_prototype_init_battle_item_count($item_token);
+    $_SESSION[$session_token]['values']['battle_items'][$item_token] += $inc_amount;
+    return mmrpg_prototype_get_battle_item_count($item_token);
+}
+function mmrpg_prototype_dec_battle_item_count($item_token, $dec_amount = 1){
+    $session_token = mmrpg_game_token();
+    mmrpg_prototype_init_battle_item_count($item_token);
+    $_SESSION[$session_token]['values']['battle_items'][$item_token] -= $dec_amount;
+    return mmrpg_prototype_get_battle_item_count($item_token);
+}
+
+// Define quick functions for getting or setting battle setting items for robots
+function mmrpg_prototype_get_robot_battle_item($player_token, $robot_token){
+    $session_token = mmrpg_game_token();
+    if (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['robot_item'])){
+        return $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['robot_item'];
+    }
+    return '';
+}
+function mmrpg_prototype_set_robot_battle_item($player_token, $robot_token, $item_token){
+    $session_token = mmrpg_game_token();
+    $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['robot_item'] = $item_token;
+}
+function mmrpg_prototype_unset_robot_battle_item($player_token, $robot_token){
+    $session_token = mmrpg_game_token();
+    $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['robot_item'] = '';
+}
+
 // Define a function for checking if a prototype alt image has been unlocked
 function mmrpg_prototype_altimage_unlocked($robot_token, $alt_token = ''){
 
