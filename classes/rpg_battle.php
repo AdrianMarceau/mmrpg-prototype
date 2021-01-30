@@ -2765,6 +2765,13 @@ class rpg_battle extends rpg_object {
         return false;
     }
 
+    // Define a function for checking if inventory access is allowed in this battle
+    public function allow_inventory_access(){
+        if (!empty($this->flags['player_battle'])){ return false; }
+        elseif (!empty($this->flags['challenge_battle'])){ return false; }
+        return true;
+    }
+
     // Define a function for generating star console variables
     public function star_console_markup($options, $player_data, $robot_data){
 
