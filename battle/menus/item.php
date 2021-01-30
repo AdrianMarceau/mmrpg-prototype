@@ -15,6 +15,9 @@ foreach ($current_player_items AS $token => $quantity){
     }
 }
 
+// Check to see if inventory access is allowed in this battle
+$allow_inventory_access = $this_battle->allow_inventory_access();
+
 // Count the number of items the player has and determine pages
 $current_player_items_count = count($current_player_items);
 $current_player_items_pages = ceil($current_player_items_count / 8);
@@ -33,9 +36,7 @@ ob_start();
     ?>
     <div class="main_actions main_actions_hastitle">
         <span class="main_actions_title <?=
-            !empty($this_player->flags['item_used_this_turn'])
-            || !empty($this_battle->flags['player_battle'])
-            || !empty($this_battle->flags['challenge_battle'])
+            !$allow_inventory_access || !empty($this_player->flags['item_used_this_turn'])
             ? 'main_actions_title_disabled'
             : '' ?>">
             <?
@@ -46,9 +47,7 @@ ob_start();
                 echo '<span class="float_links">';
                     echo '<span class="page">Page</span>';
                     for ($i = 1; $i <= $current_player_items_pages; $i++){ echo '<a class="num'.($i == $temp_selected_page ? ' active' : '').'" href="#'.$i.'">'.$i.'</a>'; }
-                    if (!empty($this_robot->robot_item)
-                        && empty($this_battle->flags['player_battle'])
-                        && empty($this_battle->flags['challenge_battle'])){
+                    if ($allow_inventory_access && !empty($this_robot->robot_item)){
                         $temp_iteminfo = $mmrpg_database_items[$this_robot->robot_item];
                         $temp_owned = !empty($_SESSION['GAME']['values']['battle_items'][$this_robot->robot_item]) ? $_SESSION['GAME']['values']['battle_items'][$this_robot->robot_item] : 0;
                         $temp_allowed = $temp_owned < MMRPG_SETTINGS_ITEMS_MAXQUANTITY ? true : false;
@@ -79,9 +78,7 @@ ob_start();
             $equipped_items_count = 0;
 
             // If this player has already used an item this turn or items are disabled
-            if (!empty($this_player->flags['item_used_this_turn'])
-                || !empty($this_battle->flags['player_battle'])
-                || !empty($this_battle->flags['challenge_battle'])){
+            if (!$allow_inventory_access || !empty($this_player->flags['item_used_this_turn'])){
                 $temp_button_enabled_base = false;
             } else {
                 $temp_button_enabled_base = true;
