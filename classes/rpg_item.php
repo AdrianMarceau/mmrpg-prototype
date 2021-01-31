@@ -1657,8 +1657,9 @@ class rpg_item extends rpg_object {
                                         $value_rows = array();
                                         if (strstr($item_info['item_token'], '-screw')){
                                             $value_rows[] = '<span class="item_stat">'.number_format($item_info['item_value'], 0, '.', ',').' z</span>';
+                                            $value_rows[] = '<span class="item_stat">'.number_format(($item_info['item_value'] / 2), 0, '.', ',').' BP</span>';
                                         } elseif (strstr($item_info['item_token'], '-shard')){
-                                            $value_rows[] = '<span class="item_stat">-</span>';
+                                            $value_rows[] = '<span class="item_stat">'.number_format($item_info['item_value'], 0, '.', ',').' BP</span>';
                                         } elseif (strstr($item_info['item_token'], '-core')){
                                             $value_rows[] = '<span class="item_stat">'.number_format(ceil($item_info['item_value'] / 2), 0, '.', ',').' z</span>';
                                             $value_rows[] = '<span class="item_stat">'.number_format($item_info['item_value'], 0, '.', ',').' BP</span>';

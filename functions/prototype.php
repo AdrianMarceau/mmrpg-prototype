@@ -197,19 +197,15 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
         foreach ($user_battle_items As $item_token => $item_quantity){
             if (!isset($mmrpg_items[$item_token])){ continue; }
             elseif (in_array($item_token, $items_unlocked)){ continue; }
-            elseif (empty($item_quantity)){ continue; }
-            elseif (strstr($item_token, '-screw')){ continue; }
-            elseif (strstr($item_token, '-shard')){ continue; }
             $item_info = $mmrpg_items[$item_token];
             if (!$item_info['item_flag_complete']){ continue; }
             elseif ($item_info['item_flag_hidden']){ continue; }
             $item_value = 0;
             if (!empty($item_info['item_value'])){ $item_value = $item_info['item_value']; }
             elseif (!empty($item_info['item_price'])){ $item_value = $item_info['item_price']; }
-            if (strstr($item_token, '-shard') && $item_quantity > MMRPG_SETTINGS_SHARDS_MAXQUANTITY){ $item_quantity = MMRPG_SETTINGS_SHARDS_MAXQUANTITY; }
-            elseif ($item_quantity > MMRPG_SETTINGS_ITEMS_MAXQUANTITY){ $item_quantity = MMRPG_SETTINGS_ITEMS_MAXQUANTITY; }
-            $item_points += $item_value + ($item_quantity - 1);
-            $item_label = $item_token.($item_quantity > 1 ? ' x'.$item_quantity : '');
+            elseif (strstr($item_token, '-screw')){ $item_value = ($item_value / 2); }
+            $item_points += $item_value;
+            $item_label = $item_token;
             $items_unlocked[] = $item_label;
         }
         $points_index['items_unlocked'] = $items_unlocked;
