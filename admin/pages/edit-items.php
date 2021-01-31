@@ -770,7 +770,7 @@
                             $temp_subclass_colours = array(
                                 '' => array('none', ''),
                                 'consumable' => array('energy', '<i class="fas fa-apple-alt"></i>'),
-                                'collectible' => array('defense', '<i class="fas fa-cubes"></i>'),
+                                'collectable' => array('defense', '<i class="fas fa-cubes"></i>'),
                                 'holdable' => array('attack', '<i class="fas fa-archive"></i>'),
                                 'treasure' => array('electric', '<i class="fas fa-gem"></i>'),
                                 'event' => array('time', '<i class="fas fa-key"></i>'),
@@ -951,7 +951,7 @@
                                     <select class="select" name="item_subclass">
                                         <option value="" <?= empty($item_data['item_subclass']) ? 'selected="selected"' : '' ?>>- select kind -</option>
                                         <option value="consumable" <?= $item_data['item_subclass'] == 'consumable' ? 'selected="selected"' : '' ?>>Consumable</option>
-                                        <option value="collective" <?= $item_data['item_subclass'] == 'collective' ? 'selected="selected"' : '' ?>>Collective</option>
+                                        <option value="collectable" <?= $item_data['item_subclass'] == 'collectable' ? 'selected="selected"' : '' ?>>Collectable</option>
                                         <option value="holdable" <?= $item_data['item_subclass'] == 'holdable' ? 'selected="selected"' : '' ?>>Holdable</option>
                                         <option value="treasure" <?= $item_data['item_subclass'] == 'treasure' ? 'selected="selected"' : '' ?>>Treasure</option>
                                         <option value="event" <?= $item_data['item_subclass'] == 'event' ? 'selected="selected"' : '' ?>>Event</option>
