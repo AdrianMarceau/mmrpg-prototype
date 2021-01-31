@@ -18,7 +18,7 @@ require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/players.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/robots.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
-require(MMRPG_CONFIG_ROOTDIR.'includes/starforce.php');
+//require(MMRPG_CONFIG_ROOTDIR.'includes/starforce.php');
 
 // Collect the editor flag if set
 $global_allow_editing = !defined('MMRPG_REMOTE_GAME') ? true : false;
@@ -27,10 +27,6 @@ $global_frame_source = !empty($_GET['source']) ? trim($_GET['source']) : 'protot
 
 
 // -- GENERATE EDITOR MARKUP
-
-// Manually remove items that should not show here
-unset($mmrpg_database_items['heart']);
-unset($mmrpg_database_items['star']);
 
 // Define which items we're allowed to see
 $global_battle_items = !empty($_SESSION[$session_token]['values']['battle_items']) ? $_SESSION[$session_token]['values']['battle_items'] : array();
@@ -41,6 +37,7 @@ $global_battle_item_categories['all'] = array('category_name' => 'All Items', 'c
 $mmrpg_database_items = array_filter($mmrpg_database_items, function($item_info){
     if (empty($item_info['item_flag_published'])){ return false; }
     elseif (empty($item_info['item_flag_complete'])){ return false; }
+    elseif (in_array($item_info['item_token'], array('field-star', 'fusion-star'))){ return false; }
     return true;
     });
 $global_battle_items = array_filter($global_battle_items, function($item_token) use ($mmrpg_database_items){
@@ -49,8 +46,8 @@ $global_battle_items = array_filter($global_battle_items, function($item_token) 
     }, ARRAY_FILTER_USE_KEY);
 
 // If the user has collected any stars, make sure those contribute to the count
-if (!empty($this_battle_stars_field_count)){ $global_battle_items['field-star'] = $this_battle_stars_field_count; }
-if (!empty($this_battle_stars_fusion_count)){ $global_battle_items['fusion-star'] = $this_battle_stars_fusion_count; }
+//if (!empty($this_battle_stars_field_count)){ $global_battle_items['field-star'] = $this_battle_stars_field_count; }
+//if (!empty($this_battle_stars_fusion_count)){ $global_battle_items['fusion-star'] = $this_battle_stars_fusion_count; }
 
 
 /*
@@ -191,7 +188,7 @@ if (true){
                                             // Check to see if this is a special item type
                                             $item_is_shard = strstr($item_token, '-shard') ? true : false;
                                             $item_is_core = strstr($item_token, '-core') ? true : false;
-                                            $item_is_star = strstr($item_token, '-star') ? true : false;
+                                            //$item_is_star = strstr($item_token, '-star') ? true : false;
 
                                             // Define the editor title markup print options
                                             $item_print_options = array('show_quantity' => false);
@@ -212,6 +209,7 @@ if (true){
                                                 $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
 
                                             }
+                                            /*
                                             // Otherwise if this is a Field Star, use the total number as quantity
                                             elseif ($item_token == 'field-star' && !empty($this_battle_stars_field_count)){
 
@@ -231,6 +229,7 @@ if (true){
                                                 $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
 
                                             }
+                                            */
                                             // Otherwise this item slot is mysterious
                                             else {
 
