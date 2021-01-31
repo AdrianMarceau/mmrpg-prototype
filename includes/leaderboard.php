@@ -29,17 +29,6 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
     // Define the awards strong and default to empty
     $this_user_awards = ' ';
 
-    // Break apart the battle and battle values into arrays
-    $temp_battles = !empty($board['board_battles']) ? explode(',', $board['board_battles']) : array();
-    $board['board_battles'] = $temp_battles;
-
-    // Loop through the available players
-    foreach ($mmrpg_index_players AS $ptoken => $pinfo){
-        $ptoken2 = str_replace('-', '_', $ptoken);
-        $temp_battles = !empty($board['board_battles_'.$ptoken2]) ? explode(',', $board['board_battles_'.$ptoken2]) : array();
-        $board['board_battles_'.$ptoken2] = $temp_battles;
-    }
-
     // Collect this player's robots
     $this_robots = !empty($board['board_robots_count']) ? $board['board_robots_count'] : 0;
     $this_items = !empty($board['board_items']) ? $board['board_items'] : 0;

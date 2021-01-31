@@ -217,11 +217,6 @@ $temp_show_stars = !empty($this_playerinfo['save_values_battle_stars']) ? true :
 $temp_show_threads = !empty($this_playerinfo['thread_count']) ? true : false;
 $temp_show_posts = !empty($this_playerinfo['post_count']) ? true : false;
 
-// Define the prototype complete flags for this player
-$this_playerinfo['board_battles_dr_light'] = !empty($this_playerinfo['board_battles_dr_light']) ? explode(',', $this_playerinfo['board_battles_dr_light']) : array();
-$this_playerinfo['board_battles_dr_wily'] = !empty($this_playerinfo['board_battles_dr_wily']) ? explode(',', $this_playerinfo['board_battles_dr_wily']) : array();
-$this_playerinfo['board_battles_dr_cossack'] = !empty($this_playerinfo['board_battles_dr_cossack']) ? explode(',', $this_playerinfo['board_battles_dr_cossack']) : array();
-
 // Define the SEO variables for this page
 $this_seo_title = $temp_display_name.' | '.$this_seo_title;
 $this_seo_description = $temp_display_name.' is a player of the Mega Man RPG Prototype with a total of '.$temp_display_points.' battle points. '.$this_seo_description;

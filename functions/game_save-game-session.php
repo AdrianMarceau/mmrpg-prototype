@@ -31,6 +31,8 @@ function mmrpg_save_game_session(){
     // -- NORMAL MODE SAVE -- //
     elseif (empty($_SESSION[$session_token]['DEMO'])){
 
+        //error_log('saving game session for user ID '.$this_user['userid']);
+
         // UPDATE DATABASE INFO
 
         // Collect the save info
@@ -249,101 +251,50 @@ function mmrpg_save_game_session(){
         // DEBUG
         $DEBUG = '';
 
-        // Define the user database update array and populate
-        $this_user_array = array();
-        $this_user_array['user_name'] = $this_user['username'];
-        $this_user_array['user_name_clean'] = $this_user['username_clean'];
-        $this_user_array['user_name_public'] = !empty($this_user['displayname']) ? $this_user['displayname'] : '';
-        $this_user_array['user_profile_text'] = !empty($this_user['profiletext']) ? $this_user['profiletext'] : '';
-        $this_user_array['user_credit_text'] = !empty($this_user['creditstext']) ? $this_user['creditstext'] : '';
-        $this_user_array['user_credit_line'] = !empty($this_user['creditsline']) ? $this_user['creditsline'] : '';
-        $this_user_array['user_image_path'] = !empty($this_user['imagepath']) ? $this_user['imagepath'] : '';
-        $this_user_array['user_background_path'] = !empty($this_user['backgroundpath']) ? $this_user['backgroundpath'] : '';
-        $this_user_array['user_colour_token'] = !empty($this_user['colourtoken']) ? $this_user['colourtoken'] : '';
-        $this_user_array['user_colour_token2'] = !empty($this_user['colourtoken2']) ? $this_user['colourtoken2'] : '';
-        $this_user_array['user_gender'] = !empty($this_user['gender']) ? $this_user['gender'] : '';
-        $this_user_array['user_omega'] = !empty($this_user['omega']) ? $this_user['omega'] : md5(MMRPG_SETTINGS_OMEGA_SEED.$this_user['username_clean']);
-        $this_user_array['user_email_address'] = !empty($this_user['emailaddress']) ? $this_user['emailaddress'] : '';
-        $this_user_array['user_website_address'] = !empty($this_user['websiteaddress']) ? $this_user['websiteaddress'] : '';
-        $this_user_array['user_date_modified'] = time();
-        $this_user_array['user_date_accessed'] = time();
-        $this_user_array['user_date_birth'] = !empty($this_user['dateofbirth']) ? $this_user['dateofbirth'] : 0;
+        // Update the user modified and accessed date (everything else is saved via profile settings pages)
+        $db->update('mmrpg_users', array(
+            'user_date_modified' => time(),
+            'user_date_accessed' => time()
+            ), 'user_id = '.$this_user['userid']);
 
-        // Update this user's info in the database
-        //echo('<hr /><pre>FINAL DB USER UPDATE (user_id = '.$this_user['userid'].')</pre>');
-        //echo('<pre>$this_user_array = '.print_r($this_user_array, true).'</pre>');
-        $db->update('mmrpg_users', $this_user_array, 'user_id = '.$this_user['userid']);
+        // Call the global battle points function to collect progress details
+        mmrpg_prototype_calculate_battle_points_2k19($this_user['userid'], $battle_points_index);
+        //error_log('<pre>$battle_points_index : '.print_r($battle_points_index, true).'</pre>');
 
-        // DEBUG
-        //$DEBUG .= '$db->update(\'mmrpg_users\', $this_user_array, \'user_id = \'.$this_user[\'userid\']);';
-        //$DEBUG .= '<pre>$this_user_array = '.print_r($this_user_array, true).'</pre>';
-        //$DEBUG .= '<pre>$this_user = '.print_r($this_user, true).'</pre>';
+        // Define the tokens for updating legacy player fields to ZERO
+        $legacy_player_field_tokens = array('dr_light', 'dr_wily', 'dr_cossack');
 
         // Define the board database update array and populate
         $this_board_array = array();
-        $this_board_array['board_points'] = !empty($this_counters['battle_points']) ? $this_counters['battle_points'] : 0;
-        $this_board_array['board_robots_count'] = array();
-        $this_board_array['board_robots'] = array();
-        $this_board_array['board_stars'] = 0;
-        $this_board_array['board_stars_dr_light'] = 0;
-        $this_board_array['board_stars_dr_wily'] = 0;
-        $this_board_array['board_stars_dr_cossack'] = 0;
-        $this_board_array['board_abilities'] = mmrpg_prototype_abilities_unlocked();
-        $this_board_array['board_abilities_dr_light'] = 0;
-        $this_board_array['board_abilities_dr_wily'] = 0;
-        $this_board_array['board_abilities_dr_cossack'] = 0;
+
+        $this_board_array['board_points'] = $battle_points_index['total_battle_points'];
+            foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_points_'.$ptoken] = 0; }
+
+        $this_board_array['board_robots'] = implode(',', $battle_points_index['robots_unlocked']);
+        $this_board_array['board_robots_count'] = count($battle_points_index['robots_unlocked']);
+            foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_robots_'.$ptoken] = ''; }
+
+        $this_board_array['board_abilities'] = count($battle_points_index['abilities_unlocked']);
+            foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_abilities_'.$ptoken] = 0; }
+
+        $this_board_array['board_stars'] = count($battle_points_index['field_stars_collected']) + count($battle_points_index['fusion_stars_collected']);
+            foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_stars_'.$ptoken] = 0; }
+
+        $this_board_array['board_items'] = count($battle_points_index['items_unlocked']);
+
+        $this_board_array['board_battles'] = 0;
+            foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_battles_'.$ptoken] = 0; }
+
+        $this_board_array['board_missions'] = 0;
+            foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_missions_'.$ptoken] = 0; }
+
         $this_board_array['board_awards'] = !empty($this_values['prototype_awards']) ? array_keys($this_values['prototype_awards']) : '';
-        if (!empty($this_values['battle_rewards']) || $reset_in_progress){
-            if (empty($this_values['battle_rewards'])){ $this_values['battle_rewards'] = array(); }
-            //foreach ($this_values['battle_rewards'] AS $player_token => $player_array){
-            foreach ($mmrpg_index_players AS $player_token => $player_array){
-                if ($player_token == 'player' || !mmrpg_prototype_player_unlocked($player_token)){ continue; }
-                $player_reward_array = !empty($this_values['battle_rewards'][$player_token]) ? $this_values['battle_rewards'][$player_token] : array();
-                $player_battles_array = !empty($this_values['battle_complete'][$player_token]) ? $this_values['battle_complete'][$player_token] : array();
-                $player_database_token = str_replace('-', '_', $player_token);
-                if (!empty($player_reward_array)){
-                    $this_board_array['board_robots_'.$player_database_token] = array();
-                    if (!empty($player_reward_array['player_robots'])){
-                        foreach ($player_reward_array['player_robots'] AS $robot_token => $robot_array){
-                            if (!isset($mmrpg_index_robots[$robot_token])){ continue; }
-                            elseif (!mmrpg_prototype_robot_unlocked($player_token, $robot_token)){ continue; }
-                            else { $robot_index = $mmrpg_index_robots[$robot_token]; }
-                            if (empty($robot_index['robot_flag_published'])){ continue; }
-                            elseif (empty($robot_index['robot_flag_complete'])){ continue; }
-                            elseif (empty($robot_index['robot_flag_unlockable'])){ continue; }
-                            $temp_token = !empty($robot_array['robot_token']) ? $robot_array['robot_token']: $robot_token;
-                            $temp_level = !empty($robot_array['robot_level']) ? $robot_array['robot_level'] : 1;
-                            $temp_robot_info = array('robot_token' => $temp_token, $temp_level);
-                            $this_board_array['board_robots'][] = '['.$temp_token.':'.$temp_level.']';
-                            $this_board_array['board_robots_'.$player_database_token][] = '['.$temp_token.':'.$temp_level.']';
-                        }
-                    }
-                } else {
-                    $this_board_array['board_robots_'.$player_database_token] = array();
-                }
-                $this_board_array['board_robots_'.$player_database_token] = !empty($this_board_array['board_robots_'.$player_database_token]) ? implode(',', $this_board_array['board_robots_'.$player_database_token]) : '';
-            }
-        }
-
-        if (!empty($this_stars)){
-            foreach ($this_stars AS $temp_star_token => $temp_star_info){
-                $temp_star_player = str_replace('-', '_', $temp_star_info['star_player']);
-                $this_board_array['board_stars'] += 1;
-                $this_board_array['board_stars_'.$temp_star_player] += 1;
-            }
-        }
-
-        $this_board_array['board_robots_count'] = !empty($this_board_array['board_robots']) ? count($this_board_array['board_robots']) : 0;
-        $this_board_array['board_robots'] = !empty($this_board_array['board_robots']) ? implode(',', $this_board_array['board_robots']) : '';
         $this_board_array['board_awards'] = !empty($this_board_array['board_awards']) ? implode(',', $this_board_array['board_awards']) : '';
+
         $this_board_array['board_date_modified'] = time();
 
-        // DEBUG DEBUG DEBUG
-        //die('<pre>$this_board_array : '.print_r($this_board_array, true).'</pre>');
-
         // Update this board's info in the database
-        //echo('<hr /><pre>FINAL DB LEADERBOARD UPDATE (user_id = '.$this_user['userid'].')</pre>');
-        //echo('<pre>$this_board_array = '.print_r($this_board_array, true).'</pre>');
+        //error_log('<pre>$this_board_array : '.print_r($this_board_array, true).'</pre>');
         $db->update('mmrpg_leaderboard', $this_board_array, 'user_id = '.$this_user['userid']);
 
         // Clear any leaderboard data that exists in the session, forcing it to recache
