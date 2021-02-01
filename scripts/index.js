@@ -350,15 +350,24 @@ $(document).ready(function(){
             var markupScriptURL = 'scripts/get-markup.php?kind=community-formatting-preview';
             // Define a function for getting a post/thread textarea given a preview button
             var getPostTextarea = function($button){
+                var $field = $button.closest('.field');
+                if ($field.length){
+                    var $textarea = $field.find('textarea');
+                    if ($textarea.length){ return $textarea.first(); }
+                    }
                 var $form = $button.closest('form');
-                var $textarea = $form.find('textarea[name$="_body"]');
-                return $textarea;
+                if ($form.length){
+                    var $textarea = $form.find('textarea[name$="_body"]');
+                    if ($textarea.length){ return $textarea.first(); }
+                    }
+                return false;
                 };
             // Loop through each of the preview buttons on-page and define events for 'em
             $formattingPopupLinks.each(function(){
                 // Collect a ref to the button and the textarea
                 var $button = $(this);
                 var $textarea = getPostTextarea($button);
+                if (!$textarea || !$textarea.length){ return false; }
                 // Bind a keyup event to the textarea to show/hide the button
                 $textarea.bind('keyup', function(){
                     var rawMarkup = $textarea.val();
