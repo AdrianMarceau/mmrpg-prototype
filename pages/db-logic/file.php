@@ -162,45 +162,56 @@ while ($this_action == 'profile'){
                 if (!in_array($post_colourtoken2, $allowed_colour_options)){ $post_colourtoken2 = ''; }
                 if (!in_array($post_gender, $allowed_gender_options)){ $post_gender = $allowed_gender_options[0]; }
 
-                // Update the current game's user and file info using the new password
-                $_SESSION['GAME']['USER']['displayname'] = $user_displayname;
+                // Define an array to update the database with
+                $update_array = array();
+                $update_array['user_name_public'] = $user_displayname;
                 if (!empty($user_emailaddress)
                     && preg_match('/^([^@]+)@([-_a-z0-9\.]+)\.([a-z0-9]+)/i', $user_emailaddress)){
-                    $_SESSION['GAME']['USER']['emailaddress'] = $user_emailaddress;
+                    $update_array['user_email_address'] = $user_emailaddress;
                 }
                 if (!empty($this_userinfo['user_flag_postpublic'])){
-                    $_SESSION['GAME']['USER']['websiteaddress'] = $user_websiteaddress;
-                    $_SESSION['GAME']['USER']['profiletext'] = $user_profiletext;
-                    $_SESSION['GAME']['USER']['creditstext'] = $user_creditstext;
-                    $_SESSION['GAME']['USER']['creditsline'] = $user_creditsline;
+                    $update_array['user_website_address'] = $user_websiteaddress;
+                    $update_array['user_profile_text'] = $user_profiletext;
+                    $update_array['user_credit_line'] = $user_creditsline;
+                    $update_array['user_credit_text'] = $user_creditstext;
                 }
-                $_SESSION['GAME']['USER']['imagepath'] = $post_imagepath;
-                $_SESSION['GAME']['USER']['backgroundpath'] = $post_backgroundpath;
-                $_SESSION['GAME']['USER']['colourtoken'] = $post_colourtoken;
-                $_SESSION['GAME']['USER']['colourtoken2'] = $post_colourtoken2;
-                $_SESSION['GAME']['USER']['gender'] = $post_gender;
+                $update_array['user_image_path'] = $post_imagepath;
+                $update_array['user_background_path'] = $post_backgroundpath;
+                $update_array['user_colour_token'] = $post_colourtoken;
+                $update_array['user_colour_token2'] = $post_colourtoken2;
+                $update_array['user_gender'] = $post_gender;
                 if (!empty($user_omega_seed)){
-                    $_SESSION['GAME']['USER']['omega'] = md5(MMRPG_SETTINGS_OMEGA_SEED.$user_omega_seed);
+                    $user_omega_sequence = md5(MMRPG_SETTINGS_OMEGA_SEED.$user_omega_seed);
+                    $update_array['user_omega'] = $user_omega_sequence;
+                }
+
+                // Update the database with collected field details
+                $db->update('mmrpg_users', $update_array, "user_id = {$this_userid}");
+
+                // If any of the contributor fields were provided, update those in relevant table
+                // If this user has a non-zero contributor ID assigned, export relevant data to the other table
+                $user_name_clean = $db->get_value("SELECT user_name_clean FROM mmrpg_users WHERE user_id = {$this_userid} LIMIT 1;", 'user_name_clean');
+                $contributor_id = $db->get_value("SELECT contributor_id FROM mmrpg_users_contributors WHERE user_name_clean = '{$user_name_clean}' LIMIT 1;", 'contributor_id');
+                if (!empty($contributor_id)){
+                    $temp_export_data = array();
+                    $temp_export_fields = rpg_user::get_contributor_index_fields(false);
+                    foreach ($temp_export_fields AS $f){ if ($f === 'contributor_id' || !isset($update_array[$f])){ continue; } else { $temp_export_data[$f] = $update_array[$f]; } }
+                    if (!empty($temp_export_data)){
+                        $temp_export_data['user_date_modified'] = time();
+                        $db->update('mmrpg_users_contributors', $temp_export_data, array('contributor_id' => $contributor_id));
+                    }
                 }
 
             }
 
         }
 
-        // Save the current game session into the file
+        // Now that we're done submitting the form, re-collect session data from the db
+        $temp_user_fields = rpg_user::get_index_fields(true, 'users');
+        $temp_user_role_fields = rpg_user_role::get_index_fields(true, 'roles');
+        $this_userinfo = $db->get_array("SELECT {$temp_user_fields}, {$temp_user_role_fields} FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
+        $_SESSION['GAME']['USER'] = mmrpg_prototype_format_user_data_for_session($this_userinfo);
         mmrpg_save_game_session();
-        $db_users_fields = rpg_user::get_index_fields(true, 'users');
-        $db_users_roles_fields = rpg_user_role::get_index_fields(true, 'roles');
-        $this_userinfo = $db->get_array("SELECT
-            {$db_users_fields},
-            {$db_users_roles_fields}
-            FROM mmrpg_users AS users
-            LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
-            WHERE users.user_id = '{$this_userid}'
-            LIMIT 1
-            ;");
-        $_SESSION['GAME']['USER']['userinfo'] = $this_userinfo;
-        $_SESSION['GAME']['USER']['userinfo']['user_password_encoded'] = '';
 
         // Update the has updated flag variable
         $file_has_updated = true;
