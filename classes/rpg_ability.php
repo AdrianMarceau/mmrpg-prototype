@@ -3211,6 +3211,7 @@ class rpg_ability extends rpg_object {
         // Create an options object for this function and populate
         $options = rpg_game::new_options_object();
         $options->buster_charge_required = !isset($this_robot_attachments[$this_attachment_token]) ? true : false;
+        $options->weapon_energy_required =  $options->buster_charge_required ? true : false;
         $extra_objects = array('this_ability' => $this_ability, 'options' => $options);
 
         // Trigger this robot's custom function if one has been defined for this context
@@ -3218,7 +3219,7 @@ class rpg_ability extends rpg_object {
         if ($options->return_early){ return $options->return_value; }
 
         // If the ability flag had already been set, reduce the weapon energy to zero
-        if (!$options->buster_charge_required){ $this_ability->set_energy(0); }
+        if (!$options->weapon_energy_required){ $this_ability->set_energy(0); }
 
         // Trigger this robot's custom function if one has been defined for this context
         $this_robot->trigger_custom_function('rpg-ability_elemental-buster_onload_after', $extra_objects);
