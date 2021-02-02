@@ -16,7 +16,7 @@ if ($request_kind === 'community-formatting-help'){
 
     // Collect and parse the raw markup for the post/thread
     $raw_markup = !empty($_POST['rawMarkup']) ? strip_tags(trim($_POST['rawMarkup'])) : '';
-    $parsed_markup = normalize_line_endings($raw_markup);
+    $parsed_markup = normalize_line_endings($raw_markup, false);
     $parsed_markup = nl2br(mmrpg_formatting_decode($parsed_markup));
 
     // Return the markup for the community formatting guide

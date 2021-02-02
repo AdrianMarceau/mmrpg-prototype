@@ -1456,9 +1456,9 @@ function getSortedDirContents($dir, $method = 'date'){
 }
 
 // Define a function for normalizing line endings to unix
-function normalize_line_endings($s){
+function normalize_line_endings($s, $max_nl = 3){
     $s = str_replace(array("\r\n", "\r", "\n"), "\n", $s); // Convert all line-endings to UNIX format.
-    $s = preg_replace("/\n{3,}/", "\n\n", $s); // Don't allow out-of-control blank lines.
+    if (!empty($max_nl)){ $s = preg_replace("/\n{".$max_nl.",}/", "\n\n", $s); } // Don't allow out-of-control blank lines.
     return $s;
 }
 
