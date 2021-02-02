@@ -46,163 +46,146 @@ if (!empty($this_playerinfo['user_colour_token2'])){ $temp_header_colour_token .
 $temp_subheader_colour_token = !empty($this_playerinfo['user_colour_token']) ? $this_playerinfo['user_colour_token'] : 'none';
 $temp_subheader_colour_token2 = !empty($this_playerinfo['user_colour_token2']) ? $this_playerinfo['user_colour_token2'] : $temp_subheader_colour_token;
 
-// Collect the robot index for later use
-$hidden_database_robots = array('robot', 'mega-man-ds', 'proto-man-ds', 'bass-ds', 'rock', 'cache', 'bond-man', 'fake-man');
-foreach ($hidden_database_robots AS $key => $token){ $hidden_database_robots[$key] = "'".$token."'"; }
-$db_robot_fields = rpg_robot::get_index_fields(true);
-$temp_robots_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1 AND robot_token NOT IN (".implode(',', $hidden_database_robots).");", 'robot_token');
+// Collect the player and robot index for later use
+$mmrpg_index_players = rpg_player::get_index();
+$mmrpg_index_robots = rpg_robot::get_index();
 
-// Generate this player's record numbers
-$temp_counter_players = array('total' => 0);
-$temp_counter_points = array('total' => 0);
-$temp_counter_missions = array('total_complete' => 0, 'total_failure' => 0);
-$temp_counter_robots = array('total' => 0);
-$temp_counter_abilities = array('total' => 0);
-$temp_counter_stars = array('total' => 0, 'field' => 0, 'fusion' => 0);
-$temp_counter_database = array();
-$temp_counter_database['total'] = 0;
-$temp_counter_database['encountered'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
-$temp_counter_database['scanned'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
-$temp_counter_database['summoned'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
-$temp_counter_database['unlocked'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
-$temp_counter_levels = array();
-// Loop through the completed battles
-if (!empty($this_playerinfo['save_values_battle_complete'])){
-    foreach ($this_playerinfo['save_values_battle_complete'] AS $token => $array){
-        foreach ($array AS $token2 => $array2){
-            $temp_counter_missions[$token] = !isset($temp_counter_missions[$token]) ? 1 : $temp_counter_missions[$token] + 1;
-            $temp_counter_missions['total_complete'] = !isset($temp_counter_missions['total_complete']) ? 1 : $temp_counter_missions['total_complete'] + 1;
-        }
-    }
-}
-// Loop through the failed battles
-if (!empty($this_playerinfo['save_values_battle_failure'])){
-    foreach ($this_playerinfo['save_values_battle_failure'] AS $token => $array){
-        foreach ($array AS $token2 => $array2){
-            $temp_counter_missions[$token] = !isset($temp_counter_missions[$token]) ? 1 : $temp_counter_missions[$token] + 1;
-            $temp_counter_missions['total_failure'] = !isset($temp_counter_missions['total_failure']) ? 1 : $temp_counter_missions['total_failure'] + 1;
-        }
-    }
-}
-// Loop through the battle stars
-if (!empty($this_playerinfo['save_values_battle_stars'])){
-    foreach ($this_playerinfo['save_values_battle_stars'] AS $token => $array){
-        $temp_counter_stars[$array['star_kind']] = !isset($temp_counter_stars[$array['star_kind']]) ? 1 : $temp_counter_stars[$array['star_kind']] + 1;
-        $temp_counter_stars[$array['star_player']] = !isset($temp_counter_stars[$array['star_player']]) ? 1 : $temp_counter_stars[$array['star_player']] + 1;
-        $temp_counter_stars['total'] = !isset($temp_counter_stars['total']) ? 1 : $temp_counter_stars['total'] + 1;
-    }
-}
-// Loop through the reward array
-if (!empty($this_playerinfo['save_values_battle_rewards'])){
-    foreach ($this_playerinfo['save_values_battle_rewards'] AS $token => $array){
-        if (!isset($array['player_points'])){ $array['player_points'] = 0; }
-        $temp_counter_players['total'] = !isset($temp_counter_players['total']) ? 1 : $temp_counter_players['total'] + 1;
-        $temp_counter_points[$token] = !isset($temp_counter_points[$token]) ? $array['player_points'] : $temp_counter_points[$token] + $array['player_points'];
-        $temp_counter_points['total'] = !isset($temp_counter_points['total']) ? $array['player_points'] : $temp_counter_points['total'] + $array['player_points'];
-        $array['player_robots'] = !empty($array['player_robots']) ? $array['player_robots'] : array();
-        foreach ($array['player_robots'] AS $token2 => $array2){
-            $temp_counter_robots[$token] = !isset($temp_counter_robots[$token]) ? 1 : $temp_counter_robots[$token] + 1;
-            $temp_counter_robots['total'] = !isset($temp_counter_robots['total']) ? 1 : $temp_counter_robots['total'] + 1;
-            $temp_level_total = !empty($array2['robot_level']) ? $array2['robot_level'] * 1000 : 0;
-            $temp_experience_total = !empty($array2['robot_experience']) ? $array2['robot_experience'] : 0;
-            $temp_stats_total = 0;
-            if (!empty($array2['robot_attack'])){ $temp_stats_total += $array2['robot_attack']; }
-            if (!empty($array2['robot_attack_pending'])){ $temp_stats_total += $array2['robot_attack_pending']; }
-            if (!empty($array2['robot_defense'])){ $temp_stats_total += $array2['robot_defense']; }
-            if (!empty($array2['robot_defense_pending'])){ $temp_stats_total += $array2['robot_defense_pending']; }
-            if (!empty($array2['robot_speed'])){ $temp_stats_total += $array2['robot_speed']; }
-            if (!empty($array2['robot_speed_pending'])){ $temp_stats_total += $array2['robot_speed_pending']; }
-            if (!empty($temp_stats_total)){ $temp_stats_total = $temp_stats_total / 1000;}
-            $temp_counter_levels[$token2] = $temp_level_total + $temp_experience_total + $temp_stats_total;
-        }
-        if (!empty($array['player_abilities'])){
-            foreach ($array['player_abilities'] AS $token2 => $array2){
-                if (!isset($temp_counter_abilities[$token2])){ $temp_counter_abilities['total'] = !isset($temp_counter_abilities['total']) ? 1 : $temp_counter_abilities['total'] + 1; }
-                $temp_counter_abilities[$token] = !isset($temp_counter_abilities[$token]) ? 1 : $temp_counter_abilities[$token] + 1;
-                $temp_counter_abilities[$token2] = !isset($temp_counter_abilities[$token2]) ? 1 : $temp_counter_abilities[$token2] + 1;
+// Generate an array of unlocked robot data for this user
+$user_robot_data = array();
+if (!empty($this_playerinfo['save_values_battle_rewards'])
+    && !empty($this_playerinfo['save_values_battle_settings'])){
+    foreach ($mmrpg_index_robots AS $robot_token => $robot_info){
+        if (empty($robot_info['robot_flag_published']) || empty($robot_info['robot_flag_unlockable'])){ continue; }
+        $robot_data = array();
+        foreach ($mmrpg_index_players AS $player_token => $player_info){
+            $rewards = $settings = array();
+            $flags = $values = $counters = array();
+            if (!empty($this_playerinfo['save_values_battle_rewards'][$player_token]['player_robots'][$robot_token])){
+                $rewards = $this_playerinfo['save_values_battle_rewards'][$player_token]['player_robots'][$robot_token];
             }
+            if (!empty($this_playerinfo['save_values_battle_settings'][$player_token]['player_robots'][$robot_token])){
+                $settings = $this_playerinfo['save_values_battle_settings'][$player_token]['player_robots'][$robot_token];
+            }
+            if (isset($rewards['flags'])){ $flags = array_merge($flags, $rewards['flags']); }
+            if (isset($settings['flags'])){ $flags = array_merge($flags, $settings['flags']); }
+            if (isset($rewards['values'])){ $values = array_merge($values, $rewards['values']); }
+            if (isset($settings['values'])){ $values = array_merge($values, $settings['values']); }
+            if (isset($rewards['counters'])){ $counters = array_merge($counters, $rewards['counters']); }
+            if (isset($settings['counters'])){ $counters = array_merge($counters, $settings['counters']); }
+            $robot_data = array_merge($robot_data, $rewards, $settings);
+            $robot_data = array_merge($robot_data, array('flags' => $flags, 'values' => $values, 'counters' => $counters));
         }
+        if (!empty($robot_data)){ $user_robot_data[$robot_token] = $robot_data; }
     }
 }
-// Loop through the robot database
+//error_log('$user_robot_data = '.print_r($user_robot_data, true));
+
+// Generate an array of robot masters with their summon counters for the most-used section
+$most_used_robot_masters = array();
+$most_used_robot_masters_text = '';
 if (!empty($this_playerinfo['save_values_robot_database'])){
-
-    // Loop through all of the robots, one by one, formatting their info
-    foreach($temp_robots_index AS $robot_key => $robot_info){
-
-        // Update and/or define the encountered, scanned, summoned, and unlocked flags
-        //die('dance <pre>'.print_r($this_playerinfo['save_values_robot_database'], true).'</pre>');
-        //$robot_info = rpg_robot::parse_index_info($robot_info);
-        if (!isset($robot_info['robot_visible'])){ $robot_info['robot_visible'] = !empty($this_playerinfo['save_values_robot_database'][$robot_info['robot_token']]) ? true : false; }
-        if (!isset($robot_info['robot_encountered'])){ $robot_info['robot_encountered'] = !empty($this_playerinfo['save_values_robot_database'][$robot_info['robot_token']]['robot_encountered']) ? $this_playerinfo['save_values_robot_database'][$robot_info['robot_token']]['robot_encountered'] : 0; }
-        if (!isset($robot_info['robot_scanned'])){ $robot_info['robot_scanned'] = !empty($this_playerinfo['save_values_robot_database'][$robot_info['robot_token']]['robot_scanned']) ? $this_playerinfo['save_values_robot_database'][$robot_info['robot_token']]['robot_scanned'] : 0; }
-        if (!isset($robot_info['robot_summoned'])){ $robot_info['robot_summoned'] = !empty($this_playerinfo['save_values_robot_database'][$robot_info['robot_token']]['robot_summoned']) ? $this_playerinfo['save_values_robot_database'][$robot_info['robot_token']]['robot_summoned'] : 0; }
-        if (!isset($robot_info['robot_unlocked'])){ $robot_info['robot_unlocked'] = !empty($this_playerinfo['save_values_robot_database'][$robot_info['robot_token']]['robot_unlocked']) ? $this_playerinfo['save_values_robot_database'][$robot_info['robot_token']]['robot_unlocked'] : 0; }
-        if (!isset($robot_info['robot_defeated'])){ $robot_info['robot_defeated'] = !empty($this_playerinfo['save_values_robot_database'][$robot_info['robot_token']]['robot_defeated']) ? $this_playerinfo['save_values_robot_database'][$robot_info['robot_token']]['robot_defeated'] : 0; }
-
-        // Increment the global robots counters
-        $temp_counter_database['total']++;
-        if ($robot_info['robot_encountered']){ $temp_counter_database['encountered']['total']++; $temp_counter_database['encountered'][$robot_info['robot_class']]++; }
-        if ($robot_info['robot_scanned']){ $temp_counter_database['scanned']['total']++; $temp_counter_database['scanned'][$robot_info['robot_class']]++; }
-        if ($robot_info['robot_unlocked']){ $temp_counter_database['unlocked']['total']++; $temp_counter_database['unlocked'][$robot_info['robot_class']]++; }
-        elseif ($robot_info['robot_summoned']){ $temp_counter_database['summoned']['total']++; $temp_counter_database['summoned'][$robot_info['robot_class']]++; }
-
-    }
-    unset($robot_info);
+    $most_used_robot_masters = array_map(function($r){
+        return !empty($r['robot_summoned']) ? $r['robot_summoned'] : 0;
+        }, $this_playerinfo['save_values_robot_database']);
+    $most_used_robot_masters = array_filter($most_used_robot_masters, function($e, $t) use($mmrpg_index_robots){
+        if (empty($e) || empty($mmrpg_index_robots[$t])){ return false; }
+        $r = $mmrpg_index_robots[$t];
+        if (empty($r['robot_flag_published']) || empty($r['robot_flag_unlockable'])){ return false; }
+        if ($r['robot_class'] !== 'master'){ return false; }
+        return true;
+        }, ARRAY_FILTER_USE_BOTH);
+    asort($most_used_robot_masters);
+    $most_used_robot_masters = array_reverse($most_used_robot_masters);
 }
-// Sort the points array for most-used
-asort($temp_counter_points);
-$temp_counter_points = array_reverse($temp_counter_points);
-// Sort the levels array for most-used
-asort($temp_counter_levels);
-$temp_counter_levels = array_reverse($temp_counter_levels);
-// Collect the most users player and most used robots
-$temp_top_player = '';
-foreach ($temp_counter_points AS $token => $value){
-    if ($token != 'total'){
-        $temp_top_player = '<strong>'.$mmrpg_index_players[$token]['player_name'].'</strong>';
-        break;
+if (!empty($most_used_robot_masters)){
+    $temp_robot_names = array_map(function($r) use($mmrpg_index_robots){ return $mmrpg_index_robots[$r]['robot_name']; }, array_keys($most_used_robot_masters));
+    if (count($temp_robot_names) > 5){
+        $temp_robot_names = array_slice($temp_robot_names, 0, 5);
+        $most_used_robot_masters_text .= 'top five ';
     }
+    $temp_robot_names = array_map(function($r){ return '<strong>'.$r.'</strong>'; }, $temp_robot_names);
+    $most_used_robot_masters_text .= 'most-used robot master'.(count($most_used_robot_masters) !== 1 ? 's are' : ' is').' ';
+    $most_used_robot_masters_text .= implode_with_oxford_comma($temp_robot_names);
 }
-$temp_top_robots = array();
+//error_log('$most_used_robot_masters = '.print_r($most_used_robot_masters, true));
+//error_log('$most_used_robot_masters_text = '.print_r($most_used_robot_masters_text, true));
 
-// Collect the favourite robots if there are set
-$temp_top_robots = array();
-$temp_top_robots_tokens = array();
-$temp_top_robots_counter = 5;
+// Generate an array of favourite robots master if any have been set
+$favourite_robot_masters = array();
+$favourite_robot_masters_text = '';
 if (!empty($this_playerinfo['save_values']['robot_favourites'])){
-    //die('we have favourites, people!');
-    $temp_top_robots_method = 'favourite';
-    foreach ($temp_counter_levels AS $token => $value){
-        if (in_array($token, $temp_top_robots_tokens)){ continue; }
-        elseif (!in_array($token, $this_playerinfo['save_values']['robot_favourites'])){ continue; }
-        if (count($temp_top_robots) < $temp_top_robots_counter){
-            $temp_top_robots_tokens[] = $token;
-            $temp_index = rpg_robot::parse_index_info($temp_robots_index[$token]);
-            $temp_top_robots[] = '<strong>'.$temp_index['robot_name'].'</strong>';
-            unset($temp_index);
-        } else {
-            break;
-        }
+    $favourite_robot_masters = $this_playerinfo['save_values']['robot_favourites'];
+    if (!empty($most_used_robot_masters)){
+        usort($favourite_robot_masters, function($r1, $r2) use($most_used_robot_masters){
+            $r1e = !empty($most_used_robot_masters[$r1]) ? $most_used_robot_masters[$r1] : 0;
+            $r2e = !empty($most_used_robot_masters[$r2]) ? $most_used_robot_masters[$r2] : 0;
+            if ($r1e > $r2e){ return -1; }
+            elseif ($r1e < $r2e){ return 1; }
+            else { return 0; }
+            });
     }
-} else {
-    $temp_top_robots_method = 'most-used';
 }
-if (count($temp_top_robots) < $temp_top_robots_counter){
-    foreach ($temp_counter_levels AS $token => $value){
-        if (in_array($token, $temp_top_robots_tokens)){ continue; }
-        if (count($temp_top_robots) < $temp_top_robots_counter){
-            $temp_top_robots_tokens[] = $token;
-            $temp_index = rpg_robot::parse_index_info($temp_robots_index[$token]);
-            $temp_top_robots[] = '<strong>'.$temp_index['robot_name'].'</strong>';
-            unset($temp_index);
-        } else {
-            break;
-        }
+if (!empty($favourite_robot_masters)){
+    $temp_robot_names = array_map(function($r) use($mmrpg_index_robots){ return $mmrpg_index_robots[$r]['robot_name']; }, $favourite_robot_masters);
+    if (count($temp_robot_names) > 5){
+        $temp_robot_names = array_slice($temp_robot_names, 0, 5);
+        $most_used_robot_masters_text .= 'top five ';
     }
+    $temp_robot_names = array_map(function($r){ return '<strong>'.$r.'</strong>'; }, $temp_robot_names);
+    $favourite_robot_masters_text .= 'favourite robot master'.(count($favourite_robot_masters) !== 1 ? 's are' : ' is').' ';
+    $favourite_robot_masters_text .= implode_with_oxford_comma($temp_robot_names);
+}
+//error_log('$favourite_robot_masters = '.print_r($favourite_robot_masters, true));
+//error_log('$favourite_robot_masters_text = '.print_r($favourite_robot_masters_text, true));
+
+// Attempt to generate the user's achievement text for their profile
+$user_profile_achievement_text = array();
+if (!empty($this_playerinfo['board_awards'])){
+    $board_awards = explode(',', $this_playerinfo['board_awards']);
+    $campaigns_complete = 0;
+    if (in_array('prototype_complete_light', $board_awards)){ $campaigns_complete += 1; }
+    if (in_array('prototype_complete_wily', $board_awards)){ $campaigns_complete += 1; }
+    if (in_array('prototype_complete_cossack', $board_awards)){ $campaigns_complete += 1; }
+    $user_profile_achievement_text[] = 'completed '.$campaigns_complete.' player campaign'.($campaigns_complete !== 1 ? 's' : '');
+}
+if (!empty($this_playerinfo['board_robots_count'])){
+    $count = $this_playerinfo['board_robots_count'];
+    $user_profile_achievement_text[] = 'unlocked '.$count.' robot master'.($count !== 1 ? 's' : '');
+}
+if (!empty($this_playerinfo['board_abilities'])){
+    $count = $this_playerinfo['board_abilities'];
+    $user_profile_achievement_text[] = 'learned '.$count.' special '.($count !== 1 ? 'abilities' : 'ability');
+}
+if (!empty($this_playerinfo['board_items'])){
+    $count = $this_playerinfo['board_items'];
+    $user_profile_achievement_text[] = 'found '.$count.($count > 1 ? ' different' : '').' inventory item'.($count !== 1 ? 's' : '');
+}
+if (!empty($this_playerinfo['board_stars'])){
+    $count = $this_playerinfo['board_stars'];
+    $user_profile_achievement_text[] = 'collected '.$count.' elemental star'.($count !== 1 ? 's' : '');
+}
+if (!empty($user_profile_achievement_text)){
+    $user_profile_achievement_text = implode_with_oxford_comma($user_profile_achievement_text);
+} else {
+    $user_profile_achievement_text = '';
 }
 
-//die('<pre>$temp_top_robots = '.print_r($temp_top_robots, true).'</pre>');
+// Attempt to generate favourite and most-used text for this player's robots
+$user_profile_robot_text = array();
+if (!empty($favourite_robot_masters_text)){ $user_profile_robot_text[] = $favourite_robot_masters_text; }
+if (!empty($most_used_robot_masters_text)){ $user_profile_robot_text[] = $most_used_robot_masters_text; }
+if (!empty($user_profile_robot_text)){
+    $user_profile_robot_text = implode(' and '.$temp_gender_pronoun.' ', $user_profile_robot_text);
+    $user_profile_robot_text = '<strong>'.$temp_display_name.'</strong>\'s '.$user_profile_robot_text.'.'.PHP_EOL;
+} else {
+    $user_profile_robot_text = '';
+}
+
+// Now let's put it all together into one big blog of player profile text
+$user_profile_text_complete = '';
+$user_profile_text_complete .= '<strong>'.$temp_display_name.'</strong> is '.($temp_is_contributor ? 'a contributor and ' : '').$temp_display_active.' of the <strong>Mega Man RPG Prototype</strong> with a current battle point total of <strong>'.number_format($temp_display_points).'</strong>'.($temp_display_zenny > 0 ? ' and a zenny total of <strong>'.number_format($temp_display_zenny).'</strong>' : '').'.  ';
+$user_profile_text_complete .= '<strong>'.$temp_display_name.'</strong> created '.$temp_gender_pronoun.' account on '.($temp_display_created <= 1357016400 ? 'or before ' : '').date('F jS, Y', $temp_display_created).(!empty($user_profile_achievement_text) ? ' and has since '.$user_profile_achievement_text : '').'.  ';
+if ($user_profile_robot_text){ $user_profile_text_complete .= $user_profile_robot_text.'  '; }
 
 // Require the leaderboard data file
 define('MMRPG_SKIP_MARKUP', true);
@@ -219,11 +202,11 @@ $temp_show_posts = !empty($this_playerinfo['post_count']) ? true : false;
 
 // Define the SEO variables for this page
 $this_seo_title = $temp_display_name.' | '.$this_seo_title;
-$this_seo_description = $temp_display_name.' is a player of the Mega Man RPG Prototype with a total of '.$temp_display_points.' battle points. '.$this_seo_description;
+$this_seo_description = preg_replace('/\s+/', ' ', strip_tags($user_profile_text_complete)).' '.$this_seo_description;
 
 // Define the Open Graph variables for this page
 $this_graph_data['title'] = $temp_display_name.' | '.$this_graph_data['title'];
-$this_graph_data['description'] = $temp_display_name.' is a player of the Mega Man RPG Prototype with a total of '.$temp_display_points.' battle points. '.$this_graph_data['description'];
+$this_graph_data['description'] = preg_replace('/\s+/', ' ', strip_tags($user_profile_text_complete)).' '.$this_graph_data['description'];
 
 // Update the GET variables with the current page num
 $this_num_offset = $this_current_num - 1;
@@ -294,9 +277,7 @@ if (true || strstr($page_content_parsed, $find)){
                 </div>
                 <div class="bodytext">
                     <p class="text" style="color: rgb(157, 220, 255);">
-                        <strong><?= $temp_display_name ?></strong> is <?= $temp_is_contributor ? 'a contributor and ' : '' ?><?= $temp_display_active  ?> of the <strong>Mega Man RPG Prototype</strong> with a current battle point total of <strong><?= number_format($temp_display_points) ?></strong><?= $temp_display_zenny > 0 ? ' and a zenny total of <strong>'.number_format($temp_display_zenny).'</strong>' : '' ?>.
-                        <strong><?= $temp_display_name ?></strong> created <?= $temp_gender_pronoun ?> account on <?= ($temp_display_created <= 1357016400 ? 'or before ' : '').date('F jS, Y', $temp_display_created) ?> and has since completed <?= $temp_counter_missions['total_complete'] ?> different missions, unlocked <?= $temp_counter_players['total'] ?> playable characters, <?= $temp_counter_robots['total'] ?> robot fighters, <?= $temp_counter_abilities['total'] ?> special abilities, and <?= count($this_playerinfo['save_values_battle_stars']) == 1 ? '1 field star' : count($this_playerinfo['save_values_battle_stars']).' field stars' ?>.
-                        <strong><?= $temp_display_name ?></strong>'s most-used playable character is <?= $temp_top_player ?>, and <?= $temp_gender_pronoun ?> <?= count($temp_top_robots) > 1 ? 'top '.count($temp_top_robots).' '.$temp_top_robots_method.' robots appear' : $temp_top_robots_method.' robot appears' ?> to be <?= implode(', ', array_slice($temp_top_robots, 0, -1)).(count($temp_top_robots) > 1 ? ' and ' : '').$temp_top_robots[count($temp_top_robots) - 1] ?>.
+                        <?= $user_profile_text_complete ?>
                     </p>
                     <?
                     // Define a quick function for formatting a legacy ranking span
@@ -347,34 +328,11 @@ if (true || strstr($page_content_parsed, $find)){
                             <? endif; ?>
                         </ul>
                     </div>
-                    <div class="text player_stats">
-                        <strong class="label">Robot Database Stats</strong>
-                        <ul class="records">
-                            <? $temp_unlocked_summoned_total = $temp_counter_database['unlocked']['total'] + $temp_counter_database['summoned']['total']; ?>
-                            <? if(!empty($temp_counter_database['total'])): ?>
-                                <li class="stat"><span class="counter summoned_counter"><?= $temp_counter_database['unlocked']['total'] ?> Unlocked</span></li>
-                                <li class="stat"><span class="counter scanned_counter"><?= $temp_counter_database['scanned']['total'] ?> Scanned</span></li>
-                                <li class="stat"><span class="counter encountered_counter"><?= $temp_counter_database['encountered']['total'] ?> Encountered</span></li>
-                            <? else: ?>
-                                <li class="stat"><span class="counter summoned_counter">0 Summoned</span></li>
-                                <li class="stat"><span class="counter scanned_counter">0 Scanned</span></li>
-                                <li class="stat"><span class="counter encountered_counter">0 Encountered</span></li>
-                            <? endif; ?>
-                        </ul>
-                    </div>
                 </div>
             </div>
 
             <h2 class="subheader field_type_<?= $temp_header_colour_token ?>" style="margin: 10px 0 4px; text-align: left;">
                 <?=$temp_display_name?>&#39;s Leaderboard
-                <? /*<span class="count" style="position: relative; bottom: 1px;"><?
-                    // Add the prototype complete flags if applicable
-                    $this_awards = !empty($this_playerinfo['board_awards']) ? explode(',', $this_playerinfo['board_awards']) : array();
-                    if (in_array('prototype_complete_light', $this_awards)){ echo '<span class="prototype_complete prototype_complete_dr-light" title="Dr. Light Prototype Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span> '; }
-                    if (in_array('prototype_complete_wily', $this_awards)){ echo '<span class="prototype_complete prototype_complete_dr-wily" title="Dr. Wily Prototype Complete!" data-tooltip-type="player_type player_type_attack">&clubs;</span> '; }
-                    if (in_array('prototype_complete_cossack', $this_awards)){ echo '<span class="prototype_complete prototype_complete_dr-cossack" title="Dr. Cossack Prototype Complete!" data-tooltip-type="player_type player_type_speed">&diams;</span> '; }
-                    if (in_array('ranking_first_place', $this_awards)){ echo '<span class="prototype_complete prototype_complete_firstplace" data-tooltip="Reached First Place" data-tooltip-type="player_type player_type_level">&#9733;</span> '; }
-                ?></span>*/ ?>
             </h2>
 
             <div id="game_container" class="subbody thread_subbody thread_subbody_full thread_subbody_full_right thread_right event event_triple event_visible <?= in_array($this_current_token, array('robots', 'players', 'database', 'items', 'stars')) ? 'has_iframe' : '' ?>" style="text-align: left; position: relative; padding-bottom: 6px; margin-bottom: 4px;">
@@ -440,41 +398,6 @@ if (true || strstr($page_content_parsed, $find)){
                 // If this is the View Profile page, show the appropriate content
                 if (empty($this_current_token) || !in_array($this_current_token, $temp_allowed_pages)){
                     ?>
-
-                        <? /*
-                        <div class="bodytext community_stats">
-                            <div class="text player_stats">
-                                <strong class="label">Community Forum Stats</strong>
-                                <ul class="records">
-                                    <li class="stat"><span class="counter thread_counter" style=""><?= $this_playerinfo['thread_count'] == 1 ? '1 Thread' : $this_playerinfo['thread_count'].' Threads' ?></span></li>
-                                    <li class="stat"><span class="counter post_counter"><?= $this_playerinfo['post_count'] == 1 ? '1 Post' : $this_playerinfo['post_count'].' Posts' ?></span></li>
-                                    <?/ *<li class="stat"><span class="counter like_counter"><?= $this_playerinfo['like_count'] == 1 ? '1 Like' : $this_playerinfo['like_count'].' Likes' ?></span></li>* /?>
-                                    <? $this_playerinfo['comment_count'] = $this_playerinfo['post_count'] + $this_playerinfo['thread_count']; ?>
-                                    <? $this_playerinfo['comment_rating'] = round(($this_playerinfo['post_count'] * 2) - ($this_playerinfo['thread_count'] / 2)); ?>
-                                    <? if($this_playerinfo['comment_rating'] != 0): ?>
-                                        <li class="stat"><span class="counter rating_counter"><?= ($this_playerinfo['comment_rating'] > 0 ? '+' : '-').$this_playerinfo['comment_rating'] ?> Rating</span></li>
-                                    <? else: ?>
-                                        <li class="stat"><span class="counter rating_counter">0 Rating</span></li>
-                                    <? endif; ?>
-                                </ul>
-                            </div>
-                            <div class="text player_stats">
-                                <strong class="label">Robot Database Stats</strong>
-                                <ul class="records">
-                                    <? $temp_unlocked_summoned_total = $temp_counter_database['unlocked']['total'] + $temp_counter_database['summoned']['total']; ?>
-                                    <? if(!empty($temp_counter_database['total'])): ?>
-                                        <li class="stat"><span class="counter summoned_counter"><?= $temp_counter_database['unlocked']['total'] ?> Unlocked</span></li>
-                                        <li class="stat"><span class="counter scanned_counter"><?= $temp_counter_database['scanned']['total'] ?> Scanned</span></li>
-                                        <li class="stat"><span class="counter encountered_counter"><?= $temp_counter_database['encountered']['total'] ?> Encountered</span></li>
-                                    <? else: ?>
-                                        <li class="stat"><span class="counter summoned_counter">0 Summoned</span></li>
-                                        <li class="stat"><span class="counter scanned_counter">0 Scanned</span></li>
-                                        <li class="stat"><span class="counter encountered_counter">0 Encountered</span></li>
-                                    <? endif; ?>
-                                </ul>
-                            </div>
-                        </div>
-                        */ ?>
 
                         <div class="bodytext" style="margin-top: 15px;">
                             <? if(!empty($temp_display_text)): ?>
@@ -872,22 +795,6 @@ if (true || strstr($page_content_parsed, $find)){
 
         </div>
 
-        <? if(false): ?>
-            <div style="padding: 10px; color: white;">
-                <pre>$temp_counter_players : <?= print_r($temp_counter_players, true) ?></pre>
-                <hr />
-                <pre>$temp_counter_points : <?= print_r($temp_counter_points, true) ?>
-                <hr />
-                <pre>$temp_counter_missions : <?= print_r($temp_counter_missions, true) ?>
-                <hr />
-                <pre>$temp_counter_robots : <?= print_r($temp_counter_robots, true) ?>
-                <hr />
-                <pre>$temp_counter_abilities : <?= print_r($temp_counter_abilities, true) ?>
-                <hr />
-                <pre>$temp_counter_levels : <?= print_r($temp_counter_levels, true) ?>
-                <hr />
-            </div>
-        <? endif; ?>
     <?
     $replace = ob_get_clean();
     //$page_content_parsed = str_replace($find, $replace, $page_content_parsed);

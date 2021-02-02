@@ -1504,5 +1504,13 @@ function encode_form_value($string, $double_encode = true){
     return htmlentities($string, ENT_QUOTES, 'UTF-8', $double_encode);
 }
 
+// Define a function for imploding a list with oxford commas and a final "and" between last two
+function implode_with_oxford_comma($list){
+    if (empty($list)){ return ''; }
+    $size = count($list);
+    if ($size === 1){ return implode('', $list); }
+    elseif ($size === 2){ return implode(' and ', $list); }
+    else { return implode(', ', array_slice($list, 0, -1)).', and '.$list[$size - 1]; }
+}
 
 ?>
