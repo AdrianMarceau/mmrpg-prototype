@@ -1040,7 +1040,7 @@
 
                                     <div class="field foursize has_unit has_unit_checkbox">
                                         <strong class="label"><span class="type_span type_weapons">Energy</span> <em>WE</em></strong>
-                                        <input class="textbox" type="number" name="ability_energy" value="<?= $ability_data['ability_energy'] ?>" maxlength="8" min="0" max="64" step="2" />
+                                        <input class="textbox" type="number" name="ability_energy" value="<?= $ability_data['ability_energy'] ?>" maxlength="8" min="0" max="64" step="1" />
                                         <? $is_percent = !empty($ability_data['ability_energy_percent']) ? true : false; ?>
                                         <strong class="unit has_checkbox" title="Is Percent?">
                                             <span class="<?= $is_percent ? 'active' : 'inactive' ?>">%</span>
