@@ -710,34 +710,63 @@ $(document).ready(function(){
                 // If the ability change was a success, update the console link
                 if (dataStatus == 'success'){
 
-                    // If a non-empty ability token was provided, normal equip
-                    if (thisAbilityToken.length){
+                    // Break apart the returned content into a list of new abilities
+                    var newAbilityList = dataContent.split(',');
+                    //console.log('newAbilityList =', newAbilityList);
 
-                        // Update the target ability link with new data
-                        targetAbilityLink.attr('class', thisAbilityLink.attr('class'));
-                        targetAbilityLink.attr('data-id', thisAbilityLink.attr('data-id'));
-                        targetAbilityLink.attr('data-ability', thisAbilityLink.attr('data-ability'));
-                        targetAbilityLink.attr('data-type', thisAbilityLink.attr('data-type'));
-                        targetAbilityLink.attr('data-type2', thisAbilityLink.attr('data-type2'));
-                        targetAbilityLink.attr('data-tooltip', thisAbilityLink.attr('data-tooltip'));
-                        // Clone the inner html into the target ability link
-                        targetAbilityLink.html(thisAbilityLink.html());
+                    // If the new ability list is completely empty (somehow), add Buster Shot
+                    if (!newAbilityList.length){ newAbilityList.push('buster-shot'); }
 
-                        }
-                    // Otherwise if this was an ability remove option, clear stuff
-                    else {
+                    // Loop through all the ability slots and update them with relevant abilities
+                    var $parentAbilityContainer = targetAbilityLink.closest('.ability_container');
+                    var $targetAbilityLinks = $parentAbilityContainer.find('a.ability_name[data-key]');
+                    var $refAbilityLinks = $('a.ability_name[data-ability]', thisAbilityCanvas);
+                    //console.log('$parentAbilityContainer.length =', $parentAbilityContainer.length);
+                    //console.log('$targetAbilityLinks.length =', $targetAbilityLinks.length);
+                    $targetAbilityLinks.each(function(index){
 
-                        // Update the target ability link with empty data
-                        targetAbilityLink.attr('class', 'ability_name');
-                        targetAbilityLink.attr('data-id', '0');
-                        targetAbilityLink.attr('data-ability', '');
-                        targetAbilityLink.attr('data-type', '');
-                        targetAbilityLink.attr('data-type2', '');
-                        targetAbilityLink.attr('data-tooltip', '');
-                        // Remove the label text and replace with empty hyphen
-                        targetAbilityLink.find('label').attr('style', '').html('-');
+                        var slotKey = index;
+                        var newAbilityToken = typeof newAbilityList[slotKey] !== 'undefined' ? newAbilityList[slotKey] : '';
+                        //console.log('slotKey =', slotKey);
+                        //console.log('newAbilityToken =', newAbilityToken);
 
-                        }
+                        var $targetAbilityLink = $(this);
+                        var $refAbilityLink = false;
+                        if (newAbilityToken.length){ $refAbilityLink = $refAbilityLinks.filter('[data-ability="'+newAbilityToken+'"]'); }
+                        //console.log('$targetAbilityLink.length =', $targetAbilityLink.length);
+                        //console.log('$refAbilityLink.length =', $refAbilityLink.length);
+
+                        // If a non-empty ability token was provided, normal equip
+                        if (newAbilityToken.length
+                            && $refAbilityLink.length){
+
+                            // Update the target ability link with new data
+                            $targetAbilityLink.attr('class', $refAbilityLink.attr('class'));
+                            $targetAbilityLink.attr('data-id', $refAbilityLink.attr('data-id'));
+                            $targetAbilityLink.attr('data-ability', $refAbilityLink.attr('data-ability'));
+                            $targetAbilityLink.attr('data-type', $refAbilityLink.attr('data-type'));
+                            $targetAbilityLink.attr('data-type2', $refAbilityLink.attr('data-type2'));
+                            $targetAbilityLink.attr('data-tooltip', $refAbilityLink.attr('data-tooltip'));
+                            // Clone the inner html into the target ability link
+                            $targetAbilityLink.html($refAbilityLink.html());
+
+                            }
+                        // Otherwise if this was an ability remove option, clear stuff
+                        else {
+
+                            // Update the target ability link with empty data
+                            $targetAbilityLink.attr('class', 'ability_name');
+                            $targetAbilityLink.attr('data-id', '0');
+                            $targetAbilityLink.attr('data-ability', '');
+                            $targetAbilityLink.attr('data-type', '');
+                            $targetAbilityLink.attr('data-type2', '');
+                            $targetAbilityLink.attr('data-tooltip', '');
+                            // Remove the label text and replace with empty hyphen
+                            $targetAbilityLink.find('label').attr('style', '').html('-');
+
+                            }
+
+                        });
 
                     }
 
