@@ -104,7 +104,11 @@ function mmrpg_load_game_session(){
             $new_game_data['values']['robot_alts_hash'] = md5($this_database_save['save_values_robot_alts']);
         }
 
-        if (!empty($this_database_save['save_values_robot_database'])){
+        mmrpg_pull_user_robot_records($login_user_id, $user_robot_records);
+        if (!empty($user_robot_records)){
+            $new_game_data['values']['robot_database'] = $user_robot_records;
+            $new_game_data['values']['robot_database_hash'] = md5(json_encode($user_robot_records));
+        } elseif (!empty($this_database_save['save_values_robot_database'])){
             $new_game_data['values']['robot_database'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_robot_database']), true);
             $new_game_data['values']['robot_database_hash'] = md5($this_database_save['save_values_robot_database']);
         }
