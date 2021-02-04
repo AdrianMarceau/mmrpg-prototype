@@ -90,6 +90,14 @@ function mmrpg_reset_game_session(){
     // -- NORMAL MODE UNLOCKS -- //
     elseif (empty($_SESSION[$session_token]['DEMO'])){
 
+        // Clear all records for this user from the database
+        $user_id = $this_user['userid'];
+        if (!empty($user_id)){
+            $db->delete('mmrpg_users_records_robots', array('user_id' => $user_id));
+            $db->delete('mmrpg_challenges_leaderboard', array('user_id' => $user_id));
+            $db->delete('mmrpg_challenges_waveboard', array('user_id' => $user_id));
+        }
+
         // Define a session var to ensure full reset
         $_SESSION[$session_token]['RESET'] = true;
 
