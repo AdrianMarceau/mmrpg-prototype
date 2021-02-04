@@ -3037,11 +3037,11 @@ function mmrpg_prototype_format_user_data_for_session($this_userinfo){
 
 
 // Define a function for updating a given user's robot records in the database
-function mmrpg_update_user_robot_records($user_id, $user_robot_database){
+function mmrpg_update_user_robot_records($user_id, $user_robot_records){
     global $db;
 
     if (empty($user_id)){ return false; }
-    if (empty($user_robot_database)){ return false; }
+    if (empty($user_robot_records)){ return false; }
 
     // Define the list of stat fields to collect/review
     $record_fields = array(
@@ -3064,7 +3064,7 @@ function mmrpg_update_user_robot_records($user_id, $user_robot_database){
     // Loop through the provided list of records and update/insert/skip
     $insert_records = array();
     $update_records = array();
-    foreach ($user_robot_database AS $robot_token => $robot_records){
+    foreach ($user_robot_records AS $robot_token => $robot_records){
         if (!isset($existing_robot_records[$robot_token])){
             $insert_record = array('user_id' => $user_id, 'robot_token' => $robot_token);
             foreach ($record_fields AS $record){ $insert_record[$record] = isset($robot_records[$record]) ? $robot_records[$record] : 0; }

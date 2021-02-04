@@ -372,6 +372,12 @@ function mmrpg_save_game_session(){
         //echo('<pre>$this_save_array = '.print_r($this_save_array, true).'</pre>');
         $db->update('mmrpg_saves', $this_save_array, 'user_id = '.$this_user['userid']);
 
+        // If the robot database values were not empty, we should update them in the records table
+        if (!empty($this_save_array['save_values_robot_database'])){
+            $user_robot_records = json_decode($this_save_array['save_values_robot_database'], true);
+            mmrpg_update_user_robot_records($this_user['userid'], $user_robot_records);
+        }
+
     }
 
     // Unset the reset flag in the session
