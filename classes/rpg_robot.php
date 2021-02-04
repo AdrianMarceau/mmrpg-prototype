@@ -3338,34 +3338,29 @@ class rpg_robot extends rpg_object {
             // Otherwise, if record not exists or too old, generate a new one
             else {
 
-                // Collect relevant save files from the database
-                $temp_player_query = "SELECT
-                    saves.user_id,
-                    saves.save_values_robot_database,
-                    board.board_points,
-                    users.user_image_path
-                    FROM mmrpg_saves AS saves
-                    LEFT JOIN mmrpg_leaderboard AS board ON board.user_id = saves.user_id
-                    LEFT JOIN mmrpg_users AS users ON users.user_id = saves.user_id
-                    WHERE
-                    board.board_points > 0
-                    AND saves.save_values_robot_database LIKE '%\"{$record_token}\"%'
+                // Generate a record query for this robot and pull from database
+                $record_token = $robot_info['robot_token'];
+                $record_avatar_string = 'robots/'.$record_token.'/'.$robot_image_size;
+                $temp_record_query = "SELECT
+                    records.robot_token,
+                    SUM(records.robot_encountered) AS robot_encountered,
+                    SUM(records.robot_defeated) AS robot_defeated,
+                    SUM(records.robot_unlocked) AS robot_unlocked,
+                    SUM(records.robot_summoned) AS robot_summoned,
+                    SUM(records.robot_scanned) AS robot_scanned,
+                    avatars.robot_avatars AS robot_avatars
+                    FROM mmrpg_users_records_robots AS records
+                    LEFT JOIN (SELECT
+                        '{$record_token}' AS robot_token,
+                        COUNT(*) AS robot_avatars
+                        FROM mmrpg_users AS users
+                        LEFT JOIN mmrpg_leaderboard AS board ON board.user_id = users.user_id
+                        WHERE board.board_points > 0 AND users.user_image_path = '{$record_avatar_string}'
+                        ) AS avatars ON avatars.robot_token = records.robot_token
+                    WHERE records.robot_token = '{$record_token}'
                     ;";
-                $temp_player_list = $db->get_array_list($temp_player_query);
-
-                // Loop through save files and count unlock records etc.
-                if (!empty($temp_player_list)){
-                    foreach ($temp_player_list AS $temp_data){
-                        $temp_values = !empty($temp_data['save_values_robot_database']) ? json_decode($temp_data['save_values_robot_database'], true) : array();
-                        $temp_entry = !empty($temp_values[$robot_info['robot_token']]) ? $temp_values[$robot_info['robot_token']] : array();
-                        foreach ($temp_robot_records AS $temp_record => $temp_count){
-                            if (!empty($temp_entry[$temp_record])){ $temp_robot_records[$temp_record] += $temp_entry[$temp_record]; }
-                        }
-                        if (strstr($temp_data['user_image_path'], 'robots/'.$robot_info['robot_token'])){
-                            $temp_robot_records['robot_avatars'] += 1;
-                        }
-                    }
-                }
+                $temp_robot_records = $db->get_array($temp_record_query);
+                //error_log('$temp_robot_records = '.print_r($temp_robot_records, true));
 
                 // Now that we have the data, either insert or update the record in the db
                 if (empty($existing_record)){
