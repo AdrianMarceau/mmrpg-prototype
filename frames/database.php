@@ -180,6 +180,7 @@ if (true){
     // Define the header/base counters for the database
     $global_robots_counters = array();
     $global_robots_counters['total'] = 0;
+    $global_robots_counters['registered'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
     $global_robots_counters['encountered'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
     $global_robots_counters['scanned'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
     $global_robots_counters['summoned'] = array('total' => 0, 'master' => 0, 'mecha' => 0, 'boss' => 0);
@@ -207,12 +208,14 @@ if (true){
             if (!isset($robot_info['robot_unlocked'])){ $robot_info['robot_unlocked'] = !empty($_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_unlocked']) ? $_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_unlocked'] : 0; }
             if (!isset($robot_info['robot_defeated'])){ $robot_info['robot_defeated'] = !empty($_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_defeated']) ? $_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_defeated'] : 0; }
 
+            /*
             // If this robot was summoned but not enountered, let's fix that
             if (empty($robot_info['robot_encountered'])
                 && !empty($robot_info['robot_summoned'])){
                 $robot_info['robot_encountered'] = $robot_info['robot_summoned'];
                 $_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_encountered'] = $robot_info['robot_encountered'];
             }
+            */
 
             // Define the page token based on this robot's game of origin
             if (!isset($robot_info['robot_page_token'])){
@@ -232,7 +235,8 @@ if (true){
 
             // Increment the global robots counters
             $global_robots_counters['total']++;
-            if ($robot_info['robot_unlocked'] || $robot_info['robot_encountered']){ $global_robots_counters['encountered']['total']++; $global_robots_counters['encountered'][$robot_info['robot_class']]++; }
+            if ($robot_info['robot_unlocked'] || $robot_info['robot_summoned'] || $robot_info['robot_encountered']){ $global_robots_counters['registered']['total']++; $global_robots_counters['registered'][$robot_info['robot_class']]++; }
+            if ($robot_info['robot_encountered']){ $global_robots_counters['encountered']['total']++; $global_robots_counters['encountered'][$robot_info['robot_class']]++; }
             if ($robot_info['robot_scanned']){ $global_robots_counters['scanned']['total']++; $global_robots_counters['scanned'][$robot_info['robot_class']]++; }
             if ($robot_info['robot_unlocked']){ $global_robots_counters['unlocked']['total']++; $global_robots_counters['unlocked'][$robot_info['robot_class']]++; }
             elseif ($robot_info['robot_summoned']){ $global_robots_counters['summoned']['total']++; $global_robots_counters['summoned'][$robot_info['robot_class']]++; }
@@ -256,7 +260,7 @@ if (true){
             <i class="fa fas fa-book"></i>
             Robot Database
             <span class="progress">(
-                <?= $global_robots_counters['encountered']['total'] == 1 ? '<span title="1 Robot Encountered">1</span>' : '<span title="'.$global_robots_counters['encountered']['total'].' Robots Encountered">'.$global_robots_counters['encountered']['total'].'</span>' ?>
+                <?= $global_robots_counters['registered']['total'] == 1 ? '<span title="1 Robot Registered">1</span>' : '<span title="'.$global_robots_counters['registered']['total'].' Robots Registered">'.$global_robots_counters['registered']['total'].'</span>' ?>
                 / <?= $global_robots_counters['total'] == 1 ? '<span title="1 Robot">1 Robot Total</span>' : '<span title="'.$global_robots_counters['total'].' Robots Total">'.$global_robots_counters['total'].' Robots</span>' ?>
             )</span>
         </span>
