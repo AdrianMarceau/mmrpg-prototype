@@ -490,7 +490,7 @@ foreach ($this_menu_tooltips AS $token => $text){
                         <label>inventory</label>
                     </a>
                 <? endif; ?>
-                <? if (mmrpg_prototype_abilities_unlocked() > 0): ?>
+                <? if (mmrpg_prototype_abilities_unlocked() > 2): ?>
                     <span class="pipe">|</span>
                     <a class="link link_abilities" data-step="abilities" data-index="<?= $this_menu_indexes['abilities'] ?>" data-source="frames/abilities.php" data-music="misc/item-viewer" data-tooltip="<?= $this_menu_tooltips['abilities'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <i class="fa fas fa-fire-alt"></i>
