@@ -3034,7 +3034,50 @@ function mmrpg_prototype_format_user_data_for_session($this_userinfo){
     return $session_user;
 }
 
+// Define a function for pulling a given user's robot records from the database
+function mmrpg_pull_user_robot_records($user_id, &$user_robot_records = array()){
+    global $db;
 
+    if (empty($user_id)){ return false; }
+
+    // Define the list of stat fields to collect/review
+    $record_fields = array(
+        'robot_encountered',
+        'robot_defeated',
+        'robot_unlocked',
+        'robot_summoned',
+        'robot_scanned'
+        );
+
+    // Collect a list of existing records for this user from the database
+    $record_table_name = 'mmrpg_users_records_robots';
+    $record_fields_string = implode(', ', $record_fields);
+    $existing_robot_records = $db->get_array_list("SELECT
+        robot_token, {$record_fields_string}
+        FROM `{$record_table_name}`
+        WHERE user_id = {$user_id}
+        ;", 'robot_token');
+
+    // If not empty, loop through database records and update local array
+    if ($existing_robot_records){
+        foreach ($existing_robot_records AS $robot_token => $robot_records){
+            if (!isset($user_robot_records[$robot_token])){
+                $user_robot_records[$robot_token] = $robot_records;
+            } else {
+                foreach ($record_fields AS $record){
+                    if (!isset($user_robot_records[$robot_token][$record])
+                        || $robot_records[$record] > $user_robot_records[$robot_token][$record]){
+                        $user_robot_records[$robot_token][$record] = $robot_records[$record];
+                    }
+                }
+            }
+        }
+    }
+
+    // Return true on success
+    return true;
+
+}
 
 // Define a function for updating a given user's robot records in the database
 function mmrpg_update_user_robot_records($user_id, $user_robot_records){
