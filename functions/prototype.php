@@ -3034,4 +3034,73 @@ function mmrpg_prototype_format_user_data_for_session($this_userinfo){
     return $session_user;
 }
 
+
+
+// Define a function for updating a given user's robot records in the database
+function mmrpg_update_user_robot_records($user_id, $user_robot_database){
+    global $db;
+
+    if (empty($user_id)){ return false; }
+    if (empty($user_robot_database)){ return false; }
+
+    // Define the list of stat fields to collect/review
+    $record_fields = array(
+        'robot_encountered',
+        'robot_defeated',
+        'robot_unlocked',
+        'robot_summoned',
+        'robot_scanned'
+        );
+
+    // Collect a list of existing records so we know when to update vs insert vs skip
+    $record_table_name = 'mmrpg_users_records_robots';
+    $record_fields_string = implode(', ', $record_fields);
+    $existing_robot_records = $db->get_array_list("SELECT
+        robot_token, {$record_fields_string}
+        FROM `{$record_table_name}`
+        WHERE user_id = {$user_id}
+        ;", 'robot_token');
+
+    // Loop through the provided list of records and update/insert/skip
+    $insert_records = array();
+    $update_records = array();
+    foreach ($user_robot_database AS $robot_token => $robot_records){
+        if (!isset($existing_robot_records[$robot_token])){
+            $insert_record = array('user_id' => $user_id, 'robot_token' => $robot_token);
+            foreach ($record_fields AS $record){ $insert_record[$record] = isset($robot_records[$record]) ? $robot_records[$record] : 0; }
+            $insert_records[] = $insert_record;
+        } else {
+            $base_record = $existing_robot_records[$robot_token];
+            $update_record = array();
+            foreach ($record_fields AS $record){
+                if (isset($robot_records[$record])
+                    && $robot_records[$record] > $base_record[$record]){
+                    $update_record[$record] = $robot_records[$record];
+                }
+            }
+            if (!empty($update_record)){
+                $update_records[$robot_token] = $update_record;
+            }
+        }
+    }
+
+    // If there are insert records, process them now
+    if (!empty($insert_records)){
+        $insert_query = $db->get_bulk_insert_sql($record_table_name, $insert_records);
+        $db->query($insert_query);
+    }
+
+    // If there are update records, process them now
+    if (!empty($update_records)){
+        foreach ($update_records AS $robot_token => $robot_records){
+            $db->update($record_table_name, $robot_records, array('user_id' => $user_id, 'robot_token' => $robot_token));
+        }
+    }
+
+    // Return true on success
+    return true;
+
+}
+
+
 ?>
