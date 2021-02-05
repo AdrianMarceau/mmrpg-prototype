@@ -76,7 +76,7 @@ ob_start();
     // Only show the header if a specific boss has not been selected
     if (empty($this_current_token)){
         ?>
-        <h2 class="subheader field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+        <h2 class="subheader field_type_<?= isset($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
             <span class="subheader_typewrapper">
                 <a class="inline_link" href="database/bosses/">Boss Database</a>
                 <span class="count">(
@@ -186,6 +186,12 @@ ob_start();
                 $key_counter++;
             }
         }
+    }
+
+    // If we're not on a specific boss page, let's show global boss records
+    if (empty($this_current_token)){
+        echo(mmrpg_get_robot_database_records_markup('boss', 5).PHP_EOL);
+        echo('<div style="clear: both;">&nbsp;</div>'.PHP_EOL);
     }
 
 // Collect the output buffer contents and overwrite default index markup

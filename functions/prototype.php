@@ -3145,5 +3145,123 @@ function mmrpg_update_user_robot_records($user_id, $user_robot_records){
 
 }
 
+// Define a function for generating type spans given a list of object tokens
+function mmrpg_generate_type_spans_from_tokens($kind, $tokens, $tooltips = array(), $prefixes = array()){
+    $span_list = array();
+    if ($kind === 'robots'){
+        $mmrpg_robots_index = rpg_robot::get_index();
+        foreach ($tokens AS $key => $token){
+            if (!empty($mmrpg_robots_index[$token])){
+                $info = $mmrpg_robots_index[$token];
+                $name = $info['robot_name'];
+                $types = !empty($info['robot_core']) ? $info['robot_core'] : '';
+                if (!empty($types) && !empty($info['robot_core2'])){ $types .= '_'.$info['robot_core2']; }
+                if (empty($types)){ $types = 'none'; }
+                $title = (isset($tooltips[$token]) ? ' title="'.$tooltips[$token].'"' : $info['robot_name']);
+                $markup = '';
+                if (isset($prefixes[$token])){ $markup .= '<span class="prefix">'.$prefixes[$token].'</span> '; }
+                $markup .= '<span class="robot_name type_span type type_'.$types.'"'.$title.'>'.$name.'</span>';
+                $span_list[] = $markup;
+            }
+        }
+    }
+    return $span_list;
+}
+
+
+// Define a function for printing out global records at the bottom of a robot/mecha/boss database page
+function mmrpg_get_robot_database_records_markup($robot_class, $record_limit = 10){
+    global $db;
+    global $this_current_filter, $this_current_filter_name;
+
+    // Define the section title given the robot class provided
+    $section_title = 'Robot Records';
+    if ($robot_class === 'mecha'){ $section_title = 'Mecha Records'; }
+    elseif ($robot_class === 'boss'){ $section_title = 'Boss Records'; }
+
+    // Collect global records for the robot masters
+    $record_categories = array('robot_encountered', 'robot_defeated', 'robot_unlocked', 'robot_summoned', 'robot_scanned', 'robot_avatars');
+    if ($robot_class !== 'master'){
+        unset($record_categories[array_search('robot_unlocked', $record_categories)]);
+        unset($record_categories[array_search('robot_avatars', $record_categories)]);
+    }
+    if ($robot_class === 'boss'){
+        unset($record_categories[array_search('robot_summoned', $record_categories)]);
+    }
+    $record_categories = array_values($record_categories);
+    $record_categories_label = function($record_category){
+        $label = str_replace('robot_', '', $record_category);
+        $label = ucfirst(preg_replace('/(ed|s)$/i', '', $label));
+        return $label;
+        };
+    $record_query_conditions = '';
+    $record_query_conditions .= "AND robots.robot_class = '{$robot_class}' ";
+    if (!empty($this_current_filter)){
+        if ($this_current_filter === 'none'){ $record_query_conditions .= "AND robots.robot_core = '' "; }
+        else { $record_query_conditions .= "AND (robots.robot_core = '{$this_current_filter}' OR robots.robot_core2 = '{$this_current_filter}') "; }
+    }
+    $global_robot_records = array();
+    foreach ($record_categories AS $record_category){
+        $record_array = $db->get_array_list("SELECT
+            records.robot_token,
+            records.{$record_category}
+            FROM mmrpg_records_robots AS records
+            LEFT JOIN mmrpg_index_robots AS robots ON robots.robot_token = records.robot_token
+            WHERE
+            robots.robot_flag_published = 1
+            AND robots.robot_flag_complete = 1
+            {$record_query_conditions}
+            ORDER BY
+            records.{$record_category} DESC
+            LIMIT {$record_limit}
+            ;", 'robot_token');
+        if (empty($record_array)){ continue; }
+        $label = $record_categories_label($record_category);
+        $record_array = array_filter(array_map(function($a) use($record_category, $label){
+            return isset($a[$record_category]) ? $a[$record_category] : 0;
+            }, $record_array));
+        $record_array = array_map(function($value) use($record_category, $label){
+            return number_format($value, 0, '.', ',').' '.$label.($value !== 1 ? 's' : '');
+            }, $record_array);
+        $global_robot_records[$record_category] = $record_array;
+    }
+
+    ob_start();
+    ?>
+    <h2 class="subheader field_type_<?= !empty($this_current_filter) ? $this_current_filter : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" style="margin-top: 10px;">
+        <span class="subheader_typewrapper">
+            <?= $section_title ?>
+            <?= !empty($this_current_filter) ? '<span class="count" style="float: right;">( '.$this_current_filter_name.' Core )</span>' : '' ?>
+        </span>
+    </h2>
+    <div class="subbody subbody_database_records">
+        <div class="global_records robots">
+            <div class="wrap">
+                <ul class="categories">
+                    <?
+                    // Loop through and print out the records with names and labels
+                    foreach ($global_robot_records AS $record_category => $record_robot_list){
+                        if (empty($record_robot_list)){ continue; }
+                        $label = 'Most '.ucfirst(str_replace('robot_', '', $record_category));
+                        $robot_tokens = array_keys($record_robot_list);
+                        $position_prefixes = array();
+                        foreach ($robot_tokens AS $key => $token){ $rank = $key + 1; $position_prefixes[$token] = mmrpg_number_suffix($rank, true, true); }
+                        $robot_list = mmrpg_generate_type_spans_from_tokens('robots', $robot_tokens, $record_robot_list, $position_prefixes);
+                        echo('<li class="category">'.PHP_EOL);
+                            echo('<strong>'.$label.'</strong>'.PHP_EOL);
+                            echo('<ul><li>'.implode('</li><li>', $robot_list).'</li></ul>'.PHP_EOL);
+                        echo('</li>'.PHP_EOL);
+                    }
+                    ?>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <?
+    $records_markup = ob_get_clean();
+    return $records_markup;
+
+}
+
 
 ?>

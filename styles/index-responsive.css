@@ -752,6 +752,15 @@ body:before {
         border: 0 none transparent;
     }
 
+    #window .page .body .subbody_database_records .global_records ul.categories > li.category > ul > li {
+        text-align: center;
+    }
+    #window .page .body .subbody_database_records .global_records ul.categories > li.category > ul > li .prefix {
+        display: block;
+        min-width: 0;
+        padding: 0 4px;
+    }
+
     #window .page .event .robot_container .robot_name,
     #window .page .event .ability_container .ability_name {
         display: block;
