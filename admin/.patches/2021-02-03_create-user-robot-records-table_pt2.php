@@ -5,7 +5,7 @@ $db_tables_list = $db->table_list();
 
 // If `mmrpg_users_records_robots` table exists now
 if (in_array('mmrpg_users_records_robots', $db_tables_list)
-    && function_exists('mmrpg_update_user_robot_records')){
+    && method_exists('rpg_user', 'update_robot_records')){
 
     // Check to see if the newly created table is completely empty
     $existing_records = $db->get_value("SELECT
@@ -37,7 +37,7 @@ if (in_array('mmrpg_users_records_robots', $db_tables_list)
                     echo('- adding records for user_id '.$user_id.PHP_EOL);
                     //error_log('$user_id = '.print_r($user_id, true));
                     //error_log('$user_robot_database = '.print_r($user_robot_database, true));
-                    mmrpg_update_user_robot_records($user_id, $user_robot_database);
+                    rpg_user::update_robot_records($user_id, $user_robot_database);
                     //break;
                 }
             }

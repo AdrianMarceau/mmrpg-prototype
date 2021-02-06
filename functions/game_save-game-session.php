@@ -375,7 +375,7 @@ function mmrpg_save_game_session(){
         // If the robot database values were not empty, we should update them in the records table
         if (!empty($_SESSION[$session_token]['values']['robot_database'])){
             $user_robot_records = $_SESSION[$session_token]['values']['robot_database'];
-            mmrpg_update_user_robot_records($this_user['userid'], $user_robot_records);
+            rpg_user::update_robot_records($this_user['userid'], $user_robot_records);
         }
 
     }
