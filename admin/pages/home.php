@@ -815,6 +815,13 @@
                 );
             $this_group_options[] = $this_option;
         }
+        if (rpg_user::current_user_has_permission('pull-core-updates')){
+            $this_option = array(
+                'link' => array('url' => 'admin/scripts/update-core.php?return=html', 'text' => 'Pull Core Updates', 'target' => '_blank', 'bullet' => 'caret-square-down'),
+                'desc' => 'pull updates to the master code, typically used only by the lead dev'
+                );
+            $this_group_options[] = $this_option;
+        }
         if (MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== false
             && MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== MMRPG_CONFIG_SERVER_ENV){
             if (rpg_user::current_user_has_permission('pull-user-data')){
@@ -824,13 +831,6 @@
                     );
                 $this_group_options[] = $this_option;
             }
-        }
-        if (rpg_user::current_user_has_permission('pull-core-updates')){
-            $this_option = array(
-                'link' => array('url' => 'admin/scripts/update-core.php?return=html', 'text' => 'Pull Core Updates', 'target' => '_blank', 'bullet' => 'caret-square-down'),
-                'desc' => 'pull updates to the master code, typically used only by the lead dev'
-                );
-            $this_group_options[] = $this_option;
         }
         if (rpg_user::current_user_has_permission('delete-cached-files')){
             $this_option = array(
