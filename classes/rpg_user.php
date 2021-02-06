@@ -700,6 +700,36 @@ class rpg_user {
 
     }
 
+    // Define a function for pulling a given user's unlocked items from the database
+    public static function pull_unlocked_items($user_id, &$user_unlocked_items = array()){
+        global $db;
+
+        if (empty($user_id)){ return false; }
+
+        // Collect a list of existing records for this user from the database
+        $record_table_name = 'mmrpg_users_unlocked_items';
+        $existing_item_records = $db->get_array_list("SELECT
+            item_token, item_quantity
+            FROM `{$record_table_name}`
+            WHERE user_id = {$user_id}
+            ;", 'item_token');
+        if (empty($existing_item_records)){
+            $existing_item_records = array();
+        }
+
+        // If not empty, loop through database records and update local array
+        if ($existing_item_records){
+            foreach ($existing_item_records AS $item_token => $item_record){
+                $item_quantity = $item_record['item_quantity'];
+                $user_unlocked_items[$item_token] = $item_quantity;
+            }
+        }
+
+        // Return true on success
+        return true;
+
+    }
+
     // Define a function for updating a given user's unlocked items in the database
     public static function update_unlocked_items($user_id, $user_unlocked_items){
         global $db;
