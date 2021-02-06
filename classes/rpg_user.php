@@ -606,6 +606,9 @@ class rpg_user {
             FROM `{$record_table_name}`
             WHERE user_id = {$user_id}
             ;", 'robot_token');
+        if (empty($existing_robot_records)){
+            $existing_robot_records = array();
+        }
 
         // If not empty, loop through database records and update local array
         if ($existing_robot_records){
@@ -652,6 +655,9 @@ class rpg_user {
             FROM `{$record_table_name}`
             WHERE user_id = {$user_id}
             ;", 'robot_token');
+        if (empty($existing_robot_records)){
+            $existing_robot_records = array();
+        }
 
         // Loop through the provided list of records and update/insert/skip
         $insert_records = array();
@@ -686,6 +692,65 @@ class rpg_user {
         if (!empty($update_records)){
             foreach ($update_records AS $robot_token => $robot_records){
                 $db->update($record_table_name, $robot_records, array('user_id' => $user_id, 'robot_token' => $robot_token));
+            }
+        }
+
+        // Return true on success
+        return true;
+
+    }
+
+    // Define a function for updating a given user's unlocked items in the database
+    public static function update_unlocked_items($user_id, $user_unlocked_items){
+        global $db;
+
+        if (empty($user_id)){ return false; }
+        if (empty($user_unlocked_items)){ return false; }
+
+        // Collect a list of existing records so we know when to update vs insert vs skip
+        $record_table_name = 'mmrpg_users_unlocked_items';
+        $existing_item_records = $db->get_array_list("SELECT
+            item_token, item_quantity
+            FROM `{$record_table_name}`
+            WHERE user_id = {$user_id}
+            ;", 'item_token');
+        if (empty($existing_item_records)){
+            $existing_item_records = array();
+        }
+
+        // Loop through the provided list of records and update/insert/skip
+        $insert_records = array();
+        $update_records = array();
+        foreach ($user_unlocked_items AS $item_token => $item_quantity){
+            if (strstr($item_token, '-shard') && $item_quantity > MMRPG_SETTINGS_SHARDS_MAXQUANTITY){ $item_quantity = MMRPG_SETTINGS_SHARDS_MAXQUANTITY; }
+            elseif ($item_quantity > MMRPG_SETTINGS_ITEMS_MAXQUANTITY){ $item_quantity = MMRPG_SETTINGS_ITEMS_MAXQUANTITY; }
+            $item_quantity = intval($item_quantity);
+            if (!isset($existing_item_records[$item_token])){
+                $insert_record = array('user_id' => $user_id, 'item_token' => $item_token, 'item_quantity' => $item_quantity);
+                $insert_records[] = $insert_record;
+            } else {
+                $base_record = $existing_item_records[$item_token];
+                $base_quantity = intval($base_record['item_quantity']);
+                $update_record = array();
+                if ($base_quantity !== $item_quantity){
+                    $update_record['item_quantity'] = $item_quantity;
+                }
+                if (!empty($update_record)){
+                    $update_records[$item_token] = $update_record;
+                }
+            }
+        }
+
+        // If there are insert records, process them now
+        if (!empty($insert_records)){
+            $insert_query = $db->get_bulk_insert_sql($record_table_name, $insert_records);
+            $db->query($insert_query);
+        }
+
+        // If there are update records, process them now
+        if (!empty($update_records)){
+            foreach ($update_records AS $item_token => $item_records){
+                $db->update($record_table_name, $item_records, array('user_id' => $user_id, 'item_token' => $item_token));
             }
         }
 
