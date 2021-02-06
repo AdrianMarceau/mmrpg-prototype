@@ -372,10 +372,16 @@ function mmrpg_save_game_session(){
         //echo('<pre>$this_save_array = '.print_r($this_save_array, true).'</pre>');
         $db->update('mmrpg_saves', $this_save_array, 'user_id = '.$this_user['userid']);
 
-        // If the robot database values were not empty, we should update them in the records table
+        // If the robot database records were not empty, we should update them in the database table
         if (!empty($_SESSION[$session_token]['values']['robot_database'])){
             $user_robot_records = $_SESSION[$session_token]['values']['robot_database'];
             rpg_user::update_robot_records($this_user['userid'], $user_robot_records);
+        }
+
+        // If the unlocked item list was not empty, we should update them in the database table
+        if (!empty($_SESSION[$session_token]['values']['battle_items'])){
+            $user_unlocked_items = $_SESSION[$session_token]['values']['battle_items'];
+            rpg_user::update_unlocked_items($this_user['userid'], $user_unlocked_items);
         }
 
     }

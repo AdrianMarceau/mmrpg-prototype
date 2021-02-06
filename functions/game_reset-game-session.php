@@ -94,6 +94,7 @@ function mmrpg_reset_game_session(){
         $user_id = $this_user['userid'];
         if (!empty($user_id)){
             $db->delete('mmrpg_users_records_robots', array('user_id' => $user_id));
+            $db->delete('mmrpg_users_unlocked_items', array('user_id' => $user_id));
             $db->delete('mmrpg_challenges_leaderboard', array('user_id' => $user_id));
             $db->delete('mmrpg_challenges_waveboard', array('user_id' => $user_id));
         }
