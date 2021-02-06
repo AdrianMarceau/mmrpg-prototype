@@ -37,6 +37,7 @@ $copy_db_tables = array(
     // game records tables
     'mmrpg_records_abilities',
     'mmrpg_records_robots'
+    'mmrpg_users_records_robots',
     );
 
 // Loop through the above tables and import data from each of them
