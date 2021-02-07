@@ -588,6 +588,7 @@ class rpg_user {
         global $db;
 
         if (empty($user_id)){ return false; }
+        if (!is_array($user_robot_records)){ $user_robot_records = array(); }
 
         // Define the list of stat fields to collect/review
         $record_fields = array(
@@ -605,6 +606,7 @@ class rpg_user {
             robot_token, {$record_fields_string}
             FROM `{$record_table_name}`
             WHERE user_id = {$user_id}
+            ORDER BY record_id ASC
             ;", 'robot_token');
         if (empty($existing_robot_records)){
             $existing_robot_records = array();
@@ -705,6 +707,7 @@ class rpg_user {
         global $db;
 
         if (empty($user_id)){ return false; }
+        if (!is_array($user_unlocked_items)){ $user_unlocked_items = array(); }
 
         // Collect a list of existing records for this user from the database
         $record_table_name = 'mmrpg_users_unlocked_items';
@@ -712,6 +715,7 @@ class rpg_user {
             item_token, item_quantity
             FROM `{$record_table_name}`
             WHERE user_id = {$user_id}
+            ORDER BY record_id ASC
             ;", 'item_token');
         if (empty($existing_item_records)){
             $existing_item_records = array();
@@ -789,8 +793,79 @@ class rpg_user {
 
     }
 
+    // Define a function for pulling a given user's unlocked abilities from the database
+    public static function pull_unlocked_abilities($user_id, &$user_unlocked_abilities = array()){
+        global $db;
 
+        if (empty($user_id)){ return false; }
+        if (!is_array($user_unlocked_abilities)){ $user_unlocked_abilities = array(); }
+
+        // Collect a list of existing records for this user from the database
+        $record_table_name = 'mmrpg_users_unlocked_abilities';
+        $existing_ability_records = $db->get_array_list("SELECT
+            ability_token
+            FROM `{$record_table_name}`
+            WHERE user_id = {$user_id}
+            ORDER BY record_id ASC
+            ;", 'ability_token');
+        if (empty($existing_ability_records)){
+            $existing_ability_records = array();
+        }
+
+        // If not empty, loop through database records and update local array
+        if ($existing_ability_records){
+            foreach ($existing_ability_records AS $ability_token => $ability_record){
+                if (!in_array($ability_token, $user_unlocked_abilities)){
+                    $user_unlocked_abilities[] = $ability_token;
+                }
+            }
+        }
+
+        // Return true on success
+        return true;
+
+    }
+
+    // Define a function for updating a given user's unlocked abilities in the database
+    public static function update_unlocked_abilities($user_id, $user_unlocked_abilities){
+        global $db;
+
+        if (empty($user_id)){ return false; }
+        if (empty($user_unlocked_abilities)){ return false; }
+
+        // Collect a list of existing records so we know when to update vs insert vs skip
+        $record_table_name = 'mmrpg_users_unlocked_abilities';
+        $existing_ability_records = $db->get_array_list("SELECT
+            ability_token
+            FROM `{$record_table_name}`
+            WHERE user_id = {$user_id}
+            ;", 'ability_token');
+        if (empty($existing_ability_records)){
+            $existing_ability_records = array();
+        }
+
+        // Loop through the provided list of records and update/insert/skip
+        $insert_records = array();
+        foreach ($user_unlocked_abilities AS $ability_key => $ability_token){
+            if (!isset($existing_ability_records[$ability_token])){
+                $insert_record = array('user_id' => $user_id, 'ability_token' => $ability_token);
+                $insert_records[$ability_token] = $insert_record;
+            }
+        }
+
+        // If there are insert records, process them now
+        if (!empty($insert_records)){
+            $insert_records = array_values($insert_records);
+            $insert_query = $db->get_bulk_insert_sql($record_table_name, $insert_records);
+            $db->query($insert_query);
+        }
+
+        // Return true on success
+        return true;
+
+    }
 
 
 }
+
 ?>
