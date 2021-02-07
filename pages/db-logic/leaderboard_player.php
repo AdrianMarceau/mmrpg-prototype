@@ -129,7 +129,7 @@ if (!empty($favourite_robot_masters)){
     $temp_robot_names = array_map(function($r) use($mmrpg_index_robots){ return $mmrpg_index_robots[$r]['robot_name']; }, $favourite_robot_masters);
     if (count($temp_robot_names) > 5){
         $temp_robot_names = array_slice($temp_robot_names, 0, 5);
-        $most_used_robot_masters_text .= 'top five ';
+        $favourite_robot_masters_text .= 'top five ';
     }
     $temp_robot_names = array_map(function($r){ return '<strong>'.$r.'</strong>'; }, $temp_robot_names);
     $favourite_robot_masters_text .= 'favourite robot master'.(count($favourite_robot_masters) !== 1 ? 's are' : ' is').' ';
