@@ -601,12 +601,13 @@ class rpg_user {
 
         // Collect a list of existing records for this user from the database
         $record_table_name = 'mmrpg_users_records_robots';
-        $record_fields_string = implode(', ', $record_fields);
+        $record_fields_string = implode(', ', array_map(function($s){ return '`records`.`'.$s.'`'; }, $record_fields));
         $existing_robot_records = $db->get_array_list("SELECT
-            robot_token, {$record_fields_string}
-            FROM `{$record_table_name}`
-            WHERE user_id = {$user_id}
-            ORDER BY record_id ASC
+            `records`.`robot_token`, {$record_fields_string}
+            FROM `{$record_table_name}` AS `records`
+            LEFT JOIN `mmrpg_index_robots` AS `index` ON `index`.`robot_token` = `records`.`robot_token`
+            WHERE `records`.`user_id` = {$user_id} AND `index`.`robot_flag_published` = 1 AND `index`.`robot_flag_complete` = 1
+            ORDER BY `records`.`record_id` ASC
             ;", 'robot_token');
         if (empty($existing_robot_records)){
             $existing_robot_records = array();
@@ -712,10 +713,11 @@ class rpg_user {
         // Collect a list of existing records for this user from the database
         $record_table_name = 'mmrpg_users_unlocked_items';
         $existing_item_records = $db->get_array_list("SELECT
-            item_token, item_quantity
-            FROM `{$record_table_name}`
-            WHERE user_id = {$user_id}
-            ORDER BY record_id ASC
+            `unlocked`.`item_token`, `unlocked`.`item_quantity`
+            FROM `{$record_table_name}` AS `unlocked`
+            LEFT JOIN `mmrpg_index_items` AS `index` ON `index`.`item_token` = `unlocked`.`item_token`
+            WHERE `unlocked`.`user_id` = {$user_id} AND `index`.`item_flag_published` = 1 AND `index`.`item_flag_complete` = 1
+            ORDER BY `unlocked`.`record_id` ASC
             ;", 'item_token');
         if (empty($existing_item_records)){
             $existing_item_records = array();
@@ -803,10 +805,11 @@ class rpg_user {
         // Collect a list of existing records for this user from the database
         $record_table_name = 'mmrpg_users_unlocked_abilities';
         $existing_ability_records = $db->get_array_list("SELECT
-            ability_token
-            FROM `{$record_table_name}`
-            WHERE user_id = {$user_id}
-            ORDER BY record_id ASC
+            `unlocked`.`ability_token`
+            FROM `{$record_table_name}` AS `unlocked`
+            LEFT JOIN `mmrpg_index_abilities` AS `index` ON `index`.`ability_token` = `unlocked`.`ability_token`
+            WHERE `unlocked`.`user_id` = {$user_id} AND `index`.`ability_flag_published` = 1 AND `index`.`ability_flag_complete` = 1
+            ORDER BY `unlocked`.`record_id` ASC
             ;", 'ability_token');
         if (empty($existing_ability_records)){
             $existing_ability_records = array();
