@@ -957,8 +957,9 @@ class rpg_user {
                 $insert_records[] = $insert_record;
             } else {
                 $base_record = $existing_star_records[$star_token];
+                $base_date = !empty($base_record['star_date']) ? $base_record['star_date'] : 0;
                 $update_record = array();
-                if (!empty($star_info['star_date'])){
+                if (!empty($star_info['star_date']) && $star_info['star_date'] !== $base_date){
                     $update_record['star_date'] = $star_info['star_date'];
                 }
                 if (!empty($update_record)){
