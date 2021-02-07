@@ -390,6 +390,12 @@ function mmrpg_save_game_session(){
             rpg_user::update_unlocked_abilities($this_user['userid'], $user_unlocked_abilities);
         }
 
+        // If the unlocked star list was not empty, we should update them in the database table
+        if (!empty($_SESSION[$session_token]['values']['battle_stars'])){
+            $user_unlocked_stars = $_SESSION[$session_token]['values']['battle_stars'];
+            rpg_user::update_unlocked_stars($this_user['userid'], $user_unlocked_stars);
+        }
+
     }
 
     // Unset the reset flag in the session

@@ -97,12 +97,16 @@ function mmrpg_load_game_session(){
         if (!empty($user_unlocked_abilities)){
             $new_game_data['values']['battle_abilities'] = $user_unlocked_abilities;
             $new_game_data['values']['battle_abilities_hash'] = md5(json_encode($user_unlocked_abilities));
-        } if (!empty($this_database_save['save_values_battle_abilities'])){
+        } elseif (!empty($this_database_save['save_values_battle_abilities'])){
             $new_game_data['values']['battle_abilities'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_abilities']), true);
             $new_game_data['values']['battle_abilities_hash'] = md5($this_database_save['save_values_battle_abilities']);
         }
 
-        if (!empty($this_database_save['save_values_battle_stars'])){
+        rpg_user::pull_unlocked_stars($login_user_id, $user_unlocked_stars);
+        if (!empty($user_unlocked_stars)){
+            $new_game_data['values']['battle_stars'] = $user_unlocked_stars;
+            $new_game_data['values']['battle_stars_hash'] = md5(json_encode($user_unlocked_stars));
+        } elseif (!empty($this_database_save['save_values_battle_stars'])){
             $new_game_data['values']['battle_stars'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_stars']), true);
             $new_game_data['values']['battle_stars_hash'] = md5($this_database_save['save_values_battle_stars']);
         }
