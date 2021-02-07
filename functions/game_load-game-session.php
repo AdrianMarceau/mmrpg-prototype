@@ -93,7 +93,11 @@ function mmrpg_load_game_session(){
             $new_game_data['values']['battle_items_hash'] = md5($this_database_save['save_values_battle_items']);
         }
 
-        if (!empty($this_database_save['save_values_battle_abilities'])){
+        rpg_user::pull_unlocked_abilities($login_user_id, $user_unlocked_abilities);
+        if (!empty($user_unlocked_abilities)){
+            $new_game_data['values']['battle_abilities'] = $user_unlocked_abilities;
+            $new_game_data['values']['battle_abilities_hash'] = md5(json_encode($user_unlocked_abilities));
+        } if (!empty($this_database_save['save_values_battle_abilities'])){
             $new_game_data['values']['battle_abilities'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_abilities']), true);
             $new_game_data['values']['battle_abilities_hash'] = md5($this_database_save['save_values_battle_abilities']);
         }

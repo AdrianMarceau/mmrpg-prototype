@@ -384,6 +384,12 @@ function mmrpg_save_game_session(){
             rpg_user::update_unlocked_items($this_user['userid'], $user_unlocked_items);
         }
 
+        // If the unlocked ability list was not empty, we should update them in the database table
+        if (!empty($_SESSION[$session_token]['values']['battle_abilities'])){
+            $user_unlocked_abilities = $_SESSION[$session_token]['values']['battle_abilities'];
+            rpg_user::update_unlocked_abilities($this_user['userid'], $user_unlocked_abilities);
+        }
+
     }
 
     // Unset the reset flag in the session
