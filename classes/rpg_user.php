@@ -868,6 +868,123 @@ class rpg_user {
 
     }
 
+    // Define a function for pulling a given user's unlocked stars from the database
+    public static function pull_unlocked_stars($user_id, &$user_unlocked_stars = array()){
+        global $db;
+
+        if (empty($user_id)){ return false; }
+        if (!is_array($user_unlocked_stars)){ $user_unlocked_stars = array(); }
+
+        // Define a list of compatible fields we can save for a given star
+        $record_fields = array(
+            'star_name',
+            'star_kind',
+            'star_type',
+            'star_type2',
+            'star_field',
+            'star_field2',
+            'star_player',
+            'star_date'
+            );
+
+        // Collect a list of existing records for this user from the database
+        $record_table_name = 'mmrpg_users_unlocked_stars';
+        $record_fields_string = implode(', ', array_map(function($s){ return '`unlocked`.`'.$s.'`'; }, $record_fields));
+        $existing_star_records = $db->get_array_list("SELECT
+            `unlocked`.`star_token`, {$record_fields_string}
+            FROM `{$record_table_name}` AS `unlocked`
+            WHERE `unlocked`.`user_id` = {$user_id}
+            ORDER BY `unlocked`.`record_id` ASC
+            ;", 'star_token');
+        if (empty($existing_star_records)){
+            $existing_star_records = array();
+        }
+
+        // If not empty, loop through database records and update local array
+        if ($existing_star_records){
+            foreach ($existing_star_records AS $star_token => $star_record){
+                if (empty($star_record['star_date'])){ unset($star_record['star_date']); }
+                $user_unlocked_stars[$star_token] = $star_record;
+            }
+        }
+
+        // Return true on success
+        return true;
+
+    }
+
+    // Define a function for updating a given user's unlocked stars in the database
+    public static function update_unlocked_stars($user_id, $user_unlocked_stars){
+        global $db;
+
+        if (empty($user_id)){ return false; }
+        if (empty($user_unlocked_stars)){ return false; }
+
+        // Define a list of compatible fields we can save for a given star
+        $record_fields = array(
+            'star_name',
+            'star_kind',
+            'star_type',
+            'star_type2',
+            'star_field',
+            'star_field2',
+            'star_player',
+            'star_date'
+            );
+
+        // Collect a list of existing records so we know when to update vs insert vs skip
+        $record_table_name = 'mmrpg_users_unlocked_stars';
+        $record_fields_string = implode(', ', $record_fields);
+        $existing_star_records = $db->get_array_list("SELECT
+            star_token, {$record_fields_string}
+            FROM `{$record_table_name}`
+            WHERE user_id = {$user_id}
+            ;", 'star_token');
+        if (empty($existing_star_records)){
+            $existing_star_records = array();
+        }
+
+        // Loop through the provided list of records and update/insert/skip
+        $insert_records = array();
+        $update_records = array();
+        foreach ($user_unlocked_stars AS $star_token => $star_info){
+            if (!isset($existing_star_records[$star_token])){
+                $insert_record = array('user_id' => $user_id, 'star_token' => $star_token);
+                foreach ($record_fields AS $field){
+                    if (isset($star_info[$field])){ $insert_record[$field] = $star_info[$field]; }
+                    else { $insert_record[$field] = strstr($field, '_date') ? 0 : ''; }
+                }
+                $insert_records[] = $insert_record;
+            } else {
+                $base_record = $existing_star_records[$star_token];
+                $update_record = array();
+                if (!empty($star_info['star_date'])){
+                    $update_record['star_date'] = $star_info['star_date'];
+                }
+                if (!empty($update_record)){
+                    $update_records[$star_token] = $update_record;
+                }
+            }
+        }
+
+        // If there are insert records, process them now
+        if (!empty($insert_records)){
+            $insert_query = $db->get_bulk_insert_sql($record_table_name, $insert_records);
+            $db->query($insert_query);
+        }
+
+        // If there are update records, process them now
+        if (!empty($update_records)){
+            foreach ($update_records AS $star_token => $star_records){
+                $db->update($record_table_name, $star_records, array('user_id' => $user_id, 'star_token' => $star_token));
+            }
+        }
+
+        // Return true on success
+        return true;
+
+    }
+
 
 }
 
