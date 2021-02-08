@@ -3064,21 +3064,22 @@ function mmrpg_get_robot_database_records($record_filters = array()){
 
     // Ensure the record filters var was an array and then collect
     if (empty($record_filters) || !is_array($record_filters)){ extract($record_filters); }
-    $robot_class = !empty($record_filters['robot_class']) ? $record_filters['robot_class'] : false;
-    $robot_core = !empty($record_filters['robot_core']) ? $record_filters['robot_core'] : false;
-    $robot_token = !empty($record_filters['robot_token']) ? $record_filters['robot_token'] : false;
-    $record_limit = !empty($record_filters['record_limit']) ? $record_filters['record_limit'] : false;
+    $record_filters['robot_class'] = !empty($record_filters['robot_class']) ? $record_filters['robot_class'] : false;
+    $record_filters['robot_core'] = !empty($record_filters['robot_core']) ? $record_filters['robot_core'] : false;
+    $record_filters['robot_token'] = !empty($record_filters['robot_token']) ? $record_filters['robot_token'] : false;
+    $record_filters['record_limit'] = !empty($record_filters['record_limit']) ? $record_filters['record_limit'] : false;
+    $record_filters['record_labels'] = !empty($record_filters['record_labels']) ? $record_filters['record_labels'] : false;
 
     // Define an array to hold the database records in
     $global_robot_records = array();
 
     // Define the record categories we'll be pulling data for (filter for class if defined)
     $record_categories = array('robot_encountered', 'robot_defeated', 'robot_unlocked', 'robot_summoned', 'robot_scanned', 'robot_avatars');
-    if (!empty($robot_class) && $robot_class !== 'master'){
+    if (!empty($record_filters['robot_class']) && $record_filters['robot_class'] !== 'master'){
         unset($record_categories[array_search('robot_unlocked', $record_categories)]);
         unset($record_categories[array_search('robot_avatars', $record_categories)]);
     }
-    if (!empty($robot_class) && $robot_class === 'boss'){
+    if (!empty($record_filters['robot_class']) && $record_filters['robot_class'] === 'boss'){
         unset($record_categories[array_search('robot_summoned', $record_categories)]);
     }
     $record_categories = array_values($record_categories);
@@ -3093,15 +3094,15 @@ function mmrpg_get_robot_database_records($record_filters = array()){
 
     // Define common query conditions given provided filters
     $record_query_conditions = '';
-    if (!empty($robot_class)){ $record_query_conditions .= "AND robots.robot_class = '{$robot_class}' "; }
-    if (!empty($robot_token)){ $record_query_conditions .= "AND robots.robot_token = '{$robot_token}' "; }
-    if (!empty($robot_core)){
-        if ($robot_core === 'none'){ $record_query_conditions .= "AND robots.robot_core = '' "; }
-        else { $record_query_conditions .= "AND (robots.robot_core = '{$robot_core}' OR robots.robot_core2 = '{$robot_core}') "; }
+    if (!empty($record_filters['robot_class'])){ $record_query_conditions .= "AND robots.robot_class = '{$record_filters['robot_class']}' "; }
+    if (!empty($record_filters['robot_token'])){ $record_query_conditions .= "AND robots.robot_token = '{$record_filters['robot_token']}' "; }
+    if (!empty($record_filters['robot_core'])){
+        if ($record_filters['robot_core'] === 'none'){ $record_query_conditions .= "AND robots.robot_core = '' "; }
+        else { $record_query_conditions .= "AND (robots.robot_core = '{$record_filters['robot_core']}' OR robots.robot_core2 = '{$record_filters['robot_core']}') "; }
     }
 
     // Define the common limit string if one has been provided
-    $record_limit_string = !empty($record_limit) ? "LIMIT {$record_limit}" : '';
+    $record_limit_string = !empty($record_filters['record_limit']) ? "LIMIT {$record_filters['record_limit']}" : '';
 
     // Collect global records for the robot masters
     foreach ($record_categories AS $record_category){
@@ -3143,10 +3144,9 @@ function mmrpg_get_robot_database_records($record_filters = array()){
                 asort($record_array);
                 $record_array = array_reverse($record_array);
             }
-            $label = $record_categories_label($record_category);
             $record_array = array_filter($record_array);
             if (empty($record_array)){ continue; }
-            if (!empty($record_limit)){ $record_array = array_slice($record_array, 0, $record_limit); }
+            if (!empty($record_filters['record_limit'])){ $record_array = array_slice($record_array, 0, $record_filters['record_limit']); }
 
         }
         // Otherwise, all other record types can be pulled normally
@@ -3168,21 +3168,40 @@ function mmrpg_get_robot_database_records($record_filters = array()){
                 {$record_limit_string}
                 ;", 'robot_token');
             if (empty($record_array)){ continue; }
-            $label = $record_categories_label($record_category);
-            $record_array = array_filter(array_map(function($a) use($record_category, $label){
+            $record_array = array_filter(array_map(function($a) use($record_category){
                 return isset($a[$record_category.'_total']) ? $a[$record_category.'_total'] : 0;
                 }, $record_array));
 
         }
 
         // Format the totals with proper number formatting
-        $record_array = array_map(function($value) use($record_category, $label){
-            return number_format($value, 0, '.', ',').' '.$label.($value !== 1 ? 's' : '');
+        $record_array = array_map(function($value){
+            return number_format($value, 0, '.', ',');
             }, $record_array);
+
+        // If allowed, append each of the records with an appropriate label
+        if (!empty($record_filters['record_labels'])){
+            $label = $record_categories_label($record_category);
+            $record_array = array_map(function($value) use($label){
+                return $value.' '.$label.(intval($value) !== 1 ? 's' : '');
+                }, $record_array);
+        }
 
         // Add the final record array to the global list
         $global_robot_records[$record_category] = $record_array;
 
+    }
+
+    // If a specific robot token was defined, let's simplify the data structure
+    if (!empty($record_filters['robot_token'])){
+        $single_robot_records = array();
+        if (!empty($global_robot_records)){
+            foreach ($global_robot_records AS $record_category => $record_array){
+                if (!isset($record_array[$record_filters['robot_token']])){ continue; }
+                $single_robot_records[$record_category] = $record_array[$record_filters['robot_token']];
+            }
+        }
+        $global_robot_records = $single_robot_records;
     }
 
     // Return collected records if they're not empty
@@ -3205,7 +3224,8 @@ function mmrpg_get_robot_database_records_markup($robot_class, $record_limit = 1
     $global_robot_records = mmrpg_get_robot_database_records(array(
         'robot_class' => $robot_class,
         'robot_core' => $this_current_filter,
-        'record_limit' => $record_limit
+        'record_limit' => $record_limit,
+        'record_labels' => true
         ));
 
     ob_start();

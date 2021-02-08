@@ -3309,76 +3309,11 @@ class rpg_robot extends rpg_object {
         // Collect the database records for this robot
         if ($print_options['show_records']){
 
-            // Pull in global DB and preset the record array
-            global $db;
-            $temp_robot_records = array('robot_encountered' => 0, 'robot_defeated' => 0, 'robot_unlocked' => 0, 'robot_summoned' => 0, 'robot_scanned' => 0, 'robot_avatars' => 0);
-
-            // Check to see if a recent record already exists and use it if possible
-            $temp_fields = implode(', ', array_keys($temp_robot_records));
-            $record_token = $robot_info['robot_token'];
-            $existing_record = $db->get_array("SELECT
-                record_id,
-                record_time,
-                robot_token,
-                {$temp_fields}
-                FROM mmrpg_records_robots
-                WHERE robot_token = '{$record_token}'
-                ;");
-
-            // If the record exists and isn't too old, loop through and collect
-            if (!empty($existing_record)
-                && $existing_record['record_time'] >= MMRPG_CONFIG_LAST_SAVE_DATE){
-                foreach ($temp_robot_records AS $token => $value){
-                    if (!empty($existing_record[$token])){
-                        $temp_robot_records[$token] = $existing_record[$token];
-                        continue;
-                    }
-                }
-            }
-            // Otherwise, if record not exists or too old, generate a new one
-            else {
-
-                // Generate a record query for this robot and pull from database
-                $record_token = $robot_info['robot_token'];
-                $record_avatar_string = 'robots/'.$record_token.'/'.$robot_image_size;
-                $temp_record_query = "SELECT
-                    records.robot_token,
-                    SUM(records.robot_encountered) AS robot_encountered,
-                    SUM(records.robot_defeated) AS robot_defeated,
-                    SUM(records.robot_unlocked) AS robot_unlocked,
-                    SUM(records.robot_summoned) AS robot_summoned,
-                    SUM(records.robot_scanned) AS robot_scanned,
-                    avatars.robot_avatars AS robot_avatars
-                    FROM mmrpg_users_records_robots AS records
-                    LEFT JOIN (SELECT
-                        '{$record_token}' AS robot_token,
-                        COUNT(*) AS robot_avatars
-                        FROM mmrpg_users AS users
-                        LEFT JOIN mmrpg_leaderboard AS board ON board.user_id = users.user_id
-                        WHERE board.board_points > 0 AND users.user_image_path = '{$record_avatar_string}'
-                        ) AS avatars ON avatars.robot_token = records.robot_token
-                    WHERE records.robot_token = '{$record_token}'
-                    ;";
-                $temp_robot_records = $db->get_array($temp_record_query);
-                //error_log('$temp_robot_records = '.print_r($temp_robot_records, true));
-
-                // Now that we have the data, either insert or update the record in the db
-                if (empty($existing_record)){
-                    $insert_array = array();
-                    $insert_array['record_time'] = MMRPG_CONFIG_LAST_SAVE_DATE;
-                    $insert_array['robot_token'] = $record_token;
-                    foreach ($temp_robot_records AS $token => $value){ $insert_array[$token] = $value; }
-                    $db->insert('mmrpg_records_robots', $insert_array);
-                } else {
-                    $update_array = array();
-                    $update_array['record_time'] = MMRPG_CONFIG_LAST_SAVE_DATE;
-                    foreach ($temp_robot_records AS $token => $value){ $update_array[$token] = $value; }
-                    $db->update('mmrpg_records_robots', $update_array, array('robot_token' => $record_token));
-                }
-
-
-            }
-
+            // Collect global robot records from the dedicated function
+            $global_robot_records = mmrpg_get_robot_database_records(array(
+                'robot_token' => $robot_info['robot_token']
+                ));
+            //error_log('$global_robot_records = '.print_r($global_robot_records, true));
 
         }
 
@@ -4247,49 +4182,51 @@ class rpg_robot extends rpg_object {
                                 <col width="100%" />
                             </colgroup>
                             <tbody>
-                                <tr>
-                                    <td class="right">
-                                        <label>Encountered : </label>
-                                        <span class="robot_record"><?= $temp_robot_records['robot_encountered'] == 1 ? '1 Time' : number_format($temp_robot_records['robot_encountered'], 0, '.', ',').' Times' ?></span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="right">
-                                        <label>Scanned : </label>
-                                        <span class="robot_record"><?= $temp_robot_records['robot_scanned'] == 1 ? '1 Time' : number_format($temp_robot_records['robot_scanned'], 0, '.', ',').' Times' ?></span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="right">
-                                        <label>Defeated : </label>
-                                        <span class="robot_record"><?= $temp_robot_records['robot_defeated'] == 1 ? '1 Time' : number_format($temp_robot_records['robot_defeated'], 0, '.', ',').' Times' ?></span>
-                                    </td>
-                                </tr>
-                                <? if (
-                                    ($robot_info['robot_class'] == 'mecha')
-                                    || ($robot_info['robot_class'] == 'master' && !empty($robot_info['robot_flag_unlockable']))
-                                    ){ ?>
+                                <? if (isset($global_robot_records['robot_encountered'])){ ?>
                                     <tr>
                                         <td class="right">
-                                            <label>Summoned : </label>
-                                            <span class="robot_record"><?= $temp_robot_records['robot_summoned'] == 1 ? '1 Time' : number_format($temp_robot_records['robot_summoned'], 0, '.', ',').' Times' ?></span>
+                                            <label>Encountered : </label>
+                                            <span class="robot_record"><?= intval($global_robot_records['robot_encountered']) === 1 ? '1 Time' : $global_robot_records['robot_encountered'].' Times' ?></span>
                                         </td>
                                     </tr>
                                 <? } ?>
-                                <? if (
-                                    $robot_info['robot_class'] == 'master'
-                                    && !empty($robot_info['robot_flag_unlockable'])
-                                    ){ ?>
+                                <? if (isset($global_robot_records['robot_scanned'])){ ?>
+                                    <tr>
+                                        <td class="right">
+                                            <label>Scanned : </label>
+                                            <span class="robot_record"><?= intval($global_robot_records['robot_scanned']) === 1 ? '1 Time' : $global_robot_records['robot_scanned'].' Times' ?></span>
+                                        </td>
+                                    </tr>
+                                <? } ?>
+                                <? if (isset($global_robot_records['robot_defeated'])){ ?>
+                                    <tr>
+                                        <td class="right">
+                                            <label>Defeated : </label>
+                                            <span class="robot_record"><?= intval($global_robot_records['robot_defeated']) === 1 ? '1 Time' : $global_robot_records['robot_defeated'].' Times' ?></span>
+                                        </td>
+                                    </tr>
+                                <? } ?>
+                                <? if (isset($global_robot_records['robot_summoned'])){ ?>
+                                    <tr>
+                                        <td class="right">
+                                            <label>Summoned : </label>
+                                            <span class="robot_record"><?= intval($global_robot_records['robot_summoned']) === 1 ? '1 Time' : $global_robot_records['robot_summoned'].' Times' ?></span>
+                                        </td>
+                                    </tr>
+                                <? } ?>
+                                <? if (isset($global_robot_records['robot_unlocked'])){ ?>
                                     <tr>
                                         <td class="right">
                                             <label>Unlocked By : </label>
-                                            <span class="robot_record"><?= $temp_robot_records['robot_unlocked'] == 1 ? '1 Player' : number_format($temp_robot_records['robot_unlocked'], 0, '.', ',').' Players' ?></span>
+                                            <span class="robot_record"><?= intval($global_robot_records['robot_unlocked']) === 1 ? '1 Player' : $global_robot_records['robot_unlocked'].' Players' ?></span>
                                         </td>
                                     </tr>
+                                <? } ?>
+                                <? if (isset($global_robot_records['robot_avatars'])){ ?>
                                     <tr>
                                         <td class="right">
                                             <label>Avatar Of : </label>
-                                            <span class="robot_record"><?= $temp_robot_records['robot_avatars'] == 1 ? '1 Player' : number_format($temp_robot_records['robot_avatars'], 0, '.', ',').' Players' ?></span>
+                                            <span class="robot_record"><?= intval($global_robot_records['robot_avatars']) === 1 ? '1 Player' : $global_robot_records['robot_avatars'].' Players' ?></span>
                                         </td>
                                     </tr>
                                 <? } ?>
