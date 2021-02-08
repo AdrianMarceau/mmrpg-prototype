@@ -3081,6 +3081,7 @@ function mmrpg_get_robot_database_records_markup($robot_class, $record_limit = 1
     $record_categories_label = function($record_category){
         $label = str_replace('robot_', '', $record_category);
         $label = ucfirst(preg_replace('/(ed|s)$/i', '', $label));
+        $label = preg_replace('/nn$/i', 'n', $label);
         return $label;
         };
     $record_query_conditions = '';
@@ -3091,28 +3092,83 @@ function mmrpg_get_robot_database_records_markup($robot_class, $record_limit = 1
     }
     $global_robot_records = array();
     foreach ($record_categories AS $record_category){
-        $record_array = $db->get_array_list("SELECT
-            records.robot_token,
-            records.{$record_category}
-            FROM mmrpg_records_robots AS records
-            LEFT JOIN mmrpg_index_robots AS robots ON robots.robot_token = records.robot_token
-            WHERE
-            robots.robot_flag_published = 1
-            AND robots.robot_flag_complete = 1
-            {$record_query_conditions}
-            ORDER BY
-            records.{$record_category} DESC
-            LIMIT {$record_limit}
-            ;", 'robot_token');
-        if (empty($record_array)){ continue; }
-        $label = $record_categories_label($record_category);
-        $record_array = array_filter(array_map(function($a) use($record_category, $label){
-            return isset($a[$record_category]) ? $a[$record_category] : 0;
-            }, $record_array));
+
+        // Avatar records have to be collected in a special way
+        if ($record_category === 'robot_avatars'){
+
+            $allowed_robot_tokens = $db->get_array_list("
+                SELECT robots.robot_token
+                FROM mmrpg_index_robots AS robots
+                WHERE
+                robots.robot_flag_published = 1
+                AND robots.robot_flag_complete = 1
+                {$record_query_conditions}
+                ;", 'robot_token');
+            $allowed_robot_tokens = !empty($allowed_robot_tokens) ? array_keys($allowed_robot_tokens) : array();
+            if (empty($allowed_robot_tokens)){ continue; }
+
+            $user_image_paths = $db->get_array_list("SELECT
+                user_image_path,
+                COUNT(*) AS robot_avatars_total
+                FROM mmrpg_users AS users
+                WHERE user_image_path <> ''
+                GROUP BY user_image_path
+                ORDER BY robot_avatars_total DESC
+                ;");
+            if (empty($user_image_paths)){ continue; }
+
+            $record_array = array();
+            if (!empty($user_image_paths)){
+                $regex = '/^(?:[^\/]+)\/([-a-z0-9]+)(?:[^\/]+)?\/(?:[0-9]+)$/i';
+                foreach ($user_image_paths AS $key => $data){
+                    $robot_token = preg_replace($regex, '$1', $data['user_image_path']);
+                    if (!in_array($robot_token, $allowed_robot_tokens)){ continue; }
+                    $avatar_count = $data['robot_avatars_total'];
+                    if (!isset($record_array[$robot_token])){ $record_array[$robot_token] = 0; }
+                    $record_array[$robot_token] += $avatar_count;
+                }
+                asort($record_array);
+                $record_array = array_reverse($record_array);
+            }
+            $label = $record_categories_label($record_category);
+            $record_array = array_filter($record_array);
+            if (empty($record_array)){ continue; }
+
+        }
+        // Otherwise, all other record types can be pulled normally
+        else {
+
+            $record_array = $db->get_array_list("SELECT
+                records.robot_token,
+                SUM(records.{$record_category}) AS {$record_category}_total
+                FROM mmrpg_users_records_robots AS records
+                LEFT JOIN mmrpg_index_robots AS robots ON robots.robot_token = records.robot_token
+                WHERE
+                robots.robot_flag_published = 1
+                AND robots.robot_flag_complete = 1
+                {$record_query_conditions}
+                GROUP BY
+                records.robot_token
+                ORDER BY
+                {$record_category}_total DESC
+                LIMIT {$record_limit}
+                ;", 'robot_token');
+            if (empty($record_array)){ continue; }
+            $label = $record_categories_label($record_category);
+            $record_array = array_filter(array_map(function($a) use($record_category, $label){
+                return isset($a[$record_category.'_total']) ? $a[$record_category.'_total'] : 0;
+                }, $record_array));
+
+        }
+
+        // Format the totals with proper number formatting
         $record_array = array_map(function($value) use($record_category, $label){
             return number_format($value, 0, '.', ',').' '.$label.($value !== 1 ? 's' : '');
             }, $record_array);
+
+        // Add the final record array to the global list
         $global_robot_records[$record_category] = $record_array;
+
     }
 
     ob_start();
