@@ -342,6 +342,7 @@ class cms_website_page {
             if (!empty($old_subs_list)){
                 foreach ($old_subs_list AS $page_token => $page_data){
                     if (!isset($new_subs_list[$page_token])){
+                        if ($page_token == 'personal' && ($is_guest || empty($this_userinfo['user_flag_postprivate']))){ continue; }
                         $new_subs_list[$page_token] = $page_data;
                     }
                 }
