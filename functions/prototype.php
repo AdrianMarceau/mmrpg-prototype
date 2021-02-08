@@ -3035,8 +3035,9 @@ function mmrpg_prototype_format_user_data_for_session($this_userinfo){
 }
 
 // Define a function for generating type spans given a list of object tokens
-function mmrpg_generate_type_spans_from_tokens($kind, $tokens, $tooltips = array(), $prefixes = array()){
+function mmrpg_generate_type_spans_from_tokens($kind, $tokens, $tooltips = array(), $index_by_token = false){
     $span_list = array();
+    if (!is_array($tooltips)){ $tooltips = array(); }
     if ($kind === 'robots'){
         $mmrpg_robots_index = rpg_robot::get_index();
         foreach ($tokens AS $key => $token){
@@ -3050,7 +3051,8 @@ function mmrpg_generate_type_spans_from_tokens($kind, $tokens, $tooltips = array
                 $markup = '';
                 if (isset($prefixes[$token])){ $markup .= '<span class="prefix">'.$prefixes[$token].'</span> '; }
                 $markup .= '<span class="robot_name type_span type type_'.$types.'"'.$title.'>'.$name.'</span>';
-                $span_list[] = $markup;
+                if ($index_by_token){ $span_list[$token] = $markup; }
+                else { $span_list[] = $markup; }
             }
         }
     }
@@ -3059,7 +3061,7 @@ function mmrpg_generate_type_spans_from_tokens($kind, $tokens, $tooltips = array
 
 
 // Define a function for printing out global records at the bottom of a robot/mecha/boss database page
-function mmrpg_get_robot_database_records($record_filters = array()){
+function mmrpg_get_robot_database_records($record_filters = array(), &$record_categories_index = array()){
     global $db;
 
     // Ensure the record filters var was an array and then collect
@@ -3074,7 +3076,15 @@ function mmrpg_get_robot_database_records($record_filters = array()){
     $global_robot_records = array();
 
     // Define the record categories we'll be pulling data for (filter for class if defined)
-    $record_categories = array('robot_encountered', 'robot_defeated', 'robot_unlocked', 'robot_summoned', 'robot_scanned', 'robot_avatars');
+    $record_categories_index = array(
+        'robot_encountered' => array('label' => 'encountered', 'noun' => 'encounter', 'xnoun' => 'encounters', 'counter' => 'time', 'xcounter' => 'times'),
+        'robot_scanned' => array('label' => 'scanned', 'noun' => 'scan', 'xnoun' => 'scans', 'counter' => 'time', 'xcounter' => 'times'),
+        'robot_defeated' => array('label' => 'defeated', 'noun' => 'defeat', 'xnoun' => 'defeats', 'counter' => 'time', 'xcounter' => 'times'),
+        'robot_summoned' => array('label' => 'summoned', 'noun' => 'summon', 'xnoun' => 'summons', 'counter' => 'time', 'xcounter' => 'times'),
+        'robot_unlocked' => array('label' => 'unlocked', 'zlabel' => 'unlocked by', 'noun' => 'unlock', 'xnoun' => 'unlocks', 'counter' => 'player', 'xcounter' => 'players'),
+        'robot_avatars' => array('label' => 'avatars', 'zlabel' => 'avatar by', 'noun' => 'avatar', 'xnoun' => 'avatars', 'counter' => 'player', 'xcounter' => 'players')
+        );
+    $record_categories = array_keys($record_categories_index); //array('robot_encountered', 'robot_scanned', 'robot_defeated', 'robot_summoned', 'robot_unlocked', 'robot_avatars');
     if (!empty($record_filters['robot_class']) && $record_filters['robot_class'] !== 'master'){
         unset($record_categories[array_search('robot_unlocked', $record_categories)]);
         unset($record_categories[array_search('robot_avatars', $record_categories)]);
@@ -3085,11 +3095,8 @@ function mmrpg_get_robot_database_records($record_filters = array()){
     $record_categories = array_values($record_categories);
 
     // Define a function for generating a label for a given category
-    $record_categories_label = function($record_category){
-        $label = str_replace('robot_', '', $record_category);
-        $label = ucfirst(preg_replace('/(ed|s)$/i', '', $label));
-        $label = preg_replace('/nn$/i', 'n', $label);
-        return $label;
+    $record_categories_label = function($record_category, $kind) use($record_categories_index){
+        return ucwords($record_categories_index[$record_category][$kind]);
         };
 
     // Define common query conditions given provided filters
@@ -3181,9 +3188,9 @@ function mmrpg_get_robot_database_records($record_filters = array()){
 
         // If allowed, append each of the records with an appropriate label
         if (!empty($record_filters['record_labels'])){
-            $label = $record_categories_label($record_category);
-            $record_array = array_map(function($value) use($label){
-                return $value.' '.$label.(intval($value) !== 1 ? 's' : '');
+            $label_kind = is_string($record_filters['record_labels']) ? $record_filters['record_labels'] : 'noun';
+            $record_array = array_map(function($value) use($record_categories_label, $record_category, $label_kind){
+                return $value.' '.ucwords($record_categories_label($record_category, (number_is_plural($value) ? 'x' : '').$label_kind));
                 }, $record_array);
         }
 
@@ -3225,8 +3232,8 @@ function mmrpg_get_robot_database_records_markup($robot_class, $record_limit = 1
         'robot_class' => $robot_class,
         'robot_core' => $this_current_filter,
         'record_limit' => $record_limit,
-        'record_labels' => true
-        ));
+        'record_labels' => 'counter'
+        ), $record_categories_index);
 
     ob_start();
     ?>
@@ -3244,14 +3251,20 @@ function mmrpg_get_robot_database_records_markup($robot_class, $record_limit = 1
                     // Loop through and print out the records with names and labels
                     foreach ($global_robot_records AS $record_category => $record_robot_list){
                         if (empty($record_robot_list)){ continue; }
-                        $label = 'Most '.ucfirst(str_replace('robot_', '', $record_category));
+                        $label = 'Most '.ucwords($record_categories_index[$record_category]['label']);
                         $robot_tokens = array_keys($record_robot_list);
-                        $position_prefixes = array();
-                        foreach ($robot_tokens AS $key => $token){ $rank = $key + 1; $position_prefixes[$token] = mmrpg_number_suffix($rank, true, true); }
-                        $robot_list = mmrpg_generate_type_spans_from_tokens('robots', $robot_tokens, $record_robot_list, $position_prefixes);
+                        $robot_span_list = mmrpg_generate_type_spans_from_tokens('robots', $robot_tokens, false, true);
+                        $rank = 0; $rank_value = '';
+                        foreach ($robot_span_list AS $token => $markup){
+                            $value = $record_robot_list[$token];
+                            if ($value !== $rank_value){ $rank += 1; $rank_value = $value; }
+                            $rank_span = '<span class="rank_span">'.mmrpg_number_suffix($rank, true, true).'</span>';
+                            $value_span = '<span class="value_span">'.$value.'</span>';
+                            $robot_span_list[$token] = $rank_span.' '.$markup.' '.$value_span;
+                        }
                         echo('<li class="category">'.PHP_EOL);
                             echo('<strong>'.$label.'</strong>'.PHP_EOL);
-                            echo('<ul><li>'.implode('</li><li>', $robot_list).'</li></ul>'.PHP_EOL);
+                            echo('<ul><li>'.implode('</li><li>', $robot_span_list).'</li></ul>'.PHP_EOL);
                         echo('</li>'.PHP_EOL);
                     }
                     ?>

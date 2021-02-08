@@ -753,12 +753,23 @@ body:before {
     }
 
     #window .page .body .subbody_database_records .global_records ul.categories > li.category > ul > li {
-        text-align: center;
-    }
-    #window .page .body .subbody_database_records .global_records ul.categories > li.category > ul > li .prefix {
         display: block;
-        min-width: 0;
-        padding: 0 4px;
+        float: none;
+        clear: both;
+        width: auto;
+        text-align: left;
+        padding: 6px;
+    }
+    #window .page .body .subbody_database_records .global_records ul.categories > li.category > ul > li .rank_span,
+    #window .page .body .subbody_database_records .global_records ul.categories > li.category > ul > li .type_span,
+    #window .page .body .subbody_database_records .global_records ul.categories > li.category > ul > li .value_span {
+        display: inline-block;
+        position: static;
+        transform: none;
+        margin-right: 6px;
+    }
+    #window .page .body .subbody_database_records .global_records ul.categories > li.category > ul > li .value_span {
+        float: right;
     }
 
     #window .page .event .robot_container .robot_name,

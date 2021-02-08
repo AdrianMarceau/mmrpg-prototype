@@ -1513,4 +1513,11 @@ function implode_with_oxford_comma($list){
     else { return implode(', ', array_slice($list, 0, -1)).', and '.$list[$size - 1]; }
 }
 
+// Check to see if a number is plural or not (accounting for formatting)
+function number_is_plural($number, $zero_is_plural = true){
+    $real_number = floatval(str_replace(',', '', $number));
+    if (empty($real_number) && $zero_is_plural){ return true; }
+    else { return $real_number !== 1 ? true : false; }
+}
+
 ?>

@@ -4186,7 +4186,7 @@ class rpg_robot extends rpg_object {
                                     <tr>
                                         <td class="right">
                                             <label>Encountered : </label>
-                                            <span class="robot_record"><?= intval($global_robot_records['robot_encountered']) === 1 ? '1 Time' : $global_robot_records['robot_encountered'].' Times' ?></span>
+                                            <span class="robot_record"><?= !number_is_plural($global_robot_records['robot_encountered']) ? '1 Time' : $global_robot_records['robot_encountered'].' Times' ?></span>
                                         </td>
                                     </tr>
                                 <? } ?>
@@ -4194,7 +4194,7 @@ class rpg_robot extends rpg_object {
                                     <tr>
                                         <td class="right">
                                             <label>Scanned : </label>
-                                            <span class="robot_record"><?= intval($global_robot_records['robot_scanned']) === 1 ? '1 Time' : $global_robot_records['robot_scanned'].' Times' ?></span>
+                                            <span class="robot_record"><?= !number_is_plural($global_robot_records['robot_scanned']) ? '1 Time' : $global_robot_records['robot_scanned'].' Times' ?></span>
                                         </td>
                                     </tr>
                                 <? } ?>
@@ -4202,7 +4202,7 @@ class rpg_robot extends rpg_object {
                                     <tr>
                                         <td class="right">
                                             <label>Defeated : </label>
-                                            <span class="robot_record"><?= intval($global_robot_records['robot_defeated']) === 1 ? '1 Time' : $global_robot_records['robot_defeated'].' Times' ?></span>
+                                            <span class="robot_record"><?= !number_is_plural($global_robot_records['robot_defeated']) ? '1 Time' : $global_robot_records['robot_defeated'].' Times' ?></span>
                                         </td>
                                     </tr>
                                 <? } ?>
@@ -4210,7 +4210,7 @@ class rpg_robot extends rpg_object {
                                     <tr>
                                         <td class="right">
                                             <label>Summoned : </label>
-                                            <span class="robot_record"><?= intval($global_robot_records['robot_summoned']) === 1 ? '1 Time' : $global_robot_records['robot_summoned'].' Times' ?></span>
+                                            <span class="robot_record"><?= !number_is_plural($global_robot_records['robot_summoned']) ? '1 Time' : $global_robot_records['robot_summoned'].' Times' ?></span>
                                         </td>
                                     </tr>
                                 <? } ?>
@@ -4218,7 +4218,7 @@ class rpg_robot extends rpg_object {
                                     <tr>
                                         <td class="right">
                                             <label>Unlocked By : </label>
-                                            <span class="robot_record"><?= intval($global_robot_records['robot_unlocked']) === 1 ? '1 Player' : $global_robot_records['robot_unlocked'].' Players' ?></span>
+                                            <span class="robot_record"><?= !number_is_plural($global_robot_records['robot_unlocked']) ? '1 Player' : $global_robot_records['robot_unlocked'].' Players' ?></span>
                                         </td>
                                     </tr>
                                 <? } ?>
@@ -4226,7 +4226,7 @@ class rpg_robot extends rpg_object {
                                     <tr>
                                         <td class="right">
                                             <label>Avatar Of : </label>
-                                            <span class="robot_record"><?= intval($global_robot_records['robot_avatars']) === 1 ? '1 Player' : $global_robot_records['robot_avatars'].' Players' ?></span>
+                                            <span class="robot_record"><?= !number_is_plural($global_robot_records['robot_avatars']) ? '1 Player' : $global_robot_records['robot_avatars'].' Players' ?></span>
                                         </td>
                                     </tr>
                                 <? } ?>
