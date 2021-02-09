@@ -67,6 +67,7 @@ class rpg_player extends rpg_object {
         $this->player_id = isset($this_playerinfo['player_id']) ? $this_playerinfo['player_id'] : 0;
         $this->player_name = isset($this_playerinfo['player_name']) ? $this_playerinfo['player_name'] : 'Robot';
         $this->player_token = isset($this_playerinfo['player_token']) ? $this_playerinfo['player_token'] : 'player';
+        $this->player_number = isset($this_playerinfo['player_number']) ? $this_playerinfo['player_number'] : 0;
         $this->player_type = isset($this_playerinfo['player_type']) ? $this_playerinfo['player_type'] : '';
         $this->player_type2 = isset($this_playerinfo['player_type2']) ? $this_playerinfo['player_type2'] : '';
         $this->player_image = isset($this_playerinfo['player_image']) ? $this_playerinfo['player_image'] : $this->player_token;
@@ -2271,6 +2272,7 @@ class rpg_player extends rpg_object {
             'player_id' => $this->player_id,
             'player_name' => $this->player_name,
             'player_token' => $this->player_token,
+            'player_number' => $this->player_number,
             'player_type' => $this->player_type,
             'player_type2' => $this->player_type2,
             'player_image' => $this->player_image,
