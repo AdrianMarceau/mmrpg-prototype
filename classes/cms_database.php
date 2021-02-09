@@ -242,6 +242,8 @@ class cms_database {
         if (!$this->MYSQL_RESULT || mysqli_num_rows($this->MYSQL_RESULT) < 1) { return false; }
         // Otherwise, pull an array from the result
         $result_array = mysqli_fetch_array($this->MYSQL_RESULT, MYSQLI_ASSOC);
+        // Fix numeric values in result array
+        $result_array = $this->fix_numeric_values_in_result_array($result_array);
         // Free the results of the query
         $this->clear();
         // Check to see if this is a cacheable result, and encode if so
@@ -283,6 +285,8 @@ class cms_database {
         $array_list = array();
         // Now loop through the result rows, pulling associative arrays
         while ($result_array = mysqli_fetch_array($this->MYSQL_RESULT, MYSQLI_ASSOC)){
+            // Fix numeric values in result array
+            $result_array = $this->fix_numeric_values_in_result_array($result_array);
             // If there was an index defined, assign the array to a specific key in the list
             if ($index) { $array_list[$result_array[$index]] = $result_array; }
             // Otherwise, append the array to the end of the list
@@ -338,6 +342,8 @@ class cms_database {
         if (!$this->MYSQL_RESULT || mysqli_num_rows($this->MYSQL_RESULT) < 1) { return false; }
         // Otherwise, pull an array from the result
         $result_array = mysqli_fetch_array($this->MYSQL_RESULT, MYSQLI_ASSOC);
+        // Fix numeric values in result array
+        $result_array = $this->fix_numeric_values_in_result_array($result_array);
         // Free the results of the query
         $this->clear();
         // Check to see if this is a cacheable result, and encode if so
@@ -347,6 +353,18 @@ class cms_database {
         }
         // Now return the resulting array
         return isset($result_array[$field_name]) ? $result_array[$field_name] : false;
+    }
+    // Define a function for parsing result arrays for numbers and auto-casting them
+    public function fix_numeric_values_in_result_array($result_array){
+        if (empty($result_array) || !is_array($result_array)){ return $result_array; }
+        foreach ($result_array AS $field => $value){
+            if (is_numeric($value)){
+                if (strstr($value, '.')){ $result_array[$field] = floatval($value); }
+                else { $result_array[$field] = intval($value); }
+                continue;
+            }
+        }
+        return $result_array;
     }
 
     // Define a function for inserting a record into the database
