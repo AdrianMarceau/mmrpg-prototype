@@ -160,14 +160,22 @@ function mmrpg_formatting_decode($string){
             '/\[robot:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|command|01|02|03|04|05|06|07|08|09|10)\]\{(.*?)\}/i' => '<span class="sprite_image robot sprite_image_40x40 sprite_image_40x40_$2"><span><img src="images/robots/$3/sprite_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
             );
         $mmrpg_formatting_array += array(
+            // mecha 80x80 Alts
+            '/\[mecha\]\{('.implode('|', $mmrpg_large_robot_images).')_([-_a-z0-9]+)\}/i' => '<span data-test="1" class="sprite_image robot sprite_image_80x80"><img src="images/robots/$1_$2/mug_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
+            '/\[mecha:(left|right)\]\{('.implode('|', $mmrpg_large_robot_images).')_([-_a-z0-9]+)\}/i' => '<span data-test="2" class="sprite_image robot sprite_image_80x80"><img src="images/robots/$2_$3/mug_$1_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
+            '/\[mecha:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|01|02|03|04|05|06|07|08|09|10)\]\{('.implode('|', $mmrpg_large_robot_images).')_([-_a-z0-9]+)\}/i' => '<span data-test="3" class="sprite_image robot sprite_image_80x80 sprite_image_80x80_$2"><span><img src="images/robots/$3_$4/sprite_$1_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
+            // mecha 40x40 Alts
+            '/\[mecha\]\{([-a-z0-9]+)_([-_a-z0-9]+)\}/i' => '<span class="sprite_image robot sprite_image_40x40"><img src="images/robots/$1_$2/mug_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
+            '/\[mecha:(left|right)\]\{([-a-z0-9]+)_([-_a-z0-9]+)\}/i' => '<span class="sprite_image robot sprite_image_40x40"><img src="images/robots/$2_$3/mug_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
+            '/\[mecha:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|command|01|02|03|04|05|06|07|08|09|10)\]\{([-a-z0-9]+)_([-_a-z0-9]+)\}/i' => '<span class="sprite_image robot sprite_image_40x40 sprite_image_40x40_$2"><span><img src="images/robots/$3_$4/sprite_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
             // mecha 80x80
-            '/\[mecha\]\{('.implode('|', $mmrpg_large_robot_images).')\}/i' => '<span class="sprite_image robot mecha sprite_image_80x80"><img src="images/mechas/$1/mug_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
-            '/\[mecha:(left|right)\]\{('.implode('|', $mmrpg_large_robot_images).')\}/i' => '<span class="sprite_image robot mecha sprite_image_80x80"><img src="images/mechas/$2/mug_$1_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
-            '/\[mecha:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|01|02|03|04|05|06|07|08|09|10)\]\{('.implode('|', $mmrpg_large_robot_images).')\}/i' => '<span class="sprite_image robot mecha sprite_image_80x80 sprite_image_80x80_$2"><span><img src="images/mechas/$3/sprite_$1_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
+            '/\[mecha\]\{('.implode('|', $mmrpg_large_robot_images).')\}/i' => '<span class="sprite_image robot sprite_image_80x80"><img src="images/robots/$1/mug_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
+            '/\[mecha:(left|right)\]\{('.implode('|', $mmrpg_large_robot_images).')\}/i' => '<span class="sprite_image robot sprite_image_80x80"><img src="images/robots/$2/mug_$1_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
+            '/\[mecha:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|01|02|03|04|05|06|07|08|09|10)\]\{('.implode('|', $mmrpg_large_robot_images).')\}/i' => '<span class="sprite_image robot sprite_image_80x80 sprite_image_80x80_$2"><span><img src="images/robots/$3/sprite_$1_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
             // mecha 40x40
-            '/\[mecha\]\{(.*?)\}/i' => '<span class="sprite_image robot mecha sprite_image_40x40"><img src="images/robots/$1/mug_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
-            '/\[mecha:(left|right)\]\{(.*?)\}/i' => '<span class="sprite_image robot mecha sprite_image_40x40"><img src="images/robots/$2/mug_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
-            '/\[mecha:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|command|01|02|03|04|05|06|07|08|09|10)\]\{(.*?)\}/i' => '<span class="sprite_image robot mecha sprite_image_40x40 sprite_image_40x40_$2"><span><img src="images/robots/$3/sprite_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
+            '/\[mecha\]\{(.*?)\}/i' => '<span class="sprite_image robot sprite_image_40x40"><img src="images/robots/$1/mug_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
+            '/\[mecha:(left|right)\]\{(.*?)\}/i' => '<span class="sprite_image robot sprite_image_40x40"><img src="images/robots/$2/mug_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
+            '/\[mecha:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|command|01|02|03|04|05|06|07|08|09|10)\]\{(.*?)\}/i' => '<span class="sprite_image robot sprite_image_40x40 sprite_image_40x40_$2"><span><img src="images/robots/$3/sprite_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
             );
         $mmrpg_formatting_array += array(
             // ability 80x80
