@@ -25,6 +25,7 @@ $copy_db_tables = array(
     'mmrpg_leaderboard',
     'mmrpg_sessions',
     'mmrpg_users_records_robots',
+    'mmrpg_users_save_counters',
     'mmrpg_users_unlocked_items',
     'mmrpg_users_unlocked_abilities',
     'mmrpg_users_unlocked_stars',
