@@ -57,7 +57,14 @@ function mmrpg_load_game_session(){
 
         $new_game_data['USER'] = mmrpg_prototype_format_user_data_for_session($this_database_user);
 
-        $new_game_data['counters'] = !empty($this_database_save['save_counters']) ? json_decode($this_database_save['save_counters'], true) : array();
+        rpg_user::pull_save_counters($login_user_id, $user_save_counters);
+        if (!empty($user_save_counters)){
+            $new_game_data['counters'] = $user_save_counters;
+        } else {
+            // Legacy support / remove once new methods confirmed working
+            $new_game_data['counters'] = !empty($this_database_save['save_counters']) ? json_decode($this_database_save['save_counters'], true) : array();
+        }
+
         $new_game_data['values'] = !empty($this_database_save['save_values']) ? json_decode($this_database_save['save_values'], true) : array();
 
         if (!isset($this_database_save['save_values_battle_index'])){
@@ -89,6 +96,7 @@ function mmrpg_load_game_session(){
             $new_game_data['values']['battle_items'] = $user_unlocked_items;
             $new_game_data['values']['battle_items_hash'] = md5(json_encode($user_unlocked_items));
         } elseif (!empty($this_database_save['save_values_battle_items'])){
+            // Legacy support / remove once new methods confirmed working
             $new_game_data['values']['battle_items'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_items']), true);
             $new_game_data['values']['battle_items_hash'] = md5($this_database_save['save_values_battle_items']);
         }
@@ -98,6 +106,7 @@ function mmrpg_load_game_session(){
             $new_game_data['values']['battle_abilities'] = $user_unlocked_abilities;
             $new_game_data['values']['battle_abilities_hash'] = md5(json_encode($user_unlocked_abilities));
         } elseif (!empty($this_database_save['save_values_battle_abilities'])){
+            // Legacy support / remove once new methods confirmed working
             $new_game_data['values']['battle_abilities'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_abilities']), true);
             $new_game_data['values']['battle_abilities_hash'] = md5($this_database_save['save_values_battle_abilities']);
         }
@@ -107,6 +116,7 @@ function mmrpg_load_game_session(){
             $new_game_data['values']['battle_stars'] = $user_unlocked_stars;
             $new_game_data['values']['battle_stars_hash'] = md5(json_encode($user_unlocked_stars));
         } elseif (!empty($this_database_save['save_values_battle_stars'])){
+            // Legacy support / remove once new methods confirmed working
             $new_game_data['values']['battle_stars'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_stars']), true);
             $new_game_data['values']['battle_stars_hash'] = md5($this_database_save['save_values_battle_stars']);
         }
@@ -121,6 +131,7 @@ function mmrpg_load_game_session(){
             $new_game_data['values']['robot_database'] = $user_robot_records;
             $new_game_data['values']['robot_database_hash'] = md5(json_encode($user_robot_records));
         } elseif (!empty($this_database_save['save_values_robot_database'])){
+            // Legacy support / remove once new methods confirmed working
             $new_game_data['values']['robot_database'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_robot_database']), true);
             $new_game_data['values']['robot_database_hash'] = md5($this_database_save['save_values_robot_database']);
         }
