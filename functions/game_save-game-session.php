@@ -345,6 +345,12 @@ function mmrpg_save_game_session(){
         //echo('<pre>$this_save_array = '.print_r($this_save_array, true).'</pre>');
         $db->update('mmrpg_saves', $this_save_array, 'user_id = '.$this_user['userid']);
 
+        // If the save couneters were not empty, we should update them in the database table
+        if (!empty($_SESSION[$session_token]['counters'])){
+            $user_save_counters = $_SESSION[$session_token]['counters'];
+            rpg_user::update_save_counters($this_user['userid'], $user_save_counters);
+        }
+
         // If the robot database records were not empty, we should update them in the database table
         if (!empty($_SESSION[$session_token]['values']['robot_database'])){
             $user_robot_records = $_SESSION[$session_token]['values']['robot_database'];
