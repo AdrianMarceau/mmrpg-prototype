@@ -614,7 +614,7 @@ class rpg_user {
         }
 
         // If not empty, loop through database records and update local array
-        if ($existing_robot_records){
+        if (!empty($existing_robot_records)){
             foreach ($existing_robot_records AS $robot_token => $robot_records){
                 if (!isset($user_robot_records[$robot_token])){
                     $user_robot_records[$robot_token] = $robot_records;
@@ -724,7 +724,7 @@ class rpg_user {
         }
 
         // If not empty, loop through database records and update local array
-        if ($existing_item_records){
+        if (!empty($existing_item_records)){
             foreach ($existing_item_records AS $item_token => $item_record){
                 $item_quantity = $item_record['item_quantity'];
                 $user_unlocked_items[$item_token] = $item_quantity;
@@ -816,7 +816,7 @@ class rpg_user {
         }
 
         // If not empty, loop through database records and update local array
-        if ($existing_ability_records){
+        if (!empty($existing_ability_records)){
             foreach ($existing_ability_records AS $ability_token => $ability_record){
                 if (!in_array($ability_token, $user_unlocked_abilities)){
                     $user_unlocked_abilities[] = $ability_token;
@@ -901,7 +901,7 @@ class rpg_user {
         }
 
         // If not empty, loop through database records and update local array
-        if ($existing_star_records){
+        if (!empty($existing_star_records)){
             foreach ($existing_star_records AS $star_token => $star_record){
                 if (empty($star_record['star_date'])){ unset($star_record['star_date']); }
                 $user_unlocked_stars[$star_token] = $star_record;
@@ -978,6 +978,97 @@ class rpg_user {
         if (!empty($update_records)){
             foreach ($update_records AS $star_token => $star_records){
                 $db->update($record_table_name, $star_records, array('user_id' => $user_id, 'star_token' => $star_token));
+            }
+        }
+
+        // Return true on success
+        return true;
+
+    }
+
+    // Define a function for pulling a given user's save counters from the database
+    public static function pull_save_counters($user_id, &$user_save_counters = array()){
+        global $db;
+
+        if (empty($user_id)){ return false; }
+        if (!is_array($user_save_counters)){ $user_save_counters = array(); }
+
+        // Collect a list of existing records for this user from the database
+        $record_table_name = 'mmrpg_users_save_counters';
+        $existing_counter_records = $db->get_array_list("SELECT
+            `counters`.`counter_token`, `counters`.`counter_value`
+            FROM `{$record_table_name}` AS `counters`
+            WHERE `counters`.`user_id` = {$user_id}
+            ORDER BY `counters`.`record_id` ASC
+            ;", 'counter_token');
+        if (empty($existing_counter_records)){
+            $existing_counter_records = array();
+        }
+
+        // If not empty, loop through database records and update local array
+        if (!empty($existing_counter_records)){
+            $existing_counter_records = array_map(function($a){ return $a['counter_value']; }, $existing_counter_records);
+            $existing_counter_records = !empty($existing_counter_records) ? inflate_nested_array($existing_counter_records) : array();
+            if (!empty($existing_counter_records)){
+                foreach ($existing_counter_records AS $counter_token => $counter_value){
+                    $user_save_counters[$counter_token] = $counter_value;
+                }
+            }
+        }
+
+        // Return true on success
+        return true;
+
+    }
+
+    // Define a function for updating a given user's save counters in the database
+    public static function update_save_counters($user_id, $user_save_counters){
+        global $db;
+
+        if (empty($user_id)){ return false; }
+        if (empty($user_save_counters)){ return false; }
+
+        // Collect a list of existing records so we know when to update vs insert vs skip
+        $record_table_name = 'mmrpg_users_save_counters';
+        $existing_counter_records = $db->get_array_list("SELECT
+            counter_token, counter_value
+            FROM `{$record_table_name}`
+            WHERE user_id = {$user_id}
+            ;", 'counter_token');
+        if (empty($existing_counter_records)){
+            $existing_counter_records = array();
+        }
+
+        // Loop through the provided list of records and update/insert/skip
+        $insert_records = array();
+        $update_records = array();
+        $user_save_counters = flatten_nested_array($user_save_counters, '/');
+        foreach ($user_save_counters AS $counter_token => $counter_value){
+            if (!isset($existing_counter_records[$counter_token])){
+                $insert_record = array('user_id' => $user_id, 'counter_token' => $counter_token, 'counter_value' => $counter_value);
+                $insert_records[] = $insert_record;
+            } else {
+                $base_record = $existing_counter_records[$counter_token];
+                $update_record = array();
+                if ($base_record['counter_value'] !== $counter_value){
+                    $update_record['counter_value'] = $counter_value;
+                }
+                if (!empty($update_record)){
+                    $update_records[$counter_token] = $update_record;
+                }
+            }
+        }
+
+        // If there are insert records, process them now
+        if (!empty($insert_records)){
+            $insert_query = $db->get_bulk_insert_sql($record_table_name, $insert_records);
+            $db->query($insert_query);
+        }
+
+        // If there are update records, process them now
+        if (!empty($update_records)){
+            foreach ($update_records AS $counter_token => $counter_records){
+                $db->update($record_table_name, $counter_records, array('user_id' => $user_id, 'counter_token' => $counter_token));
             }
         }
 
