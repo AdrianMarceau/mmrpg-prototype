@@ -161,9 +161,12 @@ function mmrpg_save_game_session(){
 
                 // Generate the SAVE details for import
                 $this_save_array = array();
+
+                /*
                 if (!empty($this_values['battle_index'])){
                     unset($this_values['battle_index']);
                 }
+                */
                 if (!empty($this_values['battle_complete']) || $reset_in_progress){
                     $this_save_array['save_values_battle_complete'] = json_encode(!empty($this_values['battle_complete']) ? $this_values['battle_complete'] : array());
                     $temp_hash = md5($this_save_array['save_values_battle_complete']);
@@ -226,6 +229,13 @@ function mmrpg_save_game_session(){
                     unset($this_values['robot_database'], $this_values['robot_database_hash']);
                 }
                 */
+
+                unset($this_values['battle_index']);
+                unset($this_values['battle_items'], $this_values['battle_items_hash']);
+                unset($this_values['battle_abilities'], $this_values['battle_abilities_hash']);
+                unset($this_values['battle_stars'], $this_values['battle_stars_hash']);
+                unset($this_values['robot_database'], $this_values['robot_database_hash']);
+
                 $this_save_array['save_id'] = $temp_save_id;
                 $this_save_array['user_id'] = $temp_user_id;
                 $this_save_array['save_counters'] = json_encode($this_counters);
@@ -267,9 +277,11 @@ function mmrpg_save_game_session(){
 
         // Define the save database update array and populate
         $this_save_array = array();
+        /*
         if (!empty($this_values['battle_index']) || $reset_in_progress){
             unset($this_values['battle_index']);
         }
+        */
         if (!empty($this_values['battle_complete']) || $reset_in_progress){
             $this_save_array['save_values_battle_complete'] = json_encode(!empty($this_values['battle_complete']) ? $this_values['battle_complete'] : array());
             $temp_hash = md5($this_save_array['save_values_battle_complete']);
@@ -332,6 +344,12 @@ function mmrpg_save_game_session(){
             unset($this_values['robot_database'], $this_values['robot_database_hash']);
         }
         */
+
+        unset($this_values['battle_index']);
+        unset($this_values['battle_items'], $this_values['battle_items_hash']);
+        unset($this_values['battle_abilities'], $this_values['battle_abilities_hash']);
+        unset($this_values['battle_stars'], $this_values['battle_stars_hash']);
+        unset($this_values['robot_database'], $this_values['robot_database_hash']);
 
         $this_save_array['save_counters'] = json_encode($this_counters);
         $this_save_array['save_values'] = json_encode($this_values);
