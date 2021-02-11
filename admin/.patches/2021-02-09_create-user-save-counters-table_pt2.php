@@ -37,7 +37,6 @@ if (in_array('mmrpg_users_save_counters', $db_tables_list)
                     echo('- adding records for user_id '.$user_id.PHP_EOL);
                     //error_log('$user_id = '.print_r($user_id, true));
                     //error_log('$user_save_counters = '.print_r($user_save_counters, true));
-                    if (isset($user_save_counters['battle_hearts'])){ unset($user_save_counters['battle_hearts']); }
                     rpg_user::update_save_counters($user_id, $user_save_counters);
                     //break;
                 }

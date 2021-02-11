@@ -1039,6 +1039,9 @@ class rpg_user {
             $existing_counter_records = array();
         }
 
+        // Unset and skip any counters that are saved elsewhere or have been deprecated
+        if (isset($user_save_counters['battle_hearts'])){ unset($user_save_counters['battle_hearts']); }
+
         // Loop through the provided list of records and update/insert/skip
         $insert_records = array();
         $update_records = array();
