@@ -97,11 +97,17 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
     $total_battle_points = 0;
 
     // Collect quick references to the rest of the key arrays in the game save data
-    $user_battle_abilities = !empty($user_save_array['save_values_battle_abilities']) ? $user_save_array['save_values_battle_abilities'] : array();
-    $user_battle_items = !empty($user_save_array['save_values_battle_items']) ? $user_save_array['save_values_battle_items'] : array();
-    $user_battle_stars = !empty($user_save_array['save_values_battle_stars']) ? $user_save_array['save_values_battle_stars'] : array();
+    //$user_battle_abilities = !empty($user_save_array['save_values_battle_abilities']) ? $user_save_array['save_values_battle_abilities'] : array();
+    //$user_battle_items = !empty($user_save_array['save_values_battle_items']) ? $user_save_array['save_values_battle_items'] : array();
+    //$user_battle_stars = !empty($user_save_array['save_values_battle_stars']) ? $user_save_array['save_values_battle_stars'] : array();
     $user_robot_alts = !empty($user_save_array['save_values_robot_alts']) ? $user_save_array['save_values_robot_alts'] : array();
-    $user_robot_database = !empty($user_save_array['save_values_robot_database']) ? $user_save_array['save_values_robot_database'] : array();
+    //$user_robot_database = !empty($user_save_array['save_values_robot_database']) ? $user_save_array['save_values_robot_database'] : array();
+
+    // Manually collect save data for certain progress using their dedicated functions
+    rpg_user::pull_unlocked_abilities($user_id, $user_battle_abilities);
+    rpg_user::pull_unlocked_items($user_id, $user_battle_items);
+    rpg_user::pull_unlocked_stars($user_id, $user_battle_stars);
+    rpg_user::pull_robot_records($user_id, $user_robot_database);
 
     // Collect a quick robot, ability, and item index for reference
     $mmrpg_robots = rpg_robot::get_index();
