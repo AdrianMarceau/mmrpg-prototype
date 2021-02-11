@@ -188,36 +188,44 @@ function mmrpg_save_game_session(){
                     if (isset($this_values['battle_settings_hash']) && $this_values['battle_settings_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_settings']); }
                     unset($this_values['battle_settings'], $this_values['battle_settings_hash']);
                 }
+                /*
                 if (!empty($this_values['battle_items']) || $reset_in_progress){
                     $this_save_array['save_values_battle_items'] = json_encode(!empty($this_values['battle_items']) ? $this_values['battle_items'] : array());
                     $temp_hash = md5($this_save_array['save_values_battle_items']);
                     if (isset($this_values['battle_items_hash']) && $this_values['battle_items_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_items']); }
                     unset($this_values['battle_items'], $this_values['battle_items_hash']);
                 }
+                */
+                /*
                 if (!empty($this_values['battle_abilities'])){
                     $this_save_array['save_values_battle_abilities'] = json_encode(!empty($this_values['battle_abilities']) ? $this_values['battle_abilities'] : array());
                     $temp_hash = md5($this_save_array['save_values_battle_abilities']);
                     if (isset($this_values['battle_abilities_hash']) && $this_values['battle_abilities_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_abilities']); }
                     unset($this_values['battle_abilities'], $this_values['battle_abilities_hash']);
                 }
+                */
+                /*
                 if (!empty($this_values['battle_stars']) || $reset_in_progress){
                     $this_save_array['save_values_battle_stars'] = json_encode(!empty($this_values['battle_stars']) ? $this_values['battle_stars'] : array());
                     $temp_hash = md5($this_save_array['save_values_battle_stars']);
                     if (isset($this_values['battle_stars_hash']) && $this_values['battle_stars_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_stars']); }
                     unset($this_values['battle_stars'], $this_values['battle_stars_hash']);
                 }
+                */
                 if (!empty($this_values['robot_alts']) || $reset_in_progress){
                     $this_save_array['save_values_robot_alts'] = json_encode(!empty($this_values['robot_alts']) ? $this_values['robot_alts'] : array());
                     $temp_hash = md5($this_save_array['save_values_robot_alts']);
                     if (isset($this_values['robot_alts_hash']) && $this_values['robot_alts_hash'] == $temp_hash){ unset($this_save_array['save_values_robot_alts']); }
                     unset($this_values['robot_alts'], $this_values['robot_alts_hash']);
                 }
+                /*
                 if (!empty($this_values['robot_database']) || $reset_in_progress){
                     $this_save_array['save_values_robot_database'] = json_encode(!empty($this_values['robot_database']) ? $this_values['robot_database'] : array());
                     $temp_hash = md5($this_save_array['save_values_robot_database']);
                     if (isset($this_values['robot_database_hash']) && $this_values['robot_database_hash'] == $temp_hash){ unset($this_save_array['save_values_robot_database']); }
                     unset($this_values['robot_database'], $this_values['robot_database_hash']);
                 }
+                */
                 $this_save_array['save_id'] = $temp_save_id;
                 $this_save_array['user_id'] = $temp_user_id;
                 $this_save_array['save_counters'] = json_encode($this_counters);
@@ -329,36 +337,44 @@ function mmrpg_save_game_session(){
             if (isset($this_values['battle_settings_hash']) && $this_values['battle_settings_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_settings']); }
             unset($this_values['battle_settings'], $this_values['battle_settings_hash']);
         }
+        /*
         if (!empty($this_values['battle_items']) || $reset_in_progress){
             $this_save_array['save_values_battle_items'] = json_encode(!empty($this_values['battle_items']) ? $this_values['battle_items'] : array());
             $temp_hash = md5($this_save_array['save_values_battle_items']);
             if (isset($this_values['battle_items_hash']) && $this_values['battle_items_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_items']); }
             unset($this_values['battle_items'], $this_values['battle_items_hash']);
         }
+        */
+        /*
         if (!empty($this_values['battle_abilities']) || $reset_in_progress){
             $this_save_array['save_values_battle_abilities'] = json_encode(!empty($this_values['battle_abilities']) ? $this_values['battle_abilities'] : array());
             $temp_hash = md5($this_save_array['save_values_battle_abilities']);
             if (isset($this_values['battle_abilities_hash']) && $this_values['battle_abilities_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_abilities']); }
             unset($this_values['battle_abilities'], $this_values['battle_abilities_hash']);
         }
+        */
+        /*
         if (!empty($this_values['battle_stars']) || $reset_in_progress){
             $this_save_array['save_values_battle_stars'] = json_encode(!empty($this_values['battle_stars']) ? $this_values['battle_stars'] : array());
             $temp_hash = md5($this_save_array['save_values_battle_stars']);
             if (isset($this_values['battle_stars_hash']) && $this_values['battle_stars_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_stars']); }
             unset($this_values['battle_stars'], $this_values['battle_stars_hash']);
         }
+        */
         if (!empty($this_values['robot_alts']) || $reset_in_progress){
             $this_save_array['save_values_robot_alts'] = json_encode(!empty($this_values['robot_alts']) ? $this_values['robot_alts'] : array());
             $temp_hash = md5($this_save_array['save_values_robot_alts']);
             if (isset($this_values['robot_alts_hash']) && $this_values['robot_alts_hash'] == $temp_hash){ unset($this_save_array['save_values_robot_alts']); }
             unset($this_values['robot_alts'], $this_values['robot_alts_hash']);
         }
+        /*
         if (!empty($this_values['robot_database']) || $reset_in_progress){
             $this_save_array['save_values_robot_database'] = json_encode(!empty($this_values['robot_database']) ? $this_values['robot_database'] : array());
             $temp_hash = md5($this_save_array['save_values_robot_database']);
             if (isset($this_values['robot_database_hash']) && $this_values['robot_database_hash'] == $temp_hash){ unset($this_save_array['save_values_robot_database']); }
             unset($this_values['robot_database'], $this_values['robot_database_hash']);
         }
+        */
 
         $this_save_array['save_counters'] = json_encode($this_counters);
         $this_save_array['save_values'] = json_encode($this_values);
