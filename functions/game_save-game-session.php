@@ -265,49 +265,6 @@ function mmrpg_save_game_session(){
             'user_date_accessed' => time()
             ), 'user_id = '.$this_user['userid']);
 
-        // Call the global battle points function to collect progress details
-        mmrpg_prototype_calculate_battle_points_2k19($this_user['userid'], $battle_points_index);
-        //error_log('<pre>$battle_points_index : '.print_r($battle_points_index, true).'</pre>');
-
-        // Define the tokens for updating legacy player fields to ZERO
-        $legacy_player_field_tokens = array('dr_light', 'dr_wily', 'dr_cossack');
-
-        // Define the board database update array and populate
-        $this_board_array = array();
-
-        $this_board_array['board_points'] = $battle_points_index['total_battle_points'];
-            foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_points_'.$ptoken] = 0; }
-
-        $this_board_array['board_robots'] = implode(',', $battle_points_index['robots_unlocked']);
-        $this_board_array['board_robots_count'] = count($battle_points_index['robots_unlocked']);
-            foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_robots_'.$ptoken] = ''; }
-
-        $this_board_array['board_abilities'] = count($battle_points_index['abilities_unlocked']);
-            foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_abilities_'.$ptoken] = 0; }
-
-        $this_board_array['board_stars'] = count($battle_points_index['field_stars_collected']) + count($battle_points_index['fusion_stars_collected']);
-            foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_stars_'.$ptoken] = 0; }
-
-        $this_board_array['board_items'] = count($battle_points_index['items_unlocked']);
-
-        $this_board_array['board_battles'] = 0;
-            foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_battles_'.$ptoken] = 0; }
-
-        $this_board_array['board_missions'] = 0;
-            foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_missions_'.$ptoken] = 0; }
-
-        $this_board_array['board_awards'] = !empty($this_values['prototype_awards']) ? array_keys($this_values['prototype_awards']) : '';
-        $this_board_array['board_awards'] = !empty($this_board_array['board_awards']) ? implode(',', $this_board_array['board_awards']) : '';
-
-        $this_board_array['board_date_modified'] = time();
-
-        // Update this board's info in the database
-        //error_log('<pre>$this_board_array : '.print_r($this_board_array, true).'</pre>');
-        $db->update('mmrpg_leaderboard', $this_board_array, 'user_id = '.$this_user['userid']);
-
-        // Clear any leaderboard data that exists in the session, forcing it to recache
-        if (isset($_SESSION[$session_token]['BOARD']['boardrank'])){ unset($_SESSION[$session_token]['BOARD']['boardrank']); }
-
         // Define the save database update array and populate
         $this_save_array = array();
         if (!empty($this_values['battle_index']) || $reset_in_progress){
@@ -411,6 +368,43 @@ function mmrpg_save_game_session(){
             $user_unlocked_stars = $_SESSION[$session_token]['values']['battle_stars'];
             rpg_user::update_unlocked_stars($this_user['userid'], $user_unlocked_stars);
         }
+
+
+        // -- UPDATE LEADERBOARD RANKINGS -- //
+
+        // Call the global battle points function to collect progress details
+        mmrpg_prototype_calculate_battle_points_2k19($this_user['userid'], $battle_points_index);
+        //error_log('<pre>$battle_points_index : '.print_r($battle_points_index, true).'</pre>');
+
+        // Define the tokens for updating legacy player fields to ZERO
+        $legacy_player_field_tokens = array('dr_light', 'dr_wily', 'dr_cossack');
+
+        // Define the board database update array and populate
+        $this_board_array = array();
+        $this_board_array['board_points'] = $battle_points_index['total_battle_points'];
+            foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_points_'.$ptoken] = 0; }
+        $this_board_array['board_robots'] = implode(',', $battle_points_index['robots_unlocked']);
+        $this_board_array['board_robots_count'] = count($battle_points_index['robots_unlocked']);
+            foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_robots_'.$ptoken] = ''; }
+        $this_board_array['board_abilities'] = count($battle_points_index['abilities_unlocked']);
+            foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_abilities_'.$ptoken] = 0; }
+        $this_board_array['board_stars'] = count($battle_points_index['field_stars_collected']) + count($battle_points_index['fusion_stars_collected']);
+            foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_stars_'.$ptoken] = 0; }
+        $this_board_array['board_items'] = count($battle_points_index['items_unlocked']);
+        $this_board_array['board_battles'] = 0;
+            foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_battles_'.$ptoken] = 0; }
+        $this_board_array['board_missions'] = 0;
+            foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_missions_'.$ptoken] = 0; }
+        $this_board_array['board_awards'] = !empty($this_values['prototype_awards']) ? array_keys($this_values['prototype_awards']) : '';
+        $this_board_array['board_awards'] = !empty($this_board_array['board_awards']) ? implode(',', $this_board_array['board_awards']) : '';
+        $this_board_array['board_date_modified'] = time();
+
+        // Update this board's info in the database
+        //error_log('<pre>$this_board_array : '.print_r($this_board_array, true).'</pre>');
+        $db->update('mmrpg_leaderboard', $this_board_array, 'user_id = '.$this_user['userid']);
+
+        // Clear any leaderboard data that exists in the session, forcing it to recache
+        if (isset($_SESSION[$session_token]['BOARD']['boardrank'])){ unset($_SESSION[$session_token]['BOARD']['boardrank']); }
 
     }
 
