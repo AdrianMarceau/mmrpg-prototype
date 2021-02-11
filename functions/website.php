@@ -1528,4 +1528,47 @@ function number_is_plural($number, $zero_is_plural = true){
     else { return $real_number !== 1 ? true : false; }
 }
 
+// Define a recursive function for flattening a nested array into one depth w/ a separator
+function flatten_nested_array_recursive(array &$out, $key, array $in, $glue = '_'){
+    foreach($in as $k=>$v){
+        if(is_array($v)){
+            flatten_nested_array_recursive($out, $key.$k.$glue, $v, $glue);
+        }else{
+            $out[$key.$k] = $v;
+        }
+    }
+}
+
+// Define a function for flattening a nested array into one depth w/ a separator
+function flatten_nested_array(array $in, $glue = '_'){
+    $out = array();
+    flatten_nested_array_recursive($out, '', $in, $glue);
+    return $out;
+}
+
+// Define a function for inflating a previously-flattened array into a nested one w/ separator
+function inflate_nested_array($arr, $divider_char = "/") {
+    if (!is_array($arr)){ return false; }
+    $split = '/' . preg_quote($divider_char, '/') . '/';
+    $ret = array();
+    foreach ($arr as $key => $val) {
+        $parts = preg_split($split, $key, -1, PREG_SPLIT_NO_EMPTY);
+        $leafpart = array_pop($parts);
+        $parent = &$ret;
+        foreach ($parts as $part) {
+            if (!isset($parent[$part])) {
+                $parent[$part] = array();
+            } elseif (!is_array($parent[$part])) {
+                $parent[$part] = array();
+            }
+            $parent = &$parent[$part];
+        }
+        if (empty($parent[$leafpart])) {
+            $parent[$leafpart] = $val;
+        }
+    }
+    return $ret;
+}
+
+
 ?>
