@@ -32,7 +32,13 @@ if (in_array('mmrpg_users_save_counters', $db_tables_list)
         if (!empty($user_save_counter_records)){
             foreach ($user_save_counter_records AS $user_id => $save_data){
                 if (empty($save_data['save_counters'])){ continue; }
-                $user_save_counters = json_decode($save_data['save_counters'], true);
+                if (substr($save_data['save_counters'], 0, 1) === '{'){
+                    $user_save_counters = json_decode($save_data['save_counters'], true);
+                } elseif (substr($save_data['save_counters'], 0, 2) === 'a:'){
+                    $user_save_counters = unserialize($save_data['save_counters']);
+                } else {
+                    continue;
+                }
                 if (!empty($user_save_counters)){
                     echo('- adding records for user_id '.$user_id.PHP_EOL);
                     //error_log('$user_id = '.print_r($user_id, true));
