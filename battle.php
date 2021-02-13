@@ -656,6 +656,7 @@ if (!empty($event_cross_fade)){ echo "gameSettings.eventCrossFade = {$event_cros
 ?>
 // Create the document ready events
 $(document).ready(function(){
+
 <?
 // Preload battle related image files
 if (!empty($this_battle_data)){
@@ -675,6 +676,11 @@ if (!empty($target_player_data) && !empty($target_player_data['player_robots']))
     }
 }
 ?>
+
+<? if (rpg_game::is_user()){ ?>
+    // The user is logged-in so let's keep the session alive
+    mmrpg_keep_session_alive(<?= rpg_game::get_userid() ?>);
+<? } ?>
 
 });
 

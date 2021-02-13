@@ -675,6 +675,11 @@ $(document).ready(function(){
     }
     ?>
 
+    <? if (rpg_game::is_user()){ ?>
+        // The user is logged-in so let's keep the session alive
+        mmrpg_keep_session_alive(<?= rpg_game::get_userid() ?>);
+    <? } ?>
+
 });
 </script>
 <?

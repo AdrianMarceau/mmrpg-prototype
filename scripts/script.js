@@ -2065,6 +2065,59 @@ function mmrpg_toggle_perspective_mode(element){
 }
 
 
+// Define a function for keeping the session alive and auto-redirecting when it's over
+function mmrpg_keep_session_alive(sessionUserID){
+    //console.log('mmrpg_keep_session_alive()');
+
+    var keepSessionAlive = true;
+    var thisSessionUserID = sessionUserID;
+    var sessionPingFrequency = 1000 * 60 * 5; // every 5 mins
+    var sessionPingURL = gameSettings.baseHref + 'scripts/ping.php';
+    var loginPageURL = gameSettings.baseHref + 'file/load/';
+
+    // Define a function that "pings" the server to keep login status alive
+    var extendGameSession = function(){
+        //console.log('extendGameSession()');
+        if (!keepSessionAlive){ return false; }
+        $.post(sessionPingURL, function(data){
+            //console.log('data =', data);
+            if (typeof data.status !== 'undefined'
+                && data.status === 'success'
+                && data.user_id === thisSessionUserID){
+                keepSessionAlive = true;
+                } else {
+                keepSessionAlive = false;
+                redirectToLogin();
+                }
+            //console.log('keepSessionAlive =', keepSessionAlive);
+            });
+        };
+
+    // Define a function that redirects to the login frame when logged out
+    var redirectToLogin = function(){
+        //console.log('redirectToLogin()');
+        var confirmRedirect = confirm('MMRPG SESSION ERROR! \n'
+            + 'Your session has expired or you logged out in another frame! \n'
+            + 'The game cannot function in this state and must be restarted. \n'
+            + 'You will now be redirected to the login page... '
+            );
+        if (!confirmRedirect){ return; }
+        if (window.self !== window.parent){
+            window.parent.location.href = loginPageURL;
+            } else {
+            window.location.href = loginPageURL;
+            }
+        };
+
+    // Start the extend session interval to keep pinging every X minutes
+    var extendSessionInterval = setInterval(function(){
+        if (keepSessionAlive){ extendGameSession(); }
+        else { clearInterval(extendSessionInterval); }
+        }, sessionPingFrequency);
+
+}
+
+
 /**
  * Function : dump()
  * Arguments: The data - array,hash(associative array),object
