@@ -5,7 +5,7 @@ require_once('top.php');
 
 // If the user is not logged in, don't allow them here
 if (!rpg_game::is_user()){
-    header('Location: '.MMRPG_CONFIG_ROOTURL.'frames/file.php?action=load');
+    header('Location: '.MMRPG_CONFIG_ROOTURL.'frames/login.php');
     exit();
 }
 
