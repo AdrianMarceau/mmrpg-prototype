@@ -98,8 +98,8 @@ function mmrpg_reset_game_session(){
             $db->delete('mmrpg_users_items_unlocked', array('user_id' => $user_id));
             $db->delete('mmrpg_users_abilities_unlocked', array('user_id' => $user_id));
             $db->delete('mmrpg_users_stars_unlocked', array('user_id' => $user_id));
-            $db->delete('mmrpg_challenges_leaderboard', array('user_id' => $user_id));
-            $db->delete('mmrpg_challenges_waveboard', array('user_id' => $user_id));
+            //$db->delete('mmrpg_challenges_leaderboard', array('user_id' => $user_id));
+            //$db->delete('mmrpg_challenges_waveboard', array('user_id' => $user_id));
         }
 
         // Define a session var to ensure full reset
