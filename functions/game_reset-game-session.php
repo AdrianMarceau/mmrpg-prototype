@@ -91,13 +91,13 @@ function mmrpg_reset_game_session(){
     elseif (empty($_SESSION[$session_token]['DEMO'])){
 
         // Clear all records for this user from the database
-        $user_id = $this_user['userid'];
-        if (!empty($user_id)){
+        $user_id = rpg_user::get_current_userid();
+        if (rpg_user::is_member() && !empty($user_id)){
             $db->delete('mmrpg_users_save_counters', array('user_id' => $user_id));
-            $db->delete('mmrpg_users_records_robots', array('user_id' => $user_id));
-            $db->delete('mmrpg_users_unlocked_items', array('user_id' => $user_id));
-            $db->delete('mmrpg_users_unlocked_abilities', array('user_id' => $user_id));
-            $db->delete('mmrpg_users_unlocked_stars', array('user_id' => $user_id));
+            $db->delete('mmrpg_users_robots_records', array('user_id' => $user_id));
+            $db->delete('mmrpg_users_items_unlocked', array('user_id' => $user_id));
+            $db->delete('mmrpg_users_abilities_unlocked', array('user_id' => $user_id));
+            $db->delete('mmrpg_users_stars_unlocked', array('user_id' => $user_id));
             $db->delete('mmrpg_challenges_leaderboard', array('user_id' => $user_id));
             $db->delete('mmrpg_challenges_waveboard', array('user_id' => $user_id));
         }

@@ -3168,7 +3168,7 @@ function mmrpg_get_robot_database_records($record_filters = array(), &$record_ca
             $record_array = $db->get_array_list("SELECT
                 records.robot_token,
                 SUM(records.{$record_category}) AS {$record_category}_total
-                FROM mmrpg_users_records_robots AS records
+                FROM mmrpg_users_robots_records AS records
                 LEFT JOIN mmrpg_index_robots AS robots ON robots.robot_token = records.robot_token
                 WHERE
                 robots.robot_flag_published = 1

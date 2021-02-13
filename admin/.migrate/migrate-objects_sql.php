@@ -50,7 +50,7 @@ if (true){
     // content records
     $sql_table_list[] = array('name' => 'mmrpg_records_abilities', 'export_data' => false);
     $sql_table_list[] = array('name' => 'mmrpg_records_robots', 'export_data' => false);
-    $sql_table_list[] = array('name' => 'mmrpg_users_records_robots', 'export_data' => false);
+    $sql_table_list[] = array('name' => 'mmrpg_users_robots_records', 'export_data' => false);
 
     // community
     $sql_table_list[] = array('name' => 'mmrpg_categories');

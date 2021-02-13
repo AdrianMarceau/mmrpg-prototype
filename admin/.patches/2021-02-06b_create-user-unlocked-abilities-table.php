@@ -4,7 +4,8 @@
 $db_tables_list = $db->table_list();
 
 // If `mmrpg_users_unlocked_abilities` table does not exist yet
-if (!in_array('mmrpg_users_unlocked_abilities', $db_tables_list)){
+if (!in_array('mmrpg_users_unlocked_abilities', $db_tables_list)
+    && !in_array('mmrpg_users_abilities_unlocked', $db_tables_list)){
 
     // Create the new table in the database
     echo('- creating new table `mmrpg_users_unlocked_abilities` in the database'.PHP_EOL);

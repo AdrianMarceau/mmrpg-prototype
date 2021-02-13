@@ -600,7 +600,7 @@ class rpg_user {
             );
 
         // Collect a list of existing records for this user from the database
-        $record_table_name = 'mmrpg_users_records_robots';
+        $record_table_name = 'mmrpg_users_robots_records';
         $record_fields_string = implode(', ', array_map(function($s){ return '`records`.`'.$s.'`'; }, $record_fields));
         $existing_robot_records = $db->get_array_list("SELECT
             `records`.`robot_token`, {$record_fields_string}
@@ -651,7 +651,7 @@ class rpg_user {
             );
 
         // Collect a list of existing records so we know when to update vs insert vs skip
-        $record_table_name = 'mmrpg_users_records_robots';
+        $record_table_name = 'mmrpg_users_robots_records';
         $record_fields_string = implode(', ', $record_fields);
         $existing_robot_records = $db->get_array_list("SELECT
             robot_token, {$record_fields_string}
@@ -711,7 +711,7 @@ class rpg_user {
         if (!is_array($user_unlocked_items)){ $user_unlocked_items = array(); }
 
         // Collect a list of existing records for this user from the database
-        $record_table_name = 'mmrpg_users_unlocked_items';
+        $record_table_name = 'mmrpg_users_items_unlocked';
         $existing_item_records = $db->get_array_list("SELECT
             `unlocked`.`item_token`, `unlocked`.`item_quantity`
             FROM `{$record_table_name}` AS `unlocked`
@@ -744,7 +744,7 @@ class rpg_user {
         if (empty($user_unlocked_items)){ return false; }
 
         // Collect a list of existing records so we know when to update vs insert vs skip
-        $record_table_name = 'mmrpg_users_unlocked_items';
+        $record_table_name = 'mmrpg_users_items_unlocked';
         $existing_item_records = $db->get_array_list("SELECT
             item_token, item_quantity
             FROM `{$record_table_name}`
@@ -803,7 +803,7 @@ class rpg_user {
         if (!is_array($user_unlocked_abilities)){ $user_unlocked_abilities = array(); }
 
         // Collect a list of existing records for this user from the database
-        $record_table_name = 'mmrpg_users_unlocked_abilities';
+        $record_table_name = 'mmrpg_users_abilities_unlocked';
         $existing_ability_records = $db->get_array_list("SELECT
             `unlocked`.`ability_token`
             FROM `{$record_table_name}` AS `unlocked`
@@ -837,7 +837,7 @@ class rpg_user {
         if (empty($user_unlocked_abilities)){ return false; }
 
         // Collect a list of existing records so we know when to update vs insert vs skip
-        $record_table_name = 'mmrpg_users_unlocked_abilities';
+        $record_table_name = 'mmrpg_users_abilities_unlocked';
         $existing_ability_records = $db->get_array_list("SELECT
             ability_token
             FROM `{$record_table_name}`
@@ -888,7 +888,7 @@ class rpg_user {
             );
 
         // Collect a list of existing records for this user from the database
-        $record_table_name = 'mmrpg_users_unlocked_stars';
+        $record_table_name = 'mmrpg_users_stars_unlocked';
         $record_fields_string = implode(', ', array_map(function($s){ return '`unlocked`.`'.$s.'`'; }, $record_fields));
         $existing_star_records = $db->get_array_list("SELECT
             `unlocked`.`star_token`, {$record_fields_string}
@@ -933,7 +933,7 @@ class rpg_user {
             );
 
         // Collect a list of existing records so we know when to update vs insert vs skip
-        $record_table_name = 'mmrpg_users_unlocked_stars';
+        $record_table_name = 'mmrpg_users_stars_unlocked';
         $record_fields_string = implode(', ', $record_fields);
         $existing_star_records = $db->get_array_list("SELECT
             star_token, {$record_fields_string}
