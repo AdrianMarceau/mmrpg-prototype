@@ -4444,8 +4444,12 @@ body.mobileFlag_landscapeMode #window .page .event .option_this-team-select .chr
     border-radius: 0.5em;
     -moz-border-radius: 0.5em;
     -webkit-border-radius: 0.5em;
-    line-height: 11px;
+    /* line-height: 11px; */
     /* white-space: nowrap; */
+    line-height: 1.6;
+    -webkit-box-decoration-break: clone;
+    -o-box-decoration-break: clone;
+    box-decoration-break: clone;
 }
 #window .page .type_block {
     border: 1px solid rgb(46,46,46);
@@ -5140,6 +5144,7 @@ body.windowFlag_landscapeMode #window .page .type_block {
     max-height: 32px;
     line-height: 32px;
     vertical-align: text-bottom;
+    position: relative;
 }
 #window .page .body .community .sprite_image_40x40 img {
     display: inline-block;
@@ -5792,6 +5797,12 @@ body.windowFlag_landscapeMode #window .page .type_block {
     font-size: 13px;
     line-height: 19px;
 }
+#window .page .body .bodytext > p:after,
+#window .page .body .bodytext > div:after {
+    content: "";
+    display: block;
+    clear: both;
+}
 #window .page .body .bodytext .type {
     padding: 0 5px;
     font-size: 12px;
@@ -5803,55 +5814,100 @@ body.windowFlag_landscapeMode #window .page .type_block {
     text-decoration: underline;
 }
 #window .page .body .bodytext .type_panel,
-#window .page .body .bodytext .field_panel {
+#window .page .body .bodytext .field_panel,
+#window .page .body .bodytext .colour_panel {
     display: block;
     float: none;
+    clear: both;
     width: auto;
     padding: 6px 8px;
-    margin: 0 auto 10px;
+    margin: 10px auto;
     background: rgb(65,65,65) none scroll no-repeat 0 0;
-    border-radius: 0.5em;
-    -moz-border-radius: 0.5em;
-    -webkit-border-radius: 0.5em;
+    -webkit-border-radius: 0.6em;
+    -moz-border-radius: 0.6em;
+    border-radius: 0.6em;
     border: 1px solid rgb(46,46,46);
     font-weight: normal;
     white-space: normal;
-    line-height: 16px;
+    -webkit-touch-callout: text;
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+    box-sizing: border-box;
 }
+#window .page .body .bodytext .type_panel:first-child,
+#window .page .body .bodytext .field_panel:first-child,
+#window .page .body .bodytext .colour_panel:first-child {
+    margin-top : 0;
+}
+#window .page .body .bodytext .type_panel:last-child,
+#window .page .body .bodytext .field_panel:last-child,
+#window .page .body .bodytext .colour_panel:last-child {
+    margin-bottom: 0;
+}
+
 #window .page .body .bodytext .field_panel {
     background-color: #262626;
     background-image: none;
     background-position: center center;
     background-repeat: repeat-x;
-    overflow: visible;
+    overflow: hidden;
     white-space: nowrap;
     position: relative;
     z-index: 10;
-    padding: 10px 8px 0;
-    height: 60px;
+    padding: 0;
+    height: 120px !important;
     text-align: center;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+    background-clip: padding-box;
 }
+#window .page .body .bodytext .type_panel {
+
+}
+#window .page .body .bodytext .colour_panel {
+    padding: 0;
+    background-color: transparent;
+    background-image: none;
+    border-style: none;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    border-radius: 0;
+}
+
 #window .page .body .bodytext .field_panel_background {
     border-color: rgb(26,26,26);
 }
 #window .page .body .bodytext .field_panel_foreground {
-
+    border-color: rgb(26,26,26);
 }
-#window .page .body .bodytext .field_panel_background .field_panel_foreground .wrap {
+#window .page .body .bodytext .field_panel .field_panel {
+    border: 0 none transparent;
+    -webkit-border-radius: 0.3em;
+    -moz-border-radius: 0.3em;
+    border-radius: 0.3em;
+}
+#window .page .body .bodytext .field_panel .wrap,
+#window .page .body .bodytext .field_panel .layer,
+#window .page .body .bodytext .field_panel .field_panel .wrap {
     margin: 0;
     position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-    padding-top: 16px;
+    padding: 0;
     background-color: rgba(0, 0, 0, 0.25);
+    line-height: 130px;
 }
-body.mobileFlag_landscapeMode #window .page .body .bodytext .field_panel_foreground,
-body.windowFlag_landscapeMode #window .page .body .bodytext .field_panel_foreground {
-    background-size: 101% auto;
+#window .page .body .bodytext .field_panel .field_panel .wrap {
+
 }
+#window .page .body .bodytext .field_panel .layer {
+    background-color: transparent;
+}
+
 #window .page .body .bodytext .field_panel .align_left,
 #window .page .body .bodytext .field_panel .align_right,
 #window .page .body .bodytext .field_panel .align_center,
@@ -5861,11 +5917,8 @@ body.windowFlag_landscapeMode #window .page .body .bodytext .field_panel_foregro
 }
 #window .page .body .bodytext .field_panel .field_panel {
     background-color: transparent;
-    margin: -11px -9px 0;
-    padding-top: 16px;
-}
-#window .page .body .bodytext .type_panel .field_panel {
-    margin-bottom: 0;
+    margin: 0;
+    padding: 0;
 }
 #window .page .body .bodytext .type_panel .type_panel,
 #window .page .body .bodytext .field_panel .field_panel,
@@ -5897,6 +5950,11 @@ body.windowFlag_landscapeMode #window .page .body .bodytext .field_panel_foregro
 #window .page .body .bodytext .align_center {
     display: block;
     margin: 0 auto 10px;
+}
+#window .page .body .bodytext .float_panel .align_left,
+#window .page .body .bodytext .float_panel  .align_right,
+#window .page .body .bodytext .float_panel  .align_center {
+    margin: 0 auto;
 }
 #window .page .body .bodytext .align_left {
     text-align: left;
