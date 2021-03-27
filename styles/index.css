@@ -5901,6 +5901,10 @@ body.windowFlag_landscapeMode #window .page .type_block {
     background-color: rgba(0, 0, 0, 0.25);
     line-height: 130px;
 }
+#window .page .body .bodytext .field_panel .wrap br,
+#window .page .body .bodytext .field_panel .layer br {
+    display: none;
+}
 #window .page .body .bodytext .field_panel .field_panel .wrap {
 
 }
@@ -6040,7 +6044,7 @@ body.windowFlag_landscapeMode #window .page .type_block {
 }
 #window .page .body .thread_subbody .comic_layout {
     margin-left: 0;
-    max-width: calc(100% - 125px);
+    max-width: 886px;
     clear: left;
 }
 #window .page .body .bodytext .comic_layout:after {
@@ -6054,7 +6058,7 @@ body.windowFlag_landscapeMode #window .page .type_block {
     float: left;
     width: 49%;
     width: calc(50% - 10px);
-    min-width: 300px;
+    min-width: 433px;
     margin: 0 10px 10px 0;
     border: 1px solid #141414;
     background-color: #1c1c1c;
@@ -6129,16 +6133,15 @@ body.windowFlag_landscapeMode #window .page .type_block {
 
 /* -- inline-responsive layout -- */
 
+@media (max-width: 920px){
 
-@media (max-width: 900px){
-
-    #window .page .body .bodytext .comic_layout {
+    #window .page .body .thread_subbody .comic_layout {
         display: block;
     }
-    #window .page .body .bodytext .comic_layout:after {
+    #window .page .body .thread_subbody .comic_layout:after {
         display: block;
     }
-    #window .page .body .bodytext .comic_layout .comic_panel {
+    #window .page .body .thread_subbody .comic_layout .comic_panel {
         float: left;
         clear: left;
         width: auto;
@@ -6147,6 +6150,22 @@ body.windowFlag_landscapeMode #window .page .type_block {
 
 }
 
+@media (max-width: 1040px){
+
+    #window .page .body .post_subbody .comic_layout {
+        display: block;
+    }
+    #window .page .body .post_subbody .comic_layout:after {
+        display: block;
+    }
+    #window .page .body .post_subbody .comic_layout .comic_panel {
+        float: left;
+        clear: left;
+        width: auto;
+        max-width: 375px;
+    }
+
+}
 
 
 #window .page_community .form,

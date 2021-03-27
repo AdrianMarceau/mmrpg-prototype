@@ -190,15 +190,17 @@ function mmrpg_formatting_decode($string){
             // inline colours
             '/\[([^\[\]]+)\]\{#([a-f0-9]{6})\}/i' => '<span class="colour_inline" style="color: #$2;">$1</span>',
             '/\[([^\[\]]+)\]\{([0-9]{1,3}),\s?([0-9]{1,3}),\s?([0-9]{1,3})\}/i' => '<span class="colour_inline" style="color: rgb($2, $3, $4);">$1</span>',
+
+            /*
+
             // inline text with link to image
             '/\[([^\[\]]+)\]\((.*?).(jpg|jpeg|gif|png|bmp)\:text\)/i' => '<a class="link_inline" href="$2.$3" target="_blank">$1</a>',
             '/\[([^\[\]]+)\]\((.*?).(jpg|jpeg|gif|png|bmp)\:image\)/i' => '<a class="link_image_inline" href="$2.$3" target="_blank"><img src="$2.$3" alt="$1" title="$1" /></a>',
-            // inline image with hover and link
-            '/\[([^\[\]]+)\]\((.*?).(jpg|jpeg|gif|png|bmp)\)/i' => '<a class="link_image_inline" href="$2.$3" target="_blank"><img src="$2.$3" alt="$1" title="$1" /></a>',
-            // standard link
-            '/\[([^\[\]]+)\]\((.*?)\)/i' => '<a class="link_inline" href="$2" target="_blank">$1</a>',
+
             // elemental type
             '/\[([^\[\]]+)\]\{(.*?)\}/i' => '<span class="type type_span ability_type ability_type_$2">$1</span>',
+
+            */
 
             );
 
@@ -233,18 +235,6 @@ function mmrpg_formatting_decode($string){
     //$string = str_replace("\r\n", "\n", $string);
     $string = str_replace(array("\r\n", "\r"), "\n", $string);
 
-    // -- REPLACE IMAGES -- //
-
-    // Recusively replace all the size spans with their span markup
-    do { $string = preg_replace('/\[([^\[\]]+)\]\((.*?).(jpg|jpeg|gif|png|bmp)\)/i', '<a class="link_image_inline" href="$2.$3" target="_blank"><img src="$2.$3" alt="$1" title="$1" /></a>', $string, -1, $count); }
-    while ($count > 0);
-
-    // -- REPLACE LINKS -- //
-
-    // Recusively replace all the standard text links with their markup
-    do { $string = preg_replace('/\[([^\[\]]+)\]\((.*?)\)/i', '<a class="link_inline" href="$2" target="_blank">$1</a>', $string, -1, $count); }
-    while ($count > 0);
-
     // -- REPLACE BBCODE BLOCKS/SPANS -- //
 
     // Recusively replace all the BOLD blocks with their div markup
@@ -261,6 +251,18 @@ function mmrpg_formatting_decode($string){
 
     // Recusively replace all the STRIKE blocks with their div markup
     do { $string = preg_replace('/\[s\](.*?)\[\/s\]/is', '<span class="strike">$1</span>', $string, -1, $count); }
+    while ($count > 0);
+
+    // -- REPLACE IMAGES -- //
+
+    // Recusively replace all the size spans with their span markup
+    do { $string = preg_replace('/\[([^\[\]]+)\]\(([^\s]+).(jpg|jpeg|gif|png|bmp)\)/i', '<a class="link_image_inline" href="$2.$3" target="_blank"><img src="$2.$3" alt="$1" title="$1" /></a>', $string, -1, $count); }
+    while ($count > 0);
+
+    // -- REPLACE LINKS -- //
+
+    // Recusively replace all the standard text links with their markup
+    do { $string = preg_replace('/\[([^\[\]]+)\]\(([^\s]+)\)/i', '<a class="link_inline" href="$2" target="_blank">$1</a>', $string, -1, $count); }
     while ($count > 0);
 
     // -- REPLACE TYPE/COLOR/SIZE SPANS -- //
