@@ -6032,6 +6032,123 @@ body.windowFlag_landscapeMode #window .page .type_block {
 }
 
 
+#window .page .body .bodytext .comic_layout {
+    display: block;
+    box-sizing: border-box;
+    margin: 0 auto 20px;
+    clear: both;
+}
+#window .page .body .thread_subbody .comic_layout {
+    margin-left: 0;
+    max-width: calc(100% - 125px);
+    clear: left;
+}
+#window .page .body .bodytext .comic_layout:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+#window .page .body .bodytext .comic_layout .comic_panel {
+    display: block;
+    box-sizing: border-box;
+    float: left;
+    width: 49%;
+    width: calc(50% - 10px);
+    min-width: 300px;
+    margin: 0 10px 10px 0;
+    border: 1px solid #141414;
+    background-color: #1c1c1c;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+    padding: 10px;
+}
+
+#window .page .body .bodytext .comic_layout .comic_panel .intro {
+
+}
+#window .page .body .bodytext .comic_layout .comic_panel .quote {
+    position: relative;
+}
+#window .page .body .bodytext .comic_layout .comic_panel .quote:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+#window .page .body .bodytext .comic_layout .comic_panel .quote br {
+    display: none;
+}
+#window .page .body .bodytext .comic_layout .comic_panel .quote .image_span,
+#window .page .body .bodytext .comic_layout .comic_panel .quote .type_span {
+    vertical-align: middle;
+}
+#window .page .body .bodytext .comic_layout .comic_panel .quote.align_left .sprite_image,
+#window .page .body .bodytext .comic_layout .comic_panel .quote.align_left .type_span {
+    float: left;
+}
+#window .page .body .bodytext .comic_layout .comic_panel .quote.align_right .sprite_image,
+#window .page .body .bodytext .comic_layout .comic_panel .quote.align_right .type_span {
+    float: right;
+}
+#window .page .body .bodytext .comic_layout .comic_panel .quote.align_left .type_span {
+    margin-left: 4px;
+}
+#window .page .body .bodytext .comic_layout .comic_panel .quote.align_right .type_span {
+    margin-right: 4px;
+}
+#window .page .body .bodytext .comic_layout .comic_panel .quote.align_left .sprite_image + .sprite_image {
+    margin-left: -10px;
+}
+#window .page .body .bodytext .comic_layout .comic_panel .quote.align_right .sprite_image + .sprite_image {
+    margin-right: -10px;
+}
+#window .page .body .bodytext .comic_layout .comic_panel .quote .type_span {
+    position: relative;
+    margin-top: 10px;
+    width: auto;
+    max-width: calc(100% - 100px);
+}
+
+
+/* -- grid layout / not fully-supported -- */
+
+#window .page .body .bodytext .comic_layout {
+    display: grid;
+    grid-auto-rows: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    grid-column-gap: 0;
+    grid-row-gap: 0;
+}
+#window .page .body .bodytext .comic_layout:after {
+    display: none;
+}
+#window .page .body .bodytext .comic_layout .comic_panel {
+    float: none;
+    width: auto;
+}
+
+/* -- inline-responsive layout -- */
+
+
+@media (max-width: 900px){
+
+    #window .page .body .bodytext .comic_layout {
+        display: block;
+    }
+    #window .page .body .bodytext .comic_layout:after {
+        display: block;
+    }
+    #window .page .body .bodytext .comic_layout .comic_panel {
+        float: left;
+        clear: left;
+        width: auto;
+        max-width: 375px;
+    }
+
+}
+
+
+
 #window .page_community .form,
 #window .page_file .form {
     display: block;

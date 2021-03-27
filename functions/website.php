@@ -101,7 +101,7 @@ function mmrpg_formatting_decode($string){
             );
         $mmrpg_formatting_array += array(
             // spacers
-            '/\[tab\]/i' => '&nbsp;&nbsp;',
+            '/\[(tab|space)\]/i' => '&nbsp;&nbsp;',
             '/\s{2,}[-]{5,}\s{2,}/i' => '<hr class="line_divider line_divider_bigger" />',
             '/\s?[-]{5,}\s?/i' => '<hr class="line_divider" />',
             '/\s\|\s/i' => '&nbsp;<span class="pipe">|</span>&nbsp;',
@@ -439,6 +439,25 @@ function mmrpg_formatting_decode($string){
     while ($count > 0);
     // Replace float blocks code with relavant markup [float][/float]
     do { $string = preg_replace('/\s?\[float\](.*?)\[\/float\]\s?/is', '<div class="float_left">$1</div>', $string, -1, $count); }
+    while ($count > 0);
+
+    // -- REPLACE COMIC BLOCKS -- //
+
+    // Replace comic layout code with relavant markup
+
+    do { $string = preg_replace('/\s?\[comic(?:-layout)?\](.*?)\[\/comic(?:-layout)?\]\s?/is', '<div class="comic_layout">$1</div>', $string, -1, $count); }
+    while ($count > 0);
+
+    do { $string = preg_replace('/\s?\[(?:comic-)?panel\](.*?)\[\/(?:comic-)?panel\]\s?/is', '<div class="comic_panel">$1</div>', $string, -1, $count); }
+    while ($count > 0);
+
+    do { $string = preg_replace('/\s{0,}\[intro(?:-text)?\](.*?)\[\/intro(?:-text)?\]\s?/is', '<div class="align_panel align_left intro">$1</div>', $string, -1, $count); }
+    while ($count > 0);
+
+    do { $string = preg_replace('/\s{0,}\[quote(?:-left)?\](.*?)\[\/quote(?:-left)?\]\s?/is', '<div class="align_panel align_left quote">$1</div>', $string, -1, $count); }
+    while ($count > 0);
+
+    do { $string = preg_replace('/\s{0,}\[quote-right?\](.*?)\[\/quote(?:-right)?\]\s?/is', '<div class="align_panel align_right quote">$1</div>', $string, -1, $count); }
     while ($count > 0);
 
     // -- RE-INSERT CODE BLOCKS -- //
