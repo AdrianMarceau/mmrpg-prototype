@@ -63,6 +63,7 @@ RewriteRule ^images/abilities/item-core-([a-z]+)/(.*)?$ /images/items/$1-core/$2
 #RewriteRule ^images/abilities/item-([-_a-z0-9]+)/(.*)?$ /images/items/$1/$2 [R,L]
 RewriteRule ^(images|database)/items/core-([a-z]+)/(.*)?$ /$1/items/$2-core/$3 [R,L]
 RewriteRule ^(images|database)/items/screw-([a-z]+)/(.*)?$ /$1/items/$2-screw/$3 [R,L]
+RewriteRule ^images/abilities/attachment-defeat/(.*)?$ /images/objects/defeat-explosion/$1 [R,L]
 
 
 #####################################

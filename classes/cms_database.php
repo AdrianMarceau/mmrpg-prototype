@@ -358,7 +358,7 @@ class cms_database {
     public function fix_numeric_values_in_result_array($result_array){
         if (empty($result_array) || !is_array($result_array)){ return $result_array; }
         foreach ($result_array AS $field => $value){
-            if (is_numeric($value)){
+            if (is_numeric($value) && !preg_match('/^0{1,}[0-9]+$/', $value)){
                 if (strstr($value, '.')){ $result_array[$field] = floatval($value); }
                 else { $result_array[$field] = intval($value); }
                 continue;

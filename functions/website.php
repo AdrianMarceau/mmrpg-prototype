@@ -42,13 +42,14 @@ function mmrpg_formatting_decode($string){
 
     // Define the static formatting array variable
     static $mmrpg_formatting_array = array();
+    static $mmrpg_types_array_string = '';
 
     // If the formatting array has not been populated, do so
     if (empty($mmrpg_formatting_array)){
 
         // Collect the robot and ability index from the database
         global $db;
-        static $temp_robots_index, $temp_abilities_index;
+        static $temp_robots_index, $temp_abilities_index, $temp_types_index;
         if (empty($temp_robots_index)){
             $db_robot_fields = rpg_robot::get_index_fields(true);
             $temp_robots_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
@@ -57,12 +58,35 @@ function mmrpg_formatting_decode($string){
             $db_ability_fields = rpg_ability::get_index_fields(true);
             $temp_abilities_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
         }
+        if (empty($temp_types_index)){
+            $db_types_fields = rpg_type::get_index_fields(true);
+            $temp_types_index = $db->get_array_list("SELECT {$db_types_fields} FROM mmrpg_index_types WHERE 1 = 1;", 'type_token');
+        }
+
         // Define the array to hold the images of larger size than default
         $mmrpg_large_robot_images = array();
-        $mmrpg_large_ability_images = array();
+        //$mmrpg_large_ability_images = array();
+
         // Loop through robots and abilities and collect tokens of large ones
         if (!empty($temp_robots_index)){ foreach ($temp_robots_index AS $token => $info){ if ($info['robot_image_size'] == 80){ $mmrpg_large_robot_images[] = $info['robot_token']; } } }
-        if (!empty($temp_abilities_index)){ foreach ($temp_abilities_index AS $token => $info){ if ($info['ability_image_size'] == 80){ $mmrpg_large_ability_images[] = $info['ability_token']; } } }
+        //if (!empty($temp_abilities_index)){ foreach ($temp_abilities_index AS $token => $info){ if ($info['ability_image_size'] == 80){ $mmrpg_large_ability_images[] = $info['ability_token']; } } }
+
+        // Create strings for the large robot and ability patterns by imploding the arrays
+        $mmrpg_large_robot_images_string = implode('|', $mmrpg_large_robot_images);
+        //$mmrpg_large_ability_images_string = implode('|', $mmrpg_large_ability_images);
+
+        // Collect the types array from the index
+        $mmrpg_types_array = array_keys($temp_types_index);
+        $mmrpg_types_array_string = implode('|', $mmrpg_types_array);
+        $mmrpg_types_array_string .= '|neutral';
+
+        // Define a string of acceptable player/robot/ability/item "frames" for formatting
+        $player_frames_string = 'base|taunt|victory|defeat|command|damage|base2|01|02|03|04|05|06|07|08|09|10';
+        $robot_frames_string = 'base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|01|02|03|04|05|06|07|08|09|10';
+        $ability_frames_string = 'base|01|02|03|04|05|06|07|08|09|10';
+        $item_frames_string = 'base|01|02|03|04|05|06|07|08|09|10';
+        $shop_frames_string = 'base|01|02|03|04|05|06|07|08|09|10';
+        $object_frames_string = 'base|01|02|03|04|05|06|07|08|09|10';
 
         // Fix any instances of objects that used to be items for our users' convenience
         $string = preg_replace('/\[item([\:a-z0-9]+)?\]\{challenge-marker_([-_a-z0-9]+)?\}/i', '[object$1]{challenge-markers/$2}', $string);
@@ -75,34 +99,14 @@ function mmrpg_formatting_decode($string){
             // code font
             '/\s?\[code\]\s?(.*?)\s?\[\/code\]\s+/is' => '$1',  // code
             );
-        // Define each of the different types of formatting options
-        $mmrpg_formatting_array += array(
-            '/\[b\](.*?)\[\/b\]/i' => '<strong class="bold">$1</strong>', // bold
-            '/\[i\](.*?)\[\/i\]/i' => '<em class="italic">$1</em>',  // italic
-            '/\[u\](.*?)\[\/u\]/i' => '<span class="underline">$1</span>',  // underline
-            '/\[s\](.*?)\[\/s\]/i' => '<span class="strike">$1</span>',  // strike
-            );
         $mmrpg_formatting_array += array(
             // spacers
-            '/\[tab\]/i' => '&nbsp;&nbsp;',
+            '/\[(tab|space)\]/i' => '&nbsp;&nbsp;',
             '/\s{2,}[-]{5,}\s{2,}/i' => '<hr class="line_divider line_divider_bigger" />',
             '/\s?[-]{5,}\s?/i' => '<hr class="line_divider" />',
             '/\s\|\s/i' => '&nbsp;<span class="pipe">|</span>&nbsp;',
             );
         $mmrpg_formatting_array += array(
-            // left/right/center formatting
-            '/\s{2,}\[size-large\]\s?(.*?)\s?\[\/size(?:-large)?\]\s{2,}/ism' => '<div class="size_large">$1</div>',
-            '/\s{2,}\[size-medium\]\s?(.*?)\s?\[\/size(?:-medium)?\]\s{2,}/ism' => '<div class="size_medium">$1</div>',
-            '/\s{2,}\[size-small\]\s?(.*?)\s?\[\/size(?:-small)?\]\s{2,}/ism' => '<div class="size_small">$1</div>',
-            '/\s?\[size-large\]\s?(.*?)\s?\[\/size(?:-large)?\]/ism' => '<span class="size_large">$1</span>',
-            '/\s?\[size-medium\]\s?(.*?)\s?\[\/size(?:-medium)?\]/ism' => '<span class="size_medium">$1</span>',
-            '/\s?\[size-small\]\s?(.*?)\s?\[\/size(?:-small)?\]/ism' => '<span class="size_small">$1</span>',
-            // colour block formatting
-            '/\s{2,}\[color=#([a-f0-9]{6})\](?:\s+)?(.*?)(?:\s+)?\[\/color\]\s{2,}/ism' => '<div class="color_block" style="color: #$1;">$2</div>',
-            '/\s{2,}\[color=([0-9]{1,3}),\s?([0-9]{1,3}),\s?([0-9]{1,3})\](?:\s+)?(.*?)(?:\s+)?\[\/color\]\s{2,}/ism' => '<div class="color_block" style="color: rgb($1, $2, $3);">$4</div>',
-            '/\s?\[color=#([a-f0-9]{6})\](?:\s+)?(.*?)(?:\s+)?\[\/color\]/ism' => '<span class="color_inline" style="color: #$1;">$2</span>',
-            '/\s?\[color=([0-9]{1,3}),\s?([0-9]{1,3}),\s?([0-9]{1,3})\](?:\s+)?(.*?)(?:\s+)?\[\/color\]/ism' => '<span class="color_inline" style="color: rgb($1, $2, $3);">$4</span>',
-            //'/\s?\[size-(large|medium|small)\]\s?(.*?)\s?\[\/size-\1\]/is' => '<span class="size_$1">$2</span>',
             // font block formatting
             '/\s{2,}\[font="?([-_a-z0-9\s]+)"?\](?:\s+)?(.*?)(?:\s+)?\[\/font\]\s{2,}/ism' => '<div class="font_block" style="font-family: \'$1\';">$2</div>',
             '/\s?\[font="?([-_a-z0-9\s]+)"?\](?:\s+)?(.*?)(?:\s+)?\[\/font\]/ism' => '<span class="font_inline" style="font-family: \'$1\';">$2</span>',
@@ -111,100 +115,73 @@ function mmrpg_formatting_decode($string){
             '/\s?\[system\](?:\s+)?(.*?)(?:\s+)?\[\/system\]/ism' => '<span class="code">$1</span>',
             );
         $mmrpg_formatting_array += array(
-            '/\s?\[align-left\]\s?(.*?)\s?\[\/align(?:-left)?\]/is' => '<div class="align_left">$1</div>',
-            '/\s?\[align-right\]\s?(.*?)\s?\[\/align(?:-right)?\]/is' => '<div class="align_right">$1</div>',
-            '/\s?\[align-center\]\s?(.*?)\s?\[\/align(?:-center)?\]/is' => '<div class="align_center">$1</div>',
-            '/\s?\[float-left\]\s?(.*?)\s?\[\/float(?:-left)?\]/is' => '<div class="float_left">$1</div>',
-            '/\s?\[float-right\]\s?(.*?)\s?\[\/float(?:-right)?\]/is' => '<div class="float_right">$1</div>',
-            '/\s?\[float-none\]\s?(.*?)\s?\[\/float(?:-none)?\]/is' => '<div class="float_none">$1</div>',
-            //'/\s?\[align-(left|right|center)\]\s?(.*?)\s?\[\/align-\1\]/is' => '<span class="align_$1">$2</span>',
-            );
-        $mmrpg_formatting_array += array(
-            '/\s{2,}\[type-([_a-z]+)\]\s?(.*?)\s?\[\/type-\1\]\s{2,}/is' => '<div class="type type_panel ability_type ability_type_$1">$2</div>',
-            '/\s?\[type-([_a-z]+)\]\s?(.*?)\s?\[\/type-\1\]\s?/is' => '<span class="type type_panel ability_type ability_type_$1">$2</span>',
-            '/\s?\[background-([-_a-z0-9]+)-(top|center|bottom)\]\s?(.*?)\s?\[\/background-\1-\2\]\s?/is' => '<div class="field field_panel field_panel_background" style="background-position: center $2; background-image: url(images/fields/$1/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$3</div></div>',
-            '/\s?\[foreground-([-_a-z0-9]+)-(top|center|bottom)\]\s?(.*?)\s?\[\/foreground-\1-\2\]\s?/is' => '<div class="field field_panel field_panel_foreground" style="background-position: center $2; background-image: url(images/fields/$1/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$3</div></div>',
-            '/\s?\[background-([-_a-z0-9]+)\]\s?(.*?)\s?\[\/background-\1\]\s?/is' => '<div class="field field_panel field_panel_background" style="background-image: url(images/fields/$1/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$2</div></div>',
-            '/\s?\[foreground-([-_a-z0-9]+)\]\s?(.*?)\s?\[\/foreground-\1\]\s?/is' => '<div class="field field_panel field_panel_foreground" style="background-image: url(images/fields/$1/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$2</div></div>',
-            );
-        $mmrpg_formatting_array += array(
             // image-inline (no hover, no link)
             '/\[image\]\((.*?).(jpg|jpeg|gif|png|bmp)\)/i' => '<span class="link_image_inline"><img src="$1.$2" /></span>',
             );
         $mmrpg_formatting_array += array(
-            // player 80x80
-            //'/\[player\]\{('.implode('|', $mmrpg_large_player_images).')\}/i' => '<span class="sprite_image sprite_image_80x80"><img src="images/players/$1/mug_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
-            //'/\[player:(left|right)\]\{('.implode('|', $mmrpg_large_player_images).')\}/i' => '<span class="sprite_image sprite_image_80x80"><img src="images/players/$2/mug_$1_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
-            //'/\[player:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|01|02|03|04|05|06|07|08|09|10)\]\{('.implode('|', $mmrpg_large_player_images).')\}/i' => '<span class="sprite_image sprite_image_80x80 sprite_image_80x80_$2"><span><img src="images/players/$3/sprite_$1_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
+            // sprite 40x40
+            '/\[sprite\]/i' => '<span class="sprite_image sprite_image_40x40"></span>',
+            );
+        $mmrpg_formatting_array += array(
+
             // player 40x40
             '/\[player\]\{(.*?)\}/i' => '<span class="sprite_image player sprite_image_40x40"><img src="images/players/$1/mug_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
             '/\[player:(left|right)\]\{(.*?)\}/i' => '<span class="sprite_image player sprite_image_40x40"><img src="images/players/$2/mug_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
-            '/\[player:(left|right):(base|taunt|victory|defeat|command|damage|base2|01|02|03|04|05|06|07|08|09|10)\]\{(.*?)\}/i' => '<span class="sprite_image player sprite_image_40x40 sprite_image_40x40_$2"><span><img src="images/players/$3/sprite_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
+            '/\[player:(left|right):('.$player_frames_string.')\]\{(.*?)\}/i' => '<span class="sprite_image player sprite_image_40x40 sprite_image_40x40_$2"><span><img src="images/players/$3/sprite_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
+            '/\[player:left:('.$player_frames_string.'):(-?[0-9]+),(-?[0-9]+),(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image sprite_image_40x40 sprite_image_40x40_$1" style="right: $2px; bottom: $3px; z-index: $4;"><span><img src="images/players/$5/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$5" /></span></span>',
+            '/\[player:right:('.$player_frames_string.'):(-?[0-9]+),(-?[0-9]+),(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image sprite_image_40x40 sprite_image_40x40_$1" style="left: $2px; bottom: $3px; z-index: $4;"><span><img src="images/players/$5/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$5" /></span></span>',
+            '/\[player:left:('.$player_frames_string.'):(-?[0-9]+),(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image sprite_image_40x40 sprite_image_40x40_$1" style="right: $2px; bottom: $3px;"><span><img src="images/players/$4/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$4" /></span></span>',
+            '/\[player:right:('.$player_frames_string.'):(-?[0-9]+),(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image sprite_image_40x40 sprite_image_40x40_$1" style="left: $2px; bottom: $3px;"><span><img src="images/players/$4/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$4" /></span></span>',
+            '/\[player:left:('.$player_frames_string.'):(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image sprite_image_40x40 sprite_image_40x40_$1" style="right: $2px;"><span><img src="images/players/$3/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
+            '/\[player:right:('.$player_frames_string.'):(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image sprite_image_40x40 sprite_image_40x40_$1" style="left: $2px;"><span><img src="images/players/$3/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
+
             );
         $mmrpg_formatting_array += array(
-            // robot 80x80 Alts
-            '/\[robot\]\{('.implode('|', $mmrpg_large_robot_images).')_([-_a-z0-9]+)\}/i' => '<span data-test="1" class="sprite_image robot sprite_image_80x80"><img src="images/robots/$1_$2/mug_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
-            '/\[robot:(left|right)\]\{('.implode('|', $mmrpg_large_robot_images).')_([-_a-z0-9]+)\}/i' => '<span data-test="2" class="sprite_image robot sprite_image_80x80"><img src="images/robots/$2_$3/mug_$1_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
-            '/\[robot:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|01|02|03|04|05|06|07|08|09|10)\]\{('.implode('|', $mmrpg_large_robot_images).')_([-_a-z0-9]+)\}/i' => '<span data-test="3" class="sprite_image robot sprite_image_80x80 sprite_image_80x80_$2"><span><img src="images/robots/$3_$4/sprite_$1_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
-            // robot 40x40 Alts
-            '/\[robot\]\{([-a-z0-9]+)_([-_a-z0-9]+)\}/i' => '<span class="sprite_image robot sprite_image_40x40"><img src="images/robots/$1_$2/mug_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
-            '/\[robot:(left|right)\]\{([-a-z0-9]+)_([-_a-z0-9]+)\}/i' => '<span class="sprite_image robot sprite_image_40x40"><img src="images/robots/$2_$3/mug_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
-            '/\[robot:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|command|01|02|03|04|05|06|07|08|09|10)\]\{([-a-z0-9]+)_([-_a-z0-9]+)\}/i' => '<span class="sprite_image robot sprite_image_40x40 sprite_image_40x40_$2"><span><img src="images/robots/$3_$4/sprite_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
+
             // robot 80x80
-            '/\[robot\]\{('.implode('|', $mmrpg_large_robot_images).')\}/i' => '<span class="sprite_image robot sprite_image_80x80"><img src="images/robots/$1/mug_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
-            '/\[robot:(left|right)\]\{('.implode('|', $mmrpg_large_robot_images).')\}/i' => '<span class="sprite_image robot sprite_image_80x80"><img src="images/robots/$2/mug_$1_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
-            '/\[robot:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|01|02|03|04|05|06|07|08|09|10)\]\{('.implode('|', $mmrpg_large_robot_images).')\}/i' => '<span class="sprite_image robot sprite_image_80x80 sprite_image_80x80_$2"><span><img src="images/robots/$3/sprite_$1_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
+            '/\[(robot|mecha|boss)\]\{('.$mmrpg_large_robot_images_string.')\}/i' => '<span class="sprite_image $1 sprite_image_80x80"><img src="images/robots/$2/mug_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
+            '/\[(robot|mecha|boss):(left|right)\]\{('.$mmrpg_large_robot_images_string.')\}/i' => '<span class="sprite_image $1 sprite_image_80x80"><img src="images/robots/$3/mug_$2_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span>',
+            '/\[(robot|mecha|boss):(left|right):('.$robot_frames_string.')\]\{('.$mmrpg_large_robot_images_string.')\}/i' => '<span class="sprite_image $1 sprite_image_80x80 sprite_image_80x80_$3"><span><img src="images/robots/$4/sprite_$2_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$4" /></span></span>',
+            '/\[(robot|mecha|boss):left:('.$robot_frames_string.'):(-?[0-9]+),(-?[0-9]+),(-?[0-9]+)\]\{('.$mmrpg_large_robot_images_string.')\}/i' => '<span class="sprite_image $1 sprite_image_80x80 sprite_image_80x80_$2" style="right: $3px; bottom: $4px; z-index: $5;"><span><img src="images/robots/$6/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$6" /></span></span>',
+            '/\[(robot|mecha|boss):right:('.$robot_frames_string.'):(-?[0-9]+),(-?[0-9]+),(-?[0-9]+)\]\{('.$mmrpg_large_robot_images_string.')\}/i' => '<span class="sprite_image $1 sprite_image_80x80 sprite_image_80x80_$2" style="left: $3px; bottom: $4px; z-index: $5;"><span><img src="images/robots/$6/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$6" /></span></span>',
+            '/\[(robot|mecha|boss):left:('.$robot_frames_string.'):(-?[0-9]+),(-?[0-9]+)\]\{('.$mmrpg_large_robot_images_string.')\}/i' => '<span class="sprite_image $1 sprite_image_80x80 sprite_image_80x80_$2" style="right: $3px; bottom: $4px;"><span><img src="images/robots/$5/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$5" /></span></span>',
+            '/\[(robot|mecha|boss):right:('.$robot_frames_string.'):(-?[0-9]+),(-?[0-9]+)\]\{('.$mmrpg_large_robot_images_string.')\}/i' => '<span class="sprite_image $1 sprite_image_80x80 sprite_image_80x80_$2" style="left: $3px; bottom: $4px;"><span><img src="images/robots/$5/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$5" /></span></span>',
+            '/\[(robot|mecha|boss):left:('.$robot_frames_string.'):(-?[0-9]+)\]\{('.$mmrpg_large_robot_images_string.')\}/i' => '<span class="sprite_image $1 sprite_image_80x80 sprite_image_80x80_$2" style="right: $3px;"><span><img src="images/robots/$4/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$4" /></span></span>',
+            '/\[(robot|mecha|boss):right:('.$robot_frames_string.'):(-?[0-9]+)\]\{('.$mmrpg_large_robot_images_string.')\}/i' => '<span class="sprite_image $1 sprite_image_80x80 sprite_image_80x80_$2" style="left: $3px;"><span><img src="images/robots/$4/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$4" /></span></span>',
+
             // robot 40x40
-            '/\[robot\]\{(.*?)\}/i' => '<span class="sprite_image robot sprite_image_40x40"><img src="images/robots/$1/mug_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
-            '/\[robot:(left|right)\]\{(.*?)\}/i' => '<span class="sprite_image robot sprite_image_40x40"><img src="images/robots/$2/mug_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
-            '/\[robot:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|command|01|02|03|04|05|06|07|08|09|10)\]\{(.*?)\}/i' => '<span class="sprite_image robot sprite_image_40x40 sprite_image_40x40_$2"><span><img src="images/robots/$3/sprite_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
+            '/\[(robot|mecha|boss)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40"><img src="images/robots/$2/mug_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
+            '/\[(robot|mecha|boss):(left|right)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40"><img src="images/robots/$3/mug_$2_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span>',
+            '/\[(robot|mecha|boss):(left|right):('.$robot_frames_string.')\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$3"><span><img src="images/robots/$4/sprite_$2_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$4" /></span></span>',
+            '/\[(robot|mecha|boss):left:('.$robot_frames_string.'):(-?[0-9]+),(-?[0-9]+),(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="right: $3px; bottom: $4px; z-index: $5;"><span><img src="images/robots/$6/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$6" /></span></span>',
+            '/\[(robot|mecha|boss):right:('.$robot_frames_string.'):(-?[0-9]+),(-?[0-9]+),(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="left: $3px; bottom: $4px; z-index: $5;"><span><img src="images/robots/$6/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$6" /></span></span>',
+            '/\[(robot|mecha|boss):left:('.$robot_frames_string.'):(-?[0-9]+),(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="right: $3px; bottom: $4px;"><span><img src="images/robots/$5/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$5" /></span></span>',
+            '/\[(robot|mecha|boss):right:('.$robot_frames_string.'):(-?[0-9]+),(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="left: $3px; bottom: $4px;"><span><img src="images/robots/$5/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$5" /></span></span>',
+            '/\[(robot|mecha|boss):left:('.$robot_frames_string.'):(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="right: $3px;"><span><img src="images/robots/$4/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$4" /></span></span>',
+            '/\[(robot|mecha|boss):right:('.$robot_frames_string.'):(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="left: $3px;"><span><img src="images/robots/$4/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$4" /></span></span>',
+
             );
+
         $mmrpg_formatting_array += array(
-            // mecha 80x80 Alts
-            '/\[mecha\]\{('.implode('|', $mmrpg_large_robot_images).')_([-_a-z0-9]+)\}/i' => '<span data-test="1" class="sprite_image robot sprite_image_80x80"><img src="images/robots/$1_$2/mug_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
-            '/\[mecha:(left|right)\]\{('.implode('|', $mmrpg_large_robot_images).')_([-_a-z0-9]+)\}/i' => '<span data-test="2" class="sprite_image robot sprite_image_80x80"><img src="images/robots/$2_$3/mug_$1_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
-            '/\[mecha:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|01|02|03|04|05|06|07|08|09|10)\]\{('.implode('|', $mmrpg_large_robot_images).')_([-_a-z0-9]+)\}/i' => '<span data-test="3" class="sprite_image robot sprite_image_80x80 sprite_image_80x80_$2"><span><img src="images/robots/$3_$4/sprite_$1_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
-            // mecha 40x40 Alts
-            '/\[mecha\]\{([-a-z0-9]+)_([-_a-z0-9]+)\}/i' => '<span class="sprite_image robot sprite_image_40x40"><img src="images/robots/$1_$2/mug_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
-            '/\[mecha:(left|right)\]\{([-a-z0-9]+)_([-_a-z0-9]+)\}/i' => '<span class="sprite_image robot sprite_image_40x40"><img src="images/robots/$2_$3/mug_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
-            '/\[mecha:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|command|01|02|03|04|05|06|07|08|09|10)\]\{([-a-z0-9]+)_([-_a-z0-9]+)\}/i' => '<span class="sprite_image robot sprite_image_40x40 sprite_image_40x40_$2"><span><img src="images/robots/$3_$4/sprite_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
-            // mecha 80x80
-            '/\[mecha\]\{('.implode('|', $mmrpg_large_robot_images).')\}/i' => '<span class="sprite_image robot sprite_image_80x80"><img src="images/robots/$1/mug_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
-            '/\[mecha:(left|right)\]\{('.implode('|', $mmrpg_large_robot_images).')\}/i' => '<span class="sprite_image robot sprite_image_80x80"><img src="images/robots/$2/mug_$1_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
-            '/\[mecha:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|01|02|03|04|05|06|07|08|09|10)\]\{('.implode('|', $mmrpg_large_robot_images).')\}/i' => '<span class="sprite_image robot sprite_image_80x80 sprite_image_80x80_$2"><span><img src="images/robots/$3/sprite_$1_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
-            // mecha 40x40
-            '/\[mecha\]\{(.*?)\}/i' => '<span class="sprite_image robot sprite_image_40x40"><img src="images/robots/$1/mug_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
-            '/\[mecha:(left|right)\]\{(.*?)\}/i' => '<span class="sprite_image robot sprite_image_40x40"><img src="images/robots/$2/mug_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
-            '/\[mecha:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|command|01|02|03|04|05|06|07|08|09|10)\]\{(.*?)\}/i' => '<span class="sprite_image robot sprite_image_40x40 sprite_image_40x40_$2"><span><img src="images/robots/$3/sprite_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
+
+            // ability/item/object/shop 40x40
+            '/\[(ability|item|object|shop)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40"><img src="images/$1/$2/mug_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
+            '/\[(ability|item|object|shop):(left|right)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40"><img src="images/$1/$3/mug_$2_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span>',
+            '/\[(ability|item|object|shop):(left|right):([a-z0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$3"><span><img src="images/$1/$4/sprite_$2_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$4" /></span></span>',
+            '/\[(ability|item|object|shop):left:([a-z0-9]+):(-?[0-9]+),(-?[0-9]+),(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="right: $3px; bottom: $4px; z-index: $5;"><span><img src="images/$1/$6/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$6" /></span></span>',
+            '/\[(ability|item|object|shop):right:([a-z0-9]+):(-?[0-9]+),(-?[0-9]+),(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="left: $3px; bottom: $4px; z-index: $5;"><span><img src="images/$1/$6/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$6" /></span></span>',
+            '/\[(ability|item|object|shop):left:([a-z0-9]+):(-?[0-9]+),(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="right: $3px; bottom: $4px;"><span><img src="images/$1/$5/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$5" /></span></span>',
+            '/\[(ability|item|object|shop):right:([a-z0-9]+):(-?[0-9]+),(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="left: $3px; bottom: $4px;"><span><img src="images/$1/$5/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$5" /></span></span>',
+            '/\[(ability|item|object|shop):left:([a-z0-9]+):(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="right: $3px;"><span><img src="images/$1/$4/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$4" /></span></span>',
+            '/\[(ability|item|object|shop):right:([a-z0-9]+):(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="left: $3px;"><span><img src="images/$1/$4/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$4" /></span></span>',
+
+            '/images\/ability\//i' => 'images/abilities/',
+            '/images\/item\//i' => 'images/items/',
+            '/images\/object\//i' => 'images/objects/',
+            '/images\/shop\//i' => 'images/shops/'
+
             );
-        $mmrpg_formatting_array += array(
-            // ability 80x80
-            '/\[ability\]\{('.implode('|', $mmrpg_large_ability_images).')\}/i' => '<span class="sprite_image ability sprite_image_80x80"><img src="images/abilities/$1/icon_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
-            '/\[ability:(left|right)\]\{('.implode('|', $mmrpg_large_ability_images).')\}/i' => '<span class="sprite_image ability sprite_image_80x80"><img src="images/abilities/$2/icon_$1_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
-            '/\[ability:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|command|01|02|03|04|05|06|07|08|09|10)\]\{('.implode('|', $mmrpg_large_ability_images).')\}/i' => '<span class="sprite_image ability sprite_image_80x80 sprite_image_80x80_$2"><span><img src="images/abilities/$3/sprite_$1_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
-            // ability 40x40
-            '/\[ability\]\{(.*?)\}/i' => '<span class="sprite_image ability sprite_image_40x40"><img src="images/abilities/$1/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
-            '/\[ability:(left|right)\]\{(.*?)\}/i' => '<span class="sprite_image ability sprite_image_40x40"><img src="images/abilities/$2/icon_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
-            '/\[ability:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|command|01|02|03|04|05|06|07|08|09|10)\]\{(.*?)\}/i' => '<span class="sprite_image ability sprite_image_40x40 sprite_image_40x40_$2"><span><img src="images/abilities/$3/sprite_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
-            );
-        $mmrpg_formatting_array += array(
-            // item 40x40
-            '/\[item\]\{(.*?)\}/i' => '<span class="sprite_image item sprite_image_40x40"><img src="images/items/$1/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
-            '/\[item:(left|right)\]\{(.*?)\}/i' => '<span class="sprite_image item sprite_image_40x40"><img src="images/items/$2/icon_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
-            '/\[item:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|command|01|02|03|04|05|06|07|08|09|10)\]\{(.*?)\}/i' => '<span class="sprite_image item sprite_image_40x40 sprite_image_40x40_$2"><span><img src="images/items/$3/sprite_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
-            );
-        $mmrpg_formatting_array += array(
-            // shop 40x40
-            '/\[shop\]\{(.*?)\}/i' => '<span class="sprite_image shop sprite_image_40x40"><img src="images/shops/$1/mug_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
-            '/\[shop:(left|right)\]\{(.*?)\}/i' => '<span class="sprite_image shop sprite_image_40x40"><img src="images/shops/$2/mug_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
-            '/\[shop:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|command|01|02|03|04|05|06|07|08|09|10)\]\{(.*?)\}/i' => '<span class="sprite_image shop sprite_image_40x40 sprite_image_40x40_$2"><span><img src="images/shops/$3/sprite_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
-            );
-        $mmrpg_formatting_array += array(
-            // object 40x40
-            '/\[object\]\{(.*?)\}/i' => '<span class="sprite_image object sprite_image_40x40"><img src="images/objects/$1/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$1" /></span>',
-            '/\[object:(left|right)\]\{(.*?)\}/i' => '<span class="sprite_image object sprite_image_40x40"><img src="images/objects/$2/icon_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
-            '/\[object:(left|right):(base|taunt|victory|defeat|shoot|throw|summon|slide|defend|damage|base2|command|01|02|03|04|05|06|07|08|09|10)\]\{(.*?)\}/i' => '<span class="sprite_image object sprite_image_40x40 sprite_image_40x40_$2"><span><img src="images/objects/$3/sprite_$1_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
-            );
+
         $mmrpg_formatting_array += array(
 
             // spoiler tags
@@ -222,31 +199,281 @@ function mmrpg_formatting_decode($string){
             '/\[([^\[\]]+)\]\((.*?)\)/i' => '<a class="link_inline" href="$2" target="_blank">$1</a>',
             // elemental type
             '/\[([^\[\]]+)\]\{(.*?)\}/i' => '<span class="type type_span ability_type ability_type_$2">$1</span>',
+
             );
 
     }
 
-    //die('<pre>$mmrpg_formatting_array = '.print_r($mmrpg_formatting_array, true).'</pre>');
+    // -- REPLACE CODE BLOCKS -- //
+
+    // Define the newline string
+    $nl = "\n";
 
     // Strip any illegal HTML from the string
     $string = strip_tags($string);
     $string = preg_replace('/\[\/code\]\[\/code\]/i', '[&#47;code][/code]', $string);
     //$string = preg_replace('/\s+/', ' ', $string);
-
     // Loop through each find, and replace with the appropriate replacement
     $code_matches = array();
     $has_code = preg_match_all('/\[code\]\s?(.*?)\s?\[\/code\]/is', $string, $code_matches);
     //if ($has_code){ echo('<pre style="background-color: white; clear: both; width: 100%; white-space: normal; color: #000000; margin: 0 auto 20px;">$code_matches = '.print_r($code_matches[0], true).'</pre>'); }
     if ($has_code){ foreach ($code_matches[0] AS $key => $match){ $string = str_replace($match, '##CODE'.$key.'##', $string); } }
     //if ($has_code){ echo('<pre style="background-color: white; clear: both; width: 100%; white-space: normal; color: #000000; margin: 0 auto 20px;">$string = '.print_r($string, true).'</pre>'); }
+
+
+    // -- REPLACE STANDARD FORMATTING -- //
+
+    // Replace all the other, inline formatting with its markup
     foreach ($mmrpg_formatting_array AS $find_pattern => $replace_pattern){ $string = preg_replace($find_pattern, $replace_pattern, $string); }
+
+    // Start off the count variable for later
+    $count = 0;
+
+    // Replace special types of line breaks with one single type
+    //$string = str_replace("\r\n", "\n", $string);
+    $string = str_replace(array("\r\n", "\r"), "\n", $string);
+
+    // -- REPLACE IMAGES -- //
+
+    // Recusively replace all the size spans with their span markup
+    do { $string = preg_replace('/\[([^\[\]]+)\]\((.*?).(jpg|jpeg|gif|png|bmp)\)/i', '<a class="link_image_inline" href="$2.$3" target="_blank"><img src="$2.$3" alt="$1" title="$1" /></a>', $string, -1, $count); }
+    while ($count > 0);
+
+    // -- REPLACE LINKS -- //
+
+    // Recusively replace all the standard text links with their markup
+    do { $string = preg_replace('/\[([^\[\]]+)\]\((.*?)\)/i', '<a class="link_inline" href="$2" target="_blank">$1</a>', $string, -1, $count); }
+    while ($count > 0);
+
+    // -- REPLACE BBCODE BLOCKS/SPANS -- //
+
+    // Recusively replace all the BOLD blocks with their div markup
+    do { $string = preg_replace('/\[b\](.*?)\[\/b\]/is', '<strong class="bold">$1</strong>', $string, -1, $count); }
+    while ($count > 0);
+
+    // Recusively replace all the ITALIC blocks with their div markup
+    do { $string = preg_replace('/\[i\](.*?)\[\/i\]/is', '<em class="italic">$1</em>', $string, -1, $count); }
+    while ($count > 0);
+
+    // Recusively replace all the UNDERLINE blocks with their div markup
+    do { $string = preg_replace('/\[u\](.*?)\[\/u\]/is', '<span class="underline">$1</span>', $string, -1, $count); }
+    while ($count > 0);
+
+    // Recusively replace all the STRIKE blocks with their div markup
+    do { $string = preg_replace('/\[s\](.*?)\[\/s\]/is', '<span class="strike">$1</span>', $string, -1, $count); }
+    while ($count > 0);
+
+    // -- REPLACE TYPE/COLOR/SIZE SPANS -- //
+
+    // Recusively replace all the dual type spans with their span markup
+    do { $string = preg_replace('/\[([^\[\]]+)\]\{('.$mmrpg_types_array_string.')_('.$mmrpg_types_array_string.')\}/i', '<span class="type type_span type_$2_$3">$1</span>', $string, -1, $count); }
+    while ($count > 0);
+
+    // Recusively replace all the single type spans with their span markup
+    do { $string = preg_replace('/\[([^\[\]]+)\]\{('.$mmrpg_types_array_string.')\}/i', '<span class="type type_span type_$2">$1</span>', $string, -1, $count); }
+    while ($count > 0);
+
+    // Recusively replace all the size spans with their span markup
+    do { $string = preg_replace('/\[([^\[\]]+)\]\{(small|medium|large)\}/i', '<span class="size_$2">$1</span>', $string, -1, $count); }
+    while ($count > 0);
+
+    // Recusively replace all the colour(hex) spans with their span markup
+    do { $string = preg_replace('/\[([^\[\]]+)\]\{(#[a-f0-9]{6}|[a-z]+|rgb\([0-9]+,[0-9]+,[0-9]+\)|rgba\([0-9]+,[0-9]+,[0-9]+,[.0-9]+\)|[a-z]+)\}/i', '<span class="colour_inline" style="color: $2;">$1</span>', $string, -1, $count); }
+    while ($count > 0);
+
+    // -- REPLACE BACKGROUND BLOCKS -- //
+
+    // Replace background blocks code with relavant markup [background-name:posx,posy:width,height][/background]
+    do { $string = preg_replace('/\[background(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px),(top|bottom|center|[0-9]+%|[0-9]+px)(?:-|=|\:)([0-9]+%|[0-9]+px),([0-9]+%|[0-9]+px)\](.*?)\[\/background(?:-\1)?(?:-\2)\]/is', '<div class="field field_panel field_panel_background" style="background-position: $2 $3; width: $4; height: $5; background-image: url(images/fields/$1/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$6</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace background blocks code with relavant markup [background-name:posx,posy:width][/background]
+    do { $string = preg_replace('/\[background(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px),(top|bottom|center|[0-9]+%|[0-9]+px)(?:-|=|\:)([0-9]+%|[0-9]+px)\](.*?)\[\/background(?:-\1)?(?:-\2)\]/is', '<div class="field field_panel field_panel_background" style="background-position: $2 $3; width: $4; background-image: url(images/fields/$1/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$5</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace background blocks code with relavant markup [background-name:posx,posy][/background]
+    do { $string = preg_replace('/\[background(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px),(top|bottom|center|[0-9]+%|[0-9]+px)\](.*?)\[\/background(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_background" style="background-position: $2 $3; background-image: url(images/fields/$1/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$4</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace background blocks code with relavant markup [background-name:posy][/background]
+    do { $string = preg_replace('/\[background(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(top|bottom)\](.*?)\[\/background(?:-\1)(?:-\2)?\]/is', '<div class="field field_panel field_panel_background" style="background-position: center $2; background-image: url(images/fields/$1/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$3</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace background blocks code with relavant markup [background-name:posx][/background]
+    do { $string = preg_replace('/\[background(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px)\](.*?)\[\/background(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_background" style="background-position: $2 center; background-image: url(images/fields/$1/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$3</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace background blocks code with relavant markup [background-name][/background]
+    do { $string = preg_replace('/\[background(?:-|=|\:)([-_a-z0-9]+)\](.*?)\[\/background(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_background" style="background-image: url(images/fields/$1/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$2</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace background blocks code with relavant markup [background][/background]
+    do { $string = preg_replace('/\[background\](.*?)\[\/background\]/is', '<div class="field field_panel field_panel_background"><div class="wrap">$1</div></div>', $string, -1, $count); }
+    while ($count > 0);
+
+    // -- REPLACE FOREGROUND BLOCKS -- //
+
+    // Replace foreground blocks code with relavant markup [foreground-name:posx,posy:width,height][/foreground]
+    do { $string = preg_replace('/\[foreground(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px),(top|bottom|center|[0-9]+%|[0-9]+px)(?:-|=|\:)([0-9]+%|[0-9]+px),([0-9]+%|[0-9]+px)\](.*?)\[\/foreground(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_foreground" style="background-position: $2 $3; width: $4; height: $5; background-image: url(images/fields/$1/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$6</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace foreground blocks code with relavant markup [foreground-name:posx,posy:width][/foreground]
+    do { $string = preg_replace('/\[foreground(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px),(top|bottom|center|[0-9]+%|[0-9]+px)(?:-|=|\:)([0-9]+%|[0-9]+px)\](.*?)\[\/foreground(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_foreground" style="background-position: $2 $3; width: $4; background-image: url(images/fields/$1/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$5</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace foreground blocks code with relavant markup [foreground-name:posx,posy][/foreground]
+    do { $string = preg_replace('/\[foreground(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px),(top|bottom|center|[0-9]+%|[0-9]+px)\](.*?)\[\/foreground(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_foreground" style="background-position: $2 $3; background-image: url(images/fields/$1/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$4</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace foreground blocks code with relavant markup [foreground-name:posy][/foreground]
+    do { $string = preg_replace('/\[foreground(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(top|bottom)\](.*?)\[\/foreground(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_foreground" style="background-position: center $2; background-image: url(images/fields/$1/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$3</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace foreground blocks code with relavant markup [foreground-name:posx][/foreground]
+    do { $string = preg_replace('/\[foreground(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px)\](.*?)\[\/foreground(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_foreground" style="background-position: $2 center; background-image: url(images/fields/$1/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$3</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace foreground blocks code with relavant markup [foreground-name][/foreground]
+    do { $string = preg_replace('/\[foreground(?:-|=|\:)([-_a-z0-9]+)\](.*?)\[\/foreground(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_foreground" style="background-image: url(images/fields/$1/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$2</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace foreground blocks code with relavant markup [foreground][/foreground]
+    do { $string = preg_replace('/\[foreground\](.*?)\[\/foreground\]/is', '<div class="field field_panel field_panel_foreground"><div class="wrap">$1</div></div>', $string, -1, $count); }
+    while ($count > 0);
+
+    // -- REPLACE LAYER WRAPPERS -- //
+
+    // Replace layer wrappers code with relavant markup [layer][/layer]
+    do { $string = preg_replace('/\[layer(?:-|=|\:)([0-9]+)%\](.*?)\[\/layer\]/is', '<div class="layer" style="opacity: 0.$1;">$2</div>', $string, -1, $count); }
+    while ($count > 0);
+
+    // Replace layer wrappers code with relavant markup [layer][/layer]
+    do { $string = preg_replace('/\[layer\](.*?)\[\/layer\]/is', '<div class="layer">$1</div>', $string, -1, $count); }
+    while ($count > 0);
+
+    // -- REPLACE BLOCK/SPAN GIVEN WHITESPACE -- //
+
+    $block_span_kinds = array();
+    $block_span_kinds[] = array('content' => '(\n+(?:.*?)\n+)', 'element' => 'div', 'class' => 'panel');
+    $block_span_kinds[] = array('content' => '(.*?)', 'element' => 'span', 'class' => 'span');
+    foreach ($block_span_kinds AS $key => $info){
+        $content = $info['content'];
+        $element = $info['element'];
+        $class = $info['class'];
+
+        // -- REPLACE TYPE BLOCKS -- //
+
+        // Replace type blocks code with relavant markup [type-name:width,height][/type]
+        do { $string = preg_replace('/\[type(?:-|=|\:)([_a-z]+)(?:-|=|\:)([0-9]+%|[0-9]+px),([0-9]+%|[0-9]+px)\]'.$content.'\[\/type(?:-\1)?\]/is', '<'.$element.' class="type type_'.$class.' type_$1" style="width: $2; height: $3;">$4</'.$element.'>', $string, -1, $count); }
+        while ($count > 0);
+        // Replace type blocks code with relavant markup [type-name:width][/type]
+        do { $string = preg_replace('/\[type(?:-|=|\:)([_a-z]+)(?:-|=|\:)([0-9]+%|[0-9]+px)\]'.$content.'\[\/type(?:-\1)?\]/is', '<'.$element.' class="type type_'.$class.' type_$1" style="width: $2;">$3</'.$element.'>', $string, -1, $count); }
+        while ($count > 0);
+        // Replace type blocks code with relavant markup [type-name][/type]
+        do { $string = preg_replace('/\[type(?:-|=|\:)([_a-z]+)\]'.$content.'\[\/type(?:-\1)?\]/is', '<'.$element.' class="type type_'.$class.' type_$1">$2</'.$element.'>', $string, -1, $count); }
+        while ($count > 0);
+        // Replace type blocks code with relavant markup [type][/type]
+        do { $string = preg_replace('/\[type\]'.$content.'\[\/type\]/is', '<'.$element.' class="type type_'.$class.' type_none">$1</'.$element.'>', $string, -1, $count); }
+        while ($count > 0);
+
+        // -- REPLACE COLOUR BLOCKS/SPANS (LEGACY) -- //
+
+        // Replace colour blocks code with relavant markup [color-value:width,height][/color]
+        do { $string = preg_replace('/\[color(?:-|=|\:)([0-9]+,[0-9]+,[0-9]+)(?:-|=|\:)([0-9]+%|[0-9]+px),([0-9]+%|[0-9]+px)\]'.$content.'\[\/color(?:-\1)?\]/is', '<'.$element.' class="colour_'.$class.'" style="color: rgb($1); width: $2; height: $3;">$4</'.$element.'>', $string, -1, $count); }
+        while ($count > 0);
+        // Replace colour blocks code with relavant markup [color-value:width][/color]
+        do { $string = preg_replace('/\[color(?:-|=|\:)([0-9]+,[0-9]+,[0-9]+)(?:-|=|\:)([0-9]+%|[0-9]+px)\]'.$content.'\[\/color(?:-\1)?\]/is', '<'.$element.' class="colour_'.$class.'" style="color: rgb($1); width: $2;">$3</'.$element.'>', $string, -1, $count); }
+        while ($count > 0);
+        // Replace colour blocks code with relavant markup [color-value][/color]
+        do { $string = preg_replace('/\[color(?:-|=|\:)([0-9]+,[0-9]+,[0-9]+)\]'.$content.'\[\/color(?:-\1)?\]/is', '<'.$element.' class="colour_'.$class.'" style="color: rgb($1);">$2</'.$element.'>', $string, -1, $count); }
+        while ($count > 0);
+        // Replace colour blocks code with relavant markup [color][/color]
+        do { $string = preg_replace('/\[color\]'.$content.'\[\/color\]/is', '<'.$element.' class="colour_'.$class.'" style="color: #FFFFFF;">$1</'.$element.'>', $string, -1, $count); }
+        while ($count > 0);
+
+        // -- REPLACE COLOUR BLOCKS/SPANS (NEW) -- //
+
+        // Replace colour blocks code with relavant markup [color-value:width,height][/color]
+        do { $string = preg_replace('/\[color(?:-|=|\:)(#[a-f0-9]{6}|[a-z]+|rgb\([0-9]+,[0-9]+,[0-9]+\)|rgba\([0-9]+,[0-9]+,[0-9]+,[.0-9]+\)|[a-z]+)(?:-|=|\:)([0-9]+%|[0-9]+px),([0-9]+%|[0-9]+px)\]'.$content.'\[\/color(?:-\1)?\]/is', '<'.$element.' class="colour_'.$class.'" style="color: $1; width: $2; height: $3;">$4</'.$element.'>', $string, -1, $count); }
+        while ($count > 0);
+        // Replace colour blocks code with relavant markup [color-value:width][/color]
+        do { $string = preg_replace('/\[color(?:-|=|\:)(#[a-f0-9]{6}|[a-z]+|rgb\([0-9]+,[0-9]+,[0-9]+\)|rgba\([0-9]+,[0-9]+,[0-9]+,[.0-9]+\)|[a-z]+)(?:-|=|\:)([0-9]+%|[0-9]+px)\]'.$content.'\[\/color(?:-\1)?\]/is', '<'.$element.' class="colour_'.$class.'" style="color: $1; width: $2;">$3</'.$element.'>', $string, -1, $count); }
+        while ($count > 0);
+        // Replace colour blocks code with relavant markup [color-value][/color]
+        do { $string = preg_replace('/\[color(?:-|=|\:)(#[a-f0-9]{6}|[a-z]+|rgb\([0-9]+,[0-9]+,[0-9]+\)|rgba\([0-9]+,[0-9]+,[0-9]+,[.0-9]+\)|[a-z]+)\]'.$content.'\[\/color(?:-\1)?\]/is', '<'.$element.' class="colour_'.$class.'" style="color: $1;">$2</'.$element.'>', $string, -1, $count); }
+        while ($count > 0);
+        // Replace colour blocks code with relavant markup [color][/color]
+        do { $string = preg_replace('/\[color\]'.$content.'\[\/color\]/is', '<'.$element.' class="colour_'.$class.'" style="color: #FFFFFF;">$1</'.$element.'>', $string, -1, $count); }
+        while ($count > 0);
+
+        // -- REPLACE SIZE BLOCKS -- //
+
+        // Replace size blocks code with relavant markup [size-keyword:width,height][/size]
+        do { $string = preg_replace('/\[size(?:-|=|\:)(small|medium|large)(?:-|=|\:)([0-9]+%|[0-9]+px),([0-9]+%|[0-9]+px)\]'.$content.'\[\/size(?:-\1)?\]/is', '<'.$element.' class="size_$1" style="width: $2; height: $3;">$4</'.$element.'>', $string, -1, $count); }
+        while ($count > 0);
+        // Replace size blocks code with relavant markup [size-keyword:width][/size]
+        do { $string = preg_replace('/\[size(?:-|=|\:)(small|medium|large)(?:-|=|\:)([0-9]+%|[0-9]+px)\]'.$content.'\[\/size(?:-\1)?\]/is', '<'.$element.' class="size_$1" style="width: $2;">$3</'.$element.'>', $string, -1, $count); }
+        while ($count > 0);
+        // Replace size blocks code with relavant markup [size-keyword][/size]
+        do { $string = preg_replace('/\[size(?:-|=|\:)(small|medium|large)\]'.$content.'\[\/size(?:-\1)?\]/is', '<'.$element.' class="size_$1">$2</'.$element.'>', $string, -1, $count); }
+        while ($count > 0);
+        // Replace size blocks code with relavant markup [size][/size]
+        do { $string = preg_replace('/\[size\]'.$content.'\[\/size\]/is', '<'.$element.' class="size_medium">$1</'.$element.'>', $string, -1, $count); }
+        while ($count > 0);
+
+    }
+
+    // -- REPLACE ALIGN BLOCKS -- //
+
+    // Replace align blocks code with relavant markup [align-direction:width,height][/align]
+    do { $string = preg_replace('/\s?\[align(?:-|=)(left|right|center)(?:-|=|\:)([0-9]+%|[0-9]+px),([0-9]+%|[0-9]+px)\](.*?)\[\/align(?:-\1)?\]\s?/is', '<div class="align_panel align_$1" style="width: $2; height: $3;">$4</div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace align blocks code with relavant markup [align-direction:width][/align]
+    do { $string = preg_replace('/\s?\[align(?:-|=)(left|right|center)(?:-|=|\:)([0-9]+%|[0-9]+px)\](.*?)\[\/align(?:-\1)?\]\s?/is', '<div class="align_panel align_$1" style="width: $2;">$3</div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace align blocks code with relavant markup [align-direction][/align]
+    do { $string = preg_replace('/\s?\[align(?:-|=)(left|right|center)\](.*?)\[\/align(?:-\1)?\]\s?/is', '<div class="align_panel align_$1">$2</div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace align blocks code with relavant markup [align][/align]
+    do { $string = preg_replace('/\s?\[align\](.*?)\[\/align\]\s?/is', '<div class="align_panel align_left">$1</div>', $string, -1, $count); }
+    while ($count > 0);
+
+    // -- REPLACE FLOAT BLOCKS -- //
+
+    // Replace float blocks code with relavant markup [float-direction:width,height][/float]
+    do { $string = preg_replace('/\s?\[float(?:-|=|\:)(left|right|none)(?:-|=|\:)([0-9]+%|[0-9]+px),([0-9]+%|[0-9]+px)\](.*?)\[\/float(?:-\1)?\]\s?/is', '<div class="float_panel float_$1" style="width: $2; height: $3;">$4</div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace float blocks code with relavant markup [float-direction:width][/float]
+    do { $string = preg_replace('/\s?\[float(?:-|=|\:)(left|right|none)(?:-|=|\:)([0-9]+%|[0-9]+px)\](.*?)\[\/float(?:-\1)?\]\s?/is', '<div class="float_panel float_$1" style="width: $2;">$3</div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace float blocks code with relavant markup [float-direction][/float]
+    do { $string = preg_replace('/\s?\[float(?:-|=|\:)(left|right|none)\](.*?)\[\/float(?:-\1)?\]\s?/is', '<div class="float_panel float_$1">$2</div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace float blocks code with relavant markup [float][/float]
+    do { $string = preg_replace('/\s?\[float\](.*?)\[\/float\]\s?/is', '<div class="float_left">$1</div>', $string, -1, $count); }
+    while ($count > 0);
+
+    // -- REPLACE COMIC BLOCKS -- //
+
+    // Replace comic layout code with relavant markup
+
+    do { $string = preg_replace('/\s?\[comic(?:-layout)?\](.*?)\[\/comic(?:-layout)?\]\s?/is', '<div class="comic_layout">$1</div>', $string, -1, $count); }
+    while ($count > 0);
+
+    do { $string = preg_replace('/\s?\[(?:comic-)?panel\](.*?)\[\/(?:comic-)?panel\]\s?/is', '<div class="comic_panel">$1</div>', $string, -1, $count); }
+    while ($count > 0);
+
+    do { $string = preg_replace('/\s{0,}\[intro(?:-text)?\](.*?)\[\/intro(?:-text)?\]\s?/is', '<div class="align_panel align_left intro">$1</div>', $string, -1, $count); }
+    while ($count > 0);
+
+    do { $string = preg_replace('/\s{0,}\[quote(?:-left)?\](.*?)\[\/quote(?:-left)?\]\s?/is', '<div class="align_panel align_left quote">$1</div>', $string, -1, $count); }
+    while ($count > 0);
+
+    do { $string = preg_replace('/\s{0,}\[quote-right?\](.*?)\[\/quote(?:-right)?\]\s?/is', '<div class="align_panel align_right quote">$1</div>', $string, -1, $count); }
+    while ($count > 0);
+
+    // -- RE-INSERT CODE BLOCKS -- //
+
+    // Loop through any code blocks and replace their contents with the original markup
     if ($has_code){ foreach ($code_matches[1] AS $key => $match){ $string = str_replace('##CODE'.$key.'##', '<span class="code">'.$match.'</span>', $string); } }
 
+    // -- REPLACE LINE BREAKS -- //
+
     // Change line breaks to actual breaks by grouping into paragraphs
-    $string = str_replace("\r\n", "\n", $string);
     $string = str_replace("\n", '<br />', $string);
-    //$string = '<p>'.preg_replace('/(<br\s?\/>\s?){2,}/i', '</p><p>', $string).'</p>';
+    $string = preg_replace('/<div( class="[^"]+")?( style="[^"]+")?><br \/>/is', '<div$1$2>', $string);
+    $string = preg_replace('/<br \/><\/div>/is', '</div>', $string);
+    //$string = preg_replace('<br /><', '<', $string);
     $string = '<div>'.$string.'</div>';
+
 
     // If we'e in HTTPS mode, manually rewrite common external sources with proper protocols
     if (defined('MMRPG_IS_HTTPS')
