@@ -6180,6 +6180,20 @@ body.windowFlag_landscapeMode #window .page .type_block {
 
 }
 
+@media (max-width: 460px){
+
+    #window .page .body .thread_subbody .comic_layout .comic_panel {
+        width: 100%;
+        min-width: 100%;
+    }
+
+    #window .page .body .post_subbody .comic_layout .comic_panel {
+        width: 100%;
+        min-width: 100%;
+    }
+
+}
+
 
 #window .page_community .form,
 #window .page_file .form {
