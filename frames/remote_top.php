@@ -1,17 +1,18 @@
 <?php
 // If a user ID has been defined, attempt to swap the save session
-if (!defined('MMRPG_REMOTE_GAME_ID')){ define('MMRPG_REMOTE_GAME_ID', (!empty($_REQUEST['user_id']) ? $_REQUEST['user_id'] : 0)); }
+if (!defined('MMRPG_REMOTE_GAME_ID')){ define('MMRPG_REMOTE_GAME_ID', (!empty($_REQUEST['user_id']) && is_numeric($_REQUEST['user_id']) ? $_REQUEST['user_id'] : 0)); }
 if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER']['userid']){
 
     // Attempt to collect data for this player from the database
     $user_fields = rpg_user::get_index_fields(true, 'users');
     $user_save_fields = rpg_user::get_save_index_fields(true, 'usaves');
+    $this_playerid = intval(MMRPG_REMOTE_GAME_ID);
     $this_playerinfo = $db->get_array("SELECT
         {$user_fields},
         {$user_save_fields}
         FROM mmrpg_users AS users
         LEFT JOIN mmrpg_saves AS usaves ON usaves.user_id = users.user_id
-        WHERE users.user_id = '".MMRPG_REMOTE_GAME_ID."';");
+        WHERE users.user_id = {$this_playerid};");
 
     // If the userinfo exists in the database, display it
     if (!empty($this_playerinfo)){
