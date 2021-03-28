@@ -52,6 +52,32 @@ if (MMRPG_REMOTE_GAME_ID != 0 && MMRPG_REMOTE_GAME_ID != $_SESSION['GAME']['USER
             $this_playerinfo['save_settings']
             );
 
+        // Pull various game values if allowed
+        if (!defined('MMRPG_REMOTE_SKIP_ITEMS')){
+            rpg_user::pull_unlocked_items(MMRPG_REMOTE_GAME_ID, $user_unlocked_items);
+            if (!empty($user_unlocked_items)){
+                $this_playerinfo['values']['battle_items'] = $user_unlocked_items;
+            }
+        }
+        if (!defined('MMRPG_REMOTE_SKIP_ABILITIES')){
+            rpg_user::pull_unlocked_abilities(MMRPG_REMOTE_GAME_ID, $user_unlocked_abilities);
+            if (!empty($user_unlocked_abilities)){
+                $this_playerinfo['values']['battle_abilities'] = $user_unlocked_abilities;
+            }
+        }
+        if (!defined('MMRPG_REMOTE_SKIP_STARS')){
+            rpg_user::pull_unlocked_stars(MMRPG_REMOTE_GAME_ID, $user_unlocked_stars);
+            if (!empty($user_unlocked_stars)){
+                $this_playerinfo['values']['battle_stars'] = $user_unlocked_stars;
+            }
+        }
+        if (!defined('MMRPG_REMOTE_SKIP_DATABASE')){
+            rpg_user::pull_robot_records(MMRPG_REMOTE_GAME_ID, $user_robot_records);
+            if (!empty($user_robot_records)){
+                $this_playerinfo['values']['robot_database'] = $user_robot_records;
+            }
+        }
+
         // Fix issues with legacy player rewards array
         if (!empty($this_playerinfo['values']['battle_rewards'])){
             foreach ($this_playerinfo['values']['battle_rewards'] AS $player_token => $player_info){
