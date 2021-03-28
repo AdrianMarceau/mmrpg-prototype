@@ -101,7 +101,7 @@ function mmrpg_formatting_decode($string){
             );
         $mmrpg_formatting_array += array(
             // spacers
-            '/\[(tab|space)\]/i' => '&nbsp;&nbsp;',
+            '/\[tab\]/i' => '&nbsp;&nbsp;',
             '/\s{2,}[-]{5,}\s{2,}/i' => '<hr class="line_divider line_divider_bigger" />',
             '/\s?[-]{5,}\s?/i' => '<hr class="line_divider" />',
             '/\s\|\s/i' => '&nbsp;<span class="pipe">|</span>&nbsp;',
