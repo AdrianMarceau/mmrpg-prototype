@@ -187,11 +187,11 @@ function mmrpg_formatting_decode($string){
             // spoiler tags
             '/\[([^\[\]]+)\]\{spoiler\}/i' => '<span class="type type_span ability_type ability_type_space" style="background-image: none; color: rgb(54,57,90);">$1</span>',
 
+            /*
+
             // inline colours
             '/\[([^\[\]]+)\]\{#([a-f0-9]{6})\}/i' => '<span class="colour_inline" style="color: #$2;">$1</span>',
             '/\[([^\[\]]+)\]\{([0-9]{1,3}),\s?([0-9]{1,3}),\s?([0-9]{1,3})\}/i' => '<span class="colour_inline" style="color: rgb($2, $3, $4);">$1</span>',
-
-            /*
 
             // inline text with link to image
             '/\[([^\[\]]+)\]\((.*?).(jpg|jpeg|gif|png|bmp)\:text\)/i' => '<a class="link_inline" href="$2.$3" target="_blank">$1</a>',
@@ -253,92 +253,14 @@ function mmrpg_formatting_decode($string){
     do { $string = preg_replace('/\[s\](.*?)\[\/s\]/is', '<span class="strike">$1</span>', $string, -1, $count); }
     while ($count > 0);
 
-    // -- REPLACE IMAGES -- //
-
-    // Recusively replace all the size spans with their span markup
-    do { $string = preg_replace('/\[([^\[\]]+)\]\(([^\s]+).(jpg|jpeg|gif|png|bmp)\)/i', '<a class="link_image_inline" href="$2.$3" target="_blank"><img src="$2.$3" alt="$1" title="$1" /></a>', $string, -1, $count); }
-    while ($count > 0);
-
-    // -- REPLACE LINKS -- //
-
-    // Recusively replace all the standard text links with their markup
-    do { $string = preg_replace('/\[([^\[\]]+)\]\(([^\s]+)\)/i', '<a class="link_inline" href="$2" target="_blank">$1</a>', $string, -1, $count); }
-    while ($count > 0);
-
-    // -- REPLACE TYPE/COLOR/SIZE SPANS -- //
-
-    // Recusively replace all the dual type spans with their span markup
-    do { $string = preg_replace('/\[([^\[\]]+)\]\{('.$mmrpg_types_array_string.')_('.$mmrpg_types_array_string.')\}/i', '<span class="type type_span type_$2_$3">$1</span>', $string, -1, $count); }
-    while ($count > 0);
-
-    // Recusively replace all the single type spans with their span markup
-    do { $string = preg_replace('/\[([^\[\]]+)\]\{('.$mmrpg_types_array_string.')\}/i', '<span class="type type_span type_$2">$1</span>', $string, -1, $count); }
-    while ($count > 0);
+    // -- REPLACE SIZE/COLOR SPANS -- //
 
     // Recusively replace all the size spans with their span markup
     do { $string = preg_replace('/\[([^\[\]]+)\]\{(small|medium|large)\}/i', '<span class="size_$2">$1</span>', $string, -1, $count); }
     while ($count > 0);
 
     // Recusively replace all the colour(hex) spans with their span markup
-    do { $string = preg_replace('/\[([^\[\]]+)\]\{(#[a-f0-9]{6}|[a-z]+|rgb\([0-9]+,[0-9]+,[0-9]+\)|rgba\([0-9]+,[0-9]+,[0-9]+,[.0-9]+\)|[a-z]+)\}/i', '<span class="colour_inline" style="color: $2;">$1</span>', $string, -1, $count); }
-    while ($count > 0);
-
-    // -- REPLACE BACKGROUND BLOCKS -- //
-
-    // Replace background blocks code with relavant markup [background-name:posx,posy:width,height][/background]
-    do { $string = preg_replace('/\[background(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px),(top|bottom|center|[0-9]+%|[0-9]+px)(?:-|=|\:)([0-9]+%|[0-9]+px),([0-9]+%|[0-9]+px)\](.*?)\[\/background(?:-\1)?(?:-\2)\]/is', '<div class="field field_panel field_panel_background" style="background-position: $2 $3; width: $4; height: $5; background-image: url(images/fields/$1/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$6</div></div>', $string, -1, $count); }
-    while ($count > 0);
-    // Replace background blocks code with relavant markup [background-name:posx,posy:width][/background]
-    do { $string = preg_replace('/\[background(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px),(top|bottom|center|[0-9]+%|[0-9]+px)(?:-|=|\:)([0-9]+%|[0-9]+px)\](.*?)\[\/background(?:-\1)?(?:-\2)\]/is', '<div class="field field_panel field_panel_background" style="background-position: $2 $3; width: $4; background-image: url(images/fields/$1/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$5</div></div>', $string, -1, $count); }
-    while ($count > 0);
-    // Replace background blocks code with relavant markup [background-name:posx,posy][/background]
-    do { $string = preg_replace('/\[background(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px),(top|bottom|center|[0-9]+%|[0-9]+px)\](.*?)\[\/background(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_background" style="background-position: $2 $3; background-image: url(images/fields/$1/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$4</div></div>', $string, -1, $count); }
-    while ($count > 0);
-    // Replace background blocks code with relavant markup [background-name:posy][/background]
-    do { $string = preg_replace('/\[background(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(top|bottom)\](.*?)\[\/background(?:-\1)(?:-\2)?\]/is', '<div class="field field_panel field_panel_background" style="background-position: center $2; background-image: url(images/fields/$1/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$3</div></div>', $string, -1, $count); }
-    while ($count > 0);
-    // Replace background blocks code with relavant markup [background-name:posx][/background]
-    do { $string = preg_replace('/\[background(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px)\](.*?)\[\/background(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_background" style="background-position: $2 center; background-image: url(images/fields/$1/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$3</div></div>', $string, -1, $count); }
-    while ($count > 0);
-    // Replace background blocks code with relavant markup [background-name][/background]
-    do { $string = preg_replace('/\[background(?:-|=|\:)([-_a-z0-9]+)\](.*?)\[\/background(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_background" style="background-image: url(images/fields/$1/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$2</div></div>', $string, -1, $count); }
-    while ($count > 0);
-    // Replace background blocks code with relavant markup [background][/background]
-    do { $string = preg_replace('/\[background\](.*?)\[\/background\]/is', '<div class="field field_panel field_panel_background"><div class="wrap">$1</div></div>', $string, -1, $count); }
-    while ($count > 0);
-
-    // -- REPLACE FOREGROUND BLOCKS -- //
-
-    // Replace foreground blocks code with relavant markup [foreground-name:posx,posy:width,height][/foreground]
-    do { $string = preg_replace('/\[foreground(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px),(top|bottom|center|[0-9]+%|[0-9]+px)(?:-|=|\:)([0-9]+%|[0-9]+px),([0-9]+%|[0-9]+px)\](.*?)\[\/foreground(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_foreground" style="background-position: $2 $3; width: $4; height: $5; background-image: url(images/fields/$1/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$6</div></div>', $string, -1, $count); }
-    while ($count > 0);
-    // Replace foreground blocks code with relavant markup [foreground-name:posx,posy:width][/foreground]
-    do { $string = preg_replace('/\[foreground(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px),(top|bottom|center|[0-9]+%|[0-9]+px)(?:-|=|\:)([0-9]+%|[0-9]+px)\](.*?)\[\/foreground(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_foreground" style="background-position: $2 $3; width: $4; background-image: url(images/fields/$1/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$5</div></div>', $string, -1, $count); }
-    while ($count > 0);
-    // Replace foreground blocks code with relavant markup [foreground-name:posx,posy][/foreground]
-    do { $string = preg_replace('/\[foreground(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px),(top|bottom|center|[0-9]+%|[0-9]+px)\](.*?)\[\/foreground(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_foreground" style="background-position: $2 $3; background-image: url(images/fields/$1/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$4</div></div>', $string, -1, $count); }
-    while ($count > 0);
-    // Replace foreground blocks code with relavant markup [foreground-name:posy][/foreground]
-    do { $string = preg_replace('/\[foreground(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(top|bottom)\](.*?)\[\/foreground(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_foreground" style="background-position: center $2; background-image: url(images/fields/$1/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$3</div></div>', $string, -1, $count); }
-    while ($count > 0);
-    // Replace foreground blocks code with relavant markup [foreground-name:posx][/foreground]
-    do { $string = preg_replace('/\[foreground(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px)\](.*?)\[\/foreground(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_foreground" style="background-position: $2 center; background-image: url(images/fields/$1/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$3</div></div>', $string, -1, $count); }
-    while ($count > 0);
-    // Replace foreground blocks code with relavant markup [foreground-name][/foreground]
-    do { $string = preg_replace('/\[foreground(?:-|=|\:)([-_a-z0-9]+)\](.*?)\[\/foreground(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_foreground" style="background-image: url(images/fields/$1/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$2</div></div>', $string, -1, $count); }
-    while ($count > 0);
-    // Replace foreground blocks code with relavant markup [foreground][/foreground]
-    do { $string = preg_replace('/\[foreground\](.*?)\[\/foreground\]/is', '<div class="field field_panel field_panel_foreground"><div class="wrap">$1</div></div>', $string, -1, $count); }
-    while ($count > 0);
-
-    // -- REPLACE LAYER WRAPPERS -- //
-
-    // Replace layer wrappers code with relavant markup [layer][/layer]
-    do { $string = preg_replace('/\[layer(?:-|=|\:)([0-9]+)%\](.*?)\[\/layer\]/is', '<div class="layer" style="opacity: 0.$1;">$2</div>', $string, -1, $count); }
-    while ($count > 0);
-
-    // Replace layer wrappers code with relavant markup [layer][/layer]
-    do { $string = preg_replace('/\[layer\](.*?)\[\/layer\]/is', '<div class="layer">$1</div>', $string, -1, $count); }
+    do { $string = preg_replace('/\[([^\[\]]+)\]\{(#[a-f0-9]{6}|rgb\([0-9]+,[0-9]+,[0-9]+\)|rgba\([0-9]+,[0-9]+,[0-9]+,[.0-9]+\))\}/i', '<span class="colour_inline" style="color: $2;">$1</span>', $string, -1, $count); }
     while ($count > 0);
 
     // -- REPLACE BLOCK/SPAN GIVEN WHITESPACE -- //
@@ -412,6 +334,86 @@ function mmrpg_formatting_decode($string){
         while ($count > 0);
 
     }
+
+    // -- REPLACE IMAGES -- //
+
+    // Recusively replace all the inline images with their span markup
+    do { $string = preg_replace('/\[([^\[\]]+)\]\(([^\s]+).(jpg|jpeg|gif|png|bmp)\)/i', '<a class="link_image_inline" href="$2.$3" target="_blank"><img src="$2.$3" alt="$1" title="$1" /></a>', $string, -1, $count); }
+    while ($count > 0);
+
+    // -- REPLACE LINKS -- //
+
+    // Recusively replace all the standard text links with their markup
+    do { $string = preg_replace('/\[([^\[\]]+)\]\(([^\s]+)\)/i', '<a class="link_inline" href="$2" target="_blank">$1</a>', $string, -1, $count); }
+    while ($count > 0);
+
+    // -- REPLACE TYPE SPANS -- //
+
+    // Recusively replace all the dual type spans with their span markup
+    do { $string = preg_replace('/\[([^\[\]]+)\]\{('.$mmrpg_types_array_string.')_('.$mmrpg_types_array_string.')\}/i', '<span class="type type_span type_$2_$3">$1</span>', $string, -1, $count); }
+    while ($count > 0);
+
+    // Recusively replace all the single type spans with their span markup
+    do { $string = preg_replace('/\[([^\[\]]+)\]\{('.$mmrpg_types_array_string.')\}/i', '<span class="type type_span type_$2">$1</span>', $string, -1, $count); }
+    while ($count > 0);
+
+    // -- REPLACE BACKGROUND BLOCKS -- //
+
+    // Replace background blocks code with relavant markup [background-name:posx,posy:width,height][/background]
+    do { $string = preg_replace('/\[background(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px),(top|bottom|center|[0-9]+%|[0-9]+px)(?:-|=|\:)([0-9]+%|[0-9]+px),([0-9]+%|[0-9]+px)\](.*?)\[\/background(?:-\1)?(?:-\2)\]/is', '<div class="field field_panel field_panel_background" style="background-position: $2 $3; width: $4; height: $5; background-image: url(images/fields/$1/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$6</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace background blocks code with relavant markup [background-name:posx,posy:width][/background]
+    do { $string = preg_replace('/\[background(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px),(top|bottom|center|[0-9]+%|[0-9]+px)(?:-|=|\:)([0-9]+%|[0-9]+px)\](.*?)\[\/background(?:-\1)?(?:-\2)\]/is', '<div class="field field_panel field_panel_background" style="background-position: $2 $3; width: $4; background-image: url(images/fields/$1/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$5</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace background blocks code with relavant markup [background-name:posx,posy][/background]
+    do { $string = preg_replace('/\[background(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px),(top|bottom|center|[0-9]+%|[0-9]+px)\](.*?)\[\/background(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_background" style="background-position: $2 $3; background-image: url(images/fields/$1/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$4</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace background blocks code with relavant markup [background-name:posy][/background]
+    do { $string = preg_replace('/\[background(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(top|bottom)\](.*?)\[\/background(?:-\1)(?:-\2)?\]/is', '<div class="field field_panel field_panel_background" style="background-position: center $2; background-image: url(images/fields/$1/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$3</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace background blocks code with relavant markup [background-name:posx][/background]
+    do { $string = preg_replace('/\[background(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px)\](.*?)\[\/background(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_background" style="background-position: $2 center; background-image: url(images/fields/$1/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$3</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace background blocks code with relavant markup [background-name][/background]
+    do { $string = preg_replace('/\[background(?:-|=|\:)([-_a-z0-9]+)\](.*?)\[\/background(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_background" style="background-image: url(images/fields/$1/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$2</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace background blocks code with relavant markup [background][/background]
+    do { $string = preg_replace('/\[background\](.*?)\[\/background\]/is', '<div class="field field_panel field_panel_background"><div class="wrap">$1</div></div>', $string, -1, $count); }
+    while ($count > 0);
+
+    // -- REPLACE FOREGROUND BLOCKS -- //
+
+    // Replace foreground blocks code with relavant markup [foreground-name:posx,posy:width,height][/foreground]
+    do { $string = preg_replace('/\[foreground(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px),(top|bottom|center|[0-9]+%|[0-9]+px)(?:-|=|\:)([0-9]+%|[0-9]+px),([0-9]+%|[0-9]+px)\](.*?)\[\/foreground(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_foreground" style="background-position: $2 $3; width: $4; height: $5; background-image: url(images/fields/$1/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$6</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace foreground blocks code with relavant markup [foreground-name:posx,posy:width][/foreground]
+    do { $string = preg_replace('/\[foreground(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px),(top|bottom|center|[0-9]+%|[0-9]+px)(?:-|=|\:)([0-9]+%|[0-9]+px)\](.*?)\[\/foreground(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_foreground" style="background-position: $2 $3; width: $4; background-image: url(images/fields/$1/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$5</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace foreground blocks code with relavant markup [foreground-name:posx,posy][/foreground]
+    do { $string = preg_replace('/\[foreground(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px),(top|bottom|center|[0-9]+%|[0-9]+px)\](.*?)\[\/foreground(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_foreground" style="background-position: $2 $3; background-image: url(images/fields/$1/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$4</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace foreground blocks code with relavant markup [foreground-name:posy][/foreground]
+    do { $string = preg_replace('/\[foreground(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(top|bottom)\](.*?)\[\/foreground(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_foreground" style="background-position: center $2; background-image: url(images/fields/$1/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$3</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace foreground blocks code with relavant markup [foreground-name:posx][/foreground]
+    do { $string = preg_replace('/\[foreground(?:-|=|\:)([-_a-z0-9]+)(?:-|=|\:)(left|right|center|[0-9]+%|[0-9]+px)\](.*?)\[\/foreground(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_foreground" style="background-position: $2 center; background-image: url(images/fields/$1/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$3</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace foreground blocks code with relavant markup [foreground-name][/foreground]
+    do { $string = preg_replace('/\[foreground(?:-|=|\:)([-_a-z0-9]+)\](.*?)\[\/foreground(?:-\1)?(?:-\2)?\]/is', '<div class="field field_panel field_panel_foreground" style="background-image: url(images/fields/$1/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');"><div class="wrap">$2</div></div>', $string, -1, $count); }
+    while ($count > 0);
+    // Replace foreground blocks code with relavant markup [foreground][/foreground]
+    do { $string = preg_replace('/\[foreground\](.*?)\[\/foreground\]/is', '<div class="field field_panel field_panel_foreground"><div class="wrap">$1</div></div>', $string, -1, $count); }
+    while ($count > 0);
+
+    // -- REPLACE LAYER WRAPPERS -- //
+
+    // Replace layer wrappers code with relavant markup [layer][/layer]
+    do { $string = preg_replace('/\[layer(?:-|=|\:)([0-9]+)%\](.*?)\[\/layer\]/is', '<div class="layer" style="opacity: 0.$1;">$2</div>', $string, -1, $count); }
+    while ($count > 0);
+
+    // Replace layer wrappers code with relavant markup [layer][/layer]
+    do { $string = preg_replace('/\[layer\](.*?)\[\/layer\]/is', '<div class="layer">$1</div>', $string, -1, $count); }
+    while ($count > 0);
 
     // -- REPLACE ALIGN BLOCKS -- //
 
