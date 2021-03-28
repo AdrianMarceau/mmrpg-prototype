@@ -205,7 +205,7 @@ function mmrpg_formatting_decode($string){
         $mmrpg_formatting_array += array(
 
             // spoiler tags
-            '/\[([^\[\]]+)\]\{spoiler\}/i' => '<span class="type type_span ability_type ability_type_space" style="background-image: none; color: rgb(54,57,90);">$1</span>',
+            '/\[([^\[\]]+)\]\{spoiler\}/i' => '<span class="type type_span ability_type ability_type_space spoiler_span">$1</span>',
 
             /*
 

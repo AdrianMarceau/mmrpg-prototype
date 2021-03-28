@@ -6035,6 +6035,35 @@ body.windowFlag_landscapeMode #window .page .type_block {
     margin-bottom: 5px;
 }
 
+#window .page .body .bodytext .spoiler_span {
+    color: rgba(255, 255, 255, 0);
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0);
+    cursor: pointer;
+    transition: color 0.3s, text-shadow 0.3s;
+    padding: 0 10px;
+}
+#window .page .body .bodytext .spoiler_span:before {
+    content: "\f06e";
+    color: rgba(255, 255, 255, 0.6);
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    margin-right: 5px;
+}
+#window .page .body .bodytext .spoiler_span:hover {
+    color: rgba(255, 255, 255, 1.0);
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+}
+#window .page .body .bodytext .spoiler_span:hover:before {
+    color: rgba(255, 255, 255, 1.0);
+}
+
 
 #window .page .body .bodytext .comic_layout {
     display: block;
