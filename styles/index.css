@@ -6133,6 +6133,19 @@ body.windowFlag_landscapeMode #window .page .type_block {
 
 /* -- inline-responsive layout -- */
 
+#window .popup_body .page .body .comic_layout {
+    display: block;
+}
+#window .popup_body .page .body .comic_layout:after {
+    display: block;
+}
+#window .popup_body .page .body .comic_layout .comic_panel {
+    float: left;
+    clear: left;
+    width: auto;
+    max-width: 375px;
+}
+
 @media (max-width: 920px){
 
     #window .page .body .thread_subbody .comic_layout {
