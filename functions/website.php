@@ -135,10 +135,13 @@ function mmrpg_formatting_decode($string){
             '/\[player:left:('.$player_frames_string.'):(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image sprite_image_40x40 sprite_image_40x40_$1" style="right: $2px;"><span><img src="images/players/$3/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
             '/\[player:right:('.$player_frames_string.'):(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image sprite_image_40x40 sprite_image_40x40_$1" style="left: $2px;"><span><img src="images/players/$3/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span></span>',
 
+            '/"images\/players\/(https?:\/\/(?:[^"]+))\/(?:sprite|mug|icon)_(?:left|right)_(?:40x40|80x80|160x160).png\?(?:[-0-9]+)"/i' => '"$1"',
+            '/alt="https?:\/\/(?:[^"]+)"/i' => 'alt=""',
+
             );
         $mmrpg_formatting_array += array(
 
-            // robot 80x80
+            // robot 80x80 (official)
             '/\[(robot|mecha|boss)\]\{((?:'.$mmrpg_large_robot_images_string.')(?:_[a-z0-9]+)?)\}/i' => '<span class="sprite_image $1 sprite_image_80x80"><img src="images/robots/$2/mug_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
             '/\[(robot|mecha|boss):(left|right)\]\{((?:'.$mmrpg_large_robot_images_string.')(?:_[a-z0-9]+)?)\}/i' => '<span class="sprite_image $1 sprite_image_80x80"><img src="images/robots/$3/mug_$2_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span>',
             '/\[(robot|mecha|boss):(left|right):('.$robot_frames_string.')\]\{((?:'.$mmrpg_large_robot_images_string.')(?:_[a-z0-9]+)?)\}/i' => '<span class="sprite_image $1 sprite_image_80x80 sprite_image_80x80_$3"><span><img src="images/robots/$4/sprite_$2_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$4" /></span></span>',
@@ -149,16 +152,30 @@ function mmrpg_formatting_decode($string){
             '/\[(robot|mecha|boss):left:('.$robot_frames_string.'):(-?[0-9]+)\]\{((?:'.$mmrpg_large_robot_images_string.')(?:_[a-z0-9]+)?)\}/i' => '<span class="sprite_image $1 sprite_image_80x80 sprite_image_80x80_$2" style="right: $3px;"><span><img src="images/robots/$4/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$4" /></span></span>',
             '/\[(robot|mecha|boss):right:('.$robot_frames_string.'):(-?[0-9]+)\]\{((?:'.$mmrpg_large_robot_images_string.')(?:_[a-z0-9]+)?)\}/i' => '<span class="sprite_image $1 sprite_image_80x80 sprite_image_80x80_$2" style="left: $3px;"><span><img src="images/robots/$4/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$4" /></span></span>',
 
-            // robot 40x40
-            '/\[(robot|mecha|boss)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40"><img src="images/robots/$2/mug_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
-            '/\[(robot|mecha|boss):(left|right)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40"><img src="images/robots/$3/mug_$2_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span>',
-            '/\[(robot|mecha|boss):(left|right):('.$robot_frames_string.')\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$3"><span><img src="images/robots/$4/sprite_$2_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$4" /></span></span>',
-            '/\[(robot|mecha|boss):left:('.$robot_frames_string.'):(-?[0-9]+),(-?[0-9]+),(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="right: $3px; bottom: $4px; z-index: $5;"><span><img src="images/robots/$6/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$6" /></span></span>',
-            '/\[(robot|mecha|boss):right:('.$robot_frames_string.'):(-?[0-9]+),(-?[0-9]+),(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="left: $3px; bottom: $4px; z-index: $5;"><span><img src="images/robots/$6/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$6" /></span></span>',
-            '/\[(robot|mecha|boss):left:('.$robot_frames_string.'):(-?[0-9]+),(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="right: $3px; bottom: $4px;"><span><img src="images/robots/$5/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$5" /></span></span>',
-            '/\[(robot|mecha|boss):right:('.$robot_frames_string.'):(-?[0-9]+),(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="left: $3px; bottom: $4px;"><span><img src="images/robots/$5/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$5" /></span></span>',
-            '/\[(robot|mecha|boss):left:('.$robot_frames_string.'):(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="right: $3px;"><span><img src="images/robots/$4/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$4" /></span></span>',
-            '/\[(robot|mecha|boss):right:('.$robot_frames_string.'):(-?[0-9]+)\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="left: $3px;"><span><img src="images/robots/$4/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$4" /></span></span>',
+            // robot 80x80 (custom)
+            '/\[(robot|mecha|boss)\]\[80\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_80x80"><img src="images/robots/$2/mug_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
+            '/\[(robot|mecha|boss):(left|right)\]\[80\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_80x80"><img src="images/robots/$3/mug_$2_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span>',
+            '/\[(robot|mecha|boss):(left|right):('.$robot_frames_string.')\]\[80\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_80x80 sprite_image_80x80_$3"><span><img src="images/robots/$4/sprite_$2_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$4" /></span></span>',
+            '/\[(robot|mecha|boss):left:('.$robot_frames_string.'):(-?[0-9]+),(-?[0-9]+),(-?[0-9]+)\]\[80\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_80x80 sprite_image_80x80_$2" style="right: $3px; bottom: $4px; z-index: $5;"><span><img src="images/robots/$6/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$6" /></span></span>',
+            '/\[(robot|mecha|boss):right:('.$robot_frames_string.'):(-?[0-9]+),(-?[0-9]+),(-?[0-9]+)\]\[80\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_80x80 sprite_image_80x80_$2" style="left: $3px; bottom: $4px; z-index: $5;"><span><img src="images/robots/$6/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$6" /></span></span>',
+            '/\[(robot|mecha|boss):left:('.$robot_frames_string.'):(-?[0-9]+),(-?[0-9]+)\]\[80\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_80x80 sprite_image_80x80_$2" style="right: $3px; bottom: $4px;"><span><img src="images/robots/$5/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$5" /></span></span>',
+            '/\[(robot|mecha|boss):right:('.$robot_frames_string.'):(-?[0-9]+),(-?[0-9]+)\]\[80\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_80x80 sprite_image_80x80_$2" style="left: $3px; bottom: $4px;"><span><img src="images/robots/$5/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$5" /></span></span>',
+            '/\[(robot|mecha|boss):left:('.$robot_frames_string.'):(-?[0-9]+)\]\[80\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_80x80 sprite_image_80x80_$2" style="right: $3px;"><span><img src="images/robots/$4/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$4" /></span></span>',
+            '/\[(robot|mecha|boss):right:('.$robot_frames_string.'):(-?[0-9]+)\]\[80\]\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_80x80 sprite_image_80x80_$2" style="left: $3px;"><span><img src="images/robots/$4/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$4" /></span></span>',
+
+            // robot 40x40 (official / custom)
+            '/\[(robot|mecha|boss)\](?:\[40\])?\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40"><img src="images/robots/$2/mug_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$2" /></span>',
+            '/\[(robot|mecha|boss):(left|right)\](?:\[40\])?\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40"><img src="images/robots/$3/mug_$2_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$3" /></span>',
+            '/\[(robot|mecha|boss):(left|right):('.$robot_frames_string.')\](?:\[40\])?\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$3"><span><img src="images/robots/$4/sprite_$2_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$4" /></span></span>',
+            '/\[(robot|mecha|boss):left:('.$robot_frames_string.'):(-?[0-9]+),(-?[0-9]+),(-?[0-9]+)\](?:\[40\])?\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="right: $3px; bottom: $4px; z-index: $5;"><span><img src="images/robots/$6/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$6" /></span></span>',
+            '/\[(robot|mecha|boss):right:('.$robot_frames_string.'):(-?[0-9]+),(-?[0-9]+),(-?[0-9]+)\](?:\[40\])?\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="left: $3px; bottom: $4px; z-index: $5;"><span><img src="images/robots/$6/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$6" /></span></span>',
+            '/\[(robot|mecha|boss):left:('.$robot_frames_string.'):(-?[0-9]+),(-?[0-9]+)\](?:\[40\])?\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="right: $3px; bottom: $4px;"><span><img src="images/robots/$5/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$5" /></span></span>',
+            '/\[(robot|mecha|boss):right:('.$robot_frames_string.'):(-?[0-9]+),(-?[0-9]+)\](?:\[40\])?\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="left: $3px; bottom: $4px;"><span><img src="images/robots/$5/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$5" /></span></span>',
+            '/\[(robot|mecha|boss):left:('.$robot_frames_string.'):(-?[0-9]+)\](?:\[40\])?\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="right: $3px;"><span><img src="images/robots/$4/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$4" /></span></span>',
+            '/\[(robot|mecha|boss):right:('.$robot_frames_string.'):(-?[0-9]+)\](?:\[40\])?\{(.*?)\}/i' => '<span class="sprite_image $1 sprite_image_40x40 sprite_image_40x40_$2" style="left: $3px;"><span><img src="images/robots/$4/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'" alt="$4" /></span></span>',
+
+            '/"images\/robots\/(https?:\/\/(?:[^"]+))\/(?:sprite|mug|icon)_(?:left|right)_(?:40x40|80x80|160x160).png\?(?:[-0-9]+)"/i' => '"$1"',
+            '/alt="https?:\/\/(?:[^"]+)"/i' => 'alt=""',
 
             );
 
@@ -178,7 +195,10 @@ function mmrpg_formatting_decode($string){
             '/images\/ability\//i' => 'images/abilities/',
             '/images\/item\//i' => 'images/items/',
             '/images\/object\//i' => 'images/objects/',
-            '/images\/shop\//i' => 'images/shops/'
+            '/images\/shop\//i' => 'images/shops/',
+
+            '/"images\/(?:abilities|items|objects|shops)\/(https?:\/\/(?:[^"]+))\/(?:sprite|mug|icon)_(?:left|right)_(?:40x40|80x80|160x160).png\?(?:[-0-9]+)"/i' => '"$1"',
+            '/alt="https?:\/\/(?:[^"]+)"/i' => 'alt=""',
 
             );
 
