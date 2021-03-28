@@ -330,6 +330,7 @@
         if (!empty($user_data['user_name_public']) && $user_data['user_name_public'] != $user_data['user_name']){
             $user_name_display = $user_data['user_name_public'] .' / '. $user_name_display;
         }
+        $this_page_tabtitle = $user_name_display.' | '.$this_page_tabtitle;
 
         // If form data has been submit for this user, we should process it
         $form_data = array();
