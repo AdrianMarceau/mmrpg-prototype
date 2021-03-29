@@ -45,7 +45,7 @@ define('MMRPG_SETTINGS_UPDATE_TIMEOUT', (60 * 60 * 24 * 1)); // In seconds (60se
 
 // Define the global leaderboard values for various sorting methods
 define('MMRPG_SETTINGS_DEFAULT_LEADERBOARD_METRIC', 'battle_points');
-define('MMRPG_SETTINGS_CURRENT_LEADERBOARD_METRIC', 'battle_points');
+define('MMRPG_SETTINGS_CURRENT_LEADERBOARD_METRIC', (date('m-d') === '04-01' ? 'battle_zenny' : 'battle_points'));
 
 // Define the global password salt and omega seed strings if not already set
 if (!defined('MMRPG_SETTINGS_PASSWORD_SALT')){ define('MMRPG_SETTINGS_PASSWORD_SALT', 'mmrpg'); }
