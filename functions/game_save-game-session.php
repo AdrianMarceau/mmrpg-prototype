@@ -110,6 +110,7 @@ function mmrpg_save_game_session(){
                 $this_board_array['user_id'] = $temp_user_id;
                 $this_board_array['save_id'] = $temp_save_id;
                 $this_board_array['board_points'] = !empty($this_counters['battle_points']) ? $this_counters['battle_points'] : 0;
+                $this_board_array['board_zenny'] = !empty($this_counters['battle_zenny']) ? $this_counters['battle_zenny'] : 0;
                 $this_board_array['board_robots_count'] = 0;
                 $this_board_array['board_robots'] = array();
                 $this_board_array['board_stars'] = 0;
@@ -421,6 +422,7 @@ function mmrpg_save_game_session(){
             foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_missions_'.$ptoken] = 0; }
         $this_board_array['board_awards'] = !empty($this_values['prototype_awards']) ? array_keys($this_values['prototype_awards']) : '';
         $this_board_array['board_awards'] = !empty($this_board_array['board_awards']) ? implode(',', $this_board_array['board_awards']) : '';
+        $this_board_array['board_zenny'] = !empty($this_counters['battle_zenny']) ? $this_counters['battle_zenny'] : 0;
         $this_board_array['board_date_modified'] = time();
 
         // Update this board's info in the database
