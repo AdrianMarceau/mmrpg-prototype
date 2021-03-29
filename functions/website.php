@@ -311,13 +311,13 @@ function mmrpg_formatting_decode($string){
         // -- REPLACE COLOUR BLOCKS/SPANS (LEGACY) -- //
 
         // Replace colour blocks code with relavant markup [color-value:width,height][/color]
-        do { $string = preg_replace('/\[color(?:-|=|\:)([0-9]+,[0-9]+,[0-9]+)(?:-|=|\:)([0-9]+%|[0-9]+px),([0-9]+%|[0-9]+px)\]'.$content.'\[\/color(?:-\1)?\]/is', '<'.$element.' class="colour_'.$class.'" style="color: rgb($1); width: $2; height: $3;">$4</'.$element.'>', $string, -1, $count); }
+        do { $string = preg_replace('/\[color(?:-|=|\:)([0-9]+,\s?[0-9]+,\s?[0-9]+)(?:-|=|\:)([0-9]+%|[0-9]+px),([0-9]+%|[0-9]+px)\]'.$content.'\[\/color(?:-\1)?\]/is', '<'.$element.' class="colour_'.$class.'" style="color: rgb($1); width: $2; height: $3;">$4</'.$element.'>', $string, -1, $count); }
         while ($count > 0);
         // Replace colour blocks code with relavant markup [color-value:width][/color]
-        do { $string = preg_replace('/\[color(?:-|=|\:)([0-9]+,[0-9]+,[0-9]+)(?:-|=|\:)([0-9]+%|[0-9]+px)\]'.$content.'\[\/color(?:-\1)?\]/is', '<'.$element.' class="colour_'.$class.'" style="color: rgb($1); width: $2;">$3</'.$element.'>', $string, -1, $count); }
+        do { $string = preg_replace('/\[color(?:-|=|\:)([0-9]+,\s?[0-9]+,\s?[0-9]+)(?:-|=|\:)([0-9]+%|[0-9]+px)\]'.$content.'\[\/color(?:-\1)?\]/is', '<'.$element.' class="colour_'.$class.'" style="color: rgb($1); width: $2;">$3</'.$element.'>', $string, -1, $count); }
         while ($count > 0);
         // Replace colour blocks code with relavant markup [color-value][/color]
-        do { $string = preg_replace('/\[color(?:-|=|\:)([0-9]+,[0-9]+,[0-9]+)\]'.$content.'\[\/color(?:-\1)?\]/is', '<'.$element.' class="colour_'.$class.'" style="color: rgb($1);">$2</'.$element.'>', $string, -1, $count); }
+        do { $string = preg_replace('/\[color(?:-|=|\:)([0-9]+,\s?[0-9]+,\s?[0-9]+)\]'.$content.'\[\/color(?:-\1)?\]/is', '<'.$element.' class="colour_'.$class.'" style="color: rgb($1);">$2</'.$element.'>', $string, -1, $count); }
         while ($count > 0);
         // Replace colour blocks code with relavant markup [color][/color]
         do { $string = preg_replace('/\[color\]'.$content.'\[\/color\]/is', '<'.$element.' class="colour_'.$class.'" style="color: #FFFFFF;">$1</'.$element.'>', $string, -1, $count); }
@@ -326,13 +326,13 @@ function mmrpg_formatting_decode($string){
         // -- REPLACE COLOUR BLOCKS/SPANS (NEW) -- //
 
         // Replace colour blocks code with relavant markup [color-value:width,height][/color]
-        do { $string = preg_replace('/\[color(?:-|=|\:)(#[a-f0-9]{6}|[a-z]+|rgb\([0-9]+,[0-9]+,[0-9]+\)|rgba\([0-9]+,[0-9]+,[0-9]+,[.0-9]+\)|[a-z]+)(?:-|=|\:)([0-9]+%|[0-9]+px),([0-9]+%|[0-9]+px)\]'.$content.'\[\/color(?:-\1)?\]/is', '<'.$element.' class="colour_'.$class.'" style="color: $1; width: $2; height: $3;">$4</'.$element.'>', $string, -1, $count); }
+        do { $string = preg_replace('/\[color(?:-|=|\:)(#[a-f0-9]{6}|[a-z]+|rgb\([0-9]+,\s?[0-9]+,\s?[0-9]+\)|rgba\([0-9]+,\s?[0-9]+,\s?[0-9]+,\s?[.0-9]+\))(?:-|=|\:)([0-9]+%|[0-9]+px),([0-9]+%|[0-9]+px)\]'.$content.'\[\/color(?:-\1)?\]/is', '<'.$element.' class="colour_'.$class.'" style="color: $1; width: $2; height: $3;">$4</'.$element.'>', $string, -1, $count); }
         while ($count > 0);
         // Replace colour blocks code with relavant markup [color-value:width][/color]
-        do { $string = preg_replace('/\[color(?:-|=|\:)(#[a-f0-9]{6}|[a-z]+|rgb\([0-9]+,[0-9]+,[0-9]+\)|rgba\([0-9]+,[0-9]+,[0-9]+,[.0-9]+\)|[a-z]+)(?:-|=|\:)([0-9]+%|[0-9]+px)\]'.$content.'\[\/color(?:-\1)?\]/is', '<'.$element.' class="colour_'.$class.'" style="color: $1; width: $2;">$3</'.$element.'>', $string, -1, $count); }
+        do { $string = preg_replace('/\[color(?:-|=|\:)(#[a-f0-9]{6}|[a-z]+|rgb\([0-9]+,\s?[0-9]+,\s?[0-9]+\)|rgba\([0-9]+,\s?[0-9]+,\s?[0-9]+,\s?[.0-9]+\))(?:-|=|\:)([0-9]+%|[0-9]+px)\]'.$content.'\[\/color(?:-\1)?\]/is', '<'.$element.' class="colour_'.$class.'" style="color: $1; width: $2;">$3</'.$element.'>', $string, -1, $count); }
         while ($count > 0);
         // Replace colour blocks code with relavant markup [color-value][/color]
-        do { $string = preg_replace('/\[color(?:-|=|\:)(#[a-f0-9]{6}|[a-z]+|rgb\([0-9]+,[0-9]+,[0-9]+\)|rgba\([0-9]+,[0-9]+,[0-9]+,[.0-9]+\)|[a-z]+)\]'.$content.'\[\/color(?:-\1)?\]/is', '<'.$element.' class="colour_'.$class.'" style="color: $1;">$2</'.$element.'>', $string, -1, $count); }
+        do { $string = preg_replace('/\[color(?:-|=|\:)(#[a-f0-9]{6}|[a-z]+|rgb\([0-9]+,\s?[0-9]+,\s?[0-9]+\)|rgba\([0-9]+,\s?[0-9]+,\s?[0-9]+,\s?[.0-9]+\))\]'.$content.'\[\/color(?:-\1)?\]/is', '<'.$element.' class="colour_'.$class.'" style="color: $1;">$2</'.$element.'>', $string, -1, $count); }
         while ($count > 0);
         // Replace colour blocks code with relavant markup [color][/color]
         do { $string = preg_replace('/\[color\]'.$content.'\[\/color\]/is', '<'.$element.' class="colour_'.$class.'" style="color: #FFFFFF;">$1</'.$element.'>', $string, -1, $count); }
