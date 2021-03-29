@@ -377,6 +377,9 @@ function mmrpg_formatting_decode($string){
     do { $string = preg_replace('/\[([^\[\]]+)\]\{('.$mmrpg_types_array_string.')\}/i', '<span class="type type_span type_$2">$1</span>', $string, -1, $count); }
     while ($count > 0);
 
+    // Replace any instances of "neutral" type blocks to "none" as they should be
+    $string = preg_replace('/(\s|")type_([a-z]+_)?(neutral)(_[a-z]+)?(\s|")/i', '$1type_$2none$4$5', $string);
+
     // -- REPLACE BACKGROUND BLOCKS -- //
 
     // Replace background blocks code with relavant markup [background-name:posx,posy:width,height][/background]
@@ -483,6 +486,7 @@ function mmrpg_formatting_decode($string){
 
     do { $string = preg_replace('/\s{0,}\[quote-right?\](.*?)\[\/quote(?:-right)?\]\s?/is', '<div class="align_panel align_right quote">$1</div>', $string, -1, $count); }
     while ($count > 0);
+
 
     // -- RE-INSERT CODE BLOCKS -- //
 
