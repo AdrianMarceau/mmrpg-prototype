@@ -2184,8 +2184,15 @@ function mmrpg_prototype_star_image($type){
 }
 
 // Define a function for pulling the leaderboard players index
-function mmrpg_prototype_leaderboard_index(){
+function mmrpg_prototype_leaderboard_index($board_metric = ''){
     global $db;
+
+    // Collect the current leaderboard metric in case we need it
+    if (empty($board_metric)){ $board_metric = MMRPG_SETTINGS_CURRENT_LEADERBOARD_METRIC; }
+    $rank_field = 'board_points';
+    if ($board_metric === 'battle_points'){ $rank_field = 'board_points'; }
+    elseif ($board_metric === 'battle_zenny'){ $rank_field = 'board_zenny'; }
+
     // Check to see if the leaderboard index has already been pulled or not
     if (!empty($db->INDEX['LEADERBOARD']['index'])){
         $this_leaderboard_index = json_decode($db->INDEX['LEADERBOARD']['index'], true);
@@ -2197,48 +2204,67 @@ function mmrpg_prototype_leaderboard_index(){
             mmrpg_users.user_name_clean,
             mmrpg_users.user_name_public,
             mmrpg_users.user_date_accessed,
-            mmrpg_leaderboard.board_points
+            mmrpg_leaderboard.board_points,
+            mmrpg_leaderboard.board_zenny
             FROM mmrpg_users
             LEFT JOIN mmrpg_leaderboard ON mmrpg_users.user_id = mmrpg_leaderboard.user_id
-            WHERE mmrpg_leaderboard.board_points > 0 ORDER BY mmrpg_leaderboard.board_points DESC
+            WHERE mmrpg_leaderboard.'.$rank_field.' > 0 ORDER BY mmrpg_leaderboard.'.$rank_field.' DESC
             ';
         // Query the database and collect the array list of all online players
         $this_leaderboard_index = $db->get_array_list($temp_leaderboard_query);
         // Update the database index cache
         $db->INDEX['LEADERBOARD']['index'] = json_encode($this_leaderboard_index);
     }
+
     // Return the collected leaderboard index
     return $this_leaderboard_index;
 }
 
+// Define a function for collecting the leaderboard ranking index
+function mmrpg_prototype_leaderboard_rank_index($board_metric = ''){
+    static $this_rank_index;
+    if (empty($this_rank_index)){
+
+        // Collect the current leaderboard metric in case we need it
+        if (empty($board_metric)){ $board_metric = MMRPG_SETTINGS_CURRENT_LEADERBOARD_METRIC; }
+        $rank_field = 'board_points';
+        if ($board_metric === 'battle_points'){ $rank_field = 'board_points'; }
+        elseif ($board_metric === 'battle_zenny'){ $rank_field = 'board_zenny'; }
+
+        // Collect the leaderboard index for ranking
+        $this_leaderboard_index = mmrpg_prototype_leaderboard_index();
+
+        // Generate the points index and then break it down to unique for ranks
+        $this_points_index = array();
+        if (!empty($this_leaderboard_index)){
+            foreach ($this_leaderboard_index AS $info){
+                $this_points_index[] = $info[$rank_field];
+            }
+        }
+        $this_points_index = array_unique($this_points_index);
+
+        // Loop through all the players and generate a rank index
+        $this_rank_index = array();
+        foreach ($this_leaderboard_index AS $key => $board_info){
+            $temp_rank = array_search($board_info[$rank_field], $this_points_index) + 1;
+            $this_rank_index[$board_info['user_id']] = $temp_rank;
+        }
+
+
+    }
+    return $this_rank_index;
+
+}
+
 // Define a function for collecting the requested player's board ranking
-function mmrpg_prototype_leaderboard_rank($user_id){
+function mmrpg_prototype_leaderboard_rank($user_id, $board_metric = ''){
     global $db;
 
-    // Generate the query for selecting this user's rank
-    $rank_query = "SELECT
-        uo.user_id,
-        uo.board_points,
-        (SELECT
-            COUNT(DISTINCT ui.board_points)
-            FROM mmrpg_leaderboard AS ui
-            WHERE
-            ui.board_points >= uo.board_points
-            AND ui.user_id <> uo.user_id
-            ) AS user_rank
-        FROM mmrpg_leaderboard uo
-        WHERE
-        user_id = {$user_id} AND
-        uo.board_points > 0
-        ;";
+    // Collect the rank index to start
+    $this_rank_index = mmrpg_prototype_leaderboard_rank_index($board_metric);
 
-    // Query the database for this user's specific ranking
-    $rank_info = $db->get_array($rank_query);
-
-    // Return the user's rank if not empty
-    if (!empty($rank_info['user_rank'])){ return (int)($rank_info['user_rank']); }
-    // Otherwise, simply return a zero rank
-    else { return 0; }
+    // Return the rank of this user id if set
+    return isset($this_rank_index[$user_id]) ? $this_rank_index[$user_id] : count($this_rank_index) + 1;
 
 }
 
@@ -2280,6 +2306,13 @@ function mmrpg_prototype_leaderboard_rank_legacy($user_id, $year_token = 2016){
 // Define a function for pulling the leaderboard online player
 function mmrpg_prototype_leaderboard_online(){
     global $db;
+
+    // Collect the current leaderboard metric in case we need it
+    $board_metric = MMRPG_SETTINGS_CURRENT_LEADERBOARD_METRIC;
+    $rank_field = 'board_points';
+    if ($board_metric === 'battle_points'){ $rank_field = 'board_points'; }
+    elseif ($board_metric === 'battle_zenny'){ $rank_field = 'board_zenny'; }
+
     // Check to see if the leaderboard online has already been pulled or not
     if (!empty($db->INDEX['LEADERBOARD']['online'])){
         $this_leaderboard_online_players = json_decode($db->INDEX['LEADERBOARD']['online'], true);
@@ -2290,7 +2323,7 @@ function mmrpg_prototype_leaderboard_online(){
         $this_points_index = array();
         if (!empty($this_leaderboard_index)){
             foreach ($this_leaderboard_index AS $info){
-                $this_points_index[] = $info['board_points'];
+                $this_points_index[] = $info[$rank_field];
             }
         }
         $this_points_index = array_unique($this_points_index);
@@ -2306,8 +2339,8 @@ function mmrpg_prototype_leaderboard_online(){
                     $temp_usertoken = $board['user_name_clean'];
                     $temp_username = !empty($board['user_name_public']) ? $board['user_name_public'] : $board['user_name'];
                     $temp_username = htmlentities($temp_username, ENT_QUOTES, 'UTF-8', true);
-                    $temp_points = !empty($board['board_points']) ? $board['board_points'] : 0;
-                    $temp_place = array_search($board['board_points'], $this_points_index) + 1;
+                    $temp_points = !empty($board[$rank_field]) ? $board[$rank_field] : 0;
+                    $temp_place = array_search($board[$rank_field], $this_points_index) + 1;
                     $this_leaderboard_online_players[] = array('id' => $temp_userid, 'name' => $temp_username, 'token' => $temp_usertoken, 'points' => $temp_points, 'place' => $temp_place);
                 }
             }
@@ -2315,6 +2348,7 @@ function mmrpg_prototype_leaderboard_online(){
         // Update the database index cache
         $db->INDEX['LEADERBOARD']['online'] = json_encode($this_leaderboard_online_players);
     }
+
     // Return the collected online players if any
     return $this_leaderboard_online_players;
 }

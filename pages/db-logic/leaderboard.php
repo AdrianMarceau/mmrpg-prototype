@@ -42,6 +42,7 @@ elseif (!empty($this_current_sub) && preg_match('/^([-_a-z0-9]+)$/i', $this_curr
     mmrpg_leaderboard.board_abilities,
     mmrpg_leaderboard.board_missions,
     mmrpg_leaderboard.board_awards,
+    mmrpg_leaderboard.board_zenny,
     mmrpg_leaderboard.board_date_created,
     mmrpg_leaderboard.board_date_modified,
     mmrpg_saves.save_id,

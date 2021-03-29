@@ -23,6 +23,27 @@ if (strstr($page_content_parsed, $find)){
     $page_content_parsed = str_replace($find, $replace, $page_content_parsed);
 }
 
+// Parse the pseudo-code tag <!-- MMRPG_LEADERBOARD_METRIC_TEXT -->
+$find = '<!-- MMRPG_LEADERBOARD_METRIC_TEXT -->';
+if (strstr($page_content_parsed, $find)){
+    $replace = '';
+    if ($this_leaderboard_metric === 'battle_points'){ $replace = 'Battle Point'; }
+    elseif ($this_leaderboard_metric === 'battle_zenny'){ $replace = 'zenny'; }
+    $page_content_parsed = str_replace($find, $replace, $page_content_parsed);
+}
+
+// Parse the pseudo-code tag <!-- MMRPG_LEADERBOARD_METRIC_METHOD -->
+$find = '<!-- MMRPG_LEADERBOARD_METRIC_METHOD -->';
+if (strstr($page_content_parsed, $find)){
+    $replace = '';
+    if ($this_leaderboard_metric === 'battle_points'){
+        $replace = 'Players earn Battle Points throughout the course of the game by completing certain events, collecting items, unlocking new robots or abilities, and by doing or collecting lots of other things as well.';
+    } elseif ($this_leaderboard_metric === 'battle_zenny'){
+        $replace = 'Players earn zenny throughout the course of the game by completing missions, selling items, or other miscellaneous tasks.';
+    }
+    $page_content_parsed = str_replace($find, $replace, $page_content_parsed);
+}
+
 // Parse the pseudo-code tag <!-- MMRPG_LEADERBOARD_ONLINE_PLAYERS -->
 $find = '<!-- MMRPG_LEADERBOARD_ONLINE_PLAYERS -->';
 if (strstr($page_content_parsed, $find)){

@@ -43,6 +43,10 @@ define('MMRPG_SETTINGS_ACTIVE_TIMEOUT', (60 * 60 * 24 * 90)); // In seconds (60s
 define('MMRPG_SETTINGS_LEGACY_TIMEOUT', (60 * 60 * 24 * 365)); // In seconds (60sec x 60min x 24hr x 365days)
 define('MMRPG_SETTINGS_UPDATE_TIMEOUT', (60 * 60 * 24 * 1)); // In seconds (60sec x 60min x 24hr x 1days)
 
+// Define the global leaderboard values for various sorting methods
+define('MMRPG_SETTINGS_DEFAULT_LEADERBOARD_METRIC', 'battle_points');
+define('MMRPG_SETTINGS_CURRENT_LEADERBOARD_METRIC', 'battle_points');
+
 // Define the global password salt and omega seed strings if not already set
 if (!defined('MMRPG_SETTINGS_PASSWORD_SALT')){ define('MMRPG_SETTINGS_PASSWORD_SALT', 'mmrpg'); }
 if (!defined('MMRPG_SETTINGS_OMEGA_SEED')){ define('MMRPG_SETTINGS_OMEGA_SEED', 'mmrpg'); }

@@ -214,14 +214,15 @@ if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defi
                 board_stars, board_stars_dr_light, board_stars_dr_wily, board_stars_dr_cossack,
                 board_abilities, board_abilities_dr_light, board_abilities_dr_wily, board_abilities_dr_cossack,
                 board_missions, board_missions_dr_light, board_missions_dr_wily, board_missions_dr_cossack,
+                board_zenny,
                 board_date_created, board_date_modified
                 FROM mmrpg_leaderboard
                 WHERE
                 user_id = {$this_userid}
                 ;");
             $this_boardid = $this_boardinfo['board_id'];
-            $this_boardinfo['board_rank'] = !empty($_SESSION['GAME']['BOARD']['boardrank']) ? $_SESSION['GAME']['BOARD']['boardrank'] : 0;
-            if (empty($this_boardinfo['board_rank'])){ $_SESSION['GAME']['BOARD']['boardrank'] = $this_boardinfo['board_rank'] = mmrpg_prototype_leaderboard_rank($this_userid); }
+            $this_boardinfo['board_rank'] = mmrpg_prototype_leaderboard_rank($this_userid);
+            $_SESSION['GAME']['BOARD']['boardrank'] = $this_boardinfo['board_rank'];
         }
 
     }
@@ -231,7 +232,9 @@ if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defi
         // Collect the guest userinfo from the database
         $this_userid = MMRPG_SETTINGS_GUEST_ID;
         if (empty($_SESSION['GAME']['USER']['userinfo'])){
-            $this_userinfo = $db->get_array("SELECT users.* FROM mmrpg_users AS users WHERE users.user_id = '{$this_userid}' LIMIT 1");
+            $temp_user_fields = rpg_user::get_index_fields(true, 'users');
+            $temp_user_role_fields = rpg_user_role::get_index_fields(true, 'roles');
+            $this_userinfo = $db->get_array("SELECT {$temp_user_fields}, {$temp_user_role_fields} FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$this_userid}' LIMIT 1");
             $_SESSION['GAME']['USER']['userinfo'] = $this_userinfo;
         } else {
             $this_userinfo = $_SESSION['GAME']['USER']['userinfo'];

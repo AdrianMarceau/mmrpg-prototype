@@ -1,5 +1,8 @@
 <?
 
+// Check to see which metric we'll be sorting based on
+if (!isset($this_leaderboard_metric)){ $this_leaderboard_metric = MMRPG_SETTINGS_CURRENT_LEADERBOARD_METRIC; }
+
 // Collect and define the display limit if set
 $this_start_key = !empty($_GET['start']) ? trim($_GET['start']) : 0;
 if (!isset($this_display_limit_default)){ $this_display_limit_default = 50; }
@@ -12,6 +15,7 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
     global $this_userid, $this_userinfo, $this_boardinfo;
     global $this_display_limit, $this_num_offset;
     global $this_time, $this_start_key, $this_display_limit_default;
+    global $this_leaderboard_metric;
 
     global $mmrpg_index_players;
     if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
@@ -23,8 +27,13 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
 
     $board_key = $key;
 
-    // Collect the points
-    $this_points = $board['board_points'];
+    // Collect the points/zenny/etc.
+    $this_points = 0;
+    if ($this_leaderboard_metric === 'battle_points'){
+        $this_points = $board['board_points'];
+    } elseif ($this_leaderboard_metric === 'battle_zenny'){
+        $this_points = $board['board_zenny'];
+    }
 
     // Define the awards strong and default to empty
     $this_user_awards = ' ';
@@ -68,8 +77,16 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
             if (!empty($this_stars_count)){ $this_records_html[] = '<span class="count stars">'.$this_stars_count.'</span>'; }
             $this_records_html = implode(' <span class="pipe">|</span> ', $this_records_html);
 
-            $this_points_html = '<span class="value">'.(!empty($this_points) ? number_format($this_points, 0, '.', ',') : 0).'</span>'.' BP';
-            $this_points_plain = (!empty($this_points) ? number_format($this_points, 0, '.', ',') : 0).' BP';
+            $this_points_html = '<span class="value">'.(!empty($this_points) ? number_format($this_points, 0, '.', ',') : 0).'</span>';
+            $this_points_plain = (!empty($this_points) ? number_format($this_points, 0, '.', ',') : 0);
+
+            if ($this_leaderboard_metric === 'battle_points'){
+                $this_points_html .= ' BP';
+                $this_points_plain .= ' BP';
+            } elseif ($this_leaderboard_metric === 'battle_zenny'){
+                $this_points_html .= ' &#438;';
+                $this_points_plain .= ' z';
+            }
 
             $this_details = ''.$this_last_save;
 
@@ -88,7 +105,8 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
                 $this_awards[] = 'ranking_third_place';
                 $this_awards_string = implode(',', $this_awards);
             }
-            if (!empty($this_awards_string)){
+            if (!empty($this_awards_string)
+                && $this_leaderboard_metric === MMRPG_SETTINGS_DEFAULT_LEADERBOARD_METRIC){
                 $db->query("UPDATE mmrpg_leaderboard SET board_awards = '{$this_awards_string}' WHERE user_id = {$board['user_id']};");
             }
 
@@ -151,6 +169,9 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
 $this_limit_query = '';
 if ($this_current_page == 'home'){ $this_limit_query = "LIMIT {$this_display_limit_default} "; }
 $this_online_timeout = MMRPG_SETTINGS_ONLINE_TIMEOUT;
+$this_sort_field = 'board.board_points';
+if ($this_leaderboard_metric === 'battle_points'){ $this_sort_field = 'board.board_points'; }
+elseif ($this_leaderboard_metric === 'battle_zenny'){ $this_sort_field = 'board.board_zenny'; }
 $temp_leaderboard_query = "SELECT
     users.user_id,
     users.user_name,
@@ -191,14 +212,15 @@ $temp_leaderboard_query = "SELECT
     board.board_missions_dr_wily,
     board.board_missions_dr_cossack,
     board.board_awards,
+    board.board_zenny,
     board.board_date_created,
     board.board_date_modified
     FROM mmrpg_users AS users
     LEFT JOIN mmrpg_leaderboard AS board ON users.user_id = board.user_id
     LEFT JOIN mmrpg_saves AS saves ON saves.user_id = board.user_id
-    WHERE board.board_points > 0
+    WHERE {$this_sort_field} > 0
     ORDER BY
-    board.board_points DESC,
+    {$this_sort_field} DESC,
     saves.save_date_modified DESC
     {$this_limit_query}
     ;";
@@ -222,9 +244,9 @@ if ($this_current_page == 'home'){
     FROM mmrpg_users AS users
     LEFT JOIN mmrpg_leaderboard AS board ON users.user_id = board.user_id
     LEFT JOIN mmrpg_saves AS saves ON saves.user_id = board.user_id
-    WHERE board.board_points > 0
+    WHERE {$this_sort_field} > 0
     ORDER BY
-    board.board_points DESC,
+    {$this_sort_field} DESC,
     saves.save_date_modified DESC
     ;", 'num_players');
 }
@@ -253,7 +275,7 @@ if (!empty($this_leaderboard_index)){
         if (!empty($board['user_is_online'])){
             //echo("<!-- !empty(\$board['user_is_online']) -->\n");
             $this_leaderboard_online_count++;
-            $this_current_page_number = ceil($key / $this_display_limit_default);
+            $this_current_page_number = ceil(($key + 1) / $this_display_limit_default);
             if (!in_array($this_current_page_number, $this_leaderboard_online_pages)){ $this_leaderboard_online_pages[] = $this_current_page_number; }
             $this_leaderboard_online_players[] = array(
                 'id' => $board['user_id'],
