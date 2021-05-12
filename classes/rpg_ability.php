@@ -1668,35 +1668,19 @@ class rpg_ability extends rpg_object {
             // Otherwise, if record not exists or too old, generate a new one
             else {
 
-                // Collect relevant save files from the database
-                $temp_player_query = "SELECT
-                    saves.user_id,
-                    saves.save_values_battle_rewards,
-                    saves.save_values_battle_settings,
-                    board.board_points
-                    FROM mmrpg_saves AS saves
-                    LEFT JOIN mmrpg_leaderboard AS board ON board.user_id = saves.user_id
+                // Collect temp ability records directly from the database
+                $temp_ability_records = $db->get_array("SELECT
+                    COUNT(DISTINCT(unlocked.user_id)) AS ability_unlocked,
+                    0 AS ability_equipped
+                    FROM mmrpg_users_abilities_unlocked AS unlocked
+                    LEFT JOIN mmrpg_index_abilities AS abilities ON abilities.ability_token = unlocked.ability_token
+                    LEFT JOIN mmrpg_leaderboard AS leaderboard ON leaderboard.user_id = unlocked.user_id
                     WHERE
-                    board.board_points > 0
-                    AND (saves.save_values_battle_rewards LIKE '%\"{$record_token}\"%'
-                    OR saves.save_values_battle_settings LIKE '%\"{$record_token}\"%')
-                    ;";
-                $temp_player_list = $db->get_array_list($temp_player_query);
-
-                // Loop through save files and count unlock records etc.
-                if (!empty($temp_player_list)){
-                    foreach ($temp_player_list AS $temp_data){
-                        $temp_rewards = !empty($temp_data['save_values_battle_rewards']) ? $temp_data['save_values_battle_rewards'] : array();
-                        $temp_settings = !empty($temp_data['save_values_battle_settings']) ? $temp_data['save_values_battle_settings'] : array();
-                        if (strstr($temp_settings, '"'.$record_token.'"')){
-                            $temp_ability_records['ability_equipped'] += substr_count($temp_settings, '"'.$record_token.'"');
-                            $temp_ability_records['ability_unlocked'] += 1;
-                        } elseif (strstr($temp_rewards, '"'.$record_token.'"')){
-                            $temp_ability_records['ability_unlocked'] += 1;
-                        }
-
-                    }
-                }
+                    unlocked.ability_token = '{$record_token}'
+                    AND abilities.ability_flag_complete = 1
+                    AND abilities.ability_flag_unlockable = 1
+                    AND leaderboard.board_points > 0
+                    ;");
 
                 // Now that we have the data, either insert or update the record in the db
                 if (empty($existing_record)){
@@ -2395,12 +2379,14 @@ class rpg_ability extends rpg_object {
                                         <span class="ability_record"><?= $temp_ability_records['ability_unlocked'] == 1 ? '1 Player' : number_format($temp_ability_records['ability_unlocked'], 0, '.', ',').' Players' ?></span>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td class="right">
-                                        <label>Equipped To : </label>
-                                        <span class="ability_record"><?= $temp_ability_records['ability_equipped'] == 1 ? '1 Robot' : number_format($temp_ability_records['ability_equipped'], 0, '.', ',').' Robots' ?></span>
-                                    </td>
-                                </tr>
+                                <? if (!empty($temp_ability_records['ability_equipped'])){ ?>
+                                    <tr>
+                                        <td class="right">
+                                            <label>Equipped To : </label>
+                                            <span class="ability_record"><?= $temp_ability_records['ability_equipped'] == 1 ? '1 Robot' : number_format($temp_ability_records['ability_equipped'], 0, '.', ',').' Robots' ?></span>
+                                        </td>
+                                    </tr>
+                                <? } ?>
                             </tbody>
                         </table>
                     </div>
