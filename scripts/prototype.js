@@ -413,14 +413,16 @@ function windowResizePrototype(){
 }
 
 // Define a function to trigger when resetting data
-function mmrpg_trigger_reset(){
+function mmrpg_trigger_reset(fullReset){
     // Define the confirmation text string
+    var fullReset = typeof fullReset !== 'boolean' ? false : true;
     var confirmText = 'Are you sure you want to reset your entire game?\nAll progress will be lost and cannot be restored including any and all unlocked missions, robots, and abilities. Continue?';
     var confirmText2 = 'Let me repeat that one more time.\nIf you reset your game ALL unlocks and progress with be lost. \nEverything. \nReset anyway?';
     // Attempt to confirm with the user of they want to resey
     if (confirm(confirmText) && confirm(confirmText2)){
         // Redirect the user to the prototype reset page
         var postURL = 'prototype.php?action=reset';
+        if (fullReset){ postURL += '&full_reset=true'; }
         $.post(postURL, function(){
             //alert('reset complete!');
             if (window.self != window.parent){

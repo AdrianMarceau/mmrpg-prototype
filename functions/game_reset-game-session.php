@@ -1,6 +1,6 @@
 <?
 // Define a function for resetting the game session
-function mmrpg_reset_game_session(){
+function mmrpg_reset_game_session($delete_db_records = false, $delete_db_records_user_id = 0){
 
     // Reference global variables
     global $db;
@@ -92,14 +92,17 @@ function mmrpg_reset_game_session(){
 
         // Clear all records for this user from the database
         $user_id = rpg_user::get_current_userid();
-        if (rpg_user::is_member() && !empty($user_id)){
-            $db->delete('mmrpg_users_save_counters', array('user_id' => $user_id));
-            $db->delete('mmrpg_users_robots_records', array('user_id' => $user_id));
-            $db->delete('mmrpg_users_items_unlocked', array('user_id' => $user_id));
-            $db->delete('mmrpg_users_abilities_unlocked', array('user_id' => $user_id));
-            $db->delete('mmrpg_users_stars_unlocked', array('user_id' => $user_id));
-            //$db->delete('mmrpg_challenges_leaderboard', array('user_id' => $user_id));
-            //$db->delete('mmrpg_challenges_waveboard', array('user_id' => $user_id));
+        if ($delete_db_records === true
+            && !empty($delete_db_records_user_id)
+            && $delete_db_records_user_id === $user_id
+            && rpg_user::is_member()){
+            $db->delete('mmrpg_users_save_counters', array('user_id' => $delete_db_records_user_id));
+            $db->delete('mmrpg_users_robots_records', array('user_id' => $delete_db_records_user_id));
+            $db->delete('mmrpg_users_items_unlocked', array('user_id' => $delete_db_records_user_id));
+            $db->delete('mmrpg_users_abilities_unlocked', array('user_id' => $delete_db_records_user_id));
+            $db->delete('mmrpg_users_stars_unlocked', array('user_id' => $delete_db_records_user_id));
+            $db->delete('mmrpg_challenges_leaderboard', array('user_id' => $delete_db_records_user_id));
+            $db->delete('mmrpg_challenges_waveboard', array('user_id' => $delete_db_records_user_id));
         }
 
         // Define a session var to ensure full reset

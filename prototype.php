@@ -45,7 +45,14 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset'){
     $this_user = $_SESSION[$session_token]['USER'];
 
     // Reset the game session and reload the page
-    mmrpg_reset_game_session();
+    //$db->log_queries = true;
+    if (!empty($_REQUEST['full_reset'])
+        && $_REQUEST['full_reset'] == 'true'){
+        mmrpg_reset_game_session(true, $this_user['userid']);
+    } else {
+        mmrpg_reset_game_session();
+    }
+    //$db->log_queries = false;
 
     // Update the appropriate session variables
     $_SESSION[$session_token]['USER'] = $this_user;

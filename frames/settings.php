@@ -491,7 +491,7 @@ if (true){
                 <strong>Save File Options</strong>
             </div>
             <div class="wrapper">
-                <input class="button type type_flame button_reset" type="button" name="reset" value="Reset Entire Game" onclick="javascript:parent.window.mmrpg_trigger_reset();" />
+                <input class="button type type_flame button_reset" type="button" name="reset" value="Reset Entire Game" onclick="javascript:parent.window.mmrpg_trigger_reset(true);" />
             </div>
         </div>
 
