@@ -42,6 +42,7 @@ foreach ($content_types_index AS $content_key => $content_info){
     // Preset the script URL we'll be posting to here
     $post_url = MMRPG_CONFIG_ROOTURL.'admin/scripts/pull-game-content.php';
     //debug_echo('$post_url = '.print_r($post_url, true));
+    //debug_echo('$post_url(full) = '.print_r(($post_url.'?'.http_build_query($post_data)), true));
 
     // Init curl connection and send the request
     $curl = curl_init();
@@ -54,13 +55,27 @@ foreach ($content_types_index AS $content_key => $content_info){
     curl_setopt($curl, CURLOPT_POST, true);
     curl_setopt($curl, CURLOPT_POSTFIELDS, $post_data);
     curl_setopt($curl, CURLOPT_COOKIE, $cookie_string);
+    if (MMRPG_CONFIG_IS_LIVE === false){ curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0); }
     $curl_response = curl_exec($curl);
     //debug_echo('$curl_response = '.print_r($curl_response, true));
+
+    // If the response was completely empty, there was an issue
+    if (empty($curl_response)){
+        if (curl_errno($curl)){
+            //$error_msg = 'Error message(s): '.preg_replace('/\s+/', ' ', strip_tags(curl_error($curl)));
+            $error_msg = curl_error($curl);
+        } else {
+            $error_msg = 'The cURL response was empty!';
+        }
+        curl_close($curl);
+        exit_action('error|There was an error with the cURL request!', $error_msg);
+    }
 
     // Add the response to the feedback array
     list($curl_status, $curl_message) = explode('|', $curl_response);
     $request_feedback[$curl_status][$post_data['kind']] = trim($curl_message);
     $request_feedback['all'][$post_data['kind']] = trim($curl_message);
+    curl_close($curl);
 
 }
 

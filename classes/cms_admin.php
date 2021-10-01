@@ -756,8 +756,8 @@ class cms_admin {
 
     // Define a quick function for filtering a given list of git changes by its data
     public static function git_filter_list_by_data($list, $filter_data, $pk_kind = 'token'){
-        //echo('<pre>git_filter_list_by_data($list, $filter_data)</pre>'.PHP_EOL);
-        //echo('<pre>$list = '.print_r($list, true).'</pre>'.PHP_EOL);
+        //error_log('<pre>git_filter_list_by_data($list, $filter_data)</pre>'.PHP_EOL);
+        //error_log('<pre>$list = '.print_r($list, true).'</pre>'.PHP_EOL);
         //echo('<pre>$filter_data = '.print_r($filter_data, true).'</pre>'.PHP_EOL);
         //echo('<pre>$pk_kind = '.print_r($pk_kind, true).'</pre>'.PHP_EOL);
         if (empty($list)){ return array(); }
@@ -818,7 +818,7 @@ class cms_admin {
                 }
         }
         $list = array_values($list);
-        //echo('<pre>$list = '.print_r($list, true).'</pre>'.PHP_EOL);
+        //error_log('<pre>$list = '.print_r($list, true).'</pre>'.PHP_EOL);
         //exit();
         //echo('--------------------'.PHP_EOL);
 

@@ -11,9 +11,10 @@ function debug_echo($echo){
 }
 
 // Define a function for exiting the script with status first, debug last
-function exit_action($status_line){
+function exit_action($status_line, $output = ''){
     global $return_kind;
-    $output = trim(ob_get_clean());
+    if (!empty($output)){ $output .= PHP_EOL; }
+    $output .= trim(ob_get_clean());
     if ($return_kind === 'html'){
         list($status_name, $status_text) = explode('|', $status_line);
         $status_colour = $status_name === 'success' ? 'green' : 'red';
