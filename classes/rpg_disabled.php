@@ -376,7 +376,11 @@ class rpg_disabled {
             if ($temp_boost_multiplier > 0 || $temp_boost_multiplier < 0){ $temp_experience += $temp_experience * $temp_boost_multiplier; }
             if ($temp_experience <= 0){ $temp_experience = 1; }
             $temp_experience = round($temp_experience);
-            $temp_target_experience = array('level' => $this_robot->robot_level, 'experience' => $temp_experience);
+            $temp_target_experience = array('level' => $this_robot->robot_level, 'experience' => $temp_experience, 'stats' => array());
+            $temp_target_experience['stats']['energy'] = $this_robot->robot_base_energy;
+            $temp_target_experience['stats']['attack'] = $this_robot->robot_base_attack;
+            $temp_target_experience['stats']['defense'] = $this_robot->robot_base_defense;
+            $temp_target_experience['stats']['speed'] = $this_robot->robot_base_speed;
 
             // DEBUG
             //$event_body = preg_replace('/\s+/', ' ', $this_robot->robot_token.' : $temp_target_experience = <pre>'.print_r($temp_target_experience, true).'</pre>');
@@ -391,6 +395,7 @@ class rpg_disabled {
             foreach ($temp_target_robots_active AS $temp_id => $temp_info){
                 $temp_target_robot = $target_robot->robot_id == $temp_info['robot_id'] ? $target_robot : rpg_game::get_robot($this_robot, $target_player, $temp_info);
                 if ($temp_target_robot->robot_class != 'master'){ $temp_target_robots_active_num2--; }
+                if ($temp_target_robot->robot_level >= 100){ $temp_target_robots_active_num2--; }
                 if ($temp_target_robot->robot_position == 'active'){
                     $temp_robot_active_position = $temp_target_robots_active[$temp_id];
                     unset($temp_target_robots_active[$temp_id]);
@@ -432,8 +437,14 @@ class rpg_disabled {
                 // Continue with experience mods only if under level 100
                 if ($temp_target_robot->robot_level < 100){
 
-                    //$debug_text = 'START EXPERIENCE | ';
-                    //$debug_text .= '(for '.$temp_target_robot->robot_token.' via '.$this_robot->robot_token.') <br /> ';
+                    $debug_text = 'START EXPERIENCE | ';
+                    $debug_text .= '(for '.$temp_target_robot->robot_token.' via '.$this_robot->robot_token.') <br /> ';
+                    $debug_text .= 'target_stats = '.(implode($temp_target_experience['stats'], '+')).' | ';
+                    $debug_text .= 'base_experience = '.$temp_target_experience['experience'].' ';
+                    $this_battle->events_debug(__FILE__, __LINE__, $debug_text);
+
+                    $debug_text = 'LEVEL-ADJUSTED EXPERIENCE | ';
+                    $debug_text .= '(for '.$temp_target_robot->robot_token.' via '.$this_robot->robot_token.') <br /> ';
                     // Give a proportionate amount of experience based on this and the target robot's levels
                     if ($temp_target_robot->robot_level == $temp_target_experience['level']){
                         $options->start_experience = $temp_target_experience['experience'];
@@ -442,21 +453,23 @@ class rpg_disabled {
                     } elseif ($temp_target_robot->robot_level > $temp_target_experience['level']){
                         $options->start_experience = $temp_target_experience['experience'] - round((($temp_target_robot->robot_level - $temp_target_experience['level']) / 100)  * $temp_target_experience['experience']);
                     }
-                    //$debug_text .= 'start_experience = '.$options->start_experience.' | ';
-                    //$debug_text .= '(start) earned_experience = '.$options->earned_experience.' ';
-                    //$this_battle->events_create(false, false, 'DEBUG', $debug_text);
+                    $debug_text .= 'levels = '.$temp_target_robot->robot_level.' vs '.$temp_target_experience['level'].' | ';
+                    $debug_text .= 'adjusted_experience = '.$options->start_experience.' | ';
+                    $debug_text .= 'earned_experience = '.$options->start_experience.' (start value) ';
+                    $this_battle->events_debug(__FILE__, __LINE__, $debug_text);
 
-                    //$debug_text = 'ACTIVE ROBOT DIVISION | ';
-                    //$debug_text .= '(for '.$temp_target_robot->robot_token.' via '.$this_robot->robot_token.') <br /> ';
-                    $options->divided_experience = ceil($options->start_experience / $temp_target_robots_active_num);
+                    $debug_text = 'ACTIVE ROBOT DIVISION | ';
+                    $debug_text .= '(for '.$temp_target_robot->robot_token.' via '.$this_robot->robot_token.') <br /> ';
+                    $options->divided_experience = ceil($options->start_experience / $temp_target_robots_active_num2);
                     if ($options->divided_experience > MMRPG_SETTINGS_STATS_MAX){ $options->divided_experience = MMRPG_SETTINGS_STATS_MAX; }
                     $options->earned_experience += $options->divided_experience;
-                    //$debug_text .= 'divided_experience = '.$options->divided_experience.' | ';
-                    //$debug_text .= '(new) earned_experience = '.$options->earned_experience.' ';
-                    //$this_battle->events_create(false, false, 'DEBUG', $debug_text);
+                    $debug_text .= 'growing_active_robots = '.$temp_target_robots_active_num2.' | ';
+                    $debug_text .= 'divided_experience = '.$options->divided_experience.' | ';
+                    $debug_text .= 'earned_experience = '.$options->earned_experience.' (adjusted value) ';
+                    $this_battle->events_debug(__FILE__, __LINE__, $debug_text);
 
-                    //$debug_text = 'PLAYER BOOSTED | ';
-                    //$debug_text .= '(for '.$temp_target_robot->robot_token.' via '.$this_robot->robot_token.') <br /> ';
+                    $debug_text = 'PLAYER BOOSTED | ';
+                    $debug_text .= '(for '.$temp_target_robot->robot_token.' via '.$this_robot->robot_token.') <br /> ';
                     // If this robot has been traded, give it an additional experience boost
                     $options->this_experience_boost = 0;
                     $options->is_player_boosted = false;
@@ -467,12 +480,13 @@ class rpg_disabled {
                         $options->earned_experience *= 2;
                         $options->this_experience_boost = $options->earned_experience - $temp_experience_bak;
                     }
-                    //$debug_text .= 'this_experience_boost = '.$options->this_experience_boost.' | ';
-                    //$debug_text .= '(new) earned_experience = '.$options->earned_experience.' ';
-                    //$this_battle->events_create(false, false, 'DEBUG', $debug_text);
+                    $debug_text .= 'is_player_boosted = '.($options->is_player_boosted ? 'true' : 'false').' | ';
+                    $debug_text .= 'this_experience_boost = '.$options->this_experience_boost.' | ';
+                    $debug_text .= 'earned_experience = '.$options->earned_experience.' (adjusted value) ';
+                    $this_battle->events_debug(__FILE__, __LINE__, $debug_text);
 
-                    //$debug_text = 'FIELD MULTIPLIERS | ';
-                    //$debug_text .= '(for '.$temp_target_robot->robot_token.' via '.$this_robot->robot_token.') <br /> ';
+                    $debug_text = 'FIELD MULTIPLIERS | ';
+                    $debug_text .= '(for '.$temp_target_robot->robot_token.' via '.$this_robot->robot_token.') <br /> ';
                     // If there are field multipliers in place, apply them now
                     $options->this_experience_boost = 0;
                     $options->is_field_boosted = false;
@@ -483,22 +497,36 @@ class rpg_disabled {
                         $temp_experience_bak = $options->earned_experience;
                         $options->earned_experience = ceil($options->earned_experience * $this_robot->field->field_multipliers['experience']);
                         $options->this_experience_boost = $options->earned_experience - $temp_experience_bak;
+                        $debug_text .= 'field_multiplier = '.$this_robot->field->field_multipliers['experience'].' | ';
                     }
-                    //$debug_text .= 'this_experience_boost = '.$options->this_experience_boost.' | ';
-                    //$debug_text .= '(new) earned_experience = '.$options->earned_experience.' ';
-                    //$this_battle->events_create(false, false, 'DEBUG', $debug_text);
+                    $debug_text .= 'this_experience_boost = '.$options->this_experience_boost.' | ';
+                    $debug_text .= 'earned_experience = '.$options->earned_experience.' (adjusted value) ';
+                    $this_battle->events_debug(__FILE__, __LINE__, $debug_text);
 
                     // Trigger this and target robot's item functions if they have been defined for this context
+                    $earned_experience_backup = $options->earned_experience;
                     $this_robot->trigger_custom_function('rpg-robot_trigger-disabled_experience-rewards', $extra_objects);
                     $temp_target_robot->trigger_custom_function('rpg-robot_trigger-disabled_experience-rewards', $extra_objects);
 
-                    //$debug_text = 'MIN/MAX ROUNDING | ';
-                    //$debug_text .= '(for '.$temp_target_robot->robot_token.' via '.$this_robot->robot_token.') <br /> ';
+                    if ($earned_experience_backup != $options->earned_experience){
+                        $custom_kinds = $options->this_experience_boost_kinds;
+                        if (in_array('player', $custom_kinds)){ unset($custom_kinds[array_search('player', $custom_kinds)]); }
+                        if (in_array('field', $custom_kinds)){ unset($custom_kinds[array_search('field', $custom_kinds)]); }
+                        $debug_text = 'CUSTOM MODIFIERS | ';
+                        $debug_text .= '(for '.$temp_target_robot->robot_token.' via '.$this_robot->robot_token.') <br /> ';
+                        $debug_text .= 'custom_modifiers = '.implode($custom_kinds, ', ').' | ';
+                        $debug_text .= 'this_experience_boost = '.$options->this_experience_boost.' | ';
+                        $debug_text .= 'earned_experience = '.$options->earned_experience.' (adjusted value) ';
+                        $this_battle->events_debug(__FILE__, __LINE__, $debug_text);
+                    }
+
+                    $debug_text = 'MIN/MAX ROUNDING | ';
+                    $debug_text .= '(for '.$temp_target_robot->robot_token.' via '.$this_robot->robot_token.') <br /> ';
                     // If the experience is greater then the max, level it off at the max (sorry guys!)
                     if ($options->earned_experience > MMRPG_SETTINGS_STATS_MAX){ $options->earned_experience = MMRPG_SETTINGS_STATS_MAX; }
                     if ($options->earned_experience < MMRPG_SETTINGS_STATS_MIN){ $options->earned_experience = MMRPG_SETTINGS_STATS_MIN; }
-                    //$debug_text .= '(final) earned_experience = '.$options->earned_experience.' ';
-                    //$this_battle->events_create(false, false, 'DEBUG', $debug_text);
+                    $debug_text .= 'earned_experience = '.$options->earned_experience.' (final value)';
+                    $this_battle->events_debug(__FILE__, __LINE__, $debug_text);
 
                     // Update the boost text based on applied multiplier kinds
                     if (!empty($options->this_experience_boost_kinds)){
