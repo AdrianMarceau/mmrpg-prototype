@@ -687,9 +687,13 @@ class rpg_ability_recovery extends rpg_recovery {
                 && $trigger_options['apply_attachment_recovery_modifiers'] != false
                 ){
 
+                // Pre-determine which attachment modifiers we're allowed to apply
+                $apply_origin_attachment_modifiers = isset($trigger_options['apply_origin_attachment_modifiers']) && $trigger_options['apply_origin_attachment_modifiers'] == false ? false : true;
+                $apply_target_attachment_modifiers = isset($trigger_options['apply_target_attachment_modifiers']) && $trigger_options['apply_target_attachment_modifiers'] == false ? false : true;
+
                 // If this robot has an attachment with a recovery multiplier
                 $this_robot_attachments = $this_robot->get_current_attachments();
-                if (!empty($this_robot_attachments)){
+                if ($apply_target_attachment_modifiers && !empty($this_robot_attachments)){
 
                     // Loop through this robot's attachments one-by-one and apply their modifiers
                     foreach ($this_robot_attachments AS $temp_token => $temp_info){
@@ -794,7 +798,7 @@ class rpg_ability_recovery extends rpg_recovery {
 
                 // If this robot has an attachment with a recovery multiplier
                 $target_robot_attachments = $target_robot->get_current_attachments();
-                if (!empty($target_robot_attachments)){
+                if ($apply_origin_attachment_modifiers && !empty($target_robot_attachments)){
 
                     // Loop through the target robot's attachments one-by-one and apply their modifiers
                     foreach ($target_robot_attachments AS $temp_token => $temp_info){
