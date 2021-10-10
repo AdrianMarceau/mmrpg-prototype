@@ -23,6 +23,7 @@ class rpg_item_damage extends rpg_damage {
         if (!isset($trigger_options['apply_field_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_field_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['apply_stat_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_stat_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['apply_attachment_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_attachment_modifiers'] = $trigger_options['apply_modifiers']; }
+        if (!isset($trigger_options['apply_attachment_damage_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_attachment_damage_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['referred_damage'])){ $trigger_options['referred_damage'] = false; }
         if (!isset($trigger_options['referred_damage_id'])){ $trigger_options['referred_damage_id'] = 0; }
         if (!isset($trigger_options['referred_damage_stats'])){ $trigger_options['referred_damage_stats'] = array(); }
@@ -598,6 +599,7 @@ class rpg_item_damage extends rpg_damage {
             if ($trigger_options['apply_modifiers'] != false
                 && $trigger_options['referred_damage'] == false
                 && $trigger_options['apply_attachment_modifiers'] != false
+                && $trigger_options['apply_attachment_damage_modifiers'] != false
                 ){
 
                 // If this robot has an attachment with a damage multiplier

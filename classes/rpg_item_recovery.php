@@ -23,6 +23,7 @@ class rpg_item_recovery extends rpg_recovery {
         if (!isset($trigger_options['apply_field_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_field_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['apply_stat_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_stat_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['apply_attachment_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_attachment_modifiers'] = $trigger_options['apply_modifiers']; }
+        if (!isset($trigger_options['apply_attachment_recovery_modifiers']) || $trigger_options['apply_modifiers'] == false){ $trigger_options['apply_attachment_recovery_modifiers'] = $trigger_options['apply_modifiers']; }
         if (!isset($trigger_options['referred_recovery'])){ $trigger_options['referred_recovery'] = false; }
         if (!isset($trigger_options['referred_recovery_id'])){ $trigger_options['referred_recovery_id'] = 0; }
         if (!isset($trigger_options['referred_recovery_stats'])){ $trigger_options['referred_recovery_stats'] = array(); }
@@ -591,6 +592,7 @@ class rpg_item_recovery extends rpg_recovery {
             if ($trigger_options['apply_modifiers'] != false
                 && $trigger_options['referred_recovery'] == false
                 && $trigger_options['apply_attachment_modifiers'] != false
+                && $trigger_options['apply_attachment_recovery_modifiers'] != false
                 ){
 
                 // If this robot has an attachment with a recovery multiplier
