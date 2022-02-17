@@ -82,6 +82,7 @@ else {
 }
 
 // Collect this player's index data if available
+$temp_this_robot_classes = array();
 if (!empty($this_player_token)){
     $this_player_data = rpg_player::get_index_info($this_player_token);
     $temp_user_id = rpg_user::get_current_userid();
@@ -94,8 +95,11 @@ if (!empty($this_player_token)){
         $this_player_data['player_robots'] = array();
         foreach ($allowed_robots AS $key => $robot_string){
             list($robot_id, $robot_token) = explode('_', $robot_string);
+            $temp_robot_data = rpg_robot::get_index_info($robot_token);
+            $temp_robot_class = $temp_robot_data['robot_class'];
+            if (!isset($temp_this_robot_classes[$temp_robot_class])){ $temp_this_robot_classes[$temp_robot_class] = 0; }
+            $temp_this_robot_classes[$temp_robot_class] += 1;
             if (mmrpg_prototype_robot_unlocked($this_player_token, $robot_token)){
-                $temp_robot_data = rpg_robot::get_index_info($robot_token);
                 $temp_robot_id = strstr($robot_id, $temp_player_id) ? $robot_id : rpg_game::unique_robot_id($temp_player_id, $temp_robot_data['robot_id'], ($key + 1));
                 $this_player_data['player_robots'][] = array('robot_id' => $temp_robot_id, 'robot_token' => $robot_token);
                 $allowed_robots_parsed[] = $temp_robot_id.'_'.$robot_token;
@@ -108,6 +112,69 @@ if (!empty($this_player_token)){
 else {
     $this_player_data = false;
 }
+
+// If the current player has no robots, we can't proceed
+if (empty($this_player_robots)){
+
+    // Ensure we have the correct user ID before proceeding
+    $this_user_id = rpg_user::get_current_userid();
+
+    // Automatically empty all temporary battle variables
+    $_SESSION['BATTLES'] = array();
+    $_SESSION['FIELDS'] = array();
+    $_SESSION['PLAYERS'] = array();
+    $_SESSION['ROBOTS'] = array();
+    $_SESSION['ABILITIES'] = array();
+    $_SESSION['ITEMS'] = array();
+    $_SESSION['SKILLS'] = array();
+
+    // Redirect the user back to the prototype screen
+    $this_redirect = 'prototype.php?'.($flag_wap ? 'wap=true' : '');
+
+    // Check if this was an ENDLESS ATTACK MODE mission and we're exiting
+    if (!empty($this_battle_data['flags']['challenge_battle'])
+        && !empty($this_battle_data['flags']['endless_battle'])){
+
+        // If the player was trying to bring non-masters here, create a message
+        if (empty($temp_this_robot_classes['master'])
+            && (!empty($temp_this_robot_classes['mecha'])
+                || !empty($temp_this_robot_classes['boss']))){
+
+            // Define the canvas markup for the error message
+            $temp_canvas_markup = '';
+            $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/gentle-countryside/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+            $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/gentle-countryside/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+            $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/robots/met/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 30px; left: 100px;"></div>';
+
+            // Define the console markup for the error message
+            $temp_console_markup = '';
+            $temp_console_markup .= '<p>';
+                if (!empty($temp_this_robot_classes['mecha'])){
+                    $temp_console_markup .= 'Support Mechas <em>cannot</em> participate in Endless Attack Mode without their Robot Master operators present. ';
+                } elseif (!empty($temp_this_robot_classes['boss'])) {
+                    $temp_console_markup .= 'Fortress Bosses <em>cannot</em> participate in Endless Attack Mode and we\'re not sure how you managed to summon one in the first place. ';
+                }
+                $temp_console_markup .= 'As such, your progress has been halted and you have been returned to the main menu. ';
+                $temp_console_markup .= 'Better luck next time, but great work out there either way! ';
+            $temp_console_markup .= '</p>';
+
+            // Push this error message into the event queue
+            array_push($_SESSION[$session_token]['EVENTS'], array(
+                'canvas_markup' => $temp_canvas_markup,
+                'console_markup' => $temp_console_markup
+                ));
+        }
+
+        // We need to clear any savestate data from the waveboard so it doesn't infinitly redirect
+        $db->update('mmrpg_challenges_waveboard', array('challenge_wave_savestate' => ''), array('user_id' => $this_user_id));
+
+    }
+
+    // We have to redirect back to the home page of the prototype
+    header('Location: '.$this_redirect);
+    exit();
+}
+
 
 // Collect the target player's index data if available
 if (!empty($target_player_token)){
