@@ -654,6 +654,19 @@ class cms_database {
         else { return '`'.$table_name.'`'; }
     }
 
+    // Define a function for safely wrapping a value string in some kind of quotes for query use
+    public static function wrap_query_value($field_value, $quote_character = "'"){
+        $wrapped_query_value = $quote_character.self::clean_query_value($field_value, $quote_character).$quote_character;
+        return $wrapped_query_value;
+    }
+
+    // Define a function for cleaning a query string value such that wrapping characters (quotes) are properly escaped
+    public static function clean_query_value($field_value, $quote_character = "'"){
+        $new_field_value = $field_value;
+        $new_field_value = str_replace($quote_character, '\\'.$quote_character, $new_field_value);
+        return $new_field_value;
+    }
+
     // Define a function for importing an SQL file directory
     public function import_sql_file($path){
         // Return false if file does not exist
