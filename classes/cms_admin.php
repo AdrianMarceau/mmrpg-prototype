@@ -944,6 +944,24 @@ class cms_admin {
         }
     }
 
+    // Define a function for X to a given object index's search data
+    public static function object_index_search_data_clean_query_values(&$search_data, $object_kind, &$backup_search_data){
+        $backup_search_data = $search_data;
+        foreach ($search_data AS $key => $value){
+            if (is_string($value)){
+                $clean_value = $value;
+                $clean_value = cms_database::clean_query_value($clean_value);
+                $search_data[$key] = $clean_value;
+            }
+        }
+    }
+
+    // Define a function for X to a given object index's search data
+    public static function object_index_search_data_restore_backup_data(&$search_data, $object_kind, &$backup_search_data){
+        $search_data = $backup_search_data;
+        return ($search_data === $backup_search_data) ? true : false;
+    }
+
     // Define a function for appending git-related status icons to a given object index link
     public static function object_index_links_append_git_statues(&$object_link, $object_token, $git_file_arrays){
         $change_kinds = self::git_get_change_kinds();
