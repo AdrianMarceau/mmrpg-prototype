@@ -156,6 +156,7 @@
         $search_data['field_flag_complete'] = isset($_GET['field_flag_complete']) && $_GET['field_flag_complete'] !== '' ? (!empty($_GET['field_flag_complete']) ? 1 : 0) : '';
         $search_data['field_flag_published'] = isset($_GET['field_flag_published']) && $_GET['field_flag_published'] !== '' ? (!empty($_GET['field_flag_published']) ? 1 : 0) : '';
         cms_admin::object_index_search_data_append_git_statuses($search_data, 'field');
+        cms_admin::object_index_search_data_clean_query_values($search_data, 'field', $backup_search_data);
 
         /* -- Collect Search Results -- */
 
@@ -259,6 +260,7 @@
         $search_results = $db->get_array_list($search_query);
         $search_results_count = is_array($search_results) ? count($search_results) : 0;
         cms_admin::object_index_search_results_filter_git_statuses($search_results, $search_results_count, $search_data, 'field', $mmrpg_git_file_arrays);
+        cms_admin::object_index_search_data_restore_backup_data($search_data, 'field', $backup_search_data);
 
         // Collect a total number from the database
         $search_results_total = $db->get_value("SELECT COUNT(field_id) AS total FROM mmrpg_index_fields WHERE 1=1 AND field_token <> 'field';", 'total');

@@ -271,7 +271,10 @@
         $search_data['challenge_creator'] = !empty($_GET['challenge_creator']) && is_numeric($_GET['challenge_creator']) ? (int)($_GET['challenge_creator']) : '';
         $search_data['challenge_flag_hidden'] = isset($_GET['challenge_flag_hidden']) && $_GET['challenge_flag_hidden'] !== '' ? (!empty($_GET['challenge_flag_hidden']) ? 1 : 0) : '';
         $search_data['challenge_flag_published'] = isset($_GET['challenge_flag_published']) && $_GET['challenge_flag_published'] !== '' ? (!empty($_GET['challenge_flag_published']) ? 1 : 0) : '';
-        if ($this_challenge_kind === 'event'){ cms_admin::object_index_search_data_append_git_statuses($search_data, 'challenge'); }
+        if ($this_challenge_kind === 'event'){
+            cms_admin::object_index_search_data_append_git_statuses($search_data, 'challenge');
+            cms_admin::object_index_search_data_clean_query_values($search_data, 'challenge', $backup_search_data);
+        }
 
         /* -- Collect Search Results -- */
 
@@ -360,7 +363,10 @@
         // Collect search results from the database
         $search_results = $db->get_array_list($search_query);
         $search_results_count = is_array($search_results) ? count($search_results) : 0;
-        if ($this_challenge_kind === 'event'){ cms_admin::object_index_search_results_filter_git_statuses($search_results, $search_results_count, $search_data, 'challenge', $mmrpg_git_file_arrays); }
+        if ($this_challenge_kind === 'event'){
+            cms_admin::object_index_search_results_filter_git_statuses($search_results, $search_results_count, $search_data, 'challenge', $mmrpg_git_file_arrays);
+            cms_admin::object_index_search_data_restore_backup_data($search_data, 'challenge', $backup_search_data);
+        }
 
         // Collect a total number from the database
         $search_results_total = $db->get_value("SELECT COUNT(challenge_id) AS total FROM {$this_challenge_table} WHERE 1=1;", 'total');

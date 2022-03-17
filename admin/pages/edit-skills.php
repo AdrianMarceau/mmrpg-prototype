@@ -92,6 +92,7 @@
         $search_data['skill_flag_exclusive'] = isset($_GET['skill_flag_exclusive']) && $_GET['skill_flag_exclusive'] !== '' ? (!empty($_GET['skill_flag_exclusive']) ? 1 : 0) : '';
         $search_data['skill_flag_published'] = isset($_GET['skill_flag_published']) && $_GET['skill_flag_published'] !== '' ? (!empty($_GET['skill_flag_published']) ? 1 : 0) : '';
         cms_admin::object_index_search_data_append_git_statuses($search_data, 'skill');
+        cms_admin::object_index_search_data_clean_query_values($search_data, 'skill', $backup_search_data);
 
         /* -- Collect Search Results -- */
 
@@ -169,6 +170,7 @@
         $search_results = $db->get_array_list($search_query);
         $search_results_count = is_array($search_results) ? count($search_results) : 0;
         cms_admin::object_index_search_results_filter_git_statuses($search_results, $search_results_count, $search_data, 'skill', $mmrpg_git_file_arrays);
+        cms_admin::object_index_search_data_restore_backup_data($search_data, 'skill', $backup_search_data);
 
         // Collect a total number from the database
         $search_results_total = $db->get_value("SELECT COUNT(skill_id) AS total FROM mmrpg_index_skills WHERE 1=1 AND skill_token <> 'skill';", 'total');

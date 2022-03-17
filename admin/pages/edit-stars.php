@@ -97,6 +97,7 @@
         $search_data['star_status'] = !empty($_GET['star_status']) && preg_match('/[-_0-9a-z]+/i', $_GET['star_status']) ? trim(strtolower($_GET['star_status'])) : '';
         $search_data['star_flag_enabled'] = isset($_GET['star_flag_enabled']) && $_GET['star_flag_enabled'] !== '' ? (!empty($_GET['star_flag_enabled']) ? 1 : 0) : '';
         cms_admin::object_index_search_data_append_git_statuses($search_data, 'star');
+        cms_admin::object_index_search_data_clean_query_values($search_data, 'star', $backup_search_data);
 
         /* -- Collect Search Results -- */
 
@@ -196,6 +197,7 @@
         $search_results = $db->get_array_list($search_query);
         $search_results_count = is_array($search_results) ? count($search_results) : 0;
         cms_admin::object_index_search_results_filter_git_statuses($search_results, $search_results_count, $search_data, 'star', $mmrpg_git_file_arrays);
+        cms_admin::object_index_search_data_restore_backup_data($search_data, 'star', $backup_search_data);
 
         // Collect a total number from the database
         $search_results_total = $db->get_value("SELECT COUNT(star_id) AS total FROM mmrpg_rogue_stars WHERE 1=1 AND star_id <> 0;", 'total');
