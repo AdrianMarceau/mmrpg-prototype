@@ -904,4 +904,15 @@ if (!mmrpg_prototype_item_unlocked('omega-seed')
 
 }
 
+// Unlock the LIGHT BUSTER / WILY BUSTER / COSSACK BUSTER if not unlocked automatically by their doctors (bugfix)
+foreach ($chapter_unlock_players AS $player_token){
+    // If the player has a doctor unlocked without also having their buster, unlock it now
+    $buster_token = str_replace('dr-', '', $player_token).'-buster';
+    if (mmrpg_prototype_player_unlocked($player_token)
+        && !mmrpg_prototype_ability_unlocked($player_token, '', $buster_token)){
+        $unlock_player_info = $mmrpg_index_players[$player_token];
+        mmrpg_game_unlock_ability($unlock_player_info, '', array('ability_token' => $buster_token), false);
+    }
+}
+
 ?>
