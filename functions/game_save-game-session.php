@@ -201,7 +201,7 @@ function mmrpg_save_game_session(){
                 }
                 */
                 /*
-                if (!empty($this_values['battle_abilities'])){
+                if (!empty($this_values['battle_abilities']) || $reset_in_progress){
                     $this_save_array['save_values_battle_abilities'] = json_encode(!empty($this_values['battle_abilities']) ? $this_values['battle_abilities'] : array());
                     $temp_hash = md5($this_save_array['save_values_battle_abilities']);
                     if (isset($this_values['battle_abilities_hash']) && $this_values['battle_abilities_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_abilities']); }
@@ -256,6 +256,9 @@ function mmrpg_save_game_session(){
                 $this_user_array_return = $db->insert('mmrpg_users', $this_user_array);
                 $this_save_array_return = $db->insert('mmrpg_saves', $this_save_array);
                 $this_board_array_return = $db->insert('mmrpg_leaderboard', $this_board_array);
+
+                // Make sure relevant user-tables in the database are updated with any unlocks
+                mmrpg_save_game_session_user_tables($session_token, $temp_user_id);
 
                 // Update the ID in the user array and continue
                 $this_user['userid'] = $temp_user_id;
@@ -364,35 +367,8 @@ function mmrpg_save_game_session(){
         //echo('<pre>$this_save_array = '.print_r($this_save_array, true).'</pre>');
         $db->update('mmrpg_saves', $this_save_array, 'user_id = '.$this_user['userid']);
 
-        // If the save couneters were not empty, we should update them in the database table
-        if (!empty($_SESSION[$session_token]['counters'])){
-            $user_save_counters = $_SESSION[$session_token]['counters'];
-            rpg_user::update_save_counters($this_user['userid'], $user_save_counters);
-        }
-
-        // If the robot database records were not empty, we should update them in the database table
-        if (!empty($_SESSION[$session_token]['values']['robot_database'])){
-            $user_robot_records = $_SESSION[$session_token]['values']['robot_database'];
-            rpg_user::update_robot_records($this_user['userid'], $user_robot_records);
-        }
-
-        // If the unlocked item list was not empty, we should update them in the database table
-        if (!empty($_SESSION[$session_token]['values']['battle_items'])){
-            $user_unlocked_items = $_SESSION[$session_token]['values']['battle_items'];
-            rpg_user::update_unlocked_items($this_user['userid'], $user_unlocked_items);
-        }
-
-        // If the unlocked ability list was not empty, we should update them in the database table
-        if (!empty($_SESSION[$session_token]['values']['battle_abilities'])){
-            $user_unlocked_abilities = $_SESSION[$session_token]['values']['battle_abilities'];
-            rpg_user::update_unlocked_abilities($this_user['userid'], $user_unlocked_abilities);
-        }
-
-        // If the unlocked star list was not empty, we should update them in the database table
-        if (!empty($_SESSION[$session_token]['values']['battle_stars'])){
-            $user_unlocked_stars = $_SESSION[$session_token]['values']['battle_stars'];
-            rpg_user::update_unlocked_stars($this_user['userid'], $user_unlocked_stars);
-        }
+        // Make sure relevant user-tables in the database are updated with any unlocks
+        mmrpg_save_game_session_user_tables($session_token, $this_user['userid']);
 
 
         // -- UPDATE LEADERBOARD RANKINGS -- //
@@ -444,4 +420,50 @@ function mmrpg_save_game_session(){
     return true;
 
 }
+
+// Define a function for scanning session save data and updating relevant user tables in the database
+function mmrpg_save_game_session_user_tables($session_token, $user_id){
+    //error_log('mmrpg_save_game_session_user_tables('.$session_token.', '.$user_id.')');
+
+    // Ensure the requested session array actually exists
+    if (empty($_SESSION[$session_token])){ return false; }
+    $GAME_SESSION = $_SESSION[$session_token];
+
+    // If the save counters were not empty, we should update them in the database table
+    if (!empty($GAME_SESSION['counters'])){
+        $user_save_counters = $GAME_SESSION['counters'];
+        //error_log('$user_save_counters = '.(!empty($user_save_counters) ? json_encode($user_save_counters) : '[]'));
+        rpg_user::update_save_counters($user_id, $user_save_counters);
+    }
+
+    // If the robot database records were not empty, we should update them in the database table
+    if (!empty($GAME_SESSION['values']['robot_database'])){
+        $user_robot_records = $GAME_SESSION['values']['robot_database'];
+        //error_log('$user_robot_records = '.(!empty($user_robot_records) ? json_encode($user_robot_records) : '[]'));
+        rpg_user::update_robot_records($user_id, $user_robot_records);
+    }
+
+    // If the unlocked item list was not empty, we should update them in the database table
+    if (!empty($GAME_SESSION['values']['battle_items'])){
+        $user_unlocked_items = $GAME_SESSION['values']['battle_items'];
+        //error_log('$user_unlocked_items = '.(!empty($user_unlocked_items) ? json_encode($user_unlocked_items) : '[]'));
+        rpg_user::update_unlocked_items($user_id, $user_unlocked_items);
+    }
+
+    // If the unlocked ability list was not empty, we should update them in the database table
+    if (!empty($GAME_SESSION['values']['battle_abilities'])){
+        $user_unlocked_abilities = $GAME_SESSION['values']['battle_abilities'];
+        //error_log('$user_unlocked_abilities = '.(!empty($user_unlocked_abilities) ? json_encode($user_unlocked_abilities) : '[]'));
+        rpg_user::update_unlocked_abilities($user_id, $user_unlocked_abilities);
+    }
+
+    // If the unlocked star list was not empty, we should update them in the database table
+    if (!empty($GAME_SESSION['values']['battle_stars'])){
+        $user_unlocked_stars = $GAME_SESSION['values']['battle_stars'];
+        //error_log('$user_unlocked_stars = '.(!empty($user_unlocked_stars) ? json_encode($user_unlocked_stars) : '[]'));
+        rpg_user::update_unlocked_stars($user_id, $user_unlocked_stars);
+    }
+
+}
+
 ?>
