@@ -808,7 +808,9 @@ class cms_admin {
         elseif ($pk_kind === 'url'){ foreach ($allowed_folder_names AS $key => $url){ $allowed_folder_names[$key] = self::git_get_url_token(substr($filter_by_field, 0, -3), $url); } }
         //echo('<pre>$allowed_folder_names = '.print_r($allowed_folder_names, true).'</pre>'.PHP_EOL);
 
+        //error_log('<pre>$list(before) = '.print_r($list, true).'</pre>'.PHP_EOL);
         foreach ($list AS $key => $path){
+            if (!strstr($path, '/')){ unset($list[$key]); continue; }
             $folders = array_slice(explode('/', $path), 0, -1);
             $folder = $folders[0];
             $folder2 = isset($folders[1]) ? $folders[0].'/'.$folders[1] : false;
@@ -818,7 +820,7 @@ class cms_admin {
                 }
         }
         $list = array_values($list);
-        //error_log('<pre>$list = '.print_r($list, true).'</pre>'.PHP_EOL);
+        //error_log('<pre>$list(after) = '.print_r($list, true).'</pre>'.PHP_EOL);
         //exit();
         //echo('--------------------'.PHP_EOL);
 
