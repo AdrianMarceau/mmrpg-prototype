@@ -447,6 +447,9 @@ while ($this_action == 'new'){
             } elseif (!preg_match('/^[-_a-z0-9\.]+$/i', $_REQUEST['username'])){
                 $html_form_messages .= '<span class="error">(!) The username must only contain letters and numbers.</span>';
                 $html_form_verified = false;
+            } elseif (!preg_match('/^[a-z]/i', $_REQUEST['username'])){
+                $html_form_messages .= '<span class="error">(!) The username cannot start with a number.</span>';
+                $html_form_verified = false;
             }
             // Ensure the email is valid
             if (empty($_REQUEST['emailaddress'])){
