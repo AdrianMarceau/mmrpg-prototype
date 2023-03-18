@@ -316,7 +316,8 @@
         cms_admin::object_index_search_data_restore_backup_data($search_data, 'thread', $backup_search_data);
 
         // Collect a total number from the database
-        $search_results_total = $db->get_value("SELECT COUNT(thread_id) AS total FROM `mmrpg_threads` WHERE 1=1 AND `thread_token` <> 'thread';", 'total');
+        $where = 'AND category_id '.($this_thread_class === 'private' ? '=' : '<>').' 0';
+        $search_results_total = $db->get_value("SELECT COUNT(thread_id) AS total FROM `mmrpg_threads` WHERE 1=1 {$where};", 'total');
 
     }
 
