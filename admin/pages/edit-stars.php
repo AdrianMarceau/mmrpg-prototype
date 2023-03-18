@@ -538,8 +538,8 @@
                                 <th class="name"><?= cms_admin::get_sort_link('star_name', 'Name') ?></th>
                                 <th class="range"><?= cms_admin::get_sort_link('star_date_range', 'Date(s)') ?></th>
                                 <? /*
-                                <th class="date from"><?= cms_admin::get_sort_link('star_from_date', 'From') ?></th>
-                                <th class="date to"><?= cms_admin::get_sort_link('star_to_date', 'To') ?></th>
+                                <th class="date from">< ?= cms_admin::get_sort_link('star_from_date', 'From') ? ></th>
+                                <th class="date to">< ?= cms_admin::get_sort_link('star_to_date', 'To') ? ></th>
                                 */ ?>
                                 <th class="type"><?= cms_admin::get_sort_link('star_type', 'Type') ?></th>
                                 <th class="power"><?= cms_admin::get_sort_link('star_power', 'Power') ?></th>
