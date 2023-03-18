@@ -31,7 +31,7 @@
         // Populate the group options array with relevant pages and buttons
         if (rpg_user::current_user_has_permission('edit-user-accounts')){
             $this_option = array(
-                'link' => array('url' => 'admin/edit-users/', 'text' => 'Moderate Users', 'bullet' => 'users'),
+                'link' => array('url' => 'admin/edit-users/', 'text' => 'Moderate User Accounts', 'bullet' => 'users'),
                 'desc' => 'update or modify user account info and permissions'
                 );
             $this_group_options[] = $this_option;
@@ -43,6 +43,18 @@
                 );
             $this_group_options[] = $this_option;
         }
+        if (rpg_user::current_user_has_permission('edit-private-messages')){
+            $this_option = array(
+                'link' => array('url' => 'admin/edit-messages/', 'text' => 'Moderate Personal Messages', 'bullet' => 'envelope'),
+                'desc' => 'review and moderate personal message invites sent between users'
+                );
+            $this_group_options[] = $this_option;
+            /* $this_option = array(
+                'link' => array('url' => 'admin/edit-message-replies/', 'text' => 'Moderate Message Replies', 'bullet' => 'stream'), //envelope-square
+                'desc' => 'individually review replies posted within personal messages'
+                );
+            $this_group_options[] = $this_option; */
+        }
 
         // Define the group name subtext for this section
         $this_group_name_subtext = '';
@@ -50,6 +62,42 @@
             && MMRPG_CONFIG_SERVER_ENV !== 'prod'){
             $this_group_name_subtext = '<p class="env-notice warning">'.
                 'Changes made to user accounts and content on the '.MMRPG_CONFIG_SERVER_ENV.'-build may be overwritten at any time. <br /> '.
+                'This section is available in the '.ucfirst(MMRPG_CONFIG_SERVER_ENV).' Admin Panel for testing purposes only, so please be mindful.'.
+            '</p>';
+            }
+
+        // Print out the group title and options, assuming there are any available
+        echo cms_admin::print_admin_home_group_options($this_group_name, $this_group_options, $this_group_name_subtext);
+
+    }
+
+    /* -- COMMUNITY CONTROLS (LOCAL/DEV/STAGE/PROD) -- */
+    if (true){
+
+        // Define the group name and options array
+        $this_group_name = 'Community Moderation';
+        $this_group_options = array();
+
+        // Populate the group options array with relevant pages and buttons
+        if (rpg_user::current_user_has_permission('edit-community-threads')){
+            $this_option = array(
+                'link' => array('url' => 'admin/edit-threads/', 'text' => 'Moderate Community Threads', 'bullet' => 'comment-alt'),
+                'desc' => 'review and moderate threads posted to the community forums'
+                );
+            $this_group_options[] = $this_option;
+            /* $this_option = array(
+                'link' => array('url' => 'admin/edit-thread-comments/', 'text' => 'Moderate Thread Comments', 'bullet' => 'stream'), //comments
+                'desc' => 'individually review comments posted within community threads'
+                );
+            $this_group_options[] = $this_option; */
+        }
+
+        // Define the group name subtext for this section
+        $this_group_name_subtext = '';
+        if (MMRPG_CONFIG_SERVER_ENV !== MMRPG_CONFIG_PULL_LIVE_DATA_FROM
+            && MMRPG_CONFIG_SERVER_ENV !== 'prod'){
+            $this_group_name_subtext = '<p class="env-notice warning">'.
+                'Changes made to community threads and comments on the '.MMRPG_CONFIG_SERVER_ENV.'-build may be overwritten at any time. <br /> '.
                 'This section is available in the '.ucfirst(MMRPG_CONFIG_SERVER_ENV).' Admin Panel for testing purposes only, so please be mindful.'.
             '</p>';
             }

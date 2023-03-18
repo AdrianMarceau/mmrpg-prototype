@@ -121,7 +121,8 @@ body:before {
         margin: 0 auto;
         padding: 20px 0 0;
     }
-    .adminform .formfoot .metadata .date {
+    .adminform .formfoot .metadata .date,
+    .adminform .formfoot .metadata .time {
         margin: 0 20px 0 0;
     }
 
@@ -160,6 +161,8 @@ body:before {
     }
 
     .adminform .results .list .date,
+    .adminform .results .list .time,
+    .adminform .results .list .body,
     .adminform .results .list .flag {
         display: none;
     }

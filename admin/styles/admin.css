@@ -1004,6 +1004,11 @@ tr:nth-child(odd) td {
     font-size: 80%;
     margin: 0 2px;
 }
+.adminform table tbody td .type_span.nowrap {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 .adminform .editor .form .label .floatright {
     float: right;
 }
@@ -1349,6 +1354,7 @@ tr:nth-child(odd) td {
 }
 
 .adminform.edit_players table .type,
+.adminform.edit_players table .category,
 .adminform.edit_players table .flag,
 .adminform.edit_players table .flag {
     text-align: center;
@@ -1361,12 +1367,14 @@ tr:nth-child(odd) td {
 .adminform.edit_robots table .game,
 .adminform.edit_robots table .group,
 .adminform.edit_robots table .type,
+.adminform.edit_robots table .category,
 .adminform.edit_robots table .flag,
 .adminform.edit_robots table .flag {
     text-align: center;
 }
 .adminform.edit_robots table td.class .type_span,
-.adminform.edit_robots table td.type .type_span {
+.adminform.edit_robots table td.type .type_span,
+.adminform.edit_robots table td.category .type_span {
     min-width: 75px;
 }
 .adminform.edit_robots table td.game .type_span,
@@ -1381,12 +1389,14 @@ tr:nth-child(odd) td {
 .adminform.edit_fields table .game,
 .adminform.edit_fields table .group,
 .adminform.edit_fields table .type,
+.adminform.edit_fields table .category,
 .adminform.edit_fields table .flag,
 .adminform.edit_fields table .flag {
     text-align: center;
 }
 .adminform.edit_fields table td.class .type_span,
-.adminform.edit_fields table td.type .type_span {
+.adminform.edit_fields table td.type .type_span,
+.adminform.edit_fields table td.category .type_span {
     min-width: 75px;
 }
 .adminform.edit_fields table td.game .type_span,
@@ -1659,6 +1669,9 @@ input[type=file] {
     min-height: 50px;
     position: relative;
 }
+.adminform .field.autosize {
+    width: auto;
+}
 .adminform .field.halfsize {
     width: 50%;
 }
@@ -1699,7 +1712,8 @@ input[type=file] {
     display: block;
     clear: both;
 }
-.adminform .formfoot .metadata .date {
+.adminform .formfoot .metadata .date,
+.adminform .formfoot .metadata .time {
     display: block;
     margin: 0 auto 5px 0;
 }
@@ -2259,12 +2273,26 @@ input[type=file] {
     padding-right: 6px;
 }
 .adminform .results .list .date,
+.adminform .results .list .time,
 .adminform .results .list .flag,
 .adminform .results .list .order,
+.adminform .results .list .count,
+.adminform .results .list .creator,
+.adminform .results .list .target,
 .adminform .results .list .game,
 .adminform .results .list .points,
 .adminform .results .list .class {
     text-align: center;
+}
+
+
+.adminform .results .list .link.sublink {
+    color: inherit;
+}
+.adminform .results .list .link + i.fa,
+.adminform .results .list .link + i.fas,
+.adminform .results .list .wrap > i.fas {
+    color: #008aab;
 }
 
 
@@ -2557,7 +2585,8 @@ input[type=file] {
 .adminform .bfg-attachments-preview .foreground_attachments { z-index: 4; }
 .adminform .bfg-attachments-preview .preview_wrapper:after { z-index: 5; }
 
-.adminform.edit-users .formfoot .metadata .date {
+.adminform.edit-users .formfoot .metadata .date,
+.adminform.edit-users .formfoot .metadata .time {
     float: left;
     margin: 0 20px 10px 0;
 }

@@ -257,6 +257,22 @@ elseif ($this_page_action == 'watch-error-log'){
     // Require the edit pages file
     require(MMRPG_CONFIG_ROOTDIR.'admin/pages/error-log.php');
 }
+// Else if this is an EDIT PRIVATE MESSAGE requests
+elseif ($this_page_action == 'edit-messages'){ // personal messages (private)
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-threads_private.php');
+}
+// Else if this is an EDIT COMMUNITY THREAD requests
+elseif ($this_page_action == 'edit-threads'){ // community threads (public)
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-threads_public.php');
+}
+/*
+elseif ($this_page_action == 'edit-message-replies'){
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-posts_private.php');
+}
+elseif ($this_page_action == 'edit-threads-comments'){
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-posts_public.php');
+}
+*/
 // Otherwise, not a valid page
 else {
     // Define error 404 text to print
