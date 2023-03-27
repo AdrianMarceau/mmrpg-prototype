@@ -32,28 +32,28 @@
         if (rpg_user::current_user_has_permission('edit-user-accounts')){
             $this_option = array(
                 'link' => array('url' => 'admin/edit-users/', 'text' => 'Moderate User Accounts', 'bullet' => 'users'),
-                'desc' => 'update or modify user account info and permissions'
+                'desc' => 'Manage user account information and permissions'
                 );
             $this_group_options[] = $this_option;
         }
         if (rpg_user::current_user_has_permission('edit-user-challenges')){
             $this_option = array(
                 'link' => array('url' => 'admin/edit-user-challenges/', 'text' => 'Moderate User Challenges', 'bullet' => 'users-cog'),
-                'desc' => 'update or modify user-created challenge missions for the post-game'
+                'desc' => 'Manage user-created challenge missions for the post-game'
                 );
             $this_group_options[] = $this_option;
         }
         if (rpg_user::current_user_has_permission('edit-private-messages')){
             $this_option = array(
                 'link' => array('url' => 'admin/edit-messages/', 'text' => 'Moderate Personal Messages', 'bullet' => 'envelope'),
-                'desc' => 'review and moderate personal message invites sent between users'
+                'desc' => 'Review and moderate personal message invites between users'
                 );
             $this_group_options[] = $this_option;
-            /* $this_option = array(
+            $this_option = array(
                 'link' => array('url' => 'admin/edit-message-replies/', 'text' => 'Moderate Message Replies', 'bullet' => 'stream'), //envelope-square
-                'desc' => 'individually review replies posted within personal messages'
+                'desc' => 'Review and moderate individual replies within personal messages'
                 );
-            $this_group_options[] = $this_option; */
+            $this_group_options[] = $this_option;
         }
 
         // Define the group name subtext for this section
@@ -61,8 +61,8 @@
         if (MMRPG_CONFIG_SERVER_ENV !== MMRPG_CONFIG_PULL_LIVE_DATA_FROM
             && MMRPG_CONFIG_SERVER_ENV !== 'prod'){
             $this_group_name_subtext = '<p class="env-notice warning">'.
-                'Changes made to user accounts and content on the '.MMRPG_CONFIG_SERVER_ENV.'-build may be overwritten at any time. <br /> '.
-                'This section is available in the '.ucfirst(MMRPG_CONFIG_SERVER_ENV).' Admin Panel for testing purposes only, so please be mindful.'.
+                'Note that changes to personal messages and replies on the '.MMRPG_CONFIG_SERVER_ENV.' build may be overwritten. <br /> '.
+                'This section is available in the '.ucfirst(MMRPG_CONFIG_SERVER_ENV).' Admin Panel for testing purposes only.'.
             '</p>';
             }
 
@@ -82,14 +82,14 @@
         if (rpg_user::current_user_has_permission('edit-community-threads')){
             $this_option = array(
                 'link' => array('url' => 'admin/edit-threads/', 'text' => 'Moderate Community Threads', 'bullet' => 'comment-alt'),
-                'desc' => 'review and moderate threads posted to the community forums'
+                'desc' => 'Review and moderate community forum threads'
                 );
             $this_group_options[] = $this_option;
-            /* $this_option = array(
+            $this_option = array(
                 'link' => array('url' => 'admin/edit-thread-comments/', 'text' => 'Moderate Thread Comments', 'bullet' => 'stream'), //comments
-                'desc' => 'individually review comments posted within community threads'
+                'desc' => 'Review and moderate individual comments within community threads'
                 );
-            $this_group_options[] = $this_option; */
+            $this_group_options[] = $this_option;
         }
 
         // Define the group name subtext for this section
@@ -97,8 +97,8 @@
         if (MMRPG_CONFIG_SERVER_ENV !== MMRPG_CONFIG_PULL_LIVE_DATA_FROM
             && MMRPG_CONFIG_SERVER_ENV !== 'prod'){
             $this_group_name_subtext = '<p class="env-notice warning">'.
-                'Changes made to community threads and comments on the '.MMRPG_CONFIG_SERVER_ENV.'-build may be overwritten at any time. <br /> '.
-                'This section is available in the '.ucfirst(MMRPG_CONFIG_SERVER_ENV).' Admin Panel for testing purposes only, so please be mindful.'.
+                'Note that changes to community threads and comments on the '.MMRPG_CONFIG_SERVER_ENV.'-build may be overwritten. <br /> '.
+                'This section is available in the '.ucfirst(MMRPG_CONFIG_SERVER_ENV).' Admin Panel for testing purposes only.'.
             '</p>';
             }
 
@@ -264,7 +264,7 @@
                 $option_name = 'Edit Players';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-players/', 'text' => $option_name, 'bullet' => 'mask'),
-                    'desc' => 'edit the details and images of the in-game player characters',
+                    'desc' => 'Manage in-game player character details and images',
                     'repo' => array(
                         'name' => 'players',
                         'data' => array('prefix' => 'player'),
@@ -302,7 +302,7 @@
                 $option_name = 'Edit Robot Masters';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-robot-masters/', 'text' => $option_name, 'bullet' => 'robot'),
-                    'desc' => 'edit the details and images of the in-game robot masters',
+                    'desc' => 'Manage in-game robot master details and images',
                     'repo' => array(
                         'name' => 'robots',
                         'data' => array('prefix' => 'robot'),
@@ -342,100 +342,11 @@
                     );
                 $this_group_options[] = $this_option;
             }
-            if (rpg_user::current_user_has_permission('edit-support-mechas')){
-                $option_name = 'Edit Support Mechas';
-                $this_option = array(
-                    'link' => array('url' => 'admin/edit-support-mechas/', 'text' => $option_name, 'bullet' => 'ghost'),
-                    'desc' => 'edit the details and images of the in-game support mechas',
-                    'repo' => array(
-                        'name' => 'robots',
-                        'data' => array('prefix' => 'robot'),
-                        'path' => MMRPG_CONFIG_ROBOTS_CONTENT_PATH,
-                        'filter' => array(
-                            'table' => 'mmrpg_index_robots',
-                            'token' => 'robot_token',
-                            'extra' => array('robot_class' => 'mecha')
-                            )
-                        ),
-                    'buttons' => array(
-                        array(
-                            'text' => 'Revert Uncommitted',
-                            'condition' => array('uncommitted' => true, 'permissions' => 'revert-changes'),
-                            'attributes' => array(
-                                'data-button' => 'git',
-                                'data-action' => 'revert',
-                                'data-kind' => 'robots',
-                                'data-subkind' => 'mechas',
-                                'data-token' => 'all',
-                                'data-source' => 'github'
-                                )
-                            ),
-                        array(
-                            'text' => 'Commit All',
-                            'condition' => array('uncommitted' => true, 'permissions' => 'commit-changes'),
-                            'attributes' => array(
-                                'data-button' => 'git',
-                                'data-action' => 'commit',
-                                'data-kind' => 'robots',
-                                'data-subkind' => 'mechas',
-                                'data-token' => 'all',
-                                'data-source' => 'github'
-                                )
-                            )
-                        )
-                    );
-                $this_group_options[] = $this_option;
-            }
-            if (rpg_user::current_user_has_permission('edit-fortress-bosses')){
-                $option_name = 'Edit Fortress Bosses';
-                $this_option = array(
-                    'link' => array('url' => 'admin/edit-fortress-bosses/', 'text' => $option_name, 'bullet' => 'skull'),
-                    'desc' => 'edit the details and images of the in-game fortress bosses',
-                    'repo' => array(
-                        'name' => 'robots',
-                        'data' => array('prefix' => 'robot'),
-                        'path' => MMRPG_CONFIG_ROBOTS_CONTENT_PATH,
-                        'filter' => array(
-                            'table' => 'mmrpg_index_robots',
-                            'token' => 'robot_token',
-                            'extra' => array('robot_class' => 'boss')
-                            )
-                        ),
-                    'buttons' => array(
-                        array(
-                            'text' => 'Revert Uncommitted',
-                            'condition' => array('uncommitted' => true, 'permissions' => 'revert-changes'),
-                            'attributes' => array(
-                                'data-button' => 'git',
-                                'data-action' => 'revert',
-                                'data-kind' => 'robots',
-                                'data-subkind' => 'bosses',
-                                'data-token' => 'all',
-                                'data-source' => 'github'
-                                )
-                            ),
-                        array(
-                            'text' => 'Commit All',
-                            'condition' => array('uncommitted' => true, 'permissions' => 'commit-changes'),
-                            'attributes' => array(
-                                'data-button' => 'git',
-                                'data-action' => 'commit',
-                                'data-kind' => 'robots',
-                                'data-subkind' => 'bosses',
-                                'data-token' => 'all',
-                                'data-source' => 'github'
-                                )
-                            )
-                        )
-                    );
-                $this_group_options[] = $this_option;
-            }
-
             if (rpg_user::current_user_has_permission('edit-master-abilities')){
                 $option_name = 'Edit Master Abilities';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-master-abilities/', 'text' => $option_name, 'bullet' => 'fire-alt'),
-                    'desc' => 'edit the details and images of the abilities used by robot masters',
+                    'desc' => 'Manage robot master ability details and images',
                     'repo' => array(
                         'name' => 'abilities',
                         'data' => array('prefix' => 'ability'),
@@ -475,11 +386,56 @@
                     );
                 $this_group_options[] = $this_option;
             }
+
+            if (rpg_user::current_user_has_permission('edit-support-mechas')){
+                $option_name = 'Edit Support Mechas';
+                $this_option = array(
+                    'link' => array('url' => 'admin/edit-support-mechas/', 'text' => $option_name, 'bullet' => 'ghost'),
+                    'desc' => 'Manage in-game support mecha details and images',
+                    'repo' => array(
+                        'name' => 'robots',
+                        'data' => array('prefix' => 'robot'),
+                        'path' => MMRPG_CONFIG_ROBOTS_CONTENT_PATH,
+                        'filter' => array(
+                            'table' => 'mmrpg_index_robots',
+                            'token' => 'robot_token',
+                            'extra' => array('robot_class' => 'mecha')
+                            )
+                        ),
+                    'buttons' => array(
+                        array(
+                            'text' => 'Revert Uncommitted',
+                            'condition' => array('uncommitted' => true, 'permissions' => 'revert-changes'),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'revert',
+                                'data-kind' => 'robots',
+                                'data-subkind' => 'mechas',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            ),
+                        array(
+                            'text' => 'Commit All',
+                            'condition' => array('uncommitted' => true, 'permissions' => 'commit-changes'),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'commit',
+                                'data-kind' => 'robots',
+                                'data-subkind' => 'mechas',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            )
+                        )
+                    );
+                $this_group_options[] = $this_option;
+            }
             if (rpg_user::current_user_has_permission('edit-mecha-abilities')){
                 $option_name = 'Edit Mecha Abilities';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-mecha-abilities/', 'text' => $option_name, 'bullet' => 'fire'),
-                    'desc' => 'edit the details and images of abilities used by support mechas',
+                    'desc' => 'Manage support mecha ability details and images',
                     'repo' => array(
                         'name' => 'abilities',
                         'data' => array('prefix' => 'ability'),
@@ -519,11 +475,56 @@
                     );
                 $this_group_options[] = $this_option;
             }
+
+            if (rpg_user::current_user_has_permission('edit-fortress-bosses')){
+                $option_name = 'Edit Fortress Bosses';
+                $this_option = array(
+                    'link' => array('url' => 'admin/edit-fortress-bosses/', 'text' => $option_name, 'bullet' => 'skull'),
+                    'desc' => 'Manage in-game fortress boss details and images',
+                    'repo' => array(
+                        'name' => 'robots',
+                        'data' => array('prefix' => 'robot'),
+                        'path' => MMRPG_CONFIG_ROBOTS_CONTENT_PATH,
+                        'filter' => array(
+                            'table' => 'mmrpg_index_robots',
+                            'token' => 'robot_token',
+                            'extra' => array('robot_class' => 'boss')
+                            )
+                        ),
+                    'buttons' => array(
+                        array(
+                            'text' => 'Revert Uncommitted',
+                            'condition' => array('uncommitted' => true, 'permissions' => 'revert-changes'),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'revert',
+                                'data-kind' => 'robots',
+                                'data-subkind' => 'bosses',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            ),
+                        array(
+                            'text' => 'Commit All',
+                            'condition' => array('uncommitted' => true, 'permissions' => 'commit-changes'),
+                            'attributes' => array(
+                                'data-button' => 'git',
+                                'data-action' => 'commit',
+                                'data-kind' => 'robots',
+                                'data-subkind' => 'bosses',
+                                'data-token' => 'all',
+                                'data-source' => 'github'
+                                )
+                            )
+                        )
+                    );
+                $this_group_options[] = $this_option;
+            }
             if (rpg_user::current_user_has_permission('edit-boss-abilities')){
                 $option_name = 'Edit Boss Abilities';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-boss-abilities/', 'text' => $option_name, 'bullet' => 'meteor'),
-                    'desc' => 'edit the details and images of abilities used by fortress bosses',
+                    'desc' => 'Manage fortress boss ability details and images',
                     'repo' => array(
                         'name' => 'abilities',
                         'data' => array('prefix' => 'ability'),
@@ -568,7 +569,7 @@
                 $option_name = 'Edit Passive Skills';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-skills/', 'text' => $option_name, 'bullet' => 'dna'),
-                    'desc' => 'edit the details and effects of the various in-game passive skills',
+                    'desc' => 'Manage in-game passive skill details and effects',
                     'repo' => array(
                         'name' => 'skills',
                         'data' => array('prefix' => 'skill'),
@@ -606,7 +607,7 @@
                 $option_name = 'Edit Items';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-items/', 'text' => $option_name, 'bullet' => 'flask'),
-                    'desc' => 'edit the details and images of the various in-game items',
+                    'desc' => 'Manage in-game item details and images',
                     'repo' => array(
                         'name' => 'items',
                         'data' => array('prefix' => 'item'),
@@ -644,7 +645,7 @@
                 $option_name = 'Edit Fields';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-fields/', 'text' => $option_name, 'bullet' => 'map'),
-                    'desc' => 'edit the details and images of the in-game battle fields',
+                    'desc' => 'Manage in-game battle field details and images',
                     'repo' => array(
                         'name' => 'fields',
                         'data' => array('prefix' => 'field'),
@@ -683,7 +684,7 @@
                 && file_exists(MMRPG_CONFIG_CDN_ROOTDIR)){
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-music/', 'text' => 'Edit Music', 'bullet' => 'music'),
-                    'desc' => 'edit the details and sound files of the in-game music tracks',
+                    'desc' => 'Manage in-game music track details and sound files',
                     );
                 $this_group_options[] = $this_option;
             }
@@ -707,7 +708,7 @@
             if (rpg_user::current_user_has_permission('edit-stars')){
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-stars/', 'text' => 'Edit Rogue Stars', 'bullet' => 'star'),
-                    'desc' => 'schedule and manage rogue star appearances in the post-game',
+                    'desc' => 'Schedule and manage post-game rogue star appearances',
                     'repo' => array(
                         'name' => 'stars',
                         'data' => array('prefix' => 'star'),
@@ -743,7 +744,7 @@
             if (rpg_user::current_user_has_permission('edit-event-challenges')){
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-event-challenges/', 'text' => 'Edit Event Challenges', 'bullet' => 'trophy'),
-                    'desc' => 'create or modify event-based challenge missions for the post-game',
+                    'desc' => 'Create or modify post-game event-based challenge missions',
                     'repo' => array(
                         'name' => 'challenges',
                         'data' => array('prefix' => 'challenge'),
@@ -796,7 +797,7 @@
             if (rpg_user::current_user_has_permission('edit-pages')){
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-pages/', 'text' => 'Edit Website Pages', 'bullet' => 'sitemap'),
-                    'desc' => 'edit the text and images on various website pages',
+                    'desc' => 'Manage text and images on various website pages',
                     'repo' => array(
                         'name' => 'pages',
                         'data' => array('prefix' => 'page'),
@@ -859,14 +860,14 @@
         if (rpg_user::current_user_has_permission('pull-content-updates')){
             $this_option = array(
                 'link' => array('url' => 'admin/scripts/pull-all-game-content.php?return=html', 'text' => 'Pull Content Updates', 'target' => '_blank', 'bullet' => 'cloud-download-alt'),
-                'desc' => 'pull published updates to game content and apply to this build'
+                'desc' => 'Apply published game content updates to this build'
                 );
             $this_group_options[] = $this_option;
         }
         if (rpg_user::current_user_has_permission('pull-core-updates')){
             $this_option = array(
                 'link' => array('url' => 'admin/scripts/update-core.php?return=html', 'text' => 'Pull Core Updates', 'target' => '_blank', 'bullet' => 'caret-square-down'),
-                'desc' => 'pull updates to the master code, typically used only by the lead dev'
+                'desc' => 'Apply master code updates, typically for lead dev use'
                 );
             $this_group_options[] = $this_option;
         }
@@ -875,7 +876,7 @@
             if (rpg_user::current_user_has_permission('pull-user-data')){
                 $this_option = array(
                     'link' => array('url' => 'admin/scripts/pull-live-user-data.php?return=html', 'text' => 'Pull Live User Data', 'target' => '_blank', 'bullet' => 'arrow-alt-circle-down'),
-                    'desc' => 'pull current users and their data from live build to overwrite existing'
+                    'desc' => 'Overwrite '.MMRPG_CONFIG_SERVER_ENV.' user data with '.MMRPG_CONFIG_PULL_LIVE_DATA_FROM.' build data'
                     );
                 $this_group_options[] = $this_option;
             }
@@ -883,7 +884,7 @@
         if (rpg_user::current_user_has_permission('delete-cached-files')){
             $this_option = array(
                 'link' => array('url' => 'admin/delete-cached-files/', 'text' => 'Delete Cached Files', 'target' => '_blank', 'bullet' => 'trash'),
-                'desc' => 'delete cached markup, objects, timeouts, indexes, and more'
+                'desc' => 'Remove cached markup, objects, timeouts, indexes, etc.'
                 );
             $this_group_options[] = $this_option;
         }
@@ -892,7 +893,7 @@
             && rpg_user::current_user_has_permission('refresh-leaderboard')){
             $this_option = array(
                 'link' => array('url' => 'admin/scripts/refresh-battle-points.php?limit=10&offset=0&return=html', 'text' => 'Refresh Leaderboard', 'target' => '_blank', 'bullet' => 'sync-alt'),
-                'desc' => 'recalculate battle points for X number of users and refresh leaderboard'
+                'desc' => 'Recalculate battle points and update leaderboard for specified users'
                 );
             /* $this_option = array(
                 'link' => array('url' => 'admin/refresh-leaderboard/incognito=true&amp;force=true', 'text' => 'Refresh Leaderboard', 'target' => '_blank', 'bullet' => 'sync-alt'),
@@ -905,14 +906,14 @@
             && rpg_user::current_user_has_permission('purge-bogus-users')){
             $this_option = array(
                 'link' => array('url' => 'admin/purge-bogus-users/limit=10', 'text' => 'Purge Bogus Users', 'target' => '_blank', 'bullet' => 'bomb'),
-                'desc' => 'purge user accounts with zero progress and no login history'
+                'desc' => 'Remove user accounts with no progress or login history'
                 );
             $this_group_options[] = $this_option;
         }
         if (rpg_user::current_user_has_permission('watch-error-logs')){
             $this_option = array(
                 'link' => array('url' => 'admin/watch-error-log/', 'text' => 'Watch Error Log', 'target' => '_blank', 'bullet' => 'bug'),
-                'desc' => 'watch the error log to help with dev, debug, and testing'
+                'desc' => 'Monitor error log for development, debugging, and testing purposes'
                 );
             $this_group_options[] = $this_option;
         }

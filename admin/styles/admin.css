@@ -261,9 +261,47 @@ a:hover {
 .adminhome li > div.link {
     width: 25%;
 }
+.adminhome li.moderate-message-replies,
+.adminhome li.moderate-thread-comments,
+.adminhome li.edit-master-abilities,
+.adminhome li.edit-mecha-abilities,
+.adminhome li.edit-boss-abilities {
+    position: relative;
+}
+.adminhome li.moderate-message-replies:before,
+.adminhome li.moderate-thread-comments:before,
+.adminhome li.edit-master-abilities:before,
+.adminhome li.edit-mecha-abilities:before,
+.adminhome li.edit-boss-abilities:before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 12px;
+    left: 8px;
+    width: 6px;
+    height: 6px;
+    border-left: 1px solid #E0E0E0;
+    border-bottom: 1px solid #E0E0E0;
+    transform: rotate(-135deg);
+}
+.adminhome li.moderate-message-replies >  div.link,
+.adminhome li.moderate-thread-comments >  div.link,
+.adminhome li.edit-master-abilities >  div.link,
+.adminhome li.edit-mecha-abilities >  div.link,
+.adminhome li.edit-boss-abilities >  div.link {
+    padding-left: 16px;
+}
+
 .adminhome li > div.desc {
     width: auto;
     font-weight: normal;
+}
+.adminhome li > div.desc:before {
+    content: " | ";
+    display: inline-block;
+    margin: 0 12px 0 0;
+    font-weight: normal;
+    opacity: 0.1;
 }
 .adminhome li > div.buttons {
     float: right;
@@ -733,6 +771,9 @@ tr:nth-child(odd) td {
     width: 95%;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+.adminform table tbody td .wrap.nowrap {
+    white-space: nowrap;
 }
 
 
@@ -2277,7 +2318,6 @@ input[type=file] {
 .adminform .results .list .flag,
 .adminform .results .list .order,
 .adminform .results .list .count,
-.adminform .results .list .creator,
 .adminform .results .list .target,
 .adminform .results .list .game,
 .adminform .results .list .points,
