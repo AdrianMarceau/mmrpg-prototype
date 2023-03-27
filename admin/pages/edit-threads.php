@@ -35,18 +35,7 @@
     $mmrpg_types_index = cms_admin::get_types_index();
 
     // Collect indexes for required object types
-    $community_categories_index = cms_thread_category::get_index();
-    //error_log('$community_categories_index = '.print_r($community_categories_index, true));
-    $community_categories_index[0] = array(
-        'category_id' => 0,
-        'category_level' => 6,
-        'category_name' => 'Personal',
-        'category_token' => 'personal',
-        'category_description' => '',
-        'category_published' => 0,
-        'category_order' => -1,
-        '_parsed' => 1
-        );
+    $community_categories_index = cms_thread_category::get_index(true, true, true);
 
     // Create a temporary index of username to be used below
     $community_users_index = array();
@@ -88,6 +77,7 @@
     foreach ($community_categories_index AS $this_category_key => $category_info){
         $category_id = $category_info['category_id'];
         $category_token = $category_info['category_token'];
+        if ($category_info['category_token'] == 'chat'){ continue; }
         if ($this_thread_class === 'private' && $category_token !== 'personal'){ continue; }
         elseif ($this_thread_class !== 'private' && $category_token === 'personal'){ continue; }
         $category_name = !empty($category_info['category_name']) ? $category_info['category_name'] : 'Unknown ID '.$category_id;
@@ -104,6 +94,7 @@
         $creator_id = $creator_info['user_id'];
         $creator_name = !empty($creator_info['user_name_public']) ? $creator_info['user_name_public'] : $creator_info['user_name'];
         if ($creator_name !== $creator_info['user_name']){ $creator_name .= ' ('.$creator_info['user_name'].')'; }
+        $creator_name .= ' (ID: '.$creator_info['user_id'].')';
         $user_options_markup[] = '<option value="'.$creator_id.'">'.$creator_name.'</option>';
     }
     $creator_options_count = count($user_options_markup);
@@ -536,7 +527,7 @@
 
     <?= !empty($this_error_markup) ? '<div style="margin: 0 auto 20px">'.$this_error_markup.'</div>' : '' ?>
 
-    <div class="adminform edit-<?= $this_thread_xclass_name ?>" data-baseurl="<?= $this_thread_page_baseurl ?>" data-object="thread" data-xobject="threads">
+    <div class="adminform edit-community edit-threads edit-<?= $this_thread_xclass_name ?>" data-baseurl="<?= $this_thread_page_baseurl ?>" data-object="thread" data-xobject="threads">
 
         <? if ($sub_action == 'search'): ?>
 
