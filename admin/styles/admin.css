@@ -2792,6 +2792,12 @@ input[type=file] {
 .adminform.edit-community .posts-list li.focus .post-body {
     border-color: #008aab;
 }
+.adminform.edit-community .posts-list li.focus.deleted .post-body {
+    border-color: #a50909;
+}
+.adminform.edit-community .posts-list li.deleted .post-body {
+    text-decoration: line-through;
+}
 .adminform.edit-community .posts-list .post-author,
 .adminform.edit-community .posts-list .post-date,
 .adminform.edit-community .posts-list .post-key,

@@ -1171,9 +1171,9 @@
                                             $thread_author_username = $thread_author['user_name_clean'];
                                             $thread_author_url = 'admin/edit-users/editor/user_id=' . $thread_data['user_id'];
                                             $thread_body = htmlspecialchars($thread_data['thread_body']);
-                                            $thread_view_url = '#';
+                                            $thread_view_url = !empty($thread_data['thread_url']) ? $thread_data['thread_url'] : '';
                                             ?>
-                                            <li class="focus">
+                                            <li class="focus <?= !$thread_data['thread_published'] ? 'deleted' : '' ?>">
                                                 <div class="post-author">
                                                     By: <a href="<?= $thread_author_url ?>" class="author"><?= $thread_author_username ?></a>
                                                 </div>
@@ -1184,7 +1184,9 @@
                                                     <ins>Initial <?= $this_thread_class_name_uc ?></ins>
                                                 </div>
                                                 <div class="post-actions">
-                                                    <a href="<?= $thread_view_url ?>" target="_blank"><i class="fas fa-external-link-alt"></i><strong>view on site</strong></a>
+                                                    <? if ($this_thread_class == 'public' && $thread_data['thread_published']){ ?>
+                                                        <a href="<?= $thread_view_url ?>" target="_blank"><i class="fas fa-external-link-alt"></i><strong>view on site</strong></a>
+                                                    <? } ?>
                                                 </div>
                                                 <div class="post-body">
                                                     <?= $thread_body ?>
@@ -1199,11 +1201,11 @@
                                                     $post_id = $post['post_id'];
                                                     $post_body = htmlspecialchars($post['post_body']);
                                                     $post_edit_url = $this_thread_post_page_baseurl . 'editor/post_id=' . $post_id;
-                                                    $post_view_url = '#';
+                                                    $post_view_url = !empty($post['post_url']) ? $post['post_url'] : '';
                                                     $post_author_username = htmlspecialchars($post['author_name']);
                                                     $post_author_url = 'admin/edit-users/editor/user_id=' . $post['author_id'];
                                                     ?>
-                                                    <li>
+                                                    <li class="<?= !$thread_data['thread_published'] || $post['post_deleted'] ? 'deleted' : '' ?>">
                                                         <div class="post-author">
                                                             By: <a href="<?= $post_author_url ?>" class="author"><?= $post_author_username ?></a>
                                                         </div>
@@ -1215,7 +1217,9 @@
                                                         </div>
                                                         <div class="post-actions">
                                                             <a href="<?= $post_edit_url ?>"><i class="fas fa-pencil-alt"></i><strong>edit in admin</strong></a>
-                                                            <a href="<?= $post_view_url ?>" target="_blank"><i class="fas fa-external-link-alt"></i><strong>view on site</strong></a>
+                                                            <? if ($this_thread_class == 'public' && $thread_data['thread_published'] && !$post['post_deleted']){ ?>
+                                                                <a href="<?= $post_view_url ?>" target="_blank"><i class="fas fa-external-link-alt"></i><strong>view on site</strong></a>
+                                                            <? } ?>
                                                         </div>
                                                         <div class="post-body">
                                                             <?= $post_body ?>

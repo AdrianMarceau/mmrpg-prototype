@@ -116,7 +116,7 @@ class cms_thread_post {
                 LEFT JOIN `mmrpg_users` AS `users` ON `users`.`user_id` = `posts`.`user_id`
                 LEFT JOIN `mmrpg_threads` AS `threads` ON `threads`.`thread_id` = `posts`.`thread_id`
                 LEFT JOIN `mmrpg_categories` AS `categories` ON `categories`.`category_id` = `posts`.`category_id`
-                WHERE `posts`.`post_deleted` = 0 ";
+                WHERE 1 = 1 ";
 
         // Collect any filters that were passed to this function and add them to the query
         if (!empty($filters)) {
@@ -127,10 +127,15 @@ class cms_thread_post {
                 } else {
                     $query_string .= "AND `posts`.`post_id` = {$filters['post_id']} ";
                 }
+            } else {
+                if (!isset($filters['post_deleted'])){
+                    $filters['post_deleted'] = 0;
+                }
             }
             if (isset($filters['category_id'])) { $query_string .= "AND `posts`.`category_id` = {$filters['category_id']} "; }
             if (isset($filters['thread_id'])) { $query_string .= "AND `posts`.`thread_id` = {$filters['thread_id']} "; }
             if (isset($filters['user_id'])) { $query_string .= "AND `posts`.`user_id` = {$filters['user_id']} "; }
+            if (isset($filters['post_deleted'])) { $query_string .= "AND `posts`.`post_deleted` = {$filters['post_deleted']} "; }
             // Add any other filters here as needed
         }
 

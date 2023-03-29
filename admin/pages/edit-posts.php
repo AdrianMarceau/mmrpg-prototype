@@ -1089,9 +1089,9 @@
                                             $thread_author_url = 'admin/edit-users/editor/user_id=' . $post_thread_data['user_id'];
                                             $thread_body = htmlspecialchars($post_thread_data['thread_body']);
                                             $post_thread_edit_url = $this_post_thread_page_baseurl . 'editor/thread_id=' . $thread_id;
-                                            $post_thread_view_url = $post_thread_data['thread_url'];
+                                            $post_thread_view_url = !empty($post_thread_data['thread_url']) ? $post_thread_data['thread_url'] : '';
                                             ?>
-                                            <li>
+                                            <li class="<?= !$post_thread_data['thread_published'] ? 'deleted' : '' ?>">
                                                 <div class="post-author">
                                                     By: <a href="<?= $thread_author_url ?>" class="author"><?= $thread_author_username ?></a>
                                                 </div>
@@ -1103,7 +1103,9 @@
                                                 </div>
                                                 <div class="post-actions">
                                                     <a href="<?= $post_thread_edit_url ?>"><i class="fas fa-pencil-alt"></i><strong>edit in admin</strong></a>
-                                                    <a href="<?= $post_thread_view_url ?>" target="_blank"><i class="fas fa-external-link-alt"></i><strong>view on site</strong></a>
+                                                    <? if ($this_post_class == 'public' && $post_thread_data['thread_published'] && !empty($post_thread_view_url)){ ?>
+                                                        <a href="<?= $post_thread_view_url ?>" target="_blank"><i class="fas fa-external-link-alt"></i><strong>view on site</strong></a>
+                                                    <? } ?>
                                                 </div>
                                                 <div class="post-body">
                                                     <?= $thread_body ?>
@@ -1113,16 +1115,23 @@
                                             // If threads were found, we should print them out now
                                             if (!empty($community_thread_posts_array)){
                                                 $post_num = 0;
+                                                // If this post has been deleted, it's not going to be in the data and we have to re-add it manually
+                                                if ($post_data['post_deleted']){
+                                                    $insert_post_info = cms_thread_post::get_thread_post_info($post_data['post_id'], true);
+                                                    $community_thread_posts_array[] = $insert_post_info;
+                                                    usort($community_thread_posts_array, function($a, $b) { return $a['post_date'] > $b['post_date']; });
+                                                }
                                                 foreach ($community_thread_posts_array as $post) {
                                                     $post_num++;
                                                     $post_id = $post['post_id'];
                                                     //if ($post_id !== $post_data['post_id']){ echo('<li></li>'); continue; }
                                                     $post_body = htmlspecialchars($post['post_body']);
-                                                    $post_view_url = $post['post_url'];
+                                                    $post_edit_url = $this_post_thread_page_baseurl . 'editor/post_id=' . $post_id;
+                                                    $post_view_url = !empty($post['post_url']) ? $post['post_url'] : '';
                                                     $post_author_username = htmlspecialchars($post['author_name']);
                                                     $post_author_url = 'admin/edit-users/editor/user_id=' . $post['author_id'];
                                                     ?>
-                                                    <li class="<?= $post_id === $post_data['post_id'] ? 'focus' : ''?>">
+                                                    <li class="<?= $post_id === $post_data['post_id'] ? 'focus ' : ''?><?= !$post_thread_data['thread_published'] || $post['post_deleted'] ? 'deleted ' : ''?>">
                                                         <div class="post-author">
                                                             By: <a href="<?= $post_author_url ?>" class="author"><?= $post_author_username ?></a>
                                                         </div>
@@ -1130,16 +1139,22 @@
                                                             On: <ins><?= !empty($post['post_date']) ? str_replace('@', 'at', date('Y-m-d @ g:s a', $post['post_date'])) : '-' ?></ins>
                                                         </div>
                                                         <div class="post-key">
-                                                            <?= $this_post_class_name_uc ?> No. <ins><?= $post_num.' of '.$community_thread_posts_count ?></ins>
+                                                            <?= $this_post_class_name_uc ?> No. <ins><?= (!$post['post_deleted'] ? $post_num : '?').' of '.$community_thread_posts_count ?></ins>
                                                         </div>
                                                         <div class="post-actions">
-                                                            <a href="<?= $post_view_url ?>" target="_blank"><i class="fas fa-external-link-alt"></i><strong>view on site</strong></a>
+                                                            <? if ($post_id !== $post_data['post_id']){ ?>
+                                                                <a href="<?= $post_edit_url ?>"><i class="fas fa-pencil-alt"></i><strong>edit in admin</strong></a>
+                                                            <? } ?>
+                                                            <? if ($this_post_class == 'public' && !$post['post_deleted'] && !empty($post_view_url)){ ?>
+                                                                <a href="<?= $post_view_url ?>" target="_blank"><i class="fas fa-external-link-alt"></i><strong>view on site</strong></a>
+                                                            <? } ?>
                                                         </div>
                                                         <div class="post-body">
                                                             <?= $post_body ?>
                                                         </div>
                                                     </li>
                                                     <?
+                                                    if ($post['post_deleted']){ $post_num--; }
                                                 }
                                             } else {
                                                 ?>

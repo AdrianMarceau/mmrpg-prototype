@@ -119,7 +119,7 @@ class cms_thread {
                 LEFT JOIN `mmrpg_categories` AS `categories` ON `categories`.`category_id` = `threads`.`category_id`
                 LEFT JOIN `mmrpg_posts` AS `posts` ON `posts`.`thread_id` = `threads`.`thread_id`
                 LEFT JOIN `mmrpg_users` AS `users` ON `users`.`user_id` = `threads`.`user_id`
-                WHERE `threads`.`thread_published` = 1 ";
+                WHERE 1 = 1 ";
 
         // Collect any filters that were passed to this function and add them to the query
         if (!empty($filters)) {
@@ -130,6 +130,10 @@ class cms_thread {
                 } else {
                     $query_string .= "AND `threads`.`thread_id` = {$filters['thread_id']} ";
                 }
+            } else {
+                if (!isset($filters['thread_published'])){
+                    $filters['thread_published'] = 1;
+                }
             }
             if (isset($filters['category_kind'])) {
                 if ($filters['category_kind'] === 'public') { $query_string .= "AND `categories`.`category_id` != 0 "; }
@@ -138,6 +142,7 @@ class cms_thread {
             if (isset($filters['category_id'])) { $query_string .= "AND `categories`.`category_id` = {$filters['category_id']} "; }
             if (isset($filters['thread_target'])) { $query_string .= "AND `threads`.`thread_target` = {$filters['thread_target']} "; }
             if (isset($filters['user_id'])) { $query_string .= "AND `threads`.`user_id` = {$filters['user_id']} "; }
+            if (isset($filters['thread_published'])) { $query_string .= "AND `threads`.`thread_published` = {$filters['thread_published']} "; }
             // Add any other filters here as needed
         }
 
@@ -188,12 +193,15 @@ class cms_thread {
 
 
     // Generate markup for a single <option> element for a thread.
-    public static function generate_thread_option_markup($thread_info, $include_user_name = true, $include_thread_date = true)
-    {
+    public static function generate_thread_option_markup($thread_info, $include_user_name = true, $include_thread_date = true){
         $thread_id = $thread_info['thread_id'];
-        $user_name = !empty($thread_info['author_name_public']) && $thread_info['author_name_public'] !== $thread_info['author_name']
-            ? $thread_info['author_name_public'] . ' / ' . $thread_info['author_name']
-            : $thread_info['author_name_public'] ?: $thread_info['author_name'];
+        $author_name_public = isset($thread_info['author_name_public']) ? $thread_info['author_name_public'] : '';
+        $author_name = isset($thread_info['author_name']) ? $thread_info['author_name'] : '';
+        if (!empty($author_name_public) && $author_name_public !== $author_name) {
+            $user_name = $author_name_public . ' / ' . $author_name;
+        } else {
+            $user_name = !empty($author_name_public) ? $author_name_public : $author_name;
+        }
         $thread_name = !empty($thread_info['thread_name']) ? $thread_info['thread_name'] : 'Unknown ID '.$thread_id;
         $thread_label = $thread_name;
         if ($include_user_name) {
@@ -205,9 +213,9 @@ class cms_thread {
         return '<option value="'.$thread_id.'">'.$thread_label.'</option>';
     }
 
+
     // Generate markup for a <select> element containing options for all threads.
-    public static function generate_thread_options_markup($community_threads_index, $include_user_name = true, $include_thread_date = true)
-    {
+    public static function generate_thread_options_markup($community_threads_index, $include_user_name = true, $include_thread_date = true){
         // Pre-generate a list of all threads so we can re-use it over and over
         $last_category_id = false;
         $thread_options_markup = array();

@@ -1533,7 +1533,7 @@ $(document).ready(function(){
             function updateThreads() {
                 //console.log('updateThreads()');
                 var categoryId = $categoryDropdown.val();
-                var url = 'admin/scripts/get-content.php?return=json&request=get-threads&category=' + categoryId;
+                var url = 'admin/scripts/get-content.php?return=json&request=get-threads&full=true&category=' + categoryId;
                 $.getJSON(url, function (data) {
                     if (data.status === 'success') {
                         //console.log('data.status === \'success\'', data);
@@ -1561,7 +1561,7 @@ $(document).ready(function(){
             }
 
             // Update threads initially and when the category changes
-            updateThreads();
+            //updateThreads();
             $categoryDropdown.bind('change', updateThreads);
 
             // Update the backup value when the user selects a new thread
