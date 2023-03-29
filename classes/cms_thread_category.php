@@ -14,7 +14,7 @@ class cms_thread_category {
     public static function get_index_fields($implode = false, $table = ''){
 
         // Define the various table fields for category objects
-        $category_fields = array(
+        $thread_category_fields = array(
             'category_id',
             'category_level',
             'category_name',
@@ -26,18 +26,18 @@ class cms_thread_category {
 
         // Add table name to each field string if requested
         if (!empty($table)){
-            foreach ($category_fields AS $key => $field){
-                $category_fields[$key] = $table.'.'.$field;
+            foreach ($thread_category_fields AS $key => $field){
+                $thread_category_fields[$key] = $table.'.'.$field;
             }
         }
 
         // Implode the table fields into a string if requested
         if ($implode){
-            $category_fields = implode(', ', $category_fields);
+            $thread_category_fields = implode(', ', $thread_category_fields);
         }
 
         // Return the table fields, array or string
-        return $category_fields;
+        return $thread_category_fields;
 
     }
 
@@ -53,10 +53,10 @@ class cms_thread_category {
         $db = cms_database::get_database();
 
         // Collect every category's info from the database index
-        $category_fields = self::get_index_fields(true);
+        $thread_category_fields = self::get_index_fields(true);
         $where_string = '1 = 1 '.($include_personal ? '' : 'AND category_id <> 0 ');
         if (!is_string($index_field)){ $index_field = 'category_id'; }
-        $category_index = $db->get_array_list("SELECT {$category_fields} FROM mmrpg_categories WHERE {$where_string};", $index_field);
+        $category_index = $db->get_array_list("SELECT {$thread_category_fields} FROM mmrpg_categories WHERE {$where_string};", $index_field);
 
         // Parse and return the data if not empty, else nothing
         if (!empty($category_index)){
@@ -92,8 +92,8 @@ class cms_thread_category {
         $where_string = implode(' OR ', $where_string);
 
         // Collect the requested category's info from the database index
-        $category_fields = self::get_index_fields(true);
-        $category_index = $db->get_array_list("SELECT {$category_fields} FROM mmrpg_categories WHERE category_id <> 0 AND ({$where_string});", $index_field);
+        $thread_category_fields = self::get_index_fields(true);
+        $category_index = $db->get_array_list("SELECT {$thread_category_fields} FROM mmrpg_categories WHERE category_id <> 0 AND ({$where_string});", $index_field);
 
         // Parse and return the data if not empty, else nothing
         if (!empty($category_index)){
@@ -120,8 +120,8 @@ class cms_thread_category {
 
         // Return the tokens if not empty, else nothing
         if (!empty($category_index)){
-            $category_fields = array_keys($category_index);
-            return $category_fields;
+            $thread_category_fields = array_keys($category_index);
+            return $thread_category_fields;
         } else {
             return array();
         }
@@ -166,8 +166,8 @@ class cms_thread_category {
 
         // Collect this category's info from the database index
         $lookup = !is_numeric($category_lookup) ? "category_name_clean = '{$category_lookup}'" : "category_id = {$category_lookup}";
-        $category_fields = self::get_index_fields(true);
-        $category_index = $db->get_array("SELECT {$category_fields} FROM mmrpg_categories WHERE {$lookup};");
+        $thread_category_fields = self::get_index_fields(true);
+        $category_index = $db->get_array("SELECT {$thread_category_fields} FROM mmrpg_categories WHERE {$lookup};");
 
         // Parse and return the data if not empty, else nothing
         if (!empty($category_index)){

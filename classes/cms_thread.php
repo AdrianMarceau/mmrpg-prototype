@@ -14,7 +14,7 @@ class cms_thread {
     public static function get_index_fields($implode = false, $table = ''){
 
         // Define the various table fields for music objects
-        $music_fields = array(
+        $thread_fields = array(
             'thread_id',
             'category_id',
             'user_id',
@@ -37,18 +37,18 @@ class cms_thread {
 
         // Add table name to each field string if requested
         if (!empty($table)){
-            foreach ($music_fields AS $key => $field){
-                $music_fields[$key] = $table.'.'.$field;
+            foreach ($thread_fields AS $key => $field){
+                $thread_fields[$key] = $table.'.'.$field;
             }
         }
 
         // Implode the table fields into a string if requested
         if ($implode){
-            $music_fields = implode(', ', $music_fields);
+            $thread_fields = implode(', ', $thread_fields);
         }
 
         // Return the table fields, array or string
-        return $music_fields;
+        return $thread_fields;
 
     }
 
@@ -56,59 +56,93 @@ class cms_thread {
     // Define a function for returning a list of threads from the database
     public static function get_community_threads($filters = array(), $pagination = array(), $sorting = array(), $fetch_all_fields = false, $index_by_id = false) {
 
+        // Collect a reference to the database
         $db = cms_database::get_database();
 
-        $select_fields = self::get_index_fields(false, 'threads');
+        // Define an array to hold SELECT fields to run against the DB
+        $select_fields = array();
+        $remove_fields = array();
 
-        if (!$fetch_all_fields) {
-            $remove = array('threads.thread_body', 'threads.thread_frame', 'threads.thread_colour');
-            $select_fields = array_filter($select_fields, function($val) use($remove){ return !in_array($val, $remove); });
-        }
+        // Pull table field names from the helper classes of each
+        $thread_fields = self::get_index_fields(false, 'threads');
+        $thread_category_fields = cms_thread_category::get_index_fields(false, 'categories');
+        $thread_post_fields = cms_thread_post::get_index_fields(false, 'posts');
 
-        $select_fields = array_merge($select_fields, array(
-            'categories.category_name',
-            'categories.category_token',
-            '(CASE WHEN categories.category_id = 0 THEN \'private\' ELSE \'public\' END) AS category_kind',
-            'categories.category_order',
-            'users.user_id AS author_id',
-            'users.user_name AS author_name',
-            'users.user_name_clean AS author_name_clean',
-            'users.user_name_public AS author_name_public',
-            'users.user_image_path AS author_image_path',
-            'users.user_colour_token AS author_colour_token',
-            'users.user_colour_token2 AS author_colour_token2',
-            'COUNT(posts.post_id) AS thread_post_count'
+        // Merge in the thread fields and then parse out ones we might not want
+        $select_fields = array_merge($select_fields, $thread_fields, array(
+            // ...
             ));
-
-        if ($fetch_all_fields) {
-            $select_fields[] = 'threads.thread_body';
-            $select_fields[] = 'threads.thread_frame';
-            $select_fields[] = 'threads.thread_colour';
+        if (!$fetch_all_fields) {
+            $remove_fields[] = '`threads`.`thread_body`';
         }
 
+        // Merge in the thread category fields and then parse out ones we might not want
+        if ($fetch_all_fields) {
+            $select_fields = array_merge($select_fields, $thread_category_fields, array(
+                '(CASE WHEN `categories`.`category_id` = 0 THEN \'private\' ELSE \'public\' END) AS `category_kind`'
+                ));
+        }
+
+        // Merge in the user fields and then parse out ones we might not want
+        if ($fetch_all_fields) {
+            $select_fields = array_merge($select_fields, array(
+                '`users`.`user_id` AS `author_id`',
+                '`users`.`user_name` AS `author_name`',
+                '`users`.`user_name_clean` AS `author_name_clean`',
+                '`users`.`user_name_public` AS `author_name_public`',
+                '`users`.`user_image_path` AS `author_image_path`',
+                '`users`.`user_colour_token` AS `author_colour_token`',
+                '`users`.`user_colour_token2` AS `author_colour_token2`'
+                ));
+        }
+
+        // Merge in the thread post fields if we're allowed to
+        if ($fetch_all_fields) {
+            $select_fields = array_merge($select_fields, array(
+                'COUNT(`posts`.`post_id`) AS `thread_post_count`',
+                'GROUP_CONCAT(`posts`.`post_id` ORDER BY `posts`.`post_date` ASC) AS `thread_post_ids`'
+                ));
+        }
+
+        // Remove any fields that should be removed based on filtering
+        if (!empty($remove_fields)) {
+            $select_fields = array_filter($select_fields, function($val) use($remove_fields){ return !in_array($val, $remove_fields); });
+        }
+
+        // Implode the select fields into a string
         $select_fields_imploded = implode(', ', $select_fields);
 
-        $sql = "SELECT
+        // Define the base SQL query for this function
+        $query_string = "SELECT
                 {$select_fields_imploded}
-                FROM mmrpg_threads AS threads
-                LEFT JOIN mmrpg_categories AS categories ON categories.category_id = threads.category_id
-                LEFT JOIN mmrpg_posts AS posts ON posts.thread_id = threads.thread_id
-                LEFT JOIN mmrpg_users AS users ON users.user_id = threads.user_id
-                WHERE threads.thread_published = 1 ";
+                FROM `mmrpg_threads` AS `threads`
+                LEFT JOIN `mmrpg_categories` AS `categories` ON `categories`.`category_id` = `threads`.`category_id`
+                LEFT JOIN `mmrpg_posts` AS `posts` ON `posts`.`thread_id` = `threads`.`thread_id`
+                LEFT JOIN `mmrpg_users` AS `users` ON `users`.`user_id` = `threads`.`user_id`
+                WHERE `threads`.`thread_published` = 1 ";
 
+        // Collect any filters that were passed to this function and add them to the query
         if (!empty($filters)) {
-            if (isset($filters['category_kind'])) {
-                if ($filters['category_kind'] === 'public') { $sql .= "AND categories.category_id != 0 "; }
-                elseif ($filters['category_kind'] === 'private') { $sql .= "AND categories.category_id = 0 "; }
+            if (isset($filters['thread_id'])) {
+                if (is_array($filters['thread_id'])) {
+                    $thread_id_list = implode(',', $filters['thread_id']);
+                    $query_string .= "AND `threads`.`thread_id` IN ({$thread_id_list}) ";
+                } else {
+                    $query_string .= "AND `threads`.`thread_id` = {$filters['thread_id']} ";
+                }
             }
-            if (isset($filters['category_id'])) { $sql .= "AND categories.category_id = {$filters['category_id']} "; }
-            if (isset($filters['thread_target'])) { $sql .= "AND threads.thread_target = {$filters['thread_target']} "; }
-            if (isset($filters['user_id'])) { $sql .= "AND threads.user_id = {$filters['user_id']} "; }
+            if (isset($filters['category_kind'])) {
+                if ($filters['category_kind'] === 'public') { $query_string .= "AND `categories`.`category_id` != 0 "; }
+                elseif ($filters['category_kind'] === 'private') { $query_string .= "AND `categories`.`category_id` = 0 "; }
+            }
+            if (isset($filters['category_id'])) { $query_string .= "AND `categories`.`category_id` = {$filters['category_id']} "; }
+            if (isset($filters['thread_target'])) { $query_string .= "AND `threads`.`thread_target` = {$filters['thread_target']} "; }
+            if (isset($filters['user_id'])) { $query_string .= "AND `threads`.`user_id` = {$filters['user_id']} "; }
             // Add any other filters here as needed
         }
 
-        $sql .= "GROUP BY threads.thread_id ";
-
+        // Collect any sorting that was passed to this function and add it to the query
+        $query_string .= "GROUP BY `threads`.`thread_id` ";
         if (!empty($sorting)) {
             $sorting_array = array();
             foreach ($sorting as $field => $direction) {
@@ -116,32 +150,34 @@ class cms_thread {
                 $sorting_array[] = "{$field} {$direction}";
             }
             $sorting_string = implode(', ', $sorting_array);
-            $sql .= "ORDER BY {$sorting_string} ";
+            $query_string .= "ORDER BY {$sorting_string} ";
         } else {
-            $sql .= "ORDER BY categories.category_order ASC, threads.thread_date DESC ";
+            $query_string .= "ORDER BY `categories`.`category_order` ASC, `threads`.`thread_date` DESC ";
         }
 
-
+        // Collect any pagination that was passed to this function and add it to the query
         if (!empty($pagination) && isset($pagination['limit']) && isset($pagination['offset'])) {
-            $sql .= "LIMIT {$pagination['limit']} OFFSET {$pagination['offset']} ";
+            $query_string .= "LIMIT {$pagination['limit']} OFFSET {$pagination['offset']} ";
         }
 
-        $sql .= "; ";
+        // Finish the query string
+        $query_string .= "; ";
 
-        //error_log('get_community_threads()::$sql = '.print_r($sql, true));
+        // Execute the query string against the DB and format as requested
+        $community_threads_index = $db->get_array_list($query_string, 'thread_id');
+        if (!$index_by_id){ $community_threads_index = array_values($community_threads_index); }
+        if (empty($community_threads_index)){ $community_threads_index = array(); }
 
-        if ($index_by_id){
-            $community_threads_index = $db->get_array_list($sql, 'thread_id');
-        } else {
-            $community_threads_index = $db->get_array_list($sql);
+        // If the threads index is not empty, make sure we add the URLs if we're allowed
+        if ($fetch_all_fields && !empty($community_threads_index)){
+            foreach ($community_threads_index AS $key => $info){
+                $community_threads_index[$key]['thread_url'] = self::get_thread_url($info);
+            }
         }
 
-
-        if (empty($community_threads_index)) {
-            $community_threads_index = array();
-        }
-
+        // Return the community threads index
         return $community_threads_index;
+
     }
 
 
@@ -187,6 +223,51 @@ class cms_thread {
         if (!empty($thread_options_markup)){ $thread_options_markup[] = '</optgroup>'; }
         $thread_options_markup = implode(PHP_EOL, $thread_options_markup);
         return $thread_options_markup;
+    }
+
+    // Define a function for getting thread info from the database given an ID or partial info
+    public static function get_thread_info($thread_id_or_info, $fetch_all_fields = false) {
+
+        // Predefine thread ID and info variables
+        $thread_id = null;
+        $thread_info = null;
+
+        // Fetch thread info from the database if we don't already have it
+        if (!$thread_info) {
+            if (is_numeric($thread_id_or_info)) {
+                $thread_id = (int) $thread_id_or_info;
+                $filters = array('thread_id' => $thread_id);
+                $community_threads = self::get_community_threads($filters, array(), array(), $fetch_all_fields, true);
+                $thread_info = !empty($community_threads) ? array_shift($community_threads) : null;
+            } elseif (is_array($thread_id_or_info) && !empty($thread_id_or_info['thread_id'])) {
+                $thread_info = $thread_id_or_info;
+                $thread_id = (int) $thread_info['thread_id'];
+                $required_fields = array('thread_name', 'thread_token', 'thread_date');
+                if ($fetch_all_fields){ $required_fields = array_merge($required_fields, array('category_name', 'category_token', 'category_kind')); }
+                $missing_fields = array_diff($required_fields, array_keys($thread_info));
+                if (!empty($missing_fields)) {
+                    $filters = array('thread_id' => $thread_id);
+                    $community_threads = self::get_community_threads($filters, array(), array(), $fetch_all_fields, true);
+                    $thread_info = !empty($community_threads) ? array_shift($community_threads) : null;
+                }
+            } else {
+                return false;
+            }
+        }
+
+        return $thread_info;
+    }
+
+
+    // Define a function for calculating the front-end URL for a given thread
+    public static function get_thread_url($thread_id_or_info) {
+        $thread_info = self::get_thread_info($thread_id_or_info);
+        if (!$thread_info){ return false; }
+        $category_token = $thread_info['category_token'];
+        $thread_id = $thread_info['thread_id'];
+        $thread_token = $thread_info['thread_token'];
+        $thread_url = "community/{$category_token}/{$thread_id}/{$thread_token}/";
+        return $thread_url;
     }
 
 
