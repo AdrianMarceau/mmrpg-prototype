@@ -8,6 +8,7 @@ $this_thread_subclass_name = 'reply';
 $this_thread_xsubclass_name = 'replies';
 $this_thread_page_basename = 'Moderate Personal Messages';
 $this_thread_page_baseurl = 'admin/edit-messages/';
+$this_thread_post_page_baseurl = 'admin/edit-message-replies/';
 // Require the main challenge editor script with above values preset
 require_once('edit-threads.php');
 ?>

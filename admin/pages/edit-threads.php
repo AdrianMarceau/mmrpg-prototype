@@ -995,9 +995,20 @@
 
                     <? print_form_messages() ?>
 
+
+                    <?php
+                    // Collect posts for this thread if any exist (we need the list and count for later)
+                    $filter_array = array('thread_id' => $thread_data['thread_id']);
+                    $sorting_array = array('posts.post_date' => 'ASC');
+                    $community_thread_posts_index = cms_thread_post::get_community_thread_posts_index($filter_array, null, $sorting_array, true);
+                    $community_thread_posts_array = array_values($community_thread_posts_index);
+                    $community_thread_posts_count = count($community_thread_posts_array);
+                    ?>
+
                     <? if (!$thread_data_is_new){ ?>
                         <div class="editor-tabs" data-tabgroup="thread">
                             <a class="tab active" data-tab="basic">Basic</a><span></span>
+                            <a class="tab" data-tab="posts">View in Context</a><span></span>
                             <a class="tab" data-tab="spacer">&nbsp;</a><span></span>
                         </div>
                     <? } ?>
@@ -1145,6 +1156,84 @@
                                     <? } ?>
 
                                 <? } ?>
+
+                            </div>
+
+                            <div class="panel active" data-tab="posts">
+
+                                <div class="field fullsize">
+                                    <strong class="label"><?= 'Initial '.$this_thread_class_name_uc.' w/ '.$community_thread_posts_count.' '.($community_thread_posts_count === 1 ? $this_thread_subclass_name_uc : $this_thread_xsubclass_name_uc) ?></strong>
+                                    <div class="posts-list">
+                                        <ul>
+                                            <?
+                                            $thread_id = $thread_data['thread_id'];
+                                            $thread_author = $community_users_index[$thread_data['user_id']];
+                                            $thread_author_username = $thread_author['user_name_clean'];
+                                            $thread_author_url = 'admin/edit-users/editor/user_id=' . $thread_data['user_id'];
+                                            $thread_body = htmlspecialchars($thread_data['thread_body']);
+                                            $thread_view_url = '#';
+                                            ?>
+                                            <li class="focus">
+                                                <div class="post-author">
+                                                    By: <a href="<?= $thread_author_url ?>" class="author"><?= $thread_author_username ?></a>
+                                                </div>
+                                                <div class="post-date">
+                                                    On: <ins><?= !empty($thread_data['thread_date']) ? str_replace('@', 'at', date('Y-m-d @ g:s a', $thread_data['thread_date'])) : '-' ?></ins>
+                                                </div>
+                                                <div class="post-key">
+                                                    <ins>Initial <?= $this_thread_class_name_uc ?></ins>
+                                                </div>
+                                                <div class="post-actions">
+                                                    <a href="<?= $thread_view_url ?>" target="_blank"><i class="fas fa-external-link-alt"></i><strong>view on site</strong></a>
+                                                </div>
+                                                <div class="post-body">
+                                                    <?= $thread_body ?>
+                                                </div>
+                                            </li>
+                                            <?php
+                                            // If threads were found, we should print them out now
+                                            if (!empty($community_thread_posts_array)){
+                                                $post_num = 0;
+                                                foreach ($community_thread_posts_array as $post) {
+                                                    $post_num++;
+                                                    $post_id = $post['post_id'];
+                                                    $post_body = htmlspecialchars($post['post_body']);
+                                                    $post_edit_url = $this_thread_post_page_baseurl . 'editor/post_id=' . $post_id;
+                                                    $post_view_url = '#';
+                                                    $post_author_username = htmlspecialchars($post['author_name']);
+                                                    $post_author_url = 'admin/edit-users/editor/user_id=' . $post['author_id'];
+                                                    ?>
+                                                    <li>
+                                                        <div class="post-author">
+                                                            By: <a href="<?= $post_author_url ?>" class="author"><?= $post_author_username ?></a>
+                                                        </div>
+                                                        <div class="post-date">
+                                                            On: <ins><?= !empty($post['post_date']) ? str_replace('@', 'at', date('Y-m-d @ g:s a', $post['post_date'])) : '-' ?></ins>
+                                                        </div>
+                                                        <div class="post-key">
+                                                            <?= $this_thread_subclass_name_uc?> No. <ins><?= $post_num.' of '.$community_thread_posts_count ?></ins>
+                                                        </div>
+                                                        <div class="post-actions">
+                                                            <a href="<?= $post_edit_url ?>"><i class="fas fa-pencil-alt"></i><strong>edit in admin</strong></a>
+                                                            <a href="<?= $post_view_url ?>" target="_blank"><i class="fas fa-external-link-alt"></i><strong>view on site</strong></a>
+                                                        </div>
+                                                        <div class="post-body">
+                                                            <?= $post_body ?>
+                                                        </div>
+                                                    </li>
+                                                    <?
+                                                }
+                                            } else {
+                                                ?>
+                                                <li>
+                                                    &hellip;
+                                                </li>
+                                                <?
+                                            }
+                                            ?>
+                                        </ul>
+                                    </div>
+                                </div>
 
                             </div>
 

@@ -2754,3 +2754,93 @@ input[type=file] {
 .adminform.loading .buttons .button:not(.loading) {
     opacity: 0.25;
 }
+
+.adminform.edit-community .posts-list {
+    font-size: 100%;
+    line-height: 1.5;
+}
+.adminform.edit-community .posts-list ul {
+    list-style: none;
+    padding: 0;
+}
+.adminform.edit-community .posts-list li {
+    border-bottom: 1px solid #ccc;
+    padding: 15px 0;
+}
+.adminform.edit-community .posts-list li.focus {
+
+}
+.adminform.edit-community .posts-list li:after {
+    content: "";
+    clear: both;
+}
+.adminform.edit-community .posts-list li:empty {
+    padding: 2px 0;
+}
+.adminform.edit-community .posts-list .post-body {
+    clear: both;
+    width: 100%;
+    margin-bottom: 10px;
+    color: #696969;
+    border: 3px double transparent;
+    background-color: #fefefe;
+    padding: 3px 6px;
+    border-radius: 3px;
+    margin: 6px auto 0;
+    box-sizing: border-box;
+}
+.adminform.edit-community .posts-list li.focus .post-body {
+    border-color: #008aab;
+}
+.adminform.edit-community .posts-list .post-author,
+.adminform.edit-community .posts-list .post-date,
+.adminform.edit-community .posts-list .post-key,
+.adminform.edit-community .posts-list .post-actions {
+    display: inline-block;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+.adminform.edit-community .posts-list .author {
+    font-weight: bold;
+}
+.adminform.edit-community .posts-list .post-date u {
+    text-decoration: none;
+}
+.adminform.edit-community .posts-list li:last-child {
+    border-bottom: none;
+}
+.adminform.edit-community .posts-list .post-actions {
+    float: right;
+}
+.adminform.edit-community .posts-list .post-actions a {
+    display: inline-block;
+    margin-left: 10px;
+    vertical-align: middle;
+    transition: color 0.3s;
+    text-decoration: none;
+}
+.adminform.edit-community .posts-list .post-actions a i {
+    font-size: 1em;
+    margin-right: 5px;
+    vertical-align: middle;
+    color: #696969;
+}
+.adminform.edit-community .posts-list .post-actions a strong {
+    text-decoration: none;
+    font-weight: normal;
+}
+.adminform.edit-community .posts-list .post-actions a:hover strong {
+    text-decoration: underline;
+}
+.adminform.edit-community .posts-list .post-actions a strong:before,
+.adminform.edit-community .posts-list .post-actions a strong:after {
+    content: "";
+    padding: 0 3px;
+}
+.adminform.edit-community .posts-list .post-actions a strong:before {
+    content: "[";
+}
+.adminform.edit-community .posts-list .post-actions a strong:after {
+    content: "]";
+}
+
