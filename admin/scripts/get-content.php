@@ -60,8 +60,36 @@ switch ($request_type) {
 
     }
 
+    // Retrieve a single thread if requested
+    case 'get-thread': {
+
+        // Collect the thread ID if provided
+        $thread_id = isset($_GET['thread']) && is_numeric($_GET['thread']) ? (int)$_GET['thread'] : null;
+
+        // If the thread ID is not provided, exit with an error message
+        if ($thread_id === null) {
+            exit_action('error|thread_id is required');
+        }
+
+        // Collect the variable for fetching all fields if provided
+        $fetch_all_fields = isset($_GET['full']) && $_GET['full'] === 'true' ? true : false;
+
+        // Call the function with the provided thread_id and fetch_all_fields parameters
+        $thread_info = cms_thread::get_thread_info($thread_id, $fetch_all_fields);
+
+        // If the thread_info is null, it means no thread was found with the given thread_id
+        if ($thread_info === null) {
+            exit_action('error|no thread found with the given thread_id');
+        }
+
+        // Print out the success message now that we have our data and exit
+        exit_action('success|found the requested thread', $thread_info);
+        break;
+
+    }
+
     // Collect thread comments if requested
-    case 'get-threads-posts': {
+    case 'get-thread-posts': {
 
         // Collect the category ID and kind if they've been provided
         $category_id = isset($_GET['category']) && is_numeric($_GET['category']) ? (int)$_GET['category'] : -1;
