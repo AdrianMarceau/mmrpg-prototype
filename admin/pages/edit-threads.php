@@ -576,26 +576,14 @@
                     <? } ?>
 
                     <div class="field">
-                        <strong class="label">By Creator</strong>
-                        <select class="select" name="thread_creator"><option value=""></option><?
-                            foreach ($community_users_index AS $creator_id => $creator_info){
-                                $option_label = $creator_info['user_name'];
-                                if (!empty($creator_info['user_name_public']) && $creator_info['user_name_public'] !== $creator_info['user_name']){ $option_label = $creator_info['user_name_public'].' ('.$option_label.')'; }
-                                ?><option value="<?= $creator_id ?>"<?= !empty($search_data['thread_creator']) && $search_data['thread_creator'] === $creator_id ? ' selected="selected"' : '' ?>><?= $option_label ?></option><?
-                                } ?>
-                        </select><span></span>
+                        <strong class="label">By Creator ID</strong>
+                        <input class="textbox" type="text" name="thread_creator" value="<?= !empty($search_data['thread_creator']) ? $search_data['thread_creator'] : '' ?>" />
                     </div>
 
                     <? if ($this_thread_class === 'private'){ ?>
                         <div class="field">
-                            <strong class="label">By Target</strong>
-                            <select class="select" name="thread_target"><option value=""></option><?
-                                foreach ($community_users_index AS $creator_id => $creator_info){
-                                    $option_label = $creator_info['user_name'];
-                                    if (!empty($creator_info['user_name_public']) && $creator_info['user_name_public'] !== $creator_info['user_name']){ $option_label = $creator_info['user_name_public'].' ('.$option_label.')'; }
-                                    ?><option value="<?= $creator_id ?>"<?= !empty($search_data['thread_target']) && $search_data['thread_target'] === $creator_id ? ' selected="selected"' : '' ?>><?= $option_label ?></option><?
-                                    } ?>
-                            </select><span></span>
+                            <strong class="label">By Target ID</strong>
+                            <input class="textbox" type="text" name="thread_target" value="<?= !empty($search_data['thread_target']) ? $search_data['thread_target'] : '' ?>" />
                         </div>
                     <? } ?>
 

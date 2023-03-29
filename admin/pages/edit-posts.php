@@ -540,26 +540,14 @@
                     <? } ?>
 
                     <div class="field">
-                        <strong class="label">By <?= $this_post_creator_label_uc ?></strong>
-                        <select class="select" name="post_creator"><option value=""></option><?
-                            foreach ($community_users_index AS $creator_id => $creator_info){
-                                $option_label = $creator_info['user_name'];
-                                if (!empty($creator_info['user_name_public']) && $creator_info['user_name_public'] !== $creator_info['user_name']){ $option_label = $creator_info['user_name_public'].' ('.$option_label.')'; }
-                                ?><option value="<?= $creator_id ?>"<?= !empty($search_data['post_creator']) && $search_data['post_creator'] === $creator_id ? ' selected="selected"' : '' ?>><?= $option_label ?></option><?
-                                } ?>
-                        </select><span></span>
+                        <strong class="label">By <?= $this_post_creator_label_uc ?> ID</strong>
+                        <input class="textbox" type="text" name="post_creator" value="<?= !empty($search_data['post_creator']) ? $search_data['post_creator'] : '' ?>" />
                     </div>
 
                     <? if ($this_post_class === 'private'){ ?>
                         <div class="field">
-                            <strong class="label">By <?= $this_post_target_label_uc ?></strong>
-                            <select class="select" name="post_target"><option value=""></option><?
-                                foreach ($community_users_index AS $creator_id => $creator_info){
-                                    $option_label = $creator_info['user_name'];
-                                    if (!empty($creator_info['user_name_public']) && $creator_info['user_name_public'] !== $creator_info['user_name']){ $option_label = $creator_info['user_name_public'].' ('.$option_label.')'; }
-                                    ?><option value="<?= $creator_id ?>"<?= !empty($search_data['post_target']) && $search_data['post_target'] === $creator_id ? ' selected="selected"' : '' ?>><?= $option_label ?></option><?
-                                    } ?>
-                            </select><span></span>
+                            <strong class="label">By <?= $this_post_target_label_uc ?> ID</strong>
+                            <input class="textbox" type="text" name="post_target" value="<?= !empty($search_data['post_target']) ? $search_data['post_target'] : '' ?>" />
                         </div>
                     <? } ?>
 
