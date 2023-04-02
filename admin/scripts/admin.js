@@ -1500,6 +1500,81 @@ $(document).ready(function(){
     }
 
 
+    // COMMUNITY THREAD & POST EDITOR EVENTS
+
+    // Check to make sure we're on the community editor page
+    var $editCommunity = $('.adminform.edit-community', thisAdmin);
+    //console.log('$editCommunity =', $editCommunity);
+    if ($editCommunity.length){
+
+
+        // Scope thread-specific functionality if the thread editor exists on-page
+        var $editCommunityThreads = $editCommunity.filter('.edit-threads');
+        //console.log('$editCommunityThreads =', $editCommunityThreads);
+        if ($editCommunityThreads.length){
+
+            // ...
+
+        }
+
+        // Scope post-specific functionality if the post editor exists on-page
+        var $editCommunityPosts = $editCommunity.filter('.edit-posts');
+        //console.log('$editCommunityPosts =', $editCommunityPosts);
+        if ($editCommunityPosts.length) {
+
+            // Get the category and thread dropdowns
+            var $categoryDropdown = $editCommunityPosts.find('select[name="category_id"]');
+            var $threadDropdown = $editCommunityPosts.find('select[name="thread_id"]');
+
+            // Store the original thread_id
+            $threadDropdown.data('original-thread-id', $threadDropdown.val());
+
+            // Function to fetch and update threads
+            function updateThreads() {
+                //console.log('updateThreads()');
+                var categoryId = $categoryDropdown.val();
+                var url = 'admin/scripts/get-content.php?return=json&request=get-threads&full=true&category=' + categoryId;
+                $.getJSON(url, function (data) {
+                    if (data.status === 'success') {
+                        //console.log('data.status === \'success\'', data);
+                        var threads = data.data;
+                        //console.log('threads =', threads);
+                        var options = '<option value="">- select thread -</option>'; // Add the blank option
+                        var threadKeys = Object.keys(threads);
+                        for (var i = 0; i < threadKeys.length; i++) {
+                            var thread = threads[threadKeys[i]];
+                            options += '<option value="' + thread.thread_id + '">' + thread.thread_name + ' (by ' + thread.author_name + ') (' + new Date(thread.thread_date * 1000).toISOString().slice(0, 10) + ')</option>';
+                        }
+                        $threadDropdown.empty().append(options);
+
+                        // Re-select the original option if it's still in the list, otherwise select the blank option
+                        var originalThreadId = $threadDropdown.data('original-thread-id');
+                        if ($threadDropdown.find('option[value="' + originalThreadId + '"]').length) {
+                            $threadDropdown.val(originalThreadId);
+                        } else {
+                            $threadDropdown.val('');
+                        }
+                    } else {
+                        console.error('Error fetching threads:', data.message);
+                    }
+                });
+            }
+
+            // Update threads initially and when the category changes
+            //updateThreads();
+            $categoryDropdown.bind('change', updateThreads);
+
+            // Update the backup value when the user selects a new thread
+            $threadDropdown.bind('change', function () {
+                $threadDropdown.data('original-thread-id', $threadDropdown.val());
+            });
+
+
+        }
+
+    }
+
+
     // ERROR LOG EVENTS
 
     // Check to make sure we're on the page editor page

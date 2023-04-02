@@ -47,7 +47,7 @@ class cms_admin {
         $totals_markup .= '<div class="totals_div">';
         if (!empty($search_results_limit)){ $totals_markup .= ('<span class="showing">Showing '.($search_results_count == 1 ? '1 Row' : $search_results_count.' Rows').'</span>');  }
         else {  $totals_markup .= ('<span class="showing">'.($search_results_count == 1 ? '1 Result' : $search_results_count.' Results').'</span>');  }
-        if ($search_results_count != $search_results_total){ $totals_markup .= ('<span class="total">'.$search_results_total.' Total</span>'); }
+        if ($search_results_count != $search_results_total){ $totals_markup .= ('<span class="total">'.number_format($search_results_total, 0, '.', ',').' Total</span>'); }
         $totals_markup .= '</div>';
         return $totals_markup;
     }
@@ -410,9 +410,9 @@ class cms_admin {
                 if (isset($option_info['link']['icon'])){ $icon_tokens = array($option_info['link']['icon']); }
                 elseif (isset($option_info['link']['icons'])){ $icon_tokens = $option_info['link']['icons']; }
                 if (!empty($icon_tokens)){ foreach ($icon_tokens AS $token){ $link_icons .= '<i class="icon fa fa-'.$token.'"></i>'; } }
-                echo('<div class="link">'.$link_bullet.'<a'.$link_url.$link_target.$link_class.'>'.$link_text.'</a>'.$link_icons.$repo_icons.'</div>'.PHP_EOL);
+                echo('<div class="link">'.$link_bullet.'<a'.$link_url.$link_target.$link_class.'>'.$link_text.'</a>'.$link_icons.$repo_icons.'&nbsp;</div>'.PHP_EOL);
                 $desc_text = $option_info['desc'];
-                echo('<div class="desc"><em>'.$desc_text.'</em></div>'.PHP_EOL);
+                echo('<div class="desc">:&nbsp;<em>'.$desc_text.'</em></div>'.PHP_EOL);
                 if (!empty($option_info['buttons'])){
                     $buttons_markup = array();
                     foreach ($option_info['buttons'] AS $button_key => $button_info){

@@ -217,7 +217,7 @@ class rpg_user {
      * @param string $index_field (optional)
      * @return array
      */
-    public static function get_index_custom($user_list, $index_field = 'user_id'){
+    public static function get_index_custom($user_list, $index_field = 'user_id', $order_by = ''){
 
         // Pull in global variables
         $db = cms_database::get_database();
@@ -337,7 +337,7 @@ class rpg_user {
 
         // Loop through each entry and parse its data
         foreach ($user_index AS $token => $info){
-            $user_index[$token] = self::parse_user_info($info);
+            $user_index[$token] = self::parse_info($info);
         }
 
         // Return the parsed index

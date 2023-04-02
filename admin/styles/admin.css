@@ -261,9 +261,47 @@ a:hover {
 .adminhome li > div.link {
     width: 25%;
 }
+.adminhome li.moderate-message-replies,
+.adminhome li.moderate-thread-comments,
+.adminhome li.edit-master-abilities,
+.adminhome li.edit-mecha-abilities,
+.adminhome li.edit-boss-abilities {
+    position: relative;
+}
+.adminhome li.moderate-message-replies:before,
+.adminhome li.moderate-thread-comments:before,
+.adminhome li.edit-master-abilities:before,
+.adminhome li.edit-mecha-abilities:before,
+.adminhome li.edit-boss-abilities:before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 12px;
+    left: 8px;
+    width: 6px;
+    height: 6px;
+    border-left: 1px solid #E0E0E0;
+    border-bottom: 1px solid #E0E0E0;
+    transform: rotate(-135deg);
+}
+.adminhome li.moderate-message-replies >  div.link,
+.adminhome li.moderate-thread-comments >  div.link,
+.adminhome li.edit-master-abilities >  div.link,
+.adminhome li.edit-mecha-abilities >  div.link,
+.adminhome li.edit-boss-abilities >  div.link {
+    padding-left: 16px;
+}
+
 .adminhome li > div.desc {
     width: auto;
     font-weight: normal;
+}
+.adminhome li > div.desc:before {
+    content: " | ";
+    display: inline-block;
+    margin: 0 12px 0 0;
+    font-weight: normal;
+    opacity: 0.1;
 }
 .adminhome li > div.buttons {
     float: right;
@@ -734,6 +772,9 @@ tr:nth-child(odd) td {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.adminform table tbody td .wrap.nowrap {
+    white-space: nowrap;
+}
 
 
 .adminform table .name .status {
@@ -1003,6 +1044,11 @@ tr:nth-child(odd) td {
 .adminform table tbody td .type_span i.fas {
     font-size: 80%;
     margin: 0 2px;
+}
+.adminform table tbody td .type_span.nowrap {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .adminform .editor .form .label .floatright {
     float: right;
@@ -1349,6 +1395,7 @@ tr:nth-child(odd) td {
 }
 
 .adminform.edit_players table .type,
+.adminform.edit_players table .category,
 .adminform.edit_players table .flag,
 .adminform.edit_players table .flag {
     text-align: center;
@@ -1361,12 +1408,14 @@ tr:nth-child(odd) td {
 .adminform.edit_robots table .game,
 .adminform.edit_robots table .group,
 .adminform.edit_robots table .type,
+.adminform.edit_robots table .category,
 .adminform.edit_robots table .flag,
 .adminform.edit_robots table .flag {
     text-align: center;
 }
 .adminform.edit_robots table td.class .type_span,
-.adminform.edit_robots table td.type .type_span {
+.adminform.edit_robots table td.type .type_span,
+.adminform.edit_robots table td.category .type_span {
     min-width: 75px;
 }
 .adminform.edit_robots table td.game .type_span,
@@ -1381,12 +1430,14 @@ tr:nth-child(odd) td {
 .adminform.edit_fields table .game,
 .adminform.edit_fields table .group,
 .adminform.edit_fields table .type,
+.adminform.edit_fields table .category,
 .adminform.edit_fields table .flag,
 .adminform.edit_fields table .flag {
     text-align: center;
 }
 .adminform.edit_fields table td.class .type_span,
-.adminform.edit_fields table td.type .type_span {
+.adminform.edit_fields table td.type .type_span,
+.adminform.edit_fields table td.category .type_span {
     min-width: 75px;
 }
 .adminform.edit_fields table td.game .type_span,
@@ -1659,6 +1710,9 @@ input[type=file] {
     min-height: 50px;
     position: relative;
 }
+.adminform .field.autosize {
+    width: auto;
+}
 .adminform .field.halfsize {
     width: 50%;
 }
@@ -1699,7 +1753,8 @@ input[type=file] {
     display: block;
     clear: both;
 }
-.adminform .formfoot .metadata .date {
+.adminform .formfoot .metadata .date,
+.adminform .formfoot .metadata .time {
     display: block;
     margin: 0 auto 5px 0;
 }
@@ -2259,12 +2314,25 @@ input[type=file] {
     padding-right: 6px;
 }
 .adminform .results .list .date,
+.adminform .results .list .time,
 .adminform .results .list .flag,
 .adminform .results .list .order,
+.adminform .results .list .count,
+.adminform .results .list .target,
 .adminform .results .list .game,
 .adminform .results .list .points,
 .adminform .results .list .class {
     text-align: center;
+}
+
+
+.adminform .results .list .link.sublink {
+    color: inherit;
+}
+.adminform .results .list .link + i.fa,
+.adminform .results .list .link + i.fas,
+.adminform .results .list .wrap > i.fas {
+    color: #008aab;
 }
 
 
@@ -2557,7 +2625,8 @@ input[type=file] {
 .adminform .bfg-attachments-preview .foreground_attachments { z-index: 4; }
 .adminform .bfg-attachments-preview .preview_wrapper:after { z-index: 5; }
 
-.adminform.edit-users .formfoot .metadata .date {
+.adminform.edit-users .formfoot .metadata .date,
+.adminform.edit-users .formfoot .metadata .time {
     float: left;
     margin: 0 20px 10px 0;
 }
@@ -2685,3 +2754,99 @@ input[type=file] {
 .adminform.loading .buttons .button:not(.loading) {
     opacity: 0.25;
 }
+
+.adminform.edit-community .posts-list {
+    font-size: 100%;
+    line-height: 1.5;
+}
+.adminform.edit-community .posts-list ul {
+    list-style: none;
+    padding: 0;
+}
+.adminform.edit-community .posts-list li {
+    border-bottom: 1px solid #ccc;
+    padding: 15px 0;
+}
+.adminform.edit-community .posts-list li.focus {
+
+}
+.adminform.edit-community .posts-list li:after {
+    content: "";
+    clear: both;
+}
+.adminform.edit-community .posts-list li:empty {
+    padding: 2px 0;
+}
+.adminform.edit-community .posts-list .post-body {
+    clear: both;
+    width: 100%;
+    margin-bottom: 10px;
+    color: #696969;
+    border: 3px double transparent;
+    background-color: #fefefe;
+    padding: 3px 6px;
+    border-radius: 3px;
+    margin: 6px auto 0;
+    box-sizing: border-box;
+}
+.adminform.edit-community .posts-list li.focus .post-body {
+    border-color: #008aab;
+}
+.adminform.edit-community .posts-list li.focus.deleted .post-body {
+    border-color: #a50909;
+}
+.adminform.edit-community .posts-list li.deleted .post-body {
+    text-decoration: line-through;
+}
+.adminform.edit-community .posts-list .post-author,
+.adminform.edit-community .posts-list .post-date,
+.adminform.edit-community .posts-list .post-key,
+.adminform.edit-community .posts-list .post-actions {
+    display: inline-block;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+.adminform.edit-community .posts-list .author {
+    font-weight: bold;
+}
+.adminform.edit-community .posts-list .post-date u {
+    text-decoration: none;
+}
+.adminform.edit-community .posts-list li:last-child {
+    border-bottom: none;
+}
+.adminform.edit-community .posts-list .post-actions {
+    float: right;
+}
+.adminform.edit-community .posts-list .post-actions a {
+    display: inline-block;
+    margin-left: 10px;
+    vertical-align: middle;
+    transition: color 0.3s;
+    text-decoration: none;
+}
+.adminform.edit-community .posts-list .post-actions a i {
+    font-size: 1em;
+    margin-right: 5px;
+    vertical-align: middle;
+    color: #696969;
+}
+.adminform.edit-community .posts-list .post-actions a strong {
+    text-decoration: none;
+    font-weight: normal;
+}
+.adminform.edit-community .posts-list .post-actions a:hover strong {
+    text-decoration: underline;
+}
+.adminform.edit-community .posts-list .post-actions a strong:before,
+.adminform.edit-community .posts-list .post-actions a strong:after {
+    content: "";
+    padding: 0 3px;
+}
+.adminform.edit-community .posts-list .post-actions a strong:before {
+    content: "[";
+}
+.adminform.edit-community .posts-list .post-actions a strong:after {
+    content: "]";
+}
+

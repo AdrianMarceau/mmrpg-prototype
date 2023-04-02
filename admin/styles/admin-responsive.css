@@ -29,6 +29,32 @@ body:before {
         content: "01";
     }
 
+    /*
+    #mmrpg {
+        max-width: calc(100vw - 50px);
+    }
+    .adminform .results .list col,
+    .adminform .results .list th,
+    .adminform .results .list td {
+        width: auto;
+    }
+    .adminform .results .list col.id,
+    .adminform .results .list th.id,
+    .adminform .results .list td.id {
+        width: 60px;
+    }
+    .adminform .results .list col.actions,
+    .adminform .results .list th.actions,
+    .adminform .results .list td.actions {
+        width: 130px;
+    }
+    .adminform .results .list col.id + col,
+    .adminform .results .list th.id + th,
+    .adminform .results .list td.id + td {
+        width: 30%;
+    }
+    */
+
 }
 
 /* -- Portrait Mode -- */
@@ -121,7 +147,8 @@ body:before {
         margin: 0 auto;
         padding: 20px 0 0;
     }
-    .adminform .formfoot .metadata .date {
+    .adminform .formfoot .metadata .date,
+    .adminform .formfoot .metadata .time {
         margin: 0 20px 0 0;
     }
 
@@ -160,6 +187,8 @@ body:before {
     }
 
     .adminform .results .list .date,
+    .adminform .results .list .time,
+    .adminform .results .list .body,
     .adminform .results .list .flag {
         display: none;
     }
@@ -229,6 +258,9 @@ body:before {
     .adminhome li > div.desc:last-child,
     .adminhome li > div.buttons:last-child {
         margin-bottom: 0;
+    }
+    .adminhome li > div.desc:before {
+        display: none;
     }
     .adminhome li > div.buttons .button {
         margin: 0 3px 3px 0;

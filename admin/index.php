@@ -126,6 +126,8 @@ if (!empty($_SESSION['admin_id'])){
         ;");
 }
 
+
+/*
 // If we're not logged in yet
 if (!MMRPG_CONFIG_ADMIN_MODE){
     // Require the admin home file
@@ -257,6 +259,20 @@ elseif ($this_page_action == 'watch-error-log'){
     // Require the edit pages file
     require(MMRPG_CONFIG_ROOTDIR.'admin/pages/error-log.php');
 }
+// Else if this is an EDIT PRIVATE MESSAGE requests
+elseif ($this_page_action == 'edit-messages'){ // personal messages (private)
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-threads_private.php');
+}
+// Else if this is an EDIT COMMUNITY THREAD requests
+elseif ($this_page_action == 'edit-threads'){ // community threads (public)
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-threads_public.php');
+}
+elseif ($this_page_action == 'edit-message-replies'){
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-posts_private.php');
+}
+elseif ($this_page_action == 'edit-thread-comments'){
+    require(MMRPG_CONFIG_ROOTDIR.'admin/pages/edit-posts_public.php');
+}
 // Otherwise, not a valid page
 else {
     // Define error 404 text to print
@@ -267,7 +283,78 @@ else {
 
 // Unset the database variable
 unset($db);
+*/
 
+
+
+
+// Define the root location of all admin scripts
+$adminPagesRoot = MMRPG_CONFIG_ROOTDIR . 'admin/pages/';
+
+// Define an array for mapping URL actions with script filenames
+$actionMap = [
+    'home' => 'home.php',
+    'exit' => null,
+    'edit-users' => 'edit-users.php',
+    'edit-messages' => 'edit-threads_private.php',
+    'edit-message-replies' => 'edit-posts_private.php',
+    'edit-threads' => 'edit-threads_public.php',
+    'edit-thread-comments' => 'edit-posts_public.php',
+    'edit-players' => 'edit-players.php',
+    'edit-fields' => 'edit-fields.php',
+    'edit-items' => 'edit-items.php',
+    'edit-skills' => 'edit-skills.php',
+    'edit-robot-masters' => 'edit-robots_masters.php',
+    'edit-support-mechas' => 'edit-robots_mechas.php',
+    'edit-fortress-bosses' => 'edit-robots_bosses.php',
+    'edit-master-abilities' => 'edit-abilities_master.php',
+    'edit-robot-master-abilities' => 'edit-abilities_master.php',
+    'edit-mecha-abilities' => 'edit-abilities_mecha.php',
+    'edit-support-mecha-abilities' => 'edit-abilities_mecha.php',
+    'edit-boss-abilities' => 'edit-abilities_boss.php',
+    'edit-fortress-boss-abilities' => 'edit-abilities_boss.php',
+    'edit-event-challenges' => 'edit-challenges_event.php',
+    'edit-user-challenges' => 'edit-challenges_user.php',
+    'edit-stars' => 'edit-stars.php',
+    'edit-pages' => 'edit-pages.php',
+    'watch-error-log' => 'error-log.php',
+    'purge-bogus-users' => 'purge.php',
+    'delete-cached-files' => 'delete-cache.php',
+    'clear-active-sessions' => 'clear-sessions.php',
+    'refresh-leaderboard' => 'update.php'
+    ];
+
+// Include the relevant admin page based on the action
+if (!MMRPG_CONFIG_ADMIN_MODE) {
+    require($adminPagesRoot . 'login.php');
+} elseif ($this_page_action == 'exit') {
+    unset($_SESSION['admin_id']);
+    unset($_SESSION['admin_username']);
+    unset($_SESSION['admin_username_display']);
+    redirect_form_action('admin/');
+} elseif (array_key_exists($this_page_action, $actionMap)) {
+    $file = $actionMap[$this_page_action];
+    if ($this_page_action == 'edit-music') {
+        if (defined('MMRPG_CONFIG_CDN_ROOTDIR') && file_exists(MMRPG_CONFIG_CDN_ROOTDIR)) {
+            require($adminPagesRoot . $file);
+        } else {
+            $this_error_markup = '<strong>Error 404</strong><br />MMRPG_CONFIG_CDN_ROOTDIR NOT FOUND<br />';
+            require($adminPagesRoot . 'home.php');
+        }
+    } elseif ($this_page_action == 'refresh-leaderboard') {
+        $_REQUEST['date'] = MMRPG_CONFIG_CACHE_DATE;
+        $_REQUEST['patch'] = 'recalculate_all_battle_points';
+        require($adminPagesRoot . $file);
+    } else {
+        require($adminPagesRoot . $file);
+    }
+} else {
+    $this_error_markup = '<strong>Error 404</strong><br />Page Not Found<br />invalid action: '.$this_page_action.'<br />';
+    require($adminPagesRoot . 'home.php');
+}
+
+// Unset the database variable
+unset($db);
 
 ?>
 <!DOCTYPE html>
