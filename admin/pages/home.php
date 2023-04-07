@@ -859,7 +859,7 @@
         // Populate the group options array with relevant pages and buttons
         if (rpg_user::current_user_has_permission('pull-content-updates')){
             $this_option = array(
-                'link' => array('url' => 'admin/scripts/pull-all-game-content.php?return=html', 'text' => 'Pull Content Updates', 'target' => '_blank', 'bullet' => 'cloud-download-alt'),
+                'link' => array('url' => 'admin/scripts/update-game-content.php?return=html', 'text' => 'Pull Content Updates', 'target' => '_blank', 'bullet' => 'cloud-download-alt'),
                 'desc' => 'Apply published game content updates to this build'
                 );
             $this_group_options[] = $this_option;

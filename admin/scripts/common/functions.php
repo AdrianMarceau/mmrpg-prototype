@@ -42,4 +42,92 @@ function exit_action($status_line, $output = '', $data = array()){
     exit();
 }
 
+// Define a function for appending a project directory to the git update queue
+function queue_git_updates($file_token, $project_path){
+    // Set the path to the list file
+    $list_file = ".cache/admin/cron_{$file_token}-pending.list";
+    $list_file_dir = MMRPG_CONFIG_ROOTDIR.$list_file;
+    // Check if the list file exists
+    if (!file_exists($list_file_dir)) {
+        // Create the file and add the entry
+        file_put_contents($list_file_dir, $project_path . PHP_EOL);
+    } else {
+        // Read the content of the list file
+        $content = file_get_contents($list_file_dir);
+        // Check if the entry already exists in the file
+        $entries = explode(PHP_EOL, $content);
+        if (!in_array($project_path, $entries)) {
+            // Append the entry to the file
+            file_put_contents($list_file_dir, $project_path . PHP_EOL, FILE_APPEND);
+        }
+    }
+}
+
+// Define a function for printing the cron status checker response
+function print_cron_status_checker($cron_kind, $print = true, $reload = false){
+    ob_start();
+
+    $cron_name = ucwords(str_replace('-', ' ', $cron_kind));
+    $cron_path = MMRPG_CONFIG_ROOTDIR.'admin/scripts/cron_'.$cron_kind.'-wrapper.sh';
+    $jquery_path = MMRPG_CONFIG_ROOTURL.'.libs/jquery/jquery-1.6.1.min.js';
+    $checker_path = MMRPG_CONFIG_ROOTURL.'admin/scripts/cron_check-git-status.php';
+
+    echo('<script src="'.$jquery_path.'"></script>'.PHP_EOL);
+    echo('<div id="cron-status-div">'.$cron_name.' Status: Pending</div>'.PHP_EOL);
+
+    $displayed_cron_text = '';
+    $displayed_cron_path = MMRPG_CONFIG_IS_LIVE !== true ? $cron_path : str_replace(MMRPG_CONFIG_ROOTDIR, '', $cron_path);
+    $displayed_cron_cmd = $displayed_cron_path.' '.$cron_kind.' '.MMRPG_CONFIG_SERVER_USER;
+    if (MMRPG_CONFIG_IS_LIVE !== true){
+        $displayed_cron_text = 'On localhost, please run the following command:';
+    } else {
+        $displayed_cron_text = 'Waiting for the cron job to run the following command:';
+    }
+    echo('<div class="cron-help">'.$displayed_cron_text.'</div>'.PHP_EOL);
+    echo('<div class="cron-help">$  <span>'.$displayed_cron_cmd.'</span></div>'.PHP_EOL);
+
+    ?>
+    <script>
+        // Define a function for checking the cron job status
+        function checkCronStatus() {
+            $.ajax({
+                data: {kind: '<?= $cron_kind ?>'},
+                url: '<?= $checker_path ?>',
+                success: function(response) {
+                    if (response === "completed") {
+                        $("#cron-status-div").text("<?= $cron_name ?> Status: Completed");
+                        $(".cron-help").remove();
+                        clearTimeout(checkCronStatus);
+                        <? if ($reload === true){ ?>
+                        setTimeout(function(){
+                            var newHref = window.location.href;
+                            if (newHref.indexOf('&complete=true') === -1){ newHref += '&complete=true'; }
+                            window.location = newHref;
+                            }, 2000);
+                        <? } ?>
+                    } else {
+                        $("#cron-status-div").append('.');
+                        setTimeout(checkCronStatus, 5000); // Check the status again after 5 seconds
+                    }
+                },
+                error: function() {
+                    $("#cron-status-div").append('!');
+                    setTimeout(checkCronStatus, 5000); // Check the status again after 5 seconds in case of an error
+                }
+            });
+        }
+        // Start checking the cron job status
+        $(document).ready(function(){
+            $("#cron-status-div").append('.');
+            checkCronStatus();
+        });
+    </script>
+    <?
+
+    $output = ob_get_clean();
+    if ($print){ echo($output); }
+    else { return $output; }
+
+}
+
 ?>
