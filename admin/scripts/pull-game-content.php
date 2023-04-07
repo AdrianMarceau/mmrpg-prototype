@@ -1,5 +1,12 @@
 <?
 
+// ==============================
+// (!) LEGACY FILE!  DO NOT USE!
+// ==============================
+die('This file is no longer used!');
+
+// ...
+
 // Require the top file for all admin scripts
 require_once('common/top.php');
 
