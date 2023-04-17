@@ -53,6 +53,13 @@
                     <?php endforeach; ?>
                 </select>
             </div>
+            <div class="field" data-field="dir">
+                <label for="direction">Direction:</label>
+                <select name="dir" id="direction">
+                    <option value="right" <?= $direction === 'right' ? 'selected' : '' ?>>Right</option>
+                    <option value="left" <?= $direction === 'left' ? 'selected' : '' ?>>Left</option>
+                </select>
+            </div>
         </div>
         <div class="section additional-fields">
             <div class="field" data-field="cols">
@@ -114,14 +121,10 @@
         .sprite-filters .field.disabled {
             opacity: 0.6;
         }
-        .sprite-filters .section.main-fields {
-            font-size: 120%;
-        }
-        .sprite-filters .section.main-fields .field select {
-            min-width: 10rem;
-        }
-        .sprite-filters .section.additional-fields {
-            font-size: 90%;
+        .sprite-filters .field label {
+            display: block;
+            margin: 0 auto 0.2rem;
+            clear: both;
         }
         .sprite-filters label {
             display: inline-block;
@@ -143,17 +146,32 @@
         .sprite-filters input[type="number"]:focus {
             border-color: #007bff;
         }
+
+        .sprite-filters .section.main-fields {
+            font-size: 120%;
+        }
+        .sprite-filters .section.main-fields .field[data-field="kind"] select {
+            min-width: 10rem;
+        }
+        .sprite-filters .section.main-fields .field[data-field="class"] select {
+            min-width: 8rem;
+        }
+        .sprite-filters .section.main-fields .field[data-field="dir"] select {
+            min-width: 6rem;
+        }
+
+        .sprite-filters .section.additional-fields {
+            font-size: 100%;
+        }
         .sprite-filters .section.additional-fields select,
         .sprite-filters .section.additional-fields input[type="number"] {
-            padding: 3px 6px;
-            max-width: 3rem;
+            max-width: 5rem;
         }
+
         .sprite-filters button {
             background-color: #4c8aab;
-            border-color: #427794;
+            border: 0 solid #427794;
             color: #fff;
-            border-width: 0;
-            border-style: solid;
             border-radius: 4px;
             padding: 6px 12px;
             font-family: inherit;
@@ -162,50 +180,36 @@
             cursor: pointer;
             transition: background-color 0.2s;
             margin-left: auto;
+            position: absolute;
+            bottom: 6px;
+            width: 140px;
+        }
+        .sprite-filters button[type="submit"] {
+            font-size: 120%;
+            right: 6px;
+        }
+        .sprite-filters button[type="reset"] {
+            right: 150px;
+            font-size: 110%;
+            background-color: #c85151;
+            border-color: #b63e3e;
+            width: 100px;
         }
         .sprite-filters button:hover {
             background-color: #5d97b6;
         }
-        .sprite-filters button[type="submit"],
-        .sprite-filters button[type="reset"] {
-            position: absolute;
-            right: 6px;
-            width: 140px;
-        }
-        .sprite-filters button[type="submit"] {
-            bottom: 6px;
-            font-size: 120%;
-        }
-        .sprite-filters button[type="reset"] {
-            top: 6px;
-            font-size: 110%;
-        }
-
-        .sprite-filters button[type="submit"] {
-            background-color: #4c8aab;
-            border-color: #427794;
-        }
-        .sprite-filters button[type="submit"]:hover {
-            background-color: #5d97b6;
-        }
-
-        .sprite-filters button[type="reset"] {
-            background-color: #c85151;
-            border-color: #b63e3e;
-        }
         .sprite-filters button[type="reset"]:hover {
             background-color: #d55c5c;
         }
-
         @media (max-width: 768px) {
             .sprite-filters button[type="submit"],
             .sprite-filters button[type="reset"] {
                 position: static;
                 width: auto;
                 padding: 0.5rem 3rem;
+                font-size: 120%;
             }
         }
-
         .sprite-filters .field[data-field="rows"] {
             display: none;
         }
