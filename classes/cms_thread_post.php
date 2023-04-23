@@ -183,6 +183,61 @@ class cms_thread_post {
         return $community_thread_posts_index;
     }
 
+    // Define a function for returning a list of thread posts from the database
+    public static function get_community_thread_posts_count($filters = array()) {
+
+        // Collect a reference to the database
+        $db = cms_database::get_database();
+
+        // Define an array to hold SELECT fields to run against the DB
+        $remove_fields = array();
+
+        // Pull table field names from the helper classes of each
+        $thread_fields = cms_thread::get_index_fields(false, 'threads');
+        $thread_post_fields = cms_thread_post::get_index_fields(false, 'posts');
+        $thread_category_fields = cms_thread_category::get_index_fields(false, 'categories');
+
+        // Define the base SQL query for this function
+        $query_string = "SELECT
+                COUNT(*) AS `num_posts`
+                FROM `mmrpg_posts` AS `posts`
+                LEFT JOIN `mmrpg_users` AS `users` ON `users`.`user_id` = `posts`.`user_id`
+                LEFT JOIN `mmrpg_threads` AS `threads` ON `threads`.`thread_id` = `posts`.`thread_id`
+                LEFT JOIN `mmrpg_categories` AS `categories` ON `categories`.`category_id` = `posts`.`category_id`
+                WHERE 1 = 1 ";
+
+        // Collect any filters that were passed to this function and add them to the query
+        if (!empty($filters)) {
+            if (isset($filters['post_id'])) {
+                if (is_array($filters['post_id'])) {
+                    $post_id_list = implode(',', $filters['post_id']);
+                    $query_string .= "AND `posts`.`post_id` IN ({$post_id_list}) ";
+                } else {
+                    $query_string .= "AND `posts`.`post_id` = {$filters['post_id']} ";
+                }
+            } else {
+                if (!isset($filters['post_deleted'])){
+                    $filters['post_deleted'] = 0;
+                }
+            }
+            if (isset($filters['category_id'])) { $query_string .= "AND `posts`.`category_id` = {$filters['category_id']} "; }
+            if (isset($filters['thread_id'])) { $query_string .= "AND `posts`.`thread_id` = {$filters['thread_id']} "; }
+            if (isset($filters['user_id'])) { $query_string .= "AND `posts`.`user_id` = {$filters['user_id']} "; }
+            if (isset($filters['post_deleted'])) { $query_string .= "AND `posts`.`post_deleted` = {$filters['post_deleted']} "; }
+            // Add any other filters here as needed
+        }
+
+        // Finish the query string
+        $query_string .= "; ";
+
+        // Execute the query string against the DB and to collect the amount
+        $community_thread_posts_count = $db->get_value($query_string, 'num_posts');
+        if (empty($community_thread_posts_count)){ $community_thread_posts_count = 0; }
+
+        // Return the community threads count
+        return $community_thread_posts_count;
+    }
+
     // Define a function for returning an indexed list of thread posts from the database
     public static function get_community_thread_posts_index($filters = array(), $pagination = array(), $sorting = array(), $fetch_all_fields = false) {
         return self::get_community_thread_posts($filters, $pagination, $sorting, $fetch_all_fields, true);
