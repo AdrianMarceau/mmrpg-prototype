@@ -44,6 +44,7 @@ function exit_action($status_line, $output = '', $data = array()){
 
 // Define a function for appending a project directory to the git update queue
 function queue_git_updates($file_token, $project_path){
+    //error_log('$file_token = '.print_r($file_token, true).PHP_EOL.'$project_path = '.print_r($project_path, true));
     // Set the path to the list file
     $list_file = ".cache/admin/cron_{$file_token}-pending.list";
     $list_file_dir = MMRPG_CONFIG_ROOTDIR.$list_file;
@@ -68,7 +69,7 @@ function print_cron_status_checker($cron_kind, $print = true, $reload = false){
     ob_start();
 
     $cron_name = ucwords(str_replace('-', ' ', $cron_kind));
-    $cron_path = MMRPG_CONFIG_ROOTDIR.'admin/scripts/cron_'.$cron_kind.'-wrapper.sh';
+    $cron_path = MMRPG_CONFIG_ROOTDIR.'admin/scripts/cron_sudo-git-wrapper.sh';
     $jquery_path = MMRPG_CONFIG_ROOTURL.'.libs/jquery/jquery-1.6.1.min.js';
     $checker_path = MMRPG_CONFIG_ROOTURL.'admin/scripts/cron_check-git-status.php';
 

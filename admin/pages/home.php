@@ -895,6 +895,17 @@
                 $this_group_options[] = $this_option;
             }
         }
+        if (MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== false
+            && MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== MMRPG_CONFIG_SERVER_ENV){
+            if (rpg_user::current_user_has_permission('pull-content-updates')
+                || rpg_user::current_user_has_permission('push-content-updates')){
+                $this_option = array(
+                    'link' => array('url' => 'admin/scripts/publish-game-content.php?return=html&kind=all&token=all&source=github', 'text' => 'Push Content Updates', 'target' => '_blank', 'bullet' => 'cloud-upload-alt'),
+                    'desc' => 'Published game content updates to the cloud'
+                    );
+                $this_group_options[] = $this_option;
+            }
+        }
         if (rpg_user::current_user_has_permission('delete-cached-files')){
             $this_option = array(
                 'link' => array('url' => 'admin/delete-cached-files/', 'text' => 'Delete Cached Files', 'target' => '_blank', 'bullet' => 'trash'),

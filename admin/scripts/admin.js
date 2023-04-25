@@ -427,8 +427,8 @@ $(document).ready(function(){
             var postURLs = {
                 revert: 'admin/scripts/revert-game-content.php',
                 commit: 'admin/scripts/commit-game-content.php',
-                publish: 'admin/scripts/push-game-content.php',
-                update: 'admin/scripts/pull-game-content.php'
+                publish: 'admin/scripts/publish-game-content.php',
+                update: 'admin/scripts/update-game-content.php'
                 };
             var confirmMessages = {
                 revert: 'Are you sure you want to revert uncommitted changes to all {object}? '
@@ -447,6 +447,62 @@ $(document).ready(function(){
                     + 'Are you absolutely, 100% sure you want to \n'
                     + '{action} CHANGES TO {object}? '
                 }
+            var homeDataActionTimeout = false;
+            var homeDataActionHandler = function($thisButton, thisAction, postURL, postData){
+                $thisButton.addClass('loading');
+                $adminHome.addClass('loading');
+                $.post(postURL, postData, function(returnData){
+                    //console.log('returnData = ', returnData);
+                    if (typeof returnData !== 'undefined' && returnData.length){
+                        var lineData = returnData.split('\n');
+                        //console.log('lineData = ', lineData);
+                        var statusLine = lineData[0].split('|');
+                        //console.log('statusLine = ', statusLine);
+                        if (statusLine[0] === 'success'
+                            || statusLine[0] === 'completed'){
+
+                            var completeFunction = function(){
+                                $('html, body').animate({ scrollTop: 0 }, 'fast', function(){
+                                    window.location.href = window.location.href.replace(location.hash,'');
+                                    //alert('Reload the window!');
+                                    });
+                                };
+                            var statusToken = statusLine[0];
+                            var statusText = typeof statusLine[1] !== 'undefined' && statusLine[1].length ? statusLine[1] : (statusToken.charAt(0).toUpperCase() + statusToken.slice(1));
+                            printStatusMessage(statusToken, statusText, completeFunction);
+
+                            } else if (statusLine[0] === 'pending'){
+
+
+                            //alert('request is pending?A');
+                            $('html, body').animate({ scrollTop: 0 }, {easing: 'linear', duration: 'fast', queue: false});
+                            if (homeDataActionTimeout !== false){ clearTimeout(homeDataActionTimeout); }
+                            postURL = 'admin/scripts/cron_check-git-status.php';
+                            if (thisAction === 'publish'){ postData = {'kind': 'git-push'}; }
+                            else if (thisAction === 'update'){ postData = {'kind': 'git-pull'}; }
+                            if (typeof statusLine[1] !== 'undefined' && statusLine[1].length){
+                                console.log('statusline1 exists, printing | statusLine =', statusLine);
+                                $('.messages', thisAdmin).find('.message.pending').remove();
+                                printStatusMessage(statusLine[0], statusLine[1]);
+                            } else {
+                                console.log('statusline1 NOT exists, appending | statusLine =', statusLine);
+                                $('.messages', thisAdmin).find('.message.pending').append('.');
+                            }
+
+                            homeDataActionTimeout = setTimeout(function(){
+                                homeDataActionHandler($thisButton, thisAction, postURL, postData);
+                                }, 3000);
+
+                            } else {
+
+                            printStatusMessage(statusLine[0], statusLine[1]);
+                            $thisButton.removeClass('loading');
+                            $adminHome.removeClass('loading');
+
+                            }
+                        }
+                    });
+                };
             $('a[data-action]', $homeButtons).bind('click', function(){
                 var $thisButton = $(this);
                 var thisButtonType = $thisButton.attr('data-button');
@@ -486,30 +542,7 @@ $(document).ready(function(){
                             allowButtonAction = confirm(confirmMessage2);
                             }
                         if (allowButtonAction){
-                            $thisButton.addClass('loading');
-                            $adminHome.addClass('loading');
-                            $.post(postURL, postData, function(returnData){
-                                //console.log('returnData = ', returnData);
-                                if (typeof returnData !== 'undefined' && returnData.length){
-                                    var lineData = returnData.split('\n');
-                                    //console.log('lineData = ', lineData);
-                                    var statusLine = lineData[0].split('|');
-                                    //console.log('statusLine = ', statusLine);
-                                    if (statusLine[0] === 'success'){
-                                        var completeFunction = function(){
-                                            $('html, body').animate({ scrollTop: 0 }, 'fast', function(){
-                                                window.location.href = window.location.href.replace(location.hash,'');
-                                                //alert('Reload the window!');
-                                                });
-                                            };
-                                        printStatusMessage(statusLine[0], statusLine[1], completeFunction);
-                                        } else {
-                                        printStatusMessage(statusLine[0], statusLine[1]);
-                                        $thisButton.removeClass('loading');
-                                        $adminHome.removeClass('loading');
-                                        }
-                                    }
-                                });
+                            homeDataActionHandler($thisButton, thisAction, postURL, postData);
                             }
                         }
                     return true;
@@ -589,8 +622,8 @@ $(document).ready(function(){
             var postURLs = {
                 revert: 'admin/scripts/revert-game-content.php',
                 commit: 'admin/scripts/commit-game-content.php',
-                publish: 'admin/scripts/push-game-content.php',
-                update: 'admin/scripts/pull-game-content.php'
+                publish: 'admin/scripts/publish-game-content.php',
+                update: 'admin/scripts/update-game-content.php'
                 };
             var confirmMessages = {
                 revert: 'Are you sure you want to revert uncommitted changes to this {object}? '
@@ -606,6 +639,40 @@ $(document).ready(function(){
                     + 'Updates cannot be reverted once applied.\n'
                     + 'Continue anyway? '
                 }
+            var editorDataActionTimeout = false;
+            var editorDataActionHandler = function($thisButton, postURL, postData){
+                $thisButton.addClass('loading');
+                thisAdminForm.addClass('loading');
+                $.post(postURL, postData, function(returnData){
+                    console.log('returnData = ', returnData);
+                    if (typeof returnData !== 'undefined' && returnData.length){
+                        var lineData = returnData.split('\n');
+                        console.log('lineData = ', lineData);
+                        var statusLine = lineData[0].split('|');
+                        console.log('statusLine = ', statusLine);
+                        if (statusLine[0] === 'success'){
+                            var completeFunction = function(){
+                                $('html, body').animate({ scrollTop: 0 }, 'fast', function(){
+                                    window.location.href = window.location.href.replace(location.hash,'');
+                                    //alert('Reload the window!');
+                                    });
+                                };
+                            printStatusMessage(statusLine[0], statusLine[1], completeFunction);
+                            } else if (statusLine[0] === 'pending'){
+                            //alert('request is pending?B');
+                            if (editorDataActionTimeout !== false){ clearTimeout(editorDataActionTimeout); }
+                            printStatusMessage(statusLine[0], statusLine[1]);
+                            editorDataActionTimeout = setTimeout(function(){
+                                editorDataActionHandler($thisButton, postURL, postData);
+                                }, 3000);
+                            } else {
+                            printStatusMessage(statusLine[0], statusLine[1]);
+                            $thisButton.removeClass('loading');
+                            thisAdminForm.removeClass('loading');
+                            }
+                        }
+                    });
+                };
             $('a[data-action]', $editorGitButtons).bind('click', function(){
                 var $thisButton = $(this);
                 var $thisWrapper = $thisButton.closest('.git-buttons');
@@ -626,32 +693,7 @@ $(document).ready(function(){
                 //console.log('postURL = ', postURL);
                 //console.log('postData = ', postData);
                 //console.log('confirmMessage = ', confirmMessage);
-                if (confirm(confirmMessage)){
-                    $thisButton.addClass('loading');
-                    thisAdminForm.addClass('loading');
-                    $.post(postURL, postData, function(returnData){
-                        //console.log('returnData = ', returnData);
-                        if (typeof returnData !== 'undefined' && returnData.length){
-                            var lineData = returnData.split('\n');
-                            //console.log('lineData = ', lineData);
-                            var statusLine = lineData[0].split('|');
-                            //console.log('statusLine = ', statusLine);
-                            if (statusLine[0] === 'success'){
-                                var completeFunction = function(){
-                                    $('html, body').animate({ scrollTop: 0 }, 'fast', function(){
-                                        window.location.href = window.location.href.replace(location.hash,'');
-                                        //alert('Reload the window!');
-                                        });
-                                    };
-                                printStatusMessage(statusLine[0], statusLine[1], completeFunction);
-                                } else {
-                                printStatusMessage(statusLine[0], statusLine[1]);
-                                $thisButton.removeClass('loading');
-                                thisAdminForm.removeClass('loading');
-                                }
-                            }
-                        });
-                    }
+                if (confirm(confirmMessage)){ editorDataActionHandler($thisButton, postURL, postData); }
             });
         }
 
@@ -1688,7 +1730,7 @@ $(document).ready(function(){
 // Define a common action for printing a status message at the top of the editor
 function printStatusMessage(messageStatus, messageText, onCompleteFunction){
     if (typeof onCompleteFunction !== 'function'){ onCompleteFunction = function(){}; }
-    var $messagesDiv = $('.messages', thisAdminEditor);
+    var $messagesDiv = $('.messages', thisAdmin);
     if (!$messagesDiv.length){
         $messagesDiv = $('<div class="messages"><ul class="list"></ul></div>');
         if (thisAdminEditor.length){ $messagesDiv.insertBefore(thisAdminEditor.find('.editor-tabs[data-tabgroup]')); }
