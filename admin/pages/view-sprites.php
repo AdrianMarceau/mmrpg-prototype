@@ -325,7 +325,7 @@
             if ($kind === 'fields') { $src_size = $sprite_image_size; }
             else { $src_size = (int)($object_info[$kind_singular . '_image_size']); }
             $src_size_x = $src_size . 'x' . $src_size;
-            echo('<div class="sheet '.$kind.'" id="'.$object_token.'">' . PHP_EOL); // Add sheet container
+            echo('<div class="sheet '.$kind.'" id="'.$object_token.'" data-key="'.$object_key.'">' . PHP_EOL); // Add sheet container
                 echo('<div class="wrapper">' . PHP_EOL);
                 for ($i = 0; $i < $num_sprites_per_object; $i++) {
                     $current_column = $i % $max_columns;
@@ -360,6 +360,8 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, <?= $grid_sheet_element_width ?>px);
             grid-gap: <?= $sheet_spacing ?>px;
+            background-color: #202020;
+            padding: <?= $sheet_spacing ?>px;
         }
         .sprite-sheets .sheet {
             position: relative;
