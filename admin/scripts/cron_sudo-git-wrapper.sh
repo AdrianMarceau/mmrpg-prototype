@@ -34,9 +34,10 @@ if [ -f "$LIST_FILE" ]; then
             git_output=$(sudo -u "$2" git pull -s recursive -X theirs --no-edit 2>&1)
             echo "$git_output"
         elif [ "$1" = "git-push" ]; then
-            echo "Output from git pre-pull and push:"
+            echo "First, output from git pull:"
             git_output=$(sudo -u "$2" git pull -s recursive -X theirs --no-edit 2>&1)
             echo "$git_output"
+            echo "Then, output from git push:"
             git_output=$(sudo -u "$2" git push origin master 2>&1)
             echo "$git_output"
         else
