@@ -162,6 +162,17 @@ body:before {
         display: none;
     }
 
+    .adminform.edit-community .posts-list .post-meta,
+    .adminform.edit-community .posts-list .post-actions {
+        display: block;
+    }
+    .adminform.edit-community .posts-list .post-meta {
+        float: left;
+    }
+    .adminform.edit-community .posts-list .post-actions {
+        float: right;
+    }
+
 
 }
 
@@ -172,6 +183,15 @@ body:before {
         content: "05";
     }
 
+    .adminform.edit-community .posts-list .post-meta,
+    .adminform.edit-community .posts-list .post-actions {
+        display: block;
+        clear: both;
+        margin: 0 auto 5px;
+    }
+    .adminform.edit-community .posts-list .post-actions {
+        margin-bottom: 10px;
+    }
 
 }
 
@@ -271,6 +291,15 @@ body:before {
     }
     .adminhome li.top .env-notice br {
         display: none;
+    }
+
+    .adminform.edit-community .posts-list .post-actions {
+        float: left;
+        text-align: left;
+    }
+    .adminform.edit-community .posts-list .post-actions a {
+        margin-left: 0;
+        margin-right: 10px;
     }
 
 
