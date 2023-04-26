@@ -177,12 +177,16 @@ define('MMRPG_SETTINGS_CHAPTER5_STARLOCK', MMRPG_SETTINGS_CHAPTER4_STARLOCK + (3
 
 // Back-up definition in case COPPA is not defined
 if (!defined('MMRPG_CONFIG_COPPA_PERMISSIONS')){
-    define(MMRPG_CONFIG_COPPA_PERMISSIONS, '');
+    define('MMRPG_CONFIG_COPPA_PERMISSIONS', '');
 }
 
 // Back-up definition in case SERVER ENV are not defined
 if (!defined('MMRPG_CONFIG_SERVER_ENV')){
-    define(MMRPG_CONFIG_SERVER_ENV, 'local');
+    define('MMRPG_CONFIG_SERVER_ENV', 'local');
+}
+// Back-up definition in case SERVER USER are not defined
+if (!defined('MMRPG_CONFIG_SERVER_USER')){
+    define('MMRPG_CONFIG_SERVER_USER', 'mmrpg2');
 }
 
 // Define other server-related variables given the current SERVER ENV
@@ -198,11 +202,6 @@ if (MMRPG_CONFIG_SERVER_ENV === 'local'){
 } elseif (MMRPG_CONFIG_SERVER_ENV === 'prod'){
     define('MMRPG_CONFIG_PULL_DEV_DATA_FROM', 'dev');
     define('MMRPG_CONFIG_PULL_LIVE_DATA_FROM', false);
-}
-
-// Back-up definition in case SERVER USER are not defined
-if (!defined('MMRPG_CONFIG_SERVER_USER')){
-    define(MMRPG_CONFIG_SERVER_USER, 'mmrpg2');
 }
 
 // Define the last save timestamp now if not already done so
