@@ -13,7 +13,7 @@ require_once(MMRPG_CONFIG_CONTENT_PATH.'index.php');
 if (empty($_GET['complete']) || $_GET['complete'] !== 'true'){
 
     // Loop through the content types one-by-one and queue pulling updates for each
-    session_write_close();
+    //session_write_close();
     foreach ($content_types_index AS $content_key => $content_type_info){
 
         // Collect the content kind as we'll use it a lot
@@ -54,7 +54,7 @@ elseif ($_GET['complete'] === 'true') {
     //debug_echo('$contributor_usernames_to_ids = '.print_r($contributor_usernames_to_ids, true).'');
 
     // Loop through the content types one-by-one and queue pulling updates for each
-    session_write_close();
+    //session_write_close();
     $request_kind = '';
     $request_kind_singular = '';
     foreach ($content_types_index AS $content_key => $content_type_info){
