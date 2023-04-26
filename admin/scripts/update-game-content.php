@@ -12,6 +12,9 @@ require_once(MMRPG_CONFIG_CONTENT_PATH.'index.php');
 // If this is the first run, we should queue up content updates and wait for a refresh
 if (empty($_GET['complete']) || $_GET['complete'] !== 'true'){
 
+    // No matter what, start the output buffer
+    ob_start();
+
     // Loop through the content types one-by-one and queue pulling updates for each
     //session_write_close();
     foreach ($content_types_index AS $content_key => $content_type_info){
@@ -37,11 +40,14 @@ if (empty($_GET['complete']) || $_GET['complete'] !== 'true'){
     }
 
     // Print the success message with the returned output
-    exit_action('success|MMRPG Game Content Updates Have Been Queued');
+    exit_action('success|MMRPG Game Content Updates Have Been Queued', ob_get_contents());
 
 }
 // Otherwise, we can run any post-update functionality now that pulling is complete
 elseif ($_GET['complete'] === 'true') {
+
+    // No matter what, start the output buffer
+    ob_start();
 
     // Pre-collect a list of contributors so we can match usernames to IDs later
     $contributor_fields = rpg_user::get_contributor_index_fields(true, 'contributors');
@@ -277,7 +283,7 @@ elseif ($_GET['complete'] === 'true') {
     echo('MMRPG is now on version '.$cache_date.'-'.$cache_time.PHP_EOL);
 
     // Print the success message with the returned output
-    exit_action('success|MMRPG Game Content Has Been Updated');
+    exit_action('success|MMRPG Game Content Has Been Updated', ob_get_contents());
 
 }
 
