@@ -1,60 +1,85 @@
 #!/bin/bash
 
-# Check if the required arguments are provided
-if [ "$#" -ne 2 ]; then
-    echo "Error: Missing arguments"
-    echo "Usage: $0 <action_token> <user>"
-    exit 1
-fi
-
 # Get the script's directory
 current_script_path="$(readlink -f "$BASH_SOURCE")"
 project_base_path="$(dirname "$(dirname "$(dirname "$current_script_path")")")"
+log_base_path="$(dirname "$project_base_path")"
 
-# Set the path to the list file
-LIST_FILE="$project_base_path/.cache/admin/cron_${1}-pending.list"
+# Redirect stdout and stderr to log files in the script directory
+exec >> "$log_base_path/_logs/cron.log" 2>> "$log_base_path/_logs/error.log"
 
-echo "================================"
-echo "Running the $1 wrapper script..."
-echo "================================"
-
-# Check if the list file exists
-if [ -f "$LIST_FILE" ]; then
-    echo "The $1 list file exists, proceeding with the script."
-
-    # Read the directories from the list file and process them
-    while IFS= read -r repo_path; do
-        echo "Entering the script as user $2"
-        cd "$repo_path"
-        echo -e "Changed directory to path: \n$repo_path"
-
-        # Perform the action based on the first argument
-        if [ "$1" = "git-pull" ]; then
-            echo "Output from git pull:"
-            git_output=$(sudo -u "$2" git pull -s recursive -X theirs --no-edit 2>&1)
-            echo "$git_output"
-        elif [ "$1" = "git-push" ]; then
-            echo "First, output from git pull:"
-            git_output=$(sudo -u "$2" git pull -s recursive -X theirs --no-edit 2>&1)
-            echo "$git_output"
-            echo "Then, output from git push:"
-            git_output=$(sudo -u "$2" git push origin master 2>&1)
-            echo "$git_output"
-        else
-            echo "Unknown action token: $1"
-            break
-        fi
-
-        echo -e "Finished executing $1 on path"
-    done < "$LIST_FILE"
-
-    # Remove the list file
-    rm "$LIST_FILE"
-    echo -e "Deleted the $1 list file at: \n$LIST_FILE"
-
-else
-    echo -e "Could not find the $1 list file at: \n$LIST_FILE"
-    echo "A pending $1 list file does not exist, aborting the script."
+# Check if the required argument is provided
+if [ "$#" -ne 1 ]; then
+    echo "Cron Error: Missing argument(s) to cron_sudo-git-wrapper.sh" >&2
+    echo "Missing argument(s) to cron_sudo-git-wrapper.sh" >&1
+    echo "Usage: $0 <user>"
+    exit 1
 fi
 
-echo "================================"
+# Set the path to the list files
+PUSH_LIST_FILE="$project_base_path/.cache/admin/cron_git-push-pending.list"
+PULL_LIST_FILE="$project_base_path/.cache/admin/cron_git-pull-pending.list"
+
+#echo "=========="
+echo "Running the sudo-git-wrapper script as '$1' on $(date '+%Y-%m-%d @ %l:%M%p')"
+#echo "-----"
+
+# Check if the list files exist and process them
+for LIST_FILE in "$PUSH_LIST_FILE" "$PULL_LIST_FILE"; do
+    if [ -f "$LIST_FILE" ]; then
+
+        echo "-----"
+        echo -e "Found a list file: '$LIST_FILE'"
+
+        # Read the directories from the list file and process them
+        processed_successfully=false
+        while IFS= read -r repo_path; do
+
+            repo_rel_path=$(echo "$repo_path" | sed "s|$project_base_path/||")
+            filename="$(basename "$LIST_FILE")"
+            action_token="$(echo "$filename" | sed 's/-pending.list//')"
+            echo -e "Attempting to run '$action_token' on the '$repo_rel_path' repository directory..."
+
+            # Perform the action based on the list file name
+            cd "$repo_path"
+            if [ "$action_token" = "cron_git-pull" ]; then
+                echo "Output from git pull:"
+                git_output=$(sudo -u "$1" git pull -s recursive -X theirs --no-edit 2>&1)
+                echo "$git_output"
+                processed_successfully=true
+            elif [ "$action_token" = "cron_git-push" ]; then
+                echo "First, output from git pull:"
+                git_output=$(sudo -u "$1" git pull -s recursive -X theirs --no-edit 2>&1)
+                echo "$git_output"
+                echo "Then, output from git push:"
+                git_output=$(sudo -u "$1" git push origin master 2>&1)
+                echo "$git_output"
+                processed_successfully=true
+            else
+                echo "Cron Error (1/2): Something went wrong running the sudo-git-wrapper script as '$1' on $(date '+%Y-%m-%d @ %l:%M%p')" >&2
+                echo "Cron Error (2/2): Unknown list file: $LIST_FILE" >&2
+                echo "Unknown list file: $LIST_FILE" >&1
+                break
+            fi
+
+            if [ "$processed_successfully" = true ]; then
+                echo -e "Finished executing '$(basename "$LIST_FILE" | sed 's/-pending.list//')' on path\n"
+            fi
+
+        done < "$LIST_FILE"
+
+        # Remove the list file if it was successfully processed
+        if [ "$processed_successfully" = true ]; then
+            rm "$LIST_FILE"
+            echo -e "Deleted the list file: '$LIST_FILE'"
+        fi
+        echo "-----"
+
+    #else
+        #echo "Nothing to '$(basename "$LIST_FILE" | sed 's/-pending.list//')' yet."
+
+    fi
+done
+
+#echo "=========="
+#echo "-----"

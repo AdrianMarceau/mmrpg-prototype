@@ -152,7 +152,8 @@ a:hover {
 .messages .list .message.success:before,
 .messages .list .message.warning:before,
 .messages .list .message.alert:before,
-.messages .list .message.error:before {
+.messages .list .message.error:before,
+.messages .list .message.pending:before {
     content: "*";
     display: inline-block;
     box-sizing: border-box;
@@ -182,6 +183,9 @@ a:hover {
 .messages .list .message.error {
     color: #8c2525;
 }
+.messages .list .message.pending {
+    color: #262626;
+}
 .messages .list .message.success:before {
     content: "\2713";
     background-color: #005d07;
@@ -197,6 +201,16 @@ a:hover {
 .messages .list .message.error:before {
     content: "\00d7";
     background-color: #8c2525;
+}
+.messages .list .message.pending:before {
+    content: " ";
+    background-color: #262626;
+    background-color: transparent;
+    background-image: url("../images/ajax-loader_on-home.gif");
+    background-size: 100% auto;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
 }
 
 .adminhome {

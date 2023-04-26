@@ -469,7 +469,7 @@ $(document).ready(function(){
                                 };
                             var statusToken = statusLine[0];
                             var statusText = typeof statusLine[1] !== 'undefined' && statusLine[1].length ? statusLine[1] : (statusToken.charAt(0).toUpperCase() + statusToken.slice(1));
-                            printStatusMessage(statusToken, statusText, completeFunction);
+                            printStatusMessage('success', statusText, completeFunction);
 
                             } else if (statusLine[0] === 'pending'){
 
@@ -481,11 +481,11 @@ $(document).ready(function(){
                             if (thisAction === 'publish'){ postData = {'kind': 'git-push'}; }
                             else if (thisAction === 'update'){ postData = {'kind': 'git-pull'}; }
                             if (typeof statusLine[1] !== 'undefined' && statusLine[1].length){
-                                console.log('statusline1 exists, printing | statusLine =', statusLine);
+                                //console.log('statusline1 exists, printing | statusLine =', statusLine);
                                 $('.messages', thisAdmin).find('.message.pending').remove();
                                 printStatusMessage(statusLine[0], statusLine[1]);
                             } else {
-                                console.log('statusline1 NOT exists, appending | statusLine =', statusLine);
+                                //console.log('statusline1 NOT exists, appending | statusLine =', statusLine);
                                 $('.messages', thisAdmin).find('.message.pending').append('.');
                             }
 

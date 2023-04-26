@@ -78,17 +78,37 @@ function print_cron_status_checker($cron_kind, $print = true, $reload = false){
 
     $displayed_cron_text = '';
     $displayed_cron_path = MMRPG_CONFIG_IS_LIVE !== true ? $cron_path : str_replace(MMRPG_CONFIG_ROOTDIR, '', $cron_path);
-    $displayed_cron_cmd = $displayed_cron_path.' '.$cron_kind.' '.MMRPG_CONFIG_SERVER_USER;
+    $displayed_cron_cmd = $displayed_cron_path.' '.MMRPG_CONFIG_SERVER_USER;
     if (MMRPG_CONFIG_IS_LIVE !== true){
-        $displayed_cron_text = 'On localhost, please run the following command:';
+        $displayed_cron_text = 'This may take a few minutes. On localhost, you may need to run the following command:';
     } else {
-        $displayed_cron_text = 'Waiting for the cron job to run the following command:';
+        $displayed_cron_text = 'This may take a few minutes. A server admin can run following command:';
     }
     echo('<div class="cron-help">'.$displayed_cron_text.'</div>'.PHP_EOL);
     echo('<div class="cron-help">$  <span>'.$displayed_cron_cmd.'</span></div>'.PHP_EOL);
 
     ?>
-    <script>
+    <style type="text/css">
+        #cron-status-div {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        #cron-status-div:before {
+            content: "";
+            display: inline-block;
+            width: 1.5em;
+            height: 1.5em;
+            background-color: transparent;
+            background-image: url("../images/ajax-loader_on-home.gif");
+            background-size: 100% auto;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center center;
+            margin: 0 6px 0 0;
+        }
+    </style>
+    <script type="text/javascript">
         // Define a function for checking the cron job status
         function checkCronStatus() {
             $.ajax({
