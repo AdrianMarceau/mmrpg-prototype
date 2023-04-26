@@ -42,6 +42,10 @@ if (empty($_GET['complete']) || $_GET['complete'] !== 'true'){
 // Otherwise, we can run any post-update functionality now that pulling is complete
 elseif ($_GET['complete'] === 'true') {
 
+    // No matter what, start the output buffer
+    ob_end_clean();
+    ob_start();
+
     // Pre-collect a list of contributors so we can match usernames to IDs later
     $contributor_fields = rpg_user::get_contributor_index_fields(true, 'contributors');
     if (MMRPG_CONFIG_IMAGE_EDITOR_ID_FIELD === 'contributor_id'){ $contributor_sql = "SELECT {$contributor_fields} FROM mmrpg_users_contributors AS contributors ORDER BY contributors.contributor_id ASC;"; }
@@ -276,7 +280,7 @@ elseif ($_GET['complete'] === 'true') {
     echo('MMRPG is now on version '.$cache_date.'-'.$cache_time.PHP_EOL);
 
     // Print the success message with the returned output
-    exit_action('success|MMRPG Game Content Has Been Updated');
+    exit_action('success|MMRPG Game Content Has Been Updated', ob_get_contents());
 
 }
 
