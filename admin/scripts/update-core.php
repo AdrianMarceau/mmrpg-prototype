@@ -3,46 +3,40 @@
 // Require the top file for all admin scripts
 require_once('common/top.php');
 
-// Navigate to the git repo and run a git pull to collect updates
-$git_commands = '';
-$git_commands .= 'cd '.MMRPG_CONFIG_ROOTDIR.' ';
-$git_commands .= '&& git pull -s recursive -X theirs --no-edit 2>&1';
-//debug_echo('$git_commands = '.print_r($git_commands, true).'');
-$git_output = shell_exec($git_commands);
-//debug_echo('$git_output = '.print_r($git_output, true).'');
+// If this is the first run, we should queue up content updates and wait for a refresh
+if (empty($_GET['complete']) || $_GET['complete'] !== 'true'){
 
-// Print the returned output (modified if appropriate)
-$print_output = $git_output;
-if (strstr($print_output, 'Already up to date')){ $print_output = str_replace('Already', 'MMRPG already', $print_output); }
-echo(trim($print_output).PHP_EOL);
+    // Append this directory to the git update queue
+    $file_token = "git-pull";
+    $project_path = MMRPG_CONFIG_ROOTDIR;
+    $project_path_clean = (MMRPG_CONFIG_IS_LIVE === true ? str_replace(MMRPG_CONFIG_ROOTDIR, '/', $project_path) : $project_path);
+    echo('$ '.$file_token.' '.$project_path_clean.' '.PHP_EOL);
+    queue_git_updates($file_token, $project_path);
 
-// Automatically increment the config timestamp to force-refresh assets
-if (!strstr($git_output, 'Already up to date')){
-    list($date, $time) = explode('-', date('Ymd-Hi'));
-    $db->update('mmrpg_config', array('config_value' => $date), "config_group = 'global' AND config_name = 'cache_date'");
-    $db->update('mmrpg_config', array('config_value' => $time), "config_group = 'global' AND config_name = 'cache_time'");
-    echo('Cache timestamp updated to '.$date.'-'.$time.PHP_EOL);
-}
-
-// Check for patch files and run them one-by-one
-$patch_dir = MMRPG_CONFIG_ROOTDIR.'admin/.patches/';
-$patch_files = getSortedDirContents($patch_dir, 'name');
-if (!empty($patch_files)){ foreach ($patch_files AS $path){ include_patch_file($path); } }
-function include_patch_file($path){
-    global $db;
-    ob_start();
-    require_once($path);
-    $output = ob_get_clean();
-    if (!empty($output)){
-        list($date, $name) = explode('_', str_replace('.php', '', basename($path)));
-        echo(PHP_EOL);
-        echo('<strong>patch name</strong>: '.$name.''.PHP_EOL);
-        echo('<strong>patch date</strong>: '.$date.''.PHP_EOL);
-        echo(trim($output).PHP_EOL);
+    // If the request was made via a regular browser tab, print out javascript status checker
+    if ($return_kind === 'html'){
+        print_cron_status_checker('git-pull', true, true);
     }
-}
 
-// Print the success message with the returned output
-exit_action('success|Pulled Git Updates to MMRPG Core');
+    // Print the success message with the returned output
+    exit_action('success|MMRPG Core Updates Have Been Queued');
+
+}
+// Otherwise, we can run any post-update functionality now that pulling is complete
+elseif ($_GET['complete'] === 'true') {
+
+    // Update the global cache timestamp to ensure things are refreshed
+    $cache_date = date('Ymd');
+    $cache_time = date('Hi');
+    $db->update('mmrpg_config', array('config_value' => $cache_date), array('config_group' => 'global', 'config_name' => 'cache_date'));
+    $db->update('mmrpg_config', array('config_value' => $cache_time), array('config_group' => 'global', 'config_name' => 'cache_time'));
+
+    // We are not done so we can print the cache date and time
+    echo('MMRPG is now on version '.$cache_date.'-'.$cache_time.PHP_EOL);
+
+    // Print the success message with the returned output
+    exit_action('success|MMRPG Game Core Has Been Updated');
+
+}
 
 ?>

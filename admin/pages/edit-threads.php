@@ -956,6 +956,99 @@
             && isset($_GET['thread_id'])
             ){
 
+            // Collect ajax request variables for later
+            $is_ajax = !empty($_REQUEST['ajax']) && $_REQUEST['ajax'] !== 'false' ? true : false;
+            $allowed_requests = array('load-more-posts');
+            $ajax_request = $is_ajax && in_array($_REQUEST['ajax'], $allowed_requests) ? $_REQUEST['ajax'] : false;
+            $ajax_start = $is_ajax && !empty($_REQUEST['ajax-start']) && is_numeric($_REQUEST['ajax-start']) ? (int)($_REQUEST['ajax-start']) : false;
+            $ajax_limit = $is_ajax && !empty($_REQUEST['ajax-limit']) && is_numeric($_REQUEST['ajax-limit']) ? (int)($_REQUEST['ajax-limit']) : false;
+
+            // Collect posts for this thread if any exist (we need the list and count for later)
+            $community_thread_posts_start = $ajax_start ? $ajax_start : 1;
+            $community_thread_posts_limit = $ajax_limit ? $ajax_limit : 100;
+            $pagination_array = array('offset' => ($community_thread_posts_start - 1), 'limit' => $community_thread_posts_limit);
+            $filter_array = array('thread_id' => $thread_data['thread_id']);
+            $sorting_array = array('posts.post_date' => 'ASC');
+            $community_thread_posts_index = cms_thread_post::get_community_thread_posts_index($filter_array, $pagination_array, $sorting_array, true);
+            $community_thread_posts_array = array_values($community_thread_posts_index);
+            $community_thread_posts_count = count($community_thread_posts_array);
+            $community_thread_posts_total = cms_thread_post::get_community_thread_posts_count($filter_array);
+            $community_thread_posts_count_formatted = number_format($community_thread_posts_count, 0, '.', ',');
+            $community_thread_posts_total_formatted = number_format($community_thread_posts_total, 0, '.', ',');
+
+            // Define a quick function that formats the thread or post body in a preview-ready format for the admin panel
+            $format_thread_post_body = function($body){
+                $body = htmlentities($body, ENT_QUOTES, 'UTF-8', true);
+                $body = str_replace(array('[b]', '[/b]', '[i]', '[/i]', '[u]', '[/u]', '[tab]'), array('<strong>', '</strong>', '<em>', '</em>', '<ins>', '</ins>', '&nbsp;'), $body);
+                $body = preg_replace('/(\r\n|\n\n){2,}/', '<span class="nbr">// //</span>', $body);
+                $body = preg_replace('/(\r\n|\n\n|\n){1,}/', '<span class="nbr">//</span>', $body);
+                $body = preg_replace('/\[image\]\((https?:\/\/)?(www\.)?([^\/\s]+)\/([^\(\)\[\]]+?)([^\(\)\[\]\/]+?)(\.[a-zA-Z]{3,4})?(\?[^\(\)\[\]\s]+)?\)/i', '[<a href="$1$2$3/$4$5$6$7" title="$3 // $5$6" target="_blank">$5$6</a>]', $body);
+                return $body;
+            };
+
+            // Pre-generate the list of posts given the above information
+            $community_thread_posts_markup = '';
+            if (!empty($community_thread_posts_array)){
+                $post_num = ($community_thread_posts_start - 1);
+                $post_key_max = $community_thread_posts_limit;
+                $post_key_max_triggered = false;
+                $post_key_max_triggered_at = 0;
+                foreach ($community_thread_posts_array AS $post_key => $post_data) {
+                    $post_num++;
+                    $post_id = $post_data['post_id'];
+                    $post_body = $format_thread_post_body($post_data['post_body']);
+                    $post_edit_url = $this_thread_post_page_baseurl . 'editor/post_id=' . $post_id;
+                    $post_view_url = !empty($post_data['post_url']) ? $post_data['post_url'] : '';
+                    $post_author_username = htmlspecialchars($post_data['author_name']);
+                    $post_author_url = 'admin/edit-users/editor/user_id=' . $post_data['author_id'];
+                    ob_start();
+                    ?>
+                    <li class="<?= !$thread_data['thread_published'] || $post_data['post_deleted'] ? 'deleted' : '' ?>">
+                        <div class="post-meta">
+                            <div class="post-author">
+                                By: <a href="<?= $post_author_url ?>" class="author"><?= $post_author_username ?></a>
+                            </div>
+                            <div class="post-date">
+                                On: <ins><?= !empty($post_data['post_date']) ? str_replace('@', 'at', date('Y-m-d @ g:s a', $post_data['post_date'])) : '-' ?></ins>
+                            </div>
+                            <div class="post-key">
+                                <?= $this_thread_subclass_name_uc?> No. <ins><?= $post_num.' of '.$community_thread_posts_total ?></ins>
+                            </div>
+                        </div>
+                        <div class="post-actions">
+                            <a href="<?= $post_edit_url ?>"><i class="fas fa-pencil-alt"></i><strong>edit in admin</strong></a>
+                            <? if ($this_thread_class == 'public' && $thread_data['thread_published'] && !$post_data['post_deleted']){ ?>
+                                <a href="<?= $post_view_url ?>" target="_blank"><i class="fas fa-external-link-alt"></i><strong>view on site</strong></a>
+                            <? } ?>
+                        </div>
+                        <div class="post-body">
+                            <?= $post_body ?>
+                        </div>
+                    </li>
+                    <?
+                    $community_thread_posts_markup .= trim(ob_get_clean()).PHP_EOL;
+                }
+            }
+
+            // If this is an AJAX request, we should generate only the thread's post-list markup and exit
+            if ($is_ajax && $ajax_request === 'load-more-posts'){
+                ob_end_clean();
+                header('Content-Type: application/json');
+                echo(json_encode(array(
+                    'status' => 'success',
+                    'meta' => array(
+                        'total' => $community_thread_posts_total,
+                        'offset' => $pagination_array['offset'],
+                        'limit' => $pagination_array['limit'],
+                        'count' => $community_thread_posts_count,
+                        'more' => max(0, ($community_thread_posts_total - $community_thread_posts_count - $pagination_array['offset']))
+                        ),
+                    'markup' => $community_thread_posts_markup
+                    )));
+                exit();
+
+            }
+
             // Capture editor markup in a buffer in case we need to modify
             if (true){
                 ob_start();
@@ -982,16 +1075,6 @@
                     </h3>
 
                     <? print_form_messages() ?>
-
-
-                    <?php
-                    // Collect posts for this thread if any exist (we need the list and count for later)
-                    $filter_array = array('thread_id' => $thread_data['thread_id']);
-                    $sorting_array = array('posts.post_date' => 'ASC');
-                    $community_thread_posts_index = cms_thread_post::get_community_thread_posts_index($filter_array, null, $sorting_array, true);
-                    $community_thread_posts_array = array_values($community_thread_posts_index);
-                    $community_thread_posts_count = count($community_thread_posts_array);
-                    ?>
 
                     <? if (!$thread_data_is_new){ ?>
                         <div class="editor-tabs" data-tabgroup="thread">
@@ -1150,26 +1233,32 @@
                             <div class="panel active" data-tab="posts">
 
                                 <div class="field fullsize">
-                                    <strong class="label"><?= 'Initial '.$this_thread_class_name_uc.' w/ '.$community_thread_posts_count.' '.($community_thread_posts_count === 1 ? $this_thread_subclass_name_uc : $this_thread_xsubclass_name_uc) ?></strong>
-                                    <div class="posts-list">
+                                    <strong class="label">
+                                        <?= 'Initial '.$this_thread_class_name_uc.' w/ ' ?>
+                                        <?= $community_thread_posts_total_formatted.' '.($community_thread_posts_total === 1 ? $this_thread_subclass_name_uc : $this_thread_xsubclass_name_uc) ?>
+                                        <?= ($community_thread_posts_count < $community_thread_posts_total) ? '<span class="showing">(Showing '.$community_thread_posts_start.'-'.(($community_thread_posts_start - 1) + $community_thread_posts_limit).')</span>' : '' ?>
+                                    </strong>
+                                    <div class="posts-list <?= $community_thread_posts_count < $community_thread_posts_total ? 'has-load-more' : '' ?>">
                                         <ul>
                                             <?
                                             $thread_id = $thread_data['thread_id'];
                                             $thread_author = $community_users_index[$thread_data['user_id']];
                                             $thread_author_username = $thread_author['user_name_clean'];
                                             $thread_author_url = 'admin/edit-users/editor/user_id=' . $thread_data['user_id'];
-                                            $thread_body = htmlspecialchars($thread_data['thread_body']);
+                                            $thread_body = $format_thread_post_body($thread_data['thread_body']);
                                             $thread_view_url = !empty($thread_data['thread_url']) ? $thread_data['thread_url'] : '';
                                             ?>
                                             <li class="focus <?= !$thread_data['thread_published'] ? 'deleted' : '' ?>">
-                                                <div class="post-author">
-                                                    By: <a href="<?= $thread_author_url ?>" class="author"><?= $thread_author_username ?></a>
-                                                </div>
-                                                <div class="post-date">
-                                                    On: <ins><?= !empty($thread_data['thread_date']) ? str_replace('@', 'at', date('Y-m-d @ g:s a', $thread_data['thread_date'])) : '-' ?></ins>
-                                                </div>
-                                                <div class="post-key">
-                                                    <ins>Initial <?= $this_thread_class_name_uc ?></ins>
+                                                <div class="post-meta">
+                                                    <div class="post-author">
+                                                        By: <a href="<?= $thread_author_url ?>" class="author"><?= $thread_author_username ?></a>
+                                                    </div>
+                                                    <div class="post-date">
+                                                        On: <ins><?= !empty($thread_data['thread_date']) ? str_replace('@', 'at', date('Y-m-d @ g:s a', $thread_data['thread_date'])) : '-' ?></ins>
+                                                    </div>
+                                                    <div class="post-key">
+                                                        <ins>Initial <?= $this_thread_class_name_uc ?></ins>
+                                                    </div>
                                                 </div>
                                                 <div class="post-actions">
                                                     <? if ($this_thread_class == 'public' && $thread_data['thread_published']){ ?>
@@ -1181,47 +1270,101 @@
                                                 </div>
                                             </li>
                                             <?php
-                                            // If threads were found, we should print them out now
-                                            if (!empty($community_thread_posts_array)){
-                                                $post_num = 0;
-                                                foreach ($community_thread_posts_array as $post) {
-                                                    $post_num++;
-                                                    $post_id = $post['post_id'];
-                                                    $post_body = htmlspecialchars($post['post_body']);
-                                                    $post_edit_url = $this_thread_post_page_baseurl . 'editor/post_id=' . $post_id;
-                                                    $post_view_url = !empty($post['post_url']) ? $post['post_url'] : '';
-                                                    $post_author_username = htmlspecialchars($post['author_name']);
-                                                    $post_author_url = 'admin/edit-users/editor/user_id=' . $post['author_id'];
-                                                    ?>
-                                                    <li class="<?= !$thread_data['thread_published'] || $post['post_deleted'] ? 'deleted' : '' ?>">
-                                                        <div class="post-author">
-                                                            By: <a href="<?= $post_author_url ?>" class="author"><?= $post_author_username ?></a>
-                                                        </div>
-                                                        <div class="post-date">
-                                                            On: <ins><?= !empty($post['post_date']) ? str_replace('@', 'at', date('Y-m-d @ g:s a', $post['post_date'])) : '-' ?></ins>
-                                                        </div>
-                                                        <div class="post-key">
-                                                            <?= $this_thread_subclass_name_uc?> No. <ins><?= $post_num.' of '.$community_thread_posts_count ?></ins>
-                                                        </div>
-                                                        <div class="post-actions">
-                                                            <a href="<?= $post_edit_url ?>"><i class="fas fa-pencil-alt"></i><strong>edit in admin</strong></a>
-                                                            <? if ($this_thread_class == 'public' && $thread_data['thread_published'] && !$post['post_deleted']){ ?>
-                                                                <a href="<?= $post_view_url ?>" target="_blank"><i class="fas fa-external-link-alt"></i><strong>view on site</strong></a>
-                                                            <? } ?>
-                                                        </div>
-                                                        <div class="post-body">
-                                                            <?= $post_body ?>
-                                                        </div>
-                                                    </li>
-                                                    <?
-                                                }
+
+                                            // Print out the generated thread post markup, if any was generated above
+                                            if (!empty($community_thread_posts_markup)){
+                                                echo($community_thread_posts_markup);
                                             } else {
+                                                echo('<li>&hellip;</li>'.PHP_EOL);
+                                            }
+
+                                            // If there were too many posts to display, make sure we include the "load more" links
+                                            if ($community_thread_posts_count < $community_thread_posts_total){
                                                 ?>
-                                                <li>
-                                                    &hellip;
+                                                <li class="load-more load-more-posts" data-num-total="<?= $community_thread_posts_total ?>" data-num-showing="<?= $community_thread_posts_count ?>">
+                                                    <a class="more next" data-thread-id="<?= $thread_id ?>" data-load-limit="next">
+                                                        Load More <?= $this_thread_xsubclass_name_uc ?>
+                                                    </a>
+                                                    <a class="more all" data-thread-id="<?= $thread_id ?>" data-load-limit="all">
+                                                        Load All <?= $this_thread_xsubclass_name_uc ?>
+                                                    </a>
                                                 </li>
                                                 <?
+                                                ob_start();
+                                                if (!isset($admin_inline_javascript)){ $admin_inline_javascript = ''; }
+                                                ?>
+                                                <script type="text/javascript">
+                                                    $(document).ready(function(){
+                                                        var loadButtons = $('.load-more-posts a.more');
+                                                        loadButtons.filter('.next').bind('click', function(e) {
+                                                            e.preventDefault();
+                                                            var loadButton = $(this);
+                                                            var loadMoreContainer = loadButton.closest('.load-more-posts');
+                                                            var postsListDiv = loadMoreContainer.closest('.posts-list');
+                                                            var postsList = postsListDiv.find('ul');
+                                                            var currentShowing = parseInt(loadMoreContainer.attr('data-num-showing'));
+                                                            var threadId = loadButton.attr('data-thread-id');
+                                                            var loadLimit = loadButton.attr('data-load-limit');
+                                                            var startAt = currentShowing + 1;
+                                                            var postURL = window.location.href.split('#')[0];
+                                                            postURL += '&ajax=load-more-posts';
+                                                            postURL += '&ajax-start='+startAt;
+                                                            postURL += '&ajax-limit='+loadLimit;
+                                                            //console.log('postURL = ', postURL);
+                                                            loadButtons.addClass('loading');
+                                                            $.ajax({
+                                                                url: postURL,
+                                                                dataType: 'json',
+                                                                success: function(response) {
+                                                                    if (response.status === 'success') {
+                                                                        postsList.find('li.load-more').before(response.markup);
+                                                                        var newShowing = currentShowing + response.meta.count;
+                                                                        loadMoreContainer.attr('data-num-showing', newShowing);
+                                                                        if (response.meta.more === 0) {
+                                                                            postsListDiv.removeClass('has-load-more');
+                                                                            loadMoreContainer.remove();
+                                                                        }
+                                                                    } else {
+                                                                        console.error('Error loading more posts');
+                                                                    }
+                                                                },
+                                                                error: function() {
+                                                                    console.error('Error loading more posts');
+                                                                },
+                                                                complete: function() {
+                                                                    loadButtons.removeClass('loading');
+                                                                }
+                                                            });
+                                                        });
+                                                        var autoLoadInterval;
+                                                        loadButtons.filter('.all').bind('click', function(e) {
+                                                            e.preventDefault();
+                                                            var loadButton = $(this);
+                                                            if (!loadButton.hasClass('auto')){ loadButton.addClass('auto'); }
+                                                            else { loadButton.removeClass('auto'); return true; }
+                                                            if (autoLoadInterval){ clearInterval(autoLoadInterval); }
+                                                            autoLoadInterval = setInterval(function(){
+                                                                var loadMoreContainer = $('.load-more-posts');
+                                                                var loadAutoButton = loadMoreContainer.length ? loadMoreContainer.find('.all') : [];
+                                                                var loadNextButton = loadMoreContainer.length ? loadMoreContainer.find('.next') : [];
+                                                                if (loadAutoButton.hasClass('auto')
+                                                                    || !loadMoreContainer.length
+                                                                    || !loadNextButton.length){
+                                                                    loadButton.removeClass('auto');
+                                                                    clearInterval(autoLoadInterval);
+                                                                    return;
+                                                                }
+                                                                if (!loadNextButton.hasClass('loading')){
+                                                                    loadNextButton.trigger('click');
+                                                                }
+                                                            }, 2000);
+                                                        });
+                                                    });
+                                                </script>
+                                                <?
+                                                $admin_inline_javascript .= ob_get_clean();
                                             }
+
                                             ?>
                                         </ul>
                                     </div>

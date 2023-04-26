@@ -5,6 +5,10 @@ html, body {
     min-height: 0;
 }
 
+* {
+    max-height: none;
+}
+
 #mmrpg {
     width: auto;
     margin-left: auto;
@@ -148,7 +152,8 @@ a:hover {
 .messages .list .message.success:before,
 .messages .list .message.warning:before,
 .messages .list .message.alert:before,
-.messages .list .message.error:before {
+.messages .list .message.error:before,
+.messages .list .message.pending:before {
     content: "*";
     display: inline-block;
     box-sizing: border-box;
@@ -178,6 +183,9 @@ a:hover {
 .messages .list .message.error {
     color: #8c2525;
 }
+.messages .list .message.pending {
+    color: #262626;
+}
 .messages .list .message.success:before {
     content: "\2713";
     background-color: #005d07;
@@ -193,6 +201,16 @@ a:hover {
 .messages .list .message.error:before {
     content: "\00d7";
     background-color: #8c2525;
+}
+.messages .list .message.pending:before {
+    content: " ";
+    background-color: #262626;
+    background-color: transparent;
+    background-image: url("../images/ajax-loader_on-home.gif");
+    background-size: 100% auto;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
 }
 
 .adminhome {
@@ -2758,10 +2776,12 @@ input[type=file] {
 .adminform.edit-community .posts-list {
     font-size: 100%;
     line-height: 1.5;
+    position: relative;
 }
 .adminform.edit-community .posts-list ul {
     list-style: none;
-    padding: 0;
+    padding: 0 15px 0 0;
+    max-height: none;
 }
 .adminform.edit-community .posts-list li {
     border-bottom: 1px solid #ccc;
@@ -2788,6 +2808,18 @@ input[type=file] {
     border-radius: 3px;
     margin: 6px auto 0;
     box-sizing: border-box;
+    overflow: hidden;
+}
+.adminform.edit-community .posts-list .post-body a {
+    color: inherit;
+}
+.adminform.edit-community .posts-list .post-body a:hover {
+    color: #008aab;
+}
+.adminform.edit-community .posts-list .post-body .nbr {
+    display: inline-block;
+    margin: 0 6px;
+    opacity: 0.3;
 }
 .adminform.edit-community .posts-list li.focus .post-body {
     border-color: #008aab;
@@ -2798,6 +2830,7 @@ input[type=file] {
 .adminform.edit-community .posts-list li.deleted .post-body {
     text-decoration: line-through;
 }
+.adminform.edit-community .posts-list .post-meta,
 .adminform.edit-community .posts-list .post-author,
 .adminform.edit-community .posts-list .post-date,
 .adminform.edit-community .posts-list .post-key,
@@ -2805,6 +2838,10 @@ input[type=file] {
     display: inline-block;
     margin-right: 10px;
     vertical-align: middle;
+}
+.adminform.edit-community .posts-list .post-meta,
+.adminform.edit-community .posts-list .post-actions {
+    margin: 0 auto 5px;
 }
 .adminform.edit-community .posts-list .author {
     font-weight: bold;
@@ -2849,4 +2886,55 @@ input[type=file] {
 .adminform.edit-community .posts-list .post-actions a strong:after {
     content: "]";
 }
+
+.adminform.edit-community .posts-list.has-load-more {
+    padding-bottom: 125px;
+}
+.adminform.edit-community .posts-list .load-more-posts {
+    text-align: center;
+    margin-top: 10px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+.adminform.edit-community .posts-list .load-more-posts a {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 9px 12px;
+    margin-bottom: 10px;
+    background-color: #2f97b1;
+    color: #fefefe;
+    font-size: 110%;
+    line-height: 1.6;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+.adminform.edit-community .posts-list .load-more-posts a:hover {
+    background-color: #36a6c2;
+}
+.adminform.edit-community .posts-list .load-more-posts .more.next {
+    font-size: 120%;
+    line-height: 1.8;
+}
+.adminform.edit-community .posts-list .load-more-posts a.disabled,
+.adminform.edit-community .posts-list .load-more-posts a.loading {
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.3;
+}
+.adminform.edit-community .posts-list .load-more-posts a.auto {
+    background-color: red;
+    pointer-events: all;
+}
+.adminform.edit-community .posts-list .load-more-posts a.auto:before,
+.adminform.edit-community .posts-list .load-more-posts a.auto:after {
+    content: "(!)";
+}
+
+
 

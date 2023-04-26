@@ -311,11 +311,24 @@ button {
 }
 #window .banner .credits {
     z-index: 40;
-    background-image: url(../images/assets/mmrpg-prototype-banner-logo-2k19.png?20200906);
+    background-image: none;
     background-color: transparent;
     background-repeat: no-repeat;
     background-position: center top;
 
+}
+#window .banner .credits > a {
+    display: block;
+    width: 244px;
+    height: 150px;
+    background-image: url(../images/assets/mmrpg-prototype-banner-logo-2k19.png?20200906);
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: center top;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
 }
 #window .banner .overlay {
     z-index: 30;

@@ -449,7 +449,7 @@ if ($this_current_page == 'file' // File sub-pages
             }
             ?>
             <div class="foreground scanlines" style="background-image: url(images/assets/canvas-scanlines.png?<?=MMRPG_CONFIG_CACHE_DATE?>);">&nbsp;</div>
-            <div class="sprite credits banner_credits">Mega Man RPG Prototype | PlutoLighthouse.NET</div>
+            <div class="sprite credits banner_credits"><a href="<?= MMRPG_CONFIG_ROOTURL ?>"><strong>Mega Man RPG Prototype | PlutoLighthouse.NET</strong></a></div>
             <div class="sprite overlay banner_overlay" style="">&nbsp;</div>
 
             <div class="header_social_icons x16">

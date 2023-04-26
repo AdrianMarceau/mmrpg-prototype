@@ -42,3 +42,7 @@ testing.mmrpg-world.net/
 /xxx_data/*
 /xxx_sounds/
 /xxx_sounds/*
+.DS_Store
+*/.DS_Store
+Thumbs.db
+*/Thumbs.db

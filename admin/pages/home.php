@@ -689,6 +689,20 @@
                 $this_group_options[] = $this_option;
             }
 
+            if (
+                rpg_user::current_user_has_permission('edit-players')
+                || rpg_user::current_user_has_permission('edit-robots')
+                || rpg_user::current_user_has_permission('edit-abilities')
+                || rpg_user::current_user_has_permission('edit-items')
+                || rpg_user::current_user_has_permission('edit-fields')
+                ){
+                $this_option = array(
+                    'link' => array('url' => 'admin/view-sprites/', 'text' => 'View Sprites', 'target' => '_blank', 'bullet' => 'running'),
+                    'desc' => 'Quickly view game sprites all together in bulk',
+                    );
+                $this_group_options[] = $this_option;
+            }
+
             // Merge in the common game database group options to all envs
             $this_group_options = array_merge($this_group_options, $common_group_kinds_options['game_database']);
 
@@ -859,7 +873,7 @@
         // Populate the group options array with relevant pages and buttons
         if (rpg_user::current_user_has_permission('pull-content-updates')){
             $this_option = array(
-                'link' => array('url' => 'admin/scripts/pull-all-game-content.php?return=html', 'text' => 'Pull Content Updates', 'target' => '_blank', 'bullet' => 'cloud-download-alt'),
+                'link' => array('url' => 'admin/scripts/update-game-content.php?return=html', 'text' => 'Pull Content Updates', 'target' => '_blank', 'bullet' => 'cloud-download-alt'),
                 'desc' => 'Apply published game content updates to this build'
                 );
             $this_group_options[] = $this_option;
@@ -877,6 +891,17 @@
                 $this_option = array(
                     'link' => array('url' => 'admin/scripts/pull-live-user-data.php?return=html', 'text' => 'Pull Live User Data', 'target' => '_blank', 'bullet' => 'arrow-alt-circle-down'),
                     'desc' => 'Overwrite '.MMRPG_CONFIG_SERVER_ENV.' user data with '.MMRPG_CONFIG_PULL_LIVE_DATA_FROM.' build data'
+                    );
+                $this_group_options[] = $this_option;
+            }
+        }
+        if (MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== false
+            && MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== MMRPG_CONFIG_SERVER_ENV){
+            if (rpg_user::current_user_has_permission('pull-content-updates')
+                || rpg_user::current_user_has_permission('push-content-updates')){
+                $this_option = array(
+                    'link' => array('url' => 'admin/scripts/publish-game-content.php?return=html&kind=all&token=all&source=github', 'text' => 'Push Content Updates', 'target' => '_blank', 'bullet' => 'cloud-upload-alt'),
+                    'desc' => 'Published game content updates to the cloud'
                     );
                 $this_group_options[] = $this_option;
             }

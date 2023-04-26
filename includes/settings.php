@@ -200,6 +200,11 @@ if (MMRPG_CONFIG_SERVER_ENV === 'local'){
     define('MMRPG_CONFIG_PULL_LIVE_DATA_FROM', false);
 }
 
+// Back-up definition in case SERVER USER are not defined
+if (!defined('MMRPG_CONFIG_SERVER_USER')){
+    define(MMRPG_CONFIG_SERVER_USER, 'mmrpg2');
+}
+
 // Define the last save timestamp now if not already done so
 if (!defined('MMRPG_CONFIG_LAST_SAVE_DATE')){
     $guest_id = MMRPG_SETTINGS_GUEST_ID;
