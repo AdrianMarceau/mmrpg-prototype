@@ -21,7 +21,8 @@ PUSH_LIST_FILE="$project_base_path/.cache/admin/cron_git-push-pending.list"
 PULL_LIST_FILE="$project_base_path/.cache/admin/cron_git-pull-pending.list"
 
 #echo "=========="
-echo "Running the sudo-git-wrapper script as '$1' on $(date '+%Y-%m-%d @ %l:%M%p')"
+#echo "Running the sudo-git-wrapper script as '$1' on $(date '+%Y-%m-%d @ %l:%M%p')"
+echo "Running the '$BASH_SOURCE' script as '$1' on $(date '+%Y-%m-%d @ %l:%M%p')"
 #echo "-----"
 
 # Check if the list files exist and process them
