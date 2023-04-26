@@ -9,14 +9,6 @@ log_base_path="$(dirname "$project_base_path")"
 # Redirect stdout and stderr to log files in the script directory
 exec >> "$log_base_path/_logs/cron.log" 2>> "$log_base_path/_logs/error.log"
 
-# Check if the required argument is provided
-if [ "$#" -ne 1 ]; then
-    echo "Cron Error: Missing argument(s) to cron_sudo-git-wrapper.sh" >&2
-    echo "Missing argument(s) to cron_sudo-git-wrapper.sh" >&1
-    echo "Usage: $0 <user>"
-    exit 1
-fi
-
 # Set the path to the list files
 PUSH_LIST_FILE="$project_base_path/.cache/admin/cron_git-push-pending.list"
 PULL_LIST_FILE="$project_base_path/.cache/admin/cron_git-pull-pending.list"
