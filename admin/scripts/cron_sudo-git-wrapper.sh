@@ -15,7 +15,6 @@ PULL_LIST_FILE="$project_base_path/.cache/admin/cron_git-pull-pending.list"
 
 #echo "=========="
 echo "Running the '$BASH_SOURCE' script as '$current_user' on $(date '+%Y-%m-%d @ %l:%M%p')"
-#echo "-----"
 
 # Check if the list files exist and process them
 for LIST_FILE in "$PUSH_LIST_FILE" "$PULL_LIST_FILE"; do
