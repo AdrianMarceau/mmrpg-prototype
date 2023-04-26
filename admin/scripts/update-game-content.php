@@ -13,6 +13,7 @@ require_once(MMRPG_CONFIG_CONTENT_PATH.'index.php');
 if (empty($_GET['complete']) || $_GET['complete'] !== 'true'){
 
     // No matter what, start the output buffer
+    ob_end_clean();
     ob_start();
 
     // Loop through the content types one-by-one and queue pulling updates for each
@@ -47,6 +48,7 @@ if (empty($_GET['complete']) || $_GET['complete'] !== 'true'){
 elseif ($_GET['complete'] === 'true') {
 
     // No matter what, start the output buffer
+    ob_end_clean();
     ob_start();
 
     // Pre-collect a list of contributors so we can match usernames to IDs later
