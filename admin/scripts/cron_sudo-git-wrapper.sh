@@ -27,10 +27,9 @@ for LIST_FILE in "$PUSH_LIST_FILE" "$PULL_LIST_FILE"; do
         while IFS= read -r repo_path; do
 
             # Collect the relative path and action token
-            repo_rel_path=$(echo "$repo_path" | sed "s|$project_base_path/||")
             filename="$(basename "$LIST_FILE")"
             action_token="$(echo "$filename" | sed 's/-pending.list//')"
-            echo -e "Attempting to run '$action_token' on the '$repo_rel_path' repository directory..."
+            echo -e "Attempting to run '$action_token' on the '$repo_path' repository directory..."
 
             # Perform the action based on the list file name
             cd "$repo_path"
