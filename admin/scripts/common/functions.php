@@ -78,7 +78,7 @@ function print_cron_status_checker($cron_kind, $print = true, $reload = false){
 
     $displayed_cron_text = '';
     $displayed_cron_path = MMRPG_CONFIG_IS_LIVE !== true ? $cron_path : str_replace(MMRPG_CONFIG_ROOTDIR, '', $cron_path);
-    $displayed_cron_cmd = $displayed_cron_path.' '.MMRPG_CONFIG_SERVER_USER;
+    $displayed_cron_cmd = 'sudo '.$displayed_cron_path;
     if (MMRPG_CONFIG_IS_LIVE !== true){
         $displayed_cron_text = 'This may take a few minutes. On localhost, you may need to run the following command:';
     } else {
