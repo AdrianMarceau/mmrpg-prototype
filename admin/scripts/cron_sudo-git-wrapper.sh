@@ -13,7 +13,8 @@ PUSH_LIST_FILE="$project_base_path/.cache/admin/cron_git-push-pending.list"
 PULL_LIST_FILE="$project_base_path/.cache/admin/cron_git-pull-pending.list"
 
 #echo "=========="
-echo "Running the '$BASH_SOURCE' script as '$USER' on $(date '+%Y-%m-%d @ %l:%M%p')"
+CURRENT_USER="$(id -un 2>/dev/null || whoami)"
+echo "Running the '$BASH_SOURCE' script as '$CURRENT_USER' on $(date '+%Y-%m-%d @ %l:%M%p')"
 
 # Check if the list files exist and process them
 for LIST_FILE in "$PUSH_LIST_FILE" "$PULL_LIST_FILE"; do
@@ -47,7 +48,7 @@ for LIST_FILE in "$PUSH_LIST_FILE" "$PULL_LIST_FILE"; do
                 echo "$git_output"
                 processed_successfully=true
             else
-                echo "Cron Error (1/2): Something went wrong running the sudo-git-wrapper script as '$USER' on $(date '+%Y-%m-%d @ %l:%M%p')" >&2
+                echo "Cron Error (1/2): Something went wrong running the sudo-git-wrapper script as '$CURRENT_USER' on $(date '+%Y-%m-%d @ %l:%M%p')" >&2
                 echo "Cron Error (2/2): Unknown list file: $LIST_FILE" >&2
                 echo "Unknown list file: $LIST_FILE" >&1
                 break
