@@ -71,5 +71,5 @@ for LIST_FILE in "$PUSH_LIST_FILE" "$PULL_LIST_FILE"; do
     fi
 done
 
-echo "Done."
+#echo "Done."
 exit 0
