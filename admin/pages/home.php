@@ -942,6 +942,14 @@
                 );
             $this_group_options[] = $this_option;
         }
+        if (rpg_user::current_user_has_permission('watch-error-logs')
+            || rpg_user::current_user_has_permission('check-git-status')){
+            $this_option = array(
+                'link' => array('url' => 'content/git-status.php', 'text' => 'Check Git Status', 'target' => '_blank', 'bullet' => 'code-branch'),
+                'desc' => 'Run a git permission check and status diagnostic on the server'
+                );
+            $this_group_options[] = $this_option;
+        }
 
         // Print out the group title and options, assuming there are any available
         echo cms_admin::print_admin_home_group_options($this_group_name, $this_group_options);
