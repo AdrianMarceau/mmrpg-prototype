@@ -1135,6 +1135,8 @@ class rpg_ability_recovery extends rpg_recovery {
 
         // Update this robot's history with the triggered recovery amount
         $this_robot->history['triggered_recovery'][] = $this_ability->ability_results['this_amount'];
+        $this_robot->history['triggered_recovery_by'][] = $this_ability->ability_token;
+
         // Update the robot's history with the triggered recovery types
         if (!empty($this_ability->ability_results['recovery_type'])){
             $temp_types = array();

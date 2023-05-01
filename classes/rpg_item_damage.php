@@ -1054,6 +1054,7 @@ class rpg_item_damage extends rpg_damage {
 
             // Update this robot's history with the triggered damage amount
             $this_robot->history['triggered_damage'][] = $this_item->item_results['this_amount'];
+            $this_robot->history['triggered_damage_by'][] = $this_item->item_token;
 
             // Update the robot's history with the triggered damage types
             if (!empty($this_item->item_results['damage_type'])){
@@ -1062,7 +1063,7 @@ class rpg_item_damage extends rpg_damage {
                 if (!empty($this_item->item_results['damage_type2'])){ $temp_types[] = $this_item->item_results['damage_type2']; }
                 $this_robot->history['triggered_damage_types'][] = $temp_types;
             } else {
-                $this_robot->history['triggered_damage_types'][] = array();
+                $this_robot->history['triggered_damage_types'][] = null; //array();
             }
 
         }

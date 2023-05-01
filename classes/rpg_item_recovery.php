@@ -1044,6 +1044,8 @@ class rpg_item_recovery extends rpg_recovery {
 
         // Update this robot's history with the triggered recovery amount
         $this_robot->history['triggered_recovery'][] = $this_item->item_results['this_amount'];
+        $this_robot->history['triggered_recovery_by'][] = $this_item->item_token;
+
         // Update the robot's history with the triggered recovery types
         if (!empty($this_item->item_results['recovery_type'])){
             $temp_types = array();
@@ -1051,7 +1053,7 @@ class rpg_item_recovery extends rpg_recovery {
             if (!empty($this_item->item_results['recovery_type2'])){ $temp_types[] = $this_item->item_results['recovery_type2']; }
             $this_robot->history['triggered_recovery_types'][] = $temp_types;
         } else {
-            $this_robot->history['triggered_recovery_types'][] = array();
+            $this_robot->history['triggered_recovery_types'][] = null; //array();
         }
 
         // Update the recovery result total variables
