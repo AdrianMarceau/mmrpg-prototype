@@ -180,6 +180,8 @@ require('classes/rpg_item.php');
 require('classes/rpg_item_damage.php');
 require('classes/rpg_item_recovery.php');
 require('classes/rpg_skill.php');
+require('classes/rpg_skill_damage.php');
+require('classes/rpg_skill_recovery.php');
 
 // Include mandatory function files
 require('functions/website.php');
