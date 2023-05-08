@@ -120,9 +120,23 @@ class rpg_game {
         // If the field index has not been created, do so
         if (!isset(self::$index['fields'])){ self::$index['fields'] = array(); }
 
+        // If the field was not provided at all, we can assume a stub
+        if (empty($this_fieldinfo)){ $this_fieldinfo = array('field_token' => 'field'); }
+
         // Check if a field ID has been defined
         if (isset($this_fieldinfo['field_id'])){
             $field_id = $this_fieldinfo['field_id'];
+        }
+        // Otherwise if only a field token was defined
+        elseif (isset($this_fieldinfo['field_token'])){
+            $field_id = 0;
+            $field_token = $this_fieldinfo['field_token'];
+            foreach (self::$index['fields'] AS $field){
+                if ($field_token == $field->field_token){
+                    $field_id = $field->field_id;
+                    break;
+                }
+            }
         }
 
         // If this field has already been created, retrieve it
@@ -157,6 +171,9 @@ class rpg_game {
 
         // If the player index has not been created, do so
         if (!isset(self::$index['players'])){ self::$index['players'] = array(); }
+
+        // If the player was not provided at all, we can assume a stub
+        if (empty($this_playerinfo)){ $this_playerinfo = array('player_token' => 'player'); }
 
         // Check if a player ID has been defined
         if (isset($this_playerinfo['player_id'])){
@@ -217,6 +234,9 @@ class rpg_game {
         // If the robot index has not been created, do so
         if (!isset(self::$index['robots'])){ self::$index['robots'] = array(); }
 
+        // If the robot was not provided at all, we can assume a stub
+        if (empty($this_robotinfo)){ $this_robotinfo = array('robot_token' => 'robot'); }
+
         // Check if a robot ID has been defined
         if (isset($this_robotinfo['robot_id'])){
             $robot_id = $this_robotinfo['robot_id'];
@@ -276,6 +296,9 @@ class rpg_game {
 
         // If the ability index has not been created, do so
         if (!isset(self::$index['abilities'])){ self::$index['abilities'] = array(); }
+
+        // If the ability was not provided at all, we can assume a stub
+        if (empty($this_abilityinfo)){ $this_abilityinfo = array('ability_token' => 'ability'); }
 
         // Check if a ability ID has been defined
         if (isset($this_abilityinfo['ability_id'])){
@@ -338,6 +361,9 @@ class rpg_game {
         // If the item index has not been created, do so
         if (!isset(self::$index['items'])){ self::$index['items'] = array(); }
 
+        // If the item was not provided at all, we can assume a stub
+        if (empty($this_iteminfo)){ $this_iteminfo = array('item_token' => 'item'); }
+
         // Check if a item ID has been defined
         if (isset($this_iteminfo['item_id'])){
             $item_id = $this_iteminfo['item_id'];
@@ -398,6 +424,9 @@ class rpg_game {
 
         // If the skill index has not been created, do so
         if (!isset(self::$index['skills'])){ self::$index['skills'] = array(); }
+
+        // If the skill was not provided at all, we can assume a stub
+        if (empty($this_skillinfo)){ $this_skillinfo = array('skill_token' => 'skill'); }
 
         // Check if a skill ID has been defined
         if (isset($this_skillinfo['skill_id'])){
