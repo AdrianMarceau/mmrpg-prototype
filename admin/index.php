@@ -377,6 +377,7 @@ unset($db);
 <? } ?>
 <? if (in_array('codemirror', $admin_include_common_styles)){ ?>
     <link rel="stylesheet" href=".libs/codemirror/lib/codemirror.css?<?= MMRPG_CONFIG_CACHE_DATE ?>">
+    <link rel="stylesheet" href=".libs/codemirror/addon/dialog/dialog.css?<?= MMRPG_CONFIG_CACHE_DATE ?>">
 <? } ?>
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
@@ -422,6 +423,10 @@ unset($db);
 <? if (in_array('codemirror', $admin_include_common_scripts)){ ?>
     <script type="text/javascript" src=".libs/codemirror/lib/codemirror.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
     <script type="text/javascript" src=".libs/codemirror/addon/edit/matchbrackets.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
+    <script type="text/javascript" src=".libs/codemirror/addon/search/search.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
+    <script type="text/javascript" src=".libs/codemirror/addon/search/searchcursor.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
+    <script type="text/javascript" src=".libs/codemirror/addon/search/jump-to-line.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
+    <script type="text/javascript" src=".libs/codemirror/addon/dialog/dialog.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
     <script type="text/javascript" src=".libs/codemirror/mode/htmlmixed/htmlmixed.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
     <script type="text/javascript" src=".libs/codemirror/mode/xml/xml.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
     <script type="text/javascript" src=".libs/codemirror/mode/javascript/javascript.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
