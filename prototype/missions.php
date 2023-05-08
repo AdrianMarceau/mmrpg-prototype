@@ -23,18 +23,6 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     // If the player has completed at least zero battles, display the starter battle
     if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['0'])){
 
-        // Generate the battle option with the starter data
-        $temp_session_token = $this_prototype_data['this_player_token'].'_battle_'.$this_prototype_data['this_current_chapter'];
-        if (empty($_SESSION['PROTOTYPE_TEMP'][$temp_session_token])){
-            $temp_battle_omega = rpg_mission_starter::generate($this_prototype_data, 'met', $this_prototype_data['this_chapter_levels'][0], $this_prototype_data['this_support_robot'], $this_prototype_data['this_intro_field']);
-            $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
-            rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
-            $_SESSION['PROTOTYPE_TEMP'][$temp_session_token] = $temp_battle_omega['battle_token'];
-        } else {
-            $temp_battle_token = $_SESSION['PROTOTYPE_TEMP'][$temp_session_token];
-            $temp_battle_omega = rpg_battle::get_index_info($temp_battle_token);
-        }
-
         // EVENT MESSAGE : CHAPTER ONE
         $this_prototype_data['battle_options'][] = array(
             'option_type' => 'message',
@@ -42,8 +30,25 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             'option_maintext' => 'Chapter One : An Unexpected Attack'
             );
 
-        // Add the omega battle to the options, index, and session
-        $this_prototype_data['battle_options'][] = $temp_battle_omega;
+        // Intro Battle I (Vs. MET)
+        // Always generate the very first battle no matter what
+        if (true){
+
+            // Generate the battle option with the starter data
+            $temp_session_token = $this_prototype_data['this_player_token'].'_battle_'.$this_prototype_data['this_current_chapter'];
+            if (empty($_SESSION['PROTOTYPE_TEMP'][$temp_session_token])){
+                $temp_battle_omega = rpg_mission_starter::generate_intro($this_prototype_data, $this_prototype_data['this_intro_targets'][0], $this_prototype_data['this_chapter_levels'][0], $this_prototype_data['this_support_robot'], $this_prototype_data['this_intro_field']);
+                $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
+                rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+                $_SESSION['PROTOTYPE_TEMP'][$temp_session_token] = $temp_battle_omega['battle_token'];
+            } else {
+                $temp_battle_token = $_SESSION['PROTOTYPE_TEMP'][$temp_session_token];
+                $temp_battle_omega = rpg_battle::get_index_info($temp_battle_token);
+            }
+            $this_prototype_data['battle_options'][] = $temp_battle_omega;
+
+        }
+
 
     }
 

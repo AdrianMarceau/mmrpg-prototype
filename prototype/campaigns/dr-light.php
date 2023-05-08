@@ -7,6 +7,7 @@ $this_prototype_data['this_player_token'] = 'dr-light';
 $this_prototype_data['this_intro_field'] = 'gentle-countryside';
 $this_prototype_data['this_player_field'] = 'light-laboratory';
 $this_prototype_data['this_support_robot'] = 'roll';
+$this_prototype_data['this_intro_targets'] = array('met', 'sniper-joe', 'trill/speed');
 $this_prototype_data['this_chapter_levels'] = array(
     0 => 1,   // Intro
     1 => 02,  // Singles
