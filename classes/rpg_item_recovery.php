@@ -27,6 +27,7 @@ class rpg_item_recovery extends rpg_recovery {
         if (!isset($trigger_options['referred_recovery'])){ $trigger_options['referred_recovery'] = false; }
         if (!isset($trigger_options['referred_recovery_id'])){ $trigger_options['referred_recovery_id'] = 0; }
         if (!isset($trigger_options['referred_recovery_stats'])){ $trigger_options['referred_recovery_stats'] = array(); }
+        if (!isset($trigger_options['force_flags'])){ $trigger_options['force_flags'] = array(); }
 
         // If this is referred recovery, collect the actual target
         if (!empty($trigger_options['referred_recovery']) && !empty($trigger_options['referred_recovery_id'])){
@@ -165,6 +166,24 @@ class rpg_item_recovery extends rpg_recovery {
                     $this_item->item_results['flag_immunity'] = true;
                 }
 
+                // If any force flags have been applied, it's best to parse them now
+                if (in_array('flag_weakness', $trigger_options['force_flags'])){
+                    $this_item->item_results['counter_weaknesses'] += 1;
+                    $this_item->item_results['flag_weakness'] = true;
+                }
+                if (in_array('flag_affinity', $trigger_options['force_flags'])){
+                    $this_item->item_results['counter_affinities'] += 1;
+                    $this_item->item_results['flag_affinity'] = true;
+                }
+                if (in_array('flag_resistance', $trigger_options['force_flags'])){
+                    $this_item->item_results['counter_resistances'] += 1;
+                    $this_item->item_results['flag_resistance'] = true;
+                }
+                if (in_array('flag_immunity', $trigger_options['force_flags'])){
+                    $this_item->item_results['counter_immunities'] += 1;
+                    $this_item->item_results['flag_immunity'] = true;
+                }
+
             }
 
             // Apply core boosts if allowed to
@@ -232,6 +251,12 @@ class rpg_item_recovery extends rpg_recovery {
                         $item_coreboost_multipliers[] = MMRPG_SETTINGS_SUBCOREBOOST_MULTIPLIER;
                     }
 
+                }
+
+                // If any force flags have been applied, it's best to parse them now
+                if (in_array('flag_coreboost', $trigger_options['force_flags'])){
+                    $this_item->item_results['counter_coreboosts'] += 1;
+                    $this_item->item_results['flag_coreboost'] = true;
                 }
 
                 // If any coreboosts were present, update the flag
@@ -550,6 +575,12 @@ class rpg_item_recovery extends rpg_recovery {
                     $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | flag_critical | x '.$this_item->recovery_options['critical_multiplier'].' = '.$this_item->item_results['this_amount'].'');
                 } else {
                     $this_item->item_results['flag_critical'] = false;
+                }
+
+                // If any force flags have been applied, it's best to parse them now
+                if (in_array('flag_critical', $trigger_options['force_flags'])){
+                    $this_item->item_results['this_amount'] = $this_item->item_results['this_amount'] * $this_item->recovery_options['critical_multiplier'];
+                    $this_item->item_results['flag_critical'] = true;
                 }
 
             }
