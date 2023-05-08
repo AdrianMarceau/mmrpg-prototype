@@ -401,6 +401,63 @@ class rpg_robot extends rpg_object {
 
     }
 
+    // Define some quick helper functions for getting specific types of objects
+
+    // Define a function for getting this robot's ability object (or a new ability object owned by this robot)
+    public function get_ability_object(){
+        $args = func_num_args() > 0 ? func_get_args() : array();
+        if (empty($args)){ return false; }
+        if (empty($args[0])){ return rpg_game::get_ability($this->battle, $this->player, $this, null); }
+        if (is_numeric($args[0])){ $ability_info = array('ability_id' => $args[0]); }
+        elseif (is_string($args[0])){ $ability_info = array('ability_token' => $args[0]); }
+        else { $ability_info = $args[0]; }
+        return rpg_game::get_ability($this->battle, $this->player, $this, $ability_info);
+    }
+
+    // Define a function for getting this robot's ability objects (or new ability objects owned by this robot)
+    public function get_ability_objects(){
+        $args = func_num_args() > 0 ? func_get_args() : array();
+        if (empty($args)){ $ability_tokens = $this->robot_abilities; }
+        elseif (is_array($args[0])){ $ability_tokens = $args[0]; }
+        else { $ability_tokens = $args; }
+        $ability_objects = array();
+        foreach ($ability_tokens AS $key => $token){ $ability_objects[] = $this->get_ability_object($token); }
+        return $ability_objects;
+    }
+
+    // Define a public function for getting this robot's ability object, if any
+    public function get_robot_ability_object($ability_token, $extra_ability_info = array()){
+
+        // Collect and cache an ability index for reference
+        static $mmrpg_index_abilities;
+        if (empty($mmrpg_index_abilities)){ $mmrpg_index_abilities = rpg_ability::get_index(); }
+
+        // Collect the ability's index info if exists, else return now
+        if (!isset($mmrpg_index_abilities[$ability_token])){ return; }
+        $ability_index_info = $mmrpg_index_abilities[$ability_token];
+        $ability_id = rpg_game::unique_ability_id($this->robot_id, $ability_index_info['ability_id']);
+        $ability_info = array('ability_id' => $ability_id, 'ability_token' => $ability_token);
+        if (!empty($extra_ability_info)){ $ability_info = array_merge($ability_info, $extra_ability_info); }
+
+        // Collect this ability's object from the game class
+        $this_ability = rpg_game::get_ability($this->battle, $this->player, $this, $ability_info);
+
+        // Return the collected ability
+        return $this_ability;
+
+    }
+
+    // Define a function for getting this robot's item object (or a new item object owned by this robot)
+    public function get_item_object(){
+        $args = func_num_args() > 0 ? func_get_args() : array();
+        if (empty($args)){ return $this->get_robot_item_object(); }
+        if (empty($args[0])){ return rpg_game::get_item($this->battle, $this->player, $this, null); }
+        if (is_numeric($args[0])){ $item_info = array('item_id' => $args[0]); }
+        elseif (is_string($args[0])){ $item_info = array('item_token' => $args[0]); }
+        else { $item_info = $args[0]; }
+        return rpg_game::get_item($this->battle, $this->player, $this, $item_info);
+    }
+
     // Define a public function for getting this robot's item object, if any
     public function get_robot_item_object($extra_item_info = array()){
 
@@ -425,6 +482,17 @@ class rpg_robot extends rpg_object {
         // Return the collected item
         return $this_item;
 
+    }
+
+    // Define a function for getting this robot's skill object (or a new skill object owned by this robot)
+    public function get_skill_object(){
+        $args = func_num_args() > 0 ? func_get_args() : array();
+        if (empty($args)){ return $this->get_robot_skill_object(); }
+        if (empty($args[0])){ return rpg_game::get_skill($this->battle, $this->player, $this, null); }
+        if (is_numeric($args[0])){ $skill_info = array('skill_id' => $args[0]); }
+        elseif (is_string($args[0])){ $skill_info = array('skill_token' => $args[0]); }
+        else { $skill_info = $args[0]; }
+        return rpg_game::get_skill($this->battle, $this->player, $this, $skill_info);
     }
 
     // Define a public function for getting this robot's skill object, if any
@@ -2316,10 +2384,14 @@ class rpg_robot extends rpg_object {
             // This was an ability so delegate to the ability class function
             $trigger_return = rpg_ability_damage::trigger_robot_damage($this, $target_robot, $this_object, $damage_amount, $trigger_disabled, $trigger_options);
 
-        } elseif (isset($this_object->item_token)){
+        }
+        elseif (isset($this_object->item_token)){
             // This was an item so delegate to the item class function
-            //return $this->trigger_item_damage($target_robot, $this_object, $damage_amount, $trigger_disabled, $trigger_options);
             $trigger_return = rpg_item_damage::trigger_robot_damage($this, $target_robot, $this_object, $damage_amount, $trigger_disabled, $trigger_options);
+        }
+        elseif (isset($this_object->skill_token)){
+            // This was a skill so delegate to the skill class function
+            $trigger_return = rpg_skill_damage::trigger_robot_damage($this, $target_robot, $this_object, $damage_amount, $trigger_disabled, $trigger_options);
         }
 
         // Check if this unlockable robot's data has been corrupted
@@ -2358,11 +2430,18 @@ class rpg_robot extends rpg_object {
             // This was an ability so delegate to the ability class function
             return rpg_ability_recovery::trigger_robot_recovery($this, $target_robot, $this_object, $recovery_amount, $trigger_disabled, $trigger_options);
 
-        } elseif (isset($this_object->item_token)){
+        }
+        elseif (isset($this_object->item_token)){
             // This was an item so delegate to the item class function
             if (!isset($trigger_options['apply_position_modifiers'])){ $trigger_options['apply_position_modifiers'] = false; }
             if (!isset($trigger_options['apply_stat_modifiers'])){ $trigger_options['apply_stat_modifiers'] = false; }
             return rpg_item_recovery::trigger_robot_recovery($this, $target_robot, $this_object, $recovery_amount, $trigger_disabled, $trigger_options);
+        }
+        elseif (isset($this_object->skill_token)){
+            // This was an skill so delegate to the skill class function
+            if (!isset($trigger_options['apply_position_modifiers'])){ $trigger_options['apply_position_modifiers'] = false; }
+            if (!isset($trigger_options['apply_stat_modifiers'])){ $trigger_options['apply_stat_modifiers'] = false; }
+            return rpg_skill_recovery::trigger_robot_recovery($this, $target_robot, $this_object, $recovery_amount, $trigger_disabled, $trigger_options);
         }
 
     }
