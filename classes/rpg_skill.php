@@ -92,6 +92,7 @@ class rpg_skill extends rpg_object {
             $temp_backup_id = $this_skillinfo['skill_id'];
             if (empty($this_skillinfo_backup['_parsed']) && !empty($this_indexinfo)){
                 $robot_skillinfo = $this->robot->get_skill_info($this->robot->robot_skill);
+                if (empty($robot_skillinfo)){ $robot_skillinfo = array(); }
                 $this_skillinfo = array_replace($this_indexinfo, $robot_skillinfo, $this_skillinfo_backup);
             }
         }
