@@ -324,7 +324,7 @@ foreach ($this_menu_tooltips AS $token => $text){
     <div class="banner">
         <div class="sprite background banner_background" style="background-image: url(images/menus/menu-banner_this-battle-select.png);">&nbsp;</div>
         <div class="sprite foreground banner_foreground banner_dynamic" style="background-image: url(images/menus/prototype-banners_title-screen_01.gif?<?=MMRPG_CONFIG_CACHE_DATE?>); background-position: center -10px;">&nbsp;</div>
-        <div class="sprite credits banner_credits">Mega Man RPG Prototype | PlutoLighthouse.NET</div>
+        <div class="sprite credits banner_credits"><h1>Mega Man RPG Prototype | Browser-Based Battle Simulator</h1></div>
         <div class="sprite overlay overlay_hidden banner_overlay">&nbsp;</div>
 
         <div class="title">Mega Man RPG Prototype</div>
