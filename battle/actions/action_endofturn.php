@@ -49,6 +49,15 @@ if ($this_battle->battle_status != 'complete'){
 
     // Loop through this player's robots and apply end-turn checks
     foreach ($this_robots_active AS $key => $active_robot){
+        $temp_endofturn_function = $active_robot->robot_function_onendofturn;
+        $temp_result = $temp_endofturn_function(array(
+            'this_battle' => $active_robot->player->battle,
+            'this_field' => $active_robot->player->battle->battle_field,
+            'this_player' => $active_robot->player,
+            'this_robot' => $active_robot,
+            'target_player' => $target_player,
+            'target_robot' => $target_robot
+            ));
         $active_robot->check_history($target_player, $target_robot);
         $active_robot->check_weapons($target_player, $target_robot);
         $active_robot->check_attachments($target_player, $target_robot);
@@ -61,6 +70,15 @@ if ($this_battle->battle_status != 'complete'){
 
     // Loop through the target player's robots and apply end-turn checks
     foreach ($target_robots_active AS $key => $active_robot){
+        $temp_endofturn_function = $active_robot->robot_function_onendofturn;
+        $temp_result = $temp_endofturn_function(array(
+            'this_battle' => $active_robot->player->battle,
+            'this_field' => $active_robot->player->battle->battle_field,
+            'this_player' => $active_robot->player,
+            'this_robot' => $active_robot,
+            'target_player' => $this_player,
+            'target_robot' => $this_robot
+            ));
         $active_robot->check_history($this_player, $this_robot);
         $active_robot->check_weapons($this_player, $this_robot);
         $active_robot->check_attachments($this_player, $this_robot);
