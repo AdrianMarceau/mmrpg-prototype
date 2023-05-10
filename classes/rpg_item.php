@@ -442,6 +442,10 @@ class rpg_item extends rpg_object {
         elseif ($type_class == 'none' && !empty($this->item_type2)){ $type_class = $this->item_type2; }
         return '<span class="item_name item_type item_type_'.$type_class.'">'.$this->item_name.($plural ? 's' : '').'</span>';
     }
+    public function print_name_s(){
+        $ends_with_s = substr($this->item_name, -1) === 's' ? true : false;
+        return $this->print_name()."'".(!$ends_with_s ? 's' : '');
+    }
     //public function print_name(){ return '<span class="item_name">'.$this->item_name.'</span>'; }
     public function print_token(){ return '<span class="item_token">'.$this->item_token.'</span>'; }
     public function print_description(){ return '<span class="item_description">'.$this->item_description.'</span>'; }

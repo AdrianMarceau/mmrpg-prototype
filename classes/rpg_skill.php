@@ -324,6 +324,11 @@ class rpg_skill extends rpg_object {
         if (!empty($pseudo_name)){ $print_name = $pseudo_name; }
         return '<span class="skill_name skill_type type_'.$print_type.'">'.$print_name.'</span>';
     }
+    public function print_name_s($pseudo_name = ''){
+        $print_name = $this->print_name($pseudo_name);
+        $ends_with_s = substr(trim(strip_tags($print_name)), -1) === 's' ? true : false;
+        return $print_name."'".(!$ends_with_s ? 's' : '');
+    }
     public function print_token(){
         return '<span class="skill_token">'.$this->skill_token.'</span>';
     }

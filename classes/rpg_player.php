@@ -1472,6 +1472,10 @@ class rpg_player extends rpg_object {
         }
         return '<span class="player_name player_type'.(!empty($type_class) ? ' '.$type_class : '').'">'.$this->player_name.'</span>';
     }
+    public function print_name_s(){
+        $ends_with_s = substr($this->player_name, -1) === 's' ? true : false;
+        return $this->print_name()."'".(!$ends_with_s ? 's' : '');
+    }
     public function print_token(){ return '<span class="player_token">'.$this->player_token.'</span>'; }
     public function print_description(){ return '<span class="player_description">'.$this->player_description.'</span>'; }
     public function print_quote($quote_type, $this_find = array(), $this_replace = array()){

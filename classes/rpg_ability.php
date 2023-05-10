@@ -457,6 +457,10 @@ class rpg_ability extends rpg_object {
         elseif ($type_class == 'none' && !empty($this->ability_type2)){ $type_class = $this->ability_type2; }
         return '<span class="ability_name ability_type ability_type_'.$type_class.'">'.$print_name.($plural ? (substr($print_name, -1, 1) == 's' ? 'es' : 's') : '').'</span>';
     }
+    public function print_name_s(){
+        $ends_with_s = substr($this->ability_name, -1) === 's' ? true : false;
+        return $this->print_name()."'".(!$ends_with_s ? 's' : '');
+    }
 
     public function print_token(){ return '<span class="ability_token">'.$this->ability_token.'</span>'; }
     public function print_description(){ return '<span class="ability_description">'.$this->ability_description.'</span>'; }
