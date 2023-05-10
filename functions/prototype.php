@@ -387,6 +387,28 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
         $total_battle_points += $points_index['challenges_completed_points'];
     }
 
+    // -- PLAYER POINTS -- //
+
+    // Grant the user points for each unique player they've defeated in a player battle
+    if (true){
+        $defeated_players = $db->get_array_list("SELECT
+            DISTINCT(battles.target_user_id) AS target_user_id,
+            (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS target_user_name,
+            users.user_name_clean AS target_user_token,
+            users.user_colour_token AS target_user_colour,
+            users.user_colour_token2 AS target_user_colour2
+            FROM mmrpg_battles AS battles
+            LEFT JOIN mmrpg_users AS users ON battles.target_user_id = users.user_id
+            WHERE
+            battles.this_user_id = {$user_id}
+            AND battles.this_player_result = 'victory'
+            AND users.user_flag_approved = 1
+            ;", 'target_user_name');
+        $points_index['players_defeated'] = !empty($defeated_players) ? $defeated_players : array();
+        $points_index['players_defeated_points'] = !empty($defeated_players) ? (count($defeated_players) * 10000) : 0;
+        $total_battle_points += $points_index['players_defeated_points'];
+    }
+
     // -- ENDLESS ATTACK POINTS -- //
 
     // Grant the user points for their personal best record in the ENDLESS ATTACK MODE challenge
@@ -411,28 +433,6 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
             $points_index['endless_waves_completed_points'] = $challenge_waveboard_results['challenge_points_total'];
             $total_battle_points += $points_index['endless_waves_completed_points'];
         }
-    }
-
-    // -- PLAYER POINTS -- //
-
-    // Grant the user points for each unique player they've defeated in a player battle
-    if (true){
-        $defeated_players = $db->get_array_list("SELECT
-            DISTINCT(battles.target_user_id) AS target_user_id,
-            (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS target_user_name,
-            users.user_name_clean AS target_user_token,
-            users.user_colour_token AS target_user_colour,
-            users.user_colour_token2 AS target_user_colour2
-            FROM mmrpg_battles AS battles
-            LEFT JOIN mmrpg_users AS users ON battles.target_user_id = users.user_id
-            WHERE
-            battles.this_user_id = {$user_id}
-            AND battles.this_player_result = 'victory'
-            AND users.user_flag_approved = 1
-            ;", 'target_user_name');
-        $points_index['players_defeated'] = !empty($defeated_players) ? $defeated_players : array();
-        $points_index['players_defeated_points'] = !empty($defeated_players) ? (count($defeated_players) * 10000) : 0;
-        $total_battle_points += $points_index['players_defeated_points'];
     }
 
     // -- BONUS POINTS -- //

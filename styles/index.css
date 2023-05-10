@@ -1663,7 +1663,7 @@ button {
 }
 
 #window .page .body .pipe {
-    color: rgba(255, 255, 255, 0.15);
+    opacity: 0.15;
 }
 
 #window .page .body .anchor {
@@ -2755,7 +2755,7 @@ button {
     font-size: 9px;
     line-height: 9px;
     width: 400px;
-    text-transform: uppercase;
+    text-transform: none;
     color: #DEDEDE;
 }
 #window .page .leaderboard .file .points .padding {
@@ -2792,6 +2792,115 @@ button {
     background-size: 32px 32px;
     background-position: -8px -8px;
 }
+
+
+
+#window .page_leaderboard .ranking-options {
+    display: block;
+    margin: 0 auto 5px;
+    text-align: left;
+}
+#window .page_leaderboard .ranking-options .event.text {
+    min-height: 1px;
+    text-align: inherit;
+    font-size: 10px;
+    line-height: 13px;
+    margin: 0 auto !important;
+    padding-bottom: 5px;
+}
+#window .page_leaderboard .ranking-options .event.text .label {
+    display: inline-block;
+    margin: 0 6px 0 0;
+    text-decoration: none;
+    font-weight: normal;
+}
+#window .page_leaderboard .ranking-options .event.text .label span {
+    font-weight: bold;
+    text-decoration: underline;
+}
+#window .page_leaderboard .ranking-options .event.text a.ranking {
+    line-height: 20px;
+    margin: 0 3px 0 0;
+    white-space: nowrap;
+    text-decoration: none;
+}
+#window .page_leaderboard .ranking-options .event.text a.ranking:hover,
+#window .page_leaderboard .ranking-options .event.text a.ranking.active {
+    text-decoration: none;
+}
+#window .page_leaderboard .ranking-options .event.text a.ranking:hover strong,
+#window .page_leaderboard .ranking-options .event.text a.ranking.active strong {
+    text-decoration: underline;
+}
+#window .page_leaderboard .ranking-options .event.text .pipe {
+    margin-right: 3px;
+}
+
+#window .page_leaderboard .online-players {
+    display: block;
+    margin: 0 auto 5px;
+    text-align: right;
+}
+#window .page_leaderboard .online-players .event.text {
+    min-height: 1px;
+    text-align: inherit;
+    font-size: 10px;
+    line-height: 13px;
+    margin: 0 auto !important;
+    padding-bottom: 5px;
+}
+#window .page_leaderboard .online-players .event.text .label {
+    display: block;
+    text-decoration: underline;
+    margin-bottom: 6px;
+}
+#window .page_leaderboard .online-players .event.text a {
+    text-decoration: none;
+    line-height: 20px;
+    padding-right: 12px;
+    margin: 0 0 0 6px;
+    white-space: nowrap;
+}
+#window .page_leaderboard .online-players .event.text a:hover {
+    text-decoration: none;
+}
+#window .page_leaderboard .online-players .event.text a .sprite-wrap {
+    pointer-events: none;
+    display: inline-block;
+    width: 34px;
+    height: 14px;
+    position: relative;
+}
+#window .page_leaderboard .online-players .event.text a .sprite-wrap .sprite {
+    margin: 0;
+    position: absolute;
+    bottom: 0;
+    background-repeat: no-repeat;
+}
+#window .page_leaderboard .online-players .event.text a:hover .sprite-wrap .sprite {
+    bottom: 0;
+}
+#window .page_leaderboard .online-players .event.text a:hover .sprite-wrap .sprite_40x40 {
+    background-position: -240px 0;
+}
+#window .page_leaderboard .online-players .event.text a:hover .sprite-wrap .sprite_80x80 {
+    background-position: -480px 0;
+}
+#window .page_leaderboard .online-players .event.text a .name-wrap {
+    vertical-align: top;
+    line-height: 18px;
+    white-space: nowrap;
+    text-decoration: none;
+}
+#window .page_leaderboard .online-players .event.text a:hover .name-wrap {
+    text-decoration: none;
+}
+
+#window .page_leaderboard .ranking-options + .online-players {
+    margin-top: -10px;
+}
+
+
 
 
 #window .page .body_wrapper .pagelinks {
@@ -3016,7 +3125,7 @@ button {
 #window .page .leaderboard .subbody .bodytext .player_float .count {
     float: right;
     color: #EFEFEF;
-    color: rgba(255, 255, 255, 0.6);
+    opacity: 0.6;
 }
 #window .page .leaderboard .subbody .bodytext .player_float .count:before {
     content: "(";

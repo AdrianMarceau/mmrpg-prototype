@@ -873,6 +873,11 @@ body:before {
         bottom: 16px;
     }
 
+    #window .page_leaderboard .online-players .event.text {
+        text-align: inherit;
+    }
+
+
     /* -- Credit Page Styles -- */
 
     #window .page_credits .body .creditblock .text .details .label {
@@ -1631,6 +1636,11 @@ body:before {
         right: 0;
     }
 
+    #window .page_leaderboard .ranking-options .event.text .label {
+        display: block;
+        margin-bottom: 6px;
+    }
+
     #window .page .body .community .search_form .section {
         float: none;
         clear: both;
@@ -1699,7 +1709,8 @@ body:before {
     }
 
 
-    #window .page .leaderboard .file .records .count.robots + .pipe {
+    #window .page .leaderboard .file .records .count.stars + .pipe,
+    #window .page .leaderboard .file .records .count.waves + .pipe {
         display: block;
         height: 0px;
         clear: both;
