@@ -370,6 +370,7 @@ if ($this_current_page == 'file' // File sub-pages
         <div class="banner <?= defined('MMRPG_INDEX_COMPACT_MODE') ? 'compact' : '' ?>">
 
             <?
+
             // Define variables based on login status
             if (!defined('MMRPG_CRITICAL_ERROR') && !rpg_user::is_guest()){
                 // Define the avatar class and path variables
@@ -393,9 +394,14 @@ if ($this_current_page == 'file' // File sub-pages
                 if (defined('MMRPG_INDEX_COMPACT_MODE')){ $temp_background_path = str_replace('.gif', '.png', $temp_background_path); }
             }
             //die($temp_background_path);
+
+            // Define a variable to hold the background image style
+            $temp_background_style = 'background-image: url('.(!empty($temp_background_path) ? $temp_background_path : 'images/fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN.'/battle-field_background_base.gif').'?'.MMRPG_CONFIG_CACHE_DATE.');';
+
             ?>
             <a class="anchor" id="top">&nbsp;</a>
-            <div class="sprite background banner_background" style="background-image: url(<?= !empty($temp_background_path) ? $temp_background_path : 'images/fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN.'/battle-field_background_base.gif' ?>?<?=MMRPG_CONFIG_CACHE_DATE?>);"></div>
+            <div class="sprite background banner_background blur" style="<?= $temp_background_style ?>"></div>
+            <div class="sprite background banner_background focus" style="<?= $temp_background_style ?>"></div>
             <?
             // Only continue if we're NOT in critical error mode
             if (!defined('MMRPG_CRITICAL_ERROR')){
