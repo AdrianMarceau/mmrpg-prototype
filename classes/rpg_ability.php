@@ -3649,6 +3649,50 @@ class rpg_ability extends rpg_object {
         return $field_hazard_index;
     }
 
+    // Define a static function for getting a preset core shield for the challenge
+    public static function get_static_attachment($ability_token, $attachment_token){
+
+        // Require the functions file if it exists
+        $temp_functions_dir = preg_replace('/^action-/', '_actions/', $ability_token);
+        $temp_functions_path = MMRPG_CONFIG_ABILITIES_CONTENT_PATH.$temp_functions_dir.'/functions.php';
+        if (file_exists($temp_functions_path)){ require($temp_functions_path); }
+        else { $functions = array(); }
+
+        // Collect a quick ref to the current battle
+        $this_battle = rpg_battle::get_battle();
+        $this_ability = (object)(array('ability_token' => $ability_token));
+        $this_attachment = (object)(array('attachment_token' => $attachment_token));
+
+        // Collect refs to all the known objects for this ability
+        $objects = array(
+            'this_battle' => $this_battle,
+            'this_field' => $this_battle->battle_field,
+            'this_ability' => $this_ability,
+            'this_attachment' => $this_attachment
+            );
+
+        // Generate very basic attachment info without knowing much else
+        $this_attachment_info = array(
+            'class' => 'ability',
+            'ability_token' => $this_ability->ability_token,
+            'attachment_token' => 'ability_'.$this_ability->ability_token.'_'.$this_attachment->attachment_token
+            );
+
+        // If the required attachment function exists (it better!) we can use it to generate actual attachment info
+        if (isset($functions['static_attachment_function_'.$attachment_token])){
+            $static_attachment_function = $functions['static_attachment_function_'.$attachment_token];
+            $static_attachment_function_args = func_get_args();
+            $static_attachment_function_args = array_slice($static_attachment_function_args, 2);
+            array_unshift($static_attachment_function_args, $objects);
+            $new_attachment_info = call_user_func_array($static_attachment_function, $static_attachment_function_args);
+            if (!empty($new_attachment_info)){ $this_attachment_info = array_merge($this_attachment_info, $new_attachment_info); }
+        }
+
+        // Return generated attachment info, whatever it is
+        return $this_attachment_info;
+
+    }
+
     // Define a static function for generating/returning the Super Arm sprite index w/ sheet & frame refs for each field
     public static function get_super_block_sprite_index(){
         // Define the sprite sheets and the stages they contain
@@ -3785,42 +3829,7 @@ class rpg_ability extends rpg_object {
 
     // Define a static function for generating a static field attachment of "crude oil" (from the Oil Shooter ability)
     public static function get_static_crude_oil($static_attachment_key, $this_attachment_duration = 99){
-        $this_battle = rpg_battle::get_battle();
-        $existing_attachments = isset($this_battle->battle_attachments[$static_attachment_key]) ? count($this_battle->battle_attachments[$static_attachment_key]) : 0;
-        $this_ability_token = 'oil-shooter';
-        $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
-        $this_attachment_image = $this_ability_token;
-        $this_attachment_destroy_text = 'The puddle of <span class="ability_name ability_type ability_type_earth">Crude Oil</span> below {this_robot} faded away... ';
-        $this_attachment_info = array(
-            'class' => 'ability',
-            'sticky' => true,
-            'ability_token' => $this_ability_token,
-            'ability_image' => $this_attachment_image,
-            'attachment_token' => $this_attachment_token,
-            'attachment_duration' => $this_attachment_duration,
-            'attachment_sticky' => true,
-            'attachment_damage_input_booster_flame' => 2.0,
-            'attachment_damage_input_booster_explode' => 2.0,
-            'attachment_destroy' => array(
-                'trigger' => 'special',
-                'kind' => '',
-                'type' => '',
-                'percent' => true,
-                'modifiers' => false,
-                'frame' => 'defend',
-                'rates' => array(100, 0, 0),
-                'success' => array(9, -9999, -9999, 10, $this_attachment_destroy_text),
-                'failure' => array(9, -9999, -9999, 10, $this_attachment_destroy_text)
-                ),
-            'ability_frame' => 1,
-            'ability_frame_animate' => array(1, 2),
-            'ability_frame_offset' => array(
-                'x' => (0 + ($existing_attachments * 8)),
-                'y' => (-10 + ($existing_attachments * 2)),
-                'z' => (-8 - $existing_attachments)
-                )
-            );
-        return $this_attachment_info;
+        return self::get_static_attachment('oil-shooter', 'crude-oil', $static_attachment_key, $this_attachment_duration = 99);
     }
 
     // Define a static function for generating a static field attachment of "foamy bubbles" (from the Bubble Spray ability)
