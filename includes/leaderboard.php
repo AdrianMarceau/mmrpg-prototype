@@ -9,6 +9,7 @@ $leaderboard_metric_index['battle_points'] = array(
     'url' => 'points',
     'key' => 'board_points',
     'col' => 'board.board_points',
+    'icon' => 'fa-trophy',
     'unit' => 'BP'
     );
 $leaderboard_metric_index['battle_zenny'] = array(
@@ -18,6 +19,7 @@ $leaderboard_metric_index['battle_zenny'] = array(
     'url' => 'zenny',
     'key' => 'board_zenny',
     'col' => 'board.board_zenny',
+    'icon' => 'fa-dollar-sign',
     'unit' => '&#438;',
     'unit_plain' => 'z'
     );

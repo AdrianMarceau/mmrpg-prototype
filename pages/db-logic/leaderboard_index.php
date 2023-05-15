@@ -74,10 +74,13 @@ if (strstr($page_content_parsed, $find)){
                     if ($key > 0){ echo('<span class="pipe">|</span> '); }
                     $info = $leaderboard_metric_index[$token];
                     $active = $token === $this_leaderboard_metric ? true : false;
+                    $class = 'ranking';
+                    $class .= ($active ? ' active type_span type_'.MMRPG_SETTINGS_CURRENT_FIELDTYPE : '');
                     $url = $base_leaderboard_url.($token !== MMRPG_SETTINGS_DEFAULT_LEADERBOARD_METRIC ? 'by-'.$info['url'].'/' : '');
-                    echo('<a class="ranking '.($active ? ' active' : '').'" href="'.$url.'">');
+                    echo('<a class="'.$class.'" href="'.$url.'">');
                         echo('<strong>'.ucfirst($info['url']).'</strong>');
                         if (!empty($info['icon'])){ echo(' <i class="fa fa-fw '.$info['icon'].'"></i>'); }
+                        else { echo(' <i class="fa fa-fw pfa-'.str_replace('_', '-', $token).'"></i>'); }
                     echo('</a> ');
                 } ?>
             </div>

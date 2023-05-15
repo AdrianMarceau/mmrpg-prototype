@@ -2840,21 +2840,48 @@ button {
     text-decoration: underline;
 }
 #window .page_leaderboard .ranking-options .event.text a.ranking {
-    line-height: 20px;
+    display: inline-block;
+    line-height: 1.6;
     margin: 0 3px 0 0;
+    padding: 3px 0;
     white-space: nowrap;
     text-decoration: none;
+    position: relative;
+    filter: brightness(1.0);
+    transition: filter 0.3s;
+}
+#window .page_leaderboard .ranking-options .event.text a.ranking.active {
+    padding-left: 6px;
+    padding-right: 3px;
 }
 #window .page_leaderboard .ranking-options .event.text a.ranking:hover,
 #window .page_leaderboard .ranking-options .event.text a.ranking.active {
     text-decoration: none;
 }
-#window .page_leaderboard .ranking-options .event.text a.ranking:hover strong,
-#window .page_leaderboard .ranking-options .event.text a.ranking.active strong {
+#window .page_leaderboard .ranking-options .event.text a.ranking.active:hover {
+    filter: brightness(1.1);
+}
+#window .page_leaderboard .ranking-options .event.text a.ranking:hover strong {
     text-decoration: underline;
+}
+#window .page_leaderboard .ranking-options .event.text a.ranking.active strong {
+    text-decoration: none;
 }
 #window .page_leaderboard .ranking-options .event.text .pipe {
     margin-right: 3px;
+}
+#window .page_leaderboard .fa-fw.pfa-battle-points,
+#window .page_leaderboard .fa-fw.pfa-battle-zenny {
+    width: 1em;
+}
+#window .page_leaderboard .pfa-battle-points:before {
+    /* content: '\000243\00a750';  */
+    /* content: '\00a750'; */
+    /* content: '\000243';  */
+    content: '\00a750';
+}
+#window .page_leaderboard .pfa-battle-zenny:before {
+    content: '\0001b5';
 }
 
 #window .page_leaderboard .online-players {
