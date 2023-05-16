@@ -3211,6 +3211,15 @@ class rpg_ability extends rpg_object {
         // If the ability flag had already been set, reduce the weapon energy to zero
         if (!$options->weapon_energy_required){ $this_ability->set_energy(0); }
 
+        // If this ability is being already charged, we should put an indicator
+        if (!$options->buster_charge_required){
+            $new_name = $this_ability->ability_base_name;
+            if ($is_charged){ $new_name .= ' ✦'; }
+            $this_ability->set_name($new_name);
+        } else {
+            $this_ability->reset_name();
+        }
+
         // Trigger this robot's custom function if one has been defined for this context
         $this_robot->trigger_custom_function('rpg-ability_elemental-buster_onload_after', $extra_objects);
 
@@ -3650,18 +3659,48 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function for getting a preset core shield for the challenge
-    public static function get_static_attachment($ability_token, $attachment_token){
+    public static function get_static_attachment($ability, $attachment_token){
+
+        // Collect a quick ref to the current battle
+        $this_battle = rpg_battle::get_battle();
+
+        // Collect this ability's token and object, however it was provided
+        if (!empty($ability)){
+            if (is_string($ability)){
+                $ability_token = $ability;
+                $ability_info = rpg_ability::get_index_info($ability_token);
+                $this_ability = (object)($ability_info);
+            } elseif (is_array($ability)){
+                $ability_info = $ability;
+                $ability_token = $ability_info['ability_token'];
+                $this_ability = (object)($ability_info);
+            } elseif (is_object($ability)){
+                $ability_token = $ability->ability_token;
+                $ability_info = $ability->export_array();
+                $this_ability = $ability;
+            }
+        }
+
+        // Compensate for missing or invalid ability details
+        if (empty($ability_token) || empty($this_ability)){
+            $ability_token = 'ability';
+            $ability_info = array(
+                'ability_token' => $ability_token,
+                'ability_image' => $ability_token,
+                'ability_damage' => 0,
+                'ability_recovery' => 0
+                );
+            $this_ability = (object)($ability_info);
+        }
+
+        // Define an empty attachment object to start with at least the token
+        $this_attachment = (object)(array('attachment_token' => $attachment_token));
 
         // Require the functions file if it exists
         $temp_functions_dir = preg_replace('/^action-/', '_actions/', $ability_token);
         $temp_functions_path = MMRPG_CONFIG_ABILITIES_CONTENT_PATH.$temp_functions_dir.'/functions.php';
         if (file_exists($temp_functions_path)){ require($temp_functions_path); }
         else { $functions = array(); }
-
-        // Collect a quick ref to the current battle
-        $this_battle = rpg_battle::get_battle();
-        $this_ability = (object)(array('ability_token' => $ability_token));
-        $this_attachment = (object)(array('attachment_token' => $attachment_token));
 
         // Collect refs to all the known objects for this ability
         $objects = array(
@@ -3688,6 +3727,8 @@ class rpg_ability extends rpg_object {
             if (!empty($new_attachment_info)){ $this_attachment_info = array_merge($this_attachment_info, $new_attachment_info); }
         } else {
             error_log('Unable to get `static_attachment_function_'.$attachment_token.'` from ability `'.$ability_token.'`');
+            error_log('Available functions in  '.$temp_functions_path.' : '.implode(', ', array_keys($functions)));
+            //error_log('$functions = '.print_r($functions, true));
         }
 
         // Return generated attachment info, whatever it is
@@ -3910,212 +3951,22 @@ class rpg_ability extends rpg_object {
 
     // Define a static function for generating a static field attachment of a "disco ball" (from the Disco Fever ability)
     public static function get_static_disco_ball($static_attachment_key, $this_attachment_duration = 99){
-        $this_battle = rpg_battle::get_battle();
-        $existing_attachments = isset($this_battle->battle_attachments[$static_attachment_key]) ? count($this_battle->battle_attachments[$static_attachment_key]) : 0;
-        $this_ability_token = 'disco-fever';
-        $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
-        $this_attachment_image = $this_ability_token;
-        $this_attachment_destroy_text = 'The spinning <span class="ability_name ability_type ability_type_laser">Disco Ball</span> in front of {this_robot} faded away... ';
-        $this_attachment_info = array(
-            'class' => 'ability',
-            'sticky' => true,
-            'ability_token' => $this_ability_token,
-            'ability_image' => $this_attachment_image,
-            'attachment_token' => $this_attachment_token,
-            'attachment_duration' => $this_attachment_duration,
-            'attachment_sticky' => true,
-            'attachment_damage_output_breaker' => 0.50,
-            'attachment_destroy' => array(
-                'trigger' => 'special',
-                'kind' => '',
-                'type' => '',
-                'percent' => true,
-                'modifiers' => false,
-                'frame' => 'defend',
-                'rates' => array(100, 0, 0),
-                'success' => array(9, -9999, -9999, 10, $this_attachment_destroy_text),
-                'failure' => array(9, -9999, -9999, 10, $this_attachment_destroy_text)
-                ),
-            'ability_frame' => 0,
-            'ability_frame_animate' => array(0, 1, 2, 1),
-            'ability_frame_offset' => array(
-                'x' => (70 + ($existing_attachments * 10)),
-                'y' => (10),
-                'z' => (20 + $existing_attachments)
-                )
-            );
-        return $this_attachment_info;
+        return self::get_static_attachment('disco-fever', 'disco-ball', $static_attachment_key, $this_attachment_duration);
     }
 
     // Define a static function for generating a static field attachment of a "woolly cloud" (from the Thunder Wool ability)
     public static function get_static_woolly_cloud($static_attachment_key, $this_attachment_duration = 99){
-        $this_battle = rpg_battle::get_battle();
-        $existing_attachments = isset($this_battle->battle_attachments[$static_attachment_key]) ? count($this_battle->battle_attachments[$static_attachment_key]) : 0;
-        $this_ability_token = 'thunder-wool-2';
-        $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
-        $this_attachment_image = $this_ability_token;
-        $this_attachment_destroy_text = 'The thunderous '.rpg_type::print_span('electric', 'Woolly Cloud').' above {this_robot} faded away... ';
-        $this_attachment_repeat_text = 'The '.rpg_type::print_span('electric', 'Woolly Cloud').' above {this_robot} released a lightning bolt! ';
-        $this_attachment_info = array(
-            'class' => 'ability',
-            'sticky' => true,
-            'ability_token' => $this_ability_token,
-            'ability_image' => $this_attachment_image,
-            'attachment_token' => $this_attachment_token,
-            'attachment_duration' => $this_attachment_duration,
-            'attachment_energy' => 0,
-            'attachment_energy_base_percent' => 15,
-            'attachment_sticky' => true,
-            'attachment_destroy' => array(
-                'trigger' => 'special',
-                'kind' => '',
-                'type' => '',
-                'percent' => true,
-                'modifiers' => false,
-                'frame' => 'defend',
-                'rates' => array(100, 0, 0),
-                'success' => array(9, -9999, -9999, 10, $this_attachment_destroy_text),
-                'failure' => array(9, -9999, -9999, 10, $this_attachment_destroy_text)
-                ),
-            'attachment_repeat' => array(
-                'kind' => 'energy',
-                'trigger' => 'damage',
-                'type' => 'electric',
-                'type2' => '',
-                'energy' => 15,
-                'percent' => true,
-                'modifiers' => true,
-                'frame' => 'damage',
-                'rates' => array(100, 0, 0),
-                'success' => array(9, -5, 30, 10, $this_attachment_repeat_text),
-                'failure' => array(9, -5, 30, 10, $this_attachment_repeat_text),
-                'options' => array(
-                    'apply_modifiers' => true,
-                    'apply_type_modifiers' => true,
-                    'apply_core_modifiers' => true,
-                    'apply_field_modifiers' => true,
-                    'apply_stat_modifiers' => false,
-                    'apply_position_modifiers' => false,
-                    'referred_damage' => true,
-                    'referred_damage_id' => 0,
-                    'referred_damage_stats' => array()
-                    )
-                ),
-            'ability_frame' => 0,
-            'ability_frame_animate' => array(0, 2, 4, 1, 3, 5),
-            'ability_frame_offset' => array(
-                'x' => (-5 + ($existing_attachments * 2)),
-                'y' => (40 + ($existing_attachments * 1)),
-                'z' => (-8 - $existing_attachments)
-                )
-            );
-        return $this_attachment_info;
+        return self::get_static_attachment('thunder-wool', 'woolly-cloud', $static_attachment_key, $this_attachment_duration);
     }
 
     // Define a static function for generating a static field attachment of an "acid glob" (from the Acid Glob ability)
     public static function get_static_acid_glob($static_attachment_key, $this_attachment_duration = 99){
-        $this_battle = rpg_battle::get_battle();
-        $existing_attachments = isset($this_battle->battle_attachments[$static_attachment_key]) ? count($this_battle->battle_attachments[$static_attachment_key]) : 0;
-        $this_ability_token = 'acid-glob';
-        $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
-        $this_attachment_image = $this_ability_token;
-        $this_attachment_destroy_text = 'The corrosive <span class="ability_name ability_type ability_type_water">Acid Glob</span> below {this_robot} faded away... ';
-        $this_attachment_repeat_text = 'The corrosive <span class="ability_name ability_type ability_type_water">Acid Glob</span> melted through {this_robot}\'s armor! ';
-        $this_attachment_info = array(
-            'class' => 'ability',
-            'sticky' => true,
-            'ability_token' => $this_ability_token,
-            'ability_image' => $this_attachment_image,
-            'attachment_token' => $this_attachment_token,
-            'attachment_duration' => $this_attachment_duration,
-            'attachment_energy' => 0,
-            'attachment_energy_base_percent' => 8,
-            'attachment_sticky' => true,
-            'attachment_destroy' => array(
-                'trigger' => 'special',
-                'kind' => '',
-                'type' => '',
-                'percent' => true,
-                'modifiers' => false,
-                'frame' => 'defend',
-                'rates' => array(100, 0, 0),
-                'success' => array(9, -9999, -9999, 10, $this_attachment_destroy_text),
-                'failure' => array(9, -9999, -9999, 10, $this_attachment_destroy_text)
-                ),
-            'attachment_repeat' => array(
-                'kind' => 'energy',
-                'trigger' => 'damage',
-                'type' => 'water',
-                'type2' => '',
-                'energy' => 8,
-                'percent' => true,
-                'modifiers' => true,
-                'frame' => 'damage',
-                'rates' => array(100, 0, 0),
-                'success' => array(1, -5, 5, -10, $this_attachment_repeat_text),
-                'failure' => array(1, -5, 5, -99, $this_attachment_repeat_text),
-                'options' => array(
-                    'apply_modifiers' => true,
-                    'apply_type_modifiers' => true,
-                    'apply_core_modifiers' => true,
-                    'apply_field_modifiers' => true,
-                    'apply_stat_modifiers' => false,
-                    'apply_position_modifiers' => false,
-                    'referred_damage' => true,
-                    'referred_damage_id' => 0,
-                    'referred_damage_stats' => array()
-                    )
-                ),
-            'ability_frame' => 2,
-            'ability_frame_animate' => array(2, 3),
-            'ability_frame_offset' => array(
-                'x' => (5 + ($existing_attachments * 2)),
-                'y' => (0 + ($existing_attachments * 1)),
-                'z' => (10 - $existing_attachments)
-                )
-            );
-        return $this_attachment_info;
+        return self::get_static_attachment('acid-glob', 'acid-glob', $static_attachment_key, $this_attachment_duration);
     }
 
     // Define a static function for generating a static field attachment of "remote mine" (from the Remote Mine ability)
     public static function get_static_remote_mine($static_attachment_key, $this_attachment_duration = 99, $this_attachment_created = 0){
-        $this_battle = rpg_battle::get_battle();
-        $existing_attachments = isset($this_battle->battle_attachments[$static_attachment_key]) ? count($this_battle->battle_attachments[$static_attachment_key]) : 0;
-        $this_ability_token = 'remote-mine';
-        $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
-        $this_attachment_image = $this_ability_token;
-        $this_attachment_destroy_text = 'The <span class="ability_name ability_type ability_type_explode">Remote Mine</span> below {this_robot} was defused... ';
-        $this_attachment_info = array(
-            'class' => 'ability',
-            'sticky' => true,
-            'ability_token' => $this_ability_token,
-            'ability_image' => $this_attachment_image,
-            'attachment_token' => $this_attachment_token,
-            'attachment_duration' => $this_attachment_duration,
-            'attachment_created' => $this_attachment_created,
-            'attachment_sticky' => true,
-            'attachment_weaknesses' => array('flame'),
-            'attachment_weaknesses_trigger' => 'user',
-            'attachment_destroy' => array(
-                'trigger' => 'special',
-                'kind' => '',
-                'type' => '',
-                'percent' => true,
-                'modifiers' => false,
-                'frame' => 'defend',
-                'rates' => array(100, 0, 0),
-                'success' => array(8, 0, -10, 10, $this_attachment_destroy_text),
-                'failure' => array(8, 0, -10, 10, $this_attachment_destroy_text)
-                ),
-            'ability_frame' => 6,
-            'ability_frame_animate' => array(6, 7),
-            'ability_frame_offset' => array(
-                'x' => (30 + ($existing_attachments * 8)),
-                'y' => (-5),
-                'z' => (6 + $existing_attachments)
-                )
-            );
-        return $this_attachment_info;
+        return self::get_static_attachment('remote-mine', 'remote-mine', $static_attachment_key, $this_attachment_duration, $this_attachment_created);
     }
 
 }
