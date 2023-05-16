@@ -1157,13 +1157,13 @@ body.index #header {
 #mmrpg .item_overlay,
 #mmrpg .scan_overlay {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: -50%;
+    left: -50%;
     z-index: 5000;
     border: 0 none transparent;
     background: #000000 none scroll no-repeat 0 0;
-    width: 100%;
-    height: 100%;
+    width: 200%;
+    height: 200%;
     padding: 0;
     overflow: hidden;
     font-size: 1px;
@@ -2029,6 +2029,10 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     left: 8px;
     right: 8px;
 }
+#canvas > .wrapper {
+    border-radius: 6px;
+    overflow: hidden;
+}
 #canvas .event {
     display: block;
     margin: 0;
@@ -2159,6 +2163,79 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #canvas .event .foreground_09 {
     background-position: center -2232px;
 }
+#canvas .event .battle_scene {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+
+#canvas [data-camera-shift] .event .background_canvas,
+#canvas [data-camera-shift] .event .background_event,
+#canvas [data-camera-shift] .event .foreground_canvas,
+#canvas [data-camera-shift] .event .foreground_event,
+#canvas [data-camera-shift] .event .battle_scene {
+    transform: translate(0, 0) scale(1.0);
+    transition: none;
+}
+
+#canvas [data-camera-shift="left"] .event .background_canvas,
+#canvas [data-camera-shift="left"] .event .background_event {
+    transform: translate(-5%, 0) scale(1.2);
+}
+#canvas [data-camera-shift="left"] .event .foreground_canvas,
+#canvas [data-camera-shift="left"] .event .foreground_event {
+    transform: translate(10%, -5%) scale(1.3);
+}
+#canvas [data-camera-shift="left"] .event .battle_scene {
+    transform: translate(15%, -10%) scale(1.4);
+}
+
+#canvas [data-camera-shift="right"] .event .background_canvas,
+#canvas [data-camera-shift="right"] .event .background_event {
+    transform: translate(5%, 0) scale(1.2);
+}
+#canvas [data-camera-shift="right"] .event .foreground_canvas,
+#canvas [data-camera-shift="right"] .event .foreground_event {
+    transform: translate(-10%, -5%) scale(1.3);
+}
+#canvas [data-camera-shift="right"] .event .battle_scene {
+    transform: translate(-15%, -10%) scale(1.4);
+}
+
+#canvas [data-camera-shift="left"][data-camera-focus="bench"] .event .background_canvas,
+#canvas [data-camera-shift="left"][data-camera-focus="bench"] .event .background_event {
+    transform: translate(-10%, 0) scale(1.2);
+}
+#canvas [data-camera-shift="left"][data-camera-focus="bench"] .event .foreground_canvas,
+#canvas [data-camera-shift="left"][data-camera-focus="bench"] .event .foreground_event {
+    transform: translate(15%, -5%) scale(1.3);
+}
+#canvas [data-camera-shift="left"][data-camera-focus="bench"] .event .battle_scene {
+    transform: translate(20%, -10%) scale(1.4);
+}
+
+#canvas [data-camera-shift="right"][data-camera-focus="bench"] .event .background_canvas,
+#canvas [data-camera-shift="right"][data-camera-focus="bench"] .event .background_event {
+    transform: translate(10%, 0) scale(1.2);
+}
+#canvas [data-camera-shift="right"][data-camera-focus="bench"] .event .foreground_canvas,
+#canvas [data-camera-shift="right"][data-camera-focus="bench"] .event .foreground_event {
+    transform: translate(-15%, -5%) scale(1.3);
+}
+#canvas [data-camera-shift="right"][data-camera-focus="bench"] .event .battle_scene {
+    transform: translate(-20%, -10%) scale(1.4);
+}
+
+#canvas [data-camera-shift="left"][data-camera-focus="bench"] .event .battle_scene .sprite[data-position="active"][data-direction="right"],
+#canvas [data-camera-shift="right"][data-camera-focus="bench"] .event .battle_scene .sprite[data-position="active"][data-direction="left"] {
+    opacity: 0.4;
+}
+
+
 #canvas .event pre {
     position: absolute;
     z-index: 9999;

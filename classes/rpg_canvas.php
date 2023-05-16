@@ -1744,6 +1744,7 @@ class rpg_canvas {
 
         // Define the console markup string
         $this_markup = '';
+        $this_overlay_markup = '';
 
         // Define the results type we'll be working with
         $results_type = false;
@@ -2180,7 +2181,7 @@ class rpg_canvas {
                                 $this_mugshot_markup_right .= str_replace('/'.$this_mugshot_image.'/', '/'.$this_mugshot_image2.'/', $this_mugshot_markup_right);
                             }
                             $this_mugshot_markup_combined =  '<div class="'.$this_ability_data['ability_markup_class'].' canvas_ability_details ability_type ability_type_'.(!empty($this_options['this_ability']->ability_type) ? $this_options['this_ability']->ability_type : 'none').(!empty($this_options['this_ability']->ability_type2) ? '_'.$this_options['this_ability']->ability_type2 : '').'" style="">'.$this_mugshot_markup_left.'<div class="ability_name" style="">'.$this_ability_data['ability_title'].'</div>'.$this_mugshot_markup_right.'</div>';
-                            $this_markup .=  $this_mugshot_markup_combined;
+                            $this_overlay_markup .=  $this_mugshot_markup_combined;
                         }
 
                         // Append this object's markup to the main markup array
@@ -2199,7 +2200,7 @@ class rpg_canvas {
                             $this_mugshot_markup_left = '<div class="sprite item_icon item_icon_left" style="background-image: url(images/items/'.(!empty($this_options['this_item']->item_image) ? $this_options['this_item']->item_image : $this_options['this_item']->item_token).'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$this_options['this_item']->item_name.'</div>';
                             $this_mugshot_markup_right = '<div class="sprite item_icon item_icon_right" style="background-image: url(images/items/'.(!empty($this_options['this_item']->item_image) ? $this_options['this_item']->item_image : $this_options['this_item']->item_token).'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$this_options['this_item']->item_name.'</div>';
                             $this_mugshot_markup_combined =  '<div class="'.$this_item_data['item_markup_class'].' canvas_item_details item_type item_type_'.(!empty($this_options['this_item']->item_type) ? $this_options['this_item']->item_type : 'none').(!empty($this_options['this_item']->item_type2) ? '_'.$this_options['this_item']->item_type2 : '').'" style="">'.$this_mugshot_markup_left.'<div class="item_name" style="">'.$this_item_data['item_title'].'</div>'.$this_mugshot_markup_right.'</div>';
-                            $this_markup .=  $this_mugshot_markup_combined;
+                            $this_overlay_markup .=  $this_mugshot_markup_combined;
                         }
 
                         // Append this object's markup to the main markup array
@@ -2215,7 +2216,7 @@ class rpg_canvas {
                         // Display the object's mugshot sprite
                         if (empty($this_options['this_skill_results']['total_actions'])){
                             $this_mugshot_markup_combined = '<div class="sprite skill_sprite canvas_skill_details skill_type skill_type_none" style=""><div class="skill_name" style="">'.$this_skill_data['skill_title'].'</div></div>';
-                            $this_markup .= $this_mugshot_markup_combined;
+                            $this_overlay_markup .= $this_mugshot_markup_combined;
                         }
 
                     }
@@ -2553,7 +2554,7 @@ class rpg_canvas {
                     $overlay_footer .= '<strong class="overlay_label">Field Multipliers</strong>';
                     $overlay_footer .= '<span class="overlay_multiplier_count_'.$temp_multipliers_count.'">'.$multiplier_markup_left.$multiplier_markup_right.'</span>';
                 $overlay_footer .= '</div>';
-                $this_markup .= $overlay_footer;
+                $this_overlay_markup .= $overlay_footer;
             }
 
         }
@@ -2573,12 +2574,17 @@ class rpg_canvas {
             if (!empty($this_markup) && $this_battle->battle_status == 'complete' || $this_battle->battle_result == 'defeat'){
                 $this_mugshot_markup_left = '<div class="sprite ability_icon ability_icon_left">&nbsp;</div>';
                 $this_mugshot_markup_right = '<div class="sprite ability_icon ability_icon_right">&nbsp;</div>';
-                $this_markup = '<div class="sprite canvas_ability_details ability_type ability_type_'.$result_class.'">'.$this_mugshot_markup_left.'<div class="ability_name">'.$result_text.'</div>'.$this_mugshot_markup_right.'</div>'.$this_markup;
+                $this_overlay_markup = '<div class="sprite canvas_ability_details ability_type ability_type_'.$result_class.'">'.$this_mugshot_markup_left.'<div class="ability_name">'.$result_text.'</div>'.$this_mugshot_markup_right.'</div>'.$this_markup;
             }
         }
 
-        // Return the generated markup and robot data
-        return $this_markup;
+        // Put everything together into the final markup
+        $final_markup = '';
+        $final_markup .= '<div class="battle_scene">'.$this_markup.'</div>';
+        if (!empty($this_overlay_markup)){ $final_markup .= '<div class="battle_overlay">'.$this_overlay_markup.'</div>'; }
+
+        // Return the final markup with everything together
+        return $final_markup;
 
     }
 

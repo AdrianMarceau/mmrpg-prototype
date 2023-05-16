@@ -75,6 +75,10 @@ class rpg_target {
         $event_options['this_ability_results'] = $this_ability->ability_results;
         if (isset($trigger_options['canvas_show_this_ability'])){ $event_options['canvas_show_this_ability'] = $trigger_options['canvas_show_this_ability'];  }
 
+        // Set the camera options for this target event
+        $event_options['event_flag_camera_action'] = true;
+        $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
+
         // Create a new entry in the event log for the targeting event
         $temp_event_header = $this_ability->target_options['target_header'];
         $temp_event_body = $this_ability->ability_results['this_text'];
@@ -169,6 +173,10 @@ class rpg_target {
         $event_options['this_item_results'] = $this_item->item_results;
         if (isset($trigger_options['canvas_show_this_item'])){ $event_options['canvas_show_this_item'] = $trigger_options['canvas_show_this_item'];  }
 
+        // Set the camera options for this target event
+        $event_options['event_flag_camera_action'] = true;
+        $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
+
         // Create a new entry in the event log for the targeting event
         $this_robot->battle->events_create($this_robot, $target_robot, $this_item->target_options['target_header'], $this_item->item_results['this_text'], $event_options);
 
@@ -247,6 +255,10 @@ class rpg_target {
         // Update the event options with the skill results
         $event_options['this_skill_results'] = $this_skill->skill_results;
         $event_options['canvas_show_this_skill'] = false;
+
+        // Set the camera options for this target event
+        $event_options['event_flag_camera_action'] = true;
+        $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
 
         // Create a new entry in the event log for the targeting event
         $this_robot->battle->events_create($this_robot, $target_robot, $this_skill->target_options['target_header'], $this_skill->skill_results['this_text'], $event_options);

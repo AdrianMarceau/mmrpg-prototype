@@ -770,9 +770,11 @@ function mmrpg_canvas_animate(){
     //clearTimeout(canvasAnimationTimeout);
     clearInterval(canvasAnimationTimeout);
     if (!gameSettings.idleAnimation){  return false; }
+
     // Collect the current battle status and result
     var battleStatus = $('input[name=this_battle_status]', gameEngine).val();
     var battleResult = $('input[name=this_battle_result]', gameEngine).val();
+
     // Loop through all field layers on the canvas
     $('.background[data-animate],.foreground[data-animate]', gameCanvas).each(function(){
         // Trigger an animation frame change for this field
@@ -924,12 +926,17 @@ function mmrpg_canvas_animate(){
             var shadowSprite = $('.sprite[data-shadowid='+spriteID+']', gameCanvas);
             if (shadowSprite.length){ mmrpg_canvas_robot_frame(shadowSprite, newFrame);  }
 
-            } else if (thisRobot.attr('data-status') == 'disabled' && thisRobot.attr('data-direction') == 'right'){
+            }
+            else if (thisRobot.attr('data-status') == 'disabled' && thisRobot.attr('data-direction') == 'right'){
+
             // Default the new frame to base
             //var newFrame = 'base';
             // Trigger the robot frame advancement
             //mmrpg_canvas_robot_frame(thisRobot, newFrame);
-            } else {
+
+            }
+            else {
+
             //alert('robot is disabled');
             // Fade this robot off-screen
             var spriteKind = thisRobot.attr('data-type');
@@ -945,7 +952,6 @@ function mmrpg_canvas_animate(){
                 if (detailsSprite.length){ detailsSprite.stop(true, true).animate({opacity:0},1000,'linear',function(){ $(this).remove(); }); }
                 if (mugshotSprite.length){ mugshotSprite.stop(true, true).animate({opacity:0},1000,'linear',function(){ $(this).remove(); }); }
                 });
-
 
             }
 
@@ -1556,7 +1562,7 @@ function mmrpg_event(flagsMarkup, dataMarkup, canvasMarkup, consoleMarkup){
     if (dataMarkup.length){ dataMarkup = $.parseJSON(dataMarkup); }
     else { dataMarkup = {}; }
     mmrpgEvents.push({
-        'event_functions' : function(){
+        'event_functions' : function(eventFlags){
             if (dataMarkup.length){
                 //dataMarkup = $.parseJSON(dataMarkup);
                 /*
@@ -1571,10 +1577,10 @@ function mmrpg_event(flagsMarkup, dataMarkup, canvasMarkup, consoleMarkup){
                 */
                 }
             if (canvasMarkup.length){
-                mmrpg_canvas_event(canvasMarkup); //, flagsMarkup
+                mmrpg_canvas_event(canvasMarkup, eventFlags); //, flagsMarkup
                 }
             if (consoleMarkup.length){
-                mmrpg_console_event(consoleMarkup);  //, flagsMarkup
+                mmrpg_console_event(consoleMarkup, eventFlags);  //, flagsMarkup
                 }
             },
         'event_flags' : flagsMarkup //$.parseJSON(flagsMarkup)
@@ -1593,7 +1599,7 @@ function mmrpg_events(){
         mmrpg_action_panel('event');
         // Collect the topmost event and execute it
         thisEvent = mmrpgEvents.shift();
-        thisEvent.event_functions();
+        thisEvent.event_functions(thisEvent.event_flags);
         }
 
     if (mmrpgEvents.length < 1){
@@ -1655,9 +1661,10 @@ function mmrpg_events(){
 }
 
 // Define a function for creating a new layer on the canvas
-function mmrpg_canvas_event(thisMarkup){ //, flagsMarkup
+function mmrpg_canvas_event(thisMarkup, eventFlags){ //, flagsMarkup
     var thisContext = $('.wrapper', gameCanvas);
     if (thisContext.length){
+        //console.log('mmrpg_canvas_event(thisMarkup, eventFlags) | eventFlags =', eventFlags);
         // Drop all the z-indexes to a single amount
         $('.event:not(.sticky)', thisContext).css({zIndex:500});
         // Calculate the top offset based on previous event height
@@ -1671,6 +1678,25 @@ function mmrpg_canvas_event(thisMarkup){ //, flagsMarkup
 
             // Find all the details in this event markup and move them to the sticky
             $(this).find('.details').addClass('hidden').css({opacity:0}).appendTo('.event_details', gameCanvas);
+
+            // If this event has any camera action going on, make sure we update the canvas
+            var currentShift = thisContext.attr('data-camera-shift') || '';
+            var currentFocus = thisContext.attr('data-camera-focus') || '';
+            var newCameraShift = '';
+            var newCameraFocus = '';
+            if (typeof eventFlags.camera !== 'undefined'
+                && eventFlags.camera !== false){
+                //console.log('we have camera action!', eventFlags.camera);
+                newCameraShift = eventFlags.camera.side;
+                newCameraFocus = eventFlags.camera.focus;
+                //if (eventFlags.camera.action === true){ var shiftSide = eventFlags.camera.side; }
+                //else if (eventFlags.camera.reaction === true){ var shiftSide = eventFlags.camera.side !== 'left' ? 'left' : 'right'; }
+                //thisContext.attr('data-camera-shift', shiftSide);
+            }
+            if (currentShift !== newCameraShift){
+                thisContext.attr('data-camera-shift', newCameraShift);
+                thisContext.attr('data-camera-focus', newCameraFocus);
+            }
 
             // If we're allowed to cross-fade transition the normal way, otherwise straight-up replace the event
             if (gameSettings.eventCrossFade === true){
@@ -1711,7 +1737,8 @@ function mmrpg_canvas_event(thisMarkup){ //, flagsMarkup
                     $(this).css({zIndex:500});
                     }
 
-                } else {
+            }
+            else {
 
                     // Make sure the new event is visible then remove the old ones
                     $(this).css({opacity:1.0,zIndex:500});
@@ -1720,7 +1747,7 @@ function mmrpg_canvas_event(thisMarkup){ //, flagsMarkup
                     $('.details', thisContext).css({opacity:1}).removeClass('hidden');
                     $('.event:not(.sticky):gt(0)', thisContext).remove();
 
-                }
+            }
 
             // Loop through all field layers on the canvas and trigger animations
             $('.background[data-animate],.foreground[data-animate]', gameCanvas).each(function(){
@@ -1763,9 +1790,10 @@ function mmrpg_canvas_update(thisBattle, thisPlayer, thisRobot, targetPlayer, ta
 
 
 // Define a function for appending a event to the console window
-function mmrpg_console_event(thisMarkup){ //, flagsMarkup
+function mmrpg_console_event(thisMarkup, eventFlags){ //, flagsMarkup
     var thisContext = $('.wrapper', gameConsole);
     if (thisContext.length){
+        //console.log('mmrpg_console_event(thisMarkup, eventFlags) | eventFlags =', eventFlags);
         // Append the event to the current stack
         //thisContext.prepend('<div class="event" style="top: -100px;">'+thisMarkup+'</div>');
         thisContext.prepend(thisMarkup);

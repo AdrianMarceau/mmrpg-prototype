@@ -82,6 +82,11 @@ class rpg_ability_recovery extends rpg_recovery {
         $event_options['this_ability'] = $this_ability;
         $event_options['this_ability_results'] = array();
 
+        // Set the camera options for this target event
+        $event_options['event_flag_camera_reaction'] = true;
+        $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
+        $event_options['event_flag_camera_focus'] = $this_robot->robot_position;
+
         // Create an options object for this function and populate
         $options = rpg_game::new_options_object();
         $options->recovery_target = $this_robot;

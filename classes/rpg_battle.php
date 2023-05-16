@@ -1428,7 +1428,13 @@ class rpg_battle extends rpg_object {
                         $event_body .= $this_robot->print_quote('battle_start', $this_find, $this_replace);
                     }
                     $this_player->update_variables();
-                    $this->events_create($this_robot, false, $event_header, $event_body, array('canvas_show_target' => false, 'console_show_target' => false));
+                    $event_options = array();
+                    $event_options['canvas_show_target'] = false;
+                    $event_options['console_show_target'] = false;
+                    //$event_options['event_flag_camera_reaction'] = true;
+                    //$event_options['event_flag_camera_side'] = $this_robot->player->player_side;
+                    //$event_options['event_flag_camera_focus'] = $this_robot->robot_position;
+                    $this->events_create($this_robot, false, $event_header, $event_body, $event_options);
 
                     // Create an event for this robot teleporting in
                     if ($this_player->counters['robots_active'] == 1){
@@ -1876,6 +1882,10 @@ class rpg_battle extends rpg_object {
                         $this_player->set_value('current_robot_enter', $this_battle->counters['battle_turn']);
                         $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$temp_new_robot->robot_name;
                         $event_body = "{$temp_new_robot->print_name()} joins the battle!<br />";
+                        $event_options = array();
+                        //$event_options['event_flag_camera_reaction'] = true;
+                        //$event_options['event_flag_camera_side'] = $temp_new_robot->player->player_side;
+                        //$event_options['event_flag_camera_focus'] = $temp_new_robot->robot_position;
                         if (isset($temp_new_robot->robot_quotes['battle_start'])){
                             $temp_new_robot->set_frame('taunt');
                             $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
@@ -1885,7 +1895,7 @@ class rpg_battle extends rpg_object {
 
                         // Only show the enter event if the switch reason was removed or if there is more then one robot
                         if ($this_switch_reason == 'removed' || $this_player->counters['robots_active'] > 1){
-                            $this_battle->events_create($temp_new_robot, false, $event_header, $event_body);
+                            $this_battle->events_create($temp_new_robot, false, $event_header, $event_body, $event_options);
                         }
 
                     }
@@ -2522,6 +2532,10 @@ class rpg_battle extends rpg_object {
         $options['this_robot_image'] = isset($eventinfo['event_options']['this_robot_image']) ? $eventinfo['event_options']['this_robot_image'] : 'sprite';
         $options['this_ability_image'] = isset($eventinfo['event_options']['this_ability_image']) ? $eventinfo['event_options']['this_ability_image'] : 'sprite';
         $options['this_item_image'] = isset($eventinfo['event_options']['this_item_image']) ? $eventinfo['event_options']['this_item_image'] : 'sprite';
+        $options['event_flag_camera_action'] = isset($eventinfo['event_options']['event_flag_camera_action']) ? $eventinfo['event_options']['event_flag_camera_action'] : false;
+        $options['event_flag_camera_reaction'] = isset($eventinfo['event_options']['event_flag_camera_reaction']) ? $eventinfo['event_options']['event_flag_camera_reaction'] : false;
+        $options['event_flag_camera_side'] = isset($eventinfo['event_options']['event_flag_camera_side']) ? $eventinfo['event_options']['event_flag_camera_side'] : 'left';
+        $options['event_flag_camera_focus'] = isset($eventinfo['event_options']['event_flag_camera_focus']) ? $eventinfo['event_options']['event_flag_camera_focus'] : 'active';
 
         // Define the variable to collect markup
         $this_markup = array();
@@ -2531,6 +2545,12 @@ class rpg_battle extends rpg_object {
         $event_flags['autoplay'] = $options['event_flag_autoplay'];
         $event_flags['victory'] = $options['event_flag_victory'];
         $event_flags['defeat'] = $options['event_flag_defeat'];
+        $event_flags['camera'] = array();
+        $event_flags['camera']['action'] = $options['event_flag_camera_action'];
+        $event_flags['camera']['reaction'] = $options['event_flag_camera_reaction'];
+        $event_flags['camera']['side'] = $options['event_flag_camera_side'];
+        $event_flags['camera']['focus'] = $options['event_flag_camera_focus'];
+        if (!$event_flags['camera']['action'] && !$event_flags['camera']['reaction']){ $event_flags['camera'] = false; }
         $this_markup['flags'] = json_encode($event_flags);
 
         // Generate the console message markup
