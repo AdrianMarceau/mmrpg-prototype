@@ -2572,11 +2572,13 @@ class rpg_ability extends rpg_object {
                 elseif ($trigger_skill){ $trigger_object->skill_results = $target_results; }
                 $trigger_object->target_options_update($target_options);
                 $target_robot->trigger_target($target_robot, $trigger_object, $trigger_options);
+                $trigger_object->unset_flag('skip_canvas_header');
             } else {
                 $trigger_ability->set_flag('skip_canvas_header', true);
                 $trigger_ability->ability_results = $target_results;
                 $trigger_ability->target_options_update($target_options);
                 $target_robot->trigger_target($target_robot, $trigger_ability, $trigger_options);
+                $trigger_ability->unset_flag('skip_canvas_header');
             }
 
             // Update the robot's counter for applied mods
@@ -2592,10 +2594,12 @@ class rpg_ability extends rpg_object {
                 $trigger_object->set_flag('skip_canvas_header', true);
                 $trigger_object->target_options_update($target_options);
                 $target_robot->trigger_target($target_robot, $trigger_object);
+                $trigger_object->unset_flag('skip_canvas_header');
             } else {
                 $trigger_ability->set_flag('skip_canvas_header', true);
                 $trigger_ability->target_options_update($target_options);
                 $target_robot->trigger_target($target_robot, $trigger_ability);
+                $trigger_ability->unset_flag('skip_canvas_header');
             }
             $target_robot->counters[$mods_token] = MMRPG_SETTINGS_STATS_MOD_MAX;
             $target_robot->update_session();
@@ -2731,11 +2735,13 @@ class rpg_ability extends rpg_object {
                 elseif ($trigger_skill){ $trigger_object->skill_results = $target_results; }
                 $trigger_object->target_options_update($target_options);
                 $target_robot->trigger_target($target_robot, $trigger_object, $trigger_options);
+                $trigger_object->unset_flag('skip_canvas_header');
             } else {
                 $trigger_ability->set_flag('skip_canvas_header', true);
                 $trigger_ability->ability_results = $target_results;
                 $trigger_ability->target_options_update($target_options);
                 $target_robot->trigger_target($target_robot, $trigger_ability, $trigger_options);
+                $trigger_ability->unset_flag('skip_canvas_header');
             }
 
             // Update the robot's counter for applied mods
@@ -2752,10 +2758,12 @@ class rpg_ability extends rpg_object {
                 $trigger_object->set_flag('skip_canvas_header', true);
                 $trigger_object->target_options_update($target_options);
                 $target_robot->trigger_target($target_robot, $trigger_object);
+                $trigger_object->unset_flag('skip_canvas_header');
             } else {
                 $trigger_ability->set_flag('skip_canvas_header', true);
                 $trigger_ability->target_options_update($target_options);
                 $target_robot->trigger_target($target_robot, $trigger_ability);
+                $trigger_ability->unset_flag('skip_canvas_header');
             }
             $target_robot->counters[$mods_token] = MMRPG_SETTINGS_STATS_MOD_MIN;
             $target_robot->update_session();
@@ -3212,7 +3220,8 @@ class rpg_ability extends rpg_object {
         if (!$options->weapon_energy_required){ $this_ability->set_energy(0); }
 
         // If this ability is being already charged, we should put an indicator
-        if (!$options->buster_charge_required){
+        $is_charged = !$options->buster_charge_required ? true : false;
+        if ($is_charged){
             $new_name = $this_ability->ability_base_name;
             if ($is_charged){ $new_name .= ' ✦'; }
             $this_ability->set_name($new_name);
