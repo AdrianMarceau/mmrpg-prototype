@@ -2361,16 +2361,19 @@ class rpg_robot extends rpg_object {
         if (isset($this_object->ability_token)){
 
             // This was an ability so delegate to the ability function
+            //error_log('trigger_target('.$this_object->ability_token.') on '.$target_robot->robot_token.'/'.$target_robot->robot_position.'/'.$target_robot->robot_key);
             return rpg_target::trigger_ability_target($this, $target_robot, $this_object, $trigger_options);
 
         } elseif (isset($this_object->item_token)){
 
             // This was an item so delegate to the item function
+            //error_log('trigger_target('.$this_object->item_token.') on '.$target_robot->robot_token.'/'.$target_robot->robot_position.'/'.$target_robot->robot_key);
             return rpg_target::trigger_item_target($this, $target_robot, $this_object, $trigger_options);
 
         } elseif (isset($this_object->skill_token)){
 
             // This was an item so delegate to the skill function
+            //error_log('trigger_target('.$this_object->skill_token.') on '.$target_robot->robot_token.'/'.$target_robot->robot_position.'/'.$target_robot->robot_key);
             return rpg_target::trigger_skill_target($this, $target_robot, $this_object, $trigger_options);
         }
 
@@ -2387,16 +2390,22 @@ class rpg_robot extends rpg_object {
 
         // Check to see which object type has been provided
         if (isset($this_object->ability_token)){
+
             // This was an ability so delegate to the ability class function
+            //error_log('trigger_damage('.$this_object->ability_token.') on '.$this->robot_token.'/'.$target_robot->robot_position.'/'.$target_robot->robot_key);
             $trigger_return = rpg_ability_damage::trigger_robot_damage($this, $target_robot, $this_object, $damage_amount, $trigger_disabled, $trigger_options);
 
         }
         elseif (isset($this_object->item_token)){
+
             // This was an item so delegate to the item class function
+            //error_log('trigger_damage('.$this_object->item_token.') on '.$this->robot_token.'/'.$target_robot->robot_position.'/'.$target_robot->robot_key);
             $trigger_return = rpg_item_damage::trigger_robot_damage($this, $target_robot, $this_object, $damage_amount, $trigger_disabled, $trigger_options);
         }
         elseif (isset($this_object->skill_token)){
+
             // This was a skill so delegate to the skill class function
+            //error_log('trigger_damage('.$this_object->skill_token.') on '.$this->robot_token.'/'.$target_robot->robot_position.'/'.$target_robot->robot_key);
             $trigger_return = rpg_skill_damage::trigger_robot_damage($this, $target_robot, $this_object, $damage_amount, $trigger_disabled, $trigger_options);
         }
 
@@ -2433,21 +2442,29 @@ class rpg_robot extends rpg_object {
 
         // Check to see which object type has been provided
         if (isset($this_object->ability_token)){
+
             // This was an ability so delegate to the ability class function
+            //error_log('trigger_recovery('.$this_object->ability_token.') on '.$this->robot_token.'/'.$target_robot->robot_position.'/'.$target_robot->robot_key);
             return rpg_ability_recovery::trigger_robot_recovery($this, $target_robot, $this_object, $recovery_amount, $trigger_disabled, $trigger_options);
 
         }
         elseif (isset($this_object->item_token)){
+
             // This was an item so delegate to the item class function
+            //error_log('trigger_recovery('.$this_object->item_token.') on '.$this->robot_token.'/'.$target_robot->robot_position.'/'.$target_robot->robot_key);
             if (!isset($trigger_options['apply_position_modifiers'])){ $trigger_options['apply_position_modifiers'] = false; }
             if (!isset($trigger_options['apply_stat_modifiers'])){ $trigger_options['apply_stat_modifiers'] = false; }
             return rpg_item_recovery::trigger_robot_recovery($this, $target_robot, $this_object, $recovery_amount, $trigger_disabled, $trigger_options);
+
         }
         elseif (isset($this_object->skill_token)){
+
             // This was an skill so delegate to the skill class function
+            //error_log('trigger_recovery('.$this_object->item_token.') on '.$this->robot_token.'/'.$target_robot->robot_position.'/'.$target_robot->robot_key);
             if (!isset($trigger_options['apply_position_modifiers'])){ $trigger_options['apply_position_modifiers'] = false; }
             if (!isset($trigger_options['apply_stat_modifiers'])){ $trigger_options['apply_stat_modifiers'] = false; }
             return rpg_skill_recovery::trigger_robot_recovery($this, $target_robot, $this_object, $recovery_amount, $trigger_disabled, $trigger_options);
+
         }
 
     }
