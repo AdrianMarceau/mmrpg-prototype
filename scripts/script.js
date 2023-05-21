@@ -306,17 +306,8 @@ $(document).ready(function(){
         mmrpgBody.attr('data-render-mode', gameSettings['spriteRenderMode']);
 
         // Define a change event for whenever this game setting is altered
-        gameSettingsChangeEvents['spriteRenderMode'] = function(newValue){
-            //console.log('setting data-render-mode to ', newValue);
-            mmrpgBody.attr('data-render-mode', newValue);
-            if (typeof window.localStorage !== 'undefined'){
-                window.localStorage.setItem('spriteRenderMode', newValue);
-                }
-            };
-
-        // Define a change event for whenever this game setting is altered
-        gameSettingsChangeEvents['eventTimeout'] = function(newValue){
-            //console.log('setting eventTimeout to ', newValue);
+        var updateCameraShift = function(newValue){
+            //console.log('updateCameraShift() to ', newValue);
             // Update the camera shift transition for zooms and pans
             var cssVarName = '--camera-shift-transition-duration';
             var cssVarValue = (function(){
@@ -330,7 +321,29 @@ $(document).ready(function(){
             var root = document.documentElement;
             root.style.setProperty(cssVarName, cssVarValue);
             };
+
+        // Define a change event for whenever this game setting is altered
+        gameSettingsChangeEvents['spriteRenderMode'] = function(newValue){
+            //console.log('setting data-render-mode to ', newValue);
+            mmrpgBody.attr('data-render-mode', newValue);
+            if (typeof window.localStorage !== 'undefined'){
+                window.localStorage.setItem('spriteRenderMode', newValue);
+                }
+            };
+
+        // Define a change event for whenever this game setting is altered
+        gameSettingsChangeEvents['eventTimeout'] = function(newValue){
+            //console.log('setting eventTimeout to ', newValue);
+            updateCameraShift(newValue);
+            };
         gameSettingsChangeEvents['eventTimeout'](gameSettings.eventTimeout);
+
+        // Define a change event for whenever this game setting is altered
+        gameSettingsChangeEvents['eventCrossFade'] = function(newValue){
+            //console.log('setting eventCrossFade to ', newValue, ' w/ timeout at ', gameSettings.eventTimeout);
+            updateCameraShift(gameSettings.eventTimeout);
+            };
+        gameSettingsChangeEvents['eventCrossFade'](gameSettings.eventCrossFade);
 
         // Auto-highlight settings buttons that are "active"
         var settingsWithActiveStates = ['eventTimeout', 'eventCrossFade', 'spriteRenderMode'];
@@ -2121,7 +2134,7 @@ function mmrpg_toggle_settings_option(element){
     var thisRequestData = 'battle_settings,'+thisSettingToken+','+(newSettingValue ? 'true' : 'false');
     //console.log('thisRequestData =', thisRequestData);
     $.post('scripts/script.php',{requestType: thisRequestType, requestData: thisRequestData});
-    if (typeof gameSettingsChangeEvents[thisSettingToken] === 'function'){ gameSettingsChangeEvents[thisSettingToken](thisSettingValue); }
+    if (typeof gameSettingsChangeEvents[thisSettingToken] === 'function'){ gameSettingsChangeEvents[thisSettingToken](newSettingValue); }
 
     return true;
 }
