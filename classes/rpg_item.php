@@ -2041,10 +2041,16 @@ class rpg_item extends rpg_object {
                 $existing_shields = !empty($this_robot->robot_attachments) ? substr_count(implode('|', array_keys($this_robot->robot_attachments)), 'ability_core-shield_') : 0;
                 $core_shield_info = rpg_ability::get_static_core_shield($core_type, $base_core_duration, $existing_shields);
                 $this_robot->set_attachment($core_shield_token, $core_shield_info);
+                $event_options = array();
+                $event_options['canvas_show_this_item_overlay'] = true;
+                $event_options['event_flag_camera_action'] = true;
+                $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
+                $event_options['event_flag_camera_focus'] = $this_robot->robot_position;
+                $event_options['event_flag_camera_depth'] = $this_robot->robot_key;
                 $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_item->item_name,
                     $this_robot->print_name().' triggers '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!<br />'.
                     'The held item generated a new '.rpg_type::print_span($core_type, 'Core Shield').'!',
-                    array('canvas_show_this_item_overlay' => true)
+                    $event_options
                     );
             }
         }
