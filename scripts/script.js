@@ -26,6 +26,7 @@ gameSettings.eventTimeout = 1250; // default animation frame base internal
 gameSettings.eventTimeoutThreshold = 250; // timeout theshold for when frames stop cross-fading
 gameSettings.eventAutoPlay = true; // whether or not to automatically advance events
 gameSettings.eventCrossFade = true; // whether or not to canvas events have crossfade animation
+gameSettings.eventCameraShift = true; // whether or not to canvas events have camera shifts
 gameSettings.spriteRenderMode = 'default'; // the render mode we should be using for sprites
 gameSettings.idleAnimation = true; // default to allow idle animations
 gameSettings.indexLoaded = false; // default to false until the index is loaded
@@ -312,6 +313,24 @@ $(document).ready(function(){
                 window.localStorage.setItem('spriteRenderMode', newValue);
                 }
             };
+
+        // Define a change event for whenever this game setting is altered
+        gameSettingsChangeEvents['eventTimeout'] = function(newValue){
+            //console.log('setting eventTimeout to ', newValue);
+            // Update the camera shift transition for zooms and pans
+            var cssVarName = '--camera-shift-transition-duration';
+            var cssVarValue = (function(){
+                var duration = Math.ceil(newValue / 2);
+                if (!gameSettings.eventCrossFade){ duration = 0; }
+                else if (!gameSettings.eventCameraShift){ duration = 0; }
+                else if (gameSettings.eventTimeout <= gameSettings.eventTimeoutThreshold){ duration = 0; }
+                return duration > 0 ? (duration / 1000)+'s' : 'none';
+                })();
+            //console.log('cssVarName =', cssVarName, '; cssVarValue =', cssVarValue);
+            var root = document.documentElement;
+            root.style.setProperty(cssVarName, cssVarValue);
+            };
+        gameSettingsChangeEvents['eventTimeout'](gameSettings.eventTimeout);
 
         // Auto-highlight settings buttons that are "active"
         var settingsWithActiveStates = ['eventTimeout', 'eventCrossFade', 'spriteRenderMode'];
@@ -1684,7 +1703,8 @@ function mmrpg_canvas_event(thisMarkup, eventFlags){ //, flagsMarkup
             var currentFocus = thisContext.attr('data-camera-focus') || '';
             var newCameraShift = '';
             var newCameraFocus = '';
-            if (typeof eventFlags.camera !== 'undefined'
+            if (gameSettings.eventCameraShift
+                && typeof eventFlags.camera !== 'undefined'
                 && eventFlags.camera !== false){
                 //console.log('we have camera action!', eventFlags.camera);
                 newCameraShift = eventFlags.camera.side;
@@ -1693,7 +1713,8 @@ function mmrpg_canvas_event(thisMarkup, eventFlags){ //, flagsMarkup
                 //else if (eventFlags.camera.reaction === true){ var shiftSide = eventFlags.camera.side !== 'left' ? 'left' : 'right'; }
                 //thisContext.attr('data-camera-shift', shiftSide);
             }
-            if (currentShift !== newCameraShift){
+            if (currentShift !== newCameraShift
+                || currentFocus !== newCameraFocus){
                 thisContext.attr('data-camera-shift', newCameraShift);
                 thisContext.attr('data-camera-focus', newCameraFocus);
             }
@@ -2063,6 +2084,45 @@ function mmrpg_toggle_debug_mode(element){
     var thisRequestType = 'session';
     var thisRequestData = 'debug_mode,'+newValue;
     $.post('scripts/script.php',{requestType:thisRequestType,requestData:thisRequestData});
+    return true;
+}
+
+// Define a function for updating the loaded status of the main index page
+function mmrpg_toggle_settings_option(element){
+    //console.log('mmrpg_toggle_settings_option()');
+
+    // Collect the object references to the button and internal label
+    var thisButton = $(element);
+    var thisLabel = $('.multi', thisButton);
+
+    // Parse the settings token and value, then clean the action token
+    var thisSettingToken = thisButton.attr('data-setting-token');
+    var thisSettingValue = parseInt(thisButton.attr('data-setting-value'));
+    if (thisSettingValue === 1){ thisSettingValue = true; }
+    else if (thisSettingValue === 0){ thisSettingValue = false; }
+    //console.log('thisSettingToken =', thisSettingToken);
+    //console.log('thisSettingValue =', thisSettingValue);
+
+    // Pull the current value and use it to calculate new ones
+    var newSettingValue = !thisSettingValue ? true : false;
+    var newSettingValueText = newSettingValue ? 'ON' : 'OFF';
+    var newSettingValueClass = 'value type type_';
+    newSettingValueClass += (newSettingValue ? 'nature' : 'flame');
+    //console.log('newSettingValue =', newSettingValue);
+
+    // Update the local setting in case we need to work with it again
+    gameSettings[thisSettingToken] = newSettingValue;
+    //console.log('gameSettings[' + thisSettingToken + '] = ' + newSettingValue + ';');
+
+    // Update the button value and label text/colour
+    thisButton.attr('data-setting-value', (newSettingValue ? 1 : 0));
+    thisLabel.find('.value').html(newSettingValueText).removeClass().addClass(newSettingValueClass);
+    var thisRequestType = 'session';
+    var thisRequestData = 'battle_settings,'+thisSettingToken+','+(newSettingValue ? 'true' : 'false');
+    //console.log('thisRequestData =', thisRequestData);
+    $.post('scripts/script.php',{requestType: thisRequestType, requestData: thisRequestData});
+    if (typeof gameSettingsChangeEvents[thisSettingToken] === 'function'){ gameSettingsChangeEvents[thisSettingToken](thisSettingValue); }
+
     return true;
 }
 

@@ -27,17 +27,23 @@ ob_start();
     $block_num++;
     $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" onclick="parent.mmrpg_music_load(\''.(!strstr($this_field->field_music, '/') ? 'fields/'.$this_field->field_music : $this_field->field_music).'\', true);"><label><span class="multi">Restart<br />Music</span></label></a>';
 
-    // Display the option for RENDER MODE
-    $block_num++;
-    $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-panel="settings_spriteRenderMode"><label><span class="multi">Sprite<br />Rendering</span></label></a>';
-
     // Display the option for ANIMATION SPEED
     $block_num++;
     $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-panel="settings_eventTimeout"><label><span class="multi">Animation<br />Speed</span></label></a>';
 
     // Display the option for ANIMATION EFFECT
     $block_num++;
-    $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-panel="settings_eventCrossFade"><label><span class="multi">Animation<br />Effect</span></label></a>';
+    $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-panel="settings_animationEffects"><label><span class="multi">Animation<br />Effects</span></label></a>';
+
+    /*
+    // Display the option for EVENT CROSS-FADE
+    $block_num++;
+    $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-panel="settings_eventCrossFade"><label><span class="multi">Event<br />Cross-Fade</span></label></a>';
+    */
+
+    // Display the option for RENDER MODE
+    $block_num++;
+    $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-panel="settings_spriteRenderMode"><label><span class="multi">Sprite<br />Rendering</span></label></a>';
 
 	// If we're on the LOCAL or DEV build, display exrta options
 	if (MMRPG_CONFIG_SERVER_ENV === 'local' || MMRPG_CONFIG_SERVER_ENV === 'dev'){
