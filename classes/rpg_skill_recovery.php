@@ -73,6 +73,7 @@ class rpg_skill_recovery extends rpg_recovery {
         $event_options['event_flag_camera_reaction'] = true;
         $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
         $event_options['event_flag_camera_focus'] = $this_robot->robot_position;
+        $event_options['event_flag_camera_depth'] = $this_robot->robot_key;
 
         // Create an options object for this function and populate
         $options = rpg_game::new_options_object();
