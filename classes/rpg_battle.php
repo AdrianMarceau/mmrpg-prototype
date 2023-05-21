@@ -1392,31 +1392,78 @@ class rpg_battle extends rpg_object {
             if ($this_action == 'start'){
 
                 // Ensure this is an actual player
-                if ($this_player->player_token != 'player'){
+                if ($this_player->player_token !== 'player'){
 
-                    /*
-                    // Create the enter event for this robot
-                    $event_header = $this_player->player_name.'&#39;s '.$this_robot->robot_name;
-                    if ($target_player->player_token != 'player'){ $event_body = "{$this_robot->print_name()} enters the battle!<br />"; }
-                    else { $event_body = "{$this_robot->print_name()} prepares for battle!<br />"; }
-                    $this_robot->robot_frame = 'base';
-                    $this_player->player_frame = 'command';
-                    $this_robot->robot_position = 'active';
-                    if (isset($this_robot->robot_quotes['battle_start'])){
-                        $this_robot->robot_frame = 'taunt';
-                        $event_body .= '&quot;<em>'.$this_robot->robot_quotes['battle_start'].'</em>&quot;';
+                    // If there's a whole team, we should display it as a team entrance
+                    if ($this_player->counters['robots_active'] > 1){
+
+                        // Create the enter event for the target player's active robot
+                        $event_header = ''.$this_player->player_name.'\'s Robots';
+                        $event_body = $this_player->print_name_s().' robots appear on the battle field!<br />';
+                        //if (isset($this_player->player_quotes['battle_start'])){ $event_body .= '&quot;<em>'.$this_player->player_quotes['battle_start'].'</em>&quot;'; }
+                        if ($this_player->player_token != 'player'
+                            && isset($this_player->player_quotes['battle_start'])){
+                            $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
+                            $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
+                            $event_body .= $this_player->print_quote('battle_start', $this_find, $this_replace);
+                        }
+                        $event_options = array();
+                        $event_options['this_header_float'] = $event_options['this_body_float'] = $this_player->player_side;
+                        $event_options['console_show_this_player'] = true;
+                        $event_options['console_show_target'] = false;
+                        $event_options['console_show_target_player'] = false;
+                        $event_options['event_flag_camera_action'] = true;
+                        $event_options['event_flag_camera_side'] = $this_player->player_side;
+                        $event_options['event_flag_camera_focus'] = 'active';
+                        $this_player->set_frame('taunt');
+                        $this_robot->set_frame('taunt');
+                        $this_robot->set_frame_styles('');
+                        $this_robot->set_detail_styles('');
+                        $this_robot->set_position('active');
+                        $this->events_create($this_robot, $target_robot, $event_header, $event_body, $event_options);
+                        $this_player->set_frame('base');
+                        $this_robot->set_frame('base');
+
                     }
-                    $this_robot->update_session();
-                    $this_player->update_session();
-                    $this->events_create($this_robot, false, $event_header, $event_body, array('canvas_show_target' => false, 'console_show_target' => false));
-                    */
+                    // Otherwise, we can display this as a heroic single-robot entrance
+                    else {
+
+                        // Create the enter event for this player's robots
+                        $event_header = ''.$this_player->player_name.'\'s '.$this_robot->robot_name;
+                        $event_body = $this_robot->print_name().' '.($this_player->player_side === 'left' ? 'joins' : 'enters').' the battle!<br />';
+                        if ($this_robot->robot_token != 'robot'
+                            && isset($this_robot->robot_quotes['battle_start'])){
+                            $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
+                            $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
+                            $event_body .= $this_robot->print_quote('battle_start', $this_find, $this_replace);
+                        }
+                        $event_options = array();
+                        $event_options['this_header_float'] = $event_options['this_body_float'] = 'left';
+                        $event_options['canvas_show_this'] = true;
+                        $event_options['canvas_show_target'] = $event_options['console_show_target'] = false;
+                        $event_options['console_show_this_robot'] = true;
+                        $event_options['console_show_target_player'] = false;
+                        $event_options['event_flag_camera_action'] = true;
+                        $event_options['event_flag_camera_side'] = $this_player->player_side;
+                        $event_options['event_flag_camera_focus'] = 'active';
+                        $this_player->set_frame('taunt');
+                        $this_robot->set_frame('taunt');
+                        $this_robot->set_frame_styles('');
+                        $this_robot->set_detail_styles('');
+                        $this_robot->set_position('active');
+                        $this->events_create($this_robot, $target_robot, $event_header, $event_body, $event_options);
+                        $this_player->set_frame('base');
+                        $this_robot->set_frame('base');
+
+                    }
 
                 }
                 // Otherwise, if the player is empty
                 else {
 
                     // Create the enter event for this robot
-                    $event_header = $this_robot->robot_name;
+                    $event_header = ''.$this_robot->robot_name;
+                    if ($this_player->counters['robots_active'] > 1){ $event_header .= ' & Team'; }
                     $event_body = "{$this_robot->print_name()} wants to fight!<br />";
                     $this_robot->set_frame('defend');
                     $this_robot->set_frame_styles('');
@@ -1431,15 +1478,20 @@ class rpg_battle extends rpg_object {
                     $event_options = array();
                     $event_options['canvas_show_target'] = false;
                     $event_options['console_show_target'] = false;
-                    //$event_options['event_flag_camera_reaction'] = true;
-                    //$event_options['event_flag_camera_side'] = $this_robot->player->player_side;
-                    //$event_options['event_flag_camera_focus'] = $this_robot->robot_position;
+                    $event_options['event_flag_camera_action'] = true;
+                    $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
+                    $event_options['event_flag_camera_focus'] = $this_robot->robot_position;
                     $this->events_create($this_robot, false, $event_header, $event_body, $event_options);
 
                     // Create an event for this robot teleporting in
-                    if ($this_player->counters['robots_active'] == 1){
+                    if ($this_player->counters['robots_active'] == 1
+                        || $this_robot->robot_position = 'active'){
+                        $event_options = array();
+                        $event_options['event_flag_camera_action'] = true;
+                        $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
+                        $event_options['event_flag_camera_focus'] = $this_robot->robot_position;
                         $this_robot->set_frame('taunt');
-                        $this->events_create(false, false, '', '');
+                        $this->events_create(false, false, '', '', $event_options);
                     }
                     $this_robot->set_frame('base');
                     $this_robot->set_frame_styles('');
@@ -1451,7 +1503,7 @@ class rpg_battle extends rpg_object {
                 foreach ($this_player->values['robots_active'] AS $key => $info){
                     if (!preg_match('/display:\s?none;/i', $info['robot_frame_styles'])){ continue; }
                     if ($this_robot->robot_id == $info['robot_id']){
-                        $this_robot->set_frame('taunt');
+                        $this_robot->set_frame('defend');
                         $this_robot->set_frame_styles('');
                         $this_robot->set_detail_styles('');
                     } else {
@@ -1463,7 +1515,11 @@ class rpg_battle extends rpg_object {
                 }
 
                 // Create an event to show the robots in their taunt sprites
-                $this->events_create(false, false, '', '');
+                $event_options = array();
+                $event_options['event_flag_camera_action'] = true;
+                $event_options['event_flag_camera_side'] = $this_player->player_side;
+                $event_options['event_flag_camera_focus'] = count($this_player->values['robots_active']) > 1 ? 'bench' : 'active';
+                $this->events_create(false, false, '', '', $event_options);
 
                 // Change all this player's robot sprite back to their base, then update
                 foreach ($this_player->values['robots_active'] AS $key => $info){
@@ -1481,6 +1537,10 @@ class rpg_battle extends rpg_object {
                     $temp_abilities_index = rpg_ability::get_index(true);
                     foreach ($this_robot->robot_abilities AS $this_key => $this_token){
                         // Define the current ability object using the loaded ability data
+                        if (!isset($temp_abilities_index[$this_token])){
+                            unset($this_robot->robot_abilities[$this_key]);
+                            continue;
+                        }
                         $temp_abilityinfo = $temp_abilities_index[$this_token];
                         $temp_ability = rpg_game::get_ability($this, $this_player, $this_robot, $temp_abilityinfo);
                     }
@@ -1881,11 +1941,12 @@ class rpg_battle extends rpg_object {
                         $this_player->set_value('current_robot', $temp_new_robot->robot_string);
                         $this_player->set_value('current_robot_enter', $this_battle->counters['battle_turn']);
                         $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$temp_new_robot->robot_name;
-                        $event_body = "{$temp_new_robot->print_name()} joins the battle!<br />";
+                        $event_body = "{$temp_new_robot->print_name()} ".($this_player->player_side === 'left' ? 'joins' : 'enters')." the battle!<br />";
                         $event_options = array();
-                        //$event_options['event_flag_camera_reaction'] = true;
-                        //$event_options['event_flag_camera_side'] = $temp_new_robot->player->player_side;
-                        //$event_options['event_flag_camera_focus'] = $temp_new_robot->robot_position;
+                        $event_options['event_flag_camera_reaction'] = true;
+                        $event_options['event_flag_camera_side'] = $temp_new_robot->player->player_side;
+                        $event_options['event_flag_camera_focus'] = $temp_new_robot->robot_position;
+                        $event_options['event_flag_camera_depth'] = $temp_new_robot->robot_key;
                         if (isset($temp_new_robot->robot_quotes['battle_start'])){
                             $temp_new_robot->set_frame('taunt');
                             $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
@@ -1896,6 +1957,7 @@ class rpg_battle extends rpg_object {
                         // Only show the enter event if the switch reason was removed or if there is more then one robot
                         if ($this_switch_reason == 'removed' || $this_player->counters['robots_active'] > 1){
                             $this_battle->events_create($temp_new_robot, false, $event_header, $event_body, $event_options);
+                            $this_battle->events_create(false, false, '', '');
                         }
 
                     }
@@ -2171,10 +2233,19 @@ class rpg_battle extends rpg_object {
                     </div>
                 <?
                 $event_body .= preg_replace('#\s+#', ' ', trim(ob_get_clean()));
-                $this->events_create($temp_target_robot, false, $event_header, $event_body, array('console_container_height' => 2, 'canvas_show_this' => false)); //, 'event_flag_autoplay' => false
+                $event_options = array();
+                $event_options['console_container_height'] = 2;
+                $event_options['canvas_show_this'] = false;
+                $event_options['event_flag_camera_action'] = true;
+                $event_options['event_flag_camera_side'] = $temp_target_robot->player->player_side;
+                $event_options['event_flag_camera_focus'] = $temp_target_robot->robot_position;
+                $event_options['event_flag_camera_depth'] = $temp_target_robot->robot_key;
+                $this->events_create($temp_target_robot, false, $event_header, $event_body, $event_options);
 
                 // Ensure the target robot's frame is set to its base
                 $temp_target_robot->set_frame('base');
+                $this->events_create(false, false, '', '', $event_options);
+                $this->events_create(false, false, '', '');
 
                 // Add this robot to the global robot database array
                 if (!isset($_SESSION['GAME']['values']['robot_database'][$temp_target_robot->robot_token])){ $_SESSION['GAME']['values']['robot_database'][$temp_target_robot->robot_token] = array('robot_token' => $temp_target_robot->robot_token); }
@@ -2536,6 +2607,7 @@ class rpg_battle extends rpg_object {
         $options['event_flag_camera_reaction'] = isset($eventinfo['event_options']['event_flag_camera_reaction']) ? $eventinfo['event_options']['event_flag_camera_reaction'] : false;
         $options['event_flag_camera_side'] = isset($eventinfo['event_options']['event_flag_camera_side']) ? $eventinfo['event_options']['event_flag_camera_side'] : 'left';
         $options['event_flag_camera_focus'] = isset($eventinfo['event_options']['event_flag_camera_focus']) ? $eventinfo['event_options']['event_flag_camera_focus'] : 'active';
+        $options['event_flag_camera_depth'] = isset($eventinfo['event_options']['event_flag_camera_depth']) ? $eventinfo['event_options']['event_flag_camera_depth'] : 0;
 
         // Define the variable to collect markup
         $this_markup = array();
@@ -2550,6 +2622,7 @@ class rpg_battle extends rpg_object {
         $event_flags['camera']['reaction'] = $options['event_flag_camera_reaction'];
         $event_flags['camera']['side'] = $options['event_flag_camera_side'];
         $event_flags['camera']['focus'] = $options['event_flag_camera_focus'];
+        $event_flags['camera']['depth'] = $options['event_flag_camera_depth'];
         if (!$event_flags['camera']['action'] && !$event_flags['camera']['reaction']){ $event_flags['camera'] = false; }
         $this_markup['flags'] = json_encode($event_flags);
 
