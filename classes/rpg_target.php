@@ -78,6 +78,8 @@ class rpg_target {
         // Set the camera options for this target event
         $event_options['event_flag_camera_action'] = true;
         $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
+        $event_options['event_flag_camera_focus'] = $this_robot->robot_position;
+        $event_options['event_flag_camera_depth'] = $this_robot->robot_key;
 
         // Create a new entry in the event log for the targeting event
         $temp_event_header = $this_ability->target_options['target_header'];
@@ -176,6 +178,8 @@ class rpg_target {
         // Set the camera options for this target event
         $event_options['event_flag_camera_action'] = true;
         $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
+        $event_options['event_flag_camera_focus'] = $this_robot->robot_position;
+        $event_options['event_flag_camera_depth'] = $this_robot->robot_key;
 
         // Create a new entry in the event log for the targeting event
         $this_robot->battle->events_create($this_robot, $target_robot, $this_item->target_options['target_header'], $this_item->item_results['this_text'], $event_options);
@@ -259,6 +263,8 @@ class rpg_target {
         // Set the camera options for this target event
         $event_options['event_flag_camera_action'] = true;
         $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
+        $event_options['event_flag_camera_focus'] = $this_robot->robot_position;
+        $event_options['event_flag_camera_depth'] = $this_robot->robot_key;
 
         // Create a new entry in the event log for the targeting event
         $this_robot->battle->events_create($this_robot, $target_robot, $this_skill->target_options['target_header'], $this_skill->skill_results['this_text'], $event_options);
