@@ -67,6 +67,17 @@ class rpg_canvas {
             $this_data['player_markup_style'] .= 'z-index: '.$this_data['canvas_offset_z'].'; '.$this_data['player_float'].': '.$this_data['canvas_offset_x'].'px; bottom: '.$this_data['canvas_offset_y'].'px; ';
             $this_data['player_markup_style'] .= 'background-image: url('.$this_data['player_image'].'); width: '.$this_data['player_sprite_size'].'px; height: '.$this_data['player_sprite_size'].'px; background-size: '.$this_data['player_image_width'].'px '.$this_data['player_image_height'].'px; ';
 
+            $camera_action_styles = '';
+            $camera_has_action = self::has_camera_action(array(
+                'token' => $this_player->player_token,
+                'side' => $this_player->player_side,
+                'position' => 'active',
+                'key' => 0,
+                ), $options, $camera_action_styles);
+            if (!empty($camera_action_styles)){
+                $this_data['player_markup_style'] .= $camera_action_styles;
+            }
+
             // Generate the final markup for the canvas player
             ob_start();
 
@@ -374,6 +385,18 @@ class rpg_canvas {
             $this_data['robot_markup_style'] .= 'background-image: url('.$this_data['robot_file'].'); width: '.$this_data['robot_sprite_size'].'px; height: '.$this_data['robot_sprite_size'].'px; background-size: '.$this_data['robot_file_width'].'px '.$this_data['robot_file_height'].'px; ';
             $this_data['robot_markup_style'] .= $this_data['robot_frame_styles'];
 
+            // Check if this robot has any camera action and collect the styles if so
+            $camera_action_styles = '';
+            $camera_has_action = self::has_camera_action(array(
+                'token' => $this_robot->robot_token,
+                'side' => $this_robot->player->player_side,
+                'position' => $this_robot->robot_position,
+                'key' => $this_robot->robot_key
+                ), $options, $camera_action_styles);
+            if (!empty($camera_action_styles)){
+                $this_data['robot_markup_style'] .= $camera_action_styles;
+            }
+
             $this_data['energy_class'] = 'energy';
             $this_data['energy_style'] = 'background-position: '.$this_data['energy_x_position'].'px '.$this_data['energy_y_position'].'px;';
             $this_data['weapons_class'] = 'weapons';
@@ -516,6 +539,8 @@ class rpg_canvas {
                 }
                 $temp_clone_style .= 'background-image: url('.$this_data['robot_file'].'); width: '.$this_data['robot_sprite_size'].'px; height: '.$this_data['robot_sprite_size'].'px; background-size: '.$this_data['robot_file_width'].'px '.$this_data['robot_file_height'].'px; ';
 
+                if (!empty($camera_action_styles)){ $temp_clone_style .= $camera_action_styles; }
+
                 //$filters = 'grayscale(100%) sepia(1) hue-rotate(145deg)';
                 //$temp_clone_style .= '-moz-filter: '.$filters.'; -webkit-filter: '.$filters.'; filter: '.$filters.'; ';
                 $temp_clone_style .= rpg_ability::get_css_filter_styles_for_gemini_clone();
@@ -587,6 +612,7 @@ class rpg_canvas {
                             $icon_float.': '.$icon_offset_x.'px; '.
                             'bottom: '.$icon_offset_y.'px; '.
                             ($is_corrupted ? 'filter: opacity(0.5); ' : '').
+                            (!empty($camera_action_styles) ? $camera_action_styles : '').
                             '" '.
                         'data-type="attachment" '.
                         'data-size="'.$icon_sprite_size.'" '.
@@ -1741,9 +1767,11 @@ class rpg_canvas {
 
     // Define a function for generating canvas scene markup
     public static function battle_markup($this_battle, $eventinfo, $options = array()){
+        //error_log('rpg_canvas::battle_markup() w/ $options ='.print_r(array_filter($options, function($k){ return !strstr($k, 'this_'); }, ARRAY_FILTER_USE_KEY), true));
 
         // Define the console markup string
         $this_markup = '';
+        $this_underlay_markup = '';
         $this_overlay_markup = '';
 
         // Define the results type we'll be working with
@@ -1857,18 +1885,14 @@ class rpg_canvas {
                 $this_robot_data = $this_robot->canvas_markup($this_options, $this_player_data);
                 $this_robot_id_token = $this_robot_data['robot_id'].'_'.$this_robot_data['robot_token'];
 
-                // OVERLAY STUFF
-                if (!empty($results_type)){
-                    if (!empty($this_options['this_'.$results_type.'_results']) && $this_options['this_'.$results_type.'_target'] == $this_robot_id_token){
-                        $this_markup .= '<div class="'.$results_type.'_overlay overlay1" data-target="'.$this_options['this_'.$results_type.'_target'].'" data-key="'.$this_robot_data['robot_key'].'" style="z-index: '.(($this_robot_data['robot_position'] == 'active' ? 5050 : (4900 - ($this_robot_data['robot_key'] * 100)))).';">&nbsp;</div>';
-                    }
-                    elseif ($this_robot_data['robot_position'] != 'bench' && !empty($this_options['this_'.$results_type]) && !empty($options['canvas_show_this_'.$results_type])){
-                        $this_markup .= '<div class="'.$results_type.'_overlay overlay2" data-target="'.$this_options['this_'.$results_type.'_target'].'" data-key="'.$this_robot_data['robot_key'].'" style="z-index: 5050;">&nbsp;</div>';
-                    }
-                    elseif ($this_robot_data['robot_position'] != 'bench' && !empty($options['canvas_show_this_'.$results_type.'_overlay'])){
-                        $this_markup .= '<div class="'.$results_type.'_overlay overlay3" style="z-index: 100;">&nbsp;</div>';
-                    }
-                }
+                // Check to see if this robot has any camera action styles applied
+                $this_camera_action_styles = '';
+                $this_camera_has_action = rpg_canvas::has_camera_action(array(
+                    'token' => $this_robot->robot_token,
+                    'side' => $this_robot->player->player_side,
+                    'position' => $this_robot->robot_position,
+                    'key' => $this_robot->robot_key
+                    ), $options, $this_camera_action_styles);
 
                 // RESULTS ANIMATION STUFF
                 if (!empty($results_type)
@@ -1900,7 +1924,8 @@ class rpg_canvas {
                     $temp_size_diff = $this_robot_data['robot_size'] > 80 ? ceil(($this_robot_data['robot_size'] - 80) * 0.5) : 0;
                     $this_results_data['canvas_offset_x'] += $temp_size_diff;
                     if ($this_robot_data['robot_position'] == 'bench' && $this_robot_data['robot_size'] >= 80){
-                        $this_results_data['canvas_offset_x'] += ceil($this_robot_data['robot_size'] / 2);
+                        //$this_results_data['canvas_offset_x'] += ceil($this_robot_data['robot_size'] / 2);
+                        $this_results_data['canvas_offset_x'] += ($this_robot_data['robot_size'] - 40);
                     }
 
 
@@ -1914,33 +1939,44 @@ class rpg_canvas {
                     $this_results_data[$results_type.'_sprite_height'] = ceil($this_results_data[$results_type.'_scale'] * $zoom_size);
                     $this_results_data[$results_type.'_image_width'] = ceil($this_results_data[$results_type.'_scale'] * $zoom_size * 10);
                     $this_results_data[$results_type.'_image_height'] = ceil($this_results_data[$results_type.'_scale'] * $zoom_size);
+
                     $this_results_data['results_amount_class'] = 'sprite ';
-                    $this_results_data['results_amount_canvas_offset_y'] = $this_robot_data['canvas_offset_y'] + 50;
-                    $this_results_data['results_amount_canvas_offset_x'] = $this_robot_data['canvas_offset_x'] - 40;
-                    $this_results_data['results_amount_canvas_offset_z'] = $this_robot_data['canvas_offset_z'] + 100;
-                    if (!empty($this_options['this_'.$results_type.'_results']['total_actions'])){
-                        $total_actions = $this_options['this_'.$results_type.'_results']['total_actions'];
-                        if ($this_options['this_'.$results_type.'_results']['trigger_kind'] == 'damage'){
-                            $this_results_data['results_amount_canvas_offset_y'] -= ceil((1.5 * $total_actions) * $total_actions);
-                            $this_results_data['results_amount_canvas_offset_x'] -= $total_actions * 4;
-                        } elseif ($this_options['this_'.$results_type.'_results']['trigger_kind'] == 'recovery'){
-                            $this_results_data['results_amount_canvas_offset_y'] = $this_robot_data['canvas_offset_y'] + 20;
-                            $this_results_data['results_amount_canvas_offset_x'] = $this_robot_data['canvas_offset_x'] - 40;
-                            $this_results_data['results_amount_canvas_offset_y'] += ceil((1.5 * $total_actions) * $total_actions);
-                            $this_results_data['results_amount_canvas_offset_x'] -= $total_actions * 4;
-                        }
-                    }
                     $this_results_data['results_amount_canvas_opacity'] = 1.00;
-                    if ($this_robot_data['robot_position'] == 'bench'){
-                        $this_results_data['results_amount_canvas_offset_x'] += 105 - 10; //$this_results_data['results_amount_canvas_offset_x'] * -1;
-                        $this_results_data['results_amount_canvas_offset_y'] += 5; //10;
-                        $this_results_data['results_amount_canvas_offset_z'] = $this_robot_data['canvas_offset_z'] + 1000;
-                        $this_results_data['results_amount_canvas_opacity'] -= 0.10;
-                    } else {
+
+                    // Results Amount Window
+
+                    // Define the hard-coded size for the results window graphic
+                    // with name like 'battle-scene_robot-results.png'
+                    $results_amount_width = 52;
+                    $results_amount_height = 41;
+
+                    // Vertically position the result window as a static value slightly higher than the robot
+                    $this_results_data['results_amount_canvas_offset_y'] = $this_robot_data['canvas_offset_y'] + 35;
+
+                    // Horizontally position the result window by centering it to the robot first, then raising it half the sprite height
+                    // Shift the window in front or behind the robot based on active vs bench status so it stays within view
+                    $this_results_data['results_amount_canvas_offset_x'] = $this_robot_data['canvas_offset_x'] + 0;
+                    $this_results_data['results_amount_canvas_offset_x'] += ceil($this_robot_data['robot_sprite_size'] / 2);
+                    $this_results_data['results_amount_canvas_offset_x'] -= ceil($results_amount_width / 2);
+                    if ($this_robot_data['robot_position'] == 'active'){ $this_results_data['results_amount_canvas_offset_x'] -= 35; }
+                    else if ($this_robot_data['robot_position'] == 'bench'){ $this_results_data['results_amount_canvas_offset_x'] += 35; }
+
+                    // Bring the result window to the front of the robot to prevent text from being overlapped by the sprite
+                    $this_results_data['results_amount_canvas_offset_z'] = $this_robot_data['canvas_offset_z'] + 100;
+
+                    // Result Effect Graphic
+
+                    // Randomly jitter the position of the effect graphic a bit in case multiple show
+                    // up one after another so they don't look so static and boring
+                    if ($this_robot_data['robot_position'] !== 'bench'){
                         $this_results_data['canvas_offset_x'] += mt_rand(0, 5) - 10; //jitter
                         $this_results_data['canvas_offset_y'] += mt_rand(0, 5); //jitter
                     }
+
+                    // Now bring it all together to form the result amount style
                     $this_results_data['results_amount_style'] = 'bottom: '.$this_results_data['results_amount_canvas_offset_y'].'px; '.$this_robot_data['robot_float'].': '.$this_results_data['results_amount_canvas_offset_x'].'px; z-index: '.$this_results_data['results_amount_canvas_offset_z'].'; opacity: '.$this_results_data['results_amount_canvas_opacity'].'; ';
+
+                    // Now bring it all together to form the result effect style and class
                     $this_results_data['results_effect_class'] = 'sprite sprite_'.$this_results_data[$results_type.'_sprite_size'].'x'.$this_results_data[$results_type.'_sprite_size'].' '.$results_type.'_status_active '.$results_type.'_position_active ';
                     $this_results_data['results_effect_style'] = 'z-index: '.$this_results_data['canvas_offset_z'].'; '.$this_robot_data['robot_float'].': '.$this_results_data['canvas_offset_x'].'px; bottom: '.$this_results_data['canvas_offset_y'].'px; background-image: url(images/abilities/_effects/stat-arrows/sprite_'.$this_robot_data['robot_direction'].'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); ';
 
@@ -2058,6 +2094,7 @@ class rpg_canvas {
                             $this_attachment_options['ability_frame_offset'] = isset($attachment_info['ability_frame_offset']) ? $attachment_info['ability_frame_offset'] : $this_ability->ability_frame_offset;
                             $this_attachment_options['ability_frame_styles'] = isset($attachment_info['ability_frame_styles']) ? $attachment_info['ability_frame_styles'] : $this_ability->ability_frame_styles;
                             $this_attachment_options['ability_frame_classes'] = isset($attachment_info['ability_frame_classes']) ? $attachment_info['ability_frame_classes'] : $this_ability->ability_frame_classes;
+                            if ($this_camera_action_styles){ $this_attachment_options['ability_frame_styles'] .= $this_camera_action_styles; }
                             $this_ability_data = $this_ability->canvas_markup($this_attachment_options, $this_player_data, $this_robot_data);
                             // Append this ability's markup to the main markup array
                             if (!preg_match('/display:\s?none;/i', $this_robot->robot_frame_styles)){
@@ -2088,6 +2125,7 @@ class rpg_canvas {
                             $this_attachment_options['item_frame_offset'] = isset($attachment_info['item_frame_offset']) ? $attachment_info['item_frame_offset'] : $this_item->item_frame_offset;
                             $this_attachment_options['item_frame_styles'] = isset($attachment_info['item_frame_styles']) ? $attachment_info['item_frame_styles'] : $this_item->item_frame_styles;
                             $this_attachment_options['item_frame_classes'] = isset($attachment_info['item_frame_classes']) ? $attachment_info['item_frame_classes'] : $this_item->item_frame_classes;
+                            if ($this_camera_action_styles){ $this_attachment_options['item_frame_styles'] .= $this_camera_action_styles; }
                             $this_item_data = $this_item->canvas_markup($this_attachment_options, $this_player_data, $this_robot_data);
                             // Append this item's markup to the main markup array
                             if (!preg_match('/display:\s?none;/i', $this_robot->robot_frame_styles)){
@@ -2118,6 +2156,7 @@ class rpg_canvas {
                             $this_attachment_options['skill_frame_offset'] = isset($attachment_info['skill_frame_offset']) ? $attachment_info['skill_frame_offset'] : $this_skill->skill_frame_offset;
                             $this_attachment_options['skill_frame_styles'] = isset($attachment_info['skill_frame_styles']) ? $attachment_info['skill_frame_styles'] : $this_skill->skill_frame_styles;
                             $this_attachment_options['skill_frame_classes'] = isset($attachment_info['skill_frame_classes']) ? $attachment_info['skill_frame_classes'] : $this_skill->skill_frame_classes;
+                            if ($this_camera_action_styles){ $this_attachment_options['skill_frame_styles'] .= $this_camera_action_styles; }
                             $this_skill_data = $this_skill->canvas_markup($this_attachment_options, $this_player_data, $this_robot_data);
                             // Append this skill's markup to the main markup array
                             if (!preg_match('/display:\s?none;/i', $this_robot->robot_frame_styles)){
@@ -2148,6 +2187,7 @@ class rpg_canvas {
                             $this_attachment_options['object_frame_offset'] = isset($attachment_info['object_frame_offset']) ? $attachment_info['object_frame_offset'] : $this_object->object_frame_offset;
                             $this_attachment_options['object_frame_styles'] = isset($attachment_info['object_frame_styles']) ? $attachment_info['object_frame_styles'] : $this_object->object_frame_styles;
                             $this_attachment_options['object_frame_classes'] = isset($attachment_info['object_frame_classes']) ? $attachment_info['object_frame_classes'] : $this_object->object_frame_classes;
+                            if ($this_camera_action_styles){ $this_attachment_options['object_frame_styles'] .= $this_camera_action_styles; }
                             $this_object_data = $this_object->proto_canvas_markup($this_attachment_options, $this_player_data, $this_robot_data);
                             // Append this object's markup to the main markup array
                             if (!preg_match('/display:\s?none;/i', $this_robot->robot_frame_styles)){
@@ -2181,7 +2221,7 @@ class rpg_canvas {
                                 $this_mugshot_markup_right .= str_replace('/'.$this_mugshot_image.'/', '/'.$this_mugshot_image2.'/', $this_mugshot_markup_right);
                             }
                             $this_mugshot_markup_combined =  '<div class="'.$this_ability_data['ability_markup_class'].' canvas_ability_details ability_type ability_type_'.(!empty($this_options['this_ability']->ability_type) ? $this_options['this_ability']->ability_type : 'none').(!empty($this_options['this_ability']->ability_type2) ? '_'.$this_options['this_ability']->ability_type2 : '').'" style="">'.$this_mugshot_markup_left.'<div class="ability_name" style="">'.$this_ability_data['ability_title'].'</div>'.$this_mugshot_markup_right.'</div>';
-                            $this_overlay_markup .=  $this_mugshot_markup_combined;
+                            $this_markup .=  $this_mugshot_markup_combined;
                         }
 
                         // Append this object's markup to the main markup array
@@ -2200,7 +2240,7 @@ class rpg_canvas {
                             $this_mugshot_markup_left = '<div class="sprite item_icon item_icon_left" style="background-image: url(images/items/'.(!empty($this_options['this_item']->item_image) ? $this_options['this_item']->item_image : $this_options['this_item']->item_token).'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$this_options['this_item']->item_name.'</div>';
                             $this_mugshot_markup_right = '<div class="sprite item_icon item_icon_right" style="background-image: url(images/items/'.(!empty($this_options['this_item']->item_image) ? $this_options['this_item']->item_image : $this_options['this_item']->item_token).'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$this_options['this_item']->item_name.'</div>';
                             $this_mugshot_markup_combined =  '<div class="'.$this_item_data['item_markup_class'].' canvas_item_details item_type item_type_'.(!empty($this_options['this_item']->item_type) ? $this_options['this_item']->item_type : 'none').(!empty($this_options['this_item']->item_type2) ? '_'.$this_options['this_item']->item_type2 : '').'" style="">'.$this_mugshot_markup_left.'<div class="item_name" style="">'.$this_item_data['item_title'].'</div>'.$this_mugshot_markup_right.'</div>';
-                            $this_overlay_markup .=  $this_mugshot_markup_combined;
+                            $this_markup .=  $this_mugshot_markup_combined;
                         }
 
                         // Append this object's markup to the main markup array
@@ -2216,7 +2256,7 @@ class rpg_canvas {
                         // Display the object's mugshot sprite
                         if (empty($this_options['this_skill_results']['total_actions'])){
                             $this_mugshot_markup_combined = '<div class="sprite skill_sprite canvas_skill_details skill_type skill_type_none" style=""><div class="skill_name" style="">'.$this_skill_data['skill_title'].'</div></div>';
-                            $this_overlay_markup .= $this_mugshot_markup_combined;
+                            $this_markup .= $this_mugshot_markup_combined;
                         }
 
                     }
@@ -2257,6 +2297,16 @@ class rpg_canvas {
                 elseif (!empty($eventinfo['target_robot']->robot_id) && $eventinfo['target_robot']->robot_id == $target_robot->robot_id && $options['canvas_show_target'] != false){ $target_robot->robot_frame =  $eventinfo['target_robot']->robot_frame; }
                 $target_robot->robot_key = $target_robot->robot_key !== false ? $target_robot->robot_key : ($target_key > 0 ? $target_key : $num_player_robots);
                 $target_robot_data = $target_robot->canvas_markup($target_options, $target_player_data);
+                $target_robot_id_token = $target_robot_data['robot_id'].'_'.$target_robot_data['robot_token'];
+
+                // Check to see if this robot has any camera action styles applied
+                $target_camera_action_styles = '';
+                $target_camera_has_action = rpg_canvas::has_camera_action(array(
+                    'token' => $target_robot->robot_token,
+                    'side' => $target_robot->player->player_side,
+                    'position' => $target_robot->robot_position,
+                    'key' => $target_robot->robot_key
+                    ), $options, $target_camera_action_styles);
 
                 // ATTACHMENT ANIMATION STUFF
                 if (!empty($target_robot->robot_attachments)){
@@ -2291,6 +2341,7 @@ class rpg_canvas {
                             $target_attachment_options['ability_frame_offset'] = isset($attachment_info['ability_frame_offset']) ? $attachment_info['ability_frame_offset'] : $target_ability->ability_frame_offset;
                             $target_attachment_options['ability_frame_styles'] = isset($attachment_info['ability_frame_styles']) ? $attachment_info['ability_frame_styles'] : $target_ability->ability_frame_styles;
                             $target_attachment_options['ability_frame_classes'] = isset($attachment_info['ability_frame_classes']) ? $attachment_info['ability_frame_classes'] : $target_ability->ability_frame_classes;
+                            if ($target_camera_action_styles){ $target_attachment_options['ability_frame_styles'] .= $target_camera_action_styles; }
                             $target_ability_data = $target_ability->canvas_markup($target_attachment_options, $target_player_data, $target_robot_data);
 
                             // Append this target's ability's markup to the main markup array
@@ -2327,6 +2378,7 @@ class rpg_canvas {
                             $target_attachment_options['item_frame_offset'] = isset($attachment_info['item_frame_offset']) ? $attachment_info['item_frame_offset'] : $target_item->item_frame_offset;
                             $target_attachment_options['item_frame_styles'] = isset($attachment_info['item_frame_styles']) ? $attachment_info['item_frame_styles'] : $target_item->item_frame_styles;
                             $target_attachment_options['item_frame_classes'] = isset($attachment_info['item_frame_classes']) ? $attachment_info['item_frame_classes'] : $target_item->item_frame_classes;
+                            if ($target_camera_action_styles){ $target_attachment_options['item_frame_styles'] .= $target_camera_action_styles; }
                             $target_item_data = $target_item->canvas_markup($target_attachment_options, $target_player_data, $target_robot_data);
 
                             // Append this target's item's markup to the main markup array
@@ -2363,6 +2415,7 @@ class rpg_canvas {
                             $target_attachment_options['object_frame_offset'] = isset($attachment_info['object_frame_offset']) ? $attachment_info['object_frame_offset'] : $target_object->object_frame_offset;
                             $target_attachment_options['object_frame_styles'] = isset($attachment_info['object_frame_styles']) ? $attachment_info['object_frame_styles'] : $target_object->object_frame_styles;
                             $target_attachment_options['object_frame_classes'] = isset($attachment_info['object_frame_classes']) ? $attachment_info['object_frame_classes'] : $target_object->object_frame_classes;
+                            if ($target_camera_action_styles){ $target_attachment_options['object_frame_styles'] .= $target_camera_action_styles; }
                             $target_object_data = $target_object->proto_canvas_markup($target_attachment_options, $target_player_data, $target_robot_data);
 
                             // Append this target's object's markup to the main markup array
@@ -2452,6 +2505,15 @@ class rpg_canvas {
                     $static_robot_data['robot_scale'] = $static_position_offset['canvas_scale'];
                     $static_robot_data['robot_sprite_size']  = ceil($static_robot_data['robot_scale'] * ($static_robot_object->robot_image_size * 2));
 
+                    // Check if this position has any camera action and collect the styles if so
+                    $camera_action_styles = '';
+                    $camera_has_action = self::has_camera_action(array(
+                        'token' => $attachment_token,
+                        'side' => $static_side,
+                        'position' => $static_position,
+                        'key' => $static_key
+                        ), $options, $camera_action_styles);
+
                     // If this is an ability attachment
                     if ($attachment_info['class'] == 'ability'){
 
@@ -2479,6 +2541,7 @@ class rpg_canvas {
                         $this_attachment_options['ability_frame_offset'] = isset($attachment_info['ability_frame_offset']) ? $attachment_info['ability_frame_offset'] : array('x' => 0, 'y' => 0, 'z' => 0);
                         $this_attachment_options['ability_frame_styles'] = isset($attachment_info['ability_frame_styles']) ? $attachment_info['ability_frame_styles'] : $this_ability->ability_frame_styles;
                         $this_attachment_options['ability_frame_classes'] = isset($attachment_info['ability_frame_classes']) ? $attachment_info['ability_frame_classes'] : $this_ability->ability_frame_classes;
+                        if (!empty($camera_action_styles)){ $this_attachment_options['ability_frame_styles'] .= $camera_action_styles; }
 
                         // Collect and appent static abilty markup to the parent string
                         $this_attachment_data = rpg_canvas::static_ability_markup($this_ability, $this_attachment_options, $left_side_player_data, $static_robot_data);
@@ -2512,6 +2575,7 @@ class rpg_canvas {
                         $this_attachment_options['item_frame_offset'] = isset($attachment_info['item_frame_offset']) ? $attachment_info['item_frame_offset'] : array('x' => 0, 'y' => 0, 'z' => 0);
                         $this_attachment_options['item_frame_styles'] = isset($attachment_info['item_frame_styles']) ? $attachment_info['item_frame_styles'] : $this_item->item_frame_styles;
                         $this_attachment_options['item_frame_classes'] = isset($attachment_info['item_frame_classes']) ? $attachment_info['item_frame_classes'] : $this_item->item_frame_classes;
+                        if (!empty($camera_action_styles)){ $this_attachment_options['item_frame_styles'] .= $camera_action_styles; }
 
                         // Collect and appent static abilty markup to the parent string
                         $this_attachment_data = rpg_canvas::static_item_markup($this_item, $this_attachment_options, $left_side_player_data, $static_robot_data);
@@ -2574,17 +2638,77 @@ class rpg_canvas {
             if (!empty($this_markup) && $this_battle->battle_status == 'complete' || $this_battle->battle_result == 'defeat'){
                 $this_mugshot_markup_left = '<div class="sprite ability_icon ability_icon_left">&nbsp;</div>';
                 $this_mugshot_markup_right = '<div class="sprite ability_icon ability_icon_right">&nbsp;</div>';
-                $this_overlay_markup = '<div class="sprite canvas_ability_details ability_type ability_type_'.$result_class.'">'.$this_mugshot_markup_left.'<div class="ability_name">'.$result_text.'</div>'.$this_mugshot_markup_right.'</div>'.$this_markup;
+                $this_overlay_markup = '<div class="sprite canvas_ability_details ability_type ability_type_'.$result_class.'">'.$this_mugshot_markup_left.'<div class="ability_name">'.$result_text.'</div>'.$this_mugshot_markup_right.'</div>';
             }
         }
 
         // Put everything together into the final markup
         $final_markup = '';
+        if (!empty($this_underlay_markup)){ $final_markup .= '<div class="battle_overlay under">'.$this_underlay_markup.'</div>'; }
         $final_markup .= '<div class="battle_scene">'.$this_markup.'</div>';
-        if (!empty($this_overlay_markup)){ $final_markup .= '<div class="battle_overlay">'.$this_overlay_markup.'</div>'; }
+        if (!empty($this_overlay_markup)){ $final_markup .= '<div class="battle_overlay over">'.$this_overlay_markup.'</div>'; }
 
         // Return the final markup with everything together
         return $final_markup;
+
+    }
+
+    // Define a function for checking if a robot has camera action given an array of event options, optionally returning a style
+    public static function has_camera_action($object_info, $options, &$camera_action_styles = ''){
+        //error_log('rpg_canvas::has_camera_action()');
+        //error_log('rpg_canvas::has_camera_action()'.PHP_EOL.'$object_info = '.print_r($object_info, true).' '.PHP_EOL.'$options = '.print_r(array_filter($options, function($k){ return strstr($k, 'event_flag_'); }, ARRAY_FILTER_USE_KEY), true).' '.PHP_EOL.'$camera_action_styles = '.print_r($camera_action_styles, true).PHP_EOL);
+
+        if (!isset($object_info['token'])){ $object_info['token'] = 'object'; }
+        if (!isset($object_info['side'])){ $object_info['side'] = ''; }
+        if (!isset($object_info['position'])){ $object_info['position'] = ''; }
+        if (!isset($object_info['key'])){ $object_info['key'] = -1; }
+
+        $debug = array();
+        //$debug[] = ('CANVAS call for '.strtoupper($object_info['token']));
+        //$debug[] = ('$object_info = '.print_r($object_info, true));
+        //$debug[] = ('$options = '.print_r(array_filter($options, function($k){ return strstr($k, 'event_flag_'); }, ARRAY_FILTER_USE_KEY), true));
+        $has_camera_action = !empty($options['event_flag_camera_action']) || !empty($options['event_flag_camera_reaction']) ? true : false;
+        $has_direct_camera_action = false;
+        $camera_action_styles = '';
+
+        if (!empty($has_camera_action)
+            && $options['event_flag_camera_side'] === $object_info['side']
+            && $options['event_flag_camera_focus'] === $object_info['position']
+            && $options['event_flag_camera_depth'] === $object_info['key']){
+            //$debug[] = ('DIRECT camera action for '.$object_info['token']);
+            $has_direct_camera_action = true;
+
+        } else if (!empty($has_camera_action)
+            && $options['event_flag_camera_side'] === $object_info['side']
+            && $options['event_flag_camera_focus'] === $object_info['position']
+            && $options['event_flag_camera_depth'] !== $object_info['key']){
+            if ($options['event_flag_camera_depth'] === 0){
+                //$debug[] = (strtoupper($object_info['token']).' is BENCHED behind the active camera action');
+
+            } else if ($options['event_flag_camera_depth'] > $object_info['key']){
+                //$debug[] = (strtoupper($object_info['token']).' is BESIDE but BLOCKING the benched camera action');
+                $camera_action_styles = 'filter: brightness(0.8); opacity: 0.2; ';
+
+            } else if ($options['event_flag_camera_depth'] < $object_info['key']){
+                //$debug[] = (strtoupper($object_info['token']).' is BESIDE but behind the benched camera action');
+                $camera_action_styles = 'filter: brightness(0.8); opacity: 0.2; ';
+
+            }
+        } else if (!empty($has_camera_action)
+            && $options['event_flag_camera_side'] === $object_info['side']
+            && $options['event_flag_camera_focus'] === 'bench'
+            && $object_info['position'] !== 'bench'){
+            //$debug[] = (strtoupper($object_info['token']).' is actively BLOCKING the benched camera action');
+            $camera_action_styles = 'filter: brightness(0.6); opacity: 0.6; ';
+
+        } else {
+            //$debug[] = ('NO camera action for '.$object_info['token']);
+
+        }
+
+        //error_log(implode(PHP_EOL, $debug).PHP_EOL);
+
+        return $has_direct_camera_action;
 
     }
 
