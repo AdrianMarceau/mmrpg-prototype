@@ -294,6 +294,10 @@ class rpg_disabled {
                         $event_options['this_ability_results']['total_actions'] = $temp_boost_actions++;
                         $event_options['this_ability_target'] = $target_robot->robot_id.'_'.$target_robot->robot_token;
                         $event_options['console_show_target'] = false;
+                        $event_options['event_flag_camera_action'] = true;
+                        $event_options['event_flag_camera_side'] = $target_robot->player->player_side;
+                        $event_options['event_flag_camera_focus'] = $target_robot->robot_position;
+                        $event_options['event_flag_camera_depth'] = $target_robot->robot_key;
                         $event_body = $target_robot->print_name().' downloads '.$stat_system[$stat].' data from the target! ';
                         $event_body .= '<br />';
                         $event_body .= $target_robot->print_name().'&#39;s base '.$stat.' grew by <span class="recovery_amount">'.$temp_stat_base_boost.'</span>! ';
@@ -582,6 +586,10 @@ class rpg_disabled {
                 $event_options['this_ability_results']['flag_affinity'] = true;
                 $event_options['this_ability_results']['total_actions'] = 1;
                 $event_options['this_ability_target'] = $temp_target_robot->robot_id.'_'.$temp_target_robot->robot_token;
+                $event_options['event_flag_camera_action'] = true;
+                $event_options['event_flag_camera_side'] = $temp_target_robot->player->player_side;
+                $event_options['event_flag_camera_focus'] = $temp_target_robot->robot_position;
+                $event_options['event_flag_camera_depth'] = $temp_target_robot->robot_key;
 
                 // Update player/robot frames and points for the victory
                 $temp_target_robot->robot_frame = 'victory';
@@ -639,6 +647,10 @@ class rpg_disabled {
                     $event_options['this_ability_results']['this_result'] = 'success';
                     $event_options['this_ability_results']['total_actions'] = 2;
                     $event_options['this_ability_target'] = $temp_target_robot->robot_id.'_'.$temp_target_robot->robot_token;
+                    $event_options['event_flag_camera_action'] = true;
+                    $event_options['event_flag_camera_side'] = $temp_target_robot->player->player_side;
+                    $event_options['event_flag_camera_focus'] = $temp_target_robot->robot_position;
+                    $event_options['event_flag_camera_depth'] = $temp_target_robot->robot_key;
 
                     // Display the win message for this robot with battle points
                     $temp_target_robot->set_frame('taunt');
