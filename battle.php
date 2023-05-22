@@ -620,25 +620,6 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
         </div>
     </div>
 
-    <?
-
-    // Define an index to hold information we might need about action buttons
-    $action_settings_options = array();
-
-    // Define the animation effects we can toggle ON or OFF
-    $action_settings_options['animationEffects'] = array();
-    $action_settings_options['animationEffects'][] = array(
-        'name' => 'Cross-Fade Frames',
-        'token' => 'eventCrossFade',
-        'default' => true
-        );
-    $action_settings_options['animationEffects'][] = array(
-        'name' => 'Dynamic Camera',
-        'token' => 'eventCameraShift',
-        'default' => true
-        );
-
-    ?>
     <div id="actions">
         <a id="actions_resend" class="actions_resend button">RESEND</a>
         <div id="actions_loading" class="actions_loading wrapper">
@@ -727,7 +708,8 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
 
                 // Loop through the defined effects and print buttons for each
                 $block_num = 0;
-                foreach ($action_settings_options['animationEffects'] AS $effect_key => $effect_info){
+                $animation_effects_index = rpg_canvas::get_animation_effects_index();
+                foreach ($animation_effects_index AS $effect_key => $effect_info){
                     $block_num++;
                     $setting_name = $effect_info['name'];
                     $setting_token = $effect_info['token'];
@@ -786,35 +768,12 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
 <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/battle.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
-// Update game setting flags
+
+// Update relevent game settings and flags
 <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 gameSettings.idleAnimation = <?= $debug_flag_animation ? 'true' : 'false' ?>;
 gameSettings.fieldMusic = '<?= !strstr($this_field_data['field_music'], '/') ? 'fields/'.$this_field_data['field_music'] : $this_field_data['field_music'] ?>';
-<?
 
-// Update the event timeout setting if set
-$event_timeout = !empty($_SESSION['GAME']['battle_settings']['eventTimeout']) ? $_SESSION['GAME']['battle_settings']['eventTimeout'] : 0;
-if (!empty($event_timeout)){ echo "gameSettings.eventTimeout = {$event_timeout};\n"; }
-
-// Update the sprite render mode setting if set
-$sprite_render_mode = !empty($_SESSION['GAME']['battle_settings']['spriteRenderMode']) ? $_SESSION['GAME']['battle_settings']['spriteRenderMode'] : 0;
-if (!empty($sprite_render_mode)){ echo "gameSettings.spriteRenderMode = '{$sprite_render_mode}';\n"; }
-
-// Update any animation effects that have been defined in the session
-if (!empty($action_settings_options['animationEffects'])){
-    foreach ($action_settings_options['animationEffects'] AS $effect_key => $effect_info){
-        $setting_token = $effect_info['token'];
-        $setting_value = $effect_info['default'];
-        if (isset($_SESSION['GAME']['battle_settings'][$setting_token])){
-            $value = $_SESSION['GAME']['battle_settings'][$setting_token];
-            $setting_value = $value === 'true' ? true : false;
-        }
-        $setting_value_js = $setting_value ? 'true' : 'false';
-        echo "gameSettings.{$setting_token} = {$setting_value_js};\n";
-    }
-}
-
-?>
 // Create the document ready events
 $(document).ready(function(){
 

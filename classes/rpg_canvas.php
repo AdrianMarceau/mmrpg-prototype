@@ -2712,6 +2712,29 @@ class rpg_canvas {
 
     }
 
+    // Define a function for getting the canvas animation effect index (for accessibility toggles)
+    public static function get_animation_effects_index(){
+
+        // Define an index to hold the animation effects
+        $animation_effects_index = array();
+
+        // Define the animation effects we can toggle ON or OFF
+        $animation_effects_index['eventCrossFade'] = array(
+            'name' => 'Cross-Fade Frames',
+            'token' => 'eventCrossFade',
+            'default' => true
+            );
+        $animation_effects_index['eventCameraShift'] = array(
+            'name' => 'Dynamic Camera',
+            'token' => 'eventCameraShift',
+            'default' => true
+            );
+
+        // Return the list of effects
+        return $animation_effects_index;
+
+    }
+
 
 
 }

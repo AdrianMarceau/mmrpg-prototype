@@ -96,6 +96,10 @@ $(document).ready(function(){
     gameSettings.wapFlagIphone = (navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)) ? true : false;
     gameSettings.wapFlagIpad = navigator.userAgent.match(/iPad/i) ? true : false;
 
+    // Update the body to use the requested sprite rendering mode
+    //console.log('setting data-render-mode to ', gameSettings['spriteRenderMode']);
+    mmrpgBody.attr('data-render-mode', gameSettings['spriteRenderMode']);
+
 
     /*
      * INDEX EVENTS
@@ -300,10 +304,6 @@ $(document).ready(function(){
                 gameSettings['spriteRenderMode'] = spriteRenderMode;
             }
         }
-
-        // Update the body to use the requested sprite rendering mode
-        //console.log('setting data-render-mode to ', gameSettings['spriteRenderMode']);
-        mmrpgBody.attr('data-render-mode', gameSettings['spriteRenderMode']);
 
         // Define a change event for whenever this game setting is altered
         var updateCameraShift = function(newValue){

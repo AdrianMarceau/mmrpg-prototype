@@ -634,7 +634,8 @@ foreach ($this_menu_tooltips AS $token => $text){
 <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
-// Define the game WAP and cache flags/values
+
+// Update relevent game settings and flags
 <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 gameSettings.fadeIn = true;
 gameSettings.demo = false;
@@ -645,6 +646,7 @@ gameSettings.windowEventsMessages = [];
 gameSettings.totalPlayerOptions = <?= $unlock_count_players ?>;
 gameSettings.prototypeBannerKey = 0;
 gameSettings.prototypeBanners = ['prototype-banners_title-screen_01.gif'];
+
 // Define any preset menu selections
 battleOptions['this_user_id'] = <?= $this_userid ?>;
 <? if (!empty($_SESSION[$session_token]['battle_settings']['this_player_token'])){ ?>
