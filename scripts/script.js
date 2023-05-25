@@ -1702,7 +1702,7 @@ function mmrpg_canvas_event(thisMarkup, eventFlags){ //, flagsMarkup
         // Calculate the top offset based on previous event height
         var eventTop = $('.event:not(.sticky):first-child', thisContext).outerHeight();
         // Prepend the event to the current stack but bring it to the front
-        var thisEvent = $('<div class="event clearback">'+thisMarkup+'</div>');
+        var thisEvent = $('<div class="event event_frame clearback">'+thisMarkup+'</div>');
         thisEvent.css({opacity:0.0,zIndex:600});
         thisContext.prepend(thisEvent);
         // Wait for all the event's assets to finish loading
@@ -1714,23 +1714,49 @@ function mmrpg_canvas_event(thisMarkup, eventFlags){ //, flagsMarkup
             // If this event has any camera action going on, make sure we update the canvas
             var currentShift = thisContext.attr('data-camera-shift') || '';
             var currentFocus = thisContext.attr('data-camera-focus') || '';
+            var currentDepth = thisContext.attr('data-camera-depth') || '';
             var newCameraShift = '';
             var newCameraFocus = '';
+            var newCameraDepth = '';
             if (gameSettings.eventCameraShift
                 && typeof eventFlags.camera !== 'undefined'
                 && eventFlags.camera !== false){
                 //console.log('we have camera action!', eventFlags.camera);
                 newCameraShift = eventFlags.camera.side;
                 newCameraFocus = eventFlags.camera.focus;
+                newCameraDepth = eventFlags.camera.depth;
                 //if (eventFlags.camera.action === true){ var shiftSide = eventFlags.camera.side; }
                 //else if (eventFlags.camera.reaction === true){ var shiftSide = eventFlags.camera.side !== 'left' ? 'left' : 'right'; }
                 //thisContext.attr('data-camera-shift', shiftSide);
             }
             if (currentShift !== newCameraShift
-                || currentFocus !== newCameraFocus){
+                || currentFocus !== newCameraFocus
+                || currentDepth !== newCameraDepth){
                 thisContext.attr('data-camera-shift', newCameraShift);
                 thisContext.attr('data-camera-focus', newCameraFocus);
+                thisContext.attr('data-camera-depth', newCameraDepth);
+                var cssVarName = '--camera-shift-depth-mod';
+                var cssVarValue = newCameraDepth > 0 ? 1 - ((newCameraDepth - 1) * 0.1) : 1;
+                //console.log('cssVarName =', cssVarName, '; cssVarValue =', cssVarValue);
+                document.documentElement.style.setProperty(cssVarName, cssVarValue);
             }
+
+        // Define a change event for whenever this game setting is altered
+        var updateCameraShift = function(newValue){
+            //console.log('updateCameraShift() to ', newValue);
+            // Update the camera shift transition for zooms and pans
+            var cssVarName = '--camera-shift-transition-duration';
+            var cssVarValue = (function(){
+                var duration = Math.ceil(newValue / 2);
+                if (!gameSettings.eventCrossFade){ duration = 0; }
+                else if (!gameSettings.eventCameraShift){ duration = 0; }
+                else if (gameSettings.eventTimeout <= gameSettings.eventTimeoutThreshold){ duration = 0; }
+                return duration > 0 ? (duration / 1000)+'s' : 'none';
+                })();
+            //console.log('cssVarName =', cssVarName, '; cssVarValue =', cssVarValue);
+            var root = document.documentElement;
+            root.style.setProperty(cssVarName, cssVarValue);
+            };
 
             // If we're allowed to cross-fade transition the normal way, otherwise straight-up replace the event
             if (gameSettings.eventCrossFade === true){

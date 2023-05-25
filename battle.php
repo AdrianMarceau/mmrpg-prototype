@@ -263,7 +263,7 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
             <div class="canvas_overlay_header canvas_overlay_hidden" style="">&nbsp;</div>
 
             <div id="animate" style="opacity: 0;"><a class="toggle paused" href="#" onclick=""><span><span>loading&hellip;</span></span></a></div>
-            <div class="event sticky" style="z-index: 1;">
+            <div class="event event_fieldback sticky" style="z-index: 1;">
                 <?
 
                 // If field data was provided, preload the background/foreground
