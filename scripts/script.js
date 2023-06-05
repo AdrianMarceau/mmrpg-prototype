@@ -313,6 +313,14 @@ $(document).ready(function(){
             if (typeof window.localStorage !== 'undefined'){
                 window.localStorage.setItem('spriteRenderMode', newValue);
                 }
+            var $actionButton = $('.button.action_option[data-panel="settings_spriteRenderMode"]');
+            if ($actionButton.length){
+                var newValueTitle = newValue;
+                newValueTitle = newValueTitle.replace('/\-/g', ' ');
+                newValueTitle = newValueTitle.replace(/\b\w/g, function(l){ return l.toUpperCase() });
+                newValueTitle = newValueTitle.replace('/\s+/g', '-');
+                $actionButton.find('.value').html(newValueTitle);
+                }
             };
 
         // Define a change event for whenever this game setting is altered

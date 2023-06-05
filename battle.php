@@ -663,45 +663,6 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
             </div>
             <div class="sub_actions"><a data-order="3" class="button action_back" type="button" data-panel="option"><label>Back</label></a></div>
         </div>
-        <div id="actions_settings_eventTimeout" class="actions_settings actions_settings_eventTimeout wrapper">
-            <div class="main_actions">
-                <a data-order="1" class="button action_setting block_1" type="button" data-action="settings_eventTimeout_1600"><label><span class="multi">Super&nbsp;Slow<br />(1f/1600ms)</span></label></a>
-                <a data-order="2" class="button action_setting block_2" type="button" data-action="settings_eventTimeout_1250"><label><span class="multi">Medium&nbsp;Slow<br />(1f/1250ms)</span></label></a>
-                <a data-order="3" class="button action_setting block_3" type="button" data-action="settings_eventTimeout_1000"><label><span class="multi">Normal&nbsp;Slow<br />(1f/1000ms)</span></label></a>
-                <a data-order="4" class="button action_setting block_4" type="button" data-action="settings_eventTimeout_900"><label><span class="multi">Normal<br />(1f/900ms)</span></label></a>
-                <a data-order="5" class="button action_setting block_5" type="button" data-action="settings_eventTimeout_800"><label><span class="multi">Normal&nbsp;Fast<br />(1f/800ms)</span></label></a>
-                <a data-order="6" class="button action_setting block_6" type="button" data-action="settings_eventTimeout_700"><label><span class="multi">Medium&nbsp;Fast<br />(1f/700ms)</span></label></a>
-                <a data-order="7" class="button action_setting block_7" type="button" data-action="settings_eventTimeout_600"><label><span class="multi">Super&nbsp;Fast<br />(1f/600ms)</span></label></a>
-                <a data-order="8" class="button action_setting block_8" type="button" data-action="settings_eventTimeout_250"><label><span class="multi">Ultra&nbsp;Fast<br />(1f/250ms)</span></label></a>
-            </div>
-            <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="option"><label>Back</label></a></div>
-        </div>
-        <div id="actions_settings_spriteRenderMode" class="actions_settings actions_settings_spriteRenderMode wrapper">
-            <div class="main_actions">
-                <a data-order="1" class="button action_setting block_1" type="button" data-action="settings_spriteRenderMode_default"><label><span>Default</span></label></a>
-                <a data-order="2" class="button action_setting block_2" type="button" data-action="settings_spriteRenderMode_auto"><label><span class="multi">Browser<br />&quot;Auto&quot;</span></label></a>
-                <a data-order="3" class="button action_setting block_3" type="button" data-action="settings_spriteRenderMode_smooth"><label><span class="multi">Browser<br />&quot;Smooth&quot;</span></label></a>
-                <a data-order="4" class="button action_setting block_4" type="button" data-action="settings_spriteRenderMode_pixelated"><label><span class="multi">Browser<br />&quot;Pixelated&quot;</span></label></a>
-                <a data-order="5" class="button action_setting block_5" type="button" data-action="settings_spriteRenderMode_high-quality"><label><span class="multi">Browser<br />&quot;High-Quality&quot;</span></label></a>
-                <a data-order="6" class="button action_setting block_6" type="button" data-action="settings_spriteRenderMode_crisp-edges"><label><span class="multi">Browser<br />&quot;Crisp-Edges&quot;</span></label></a>
-                <a class="button action_setting button_disabled block_7" type="button">&nbsp;</a>
-                <a class="button action_setting button_disabled block_8" type="button">&nbsp;</a>
-            </div>
-            <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="option"><label>Back</label></a></div>
-        </div>
-        <div id="actions_settings_eventCrossFade" class="actions_settings actions_settings_eventCrossFade wrapper">
-            <div class="main_actions">
-                <a data-order="1" class="button action_setting block_1" type="button" data-action="settings_eventCrossFade_false"><label><span>None</span></label></a>
-                <a data-order="2" class="button action_setting block_2" type="button" data-action="settings_eventCrossFade_true"><label><span class="multi">Cross-Fade<br />Frames</span></label></a>
-                <a class="button action_setting button_disabled block_3" type="button">&nbsp;</a>
-                <a class="button action_setting button_disabled block_4" type="button">&nbsp;</a>
-                <a class="button action_setting button_disabled block_5" type="button">&nbsp;</a>
-                <a class="button action_setting button_disabled block_6" type="button">&nbsp;</a>
-                <a class="button action_setting button_disabled block_7" type="button">&nbsp;</a>
-                <a class="button action_setting button_disabled block_8" type="button">&nbsp;</a>
-            </div>
-            <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="option"><label>Back</label></a></div>
-        </div>
         <div id="actions_settings_animationEffects" class="actions_settings actions_settings_animationEffects wrapper">
             <div class="main_actions">
                 <?
@@ -739,6 +700,34 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                     echo('</a>');
                 }
 
+                // Manually add buttons for other sub-menus related to animation
+                if (true){
+                    $block_num++;
+                    $setting_name = 'Sprite Rendering';
+                    $setting_token = 'spriteRenderMode';
+                    $default_value = 'default';
+                    $current_value = $default_value;
+                    if (isset($_SESSION['GAME']['battle_settings'][$setting_token])){
+                        $value = $_SESSION['GAME']['battle_settings'][$setting_token];
+                        if (empty($value) || $value === 'false'){ $value = false; }
+                        elseif (!empty($value) && $value === 'true'){ $value = true; }
+                        $current_value = $value;
+                    }
+                    $current_value_title = $current_value;
+                    $current_value_title = str_replace('-', ' ', $current_value_title);
+                    $current_value_title = ucwords($current_value_title);
+                    $current_value_title = str_replace(' ', '-', $current_value_title);
+                    echo('<a data-order="'.$block_num.'" class="button action_option action_setting block_'.$block_num.'" type="button" data-panel="settings_spriteRenderMode">');
+                        echo('<label><span class="multi">');
+                            echo('<span class="title">'.$setting_name.'</span>');
+                            echo('<br />');
+                            echo('<span class="value type type_none">');
+                                echo($current_value_title);
+                            echo('</span>');
+                        echo('</span></label>');
+                    echo('</a>');
+                }
+
                 // If there were less than eight buttons, we should print spacers
                 while ($block_num < 8){
                     $block_num++;
@@ -748,6 +737,32 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                 ?>
             </div>
             <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="option"><label>Back</label></a></div>
+        </div>
+        <div id="actions_settings_eventTimeout" class="actions_settings actions_settings_eventTimeout wrapper">
+            <div class="main_actions">
+                <a data-order="1" class="button action_setting block_1" type="button" data-action="settings_eventTimeout_1600"><label><span class="multi">Super&nbsp;Slow<br />(1f/1600ms)</span></label></a>
+                <a data-order="2" class="button action_setting block_2" type="button" data-action="settings_eventTimeout_1250"><label><span class="multi">Medium&nbsp;Slow<br />(1f/1250ms)</span></label></a>
+                <a data-order="3" class="button action_setting block_3" type="button" data-action="settings_eventTimeout_1000"><label><span class="multi">Normal&nbsp;Slow<br />(1f/1000ms)</span></label></a>
+                <a data-order="4" class="button action_setting block_4" type="button" data-action="settings_eventTimeout_900"><label><span class="multi">Normal<br />(1f/900ms)</span></label></a>
+                <a data-order="5" class="button action_setting block_5" type="button" data-action="settings_eventTimeout_800"><label><span class="multi">Normal&nbsp;Fast<br />(1f/800ms)</span></label></a>
+                <a data-order="6" class="button action_setting block_6" type="button" data-action="settings_eventTimeout_700"><label><span class="multi">Medium&nbsp;Fast<br />(1f/700ms)</span></label></a>
+                <a data-order="7" class="button action_setting block_7" type="button" data-action="settings_eventTimeout_600"><label><span class="multi">Super&nbsp;Fast<br />(1f/600ms)</span></label></a>
+                <a data-order="8" class="button action_setting block_8" type="button" data-action="settings_eventTimeout_250"><label><span class="multi">Ultra&nbsp;Fast<br />(1f/250ms)</span></label></a>
+            </div>
+            <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="option"><label>Back</label></a></div>
+        </div>
+        <div id="actions_settings_spriteRenderMode" class="actions_settings actions_settings_spriteRenderMode wrapper">
+            <div class="main_actions">
+                <a data-order="1" class="button action_setting block_1" type="button" data-action="settings_spriteRenderMode_default"><label><span>Default</span></label></a>
+                <a data-order="2" class="button action_setting block_2" type="button" data-action="settings_spriteRenderMode_auto"><label><span class="multi">Browser<br />&quot;Auto&quot;</span></label></a>
+                <a data-order="3" class="button action_setting block_3" type="button" data-action="settings_spriteRenderMode_smooth"><label><span class="multi">Browser<br />&quot;Smooth&quot;</span></label></a>
+                <a data-order="4" class="button action_setting block_4" type="button" data-action="settings_spriteRenderMode_pixelated"><label><span class="multi">Browser<br />&quot;Pixelated&quot;</span></label></a>
+                <a data-order="5" class="button action_setting block_5" type="button" data-action="settings_spriteRenderMode_high-quality"><label><span class="multi">Browser<br />&quot;High-Quality&quot;</span></label></a>
+                <a data-order="6" class="button action_setting block_6" type="button" data-action="settings_spriteRenderMode_crisp-edges"><label><span class="multi">Browser<br />&quot;Crisp-Edges&quot;</span></label></a>
+                <a class="button action_setting button_disabled block_7" type="button">&nbsp;</a>
+                <a class="button action_setting button_disabled block_8" type="button">&nbsp;</a>
+            </div>
+            <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="settings_animationEffects"><label>Back</label></a></div>
         </div>
         <div id="actions_event" class="actions_event wrapper">
             <div class="main_actions">
