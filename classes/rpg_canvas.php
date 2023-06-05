@@ -2636,9 +2636,9 @@ class rpg_canvas {
                 $result_class = 'flame';
             }
             if (!empty($this_markup) && $this_battle->battle_status == 'complete' || $this_battle->battle_result == 'defeat'){
-                $this_mugshot_markup_left = '<div class="sprite ability_icon ability_icon_left">&nbsp;</div>';
-                $this_mugshot_markup_right = '<div class="sprite ability_icon ability_icon_right">&nbsp;</div>';
-                $this_overlay_markup = '<div class="sprite canvas_ability_details ability_type ability_type_'.$result_class.'">'.$this_mugshot_markup_left.'<div class="ability_name">'.$result_text.'</div>'.$this_mugshot_markup_right.'</div>';
+                $this_mugshot_markup_left = '<div class="sprite results_icon results_icon_left">&nbsp;</div>';
+                $this_mugshot_markup_right = '<div class="sprite results_icon results_icon_right">&nbsp;</div>';
+                $this_markup .= '<div class="sprite canvas_battle_results ability_type ability_type_'.$result_class.'">'.$this_mugshot_markup_left.'<div class="results_name ability_name">'.$result_text.'</div>'.$this_mugshot_markup_right.'</div>';
             }
         }
 
@@ -2699,7 +2699,7 @@ class rpg_canvas {
             && $options['event_flag_camera_focus'] === 'bench'
             && $object_info['position'] !== 'bench'){
             //$debug[] = (strtoupper($object_info['token']).' is actively BLOCKING the benched camera action');
-            $camera_action_styles = 'filter: brightness(0.6); opacity: 0.6; ';
+            $camera_action_styles = 'filter: brightness(0.8); opacity: 0.2; ';
 
         } else {
             //$debug[] = ('NO camera action for '.$object_info['token']);
@@ -2735,6 +2735,45 @@ class rpg_canvas {
 
     }
 
+
+    // Define a function for updating an event with camera action given context flags
+    public static function apply_camera_action_flags(&$event_options, $this_robot, $trigger_object = false, $trigger_kind = ''){
+
+        // Set the camera options for this target event
+        $event_options['event_flag_camera_action'] = true;
+        if ($trigger_kind !== 'target'){ $event_options['event_flag_camera_reaction'] = true; }
+        $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
+        $event_options['event_flag_camera_focus'] = $this_robot->robot_position;
+        $event_options['event_flag_camera_depth'] = $this_robot->robot_key;
+        $kickback_shift_threshold = 20;
+        if (!empty($trigger_object)
+            && !empty($trigger_kind)){
+            $object_kind = $trigger_object->class;
+            $token_key = $object_kind.'_token';
+            $options_key = $trigger_kind.'_options';
+            $kickback_key = $trigger_kind.'_kickback';
+            $kickback_shift_value = 0;
+            //error_log('$trigger_object->$options_key = '.print_r($trigger_object->$options_key, true));
+            if (isset($trigger_object->$options_key)){
+                $trigger_object_options = $trigger_object->$options_key;
+                //error_log('$trigger_object_options = '.print_r($trigger_object_options, true));
+                if (isset($trigger_object_options[$kickback_key])
+                    && isset($trigger_object_options[$kickback_key]['x'])){
+                    $kickback_shift_value = $trigger_object_options[$kickback_key]['x'];
+                    //error_log('$kickback_shift_value = '.print_r($kickback_shift_value, true));
+                }
+            }
+            if (!empty($kickback_shift_value)
+                && $kickback_shift_value != 0
+                && abs($kickback_shift_value) >= $kickback_shift_threshold){
+                //error_log($kickback_shift_value.' for '.$trigger_object->$token_key.' = '.$kickback_shift_value);
+                $event_options['event_flag_camera_offset'] = round(($kickback_shift_value / $kickback_shift_threshold), 1);
+                if ($trigger_kind === 'target'){ $event_options['event_flag_camera_offset'] *= -1; }
+                //error_log('event_flag_camera_offset = '.$event_options['event_flag_camera_offset']);
+            }
+        }
+
+    }
 
 
 }

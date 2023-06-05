@@ -3668,6 +3668,28 @@ class rpg_ability extends rpg_object {
     }
 
     // Define a static function for getting a preset core shield for the challenge
+    public static function get_static_attachment_token($ability_token, $attachment_token, $attachment_key){
+
+        // If an ability object or array was provided instead
+        if (is_object($ability_token) && isset($ability_token->ability_token)){ $ability_token = $ability_token->ability_token; }
+        elseif (is_array($ability_token) && isset($ability_token['ability_token'])){ $ability_token = $ability_token['ability_token']; }
+        elseif (empty($ability_token) || !is_string($ability_token)){ $ability_token = 'ability'; }
+
+        // If an attachment object or array was provided instead
+        if (is_object($attachment_token) && isset($attachment_token->attachment_token)){ $attachment_token = $attachment_token->attachment_token; }
+        elseif (is_array($attachment_token) && isset($attachment_token['attachment_token'])){ $attachment_token = $attachment_token['attachment_token']; }
+        elseif (empty($attachment_token) || !is_string($attachment_token)){ $ability_token = 'attachment'; }
+
+        // If the attachment key was not provided, just set it to zero
+        if (!is_numeric($attachment_key)){ $attachment_key = 0; }
+
+        // Generate and return the attachment token
+        $static_attachment_token = 'ability_'.$ability_token.'_'.$attachment_token.'_'.$attachment_key;
+        return $static_attachment_token;
+
+    }
+
+    // Define a static function for getting a preset core shield for the challenge
     public static function get_static_attachment($ability, $attachment_token){
 
         // Collect a quick ref to the current battle

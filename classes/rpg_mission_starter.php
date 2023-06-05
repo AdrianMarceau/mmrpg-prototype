@@ -6,7 +6,7 @@
 class rpg_mission_starter extends rpg_mission {
 
     // Define a function for generating the STARTER missions
-    public static function generate($this_prototype_data, $this_robot_token = 'met', $this_start_level = 1, $this_rescue_token = 'roll', $this_intro_field = ''){
+    public static function generate_intro($this_prototype_data, $this_robot_token = 'met', $this_start_level = 1, $this_rescue_token = 'roll', $this_intro_field = ''){
 
         // Pull in global variables for this function
         global $db;
@@ -160,6 +160,117 @@ class rpg_mission_starter extends rpg_mission {
                 // Nothing special the first time around
                 );
         }
+
+        // Return the generated omega battle data
+        return $temp_battle_omega;
+
+    }
+
+    // Define a function for generating the STARTER missions
+    public static function generate_midboss($this_prototype_data, $this_robot_token = 'sniper-joe', $this_start_level = 1, $this_rescue_token = 'roll', $this_intro_field = ''){
+
+        // Pull in global variables for this function
+        global $db;
+        global $this_omega_factors_one;
+        global $this_omega_factors_two;
+        global $this_omega_factors_three;
+        global $this_omega_factors_four;
+        global $this_omega_factors_five;
+        global $this_omega_factors_six;
+        global $this_omega_factors_seven;
+        global $this_omega_factors_eight;
+        global $this_omega_factors_eight_two;
+        global $this_omega_factors_nine;
+        global $this_omega_factors_ten;
+        global $this_omega_factors_eleven;
+
+        // Collect data on this robot and the rescue robot
+        $db_robot_fields = rpg_robot::get_index_fields(true);
+        $this_robot_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+        $this_robot_data = rpg_robot::parse_index_info($this_robot_index[$this_robot_token]);
+        $this_robot_name = $this_robot_data['robot_name'];
+        if (empty($this_intro_field)){ $this_intro_field = rpg_player::get_intro_field($this_prototype_data['this_player_token']); }
+        $intro_field_data = rpg_field::get_index_info($this_intro_field);
+        // Populate the battle options with the starter battle option
+        $temp_target_count = 1;
+        $temp_battle_token = $this_prototype_data['phase_battle_token'].'-'.$this_robot_token;
+        $temp_user_id = MMRPG_SETTINGS_TARGET_PLAYERID;
+        $temp_player_id = rpg_game::unique_player_id($temp_user_id, 0);
+        $temp_battle_omega = array();
+        $temp_battle_omega['battle_field_base']['field_id'] = 100;
+        $temp_battle_omega['battle_field_base']['field_token'] = $this_intro_field;
+        $temp_battle_omega['flags']['starter_battle'] = true;
+        $temp_battle_omega['battle_token'] = $temp_battle_token;
+        $temp_battle_omega['battle_size'] = '1x4';
+        $temp_battle_omega_complete = mmrpg_prototype_battle_complete($this_prototype_data['this_player_token'], $temp_battle_omega['battle_token']);
+        $temp_battle_omega['battle_level'] = $this_start_level;
+        $temp_battle_omega['battle_phase'] = $this_prototype_data['battle_phase'];
+        $temp_battle_omega['battle_name'] = 'Chapter One Midboss Battle';
+        $temp_battle_omega['battle_turns'] = (MMRPG_SETTINGS_BATTLETURNS_PERROBOT * $temp_target_count);
+        $temp_battle_omega['battle_zenny'] = ceil(($this_prototype_data['battles_complete'] > 1 ? MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL2 : MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL) * $temp_target_count * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER);
+        if ($temp_battle_omega_complete['battle_count'] > 0){ $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * (2 / (2 + $temp_battle_omega_complete['battle_count']))); }
+        //$temp_battle_omega['battle_field_base']['field_music'] = mmrpg_prototype_get_player_boss_music($this_prototype_data['this_player_token']);
+        $temp_battle_omega['battle_target_player']['user_id'] = $temp_user_id;
+        $temp_battle_omega['battle_target_player']['player_id'] = $temp_player_id;
+        $temp_battle_omega['battle_target_player']['player_token'] = 'player';
+        $temp_battle_omega['battle_target_player']['player_robots'] = array();
+        $temp_midboss_level = $this_start_level;
+        $temp_midboss_robot = array(
+            'robot_token' => $this_robot_token,
+            'robot_id' => rpg_game::unique_robot_id($temp_player_id, $this_robot_data['robot_id'], 0),
+            'robot_level' => $temp_midboss_level,
+            'robot_abilities' => !empty($this_robot_data['robot_rewards']['abilities']) ? array_map(function($a){ return $a['token']; }, $this_robot_data['robot_rewards']['abilities']) : array('buster-shot')
+            );
+        $temp_battle_omega['battle_target_player']['player_robots'][0] = $temp_midboss_robot;
+
+        // If the rescure robot has not yet been unlocked as a playable character, show it in the background
+        $rescue_robot_unlockable = false;
+        if (!mmrpg_prototype_robot_unlocked(false, $this_rescue_token)){
+
+            // Define the rescue robot's level and display properties depending on who it is
+            $rescue_robot_unlockable = true;
+            $rescue_robot_level = $temp_midboss_level;
+            $rescue_robot_frame = array(8,0,8,0,0);
+            $rescue_robot_position = array('x' => 354, 'y' => 118, 'direction' => 'left');
+            if ($this_rescue_token === 'roll'){
+                $rescue_robot_level += 0;
+                $rescue_robot_frame = array(0,5,0,5,0,8,0,10,0,10,0,8);
+                $rescue_robot_position = array('x' => 520, 'y' => 128, 'direction' => 'left');
+            }
+            elseif ($this_rescue_token === 'disco'){
+                $rescue_robot_level += 10;
+                $rescue_robot_frame = array(0,1,2,1,2,10);
+                $rescue_robot_position = array('x' => 180, 'y' => 140, 'direction' => 'left');
+            }
+            elseif ($this_rescue_token === 'rhythm'){
+                $rescue_robot_level += 20;
+                $rescue_robot_frame = array(0,6,2,6,2,10);
+                $rescue_robot_position = array('x' => 112, 'y' => 168, 'direction' => 'left');
+            }
+
+            // Add the rescue robot to the background with animation
+            if (empty($temp_battle_omega['battle_field_base']['field_foreground_attachments']) && !empty($intro_field_data['field_foreground_attachments'])){ $temp_battle_omega['battle_field_base']['field_foreground_attachments'] = $intro_field_data['field_foreground_attachments']; }
+            $temp_battle_omega['battle_field_base']['field_foreground_attachments']['robot_'.$this_rescue_token.'-01'] = array('class' => 'robot', 'size' => 40, 'offset_x' => $rescue_robot_position['x'], 'offset_y' => $rescue_robot_position['y'], 'offset_z' => 2, 'robot_token' => $this_rescue_token, 'robot_frame' => $rescue_robot_frame, 'robot_direction' => $rescue_robot_position['direction']);
+
+            // Add the rescue robot to the list of unlockables
+            $temp_battle_omega['battle_rewards']['robots'] = array();
+            $temp_battle_omega['battle_rewards']['robots'][] = array('token' => $this_rescue_token, 'level' => $rescue_robot_level, 'experience' => 999);
+
+        }
+
+        // Update the description text for the battle
+        $temp_battle_omega['battle_description'] = 'Defeat the '.$this_robot_name.' guarding the '.explode(' ', strtolower($intro_field_data['field_name']))[1].'\'s entrance!';
+
+        // If the rescue robot is here, add some ambiguous text to the description
+        if ($rescue_robot_unlockable){
+            //$temp_battle_omega['battle_description'] = str_replace('!', ' and rescue the support robot that\'s appeared on the field!', $temp_battle_omega['battle_description']);
+            $temp_battle_omega['battle_description2'] = ' Wait a minute... who\'s that in the background?';
+        }
+
+        // Add some random item drops to the midboss battle
+        $temp_battle_omega['battle_rewards']['items'] = array(
+            // Nothing special to drop FOR NOW
+            );
 
         // Return the generated omega battle data
         return $temp_battle_omega;

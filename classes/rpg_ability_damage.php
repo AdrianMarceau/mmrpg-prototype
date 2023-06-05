@@ -86,11 +86,24 @@ class rpg_ability_damage extends rpg_damage {
         $event_options['this_ability'] = $this_ability;
         $event_options['this_ability_results'] = array();
 
+        // Apply appropriate camera action flags to the event options
+        rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $this_ability, 'damage');
+
         // Set the camera options for this target event
+        /*
         $event_options['event_flag_camera_reaction'] = true;
         $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
         $event_options['event_flag_camera_focus'] = $this_robot->robot_position;
         $event_options['event_flag_camera_depth'] = $this_robot->robot_key;
+        $kickback_shift_threshold = 20;
+        if (!empty($this_ability->damage_options['damage_kickback']['x'])
+            && $this_ability->damage_options['damage_kickback']['x'] != 0
+            && abs($this_ability->damage_options['damage_kickback']['x']) >= $kickback_shift_threshold){
+            error_log('damage_kickback_x for '.$this_ability->ability_token.' = '.$this_ability->damage_options['damage_kickback']['x']);
+            $event_options['event_flag_camera_offset'] = 1 * round(($this_ability->damage_options['damage_kickback']['x'] / $kickback_shift_threshold), 1);
+            error_log('event_flag_camera_offset = '.$event_options['event_flag_camera_offset']);
+        }
+        */
 
         // Create an options object for this function and populate
         $options = rpg_game::new_options_object();

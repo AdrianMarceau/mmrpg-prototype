@@ -66,11 +66,8 @@ class rpg_item_recovery extends rpg_recovery {
         $event_options['this_other_item'] = $this_item;
         $event_options['this_item_results'] = array();
 
-        // Set the camera options for this target event
-        $event_options['event_flag_camera_reaction'] = true;
-        $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
-        $event_options['event_flag_camera_focus'] = $this_robot->robot_position;
-        $event_options['event_flag_camera_depth'] = $this_robot->robot_key;
+        // Apply appropriate camera action flags to the event options
+        rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $this_item, 'recovery');
 
         // Create an options object for this function and populate
         $options = rpg_game::new_options_object();
