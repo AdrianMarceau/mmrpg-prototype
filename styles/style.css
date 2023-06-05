@@ -1480,6 +1480,7 @@ body.index #header {
     margin: 0 1px !important;
 }
 
+#mmrpg .canvas_battle_results,
 #mmrpg .canvas_ability_details,
 #mmrpg .canvas_item_details {
     position: absolute;
@@ -1499,6 +1500,7 @@ body.index #header {
     text-overflow: ellipsis;
     z-index: 5100;
 }
+#canvas .canvas_battle_results .results_icon,
 #canvas .canvas_ability_details .ability_icon,
 #canvas .canvas_item_details .item_icon {
     top: 5px;
@@ -1511,11 +1513,13 @@ body.index #header {
     -webkit-border-radius: 5px 0 0 5px;
     background: #000000 none scroll no-repeat -5px -5px;
 }
+#canvas .canvas_battle_results .results_icon + .results_icon,
 #canvas .canvas_ability_details .ability_icon + .ability_icon,
 #canvas .canvas_item_details .item_icon + .item_icon {
     border-color: transparent;
     background-color: transparent;
 }
+#canvas .canvas_battle_results .results_icon_right,
 #canvas .canvas_ability_details .ability_icon_right,
 #canvas .canvas_item_details .item_icon_right {
     left: auto;
@@ -1524,6 +1528,7 @@ body.index #header {
     -moz-border-radius: 0 5px 5px 0;
     -webkit-border-radius: 0 5px 5px 0;
 }
+#canvas .canvas_battle_results .results_name,
 #canvas .canvas_ability_details .ability_name,
 #canvas .canvas_item_details .item_name,
 #canvas .canvas_item_details .skill_name {
@@ -2185,40 +2190,74 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 
 :root {
     --camera-shift-transition-duration: 0.250s;
+    --camera-shift-transition-timing: ease;
     --camera-shift-depth-mod: 1;
+    --camera-shift-depth-mod2: 1.8;
+    --camera-shift-zoom-perspective: 248px;
 }
 #canvas [data-camera-shift] .event .background_canvas,
 #canvas [data-camera-shift] .event .background_event,
 #canvas [data-camera-shift] .event .foreground_canvas,
 #canvas [data-camera-shift] .event .foreground_event,
 #canvas [data-camera-shift] .event .battle_scene {
-    transform: translate(0, 0) scale(1.0);
+    transform: translate(0) scale(1);
     filter: blur(0) brightness(1);
     transition: 0.250s;
 }
+#canvas [data-camera-shift] .event .foreground_canvas {
+    transform-style: preserve-3d;
+    transform:
+        perspective(var(--camera-shift-zoom-perspective))
+        translate(0)
+        scale(1)
+        skew(0)
+        rotate(0)
+        ;
+}
+#canvas [data-camera-shift] .canvas_battle_results,
 #canvas [data-camera-shift] .canvas_ability_details,
 #canvas [data-camera-shift] .canvas_item_details,
 #canvas [data-camera-shift] .canvas_skill_details {
     transform: translate(0, 0);
     transition: none;
+    z-index: 5000;
 }
 #canvas [data-camera-shift] .event .background_canvas {
-    transition: calc(var(--camera-shift-transition-duration) * 1.20);
+    transition:
+        calc(var(--camera-shift-transition-duration) * 1.20)
+        var(--camera-shift-transition-timing)
+        ;
 }
 #canvas [data-camera-shift] .event .background_event {
-    transition: calc(var(--camera-shift-transition-duration) * 1.15);
+    transition:
+        calc(var(--camera-shift-transition-duration) * 1.15)
+        var(--camera-shift-transition-timing)
+        ;
 }
 #canvas [data-camera-shift] .event .foreground_canvas {
-    transition: calc(var(--camera-shift-transition-duration) * 1.05);
+    transition:
+        calc(var(--camera-shift-transition-duration) * 1.05)
+        var(--camera-shift-transition-timing)
+        ;
 }
 #canvas [data-camera-shift] .event .foreground_event.foreground_subevent {
-    transition: calc(var(--camera-shift-transition-duration) * 1.025);
+    transition:
+        calc(var(--camera-shift-transition-duration) * 1.025)
+        var(--camera-shift-transition-timing)
+        ;
 }
+#canvas [data-camera-shift] .canvas_battle_results,
 #canvas [data-camera-shift] .event:first-child .battle_scene {
-    transition: calc(var(--camera-shift-transition-duration) * 1.00);
+    transition:
+        calc(var(--camera-shift-transition-duration) * 1.05)
+        var(--camera-shift-transition-timing)
+        ;
 }
 #canvas [data-camera-shift] .event .foreground_event {
-    transition: calc(var(--camera-shift-transition-duration) * 0.95);
+    transition:
+        calc(var(--camera-shift-transition-duration) * 0.95)
+        var(--camera-shift-transition-timing)
+        ;
 }
 
 #canvas [data-camera-shift="left"] .event .background_canvas,
@@ -2237,35 +2276,70 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #canvas [data-camera-shift="left"] .event .background_canvas,
 #canvas [data-camera-shift="left"] .event .background_event {
     transform: translate(-4%, 0) scale(1.2);
+    transform:
+        translate(calc(-4% * var(--camera-shift-depth-mod2)), 0)
+        scale(1.2)
+        ;
 }
 #canvas [data-camera-shift="left"] .event .foreground_canvas,
 #canvas [data-camera-shift="left"] .event .foreground_event {
     transform: translate(8%, -5%) scale(1.3);
+    transform: translate(calc(8% * var(--camera-shift-depth-mod2)), -5%) scale(1.3);
+}
+#canvas [data-camera-shift="left"] .event .foreground_canvas {
+    transform:
+        perspective(var(--camera-shift-zoom-perspective))
+        translate(calc(8% * var(--camera-shift-depth-mod2)), -5%)
+        scale(1.3)
+        skew(calc(8deg * var(--camera-shift-depth-mod)))
+        rotateX(10deg)
+        ;
+}
+#canvas [data-camera-shift="left"] .event .foreground_event {
+    transform: translate(8%, -5%) scale(1.3);
+    transform: translate(calc(8% * var(--camera-shift-depth-mod2)), -5%) scale(1.3);
 }
 #canvas [data-camera-shift="left"] .event .battle_scene {
     transform: translate(10%, -10%) scale(1.4);
+    transform: translate(calc(10% * var(--camera-shift-depth-mod2)), -10%) scale(1.4);
 }
+#canvas [data-camera-shift="left"] .canvas_battle_results,
 #canvas [data-camera-shift="left"] .canvas_ability_details,
 #canvas [data-camera-shift="left"] .canvas_item_details,
 #canvas [data-camera-shift="left"] .canvas_skill_details {
     transform: translate(-24%, 78%);
+    transform: translate(calc(-24% * var(--camera-shift-depth-mod2)), 78%);
 }
 
 #canvas [data-camera-shift="right"] .event .background_canvas,
 #canvas [data-camera-shift="right"] .event .background_event {
     transform: translate(4%, 0) scale(1.2);
+    transform: translate(calc(4% * var(--camera-shift-depth-mod2)), 0) scale(1.2);
 }
 #canvas [data-camera-shift="right"] .event .foreground_canvas,
 #canvas [data-camera-shift="right"] .event .foreground_event {
     transform: translate(-8%, -5%) scale(1.3);
+    transform: translate(calc(-8% * var(--camera-shift-depth-mod2)), -5%) scale(1.3);
+}
+#canvas [data-camera-shift="right"] .event .foreground_canvas {
+    transform:
+        perspective(var(--camera-shift-zoom-perspective))
+        translate(calc(-8% * var(--camera-shift-depth-mod2)), -5%)
+        scale(1.3)
+        skew(calc(-8deg * var(--camera-shift-depth-mod)))
+        rotateX(10deg)
+        ;
 }
 #canvas [data-camera-shift="right"] .event .battle_scene {
     transform: translate(-10%, -10%) scale(1.4);
+    transform: translate(calc(-10% * var(--camera-shift-depth-mod2)), -10%) scale(1.4);
 }
+#canvas [data-camera-shift="right"] .canvas_battle_results,
 #canvas [data-camera-shift="right"] .canvas_ability_details,
 #canvas [data-camera-shift="right"] .canvas_item_details,
 #canvas [data-camera-shift="right"] .canvas_skill_details {
     transform: translate(14.5%, 78%);
+    transform: translate(calc(14.5% * var(--camera-shift-depth-mod2)), 78%);
 }
 
 #canvas [data-camera-shift="left"][data-camera-focus="bench"] .event .background_canvas,
@@ -2278,10 +2352,20 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     transform: translate(14%, -5%) scale(1.3);
     transform: translate(calc(14% * var(--camera-shift-depth-mod)), -5%) scale(1.3);
 }
+#canvas [data-camera-shift="left"][data-camera-focus="bench"] .event .foreground_canvas {
+    transform:
+        perspective(var(--camera-shift-zoom-perspective))
+        translate(calc(14% * var(--camera-shift-depth-mod)), -5%)
+        scale(1.3)
+        skew(calc(14deg * var(--camera-shift-depth-mod)))
+        rotateX(10deg)
+        ;
+}
 #canvas [data-camera-shift="left"][data-camera-focus="bench"] .event .battle_scene {
     transform: translate(20%, -10%) scale(1.4);
     transform: translate(calc(20% * var(--camera-shift-depth-mod)), -10%) scale(1.4);
 }
+#canvas [data-camera-shift="left"][data-camera-focus="bench"] .canvas_battle_results,
 #canvas [data-camera-shift="left"][data-camera-focus="bench"] .canvas_ability_details,
 #canvas [data-camera-shift="left"][data-camera-focus="bench"] .canvas_item_details,
 #canvas [data-camera-shift="left"][data-camera-focus="bench"] .canvas_skill_details {
@@ -2299,10 +2383,20 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     transform: translate(-14%, -5%) scale(1.3);
     transform: translate(calc(-14% * var(--camera-shift-depth-mod)), -5%) scale(1.3);
 }
+#canvas [data-camera-shift="right"][data-camera-focus="bench"] .event .foreground_canvas {
+    transform:
+        perspective(var(--camera-shift-zoom-perspective))
+        translate(calc(-14% * var(--camera-shift-depth-mod)), -5%)
+        scale(1.3)
+        skew(calc(-14deg * var(--camera-shift-depth-mod)))
+        rotateX(10deg)
+        ;
+}
 #canvas [data-camera-shift="right"][data-camera-focus="bench"] .event .battle_scene {
     transform: translate(-20%, -10%) scale(1.4);
     transform: translate(calc(-20% * var(--camera-shift-depth-mod)), -10%) scale(1.4);
 }
+#canvas [data-camera-shift="right"][data-camera-focus="bench"] .canvas_battle_results,
 #canvas [data-camera-shift="right"][data-camera-focus="bench"] .canvas_ability_details,
 #canvas [data-camera-shift="right"][data-camera-focus="bench"] .canvas_item_details,
 #canvas [data-camera-shift="right"][data-camera-focus="bench"] .canvas_skill_details {

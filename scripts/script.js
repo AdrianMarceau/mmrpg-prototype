@@ -30,6 +30,7 @@ gameSettings.eventCameraShift = true; // whether or not to canvas events have ca
 gameSettings.spriteRenderMode = 'default'; // the render mode we should be using for sprites
 gameSettings.idleAnimation = true; // default to allow idle animations
 gameSettings.indexLoaded = false; // default to false until the index is loaded
+gameSettings.currentActionPanel = 'loading'; // default to loading until changed elsewhere
 gameSettings.autoScrollTop = false; // default to true to prevent too much scrolling
 gameSettings.autoResizeWidth = true; // allow auto reszing of the game window width
 gameSettings.autoResizeHeight = true; // allow auto reszing of the game window height
@@ -306,23 +307,6 @@ $(document).ready(function(){
         }
 
         // Define a change event for whenever this game setting is altered
-        var updateCameraShift = function(newValue){
-            //console.log('updateCameraShift() to ', newValue);
-            // Update the camera shift transition for zooms and pans
-            var cssVarName = '--camera-shift-transition-duration';
-            var cssVarValue = (function(){
-                var duration = Math.ceil(newValue / 2);
-                if (!gameSettings.eventCrossFade){ duration = 0; }
-                else if (!gameSettings.eventCameraShift){ duration = 0; }
-                else if (gameSettings.eventTimeout <= gameSettings.eventTimeoutThreshold){ duration = 0; }
-                return duration > 0 ? (duration / 1000)+'s' : 'none';
-                })();
-            //console.log('cssVarName =', cssVarName, '; cssVarValue =', cssVarValue);
-            var root = document.documentElement;
-            root.style.setProperty(cssVarName, cssVarValue);
-            };
-
-        // Define a change event for whenever this game setting is altered
         gameSettingsChangeEvents['spriteRenderMode'] = function(newValue){
             //console.log('setting data-render-mode to ', newValue);
             mmrpgBody.attr('data-render-mode', newValue);
@@ -334,14 +318,14 @@ $(document).ready(function(){
         // Define a change event for whenever this game setting is altered
         gameSettingsChangeEvents['eventTimeout'] = function(newValue){
             //console.log('setting eventTimeout to ', newValue);
-            updateCameraShift(newValue);
+            updateCameraShiftTransitionDuration();
             };
         gameSettingsChangeEvents['eventTimeout'](gameSettings.eventTimeout);
 
         // Define a change event for whenever this game setting is altered
         gameSettingsChangeEvents['eventCrossFade'] = function(newValue){
             //console.log('setting eventCrossFade to ', newValue, ' w/ timeout at ', gameSettings.eventTimeout);
-            updateCameraShift(gameSettings.eventTimeout);
+            updateCameraShiftTransitionDuration();
             };
         gameSettingsChangeEvents['eventCrossFade'](gameSettings.eventCrossFade);
 
@@ -363,6 +347,7 @@ $(document).ready(function(){
             //console.log('gameEngine.submit() triggered, setting timeout');
             clearTimeout(gameEngineSubmitTimeout);
             gameEngineSubmitTimeout = false;
+            canvasAnimationCameraTimer = 0;
             requestAnimationFrame(function(){
                 gameEngineSubmitTimeout = setTimeout(gameEngineSubmitFunction, 120000);
                 });
@@ -794,11 +779,16 @@ function localFunction(myMessage){
     alert(myMessage);
 }
 
-// Define a function for randomly animating canvas robots
+// Define a function for randomly animating canvas robots (idle animation, background animation, more)
 var backgroundDirection = 'left';
 var canvasAnimationTimeout = false;
+var canvasAnimationCameraShift = false;
+var canvasAnimationCameraTimer = 0;
+var canvasAnimationCameraDelay = 10;
 function mmrpg_canvas_animate(){
     //console.log('mmrpg_canvas_animate();');
+    //console.log('gameSettings.idleAnimation:', gameSettings.idleAnimation);
+    //console.log('gameSettings.idleAnimation:', gameSettings.idleAnimation);
     //clearTimeout(canvasAnimationTimeout);
     clearInterval(canvasAnimationTimeout);
     if (!gameSettings.idleAnimation){  return false; }
@@ -806,6 +796,68 @@ function mmrpg_canvas_animate(){
     // Collect the current battle status and result
     var battleStatus = $('input[name=this_battle_status]', gameEngine).val();
     var battleResult = $('input[name=this_battle_result]', gameEngine).val();
+
+    // If the camera is not yet shifted, checked to see if we randomly should
+    //console.log({eventCameraShift:gameSettings.eventCameraShift,currentActionPanel:gameSettings.currentActionPanel,mmrpgEventsLength:mmrpgEvents.length});
+    if (gameSettings.eventCameraShift
+        && gameSettings.currentActionPanel !== 'loading'
+        && !mmrpgEvents.length){
+
+        // Increment the camera shift timer and, when ready, trigger some motion
+        //console.log('canvasAnimationCameraTimer = ', canvasAnimationCameraTimer);
+        var canvasAnimationCameraTimerMax = canvasAnimationCameraDelay;
+        if (battleStatus == 'complete'){ canvasAnimationCameraTimerMax = Math.ceil(canvasAnimationCameraTimerMax / 2); }
+        if (!canvasAnimationCameraShift
+            && canvasAnimationCameraTimer >= canvasAnimationCameraTimerMax){
+            var shiftRandom = Math.floor(Math.random() * 100);
+            if (shiftRandom <= 33){
+                var focusRandom = Math.floor(Math.random() * 100);
+                var depthRandom = Math.floor(Math.random() * 100);
+                canvasAnimationCameraShift = {
+                    shift: (shiftRandom % 2 === 0 ? 'left' : 'right'),
+                    focus: (focusRandom % 3 === 0 ? 'bench' : 'active'),
+                    depth: (depthRandom % 2 === 0 ? 0 : 8),
+                    depthInc: (depthRandom % 2 === 0 ? 1 : -1),
+                    offset: 0,
+                    };
+                if (battleStatus == 'complete'){
+                    if (battleResult == 'victory'){ canvasAnimationCameraShift.shift = 'left'; }
+                    else if (battleResult == 'defeat'){ canvasAnimationCameraShift.shift = 'right'; }
+                    }
+                canvasAnimationCameraTimer = 0;
+                //console.log('canvasAnimationCameraShift:', canvasAnimationCameraShift);
+                }
+            }
+
+        // If the camera is currently being shifted, we need to animate that
+        if (canvasAnimationCameraShift){
+            canvasAnimationCameraShift.depth += canvasAnimationCameraShift.depthInc;
+            if (canvasAnimationCameraShift.depth > 8
+                || canvasAnimationCameraShift.depth < 1){
+                canvasAnimationCameraShift = false;
+                updateCameraShiftTransitionTiming();
+                updateCameraShiftTransitionDuration();
+                mmrpg_canvas_camera_shift();
+                } else {
+                mmrpg_canvas_camera_shift(
+                    canvasAnimationCameraShift.shift,
+                    canvasAnimationCameraShift.focus,
+                    canvasAnimationCameraShift.depth,
+                    canvasAnimationCameraShift.offset
+                    );
+                updateCameraShiftTransitionTiming('linear');
+                updateCameraShiftTransitionDuration(1);
+                }
+            } else {
+            canvasAnimationCameraTimer++;
+            }
+
+        } else {
+
+        // We should not be animating now
+        canvasAnimationCameraShift = false;
+
+        }
 
     // Loop through all field layers on the canvas
     $('.background[data-animate],.foreground[data-animate]', gameCanvas).each(function(){
@@ -1476,6 +1528,9 @@ function mmrpg_engine_update(newValues){
 // Define a function for switching to a different action panel
 function mmrpg_action_panel(thisPanel, currentPanel){
 
+    // Update the current panel in the game settings for reference
+    gameSettings.currentActionPanel = thisPanel;
+
     // Switch to the event actions panel
     $('.wrapper', gameActions).css({display:'none'});
     var newWrapper = $('#actions_'+thisPanel, gameActions);
@@ -1572,6 +1627,7 @@ String.prototype.replaceAll = function(search, replace) {
 var actionPanelCache = [];
 function mmrpg_action_panel_update(thisPanel, thisMarkup){
     // Update the requested panel with the supplied markup
+    //console.log('mmrpg_action_panel_update('+thisPanel+', [thisMarkup])');
     var thisActionPanel = $('#actions_'+thisPanel, gameActions);
     thisActionPanel.empty().html(thisMarkup);
     // Search for any sprites in this panel's markup
@@ -1624,6 +1680,9 @@ function mmrpg_events(){
     //console.log('mmrpg_events()');
     //clearTimeout(canvasAnimationTimeout);
     clearInterval(canvasAnimationTimeout);
+    canvasAnimationCameraTimer = 0;
+    updateCameraShiftTransitionTiming();
+    updateCameraShiftTransitionDuration();
 
     var thisEvent = false;
     if (mmrpgEvents.length){
@@ -1682,10 +1741,12 @@ function mmrpg_events(){
             // Play the victory music
             //console.log('mmrpg_events() / Play the victory music');
             parent.mmrpg_music_load('misc/battle-victory', false, true);
+            canvasAnimationCameraTimer = canvasAnimationCameraDelay - 1;
             } else if (battleResult == 'defeat' && thisEvent.event_flags.defeat != undefined && thisEvent.event_flags.defeat != false){
             // Play the failure music
             //console.log('mmrpg_events() / Play the failure music');
             parent.mmrpg_music_load('misc/battle-defeat', false, true);
+            canvasAnimationCameraTimer = canvasAnimationCameraDelay - 1;
             }
         }
 
@@ -1705,58 +1766,42 @@ function mmrpg_canvas_event(thisMarkup, eventFlags){ //, flagsMarkup
         var thisEvent = $('<div class="event event_frame clearback">'+thisMarkup+'</div>');
         thisEvent.css({opacity:0.0,zIndex:600});
         thisContext.prepend(thisEvent);
+
         // Wait for all the event's assets to finish loading
         thisEvent.waitForImages(function(){
 
             // Find all the details in this event markup and move them to the sticky
             $(this).find('.details').addClass('hidden').css({opacity:0}).appendTo('.event_details', gameCanvas);
 
-            // If this event has any camera action going on, make sure we update the canvas
-            var currentShift = thisContext.attr('data-camera-shift') || '';
-            var currentFocus = thisContext.attr('data-camera-focus') || '';
-            var currentDepth = thisContext.attr('data-camera-depth') || '';
-            var newCameraShift = '';
-            var newCameraFocus = '';
-            var newCameraDepth = '';
-            if (gameSettings.eventCameraShift
-                && typeof eventFlags.camera !== 'undefined'
-                && eventFlags.camera !== false){
-                //console.log('we have camera action!', eventFlags.camera);
-                newCameraShift = eventFlags.camera.side;
-                newCameraFocus = eventFlags.camera.focus;
-                newCameraDepth = eventFlags.camera.depth;
-                //if (eventFlags.camera.action === true){ var shiftSide = eventFlags.camera.side; }
-                //else if (eventFlags.camera.reaction === true){ var shiftSide = eventFlags.camera.side !== 'left' ? 'left' : 'right'; }
-                //thisContext.attr('data-camera-shift', shiftSide);
+            // If camera shift settings are enabled, we can process them
+            if (gameSettings.eventCameraShift){
+                // If this event has any camera action going on, make sure we update the canvas
+                var currentShift = thisContext.attr('data-camera-shift') || '';
+                var currentFocus = thisContext.attr('data-camera-focus') || '';
+                var currentDepth = thisContext.attr('data-camera-depth') || '';
+                var currentOffset = thisContext.attr('data-camera-offset') || '';
+                var newCameraShift = '';
+                var newCameraFocus = '';
+                var newCameraDepth = 0;
+                var newCameraOffset = 0;
+                // Check to see if camera shift settings were provided in the frame
+                if (gameSettings.eventCameraShift
+                    && typeof eventFlags.camera !== 'undefined'
+                    && eventFlags.camera !== false){
+                    //console.log('we have camera action!', eventFlags.camera);
+                    newCameraShift = eventFlags.camera.side;
+                    newCameraFocus = eventFlags.camera.focus;
+                    newCameraDepth = eventFlags.camera.depth;
+                    newCameraOffset = eventFlags.camera.offset;
+                }
+                // If any of the shift values have changed, we need to update everything
+                if (currentShift !== newCameraShift
+                    || currentFocus !== newCameraFocus
+                    || currentDepth !== newCameraDepth
+                    || newCameraOffset !== newCameraOffset){
+                    mmrpg_canvas_camera_shift(newCameraShift, newCameraFocus, newCameraDepth, newCameraOffset);
+                }
             }
-            if (currentShift !== newCameraShift
-                || currentFocus !== newCameraFocus
-                || currentDepth !== newCameraDepth){
-                thisContext.attr('data-camera-shift', newCameraShift);
-                thisContext.attr('data-camera-focus', newCameraFocus);
-                thisContext.attr('data-camera-depth', newCameraDepth);
-                var cssVarName = '--camera-shift-depth-mod';
-                var cssVarValue = newCameraDepth > 0 ? 1 - ((newCameraDepth - 1) * 0.1) : 1;
-                //console.log('cssVarName =', cssVarName, '; cssVarValue =', cssVarValue);
-                document.documentElement.style.setProperty(cssVarName, cssVarValue);
-            }
-
-        // Define a change event for whenever this game setting is altered
-        var updateCameraShift = function(newValue){
-            //console.log('updateCameraShift() to ', newValue);
-            // Update the camera shift transition for zooms and pans
-            var cssVarName = '--camera-shift-transition-duration';
-            var cssVarValue = (function(){
-                var duration = Math.ceil(newValue / 2);
-                if (!gameSettings.eventCrossFade){ duration = 0; }
-                else if (!gameSettings.eventCameraShift){ duration = 0; }
-                else if (gameSettings.eventTimeout <= gameSettings.eventTimeoutThreshold){ duration = 0; }
-                return duration > 0 ? (duration / 1000)+'s' : 'none';
-                })();
-            //console.log('cssVarName =', cssVarName, '; cssVarValue =', cssVarValue);
-            var root = document.documentElement;
-            root.style.setProperty(cssVarName, cssVarValue);
-            };
 
             // If we're allowed to cross-fade transition the normal way, otherwise straight-up replace the event
             if (gameSettings.eventCrossFade === true){
@@ -1848,6 +1893,99 @@ function mmrpg_canvas_update(thisBattle, thisPlayer, thisRobot, targetPlayer, ta
         }
 }
 
+
+// Define a change event for whenever this game setting is altered
+gameSettings.currentCameraShift = {shift:'',focus:'',depth:'',offset:''};
+function mmrpg_canvas_camera_shift(newCameraShift, newCameraFocus, newCameraDepth, newCameraOffset){
+    //console.log('mmrpg_canvas_camera_shift() w/ ', newCameraShift, newCameraFocus, newCameraDepth, newCameraOffset);
+
+    if (typeof newCameraShift === 'undefined' || !newCameraShift){ newCameraShift = ''; }
+    if (typeof newCameraFocus === 'undefined' || !newCameraFocus){ newCameraFocus = ''; }
+    if (typeof newCameraDepth === 'undefined' || !newCameraDepth){ newCameraDepth = 0; }
+    if (typeof newCameraOffset === 'undefined' || !newCameraOffset){ newCameraOffset = 0; }
+    //console.log('mmrpg_canvas_camera_shift() w/ ', newCameraShift, newCameraFocus, newCameraDepth, newCameraOffset);
+
+    // Collect the canvas context and immediately return false if not exists
+    var thisContext = $('.wrapper', gameCanvas);
+    if (!thisContext.length){ return false; }
+
+    // Collect current shift values for reference and updating
+    var currentCameraShift = gameSettings.currentCameraShift;
+    //console.log('currentCameraShift:', currentCameraShift);
+
+    // If the values haven't changed at all, we should just return
+    if (currentCameraShift.shift === newCameraShift
+        && currentCameraShift.focus === newCameraFocus
+        && currentCameraShift.depth === newCameraDepth
+        && currentCameraShift.offset === newCameraOffset){
+        return;
+    }
+
+    // Update the data attributes on the canvas wrapper
+    currentCameraShift.shift = newCameraShift;
+    currentCameraShift.focus = newCameraFocus;
+    currentCameraShift.depth = newCameraDepth;
+    currentCameraShift.offset = newCameraOffset;
+    thisContext.attr('data-camera-shift', newCameraShift);
+    thisContext.attr('data-camera-focus', newCameraFocus);
+    thisContext.attr('data-camera-depth', newCameraDepth);
+    thisContext.attr('data-camera-offset', newCameraOffset);
+    var offsetCameraDepth = newCameraDepth + newCameraOffset;
+    if (offsetCameraDepth < -8){ offsetCameraDepth - -8; }
+    else if (offsetCameraDepth > 8){ offsetCameraDepth = 8; }
+
+    // This first value is used for camera shifts on the bench
+    if (offsetCameraDepth !== 0){
+        var diffValue = ((Math.abs(offsetCameraDepth) - 1) * 0.1);
+        var depthModValue = 1 - diffValue;
+        if (offsetCameraDepth < 0){ depthModValue = depthModValue * -1; }
+        updateCameraShiftVariable('depth-mod', depthModValue);
+    }
+
+    // This second value is used for camera shifts in the foreground
+    if (offsetCameraDepth !== 0){
+        var diffValue = ((Math.abs(offsetCameraDepth) - 1) * 0.1);
+        var depthMod2Value = 1.8 - diffValue;
+        if (offsetCameraDepth < 0){ depthMod2Value = depthMod2Value * -1; }
+        updateCameraShiftVariable('depth-mod2', depthMod2Value);
+    }
+
+}
+
+// Define a function for easily updating camera-related CSS variables on the canvas
+function updateCameraShiftVariable(varName, varValue){
+    //console.log('updateCameraShiftVariable((varName:', varName, ', varValue:', varValue, ')');
+    var cssVarName = '--camera-shift-'+varName;
+    var cssVarValue = varValue;
+    //console.log('setting '+cssVarName+' to:', cssVarValue);
+    document.documentElement.style.setProperty(cssVarName, cssVarValue);
+}
+
+// Define a quick function for updating the camera shift transition timing variable
+function updateCameraShiftTransitionTiming(newValue){
+    //console.log('updateCameraShiftTransitionTiming(', newValue, ')');
+    if (typeof newValue !== 'string' || !newValue){ newValue = 'ease'; }
+    var transitionTimingValue = newValue;
+    updateCameraShiftVariable('transition-timing', transitionTimingValue);
+};
+
+// Define a quick function for updating the camera shift transition duration variable
+function updateCameraShiftTransitionDuration(newValue){
+    //console.log('updateCameraShiftTransitionDuration(', typeof newValue, newValue, ')');
+    if (typeof newValue !== 'number'){ newValue = 0.5; }
+    var transitionDurationValue = (function(modValue){
+        //console.log('transitionDurationValue(', modValue, ')');
+        if (typeof modValue !== 'number'){ modValue = 1; }
+        var duration = Math.ceil(gameSettings.eventTimeout * modValue);
+        if (!gameSettings.eventCrossFade){ duration = 0; }
+        else if (!gameSettings.eventCameraShift){ duration = 0; }
+        else if (gameSettings.eventTimeout <= gameSettings.eventTimeoutThreshold){ duration = 0; }
+        var cssValue = duration > 0 ? (duration / 1000)+'s' : 'none';
+        //console.log('duration:', duration, 'cssValue:', cssValue);
+        return cssValue;
+        })(newValue);
+    updateCameraShiftVariable('transition-duration', transitionDurationValue);
+};
 
 // Define a function for appending a event to the console window
 function mmrpg_console_event(thisMarkup, eventFlags){ //, flagsMarkup
