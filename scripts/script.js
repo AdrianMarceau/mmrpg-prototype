@@ -783,8 +783,9 @@ function localFunction(myMessage){
 var backgroundDirection = 'left';
 var canvasAnimationTimeout = false;
 var canvasAnimationCameraShift = false;
+var canvasAnimationCameraLastShift = false;
 var canvasAnimationCameraTimer = 0;
-var canvasAnimationCameraDelay = 10;
+var canvasAnimationCameraDelay = 6;
 function mmrpg_canvas_animate(){
     //console.log('mmrpg_canvas_animate();');
     //console.log('gameSettings.idleAnimation:', gameSettings.idleAnimation);
@@ -811,10 +812,13 @@ function mmrpg_canvas_animate(){
             && canvasAnimationCameraTimer >= canvasAnimationCameraTimerMax){
             var shiftRandom = Math.floor(Math.random() * 100);
             if (shiftRandom <= 33){
+                var lastShift = canvasAnimationCameraLastShift;
+                if (typeof lastShift.shift !== 'undefined'){ var shiftDirection = lastShift.shift !== 'left' ? 'left' : 'right'; }
+                else { var shiftDirection = (shiftRandom % 2 === 0 ? 'left' : 'right'); }
                 var focusRandom = Math.floor(Math.random() * 100);
                 var depthRandom = Math.floor(Math.random() * 100);
                 canvasAnimationCameraShift = {
-                    shift: (shiftRandom % 2 === 0 ? 'left' : 'right'),
+                    shift: shiftDirection,
                     focus: (focusRandom % 3 === 0 ? 'bench' : 'active'),
                     depth: (depthRandom % 2 === 0 ? 0 : 8),
                     depthInc: (depthRandom % 2 === 0 ? 1 : -1),
@@ -825,6 +829,7 @@ function mmrpg_canvas_animate(){
                     else if (battleResult == 'defeat'){ canvasAnimationCameraShift.shift = 'right'; }
                     }
                 canvasAnimationCameraTimer = 0;
+                canvasAnimationCameraLastShift = canvasAnimationCameraShift;
                 //console.log('canvasAnimationCameraShift:', canvasAnimationCameraShift);
                 }
             }
@@ -1741,12 +1746,12 @@ function mmrpg_events(){
             // Play the victory music
             //console.log('mmrpg_events() / Play the victory music');
             parent.mmrpg_music_load('misc/battle-victory', false, true);
-            canvasAnimationCameraTimer = canvasAnimationCameraDelay - 1;
+            if (mmrpgEvents.length < canvasAnimationCameraDelay){ canvasAnimationCameraTimer = mmrpgEvents.length; }
             } else if (battleResult == 'defeat' && thisEvent.event_flags.defeat != undefined && thisEvent.event_flags.defeat != false){
             // Play the failure music
             //console.log('mmrpg_events() / Play the failure music');
             parent.mmrpg_music_load('misc/battle-defeat', false, true);
-            canvasAnimationCameraTimer = canvasAnimationCameraDelay - 1;
+            if (mmrpgEvents.length < canvasAnimationCameraDelay){ canvasAnimationCameraTimer = mmrpgEvents.length; }
             }
         }
 
