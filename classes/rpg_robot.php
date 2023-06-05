@@ -1218,7 +1218,7 @@ class rpg_robot extends rpg_object {
         } elseif ($form === 'reflexive'){
             if ($gender === 'male'){ return 'himself'; }
             elseif ($gender === 'female'){ return 'herself'; }
-            else { return $is_mecha ? 'its' : 'themselves'; }
+            else { return $is_mecha ? 'itself' : 'themselves'; }
         } else {
             return false;
         }
