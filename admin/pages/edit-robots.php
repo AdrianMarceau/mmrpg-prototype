@@ -597,7 +597,9 @@
                     $new_robot_image_alts = array();
                     foreach ($alt_keys AS $alt_key){
                         $alt_info = $form_data['robot_image_alts'][$alt_key];
+                        $alt_summons = isset($alt_info['summons']) ? $alt_info['summons'] : null;
                         $alt_info = array_filter($alt_info);
+                        if ($alt_summons !== null){ $alt_info['summons'] = $alt_summons; }
                         $alt_path = ($alt_key != 'base' ? '_'.$alt_key : '');
                         if (!empty($alt_info['delete_images'])){
                             $delete_sprite_path = 'content/robots/'.$robot_data['robot_image'].'/sprites'.$alt_path.'/';
@@ -1742,7 +1744,7 @@
                                                     </div>
                                                     <div class="field">
                                                         <div class="label"><strong>Summons</strong></div>
-                                                        <input class="textbox" type="number" name="robot_image_alts[<?= $alt_token ?>][summons]" value="<?= $alt_info['summons'] ?>" maxlength="3" <?= $has_elemental_alts ? 'disabled="disabled"' : '' ?> />
+                                                        <input class="textbox" type="number" name="robot_image_alts[<?= $alt_token ?>][summons]" value="<?= !empty($alt_info['summons']) && is_numeric($alt_info['summons']) ? $alt_info['summons'] : 0 ?>" maxlength="3" <?= $has_elemental_alts ? 'disabled="disabled"' : '' ?> />
                                                     </div>
                                                     <div class="field">
                                                         <div class="label">
