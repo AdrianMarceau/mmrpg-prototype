@@ -38,6 +38,7 @@ gameSettings.currentBodyWidth = 0; // collect the current window width and updat
 gameSettings.currentBodyHeight = 0; // collect the current window width and update when necessary
 gameSettings.allowEditing = true; // default to true to allow all editing unless otherwise stated
 gameSettings.audioBaseHref = ''; // the base href where audio comes from (empty if same as baseHref)
+gameSettings.customIndex = {}; // default to empty but may be filled at runtime and used layer
 
 // Define an object to hold change events for settings when/if they happen
 var gameSettingsChangeEvents = {};
@@ -313,20 +314,31 @@ $(document).ready(function(){
             if (typeof window.localStorage !== 'undefined'){
                 window.localStorage.setItem('spriteRenderMode', newValue);
                 }
-            var $actionButton = $('.button.action_option[data-panel="settings_spriteRenderMode"]');
+            var $actionButton = $('.button.action_option[data-panel="settings_spriteRenderMode"]', gameActions);
             if ($actionButton.length){
-                var newValueTitle = newValue;
-                newValueTitle = newValueTitle.replace('/\-/g', ' ');
-                newValueTitle = newValueTitle.replace(/\b\w/g, function(l){ return l.toUpperCase() });
-                newValueTitle = newValueTitle.replace('/\s+/g', '-');
+                var newValueTitle = newValue.replace('/\-/g', ' ').replace(/\b\w/g, function(l){ return l.toUpperCase() });
+                if (typeof gameSettings.customIndex.renderModes !== 'undefined'){
+                    var renderModesIndex = gameSettings.customIndex.renderModes;
+                    newValueTitle = renderModesIndex[newValue]['name'];
+                    }
                 $actionButton.find('.value').html(newValueTitle);
                 }
             };
+        gameSettingsChangeEvents['spriteRenderMode'](gameSettings.spriteRenderMode);
 
         // Define a change event for whenever this game setting is altered
         gameSettingsChangeEvents['eventTimeout'] = function(newValue){
             //console.log('setting eventTimeout to ', newValue);
             updateCameraShiftTransitionDuration();
+            var $actionButton = $('.button.action_option[data-panel="settings_eventTimeout"]', gameActions);
+            if ($actionButton.length){
+                var newValueTitle = '(1f/'+newValue+'ms)';
+                if (typeof gameSettings.customIndex.gameSpeeds !== 'undefined'){
+                    var gameSpeedIndex = gameSettings.customIndex.gameSpeeds;
+                    newValueTitle = gameSpeedIndex[newValue]['name'];
+                    }
+                $actionButton.find('.value').html(newValueTitle);
+                }
             };
         gameSettingsChangeEvents['eventTimeout'](gameSettings.eventTimeout);
 
@@ -336,6 +348,28 @@ $(document).ready(function(){
             updateCameraShiftTransitionDuration();
             };
         gameSettingsChangeEvents['eventCrossFade'](gameSettings.eventCrossFade);
+
+        // Define a change event for whenever this game setting is altered
+        gameSettingsChangeEvents['eventCameraShift'] = function(newValue){
+            //console.log('setting eventCameraShift to ', newValue);
+            updateCameraShiftTransitionDuration(0);
+            if (newValue === false){
+                mmrpg_canvas_camera_shift();
+                }
+            else if (newValue === true
+                && gameSettings.currentActionPanel !== 'loading'
+                && !mmrpgEvents.length){
+                canvasAnimationCameraShift = {
+                    shift: 'left',
+                    focus: 'active',
+                    depth: 0,
+                    depthInc: 1,
+                    offset: 0,
+                    };
+                }
+            updateCameraShiftTransitionDuration();
+            };
+        gameSettingsChangeEvents['eventCameraShift'](gameSettings.eventCameraShift);
 
         // Auto-highlight settings buttons that are "active"
         var settingsWithActiveStates = ['eventTimeout', 'eventCrossFade', 'spriteRenderMode'];
@@ -1754,12 +1788,12 @@ function mmrpg_events(){
             // Play the victory music
             //console.log('mmrpg_events() / Play the victory music');
             parent.mmrpg_music_load('misc/battle-victory', false, true);
-            if (mmrpgEvents.length < canvasAnimationCameraDelay){ canvasAnimationCameraTimer = mmrpgEvents.length; }
+            if (mmrpgEvents.length < canvasAnimationCameraDelay){ canvasAnimationCameraTimer = canvasAnimationCameraDelay - mmrpgEvents.length; }
             } else if (battleResult == 'defeat' && thisEvent.event_flags.defeat != undefined && thisEvent.event_flags.defeat != false){
             // Play the failure music
             //console.log('mmrpg_events() / Play the failure music');
             parent.mmrpg_music_load('misc/battle-defeat', false, true);
-            if (mmrpgEvents.length < canvasAnimationCameraDelay){ canvasAnimationCameraTimer = mmrpgEvents.length; }
+            if (mmrpgEvents.length < canvasAnimationCameraDelay){ canvasAnimationCameraTimer = canvasAnimationCameraDelay - mmrpgEvents.length; }
             }
         }
 

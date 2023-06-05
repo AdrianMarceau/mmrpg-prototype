@@ -664,12 +664,72 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
             <div class="sub_actions"><a data-order="3" class="button action_back" type="button" data-panel="option"><label>Back</label></a></div>
         </div>
         <div id="actions_settings_animationEffects" class="actions_settings actions_settings_animationEffects wrapper">
-            <div class="main_actions">
+            <?
+
+            // Precollect the animation effects index so we can use it later
+            $animation_effects_index = rpg_canvas::get_animation_effects_index();
+
+            // Predefine the game speeds index so we can use it later
+            $game_speeds_index = array(
+                1600 => array('token' => 'super-slow', 'name' => 'Super Slow', 'value' => 1600),
+                1250 => array('token' => 'medium-slow', 'name' => 'Medium Slow', 'value' => 1250),
+                1000 => array('token' => 'normal-slow', 'name' => 'Normal Slow', 'value' => 1000),
+                900 => array('token' => 'normal', 'name' => 'Normal', 'value' => 900),
+                800 => array('token' => 'normal-fast', 'name' => 'Normal Fast', 'value' => 800),
+                700 => array('token' => 'medium-fast', 'name' => 'Medium Fast', 'value' => 700),
+                600 => array('token' => 'super-fast', 'name' => 'Super Fast', 'value' => 600),
+                250 => array('token' => 'ultra-fast', 'name' => 'Ultra Fast', 'value' => 250)
+                );
+
+            // Predefine the render modes index
+            $render_modes_index = array(
+                'default' => array('token' => 'default', 'name' => 'Default', 'label' => 'Default'),
+                'auto' => array('token' => 'auto', 'name' => 'Auto', 'label' => 'Browser "Auto"'),
+                'smooth' => array('token' => 'smooth', 'name' => 'Smooth', 'label' => 'Browser "Smooth"'),
+                'pixelated' => array('token' => 'pixelated', 'name' => 'Pixelated', 'label' => 'Browser "Pixelated"'),
+                'high-quality' => array('token' => 'high-quality', 'name' => 'High-Quality', 'label' => 'Browser "High-Quality"'),
+                'crisp-edges' => array('token' => 'crisp-edges', 'name' => 'Crisp-Edges', 'label' => 'Browser "Crisp-Edges"')
+                );
+
+            ?>
+            <div class="main_actions main_actions_hastitle">
+                <span class="main_actions_title">Customize Animation Settings</span>
                 <?
 
-                // Loop through the defined effects and print buttons for each
+                // Predefine a block number counter for later
                 $block_num = 0;
-                $animation_effects_index = rpg_canvas::get_animation_effects_index();
+
+                // Manually add buttons for sub-menus related to animation
+                if (true){
+
+                    // Add a button for the GAME SPEED submenu
+                    $block_num++;
+                    $setting_name = 'Game Speed';
+                    $setting_token = 'eventTimeout';
+                    $default_value = 'normal';
+                    $current_value = $default_value;
+                    if (isset($_SESSION['GAME']['battle_settings'][$setting_token])){
+                        $value = $_SESSION['GAME']['battle_settings'][$setting_token];
+                        if (empty($value) || $value === 'false'){ $value = false; }
+                        elseif (!empty($value) && $value === 'true'){ $value = true; }
+                        $current_value = $value;
+                    }
+                    $current_value_title = $current_value;
+                    if (isset($game_speeds_index[$current_value]['name'])){ $current_value_title = $game_speeds_index[$current_value]['name']; }
+                    echo('<a data-order="'.$block_num.'" class="button action_option action_setting block_'.$block_num.'" type="button" data-panel="settings_'.$setting_token.'">');
+                        echo('<label><span class="multi">');
+                            echo('<span class="title">'.$setting_name.'</span>');
+                            echo('<br />');
+                            echo('<span class="value type type_time">');
+                                echo($current_value_title);
+                            echo('</span>');
+                        echo('</span></label>');
+                    echo('</a>');
+
+
+                }
+
+                // Loop through the defined ON/OFF animation effects and print buttons for each
                 foreach ($animation_effects_index AS $effect_key => $effect_info){
                     $block_num++;
                     $setting_name = $effect_info['name'];
@@ -685,9 +745,6 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                     $next_value = !$current_value ? true : false;
                     $data_attrs = '';
                     $data_attrs .= 'data-order="'.$block_num.'" ';
-                    //$data_attrs .= 'data-action="settings_'.$setting_token.'_'.($next_value ? 'true' : 'false').'" ';
-                    //$data_attrs .= 'data-action-toggle="settings_'.$setting_token.'_" ';
-                    //$data_attrs .= 'data-action-current="'.($current_value ? 'true' : 'false').'" ';
                     $data_attrs .= 'onclick="mmrpg_toggle_settings_option(this);"  data-setting-token="'.$setting_token.'" data-setting-value="'.($current_value ? 1 : 0).'" ';
                     echo('<a class="button action_option action_setting block_'.$block_num.'" type="button" '.$data_attrs.'>');
                         echo('<label><span class="multi">');
@@ -700,8 +757,10 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                     echo('</a>');
                 }
 
-                // Manually add buttons for other sub-menus related to animation
+                // Manually add buttons for sub-menus related to animation
                 if (true){
+
+                    // Add a button for the SPRITE RENDERING submenu
                     $block_num++;
                     $setting_name = 'Sprite Rendering';
                     $setting_token = 'spriteRenderMode';
@@ -713,19 +772,19 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                         elseif (!empty($value) && $value === 'true'){ $value = true; }
                         $current_value = $value;
                     }
-                    $current_value_title = $current_value;
-                    $current_value_title = str_replace('-', ' ', $current_value_title);
-                    $current_value_title = ucwords($current_value_title);
-                    $current_value_title = str_replace(' ', '-', $current_value_title);
-                    echo('<a data-order="'.$block_num.'" class="button action_option action_setting block_'.$block_num.'" type="button" data-panel="settings_spriteRenderMode">');
+                    $current_value_title = ucwords(str_replace('-', ' ', $current_value));
+                    if (isset($render_modes_index[$current_value]['name'])){ $current_value_title = $render_modes_index[$current_value]['name']; }
+                    echo('<a data-order="'.$block_num.'" class="button action_option action_setting block_'.$block_num.'" type="button" data-panel="settings_'.$setting_token.'">');
                         echo('<label><span class="multi">');
                             echo('<span class="title">'.$setting_name.'</span>');
                             echo('<br />');
-                            echo('<span class="value type type_none">');
+                            echo('<span class="value type type_explode">');
                                 echo($current_value_title);
                             echo('</span>');
                         echo('</span></label>');
                     echo('</a>');
+
+
                 }
 
                 // If there were less than eight buttons, we should print spacers
@@ -740,18 +799,21 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
         </div>
         <div id="actions_settings_eventTimeout" class="actions_settings actions_settings_eventTimeout wrapper">
             <div class="main_actions">
-                <a data-order="1" class="button action_setting block_1" type="button" data-action="settings_eventTimeout_1600"><label><span class="multi">Super&nbsp;Slow<br />(1f/1600ms)</span></label></a>
-                <a data-order="2" class="button action_setting block_2" type="button" data-action="settings_eventTimeout_1250"><label><span class="multi">Medium&nbsp;Slow<br />(1f/1250ms)</span></label></a>
-                <a data-order="3" class="button action_setting block_3" type="button" data-action="settings_eventTimeout_1000"><label><span class="multi">Normal&nbsp;Slow<br />(1f/1000ms)</span></label></a>
-                <a data-order="4" class="button action_setting block_4" type="button" data-action="settings_eventTimeout_900"><label><span class="multi">Normal<br />(1f/900ms)</span></label></a>
-                <a data-order="5" class="button action_setting block_5" type="button" data-action="settings_eventTimeout_800"><label><span class="multi">Normal&nbsp;Fast<br />(1f/800ms)</span></label></a>
-                <a data-order="6" class="button action_setting block_6" type="button" data-action="settings_eventTimeout_700"><label><span class="multi">Medium&nbsp;Fast<br />(1f/700ms)</span></label></a>
-                <a data-order="7" class="button action_setting block_7" type="button" data-action="settings_eventTimeout_600"><label><span class="multi">Super&nbsp;Fast<br />(1f/600ms)</span></label></a>
-                <a data-order="8" class="button action_setting block_8" type="button" data-action="settings_eventTimeout_250"><label><span class="multi">Ultra&nbsp;Fast<br />(1f/250ms)</span></label></a>
+                <? $block_num = 0;
+                foreach ($game_speeds_index as $value => $speed){ $block_num++; ?>
+                    <a data-order="<?= $block_num ?>" class="button action_setting block_<?= $block_num ?>" type="button" data-action="settings_eventTimeout_<?= $speed['value'] ?>"><label><span class="multi"><?= $speed['name'] ?><br />(1f/<?= $speed['value'] ?>ms)</span></label></a>
+                <? } ?>
             </div>
-            <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="option"><label>Back</label></a></div>
+            <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="settings_animationEffects"><label>Back</label></a></div>
         </div>
         <div id="actions_settings_spriteRenderMode" class="actions_settings actions_settings_spriteRenderMode wrapper">
+            <div class="main_actions">
+                <? $block_num = 0;
+                foreach ($render_modes_index as $token => $mode){ $block_num++; ?>
+                    <a data-order="<?= $block_num ?>" class="button action_setting block_<?= $block_num ?>" type="button" data-action="settings_spriteRenderMode_<?= $mode['token'] ?>"><label><span class="multi"><?= str_replace(' ', '<br />', str_replace('"', '&quot;', $mode['label'])) ?></span></label></a>
+                <? } ?>
+            </div>
+            <!--
             <div class="main_actions">
                 <a data-order="1" class="button action_setting block_1" type="button" data-action="settings_spriteRenderMode_default"><label><span>Default</span></label></a>
                 <a data-order="2" class="button action_setting block_2" type="button" data-action="settings_spriteRenderMode_auto"><label><span class="multi">Browser<br />&quot;Auto&quot;</span></label></a>
@@ -762,6 +824,7 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                 <a class="button action_setting button_disabled block_7" type="button">&nbsp;</a>
                 <a class="button action_setting button_disabled block_8" type="button">&nbsp;</a>
             </div>
+            -->
             <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="settings_animationEffects"><label>Back</label></a></div>
         </div>
         <div id="actions_event" class="actions_event wrapper">
@@ -788,6 +851,9 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
 <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 gameSettings.idleAnimation = <?= $debug_flag_animation ? 'true' : 'false' ?>;
 gameSettings.fieldMusic = '<?= !strstr($this_field_data['field_music'], '/') ? 'fields/'.$this_field_data['field_music'] : $this_field_data['field_music'] ?>';
+gameSettings.customIndex.animationEffects = <?= json_encode($animation_effects_index) ?>;
+gameSettings.customIndex.gameSpeeds = <?= json_encode($game_speeds_index) ?>;
+gameSettings.customIndex.renderModes = <?= json_encode($render_modes_index) ?>;
 
 // Create the document ready events
 $(document).ready(function(){
