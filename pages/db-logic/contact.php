@@ -4,7 +4,7 @@
 function mmrpg_send_email($to_email, $from_email, $message_subject, $message_body, $reply_to_email = false, $email_type = 'text/html'){
 
     // preset the mail settings
-    $from_mmrpg = '"Mega Man RPG Prototype" <info@rpg.megamanpoweredup.net>';
+    $from_mmrpg = '"Mega Man RPG Prototype" <info@mmrpg-world.net>';
     ini_set( 'SMTP', 'smtp.gmail.com' );
     ini_set( 'SMTP_PORT', 587 );
     ini_set( 'sendmail_from', $from_mmrpg );
@@ -115,12 +115,12 @@ while ($this_formaction == 'contact'){
     $emailinfo = array();
     // Populate the relevant header fields
     $emailinfo['email_sender'] = "{$formdata['contact_name']} <{$formdata['contact_email']}>";
-    $emailinfo['email_receiver'] = '"Adrian Marceau" <adrian.marceau@gmail.com>'; //Mega Man RPG Prototype <info@megamanpoweredup.net>";
+    $emailinfo['email_receiver'] = '"Adrian Marceau" <adrian.marceau@gmail.com>'; //Mega Man RPG Prototype <info@mmrpg-world.net>";
     $emailinfo['email_subject'] = "Contact Message from {$formdata['contact_name']} via Mega Man RPG Prototype";
     ob_start();
     ?>
     <p style="margin: 0 auto 10px;"><strong>Mega Man RPG Prototype,</strong></p>
-    <p style="margin: 0 auto 10px;">A new message has been sent to you using the contact form on <a href="<?= MMRPG_CONFIG_ROOTURL ?>contact/">rpg.megamanpoweredup.net</a>.  Please find the details of the message below:</p>
+    <p style="margin: 0 auto 10px;">A new message has been sent to you using the contact form on <a href="<?= MMRPG_CONFIG_ROOTURL ?>contact/"><?= rtrim(preg_replace('/^https?\:\/\//i', '', MMRPG_CONFIG_ROOTURL), '/') ?></a>.  Please find the details of the message below:</p>
     <p style="margin: 0 auto;">
     <span style="display: block; margin: 0 auto; text-align: left;"><strong>Name</strong> : <?= htmlentities($formdata['contact_name'], ENT_QUOTES, 'UTF-8', true) ?></span>
     <span style="display: block; margin: 0 auto; text-align: left;"><strong>Email</strong> : <?= htmlentities($formdata['contact_email'], ENT_QUOTES, 'UTF-8', true)?></span>
