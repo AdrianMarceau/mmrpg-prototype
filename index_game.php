@@ -141,8 +141,11 @@ if (count($matches)>1){
 
 <style type="text/css"> html, body { background-color: #262626; } </style>
 
-<link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/solid.css" integrity="sha384-+0VIRx+yz1WBcCTXBkVQYIBVNEFH1eP6Zknm16roZCyeNg2maWEpk/l/KsyFKs7G" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/fontawesome.css" integrity="sha384-jLuaxTTBR42U2qJ/pm4JRouHkEDHkVqH0T1nyQXn1mZ7Snycpf6Rl25VBNthU4z0" crossorigin="anonymous">
 <link type="text/css" href=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.css" rel="stylesheet" />
+
+<link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype-responsive.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 
@@ -193,16 +196,35 @@ if (count($matches)>1){
     <?endif;?>
 
 </div>
-<?if(!$flag_wap):?>
 <div id="credits">
     <a href="<?= MMRPG_CONFIG_ROOTURL ?>">&laquo; Back to Website</a> |
-    Mega Man and all related names and characters are &copy; <a href="http://www.capcom.com/" target="_blank" rel="nofollow">Capcom</a> 1986 - <?= date('Y') ?>.
-    | <a href="<?= MMRPG_CONFIG_ROOTURL ?>contact/">Contact &amp; Feedback &raquo;</a>
-    | <a rel="nofollow" href="<?= MMRPG_CONFIG_ROOTURL ?>api/v2/" target="_blank">Data API</a>
-    <?= !$flag_iphone ? '<br />' : '' ?>
+    Mega Man and all related names and characters are &copy; <a href="http://www.capcom.com/" target="_blank" rel="nofollow">Capcom</a> 1986 - <?= date('Y') ?>
+        | <a href="<?= MMRPG_CONFIG_ROOTURL ?>cookies/">Cookie Policy</a>
+        | <a rel="nofollow" href="<?= MMRPG_CONFIG_ROOTURL ?>api/v2/" target="_blank">Data API</a>
+        | <a href="<?= MMRPG_CONFIG_ROOTURL ?>contact/">Contact &amp; Feedback &raquo;</a>
+    <?= !$flag_iphone ? '<br />' : '|' ?>
     This game is fan-made by <a href="https://github.com/AdrianMarceau" target="_blank" rel="author">Adrian Marceau</a>, not affiliated or endorsed by Capcom at all, and is in no way official. Any and all <a href="contact/" target="_blank">feedback</a> is appreciated. :)
 </div>
-<?endif;?>
+<div id="winmods">
+    <fieldset class="field width">
+        <legend class="label" alt="Adjust Window Width">
+            <i class="fa fas fa-tablet-alt" style="position: relative; bottom: 4px;"></i>
+            <i class="fa fas fa-arrows-alt-h" style="position: absolute; bottom: -4px; left: 50%; transform: translate(-50%, 0);"></i>
+        </legend>
+        <a type="button" class="button" data-mod-name="width" data-mod-value="small">Small</a>
+        <a type="button" class="button" data-mod-name="width" data-mod-value="large">Large</a>
+        <a type="button" class="button" data-mod-name="width" data-mod-value="flex">Flex</a>
+    </fieldset>
+    <fieldset class="field height">
+        <legend class="label" alt="Adjust Window Height">
+            <i class="fa fas fa-tablet-alt"></i>
+            <i class="fa fas fa-arrows-alt-v"></i>
+        </legend>
+        <a type="button" class="button" data-mod-name="height" data-mod-value="small">Small</a>
+        <a type="button" class="button" data-mod-name="height" data-mod-value="large">Large</a>
+        <a type="button" class="button" data-mod-name="height" data-mod-value="flex">Flex</a>
+    </fieldset>
+</div>
 <script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
 <script type="text/javascript" src=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.js"></script>
 <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
@@ -212,8 +234,10 @@ if (count($matches)>1){
 var thisScrollbarSettings = {wheelSpeed:0.3};
 </script>
 <script type="text/javascript">
+
 // When the document is ready for event binding
 $(document).ready(function(){
+
     // Preload essential audio tracks
     mmrpg_music_preload('misc/player-select');
     mmrpg_music_preload('misc/stage-select-dr-light');
@@ -222,18 +246,7 @@ $(document).ready(function(){
     //mmrpg_music_preload('misc/leader-board');
     //mmrpg_music_preload('misc/file-menu');
     //mmrpg_music_preload('misc/robot-editor');
-    // Check if we're running the game in mobile mode
-    if (false && gameSettings.wapFlag){
-        // Let the user know about the full-screen option for mobile browsers
-        if (('standalone' in window.navigator) && !window.navigator.standalone){
-            //alert('launched from full-screen ready browser, but not in full screen...');
-            alert('Use the "Add to Home Screen" option for fullscreen view! :)');
-            } else if (('standalone' in window.navigator) && window.navigator.standalone){
-            //alert('launched from full-screen ready browser, and in full screen!');
-            } else {
-            //alert('launched from a regular old browser...');
-            }
-        }
+
     // Collect a reference to the continue button
     var eventContinue = $('#events #buttons .event_continue');
     // Create the continue event for the event window
@@ -246,8 +259,69 @@ $(document).ready(function(){
             }
         });
 
+    // If window mod tools exist on the page, we should bind events to them
+    var $gameWindow = $('#window');
+    var $windowMods = $('#winmods');
+    if ($gameWindow.length
+        && $windowMods.length){
+
+        // Load previous preferences if present
+        var previousWidth = localStorage.getItem('mmrpg-window-width') || 'flex';
+        var previousHeight = localStorage.getItem('mmrpg-window-height') || 'flex';
+
+        // Set previous preferences
+        $gameWindow.attr('data-window-width', previousWidth);
+        $gameWindow.attr('data-window-height', previousHeight);
+
+        // Collect references to the different buttons
+        var $widthButtons = $('.width .button', $windowMods);
+        var $heightButtons = $('.height .button', $windowMods);
+
+        // Highlight active buttons
+        $widthButtons.removeClass('active').filter('[data-mod-value="' + previousWidth + '"]').addClass('active');
+        $heightButtons.removeClass('active').filter('[data-mod-value="' + previousHeight + '"]').addClass('active');
+
+        // Width functionality
+        $widthButtons.bind('click', function() {
+            var value = $(this).data('mod-value');
+            $gameWindow.attr('data-window-width', value);
+            localStorage.setItem('mmrpg-window-width', value);
+            $widthButtons.removeClass('active');
+            $(this).addClass('active');
+            });
+
+        // Height functionality
+        $heightButtons.bind('click', function() {
+            var value = $(this).data('mod-value');
+            $gameWindow.attr('data-window-height', value);
+            localStorage.setItem('mmrpg-window-height', value);
+            $heightButtons.removeClass('active');
+            $(this).addClass('active');
+            });
+    }
+
 });
-//function updateMobileCache(event){ window.applicationCache.swapCache(); }
+
+
+// Add some functionality for a "cinema mode" where it fades credits and stuff
+(function(){
+    var $body = $('body');
+    var $gameWindow = $('#window')
+    $(window).bind('blur', function() {
+        //console.log('Window lost focus, user must be playing');
+        // Fade elements or perform other actions
+        $body.attr('data-cinema-mode', 'true');
+        });
+    $(document).bind('click', function(event) {
+        if (!$(event.target).closest('#window').length) {
+            //console.log('Clicked outside #window, user must be configuring');
+            // Fade elements or perform other actions
+            $body.attr('data-cinema-mode', 'false');
+            }
+        });
+})();
+
+
 // Define a function for displaying event messages to the player
 gameSettings.canvasMarkupArray = [];
 gameSettings.messagesMarkupArray = [];
@@ -257,6 +331,7 @@ function windowEventCreate(canvasMarkupArray, messagesMarkupArray){
     gameSettings.messagesMarkupArray = messagesMarkupArray;
     windowEventDisplay();
 }
+
 // Define a function for displaying event messages to the player
 function windowEventDisplay(){
     var eventContainer = $('#events');
@@ -270,6 +345,7 @@ function windowEventDisplay(){
     $(window).focus();
     //alert(eventMarkup);
 }
+
 // Define a function for displaying event messages to the player
 function windowEventDestroy(){
     var eventContainer = $('#events');
@@ -279,6 +355,7 @@ function windowEventDestroy(){
     eventContainer.addClass('hidden');
     //alert(eventMarkup);
 }
+
 </script>
 <?
 // Require the remote bottom in case we're in viewer mode

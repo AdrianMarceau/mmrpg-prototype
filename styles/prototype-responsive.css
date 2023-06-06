@@ -34,11 +34,14 @@ body:before {
     #mmrpg,
     #prototype {
         width: auto !important;
+        height: auto;
+        height: 100svh;
         min-width: 768px;
         min-height: 924px;
-        height: auto;
-        background-color: #262626;
-        background-image: none;
+    }
+
+    #mmrpg.windowFlag_landscapeMode {
+        width: 1024px !important;
     }
 
 }
@@ -127,6 +130,13 @@ body:before {
 
     body:before {
         content: "05";
+    }
+
+    body,
+    #mmrpg,
+    #prototype {
+        background-color: #262626;
+        background-image: none;
     }
 
     #prototype .option_1x1 div label .maintext .icons.stats {

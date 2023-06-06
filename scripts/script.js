@@ -708,10 +708,14 @@ function windowResizeUpdate(updateType){
 
     //console.log({windowWidth:windowWidth,windowHeight:windowHeight,gameWidth:gameWidth,gameHeight:gameHeight,gameSettings:gameSettings});
 
+    var windowModWidth = localStorage.getItem('mmrpg-window-width') || 'flex';
+    var windowModHeight = localStorage.getItem('mmrpg-window-height') || 'flex';
+
     // Check if the window is in landscape mode and update the session
     var thisRequestType = 'session';
     var thisRequestData = 'index_settings,windowFlag,';
-    if (windowWidth >= (1024 + 12)){ $('body').addClass('windowFlag_landscapeMode'); thisRequestData += 'landscapeMode'; }
+    //if (windowWidth >= (1024 + 12)){ $('body').addClass('windowFlag_landscapeMode'); thisRequestData += 'landscapeMode'; }
+    if (Math.ceil(windowModWidth === 'flex' ? windowWidth : gameWidth) >= 1024){ $('body').addClass('windowFlag_landscapeMode'); thisRequestData += 'landscapeMode'; }
     else { $('body').removeClass('windowFlag_landscapeMode'); thisRequestData += 'portraitMode'; }
     if (windowResizeUpdateTimeout !== false){ clearTimeout(windowResizeUpdateTimeout); }
     windowResizeUpdateTimeout = setTimeout(function(){

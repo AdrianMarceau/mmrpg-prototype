@@ -1179,6 +1179,7 @@ body.index #header {
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
     -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
     -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+    background-color: #262626;
 }
 #window iframe {
     margin: 0 auto;
@@ -1190,21 +1191,121 @@ body.index #header {
     overflow: hidden;
     background-color: transparent;
 }
-#credits {
-    margin: 0 auto;
+
+#credits,
+#winmods {
+    margin: 10px auto 0;
     padding-bottom: 10px;
-    font-size: 10px;
+    font-size: 12px;
+    line-height: 1.5;
     color: #414141;
+    opacity: 1.0;
 }
-#credits a {
+#credits a,
+#winmods a {
     padding: 0;
     color: #464646;
     text-decoration: none;
 }
-#credits a:hover {
+#credits a:hover,
+#winmods a:hover {
     color: #494949;
     text-decoration: underline;
 }
+
+#winmods {
+    margin: 0 auto;
+}
+#winmods .field {
+    display: inline-block;
+    margin: 0 3px;
+    padding: 0 3px;
+}
+#winmods .field:after {
+    content: "|";
+    display: inline-block;
+    margin: 0 3px;
+    padding: 0 3px;
+}
+#winmods .field:last-child:after {
+    content: "";
+    display: none;
+}
+#winmods .field .label {
+    display: inline-block;
+    vertical-align: middle;
+    float: left;
+    margin: 0 6px 0 0;
+    font-weight: bold;
+    position: relative;
+}
+#winmods .field .button {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 0 3px;
+    margin: 0 0 0 6px;
+    text-decoration: none;
+    cursor: pointer;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    background-color: #292929;
+    color: #121212;
+}
+#winmods .field .button.active,
+#winmods .field .button:hover {
+    background-color: #393939;
+    text-decoration: none;
+}
+
+
+#winmods:hover .field .button {
+    background-color: #494949;
+}
+#winmods:hover .field .button.active,
+#winmods:hover .field .button:hover {
+    background-color: #797979;
+}
+
+
+#window[data-window-width="small"] {
+    width: 768px !important;
+}
+#window[data-window-width="large"] {
+    width: 1024px !important;
+}
+#window[data-window-height="small"] {
+    height: 626px !important;
+}
+#window[data-window-height="large"] {
+    height: 876px !important;
+}
+#window[data-window-width="small"] iframe,
+#window[data-window-width="large"] iframe,
+#window[data-window-height="small"] iframe,
+#window[data-window-height="large"] iframe {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+
+#mmrpg[data-cinema-mode] {
+    transition: background 0.3s;
+}
+#mmrpg[data-cinema-mode] #credits,
+#mmrpg[data-cinema-mode] #winmods {
+    transition: opacity 0.3s;
+}
+
+#mmrpg[data-cinema-mode="true"] {
+    background-color: #292929;
+    background-image: url(../images/assets/index-background.png);
+}
+#mmrpg[data-cinema-mode="true"] #credits,
+#mmrpg[data-cinema-mode="true"] #winmods {
+    opacity: 0.3;
+}
+
 
 #music,
 #animate,
@@ -3162,8 +3263,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     position: absolute;
     text-indent: -9999px;
     color: transparent;
-    right: -5px;
-    bottom: -5px;
+    right: -2px;
+    bottom: -2px;
     width: 5px;
     height: 5px;
     border-radius: 3px;
@@ -3181,10 +3282,14 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     filter: alpha(opacity=10);
 }
 #mmrpg.env_local #actions .actions_resend {
-    opacity: 0.5;
+    opacity: 0;
     border-color: red !important;
-    right: 5px;
-    bottom: 5px;
+    right: -2px;
+    bottom: -2px;
+    transition: opacity 0.3s;
+}
+#mmrpg.env_local #actions .actions_resend:hover {
+    opacity: 0.5;
 }
 
 #actions .actions_loading .main_actions {
