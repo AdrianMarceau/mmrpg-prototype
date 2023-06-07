@@ -1602,11 +1602,16 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 }
             }
 
+            // Define a variable to hold number of selectable robots, default to allowed max, but decrease for specific reasons
+            $data_next_limit = $this_option_limit;
+            $unlocked_robots_num = mmrpg_prototype_robots_unlocked();
+            if ($data_next_limit > $unlocked_robots_num){ $data_next_limit = $unlocked_robots_num; }
+
             // Print out the option button markup with sprite and name
             $this_markup .= '<a '.
                 'class="'.$this_option_class.'" '.
                 'data-token="'.(!empty($this_battleinfo['alpha_battle_token']) ? $this_battleinfo['alpha_battle_token'] : $this_battleinfo['battle_token']).'" '.
-                'data-next-limit="'.$this_option_limit.'" '.
+                'data-next-limit="'.$data_next_limit.'" '.
                 'data-chapter="'.$this_info['option_chapter'].'" '.
                 'data-tooltip="'.$this_option_title_tooltip.'" '.
                 'data-field="'.htmlentities($this_fieldinfo['field_name'], ENT_QUOTES, 'UTF-8', true).'" '.
