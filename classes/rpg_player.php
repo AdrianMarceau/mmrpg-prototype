@@ -1688,6 +1688,7 @@ class rpg_player extends rpg_object {
         $event_options['console_show_this_robot'] = false;
         $event_options['console_show_this_item'] = true;
         $event_options['canvas_show_this_item'] = true;
+        rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $temp_item);
         $this_battle->events_create($target_robot, $target_robot, $event_header, $event_body, $event_options);
 
         // Create and/or increment the session variable for this item increasing its quantity
