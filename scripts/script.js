@@ -22,7 +22,7 @@ gameSettings.wapFlag = false; // whether or not this game is running in mobile m
 gameSettings.wapFlagIphone = false; // whether or not this game is running in mobile iphone mode
 gameSettings.wapFlagIpad = false; // whether or not this game is running in mobile iphone mode
 gameSettings.baseVolume = 0.2; // default animation frame base internal
-gameSettings.eventTimeout = 1250; // default animation frame base internal
+gameSettings.eventTimeout = 900; // default animation frame base internal
 gameSettings.eventTimeoutThreshold = 250; // timeout theshold for when frames stop cross-fading
 gameSettings.eventAutoPlay = true; // whether or not to automatically advance events
 gameSettings.eventCrossFade = true; // whether or not to canvas events have crossfade animation
@@ -30,6 +30,7 @@ gameSettings.eventCameraShift = true; // whether or not to canvas events have ca
 gameSettings.spriteRenderMode = 'default'; // the render mode we should be using for sprites
 gameSettings.idleAnimation = true; // default to allow idle animations
 gameSettings.indexLoaded = false; // default to false until the index is loaded
+gameSettings.currentGameState = {}; // default to empty but may be filled at runtime and used later
 gameSettings.currentActionPanel = 'loading'; // default to loading until changed elsewhere
 gameSettings.autoScrollTop = false; // default to true to prevent too much scrolling
 gameSettings.autoResizeWidth = true; // allow auto reszing of the game window width
@@ -38,7 +39,7 @@ gameSettings.currentBodyWidth = 0; // collect the current window width and updat
 gameSettings.currentBodyHeight = 0; // collect the current window width and update when necessary
 gameSettings.allowEditing = true; // default to true to allow all editing unless otherwise stated
 gameSettings.audioBaseHref = ''; // the base href where audio comes from (empty if same as baseHref)
-gameSettings.customIndex = {}; // default to empty but may be filled at runtime and used layer
+gameSettings.customIndex = {}; // default to empty but may be filled at runtime and used later
 
 // Define an object to hold change events for settings when/if they happen
 var gameSettingsChangeEvents = {};
@@ -835,7 +836,6 @@ var canvasAnimationCameraDelay = 6;
 function mmrpg_canvas_animate(){
     //console.log('mmrpg_canvas_animate();');
     //console.log('gameSettings.idleAnimation:', gameSettings.idleAnimation);
-    //console.log('gameSettings.idleAnimation:', gameSettings.idleAnimation);
     //clearTimeout(canvasAnimationTimeout);
     clearInterval(canvasAnimationTimeout);
     if (!gameSettings.idleAnimation){  return false; }
@@ -844,10 +844,22 @@ function mmrpg_canvas_animate(){
     var battleStatus = $('input[name=this_battle_status]', gameEngine).val();
     var battleResult = $('input[name=this_battle_result]', gameEngine).val();
 
-    // If the camera is not yet shifted, checked to see if we randomly should
+
+    // Check to see if we should skip camera animations for any reason
+    var skipCameraShift = false;
+    var currentGameState = gameSettings.currentGameState;
+    var currentAction = currentGameState['this_action'];
+    var currentActionPanel = gameSettings.currentActionPanel;
     //console.log({eventCameraShift:gameSettings.eventCameraShift,currentActionPanel:gameSettings.currentActionPanel,mmrpgEventsLength:mmrpgEvents.length});
-    if (gameSettings.eventCameraShift
-        && gameSettings.currentActionPanel !== 'loading'
+    //console.log('currentGameState:', currentGameState);
+    //console.log('currentAction:', currentAction);
+    //console.log('currentActionPanel:', currentActionPanel);
+    if (currentActionPanel === 'loading' && currentAction === 'start'){ skipCameraShift = true; }
+    //console.log('skipCameraShift:', skipCameraShift);
+
+    // If the camera is not yet shifted, checked to see if we randomly should
+    if (!skipCameraShift
+        && gameSettings.eventCameraShift
         && !mmrpgEvents.length){
 
         // Increment the camera shift timer and, when ready, trigger some motion
@@ -1325,7 +1337,7 @@ function mmrpg_canvas_attachment_frame(thisAttachment, newFrame){
 
 // Define a function for triggering an action submit
 function mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel){
-    //alert('thisAction : '+thisAction);
+    //console.log('thisAction : '+thisAction);
     // Return false if this is a continue click
     if (thisAction == 'continue'){ return false; }
     if (thisTarget == undefined){ thisTarget = 'auto'; }
@@ -1374,7 +1386,8 @@ function mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel){
         mmrpg_engine_update({this_action_token:thisAbility});
         thisAction = 'ability';
 
-        } else if (thisAction.match(/^item_([-a-z0-9_]+)$/i)){
+        }
+    else if (thisAction.match(/^item_([-a-z0-9_]+)$/i)){
 
         // Parse the item token and clean the main action token
         var thisItem = thisAction.replace(/^item_([-a-z0-9_]+)$/i, '$1');
@@ -1403,21 +1416,24 @@ function mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel){
         mmrpg_engine_update({this_action_token:thisItem});
         thisAction = 'item';
 
-        } else if (thisAction.match(/^switch_([-a-z0-9_]+)$/i)){
+        }
+    else if (thisAction.match(/^switch_([-a-z0-9_]+)$/i)){
 
         // Parse the switch token and clean the main action token
         var thisSwitch = thisAction.replace(/^switch_([-a-z0-9_]+)$/i, '$1');
         mmrpg_engine_update({this_action_token:thisSwitch});
         thisAction = 'switch';
 
-        } else if (thisAction.match(/^scan_([-a-z0-9_]+)$/i)){
+        }
+    else if (thisAction.match(/^scan_([-a-z0-9_]+)$/i)){
 
         // Parse the scan token and clean the main action token
         var thisScan = thisAction.replace(/^scan_([-a-z0-9_]+)$/i, '$1');
         mmrpg_engine_update({this_action_token:thisScan});
         thisAction = 'scan';
 
-        } else if (thisAction.match(/^target_([-a-z0-9_]+)$/i)){
+        }
+    else if (thisAction.match(/^target_([-a-z0-9_]+)$/i)){
 
         // Parse the target token and clean the main action token
         var thisTarget = thisAction.replace(/^target_([-a-z0-9_]+)$/i, '$1');
@@ -1427,7 +1443,8 @@ function mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel){
         mmrpg_engine_update({target_robot_token:thisTarget[1]});
         thisAction = '';
 
-        } else if (thisAction.match(/^settings_([-a-z0-9]+)_([-a-z0-9_]+)$/i)){
+        }
+    else if (thisAction.match(/^settings_([-a-z0-9]+)_([-a-z0-9_]+)$/i)){
 
         // Parse the settings token and value, then clean the action token
         var thisSettingToken = thisAction.replace(/^settings_([-a-z0-9]+)_([-a-z0-9_]+)$/i, '$1');
@@ -1567,6 +1584,9 @@ function mmrpg_engine_update(newValues){
         // Loop through the game engine values and update them
         for (var thisName in newValues){
             var thisValue = newValues[thisName];
+            // Update the value in the global settings object
+            gameSettings.currentGameState[thisName] = thisValue;
+            // And then also update it in the DOM for form submission
             if ($('input[name='+thisName+']', gameEngine).length){
                 $('input[name='+thisName+']', gameEngine).val(thisValue);
                 } else {
