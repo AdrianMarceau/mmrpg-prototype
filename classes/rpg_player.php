@@ -1690,6 +1690,7 @@ class rpg_player extends rpg_object {
         $event_options['canvas_show_this_item'] = true;
         rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $temp_item);
         $this_battle->events_create($target_robot, $target_robot, $event_header, $event_body, $event_options);
+        $this_battle->events_create(false, false, '', '', array_filter($event_options, function($k){ return strstr($k, '_camera_'); }, ARRAY_FILTER_USE_KEY));
 
         // Create and/or increment the session variable for this item increasing its quantity
         if (empty($_SESSION['GAME']['values']['battle_items'][$temp_item_token])){ $_SESSION['GAME']['values']['battle_items'][$temp_item_token] = 0; }
