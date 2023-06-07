@@ -983,6 +983,38 @@ function mmrpg_prototype_stars_unlocked($player_token = '', $star_kind = ''){
         return count($temp_stars_index);
     }
 }
+// Define a function for checking how many limit hearts have been unlocked by a player
+function mmrpg_prototype_limit_hearts_earned($player_token, &$max_hearts){
+
+    // Define the number of hearts at zero and we'll go up from there
+    $real_max_hearts = 8;
+    $max_hearts = $real_max_hearts;
+    $num_hearts = 0;
+
+    // Collect the player's progress in terms of chapters to determine hearts
+    $player_chapters_unlocked = rpg_prototype::get_player_chapters_unlocked($player_token);
+    if ($player_chapters_unlocked['0']){ $num_hearts++; }
+    if ($player_chapters_unlocked['1']){ $num_hearts++; }
+    if ($player_chapters_unlocked['2']){ $num_hearts++; }
+    if ($player_chapters_unlocked['3']){ $num_hearts++; }
+    if ($player_chapters_unlocked['4a']){ $num_hearts++; }
+    if (mmrpg_prototype_complete($player_token)){ $num_hearts++; }
+
+    // Hide the last two hearts behind superboss battles, but don't show them until collected
+    $max_hearts -= 2;
+    $session_token = mmrpg_game_token();
+    $session_robot_database = !empty($_SESSION[$session_token]['values']['robot_database']) ? $_SESSION[$session_token]['values']['robot_database'] : array();
+    if (isset($session_robot_database['quint']['robot_defeated'])){ $num_hearts++; }
+    if (isset($session_robot_database['sunstar']['robot_defeated'])){ $num_hearts++; }
+    if ($num_hearts > $max_hearts){ $max_hearts = $num_hearts; }
+
+    // Make sure we don't go over the max hearts
+    if ($num_hearts > $real_max_hearts){ $num_hearts = $real_max_hearts; }
+
+    // Return the total number of hearts this player has earned
+    return $num_hearts;
+
+}
 
 // Define a function that returns a list of all allowed fields
 function mmrpg_prototype_unlocked_field_tokens($include_all = false){
@@ -1604,8 +1636,10 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
 
             // Define a variable to hold number of selectable robots, default to allowed max, but decrease for specific reasons
             $data_next_limit = $this_option_limit;
-            $unlocked_robots_num = mmrpg_prototype_robots_unlocked();
+            $unlocked_robots_num = mmrpg_prototype_robots_unlocked($player_token);
+            $limit_hearts_earned = mmrpg_prototype_limit_hearts_earned($player_token);
             if ($data_next_limit > $unlocked_robots_num){ $data_next_limit = $unlocked_robots_num; }
+            if ($data_next_limit > $limit_hearts_earned && !$is_endless_battle && !$is_challenge_battle){ $data_next_limit = $limit_hearts_earned; }
 
             // Print out the option button markup with sprite and name
             $this_markup .= '<a '.

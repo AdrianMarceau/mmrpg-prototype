@@ -733,7 +733,7 @@ function prototype_menu_click_option(thisContext, thisOption){
         if (tempSize == 80){ tempSpriteShift -= 20; }
         //console.log('tempSize = '+tempSize+'; tempSpriteKey = '+tempSpriteKey+'; tempSpriteShift = '+tempSpriteShift+'; ');
         var cloneShift = tempSpriteShift+'px'; //someValue+'px';
-        var cloneSprite = tempSprite.clone().addClass('sprite_clone').css({right:cloneShift,left:'auto',bottom:'6px'});
+        var cloneSprite = tempSprite.clone().addClass('sprite_clone').css({right:cloneShift,left:'auto',bottom:'6px',zIndex:'2'});
 
         // Prepend the sprite to the parent's label value
         $('label', tokenParent).append(cloneSprite);
@@ -888,12 +888,19 @@ function prototype_menu_click_option(thisContext, thisOption){
             var spriteMarkup = '';
             //for (iCounter; iCounter <= nextLimit; iCounter++){
             for (iCounter; iCounter <= gameSettings.nextRobotLimit; iCounter++){
+
                 var someValue = 80 + ((tokenParentLimit * 40) - (iCounter * 40) + 40);
                 //var someValue = (gameSettings.totalRobotLimit * 40) - (iCounter * 40) + 40;
-                var spriteClass = 'sprite sprite_40x40 sprite_40x40_defend sprite_40x40_placeholder ';
-                //var spriteStyle = 'background-image: url(images/robots/robot/sprite_right_40x40.png?'+gameSettings.cacheTime+'); bottom: 6px; left: '+someValue+'px; right: auto; opacity: 0.8; ';
-                var spriteStyle = 'background-image: url(images/robots/robot/sprite_right_40x40.png?'+gameSettings.cacheTime+'); bottom: 6px; right: '+someValue+'px; left: auto; opacity: 0.8; ';
+
+                var heartClass = 'sprite sprite_40x40 sprite_40x40_heartback ';
+                var heartStyle = ' bottom: 4px; right: '+(someValue - 2)+'px; left: auto; z-index: 1; text-indent: 0; text-align: center; color: #262626; font-size: 24px; ';
+                spriteMarkup += '<span class="'+heartClass+'" style="'+heartStyle+'"><i class="fa fas fa-heart"></i></span>';
+
+                var spriteClass = 'sprite sprite_40x40 sprite_40x40_base sprite_40x40_placeholder ';
+                //var spriteStyle = 'bottom: 6px; right: '+someValue+'px; left: auto; z-index: 2; background-image: url(images/robots/robot/sprite_right_40x40.png?'+gameSettings.cacheTime+'); ';
+                var spriteStyle = 'bottom: 6px; right: '+someValue+'px; left: auto; z-index: 2; ';
                 spriteMarkup += '<span data-key="'+(gameSettings.nextRobotLimit - iCounter)+'" class="'+spriteClass+'" style="'+spriteStyle+'">Select Robot</span>';
+
                 }
 
             // Prepend the sprite to the parent's label value
@@ -955,6 +962,8 @@ function prototype_menu_click_option(thisContext, thisOption){
 
             // Append this option object to the main banner window
             var cloneOption = thisOption.clone();
+            var cloneWidth = ((numOptions * 8) + 42);
+            if (thisSelect === 'this_player_token'){ cloneWidth = 25; }
             cloneOption.attr('data-select', thisSelect);
             cloneOption.removeClass('option_1x1 option_1x2 option_1x3 option_1x4').addClass('option_1x'+thisPosition);
             cloneOption.find('.arrow').css({right:0});
@@ -969,7 +978,7 @@ function prototype_menu_click_option(thisContext, thisOption){
                 //marginLeft:'-'+(thisBanner.outerWidth() + 100)+'px',
                 borderWidth:'1px',
                 border:'1px solid rgba(0, 0, 0, 0.6)',
-                width:((numOptions * 8) + 42)+'%'
+                width: cloneWidth+'%'
                 });
             cloneOption.find('label').css({
                 //marginRight:'15px',
