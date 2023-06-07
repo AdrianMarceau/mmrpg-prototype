@@ -1288,9 +1288,8 @@ body.index #header {
     height: 100% !important;
 }
 
-
 #mmrpg[data-cinema-mode] {
-    transition: background 0.3s;
+    transition: background 0.3s, padding 0.3s;
 }
 #mmrpg[data-cinema-mode] #credits,
 #mmrpg[data-cinema-mode] #winmods {
@@ -3720,7 +3719,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .actions_ability .action_ability label .maintext,
 #actions .actions_item .action_item label .maintext {
     margin-bottom: 0;
-    font-size: 11px;
+    /* font-size: 11px;  */
+    font-size: 10px;
     line-height: 14px;
     font-weight: bold;
 }

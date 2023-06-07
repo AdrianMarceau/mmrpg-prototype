@@ -307,17 +307,23 @@ $(document).ready(function(){
 (function(){
     var $body = $('body');
     var $gameWindow = $('#window')
-    $(window).bind('blur', function() {
+    // When the parent window loses focus, we'll assume the user is playing
+    $(window).bind('blur', function(){
         //console.log('Window lost focus, user must be playing');
-        // Fade elements or perform other actions
         $body.attr('data-cinema-mode', 'true');
         });
+    // When the document is clicked outside the game window, we'll assume the user is configuring
     $(document).bind('click', function(event) {
-        if (!$(event.target).closest('#window').length) {
-            //console.log('Clicked outside #window, user must be configuring');
-            // Fade elements or perform other actions
-            $body.attr('data-cinema-mode', 'false');
-            }
+        if ($(event.target).closest('#window').length){ return; }
+        if ($(event.target).closest('#music').length){ return; }
+        //console.log('Clicked outside game window, user must be configuring');
+        $body.attr('data-cinema-mode', 'false');
+        });
+    // When the START button is clicked (disgused music button) we can start cinema mode
+    $('#music').bind('click', function(e){
+        //console.log('User clicked start, user must be playing');
+        $body.attr('data-cinema-mode', 'true');
+        e.stopPropagation();
         });
 })();
 

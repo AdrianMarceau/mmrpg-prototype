@@ -2,6 +2,9 @@ body.prototype {
     background-color: #262626;
     border-color: #262626;
 }
+#mmrpg {
+    transition: background 0.3s, padding 0.3s, min-height 0.3s;
+}
 #falloff {
     display: block;
     position: absolute;
