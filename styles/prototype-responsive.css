@@ -96,6 +96,26 @@ body:before {
 
 }
 
+@media (min-width: 800px){
+
+    body:before {
+        content: "11";
+    }
+
+    #mmrpg.index {
+        padding-top: 20px;
+        min-height: calc(100svh - 20px);
+    }
+    #mmrpg.index #window {
+        border-radius: 0.75em;
+    }
+    #mmrpg.index #music,
+    #mmrpg.index #animate,
+    #mmrpg.index #events {
+        border-radius: 0.5em;
+    }
+
+}
 @media (max-width: 800px){
 
     body:before {

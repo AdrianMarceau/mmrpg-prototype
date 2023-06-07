@@ -316,6 +316,7 @@ $(document).ready(function(){
     $(document).bind('click', function(event) {
         if ($(event.target).closest('#window').length){ return; }
         if ($(event.target).closest('#music').length){ return; }
+        if ($(event.target).closest('#events').length){ return; }
         //console.log('Clicked outside game window, user must be configuring');
         $body.attr('data-cinema-mode', 'false');
         });

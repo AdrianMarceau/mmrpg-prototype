@@ -1288,23 +1288,6 @@ body.index #header {
     height: 100% !important;
 }
 
-#mmrpg[data-cinema-mode] {
-    transition: background 0.3s, padding 0.3s;
-}
-#mmrpg[data-cinema-mode] #credits,
-#mmrpg[data-cinema-mode] #winmods {
-    transition: opacity 0.3s;
-}
-
-#mmrpg[data-cinema-mode="true"] {
-    background-color: #292929;
-    background-image: url(../images/assets/index-background.png);
-}
-#mmrpg[data-cinema-mode="true"] #credits,
-#mmrpg[data-cinema-mode="true"] #winmods {
-    opacity: 0.3;
-}
-
 
 #music,
 #animate,

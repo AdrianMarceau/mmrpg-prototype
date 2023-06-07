@@ -2153,6 +2153,27 @@ body[data-source="website"] #prototype .menu {
 }
 
 
+/* CINEMA MODE STYLES */
+
+#mmrpg.index[data-cinema-mode] {
+    transition: background 0.3s, padding 0.3s;
+}
+#mmrpg.index[data-cinema-mode] #credits,
+#mmrpg.index[data-cinema-mode] #winmods {
+    transition: opacity 0.3s;
+}
+
+#mmrpg.index[data-cinema-mode="true"] {
+    background-color: #292929;
+    background-image: url(../images/assets/index-background.png);
+    overflow: hidden;
+}
+#mmrpg.index[data-cinema-mode="true"] #credits,
+#mmrpg.index[data-cinema-mode="true"] #winmods {
+    opacity: 0.3;
+}
+
+
 /* WINDOW SIZE STYLES */
 
 body.windowFlag_landscapeMode #prototype {
