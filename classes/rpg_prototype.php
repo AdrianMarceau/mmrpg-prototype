@@ -182,6 +182,96 @@ class rpg_prototype {
         return $temp_array;
     }
 
+    // Define a function for calculating a given player's progress through the story
+    public static function calculate_player_progress($player_token, &$chapters_unlocked){
+
+        // Collect counters and flags for this specific player
+        $session_token = rpg_game::session_token();
+        $player_unlocked = mmrpg_prototype_player_unlocked($player_token);
+        $battle_complete_counter = $player_unlocked ? mmrpg_prototype_battles_complete($player_token) : 0;
+        $battle_failure_counter = $player_unlocked ? mmrpg_prototype_battles_failure($player_token) : 0;
+        $prototype_complete_flag = $player_unlocked ? mmrpg_prototype_complete($player_token) : false;
+        $prototype_complete_count = mmrpg_prototype_complete();
+        //$battle_star_counter = mmrpg_prototype_stars_unlocked();
+        if ($player_unlocked && !$prototype_complete_flag && $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
+            $_SESSION[$session_token]['flags']['prototype_events'][$player_token]['prototype_complete'] = $prototype_complete_flag = true;
+        }
+
+        // Predefine the variable to hold the unlocked chapter progress
+        if (empty($chapters_unlocked) || !is_array($chapters_unlocked)){ $chapters_unlocked = array(); }
+
+        // -- PHASE ONE -- //
+
+        // Intro
+        $chapters_unlocked['0'] = true;
+        $chapters_unlocked['0b'] = $prototype_complete_flag || $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER0_MISSIONS + 1) ? true : false;
+        $chapters_unlocked['0c'] = $prototype_complete_flag || $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER0_MISSIONS + 2) ? true : false;
+
+        // Masters
+        $chapters_unlocked['1'] = $prototype_complete_flag || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER1_MISSIONCOUNT ? true : false;
+
+        // Rivals
+        $chapters_unlocked['2'] = $prototype_complete_flag || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER2_MISSIONCOUNT ? true : false;
+
+
+        // -- PHASE TWO -- //
+
+        // Fusions
+        $chapters_unlocked['3'] = $prototype_complete_flag || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT ? true : false;
+
+        // Finals
+        $chapters_unlocked['4a'] = $prototype_complete_flag || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT ? true : false;
+        $chapters_unlocked['4b'] = $prototype_complete_flag || $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 1) ? true : false;
+        $chapters_unlocked['4c'] = $prototype_complete_flag || $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 2) ? true : false;
+
+
+        // -- BONUS PHASE -- //
+
+        if ($prototype_complete_flag
+            || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
+
+            // Random
+            $chapters_unlocked['5'] = true;
+
+            // Players
+            $chapters_unlocked['6'] = mmrpg_prototype_item_unlocked('light-program') ? true : false;
+
+            // Challenges
+            $chapters_unlocked['8'] = mmrpg_prototype_item_unlocked('wily-program') ? true : false;
+
+            // Stars
+            $chapters_unlocked['7'] = mmrpg_prototype_item_unlocked('cossack-program') ? true : false;
+
+        } else {
+
+            // Random
+            $chapters_unlocked['5'] = false;
+
+            // Players
+            $chapters_unlocked['6'] = false;
+
+            // Challenges
+            $chapters_unlocked['8'] = false; //$prototype_complete_count >= 3 ? true : false;
+
+            // Stars
+            $chapters_unlocked['7'] = false; //mmrpg_prototype_item_unlocked('cossack-program') ? true : false;
+
+        }
+
+    }
+
+    // Define a function for getting the array of unlocked chapters for a given player
+    public static function get_player_chapters_unlocked($player_token){
+
+        // Calculate player progress and capture the chapters array
+        $chapters_unlocked = array();
+        self::calculate_player_progress($player_token, $chapters_unlocked);
+
+        // Return the array of chapters unlocked
+        return $chapters_unlocked;
+
+    }
+
 
 }
 ?>
