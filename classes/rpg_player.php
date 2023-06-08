@@ -1668,6 +1668,10 @@ class rpg_player extends rpg_object {
 
         }
 
+        // Given everything, check to see if shards will be fusing this turn
+        $shards_fusing_this_turn = false;
+        if ($shards_remaining !== false && $shards_remaining < 1){ $shards_fusing_this_turn = true; }
+
         // Display the robot reward message markup
         $event_header = $temp_item_name.' Item Drop';
         if ($item_quantity_dropped > 1){
@@ -1690,7 +1694,16 @@ class rpg_player extends rpg_object {
         $event_options['canvas_show_this_item'] = true;
         rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $temp_item);
         $this_battle->events_create($target_robot, $target_robot, $event_header, $event_body, $event_options);
-        $this_battle->events_create(false, false, '', '', array_filter($event_options, function($k){ return strstr($k, '_camera_'); }, ARRAY_FILTER_USE_KEY));
+        if ($shards_fusing_this_turn){
+            $temp_item->set_frame_styles('filter: brightness(2); ');
+            $this_battle->events_create(false, false, '', '', $event_options);
+            $event_options['this_item_quantity'] = MMRPG_SETTINGS_SHARDS_MAXQUANTITY;
+            $this_battle->events_create(false, false, '', '', $event_options);
+            $temp_item->set_frame_styles('');
+        } else {
+            $temp_item->set_frame_styles('');
+            $this_battle->events_create(false, false, '', '', array_filter($event_options, function($k){ return strstr($k, '_camera_'); }, ARRAY_FILTER_USE_KEY));
+        }
 
         // Create and/or increment the session variable for this item increasing its quantity
         if (empty($_SESSION['GAME']['values']['battle_items'][$temp_item_token])){ $_SESSION['GAME']['values']['battle_items'][$temp_item_token] = 0; }
@@ -1712,7 +1725,7 @@ class rpg_player extends rpg_object {
         }
 
         // If this was a shard, and it was the LAST shard
-        if ($shards_remaining !== false && $shards_remaining < 1){
+        if ($shards_fusing_this_turn){
 
             // Define the new core token and increment value in session
             $temp_core_token = str_replace('shard', 'core', $temp_item_token);
@@ -1769,8 +1782,10 @@ class rpg_player extends rpg_object {
             $target_player->set_frame(($item_reward_key + 1 % 3 == 0 ? 'taunt' : 'victory'));
             $target_robot->set_frame($item_reward_key % 2 == 0 ? 'base' : 'taunt');
             $temp_core->set_frame('base');
-            $temp_core->set_frame_offset(array('x' => 220, 'y' => 0, 'z' => 10));
+            $temp_core->set_frame_offset(array('x' => 260, 'y' => 0, 'z' => 10));
+            rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $temp_item);
             $this_battle->events_create($target_robot, false, $event_header, $event_body, $event_options);
+            $this_battle->events_create(false, false, '', '', array_filter($event_options, function($k){ return strstr($k, '_camera_'); }, ARRAY_FILTER_USE_KEY));
 
             // Set the old shard counter back to zero now that they've fused
             $_SESSION['GAME']['values']['battle_items'][$temp_item_token] = 0;

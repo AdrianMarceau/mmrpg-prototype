@@ -1151,9 +1151,16 @@ class rpg_canvas {
         elseif ($this_data['item_quantity'] % 2 != 0){ $middle_quantity_key = ($this_data['item_quantity'] - 1) / 2; }
         else { $middle_quantity_key = $this_data['item_quantity'] / 2; }
 
+        // Check to see if this is a fusing shard (in which case we'll adjust display)
+        $shards_fusing_this_turn = false;
+        if (strstr($this_data['item_token'], '-shard')
+            && $this_data['item_quantity'] === MMRPG_SETTINGS_SHARDS_MAXQUANTITY){
+            $shards_fusing_this_turn = true;
+        }
+
         // Shift the original x offset if there's more than one of an item
         if ($this_data['item_quantity'] > 1){
-            $this_data['canvas_offset_x'] += 50;
+            $this_data['canvas_offset_x'] += 40;
             $this_data['canvas_offset_x'] -= round(($this_data['item_quantity'] / 2) * 7);
             $this_data['canvas_offset_y'] -= round(($this_data['item_quantity'] / 2) * 1);
         }
@@ -1165,6 +1172,7 @@ class rpg_canvas {
             $canvas_offset_x = $this_data['canvas_offset_x'];
             $canvas_offset_y = $this_data['canvas_offset_y'];
             $canvas_offset_z = $this_data['canvas_offset_z'];
+            if ($shards_fusing_this_turn){ $canvas_offset_x -= 26; }
             for ($item_key = 0; $item_key < $this_data['item_quantity']; $item_key++){
 
                 // Define the rest of the display variables
@@ -1178,7 +1186,8 @@ class rpg_canvas {
                 if ($frame_position === false){ $frame_position = 0; }
                 $frame_background_offset = -1 * ceil(($this_data['item_sprite_size'] * $frame_position));
 
-                if ($item_key > 0){
+                if (!$shards_fusing_this_turn
+                    && $item_key > 0){
                     $offset_multiplier = $item_key > $middle_quantity_key ? 1 : -1;
                     $canvas_offset_x += 10;
                     if ($item_key > $middle_quantity_key){
@@ -1197,6 +1206,12 @@ class rpg_canvas {
                 $this_data['item_markup_style'] = 'background-position: '.$frame_background_offset.'px 0; ';
                 $this_data['item_markup_style'] .= 'pointer-events: none; z-index: '.$canvas_offset_z.'; '.$this_data['item_float'].': '.$canvas_offset_x.'px; bottom: '.$canvas_offset_y.'px; ';
                 $this_data['item_markup_style'] .= 'background-image: url('.$this_data['item_image'].'); width: '.($this_data['item_sprite_size'] * $this_data['item_frame_span']).'px; height: '.$this_data['item_sprite_size'].'px; background-size: '.$this_data['item_image_width'].'px '.$this_data['item_image_height'].'px; ';
+
+                if ($shards_fusing_this_turn){
+                    if ($item_key === 1){ $this_data['item_markup_style'] .= 'transform: rotate(180deg);'; }
+                    if ($item_key === 2){ $this_data['item_markup_style'] .= 'transform: rotate(90deg);'; }
+                    if ($item_key === 3){ $this_data['item_markup_style'] .= 'transform: rotate(270deg);'; }
+                }
 
                 // DEBUG
                 //$this_data['item_title'] .= 'DEBUG checkpoint data sticky = '.preg_replace('/\s+/i', ' ', htmlentities(print_r($options, true), ENT_QUOTES, 'UTF-8', true));
