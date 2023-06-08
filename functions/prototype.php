@@ -984,7 +984,7 @@ function mmrpg_prototype_stars_unlocked($player_token = '', $star_kind = ''){
     }
 }
 // Define a function for checking how many limit hearts have been unlocked by a player
-function mmrpg_prototype_limit_hearts_earned($player_token, &$max_hearts){
+function mmrpg_prototype_limit_hearts_earned($player_token, &$max_hearts = 0){
 
     // Define the number of hearts at zero and we'll go up from there
     $real_max_hearts = 8;
