@@ -2487,8 +2487,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #canvas [data-camera-shift="right"][data-camera-focus="bench"] .canvas_ability_details,
 #canvas [data-camera-shift="right"][data-camera-focus="bench"] .canvas_item_details,
 #canvas [data-camera-shift="right"][data-camera-focus="bench"] .canvas_skill_details {
-    transform: translate(-24.5%, 78%);
-    transform: translate(calc(-24.5% * var(--camera-shift-depth-mod)), 78%);
+    transform: translate(24.5%, 78%);
+    transform: translate(calc(24.5% * var(--camera-shift-depth-mod)), 78%);
 }
 
 #canvas .event pre {

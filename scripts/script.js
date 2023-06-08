@@ -2011,6 +2011,8 @@ function mmrpg_canvas_camera_shift(newCameraShift, newCameraFocus, newCameraDept
         var depthModValue = 1 - diffValue;
         if (offsetCameraDepth < 0){ depthModValue = depthModValue * -1; }
         updateCameraShiftVariable('depth-mod', depthModValue);
+    } else {
+        updateCameraShiftVariable('depth-mod', 1);
     }
 
     // This second value is used for camera shifts in the foreground
@@ -2019,6 +2021,8 @@ function mmrpg_canvas_camera_shift(newCameraShift, newCameraFocus, newCameraDept
         var depthMod2Value = 1.8 - diffValue;
         if (offsetCameraDepth < 0){ depthMod2Value = depthMod2Value * -1; }
         updateCameraShiftVariable('depth-mod2', depthMod2Value);
+    } else {
+        updateCameraShiftVariable('depth-mod2', 1.8);
     }
 
 }
