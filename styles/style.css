@@ -1,6 +1,5 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
-body { font-family: 'Open Sans', Arial, sans-serif !important; }
 
 html,
 body,
@@ -29,6 +28,7 @@ strong {
 }
 body {
     font-family: Arial, Verdana;
+    font-family: 'Open Sans', Arial, sans-serif !important;
     font-size: 12px;
     line-height: 15px;
     text-align: center;
@@ -1006,14 +1006,20 @@ body.index #header {
     width: 52px;
     height: 41px;
     color: #FFFFFF;
-    font-family: "Courier New";
     text-align: center;
     text-indent: 0;
     font-weight: bold;
     font-size: 10px;
-    line-height: 48px;
+    line-height: 41px;
     letter-spacing: 0;
-    background: transparent url(../images/assets/battle-scene_robot-results.png?20130828-2) scroll no-repeat 0 0;
+    text-shadow: 1px 1px 0 #000;
+    background-color: transparent;
+    /* background-image: url(../images/assets/battle-scene_robot-results.png?20130828-2); */
+    background-image: url(../images/assets/battle-scene_robot-results_2k23.png?20230608-3);
+    background-attachment: scroll;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+
 }
 
 #mmrpg .ability_recovery_energy { background-position: 0 0; }
@@ -1145,6 +1151,46 @@ body.index #header {
 #mmrpg .item_damage_experience_high { width: 68px; font-size: 14px; line-height: 50px; background-position: -259px -205px; }
 #mmrpg .item_damage_level_high { width: 68px; font-size: 14px; line-height: 50px; background-position: -328px -205px; }
 
+#mmrpg .ability_damage > strong,
+#mmrpg .ability_recovery > strong,
+#mmrpg .item_damage > strong,
+#mmrpg .item_recovery > strong {
+    position: relative;
+    background-color: rgb(0, 0, 0);
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    padding: 0 6px;
+    line-height: 1;
+}
+#mmrpg .ability_damage > strong,
+#mmrpg .item_damage > strong {
+    bottom: -22px;
+    background-color: rgba(80, 0, 0, 0.8);
+}
+#mmrpg .ability_recovery > strong,
+#mmrpg .item_recovery > strong {
+    bottom: 8px;
+    background-color: rgba(0, 80, 0, 0.8);
+}
+
+#mmrpg .ability_damage_experience > strong,
+#mmrpg .item_damage_experience > strong,
+#mmrpg .ability_damage_level > strong,
+#mmrpg .item_damage_level > strong {
+    bottom: -19px;
+}
+#mmrpg .ability_recovery_experience > strong,
+#mmrpg .item_recovery_experience > strong,
+#mmrpg .ability_recovery_level > strong,
+#mmrpg .item_recovery_level > strong {
+    bottom: 16px;
+}
+
+#mmrpg .ability_recovery_level,
+#mmrpg .ability_damage_level {
+    transform: scale(1.2);
+}
 
 #mmrpg .ability_overlay,
 #mmrpg .item_overlay,

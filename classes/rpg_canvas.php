@@ -2099,12 +2099,26 @@ class rpg_canvas {
                         // Check if a damage trigger was sent with the object results
                         if ($this_options['this_'.$results_type.'_results']['trigger_kind'] == 'damage'){
 
+                            // Collect details about the damage before we add it to the markup
+                            $damage_kind = $this_options['this_'.$results_type.'_results']['damage_kind'];
+                            $damage_amount = $this_options['this_'.$results_type.'_results']['this_amount'];
+                            if (in_array($damage_kind, array('attack', 'defense', 'speed', 'level'))){
+                                $damage_tier = $damage_amount;
+                            } elseif (in_array($damage_kind, array('experience'))){
+                                $damage_tier = ceil($damage_amount / 1000);
+                            } else {
+                                $damage_tier = 1;
+                                if (!empty($this_options['this_'.$results_type.'_results']['flag_weakness'])){ $damage_tier += 1; }
+                                if (!empty($this_options['this_'.$results_type.'_results']['flag_critical'])){ $damage_tier += 1; }
+                                if (!empty($this_options['this_'.$results_type.'_results']['flag_resistance'])){ $damage_tier -= 1; }
+                            }
+
                             // Append the object damage kind to the class
-                            $this_results_data['results_amount_class'] .= $results_type.'_damage '.$results_type.'_damage_'.$this_options['this_'.$results_type.'_results']['damage_kind'].' ';
-                            if (!empty($this_options['this_'.$results_type.'_results']['flag_resistance'])){ $this_results_data['results_amount_class'] .= $results_type.'_damage_'.$this_options['this_'.$results_type.'_results']['damage_kind'].'_low '; }
-                            elseif (!empty($this_options['this_'.$results_type.'_results']['flag_weakness']) || !empty($this_options['this_'.$results_type.'_results']['flag_critical'])){ $this_results_data['results_amount_class'] .= $results_type.'_damage_'.$this_options['this_'.$results_type.'_results']['damage_kind'].'_high '; }
-                            else { $this_results_data['results_amount_class'] .= $results_type.'_damage_'.$this_options['this_'.$results_type.'_results']['damage_kind'].'_base '; }
-                            $frame_number = $this_results_data['results_effect_index']['damage'][$this_options['this_'.$results_type.'_results']['damage_kind']];
+                            $this_results_data['results_amount_class'] .= $results_type.'_damage '.$results_type.'_damage_'.$damage_kind.' ';
+                            if ($damage_tier <= 1){ $this_results_data['results_amount_class'] .= $results_type.'_damage_'.$damage_kind.'_low '; }
+                            elseif ($damage_tier <= 2){ $this_results_data['results_amount_class'] .= $results_type.'_damage_'.$damage_kind.'_base '; }
+                            elseif ($damage_tier >= 3){ $this_results_data['results_amount_class'] .= $results_type.'_damage_'.$damage_kind.'_high '; }
+                            $frame_number = $this_results_data['results_effect_index']['damage'][$damage_kind];
                             $frame_int = (int)$frame_number;
                             $frame_offset = $frame_int > 0 ? '-'.($frame_int * $this_results_data[$results_type.'_sprite_size']) : 0;
                             $frame_position = $frame_int;
@@ -2112,20 +2126,35 @@ class rpg_canvas {
                             $frame_background_offset = -1 * ceil(($this_results_data[$results_type.'_sprite_size'] * $frame_position));
                             $this_results_data['results_effect_class'] .= 'sprite_'.$this_results_data[$results_type.'_sprite_size'].'x'.$this_results_data[$results_type.'_sprite_size'].'_'.$frame_number.' ';
                             $this_results_data['results_effect_style'] .= 'width: '.$this_results_data[$results_type.'_sprite_size'].'px; height: '.$this_results_data[$results_type.'_sprite_size'].'px; background-size: '.$this_results_data[$results_type.'_image_width'].'px '.$this_results_data[$results_type.'_image_height'].'px; background-position: '.$frame_background_offset.'px 0; ';
+
                             // Append the final damage results markup to the markup array
-                            $this_results_data['results_amount_markup'] .= '<div class="'.$this_results_data['results_amount_class'].'" style="'.$this_results_data['results_amount_style'].'">-'.$this_options['this_'.$results_type.'_results']['this_amount'].'</div>';
-                            $this_results_data['results_effect_markup'] .= '<div class="'.$this_results_data['results_effect_class'].'" style="'.$this_results_data['results_effect_style'].'">-'.$this_options['this_'.$results_type.'_results']['damage_kind'].'</div>';
+                            $this_results_data['results_amount_markup'] .= '<div class="'.$this_results_data['results_amount_class'].'" style="'.$this_results_data['results_amount_style'].'"><strong>-'.$damage_amount.'</strong></div>';
+                            $this_results_data['results_effect_markup'] .= '<div class="'.$this_results_data['results_effect_class'].'" style="'.$this_results_data['results_effect_style'].'"></div>';
 
                         }
                         // Check if a recovery trigger was sent with the object results
                         elseif ($this_options['this_'.$results_type.'_results']['trigger_kind'] == 'recovery'){
 
+                            // Collect details about the recovery before we add it to the markup
+                            $recovery_kind = $this_options['this_'.$results_type.'_results']['recovery_kind'];
+                            $recovery_amount = $this_options['this_'.$results_type.'_results']['this_amount'];
+                            if (in_array($recovery_kind, array('attack', 'defense', 'speed', 'level'))){
+                                $recovery_tier = $recovery_amount;
+                            } elseif (in_array($recovery_kind, array('experience'))){
+                                $recovery_tier = ceil($recovery_amount / 1000);
+                            } else {
+                                $recovery_tier = 1;
+                                if (!empty($this_options['this_'.$results_type.'_results']['flag_affinity'])){ $recovery_tier += 1; }
+                                if (!empty($this_options['this_'.$results_type.'_results']['flag_critical'])){ $recovery_tier += 1; }
+                                if (!empty($this_options['this_'.$results_type.'_results']['flag_resistance'])){ $recovery_tier -= 1; }
+                            }
+
                             // Append the object recovery kind to the class
-                            $this_results_data['results_amount_class'] .= $results_type.'_recovery '.$results_type.'_recovery_'.$this_options['this_'.$results_type.'_results']['recovery_kind'].' ';
-                            if (!empty($this_options['this_'.$results_type.'_results']['flag_resistance'])){ $this_results_data['results_amount_class'] .= $results_type.'_recovery_'.$this_options['this_'.$results_type.'_results']['recovery_kind'].'_low '; }
-                            elseif (!empty($this_options['this_'.$results_type.'_results']['flag_affinity']) || !empty($this_options['this_'.$results_type.'_results']['flag_critical'])){ $this_results_data['results_amount_class'] .= $results_type.'_recovery_'.$this_options['this_'.$results_type.'_results']['recovery_kind'].'_high '; }
-                            else { $this_results_data['results_amount_class'] .= $results_type.'_recovery_'.$this_options['this_'.$results_type.'_results']['recovery_kind'].'_base '; }
-                            $frame_number = $this_results_data['results_effect_index']['recovery'][$this_options['this_'.$results_type.'_results']['recovery_kind']];
+                            $this_results_data['results_amount_class'] .= $results_type.'_recovery '.$results_type.'_recovery_'.$recovery_kind.' ';
+                            if ($recovery_tier <= 1){ $this_results_data['results_amount_class'] .= $results_type.'_recovery_'.$recovery_kind.'_low '; }
+                            elseif ($recovery_tier <= 2){ $this_results_data['results_amount_class'] .= $results_type.'_recovery_'.$recovery_kind.'_base '; }
+                            elseif ($recovery_tier >= 3){ $this_results_data['results_amount_class'] .= $results_type.'_recovery_'.$recovery_kind.'_high '; }
+                            $frame_number = $this_results_data['results_effect_index']['recovery'][$recovery_kind];
                             $frame_int = (int)$frame_number;
                             $frame_offset = $frame_int > 0 ? '-'.($frame_int * $this_results_data[$results_type.'_size']) : 0;
                             $frame_position = $frame_int;
@@ -2133,9 +2162,10 @@ class rpg_canvas {
                             $frame_background_offset = -1 * ceil(($this_results_data[$results_type.'_sprite_size'] * $frame_position));
                             $this_results_data['results_effect_class'] .= 'sprite_'.$this_results_data[$results_type.'_sprite_size'].'x'.$this_results_data[$results_type.'_sprite_size'].'_'.$frame_number.' ';
                             $this_results_data['results_effect_style'] .= 'width: '.$this_results_data[$results_type.'_sprite_size'].'px; height: '.$this_results_data[$results_type.'_sprite_size'].'px; background-size: '.$this_results_data[$results_type.'_image_width'].'px '.$this_results_data[$results_type.'_image_height'].'px; background-position: '.$frame_background_offset.'px 0; ';
+
                             // Append the final recovery results markup to the markup array
-                            $this_results_data['results_amount_markup'] .= '<div class="'.$this_results_data['results_amount_class'].'" style="'.$this_results_data['results_amount_style'].'">+'.$this_options['this_'.$results_type.'_results']['this_amount'].'</div>';
-                            $this_results_data['results_effect_markup'] .= '<div class="'.$this_results_data['results_effect_class'].'" style="'.$this_results_data['results_effect_style'].'">+'.$this_options['this_'.$results_type.'_results']['recovery_kind'].'</div>';
+                            $this_results_data['results_amount_markup'] .= '<div class="'.$this_results_data['results_amount_class'].'" style="'.$this_results_data['results_amount_style'].'"><strong>+'.$recovery_amount.'</strong></div>';
+                            $this_results_data['results_effect_markup'] .= '<div class="'.$this_results_data['results_effect_class'].'" style="'.$this_results_data['results_effect_style'].'"></div>';
 
                         }
 
