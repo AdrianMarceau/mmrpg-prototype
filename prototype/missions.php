@@ -37,7 +37,26 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             // Generate the battle option with the starter data
             $temp_session_token = $this_prototype_data['this_player_token'].'_battle_'.$this_prototype_data['this_current_chapter'];
             if (empty($_SESSION['PROTOTYPE_TEMP'][$temp_session_token])){
-                $temp_battle_omega = rpg_mission_starter::generate_intro($this_prototype_data, $this_prototype_data['this_intro_targets'][0], $this_prototype_data['this_chapter_levels'][0], $this_prototype_data['this_support_robot'], $this_prototype_data['this_intro_field']);
+                $temp_battle_omega = rpg_mission_starter::generate_intro($this_prototype_data, $this_prototype_data['this_intro_targets'][0], $this_prototype_data['this_chapter_levels'][0], '', $this_prototype_data['this_intro_field']);
+                $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
+                rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+                $_SESSION['PROTOTYPE_TEMP'][$temp_session_token] = $temp_battle_omega['battle_token'];
+            } else {
+                $temp_battle_token = $_SESSION['PROTOTYPE_TEMP'][$temp_session_token];
+                $temp_battle_omega = rpg_battle::get_index_info($temp_battle_token);
+            }
+            $this_prototype_data['battle_options'][] = $temp_battle_omega;
+
+        }
+
+        // Intro Battle II (Vs. SNIPER/CRYSTAL/SKELETON-JOE)
+        // Only continue if the player has defeated the first 1 battles
+        if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['0b'])){
+
+            // Generate the battle option with the starter data
+            $temp_session_token = $this_prototype_data['this_player_token'].'_battle_'.$this_prototype_data['this_current_chapter'].'b';
+            if (empty($_SESSION['PROTOTYPE_TEMP'][$temp_session_token])){
+                $temp_battle_omega = rpg_mission_starter::generate_midboss($this_prototype_data, $this_prototype_data['this_intro_targets'][1], ($this_prototype_data['this_chapter_levels'][0] + 1), $this_prototype_data['this_support_robot'], $this_prototype_data['this_player_field']);
                 $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
                 rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
                 $_SESSION['PROTOTYPE_TEMP'][$temp_session_token] = $temp_battle_omega['battle_token'];
