@@ -5995,6 +5995,7 @@ class rpg_robot extends rpg_object {
         $this->set_item('');
 
         // Also remove this robot's item from the session, we're done with it, if human character and appropriate to do so
+        $session_token = rpg_game::session_token();
         if ($this->player->player_side == 'left'
             && empty($this->battle->flags['player_battle'])
             && empty($this->battle->flags['challenge_battle'])){
