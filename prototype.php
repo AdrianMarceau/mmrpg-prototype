@@ -494,14 +494,14 @@ foreach ($this_menu_tooltips AS $token => $text){
                     <span class="pipe">|</span>
                     <a class="link link_items" data-step="items" data-index="<?= $this_menu_indexes['items'] ?>" data-source="frames/items.php" data-music="misc/item-viewer" data-tooltip="<?= $this_menu_tooltips['items'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <i class="fa fas fa-briefcase"></i>
-                        <label>inventory</label>
+                        <label>items</label>
                     </a>
                 <? endif; ?>
                 <? if (mmrpg_prototype_abilities_unlocked() > 2): ?>
                     <span class="pipe">|</span>
                     <a class="link link_abilities" data-step="abilities" data-index="<?= $this_menu_indexes['abilities'] ?>" data-source="frames/abilities.php" data-music="misc/item-viewer" data-tooltip="<?= $this_menu_tooltips['abilities'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <i class="fa fas fa-fire-alt"></i>
-                        <label>arsenal</label>
+                        <label>abilities</label>
                     </a>
                 <? endif; ?>
                 <? if (mmrpg_prototype_stars_unlocked() > 0): ?>
