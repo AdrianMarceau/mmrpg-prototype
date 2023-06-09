@@ -85,39 +85,6 @@ class rpg_mission_starter extends rpg_mission {
 
         // If the rescure robot has not yet been unlocked as a playable character, show it in the background
         $rescue_robot_unlockable = false;
-        if (!mmrpg_prototype_robot_unlocked(false, $this_rescue_token)
-            && $temp_target_count >= 2){
-
-            // Define the rescue robot's level and display properties depending on who it is
-            $rescue_robot_unlockable = true;
-            $rescue_robot_level = $temp_target_count;
-            $rescue_robot_frame = array(8,0,8,0,0);
-            $rescue_robot_position = array('x' => 354, 'y' => 118, 'direction' => 'left');
-            if ($this_rescue_token === 'roll'){
-                $rescue_robot_level += 0;
-                $rescue_robot_frame = array(0,6,8,6,8,10);
-                $rescue_robot_position = array('x' => 91, 'y' => 118, 'direction' => 'right');
-            }
-            elseif ($this_rescue_token === 'disco'){
-                $rescue_robot_level += 10;
-                $rescue_robot_frame = array(0,1,2,1,2,10);
-                $rescue_robot_position = array('x' => 180, 'y' => 140, 'direction' => 'left');
-            }
-            elseif ($this_rescue_token === 'rhythm'){
-                $rescue_robot_level += 20;
-                $rescue_robot_frame = array(0,6,2,6,2,10);
-                $rescue_robot_position = array('x' => 112, 'y' => 168, 'direction' => 'left');
-            }
-
-            // Add the rescue robot to the background with animation
-            if (empty($temp_battle_omega['battle_field_base']['field_foreground_attachments']) && !empty($intro_field_data['field_foreground_attachments'])){ $temp_battle_omega['battle_field_base']['field_foreground_attachments'] = $intro_field_data['field_foreground_attachments']; }
-            $temp_battle_omega['battle_field_base']['field_foreground_attachments']['robot_'.$this_rescue_token.'-01'] = array('class' => 'robot', 'size' => 40, 'offset_x' => $rescue_robot_position['x'], 'offset_y' => $rescue_robot_position['y'], 'offset_z' => 2, 'robot_token' => $this_rescue_token, 'robot_frame' => $rescue_robot_frame, 'robot_direction' => $rescue_robot_position['direction']);
-
-            // Add the rescue robot to the list of unlockables
-            $temp_battle_omega['battle_rewards']['robots'] = array();
-            $temp_battle_omega['battle_rewards']['robots'][] = array('token' => $this_rescue_token, 'level' => $rescue_robot_level, 'experience' => 999);
-
-        }
 
         // Allow unlocking of the mecha support ability if the player has reached max targets
         if ($temp_target_count >= 8){
@@ -228,29 +195,30 @@ class rpg_mission_starter extends rpg_mission {
         if (!mmrpg_prototype_robot_unlocked(false, $this_rescue_token)){
 
             // Define the rescue robot's level and display properties depending on who it is
+            $rescue_robot_size = 40;
             $rescue_robot_unlockable = true;
             $rescue_robot_level = $temp_midboss_level;
             $rescue_robot_frame = array(8,0,8,0,0);
             $rescue_robot_position = array('x' => 354, 'y' => 118, 'direction' => 'left');
             if ($this_rescue_token === 'roll'){
                 $rescue_robot_level += 0;
-                $rescue_robot_frame = array(0,5,0,5,0,8,0,10,0,10,0,8);
-                $rescue_robot_position = array('x' => 520, 'y' => 128, 'direction' => 'left');
+                $rescue_robot_frame = array(10, 10, 8, 10, 10, 0, 10, 10, 8, 0, 8, 8);
+                $rescue_robot_position = array('x' => 192, 'y' => 128, 'direction' => 'left');
             }
             elseif ($this_rescue_token === 'disco'){
                 $rescue_robot_level += 10;
                 $rescue_robot_frame = array(0,1,2,1,2,10);
-                $rescue_robot_position = array('x' => 180, 'y' => 140, 'direction' => 'left');
+                $rescue_robot_position = array('x' => 120, 'y' => 161, 'direction' => 'left');
             }
             elseif ($this_rescue_token === 'rhythm'){
                 $rescue_robot_level += 20;
                 $rescue_robot_frame = array(0,6,2,6,2,10);
-                $rescue_robot_position = array('x' => 112, 'y' => 168, 'direction' => 'left');
+                $rescue_robot_position = array('x' => 212, 'y' => 173, 'direction' => 'left');
             }
 
             // Add the rescue robot to the background with animation
-            if (empty($temp_battle_omega['battle_field_base']['field_foreground_attachments']) && !empty($intro_field_data['field_foreground_attachments'])){ $temp_battle_omega['battle_field_base']['field_foreground_attachments'] = $intro_field_data['field_foreground_attachments']; }
-            $temp_battle_omega['battle_field_base']['field_foreground_attachments']['robot_'.$this_rescue_token.'-01'] = array('class' => 'robot', 'size' => 40, 'offset_x' => $rescue_robot_position['x'], 'offset_y' => $rescue_robot_position['y'], 'offset_z' => 2, 'robot_token' => $this_rescue_token, 'robot_frame' => $rescue_robot_frame, 'robot_direction' => $rescue_robot_position['direction']);
+            if (empty($temp_battle_omega['battle_field_base']['field_background_attachments']) && !empty($intro_field_data['field_background_attachments'])){ $temp_battle_omega['battle_field_base']['field_background_attachments'] = $intro_field_data['field_background_attachments']; }
+            $temp_battle_omega['battle_field_base']['field_background_attachments']['robot_'.$this_rescue_token.'-01'] = array('class' => 'robot', 'size' => $rescue_robot_size, 'offset_x' => $rescue_robot_position['x'], 'offset_y' => $rescue_robot_position['y'], 'offset_z' => 2, 'robot_token' => $this_rescue_token, 'robot_frame' => $rescue_robot_frame, 'robot_direction' => $rescue_robot_position['direction']);
 
             // Add the rescue robot to the list of unlockables
             $temp_battle_omega['battle_rewards']['robots'] = array();
