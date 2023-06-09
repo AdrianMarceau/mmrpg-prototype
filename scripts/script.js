@@ -975,6 +975,7 @@ function mmrpg_canvas_animate(){
         var thisRandom = Math.floor(Math.random() * 100);
         // Default the new frame to base
         var newFrame = 'base';
+        var extraStyles = {};
         // Define the relative battle result
         var relativeResult = 'pending';
         if (battleStatus == 'complete'){
@@ -989,26 +990,31 @@ function mmrpg_canvas_animate(){
                 } else {
                 // Higher animation freqency if not active
                 if (thisPlayer.attr('data-position') != 'active'){
-                    if (battleStatus == 'complete' && thisRandom >= 60){
+                    if (battleStatus == 'complete' && thisRandom >= 50){
                         newFrame = relativeResult;
-                        } else if (thisRandom >= 30){
+                        } else if (thisRandom >= 80){
                         newFrame = 'taunt';
-                        } else if (thisRandom >= 10){
+                        } else if (thisRandom >= 60){
                         newFrame = 'base2';
                         }
                     } else {
-                    if (battleStatus == 'complete' && thisRandom >= 60){
+                    if (battleStatus == 'complete' && thisRandom >= 50){
                         newFrame = relativeResult;
-                        } else if (thisRandom >= 30){
+                        } else if (thisRandom >= 80){
                         newFrame = 'taunt';
-                        } else if (thisRandom >= 10){
+                        } else if (thisRandom >= 60){
                         newFrame = 'base2';
                         }
                     }
                 }
+            // Check to see if we should be applying any extra styles
+            if (newFrame !== 'base' && thisRandom % 11 === 0){ extraStyles = {transform: 'scaleX(-1) translateX(-10%)'}; }
+            else if (thisRandom % 3 === 0){ extraStyles = {transform: ''}; }
             }
+
         // Trigger the player frame advancement
-        mmrpg_canvas_player_frame(thisPlayer, newFrame);
+        //console.log('thisRandom:', thisRandom, 'newFrame:', newFrame, 'extraStyles:', extraStyles);
+        mmrpg_canvas_player_frame(thisPlayer, newFrame, extraStyles);
 
         });
 
@@ -1209,7 +1215,7 @@ function mmrpg_canvas_robot_frame(thisRobot, newFrame){
 
 // Define a function for updating a player's frame with animation
 spriteFrameIndex.players = ['base','taunt','victory','defeat','command','damage','base2'];
-function mmrpg_canvas_player_frame(thisPlayer, newFrame){
+function mmrpg_canvas_player_frame(thisPlayer, newFrame, extraStyles){
     // Collect this player's data fields
     var thisSize = thisPlayer.attr('data-size');
     var thisPosition = thisPlayer.attr('data-position');
@@ -1217,6 +1223,7 @@ function mmrpg_canvas_player_frame(thisPlayer, newFrame){
     var thisStatus = thisPlayer.attr('data-status');
     var thisFrame = thisPlayer.attr('data-frame');
     var newFramePosition = spriteFrameIndex.players.indexOf(newFrame) || 0;
+    if (typeof extraStyles !== 'object' || !extraStyles){ extraStyles = false; }
     //if (true){ alert(newFrame+' : '+newFramePosition); }
     // If the new frame is the same as the current, return
     if (thisFrame == newFrame){ return false; }
@@ -1233,11 +1240,13 @@ function mmrpg_canvas_player_frame(thisPlayer, newFrame){
         // Create a clone object with the new class and crossfade it into view
         var clonePlayer = thisPlayer.clone().css('z-index', '-=1').appendTo(thisPlayer.parent());
         thisPlayer.stop(true, true).css({opacity:0,backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).removeClass(currentClass).addClass(newClass);
+        if (extraStyles){ thisPlayer.css(extraStyles); }
         thisPlayer.stop(true, true).animate({opacity:1}, {duration:400,easing:'swing',queue:false});
         clonePlayer.stop(true, true).animate({opacity:0}, {duration:400,easing:'swing',queue:false,complete:function(){ $(this).remove(); }});
         } else {
         // Update the existing sprite's frame without crossfade by swapping the classsa
         thisPlayer.stop(true, true).css({backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).removeClass(currentClass).addClass(newClass);
+        if (extraStyles){ thisPlayer.css(extraStyles); }
         }
     // Return true on success
     return true;
