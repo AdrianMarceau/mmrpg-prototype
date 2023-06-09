@@ -1048,6 +1048,11 @@ class rpg_battle extends rpg_object {
                     $event_options['console_show_this_robot'] = false;
                     $event_options['console_show_this_ability'] = true;
                     $event_options['canvas_show_this_ability'] = false;
+                    $event_options['event_flag_camera_action'] = true;
+                    $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
+                    $event_options['event_flag_camera_focus'] = 'active';
+                    $event_options['event_flag_camera_depth'] = 0;
+                    $event_options['event_flag_camera_offset'] = 0;
                     $this_player->player_frame = 'victory';
                     $this_player->update_session();
                     $temp_ability->ability_frame = 'base';
@@ -1909,7 +1914,11 @@ class rpg_battle extends rpg_object {
                         $event_body = $old_robot->print_name().' is '.$this_switch_reason.' from battle!';
                         $event_options = array();
                         $event_options['canvas_show_disabled_bench'] = $old_robot->robot_id.'_'.$old_robot->robot_token;
-                        rpg_canvas::apply_camera_action_flags($event_options, $old_robot);
+                        $event_options['event_flag_camera_action'] = true;
+                        $event_options['event_flag_camera_side'] = $old_robot->player->player_side;
+                        $event_options['event_flag_camera_focus'] = 'active';
+                        $event_options['event_flag_camera_depth'] = 0;
+                        $event_options['event_flag_camera_offset'] = 0;
                         if ($old_robot->robot_status != 'disabled' && isset($old_robot->robot_quotes['battle_retreat'])){
                             $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                             $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $old_robot->robot_name);
