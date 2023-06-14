@@ -2449,8 +2449,10 @@ class rpg_battle extends rpg_object {
         $grid_col_widths_total = function($row = 1, $column = 1) use ($grid_col_widths) { return ($grid_col_widths[$row - 1] * ($column - 1)); };
 
         // Define minimum and maximum scale factors for sprites
-        $scale_min = 0.50;  // Smallest scale for sprites at the farthest row
-        $scale_max = 1.00;  // Largest scale for sprites at the closest row
+        $scale_base = 1.0;
+        $scale_shift = 0.3;
+        $scale_min = $scale_base - ($scale_base * $scale_shift);  // Smallest scale for sprites at the farthest row
+        $scale_max = $scale_base + ($scale_base * $scale_shift);  // Largest scale for sprites at the closest row
 
         // Define the size of a cell (in pixels)
         $cell_width = $grid_width / $grid_columns;
