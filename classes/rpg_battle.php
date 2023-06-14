@@ -2412,146 +2412,124 @@ class rpg_battle extends rpg_object {
 
     // Define a public function for calculating canvas markup offsets
     public function canvas_markup_offset($sprite_key, $sprite_position, $sprite_size, $bench_size = 1){
-
-        // Generate with perspective mode if the user has requested it, otherwise legacy
-        if (MMRPG_CONFIG_PERSPECTIVE_MODE === true){
-            return $this->canvas_markup_offset_perspective($sprite_key, $sprite_position, $sprite_size, $bench_size);
-        } else {
-            return $this->canvas_markup_offset_legacy($sprite_key, $sprite_position, $sprite_size);
-        }
-
+        return $this->canvas_markup_offset_perspective($sprite_key, $sprite_position, $sprite_size, $bench_size);
     }
 
-    // Define a public function for calculating canvas markup offsets
-    public function canvas_markup_offset_legacy($sprite_key, $sprite_position, $sprite_size){
+    // Function to calculate canvas markup offsets with perspective
+    public function canvas_markup_offset_perspective($sprite_key, $sprite_position, $sprite_size, $current_bench_size = 1){
 
-        // Define the data array to be returned later
-        $this_data = array();
+        // Define the max bench size so we can shift later
+        $max_bench_size = 8;
+        $base_sprite_size = 40;
+        $zoom_sprite_size = $base_sprite_size * 2;
 
-        // Define the base canvas offsets for this sprite
-        $this_data['canvas_offset_x'] = 165;
-        $this_data['canvas_offset_y'] = 55;
-        $this_data['canvas_offset_z'] = $sprite_position == 'active' ? 5100 : 4900;
-        $this_data['canvas_scale'] = $sprite_position == 'active' ? 1 : 0.5 + (((8 - $sprite_key) / 8) * 0.5);
+        // Define the size of the grid (in pixels)
+        $grid_width = ceil(750 / 2); // Half the canvas width
+        $grid_width -= ceil($grid_width / 9); // Pull back for the "middle" tile
+        $grid_height = 84; // Grid height
+        $grid_offset_bottom = 35; // Offset from the bottom of the canvas
 
-        // If the robot is on the bench, calculate position offsets based on key
-        if ($sprite_position == 'bench'){
+        // Define minimum and maximum Z-offset for sprites.
+        $z_min = 4900; // Smallest Z-offset for sprites at the farthest row
+        $z_max = 5100; // Largest Z-offset for sprites at the closest row
 
-            $this_data['canvas_offset_z'] -= 100 * $sprite_key;
-            $position_modifier = ($sprite_key + 1) / 8;
-            $position_modifier_2 = 1 - $position_modifier;
-            $temp_seed_1 = 40; //$sprite_size;
-            $temp_seed_2 = 20; //ceil($sprite_size / 2);
-            $this_data['canvas_offset_x'] = (-1 * $temp_seed_2) + ceil(($sprite_key + 1) * ($temp_seed_1 + 2)) - ceil(($sprite_key + 1) * $temp_seed_2);
-            //if ($sprite_size > 40){ $this_data['canvas_offset_x'] -= 40; }
-            //if ($sprite_size > 40){ $this_data['canvas_offset_x'] = ceil($this_data['canvas_offset_x'] / 4); }
-            $temp_seed_1 = $sprite_size;
-            $temp_seed_2 = ceil($sprite_size / 2);
-            $this_data['canvas_offset_y'] = ($temp_seed_1 + 6) + ceil(($sprite_key + 1) * 14) - ceil(($sprite_key + 1) * 7) - ($sprite_size - 40);
-            $temp_seed_3 = 0;
-            if ($sprite_key == 0){ $temp_seed_3 = -10; }
-            elseif ($sprite_key == 1){ $temp_seed_3 = 0; }
-            elseif ($sprite_key == 2){ $temp_seed_3 = 10; }
-            elseif ($sprite_key == 3){ $temp_seed_3 = 20; }
-            elseif ($sprite_key == 4){ $temp_seed_3 = 30; }
-            elseif ($sprite_key == 5){ $temp_seed_3 = 40; }
-            elseif ($sprite_key == 6){ $temp_seed_3 = 50; }
-            elseif ($sprite_key == 7){ $temp_seed_3 = 60; }
-            if ($sprite_size > 40){ $temp_seed_3 -= ceil(40 * $this_data['canvas_scale']); }
-            //$temp_seed_3 = ceil($temp_seed_3 * 0.5);
-            $this_data['canvas_offset_x'] += $temp_seed_3;
-            $this_data['canvas_offset_x'] += 20;
+        // Define the number of cells in the grid
+        $grid_columns = 4;
+        $grid_rows = 7;
+        $grid_row_middle = ceil($grid_rows / 2);
+        $grid_column_offsets = array();
 
+        // Manually define the height of rows because it's just not working
+        $grid_row_tilt = 26; // degrees
+        $grid_row_heights = array(19, 16, 13, 10, 9, 8, 6);
+        $grid_col_widths = array(132, 117, 106, 98, 91, 85, 79);
+        $grid_row_height = function($row = 1, $column = 1) use ($grid_row_heights) { return $grid_row_heights[$row - 1]; };
+        $grid_col_width = function($row = 1, $column = 1) use ($grid_col_widths) { return $grid_col_widths[$row - 1]; };
+        $grid_row_heights_total = function($row = 1, $column = 1) use ($grid_row_heights) { return array_sum(array_slice($grid_row_heights, 0, ($row - 1))); };
+        $grid_col_widths_total = function($row = 1, $column = 1) use ($grid_col_widths) { return ($grid_col_widths[$row - 1] * ($column - 1)); };
+
+        // Define minimum and maximum scale factors for sprites
+        $scale_min = 0.50;  // Smallest scale for sprites at the farthest row
+        $scale_max = 1.00;  // Largest scale for sprites at the closest row
+
+        // Define the size of a cell (in pixels)
+        $cell_width = $grid_width / $grid_columns;
+        $cell_height = $grid_height / $grid_rows;
+
+        // Define the default row and column for a sprite
+        $sprite_row = 1;
+        $sprite_column = 1;
+
+        // Push all sprites are pushed from the middle column
+        $sprite_column += 1;
+
+        // Further adjust the row and column based on the sprite's position (active/bench) and position key
+        //error_log('$sprite_position ('.$sprite_row.', '.$sprite_column.')');
+        if ($sprite_position == 'active') {
+            $sprite_row = $grid_row_middle;
+        } elseif ($sprite_position == 'bench'){
+            $sprite_column += 1;
+            $sprite_row += ($sprite_key - 1);
+            $extra_bench_slots = $current_bench_size < $max_bench_size ? ($max_bench_size - $current_bench_size) : 0;
+            $bench_shift_amount = $extra_bench_slots >= 2 ? floor($extra_bench_slots / 2) : 0;
+            //error_log('$extra_bench_slots = '.$extra_bench_slots);
+            //error_log('$bench_shift_amount = '.$bench_shift_amount);
+            if ($bench_shift_amount){ $sprite_row += $bench_shift_amount; }
         }
-        // Otherwise, if the robot is in active position
-        elseif ($sprite_position == 'active'){
+        //error_log('--> $sprite_position ('.$sprite_row.', '.$sprite_column.')');
 
-            if ($sprite_size > 80){
-                $this_data['canvas_offset_x'] -= 60;
-            }
+        /*
+        // DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
+        // DEBUG (just to test positions) DEBUG
+        $sprite_row = 1; //7;
+        $sprite_column = 2; //($sprite_key + 1);
+        */
 
-        }
+        // Calculate how much the scale should change per row
+        $scale_step = round(($scale_max - $scale_min) / ($grid_rows - 1), 2);
+        $canvas_scale = ($scale_max - ($sprite_row - 1) * $scale_step);
+        //error_log('$scale_step: '.$scale_step);
+        //error_log('$canvas_scale: '.$canvas_scale);
+        $rel_sprite_size = ($canvas_scale * $sprite_size);
+        $rel_base_sprite_size = ($canvas_scale * $base_sprite_size);
+        $rel_zoom_sprite_size = ($canvas_scale * $zoom_sprite_size);
+        $rel_cell_height = ($canvas_scale * $cell_height);
+        $rel_cell_width = ($canvas_scale * $cell_width);
 
-        // Return the generated canvas data for this robot
-        return $this_data;
+        // Calculate the canvas Y-offset based on the sprite's size first and foremost
+        $canvas_offset_y = 0;
+        $canvas_offset_y += $grid_offset_bottom; // start at the outer edge
+        $canvas_offset_y += ($grid_row_height($sprite_row, $sprite_column) / 2); // push them up half the height of their panel to vertically align
+        $canvas_offset_y += $grid_row_heights_total($sprite_row, $sprite_column); // push them up for all the rows beneath theirs
 
-    }
-
-
-    // Define a public function for calculating canvas markup offsets
-    public function canvas_markup_offset_perspective($sprite_key, $sprite_position, $sprite_size, $bench_size = 1){
-
-        // Collect the max bench size
-        $max_bench_size = MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX;
-        $current_max_bench_size = $this->counters['robots_perside_max'];
-
-        // Calculate the half-key representing the middle of this side of the field
-        $half_key = -1 + ceil($current_max_bench_size / 2);
-
-        // Define the data array to be returned later
-        $this_data = array();
-
-        // Define the base canvas offsets for this sprite
-        $this_data['canvas_offset_x'] = 165;
-        $this_data['canvas_offset_y'] = 55;
-        $this_data['canvas_offset_z'] = $sprite_position == 'active' ? 5100 : 4900;
-
-        // If the robot is on the bench, calculate position offsets based on key
-        if ($sprite_position == 'bench'){
-
-            // If this bench is smaller than max, we should offset a bit
-            /*
-            if ($bench_size < $current_max_bench_size){
-                $bench_diff = $current_max_bench_size - $bench_size;
-                $sprite_key += ceil($bench_diff / 2);
-            }
-            */
-            $this_data['canvas_offset_z'] -= 100 * $sprite_key;
-
-            // Base the scale on this robot's position on the bench
-            $this_data['canvas_scale'] = 0.5 + ((($max_bench_size - $sprite_key) / $max_bench_size) * 0.5);
-
-            $position_modifier = ($sprite_key + 1) / $max_bench_size;
-            $position_modifier_2 = 1 - $position_modifier;
-
-            $temp_seed_1 = 40;
-            $temp_seed_2 = 20;
-            $this_data['canvas_offset_x'] = (-1 * $temp_seed_2) + ceil(($sprite_key + 1) * ($temp_seed_1 + 2)) - ceil(($sprite_key + 1) * $temp_seed_2);
-            $temp_seed_1 = $sprite_size;
-            $temp_seed_2 = ceil($sprite_size / 2);
-            $this_data['canvas_offset_y'] = ($temp_seed_1 + 6) + ceil(($sprite_key + 1) * 14) - ceil(($sprite_key + 1) * 7) - ($sprite_size - 40);
-
-            $temp_seed_3 = 0;
-            if ($sprite_key == 0){ $temp_seed_3 = -10; }
-            elseif ($sprite_key == 1){ $temp_seed_3 = 0; }
-            elseif ($sprite_key == 2){ $temp_seed_3 = 10; }
-            elseif ($sprite_key == 3){ $temp_seed_3 = 20; }
-            elseif ($sprite_key == 4){ $temp_seed_3 = 30; }
-            elseif ($sprite_key == 5){ $temp_seed_3 = 40; }
-            elseif ($sprite_key == 6){ $temp_seed_3 = 50; }
-            elseif ($sprite_key == 7){ $temp_seed_3 = 60; }
-            if ($sprite_size > 40){ $temp_seed_3 -= ceil(40 * $this_data['canvas_scale']); }
-            $this_data['canvas_offset_x'] += $temp_seed_3;
-            $this_data['canvas_offset_x'] += 64 - ($max_bench_size * 4);
-
-        }
-        // Otherwise, if the robot is in active position
-        elseif ($sprite_position == 'active'){
-
-            // Base the scale on the half-way position of robots on this side of the field
-            $this_data['canvas_scale'] = 0.5 + ((($max_bench_size - $half_key) / $max_bench_size) * 0.5); //1;
-
-            $this_data['canvas_offset_x'] += round(($half_key * (40 * $this_data['canvas_scale'])) * $this_data['canvas_scale']);
-            $this_data['canvas_offset_y'] += $half_key * 6;
-
-            if ($sprite_size > 80){
-                $this_data['canvas_offset_x'] -= round(60 * $this_data['canvas_scale']);
-            }
-
+        // Calculate the canvas X-offset based on the sprite's size first and foremost
+        $canvas_offset_x = 0; // start at the outer edge
+        $canvas_offset_x += $grid_width; // push them all the way to the inner middle
+        $canvas_offset_x -= $grid_col_widths_total($sprite_row, $sprite_column); // pull them back for all the columns to their left
+        if ($sprite_size > $zoom_sprite_size){
+            $temp_size_diff = $sprite_size - $zoom_sprite_size;
+            $temp_size_offset = $temp_size_diff * $canvas_scale;
+            $canvas_offset_x -= ($temp_size_offset / 2);
         }
 
-        // Return the generated canvas data for this robot
-        return $this_data;
+        // Calculate how much the Z-offset should change per row
+        $z_step = (($z_max - $z_min) / ($grid_rows - 1));
+        $canvas_offset_z = ceil($z_max - (($sprite_row - 1) * $z_step));
+
+        // Put it all together to define the canvas offset values
+        $offset_values = array(
+            'canvas_grid_column' => $sprite_column,
+            'canvas_grid_row' => $sprite_row,
+            'canvas_scale' => $canvas_scale,
+            'canvas_offset_x' => $canvas_offset_x,
+            'canvas_offset_y' => $canvas_offset_y,
+            'canvas_offset_z' => $canvas_offset_z
+            );
+
+        // Return the canvas offsets
+        //error_log(PHP_EOL.'$sprite_key: '.$sprite_key.PHP_EOL.'$sprite_size:'.$sprite_size.PHP_EOL.'$sprite_position: '.$sprite_position);
+        //error_log('canvas_offset_perspective: ' . print_r($offset_values, true));
+        return $offset_values;
 
     }
 
