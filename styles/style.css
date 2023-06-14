@@ -2363,7 +2363,7 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #canvas [data-camera-shift] .canvas_skill_details {
     transform: translate(0, 0);
     transition: none;
-    z-index: 5000;
+    z-index: 3000;
 }
 #canvas [data-camera-shift] .event .background_canvas {
     transition:
@@ -2402,7 +2402,6 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
         var(--camera-shift-transition-timing)
         ;
 }
-
 #canvas [data-camera-shift="left"] .event .background_canvas,
 #canvas [data-camera-shift="right"] .event .background_canvas {
     filter: blur(1px) brightness(0.8);
@@ -2416,6 +2415,10 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     filter: brightness(0.6);
 }
 
+
+
+
+/* LEFT and ACTIVE-focused camera angles */
 #canvas [data-camera-shift="left"] .event .background_canvas,
 #canvas [data-camera-shift="left"] .event .background_event {
     transform: translate(-4%, 0) scale(1.2);
@@ -2427,12 +2430,12 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #canvas [data-camera-shift="left"] .event .foreground_canvas,
 #canvas [data-camera-shift="left"] .event .foreground_event {
     transform: translate(8%, -5%) scale(1.3);
-    transform: translate(calc(8% * var(--camera-shift-depth-mod2)), -5%) scale(1.3);
+    transform: translate(calc(8% * var(--camera-shift-depth-mod2)), 5%) scale(1.3);
 }
 #canvas [data-camera-shift="left"] .event .foreground_canvas {
     transform:
         perspective(var(--camera-shift-zoom-perspective))
-        translate(calc(8% * var(--camera-shift-depth-mod2)), -5%)
+        translate(calc(8% * var(--camera-shift-depth-mod2)), 5%)
         scale(1.3)
         skew(calc(8deg * var(--camera-shift-depth-mod)))
         rotateX(10deg)
@@ -2440,20 +2443,21 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 }
 #canvas [data-camera-shift="left"] .event .foreground_event {
     transform: translate(8%, -5%) scale(1.3);
-    transform: translate(calc(8% * var(--camera-shift-depth-mod2)), -5%) scale(1.3);
+    transform: translate(calc(8% * var(--camera-shift-depth-mod2)), 5%) scale(1.3);
 }
 #canvas [data-camera-shift="left"] .event .battle_scene {
-    transform: translate(10%, -10%) scale(1.4);
-    transform: translate(calc(10% * var(--camera-shift-depth-mod2)), -10%) scale(1.4);
+    transform: translate(9%, -5%) scale(1.3);
+    transform: translate(calc(9% * var(--camera-shift-depth-mod2)), 5%) scale(1.3);
 }
 #canvas [data-camera-shift="left"] .canvas_battle_results,
 #canvas [data-camera-shift="left"] .canvas_ability_details,
 #canvas [data-camera-shift="left"] .canvas_item_details,
 #canvas [data-camera-shift="left"] .canvas_skill_details {
-    transform: translate(-24%, 78%);
-    transform: translate(calc(-24% * var(--camera-shift-depth-mod2)), 78%);
+    transform: scale(1.0) translate(-24%, 18%);
+    transform: scale(var(--camera-shift-depth-mod)) translate(calc(-24% * var(--camera-shift-depth-mod2)), 18%);
 }
 
+/* RIGHT and ACTIVE-focused camera angles */
 #canvas [data-camera-shift="right"] .event .background_canvas,
 #canvas [data-camera-shift="right"] .event .background_event {
     transform: translate(4%, 0) scale(1.2);
@@ -2462,29 +2466,34 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #canvas [data-camera-shift="right"] .event .foreground_canvas,
 #canvas [data-camera-shift="right"] .event .foreground_event {
     transform: translate(-8%, -5%) scale(1.3);
-    transform: translate(calc(-8% * var(--camera-shift-depth-mod2)), -5%) scale(1.3);
+    transform: translate(calc(-8% * var(--camera-shift-depth-mod2)), 5%) scale(1.3);
 }
 #canvas [data-camera-shift="right"] .event .foreground_canvas {
     transform:
         perspective(var(--camera-shift-zoom-perspective))
-        translate(calc(-8% * var(--camera-shift-depth-mod2)), -5%)
+        translate(calc(-8% * var(--camera-shift-depth-mod2)), 5%)
         scale(1.3)
         skew(calc(-8deg * var(--camera-shift-depth-mod)))
         rotateX(10deg)
         ;
 }
+#canvas [data-camera-shift="right"] .event .foreground_event {
+    transform: translate(-8%, -5%) scale(1.3);
+    transform: translate(calc(-8% * var(--camera-shift-depth-mod2)), 5%) scale(1.3);
+}
 #canvas [data-camera-shift="right"] .event .battle_scene {
-    transform: translate(-10%, -10%) scale(1.4);
-    transform: translate(calc(-10% * var(--camera-shift-depth-mod2)), -10%) scale(1.4);
+    transform: translate(-9%, -5%) scale(1.3);
+    transform: translate(calc(-9% * var(--camera-shift-depth-mod2)), 5%) scale(1.3);
 }
 #canvas [data-camera-shift="right"] .canvas_battle_results,
 #canvas [data-camera-shift="right"] .canvas_ability_details,
 #canvas [data-camera-shift="right"] .canvas_item_details,
 #canvas [data-camera-shift="right"] .canvas_skill_details {
-    transform: translate(14.5%, 78%);
-    transform: translate(calc(14.5% * var(--camera-shift-depth-mod2)), 78%);
+    transform: translate(14.5%, 18%);
+    transform: translate(calc(14.5% * var(--camera-shift-depth-mod2)), 18%);
 }
 
+/* LEFT and BENCH-focused camera angles */
 #canvas [data-camera-shift="left"][data-camera-focus="bench"] .event .background_canvas,
 #canvas [data-camera-shift="left"][data-camera-focus="bench"] .event .background_event {
     transform: translate(-7%, 0) scale(1.2);
@@ -2492,30 +2501,31 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 }
 #canvas [data-camera-shift="left"][data-camera-focus="bench"] .event .foreground_canvas,
 #canvas [data-camera-shift="left"][data-camera-focus="bench"] .event .foreground_event {
-    transform: translate(14%, -5%) scale(1.3);
-    transform: translate(calc(14% * var(--camera-shift-depth-mod)), -5%) scale(1.3);
+    transform: translate(14%, 5%) scale(1.3);
+    transform: translate(calc(14% * var(--camera-shift-depth-mod)), 5%) scale(1.3);
 }
 #canvas [data-camera-shift="left"][data-camera-focus="bench"] .event .foreground_canvas {
     transform:
         perspective(var(--camera-shift-zoom-perspective))
-        translate(calc(14% * var(--camera-shift-depth-mod)), -5%)
+        translate(calc(14% * var(--camera-shift-depth-mod)), 5%)
         scale(1.3)
         skew(calc(14deg * var(--camera-shift-depth-mod)))
         rotateX(10deg)
         ;
 }
 #canvas [data-camera-shift="left"][data-camera-focus="bench"] .event .battle_scene {
-    transform: translate(20%, -10%) scale(1.4);
-    transform: translate(calc(20% * var(--camera-shift-depth-mod)), -10%) scale(1.4);
+    transform: translate(16%, 5%) scale(1.3);
+    transform: translate(calc(16% * var(--camera-shift-depth-mod)), 5%) scale(1.3);
 }
 #canvas [data-camera-shift="left"][data-camera-focus="bench"] .canvas_battle_results,
 #canvas [data-camera-shift="left"][data-camera-focus="bench"] .canvas_ability_details,
 #canvas [data-camera-shift="left"][data-camera-focus="bench"] .canvas_item_details,
 #canvas [data-camera-shift="left"][data-camera-focus="bench"] .canvas_skill_details {
-    transform: translate(-34%, 78%);
-    transform: translate(calc(-34% * var(--camera-shift-depth-mod)), 78%);
+    transform: translate(-34%, 18%);
+    transform: translate(calc(-34% * var(--camera-shift-depth-mod)), 18%);
 }
 
+/* RIGHT and BENCH-focused camera angles */
 #canvas [data-camera-shift="right"][data-camera-focus="bench"] .event .background_canvas,
 #canvas [data-camera-shift="right"][data-camera-focus="bench"] .event .background_event {
     transform: translate(7%, 0) scale(1.2);
@@ -2523,29 +2533,70 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 }
 #canvas [data-camera-shift="right"][data-camera-focus="bench"] .event .foreground_canvas,
 #canvas [data-camera-shift="right"][data-camera-focus="bench"] .event .foreground_event {
-    transform: translate(-14%, -5%) scale(1.3);
-    transform: translate(calc(-14% * var(--camera-shift-depth-mod)), -5%) scale(1.3);
+    transform: translate(-14%, 5%) scale(1.3);
+    transform: translate(calc(-14% * var(--camera-shift-depth-mod)), 5%) scale(1.3);
 }
 #canvas [data-camera-shift="right"][data-camera-focus="bench"] .event .foreground_canvas {
     transform:
         perspective(var(--camera-shift-zoom-perspective))
-        translate(calc(-14% * var(--camera-shift-depth-mod)), -5%)
+        translate(calc(-14% * var(--camera-shift-depth-mod)), 5%)
         scale(1.3)
         skew(calc(-14deg * var(--camera-shift-depth-mod)))
         rotateX(10deg)
         ;
 }
 #canvas [data-camera-shift="right"][data-camera-focus="bench"] .event .battle_scene {
-    transform: translate(-20%, -10%) scale(1.4);
-    transform: translate(calc(-20% * var(--camera-shift-depth-mod)), -10%) scale(1.4);
+    transform: translate(-16%, 5%) scale(1.3);
+    transform: translate(calc(-16% * var(--camera-shift-depth-mod)), 5%) scale(1.3);
 }
 #canvas [data-camera-shift="right"][data-camera-focus="bench"] .canvas_battle_results,
 #canvas [data-camera-shift="right"][data-camera-focus="bench"] .canvas_ability_details,
 #canvas [data-camera-shift="right"][data-camera-focus="bench"] .canvas_item_details,
 #canvas [data-camera-shift="right"][data-camera-focus="bench"] .canvas_skill_details {
-    transform: translate(24.5%, 78%);
-    transform: translate(calc(24.5% * var(--camera-shift-depth-mod)), 78%);
+    transform: translate(24.5%, 18%);
+    transform: translate(calc(24.5% * var(--camera-shift-depth-mod)), 18%);
 }
+
+
+/* Batle Field Gridlines / Position Panels / Cell Borders */
+#canvas .event .foreground_canvas:before {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 50%;
+    bottom: 35px;
+    /* width: 700px;  */
+    width: 1290px;
+    height: 168px;
+    background-color: transparent;
+    background-image: url(../images/assets/battle-scene_gridlines-2k23.png?20230611-1);
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    transform: translateX(-50%) perspective(90px) rotateX(26deg);
+    transform-origin: center bottom;
+
+    opacity: 0.6;
+    -moz-mix-blend-mode: overlay;
+    -webkit-mix-blend-mode: overlay;
+    mix-blend-mode: overlay;
+
+}
+
+/*
+#canvas .event .battle_scene .sprite[data-robotid] {
+    box-sizing: border-box;
+    border-bottom: 2px solid red;
+}
+#canvas .event .battle_scene .sprite[data-robotid][data-direction="left"] {
+    border-left: 2px solid rgba(255, 0, 0, 0.25);
+    border-right: 2px solid rgba(0, 0, 255, 0.25);
+}
+#canvas .event .battle_scene .sprite[data-robotid][data-direction="right"] {
+    border-right: 2px solid rgba(255, 0, 0, 0.25);
+    border-left: 2px solid rgba(0, 0, 255, 0.25);
+}
+*/
 
 #canvas .event pre {
     position: absolute;
