@@ -216,7 +216,7 @@ class rpg_console {
         $this_data['item_title'] = $this_data['item_name'];
         $this_data['item_token'] = $this_item->item_token;
         $this_data['item_direction'] = 'right';
-        $this_data['item_float'] = !empty($robot_data['robot_id']) && $robot_data['robot_id'] == $this_item->robot_id ? $robot_data['robot_float'] : ($robot_data['robot_direction'] == 'left' ? 'right' : 'left');
+        $this_data['item_float'] = !empty($robot_data['robot_id']) && $robot_data['robot_id'] == $this_item->robot_id ? $robot_data['robot_float'] : ($this_data['item_direction'] == 'left' ? 'right' : 'left');
         $this_data['item_size'] = $this_item->item_image_size;
         $this_data['item_frame'] = isset($options['item_frame']) ? $options['item_frame'] : $this_item->item_frame;
         if (is_numeric($this_data['item_frame']) && $this_data['item_frame'] >= 0){ $this_data['item_frame'] = str_pad($this_data['item_frame'], 2, '0', STR_PAD_LEFT); }
