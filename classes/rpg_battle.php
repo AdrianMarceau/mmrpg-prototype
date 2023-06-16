@@ -2410,16 +2410,12 @@ class rpg_battle extends rpg_object {
 
     }
 
-    // Define a public function for calculating canvas markup offsets
-    public function canvas_markup_offset($sprite_key, $sprite_position, $sprite_size, $bench_size = 1){
-        return $this->canvas_markup_offset_perspective($sprite_key, $sprite_position, $sprite_size, $bench_size);
-    }
-
-    // Function to calculate canvas markup offsets with perspective
-    public function canvas_markup_offset_perspective($sprite_key, $sprite_position, $sprite_size, $current_bench_size = 1){
+    // Define a public function for calculating canvas markup offsets w/ perspective
+    public function canvas_markup_offset($sprite_key, $sprite_position, $sprite_size, $team_size = 1){
 
         // Define the max bench size so we can shift later
-        $max_bench_size = 8;
+        $max_team_size = 8;
+        $max_bench_size = 7;
         $base_sprite_size = 40;
         $zoom_sprite_size = $base_sprite_size * 2;
 
@@ -2443,14 +2439,14 @@ class rpg_battle extends rpg_object {
         $grid_row_tilt = 26; // degrees
         $grid_row_heights = array(19, 16, 13, 10, 9, 8, 6);
         $grid_col_widths = array(132, 117, 106, 98, 91, 85, 79);
-        $grid_row_height = function($row = 1, $column = 1) use ($grid_row_heights) { return $grid_row_heights[$row - 1]; };
-        $grid_col_width = function($row = 1, $column = 1) use ($grid_col_widths) { return $grid_col_widths[$row - 1]; };
-        $grid_row_heights_total = function($row = 1, $column = 1) use ($grid_row_heights) { return array_sum(array_slice($grid_row_heights, 0, ($row - 1))); };
-        $grid_col_widths_total = function($row = 1, $column = 1) use ($grid_col_widths) { return ($grid_col_widths[$row - 1] * ($column - 1)); };
+        $grid_row_height = function($row = 1, $column = 1) use ($grid_row_heights) { return $row >= 1 ? $grid_row_heights[$row - 1] : 0; };
+        $grid_col_width = function($row = 1, $column = 1) use ($grid_col_widths) { return $row >= 1 ? $grid_col_widths[$row - 1] : 0; };
+        $grid_row_heights_total = function($row = 1, $column = 1) use ($grid_row_heights) { return $row >= 1 ? array_sum(array_slice($grid_row_heights, 0, ($row - 1))) : 0; };
+        $grid_col_widths_total = function($row = 1, $column = 1) use ($grid_col_widths) { return $row >= 1 && $column >= 1 ? ($grid_col_widths[$row - 1] * ($column - 1)) : 0; };
 
         // Define minimum and maximum scale factors for sprites
         $scale_base = 1.0;
-        $scale_shift = 0.3;
+        $scale_shift = 0.2;
         $scale_min = $scale_base - ($scale_base * $scale_shift);  // Smallest scale for sprites at the farthest row
         $scale_max = $scale_base + ($scale_base * $scale_shift);  // Largest scale for sprites at the closest row
 
@@ -2466,19 +2462,26 @@ class rpg_battle extends rpg_object {
         $sprite_column += 1;
 
         // Further adjust the row and column based on the sprite's position (active/bench) and position key
-        //error_log('$sprite_position ('.$sprite_row.', '.$sprite_column.')');
+        //error_log('|| $sprite key ('.$sprite_key.') && position ('.$sprite_position.') ('.$sprite_row.', '.$sprite_column.') w/ team-size ('.$team_size.') ');
         if ($sprite_position == 'active') {
             $sprite_row = $grid_row_middle;
+            //error_log('--> adjusted '.$sprite_position.' $sprite position ('.$sprite_row.', '.$sprite_column.')');
         } elseif ($sprite_position == 'bench'){
             $sprite_column += 1;
             $sprite_row += ($sprite_key - 1);
-            $extra_bench_slots = $current_bench_size < $max_bench_size ? ($max_bench_size - $current_bench_size) : 0;
-            $bench_shift_amount = $extra_bench_slots >= 2 ? floor($extra_bench_slots / 2) : 0;
-            //error_log('$extra_bench_slots = '.$extra_bench_slots);
-            //error_log('$bench_shift_amount = '.$bench_shift_amount);
-            if ($bench_shift_amount){ $sprite_row += $bench_shift_amount; }
+            if ($team_size > 1){
+                $current_bench_size = $team_size - 1;
+                $extra_bench_slots = $current_bench_size < $max_bench_size ? ($max_bench_size - $current_bench_size) : 0;
+                $bench_shift_amount = $extra_bench_slots >= 2 ? floor($extra_bench_slots / 2) : 0;
+                //error_log('$current_bench_size = '.$current_bench_size);
+                //error_log('$extra_bench_slots = '.$extra_bench_slots);
+                //error_log('$bench_shift_amount = '.$bench_shift_amount);
+                if ($bench_shift_amount){ $sprite_row += $bench_shift_amount; }
+                if ($sprite_row > $grid_rows){ $sprite_row = $grid_rows - $sprite_row; }
+                //error_log('--> adjusted '.$sprite_position.' $sprite position ('.$sprite_row.', '.$sprite_column.')');
+            }
         }
-        //error_log('--> $sprite_position ('.$sprite_row.', '.$sprite_column.')');
+        //error_log('--> $sprite key ('.$sprite_key.') && position ('.$sprite_position.') ('.$sprite_row.', '.$sprite_column.') w/ team-size ('.$team_size.') ');
 
         /*
         // DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
@@ -2510,19 +2513,33 @@ class rpg_battle extends rpg_object {
         $canvas_offset_x -= $grid_col_widths_total($sprite_row, $sprite_column); // pull them back for all the columns to their left
         if ($sprite_size > $zoom_sprite_size){
             $temp_size_diff = $sprite_size - $zoom_sprite_size;
-            $temp_size_offset = $temp_size_diff * $canvas_scale;
-            $canvas_offset_x -= ($temp_size_offset / 2);
+            $canvas_offset_x -= ($temp_size_diff / 2);
         }
+
+        // Adjust the X and Y to ensure pixel-ratio compatible values
+        $canvas_offset_y = round($canvas_offset_y) % 2 === 0 ? round($canvas_offset_y) : floor($canvas_offset_y);
+        $canvas_offset_x = round($canvas_offset_x) % 2 === 0 ? round($canvas_offset_x) : floor($canvas_offset_x);
 
         // Calculate how much the Z-offset should change per row
         $z_step = (($z_max - $z_min) / ($grid_rows - 1));
         $canvas_offset_z = ceil($z_max - (($sprite_row - 1) * $z_step));
 
+        // Calculate the depth and focus values based on field depth to use as needed
+        $canvas_depth = 1 - ($sprite_row * 0.04);
+
+        // Calculate the focus and focus values based on field depth to use as needed
+        $canvas_focus = 1;
+        if ($sprite_row > $grid_row_middle){ $focus_shift = ($sprite_row - $grid_row_middle); }
+        elseif ($sprite_row < $grid_row_middle){ $focus_shift = ($grid_row_middle - $sprite_row); }
+        if (isset($focus_shift)){ $canvas_focus -= $focus_shift * 0.05; }
+
         // Put it all together to define the canvas offset values
         $offset_values = array(
             'canvas_grid_column' => $sprite_column,
             'canvas_grid_row' => $sprite_row,
-            'canvas_scale' => $canvas_scale,
+            'canvas_scale' => 1, //$canvas_scale,
+            'canvas_depth' => $canvas_depth,
+            'canvas_focus' => $canvas_focus,
             'canvas_offset_x' => $canvas_offset_x,
             'canvas_offset_y' => $canvas_offset_y,
             'canvas_offset_z' => $canvas_offset_z
