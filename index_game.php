@@ -168,7 +168,7 @@ if (count($matches)>1){
             <iframe class="loading" name="battle" src="<?= MMRPG_CONFIG_ROOTURL ?>prototype.php?wap=true" width="768" height="748" frameborder="0" scrolling="no"></iframe>
         <?endif;?>
         <div id="music" class="onload">
-            <a class="toggle paused" href="#" onclick=""><span><span>loading&hellip;</span></span></a>
+            <a class="toggle paused has_pixels" href="#" onclick=""><span><span>loading&hellip;</span></span></a>
             <audio class="stream paused" onended="this.play();">
                 <div style="color: white; background-color: black; padding: 10px;">Your browser does not support the audio tag.</div>
             </audio>
