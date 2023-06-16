@@ -283,7 +283,7 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                     }
                     $background_data_animate = count($background_animate) > 1 ? implode(',', $background_animate) : false;
                     // Display the markup of the background layer
-                    echo '<div class="'.(!$flag_skip_fadein ? 'animate_fadein ' : '').'background_canvas background background_00" data-frame="00" style="background-color: #000000; background-image: url(images/fields/'.$this_field_data['field_background'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
+                    echo '<div class="'.(!$flag_skip_fadein ? 'animate_fadein ' : '').'background_canvas has_pixels background background_00" data-frame="00" style="background-color: #000000; background-image: url(images/fields/'.$this_field_data['field_background'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
 
                     // Loop through and display the markup of any background attachments
                     if (!empty($this_field_data['field_background_attachments'])){
@@ -368,7 +368,7 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                     $foreground_data_animate = count($foreground_animate) > 1 ? implode(',', $foreground_animate) : false;
 
                     // Display the markup of the foreground layer
-                    echo '<div class="'.(!$flag_skip_fadein ? 'animate_fadein ' : '').' foreground_canvas foreground foreground_00" data-frame="00" style="background-image: url(images/fields/'.$this_field_data['field_foreground'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
+                    echo '<div class="'.(!$flag_skip_fadein ? 'animate_fadein ' : '').' foreground_canvas has_pixels foreground foreground_00" data-frame="00" style="background-image: url(images/fields/'.$this_field_data['field_foreground'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
 
                     // Check if this field has a field or fusion star in it
                     if (!empty($this_battle_data['values']['field_star'])){
@@ -433,12 +433,12 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                             'subclass' => 'common_object',
                             'size' => 80,
                             'offset_x' => 331,
-                            'offset_y' => 90,
+                            'offset_y' => 130,
                             'offset_z' => -1,
                             'object_token' => 'challenge-marker',
                             'object_image' => $temp_skull_image,
                             'object_frame' => array(0, 0, 0, 0),
-                            'object_frame_shift' => array('331,90', '331,95', '331,100', '331,95'),
+                            'object_frame_shift' => array('331,130', '331,125', '331,130', '331,135'),
                             'object_direction' => 'left',
                             'object_text' => ''
                             );
@@ -450,12 +450,12 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                             'subclass' => 'common_object',
                             'size' => 80,
                             'offset_x' => 331,
-                            'offset_y' => 75,
+                            'offset_y' => 85,
                             'offset_z' => -1,
                             'object_token' => 'challenge-marker',
                             'object_image' => $temp_shadow_image,
                             'object_frame' => array(2, 1, 0, 1),
-                            'object_frame_shift' => array('331,75', '331,75', '331,75', '331,75'),
+                            'object_frame_shift' => array('331,85', '331,85', '331,85', '331,85'),
                             'object_direction' => 'left',
                             'object_text' => ''
                             );
@@ -684,11 +684,11 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
             // Predefine the render modes index
             $render_modes_index = array(
                 'default' => array('token' => 'default', 'name' => 'Default', 'label' => 'Default'),
-                'auto' => array('token' => 'auto', 'name' => 'Auto', 'label' => 'Browser "Auto"'),
-                'smooth' => array('token' => 'smooth', 'name' => 'Smooth', 'label' => 'Browser "Smooth"'),
-                'pixelated' => array('token' => 'pixelated', 'name' => 'Pixelated', 'label' => 'Browser "Pixelated"'),
-                'high-quality' => array('token' => 'high-quality', 'name' => 'High-Quality', 'label' => 'Browser "High-Quality"'),
-                'crisp-edges' => array('token' => 'crisp-edges', 'name' => 'Crisp-Edges', 'label' => 'Browser "Crisp-Edges"')
+                //'auto' => array('token' => 'auto', 'name' => 'Auto', 'label' => 'Browser "Auto"'),
+                //'smooth' => array('token' => 'smooth', 'name' => 'Smooth', 'label' => 'Browser "Smooth"'),
+                //'high-quality' => array('token' => 'high-quality', 'name' => 'High-Quality', 'label' => 'Browser "High-Quality"'),
+                'crisp-edges' => array('token' => 'crisp-edges', 'name' => 'Crisp-Edges', 'label' => 'Browser "Crisp-Edges"'),
+                'pixelated' => array('token' => 'pixelated', 'name' => 'Pixelated', 'label' => 'Browser "Pixelated"')
                 );
 
             ?>

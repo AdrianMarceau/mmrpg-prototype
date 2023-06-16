@@ -99,10 +99,6 @@ $(document).ready(function(){
     gameSettings.wapFlagIphone = (navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)) ? true : false;
     gameSettings.wapFlagIpad = navigator.userAgent.match(/iPad/i) ? true : false;
 
-    // Update the body to use the requested sprite rendering mode
-    //console.log('setting data-render-mode to ', gameSettings['spriteRenderMode']);
-    mmrpgBody.attr('data-render-mode', gameSettings['spriteRenderMode']);
-
 
     /*
      * INDEX EVENTS
@@ -298,7 +294,12 @@ $(document).ready(function(){
     if (gameEngine.length){
 
         // Define a list of valid render modes we can use
-        var allowedRenderModes = ['default', 'auto', 'smooth', 'pixelated', 'high-quality', 'crisp-edges'];
+        //var allowedRenderModes = ['default', 'auto', 'smooth', 'pixelated', 'high-quality', 'crisp-edges'];
+        var allowedRenderModes = ['default', 'pixelated', 'crisp-edges'];
+
+        // Update the body to use the requested sprite rendering mode
+        //console.log('setting data-render-mode to ', gameSettings['spriteRenderMode']);
+        mmrpgBody.attr('data-render-mode', gameSettings['spriteRenderMode']);
 
         // If a localStorage value has been set, load that instead
         if (typeof window.localStorage !== 'undefined'){
