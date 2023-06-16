@@ -3449,7 +3449,7 @@ class rpg_robot extends rpg_object {
                     <div class="this_sprite sprite_left" style="height: 40px;">
                         <? if($print_options['show_mugshot']): ?>
                             <? if($print_options['show_key'] !== false): ?>
-                                <div class="mugshot robot_type <?= $robot_header_types ?>" style="font-size: 9px; line-height: 11px; text-align: center; margin-bottom: 2px; padding: 0 0 1px !important;"><?= 'No.'.$robot_info['robot_key'] ?></div>
+                                <div class="number robot_type <?= $robot_header_types ?>"><?= 'No.'.$robot_info['robot_key'] ?></div>
                             <? endif; ?>
                             <? if (!in_array($robot_image_token, $default_robot_class_tokens)){ ?>
                                 <div class="mugshot robot_type <?= $robot_header_types ?>"><div style="background-image: url(images/robots/<?= $robot_image_token ?>/mug_right_<?= $robot_image_size_text ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>); " class="sprite sprite_robot sprite_40x40 sprite_40x40_mug sprite_size_<?= $robot_image_size_text ?> sprite_size_<?= $robot_image_size_text ?>_mug robot_status_active robot_position_active"><?= $robot_info['robot_name']?>'s Mugshot</div></div>
@@ -4223,7 +4223,7 @@ class rpg_robot extends rpg_object {
                                                     $this_ability_sprite_path = 'images/abilities/'.$this_ability_image.'/icon_left_40x40.png';
                                                     if (!rpg_game::sprite_exists(MMRPG_CONFIG_ROOTDIR.$this_ability_sprite_path)){ $this_ability_image = 'ability'; $this_ability_sprite_path = 'images/abilities/ability/icon_left_40x40.png'; }
                                                     else { $this_ability_sprite_path = 'images/abilities/'.$this_ability_image.'/icon_left_40x40.png'; }
-                                                    $this_ability_sprite_html = '<span class="icon"><img src="'.$this_ability_sprite_path.'?'.MMRPG_CONFIG_CACHE_DATE.'" alt="'.$this_ability_name.' Icon" /></span>';
+                                                    $this_ability_sprite_html = '<span class="icon"><img class="has_pixels" src="'.$this_ability_sprite_path.'?'.MMRPG_CONFIG_CACHE_DATE.'" alt="'.$this_ability_name.' Icon" /></span>';
                                                     $this_ability_title_html = '<span class="label">'.$this_ability_title_html.'</span>';
                                                     //$this_ability_title_html = (is_numeric($this_level) && $this_level > 1 ? 'Lv '.str_pad($this_level, 2, '0', STR_PAD_LEFT).' : ' : $this_level.' : ').$this_ability_title_html;
 

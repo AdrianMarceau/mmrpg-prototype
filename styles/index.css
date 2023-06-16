@@ -1489,7 +1489,6 @@ button {
     opacity: 0;
 }
 
-
 #window .page .database_container .subbody .body table.full {
     margin: 0;
 }
@@ -1623,19 +1622,19 @@ button {
 #window .page .subbody .link_nav .float_link .sprite,
 #window .page .subbody .link_nav .float.link .sprite {
     height: 20px;
-    width: 20px;
+    width: 26px;
 }
 #window .page .subbody .link_nav .float.link .sprite.size40 img {
-    margin-top: -5px;
-    margin-left: -5px;
-    width: 30px;
-    height: 30px;
+    margin-top: -11px;
+    margin-left: -7px;
+    width: 40px;
+    height: 40px;
 }
 #window .page .subbody .link_nav .float.link .sprite.size80 img {
-    margin-top: -20px;
-    margin-left: -20px;
-    width: 60px;
-    height: 60px;
+    margin-top: -31px;
+    margin-left: -27px;
+    width: 80px;
+    height: 80px;
 }
 
 
@@ -2035,6 +2034,19 @@ button {
     -webkit-border-radius: 0.5em;
     padding: 2px !important;
     margin: 0 auto 10px;
+}
+#window .page .event .this_sprite .number {
+    display: block;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background-color: rgba(0, 0, 0, 0.05);;
+    border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    font-size: 9px;
+    line-height: 11px;
+    text-align: center;
+    margin-bottom: 2px;
+    padding: 0 0 1px !important;
 }
 #window .page .event .mugshot .sprite,
 #window .page .event .icon .sprite {
