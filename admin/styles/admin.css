@@ -738,6 +738,9 @@ a:hover {
 .adminform .editor .readonly .CodeMirror {
     background-color: #efefef;
 }
+.adminform .editor .CodeMirror-wrap pre {
+    word-break: break-word;
+}
 
 
 
@@ -1610,7 +1613,7 @@ tr:nth-child(odd) td {
 }
 
 .adminform .editor ul.files > li .filebar .action.upload {
-    max-width: 42px;
+    max-width: 46px;
     overflow: hidden;
     position: relative;
     cursor: pointer;
