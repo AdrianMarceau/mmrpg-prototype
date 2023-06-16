@@ -180,7 +180,7 @@ if (true){
                     ?>
                     <span class="core player_type">
                         <span class="wrap"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/items/<?= !empty($shop_info['shop_seeking_image']) ? $shop_info['shop_seeking_image'] : 'item' ?>/icon_left_40x40.png);"></span></span>
-                        <span class="text"><?= ucfirst(rtrim($shop_info['shop_seeking'], 's')) ?> Seeker</span>
+                        <span class="text"><?= $shop_info['shop_seeking_text'] ?></span>
                     </span>
                 </div>
 
