@@ -2473,6 +2473,7 @@ class rpg_battle extends rpg_object {
                 $current_bench_size = $team_size - 1;
                 $extra_bench_slots = $current_bench_size < $max_bench_size ? ($max_bench_size - $current_bench_size) : 0;
                 $bench_shift_amount = $extra_bench_slots >= 2 ? floor($extra_bench_slots / 2) : 0;
+                if ($current_bench_size % 2 === 0 && $sprite_key > ($current_bench_size / 2)){ $bench_shift_amount += 1; } // adjust position on non-odd numbered teams for centering purposes
                 //error_log('$current_bench_size = '.$current_bench_size);
                 //error_log('$extra_bench_slots = '.$extra_bench_slots);
                 //error_log('$bench_shift_amount = '.$bench_shift_amount);
