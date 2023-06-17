@@ -2534,6 +2534,11 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 
 /* Batle Field Gridlines / Position Panels / Cell Borders */
 
+@keyframes foreground_canvas_fade {
+  0% { opacity: 0.2; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.2; }
+}
 #canvas .event .foreground_canvas:before,
 #canvas .event .foreground_canvas:after {
     content: "";
@@ -2581,6 +2586,13 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     -moz-mix-blend-mode: overlay;
     -webkit-mix-blend-mode: overlay;
     mix-blend-mode: overlay;
+
+    /* Animation properties */
+    animation-name: foreground_canvas_fade;
+    animation-duration: 5s; /* Adjust the duration as per your preference */
+    animation-duration: calc(var(--camera-shift-transition-duration) * 10);
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
 }
 #canvas .event .foreground_canvas:after {
     z-index: 2;
@@ -2590,6 +2602,7 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     -webkit-mix-blend-mode: overlay;
     mix-blend-mode: overlay;
 }
+
 
 
 /*
