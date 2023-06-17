@@ -17,8 +17,8 @@ class rpg_disabled {
         if (!isset($trigger_options['item_multiplier'])){ $trigger_options['item_multiplier'] = 1.0; }
         if (!isset($trigger_options['item_quantity_min'])){ $trigger_options['item_quantity_min'] = 1; }
         if (!isset($trigger_options['item_quantity_max'])){ $trigger_options['item_quantity_max'] = 3; }
-        //if (!isset($trigger_options['delay_stat_bonuses'])){ $trigger_options['delay_stat_bonuses'] = false; }
-        //if (!isset($trigger_options['delay_experience_points'])){ $trigger_options['delay_experience_points'] = false; }
+        if (!isset($trigger_options['delay_stat_bonuses'])){ $trigger_options['delay_stat_bonuses'] = false; }
+        if (!isset($trigger_options['delay_experience_points'])){ $trigger_options['delay_experience_points'] = false; }
 
         // Create references to save time 'cause I'm tired
         // (rather than replace all target references to this references)
@@ -254,7 +254,8 @@ class rpg_disabled {
                         $options->this_stat_boost = ceil($options->this_stat_boost);
 
                         // If the robot is under level 100, stat boosts are pending
-                        if ($target_robot->robot_level < 100){
+                        if ($trigger_options['delay_stat_bonuses']
+                            || $target_robot->robot_level < 100){
 
                             // Update the session variables with the pending stat boost
                             if (empty($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat_pending])){ $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat_pending] = 0; }
@@ -745,24 +746,51 @@ class rpg_disabled {
                         $temp_start_experience = mmrpg_prototype_robot_experience($target_player->player_token, $temp_robot_token);
                         $temp_start_level = mmrpg_prototype_robot_level($target_player->player_token, $temp_robot_token);
 
-                        // Increment this robots's points total with the battle points
-                        $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot_token]['robot_experience'] += $options->earned_experience;
+                        // If we're not allowed to apply the experience yet, save it for later in the robot's pending data
+                        if ($trigger_options['delay_experience_points']){
 
-                        // Define the new experience for this robot
-                        $temp_new_experience = mmrpg_prototype_robot_experience($target_player->player_token, $temp_info['robot_token']);// If the new experience is over 1000, level up the robot
-                        $level_boost = 0;
-                        if ($temp_new_experience > 1000){
-                            $level_boost = floor($temp_new_experience / 1000);
-                            $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot_token]['robot_level'] += $level_boost;
-                            $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot_token]['robot_experience'] -= $level_boost * 1000;
-                            if ($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot_token]['robot_level'] > 100){
-                                $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot_token]['robot_level'] = 100;
-                            }
-                            $temp_new_experience = mmrpg_prototype_robot_experience($target_player->player_token, $temp_info['robot_token']);
+                            // Add this experience to the robot's pending data for later
+                            if (!isset($temp_target_robot->values['delayed_experience_points'])){ $temp_target_robot->values['delayed_experience_points'] = 0; }
+                            $temp_target_robot->values['delayed_experience_points'] += $options->earned_experience;
+                            //error_log($temp_target_robot->robot_token.' is banking '.$options->earned_experience.' exp for later');
+                            //error_log('|| delayed_experience_points: '.$temp_target_robot->values['delayed_experience_points'].'');
+                            $temp_target_robot->update_session();
+                            $options->earned_experience = 0;
+
                         }
+                        // Otherwise, we can proceed as normal and simply add any delayed experience points if they exist
+                        else {
 
-                        // Define the new level for this robot
-                        $temp_new_level = mmrpg_prototype_robot_level($target_player->player_token, $temp_robot_token);
+                            // Check to see if this robot has any pending experience points to apply
+                            if (isset($temp_target_robot->values['delayed_experience_points']) && $temp_target_robot->values['delayed_experience_points'] > 0){
+                                //error_log($temp_target_robot->robot_token.' has '.$temp_target_robot->values['delayed_experience_points'].' delayed exp');
+                                //error_log('|| current earned_experience: '.$options->earned_experience.'');
+                                $options->earned_experience += $temp_target_robot->values['delayed_experience_points'];
+                                //error_log('|| new earned_experience: '.$options->earned_experience.')');
+                                unset($temp_target_robot->values['delayed_experience_points']);
+                                $temp_target_robot->update_session();
+                            }
+
+                            // Increment this robots's points total with the battle points
+                            $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot_token]['robot_experience'] += $options->earned_experience;
+
+                            // Define the new experience for this robot
+                            $temp_new_experience = mmrpg_prototype_robot_experience($target_player->player_token, $temp_info['robot_token']);// If the new experience is over 1000, level up the robot
+                            $level_boost = 0;
+                            if ($temp_new_experience > 1000){
+                                $level_boost = floor($temp_new_experience / 1000);
+                                $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot_token]['robot_level'] += $level_boost;
+                                $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot_token]['robot_experience'] -= $level_boost * 1000;
+                                if ($_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot_token]['robot_level'] > 100){
+                                    $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$temp_robot_token]['robot_level'] = 100;
+                                }
+                                $temp_new_experience = mmrpg_prototype_robot_experience($target_player->player_token, $temp_info['robot_token']);
+                            }
+
+                            // Define the new level for this robot
+                            $temp_new_level = mmrpg_prototype_robot_level($target_player->player_token, $temp_robot_token);
+
+                        }
 
                     }
                     // Otherwise if this is a level 100 robot already
@@ -777,6 +805,9 @@ class rpg_disabled {
                         $temp_new_level = $temp_start_level;
 
                     }
+
+                    // If for whatever reason the earned experience is now zero, continue to next robot
+                    if (empty($options->earned_experience)){ continue; }
 
                     // Define the event options
                     $event_options = array();
@@ -1079,9 +1110,15 @@ class rpg_disabled {
                         }
                     }
 
+
+
+
                 }
 
             }
+
+
+            // < end of item rewards and experience >
 
 
         }
