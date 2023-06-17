@@ -3689,7 +3689,7 @@ class rpg_ability extends rpg_object {
 
     }
 
-    // Define a static function for getting a preset core shield for the challenge
+    // Define a static function for getting an ability's custom attachment to be attached to the field or a robot in battle
     public static function get_static_attachment($ability, $attachment_token){
 
         // Collect a quick ref to the current battle
@@ -3767,89 +3767,92 @@ class rpg_ability extends rpg_object {
 
     }
 
+    // Define a static function for getting an ability's custom index to be used in some context during battle calc
+    public static function get_static_index($ability, $index_token, $index_subtoken = ''){
+
+        // Collect a quick ref to the current battle
+        $this_battle = rpg_battle::get_battle();
+
+        // Collect this ability's token and object, however it was provided
+        if (!empty($ability)){
+            if (is_string($ability)){
+                $ability_token = $ability;
+                $ability_info = rpg_ability::get_index_info($ability_token);
+                $this_ability = (object)($ability_info);
+            } elseif (is_array($ability)){
+                $ability_info = $ability;
+                $ability_token = $ability_info['ability_token'];
+                $this_ability = (object)($ability_info);
+            } elseif (is_object($ability)){
+                $ability_token = $ability->ability_token;
+                $ability_info = $ability->export_array();
+                $this_ability = $ability;
+            }
+        }
+
+        // Compensate for missing or invalid ability details
+        if (empty($ability_token) || empty($this_ability)){
+            $ability_token = 'ability';
+            $ability_info = array(
+                'ability_token' => $ability_token,
+                'ability_image' => $ability_token,
+                'ability_damage' => 0,
+                'ability_recovery' => 0
+                );
+            $this_ability = (object)($ability_info);
+        }
+
+        // For now, we're just going to combine the index token and subtoken into one
+        $backup_index_token = $index_token;
+        $backup_index_subtoken = $index_subtoken;
+        $index_token = $index_token.(!empty($index_subtoken) ? '_'.$index_subtoken : '');
+
+        // Define an empty index object to start with at least the token
+        $this_index = (object)(array('index_token' => $index_token));
+
+        // Require the functions file if it exists
+        $temp_functions_dir = preg_replace('/^action-/', '_actions/', $ability_token);
+        $temp_functions_path = MMRPG_CONFIG_ABILITIES_CONTENT_PATH.$temp_functions_dir.'/functions.php';
+        if (file_exists($temp_functions_path)){ require($temp_functions_path); }
+        else { $functions = array(); }
+
+        // Collect refs to all the known objects for this ability
+        $objects = array(
+            'this_battle' => $this_battle,
+            'this_field' => $this_battle->battle_field,
+            'this_ability' => $this_ability,
+            'this_index' => $this_index
+            );
+
+        // Generate very basic index info without knowing much else
+        $this_index_info = array(
+            'class' => 'ability',
+            'ability_token' => $this_ability->ability_token,
+            'index_token' => 'ability_'.$this_ability->ability_token.'_'.$this_index->index_token
+            );
+
+        // If the required index function exists (it better!) we can use it to generate actual index info
+        if (isset($functions['static_index_function_'.$index_token])){
+            $static_index_function = $functions['static_index_function_'.$index_token];
+            $static_index_function_args = func_get_args();
+            $static_index_function_args = array_slice($static_index_function_args, 1);
+            array_unshift($static_index_function_args, $objects);
+            $new_index_info = call_user_func_array($static_index_function, $static_index_function_args);
+            if (!empty($new_index_info)){ $this_index_info = array_merge($this_index_info, $new_index_info); }
+        } else {
+            error_log('Unable to get `static_index_function_'.$index_token.'` from ability `'.$ability_token.'`');
+            error_log('Available functions in  '.$temp_functions_path.' : '.implode(', ', array_keys($functions)));
+            //error_log('$functions = '.print_r($functions, true));
+        }
+
+        // Return generated index info, whatever it is
+        return $this_index_info;
+
+    }
+
     // Define a static function for generating/returning the Super Arm sprite index w/ sheet & frame refs for each field
     public static function get_super_block_sprite_index(){
-        // Define the sprite sheets and the stages they contain
-        static $this_sprite_index;
-        if (empty($this_sprite_index)){
-
-            /*
-            // Define the sprite sheet index for the fields for internal reference
-            Sheet 1 : field, intro-field, wily-castle/light-laboratory/cossack-citadel, final-destination, prototype-complete
-            Sheet 2 : mountain-mines, arctic-jungle, steel-mill, electrical-tower, abandoned-warehouse
-            Sheet 3 : oil-wells, clock-citadel, orb-city, pipe-station, atomic-furnace
-            Sheet 4 : industrial-facility, underground-laboratory, preserved-forest, photon-collider, waterfall-institute
-            Sheet 5 : sky-ridge, mineral-quarry,
-            Sheet 6 :
-            Sheet 7 :
-            Sheet 8 :
-             */
-
-            // Redefine the index var then populate
-
-            // Sheet ONE
-            $this_sprite_index['field'] = array(1, 0, 1, 'plain block');
-            $this_sprite_index['intro-field'] = array(1, 2, 3, 'piece of fence', 'pieces of fence');
-                $this_sprite_index['gentle-countryside'] = array(1, 2, 3, 'piece of fence', 'pieces of fence');
-            $this_sprite_index['final-destination'] = array(1, 6, 7, 'shiny metal block');
-            $this_sprite_index['final-destination-2'] = array(1, 6, 7, 'shiny metal block');
-            $this_sprite_index['final-destination-3'] = array(1, 6, 7, 'shiny metal block');
-            $this_sprite_index['prototype-complete'] = array(1, 8, 9, 'rocky boulder');
-
-            // Sheet TWO
-            $this_sprite_index['mountain-mines'] = array(2, 0, 1, 'heavy boulder');
-                $this_sprite_index['maniacal-hideaway'] = array(2, 0, 1, 'heavy boulder');
-            $this_sprite_index['arctic-jungle'] = array(2, 2, 3, 'frozen pillar');
-                $this_sprite_index['wintry-forefront'] = array(2, 2, 3, 'frozen pillar');
-            $this_sprite_index['steel-mill'] = array(2, 4, 5, 'heated pillar');
-            $this_sprite_index['electrical-tower'] = array(2, 6, 7, 'summoned pillar');
-            $this_sprite_index['abandoned-warehouse'] = array(2, 8, 9, 'concrete block');
-
-            // Sheet THREE
-            $this_sprite_index['oil-wells'] = array(3, 0, 1, 'bucket blockade');
-            $this_sprite_index['clock-citadel'] = array(3, 2, 3, 'emerald pillar');
-            $this_sprite_index['orb-city'] = array(3, 4, 5, 'explosive pillar');
-            $this_sprite_index['pipe-station'] = array(3, 6, 7, 'bundle of pipebombs', 'bundles of pipebombs');
-            $this_sprite_index['atomic-furnace'] = array(3, 8, 9, 'heated pillar');
-
-            // Sheet FOUR
-            $this_sprite_index['industrial-facility'] = array(4, 0, 1, 'titanium block');
-            $this_sprite_index['underground-laboratory'] = array(4, 2, 3, 'smooth platform');
-            $this_sprite_index['preserved-forest'] = array(4, 4, 5, 'wooden platform');
-            $this_sprite_index['photon-collider'] = array(4, 6, 7, 'crystal pillar');
-            $this_sprite_index['waterfall-institute'] = array(4, 8, 9, 'moss-covered platform');
-
-            // Sheet FIVE
-            $this_sprite_index['sky-ridge'] = array(5, 0, 1, 'windy pillar');
-            $this_sprite_index['mineral-quarry'] = array(5, 2, 3, 'mineral pillar');
-            $this_sprite_index['lighting-control'] = array(5, 4, 5, 'summoned platform');
-            $this_sprite_index['robosaur-boneyard'] = array(5, 6, 7, 'boney pillar');
-            $this_sprite_index['space-simulator'] = array(5, 8, 9, 'crystal blockade');
-
-            // Sheet SIX
-            $this_sprite_index['submerged-armory'] = array(6, 0, 1, 'iron blockade');
-            $this_sprite_index['egyptian-excavation'] = array(6, 2, 3, 'ancient stone');
-            $this_sprite_index['rusty-scrapheap'] = array(6, 4, 5, 'rusty scrapheap');
-            $this_sprite_index['rainy-sewers'] = array(6, 6, 7, 'slippery pillar');
-            $this_sprite_index['construction-site'] = array(6, 8, 9, 'block platform');
-
-            // Sheet SEVEN
-            $this_sprite_index['magnetic-generator'] = array(7, 0, 1, 'large battery', 'large batteries');
-            $this_sprite_index['power-plant'] = array(7, 2, 3, 'summoned platform');
-            $this_sprite_index['reflection-chamber'] = array(7, 4, 5, 'pulsing platform');
-            $this_sprite_index['rocky-plateau'] = array(7, 6, 7, 'large beam');
-            $this_sprite_index['septic-system'] = array(7, 8, 9, 'purifying unit');
-
-            // Sheet EIGHT
-            $this_sprite_index['serpent-column'] = array(8, 0, 1, 'serpentine column');
-            $this_sprite_index['spinning-greenhouse'] = array(8, 2, 3, 'compact greenhouse');
-            $this_sprite_index['wily-castle'] = array(8, 4, 5, 'heavy metal block');
-            $this_sprite_index['light-laboratory'] = array(8, 6, 7, 'heavy metal block');
-            $this_sprite_index['cossack-citadel'] = array(8, 8, 9, 'heavy metal block');
-
-        }
-        // Return the populated sprite index for the ability
-        return $this_sprite_index;
+        return self::get_static_index('super-arm', 'super-block', 'sprite-index');
     }
 
     // Define a static function for getting a preset core shield for the challenge
@@ -3918,66 +3921,12 @@ class rpg_ability extends rpg_object {
 
     // Define a static function for generating a static field attachment of a "frozen foothold" (from the Ice Breath ability)
     public static function get_static_frozen_foothold($static_attachment_key, $this_attachment_duration = 99){
-        return self::get_static_attachment('ice-slasher', 'frozen-foothold', $static_attachment_key, $this_attachment_duration);
+        return self::get_static_attachment('ice-breath', 'frozen-foothold', $static_attachment_key, $this_attachment_duration);
     }
 
     // Define a static function for generating a static field attachment of a "super block" (from the Super Arm ability)
     public static function get_static_super_block($static_attachment_key, $this_attachment_duration = 99){
-        $this_battle = rpg_battle::get_battle();
-        $existing_attachments = isset($this_battle->battle_attachments[$static_attachment_key]) ? count($this_battle->battle_attachments[$static_attachment_key]) : 0;
-        $this_ability_token = 'super-arm';
-        $this_attachment_token = 'ability_'.$this_ability_token.'_'.$static_attachment_key;
-        $this_sprite_sheet = 1;
-        $this_target_frame = 0;
-        $this_impact_frame = 1;
-        $this_object_name = 'boulder';
-        $this_sprite_index = self::get_super_block_sprite_index();
-        $this_field_token1 = $this_battle->battle_field->field_background;
-        $this_field_token2 = $this_battle->battle_field->field_foreground;
-        if (isset($this_sprite_index[$this_field_token1])){ $this_sheet_token = $this_field_token1; }
-        elseif (isset($this_sprite_index[$this_field_token2])){ $this_sheet_token = $this_field_token2; }
-        if (isset($this_sheet_token)){
-            $this_sprite_sheet = $this_sprite_index[$this_sheet_token][0];
-            $this_target_frame = $this_sprite_index[$this_sheet_token][1];
-            $this_impact_frame = $this_sprite_index[$this_sheet_token][2];
-            $this_object_name = $this_sprite_index[$this_sheet_token][3];
-        }
-        $this_object_name = ucwords($this_object_name);
-        $this_object_name = str_replace(array(' A ', ' An ', ' Of ', ' The '), array(' a ', ' an ', ' of ', ' the '), $this_object_name);
-        $this_object_name_span = rpg_type::print_span('impact_shield', $this_object_name);
-        $this_attachment_image = $this_ability_token.($this_sprite_sheet > 1 ? '-'.$this_sprite_sheet : '');
-        $this_attachment_destroy_text = 'The protective '.$this_object_name_span.' in front of {this_robot} faded away... ';
-        $this_attachment_info = array(
-            'class' => 'ability',
-            'sticky' => true,
-            'ability_token' => $this_ability_token,
-            'ability_image' => $this_attachment_image,
-            'attachment_token' => $this_attachment_token,
-            'attachment_duration' => $this_attachment_duration,
-            'attachment_sticky' => true,
-            'attachment_damage_input_breaker' => 0.50,
-            'attachment_weaknesses' => array('explode', 'impact'),
-            'attachment_weaknesses_trigger' => 'target',
-            'attachment_destroy' => array(
-                'trigger' => 'special',
-                'kind' => '',
-                'type' => '',
-                'percent' => true,
-                'modifiers' => false,
-                'frame' => 'defend',
-                'rates' => array(100, 0, 0),
-                'success' => array(9, -9999, -9999, 10, $this_attachment_destroy_text),
-                'failure' => array(9, -9999, -9999, 10, $this_attachment_destroy_text)
-                ),
-            'ability_frame' => $this_target_frame,
-            'ability_frame_animate' => array($this_target_frame),
-            'ability_frame_offset' => array(
-                'x' => (95 + ($existing_attachments * 8)),
-                'y' => (0),
-                'z' => (2 + $existing_attachments)
-                )
-            );
-        return $this_attachment_info;
+        return self::get_static_attachment('super-arm', 'super-block', $static_attachment_key, $this_attachment_duration);
     }
 
     // Define a static function for generating a static field attachment of a "disco ball" (from the Disco Fever ability)
