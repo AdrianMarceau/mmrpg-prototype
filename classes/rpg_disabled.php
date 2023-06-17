@@ -347,6 +347,195 @@ class rpg_disabled {
             && empty($this_battle->flags['challenge_battle'])
             && empty($_SESSION['GAME']['DEMO'])){
 
+            // -- ITEM REWARDS -- //
+
+            // Wrap the item drop rewards in a wrapper for easier debugging
+            $reward_flag_item_drops = true;
+            if ($reward_flag_item_drops){
+
+                // Collect the current battle item counts for reference
+                $current_items_counts = !empty($_SESSION['GAME']['values']['battle_items']) ? $_SESSION['GAME']['values']['battle_items'] : array();
+                $num_existing_small_screws = !empty($current_items_counts['small-screw']) ? $current_items_counts['small-screw'] : 0;
+                $num_existing_large_screws = !empty($current_items_counts['large-screw']) ? $current_items_counts['large-screw'] : 0;
+
+                // Create an options object for this function and populate
+                $options = rpg_game::new_options_object();
+                $options->disabled_target = $this_robot;
+                $options->disabled_initiator = $target_robot;
+                $options->trigger_options = &$trigger_options;
+                $options->item_rewards_tier = 1;
+                $options->item_rewards_array = array();
+                $options->item_chance_multiplier = 1;
+                $options->force_elemental_drop = false;
+                $extra_objects = array('options' => $options);
+
+                // Define the item rewards tier for drop calculations
+                if ($this_robot->robot_class === 'mecha'){ $options->item_rewards_tier = 1; }
+                elseif ($this_robot->robot_class === 'master'){ $options->item_rewards_tier = 2; }
+                elseif ($this_robot->robot_class === 'boss'){ $options->item_rewards_tier = 3; }
+
+                // Collect any preset item drops for this battle
+                $options->item_rewards_array = !empty($this_battle->battle_rewards['items']) ? $this_battle->battle_rewards['items'] : array();
+
+                // Define the chance multiplier and start at one
+                $options->item_chance_multiplier = $trigger_options['item_multiplier'];
+
+                // Check to see if we should force an elemental item drop
+                $options->force_elemental_drop = !empty($this_robot->flags['triggered_weakness']) ? true : false;
+
+                // Trigger this and target robot's item functions if they have been defined for this context
+                $this_robot->trigger_custom_function('rpg-robot_trigger-disabled_item-rewards_before', $extra_objects);
+                $target_robot->trigger_custom_function('rpg-robot_trigger-disabled_item-rewards_before', $extra_objects);
+
+                // Increase the item chance multiplier if one is set for the stage
+                if (isset($this_battle->field->field_multipliers['items'])){ $options->item_chance_multiplier = ($options->item_chance_multiplier * $this_battle->field->field_multipliers['items']); }
+
+                // Increse the multiplier if this is an empty core robot
+                if ($this_robot->robot_core == 'empty' || $this_robot->robot_core2 == 'empty'){ $options->item_chance_multiplier = $options->item_chance_multiplier * 2; }
+
+                // If this robot was a MECHA class (Tier 1)
+                if ($options->item_rewards_tier === 1){
+
+                    // Append the Tier I screw drops
+                    if ($num_existing_small_screws < MMRPG_SETTINGS_ITEMS_MAXQUANTITY){ $options->item_rewards_array[] =  array('chance' => 30, 'token' => 'small-screw', 'min' => 1, 'max' => 3); }
+
+                }
+                // If this robot was a MASTER class (Tier 1 & 2)
+                elseif ($options->item_rewards_tier === 2){
+
+                    // Append the Tier I-b screw drops
+                    if ($num_existing_small_screws < MMRPG_SETTINGS_ITEMS_MAXQUANTITY){ $options->item_rewards_array[] =  array('chance' => 30, 'token' => 'small-screw', 'min' => 3, 'max' => 6); }
+                    // Append the Tier II screw drops
+                    if ($num_existing_large_screws < MMRPG_SETTINGS_ITEMS_MAXQUANTITY){ $options->item_rewards_array[] =  array('chance' => 60, 'token' => 'large-screw', 'min' => 1, 'max' => 3); }
+
+                }
+                // If this robot was a BOSS class (Tier 1 & 2 & 3)
+                elseif ($options->item_rewards_tier === 3){
+
+                    // Append the Tier I-c screw drops
+                    if ($num_existing_small_screws < MMRPG_SETTINGS_ITEMS_MAXQUANTITY){ $options->item_rewards_array[] =  array('chance' => 60, 'token' => 'small-screw', 'min' => 6, 'max' => 9); }
+                    // Append the Tier II-b screw drops
+                    if ($num_existing_large_screws < MMRPG_SETTINGS_ITEMS_MAXQUANTITY){ $options->item_rewards_array[] =  array('chance' => 90, 'token' => 'large-screw', 'min' => 3, 'max' => 6); }
+                    // Append the Tier III screw drops
+                    //$options->item_rewards_array[] =  array('chance' => 90, 'token' => 'hyper-screw', 'min' => 1, 'max' => 3);
+
+                }
+
+                // If a weakness was triggered, we need to switch to a different item set (SHARDS / CORES)
+                if ($options->force_elemental_drop){
+
+                    // Collect the shard or core type for this robot
+                    $temp_drop_type = !empty($this_robot->robot_core) ? $this_robot->robot_core : 'none';
+                    $temp_drop_kind = $this_robot->robot_class == 'mecha' ? 'shard' : 'core';
+                    $num_existing_shards = !empty($current_items_counts[$temp_drop_type.'-shard']) ? $current_items_counts[$temp_drop_type.'-shard'] : 0;
+                    $num_existing_cores = !empty($current_items_counts[$temp_drop_type.'-core']) ? $current_items_counts[$temp_drop_type.'-core'] : 0;
+
+                    /*
+                    $this_battle->events_create(false, false, 'DEBUG',
+                        '$temp_drop_type = '.$temp_drop_type.
+                        '<br /> $temp_drop_kind = '.$temp_drop_kind.
+                        '<br /> $num_existing_shards = '.$num_existing_shards.
+                        '<br /> $num_existing_cores = '.$num_existing_cores
+                        );
+                    */
+
+                    // If we're allowed to drop this item at this time, continue
+                    if ($temp_drop_type !== 'empty' && (
+                        ($temp_drop_kind === 'shard' && ($num_existing_shards < MMRPG_SETTINGS_SHARDS_MAXQUANTITY || $num_existing_cores < MMRPG_SETTINGS_CORES_MAXQUANTITY))
+                        || ($temp_drop_kind === 'core' && $num_existing_cores < MMRPG_SETTINGS_CORES_MAXQUANTITY)
+                        )){
+
+                        // Clear the existing set of items as they're not relevant any more
+                        $options->item_rewards_array = array();
+
+                        // If this robot was a MECHA class it will drop a SHARD, else if a MASTER/BOSS class it will drop a CORE
+                        if ($temp_drop_kind === 'shard'){
+                            $options->item_rewards_array[] =  array('chance' => 100, 'token' => $temp_drop_type.'-shard', 'min' => 1, 'max' => 1);
+                        } else if ($temp_drop_kind === 'core'){
+                            $options->item_rewards_array[] =  array('chance' => 100, 'token' => $temp_drop_type.'-core', 'min' => 1, 'max' => 1);
+                        }
+
+                    }
+
+                }
+
+                // Trigger this and target robot's item functions if they have been defined for this context
+                $this_robot->trigger_custom_function('rpg-robot_trigger-disabled_item-rewards_after', $extra_objects);
+                $target_robot->trigger_custom_function('rpg-robot_trigger-disabled_item-rewards_after', $extra_objects);
+
+                // Shuffle the rewards so it doesn't look to formulaic
+                shuffle($options->item_rewards_array);
+
+                /*
+                // DEBUG
+                $this_battle->events_create(false, false, 'DEBUG',
+                    '$options->item_chance_multiplier = '.$options->item_chance_multiplier.
+                    '<br /> $options->item_rewards_array = '.count($options->item_rewards_array).
+                    '<br /> '.preg_replace('/\s+/', ' ', print_r($options->item_rewards_array, true))
+                    );
+                */
+
+                // Loop through the ability rewards for this robot if set and NOT demo mode
+                if (empty($_SESSION['GAME']['DEMO'])
+                    && !empty($options->item_rewards_array)
+                    && empty($this_battle->flags['player_battle'])
+                    && empty($this_battle->flags['challenge_battle'])
+                    ){
+
+                    // Calculate the drop result based on success vs failure values
+                    $temp_success_value = $this_robot->robot_class == 'mecha' ? 50 : 25;
+                    $temp_success_value = ceil($temp_success_value * $options->item_chance_multiplier);
+                    if ($temp_success_value > 100){ $temp_success_value = 100; }
+                    $temp_failure_value = 100 - $temp_success_value;
+                    $temp_dropping_result = $temp_success_value == 100 ? 'success' : $this_battle->weighted_chance(array('success', 'failure'), array($temp_success_value, $temp_failure_value));
+
+                    /*
+                    $this_battle->events_create(false, false, 'DEBUG',
+                        '$temp_success_value = '.$temp_success_value.
+                        '<br /> $temp_failure_value = '.$temp_failure_value.
+                        '<br /> $temp_dropping_result = '.$temp_dropping_result
+                        );
+                    */
+
+                    // If the drop was a success, calculate the details
+                    if ($temp_dropping_result == 'success'){
+
+                        // Define variables to hold totals then loop to calculate them
+                        $temp_value_total = 0;
+                        $temp_count_total = 0;
+                        foreach ($options->item_rewards_array AS $item_reward_key => $item_reward_info){
+                            $temp_value_total += $item_reward_info['chance'];
+                            $temp_count_total += 1;
+                        }
+
+                        // Generate the tokens and weights then pick a random item
+                        $temp_item_tokens = array();
+                        $temp_item_weights = array();
+                        foreach ($options->item_rewards_array AS $item_reward_key => $item_reward_info){
+                            $temp_item_tokens[] = $item_reward_info['token'];
+                            $temp_item_weights[] = ceil(($item_reward_info['chance'] / $temp_value_total) * 100);
+                        }
+                        $random_item_token = $this_battle->weighted_chance($temp_item_tokens, $temp_item_weights);
+                        $random_item_key = array_search($random_item_token, $temp_item_tokens);
+                        $random_item_info = $options->item_rewards_array[$random_item_key];
+
+                        // Define the quantity multiplier based on chance and rarity
+                        if (!isset($random_item_info['min'])){ $random_item_info['min'] = 1; }
+                        if (!isset($random_item_info['max'])){ $random_item_info['max'] = $random_item_info['min']; }
+                        if ($random_item_info['min'] != $random_item_info['max']){
+                            $temp_quantity_dropped = mt_rand($random_item_info['min'], $random_item_info['max']);
+                        } else {
+                            $temp_quantity_dropped = $random_item_info['min'];
+                        }
+
+                        // Trigger the actual item drop function on for the player
+                        rpg_player::trigger_item_drop($this_battle, $target_player, $target_robot, $this_robot, $item_reward_key, $random_item_token, $temp_quantity_dropped);
+
+                    }
+                }
+
+            }
+
             // -- EXPERIENCE POINTS / LEVEL UP -- //
 
             // Wrap the experience points and level-up code in a wrapper for easier debugging
@@ -882,195 +1071,6 @@ class rpg_disabled {
                         }
                     }
 
-                }
-
-            }
-
-            // -- ITEM REWARDS -- //
-
-            // Wrap the item drop rewards in a wrapper for easier debugging
-            $reward_flag_item_drops = true;
-            if ($reward_flag_item_drops){
-
-                // Collect the current battle item counts for reference
-                $current_items_counts = !empty($_SESSION['GAME']['values']['battle_items']) ? $_SESSION['GAME']['values']['battle_items'] : array();
-                $num_existing_small_screws = !empty($current_items_counts['small-screw']) ? $current_items_counts['small-screw'] : 0;
-                $num_existing_large_screws = !empty($current_items_counts['large-screw']) ? $current_items_counts['large-screw'] : 0;
-
-                // Create an options object for this function and populate
-                $options = rpg_game::new_options_object();
-                $options->disabled_target = $this_robot;
-                $options->disabled_initiator = $target_robot;
-                $options->trigger_options = &$trigger_options;
-                $options->item_rewards_tier = 1;
-                $options->item_rewards_array = array();
-                $options->item_chance_multiplier = 1;
-                $options->force_elemental_drop = false;
-                $extra_objects = array('options' => $options);
-
-                // Define the item rewards tier for drop calculations
-                if ($this_robot->robot_class === 'mecha'){ $options->item_rewards_tier = 1; }
-                elseif ($this_robot->robot_class === 'master'){ $options->item_rewards_tier = 2; }
-                elseif ($this_robot->robot_class === 'boss'){ $options->item_rewards_tier = 3; }
-
-                // Collect any preset item drops for this battle
-                $options->item_rewards_array = !empty($this_battle->battle_rewards['items']) ? $this_battle->battle_rewards['items'] : array();
-
-                // Define the chance multiplier and start at one
-                $options->item_chance_multiplier = $trigger_options['item_multiplier'];
-
-                // Check to see if we should force an elemental item drop
-                $options->force_elemental_drop = !empty($this_robot->flags['triggered_weakness']) ? true : false;
-
-                // Trigger this and target robot's item functions if they have been defined for this context
-                $this_robot->trigger_custom_function('rpg-robot_trigger-disabled_item-rewards_before', $extra_objects);
-                $target_robot->trigger_custom_function('rpg-robot_trigger-disabled_item-rewards_before', $extra_objects);
-
-                // Increase the item chance multiplier if one is set for the stage
-                if (isset($this_battle->field->field_multipliers['items'])){ $options->item_chance_multiplier = ($options->item_chance_multiplier * $this_battle->field->field_multipliers['items']); }
-
-                // Increse the multiplier if this is an empty core robot
-                if ($this_robot->robot_core == 'empty' || $this_robot->robot_core2 == 'empty'){ $options->item_chance_multiplier = $options->item_chance_multiplier * 2; }
-
-                // If this robot was a MECHA class (Tier 1)
-                if ($options->item_rewards_tier === 1){
-
-                    // Append the Tier I screw drops
-                    if ($num_existing_small_screws < MMRPG_SETTINGS_ITEMS_MAXQUANTITY){ $options->item_rewards_array[] =  array('chance' => 30, 'token' => 'small-screw', 'min' => 1, 'max' => 3); }
-
-                }
-                // If this robot was a MASTER class (Tier 1 & 2)
-                elseif ($options->item_rewards_tier === 2){
-
-                    // Append the Tier I-b screw drops
-                    if ($num_existing_small_screws < MMRPG_SETTINGS_ITEMS_MAXQUANTITY){ $options->item_rewards_array[] =  array('chance' => 30, 'token' => 'small-screw', 'min' => 3, 'max' => 6); }
-                    // Append the Tier II screw drops
-                    if ($num_existing_large_screws < MMRPG_SETTINGS_ITEMS_MAXQUANTITY){ $options->item_rewards_array[] =  array('chance' => 60, 'token' => 'large-screw', 'min' => 1, 'max' => 3); }
-
-                }
-                // If this robot was a BOSS class (Tier 1 & 2 & 3)
-                elseif ($options->item_rewards_tier === 3){
-
-                    // Append the Tier I-c screw drops
-                    if ($num_existing_small_screws < MMRPG_SETTINGS_ITEMS_MAXQUANTITY){ $options->item_rewards_array[] =  array('chance' => 60, 'token' => 'small-screw', 'min' => 6, 'max' => 9); }
-                    // Append the Tier II-b screw drops
-                    if ($num_existing_large_screws < MMRPG_SETTINGS_ITEMS_MAXQUANTITY){ $options->item_rewards_array[] =  array('chance' => 90, 'token' => 'large-screw', 'min' => 3, 'max' => 6); }
-                    // Append the Tier III screw drops
-                    //$options->item_rewards_array[] =  array('chance' => 90, 'token' => 'hyper-screw', 'min' => 1, 'max' => 3);
-
-                }
-
-                // If a weakness was triggered, we need to switch to a different item set (SHARDS / CORES)
-                if ($options->force_elemental_drop){
-
-                    // Collect the shard or core type for this robot
-                    $temp_drop_type = !empty($this_robot->robot_core) ? $this_robot->robot_core : 'none';
-                    $temp_drop_kind = $this_robot->robot_class == 'mecha' ? 'shard' : 'core';
-                    $num_existing_shards = !empty($current_items_counts[$temp_drop_type.'-shard']) ? $current_items_counts[$temp_drop_type.'-shard'] : 0;
-                    $num_existing_cores = !empty($current_items_counts[$temp_drop_type.'-core']) ? $current_items_counts[$temp_drop_type.'-core'] : 0;
-
-                    /*
-                    $this_battle->events_create(false, false, 'DEBUG',
-                        '$temp_drop_type = '.$temp_drop_type.
-                        '<br /> $temp_drop_kind = '.$temp_drop_kind.
-                        '<br /> $num_existing_shards = '.$num_existing_shards.
-                        '<br /> $num_existing_cores = '.$num_existing_cores
-                        );
-                    */
-
-                    // If we're allowed to drop this item at this time, continue
-                    if ($temp_drop_type !== 'empty' && (
-                        ($temp_drop_kind === 'shard' && ($num_existing_shards < MMRPG_SETTINGS_SHARDS_MAXQUANTITY || $num_existing_cores < MMRPG_SETTINGS_CORES_MAXQUANTITY))
-                        || ($temp_drop_kind === 'core' && $num_existing_cores < MMRPG_SETTINGS_CORES_MAXQUANTITY)
-                        )){
-
-                        // Clear the existing set of items as they're not relevant any more
-                        $options->item_rewards_array = array();
-
-                        // If this robot was a MECHA class it will drop a SHARD, else if a MASTER/BOSS class it will drop a CORE
-                        if ($temp_drop_kind === 'shard'){
-                            $options->item_rewards_array[] =  array('chance' => 100, 'token' => $temp_drop_type.'-shard', 'min' => 1, 'max' => 1);
-                        } else if ($temp_drop_kind === 'core'){
-                            $options->item_rewards_array[] =  array('chance' => 100, 'token' => $temp_drop_type.'-core', 'min' => 1, 'max' => 1);
-                        }
-
-                    }
-
-                }
-
-                // Trigger this and target robot's item functions if they have been defined for this context
-                $this_robot->trigger_custom_function('rpg-robot_trigger-disabled_item-rewards_after', $extra_objects);
-                $target_robot->trigger_custom_function('rpg-robot_trigger-disabled_item-rewards_after', $extra_objects);
-
-                // Shuffle the rewards so it doesn't look to formulaic
-                shuffle($options->item_rewards_array);
-
-                /*
-                // DEBUG
-                $this_battle->events_create(false, false, 'DEBUG',
-                    '$options->item_chance_multiplier = '.$options->item_chance_multiplier.
-                    '<br /> $options->item_rewards_array = '.count($options->item_rewards_array).
-                    '<br /> '.preg_replace('/\s+/', ' ', print_r($options->item_rewards_array, true))
-                    );
-                */
-
-                // Loop through the ability rewards for this robot if set and NOT demo mode
-                if (empty($_SESSION['GAME']['DEMO'])
-                    && !empty($options->item_rewards_array)
-                    && empty($this_battle->flags['player_battle'])
-                    && empty($this_battle->flags['challenge_battle'])
-                    ){
-
-                    // Calculate the drop result based on success vs failure values
-                    $temp_success_value = $this_robot->robot_class == 'mecha' ? 50 : 25;
-                    $temp_success_value = ceil($temp_success_value * $options->item_chance_multiplier);
-                    if ($temp_success_value > 100){ $temp_success_value = 100; }
-                    $temp_failure_value = 100 - $temp_success_value;
-                    $temp_dropping_result = $temp_success_value == 100 ? 'success' : $this_battle->weighted_chance(array('success', 'failure'), array($temp_success_value, $temp_failure_value));
-
-                    /*
-                    $this_battle->events_create(false, false, 'DEBUG',
-                        '$temp_success_value = '.$temp_success_value.
-                        '<br /> $temp_failure_value = '.$temp_failure_value.
-                        '<br /> $temp_dropping_result = '.$temp_dropping_result
-                        );
-                    */
-
-                    // If the drop was a success, calculate the details
-                    if ($temp_dropping_result == 'success'){
-
-                        // Define variables to hold totals then loop to calculate them
-                        $temp_value_total = 0;
-                        $temp_count_total = 0;
-                        foreach ($options->item_rewards_array AS $item_reward_key => $item_reward_info){
-                            $temp_value_total += $item_reward_info['chance'];
-                            $temp_count_total += 1;
-                        }
-
-                        // Generate the tokens and weights then pick a random item
-                        $temp_item_tokens = array();
-                        $temp_item_weights = array();
-                        foreach ($options->item_rewards_array AS $item_reward_key => $item_reward_info){
-                            $temp_item_tokens[] = $item_reward_info['token'];
-                            $temp_item_weights[] = ceil(($item_reward_info['chance'] / $temp_value_total) * 100);
-                        }
-                        $random_item_token = $this_battle->weighted_chance($temp_item_tokens, $temp_item_weights);
-                        $random_item_key = array_search($random_item_token, $temp_item_tokens);
-                        $random_item_info = $options->item_rewards_array[$random_item_key];
-
-                        // Define the quantity multiplier based on chance and rarity
-                        if (!isset($random_item_info['min'])){ $random_item_info['min'] = 1; }
-                        if (!isset($random_item_info['max'])){ $random_item_info['max'] = $random_item_info['min']; }
-                        if ($random_item_info['min'] != $random_item_info['max']){
-                            $temp_quantity_dropped = mt_rand($random_item_info['min'], $random_item_info['max']);
-                        } else {
-                            $temp_quantity_dropped = $random_item_info['min'];
-                        }
-
-                        // Trigger the actual item drop function on for the player
-                        rpg_player::trigger_item_drop($this_battle, $target_player, $target_robot, $this_robot, $item_reward_key, $random_item_token, $temp_quantity_dropped);
-
-                    }
                 }
 
             }
