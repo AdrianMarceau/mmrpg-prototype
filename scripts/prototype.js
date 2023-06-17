@@ -963,7 +963,7 @@ function prototype_menu_click_option(thisContext, thisOption){
             // Append this option object to the main banner window
             var cloneOption = thisOption.clone();
             var cloneWidth = ((numOptions * 8) + 42);
-            if (thisSelect === 'this_player_token'){ cloneWidth = 25; }
+            if (thisSelect === 'this_player_token'){ cloneWidth = 28; }
             cloneOption.attr('data-select', thisSelect);
             cloneOption.removeClass('option_1x1 option_1x2 option_1x3 option_1x4').addClass('option_1x'+thisPosition);
             cloneOption.find('.arrow').css({right:0});
