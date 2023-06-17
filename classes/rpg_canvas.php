@@ -1153,9 +1153,12 @@ class rpg_canvas {
         }
 
         // Shift the original x offset if there's more than one of an item
+        $quantity_offset_shift = 0;
         if ($this_data['item_quantity'] > 1){
-            $this_data['canvas_offset_x'] += 40;
-            $this_data['canvas_offset_x'] -= round(($this_data['item_quantity'] / 2) * 7);
+            //$this_data['canvas_offset_x'] += 40;
+            //$this_data['canvas_offset_x'] -= round(($this_data['item_quantity'] / 2) * 7);
+            $quantity_offset_shift = round($this_data['item_quantity'] * 3);
+            $this_data['canvas_offset_x'] += $quantity_offset_shift;
             $this_data['canvas_offset_y'] -= round(($this_data['item_quantity'] / 2) * 1);
         }
 
@@ -1166,7 +1169,7 @@ class rpg_canvas {
             $canvas_offset_x = $this_data['canvas_offset_x'];
             $canvas_offset_y = $this_data['canvas_offset_y'];
             $canvas_offset_z = $this_data['canvas_offset_z'];
-            if ($shards_fusing_this_turn){ $canvas_offset_x -= 26; }
+            if ($shards_fusing_this_turn){ $canvas_offset_x -= $quantity_offset_shift; }
             for ($item_key = 0; $item_key < $this_data['item_quantity']; $item_key++){
 
                 // Define the rest of the display variables

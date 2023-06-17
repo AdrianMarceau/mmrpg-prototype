@@ -1580,12 +1580,17 @@ class rpg_player extends rpg_object {
 
     }
 
+    // Define a function to trigger when an enemy robot drops an item (in this context, "target" is the player getting the item, and "this" if the one who dropped it)
     public static function trigger_item_drop($this_battle, $target_player, $target_robot, $this_robot, $item_reward_key, $item_reward_token, $item_quantity_dropped = 1){
+
+        // Collect a reference to the player who owned the robot who dropped the item
+        $this_player = $this_robot->player;
 
         // Create the temporary item object for event creation
         $item_reward_info = rpg_item::get_index_info($item_reward_token);
         if (empty($item_reward_info)){ return false; }
-        $temp_item = rpg_game::get_item($this_battle, $target_player, $target_robot, $item_reward_info);
+        //$temp_item = rpg_game::get_item($this_battle, $target_player, $target_robot, $item_reward_info);
+        $temp_item = rpg_game::get_item($this_battle, $this_player, $this_robot, $item_reward_info);
         $temp_item->item_name = $item_reward_info['item_name'];
         $temp_item->item_image = $item_reward_info['item_token'];
         $temp_item->item_quantity = $item_quantity_dropped;
@@ -1629,7 +1634,7 @@ class rpg_player extends rpg_object {
 
         // Update the item frame and offsets then save
         $temp_item->item_frame = 0;
-        $temp_item->item_frame_offset = array('x' => 260, 'y' => 0, 'z' => 10);
+        $temp_item->item_frame_offset = array('x' => 50, 'y' => 0, 'z' => 10);
         if ($item_quantity_dropped > 1){ $temp_item->item_name = $temp_item->item_base_name.'s'; }
         else { $temp_item->item_name = $temp_item->item_base_name; }
         $temp_item->update_session();
@@ -1683,8 +1688,8 @@ class rpg_player extends rpg_object {
         //$event_body .= ' ('.$temp_item_quantity_old.' &raquo; '.$temp_item_quantity_new.')';
         $event_options = array();
         $event_options['console_show_target'] = false;
-        $event_options['this_header_float'] = $target_player->player_side;
-        $event_options['this_body_float'] = $target_player->player_side;
+        $event_options['this_header_float'] = $this_player->player_side;
+        $event_options['this_body_float'] = $this_player->player_side;
         $event_options['this_item'] = $temp_item;
         $event_options['this_item_image'] = 'icon';
         $event_options['this_item_quantity'] = $item_quantity_dropped;
@@ -1693,12 +1698,12 @@ class rpg_player extends rpg_object {
         $event_options['console_show_this_item'] = true;
         $event_options['canvas_show_this_item'] = true;
         rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $temp_item);
-        $this_battle->events_create($target_robot, $target_robot, $event_header, $event_body, $event_options);
+        $this_battle->events_create($this_robot, false, $event_header, $event_body, $event_options);
         if ($shards_fusing_this_turn){
             $temp_item->set_frame_styles('filter: brightness(2); ');
-            $this_battle->events_create(false, false, '', '', $event_options);
+            $this_battle->events_create($this_robot, false, '', '', $event_options);
             $event_options['this_item_quantity'] = MMRPG_SETTINGS_SHARDS_MAXQUANTITY;
-            $this_battle->events_create(false, false, '', '', $event_options);
+            $this_battle->events_create($this_robot, false, '', '', $event_options);
             $temp_item->set_frame_styles('');
         } else {
             $temp_item->set_frame_styles('');
@@ -1735,7 +1740,7 @@ class rpg_player extends rpg_object {
             // Create the temporary item object for event creation
             $item_core_info['item_id'] = $item_reward_info['item_id'] + 1;
             $item_core_info['item_token'] = $temp_core_token;
-            $temp_core = rpg_game::get_item($this_battle, $target_player, $target_robot, $item_core_info);
+            $temp_core = rpg_game::get_item($this_battle, $this_player, $this_robot, $item_core_info);
             $temp_core->item_name = $item_core_info['item_name'];
             $temp_core->item_image = $item_core_info['item_token'];
             $temp_core->update_session();
@@ -1771,8 +1776,8 @@ class rpg_player extends rpg_object {
             $event_body .= ' <span class="item_stat item_type item_type_none">'.$temp_core_quantity_old.' <sup style="bottom: 2px;">&raquo;</sup> '.$temp_core_quantity_new.'</span>';
             $event_options = array();
             $event_options['console_show_target'] = false;
-            $event_options['this_header_float'] = $target_player->player_side;
-            $event_options['this_body_float'] = $target_player->player_side;
+            $event_options['this_header_float'] = $this_player->player_side;
+            $event_options['this_body_float'] = $this_player->player_side;
             $event_options['this_item'] = $temp_core;
             $event_options['this_item_image'] = 'icon';
             $event_options['console_show_this_player'] = false;
@@ -1782,9 +1787,9 @@ class rpg_player extends rpg_object {
             $target_player->set_frame(($item_reward_key + 1 % 3 == 0 ? 'taunt' : 'victory'));
             $target_robot->set_frame($item_reward_key % 2 == 0 ? 'base' : 'taunt');
             $temp_core->set_frame('base');
-            $temp_core->set_frame_offset(array('x' => 260, 'y' => 0, 'z' => 10));
-            rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $temp_item);
-            $this_battle->events_create($target_robot, false, $event_header, $event_body, $event_options);
+            $temp_core->set_frame_offset(array('x' => 50, 'y' => 0, 'z' => 10));
+            rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $temp_core);
+            $this_battle->events_create($this_robot, false, $event_header, $event_body, $event_options);
             $this_battle->events_create(false, false, '', '', array_filter($event_options, function($k){ return strstr($k, '_camera_'); }, ARRAY_FILTER_USE_KEY));
 
             // Set the old shard counter back to zero now that they've fused
