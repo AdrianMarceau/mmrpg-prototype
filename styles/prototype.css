@@ -1837,6 +1837,9 @@ body[data-source="website"] #prototype .menu {
     top: 3px;
     z-index: 20;
 }
+#prototype .option_1x1 div label .icons {
+    position: absolute;
+}
 #prototype .option_1x1 div label .maintext .icons {
     position: relative;
     bottom: 2px;
@@ -1844,9 +1847,14 @@ body[data-source="website"] #prototype .menu {
 #prototype .option_1x1 div label .maintext .icons.favs {
     font-size: 11px;
 }
-#prototype .option_1x1 div label .maintext .icons.stats {
-    font-size: 9px;
-    letter-spacing: 0;
+#prototype .option_1x1 div label .icons.stats {
+    bottom: 0;
+    right: 15px;
+    font-size: 8px;
+    letter-spacing: 1px;
+    width: 40px;
+    text-align: center;
+    background-color: transparent;
 }
 #prototype .option div label .subtext .pipe,
 #prototype .option div label .subtext2 .pipe {
