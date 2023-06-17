@@ -229,9 +229,13 @@ function generate_prototype_postgame_message($player_token){
  * DR. LIGHT UNLOCKS
  */
 
+/*
+
+// DISABLING THIS UNTIL WE HAVE A REAL STORY
+
 // UNLOCK EVENT : PHASE ONE ROBOTS (LIGHT)
 
-// If Dr. Light has completed all of his second phase, open Dr. Wily's second
+// Once the player has completed the first battle, display some story to them
 if ($battle_complete_counter_light >= 1 && $battle_complete_counter_light < 2){
 
     // Create the event flag and unset the player select variable to force main menu
@@ -256,6 +260,8 @@ if ($battle_complete_counter_light >= 1 && $battle_complete_counter_light < 2){
     }
 
 }
+
+*/
 
 // UNLOCK ROBOT : ROLL
 
