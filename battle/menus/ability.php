@@ -224,16 +224,29 @@ ob_start();
                     else { $temp_ability_label .= ($temp_kind == 'damage' ? 'Damage' : ($temp_kind == 'recovery' ? 'Recovery' : ($temp_kind == 'multi' ? 'Effects' : 'Special'))); }
                 $temp_ability_label .= '</span>';
                 $temp_ability_label .= '<span class="subtext">';
+                    $temp_ability_label .= '<span class="accuracy"><i class="fa fas fa-crosshairs"></i> '.$temp_accuracy.'%</span>';
                     if (!empty($temp_damage) || !empty($temp_recovery)){
-                        $temp_ability_label .= '<span style="'.($temp_multiplier != 1 ? ($temp_multiplier > 1 ? 'color: rgb(161, 255, 124); ' : 'color: rgb(255, 150, 150); ') : '').'">';
-                            if ($temp_kind == 'damage' & !empty($temp_damage)){ $temp_ability_label .= 'P:'.$temp_damage.$temp_damage_unit.' ';  }
-                            elseif ($temp_kind == 'recovery' && !empty($temp_recovery)){ $temp_ability_label .= 'P:'.$temp_recovery.$temp_recovery_unit.' '; }
-                            elseif ($temp_kind == 'multi' && (!empty($temp_damage) || !empty($temp_recovery))){ $temp_ability_label .= 'P:'.$temp_damage.$temp_damage_unit.'/'.$temp_recovery.$temp_recovery_unit.' '; }
-                            else { $temp_ability_label .= ''; }
+                        $temp_ability_label .= ' ';
+                        $temp_ability_label .= '<span class="big-digit">';
+                            if (($temp_kind == 'multi' || $temp_kind == 'damage') & !empty($temp_damage)){
+                                $amount = $temp_damage.($temp_damage_unit ? '<sup>'.$temp_damage_unit.'</sup>' : '');
+                                $icon = '<i class="fa fas fa-fist-raised"></i>';
+                                $mods = '';
+                                if ($temp_multiplier > 1){ $mods .= '<i class="fa fas fa-angle-double-up"></i>'; }
+                                elseif ($temp_multiplier < 1){ $mods .= '<i class="fa fas fa-angle-double-down"></i>'; }
+                                $temp_ability_label .= '<span class="amount damage">'.$icon.' '.$amount.$mods.'</span>';
+                            } elseif (($temp_kind == 'multi' || $temp_kind == 'recovery') && !empty($temp_recovery)){
+                                $amount = $temp_recovery.($temp_recovery_unit ? '<sup>'.$temp_recovery_unit.'</sup>' : '');
+                                $icon = '<i class="fa fas fa-heart"></i>';
+                                $mods = '';
+                                if ($temp_multiplier > 1){ $mods .= '<i class="fa fas fa-angle-double-up"></i>'; }
+                                elseif ($temp_multiplier < 1){ $mods .= '<i class="fa fas fa-angle-double-down"></i>'; }
+                                $temp_ability_label .= '<span class="amount recovery">'.$icon.' '.$amount.$mods.'</span>';
+                            } else {
+                                $temp_ability_label .= '';
+                            }
                         $temp_ability_label .= '</span>';
-                        $temp_ability_label .= '&nbsp;';
                     }
-                    $temp_ability_label .= 'A:'.$temp_accuracy.'%';
                 $temp_ability_label .= '</span>';
                 $temp_ability_label .= '</span>';
 
