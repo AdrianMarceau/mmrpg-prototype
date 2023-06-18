@@ -1513,6 +1513,32 @@ class rpg_player extends rpg_object {
 
     }
 
+    // Define a function to trigger when all attack damage has been dealt and we need to apply disabled status to robots
+    public function check_robots_disabled($target_player, $target_robot){
+
+        // Loop through all robots on the target side and check to see if any need to be disabled
+        $robots_to_disable = array();
+        $robots_still_active = $this->get_robots();
+        foreach ($robots_still_active AS $key => $robot){
+            if (($robot->robot_energy < 1 || $robot->robot_status == 'disabled')
+                && empty($robot->flags['apply_disabled_state'])){
+                $robots_to_disable[] = $robot;
+            }
+        }
+
+        // Loop through robots to disable and trigger it, delaying experience gains until the end
+        while (!empty($robots_to_disable)){
+            $options = array();
+            $robot = array_shift($robots_to_disable);
+            if (!empty($robots_to_disable)){
+                $options['delay_stat_bonuses'] = true;
+                $options['delay_experience_points'] = true;
+            }
+            $robot->trigger_disabled($target_robot, $options);
+        }
+
+    }
+
     // Define a public function for sorting robots by their active status
     public static function robot_sort_by_active($info1, $info2){
         //$info1['robot_key'] = $info1['robot_key'] < 8 ? $info1['robot_key'] + 1 : 1;
