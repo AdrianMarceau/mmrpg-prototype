@@ -51,7 +51,7 @@ ob_start();
         $robot_direction = $this_player->player_side == 'left' ? 'right' : 'left';
 
         // Define the ability display counter
-        $unlocked_abilities_count = 0;
+        $equipped_abilities_count = 0;
 
         // Collect the temp ability and robot indexes
         $db_robot_fields = rpg_robot::get_index_fields(true);
@@ -76,7 +76,7 @@ ob_start();
 
                 // Check if this ability has been unlocked
                 $this_ability_unlocked = true;
-                if ($this_ability_unlocked){ $unlocked_abilities_count++; }
+                if ($this_ability_unlocked){ $equipped_abilities_count++; }
                 else { continue; }
 
                 // Create the ability object using the session/index data
@@ -286,18 +286,39 @@ ob_start();
                 $temp_ability_sprite['preload'] = 'images/abilities/'.$temp_ability_sprite['image'].'/sprite_'.$robot_direction.'_'.$temp_ability_sprite['image_size_zoom_text'].'.png';
 
                 // Now use the new object to generate a snapshot of this ability button
-                if ($temp_button_enabled){ ?><a data-order="<?=$temp_order_counter?>" class="button action_ability ability_<?= $temp_ability->ability_token ?> ability_type ability_type_<?= (!empty($temp_ability->ability_type) ? $temp_ability->ability_type : 'none').(!empty($temp_ability->ability_type2) ? '_'.$temp_ability->ability_type2 : '') ?> block_<?= $unlocked_abilities_count ?>" type="button" data-action="ability_<?= $temp_ability->ability_id.'_'.$temp_ability->ability_token ?>" data-tooltip="<?= $temp_ability_details_tooltip ?>" data-target="<?= $temp_target ?>"><label class=""><?= $temp_ability_sprite['markup'] ?><?= $temp_ability_label ?></label></a><? }
-                else { ?><a data-order="<?=$temp_order_counter?>" class="button button_disabled action_ability ability_<?= $temp_ability->ability_token ?> ability_type ability_type_<?= (!empty($temp_ability->ability_type) ? $temp_ability->ability_type : 'none').(!empty($temp_ability->ability_type2) ? '_'.$temp_ability->ability_type2 : '') ?> block_<?= $unlocked_abilities_count ?>" type="button"><label class=""><?= $temp_ability_sprite['markup'] ?><?= $temp_ability_label ?></label></a><? }
+                $btn_type = 'ability_type ability_type_'.(!empty($temp_ability->ability_type) ? $temp_ability->ability_type : 'none').(!empty($temp_ability->ability_type2) ? '_'.$temp_ability->ability_type2 : '');
+                $btn_class = 'button action_ability ability_'.$temp_ability->ability_token.' '.$btn_type.' block_'.$equipped_abilities_count.' ';
+                $btn_action = 'ability_'.$temp_ability->ability_id.'_'.$temp_ability->ability_token;
+                $btn_info_circle = '<span class="info" data-tooltip="'.$temp_ability_details_tooltip.'" data-tooltip-type="'.$btn_type.'"><i class="fa fas fa-info-circle"></i></span>';
+                if ($temp_button_enabled){
+                    echo('<a type="button" class="'.$btn_class.'" data-order="'.$temp_order_counter.'" data-action="'.$btn_action.'" data-target="'.$temp_target.'">'.
+                            '<label>'.
+                                $btn_info_circle.
+                                $temp_ability_sprite['markup'].
+                                $temp_ability_label.
+                            '</label>'.
+                        '</a>');
+                } else {
+                    $btn_class .= 'button_disabled ';
+                    echo('<a type="button" class="'.$btn_class.'" data-order="'.$temp_order_counter.'">'.
+                            '<label>'.
+                                $btn_info_circle.
+                                $temp_ability_sprite['markup'].
+                                $temp_ability_label.
+                            '</label>'.
+                        '</a>');
+                }
                 // Increment the order counter
                 $temp_order_counter++;
             }
             $ability_key++;
         }
         // If there were less than 8 abilities, fill in the empty spaces
-        if ($unlocked_abilities_count < 8){
-            for ($i = $unlocked_abilities_count; $i < 8; $i++){
+        if ($equipped_abilities_count < 8){
+            for ($i = $equipped_abilities_count; $i < 8; $i++){
                 // Display an empty button placeholder
-                ?><a class="button action_ability button_disabled block_<?= $i + 1 ?>" type="button">&nbsp;</a><?
+                $btn_class = 'button action_ability button_disabled block_'.($i + 1);
+                echo('<a type="button" class="'.$btn_class.'">&nbsp;</a>');
             }
         }
         // Unset the temp abilities index

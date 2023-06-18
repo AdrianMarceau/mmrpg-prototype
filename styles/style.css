@@ -3622,6 +3622,53 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     line-height: 56px;
     padding-left: 48px;
 }
+#actions .actions_option .action_option label .info,
+#actions .actions_settings .action_setting label .info,
+#actions .actions_settings_eventTimeout .action_setting label .info,
+#actions .actions_settings_volumeControl .action_setting label .info,
+#actions .actions_settings_autoScan .action_setting label .info,
+#actions .actions_switch .action_switch label .info,
+#actions .actions_scan .action_scan label .info,
+#actions .actions_target .action_target label .info,
+#actions .actions_ability .action_ability label .info,
+#actions .actions_item .action_item label .info {
+    display: inline-block;
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    font-size: 100%;
+    line-height: 1;
+    z-index: 100;
+    cursor: help;
+    transform: scale(1);
+    filter: brightness(0.8) opacity(0);
+    transition: transform 0.3s, filter 0.3s;
+}
+#actions .actions_option .action_option:hover label .info,
+#actions .actions_settings .action_setting:hover label .info,
+#actions .actions_settings_eventTimeout .action_setting:hover label .info,
+#actions .actions_settings_volumeControl .action_setting:hover label .info,
+#actions .actions_settings_autoScan .action_setting:hover label .info,
+#actions .actions_switch .action_switch:hover label .info,
+#actions .actions_scan .action_scan:hover label .info,
+#actions .actions_target .action_target:hover label .info,
+#actions .actions_ability .action_ability:hover label .info,
+#actions .actions_item .action_item:hover label .info {
+    filter: brightness(0.8) opacity(1);
+}
+#actions .actions_option .action_option label .info:hover,
+#actions .actions_settings .action_setting label .info:hover,
+#actions .actions_settings_eventTimeout .action_setting label .info:hover,
+#actions .actions_settings_volumeControl .action_setting label .info:hover,
+#actions .actions_settings_autoScan .action_setting label .info:hover,
+#actions .actions_switch .action_switch label .info:hover,
+#actions .actions_scan .action_scan label .info:hover,
+#actions .actions_target .action_target label .info:hover,
+#actions .actions_ability .action_ability label .info:hover,
+#actions .actions_item .action_item label .info:hover {
+    transform: scale(1.2);
+    filter: brightness(1.0) opacity(1);
+}
 #actions .actions_option .action_option label .multi,
 #actions .actions_settings .action_setting label .multi,
 #actions .actions_settings_eventTimeout .action_setting label .multi,
