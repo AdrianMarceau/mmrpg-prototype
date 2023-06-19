@@ -7,13 +7,13 @@ ob_start();
 	$temp_options = array();
 	$block_num = 0;
 
-	// Display the option for CHARGE WEAPONS
-	$block_num++;
-	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_defense" type="button" data-action="ability_9_action-chargeweapons"><label><span class="multi">Charge<br />Weapons</span></label></a>';
-
 	// Display the option for SKIP TURN
 	$block_num++;
 	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_speed" type="button" data-action="ability_8_action-noweapons"><label><span class="multi">Skip<br />Turn</span></label></a>';
+
+	// Display the option for CHARGE WEAPONS
+	$block_num++;
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_defense" type="button" data-action="ability_9_action-chargeweapons"><label><span class="multi">Manual<br />Recharge</span></label></a>';
 
 	// Display the option for RESTART BATTLE
 	$block_num++;
