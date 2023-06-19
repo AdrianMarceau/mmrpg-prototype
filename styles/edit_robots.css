@@ -519,7 +519,7 @@ body.windowFlag_landscapeMode #prototype {
 
 #edit #console .event .robot_favourite {
     display: block;
-    font-size: 20px;
+    font-size: 12px;
     line-height: 20px;
     margin: -2px auto 0;
     text-align: center;

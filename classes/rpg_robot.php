@@ -4688,9 +4688,9 @@ class rpg_robot extends rpg_object {
 
                 <div class="this_sprite sprite_left event_robot_favourite" style="" >
                     <? if($global_allow_editing): ?>
-                        <a class="robot_favourite <?= in_array($robot_token, $player_robot_favourites) ? 'robot_favourite_active ' : '' ?>" data-player="<?= $player_token ?>" data-robot="<?= $robot_token ?>" title="Toggle Favourite?">&hearts;</a>
+                        <a class="robot_favourite <?= in_array($robot_token, $player_robot_favourites) ? 'robot_favourite_active ' : '' ?>" data-player="<?= $player_token ?>" data-robot="<?= $robot_token ?>" title="Pin Favourite?"><i class="fa fas fa-thumbtack"></i></a>
                     <? else: ?>
-                        <span class="robot_favourite <?= in_array($robot_token, $player_robot_favourites) ? 'robot_favourite_active ' : '' ?>">&hearts;</span>
+                        <span class="robot_favourite <?= in_array($robot_token, $player_robot_favourites) ? 'robot_favourite_active ' : '' ?>"><i class="fa fas fa-thumbtack"></i></span>
                     <? endif; ?>
                 </div>
 
