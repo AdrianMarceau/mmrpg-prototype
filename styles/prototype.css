@@ -1354,8 +1354,47 @@ body[data-source="website"] #prototype .menu {
 
 #mmrpg #prototype .option_this-robot-select .sprite {
     pointer-events: none;
+    right: auto;
 }
-
+#mmrpg #prototype .option_this-robot-select .sprite_40x40 {
+    left: 5px;
+}
+#mmrpg #prototype .option_this-robot-select .sprite_80x80 {
+    left: -15px;
+}
+#mmrpg #prototype .option_this-robot-select .icons.stats,
+#mmrpg #prototype .option_this-robot-select .icons.favs {
+    position: absolute;
+}
+#mmrpg #prototype .option_this-robot-select .icons.stats {
+    bottom: 0;
+    left: 5px;
+    font-size: 8px;
+    letter-spacing: 1px;
+    width: 40px;
+    text-align: center;
+    background-color: transparent;
+}
+#mmrpg #prototype .option_this-robot-select .icons.favs {
+    top: -8px;
+    right: -8px;
+    font-size: 12px;
+    transform: rotate(26deg);
+    color: #cccccc;
+}
+#mmrpg #prototype .option_this-robot-select .multi {
+    text-align: right;
+    width: 65%;
+    height: 100%;
+    margin-left: 40px;
+    padding-left: 6px;
+    border-left: 1px solid rgba(0, 0, 0, 0.2);
+}
+#mmrpg #prototype .option_this-robot-select .multi .maintext,
+#mmrpg #prototype .option_this-robot-select .multi .subtext,
+#mmrpg #prototype .option_this-robot-select .multi .subtext2 {
+    width: auto;
+}
 
 
 #mmrpg #prototype .canvas_overlay_footer {
@@ -1843,18 +1882,6 @@ body[data-source="website"] #prototype .menu {
 #prototype .option_1x1 div label .maintext .icons {
     position: relative;
     bottom: 2px;
-}
-#prototype .option_1x1 div label .maintext .icons.favs {
-    font-size: 11px;
-}
-#prototype .option_1x1 div label .icons.stats {
-    bottom: 0;
-    right: 15px;
-    font-size: 8px;
-    letter-spacing: 1px;
-    width: 40px;
-    text-align: center;
-    background-color: transparent;
 }
 #prototype .option div label .subtext .pipe,
 #prototype .option div label .subtext2 .pipe {

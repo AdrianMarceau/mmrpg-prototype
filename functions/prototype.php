@@ -2100,7 +2100,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_robot_item = !empty($info['robot_item']) ? $info['robot_item'] : '';
 
         $this_robot_favourite = in_array($info['robot_token'], $temp_player_favourites) ? true : false;
-        $this_robot_name .= $this_robot_favourite ? ' <span class="icons favs">&hearts;</span>' : '';
+        //$this_robot_name .= $this_robot_favourite ? ' <span class="icons favs"><i class="fa fas fa-thumbtack"></i></span>' : '';
 
         // Collect starforce values for the current player
         $player_starforce = rpg_game::starforce_unlocked();
@@ -2141,6 +2141,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         for ($i = 0; $i < $bullcount; $i++){ $namestring .= '&bull;'; }
         $stat_reward_icons = !empty($namestring) ? ' <span class="icons stats">'.$namestring.'</span>' : '';
         if (!empty($stat_reward_icons)){ $temp_top -= 6; }
+        $pinned_fav_icons = $this_robot_favourite ? ' <span class="icons favs"><i class="fa fas fa-thumbtack"></i></span>' : '';
         //$this_robot_name .= $stat_reward_icons;
 
         if (!empty($this_player_info['player_energy'])){ $this_robot_energy += ceil(($this_player_info['player_energy'] / 100) * $this_robot_energy); }
@@ -2173,7 +2174,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         }
         $this_option_title_plain = strip_tags(str_replace('<br />', '&#10;', $this_option_title));
         $this_option_title_tooltip = htmlentities($this_option_title, ENT_QUOTES, 'UTF-8');
-        $this_option_label = '<span class="sprite sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_base" style="background-image: url(images/robots/'.$this_option_image.'/sprite_right_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: '.$temp_top.'px; right: '.$temp_right.'px;">'.$info['robot_name'].'</span><span class="multi">'.$stat_reward_icons.'<span class="maintext">'.$this_robot_name.'</span><span class="subtext">Level '.$this_robot_level.'</span><span class="subtext2">'.$this_robot_experience.'/1000 Exp</span></span><span class="arrow">&#9658;</span>';
+        $this_option_label = '<span class="sprite sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_base" style="background-image: url(images/robots/'.$this_option_image.'/sprite_right_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: '.$temp_top.'px; right: '.$temp_right.'px;">'.$info['robot_name'].'</span><span class="multi">'.$pinned_fav_icons.$stat_reward_icons.'<span class="maintext">'.$this_robot_name.'</span><span class="subtext">Level '.$this_robot_level.'</span><span class="subtext2">'.$this_robot_experience.'/1000 Exp</span></span><span class="arrow">&#9658;</span>';
         //$this_robots_markup .= '<a class="'.$this_option_class.'" data-child="true" data-token="'.$this_option_token.'" title="'.$this_option_title_plain.'" data-tooltip="'.$this_option_title_tooltip.'" style="'.$this_option_style.'">';
         $this_robots_markup .= '<a class="'.$this_option_class.'" data-child="true" data-token="'.$this_option_token.'" style="'.$this_option_style.'">';
         $this_robots_markup .= '<div class="chrome chrome_type robot_type_'.(!empty($this_robot_core) ? $this_robot_core : 'none').(!empty($this_robot_core2) ? '_'.$this_robot_core2 : '').'" data-tooltip="'.$this_option_title_tooltip.'"><div class="inset"><label class="has_image">'.$this_option_label.'</label></div></div>';
