@@ -84,9 +84,19 @@ ob_start();
                 $temp_button_enabled_base = true;
             }
 
+            // Collect a list of item tokens to list through
+            $item_token_list = array_keys($mmrpg_database_items);
+
+            // Define special sorting rules for the in-game item select menu
+            $sticky_item_order = array(
+                'energy-pellet', 'energy-capsule', 'energy-tank', 'extra-life',
+                'weapon-pellet', 'weapon-capsule', 'weapon-tank', 'yashichi'
+                );
+            $item_token_list = array_merge($sticky_item_order, $item_token_list);
+            $item_token_list = array_unique($item_token_list);
+
             // Loop through each item and display its button
             $item_key = 0;
-            $item_token_list = array_keys($mmrpg_database_items);
             foreach ($item_token_list AS $item_key => $item_token){
 
                 // If this item is not in the player list, skip
@@ -163,19 +173,88 @@ ob_start();
 
                 //$temp_item_details .= ' | x'.$temp_multiplier.' '.$this_robot->robot_core.' '.count($this_battle->battle_field->field_multipliers);
 
+                // Define a quick function for printing a big digit given damage/recovery values
+                $get_big_digit_markup = function($temp_kind, $temp_type, $temp_damage, $temp_damage_unit, $temp_recovery, $temp_recovery_unit, $temp_multiplier = 1, $temp_times = 1){
+                        $temp_big_digit_markup = '';
+                        if (!empty($temp_damage) || !empty($temp_recovery)){
+                            $temp_big_digits = '';
+                                if (($temp_kind == 'multi' || $temp_kind == 'damage') & !empty($temp_damage)){
+                                    $temp_big_digits .= '<span class="big-digit">';
+                                        $amount = $temp_damage.($temp_damage_unit ? '<sup>'.$temp_damage_unit.'</sup>' : '');
+                                        if ($temp_type === 'energy'){ $icon = '<i class="fa fas fa-fist-raised"></i>'; }
+                                        elseif ($temp_type === 'weapons'){ $icon = '<i class="fa fas fa-battery-half"></i>'; }
+                                        elseif (in_array($temp_type, array('attack', 'defense', 'speed', 'multi'))) { { $icon = '<i class="fa fas fa-caret-square-down"></i>'; } }
+                                        else { { $icon = '<i class="fa fas fa-fist-raised"></i>'; } }
+                                        $mods = '';
+                                        if ($temp_multiplier > 1){ $mods .= '<i class="fa fas fa-angle-double-up"></i>'; }
+                                        elseif ($temp_multiplier < 1){ $mods .= '<i class="fa fas fa-angle-double-down"></i>'; }
+                                        if ($temp_times > 1){ $mods .= ' <i class="fa fas fa-times"></i> '.$temp_times; }
+                                        $temp_big_digits .= '<span class="amount damage">'.$icon.' '.$amount.$mods.'</span>';
+                                    $temp_big_digits .= '</span>';
+                                }
+                                if (($temp_kind == 'multi' || $temp_kind == 'recovery') && !empty($temp_recovery)){
+                                    $temp_big_digits .= '<span class="big-digit">';
+                                        $amount = $temp_recovery.($temp_recovery_unit ? '<sup>'.$temp_recovery_unit.'</sup>' : '');
+                                        if ($temp_type === 'energy'){ $icon = '<i class="fa fas fa-heart"></i>'; }
+                                        elseif ($temp_type === 'weapons'){ $icon = '<i class="fa fas fa-battery-full"></i>'; }
+                                        elseif (in_array($temp_type, array('attack', 'defense', 'speed', 'multi'))) { { $icon = '<i class="fa fas fa-caret-square-up"></i>'; } }
+                                        else { { $icon = '<i class="fa fas fa-heart"></i>'; } }
+                                        $mods = '';
+                                        if ($temp_multiplier > 1){ $mods .= '<i class="fa fas fa-angle-double-up"></i>'; }
+                                        elseif ($temp_multiplier < 1){ $mods .= '<i class="fa fas fa-angle-double-down"></i>'; }
+                                        if ($temp_times > 1){ $mods .= ' <i class="fa fas fa-times"></i> '.$temp_times; }
+                                        $temp_big_digits .= '<span class="amount recovery">'.$icon.' '.$amount.$mods.'</span>';
+                                    $temp_big_digits .= '</span>';
+                                }
+                            $temp_big_digit_markup .= $temp_big_digits;
+                        }
+                        return $temp_big_digit_markup;
+                    };
+
+                // Check to see if this item falls into any preestablished categories
+                $flag_is_extra_life = $temp_item->item_token == 'extra-life' ? true : false;
+                $flag_is_super_item = preg_match('/^super-(pellet|capsule|tank)$/i', $item_token) ? true : false;
+
                 // Define the item button text variables
                 $temp_item_label = '<span class="multi">';
-                $temp_item_label .= '<span class="maintext">'.$temp_item->item_name.'</span>';
-                $temp_item_label .= '<span class="subtext">';
-                    $temp_item_label .= (!empty($temp_type) ? $battle_types_index[$temp_item->item_type]['type_name'].' ' : 'Neutral ');
-                    if (!empty($temp_type2)){ $temp_item_label .= ' / '.$battle_types_index[$temp_item->item_type2]['type_name']; }
-                    else { $temp_item_label .= ($temp_kind == 'damage' ? 'Damage' : ($temp_kind == 'recovery' ? 'Recovery' : ($temp_kind == 'multi' ? 'Effects' : 'Special'))); }
-                $temp_item_label .= '</span>';
-                $temp_item_label .= '<span class="subtext">';
-                    $temp_item_label .= '<span style="'.($temp_multiplier != 1 ? ($temp_multiplier > 1 ? 'color: rgb(161, 255, 124); ' : 'color: rgb(255, 150, 150); ') : '').'">Power :'.($temp_kind == 'damage' ? $temp_damage.$temp_damage_unit.' ' : ($temp_kind == 'recovery' ? $temp_recovery.$temp_recovery_unit.' ' : ($temp_kind == 'multi' ? $temp_damage.$temp_damage_unit.'/'.$temp_recovery.$temp_recovery_unit.' ' : '0'))).'</span>';
-                    $temp_item_label .= '&nbsp;';
-                    //$temp_item_label .= 'A:'.$temp_accuracy.'%';
-                $temp_item_label .= '</span>';
+                    $temp_item_label .= '<span class="maintext">'.$temp_item->item_name.'</span>';
+                    $temp_item_label .= '<span class="subtext">';
+                        if ($flag_is_super_item){ $temp_item_label .= 'Multi '; }
+                        else { $temp_item_label .= (!empty($temp_type) ? $battle_types_index[$temp_item->item_type]['type_name'].' ' : 'Neutral '); }
+                        if (!empty($temp_type) && !empty($temp_type2)){ $temp_item_label .= ' / '.$battle_types_index[$temp_item->item_type2]['type_name']; }
+                        else { $temp_item_label .= ($temp_kind == 'damage' ? 'Damage' : ($temp_kind == 'recovery' ? 'Recovery' : ($temp_kind == 'multi' ? 'Effects' : 'Special'))); }
+                    $temp_item_label .= '</span>';
+                    $temp_item_label .= '<span class="subtext">';
+                        //$temp_item_label .= '<span class="accuracy"><i class="fa fas fa-crosshairs"></i> '.$temp_accuracy.'%</span>';
+                        if ($flag_is_super_item){
+                            // Handle the super items which affect more than one stat one once (attack/defense/speed)
+                            $super_stats = array('attack', 'defense', 'speed');
+                            $super_stats_count = count($super_stats);
+                            $temp_item_label .= $get_big_digit_markup(
+                                $temp_kind, 'multi',
+                                round($temp_damage / $super_stats_count), $temp_damage_unit,
+                                round($temp_recovery / $super_stats_count), $temp_recovery_unit,
+                                $temp_multiplier,
+                                $super_stats_count
+                                );
+                            /*
+                            foreach ($super_stats AS $super_stat){
+                                $temp_item_label .= $get_big_digit_markup(
+                                    $temp_kind, $super_stat,
+                                    round($temp_damage / $super_stats_count), $temp_damage_unit,
+                                    round($temp_recovery / $super_stats_count), $temp_recovery_unit,
+                                    $temp_multiplier
+                                    );
+                            }
+                            */
+                        } elseif (!empty($temp_type2) && (!empty($temp_damage2) || !empty($temp_recovery2))){
+                            // Handle items that heal or affect more than one type (generally energy and weapons)
+                            $temp_item_label .= $get_big_digit_markup($temp_kind, $temp_type, $temp_damage, $temp_damage_unit, $temp_recovery, $temp_recovery_unit, $temp_multiplier);
+                            $temp_item_label .= $get_big_digit_markup($temp_kind, $temp_type2, $temp_damage2, $temp_damage2_unit, $temp_recovery2, $temp_recovery2_unit, $temp_multiplier);
+                        } else {
+                            $temp_item_label .= $get_big_digit_markup($temp_kind, $temp_type, $temp_damage, $temp_damage_unit, $temp_recovery, $temp_recovery_unit, $temp_multiplier);
+                        }
+                    $temp_item_label .= '</span>';
                 $temp_item_label .= '</span>';
 
                 // Define whether or not this item button should be enabled
@@ -192,7 +271,7 @@ ob_start();
                 $temp_item_sprite = array();
                 $temp_item_sprite['name'] = $temp_item->item_name;
                 $temp_item_sprite['image'] = $temp_item->item_image;
-                if ($temp_item->item_token == 'extra-life'){
+                if ($flag_is_extra_life){
                     // Automatically change this item's image based on player
                     if ($this_player->player_token == 'dr-light'){ $temp_item_sprite['image'] = 'extra-life'; }
                     elseif ($this_player->player_token == 'dr-wily'){ $temp_item_sprite['image'] = 'extra-life-2'; }
@@ -206,14 +285,33 @@ ob_start();
                 $temp_item_sprite['url'] = 'images/items/'.$temp_item_sprite['image'].'/icon_'.$item_direction.'_'.$temp_item_sprite['image_size_text'].'.png';
                 $temp_item_sprite['preload'] = 'images/items/'.$temp_item_sprite['image'].'/sprite_'.$item_direction.'_'.$temp_item_sprite['image_size_zoom_text'].'.png';
                 $temp_item_sprite['class'] = 'sprite sprite_'.$temp_item_sprite['image_size_text'].' sprite_'.$temp_item_sprite['image_size_text'].'_base '; // item_type item_type_'.(!empty($temp_item->item_type) ? $temp_item->item_type : 'none');
-                $temp_item_sprite['style'] = 'background-image: url('.$temp_item_sprite['url'].'?'.MMRPG_CONFIG_CACHE_DATE.');  top: 5px; left: 5px; ';
+                $temp_item_sprite['style'] = 'background-image: url('.$temp_item_sprite['url'].'?'.MMRPG_CONFIG_CACHE_DATE.'); ';
                 $temp_item_sprite['markup'] = '<span class="'.$temp_item_sprite['class'].' sprite_40x40_item" style="'.$temp_item_sprite['style'].'">'.$temp_item_sprite['name'].'</span>';
-                $temp_item_sprite['markup'] .= '<span class="'.$temp_item_sprite['class'].' sprite_40x40_weapons" style="top: 35px; left: 5px; '.($temp_item_quantity > 1 ? '' : ($temp_item_quantity > 0 ? 'color: #AA9393; ' : 'color: #A77D7D; ')).'"><sup style="position: relative: bottom: 1px;">x</sup> '.$temp_item_quantity.'</span>';
+                $temp_item_sprite['markup'] .= '<span class="'.$temp_item_sprite['class'].' sprite_40x40_cost" style="'.($temp_item_quantity > 1 ? '' : ($temp_item_quantity > 0 ? 'color: #AA9393; ' : 'color: #A77D7D; ')).'"><sup style="position: relative: bottom: 1px;">x</sup> '.$temp_item_quantity.'</span>';
 
                 // Now use the new object to generate a snapshot of this item button
-                /*if ($temp_button_enabled){ ?><a data-order="<?=$temp_order_counter?>" class="button action_item action_item item_<?= $temp_item->item_token ?> item_type item_type_electric block_<?= $equipped_items_count ?>" type="button" data-action="item_<?= $temp_item->item_id.'_'.$temp_item->item_token ?>" title="<?= $temp_item_details_plain ?>" data-tooltip="<?= $temp_item_details_tooltip ?>" data-preload="<?= $temp_item_sprite['preload'] ?>" data-actualtarget="<?= $temp_item->item_target ?>" data-target="<?= $temp_target ?>"><label class=""><?= $temp_item_sprite['markup'] ?><?= $temp_item_label ?></label></a><? }*/
-                if ($temp_button_enabled){ ?><a data-order="<?=$temp_order_counter?>" class="button action_item action_item item_<?= $temp_item->item_token ?> item_type item_type_<?= (!empty($temp_item->item_type) ? $temp_item->item_type : 'none').(!empty($temp_item->item_type2) ? '_'.$temp_item->item_type2 : '') ?> block_<?= $equipped_items_count ?>" type="button" data-action="item_<?= $temp_item->item_id.'_'.$temp_item->item_token ?>" data-tooltip="<?= $temp_item_details_tooltip ?>" data-preload="<?= $temp_item_sprite['preload'] ?>" data-actualtarget="<?= $temp_item->item_target ?>" data-target="<?= $temp_target ?>"><label class=""><?= $temp_item_sprite['markup'] ?><?= $temp_item_label ?></label></a><? }
-                else { ?><a data-order="<?=$temp_order_counter?>" class="button button_disabled action_item action_item item_<?= $temp_item->item_token ?> item_type item_type_<?= (!empty($temp_item->item_type) ? $temp_item->item_type : 'none').(!empty($temp_item->item_type2) ? '_'.$temp_item->item_type2 : '') ?> block_<?= $equipped_items_count ?>" type="button"><label class=""><?= $temp_item_sprite['markup'] ?><?= $temp_item_label ?></label></a><? }
+                $btn_type = 'item_type item_type_'.(!empty($temp_item->item_type) ? $temp_item->item_type : 'none').(!empty($temp_item->item_type2) ? '_'.$temp_item->item_type2 : '');
+                $btn_class = 'button action_item item_'.$temp_item->item_token.' '.$btn_type.' block_'.$equipped_abilities_count.' ';
+                $btn_action = 'item_'.$temp_item->item_id.'_'.$temp_item->item_token;
+                $btn_info_circle = '<span class="info" data-tooltip="'.$temp_item_details_tooltip.'" data-tooltip-type="'.$btn_type.'"><i class="fa fas fa-info-circle"></i></span>';
+                if ($temp_button_enabled){
+                    echo('<a type="button" class="'.$btn_class.'" data-order="'.$temp_order_counter.'" data-action="'.$btn_action.'" data-target="'.$temp_target.'">'.
+                            '<label>'.
+                                $btn_info_circle.
+                                $temp_item_sprite['markup'].
+                                $temp_item_label.
+                            '</label>'.
+                        '</a>');
+                } else {
+                    $btn_class .= 'button_disabled ';
+                    echo('<a type="button" class="'.$btn_class.'" data-order="'.$temp_order_counter.'">'.
+                            '<label>'.
+                                $btn_info_circle.
+                                $temp_item_sprite['markup'].
+                                $temp_item_label.
+                            '</label>'.
+                        '</a>');
+                }
 
                 // Increment the order counter
                 $temp_order_counter++;

@@ -215,39 +215,84 @@ ob_start();
 
                 //$temp_ability_details .= ' | x'.$temp_multiplier.' '.$this_robot->robot_core.' '.count($this_battle->battle_field->field_multipliers);
 
+                // Define a quick function for printing a big digit given damage/recovery values
+                $get_big_digit_markup = function($temp_kind, $temp_type, $temp_damage, $temp_damage_unit, $temp_recovery, $temp_recovery_unit, $temp_multiplier = 1, $temp_times = 1){
+                        $temp_big_digit_markup = '';
+                        if (!empty($temp_damage) || !empty($temp_recovery)){
+                            $temp_big_digits = '';
+                                if (($temp_kind == 'multi' || $temp_kind == 'damage') & !empty($temp_damage)){
+                                    $temp_big_digits .= '<span class="big-digit">';
+                                        $amount = $temp_damage.($temp_damage_unit ? '<sup>'.$temp_damage_unit.'</sup>' : '');
+                                        if ($temp_type === 'energy'){ $icon = '<i class="fa fas fa-fist-raised"></i>'; }
+                                        elseif ($temp_type === 'weapons'){ $icon = '<i class="fa fas fa-battery-half"></i>'; }
+                                        elseif (in_array($temp_type, array('attack', 'defense', 'speed'))) { { $icon = '<i class="fa fas fa-caret-square-down"></i>'; } }
+                                        else { { $icon = '<i class="fa fas fa-fist-raised"></i>'; } }
+                                        $mods = '';
+                                        if ($temp_multiplier > 1){ $mods .= '<i class="fa fas fa-angle-double-up"></i>'; }
+                                        elseif ($temp_multiplier < 1){ $mods .= '<i class="fa fas fa-angle-double-down"></i>'; }
+                                        if ($temp_times > 1){ $mods .= ' <i class="fa fas fa-times"></i> '.$temp_times; }
+                                        $temp_big_digits .= '<span class="amount damage">'.$icon.' '.$amount.$mods.'</span>';
+                                    $temp_big_digits .= '</span>';
+                                }
+                                if (($temp_kind == 'multi' || $temp_kind == 'recovery') && !empty($temp_recovery)){
+                                    $temp_big_digits .= '<span class="big-digit">';
+                                        $amount = $temp_recovery.($temp_recovery_unit ? '<sup>'.$temp_recovery_unit.'</sup>' : '');
+                                        if ($temp_type === 'energy'){ $icon = '<i class="fa fas fa-heart"></i>'; }
+                                        elseif ($temp_type === 'weapons'){ $icon = '<i class="fa fas fa-battery-full"></i>'; }
+                                        elseif (in_array($temp_type, array('attack', 'defense', 'speed'))) { { $icon = '<i class="fa fas fa-caret-square-up"></i>'; } }
+                                        else { { $icon = '<i class="fa fas fa-heart"></i>'; } }
+                                        $mods = '';
+                                        if ($temp_multiplier > 1){ $mods .= '<i class="fa fas fa-angle-double-up"></i>'; }
+                                        elseif ($temp_multiplier < 1){ $mods .= '<i class="fa fas fa-angle-double-down"></i>'; }
+                                        if ($temp_times > 1){ $mods .= ' <i class="fa fas fa-times"></i> '.$temp_times; }
+                                        $temp_big_digits .= '<span class="amount recovery">'.$icon.' '.$amount.$mods.'</span>';
+                                    $temp_big_digits .= '</span>';
+                                }
+                            $temp_big_digit_markup .= $temp_big_digits;
+                        }
+                        return $temp_big_digit_markup;
+                    };
+
+                // Check to see if this ability falls into any preestablished categories
+                $flag_is_boost_ability = preg_match('/^(energy|attack|defense|speed)-(boost|support)$/i', $ability_token) ? true : false;
+                $flag_is_break_ability = preg_match('/^(energy|attack|defense|speed)-(break|assault)$/i', $ability_token) ? true : false;
+                $flag_is_stat_ability = preg_match('/^(attack|defense|speed)-(boost|break|support|assault|mode|swap)$/i', $ability_token) ? true : false;
+                $flag_is_multi_stat_ability = preg_match('/^(attack|defense|speed)-(support|assault)$/i', $ability_token) ? true : false;
+
+                // debug debug debug
+                //$flag_string = ($flag_is_boost_ability ? 'boost ' : '').($flag_is_break_ability ? 'break ' : '').($flag_is_stat_ability ? 'stat ' : '');
+                //error_log('Ability: '.$temp_ability->ability_name.' ('.$flag_string.')');
+
                 // Define the ability button text variables
                 $temp_ability_label = '<span class="multi">';
-                $temp_ability_label .= '<span class="maintext">'.$temp_ability->ability_name.'</span>';
-                $temp_ability_label .= '<span class="subtext">';
-                    $temp_ability_label .= (!empty($temp_type) ? $battle_types_index[$temp_ability->ability_type]['type_name'].' ' : 'Neutral ');
-                    if (!empty($temp_type2)){ $temp_ability_label .= ' / '.$battle_types_index[$temp_ability->ability_type2]['type_name']; }
-                    else { $temp_ability_label .= ($temp_kind == 'damage' ? 'Damage' : ($temp_kind == 'recovery' ? 'Recovery' : ($temp_kind == 'multi' ? 'Effects' : 'Special'))); }
-                $temp_ability_label .= '</span>';
-                $temp_ability_label .= '<span class="subtext">';
-                    $temp_ability_label .= '<span class="accuracy"><i class="fa fas fa-crosshairs"></i> '.$temp_accuracy.'%</span>';
-                    if (!empty($temp_damage) || !empty($temp_recovery)){
-                        $temp_ability_label .= ' ';
-                        $temp_ability_label .= '<span class="big-digit">';
-                            if (($temp_kind == 'multi' || $temp_kind == 'damage') & !empty($temp_damage)){
-                                $amount = $temp_damage.($temp_damage_unit ? '<sup>'.$temp_damage_unit.'</sup>' : '');
-                                $icon = '<i class="fa fas fa-fist-raised"></i>';
-                                $mods = '';
-                                if ($temp_multiplier > 1){ $mods .= '<i class="fa fas fa-angle-double-up"></i>'; }
-                                elseif ($temp_multiplier < 1){ $mods .= '<i class="fa fas fa-angle-double-down"></i>'; }
-                                $temp_ability_label .= '<span class="amount damage">'.$icon.' '.$amount.$mods.'</span>';
-                            } elseif (($temp_kind == 'multi' || $temp_kind == 'recovery') && !empty($temp_recovery)){
-                                $amount = $temp_recovery.($temp_recovery_unit ? '<sup>'.$temp_recovery_unit.'</sup>' : '');
-                                $icon = '<i class="fa fas fa-heart"></i>';
-                                $mods = '';
-                                if ($temp_multiplier > 1){ $mods .= '<i class="fa fas fa-angle-double-up"></i>'; }
-                                elseif ($temp_multiplier < 1){ $mods .= '<i class="fa fas fa-angle-double-down"></i>'; }
-                                $temp_ability_label .= '<span class="amount recovery">'.$icon.' '.$amount.$mods.'</span>';
-                            } else {
-                                $temp_ability_label .= '';
-                            }
-                        $temp_ability_label .= '</span>';
-                    }
-                $temp_ability_label .= '</span>';
+                    $temp_ability_label .= '<span class="maintext">'.$temp_ability->ability_name.'</span>';
+                    $temp_ability_label .= '<span class="subtext">';
+                        $temp_ability_label .= (!empty($temp_type) ? $battle_types_index[$temp_ability->ability_type]['type_name'].' ' : 'Neutral ');
+                        if (!empty($temp_type2)){ $temp_ability_label .= ' / '.$battle_types_index[$temp_ability->ability_type2]['type_name']; }
+                        else { $temp_ability_label .= ($temp_kind == 'damage' ? 'Damage' : ($temp_kind == 'recovery' ? 'Recovery' : ($temp_kind == 'multi' ? 'Effects' : 'Special'))); }
+                    $temp_ability_label .= '</span>';
+                    $temp_ability_label .= '<span class="subtext">';
+                        $temp_ability_label .= '<span class="accuracy"><i class="fa fas fa-crosshairs"></i> '.$temp_accuracy.'%</span> ';
+                        if ($flag_is_stat_ability && ($flag_is_boost_ability || $flag_is_break_ability)){
+                            // If this is a stat ability, show the stat change from the hidden value
+                            $temp_stat_kind = $flag_is_boost_ability ? 'recovery' : 'damage';
+                            $temp_stat_type = preg_replace('/^(attack|defense|speed)-(boost|break|support|assault|mode|swap)$/i', '$1', $ability_token);
+                            $temp_stat_times = 1;
+                            if ($flag_is_multi_stat_ability){ $temp_stat_times = $flag_is_boost_ability ? $this_player->counters['robots_active'] : $target_player->counters['robots_active']; }
+                            $temp_ability_label .= $get_big_digit_markup($temp_stat_kind, $temp_stat_type, $temp_damage2, $temp_damage2_unit, $temp_recovery2, $temp_recovery2_unit, $temp_multiplier, $temp_stat_times);
+
+                            // debug debug debug
+                            //error_log('Stat Ability: '.$temp_ability->ability_name.' ('.print_r($temp_ability->export_array(), true).')');
+                            //error_log('get_big_digit_markup('.$temp_stat_kind.', '.$temp_stat_type.', '.$temp_damage2.', '.$temp_damage2_unit.', '.$temp_recovery2.', '.$temp_recovery2_unit.', '.$temp_multiplier.')');
+
+                        } elseif (!empty($temp_type2) && (!empty($temp_damage2) || !empty($temp_recovery2))){
+                            // If this is a multi-ability, show both damage/recovery values
+                            $temp_ability_label .= $get_big_digit_markup($temp_kind, $temp_type, $temp_damage, $temp_damage_unit, $temp_recovery, $temp_recovery_unit, $temp_multiplier);
+                            $temp_ability_label .= $get_big_digit_markup($temp_kind, $temp_type2, $temp_damage2, $temp_damage2_unit, $temp_recovery2, $temp_recovery2_unit, $temp_multiplier);
+                        } else {
+                            $temp_ability_label .= $get_big_digit_markup($temp_kind, $temp_type, $temp_damage, $temp_damage_unit, $temp_recovery, $temp_recovery_unit, $temp_multiplier);
+                        }
+                    $temp_ability_label .= '</span>';
                 $temp_ability_label .= '</span>';
 
                 // Define whether or not this ability button should be enabled
@@ -274,10 +319,10 @@ ob_start();
                     $temp_ability_sprite['image_size_zoom_text'] = $temp_ability_sprite['image_size'].'x'.$temp_ability_sprite['image_size'];
                     $temp_ability_sprite['url'] = 'images/abilities/'.$temp_ability_sprite['image'].'/icon_'.$robot_direction.'_'.$temp_ability_sprite['image_size_text'].'.png';
                     $temp_ability_sprite['class'] = 'sprite sprite_'.$temp_ability_sprite['image_size_text'].' sprite_'.$temp_ability_sprite['image_size_text'].'_base ';
-                    $temp_ability_sprite['style'] = 'background-image: url('.$temp_ability_sprite['url'].'?'.MMRPG_CONFIG_CACHE_DATE.'); top: 5px; left: 5px; ';
+                    $temp_ability_sprite['style'] = 'background-image: url('.$temp_ability_sprite['url'].'?'.MMRPG_CONFIG_CACHE_DATE.'); ';
                     $temp_ability_sprite['markup'] = '<span class="'.$temp_ability_sprite['class'].' sprite_40x40_ability" style="'.$temp_ability_sprite['style'].'"></span>';
                     if (!empty($temp_ability->ability_image2)){ $temp_ability_sprite['markup'] .= '<span class="'.$temp_ability_sprite['class'].' sprite2 sprite_40x40_ability" style="'.str_replace('/'.$temp_ability->ability_image.'/', '/'.$temp_ability->ability_image2.'/', $temp_ability_sprite['style']).'"></span>'; }
-                    $temp_ability_sprite['markup'] .= '<span class="'.$temp_ability_sprite['class'].' sprite_40x40_weapons" style="top: 35px; left: 5px; '.($temp_ability_energy == $temp_ability_energy_base ? '' : ($temp_ability_energy_mods <= 1 ? 'color: #80A280; ' : 'color: #68B968; ')).'">'.$temp_ability_energy.' WE</span>';
+                    $temp_ability_sprite['markup'] .= '<span class="'.$temp_ability_sprite['class'].' sprite_40x40_cost" style="'.($temp_ability_energy == $temp_ability_energy_base ? '' : ($temp_ability_energy_mods <= 1 ? 'color: #80A280; ' : 'color: #68B968; ')).'">'.$temp_ability_energy.' WE</span>';
 
 
                 } elseif ($temp_ability->ability_class == 'mecha'){
@@ -292,7 +337,7 @@ ob_start();
                     $temp_ability_sprite['style'] = 'background-image: url('.$temp_ability_sprite['url'].'?'.MMRPG_CONFIG_CACHE_DATE.'); top: 7px; left: 5px; height: 43px; background-position: center center !important; background-size: 50% 50% !important; ';
                     $temp_ability_sprite['markup'] = '<span class="'.$temp_ability_sprite['class'].' sprite_40x40_ability" style="'.$temp_ability_sprite['style'].'">'.$temp_ability_sprite['name'].'</span>';
                     if (!empty($temp_ability->ability_image2)){ $temp_ability_sprite['markup'] .= '<span class="'.$temp_ability_sprite['class'].' sprite2  sprite_40x40_ability" style="'.str_replace('/'.$temp_ability->ability_image.'/', '/'.$temp_ability->ability_image2.'/', $temp_ability_sprite['style']).'"></span>'; }
-                    //$temp_ability_sprite['markup'] .= '<span class="'.$temp_ability_sprite['class'].' sprite_40x40_weapons" style="top: 35px; left: 5px; '.($temp_ability_energy == $temp_ability_energy_base ? '' : ($temp_ability_energy_mods <= 1 ? 'color: #80A280; ' : 'color: #68B968; ')).'">'.$temp_ability_energy.' WE</span>';
+                    $temp_ability_sprite['markup'] .= '<span class="'.$temp_ability_sprite['class'].' sprite_40x40_cost" style="'.($temp_ability_energy == $temp_ability_energy_base ? '' : ($temp_ability_energy_mods <= 1 ? 'color: #80A280; ' : 'color: #68B968; ')).'">'.$temp_ability_energy.' WE</span>';
 
                 }
 
@@ -321,6 +366,7 @@ ob_start();
                             '</label>'.
                         '</a>');
                 }
+
                 // Increment the order counter
                 $temp_order_counter++;
             }

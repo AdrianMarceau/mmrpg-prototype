@@ -3727,11 +3727,11 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     -moz-border-radius: 5px 5px 0 0;
     -webkit-border-radius: 5px 5px 0 0;
 }
-#actions .actions_switch .action_switch label .sprite_40x40_weapons,
-#actions .actions_scan .action_scan label .sprite_40x40_weapons,
-#actions .actions_target .action_target label .sprite_40x40_weapons,
-#actions .actions_ability .action_ability label .sprite_40x40_weapons,
-#actions .actions_item .action_item label .sprite_40x40_weapons {
+#actions .actions_switch .action_switch label .sprite_40x40_cost,
+#actions .actions_scan .action_scan label .sprite_40x40_cost,
+#actions .actions_target .action_target label .sprite_40x40_cost,
+#actions .actions_ability .action_ability label .sprite_40x40_cost,
+#actions .actions_item .action_item label .sprite_40x40_cost {
     height: 8px;
     padding-bottom: 4px;
     border-radius: 0 0 5px 5px;
@@ -3998,15 +3998,36 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 }
 
 
-#actions .actions_ability .action_ability label {
+#actions .actions_ability .action_ability label,
+#actions .actions_ability .action_item label {
     padding-left: 36px;
 }
 #actions .actions_ability .action_ability label .sprite_40x40_ability,
-#actions .actions_ability .action_ability label .sprite_40x40_weapons {
+#actions .actions_ability .action_ability label .sprite_40x40_cost,
+#actions .actions_ability .action_item label .sprite_40x40_item,
+#actions .actions_ability .action_item label .sprite_40x40_cost {
     width: 30px;
 }
-#actions .actions_ability .action_ability label .sprite_40x40_ability {
+#actions .actions_ability .action_ability label .sprite_40x40_ability,
+#actions .actions_ability .action_item label .sprite_40x40_item {
+    top: 5px;
+    left: 5px;
+    height: 32px;
     background-position-x: -5px !important;
+}
+#actions .actions_ability .action_ability label .sprite_40x40_cost,
+#actions .actions_ability .action_item label .sprite_40x40_cost {
+    top: 38px;
+    left: 5px;
+    height: 8px;
+}
+#actions .actions_ability .action_ability label .subtext,
+#actions .actions_ability .action_item label .subtext {
+    margin-top: 2px;
+}
+#actions .actions_ability .action_ability label .multi,
+#actions .actions_ability .action_item label .multi {
+    margin-top: 5px;
 }
 #actions .actions_option .action_option label .big-digit,
 #actions .actions_settings .action_setting label .big-digit,
@@ -4015,31 +4036,14 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .actions_target .action_target label .big-digit,
 #actions .actions_ability .action_ability label .big-digit,
 #actions .actions_item .action_item label .big-digit {
-    /*
-    display: block;
-    box-sizing: border-box;
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    background-color: black;
-    top: 0px;
-    width: 35px;
-    padding: 0 3px;
-    -moz-border-radius: 0 0.75em 0.75em 0;
-    -webkit-border-radius: 0 0.75em 0.75em 0;
-    border-radius: 0 0.75em 0.75em 0;
-    font-size: 150%;
-    line-height: 56px;
-    text-align: center;
-    font-weight: bold;
-    */
     display: inline-block;
     box-sizing: border-box;
     background-color: #000000;
-    padding: 0 3px;
-    -moz-border-radius: 75em;
-    -webkit-border-radius: 75em;
-    border-radius: 0.75em;
+    padding: 0 4px 0 6px;
+    margin-right: 4px;
+    -moz-border-radius: 6px 2px;
+    -webkit-border-radius: 6px 2px;
+    border-radius: 6px 2px;
     font-size: 100%;
     text-align: center;
     font-weight: bold;
