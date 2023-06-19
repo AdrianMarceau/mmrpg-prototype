@@ -2787,7 +2787,7 @@ function mmrpg_prototype_database_summoned($robot_token = ''){
 }
 
 // Define a function for collecting robot sprite markup
-function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token = 'GAME', $robot_limit = 10){
+function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token = 'GAME', $robot_limit = 99){
 
     global $db;
 
@@ -2796,18 +2796,38 @@ function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token 
     $temp_offset_y = -2;
     $temp_offset_opacity = 0.75;
     $text_sprites_markup = '';
-    $temp_player_robots = $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'];
-    $temp_db_tokens = "'".implode("','", array_keys($temp_player_robots))."'";
-    $temp_db_fields = rpg_robot::get_index_fields(true, 'robots');
-    $mmrpg_index_robots = $db->get_array_list("SELECT
-        {$temp_db_fields}
-        FROM mmrpg_index_robots AS robots
-        WHERE robots.robot_flag_complete = 1
-        AND robot_token IN ({$temp_db_tokens})
-        ;", 'robot_token');
+
+    $player_robot_favourites = rpg_game::robot_favourites();
+    if (empty($player_robot_favourites)){ $player_robot_favourites = array(); }
+    $temp_player_robots_settings = $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'];
+    $temp_player_robots_rewards = $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'];
+    $temp_player_robots_tokens = array_unique(array_merge(array_keys($temp_player_robots_settings), array_keys($temp_player_robots_rewards)));
+    $mmrpg_index_robots = rpg_robot::get_index(true, false);
     $sprites_displayed = 0;
-    foreach ($temp_player_robots AS $token => $info){
-        if (!isset($mmrpg_index_robots[$token])){ continue; }
+    //error_log('$temp_player_robots_tokens(before): '.print_r($temp_player_robots_tokens, true));
+    //error_log('$player_robot_favourites: '.print_r($player_robot_favourites, true));
+    usort($temp_player_robots_tokens, function($a, $b) use($temp_player_robots_tokens, $player_robot_favourites){
+        $a_pos = array_search($a, $temp_player_robots_tokens);
+        $b_pos = array_search($b, $temp_player_robots_tokens);
+        $a_fav = in_array($a, $player_robot_favourites) ? 1 : 0;
+        $b_fav = in_array($b, $player_robot_favourites) ? 1 : 0;
+        if ($a_fav < $b_fav){ return 1; }
+        elseif ($a_fav > $b_fav){ return -1; }
+        elseif ($a_pos < $b_pos){ return -1; }
+        elseif ($a_pos > $b_pos){ return 1; }
+        else { return 0; }
+        });
+    //error_log('$temp_player_robots_tokens(after)['.count($temp_player_robots_tokens).']: '.print_r($temp_player_robots_tokens, true));
+    foreach ($temp_player_robots_tokens AS $key => $token){
+        if (!isset($mmrpg_index_robots[$token])){
+            //error_log('$token '.$token.' does not exist in $mmrpg_index_robots');
+            continue;
+        }
+        $info = array();
+        if (isset($temp_player_robots_rewards[$token])){ $info = array_merge($info, $temp_player_robots_rewards[$token]); }
+        if (isset($temp_player_robots_settings[$token])){ $info = array_merge($info, $temp_player_robots_settings[$token]); }
+        //error_log('$info['.$token.']: '.print_r($info, true));
+        //error_log('$info['.$token.']: '.print_r(json_encode($info), true));
         $index = rpg_robot::parse_index_info($mmrpg_index_robots[$token]);
         $info = array_merge($index, $info);
         if (mmrpg_prototype_robot_unlocked($player_token, $token)){
@@ -2816,9 +2836,9 @@ function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token 
             $temp_offset_x += $temp_size > 40 ? 0 : 20;
             $temp_offset_y = $temp_size > 40 ? -42 : -2;
             $temp_offset_z -= 1;
-            $temp_offset_opacity -= 0.06;
-            if ($temp_offset_opacity <= 0){ $temp_offset_opacity = 0; break; }
-            $text_sprites_markup .= '<span class="sprite sprite_nobanner sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_base" style="background-image: url(images/robots/'.(!empty($info['robot_image']) ? $info['robot_image'] : $info['robot_token']).'/sprite_right_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: '.$temp_offset_y.'px; right: '.$temp_offset_x.'px; z-index: '.$temp_offset_z.'; opacity: '.$temp_offset_opacity.'; ">'.$info['robot_name'].'</span>';
+            $temp_offset_opacity -= 0.04;
+            if ($temp_offset_opacity <= 0){ $temp_offset_opacity = 0; }
+            $text_sprites_markup .= '<span class="sprite sprite_nobanner sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_base" style="background-image: url(images/robots/'.(!empty($info['robot_image']) ? $info['robot_image'] : $info['robot_token']).'/sprite_right_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: '.$temp_offset_y.'px; right: '.$temp_offset_x.'px; z-index: '.$temp_offset_z.'; filter: brightness('.$temp_offset_opacity.'); ">'.$info['robot_name'].'</span>';
             if ($temp_size > 40){ $temp_offset_x += 20;  }
             $sprites_displayed++;
             if (!empty($robot_limit)
