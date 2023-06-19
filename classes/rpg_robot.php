@@ -954,6 +954,7 @@ class rpg_robot extends rpg_object {
 
     public function get_frame_styles(){ return $this->get_info('robot_frame_styles'); }
     public function set_frame_styles($value){ $this->set_info('robot_frame_styles', $value); }
+    public function reset_frame_styles(){ $this->set_info('robot_frame_styles', ''); }
 
     public function get_detail_styles(){ return $this->get_info('robot_detail_styles'); }
     public function set_detail_styles($value){ $this->set_info('robot_detail_styles', $value); }
