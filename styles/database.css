@@ -238,15 +238,23 @@
     height: 17px;
     width: 17px;
     margin: 0 4px 4px 0;
+    /*
     background-size: 27px 27px;
     background-position: -5px -5px;
+    */
+    background-size: 40px 40px;
+    background-position: center center;
 }
 #database #canvas .wrapper_robots_smaller .sprite_robot[data-size="80"] {
     height: 17px;
     width: 17px;
     margin: 0 4px 4px 0;
+    /*
     background-size: 54px 54px;
     background-position: -18px -18px;
+    */
+    background-size: 80px 80px;
+    background-position: center center;
 }
 
 /*
