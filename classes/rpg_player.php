@@ -3130,8 +3130,8 @@ class rpg_player extends rpg_object {
 
                     ?>
                     <span class="core player_type">
-                        <span class="wrap"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/items/<?= !empty($player_info['player_stat_type']) ? $player_info['player_stat_type'].'-capsule' : 'item' ?>/icon_left_40x40.png);"></span></span>
-                        <span class="text"><?= ucfirst($player_info['player_stat_type']).' +'.$player_info['player_'.$player_info['player_stat_type']].'%' ?></span>
+                        <!-- <span class="wrap"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/items/<?= !empty($player_info['player_stat_type']) ? $player_info['player_stat_type'].'-pellet' : 'item' ?>/icon_left_40x40.png);"></span></span> -->
+                        <span class="text">Skill: <?= ucfirst($player_info['player_stat_type']).' +'.$player_info['player_'.$player_info['player_stat_type']].'%' ?></span>
                     </span>
                 </div>
 
