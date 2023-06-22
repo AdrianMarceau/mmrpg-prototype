@@ -77,6 +77,8 @@ class rpg_field extends rpg_object {
         $this->field_foreground = isset($this_fieldinfo['field_foreground']) ? $this_fieldinfo['field_foreground'] : 'field';
         $this->field_background_attachments = isset($this_fieldinfo['field_background_attachments']) ? $this_fieldinfo['field_background_attachments'] : array();
         $this->field_foreground_attachments = isset($this_fieldinfo['field_foreground_attachments']) ? $this_fieldinfo['field_foreground_attachments'] : array();
+        $this->field_background_variant = isset($this_fieldinfo['field_background_variant']) ? $this_fieldinfo['field_background_variant'] : '';
+        $this->field_foreground_variant = isset($this_fieldinfo['field_foreground_variant']) ? $this_fieldinfo['field_foreground_variant'] : '';
         $this->field_music = isset($this_fieldinfo['field_music']) ? $this_fieldinfo['field_music'] : 'field';
 
         // Define the internal field base values using the fields index array
@@ -501,6 +503,8 @@ class rpg_field extends rpg_object {
             'field_foreground' => $this->field_foreground,
             'field_background_attachments' => $this->field_background_attachments,
             'field_foreground_attachments' => $this->field_foreground_attachments,
+            'field_background_variant' => $this->field_background_variant,
+            'field_foreground_variant' => $this->field_foreground_variant,
             'field_music' => $this->field_music,
             'field_base_name' => $this->field_base_name,
             'field_base_token' => $this->field_base_token,
@@ -511,6 +515,8 @@ class rpg_field extends rpg_object {
             'field_base_foreground' => $this->field_base_foreground,
             'field_base_background_attachments' => $this->field_base_background_attachments,
             'field_base_foreground_attachments' => $this->field_base_foreground_attachments,
+            'field_base_background_variant' => $this->field_base_background_variant,
+            'field_base_foreground_variant' => $this->field_base_foreground_variant,
             'field_base_music' => $this->field_base_music,
             'flags' => $this->flags,
             'counters' => $this->counters,
