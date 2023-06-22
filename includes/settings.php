@@ -156,7 +156,7 @@ define('MMRPG_SETTINGS_THREADS_PERPAGE', 50); // How many comment posts should b
 
 // Define the global counters for missions in each campaign
 define('MMRPG_SETTINGS_CHAPTER0_MISSIONS', 0);  // Void
-define('MMRPG_SETTINGS_CHAPTER1_MISSIONS', 2);  // Intro
+define('MMRPG_SETTINGS_CHAPTER1_MISSIONS', 3);  // Intro
 define('MMRPG_SETTINGS_CHAPTER2_MISSIONS', 8);  // Masters
 define('MMRPG_SETTINGS_CHAPTER3_MISSIONS', 1);  // Rivals
 define('MMRPG_SETTINGS_CHAPTER4_MISSIONS', 4);  // Fusions

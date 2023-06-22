@@ -68,6 +68,25 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
         }
 
+        // Intro Battle III (Vs. TRILL [SPEED/DEFENSE/ATTACK])
+        // Only continue if the player has defeated the first 2 battles
+        if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['0c'])){
+
+            // Generate the battle option with the starter data
+            $temp_session_token = $this_prototype_data['this_player_token'].'_battle_'.$this_prototype_data['this_current_chapter'].'c';
+            if (empty($_SESSION['PROTOTYPE_TEMP'][$temp_session_token])){
+                $temp_battle_omega = rpg_mission_starter::generate_boss($this_prototype_data, $this_prototype_data['this_intro_targets'][2], ($this_prototype_data['this_chapter_levels'][0] + 2), '', 'prototype-subspace');
+                $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
+                rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+                $_SESSION['PROTOTYPE_TEMP'][$temp_session_token] = $temp_battle_omega['battle_token'];
+            } else {
+                $temp_battle_token = $_SESSION['PROTOTYPE_TEMP'][$temp_session_token];
+                $temp_battle_omega = rpg_battle::get_index_info($temp_battle_token);
+            }
+            $this_prototype_data['battle_options'][] = $temp_battle_omega;
+
+        }
+
 
     }
 
