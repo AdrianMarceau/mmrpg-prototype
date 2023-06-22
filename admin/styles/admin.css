@@ -1545,6 +1545,11 @@ tr:nth-child(odd) td {
     margin: 0 auto;
     position: relative;
 }
+.adminform .editor ul.files > li .filebar:after {
+    content: "";
+    display: block;
+    clear: both;
+}
 .adminform .editor ul.files > li .filebar .link {
     color: #008aab;
     text-decoration: underline;
@@ -1631,6 +1636,7 @@ tr:nth-child(odd) td {
     opacity: 0;
     cursor: inherit;
 }
+
 
 /* Chrome/Safari and web-kit-based browsers
    (if it doesn't work, try maybe also on the parent/wrapper)
@@ -2007,6 +2013,17 @@ input[type=file] {
 .adminform .field.hasXcols .subfield input[type="password"] {
     width: 100%;
     margin-right: 0;
+}
+
+.adminform .field.has2cols .subfield.fullsize,
+.adminform .field.has3cols .subfield.fullsize,
+.adminform .field.has4cols .subfield.fullsize,
+.adminform .field.has5cols .subfield.fullsize,
+.adminform .field.has6cols .subfield.fullsize,
+.adminform .field.hasXcols .subfield.fullsize {
+    width: 100%;
+    float: none;
+    clear: both;
 }
 
 
