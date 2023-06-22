@@ -91,6 +91,8 @@ class rpg_field extends rpg_object {
         $this->field_base_foreground = isset($this_fieldinfo['field_base_foreground']) ? $this_fieldinfo['field_base_foreground'] : $this->field_foreground;
         $this->field_base_background_attachments = isset($this_fieldinfo['field_base_background_attachments']) ? $this_fieldinfo['field_base_background_attachments'] : $this->field_background_attachments;
         $this->field_base_foreground_attachments = isset($this_fieldinfo['field_base_foreground_attachments']) ? $this_fieldinfo['field_base_foreground_attachments'] : $this->field_foreground_attachments;
+        $this->field_base_background_variant = isset($this_fieldinfo['field_base_background_variant']) ? $this_fieldinfo['field_base_background_variant'] : $this->field_background_variant;
+        $this->field_base_foreground_variant = isset($this_fieldinfo['field_base_foreground_variant']) ? $this_fieldinfo['field_base_foreground_variant'] : $this->field_foreground_variant;
         $this->field_base_music = isset($this_fieldinfo['field_base_music']) ? $this_fieldinfo['field_base_music'] : $this->field_music;
 
         // Collect any functions associated with this field
