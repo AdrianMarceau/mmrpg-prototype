@@ -1261,16 +1261,44 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 $this_option_class .= $this_type_class;
             }
             if (!empty($this_fieldinfo['field_background'])){
-                //$this_background_x = $this_background_y = -20;
-                //$this_option_style = 'background-position: 0 0; background-size: 100% auto; background-image: url(images/fields/'.$this_fieldinfo['field_background'].'/battle-field_preview.png?'.MMRPG_CONFIG_CACHE_DATE.'); ';
-                $this_option_style = 'background-image: url(images/fields/'.$this_fieldinfo['field_background'].'/battle-field_preview.png?'.MMRPG_CONFIG_CACHE_DATE.') !important; ';
+                $image_name = 'battle-field_preview';
+                $image_path = 'images/fields/'.$this_fieldinfo['field_background'].'/';
+                $image_path_full = $image_path.$image_name.'.png';
+                if (!empty($this_fieldinfo['field_background_variant'])){
+                    //error_log('$_GET: '.print_r($_GET, true));
+                    //error_log('battle_token: '.print_r($this_info['battle_token'], true));
+                    //error_log('$this_fieldinfo: '.print_r($this_fieldinfo, true));
+                    $new_image_name = $image_name.'_'.$this_fieldinfo['field_background_variant'];
+                    $new_image_path_full = $image_path.$new_image_name.'.png';
+                    //error_log('$new_image_name: '.print_r($new_image_name, true));
+                    //error_log('$new_image_path_full: '.print_r($new_image_path_full, true));
+                    if (rpg_game::sprite_exists($new_image_path_full)){
+                        //error_log('field_background_variant sprite exists!');
+                        $image_name = $new_image_name;
+                        $image_path_full = $new_image_path_full;
+                    }
+                }
+                $this_option_style = 'background-image: url('.$image_path_full.'?'.MMRPG_CONFIG_CACHE_DATE.') !important; ';
             }
             $this_option_label = '';
             $this_option_platform_style = '';
-            if (!empty($this_fieldinfo['field_foreground'])){
-                //$this_background_x = $this_background_y = -20;
-                //$this_option_platform_style = 'background-position: 0 -76px; background-size: 100% auto; background-image: url(images/fields/'.$this_fieldinfo['field_foreground'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); ';
-                $this_option_platform_style = 'background-image: url(images/fields/'.$this_fieldinfo['field_foreground'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); ';
+            if (!empty($this_fieldinfo['field_foreground'])) {
+                $image_name = 'battle-field_foreground_base';
+                $image_path = 'images/fields/'.$this_fieldinfo['field_foreground'].'/';
+                $image_path_full = $image_path.$image_name.'.png';
+                if (!empty($this_fieldinfo['field_foreground_variant'])) {
+                    //error_log('$_GET: '.print_r($_GET, true));
+                    //error_log('battle_token: '.print_r($this_info['battle_token'], true));
+                    //error_log('$this_fieldinfo: '.print_r($this_fieldinfo, true));
+                    $new_image_name = $image_name.'_'.$this_fieldinfo['field_foreground_variant'];
+                    $new_image_path_full = $image_path.$new_image_name.'.png';
+                    if (rpg_game::sprite_exists($new_image_path_full)) {
+                        //error_log('field_foreground_variant sprite exists!');
+                        $image_name = $new_image_name;
+                        $image_path_full = $new_image_path_full;
+                    }
+                }
+                $this_option_platform_style = 'background-image: url('.$image_path_full.'?'.MMRPG_CONFIG_CACHE_DATE.'); ';
             }
             $this_option_min_level = false;
             $this_option_max_level = false;
