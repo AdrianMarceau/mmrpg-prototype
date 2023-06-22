@@ -284,8 +284,34 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                         else { $background_animate[] = str_pad($this_field_data['field_background_frame'], 2, '0', STR_PAD_LEFT); }
                     }
                     $background_data_animate = count($background_animate) > 1 ? implode(',', $background_animate) : false;
+
                     // Display the markup of the background layer
-                    echo '<div class="'.(!$flag_skip_fadein ? 'animate_fadein ' : '').'background_canvas has_pixels background background_00" data-frame="00" style="background-color: #000000; background-image: url(images/fields/'.$this_field_data['field_background'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
+                    $field_background_class = 'background_canvas has_pixels background background_00'.(!$flag_skip_fadein ? ' animate_fadein' : '');
+                    $field_background_style = 'background-color: #000000; background-image: url(images/fields/'.$this_field_data['field_background'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');';
+                    echo '<div class="'.$field_background_class.'" style="'.$field_background_style.'" data-frame="00">&nbsp;</div>';
+
+                    // Display the markup of the background layer
+                    $field_background_class = 'background_canvas has_pixels background background_00'.(!$flag_skip_fadein ? ' animate_fadein' : '');
+                    $field_background_style = 'background-color: #000000;';
+                    if (!empty($this_field_data['field_background'])){
+                        $image_name = 'battle-field_background_base';
+                        $image_path = 'images/fields/'.$this_field_data['field_background'].'/';
+                        $image_path_full = $image_path.$image_name.'.gif';
+                        error_log('$image_path_full = '.print_r($image_path_full, true));
+                        if (!empty($this_field_data['field_background_variant'])){
+                            $new_image_name = $image_name.'_'.$this_field_data['field_background_variant'];
+                            $new_image_path_full = $image_path.$new_image_name.'.gif';
+                            error_log('$new_image_path_full = '.print_r($new_image_path_full, true));
+                            if (rpg_game::sprite_exists($new_image_path_full)){
+                                error_log(basename($new_image_path_full).' exists!');
+                                $image_name = $new_image_name;
+                                $image_path_full = $new_image_path_full;
+                            }
+                        }
+                        $field_background_style .= ' background-image: url('.$image_path_full.'?'.MMRPG_CONFIG_CACHE_DATE.');';
+                    }
+                    echo '<div class="'.$field_background_class.'" style="'.$field_background_style.'" data-frame="00">&nbsp;</div>';
+
 
                     // Loop through and display the markup of any background attachments
                     if (!empty($this_field_data['field_background_attachments'])){
@@ -369,8 +395,32 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                     }
                     $foreground_data_animate = count($foreground_animate) > 1 ? implode(',', $foreground_animate) : false;
 
+                    // Display the markup of the background layer
+                    $field_foreground_class = 'foreground_canvas has_pixels foreground foreground_00'.(!$flag_skip_fadein ? ' animate_fadein' : '');
+                    $field_foreground_style = '';
+                    if (!empty($this_field_data['field_foreground'])){
+                        $image_name = 'battle-field_foreground_base';
+                        $image_path = 'images/fields/'.$this_field_data['field_foreground'].'/';
+                        $image_path_full = $image_path.$image_name.'.png';
+                        error_log('$image_path_full = '.print_r($image_path_full, true));
+                        if (!empty($this_field_data['field_foreground_variant'])){
+                            $new_image_name = $image_name.'_'.$this_field_data['field_foreground_variant'];
+                            $new_image_path_full = $image_path.$new_image_name.'.png';
+                            error_log('$new_image_path_full = '.print_r($new_image_path_full, true));
+                            if (rpg_game::sprite_exists($new_image_path_full)){
+                                error_log(basename($new_image_path_full).' exists!');
+                                $image_name = $new_image_name;
+                                $image_path_full = $new_image_path_full;
+                            }
+                        }
+                        $field_foreground_style .= ' background-image: url('.$image_path_full.'?'.MMRPG_CONFIG_CACHE_DATE.');';
+                    }
+                    echo '<div class="'.$field_foreground_class.'" style="'.$field_foreground_style.'" data-frame="00">&nbsp;</div>';
+
+                    /*
                     // Display the markup of the foreground layer
                     echo '<div class="'.(!$flag_skip_fadein ? 'animate_fadein ' : '').' foreground_canvas has_pixels foreground foreground_00" data-frame="00" style="background-image: url(images/fields/'.$this_field_data['field_foreground'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
+                    */
 
                     // Check if this field has a field or fusion star in it
                     if (!empty($this_battle_data['values']['field_star'])){
