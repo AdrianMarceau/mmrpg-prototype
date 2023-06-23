@@ -1526,15 +1526,29 @@ class rpg_player extends rpg_object {
             }
         }
 
+        // Sort the robots to ensure we process benched ones first, then active ones last
+        usort($robots_to_disable, function($r1, $r2){
+            if ($r1->robot_position === 'active' && $r2->robot_position !== 'active'){ return 1; }
+            elseif ($r1->robot_position !== 'active' && $r2->robot_position === 'active'){ return -1; }
+            elseif ($r1->robot_key < $r2->robot_key){ return -1; }
+            elseif ($r1->robot_key > $r2->robot_key){ return 1; }
+            else { return 0; }
+            });
+
         // Loop through robots to disable and trigger it, delaying experience gains until the end
         while (!empty($robots_to_disable)){
-            $options = array();
+
+            // Collect the robot object we'll be working with
             $robot = array_shift($robots_to_disable);
+
+            // And now we can process the actual disabled status and cleanup
+            $options = array();
             if (!empty($robots_to_disable)){
                 $options['delay_stat_bonuses'] = true;
                 $options['delay_experience_points'] = true;
             }
             $robot->trigger_disabled($target_robot, $options);
+
         }
 
     }
