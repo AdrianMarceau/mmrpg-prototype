@@ -297,13 +297,13 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                         $image_name = 'battle-field_background_base';
                         $image_path = 'images/fields/'.$this_field_data['field_background'].'/';
                         $image_path_full = $image_path.$image_name.'.gif';
-                        error_log('$image_path_full = '.print_r($image_path_full, true));
+                        //error_log('$image_path_full = '.print_r($image_path_full, true));
                         if (!empty($this_field_data['field_background_variant'])){
                             $new_image_name = $image_name.'_'.$this_field_data['field_background_variant'];
                             $new_image_path_full = $image_path.$new_image_name.'.gif';
-                            error_log('$new_image_path_full = '.print_r($new_image_path_full, true));
+                            //error_log('$new_image_path_full = '.print_r($new_image_path_full, true));
                             if (rpg_game::sprite_exists($new_image_path_full)){
-                                error_log(basename($new_image_path_full).' exists!');
+                                //error_log(basename($new_image_path_full).' exists!');
                                 $image_name = $new_image_name;
                                 $image_path_full = $new_image_path_full;
                             }
@@ -402,13 +402,13 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                         $image_name = 'battle-field_foreground_base';
                         $image_path = 'images/fields/'.$this_field_data['field_foreground'].'/';
                         $image_path_full = $image_path.$image_name.'.png';
-                        error_log('$image_path_full = '.print_r($image_path_full, true));
+                        //error_log('$image_path_full = '.print_r($image_path_full, true));
                         if (!empty($this_field_data['field_foreground_variant'])){
                             $new_image_name = $image_name.'_'.$this_field_data['field_foreground_variant'];
                             $new_image_path_full = $image_path.$new_image_name.'.png';
-                            error_log('$new_image_path_full = '.print_r($new_image_path_full, true));
+                            //error_log('$new_image_path_full = '.print_r($new_image_path_full, true));
                             if (rpg_game::sprite_exists($new_image_path_full)){
-                                error_log(basename($new_image_path_full).' exists!');
+                                //error_log(basename($new_image_path_full).' exists!');
                                 $image_name = $new_image_name;
                                 $image_path_full = $new_image_path_full;
                             }
