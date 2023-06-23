@@ -312,20 +312,24 @@ class rpg_mission_starter extends rpg_mission {
         if (!empty($this_robot_alt)){
             if ($this_robot_token === 'trill'){
                 $temp_midboss_image = $this_robot_token;
-                $temp_midboss_abilities = array('space-shot', 'space-buster', 'space-overdrive');
+                $temp_midboss_abilities = array('space-shot', 'space-buster', 'space-overdrive', 'energy-boost');
                 if ($this_robot_alt === 'attack'){
-                    $temp_midboss_image .= '_alt';
-                    $temp_midboss_abilities[] = 'attack-break';
+                    //$temp_midboss_image .= '_alt';
+                    //$temp_midboss_abilities[] = 'attack-break';
                     $temp_stat_priority = array('attack', 'defense', 'speed');
                 } elseif ($this_robot_alt === 'defense'){
-                    $temp_midboss_image .= '_alt2';
-                    $temp_midboss_abilities[] = 'defense-break';
+                    //$temp_midboss_image .= '_alt2';
+                    //$temp_midboss_abilities[] = 'defense-break';
                     $temp_stat_priority = array('defense', 'speed', 'attack');
                 } elseif ($this_robot_alt === 'speed'){
-                    $temp_midboss_image .= '_alt3';
-                    $temp_midboss_abilities[] = 'speed-break';
+                    //$temp_midboss_image .= '_alt3';
+                    //$temp_midboss_abilities[] = 'speed-break';
                     $temp_stat_priority = array('speed', 'attack', 'defense');
                 }
+                $temp_midboss_abilities = array_merge(
+                    array($temp_stat_priority[0].'-boost', $temp_stat_priority[0].'-break', $temp_stat_priority[1].'-break', $temp_stat_priority[2].'-break'),
+                    $temp_midboss_abilities
+                    );
                 $temp_midboss_robot['robot_image'] = $temp_midboss_image;
                 $temp_midboss_robot['robot_abilities'] = $temp_midboss_abilities;
             } else {
