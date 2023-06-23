@@ -3359,16 +3359,8 @@ class rpg_ability extends rpg_object {
         $this_robot->set_frame('base');
         $this_robot->unset_attachment($crest_attachment_token);
 
-        // Loop through all robots on the target side and disable any that need it
-        $target_robots_active = $target_player->get_robots();
-        foreach ($target_robots_active AS $key => $robot){
-            if ($robot->robot_id == $target_robot->robot_id){ $temp_target_robot = $target_robot; }
-            else { $temp_target_robot = $robot; }
-            if (($temp_target_robot->robot_energy < 1 || $temp_target_robot->robot_status == 'disabled')
-                && empty($temp_target_robot->flags['apply_disabled_state'])){
-                $temp_target_robot->trigger_disabled($this_robot);
-            }
-        }
+        // Now that all the damage has been dealt, allow the player to check for disabled
+        $target_player->check_robots_disabled($this_player, $this_robot);
 
         // Trigger this robot's custom function if one has been defined for this context
         $this_robot->trigger_custom_function('rpg-ability_elemental-overdrive_after', $extra_objects);
