@@ -2484,6 +2484,18 @@ class rpg_robot extends rpg_object {
         // If the battle has ended, trigger no disables
         if ($this->battle->battle_status == 'complete'){ return false; }
 
+        // Show a quick pre-defeat defend sprite for dramatic pause
+        $this->set_frame('defend');
+        $this->set_frame_styles('filter: brightness(3.0);');
+        $this->battle->events_create(false, false, '', '', array(
+            'event_flag_camera_action' => true,
+            'event_flag_camera_side' => $this->player->player_side,
+            'event_flag_camera_focus' => $this->robot_position,
+            'event_flag_camera_depth' => $this->robot_key
+            ));
+        $this->reset_frame('');
+        $this->reset_frame_styles();
+
         // This was an ability so delegate to the ability class function
         return rpg_disabled::trigger_robot_disabled($this, $target_robot, $trigger_options);
     }
