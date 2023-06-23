@@ -2574,6 +2574,7 @@ class rpg_battle extends rpg_object {
         $options['console_show_this_robot'] = isset($eventinfo['event_options']['console_show_this_robot']) ? $eventinfo['event_options']['console_show_this_robot'] : true;
         $options['console_show_this_ability'] = isset($eventinfo['event_options']['console_show_this_ability']) ? $eventinfo['event_options']['console_show_this_ability'] : false;
         $options['console_show_this_item'] = isset($eventinfo['event_options']['console_show_this_item']) ? $eventinfo['event_options']['console_show_this_item'] : false;
+        $options['console_show_this_skill'] = isset($eventinfo['event_options']['console_show_this_skill']) ? $eventinfo['event_options']['console_show_this_skill'] : false;
         $options['console_show_this_star'] = isset($eventinfo['event_options']['console_show_this_star']) ? $eventinfo['event_options']['console_show_this_star'] : false;
         $options['console_show_target'] = isset($eventinfo['event_options']['console_show_target']) ? $eventinfo['event_options']['console_show_target'] : true;
         $options['console_show_target_player'] = isset($eventinfo['event_options']['console_show_target_player']) ? $eventinfo['event_options']['console_show_target_player'] : true;
@@ -2585,10 +2586,14 @@ class rpg_battle extends rpg_object {
         $options['canvas_show_this_ability_overlay'] = isset($eventinfo['event_options']['canvas_show_this_ability_overlay']) ? $eventinfo['event_options']['canvas_show_this_ability_overlay'] : false;
         $options['canvas_show_this_item'] = isset($eventinfo['event_options']['canvas_show_this_item']) ? $eventinfo['event_options']['canvas_show_this_item'] : true;
         $options['canvas_show_this_item_overlay'] = isset($eventinfo['event_options']['canvas_show_this_item_overlay']) ? $eventinfo['event_options']['canvas_show_this_item_overlay'] : false;
+        $options['canvas_show_this_skill'] = isset($eventinfo['event_options']['canvas_show_this_skill']) ? $eventinfo['event_options']['canvas_show_this_skill'] : true;
+        $options['canvas_show_this_skill_overlay'] = isset($eventinfo['event_options']['canvas_show_this_skill_overlay']) ? $eventinfo['event_options']['canvas_show_this_skill_overlay'] : false;
+        $options['canvas_show_this_skill_underlay'] = isset($eventinfo['event_options']['canvas_show_this_skill_underlay']) ? $eventinfo['event_options']['canvas_show_this_skill_underlay'] : true;
         $options['canvas_show_target'] = isset($eventinfo['event_options']['canvas_show_target']) ? $eventinfo['event_options']['canvas_show_target'] : true;
         $options['canvas_show_target_robots'] = isset($eventinfo['event_options']['canvas_show_target_robots']) ? $eventinfo['event_options']['canvas_show_target_robots'] : true;
         $options['canvas_show_target_ability'] = isset($eventinfo['event_options']['canvas_show_target_ability']) ? $eventinfo['event_options']['canvas_show_target_ability'] : true;
         $options['canvas_show_target_item'] = isset($eventinfo['event_options']['canvas_show_target_item']) ? $eventinfo['event_options']['canvas_show_target_item'] : true;
+        $options['canvas_show_target_skill'] = isset($eventinfo['event_options']['canvas_show_target_skill']) ? $eventinfo['event_options']['canvas_show_target_skill'] : true;
         $options['this_ability'] = isset($eventinfo['event_options']['this_ability']) ? $eventinfo['event_options']['this_ability'] : false;
         $options['this_ability_target'] = isset($eventinfo['event_options']['this_ability_target']) ? $eventinfo['event_options']['this_ability_target'] : false;
         $options['this_ability_target_key'] = isset($eventinfo['event_options']['this_ability_target_key']) ? $eventinfo['event_options']['this_ability_target_key'] : 0;
@@ -2611,6 +2616,7 @@ class rpg_battle extends rpg_object {
         $options['this_robot_image'] = isset($eventinfo['event_options']['this_robot_image']) ? $eventinfo['event_options']['this_robot_image'] : 'sprite';
         $options['this_ability_image'] = isset($eventinfo['event_options']['this_ability_image']) ? $eventinfo['event_options']['this_ability_image'] : 'sprite';
         $options['this_item_image'] = isset($eventinfo['event_options']['this_item_image']) ? $eventinfo['event_options']['this_item_image'] : 'sprite';
+        $options['this_skill_image'] = isset($eventinfo['event_options']['this_skill_image']) ? $eventinfo['event_options']['this_skill_image'] : 'sprite';
         $options['event_flag_camera_action'] = isset($eventinfo['event_options']['event_flag_camera_action']) ? $eventinfo['event_options']['event_flag_camera_action'] : false;
         $options['event_flag_camera_reaction'] = isset($eventinfo['event_options']['event_flag_camera_reaction']) ? $eventinfo['event_options']['event_flag_camera_reaction'] : false;
         $options['event_flag_camera_side'] = isset($eventinfo['event_options']['event_flag_camera_side']) ? $eventinfo['event_options']['event_flag_camera_side'] : 'left';

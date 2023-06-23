@@ -1664,6 +1664,24 @@ body.index #header {
     -webkit-border-radius: 5px 0 0 5px;
     background: #000000 none scroll no-repeat -5px -5px;
 }
+#canvas .canvas_battle_results .results_icon_40x40,
+#canvas .canvas_ability_details .ability_icon_40x40,
+#canvas .canvas_item_details .item_icon_40x40,
+#canvas .canvas_skill_details .skill_icon_40x40 {
+    background-position: -5px -5px;
+}
+#canvas .canvas_battle_results .results_icon_80x80,
+#canvas .canvas_ability_details .ability_icon_80x80,
+#canvas .canvas_item_details .item_icon_80x80,
+#canvas .canvas_skill_details .skill_icon_80x80 {
+    background-position: -25px -25px;
+}
+#canvas .canvas_battle_results .results_icon_160x160,
+#canvas .canvas_ability_details .ability_icon_160x160,
+#canvas .canvas_item_details .item_icon_160x160,
+#canvas .canvas_skill_details .skill_icon_160x160 {
+    background-position: -45px -45px;
+}
 #canvas .canvas_battle_results .results_icon + .results_icon,
 #canvas .canvas_ability_details .ability_icon + .ability_icon,
 #canvas .canvas_item_details .item_icon + .item_icon,
@@ -1684,7 +1702,7 @@ body.index #header {
 #canvas .canvas_battle_results .results_name,
 #canvas .canvas_ability_details .ability_name,
 #canvas .canvas_item_details .item_name,
-#canvas .canvas_item_details .skill_name {
+#canvas .canvas_skill_details .skill_name {
     text-indent: 0;
     color: #FFFFFF;
     font-size: 12px;
@@ -1698,6 +1716,36 @@ body.index #header {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    position: relative;
+}
+#canvas .canvas_ability_details .ability_name,
+#canvas .canvas_item_details .item_name,
+#canvas .canvas_skill_details .skill_name {
+    padding-top: 10px;
+    line-height: 20px;
+}
+#canvas .canvas_ability_details .ability_name:before,
+#canvas .canvas_item_details .item_name:before,
+#canvas .canvas_skill_details .skill_name:before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 2px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    font-size: 8px;
+    line-height: 10px;
+    text-transform: uppercase;
+    color: #ababab;
+}
+#canvas .canvas_ability_details .ability_name:before {
+    content: "Ability";
+}
+#canvas .canvas_item_details .item_name:before {
+    content: "Item";
+}
+#canvas .canvas_skill_details .skill_name:before {
+    content: "Skill";
 }
 
 body.mobileFlag_landscapeMode #battle .canvas_overlay_header,

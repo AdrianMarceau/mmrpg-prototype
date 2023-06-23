@@ -2315,7 +2315,8 @@ class rpg_canvas {
 
                 }
 
-                // ABILITY/ITEM ANIMATION STUFF
+                // ABILITY/ITEM/SKILL ANIMATION STUFF
+                //error_log('attempting to showing object animation stuff for '.$results_type.' with option keys '.print_r(array_keys(array_filter($this_options)), true));
                 if (!empty($this_options['this_'.$results_type]) && !empty($this_options['canvas_show_this_'.$results_type])){
 
                     // If this is an ability, collect its markup
@@ -2325,19 +2326,19 @@ class rpg_canvas {
                         $attachment_options['data_type'] = 'ability';
                         $this_ability_data = $this_options['this_ability']->canvas_markup($this_options, $this_player_data, $this_robot_data);
 
-                        // Display the object's mugshot sprite
+                        // Display the object's icon sprite
                         if (empty($this_options['this_ability_results']['total_actions'])
                             && empty($this_options['this_ability']->flags['skip_canvas_header'])){
-                            $this_mugshot_image = !empty($this_options['this_ability']->ability_image) ? $this_options['this_ability']->ability_image : $this_options['this_ability']->ability_token;
-                            $this_mugshot_image2 = !empty($this_options['this_ability']->ability_image2) ? $this_options['this_ability']->ability_image2 : '';
-                            $this_mugshot_markup_left = '<div class="sprite ability_icon ability_icon_left" style="background-image: url(images/abilities/'.$this_mugshot_image.'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></div>';
-                            $this_mugshot_markup_right = '<div class="sprite ability_icon ability_icon_right" style="background-image: url(images/abilities/'.$this_mugshot_image.'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></div>';
+                            $this_icon_image = !empty($this_options['this_ability']->ability_image) ? $this_options['this_ability']->ability_image : $this_options['this_ability']->ability_token;
+                            $this_icon_image2 = !empty($this_options['this_ability']->ability_image2) ? $this_options['this_ability']->ability_image2 : '';
+                            $this_icon_markup_left = '<div class="sprite ability_icon ability_icon_left" style="background-image: url(images/abilities/'.$this_icon_image.'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></div>';
+                            $this_icon_markup_right = '<div class="sprite ability_icon ability_icon_right" style="background-image: url(images/abilities/'.$this_icon_image.'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></div>';
                             if (!empty($this_options['this_ability']->ability_image2)){
-                                $this_mugshot_markup_left .= str_replace('/'.$this_mugshot_image.'/', '/'.$this_mugshot_image2.'/', $this_mugshot_markup_left);
-                                $this_mugshot_markup_right .= str_replace('/'.$this_mugshot_image.'/', '/'.$this_mugshot_image2.'/', $this_mugshot_markup_right);
+                                $this_icon_markup_left .= str_replace('/'.$this_icon_image.'/', '/'.$this_icon_image2.'/', $this_icon_markup_left);
+                                $this_icon_markup_right .= str_replace('/'.$this_icon_image.'/', '/'.$this_icon_image2.'/', $this_icon_markup_right);
                             }
-                            $this_mugshot_markup_combined =  '<div class="'.$this_ability_data['ability_markup_class'].' canvas_ability_details ability_type ability_type_'.(!empty($this_options['this_ability']->ability_type) ? $this_options['this_ability']->ability_type : 'none').(!empty($this_options['this_ability']->ability_type2) ? '_'.$this_options['this_ability']->ability_type2 : '').'">'.$this_mugshot_markup_left.'<div class="ability_name">'.$this_ability_data['ability_title'].'</div>'.$this_mugshot_markup_right.'</div>';
-                            $this_underlay_markup .=  $this_mugshot_markup_combined;
+                            $this_icon_markup_combined =  '<div class="'.$this_ability_data['ability_markup_class'].' canvas_ability_details ability_type type type_'.(!empty($this_options['this_ability']->ability_type) ? $this_options['this_ability']->ability_type : 'none').(!empty($this_options['this_ability']->ability_type2) ? '_'.$this_options['this_ability']->ability_type2 : '').'">'.$this_icon_markup_left.'<div class="ability_name">'.$this_ability_data['ability_title'].'</div>'.$this_icon_markup_right.'</div>';
+                            $this_underlay_markup .=  $this_icon_markup_combined;
                         }
 
                         // Append this object's markup to the main markup array
@@ -2351,12 +2352,12 @@ class rpg_canvas {
                         $attachment_options['data_type'] = 'item';
                         $this_item_data = $this_options['this_item']->canvas_markup($this_options, $this_player_data, $this_robot_data);
 
-                        // Display the object's mugshot sprite
+                        // Display the object's icon sprite
                         if (empty($this_options['this_item_results']['total_actions'])){
-                            $this_mugshot_markup_left = '<div class="sprite item_icon item_icon_left" style="background-image: url(images/items/'.(!empty($this_options['this_item']->item_image) ? $this_options['this_item']->item_image : $this_options['this_item']->item_token).'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></div>';
-                            $this_mugshot_markup_right = '<div class="sprite item_icon item_icon_right" style="background-image: url(images/items/'.(!empty($this_options['this_item']->item_image) ? $this_options['this_item']->item_image : $this_options['this_item']->item_token).'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></div>';
-                            $this_mugshot_markup_combined =  '<div class="'.$this_item_data['item_markup_class'].' canvas_item_details item_type item_type_'.(!empty($this_options['this_item']->item_type) ? $this_options['this_item']->item_type : 'none').(!empty($this_options['this_item']->item_type2) ? '_'.$this_options['this_item']->item_type2 : '').'">'.$this_mugshot_markup_left.'<div class="item_name">'.$this_item_data['item_title'].'</div>'.$this_mugshot_markup_right.'</div>';
-                            $this_underlay_markup .=  $this_mugshot_markup_combined;
+                            $this_icon_markup_left = '<div class="sprite item_icon item_icon_left" style="background-image: url(images/items/'.(!empty($this_options['this_item']->item_image) ? $this_options['this_item']->item_image : $this_options['this_item']->item_token).'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></div>';
+                            $this_icon_markup_right = '<div class="sprite item_icon item_icon_right" style="background-image: url(images/items/'.(!empty($this_options['this_item']->item_image) ? $this_options['this_item']->item_image : $this_options['this_item']->item_token).'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></div>';
+                            $this_icon_markup_combined =  '<div class="'.$this_item_data['item_markup_class'].' canvas_item_details item_type type type_'.(!empty($this_options['this_item']->item_type) ? $this_options['this_item']->item_type : 'none').(!empty($this_options['this_item']->item_type2) ? '_'.$this_options['this_item']->item_type2 : '').'">'.$this_icon_markup_left.'<div class="item_name">'.$this_item_data['item_title'].'</div>'.$this_icon_markup_right.'</div>';
+                            $this_underlay_markup .=  $this_icon_markup_combined;
                         }
 
                         // Append this object's markup to the main markup array
@@ -2365,14 +2366,32 @@ class rpg_canvas {
                     }
                     // Else if this is an skill, collect its markup
                     elseif ($results_type == 'skill'){
+                        //error_log('attempting to generating skill markup for '.$this_options['this_skill']->skill_name.' in canvas_skill_results');
 
                         // Define the object data array and generate markup data
                         $attachment_options['data_type'] = 'skill';
+                        //$this_skill_data = $this_options['this_skill']->canvas_markup($this_options, $this_player_data, $this_robot_data);
+                        $this_skill_data = $this_options['this_skill']->export_array();
+                        $this_skill_parameters = !empty($this_options['this_skill']->skill_parameters) ? $this_options['this_skill']->skill_parameters : array();
+                        //error_log('$this_options[\'this_skill\']->skill_parameters ='.print_r($this_options['this_skill']->skill_parameters, true));
+                        //error_log('$this_skill_parameters ='.print_r($this_skill_parameters, true));
 
-                        // Display the object's mugshot sprite
+                        // Display the object's icon sprite
                         if (empty($this_options['this_skill_results']['total_actions'])){
-                            $this_mugshot_markup_combined = '<div class="sprite skill_sprite canvas_skill_details skill_type skill_type_none"><div class="skill_name">'.$this_skill_data['skill_title'].'</div></div>';
-                            $this_underlay_markup .= $this_mugshot_markup_combined;
+                            $this_skill_type = !empty($this_skill_parameters['type']) ? $this_skill_parameters['type'] : '';
+                            if (empty($this_skill_type) && !empty($this_options['this_skill']->robot->robot_core)){ $this_skill_type = $this_options['this_skill']->robot->robot_core; }
+                            if (empty($this_skill_type)){ $this_skill_type = 'none'; }
+                            $this_skill_label = $this_options['this_skill']->skill_name;
+                            $this_skill_robot_image = !empty($this_options['this_skill']->robot->robot_image) ? $this_options['this_skill']->robot->robot_image : $this_options['this_skill']->robot->robot_token;
+                            $this_skill_robot_image_size = $this_options['this_skill']->robot->robot_image_size.'x'.$this_options['this_skill']->robot->robot_image_size;
+                            $this_skill_mugshot = 'images/robots/'.$this_skill_robot_image.'/mug_'.$this_robot_data['robot_direction'].'_'.$this_skill_robot_image_size.'.png?'.MMRPG_CONFIG_CACHE_DATE;
+                            $this_icon_markup_left = '<div class="sprite skill_icon skill_icon_'.$this_skill_robot_image_size.' skill_icon_left" style="background-image: url('.$this_skill_mugshot.');"></div>';
+                            $this_icon_markup_right = '<div class="sprite skill_icon skill_icon_'.$this_skill_robot_image_size.' skill_icon_right" style="background-image: url('.$this_skill_mugshot.');"></div>';
+                            //$this_icon_markup_combined = '<div class="sprite skill_sprite canvas_skill_details skill_type skill_type_none"><div class="skill_name">'.$this_skill_data['skill_name'].'</div></div>';
+                            $this_icon_markup_combined = '<div class="sprite skill_sprite canvas_skill_details skill_type type type_'.$this_skill_type.'">'.$this_icon_markup_left.'<div class="skill_name">'.$this_skill_label.'</div>'.$this_icon_markup_right.'</div>';
+                            if (!empty($this_options['canvas_show_this_skill_overlay'])){ $this_overlay_markup .= $this_icon_markup_combined; }
+                            if (!empty($this_options['canvas_show_this_skill_underlay'])){ $this_underlay_markup .= $this_icon_markup_combined; }
+
                         }
 
                     }

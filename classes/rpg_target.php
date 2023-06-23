@@ -219,6 +219,9 @@ class rpg_target {
         $event_options['console_show_this'] = true;
         $event_options['console_show_this_player'] = false;
         $event_options['console_show_this_robot'] = true;
+        $event_options['canvas_show_this_skill'] = true;
+        $event_options['canvas_show_this_skill_overlay'] = false;
+        $event_options['canvas_show_this_skill_underlay'] = true;
 
         // Empty any text from the previous skill result
         $this_skill->skill_results['this_text'] = '';
@@ -252,7 +255,6 @@ class rpg_target {
 
         // Update the event options with the skill results
         $event_options['this_skill_results'] = $this_skill->skill_results;
-        $event_options['canvas_show_this_skill'] = false;
 
         // Apply appropriate camera action flags to the event options
         rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $this_skill, 'target');
