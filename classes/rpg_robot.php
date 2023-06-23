@@ -1810,7 +1810,7 @@ class rpg_robot extends rpg_object {
         $temp_ability_tokens = "'".implode("','", array_values($this_robot->robot_abilities))."'";
         $temp_ability_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_token IN ({$temp_ability_tokens});", 'ability_token');
         foreach ($this_robot->robot_abilities AS $key => $token){
-            //error_log('checking ability '.$token);
+            //error_log('checking ability['.$key.'] '.$token);
             if (!in_array($token, $options)){
 
                 // Collect ability info and define base chance
@@ -1871,6 +1871,14 @@ class rpg_robot extends rpg_object {
                 }
 
             }
+        }
+
+        // Regardless of what happened above, ensure the first ability is used on the first turn
+        if ($this_battle->counters['battle_turn'] == 1
+            && in_array($this_robot->robot_abilities[0], $options)){
+            //error_log('first ability is '.$this_robot->robot_abilities[0].' on line '.__LINE__);
+            $first_ability_position = array_search($this_robot->robot_abilities[0], $options);
+            $weights[$first_ability_position] = array_sum($weights) * 100;
         }
 
         // Remove any options that have absolute zero values
