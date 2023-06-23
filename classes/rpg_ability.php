@@ -2454,6 +2454,7 @@ class rpg_ability extends rpg_object {
 
     // Define a static function to use as a common action for all stat boosting
     public static function ability_function_stat_boost($target_robot, $stat_type, $boost_amount, $trigger_object = false, $trigger_options = array()){
+        //error_log('ability_function_stat_boost('.$target_robot->robot_token.', '.$stat_type.', '.$boost_amount.', '.gettype($trigger_object).', '.print_r($trigger_options, true).')');
 
         // Collect or defined required variables from the trigger options
         $initiator_robot = isset($trigger_options['initiator_robot']) ? $trigger_options['initiator_robot'] : false;
@@ -2463,6 +2464,7 @@ class rpg_ability extends rpg_object {
         $is_redirect = isset($trigger_options['is_redirect']) ? $trigger_options['is_redirect'] : false;
         $allow_custom_effects = isset($trigger_options['allow_custom_effects']) ? $trigger_options['allow_custom_effects'] : true;
         $is_fixed_amount = isset($trigger_options['is_fixed_amount']) ? $trigger_options['is_fixed_amount'] : false;
+        $skip_canvas_header = isset($trigger_options['skip_canvas_header']) ? $trigger_options['skip_canvas_header'] : false;
 
         // Exit or redirect if amount doesn't make sense here
         if (empty($boost_amount)){
@@ -2567,11 +2569,13 @@ class rpg_ability extends rpg_object {
             $target_results = array('total_actions' => 1, 'total_strikes' => 1, 'recovery_kind' => $options->stat_type, 'this_amount' => $rel_boost_amount);
             $trigger_options = array('override_trigger_kind' => 'recovery');
             if ($trigger_item || $trigger_skill){
-                $trigger_object->set_flag('skip_canvas_header', true);
+                if (!$skip_canvas_header){ $trigger_object->set_flag('force_canvas_header', true); }
+                else { $trigger_ability->set_flag('skip_canvas_header', true); }
                 if ($trigger_item){ $trigger_object->item_results = $target_results; }
                 elseif ($trigger_skill){ $trigger_object->skill_results = $target_results; }
                 $trigger_object->target_options_update($target_options);
                 $target_robot->trigger_target($target_robot, $trigger_object, $trigger_options);
+                $trigger_object->unset_flag('force_canvas_header');
                 $trigger_object->unset_flag('skip_canvas_header');
             } else {
                 $trigger_ability->set_flag('skip_canvas_header', true);
@@ -2616,6 +2620,7 @@ class rpg_ability extends rpg_object {
 
     // Define a static function to use as a common action for all stat breaking
     public static function ability_function_stat_break($target_robot, $stat_type, $break_amount, $trigger_object = false, $trigger_options = array()){
+        //error_log('ability_function_stat_break('.$target_robot->robot_token.', '.$stat_type.', '.$break_amount.', '.gettype($trigger_object).', '.print_r($trigger_options, true).')');
 
         // Collect or defined required variables from the trigger options
         $initiator_robot = isset($trigger_options['initiator_robot']) ? $trigger_options['initiator_robot'] : false;
@@ -2625,6 +2630,7 @@ class rpg_ability extends rpg_object {
         $is_redirect = isset($trigger_options['is_redirect']) ? $trigger_options['is_redirect'] : false;
         $allow_custom_effects = isset($trigger_options['allow_custom_effects']) ? $trigger_options['allow_custom_effects'] : true;
         $is_fixed_amount = isset($trigger_options['is_fixed_amount']) ? $trigger_options['is_fixed_amount'] : false;
+        $skip_canvas_header = isset($trigger_options['skip_canvas_header']) ? $trigger_options['skip_canvas_header'] : false;
 
         // Exit or redirect if amount doesn't make sense here
         if (empty($break_amount)){
@@ -2730,11 +2736,13 @@ class rpg_ability extends rpg_object {
             $target_results = array('total_actions' => 1, 'total_strikes' => 1, 'damage_kind' => $options->stat_type, 'this_amount' => $rel_break_amount);
             $trigger_options = array('override_trigger_kind' => 'damage');
             if ($trigger_item || $trigger_skill){
-                $trigger_object->set_flag('skip_canvas_header', true);
+                if (!$skip_canvas_header){ $trigger_object->set_flag('force_canvas_header', true); }
+                else { $trigger_ability->set_flag('skip_canvas_header', true); }
                 if ($trigger_item){ $trigger_object->item_results = $target_results; }
                 elseif ($trigger_skill){ $trigger_object->skill_results = $target_results; }
                 $trigger_object->target_options_update($target_options);
                 $target_robot->trigger_target($target_robot, $trigger_object, $trigger_options);
+                $trigger_object->unset_flag('force_canvas_header');
                 $trigger_object->unset_flag('skip_canvas_header');
             } else {
                 $trigger_ability->set_flag('skip_canvas_header', true);

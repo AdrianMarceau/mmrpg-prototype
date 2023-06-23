@@ -123,6 +123,9 @@ class rpg_target {
         $event_options['this_item_target_position'] = $target_robot->robot_position;
         $event_options['this_item_results'] = array();
         $event_options['console_show_target'] = false;
+        $event_options['canvas_show_this_item'] = true;
+        $event_options['canvas_show_this_item_overlay'] = false;
+        $event_options['canvas_show_this_item_underlay'] = true;
 
         // Empty any text from the previous item result
         $this_item->item_results['this_text'] = '';
@@ -171,6 +174,8 @@ class rpg_target {
         // Update the event options with the item results
         $event_options['this_item_results'] = $this_item->item_results;
         if (isset($trigger_options['canvas_show_this_item'])){ $event_options['canvas_show_this_item'] = $trigger_options['canvas_show_this_item'];  }
+        if (isset($trigger_options['canvas_show_this_item_overlay'])){ $event_options['canvas_show_this_item_overlay'] = $trigger_options['canvas_show_this_item_overlay'];  }
+        if (isset($trigger_options['canvas_show_this_item_underlay'])){ $event_options['canvas_show_this_item_underlay'] = $trigger_options['canvas_show_this_item_underlay'];  }
 
         // Apply appropriate camera action flags to the event options
         rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $this_item, 'target');
@@ -255,6 +260,9 @@ class rpg_target {
 
         // Update the event options with the skill results
         $event_options['this_skill_results'] = $this_skill->skill_results;
+        if (isset($trigger_options['canvas_show_this_skill'])){ $event_options['canvas_show_this_skill'] = $trigger_options['canvas_show_this_skill'];  }
+        if (isset($trigger_options['canvas_show_this_skill_overlay'])){ $event_options['canvas_show_this_skill_overlay'] = $trigger_options['canvas_show_this_skill_overlay'];  }
+        if (isset($trigger_options['canvas_show_this_skill_underlay'])){ $event_options['canvas_show_this_skill_underlay'] = $trigger_options['canvas_show_this_skill_underlay'];  }
 
         // Apply appropriate camera action flags to the event options
         rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $this_skill, 'target');
