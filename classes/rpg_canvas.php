@@ -1045,7 +1045,7 @@ class rpg_canvas {
         if (is_numeric($this_data['item_frame']) && $this_data['item_frame'] >= 0){ $this_data['item_frame'] = str_pad($this_data['item_frame'], 2, '0', STR_PAD_LEFT); }
         elseif (is_numeric($this_data['item_frame']) && $this_data['item_frame'] < 0){ $this_data['item_frame'] = ''; }
         //$this_data['item_image'] = 'images/items/'.(!empty($this_data['item_image']) ? $this_data['item_image'] : $this_data['item_token']).'/sprite_'.$this_data['item_direction'].'_'.$this_data['item_size'].'x'.$this_data['item_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE;
-        $this_data['item_frame_offset'] = isset($options['item_frame_offset']) && is_array($options['item_frame_offset']) ? $options['item_frame_offset'] : $this_item->item_frame_offset;
+        $this_data['item_frame_offset'] = !empty($options['item_frame_offset']) && is_array($options['item_frame_offset']) ? $options['item_frame_offset'] : $this_item->item_frame_offset;
         $animate_frames_array = isset($options['item_frame_animate']) ? $options['item_frame_animate'] : array($this_data['item_frame']);
         $animate_frames_string = array();
         if (!empty($animate_frames_array)){
@@ -2355,9 +2355,10 @@ class rpg_canvas {
                         // Display the object's icon sprite
                         if (empty($this_options['this_item_results']['total_actions'])
                             || !empty($this_options['this_item']->flags['force_canvas_header'])){
+                            $this_item_label = !empty($this_item_data['item_title']) ? $this_item_data['item_title'] : $this_options['this_item']->item_name;
                             $this_icon_markup_left = '<div class="sprite item_icon item_icon_left" style="background-image: url(images/items/'.(!empty($this_options['this_item']->item_image) ? $this_options['this_item']->item_image : $this_options['this_item']->item_token).'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></div>';
                             $this_icon_markup_right = '<div class="sprite item_icon item_icon_right" style="background-image: url(images/items/'.(!empty($this_options['this_item']->item_image) ? $this_options['this_item']->item_image : $this_options['this_item']->item_token).'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></div>';
-                            $this_icon_markup_combined =  '<div class="'.$this_item_data['item_markup_class'].' canvas_item_details item_type type type_'.(!empty($this_options['this_item']->item_type) ? $this_options['this_item']->item_type : 'none').(!empty($this_options['this_item']->item_type2) ? '_'.$this_options['this_item']->item_type2 : '').'">'.$this_icon_markup_left.'<div class="item_name">'.$this_item_data['item_title'].'</div>'.$this_icon_markup_right.'</div>';
+                            $this_icon_markup_combined =  '<div class="item item_sprite canvas_item_details item_type type type_'.(!empty($this_options['this_item']->item_type) ? $this_options['this_item']->item_type : 'none').(!empty($this_options['this_item']->item_type2) ? '_'.$this_options['this_item']->item_type2 : '').'">'.$this_icon_markup_left.'<div class="item_name">'.$this_item_label.'</div>'.$this_icon_markup_right.'</div>';
                             if (isset($this_options['canvas_show_this_item_underlay'])
                                 && empty($this_options['canvas_show_this_item_underlay'])
                                 && !empty($this_options['canvas_show_this_item_overlay'])){

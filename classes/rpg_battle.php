@@ -2586,6 +2586,7 @@ class rpg_battle extends rpg_object {
         $options['canvas_show_this_ability_overlay'] = isset($eventinfo['event_options']['canvas_show_this_ability_overlay']) ? $eventinfo['event_options']['canvas_show_this_ability_overlay'] : false;
         $options['canvas_show_this_item'] = isset($eventinfo['event_options']['canvas_show_this_item']) ? $eventinfo['event_options']['canvas_show_this_item'] : true;
         $options['canvas_show_this_item_overlay'] = isset($eventinfo['event_options']['canvas_show_this_item_overlay']) ? $eventinfo['event_options']['canvas_show_this_item_overlay'] : false;
+        $options['canvas_show_this_item_underlay'] = isset($eventinfo['event_options']['canvas_show_this_item_underlay']) ? $eventinfo['event_options']['canvas_show_this_item_underlay'] : true;
         $options['canvas_show_this_skill'] = isset($eventinfo['event_options']['canvas_show_this_skill']) ? $eventinfo['event_options']['canvas_show_this_skill'] : true;
         $options['canvas_show_this_skill_overlay'] = isset($eventinfo['event_options']['canvas_show_this_skill_overlay']) ? $eventinfo['event_options']['canvas_show_this_skill_overlay'] : false;
         $options['canvas_show_this_skill_underlay'] = isset($eventinfo['event_options']['canvas_show_this_skill_underlay']) ? $eventinfo['event_options']['canvas_show_this_skill_underlay'] : true;
