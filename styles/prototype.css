@@ -1422,7 +1422,7 @@ body[data-source="website"] #prototype .menu {
     z-index: 100;
     cursor: help;
     transform: scale(1);
-    filter: brightness(0.8) opacity(0);
+    filter: brightness(0.8) opacity(0.9);
     transition: color 0.3s, transform 0.3s, filter 0.3s;
 }
 #mmrpg #prototype .option_this-robot-select:hover .icons.info {

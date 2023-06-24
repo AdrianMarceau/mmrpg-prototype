@@ -2207,7 +2207,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         if (!empty($stat_reward_icons)){ $temp_sprite_top -= 6; }
         $pinned_fav_icons = $this_robot_favourite ? ' <span class="icons favs"><i class="fa fas fa-thumbtack"></i></span>' : '';
 
-        $info_tooltip_icons = ' <span class="icons info" data-tooltip="'.$this_option_title_tooltip.'" data-tooltip-type="'.$this_option_type_token.'"><i class="fa fas fa-info-circle"></i></span>';
+        $info_tooltip_icons = ' <span class="icons info" data-click-tooltip="'.$this_option_title_tooltip.'" data-tooltip-type="'.$this_option_type_token.'"><i class="fa fas fa-info-circle"></i></span>';
 
         $robot_sprite_url = 'images/robots/'.$this_option_image.'/sprite_right_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
         $robot_sprite_markup = '<span class="sprite sprite_robot sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_base" style="background-image: url('.$robot_sprite_url.'); top: '.$temp_sprite_top.'px;"></span>';
