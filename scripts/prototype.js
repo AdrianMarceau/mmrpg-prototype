@@ -1328,7 +1328,7 @@ function prototype_menu_switch(switchOptions){
                         //console.log('AJAX POST to MENU-WRAPPER :');
                         //console.log({step:currentMenuStep,select:currentMenuSelect,condition:tempMenuCondition});
 
-                        // If the player select has been skipped, do not bother loading missions
+                        // If the player select has been skipped, do not bother loading missions as they're already there
                         if (gameSettings.skipPlayerSelect){
 
                             // DEBUG
@@ -1344,7 +1344,7 @@ function prototype_menu_switch(switchOptions){
                             gameSettings.skipPlayerSelect = false;
 
                             }
-                        // Otherwise load the missions normally
+                        // Otherwise load the missions normally over ajax and replace the markup
                         else {
 
                             // Attempt to refresh the markup for this particular wrapper
@@ -1359,15 +1359,17 @@ function prototype_menu_switch(switchOptions){
 
                                     // If the markup is not empty, replace this menu's options
                                     if (markup.length){
-                                        var tempMarkup = $(markup);
+                                        var innerMarkup = markup;
+                                        innerMarkup = innerMarkup.replace(/^<div[^<>]+>/i, '');
+                                        innerMarkup = innerMarkup.replace(/<\/div>$/i, '');
                                         tempMenuWrapper.find('.chapter_select').remove();
                                         tempMenuWrapper.find('.option').not('.option_sticky').remove();
                                         var innerMenuWrapper = tempMenuWrapper.find('.wrap');
                                         if (innerMenuWrapper.length){
                                             innerMenuWrapper.empty();
-                                            innerMenuWrapper.append(tempMarkup.html());
+                                            innerMenuWrapper.append(innerMarkup);
                                             } else {
-                                            tempMenuWrapper.append(tempMarkup.html());
+                                            tempMenuWrapper.append(innerMarkup);
                                             }
                                         $('.option_message:gt(0)', tempMenuWrapper).trigger('click');
                                         }
@@ -1393,15 +1395,18 @@ function prototype_menu_switch(switchOptions){
 
                 }
 
-                } else {
+            } else {
+
+                // DEBUG
+                //console.log('currentMenuSelect is undefined');
 
                 // Trigger the callback function anyway
                 tempCallbackFunction();
 
-                }
+            }
 
 
-            };
+        };
 
         // Create the temporary fadein function for this menu
         var tempFadeinFunction = function(tempCallbackFunction){

@@ -1363,8 +1363,10 @@ body[data-source="website"] #prototype .menu {
     left: -15px;
 }
 #mmrpg #prototype .option_this-robot-select .icons.stats,
-#mmrpg #prototype .option_this-robot-select .icons.favs {
+#mmrpg #prototype .option_this-robot-select .icons.favs,
+#mmrpg #prototype .option_this-robot-select .icons.info {
     position: absolute;
+    text-align: center;
 }
 #mmrpg #prototype .option_this-robot-select .icons.stats {
     bottom: 0;
@@ -1376,12 +1378,48 @@ body[data-source="website"] #prototype .menu {
     background-color: transparent;
 }
 #mmrpg #prototype .option_this-robot-select .icons.favs {
+    top: -9px;
+    left: -2px;
+    font-size: 12px;
+    color: #cccccc;
+    transform: rotate(-15deg);
+}
+#mmrpg #prototype .option_this-robot-select .icons.favs i {
+    position: relative;
+}
+#mmrpg #prototype .option_this-robot-select .icons.favs i:after {
+    content: "";
+    display: block;
+    width: 60%;
+    height: 0;
+    border-top: 1px solid #000000;
+    border-bottom: 1px solid #202020;
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    transform: translate(-60%, 0);
+}
+#mmrpg #prototype .option_this-robot-select .icons.info {
     top: -8px;
     right: -8px;
     font-size: 12px;
-    transform: rotate(26deg);
     color: #cccccc;
+    line-height: 1;
+    z-index: 100;
+    cursor: help;
+    transform: scale(1);
+    filter: brightness(0.8) opacity(0);
+    transition: color 0.3s, transform 0.3s, filter 0.3s;
 }
+#mmrpg #prototype .option_this-robot-select:hover .icons.info {
+    filter: brightness(0.8) opacity(1);
+}
+#mmrpg #prototype .option_this-robot-select .icons.info:hover {
+    color: #ffffff;
+    transform: scale(1.2);
+    filter: brightness(1.0) opacity(1);
+}
+
 #mmrpg #prototype .option_this-robot-select .multi {
     text-align: right;
     width: 65%;

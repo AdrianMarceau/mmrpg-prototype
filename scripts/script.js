@@ -214,21 +214,21 @@ $(document).ready(function(){
                 });
 
             // Define the live MOUSELEAVE events for any elements with a title tag (which should be many)
-            $(tooltipSelector, mmrpgBody).live('mouseleave', function(e){
+            $(tooltipSelector, mmrpgBody).live('mouseleave mouseout', function(e){
                 e.preventDefault();
-                var thisElement = $(this);
                 $('.tooltip', mmrpgBody).empty();
-                //thisElement.attr('title', thisElement.attr('data-backup-title'));
-                var thisDate = new Date();
-                var thisTime = thisDate.getTime();
-                //console.log('clear tooltip timeout at '+thisTime);
                 clearTimeout(tooltipTimeout);
                 tooltipTimeout = false;
                 tooltipShowing = false;
                 });
 
-                //$('*', mmrpgBody).click(function(e){ $('.tooltip', mmrpgBody).remove(); });
-                $('*', mmrpgBody).click(function(e){ $('.tooltip', mmrpgBody).empty(); });
+            // If the user clicks somewhere in the body, immediately remove the tooltip
+            $('*', mmrpgBody).click(function(e){
+                $('.tooltip', mmrpgBody).empty();
+                clearTimeout(tooltipTimeout);
+                tooltipTimeout = false;
+                tooltipShowing = false;
+                });
 
             }
 
