@@ -186,7 +186,7 @@ $(document).ready(function(){
                 };
 
             // Define the live MOUSEENTER events for any elements with a title tag (which should be many)
-            var tooltipSelector = '*[title],*[data-backup-title],*[data-tooltip]';
+            var tooltipSelector = '*[title],*[data-backup-title]:not([data-click-tooltip]),*[data-tooltip]';
             $(tooltipSelector, mmrpgBody).live('mouseenter', function(e){
                 e.preventDefault();
                 if (tooltipTimeout == false){
@@ -235,7 +235,7 @@ $(document).ready(function(){
                 });
 
             // Define the live MOUSELEAVE events for any elements with a title tag (which should be many)
-            $(tooltipSelector, mmrpgBody).live('mouseleave mouseout', function(e){
+            $(tooltipSelector, mmrpgBody).live('mouseleave', function(e){
                 e.preventDefault();
                 $('.tooltip', mmrpgBody).empty();
                 clearTimeout(tooltipTimeout);

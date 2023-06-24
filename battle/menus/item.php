@@ -293,7 +293,7 @@ ob_start();
                 $btn_type = 'item_type item_type_'.(!empty($temp_item->item_type) ? $temp_item->item_type : 'none').(!empty($temp_item->item_type2) ? '_'.$temp_item->item_type2 : '');
                 $btn_class = 'button action_item item_'.$temp_item->item_token.' '.$btn_type.' block_'.$equipped_abilities_count.' ';
                 $btn_action = 'item_'.$temp_item->item_id.'_'.$temp_item->item_token;
-                $btn_info_circle = '<span class="info" data-tooltip="'.$temp_item_details_tooltip.'" data-tooltip-type="'.$btn_type.'"><i class="fa fas fa-info-circle"></i></span>';
+                $btn_info_circle = '<span class="info" data-click-tooltip="'.$temp_item_details_tooltip.'" data-tooltip-type="'.$btn_type.'"><i class="fa fas fa-info-circle"></i></span>';
                 if ($temp_button_enabled){
                     echo('<a type="button" class="'.$btn_class.'" data-order="'.$temp_order_counter.'" data-action="'.$btn_action.'" data-target="'.$temp_target.'">'.
                             '<label>'.

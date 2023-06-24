@@ -3692,7 +3692,7 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     z-index: 100;
     cursor: help;
     transform: scale(1);
-    filter: brightness(0.8) opacity(0);
+    filter: brightness(0.8) opacity(0.9);
     transition: transform 0.3s, filter 0.3s;
 }
 #actions .actions_option .action_option:hover label .info,
