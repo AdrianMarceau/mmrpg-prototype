@@ -2111,7 +2111,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_option_size = !empty($info['robot_image_size']) ? $info['robot_image_size'] : 40;
         $temp_size = $this_option_size;
         $temp_size_text = $temp_size.'x'.$temp_size;
-        $temp_top = -2 + (40 - $temp_size);
+        $temp_sprite_top = -2 + (40 - $temp_size);
         $temp_right_inc = $temp_size > 40 ? ceil(($temp_size * 0.5) - 60) : 0;
         $temp_right = 15 + $temp_right_inc;
         $this_robot_name = $info['robot_name'];
@@ -2156,6 +2156,9 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
             }
         }
 
+        // Collect info about the robot's item if it exists
+        $this_robot_item_info = !empty($this_robot_item) && isset($this_item_index[$this_robot_item]) ? $this_item_index[$this_robot_item] : array();
+
         $starcount = 0;
         $bullcount = 0;
         $namestring = '';
@@ -2179,7 +2182,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_option_title .= ' ('.(!empty($info['robot_core']) ? ucfirst($info['robot_core']).' Core' : 'Neutral Core').')';
         $this_option_title .= ' <br />Level '.$this_robot_level.($this_robot_level >= 100 ? ' &#9733;' : '');
         $this_option_title .= ' | '.$this_robot_experience_title.'/1000 Exp'.(!empty($this_robot_favourite_title) ? ' '.$this_robot_favourite_title : '');
-        if (!empty($this_robot_item) && isset($this_item_index[$this_robot_item])){ $this_option_title .= ' | + '.$this_item_index[$this_robot_item]['item_name'].' '; }
+        if (!empty($this_robot_item_info)){ $this_option_title .= ' | + '.$this_robot_item_info['item_name'].' '; }
         $this_option_title .= ' <br />E: '.$this_robot_energy; //.($this_robot_stats['energy']['bonus'] >= $this_robot_stats['energy']['bonus_max'] ? ($level_max ? ' &#9733;' : ' &bull;') : '');
         $this_option_title .= ' | A: '.$this_robot_attack.($this_robot_stats['attack']['bonus'] >= $this_robot_stats['attack']['bonus_max'] ? ($level_max ? ' &#9733;' : ' &bull;') : '');
         $this_option_title .= ' | D: '.$this_robot_defense.($this_robot_stats['defense']['bonus'] >= $this_robot_stats['defense']['bonus_max'] ? ($level_max ? ' &#9733;' : ' &bull;') : '');
@@ -2201,17 +2204,22 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_option_type_token = 'robot_type robot_type_'.(!empty($this_robot_core) ? $this_robot_core : 'none').(!empty($this_robot_core2) ? '_'.$this_robot_core2 : '');
 
         $stat_reward_icons = !empty($namestring) ? ' <span class="icons stats">'.$namestring.'</span>' : '';
-        if (!empty($stat_reward_icons)){ $temp_top -= 6; }
+        if (!empty($stat_reward_icons)){ $temp_sprite_top -= 6; }
         $pinned_fav_icons = $this_robot_favourite ? ' <span class="icons favs"><i class="fa fas fa-thumbtack"></i></span>' : '';
 
         $info_tooltip_icons = ' <span class="icons info" data-tooltip="'.$this_option_title_tooltip.'" data-tooltip-type="'.$this_option_type_token.'"><i class="fa fas fa-info-circle"></i></span>';
 
         $robot_sprite_url = 'images/robots/'.$this_option_image.'/sprite_right_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
+        $robot_sprite_markup = '<span class="sprite sprite_robot sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_base" style="background-image: url('.$robot_sprite_url.'); top: '.$temp_sprite_top.'px;"></span>';
+
+        if (!empty($this_robot_item_info)){
+            $item_sprite_url = 'images/items/'.$this_robot_item_info['item_image'].'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
+            $robot_item_sprite_markup = '<span class="sprite sprite_item sprite_40x40 sprite_40x40_00" style="background-image: url('.$item_sprite_url.');"></span>';
+        }
 
         $this_option_label = '';
-        $this_option_label .= '<span class="sprite sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_base" style="background-image: url('.$robot_sprite_url.'); top: '.$temp_top.'px; right: '.$temp_right.'px;">';
-            $this_option_label .= $info['robot_name'];
-        $this_option_label .= '</span>';
+        $this_option_label .= $robot_sprite_markup;
+        if (!empty($robot_item_sprite_markup)){ $this_option_label .= $robot_item_sprite_markup; }
         $this_option_label .= '<span class="multi">';
             $this_option_label .= $info_tooltip_icons;
             $this_option_label .= $pinned_fav_icons;
@@ -2224,9 +2232,16 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
             $this_option_label .= '&#9658;';
         $this_option_label .= '</span>';
 
-        $this_robots_markup .= '<a class="'.$this_option_class.'" data-child="true" data-token="'.$this_option_token.'" style="'.$this_option_style.'">';
-        $this_robots_markup .= '<div class="chrome chrome_type '.$this_option_type_token.'"><div class="inset"><label class="has_image">'.$this_option_label.'</label></div></div>';
-        $this_robots_markup .= '</a>'."\r\n";
+        $this_option_label_class = 'has_image ';
+        if (!empty($stat_reward_icons)){ $this_option_label_class .= 'has_rewards '; }
+
+        $this_robot_markup = '';
+        $this_robot_markup .= '<a class="'.$this_option_class.'" data-child="true" data-token="'.$this_option_token.'" style="'.$this_option_style.'">';
+        $this_robot_markup .= '<div class="chrome chrome_type '.$this_option_type_token.'"><div class="inset"><label class="'.$this_option_label_class.'">'.$this_option_label.'</label></div></div>';
+        $this_robot_markup .= '</a>'."\r\n";
+
+
+        $this_robots_markup .= $this_robot_markup;
     }
 
     // Loop through and display any option padding cells

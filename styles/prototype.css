@@ -1362,6 +1362,20 @@ body[data-source="website"] #prototype .menu {
 #mmrpg #prototype .option_this-robot-select .sprite_80x80 {
     left: -15px;
 }
+#mmrpg #prototype .option_this-robot-select .sprite_robot {
+    top: -8px;
+    z-index: 2;
+}
+#mmrpg #prototype .option_this-robot-select .has_image .sprite_item {
+    left: -8px;
+    bottom: -5px;
+    z-index: 3;
+    background-color: rgba(255, 0, 0, 0);
+}
+#mmrpg #prototype .option_this-robot-select .has_image.has_rewards .sprite_item {
+    bottom: 2px;
+    background-color: rgba(0, 255, 0, 0);
+}
 #mmrpg #prototype .option_this-robot-select .icons.stats,
 #mmrpg #prototype .option_this-robot-select .icons.favs,
 #mmrpg #prototype .option_this-robot-select .icons.info {
@@ -1403,7 +1417,7 @@ body[data-source="website"] #prototype .menu {
     top: -8px;
     right: -8px;
     font-size: 12px;
-    color: #cccccc;
+    color: #efefef;
     line-height: 1;
     z-index: 100;
     cursor: help;

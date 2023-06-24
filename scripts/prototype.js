@@ -724,7 +724,7 @@ function prototype_menu_click_option(thisContext, thisOption){
         var tokenParentCount = tokenParentValue.split(',').length;
 
         // Create a clone of this option's sprite element
-        var tempSprite = $('.sprite', thisOption.get(0));
+        var tempSprite = $('.sprite.sprite_robot', thisOption.get(0));
         if (tempSprite.hasClass('sprite_40x40')){ var tempSize = 40; }
         else if (tempSprite.hasClass('sprite_80x80')){ var tempSize = 80; }
         else if (tempSprite.hasClass('sprite_160x160')){ var tempSize = 160; }
@@ -859,7 +859,7 @@ function prototype_menu_click_option(thisContext, thisOption){
                     $('.option[data-child]', tempMenu).removeClass('option_disabled');
                     $('.option[data-parent]', tempMenu).addClass('option_disabled').attr('data-token', '').css({opacity:''}).find('.count').html('0/'+gameSettings.nextRobotLimit+' Select').end().find('.arrow').html('&nbsp;');
                     //$('.option[data-parent] label', tempMenu).css({paddingLeft:''});
-                    $('.option[data-parent] .sprite:not(.sprite_40x40_placeholder)', tempMenu).remove();
+                    $('.option[data-parent] .sprite:not(.sticky)', tempMenu).remove();
                     $('.sprite_40x40_placeholder', tempMenu).css({display:''});
                     delete battleOptions['this_player_robots'];
                     $(this).css({opacity:0});
@@ -892,11 +892,11 @@ function prototype_menu_click_option(thisContext, thisOption){
                 var someValue = 80 + ((tokenParentLimit * 40) - (iCounter * 40) + 40);
                 //var someValue = (gameSettings.totalRobotLimit * 40) - (iCounter * 40) + 40;
 
-                var heartClass = 'sprite sprite_40x40 sprite_40x40_heartback ';
+                var heartClass = 'sprite sprite_40x40 sprite_40x40_heartback sticky ';
                 var heartStyle = ' bottom: 4px; right: '+(someValue - 2)+'px; left: auto; z-index: 1; text-indent: 0; text-align: center; color: #262626; font-size: 24px; ';
                 spriteMarkup += '<span class="'+heartClass+'" style="'+heartStyle+'"><i class="fa fas fa-heart"></i></span>';
 
-                var spriteClass = 'sprite sprite_40x40 sprite_40x40_base sprite_40x40_placeholder ';
+                var spriteClass = 'sprite sprite_40x40 sprite_40x40_base sprite_40x40_placeholder sticky ';
                 //var spriteStyle = 'bottom: 6px; right: '+someValue+'px; left: auto; z-index: 2; background-image: url(images/robots/robot/sprite_right_40x40.png?'+gameSettings.cacheTime+'); ';
                 var spriteStyle = 'bottom: 6px; right: '+someValue+'px; left: auto; z-index: 2; ';
                 spriteMarkup += '<span data-key="'+(gameSettings.nextRobotLimit - iCounter)+'" class="'+spriteClass+'" style="'+spriteStyle+'">Select Robot</span>';
@@ -1111,7 +1111,7 @@ function prototype_menu_click_back(thisContext, thisLink){
                 $('.option[data-child]', tempMenu).removeClass('option_disabled');
                 $('.option[data-parent]', tempMenu).addClass('option_disabled').attr('data-token', '').css({opacity:''}).find('.count').html('0/'+gameSettings.nextRobotLimit+' Select').end().find('.arrow').html('&nbsp;');
                 $('.option[data-parent] label', tempMenu).css({paddingLeft:''});
-                $('.option[data-parent] .sprite:not(.sprite_40x40_placeholder)', tempMenu).remove();
+                $('.option[data-parent] .sprite:not(.sticky)', tempMenu).remove();
                 $('.sprite_40x40_placeholder', tempMenu).css({display:''});
                 delete battleOptions['this_player_robots'];
                 }
