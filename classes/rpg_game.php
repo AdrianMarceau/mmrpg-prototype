@@ -2228,17 +2228,18 @@ class rpg_game {
 
         // First check to ensure it matches the established condition format
         // examples: "attack < 3" or "defense >= 2" or "energy < 50%"
-        if (!preg_match('/^([-_a-z]+)\s?([\<\>\=\!\%]+)\s?(\-?[0-9]+\%?)$/i', $condition, $matches)){
+        if (!preg_match('/^([-_a-z]+)\s?([\<\>\=\!\%]+)\s?(\-?[0-9]+\%?|[-_a-z0-9]+)$/i', $condition, $matches)){
             error_log('skill parameter "condition" was set but was invalid ('.$this_object_token.':'.__LINE__.')');
             error_log('$condition = '.print_r($condition, true));
             return false;
         }
         // Now check to make sure the individual parts of the condition are allowed
+        $allowed_condition_keywords = array('field-type', 'robot-position');
         $allowed_condition_stats = array('energy', 'weapons', 'attack', 'defense', 'speed');
         $allowed_condition_operators = array('=', '<=', '>=', '<', '>', '<>');
         list($x, $c_stat, $c_operator, $c_value) = $matches;
-        if (!in_array($c_stat, $allowed_condition_stats)
-            && $c_stat !== 'field-type'
+        if (!in_array($c_stat, $allowed_condition_keywords)
+            && !in_array($c_stat, $allowed_condition_stats)
             && !preg_match('/^field-multiplier-([a-z]+)$/', $c_stat)){
             error_log('skill parameter "condition" stat was set but was invalid ('.$this_object_token.':'.__LINE__.')');
             error_log('$c_stat = '.print_r($c_stat, true));
@@ -2251,6 +2252,7 @@ class rpg_game {
             // Validate the value parameter differently for energy/weapons vs attack/defense/speed stats
             $is_energy_c_stat = $c_stat === 'energy' || $c_stat === 'weapons' ? true : false;
             $is_field_type_c_stat = $c_stat === 'field-type' ? true : false;
+            $is_robot_position_c_stat = $c_stat === 'robot-position' ? true : false;
             $is_field_multiplier_c_stat = preg_match('/^field-multiplier-([a-z]+)$/', $c_stat) ? true : false;
             if ($is_energy_c_stat){
                 if (!strstr($c_value, '%')){
@@ -2266,6 +2268,13 @@ class rpg_game {
                 $allowed_field_types = array_keys(rpg_type::get_index(false, false, false, false));
                 if (!in_array($c_value, $allowed_field_types)){
                     error_log('skill parameter "condition" value must be a valid type for field types ('.$this_object_token.':'.__LINE__.')');
+                    error_log('$c_value = '.print_r($c_value, true));
+                    return false;
+                }
+            } elseif ($is_robot_position_c_stat) {
+                $allowed_position_values = array('active', 'bench');
+                if (!in_array($c_value, $allowed_position_values)){
+                    error_log('skill parameter "condition" value must be a valid for robot positions ('.$this_object_token.':'.__LINE__.')');
                     error_log('$c_value = '.print_r($c_value, true));
                     return false;
                 }

@@ -5942,8 +5942,12 @@ class rpg_robot extends rpg_object {
     // Define a function for checking if a given "condition" has been satisfied for this robot
     public function check_battle_condition_is_true($condition_parameters){
 
+        // NOTE: Conditions have already been validated by this point via rpg_game::check_battle_condition_is_valid()
+
         // Break apart the parameters into stat/operator/value variables
         list($c_stat, $c_operator, $c_value) = array_values($condition_parameters);
+        //error_log('Checking condition: '.$c_stat.' '.$c_operator.' '.$c_value);
+        //error_log('Parsed from $condition_parameters = '.print_r($condition_parameters, true));
 
         // If we're comparing STANDARD STAT VALUES of the current robot
         if (preg_match('/^(energy|weapons|attack|defense|speed)$/', $c_stat)){
@@ -5999,6 +6003,18 @@ class rpg_robot extends rpg_object {
 
             // Compare the required value with the actual one and return true if they match
             if (version_compare($multi_stat_value_current, $multi_stat_value_required, $c_operator)){
+                return true;
+            }
+
+        }
+        // Else if we're comparing ROBOT POSITION VALUES of the current robot
+        elseif ($c_stat === 'robot-position'){
+
+            // Collect the current multiplier for the requested type
+            $robot_position_required = $c_value;
+            $robot_position_current = $this->get_info('robot_position');
+            // Check to see if required type is in list of current types and return true if they match
+            if ($robot_position_current === $robot_position_required){
                 return true;
             }
 
