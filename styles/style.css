@@ -199,6 +199,9 @@ body.index #header {
     margin: 0 auto;
 }
 
+#mmrpg [data-click-tooltip] > * {
+    pointer-events: none;
+}
 
 
 #mmrpg .animate_fadein {

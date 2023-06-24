@@ -118,6 +118,11 @@ $(document).ready(function(){
         // Attempt to attach tooltips regardless of device
         if (true){
 
+            var tooltipDelay = 1200; //600;
+            var tooltipTimeout = false;
+            var tooltipShowing = false;
+            var tooltipInitiator = false;
+
             // Define the function for showing the tooltip
             var showTooltipFunction = function(e){
                 var thisElement = $(this);
@@ -128,6 +133,7 @@ $(document).ready(function(){
                 var thisClassList = thisElement.attr('class') != undefined ? thisElement.attr('class').split(/\s+/) : '';
                 var thisTitle = thisElement.attr('data-backup-title') != undefined ? thisElement.attr('data-backup-title') : (thisElement.attr('title') != undefined ? thisElement.attr('title') : '');
                 var thisTooltip = thisElement.attr('data-tooltip') != undefined ? thisElement.attr('data-tooltip') : '';
+                if (!thisTooltip.length && thisElement.attr('data-click-tooltip') != undefined){ thisTooltip = thisElement.attr('data-click-tooltip'); }
                 if (!thisTitle.length && !thisTooltip.length){ return false; }
                 else if (thisTitle.length && !thisTooltip.length){ thisTooltip = thisTitle; }
                 thisTooltip = thisTooltip.replace(/\n/g, '<br />').replace(/\|\|/g, '<br />').replace(/\|/g, '<span class="pipe">|</span>').replace(/\s?\/\/\s?/g, '<br />').replace(/\[\[([^\[\]]+)\]\]/ig, '<span class="subtext">$1</span>');
@@ -155,10 +161,8 @@ $(document).ready(function(){
                 //$('.tooltip', mmrpgBody).css({width:''});
                 //var toolwidth = $('.tooltip', mmrpgBody).outerWidth();
                 //$('.tooltip', mmrpgBody).css({width:toolwidth+'px'});
-                var thisDate = new Date();
-                var thisTime = thisDate.getTime();
-                //console.log('animation should be done at '+thisTime);
                 alignTooltipFunction.call(this, e);
+                tooltipShowing = true;
                 };
 
             // Define the function for positioning the tooltip
@@ -182,17 +186,12 @@ $(document).ready(function(){
                 };
 
             // Define the live MOUSEENTER events for any elements with a title tag (which should be many)
-            var tooltipDelay = 1200; //600;
-            var tooltipTimeout = false;
-            var tooltipShowing = false;
             var tooltipSelector = '*[title],*[data-backup-title],*[data-tooltip]';
             $(tooltipSelector, mmrpgBody).live('mouseenter', function(e){
                 e.preventDefault();
                 if (tooltipTimeout == false){
-                    var thisDate = new Date();
-                    var thisTime = thisDate.getTime();
                     var thisObject = this;
-                    //console.log('set tooltip timeout for '+tooltipDelay+' at '+thisTime);
+                    tooltipInitiator = thisObject;
                     requestAnimationFrame(function(){
                         tooltipTimeout = setTimeout(function(){
                             tooltipShowing = true;
@@ -203,6 +202,28 @@ $(document).ready(function(){
                     if (thisElement.attr('title')){
                         thisElement.attr('data-backup-title', thisElement.attr('title'));
                         thisElement.removeAttr('title');
+                        }
+                    }
+                });
+
+            // Define the live CLICK events for any elements with a click-title tag (which should be a few)
+            var tooltipSelector = '*[data-click-tooltip]';
+            $(tooltipSelector, mmrpgBody).live('click', function(e){
+                e.preventDefault();
+                e.stopPropagation();
+                if (tooltipShowing){
+                    $('.tooltip', mmrpgBody).empty();
+                    clearTimeout(tooltipTimeout);
+                    tooltipTimeout = false;
+                    tooltipShowing = false;
+                    } else {
+                    if (tooltipTimeout == false){
+                        var thisObject = this;
+                        tooltipInitiator = thisObject;
+                        requestAnimationFrame(function(){
+                            tooltipShowing = true;
+                            showTooltipFunction.call(thisObject, e);
+                            });
                         }
                     }
                 });
@@ -224,6 +245,7 @@ $(document).ready(function(){
 
             // If the user clicks somewhere in the body, immediately remove the tooltip
             $('*', mmrpgBody).click(function(e){
+                if (e.target === tooltipInitiator){ return; }
                 $('.tooltip', mmrpgBody).empty();
                 clearTimeout(tooltipTimeout);
                 tooltipTimeout = false;
