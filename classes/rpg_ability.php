@@ -3462,6 +3462,22 @@ class rpg_ability extends rpg_object {
         return $temp_global_abilities;
     }
 
+    // Define a static function that returns a list of globally compatible support abilities
+    public static function get_global_support_abilities(){
+        // Define the list of global support abilities
+        $temp_global_support_abilities = array(
+            'buster-charge', 'buster-relay',
+            'energy-boost', 'attack-boost', 'defense-boost', 'speed-boost',
+            'energy-break', 'attack-break', 'defense-break', 'speed-break',
+            'energy-swap', 'attack-swap', 'defense-swap', 'speed-swap',
+            'energy-mode', 'attack-mode', 'defense-mode', 'speed-mode',
+            'field-support',
+            'core-shield',
+            );
+        // Return the list of global support abilities
+        return $temp_global_support_abilities;
+    }
+
     // Define a static function that returns a list of all T1 abilities (for the purposes of auto-generation)
     public static function get_tier_one_abilities(){
         global $db;
