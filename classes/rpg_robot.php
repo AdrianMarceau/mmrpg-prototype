@@ -218,10 +218,17 @@ class rpg_robot extends rpg_object {
             $this->robot_function = isset($functions['robot_function']) ? $functions['robot_function'] : function(){};
             $this->robot_function_onload = isset($functions['robot_function_onload']) ? $functions['robot_function_onload'] : function(){};
             $this->robot_function_onbattlestart = isset($functions['robot_function_onbattlestart']) ? $functions['robot_function_onbattlestart'] : function(){};
+            $this->robot_function_onability = isset($functions['robot_function_onability']) ? $functions['robot_function_onability'] : function(){};
             $this->robot_function_onendofturn = isset($functions['robot_function_onendofturn']) ? $functions['robot_function_onendofturn'] : function(){};
             $this->robot_function_ondamage = isset($functions['robot_function_ondamage']) ? $functions['robot_function_ondamage'] : function(){};
             $this->robot_function_onrecovery = isset($functions['robot_function_onrecovery']) ? $functions['robot_function_onrecovery'] : function(){};
             $this->robot_function_ondisabled = isset($functions['robot_function_ondisabled']) ? $functions['robot_function_ondisabled'] : function(){};
+            $this->robot_functions_custom = array();
+            foreach ($functions AS $name => $function){
+                if (strpos($name, 'robot_function_') === 0){ continue; }
+                elseif (!is_callable($function)){ continue; }
+                $this->robot_functions_custom[$name] = $function;
+            }
             unset($functions);
         }
 
@@ -368,11 +375,16 @@ class rpg_robot extends rpg_object {
         if (isset($extra_objects['options'])){ rpg_game::reset_options_object($extra_objects['options']); }
 
         // Pre-collect the skill and item objects beforehand so we can compare
+        $robot_object = $this;
         $skill_object = $this->get_robot_skill_object($extra_info);
         $item_object = $this->get_robot_item_object($extra_info);
 
         // Queue object functions based on priority values if they've been set
         $trigger_functions = array();
+        if (!empty($robot_object) && isset($robot_object->robot_functions_custom[$function])){
+            $robot_priority = isset($robot_object->priority) ? $robot_object->priority : 0;
+            $trigger_functions[] = array('kind' => 'robot', 'priority' => $robot_priority, 'robot' => $robot_object->robot_token);
+        }
         if (!empty($skill_object) && isset($skill_object->skill_functions_custom[$function])){
             $skill_priority = isset($skill_object->priority) ? $skill_object->priority : 0;
             $trigger_functions[] = array('kind' => 'skill', 'priority' => $skill_priority, 'skill' => $skill_object->skill_token);
@@ -391,9 +403,13 @@ class rpg_robot extends rpg_object {
 
         // Loop through queued trigger functions and execute them in order of priority
         foreach ($trigger_functions AS $trigger){
-            if ($trigger['kind'] === 'skill'){
+            if ($trigger['kind'] === 'robot'){
+                $return_values['robot'] = self::trigger_robot_function($function, $extra_objects, $extra_info, $robot_object);
+            }
+            elseif ($trigger['kind'] === 'skill'){
                 $return_values['skill'] = self::trigger_skill_function($function, $extra_objects, $extra_info, $skill_object);
-            } elseif ($trigger['kind'] === 'item'){
+            }
+            elseif ($trigger['kind'] === 'item'){
                 $return_values['item'] = self::trigger_item_function($function, $extra_objects, $extra_info, $item_object);
             }
         }
@@ -520,6 +536,26 @@ class rpg_robot extends rpg_object {
 
         // Return the collected skill
         return $this_skill;
+
+    }
+
+    // Define a public function for triggering an robot function if one is being held
+    public function trigger_robot_function($function, $extra_objects = array(), $extra_robot_info = array()){
+
+        // Check to make sure this robot has the given function defined, else return now
+        if (!isset($this->robot_functions_custom[$function])){ return; }
+        //error_log('triggering '.$this->robot_token.' via '.$function);
+
+        // Merge in any additional object refs into the array
+        if (!is_array($extra_objects)){ $extra_objects = array(); }
+        $extra_objects = array_merge($extra_objects, array('this_robot' => $this));
+
+        // Otherwise collect an array of global objects for this robot
+        $objects = $this->get_objects($extra_objects);
+        $return_value = $this->robot_functions_custom[$function]($objects);
+
+        // Return the return value
+        return $return_value;
 
     }
 
@@ -1584,7 +1620,27 @@ class rpg_robot extends rpg_object {
 
         // Extract all objects into the current scope
         extract($objects);
-        //error_log('$this_robot->robot_abilities = '.print_r($this_robot->robot_abilities, true));
+        //error_log('$this_robot->robot_token = '.print_r($this_robot->robot_token, true));
+        //error_log('$this_robot->robot_abilities = '.implode(', ', $this_robot->robot_abilities));
+
+        // If this robot has custom AI for ability choices, attempt to use that
+        $filter_allowed_abilities = false;
+        $allowed_abilities_filter = array();
+        if (!empty($this_robot->robot_function_onability)){
+            $custom_function = $this_robot->robot_function_onability;
+            $custom_function_return = $custom_function($objects);
+            //error_log('$custom_function_return = '.print_r($custom_function_return, true));
+            if (!empty($custom_function_return)){
+                if (is_string($custom_function_return)){
+                    return $custom_function_return;
+                } elseif (is_array($custom_function_return)){
+                    $filter_allowed_abilities = true;
+                    $allowed_abilities_filter = $custom_function_return;
+                }
+            }
+        }
+        //error_log('$filter_allowed_abilities = '.print_r($filter_allowed_abilities, true));
+        //error_log('$allowed_abilities_filter = '.print_r($allowed_abilities_filter, true));
 
         // Create the ability options and weights variables
         $options = array();
@@ -1881,6 +1937,17 @@ class rpg_robot extends rpg_object {
             $weights[$first_ability_position] = array_sum($weights) * 100;
         }
 
+        // If there's an allowed abilities filter, make sure we remove disabled ones
+        if (!empty($allowed_abilities_filter)){
+            foreach ($options AS $key => $token){
+                if (substr($token, 7) === 'action-'){ continue;}
+                if (!in_array($token, $allowed_abilities_filter)){
+                    unset($options[$key]);
+                    unset($weights[$key]);
+                }
+            }
+        }
+
         // Remove any options that have absolute zero values
         $weights_backup = $weights = array_values($weights);
         $options_backup = $options = array_values($options);
@@ -1899,7 +1966,8 @@ class rpg_robot extends rpg_object {
 
         // This robot doesn't have ANY abilities, automatically charge
         if (empty($options) || empty($weights)){
-            if ($this_robot->robot_weapons <= ($this_robot->robot_base_weapons / 2)){ return 'action-chargeweapons';  }
+            if ($filter_allowed_abilities){ return 'action-chargeweapons';  }
+            elseif ($this_robot->robot_weapons <= ($this_robot->robot_base_weapons / 2)){ return 'action-chargeweapons';  }
             elseif (!empty($options_backup)) { return $options_backup[mt_rand(0, (count($options_backup) - 1))];  }
             elseif (!empty($this_robot->robot_abilities)) { return $this_robot->robot_abilities[mt_rand(0, (count($this_robot->robot_abilities) - 1))];  }
             else { return $options_backup[mt_rand(0, (count($options_backup) - 1))];  }
