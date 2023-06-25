@@ -356,7 +356,7 @@ foreach ($this_menu_tooltips AS $token => $text){
                 data-to-date="<?= $this_rogue_star['star_to_date'] ?>"
                 data-to-date-time="<?= $this_rogue_star['star_to_date_time'] ?>"
                 data-star-power="<?= $this_rogue_star['star_power'] ?>"
-                data-tooltip="<?= $star_tooltip ?>"
+                data-click-tooltip="<?= $star_tooltip ?>"
                 data-tooltip-type="type_<?= $star_type ?>">
                 <div class="wrap">
                     <div class="label">
@@ -388,7 +388,7 @@ foreach ($this_menu_tooltips AS $token => $text){
             $battle_points_container_attrs[] = 'data-index="'.$this_menu_indexes['leaderboard'].'"';
             $battle_points_container_attrs[] = 'data-source="frames/leaderboard.php"';
             $battle_points_container_attrs[] = 'data-music="misc/leader-board"';
-            $battle_points_container_attrs[] = 'data-tooltip="'.$this_menu_tooltips['leaderboard'].'"';
+            $battle_points_container_attrs[] = 'data-maybe-tooltip="'.$this_menu_tooltips['leaderboard'].'"';
             $battle_points_container_attrs[] = 'data-tooltip-type="field_type field_type_'.MMRPG_SETTINGS_CURRENT_FIELDTYPE.'"';
         }
         $battle_points_container_attrs = implode(' ', $battle_points_container_attrs);
@@ -426,7 +426,7 @@ foreach ($this_menu_tooltips AS $token => $text){
             </div>
         </div>
 
-        <div class="options options_userinfo field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" data-step="file_save" data-index="<?= $this_menu_indexes['save'] ?>" data-source="frames/settings.php" data-music="misc/file-menu" data-tooltip="<?= $this_menu_tooltips['save'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+        <div class="options options_userinfo field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" data-step="file_save" data-index="<?= $this_menu_indexes['save'] ?>" data-source="frames/settings.php" data-music="misc/file-menu" data-maybe-tooltip="<?= $this_menu_tooltips['save'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
             <div class="wrapper">
                 <? $temp_user_name = !empty($this_userinfo['user_name_public']) && !empty($this_userinfo['user_flag_postpublic']) ? $this_userinfo['user_name_public'] : $this_userinfo['user_name']; ?>
                 <div class="info info_username">
@@ -458,7 +458,7 @@ foreach ($this_menu_tooltips AS $token => $text){
         <div class="options options_fullmenu field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
             <div class="wrapper">
 
-                <a class="link link_home link_active" data-step="<?= $unlock_count_players == 1 ? 2 : 1 ?>" data-index="<?= $this_menu_indexes['home'] ?>" data-music="misc/<?= $unlock_count_players == 1 ? 'stage-select-dr-light' : 'player-select' ?>" data-tooltip="<?= $this_menu_tooltips['home'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                <a class="link link_home link_active" data-step="<?= $unlock_count_players == 1 ? 2 : 1 ?>" data-index="<?= $this_menu_indexes['home'] ?>" data-music="misc/<?= $unlock_count_players == 1 ? 'stage-select-dr-light' : 'player-select' ?>" data-maybe-tooltip="<?= $this_menu_tooltips['home'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                     <i class="fa fas fa-home"></i>
                     <label>home</label>
                 </a>
@@ -466,47 +466,47 @@ foreach ($this_menu_tooltips AS $token => $text){
                     || mmrpg_prototype_item_unlocked('reggae-link')
                     || mmrpg_prototype_item_unlocked('kalinka-link')): ?>
                     <span class="pipe">|</span>
-                    <a class="link link_shop" data-step="shop" data-index="<?= $this_menu_indexes['shop'] ?>" data-source="frames/shop.php" data-music="misc/shop-music" data-tooltip="<?= $this_menu_tooltips['shop'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                    <a class="link link_shop" data-step="shop" data-index="<?= $this_menu_indexes['shop'] ?>" data-source="frames/shop.php" data-music="misc/shop-music" data-maybe-tooltip="<?= $this_menu_tooltips['shop'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <i class="fa fas fa-shopping-cart"></i>
                         <label>shop</label>
                     </a>
                 <? endif; ?>
                 <? if (mmrpg_prototype_players_unlocked() > 0): ?>
                     <span class="pipe">|</span>
-                    <a class="link link_players" data-step="edit_players" data-index="<?= $this_menu_indexes['players'] ?>" data-source="frames/edit_players.php?action=players" data-music="misc/player-editor" data-tooltip="<?= $this_menu_tooltips['players'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                    <a class="link link_players" data-step="edit_players" data-index="<?= $this_menu_indexes['players'] ?>" data-source="frames/edit_players.php?action=players" data-music="misc/player-editor" data-maybe-tooltip="<?= $this_menu_tooltips['players'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <i class="fa fas fa-user"></i>
                         <label><?= mmrpg_prototype_players_unlocked() > 1 ? 'players' : 'player' ?></label>
                     </a>
                 <? endif; ?>
                 <? if (mmrpg_prototype_battles_complete('dr-light') >= 1): ?>
                     <span class="pipe">|</span>
-                    <a class="link link_robots" data-step="edit_robots" data-index="<?= $this_menu_indexes['robots'] ?>" data-source="frames/edit_robots.php?action=robots" data-music="misc/robot-editor" data-tooltip="<?= $this_menu_tooltips['robots'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                    <a class="link link_robots" data-step="edit_robots" data-index="<?= $this_menu_indexes['robots'] ?>" data-source="frames/edit_robots.php?action=robots" data-music="misc/robot-editor" data-maybe-tooltip="<?= $this_menu_tooltips['robots'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <i class="fa fas fa-robot"></i>
                         <label>robots</label>
                     </a>
                 <? endif; ?>
                 <span class="pipe">|</span>
-                <a class="link link_data" data-step="database" data-index="<?= $this_menu_indexes['database'] ?>" data-source="frames/database.php" data-music="misc/data-base" data-tooltip="<?= $this_menu_tooltips['database'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                <a class="link link_data" data-step="database" data-index="<?= $this_menu_indexes['database'] ?>" data-source="frames/database.php" data-music="misc/data-base" data-maybe-tooltip="<?= $this_menu_tooltips['database'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                     <i class="fa fas fa-book"></i>
                     <label>database</label>
                 </a>
                 <? if (mmrpg_prototype_items_unlocked() > 0): ?>
                     <span class="pipe">|</span>
-                    <a class="link link_items" data-step="items" data-index="<?= $this_menu_indexes['items'] ?>" data-source="frames/items.php" data-music="misc/item-viewer" data-tooltip="<?= $this_menu_tooltips['items'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                    <a class="link link_items" data-step="items" data-index="<?= $this_menu_indexes['items'] ?>" data-source="frames/items.php" data-music="misc/item-viewer" data-maybe-tooltip="<?= $this_menu_tooltips['items'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <i class="fa fas fa-briefcase"></i>
                         <label>items</label>
                     </a>
                 <? endif; ?>
                 <? if (mmrpg_prototype_abilities_unlocked() > 2): ?>
                     <span class="pipe">|</span>
-                    <a class="link link_abilities" data-step="abilities" data-index="<?= $this_menu_indexes['abilities'] ?>" data-source="frames/abilities.php" data-music="misc/item-viewer" data-tooltip="<?= $this_menu_tooltips['abilities'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                    <a class="link link_abilities" data-step="abilities" data-index="<?= $this_menu_indexes['abilities'] ?>" data-source="frames/abilities.php" data-music="misc/item-viewer" data-maybe-tooltip="<?= $this_menu_tooltips['abilities'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <i class="fa fas fa-fire-alt"></i>
                         <label>abilities</label>
                     </a>
                 <? endif; ?>
                 <? if (mmrpg_prototype_stars_unlocked() > 0): ?>
                     <span class="pipe">|</span>
-                    <a class="link link_stars" data-step="stars" data-index="<?= $this_menu_indexes['stars'] ?>" data-source="frames/starforce.php" data-music="misc/star-force" data-tooltip="<?= $this_menu_tooltips['stars'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                    <a class="link link_stars" data-step="stars" data-index="<?= $this_menu_indexes['stars'] ?>" data-source="frames/starforce.php" data-music="misc/star-force" data-maybe-tooltip="<?= $this_menu_tooltips['stars'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <i class="fa fas fa-star"></i>
                         <label>stars</label>
                     </a>
