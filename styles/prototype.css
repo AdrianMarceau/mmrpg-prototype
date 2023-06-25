@@ -1416,6 +1416,7 @@ body[data-source="website"] #prototype .menu {
 #mmrpg #prototype .option_this-robot-select .icons.info {
     top: -8px;
     right: -8px;
+    left: auto;
     font-size: 12px;
     color: #efefef;
     line-height: 1;
@@ -1897,7 +1898,33 @@ body[data-source="website"] #prototype .menu {
     line-height: 11px;
     text-align: left;
     top: 1px;
+    bottom: 1px;
+    height: 100%;
 }
+
+#prototype .option_1x1 div label .info,
+#prototype .option_1x2 div label .info,
+#prototype .option_1x3 div label .info,
+#prototype .option_1x4 div label .info {
+    display: inline-block;
+    position: absolute;
+    top: -13px;
+    right: -14px;
+    font-size: 150%;
+    line-height: 1;
+    z-index: 100;
+    cursor: help;
+    color: #ffffff;
+    transform: scale(1);
+    transition: transform 0.3s;
+}
+#prototype .option_1x1 div label .info:hover,
+#prototype .option_1x2 div label .info:hover,
+#prototype .option_1x3 div label .info:hover,
+#prototype .option_1x4 div label .info:hover {
+    transform: scale(1.2);
+}
+
 #prototype .option_1x1 div label .multi .online_type,
 #prototype .option_1x2 div label .multi .online_type,
 #prototype .option_1x3 div label .multi .online_type,
@@ -1918,7 +1945,7 @@ body[data-source="website"] #prototype .menu {
 #prototype .option_1x4 div label .maintext {
     display: block;
     position: absolute;
-    width: 65%;
+    width: 85%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1927,6 +1954,12 @@ body[data-source="website"] #prototype .menu {
     font-weight: bold;
     top: 3px;
     z-index: 20;
+}
+#prototype .option_1x1 div label .maintext {
+    font-size: 9px;
+}
+#prototype .option_1x2 div label .maintext {
+    font-size: 10px;
 }
 #prototype .option_1x1 div label .icons {
     position: absolute;
@@ -2081,6 +2114,14 @@ body[data-source="website"] #prototype .menu {
     -moz-animation-name: starshakeX;
     -webkit-animation-name: starshakeX;
     animation-name: starshakeX;
+}
+
+#prototype .option_1x1.starfield div label .info,
+#prototype .option_1x2.starfield div label .info,
+#prototype .option_1x3.starfield div label .info,
+#prototype .option_1x4.starfield div label .info {
+    right: -200%;
+    right: calc(-200% + 2px);
 }
 
 

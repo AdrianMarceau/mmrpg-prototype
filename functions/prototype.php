@@ -1493,6 +1493,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             $this_option_zenny_amount = number_format($this_option_zenny, 0, '.', ',').' Zenny';
 
             if (!empty($this_option_button_text)){
+                $this_option_label .= '<span class="info" />';
                 $this_option_label .= '<span class="multi">';
                     if (($is_player_battle || $is_challenge_battle) && !$is_endless_battle){
                         $this_option_label .= '<span class="maintext">'.$this_option_button_text.'</span>';
@@ -1521,7 +1522,11 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                     }
                 $this_option_label .= '</span>';
                 if (!$this_has_field_star && (!$this_option_complete || ($this_option_complete && $this_option_encore))){
-                    $this_option_label .= '<span class="arrow"> &#9658;</span>';
+                    //$this_option_label .= '<span class="arrow"> &#9658;</span>';
+                    $icon = 'play';
+                    if (!empty($this_battleinfo['alpha_battle_token'])){ $icon = 'forward'; }
+                    if (!empty($this_battleinfo['battle_complete_redirect_token'])){ $icon = 'forward'; }
+                    $this_option_label .= '<span class="arrow"><i class="fa fas fa-'.$icon.'"></i></span>';
                 }
             } else {
                 $this_option_label .= '<span class="single">???</span>';
@@ -1669,13 +1674,15 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             if ($data_next_limit > $unlocked_robots_num){ $data_next_limit = $unlocked_robots_num; }
             if ($data_next_limit > $limit_hearts_earned && !$is_endless_battle && !$is_challenge_battle){ $data_next_limit = $limit_hearts_earned; }
 
+            $btn_info_circle = '<span class="info" data-click-tooltip="'.$this_option_title_tooltip.'" data-tooltip-type="'.$this_type_class.'"><i class="fa fas fa-info-circle"></i></span>';
+            $this_option_label = str_replace('<span class="info" />', $btn_info_circle, $this_option_label);
+
             // Print out the option button markup with sprite and name
             $this_markup .= '<a '.
                 'class="'.$this_option_class.'" '.
                 'data-token="'.(!empty($this_battleinfo['alpha_battle_token']) ? $this_battleinfo['alpha_battle_token'] : $this_battleinfo['battle_token']).'" '.
                 'data-next-limit="'.$data_next_limit.'" '.
                 'data-chapter="'.$this_info['option_chapter'].'" '.
-                'data-tooltip="'.$this_option_title_tooltip.'" '.
                 'data-field="'.htmlentities($this_fieldinfo['field_name'], ENT_QUOTES, 'UTF-8', true).'" '.
                 'data-description="'.htmlentities(($this_battleinfo['battle_description'].(!empty($this_battleinfo['battle_description2']) ? ' '.$this_battleinfo['battle_description2'] : '')), ENT_QUOTES, 'UTF-8', true).'" '.
                 'data-multipliers="'.$temp_field_multipliers.'" '.
