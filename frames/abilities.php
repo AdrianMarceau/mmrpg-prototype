@@ -181,7 +181,7 @@ if (true){
 
                                             ?>
                                             <td class="<?= $ability_cell_float ?> ability_cell<?= $temp_is_disabled ? ' ability_cell_disabled' : '' ?><?= !$temp_is_complete ? ' ability_cell_incomplete' : '' ?>" data-kind="ability" data-action="use-ability" data-token="<?= !$temp_is_comingsoon ? $ability_info_token : 'comingsoon' ?>" data-unlocked="<?= $temp_is_comingsoon ? 'coming-soon' : 'true' ?>">
-                                                <span class="ability_number ability_type ability_type_empty">No. <?= str_replace(' ', '&nbsp;', str_pad($ability_counter, 2, ' ', STR_PAD_LEFT)); ?></span><span class="ability_name ability_type ability_type_<?= $ability_info_type ?>" <?= !empty($temp_info_tooltip) ? 'data-tooltip="'.$temp_info_tooltip.'"' : '' ?>><?= $ability_info_name ?></span>
+                                                <span class="ability_number ability_type ability_type_empty">No. <?= str_replace(' ', '&nbsp;', str_pad($ability_counter, 2, ' ', STR_PAD_LEFT)); ?></span><span class="ability_name ability_type ability_type_<?= $ability_info_type ?>" <?= !empty($temp_info_tooltip) ? 'data-click-tooltip="'.$temp_info_tooltip.'"' : '' ?>><?= $ability_info_name ?></span>
                                                 <? if (!$temp_is_comingsoon): ?>
                                                     <span class="ability_sprite ability_type ability_type_empty"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/abilities/<?= $ability_sprite_image ?>/icon_right_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE?>);"></span></span>
                                                 <? else: ?>
