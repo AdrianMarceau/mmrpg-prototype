@@ -34,15 +34,6 @@ foreach ($shop_selling_tokens AS $selling_token){
                 require(MMRPG_CONFIG_ROOTDIR.'frames/shop_selling_abilities.php');
 
             }
-            // If this shop has fields to sell, print them out
-            elseif (
-                ($selling_token == 'fields' && !empty($shop_info['shop_fields']['fields_selling']))
-                ){
-
-                // Include the selling markup for battle fields to create starforce
-                require(MMRPG_CONFIG_ROOTDIR.'frames/shop_selling_fields.php');
-
-            }
             // If this shop has robots to sell, print them out
             elseif (
                 ($selling_token == 'robots' && !empty($shop_info['shop_robots']['robots_selling']))

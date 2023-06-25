@@ -131,7 +131,7 @@
 
                     ?>
                         <td class="<?= $alt_cell_float ?> item_cell" data-kind="alt" data-action="buy" data-token="<?= 'alt-'.$alt_info_token ?>">
-                            <span class="item_name robot_type robot_type_<?= $alt_info_type ?>" data-tooltip="<?= $temp_info_tooltip ?>"><?= $alt_info_name ?></span>
+                            <span class="item_name robot_type robot_type_<?= $alt_info_type ?>" data-click-tooltip="<?= $temp_info_tooltip ?>"><?= $alt_info_name ?></span>
                             <a class="buy_button robot_type robot_type_none" href="#">Buy</a>
                             <label class="item_quantity" data-quantity="0"><?= !empty($alt_info_quantity) ? '&#10004;' : '-' ?></label>
                             <label class="item_price" data-price="<?= $alt_info_price ?>">&hellip; <?= $alt_info_price ?>z</label>

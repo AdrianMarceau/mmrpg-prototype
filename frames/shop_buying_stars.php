@@ -246,7 +246,7 @@
 
                     ?>
                         <td class="<?= $star_cell_float ?> item_cell" data-kind="star" data-action="sell" data-token="<?= 'star-'.$star_info_token ?>">
-                            <span class="item_name ability_type ability_type_<?= $star_info_class ?>" data-tooltip="<?= $temp_info_tooltip ?>"><?= $star_info_name ?></span>
+                            <span class="item_name ability_type ability_type_<?= $star_info_class ?>" data-click-tooltip="<?= $temp_info_tooltip ?>"><?= $star_info_name ?></span>
                             <a class="sell_button ability_type ability_type_none" href="#">Show</a>
                             <label class="item_quantity" data-quantity="1" style="display: none;">x 1</label>
                             <label class="item_price" data-price="<?= $star_info_price ?>">&hellip; <?= $star_info_price ?>z</label>

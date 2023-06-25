@@ -107,7 +107,7 @@
 
                         ?>
                             <td class="<?= $ability_cell_float ?> item_cell" data-kind="ability" data-action="buy" data-token="<?= $ability_info_token ?>" data-unlocked="<?= implode(',', $ability_info_unlocked) ?>">
-                                <span class="item_name ability_type ability_type_<?= $ability_info_type ?>" data-tooltip="<?= $temp_info_tooltip ?>"><?= $ability_info_name ?></span>
+                                <span class="item_name ability_type ability_type_<?= $ability_info_type ?>" data-click-tooltip="<?= $temp_info_tooltip ?>"><?= $ability_info_name ?></span>
                                 <a class="buy_button ability_type ability_type_none" href="#">Buy</a>
                                 <label class="item_quantity" data-quantity="0"><?= !empty($ability_info_quantity) ? '&#10004;' : '-' ?></label>
                                 <label class="item_price" data-price="<?= $ability_info_price ?>">&hellip; <?= $ability_info_price ?>z</label>

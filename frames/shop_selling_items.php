@@ -66,7 +66,7 @@
 
                     ?>
                         <td class="<?= $item_cell_float ?> item_cell" data-kind="item" data-action="buy" data-token="<?= $item_info_token ?>">
-                            <span class="item_name ability_type ability_type_<?= $item_info_type ?>" data-tooltip="<?= $temp_info_tooltip ?>"><?= $item_info_name ?></span>
+                            <span class="item_name ability_type ability_type_<?= $item_info_type ?>" data-click-tooltip="<?= $temp_info_tooltip ?>"><?= $item_info_name ?></span>
                             <a class="buy_button ability_type ability_type_none" href="#">Buy</a>
                             <label class="item_quantity" data-quantity="0">x 0</label>
                             <label class="item_price" data-price="<?= $item_info_price ?>">&hellip; <?= $item_info_price ?>z</label>
