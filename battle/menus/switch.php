@@ -144,18 +144,22 @@ ob_start();
                 elseif ($temp_energy_percent > 0){ $temp_energy_class = 'low'; }
                 else { $temp_energy_class = 'zero'; }
 
+                // Collect the weapons percent so we know how they're doing
+                $temp_weapons_class = '';
+                $temp_weapons_percent = ceil(($temp_robot->robot_weapons / $temp_robot->robot_base_weapons) * 100);
+                if ($temp_weapons_percent > 50){ $temp_weapons_class = 'high'; }
+                elseif ($temp_weapons_percent > 25){ $temp_weapons_class = 'medium';  }
+                elseif ($temp_weapons_percent > 0){ $temp_weapons_class = 'low'; }
+                else { $temp_weapons_class = 'zero'; }
+
                 // Define the robot button text variables
                 $temp_robot_label = '<span class="multi">';
-                $temp_robot_label .= '<span class="maintext">'.$temp_robot->robot_name.' <sup>Lv. '.$temp_robot->robot_level.'</sup></span>';
+                $temp_robot_label .= '<span class="maintext">'.$temp_robot->robot_name.' <sup class="level">Lv. '.$temp_robot->robot_level.'</sup></span>';
                 $temp_robot_label .= '<span class="subtext">';
-                    $temp_robot_label .= '<span class="stat_is_'.$temp_energy_class.'">'.$temp_robot->robot_energy.'/'.$temp_robot->robot_base_energy.' Energy</span>';
+                    $temp_robot_label .= '<span class="stat_is_'.$temp_energy_class.'"><strong>'.$temp_robot->robot_energy.'</strong>/'.$temp_robot->robot_base_energy.' LE</span>';
                 $temp_robot_label .= '</span>';
                 $temp_robot_label .= '<span class="subtext">';
-                    $temp_robot_label .= 'A:'.$temp_robot->robot_attack;
-                    $temp_robot_label .= '&nbsp;';
-                    $temp_robot_label .= 'D:'.$temp_robot->robot_defense;
-                    $temp_robot_label .= '&nbsp;';
-                    $temp_robot_label .= 'S:'.$temp_robot->robot_speed;
+                    $temp_robot_label .= '<span class="stat_is_'.$temp_weapons_class.'"><strong>'.$temp_robot->robot_weapons.'</strong>/'.$temp_robot->robot_base_weapons.' WE</span>';
                 $temp_robot_label .= '</span>';
                 $temp_robot_label .= '</span>';
 
@@ -180,7 +184,28 @@ ob_start();
                 $temp_order_counter += $allow_button ? 1 : 0;
 
                 // Now use the new object to generate a snapshot of this switch button
-                ?><a <?= $order_button_markup ?> data-key="<?= $temp_robot->robot_key ?>" data-tooltip="<?= $temp_robot_title_tooltip ?>" class="button <?= !$allow_button ? 'button_disabled' : '' ?> action_switch switch_<?= $temp_robot->robot_token ?> status_<?= $temp_robot->robot_status ?> robot_type robot_type_<?= $temp_robot_core_type.(!empty($temp_robot_core2_type) ? '_'.$temp_robot_core2_type : '') ?> block_<?= $robot_key + 1 ?>" type="button" <?if($allow_button):?>data-action="switch_<?= $temp_robot->robot_id.'_'.$temp_robot->robot_token ?>"<?endif;?> data-preload="<?= $temp_robot_sprite['preload'] ?>"><label><?= $temp_robot_sprite['markup'] ?><?= $temp_robot_label ?></label></a><?
+                $btn_type = 'robot_type robot_type_'.(!empty($temp_robot->robot_core) ? $temp_robot->robot_core : 'none').(!empty($temp_robot->robot_core2_type) ? '_'.$temp_robot->robot_core2_type : '');
+                $btn_class = 'button action_switch switch_'.$temp_robot->robot_token.' '.$btn_type.' block_'.($robot_key + 1).' ';
+                $btn_action = 'switch_'.$temp_robot->robot_id.'_'.$temp_robot->robot_token;
+                $btn_info_circle = '<span class="info" data-click-tooltip="'.$temp_robot_title_tooltip.'" data-tooltip-type="'.$btn_type.'"><i class="fa fas fa-info-circle"></i></span>';
+                if ($allow_button){
+                    echo('<a type="button" class="'.$btn_class.'" data-action="'.$btn_action.'" data-preload="'.$temp_robot_sprite['preload'].'" data-key="'.$temp_robot->robot_key.'" '.$order_button_markup.'>'.
+                            '<label>'.
+                                $btn_info_circle.
+                                $temp_robot_sprite['markup'].
+                                $temp_robot_label.
+                            '</label>'.
+                        '</a>');
+                } else {
+                    $btn_class .= 'button_disabled ';
+                    echo('<a type="button" class="'.$btn_class.'">'.
+                            '<label>'.
+                                $btn_info_circle.
+                                $temp_robot_sprite['markup'].
+                                $temp_robot_label.
+                            '</label>'.
+                        '</a>');
+                }
 
             }
         }
