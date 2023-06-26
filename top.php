@@ -110,13 +110,23 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')
 $is_admin_mode = !empty($_SESSION['admin_id']) && is_numeric($_SESSION['admin_id']) ? true : false;
 define('MMRPG_CONFIG_ADMIN_MODE', $is_admin_mode);
 
+// Define a function to handle fatal shutdown errors
+function fatal_handler() {
+    $error = error_get_last();
+    if ($error !== NULL){
+        error_log('Fatal error:'.var_export($error, true));
+    }
+}
+
 // Turn ON error reporting if admin
 if (MMRPG_CONFIG_ADMIN_MODE){
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     ini_set('xdebug.max_nesting_level', 32);
     error_reporting(-1);
+    register_shutdown_function('fatal_handler');
 }
+
 
 // Turn OFF error reporting if live
 ini_set('log_errors', 1);
