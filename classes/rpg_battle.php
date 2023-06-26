@@ -310,6 +310,26 @@ class rpg_battle extends rpg_object {
         return $temp_text;
     }
 
+    // Define a static public function for calculating high/medium/low words to represent percentage tiers
+    public static function calculate_percentage_tier($current, $total){
+        $percent = ceil(($current / $total) * 100);
+        if ($percent > 50){ $class = 'high'; }
+        elseif ($percent > 25){ $class = 'medium';  }
+        elseif ($percent > 0){ $class = 'low'; }
+        else { $class = 'zero'; }
+        return $class;
+    }
+
+    // Define a function for sorting robots in a given battle menu for display
+    public static function sort_robots_for_battle_menu($info1, $info2){
+        if ($info1['robot_position'] === 'active' && $info2['robot_position'] !== 'active'){ return -1; }
+        elseif ($info1['robot_position'] !== 'active' && $info2['robot_position'] === 'active'){ return 1; }
+        elseif ($info1['robot_key'] < $info2['robot_key']){ return -1; }
+        elseif ($info1['robot_key'] > $info2['robot_key']){ return 1; }
+        else { return 0; }
+    }
+
+
     // Define a public function for extracting actions from the queue
     public function actions_extract($filters){
 
@@ -1303,11 +1323,11 @@ class rpg_battle extends rpg_object {
                 if ($this_mission_number >= $old_waves_completed
                     && $this_mission_number > $global_waves_completed){
                     $first_event_body_foot .= ' <span style="opacity:0.25;">|</span>';
-                    $first_event_body_foot .= ' <span title="Previous Record: '.$global_waves_completed.' Missions">'.rpg_type::print_span('electric_water', 'New Global Record!').'</span>';
+                    $first_event_body_foot .= ' <span data-click-tooltip="Previous Record: '.$global_waves_completed.' Missions">'.rpg_type::print_span('electric_water', 'New Global Record!').'</span>';
                 } elseif (!empty($old_waves_completed)){
                     if ($this_mission_number >= $old_waves_completed){
                         $first_event_body_foot .= ' <span style="opacity:0.25;">|</span>';
-                        $first_event_body_foot .= ' <span title="Previous Record: '.$old_waves_completed.' Missions">'.rpg_type::print_span('electric', 'New Personal Record!').'</span>';
+                        $first_event_body_foot .= ' <span data-click-tooltip="Previous Record: '.$old_waves_completed.' Missions">'.rpg_type::print_span('electric', 'New Personal Record!').'</span>';
                     } else {
                         $first_event_body_foot .= ' <span style="opacity:0.25;">|</span>';
                         $first_event_body_foot .= ' <span>Personal Record: '.$old_waves_completed.'</span>';
@@ -2143,28 +2163,28 @@ class rpg_battle extends rpg_object {
                                     <td  class="right"><?= !empty($temp_target_robot_weaknesses) ? $temp_target_robot_weaknesses : '<span class="robot_weakness">None</span>' ?></td>
                                     <td class="center">&nbsp;</td>
                                     <td class="left">Energy : </td>
-                                    <td  class="right"><span title="<?= floor(($temp_target_robot->robot_energy / $temp_target_robot->robot_base_energy) * 100).'% | '.$temp_target_robot->robot_energy.' / '.$temp_target_robot->robot_base_energy ?>"data-tooltip-type="robot_type robot_type_energy" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_energy_base_padding ?>px;"><span class="robot_stat robot_type robot_type_energy" style="padding-left: <?= $temp_energy_padding ?>px;"><?= $temp_target_robot->robot_energy ?></span></span></td>
+                                    <td  class="right"><span data-click-tooltip="<?= floor(($temp_target_robot->robot_energy / $temp_target_robot->robot_base_energy) * 100).'% | '.$temp_target_robot->robot_energy.' / '.$temp_target_robot->robot_base_energy ?>"data-tooltip-type="robot_type robot_type_energy" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_energy_base_padding ?>px;"><span class="robot_stat robot_type robot_type_energy" style="padding-left: <?= $temp_energy_padding ?>px;"><?= $temp_target_robot->robot_energy ?></span></span></td>
                                 </tr>
                                 <tr>
                                     <td class="left">Resistances : </td>
                                     <td  class="right"><?= !empty($temp_target_robot_resistances) ? $temp_target_robot_resistances : '<span class="robot_resistance">None</span>' ?></td>
                                     <td class="center">&nbsp;</td>
                                     <td class="left">Attack : </td>
-                                    <td  class="right"><span title="<?= floor(($temp_target_robot->robot_attack / $temp_target_robot->robot_base_attack) * 100).'% | '.$temp_target_robot->robot_attack.' / '.$temp_target_robot->robot_base_attack ?>"data-tooltip-type="robot_type robot_type_attack" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_attack_base_padding ?>px;"><span class="robot_stat robot_type robot_type_attack" style="padding-left: <?= $temp_attack_padding ?>px;"><?= $temp_attack_mod_icon.' '.$temp_target_robot->robot_attack ?></span></span></td>
+                                    <td  class="right"><span data-click-tooltip="<?= floor(($temp_target_robot->robot_attack / $temp_target_robot->robot_base_attack) * 100).'% | '.$temp_target_robot->robot_attack.' / '.$temp_target_robot->robot_base_attack ?>"data-tooltip-type="robot_type robot_type_attack" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_attack_base_padding ?>px;"><span class="robot_stat robot_type robot_type_attack" style="padding-left: <?= $temp_attack_padding ?>px;"><?= $temp_attack_mod_icon.' '.$temp_target_robot->robot_attack ?></span></span></td>
                                 </tr>
                                 <tr>
                                     <td class="left">Affinities : </td>
                                     <td  class="right"><?= !empty($temp_target_robot_affinities) ? $temp_target_robot_affinities : '<span class="robot_affinity">None</span>' ?></td>
                                     <td class="center">&nbsp;</td>
                                     <td class="left">Defense : </td>
-                                    <td  class="right"><span title="<?= floor(($temp_target_robot->robot_defense / $temp_target_robot->robot_base_defense) * 100).'% | '.$temp_target_robot->robot_defense.' / '.$temp_target_robot->robot_base_defense ?>"data-tooltip-type="robot_type robot_type_defense" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_defense_base_padding ?>px;"><span class="robot_stat robot_type robot_type_defense" style="padding-left: <?= $temp_defense_padding ?>px;"><?= $temp_defense_mod_icon.' '.$temp_target_robot->robot_defense ?></span></span></td>
+                                    <td  class="right"><span data-click-tooltip="<?= floor(($temp_target_robot->robot_defense / $temp_target_robot->robot_base_defense) * 100).'% | '.$temp_target_robot->robot_defense.' / '.$temp_target_robot->robot_base_defense ?>"data-tooltip-type="robot_type robot_type_defense" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_defense_base_padding ?>px;"><span class="robot_stat robot_type robot_type_defense" style="padding-left: <?= $temp_defense_padding ?>px;"><?= $temp_defense_mod_icon.' '.$temp_target_robot->robot_defense ?></span></span></td>
                                 </tr>
                                 <tr>
                                     <td class="left">Immunities : </td>
                                     <td  class="right"><?= !empty($temp_target_robot_immunities) ? $temp_target_robot_immunities : '<span class="robot_immunity">None</span>' ?></td>
                                     <td class="center">&nbsp;</td>
                                     <td class="left">Speed : </td>
-                                    <td  class="right"><span title="<?= floor(($temp_target_robot->robot_speed / $temp_target_robot->robot_base_speed) * 100).'% | '.$temp_target_robot->robot_speed.' / '.$temp_target_robot->robot_base_speed ?>"data-tooltip-type="robot_type robot_type_speed" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_speed_base_padding ?>px;"><span class="robot_stat robot_type robot_type_speed" style="padding-left: <?= $temp_speed_padding ?>px;"><?= $temp_speed_mod_icon.' '.$temp_target_robot->robot_speed ?></span></span></td>
+                                    <td  class="right"><span data-click-tooltip="<?= floor(($temp_target_robot->robot_speed / $temp_target_robot->robot_base_speed) * 100).'% | '.$temp_target_robot->robot_speed.' / '.$temp_target_robot->robot_base_speed ?>"data-tooltip-type="robot_type robot_type_speed" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_speed_base_padding ?>px;"><span class="robot_stat robot_type robot_type_speed" style="padding-left: <?= $temp_speed_padding ?>px;"><?= $temp_speed_mod_icon.' '.$temp_target_robot->robot_speed ?></span></span></td>
                                 </tr>
                                 <? if (($options->show_skills || MMRPG_CONFIG_DEBUG_MODE) && !empty($temp_target_robot->robot_skill)){ ?>
                                     <?
@@ -2910,12 +2930,12 @@ class rpg_battle extends rpg_object {
         // Define the back star's markup
         $this_data['star_markup_class'] = 'sprite sprite_star sprite_star_sprite sprite_40x40 sprite_40x40_'.$temp_star_back['frame'].' ';
         $this_data['star_markup_style'] = 'background-image: url('.$temp_star_back['path'].'); margin-top: 5px; ';
-        $temp_back_markup = '<div class="'.$this_data['star_markup_class'].'" style="'.$this_data['star_markup_style'].'" title="'.$this_data['star_title'].'">'.$this_data['star_title'].'</div>';
+        $temp_back_markup = '<div class="'.$this_data['star_markup_class'].'" style="'.$this_data['star_markup_style'].'" data-click-tooltip="'.$this_data['star_title'].'">'.$this_data['star_title'].'</div>';
 
         // Define the back star's markup
         $this_data['star_markup_class'] = 'sprite sprite_star sprite_star_sprite sprite_40x40 sprite_40x40_'.$temp_star_front['frame'].' ';
         $this_data['star_markup_style'] = 'background-image: url('.$temp_star_front['path'].'); margin-top: -42px; ';
-        $temp_front_markup = '<div class="'.$this_data['star_markup_class'].'" style="'.$this_data['star_markup_style'].'" title="'.$this_data['star_title'].'">'.$this_data['star_title'].'</div>';
+        $temp_front_markup = '<div class="'.$this_data['star_markup_class'].'" style="'.$this_data['star_markup_style'].'" data-click-tooltip="'.$this_data['star_title'].'">'.$this_data['star_title'].'</div>';
 
         // Generate the final markup for the console star
         $this_data['star_markup'] = '';
