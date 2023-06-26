@@ -169,7 +169,8 @@ class rpg_mission_bonus extends rpg_mission {
             // Use a random alt image for this robot if available (not for bosses though)
             if ($this_robot_class != 'boss'
                 && !empty($index['robot_image_alts'])
-                && count($index['robot_image_alts']) > 1){
+                && count($index['robot_image_alts']) > 1
+                && mt_rand(0, 100) <= 30){
                 $images = array($info['robot_token']);
                 foreach ($index['robot_image_alts'] AS $alt){
                     if ($alt['token'] == 'alt9'){ continue; }
