@@ -296,16 +296,16 @@ ob_start();
                 $temp_ability_label .= '</span>';
 
                 // Define whether or not this ability button should be enabled
-                $temp_button_enabled = $temp_robot_weapons >= $temp_ability_energy ? true : false;
+                $allow_button = $temp_robot_weapons >= $temp_ability_energy ? true : false;
 
                 // If the ability is not actually compatible with this robot, disable it
                 //$temp_robot_array = $this_robot->export_array();
                 $temp_ability_array = $temp_ability->export_array();
                 $temp_button_compatible = rpg_robot::has_ability_compatibility($temp_robotinfo, $temp_abilityinfo, $current_robot_item);
-                if (!$temp_button_compatible){ $temp_button_enabled = false; }
+                if (!$temp_button_compatible){ $allow_button = false; }
 
                 // If this button is enabled, add it to the global ability options array
-                if ($temp_button_enabled){ $temp_player_ability_actions[] = $temp_ability->ability_token; }
+                if ($allow_button){ $temp_player_ability_actions[] = $temp_ability->ability_token; }
 
                 // Define the ability sprite variables
                 $temp_ability_sprite = array();
@@ -343,13 +343,17 @@ ob_start();
 
                 $temp_ability_sprite['preload'] = 'images/abilities/'.$temp_ability_sprite['image'].'/sprite_'.$robot_direction.'_'.$temp_ability_sprite['image_size_zoom_text'].'.png';
 
+                // Update the order button if necessary
+                $order_button_markup = $allow_button ? 'data-order="'.$temp_order_counter.'"' : '';
+                $temp_order_counter += $allow_button ? 1 : 0;
+
                 // Now use the new object to generate a snapshot of this ability button
                 $btn_type = 'ability_type ability_type_'.(!empty($temp_ability->ability_type) ? $temp_ability->ability_type : 'none').(!empty($temp_ability->ability_type2) ? '_'.$temp_ability->ability_type2 : '');
                 $btn_class = 'button action_ability ability_'.$temp_ability->ability_token.' '.$btn_type.' block_'.$equipped_abilities_count.' ';
                 $btn_action = 'ability_'.$temp_ability->ability_id.'_'.$temp_ability->ability_token;
                 $btn_info_circle = '<span class="info" data-click-tooltip="'.$temp_ability_details_tooltip.'" data-tooltip-type="'.$btn_type.'"><i class="fa fas fa-info-circle"></i></span>';
-                if ($temp_button_enabled){
-                    echo('<a type="button" class="'.$btn_class.'" data-order="'.$temp_order_counter.'" data-action="'.$btn_action.'" data-target="'.$temp_target.'">'.
+                if ($allow_button){
+                    echo('<a type="button" class="'.$btn_class.'" data-action="'.$btn_action.'" data-target="'.$temp_target.'" '.$order_button_markup.'>'.
                             '<label>'.
                                 $btn_info_circle.
                                 $temp_ability_sprite['markup'].
@@ -358,7 +362,7 @@ ob_start();
                         '</a>');
                 } else {
                     $btn_class .= 'button_disabled ';
-                    echo('<a type="button" class="'.$btn_class.'" data-order="'.$temp_order_counter.'">'.
+                    echo('<a type="button" class="'.$btn_class.'">'.
                             '<label>'.
                                 $btn_info_circle.
                                 $temp_ability_sprite['markup'].
@@ -367,8 +371,6 @@ ob_start();
                         '</a>');
                 }
 
-                // Increment the order counter
-                $temp_order_counter++;
             }
             $ability_key++;
         }
