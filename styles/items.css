@@ -374,6 +374,22 @@ body.windowFlag_landscapeMode #prototype {
     text-decoration: none;
     cursor: default;
 }
+#item #console .event .item_name[data-click-tooltip],
+#item #console .event .ability_name[data-click-tooltip],
+#item #console .event .field_name[data-click-tooltip] {
+    cursor: pointer;
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    transform: scale(1);
+    transform-origin: left;
+    transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+}
+#item #console .event .item_name[data-click-tooltip]:hover,
+#item #console .event .ability_name[data-click-tooltip]:hover,
+#item #console .event .field_name[data-click-tooltip]:hover {
+    border-color: #ffffff !important;
+    transform: scale(1.1);
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+}
 #item #console .event .use_button,
 #item #console .event .confirm_button,
 #item #console .event .cancel_button,
