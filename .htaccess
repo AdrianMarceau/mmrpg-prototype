@@ -102,7 +102,7 @@ RewriteRule  ^images/(_raw|database|gallery|misc|theme|types)/(.*)$  https://cdn
 RewriteRule ^mmrpg-info\.xml$ mmrpg-info.php [L]
 RewriteRule ^mmrpg-ranking\.xml$ mmrpg-ranking.php [L]
 RewriteRule ^sitemap\.xml$ sitemap.php [L]
-RewriteRule ^styles/style\.css$ styles/style.php?files=style.css,types.css [L]
+RewriteRule ^styles/style\.css$ styles/style.php?files=fonts.css,style.css,types.css [L]
 RewriteRule ^styles/robots\.css$ styles/style.php?file=robots.css [L]
 
 
