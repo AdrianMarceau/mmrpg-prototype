@@ -675,9 +675,9 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     text-transform: uppercase;
     text-decoration: none;
     padding: 0;
-    border-radius: 0.75em;
     -moz-border-radius: 0.75em;
     -webkit-border-radius: 0.75em;
+    border-radius: 0.75em;
     color: #FFFFFF;
     border: 2px solid #1A1A1A;
     background-color: #222222;
@@ -732,9 +732,9 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     right: 6px;
     cursor: pointer;
     _cursor: hand;
-    border-radius: 0.3em;
     -moz-border-radius: 0.3em;
     -webkit-border-radius: 0.3em;
+    border-radius: 0.3em;
 }
 #prototype .header .reselect:hover,
 #prototype .header .prev:hover,
@@ -856,13 +856,35 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .option_wrapper {
     display: block;
     height: 284px;
-    overflow: hidden;
+    overflow: visible;
+}
+#prototype .option_wrapper:after {
+    content: "";
+    display: block;
+    clear: both;
 }
 #prototype .menu[data-select] .option_wrapper > .wrap {
     display: block;
+    padding-top: 4px;
+    margin-top: -4px;
     overflow: hidden;
     position: relative;
     height: inherit;
+}
+#prototype .menu[data-select] .option_wrapper > .wrap.ps-container {
+    padding-right: 10px;
+}
+#prototype .menu[data-select] .option_wrapper > .wrap.ps-container .option_1x1 {
+    width: calc((100% / 4) - 8px);
+}
+#prototype .menu[data-select] .option_wrapper > .wrap.ps-container .option_1x2 {
+    width: calc((100% / 2) - 8px);
+}
+#prototype .menu[data-select] .option_wrapper > .wrap.ps-container .option_1x3 {
+    width: calc((100% / 3) - 8px);
+}
+#prototype .menu[data-select] .option_wrapper > .wrap.ps-container .option_1x4 {
+    width: calc((100% / 4) - 8px);
 }
 
 #prototype .select_this_player_robots .option_wrapper {
@@ -1395,7 +1417,7 @@ body[data-source="website"] #prototype .menu {
     top: -9px;
     left: -2px;
     font-size: 12px;
-    color: #cccccc;
+    color: #ffffff;
     transform: rotate(-15deg);
 }
 #mmrpg #prototype .option_this-robot-select .icons.favs i {
@@ -1413,26 +1435,11 @@ body[data-source="website"] #prototype .menu {
     left: 50%;
     transform: translate(-60%, 0);
 }
-#mmrpg #prototype .option_this-robot-select .icons.info {
-    top: -8px;
-    right: -8px;
+#mmrpg #prototype .option_this-robot-select .icons.info[data-click-tooltip] {
+    top: -13px;
+    right: -13px;
     left: auto;
-    font-size: 12px;
-    color: #efefef;
-    line-height: 1;
-    z-index: 100;
-    cursor: help;
-    transform: scale(1);
-    filter: brightness(0.8) opacity(0.9);
-    transition: color 0.3s, transform 0.3s, filter 0.3s;
-}
-#mmrpg #prototype .option_this-robot-select:hover .icons.info {
-    filter: brightness(0.8) opacity(1);
-}
-#mmrpg #prototype .option_this-robot-select .icons.info:hover {
-    color: #ffffff;
-    transform: scale(1.2);
-    filter: brightness(1.0) opacity(1);
+    bottom: auto;
 }
 
 #mmrpg #prototype .option_this-robot-select .multi {
@@ -1901,30 +1908,13 @@ body[data-source="website"] #prototype .menu {
     bottom: 1px;
     height: 100%;
 }
-
-#prototype .option_1x1 div label .info,
-#prototype .option_1x2 div label .info,
-#prototype .option_1x3 div label .info,
-#prototype .option_1x4 div label .info {
-    display: inline-block;
-    position: absolute;
+#prototype .option_1x1 div label .info[data-click-tooltip],
+#prototype .option_1x2 div label .info[data-click-tooltip],
+#prototype .option_1x3 div label .info[data-click-tooltip],
+#prototype .option_1x4 div label .info[data-click-tooltip] {
     top: -13px;
     right: -14px;
-    font-size: 150%;
-    line-height: 1;
-    z-index: 100;
-    cursor: help;
-    color: #ffffff;
-    transform: scale(1);
-    transition: transform 0.3s;
 }
-#prototype .option_1x1 div label .info:hover,
-#prototype .option_1x2 div label .info:hover,
-#prototype .option_1x3 div label .info:hover,
-#prototype .option_1x4 div label .info:hover {
-    transform: scale(1.2);
-}
-
 #prototype .option_1x1 div label .multi .online_type,
 #prototype .option_1x2 div label .multi .online_type,
 #prototype .option_1x3 div label .multi .online_type,
@@ -2116,12 +2106,12 @@ body[data-source="website"] #prototype .menu {
     animation-name: starshakeX;
 }
 
-#prototype .option_1x1.starfield div label .info,
-#prototype .option_1x2.starfield div label .info,
-#prototype .option_1x3.starfield div label .info,
-#prototype .option_1x4.starfield div label .info {
+#prototype > div:not(.banner) .option_1x1.starfield div label .info[data-click-tooltip],
+#prototype > div:not(.banner) .option_1x2.starfield div label .info[data-click-tooltip],
+#prototype > div:not(.banner) .option_1x3.starfield div label .info[data-click-tooltip],
+#prototype > div:not(.banner) .option_1x4.starfield div label .info[data-click-tooltip] {
     right: -200%;
-    right: calc(-200% + 2px);
+    right: calc(-200% - 2px);
 }
 
 

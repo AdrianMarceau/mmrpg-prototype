@@ -56,6 +56,7 @@ body:before {
     #mmrpg.index {
         padding-top: 20px;
         min-height: calc(100svh - 20px);
+        height: auto;
     }
     #mmrpg.index #window {
         border-radius: 0.75em;
