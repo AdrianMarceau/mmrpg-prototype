@@ -32,30 +32,22 @@ ob_start();
         $num_robots = count($this_player->player_robots);
         $robot_direction = $this_player->player_side == 'left' ? 'right' : 'left';
 
-        // Define the sorting function for the switch robots
-        function mmrpg_action_sort_switch($info1, $info2){
-            if ($info1['robot_position'] == 'active'){ return -1; }
-            elseif ($info2['robot_position'] == 'active'){ return 1; }
-            elseif ($info1['robot_key'] < $info2['robot_key']){ return -1; }
-            elseif ($info1['robot_key'] > $info2['robot_key']){ return 1; }
-            else { return 0; }
-        }
-
         // Collect the temp ability and item indexes
-        $db_ability_fields = rpg_ability::get_index_fields(true);
-        $db_item_fields = rpg_item::get_index_fields(true);
-        $temp_abilities_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
-        $temp_items_index = $db->get_array_list("SELECT {$db_item_fields} FROM mmrpg_index_items WHERE item_flag_complete = 1;", 'item_token');
+        $mmrpg_abilities_index = rpg_ability::get_index(true);
+        $mmrpg_items_index = rpg_item::get_index(true);
 
         // Collect the target robot options and sort them
         $switch_player_robots = $this_player->player_robots;
         $switch_robots_count = $this_player->counters['robots_active'];
-        usort($switch_player_robots, 'mmrpg_action_sort_switch');
+        usort($switch_player_robots, 'rpg_prototype::sort_robots_for_battle_menu');
 
         // Loop through each robot and display its switch button
         foreach ($switch_player_robots AS $robot_key => $switch_robotinfo){
             // Ensure this is an actual switch in the index
             if (!empty($switch_robotinfo['robot_token'])){
+
+                // Default the allow button flag to true
+                $allow_button = true;
 
                 // Create the switch object using the session/index data
                 $temp_robot = rpg_game::get_robot($this_battle, $this_player, $switch_robotinfo);
@@ -81,9 +73,6 @@ ob_start();
                 // If this player has already used a switch this turn
                 if (!empty($this_player->flags['switch_used_this_turn'])){ $temp_switch_disabled = true; }
 
-                // Default the allow button flag to true
-                $allow_button = true;
-
                 // If this robot is already out, disable the button
                 if ($temp_robot->robot_position == 'active'){ $allow_button = false; }
 
@@ -101,7 +90,7 @@ ob_start();
                 $temp_robot_title .= ' <br />'.(!empty($temp_robot->robot_core) ? ucfirst($temp_robot->robot_core).' Core' : 'Neutral Core').' | '.ucfirst($temp_robot->robot_position).' Position';
 
                 // Display the robot's item if it exists
-                if (!empty($temp_robot->robot_item) && !empty($temp_items_index[$temp_robot->robot_item])){ $temp_robot_title .= ' | + '.$temp_items_index[$temp_robot->robot_item]['item_name'].' '; }
+                if (!empty($temp_robot->robot_item) && !empty($mmrpg_items_index[$temp_robot->robot_item])){ $temp_robot_title .= ' | + '.$mmrpg_items_index[$temp_robot->robot_item]['item_name'].' '; }
 
                 // Display the robot's life and weapon energy current and base
                 $temp_robot_title .= ' <br />'.$temp_robot->robot_energy.' / '.$temp_robot->robot_base_energy.' LE';
@@ -116,10 +105,10 @@ ob_start();
                 // Loop through this robot's current abilities and list them as well
                 $temp_robot_title .= ' <br />';
                 foreach ($temp_robot->robot_abilities AS $key => $token){
-                    if (!isset($temp_abilities_index[$token])){ continue; }
+                    if (!isset($mmrpg_abilities_index[$token])){ continue; }
                     if ($key > 0 && $key % 4 != 0){ $temp_robot_title .= '&nbsp;|&nbsp;'; }
                     if ($key > 0 && $key % 4 == 0){ $temp_robot_title .= '<br /> '; }
-                    $info = rpg_ability::parse_index_info($temp_abilities_index[$token]);
+                    $info = rpg_ability::parse_index_info($mmrpg_abilities_index[$token]);
                     $temp_robot_title .= $info['ability_name'];
 
                 }
@@ -136,31 +125,19 @@ ob_start();
                     if (empty($temp_robot_core2_type) && $temp_robot_core_type != $temp_item_core_type){ $temp_robot_core2_type = $temp_item_core_type; }
                 }
 
-                // Collect the energy percent so we know how they're doing
-                $temp_energy_class = '';
-                $temp_energy_percent = ceil(($temp_robot->robot_energy / $temp_robot->robot_base_energy) * 100);
-                if ($temp_energy_percent > 50){ $temp_energy_class = 'high'; }
-                elseif ($temp_energy_percent > 25){ $temp_energy_class = 'medium';  }
-                elseif ($temp_energy_percent > 0){ $temp_energy_class = 'low'; }
-                else { $temp_energy_class = 'zero'; }
-
-                // Collect the weapons percent so we know how they're doing
-                $temp_weapons_class = '';
-                $temp_weapons_percent = ceil(($temp_robot->robot_weapons / $temp_robot->robot_base_weapons) * 100);
-                if ($temp_weapons_percent > 50){ $temp_weapons_class = 'high'; }
-                elseif ($temp_weapons_percent > 25){ $temp_weapons_class = 'medium';  }
-                elseif ($temp_weapons_percent > 0){ $temp_weapons_class = 'low'; }
-                else { $temp_weapons_class = 'zero'; }
+                // Collect the energy and weapon percent so we know how they're doing
+                $temp_energy_class = rpg_prototype::calculate_percentage_tier($temp_robot->robot_energy, $temp_robot->robot_base_energy);
+                $temp_weapons_class = rpg_prototype::calculate_percentage_tier($temp_robot->robot_weapons, $temp_robot->robot_base_weapons);
 
                 // Define the robot button text variables
                 $temp_robot_label = '<span class="multi">';
-                $temp_robot_label .= '<span class="maintext">'.$temp_robot->robot_name.' <sup class="level">Lv. '.$temp_robot->robot_level.'</sup></span>';
-                $temp_robot_label .= '<span class="subtext">';
-                    $temp_robot_label .= '<span class="stat_is_'.$temp_energy_class.'"><strong>'.$temp_robot->robot_energy.'</strong>/'.$temp_robot->robot_base_energy.' LE</span>';
-                $temp_robot_label .= '</span>';
-                $temp_robot_label .= '<span class="subtext">';
-                    $temp_robot_label .= '<span class="stat_is_'.$temp_weapons_class.'"><strong>'.$temp_robot->robot_weapons.'</strong>/'.$temp_robot->robot_base_weapons.' WE</span>';
-                $temp_robot_label .= '</span>';
+                    $temp_robot_label .= '<span class="maintext">'.$temp_robot->robot_name.' <sup class="level">Lv. '.$temp_robot->robot_level.'</sup></span>';
+                    $temp_robot_label .= '<span class="subtext">';
+                        $temp_robot_label .= '<span class="stat_is_'.$temp_energy_class.'"><strong>'.$temp_robot->robot_energy.'</strong>/'.$temp_robot->robot_base_energy.' LE</span>';
+                    $temp_robot_label .= '</span>';
+                    $temp_robot_label .= '<span class="subtext">';
+                        $temp_robot_label .= '<span class="stat_is_'.$temp_weapons_class.'"><strong>'.$temp_robot->robot_weapons.'</strong>/'.$temp_robot->robot_base_weapons.' WE</span>';
+                    $temp_robot_label .= '</span>';
                 $temp_robot_label .= '</span>';
 
                 // Define the robot sprite variables

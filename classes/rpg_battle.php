@@ -310,26 +310,6 @@ class rpg_battle extends rpg_object {
         return $temp_text;
     }
 
-    // Define a static public function for calculating high/medium/low words to represent percentage tiers
-    public static function calculate_percentage_tier($current, $total){
-        $percent = ceil(($current / $total) * 100);
-        if ($percent > 50){ $class = 'high'; }
-        elseif ($percent > 25){ $class = 'medium';  }
-        elseif ($percent > 0){ $class = 'low'; }
-        else { $class = 'zero'; }
-        return $class;
-    }
-
-    // Define a function for sorting robots in a given battle menu for display
-    public static function sort_robots_for_battle_menu($info1, $info2){
-        if ($info1['robot_position'] === 'active' && $info2['robot_position'] !== 'active'){ return -1; }
-        elseif ($info1['robot_position'] !== 'active' && $info2['robot_position'] === 'active'){ return 1; }
-        elseif ($info1['robot_key'] < $info2['robot_key']){ return -1; }
-        elseif ($info1['robot_key'] > $info2['robot_key']){ return 1; }
-        else { return 0; }
-    }
-
-
     // Define a public function for extracting actions from the queue
     public function actions_extract($filters){
 
