@@ -1381,9 +1381,9 @@
                                     $possible_variants_config[] = array('/^battle-field_avatar_([-_a-z0-9]+).png$/i', 'avatar image [???]');
                                     $possible_variants_config[] = array('/^battle-field_background_base_([-_a-z0-9]+).png$/i', 'background image (stacked) [???]');
                                     //error_log('$field_files_existing = '.print_r($field_files_existing, true));
-                                    foreach ($field_files_existing AS $key => $file){
-                                        foreach ($possible_variants_config AS $variant_key => $variant_config){
-                                            list($variant_regex, $variant_label) = $variant_config;
+                                    foreach ($possible_variants_config AS $variant_key => $variant_config){
+                                        list($variant_regex, $variant_label) = $variant_config;
+                                        foreach ($field_files_existing AS $key => $file){
                                             //error_log('check if '.$file.' matches '.PHP_EOL.$variant_regex.PHP_EOL);
                                             if (preg_match($variant_regex, $file, $matches)){
                                                 $field_files_variants[] = array(
