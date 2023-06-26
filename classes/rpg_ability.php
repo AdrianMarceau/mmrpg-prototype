@@ -3801,7 +3801,7 @@ class rpg_ability extends rpg_object {
                 $this_ability = (object)($ability_info);
             } elseif (is_object($ability)){
                 $ability_token = $ability->ability_token;
-                $ability_info = $ability->export_array();
+                $ability_info = method_exists($ability, 'export_array') ? $ability->export_array() : rpg_ability::get_index_info($ability_token);
                 $this_ability = $ability;
             }
         }
