@@ -200,6 +200,9 @@ body.index #header {
 }
 
 #mmrpg .info[data-click-tooltip] {
+    cursor: help;
+}
+#mmrpg .info[data-click-tooltip] {
     position: absolute;
     top: 0;
     right: 0;
