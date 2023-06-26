@@ -2009,7 +2009,7 @@ class rpg_canvas {
                     $this_results_data['canvas_offset_z'] = ceil($this_robot_data['canvas_offset_z'] - 20);
                     $temp_size_diff = $this_robot_data['robot_size'] > 80 ? ceil(($this_robot_data['robot_size'] - 80) * 0.5) : 0;
                     $this_results_data['canvas_offset_x'] += $temp_size_diff;
-                    if ($this_robot_data['robot_position'] == 'bench' && $this_robot_data['robot_size'] >= 80){
+                    if ($this_robot_data['robot_position'] == 'bench' && $this_robot_data['robot_size'] > 80){
                         //$this_results_data['canvas_offset_x'] += ceil($this_robot_data['robot_size'] / 2);
                         $this_results_data['canvas_offset_x'] += ($this_robot_data['robot_size'] - 40);
                     }
@@ -2055,8 +2055,8 @@ class rpg_canvas {
                     // Randomly jitter the position of the effect graphic a bit in case multiple show
                     // up one after another so they don't look so static and boring
                     if ($this_robot_data['robot_position'] !== 'bench'){
-                        $this_results_data['canvas_offset_x'] += mt_rand(0, 5) - 10; //jitter
-                        $this_results_data['canvas_offset_y'] += mt_rand(0, 5); //jitter
+                        $this_results_data['canvas_offset_x'] += mt_rand(-5, 5); //jitter
+                        $this_results_data['canvas_offset_y'] += mt_rand(-5, 5); //jitter
                     }
 
                     // Now bring it all together to form the result amount style
