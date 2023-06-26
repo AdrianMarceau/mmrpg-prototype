@@ -3914,7 +3914,7 @@ class rpg_ability extends rpg_object {
             'ability_frame_offset' => array(
                 'x' => (10 + ($existing_shields * 10)),
                 'y' => (0),
-                'z' => (10 + $existing_shields)
+                'z' => -1 * (10 + $existing_shields)
                 )
             );
         return $this_attachment_info;
