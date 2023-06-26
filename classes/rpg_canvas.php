@@ -642,9 +642,9 @@ class rpg_canvas {
                 $details_data['robot_file'] = 'images/robots/'.$details_data['robot_image'].'/sprite_'.$details_data['robot_direction'].'_'.$details_data['robot_size'].'x'.$details_data['robot_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE;
                 $details_data['robot_details'] = '<div class="robot_name">'.$this_robot->robot_name.'</div>';
                 $details_data['robot_details'] .= '<div class="robot_level robot_type robot_type_'.($this_robot->robot_level >= 100 ? 'electric' : 'none').'">Lv. '.$this_robot->robot_level.'</div>';
-                $details_data['robot_details'] .= '<div class="'.$details_data['energy_class'].'" style="'.$details_data['energy_style'].'" title="'.$details_data['energy_title'].'" data-tooltip-align="'.$this_data['robot_float'].'" data-tooltip-type="robot_type robot_type_'.$this_data['energy_tooltip_type'].'">'.$details_data['energy_title'].'</div>';
-                $details_data['robot_details'] .= '<div class="'.$details_data['weapons_class'].'" style="'.$details_data['weapons_style'].'" title="'.$details_data['weapons_title'].'" data-tooltip-align="'.$this_data['robot_float'].'" data-tooltip-type="robot_type robot_type_weapons">'.$details_data['weapons_title'].'</div>';
-                if ($this_data['robot_float'] == 'left'){ $details_data['robot_details'] .= '<div class="'.$details_data['experience_class'].'" style="'.$details_data['experience_style'].'" title="'.$details_data['experience_title'].'" data-tooltip-align="'.$this_data['robot_float'].'" data-tooltip-type="robot_type robot_type_experience">'.$details_data['experience_title'].'</div>'; }
+                $details_data['robot_details'] .= '<div class="'.$details_data['energy_class'].'" style="'.$details_data['energy_style'].'" data-click-tooltip="'.$details_data['energy_title'].'" data-tooltip-align="'.$this_data['robot_float'].'" data-tooltip-type="robot_type robot_type_'.$this_data['energy_tooltip_type'].'">'.$details_data['energy_title'].'</div>';
+                $details_data['robot_details'] .= '<div class="'.$details_data['weapons_class'].'" style="'.$details_data['weapons_style'].'" data-click-tooltip="'.$details_data['weapons_title'].'" data-tooltip-align="'.$this_data['robot_float'].'" data-tooltip-type="robot_type robot_type_weapons">'.$details_data['weapons_title'].'</div>';
+                if ($this_data['robot_float'] == 'left'){ $details_data['robot_details'] .= '<div class="'.$details_data['experience_class'].'" style="'.$details_data['experience_style'].'" data-click-tooltip="'.$details_data['experience_title'].'" data-tooltip-align="'.$this_data['robot_float'].'" data-tooltip-type="robot_type robot_type_experience">'.$details_data['experience_title'].'</div>'; }
 
                 // Loop through and define the other stat variables and markup ($robot_attack_markup, $robot_defense_markup, $robot_speed_markup)
                 $stat_tokens = array('attack' => 'AT', 'defense' => 'DF', 'speed' => 'SP');
@@ -661,7 +661,7 @@ class rpg_canvas {
                     $temp_stat_percent = round(($prop_value / $prop_value_base) * 100);
                     if ($this_data['robot_float'] == 'left'){ $temp_stat_title = $prop_value.' / '.$prop_value_base.' '.$letters.' | '.$temp_stat_percent.'%'; }
                     elseif ($this_data['robot_float'] == 'right'){ $temp_stat_title = ($temp_stat_maxed ? '&#9733; |' : '').$temp_stat_percent.'% | '.$prop_value.' / '.$prop_value_base.' '.$letters; }
-                    $$prop_markup = '<div class="robot_'.$stat.''.($temp_stat_break ? ' robot_'.$stat.'_break' : ($temp_stat_break_chance ? ' robot_'.$stat.'_break_chance' : '')).($prop_value > MMRPG_SETTINGS_STATS_MAX ? ' limit_break' : '').'" title="'.$temp_stat_title.'" data-tooltip-align="'.$this_data['robot_float'].'" data-tooltip-type="robot_type robot_type_'.$stat.'">'.$prop_value.'</div>';
+                    $$prop_markup = '<div class="robot_'.$stat.''.($temp_stat_break ? ' robot_'.$stat.'_break' : ($temp_stat_break_chance ? ' robot_'.$stat.'_break_chance' : '')).($prop_value > MMRPG_SETTINGS_STATS_MAX ? ' limit_break' : '').'" data-click-tooltip="'.$temp_stat_title.'" data-tooltip-align="'.$this_data['robot_float'].'" data-tooltip-type="robot_type robot_type_'.$stat.'">'.$prop_value.'</div>';
                     if (!empty($this_robot->counters[$stat.'_mods'])){
                         $temp_stat_mods = $this_robot->counters[$stat.'_mods'];
                         if ($temp_stat_mods > 0){ $$prop_markup .= '<div class="stat_mod '.$stat.' plus s'.$temp_stat_mods.'"></div>'; }
@@ -696,7 +696,7 @@ class rpg_canvas {
                     }
                     $item_markup = '<div class="robot_item">';
                         $item_markup .= '<div class="wrap type '.$details_data['item_title_type'].'">';
-                            $item_markup .= '<div class="'.$details_data['item_class'].'" style="'.$details_data['item_style'].'" title="'.$details_data['item_title'].'" data-tooltip-type="type '.$details_data['item_title_type'].'">&nbsp;</div>';
+                            $item_markup .= '<div class="'.$details_data['item_class'].'" style="'.$details_data['item_style'].'" data-click-tooltip="'.$details_data['item_title'].'" data-tooltip-type="type '.$details_data['item_title_type'].'">&nbsp;</div>';
                         $item_markup .= '</div>';
                     $item_markup .= '</div>';
                     $details_data['robot_details'] .= $item_markup;
@@ -711,7 +711,7 @@ class rpg_canvas {
 
                 // Display the robot's mugshot sprite and detail fields
                 echo '<div data-detailsid="'.$this_data['robot_id'].'" class="sprite details robot_details robot_details_'.$details_data['robot_float'].'"'.(!empty($this_data['robot_detail_styles']) ? ' style="'.$this_data['robot_detail_styles'].'"' : '').'><div class="container">'.$details_data['robot_details'].'</div></div>';
-                echo '<div data-mugshotid="'.$this_data['robot_id'].'" class="'.str_replace('80x80', '40x40', $details_data['mugshot_class']).' robot_mugshot_type robot_type robot_type_'.$this_data['robot_core'].'"'.(!empty($this_data['robot_detail_styles']) ? ' style="'.$this_data['robot_detail_styles'].'"' : '').' data-tooltip="'.$details_data['robot_title_tooltip'].'"><div class="sprite">&nbsp;</div></div>';
+                echo '<div data-mugshotid="'.$this_data['robot_id'].'" class="'.str_replace('80x80', '40x40', $details_data['mugshot_class']).' robot_mugshot_type robot_type robot_type_'.$this_data['robot_core'].'"'.(!empty($this_data['robot_detail_styles']) ? ' style="'.$this_data['robot_detail_styles'].'"' : '').' data-click-tooltip="'.$details_data['robot_title_tooltip'].'"><div class="sprite">&nbsp;</div></div>';
                 echo '<div data-mugshotid="'.$this_data['robot_id'].'" class="'.$details_data['mugshot_class'].'" style="'.$details_data['mugshot_style'].$this_data['robot_detail_styles'].'"></div>';
 
                 // Update the main data array with this markup
@@ -2753,7 +2753,7 @@ class rpg_canvas {
                 if ($temp_number == '1.0'){ continue; }
                 $temp_title = $temp_name.' x '.$temp_number;
                 if ($temp_multipliers_count >= 8){ $temp_name = substr($temp_name, 0, 2); }
-                $temp_markup = '<span title="'.$temp_title.'" data-tooltip-align="center" class="field_multiplier field_multiplier_'.$this_type.' field_multiplier_count_'.$temp_multipliers_count.' field_type field_type_'.$this_type.'"><span class="text"><span class="type">'.$temp_name.' </span><span class="cross">x</span><span class="number"> '.$temp_number.'</span></span></span>';
+                $temp_markup = '<span data-click-tooltip="'.$temp_title.'" data-tooltip-align="center" class="field_multiplier field_multiplier_'.$this_type.' field_multiplier_count_'.$temp_multipliers_count.' field_type field_type_'.$this_type.'"><span class="text"><span class="type">'.$temp_name.' </span><span class="cross">x</span><span class="number"> '.$temp_number.'</span></span></span>';
                 if (in_array($this_type, $this_special_types)){ $multiplier_markup_left .= $temp_markup; }
                 else { $multiplier_markup_right .= $temp_markup; }
             }
