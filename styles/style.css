@@ -212,19 +212,37 @@ body.index #header {
     height: 16px;
     color: #ffffff;
     background-color: #000000;
+    border: 1px solid #1A1A1A;
     -moz-border-radius: 50%;
     -webkit-border-radius: 50%;
     border-radius: 50%;
+    overflow: hidden;
     z-index: 100;
     cursor: help;
     transform: scale(1);
     transition: transform 0.3s;
 }
-#mmrpg .info[data-click-tooltip] > i {
-    text-align: center;
+#mmrpg .info[data-click-tooltip].color {
+    background-color: #ffffff;
 }
 #mmrpg .info[data-click-tooltip]:hover {
     transform: scale(1.2);
+}
+#mmrpg .info[data-click-tooltip] > i {
+    text-align: center;
+    text-shadow: none;
+}
+#mmrpg .info[data-click-tooltip] > i:before {
+    display: block;
+}
+#mmrpg .info[data-click-tooltip] > i + i {
+    position: relative;
+    top: -22px;
+    height: 8px;
+    overflow: hidden;
+}
+#mmrpg .info[data-click-tooltip] > i + i:before {
+
 }
 #mmrpg [data-click-tooltip] > * {
     pointer-events: none;
@@ -1576,36 +1594,40 @@ body.index #header {
     line-height: 15px;
     text-transform: none;
     text-align: center;
-    background-color: transparent;
-    background-color: rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(0, 0, 0, 0.6);
-    border-width: 1px 0 0;
-    padding: 10px; color: #FFFFFF;
+    padding: 5px;
+    color: #FFFFFF;
     text-indent: 0;
     z-index: 999999;
+    background-color: transparent;
+    border: 0 none transparent;
+    background-image: -webkit-linear-gradient(bottom, rgba(0,0,0,0.3) 10%, rgba(0,0,0,0.0) 80%);
+    background-image: -moz-linear-gradient(center top, rgba(0,0,0,0.3) 10%, rgba(0,0,0,0.0) 80%);
+    background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.3) 10%, rgba(0, 0, 0, 0) 80%);
 }
 #mmrpg .canvas_overlay_hidden {
     opacity: 0;
 }
 #mmrpg .canvas_overlay_footer .overlay_label {
-    display: block;
-    font-size: 9px;
-    line-height: 11px;
-    background-color: rgb(0, 0, 0);
-    background-color: rgba(0, 0, 0, 0.60);
-    width: 140px;
-    margin: -8px auto 2px;
-    border-radius: 0.5em;
-    -moz-border-radius: 0.5em;
-    -webkit-border-radius: 0.5em;
+    display: inline-block;
+    font-size: 7px;
+    line-height: 12px;
+    background-color: #191919;
+    border: 0 none transparent;
+    width: 126px;
+    text-indent: 3px;
+    margin: 0 3px 0 0;
+    -moz-border-radius: 9px 3px 9px 3px;
+    -webkit-border-radius: 9px 3px 9px 3px;
+    border-radius: 9px 3px 9px 3px;
+    text-shadow: 1px 1px 0 #000000;
 }
 #mmrpg .canvas_overlay_footer .field_multiplier {
     margin: 0 5px;
     border-style: solid;
     border-width: 1px;
-    border-radius: 0.5em;
-    -moz-border-radius: 0.5em;
-    -webkit-border-radius: 0.5em;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
     padding: 0 6px;
     box-shadow: 1px 1px 1px #000000;
     letter-spacing: 1px;
@@ -3427,24 +3449,37 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .main_actions_hastitle .main_actions_title .float_title {
     position: static;
     float: left;
-    width: 49%;
-    text-align: right;
+    width: 34%;
+    margin-left: 33%;
+    text-align: center;
 }
 #actions .main_actions_hastitle .main_actions_title .float_links {
     position: static;
     float: right;
-    width: 49%;
-    text-align: left;
+    text-align: right;
+    padding-right: 15px;
+    width: calc(33% - 15px);
 }
 #actions .main_actions_hastitle .main_actions_title .float_links .page {
     color: #696969;
+    vertical-align: middle;
 }
 #actions .main_actions_hastitle .main_actions_title .float_links .num {
+    display: inline-block;
+    float: none;
+    position: static;
     color: #696969;
-    padding-left: 10px;
     text-decoration: none;
     cursor: pointer;
-    _cursor: hand;
+    font-size: 8px;
+    line-height: 12px;
+    border-width: 1px;
+    padding: 2px 4px 2px 7px;
+    margin: 0 0 0 6px;
+    vertical-align: middle;
+    text-align: center;
+    text-decoration: none;
+    transition: color 0.3s;
 }
 
 #actions .main_actions .button .label {
@@ -3478,11 +3513,15 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     bottom: -12px;
     left: -6px;
 }
+#actions .actions_item .main_actions_hastitle .main_actions_title .float_links .button[data-action] .info[data-click-tooltip] {
+    top: -2px;
+    right: -8px;
+}
 
 #actions .main_actions_hastitle .main_actions_title .float_links .num:hover,
 #actions .main_actions_hastitle .main_actions_title .float_links .active {
-    color: #797979;
-    text-decoration: underline;
+    color: #ffffff;
+
 }
 #actions .main_actions_hastitle .main_actions_title_disabled,
 #actions .main_actions_hastitle .main_actions_title_disabled * {
@@ -3633,10 +3672,10 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     height: 36px;
     line-height: 36px;
 }
-#actions .actions_battle .action_switch {
+#actions .actions_battle .action_scan {
     margin-right: 0;
 }
-#actions .actions_battle .action_switch label {
+#actions .actions_battle .action_scan label {
     width: auto;
 }
 
@@ -3683,6 +3722,26 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     line-height: 68px;
     margin: 0 3px 3px 0;
     letter-spacing: 2px;
+}
+#actions .actions_switch .action_switch[data-position="active/0"],
+#actions .actions_scan .action_scan[data-position="active/0"],
+#actions .actions_target .action_target[data-position="active/0"] {
+
+}
+#actions .actions_switch .action_switch[data-position="active/0"] .sprite,
+#actions .actions_scan .action_scan[data-position="active/0"] .sprite,
+#actions .actions_target .action_target[data-position="active/0"] .sprite {
+    border-bottom-width: 3px;
+}
+#actions .actions_switch .action_switch[data-position^="bench/"],
+#actions .actions_scan .action_scan[data-position^="bench/"],
+#actions .actions_target .action_target[data-position^="bench/"] {
+
+}
+#actions .actions_switch .action_switch[data-position^="bench/"] .sprite,
+#actions .actions_scan .action_scan[data-position^="bench/"] .sprite,
+#actions .actions_target .action_target[data-position^="bench/"] .sprite {
+
 }
 #actions .actions_option .action_option label,
 #actions .actions_settings .action_setting label,

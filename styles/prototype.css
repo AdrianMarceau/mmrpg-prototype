@@ -800,9 +800,6 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     position: relative;
     z-index: 2;
 }
-#prototype .header_types[data-player]:before {
-    display: none;
-}
 
 
 
@@ -1096,11 +1093,10 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
     margin: 0 0 3px 0;
     vertical-align: top;
     border: 2px solid #1A1A1A;
-    border-color: #1A1A1A !important;
+    border-color: #1A1A1A;
     font-size: 10px;
     line-height: 65px;
     letter-spacing: 2px;
-    /*text-transform: uppercase;*/
     text-decoration: none;
     padding: 0;
     border-radius: 0.75em;
@@ -1133,6 +1129,11 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
     -o-user-select: none;
     user-select: none;
 }
+/*
+#prototype .option {
+    border-color: #1A1A1A !important;
+}
+*/
 #prototype .option_message {
     margin-top: 10px;
     background-color: transparent;
@@ -2111,7 +2112,7 @@ body[data-source="website"] #prototype .menu {
 #prototype > div:not(.banner) .option_1x3.starfield div label .info[data-click-tooltip],
 #prototype > div:not(.banner) .option_1x4.starfield div label .info[data-click-tooltip] {
     right: -200%;
-    right: calc(-200% - 2px);
+    right: calc(-200% - 3px);
 }
 
 

@@ -1252,13 +1252,19 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 elseif ($player_token == 'dr-cossack'){ $field_type = 'speed'; }
                 else { $field_type = 'energy'; }
                 $this_type_class = 'field_type field_type_'.$field_type;
-                $this_option_class .= $this_type_class;
+                //$this_option_class .= $this_type_class;
+                $field_type_or_none = $field_type;
+                $field_type_or_empty = $field_type;
             } elseif (!empty($this_fieldinfo['field_type'])){
                 $this_type_class = 'field_type field_type_'.$this_fieldinfo['field_type'].(!empty($this_fieldinfo['field_type2']) ? '_'.$this_fieldinfo['field_type2'] : '');
-                $this_option_class .= $this_type_class;
+                //$this_option_class .= $this_type_class;
+                $field_type_or_none = $this_fieldinfo['field_type'];
+                $field_type_or_empty = $this_fieldinfo['field_type'];
             } else {
                 $this_type_class = 'field_type field_type_none';
-                $this_option_class .= $this_type_class;
+                //$this_option_class .= $this_type_class;
+                $field_type_or_none = 'none';
+                $field_type_or_empty = 'empty';
             }
             if (!empty($this_fieldinfo['field_background'])){
                 $image_name = 'battle-field_preview';
@@ -1674,7 +1680,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             if ($data_next_limit > $unlocked_robots_num){ $data_next_limit = $unlocked_robots_num; }
             if ($data_next_limit > $limit_hearts_earned && !$is_endless_battle && !$is_challenge_battle){ $data_next_limit = $limit_hearts_earned; }
 
-            $btn_info_circle = '<span class="info" data-click-tooltip="'.$this_option_title_tooltip.'" data-tooltip-type="'.$this_type_class.'"><i class="fa fas fa-info-circle"></i></span>';
+            $btn_info_circle = '<span class="info color '.$field_type_or_empty.'" data-click-tooltip="'.$this_option_title_tooltip.'" data-tooltip-type="'.$this_type_class.'"><i class="fa fas fa-info-circle"></i></span>';
             $this_option_label = str_replace('<span class="info" />', $btn_info_circle, $this_option_label);
 
             // Print out the option button markup with sprite and name
@@ -2132,6 +2138,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_robot_experience_title = $this_robot_level >= 100 ? '&#8734;' : $this_robot_experience;
         $this_robot_core = !empty($info['robot_core']) ? $info['robot_core'] : '';
         $this_robot_core2 = !empty($info['robot_core2']) ? $info['robot_core2'] : '';
+        $this_robot_core_or_none = !empty($this_robot_core) ? $this_robot_core : 'none';
         $this_robot_item = !empty($info['robot_item']) ? $info['robot_item'] : '';
 
         $this_robot_favourite = in_array($info['robot_token'], $temp_player_favourites) ? true : false;
@@ -2208,13 +2215,13 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         }
         $this_option_title_plain = strip_tags(str_replace('<br />', '&#10;', $this_option_title));
         $this_option_title_tooltip = htmlentities($this_option_title, ENT_QUOTES, 'UTF-8');
-        $this_option_type_token = 'robot_type robot_type_'.(!empty($this_robot_core) ? $this_robot_core : 'none').(!empty($this_robot_core2) ? '_'.$this_robot_core2 : '');
+        $this_option_type_token = 'robot_type robot_type_'.($this_robot_core_or_none).(!empty($this_robot_core2) ? '_'.$this_robot_core2 : '');
 
         $stat_reward_icons = !empty($namestring) ? ' <span class="icons stats">'.$namestring.'</span>' : '';
         if (!empty($stat_reward_icons)){ $temp_sprite_top -= 6; }
         $pinned_fav_icons = $this_robot_favourite ? ' <span class="icons favs"><i class="fa fas fa-thumbtack"></i></span>' : '';
 
-        $info_tooltip_icons = ' <span class="icons info" data-click-tooltip="'.$this_option_title_tooltip.'" data-tooltip-type="'.$this_option_type_token.'"><i class="fa fas fa-info-circle"></i></span>';
+        $info_tooltip_icons = ' <span class="icons info color '.$this_robot_core_or_none.'" data-click-tooltip="'.$this_option_title_tooltip.'" data-tooltip-type="'.$this_option_type_token.'"><i class="fa fas fa-info-circle"></i></span>';
 
         $robot_sprite_url = 'images/robots/'.$this_option_image.'/sprite_right_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
         $robot_sprite_markup = '<span class="sprite sprite_robot sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_base" style="background-image: url('.$robot_sprite_url.'); top: '.$temp_sprite_top.'px;"></span>';
