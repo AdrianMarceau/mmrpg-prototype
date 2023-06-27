@@ -78,6 +78,7 @@ ob_start();
                 $this_ability_unlocked = true;
                 if ($this_ability_unlocked){ $equipped_abilities_count++; }
                 else { continue; }
+                $block_num = $equipped_abilities_count > 8 ? $equipped_abilities_count % 8 : $equipped_abilities_count;
 
                 // Create the ability object using the session/index data
                 $temp_abilityinfo = $temp_abilities_index[$ability_token];
@@ -87,6 +88,8 @@ ob_start();
                 $temp_ability->trigger_onload(true);
                 $temp_type = $temp_ability->ability_type;
                 $temp_type2 = $temp_ability->ability_type2;
+                $temp_type_or_none = !empty($temp_type) ? $temp_type : 'none';
+                if ($temp_type_or_none === 'none' && !empty($temp_type2)){ $temp_type_or_none = $temp_type2; }
                 $temp_damage = $temp_ability->ability_damage;
                 $temp_damage2 = $temp_ability->ability_damage2;
                 $temp_damage_unit = $temp_ability->ability_damage_percent ? '%' : '';
@@ -349,9 +352,14 @@ ob_start();
 
                 // Now use the new object to generate a snapshot of this ability button
                 $btn_type = 'ability_type ability_type_'.(!empty($temp_ability->ability_type) ? $temp_ability->ability_type : 'none').(!empty($temp_ability->ability_type2) ? '_'.$temp_ability->ability_type2 : '');
-                $btn_class = 'button action_ability ability_'.$temp_ability->ability_token.' '.$btn_type.' block_'.$equipped_abilities_count.' ';
+                $btn_class = 'button action_ability ability_'.$temp_ability->ability_token.' '.$btn_type.' block_'.$block_num.' ';
                 $btn_action = 'ability_'.$temp_ability->ability_id.'_'.$temp_ability->ability_token;
-                $btn_info_circle = '<span class="info" data-click-tooltip="'.$temp_ability_details_tooltip.'" data-tooltip-type="'.$btn_type.'"><i class="fa fas fa-info-circle"></i></span>';
+
+                $btn_info_circle = '<span class="info color" data-click-tooltip="'.$temp_ability_details_tooltip.'" data-tooltip-type="'.$btn_type.'">';
+                    $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$temp_type_or_none.'"></i>';
+                    if (!empty($temp_type2)){ $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$temp_type2.'"></i>'; }
+                $btn_info_circle .= '</span>';
+
                 if ($allow_button){
                     echo('<a type="button" class="'.$btn_class.'" data-action="'.$btn_action.'" data-target="'.$temp_target.'" '.$order_button_markup.'>'.
                             '<label>'.

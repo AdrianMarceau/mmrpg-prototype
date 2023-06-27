@@ -30,17 +30,12 @@ ob_start();
         // Display the available sub options
         ?><div class="sub_actions" data-size="<?= $items_unlocked && $switch_allowed ? 4 : 3 ?>"><?
 
-            // Display the SCAN option
-            if ($target_player->counters['robots_active'] > 1){
-                ?><a class="button action_scan" type="button" <?= $target_player->counters['robots_active'] > 1 ? 'data-panel="scan"' : 'data-action="scan_'.$target_robot->robot_id.'_'.$target_robot->robot_token.'"' ?> data-order="<?= $dataOrder ?>"><label>Scan</label></a><?
-            } else {
-                foreach ($target_player->values['robots_active'] AS $key => $info){
-                    if ($info['robot_position'] != 'active'){ continue; }
-                    ?><a class="button action_scan" type="button" data-action="scan_<?= $info['robot_id'].'_'.$info['robot_token'] ?>" data-order="<?= $dataOrder ?>"><label>Scan</label></a><?
-                    break;
-                }
+            // Display the SWITCH option
+            if ($switch_allowed){
+                $temp_disabled = false;
+                ?><a class="button action_switch <?= $temp_disabled ? 'button_disabled' : '' ?>" type="button" <?= !$temp_disabled ? 'data-panel="switch"' : '' ?> <?= !$temp_disabled ? 'data-order="'.$dataOrder.'"' : '' ?>><label>Switch</label></a><?
+                $dataOrder++;
             }
-            $dataOrder++;
 
             // Display the ITEM option if it's been unlocked
             if ($items_unlocked){
@@ -53,12 +48,17 @@ ob_start();
             ?><a class="button action_option" type="button" data-panel="option" data-order="<?= $dataOrder ?>"><label>Option</label></a><?
             $dataOrder++;
 
-            // Display the SWITCH option
-            if ($switch_allowed){
-                $temp_disabled = false;
-                ?><a class="button action_switch <?= $temp_disabled ? 'button_disabled' : '' ?>" type="button" <?= !$temp_disabled ? 'data-panel="switch"' : '' ?> <?= !$temp_disabled ? 'data-order="'.$dataOrder.'"' : '' ?>><label>Switch</label></a><?
-                $dataOrder++;
+            // Display the SCAN option
+            if ($target_player->counters['robots_active'] > 1){
+                ?><a class="button action_scan" type="button" <?= $target_player->counters['robots_active'] > 1 ? 'data-panel="scan"' : 'data-action="scan_'.$target_robot->robot_id.'_'.$target_robot->robot_token.'"' ?> data-order="<?= $dataOrder ?>"><label>Scan</label></a><?
+            } else {
+                foreach ($target_player->values['robots_active'] AS $key => $info){
+                    if ($info['robot_position'] != 'active'){ continue; }
+                    ?><a class="button action_scan" type="button" data-action="scan_<?= $info['robot_id'].'_'.$info['robot_token'] ?>" data-order="<?= $dataOrder ?>"><label>Scan</label></a><?
+                    break;
+                }
             }
+            $dataOrder++;
 
         ?></div><?
     }
@@ -70,10 +70,10 @@ ob_start();
         ?></div><?
         // Display the available sub options
         ?><div class="sub_actions" data-size="<?= $items_unlocked ? 4 : 3 ?>"><?
-            ?><a class="button action_scan button_disabled" type="button"><label>Scan</label></a><?
+            ?><a class="button action_switch" type="button" data-panel="switch" data-order="2"><label>Switch</label></a><?
             if ($items_unlocked){ ?><a class="button action_item button_disabled" type="button"><label>Item</label></a><? }
             ?><a class="button action_option" type="button" data-panel="option" data-order="1"><label>Option</label></a><?
-            ?><a class="button action_switch" type="button" data-panel="switch" data-order="2"><label>Switch</label></a><?
+            ?><a class="button action_scan button_disabled" type="button"><label>Scan</label></a><?
         ?></div><?
     }
 

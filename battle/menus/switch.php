@@ -20,7 +20,7 @@ ob_start();
     }
 
     // Define and start the order counter
-    $temp_order_counter = 1;
+    $button_order = 1;
 
     // Display container for the main actions
     ?><div class="main_actions main_actions_hastitle"><span class="main_actions_title" style="<?= !empty($this_player->flags['switch_used_this_turn']) ? 'text-decoration: line-through;' : '' ?>">Select Switch Target <?= $this_switch_disabled ? '(Disabled)' : '' ?></span><?
@@ -30,161 +30,27 @@ ob_start();
 
         // Count the total number of robots
         $num_robots = count($this_player->player_robots);
-        $robot_direction = $this_player->player_side == 'left' ? 'right' : 'left';
-
-        // Collect the temp ability and item indexes
-        $mmrpg_abilities_index = rpg_ability::get_index(true);
-        $mmrpg_items_index = rpg_item::get_index(true);
 
         // Collect the target robot options and sort them
         $switch_player_robots = $this_player->player_robots;
-        $switch_robots_count = $this_player->counters['robots_active'];
         usort($switch_player_robots, 'rpg_prototype::sort_robots_for_battle_menu');
 
         // Loop through each robot and display its switch button
         foreach ($switch_player_robots AS $robot_key => $switch_robotinfo){
+
             // Ensure this is an actual switch in the index
             if (!empty($switch_robotinfo['robot_token'])){
 
-                // Default the allow button flag to true
-                $allow_button = true;
-
-                // Create the switch object using the session/index data
-                $temp_robot = rpg_game::get_robot($this_battle, $this_player, $switch_robotinfo);
-
-                // Check if the switch should be disabled based on attachments on this robot
-                $temp_switch_disabled = false;
-                if (!$this_switch_required
-                    && $temp_robot->robot_status != 'disabled'){
-                    $temp_robot_attachments = $temp_robot->get_current_attachments();
-                    if (!empty($temp_robot_attachments)){
-                        foreach ($temp_robot_attachments AS $attachment_token => $attachment_info){
-                            if (!empty($attachment_info['attachment_switch_disabled'])){
-                                $temp_switch_disabled = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                // If the switch is not disabled yet and the robot status isn't disabled, disable it
-                if ($this_switch_disabled && $this_robot->robot_status != 'disabled'){ $temp_switch_disabled = true; }
-
-                // If this player has already used a switch this turn
-                if (!empty($this_player->flags['switch_used_this_turn'])){ $temp_switch_disabled = true; }
-
-                // If this robot is already out, disable the button
-                if ($temp_robot->robot_position == 'active'){ $allow_button = false; }
-
-                // If this robot is disabled, disable the button
-                if ($temp_robot->robot_status == 'disabled'){ $allow_button = false; }
-
-                // If this robot is the "active" one (maybe it was a force switch?)
-                if ($switch_robots_count >= 2 && $temp_robot->robot_id == $this_robot->robot_id){ $allow_button = false; }
-
-                // If the current robot has switching disabled
-                if ($temp_switch_disabled){ $allow_button = false; }
-
-                // Define the title hover for the robot
-                $temp_robot_title = $temp_robot->robot_name.'  (Lv. '.$temp_robot->robot_level.')';
-                $temp_robot_title .= ' <br />'.(!empty($temp_robot->robot_core) ? ucfirst($temp_robot->robot_core).' Core' : 'Neutral Core').' | '.ucfirst($temp_robot->robot_position).' Position';
-
-                // Display the robot's item if it exists
-                if (!empty($temp_robot->robot_item) && !empty($mmrpg_items_index[$temp_robot->robot_item])){ $temp_robot_title .= ' | + '.$mmrpg_items_index[$temp_robot->robot_item]['item_name'].' '; }
-
-                // Display the robot's life and weapon energy current and base
-                $temp_robot_title .= ' <br />'.$temp_robot->robot_energy.' / '.$temp_robot->robot_base_energy.' LE';
-                $temp_robot_title .= ' | '.$temp_robot->robot_weapons.' / '.$temp_robot->robot_base_weapons.' WE';
-                if ($robot_direction == 'right' && $temp_robot->robot_class != 'mecha'){
-                    $temp_robot_title .= ' | '.$temp_robot->robot_experience.' / 1000 EXP';
-                }
-                $temp_robot_title .= ' <br />'.$temp_robot->robot_attack.' / '.$temp_robot->robot_base_attack.' AT';
-                $temp_robot_title .= ' | '.$temp_robot->robot_defense.' / '.$temp_robot->robot_base_defense.' DF';
-                $temp_robot_title .= ' | '.$temp_robot->robot_speed.' / '.$temp_robot->robot_base_speed.' SP';
-
-                // Loop through this robot's current abilities and list them as well
-                $temp_robot_title .= ' <br />';
-                foreach ($temp_robot->robot_abilities AS $key => $token){
-                    if (!isset($mmrpg_abilities_index[$token])){ continue; }
-                    if ($key > 0 && $key % 4 != 0){ $temp_robot_title .= '&nbsp;|&nbsp;'; }
-                    if ($key > 0 && $key % 4 == 0){ $temp_robot_title .= '<br /> '; }
-                    $info = rpg_ability::parse_index_info($mmrpg_abilities_index[$token]);
-                    $temp_robot_title .= $info['ability_name'];
-
-                }
-
-                // Encode the tooltip for markup insertion and create a plain one too
-                $temp_robot_title_plain = strip_tags(str_replace('<br />', '//', $temp_robot_title));
-                $temp_robot_title_tooltip = htmlentities($temp_robot_title, ENT_QUOTES, 'UTF-8');
-
-                // Collect the robot's core types for display
-                $temp_robot_core_type = !empty($temp_robot->robot_core) ? $temp_robot->robot_core : 'none';
-                $temp_robot_core2_type = !empty($temp_robot->robot_core2) ? $temp_robot->robot_core2 : '';
-                if (!empty($temp_robot->robot_item) && preg_match('/-core$/', $temp_robot->robot_item)){
-                    $temp_item_core_type = preg_replace('/-core$/', '', $temp_robot->robot_item);
-                    if (empty($temp_robot_core2_type) && $temp_robot_core_type != $temp_item_core_type){ $temp_robot_core2_type = $temp_item_core_type; }
-                }
-
-                // Collect the energy and weapon percent so we know how they're doing
-                $temp_energy_class = rpg_prototype::calculate_percentage_tier($temp_robot->robot_energy, $temp_robot->robot_base_energy);
-                $temp_weapons_class = rpg_prototype::calculate_percentage_tier($temp_robot->robot_weapons, $temp_robot->robot_base_weapons);
-
-                // Define the robot button text variables
-                $temp_robot_label = '<span class="multi">';
-                    $temp_robot_label .= '<span class="maintext">'.$temp_robot->robot_name.' <sup class="level">Lv. '.$temp_robot->robot_level.'</sup></span>';
-                    $temp_robot_label .= '<span class="subtext">';
-                        $temp_robot_label .= '<span class="stat_is_'.$temp_energy_class.'"><strong>'.$temp_robot->robot_energy.'</strong>/'.$temp_robot->robot_base_energy.' LE</span>';
-                    $temp_robot_label .= '</span>';
-                    $temp_robot_label .= '<span class="subtext">';
-                        $temp_robot_label .= '<span class="stat_is_'.$temp_weapons_class.'"><strong>'.$temp_robot->robot_weapons.'</strong>/'.$temp_robot->robot_base_weapons.' WE</span>';
-                    $temp_robot_label .= '</span>';
-                $temp_robot_label .= '</span>';
-
-                // Define the robot sprite variables
-                $temp_robot_sprite = array();
-                $temp_robot_sprite['name'] = $temp_robot->robot_name;
-                $temp_robot_sprite['image'] = $temp_robot->robot_image;
-                $temp_robot_sprite['image_size'] = $temp_robot->robot_image_size;
-                $temp_robot_sprite['image_size_text'] = $temp_robot_sprite['image_size'].'x'.$temp_robot_sprite['image_size'];
-                $temp_robot_sprite['image_size_zoom'] = $temp_robot->robot_image_size * 2;
-                $temp_robot_sprite['image_size_zoom_text'] = $temp_robot_sprite['image_size'].'x'.$temp_robot_sprite['image_size'];
-                $temp_robot_sprite['url'] = 'images/robots/'.$temp_robot->robot_image.'/sprite_'.$robot_direction.'_'.$temp_robot_sprite['image_size_text'].'.png';
-                $temp_robot_sprite['preload'] = 'images/robots/'.$temp_robot->robot_image.'/sprite_'.$robot_direction.'_'.$temp_robot_sprite['image_size_zoom_text'].'.png';
-                $temp_robot_sprite['class'] = 'sprite sprite_'.$temp_robot_sprite['image_size_text'].' sprite_'.$temp_robot_sprite['image_size_text'].'_'.($temp_robot->robot_energy > 0 ? ($temp_robot->robot_energy > ($temp_robot->robot_base_energy/2) ? 'base' : 'defend') : 'defeat').' ';
-                $temp_robot_sprite['style'] = 'background-image: url('.$temp_robot_sprite['url'].'?'.MMRPG_CONFIG_CACHE_DATE.');  top: 5px; left: 5px; ';
-                if ($temp_robot->robot_position == 'active'){ $temp_robot_sprite['style'] .= 'border-color: #ababab; '; }
-                $temp_robot_sprite['class'] .= 'sprite_'.$temp_robot_sprite['image_size_text'].'_energy_'.$temp_energy_class.' ';
-                $temp_robot_sprite['markup'] = '<span class="'.$temp_robot_sprite['class'].'" style="'.$temp_robot_sprite['style'].'">'.$temp_robot_sprite['name'].'</span>';
-
-                // Update the order button if necessary
-                $order_button_markup = $allow_button ? 'data-order="'.$temp_order_counter.'"' : '';
-                $temp_order_counter += $allow_button ? 1 : 0;
-
-                // Now use the new object to generate a snapshot of this switch button
-                $btn_type = 'robot_type robot_type_'.(!empty($temp_robot->robot_core) ? $temp_robot->robot_core : 'none').(!empty($temp_robot->robot_core2_type) ? '_'.$temp_robot->robot_core2_type : '');
-                $btn_class = 'button action_switch switch_'.$temp_robot->robot_token.' '.$btn_type.' block_'.($robot_key + 1).' ';
-                $btn_action = 'switch_'.$temp_robot->robot_id.'_'.$temp_robot->robot_token;
-                $btn_info_circle = '<span class="info" data-click-tooltip="'.$temp_robot_title_tooltip.'" data-tooltip-type="'.$btn_type.'"><i class="fa fas fa-info-circle"></i></span>';
-                if ($allow_button){
-                    echo('<a type="button" class="'.$btn_class.'" data-action="'.$btn_action.'" data-preload="'.$temp_robot_sprite['preload'].'" data-key="'.$temp_robot->robot_key.'" '.$order_button_markup.'>'.
-                            '<label>'.
-                                $btn_info_circle.
-                                $temp_robot_sprite['markup'].
-                                $temp_robot_label.
-                            '</label>'.
-                        '</a>');
-                } else {
-                    $btn_class .= 'button_disabled ';
-                    echo('<a type="button" class="'.$btn_class.'">'.
-                            '<label>'.
-                                $btn_info_circle.
-                                $temp_robot_sprite['markup'].
-                                $temp_robot_label.
-                            '</label>'.
-                        '</a>');
-                }
+                // Create the robot object using available data then use it to generate and print the buton
+                $robot = rpg_game::get_robot($this_battle, $target_player, $switch_robotinfo);
+                $robot_button_markup = rpg_prototype::print_robot_for_battle_menu($robot, 'switch', $robot_key, $button_order, array(
+                    'this_switch_disabled' => $this_switch_disabled,
+                    'this_switch_required' => $this_switch_required
+                    ));
+                echo $robot_button_markup;
 
             }
+
         }
 
         // If there were less than 8 robots, fill in the empty spaces
@@ -199,11 +65,14 @@ ob_start();
 
     // End the main action container tag
     ?></div><?
+
     // Display the back button by default
     $allow_back_button = $this_robot->robot_position == 'active' && $this_robot->robot_status != 'disabled' ? true : false;
-    ?><div class="sub_actions"><a <?= $allow_back_button ? 'data-order="'.$temp_order_counter.'"' : '' ?> class="button action_back <?= !$allow_back_button ? 'button_disabled' : '' ?>" type="button" <?= $allow_back_button ? 'data-panel="battle"' : '' ?>><?= $allow_back_button ? '<label>Back</label>' : '&nbsp;' ?></a></div><?
+    ?><div class="sub_actions"><a <?= $allow_back_button ? 'data-order="'.$button_order.'"' : '' ?> class="button action_back <?= !$allow_back_button ? 'button_disabled' : '' ?>" type="button" <?= $allow_back_button ? 'data-panel="battle"' : '' ?>><?= $allow_back_button ? '<label>Back</label>' : '&nbsp;' ?></a></div><?
+
     // Increment the order counter
-    $temp_order_counter++;
+    $button_order++;
+
 $actions_markup['switch'] = trim(ob_get_clean());
 $actions_markup['switch'] = preg_replace('#\s+#', ' ', $actions_markup['switch']);
 ?>

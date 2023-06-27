@@ -46,16 +46,20 @@ ob_start();
                 echo '<span class="float_title">Select Item</span> ';
                 echo '<span class="float_links">';
                     echo '<span class="page">Page</span>';
-                    for ($i = 1; $i <= $current_player_items_pages; $i++){ echo '<a class="num'.($i == $temp_selected_page ? ' active' : '').'" href="#'.$i.'">'.$i.'</a>'; }
+                    for ($i = 1; $i <= $current_player_items_pages; $i++){ echo '<a class="button num'.($i == $temp_selected_page ? ' active' : '').'" href="#'.$i.'">'.$i.'</a>'; }
                     if ($allow_inventory_access && !empty($this_robot->robot_item)){
                         $temp_iteminfo = $mmrpg_database_items[$this_robot->robot_item];
                         $temp_owned = !empty($_SESSION['GAME']['values']['battle_items'][$this_robot->robot_item]) ? $_SESSION['GAME']['values']['battle_items'][$this_robot->robot_item] : 0;
                         $temp_allowed = $temp_owned < MMRPG_SETTINGS_ITEMS_MAXQUANTITY ? true : false;
-                        echo '<a class="button'.(!$temp_allowed ? ' button_disabled' : '').'" data-action="ability_11_action-unequipitem" title="Unequip this item and return it to the inventory?">';
+                        echo '<a class="button'.(!$temp_allowed ? ' button_disabled' : '').'" data-action="ability_11_action-unequipitem">';
+                            echo '<i class="fa fas fa-download"></i> ';
                             echo '<span class="sprite sprite_40x40 sprite_40x40_base sprite_40x40_item" style="background-image: url(images/items/'.$this_robot->robot_item.'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span>';
-                            if ($temp_allowed){ echo 'Unequip '.$temp_iteminfo['item_name'].''; }
-                            else { echo '<del>Unequip '.$temp_iteminfo['item_name'].'</del>'; }
+                            if ($temp_allowed){ echo 'Unequip Item'; }
+                            else { echo '<del>Unequip Item</del>'; }
                             echo ' ('.$temp_owned.' &rsaquo; '.($temp_owned + 1).')';
+                            echo '<span class="info color" data-click-tooltip="Unequip the '.$temp_iteminfo['item_name'].' and return it to the inventory?" data-tooltip-type="empty">';
+                                echo '<i class="fa fas fa-info-circle color empty"></i>';
+                            echo '</span>';
                             //echo 'Send to Inventory?';
                         echo '</a>';
                     }
@@ -74,6 +78,7 @@ ob_start();
 
             // Count the total number of items
             $item_direction = $this_player->player_side == 'left' ? 'right' : 'left';
+
             // Define the item display counter
             $equipped_items_count = 0;
 
@@ -115,6 +120,7 @@ ob_start();
 
                 // Increment the equipped items count
                 $equipped_items_count++;
+                $block_num = $equipped_items_count > 8 ? $equipped_items_count % 8 : $equipped_items_count;
 
                 // Define the button enabled flag
                 $temp_button_enabled = $temp_button_enabled_base;
@@ -125,6 +131,8 @@ ob_start();
                 $temp_item->trigger_onload(true);
                 $temp_type = $temp_item->item_type;
                 $temp_type2 = $temp_item->item_type2;
+                $temp_type_or_none = !empty($temp_type) ? $temp_type : 'none';
+                if ($temp_type_or_none === 'none' && !empty($temp_type2)){ $temp_type_or_none = $temp_type2; }
                 $temp_damage = $temp_item->item_damage;
                 $temp_damage2 = $temp_item->item_damage2;
                 $temp_damage_unit = $temp_item->item_damage_percent ? '%' : '';
@@ -291,9 +299,14 @@ ob_start();
 
                 // Now use the new object to generate a snapshot of this item button
                 $btn_type = 'item_type item_type_'.(!empty($temp_item->item_type) ? $temp_item->item_type : 'none').(!empty($temp_item->item_type2) ? '_'.$temp_item->item_type2 : '');
-                $btn_class = 'button action_item item_'.$temp_item->item_token.' '.$btn_type.' block_'.$equipped_abilities_count.' ';
+                $btn_class = 'button action_item item_'.$temp_item->item_token.' '.$btn_type.' block_'.$block_num.' ';
                 $btn_action = 'item_'.$temp_item->item_id.'_'.$temp_item->item_token;
-                $btn_info_circle = '<span class="info" data-click-tooltip="'.$temp_item_details_tooltip.'" data-tooltip-type="'.$btn_type.'"><i class="fa fas fa-info-circle"></i></span>';
+
+                $btn_info_circle = '<span class="info color" data-click-tooltip="'.$temp_item_details_tooltip.'" data-tooltip-type="'.$btn_type.'">';
+                    $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$temp_type_or_none.'"></i>';
+                    if (!empty($temp_type2)){ $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$temp_type2.'"></i>'; }
+                $btn_info_circle .= '</span>';
+
                 if ($temp_button_enabled){
                     echo('<a type="button" class="'.$btn_class.'" data-order="'.$temp_order_counter.'" data-action="'.$btn_action.'" data-target="'.$temp_target.'">'.
                             '<label>'.
