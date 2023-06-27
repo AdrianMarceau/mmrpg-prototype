@@ -1672,6 +1672,9 @@ body.index #header {
     text-overflow: clip;
     */
 }
+#mmrpg .canvas_overlay_footer .overlay_multiplier_count_7 .field_multiplier,
+#mmrpg .canvas_overlay_footer .overlay_multiplier_count_8 .field_multiplier,
+#mmrpg .canvas_overlay_footer .overlay_multiplier_count_9 .field_multiplier,
 #mmrpg .canvas_overlay_footer .overlay_multiplier_count_10 .field_multiplier,
 #mmrpg .canvas_overlay_footer .overlay_multiplier_count_11 .field_multiplier,
 #mmrpg .canvas_overlay_footer .overlay_multiplier_count_12 .field_multiplier,
