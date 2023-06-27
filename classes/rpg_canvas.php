@@ -2752,7 +2752,7 @@ class rpg_canvas {
                 $temp_number = number_format($this_multiplier, 1);
                 if ($temp_number == '1.0'){ continue; }
                 $temp_title = $temp_name.' x '.$temp_number;
-                if ($temp_multipliers_count >= 8){ $temp_name = substr($temp_name, 0, 2); }
+                if ($temp_multipliers_count >= 6){ $temp_name = substr($temp_name, 0, 2); }
                 $temp_markup = '<span data-click-tooltip="'.$temp_title.'" data-tooltip-align="center" class="field_multiplier field_multiplier_'.$this_type.' field_multiplier_count_'.$temp_multipliers_count.' field_type field_type_'.$this_type.'"><span class="text"><span class="type">'.$temp_name.' </span><span class="cross">x</span><span class="number"> '.$temp_number.'</span></span></span>';
                 if (in_array($this_type, $this_special_types)){ $multiplier_markup_left .= $temp_markup; }
                 else { $multiplier_markup_right .= $temp_markup; }
