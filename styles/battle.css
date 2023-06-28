@@ -171,3 +171,58 @@
     -moz-border-radius: 0 4px 4px 0;
     border-radius: 0 4px 4px 0;
 }
+
+
+
+#mmrpg #canvas .event .sprite[data-id="foreground_attachment_field-star"],
+#mmrpg #canvas .event .sprite[data-id="foreground_attachment_fusion-star"],
+#mmrpg #canvas .event .sprite[data-id="foreground_attachment_field-star_shadow"],
+#mmrpg #canvas .event .sprite[data-id="foreground_attachment_fusion-star_shadow"] {
+    transform: scale(1) rotate(0) translate(0);
+    filter: brightness(1);
+    opacity: 1;
+    transition: transform 1.5s, filter 1.5s, opacity 1.5s;
+}
+#mmrpg #canvas .event .sprite[data-id="foreground_attachment_field-star"],
+#mmrpg #canvas .event .sprite[data-id="foreground_attachment_fusion-star"] {
+    transform-origin: center center;
+}
+#mmrpg #canvas .event .sprite[data-id="foreground_attachment_field-star_shadow"],
+#mmrpg #canvas .event .sprite[data-id="foreground_attachment_fusion-star_shadow"] {
+    transform-origin: bottom center;
+}
+#mmrpg #canvas .event .sprite[data-id="foreground_attachment_field-star"].field_star_collected,
+#mmrpg #canvas .event .sprite[data-id="foreground_attachment_fusion-star"].field_star_collected {
+    transform: scale(4) rotate(270deg) translate(0);
+    filter: brightness(4);
+    opacity: 0;
+}
+#mmrpg #canvas .event .sprite[data-id="foreground_attachment_field-star_shadow"].field_star_collected,
+#mmrpg #canvas .event .sprite[data-id="foreground_attachment_fusion-star_shadow"].field_star_collected {
+    transform: scale(2) rotate(0) translate(0, 10%);
+    opacity: 0;
+}
+
+
+#mmrpg #canvas .event .sprite[data-id="foreground_attachment_challenge-marker"],
+#mmrpg #canvas .event .sprite[data-id="foreground_attachment_challenge-marker_shadow"] {
+    transform: scale(1) rotate(0) translate(0);
+    filter: brightness(1);
+    opacity: 1;
+    transition: transform 1.5s, filter 1.5s, opacity 1.5s;
+}
+#mmrpg #canvas .event .sprite[data-id="foreground_attachment_challenge-marker"] {
+    transform-origin: center center;
+}
+#mmrpg #canvas .event .sprite[data-id="foreground_attachment_challenge-marker_shadow"] {
+    transform-origin: bottom center;
+}
+#mmrpg #canvas .event .sprite[data-id="foreground_attachment_challenge-marker"].challenge_marker_destroyed {
+    transform: scale(4) rotate(-270deg) translate(0);
+    filter: brightness(0);
+    opacity: 0;
+}
+#mmrpg #canvas .event .sprite[data-id="foreground_attachment_challenge-marker_shadow"].challenge_marker_destroyed {
+    transform: scale(1) rotate(0) translate(0, 10%);
+    opacity: 0;
+}

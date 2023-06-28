@@ -906,6 +906,7 @@ gameSettings.fieldMusic = '<?= !strstr($this_field_data['field_music'], '/') ? '
 gameSettings.customIndex.animationEffects = <?= json_encode($animation_effects_index) ?>;
 gameSettings.customIndex.gameSpeeds = <?= json_encode($game_speeds_index) ?>;
 gameSettings.customIndex.renderModes = <?= json_encode($render_modes_index) ?>;
+gameSettings.currentBattleData = <?= json_encode($this_battle_data) ?>;
 
 // Create the document ready events
 $(document).ready(function(){

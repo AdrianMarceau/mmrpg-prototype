@@ -2516,7 +2516,7 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 }
 #canvas [data-camera-shift="left"] .event .foreground_subevent,
 #canvas [data-camera-shift="right"] .event .foreground_subevent {
-    filter: brightness(0.6);
+    filter: brightness(0.8);
 }
 
 

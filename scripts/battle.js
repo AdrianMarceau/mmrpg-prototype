@@ -1,10 +1,17 @@
+
 // Define global variables
 var $thisPrototype = false;
 var $rogueStar = false;
 
+// Expand the game settings object with a variable battle specific data
+gameSettings.currentGameState = {}; // default to empty but may be filled at runtime and used later
+gameSettings.currentBattleData = {};
+gameSettings.currentBattleState = {};
+
 // Create the document ready events
 $(document).ready(function(){
     $thisPrototype = $('#mmrpg');
+    $thisCanvas = $('#canvas', $thisPrototype);
 
     // Start playing the appropriate stage music
     parent.mmrpg_music_load(gameSettings.fieldMusic, true, false);
@@ -36,7 +43,8 @@ $(document).ready(function(){
             mmrpg_start_animation();
             mmrpg_action_trigger('start', false);
             }, false, true);
-        } else {
+        }
+    else {
         // Fade the battle in normally, one layer at a time before loading
         thisContext.css({opacity:0}).removeClass('hidden').animate({opacity:1.0}, Math.ceil(gameSettings.eventTimeout * 3), 'swing', function(){
             // Automatically trigger a click on the start button
@@ -252,6 +260,139 @@ $(document).ready(function(){
         $rogueStar.removeClass('loading');
 
         }
+
+
+    // -- BATTLE-SPECIFIC ANIMATIONS -- //
+
+    // Process battle-specific conditions if they exist and are accessible
+    if (Object.keys(gameSettings.currentBattleData).length
+        && typeof gameSettings.currentBattleData.battle_token !== 'undefined'){
+        //console.log('gameSettings.currentBattleData', gameSettings.currentBattleData);
+
+        // -- STAR FORCE COLLLECTION -- //
+
+        // Define the event to trigger when STAR FORCE is collected via a Field Star or Fusion Star
+        var battleHasStarForce = false;
+        if (typeof gameSettings.currentBattleData.values !== 'undefined'
+            && typeof gameSettings.currentBattleData.values.field_star !== 'undefined'){
+
+            // Collect a reference to the field star data so we can parse it
+            var fieldStarData = gameSettings.currentBattleData.values.field_star;
+            var fieldStarKind = fieldStarData.star_kind;
+            //console.log('fieldStarData =', fieldStarKind, fieldStarData);
+
+            // Collect a reference to the star on-screen and its shadow so we can manipulate later
+            var $starForceSprite = $('.sprite[data-id="foreground_attachment_'+fieldStarKind+'-star"]', $thisCanvas);
+            var $starForceSpriteShadow = $('.sprite[data-id="foreground_attachment_'+fieldStarKind+'-star_shadow"]', $thisCanvas);
+            //console.log('$starForceSprite', $starForceSprite);
+            //console.log('$starForceSpriteShadow', $starForceSpriteShadow);
+
+            // Define a function for "collecting" the star force and animating it
+            var collectStarForceTimeout = false;
+            var collectStarForceAnimation = function(){
+                if (typeof gameSettings.currentGameState === 'undefined'){ return false; }
+                if (typeof gameSettings.currentGameState.this_action === 'undefined'){ return false; }
+                if (typeof gameSettings.currentGameState.this_battle_result === 'undefined'){ return false; }
+                if (typeof gameSettings.currentGameState.this_battle_status === 'undefined'){ return false; }
+                //console.log('Apply the field_star_collected classes');
+                $starForceSprite.addClass('field_star_collected');
+                $starForceSpriteShadow.addClass('field_star_collected');
+                };
+            var resetStarForceAnimation = function(){
+                //console.log('Remove the field_star_collected classes');
+                $starForceSprite.removeClass('field_star_collected');
+                $starForceSpriteShadow.removeClass('field_star_collected');
+                };
+
+            // Add an event hook to check for the star force collection
+            gameSettings.eventHooks.push(function(eventFlags){
+                //console.log('gameSettings.eventHooks() w/', eventFlags, gameSettings.currentGameState);
+                // If the battle status is now complet, make sure we move the
+                if (gameSettings.currentGameState.this_battle_status === 'complete'){
+                    //console.log('move the sprite into the foreground immediately');
+                    // Collect references to the two foreground divs that this star can be inside
+                    var $battleSceneDiv = $('.event .battle_scene', $thisCanvas);
+                    if (!$.contains($starForceSprite[0], $battleSceneDiv[0])){
+                        $starForceSprite.appendTo($battleSceneDiv);
+                        $starForceSpriteShadow.appendTo($battleSceneDiv);
+                        }
+                }
+                // If victory has been claimed, we can run the function to add the classes
+                if (eventFlags.victory === true){
+                    //console.log('The battle has been won!  Queue-up collecting the star force!');
+                    if (collectStarForceTimeout !== false){ clearTimeout(collectStarForceTimeout); }
+                    collectStarForceTimeout = setTimeout(collectStarForceAnimation, 1000);
+                    }
+                });
+
+            window.mmrpgCollectStarForce = collectStarForceAnimation;
+            window.mmrpgResetStarForce = resetStarForceAnimation;
+
+        }
+
+        // -- CHALLENGE MARKER COLLLECTION -- //
+
+        // Define the event to trigger when CHALLENGE MARKER is collected via a Challenge Mission
+        var battleHasChallengeMarker = false;
+        if (typeof gameSettings.currentBattleData.values !== 'undefined'
+            && typeof gameSettings.currentBattleData.values.challenge_records !== 'undefined'){
+
+            // Collect a reference to the field star data so we can parse it
+            var challengeRecordData = gameSettings.currentBattleData.values.challenge_records;
+            var challengeRecordKind = gameSettings.currentBattleData.values.challenge_battle_kind;
+            //console.log('challengeRecordData =', challengeRecordKind, challengeRecordData);
+
+            // Collect a reference to the star on-screen and its shadow so we can manipulate later
+            var $challengeMarkerSprite = $('.sprite[data-id="foreground_attachment_challenge-marker"]', $thisCanvas);
+            var $challengeMarkerSpriteShadow = $('.sprite[data-id="foreground_attachment_challenge-marker_shadow"]', $thisCanvas);
+            //console.log('$challengeMarkerSprite', $challengeMarkerSprite);
+            //console.log('$challengeMarkerSpriteShadow', $challengeMarkerSpriteShadow);
+
+            // Define a function for "collecting" the star force and animating it
+            var collectChallengeMarkerTimeout = false;
+            var collectChallengeMarkerAnimation = function(){
+                if (typeof gameSettings.currentGameState === 'undefined'){ return false; }
+                if (typeof gameSettings.currentGameState.this_action === 'undefined'){ return false; }
+                if (typeof gameSettings.currentGameState.this_battle_result === 'undefined'){ return false; }
+                if (typeof gameSettings.currentGameState.this_battle_status === 'undefined'){ return false; }
+                //console.log('Apply the challenge_marker_destroyed classes');
+                $challengeMarkerSprite.addClass('challenge_marker_destroyed');
+                $challengeMarkerSpriteShadow.addClass('challenge_marker_destroyed');
+                };
+            var resetChallengeMarkerAnimation = function(){
+                //console.log('Remove the challenge_marker_destroyed classes');
+                $challengeMarkerSprite.removeClass('challenge_marker_destroyed');
+                $challengeMarkerSpriteShadow.removeClass('challenge_marker_destroyed');
+                };
+
+            // Add an event hook to check for the star force collection
+            gameSettings.eventHooks.push(function(eventFlags){
+                //console.log('gameSettings.eventHooks() w/', eventFlags, gameSettings.currentGameState);
+                // If the battle status is now complet, make sure we move the
+                if (gameSettings.currentGameState.this_battle_status === 'complete'){
+                    //console.log('move the sprite into the foreground immediately');
+                    // Collect references to the two foreground divs that this star can be inside
+                    var $battleSceneDiv = $('.event .battle_scene', $thisCanvas);
+                    if (!$.contains($challengeMarkerSprite[0], $battleSceneDiv[0])){
+                        $challengeMarkerSprite.appendTo($battleSceneDiv);
+                        $challengeMarkerSpriteShadow.appendTo($battleSceneDiv);
+                        }
+                }
+                // If victory has been claimed, we can run the function to add the classes
+                if (eventFlags.victory === true){
+                    //console.log('The battle has been won!  Queue-up collecting the star force!');
+                    if (collectChallengeMarkerTimeout !== false){ clearTimeout(collectChallengeMarkerTimeout); }
+                    collectChallengeMarkerTimeout = setTimeout(collectChallengeMarkerAnimation, 1000);
+                    }
+                });
+
+            window.mmrpgCollectChallengeMarker = collectChallengeMarkerAnimation;
+            window.mmrpgResetChallengeMarker = resetChallengeMarkerAnimation;
+
+        }
+
+
+    }
 
 
 });
