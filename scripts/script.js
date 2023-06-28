@@ -27,6 +27,7 @@ gameSettings.eventTimeoutThreshold = 250; // timeout theshold for when frames st
 gameSettings.eventAutoPlay = true; // whether or not to automatically advance events
 gameSettings.eventCrossFade = true; // whether or not to canvas events have crossfade animation
 gameSettings.eventCameraShift = true; // whether or not to canvas events have camera shifts
+gameSettings.eventHooks = []; // default to empty but may be filled at runtime and used later
 gameSettings.spriteRenderMode = 'default'; // the render mode we should be using for sprites
 gameSettings.idleAnimation = true; // default to allow idle animations
 gameSettings.indexLoaded = false; // default to false until the index is loaded
@@ -855,7 +856,7 @@ var canvasAnimationTimeout = false;
 var canvasAnimationCameraShift = false;
 var canvasAnimationCameraLastShift = false;
 var canvasAnimationCameraTimer = 0;
-var canvasAnimationCameraDelay = 6;
+var canvasAnimationCameraDelay = 5;
 function mmrpg_canvas_animate(){
     //console.log('mmrpg_canvas_animate();');
     //console.log('gameSettings.idleAnimation:', gameSettings.idleAnimation);
@@ -1794,6 +1795,13 @@ function mmrpg_events(){
         // Collect the topmost event and execute it
         thisEvent = mmrpgEvents.shift();
         thisEvent.event_functions(thisEvent.event_flags);
+        // Loop through eventhooks functions if there are any in gameSettings.eventHooks and process them with this event
+        if (gameSettings.eventHooks.length){
+            $.each(gameSettings.eventHooks, function(){
+                var thisEventHook = this;
+                if (typeof thisEventHook == 'function'){ thisEventHook(thisEvent.event_flags); }
+                });
+            }
         }
 
     if (mmrpgEvents.length < 1){
