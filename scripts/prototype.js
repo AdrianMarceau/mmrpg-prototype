@@ -216,7 +216,7 @@ $(document).ready(function(){
             });
 
         // Check if the player token has already been selected
-        if (battleOptions['this_player_token'] != undefined){
+        if (battleOptions['this_player_token'] !== undefined){
             //alert('player selected : '+battleOptions['this_player_token']);
             gameSettings.skipPlayerSelect = true;
             var thisMenu = $('.menu[data-select="this_player_token"]', thisContext);
@@ -792,7 +792,7 @@ function prototype_menu_click_option(thisContext, thisOption){
 
         }
 
-    //alert(thisSelect);
+    //console.log('thisSelect =', thisSelect);
 
     // Execute option-specific commands for special cases
     switch (thisSelect){
@@ -829,12 +829,13 @@ function prototype_menu_click_option(thisContext, thisOption){
             var tempInnerWrapper = tempWrapper.find('> .wrap');
             var tokenParent = $('.option[data-parent]', tempWrapper);
             var tokenParentLimit = tempMenu.attr('data-limit');
+            //console.log('tempWrapper(A) =', tempWrapper, tempWrapper.html());
 
             // Count the number of available robots right now
             var requiredRobots = nextLimit;
             var availableRobots = $('.option[data-child]', tempWrapper);
             var selectedRobots = $('.option[data-parent]', tempWrapper);
-            //alert('Battle requires '+requiredRobots+' robots, you have '+availableRobots.length+'.');
+            //console.log('Battle requires '+requiredRobots+' robots, you have '+availableRobots.length+'.', availableRobots);
 
             // Trigger perfect scrollbars on the frame containers
             //console.log('tempWrapper('+tempWrapper.length+') = ', tempWrapper);
@@ -851,9 +852,7 @@ function prototype_menu_click_option(thisContext, thisOption){
             if (!$('.reselect', tempMenuHeader).length){
                 var tempReselect = $('<span class="reselect">&#215;</span>');
                 tempReselect.click(function(){
-                    //alert('reselect!');
-                    // If there are no robots selected, do nothing
-                    //if (battleOptions['this_player_robots'] == undefined){ alert('undefined?'); return; }
+                    //console.log('reselect!');
                     // Re-enable all robot options
                     $('.option_wrapper[data-condition]', tempMenu).css({display:''});
                     $('.option[data-child]', tempMenu).removeClass('option_disabled');
@@ -866,7 +865,6 @@ function prototype_menu_click_option(thisContext, thisOption){
                     return true;
                     });
                 tempMenuHeader.append(tempReselect);
-
                 }
 
             // If the user has less than the limit required
@@ -875,41 +873,40 @@ function prototype_menu_click_option(thisContext, thisOption){
                 }
 
             // If robots have not been selected, hide the reselector
-            if (battleOptions['this_player_robots'] == undefined || battleOptions['this_player_robots'].length < 1){
-                //alert('hide reselect');
+            if (battleOptions['this_player_robots'] === undefined || battleOptions['this_player_robots'].length < 1){
+                //console.log('hide reselect');
                 $('.reselect', tempMenuHeader).css({opacity:0});
                 } else {
-                //alert('show reselect');
+                //console.log('show reselect');
                 $('.reselect', tempMenuHeader).css({opacity:1});
                 }
 
             // Generate the placeholder sprite markup
             var iCounter = 1;
             var spriteMarkup = '';
-            //for (iCounter; iCounter <= nextLimit; iCounter++){
             for (iCounter; iCounter <= gameSettings.nextRobotLimit; iCounter++){
 
-                var someValue = 80 + ((tokenParentLimit * 40) - (iCounter * 40) + 40);
-                //var someValue = (gameSettings.totalRobotLimit * 40) - (iCounter * 40) + 40;
+                var tempOffset = 80 + ((tokenParentLimit * 40) - (iCounter * 40) + 40);
 
                 var heartClass = 'sprite sprite_40x40 sprite_40x40_heartback sticky ';
-                var heartStyle = ' bottom: 4px; right: '+(someValue - 2)+'px; left: auto; z-index: 1; text-indent: 0; text-align: center; color: #262626; font-size: 24px; ';
+                var heartStyle = ' bottom: 4px; right: '+(tempOffset - 2)+'px; left: auto; z-index: 1; text-indent: 0; text-align: center; color: #262626; font-size: 24px; ';
                 spriteMarkup += '<span class="'+heartClass+'" style="'+heartStyle+'"><i class="fa fas fa-heart"></i></span>';
 
                 var spriteClass = 'sprite sprite_40x40 sprite_40x40_base sprite_40x40_placeholder sticky ';
-                //var spriteStyle = 'bottom: 6px; right: '+someValue+'px; left: auto; z-index: 2; background-image: url(images/robots/robot/sprite_right_40x40.png?'+gameSettings.cacheTime+'); ';
-                var spriteStyle = 'bottom: 6px; right: '+someValue+'px; left: auto; z-index: 2; ';
+                var spriteStyle = 'bottom: 6px; right: '+tempOffset+'px; left: auto; z-index: 2; ';
                 spriteMarkup += '<span data-key="'+(gameSettings.nextRobotLimit - iCounter)+'" class="'+spriteClass+'" style="'+spriteStyle+'">Select Robot</span>';
 
                 }
 
             // Prepend the sprite to the parent's label value
             var labelPadding = ((tokenParentLimit * 40)+60)+'px';
-            //var labelPadding = ((gameSettings.totalRobotLimit * 40)+60)+'px';
             $('.sprite_40x40_placeholder', tokenParent).remove();
-            $('label', tokenParent).prepend(spriteMarkup); //.css({paddingLeft:labelPadding}),marginLeft:'260px'
+            $('label', tokenParent).prepend(spriteMarkup);
+
+            //console.log('tempWrapper(B) =', tempWrapper, tempWrapper.html());
 
             break;
+
             }
         case '': {
 
@@ -924,7 +921,7 @@ function prototype_menu_click_option(thisContext, thisOption){
         }
 
     // Only do banner events for non-child options
-    if (thisOption.attr('data-child') == undefined){
+    if (typeof thisOption.attr('data-child') === 'undefined'){
 
         // Collect the context for the banner area and remove and foregrounds
 
@@ -1354,7 +1351,7 @@ function prototype_menu_switch(switchOptions){
                                 success: function(markup, status){
 
                                     // DEBUG
-                                    //console.log('AJAX RETURN2 :');
+                                    //console.log('AJAX RETURN2 for currentMenuSelect['+currentMenuSelect+']:');
                                     //console.log({markup:markup,status:status});
 
                                     // If the markup is not empty, replace this menu's options
@@ -1385,6 +1382,25 @@ function prototype_menu_switch(switchOptions){
 
                                     // Trigger the callback function
                                     tempCallbackFunction();
+
+                                    /*
+                                    // MAYBE TODO? AUTO-CLICK WHEN ONLY ONE ROBOT?
+                                    // If this was a robot select loading, auto-click through if only one robot
+                                    if (currentMenuSelect == 'this_player_robots'){
+                                        //console.log('auto-click robot option?');
+                                        // Check to see which one should be displayed first and autoclick it
+                                        var $availableRobots = $('.option[data-token][data-child="true"]', tempMenuWrapper);
+                                        var $confirmButton = $('.option[data-token][data-parent="true"]', tempMenuWrapper);
+                                        var numRobotsAvailable = $availableRobots.length;
+                                        //console.log('numRobotsAvailable =', numRobotsAvailable);
+                                        if (numRobotsAvailable === 1){
+                                            //console.log('Only one robot! AUTO CLICK IT!');
+                                            $availableRobots.first().trigger('click');
+                                            $confirmButton.trigger('click');
+                                            }
+
+                                    }
+                                    */
 
                                     }
                                 });

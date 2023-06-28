@@ -7,6 +7,7 @@ var $rogueStar = false;
 gameSettings.currentGameState = {}; // default to empty but may be filled at runtime and used later
 gameSettings.currentBattleData = {};
 gameSettings.currentBattleState = {};
+gameSettings.battleHasStarted = false;
 
 // Create the document ready events
 $(document).ready(function(){
@@ -47,21 +48,26 @@ $(document).ready(function(){
     else {
         // Fade the battle in normally, one layer at a time before loading
         thisContext.css({opacity:0}).removeClass('hidden').animate({opacity:1.0}, Math.ceil(gameSettings.eventTimeout * 3), 'swing', function(){
-            // Automatically trigger a click on the start button
-            //$('#actions_start a[data-action=start]', thisContext).trigger('click');
+            //console.log('fade in the context');
             // Collect all the elements to be animated
             var canvasContext = $('#canvas', thisContext);
             thisContext.waitForImages(function(){
+                //console.log('images are ready');
                 $rogueStar.addClass('hidelabel');
                 // Fade the battle canvas startup elements into view
                 mmrpg_battle_fadein_background(canvasContext, Math.ceil(gameSettings.eventTimeout * 2), function(){
+                    //console.log('background has faded in');
                     // Fade in the foreground now so it loads at the same time as the robots
                     mmrpg_battle_fadein_foreground(canvasContext, Math.ceil(gameSettings.eventTimeout * 1), function(){
-                        // Automatically send the start action to the data api
-                        $('#animate').css({opacity:1});
-                        $('#canvas .canvas_overlay_header').animate({opacity:1}, Math.ceil(gameSettings.eventTimeout * 2), 'swing', function(){ $(this).removeClass('canvas_overlay_hidden'); });
-                        mmrpg_start_animation();
-                        mmrpg_action_trigger('start', false);
+                        //console.log('foreground has faded in');
+                        if (!gameSettings.battleHasStarted){
+                            // Automatically send the start action to the data api
+                            $('#animate').css({opacity:1});
+                            $('#canvas .canvas_overlay_header').animate({opacity:1}, Math.ceil(gameSettings.eventTimeout * 2), 'swing', function(){ $(this).removeClass('canvas_overlay_hidden'); });
+                            mmrpg_start_animation();
+                            mmrpg_action_trigger('start', false);
+                            gameSettings.battleHasStarted = true;
+                            }
                         });
                     });
                 }, false, true);

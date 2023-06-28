@@ -353,7 +353,7 @@ $(document).ready(function(){
 
         // Define a change event for whenever this game setting is altered
         gameSettingsChangeEvents['eventTimeout'] = function(newValue){
-            //console.log('setting eventTimeout to ', newValue);
+            //console.log('setting eventTimeout to ', newValue, typeof newValue);
             updateCameraShiftTransitionDuration();
             var $actionButton = $('.button.action_option[data-panel="settings_eventTimeout"]', gameActions);
             if ($actionButton.length){
@@ -974,12 +974,14 @@ function mmrpg_canvas_animate(){
             //var mugshotSprite = $('.sprite[data-mugshotid='+spriteID+']', gameCanvas);
             //alert('Shadowsprite '+(shadowSprite.length ? 'exists' : 'does not exist')+'!');
             if (gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold){
+                //console.log('normal animation');
                 // We're at a normal speed, so we can animate normally
                 thisSprite.stop(true, true).animate({opacity:0},Math.ceil(gameSettings.eventTimeout / 2),'linear',function(){
                     $(this).remove();
                     if (shadowSprite.length){ shadowSprite.stop(true, true).animate({opacity:0},Math.ceil(gameSettings.eventTimeout / 2),'linear',function(){ $(this).remove(); }); }
                     });
                 } else {
+                //console.log('speedy animation');
                 // We're at a super-fast speed, so we should NOT cross-fade
                 thisSprite.stop(true, true).remove();
                 if (shadowSprite.length){ shadowSprite.stop(true, true).remove(); }
@@ -1777,9 +1779,13 @@ function mmrpg_event(flagsMarkup, dataMarkup, canvasMarkup, consoleMarkup){
             },
         'event_flags' : flagsMarkup //$.parseJSON(flagsMarkup)
             });
+    //console.log('mmrpgEvents.push() w/ new size', mmrpgEvents.length);
 }
 // Define a function for playing the events
+var eventAlreadyQueued = false;
 function mmrpg_events(){
+
+    if (eventAlreadyQueued){ return; }
 
     //console.log('mmrpg_events()');
     //clearTimeout(canvasAnimationTimeout);
@@ -1790,6 +1796,7 @@ function mmrpg_events(){
 
     var thisEvent = false;
     if (mmrpgEvents.length){
+        //console.log('mmrpgEvents.length =', mmrpgEvents.length);
         // Switch to the events panel
         mmrpg_action_panel('event');
         // Collect the topmost event and execute it
@@ -1816,11 +1823,16 @@ function mmrpg_events(){
         } else if (mmrpgEvents.length >= 1){
             var autoClickTimer = false;
             if (gameSettings.eventAutoPlay && thisEvent.event_flags.autoplay != false){
-                requestAnimationFrame(function(){
-                    autoClickTimer = setTimeout(function(){
+                //console.log('queue next event');
+                eventAlreadyQueued = true;
+                clearTimeout(autoClickTimer);
+                autoClickTimer = setTimeout(function(){
+                    requestAnimationFrame(function(){
+                        //console.log('fire next event');
+                        eventAlreadyQueued = false;
                         mmrpg_events();
-                        }, parseInt(gameSettings.eventTimeout));
-                    });
+                        });
+                    }, parseInt(gameSettings.eventTimeout));
                 $('a[data-action="continue"]').addClass('button_disabled');
                 } else {
                 $('a[data-action="continue"]').removeClass('button_disabled');
@@ -1869,6 +1881,7 @@ function mmrpg_canvas_event(thisMarkup, eventFlags){ //, flagsMarkup
     var thisContext = $('.wrapper', gameCanvas);
     if (thisContext.length){
         //console.log('mmrpg_canvas_event(thisMarkup, eventFlags) | eventFlags =', eventFlags);
+        //console.log('gameSettings.eventTimeout =', gameSettings.eventTimeout, 'gameSettings.eventTimeoutThreshold =', gameSettings.eventTimeoutThreshold);
         // Drop all the z-indexes to a single amount
         $('.event:not(.sticky)', thisContext).css({zIndex:500});
         // Calculate the top offset based on previous event height
@@ -2550,135 +2563,127 @@ function dump(arr,level) {
 
 // Define a jQuery function for waiting for images
 ;(function($) {
+
         // Namespace all events.
         var eventNamespace = 'waitForImages';
 
         // CSS properties which contain references to images.
         $.waitForImages = {
-                hasImageProperties: [
-                'backgroundImage',
-                'listStyleImage',
-                'borderImage',
-                'borderCornerImage'
-                ]
+            hasImageProperties: [
+            'backgroundImage',
+            'listStyleImage',
+            'borderImage',
+            'borderCornerImage'
+            ]
         };
 
         // Custom selector to find `img` elements that have a valid `src` attribute and have not already loaded.
         $.expr[':'].uncached = function(obj) {
-                // Ensure we are dealing with an `img` element with a valid `src` attribute.
-                if ( ! $(obj).is('img[src!=""]')) {
-                        return false;
-                }
-
-                // Firefox's `complete` property will always be`true` even if the image has not been downloaded.
-                // Doing it this way works in Firefox.
-                var img = document.createElement('img');
-                img.src = obj.src;
-                return ! img.complete;
+            // Ensure we are dealing with an `img` element with a valid `src` attribute.
+            if ( ! $(obj).is('img[src!=""]')) {
+                return false;
+            }
+            // Firefox's `complete` property will always be`true` even if the image has not been downloaded.
+            // Doing it this way works in Firefox.
+            var img = document.createElement('img');
+            img.src = obj.src;
+            return ! img.complete;
         };
 
         $.fn.waitForImages = function(finishedCallback, eachCallback, waitForAll) {
-
-                // Handle options object.
-                if ($.isPlainObject(arguments[0])) {
-                        eachCallback = finishedCallback.each;
-                        waitForAll = finishedCallback.waitForAll;
-                        finishedCallback = finishedCallback.finished;
-                }
-
-                // Handle missing callbacks.
-                finishedCallback = finishedCallback || $.noop;
-                eachCallback = eachCallback || $.noop;
-
-                // Convert waitForAll to Boolean
-                waitForAll = !! waitForAll;
-
-                // Ensure callbacks are functions.
-                if (!$.isFunction(finishedCallback) || !$.isFunction(eachCallback)) {
-                        throw new TypeError('An invalid callback was supplied.');
-                };
-
-                return this.each(function() {
-                        // Build a list of all imgs, dependent on what images will be considered.
-                        var obj = $(this),
-                                allImgs = [];
-
-                        if (waitForAll) {
-                                // CSS properties which may contain an image.
-                                var hasImgProperties = $.waitForImages.hasImageProperties || [],
-                                        matchUrl = /url\((['"]?)(.*?)\1\)/g;
-
-                                // Get all elements, as any one of them could have a background image.
-                                obj.find('*').each(function() {
-                                        var element = $(this);
-
-                                        // If an `img` element, add it. But keep iterating in case it has a background image too.
-                                        if (element.is('img:uncached')) {
-                                                allImgs.push({
-                                                        src: element.attr('src'),
-                                                        element: element[0]
-                                                });
-                                        }
-
-                                        $.each(hasImgProperties, function(i, property) {
-                                                var propertyValue = element.css(property);
-                                                // If it doesn't contain this property, skip.
-                                                if ( ! propertyValue) {
-                                                        return true;
-                                                }
-
-                                                // Get all url() of this element.
-                                                var match;
-                                                while (match = matchUrl.exec(propertyValue)) {
-                                                        allImgs.push({
-                                                                src: match[2],
-                                                                element: element[0]
-                                                        });
-                                                };
+            // Handle options object.
+            if ($.isPlainObject(arguments[0])) {
+                eachCallback = finishedCallback.each;
+                waitForAll = finishedCallback.waitForAll;
+                finishedCallback = finishedCallback.finished;
+            }
+            // Handle missing callbacks.
+            finishedCallback = finishedCallback || $.noop;
+            eachCallback = eachCallback || $.noop;
+            // Convert waitForAll to Boolean
+            waitForAll = !! waitForAll;
+            // Ensure callbacks are functions.
+            if (!$.isFunction(finishedCallback) || !$.isFunction(eachCallback)) {
+                throw new TypeError('An invalid callback was supplied.');
+            };
+            return this.each(function() {
+                // Build a list of all imgs, dependent on what images will be considered.
+                var obj = $(this);
+                var allImgs = [];
+                var processedImages = new Set();
+                if (waitForAll){
+                    // CSS properties which may contain an image.
+                    var hasImgProperties = $.waitForImages.hasImageProperties || [];
+                    var matchUrl = /url\((['"]?)(.*?)\1\)/g;
+                    // Get all elements, as any one of them could have a background image.
+                    obj.find('*').each(function(){
+                        var element = $(this);
+                        // If an `img` element, add it. But keep iterating in case it has a background image too.
+                        if (element.is('img:uncached')
+                            && !processedImages.has(element.attr('src'))){
+                            allImgs.push({
+                                src: element.attr('src'),
+                                element: element[0]
+                                });
+                            processedImages.add(element.attr('src'));
+                        }
+                        $.each(hasImgProperties, function(i, property){
+                            var propertyValue = element.css(property);
+                            // If it doesn't contain this property, skip.
+                            if (!propertyValue){
+                                return true;
+                                }
+                            // Get all url() of this element.
+                            var match;
+                            while (match = matchUrl.exec(propertyValue)){
+                                if (!processedImages.has(match[2])){
+                                    allImgs.push({
+                                        src: match[2],
+                                        element: element[0]
                                         });
-                                });
-                        } else {
-                                // For images only, the task is simpler.
-                                obj
-                                 .find('img:uncached')
-                                 .each(function() {
-                                        allImgs.push({
-                                                src: this.src,
-                                                element: this
-                                        });
-                                });
-                        };
-
-                        var allImgsLength = allImgs.length,
-                                allImgsLoaded = 0;
-
-                        // If no images found, don't bother.
-                        if (allImgsLength == 0) {
-                                finishedCallback.call(obj[0]);
-                        };
-
-                        $.each(allImgs, function(i, img) {
-
-                                var image = new Image;
-
-                                // Handle the image loading and error with the same callback.
-                                $(image).bind('load.' + eventNamespace + ' error.' + eventNamespace, function(event) {
-                                        allImgsLoaded++;
-
-                                        // If an error occurred with loading the image, set the third argument accordingly.
-                                        eachCallback.call(img.element, allImgsLoaded, allImgsLength, event.type == 'load');
-
-                                        if (allImgsLoaded == allImgsLength) {
-                                                finishedCallback.call(obj[0]);
-                                                return false;
-                                        };
-
-                                });
-
-                                image.src = img.src;
+                                    processedImages.add(match[2]);
+                                    }
+                                };
+                            });
                         });
+                } else {
+                    // For images only, the task is simpler.
+                    obj.find('img:uncached').each(function(){
+                            allImgs.push({
+                                src: this.src,
+                                element: this
+                                });
+                            });
+                };
+                var allImgsLength = allImgs.length;
+                var allImgsLoaded = 0;
+                // If no images found, don't bother.
+                if (allImgsLength == 0){
+                    finishedCallback.call(obj[0]);
+                    };
+                //console.log('allImgs =', allImgs, allImgs.length);
+                $.each(allImgs, function(i, img) {
+                    var image = new Image;
+                    var loadedOrErrored = false;  // Add this line
+                    // Update the callback
+                    $(image).bind('load.' + eventNamespace + ' error.' + eventNamespace, function(event) {
+                        // Only increment if this is the first event for this image
+                        if (!loadedOrErrored) {
+                            loadedOrErrored = true;
+                            allImgsLoaded++;
+                            // If an error occurred with loading the image, set the third argument accordingly.
+                            eachCallback.call(img.element, allImgsLoaded, allImgsLength, event.type == 'load');
+                            if (allImgsLoaded == allImgsLength) {
+                                finishedCallback.call(obj[0]);
+                                return false;
+                            };
+                        }
+                    });
+                    image.src = img.src;
                 });
+            });
         };
+
 })(jQuery);
 
 // Fix the indexOf issue for IE8 and lower
