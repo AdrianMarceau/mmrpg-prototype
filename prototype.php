@@ -471,25 +471,20 @@ foreach ($this_menu_tooltips AS $token => $text){
                         <label>shop</label>
                     </a>
                 <? endif; ?>
-                <? if (mmrpg_prototype_players_unlocked() > 0): ?>
+                <? if (mmrpg_prototype_battles_complete('dr-light') >= MMRPG_SETTINGS_CHAPTER1_MISSIONS): ?>
+                    <span class="pipe">|</span>
+                    <a class="link link_robots" data-step="edit_robots" data-index="<?= $this_menu_indexes['robots'] ?>" data-source="frames/edit_robots.php?action=robots" data-music="misc/robot-editor" data-maybe-tooltip="<?= $this_menu_tooltips['robots'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                        <i class="fa fas fa-robot"></i>
+                        <label><?= mmrpg_prototype_robots_unlocked('dr-light') > 1 ? 'robots' : 'robot' ?></label>
+                    </a>
+                <? endif; ?>
+                <? if (mmrpg_prototype_battles_complete('dr-light') >= MMRPG_SETTINGS_CHAPTER1_MISSIONS): ?>
                     <span class="pipe">|</span>
                     <a class="link link_players" data-step="edit_players" data-index="<?= $this_menu_indexes['players'] ?>" data-source="frames/edit_players.php?action=players" data-music="misc/player-editor" data-maybe-tooltip="<?= $this_menu_tooltips['players'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <i class="fa fas fa-user"></i>
                         <label><?= mmrpg_prototype_players_unlocked() > 1 ? 'players' : 'player' ?></label>
                     </a>
                 <? endif; ?>
-                <? if (mmrpg_prototype_battles_complete('dr-light') >= 1): ?>
-                    <span class="pipe">|</span>
-                    <a class="link link_robots" data-step="edit_robots" data-index="<?= $this_menu_indexes['robots'] ?>" data-source="frames/edit_robots.php?action=robots" data-music="misc/robot-editor" data-maybe-tooltip="<?= $this_menu_tooltips['robots'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-                        <i class="fa fas fa-robot"></i>
-                        <label>robots</label>
-                    </a>
-                <? endif; ?>
-                <span class="pipe">|</span>
-                <a class="link link_data" data-step="database" data-index="<?= $this_menu_indexes['database'] ?>" data-source="frames/database.php" data-music="misc/data-base" data-maybe-tooltip="<?= $this_menu_tooltips['database'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-                    <i class="fa fas fa-book"></i>
-                    <label>database</label>
-                </a>
                 <? if (mmrpg_prototype_items_unlocked() > 0): ?>
                     <span class="pipe">|</span>
                     <a class="link link_items" data-step="items" data-index="<?= $this_menu_indexes['items'] ?>" data-source="frames/items.php" data-music="misc/item-viewer" data-maybe-tooltip="<?= $this_menu_tooltips['items'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
@@ -511,6 +506,11 @@ foreach ($this_menu_tooltips AS $token => $text){
                         <label>stars</label>
                     </a>
                 <? endif; ?>
+                <span class="pipe">|</span>
+                <a class="link link_data" data-step="database" data-index="<?= $this_menu_indexes['database'] ?>" data-source="frames/database.php" data-music="misc/data-base" data-maybe-tooltip="<?= $this_menu_tooltips['database'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                    <i class="fa fas fa-book"></i>
+                    <label>database</label>
+                </a>
 
             </div>
         </div>
