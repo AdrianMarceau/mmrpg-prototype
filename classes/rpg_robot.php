@@ -984,6 +984,11 @@ class rpg_robot extends rpg_object {
         if (isset($args[1])){ $this->set_info('robot_frame_offset', $args[0], $args[1]); }
         else { $this->set_info('robot_frame_offset', $value); }
     }
+    public function reset_frame_offset(){
+        $args = func_get_args();
+        if (isset($args[0])){ $this->set_info('robot_frame_offset', $args[0], 0); }
+        else { $this->set_info('robot_frame_offset', array('x' => 0, 'y' => 0, 'z' => 0)); }
+    }
 
     public function get_frame_classes(){ return $this->get_info('robot_frame_classes'); }
     public function set_frame_classes($value){ $this->set_info('robot_frame_classes', $value); }
