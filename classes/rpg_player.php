@@ -2898,11 +2898,7 @@ class rpg_player extends rpg_object {
                                                 if ($this_ability_recovery_percent && $this_ability_recovery > 100){ $this_ability_recovery = 100; }
                                                 if ($this_ability_recovery2_percent && $this_ability_recovery2 > 100){ $this_ability_recovery2 = 100; }
                                                 $this_ability_accuracy = !empty($this_ability['ability_accuracy']) ? $this_ability['ability_accuracy'] : 0;
-                                                $this_ability_description = !empty($this_ability['ability_description']) ? $this_ability['ability_description'] : '';
-                                                $this_ability_description = str_replace('{DAMAGE}', $this_ability_damage, $this_ability_description);
-                                                $this_ability_description = str_replace('{RECOVERY}', $this_ability_recovery, $this_ability_description);
-                                                $this_ability_description = str_replace('{DAMAGE2}', $this_ability_damage2, $this_ability_description);
-                                                $this_ability_description = str_replace('{RECOVERY2}', $this_ability_recovery2, $this_ability_description);
+                                                $this_ability_description = rpg_ability::get_parsed_ability_description($this_ability);
                                                 //$this_ability_title_plain = $this_ability_name;
                                                 //if (!empty($this_ability_type)){ $this_ability_title_plain .= ' | '.$this_ability_type; }
                                                 //if (!empty($this_ability_damage)){ $this_ability_title_plain .= ' | '.$this_ability_damage.' Damage'; }
@@ -3780,6 +3776,32 @@ class rpg_player extends rpg_object {
                 );
         } else {
             return $intro_field;
+        }
+    }
+
+    // Define a function for getting a list of homebase fields for players
+    public static function get_homebase_fields(){
+        return array(
+            'default' => 'intro-field',
+            'dr-light' => 'light-laboratory',
+            'dr-wily' => 'wily-castle',
+            'dr-cossack' => 'cossack-citadel'
+            );
+    }
+
+
+    // Define a function for calculating the homebase field for a given player
+    public static function get_homebase_field($player_token = '', $return_info_array = false){
+        $homebase_field_index = self::get_homebase_fields();
+        if (isset($homebase_field_index[$player_token])){ $homebase_field = $homebase_field_index[$player_token]; }
+        else { $homebase_field = $homebase_field_index['default']; }
+        if ($return_info_array){
+            return array(
+                'field_token' => $homebase_field,
+                'field_name' => ucwords(str_replace('-', ' ', $homebase_field))
+                );
+        } else {
+            return $homebase_field;
         }
     }
 
