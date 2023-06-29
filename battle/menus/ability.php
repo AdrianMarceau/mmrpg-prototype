@@ -207,11 +207,7 @@ ob_start();
                     elseif ($temp_ability_speed < 1){ $temp_ability_details .= ' | Slow <sup>('.($temp_ability_speed + 1).')'; }
                 }
 
-                $temp_ability_description = $temp_ability->ability_description;
-                $temp_ability_description = str_replace('{DAMAGE}', $temp_damage, $temp_ability_description);
-                $temp_ability_description = str_replace('{RECOVERY}', $temp_recovery, $temp_ability_description);
-                $temp_ability_description = str_replace('{DAMAGE2}', $temp_damage2, $temp_ability_description);
-                $temp_ability_description = str_replace('{RECOVERY2}', $temp_recovery2, $temp_ability_description);
+                $temp_ability_description = $temp_ability->get_parsed_description();
                 $temp_ability_details .= ' <br />'.$temp_ability_description;
                 $temp_ability_details_plain = strip_tags(str_replace('<br />', '&#10;', $temp_ability_details));
                 $temp_ability_details_tooltip = htmlentities($temp_ability_details, ENT_QUOTES, 'UTF-8');

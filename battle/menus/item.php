@@ -169,11 +169,7 @@ ob_start();
                     if ($temp_item_quantity != 1){ $temp_item_details .= ' | '.$temp_item_quantity.' Units'; }
                     else { $temp_item_details .= ' | 1 Unit'; }
                 }
-                $temp_item_description = $temp_item->item_description;
-                $temp_item_description = str_replace('{DAMAGE}', $temp_damage, $temp_item_description);
-                $temp_item_description = str_replace('{RECOVERY}', $temp_recovery, $temp_item_description);
-                $temp_item_description = str_replace('{DAMAGE2}', $temp_damage2, $temp_item_description);
-                $temp_item_description = str_replace('{RECOVERY2}', $temp_recovery2, $temp_item_description);
+                $temp_item_description = $temp_item->get_parsed_description();
                 $temp_item_details .= ' <br />'.$temp_item_description;
                 //$temp_item_details .= ' <br />subclass:'.$temp_iteminfo['item_subclass'];
                 $temp_item_details_plain = strip_tags(str_replace('<br />', '&#10;', $temp_item_details));
