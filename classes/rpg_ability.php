@@ -448,6 +448,67 @@ class rpg_ability extends rpg_object {
 
     }
 
+    // Define a function for getting the parsed version of an ability's description
+    public function get_parsed_description($options = array()){
+        $ability = $this;
+        $object = array(
+            'this_battle' => $this->battle,
+            'this_player' => $this->player,
+            'this_robot' => $this->robot,
+            'this_ability' => $this
+            );
+        return self::get_parsed_ability_description($ability, $objects, $options);
+    }
+
+    // Define a static function for getting the parsed version of an ability's description
+    public static function get_parsed_ability_description($ability, $objects = array(), $options = array()){
+
+        // Validate or clean provided optional arguments
+        if (empty($objects) || !is_array($objects)){ $objects = array(); }
+        if (empty($options) || !is_array($options)){ $options = array(); }
+
+        // Extract the objects array into the current scope
+        extract($objects);
+
+        // Define the placeholder text in case we need it
+        $placeholder_text = '...';
+
+        // Initialize ability info depending on ability type
+        if (is_array($ability)){
+            $ability_info = $ability;
+        } elseif (is_object($ability) && method_exists($ability, 'export_array')){
+            $ability_info = $ability->export_array();
+        } else {
+            throw new Exception('Invalid ability format. Expected an array or an object with an export_array method.');
+            return $placeholder_text;
+        }
+
+        // Ensure there is an ability description
+        if (!isset($ability_info['ability_description'])) {
+            throw new Exception('No ability description found.');
+        } elseif (empty($ability_info['ability_description'])){
+            return $placeholder_text;
+        }
+
+        // Define the tags and their corresponding replacements
+        $tags = array('{}', '{DAMAGE}', '{DAMAGE2}', '{RECOVERY}', '{RECOVERY2}', '{ACCURACY}');
+        $replacements = array($placeholder_text,
+            isset($ability_info['ability_damage']) ? $ability_info['ability_damage'] : '',
+            isset($ability_info['ability_damage2']) ? $ability_info['ability_damage2'] : '',
+            isset($ability_info['ability_recovery']) ? $ability_info['ability_recovery'] : '',
+            isset($ability_info['ability_recovery2']) ? $ability_info['ability_recovery2'] : '',
+            isset($ability_info['ability_accuracy']) ? $ability_info['ability_accuracy'] : ''
+            );
+
+        // Collect the base description string and apply any options provided
+        $ability_description = $ability_info['ability_description'];
+        //if ($options['show_x_desc']){ $ability_description .= ' '.trim($ability_info['ability_description_x']); }
+
+        // Replace the tags in the description and return the result
+        $parsed_description = str_replace($tags, $replacements, $ability_description);
+        return $parsed_description;
+    }
+
     // Define public print functions for markup generation
     public function print_name($plural = false, $pseudo_name = ''){
         $print_name = $this->ability_name;
@@ -1242,9 +1303,7 @@ class rpg_ability extends rpg_object {
 
         $temp_ability_title3 = '';
         if (!empty($ability_info['ability_description'])){
-            $temp_find = array('{RECOVERY}', '{RECOVERY2}', '{DAMAGE}', '{DAMAGE2}');
-            $temp_replace = array($temp_ability_recovery, $temp_ability_recovery2, $temp_ability_damage, $temp_ability_damage2);
-            $temp_description = str_replace($temp_find, $temp_replace, $ability_info['ability_description']);
+            $temp_description = self::get_parsed_ability_description($ability_info);
             $temp_ability_title3 = $temp_description;
         }
 
@@ -1412,11 +1471,7 @@ class rpg_ability extends rpg_object {
         if (!empty($ability_info_recovery) && $ability_info_recovery > $ability_power){ $ability_power = $ability_info_recovery; }
 
         $ability_info_accuracy = !empty($ability_info['ability_accuracy']) ? $ability_info['ability_accuracy'] : 0;
-        $ability_info_description = !empty($ability_info['ability_description']) ? $ability_info['ability_description'] : '';
-        $ability_info_description = str_replace('{DAMAGE}', $ability_info_damage, $ability_info_description);
-        $ability_info_description = str_replace('{RECOVERY}', $ability_info_recovery, $ability_info_description);
-        $ability_info_description = str_replace('{DAMAGE2}', $ability_info_damage2, $ability_info_description);
-        $ability_info_description = str_replace('{RECOVERY2}', $ability_info_recovery2, $ability_info_description);
+        $ability_info_description =  self::get_parsed_ability_description($ability_info);
         $ability_info_class_type = !empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none';
         if (!empty($ability_info['ability_type2'])){ $ability_info_class_type = $ability_info_class_type != 'none' ? $ability_info_class_type.'_'.$ability_info['ability_type2'] : $ability_info['ability_type2']; }
         $ability_info_title = rpg_ability::print_editor_title_markup($robot_info, $ability_info);
@@ -1924,18 +1979,9 @@ class rpg_ability extends rpg_object {
                                 <tbody>
                                     <tr>
                                         <td class="right">
-                                            <div class="ability_description" style="white-space: normal; text-align: left; <?= $print_options['layout_style'] == 'event' ? 'font-size: 12px; ' : '' ?> "><?
-                                            // Define the search/replace pairs for the description
-                                            $temp_find = array('{DAMAGE}', '{RECOVERY}', '{DAMAGE2}', '{RECOVERY2}', '{}');
-                                            $temp_replace = array(
-                                                (!empty($ability_info['ability_damage']) ? $ability_info['ability_damage'] : 0), // {DAMAGE}
-                                                (!empty($ability_info['ability_recovery']) ? $ability_info['ability_recovery'] : 0), // {RECOVERY}
-                                                (!empty($ability_info['ability_damage2']) ? $ability_info['ability_damage2'] : 0), // {DAMAGE2}
-                                                (!empty($ability_info['ability_recovery2']) ? $ability_info['ability_recovery2'] : 0), // {RECOVERY2}
-                                                '' // {}
-                                                );
-                                            echo !empty($ability_info['ability_description']) ? str_replace($temp_find, $temp_replace, $ability_info['ability_description']) : '&hellip;'
-                                            ?></div>
+                                            <div class="ability_description" style="white-space: normal; text-align: left; <?= $print_options['layout_style'] == 'event' ? 'font-size: 12px; ' : '' ?> ">
+                                                <?= self::get_parsed_ability_description($ability_info); ?>
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>
