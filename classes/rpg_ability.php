@@ -451,7 +451,7 @@ class rpg_ability extends rpg_object {
     // Define a function for getting the parsed version of an ability's description
     public function get_parsed_description($options = array()){
         $ability = $this;
-        $object = array(
+        $objects = array(
             'this_battle' => $this->battle,
             'this_player' => $this->player,
             'this_robot' => $this->robot,

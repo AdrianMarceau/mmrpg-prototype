@@ -438,7 +438,7 @@ class rpg_item extends rpg_object {
     // Define a function for getting the parsed version of an item's description
     public function get_parsed_description($options = array()){
         $item = $this;
-        $object = array(
+        $objects = array(
             'this_battle' => $this->battle,
             'this_player' => $this->player,
             'this_robot' => $this->robot,
