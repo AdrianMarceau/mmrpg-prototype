@@ -1510,15 +1510,6 @@ class rpg_field extends rpg_object {
             if (!empty($temp_field_master)){ $temp_field_title .= 'Master : '.$temp_field_master['robot_name'].' // '; }
             if (!empty($temp_field_mechas)){ $temp_field_title .= 'Mecha'.(count($temp_field_mechas) > 1 ? 's' : '').' : '.implode(', ', $temp_field_mechas).' // '; }
         $temp_field_title .= '  ]] ';
-        /*
-        if (!empty($field_info['field_description'])){
-            //$temp_find = array('{RECOVERY}', '{RECOVERY2}', '{DAMAGE}', '{DAMAGE2}');
-            //$temp_replace = array($temp_field_recovery, $temp_field_recovery2, $temp_field_damage, $temp_field_damage2);
-            //$temp_description = str_replace($temp_find, $temp_replace, $field_info['field_description']);
-            //$temp_field_title .= ' <br />'.$temp_description;
-            $temp_field_title .= $field_info['field_description'];
-        }
-        */
         // Return the generated option markup
         return $temp_field_title;
     }
