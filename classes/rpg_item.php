@@ -435,6 +435,69 @@ class rpg_item extends rpg_object {
 
     }
 
+    // Define a function for getting the parsed version of an item's description
+    public function get_parsed_description($options = array()){
+        $item = $this;
+        $object = array(
+            'this_battle' => $this->battle,
+            'this_player' => $this->player,
+            'this_robot' => $this->robot,
+            'this_item' => $this
+            );
+        return self::get_parsed_item_description($item, $objects, $options);
+    }
+
+    // Define a static function for getting the parsed version of an item's description
+    public static function get_parsed_item_description($item, $objects = array(), $options = array()){
+
+        // Validate or clean provided optional arguments
+        if (empty($objects) || !is_array($objects)){ $objects = array(); }
+        if (empty($options) || !is_array($options)){ $options = array(); }
+
+        // Extract the objects array into the current scope
+        extract($objects);
+
+        // Define the placeholder text in case we need it
+        $placeholder_text = '...';
+
+        // Initialize item info depending on item type
+        if (is_array($item)){
+            $item_info = $item;
+        } elseif (is_object($item) && method_exists($item, 'export_array')){
+            $item_info = $item->export_array();
+        } else {
+            throw new Exception('Invalid item format. Expected an array or an object with an export_array method.');
+            return $placeholder_text;
+        }
+
+        // Ensure there is an item description
+        if (!isset($item_info['item_description'])) {
+            throw new Exception('No item description found.');
+        } elseif (empty($item_info['item_description'])){
+            return $placeholder_text;
+        }
+
+        // Define the tags and their corresponding replacements
+        $tags = array('{}', '{DAMAGE}', '{DAMAGE2}', '{RECOVERY}', '{RECOVERY2}', '{ACCURACY}');
+        $replacements = array($placeholder_text,
+            isset($item_info['item_damage']) ? $item_info['item_damage'] : '',
+            isset($item_info['item_damage2']) ? $item_info['item_damage2'] : '',
+            isset($item_info['item_recovery']) ? $item_info['item_recovery'] : '',
+            isset($item_info['item_recovery2']) ? $item_info['item_recovery2'] : '',
+            isset($item_info['item_accuracy']) ? $item_info['item_accuracy'] : ''
+            );
+
+        // Collect the base description string and apply any options provided
+        $item_description = $item_info['item_description'];
+        if ($options['show_use_desc']){ $item_description .= ' '.trim($item_info['item_description_use']); }
+        if ($options['show_hold_desc']){ $item_description .= ' '.trim($item_info['item_description_hold']); }
+        if ($options['show_shop_desc']){ $item_description .= ' '.trim($item_info['item_description_shop']); }
+
+        // Replace the tags in the description and return the result
+        $parsed_description = str_replace($tags, $replacements, $item_description);
+        return $parsed_description;
+    }
+
     // Define public print functions for markup generation
     public function print_name($plural = false){
         $type_class = !empty($this->item_type) ? $this->item_type : 'none';
@@ -1194,13 +1257,7 @@ class rpg_item extends rpg_object {
         if ($item_info['item_class'] != 'item' && $temp_item_target != 'auto'){ $temp_item_title .= ' | Select Target'; }
 
         if (!empty($item_info['item_description'])){
-            $temp_find = array('{RECOVERY}', '{RECOVERY2}', '{DAMAGE}', '{DAMAGE2}');
-            $temp_replace = array($temp_item_recovery, $temp_item_recovery2, $temp_item_damage, $temp_item_damage2);
-            $temp_description = trim($item_info['item_description']);
-            if ($print_options['show_use_desc']){ $temp_description .= ' '.trim($item_info['item_description_use']); }
-            if ($print_options['show_hold_desc']){ $temp_description .= ' '.trim($item_info['item_description_hold']); }
-            if ($print_options['show_shop_desc']){ $temp_description .= ' '.trim($item_info['item_description_shop']); }
-            $temp_description = str_replace($temp_find, $temp_replace, $temp_description);
+            $temp_description = self::get_parsed_item_description($item_info, false, $print_options);
             $temp_item_title .= ' // '.$temp_description;
         }
 
@@ -1350,11 +1407,7 @@ class rpg_item extends rpg_object {
         if ($item_info_recovery_percent && $item_info_recovery > 100){ $item_info_recovery = 100; }
         if ($item_info_recovery2_percent && $item_info_recovery2 > 100){ $item_info_recovery2 = 100; }
         $item_info_accuracy = !empty($item_info['item_accuracy']) ? $item_info['item_accuracy'] : 0;
-        $item_info_description = !empty($item_info['item_description']) ? $item_info['item_description'] : '';
-        $item_info_description = str_replace('{DAMAGE}', $item_info_damage, $item_info_description);
-        $item_info_description = str_replace('{RECOVERY}', $item_info_recovery, $item_info_description);
-        $item_info_description = str_replace('{DAMAGE2}', $item_info_damage2, $item_info_description);
-        $item_info_description = str_replace('{RECOVERY2}', $item_info_recovery2, $item_info_description);
+        $item_info_description = self::get_parsed_item_description($item_info);
         $item_info_class_type = !empty($item_info['item_type']) ? $item_info['item_type'] : 'none';
         if (!empty($item_info['item_type2'])){ $item_info_class_type = $item_info_class_type != 'none' ? $item_info_class_type.'_'.$item_info['item_type2'] : $item_info['item_type2']; }
         $item_info_title = rpg_item::print_editor_title_markup($robot_info, $item_info);
@@ -1694,22 +1747,9 @@ class rpg_item extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td class="right">
-                                        <div class="item_description" style="white-space: normal; text-align: left; <?= $print_options['layout_style'] == 'event' ? 'font-size: 12px; ' : '' ?> "><?
-                                        // Define the search/replace pairs for the description
-                                        $temp_find = array('{DAMAGE}', '{RECOVERY}', '{DAMAGE2}', '{RECOVERY2}', '{}');
-                                        $temp_replace = array(
-                                            (!empty($item_info['item_damage']) ? number_format($item_info['item_damage'], 0, '.', ',') : 0), // {DAMAGE}
-                                            (!empty($item_info['item_recovery']) ? number_format($item_info['item_recovery'], 0, '.', ',') : 0), // {RECOVERY}
-                                            (!empty($item_info['item_damage2']) ? number_format($item_info['item_damage2'], 0, '.', ',') : 0), // {DAMAGE2}
-                                            (!empty($item_info['item_recovery2']) ? number_format($item_info['item_recovery2'], 0, '.', ',') : 0) // {RECOVERY2}
-                                            );
-                                        $temp_description = trim($item_info['item_description']);
-                                        if ($print_options['show_use_desc']){ $temp_description .= ' '.trim($item_info['item_description_use']); }
-                                        if ($print_options['show_hold_desc']){ $temp_description .= ' '.trim($item_info['item_description_hold']); }
-                                        if ($print_options['show_shop_desc']){ $temp_description .= ' '.trim($item_info['item_description_shop']); }
-                                        $temp_description = str_replace($temp_find, $temp_replace, $temp_description);
-                                        echo !empty($temp_description) ? $temp_description : '&hellip;'
-                                        ?></div>
+                                        <div class="item_description" style="white-space: normal; text-align: left; <?= $print_options['layout_style'] == 'event' ? 'font-size: 12px; ' : '' ?> ">
+                                            <?= self::get_parsed_item_description($item_info, false, $print_options) ?>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>
