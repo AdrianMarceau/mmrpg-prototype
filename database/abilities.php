@@ -167,14 +167,6 @@ if (!empty($mmrpg_database_abilities)){
         if (!empty($ability_info['ability_accuracy'])){ $ability_title_text .= ' | '.$ability_info['ability_accuracy'].'% Accuracy'; }
         if (isset($ability_info['ability_energy'])){ $ability_title_text .= ' | '.$ability_info['ability_energy'].(!empty($ability_info['ability_energy_percent']) ? '%' : '').' Energy'; }
         $ability_title_text .= ']]';
-        if (false && !empty($ability_info['ability_description'])){
-            $temp_description = $ability_info['ability_description'];
-            $temp_description = str_replace('{DAMAGE}', $ability_info['ability_damage'], $temp_description);
-            $temp_description = str_replace('{DAMAGE2}', $ability_info['ability_damage2'], $temp_description);
-            $temp_description = str_replace('{RECOVERY}', $ability_info['ability_recovery'], $temp_description);
-            $temp_description = str_replace('{RECOVERY2}', $ability_info['ability_recovery2'], $temp_description);
-            $ability_title_text .= '|| [['.$temp_description.']]';
-        }
         $ability_image_path = 'images/abilities/'.$ability_image_token.'/icon_right_'.$ability_image_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
 
         // Start the output buffer and collect the generated markup
