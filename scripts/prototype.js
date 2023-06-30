@@ -1171,6 +1171,8 @@ function prototype_menu_switch(switchOptions){
         onComplete: switchOptions.onComplete || function(){}
         };
 
+    //console.log('prototype_menu_switch(switchOptions) w/', switchOptions);
+
     // Define the prototype context
     var thisContext = $('#prototype');
     var thisBanner = $('.banner', thisContext);
@@ -1387,19 +1389,19 @@ function prototype_menu_switch(switchOptions){
                                     // MAYBE TODO? AUTO-CLICK WHEN ONLY ONE ROBOT?
                                     // If this was a robot select loading, auto-click through if only one robot
                                     if (currentMenuSelect == 'this_player_robots'){
-                                        //console.log('auto-click robot option?');
+                                        console.log('auto-click robot option?');
                                         // Check to see which one should be displayed first and autoclick it
                                         var $availableRobots = $('.option[data-token][data-child="true"]', tempMenuWrapper);
                                         var $confirmButton = $('.option[data-token][data-parent="true"]', tempMenuWrapper);
                                         var numRobotsAvailable = $availableRobots.length;
-                                        //console.log('numRobotsAvailable =', numRobotsAvailable);
+                                        console.log('numRobotsAvailable =', numRobotsAvailable);
                                         if (numRobotsAvailable === 1){
-                                            //console.log('Only one robot! AUTO CLICK IT!');
+                                            console.log('Only one robot! AUTO CLICK IT!');
                                             $availableRobots.first().trigger('click');
                                             $confirmButton.trigger('click');
                                             }
 
-                                    }
+                                        }
                                     */
 
                                     }
@@ -1433,7 +1435,7 @@ function prototype_menu_switch(switchOptions){
             //console.log('tempFadeinFunction triggered');
 
             // Create the function to be executed after the menu has faded out
-            var tempFadeoutFadeout = function(){
+            var tempFadeoutFunction = function(){
 
                 // DEBUG
                 //console.log('.menu[data-step]:not(.menu_hide) has completed animation');
@@ -1455,10 +1457,10 @@ function prototype_menu_switch(switchOptions){
                     //$('.title', thisBanner).html(thisBannerTitle+' : '+thisMenuTitle);
                     // Check how many choices are available
                     var thisMenuChoices = $('.option[data-token]:not(.option_disabled):not(.option[data-parent])', thisMenu);
-                    //alert('Menu choices : '+thisMenuChoices.length);
+                    //console.log('Menu choices : '+thisMenuChoices.length);
                     // Check if there is only one menu-choice available and skip is enabled
                     if (switchOptions.autoSkip == 'true' && thisMenuChoices.length <= 1){
-                        //alert('Auto Skip triggered...');
+                        //console.log('Auto Skip triggered...');
                         // Secretly unhide the current menu and auto-click the only available option
                         thisMenu.css({opacity:0}).removeClass('menu_hide');
                         thisMenuChoices.eq(0).trigger('click');
@@ -1513,7 +1515,7 @@ function prototype_menu_switch(switchOptions){
                 };
 
             // Automatically fade-out the previous menu screen
-            $('.menu[data-step]:not(.menu_hide)', thisContext).animate(slideOutAnimation, switchOptions.slideDuration, 'swing', tempFadeoutFadeout);
+            $('.menu[data-step]:not(.menu_hide)', thisContext).animate(slideOutAnimation, switchOptions.slideDuration, 'swing', tempFadeoutFunction);
 
             // Execute option-specific commands for special cases
             switch (currentMenuSelect){
