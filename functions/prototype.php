@@ -2226,6 +2226,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $robot_sprite_url = 'images/robots/'.$this_option_image.'/sprite_right_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
         $robot_sprite_markup = '<span class="sprite sprite_robot sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_base" style="background-image: url('.$robot_sprite_url.'); top: '.$temp_sprite_top.'px;"></span>';
 
+        $robot_item_sprite_markup = '';
         if (!empty($this_robot_item_info)){
             $item_sprite_url = 'images/items/'.$this_robot_item_info['item_image'].'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
             $robot_item_sprite_markup = '<span class="sprite sprite_item sprite_40x40 sprite_40x40_00" style="background-image: url('.$item_sprite_url.');"></span>';
