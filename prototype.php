@@ -471,7 +471,7 @@ foreach ($this_menu_tooltips AS $token => $text){
                         <label>shop</label>
                     </a>
                 <? endif; ?>
-                <? if (mmrpg_prototype_battles_complete('dr-light') >= MMRPG_SETTINGS_CHAPTER1_MISSIONS): ?>
+                <? if (mmrpg_prototype_robots_unlocked() > 1 || mmrpg_prototype_battles_complete('dr-light') >= MMRPG_SETTINGS_CHAPTER1_MISSIONS): ?>
                     <span class="pipe">|</span>
                     <a class="link link_robots" data-step="edit_robots" data-index="<?= $this_menu_indexes['robots'] ?>" data-source="frames/edit_robots.php?action=robots" data-music="misc/robot-editor" data-maybe-tooltip="<?= $this_menu_tooltips['robots'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <i class="fa fas fa-robot"></i>
@@ -492,7 +492,7 @@ foreach ($this_menu_tooltips AS $token => $text){
                         <label>items</label>
                     </a>
                 <? endif; ?>
-                <? if (mmrpg_prototype_abilities_unlocked() > 2): ?>
+                <? if (mmrpg_prototype_abilities_unlocked() >= 2): ?>
                     <span class="pipe">|</span>
                     <a class="link link_abilities" data-step="abilities" data-index="<?= $this_menu_indexes['abilities'] ?>" data-source="frames/abilities.php" data-music="misc/item-viewer" data-maybe-tooltip="<?= $this_menu_tooltips['abilities'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <i class="fa fas fa-fire-alt"></i>
@@ -555,29 +555,13 @@ foreach ($this_menu_tooltips AS $token => $text){
          */
         if (!empty($_SESSION[$session_token]['DEMO'])){
 
-            // Only show robot select if the player has more than two robots
-            if (mmrpg_prototype_robots_unlocked('dr-light') > 3){
-
-                // Print out the opening tags for the robot select container
-                echo '<div class="menu menu_hide select_this_player_robots" data-step="3" data-limit="" data-title="Robot Select" data-select="this_player_robots">'."\n";
-                echo '<span class="header block_1 header_types type_none"><span class="count">Robot Select</span></span>'."\n";
-
-                // Require the prototype robots display file
-                require_once(MMRPG_CONFIG_ROOTDIR.'prototype/robots.php');
-
-                // Print out the back button for going back to player select
-                echo '<a class="option option_back block_1" data-back="2">&#9668; Back</a>'."\n";
-
-                // Print out the closing tags for the robot select container
-                echo '</div>'."\n";
-
-            }
+            // There is no demo get out of here!
 
         }
         /*
          * NORMAL ROBOT SELECT
          */
-        else {
+        elseif (mmrpg_prototype_robots_unlocked() > 1){
 
             // Print out the opening tags for the robot select container
             echo '<div class="menu menu_hide select_this_player_robots" data-step="3" data-limit="" data-title="Robot Select" data-select="this_player_robots">'."\n";
@@ -644,6 +628,7 @@ gameSettings.startLink = '<?= $prototype_start_link ?>';
 gameSettings.windowEventsCanvas = [];
 gameSettings.windowEventsMessages = [];
 gameSettings.totalPlayerOptions = <?= $unlock_count_players ?>;
+gameSettings.totalRobotOptions = <?= mmrpg_prototype_robots_unlocked() ?>;
 gameSettings.prototypeBannerKey = 0;
 gameSettings.prototypeBanners = ['prototype-banners_title-screen_01.gif'];
 
@@ -656,6 +641,10 @@ battleOptions['this_user_id'] = <?= $this_userid ?>;
     battleOptions['this_player_id'] = <?= $mmrpg_index_players['dr-light']['player_id'] ?>;
     battleOptions['this_player_token'] = 'dr-light';
 <? } ?>
+<? if ($unlock_count_players === 1 && mmrpg_prototype_robots_unlocked() === 1){ ?>
+    battleOptions['this_player_robots'] = ['101_mega-man'];
+<? } ?>
+
 // Create the document ready events
 $(document).ready(function(){
 
