@@ -777,6 +777,11 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .header_types[data-player="dr-cossack"] {
     background-image: url(../images/menus/menu-options_this-dr-cossack-player-select.gif);
 }
+#prototype .header_types[data-player="dr-light"]:before,
+#prototype .header_types[data-player="dr-wily"]:before,
+#prototype .header_types[data-player="dr-cossack"]:before {
+    display: none;
+}
 
 #prototype .header_types {
     overflow: hidden;
