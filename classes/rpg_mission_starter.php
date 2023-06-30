@@ -45,7 +45,7 @@ class rpg_mission_starter extends rpg_mission {
         $temp_battle_omega['battle_size'] = '1x4';
         $temp_battle_omega_complete = mmrpg_prototype_battle_complete($this_prototype_data['this_player_token'], $temp_battle_omega['battle_token']);
         if (!empty($temp_battle_omega_complete['battle_count'])){ $temp_target_count = 1 + $temp_battle_omega_complete['battle_count']; }
-        if ($temp_target_count > 8 ){ $temp_target_count = 8; }
+        if ($temp_target_count > 8){ $temp_target_count = 8; }
         $temp_battle_omega['battle_level'] = $this_start_level;
         $temp_battle_omega['battle_phase'] = $this_prototype_data['battle_phase'];
         $temp_battle_omega['battle_name'] = 'Chapter One Intro Battle';
@@ -89,28 +89,33 @@ class rpg_mission_starter extends rpg_mission {
         $rescue_robot_unlockable = false;
 
         // Allow unlocking of the mecha support ability if the player has reached max targets
-        if ($temp_target_count >= 8){
+        if ($temp_target_count > 3){
             // Add the Mecha Support ability as an unlockable move if not already unlocked
             $temp_battle_omega['battle_rewards']['abilities'] = array();
-            if (!mmrpg_prototype_ability_unlocked($this_prototype_data['this_player_token'], false, 'mecha-support')){
-                // Add the Met as a reward for the battle
+            if ($temp_target_count >= 8
+                && !mmrpg_prototype_ability_unlocked($this_prototype_data['this_player_token'], false, 'mecha-support')){
+                // Add the ability as a reward for the battle
                 $temp_battle_omega['battle_rewards']['abilities'][] = array('token' => 'mecha-support');
                 // Update the description text for the battle
                 $temp_battle_omega['battle_description'] = 'Defeat the '.$this_robot_name.($temp_target_count > 1 ? 's' : '').' and download '.($temp_target_count > 1 ? 'their' : 'its').' secret mecha data! &#10023; ';
-            } elseif (!mmrpg_prototype_ability_unlocked($this_prototype_data['this_player_token'], false, 'field-support')){
-                // Add the Met as a reward for the battle
+            }
+            elseif ($temp_target_count >= 8
+                && !mmrpg_prototype_ability_unlocked($this_prototype_data['this_player_token'], false, 'field-support')){
+                // Add the ability as a reward for the battle
                 $temp_battle_omega['battle_rewards']['abilities'][] = array('token' => 'field-support');
                 // Update the description text for the battle
                 $temp_battle_omega['battle_description'] = 'Defeat the '.$this_robot_name.($temp_target_count > 1 ? 's' : '').' and download '.($temp_target_count > 1 ? 'their' : 'its').' secret field data! &#10022; ';
             } else {
+                // Add an item as a reward for the battle (doesn't work yet but will someday!)
+                $temp_battle_omega['battle_rewards']['items'][] = array('token' => ($temp_battle_omega_complete['battle_count'] % 2 === 0 ? 'energy-tank' : 'weapon-tank'));
                 // Update the description text for the battle
-                $temp_battle_omega['battle_description'] = 'Defeat the '.$this_robot_name.($temp_target_count > 1 ? 's that are' : ' that\'s').' blocking your progress!';
+                $temp_battle_omega['battle_description'] = 'Defeat the '.$this_robot_name.($temp_target_count > 1 ? 's that are currently attacking' : ' that has suddenly attacked').'!';
             }
         }
-        // Otherwise, if the player has already unlocked Roll
+        // Otherwise, if the player has already unlocked the rescure bot
         else {
             // Update the description text for the battle
-            $temp_battle_omega['battle_description'] = 'Defeat the '.$this_robot_name.($temp_target_count > 1 ? 's that are' : ' that\'s').' blocking your progress!';
+            $temp_battle_omega['battle_description'] = 'Defeat the '.$this_robot_name.($temp_target_count > 1 ? 's that are currently attacking' : ' that has suddenly attacked').'!';
         }
 
         // If the rescue robot is here, add some ambiguous text to the description
@@ -321,7 +326,7 @@ class rpg_mission_starter extends rpg_mission {
                     $temp_stat_priority = array('speed', 'attack', 'defense');
                 }
                 $temp_midboss_abilities = array_merge(
-                    array($temp_stat_priority[0].'-boost', $temp_stat_priority[0].'-break', $temp_stat_priority[0].'-mode', $temp_stat_priority[2].'-break'),
+                    array($temp_stat_priority[0].'-boost', $temp_stat_priority[0].'-break', $temp_stat_priority[0].'-mode', 'buster-charge'),
                     $temp_midboss_abilities
                     );
                 $temp_midboss_robot['robot_image'] = $temp_midboss_image;
