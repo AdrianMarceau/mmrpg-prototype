@@ -317,6 +317,7 @@ $actionMap = [
     'edit-user-challenges' => 'edit-challenges_user.php',
     'edit-stars' => 'edit-stars.php',
     'edit-pages' => 'edit-pages.php',
+    'edit-music' => 'edit-music.php',
     'watch-error-log' => 'error-log.php',
     'view-sprites' => 'view-sprites.php',
     'generate-prompts' => 'generate-prompts.php',
