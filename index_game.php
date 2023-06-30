@@ -174,6 +174,7 @@ if (count($matches)>1){
                 <div style="color: white; background-color: black; padding: 10px;">Your browser does not support the audio tag.</div>
             </audio>
         </div>
+        <? /*
         <div id="events" class="hidden">
             <div class="event_wrapper">
                 <div class="event_container">
@@ -183,6 +184,7 @@ if (count($matches)>1){
                 </div>
             </div>
         </div>
+        */ ?>
     <?elseif(!$this_online_flag):?>
         <strong style="display: block; margin: 100px auto; font-size: 13px; line-height: 19px; color: #DEDEDE; ">
             The <strong>Mega Man RPG Prototype</strong> is temporarily down for maintenance.<br />
@@ -247,18 +249,6 @@ $(document).ready(function(){
     //mmrpg_music_preload('misc/leader-board');
     //mmrpg_music_preload('misc/file-menu');
     //mmrpg_music_preload('misc/robot-editor');
-
-    // Collect a reference to the continue button
-    var eventContinue = $('#events #buttons .event_continue');
-    // Create the continue event for the event window
-    eventContinue.click(function(e){
-        e.preventDefault();
-        //alert('clicked');
-        windowEventDestroy();
-        if (gameSettings.canvasMarkupArray.length || gameSettings.messagesMarkupArray.length){
-            windowEventDisplay();
-            }
-        });
 
     // If window mod tools exist on the page, we should bind events to them
     var $gameWindow = $('#window');
@@ -328,41 +318,6 @@ $(document).ready(function(){
         e.stopPropagation();
         });
 })();
-
-
-// Define a function for displaying event messages to the player
-gameSettings.canvasMarkupArray = [];
-gameSettings.messagesMarkupArray = [];
-function windowEventCreate(canvasMarkupArray, messagesMarkupArray){
-    //console.log('windowEventCreate('+canvasMarkupArray+', '+messagesMarkupArray+')');
-    gameSettings.canvasMarkupArray = canvasMarkupArray;
-    gameSettings.messagesMarkupArray = messagesMarkupArray;
-    windowEventDisplay();
-}
-
-// Define a function for displaying event messages to the player
-function windowEventDisplay(){
-    var eventContainer = $('#events');
-    //console.log('windowEventDisplay()');
-    var canvasMarkup = gameSettings.canvasMarkupArray.length ? gameSettings.canvasMarkupArray.shift() : '';
-    var messagesMarkup = gameSettings.messagesMarkupArray.length ? gameSettings.messagesMarkupArray.shift() : '';
-    $('#canvas', eventContainer).empty().html(canvasMarkup);
-    $('#messages', eventContainer).empty().html(messagesMarkup);
-    eventContainer.css({opacity:0}).removeClass('hidden').animate({opacity:1},300,'swing');
-    $('#messages', eventContainer).perfectScrollbar(thisScrollbarSettings);
-    $(window).focus();
-    //alert(eventMarkup);
-}
-
-// Define a function for displaying event messages to the player
-function windowEventDestroy(){
-    var eventContainer = $('#events');
-    //console.log('windowEventDestroy()');
-    $('#canvas', eventContainer).empty();
-    $('#messages', eventContainer).empty();
-    eventContainer.addClass('hidden');
-    //alert(eventMarkup);
-}
 
 </script>
 <?

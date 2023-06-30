@@ -22,7 +22,7 @@ gameSettings.wapFlag = false; // whether or not this game is running in mobile m
 gameSettings.wapFlagIphone = false; // whether or not this game is running in mobile iphone mode
 gameSettings.wapFlagIpad = false; // whether or not this game is running in mobile iphone mode
 gameSettings.baseVolume = 0.2; // default animation frame base internal
-gameSettings.eventTimeout = 900; // default animation frame base internal
+gameSettings.eventTimeout = 800; // default animation frame base internal
 gameSettings.eventTimeoutThreshold = 250; // timeout theshold for when frames stop cross-fading
 gameSettings.eventAutoPlay = true; // whether or not to automatically advance events
 gameSettings.eventCrossFade = true; // whether or not to canvas events have crossfade animation
@@ -860,6 +860,7 @@ var canvasAnimationCameraDelay = 5;
 function mmrpg_canvas_animate(){
     //console.log('mmrpg_canvas_animate();');
     //console.log('gameSettings.idleAnimation:', gameSettings.idleAnimation);
+    //console.log('canvasAnimationCameraTimer:', canvasAnimationCameraTimer, 'canvasAnimationCameraDelay:', canvasAnimationCameraDelay);
     //clearTimeout(canvasAnimationTimeout);
     clearInterval(canvasAnimationTimeout);
     if (!gameSettings.idleAnimation){  return false; }
@@ -2352,6 +2353,81 @@ function mmrpg_music_preload(newTrack){
         // Does not need to be preloaded
         return false;
         }
+}
+
+// Define a function for displaying event messages to the player
+gameSettings.canvasMarkupArray = [];
+gameSettings.messagesMarkupArray = [];
+function windowEventCreate(canvasMarkupArray, messagesMarkupArray){
+    //console.log('windowEventCreate('+canvasMarkupArray+', '+messagesMarkupArray+')');
+    gameSettings.canvasMarkupArray = canvasMarkupArray;
+    gameSettings.messagesMarkupArray = messagesMarkupArray;
+    windowEventDisplay();
+}
+
+// Define a function for displaying event messages to the player
+function windowEventDisplay(){
+    //console.log('windowEventDisplay()');
+
+    // Check if the event container exists and, if not, create it
+    var $eventContainer = $('#events');
+    if (!$eventContainer.length){
+
+        // Define the markup for the event window dynamically
+        $eventContainer = $(
+            '<div id="events" class="hidden">'+
+                '<div class="event_wrapper">'+
+                    '<div class="event_container">'+
+                        '<div id="canvas" class="event_canvas"></div>'+
+                        '<div id="messages" class="event_messages"></div>'+
+                        '<div id="buttons" class="event_buttons"><a class="event_continue">Continue</a></div>'+
+                    '</div>'+
+                '</div>'+
+            '</div>'
+            );
+
+        // Detect which parent window is available and then append the window to it
+        var $eventContainerParent = false;
+        if ($('#window').length){ $eventContainerParent = $('#window').first(); }
+        else if ($('#prototype').length){ $eventContainerParent = $('#prototype').first(); }
+        else if ($('#battle').length){ $eventContainerParent = $('#battle').first(); }
+        $eventContainerParent.append($eventContainer);
+
+        // Define a click event for the event window continue button
+        var eventContinue = $('#buttons .event_continue', $eventContainer);
+        eventContinue.click(function(e){
+            e.preventDefault();
+            //alert('clicked');
+            windowEventDestroy();
+            if (gameSettings.canvasMarkupArray.length || gameSettings.messagesMarkupArray.length){
+                windowEventDisplay();
+                }
+            });
+
+        }
+
+    // Collect the canvas and message markup to be added to the event container
+    var canvasMarkup = gameSettings.canvasMarkupArray.length ? gameSettings.canvasMarkupArray.shift() : '';
+    var messagesMarkup = gameSettings.messagesMarkupArray.length ? gameSettings.messagesMarkupArray.shift() : '';
+    //console.log('canvasMarkup:', canvasMarkup, 'messagesMarkup:', messagesMarkup);
+
+    // Empty the canvas and messages of any leftover, fill them with new markup, then show 'em
+    $('#canvas', $eventContainer).empty().html(canvasMarkup);
+    $('#messages', $eventContainer).empty().html(messagesMarkup);
+    $eventContainer.css({opacity:0}).removeClass('hidden').animate({opacity:1},300,'swing');
+    $('#messages', $eventContainer).perfectScrollbar(thisScrollbarSettings);
+    $(window).focus();
+
+}
+
+// Define a function for displaying event messages to the player
+function windowEventDestroy(){
+    var $eventContainer = $('#events');
+    //console.log('windowEventDestroy()');
+    $('#canvas', $eventContainer).empty();
+    $('#messages', $eventContainer).empty();
+    $eventContainer.addClass('hidden');
+    //alert(eventMarkup);
 }
 
 // Define a function for updating the loaded status of the main index page
