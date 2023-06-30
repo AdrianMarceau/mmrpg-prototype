@@ -352,7 +352,11 @@ class rpg_prototype {
             }
 
             // If the switch is not disabled yet and the robot status isn't disabled, disable it
-            if ($this_switch_disabled && $this_active_robot->robot_status != 'disabled'){ $temp_switch_disabled = true; }
+            if ($this_switch_disabled
+                && !empty($this_active_robot)
+                && $this_active_robot->robot_status != 'disabled'){
+                $temp_switch_disabled = true;
+            }
 
             // If this player has already used a switch this turn
             if (!empty($this_player->flags['switch_used_this_turn'])){ $temp_switch_disabled = true; }
@@ -364,7 +368,11 @@ class rpg_prototype {
             if ($robot->robot_status === 'disabled'){ $allow_button = false; }
 
             // If this robot is the "active" one (maybe it was a force switch?)
-            if ($robot->player->counters['robots_active'] >= 2 && $robot->robot_id == $this_active_robot->robot_id){ $allow_button = false; }
+            if ($robot->player->counters['robots_active'] >= 2
+                && !empty($this_active_robot)
+                && $robot->robot_id == $this_active_robot->robot_id){
+                $allow_button = false;
+            }
 
             // If the current robot has switching disabled
             if ($temp_switch_disabled){ $allow_button = false; }
