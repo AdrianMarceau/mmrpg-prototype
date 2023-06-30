@@ -1885,6 +1885,9 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     text-align: left;
     padding: 0 5px 5px;
 }
+#events .event_container p:last-child {
+    padding-bottom: 0;
+}
 #events .event_container p a {
     text-decoration: none;
     color: #FFFFFF;
@@ -1991,6 +1994,30 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 }
 #events #messages p.centertext {
     text-align: center;
+}
+#events #messages p.smalltext {
+    font-size: 100%;
+    line-height: 1.6;
+}
+#events #messages div.inset_panel .sprite,
+#events #messages p.inset_panel .sprite {
+
+}
+#events #messages div.inset_panel .sprite_player,
+#events #messages p.inset_panel .sprite_player {
+
+}
+#events #messages div.inset_panel .sprite.float_left,
+#events #messages p.inset_panel .sprite.float_left {
+    top: calc(50% - 5px);
+    left: calc(50% - 120px);
+    transform: translate(-50%, -50%);
+}
+#events #messages div.inset_panel .sprite.float_right,
+#events #messages p.inset_panel .sprite.float_right {
+    top: calc(50% - 5px);
+    left: calc(50% + 120px);
+    transform: translate(-50%, -50%);
 }
 
 
