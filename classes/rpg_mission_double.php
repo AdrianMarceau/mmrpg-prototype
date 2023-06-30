@@ -525,6 +525,8 @@ class rpg_mission_double extends rpg_mission {
 
         // Update the battle description based on what we've calculated
         //$temp_description_target_robots = ($temp_option_field['field_type'] != $temp_option_field2['field_type'] ? ucfirst($temp_option_field['field_type']).' and '.ucfirst($temp_option_field2['field_type']) : ucfirst($temp_option_field['field_type'])).' core';
+        //$temp_option_robot_pronoun_possessive = rpg_robot::get_robot_pronoun($temp_option_robot['robot_class'], $temp_option_robot['robot_gender'], 'possessive');
+        //$temp_option_robot2_pronoun_possessive = rpg_robot::get_robot_pronoun($temp_option_robot2['robot_class'], $temp_option_robot2['robot_gender'], 'possessive');
         $temp_description_target_robots = $temp_option_robot['robot_name'].' and '.$temp_option_robot2['robot_name'];
         if ($starfield_mission){
             if ($temp_fusion_star_present){
