@@ -243,11 +243,12 @@ class rpg_type {
         $type_tokens = array_filter($type_tokens, function($value) { return $value !== ''; });
         if (empty($type_tokens)){ $type_tokens[] = 'none'; }
         $type_tokens = array_unique($type_tokens);
+        $type_tokens = array_values($type_tokens);
         $span_markup = '';
         foreach ($type_tokens AS $type_key => $type_token){
-            if (empty($type_text)){ $type_text = $type_token === 'none' ? 'Neutral' : ucwords(str_replace('_', ' ', $type_token)); }
+            $span_text = !empty($type_text) ? $type_text : ($type_token === 'none' ? 'Neutral' : ucwords(str_replace('_', ' ', $type_token)));
             if ($type_key > 0){ $span_markup .= $multi_glue; }  // Used the $multi_glue parameter instead of hardcoded ' and '
-            $span_markup .= '<span class="ability_name ability_type ability_type_'.$type_token.'">'.$type_text.'</span>';
+            $span_markup .= '<span class="ability_name ability_type ability_type_'.$type_token.'">'.$span_text.'</span>';
         }
         return $span_markup;
     }
