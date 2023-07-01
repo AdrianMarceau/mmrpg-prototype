@@ -489,9 +489,9 @@ class rpg_item extends rpg_object {
 
         // Collect the base description string and apply any options provided
         $item_description = $item_info['item_description'];
-        if ($options['show_use_desc']){ $item_description .= ' '.trim($item_info['item_description_use']); }
-        if ($options['show_hold_desc']){ $item_description .= ' '.trim($item_info['item_description_hold']); }
-        if ($options['show_shop_desc']){ $item_description .= ' '.trim($item_info['item_description_shop']); }
+        if (!empty($options['show_use_desc'])){ $item_description .= ' '.trim($item_info['item_description_use']); }
+        if (!empty($options['show_hold_desc'])){ $item_description .= ' '.trim($item_info['item_description_hold']); }
+        if (!empty($options['show_shop_desc'])){ $item_description .= ' '.trim($item_info['item_description_shop']); }
 
         // Replace the tags in the description and return the result
         $parsed_description = str_replace($tags, $replacements, $item_description);
