@@ -2117,7 +2117,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
     foreach ($this_prototype_data['robot_options'] AS $key => $info){
         $info = array_merge($this_robot_index[$info['robot_token']], $info);
         if (!isset($info['original_player'])){ $info['original_player'] = $this_prototype_data['this_player_token']; }
-        $this_option_class = 'option option_this-robot-select option_this-'.$info['original_player'].'-robot-select option_'.($temp_robot_option_count == 1 ? '1x4' : ($this_prototype_data['robots_unlocked'] <= 2 ? '1x2' : '1x1')).' option_'.$info['robot_token'].' block_'.($key + 1);
+        $this_option_class = 'option option_this-robot-select option_this-'.$info['original_player'].'-robot-select option_'.($this_prototype_data['robots_unlocked'] === 1 ? '1x4' : ($this_prototype_data['robots_unlocked'] <= 2 ? '1x2' : '1x1')).' option_'.$info['robot_token'].' block_'.($key + 1);
         $this_option_style = '';
         $this_option_token = $info['robot_id'].'_'.$info['robot_token'];
         $this_option_image = !empty($info['robot_image']) ? $info['robot_image'] : $info['robot_token'];

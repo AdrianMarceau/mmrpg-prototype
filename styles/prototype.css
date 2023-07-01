@@ -876,17 +876,21 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .menu[data-select] .option_wrapper > .wrap.ps-container {
     padding-right: 10px;
 }
+#prototype .menu[data-select] .option_wrapper > .wrap .option_1x1,
 #prototype .menu[data-select] .option_wrapper > .wrap.ps-container .option_1x1 {
     width: calc((100% / 4) - 8px);
 }
+#prototype .menu[data-select] .option_wrapper > .wrap .option_1x2,
 #prototype .menu[data-select] .option_wrapper > .wrap.ps-container .option_1x2 {
     width: calc((100% / 2) - 8px);
 }
+#prototype .menu[data-select] .option_wrapper > .wrap .option_1x3,
 #prototype .menu[data-select] .option_wrapper > .wrap.ps-container .option_1x3 {
-    width: calc((100% / 3) - 8px);
+    width: calc(((100% / 4) * 3) - 8px);
 }
+#prototype .menu[data-select] .option_wrapper > .wrap .option_1x4,
 #prototype .menu[data-select] .option_wrapper > .wrap.ps-container .option_1x4 {
-    width: calc((100% / 4) - 8px);
+    width: calc(100% - 8px);
 }
 
 #prototype .select_this_player_robots .option_wrapper {
