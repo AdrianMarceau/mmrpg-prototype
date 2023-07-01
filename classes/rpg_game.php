@@ -1904,7 +1904,7 @@ class rpg_game {
                 $title .= ' / '.$source_info['source_name_aka'];
             }
             $title .= ' ('.$source_info['source_systems'].')';
-            $source_name = '<span title="'.htmlspecialchars($title, ENT_QUOTES, 'UTF-8', true).'">'.$source_name.'</span>';
+            $source_name = '<span data-click-tooltip="'.htmlspecialchars($title, ENT_QUOTES, 'UTF-8', true).'">'.$source_name.'</span>';
         }
         return $source_name;
     }
