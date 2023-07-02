@@ -797,6 +797,7 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
         $player_type = !empty($player_info['player_type']) ? $player_info['player_type'] : 'none';
         $ability_info_size = isset($ability_info['ability_image_size']) ? $ability_info['ability_image_size'] * 2 : 40 * 2;
         $ability_info_size_token = $ability_info_size.'x'.$ability_info_size;
+        $ability_type_or_none = !empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none';
         $this_name = $ability_info['ability_name'];
         $this_type_token = !empty($ability_info['ability_type']) ? $ability_info['ability_type'] : '';
         if (!empty($ability_info['ability_type2'])){ $this_type_token .= '_'.$ability_info['ability_type2']; }
@@ -862,7 +863,7 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
         $temp_console_markup .= '<div id="console" style="width: auto; height: auto; font-size: 120%; line-height: 1.6; margin: 10px auto;">';
             $temp_console_markup .= '<div class="extra"><div class="extra2" style="max-width: 460px; margin: 0 auto;">';
                 $temp_console_markup .= '<i class="fa fas fa-quote-left" style="font-size: 80%; filter: brightness(1);"></i> ';
-                $temp_console_markup .= '<span class="color '.$player_type.'" style="filter: brightness(2); text-shadow: none;">'.$this_description.'</span> ';
+                $temp_console_markup .= '<span class="color '.$ability_type_or_none.'" style="filter: brightness('.($ability_type_or_none === 'shadow' ? 3 : 2).'2); text-shadow: none;">'.$this_description.'</span> ';
                 $temp_console_markup .= '<i class="fa fas fa-quote-right" style="font-size: 80%; filter: brightness(1);"></i>';
             $temp_console_markup .= '</div></div>';
         $temp_console_markup .= '</div>';
