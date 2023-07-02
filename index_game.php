@@ -244,11 +244,6 @@ $(document).ready(function(){
     // Preload essential audio tracks
     mmrpg_music_preload('misc/player-select');
     mmrpg_music_preload('misc/stage-select-dr-light');
-    //mmrpg_music_preload('misc/stage-select-dr-wily');
-    //mmrpg_music_preload('misc/data-base');
-    //mmrpg_music_preload('misc/leader-board');
-    //mmrpg_music_preload('misc/file-menu');
-    //mmrpg_music_preload('misc/robot-editor');
 
     // If window mod tools exist on the page, we should bind events to them
     var $gameWindow = $('#window');
