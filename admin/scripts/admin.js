@@ -645,12 +645,12 @@ $(document).ready(function(){
                 $thisButton.addClass('loading');
                 thisAdminForm.addClass('loading');
                 $.post(postURL, postData, function(returnData){
-                    console.log('returnData = ', returnData);
+                    //console.log('returnData = ', returnData);
                     if (typeof returnData !== 'undefined' && returnData.length){
                         var lineData = returnData.split('\n');
-                        console.log('lineData = ', lineData);
+                        //console.log('lineData = ', lineData);
                         var statusLine = lineData[0].split('|');
-                        console.log('statusLine = ', statusLine);
+                        //console.log('statusLine = ', statusLine);
                         if (statusLine[0] === 'success'){
                             var completeFunction = function(){
                                 $('html, body').animate({ scrollTop: 0 }, 'fast', function(){
@@ -1820,11 +1820,21 @@ function printStatusMessage(messageStatus, messageText, onCompleteFunction){
                 }
             var sound = new Howl(config);
             audioObjectIndex.push(sound);
-            return (audioObjectIndex.length - 1);
+            var audioID = (audioObjectIndex.length - 1);
+            return audioID;
             }
-        function getAudioObject(key){
-            if (typeof audioObjectIndex[key] === 'undefined'){ return false; }
-            return audioObjectIndex[key];
+
+        // Define a function for getting an audio object from the list given its ID
+        function getAudioObject(audioID){
+            if (typeof audioObjectIndex[audioID] === 'undefined'){ return false; }
+            return audioObjectIndex[audioID];
+            }
+
+        // Define a function for deleting an audio object from the list given its ID
+        function deleteAudioObject(audioID){
+            if (typeof audioObjectIndex[audioID] === 'undefined'){ return false; }
+            audioObjectIndex[audioID] = false;
+            delete audioObjectIndex[audioID];
             }
 
         // Define a variable to keep track of which audio objects are currently playing
@@ -1960,6 +1970,8 @@ function printStatusMessage(messageStatus, messageText, onCompleteFunction){
 
         // Loop through each music link trigger and add the player to the page
         $audioPlayers.each(function(){
+
+            // Collect a reference to the audio player and collect its settings
             var $audioPlayer = $(this);
             var thisKind = $audioPlayer.attr('data-kind');
             if (!thisKind){ thisKind = 'audio'; }
@@ -1969,9 +1981,13 @@ function printStatusMessage(messageStatus, messageText, onCompleteFunction){
             if (!thisPath){ thisBackupPath = false; }
             var preloadMeta = true;
             if ($audioPlayer.is('.no-preload')){ preloadMeta = false; }
+            var selectToWatch = $audioPlayer.attr('data-select');
+            var $selectToWatch = typeof selectToWatch !== 'undefined' ? $('select[name="'+selectToWatch+'"]', $parentContainer) : false;
+
+            // Empty the element of any existing markup then add new attributes and insert new buttons
+            $audioPlayer.empty();
             $audioPlayer.removeAttr('data-kind');
             $audioPlayer.removeAttr('data-path');
-            $audioPlayer.empty();
             $audioPlayer.attr('data-audio-kind', thisKind);
             $audioPlayer.attr('data-audio-path', thisPath);
             $audioPlayer.attr('data-audio-state', 'stop');
@@ -1981,7 +1997,9 @@ function printStatusMessage(messageStatus, messageText, onCompleteFunction){
             $audioPlayer.append('<span class="button stop" data-audio-control="stop"><i class="fa fas fa-stop-circle"></i></span>');
             $audioPlayer.append('<span class="widget timer"><span class="current">'+(preloadMeta ? '0:00' : '')+'</span>/<span class="total">'+(preloadMeta ? '0:00' : '')+'</span></span>');
             $audioPlayer.append('<span class="widget state"><i class="fa fas fa-music"></i></span>');
-            var audioID = newAudioObject(thisPath, thisBackupPath, preloadMeta, function(audioObject){
+
+            // Define a little onComplete function for when an audio file finishes loading
+            var onComplete = function(audioObject){
                 var audioObject = this;
                 var audioPosition = audioObject.seek();
                 var audioDuration = audioObject.duration();
@@ -1989,12 +2007,55 @@ function printStatusMessage(messageStatus, messageText, onCompleteFunction){
                 var seconds = Math.floor(audioDuration - minutes * 60);
                 var audioDurationText = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
                 $audioPlayer.find('.widget.timer .total').html(audioDurationText);
-                });
+                };
+
+            // Create the new audio object and collect the real ID for it, updating the player with it
+            var audioID = newAudioObject(thisPath, thisBackupPath, preloadMeta, onComplete);
             $audioPlayer.attr('data-audio-id', audioID);
+
+            // Define the click event for the audio controls within this player
             $('.button[data-audio-control]', $audioPlayer).bind('click', function(e){
                 e.preventDefault();
                 audioButtonClicked.call(this);
                 });
+
+            // If this player has a select dropdown to watch, bind the event
+            if ($selectToWatch  && $selectToWatch.length){
+                //console.log('$selectToWatch =', $selectToWatch);
+                var selectPathBase = $audioPlayer.attr('data-select-path-base');
+                var selectPathSources = $audioPlayer.attr('data-select-path-sources');
+                selectPathSources = typeof selectPathSources === 'string' ? selectPathSources.split(',') : [];
+                //console.log('selectPathBase =', selectPathBase);
+                //console.log('selectPathSources =', selectPathSources);
+                $selectToWatch.bind('change', function(){
+
+                    // Collect reference to new option value and generate new paths
+                    //console.log('select has changed values!');
+                    var $optionSelected = $('option:selected', this);
+                    var optionValue = $optionSelected.val();
+                    var newPath = selectPathBase+optionValue+selectPathSources[0];
+                    var newBackupPath = selectPathBase+optionValue+selectPathSources[1];
+                    newPath += (newPath.indexOf('?') === -1 ? '?' : '&') + Date.now();
+                    newBackupPath += (newBackupPath.indexOf('?') === -1 ? '?' : '&') + Date.now();
+                    //console.log('optionValue =', optionValue);
+                    //console.log('newPath =', newPath);
+                    //console.log('newBackupPath =', newBackupPath);
+
+                    // Collect reference to the old audio and stop it if currently playing
+                    var oldAudioID = $audioPlayer.attr('data-audio-id');
+                    var oldAudioObject = getAudioObject(oldAudioID);
+                    updateAudioState('stop', oldAudioID);
+                    $audioPlayer.find('.widget.timer .current').html('0:00');
+                    $audioPlayer.find('.widget.timer .total').html('0:00');
+
+                    // Collect a new audio ID using the new settings and then update the player
+                    var newAudioID = newAudioObject(newPath, newBackupPath, true, onComplete);
+                    $audioPlayer.attr('data-audio-id', newAudioID);
+
+
+                    });
+                }
+
             });
 
         };

@@ -89,6 +89,10 @@
     $admin_include_common_styles[] = 'codemirror';
     $admin_include_common_scripts[] = 'codemirror';
 
+    // Require codemirror scripts and styles for this page
+    $admin_include_common_styles[] = 'howler';
+    $admin_include_common_scripts[] = 'howler';
+
 
     /* -- Form Setup Actions -- */
 
@@ -1138,24 +1142,48 @@
                                             <strong>Field Music</strong>
                                             <em>default music that plays on this stage</em>
                                         </div>
-                                        <select class="select" name="field_music">
-                                            <?
-                                            if (!empty($field_data['field_music'])
-                                                && !strstr($music_options_markup, 'value="'.$field_data['field_music'].'"')){
-                                                ?>
-                                                <option value="">-</option>
-                                                <optgroup label="Legacy Support">
-                                                    <option value="<?= $field_data['field_music'] ?>" selected="selected"><?= ucwords(str_replace('-', ' ', $field_data['field_music'])).' (Legacy)' ?></option>
-                                                </optgroup>
-                                                <?= str_replace('value="'.$field_data['field_music'].'"', 'value="'.$field_data['field_music'].'" selected="selected"', str_replace('<option value="">-</option>', '', $music_options_markup)) ?>
+                                        <div class="subfield">
+                                            <select class="select" name="field_music">
                                                 <?
-                                            } else {
+                                                if (!empty($field_data['field_music'])
+                                                    && !strstr($music_options_markup, 'value="'.$field_data['field_music'].'"')){
+                                                    ?>
+                                                    <option value="">-</option>
+                                                    <optgroup label="Legacy Support">
+                                                        <option value="<?= $field_data['field_music'] ?>" selected="selected"><?= ucwords(str_replace('-', ' ', $field_data['field_music'])).' (Legacy)' ?></option>
+                                                    </optgroup>
+                                                    <?= str_replace('value="'.$field_data['field_music'].'"', 'value="'.$field_data['field_music'].'" selected="selected"', str_replace('<option value="">-</option>', '', $music_options_markup)) ?>
+                                                    <?
+                                                } else {
+                                                    ?>
+                                                    <?= str_replace('value="'.$field_data['field_music'].'"', 'value="'.$field_data['field_music'].'" selected="selected"', $music_options_markup) ?>
+                                                    <?
+                                                }
                                                 ?>
-                                                <?= str_replace('value="'.$field_data['field_music'].'"', 'value="'.$field_data['field_music'].'" selected="selected"', $music_options_markup) ?>
-                                                <?
-                                            }
-                                            ?>
-                                        </select><span></span>
+                                            </select><span></span>
+                                        </div>
+                                        <?
+                                        $data_path = '';
+                                        $data_backup_path = '';
+                                        if (!empty($field_data['field_music'])){
+                                            $mmrpg_music_path = 'prototype/sounds/';
+                                            $mmrpg_music_rootdir = MMRPG_CONFIG_CDN_ROOTDIR.$mmrpg_music_path;
+                                            $mmrpg_music_rooturl = MMRPG_CONFIG_CDN_ROOTURL.$mmrpg_music_path;
+                                            $this_music_path = $field_data['field_music'].'/';
+                                            $data_path = $mmrpg_music_rooturl.$this_music_path.'audio.mp3';
+                                            $data_backup_path = $mmrpg_music_rooturl.$this_music_path.'audio.ogg';
+                                        }
+                                        ?>
+                                        <div class="audio-player light-theme"
+                                            style="margin: 5px auto 0 0;"
+                                            data-kind="music"
+                                            data-path="<?= $data_path ?>"
+                                            data-backup-path="<?= $data_backup_path ?>"
+                                            data-select="field_music"
+                                            data-select-path-base="<?= $mmrpg_music_rooturl ?>"
+                                            data-select-path-sources="/audio.mp3,/audio.ogg"
+                                            ><i class="loading fa fas fa-music"></i>
+                                        </div>
                                     </div>
 
                                 </div>
