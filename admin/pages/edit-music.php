@@ -643,8 +643,8 @@
                     <div class="field fullsize has5cols flags">
                     <?
                     $flag_names = array(
-                        'haslink' => array('icon' => 'fas fa-check-square', 'yes' => 'Has Link', 'no' => 'Missing Link'),
-                        'hasfiles' => array('icon' => 'fas fa-check-square', 'yes' => 'Has Files', 'no' => 'Missing Files'),
+                        'haslink' => array('icon' => 'fas fa-check-square', 'yes' => 'Has Link', 'no' => 'Missing Link', 'label' => 'Has Credits Link'),
+                        'hasfiles' => array('icon' => 'fas fa-check-square', 'yes' => 'Has Files', 'no' => 'Missing Files', 'label' => 'Has Files Uploaded'),
                         );
                     foreach ($flag_names AS $flag_token => $flag_info){
                         if (isset($flag_info['break'])){ echo('<div class="break"></div>'); continue; }
@@ -687,8 +687,8 @@
                             <col class="token" width="160" />
                             <col class="album" width="90" />
                             <col class="game" width="80" />
-                            <col class="flag haslink" width="80" />
                             <col class="flag hasfiles" width="80" />
+                            <col class="flag haslink" width="80" />
                             <col class="actions" width="100" />
                         </colgroup>
                         <thead>
@@ -698,8 +698,8 @@
                                 <th class="token"><?= cms_admin::get_sort_link('music_token', 'Token') ?></th>
                                 <th class="album"><?= cms_admin::get_sort_link('music_album', 'Album') ?></th>
                                 <th class="game"><?= cms_admin::get_sort_link('music_game', 'Game') ?></th>
-                                <th class="flag haslink"><?= cms_admin::get_sort_link('music_flag_haslink', 'Has Link') ?></th>
-                                <th class="flag hasfiles"><?= cms_admin::get_sort_link('music_flag_haslink', 'Has Files') ?></th>
+                                <th class="flag hasfiles"><?= cms_admin::get_sort_link('music_flag_haslink', 'Files') ?></th>
+                                <th class="flag haslink"><?= cms_admin::get_sort_link('music_flag_haslink', 'Link') ?></th>
                                 <th class="actions">Actions</th>
                             </tr>
                             <tr>
@@ -708,8 +708,8 @@
                                 <th class="head token"></th>
                                 <th class="head album"></th>
                                 <th class="head game"></th>
-                                <th class="head flag haslink"></th>
                                 <th class="head flag hasfiles"></th>
+                                <th class="head flag haslink"></th>
                                 <th class="head count"><?= cms_admin::get_totals_markup() ?></th>
                             </tr>
                         </thead>
@@ -720,8 +720,8 @@
                                 <td class="foot token"></td>
                                 <td class="foot album"></td>
                                 <td class="foot game"></td>
-                                <td class="foot flag haslink"></td>
                                 <td class="foot flag hasfiles"></td>
+                                <td class="foot flag haslink"></td>
                                 <td class="foot count"><?= cms_admin::get_totals_markup() ?></td>
                             </tr>
                         </tfoot>
@@ -745,7 +745,31 @@
 
                                 $music_flag_hasfiles = !empty($music_data['music_flag_hasfiles']) ? '<i class="fas fa-'.($music_data['music_flag_hasfiles'] > 1 ? 'check-double' : 'check').'"></i>' : '-';
 
-                                $music_flag_haslink_span =
+                                $music_player_markup = '';
+                                if ($music_flag_hasfiles){
+                                    $this_music_path = $music_data['music_album'].'/'.$music_data['music_token'].'/';
+                                    $this_music_dir = $mmrpg_music_rootdir.$this_music_path;
+                                    $this_music_url = $mmrpg_music_rooturl.$this_music_path;
+                                    $this_file_urls = array();
+                                    $this_file_urls_w_cache = array();
+                                    foreach ($mmrpg_music_file_types AS $file_type){
+                                        $file_exists = false;
+                                        $file_dir = $this_music_dir.'audio.'.$file_type;
+                                        $file_url = $this_music_url.'audio.'.$file_type;
+                                        if (file_exists($file_dir)){
+                                            $this_file_urls[] = $file_url;
+                                            $this_file_urls_w_cache[] = $file_url.'?'.MMRPG_CONFIG_CACHE_DATE;
+                                        }
+                                    }
+                                    $this_data_attrs = '';
+                                    $this_data_attrs .= 'data-kind="music" ';
+                                    $this_data_attrs .= 'data-path="'.$this_file_urls_w_cache[0].'" ';
+                                    if (isset($this_file_urls_w_cache[1])){ $this_data_attrs .= 'data-backup-path="'.$this_file_urls_w_cache[1].'" '; }
+                                    $music_player_markup .= '<br />';
+                                    $music_player_markup .= '<span class="audio-player light-theme no-preload" '.$this_data_attrs.' style="margin: 3px auto 0 0;">';
+                                        $music_player_markup .= '<i class="loading fa fas fa-music"></i>';
+                                    $music_player_markup .= '</span>';
+                                }
 
                                 $music_edit = 'admin/edit-music/editor/music_id='.$music_id;
 
@@ -758,12 +782,12 @@
 
                                 echo '<tr>'.PHP_EOL;
                                     echo '<td class="id"><div>'.$music_id.'</div></td>'.PHP_EOL;
-                                    echo '<td class="name"><div>'.$music_name_link.'</div></td>'.PHP_EOL;
+                                    echo '<td class="name"><div>'.$music_name_link.$music_player_markup.'</div></td>'.PHP_EOL;
                                     echo '<td class="token"><div>'.$music_token.'</div></td>'.PHP_EOL;
                                     echo '<td class="album"><div>'.$music_album.'</div></td>'.PHP_EOL;
                                     echo '<td class="game"><div class="wrap">'.$music_game.'</div></td>'.PHP_EOL;
-                                    echo '<td class="flag haslink"><div>'.$music_flag_haslink.'</div></td>'.PHP_EOL;
                                     echo '<td class="flag hasfiles"><div>'.$music_flag_hasfiles.'</div></td>'.PHP_EOL;
+                                    echo '<td class="flag haslink"><div>'.$music_flag_haslink.'</div></td>'.PHP_EOL;
                                     echo '<td class="actions"><div>'.$music_actions.'</div></td>'.PHP_EOL;
                                 echo '</tr>'.PHP_EOL;
 
@@ -888,7 +912,7 @@
                                         <input class="fileinput" type="file" name="music_files_<?= $file_type ?>" value="" />
                                     </div>
                                     <? if ($file_exists){ ?>
-                                        <div class="audio-player" data-kind="music" data-path="<?= $file_url_w_cache ?>" style="margin: 5px auto 0 0;">
+                                        <div class="audio-player light-theme" data-kind="music" data-path="<?= $file_url_w_cache ?>" style="margin: 5px auto 0 0;">
                                             <i class="loading fa fas fa-music"></i>
                                         </div>
                                     <? } ?>

@@ -2956,7 +2956,7 @@ input[type=file] {
 }
 
 
-.adminform .field .audio-player {
+.adminform .audio-player {
     display: inline-block;
     margin: 0 auto 0 10px;
     background-color: #5a5a5a;
@@ -2972,53 +2972,54 @@ input[type=file] {
     user-select: none;
     min-width: 1em;
     min-height: 1em;
+    transition: width 0.3s, color 0.3s, background-color 0.3s;
 }
-.adminform .field .audio-player > i.loading {
+.adminform .audio-player > i.loading {
     transform: scale(0.6);
     opacity: 0.6;
     margin-right: 4px;
 }
-.adminform .field .audio-player .button,
-.adminform .field .audio-player .widget {
+.adminform .audio-player .button,
+.adminform .audio-player .widget {
     display: inline-block;
     margin: 0 4px 0 0;
     opacity: 1.0;
     transform: scale(1);
     transition: opacity 0.2s, transform 0.2s, color 0.2s;
 }
-.adminform .field .audio-player .button {
+.adminform .audio-player .button {
     cursor: pointer;
     opacity: 0.9;
 }
-.adminform .field .audio-player .widget {
+.adminform .audio-player .widget {
 
 }
 
-.adminform .field .audio-player[data-audio-state="play"],
-.adminform .field .audio-player[data-audio-state="pause"] {
+.adminform .audio-player[data-audio-state="play"],
+.adminform .audio-player[data-audio-state="pause"] {
     background-color: #4b8bb2;
 }
 
-.adminform .field .audio-player[data-audio-state] .button {
+.adminform .audio-player[data-audio-state] .button {
     opacity: 0.3;
 }
-.adminform .field .audio-player[data-audio-state] .button:hover {
+.adminform .audio-player[data-audio-state] .button:hover {
     opacity: 1.0;
     transform: scale(1.3);
 }
-.adminform .field .audio-player[data-audio-state="play"] .button.play,
-.adminform .field .audio-player[data-audio-state="pause"] .button.pause,
-.adminform .field .audio-player[data-audio-state="stop"] .button.stop {
+.adminform .audio-player[data-audio-state="play"] .button.play,
+.adminform .audio-player[data-audio-state="pause"] .button.pause,
+.adminform .audio-player[data-audio-state="stop"] .button.stop {
     opacity: 1.0;
 }
-.adminform .field .audio-player[data-audio-state="stop"] .button.pause,
-.adminform .field .audio-player[data-audio-state="stop"] .button.stop {
+.adminform .audio-player[data-audio-state="stop"] .button.pause,
+.adminform .audio-player[data-audio-state="stop"] .button.stop {
     cursor: default;
     pointer-events: none;
 }
-.adminform .field .audio-player[data-audio-state="play"] .button.pause,
-.adminform .field .audio-player[data-audio-state="pause"] .button.play,
-.adminform .field .audio-player[data-audio-state="stop"] .button.pause {
+.adminform .audio-player[data-audio-state="play"] .button.pause,
+.adminform .audio-player[data-audio-state="pause"] .button.play,
+.adminform .audio-player[data-audio-state="stop"] .button.pause {
     display: none;
 }
 
@@ -3032,33 +3033,51 @@ input[type=file] {
         opacity: 1.0;
     }
 }
-.adminform .field .audio-player .widget.timer {
+.adminform .audio-player .widget.timer {
     padding: 0 6px;
     background-color: #404040;
     background-color: rgba(0, 0, 0, 0.3);
     border-radius: 2px;
     font-weight: normal;
 }
-.adminform .field .audio-player .widget.timer .current,
-.adminform .field .audio-player .widget.timer .total {
+.adminform .audio-player .widget.timer .current,
+.adminform .audio-player .widget.timer .total {
     font-size: 80%;
     position: relative;
     bottom: 1px;
     padding: 0 4px;
     font-weight: normal;
 }
-.adminform .field .audio-player .widget.timer .total {
-    opacity: 0.6;
+.adminform .audio-player .widget.timer .total {
+    opacity: 0.5;
 }
-.adminform .field .audio-player .widget.state {
+.adminform .audio-player .widget.state {
     opacity: 0.2;
     transform: scale(0.5);
     color: #ffffff;
 }
-.adminform .field .audio-player[data-audio-state="play"] .widget.state {
+.adminform .audio-player[data-audio-state="play"] .widget.state {
     animation: pulse-widget-state-active 2s infinite;
 }
-.adminform .field .audio-player[data-audio-state="pause"] .widget.state {
+.adminform .audio-player[data-audio-state="pause"] .widget.state {
     opacity: 0.6;
     transform: scale(0.75);
+}
+
+.adminform .audio-player.light-theme {
+    background-color: #dedede;
+    color: #008aab;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
+}
+.adminform .audio-player.light-theme[data-audio-state="play"],
+.adminform .audio-player.light-theme[data-audio-state="pause"] {
+    background-color: #c5e2f4;
+}
+.adminform .audio-player.light-theme .widget.timer {
+    background-color: rgba(255, 255, 255, 0.6);
+    text-shadow: none;
+    color: #262626;
+}
+.adminform .audio-player.light-theme .widget.state {
+    color: #5d97b6;
 }
