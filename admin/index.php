@@ -389,6 +389,9 @@ unset($db);
 <?endif;?>
 <link type="text/css" href="admin/styles/admin.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="admin/styles/admin-responsive.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<? if (file_exists(MMRPG_CONFIG_ROOTDIR.'admin/styles/admin_'.$this_page_action.'.css')){ ?>
+    <link type="text/css" href="admin/styles/admin_<?= $this_page_action ?>.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<? } ?>
 </head>
 <body id="mmrpg">
     <div id="admin">
@@ -438,10 +441,18 @@ unset($db);
 <? if (in_array('sortable', $admin_include_common_scripts)){ ?>
     <script type="text/javascript" src=".libs/jquery-ui-sortable/jquery.sortable.min.js"></script>
 <? } ?>
-<script type="text/javascript" src="admin/scripts/admin.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
+<? if (in_array('howler', $admin_include_common_scripts)){ ?>
+    <script src=".libs/howler-js/howler.core.min.js"></script>
+    <script src=".libs/howler-js/howler.min.js"></script>
+<? } ?>
 <script type="text/javascript">
-    thisRootURL = '<?= MMRPG_CONFIG_ROOTURL ?>';
+    var thisRootURL = '<?= MMRPG_CONFIG_ROOTURL ?>';
+    var mmrpgConfigRootURL = '<?= MMRPG_CONFIG_ROOTURL ?>';
 </script>
+<script type="text/javascript" src="admin/scripts/admin.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
+<? if (file_exists(MMRPG_CONFIG_ROOTDIR.'admin/scripts/admin_'.$this_page_action.'.js')){ ?>
+    <script type="text/javascript" src="admin/scripts/admin_<?= $this_page_action ?>.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
+<? } ?>
 <? if (!empty($admin_inline_javascript)){ ?>
     <?= $admin_inline_javascript ?>
 <? } ?>
