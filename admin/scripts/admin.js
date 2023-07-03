@@ -7,11 +7,11 @@ var thisAdminForm = false;
 var thisAdminSearch = false;
 var thisAdminResults = false;
 var thisAdminEditor = false;
-var thisRootURL = '/';
 var $adminHome = false;
 var $adminForm = false;
 var $adminAjaxForm = false;
 var $adminAjaxFrame = false;
+var thisRootURL = '/';
 
 // Pre-define the upload complete functions
 window.onUpdateImageComplete = function(){ };
@@ -32,6 +32,7 @@ $(document).ready(function(){
     $adminForm = $('.adminform form.form', thisAdmin);
     $adminAjaxForm = $('.adminform form[name="ajax-form"]', thisAdmin);
     $adminAjaxFrame = $('.adminform iframe[name="ajax-frame"]', thisAdmin);
+    if (typeof window.mmrpgConfigRootURL !== 'undefined'){ thisRootURL = window.mmrpgConfigRootURL; }
 
     // Define an event for delete links and buttons
     var confirmTemplate1 = 'Are you sure you want to delete {object}? \nThis action cannot be undone.';

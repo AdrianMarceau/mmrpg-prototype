@@ -28,6 +28,7 @@
     $mmrpg_music_rootdir = MMRPG_CONFIG_CDN_ROOTDIR.$mmrpg_music_path;
     $mmrpg_music_rooturl = MMRPG_CONFIG_CDN_ROOTURL.$mmrpg_music_path;
     $mmrpg_music_file_types = array('mp3', 'ogg');
+    $mmrpg_music_file_types_mime = array('mp3' => 'audio/mpeg', 'ogg' => 'audio/ogg');
     $mmrpg_music_file_list = array();
     if (is_dir($mmrpg_music_rootdir)){
         $mmrpg_music_file_list = getDirContents($mmrpg_music_rootdir);
@@ -69,6 +70,13 @@
     if (!empty($last_option_group)){ $source_options_markup[] = '</optgroup>'; }
     $source_options_count = count($source_options_markup);
     $source_options_markup = implode(PHP_EOL, $source_options_markup);
+
+
+    /* -- Page Script/Style Dependencies  -- */
+
+    // Require codemirror scripts and styles for this page
+    $admin_include_common_styles[] = 'howler';
+    $admin_include_common_scripts[] = 'howler';
 
 
     /* -- Form Setup Actions -- */
@@ -864,10 +872,11 @@
                             $this_music_dir = $mmrpg_music_rootdir.$this_music_path;
                             $this_music_url = $mmrpg_music_rooturl.$this_music_path;
                             foreach ($mmrpg_music_file_types AS $file_type){
+                                $file_exists = false;
                                 $file_dir = $this_music_dir.'audio.'.$file_type;
                                 $file_url = $this_music_url.'audio.'.$file_type;
-                                if (file_exists($file_dir)){ $file_status = '<a class="status yes" href="'.$file_url.'" target="_blank"><i class="fa fas fa-check-circle"></i></a>'; }
-                                else { $file_status = '<span class="status no"><i class="fa fas fa-times-circle"></i></span>'; }
+                                if (file_exists($file_dir)){ $file_exists = true; $file_status = '<a class="status yes" href="'.$file_url.'?'.MMRPG_CONFIG_CACHE_DATE.'" target="_blank"><i class="fa fas fa-check-circle"></i></a>'; }
+                                else { $file_exists = false; $file_status = '<span class="status no"><i class="fa fas fa-times-circle"></i></span>'; }
                                 ?>
                                 <div class="field">
                                     <div class="label">
@@ -877,6 +886,11 @@
                                     <div class="filewrap">
                                         <input class="fileinput" type="file" name="music_files_<?= $file_type ?>" value="" />
                                     </div>
+                                    <? if ($file_exists){ ?>
+                                        <div class="audio-player" data-kind="music" data-path="<?= $file_url ?>" style="margin: 5px auto 0 0;">
+                                            <i class="loading fa fas fa-music"></i>
+                                        </div>
+                                    <? } ?>
                                 </div>
                                 <?
                             }
