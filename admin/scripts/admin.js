@@ -698,6 +698,15 @@ $(document).ready(function(){
             });
         }
 
+        // Check to see if there are any music player triggers on the page
+        var $audioPlayers = $('.audio-player[data-path]', thisAdminForm);
+        //var $musicLinks = $('a[href*=".mp3"],a[href*=".ogg"]', $thisAdminForm);
+        if ($audioPlayers.length){
+            //console.log('There are ', $audioPlayers.length, 'audio players on this page');
+            mmrpgAdminAudioPlayer($audioPlayers, {});
+            }
+
+
     }
 
 
