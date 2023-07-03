@@ -698,12 +698,12 @@ $(document).ready(function(){
             });
         }
 
-        // Check to see if there are any music player triggers on the page
+        // Check to see if there are any audio player triggers on the page
         var $audioPlayers = $('.audio-player[data-path]', thisAdminForm);
         //var $musicLinks = $('a[href*=".mp3"],a[href*=".ogg"]', $thisAdminForm);
         if ($audioPlayers.length){
             //console.log('There are ', $audioPlayers.length, 'audio players on this page');
-            mmrpgAdminAudioPlayer($audioPlayers, {});
+            mmrpgAdminAudioPlayer($audioPlayers, {size:'default'});
             }
 
 
@@ -1832,7 +1832,7 @@ function printStatusMessage(messageStatus, messageText, onCompleteFunction){
             for (var i = 0; i < audioCurrentlyPlaying.length; i++){
                 var audioID = audioCurrentlyPlaying[i];
                 var audioObject = getAudioObject(audioID);
-                var $audioPlayer = $('.audio-player[data-audio-id="' + audioID + '"]', $parentContainer);
+                var $audioPlayer = $audioPlayers.filter('[data-audio-id="' + audioID + '"]');
                 var $timerWidget = $('.widget.timer', $audioPlayer);
                 if ($timerWidget.length){
                     var audioPosition = audioObject.seek();
@@ -1864,7 +1864,7 @@ function printStatusMessage(messageStatus, messageText, onCompleteFunction){
 
             // Collect references to the audio button itself and the parent player element
             var $audioButton = $(this);
-            var $audioPlayer = $audioButton.closest('.audio-player');
+            var $audioPlayer = $audioButton.closest('[data-audio-id]');
 
             // Collect the current state of the player and the new state from the button
             var audioKind = $audioPlayer.attr('data-audio-kind');
@@ -1892,7 +1892,7 @@ function printStatusMessage(messageStatus, messageText, onCompleteFunction){
             //console.log('updateAudioState(', audioStateNew, ',', audioID, ')');
 
             // Derive the $audioPlayer and $audioButton from the audioID
-            var $audioPlayer = $('.audio-player[data-audio-id="' + audioID + '"]', $parentContainer);
+            var $audioPlayer = $audioPlayers.filter('[data-audio-id="' + audioID + '"]');
             var $audioButton = $audioPlayer.find('.audio-button[data-audio-control="' + audioStateNew + '"]');
 
             // Update the audio state of the player container to reflect the change

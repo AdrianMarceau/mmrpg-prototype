@@ -875,7 +875,8 @@
                                 $file_exists = false;
                                 $file_dir = $this_music_dir.'audio.'.$file_type;
                                 $file_url = $this_music_url.'audio.'.$file_type;
-                                if (file_exists($file_dir)){ $file_exists = true; $file_status = '<a class="status yes" href="'.$file_url.'?'.MMRPG_CONFIG_CACHE_DATE.'" target="_blank"><i class="fa fas fa-check-circle"></i></a>'; }
+                                $file_url_w_cache = $file_url.'?'.time();
+                                if (file_exists($file_dir)){ $file_exists = true; $file_status = '<a class="status yes" href="'.$file_url_w_cache.'" target="_blank"><i class="fa fas fa-check-circle"></i></a>'; }
                                 else { $file_exists = false; $file_status = '<span class="status no"><i class="fa fas fa-times-circle"></i></span>'; }
                                 ?>
                                 <div class="field">
@@ -887,7 +888,7 @@
                                         <input class="fileinput" type="file" name="music_files_<?= $file_type ?>" value="" />
                                     </div>
                                     <? if ($file_exists){ ?>
-                                        <div class="audio-player" data-kind="music" data-path="<?= $file_url ?>" style="margin: 5px auto 0 0;">
+                                        <div class="audio-player" data-kind="music" data-path="<?= $file_url_w_cache ?>" style="margin: 5px auto 0 0;">
                                             <i class="loading fa fas fa-music"></i>
                                         </div>
                                     <? } ?>
