@@ -170,9 +170,8 @@ if (count($matches)>1){
         <?endif;?>
         <div id="music" class="onload">
             <a class="toggle paused has_pixels" href="#" onclick=""><span><span>loading&hellip;</span></span></a>
-            <audio class="stream paused" onended="this.play();">
-                <div style="color: white; background-color: black; padding: 10px;">Your browser does not support the audio tag.</div>
-            </audio>
+            <input type="hidden" class="audio-stream music paused" />
+            <input type="hidden" class="audio-stream effects paused" />
         </div>
         <? /*
         <div id="events" class="hidden">
@@ -230,11 +229,14 @@ if (count($matches)>1){
 </div>
 <script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
 <script type="text/javascript" src=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.js"></script>
+<script type="text/javascript" src=".libs/howler-js/howler.core.min.js"></script>
+<script type="text/javascript" src=".libs/howler-js/howler.min.js"></script>
 <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
 // Define the key client variables
 <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 var thisScrollbarSettings = {wheelSpeed:0.3};
+gameSettings.customIndex.musicMeta = <?= json_encode($render_modes_index) ?>;
 </script>
 <script type="text/javascript">
 
