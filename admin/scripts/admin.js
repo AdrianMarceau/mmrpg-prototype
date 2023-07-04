@@ -1800,28 +1800,60 @@ function printStatusMessage(messageStatus, messageText, onCompleteFunction){
 
         // Define a function for creating new audio objects and adding them to a index for caching purposes
         var audioObjectIndex = [];
-        function newAudioObject(audioPath, backupPath, preloadMeta, onLoaded){
-            var src = [audioPath];
-            if (backupPath){ src.push(backupPath); }
-            if (typeof preloadMeta === 'undefined'){ preloadMeta = true; }
-            if (typeof onLoaded !== 'function'){ onLoaded = function(){}; }
-            var config = {
-                src: src,
-                volume: 0.5,
-                loop: true,
-                preload: false,
-                onload: function(){
-                    onLoaded.call(sound);
-                    }
+        var audioConfigIndex = [];
+        function newAudioObject(audioPath, backupPath, configOptions, onLoaded){
+
+            var audioSources = [audioPath];
+            if (backupPath){ audioSources.push(backupPath); }
+
+            if (typeof configOptions !== 'object'){ configOptions = {}; }
+            if (typeof configOptions.preload === 'undefined'){ configOptions.preload = false; }
+            if (typeof configOptions.preloadMeta === 'undefined'){ configOptions.preloadMeta = true; }
+            if (typeof configOptions.loop === 'undefined'){ configOptions.loop = true; }
+            if (typeof configOptions.loopStart === 'undefined'){ configOptions.loopStart = false; }
+            if (typeof configOptions.loopEnd === 'undefined'){ configOptions.loopEnd = false; }
+            if (typeof configOptions.volume === 'undefined'){ configOptions.volume = 0.5; }
+
+            if (typeof onLoaded !== 'function'){ onLoaded = false; }
+
+            var audioObject = false;
+            var audioConfig = {
+                src: audioSources,
+                volume: configOptions.volume,
+                loop: configOptions.loop,
+                preload: configOptions.preload
                 };
-            if (preloadMeta === true){
-                config.html5 = true;
-                config.preload = 'metadata';
+            if (configOptions.preloadMeta === true){
+                audioConfig.html5 = true;
+                audioConfig.preload = 'metadata';
                 }
-            var sound = new Howl(config);
-            audioObjectIndex.push(sound);
+            if (configOptions.onLoaded !== false){
+                audioConfig.onload = function(){
+                    onLoaded.call(audioObject);
+                    };
+                }
+            if (configOptions.loopStart !== false
+                && configOptions.loopEnd !== false){
+                var milliFrame = Math.ceil(1000 / 60);
+                var introStart = 0;
+                var introDuration = configOptions.loopStart - (milliFrame * 10);
+                var loopStart = configOptions.loopStart + (milliFrame * 2);
+                var loopDuration = configOptions.loopEnd - configOptions.loopStart;
+                audioConfig.loop = false;
+                audioConfig.sprite = {
+                    intro: [introStart, introDuration, false],
+                    loop: [loopStart, loopDuration, true]
+                    };
+                }
+            audioObject = new Howl(audioConfig);
+
+           //console.log('created new Howl w/ configOptions:', configOptions, 'and audioConfig:', audioConfig);
+
+            audioObjectIndex.push(audioObject);
+            audioConfigIndex.push(audioConfig);
             var audioID = (audioObjectIndex.length - 1);
             return audioID;
+
             }
 
         // Define a function for getting an audio object from the list given its ID
@@ -1830,11 +1862,24 @@ function printStatusMessage(messageStatus, messageText, onCompleteFunction){
             return audioObjectIndex[audioID];
             }
 
+        // Define a function for getting an audio object from the list given its ID
+        function getAudioConfig(audioID){
+            if (typeof audioConfigIndex[audioID] === 'undefined'){ return false; }
+            return audioConfigIndex[audioID];
+            }
+
         // Define a function for deleting an audio object from the list given its ID
         function deleteAudioObject(audioID){
             if (typeof audioObjectIndex[audioID] === 'undefined'){ return false; }
             audioObjectIndex[audioID] = false;
             delete audioObjectIndex[audioID];
+            }
+
+        // Define a function for deleting an audio object from the list given its ID
+        function deleteAudioConfig(audioID){
+            if (typeof audioConfigIndex[audioID] === 'undefined'){ return false; }
+            audioConfigIndex[audioID] = false;
+            delete audioConfigIndex[audioID];
             }
 
         // Define a variable to keep track of which audio objects are currently playing
@@ -1849,8 +1894,6 @@ function printStatusMessage(messageStatus, messageText, onCompleteFunction){
             if (index > -1){ audioCurrentlyPlaying.splice(index, 1); }
             };
         function updateCurrentlyPlaying(){
-            //console.log('updateCurrentlyPlaying()');
-            //console.log('audioCurrentlyPlaying =', audioCurrentlyPlaying.length, audioCurrentlyPlaying);
             if (!audioCurrentlyPlaying.length){ return; }
             for (var i = 0; i < audioCurrentlyPlaying.length; i++){
                 var audioID = audioCurrentlyPlaying[i];
@@ -1863,24 +1906,24 @@ function printStatusMessage(messageStatus, messageText, onCompleteFunction){
                     // convert the position to a 0:00:00 format
                     var minutes = Math.floor(audioPosition / 60);
                     var seconds = Math.floor(audioPosition - minutes * 60);
-                    var milliseconds = Math.floor((audioPosition - Math.floor(audioPosition)) * 100);
-                    var audioPositionText = minutes + ':' + (seconds < 10 ? '0' : '') + seconds + ':' + (milliseconds < 10 ? '0' : '') + milliseconds;
+                    var frames = Math.round((audioPosition - Math.floor(audioPosition)) * 60);
+                    var audioPositionText = (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds + ':' + (frames < 10 ? '0' : '') + frames;
                     // convert the duration to a 0:00 format
                     var minutes = Math.floor(audioDuration / 60);
                     var seconds = Math.floor(audioDuration - minutes * 60);
-                    var audioDurationText = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+                    var audioDurationText = (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
                     // Update the timer widget
                     var newMarkup = '/';
                     newMarkup = '<span class="current">'+audioPositionText+'</span>' + newMarkup;
                     newMarkup = newMarkup + '<span class="total">'+audioDurationText+'</span>';
                     $timerWidget.html(newMarkup);
-                    }
-
+                }
             }
             // Loop through each audio player on the page and update it's state
             requestAnimationFrame(updateCurrentlyPlaying);
         }
         requestAnimationFrame(updateCurrentlyPlaying);
+
 
         // This function will be responsible for figuring out which button was clicked
         function audioButtonClicked(){
@@ -1919,6 +1962,7 @@ function printStatusMessage(messageStatus, messageText, onCompleteFunction){
             var $audioPlayer = $audioPlayers.filter('[data-audio-id="' + audioID + '"]');
             var $audioButton = $audioPlayer.find('.audio-button[data-audio-control="' + audioStateNew + '"]');
             var audioObject = getAudioObject(audioID);
+            var audioConfig = getAudioConfig(audioID);
 
             // Update the audio state of the player container to reflect the change
             $audioPlayer.attr('data-audio-state', audioStateNew);
@@ -1944,8 +1988,22 @@ function printStatusMessage(messageStatus, messageText, onCompleteFunction){
 
             // Apply the play state to the audio object itself
             if (audioStateNew === 'play'){
-                //console.log('PLAY the current clip');
-                audioObject.play();
+               //console.log('PLAY the current clip');
+               //console.log('audioConfig =', audioConfig);
+                if (typeof audioConfig.sprite !== 'undefined'
+                    && typeof audioConfig.sprite.intro !== 'undefined'
+                    && typeof audioConfig.sprite.loop !== 'undefined'){
+                   //console.log('we can LOOP the current clip!');
+                    audioObject.once('end', function(){
+                       //console.log('intro has ended, now play the loop');
+                        audioObject.stop();
+                        //audioObject.seek(audioConfig.sprite.loop[0] / 1000); // convert ms to seconds
+                        audioObject.play('loop');
+                        });
+                    audioObject.play('intro');
+                } else {
+                    audioObject.play();
+                }
                 addToCurrentlyPlaying(audioID);
             }
             if (audioStateNew === 'pause'){
@@ -1973,16 +2031,28 @@ function printStatusMessage(messageStatus, messageText, onCompleteFunction){
 
             // Collect a reference to the audio player and collect its settings
             var $audioPlayer = $(this);
+
             var thisKind = $audioPlayer.attr('data-kind');
-            if (!thisKind){ thisKind = 'audio'; }
+            if (typeof thisKind !== 'string' || !thisKind.length){ thisKind = 'audio'; }
+
             var thisPath = $audioPlayer.attr('data-path');
-            if (!thisPath){ return true; }
             var thisBackupPath = $audioPlayer.attr('data-backup-path');
-            if (!thisPath){ thisBackupPath = false; }
+            if (typeof thisPath !== 'string' || !thisPath.length){ return true; }
+            if (typeof thisBackupPath !== 'string' || !thisBackupPath.length){ thisBackupPath = false; }
+
             var preloadMeta = true;
             if ($audioPlayer.is('.no-preload')){ preloadMeta = false; }
+
             var selectToWatch = $audioPlayer.attr('data-select');
             var $selectToWatch = typeof selectToWatch !== 'undefined' ? $('select[name="'+selectToWatch+'"]', $parentContainer) : false;
+
+            var thisLoopStart = $audioPlayer.attr('data-loop-start');
+            var thisLoopEnd = $audioPlayer.attr('data-loop-end');
+            if (typeof thisLoopStart !== 'string' || !thisLoopStart.length){ thisLoopStart = false; }
+            else { thisLoopStart = parseInt(thisLoopStart); }
+            if (typeof thisLoopEnd !== 'string' || !thisLoopEnd.length){ thisLoopEnd = false; }
+            else { thisLoopEnd = parseInt(thisLoopEnd); }
+           //console.log('thisLoopStart =', thisLoopStart, 'thisLoopEnd =', thisLoopEnd);
 
             // Empty the element of any existing markup then add new attributes and insert new buttons
             $audioPlayer.empty();
@@ -2010,7 +2080,11 @@ function printStatusMessage(messageStatus, messageText, onCompleteFunction){
                 };
 
             // Create the new audio object and collect the real ID for it, updating the player with it
-            var audioID = newAudioObject(thisPath, thisBackupPath, preloadMeta, onComplete);
+            var audioID = newAudioObject(thisPath, thisBackupPath, {
+                preloadMeta: preloadMeta,
+                loopStart: thisLoopStart,
+                loopEnd: thisLoopEnd
+                }, onComplete);
             $audioPlayer.attr('data-audio-id', audioID);
 
             // Define the click event for the audio controls within this player
@@ -2047,9 +2121,15 @@ function printStatusMessage(messageStatus, messageText, onCompleteFunction){
                     updateAudioState('stop', oldAudioID);
                     $audioPlayer.find('.widget.timer .current').html('0:00');
                     $audioPlayer.find('.widget.timer .total').html('0:00');
+                    deleteAudioObject(oldAudioID);
+                    deleteAudioConfig(oldAudioID);
 
                     // Collect a new audio ID using the new settings and then update the player
-                    var newAudioID = newAudioObject(newPath, newBackupPath, true, onComplete);
+                    var newAudioID = newAudioObject(newPath, newBackupPath, {
+                        preloadMeta: true,
+                        loopStart: thisLoopStart,
+                        loopEnd: thisLoopEnd
+                        }, onComplete);
                     $audioPlayer.attr('data-audio-id', newAudioID);
 
 

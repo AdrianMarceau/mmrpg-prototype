@@ -2973,6 +2973,9 @@ input[type=file] {
     min-width: 1em;
     min-height: 1em;
     transition: width 0.3s, color 0.3s, background-color 0.3s;
+    overflow: hidden;
+    text-overflow: clip;
+    white-space: nowrap;
 }
 .adminform .audio-player > i.loading {
     transform: scale(0.6);
@@ -3077,6 +3080,9 @@ input[type=file] {
     background-color: rgba(255, 255, 255, 0.6);
     text-shadow: none;
     color: #262626;
+}
+.adminform .audio-player.light-theme .widget.timer .current {
+    user-select: all;
 }
 .adminform .audio-player.light-theme .widget.state {
     color: #5d97b6;
