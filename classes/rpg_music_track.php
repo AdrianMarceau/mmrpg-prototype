@@ -36,6 +36,7 @@ class rpg_music_track {
             'music_game',
             'music_name',
             'music_link',
+            'music_loop',
             'music_order',
             'legacy_music_token',
             'legacy_music_album',
@@ -56,6 +57,28 @@ class rpg_music_track {
 
         // Return the table fields, array or string
         return $music_fields;
+
+    }
+
+    /**
+     * Get a list of all JSON-based music index fields as an array or, optionally, imploded into a string
+     * @param bool $implode
+     * @return mixed
+     */
+    public static function get_json_index_fields($implode = false){
+
+        // Define the various json index fields for player objects
+        $json_index_fields = array(
+            'music_loop'
+            );
+
+        // Implode the index fields into a string if requested
+        if ($implode){
+            $json_index_fields = implode(', ', $json_index_fields);
+        }
+
+        // Return the index fields, array or string
+        return $json_index_fields;
 
     }
 
@@ -234,9 +257,24 @@ class rpg_music_track {
         if (!empty($music_info['_parsed'])){ return $music_info; }
         else { $music_info['_parsed'] = true; }
 
+        // Explode the weaknesses, resistances, affinities, and immunities into an array
+        $temp_field_names = self::get_json_index_fields();
+        foreach ($temp_field_names AS $field_name){
+            if (!empty($music_info[$field_name])){ $music_info[$field_name] = json_decode($music_info[$field_name], true); }
+            else { $music_info[$field_name] = array(); }
+        }
+
         // Return the parsed music info
         return $music_info;
     }
+
+
+
+    // -- MISC HELPER FUNCTIONS -- //
+
+
+    /* ... */
+
 
 }
 ?>
