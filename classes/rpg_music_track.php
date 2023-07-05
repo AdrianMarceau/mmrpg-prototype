@@ -102,12 +102,21 @@ class rpg_music_track {
         // Define the query condition based on args
         $temp_where = '';
         //if (!$include_hidden){ ... }
-        if (!$include_disabled){ $temp_where .= 'AND music_flag_enabled = 1 '; }
+        //if (!$include_disabled){ $temp_where .= 'AND music_flag_enabled = 1 '; }
 
         // Collect every music's info from the database index
         $music_dbname = (method_exists(__CLASS__, 'get_dbname') ? self::get_dbname() : MMRPG_CONFIG_CDN_DBNAME);
-        $music_fields = self::get_fields(true);
-        $music_index = $db->get_array_list("SELECT {$music_fields} FROM {$music_dbname}.mmrpg_index_music WHERE music_id <> 0 {$temp_where};", $index_field);
+        $music_fields = self::get_fields(true, 'music');
+        $music_query = "SELECT
+            {$music_fields}
+            FROM {$music_dbname}.`mmrpg_index_music` AS `music`
+            LEFT JOIN {$music_dbname}.`mmrpg_index_sources` AS `sources` ON `music`.`music_game` = `sources`.`source_token`
+            WHERE `music_id` <> 0 {$temp_where}
+            ORDER BY
+            `sources`.`source_order` ASC,
+            `music`.`music_order` ASC
+            ;";
+        $music_index = $db->get_array_list($music_query, $index_field);
 
         // Parse and return the data if not empty, else nothing
         if (!empty($music_index)){
@@ -171,7 +180,7 @@ class rpg_music_track {
         // Define the query condition based on args
         $temp_where = '';
         //if (!$include_hidden){ ... }
-        if (!$include_disabled){ $temp_where .= 'AND music_flag_enabled = 1 '; }
+        //if (!$include_disabled){ $temp_where .= 'AND music_flag_enabled = 1 '; }
 
         // Collect an array of music tokens from the database
         $music_dbname = (method_exists(__CLASS__, 'get_dbname') ? self::get_dbname() : MMRPG_CONFIG_CDN_DBNAME);
@@ -235,7 +244,7 @@ class rpg_music_track {
 
         // Loop through each entry and parse its data
         foreach ($music_index AS $token => $info){
-            $music_index[$token] = self::parse_music_info($info);
+            $music_index[$token] = self::parse_info($info);
         }
 
         // Return the parsed index
