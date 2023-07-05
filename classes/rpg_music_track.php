@@ -94,7 +94,7 @@ class rpg_music_track {
      * @param string $index_field (optional)
      * @return array
      */
-    public static function get_index($include_hidden = false, $include_disabled = false, $index_field = 'music_id'){
+    public static function get_index($include_hidden = false, $include_disabled = false, $index_field = 'music_id', $composite_field = false){
 
         // Pull in global variables
         $db = cms_database::get_database();
@@ -117,6 +117,22 @@ class rpg_music_track {
             `music`.`music_order` ASC
             ;";
         $music_index = $db->get_array_list($music_query, $index_field);
+
+        // If the index field has multiple fields, we're parse that
+        if (!empty($composite_field)){
+            $new_music_index = array();
+            $composite_fields = strstr($composite_field, '+') ? explode('+', $composite_field) : array($composite_field);
+            foreach ($music_index AS $music_id => $music_info){
+                $lookup_token = array();
+                foreach ($composite_fields AS $field_name){
+                    if (isset($music_info[$field_name])){ $lookup_token[] = $music_info[$field_name]; }
+                    else { $lookup_token[] = $field_name; }
+                }
+                $lookup_token = implode('', $lookup_token);
+                $new_music_index[$lookup_token] = $music_info;
+            }
+            $music_index = $new_music_index;
+        }
 
         // Parse and return the data if not empty, else nothing
         if (!empty($music_index)){
