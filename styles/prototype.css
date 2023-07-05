@@ -1615,9 +1615,9 @@ body[data-source="website"] #prototype .menu {
     background-size: cover;
 }
 @keyframes border-pulsate {
-    0%   { border-color: #1A1A1A; }
-    50% { border-color: #C0C0C0; }
-    100%   { border-color: #1A1A1A; }
+    0%   { border-color: #C0C0C0; }
+    50% { border-color: #1A1A1A; }
+    100%   { border-color: #C0C0C0; }
 }
 #mmrpg #prototype .option[data-token] {
     -moz-transition: border 0.1s linear;
@@ -1782,6 +1782,7 @@ body[data-source="website"] #prototype .menu {
 
 #prototype .option_message .inset {
     background-color: rgb(15, 15, 15);
+    overflow: hidden;
 }
 
 #prototype .option_1x1 div label,
