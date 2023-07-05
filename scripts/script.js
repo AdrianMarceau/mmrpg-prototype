@@ -21,7 +21,7 @@ gameSettings.baseHref = 'http://localhost/'; // the base href where this game is
 gameSettings.wapFlag = false; // whether or not this game is running in mobile mode
 gameSettings.wapFlagIphone = false; // whether or not this game is running in mobile iphone mode
 gameSettings.wapFlagIpad = false; // whether or not this game is running in mobile iphone mode
-gameSettings.baseVolume = 0.6; // default animation frame base internal
+gameSettings.baseVolume = 0.5; // default animation frame base internal
 gameSettings.eventTimeout = 800; // default animation frame base internal
 gameSettings.eventTimeoutThreshold = 250; // timeout theshold for when frames stop cross-fading
 gameSettings.eventAutoPlay = true; // whether or not to automatically advance events
@@ -2202,13 +2202,13 @@ var mmrpgMusicInit = false;
 function mmrpg_music_toggle(){
     //console.log('mmrpg_music_toggle()');
     var musicToggle = $('a.toggle', gameMusic);
-    if (!mmrpgMusicSound.playing()) {
-        mmrpgMusicSound.volume(gameSettings.baseVolume);
+    if (!mmrpgMusicSound.playing()){
+        mmrpg_music_volume(1);
         mmrpgMusicSound.play();
         musicToggle.html('&#9658;');
         musicToggle.removeClass('paused').addClass('playing');
     } else {
-        mmrpgMusicSound.volume(0);
+        mmrpg_music_volume(0);
         mmrpgMusicSound.pause();
         musicToggle.html('&#8226;');
         musicToggle.removeClass('playing').addClass('paused');
@@ -2225,7 +2225,7 @@ function mmrpg_music_play(){
     var musicStream = $('.audio-stream.music', gameMusic);
     var musicStreamSource = $('source', musicStream).attr('src');
     if (!mmrpgMusicSound.playing()){
-        mmrpgMusicSound.volume(gameSettings.baseVolume);
+        mmrpg_music_volume(1);
         mmrpgMusicSound.play();
         musicToggle.html('&#9658;');
         musicToggle.removeClass('paused').addClass('playing');
@@ -2240,7 +2240,7 @@ function mmrpg_music_stop(){
     var musicToggle = $('a.toggle', gameMusic);
     if (mmrpgMusicSound && mmrpgMusicSound.playing()){
         //console.log('updating the sound and toggle');
-        mmrpgMusicSound.volume(0);
+        mmrpg_music_volume(0);
         mmrpgMusicSound.stop();
         musicToggle.find('span').html('PLAY');
         musicToggle.removeClass('playing').addClass('paused');
@@ -2291,16 +2291,17 @@ function mmrpg_music_load(newTrack, resartTrack, playOnce, onendFunction){
         }, waitTime);
 }
 // Define a function for adjusting the currently playing music's volume
-function mmrpg_music_volume(newVolume, isRelative){
+function mmrpg_music_volume(newVolume, isRelative, fadeDuration){
     if (!mmrpgMusicSound){ return false; }
     //console.log('mmrpg_music_volume(newVolume:', newVolume, 'isRelative:', isRelative, ')');
-    if (typeof isRelative !== 'boolean'){ isRelative = false; }
+    if (typeof isRelative !== 'boolean'){ isRelative = true; }
+    if (typeof fadeDuration !== 'number'){ fadeDuration = 500; }
     var currentVolume = mmrpgMusicSound !== false ? mmrpgMusicSound.volume() : gameSettings.baseVolume;
-    var newVolume = isRelative ? (currentVolume * newVolume) : newVolume;
+    var newVolume = isRelative ? (gameSettings.baseVolume * newVolume) : newVolume;
     //console.log('currentVolume =', currentVolume);
     //console.log('newVolume =', newVolume);
-    //mmrpgMusicSound.volume(newVolume);
-    mmrpgMusicSound.fade(currentVolume, newVolume, 500);
+    if (fadeDuration > 0){ mmrpgMusicSound.fade(currentVolume, newVolume, fadeDuration);  }
+    else { mmrpgMusicSound.volume(newVolume); }
 }
 
 // Define a function for playing a specific fanfare track
@@ -2327,7 +2328,7 @@ function mmrpg_fanfare_load(newTrack, resartTrack, playOnce, fadeMusic, onendFun
     fanfareStream.attr('data-track', newTrack);
     fanfareStream.attr('data-last-track', thisTrack);
     // Create a new Howl object and load the new track
-    if (fadeMusic){ mmrpg_music_volume((gameSettings.baseVolume * 0.1)); }
+    if (fadeMusic){ mmrpg_music_volume(0.1); }
     mmrpgFanfareSound = new Howl({
         src: [gameSettings.audioBaseHref+'sounds/'+newTrack+'/audio.mp3?'+gameSettings.cacheTime,
               gameSettings.audioBaseHref+'sounds/'+newTrack+'/audio.ogg?'+gameSettings.cacheTime],
@@ -2336,7 +2337,7 @@ function mmrpg_fanfare_load(newTrack, resartTrack, playOnce, fadeMusic, onendFun
         loop: isPlayOnce ? false : true,
         onend: function(){
             onendFunction();
-            if (fadeMusic){ mmrpg_music_volume(gameSettings.baseVolume); }
+            if (fadeMusic){ mmrpg_music_volume(1); }
             }
     });
 }
