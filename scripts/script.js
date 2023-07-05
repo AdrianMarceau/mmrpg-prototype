@@ -279,7 +279,7 @@ $(document).ready(function(){
             });
 
         // Set up the game music options
-        if (true){
+        if (gameMusic.length){
 
             // Add the click-events to the music toggle button
             $('a.toggle', gameMusic).bind('click touch', function(e){
