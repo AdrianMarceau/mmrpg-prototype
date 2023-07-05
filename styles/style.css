@@ -1054,12 +1054,14 @@ body.index #header {
     right: 57px;
 }
 
+/*
 #mmrpg #canvas .robot_mugshot_type .sprite.robot_mugshot,
 #mmrpg #canvas .robot_details .robot_item .wrap .sprite {
     -ms-interpolation-mode: nearest-neighbor;
     image-rendering: optimizeSpeed;
     image-rendering: pixelated;
 }
+*/
 
 #mmrpg .ability_damage,
 #mmrpg .ability_recovery,
