@@ -236,7 +236,6 @@ if (count($matches)>1){
 // Define the key client variables
 <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 var thisScrollbarSettings = {wheelSpeed:0.3};
-gameSettings.customIndex.musicMeta = <?= json_encode($render_modes_index) ?>;
 </script>
 <script type="text/javascript">
 
