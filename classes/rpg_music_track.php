@@ -105,7 +105,7 @@ class rpg_music_track {
         if (!$include_disabled){ $temp_where .= 'AND music_flag_enabled = 1 '; }
 
         // Collect every music's info from the database index
-        $music_dbname = self::get_dbname();
+        $music_dbname = (method_exists(__CLASS__, 'get_dbname') ? self::get_dbname() : MMRPG_CONFIG_CDN_DBNAME);
         $music_fields = self::get_fields(true);
         $music_index = $db->get_array_list("SELECT {$music_fields} FROM {$music_dbname}.mmrpg_index_music WHERE music_id <> 0 {$temp_where};", $index_field);
 
@@ -142,7 +142,7 @@ class rpg_music_track {
         $where_string = implode(' OR ', $where_string);
 
         // Collect the requested music's info from the database index
-        $music_dbname = self::get_dbname();
+        $music_dbname = (method_exists(__CLASS__, 'get_dbname') ? self::get_dbname() : MMRPG_CONFIG_CDN_DBNAME);
         $music_fields = self::get_fields(true);
         $music_index = $db->get_array_list("SELECT {$music_fields} FROM {$music_dbname}.mmrpg_index_music WHERE music_id <> 0 AND ({$where_string});", $index_field);
 
@@ -174,7 +174,7 @@ class rpg_music_track {
         if (!$include_disabled){ $temp_where .= 'AND music_flag_enabled = 1 '; }
 
         // Collect an array of music tokens from the database
-        $music_dbname = self::get_dbname();
+        $music_dbname = (method_exists(__CLASS__, 'get_dbname') ? self::get_dbname() : MMRPG_CONFIG_CDN_DBNAME);
         $music_index = $db->get_array_list("SELECT DISTINCT {$index_field} FROM {$music_dbname}.mmrpg_index_music WHERE music_id <> 0 {$temp_where};", $index_field);
 
         // Return the tokens if not empty, else nothing
@@ -212,7 +212,7 @@ class rpg_music_track {
 
         // Collect this music's info from the database index
         $lookup = !is_numeric($music_lookup) ? "music_type = '{$music_lookup}'" : "music_id = {$music_lookup}";
-        $music_dbname = self::get_dbname();
+        $music_dbname = (method_exists(__CLASS__, 'get_dbname') ? self::get_dbname() : MMRPG_CONFIG_CDN_DBNAME);
         $music_fields = self::get_fields(true);
         $music_index = $db->get_array("SELECT {$music_fields} FROM {$music_dbname}.mmrpg_index_music WHERE {$lookup};");
 
