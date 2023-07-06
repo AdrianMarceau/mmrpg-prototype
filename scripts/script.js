@@ -2584,8 +2584,8 @@ gameSettings.soundEffectAliases = {
     'marker-destroyed': 'dark-moon-stomp',
     'field-boost': 'wily-escape-iv-a',
     'field-break': 'wily-escape-iii-b',
-    'scan-start': 'big-eye',
-    'scan-complete': 'ring-boomerang',
+    'scan-start': 'ring-boomerang',
+    'scan-success': 'pause-2',
     'no-effect': 'text',
     // Ability Sound Effects
     'defend': 'dink',
@@ -2605,6 +2605,8 @@ function mmrpg_play_sound_effect(effectName, effectConfig){
 
     // If the game hasn't loaded we shoudln't be playing anything
     if (!gameSettings.indexLoaded){ return false; }
+    if (mmrpgMusicSound === false){ return false; }
+    if (!mmrpgMusicSound.playing()){ return false; }
 
     // Otherwise, define a base volume for these sound effects to use
     var baseVolume = gameSettings.baseVolume;
