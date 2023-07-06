@@ -2482,11 +2482,14 @@ gameSettings.soundEffectPoolLimit = 10;
 gameSettings.soundEffectSources = [];
 gameSettings.soundEffectSprites = {};
 gameSettings.soundEffectAliases = {
-    'game-start': 'dead',
-    'link-hover': 'cursor-2',
+    'game-start': 'selected', //'dead',
+    'link-hover': 'cursor-2', //'dink', //'cursor-2',
     'link-click': 'pause-2',
     'link-click-special': 'get-beat',
     'link-click-robot': 'land-3',
+    'back-hover': 'cursor-3',
+    'back-click': 'transform',
+    'back-click-loading': 'giant-suzy-bounce',
     'lets-go': 'selected',
     'lets-go-robots': 'beam-out-2',
     };
@@ -2975,6 +2978,30 @@ function dump(arr,level) {
             });
         };
 
+})(jQuery);
+
+// Extend jQuery to offer a "triggerSilentClick" trigger so that we can do menu stuff in the background without
+// triggering associated sound effects prematurely (as well as other helpful functionality, presumably)
+(function($) {
+    $.fn.triggerSilentClick = function() {
+        return this.each(function() {
+            var $this = $(this);
+
+            // Your special functionality goes here.
+            // For example, if you need to log some information
+            //console.log('Pre-click special functionality executed!');
+
+            // Add a data attribute to the element
+            $this.data('silentClick', true);
+
+            // Then, trigger the click event
+            $this.trigger('click');
+
+            // After the click event, remove the data attribute
+            $this.removeData('silentClick');
+
+        });
+    };
 })(jQuery);
 
 // Fix the indexOf issue for IE8 and lower
