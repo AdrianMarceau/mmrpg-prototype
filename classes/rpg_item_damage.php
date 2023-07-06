@@ -1157,14 +1157,15 @@ class rpg_item_damage extends rpg_damage {
         // Define the sound effects for this damage event so it plays for the player
         if ($this_item->item_results['this_amount'] > 0){
             $damage_sounds = array();
-            if (!empty($this_item->item_results['flag_resistance'])
-                || $this_item->item_results['this_amount'] === 1){
-                $damage_sounds[] = array('name' => 'damage-hindered', 'volume' => 1.5);
-            } elseif (!empty($this_item->item_results['flag_weakness'])
+            if (!empty($this_item->item_results['flag_weakness'])
                 || !empty($this_item->item_results['flag_critical'])){
                 $damage_sounds[] = array('name' => 'damage-critical', 'volume' => 1.5);
                 $damage_sounds[] = array('name' => 'small-boom-b', 'volume' => 1.6, 'delay' => 100);
                 $damage_sounds[] = array('name' => 'small-boom-b', 'volume' => 1.4, 'delay' => 200);
+            } elseif (!empty($this_item->item_results['flag_resistance'])){
+                $damage_sounds[] = array('name' => 'damage-reduced', 'volume' => 1.5);
+            } elseif ($this_item->item_results['this_amount'] === 1){
+                $damage_sounds[] = array('name' => 'damage-hindered', 'volume' => 1.5);
             } else {
                 $damage_sounds[] = array('name' => 'damage', 'volume' => 1.5);
                 $damage_sounds[] = array('name' => 'small-boom-b', 'volume' => 1.4, 'delay' => 100);
