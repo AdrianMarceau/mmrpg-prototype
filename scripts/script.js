@@ -2526,6 +2526,8 @@ gameSettings.soundEffectAliases = {
     'text': 'text',
     'event': 'enker-absorb',
     // Battle Sound Effects
+    'background-spawn': 'yoku-3',
+    'foreground-spawn': 'shutter-3',
     'damage': 'hurt-3',
     'damage-critical': 'enemy-hit-3',
     'damage-hindered': 'dink-2',
@@ -2541,11 +2543,15 @@ gameSettings.soundEffectAliases = {
     'level-up': 'password-okay',
     'star-collected': 'wpn-get-iii',
     'marker-destroyed': 'dark-moon-stomp',
+    'field-boost': 'wily-escape-iv-a',
+    'field-break': 'wily-escape-iii-b',
     // Ability Sound Effects
     'shot': 'shot-a',
     'shot-alt': 'shot-2',
     'charge': 'charge',
-    'summon': 'wily-escape-iv-a'
+    'slide': 'charge-kick',
+    'summon': 'pharoah-shot-a',
+    'blast': 'mid-scene-mega-shoot',
     };
 function mmrpg_play_sound_effect(effectName, effectConfig){
     //console.log('mmrpg_play_sound_effect(effectName:', effectName, 'effectConfig:', effectConfig, ')');
