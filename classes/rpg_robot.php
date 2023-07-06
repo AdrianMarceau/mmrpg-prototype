@@ -1322,7 +1322,7 @@ class rpg_robot extends rpg_object {
             $ability_type = !empty($ability_info['ability_type']) ? $ability_info['ability_type'] : '';
             if (!empty($ability_type) && !empty($ability_info['ability_type2'])){ $ability_type .= '_'.$ability_info['ability_type2']; }
             if (empty($ability_type)){ $ability_type = 'none'; }
-            $this_markup[] = '<span class="ability_name ability_type type_'.$ability_type.'" title="'.$ability_info['ability_name'].'">'.$ability_info['ability_name'].'</span>';
+            $this_markup[] = '<span class="ability_name ability_type type_'.$ability_type.'" data-click-tooltip="'.$ability_info['ability_name'].'">'.$ability_info['ability_name'].'</span>';
         }
         if ($implode){ $this_markup = implode(', ', $this_markup); }
         return $this_markup;
@@ -3564,9 +3564,9 @@ class rpg_robot extends rpg_object {
                             <?= $robot_info['robot_name'].$robot_info['robot_name_append'] ?>
                         <? } ?>
                         <? if ($robot_info['robot_class'] == 'master' && empty($robot_info['robot_flag_unlockable'])){ ?>
-                            <span class="not_unlockable" data-tooltip-type="<?= $robot_header_types ?>" title="* This robot can be encountered in-game but cannot be unlocked yet">*</span>
+                            <span class="not_unlockable" data-tooltip-type="<?= $robot_header_types ?>" data-click-tooltip="* This robot can be encountered in-game but cannot be unlocked yet">*</span>
                         <? } elseif ($robot_info['robot_class'] != 'master' && empty($robot_info['robot_flag_fightable'])){ ?>
-                            <span class="not_fightable" data-tooltip-type="<?= $robot_header_types ?>" title="* This <?= $robot_info['robot_class'] ?> cannot be encountered in-game yet">*</span>
+                            <span class="not_fightable" data-tooltip-type="<?= $robot_header_types ?>" data-click-tooltip="* This <?= $robot_info['robot_class'] ?> cannot be encountered in-game yet">*</span>
                         <? } ?>
                         <div class="header_core robot_type"><?= !empty($robot_info['robot_core']) ? ucwords($robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? ' / '.$robot_info['robot_core2'] : '')) : 'Neutral' ?><?= $robot_info['robot_class'] == 'mecha' ? ' Type' : ' Core' ?></div>
                     </h2>
@@ -4333,7 +4333,7 @@ class rpg_robot extends rpg_object {
                                                     // Only show if this ability is greater than level 0 OR it's not copy core (?)
                                                     elseif ($this_level >= 0 || !$robot_copy_program){
                                                         $temp_element = $this_ability_class == 'master' ? 'a' : 'span';
-                                                        $temp_markup = '<'.$temp_element.' '.($this_ability_class == 'master' ? 'href="'.MMRPG_CONFIG_ROOTURL.'database/abilities/'.$this_ability['ability_token'].'/"' : '').' class="ability_name ability_class_'.$this_ability_class.' ability_type ability_type_'.(!empty($this_ability['ability_type']) ? $this_ability['ability_type'] : 'none').(!empty($this_ability['ability_type2']) ? '_'.$this_ability['ability_type2'] : '').'" title="'.$this_ability_title_plain.'" style="'.($this_ability_image == 'ability' ? 'opacity: 0.3; ' : '').'">';
+                                                        $temp_markup = '<'.$temp_element.' '.($this_ability_class == 'master' ? 'href="'.MMRPG_CONFIG_ROOTURL.'database/abilities/'.$this_ability['ability_token'].'/"' : '').' class="ability_name ability_class_'.$this_ability_class.' ability_type ability_type_'.(!empty($this_ability['ability_type']) ? $this_ability['ability_type'] : 'none').(!empty($this_ability['ability_type2']) ? '_'.$this_ability['ability_type2'] : '').'" data-click-tooltip="'.$this_ability_title_plain.'" style="'.($this_ability_image == 'ability' ? 'opacity: 0.3; ' : '').'">';
                                                         $temp_markup .= '<span class="chrome">'.$this_ability_sprite_html.$this_ability_title_html.'</span>';
                                                         $temp_markup .= '</'.$temp_element.'>';
                                                         $temp_string[] = $temp_markup;
@@ -4777,7 +4777,7 @@ class rpg_robot extends rpg_object {
 
                 <div class="this_sprite sprite_left event_robot_favourite" style="" >
                     <? if($global_allow_editing): ?>
-                        <a class="robot_favourite <?= in_array($robot_token, $player_robot_favourites) ? 'robot_favourite_active ' : '' ?>" data-player="<?= $player_token ?>" data-robot="<?= $robot_token ?>" title="Pin Favourite?"><i class="fa fas fa-thumbtack"></i></a>
+                        <a class="robot_favourite <?= in_array($robot_token, $player_robot_favourites) ? 'robot_favourite_active ' : '' ?>" data-player="<?= $player_token ?>" data-robot="<?= $robot_token ?>" data-click-tooltip="Pin Favourite?"><i class="fa fas fa-thumbtack"></i></a>
                     <? else: ?>
                         <span class="robot_favourite <?= in_array($robot_token, $player_robot_favourites) ? 'robot_favourite_active ' : '' ?>"><i class="fa fas fa-thumbtack"></i></span>
                     <? endif; ?>
@@ -4814,7 +4814,7 @@ class rpg_robot extends rpg_object {
                         }
                         ?>
                         <? if($robot_info['original_player'] != $player_info['player_token']): ?>
-                            <label title="<?= 'Transferred from Dr. '.ucfirst(str_replace('dr-', '', $robot_info['original_player'])) ?>"  class="original_player original_player_<?= $robot_info['original_player'] ?>" data-tooltip-type="player_type player_type_<?= str_replace('dr-', '', $robot_info['original_player']) ?>" style="display: block; float: left; <?= $player_style ?>"><span class="current_player current_player_<?= $player_info['player_token'] ?>">Player</span> :</label>
+                            <label data-click-tooltip="<?= 'Transferred from Dr. '.ucfirst(str_replace('dr-', '', $robot_info['original_player'])) ?>"  class="original_player original_player_<?= $robot_info['original_player'] ?>" data-tooltip-type="player_type player_type_<?= str_replace('dr-', '', $robot_info['original_player']) ?>" style="display: block; float: left; <?= $player_style ?>"><span class="current_player current_player_<?= $player_info['player_token'] ?>">Player</span> :</label>
                         <? else: ?>
                             <label class="original_player original_player_<?= $robot_info['original_player'] ?>" data-tooltip-type="player_type player_type_<?= str_replace('dr-', '', $robot_info['original_player']) ?>" style="display: block; float: left; <?= $player_style ?>"><span class="current_player current_player_<?= $player_info['player_token'] ?>">Player</span> :</label>
                         <? endif; ?>
@@ -4861,10 +4861,10 @@ class rpg_robot extends rpg_object {
                     }
                     ob_start();
                     ?>
-                    <td  class="right">
+                    <td class="right">
                         <label style="display: block; float: left;">Item :</label>
                         <? if($global_allow_editing): ?>
-                            <a title="Change Item?" class="item_name type <?= $current_item_type ?>" <?= $current_date_attr ?>><label style="background-image: url(images/items/<?= $current_item_image ?>/icon_left_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"><?= $current_item_name ?><span class="arrow">&#8711;</span></label></a>
+                            <a class="item_name type <?= $current_item_type ?>" <?= $current_date_attr ?>><label style="background-image: url(images/items/<?= $current_item_image ?>/icon_left_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"><?= $current_item_name ?><span class="arrow">&#8711;</span></label></a>
                         <? else: ?>
                             <a class="item_name type <?= $current_item_type ?>" style="opacity: 0.5; filter: alpha(opacity=50); cursor: default;"><label style="background-image: url(images/items/<?= $current_item_image ?>/icon_left_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"><?= $current_item_name ?></label></a>
                         <? endif; ?>
@@ -4968,7 +4968,7 @@ class rpg_robot extends rpg_object {
                     <td  class="right">
                         <label style="display: block; float: left;">Level :</label>
                         <? if($robot_info['robot_level'] >= 100){ ?>
-                            <a class="robot_stat robot_type_electric" title="Max Level!">
+                            <a class="robot_stat robot_type_electric" data-click-tooltip="Max Level!">
                                 <span class="unit">Lv.</span>
                                 <?= $robot_info['robot_level'] ?>
                             </a>
@@ -4981,7 +4981,7 @@ class rpg_robot extends rpg_object {
                         <? } ?>
                         &nbsp;
                         <? if($robot_info['robot_level'] >= 100): ?>
-                            <span class="robot_stat robot_type_experience" title="Max Experience!">
+                            <span class="robot_stat robot_type_experience" data-click-tooltip="Max Experience!">
                                 <span class="details">
                                     <span>&#8734;</span> / 1000
                                 </span>
@@ -5014,7 +5014,7 @@ class rpg_robot extends rpg_object {
                         ?>
                         <td class="right">
                             <label class="skill" style="display: block; float: left;">Skill :</label>
-                            <span class="skill_name type type_<?= $temp_skill_type ?>" title="<?= htmlspecialchars($temp_skill_info['skill_description'], ENT_QUOTES, 'UTF-8', true) ?>"><?= $temp_skill_info['skill_name'] ?></span>
+                            <span class="skill_name type type_<?= $temp_skill_type ?>" data-click-tooltip="<?= htmlspecialchars($temp_skill_info['skill_description'], ENT_QUOTES, 'UTF-8', true) ?>"><?= $temp_skill_info['skill_name'] ?></span>
                         </td>
                         <?
                         $right_column_markup[] = ob_get_clean();
@@ -5142,7 +5142,7 @@ class rpg_robot extends rpg_object {
                         $robot_hidden_power = rpg_game::select_omega_value($robot_omega_string, $hidden_power_types);
 
                         // Print out the omega indicators for the shop
-                        echo '<span class="omega robot_type type_'.$robot_hidden_power.'" title="Omega Influence || [['.ucfirst($robot_hidden_power).' Type]]"></span>'.PHP_EOL;
+                        echo '<span class="omega robot_type type_'.$robot_hidden_power.'" data-click-tooltip="Omega Influence || [['.ucfirst($robot_hidden_power).' Type]]"></span>'.PHP_EOL;
                         //title="Omega Influence || [['.ucfirst($robot_hidden_power).' Type]]"
 
                     }
@@ -5307,7 +5307,7 @@ class rpg_robot extends rpg_object {
                                                     //$temp_select_options = str_replace('value=""', 'value="" selected="selected" disabled="disabled"', $ability_rewards_options);
                                                     $this_ability_title_html = '<label>-</label>';
                                                     //if ($global_allow_editing){ $this_ability_title_html .= '<select class="ability_name" data-key="'.$ability_key.'" data-player="'.$player_info['player_token'].'" data-robot="'.$robot_info['robot_token'].'" '.($empty_ability_disable ? 'disabled="disabled" ' : '').'>'.$temp_select_options.'</select>'; }
-                                                    $temp_string[] = '<a class="ability_name " style="'.($empty_ability_disable ? 'opacity:0.25; ' : '').(!$global_allow_editing ? 'cursor: default; ' : '').'" data-id="0" data-key="'.$ability_key.'" data-player="'.$player_info['player_token'].'" data-robot="'.$robot_info['robot_token'].'" data-ability="" title="" data-tooltip="">'.$this_ability_title_html.'</a>';
+                                                    $temp_string[] = '<a class="ability_name " style="'.($empty_ability_disable ? 'opacity:0.25; ' : '').(!$global_allow_editing ? 'cursor: default; ' : '').'" data-id="0" data-key="'.$ability_key.'" data-player="'.$player_info['player_token'].'" data-robot="'.$robot_info['robot_token'].'" data-ability="">'.$this_ability_title_html.'</a>';
                                                 }
                                             }
 
