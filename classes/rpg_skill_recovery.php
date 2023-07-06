@@ -1113,6 +1113,22 @@ class rpg_skill_recovery extends rpg_recovery {
         $target_robot->trigger_custom_function('rpg-skill_trigger-recovery_middle', $extra_objects);
         if ($options->return_early){ return $options->return_value; }
 
+        // Define the sound effects for this recovery event so it plays for the player
+        if ($this_skill->skill_results['this_amount'] > 0){
+            $percent = ceil(($this_skill->skill_results['this_amount'] / $this_robot->robot_base_energy) * 100);
+            $recovery_sounds = array();
+            if ($this_skill->recovery_options['recovery_kind'] == 'energy'){
+                $recovery_sounds[] = array('name' => 'recovery-energy', 'volume' => 1.5, 'delay' => 200);
+                if ($percent > 50){ $recovery_sounds[] = array('name' => 'recovery-energy', 'volume' => 1.5, 'delay' => 400); }
+            } elseif ($this_skill->recovery_options['recovery_kind'] == 'weapons'){
+                $recovery_sounds[] = array('name' => 'recovery-weapons', 'volume' => 1.5, 'delay' => 200);
+                if ($percent > 50){ $recovery_sounds[] = array('name' => 'recovery-weapons', 'volume' => 1.5, 'delay' => 400); }
+            }
+        } else {
+            $recovery_sounds[] = array('name' => 'no-effect', 'volume' => 1.5);
+        }
+        $event_options['event_flag_sound_effects'] = $recovery_sounds;
+
         // Generate an event with the collected recovery results based on recovery type
         $temp_event_header = $this_skill->recovery_options['recovery_header'];
         $temp_event_body = $this_skill->skill_results['this_text'];
