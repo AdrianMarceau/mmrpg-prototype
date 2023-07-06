@@ -1119,7 +1119,9 @@ function mmrpg_canvas_animate(){
         // Ensure the robot has not been disabled
         if (thisRobot.attr('data-status') != 'disabled'){
             // Generate a random number
+            var shiftChance = Math.floor(Math.random() * 100);
             var thisRandom = Math.floor(Math.random() * 100);
+            console.log('shiftChance =', shiftChance);
             // Default the new frame to base
             var newFrame = 'base';
             var currentFrame = thisRobot.attr('data-frame');
@@ -1140,7 +1142,7 @@ function mmrpg_canvas_animate(){
                         // Animation freqency based on position
                         if (thisRobot.attr('data-position') != 'active'){
                             // Higher animation freqency if not active (BENCH)
-                            if (battleStatus == 'complete' && thisRandom >= 50){
+                            if (battleStatus == 'complete' && shiftChance >= 90){
                                 newFrame = relativeResult;
                                 } else if (thisRandom >= 80){
                                 newFrame = 'base2';
@@ -1151,7 +1153,7 @@ function mmrpg_canvas_animate(){
                                 }
                             } else {
                             // Lower animation freqency if active (ACTIVE)
-                            if (battleStatus == 'complete' && thisRandom >= 50){
+                            if (battleStatus == 'complete' && shiftChance >= 80){
                                 newFrame = relativeResult;
                                 } else if (thisRandom >= 90){
                                 newFrame = 'base2';
@@ -1172,7 +1174,7 @@ function mmrpg_canvas_animate(){
             if (shadowSprite.length){ mmrpg_canvas_robot_frame(shadowSprite, newFrame);  }
 
             }
-            else if (thisRobot.attr('data-status') == 'disabled' && thisRobot.attr('data-direction') == 'right'){
+        else if (thisRobot.attr('data-status') == 'disabled' && thisRobot.attr('data-direction') == 'right'){
 
             // Default the new frame to base
             //var newFrame = 'base';
@@ -1180,7 +1182,7 @@ function mmrpg_canvas_animate(){
             //mmrpg_canvas_robot_frame(thisRobot, newFrame);
 
             }
-            else {
+        else {
 
             //alert('robot is disabled');
             // Fade this robot off-screen
@@ -1270,6 +1272,7 @@ function mmrpg_canvas_robot_frame(thisRobot, newFrame){
     var thisPosition = thisRobot.attr('data-position');
     var thisDirection = thisRobot.attr('data-direction');
     var thisStatus = thisRobot.attr('data-status');
+    var thisKey = parseInt(thisRobot.attr('data-key'));
     var thisFrame = thisRobot.attr('data-frame');
     var isShadow = thisRobot.attr('data-shadowid') != undefined ? true : false;
     var newFramePosition = spriteFrameIndex.robots.indexOf(newFrame) || 0;
@@ -1295,6 +1298,17 @@ function mmrpg_canvas_robot_frame(thisRobot, newFrame){
         thisRobot.stop(true, true).css({opacity:0,backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).removeClass(currentClass).addClass(newClass);
         thisRobot.stop(true, true).animate({opacity:1}, {duration:400,easing:'swing',queue:false});
         cloneRobot.stop(true, true).animate({opacity:0}, {duration:400,easing:'swing',queue:false,complete:function(){ $(this).remove(); }});
+        // Maybe play a sound effect if allowed and frame is correct
+        if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+            if (newFrame === 'defend' || newFrame === 'taunt'){
+                if (thisPosition === 'bench'){
+                    var delay = 100 + (thisKey + 50);
+                    setTimeout(function(){ parent.mmrpg_play_sound_effect('defend', {volume: 0.1}); }, delay);
+                    } else {
+                    parent.mmrpg_play_sound_effect('defend', {volume: 0.1});
+                    }
+                }
+            }
         } else {
         // Update the existing sprite's frame without crossfade by swapping the classsa
         thisRobot.stop(true, true).css({backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).removeClass(currentClass).addClass(newClass);
@@ -2296,19 +2310,19 @@ function mmrpg_music_toggle(){
     //console.log('mmrpg_music_toggle()');
     var musicToggle = $('a.toggle', gameMusic);
     if (!mmrpgMusicSound.playing()){
+        gameSettings.musicVolumeEnabled = true;
+        gameSettings.effectVolumeEnabled = true;
         mmrpg_music_volume(1);
         mmrpg_music_play();
         musicToggle.html('&#9658;');
         musicToggle.removeClass('paused').addClass('playing');
-        gameSettings.musicVolumeEnabled = true;
-        gameSettings.effectVolumeEnabled = true;
     } else {
+        gameSettings.musicVolumeEnabled = false;
+        gameSettings.effectVolumeEnabled = false;
         mmrpg_music_volume(0);
         mmrpgMusicSound.pause();
         musicToggle.html('&#8226;');
         musicToggle.removeClass('playing').addClass('paused');
-        gameSettings.musicVolumeEnabled = false;
-        gameSettings.effectVolumeEnabled = false;
     }
     if (!mmrpgMusicInit){
         mmrpgMusicSound.on('end', mmrpgMusicEnded);
@@ -2542,8 +2556,15 @@ gameSettings.soundEffectAliases = {
     // Battle Sound Effects
     'teleport-in': 'land-3',
     'switch-in': 'pause',
+    'mecha-teleport-in': 'beam-in',
+    'mecha-switch-in': 'land',
+    'boss-teleport-in': 'ladder-press',
+    'boss-switch-in': 'floor-break',
     'background-spawn': 'yoku-3',
     'foreground-spawn': 'shutter-3',
+    'victory-result': 'enker-absorb',
+    'failure-result': 'dark-moon-stomp',
+    'exit-mission': 'beam-out-2',
     'damage': 'hurt-3',
     'damage-critical': 'enemy-hit-3',
     'damage-reduced': 'hurt-2',
@@ -2567,8 +2588,10 @@ gameSettings.soundEffectAliases = {
     'scan-complete': 'ring-boomerang',
     'no-effect': 'text',
     // Ability Sound Effects
+    'defend': 'dink',
     'shot': 'shot-a',
-    'shot-alt': 'shot-2',
+    'shot-alt': 'shot-b',
+    'shot-alt2': 'shot-2',
     'charge': 'charge',
     'slide': 'charge-kick',
     'summon': 'pharoah-shot-a',
