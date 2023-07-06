@@ -36,9 +36,114 @@ $(document).ready(function(){
     var thisContext = $('#prototype');
     if (thisContext.length){
 
+        // Define the window resize event so we can adapt to changes
         thisWindow.resize(function(){ windowResizePrototype(); });
         setTimeout(function(){ windowResizePrototype(); }, 2000);
         //$('.banner .link', thisPrototype).live('click', function(){ windowResizePrototype(); });
+
+        // -- SOUND EFFECT FUNCTIONALITY -- //
+
+        // Define some interaction sound effects for the prototype main menu
+        if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+
+            // Define a quick local function for routing sound effect plays to the parent
+            function playSoundEffect(soundName, options){
+                if ($(this).data('silentClick')){ return; }
+                parent.mmrpg_play_sound_effect(soundName, options);
+                };
+
+
+            // HOME LINKS
+
+            // Add hover and click sounds to the links in the main menu
+            $('.banner .options_fullmenu .link', thisContext).live('mouseenter', function(){
+                playSoundEffect.call(this, 'link-hover', {volume: 0.5});
+                });
+            $('.banner .options_fullmenu .link', thisContext).live('click', function(){
+                if ($(this).is('.link_home')){ playSoundEffect.call(this, 'link-click-special'); }
+                else { playSoundEffect.call(this, 'link-click'); }
+                });
+
+            // Add hover and click sounds to the user config button in the main menu
+            $('.banner .options_userinfo[data-step]', thisContext).live('mouseenter', function(){
+                playSoundEffect.call(this, 'link-hover', {volume: 0.5});
+                });
+            $('.banner .options_userinfo[data-step]', thisContext).live('click', function(){
+                playSoundEffect.call(this, 'link-click');
+                });
+
+            // Add hover and click sounds to the leaderboard button in the main menu
+            $('.banner .points[data-step]', thisContext).live('mouseenter', function(){
+                playSoundEffect.call(this, 'link-hover', {volume: 0.5});
+                });
+            $('.banner .points[data-step]', thisContext).live('click', function(){
+                playSoundEffect.call(this, 'link-click');
+                });
+
+            // CHAPTER SELECT
+
+            // Add hover and click sounds to the chapter select buttons
+            $('.menu .chapter_select .chapter_link', thisContext).live('mouseenter', function(){
+                playSoundEffect.call(this, 'link-hover', {volume: 0.5});
+                });
+            $('.menu .chapter_select .chapter_link', thisContext).live('click', function(){
+                playSoundEffect.call(this, 'link-click');
+                });
+
+            // PLAYER SELECT
+
+            // Add hover and click sounds to the player select buttons
+            $('.menu .option_this-player-select', thisContext).live('mouseenter', function(){
+                playSoundEffect.call(this, 'link-hover', {volume: 0.5});
+                });
+            $('.menu .option_this-player-select', thisContext).live('click', function(){
+                playSoundEffect.call(this, 'lets-go');
+                });
+
+            // MISSION SELECT (BATTLE SELECT)
+
+            // Add hover and click sounds to the battle select buttons
+            $('.menu .option_this-battle-select', thisContext).live('mouseenter', function(){
+                playSoundEffect.call(this, 'link-hover', {volume: 0.5});
+                });
+            $('.menu .option_this-battle-select', thisContext).live('click', function(){
+                playSoundEffect.call(this, 'lets-go');
+                });
+
+            // ROBOT SELECT
+
+            // Add hover and click sounds to the robot select buttons
+            $('.menu .option_this-robot-select', thisContext).live('mouseenter', function(){
+                if ($(this).is('.option_disabled')){ return; }
+                playSoundEffect.call(this, 'link-hover', {volume: 0.5});
+                });
+            $('.menu .option_this-robot-select', thisContext).live('click', function(){
+                if ($(this).is('.option_disabled')){ return; }
+                playSoundEffect.call(this, 'link-click-robot');
+                });
+            $('.menu .option_this-team-select', thisContext).live('click', function(){
+                if ($(this).is('.option_disabled')){ return; }
+                playSoundEffect.call(this, 'lets-go-robots');
+                });
+
+            // BACK BUTTON(s)
+
+            // Add hover and click sounds to any back buttons
+            $('.menu .option_back', thisContext).live('mouseenter', function(){
+                playSoundEffect.call(this, 'back-hover', {volume: 0.5});
+                });
+            $('.menu .option_back', thisContext).live('click', function(){
+                playSoundEffect.call(this, 'back-click');
+                setTimeout(function(){
+                    playSoundEffect.call(this, 'back-click-loading');
+                    }, 800);
+                });
+
+
+            }
+
+
+        // -- MENU FUNCTIONALITY -- //
 
         $('.option_wrapper', thisContext).scroll(function(e){
             var scrollTop = $(this).scrollTop();
@@ -130,8 +235,7 @@ $(document).ready(function(){
             prototype_menu_preload_source(thisContext, this);
             });
 
-
-        // DEBUG
+        // Define the click event for menu items that require a reload
         $('.menu a[data-reload="true"]', thisContext).live('click', function(e){
             // Prevent the default click action
             e.preventDefault();
@@ -140,7 +244,7 @@ $(document).ready(function(){
             var thisParentStep = thisParentMenu.attr('data-step');
             var thisParentSelect = thisParentMenu.attr('data-select');
 
-            alert('thisParentStep = '+thisParentStep+' | thisParentSelect = '+thisParentSelect+' | ');
+            console.log('thisParentStep = '+thisParentStep+' | thisParentSelect = '+thisParentSelect+' | ');
 
             // Trigger an ajax call for the appropriate markup
             $.ajax({
@@ -185,7 +289,7 @@ $(document).ready(function(){
             // Check to see which one should be displayed first and autoclick it
             if ($('.chapter_link_active', thisChapterSelects).length){ var firstChapterLink = $('.chapter_link_active', thisChapterSelects); }
             else { var firstChapterLink = $('.chapter_link[data-chapter]:first-child', thisChapterSelects); }
-            firstChapterLink.trigger('click');
+            firstChapterLink.triggerSilentClick();
             }
 
 
@@ -220,8 +324,8 @@ $(document).ready(function(){
             //alert('player selected : '+battleOptions['this_player_token']);
             gameSettings.skipPlayerSelect = true;
             var thisMenu = $('.menu[data-select="this_player_token"]', thisContext);
-            $('.option[data-token="'+battleOptions['this_player_token']+'"]', thisMenu).trigger('click');
-        }
+            $('.option[data-token="'+battleOptions['this_player_token']+'"]', thisMenu).triggerSilentClick();
+            }
 
         // Attempt to define the top frame
         var topFrame = window.top;
@@ -257,31 +361,31 @@ $(document).ready(function(){
                 }
             };
 
-    // Define the event for the password prompt's click unlock sequence
-    $('.banner .sprite_player', thisPrototype).live('click', function(){
-        gameSettings.passwordUnlocked++;
-        //console.log('counter = '+gameSettings.passwordUnlocked);
-        if (gameSettings.passwordUnlocked >= 5){
-            //console.log('omg you unlocked me!');
-            var thisToken = $(this).html().toLowerCase();
-            //thisToken = thisToken.replace('.', '-');
-            thisToken = thisToken.replace(/[^-_a-z0-9]+/ig, '');
-            if (thisToken == 'drlight'){ var thisPromptText = 'Oh, hello there! What can I help you with today?'; }
-            else if (thisToken == 'drwily'){ var thisPromptText = 'Eh? You want something from me?'; }
-            else if (thisToken == 'drcossack'){ var thisPromptText = 'Greetings.  How can I assist you today?'; }
-            var thisPassword = prompt(thisPromptText);
-            if (thisPassword != undefined && thisPassword.length){
-                thisPassword = thisPassword.toLowerCase().replace(/[^a-z0-9]+/ig, '');
-                //alert(thisToken+':'+thisPassword);
-                // Update the session with this password string
-                var thisRequestType = 'session';
-                var thisRequestData = 'flags,'+thisToken+'_password_'+thisPassword+',true';
-                $.post('scripts/script.php',{requestType:'session',requestData:thisRequestData},function(){
-                    window.location.href = 'prototype.php?wap='+(gameSettings.wapFlag ? 'true' : 'false');
-                    });
+        // Define the event for the password prompt's click unlock sequence
+        $('.banner .sprite_player', thisPrototype).live('click', function(){
+            gameSettings.passwordUnlocked++;
+            //console.log('counter = '+gameSettings.passwordUnlocked);
+            if (gameSettings.passwordUnlocked >= 5){
+                //console.log('omg you unlocked me!');
+                var thisToken = $(this).html().toLowerCase();
+                //thisToken = thisToken.replace('.', '-');
+                thisToken = thisToken.replace(/[^-_a-z0-9]+/ig, '');
+                if (thisToken == 'drlight'){ var thisPromptText = 'Oh, hello there! What can I help you with today?'; }
+                else if (thisToken == 'drwily'){ var thisPromptText = 'Eh? You want something from me?'; }
+                else if (thisToken == 'drcossack'){ var thisPromptText = 'Greetings.  How can I assist you today?'; }
+                var thisPassword = prompt(thisPromptText);
+                if (thisPassword != undefined && thisPassword.length){
+                    thisPassword = thisPassword.toLowerCase().replace(/[^a-z0-9]+/ig, '');
+                    //alert(thisToken+':'+thisPassword);
+                    // Update the session with this password string
+                    var thisRequestType = 'session';
+                    var thisRequestData = 'flags,'+thisToken+'_password_'+thisPassword+',true';
+                    $.post('scripts/script.php',{requestType:'session',requestData:thisRequestData},function(){
+                        window.location.href = 'prototype.php?wap='+(gameSettings.wapFlag ? 'true' : 'false');
+                        });
+                    }
                 }
-            }
-        });
+            });
 
         // Define the live Rogue Star ticker functionality if present
         var $rogueStar = $('.banner .rogue_star', thisPrototype);
@@ -349,11 +453,12 @@ $(document).ready(function(){
             thisFadeCallback();
             }
 
+
+
         }
 
     // Reset the animation back to normal
     //gameSettings.skipPlayerSelect = false;
-
 
 
 });
@@ -527,15 +632,6 @@ function prototype_menu_loaded(){
             $('.banner .points, .banner .subpoints, .banner .options, .banner .tooltip', thisPrototype).stop().animate({opacity:1},500,'swing');
             }});
         }
-}
-
-// Define a function for triggering a banner click
-function prototype_menu_banner_link(thisStep){
-    // Define the prototype context
-    var thisContext = $('#prototype');
-    if (thisContext.length){
-        $('.banner .link[data-step="'+thisStep+'"]', thisContext).trigger('click');
-    }
 }
 
 // Define a function for preloading any menus with source iframes
@@ -1295,15 +1391,15 @@ function prototype_menu_switch(switchOptions){
                         success: function(markup, status){
 
                             // DEBUG
-                            //console.log('AJAX RETURN :');
-                            //console.log({markup:markup,status:status});
+                            console.log('AJAX RETURN :');
+                            console.log({markup:markup,status:status});
 
                             // If the markup is not empty, replace this menu's options
                             if (markup.length){
                                 currentMenu.find('.chapter_select').remove();
                                 currentMenu.find('.option').not('.option_sticky').remove();
                                 currentMenu.find('.header').after(markup);
-                                $('.option_message:gt(0)', currentMenu).trigger('click');
+                                $('.option_message:gt(0)', currentMenu).triggerSilentClick();
                                 }
 
                             // Trigger the callback function
@@ -1334,7 +1430,7 @@ function prototype_menu_switch(switchOptions){
                             //console.log('SKIPPING AJAX :');
 
                             // Auto-click any option messages after the first
-                            $('.option_message:gt(0)', tempMenuWrapper).trigger('click');
+                            $('.option_message:gt(0)', tempMenuWrapper).triggerSilentClick();
 
                             // Trigger the callback function
                             tempCallbackFunction();
@@ -1370,7 +1466,7 @@ function prototype_menu_switch(switchOptions){
                                             } else {
                                             tempMenuWrapper.append(innerMarkup);
                                             }
-                                        $('.option_message:gt(0)', tempMenuWrapper).trigger('click');
+                                        $('.option_message:gt(0)', tempMenuWrapper).triggerSilentClick();
                                         }
 
                                     // If this was a mission select loading, auto-click the proper chapter
@@ -1379,7 +1475,7 @@ function prototype_menu_switch(switchOptions){
                                         // Check to see which one should be displayed first and autoclick it
                                         if ($('.chapter_link_active', tempMenuWrapper).length){ var firstChapterLink = $('.chapter_link_active', tempMenuWrapper); }
                                         else { var firstChapterLink = $('.chapter_link[data-chapter]:first-child', tempMenuWrapper); }
-                                        firstChapterLink.trigger('click');
+                                        firstChapterLink.triggerSilentClick();
                                     }
 
                                     // Trigger the callback function
@@ -1397,8 +1493,8 @@ function prototype_menu_switch(switchOptions){
                                         console.log('numRobotsAvailable =', numRobotsAvailable);
                                         if (numRobotsAvailable === 1){
                                             console.log('Only one robot! AUTO CLICK IT!');
-                                            $availableRobots.first().trigger('click');
-                                            $confirmButton.trigger('click');
+                                            $availableRobots.first().triggerSilentClick();
+                                            $confirmButton.triggerSilentClick();
                                             }
 
                                         }
@@ -1463,7 +1559,7 @@ function prototype_menu_switch(switchOptions){
                         //console.log('Auto Skip triggered...');
                         // Secretly unhide the current menu and auto-click the only available option
                         thisMenu.css({opacity:0}).removeClass('menu_hide');
-                        thisMenuChoices.eq(0).trigger('click');
+                        thisMenuChoices.eq(0).triggerSilentClick();
                         } else {
                         // Unhide the current menu so the user can pick
                         thisMenu.css(slideInAnimation).removeClass('menu_hide').animate({opacity:1.0,marginLeft:'0',marginRight:'0'}, 400, 'swing');
