@@ -78,6 +78,9 @@ class rpg_target {
         // Apply appropriate camera action flags to the event options
         rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $this_ability, 'target');
 
+        // If sound effects were supplied in the trigger options, apply them now
+        $event_options['event_flag_sound_effects'] = !empty($trigger_options['event_flag_sound_effects']) ? $trigger_options['event_flag_sound_effects'] : false;
+
         // Create a new entry in the event log for the targeting event
         $temp_event_header = $this_ability->target_options['target_header'];
         $temp_event_body = $this_ability->ability_results['this_text'];
@@ -180,6 +183,9 @@ class rpg_target {
         // Apply appropriate camera action flags to the event options
         rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $this_item, 'target');
 
+        // If sound effects were supplied in the trigger options, apply them now
+        $event_options['event_flag_sound_effects'] = !empty($trigger_options['event_flag_sound_effects']) ? $trigger_options['event_flag_sound_effects'] : false;
+
         // Create a new entry in the event log for the targeting event
         $this_robot->battle->events_create($this_robot, $target_robot, $this_item->target_options['target_header'], $this_item->item_results['this_text'], $event_options);
 
@@ -266,6 +272,9 @@ class rpg_target {
 
         // Apply appropriate camera action flags to the event options
         rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $this_skill, 'target');
+
+        // If sound effects were supplied in the trigger options, apply them now
+        $event_options['event_flag_sound_effects'] = !empty($trigger_options['event_flag_sound_effects']) ? $trigger_options['event_flag_sound_effects'] : false;
 
         // Create a new entry in the event log for the targeting event
         $this_robot->battle->events_create($this_robot, $target_robot, $this_skill->target_options['target_header'], $this_skill->skill_results['this_text'], $event_options);
