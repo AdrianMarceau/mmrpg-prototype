@@ -418,7 +418,11 @@ function mmrpg_battle_fadein_background(animateCanvas, animateDuration, onComple
     // Collect or define the onComplete function
     var onComplete = onComplete != undefined ? onComplete : function(){};
     // Play the sound effect if we haven't already and we're allowed
-    if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){ parent.mmrpg_play_sound_effect('background-spawn', {volume: 1.0}); }
+    if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+        setTimeout(function(){
+            parent.mmrpg_play_sound_effect('background-spawn', {volume: 0.5});
+            }, Math.ceil(animateDuration / 4));
+        }
     // Collect the background canvas and event elements
     var animateBackgroundCanvas = $('.animate_fadein', animateCanvas).filter('.background_canvas');
     var animateBackgroundEvent = $('.animate_fadein', animateCanvas).filter('.background_event');
