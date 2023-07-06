@@ -21,12 +21,14 @@ gameSettings.baseHref = 'http://localhost/'; // the base href where this game is
 gameSettings.wapFlag = false; // whether or not this game is running in mobile mode
 gameSettings.wapFlagIphone = false; // whether or not this game is running in mobile iphone mode
 gameSettings.wapFlagIpad = false; // whether or not this game is running in mobile iphone mode
-gameSettings.baseVolume = 0.5; // default animation frame base internal
+gameSettings.maxVolume = 1.0; // default max volume for the game that cannot be exceeded (user controlled)
+gameSettings.baseVolume = 0.5; // default base volume for the game that is half of the max volume for leeway
 gameSettings.eventTimeout = 800; // default animation frame base internal
 gameSettings.eventTimeoutThreshold = 250; // timeout theshold for when frames stop cross-fading
 gameSettings.eventAutoPlay = true; // whether or not to automatically advance events
 gameSettings.eventCrossFade = true; // whether or not to canvas events have crossfade animation
 gameSettings.eventCameraShift = true; // whether or not to canvas events have camera shifts
+gameSettings.eventSoundEffects = true; // whether or not to use sound effects for battle events
 gameSettings.eventHooks = []; // default to empty but may be filled at runtime and used later
 gameSettings.spriteRenderMode = 'default'; // the render mode we should be using for sprites
 gameSettings.idleAnimation = true; // default to allow idle animations
@@ -1974,8 +1976,7 @@ function mmrpg_canvas_event(thisMarkup, eventFlags){ //, flagsMarkup
                 var newCameraDepth = 0;
                 var newCameraOffset = 0;
                 // Check to see if camera shift settings were provided in the frame
-                if (gameSettings.eventCameraShift
-                    && typeof eventFlags.camera !== 'undefined'
+                if (typeof eventFlags.camera !== 'undefined'
                     && eventFlags.camera !== false){
                     //console.log('we have camera action!', eventFlags.camera);
                     newCameraShift = eventFlags.camera.side;
@@ -1989,6 +1990,31 @@ function mmrpg_canvas_event(thisMarkup, eventFlags){ //, flagsMarkup
                     || currentDepth !== newCameraDepth
                     || newCameraOffset !== newCameraOffset){
                     mmrpg_canvas_camera_shift(newCameraShift, newCameraFocus, newCameraDepth, newCameraOffset);
+                }
+            }
+
+            // If found effect settings are enabled, we can process them
+            if (gameSettings.eventSoundEffects
+                && typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+                //console.log('we can react to sound effects!');
+                //console.log('eventFlags =', eventFlags);
+                // Check to see if camera shift settings were provided in the frame
+                if (typeof eventFlags.sounds !== 'undefined'
+                    && eventFlags.sounds !== false){
+                    console.log('we have sound effect(s)!', eventFlags.sounds);
+                    for (var i = 0; i < eventFlags.sounds.length; i++){
+                        var effectConfig = eventFlags.sounds[i];
+                        var effectName = effectConfig.name;
+                        console.log('effectName =', effectName);
+                        console.log('effectConfig =', effectConfig);
+                        if (typeof effectConfig.delay === 'number'){
+                            setTimeout(function(){
+                                parent.mmrpg_play_sound_effect(effectName, effectConfig);
+                                }, effectConfig.delay);
+                            } else {
+                            parent.mmrpg_play_sound_effect(effectName, effectConfig);
+                            }
+                    }
                 }
             }
 
@@ -2411,6 +2437,8 @@ function mmrpg_music_volume(newVolume, isRelative, fadeDuration){
     if (typeof fadeDuration !== 'number'){ fadeDuration = 500; }
     var currentVolume = mmrpgMusicSound !== false ? mmrpgMusicSound.volume() : gameSettings.baseVolume;
     var newVolume = isRelative ? (gameSettings.baseVolume * newVolume) : newVolume;
+    if (newVolume > gameSettings.maxVolume){ newVolume = gameSettings.maxVolume; }
+    else if (newVolume < 0){ newVolume = 0; }
     //console.log('currentVolume =', currentVolume);
     //console.log('newVolume =', newVolume);
     if (fadeDuration > 0){ mmrpgMusicSound.fade(currentVolume, newVolume, fadeDuration);  }
@@ -2481,9 +2509,12 @@ gameSettings.soundEffectPoolIndex = -1;
 gameSettings.soundEffectPoolLimit = 10;
 gameSettings.soundEffectSources = [];
 gameSettings.soundEffectSprites = {};
+// Define a list of sound effect aliases we can use in the code to abstract a bit
 gameSettings.soundEffectAliases = {
-    'game-start': 'selected', //'dead',
-    'link-hover': 'cursor-2', //'dink', //'cursor-2',
+    // Game Start
+    'game-start': 'selected',
+    // Menu Sound Effects
+    'link-hover': 'cursor-2',
     'link-click': 'pause-2',
     'link-click-special': 'get-beat',
     'link-click-robot': 'land-3',
@@ -2492,6 +2523,29 @@ gameSettings.soundEffectAliases = {
     'back-click-loading': 'giant-suzy-bounce',
     'lets-go': 'selected',
     'lets-go-robots': 'beam-out-2',
+    'text': 'text',
+    'event': 'enker-absorb',
+    // Battle Sound Effects
+    'damage': 'hurt-3',
+    'damage-critical': 'enemy-hit-3',
+    'damage-hindered': 'dink-2',
+    'damage-stats': 'wily-star-missile',
+    'recovery-energy': 'password-okay',
+    'recovery-weapons': 'refill-3',
+    'recovery-stats': 'terra-freeze',
+    'destroyed': 'dead',
+    'get-item': 'one-up-2',
+    'get-big-item': 'get-beat',
+    'no-effect': 'text',
+    'experience-points': 'refill-3',
+    'level-up': 'password-okay',
+    'star-collected': 'wpn-get-iii',
+    'marker-destroyed': 'dark-moon-stomp',
+    // Ability Sound Effects
+    'shot': 'shot-a',
+    'shot-alt': 'shot-2',
+    'charge': 'charge',
+    'summon': 'wily-escape-iv-a'
     };
 function mmrpg_play_sound_effect(effectName, effectConfig){
     //console.log('mmrpg_play_sound_effect(effectName:', effectName, 'effectConfig:', effectConfig, ')');
@@ -2539,7 +2593,7 @@ function mmrpg_play_sound_effect(effectName, effectConfig){
     if (effectConfig) {
         if (effectConfig.volume !== undefined){
             var newVolume = baseVolume * effectConfig.volume;
-            if (newVolume > gameSettings.baseVolume){ newVolume = gameSettings.baseVolume; }
+            if (newVolume > gameSettings.maxVolume){ newVolume = gameSettings.maxVolume; }
             sound.volume(newVolume);
             }
         if (effectConfig.loop !== undefined){ sound.loop(effectConfig.loop); }
