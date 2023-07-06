@@ -410,9 +410,15 @@ $(document).ready(function(){
 });
 
 // Define a function for animation the canvas background startup elements
+var fieldBackgroundInit = false;
 function mmrpg_battle_fadein_background(animateCanvas, animateDuration, onComplete){
+    // Make sure we only do this one
+    if (fieldBackgroundInit){ return false; }
+    else { fieldBackgroundInit = true; }
     // Collect or define the onComplete function
     var onComplete = onComplete != undefined ? onComplete : function(){};
+    // Play the sound effect if we haven't already and we're allowed
+    if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){ parent.mmrpg_play_sound_effect('background-spawn', {volume: 1.0}); }
     // Collect the background canvas and event elements
     var animateBackgroundCanvas = $('.animate_fadein', animateCanvas).filter('.background_canvas');
     var animateBackgroundEvent = $('.animate_fadein', animateCanvas).filter('.background_event');
@@ -432,9 +438,19 @@ function mmrpg_battle_fadein_background(animateCanvas, animateDuration, onComple
 }
 
 // Define a function for animation the canvas foreground startup elements
+var fieldForegroundInit = false;
 function mmrpg_battle_fadein_foreground(animateCanvas, animateDuration, onComplete){
+    // Make sure we only do this one
+    if (fieldForegroundInit){ return false; }
+    else { fieldForegroundInit = true; }
     // Collect or define the onComplete function
     var onComplete = onComplete != undefined ? onComplete : function(){};
+    // Play the sound effect if we haven't already and we're allowed
+    if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+        setTimeout(function(){
+            parent.mmrpg_play_sound_effect('foreground-spawn', {volume: 1.5});
+            }, Math.ceil(animateDuration / 3));
+        }
     // Collect the foreground canvas and event elements
     var animateForegroundCanvas = $('.animate_fadein', animateCanvas).filter('.foreground_canvas');
     var animateForegroundEvent = $('.animate_fadein', animateCanvas).filter('.foreground_event');
