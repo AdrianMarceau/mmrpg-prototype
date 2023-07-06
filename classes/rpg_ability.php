@@ -2611,8 +2611,13 @@ class rpg_ability extends rpg_object {
 
             // Define the sound effect variables for this stat boost
             $boost_sounds = array();
-            $boost_sounds[] = array('name' => 'recovery-stats', 'volume' => 1.5);
-            if ($rel_boost_amount >= 2){ $boost_sounds[] = array('name' => 'recovery-stats', 'volume' => 1.5, 'delat' => 200); }
+            for ($i = 0; $i < $rel_boost_amount; $i++){
+                $boost_sounds[] = array(
+                    'name' => 'recovery-stats',
+                    'volume' => 1.5 - ($i * 0.1),
+                    'delay' => 0 + ($i * 80)
+                    );
+            }
 
             // Target this robot's self to show the success message
             $amount_text = ''; //' (old:'.$old_mod_value.', amount:'.$options->boost_amount.', rel-amount:'.$rel_boost_amount.', result:'.$target_robot->counters[$mods_token].')';
@@ -2790,8 +2795,13 @@ class rpg_ability extends rpg_object {
 
             // Define the sound effect variables for this stat boost
             $break_sounds = array();
-            $break_sounds[] = array('name' => 'damage-stats', 'volume' => 1.5);
-            if ($rel_break_amount >= 2){ $break_sounds[] = array('name' => 'damage-stats', 'volume' => 1.5, 'delat' => 200); }
+            for ($i = 0; $i < $rel_break_amount; $i++){
+                $break_sounds[] = array(
+                    'name' => 'damage-stats',
+                    'volume' => 1.5 - ($i * 0.1),
+                    'delay' => 0 + ($i * 100)
+                    );
+            }
 
             // Target this robot's self to show the success message
             $amount_text = ''; //' (old:'.$old_mod_value.', amount:'.$options->break_amount.', rel-amount:'.$rel_break_amount.', result:'.$target_robot->counters[$mods_token].')';
@@ -3090,9 +3100,7 @@ class rpg_ability extends rpg_object {
                 $target_options['prevent_default_text'] = true;
             }
             $target_options['event_flag_sound_effects'] = array(
-                array('name' => 'shot-alt', 'volume' => 1.5),
-                array('name' => 'shot-alt', 'volume' => 1.5, 'delay' => 200),
-                array('name' => 'shot-alt', 'volume' => 1.5, 'delay' => 400)
+                array('name' => 'shot-alt', 'volume' => 1.5)
                 );
             $this_ability->target_options_update(array(
                 'frame' => 'shoot',
@@ -3216,11 +3224,17 @@ class rpg_ability extends rpg_object {
         if ($options->buster_charge_required){
 
             // Target this robot's self
+            $target_options = array();
+            $target_options['event_flag_sound_effects'] = array(
+                array('name' => 'charge', 'volume' => 1.2),
+                array('name' => 'charge', 'volume' => 1.4, 'delay' => 100),
+                array('name' => 'charge', 'volume' => 1.6, 'delay' => 300)
+                );
             $this_ability->target_options_update(array(
                 'frame' => 'defend',
                 'success' => array(1, -10, 0, -10, $this_robot->print_name().' charges the '.$this_ability->print_name().'&hellip;')
                 ));
-            $this_robot->trigger_target($this_robot, $this_ability);
+            $this_robot->trigger_target($this_robot, $this_ability, $target_options);
 
             // Attach this ability attachment to the robot using it
             $this_robot->set_attachment($this_attachment_token, $this_attachment_info);
@@ -3237,12 +3251,16 @@ class rpg_ability extends rpg_object {
             $this_robot->set_attachment($this_attachment_token, $new_attachment_info);
 
             // Update this ability's target options and trigger
+            $target_options = array();
+            $target_options['event_flag_sound_effects'] = array(
+                array('name' => 'blast', 'volume' => 1.5)
+                );
             $this_ability->target_options_update(array(
                 'frame' => 'shoot',
                 'kickback' => array(-5, 0, 0),
                 'success' => array(3, 100, -15, 10, $this_robot->print_name().' fires the '.$this_ability->print_name().'!'),
                 ));
-            $this_robot->trigger_target($target_robot, $this_ability);
+            $this_robot->trigger_target($target_robot, $this_ability, $target_options);
 
             // Inflict damage on the opposing robot
             $this_ability->damage_options_update(array(
@@ -3338,12 +3356,16 @@ class rpg_ability extends rpg_object {
         $this_robot->set_weapons(0);
 
         // Target the opposing robot
+        $target_options = array();
+        $target_options['event_flag_sound_effects'] = array(
+            array('name' => 'summon', 'volume' => 1.5)
+            );
         $this_ability->target_options_update(array(
             'kickback' => array(-5, 0, 0),
             'frame' => 'defend',
             'success' => array(0, 15, 45, 10, $this_robot->print_name().' uses the '.$this_ability->print_name().'!')
             ));
-        $this_robot->trigger_target($target_robot, $this_ability);
+        $this_robot->trigger_target($target_robot, $this_ability, $target_options);
 
         // Define this ability's attachment token
         $crest_attachment_token = 'ability_'.$this_ability->ability_token;
@@ -3382,6 +3404,10 @@ class rpg_ability extends rpg_object {
         $target_robot->set_attachment($overlay_attachment_token, $overlay_attachment_info);
 
         // prepare the ability options
+        $trigger_options = array();
+        $trigger_options['event_flag_sound_effects'] = array(
+            array('name' => 'blast', 'volume' => 1.5)
+            );
         $this_ability->damage_options_update(array(
             'kind' => 'energy',
             'kickback' => array(20, 0, 0),
@@ -3397,7 +3423,7 @@ class rpg_ability extends rpg_object {
             ));
         // Inflict damage on the opposing robot
         $energy_damage_amount = $this_ability->ability_damage;
-        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
+        $target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false, $trigger_options);
         // Remove the black overlay attachment
         $target_robot->unset_attachment($overlay_attachment_token);
 
@@ -3426,7 +3452,7 @@ class rpg_ability extends rpg_object {
                 ));
             //$energy_damage_amount = ceil($this_ability->ability_damage / $target_robots_active);
             $energy_damage_amount = $this_ability->ability_damage;
-            $temp_target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false);
+            $temp_target_robot->trigger_damage($this_robot, $this_ability, $energy_damage_amount, false, $trigger_options);
             $temp_target_robot->unset_attachment($overlay_attachment_token);
         }
 
