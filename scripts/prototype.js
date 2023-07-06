@@ -996,6 +996,7 @@ function prototype_menu_click_option(thisContext, thisOption){
 
             // Prepend the sprite to the parent's label value
             var labelPadding = ((tokenParentLimit * 40)+60)+'px';
+            $('.sprite_40x40_heartback', tokenParent).remove();
             $('.sprite_40x40_placeholder', tokenParent).remove();
             $('label', tokenParent).prepend(spriteMarkup);
 
