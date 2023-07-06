@@ -2624,15 +2624,19 @@ class rpg_battle extends rpg_object {
         $options['event_flag_camera_focus'] = isset($eventinfo['event_options']['event_flag_camera_focus']) ? $eventinfo['event_options']['event_flag_camera_focus'] : 'active';
         $options['event_flag_camera_depth'] = isset($eventinfo['event_options']['event_flag_camera_depth']) ? $eventinfo['event_options']['event_flag_camera_depth'] : 0;
         $options['event_flag_camera_offset'] = isset($eventinfo['event_options']['event_flag_camera_offset']) ? $eventinfo['event_options']['event_flag_camera_offset'] : 0;
+        $options['event_flag_sound_effects'] = isset($eventinfo['event_options']['event_flag_sound_effects']) ? $eventinfo['event_options']['event_flag_sound_effects'] : false;
 
         // Define the variable to collect markup
         $this_markup = array();
 
         // Generate the event flags markup
         $event_flags = array();
+
         $event_flags['autoplay'] = $options['event_flag_autoplay'];
+
         $event_flags['victory'] = $options['event_flag_victory'];
         $event_flags['defeat'] = $options['event_flag_defeat'];
+
         $event_flags['camera'] = array();
         $event_flags['camera']['action'] = $options['event_flag_camera_action'];
         $event_flags['camera']['reaction'] = $options['event_flag_camera_reaction'];
@@ -2641,6 +2645,16 @@ class rpg_battle extends rpg_object {
         $event_flags['camera']['depth'] = $options['event_flag_camera_depth'];
         $event_flags['camera']['offset'] = $options['event_flag_camera_offset'];
         if (!$event_flags['camera']['action'] && !$event_flags['camera']['reaction']){ $event_flags['camera'] = false; }
+
+        $event_flags['sounds'] = array();
+        if (!empty($options['event_flag_sound_effects'])){
+            foreach ($options['event_flag_sound_effects'] AS $key => $effect){
+                if (empty($effect['name'])){ continue; }
+                $event_flags['sounds'][] = $effect;
+            }
+        }
+        if (empty($event_flags['sounds'])){ $event_flags['sounds'] = false; }
+
         $this_markup['flags'] = json_encode($event_flags);
 
         // Generate the console message markup
