@@ -1155,6 +1155,8 @@ class rpg_item_damage extends rpg_damage {
         if ($options->return_early){ return $options->return_value; }
 
         // Define the sound effects for this damage event so it plays for the player
+        $damage_sounds = array();
+        $event_options['event_flag_sound_effects'] = !empty($trigger_options['event_flag_sound_effects']) ? $trigger_options['event_flag_sound_effects'] : array();
         if ($this_item->item_results['this_amount'] > 0){
             $damage_sounds = array();
             if (!empty($this_item->item_results['flag_weakness'])
@@ -1176,8 +1178,10 @@ class rpg_item_damage extends rpg_damage {
                 $damage_sounds[] = array('name' => 'small-boom-b', 'volume' => 1.4, 'delay' => $delay + 200);
                 $damage_sounds[] = array('name' => 'small-boom-b', 'volume' => 1.4, 'delay' => $delay + 300);
             }
-            $event_options['event_flag_sound_effects'] = $damage_sounds;
+        } else {
+            $damage_sounds[] = array('name' => 'no-effect', 'volume' => 1.5);
         }
+        $event_options['event_flag_sound_effects'] = array_merge($event_options['event_flag_sound_effects'], $damage_sounds);
 
         // Generate an event with the collected damage results based on damage type
         $temp_event_header = $this_item->damage_options['damage_header'];

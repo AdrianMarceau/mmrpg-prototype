@@ -1111,9 +1111,10 @@ class rpg_item_recovery extends rpg_recovery {
         if ($options->return_early){ return $options->return_value; }
 
         // Define the sound effects for this recovery event so it plays for the player
+        $recovery_sounds = array();
+        $event_options['event_flag_sound_effects'] = !empty($trigger_options['event_flag_sound_effects']) ? $trigger_options['event_flag_sound_effects'] : array();
         if ($this_item->item_results['this_amount'] > 0){
             $percent = ceil(($this_item->item_results['this_amount'] / $this_robot->robot_base_energy) * 100);
-            $recovery_sounds = array();
             if ($this_item->recovery_options['recovery_kind'] == 'energy'){
                 $recovery_sounds[] = array('name' => 'recovery-energy', 'volume' => 1.5, 'delay' => 200);
                 if ($percent > 50){ $recovery_sounds[] = array('name' => 'recovery-energy', 'volume' => 1.5, 'delay' => 400); }
@@ -1124,7 +1125,7 @@ class rpg_item_recovery extends rpg_recovery {
         } else {
             $recovery_sounds[] = array('name' => 'no-effect', 'volume' => 1.5);
         }
-        $event_options['event_flag_sound_effects'] = $recovery_sounds;
+        $event_options['event_flag_sound_effects'] = array_merge($event_options['event_flag_sound_effects'], $recovery_sounds);
 
         // Generate an event with the collected recovery results based on recovery type
         $temp_event_header = $this_item->recovery_options['recovery_header'];
