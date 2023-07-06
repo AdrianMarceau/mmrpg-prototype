@@ -73,6 +73,9 @@ class rpg_disabled {
             $event_options = array();
             $event_options['console_show_target'] = false;
             $event_options['canvas_show_disabled_bench'] = $this_robot->robot_id.'_'.$this_robot->robot_token;
+            $event_options['event_flag_sound_effects'] = array(
+                array('name' => 'destroyed', 'volume' => 1.5)
+                );
             rpg_canvas::apply_camera_action_flags($event_options, $this_robot);
             $this_battle->events_create($this_robot, $target_robot, $event_header, $event_body, $event_options);
         }
@@ -847,6 +850,9 @@ class rpg_disabled {
                         }
                         $event_options['console_show_target'] = false;
                         $event_options['this_header_float'] = $event_options['this_body_float'] = $target_player->player_side;
+                        $event_options['event_flag_sound_effects'] = array(
+                            array('name' => 'experience-points', 'volume' => 1.5)
+                            );
                         $temp_target_robot->update_session();
                         $target_player->update_session();
                         $this_battle->events_create($temp_target_robot, $this_robot, $event_header, $event_body, $event_options);
@@ -890,6 +896,9 @@ class rpg_disabled {
                         $event_body .= $temp_target_robot->robot_name.'&#39;s energy, weapons, shields, and mobility were upgraded!';
                         $event_options['console_show_target'] = false;
                         $event_options['this_header_float'] = $event_options['this_body_float'] = $target_player->player_side;
+                        $event_options['event_flag_sound_effects'] = array(
+                            array('name' => 'level-up', 'volume' => 1.5)
+                            );
                         $temp_target_robot->update_session();
                         $target_player->update_session();
                         $this_battle->events_create($temp_target_robot, $this_robot, $event_header, $event_body, $event_options);
