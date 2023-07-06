@@ -2609,11 +2609,17 @@ class rpg_ability extends rpg_object {
             elseif ($rel_boost_amount >= 2){ $boost_text = 'sharply rose'; }
             else { $boost_text = 'rose'; }
 
+            // Define the sound effect variables for this stat boost
+            $boost_sounds = array();
+            $boost_sounds[] = array('name' => 'recovery-stats', 'volume' => 1.5);
+            if ($rel_boost_amount >= 2){ $boost_sounds[] = array('name' => 'recovery-stats', 'volume' => 1.5, 'delat' => 200); }
+
             // Target this robot's self to show the success message
             $amount_text = ''; //' (old:'.$old_mod_value.', amount:'.$options->boost_amount.', rel-amount:'.$rel_boost_amount.', result:'.$target_robot->counters[$mods_token].')';
             $target_options = array('frame' => 'taunt', 'success' => array($options->success_frame, -2, 0, -10, $options->extra_text.$target_robot->print_name().'&#39;s '.$options->stat_type.' '.$boost_text.$amount_text.'!'));
             $target_results = array('total_actions' => 1, 'total_strikes' => 1, 'recovery_kind' => $options->stat_type, 'this_amount' => $rel_boost_amount);
             $trigger_options = array('override_trigger_kind' => 'recovery');
+            if (!empty($boost_sounds)){ $trigger_options['event_flag_sound_effects'] = $boost_sounds; }
             if ($trigger_item || $trigger_skill){
                 if (!$skip_canvas_header){ $trigger_object->set_flag('force_canvas_header', true); }
                 else { $trigger_ability->set_flag('skip_canvas_header', true); }
@@ -2637,18 +2643,24 @@ class rpg_ability extends rpg_object {
 
         } else {
 
+            // Define the sound effect variables for this failed stat boost
+            $boost_sounds = array();
+            $boost_sounds[] = array('name' => 'no-effect', 'volume' => 1.5);
+
             // Target this robot's self to show the failure message
             $amount_text = ''; //' ('.($target_robot->counters[$mods_token] > 0 ? '+'.$target_robot->counters[$mods_token] : $target_robot->counters[$mods_token]).')';
             $target_options = array('frame' => 'defend', 'success' => array($options->failure_frame, -2, 0, -10, $options->extra_text.$target_robot->print_name().'&#39;s '.$options->stat_type.' won\'t go any higher'.$amount_text.'&hellip;'));
+            $trigger_options = array();
+            if (!empty($boost_sounds)){ $trigger_options['event_flag_sound_effects'] = $boost_sounds; }
             if ($trigger_item || $trigger_skill){
                 $trigger_object->set_flag('skip_canvas_header', true);
                 $trigger_object->target_options_update($target_options);
-                $target_robot->trigger_target($target_robot, $trigger_object);
+                $target_robot->trigger_target($target_robot, $trigger_object, $trigger_options);
                 $trigger_object->unset_flag('skip_canvas_header');
             } else {
                 $trigger_ability->set_flag('skip_canvas_header', true);
                 $trigger_ability->target_options_update($target_options);
-                $target_robot->trigger_target($target_robot, $trigger_ability);
+                $target_robot->trigger_target($target_robot, $trigger_ability, $trigger_options);
                 $trigger_ability->unset_flag('skip_canvas_header');
             }
             $target_robot->counters[$mods_token] = MMRPG_SETTINGS_STATS_MOD_MAX;
@@ -2776,11 +2788,17 @@ class rpg_ability extends rpg_object {
             elseif ($rel_break_amount >= 2){ $break_text = 'harshly fell'; }
             else { $break_text = 'fell'; }
 
+            // Define the sound effect variables for this stat boost
+            $break_sounds = array();
+            $break_sounds[] = array('name' => 'damage-stats', 'volume' => 1.5);
+            if ($rel_break_amount >= 2){ $break_sounds[] = array('name' => 'damage-stats', 'volume' => 1.5, 'delat' => 200); }
+
             // Target this robot's self to show the success message
             $amount_text = ''; //' (old:'.$old_mod_value.', amount:'.$options->break_amount.', rel-amount:'.$rel_break_amount.', result:'.$target_robot->counters[$mods_token].')';
             $target_options = array('frame' => 'defend', 'success' => array($options->success_frame, -2, 0, -10, $options->extra_text.$target_robot->print_name().'&#39;s '.$options->stat_type.' '.$break_text.$amount_text.'!'));
             $target_results = array('total_actions' => 1, 'total_strikes' => 1, 'damage_kind' => $options->stat_type, 'this_amount' => $rel_break_amount);
             $trigger_options = array('override_trigger_kind' => 'damage');
+            if (!empty($break_sounds)){ $trigger_options['event_flag_sound_effects'] = $break_sounds; }
             if ($trigger_item || $trigger_skill){
                 if (!$skip_canvas_header){ $trigger_object->set_flag('force_canvas_header', true); }
                 else { $trigger_ability->set_flag('skip_canvas_header', true); }
@@ -2805,18 +2823,24 @@ class rpg_ability extends rpg_object {
 
         } else {
 
+            // Define the sound effect variables for this failed stat break
+            $break_sounds = array();
+            $break_sounds[] = array('name' => 'no-effect', 'volume' => 1.5);
+
             // Target this robot's self to show the failure message
             $amount_text = ''; //' ('.($target_robot->counters[$mods_token] > 0 ? '+'.$target_robot->counters[$mods_token] : $target_robot->counters[$mods_token]).')';
             $target_options = array('frame' => 'base', 'success' => array($options->failure_frame, -2, 0, -10, $options->extra_text.$target_robot->print_name().'&#39;s '.$options->stat_type.' won\'t go any lower'.$amount_text.'&hellip;'));
+            $trigger_options = array();
+            if (!empty($boost_sounds)){ $trigger_options['event_flag_sound_effects'] = $boost_sounds; }
             if ($trigger_item || $trigger_skill){
                 $trigger_object->set_flag('skip_canvas_header', true);
                 $trigger_object->target_options_update($target_options);
-                $target_robot->trigger_target($target_robot, $trigger_object);
+                $target_robot->trigger_target($target_robot, $trigger_object, $trigger_options);
                 $trigger_object->unset_flag('skip_canvas_header');
             } else {
                 $trigger_ability->set_flag('skip_canvas_header', true);
                 $trigger_ability->target_options_update($target_options);
-                $target_robot->trigger_target($target_robot, $trigger_ability);
+                $target_robot->trigger_target($target_robot, $trigger_ability, $trigger_options);
                 $trigger_ability->unset_flag('skip_canvas_header');
             }
             $target_robot->counters[$mods_token] = MMRPG_SETTINGS_STATS_MOD_MIN;
@@ -3065,6 +3089,11 @@ class rpg_ability extends rpg_object {
                 $target_text = $this_robot->print_name().' fires another '.$this_ability->print_name().'!';
                 $target_options['prevent_default_text'] = true;
             }
+            $target_options['event_flag_sound_effects'] = array(
+                array('name' => 'shot-alt', 'volume' => 1.5),
+                array('name' => 'shot-alt', 'volume' => 1.5, 'delay' => 200),
+                array('name' => 'shot-alt', 'volume' => 1.5, 'delay' => 400)
+                );
             $this_ability->target_options_update(array(
                 'frame' => 'shoot',
                 'success' => array(0, 105, 0, 10, $target_text)
