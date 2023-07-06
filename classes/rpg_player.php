@@ -1737,9 +1737,15 @@ class rpg_player extends rpg_object {
         $event_options['console_show_this_robot'] = false;
         $event_options['console_show_this_item'] = true;
         $event_options['canvas_show_this_item'] = true;
+        $event_options['event_flag_sound_effects'] = array(
+            array('name' => 'get-item', 'volume' => 1.5)
+            );
         rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $temp_item);
         $this_battle->events_create($this_robot, false, $event_header, $event_body, $event_options);
         if ($shards_fusing_this_turn){
+            $event_options['event_flag_sound_effects'] = array(
+                array('name' => 'shards-fusing', 'volume' => 1.0)
+                );
             $temp_item->set_frame_styles('filter: brightness(2); ');
             $this_battle->events_create($this_robot, false, '', '', $event_options);
             $event_options['this_item_quantity'] = MMRPG_SETTINGS_SHARDS_MAXQUANTITY;
@@ -1824,6 +1830,9 @@ class rpg_player extends rpg_object {
             $event_options['console_show_this_robot'] = false;
             $event_options['console_show_this_item'] = true;
             $event_options['canvas_show_this_item'] = true;
+            $event_options['event_flag_sound_effects'] = array(
+                array('name' => 'get-big-item', 'volume' => 1.5)
+                );
             $target_player->set_frame(($item_reward_key + 1 % 3 == 0 ? 'taunt' : 'victory'));
             $target_robot->set_frame($item_reward_key % 2 == 0 ? 'base' : 'taunt');
             $temp_core->set_frame('base');

@@ -308,6 +308,9 @@ class rpg_disabled {
                             $event_options['this_ability_results']['total_actions'] = $temp_boost_actions++;
                             $event_options['this_ability_target'] = $target_robot->robot_id.'_'.$target_robot->robot_token;
                             $event_options['console_show_target'] = false;
+                            $event_options['event_flag_sound_effects'] = array(
+                                array('name' => 'stat-bonus', 'volume' => 1.5)
+                                );
                             rpg_canvas::apply_camera_action_flags($event_options, $target_robot);
                             $event_body = $target_robot->print_name().' downloads '.$stat_system[$stat].' data from the target! ';
                             $event_body .= '<br />';
@@ -945,6 +948,9 @@ class rpg_disabled {
                             $event_options['this_ability_results']['recovery_kind'] = 'energy';
                             $event_options['this_ability_results']['this_amount'] = $temp_energy_boost;
                             $event_options['this_ability_results']['total_actions']++;
+                            $event_options['event_flag_sound_effects'] = array(
+                                array('name' => 'stat-bonus', 'volume' => 1.5)
+                                );
                             $event_body = $temp_target_robot->print_name().'&#39;s health improved! ';
                             $event_body .= '<br />';
                             $event_body .= $temp_target_robot->print_name().'&#39;s base energy grew by <span class="recovery_amount">'.$temp_energy_boost.'</span>! ';
@@ -975,6 +981,9 @@ class rpg_disabled {
                             $event_options['this_ability_results']['recovery_kind'] = 'attack';
                             $event_options['this_ability_results']['this_amount'] = $temp_base_attack_boost;
                             $event_options['this_ability_results']['total_actions']++;
+                            $event_options['event_flag_sound_effects'] = array(
+                                array('name' => 'stat-bonus', 'volume' => 1.5)
+                                );
                             $event_body = $temp_target_robot->print_name().'&#39;s weapons improved! ';
                             $event_body .= '<br />';
                             $event_body .= $temp_target_robot->print_name().'&#39;s base attack grew by <span class="recovery_amount">'.$temp_base_attack_boost.'</span>! ';
@@ -1005,6 +1014,9 @@ class rpg_disabled {
                             $event_options['this_ability_results']['recovery_kind'] = 'defense';
                             $event_options['this_ability_results']['this_amount'] = $temp_base_defense_boost;
                             $event_options['this_ability_results']['total_actions']++;
+                            $event_options['event_flag_sound_effects'] = array(
+                                array('name' => 'stat-bonus', 'volume' => 1.5)
+                                );
                             $event_body = $temp_target_robot->print_name().'&#39;s shields improved! ';
                             $event_body .= '<br />';
                             $event_body .= $temp_target_robot->print_name().'&#39;s base defense grew by <span class="recovery_amount">'.$temp_base_defense_boost.'</span>! ';
@@ -1035,6 +1047,9 @@ class rpg_disabled {
                             $event_options['this_ability_results']['recovery_kind'] = 'speed';
                             $event_options['this_ability_results']['this_amount'] = $temp_base_speed_boost;
                             $event_options['this_ability_results']['total_actions']++;
+                            $event_options['event_flag_sound_effects'] = array(
+                                array('name' => 'stat-bonus', 'volume' => 1.5)
+                                );
                             $event_body = $temp_target_robot->print_name().'&#39;s mobility improved! ';
                             $event_body .= '<br />';
                             $event_body .= $temp_target_robot->print_name().'&#39;s base speed grew by <span class="recovery_amount">'.$temp_base_speed_boost.'</span>! ';
@@ -1096,6 +1111,9 @@ class rpg_disabled {
                                     $event_options['console_show_this_robot'] = false;
                                     $event_options['console_show_this_ability'] = true;
                                     $event_options['canvas_show_this_ability'] = false;
+                                    $event_options['event_flag_sound_effects'] = array(
+                                        array('name' => 'get-big-item', 'volume' => 1.5)
+                                        );
                                     rpg_canvas::apply_camera_action_flags($event_options, $temp_target_robot);
                                     $temp_target_robot->robot_frame = $ability_reward_key % 2 == 2 ? 'taunt' : 'victory';
                                     $temp_target_robot->update_session();
@@ -1325,6 +1343,9 @@ class rpg_disabled {
                         $event_options['this_header_float'] = $target_player->player_side;
                         $event_options['this_body_float'] = $target_player->player_side;
                         $event_options['this_robot_image'] = 'mug';
+                        $event_options['event_flag_sound_effects'] = array(
+                            array('name' => 'get-big-item', 'volume' => 1.5)
+                            );
                         $temp_unlocked_robot->robot_frame = 'base';
                         $temp_unlocked_robot->update_session();
                         $this_battle->events_create($temp_unlocked_robot, false, $event_header, $event_body, $event_options);
