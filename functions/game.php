@@ -427,7 +427,11 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
 
         $temp_console_markup = '';
         $temp_console_markup .= '<p style="text-align: center; margin: 5px auto 10px;">';
-            $temp_console_markup .= '<strong class="ability_type type_'.$player_info['player_type'].'" style="display: inline-block; text-transform: uppercase; padding: 0 30px; margin: 0 auto; filter: brightness(1.3);">You Got A New Robot!</strong>';
+            $temp_console_markup .= '<strong '.
+                'class="ability_type type_'.$player_info['player_type'].'" '.
+                'style="display: inline-block; text-transform: uppercase; padding: 0 30px; margin: 0 auto; filter: brightness(1.3);">'.
+                'You Got A New Robot!'.
+                '</strong>';
         $temp_console_markup .= '</p>';
         $temp_console_markup .= '<p style="text-align: center; margin: 5px auto;">';
             $temp_console_markup .= rpg_type::print_span($player_info['player_type'], $player_info['player_name']).' unlocked '.rpg_type::print_span($robot_info['robot_core'], $robot_info['robot_name'], true).' as a robot fighter!';
@@ -440,10 +444,10 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
         //    $temp_console_markup .= ''.rpg_type::print_span($robot_info['robot_core'], $robot_info['robot_name'], true).'\'s data was '.($temp_data_existed ? 'updated in ' : 'added to ' ).' the <strong>Robot Database</strong>.</p>';
         //$temp_console_markup .= '</p>';
         $temp_console_markup .= '<div id="console" style="width: auto; height: auto; font-size: 120%; line-height: 1.6; margin: 10px auto;">';
-            $temp_console_markup .= '<div class="extra"><div class="extra2" style="max-width: 460px; margin: 0 auto;">';
-                $temp_console_markup .= '<i class="fa fas fa-quote-left" style="font-size: 80%; filter: brightness(1);"></i> ';
+            $temp_console_markup .= '<div class="extra"><div class="extra2" style="max-width: 460px; margin: 0 auto; position: relative;">';
+                $temp_console_markup .= '<i class="fa fas fa-quote-left" style="font-size: 80%; filter: brightness(1); position: absolute; top: 0; left: -15px;"></i> ';
                 $temp_console_markup .= '<span class="color '.$this_robot_core_or_none.'" style="filter: brightness(2); text-shadow: none;">'.$this_quote.'</span> ';
-                $temp_console_markup .= '<i class="fa fas fa-quote-right" style="font-size: 80%; filter: brightness(1);"></i>';
+                $temp_console_markup .= '<i class="fa fas fa-quote-right" style="font-size: 80%; filter: brightness(1); position: absolute; top: 0; right: -15px;"></i>';
             $temp_console_markup .= '</div></div>';
         $temp_console_markup .= '</div>';
         $temp_console_markup .= '<p style="text-align: center; font-size: 90%; margin: 5px auto; filter: brightness(1);">';
@@ -852,7 +856,11 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
 
         $temp_console_markup = '';
         $temp_console_markup .= '<p style="text-align: center; margin: 5px auto 10px;">';
-            $temp_console_markup .= '<strong class="ability_type type_'.$player_info['player_type'].'" style="display: inline-block; text-transform: uppercase; padding: 0 30px; margin: 0 auto; filter: brightness(1.3);">You Got A New Ability!</strong>';
+            $temp_console_markup .= '<strong '.
+                'class="ability_type type_'.$player_info['player_type'].'" '.
+                'style="display: inline-block; text-transform: uppercase; padding: 0 30px; margin: 0 auto; filter: brightness(1.3);">'.
+                'You Got A New Ability!'.
+                '</strong>';
         $temp_console_markup .= '</p>';
         $temp_console_markup .= '<p style="text-align: center; margin: 5px auto;">';
             $temp_console_markup .= rpg_type::print_span($player_type, $player_info['player_name']).' unlocked the '.rpg_type::print_span($this_type_token, $this_name).' ability!';
@@ -861,10 +869,13 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
             $temp_console_markup .= 'It\'s '.(!empty($ability_info['ability_type']) && preg_match('/^(a|e|i|o|u)/i', $ability_info['ability_type']) ? 'an ' : 'a ').$temp_console_type_text.' type '.$temp_console_extra_text.'!';
         $temp_console_markup .= '</p>';
         $temp_console_markup .= '<div id="console" style="width: auto; height: auto; font-size: 120%; line-height: 1.6; margin: 10px auto;">';
-            $temp_console_markup .= '<div class="extra"><div class="extra2" style="max-width: 460px; margin: 0 auto;">';
-                $temp_console_markup .= '<i class="fa fas fa-quote-left" style="font-size: 80%; filter: brightness(1);"></i> ';
-                $temp_console_markup .= '<span class="color '.$ability_type_or_none.'" style="filter: brightness('.($ability_type_or_none === 'shadow' ? 3 : 2).'2); text-shadow: none;">'.$this_description.'</span> ';
-                $temp_console_markup .= '<i class="fa fas fa-quote-right" style="font-size: 80%; filter: brightness(1);"></i>';
+            $temp_console_markup .= '<div class="extra"><div class="extra2" style="max-width: 460px; margin: 0 auto; position: relative;">';
+                $temp_console_markup .= '<i class="fa fas fa-quote-left" style="font-size: 80%; filter: brightness(1); position: absolute; top: 0; left: -15px;"></i> ';
+                $temp_span_style = 'text-shadow: none; ';
+                if ($ability_type_or_none === 'shadow'){ $temp_span_style .= 'filter: brightness(3); '; }
+                else { $temp_span_style .= 'filter: brightness(1.5); '; }
+                $temp_console_markup .= '<span class="color '.$ability_type_or_none.'" style="'.$temp_span_style.'">'.$this_description.'</span> ';
+                $temp_console_markup .= '<i class="fa fas fa-quote-right" style="font-size: 80%; filter: brightness(1); position: absolute; top: 0; right: -15px;"></i>';
             $temp_console_markup .= '</div></div>';
         $temp_console_markup .= '</div>';
         $temp_console_markup .= '<p style="text-align: center; font-size: 90%; margin: 5px auto; filter: brightness(1);">';
@@ -1045,17 +1056,21 @@ function mmrpg_game_unlock_item($item_token, $print_options = array()){
         // Print out the parsed event text and the item database markup
         $temp_console_markup = '';
         $temp_console_markup .= '<p style="text-align: center; margin: 5px auto 10px;">';
-            $temp_console_markup .= '<strong class="ability_type type_'.$player_info['player_type'].'" style="display: inline-block; text-transform: uppercase; padding: 0 30px; margin: 0 auto; filter: brightness(1.3);">'.($is_shop_item ? 'You Got A New Shop' : 'You Got A New Item').'!</strong>';
+            $temp_console_markup .= '<strong '.
+                'class="ability_type type_'.$player_info['player_type'].'" '.
+                'style="display: inline-block; text-transform: uppercase; padding: 0 30px; margin: 0 auto; filter: brightness(1.3);">'.
+                ($is_shop_item ? 'You Got A New Shop' : 'You Got A New Item').'!'.
+                '</strong>';
         $temp_console_markup .= '</p>';
         $temp_console_markup .= '<p style="text-align: center; line-height: 2;">';
             $temp_console_markup .= $print_options['positive_word'].' ';
             $temp_console_markup .= str_replace($console_search, $console_replace, $print_options['event_text']);
         $temp_console_markup .= '</p>';
         $temp_console_markup .= '<div id="console" style="width: auto; height: auto; font-size: 120%; line-height: 1.6; margin-top: 5px;">';
-            $temp_console_markup .= '<div class="extra"><div class="extra2" style="max-width: 460px; margin: 0 auto;">';
-                $temp_console_markup .= '<i class="fa fas fa-quote-left" style="font-size: 80%; filter: brightness(1);"></i> ';
+            $temp_console_markup .= '<div class="extra"><div class="extra2" style="max-width: 460px; margin: 0 auto; position: relative;">';
+                $temp_console_markup .= '<i class="fa fas fa-quote-left" style="font-size: 80%; filter: brightness(1); position: absolute; top: 0; left: -15px;"></i> ';
                 $temp_console_markup .= '<span class="color '.$player_type.'" style="filter: brightness(2); text-shadow: none;">'.$this_description.'</span> ';
-                $temp_console_markup .= '<i class="fa fas fa-quote-right" style="font-size: 80%; filter: brightness(1);"></i>';
+                $temp_console_markup .= '<i class="fa fas fa-quote-right" style="font-size: 80%; filter: brightness(1); position: absolute; top: 0; right: -15px;"></i>';
             $temp_console_markup .= '</div></div>';
         $temp_console_markup .= '</div>';
         $temp_console_markup .= '<p style="text-align: center; font-size: 90%; margin-top: 10px; filter: brightness(1);">';
