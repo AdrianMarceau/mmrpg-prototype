@@ -1121,7 +1121,7 @@ function mmrpg_canvas_animate(){
             // Generate a random number
             var shiftChance = Math.floor(Math.random() * 100);
             var thisRandom = Math.floor(Math.random() * 100);
-            console.log('shiftChance =', shiftChance);
+            //console.log('shiftChance =', shiftChance);
             // Default the new frame to base
             var newFrame = 'base';
             var currentFrame = thisRobot.attr('data-frame');
@@ -1863,6 +1863,7 @@ function mmrpg_event(flagsMarkup, dataMarkup, canvasMarkup, consoleMarkup){
 }
 // Define a function for playing the events
 var eventAlreadyQueued = false;
+var battleResultsDisplayed = false;
 function mmrpg_events(){
 
     if (eventAlreadyQueued){ return; }
@@ -1930,8 +1931,10 @@ function mmrpg_events(){
     var battleResult = $('input[name=this_battle_result]', gameEngine).val();
 
     // Check for specific value triggers and execute events
-    if (battleStatus == 'complete'){
+    if (battleStatus == 'complete'
+        && battleResultsDisplayed === false){
         //console.log('checkpoint | battleStatus='+battleStatus+' battleResult='+battleResult);
+        //console.log('thisEvent.event_flags =', thisEvent.event_flags);
 
         // Define the post-results music sequence that's common for both results
         var onCompleteCooldown = function(){
@@ -1940,20 +1943,27 @@ function mmrpg_events(){
             };
 
         // Based on the battle result, play the victory or defeat music
-        if (battleResult == 'victory' && thisEvent.event_flags.victory != undefined && thisEvent.event_flags.victory != false){
+        if (battleResult == 'victory'
+            && typeof thisEvent.event_flags.victory !== 'undefined'
+            && thisEvent.event_flags.victory === true){
             // Play the victory music
             //console.log('mmrpg_events() / Play the victory music');
             parent.mmrpg_music_load('misc/leader-board', true, false);
             setTimeout(function(){ parent.mmrpg_music_volume(0); }, 600);
             setTimeout(function(){ parent.mmrpg_fanfare_load('misc/battle-victory', true, true, true, onCompleteCooldown); }, 900);
             if (mmrpgEvents.length < canvasAnimationCameraDelay){ canvasAnimationCameraTimer = canvasAnimationCameraDelay - mmrpgEvents.length; }
-            } else if (battleResult == 'defeat' && thisEvent.event_flags.defeat != undefined && thisEvent.event_flags.defeat != false){
+            battleResultsDisplayed = true;
+            }
+        if (battleResult == 'defeat'
+            && typeof thisEvent.event_flags.defeat !== 'undefined'
+            && thisEvent.event_flags.defeat === true){
             // Play the failure music
             //console.log('mmrpg_events() / Play the failure music');
             parent.mmrpg_music_load('misc/leader-board', true, false);
             setTimeout(function(){ parent.mmrpg_music_volume(0); }, 600);
             setTimeout(function(){ parent.mmrpg_fanfare_load('misc/battle-defeat', true, true, true, onCompleteCooldown); }, 900);
             if (mmrpgEvents.length < canvasAnimationCameraDelay){ canvasAnimationCameraTimer = canvasAnimationCameraDelay - mmrpgEvents.length; }
+            battleResultsDisplayed = true;
             }
 
         }
@@ -2019,12 +2029,12 @@ function mmrpg_canvas_event(thisMarkup, eventFlags){ //, flagsMarkup
                 // Check to see if camera shift settings were provided in the frame
                 if (typeof eventFlags.sounds !== 'undefined'
                     && eventFlags.sounds !== false){
-                    console.log('we have sound effect(s)!', eventFlags.sounds);
+                    //console.log('we have sound effect(s)!', eventFlags.sounds);
                     for (var i = 0; i < eventFlags.sounds.length; i++){
                         var effectConfig = eventFlags.sounds[i];
                         var effectName = effectConfig.name;
-                        console.log('effectName =', effectName);
-                        console.log('effectConfig =', effectConfig);
+                        //console.log('effectName =', effectName);
+                        //console.log('effectConfig =', effectConfig);
                         if (typeof effectConfig.delay === 'number'){
                             setTimeout(function(){
                                 parent.mmrpg_play_sound_effect(effectName, effectConfig);
@@ -2589,6 +2599,9 @@ gameSettings.soundEffectAliases = {
     'no-effect': 'text',
     // Ability Sound Effects
     'defend': 'dink',
+    'taunt': 'selected',
+    'mecha-taunt': 'land',
+    'boss-taunt': 'dark-moon-stomp',
     'shot': 'shot-a',
     'shot-alt': 'shot-b',
     'shot-alt2': 'shot-2',
