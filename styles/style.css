@@ -1970,6 +1970,7 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     -webkit-box-decoration-break: clone;
     -o-box-decoration-break: clone;
     box-decoration-break: clone;
+    box-shadow: 1px 2px 0 #000000;
 }
 #events #messages div.headline,
 #events #messages p.headline {
