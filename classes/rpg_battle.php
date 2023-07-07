@@ -1518,7 +1518,7 @@ class rpg_battle extends rpg_object {
                         $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
                         $event_options['event_flag_camera_focus'] = $this_robot->robot_position;
                         $event_options['event_flag_sound_effects'] = array(
-                            array('name' => ($this_robot->robot_class !== 'master' ? $this_robot->robot_class.'-' : '').'taunt', 'volume' => 1.5)
+                            array('name' => ($this_robot->robot_class !== 'master' ? $this_robot->robot_class.'-' : '').'taunt-sound', 'volume' => 1.5)
                             );
                         $this_robot->set_frame('taunt');
                         $this->events_create(false, false, '', '', $event_options);
@@ -1826,7 +1826,7 @@ class rpg_battle extends rpg_object {
                         $event_options = array();
                         $event_options['console_show_target'] = false;
                         $event_options['event_flag_sound_effects'] = array(
-                            array('name' => ($this_robot->robot_class !== 'master' ? $this_robot->robot_class.'-' : '').'taunt', 'volume' => 1.5)
+                            array('name' => ($this_robot->robot_class !== 'master' ? $this_robot->robot_class.'-' : '').'taunt-sound', 'volume' => 1.5)
                             );
                         $this_robot->set_frame('taunt');
                         $target_robot->set_frame('base');
@@ -2174,9 +2174,13 @@ class rpg_battle extends rpg_object {
                 $this_robot->trigger_custom_function('rpg-battle_scan-target_before', $extra_objects);
                 $temp_target_robot->trigger_custom_function('rpg-battle_scan-target_before', $extra_objects);
 
+                // Check to see if this is a "new" scan for this player
+                $is_new_scan = false;
+                if (empty($_SESSION['GAME']['values']['robot_database'][$temp_target_robot->robot_token]['robot_scanned'])){ $is_new_scan = true; }
+
                 // Create an event showing the scanned robot's data
                 $event_header = ($temp_target_player->player_token != 'player' ? $temp_target_player->player_name.'&#39;s ' : '').$temp_target_robot->robot_name;
-                if (empty($_SESSION['GAME']['values']['robot_database'][$temp_target_robot->robot_token]['robot_scanned'])){ $event_header .= '  <span class="robot_stat robot_type robot_type_electric" style="font-size: 90%; top: -1px;">New!</span>'; }
+                if ($is_new_scan){ $event_header .= '  <span class="robot_stat robot_type robot_type_electric" style="font-size: 90%; top: -1px;">New!</span>'; }
                 $event_body = '';
                 ob_start();
                 ?>
@@ -2317,7 +2321,7 @@ class rpg_battle extends rpg_object {
 
                 // Ensure the target robot's frame is set to its base
                 $event_options['event_flag_sound_effects'] = array(
-                    array('name' => 'scan-success', 'volume' => 1.6)
+                    array('name' => 'scan-success'.($is_new_scan ? '-new' : ''), 'volume' => 1.6)
                     );
                 $temp_target_robot->set_frame('taunt');
                 $this->events_create(false, false, '', '', $event_options);
