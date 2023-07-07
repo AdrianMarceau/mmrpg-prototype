@@ -1099,8 +1099,8 @@ class rpg_disabled {
                                 // Display the robot reward message markup
                                 if (!mmrpg_prototype_ability_unlocked('', $temp_robot_token, $ability_reward_info['token'])){
                                     $event_header = $ability_info['ability_name'].' Unlocked';
-                                    $event_body = '<span class="robot_name">'.$temp_info['robot_name'].'</span> unlocked new ability data!<br />';
-                                    $event_body .= '<span class="ability_name">'.$ability_info['ability_name'].'</span> can now be used in battle!';
+                                    $event_body = '<span class="robot_name">'.$temp_info['robot_name'].'</span> unlocked a new ability!<br />';
+                                    $event_body .= '<span class="ability_name">'.$temp_ability->print_name().'</span> can now be used in battle!';
                                     $event_options = array();
                                     $event_options['console_show_target'] = false;
                                     $event_options['this_header_float'] = $target_player->player_side;
@@ -1336,7 +1336,7 @@ class rpg_disabled {
                     // Display the robot reward message markup
                     if ($temp_was_unlocked){
                         $event_header = $temp_unlocked_robot->robot_name.' Unlocked';
-                        $event_body = rpg_battle::random_positive_word().' '.$target_player->print_name().' unlocked new robot data!<br />';
+                        $event_body = rpg_battle::random_positive_word().' '.$target_player->print_name().' unlocked a new robot!<br />';
                         $event_body .= $temp_unlocked_robot->print_name().' can now be used in battle!';
                         $event_options = array();
                         $event_options['console_show_target'] = false;
