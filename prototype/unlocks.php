@@ -889,22 +889,24 @@ foreach ($chapter_unlock_players AS $player_key => $player_token){
                 $temp_console_markup .= '<p class="bigtext centertext"><strong class="ability_type ability_type_'.$player_type.'">'.$player_name.'</strong> '.$chapter_unlock_text.' a new chapter!</p>';
                 $temp_console_markup .= '<p class="bigtext centertext">&quot;<strong>'.$chapter_subname.'</strong>&quot;'.(!$chapter_is_intro ? '<br /> is now available!' : '').'</p>';
             $temp_console_markup .= '</div>';
-            if (!$chapter_is_intro){
-                $temp_limit_hearts = mmrpg_prototype_limit_hearts_earned($player_token);
-                $temp_console_markup .= '<div class="ability_type inset_panel" style="margin-top: 5px; padding: 10px;">';
-                    $temp_console_markup .= '<p class="smalltext centertext">The doctor also earned a '.rpg_type::print_span('copy', '<i class="fa fas fa-heart"></i> Limit Heart').' for his progress!</p>';
-                    $temp_console_markup .= '<p class="smalltext centertext">He feels strong enough to bring <strong>'.$temp_limit_hearts.'</strong> robots into battle now!</p>';
-                $temp_console_markup .= '</div>';
-            } else {
-                $letsgo_template_text = $chapter_unlock_config['letsgo_template'];
-                $letsgo_robot_token = $chapter_unlock_config['letsgo_robot']['token'];
-                $letsgo_robot_name = $chapter_unlock_config['letsgo_robot']['name'];
-                $letsgo_text = str_replace('{ROBOT}', ' '.rpg_type::print_span('copy', $letsgo_robot_name).' ', $letsgo_template_text);
-                $temp_console_markup .= '<div class="ability_type inset_panel" style="margin-top: 5px; padding: 10px;">';
-                    $temp_console_markup .= '<span class="sprite sprite_40x40 sprite_40x40_taunt float_left" style="background-image: url(images/players/'.$player_token.'/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span>';
-                    $temp_console_markup .= '<p class="smalltext centertext">'.$letsgo_text.'</p>';
-                    $temp_console_markup .= '<span class="sprite sprite_40x40 sprite_40x40_defend float_right" style="background-image: url(images/robots/'.$letsgo_robot_token.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span>';
-                $temp_console_markup .= '</div>';
+            if (!$chapter_is_bonus){
+                if (!$chapter_is_intro){
+                    $temp_limit_hearts = mmrpg_prototype_limit_hearts_earned($player_token);
+                    $temp_console_markup .= '<div class="ability_type inset_panel" style="margin-top: 5px; padding: 10px;">';
+                        $temp_console_markup .= '<p class="smalltext centertext">The doctor also earned a '.rpg_type::print_span('copy', '<i class="fa fas fa-heart"></i> Limit Heart').' for his progress!</p>';
+                        $temp_console_markup .= '<p class="smalltext centertext">He feels strong enough to bring <strong>'.$temp_limit_hearts.'</strong> robots into battle now!</p>';
+                    $temp_console_markup .= '</div>';
+                } else {
+                    $letsgo_template_text = $chapter_unlock_config['letsgo_template'];
+                    $letsgo_robot_token = $chapter_unlock_config['letsgo_robot']['token'];
+                    $letsgo_robot_name = $chapter_unlock_config['letsgo_robot']['name'];
+                    $letsgo_text = str_replace('{ROBOT}', ' '.rpg_type::print_span('copy', $letsgo_robot_name).' ', $letsgo_template_text);
+                    $temp_console_markup .= '<div class="ability_type inset_panel" style="margin-top: 5px; padding: 10px;">';
+                        $temp_console_markup .= '<span class="sprite sprite_40x40 sprite_40x40_taunt float_left" style="background-image: url(images/players/'.$player_token.'/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span>';
+                        $temp_console_markup .= '<p class="smalltext centertext">'.$letsgo_text.'</p>';
+                        $temp_console_markup .= '<span class="sprite sprite_40x40 sprite_40x40_defend float_right" style="background-image: url(images/robots/'.$letsgo_robot_token.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span>';
+                    $temp_console_markup .= '</div>';
+                }
             }
             array_unshift($_SESSION[$session_token]['EVENTS'], array(
                 'canvas_markup' => $temp_canvas_markup,
@@ -924,7 +926,7 @@ if ($unlock_flag_wily){
     if (empty($temp_game_flags['events'][$temp_event_flag])){
         $temp_game_flags['events'][$temp_event_flag] = true;
         $temp_canvas_markup = '';
-        $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/wily-castle/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+        $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/wily-castle/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto; filter: blur(1px) brightness(0.8);"></div>';
         $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/wily-castle/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
         $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/players/dr-wily/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 20px; left: calc(50% - 20px); transform: scale(1.5) translate(-50%, 0); transform-origin: bottom right;"></div>';
         $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_taunt" style="background-image: url(images/robots/bass/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: calc(50% + 20px); transform: scale(1) translate(-50%, 0); transform-origin: bottom left; filter: brightness(0.9);"></div>';
