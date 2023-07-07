@@ -3100,7 +3100,7 @@ class rpg_ability extends rpg_object {
                 $target_options['prevent_default_text'] = true;
             }
             $target_options['event_flag_sound_effects'] = array(
-                array('name' => 'shot-alt', 'volume' => 1.5)
+                array('name' => 'shot-sound-alt', 'volume' => 1.5)
                 );
             $this_ability->target_options_update(array(
                 'frame' => 'shoot',
@@ -3226,9 +3226,9 @@ class rpg_ability extends rpg_object {
             // Target this robot's self
             $target_options = array();
             $target_options['event_flag_sound_effects'] = array(
-                array('name' => 'charge', 'volume' => 1.2),
-                array('name' => 'charge', 'volume' => 1.4, 'delay' => 100),
-                array('name' => 'charge', 'volume' => 1.6, 'delay' => 300)
+                array('name' => 'charge-sound', 'volume' => 1.2),
+                array('name' => 'charge-sound', 'volume' => 1.4, 'delay' => 100),
+                array('name' => 'charge-sound', 'volume' => 1.6, 'delay' => 300)
                 );
             $this_ability->target_options_update(array(
                 'frame' => 'defend',
@@ -3253,7 +3253,7 @@ class rpg_ability extends rpg_object {
             // Update this ability's target options and trigger
             $target_options = array();
             $target_options['event_flag_sound_effects'] = array(
-                array('name' => 'blast', 'volume' => 1.5)
+                array('name' => 'blast-sound', 'volume' => 1.5)
                 );
             $this_ability->target_options_update(array(
                 'frame' => 'shoot',
@@ -3358,7 +3358,7 @@ class rpg_ability extends rpg_object {
         // Target the opposing robot
         $target_options = array();
         $target_options['event_flag_sound_effects'] = array(
-            array('name' => 'summon', 'volume' => 1.5)
+            array('name' => 'hyper-summon-sound', 'volume' => 1.5)
             );
         $this_ability->target_options_update(array(
             'kickback' => array(-5, 0, 0),
@@ -3406,7 +3406,7 @@ class rpg_ability extends rpg_object {
         // prepare the ability options
         $trigger_options = array();
         $trigger_options['event_flag_sound_effects'] = array(
-            array('name' => 'blast', 'volume' => 1.5)
+            array('name' => 'blast-sound', 'volume' => 1.5)
             );
         $this_ability->damage_options_update(array(
             'kind' => 'energy',
