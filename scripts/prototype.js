@@ -48,6 +48,7 @@ $(document).ready(function(){
 
             // Define a quick local function for routing sound effect plays to the parent
             function playSoundEffect(soundName, options){
+                if ($(this).is('.option_disabled')){ return; }
                 if ($(this).data('silentClick')){ return; }
                 parent.mmrpg_play_sound_effect(soundName, options);
                 };
@@ -84,9 +85,11 @@ $(document).ready(function(){
 
             // Add hover and click sounds to the chapter select buttons
             $('.menu .chapter_select .chapter_link', thisContext).live('mouseenter', function(){
+                if ($(this).is('.chapter_link_disabled')){ return; }
                 playSoundEffect.call(this, 'link-hover', {volume: 0.5});
                 });
             $('.menu .chapter_select .chapter_link', thisContext).live('click', function(){
+                if ($(this).is('.chapter_link_disabled')){ return; }
                 playSoundEffect.call(this, 'link-click');
                 });
 
@@ -114,15 +117,12 @@ $(document).ready(function(){
 
             // Add hover and click sounds to the robot select buttons
             $('.menu .option_this-robot-select', thisContext).live('mouseenter', function(){
-                if ($(this).is('.option_disabled')){ return; }
                 playSoundEffect.call(this, 'link-hover', {volume: 0.5});
                 });
             $('.menu .option_this-robot-select', thisContext).live('click', function(){
-                if ($(this).is('.option_disabled')){ return; }
                 playSoundEffect.call(this, 'link-click-robot');
                 });
             $('.menu .option_this-team-select', thisContext).live('click', function(){
-                if ($(this).is('.option_disabled')){ return; }
                 playSoundEffect.call(this, 'lets-go-robots');
                 });
 
@@ -244,7 +244,7 @@ $(document).ready(function(){
             var thisParentStep = thisParentMenu.attr('data-step');
             var thisParentSelect = thisParentMenu.attr('data-select');
 
-            console.log('thisParentStep = '+thisParentStep+' | thisParentSelect = '+thisParentSelect+' | ');
+            //console.log('thisParentStep = '+thisParentStep+' | thisParentSelect = '+thisParentSelect+' | ');
 
             // Trigger an ajax call for the appropriate markup
             $.ajax({
@@ -1392,8 +1392,8 @@ function prototype_menu_switch(switchOptions){
                         success: function(markup, status){
 
                             // DEBUG
-                            console.log('AJAX RETURN :');
-                            console.log({markup:markup,status:status});
+                            //console.log('AJAX RETURN :');
+                            //console.log({markup:markup,status:status});
 
                             // If the markup is not empty, replace this menu's options
                             if (markup.length){
@@ -1486,14 +1486,14 @@ function prototype_menu_switch(switchOptions){
                                     // MAYBE TODO? AUTO-CLICK WHEN ONLY ONE ROBOT?
                                     // If this was a robot select loading, auto-click through if only one robot
                                     if (currentMenuSelect == 'this_player_robots'){
-                                        console.log('auto-click robot option?');
+                                        //console.log('auto-click robot option?');
                                         // Check to see which one should be displayed first and autoclick it
                                         var $availableRobots = $('.option[data-token][data-child="true"]', tempMenuWrapper);
                                         var $confirmButton = $('.option[data-token][data-parent="true"]', tempMenuWrapper);
                                         var numRobotsAvailable = $availableRobots.length;
-                                        console.log('numRobotsAvailable =', numRobotsAvailable);
+                                        //console.log('numRobotsAvailable =', numRobotsAvailable);
                                         if (numRobotsAvailable === 1){
-                                            console.log('Only one robot! AUTO CLICK IT!');
+                                            //console.log('Only one robot! AUTO CLICK IT!');
                                             $availableRobots.first().triggerSilentClick();
                                             $confirmButton.triggerSilentClick();
                                             }
