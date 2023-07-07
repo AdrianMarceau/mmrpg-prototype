@@ -345,7 +345,7 @@ if ($battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 // UNLOCK PLAYER : DR. WILY
 
 // If Dr. Light has completed phase1 of his battles, unlock Dr. Wily
-if ($battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT && !$unlock_flag_wily){
+if (!$unlock_flag_wily && mmrpg_prototype_complete('dr-light')){
 
     // Unlock Dr. Wily as a playable character
     $unlock_player_info = $mmrpg_index_players['dr-wily'];
@@ -460,7 +460,7 @@ if ($battle_complete_counter_wily >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 // UNLOCK PLAYER : DR. COSSACK
 
 // If Dr. Light has completed phase1 of his battles, unlock Dr. Cossack
-if ($battle_complete_counter_wily >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT && !$unlock_flag_cossack){
+if (!$unlock_flag_cossack && mmrpg_prototype_complete('dr-wily')){
 
     // Unlock Dr. Cossack as a playable character
     $unlock_player_info = $mmrpg_index_players['dr-cossack'];
