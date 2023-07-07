@@ -2009,10 +2009,6 @@ class rpg_canvas {
                     $this_results_data['canvas_offset_z'] = ceil($this_robot_data['canvas_offset_z'] - 20);
                     $temp_size_diff = $this_robot_data['robot_size'] > 80 ? ceil(($this_robot_data['robot_size'] - 80) * 0.5) : 0;
                     $this_results_data['canvas_offset_x'] += $temp_size_diff;
-                    if ($this_robot_data['robot_position'] == 'bench' && $this_robot_data['robot_size'] > 80){
-                        //$this_results_data['canvas_offset_x'] += ceil($this_robot_data['robot_size'] / 2);
-                        $this_results_data['canvas_offset_x'] += ($this_robot_data['robot_size'] - 40);
-                    }
 
 
                     // Define the style and class variables for these results
