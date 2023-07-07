@@ -1834,7 +1834,7 @@ function printStatusMessage(messageStatus, messageText, onCompleteFunction){
                 }
             if (configOptions.loopStart !== false
                 && configOptions.loopEnd !== false){
-                var milliFrame = Math.ceil(1000 / 60);
+                var milliFrame = Math.ceil(1000 / 24);
                 var introStart = 0;
                 var introDuration = configOptions.loopStart - (milliFrame * 10);
                 var loopStart = configOptions.loopStart + (milliFrame * 2);
@@ -1893,29 +1893,30 @@ function printStatusMessage(messageStatus, messageText, onCompleteFunction){
             var index = audioCurrentlyPlaying.indexOf(audioID);
             if (index > -1){ audioCurrentlyPlaying.splice(index, 1); }
             };
-        function updateCurrentlyPlaying(){
-            if (!audioCurrentlyPlaying.length){ return; }
-            for (var i = 0; i < audioCurrentlyPlaying.length; i++){
+        function updateCurrentlyPlaying() {
+            if (!audioCurrentlyPlaying.length) { return; }
+            for (var i = 0; i < audioCurrentlyPlaying.length; i++) {
                 var audioID = audioCurrentlyPlaying[i];
                 var audioObject = getAudioObject(audioID);
                 var $audioPlayer = $audioPlayers.filter('[data-audio-id="' + audioID + '"]');
                 var $timerWidget = $('.widget.timer', $audioPlayer);
-                if ($timerWidget.length){
+                if ($timerWidget.length) {
                     var audioPosition = audioObject.seek();
                     var audioDuration = audioObject.duration();
-                    // convert the position to a 0:00:00 format
+                    // convert the position to a 00:00:00 format (mm:ss:ff) [w/ ff@24]
                     var minutes = Math.floor(audioPosition / 60);
                     var seconds = Math.floor(audioPosition - minutes * 60);
-                    var frames = Math.round((audioPosition - Math.floor(audioPosition)) * 60);
+                    var frames = Math.round((audioPosition - Math.floor(audioPosition)) * 24);
                     var audioPositionText = (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds + ':' + (frames < 10 ? '0' : '') + frames;
-                    // convert the duration to a 0:00 format
+                    // convert the duration to a 00:00:00 format (mm:ss:ff)
                     var minutes = Math.floor(audioDuration / 60);
                     var seconds = Math.floor(audioDuration - minutes * 60);
-                    var audioDurationText = (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+                    var frames = Math.round((audioDuration - Math.floor(audioDuration)) * 24);
+                    var audioDurationText = (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds + ':' + (frames < 10 ? '0' : '') + frames;
                     // Update the timer widget
                     var newMarkup = '/';
-                    newMarkup = '<span class="current">'+audioPositionText+'</span>' + newMarkup;
-                    newMarkup = newMarkup + '<span class="total">'+audioDurationText+'</span>';
+                    newMarkup = '<span class="current">' + audioPositionText + '</span>' + newMarkup;
+                    newMarkup = newMarkup + '<span class="total">' + audioDurationText + '</span>';
                     $timerWidget.html(newMarkup);
                 }
             }
@@ -1923,6 +1924,7 @@ function printStatusMessage(messageStatus, messageText, onCompleteFunction){
             requestAnimationFrame(updateCurrentlyPlaying);
         }
         requestAnimationFrame(updateCurrentlyPlaying);
+
 
 
         // This function will be responsible for figuring out which button was clicked
@@ -2065,7 +2067,7 @@ function printStatusMessage(messageStatus, messageText, onCompleteFunction){
             $audioPlayer.append('<span class="button play" data-audio-control="play"><i class="fa fas fa-play-circle"></i></span>');
             $audioPlayer.append('<span class="button pause" data-audio-control="pause"><i class="fa fas fa-pause-circle"></i></span>');
             $audioPlayer.append('<span class="button stop" data-audio-control="stop"><i class="fa fas fa-stop-circle"></i></span>');
-            $audioPlayer.append('<span class="widget timer"><span class="current">'+(preloadMeta ? '0:00' : '')+'</span>/<span class="total">'+(preloadMeta ? '0:00' : '')+'</span></span>');
+            $audioPlayer.append('<span class="widget timer"><span class="current">'+(preloadMeta ? '00:00:00' : '')+'</span>/<span class="total">'+(preloadMeta ? '00:00:00' : '')+'</span></span>');
             $audioPlayer.append('<span class="widget state"><i class="fa fas fa-music"></i></span>');
 
             // Define a little onComplete function for when an audio file finishes loading

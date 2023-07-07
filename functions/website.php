@@ -1834,7 +1834,7 @@ function convert_to_milliseconds($minutes = 0, $seconds = 0, $frames = 0){
     $minutes = (int) $minutes;
     $seconds = (int) $seconds;
     $frames = (int) $frames;
-    return (($minutes * 60 + $seconds) * 1000) + ($frames * 1000 / 60);
+    return (($minutes * 60 + $seconds) * 1000) + ($frames * 1000 / 24);
 }
 
 // Define a function for converting milliseconds to a string
@@ -1843,7 +1843,7 @@ function convert_from_milliseconds($totalMilliseconds = 0) {
     $minutes = floor($totalMilliseconds / 60000);
     $totalMilliseconds %= 60000;
     $seconds = floor($totalMilliseconds / 1000);
-    $frames = round(($totalMilliseconds % 1000) * 60 / 1000);
+    $frames = round(($totalMilliseconds % 1000) * 24 / 1000);
     return array('minutes' => $minutes, 'seconds' => $seconds, 'frames' => $frames);
 }
 
