@@ -1005,11 +1005,11 @@ class rpg_battle extends rpg_object {
             // Loop through any ability rewards for this battle
             $this_ability_rewards = !empty($this->battle_rewards['abilities']) ? $this->battle_rewards['abilities'] : array();
             if (!empty($this_ability_rewards) && empty($_SESSION['GAME']['DEMO'])){
-                $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+                $temp_abilities_index = rpg_ability::get_index(true);
                 foreach ($this_ability_rewards AS $ability_reward_key => $ability_reward_info){
 
                     // Collect the ability info from the index
-                    $ability_info = rpg_ability::parse_index_info($temp_abilities_index[$ability_reward_info['token']]);
+                    $ability_info = $temp_abilities_index[$ability_reward_info['token']];
                     // Create the temporary robot object for event creation
                     $temp_ability = rpg_game::get_ability($this, $this_player, $this_robot, $ability_info);
 
@@ -1039,8 +1039,8 @@ class rpg_battle extends rpg_object {
 
                     // Display the robot reward message markup
                     $event_header = $ability_info['ability_name'].' Unlocked';
-                    $event_body = rpg_battle::random_positive_word().' <span class="player_name">'.$this_player_info['player_name'].'</span> unlocked new ability data!<br />';
-                    $event_body .= '<span class="ability_name">'.$ability_info['ability_name'].'</span> can now be used in battle!';
+                    $event_body = rpg_battle::random_positive_word().' <span class="player_name">'.$this_player_info['player_name'].'</span> unlocked a new ability!<br />';
+                    $event_body .= ''.$temp_ability->print_name().' can now be used in battle!';
                     $event_options = array();
                     $event_options['console_show_target'] = false;
                     $event_options['this_header_float'] = $this_player->player_side;
@@ -1056,6 +1056,9 @@ class rpg_battle extends rpg_object {
                     $event_options['event_flag_camera_focus'] = 'active';
                     $event_options['event_flag_camera_depth'] = 0;
                     $event_options['event_flag_camera_offset'] = 0;
+                    $event_options['event_flag_sound_effects'] = array(
+                        array('name' => 'get-big-item', 'volume' => 1.5)
+                        );
                     $this_player->player_frame = 'victory';
                     $this_player->update_session();
                     $temp_ability->ability_frame = 'base';
@@ -1514,6 +1517,9 @@ class rpg_battle extends rpg_object {
                         $event_options['event_flag_camera_action'] = true;
                         $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
                         $event_options['event_flag_camera_focus'] = $this_robot->robot_position;
+                        $event_options['event_flag_sound_effects'] = array(
+                            array('name' => ($this_robot->robot_class !== 'master' ? $this_robot->robot_class.'-' : '').'taunt', 'volume' => 1.5)
+                            );
                         $this_robot->set_frame('taunt');
                         $this->events_create(false, false, '', '', $event_options);
                     }
@@ -1817,9 +1823,14 @@ class rpg_battle extends rpg_object {
                         $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : '').$this_robot->print_name().' taunts the opponent!<br />';
                         $event_body .= $this_robot->print_quote('battle_taunt', $this_find, $this_replace);
                         //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
+                        $event_options = array();
+                        $event_options['console_show_target'] = false;
+                        $event_options['event_flag_sound_effects'] = array(
+                            array('name' => ($this_robot->robot_class !== 'master' ? $this_robot->robot_class.'-' : '').'taunt', 'volume' => 1.5)
+                            );
                         $this_robot->set_frame('taunt');
                         $target_robot->set_frame('base');
-                        $this->events_create($this_robot, $target_robot, $event_header, $event_body, array('console_show_target' => false));
+                        $this->events_create($this_robot, $target_robot, $event_header, $event_body, $event_options);
                         $this_robot->set_frame('base');
                         // Create the quote flag to ensure robots don't repeat themselves
                         $this_robot->set_flag('robot_quotes', 'battle_taunt', true);
