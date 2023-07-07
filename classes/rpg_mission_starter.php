@@ -211,17 +211,14 @@ class rpg_mission_starter extends rpg_mission {
             $rescue_robot_frame = array(8,0,8,0,0);
             $rescue_robot_position = array('x' => 354, 'y' => 118, 'direction' => 'left');
             if ($this_rescue_token === 'roll'){
-                $rescue_robot_level += 0;
                 $rescue_robot_frame = array(10, 10, 8, 10, 10, 0, 10, 10, 8, 0, 8, 8);
                 $rescue_robot_position = array('x' => 192, 'y' => 128, 'direction' => 'left');
             }
             elseif ($this_rescue_token === 'disco'){
-                $rescue_robot_level += 10;
                 $rescue_robot_frame = array(0,1,2,1,2,10);
                 $rescue_robot_position = array('x' => 120, 'y' => 161, 'direction' => 'left');
             }
             elseif ($this_rescue_token === 'rhythm'){
-                $rescue_robot_level += 20;
                 $rescue_robot_frame = array(0,6,2,6,2,10);
                 $rescue_robot_position = array('x' => 212, 'y' => 173, 'direction' => 'left');
             }
