@@ -452,7 +452,7 @@ function mmrpg_battle_fadein_foreground(animateCanvas, animateDuration, onComple
     // Play the sound effect if we haven't already and we're allowed
     if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
         setTimeout(function(){
-            parent.mmrpg_play_sound_effect('foreground-spawn', {volume: 1.5});
+            parent.mmrpg_play_sound_effect('foreground-spawn', {volume: 1.0});
             }, Math.ceil(animateDuration / 3));
         }
     // Collect the foreground canvas and event elements
