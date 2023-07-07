@@ -245,15 +245,25 @@ $mmrpg_music_rootdir = MMRPG_CONFIG_CDN_ROOTDIR.$mmrpg_music_path;
 $mmrpg_music_rooturl = MMRPG_CONFIG_CDN_ROOTURL.$mmrpg_music_path;
 
 // Collect the sound effects index from the file and then output to the JS
-$this_sound_effects_path = $mmrpg_music_rootdir.'misc/sound-effects-mmgb/';
-$this_sound_effects_index = file_exists($this_sound_effects_path.'sprite.json') ? json_decode(file_get_contents($this_sound_effects_path.'sprite.json'), true) : array();
-if (!empty($this_sound_effects_index['sprite'])){
-    $this_sound_effects_index['sprite'] = array_map(function($info){
-        $info['start'] = ceil($info['start'] * 1000);
-        $info['end'] = ceil($info['end'] * 1000);
-        $info['duration'] = $info['end'] - $info['start'];
-        return $info;
-    }, $this_sound_effects_index['sprite']);
+$this_sound_effects_path = $mmrpg_music_rootdir.'misc/sound-effects-curated/';
+$this_sound_effects_index = array();
+$this_sound_effects_index_raw = file_exists($this_sound_effects_path.'audio.json') ? json_decode(file_get_contents($this_sound_effects_path.'audio.json'), true) : array();
+if (!empty($this_sound_effects_index_raw['resources'])
+    && !empty($this_sound_effects_index_raw['spritemap'])){
+    $this_sound_effects_index['src'] = array();
+    $this_sound_effects_index['sprite'] = array();
+    foreach ($this_sound_effects_index_raw['resources'] AS $key => $resource){
+        if (!preg_match('/\.(ogg|mp3)$/i', $resource)){ continue; }
+        $source = 'misc/'.$resource.'?'.MMRPG_CONFIG_CACHE_DATE;
+        $this_sound_effects_index['src'][] = $source;
+    }
+    foreach ($this_sound_effects_index_raw['spritemap'] AS $token => $spritemap){
+        $sprite = array();
+        $sprite['start'] = ceil($spritemap['start'] * 1000);
+        $sprite['end'] = ceil($spritemap['end'] * 1000);
+        $sprite['duration'] = $sprite['end'] - $sprite['start'];
+        $this_sound_effects_index['sprite'][$token] = $sprite;
+    }
 }
 
 //error_log('$this_sound_effects_index ='.print_r($this_sound_effects_index, true));

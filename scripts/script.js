@@ -1303,9 +1303,9 @@ function mmrpg_canvas_robot_frame(thisRobot, newFrame){
             if (newFrame === 'defend' || newFrame === 'taunt'){
                 if (thisPosition === 'bench'){
                     var delay = 100 + (thisKey + 50);
-                    setTimeout(function(){ parent.mmrpg_play_sound_effect('defend', {volume: 0.1}); }, delay);
+                    setTimeout(function(){ parent.mmrpg_play_sound_effect('defend-sound', {volume: 0.1}); }, delay);
                     } else {
-                    parent.mmrpg_play_sound_effect('defend', {volume: 0.1});
+                    parent.mmrpg_play_sound_effect('defend-sound', {volume: 0.1});
                     }
                 }
             }
@@ -2550,65 +2550,82 @@ gameSettings.soundEffectSprites = {};
 // Define a list of sound effect aliases we can use in the code to abstract a bit
 gameSettings.soundEffectAliases = {
     // Game Start
-    'game-start': 'selected',
+    'game-start': 'selected_mmv-gb',
     // Menu Sound Effects
-    'link-hover': 'cursor-2',
-    'link-click': 'pause-2',
-    'link-click-special': 'get-beat',
-    'link-click-robot': 'land-3',
-    'back-hover': 'cursor-3',
-    'back-click': 'transform',
-    'back-click-loading': 'giant-suzy-bounce',
-    'lets-go': 'selected',
-    'lets-go-robots': 'beam-out-2',
-    'text': 'text',
-    'event': 'enker-absorb',
+    'link-hover': 'cursor_mmii-gb',
+    'link-click': 'pause_mmv-gb',
+    'link-click-special': 'get-beat_mmv-gb',
+    'link-click-robot': 'land_mmv-gb',
+    'back-hover': 'cursor_mmv-gb',
+    'back-click': 'transform_mmv-gb',
+    'back-click-loading': 'giant-suzy-bounce_mmv-gb',
+    'lets-go': 'selected_mmv-gb',
+    'lets-go-robots': 'beam-out_mmv-gb',
+    'text': 'text_mmv-gb',
+    'event': 'enker-absorb_mmi-gb',
     // Battle Sound Effects
-    'teleport-in': 'land-3',
-    'switch-in': 'pause',
-    'mecha-teleport-in': 'beam-in',
-    'mecha-switch-in': 'land',
-    'boss-teleport-in': 'ladder-press',
-    'boss-switch-in': 'floor-break',
-    'background-spawn': 'yoku-3',
-    'foreground-spawn': 'shutter-3',
-    'victory-result': 'enker-absorb',
-    'failure-result': 'dark-moon-stomp',
-    'exit-mission': 'beam-out-2',
-    'damage': 'hurt-3',
-    'damage-critical': 'enemy-hit-3',
-    'damage-reduced': 'hurt-2',
-    'damage-hindered': 'dink-2',
-    'damage-stats': 'wily-star-missile',
-    'recovery-energy': 'password-okay',
-    'recovery-weapons': 'refill-3',
-    'recovery-stats': 'terra-freeze',
-    'destroyed': 'dead',
-    'get-item': 'one-up-2',
-    'get-big-item': 'get-beat',
-    'experience-points': 'refill-3',
-    'level-up': 'password-okay-2',
-    'stat-bonus': 'password-okay',
-    'star-collected': 'wpn-get-iii',
-    'shards-fusing': 'wily-fortress-appear',
-    'marker-destroyed': 'dark-moon-stomp',
-    'field-boost': 'wily-escape-iv-a',
-    'field-break': 'wily-escape-iii-b',
-    'scan-start': 'ring-boomerang',
-    'scan-success': 'pause-2',
-    'no-effect': 'text',
+    'teleport-in': 'land_mmv-gb',
+    'switch-in': 'pause_mmi-gb',
+    'mecha-teleport-in': 'beam-in_mmv-gb',
+    'mecha-switch-in': 'land_mmi-gb',
+    'boss-teleport-in': 'ladder-press_mmv-gb',
+    'boss-switch-in': 'floor-break_mmv-gb',
+    'background-spawn': 'yoku_mmv-gb',
+    'foreground-spawn': 'shutter_mmv-gb',
+    'victory-result': 'enker-absorb_mmi-gb',
+    'failure-result': 'dark-moon-stomp_mmv-gb',
+    'exit-mission': 'beam-out_mmii-gb',
+    'damage': 'hurt_mmv-gb',
+    'damage-reverb': 'small-boom-b_mmv-gb',
+    'damage-critical': 'enemy-hit_mmv-gb',
+    'damage-reduced': 'hurt_mmii-gb',
+    'damage-hindered': 'dink_mmii-gb',
+    'damage-stats': 'wily-star-missile_mmv-gb',
+    'recovery-energy': 'password-okay_mmi-gb',
+    'recovery-weapons': 'refill_mmv-gb',
+    'recovery-stats': 'terra-freeze_mmv-gb',
+    'destroyed': 'dead_mmi-gb',
+    'get-item': 'one-up_mmv-gb',
+    'get-big-item': 'get-beat_mmv-gb',
+    'get-weird-item': 'weapon-get_mmi-gb',
+    'experience-points': 'refill_mmv-gb',
+    'level-up': 'password-okay_mmv-gb',
+    'stat-bonus': 'password-okay_mmi-gb',
+    'star-collected': 'wpn-get-iii_mmv-gb',
+    'shards-fusing': 'wily-fortress-appear_mmv-gb',
+    'marker-destroyed': 'dark-moon-stomp_mmv-gb',
+    'field-boost': 'wily-escape-iv-a_mmv-gb',
+    'field-break': 'wily-escape-iii-b_mmv-gb',
+    'scan-start': 'ring-boomerang_mmv-gb',
+    'scan-success': 'land_mmv-gb',
+    'scan-success-new': 'pause_mmii-gb',
+    'defend-sound': 'dink_mmi-gb',
+    'taunt-sound': 'selected_mmv-gb',
+    'mecha-taunt-sound': 'land_mmi-gb',
+    'boss-taunt-sound': 'dark-moon-stomp_mmv-gb',
+    'no-effect': 'text_mmv-gb',
     // Ability Sound Effects
-    'defend': 'dink',
-    'taunt': 'selected',
-    'mecha-taunt': 'land',
-    'boss-taunt': 'dark-moon-stomp',
-    'shot': 'shot-a',
-    'shot-alt': 'shot-b',
-    'shot-alt2': 'shot-2',
-    'charge': 'charge',
-    'slide': 'charge-kick',
-    'summon': 'pharoah-shot-a',
-    'blast': 'mid-scene-mega-shoot',
+    'shot-sound': 'shot-a_mmv-gb',
+    'shot-sound-alt': 'shot-b_mmv-gb',
+    'shot-sound-alt2': 'shot_mmii-gb',
+    'charge-sound': 'charge_mmxi-gb',
+    'suck-sound': 'charge_mmv-gb',
+    'swing-sound': 'pharoah-shot-b_mmv-gb',
+    'slide-sound': 'charge-kick_mmv-gb',
+    'summon-sound': 'pharoah-shot-a_mmv-gb',
+    'blast-sound': 'mid-scene-mega-shoot_mmv-gb',
+    'full-screen-woosh': 'wily-fortress-appear_mmv-gb',
+    'full-screen-down': 'wily-escape-iii-b_mmv-gb',
+    'hyper-charge-sound': 'charge_mmxi-gb',
+    'hyper-slide-slide': 'charge-kick_mmv-gb',
+    'hyper-summon-sound': 'pharoah-shot-a_mmv-gb',
+    'hyper-blast-sound': 'mid-scene-mega-shoot_mmv-gb',
+    'buff-received': 'selected_mmv-gb',
+    'debuff-received': 'dark-moon-stomp_mmv-gb',
+    'small-buff-received': 'pause-open_mmii-gb',
+    'small-debuff-received': 'wily-waggle_mmv-gb',
+    'raise-it-up': 'floor-break_mmv-gb',
+    'smack-it-down': 'punk-dig_mmv-gb'
     };
 function mmrpg_play_sound_effect(effectName, effectConfig){
     //console.log('mmrpg_play_sound_effect(effectName:', effectName, 'effectConfig:', effectConfig, ')');
@@ -2670,6 +2687,9 @@ function mmrpg_play_sound_effect(effectName, effectConfig){
     // Replace the effect name if we're using an alias at the moment
     if (typeof gameSettings.soundEffectAliases[effectName] !== 'undefined'){
         effectName = gameSettings.soundEffectAliases[effectName];
+        //console.log('alias triggered // new effectName =', effectName);
+        } else {
+        //console.log('using RAW name // effectName =', effectName);
         }
 
     // Play the sound when ready using a function that checks load status
