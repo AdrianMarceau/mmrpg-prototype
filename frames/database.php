@@ -831,7 +831,7 @@ $(document).ready(function(){
 
     // -- SOUND EFFECT FUNCTIONALITY -- //
 
-    // Define some interaction sound effects for the items menu
+    // Define some interaction sound effects for the database menu
     var thisContext = $('#database');
     if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
 
@@ -844,7 +844,7 @@ $(document).ready(function(){
             };
 
 
-        // DATABASE ICON LINKS
+        // DATABASE PAGE LINKS
 
         // Add hover and click sounds to the buttons in the game-pages menu
         $('#canvas #robot_games .game_link', thisContext).live('mouseenter', function(){
@@ -857,6 +857,8 @@ $(document).ready(function(){
             if ($(this).is('.game_link_disabled')){ return; }
             playSoundEffect.call(this, 'link-click', {volume: 1.0});
             });
+
+        // DATABASE ICON LINKS
 
         // Add hover and click sounds to the buttons in the main menu
         $('#canvas .wrapper_robots .sprite_robot', thisContext).live('mouseenter', function(){

@@ -32,7 +32,7 @@ $(document).ready(function(){
         // ITEM INVENTORY LINKS
 
         // Add hover and click sounds to the buttons in the main menu
-        $('#console .event .item_name[data-click-tooltip],', thisContext).live('mouseenter', function(){
+        $('#console .event .item_name[data-click-tooltip]', thisContext).live('mouseenter', function(){
             playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
             });
         /*
