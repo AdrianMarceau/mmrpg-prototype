@@ -495,6 +495,45 @@
 #shop #console .event .field_name:hover {
     display: block;
 }
+
+#shop #console .event .item_name,
+#shop #console .event .ability_name,
+#shop #console .event .robot_name,
+#shop #console .event .field_name,
+#shop #console .event .buy_button,
+#shop #console .event .sell_button,
+#shop #console .event .confirm_button,
+#shop #console .event .cancel_button,
+#shop #console .event .player_button,
+#shop #console .event .item_quantity_mods a {
+    cursor: pointer;
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    transform: scale(1);
+    transform-origin: center;
+    transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+}
+#shop #console .event .item_name,
+#shop #console .event .ability_name,
+#shop #console .event .robot_name,
+#shop #console .event .field_name {
+    transform-origin: left;
+}
+
+#shop #console .event .item_name:hover,
+#shop #console .event .ability_name:hover,
+#shop #console .event .robot_name:hover,
+#shop #console .event .field_name:hover,
+#shop #console .event .buy_button:hover,
+#shop #console .event .sell_button:hover,
+#shop #console .event .confirm_button:hover,
+#shop #console .event .cancel_button:hover,
+#shop #console .event .player_button:hover,
+#shop #console .event .item_quantity_mods a:hover {
+    border-color: #ffffff !important;
+    transform: scale(1.1);
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+}
+
 #shop #console .event .item_cell_confirm .item_name {
     float: right;
     margin-right: 30px;
