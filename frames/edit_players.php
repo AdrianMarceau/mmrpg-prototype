@@ -467,7 +467,7 @@ if (true){
 
     <span class="header block_1 header_types type_<?= defined('MMRPG_SETTINGS_REMOTE_FIELDTYPE') ? MMRPG_SETTINGS_REMOTE_FIELDTYPE : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
         <span class="count">
-            <i class="fa fas fa-user"></i>
+            <i class="fa fas fa-user-circle"></i>
             Player <?= $global_allow_editing ? 'Editor' : 'Viewer' ?>
             <span class="progress">(<?= $allowed_edit_player_count == 1 ? '1 Player' : $allowed_edit_player_count.' Players' ?>)</span>
         </span>

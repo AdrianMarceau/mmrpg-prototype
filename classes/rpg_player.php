@@ -3117,8 +3117,13 @@ class rpg_player extends rpg_object {
         // DEBUG
         //echo(print_r($player_field_rewards, true));
 
+            // Check to see which size this player container should be based on unlocks
+            $event_container_size = 1;
+            if (mmrpg_prototype_item_unlocked('wily-program')){ $event_container_size++; }
+            if (mmrpg_prototype_item_unlocked('cossack-program')){ $event_container_size++; }
+
             ?>
-            <div class="event event_double event_<?= $player_key == $first_player_token ? 'visible' : 'hidden' ?>" data-token="<?=$player_info['player_token'].'_'.$player_info['player_token']?>">
+            <div class="event event_double event_<?= $player_key == $first_player_token ? 'visible' : 'hidden' ?>" data-token="<?=$player_info['player_token'].'_'.$player_info['player_token']?>" data-size="<?= $event_container_size ?>">
 
                 <div class="this_sprite sprite_left" style="top: 4px; left: 4px; width: 36px; height: 36px; background-image: url(images/fields/<?= $player_info['player_field'] ?>/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center center; border: 1px solid #1A1A1A;">
                     <? $temp_margin = -1 * ceil(($player_info['player_image_size'] - 40) * 0.5); ?>
@@ -3507,9 +3512,9 @@ class rpg_player extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td class="right" style="padding-top: 4px;">
-                                        <label class="field_header">Players Fields :
+                                        <label class="field_header">Mission Customizer :
                                             <span style="font-size: 80%; color: #969696; position: relative; bottom: 1px;">
-                                            (Used in Chapter 2 + 4 mission generation. Also influence online Player Battle appearances.)
+                                            (Used in Chapter 2 + 4 of the player's campaign. Also influences Player Battles.)
                                             </span></label>
                                         <div class="field_container" style="height: auto;">
                                         <?
