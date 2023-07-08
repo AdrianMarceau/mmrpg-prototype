@@ -21,6 +21,11 @@ function generate_prototype_complete_message($player_token){
     $player_info['player_battles_failure_total'] = mmrpg_prototype_battles_failure($player_token, false);
     $player_info['player_robots_count'] = 0;
     $player_info['player_abilities_count'] = mmrpg_prototype_abilities_unlocked($player_token);
+    $player_info['player_field_stars'] = mmrpg_prototype_stars_unlocked($player_token, 'field');
+    $player_info['player_fusion_stars'] = mmrpg_prototype_stars_unlocked($player_token, 'fusion');
+    $player_info['battle_turns_player_total'] = !empty($_SESSION[$session_token]['counters']['battle_turns_'.$player_info['player_token'].'_total']) ? $_SESSION[$session_token]['counters']['battle_turns_'.$player_info['player_token'].'_total'] : 0;
+    $player_info['battle_turns_total'] = !empty($_SESSION[$session_token]['counters']['battle_turns_total']) ? $_SESSION[$session_token]['counters']['battle_turns_total'] : 0;
+
 
     // Define the player's experience points total and collect other robot details for display
     $player_info['player_experience'] = 0;
@@ -69,7 +74,7 @@ function generate_prototype_complete_message($player_token){
     <div class="database_container database_robot_container">
         <div class="subbody event event_double event_visible" style="margin: 0 !important; ">
             <h2 class="header header_left player_type player_type_<?= $player_info['player_type'] ?>" style="margin-right: 0; margin-left: 0; ">
-                <?= $player_info['player_name'] ?>&#39;s Records <div class="header_core robot_type" style="border-color: rgba(0, 0, 0, 0.2) !important; background-color: rgba(0, 0, 0, 0.2) !important;"><?= ucfirst($player_info['player_type']) ?> Type</div>
+                <?= $player_info['player_name'] ?>&#39;s Records
             </h2>
             <div class="body body_left" style="margin-left: 0; margin-right: 0; margin-bottom: 5px; padding: 2px 0; min-height: auto; font-size: 10px; min-height: 90px; ">
                 <table class="full" style="margin: 5px auto -2px;">
@@ -123,6 +128,24 @@ function generate_prototype_complete_message($player_token){
                                 <span class="player_stat player_type player_type_<?= !empty($player_info['player_battles_failure_total']) ? 'attack' : 'none' ?>"><?= $player_info['player_battles_failure_total'] ?> Defeats</span>
                             </td>
                         </tr>
+                        <tr>
+                            <td  class="right">
+                                <label style="display: block; float: left;">Total Turns :</label>
+                                <span class="player_stat player_type player_type_<?= !empty($player_info['battle_turns_player_total']) ? 'cutter' : 'none' ?>" title="<?= $player_info['battle_turns_player_total'].' of '.$player_info['battle_turns_total'].' Turns Overall' ?>"><?= $player_info['battle_turns_player_total'] == 1 ? '1 Turn' : $player_info['battle_turns_player_total'].' Turns'  ?></span>
+                            </td>
+                            <td class="center">&nbsp;</td>
+                            <td  class="right">
+                                <? if(!empty($player_info['player_field_stars'])
+                                    || !empty($player_info['player_fusion_stars'])): ?>
+                                    <label style="display: block; float: left;">Stars Collected :</label>
+                                    <? $total_stars_collected = $player_info['player_field_stars'] + $player_info['player_fusion_stars']; ?>
+                                    <span class="player_stat player_type player_type_cutter" title="<?= 'Field x'.$player_info['player_field_stars'].' | Fusion x'.$player_info['player_fusion_stars'] ?>"><?= $total_stars_collected.' '.($total_stars_collected == 1 ? 'Star' : 'Stars') ?></span>
+                                <? else: ?>
+                                    <label style="display: block; float: left; opacity: 0.5; filter: alpha(opacity=50); ">??? :</label>
+                                    <span class="player_stat player_type player_type_empty" style=" opacity: 0.5; filter: alpha(opacity=50); ">0</span>
+                                <? endif; ?>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -142,9 +165,9 @@ function generate_prototype_complete_message($player_token){
     $temp_user_name = !empty($_SESSION[$session_token]['USER']['displayname']) ? $_SESSION[$session_token]['USER']['displayname'] : $_SESSION[$session_token]['USER']['username'];
     $temp_user_colour = !empty($_SESSION[$session_token]['USER']['colourtoken']) ? $_SESSION[$session_token]['USER']['colourtoken'] : $player_info['player_type'];
     if (!empty($_SESSION[$session_token]['USER']['colourtoken2'])){ $temp_user_colour .= '_'.$_SESSION[$session_token]['USER']['colourtoken2']; }
-    if ($player_token === 'dr-light'){ $temp_icon_code = '<span class="sprite achievement_icon achievement_dr-light-complete" style="display: inline-block; position: relative; bottom: 6px;" title="Light Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>'; }
-    elseif ($player_token === 'dr-wily'){ $temp_icon_code = '<span class="sprite achievement_icon achievement_dr-wily-complete" style="display: inline-block; position: relative; bottom: 6px;" title="Wily Campaign Complete!" data-tooltip-type="player_type player_type_attack">&clubs;</span>'; }
-    elseif ($player_token === 'dr-cossack'){ $temp_icon_code = '<span class="sprite achievement_icon achievement_dr-cossack-complete" style="display: inline-block; position: relative; bottom: 6px;" title="Cossack Campaign Complete!" data-tooltip-type="player_type player_type_speed">&diams;</span>'; }
+    if ($player_token === 'dr-light'){ $temp_icon_code = '<span class="sprite achievement_icon achievement_dr-light-complete" style="display: inline-block; position: relative; bottom: 4px;" data-click-tooltip="Light Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>'; }
+    elseif ($player_token === 'dr-wily'){ $temp_icon_code = '<span class="sprite achievement_icon achievement_dr-wily-complete" style="display: inline-block; position: relative; bottom: 4px;" data-click-tooltip="Wily Campaign Complete!" data-tooltip-type="player_type player_type_attack">&clubs;</span>'; }
+    elseif ($player_token === 'dr-cossack'){ $temp_icon_code = '<span class="sprite achievement_icon achievement_dr-cossack-complete" style="display: inline-block; position: relative; bottom: 4px;" data-click-tooltip="Cossack Campaign Complete!" data-tooltip-type="player_type player_type_speed">&diams;</span>'; }
     $temp_console_markup = '';
     $temp_console_markup .= '<p><strong class="ability_type ability_type_'.$temp_user_colour.'">Congratulations, '.$temp_user_name.'!</strong>  You\'ve completed the <strong>Mega Man RPG Prototype</strong> as <strong>'.$player_info['player_name'].'</strong> and his robots! '.rpg_battle::random_victory_quote().'! Your completion records are as follows:</p>';
     $temp_console_markup .= '<div id="console" style="width: auto; height: auto;"><div class="extra"><div class="extra2">'.preg_replace('/\s+/', ' ', $temp_player_records).'</div></div></div>';
@@ -197,10 +220,10 @@ function generate_prototype_postgame_message($player_token){
 
     // Generate the markup for bonus chapters unlocks
     $temp_bonus_chapter_markup = array();
-    $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_speed">Mission Randomizer</strong> chapter offers exactly what you\'d expect given the name. These missions are perfect for trying out new strategies or grinding for cores!</p>';
+    $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_speed">Mission Randomizer</strong> chapter lets you to refight past foes in unlikey pairings. These missions are perfect for trying out new strategies or grinding for cores!</p>';
     if (mmrpg_prototype_item_unlocked('light-program')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_attack">Player Battles</strong> chapter contains missions against the ghost-data of other users from the leaderboard. These missions are great for grinding lots of zenny!</p>'; }
     if (mmrpg_prototype_item_unlocked('cossack-program')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_defense">Star Fields</strong> chapter locates and displays any Field Star or Fusion Star missions that you\'ve yet to complete.  Collecting stars helps your robots grow stronger!</p>'; }
-    if (mmrpg_prototype_item_unlocked('wily-program')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_energy">Challenge Mode</strong> chapter offers a collection of unique missions designed by the MMRPG staff. These are hard but have great rewards! Try the Endless Attack Mode!</p>'; }
+    if (mmrpg_prototype_item_unlocked('wily-program')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_energy">Challenge Mode</strong> chapter offers a collection of unique missions designed by the MMRPG staff. These are hard but have great rewards! <span style="font-size: 70%;position: relative;bottom: 4px;left: 2px;">(Try the Endless Attack Mode!)</span></p>'; }
 
     // Generate the canvas markup with the player standing with and their team of robots
     $temp_console_markup = '';
@@ -1026,6 +1049,9 @@ if (true){
         ));
 }
 */
+
+// Manually define event priority so it's easier to sort stuff
+$event_priority = array();
 
 // Re-sort the events to make sure they are in player order
 if (isset($_SESSION[$session_token]['EVENTS']) && is_array($_SESSION[$session_token]['EVENTS'])){
