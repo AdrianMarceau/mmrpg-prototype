@@ -189,7 +189,6 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
         // Recalculate zenny and turns for this fortress mission
         rpg_mission_fortress::prepare($temp_rival_option, $this_prototype_data);
-        //rpg_mission::calculate_mission_zenny_and_turns($temp_rival_option, $this_prototype_data, $mmrpg_robots_index);
 
         // Add the omega battle to the battle options
         $this_prototype_data['battle_options'][] = $temp_rival_option;
@@ -289,7 +288,6 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $temp_final_option['battle_level'] = $this_prototype_data['this_chapter_levels'][4];
             $temp_final_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
             rpg_mission_fortress::prepare($temp_final_option, $this_prototype_data);
-            //rpg_mission::calculate_mission_zenny_and_turns($temp_final_option, $this_prototype_data, $mmrpg_robots_index);
             $this_prototype_data['battle_options'][] = $temp_final_option;
             rpg_battle::update_index_info($temp_final_option['battle_token'], $temp_final_option);
 
@@ -306,7 +304,6 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $temp_final_option['battle_level'] = $this_prototype_data['this_chapter_levels'][4];
             $temp_final_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
             rpg_mission_fortress::prepare($temp_final_option, $this_prototype_data);
-            //rpg_mission::calculate_mission_zenny_and_turns($temp_final_option, $this_prototype_data, $mmrpg_robots_index);
             $this_prototype_data['battle_options'][] = $temp_final_option;
             rpg_battle::update_index_info($temp_final_option['battle_token'], $temp_final_option);
 
@@ -383,7 +380,6 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             shuffle($temp_final_option['battle_target_player']['player_robots']);
             //die('<pre>'.print_r($temp_final_option, true).'</pre>');
             rpg_mission_fortress::prepare($temp_final_option, $this_prototype_data);
-            //rpg_mission::calculate_mission_zenny_and_turns($temp_final_option, $this_prototype_data, $mmrpg_robots_index);
             $this_prototype_data['battle_options'][] = $temp_final_option;
             rpg_battle::update_index_info($temp_final_option['battle_token'], $temp_final_option);
 
