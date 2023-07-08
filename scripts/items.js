@@ -14,6 +14,37 @@ $(document).ready(function(){
     thisWindow = $(window);
     thisItem = $('#item', thisBody);
 
+    // -- SOUND EFFECT FUNCTIONALITY -- //
+
+    // Define some interaction sound effects for the items menu
+    var thisContext = $('#item');
+    if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+
+        // Define a quick local function for routing sound effect plays to the parent
+        function playSoundEffect(soundName, options){
+            if ($(this).is('.button_disabled')){ return; }
+            if ($(this).data('silentClick')){ return; }
+            console.log('trying to play sound effect');
+            top.mmrpg_play_sound_effect(soundName, options);
+            };
+
+
+        // ITEM INVENTORY LINKS
+
+        // Add hover and click sounds to the buttons in the main menu
+        $('#console .event .item_name[data-click-tooltip],', thisContext).live('mouseenter', function(){
+            playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
+            });
+        /*
+        $('#console .event .item_name[data-click-tooltip]', thisContext).live('click', function(){
+            // [tooltip takes care of this one]
+            });
+        */
+
+        }
+
+    // -- PRIMARY SCRIPT FUNCTIONALITY -- //
+
     // Attach tab events to any item tabs so that we can switch between selling/buying
     $('.item_tabs_links .tab_link[data-tab]', gameConsole).live('click', function(e){
         e.preventDefault();
