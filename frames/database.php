@@ -829,10 +829,49 @@ $(document).ready(function(){
     thisPrototype = $('#prototype', thisBody);
     thisWindow = $(window);
 
-    //alert('I, the database, have a wap setting of '+(gameSettings.wapFlag ? 'true' : 'false')+'?! and my body has a class of '+$('body').attr('class')+'!');
+    // -- SOUND EFFECT FUNCTIONALITY -- //
 
-    // Start playing the appropriate stage music
-    //top.mmrpg_music_load('misc/data-base');
+    // Define some interaction sound effects for the items menu
+    var thisContext = $('#database');
+    if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+
+        // Define a quick local function for routing sound effect plays to the parent
+        function playSoundEffect(soundName, options){
+            if ($(this).is('.button_disabled')){ return; }
+            if ($(this).data('silentClick')){ return; }
+            console.log('trying to play sound effect');
+            top.mmrpg_play_sound_effect(soundName, options);
+            };
+
+
+        // DATABASE ICON LINKS
+
+        // Add hover and click sounds to the buttons in the game-pages menu
+        $('#canvas #robot_games .game_link', thisContext).live('mouseenter', function(){
+            console.log('hovering over database game page');
+            if ($(this).is('.game_link_disabled')){ return; }
+            playSoundEffect.call(this, 'link-hover', {volume: 0.5});
+            });
+        $('#canvas #robot_games .game_link', thisContext).live('click', function(){
+            console.log('clicking database game page');
+            if ($(this).is('.game_link_disabled')){ return; }
+            playSoundEffect.call(this, 'link-click', {volume: 1.0});
+            });
+
+        // Add hover and click sounds to the buttons in the main menu
+        $('#canvas .wrapper_robots .sprite_robot', thisContext).live('mouseenter', function(){
+            console.log('hovering over database robot icon');
+            playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
+            });
+        $('#canvas .wrapper_robots .sprite_robot', thisContext).live('click', function(){
+            console.log('clicking database robot icon');
+            if ($(this).is('[data-token-locked]')){ return; }
+            playSoundEffect.call(this, 'icon-click', {volume: 1.0});
+            });
+
+        }
+
+    // -- PRIMARY SCRIPT FUNCTIONALITY -- //
 
     // Fade in the leaderboard screen slowly
     thisBody.waitForImages(function(){
@@ -925,7 +964,7 @@ $(document).ready(function(){
             var firstVisibleSprite = $('.sprite[data-token][data-game='+dataGame+']', gameCanvas).first();
             }
         //console.log(firstVisibleSprite.text());
-        firstVisibleSprite.trigger('click');
+        firstVisibleSprite.triggerSilentClick();
         // Update the session variable with the current page link number
         $.post('scripts/script.php',{requestType:'session',requestData:'battle_settings,current_database_page_key,'+dataGame});
         // Return true on succes
@@ -934,7 +973,7 @@ $(document).ready(function(){
     // Click the first game link, whatever it is
     if ($('.game_link_active[data-game]', gameCanvas).length){ var tempFirstLink = $('.game_link_active[data-game]', gameCanvas); }
     else { var tempFirstLink = $('.game_link[data-game]', gameCanvas).first(); }
-    tempFirstLink.trigger('click');
+    tempFirstLink.triggerSilentClick();
 
     // Create the click event for the back button
     $('a.back', gameCanvas).click(function(e){
