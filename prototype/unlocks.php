@@ -937,7 +937,8 @@ foreach ($chapter_unlock_players AS $player_key => $player_token){
             array_push($_SESSION[$session_token]['EVENTS'], array(
                 'canvas_markup' => $temp_canvas_markup,
                 'console_markup' => $temp_console_markup,
-                'player_token' => $player_token
+                'player_token' => $player_token,
+                'event_type' => 'new-chapter'
                 ));
         }
     }
