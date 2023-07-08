@@ -24,7 +24,7 @@ $(document).ready(function(){
         function playSoundEffect(soundName, options){
             if ($(this).is('.button_disabled')){ return; }
             if ($(this).data('silentClick')){ return; }
-            console.log('trying to play sound effect');
+            //console.log('trying to play sound effect');
             top.mmrpg_play_sound_effect(soundName, options);
             };
 

@@ -2654,7 +2654,7 @@ gameSettings.soundEffectAliases = {
     'full-screen-woosh': 'wily-fortress-appear_mmv-gb',
     'full-screen-down': 'wily-escape-iii-b_mmv-gb',
     'hyper-charge-sound': 'charge_mmxi-gb',
-    'hyper-slide-slide': 'charge-kick_mmv-gb',
+    'hyper-slide-sound': 'charge-kick_mmv-gb',
     'hyper-summon-sound': 'pharoah-shot-a_mmv-gb',
     'hyper-blast-sound': 'mid-scene-mega-shoot_mmv-gb',
     'buff-received': 'selected_mmv-gb',

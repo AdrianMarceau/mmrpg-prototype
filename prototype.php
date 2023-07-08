@@ -481,7 +481,7 @@ foreach ($this_menu_tooltips AS $token => $text){
                 <? if (mmrpg_prototype_battles_complete('dr-light') >= MMRPG_SETTINGS_CHAPTER1_MISSIONS): ?>
                     <span class="pipe">|</span>
                     <a class="link link_players" data-step="edit_players" data-index="<?= $this_menu_indexes['players'] ?>" data-source="frames/edit_players.php?action=players" data-music="misc/player-editor" data-maybe-tooltip="<?= $this_menu_tooltips['players'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-                        <i class="fa fas fa-user"></i>
+                        <i class="fa fas fa-user-circle"></i>
                         <label><?= mmrpg_prototype_players_unlocked() > 1 ? 'players' : 'player' ?></label>
                     </a>
                 <? endif; ?>
