@@ -2613,7 +2613,9 @@ gameSettings.soundEffectAliases = {
     'suck-sound': 'charge_mmv-gb',
     'swing-sound': 'pharoah-shot-b_mmv-gb',
     'slide-sound': 'charge-kick_mmv-gb',
-    'summon-sound': 'pharoah-shot-a_mmv-gb',
+    'summon-sound': 'yoku_mmv-gb',
+    'summon-positive': 'wily-escape-iv-a_mmv-gb',
+    'summon-negative': 'wily-escape-iii-b_mmv-gb',
     'blast-sound': 'mid-scene-mega-shoot_mmv-gb',
     'full-screen-woosh': 'wily-fortress-appear_mmv-gb',
     'full-screen-down': 'wily-escape-iii-b_mmv-gb',
@@ -2625,8 +2627,8 @@ gameSettings.soundEffectAliases = {
     'debuff-received': 'dark-moon-stomp_mmv-gb',
     'small-buff-received': 'pause-open_mmii-gb',
     'small-debuff-received': 'wily-waggle_mmv-gb',
-    'raise-it-up': 'floor-break_mmv-gb',
-    'smack-it-down': 'punk-dig_mmv-gb'
+    'upward-impact': 'floor-break_mmv-gb',
+    'downward-impact': 'punk-dig_mmv-gb'
     };
 function mmrpg_play_sound_effect(effectName, effectConfig){
     //console.log('mmrpg_play_sound_effect(effectName:', effectName, 'effectConfig:', effectConfig, ')');
