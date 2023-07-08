@@ -78,7 +78,7 @@ $(document).ready(function(){
 
     // -- SOUND EFFECT FUNCTIONALITY -- //
 
-    // Define some interaction sound effects for the prototype main menu
+    // Define some interaction sound effects for the battle menu
     var thisContext = $('#battle');
     if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
 

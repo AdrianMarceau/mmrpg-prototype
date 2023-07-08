@@ -179,6 +179,9 @@ $(document).ready(function(){
                 //$('.tooltip', mmrpgBody).css({width:toolwidth+'px'});
                 alignTooltipFunction.call(this, e);
                 tooltipShowing = true;
+                if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
+                    top.mmrpg_play_sound_effect('tooltip-text');
+                    }
                 };
 
             // Define the function for positioning the tooltip
@@ -201,6 +204,7 @@ $(document).ready(function(){
 
                 };
 
+            /*
             // Define the live MOUSEENTER events for any elements with a title tag (which should be many)
             var tooltipSelector = '*[title],*[data-backup-title]:not([data-click-tooltip]),*[data-tooltip]';
             $(tooltipSelector, mmrpgBody).live('mouseenter', function(e){
@@ -221,6 +225,7 @@ $(document).ready(function(){
                         }
                     }
                 });
+            */
 
             // Define the live CLICK events for any elements with a click-title tag (which should be a few)
             var tooltipSelector = '*[data-click-tooltip]';
@@ -239,6 +244,9 @@ $(document).ready(function(){
                         requestAnimationFrame(function(){
                             tooltipShowing = true;
                             showTooltipFunction.call(thisObject, e);
+                            if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
+                                top.mmrpg_play_sound_effect('tooltip-open');
+                                }
                             });
                         }
                     }
@@ -2579,10 +2587,14 @@ gameSettings.soundEffectAliases = {
     'back-hover': 'cursor_mmv-gb',
     'back-click': 'transform_mmv-gb',
     'back-click-loading': 'giant-suzy-bounce_mmv-gb',
+    'icon-hover': 'dink_mmi-gb',
+    'icon-click': 'pause_mmv-gb',
     'lets-go': 'selected_mmv-gb',
     'lets-go-robots': 'beam-out_mmv-gb',
     'text-sound': 'text_mmv-gb',
     'event-sound': 'get-beat_mmv-gb',
+    'tooltip-open': 'refill_mmii-gb',
+    'tooltip-text': 'atomic-fire-charge-b_mmi-gb',
     // Battle Sound Effects
     'teleport-in': 'land_mmv-gb',
     'switch-in': 'pause_mmi-gb',
@@ -2767,8 +2779,10 @@ function windowEventsPull(){
                 //console.log('creating event');
                 var eventsMarkup = response.data.events;
                 var messagesMarkup = response.data.messages;
-                windowEventCreate(eventsMarkup, messagesMarkup, false);
-                windowEventDisplay();
+                if (eventsMarkup.length && messagesMarkup.length){
+                    windowEventCreate(eventsMarkup, messagesMarkup, false);
+                    windowEventDisplay();
+                    }
                 }
             }
         });
