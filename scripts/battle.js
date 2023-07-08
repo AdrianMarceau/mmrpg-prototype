@@ -74,6 +74,45 @@ $(document).ready(function(){
             });
         }
 
+
+
+    // -- SOUND EFFECT FUNCTIONALITY -- //
+
+    // Define some interaction sound effects for the prototype main menu
+    var thisContext = $('#battle');
+    if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+
+        // Define a quick local function for routing sound effect plays to the parent
+        function playSoundEffect(soundName, options){
+            if ($(this).is('.button_disabled')){ return; }
+            if ($(this).data('silentClick')){ return; }
+            parent.mmrpg_play_sound_effect(soundName, options);
+            };
+
+
+        // MENU LINKS
+
+        // Add hover and click sounds to the buttons in the main menu
+        $('#actions .main_actions .button', thisContext).live('mouseenter', function(){
+            playSoundEffect.call(this, 'link-hover', {volume: 0.5});
+            });
+        $('#actions .main_actions .button', thisContext).live('click', function(){
+            playSoundEffect.call(this, 'link-click', {volume: 1.0});
+            });
+
+        // Add hover and click sounds to any buttons in the sub menu
+        $('#actions .sub_actions .button', thisContext).live('mouseenter', function(){
+            if ($(this).is('.action_back')){ playSoundEffect.call(this, 'back-hover', {volume: 0.5}); }
+            else { playSoundEffect.call(this, 'link-hover', {volume: 0.5}); }
+            });
+        $('#actions .sub_actions .button', thisContext).live('click', function(){
+            if ($(this).is('.action_back')){ playSoundEffect.call(this, 'back-click'); }
+            else { playSoundEffect.call(this, 'link-click', {volume: 1.0}); }
+            });
+
+        }
+
+
     // Collect a reference to the continue button
     var actionContinue = $('.action_continue', gameActions);
 
