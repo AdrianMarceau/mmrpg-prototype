@@ -161,7 +161,9 @@ if (empty($this_player_robots)){
             // Push this error message into the event queue
             array_push($_SESSION[$session_token]['EVENTS'], array(
                 'canvas_markup' => $temp_canvas_markup,
-                'console_markup' => $temp_console_markup
+                'console_markup' => $temp_console_markup,
+                'player_token' => !empty($this_player_token) ? $this_player_token : 'player',
+                'event_type' => 'critical-issue'
                 ));
         }
 

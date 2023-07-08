@@ -53,6 +53,13 @@ class rpg_canvas {
             $this_data['canvas_offset_x'] += ($this_data['canvas_offset_x'] * 0.20);
             $this_data['canvas_offset_y'] += ($this_data['canvas_offset_y'] * 0.10);
 
+            // If there's a field hazard in the active position, let's move the doctor out of the way
+            $has_active_field_harzard = false;
+            $static_attachment_key = $this_player->player_side.'-active';
+            if (!empty($this_player->battle->battle_attachments[$static_attachment_key])){ $has_active_field_harzard = true; }
+            if ($has_active_field_harzard){ $this_data['canvas_offset_x'] -= ($this_data['canvas_offset_x'] * 0.22); }
+            // TODO convert this to a 'backwards offset' that is relative to the doctor's emotions about the battle's progress
+
             $this_data['player_sprite_size'] = ceil($this_data['player_scale'] * $this_data['player_sprite_zoom_size']);
             $this_data['player_sprite_width'] = ceil($this_data['player_scale'] * $this_data['player_sprite_zoom_size']);
             $this_data['player_sprite_height'] = ceil($this_data['player_scale'] * $this_data['player_sprite_zoom_size']);

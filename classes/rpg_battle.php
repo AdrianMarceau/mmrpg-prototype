@@ -2728,7 +2728,7 @@ class rpg_battle extends rpg_object {
             && !empty($eventinfo['event_header'])
             && !empty($eventinfo['event_body'])
             ){
-            $event_flags['sounds'][] = array('name' => 'text', 'volume' => 1.5);
+            $event_flags['sounds'][] = array('name' => 'text-sound', 'volume' => 1.5);
         }
         if (empty($event_flags['sounds'])){ $event_flags['sounds'] = false; }
 

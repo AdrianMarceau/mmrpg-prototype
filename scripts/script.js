@@ -35,6 +35,7 @@ gameSettings.eventCameraShift = true; // whether or not to canvas events have ca
 gameSettings.eventSoundEffects = true; // whether or not to use sound effects for battle events
 gameSettings.eventHooks = []; // default to empty but may be filled at runtime and used later
 gameSettings.spriteRenderMode = 'default'; // the render mode we should be using for sprites
+gameSettings.gameHasStarted = false; // default to false so we can only set to true when ready
 gameSettings.idleAnimation = true; // default to allow idle animations
 gameSettings.indexLoaded = false; // default to false until the index is loaded
 gameSettings.currentGameState = {}; // default to empty but may be filled at runtime and used later
@@ -47,6 +48,7 @@ gameSettings.currentBodyHeight = 0; // collect the current window width and upda
 gameSettings.allowEditing = true; // default to true to allow all editing unless otherwise stated
 gameSettings.audioBaseHref = ''; // the base href where audio comes from (empty if same as baseHref)
 gameSettings.customIndex = {}; // default to empty but may be filled at runtime and used later
+gameSettings.onGameStart = []; // define an array to hold  events that have to wait until game start
 
 // Define an object to hold change events for settings when/if they happen
 var gameSettingsChangeEvents = {};
@@ -105,6 +107,13 @@ $(document).ready(function(){
     // Check if iPhone or iPad detected
     gameSettings.wapFlagIphone = (navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)) ? true : false;
     gameSettings.wapFlagIpad = navigator.userAgent.match(/iPad/i) ? true : false;
+
+    // If this window is running as a child, we need to ask the parent
+    if (window.self !== window.top
+        && typeof window.top.gameSettings !== 'undefined'
+        && typeof window.top.gameSettings.gameHasStarted !== 'undefined'){
+        gameSettings.gameHasStarted = window.top.gameSettings.gameHasStarted;
+    }
 
 
     /*
@@ -356,11 +365,21 @@ $(document).ready(function(){
                 if (gameSettings.indexLoaded){
                     if ($('iframe', gameWindow).hasClass('loading')){ $('iframe', gameWindow).css({opacity:0}).removeClass('loading').animate({opacity:1}, 1000, 'swing'); } // DEBUG
                     if (gameMusic.hasClass('onload')){
+                        // THIS is the GAME START button
                         gameMusic.removeClass('onload');
                         gameMusic.find('.start').remove();
                         mmrpg_music_toggle();
+                        gameSettings.gameHasStarted = true;
                         mmrpg_play_sound_effect('game-start');
+                        if (gameSettings.onGameStart.length){
+                            //console.log('gameSettings.onGameStart =', gameSettings.onGameStart);
+                            while (gameSettings.onGameStart.length){
+                                var onGameStart = gameSettings.onGameStart.shift();
+                                if (typeof onGameStart === 'function'){ onGameStart.call(); }
+                                }
+                            }
                         } else {
+                        // THIS is just a simple MUSIC TOGGLE
                         mmrpg_music_toggle();
                         }
                     return true;
@@ -2562,8 +2581,8 @@ gameSettings.soundEffectAliases = {
     'back-click-loading': 'giant-suzy-bounce_mmv-gb',
     'lets-go': 'selected_mmv-gb',
     'lets-go-robots': 'beam-out_mmv-gb',
-    'text': 'text_mmv-gb',
-    'event': 'enker-absorb_mmi-gb',
+    'text-sound': 'text_mmv-gb',
+    'event-sound': 'get-beat_mmv-gb',
     // Battle Sound Effects
     'teleport-in': 'land_mmv-gb',
     'switch-in': 'pause_mmi-gb',
@@ -2714,16 +2733,63 @@ function mmrpg_play_sound_effect(effectName, effectConfig){
 }
 
 
+// Define a function for queueing something for when the game has started
+function mmrpg_queue_for_game_start(onGameStart){
+    gameSettings.onGameStart.push(onGameStart);
+    if (!gameSettings.gameHasStarted){ return; }
+    while (gameSettings.onGameStart.length){
+        var onGameStart = gameSettings.onGameStart.shift();
+        onGameStart.call();
+        }
+}
+
+
 // -- POPUP WINDOW EVENT FUNCTIONS -- //
+
+// Define a function that checks the server for any event popups to display
+function windowEventsPull(){
+    //console.log('windowEventsPull()');
+    // Do not pull events if we're currently in a sub-menu iframe
+    var $mmrpg = $('#mmrpg');
+    var $prototype = $('#prototype');
+    if (!$mmrpg.length || $mmrpg.is('.iframe')){ return -1; }
+    else if ($mmrpg.is('.iframe')){ return -2; }
+    else if (!$prototype.length){ return -3; }
+    // Otherwise we can pull events from the server and display them
+    $.ajax({
+        url: 'scripts/get-events.php',
+        dataType: 'json',
+        success: function(response){
+            //console.log('scripts/get-events.php returned ', response);
+            if (typeof response.data !== 'undefined'
+                && typeof response.data.events !== 'undefined'
+                && typeof response.data.messages !== 'undefined'){
+                //console.log('creating event');
+                var eventsMarkup = response.data.events;
+                var messagesMarkup = response.data.messages;
+                windowEventCreate(eventsMarkup, messagesMarkup, false);
+                windowEventDisplay();
+                }
+            }
+        });
+}
 
 // Define a function for displaying event messages to the player
 gameSettings.canvasMarkupArray = [];
 gameSettings.messagesMarkupArray = [];
-function windowEventCreate(canvasMarkupArray, messagesMarkupArray){
+function windowEventCreate(canvasMarkupArray, messagesMarkupArray, autoDisplay){
     //console.log('windowEventCreate('+canvasMarkupArray+', '+messagesMarkupArray+')');
+    if (typeof autoDisplay !== 'boolean'){ autoDisplay = true; }
     gameSettings.canvasMarkupArray = canvasMarkupArray;
     gameSettings.messagesMarkupArray = messagesMarkupArray;
-    windowEventDisplay();
+    if (autoDisplay){
+        if (!gameSettings.gameHasStarted){
+            gameSettings.onGameStart.push(function(){ setTimeout(windowEventDisplay, 1000); });
+            }
+        else {
+            windowEventDisplay();
+            }
+        }
 }
 
 // Define a function for displaying event messages to the player
@@ -2756,9 +2822,12 @@ function windowEventDisplay(){
 
         // Define a click event for the event window continue button
         var eventContinue = $('#buttons .event_continue', $eventContainer);
-        eventContinue.click(function(e){
+        eventContinue.bind('click', function(e){
             e.preventDefault();
             //alert('clicked');
+            if (typeof window.top.mmrpg_play_sound_effect !== 'undefined'){
+                window.top.mmrpg_play_sound_effect('link-click');
+                }
             windowEventDestroy();
             if (gameSettings.canvasMarkupArray.length || gameSettings.messagesMarkupArray.length){
                 windowEventDisplay();
@@ -2778,6 +2847,12 @@ function windowEventDisplay(){
     $eventContainer.css({opacity:0}).removeClass('hidden').animate({opacity:1},300,'swing');
     $('#messages', $eventContainer).perfectScrollbar(thisScrollbarSettings);
     $(window).focus();
+
+    // Play the appropriate sound effect
+    if (typeof window.top.mmrpg_play_sound_effect !== 'undefined'){
+        //console.log('play sound effect');
+        window.top.mmrpg_play_sound_effect('event-sound');
+        }
 
 }
 

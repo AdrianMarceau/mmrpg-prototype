@@ -471,6 +471,15 @@ $(document).ready(function(){
                             });
                         });
 
+                    // Make sure we always poll the server for popup events after our action
+                    //console.log('queuing the windowEventsPull event (via shop)');
+                    if (typeof window.top.mmrpg_queue_for_game_start !== 'undefined'){
+                        window.top.mmrpg_queue_for_game_start(function(){
+                            //console.log('i guess the game has started');
+                            setTimeout(function(){ parent.windowEventsPull(); }, 1000);
+                            });
+                        }
+
                     return true;
 
                     } else {

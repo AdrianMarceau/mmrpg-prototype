@@ -457,7 +457,8 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
         $_SESSION[$session_token]['EVENTS'][] = array(
             'canvas_markup' => $temp_canvas_markup,
             'console_markup' => $temp_console_markup,
-            'player_token' => $this_player_token
+            'player_token' => $this_player_token,
+            'event_type' => 'new-robot'
             );
 
     }
@@ -885,7 +886,9 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
         $_SESSION[$session_token]['EVENTS'][] = array(
             'canvas_markup' => preg_replace('/\s+/', ' ', $temp_canvas_markup),
             'console_markup' => $temp_console_markup,
-            'player_token' => $this_player_token
+            'player_token' => $this_player_token,
+            'event_type' => 'new-ability',
+            'event_sort' => $ability_info['ability_energy']
             );
 
     }
@@ -1082,7 +1085,8 @@ function mmrpg_game_unlock_item($item_token, $print_options = array()){
         $_SESSION[$session_token]['EVENTS'][] = array(
             'canvas_markup' => preg_replace('/\s+/', ' ', $temp_canvas_markup),
             'console_markup' => $temp_console_markup,
-            'player_token' => $player_token
+            'player_token' => $player_token,
+            'event_type' => ($is_shop_item ? 'new-shop' : 'new-item')
             );
 
     }

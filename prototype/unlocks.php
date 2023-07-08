@@ -177,7 +177,8 @@ function generate_prototype_complete_message($player_token){
     return array(
         'canvas_markup' => $temp_canvas_markup,
         'console_markup' => $temp_console_markup,
-        'player_token' => $player_token
+        'player_token' => $player_token,
+        'event_type' => 'prototype-complete'
         );
 
 }
@@ -244,7 +245,8 @@ function generate_prototype_postgame_message($player_token){
     return array(
         'canvas_markup' => $temp_canvas_markup,
         'console_markup' => $temp_console_markup,
-        'player_token' => $player_token
+        'player_token' => $player_token,
+        'event_type' => 'prototype-postgame'
         );
 
 }
@@ -275,10 +277,11 @@ if ($battle_complete_counter_light >= 1 && $battle_complete_counter_light < 2){
         $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_defend" style="background-image: url(images/robots/mega-man/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; right: 180px;">Mega Man</div>';
         $temp_console_markup = '<p>Mega Man! Thank you for saving us! I&#39;m not sure how it happened, but it looks like we&#39;ve been digitized and transported <em>inside</em> of the prototype! That Met was made of pure data, and it looks like we are now too&hellip;</p>';
         $temp_console_markup .= '<p>We have to find Dr. Cossack and make our way back to the real world, but I&#39;m afraid it won\'t be easy. Sensors detect a high concentration of enemy robot data active on this server, and we\'ll need to clear them out before we can continue on our mission.</p>';
-        array_unshift($_SESSION[$session_token]['EVENTS'], array(
+        array_push($_SESSION[$session_token]['EVENTS'], array(
             'canvas_markup' => $temp_canvas_markup,
             'console_markup' => $temp_console_markup,
-            'player_token' => 'dr-light'
+            'player_token' => 'dr-light',
+            'event_type' => 'other'
             ));
 
         //$temp_game_flags['events'][$temp_event_flag] = true;
@@ -931,7 +934,7 @@ foreach ($chapter_unlock_players AS $player_key => $player_token){
                     $temp_console_markup .= '</div>';
                 }
             }
-            array_unshift($_SESSION[$session_token]['EVENTS'], array(
+            array_push($_SESSION[$session_token]['EVENTS'], array(
                 'canvas_markup' => $temp_canvas_markup,
                 'console_markup' => $temp_console_markup,
                 'player_token' => $player_token
@@ -958,10 +961,11 @@ if ($unlock_flag_wily){
         $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">'.rpg_type::print_span('attack', 'Dr. Wily').' has been unlocked as a player character!</p>';
         $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">Play through the game as <strong>Dr. Wily</strong> and <strong>Bass</strong> to continue the story from their perspective.  Unlock even more new robots, abilities, and items as you continue your fight against the prototype\'s army of powered up opponents!</p>';
         $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center; font-size: 90%; line-height: 1.6; color: #d6d6d6;">Select <strong class="ability_type ability_type_attack">Dr. Wily</strong> from the player select menu to continue the campaign.<br />  You can also go back to replay <strong class="ability_type ability_type_defense">Dr. Light</strong> missions at any time.</p>';
-        array_unshift($_SESSION[$session_token]['EVENTS'], array(
+        array_push($_SESSION[$session_token]['EVENTS'], array(
             'canvas_markup' => $temp_canvas_markup,
             'console_markup' => $temp_console_markup,
-            'player_token' => 'dr-wily'
+            'player_token' => 'dr-wily',
+            'event_type' => 'new-player'
             ));
     }
 
@@ -994,10 +998,11 @@ if ($unlock_flag_cossack){
         $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">'.rpg_type::print_span('speed', 'Dr. Cossack').' has been unlocked as a player character!</p>';
         $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">Play through the game as <strong>Dr. Cossack</strong> and <strong>Proto Man</strong> to continue the story from their perspective.  Unlock even more new robots, abilities, and items as you continue your fight against the prototype\'s army of powered up opponents!</p>';
         $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center; font-size: 90%; line-height: 1.6; color: #d6d6d6;">Select <strong class="ability_type ability_type_speed">Dr. Cossack</strong> from the player select menu to continue the campaign.<br />  You can also go back to replay <strong class="ability_type ability_type_defense">Dr. Light</strong> or <strong class="ability_type ability_type_attack">Dr. Wily</strong> missions at any time.</p>';
-        array_unshift($_SESSION[$session_token]['EVENTS'], array(
+        array_push($_SESSION[$session_token]['EVENTS'], array(
             'canvas_markup' => $temp_canvas_markup,
             'console_markup' => $temp_console_markup,
-            'player_token' => 'dr-cossack'
+            'player_token' => 'dr-cossack',
+            'event_type' => 'new-player'
             ));
     }
 
@@ -1045,25 +1050,11 @@ if (true){
     array_unshift($_SESSION[$session_token]['EVENTS'], array(
         'canvas_markup' => $temp_canvas_markup,
         'console_markup' => $temp_console_markup,
-        'player_token' => 'foobar'
+        'player_token' => 'foobar',
+        'event_type' => 'other'
         ));
 }
 */
-
-// Manually define event priority so it's easier to sort stuff
-$event_priority = array();
-
-// Re-sort the events to make sure they are in player order
-if (isset($_SESSION[$session_token]['EVENTS']) && is_array($_SESSION[$session_token]['EVENTS'])){
-    usort($_SESSION[$session_token]['EVENTS'], function($a, $b) use ($chapter_unlock_players){
-        $a_position = array_search($a['player_token'], $chapter_unlock_players);
-        $b_position = array_search($b['player_token'], $chapter_unlock_players);
-        if ($a_position === $b_position){ return 0; }
-        return ($a_position < $b_position) ? -1 : 1;
-        });
-}
-
-//error_log('$_SESSION[$session_token][\'EVENTS\'] = '.print_r($_SESSION[$session_token]['EVENTS'], true));
 
 
 ?>

@@ -333,7 +333,7 @@ $(document).ready(function(){
 
         // Define the a fadein function for the page
         var thisFadeCallback = function(){
-            //alert('fadeCallback');
+            //console.log('thisFadeCallback()');
             // Fade in the prototype screen slowly if allowed
             if (gameSettings.fadeIn == true){
                 //alert('gameSettings.fadeIn == true? '+(gameSettings.fadeIn ? 'true' : 'false'));
@@ -343,8 +343,11 @@ $(document).ready(function(){
                         windowResizePrototype();
                         topFrame.mmrpg_toggle_index_loaded(true);
                         gameSettings.startLink = 'home';
-                        if ((gameSettings.windowEventsCanvas != undefined && gameSettings.windowEventsCanvas.length) || (gameSettings.windowEventsMessages != undefined && gameSettings.windowEventsMessages.length)){
-                            topFrame.windowEventCreate(gameSettings.windowEventsCanvas, gameSettings.windowEventsMessages);
+                        if ((gameSettings.windowEventsCanvas != undefined && gameSettings.windowEventsCanvas.length)
+                            || (gameSettings.windowEventsMessages != undefined && gameSettings.windowEventsMessages.length)){
+                            //topFrame.windowEventCreate(gameSettings.windowEventsCanvas, gameSettings.windowEventsMessages);
+                            //console.log('trying to topFrame.windowEventsPull() [A]');
+                            topFrame.windowEventsPull();
                             }
                         }, 1000);
                     }, false, true);
@@ -355,8 +358,11 @@ $(document).ready(function(){
                 windowResizePrototype();
                 topFrame.mmrpg_toggle_index_loaded(true);
                 gameSettings.startLink = 'home';
-                if ((gameSettings.windowEventsCanvas != undefined && gameSettings.windowEventsCanvas.length) || (gameSettings.windowEventsMessages != undefined && gameSettings.windowEventsMessages.length)){
-                    topFrame.windowEventCreate(gameSettings.windowEventsCanvas, gameSettings.windowEventsMessages);
+                if ((gameSettings.windowEventsCanvas != undefined && gameSettings.windowEventsCanvas.length)
+                    || (gameSettings.windowEventsMessages != undefined && gameSettings.windowEventsMessages.length)){
+                    //topFrame.windowEventCreate(gameSettings.windowEventsCanvas, gameSettings.windowEventsMessages);
+                    //console.log('trying to topFrame.windowEventsPull() [B]');
+                    topFrame.windowEventsPull();
                     }
                 }
             };
@@ -443,7 +449,7 @@ $(document).ready(function(){
             }
 
         // Trigger the prototype step function if not home
-        if (gameSettings.startLink != 'home'){
+        if (gameSettings.startLink !== 'home'){
             //gameSettings.skipPlayerSelect = true;
             var thisLink = $('.banner .link[data-step="'+gameSettings.startLink+'"]', thisContext);
             prototype_menu_click_step(thisContext, thisLink, thisFadeCallback, 10); //CHECKPOINT
@@ -453,6 +459,14 @@ $(document).ready(function(){
             thisFadeCallback();
             }
 
+        // Make sure we always poll the server for popup events after loading
+        //console.log('queuing the windowEventsPull event (via prototype)');
+        if (typeof window.top.mmrpg_queue_for_game_start !== 'undefined'){
+            window.top.mmrpg_queue_for_game_start(function(){
+                //console.log('i guess the game has started');
+                setTimeout(function(){ windowEventsPull(); }, 1000);
+                });
+            }
 
 
         }
