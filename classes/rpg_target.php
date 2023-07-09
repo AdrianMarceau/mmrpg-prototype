@@ -79,7 +79,9 @@ class rpg_target {
         rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $this_ability, 'target');
 
         // If sound effects were supplied in the trigger options, apply them now
+        //error_log('$trigger_options = '.print_r($trigger_options, true));
         $event_options['event_flag_sound_effects'] = !empty($trigger_options['event_flag_sound_effects']) ? $trigger_options['event_flag_sound_effects'] : false;
+        //error_log('event_flag_sound_effects = '.print_r($event_options['event_flag_sound_effects'], true));
 
         // Create a new entry in the event log for the targeting event
         $temp_event_header = $this_ability->target_options['target_header'];

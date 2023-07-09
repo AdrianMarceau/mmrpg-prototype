@@ -53,6 +53,25 @@ class rpg_canvas {
             $this_data['canvas_offset_x'] += ($this_data['canvas_offset_x'] * 0.20);
             $this_data['canvas_offset_y'] += ($this_data['canvas_offset_y'] * 0.10);
 
+            // TODO convert this to a 'backwards offset' that is relative to the doctor's emotions about the battle's progress
+
+            // Define a variable to hold the player offset shift based on emotions (status in battle)
+            $max_position_shift = 22;
+            $current_position_shift = 0;
+            $current_position_relative = 'back';
+
+            // Loop through the player's robots and check if any have been hurt or disabled
+            if (!empty($this_player->player_robots)){
+                foreach ($this_player->player_robots AS $key => $robot){
+                    $possible_shift = ($max_position_shift / 8);
+                    if ($robot['robot_status'] === 'disabled'){
+                        $current_position_shift += $possible_shift;
+                    } elseif ($robot['robot_energy'] < $robot['robot_base_energy']){
+                        $current_position_shift += $possible_shift - (($robot['robot_energy'] / $robot['robot_base_energy']) * $possible_shift);
+                    }
+                }
+            }
+
             // If there's a field hazard in the active position, let's move the doctor out of the way
             $has_obscurring_field_object = false;
             $static_attachment_key = $this_player->player_side.'-active';
@@ -66,8 +85,22 @@ class rpg_canvas {
                     $has_obscurring_field_object = true;
                 }
             }
-            if ($has_obscurring_field_object){ $this_data['canvas_offset_x'] -= ($this_data['canvas_offset_x'] * 0.22); }
-            // TODO convert this to a 'backwards offset' that is relative to the doctor's emotions about the battle's progress
+            if ($has_obscurring_field_object){
+                $current_position_relative = 'front';
+                $current_position_shift += 22;
+            }
+
+            // If a position shift has been defined, we can move the doctor back a little bit
+            if ($current_position_shift > $max_position_shift){ $current_position_shift = $max_position_shift; }
+            if ($current_position_shift > 0){ $this_data['canvas_offset_x'] -= ($this_data['canvas_offset_x'] * ($current_position_shift / 100)); }
+            elseif ($current_position_shift < 0){ $this_data['canvas_offset_x'] += ($this_data['canvas_offset_x'] * (abs($current_position_shift) / 100)); }
+            //error_log('$current_position_relative ='.print_r($current_position_relative, true));
+            if ($current_position_relative === 'front'){
+                //error_log('trying to move player to front');
+                $this_data['canvas_offset_x'] -= 20;
+                $this_data['canvas_offset_y'] -= 20;
+                $this_data['canvas_offset_z'] += 20;
+            }
 
             $this_data['player_sprite_size'] = ceil($this_data['player_scale'] * $this_data['player_sprite_zoom_size']);
             $this_data['player_sprite_width'] = ceil($this_data['player_scale'] * $this_data['player_sprite_zoom_size']);
