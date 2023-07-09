@@ -3934,7 +3934,7 @@ class rpg_robot extends rpg_object {
                                         $temp_title = htmlentities($temp_title, ENT_QUOTES, 'UTF-8', true);
                                         $temp_label = 'Mugshot '.ucfirst(substr($temp_direction, 0, 1));
                                         echo '<div class="frame_container" data-clickcopy="'.$temp_embed.'" data-direction="'.$temp_direction.'" data-image="'.$temp_robot_image_token.'" data-frame="mugshot" style="'.($size_is_final ? 'padding-top: 20px;' : 'padding: 0;').' float: left; position: relative; margin: 0; box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.75); width: '.$size_value.'px; height: '.$size_value.'px; overflow: hidden;">';
-                                            echo '<img class="has_pixels" style="margin-left: 0; height: '.$size_value.'px;" data-tooltip="'.$temp_title.'" src="images/robots/'.$temp_robot_image_token.'/mug_'.$temp_direction.'_'.$show_sizes[$base_size].'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
+                                            echo '<img class="has_pixels" style="margin-left: 0; height: '.$size_value.'px;" data-click-tooltip="'.$temp_title.'" src="images/robots/'.$temp_robot_image_token.'/mug_'.$temp_direction.'_'.$show_sizes[$base_size].'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
                                             if ($size_is_final){ echo '<label style="position: absolute; left: 5px; top: 0; color: #EFEFEF; font-size: 10px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);">'.$temp_label.'</label>'; }
                                         echo '</div>';
                                     }
@@ -3957,7 +3957,7 @@ class rpg_robot extends rpg_object {
                                             //$image_token = !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'];
                                             //if ($temp_sheet > 1){ $temp_robot_image_token .= '-'.$temp_sheet; }
                                             echo '<div class="frame_container" data-clickcopy="'.$temp_embed.'" data-direction="'.$temp_direction.'" data-image="'.$temp_robot_image_token.'" data-frame="'.$frame_relative.'" style="'.($size_is_final ? 'padding-top: 20px;' : 'padding: 0;').' float: left; position: relative; margin: 0; box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.75); width: '.$size_value.'px; height: '.$size_value.'px; overflow: hidden;">';
-                                                echo '<img class="has_pixels" style="margin-left: '.$margin_left.'px; height: '.$size_value.'px;" data-tooltip="'.$temp_title.'" alt="'.$temp_imgalt.'" src="images/robots/'.$temp_robot_image_token.'/sprite_'.$temp_direction.'_'.$sprite_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
+                                                echo '<img class="has_pixels" style="margin-left: '.$margin_left.'px; height: '.$size_value.'px;" data-click-tooltip="'.$temp_title.'" alt="'.$temp_imgalt.'" src="images/robots/'.$temp_robot_image_token.'/sprite_'.$temp_direction.'_'.$sprite_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
                                                 if ($size_is_final){ echo '<label style="position: absolute; left: 5px; top: 0; color: #EFEFEF; font-size: 10px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);">'.$temp_label.'</label>'; }
                                             echo '</div>';
                                         }
@@ -4000,8 +4000,8 @@ class rpg_robot extends rpg_object {
                                         //if ($robot_info['robot_core'] == 'copy' && $alt_key == 0){ $alt_type = 'robot_type type_empty '; }
                                     }
 
-                                    echo '<a href="#" data-tooltip="'.$alt_title.'" data-tooltip-type="'.$alt_title_type.'" class="link link_image '.($alt_key == 0 ? 'link_active ' : '').'" data-image="'.$alt_info['image'].'">';
-                                    echo '<span class="'.$alt_type.'" style="'.$alt_style.'">'.$alt_name.'</span>';
+                                    echo '<a href="#" data-maybe-tooltip="'.$alt_title.'" data-tooltip-type="'.$alt_title_type.'" class="link link_image '.($alt_key == 0 ? 'link_active ' : '').'" data-image="'.$alt_info['image'].'">';
+                                        echo '<span class="'.$alt_type.'" style="'.$alt_style.'">'.$alt_name.'</span>';
                                     echo '</a>';
                                 }
                                 ?></span>
@@ -4009,8 +4009,8 @@ class rpg_robot extends rpg_object {
                             <span class="directions"><?
                                 // Loop though and print links for the alts
                                 foreach (array('right', 'left') AS $temp_key => $temp_direction){
-                                    echo '<a href="#" data-tooltip="'.ucfirst($temp_direction).' Facing Sprites" data-tooltip-type="'.$alt_type_base.'" class="link link_direction '.($temp_key == 0 ? 'link_active' : '').'" data-direction="'.$temp_direction.'">';
-                                    echo '<span class="ability_type ability_type_empty" style="border-color: rgba(0, 0, 0, 0.2) !important; background-color: rgba(0, 0, 0, 0.2) !important; ">'.ucfirst($temp_direction).'</span>';
+                                    echo '<a href="#" data-maybe-tooltip="'.ucfirst($temp_direction).' Facing Sprites" data-tooltip-type="'.$alt_type_base.'" class="link link_direction '.($temp_key == 0 ? 'link_active' : '').'" data-direction="'.$temp_direction.'">';
+                                        echo '<span class="ability_type ability_type_empty" style="border-color: rgba(0, 0, 0, 0.2) !important; background-color: rgba(0, 0, 0, 0.2) !important; ">'.ucfirst($temp_direction).'</span>';
                                     echo '</a>';
                                 }
                                 ?></span>
@@ -4604,19 +4604,19 @@ class rpg_robot extends rpg_object {
                         echo '<span class="details">';
 
 
-                            echo '<span data-tooltip="'.$base_text.'" data-tooltip-type="robot_type robot_type_none">'.$robot_stats[$stat_token]['current_noboost'].'</span> ';
+                            echo '<span data-click-tooltip="'.$base_text.'" data-tooltip-type="robot_type robot_type_none">'.$robot_stats[$stat_token]['current_noboost'].'</span> ';
 
 
                             if (!empty($robot_stats[$stat_token]['bonus'])){
-                                echo '+ <span data-tooltip="'.$robot_bonus_text.'" class="statboost_robot" data-tooltip-type="robot_stat robot_type_none">'.$robot_stats[$stat_token]['bonus'].'</span> ';
+                                echo '+ <span data-click-tooltip="'.$robot_bonus_text.'" class="statboost_robot" data-tooltip-type="robot_stat robot_type_none">'.$robot_stats[$stat_token]['bonus'].'</span> ';
                             }
 
                             if (!empty($robot_stats[$stat_token]['starforce'])){
-                                echo '+ <span data-tooltip="'.$starforce_bonus_text.'" class="statboost_force" data-tooltip-type="robot_stat robot_type_none">'.$robot_stats[$stat_token]['starforce'].'</span> ';
+                                echo '+ <span data-click-tooltip="'.$starforce_bonus_text.'" class="statboost_force" data-tooltip-type="robot_stat robot_type_none">'.$robot_stats[$stat_token]['starforce'].'</span> ';
                             }
 
                             if (!empty($robot_stats[$stat_token]['player'])){
-                                echo '+ <span data-tooltip="'.$player_bonus_text.'" class="statboost_player_'.$player_info['player_token'].'" data-tooltip-type="robot_stat robot_type_'.$stat_token.'">'.$robot_stats[$stat_token]['player'].'</span> ';
+                                echo '+ <span data-click-tooltip="'.$player_bonus_text.'" class="statboost_player_'.$player_info['player_token'].'" data-tooltip-type="robot_stat robot_type_'.$stat_token.'">'.$robot_stats[$stat_token]['player'].'</span> ';
                             }
 
                         echo ' = </span>';
@@ -4637,7 +4637,7 @@ class rpg_robot extends rpg_object {
                     // Otherwise display as one block
                     else {
 
-                        echo '<span class="total" data-tooltip="'.$base_text.'">';
+                        echo '<span class="total" data-click-tooltip="'.$base_text.'">';
                             echo $robot_info['robot_'.$stat_token];
                         echo '</span>';
 
@@ -4750,7 +4750,7 @@ class rpg_robot extends rpg_object {
 
                 <div class="this_sprite sprite_left event_robot_images" style="">
                     <? if($global_allow_editing && !empty($robot_alt_options)): ?>
-                        <a class="robot_image_alts" data-player="<?= $player_token ?>" data-robot="<?= $robot_token ?>" data-alt-index="base<?= !empty($robot_alt_options) ? ','.implode(',', $robot_alt_options) : '' ?>" data-alt-current="<?= $robot_image_unlock_current ?>" data-tooltip="<?= $temp_image_alt_title ?>">
+                        <a class="robot_image_alts" data-player="<?= $player_token ?>" data-robot="<?= $robot_token ?>" data-alt-index="base<?= !empty($robot_alt_options) ? ','.implode(',', $robot_alt_options) : '' ?>" data-alt-current="<?= $robot_image_unlock_current ?>" data-maybe-tooltip="<?= $temp_image_alt_title ?>">
                             <? $temp_offset = $robot_info['robot_image_size'] == 80 ? '-20px' : '0'; ?>
                             <span class="sprite_wrapper" style="">
                                 <?= $robot_image_unlock_tokens ?>
@@ -4758,7 +4758,7 @@ class rpg_robot extends rpg_object {
                             </span>
                         </a>
                     <? else: ?>
-                        <span class="robot_image_alts" data-player="<?= $player_token ?>" data-robot="<?= $robot_token ?>" data-alt-index="base<?= !empty($robot_alt_options) ? ','.implode(',', $robot_alt_options) : '' ?>" data-alt-current="<?= $robot_image_unlock_current ?>" data-tooltip="<?= $temp_image_alt_title ?>">
+                        <span class="robot_image_alts" data-player="<?= $player_token ?>" data-robot="<?= $robot_token ?>" data-alt-index="base<?= !empty($robot_alt_options) ? ','.implode(',', $robot_alt_options) : '' ?>" data-alt-current="<?= $robot_image_unlock_current ?>" data-maybe-tooltip="<?= $temp_image_alt_title ?>">
                             <? $temp_offset = $robot_info['robot_image_size'] == 80 ? '-20px' : '0'; ?>
                             <span class="sprite_wrapper" style="">
                                 <?= $robot_image_unlock_tokens ?>
@@ -4777,7 +4777,7 @@ class rpg_robot extends rpg_object {
 
                 <div class="this_sprite sprite_left event_robot_favourite" style="" >
                     <? if($global_allow_editing): ?>
-                        <a class="robot_favourite <?= in_array($robot_token, $player_robot_favourites) ? 'robot_favourite_active ' : '' ?>" data-player="<?= $player_token ?>" data-robot="<?= $robot_token ?>" data-click-tooltip="Pin Favourite?"><i class="fa fas fa-thumbtack"></i></a>
+                        <a class="robot_favourite <?= in_array($robot_token, $player_robot_favourites) ? 'robot_favourite_active ' : '' ?>" data-player="<?= $player_token ?>" data-robot="<?= $robot_token ?>"><i class="fa fas fa-thumbtack"></i></a>
                     <? else: ?>
                         <span class="robot_favourite <?= in_array($robot_token, $player_robot_favourites) ? 'robot_favourite_active ' : '' ?>"><i class="fa fas fa-thumbtack"></i></span>
                     <? endif; ?>
@@ -4820,7 +4820,7 @@ class rpg_robot extends rpg_object {
                         <? endif; ?>
 
                         <?if($global_allow_editing && $allow_player_selector):?>
-                            <a class="player_name player_type player_type_<?= str_replace('dr-', '', $player_info['player_token']) ?>"><label style="background-image: url(images/players/<?= $player_info['player_token']?>/mug_left_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"><?= $player_info['player_name']?><span class="arrow">&#8711;</span></label></a>
+                            <a class="player_name player_type player_type_<?= str_replace('dr-', '', $player_info['player_token']) ?>"><label style="background-image: url(images/players/<?= $player_info['player_token']?>/mug_left_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"><?= $player_info['player_name']?><span class="arrow"><i class="fa fas fa-angle-double-down"></i></span></label></a>
                         <?elseif(!$global_allow_editing && $allow_player_selector):?>
                             <a class="player_name player_type player_type_<?= str_replace('dr-', '', $player_info['player_token']) ?>" style="cursor: default; "><label style="background-image: url(images/players/<?= $player_info['player_token']?>/mug_left_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); cursor: default; "><?= $player_info['player_name']?></label></a>
                         <?else:?>
@@ -4845,6 +4845,8 @@ class rpg_robot extends rpg_object {
                     if (!empty($current_item_info['item_type2'])){ $current_item_type = $current_item_type != 'none' ?  $current_item_type.'_'.$current_item_info['item_type2'] : $current_item_info['item_type2']; }
                     if (empty($current_item_info)){ $current_item_token = ''; $current_item_image = 'item'; }
                     $current_date_attr = '';
+                    $title_markup = '';
+                    $title_markup_encoded = '';
                     if (!empty($current_item_info)){
                         $title_markup = rpg_item::print_editor_title_markup($robot_info, $current_item_info, array());
                         $title_markup_encoded = htmlentities($title_markup, ENT_QUOTES, 'UTF-8', true);
@@ -4852,21 +4854,44 @@ class rpg_robot extends rpg_object {
                         $current_date_attr .= 'data-item="'.$current_item_info['item_token'].'" ';
                         $current_date_attr .= 'data-type="'.$current_item_info['item_type'].'" ';
                         $current_date_attr .= 'data-type2="'.$current_item_info['item_type2'].'" ';
-                        $current_date_attr .= 'data-tooltip="'.$title_markup_encoded.'" ';
                     } else {
                         $current_date_attr .= 'data-id="" ';
                         $current_date_attr .= 'data-item="" ';
                         $current_date_attr .= 'data-type="" ';
                         $current_date_attr .= 'data-type2="" ';
                     }
+
+                    $type_or_none = $current_item_info['item_type'] ? $current_item_info['item_type'] : 'none';
+                    $type2_or_false = !empty($current_item_info['item_type2']) ? $current_item_info['item_type2'] : false;
+                    $types_available = array_filter(array($current_item_info['item_type'], $current_item_info['item_type2']));
+                    $all_types_or_none = !empty($types_available) ? implode('_', $types_available) : 'none';
+                    $any_type_or_none = !empty($types_available) ? array_shift($types_available) : 'none';
+
+                    $btn_type = 'item_type item_type_'.$all_types_or_none;
+                    $btn_info_circle = '<span class="info color" data-click-tooltip="'.$title_markup_encoded.'" data-tooltip-type="'.$btn_type.'">';
+                        $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$any_type_or_none.'"></i>';
+                        if (!empty($type2_or_false) && $type2_or_false !== $any_type_or_none){ $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$type2_or_false.'"></i>'; }
+                    $btn_info_circle .= '</span>';
+
                     ob_start();
                     ?>
                     <td class="right">
                         <label style="display: block; float: left;">Item :</label>
                         <? if($global_allow_editing): ?>
-                            <a class="item_name type <?= $current_item_type ?>" <?= $current_date_attr ?>><label style="background-image: url(images/items/<?= $current_item_image ?>/icon_left_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"><?= $current_item_name ?><span class="arrow">&#8711;</span></label></a>
+                            <a class="item_name type <?= $current_item_type ?>" <?= $current_date_attr ?>>
+                                <label style="background-image: url(images/items/<?= $current_item_image ?>/icon_left_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">
+                                    <?= $current_item_name ?>
+                                    <span class="arrow"><i class="fa fas fa-angle-double-down"></i></span>
+                                </label>
+                                <?= $btn_info_circle ?>
+                            </a>
                         <? else: ?>
-                            <a class="item_name type <?= $current_item_type ?>" style="opacity: 0.5; filter: alpha(opacity=50); cursor: default;"><label style="background-image: url(images/items/<?= $current_item_image ?>/icon_left_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"><?= $current_item_name ?></label></a>
+                            <a class="item_name type <?= $current_item_type ?>" style="opacity: 0.5; filter: alpha(opacity=50); cursor: default;">
+                                <label style="background-image: url(images/items/<?= $current_item_image ?>/icon_left_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">
+                                    <?= $current_item_name ?>
+                                </label>
+                                <?= $btn_info_circle ?>
+                            </a>
                         <? endif; ?>
                     </td>
                     <?

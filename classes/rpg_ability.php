@@ -1475,11 +1475,25 @@ class rpg_ability extends rpg_object {
         $ability_info_class_type = !empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none';
         if (!empty($ability_info['ability_type2'])){ $ability_info_class_type = $ability_info_class_type != 'none' ? $ability_info_class_type.'_'.$ability_info['ability_type2'] : $ability_info['ability_type2']; }
         $ability_info_title = rpg_ability::print_editor_title_markup($robot_info, $ability_info);
-        //$ability_info_title_plain = strip_tags(str_replace('<br />', '//', $ability_info_title));
         $ability_info_title_tooltip = htmlentities($ability_info_title, ENT_QUOTES, 'UTF-8');
-        $ability_info_title_html = str_replace(' ', '&nbsp;', $ability_info_name);
         $temp_select_options = str_replace('value="'.$ability_info_token.'"', 'value="'.$ability_info_token.'" selected="selected" disabled="disabled"', $ability_rewards_options);
-        $ability_info_title_html = '<label style="background-image: url(images/abilities/'.$ability_info_token.'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$ability_info_title_html.'<span class="arrow">&#8711;</span></label>';
+
+        $type_or_none = $ability_info['ability_type'] ? $ability_info['ability_type'] : 'none';
+        $type2_or_false = !empty($ability_info['ability_type2']) ? $ability_info['ability_type2'] : false;
+
+        $btn_type = 'ability_type ability_type_'.(!empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none').(!empty($ability_info['ability_type2']) ? '_'.$ability_info['ability_type2'] : '');
+        $btn_info_circle = '<span class="info color" data-click-tooltip="'.$ability_info_title_tooltip.'" data-tooltip-type="'.$btn_type.'">';
+            $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$type_or_none.'"></i>';
+            if (!empty($type2_or_false)){ $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$type2_or_false.'"></i>'; }
+        $btn_info_circle .= '</span>';
+
+        $ability_info_title_html = '';
+        $ability_info_title_html .= '<label style="background-image: url(images/abilities/'.$ability_info_token.'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">';
+            $ability_info_title_html .= str_replace(' ', '&nbsp;', $ability_info_name);
+            $ability_info_title_html .= '<span class="arrow"><i class="fa fas fa-angle-double-down"></i></span>';
+        $ability_info_title_html .= '</label>';
+        $ability_info_title_html .= $btn_info_circle;
+
         $this_select_markup = '<a '.
             'class="ability_name type type_'.$ability_info_class_type.'" '.
             'data-id="'.$ability_info_id.'" '.
@@ -1491,7 +1505,7 @@ class rpg_ability extends rpg_object {
             'data-type2="'.(!empty($ability_info['ability_type2']) ? $ability_info['ability_type2'] : '').'" '.
             'data-power="'.$ability_power.'" '.
             //'title="'.$ability_info_title_plain.'" '.
-            'data-tooltip="'.$ability_info_title_tooltip.'"'.
+            //'data-tooltip="'.$ability_info_title_tooltip.'"'.
             '>'.$ability_info_title_html.'</a>';
 
         // Return the generated select markup

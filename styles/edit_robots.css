@@ -527,8 +527,11 @@ body.windowFlag_landscapeMode #prototype {
     text-decoration: none;
     color: #2A2A2A;
 }
-#edit #console .event .robot_favourite:hover,
-#edit #console .event .robot_favourite_active {
+#edit #console .event .robot_favourite:hover {
+    color: #616161;
+}
+#edit #console .event .robot_favourite_active,
+#edit #console .event .robot_favourite_active:hover {
     color: #DEDEDE;
 }
 #edit #console .event span.robot_favourite,
@@ -552,15 +555,24 @@ body.windowFlag_landscapeMode #prototype {
     margin: 2px 0 0;
     width: 155px;
     text-align: center;
-    overflow: hidden;
+    overflow: visible;
     text-overflow: ellipsis;
     white-space: nowrap;
     height: 13px;
     cursor: pointer;
-    _cursor: hand;
+    position: relative;
+}
+#edit #console .event a.player_name:after,
+#edit #console .event a.item_name:after,
+#edit #console .event span.skill_name:after {
+    content: "";
 }
 #edit #console .event a.item_name {
-
+    width: 185px;
+}
+#edit #console .event a.item_name .info[data-click-tooltip] {
+    top: -2px;
+    right: -2px;
 }
 #edit #console .event span.skill_name {
     width: auto;
@@ -592,7 +604,7 @@ body.windowFlag_landscapeMode #prototype {
     background-position: 0 -3px;
     background-size: 17px 17px;
     position: relative;
-    bottom: -1px;
+    bottom: 0;
 }
 #edit #console .event a.item_name label {
 
@@ -644,15 +656,18 @@ body.windowFlag_landscapeMode #prototype {
     height: auto;
     text-align: center;
     cursor: pointer;
-    _cursor: hand;
     color: #FFFFFF;
     position: absolute;
-    top: 3px;
+    top: 50%;
     right: 4px;
-    font-size: 8px;
+    transform: translate(0, -50%);
+    font-size: 100%;
     line-height: 8px;
     opacity: 0.10;
-    filter: alpha(opacity=10);
+}
+#edit #console .event a.ability_name label .arrow,
+#edit #console .event a.item_name label .arrow {
+    right: 20px;
 }
 body[data-mode="viewer"] #edit #console .event a.player_name label .arrow,
 body[data-mode="viewer"] #edit #console .event a.ability_name label .arrow,
@@ -761,13 +776,22 @@ body[data-mode="viewer"] #edit #console .event a.item_name label .arrow {
     margin: 0 5px 5px 0;
     width: 140px;
     text-align: center;
-    overflow: hidden;
+    overflow: visible;
     text-overflow: ellipsis;
     white-space: nowrap;
     height: 13px;
     cursor: pointer;
     _cursor: hand;
     background-clip: padding-box;
+    position: relative;
+}
+#edit #console .event a.ability_name:after,
+#edit #canvas .player_canvas a.player_name:after,
+#edit #canvas .ability_canvas a.ability_name:after,
+#edit #canvas .item_canvas a.item_name:after {
+    content: "";
+    display: block;
+    margin: 0 auto;
 }
 body[data-mode="viewer"] #edit #console .event a.ability_name,
 body[data-mode="viewer"] #edit #canvas .player_canvas a.player_name,

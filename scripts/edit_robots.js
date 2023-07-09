@@ -36,6 +36,109 @@ $(document).ready(function(){
 
     //console.log( thisEditorData);
 
+    // -- SOUND EFFECT FUNCTIONALITY -- //
+
+    // Define some interaction sound effects for the items menu
+    var thisContext = $('#edit');
+    if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+
+        // Define a quick local function for routing sound effect plays to the parent
+        function playSoundEffect(soundName, options){
+            if ($(this).is('.button_disabled')){ return; }
+            if ($(this).data('silentClick')){ return; }
+            //console.log('trying to play robot editor sound effect');
+            top.mmrpg_play_sound_effect(soundName, options);
+            };
+
+
+        // ROBOT AVATAR LINKS
+
+        // Add hover and click sounds to the robot avatar in the selection drawer
+        $('#canvas .wrapper .sprite_robot', thisContext).live('mouseenter', function(){
+            playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
+            });
+        $('#canvas .wrapper .sprite_robot', thisContext).live('click', function(){
+            playSoundEffect.call(this, 'icon-click-mini', {volume: 1.0});
+            });
+
+        // ROBOT PANEL BUTTONS
+
+        // Add hover and click sounds to the robot favourite (pin) button in the editor panel
+        $('#console .event .robot_favourite', thisContext).live('mouseenter', function(){
+            playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
+            });
+        $('#console .event .robot_favourite', thisContext).live('click', function(){
+            playSoundEffect.call(this, 'icon-click-mini', {volume: 1.0});
+            });
+
+        // Add hover and click sounds to the robot alt image sprite in the editor panel
+        $('#console .event .event_robot_images a.robot_image_alts', thisContext).live('mouseenter', function(){
+            if ($(this).is('[data-alt-index="base"]')){ return; }
+            playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
+            });
+        $('#console .event .event_robot_images a.robot_image_alts', thisContext).live('click', function(){
+            if ($(this).is('[data-alt-index="base"]')){ return; }
+            playSoundEffect.call(this, 'icon-click-mini', {volume: 1.0});
+            setTimeout(function(){ playSoundEffect.call(this, 'link-click-action', {volume: 1.0}); }, 800);
+            });
+
+        //#console .event .event_robot_images .sprite_wrapper .sprite
+
+        // EQUIP ABILITY LINKS & SUBLINKS
+
+        // Add hover and click sounds to the ability buttons in the editor
+        $('#console .event a.ability_name', thisContext).live('mouseenter', function(){
+            playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
+            });
+        $('#console .event a.ability_name', thisContext).live('click', function(){
+            playSoundEffect.call(this, 'icon-click-mini', {volume: 1.0});
+            });
+
+        // Add hover and click sounds to the ability buttons in the selection drawer
+        $('#canvas .ability_canvas div.links a', thisContext).live('mouseenter', function(){
+            playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
+            });
+        $('#canvas .ability_canvas div.links a', thisContext).live('click', function(){
+            playSoundEffect.call(this, 'icon-click-mini', {volume: 1.0});
+            });
+
+        // EQUIP ITEM LINKS
+
+        // Add hover and click sounds to the item buttons in the editor
+        $('#console .event a.item_name', thisContext).live('mouseenter', function(){
+            playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
+            });
+        $('#console .event a.item_name', thisContext).live('click', function(){
+            playSoundEffect.call(this, 'icon-click-mini', {volume: 1.0});
+            });
+
+        // Add hover and click sounds to the item buttons in the selection drawer
+        $('#canvas .item_canvas div.links a', thisContext).live('mouseenter', function(){
+            playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
+            });
+        $('#canvas .item_canvas div.links a', thisContext).live('click', function(){
+            playSoundEffect.call(this, 'icon-click-mini', {volume: 1.0});
+            });
+
+        // CHANGE PLAYER LINKS
+
+        // Add hover and click sounds to the player buttons in the editor
+        $('#console .event a.player_name', thisContext).live('mouseenter', function(){
+            playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
+            });
+        $('#console .event a.player_name', thisContext).live('click', function(){
+            playSoundEffect.call(this, 'icon-click-mini', {volume: 1.0});
+            });
+
+        // Add hover and click sounds to the player buttons in the selection drawer
+        $('#canvas .player_canvas div.links a', thisContext).live('mouseenter', function(){
+            playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
+            });
+        $('#canvas .player_canvas div.links a', thisContext).live('click', function(){
+            playSoundEffect.call(this, 'icon-click-mini', {volume: 1.0});
+            });
+
+        }
 
     // -- RESIZE WRAPPER FUNCTIONS -- //
 
@@ -227,51 +330,54 @@ $(document).ready(function(){
         };
 
 
-        // -- ROBOT CANVAS EVENTS -- //
+    // -- ROBOT CANVAS EVENTS -- //
 
-        // Create the click event for canvas sprites
-        $('.robot_canvas .sprite[data-token]', gameCanvas).live('click', function(e){
-            e.preventDefault();
-            if (thisBody.hasClass('loading')){ return false; }
+    // Create the click event for canvas sprites
+    $('.robot_canvas .sprite[data-token]', gameCanvas).live('click', function(e){
+        e.preventDefault();
+        if (thisBody.hasClass('loading')){ return false; }
 
-            var dataSprite = $(this);
-            var dataSpriteIndex = dataSprite.index();
-            var dataParent = dataSprite.closest('.wrapper')
-            var dataSelect = dataParent.attr('data-select');
-            var dataToken = dataSprite.attr('data-token');
-            var dataRobot = dataSprite.attr('data-robot');
-            var dataPlayer = dataSprite.attr('data-player');
-            if (dataSprite.hasClass('loading')){ return false; }
-            dataSprite.addClass('loading');
+        var dataSprite = $(this);
+        var dataSpriteIndex = dataSprite.index();
+        var dataParent = dataSprite.closest('.wrapper')
+        var dataSelect = dataParent.attr('data-select');
+        var dataToken = dataSprite.attr('data-token');
+        var dataRobot = dataSprite.attr('data-robot');
+        var dataPlayer = dataSprite.attr('data-player');
+        if (dataSprite.hasClass('loading')){ return false; }
+        dataSprite.addClass('loading');
 
-            $('.robot_canvas .sprite[data-token]', gameCanvas).css({opacity:''});
+        $('.robot_canvas .sprite[data-token]', gameCanvas).css({opacity:''});
 
-            // Define the show function for this sprite
-            var showFunction = function(){
-                var dataSelectorCurrent = '#'+dataSelect+' .event_visible';
-                var dataSelectorNext = '#'+dataSelect+' .event[data-token='+dataToken+']';
-                $('.sprite[data-token]', gameCanvas).removeClass('sprite_robot_current').removeClass('sprite_robot_dr-light_current sprite_robot_dr-wily_current sprite_robot_dr-cossack_current');
-                dataSprite.addClass('sprite_robot_current').addClass('sprite_robot_current').addClass('sprite_robot_'+dataPlayer+'_current');
-                dataParent.css({display:'block'});
-                if ($(dataSelectorCurrent, gameConsole).length){
-                    $(dataSelectorCurrent, gameConsole).stop().animate({opacity:0},250,'swing',function(){
-                        $(this).removeClass('event_visible').addClass('event_hidden').css({opacity:1});
-                        $(dataSelectorNext, gameConsole).css({opacity:0}).removeClass('event_hidden').addClass('event_visible').animate({opacity:1.0},250,'swing');
-                        });
-                    } else {
-                        $(dataSelectorNext, gameConsole).css({opacity:0}).removeClass('event_hidden').addClass('event_visible').animate({opacity:1.0},250,'swing');
-                    }
-                dataSprite.removeClass('loading');
-                }
-
-            // Load the robot data if not already loaded
-            if (loadedConsoleRobotTokens.indexOf(dataRobot) == -1){
-                loadConsoleRobotMarkup(dataSprite, dataSpriteIndex, showFunction);
+        // Define the show function for this sprite
+        var showFunction = function(){
+            var dataSelectorCurrent = '#'+dataSelect+' .event_visible';
+            var dataSelectorNext = '#'+dataSelect+' .event[data-token='+dataToken+']';
+            $('.sprite[data-token]', gameCanvas).removeClass('sprite_robot_current').removeClass('sprite_robot_dr-light_current sprite_robot_dr-wily_current sprite_robot_dr-cossack_current');
+            dataSprite.addClass('sprite_robot_current').addClass('sprite_robot_current').addClass('sprite_robot_'+dataPlayer+'_current');
+            dataParent.css({display:'block'});
+            if ($(dataSelectorCurrent, gameConsole).length){
+                $(dataSelectorCurrent, gameConsole).stop().animate({opacity:0},250,'swing',function(){
+                    $(this).removeClass('event_visible').addClass('event_hidden').css({opacity:1});
+                    $(dataSelectorNext, gameConsole).css({opacity:0}).removeClass('event_hidden').addClass('event_visible').animate({opacity:1.0},250,'swing');
+                    });
                 } else {
-                showFunction();
+                    $(dataSelectorNext, gameConsole).css({opacity:0}).removeClass('event_hidden').addClass('event_visible').animate({opacity:1.0},250,'swing');
                 }
+            if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+                setTimeout(function(){ playSoundEffect('link-click', {volume: 1.0}); }, 250);
+                }
+            dataSprite.removeClass('loading');
+            }
 
-            });
+        // Load the robot data if not already loaded
+        if (loadedConsoleRobotTokens.indexOf(dataRobot) == -1){
+            loadConsoleRobotMarkup(dataSprite, dataSpriteIndex, showFunction);
+            } else {
+            showFunction();
+            }
+
+        });
 
     // Create the click event for robot canvas sort button
     $('div[data-canvas=robots] .sort', gameCanvas).live('click', function(e){
@@ -347,6 +453,9 @@ $(document).ready(function(){
                     thisPlayerContainer.find('.sprite[data-token]').remove();
                     thisPlayerContainer.find('.wrapper_overflow').append(myArray);
                     thisBody.removeClass('loading');
+                    if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+                        playSoundEffect('link-click-action', {volume: 1.0});
+                        }
                     return true;
                     } else {
                     //console.log('ummmm');
@@ -446,6 +555,9 @@ $(document).ready(function(){
         thisAbilityWrapper.find('.ability_name[data-id!="0"]').remove();
         thisAbilityWrapper.find('.wrapper_overflow').append(myArray);
         thisBody.removeClass('loading');
+        if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+            playSoundEffect('icon-click-mini', {volume: 1.0});
+            }
         return true;
 
         });
@@ -533,6 +645,9 @@ $(document).ready(function(){
         thisAbilityWrapper.find('.item_name[data-id!="0"]').remove();
         thisAbilityWrapper.find('.wrapper_overflow').append(myArray);
         thisBody.removeClass('loading');
+        if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+            playSoundEffect('icon-click-mini', {volume: 1.0});
+            }
         return true;
 
         });
@@ -768,10 +883,14 @@ $(document).ready(function(){
 
                         });
 
+                    if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+                        playSoundEffect('link-click-action', {volume: 1.0});
+                        }
+
                     }
 
                 thisBody.removeClass('loading');
-                targetAbilityLink.trigger('click');
+                targetAbilityLink.triggerSilentClick();
 
 
                 }
@@ -903,9 +1022,13 @@ $(document).ready(function(){
 
             //console.log('robot transfer complete');
 
+            if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+                playSoundEffect('link-click-action', {volume: 1.0});
+                }
+
             thisBody.removeClass('loading');
             resetEditorMenus(thisRobotEvent);
-            //thisPlayerLink.trigger('click');
+            //thisPlayerLink.triggerSilentClick();
 
             });
 
@@ -1143,10 +1266,14 @@ $(document).ready(function(){
                         });
                     */
 
+                    if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+                        playSoundEffect('link-click-action', {volume: 1.0});
+                        }
+
                     }
 
                 thisBody.removeClass('loading');
-                targetItemLink.trigger('click');
+                targetItemLink.triggerSilentClick();
 
                 }
             });

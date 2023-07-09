@@ -1411,12 +1411,28 @@ class rpg_item extends rpg_object {
         $item_info_class_type = !empty($item_info['item_type']) ? $item_info['item_type'] : 'none';
         if (!empty($item_info['item_type2'])){ $item_info_class_type = $item_info_class_type != 'none' ? $item_info_class_type.'_'.$item_info['item_type2'] : $item_info['item_type2']; }
         $item_info_title = rpg_item::print_editor_title_markup($robot_info, $item_info);
-        //$item_info_title_plain = strip_tags(str_replace('<br />', '//', $item_info_title));
         $item_info_title_tooltip = htmlentities($item_info_title, ENT_QUOTES, 'UTF-8');
-        $item_info_title_html = str_replace(' ', '&nbsp;', $item_info_name);
-        $item_info_title_html .= '<span class="count">x '.$item_info_count.'</span>';
         $temp_select_options = str_replace('value="'.$item_info_token.'"', 'value="'.$item_info_token.'" selected="selected" disabled="disabled"', $item_rewards_options);
-        $item_info_title_html = '<label style="background-image: url(images/items/'.$item_info_token.'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$item_info_title_html.'</label>';
+
+        $type_or_none = $item_info['item_type'] ? $item_info['item_type'] : 'none';
+        $type2_or_false = !empty($item_info['item_type2']) ? $item_info['item_type2'] : false;
+        $types_available = array_filter(array($item_info['item_type'], $item_info['item_type2']));
+        $all_types_or_none = !empty($types_available) ? implode('_', $types_available) : 'none';
+        $any_type_or_none = !empty($types_available) ? array_shift($types_available) : 'none';
+
+        $btn_type = 'item_type item_type_'.$all_types_or_none;
+        $btn_info_circle = '<span class="info color" data-click-tooltip="'.$item_info_title_tooltip.'" data-tooltip-type="'.$btn_type.'">';
+            $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$any_type_or_none.'"></i>';
+            if (!empty($type2_or_false) && $type2_or_false !== $any_type_or_none){ $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$type2_or_false.'"></i>'; }
+        $btn_info_circle .= '</span>';
+
+        $item_info_title_html = '';
+        $item_info_title_html .= '<label style="background-image: url(images/items/'.$item_info_token.'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">';
+            $item_info_title_html .= str_replace(' ', '&nbsp;', $item_info_name);
+            $item_info_title_html .= '<span class="arrow"><i class="fa fas fa-angle-double-down"></i></span>';
+        $item_info_title_html .= '</label>';
+        $item_info_title_html .= $btn_info_circle;
+
         $this_select_markup = '<a '.
             'class="item_name type type_'.$item_info_class_type.'" '.
             'data-id="'.$item_info_id.'" '.
