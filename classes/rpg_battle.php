@@ -1434,7 +1434,7 @@ class rpg_battle extends rpg_object {
                         $event_options['event_flag_camera_side'] = $this_player->player_side;
                         $event_options['event_flag_camera_focus'] = 'active';
                         $event_options['event_flag_sound_effects'] = array(
-                            array('name' => ($this_robot->robot_class !== 'master' ? $this_robot->robot_class.'-' : '').'teleport-in', 'volume' => 1.5)
+                            array('name' => $this_robot->robot_class.'-teleport-in', 'volume' => 1.5)
                             );
                         $this_player->set_frame('taunt');
                         $this_robot->set_frame('taunt');
@@ -1468,7 +1468,7 @@ class rpg_battle extends rpg_object {
                         $event_options['event_flag_camera_side'] = $this_player->player_side;
                         $event_options['event_flag_camera_focus'] = 'active';
                         $event_options['event_flag_sound_effects'] = array(
-                            array('name' => ($this_robot->robot_class !== 'master' ? $this_robot->robot_class.'-' : '').'teleport-in', 'volume' => 1.5)
+                            array('name' => $this_robot->robot_class.'-teleport-in', 'volume' => 1.5)
                             );
                         $this_player->set_frame('taunt');
                         $this_robot->set_frame('taunt');
@@ -1506,7 +1506,7 @@ class rpg_battle extends rpg_object {
                     $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
                     $event_options['event_flag_camera_focus'] = $this_robot->robot_position;
                     $event_options['event_flag_sound_effects'] = array(
-                        array('name' => ($this_robot->robot_class !== 'master' ? $this_robot->robot_class.'-' : '').'teleport-in', 'volume' => 1.5)
+                        array('name' => $this_robot->robot_class.'-teleport-in', 'volume' => 1.5)
                         );
                     $this->events_create($this_robot, false, $event_header, $event_body, $event_options);
 
@@ -1518,7 +1518,7 @@ class rpg_battle extends rpg_object {
                         $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
                         $event_options['event_flag_camera_focus'] = $this_robot->robot_position;
                         $event_options['event_flag_sound_effects'] = array(
-                            array('name' => ($this_robot->robot_class !== 'master' ? $this_robot->robot_class.'-' : '').'taunt-sound', 'volume' => 1.5)
+                            array('name' => $this_robot->robot_class.'-taunt-sound', 'volume' => 1.5)
                             );
                         $this_robot->set_frame('taunt');
                         $this->events_create(false, false, '', '', $event_options);
@@ -1558,7 +1558,7 @@ class rpg_battle extends rpg_object {
                         if ($this_robot->robot_id == $info['robot_id']){ continue; }
                         $temp_robot = rpg_game::get_robot($this, $this_player, $info);
                         $event_options['event_flag_sound_effects'][] = array(
-                            'name' => ($temp_robot->robot_class !== 'master' ? $temp_robot->robot_class.'-' : '').'teleport-in',
+                            'name' => $temp_robot->robot_class.'-teleport-in',
                             'volume' => 1.5,
                             'delay' => ($key * 100)
                             );
@@ -1826,7 +1826,7 @@ class rpg_battle extends rpg_object {
                         $event_options = array();
                         $event_options['console_show_target'] = false;
                         $event_options['event_flag_sound_effects'] = array(
-                            array('name' => ($this_robot->robot_class !== 'master' ? $this_robot->robot_class.'-' : '').'taunt-sound', 'volume' => 1.5)
+                            array('name' => $this_robot->robot_class.'-taunt-sound', 'volume' => 1.5)
                             );
                         $this_robot->set_frame('taunt');
                         $target_robot->set_frame('base');
@@ -2022,8 +2022,8 @@ class rpg_battle extends rpg_object {
                         // Only show the enter event if the switch reason was removed or if there is more then one robot
                         if ($this_switch_reason == 'removed' || $this_player->counters['robots_active'] > 1){
                             $event_options['event_flag_sound_effects'] = array(
-                                array('name' => ($old_robot->robot_class !== 'master' ? $old_robot->robot_class.'-' : '').'switch-in', 'volume' => 1.5),
-                                array('name' => ($temp_new_robot->robot_class !== 'master' ? $temp_new_robot->robot_class.'-' : '').'teleport-in', 'volume' => 1.5, 'delay' => 200)
+                                array('name' => $old_robot->robot_class.'-switch-in', 'volume' => 1.5),
+                                array('name' => $temp_new_robot->robot_class.'-teleport-in', 'volume' => 1.5, 'delay' => 200)
                                 );
                             $this_battle->events_create($temp_new_robot, false, $event_header, $event_body, $event_options);
                             $this_battle->events_create(false, false, '', '');
@@ -2320,12 +2320,12 @@ class rpg_battle extends rpg_object {
                 $this->events_create($temp_target_robot, false, $event_header, $event_body, $event_options);
 
                 // Ensure the target robot's frame is set to its base
-                $event_options['event_flag_sound_effects'] = array(
-                    array('name' => 'scan-success'.($is_new_scan ? '-new' : ''), 'volume' => 1.6)
-                    );
+                $event_options['event_flag_sound_effects'] = array();
+                $event_options['event_flag_sound_effects'][] = array('name' => 'scan-success', 'volume' => 1.5);
+                if ($is_new_scan){ $event_options['event_flag_sound_effects'][] = array('name' => 'scan-success-new', 'volume' => 1.5, 'delay' => 150); }
                 $temp_target_robot->set_frame('taunt');
                 $this->events_create(false, false, '', '', $event_options);
-                $temp_target_robot->set_frame('case');
+                $temp_target_robot->set_frame('base');
                 $this->events_create(false, false, '', '');
 
                 // Add this robot to the global robot database array
