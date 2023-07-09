@@ -754,13 +754,13 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     background-position: 0 0;
 }
 #prototype .header_dr-light {
-    background-image: url(../images/menus/menu-options_this-dr-light-player-select.gif);
+    background-image: url(../images/menus/menu-options_this-dr-light-player-select.gif) !important;
 }
 #prototype .header_dr-wily {
-    background-image: url(../images/menus/menu-options_this-dr-wily-player-select.gif);
+    background-image: url(../images/menus/menu-options_this-dr-wily-player-select.gif) !important;
 }
 #prototype .header_dr-cossack {
-    background-image: url(../images/menus/menu-options_this-dr-cossack-player-select.gif);
+    background-image: url(../images/menus/menu-options_this-dr-cossack-player-select.gif) !important;
 }
 
 #prototype .header_types {
@@ -769,13 +769,13 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     position: relative;
 }
 #prototype .header_types[data-player="dr-light"] {
-    background-image: url(../images/menus/menu-options_this-dr-light-player-select.gif);
+    background-image: url(../images/menus/menu-options_this-dr-light-player-select.gif) !important;
 }
 #prototype .header_types[data-player="dr-wily"] {
-    background-image: url(../images/menus/menu-options_this-dr-wily-player-select.gif);
+    background-image: url(../images/menus/menu-options_this-dr-wily-player-select.gif) !important;
 }
 #prototype .header_types[data-player="dr-cossack"] {
-    background-image: url(../images/menus/menu-options_this-dr-cossack-player-select.gif);
+    background-image: url(../images/menus/menu-options_this-dr-cossack-player-select.gif) !important;
 }
 #prototype .header_types[data-player="dr-light"]:before,
 #prototype .header_types[data-player="dr-wily"]:before,
