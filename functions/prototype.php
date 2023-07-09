@@ -1507,7 +1507,10 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                         $turns = $this_option_turns.($this_option_turns == 1 ? ' T' : ' Ts');
                         $zenny = str_replace('Zenny', 'Zs', $this_option_zenny_amount);
                         $this_option_label .= '<span class="subtext">'.$robots.' | '.$turns.' | '.$zenny.'</span>';
-                        if ($is_player_battle){ $this_option_label .= '<span class="subtext2">At '.$this_fieldinfo['field_name'].'</span>'; }
+                        if ($is_player_battle){
+                            $level_txt = 'Lv. '.$this_option_max_level;
+                            $this_option_label .= '<span class="subtext2">'.$level_txt.' @ '.$this_fieldinfo['field_name'].'</span>';
+                        }
                         elseif ($is_challenge_battle){
                             if ($this_battleinfo['values']['challenge_battle_kind'] == 'user'){
                                 $this_option_label .= '<span class="subtext2">By '.ucwords($this_battleinfo['values']['challenge_battle_by']).'</span>';
