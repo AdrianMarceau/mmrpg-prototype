@@ -221,6 +221,7 @@ body.index #header {
     cursor: help;
     transform: scale(1);
     transition: transform 0.3s;
+    white-space: break-spaces;
 }
 #mmrpg .info[data-click-tooltip].color {
     background-color: #ffffff;
