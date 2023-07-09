@@ -54,10 +54,19 @@ class rpg_canvas {
             $this_data['canvas_offset_y'] += ($this_data['canvas_offset_y'] * 0.10);
 
             // If there's a field hazard in the active position, let's move the doctor out of the way
-            $has_active_field_harzard = false;
+            $has_obscurring_field_object = false;
             $static_attachment_key = $this_player->player_side.'-active';
-            if (!empty($this_player->battle->battle_attachments[$static_attachment_key])){ $has_active_field_harzard = true; }
-            if ($has_active_field_harzard){ $this_data['canvas_offset_x'] -= ($this_data['canvas_offset_x'] * 0.22); }
+            if (!empty($this_player->battle->battle_attachments[$static_attachment_key])){
+                //error_log(PHP_EOL.'player:'.$this_data['player_token'].' has a field hazard in the active position');
+                $static_attachment_tokens = array_keys($this_player->battle->battle_attachments[$static_attachment_key]);
+                $static_attachment_tokens_joined = implode('|', $static_attachment_tokens);
+                //error_log(print_r($static_attachment_tokens, true));
+                //error_log(print_r($this_player->battle->battle_attachments[$static_attachment_key], true));
+                if (strstr($static_attachment_tokens_joined, '_super-block_')){
+                    $has_obscurring_field_object = true;
+                }
+            }
+            if ($has_obscurring_field_object){ $this_data['canvas_offset_x'] -= ($this_data['canvas_offset_x'] * 0.22); }
             // TODO convert this to a 'backwards offset' that is relative to the doctor's emotions about the battle's progress
 
             $this_data['player_sprite_size'] = ceil($this_data['player_scale'] * $this_data['player_sprite_zoom_size']);
