@@ -198,17 +198,13 @@ if (count($matches)>1){
     <?endif;?>
 
 </div>
-<div id="credits">
-    <a href="<?= MMRPG_CONFIG_ROOTURL ?>">&laquo; Back to Website</a> |
-    Mega Man and all related names and characters are &copy; <a href="http://www.capcom.com/" target="_blank" rel="nofollow">Capcom</a> 1986 - <?= date('Y') ?>
-        | <a href="<?= MMRPG_CONFIG_ROOTURL ?>cookies/">Cookie Policy</a>
-        | <a rel="nofollow" href="<?= MMRPG_CONFIG_ROOTURL ?>api/v2/" target="_blank">Data API</a>
-        | <a href="<?= MMRPG_CONFIG_ROOTURL ?>contact/">Contact &amp; Feedback &raquo;</a>
-    <?= !$flag_iphone ? '<br />' : '|' ?>
-    This game is fan-made by <a href="https://github.com/AdrianMarceau" target="_blank" rel="author">Adrian Marceau</a>, not affiliated or endorsed by Capcom at all, and is in no way official. Any and all <a href="contact/" target="_blank">feedback</a> is appreciated. :)
-</div>
+<?
+// Require the common footer
+$footer_context = 'base';
+require(MMRPG_CONFIG_ROOTDIR.'includes/footer.php');
+?>
 <div id="winmods">
-    <fieldset class="field width">
+    <fieldset class="field width" style="display: none;">
         <legend class="label" alt="Adjust Window Width">
             <i class="fa fas fa-tablet-alt" style="position: relative; bottom: 4px;"></i>
             <i class="fa fas fa-arrows-alt-h" style="position: absolute; bottom: -4px; left: 50%; transform: translate(-50%, 0);"></i>
@@ -301,8 +297,8 @@ $(document).ready(function(){
         && $windowMods.length){
 
         // Load previous preferences if present
-        var previousWidth = localStorage.getItem('mmrpg-window-width') || 'flex';
-        var previousHeight = localStorage.getItem('mmrpg-window-height') || 'flex';
+        var previousWidth = localStorage.getItem('mmrpg-window-width') || 'small';
+        var previousHeight = localStorage.getItem('mmrpg-window-height') || 'small';
 
         // Set previous preferences
         $gameWindow.attr('data-window-width', previousWidth);

@@ -2329,7 +2329,8 @@ body[data-source="website"] #prototype .menu {
 }
 #mmrpg.index[data-cinema-mode] #credits,
 #mmrpg.index[data-cinema-mode] #winmods {
-    transition: opacity 0.3s;
+    filter: brightness(1.0);
+    transition: filter 0.3s;
 }
 
 #mmrpg.index[data-cinema-mode="true"] {
@@ -2339,7 +2340,7 @@ body[data-source="website"] #prototype .menu {
 }
 #mmrpg.index[data-cinema-mode="true"] #credits,
 #mmrpg.index[data-cinema-mode="true"] #winmods {
-    opacity: 0.3;
+    filter: brightness(0.6);
 }
 
 

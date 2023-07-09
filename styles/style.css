@@ -2481,6 +2481,7 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     --camera-shift-depth-mod2: 1.8;
     --camera-shift-zoom-perspective: 248px;
 }
+
 #canvas [data-camera-shift] .event .background_canvas,
 #canvas [data-camera-shift] .event .background_event,
 #canvas [data-camera-shift] .event .foreground_canvas,
@@ -4278,9 +4279,11 @@ body.windowFlag_landscapeMode #canvas .clearback {
     box-shadow: 0 0 0 transparent;
     -moz-box-shadow: 0 0 0 transparent;
     -webkit-box-shadow: 0 0 0 transparent;
-    left: auto;
-    right: 124px;
     overflow: visible;
+    left: 50%;
+    right: auto;
+    overflow: visible;
+    transform: translate(-50%, 0);
 }
 body.windowFlag_landscapeMode #canvas .clearback .robot_details_left {
     left: -124px;
