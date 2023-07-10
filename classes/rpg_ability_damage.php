@@ -1276,25 +1276,25 @@ class rpg_ability_damage extends rpg_damage {
         if ($this_ability->ability_results['this_amount'] > 0){
             if (!empty($this_ability->ability_results['flag_weakness'])
                 || !empty($this_ability->ability_results['flag_critical'])){
-                $damage_sounds[] = array('name' => 'damage-critical', 'volume' => 1.5);
-                $damage_sounds[] = array('name' => 'damage-reverb', 'volume' => 1.6, 'delay' => 100);
-                $damage_sounds[] = array('name' => 'damage-reverb', 'volume' => 1.4, 'delay' => 200);
+                $damage_sounds[] = array('name' => 'damage-critical', 'volume' => 0.9);
+                $damage_sounds[] = array('name' => 'damage-reverb', 'volume' => 1.0, 'delay' => 100);
+                $damage_sounds[] = array('name' => 'damage-reverb', 'volume' => 0.8, 'delay' => 200);
             } elseif (!empty($this_ability->ability_results['flag_resistance'])){
-                $damage_sounds[] = array('name' => 'damage-reduced', 'volume' => 1.5);
+                $damage_sounds[] = array('name' => 'damage-reduced', 'volume' => 0.9);
             } elseif ($this_ability->ability_results['this_amount'] === 1){
-                $damage_sounds[] = array('name' => 'damage-hindered', 'volume' => 1.5);
+                $damage_sounds[] = array('name' => 'damage-hindered', 'volume' => 0.9);
             } else {
-                $damage_sounds[] = array('name' => 'damage', 'volume' => 1.5);
-                $damage_sounds[] = array('name' => 'damage-reverb', 'volume' => 1.4, 'delay' => 100);
+                $damage_sounds[] = array('name' => 'damage', 'volume' => 0.9);
+                $damage_sounds[] = array('name' => 'damage-reverb', 'volume' => 0.8, 'delay' => 100);
             }
             if (!empty($this_ability->ability_results['energy_ohko'])){
                 $delay = count($damage_sounds) * 100;
-                $damage_sounds[] = array('name' => 'damage-reverb', 'volume' => 1.4, 'delay' => $delay + 100);
-                $damage_sounds[] = array('name' => 'damage-reverb', 'volume' => 1.4, 'delay' => $delay + 200);
-                $damage_sounds[] = array('name' => 'damage-reverb', 'volume' => 1.4, 'delay' => $delay + 300);
+                $damage_sounds[] = array('name' => 'damage-reverb', 'volume' => 0.8, 'delay' => $delay + 100);
+                $damage_sounds[] = array('name' => 'damage-reverb', 'volume' => 0.8, 'delay' => $delay + 200);
+                $damage_sounds[] = array('name' => 'damage-reverb', 'volume' => 0.8, 'delay' => $delay + 300);
             }
         } else {
-            $damage_sounds[] = array('name' => 'no-effect', 'volume' => 1.5);
+            $damage_sounds[] = array('name' => 'no-effect', 'volume' => 1.0);
         }
         $event_options['event_flag_sound_effects'] = array_merge($event_options['event_flag_sound_effects'], $damage_sounds);
 

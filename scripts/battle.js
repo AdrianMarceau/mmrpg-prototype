@@ -343,7 +343,7 @@ $(document).ready(function(){
                 $starForceSprite.addClass('field_star_collected');
                 $starForceSpriteShadow.addClass('field_star_collected');
                 if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
-                    parent.mmrpg_play_sound_effect('star-collected', {volume: 1.5});
+                    parent.mmrpg_play_sound_effect('star-collected', {volume: 1.0});
                     }
                 };
             var resetStarForceAnimation = function(){
@@ -407,7 +407,7 @@ $(document).ready(function(){
                 $challengeMarkerSprite.addClass('challenge_marker_destroyed');
                 $challengeMarkerSpriteShadow.addClass('challenge_marker_destroyed');
                 if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
-                    parent.mmrpg_play_sound_effect('marker-destroyed', {volume: 1.5});
+                    parent.mmrpg_play_sound_effect('marker-destroyed', {volume: 1.0});
                     }
                 };
             var resetChallengeMarkerAnimation = function(){

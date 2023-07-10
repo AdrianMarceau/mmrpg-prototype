@@ -1057,7 +1057,7 @@ class rpg_battle extends rpg_object {
                     $event_options['event_flag_camera_depth'] = 0;
                     $event_options['event_flag_camera_offset'] = 0;
                     $event_options['event_flag_sound_effects'] = array(
-                        array('name' => 'get-big-item', 'volume' => 1.5)
+                        array('name' => 'get-big-item', 'volume' => 1.0)
                         );
                     $this_player->player_frame = 'victory';
                     $this_player->update_session();
@@ -1359,10 +1359,10 @@ class rpg_battle extends rpg_object {
         $event_options['event_flag_sound_effects'] = array();
         if ($this->battle_result === 'victory'){
             $event_options['event_flag_victory'] = true;
-            $event_options['event_flag_sound_effects'][] = array('name' => 'victory-result', 'volume' => 1.5);
+            $event_options['event_flag_sound_effects'][] = array('name' => 'victory-result', 'volume' => 1.0);
         } elseif ($this->battle_result === 'defeat'){
             $event_options['event_flag_defeat'] = true;
-            $event_options['event_flag_sound_effects'][] = array('name' => 'failure-result', 'volume' => 1.5);
+            $event_options['event_flag_sound_effects'][] = array('name' => 'failure-result', 'volume' => 1.0);
         }
         $event_options['console_container_classes'] = 'field_type field_type_event field_type_'.($this->battle_result == 'victory' ? 'nature' : 'flame');
         $this->events_create($target_robot, $this_robot, $first_event_header, $first_event_body, $event_options);
@@ -1434,7 +1434,7 @@ class rpg_battle extends rpg_object {
                         $event_options['event_flag_camera_side'] = $this_player->player_side;
                         $event_options['event_flag_camera_focus'] = 'active';
                         $event_options['event_flag_sound_effects'] = array(
-                            array('name' => $this_robot->robot_class.'-teleport-in', 'volume' => 1.5)
+                            array('name' => $this_robot->robot_class.'-teleport-in', 'volume' => 1.0)
                             );
                         $this_player->set_frame('taunt');
                         $this_robot->set_frame('taunt');
@@ -1468,7 +1468,7 @@ class rpg_battle extends rpg_object {
                         $event_options['event_flag_camera_side'] = $this_player->player_side;
                         $event_options['event_flag_camera_focus'] = 'active';
                         $event_options['event_flag_sound_effects'] = array(
-                            array('name' => $this_robot->robot_class.'-teleport-in', 'volume' => 1.5)
+                            array('name' => $this_robot->robot_class.'-teleport-in', 'volume' => 1.0)
                             );
                         $this_player->set_frame('taunt');
                         $this_robot->set_frame('taunt');
@@ -1506,7 +1506,7 @@ class rpg_battle extends rpg_object {
                     $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
                     $event_options['event_flag_camera_focus'] = $this_robot->robot_position;
                     $event_options['event_flag_sound_effects'] = array(
-                        array('name' => $this_robot->robot_class.'-teleport-in', 'volume' => 1.5)
+                        array('name' => $this_robot->robot_class.'-teleport-in', 'volume' => 1.0)
                         );
                     $this->events_create($this_robot, false, $event_header, $event_body, $event_options);
 
@@ -1518,7 +1518,7 @@ class rpg_battle extends rpg_object {
                         $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
                         $event_options['event_flag_camera_focus'] = $this_robot->robot_position;
                         $event_options['event_flag_sound_effects'] = array(
-                            array('name' => $this_robot->robot_class.'-taunt-sound', 'volume' => 1.5)
+                            array('name' => $this_robot->robot_class.'-taunt-sound', 'volume' => 1.0)
                             );
                         $this_robot->set_frame('taunt');
                         $this->events_create(false, false, '', '', $event_options);
@@ -1559,7 +1559,7 @@ class rpg_battle extends rpg_object {
                         $temp_robot = rpg_game::get_robot($this, $this_player, $info);
                         $event_options['event_flag_sound_effects'][] = array(
                             'name' => $temp_robot->robot_class.'-teleport-in',
-                            'volume' => 1.5,
+                            'volume' => 1.0,
                             'delay' => ($key * 100)
                             );
 
@@ -1826,7 +1826,7 @@ class rpg_battle extends rpg_object {
                         $event_options = array();
                         $event_options['console_show_target'] = false;
                         $event_options['event_flag_sound_effects'] = array(
-                            array('name' => $this_robot->robot_class.'-taunt-sound', 'volume' => 1.5)
+                            array('name' => $this_robot->robot_class.'-taunt-sound', 'volume' => 1.0)
                             );
                         $this_robot->set_frame('taunt');
                         $target_robot->set_frame('base');
@@ -2022,8 +2022,8 @@ class rpg_battle extends rpg_object {
                         // Only show the enter event if the switch reason was removed or if there is more then one robot
                         if ($this_switch_reason == 'removed' || $this_player->counters['robots_active'] > 1){
                             $event_options['event_flag_sound_effects'] = array(
-                                array('name' => $old_robot->robot_class.'-switch-in', 'volume' => 1.5),
-                                array('name' => $temp_new_robot->robot_class.'-teleport-in', 'volume' => 1.5, 'delay' => 200)
+                                array('name' => $old_robot->robot_class.'-switch-in', 'volume' => 1.0),
+                                array('name' => $temp_new_robot->robot_class.'-teleport-in', 'volume' => 1.0, 'delay' => 200)
                                 );
                             $this_battle->events_create($temp_new_robot, false, $event_header, $event_body, $event_options);
                             $this_battle->events_create(false, false, '', '');
@@ -2314,15 +2314,15 @@ class rpg_battle extends rpg_object {
                 $event_options['event_flag_camera_focus'] = $temp_target_robot->robot_position;
                 $event_options['event_flag_camera_depth'] = $temp_target_robot->robot_key;
                 $event_options['event_flag_sound_effects'] = array(
-                    array('name' => 'scan-start', 'volume' => 1.5)
+                    array('name' => 'scan-start', 'volume' => 1.0)
                     );
                 $temp_target_robot->set_frame('defend');
                 $this->events_create($temp_target_robot, false, $event_header, $event_body, $event_options);
 
                 // Ensure the target robot's frame is set to its base
                 $event_options['event_flag_sound_effects'] = array();
-                $event_options['event_flag_sound_effects'][] = array('name' => 'scan-success', 'volume' => 1.5);
-                if ($is_new_scan){ $event_options['event_flag_sound_effects'][] = array('name' => 'scan-success-new', 'volume' => 1.5, 'delay' => 150); }
+                $event_options['event_flag_sound_effects'][] = array('name' => 'scan-success', 'volume' => 1.0);
+                if ($is_new_scan){ $event_options['event_flag_sound_effects'][] = array('name' => 'scan-success-new', 'volume' => 1.0, 'delay' => 150); }
                 $temp_target_robot->set_frame('taunt');
                 $this->events_create(false, false, '', '', $event_options);
                 $temp_target_robot->set_frame('base');
@@ -2728,7 +2728,7 @@ class rpg_battle extends rpg_object {
             && !empty($eventinfo['event_header'])
             && !empty($eventinfo['event_body'])
             ){
-            $event_flags['sounds'][] = array('name' => 'text-sound', 'volume' => 1.5);
+            $event_flags['sounds'][] = array('name' => 'text-sound', 'volume' => 1.0);
         }
         if (empty($event_flags['sounds'])){ $event_flags['sounds'] = false; }
 

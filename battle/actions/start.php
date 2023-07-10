@@ -230,7 +230,7 @@ require(MMRPG_CONFIG_ROOTDIR.'battle/actions/action_battlestart.php');
 
 // Create a final frame before giving control to the user
 $event_options = array();
-$event_options['event_flag_sound_effects'] = array( array('name' => 'battle-start-sound', 'volume' => 1.5, 'delay' => 200) );
+$event_options['event_flag_sound_effects'] = array( array('name' => 'battle-start-sound', 'volume' => 1.0, 'delay' => 200) );
 $this_battle->events_create(false, false, '', '', $event_options);
 
 ?>
