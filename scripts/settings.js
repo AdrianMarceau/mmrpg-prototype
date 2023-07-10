@@ -190,15 +190,6 @@ $(document).ready(function(){
         var thisSpriteWindow = window.self;
         var thisGameSettings = window.top.gameSettings;
 
-        // Backup the user's audio changes in case we need to reset them
-        var userAudioConfigBackup = {};
-        userAudioConfigBackup.masterVolume = thisGameSettings.masterVolume;
-        userAudioConfigBackup.musicVolume = thisGameSettings.musicVolume;
-        userAudioConfigBackup.effectVolume = thisGameSettings.effectVolume;
-
-        // Backup the user's sprite render mode in case we need to reset it
-        var userSpriteRenderModeBackup = thisGameSettings.spriteRenderMode;
-
         // Collect references to the applicable form fields
         var $audoBalanceConfigField = $('.field[data-setting="audioBalanceConfig"]', $gameSettings);
         var $spriteRenderModeField = $('.field[data-setting="spriteRenderMode"]', $gameSettings);
@@ -230,7 +221,7 @@ $(document).ready(function(){
         }
 
         // Define a function for parsing the audio balance config from the form
-        var parseAudioBalanceConfig = function(){
+        function parseAudioBalanceConfig(){
             // collect refs to all three fields manually
             var $masterVolumeField = $('input[name="masterVolume"]', $audoBalanceConfigField);
             var $musicVolumeField = $('input[name="musicVolume"]', $audoBalanceConfigField);
@@ -249,11 +240,19 @@ $(document).ready(function(){
             };
 
         // Define a function for parsing the sprite render mode setting from the form
-        var parseSpriteRenderMode = function(){
+        function parseSpriteRenderMode(){
             var $checkedInput = $('input[type="radio"]:checked', $spriteRenderModeField);
             var checkedValue = $checkedInput.val();
             return checkedValue;
             };
+
+        // Backup the user's audio changes in case we need to reset them
+        var userAudioConfigBackup = {};
+        userAudioConfigBackup = parseAudioBalanceConfig();
+
+        // Backup the user's sprite render mode in case we need to reset it
+        var userSpriteRenderModeBackup = '';
+        userSpriteRenderModeBackup = parseSpriteRenderMode();
 
         // Define click events for the game settings form elements
         $('input[type="range"]', $audoBalanceConfigField).bind('change', function(e){
@@ -281,10 +280,16 @@ $(document).ready(function(){
 
         // Reset back to backup values if the user switches windows without saving
         var resetGameSettings = function(){
+            //console.log('resetGameSettings()');
+            //console.log('userAudioConfigBackup = ', userAudioConfigBackup);
+            //console.log('userSpriteRenderModeBackup = ', userSpriteRenderModeBackup);
             updateAudioBalanceConfig(userAudioConfigBackup);
             updateSpriteRenderMode(userSpriteRenderModeBackup);
             };
         var applyGameSettings = function(){
+            //console.log('applyGameSettings()');
+            //console.log('parseAudioBalanceConfig() = ', parseAudioBalanceConfig());
+            //console.log('parseSpriteRenderMode() = ', parseSpriteRenderMode());
             updateAudioBalanceConfig(parseAudioBalanceConfig());
             updateSpriteRenderMode(parseSpriteRenderMode());
             };
@@ -299,11 +304,11 @@ $(document).ready(function(){
                 }
             });
         window.onblur = function(){
-            console.log('iframe has lost focus!');
+            //console.log('iframe has lost focus!');
             resetGameSettings();
             };
         window.onfocus = function(){
-            console.log('iframe has gained focus!');
+            //console.log('iframe has gained focus!');
             applyGameSettings();
             };
 

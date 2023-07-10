@@ -1,5 +1,8 @@
 <?
 
+// Require the top file if not already
+if (!defined('MMRPG_CONFIG_ROOTURL')){ require_once('../top.php'); }
+
 // Print out common game settings (the script wrappers are assumed there already)
 echo('gameSettings.baseHref = "'.MMRPG_CONFIG_ROOTURL.'";'.PHP_EOL);
 echo('gameSettings.wapFlag = '.($flag_wap ? 'true' : 'false').';'.PHP_EOL);

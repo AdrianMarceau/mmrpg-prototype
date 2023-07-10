@@ -4861,7 +4861,7 @@ class rpg_robot extends rpg_object {
                         $current_date_attr .= 'data-type2="" ';
                     }
 
-                    $type_or_none = $current_item_info['item_type'] ? $current_item_info['item_type'] : 'none';
+                    $type_or_none = !empty($current_item_info['item_type']) ? $current_item_info['item_type'] : 'none';
                     $type2_or_false = !empty($current_item_info['item_type2']) ? $current_item_info['item_type2'] : false;
                     $types_available = array_filter(array($current_item_info['item_type'], $current_item_info['item_type2']));
                     $all_types_or_none = !empty($types_available) ? implode('_', $types_available) : 'none';
