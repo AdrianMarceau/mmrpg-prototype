@@ -75,7 +75,7 @@ ob_start();
                 echo '<span class="float_title">Select Option</span> ';
                 echo '<span class="float_links">';
                     echo '<span class="page">Page</span>';
-                    for ($i = 1; $i <= $current_options_pages; $i++){ echo '<a class="num'.($i == $temp_selected_page ? ' active' : '').'" href="#'.$i.'">'.$i.'</a>'; }
+                    for ($i = 1; $i <= $current_options_pages; $i++){ echo '<a class="button num'.($i == $temp_selected_page ? ' active' : '').'" href="#'.$i.'">'.$i.'</a>'; }
                 echo '</span> ';
             }
             // Otherwise, simply print the item select text label
