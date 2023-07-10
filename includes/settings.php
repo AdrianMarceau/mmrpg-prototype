@@ -182,6 +182,11 @@ define('MMRPG_SETTINGS_CHAPTER3_STARLOCK', MMRPG_SETTINGS_CHAPTER2_STARLOCK + 0)
 define('MMRPG_SETTINGS_CHAPTER4_STARLOCK', MMRPG_SETTINGS_CHAPTER3_STARLOCK + (3 * 8));       // 24  (Fusions)
 define('MMRPG_SETTINGS_CHAPTER5_STARLOCK', MMRPG_SETTINGS_CHAPTER4_STARLOCK + (3 * 4));       // 36  (Finals)
 
+// Define the global constants related to audio defaults
+define('MMRPG_SETTINGS_AUDIODEFAULT_MASTERVOLUME', 0.7); // Not quite full blast
+define('MMRPG_SETTINGS_AUDIODEFAULT_MUSICVOLUME', 0.4); // Slightly lower than the sfx
+define('MMRPG_SETTINGS_AUDIODEFAULT_EFFECTVOLUME', 0.6); // Slightly higher than the music
+
 // Back-up definition in case COPPA is not defined
 if (!defined('MMRPG_CONFIG_COPPA_PERMISSIONS')){
     define('MMRPG_CONFIG_COPPA_PERMISSIONS', '');

@@ -164,9 +164,9 @@ if (count($matches)>1){
 
     <?if($this_online_flag && $this_browser_flag):?>
         <?if(!$flag_wap):?>
-            <iframe class="loading" name="battle" src="<?= MMRPG_CONFIG_ROOTURL ?>prototype.php?wap=false" width="768" height="1004" frameborder="1" scrolling="no"></iframe>
+            <iframe class="loading" name="prototype" src="<?= MMRPG_CONFIG_ROOTURL ?>prototype.php?wap=false" width="768" height="1004" frameborder="1" scrolling="no"></iframe>
         <?else:?>
-            <iframe class="loading" name="battle" src="<?= MMRPG_CONFIG_ROOTURL ?>prototype.php?wap=true" width="768" height="748" frameborder="0" scrolling="no"></iframe>
+            <iframe class="loading" name="prototype" src="<?= MMRPG_CONFIG_ROOTURL ?>prototype.php?wap=true" width="768" height="748" frameborder="0" scrolling="no"></iframe>
         <?endif;?>
         <div id="music" class="onload">
             <a class="toggle paused has_pixels" href="#" onclick=""><span><span>loading&hellip;</span></span></a>
@@ -281,7 +281,7 @@ echo 'gameSettings.customIndex.soundsIndex = '.json_encode($this_sound_effects_i
 // Collect the sound effect aliases index from teh file and then outpyt to the JS
 $sound_effects_aliases_index = array();
 require(MMRPG_CONFIG_ROOTDIR.'includes/sounds.php');
-error_log('$sound_effects_aliases_index ='.print_r($sound_effects_aliases_index, true));
+//error_log('$sound_effects_aliases_index ='.print_r($sound_effects_aliases_index, true));
 echo 'gameSettings.customIndex.soundsAliasesIndex = '.json_encode($sound_effects_aliases_index).';'.PHP_EOL;
 
 ?>

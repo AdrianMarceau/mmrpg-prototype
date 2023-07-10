@@ -1554,6 +1554,11 @@ function prototype_menu_switch(switchOptions){
                 // Once the menu is faded, remove it from display
                 $(this).addClass('menu_hide').css({opacity:0,marginLeft:'0',marginRight:'0'});
 
+                // Attempt to send a message to the iframe that it's being hidden
+                // var $iframe = $(this).find('iframe');
+                // TODO find a way to send a message to the iframe so that it can revert unsaved audio changes
+
+
                 // Check if the stepNumber is numeric or not
                 if (switchOptions.stepNumber !== false){
 

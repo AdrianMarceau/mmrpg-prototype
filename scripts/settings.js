@@ -15,6 +15,68 @@ $(document).ready(function(){
     $thisSettings = $('#settings', $thisBody);
     $thisSettingsPanel = $('.settings_panel', $thisSettings);
 
+    // -- SOUND EFFECT FUNCTIONALITY -- //
+
+    // Define some interaction sound effects for the items menu
+    var thisContext = $('#settings');
+    if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+
+        // Define a quick local function for routing sound effect plays to the parent
+        function playSoundEffect(soundName, options){
+            if ($(this).is('.button_disabled')){ return; }
+            if ($(this).data('silentClick')){ return; }
+            //console.log('trying to play sound effect');
+            top.mmrpg_play_sound_effect(soundName, options);
+            };
+
+
+        // SETTINGS MENU TABS
+
+        // Add hover and click sounds to the buttons in the main menu
+        $('.tab_links .link', thisContext).live('mouseenter', function(){
+            playSoundEffect.call(this, 'icon-hover', {volume: 0.8});
+            });
+        $('.tab_links .link', thisContext).live('click', function(){
+            playSoundEffect.call(this, 'icon-click', {volume: 1.0});
+            });
+
+
+        // GAME SETTINGS RADIO FIELDS
+
+        // Add hover and click sounds to the buttons in the main menu
+        $('.field .radiofield', thisContext).live('mouseenter', function(){
+            playSoundEffect.call(this, 'icon-hover', {volume: 0.8});
+            });
+        $('.field .radiofield', thisContext).live('click', function(){
+            playSoundEffect.call(this, 'icon-click-mini', {volume: 1.0});
+            });
+
+
+        // GAME SETTINGS AUDIO SLIDERS
+
+        // Add hover and click sounds to the buttons in the main menu
+        $('.field .slider', thisContext).live('mouseenter', function(){
+            playSoundEffect.call(this, 'icon-hover', {volume: 1.0});
+            });
+        $('.field .slider', thisContext).live('click', function(){
+            playSoundEffect.call(this, 'icon-click-mini', {volume: 1.0});
+            });
+        $('.field .slider', thisContext).live('change', function(){
+            playSoundEffect.call(this, 'icon-click-mini', {volume: 1.0});
+            });
+
+        // SAVE & DISCARD BUTTONS
+
+        // Add hover and click sounds to the buttons in the main menu
+        $('.tab_buttons .button', thisContext).live('mouseenter', function(){
+            playSoundEffect.call(this, 'icon-hover', {volume: 0.8});
+            });
+        $('.tab_buttons .button', thisContext).live('click', function(){
+            playSoundEffect.call(this, 'link-click', {volume: 1.0});
+            });
+
+        }
+
     // Check if this window is currently in an iframe
     var windowIsFrame = window.self != window.parent ? true : false;
 
@@ -22,7 +84,7 @@ $(document).ready(function(){
     var windowUpdateProfileSettings = function(){};
     if (typeof parent.window.prototype_update_profile_settings !== 'undefined'){
         windowUpdateProfileSettings = parent.window.prototype_update_profile_settings;
-        }
+    }
 
     // Ensure a settings panels exists before trying to delegate events
     if ($thisSettingsPanel.length){
@@ -49,7 +111,7 @@ $(document).ready(function(){
             $thisSection.addClass('active');
             $('input[name="current_tab"]', $thisSettingsPanel).val(tabToken);
             });
-        $tabLinks.filter('.active').trigger('click');
+        $tabLinks.filter('.active').triggerSilentClick();
 
         // Define a basic validation function to prevent premature submissions
         var $requiredFields = $('[required="required"]', $tabSections);
@@ -102,7 +164,7 @@ $(document).ready(function(){
         clearMessagesFunction();
 
 
-        }
+    }
 
     // Check to see if we are in an iframe before delegating parent events
     if (windowIsFrame){
@@ -113,7 +175,143 @@ $(document).ready(function(){
             windowUpdateProfileSettings(window.profileSettings);
             }
 
+    }
+
+
+    // -- GAME SETTINGS -- //
+
+    // Process complex game setting updates and pass them to the parent window
+    var $gameSettings = $('.game-settings', $thisSettings);
+    if ($gameSettings.length){
+        //console.log('we have game settings specifically');
+
+        // Collect references to the appropriate windows for updating
+        var thisMusicWindow = window.top;
+        var thisSpriteWindow = window.self;
+        var thisGameSettings = window.top.gameSettings;
+
+        // Backup the user's audio changes in case we need to reset them
+        var userAudioConfigBackup = {};
+        userAudioConfigBackup.masterVolume = thisGameSettings.masterVolume;
+        userAudioConfigBackup.musicVolume = thisGameSettings.musicVolume;
+        userAudioConfigBackup.effectVolume = thisGameSettings.effectVolume;
+
+        // Backup the user's sprite render mode in case we need to reset it
+        var userSpriteRenderModeBackup = thisGameSettings.spriteRenderMode;
+
+        // Collect references to the applicable form fields
+        var $audoBalanceConfigField = $('.field[data-setting="audioBalanceConfig"]', $gameSettings);
+        var $spriteRenderModeField = $('.field[data-setting="spriteRenderMode"]', $gameSettings);
+
+        // Define a function for updating the audio balance config w/ form changes
+        function updateAudioBalanceConfig(newConfig){
+            //console.log('updateAudioBalanceConfig(newConfig) w/', newConfig);
+            if (typeof newConfig !== 'object'){ return false; }
+            var masterVolume = typeof newConfig.masterVolume === 'number' ? newConfig.masterVolume : thisGameSettings.masterVolume;
+            var musicVolume = typeof newConfig.musicVolume === 'number' ? newConfig.musicVolume : thisGameSettings.musicVolume;
+            var effectVolume = typeof newConfig.effectVolume === 'number' ? newConfig.effectVolume : thisGameSettings.effectVolume;
+            thisGameSettings.masterVolume = masterVolume;
+            thisGameSettings.musicVolume = musicVolume;
+            thisGameSettings.effectVolume = effectVolume;
+            if (typeof thisMusicWindow.mmrpg_sound_effect_volume !== 'undefined'){ thisMusicWindow.mmrpg_sound_effect_volume(effectVolume); }
+            if (typeof thisMusicWindow.mmrpg_music_volume !== 'undefined'){ thisMusicWindow.mmrpg_music_volume(musicVolume); }
+            if (typeof thisMusicWindow.mmrpg_master_volume !== 'undefined'){ thisMusicWindow.mmrpg_master_volume(masterVolume); }
+            return true;
         }
+
+        // Define a function for updating the sprite rendering mode w/ form changes
+        function updateSpriteRenderMode(newMode){
+            //console.log('updateSpriteRenderMode(newMode) w/', newMode);
+            if (typeof newMode !== 'string'){ return false; }
+            var newRenderMode = newMode.length ? newMode : thisGameSettings.spriteRenderMode;
+            thisGameSettings.spriteRenderMode = newRenderMode;
+            $('#mmrpg').attr('data-render-mode', newRenderMode);
+            return true;
+        }
+
+        // Define a function for parsing the audio balance config from the form
+        var parseAudioBalanceConfig = function(){
+            // collect refs to all three fields manually
+            var $masterVolumeField = $('input[name="masterVolume"]', $audoBalanceConfigField);
+            var $musicVolumeField = $('input[name="musicVolume"]', $audoBalanceConfigField);
+            var $effectVolumeField = $('input[name="effectVolume"]', $audoBalanceConfigField);
+            // collect the values from the three fields
+            var masterVolume = parseFloat($masterVolumeField.val());
+            var musicVolume = parseFloat($musicVolumeField.val());
+            var effectVolume = parseFloat($effectVolumeField.val());
+            // construct a new config object to update with
+            var newConfig = {};
+            newConfig.masterVolume = masterVolume;
+            newConfig.musicVolume = musicVolume;
+            newConfig.effectVolume = effectVolume;
+            //console.log('newConfig = ', newConfig);
+            return newConfig;
+            };
+
+        // Define a function for parsing the sprite render mode setting from the form
+        var parseSpriteRenderMode = function(){
+            var $checkedInput = $('input[type="radio"]:checked', $spriteRenderModeField);
+            var checkedValue = $checkedInput.val();
+            return checkedValue;
+            };
+
+        // Define click events for the game settings form elements
+        $('input[type="range"]', $audoBalanceConfigField).bind('change', function(e){
+            //console.log('change event on audio balance config field');
+            var newConfig = parseAudioBalanceConfig();
+            updateAudioBalanceConfig(newConfig);
+            });
+
+        // Make it so when the user clicks on a radio button's container it automatically triggers the radio button inside
+        $('.radiofield', $spriteRenderModeField).bind('click', function(e){
+            //console.log('click event on sprite render mode field');
+            var $thisField = $(this);
+            var $radioButton = $('input[type="radio"]', $thisField);
+            $radioButton.prop('checked', true);
+            $radioButton.trigger('change');
+            });
+        $('input[type="radio"]', $spriteRenderModeField).bind('change', function(e){
+            //console.log('change event on sprite render mode field');
+            e.stopPropagation();
+            var checkedValue = parseSpriteRenderMode();
+            updateSpriteRenderMode(checkedValue);
+            $spriteRenderModeField.find('.radiofield').removeClass('active');
+            $('input[type="radio"]:checked', $spriteRenderModeField).closest('.radiofield').addClass('active');
+            });
+
+        // Reset back to backup values if the user switches windows without saving
+        var resetGameSettings = function(){
+            updateAudioBalanceConfig(userAudioConfigBackup);
+            updateSpriteRenderMode(userSpriteRenderModeBackup);
+            };
+        var applyGameSettings = function(){
+            updateAudioBalanceConfig(parseAudioBalanceConfig());
+            updateSpriteRenderMode(parseSpriteRenderMode());
+            };
+        window.addEventListener('message', function(event){
+            //console.log('iframe received a message from', event.origin);
+            // IMPORTANT: Check the origin of the data!
+            if (event.origin.startsWith(gameSettings.baseHref)){
+                if (event.data === 'hidden'){
+                    //console.log('The iframe was hidden!');
+                    resetGameSettings();
+                    }
+                }
+            });
+        window.onblur = function(){
+            console.log('iframe has lost focus!');
+            resetGameSettings();
+            };
+        window.onfocus = function(){
+            console.log('iframe has gained focus!');
+            applyGameSettings();
+            };
+
+        // Automatically update saved game settings to be sure it's working
+        updateAudioBalanceConfig(parseAudioBalanceConfig());
+        updateSpriteRenderMode(parseSpriteRenderMode());
+
+    }
 
 
     /*

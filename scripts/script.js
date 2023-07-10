@@ -21,12 +21,6 @@ gameSettings.baseHref = 'http://localhost/'; // the base href where this game is
 gameSettings.wapFlag = false; // whether or not this game is running in mobile mode
 gameSettings.wapFlagIphone = false; // whether or not this game is running in mobile iphone mode
 gameSettings.wapFlagIpad = false; // whether or not this game is running in mobile iphone mode
-gameSettings.maxVolume = 1.0; // default max volume for the game that cannot be exceeded (user controlled)
-gameSettings.baseVolume = 0.5; // default base volume for the game that is half of the max volume for leeway
-gameSettings.musicVolume = 0.6; // default music volume for the game, relative to the other two settings
-gameSettings.effectVolume = 0.8; // default effect volume for the game, relative to the other two settings
-gameSettings.musicVolumeEnabled = true; // default to true to allow music unless otherwise stated
-gameSettings.effectVolumeEnabled = true; // default to true to allow music unless otherwise stated
 gameSettings.eventTimeout = 800; // default animation frame base internal
 gameSettings.eventTimeoutThreshold = 250; // timeout theshold for when frames stop cross-fading
 gameSettings.eventAutoPlay = true; // whether or not to automatically advance events
@@ -34,7 +28,6 @@ gameSettings.eventCrossFade = true; // whether or not to canvas events have cros
 gameSettings.eventCameraShift = true; // whether or not to canvas events have camera shifts
 gameSettings.eventSoundEffects = true; // whether or not to use sound effects for battle events
 gameSettings.eventHooks = []; // default to empty but may be filled at runtime and used later
-gameSettings.spriteRenderMode = 'default'; // the render mode we should be using for sprites
 gameSettings.gameHasStarted = false; // default to false so we can only set to true when ready
 gameSettings.idleAnimation = true; // default to allow idle animations
 gameSettings.indexLoaded = false; // default to false until the index is loaded
@@ -47,8 +40,21 @@ gameSettings.currentBodyWidth = 0; // collect the current window width and updat
 gameSettings.currentBodyHeight = 0; // collect the current window width and update when necessary
 gameSettings.allowEditing = true; // default to true to allow all editing unless otherwise stated
 gameSettings.audioBaseHref = ''; // the base href where audio comes from (empty if same as baseHref)
-gameSettings.customIndex = {}; // default to empty but may be filled at runtime and used later
 gameSettings.onGameStart = []; // define an array to hold  events that have to wait until game start
+gameSettings.customIndex = {}; // default to empty but may be filled at runtime and used later
+gameSettings.customIndex.musicIndex = {} // predefine to be filled later so we don't get errors
+gameSettings.customIndex.soundsIndex = {} // predefine to be filled later so we don't get errors
+gameSettings.customIndex.soundsAliasesIndex = {} // predefine to be filled later so we don't get errors
+
+// Define the customizable MMRPG settings variables
+gameSettings.maxVolume = 1.0; // default max volume for the game that cannot be exceeded (because that would be rude)
+gameSettings.masterVolume = 0.7; // default base volume for the game that is half of the max volume for leeway
+gameSettings.musicVolume = 0.4; // default music volume for the game, relative to the other two settings
+gameSettings.effectVolume = 0.6; // default effect volume for the game, relative to the other two settings
+gameSettings.musicVolumeEnabled = true; // default to true to allow music unless otherwise stated
+gameSettings.effectVolumeEnabled = true; // default to true to allow music unless otherwise stated
+gameSettings.audioBalanceConfig = {}; // default to empty but can hold custom overrides for above
+gameSettings.spriteRenderMode = 'default'; // the render mode we should be using for sprites
 
 // Define an object to hold change events for settings when/if they happen
 var gameSettingsChangeEvents = {};
@@ -399,6 +405,13 @@ $(document).ready(function(){
             }
 
     }
+
+
+    /*
+     * RENDER MODE TRIGGERS
+     */
+
+
 
 
     /*
@@ -1976,7 +1989,7 @@ function mmrpg_events(){
             // Play the victory music
             //console.log('mmrpg_events() / Play the victory music');
             parent.mmrpg_music_load('misc/leader-board', true, false);
-            setTimeout(function(){ parent.mmrpg_music_volume(0); }, 600);
+            setTimeout(function(){ parent.mmrpg_music_volume(0, false); }, 600);
             setTimeout(function(){ parent.mmrpg_fanfare_load('misc/battle-victory', true, true, true, onCompleteCooldown); }, 900);
             if (mmrpgEvents.length < canvasAnimationCameraDelay){ canvasAnimationCameraTimer = canvasAnimationCameraDelay - mmrpgEvents.length; }
             battleResultsDisplayed = true;
@@ -1987,7 +2000,7 @@ function mmrpg_events(){
             // Play the failure music
             //console.log('mmrpg_events() / Play the failure music');
             parent.mmrpg_music_load('misc/leader-board', true, false);
-            setTimeout(function(){ parent.mmrpg_music_volume(0); }, 600);
+            setTimeout(function(){ parent.mmrpg_music_volume(0, false); }, 600);
             setTimeout(function(){ parent.mmrpg_fanfare_load('misc/battle-defeat', true, true, true, onCompleteCooldown); }, 900);
             if (mmrpgEvents.length < canvasAnimationCameraDelay){ canvasAnimationCameraTimer = canvasAnimationCameraDelay - mmrpgEvents.length; }
             battleResultsDisplayed = true;
@@ -2332,7 +2345,43 @@ function mmrpg_stop_animation(){
     return gameSettings.idleAnimation;
 }
 
-// Define a Howl object to handle audio playback and set up some defaults
+
+// -- AUDIO FUNCTIONS -- //
+
+// If our dependency, the Howler.js library, is not loaded, then we'll define a dummy function to prevent errors
+if (typeof window.Howl === 'undefined'){
+    var no = function(){ return false; };
+    Howl = function(){
+        return {
+            play: no,
+            playing: no,
+            stop: no,
+            pause: no,
+            volume: no,
+            fade: no
+            }
+        };
+}
+
+// Define a function for adjusting the master volume of basically everything
+function mmrpg_master_volume(newVolume, saveToSettings, updateMusic, updateSoundEffects){
+    if (!mmrpgMusicSound){ return false; }
+    if (!gameSettings.soundEffectPool){ return false; }
+    //console.log('mmrpg_master_volume(newVolume:', newVolume, ', saveToSettings:', saveToSettings, ', updateMusic:', updateMusic, ', updateSoundEffects:', updateSoundEffects, ')');
+    if (typeof saveToSettings !== 'boolean'){ saveToSettings = true; }
+    if (typeof updateMusic !== 'boolean'){ updateMusic = true; }
+    if (typeof updateSoundEffects !== 'boolean'){ updateSoundEffects = true; }
+    if (newVolume < 0){ newVolume = 0; }
+    if (newVolume > 1){ newVolume = 1; }
+    //console.log('adjusted newVolume =', newVolume);
+    var currentMasterVolume = gameSettings.masterVolume;
+    gameSettings.masterVolume = newVolume;
+    if (updateMusic){ mmrpg_music_volume(gameSettings.musicVolume, saveToSettings, 0); }
+    if (updateSoundEffects){ mmrpg_sound_effect_volume(gameSettings.effectVolume, saveToSettings); }
+    if (!saveToSettings){ gameSettings.masterVolume = currentMasterVolume; }
+}
+
+// Define required music objects to handle audio playback and set up some defaults
 var mmrpgMusicSound = false;
 var mmrpgMusicConfig = {};
 var mmrpgFanfareSound = false;
@@ -2349,14 +2398,14 @@ function mmrpg_music_toggle(){
     if (!mmrpgMusicSound.playing()){
         gameSettings.musicVolumeEnabled = true;
         gameSettings.effectVolumeEnabled = true;
-        mmrpg_music_volume(1);
+        mmrpg_reset_music_volume();
         mmrpg_music_play();
         musicToggle.html('&#9658;');
         musicToggle.removeClass('paused').addClass('playing');
     } else {
         gameSettings.musicVolumeEnabled = false;
         gameSettings.effectVolumeEnabled = false;
-        mmrpg_music_volume(0);
+        mmrpg_music_volume(0, false);
         mmrpgMusicSound.pause();
         musicToggle.html('&#8226;');
         musicToggle.removeClass('playing').addClass('paused');
@@ -2381,7 +2430,7 @@ function mmrpg_music_play(){
         mmrpgMusicSound.play('intro');
         };
     if (!mmrpgMusicSound.playing()){
-        mmrpg_music_volume(1);
+        mmrpg_reset_music_volume();
         if (typeof mmrpgMusicConfig.sprite !== 'undefined'
             && typeof mmrpgMusicConfig.sprite.intro !== 'undefined'
             && typeof mmrpgMusicConfig.sprite.loop !== 'undefined'){
@@ -2405,7 +2454,6 @@ function mmrpg_music_play(){
         }
 }
 
-
 // Define a function for stopping the current music
 function mmrpg_music_stop(){
     //console.log('mmrpg_music_stop()');
@@ -2414,7 +2462,7 @@ function mmrpg_music_stop(){
     var musicToggle = $('a.toggle', gameMusic);
     if (mmrpgMusicSound && mmrpgMusicSound.playing()){
         //console.log('updating the sound and toggle');
-        mmrpg_music_volume(0);
+        mmrpg_music_volume(0, false);
         mmrpgMusicSound.stop();
         musicToggle.find('span').html('PLAY');
         musicToggle.removeClass('playing').addClass('paused');
@@ -2448,7 +2496,8 @@ function mmrpg_music_load(newTrack, resartTrack, playOnce, onendFunction){
         }
     var waitTime = mmrpgMusicSound && mmrpgMusicSound.playing() ? 500 : 0;
     var musicMeta = typeof gameSettings.customIndex.musicIndex[newTrack] === 'object' ? gameSettings.customIndex.musicIndex[newTrack] : false;
-    var musicBaseVolume = gameSettings.baseVolume * gameSettings.musicVolume;
+    var musicBaseVolume = gameSettings.musicVolume * gameSettings.masterVolume;
+    //console.log('music object created with gameSettings.musicVolume:', gameSettings.musicVolume, ' * gameSettings.masterVolume:', gameSettings.masterVolume, ' = musicBaseVolume:', musicBaseVolume);
     if (!gameSettings.musicVolumeEnabled){ musicBaseVolume = 0; }
     var audioConfig = {
         src: [gameSettings.audioBaseHref+'sounds/'+newTrack+'/audio.mp3?'+gameSettings.cacheTime,
@@ -2477,7 +2526,7 @@ function mmrpg_music_load(newTrack, resartTrack, playOnce, onendFunction){
     if (waitTime > 0){ audioConfig.autoplay = false; }
     //console.log('musicMeta =', musicMeta);
     //console.log('audioConfig =', audioConfig);
-    mmrpg_music_volume(0);
+    mmrpg_music_volume(0, false);
     mmrpg_music_stop();
     musicStream.attr('data-track', newTrack);
     musicStream.attr('data-last-track', thisTrack);
@@ -2491,20 +2540,34 @@ function mmrpg_music_load(newTrack, resartTrack, playOnce, onendFunction){
         }
 }
 // Define a function for adjusting the currently playing music's volume
-function mmrpg_music_volume(newVolume, isRelative, fadeDuration){
+function mmrpg_music_volume(newVolume, saveToSettings, fadeDuration){
     if (!mmrpgMusicSound){ return false; }
-    //console.log('mmrpg_music_volume(newVolume:', newVolume, 'isRelative:', isRelative, ')');
-    if (typeof isRelative !== 'boolean'){ isRelative = true; }
+    //console.log('mmrpg_music_volume(newVolume:', newVolume, ', saveToSettings:', saveToSettings, ', fadeDuration:', fadeDuration, ')');
+    if (typeof saveToSettings !== 'boolean'){ saveToSettings = true; }
     if (typeof fadeDuration !== 'number'){ fadeDuration = 500; }
-    var musicBaseVolume = gameSettings.baseVolume * gameSettings.musicVolume;
-    if (!gameSettings.musicVolumeEnabled){ musicBaseVolume = 0; }
-    var currentVolume = mmrpgMusicSound !== false ? mmrpgMusicSound.volume() : musicBaseVolume;
-    var newVolume = isRelative ? (musicBaseVolume * newVolume) : newVolume;
-    if (newVolume > gameSettings.maxVolume){ newVolume = gameSettings.maxVolume; }
-    else if (newVolume < 0){ newVolume = 0; }
-    //console.log('currentVolume =', currentVolume);
-    //console.log('newVolume =', newVolume);
-    if (fadeDuration > 0){ mmrpgMusicSound.fade(currentVolume, newVolume, fadeDuration);  }
+    //newVolume = gameSettings.masterVolume * newVolume; (do that at runtime instead!)
+    if (newVolume < 0){ newVolume = 0; }
+    if (newVolume > 1){ newVolume = 1; }
+    //console.log('adjusted newVolume =', newVolume);
+    var relativeMusicVolume = newVolume * gameSettings.masterVolume;
+    var currentMusicVolume = gameSettings.musicVolume;
+    //console.log('currentMusicVolume =', currentMusicVolume);
+    if (saveToSettings){ gameSettings.musicVolume = currentMusicVolume; }
+    if (fadeDuration > 0){ mmrpgMusicSound.fade(currentMusicVolume, relativeMusicVolume, fadeDuration);  }
+    else { mmrpgMusicSound.volume(relativeMusicVolume); }
+}
+// Define a function for resetting the currently playing music's volume
+function mmrpg_reset_music_volume(fadeDuration){
+    if (!mmrpgMusicSound){ return false; }
+    //console.log('mmrpg_reset_music_volume(fadeDuration:', fadeDuration, ')');
+    if (typeof fadeDuration !== 'number'){ fadeDuration = 500; }
+    var resetToVolume = gameSettings.masterVolume * gameSettings.musicVolume;
+    if (resetToVolume < 0){ resetToVolume = 0; }
+    if (resetToVolume > 1){ resetToVolume = 1; }
+    //console.log('calculated resetToVolume =', resetToVolume);
+    var currentMusicVolume = mmrpgMusicSound.volume();
+    //console.log('currentMusicVolume =', currentMusicVolume);
+    if (fadeDuration > 0){ mmrpgMusicSound.fade(currentMusicVolume, resetToVolume, fadeDuration);  }
     else { mmrpgMusicSound.volume(newVolume); }
 }
 
@@ -2532,8 +2595,8 @@ function mmrpg_fanfare_load(newTrack, resartTrack, playOnce, fadeMusic, onendFun
     fanfareStream.attr('data-track', newTrack);
     fanfareStream.attr('data-last-track', thisTrack);
     // Create a new Howl object and load the new track
-    if (fadeMusic){ mmrpg_music_volume(0.1); }
-    var musicBaseVolume = gameSettings.baseVolume * gameSettings.musicVolume;
+    if (fadeMusic){ mmrpg_music_volume(0.1, false); }
+    var musicBaseVolume = gameSettings.musicVolume * gameSettings.masterVolume;
     if (!gameSettings.musicVolumeEnabled){ musicBaseVolume = 0; }
     mmrpgFanfareSound = new Howl({
         src: [gameSettings.audioBaseHref+'sounds/'+newTrack+'/audio.mp3?'+gameSettings.cacheTime,
@@ -2543,7 +2606,7 @@ function mmrpg_fanfare_load(newTrack, resartTrack, playOnce, fadeMusic, onendFun
         loop: isPlayOnce ? false : true,
         onend: function(){
             onendFunction();
-            if (fadeMusic){ mmrpg_music_volume(1); }
+            if (fadeMusic){ mmrpg_reset_music_volume(); }
             }
     });
 }
@@ -2589,8 +2652,7 @@ function mmrpg_play_sound_effect(effectName, effectConfig){
     if (!mmrpgMusicSound.playing()){ return false; }
 
     // Otherwise, define a base volume for these sound effects to use
-    var baseVolume = gameSettings.baseVolume;
-    var effectBaseVolume = gameSettings.baseVolume * gameSettings.effectVolume;
+    var effectBaseVolume = gameSettings.effectVolume * gameSettings.masterVolume;
     if (!gameSettings.effectVolumeEnabled){ effectBaseVolume = 0; }
     if (mmrpgMusicSound.state() === 'loaded'){ baseVolume = mmrpgMusicSound.volume(); }
 
@@ -2658,6 +2720,27 @@ function mmrpg_play_sound_effect(effectName, effectConfig){
         };
     playSoundWhenReady(effectName);
 
+}
+// Define a function for adjusting the volume if in-game sound effects
+function mmrpg_sound_effect_volume(newVolume, saveToSettings){
+    if (!gameSettings.soundEffectPool){ return false; }
+    //console.log('mmrpg_sound_effect_volume(newVolume:', newVolume, 'saveToSettings:', saveToSettings, ')');
+    if (typeof saveToSettings !== 'boolean'){ saveToSettings = true; }
+    //newVolume = gameSettings.masterVolume * gameSettings.effectVolume; (do that at runtime instead!)
+    if (newVolume < 0){ newVolume = 0; }
+    if (newVolume > 1){ newVolume = 1; }
+    //console.log('adjusted newVolume =', newVolume);
+    var relativeEffectVolume = newVolume * gameSettings.masterVolume;
+    var currentEffectVolume = gameSettings.effectVolume;
+    if (saveToSettings){ gameSettings.effectVolume = newVolume; }
+    if (gameSettings.soundEffectPool.length){
+        var soundIDs = Object.keys(gameSettings.soundEffectPool);
+        for (var i = 0; i < soundIDs.length; i++){
+            var soundID = soundIDs[i];
+            var sound = gameSettings.soundEffectPool[soundID];
+            sound.volume(relativeEffectVolume);
+        }
+    }
 }
 
 

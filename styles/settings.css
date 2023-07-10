@@ -394,6 +394,14 @@ body.windowFlag_landscapeMode #prototype {
 #settings .tab_sections .section .field .select.error {
     border-color: red;
 }
+#settings .tab_sections .section .field .slider {
+    display: block;
+    clear: both;
+    margin: 0 auto 4px 0;
+    font-size: 100%;
+    line-height: 1.4;
+    width: 98%;
+}
 input:-internal-autofill-selected {
     color: #F2F2F2 !important;
     border: 1px solid #3c3c3c !important;
@@ -439,6 +447,63 @@ input::-webkit-calendar-picker-indicator {
     content: ")";
 }
 
+#settings .tab_sections .section .field .subfield {
+    display: block;
+    clear: both;
+    margin: 0 auto 0 0;
+    padding-right: 20px;
+}
+#settings .tab_sections .section .field .label + .subfield {
+    padding-top: 5px;
+}
+#settings .tab_sections .section .field .subfield .label {
+    font-size: 10px;
+    font-weight: normal;
+}
+
+
+#settings .tab_sections .section .field .radiofield {
+    display: block;
+    float: left;
+    clear: left;
+    margin: 0 5px 5px 0;
+    border: 1px solid #3c3c3c;
+    background-color: #272727;
+    color: #FAFAFA;
+    border-radius: 3px;
+    position: relative;
+    transition: background-color 0.3s, color 0.3s;
+}
+#settings .tab_sections .section .field .radiofield:hover {
+    background-color: #363636;
+}
+#settings .tab_sections .section .field .radiofield.active {
+    background-color: #cacaca;
+    color: #262626;
+}
+#settings .tab_sections .section .field .radiofield input[type="radio"] {
+    position: absolute;
+    z-index: 2;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
+}
+#settings .tab_sections .section .field .radiofield label {
+    position: relative;
+    z-index: 1;
+    display: block;
+    padding: 6px 12px;
+    padding-left: 30px;
+    text-align: left;
+    font-size: 10px;
+    font-weight: normal;
+    pointer-events: none;
+}
+#settings .tab_sections .section .field .radiofield,
+#settings .tab_sections .section .field .radiofield * {
+    cursor: pointer;
+}
 
 #settings .tab_sections .section .field.buttons {
 
@@ -482,6 +547,63 @@ input::-webkit-calendar-picker-indicator {
     background-color: transparent;
     bottom: 0px;
     height: auto !important;
+}
+
+
+#settings .game-settings {
+
+
+}
+
+
+#settings .game-settings .field[data-setting="spriteRenderMode"] {
+
+
+}
+#settings .game-settings .field[data-setting="spriteRenderMode"] .samples {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: block;
+    box-sizing: border-box;
+    width: 210px;
+    height: 130px;
+    /* border: 1px dotted red; */
+}
+#settings .game-settings .field[data-setting="spriteRenderMode"] .samples .group {
+    display: block;
+    float: left;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    /* border: 1px dotted cyan; */
+}
+#settings .game-settings .field[data-setting="spriteRenderMode"] .samples:after,
+#settings .game-settings .field[data-setting="spriteRenderMode"] .samples .group:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+#settings .game-settings .field[data-setting="spriteRenderMode"] .samples .group.of2 {
+    height: 50%;
+}
+#settings .game-settings .field[data-setting="spriteRenderMode"] .samples .group .sprite {
+    position: absolute;
+    margin: 0;
+    background-size: auto 100%;
+}
+#settings .game-settings .field[data-setting="spriteRenderMode"] .samples .group .sprite_40x40 {
+    top: -16px;
+    left: -10px;
+}
+#settings .game-settings .field[data-setting="spriteRenderMode"] .samples .group .sprite_80x80 {
+    top: -30px;
+    left: 0px;
+}
+#settings .game-settings .field[data-setting="spriteRenderMode"] .samples .group .sprite_160x160 {
+    bottom: 0;
+    left: -10px;
 }
 
 

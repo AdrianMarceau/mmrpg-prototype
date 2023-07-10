@@ -18,6 +18,15 @@ if (!empty($event_timeout)){ echo "gameSettings.eventTimeout = {$event_timeout};
 $sprite_render_mode = !empty($_SESSION['GAME']['battle_settings']['spriteRenderMode']) ? $_SESSION['GAME']['battle_settings']['spriteRenderMode'] : '';
 if (!empty($sprite_render_mode)){ echo "gameSettings.spriteRenderMode = '{$sprite_render_mode}';\n"; }
 
+// Update the audio balance config setting if set
+$audio_balance_config = !empty($_SESSION['GAME']['battle_settings']['audioBalanceConfig']) ? $_SESSION['GAME']['battle_settings']['audioBalanceConfig'] : '';
+if (!empty($audio_balance_config)){
+    echo "gameSettings.audioBalanceConfig = ".json_encode($audio_balance_config).";\n";
+    echo "gameSettings.masterVolume = ".$audio_balance_config['masterVolume'].";\n";
+    echo "gameSettings.musicVolume = ".$audio_balance_config['musicVolume'].";\n";
+    echo "gameSettings.effectVolume = ".$audio_balance_config['effectVolume'].";\n";
+}
+
 // Update any animation effects that have been defined in the session
 $animation_effects_index = rpg_canvas::get_animation_effects_index();
 if (!empty($animation_effects_index)){

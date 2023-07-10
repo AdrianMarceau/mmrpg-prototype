@@ -1322,9 +1322,19 @@ body[data-source="website"] #prototype .menu {
     */
 }
 
+@keyframes player-button-background-scroll {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: -100% 0;
+    }
+}
 #mmrpg #prototype .option_this-player-select {
     background-image: url(../images/menus/menu-options_this-player-select.gif);
     background-repeat: repeat;
+    background-position: 0 0;
+    animation: player-button-background-scroll 60s linear infinite;
 }
 #mmrpg #prototype .option_this-battle-select {
     background-image: url(../images/menus/menu-options_this-battle-select.gif);
@@ -1639,6 +1649,10 @@ body[data-source="website"] #prototype .menu {
     -o-animation: none;
     -webkit-animation: none;
     animation: none;
+}
+#mmrpg #prototype .banner .option_this-player-select[data-token] {
+    background-position: 0 0;
+    animation: player-button-background-scroll 40s linear infinite;
 }
 
 #mmrpg #prototype .option_wrapper_missions .option[data-token="dr-light-endless-mission"],
