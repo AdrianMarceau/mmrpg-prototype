@@ -838,15 +838,18 @@ function windowResizeUpdate(updateType){
 
     //console.log({windowWidth:windowWidth,windowHeight:windowHeight,gameWidth:gameWidth,gameHeight:gameHeight,gameSettings:gameSettings});
 
-    var windowModWidth = localStorage.getItem('mmrpg-window-width') || 'flex';
-    var windowModHeight = localStorage.getItem('mmrpg-window-height') || 'flex';
+    var windowModWidth = localStorage.getItem('mmrpg-window-width') || 'small';
+    var windowModHeight = localStorage.getItem('mmrpg-window-height') || 'small';
 
     // Check if the window is in landscape mode and update the session
     var thisRequestType = 'session';
     var thisRequestData = 'index_settings,windowFlag,';
     //if (windowWidth >= (1024 + 12)){ $('body').addClass('windowFlag_landscapeMode'); thisRequestData += 'landscapeMode'; }
-    if (Math.ceil(windowModWidth === 'flex' ? windowWidth : gameWidth) >= 1024){ $('body').addClass('windowFlag_landscapeMode'); thisRequestData += 'landscapeMode'; }
-    else { $('body').removeClass('windowFlag_landscapeMode'); thisRequestData += 'portraitMode'; }
+    //if (Math.ceil(windowModWidth === 'flex' ? windowWidth : gameWidth) >= 1024){ $('body').addClass('windowFlag_landscapeMode'); thisRequestData += 'landscapeMode'; }
+    //else { $('body').removeClass('windowFlag_landscapeMode'); thisRequestData += 'portraitMode'; }
+    $('body').removeClass('windowFlag_portraitMode'); // we hate "portraitMode" now
+    $('body').removeClass('windowFlag_landscapeMode'); // we hate "landscapeMode" now
+    thisRequestData += 'portraitMode'; // we still gotta send "portraitMode" every update I guess
     if (windowResizeUpdateTimeout !== false){ clearTimeout(windowResizeUpdateTimeout); }
     windowResizeUpdateTimeout = setTimeout(function(){
         $.post('scripts/script.php',{requestType:thisRequestType,requestData:thisRequestData});
