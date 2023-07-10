@@ -2416,16 +2416,16 @@ class rpg_player extends rpg_object {
             if (!isset($print_options['show_quotes'])){ $print_options['show_quotes'] = true; }
             if (!isset($print_options['show_description'])){ $print_options['show_description'] = true; }
             if (!isset($print_options['show_sprites'])){ $print_options['show_sprites'] = true; }
-            if (!isset($print_options['show_abilities'])){ $print_options['show_abilities'] = true; }
+            if (!isset($print_options['show_abilities'])){ $print_options['show_abilities'] = false; }
             if (!isset($print_options['show_records'])){ $print_options['show_records'] = true; }
             if (!isset($print_options['show_footer'])){ $print_options['show_footer'] = true; }
             if (!isset($print_options['show_key'])){ $print_options['show_key'] = false; }
         } elseif ($print_options['layout_style'] == 'website_compact'){
             if (!isset($print_options['show_basics'])){ $print_options['show_basics'] = true; }
             if (!isset($print_options['show_mugshot'])){ $print_options['show_mugshot'] = true; }
-            if (!isset($print_options['show_quotes'])){ $print_options['show_quotes'] = true; }
+            if (!isset($print_options['show_quotes'])){ $print_options['show_quotes'] = false; }
             if (!isset($print_options['show_description'])){ $print_options['show_description'] = false; }
-            if (!isset($print_options['show_sprites'])){ $print_options['show_sprites'] = false; }
+            if (!isset($print_options['show_sprites'])){ $print_options['show_sprites'] = true; }
             if (!isset($print_options['show_abilities'])){ $print_options['show_abilities'] = false; }
             if (!isset($print_options['show_records'])){ $print_options['show_records'] = false; }
             if (!isset($print_options['show_footer'])){ $print_options['show_footer'] = true; }
@@ -2478,9 +2478,6 @@ class rpg_player extends rpg_object {
                         <? else: ?>
                             <?= $player_info['player_name'] ?>
                         <? endif; ?>
-                        <? if (!empty($player_info['player_type'])): ?>
-                            <span class="header_core ability_type" style="border-color: rgba(0, 0, 0, 0.2) !important; background-color: rgba(0, 0, 0, 0.2) !important;"><?= ucfirst($player_info['player_type']) ?> Type</span>
-                        <? endif; ?>
                     </h2>
 
                     <div class="body body_left" style="margin-right: 0; padding: 0 0 2px;">
@@ -2500,13 +2497,13 @@ class rpg_player extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td class="right">
-                                        <label style="display: block; float: left;">Bonus :</label>
+                                        <label style="display: block; float: left;">Skill :</label>
                                         <?
                                             // Display any special boosts this player has
-                                            if (!empty($player_info['player_energy'])){ echo '<span class="player_name player_type player_type_energy">Robot Energy +'.$player_info['player_energy'].'%</span>'; }
-                                            elseif (!empty($player_info['player_attack'])){ echo '<span class="player_name player_type player_type_attack">Robot Attack +'.$player_info['player_attack'].'%</span>'; }
-                                            elseif (!empty($player_info['player_defense'])){ echo '<span class="player_name player_type player_type_defense">Robot Defense +'.$player_info['player_defense'].'%</span>'; }
-                                            elseif (!empty($player_info['player_speed'])){ echo '<span class="player_name player_type player_type_speed">Robot Speed +'.$player_info['player_speed'].'%</span>'; }
+                                            if (!empty($player_info['player_energy'])){ echo '<span class="player_name player_type player_type_energy">Energy +'.$player_info['player_energy'].'%</span>'; }
+                                            elseif (!empty($player_info['player_attack'])){ echo '<span class="player_name player_type player_type_attack">Attack +'.$player_info['player_attack'].'%</span>'; }
+                                            elseif (!empty($player_info['player_defense'])){ echo '<span class="player_name player_type player_type_defense">Defense +'.$player_info['player_defense'].'%</span>'; }
+                                            elseif (!empty($player_info['player_speed'])){ echo '<span class="player_name player_type player_type_speed">Speed +'.$player_info['player_speed'].'%</span>'; }
                                             else { echo '<span class="player_name player_type player_type_none">None</span>'; }
                                         ?>
                                     </td>
@@ -2577,12 +2574,16 @@ class rpg_player extends rpg_object {
                         $show_sizes = array();
                         $base_size = $player_image_size;
                         $zoom_size = $player_image_size * 2;
-                        $show_sizes[$base_size] = $base_size.'x'.$base_size;
-                        $show_sizes[$zoom_size] = $zoom_size.'x'.$zoom_size;
+                        $base_size_text = $base_size.'x'.$base_size;
+                        $zoom_size_text = $zoom_size.'x'.$zoom_size;
+                        $show_sizes[$base_size] = $base_size_text;
+                        $show_sizes[$zoom_size] = $zoom_size_text;
+                        if ($print_options['layout_style'] === 'website_compact'){ unset($show_sizes[$base_size]); }
                         $size_key = -1;
                         foreach ($show_sizes AS $size_value => $sprite_size_text){
                             $size_key++;
                             $size_is_final = $size_key == (count($show_sizes) - 1);
+                            $show_sprite_labels = $size_is_final && $print_options['layout_style'] !== 'website_compact' ? true : false;
 
                             // Start the output buffer and prepare to collect sprites
                             ob_start();
@@ -2610,8 +2611,8 @@ class rpg_player extends rpg_object {
                                         $temp_title = htmlentities($temp_title, ENT_QUOTES, 'UTF-8', true);
                                         $temp_label = 'Mugshot '.ucfirst(substr($temp_direction, 0, 1));
                                         echo '<div class="frame_container" data-clickcopy="'.$temp_embed.'" data-direction="'.$temp_direction.'" data-image="'.$temp_player_image_token.'" data-frame="mugshot" style="'.($size_is_final ? 'padding-top: 20px;' : 'padding: 0;').' float: left; position: relative; margin: 0; box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.75); width: '.$size_value.'px; height: '.$size_value.'px; overflow: hidden;">';
-                                            echo '<img class="has_pixels" style="margin-left: 0; height: '.$size_value.'px;" data-tooltip="'.$temp_title.'" src="images/players/'.$temp_player_image_token.'/mug_'.$temp_direction.'_'.$show_sizes[$base_size].'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
-                                            if ($size_is_final){ echo '<label style="position: absolute; left: 5px; top: 0; color: #EFEFEF; font-size: 10px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);">'.$temp_label.'</label>'; }
+                                            echo '<img class="has_pixels" style="margin-left: 0; height: '.$size_value.'px;" data-tooltip="'.$temp_title.'" src="images/players/'.$temp_player_image_token.'/mug_'.$temp_direction.'_'.$sprite_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
+                                            if ($show_sprite_labels){ echo '<label style="position: absolute; left: 5px; top: 0; color: #EFEFEF; font-size: 10px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);">'.$temp_label.'</label>'; }
                                         echo '</div>';
                                     }
 
@@ -2634,7 +2635,7 @@ class rpg_player extends rpg_object {
                                             //if ($temp_sheet > 1){ $temp_player_image_token .= '-'.$temp_sheet; }
                                             echo '<div class="frame_container" data-clickcopy="'.$temp_embed.'" data-direction="'.$temp_direction.'" data-image="'.$temp_player_image_token.'" data-frame="'.$frame_relative.'" style="'.($size_is_final ? 'padding-top: 20px;' : 'padding: 0;').' float: left; position: relative; margin: 0; box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.75); width: '.$size_value.'px; height: '.$size_value.'px; overflow: hidden;">';
                                                 echo '<img class="has_pixels" style="margin-left: '.$margin_left.'px; height: '.$size_value.'px;" data-tooltip="'.$temp_title.'" alt="'.$temp_imgalt.'" src="images/players/'.$temp_player_image_token.'/sprite_'.$temp_direction.'_'.$sprite_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
-                                                if ($size_is_final){ echo '<label style="position: absolute; left: 5px; top: 0; color: #EFEFEF; font-size: 10px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);">'.$temp_label.'</label>'; }
+                                                if ($show_sprite_labels){ echo '<label style="position: absolute; left: 5px; top: 0; color: #EFEFEF; font-size: 10px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);">'.$temp_label.'</label>'; }
                                             echo '</div>';
                                         }
                                     }
@@ -2651,7 +2652,7 @@ class rpg_player extends rpg_object {
 
                     ?>
 
-                    <h2 id="sprites" class="header header_full <?= $player_header_types ?>" style="margin: 10px 0 0; text-align: left; overflow: hidden; height: auto;">
+                    <h2 <?= $print_options['layout_style'] == 'website' ? 'id="sprites"' : '' ?> class="header header_full sprites_header <?= $player_header_types ?>" style="margin: 10px 0 0; text-align: left; overflow: hidden; height: auto; <?= $print_options['layout_style'] == 'website_compact' ? 'display: none;' : '' ?>">
                         Sprite Sheets
                         <span class="header_links image_link_container">
                             <span class="images" style="<?= count($temp_alts_array) == 1 ? 'display: none;' : '' ?>"><?
@@ -2693,7 +2694,7 @@ class rpg_player extends rpg_object {
                         </span>
                     </h2>
 
-                    <div id="sprites_body" class="body body_full sprites_body solid">
+                    <div <?= $print_options['layout_style'] == 'website' ? 'id="sprites_body"' : '' ?> class="body body_full sprites_body solid">
                         <?= $this_sprite_markup ?>
                         <?
                         // Define the editor title based on ID
@@ -2778,7 +2779,7 @@ class rpg_player extends rpg_object {
 
                 <? endif; ?>
 
-                <? if ($print_options['show_quotes'] && $print_options['layout_style'] == 'website'): ?>
+                <? if ($print_options['show_quotes']): ?>
 
                     <h2 id="quotes" class="header player_type_<?= $player_type_token ?>" style="margin: 10px 0 0; text-align: left; ">
                         Battle Quotes
@@ -3715,7 +3716,7 @@ class rpg_player extends rpg_object {
             $bonus_stat_token = $temp_player_type['type_token'];
             $bonus_stat_name = $temp_player_type['type_name'];
             $bonus_stat_value = !empty($player_info['player_'.$bonus_stat_token]) ? $player_info['player_'.$bonus_stat_token] : 0;
-            $temp_description .= 'Bonus : +'.$bonus_stat_value.'% '.$bonus_stat_name.'';
+            $temp_description .= 'Skill : +'.$bonus_stat_value.'% '.$bonus_stat_name.'';
         }
 
         $temp_player_title .= ' // '.$temp_description;

@@ -708,51 +708,56 @@ function refreshDatabaseEvents(thisDatabase){
     var thisSpritesHeader = $('#tabs', thisDatabase);
 
     // Collect a reference to the link container and make sure it exists
-    var thisSpritesHeader = $('#sprites', thisDatabase);
-    var thisSpritesBody = $('#sprites_body', thisDatabase);
-    if (thisSpritesHeader.length && thisSpritesBody.length){
+    var thisSpritesHeaders = $('.sprites_header', thisDatabase);
+    var thisSpritesBodies = $('.sprites_body', thisDatabase);
+    if (thisSpritesHeaders.length && thisSpritesBodies.length){
         //console.log('database sprite links');
+        thisSpritesBodies.each(function(){
+            var thisSpritesBody = $(this);
+            var thisSpritesHeader = thisSpritesBody.prev('.sprites_header');
+            console.log('thisSpritesBody =', thisSpritesBody.length, thisSpritesBody);
+            console.log('thisSpritesHeader =', thisSpritesHeader.length, thisSpritesHeader);
+            // Collect a reference to the link container if it exists
+            var thisLinkContainer = $('.image_link_container', thisSpritesHeader);
+            if (thisLinkContainer.length){
+            //console.log('database sprite links > image link container');
 
-        // Collect a reference to the link container if it exists
-        var thisLinkContainer = $('.image_link_container', thisSpritesHeader);
-        if (thisLinkContainer.length){
-        //console.log('database sprite links > image link container');
+                // Define the click events for the direction links
+                var directionLinks = $('.directions', thisLinkContainer);
+                $('.link_direction', directionLinks).click(function(e){
+                    e.preventDefault();
+                    var thisLink = $(this);
+                    var thisDirection = thisLink.attr('data-direction');
+                    var thisImage = $('.images .link_active', thisLinkContainer).attr('data-image');
+                    //console.log('database sprite links > image link container > click direction '+thisDirection);
+                    $('.link', directionLinks).removeClass('link_active');
+                    thisLink.addClass('link_active');
+                    $('.frame_container', thisSpritesBody).css({display:'none'});
+                    $('.frame_container[data-image='+thisImage+'][data-direction='+thisDirection+']', thisSpritesBody).css({display:''});
+                    });
+                // Auto-click the first link or whichever one has the active class
+                var firstLink = $('.link_active', directionLinks).length ? $('.link_active', directionLinks) : $('.link_direction:first-child', directionLinks);
+                firstLink.trigger('click');
 
-            // Define the click events for the direction links
-            var directionLinks = $('.directions', thisLinkContainer);
-            $('.link_direction', directionLinks).click(function(e){
-                e.preventDefault();
-                var thisLink = $(this);
-                var thisDirection = thisLink.attr('data-direction');
-                var thisImage = $('.images .link_active', thisLinkContainer).attr('data-image');
-                //console.log('database sprite links > image link container > click direction '+thisDirection);
-                $('.link', directionLinks).removeClass('link_active');
-                thisLink.addClass('link_active');
-                $('.frame_container', thisSpritesBody).css({display:'none'});
-                $('.frame_container[data-image='+thisImage+'][data-direction='+thisDirection+']', thisSpritesBody).css({display:''});
-                });
-            // Auto-click the first link or whichever one has the active class
-            var firstLink = $('.link_active', directionLinks).length ? $('.link_active', directionLinks) : $('.link_direction:first-child', directionLinks);
-            firstLink.trigger('click');
+                // Define the click events for the image links
+                var imageLinks = $('.images', thisLinkContainer);
+                $('.link_image', imageLinks).click(function(e){
+                    e.preventDefault();
+                    var thisLink = $(this);
+                    var thisImage = thisLink.attr('data-image');
+                    var thisDirection = $('.directions .link_active', thisLinkContainer).attr('data-direction');
+                    //console.log('database sprite links > image link container > click image '+thisImage);
+                    $('.link', imageLinks).removeClass('link_active');
+                    thisLink.addClass('link_active');
+                    $('.frame_container', thisSpritesBody).css({display:'none'});
+                    $('.frame_container[data-image='+thisImage+'][data-direction='+thisDirection+']', thisSpritesBody).css({display:''});
+                    });
+                // Auto-click the first link or whichever one has the active class
+                var firstLink = $('.link_active', imageLinks).length ? $('.link_active', imageLinks) : $('.link_image:first-child', imageLinks);
+                firstLink.trigger('click');
 
-            // Define the click events for the image links
-            var imageLinks = $('.images', thisLinkContainer);
-            $('.link_image', imageLinks).click(function(e){
-                e.preventDefault();
-                var thisLink = $(this);
-                var thisImage = thisLink.attr('data-image');
-                var thisDirection = $('.directions .link_active', thisLinkContainer).attr('data-direction');
-                //console.log('database sprite links > image link container > click image '+thisImage);
-                $('.link', imageLinks).removeClass('link_active');
-                thisLink.addClass('link_active');
-                $('.frame_container', thisSpritesBody).css({display:'none'});
-                $('.frame_container[data-image='+thisImage+'][data-direction='+thisDirection+']', thisSpritesBody).css({display:''});
-                });
-            // Auto-click the first link or whichever one has the active class
-            var firstLink = $('.link_active', imageLinks).length ? $('.link_active', imageLinks) : $('.link_image:first-child', imageLinks);
-            firstLink.trigger('click');
-
-            }
+                }
+            });
 
         }
 

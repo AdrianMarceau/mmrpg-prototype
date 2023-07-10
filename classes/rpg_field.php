@@ -1366,10 +1366,10 @@ class rpg_field extends rpg_object {
 
                 <? if($print_options['show_sprites'] && $field_image_token != 'field'): ?>
 
-                    <h2 id="sprites" class="header header_full field_type_<?= $field_type_token ?>" style="margin: 10px 0 0; text-align: left;">
+                    <h2 <?= $print_options['layout_style'] == 'website' ? 'id="sprites"' : '' ?> class="header header_full sprites_header field_type_<?= $field_type_token ?>" style="margin: 10px 0 0; text-align: left;">
                         Sprite Sheets
                     </h2>
-                    <div id="sprites_body" class="body body_full sprites_body field_sprites_body solid">
+                    <div <?= $print_options['layout_style'] == 'website' ? 'id="sprites_body"' : '' ?> class="body body_full sprites_body field_sprites_body solid">
                         <div id="sprite_container" class="sprite_container">
                             <div class="sprite_background" style="background-image: url(images/fields/<?= $field_info['field_background'] ?>/battle-field_background_base.gif?<?= MMRPG_CONFIG_CACHE_DATE ?>);">
                                 <div class="sprite_foreground" style="background-image: url(images/fields/<?= $field_info['field_background'] ?>/battle-field_foreground_base.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">

@@ -1907,7 +1907,7 @@ class rpg_item extends rpg_object {
 
                     ?>
 
-                    <h2 id="sprites" class="header header_full <?= $item_header_types ?>" style="margin: 10px 0 0; text-align: left; overflow: hidden; height: auto;">
+                    <h2 <?= $print_options['layout_style'] == 'website' ? 'id="sprites"' : '' ?> class="header header_full sprites_header <?= $item_header_types ?>" style="margin: 10px 0 0; text-align: left; overflow: hidden; height: auto;">
                         Sprite Sheets
                         <span class="header_links image_link_container">
                             <span class="images" style="<?= count($temp_alts_array) == 1 ? 'display: none;' : '' ?>"><?
@@ -1949,7 +1949,7 @@ class rpg_item extends rpg_object {
                         </span>
                     </h2>
 
-                    <div id="sprites_body" class="body body_full sprites_body solid">
+                    <div <?= $print_options['layout_style'] == 'website' ? 'id="sprites_body"' : '' ?> class="body body_full sprites_body solid">
                         <?= $this_sprite_markup ?>
                         <?
                         // Define the editor title based on ID
