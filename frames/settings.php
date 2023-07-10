@@ -803,8 +803,8 @@ if (!empty($_REQUEST['current_tab']) && in_array($_REQUEST['current_tab'], $allo
                         </div>
 
                         <div class="tab_buttons">
-                            <input class="button save type type_nature" type="submit" value="Save Changes" />
-                            <input class="button reset type type_flame" type="reset" value="Discard Changes" onclick="javascript: window.location.href = window.location.href;" />
+                            <input class="button save clickonce type type_nature" type="submit" value="Save Changes" />
+                            <input class="button reset clickonce type type_flame" type="reset" value="Discard Changes" onclick="javascript: window.location.href = window.location.href;" />
                         </div>
 
                     </form>

@@ -58,21 +58,37 @@ $(document).ready(function(){
         $('.field .slider', thisContext).live('mouseenter', function(){
             playSoundEffect.call(this, 'icon-hover', {volume: 1.0});
             });
+        /*
         $('.field .slider', thisContext).live('click', function(){
             playSoundEffect.call(this, 'icon-click-mini', {volume: 1.0});
             });
         $('.field .slider', thisContext).live('change', function(){
             playSoundEffect.call(this, 'icon-click-mini', {volume: 1.0});
             });
+            */
 
         // SAVE & DISCARD BUTTONS
 
         // Add hover and click sounds to the buttons in the main menu
         $('.tab_buttons .button', thisContext).live('mouseenter', function(){
-            playSoundEffect.call(this, 'icon-hover', {volume: 0.8});
+            if ($(this).is('.reset')){
+                playSoundEffect.call(this, 'back-hover', {volume: 1.0});
+                }
+            else {
+                playSoundEffect.call(this, 'link-hover', {volume: 0.8});
+                }
             });
         $('.tab_buttons .button', thisContext).live('click', function(){
-            playSoundEffect.call(this, 'link-click', {volume: 1.0});
+            if ($(this).is('.button.save')){
+                playSoundEffect.call(this, 'link-click-special', {volume: 1.0});
+                }
+            else if ($(this).is('.reset')){
+                playSoundEffect.call(this, 'back-click', {volume: 1.0});
+                setTimeout(function(){ playSoundEffect.call(this, 'back-click-loading', {volume: 1.0}); }, 300);
+                }
+            else {
+                playSoundEffect.call(this, 'link-click', {volume: 1.0});
+                }
             });
 
         }
@@ -112,6 +128,12 @@ $(document).ready(function(){
             $('input[name="current_tab"]', $thisSettingsPanel).val(tabToken);
             });
         $tabLinks.filter('.active').triggerSilentClick();
+        var $clickOnceButtons = $tabButtons.find('.button.clickonce');
+        //console.log('$clickOnceButtons =', $clickOnceButtons.length, $clickOnceButtons);
+        $clickOnceButtons.bind('click', function(e){
+            $(this).addClass('clicked');
+            $tabSections.css({opacity: 0.5, filter:'brightness(0.5)'});
+            });
 
         // Define a basic validation function to prevent premature submissions
         var $requiredFields = $('[required="required"]', $tabSections);
@@ -259,6 +281,7 @@ $(document).ready(function(){
             //console.log('change event on audio balance config field');
             var newConfig = parseAudioBalanceConfig();
             updateAudioBalanceConfig(newConfig);
+            playSoundEffect.call(this, 'icon-click-mini', {volume: 1.0});
             });
 
         // Make it so when the user clicks on a radio button's container it automatically triggers the radio button inside

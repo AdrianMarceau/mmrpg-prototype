@@ -273,6 +273,21 @@ body.windowFlag_landscapeMode #prototype {
     content: "\0003a9";
 }
 
+@keyframes tab-button-clicked-pulse {
+    0% {
+        transform: scale(1.1);
+        filter: brightness(1.0);
+    }
+    50% {
+        transform: scale(1.15);
+        filter: brightness(1.2);
+    }
+    100% {
+        transform: scale(1.1);
+        filter: brightness(1.0);
+    }
+}
+
 #settings .tab_buttons {
     display: block;
     margin: 0 auto;
@@ -293,6 +308,17 @@ body.windowFlag_landscapeMode #prototype {
     font-size: 12px;
     line-height: 1.4;
     padding: 6px 12px;
+    transform: scale(1.0);
+    filter: brightness(1.0);
+    transition: transform 0.3s, filter 0.3s;
+}
+#settings .tab_buttons .button:hover {
+    transform: scale(1.1);
+}
+#settings .tab_buttons .button.clickonce.clicked {
+    animation: tab-button-clicked-pulse 1s infinite;
+    pointer-events: none;
+    cursor: wait;
 }
 
 #settings .tab_sections {
