@@ -95,7 +95,7 @@ function print_starchart_omega($info, $key, $kind){
         $sprite_markup = '<span class="'.$sprite_class.'" style="'.$sprite_style.'">&nbsp;</span>';
 
         $icon_class = 'icon robot_type robot_type_'.$type.' ';
-        $icon_markup = '<a class="'.$icon_class.'" data-'.$kind.'-key="'.$key.'" title="'.$title.'">%s</a>';
+        $icon_markup = '<a class="'.$icon_class.'" data-'.$kind.'-key="'.$key.'" data-click-tooltip="'.$title.'">%s</a>';
 
         $return_markup = sprintf($icon_markup, $sprite_markup)."\n";
 
@@ -197,7 +197,10 @@ gameSettings.autoScrollTop = false;
 
                     <div class="starforce">
                         <div class="wrapper">
-                            <a class="size_toggle"><span>X</span></a>
+                            <a class="size_toggle">
+                                <span class="maximize"><i class="fa fas fa-window-maximize"></i></span>
+                                <span class="restore"><i class="fa fas fa-window-restore"></i></span>
+                            </a>
 
                             <?
 
@@ -565,8 +568,9 @@ gameSettings.autoScrollTop = false;
 
                                                     // Print out the markup for the field or fusion star
                                                     $is_visible = in_array($side_key, $chart_keys_visible['side']) && in_array($top_key, $chart_keys_visible['top']) ? true : false;
-                                                    echo '<a href="#" data-side-key="'.$side_key.'" data-top-key="'.$top_key.'" data-tooltip="'.$temp_star_title.'" data-tooltip-type="field_type field_type_'.$temp_field_type_1.(!empty($temp_field_type_2) && ($temp_field_type_1 != $temp_field_type_2) ? '_'.$temp_field_type_2 : '').'" class="sprite sprite_40x40 sprite_star '.($is_visible ? 'visible' : '').'" style="">';
+                                                    echo '<a data-side-key="'.$side_key.'" data-top-key="'.$top_key.'" data-click-tooltip="'.$temp_star_title.'" data-tooltip-type="field_type field_type_'.$temp_field_type_1.(!empty($temp_field_type_2) && ($temp_field_type_1 != $temp_field_type_2) ? '_'.$temp_field_type_2 : '').'" class="sprite sprite_40x40 sprite_star '.($is_visible ? 'visible' : '').'" style="">';
                                                         echo '<div class="sprite sprite_40x40 sprite_40x40_left sprite_40x40_left_'.$temp_star_back['frame'].'" style="background-image: url('.$temp_star_back['path'].'); z-index: 10;">&nbsp;</div>';
+                                                        echo '<div class="sprite sprite_40x40 sprite_40x40_left sprite_40x40_left_'.$temp_star_back['frame'].'" style="background-image: url('.$temp_star_back['path'].'); z-index: 8;">&nbsp;</div>';
                                                         //echo '<div class="sprite sprite_40x40 sprite_40x40_left sprite_40x40_left_'.$temp_star_front['frame'].'" style="background-image: url('.$temp_star_front['path'].'); z-index: 20;">&nbsp;</div>';
                                                     echo '</a>';
 
@@ -583,7 +587,7 @@ gameSettings.autoScrollTop = false;
 
                                                     // Print out the markup for the field or fusion star
                                                     $is_visible = in_array($side_key, $chart_keys_visible['side']) && in_array($top_key, $chart_keys_visible['top']) ? true : false;
-                                                    echo '<a href="#" data-side-key="'.$side_key.'" data-top-key="'.$top_key.'" data-tooltip-type="field_type field_type_empty" class="sprite sprite_40x40 sprite_star empty_star '.($is_visible ? 'visible' : '').'" style="">';
+                                                    echo '<a data-side-key="'.$side_key.'" data-top-key="'.$top_key.'" data-tooltip-type="field_type field_type_empty" class="sprite sprite_40x40 sprite_star empty_star '.($is_visible ? 'visible' : '').'" style="">';
                                                         echo '<div class="sprite sprite_40x40 sprite_40x40_left sprite_40x40_left_00" style="">&nbsp;</div>';
                                                         echo '<div class="sprite sprite_40x40 sprite_40x40_left sprite_40x40_left_00" style="">&nbsp;</div>';
                                                     echo '</a>';
@@ -613,6 +617,7 @@ gameSettings.autoScrollTop = false;
         </div>
 
     </div>
+
 <script type="text/javascript">
 $(document).ready(function(){
 
