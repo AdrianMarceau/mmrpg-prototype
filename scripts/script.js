@@ -2660,13 +2660,21 @@ function mmrpg_play_sound_effect(effectName, effectConfig){
 
     // If the game hasn't loaded we shoudln't be playing anything
     if (!gameSettings.indexLoaded){ return false; }
-    if (mmrpgMusicSound === false){ return false; }
     if (!mmrpgMusicSound.playing()){ return false; }
+    if (mmrpgMusicSound === false){ return false; }
 
     // Otherwise, define a base volume for these sound effects to use
-    var effectBaseVolume = gameSettings.effectVolume * gameSettings.masterVolume;
-    if (!gameSettings.effectVolumeEnabled){ effectBaseVolume = 0; }
-    if (mmrpgMusicSound.state() === 'loaded'){ baseVolume = mmrpgMusicSound.volume(); }
+    var baseEffectVolume = gameSettings.effectVolume * gameSettings.masterVolume;
+
+    // Collect this effect's volume, rate factor, and loop boolean for use
+    var effectVolume = baseEffectVolume;
+    var effectRate = 1;
+    var effectLoop = false;
+    if (typeof effectConfig !== 'object'){ effectConfig = {}; }
+    if (typeof effectConfig.volume === 'number'){ effectVolume *= effectConfig.volume; }
+    if (typeof effectConfig.rate === 'number'){ effectRate = effectConfig.rate; }
+    if (typeof effectConfig.loop === 'boolean'){ effectLoop = effectConfig.loop; }
+    if (!gameSettings.effectVolumeEnabled){ effectVolume = 0; }
 
     // Get the next sound object from the pool
     gameSettings.soundEffectPoolIndex++;
@@ -2678,8 +2686,9 @@ function mmrpg_play_sound_effect(effectName, effectConfig){
             src: gameSettings.soundEffectSources,
             sprite: gameSettings.soundEffectSprites,
             autoplay: false,
-            loop: false,
-            volume: effectBaseVolume
+            volume: effectVolume,
+            rate: effectRate,
+            loop: effectLoop
             });
         gameSettings.soundEffectPool[gameSettings.soundEffectPoolIndex] = sound;
 
@@ -2687,6 +2696,11 @@ function mmrpg_play_sound_effect(effectName, effectConfig){
 
         // We can pull an existing sound object to use from the pool
         sound = gameSettings.soundEffectPool[gameSettings.soundEffectPoolIndex];
+        sound.on('play', function(){
+            sound.volume(effectVolume);
+            sound.rate(effectRate);
+            sound.loop(effectLoop);
+            });
 
         }
 
@@ -2695,19 +2709,6 @@ function mmrpg_play_sound_effect(effectName, effectConfig){
 
     // Stop any currently playing sound
     sound.stop();
-    sound.volume(effectBaseVolume);
-    sound.rate(1);
-
-    // Update configuration for this specific sound instance if provided
-    if (effectConfig) {
-        if (effectConfig.volume !== undefined){
-            var newVolume = effectBaseVolume * effectConfig.volume;
-            if (newVolume > gameSettings.maxVolume){ newVolume = gameSettings.maxVolume; }
-            sound.volume(newVolume);
-            }
-        if (effectConfig.loop !== undefined){ sound.loop(effectConfig.loop); }
-        if (effectConfig.rate !== undefined){ sound.rate(effectConfig.rate); }
-        }
 
     // Replace the effect name if we're using an alias at the moment
     if (typeof gameSettings.customIndex.soundsAliasesIndex[effectName] !== 'undefined'){
@@ -2715,6 +2716,7 @@ function mmrpg_play_sound_effect(effectName, effectConfig){
         //console.log('alias triggered // new effectName =', effectName);
         } else {
         //console.log('using RAW name // effectName =', effectName);
+        // TODO:  Make sure this effectName actually exists in the index of sound effect sprites
         }
 
     // Play the sound when ready using a function that checks load status
@@ -2730,8 +2732,10 @@ function mmrpg_play_sound_effect(effectName, effectConfig){
             sound.stop();
             sound.play(effectName);
             }
+        return true;
         };
     playSoundWhenReady(effectName);
+    return true;
 
 }
 // Define a function for adjusting the volume if in-game sound effects
