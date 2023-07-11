@@ -217,6 +217,11 @@ body.windowFlag_landscapeMode #prototype {
 #edit #canvas .wrapper .sort_wrapper .label {
     color: rgba(255, 255, 255, 0.90);
 }
+#edit #canvas .wrapper .sort_wrapper .label:after {
+    content: ":";
+    filter: brightness(0.5);
+    padding-left: 3px;
+}
 #edit #canvas .wrapper .sort_wrapper .sort {
     margin-left: 4px;
     color: rgba(255, 255, 255, 0.60);
@@ -995,6 +1000,58 @@ body[data-mode="viewer"] #edit #canvas .item_canvas a.item_name {
 }
 #edit .section .formatter {
     width: 100%;
+}
+
+#edit #console .ability_presets {
+    display: block;
+    float: right;
+    width: auto;
+    height: 8px;
+    margin: 2px 2px 2px auto;
+    padding: 2px 6px 2px 8px;
+    font-size: 8px;
+    line-height: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #FFFFFF;
+    border: 0 none transparent;
+    background-color: #191919;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 0.3em;
+    -moz-border-radius: 0.3em;
+    -webkit-border-radius: 0.3em;
+}
+#edit #console .ability_presets .label,
+#edit #console .ability_presets .preset {
+    display: block;
+    position: static;
+    float: left;
+    font-size: 7px;
+    line-height: 7px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+}
+#edit #console .ability_presets .label {
+    color: rgba(255, 255, 255, 0.90);
+    margin-right: 3px;
+}
+#edit #console .ability_presets .label:after {
+    content: ":";
+    filter: brightness(0.5);
+    padding-left: 3px;
+}
+#edit #console .ability_presets .preset {
+    margin-left: 6px;
+    color: rgba(255, 255, 255, 0.60);
+}
+#edit #console .ability_presets .preset {
+    cursor: pointer;
+}
+#edit #console .ability_container:not([data-status="disabled"]) .ability_presets .preset:hover {
+    color: rgba(255, 255, 255, 0.90);
+    text-shadow: 1px 1px 0 #000000;
+    transform: translate(-1px, -1px);
 }
 
 

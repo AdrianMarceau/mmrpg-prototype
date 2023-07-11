@@ -4863,7 +4863,7 @@ class rpg_robot extends rpg_object {
 
                     $type_or_none = !empty($current_item_info['item_type']) ? $current_item_info['item_type'] : 'none';
                     $type2_or_false = !empty($current_item_info['item_type2']) ? $current_item_info['item_type2'] : false;
-                    $types_available = array_filter(array($current_item_info['item_type'], $current_item_info['item_type2']));
+                    $types_available = !empty($current_item_info['item_type']) ? array_filter(array($current_item_info['item_type'], $current_item_info['item_type2'])) : array();
                     $all_types_or_none = !empty($types_available) ? implode('_', $types_available) : 'none';
                     $any_type_or_none = !empty($types_available) ? array_shift($types_available) : 'none';
 
@@ -4883,14 +4883,14 @@ class rpg_robot extends rpg_object {
                                     <?= $current_item_name ?>
                                     <span class="arrow"><i class="fa fas fa-angle-double-down"></i></span>
                                 </label>
-                                <?= $btn_info_circle ?>
+                                <?= !empty($current_item_token) ? $btn_info_circle : '' ?>
                             </a>
                         <? else: ?>
                             <a class="item_name type <?= $current_item_type ?>" style="opacity: 0.5; filter: alpha(opacity=50); cursor: default;">
                                 <label style="background-image: url(images/items/<?= $current_item_image ?>/icon_left_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">
                                     <?= $current_item_name ?>
                                 </label>
-                                <?= $btn_info_circle ?>
+                                <?= !empty($current_item_token) ? $btn_info_circle : '' ?>
                             </a>
                         <? endif; ?>
                     </td>
@@ -5358,6 +5358,25 @@ class rpg_robot extends rpg_object {
                                         // DEBUG
                                         //echo '<br />';
 
+                                        ?>
+                                        <?
+                                        // Print the sort wrapper and options if allowed
+                                        if ($global_allow_editing){
+                                            // print options for start, level-up, balanced, and random
+                                            ?>
+                                            <div class="ability_presets">
+                                                <label class="label">auto</label>
+                                                <?
+                                                $preset_options = array('start', 'offense', 'support', 'balanced', 'random');
+                                                foreach($preset_options as $preset_option){
+                                                    ?>
+                                                    <a class="preset preset_<?= $preset_option ?>" data-preset="<?= $preset_option ?>" data-player="<?= $player_info['player_token'] ?>" data-robot="<?= $robot_info['robot_token'] ?>"><?= $preset_option ?></a>
+                                                    <?
+                                                }
+                                                ?>
+                                            </div>
+                                            <?
+                                        }
                                         ?>
                                     </div>
                                 </td>
