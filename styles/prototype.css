@@ -407,6 +407,20 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .banner .options .link i {
     margin-right: -2px;
     font-size: 90%;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.2);
+    color: white;
+    border-radius: 4px;
+    padding: 0 0 0 2px;
+    line-height: 1.2;
+}
+#prototype .banner .options .link i:before {
+    display: inline-block;
+    transform: scale(1.0);
+    transition: transform 0.1s;
+}
+#prototype .banner .options .link:hover i:before {
+    transform: scale(1.4);
 }
 #prototype .banner .options .pipe {
     padding: 0 4px;
@@ -456,6 +470,14 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     opacity: 0.6;
     transition: opacity 0.3s;
     color: #ffffff;
+}
+#prototype .banner .options_userinfo .config i:before {
+    display: inline-block;
+    transform: scale(1.0);
+    transition: transform 0.1s;
+}
+#prototype .banner .options_userinfo:hover .config i:before {
+    transform: scale(1.4);
 }
 #prototype .banner .options_userinfo[data-step],
 #prototype .banner .options_userinfo[data-step] * {
