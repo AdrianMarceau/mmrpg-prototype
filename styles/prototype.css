@@ -1373,6 +1373,7 @@ body[data-source="website"] #prototype .menu {
 }
 #mmrpg #prototype .option_this-dr-light-player-select {
     background-image: url(../images/menus/menu-options_this-dr-light-player-select.gif);
+    animation: player-button-background-scroll 120s linear infinite;
 }
 #mmrpg #prototype .option_this-dr-light-battle-select {
     background-image: url(../images/menus/menu-options_this-dr-light-battle-select.gif);
@@ -1389,6 +1390,7 @@ body[data-source="website"] #prototype .menu {
 }
 #mmrpg #prototype .option_this-dr-wily-player-select {
     background-image: url(../images/menus/menu-options_this-dr-wily-player-select.gif);
+    animation: player-button-background-scroll 90s linear infinite;
 }
 #mmrpg #prototype .option_this-dr-wily-battle-select {
     background-image: url(../images/menus/menu-options_this-dr-wily-battle-select.gif);
@@ -1405,6 +1407,7 @@ body[data-source="website"] #prototype .menu {
 }
 #mmrpg #prototype .option_this-dr-cossack-player-select {
     background-image: url(../images/menus/menu-options_this-dr-cossack-player-select.gif);
+    animation: player-button-background-scroll 60s linear infinite;
 }
 #mmrpg #prototype .option_this-dr-cossack-battle-select {
     background-image: url(../images/menus/menu-options_this-dr-cossack-battle-select.gif);
