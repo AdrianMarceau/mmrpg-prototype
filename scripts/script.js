@@ -47,10 +47,11 @@ gameSettings.customIndex.soundsIndex = {} // predefine to be filled later so we 
 gameSettings.customIndex.soundsAliasesIndex = {} // predefine to be filled later so we don't get errors
 
 // Define the customizable MMRPG settings variables
-gameSettings.maxVolume = 1.0; // default max volume for the game that cannot be exceeded (because that would be rude)
-gameSettings.masterVolume = 0.7; // default base volume for the game that is half of the max volume for leeway
-gameSettings.musicVolume = 0.4; // default music volume for the game, relative to the other two settings
-gameSettings.effectVolume = 0.6; // default effect volume for the game, relative to the other two settings
+gameSettings.maxVolume = 1.0; // max volume for the game that cannot be exceeded (because that would be rude)
+gameSettings.masterVolume = 0.5; // master volume for the game that is exactly in the middle of the road
+gameSettings.musicVolume = 0.4; // music volume for the game, relative to master, slightly lower than effects
+gameSettings.effectVolume = 0.6; // effect volume for the game, relative to master, slightly higher than e
+gameSettings.menuEffectVolume = 0.6; // menu effect volume modifier, relative effect volume, may be unique later
 gameSettings.musicVolumeEnabled = true; // default to true to allow music unless otherwise stated
 gameSettings.effectVolumeEnabled = true; // default to true to allow music unless otherwise stated
 gameSettings.audioBalanceConfig = {}; // default to empty but can hold custom overrides for above
@@ -114,11 +115,19 @@ $(document).ready(function(){
     gameSettings.wapFlagIphone = (navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)) ? true : false;
     gameSettings.wapFlagIpad = navigator.userAgent.match(/iPad/i) ? true : false;
 
-    // If this window is running as a child, we need to ask the parent
-    if (window.self !== window.top
-        && typeof window.top.gameSettings !== 'undefined'
-        && typeof window.top.gameSettings.gameHasStarted !== 'undefined'){
-        gameSettings.gameHasStarted = window.top.gameSettings.gameHasStarted;
+    // If this window is not running as top, we need to overwrite some variables and functions
+    if (window.self !== window.top){
+
+        // Collect a reference to the topmost window
+        var selfWindow = window.self;
+        var topWindow = window.top;
+
+        // Update the gameHasStarted variable by asking the parent for its setting
+        if (typeof topWindow.gameSettings !== 'undefined'
+            && typeof topWindow.gameSettings.gameHasStarted !== 'undefined'){
+            gameSettings.gameHasStarted = topWindow.gameSettings.gameHasStarted;
+        }
+
     }
 
 
