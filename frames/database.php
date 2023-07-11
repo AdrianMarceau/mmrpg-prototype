@@ -839,7 +839,7 @@ $(document).ready(function(){
         function playSoundEffect(soundName, options){
             if ($(this).is('.button_disabled')){ return; }
             if ($(this).data('silentClick')){ return; }
-            console.log('trying to play sound effect');
+            //console.log('trying to play sound effect');
             top.mmrpg_play_sound_effect(soundName, options);
             };
 
@@ -848,12 +848,12 @@ $(document).ready(function(){
 
         // Add hover and click sounds to the buttons in the game-pages menu
         $('#canvas #robot_games .game_link', thisContext).live('mouseenter', function(){
-            console.log('hovering over database game page');
+            //console.log('hovering over database game page');
             if ($(this).is('.game_link_disabled')){ return; }
             playSoundEffect.call(this, 'link-hover', {volume: 0.5});
             });
         $('#canvas #robot_games .game_link', thisContext).live('click', function(){
-            console.log('clicking database game page');
+            //console.log('clicking database game page');
             if ($(this).is('.game_link_disabled')){ return; }
             playSoundEffect.call(this, 'link-click', {volume: 1.0});
             });
@@ -862,13 +862,24 @@ $(document).ready(function(){
 
         // Add hover and click sounds to the buttons in the main menu
         $('#canvas .wrapper_robots .sprite_robot', thisContext).live('mouseenter', function(){
-            console.log('hovering over database robot icon');
+            //console.log('hovering over database robot icon');
             playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
             });
         $('#canvas .wrapper_robots .sprite_robot', thisContext).live('click', function(){
-            console.log('clicking database robot icon');
+            //console.log('clicking database robot icon');
             if ($(this).is('[data-token-locked]')){ return; }
             playSoundEffect.call(this, 'icon-click', {volume: 1.0});
+            });
+
+        // DATABASE PAGE SPANS
+
+        // Add hover and click sounds to the buttons in the robot page
+        $('#console .event .field_name[data-click-tooltip],'+
+            '#console .event .skill_name[data-click-tooltip],'+
+            '#console .event .ability_name[data-click-tooltip],'+
+            '#console .event .record_name[data-click-tooltip]', thisContext).live('mouseenter', function(){
+            //console.log('hovering over database robot icon');
+            playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
             });
 
         }
