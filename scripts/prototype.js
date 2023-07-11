@@ -44,13 +44,15 @@ $(document).ready(function(){
         // -- SOUND EFFECT FUNCTIONALITY -- //
 
         // Define some interaction sound effects for the prototype main menu
-        if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+        if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
 
             // Define a quick local function for routing sound effect plays to the parent
             function playSoundEffect(soundName, options){
                 if ($(this).is('.option_disabled')){ return; }
                 if ($(this).data('silentClick')){ return; }
-                parent.mmrpg_play_sound_effect(soundName, options);
+                if (top.mmrpg_play_sound_effect !== 'undefined'){
+                    top.mmrpg_play_sound_effect(soundName, options);
+                    }
                 };
 
 
@@ -58,7 +60,7 @@ $(document).ready(function(){
 
             // Add hover and click sounds to the links in the main menu
             $('.banner .options_fullmenu .link', thisContext).live('mouseenter', function(){
-                playSoundEffect.call(this, 'link-hover', {volume: 0.5});
+                playSoundEffect.call(this, 'link-hover');
                 });
             $('.banner .options_fullmenu .link', thisContext).live('click', function(){
                 if ($(this).is('.link_home')){ playSoundEffect.call(this, 'link-click-special'); }
@@ -67,7 +69,7 @@ $(document).ready(function(){
 
             // Add hover and click sounds to the user config button in the main menu
             $('.banner .options_userinfo[data-step]', thisContext).live('mouseenter', function(){
-                playSoundEffect.call(this, 'link-hover', {volume: 0.5});
+                playSoundEffect.call(this, 'link-hover');
                 });
             $('.banner .options_userinfo[data-step]', thisContext).live('click', function(){
                 playSoundEffect.call(this, 'link-click');
@@ -75,7 +77,7 @@ $(document).ready(function(){
 
             // Add hover and click sounds to the leaderboard button in the main menu
             $('.banner .points[data-step]', thisContext).live('mouseenter', function(){
-                playSoundEffect.call(this, 'link-hover', {volume: 0.5});
+                playSoundEffect.call(this, 'link-hover');
                 });
             $('.banner .points[data-step]', thisContext).live('click', function(){
                 playSoundEffect.call(this, 'link-click');
@@ -86,7 +88,7 @@ $(document).ready(function(){
             // Add hover and click sounds to the chapter select buttons
             $('.menu .chapter_select .chapter_link', thisContext).live('mouseenter', function(){
                 if ($(this).is('.chapter_link_disabled')){ return; }
-                playSoundEffect.call(this, 'link-hover', {volume: 0.5});
+                playSoundEffect.call(this, 'link-hover');
                 });
             $('.menu .chapter_select .chapter_link', thisContext).live('click', function(){
                 if ($(this).is('.chapter_link_disabled')){ return; }
@@ -97,7 +99,7 @@ $(document).ready(function(){
 
             // Add hover and click sounds to the player select buttons
             $('.menu .option_this-player-select', thisContext).live('mouseenter', function(){
-                playSoundEffect.call(this, 'link-hover', {volume: 0.5});
+                playSoundEffect.call(this, 'link-hover');
                 });
             $('.menu .option_this-player-select', thisContext).live('click', function(){
                 playSoundEffect.call(this, 'lets-go');
@@ -107,7 +109,7 @@ $(document).ready(function(){
 
             // Add hover and click sounds to the battle select buttons
             $('.menu .option_this-battle-select', thisContext).live('mouseenter', function(){
-                playSoundEffect.call(this, 'link-hover', {volume: 0.5});
+                playSoundEffect.call(this, 'link-hover');
                 });
             $('.menu .option_this-battle-select', thisContext).live('click', function(){
                 playSoundEffect.call(this, 'lets-go');
@@ -117,7 +119,7 @@ $(document).ready(function(){
 
             // Add hover and click sounds to the robot select buttons
             $('.menu .option_this-robot-select', thisContext).live('mouseenter', function(){
-                playSoundEffect.call(this, 'link-hover', {volume: 0.5});
+                playSoundEffect.call(this, 'link-hover');
                 });
             $('.menu .option_this-robot-select', thisContext).live('click', function(){
                 playSoundEffect.call(this, 'link-click-robot');
@@ -130,7 +132,7 @@ $(document).ready(function(){
 
             // Add hover and click sounds to any back buttons
             $('.menu .option_back', thisContext).live('mouseenter', function(){
-                playSoundEffect.call(this, 'back-hover', {volume: 0.5});
+                playSoundEffect.call(this, 'back-hover');
                 });
             $('.menu .option_back', thisContext).live('click', function(){
                 playSoundEffect.call(this, 'back-click');
