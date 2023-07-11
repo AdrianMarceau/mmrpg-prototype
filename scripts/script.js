@@ -1,5 +1,5 @@
 // Initialize the MMRPG global variables
-var mmrpgBody = mmrpgBody;
+var mmrpgBody = false;
 var gameWindow = false;
 var gameEngine = false;
 var gameConnect = false;
@@ -2687,6 +2687,7 @@ function mmrpg_play_sound_effect(effectName, effectConfig){
     // Stop any currently playing sound
     sound.stop();
     sound.volume(effectBaseVolume);
+    sound.rate(1);
 
     // Update configuration for this specific sound instance if provided
     if (effectConfig) {
