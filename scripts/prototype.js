@@ -44,10 +44,11 @@ $(document).ready(function(){
         // -- SOUND EFFECT FUNCTIONALITY -- //
 
         // Define some interaction sound effects for the prototype main menu
+        var playSoundEffect = function(){};
         if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
 
             // Define a quick local function for routing sound effect plays to the parent
-            function playSoundEffect(soundName, options){
+            playSoundEffect = function(soundName, options){
                 if ($(this).is('.option_disabled')){ return; }
                 if ($(this).data('silentClick')){ return; }
                 if (top.mmrpg_play_sound_effect !== 'undefined'){

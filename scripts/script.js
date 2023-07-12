@@ -51,7 +51,7 @@ gameSettings.maxVolume = 1.0; // max volume for the game that cannot be exceeded
 gameSettings.masterVolume = 0.5; // master volume for the game that is exactly in the middle of the road
 gameSettings.musicVolume = 0.4; // music volume for the game, relative to master, slightly lower than effects
 gameSettings.effectVolume = 0.6; // effect volume for the game, relative to master, slightly higher than e
-gameSettings.menuEffectVolume = 0.6; // menu effect volume modifier, relative effect volume, may be unique later
+gameSettings.menuEffectVolume = 0.8; // menu effect volume modifier, relative effect volume, may be unique later
 gameSettings.musicVolumeEnabled = true; // default to true to allow music unless otherwise stated
 gameSettings.effectVolumeEnabled = true; // default to true to allow music unless otherwise stated
 gameSettings.audioBalanceConfig = {}; // default to empty but can hold custom overrides for above
@@ -2652,8 +2652,8 @@ gameSettings.soundEffectSprites = {};
 // Define a list of sound effect aliases we can use in the code to abstract a bit
 gameSettings.customIndex.soundsIndex = {};
 gameSettings.customIndex.soundsAliasesIndex = {};
-function mmrpg_play_sound_effect(effectName, effectConfig){
-    //console.log('mmrpg_play_sound_effect(effectName:', effectName, 'effectConfig:', effectConfig, ')');
+function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
+    //console.log('mmrpg_play_sound_effect(effectName:', effectName, 'effectConfig:', effectConfig, 'isMenuSound:', isMenuSound, ')');
     //console.log('gameSettings.soundEffectPool =', gameSettings.soundEffectPool.length, gameSettings.soundEffectPool);
     //console.log('gameSettings.soundEffectSources =', gameSettings.soundEffectSources.length, gameSettings.soundEffectSources);
     //console.log('gameSettings.soundEffectSprites =', Object.keys(gameSettings.soundEffectSprites).length, gameSettings.soundEffectSprites);
@@ -2663,6 +2663,10 @@ function mmrpg_play_sound_effect(effectName, effectConfig){
     if (!mmrpgMusicSound.playing()){ return false; }
     if (mmrpgMusicSound === false){ return false; }
 
+    // Define variables that have not been defined yet in the args
+    if (typeof effectConfig !== 'object'){ effectConfig = {}; }
+    if (typeof isMenuSound !== 'boolean'){ isMenuSound = true; }
+
     // Otherwise, define a base volume for these sound effects to use
     var baseEffectVolume = gameSettings.effectVolume * gameSettings.masterVolume;
 
@@ -2670,7 +2674,7 @@ function mmrpg_play_sound_effect(effectName, effectConfig){
     var effectVolume = baseEffectVolume;
     var effectRate = 1;
     var effectLoop = false;
-    if (typeof effectConfig !== 'object'){ effectConfig = {}; }
+    //if (isMenuSound !== true){ effectVolume *= gameSettings.menuEffectVolume; } // TODO re-enable this when ready
     if (typeof effectConfig.volume === 'number'){ effectVolume *= effectConfig.volume; }
     if (typeof effectConfig.rate === 'number'){ effectRate = effectConfig.rate; }
     if (typeof effectConfig.loop === 'boolean'){ effectLoop = effectConfig.loop; }
@@ -2743,13 +2747,12 @@ function mmrpg_sound_effect_volume(newVolume, saveToSettings){
     if (!gameSettings.soundEffectPool){ return false; }
     //console.log('mmrpg_sound_effect_volume(newVolume:', newVolume, 'saveToSettings:', saveToSettings, ')');
     if (typeof saveToSettings !== 'boolean'){ saveToSettings = true; }
-    //newVolume = gameSettings.masterVolume * gameSettings.effectVolume; (do that at runtime instead!)
     if (newVolume < 0){ newVolume = 0; }
     if (newVolume > 1){ newVolume = 1; }
     //console.log('adjusted newVolume =', newVolume);
+    if (saveToSettings){ gameSettings.effectVolume = newVolume; }
     var relativeEffectVolume = newVolume * gameSettings.masterVolume;
     var currentEffectVolume = gameSettings.effectVolume;
-    if (saveToSettings){ gameSettings.effectVolume = newVolume; }
     if (gameSettings.soundEffectPool.length){
         var soundIDs = Object.keys(gameSettings.soundEffectPool);
         for (var i = 0; i < soundIDs.length; i++){
