@@ -2647,7 +2647,6 @@ function mmrpg_music_preload(newTrack){
 gameSettings.soundEffectSources = [];
 gameSettings.soundEffectSprites = {};
 gameSettings.soundEffectPool = [];
-gameSettings.soundEffectPoolIndex = -1;
 gameSettings.soundEffectPoolLimit = 10;
 // Define a list of sound effect aliases we can use in the code to abstract a bit
 gameSettings.customIndex.soundsIndex = {};
@@ -2685,9 +2684,6 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
     //console.log('effectName:', effectName, 'effectVolume:', effectVolume, 'effectRate:', effectRate, 'effectLoop:', effectLoop);
 
     // Get the next sound object from the pool
-    //gameSettings.soundEffectPoolIndex++;
-    //if (gameSettings.soundEffectPoolIndex >= gameSettings.soundEffectPoolLimit){ gameSettings.soundEffectPoolIndex = 0; }
-    //if (typeof gameSettings.soundEffectPool[gameSettings.soundEffectPoolIndex] === 'undefined'){
     if (typeof gameSettings.soundEffectPool[effectName] === 'undefined'){
 
         // We must create a new sound object before we can use it
@@ -2700,13 +2696,11 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
             loop: effectLoop,
             pool: 8
             });
-        //gameSettings.soundEffectPool[gameSettings.soundEffectPoolIndex] = sound;
         gameSettings.soundEffectPool[effectName] = sound;
 
         } else {
 
         // We can pull an existing sound object to use from the pool
-        //sound = gameSettings.soundEffectPool[gameSettings.soundEffectPoolIndex];
         sound = gameSettings.soundEffectPool[effectName];
         sound.on('play', function(){
             sound.volume(effectVolume);
