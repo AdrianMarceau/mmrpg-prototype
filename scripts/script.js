@@ -1351,13 +1351,13 @@ function mmrpg_canvas_robot_frame(thisRobot, newFrame){
         thisRobot.stop(true, true).animate({opacity:1}, {duration:400,easing:'swing',queue:false});
         cloneRobot.stop(true, true).animate({opacity:0}, {duration:400,easing:'swing',queue:false,complete:function(){ $(this).remove(); }});
         // Maybe play a sound effect if allowed and frame is correct
-        if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+        if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
             if (newFrame === 'defend' || newFrame === 'taunt'){
                 if (thisPosition === 'bench'){
                     var delay = 100 + (thisKey + 50);
-                    setTimeout(function(){ parent.mmrpg_play_sound_effect('defend-sound', {volume: 0.1}); }, delay);
+                    setTimeout(function(){ top.mmrpg_play_sound_effect('defend-sound', {volume: 0.5}, false); }, delay);
                     } else {
-                    parent.mmrpg_play_sound_effect('defend-sound', {volume: 0.1});
+                    top.mmrpg_play_sound_effect('defend-sound', {volume: 0.5}, false);
                     }
                 }
             }
@@ -2075,7 +2075,7 @@ function mmrpg_canvas_event(thisMarkup, eventFlags){ //, flagsMarkup
 
             // If found effect settings are enabled, we can process them
             if (gameSettings.eventSoundEffects
-                && typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+                && typeof top.mmrpg_play_sound_effect !== 'undefined'){
                 //console.log('we can react to sound effects!');
                 //console.log('eventFlags =', eventFlags);
                 // Check to see if camera shift settings were provided in the frame
@@ -2089,10 +2089,10 @@ function mmrpg_canvas_event(thisMarkup, eventFlags){ //, flagsMarkup
                         //console.log('effectConfig =', effectConfig);
                         if (typeof effectConfig.delay === 'number'){
                             setTimeout(function(){
-                                parent.mmrpg_play_sound_effect(effectName, effectConfig);
+                                top.mmrpg_play_sound_effect(effectName, effectConfig, false);
                                 }, effectConfig.delay);
                             } else {
-                            parent.mmrpg_play_sound_effect(effectName, effectConfig);
+                            top.mmrpg_play_sound_effect(effectName, effectConfig, false);
                             }
                     }
                 }
@@ -2643,18 +2643,19 @@ function mmrpg_music_preload(newTrack){
         }
 }
 
-// Define a function to play sound effects during game runtime
+// Define variables related to sound effects for game runtime
+gameSettings.soundEffectSources = [];
+gameSettings.soundEffectSprites = {};
 gameSettings.soundEffectPool = [];
 gameSettings.soundEffectPoolIndex = -1;
 gameSettings.soundEffectPoolLimit = 10;
-gameSettings.soundEffectSources = [];
-gameSettings.soundEffectSprites = {};
 // Define a list of sound effect aliases we can use in the code to abstract a bit
 gameSettings.customIndex.soundsIndex = {};
 gameSettings.customIndex.soundsAliasesIndex = {};
+// Define a function to play sound effects during game runtime
 function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
-    //console.log('mmrpg_play_sound_effect(effectName:', effectName, 'effectConfig:', effectConfig, 'isMenuSound:', isMenuSound, ')');
-    //console.log('gameSettings.soundEffectPool =', gameSettings.soundEffectPool.length, gameSettings.soundEffectPool);
+    //console.log('mmrpg_play_sound_effect(effectName:', effectName, 'effectConfig:', typeof effectConfig, effectConfig, 'isMenuSound:', isMenuSound, ')');
+    //console.log('gameSettings.soundEffectPool =', Object.keys(gameSettings.soundEffectPool).length, gameSettings.soundEffectPool);
     //console.log('gameSettings.soundEffectSources =', gameSettings.soundEffectSources.length, gameSettings.soundEffectSources);
     //console.log('gameSettings.soundEffectSprites =', Object.keys(gameSettings.soundEffectSprites).length, gameSettings.soundEffectSprites);
 
@@ -2679,11 +2680,15 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
     if (typeof effectConfig.rate === 'number'){ effectRate = effectConfig.rate; }
     if (typeof effectConfig.loop === 'boolean'){ effectLoop = effectConfig.loop; }
     if (!gameSettings.effectVolumeEnabled){ effectVolume = 0; }
+    if (effectVolume < 0){ effectVolume = 0; }
+    if (effectVolume > 1){ effectVolume = 1; }
+    //console.log('effectName:', effectName, 'effectVolume:', effectVolume, 'effectRate:', effectRate, 'effectLoop:', effectLoop);
 
     // Get the next sound object from the pool
-    gameSettings.soundEffectPoolIndex++;
-    if (gameSettings.soundEffectPoolIndex >= gameSettings.soundEffectPoolLimit){ gameSettings.soundEffectPoolIndex = 0; }
-    if (typeof gameSettings.soundEffectPool[gameSettings.soundEffectPoolIndex] === 'undefined'){
+    //gameSettings.soundEffectPoolIndex++;
+    //if (gameSettings.soundEffectPoolIndex >= gameSettings.soundEffectPoolLimit){ gameSettings.soundEffectPoolIndex = 0; }
+    //if (typeof gameSettings.soundEffectPool[gameSettings.soundEffectPoolIndex] === 'undefined'){
+    if (typeof gameSettings.soundEffectPool[effectName] === 'undefined'){
 
         // We must create a new sound object before we can use it
         var sound = new Howl({
@@ -2692,14 +2697,17 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
             autoplay: false,
             volume: effectVolume,
             rate: effectRate,
-            loop: effectLoop
+            loop: effectLoop,
+            pool: 8
             });
-        gameSettings.soundEffectPool[gameSettings.soundEffectPoolIndex] = sound;
+        //gameSettings.soundEffectPool[gameSettings.soundEffectPoolIndex] = sound;
+        gameSettings.soundEffectPool[effectName] = sound;
 
         } else {
 
         // We can pull an existing sound object to use from the pool
-        sound = gameSettings.soundEffectPool[gameSettings.soundEffectPoolIndex];
+        //sound = gameSettings.soundEffectPool[gameSettings.soundEffectPoolIndex];
+        sound = gameSettings.soundEffectPool[effectName];
         sound.on('play', function(){
             sound.volume(effectVolume);
             sound.rate(effectRate);
@@ -2707,12 +2715,6 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
             });
 
         }
-
-    //console.log('sound =', sound);
-    //console.log('sound._sprite['+effectName+'] =', sound._sprite[effectName]);
-
-    // Stop any currently playing sound
-    sound.stop();
 
     // Replace the effect name if we're using an alias at the moment
     if (typeof gameSettings.customIndex.soundsAliasesIndex[effectName] !== 'undefined'){
@@ -2723,17 +2725,27 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
         // TODO:  Make sure this effectName actually exists in the index of sound effect sprites
         }
 
+    //console.log('sound =', sound);
+    //console.log('sound._volume', sound._volume);
+    //console.log('sound.volume() =', sound.volume());
+    //console.log('sound._sprite['+effectName+'] =', sound._sprite[effectName]);
+
+    // Stop any currently playing sound
+    sound.stop();
+
     // Play the sound when ready using a function that checks load status
     var playSoundWhenReady = function(effectName){
         if (sound.state() !== 'loaded'){
             sound.on('load', function(){
                 //console.log('sound on loaded');
                 sound.stop();
+                sound.volume(effectVolume);
                 sound.play(effectName);
                 });
             } else {
             //console.log('sound immediate invoke');
             sound.stop();
+            sound.volume(effectVolume);
             sound.play(effectName);
             }
         return true;
