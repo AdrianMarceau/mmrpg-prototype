@@ -229,8 +229,15 @@ foreach ($this_player->values['robots_active'] AS $key => $info){
 require(MMRPG_CONFIG_ROOTDIR.'battle/actions/action_battlestart.php');
 
 // Create a final frame before giving control to the user
+$sfx_delay = 600;
+if (!empty($_SESSION['GAME']['battle_settings']['eventTimeout'])){
+    $event_timeout = $_SESSION['GAME']['battle_settings']['eventTimeout'];
+    $sfx_delay = $event_timeout;
+}
 $event_options = array();
-$event_options['event_flag_sound_effects'] = array( array('name' => 'battle-start-sound', 'volume' => 1.0, 'delay' => 200) );
+$event_options['event_flag_sound_effects'] = array(
+    array('name' => 'battle-start-sound', 'volume' => 1.0, 'delay' => $sfx_delay)
+    );
 $this_battle->events_create(false, false, '', '', $event_options);
 
 ?>
