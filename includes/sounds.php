@@ -7,7 +7,7 @@ $sound_effects_aliases_index = array(
     'game-start' => 'selected_mmv-gb',
 
     // Menu Sound Effects
-    'link-hover' => 'cursor_mmii-gb',
+    'link-hover' => 'cursor_mm10-xbox', //'cursor_mmii-gb',
     'link-click' => 'pause_mmv-gb',
     'link-click-special' => 'get-beat_mmv-gb',
     'link-click-robot' => 'land_mmv-gb',
