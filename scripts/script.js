@@ -2683,8 +2683,11 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
     if (effectVolume > 1){ effectVolume = 1; }
     //console.log('effectName:', effectName, 'effectVolume:', effectVolume, 'effectRate:', effectRate, 'effectLoop:', effectLoop);
 
+
+
     // Get the next sound object from the pool
-    if (typeof gameSettings.soundEffectPool[effectName] === 'undefined'){
+    if (typeof gameSettings.soundEffectPool[effectName] === 'undefined'
+        || typeof gameSettings.soundEffectPool[effectName].sound === 'undefined'){
 
         // We must create a new sound object before we can use it
         var sound = new Howl({
@@ -2696,17 +2699,18 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
             loop: effectLoop,
             pool: 8
             });
-        gameSettings.soundEffectPool[effectName] = sound;
+        gameSettings.soundEffectPool[effectName] = {
+            name: effectName,
+            sound: sound,
+            time: Date.now()
+            };
 
         } else {
 
         // We can pull an existing sound object to use from the pool
-        sound = gameSettings.soundEffectPool[effectName];
-        sound.on('play', function(){
-            sound.volume(effectVolume);
-            sound.rate(effectRate);
-            sound.loop(effectLoop);
-            });
+        var effect = gameSettings.soundEffectPool[effectName];
+        var sound = effect.sound;
+        effect.time = Date.now();
 
         }
 
@@ -2730,6 +2734,12 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
     // Play the sound when ready using a function that checks load status
     var playSoundWhenReady = function(effectName){
         if (sound.state() !== 'loaded'){
+            sound.on('play', function(){
+                //console.log('sound on play');
+                sound.volume(effectVolume);
+                sound.rate(effectRate);
+                sound.loop(effectLoop);
+                });
             sound.on('load', function(){
                 //console.log('sound on loaded');
                 sound.stop();
