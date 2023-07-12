@@ -80,13 +80,15 @@ $(document).ready(function(){
 
     // Define some interaction sound effects for the battle menu
     var thisContext = $('#battle');
-    if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+    if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
 
         // Define a quick local function for routing sound effect plays to the parent
-        function playSoundEffect(soundName, options){
+        playSoundEffect = function(soundName, options){
             if ($(this).is('.button_disabled')){ return; }
             if ($(this).data('silentClick')){ return; }
-            parent.mmrpg_play_sound_effect(soundName, options);
+            if (top.mmrpg_play_sound_effect !== 'undefined'){
+                top.mmrpg_play_sound_effect(soundName, options);
+                }
             };
 
 
@@ -94,20 +96,20 @@ $(document).ready(function(){
 
         // Add hover and click sounds to the buttons in the main menu
         $('#actions .main_actions .button', thisContext).live('mouseenter', function(){
-            playSoundEffect.call(this, 'link-hover', {volume: 0.5});
+            playSoundEffect.call(this, 'link-hover');
             });
         $('#actions .main_actions .button', thisContext).live('click', function(){
-            playSoundEffect.call(this, 'link-click', {volume: 1.0});
+            playSoundEffect.call(this, 'link-click');
             });
 
         // Add hover and click sounds to any buttons in the sub menu
         $('#actions .sub_actions .button', thisContext).live('mouseenter', function(){
-            if ($(this).is('.action_back')){ playSoundEffect.call(this, 'back-hover', {volume: 0.5}); }
-            else { playSoundEffect.call(this, 'link-hover', {volume: 0.5}); }
+            if ($(this).is('.action_back')){ playSoundEffect.call(this, 'back-hover'); }
+            else { playSoundEffect.call(this, 'link-hover'); }
             });
         $('#actions .sub_actions .button', thisContext).live('click', function(){
             if ($(this).is('.action_back')){ playSoundEffect.call(this, 'back-click'); }
-            else { playSoundEffect.call(this, 'link-click', {volume: 1.0}); }
+            else { playSoundEffect.call(this, 'link-click'); }
             });
 
         }
@@ -342,8 +344,8 @@ $(document).ready(function(){
                 //console.log('Apply the field_star_collected classes');
                 $starForceSprite.addClass('field_star_collected');
                 $starForceSpriteShadow.addClass('field_star_collected');
-                if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
-                    parent.mmrpg_play_sound_effect('star-collected', {volume: 1.0});
+                if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
+                    top.mmrpg_play_sound_effect('star-collected', {rate: 0.5}, false);
                     }
                 };
             var resetStarForceAnimation = function(){
@@ -406,8 +408,8 @@ $(document).ready(function(){
                 //console.log('Apply the challenge_marker_destroyed classes');
                 $challengeMarkerSprite.addClass('challenge_marker_destroyed');
                 $challengeMarkerSpriteShadow.addClass('challenge_marker_destroyed');
-                if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
-                    parent.mmrpg_play_sound_effect('marker-destroyed', {volume: 1.0});
+                if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
+                    top.mmrpg_play_sound_effect('marker-destroyed', {rate: 0.5}, false);
                     }
                 };
             var resetChallengeMarkerAnimation = function(){
@@ -459,7 +461,7 @@ function mmrpg_battle_fadein_background(animateCanvas, animateDuration, onComple
     // Play the sound effect if we haven't already and we're allowed
     if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
         setTimeout(function(){
-            parent.mmrpg_play_sound_effect('background-spawn', {volume: 0.5});
+            parent.mmrpg_play_sound_effect('background-spawn', {volume: 0.5, rate: 0.5}, false);
             }, Math.ceil(animateDuration / 4));
         }
     // Collect the background canvas and event elements
@@ -491,7 +493,7 @@ function mmrpg_battle_fadein_foreground(animateCanvas, animateDuration, onComple
     // Play the sound effect if we haven't already and we're allowed
     if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
         setTimeout(function(){
-            parent.mmrpg_play_sound_effect('foreground-spawn', {volume: 1.0});
+            parent.mmrpg_play_sound_effect('foreground-spawn', {volume: 1.0}, false);
             }, Math.ceil(animateDuration / 3));
         }
     // Collect the foreground canvas and event elements
