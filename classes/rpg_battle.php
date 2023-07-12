@@ -8,6 +8,7 @@ class rpg_battle extends rpg_object {
     // Define global class variables
     public $events;
     public $actions;
+    public $queue;
     public $endofturn_actions;
 
     // Define the constructor class
@@ -19,6 +20,9 @@ class rpg_battle extends rpg_object {
         $this->session_id = 'battle_id';
         $this->class = 'battle';
         $this->multi = 'battles';
+
+        // Create any required sub-objects
+        $this->queue['sound_effects'] = array();
 
         // Collect any provided arguments
         $args = func_get_args();
@@ -2718,6 +2722,13 @@ class rpg_battle extends rpg_object {
         if (!$event_flags['camera']['action'] && !$event_flags['camera']['reaction']){ $event_flags['camera'] = false; }
 
         $event_flags['sounds'] = array();
+        if (!empty($this->queue['sound_effects'])){
+            do {
+                $effect = array_shift($this->queue['sound_effects']);
+                if (empty($effect['name'])){ continue; }
+                $event_flags['sounds'][] = $effect;
+            } while (count($this->queue['sound_effects']) > 0);
+        }
         if (!empty($options['event_flag_sound_effects'])){
             foreach ($options['event_flag_sound_effects'] AS $key => $effect){
                 if (empty($effect['name'])){ continue; }
@@ -2766,6 +2777,35 @@ class rpg_battle extends rpg_object {
         return $this->events;
 
     }
+
+    // Define an event for queueing sound effects to be played at the next canvas and/or console event
+    public function queue_sound_effect($effect_config){
+        //error_log('rpg_battle::queue_sound_effect($effect_config:' . print_r($effect_config, true) . ')');
+        if (empty($effect_config)){ return false; }
+
+        // If no sound name is provided return false
+        if (is_string($effect_config)){ $effect_config = array('name' => $effect_config); }
+        else if (empty($effect_config['name'])){ return false; }
+
+        // Otherwise simply sanitize the results a bit (volume: 0 - 1, rate: 0.1 - 4.0)
+        if (isset($effect_config['volume'])){
+            if ($effect_config['volume'] > 1){ $effect_config['volume'] = 1; }
+            elseif ($effect_config['volume'] < 0){ $effect_config['volume'] = 0; }
+        }
+        if (isset($effect_config['rate'])){
+            if ($effect_config['rate'] > 4){ $effect_config['rate'] = 4; }
+            elseif ($effect_config['rate'] < 0.1){ $effect_config['rate'] = 0.1; }
+        }
+
+        // Add the sound to the event sounds queue
+        if (!isset($this->queue['sound_effects'])){ $this->queue['sound_effects'] = array(); }
+        $this->queue['sound_effects'][] = $effect_config;
+
+        // Return true
+        return true;
+
+    }
+
 
     // Define a function for calculating the amount of BATTLE POINTS a player gets in battle
     public function calculate_battle_zenny($this_player, $base_zenny = 0, $base_turns = 0){
