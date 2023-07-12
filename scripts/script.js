@@ -2647,7 +2647,7 @@ function mmrpg_music_preload(newTrack){
 gameSettings.soundEffectSources = [];
 gameSettings.soundEffectSprites = {};
 gameSettings.soundEffectPool = [];
-gameSettings.soundEffectPoolLimit = 10;
+gameSettings.soundEffectPoolLimit = 20;
 // Define a list of sound effect aliases we can use in the code to abstract a bit
 gameSettings.customIndex.soundsIndex = {};
 gameSettings.customIndex.soundsAliasesIndex = {};
@@ -2682,8 +2682,6 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
     if (effectVolume < 0){ effectVolume = 0; }
     if (effectVolume > 1){ effectVolume = 1; }
     //console.log('effectName:', effectName, 'effectVolume:', effectVolume, 'effectRate:', effectRate, 'effectLoop:', effectLoop);
-
-
 
     // Get the next sound object from the pool
     if (typeof gameSettings.soundEffectPool[effectName] === 'undefined'
@@ -2736,15 +2734,15 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
         if (sound.state() !== 'loaded'){
             sound.on('play', function(){
                 //console.log('sound on play');
-                sound.volume(effectVolume);
-                sound.rate(effectRate);
-                sound.loop(effectLoop);
+                this.volume(effectVolume);
+                this.rate(effectRate);
+                this.loop(effectLoop);
                 });
             sound.on('load', function(){
                 //console.log('sound on loaded');
-                sound.stop();
-                sound.volume(effectVolume);
-                sound.play(effectName);
+                this.stop();
+                this.volume(effectVolume);
+                this.play(effectName);
                 });
             } else {
             //console.log('sound immediate invoke');
@@ -2755,6 +2753,29 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
         return true;
         };
     playSoundWhenReady(effectName);
+
+    // Now that the sound is actually playing we can do cleanup
+    // If the sound effect pool is full, we need to remove the oldest sound
+    var effectPoolSizeCurrent = Object.keys(gameSettings.soundEffectPool).length;
+    if (effectPoolSizeCurrent > gameSettings.soundEffectPoolLimit){
+        //console.log('soundEffectPool is full (', effectPoolSizeCurrent, ' / ', gameSettings.soundEffectPoolLimit, '), removing oldest sound');
+        var oldestSound = false;
+        var oldestSoundTime = false;
+        for (var soundName in gameSettings.soundEffectPool){
+            var sound = gameSettings.soundEffectPool[soundName];
+            if (oldestSoundTime === false || sound.time < oldestSoundTime){
+                oldestSound = sound;
+                oldestSoundTime = sound.time;
+                }
+            }
+        if (oldestSound !== false){
+            //console.log('removing oldest sound:', oldestSound.name);
+            oldestSound.sound.unload();
+            delete gameSettings.soundEffectPool[oldestSound.name];
+            }
+        }
+
+    // Return now that we're done
     return true;
 
 }
