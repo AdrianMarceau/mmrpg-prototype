@@ -1207,16 +1207,18 @@ class rpg_ability_recovery extends rpg_recovery {
         if ($this_ability->ability_results['this_amount'] > 0){
             $percent = ceil(($this_ability->ability_results['this_amount'] / $this_robot->robot_base_energy) * 100);
             if ($this_ability->recovery_options['recovery_kind'] == 'energy'){
-                $recovery_sounds[] = array('name' => 'recovery-energy', 'volume' => 1.0, 'delay' => 200);
-                if ($percent > 50){ $recovery_sounds[] = array('name' => 'recovery-energy', 'volume' => 1.0, 'delay' => 400); }
+                $recovery_sounds[] = array('name' => 'recovery-energy', 'delay' => 200);
+                if ($percent > 50){ $recovery_sounds[] = array('name' => 'recovery-energy', 'delay' => 400); }
             } elseif ($this_ability->recovery_options['recovery_kind'] == 'weapons'){
-                $recovery_sounds[] = array('name' => 'recovery-weapons', 'volume' => 1.0, 'delay' => 200);
-                if ($percent > 50){ $recovery_sounds[] = array('name' => 'recovery-weapons', 'volume' => 1.0, 'delay' => 400); }
+                $recovery_sounds[] = array('name' => 'recovery-weapons', 'delay' => 200);
+                if ($percent > 50){ $recovery_sounds[] = array('name' => 'recovery-weapons', 'delay' => 400); }
             }
         } else {
-            $recovery_sounds[] = array('name' => 'no-effect', 'volume' => 1.0);
+            $recovery_sounds[] = array('name' => 'no-effect');
         }
-        $event_options['event_flag_sound_effects'] = array_merge($event_options['event_flag_sound_effects'], $recovery_sounds);
+        foreach ($recovery_sounds AS $recovery_sound){
+            $this_battle->queue_sound_effect($recovery_sound);
+        }
 
         // Generate an event with the collected recovery results based on recovery type
         $temp_event_header = $this_ability->recovery_options['recovery_header'];
