@@ -114,6 +114,7 @@ $sound_effects_aliases_index = array(
     'growing-sound' => 'rush-jet-move-in_mmv-gb',
     'punching-sound' => 'shot-b_mmv-gb',
     'beeping-sound' => 'shutter_mmii-gb',
+    'shield-break-sound' => 'power-stone_mmv-gb',
 
     // Elemental Ability Sound Effects
     'flame-sound' => 'fire-storm_mmi-gb',
