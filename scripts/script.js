@@ -2607,20 +2607,39 @@ function mmrpg_fanfare_load(newTrack, resartTrack, playOnce, fadeMusic, onendFun
     fanfareStream.attr('data-track', newTrack);
     fanfareStream.attr('data-last-track', thisTrack);
     // Create a new Howl object and load the new track
-    if (fadeMusic){ mmrpg_music_volume(0.1, false); }
-    var musicBaseVolume = gameSettings.musicVolume * gameSettings.masterVolume;
+    if (fadeMusic){ mmrpg_music_volume(0, false, 300); }
+    var fanfareVolume = gameSettings.musicVolume * gameSettings.masterVolume;
     if (!gameSettings.musicVolumeEnabled){ musicBaseVolume = 0; }
-    mmrpgFanfareSound = new Howl({
-        src: [gameSettings.audioBaseHref+'sounds/'+newTrack+'/audio.mp3?'+gameSettings.cacheTime,
-              gameSettings.audioBaseHref+'sounds/'+newTrack+'/audio.ogg?'+gameSettings.cacheTime],
-        autoplay: true,
-        volume: musicBaseVolume,
-        loop: isPlayOnce ? false : true,
-        onend: function(){
-            onendFunction();
-            if (fadeMusic){ mmrpg_reset_music_volume(); }
-            }
-    });
+    if (mmrpgFanfareSound === false){
+
+        mmrpgFanfareSound = new Howl({
+            src: [gameSettings.audioBaseHref+'sounds/'+newTrack+'/audio.mp3?'+gameSettings.cacheTime,
+                  gameSettings.audioBaseHref+'sounds/'+newTrack+'/audio.ogg?'+gameSettings.cacheTime],
+            autoplay: false,
+            volume: fanfareVolume,
+            loop: isPlayOnce ? false : true,
+            onend: function(){
+                if (fadeMusic){ mmrpg_reset_music_volume(); }
+                onendFunction();
+                },
+            onload: function(){
+                this.volume(fanfareVolume);
+                }
+            });
+        mmrpgFanfareSound.once('load', function(){
+            this.stop();
+            this.volume(fanfareVolume);
+            this.play();
+            });
+
+        } else {
+
+        mmrpgFanfareSound.stop();
+        mmrpgFanfareSound.volume(fanfareVolume);
+        mmrpgFanfareSound.play();
+
+        }
+
 }
 
 // Define a function for preloading music files
