@@ -118,13 +118,14 @@ $object_index = call_user_func(array('rpg_'.$object_group_kind, 'get_index'), tr
                                 $input_attrs .= 'name="'.$base_input_name.'[group_child_tokens][]" ';
                                 $input_attrs .= 'value="'.$group_child_token.'" ';
                                 echo('<input '.$input_attrs.' />'.PHP_EOL);
+                                echo('<i class="fa fas fa-grip-horizontal"></i>'.PHP_EOL);
                             echo('</li>'.PHP_EOL);
                         }
                     echo('</ul>'.PHP_EOL);
 
                     // Print out two move buttons for going up and/or down in the list
-                    echo('<a class="move-handle" data-direction="up" title="Move Up"></a>'.PHP_EOL);
-                    echo('<a class="move-handle" data-direction="down" title="Move Down"></a>'.PHP_EOL);
+                    echo('<a class="move-handle" data-direction="up" title="Move Up"><i class="fa fas fa-arrow-alt-circle-up"></i></a>'.PHP_EOL);
+                    echo('<a class="move-handle" data-direction="down" title="Move Down"><i class="fa fas fa-arrow-alt-circle-down"></i></a>'.PHP_EOL);
 
                 // Print out the closing list item tag for this group
                 echo('</div>'.PHP_EOL);

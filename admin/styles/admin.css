@@ -1137,41 +1137,18 @@ tr:nth-child(odd) td {
     color: #e6e6e6;
     transition: color 0.3s;
 }
+.adminform .editor.groups ul.groups li.group a.move-handle i {
+    font-size: 20px;
+    line-height: 20px;
+}
 .adminform .editor.groups ul.groups li.group a.move-handle:hover {
     color: #696969;
-}
-.adminform .editor.groups ul.groups li.group a.move-handle:after {
-    content: "";
-    display: block;
-    position: relative;
-    width: auto;
-    height: auto;
-    background-color: transparent;
-
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    display: inline-block;
-    font-style: normal;
-    font-variant: normal;
-    text-rendering: auto;
-    line-height: 1;
-    font-size: 15px;
-
-    content: "\f338";
 }
 .adminform .editor.groups ul.groups li.group a.move-handle[data-direction="up"] {
     top: 0;
 }
 .adminform .editor.groups ul.groups li.group a.move-handle[data-direction="down"] {
     bottom: -4px;
-}
-.adminform .editor.groups ul.groups li.group a.move-handle[data-direction="up"]:after {
-    content: "\f062";
-}
-.adminform .editor.groups ul.groups li.group a.move-handle[data-direction="down"]:after {
-    content: "\f063";
 }
 .adminform .editor.groups ul.groups li.group.readonly a.move-handle,
 .adminform .editor.groups ul.groups li.group a.move-handle.hidden {
@@ -1248,33 +1225,18 @@ tr:nth-child(odd) td {
     font-style: normal;
     color: #c6c6c6;
 }
-.adminform .editor.groups li.group_child_token:after {
-    content: "";
-    display: block;
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    bottom: 5px;
-    width: auto;
-    height: auto;
+.adminform .editor.groups li.group_child_token > i {
     background-color: transparent;
     color: #e6e6e6;
     transition: color 0.3s;
-
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    display: inline-block;
-    font-style: normal;
-    font-variant: normal;
-    text-rendering: auto;
     line-height: 1;
     font-size: 16px;
-
-    content: "\f58e";
+    line-height: 1;
+    position: absolute;
+    top: 5px;
+    right: 6px;
 }
-.adminform .editor.groups li.group_child_token:hover:after {
+.adminform .editor.groups li.group_child_token:hover > i {
     color: #696969;
 }
 .adminform .editor.groups .formfoot {
