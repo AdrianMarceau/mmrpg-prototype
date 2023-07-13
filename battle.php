@@ -452,6 +452,7 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                             'item_image' => $temp_star_image,
                             'item_frame' => array(0, 0, 0, 0),
                             'item_frame_shift' => array('331,130', '331,125', '331,130', '331,135'),
+                            'item_frame_styles' => 'filter: brightness(1.2) saturate(1.6); ',
                             'item_direction' => 'left',
                             'item_text' => $temp_star_text
                             );
@@ -580,6 +581,7 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
 
                                 $this_frames_shift = isset($this_info[$this_class.'_frame_shift']) ? $this_info[$this_class.'_frame_shift'] : array();
                                 foreach ($this_frames AS $key => $frame){ if (is_numeric($frame)){ $this_frames[$key] = str_pad($frame, 2, '0', STR_PAD_LEFT); } }
+                                $this_frame_styles = isset($this_info[$this_class.'_frame_styles']) ? $this_info[$this_class.'_frame_styles'] : '';
                                 $this_frame = $this_frames[0];
                                 $this_animate = implode(',', $this_frames);
                                 $this_animate_shift = implode('|', $this_frames_shift);
@@ -587,6 +589,13 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                                 $this_direction = $this_info[$this_class.'_direction'];
                                 $this_float = $this_direction == 'left' ? 'right' : 'left';
                                 $this_image_url = 'images/'.$this_path.'/'.$this_image.'/sprite_'.$this_direction.'_'.$this_boxsize.'.png';
+                                $this_style_attr = '';
+                                $this_style_attr .= $this_float.': '.$this_offset_x.'px; ';
+                                $this_style_attr .= 'bottom: '.$this_offset_y.'px; ';
+                                $this_style_attr .= 'z-index: '.$this_offset_z.'; ';
+                                $this_style_attr .= 'background-image: url('.$this_image_url.'?'.MMRPG_CONFIG_CACHE_DATE.'); ';
+                                $this_style_attr .= ($debug_flag_spriteboxes ? 'background-color: rgba(255, 0, 0, 0.5); opacity: 0.75; ' : '');
+                                $this_style_attr .= (!empty($this_frame_styles) ? trim($this_frame_styles).' ' : '');
                                 echo '<div '.
                                     'data-id="foreground_attachment_'.$this_id.'" '.
                                     'data-type="attachment" '.
@@ -597,7 +606,7 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                                     ''.(!empty($this_animate_enabled) ? 'data-animate="'.$this_animate.'"' : '').' '.
                                     ''.(!empty($this_animate_shift) ? 'data-animate-shift="'.$this_animate_shift.'"' : '').' '.
                                     'class="sprite sprite_'.$this_boxsize.' sprite_'.$this_boxsize.'_'.$this_direction.' sprite_'.$this_boxsize.'_'.$this_frame.'" '.
-                                    'style="'.$this_float.': '.$this_offset_x.'px; bottom: '.$this_offset_y.'px; z-index: '.$this_offset_z.'; background-image: url('.$this_image_url.'?'.MMRPG_CONFIG_CACHE_DATE.'); '.($debug_flag_spriteboxes ? 'background-color: rgba(255, 0, 0, 0.5); opacity: 0.75; ' : '').'" '.
+                                    'style="'.$this_style_attr.'" '.
                                     '>'.$this_text.'</div>';
                             }
                             echo '</div>';
