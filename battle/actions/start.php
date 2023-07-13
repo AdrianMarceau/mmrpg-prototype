@@ -235,8 +235,8 @@ if (!empty($_SESSION['GAME']['battle_settings']['eventTimeout'])){
     $sfx_delay = $event_timeout;
 }
 $event_options = array();
-$event_options['event_flag_sound_effects'] = array(
-    array('name' => 'battle-start-sound', 'volume' => 1.0, 'delay' => $sfx_delay)
+$this_battle->queue_sound_effect(
+    array('name' => 'battle-start-sound', 'delay' => $sfx_delay)
     );
 $this_battle->events_create(false, false, '', '', $event_options);
 
