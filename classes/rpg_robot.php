@@ -5367,7 +5367,11 @@ class rpg_robot extends rpg_object {
                                             <div class="ability_presets">
                                                 <label class="label">auto</label>
                                                 <?
-                                                $preset_options = array('start', 'offense', 'support', 'balanced', 'random');
+                                                $num_abilities_unlocked = mmrpg_prototype_abilities_unlocked($player_info['player_token'], $robot_info['robot_token']);
+                                                $preset_options = array();
+                                                $preset_options = array_merge($preset_options, array('reset', 'level-up'));
+                                                if ($num_abilities_unlocked >= 8){ $preset_options = array_merge($preset_options, array('offense', 'balanced', 'support')); }
+                                                $preset_options = array_merge($preset_options, array('random'));
                                                 foreach($preset_options as $preset_option){
                                                     ?>
                                                     <a class="preset preset_<?= $preset_option ?>" data-preset="<?= $preset_option ?>" data-player="<?= $player_info['player_token'] ?>" data-robot="<?= $robot_info['robot_token'] ?>"><?= $preset_option ?></a>

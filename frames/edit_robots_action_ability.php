@@ -43,7 +43,7 @@ if (!empty($request_ability)
 }
 
 // Collect the preset variables if provided in the request
-$allowed_presets = array('start', 'offense', 'support', 'balanced', 'random');
+$allowed_presets = array('reset', 'level-up', 'offense', 'support', 'balanced', 'random');
 $request_preset = isset($_REQUEST['preset']) && in_array($_REQUEST['preset'], $allowed_presets) ? $_REQUEST['preset'] : null;
 
 // Collect the current settings for the requested robot
@@ -91,8 +91,15 @@ if (!empty($request_preset)){
     // Empty the existing array because we don't need it anymore
     $request_robot_abilities = array();
 
-    // If the preset is START, set the default abilities
-    if ($request_preset == 'start'){
+    // If the preset is LEVEL-UP, set the default abilities
+    if ($request_preset == 'reset'){
+
+        // Everyone starts with Buster Shot and then we go from there
+        $request_robot_abilities[] = 'buster-shot';
+
+    }
+    // If the preset is LEVEL-UP, set the default abilities
+    elseif ($request_preset == 'level-up'){
 
         // Everyone starts with Buster Shot and then we go from there
         $request_robot_abilities[] = 'buster-shot';
@@ -104,6 +111,7 @@ if (!empty($request_preset)){
                 $level = isset($info['level']) && is_numeric($info['level']) ? (int)($info['level']) : 0;
                 $token = isset($info['token']) && preg_match('/^[-_a-z0-9]+$/i', $info['token']) ? $info['token'] : '';
                 if (empty($token) || !isset($mmrpg_index_abilities[$token])){ continue; }
+                if (in_array($token, $request_robot_abilities)){ continue; }
                 if ($level > $request_robot_level){ continue; }
                 $request_robot_abilities[] = $token;
             }
@@ -156,6 +164,9 @@ if (!empty($request_preset)){
                 //echo('next $current_group_key = '.print_r($current_group_key, true).PHP_EOL);
                 //echo('available $tokens_grouped = '.print_r($tokens_grouped, true).PHP_EOL);
                 $next_ability = array_pop($tokens_grouped[$current_group_key]);
+                if (in_array($next_ability, $request_robot_abilities)){
+                    continue;
+                }
                 if (in_array($next_ability, $doctor_buster_tokens)){
                     if (!$has_doctor_buster){ $has_doctor_buster = true; }
                     else { continue; }
@@ -198,6 +209,20 @@ if (!empty($request_preset)){
         $support_tokens_grouped = array_values($shuffled_grouped_by_energy_support);
         $pull_from_energy_groups($request_robot_abilities, $weapon_tokens_grouped, ($pull_weapon_amount - count($request_robot_abilities)));
         $pull_from_energy_groups($request_robot_abilities, $support_tokens_grouped, ($pull_ability_max - count($request_robot_abilities)));
+        if (count($request_robot_abilities) < $pull_ability_max){
+            $remaining_tokens = array();
+            foreach ($weapon_tokens_grouped AS $temp_group){ $remaining_tokens = array_merge($remaining_tokens, $temp_group); }
+            foreach ($support_tokens_grouped AS $temp_group){ $remaining_tokens = array_merge($remaining_tokens, $temp_group); }
+            $remaining_tokens = array_filter(array_values($remaining_tokens));
+            //error_log('$request_robot_abilities = '.print_r($request_robot_abilities, true));
+            //error_log('$weapon_tokens_grouped = '.print_r($weapon_tokens_grouped, true));
+            //error_log('$support_tokens_grouped = '.print_r($support_tokens_grouped, true));
+            //error_log('$remaining_tokens = '.print_r($remaining_tokens, true));
+            if (!empty($remaining_tokens)){
+                $remaining_tokens = array(0 => $remaining_tokens);
+                $pull_from_energy_groups($request_robot_abilities, $remaining_tokens, ($pull_ability_max - count($request_robot_abilities)));
+            }
+        }
 
         // Only add the Buster Shot if it's not already there
         if (($request_preset === 'balanced' || $request_preset === 'support')
@@ -207,12 +232,14 @@ if (!empty($request_preset)){
         }
         // Only add the Buster Charge if it's not already there
         if ($request_preset === 'balanced'
-            && !in_array('buster-charge', $request_robot_abilities)){
+            && !in_array('buster-charge', $request_robot_abilities)
+            && mmrpg_prototype_ability_unlocked(false, false, 'buster-charge')){
             array_pop($request_robot_abilities); // take off end, more likely to be support
             $request_robot_abilities[] = 'buster-charge';
         }
 
         // Now that everything is all pretty, let's kindly sort the tokens by type
+        //error_log('$request_robot_abilities = '.print_r($request_robot_abilities, true).PHP_EOL);
         $sort_abilities = true;
         if ($sort_abilities){
             //echo('$request_robot_abilities(before) = '.print_r($request_robot_abilities, true).PHP_EOL);
@@ -250,6 +277,7 @@ if (!empty($request_preset)){
     //exit('NEW $request_robot_abilities = '.print_r($request_robot_abilities, true).PHP_EOL);
 
     // Create a new array to hold the full ability settings and populate
+    $request_robot_abilities = array_unique($request_robot_abilities);
     $request_robot_abilities_new = array();
     foreach ($request_robot_abilities AS $temp_token){ $request_robot_abilities_new[$temp_token] = array('ability_token' => $temp_token); }
     // Update the new ability settings in the session variable
