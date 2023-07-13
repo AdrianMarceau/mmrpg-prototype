@@ -23,6 +23,7 @@ $(document).ready(function(){
         // Define a quick local function for routing sound effect plays to the parent
         playSoundEffect = function(soundName, options){
             if ($(this).is('.button_disabled')){ return; }
+            if ($(this).is('.item_cell_disabled *')){ return; }
             if ($(this).data('silentClick')){ return; }
             top.mmrpg_play_sound_effect(soundName, options);
             };

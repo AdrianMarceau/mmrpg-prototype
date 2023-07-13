@@ -519,16 +519,16 @@
     transform-origin: left;
 }
 
-#shop #console .event .item_name:hover,
-#shop #console .event .ability_name:hover,
-#shop #console .event .robot_name:hover,
-#shop #console .event .field_name:hover,
-#shop #console .event .buy_button:hover,
-#shop #console .event .sell_button:hover,
-#shop #console .event .confirm_button:hover,
-#shop #console .event .cancel_button:hover,
-#shop #console .event .player_button:hover,
-#shop #console .event .item_quantity_mods a:hover {
+#shop #console .event .item_cell:not(.item_cell_disabled) .item_name:hover,
+#shop #console .event .item_cell:not(.item_cell_disabled) .ability_name:hover,
+#shop #console .event .item_cell:not(.item_cell_disabled) .robot_name:hover,
+#shop #console .event .item_cell:not(.item_cell_disabled) .field_name:hover,
+#shop #console .event .item_cell:not(.item_cell_disabled) .buy_button:hover,
+#shop #console .event .item_cell:not(.item_cell_disabled) .sell_button:hover,
+#shop #console .event .item_cell:not(.item_cell_disabled) .confirm_button:hover,
+#shop #console .event .item_cell:not(.item_cell_disabled) .cancel_button:hover,
+#shop #console .event .item_cell:not(.item_cell_disabled) .player_button:hover,
+#shop #console .event .item_cell:not(.item_cell_disabled) .item_quantity_mods a:hover {
     border-color: #ffffff !important;
     transform: scale(1.1);
     box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
