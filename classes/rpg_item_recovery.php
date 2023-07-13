@@ -1112,7 +1112,6 @@ class rpg_item_recovery extends rpg_recovery {
 
         // Define the sound effects for this recovery event so it plays for the player
         $recovery_sounds = array();
-        $event_options['event_flag_sound_effects'] = !empty($trigger_options['event_flag_sound_effects']) ? $trigger_options['event_flag_sound_effects'] : array();
         if ($this_item->item_results['this_amount'] > 0){
             $percent = ceil(($this_item->item_results['this_amount'] / $this_robot->robot_base_energy) * 100);
             if ($this_item->recovery_options['recovery_kind'] == 'energy'){
