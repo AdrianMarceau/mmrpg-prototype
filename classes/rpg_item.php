@@ -2123,6 +2123,7 @@ class rpg_item extends rpg_object {
         extract($objects);
 
         // Target this robot's self and print item use text
+        $this_battle->queue_sound_effect('use-recovery-item');
         $this_item->target_options_update(array(
             'frame' => 'summon',
             'success' => array(0, 40, -2, 99,
