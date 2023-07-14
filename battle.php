@@ -452,7 +452,6 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                             'item_image' => $temp_star_image,
                             'item_frame' => array(0, 0, 0, 0),
                             'item_frame_shift' => array('331,130', '331,125', '331,130', '331,135'),
-                            'item_frame_styles' => 'filter: brightness(1.2) saturate(1.6); ',
                             'item_direction' => 'left',
                             'item_text' => $temp_star_text
                             );

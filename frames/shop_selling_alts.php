@@ -129,9 +129,16 @@
                     $alt_counter++;
                     $alt_cell_float = $alt_counter % 2 == 0 ? 'right' : 'left';
 
+                    $alt_sprite_image = $alt_info_token; //!empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_image'];
+                    $alt_sprite_image_size = $alt_image_size; //!empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40;
+                    $alt_sprite_image_xsize = $alt_sprite_image_size.'x'.$alt_sprite_image_size;
+                    $alt_sprite_image_url = 'images/robots/'.$alt_sprite_image.'/mug_right_'.$alt_sprite_image_xsize.'.png';
+                    $alt_sprite_image_markup = '<span class="icon_sprite"><span class="sprite smooth-scaling sprite_'.$alt_sprite_image_xsize.' sprite_'.$alt_sprite_image_xsize.'_00" style="background-image: url('.$alt_sprite_image_url.'?'.MMRPG_CONFIG_CACHE_DATE.');"></span></span>';
+                    $alt_info_name = $alt_sprite_image_markup.'<span class="wrap">'.$alt_info_name.'</span>';
+
                     ?>
                         <td class="<?= $alt_cell_float ?> item_cell" data-kind="alt" data-action="buy" data-token="<?= 'alt-'.$alt_info_token ?>">
-                            <span class="item_name robot_type robot_type_<?= $alt_info_type ?>" data-click-tooltip="<?= $temp_info_tooltip ?>"><?= $alt_info_name ?></span>
+                            <span class="item_name robot_alt_name robot_type robot_type_<?= $alt_info_type ?>" data-click-tooltip="<?= $temp_info_tooltip ?>"><?= $alt_info_name ?></span>
                             <a class="buy_button robot_type robot_type_none" href="#">Buy</a>
                             <label class="item_quantity" data-quantity="0"><?= !empty($alt_info_quantity) ? '&#10004;' : '-' ?></label>
                             <label class="item_price" data-price="<?= $alt_info_price ?>">&hellip; <?= $alt_info_price ?>z</label>

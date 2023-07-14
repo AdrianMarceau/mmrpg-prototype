@@ -113,6 +113,12 @@ $mmrpg_index_robots = rpg_robot::get_index(true, false);
                     // See if we should block the purchase for any reason
                     $robot_block_purchase = !$robot_info_unlocked && ($robot_info_exclusive || !$robot_was_scanned || !$robot_was_defeated) ? true : false;
 
+                    $robot_sprite_image = !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_image'];
+                    $robot_sprite_image_size = !empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40;
+                    $robot_sprite_image_xsize = $robot_sprite_image_size.'x'.$robot_sprite_image_size;
+                    $robot_sprite_image_markup = '<span class="icon_sprite"><span class="sprite smooth-scaling sprite_'.$robot_sprite_image_xsize.' sprite_'.$robot_sprite_image_xsize.'_00" style="background-image: url(images/robots/'.$robot_sprite_image.'/mug_right_'.$robot_sprite_image_xsize.'.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span></span>';
+                    $robot_info_name = $robot_sprite_image_markup.'<span class="wrap">'.$robot_info_name.'</span>';
+
                     ?>
                         <td class="<?= $robot_cell_float ?> item_cell" data-kind="robot" data-action="buy" data-token="<?= 'robot-'.$robot_info_token ?>">
                             <span class="item_name robot_name robot_type robot_type_<?= $robot_info_type ?>" data-click-tooltip="<?= $temp_info_tooltip ?>"<?= ($robot_block_purchase ? 'style="text-decoration: line-through;"' : '') ?>><?= $robot_info_name ?></span>

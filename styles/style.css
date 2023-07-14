@@ -306,6 +306,7 @@ body.index #header {
 
 /* -- Sprite Modes -- */
 
+#mmrpg .sprite.smooth-scaling,
 #mmrpg[data-render-mode="default"] #canvas .sprite,
 #mmrpg[data-render-mode="default"] #canvas .sprite_image,
 #mmrpg[data-render-mode="default"] #canvas .has_pixels,
@@ -325,6 +326,7 @@ body.index #header {
     image-rendering: -moz-crisp-edges;         /* Firefox */
     image-rendering: -webkit-optimize-contrast; /* Webkit (non-standard naming) */
 }
+#mmrpg .sprite.pixel-scaling,
 #mmrpg[data-render-mode="pixelated"] #canvas .sprite,
 #mmrpg[data-render-mode="pixelated"] #canvas .sprite_image,
 #mmrpg[data-render-mode="pixelated"] #canvas .has_pixels,

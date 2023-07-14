@@ -244,6 +244,10 @@
                     $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
                     $temp_info_tooltip .= '</span>';
 
+                    $star_sprite_image = $star_info['star_kind'].'-star_'.$star_info_type.(!empty($star_info_type2) ? '-'.$star_info_type2 : '');
+                    $star_sprite_image_markup = '<span class="icon_sprite"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/items/'.$star_sprite_image.'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span></span>';
+                    $star_info_name = $star_sprite_image_markup.'<span class="wrap">'.$star_info_name.'</span>';
+
                     ?>
                         <td class="<?= $star_cell_float ?> item_cell" data-kind="star" data-action="sell" data-token="<?= 'star-'.$star_info_token ?>">
                             <span class="item_name ability_type ability_type_<?= $star_info_class ?>" data-click-tooltip="<?= $temp_info_tooltip ?>"><?= $star_info_name ?></span>
