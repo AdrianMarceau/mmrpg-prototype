@@ -47,7 +47,7 @@ class rpg_canvas {
             //$this_data['canvas_offset_y'] = ($this_data['player_scale'] * 10) + $temp_data['canvas_offset_y'] + round($this_player->player_frame_offset['y'] * $temp_data['canvas_scale']);
             $this_data['canvas_offset_x'] = $temp_data['canvas_offset_x'] + round($this_player->player_frame_offset['x'] * $temp_data['canvas_scale']);
             $this_data['canvas_offset_y'] = $temp_data['canvas_offset_y'] + round($this_player->player_frame_offset['y'] * $temp_data['canvas_scale']);
-            $this_data['canvas_offset_z'] = -1 + $temp_data['canvas_offset_z'] + round($this_player->player_frame_offset['z'] * $temp_data['canvas_scale']);
+            $this_data['canvas_offset_z'] = $temp_data['canvas_offset_z'] + round($this_player->player_frame_offset['z']);
 
             // Shift this player ever-so-slightly out of the way of their robot partner
             $this_data['canvas_offset_x'] += ($this_data['canvas_offset_x'] * 0.20);
@@ -100,6 +100,8 @@ class rpg_canvas {
                 $this_data['canvas_offset_x'] -= 20;
                 $this_data['canvas_offset_y'] -= 20;
                 $this_data['canvas_offset_z'] += 20;
+            } else {
+                $this_data['canvas_offset_z'] -= 20;
             }
 
             $this_data['player_sprite_size'] = ceil($this_data['player_scale'] * $this_data['player_sprite_zoom_size']);
