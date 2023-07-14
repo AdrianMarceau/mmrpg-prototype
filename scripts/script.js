@@ -1350,17 +1350,21 @@ function mmrpg_canvas_robot_frame(thisRobot, newFrame){
         thisRobot.stop(true, true).css({opacity:0,backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).removeClass(currentClass).addClass(newClass);
         thisRobot.stop(true, true).animate({opacity:1}, {duration:400,easing:'swing',queue:false});
         cloneRobot.stop(true, true).animate({opacity:0}, {duration:400,easing:'swing',queue:false,complete:function(){ $(this).remove(); }});
-        // Maybe play a sound effect if allowed and frame is correct
+        /*
+        // Maybe play a sound effect if allowed and frame is correct?
+        // No I hate it now, this can't work until everyone's movements
+        // are independent of the event timer and more organic sounding
         if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
             if (newFrame === 'defend' || newFrame === 'taunt'){
                 if (thisPosition === 'bench'){
                     var delay = 100 + (thisKey + 50);
-                    setTimeout(function(){ top.mmrpg_play_sound_effect('defend-sound', {volume: 0.5}, false); }, delay);
+                    setTimeout(function(){ top.mmrpg_play_sound_effect('defend-sound', {volume: 0.1}, false); }, delay);
                     } else {
-                    top.mmrpg_play_sound_effect('defend-sound', {volume: 0.5}, false);
+                    top.mmrpg_play_sound_effect('defend-sound', {volume: 0.1}, false);
                     }
                 }
             }
+        */
         } else {
         // Update the existing sprite's frame without crossfade by swapping the classsa
         thisRobot.stop(true, true).css({backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).removeClass(currentClass).addClass(newClass);
@@ -1988,21 +1992,18 @@ function mmrpg_events(){
         //console.log('checkpoint | battleStatus='+battleStatus+' battleResult='+battleResult);
         //console.log('thisEvent.event_flags =', thisEvent.event_flags);
 
-        // Define the post-results music sequence that's common for both results
-        var onCompleteCooldown = function(){
-            //console.log('onCompleteCooldown()');
-            /* ... */
-            };
-
         // Based on the battle result, play the victory or defeat music
         if (battleResult == 'victory'
             && typeof thisEvent.event_flags.victory !== 'undefined'
             && thisEvent.event_flags.victory === true){
             // Play the victory music
             //console.log('mmrpg_events() / Play the victory music');
-            parent.mmrpg_music_load('misc/leader-board', true, false);
-            setTimeout(function(){ parent.mmrpg_music_volume(0, false); }, 600);
-            setTimeout(function(){ parent.mmrpg_fanfare_load('misc/battle-victory', true, true, true, onCompleteCooldown); }, 900);
+            parent.mmrpg_music_volume(0, false);
+            parent.mmrpg_play_sound_effect('battle-victory-sound');
+            setTimeout(function(){
+                parent.mmrpg_music_load('misc/leader-board', true, false);
+                //parent.mmrpg_reset_music_volume();
+                }, 1000);
             if (mmrpgEvents.length < canvasAnimationCameraDelay){ canvasAnimationCameraTimer = canvasAnimationCameraDelay - mmrpgEvents.length; }
             battleResultsDisplayed = true;
             }
@@ -2011,9 +2012,12 @@ function mmrpg_events(){
             && thisEvent.event_flags.defeat === true){
             // Play the failure music
             //console.log('mmrpg_events() / Play the failure music');
-            parent.mmrpg_music_load('misc/leader-board', true, false);
-            setTimeout(function(){ parent.mmrpg_music_volume(0, false); }, 600);
-            setTimeout(function(){ parent.mmrpg_fanfare_load('misc/battle-defeat', true, true, true, onCompleteCooldown); }, 900);
+            parent.mmrpg_music_volume(0, false);
+            parent.mmrpg_play_sound_effect('battle-defeat-sound');
+            setTimeout(function(){
+                parent.mmrpg_music_load('misc/leader-board', true, false);
+                //parent.mmrpg_reset_music_volume();
+                }, 2500);
             if (mmrpgEvents.length < canvasAnimationCameraDelay){ canvasAnimationCameraTimer = canvasAnimationCameraDelay - mmrpgEvents.length; }
             battleResultsDisplayed = true;
             }
@@ -2562,7 +2566,7 @@ function mmrpg_music_volume(newVolume, saveToSettings, fadeDuration){
     if (newVolume > 1){ newVolume = 1; }
     //console.log('adjusted newVolume =', newVolume);
     var relativeMusicVolume = newVolume * gameSettings.masterVolume;
-    var currentMusicVolume = gameSettings.musicVolume;
+    var currentMusicVolume = gameSettings.musicVolume * gameSettings.masterVolume;
     //console.log('currentMusicVolume =', currentMusicVolume);
     if (saveToSettings){ gameSettings.musicVolume = currentMusicVolume; }
     if (fadeDuration > 0){ mmrpgMusicSound.fade(currentMusicVolume, relativeMusicVolume, fadeDuration);  }
