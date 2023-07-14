@@ -5366,11 +5366,15 @@ class rpg_robot extends rpg_object {
                                             <div class="ability_presets">
                                                 <label class="label">auto</label>
                                                 <?
-                                                $num_abilities_unlocked = mmrpg_prototype_abilities_unlocked($player_info['player_token'], $robot_info['robot_token']);
+                                                $num_abilities_unlocked = mmrpg_prototype_abilities_unlocked();
                                                 $preset_options = array();
                                                 $preset_options = array_merge($preset_options, array('reset', 'level-up'));
-                                                if ($num_abilities_unlocked >= 8){ $preset_options = array_merge($preset_options, array('offense', 'balanced', 'support')); }
-                                                $preset_options = array_merge($preset_options, array('random'));
+                                                if ($num_abilities_unlocked >= 32){ $preset_options = array_merge($preset_options, array('offense', 'support')); }
+                                                if ($num_abilities_unlocked >= 16){ $preset_options = array_merge($preset_options, array('balanced')); }
+                                                if ($num_abilities_unlocked >= 8){ $preset_options = array_merge($preset_options, array('random')); }
+                                                //error_log('num_abilities_unlocked: mmrpg_prototype_abilities_unlocked()');
+                                                //error_log('num_abilities_unlocked: '.$num_abilities_unlocked);
+                                                //error_log('$preset_options: '.print_r($preset_options, true));
                                                 foreach($preset_options as $preset_option){
                                                     ?>
                                                     <a class="preset preset_<?= $preset_option ?>" data-preset="<?= $preset_option ?>" data-player="<?= $player_info['player_token'] ?>" data-robot="<?= $robot_info['robot_token'] ?>"><?= $preset_option ?></a>
