@@ -1949,6 +1949,11 @@ function mmrpg_events(){
         }
 
     if (mmrpgEvents.length < 1){
+        // Assuming we're allowed to use camera stuff, reset the camera if it's not already
+        if (gameSettings.eventCameraShift){
+            //console.log('events are done, reset the camera');
+            mmrpg_canvas_camera_shift();
+        }
         // Switch to the specified "next" action
         var nextAction = $('input[name=next_action]', gameEngine).val();
         if (nextAction.length){ mmrpg_action_panel(nextAction); }

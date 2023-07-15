@@ -1061,7 +1061,9 @@ if (!empty($this_battle->flags['challenge_battle'])
 
 // If canvas refresh is needed, create an empty event
 if ($canvas_refresh && $this_battle->battle_status != 'complete'){
-    $this_battle->events_create(false, false, '', '');
+    $this_battle->events_create(false, false, '', '', array(
+        'event_flag_camera_reset' => true
+        ));
 }
 
 // Stop the output buffer and collect contents

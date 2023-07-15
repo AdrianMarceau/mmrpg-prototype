@@ -2701,6 +2701,26 @@ class rpg_battle extends rpg_object {
         $options['event_flag_camera_offset'] = isset($eventinfo['event_options']['event_flag_camera_offset']) ? $eventinfo['event_options']['event_flag_camera_offset'] : 0;
         $options['event_flag_sound_effects'] = isset($eventinfo['event_options']['event_flag_sound_effects']) ? $eventinfo['event_options']['event_flag_sound_effects'] : false;
 
+        // If it doesn't exist or a camera reset was provided, we should reset the array to empty
+        if (!isset($this->values['last_camera_action'])
+            || !empty($eventinfo['event_options']['event_flag_camera_reset'])){
+            //error_log('creating last_camera_action ('.(!isset($this->values['last_camera_action']) ? 'not exists' : 'reset requested').')');
+            $this->values['last_camera_action'] = array();
+        }
+
+        // Check to see if any camera action settings were provided in the event info
+        $camera_action_provided = false;
+        if (isset($eventinfo['event_options']['event_flag_camera_action'])
+            || isset($eventinfo['event_options']['event_flag_camera_reaction'])
+            || isset($eventinfo['event_options']['event_flag_camera_side'])
+            || isset($eventinfo['event_options']['event_flag_camera_focus'])
+            || isset($eventinfo['event_options']['event_flag_camera_depth'])
+            || isset($eventinfo['event_options']['event_flag_camera_offset'])
+            || isset($eventinfo['event_options']['event_flag_camera_reset'])
+            ){
+            $camera_action_provided = true;
+        }
+
         // Define the variable to collect markup
         $this_markup = array();
 
@@ -2709,9 +2729,11 @@ class rpg_battle extends rpg_object {
 
         $event_flags['autoplay'] = $options['event_flag_autoplay'];
 
+        // Collect the victory and defeat event flags
         $event_flags['victory'] = $options['event_flag_victory'];
         $event_flags['defeat'] = $options['event_flag_defeat'];
 
+        // Collect the camera action flags if provided in the event options
         $event_flags['camera'] = array();
         $event_flags['camera']['action'] = $options['event_flag_camera_action'];
         $event_flags['camera']['reaction'] = $options['event_flag_camera_reaction'];
@@ -2721,6 +2743,21 @@ class rpg_battle extends rpg_object {
         $event_flags['camera']['offset'] = $options['event_flag_camera_offset'];
         if (!$event_flags['camera']['action'] && !$event_flags['camera']['reaction']){ $event_flags['camera'] = false; }
 
+        // Otherwise, save this camera action for next time, if necessary
+        if (!empty($event_flags['camera'])){
+            $this->values['last_camera_action'] = $event_flags['camera'];
+        }
+
+        // If no camera action was provided, and we have backup settings, let's use those
+        if (!$camera_action_provided
+            && !empty($this->values['last_camera_action'])){
+            //error_log('applying saved camera action');
+            $event_flags['camera'] = $this->values['last_camera_action'];
+            $event_flags['camera']['offset'] = 0;
+            $this->values['last_camera_action'] = array();
+        }
+
+        // Collect the camera action flags if they've been queued up in the sound queue
         $event_flags['sounds'] = array();
         if (!empty($this->queue['sound_effects'])){
             do {
@@ -2743,6 +2780,7 @@ class rpg_battle extends rpg_object {
         }
         if (empty($event_flags['sounds'])){ $event_flags['sounds'] = false; }
 
+        // Compress all these flags into JSON so we can send them to the client
         $this_markup['flags'] = json_encode($event_flags);
 
         // Generate the console message markup
