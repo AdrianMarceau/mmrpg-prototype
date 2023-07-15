@@ -17,12 +17,16 @@ $(document).ready(function(){
 
     // Define some interaction sound effects for the items menu
     var thisContext = $('#edit');
+    var playSoundEffect = function(){}
     if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
 
         // Define a quick local function for routing sound effect plays to the parent
-        function playSoundEffect(soundName, options){
-            if ($(this).is('.button_disabled')){ return; }
-            if ($(this).data('silentClick')){ return; }
+        playSoundEffect = function(soundName, options){
+            if (this instanceof jQuery || this instanceof Element){
+                if ($(this).data('silentClick')){ return; }
+                if ($(this).is('.disabled')){ return; }
+                if ($(this).is('.button_disabled')){ return; }
+                }
             top.mmrpg_play_sound_effect(soundName, options);
             };
 

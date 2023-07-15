@@ -391,6 +391,13 @@
     display: inline-block;
     margin-left: 4px;
     font-size: 120%;
+    cursor: pointer;
+    transform: scale(1.0);
+    transition: 0.3s;
+}
+#database #console .event .this_complete:hover,
+#database #console .event .this_unlockable:hover {
+    transform: scale(1.2);
 }
 
 #database #console .event .this_complete {

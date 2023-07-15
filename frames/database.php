@@ -833,16 +833,18 @@ $(document).ready(function(){
 
     // Define some interaction sound effects for the database menu
     var thisContext = $('#database');
+    var playSoundEffect = function(){};
     if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
 
         // Define a quick local function for routing sound effect plays to the parent
-        function playSoundEffect(soundName, options){
-            if ($(this).is('.button_disabled')){ return; }
-            if ($(this).data('silentClick')){ return; }
-            //console.log('trying to play sound effect');
+        playSoundEffect = function(soundName, options){
+            if (this instanceof jQuery || this instanceof Element){
+                if ($(this).data('silentClick')){ return; }
+                if ($(this).is('.disabled')){ return; }
+                if ($(this).is('.button_disabled')){ return; }
+                }
             top.mmrpg_play_sound_effect(soundName, options);
             };
-
 
         // DATABASE PAGE LINKS
 
@@ -850,12 +852,12 @@ $(document).ready(function(){
         $('#canvas #robot_games .game_link', thisContext).live('mouseenter', function(){
             //console.log('hovering over database game page');
             if ($(this).is('.game_link_disabled')){ return; }
-            playSoundEffect.call(this, 'link-hover', {volume: 0.5});
+            playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
             });
         $('#canvas #robot_games .game_link', thisContext).live('click', function(){
             //console.log('clicking database game page');
             if ($(this).is('.game_link_disabled')){ return; }
-            playSoundEffect.call(this, 'link-click', {volume: 1.0});
+            playSoundEffect.call(this, 'icon-click', {volume: 1.0});
             });
 
         // DATABASE ICON LINKS

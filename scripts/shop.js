@@ -22,9 +22,12 @@ $(document).ready(function(){
 
         // Define a quick local function for routing sound effect plays to the parent
         playSoundEffect = function(soundName, options){
-            if ($(this).is('.button_disabled')){ return; }
-            if ($(this).is('.item_cell_disabled *')){ return; }
-            if ($(this).data('silentClick')){ return; }
+            if (this instanceof jQuery || this instanceof Element){
+                if ($(this).data('silentClick')){ return; }
+                if ($(this).is('.disabled')){ return; }
+                if ($(this).is('.button_disabled')){ return; }
+                if ($(this).is('.item_cell_disabled *')){ return; }
+                }
             top.mmrpg_play_sound_effect(soundName, options);
             };
 

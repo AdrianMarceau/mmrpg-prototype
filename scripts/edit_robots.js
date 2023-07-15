@@ -40,16 +40,18 @@ $(document).ready(function(){
 
     // Define some interaction sound effects for the items menu
     var thisContext = $('#edit');
+    var playSoundEffect = function(){};
     if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
 
         // Define a quick local function for routing sound effect plays to the parent
-        function playSoundEffect(soundName, options){
-            if ($(this).is('.button_disabled')){ return; }
-            if ($(this).data('silentClick')){ return; }
-            //console.log('trying to play robot editor sound effect');
+        playSoundEffect = function(soundName, options){
+            if (this instanceof jQuery || this instanceof Element){
+                if ($(this).data('silentClick')){ return; }
+                if ($(this).is('.disabled')){ return; }
+                if ($(this).is('.button_disabled')){ return; }
+                }
             top.mmrpg_play_sound_effect(soundName, options);
             };
-
 
         // ROBOT AVATAR LINKS
 
@@ -990,6 +992,7 @@ $(document).ready(function(){
                                 $targetAbilityLink.attr('data-tooltip', $refAbilityLink.attr('data-tooltip'));
                                 // Clone the inner html into the target ability link
                                 $targetAbilityLink.html($refAbilityLink.html());
+                                $targetAbilityLink.css({opacity:''});
 
                                 }
                             // Otherwise if this was an ability remove option, clear stuff

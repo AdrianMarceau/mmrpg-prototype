@@ -80,17 +80,18 @@ $(document).ready(function(){
 
     // Define some interaction sound effects for the battle menu
     var thisContext = $('#battle');
+    var playSoundEffect = function(){};
     if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
 
         // Define a quick local function for routing sound effect plays to the parent
         playSoundEffect = function(soundName, options){
-            if ($(this).is('.button_disabled')){ return; }
-            if ($(this).data('silentClick')){ return; }
-            if (top.mmrpg_play_sound_effect !== 'undefined'){
-                top.mmrpg_play_sound_effect(soundName, options);
+            if (this instanceof jQuery || this instanceof Element){
+                if ($(this).data('silentClick')){ return; }
+                if ($(this).is('.disabled')){ return; }
+                if ($(this).is('.button_disabled')){ return; }
                 }
+            top.mmrpg_play_sound_effect(soundName, options);
             };
-
 
         // MENU LINKS
 

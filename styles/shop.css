@@ -474,6 +474,7 @@
     height: auto;
     width: auto;
     max-width: 50%;
+    max-width: calc(100% - 175px);
     font-size: 12px;
     line-height: 16px;
     text-align: left;

@@ -49,13 +49,13 @@ $(document).ready(function(){
 
             // Define a quick local function for routing sound effect plays to the parent
             playSoundEffect = function(soundName, options){
-                if ($(this).is('.option_disabled')){ return; }
-                if ($(this).data('silentClick')){ return; }
-                if (top.mmrpg_play_sound_effect !== 'undefined'){
-                    top.mmrpg_play_sound_effect(soundName, options);
+                if (this instanceof jQuery || this instanceof Element){
+                    if ($(this).data('silentClick')){ return; }
+                    if ($(this).is('.disabled')){ return; }
+                    if ($(this).is('.option_disabled')){ return; }
                     }
+                top.mmrpg_play_sound_effect(soundName, options);
                 };
-
 
             // HOME LINKS
 
@@ -89,7 +89,7 @@ $(document).ready(function(){
             // Add hover and click sounds to the chapter select buttons
             $('.menu .chapter_select .chapter_link', thisContext).live('mouseenter', function(){
                 if ($(this).is('.chapter_link_disabled')){ return; }
-                playSoundEffect.call(this, 'link-hover');
+                playSoundEffect.call(this, 'icon-hover');
                 });
             $('.menu .chapter_select .chapter_link', thisContext).live('click', function(){
                 if ($(this).is('.chapter_link_disabled')){ return; }
@@ -120,7 +120,7 @@ $(document).ready(function(){
 
             // Add hover and click sounds to the robot select buttons
             $('.menu .option_this-robot-select', thisContext).live('mouseenter', function(){
-                playSoundEffect.call(this, 'link-hover');
+                playSoundEffect.call(this, 'icon-hover');
                 });
             $('.menu .option_this-robot-select', thisContext).live('click', function(){
                 playSoundEffect.call(this, 'link-click-robot');
