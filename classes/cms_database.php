@@ -78,9 +78,9 @@ class cms_database {
 
     // Define the error handler for when the database goes bye bye
     private function critical_error($message){
-        error_log('['.date('Y-m-d @ H:i:s').'] ('.$_SERVER['REMOTE_ADDR'].') - '.PHP_EOL.strip_tags(nl2br(htmlspecialchars_decode($message))).PHP_EOL);
+        error_log('('.$_SERVER['REMOTE_ADDR'].') '.PHP_EOL.strip_tags(nl2br(htmlspecialchars_decode($message))).PHP_EOL);
         if (!MMRPG_CONFIG_IS_LIVE){
-            if (php_sapi_name() === 'cli'){ echo(date('Y-m-d @ H:i:s').' ('.$_SERVER['REMOTE_ADDR'].') - '.strip_tags(nl2br(htmlspecialchars_decode($message))).PHP_EOL); }
+            if (php_sapi_name() === 'cli'){ echo('['.date('Y-m-d @ H:i:s').'] ('.$_SERVER['REMOTE_ADDR'].') '.strip_tags(nl2br(htmlspecialchars_decode($message))).PHP_EOL); }
             else { echo('<pre style="display: block; clear: both; float: none; background-color: #f2f2f2; color: #292929; text-shadow: 0 0 0 transparent; white-space: normal; padding: 10px; text-align: left;">'.$message.'</pre>'); }
         }
         return false;
@@ -92,22 +92,32 @@ class cms_database {
         $this->clear();
         // Attempt to open the connection to the MySQL database
         if (!isset($this->LINK) || $this->LINK === false){
-            $this->LINK = new mysqli($this->HOST, $this->USERNAME, $this->PASSWORD, $this->DBNAME);
+            @$this->LINK = new mysqli($this->HOST, $this->USERNAME, $this->PASSWORD, $this->DBNAME);
         }
         // If the connection was not successful, return false
         if ($this->LINK === false
             || $this->LINK->connect_errno){
+            $error = error_get_last();
+            $error_number = -1;
+            $error_text = 'unknown mysqli database error';
+            if ($error && strpos($error['message'], 'mysqli::mysqli()') !== false) {
+                $error_text = $error['message'];
+                $error_number = $error['type'].' ('.self::get_php_error_type_name($error['type']).')';
+            } else if (isset($this->LINK->connect_error)) {
+                $error_text = $this->LINK->connect_error;
+                $error_number = $this->LINK->connect_errno;
+            }
             if (MMRPG_CONFIG_IS_LIVE && (!defined('MMRPG_CONFIG_ADMIN_MODE') || MMRPG_CONFIG_ADMIN_MODE !== true)){
                 $this->critical_error("<strong>cms_database::db_connect</strong> : Critical error! \n".
                     "Unable to connect to the database!  \n".
-                    "[MySQLi Error {$this->LINK->connect_errno}] : ".
-                    "&quot;".htmlentities($this->LINK->connect_error, ENT_QUOTES, 'UTF-8', true)."&quot;"
+                    "[MySQLi Error {$error_number}] : ".
+                    "&quot;".htmlentities($error_text, ENT_QUOTES, 'UTF-8', true)."&quot;"
                     );
             } else {
                 $this->critical_error("<strong>cms_database::db_connect</strong> : Critical error!  \n".
                     "Unable to connect to the database (".$this->USERNAME.":******@".$this->HOST.")!  \n".
-                    "[MySQLi Error {$this->LINK->connect_errno}] : ".
-                    "&quot;".htmlentities($this->LINK->connect_error, ENT_QUOTES, 'UTF-8', true)."&quot;"
+                    "[MySQLi Error {$error_number}] : ".
+                    "&quot;".htmlentities($error_text, ENT_QUOTES, 'UTF-8', true)."&quot;"
                     );
             }
             return false;
@@ -116,6 +126,17 @@ class cms_database {
         $this->table_list();
         // Return true
         return true;
+    }
+
+    // Define a quick function for getting a human-readable PHP error type name for display
+    private static function get_php_error_type_name($errorNumber){
+        $constants = get_defined_constants(true);
+        foreach ($constants['Core'] as $c => $n) {
+            if(strpos($c, 'E_') === 0 && $n == $errorNumber) {
+                return $c;
+            }
+        }
+        return "UNKNOWN ERROR";
     }
 
     // Define the private function for closing the database connection
