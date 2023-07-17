@@ -70,12 +70,15 @@ class rpg_disabled {
             $this_robot->robot_frame = 'defeat';
             $target_robot->update_session();
             $this_robot->update_session();
+            $destroyed_sound = $this_robot->robot_class.'-destroyed-sound';
+            $this_battle->queue_sound_effect(array('name' => $destroyed_sound));
+            if ($this_robot->robot_class === 'boss'){
+                $this_battle->queue_sound_effect(array('name' => $destroyed_sound, 'delay' => 200));
+                $this_battle->queue_sound_effect(array('name' => $destroyed_sound, 'delay' => 400));
+            }
             $event_options = array();
             $event_options['console_show_target'] = false;
             $event_options['canvas_show_disabled_bench'] = $this_robot->robot_id.'_'.$this_robot->robot_token;
-            $event_options['event_flag_sound_effects'] = array(
-                array('name' => 'destroyed', 'volume' => 1.0)
-                );
             rpg_canvas::apply_camera_action_flags($event_options, $this_robot);
             $this_battle->events_create($this_robot, $target_robot, $event_header, $event_body, $event_options);
         }
