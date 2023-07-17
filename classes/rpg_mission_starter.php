@@ -289,7 +289,7 @@ class rpg_mission_starter extends rpg_mission {
         $temp_battle_omega = array();
         $temp_battle_omega['battle_field_base']['field_id'] = 100;
         $temp_battle_omega['battle_field_base']['field_token'] = $this_boss_field;
-        $temp_battle_omega['battle_field_base']['field_background_variant'] = $this_prototype_data['target_player_token'];
+        $temp_battle_omega['battle_field_base']['field_background_variant'] = $this_prototype_data['this_player_token'];
         $temp_battle_omega['flags']['starter_battle'] = true;
         $temp_battle_omega['battle_token'] = $temp_battle_token;
         $temp_battle_omega['battle_size'] = '1x4';
