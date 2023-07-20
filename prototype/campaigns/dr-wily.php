@@ -28,6 +28,8 @@ $this_prototype_data['phase_battle_token'] = $this_prototype_data['this_player_t
 $this_prototype_data['robots_unlocked'] = mmrpg_prototype_robots_unlocked($this_prototype_data['this_player_token']);
 $this_prototype_data['points_unlocked'] = mmrpg_prototype_player_points($this_prototype_data['this_player_token']);
 $this_prototype_data['prototype_complete'] = $prototype_complete_flag_wily;
+$this_prototype_data['prev_player_token'] = 'dr-light';
+$this_prototype_data['next_player_token'] = 'dr-cossack';
 
 // Define the stage select music based on progression
 $this_music_token = $this_prototype_data['battles_complete'] >= 10 ? $this_prototype_data['target_player_token'] : $this_prototype_data['this_player_token'];
