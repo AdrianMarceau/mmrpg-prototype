@@ -451,7 +451,7 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
             $temp_console_markup .= '</div></div>';
         $temp_console_markup .= '</div>';
         $temp_console_markup .= '<p style="text-align: center; font-size: 90%; margin: 5px auto; filter: brightness(1);">';
-            $temp_console_markup .= 'Check '.$this_pronoun_posessive2.' entry in the <strong><i class="fa fas fa-book"></i> <ins>database</ins></strong> tab '.(mmrpg_prototype_robots_unlocked() > 1 ? 'or customize '.$this_pronoun_object.' from the <strong><i class="fa fas fa-robot"></i> <ins>robots</ins></strong> tab' : 'for more info').'!';
+            $temp_console_markup .= 'Check '.$this_pronoun_posessive2.' entry in the <strong><i class="fa fas fa-compact-disc"></i> <ins>database</ins></strong> tab '.(mmrpg_prototype_robots_unlocked() > 1 ? 'or customize '.$this_pronoun_object.' from the <strong><i class="fa fas fa-robot"></i> <ins>robots</ins></strong> tab' : 'for more info').'!';
         $temp_console_markup .= '</p>';
 
         $_SESSION[$session_token]['EVENTS'][] = array(
