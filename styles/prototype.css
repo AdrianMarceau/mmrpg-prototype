@@ -2049,7 +2049,44 @@ body[data-source="website"] #prototype .menu {
     padding: 0;
     position: absolute;
     top: 0;
-    right: 3px;
+    right: 5px;
+    width: 1em;
+    overflow: visible;
+    white-space: nowrap;
+}
+#prototype .option_1x1 div label .arrow i,
+#prototype .option_1x2 div label .arrow i,
+#prototype .option_1x3 div label .arrow i,
+#prototype .option_1x4 div label .arrow i {
+    display: inline-block;
+    font-size: 90%;
+    position: relative;
+    z-index: 3;
+}
+#prototype .option_1x1 div label .arrow i + i,
+#prototype .option_1x2 div label .arrow i + i,
+#prototype .option_1x3 div label .arrow i + i,
+#prototype .option_1x4 div label .arrow i + i {
+    margin-left: -0.5em;
+    z-index: 2;
+}
+#prototype .option_1x1 div label .arrow i + i + i,
+#prototype .option_1x2 div label .arrow i + i + i,
+#prototype .option_1x3 div label .arrow i + i + i,
+#prototype .option_1x4 div label .arrow i + i + i {
+    z-index: 1;
+}
+#prototype .option_1x1 div label .arrow.s2 i:first-child,
+#prototype .option_1x2 div label .arrow.s2 i:first-child,
+#prototype .option_1x3 div label .arrow.s2 i:first-child,
+#prototype .option_1x4 div label .arrow.s2 i:first-child {
+    margin-left: -0.25em;
+}
+#prototype .option_1x1 div label .arrow.s3 i:first-child,
+#prototype .option_1x2 div label .arrow.s3 i:first-child,
+#prototype .option_1x3 div label .arrow.s3 i:first-child,
+#prototype .option_1x4 div label .arrow.s3 i:first-child {
+    margin-left: -0.5em;
 }
 
 #prototype .banner .option div label .arrow,

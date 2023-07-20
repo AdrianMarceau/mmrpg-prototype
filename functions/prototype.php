@@ -1355,8 +1355,10 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
 
                     // Update min/max level indicators
                     $this_robot_level = !empty($this_robotinfo['robot_level']) ? $this_robotinfo['robot_level'] : 1;
-                    if ($this_option_min_level === false || $this_option_min_level > $this_robot_level){ $this_option_min_level = $this_robot_level; }
-                    if ($this_option_max_level === false || $this_option_max_level < $this_robot_level){ $this_option_max_level = $this_robot_level; }
+                    if (true){
+                        if ($this_option_min_level === false || $this_option_min_level > $this_robot_level){ $this_option_min_level = $this_robot_level; }
+                        if ($this_option_max_level === false || $this_option_max_level < $this_robot_level){ $this_option_max_level = $this_robot_level; }
+                    }
 
                     // HIDE HIDDEN
                     if (!$show_robot_targets || !empty($this_robotinfo['flags']['hide_from_mission_select'])){ continue; }
@@ -1533,9 +1535,13 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 if (!$this_has_field_star && (!$this_option_complete || ($this_option_complete && $this_option_encore))){
                     //$this_option_label .= '<span class="arrow"> &#9658;</span>';
                     $icon = 'play';
-                    if (!empty($this_battleinfo['alpha_battle_token'])){ $icon = 'forward'; }
-                    if (!empty($this_battleinfo['battle_complete_redirect_token'])){ $icon = 'forward'; }
-                    $this_option_label .= '<span class="arrow"><i class="fa fas fa-'.$icon.'"></i></span>';
+                    $icon_count = 1;
+                    if (!empty($this_battleinfo['alpha_battle_token'])){ $icon_count++; }
+                    if (!empty($this_battleinfo['battle_complete_redirect_token'])){ $icon_count++; }
+                    $arrow_markup = '<span class="arrow s'.$icon_count.'">';
+                    for ($i = 0; $i < $icon_count; $i++){ $arrow_markup .= '<i class="fa fas fa-'.$icon.'"></i>'; }
+                    $arrow_markup .= '</span>';
+                    $this_option_label .= $arrow_markup;
                 }
             } else {
                 $this_option_label .= '<span class="single">???</span>';
@@ -1926,6 +1932,7 @@ function mmrpg_prototype_mission_autoplay_prepend(&$base_battle_omega, &$prepend
         if (isset($battle_option['battle_token'])
             && $battle_option['battle_token'] == $base_battle_omega['battle_token']){
             $battle_option['alpha_battle_token'] = $prepend_battle_omega['battle_token'];
+            $this_prototype_data['battle_options'][$key] = $battle_option;
         }
     }
     return true;
