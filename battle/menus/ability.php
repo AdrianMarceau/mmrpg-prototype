@@ -271,7 +271,8 @@ ob_start();
                         else { $temp_ability_label .= ($temp_kind == 'damage' ? 'Damage' : ($temp_kind == 'recovery' ? 'Recovery' : ($temp_kind == 'multi' ? 'Effects' : 'Special'))); }
                     $temp_ability_label .= '</span>';
                     $temp_ability_label .= '<span class="subtext">';
-                        $temp_ability_label .= '<span class="accuracy"><i class="fa fas fa-crosshairs"></i> '.$temp_accuracy.'%</span> ';
+                        $icon = strstr($temp_ability->ability_target, 'select_') ? 'crosshairs' : 'bullseye';
+                        $temp_ability_label .= '<span class="accuracy"><i class="fa fas fa-'.$icon.'"></i> '.$temp_accuracy.'%</span> ';
                         if ($flag_is_stat_ability && ($flag_is_boost_ability || $flag_is_break_ability)){
                             // If this is a stat ability, show the stat change from the hidden value
                             $temp_stat_kind = $flag_is_boost_ability ? 'recovery' : 'damage';
