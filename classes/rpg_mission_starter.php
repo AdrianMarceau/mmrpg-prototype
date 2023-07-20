@@ -275,6 +275,7 @@ class rpg_mission_starter extends rpg_mission {
         global $this_omega_factors_eleven;
 
         // Collect data on this robot and the rescue robot
+        $this_player_data = rpg_player::get_index_info($this_prototype_data['this_player_token']);
         if (strstr($this_robot_token, '/')){ list($this_robot_token, $this_robot_alt) = explode('/', $this_robot_token); }
         $this_robot_data = rpg_robot::get_index_info($this_robot_token);
         $this_robot_name = $this_robot_data['robot_name'];
@@ -289,7 +290,7 @@ class rpg_mission_starter extends rpg_mission {
         $temp_battle_omega = array();
         $temp_battle_omega['battle_field_base']['field_id'] = 100;
         $temp_battle_omega['battle_field_base']['field_token'] = $this_boss_field;
-        $temp_battle_omega['battle_field_base']['field_background_variant'] = $this_prototype_data['this_player_token'];
+        $temp_battle_omega['battle_field_base']['field_background_variant'] = $this_prototype_data['next_player_token'];
         $temp_battle_omega['flags']['starter_battle'] = true;
         $temp_battle_omega['battle_token'] = $temp_battle_token;
         $temp_battle_omega['battle_size'] = '1x4';
@@ -304,11 +305,11 @@ class rpg_mission_starter extends rpg_mission {
         $temp_battle_omega['battle_target_player']['player_id'] = $temp_player_id;
         $temp_battle_omega['battle_target_player']['player_token'] = 'player';
         $temp_battle_omega['battle_target_player']['player_robots'] = array();
-        $temp_midboss_level = $this_start_level;
-        $temp_midboss_robot = array(
+        $temp_boss_level = $this_start_level;
+        $temp_boss_robot = array(
             'robot_token' => $this_robot_token,
             'robot_id' => rpg_game::unique_robot_id($temp_player_id, $this_robot_data['robot_id'], 0),
-            'robot_level' => $temp_midboss_level,
+            'robot_level' => $temp_boss_level,
             'robot_abilities' => !empty($this_robot_data['robot_rewards']['abilities']) ? array_map(function($a){ return $a['token']; }, $this_robot_data['robot_rewards']['abilities']) : array('buster-shot')
             );
 
@@ -316,8 +317,12 @@ class rpg_mission_starter extends rpg_mission {
         $temp_stat_alts = array('attack' => '_alt', 'defense' => '_alt2', 'speed' => '_alt3');
         if (!empty($this_robot_alt)){
             if ($this_robot_token === 'trill'){
-                $temp_midboss_image = $this_robot_token;
-                $temp_midboss_abilities = array('space-shot', 'space-buster', 'space-overdrive', 'energy-boost');
+                $temp_boss_image = $this_robot_token;
+                //$temp_boss_abilities = array('space-shot', 'space-buster', 'space-overdrive', 'energy-boost');
+                $temp_boss_abilities = array('energy-boost');
+                if ($this_player_data['player_number'] >= 1){ $temp_boss_abilities[] = 'space-overdrive'; }
+                if ($this_player_data['player_number'] >= 2){ $temp_boss_abilities[] = 'space-buster'; }
+                if ($this_player_data['player_number'] >= 3){ $temp_boss_abilities[] = 'space-shot'; }
                 if ($this_robot_alt === 'attack'){
                     $temp_stat_priority = array('attack', 'defense', 'speed');
                 } elseif ($this_robot_alt === 'defense'){
@@ -325,21 +330,22 @@ class rpg_mission_starter extends rpg_mission {
                 } elseif ($this_robot_alt === 'speed'){
                     $temp_stat_priority = array('speed', 'attack', 'defense');
                 }
-                $temp_midboss_abilities = array_merge(
+                $temp_boss_abilities = array_merge(
                     array($temp_stat_priority[0].'-boost', $temp_stat_priority[0].'-break', $temp_stat_priority[0].'-mode', 'buster-charge'),
-                    $temp_midboss_abilities
+                    $temp_boss_abilities
                     );
-                $temp_midboss_robot['robot_image'] = $temp_midboss_image;
-                $temp_midboss_robot['robot_abilities'] = $temp_midboss_abilities;
+                $temp_boss_robot['counters'][$temp_stat_priority[0]] = 1;
+                $temp_boss_robot['robot_image'] = $temp_boss_image;
+                $temp_boss_robot['robot_abilities'] = $temp_boss_abilities;
             } else {
-                $temp_midboss_image = $this_robot_token.'_'.$this_robot_alt;
-                $temp_midboss_robot['robot_image'] = $temp_midboss_image;
+                $temp_boss_image = $this_robot_token.'_'.$this_robot_alt;
+                $temp_boss_robot['robot_image'] = $temp_boss_image;
             }
         }
-        $temp_battle_omega['battle_target_player']['player_robots'][0] = $temp_midboss_robot;
+        $temp_battle_omega['battle_target_player']['player_robots'][0] = $temp_boss_robot;
 
         // Recalculate REWARD ZENNY and ALLOWED TURNS for this battle
-        rpg_mission::calculate_mission_zenny_and_turns($temp_battle_omega, $this_prototype_data, $temp_midboss_level);
+        rpg_mission::calculate_mission_zenny_and_turns($temp_battle_omega, $this_prototype_data, $temp_boss_level);
 
         // If the rescure robot has not yet been unlocked as a playable character, show it in the background
         $rescue_robot_unlockable = false;
@@ -349,7 +355,7 @@ class rpg_mission_starter extends rpg_mission {
             // Define the rescue robot's level and display properties depending on who it is
             $rescue_robot_size = 40;
             $rescue_robot_unlockable = true;
-            $rescue_robot_level = $temp_midboss_level;
+            $rescue_robot_level = $temp_boss_level;
             $rescue_robot_frame = array(8,0,8,0,0);
             $rescue_robot_position = array('x' => 354, 'y' => 118, 'direction' => 'left');
 
@@ -372,7 +378,7 @@ class rpg_mission_starter extends rpg_mission {
             $temp_battle_omega['battle_description2'] = ' Wait a minute... who\'s that in the background?';
         }
 
-        // Add some random item drops to the midboss battle
+        // Add some random item drops to the boss battle
         $temp_battle_omega['battle_rewards']['items'] = array(
             // Nothing special to drop FOR NOW
             );
