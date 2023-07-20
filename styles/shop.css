@@ -649,6 +649,7 @@
 #shop #console .event .item_quantity_mods a {
     margin: 2px;
     width: 26px;
+    max-width: none;
     height: 19px;
     text-align: center;
     box-sizing: border-box;
