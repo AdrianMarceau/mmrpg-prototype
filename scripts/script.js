@@ -2384,24 +2384,6 @@ if (typeof window.Howl === 'undefined'){
         };
 }
 
-// Define a function for adjusting the master volume of basically everything
-function mmrpg_master_volume(newVolume, saveToSettings, updateMusic, updateSoundEffects){
-    if (!mmrpgMusicSound){ return false; }
-    if (!gameSettings.soundEffectPool){ return false; }
-    //console.log('mmrpg_master_volume(newVolume:', newVolume, ', saveToSettings:', saveToSettings, ', updateMusic:', updateMusic, ', updateSoundEffects:', updateSoundEffects, ')');
-    if (typeof saveToSettings !== 'boolean'){ saveToSettings = true; }
-    if (typeof updateMusic !== 'boolean'){ updateMusic = true; }
-    if (typeof updateSoundEffects !== 'boolean'){ updateSoundEffects = true; }
-    if (newVolume < 0){ newVolume = 0; }
-    if (newVolume > 1){ newVolume = 1; }
-    //console.log('adjusted newVolume =', newVolume);
-    var currentMasterVolume = gameSettings.masterVolume;
-    gameSettings.masterVolume = newVolume;
-    if (updateMusic){ mmrpg_music_volume(gameSettings.musicVolume, saveToSettings, 0); }
-    if (updateSoundEffects){ mmrpg_sound_effect_volume(gameSettings.effectVolume, saveToSettings); }
-    if (!saveToSettings){ gameSettings.masterVolume = currentMasterVolume; }
-}
-
 // Define required music objects to handle audio playback and set up some defaults
 var mmrpgMusicSound = false;
 var mmrpgMusicConfig = {};
@@ -2411,6 +2393,88 @@ var mmrpgFanfareEndedDefault = function(){ /* ... */ };
 var mmrpgMusicEnded = mmrpgMusicEndedDefault;
 var mmrpgFanfareEnded = mmrpgFanfareEndedDefault;
 var mmrpgMusicInit = false;
+
+// Define a function for adjusting the master volume of basically everything
+function mmrpg_master_volume(newMasterVolume, saveToSettings, updateMusic, updateSoundEffects){
+    if (!mmrpgMusicSound){ return false; }
+    if (!gameSettings.soundEffectPool){ return false; }
+    //console.log('mmrpg_master_volume(newMasterVolume:', newMasterVolume, ', saveToSettings:', saveToSettings, ', updateMusic:', updateMusic, ', updateSoundEffects:', updateSoundEffects, ')');
+    //console.log('mmrpg_master_volume // gameSettings.masterVolume =', gameSettings.masterVolume);
+    //console.log('mmrpg_master_volume // gameSettings.musicVolume =', gameSettings.musicVolume);
+    //console.log('mmrpg_master_volume // gameSettings.effectVolume =', gameSettings.effectVolume);
+    if (typeof saveToSettings !== 'boolean'){ saveToSettings = true; }
+    if (typeof updateMusic !== 'boolean'){ updateMusic = true; }
+    if (typeof updateSoundEffects !== 'boolean'){ updateSoundEffects = true; }
+    if (newMasterVolume < 0){ newMasterVolume = 0; }
+    if (newMasterVolume > 1){ newMasterVolume = 1; }
+    var currentMasterVolume = gameSettings.masterVolume;
+    //console.log('mmrpg_master_volume // adjusted currentMasterVolume =', currentMasterVolume);
+    //console.log('mmrpg_master_volume // adjusted newMasterVolume =', newMasterVolume);
+    gameSettings.masterVolume = newMasterVolume;
+    if (updateMusic){ mmrpg_music_volume(gameSettings.musicVolume, saveToSettings, 0); }
+    if (updateSoundEffects){ mmrpg_sound_effect_volume(gameSettings.effectVolume, saveToSettings); }
+    if (!saveToSettings){ gameSettings.masterVolume = currentMasterVolume; }
+}
+// Define a function for adjusting the currently playing music's volume
+function mmrpg_music_volume(newVolume, saveToSettings, fadeDuration){
+    if (!mmrpgMusicSound){ return false; }
+    //console.log('mmrpg_music_volume(newVolume:', newVolume, ', saveToSettings:', saveToSettings, ', fadeDuration:', fadeDuration, ')');
+    //console.log('mmrpg_music_volume // gameSettings.masterVolume =', gameSettings.masterVolume);
+    //console.log('mmrpg_music_volume // gameSettings.musicVolume =', gameSettings.musicVolume);
+    //console.log('mmrpg_music_volume // gameSettings.effectVolume =', gameSettings.effectVolume);
+    if (typeof saveToSettings !== 'boolean'){ saveToSettings = true; }
+    if (typeof fadeDuration !== 'number'){ fadeDuration = 500; }
+    if (newVolume < 0){ newVolume = 0; }
+    if (newVolume > 1){ newVolume = 1; }
+    if (saveToSettings){ gameSettings.musicVolume = newVolume; }
+    //console.log('mmrpg_music_volume // adjusted newVolume =', newVolume);
+    var currentMusicVolume = gameSettings.musicVolume * gameSettings.masterVolume;
+    var relativeMusicVolume = newVolume * gameSettings.masterVolume;
+    //console.log('mmrpg_music_volume // currentMusicVolume =', currentMusicVolume);
+    //console.log('mmrpg_music_volume // relativeMusicVolume =', relativeMusicVolume);
+    if (fadeDuration > 0){ mmrpgMusicSound.fade(currentMusicVolume, relativeMusicVolume, fadeDuration);  }
+    else { mmrpgMusicSound.volume(relativeMusicVolume); }
+}
+// Define a function for resetting the currently playing music's volume
+function mmrpg_reset_music_volume(fadeDuration){
+    if (!mmrpgMusicSound){ return false; }
+    //console.log('mmrpg_reset_music_volume(fadeDuration:', fadeDuration, ')');
+    //console.log('mmrpg_reset_music_volume // gameSettings.masterVolume =', gameSettings.masterVolume);
+    //console.log('mmrpg_reset_music_volume // gameSettings.musicVolume =', gameSettings.musicVolume);
+    //console.log('mmrpg_reset_music_volume // gameSettings.effectVolume =', gameSettings.effectVolume);
+    if (typeof fadeDuration !== 'number'){ fadeDuration = 500; }
+    var resetToVolume = gameSettings.musicVolume;
+    if (resetToVolume < 0){ resetToVolume = 0; }
+    if (resetToVolume > 1){ resetToVolume = 1; }
+    //console.log('mmrpg_reset_music_volume // calculated resetToVolume =', resetToVolume);
+    var currentMusicVolume = mmrpgMusicSound.volume();
+    var relativeMusicVolume = resetToVolume * gameSettings.masterVolume;
+    //console.log('mmrpg_reset_music_volume // currentMusicVolume =', currentMusicVolume);
+    //console.log('mmrpg_reset_music_volume // relativeMusicVolume =', relativeMusicVolume);
+    if (fadeDuration > 0){ mmrpgMusicSound.fade(currentMusicVolume, relativeMusicVolume, fadeDuration);  }
+    else { mmrpgMusicSound.volume(relativeMusicVolume); }
+}
+// Define a function for adjusting the volume if in-game sound effects
+function mmrpg_sound_effect_volume(newVolume, saveToSettings){
+    if (!gameSettings.soundEffectPool){ return false; }
+    //console.log('mmrpg_sound_effect_volume(newVolume:', newVolume, 'saveToSettings:', saveToSettings, ')');
+    if (typeof saveToSettings !== 'boolean'){ saveToSettings = true; }
+    if (newVolume < 0){ newVolume = 0; }
+    if (newVolume > 1){ newVolume = 1; }
+    if (saveToSettings){ gameSettings.effectVolume = newVolume; }
+    //console.log('mmrpg_sound_effect_volume // adjusted newVolume =', newVolume);
+    var relativeEffectVolume = newVolume * gameSettings.masterVolume;
+    var currentEffectVolume = gameSettings.effectVolume * gameSettings.masterVolume;
+    //console.log('mmrpg_sound_effect_volume // relativeEffectVolume =', relativeEffectVolume);
+    if (gameSettings.soundEffectPool.length){
+        var soundIDs = Object.keys(gameSettings.soundEffectPool);
+        for (var i = 0; i < soundIDs.length; i++){
+            var soundID = soundIDs[i];
+            var sound = gameSettings.soundEffectPool[soundID];
+            sound.volume(relativeEffectVolume);
+        }
+    }
+}
 
 // Define a function for toggling the music player
 function mmrpg_music_toggle(){
@@ -2559,37 +2623,6 @@ function mmrpg_music_load(newTrack, resartTrack, playOnce, onendFunction){
             mmrpg_music_play();
             }, waitTime);
         }
-}
-// Define a function for adjusting the currently playing music's volume
-function mmrpg_music_volume(newVolume, saveToSettings, fadeDuration){
-    if (!mmrpgMusicSound){ return false; }
-    //console.log('mmrpg_music_volume(newVolume:', newVolume, ', saveToSettings:', saveToSettings, ', fadeDuration:', fadeDuration, ')');
-    if (typeof saveToSettings !== 'boolean'){ saveToSettings = true; }
-    if (typeof fadeDuration !== 'number'){ fadeDuration = 500; }
-    //newVolume = gameSettings.masterVolume * newVolume; (do that at runtime instead!)
-    if (newVolume < 0){ newVolume = 0; }
-    if (newVolume > 1){ newVolume = 1; }
-    //console.log('adjusted newVolume =', newVolume);
-    var relativeMusicVolume = newVolume * gameSettings.masterVolume;
-    var currentMusicVolume = gameSettings.musicVolume * gameSettings.masterVolume;
-    //console.log('currentMusicVolume =', currentMusicVolume);
-    if (saveToSettings){ gameSettings.musicVolume = currentMusicVolume; }
-    if (fadeDuration > 0){ mmrpgMusicSound.fade(currentMusicVolume, relativeMusicVolume, fadeDuration);  }
-    else { mmrpgMusicSound.volume(relativeMusicVolume); }
-}
-// Define a function for resetting the currently playing music's volume
-function mmrpg_reset_music_volume(fadeDuration){
-    if (!mmrpgMusicSound){ return false; }
-    //console.log('mmrpg_reset_music_volume(fadeDuration:', fadeDuration, ')');
-    if (typeof fadeDuration !== 'number'){ fadeDuration = 500; }
-    var resetToVolume = gameSettings.masterVolume * gameSettings.musicVolume;
-    if (resetToVolume < 0){ resetToVolume = 0; }
-    if (resetToVolume > 1){ resetToVolume = 1; }
-    //console.log('calculated resetToVolume =', resetToVolume);
-    var currentMusicVolume = mmrpgMusicSound.volume();
-    //console.log('currentMusicVolume =', currentMusicVolume);
-    if (fadeDuration > 0){ mmrpgMusicSound.fade(currentMusicVolume, resetToVolume, fadeDuration);  }
-    else { mmrpgMusicSound.volume(newVolume); }
 }
 
 // Define a function for playing a specific fanfare track
@@ -2807,27 +2840,6 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
     return true;
 
 }
-// Define a function for adjusting the volume if in-game sound effects
-function mmrpg_sound_effect_volume(newVolume, saveToSettings){
-    if (!gameSettings.soundEffectPool){ return false; }
-    //console.log('mmrpg_sound_effect_volume(newVolume:', newVolume, 'saveToSettings:', saveToSettings, ')');
-    if (typeof saveToSettings !== 'boolean'){ saveToSettings = true; }
-    if (newVolume < 0){ newVolume = 0; }
-    if (newVolume > 1){ newVolume = 1; }
-    //console.log('adjusted newVolume =', newVolume);
-    if (saveToSettings){ gameSettings.effectVolume = newVolume; }
-    var relativeEffectVolume = newVolume * gameSettings.masterVolume;
-    var currentEffectVolume = gameSettings.effectVolume;
-    if (gameSettings.soundEffectPool.length){
-        var soundIDs = Object.keys(gameSettings.soundEffectPool);
-        for (var i = 0; i < soundIDs.length; i++){
-            var soundID = soundIDs[i];
-            var sound = gameSettings.soundEffectPool[soundID];
-            sound.volume(relativeEffectVolume);
-        }
-    }
-}
-
 
 // Define a function for queueing something for when the game has started
 function mmrpg_queue_for_game_start(onGameStart){

@@ -225,12 +225,12 @@ $(document).ready(function(){
             var masterVolume = typeof newConfig.masterVolume === 'number' ? newConfig.masterVolume : thisGameSettings.masterVolume;
             var musicVolume = typeof newConfig.musicVolume === 'number' ? newConfig.musicVolume : thisGameSettings.musicVolume;
             var effectVolume = typeof newConfig.effectVolume === 'number' ? newConfig.effectVolume : thisGameSettings.effectVolume;
-            thisGameSettings.masterVolume = masterVolume;
-            thisGameSettings.musicVolume = musicVolume;
-            thisGameSettings.effectVolume = effectVolume;
-            if (typeof thisMusicWindow.mmrpg_sound_effect_volume !== 'undefined'){ thisMusicWindow.mmrpg_sound_effect_volume(effectVolume); }
-            if (typeof thisMusicWindow.mmrpg_music_volume !== 'undefined'){ thisMusicWindow.mmrpg_music_volume(musicVolume); }
+            //thisGameSettings.masterVolume = masterVolume;
+            //thisGameSettings.musicVolume = musicVolume;
+            //thisGameSettings.effectVolume = effectVolume;
             if (typeof thisMusicWindow.mmrpg_master_volume !== 'undefined'){ thisMusicWindow.mmrpg_master_volume(masterVolume); }
+            if (typeof thisMusicWindow.mmrpg_music_volume !== 'undefined'){ thisMusicWindow.mmrpg_music_volume(musicVolume); }
+            if (typeof thisMusicWindow.mmrpg_sound_effect_volume !== 'undefined'){ thisMusicWindow.mmrpg_sound_effect_volume(effectVolume); }
             return true;
         }
 
