@@ -278,11 +278,29 @@ if (!empty($this_sound_effects_index_raw['resources'])
 //error_log('$this_sound_effects_index ='.print_r($this_sound_effects_index, true));
 echo 'gameSettings.customIndex.soundsIndex = '.json_encode($this_sound_effects_index).';'.PHP_EOL;
 
+//$sound_effects_aliases_index = array();
+//require(MMRPG_CONFIG_ROOTDIR.'includes/sounds.php');
+//$old_sound_effects_aliases_index = $sound_effects_aliases_index;
+//error_log('$old_sound_effects_aliases_index ='.print_r($old_sound_effects_aliases_index, true));
+
 // Collect the sound effect aliases index from teh file and then outpyt to the JS
+$raw_json = trim(file_get_contents(MMRPG_CONFIG_ROOTDIR.'includes/sounds.json'));
+$raw_json = !empty($raw_json) ? preg_replace('!//.*$!m', '', $raw_json) : '';
+$raw_json_array = !empty($raw_json) ? json_decode($raw_json, true) : array();
+//error_log('$raw_json_array ='.print_r($raw_json_array, true));
 $sound_effects_aliases_index = array();
-require(MMRPG_CONFIG_ROOTDIR.'includes/sounds.php');
+if (!empty($raw_json_array)){
+    foreach ($raw_json_array AS $sfx_category => $sfx_category_info){
+        if (!empty($sfx_category_info['index'])){
+            $sound_effects_aliases_index = array_merge($sound_effects_aliases_index, $sfx_category_info['index']);
+        }
+    }
+}
 //error_log('$sound_effects_aliases_index ='.print_r($sound_effects_aliases_index, true));
 echo 'gameSettings.customIndex.soundsAliasesIndex = '.json_encode($sound_effects_aliases_index).';'.PHP_EOL;
+
+//$array_diff = array_diff_assoc($old_sound_effects_aliases_index, $sound_effects_aliases_index);
+//error_log('$array_diff = '.print_r($array_diff, true));
 
 ?>
 </script>
