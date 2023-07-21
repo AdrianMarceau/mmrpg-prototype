@@ -307,18 +307,6 @@ if ($battle_failure_counter_light >= 1 && !mmrpg_prototype_robot_unlocked(false,
 
 }
 
-/*
-// UNLOCK ABILITY : LIGHT BUSTER
-
-// If the player has unlocked at least one non-hero robot and has not unlocked the Light Buster ability, unlock it
-if (mmrpg_prototype_robots_unlocked('dr-light') > 2
-    && !mmrpg_prototype_ability_unlocked(false, 'light-buster')){
-    $unlock_player_info = $mmrpg_index_players['dr-light'];
-    $unlock_ability_info = rpg_ability::get_index_info('light-buster');
-    mmrpg_game_unlock_ability($unlock_player_info, '', $unlock_ability_info, true);
-}
-*/
-
 // UNLOCK EVENT : PHASE TWO CHAPTERS (WILY)
 
 // If Dr. Light has completed all of his second phase, open Dr. Wily's second
@@ -377,7 +365,6 @@ if (!$unlock_flag_wily && mmrpg_prototype_complete('dr-light')){
     $unlock_player_info = $mmrpg_index_players['dr-wily'];
     mmrpg_game_unlock_player($unlock_player_info, false, true);
     $_SESSION[$session_token]['values']['battle_rewards']['dr-wily']['player_points'] = 0;
-    mmrpg_game_unlock_ability($unlock_player_info, '', array('ability_token' => 'wily-buster'), false);
 
     // Ensure Bass hasn't already been unlocked by the player
     if (!mmrpg_prototype_robot_unlocked(false, 'bass')){
@@ -492,7 +479,6 @@ if (!$unlock_flag_cossack && mmrpg_prototype_complete('dr-wily')){
     $unlock_player_info = $mmrpg_index_players['dr-cossack'];
     mmrpg_game_unlock_player($unlock_player_info, false, true);
     $_SESSION[$session_token]['values']['battle_rewards']['dr-cossack']['player_points'] = 0;
-    //mmrpg_game_unlock_ability($unlock_player_info, '', array('ability_token' => 'cossack-buster'), false);
 
     // Ensure Proto Man hasn't already been unlocked by the player
     if (!mmrpg_prototype_robot_unlocked(false, 'proto-man')){
@@ -661,12 +647,9 @@ if (!mmrpg_prototype_item_unlocked('equip-codes')
 
 }
 
-// Unlock the LIGHT/SHARE PROGRAM after Dr. Light has finished Chapter Three (when we unlock Dr. Wily)
-$required_missions = MMRPG_SETTINGS_CHAPTER1_MISSIONS;
-$required_missions += MMRPG_SETTINGS_CHAPTER2_MISSIONS;
-$required_missions += MMRPG_SETTINGS_CHAPTER3_MISSIONS;
-if (!mmrpg_prototype_item_unlocked('light-program')
-    && mmrpg_prototype_battles_complete('dr-light') >= $required_missions
+// Unlock the LIGHT/SHARE PROGRAM after Dr. Light has finished their campaign (when we unlock Dr. Wily)
+if (mmrpg_prototype_complete('dr-light')
+    && !mmrpg_prototype_item_unlocked('light-program')
     ){
 
     // Unlock the Light Program and generate the required event details
@@ -735,12 +718,9 @@ if (!mmrpg_prototype_item_unlocked('weapon-codes')
 
 }
 
-// Unlock the WILY/TRANSFER PROGRAM after Dr. Wily has finished Chapter Three (when we unlock Dr. Cossack)
-$required_missions = MMRPG_SETTINGS_CHAPTER1_MISSIONS;
-$required_missions += MMRPG_SETTINGS_CHAPTER2_MISSIONS;
-$required_missions += MMRPG_SETTINGS_CHAPTER3_MISSIONS;
-if (!mmrpg_prototype_item_unlocked('wily-program')
-    && mmrpg_prototype_battles_complete('dr-wily') >= $required_missions
+// Unlock the WILY/TRANSFER PROGRAM after Dr. Wily has finished their campaign (when we unlock Dr. Cossack)
+if (mmrpg_prototype_complete('dr-wily')
+    && !mmrpg_prototype_item_unlocked('wily-program')
     ){
 
     // Unlock the Wily Program and generate the required event details
@@ -809,12 +789,9 @@ if (!mmrpg_prototype_item_unlocked('dress-codes')
 
 }
 
-// Unlock the COSSACK/SEARCH PROGRAM after Dr. Cossack has finished Chapter Three
-$required_missions = MMRPG_SETTINGS_CHAPTER1_MISSIONS;
-$required_missions += MMRPG_SETTINGS_CHAPTER2_MISSIONS;
-$required_missions += MMRPG_SETTINGS_CHAPTER3_MISSIONS;
-if (!mmrpg_prototype_item_unlocked('cossack-program')
-    && mmrpg_prototype_battles_complete('dr-cossack') >= $required_missions
+// Unlock the COSSACK/SEARCH PROGRAM after Dr. Cossack has finished their campaign
+if (mmrpg_prototype_complete('dr-cossack')
+    && !mmrpg_prototype_item_unlocked('cossack-program')
     ){
 
     // Unlock the Cossack Program and generate the required event details
