@@ -1429,6 +1429,7 @@ class rpg_item extends rpg_object {
         $item_info_title_html = '';
         $item_info_title_html .= '<label style="background-image: url(images/items/'.$item_info_token.'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">';
             $item_info_title_html .= str_replace(' ', '&nbsp;', $item_info_name);
+            $item_info_title_html .= '<span class="count">&times; '.$item_info_count.'</span>';
             $item_info_title_html .= '<span class="arrow"><i class="fa fas fa-angle-double-down"></i></span>';
         $item_info_title_html .= '</label>';
         $item_info_title_html .= $btn_info_circle;

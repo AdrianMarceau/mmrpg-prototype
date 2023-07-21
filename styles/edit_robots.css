@@ -881,7 +881,7 @@ body[data-mode="viewer"] #edit #canvas .item_canvas a.item_name {
 #edit #canvas .item_canvas a.item_name label .count {
     float: right;
     font-size: 80%;
-    margin-right: 2px;
+    margin-right: 20px;
 }
 #edit #console .event select.player_name,
 #edit #console .event select.player_name:hover,
