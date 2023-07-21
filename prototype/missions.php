@@ -11,9 +11,9 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     ($this_data_select == 'this_battle_token' && in_array('this_player_token='.$this_prototype_data['this_player_token'], $this_data_condition))){
 
     // Collect the robot index for quick use
-    $db_robot_fields = rpg_robot::get_index_fields(true);
-    $mmrpg_robots_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
-    $mmrpg_fields_index = rpg_field::get_index();
+    $mmrpg_indedx_players = rpg_player::get_index();
+    $mmrpg_index_robots = rpg_robot::get_index(true);
+    $mmrpg_index_fields = rpg_field::get_index();
 
     // -- STARTER BATTLE : CHAPTER ONE -- //
 
@@ -277,6 +277,10 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             'option_maintext' => 'Chapter Five : The Final Battles'
             );
 
+        // Collect information on this prototype player so we can use it later
+        $this_prototype_player_data = $mmrpg_index_players[$this_prototype_data['this_player_token']];
+        $target_prototype_player_data = $mmrpg_index_players[$this_prototype_data['target_player_token']];
+
         // Final Destination I (ENKER/PUNK/BALLADE)
         // Only continue if the player has defeated the first 1 + 8 + 1 + 4 + 1 + 8 + 1 + 4 battles
         if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['4a'])){
@@ -309,79 +313,291 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
         }
 
-        // Final Destination III (ROBOT MASTERS w/ DARKNESS ALTS)
+        // Final Destination III (SLUR w/ TRILL SUPPORT)
         // Only continue if the player has defeated the first 1 + 8 + 1 + 4 + 1 + 8 + 1 + 4 battles
         if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['4c'])){
 
-            // Unlock the first of the final destination battles
-            $temp_final_option_token = $this_prototype_data['this_player_token'].'-fortress-iv';
-            $temp_final_option = rpg_battle::get_index_info($temp_final_option_token);
-            //if (empty($temp_final_option)){ die('$temp_final_option empty on line '.__LINE__.'<pre>'.print_r($this_prototype_data['this_player_token'].'-fortress-iv', true).'</pre>'); }
-            $temp_final_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
-            //$temp_final_option['battle_token'] = $this_prototype_data['this_player_token'].'-'.$this_prototype_data['battle_phase'].'-'.$temp_final_option['battle_token'];
-            $temp_final_option['battle_phase'] = $this_prototype_data['battle_phase'];
-            $temp_final_option['battle_level'] = $this_prototype_data['this_chapter_levels'][6];
-            //$temp_final_abilities = array('attack-boost', 'attack-break', 'defense-boost', 'defense-break', 'speed-boost', 'speed-break', 'energy-boost', 'energy-break');
+            // Insert Slur w/ Trill battle here
+            // "Defeat the alien robot Slur in this daunting/desperate/decisive final battle!"
+            //error_log($this_prototype_data['this_player_token'].' // Insert Slur w/ Trill battle');
+            if (true){
 
-            // Collect and define the robot masters and support mechas to appear on this field
-            $temp_robot_masters = array();
-            $temp_support_mechas = array();
-            if (isset($this_prototype_data['target_robot_omega'][1][0])){ $this_prototype_data['target_robot_omega'] = $this_prototype_data['target_robot_omega'][1]; }
-            foreach ($this_prototype_data['target_robot_omega'] AS $key => $info){
-                $temp_field_info = rpg_field::parse_index_info($mmrpg_fields_index[$info['field']]);
-                if (!empty($temp_field_info['field_master'])){ $temp_robot_masters[] = $temp_field_info['field_master']; }
-                if (!empty($temp_field_info['field_mechas'])){ $temp_support_mechas[] = array_pop($temp_field_info['field_mechas']); }
+                // Unlock the real final battle of the final destination battles
+                $temp_final_option_token = $this_prototype_data['this_player_token'].'-fortress-iv';
+                $temp_final_option = rpg_battle::get_index_info($temp_final_option_token, true);
+                $temp_final_option['battle_phase'] = $this_prototype_data['battle_phase'];
+                $temp_final_option['battle_level'] = $this_prototype_data['this_chapter_levels'][6] + 5;
+                $temp_final_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
+
+                // Define the stats we'll be working with for the real_final boss
+                $temp_this_player_info = $mmrpg_index_players[$this_prototype_data['this_player_token']];
+                $temp_target_player_info = $mmrpg_index_players[$this_prototype_data['target_player_token']];
+                $this_player_stat_token = $mmrpg_index_players[$this_prototype_data['this_player_token']]['player_type'];
+                $target_player_stat_token = $mmrpg_index_players[$this_prototype_data['target_player_token']]['player_type'];
+
+                // Update the battle field base with more dynamic options
+                $temp_fusion_field = 'prototype-subspace';
+                $temp_fusion_field_variant = '';
+                $backup_battle_field_base = $temp_final_option['battle_field_base'];
+                $temp_final_option['battle_field_base'] = array();
+                $temp_final_option['battle_field_base']['field_music'] = 'sega-remix/wily-fortress-1-mm7';
+                $temp_final_option['battle_field_base']['field_multipliers'] = array('experience' => 2);
+                if ($this_prototype_player_data['player_number'] >= 2){
+                    $temp_final_option['battle_field_base']['field_multipliers']['experience'] += 1;
+                }
+                $temp_final_option['battle_field_base'] = array_merge($backup_battle_field_base, $temp_final_option['battle_field_base']);
+
+                // The default for this battle are nice, but we should replace them with better options
+                $temp_final_option['battle_target_player']['player_robots'] = array();
+
+                // Define the details for the main real_final boss and append them to the array
+                $final_boss_token = 'slur';
+                $final_boss_index_info = $mmrpg_index_robots[$final_boss_token];
+                $final_boss_info = array('robot_token' => $final_boss_token);
+                $final_boss_info['counters'] = array();
+                $final_boss_info['counters']['attack_mods'] = $this_prototype_player_data['player_number'];
+                $final_boss_info['counters']['defense_mods'] = $this_prototype_player_data['player_number'];
+                $final_boss_info['counters']['speed_mods'] = $this_prototype_player_data['player_number'];
+                $final_boss_info['counters'][$this_player_stat_token.'_mods'] += 2;
+                $final_boss_info['robot_level'] = $temp_final_option['battle_level'];
+                $final_boss_info['robot_item'] = 'space-core';
+                //$final_boss_info['robot_abilities'] = array('space-shot', 'space-buster', 'space-overdrive', 'buster-charge');
+                $final_boss_info['robot_abilities'] = array();
+                if ($this_prototype_player_data['player_number'] >= 1){ $final_boss_info['robot_abilities'][] = 'space-overdrive'; }
+                if ($this_prototype_player_data['player_number'] >= 2){ $final_boss_info['robot_abilities'][] = 'space-buster'; }
+                if ($this_prototype_player_data['player_number'] >= 3){ $final_boss_info['robot_abilities'][] = 'space-shot'; }
+                $final_boss_info['robot_abilities'][] = 'energy-break';
+                $final_boss_info['robot_abilities'][] = 'buster-charge';
+                $temp_addon_abilties = array('core-laser', $target_player_stat_token.'-assault');
+                if (!empty($temp_addon_abilties)){ $final_boss_info['robot_abilities'] = array_merge($final_boss_info['robot_abilities'], $temp_addon_abilties); }
+                $final_replacement_quotes = array();
+                if ($this_prototype_player_data['player_token'] === 'dr-light'){
+                    $final_replacement_quotes['battle_start'] = 'The human they call Hikari? Your hubris will be your demise.';
+                    $final_replacement_quotes['battle_taunt'] = 'You remind me of a Creator. It will be shame to extingish you.';
+                    $final_replacement_quotes['battle_victory'] = 'Can you see me, Master? I have finally completed my mission!';
+                    $final_replacement_quotes['battle_defeat'] = 'Savour your temporary victory... I will return even more powerful...!';
+                } else if ($this_prototype_player_data['player_token'] === 'dr-wily'){
+                    $final_replacement_quotes['battle_start'] = 'I sense an Evil in your heart. Allow me to erase you for it!';
+                    $final_replacement_quotes['battle_taunt'] = 'Stupid Earth creatures! You are only delaying the inevitable!';
+                    $final_replacement_quotes['battle_victory'] = 'The Earth should thank me for saving it from your tragic future!';
+                    $final_replacement_quotes['battle_defeat'] = 'It doesn\'t end like this... I still have one more fight left in me...';
+                } else if ($this_prototype_player_data['player_token'] === 'dr-cossack'){
+                    $final_replacement_quotes['battle_start'] = 'I sense you are somehow... responsible... for my suffering!';
+                    $final_replacement_quotes['battle_taunt'] = 'Stop resisting! It is time you Earthlings met your deserved ends!';
+                    $final_replacement_quotes['battle_victory'] = 'You wretched Earth NetNavis are all the same! Weak! Nyahahaha!';
+                    $final_replacement_quotes['battle_defeat'] = 'Master... why have you forsaken me again? Was it all for nothing...?';
+                }
+                $final_boss_info['robot_quotes'] = array_merge($mmrpg_index_robots[$final_boss_token]['robot_quotes'], $final_replacement_quotes);
+                $temp_final_option['battle_target_player']['player_robots'][] = $final_boss_info;
+
+                // Define the details for the real_final boss's minion "trill" and append them to the array
+                $final_boss_support_token = 'trill';
+                $final_boss_support_count = 2;
+                $final_boss_support_info = array('robot_token' => $final_boss_support_token);
+                $final_boss_support_info['counters'] = array();
+                $final_boss_support_info['counters'][$this_player_stat_token.'_mods'] = 1;
+                $final_boss_support_info['robot_level'] = $final_boss_info['robot_level'] - 5;
+                $final_boss_support_info['robot_item'] = '';
+                if ($this_prototype_player_data['player_number'] >= 1){ $final_boss_support_info['robot_item'] = $this_player_stat_token.'-pellet'; }
+                if ($this_prototype_player_data['player_number'] >= 2){ $final_boss_support_info['robot_item'] = $this_player_stat_token.'-capsule'; }
+                if ($this_prototype_player_data['player_number'] >= 3){ $final_boss_support_info['robot_item'] = $this_player_stat_token.'-booster'; }
+                $final_boss_support_info['robot_abilities'] = array();
+                if ($this_prototype_player_data['player_number'] >= 1){ $final_boss_support_info['robot_abilities'][] = 'space-overdrive'; }
+                if ($this_prototype_player_data['player_number'] >= 2){ $final_boss_support_info['robot_abilities'][] = 'space-buster'; }
+                if ($this_prototype_player_data['player_number'] >= 3){ $final_boss_support_info['robot_abilities'][] = 'space-shot'; }
+                $final_boss_support_info['robot_abilities'][] = 'energy-break';
+                $final_boss_support_info['robot_abilities'][] = 'buster-charge';
+                $temp_addon_abilties = array('rhythm-satellite', $this_player_stat_token.'-mode', $target_player_stat_token.'-support');
+                if (!empty($temp_addon_abilties)){ $final_boss_support_info['robot_abilities'] = array_merge($final_boss_support_info['robot_abilities'], $temp_addon_abilties); }
+                for ($i = 0; $i < $final_boss_support_count; $i++){ $temp_final_option['battle_target_player']['player_robots'][] = $final_boss_support_info; }
+
+                // Update the battle description with more dynamic options
+                $temp_description_options = array('daunting', 'desperate', 'decisive');
+                $temp_description_key = $this_prototype_player_data['player_number'] - 1;
+                $temp_final_option['battle_description'] = 'Defeat the alien robot '.$final_boss_index_info['robot_name'].' in this '.$temp_description_options[$temp_description_key].' final battle!';
+
+                // Now that everything is as we want it, we can prepare the battle and update the index
+                rpg_mission_fortress::prepare($temp_final_option, $this_prototype_data);
+                $this_prototype_data['battle_options'][] = $temp_final_option;
+                rpg_battle::update_index_info($temp_final_option['battle_token'], $temp_final_option);
+
             }
 
-            // Define randomized hold item options based on player
-            $item_tier = 0;
-            $item_options = array();
-            if ($this_prototype_data['this_player_token'] == 'dr-light'){ $item_tier = 1; }
-            elseif ($this_prototype_data['this_player_token'] == 'dr-wily'){ $item_tier = 2; }
-            elseif ($this_prototype_data['this_player_token'] == 'dr-cossack'){ $item_tier = 3; }
-            if ($item_tier >= 1){
-                $item_options = array_merge($item_options,
-                    array('energy-capsule', 'weapon-capsule', 'attack-capsule', 'defense-capsule', 'speed-capsule')
-                    );
-            }
-            if ($item_tier >= 2){
-                $item_options = array_merge($item_options,
-                    array('energy-tank', 'weapon-tank', 'attack-booster', 'defense-booster', 'speed-booster')
-                    );
-            }
-            if ($item_tier >= 3){
-                $item_options = array_merge($item_options,
-                    array('energy-upgrade', 'weapon-upgrade', 'yashichi', 'super-capsule')
-                    );
-            }
-            $item_max_key = count($item_options) - 1;
+            // Final Destination BEFORE-III (ROBOT MASTERS w/ DARKNESS ALTS)
+            // Only prepend this battle to the final one if we're in the second/middle player campaign
+            if ($this_prototype_player_data['player_number'] >= 2){
 
-            // Add the masters info into the omega battle
-            //foreach ($temp_final_option['battle_target_player']['player_robots'] AS $key => $info){
-            $temp_final_option['battle_target_player']['player_robots'] = array();
-            foreach ($temp_robot_masters AS $key => $token){
-                //if ($info['robot_level'] > $temp_final_option['battle_level']){ $temp_final_option['battle_level'] = $info['robot_level']; }
-                $index = rpg_robot::parse_index_info($mmrpg_robots_index[$token]);
-                $info = array();
-                $info['robot_id'] = ($key + 1); // temp, is changed later
-                $info['robot_token'] = $token;
-                $info['robot_name'] = $index['robot_name'].' Σ';
-                $info['robot_image'] = $token.'_alt9';
-                $info['robot_level'] = $temp_final_option['battle_level'];
-                $info['robot_core'] = 'empty';
-                if (!empty($item_options)){ $info['robot_item'] = $item_options[mt_rand(0, $item_max_key)]; }
-                $info['robot_abilities'] = array();
-                $info['robot_abilities'] = mmrpg_prototype_generate_abilities($index, $info['robot_level'], 8);
-                $temp_final_option['battle_target_player']['player_robots'][] = $info;
-            }
+                // Prepend the Darkness Alts battle here
+                // "Defeat the army of robot master clones augmented with darkness energy!"
+                //error_log($this_prototype_data['this_player_token'].' // Prepend the Darkness Alts battle');
+                if (true){
 
-            // Add the mechas info into the omega battle
-            $temp_final_option['battle_field_base']['field_mechas'] = $temp_support_mechas;
-            shuffle($temp_final_option['battle_target_player']['player_robots']);
-            //die('<pre>'.print_r($temp_final_option, true).'</pre>');
-            rpg_mission_fortress::prepare($temp_final_option, $this_prototype_data);
-            $this_prototype_data['battle_options'][] = $temp_final_option;
-            rpg_battle::update_index_info($temp_final_option['battle_token'], $temp_final_option);
+                    // Unlock the prefix to the final destination III battles
+                    $temp_before_final_option_token = $this_prototype_data['this_player_token'].'-fortress-iv-before';
+                    $temp_before_final_option = rpg_battle::get_index_info($temp_final_option['battle_token'], true);
+                    $temp_before_final_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
+                    $temp_before_final_option['battle_token'] = $temp_before_final_option_token;
+                    $temp_before_final_option['battle_phase'] = $this_prototype_data['battle_phase'];
+                    $temp_before_final_option['battle_level'] = $this_prototype_data['this_chapter_levels'][6];
+
+                    // Collect and define the robot masters and support mechas to appear on this field
+                    $temp_robot_masters = array();
+                    $temp_support_mechas = array();
+                    $temp_omega_session_key = $this_prototype_data['prev_player_token'].'_target-robot-omega_prototype';
+                    $temp_omega_robots_array = !empty($_SESSION['GAME']['values'][$temp_omega_session_key]) ? $_SESSION['GAME']['values'][$temp_omega_session_key] : array();
+                    if (isset($temp_omega_robots_array[1][0])){ $temp_omega_robots_array = $temp_omega_robots_array[1]; }
+                    foreach ($temp_omega_robots_array AS $key => $info){
+                        $temp_field_info = rpg_field::parse_index_info($mmrpg_index_fields[$info['field']]);
+                        if (!empty($temp_field_info['field_master'])){ $temp_robot_masters[] = $temp_field_info['field_master']; }
+                        if (!empty($temp_field_info['field_mechas'])){ $temp_support_mechas[] = array_pop($temp_field_info['field_mechas']); }
+                    }
+
+                    // Define randomized hold item options based on player
+                    $item_tier = 0;
+                    $item_options = array();
+                    if ($this_prototype_data['this_player_token'] == 'dr-light'){ $item_tier = 1; }
+                    elseif ($this_prototype_data['this_player_token'] == 'dr-wily'){ $item_tier = 2; }
+                    elseif ($this_prototype_data['this_player_token'] == 'dr-cossack'){ $item_tier = 3; }
+                    if ($item_tier >= 1){
+                        $item_options = array_merge($item_options,
+                            array('energy-capsule', 'weapon-capsule', 'attack-capsule', 'defense-capsule', 'speed-capsule')
+                            );
+                    }
+                    if ($item_tier >= 2){
+                        $item_options = array_merge($item_options,
+                            array('energy-tank', 'weapon-tank', 'attack-booster', 'defense-booster', 'speed-booster')
+                            );
+                    }
+                    if ($item_tier >= 3){
+                        $item_options = array_merge($item_options,
+                            array('energy-upgrade', 'weapon-upgrade', 'yashichi', 'super-capsule')
+                            );
+                    }
+                    $item_max_key = count($item_options) - 1;
+
+                    // Add the masters info into the omega battle
+                    //foreach ($temp_before_final_option['battle_target_player']['player_robots'] AS $key => $info){
+                    $temp_before_final_option['battle_target_player']['player_robots'] = array();
+                    foreach ($temp_robot_masters AS $key => $token){
+                        //if ($info['robot_level'] > $temp_before_final_option['battle_level']){ $temp_before_final_option['battle_level'] = $info['robot_level']; }
+                        $index = $mmrpg_index_robots[$token];
+                        $info = array();
+                        $info['robot_id'] = ($key + 1); // temp, is changed later
+                        $info['robot_token'] = $token;
+                        $info['robot_name'] = $index['robot_name'].' Σ';
+                        $info['robot_image'] = $token.'_alt9';
+                        $info['robot_level'] = $temp_before_final_option['battle_level'] - 5;
+                        $info['robot_core'] = 'empty';
+                        if (!empty($item_options)){ $info['robot_item'] = $item_options[mt_rand(0, $item_max_key)]; }
+                        $info['robot_abilities'] = array();
+                        $info['robot_abilities'] = mmrpg_prototype_generate_abilities($index, $info['robot_level'], 8);
+                        $temp_before_final_option['battle_target_player']['player_robots'][] = $info;
+                    }
+
+                    // Add the mechas info into the omega battle
+                    $temp_before_final_option['battle_field_base']['field_music'] = 'sega-remix/wily-fortress-2-mm9';
+                    $temp_before_final_option['battle_field_base']['field_mechas'] = $temp_support_mechas;
+                    shuffle($temp_before_final_option['battle_target_player']['player_robots']);
+
+                    // Prepare the final battle details, add it to the index and/or buttons, and then queue it up
+                    rpg_mission_fortress::prepare($temp_before_final_option, $this_prototype_data);
+                    //$this_prototype_data['battle_options'][] = $temp_before_final_option;
+                    rpg_battle::update_index_info($temp_before_final_option['battle_token'], $temp_before_final_option);
+                    mmrpg_prototype_mission_autoplay_prepend($temp_final_option, $temp_before_final_option, $this_prototype_data, true);
+
+                }
+
+                // Final Destination AFTER-III (CRESTFALLEN SLUR w/ DUO SUPPORT)
+                // Only prepend this battle to the final one if we're in the third and final player campaign
+                if ($this_prototype_player_data['player_number'] >= 3){
+
+                    // Append the Crestfallen Slur battle here
+                    // "Defeat the crestfallen Slur in this climactic final encounter!"
+                    //error_log($this_prototype_data['this_player_token'].' // Append the Crestfallen Slur battle');
+                    if (true){
+
+                        // Unlock the last of the final destination III battles
+                        $temp_after_final_option_token = $this_prototype_data['this_player_token'].'-fortress-iv-after';
+                        $temp_after_final_option = rpg_battle::get_index_info($temp_final_option['battle_token'], true);
+                        $temp_after_final_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
+                        $temp_after_final_option['battle_token'] = $temp_after_final_option_token;
+                        $temp_after_final_option['battle_phase'] = $this_prototype_data['battle_phase'];
+                        $temp_after_final_option['battle_level'] = $this_prototype_data['this_chapter_levels'][6];
+
+                        // Update the battle field base with more dynamic options
+                        $backup_battle_field_base = $temp_after_final_option['battle_field_base'];
+                        $temp_fusion_field = 'prototype-subspace';
+                        $temp_after_final_option['battle_field_base'] = array();
+                        $temp_after_final_option['battle_field_base']['field_music'] = 'sega-remix/final-boss-rnf';
+                        $temp_after_final_option['battle_field_base']['field_multipliers'] = array('experience' => 2);
+                        if ($this_prototype_player_data['player_number'] >= 2){
+                            $temp_fusion_field_background_variant = '';
+                            $temp_after_final_option['battle_field_base']['field_background'] = $temp_fusion_field;
+                            $temp_after_final_option['battle_field_base']['field_background_variant'] = $temp_fusion_field_background_variant;
+                            $temp_after_final_option['battle_field_base']['field_background_attachments'] = array();
+                            $temp_after_final_option['battle_field_base']['field_multipliers']['experience'] += 1;
+                        }
+                        if ($this_prototype_player_data['player_number'] >= 3){
+                            $temp_fusion_field_foreground_variant = '';
+                            $temp_after_final_option['battle_field_base']['field_foreground'] = $temp_fusion_field;
+                            $temp_after_final_option['battle_field_base']['field_foreground_variant'] = $temp_fusion_field_foreground_variant;
+                            $temp_after_final_option['battle_field_base']['field_foreground_attachments'] = array();
+                            $temp_after_final_option['battle_field_base']['field_multipliers']['experience'] += 1;
+                        }
+                        $temp_after_final_option['battle_field_base'] = array_merge($backup_battle_field_base, $temp_after_final_option['battle_field_base']);
+
+                        // The default for this battle are nice, but we should replace them with better options
+                        $temp_after_final_option['battle_target_player']['player_robots'] = array();
+
+                        // Define the details for the main real_final boss and append them to the array
+                        $real_final_boss_token = 'slur';
+                        $real_final_boss_index_info = $mmrpg_index_robots[$real_final_boss_token];
+                        $real_final_boss_info = array('robot_token' => $real_final_boss_token);
+                        $real_final_boss_info['flags'] = array();
+                        $real_final_boss_info['flags']['final_boss'] = true;
+                        $real_final_boss_info['flags']['absolute_final_boss'] = true;
+                        $real_final_boss_info['counters'] = array();
+                        $real_final_boss_info['counters']['attack_mods'] = MMRPG_SETTINGS_STATS_MOD_MAX;
+                        $real_final_boss_info['counters']['defense_mods'] = MMRPG_SETTINGS_STATS_MOD_MAX;
+                        $real_final_boss_info['counters']['speed_mods'] = MMRPG_SETTINGS_STATS_MOD_MAX;
+                        $real_final_boss_info['robot_level'] = $temp_after_final_option['battle_level'] + 10;
+                        $real_final_boss_info['robot_item'] = 'omega-seed';
+                        $real_final_boss_info['robot_abilities'] = array('space-overdrive', 'laser-overdrive', 'shield-overdrive', 'buster-charge');
+                        $temp_addon_abilties = array('freeze-overdrive', 'flame-overdrive', 'water-overdrive', 'electric-overdrive');
+                        if (!empty($temp_addon_abilties)){ $real_final_boss_info['robot_abilities'] = array_merge($real_final_boss_info['robot_abilities'], $temp_addon_abilties); }
+                        $real_final_replacement_quotes = array();
+                        if ($this_prototype_player_data['player_token'] === 'dr-light'){
+                            $real_final_replacement_quotes['battle_start'] = '...';
+                            $real_final_replacement_quotes['battle_taunt'] = '...';
+                            $real_final_replacement_quotes['battle_victory'] = '...!';
+                            $real_final_replacement_quotes['battle_defeat'] = '...!';
+                        } else if ($this_prototype_player_data['player_token'] === 'dr-wily'){
+                            $real_final_replacement_quotes['battle_start'] = '...';
+                            $real_final_replacement_quotes['battle_taunt'] = '...';
+                            $real_final_replacement_quotes['battle_victory'] = '...!';
+                            $real_final_replacement_quotes['battle_defeat'] = '...!';
+                        } else if ($this_prototype_player_data['player_token'] === 'dr-cossack'){
+                            $real_final_replacement_quotes['battle_start'] = 'No! I refuse to let it end this way!';
+                            $real_final_replacement_quotes['battle_taunt'] = 'Master, why have not come for me? Are you even out there?'; //'Master! Have you have finally come for me?!';
+                            $real_final_replacement_quotes['battle_victory'] = 'Master, I have completed my task! Are you still out there?'; //'Master, forgive me for what have I done....';
+                            $real_final_replacement_quotes['battle_defeat'] = 'Master, forgive me for I have failed you...';
+                        }
+                        $real_final_boss_info['robot_quotes'] = array_merge($mmrpg_index_robots[$real_final_boss_token]['robot_quotes'], $real_final_replacement_quotes);
+                        $temp_after_final_option['battle_target_player']['player_robots'][] = $real_final_boss_info;
+
+                        // Prepare the final battle details, add it to the index and/or buttons, and then queue it up
+                        rpg_mission_fortress::prepare($temp_after_final_option, $this_prototype_data);
+                        //$this_prototype_data['battle_options'][] = $temp_after_final_option;
+                        rpg_battle::update_index_info($temp_after_final_option['battle_token'], $temp_after_final_option);
+                        mmrpg_prototype_mission_autoplay_append($temp_final_option, $temp_after_final_option, $this_prototype_data, true);
+
+
+
+                    }
+
+                }
+
+            }
 
         }
 
@@ -495,7 +711,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 // Generate a random encounter mission for the star fields
                 //$player_starforce_levels = !empty($_SESSION[$session_token]['values']['star_force']) ? $_SESSION[$session_token]['values']['star_force'] : array();
                 $random_encounter_added = true;
-                $random_field_type = !empty($info2) ? $mmrpg_fields_index[$info2['field']]['field_type'] : $mmrpg_fields_index[$info['field']]['field_type'];
+                $random_field_type = !empty($info2) ? $mmrpg_index_fields[$info2['field']]['field_type'] : $mmrpg_index_fields[$info['field']]['field_type'];
                 $temp_battle_sigma = mmrpg_prototype_generate_mission($this_prototype_data,
                     $temp_battle_omega['battle_token'].'-random-encounter', array(
                         'battle_name' => 'Challenger from the Future?',
