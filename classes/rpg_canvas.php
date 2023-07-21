@@ -2231,6 +2231,13 @@ class rpg_canvas {
                     // Loop through each attachment and process it
                     foreach ($this_robot->robot_attachments AS $attachment_token => $attachment_info){
 
+                        // If the attachment doesn't have a class, we can just skip it
+                        if (!isset($attachment_info['class'])){
+                            //error_log('Attachment '.$attachment_token.' doesn\'t have a class set!');
+                            //error_log('$attachment_info = '.print_r($attachment_info, true));
+                            continue;
+                        }
+
                         // If this is an ability attachment
                         if ($attachment_info['class'] == 'ability'){
                             // Create the temporary ability object using the provided data and generate its markup data
