@@ -47,8 +47,10 @@ foreach ($base_style_names AS $base_style_name){
 
     // Require the dynamic CSS additions if such a file exists
     ob_start();
+    $static_file_path = $base_style_dir.'style_'.$base_style_name;
     $dynamic_file_path = $base_style_dir.'style_'.str_replace('.css', '.php', $base_style_name);
     if (file_exists($dynamic_file_path)){ require_once($dynamic_file_path); }
+    elseif (file_exists($static_file_path)){ require_once($static_file_path); }
     $cache_style_markup .= ob_get_clean();
 
 }

@@ -28,6 +28,7 @@
     $mmrpg_music_rootdir = MMRPG_CONFIG_CDN_ROOTDIR.$mmrpg_music_path;
     $mmrpg_music_rooturl = MMRPG_CONFIG_CDN_ROOTURL.$mmrpg_music_path;
     $mmrpg_music_file_types = array('mp3', 'ogg');
+    $mmrpg_music_file_types_mime = array('mp3' => 'audio/mpeg', 'ogg' => 'audio/ogg');
     $mmrpg_music_file_list = array();
     if (is_dir($mmrpg_music_rootdir)){
         $mmrpg_music_file_list = getDirContents($mmrpg_music_rootdir);
@@ -69,6 +70,13 @@
     if (!empty($last_option_group)){ $source_options_markup[] = '</optgroup>'; }
     $source_options_count = count($source_options_markup);
     $source_options_markup = implode(PHP_EOL, $source_options_markup);
+
+
+    /* -- Page Script/Style Dependencies  -- */
+
+    // Require codemirror scripts and styles for this page
+    $admin_include_common_styles[] = 'howler';
+    $admin_include_common_scripts[] = 'howler';
 
 
     /* -- Form Setup Actions -- */
@@ -136,6 +144,7 @@
         $search_data['music_name'] = !empty($_GET['music_name']) ? trim($_GET['music_name']) : '';
         $search_data['music_link'] = !empty($_GET['music_link']) && preg_match('/^https?:\/\//i', $_GET['music_link']) ? trim($_GET['music_link']) : '';
         $search_data['music_flag_haslink'] = isset($_GET['music_flag_haslink']) && $_GET['music_flag_haslink'] !== '' ? (!empty($_GET['music_flag_haslink']) ? 1 : 0) : '';
+        $search_data['music_flag_hasloop'] = isset($_GET['music_flag_hasloop']) && $_GET['music_flag_hasloop'] !== '' ? (!empty($_GET['music_flag_hasloop']) ? 1 : 0) : '';
         $search_data['music_flag_hasfiles'] = isset($_GET['music_flag_hasfiles']) && $_GET['music_flag_hasfiles'] !== '' ? (!empty($_GET['music_flag_hasfiles']) ? 1 : 0) : '';
 
         /* -- Collect Search Results -- */
@@ -148,6 +157,7 @@
             CONCAT(music.music_album, '/', music.music_token) AS music_path,
             CONCAT(music.legacy_music_album, '/', music.legacy_music_token) AS legacy_music_path,
             (CASE WHEN music_link <> '' THEN 1 ELSE 0 END) AS music_flag_haslink,
+            (CASE WHEN music_loop <> '' THEN 1 ELSE 0 END) AS music_flag_hasloop,
             0 AS music_flag_hasfiles
             FROM {$mmrpg_music_dbname}.mmrpg_index_music AS music
             WHERE 1=1
@@ -212,6 +222,14 @@
             $flag_value = $search_data['music_flag_haslink'];
             if ($flag_value){ $search_query .= "AND music_link <> '' "; }
             else { $search_query .= "AND music_link = '' "; }
+            $search_results_limit = false;
+        }
+
+        // If the music enabled flag was provided
+        if ($search_data['music_flag_hasloop'] !== ''){
+            $flag_value = $search_data['music_flag_hasloop'];
+            if ($flag_value){ $search_query .= "AND music_loop <> '' "; }
+            else { $search_query .= "AND music_loop = '' "; }
             $search_results_limit = false;
         }
 
@@ -294,6 +312,7 @@
                 'music_game' => '',
                 'music_name' => '',
                 'music_link' => '',
+                'music_loop' => '',
                 'music_order' => 0,
                 'legacy_music_token' => '',
                 'legacy_music_album' => '',
@@ -336,6 +355,7 @@
             $form_data['music_game'] = !empty($_POST['music_game']) && preg_match('/[-_0-9a-z]+/i', $_POST['music_game']) ? trim($_POST['music_game']) : '';
             $form_data['music_name'] = !empty($_POST['music_name']) ? trim($_POST['music_name']) : '';
             $form_data['music_link'] = !empty($_POST['music_link']) && preg_match('/^https?:\/\//i', $_POST['music_link']) ? trim($_POST['music_link']) : '';
+            $form_data['music_loop'] = !empty($_POST['music_loop']) && is_array($_POST['music_loop']) ? $_POST['music_loop'] : array();
             $form_data['music_order'] = !empty($_POST['music_order']) && is_numeric($_POST['music_order']) ? trim($_POST['music_order']) : 0;
 
             // If we're creating a new music, merge form data with the temp music data
@@ -386,6 +406,35 @@
 
             // If there were errors, we should exit now
             if (!$form_success){ exit_music_edit_action($form_data['music_id']); }
+
+
+            // REFORMAT or OPTIMIZE data for provided fields where necessary
+
+            // Parse and reformat the MUSIC LOOP field
+            $raw_loop_data = $form_data['music_loop'];
+            $parsed_music_loop = array();
+            $form_data['music_loop'] = '';
+            if (!empty($raw_loop_data)
+                && !empty($raw_loop_data['start'])
+                && !empty($raw_loop_data['end'])){
+                //error_log('we appear to have everything we need');
+                //error_log('$raw_loop_data = '.print_r($raw_loop_data, true));
+                $timestamp_regex = '/^([0-5]?\d):([0-5]?\d):([0-9]{1,2})$/';
+                $parsed_music_loop['start'] = preg_match($timestamp_regex, $raw_loop_data['start']) ? get_milliseconds_from_timestamp($raw_loop_data['start']) : 0;
+                $parsed_music_loop['end'] = preg_match($timestamp_regex, $raw_loop_data['end']) ? get_milliseconds_from_timestamp($raw_loop_data['end']) : 0;
+                //error_log('$parsed_music_loop = '.print_r($parsed_music_loop, true));
+                if (!empty($parsed_music_loop['start'])
+                    && !empty($parsed_music_loop['end'])){
+                    $form_data['music_loop'] = json_encode($parsed_music_loop);
+                }
+            }
+
+            // Only parse the following fields if NOT new object data
+            if (!$music_data_is_new){
+
+                // ...
+
+            }
 
             // Loop through fields to create an update string
             $update_data = $form_data;
@@ -635,8 +684,9 @@
                     <div class="field fullsize has5cols flags">
                     <?
                     $flag_names = array(
-                        'haslink' => array('icon' => 'fas fa-check-square', 'yes' => 'Has Link', 'no' => 'Missing Link'),
-                        'hasfiles' => array('icon' => 'fas fa-check-square', 'yes' => 'Has Files', 'no' => 'Missing Files'),
+                        'haslink' => array('icon' => 'fas fa-link', 'yes' => 'Has Link', 'no' => 'Missing Link', 'label' => 'Has Credits Link'),
+                        'hasfiles' => array('icon' => 'fas fa-file-audio', 'yes' => 'Has Files', 'no' => 'Missing Files', 'label' => 'Has Audio Files'),
+                        'hasloop' => array('icon' => 'fas fa-infinity', 'yes' => 'Has Loop', 'no' => 'Missing Loop', 'label' => 'Has Loop Data'),
                         );
                     foreach ($flag_names AS $flag_token => $flag_info){
                         if (isset($flag_info['break'])){ echo('<div class="break"></div>'); continue; }
@@ -679,8 +729,9 @@
                             <col class="token" width="160" />
                             <col class="album" width="90" />
                             <col class="game" width="80" />
-                            <col class="flag haslink" width="80" />
                             <col class="flag hasfiles" width="80" />
+                            <col class="flag hasloop" width="80" />
+                            <col class="flag haslink" width="80" />
                             <col class="actions" width="100" />
                         </colgroup>
                         <thead>
@@ -690,8 +741,9 @@
                                 <th class="token"><?= cms_admin::get_sort_link('music_token', 'Token') ?></th>
                                 <th class="album"><?= cms_admin::get_sort_link('music_album', 'Album') ?></th>
                                 <th class="game"><?= cms_admin::get_sort_link('music_game', 'Game') ?></th>
-                                <th class="flag haslink"><?= cms_admin::get_sort_link('music_flag_haslink', 'Has Link') ?></th>
-                                <th class="flag hasfiles"><?= cms_admin::get_sort_link('music_flag_haslink', 'Has Files') ?></th>
+                                <th class="flag hasfiles"><?= cms_admin::get_sort_link('music_flag_haslink', 'Files') ?></th>
+                                <th class="flag hasloop"><?= cms_admin::get_sort_link('music_flag_hasloop', 'Loop') ?></th>
+                                <th class="flag haslink"><?= cms_admin::get_sort_link('music_flag_haslink', 'Link') ?></th>
                                 <th class="actions">Actions</th>
                             </tr>
                             <tr>
@@ -700,8 +752,9 @@
                                 <th class="head token"></th>
                                 <th class="head album"></th>
                                 <th class="head game"></th>
-                                <th class="head flag haslink"></th>
                                 <th class="head flag hasfiles"></th>
+                                <th class="head flag hasloop"></th>
+                                <th class="head flag haslink"></th>
                                 <th class="head count"><?= cms_admin::get_totals_markup() ?></th>
                             </tr>
                         </thead>
@@ -712,8 +765,9 @@
                                 <td class="foot token"></td>
                                 <td class="foot album"></td>
                                 <td class="foot game"></td>
-                                <td class="foot flag haslink"></td>
                                 <td class="foot flag hasfiles"></td>
+                                <td class="foot flag hasloop"></td>
+                                <td class="foot flag haslink"></td>
                                 <td class="foot count"><?= cms_admin::get_totals_markup() ?></td>
                             </tr>
                         </tfoot>
@@ -724,20 +778,47 @@
                                 $music_id = $music_data['music_id'];
                                 $music_name = $music_data['music_name'];
                                 $music_token = $music_data['music_token'];
-
                                 $music_album = $music_data['music_album'];
                                 $music_album = str_replace('-', ' ', $music_album);
                                 if (strstr($music_album, ' ost')){ $music_album = strtoupper($music_album); }
                                 else { $music_album = ucwords($music_album); }
-
                                 $music_game = $music_data['music_game'];
+                                $music_loop = !empty($music_data['music_loop']) ? json_decode($music_data['music_loop'], true) : array();
 
-                                $music_flag_haslink = !empty($music_data['music_flag_haslink']) ? '<i class="fas fa-check-square"></i>' : '-';
-                                if (!empty($music_data['music_flag_haslink'])){ $music_flag_haslink = '<a href="'.$music_data['music_link'].'" target="_blank">'.$music_flag_haslink.'</a>'; }
-
+                                $music_flag_haslink = !empty($music_data['music_flag_haslink']) ? '<i class="fas fa-link"></i>' : '-';
+                                $music_flag_hasloop = !empty($music_data['music_flag_hasloop']) ? '<i class="fas fa-infinity"></i>' : '-';
                                 $music_flag_hasfiles = !empty($music_data['music_flag_hasfiles']) ? '<i class="fas fa-'.($music_data['music_flag_hasfiles'] > 1 ? 'check-double' : 'check').'"></i>' : '-';
 
-                                $music_flag_haslink_span =
+                                if (!empty($music_data['music_flag_haslink'])){ $music_flag_haslink = '<a href="'.$music_data['music_link'].'" target="_blank">'.$music_flag_haslink.'</a>'; }
+
+                                $music_player_markup = '';
+                                if ($music_flag_hasfiles){
+                                    $this_music_path = $music_data['music_album'].'/'.$music_data['music_token'].'/';
+                                    $this_music_loop = !empty($music_data['music_loop']) ? json_decode($music_data['music_loop'], true) : array();
+                                    $this_music_dir = $mmrpg_music_rootdir.$this_music_path;
+                                    $this_music_url = $mmrpg_music_rooturl.$this_music_path;
+                                    $this_file_urls = array();
+                                    $this_file_urls_w_cache = array();
+                                    foreach ($mmrpg_music_file_types AS $file_type){
+                                        $file_exists = false;
+                                        $file_dir = $this_music_dir.'audio.'.$file_type;
+                                        $file_url = $this_music_url.'audio.'.$file_type;
+                                        if (file_exists($file_dir)){
+                                            $this_file_urls[] = $file_url;
+                                            $this_file_urls_w_cache[] = $file_url.'?'.MMRPG_CONFIG_CACHE_DATE;
+                                        }
+                                    }
+                                    $this_data_attrs = '';
+                                    $this_data_attrs .= 'data-kind="music" ';
+                                    $this_data_attrs .= 'data-path="'.$this_file_urls_w_cache[0].'" ';
+                                    if (isset($this_file_urls_w_cache[1])){ $this_data_attrs .= 'data-backup-path="'.$this_file_urls_w_cache[1].'" '; }
+                                    if (!empty($this_music_loop['start'])){ $this_data_attrs .= 'data-loop-start="'.$this_music_loop['start'].'" '; }
+                                    if (!empty($this_music_loop['end'])){ $this_data_attrs .= 'data-loop-end="'.$this_music_loop['end'].'" '; }
+                                    $music_player_markup .= '<br />';
+                                    $music_player_markup .= '<span class="audio-player light-theme no-preload" '.$this_data_attrs.' style="margin: 3px auto 0 0;">';
+                                        $music_player_markup .= '<i class="loading fa fas fa-music"></i>';
+                                    $music_player_markup .= '</span>';
+                                }
 
                                 $music_edit = 'admin/edit-music/editor/music_id='.$music_id;
 
@@ -750,12 +831,13 @@
 
                                 echo '<tr>'.PHP_EOL;
                                     echo '<td class="id"><div>'.$music_id.'</div></td>'.PHP_EOL;
-                                    echo '<td class="name"><div>'.$music_name_link.'</div></td>'.PHP_EOL;
+                                    echo '<td class="name"><div>'.$music_name_link.$music_player_markup.'</div></td>'.PHP_EOL;
                                     echo '<td class="token"><div>'.$music_token.'</div></td>'.PHP_EOL;
                                     echo '<td class="album"><div>'.$music_album.'</div></td>'.PHP_EOL;
                                     echo '<td class="game"><div class="wrap">'.$music_game.'</div></td>'.PHP_EOL;
-                                    echo '<td class="flag haslink"><div>'.$music_flag_haslink.'</div></td>'.PHP_EOL;
                                     echo '<td class="flag hasfiles"><div>'.$music_flag_hasfiles.'</div></td>'.PHP_EOL;
+                                    echo '<td class="flag hasloop"><div>'.$music_flag_hasloop.'</div></td>'.PHP_EOL;
+                                    echo '<td class="flag haslink"><div>'.$music_flag_haslink.'</div></td>'.PHP_EOL;
                                     echo '<td class="actions"><div>'.$music_actions.'</div></td>'.PHP_EOL;
                                 echo '</tr>'.PHP_EOL;
 
@@ -859,6 +941,10 @@
                             <hr />
 
                             <?
+
+                            // Define an array to hold confirmed uploaded music files
+                            $uploaded_music_files = array();
+
                             // Loop through and print upload inputs for all type
                             $this_music_path = $music_data['music_album'].'/'.$music_data['music_token'].'/';
                             $this_music_dir = $mmrpg_music_rootdir.$this_music_path;
@@ -866,8 +952,12 @@
                             foreach ($mmrpg_music_file_types AS $file_type){
                                 $file_dir = $this_music_dir.'audio.'.$file_type;
                                 $file_url = $this_music_url.'audio.'.$file_type;
-                                if (file_exists($file_dir)){ $file_status = '<a class="status yes" href="'.$file_url.'" target="_blank"><i class="fa fas fa-check-circle"></i></a>'; }
+                                $file_url_w_cache = $file_url.'?'.time();
+                                $file_exists = false;
+                                if (file_exists($file_dir)){ $file_exists = true;  }
+                                if ($file_exists){ $file_status = '<a class="status yes" href="'.$file_url_w_cache.'" target="_blank"><i class="fa fas fa-check-circle"></i></a>'; }
                                 else { $file_status = '<span class="status no"><i class="fa fas fa-times-circle"></i></span>'; }
+                                if ($file_exists){ $uploaded_music_files[] = $file_url_w_cache; }
                                 ?>
                                 <div class="field">
                                     <div class="label">
@@ -877,9 +967,56 @@
                                     <div class="filewrap">
                                         <input class="fileinput" type="file" name="music_files_<?= $file_type ?>" value="" />
                                     </div>
+                                    <? if ($file_exists){ ?>
+                                        <div
+                                            class="audio-player light-theme"
+                                            style="margin: 5px auto 0 0;"
+                                            data-kind="music"
+                                            data-path="<?= $file_url_w_cache ?>"
+                                            ><i class="loading fa fas fa-music"></i>
+                                        </div>
+                                    <? } ?>
                                 </div>
                                 <?
                             }
+
+                            // If files were uploaded, we can display the music loop input
+                            if (!empty($uploaded_music_files)){
+
+                                ?>
+
+                                <hr />
+
+                                <div class="field halfsize" style="clear: left; margin-top: 10px;">
+                                    <?
+                                    $timestamp_placeholder = '00:00:00';
+                                    $music_loop_data = !empty($music_data['music_loop']) ? json_decode($music_data['music_loop'], true) : array();
+                                    //error_log('$music_loop_data = '.print_r($music_loop_data, true));
+                                    ?>
+                                    <div class="subfield">
+                                        <div class="label">
+                                            <strong>Music Loop</strong>
+                                            <em>mm:ss:ff</em>
+                                        </div>
+                                        <input class="textbox" type="text" name="music_loop[start]" value="<?= !empty($music_loop_data['start']) ? get_timestamp_from_milliseconds($music_loop_data['start']) : '' ?>" maxlength="8" placeholder="<?= $timestamp_placeholder ?>" style="float: left; width: 75px; margin: 0 5px 0 0;" />
+                                        <input class="textbox" type="text" name="music_loop[end]" value="<?= !empty($music_loop_data['end']) ? get_timestamp_from_milliseconds($music_loop_data['end']) : '' ?>" maxlength="8" placeholder="<?= $timestamp_placeholder ?>" style="float: left; width: 75px; margin: 0 5px 0 0;" />
+                                    </div>
+                                    <div
+                                        class="audio-player light-theme"
+                                        style="margin: 5px auto 0 0;"
+                                        data-kind="music"
+                                        <?= !empty($uploaded_music_files[0]) ? 'data-path="'.$uploaded_music_files[0].'"' : '' ?>
+                                        <?= !empty($uploaded_music_files[1]) ? 'data-backup-path="'.$uploaded_music_files[1].'"' : '' ?>
+                                        <?= !empty($music_loop_data['start']) ? 'data-loop-start="'.$music_loop_data['start'].'"' : '' ?>
+                                        <?= !empty($music_loop_data['end']) ? 'data-loop-end="'.$music_loop_data['end'].'"' : '' ?>
+                                        ><i class="loading fa fas fa-music"></i>
+                                    </div>
+                                </div>
+
+                                <?
+
+                            }
+
                             ?>
 
                             <hr />
@@ -917,12 +1054,8 @@
 
                 <?
 
-                /*
-                $debug_music_data = $music_data;
-                $debug_music_data['music_profile_text'] = str_replace(PHP_EOL, '\\n', $debug_music_data['music_profile_text']);
-                $debug_music_data['music_credit_text'] = str_replace(PHP_EOL, '\\n', $debug_music_data['music_credit_text']);
-                echo('<pre>$music_data = '.(!empty($debug_music_data) ? htmlentities(print_r($debug_music_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
-                */
+                //$debug_music_data = $music_data;
+                //echo('<pre>$music_data = '.(!empty($debug_music_data) ? htmlentities(print_r($debug_music_data, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
 
                 ?>
 

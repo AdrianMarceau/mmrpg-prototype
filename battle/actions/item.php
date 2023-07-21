@@ -2,6 +2,9 @@
 
 // -- ITEM BATTLE ACTION -- //
 
+// IMPORTANT! This isn't used anymore due to items requiring a turn
+// TODO: Make it so that these files are modular and this CAN be used in conjunction with existing target action files
+
 // Create the temporary item object for this player's robot
 $temp_iteminfo = array();
 list($temp_iteminfo['item_id'], $temp_iteminfo['item_token']) = explode('_', $this_action_token); //array('item_token' => $this_action_token);

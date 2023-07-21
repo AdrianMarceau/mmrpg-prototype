@@ -268,12 +268,12 @@ $temp_prototype_complete = mmrpg_prototype_complete();
 $this_menu_tooltips = array();
 $this_menu_tooltips['home'] = '&laquo; Home Menu &raquo; &lt;br /&gt;Select your mission from the home menu and prepare for battle! Complete missions in fewer turns to earn more zenny!';
 $this_menu_tooltips['shop'] = '&laquo; Item Shop &raquo; &lt;br /&gt;Trade in your extra inventory for zenny in the shop and then put your earnings towards new items, new abilities, and new battle fields.';
-$this_menu_tooltips['players'] = '&laquo; Player Editor &raquo; &lt;br /&gt;Review detailed stats about your player characters and reconfigure chapter two battle fields to generate new field and fusion stars.';
 $this_menu_tooltips['robots'] = '&laquo; Robot Editor &raquo; &lt;br /&gt;Review detailed stats about your battle robots, equip them with new abilities, and transfer them to other players in your save file.';
-$this_menu_tooltips['database'] = '&laquo; Robot Database &raquo; &lt;br /&gt;A comprehensive list of all robots encountered in battle so far including their name and basic details. Scanning robots adds their stats and weaknesses to the database and unlocking them adds a complete list of their level-up abilities.';
-$this_menu_tooltips['items'] = '&laquo; Item Inventory &raquo; &lt;br /&gt;View your inventory of collected items thus far, including quantities, descriptions, and images.';
+$this_menu_tooltips['players'] = '&laquo; Player Editor &raquo; &lt;br /&gt;Review detailed stats about your player characters and reconfigure chapter two battle fields to generate new field and fusion stars.';
 $this_menu_tooltips['abilities'] = '&laquo; Ability Arsenal &raquo; &lt;br /&gt;View your archive of abilities unlocked so far, including types, power, descriptions, and images.';
+$this_menu_tooltips['items'] = '&laquo; Item Inventory &raquo; &lt;br /&gt;View your inventory of collected items thus far, including quantities, descriptions, and images.';
 $this_menu_tooltips['stars'] = '&laquo; Star Collection &raquo; &lt;br /&gt;A detailed list of all the Field and Fusion Stars collected on your journey so far. Collect many different stars to advance in the prototype!';
+$this_menu_tooltips['database'] = '&laquo; Robot Database &raquo; &lt;br /&gt;A comprehensive list of all robots encountered in battle so far including their name and basic details. Scanning robots adds their stats and weaknesses to the database and unlocking them adds a complete list of their level-up abilities.';
 $this_menu_tooltips['save'] = '&laquo; Game Settings &raquo; &lt;br /&gt;Update your game settings and profile options including username, password, profile colour, and more.';
 $this_menu_tooltips['leaderboard'] = '&laquo; Battle Points Leaderboard &raquo; &lt;br /&gt;Live leaderboards ranking all players by their total Battle Point scores from highest to lowest. Keep an eye on your Battle Points by checking the top-right of the main menu and try to work your way up to the first page!';
 
@@ -303,8 +303,8 @@ foreach ($this_menu_tooltips AS $token => $text){
 
 <style type="text/css"> html, body { background-color: #262626; } </style>
 
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/solid.css" integrity="sha384-+0VIRx+yz1WBcCTXBkVQYIBVNEFH1eP6Zknm16roZCyeNg2maWEpk/l/KsyFKs7G" crossorigin="anonymous">
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/fontawesome.css" integrity="sha384-jLuaxTTBR42U2qJ/pm4JRouHkEDHkVqH0T1nyQXn1mZ7Snycpf6Rl25VBNthU4z0" crossorigin="anonymous">
+<link type="text/css" href=".libs/fontawesome/v5.6.3/css/solid.css" rel="stylesheet" />
+<link type="text/css" href=".libs/fontawesome/v5.6.3/css/fontawesome.css" rel="stylesheet" />
 
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.css" rel="stylesheet" />
@@ -324,7 +324,7 @@ foreach ($this_menu_tooltips AS $token => $text){
     <div class="banner">
         <div class="sprite background banner_background" style="background-image: url(images/menus/menu-banner_this-battle-select.png);">&nbsp;</div>
         <div class="sprite foreground banner_foreground banner_dynamic" style="background-image: url(images/menus/prototype-banners_title-screen_01.gif?<?=MMRPG_CONFIG_CACHE_DATE?>); background-position: center -10px;">&nbsp;</div>
-        <div class="sprite credits banner_credits">Mega Man RPG Prototype | PlutoLighthouse.NET</div>
+        <div class="sprite credits banner_credits"><h1>Mega Man RPG Prototype | Browser-Based Battle Simulator</h1></div>
         <div class="sprite overlay overlay_hidden banner_overlay">&nbsp;</div>
 
         <div class="title">Mega Man RPG Prototype</div>
@@ -356,7 +356,7 @@ foreach ($this_menu_tooltips AS $token => $text){
                 data-to-date="<?= $this_rogue_star['star_to_date'] ?>"
                 data-to-date-time="<?= $this_rogue_star['star_to_date_time'] ?>"
                 data-star-power="<?= $this_rogue_star['star_power'] ?>"
-                data-tooltip="<?= $star_tooltip ?>"
+                data-click-tooltip="<?= $star_tooltip ?>"
                 data-tooltip-type="type_<?= $star_type ?>">
                 <div class="wrap">
                     <div class="label">
@@ -388,7 +388,7 @@ foreach ($this_menu_tooltips AS $token => $text){
             $battle_points_container_attrs[] = 'data-index="'.$this_menu_indexes['leaderboard'].'"';
             $battle_points_container_attrs[] = 'data-source="frames/leaderboard.php"';
             $battle_points_container_attrs[] = 'data-music="misc/leader-board"';
-            $battle_points_container_attrs[] = 'data-tooltip="'.$this_menu_tooltips['leaderboard'].'"';
+            $battle_points_container_attrs[] = 'data-maybe-tooltip="'.$this_menu_tooltips['leaderboard'].'"';
             $battle_points_container_attrs[] = 'data-tooltip-type="field_type field_type_'.MMRPG_SETTINGS_CURRENT_FIELDTYPE.'"';
         }
         $battle_points_container_attrs = implode(' ', $battle_points_container_attrs);
@@ -426,7 +426,7 @@ foreach ($this_menu_tooltips AS $token => $text){
             </div>
         </div>
 
-        <div class="options options_userinfo field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" data-step="file_save" data-index="<?= $this_menu_indexes['save'] ?>" data-source="frames/settings.php" data-music="misc/file-menu" data-tooltip="<?= $this_menu_tooltips['save'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+        <div class="options options_userinfo field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>" data-step="file_save" data-index="<?= $this_menu_indexes['save'] ?>" data-source="frames/settings.php" data-music="misc/file-menu" data-maybe-tooltip="<?= $this_menu_tooltips['save'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
             <div class="wrapper">
                 <? $temp_user_name = !empty($this_userinfo['user_name_public']) && !empty($this_userinfo['user_flag_postpublic']) ? $this_userinfo['user_name_public'] : $this_userinfo['user_name']; ?>
                 <div class="info info_username">
@@ -458,7 +458,7 @@ foreach ($this_menu_tooltips AS $token => $text){
         <div class="options options_fullmenu field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
             <div class="wrapper">
 
-                <a class="link link_home link_active" data-step="<?= $unlock_count_players == 1 ? 2 : 1 ?>" data-index="<?= $this_menu_indexes['home'] ?>" data-music="misc/<?= $unlock_count_players == 1 ? 'stage-select-dr-light' : 'player-select' ?>" data-tooltip="<?= $this_menu_tooltips['home'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                <a class="link link_home link_active" data-step="<?= $unlock_count_players == 1 ? 2 : 1 ?>" data-index="<?= $this_menu_indexes['home'] ?>" data-music="misc/<?= $unlock_count_players == 1 ? 'stage-select-dr-light' : 'player-select' ?>" data-maybe-tooltip="<?= $this_menu_tooltips['home'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                     <i class="fa fas fa-home"></i>
                     <label>home</label>
                 </a>
@@ -466,51 +466,51 @@ foreach ($this_menu_tooltips AS $token => $text){
                     || mmrpg_prototype_item_unlocked('reggae-link')
                     || mmrpg_prototype_item_unlocked('kalinka-link')): ?>
                     <span class="pipe">|</span>
-                    <a class="link link_shop" data-step="shop" data-index="<?= $this_menu_indexes['shop'] ?>" data-source="frames/shop.php" data-music="misc/shop-music" data-tooltip="<?= $this_menu_tooltips['shop'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                    <a class="link link_shop" data-step="shop" data-index="<?= $this_menu_indexes['shop'] ?>" data-source="frames/shop.php" data-music="misc/shop-music" data-maybe-tooltip="<?= $this_menu_tooltips['shop'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <i class="fa fas fa-shopping-cart"></i>
                         <label>shop</label>
                     </a>
                 <? endif; ?>
-                <? if (mmrpg_prototype_players_unlocked() > 1): ?>
+                <? if (mmrpg_prototype_robots_unlocked() > 1 || mmrpg_prototype_battles_complete('dr-light') >= MMRPG_SETTINGS_CHAPTER1_MISSIONS): ?>
                     <span class="pipe">|</span>
-                    <a class="link link_players" data-step="edit_players" data-index="<?= $this_menu_indexes['players'] ?>" data-source="frames/edit_players.php?action=players" data-music="misc/player-editor" data-tooltip="<?= $this_menu_tooltips['players'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-                        <i class="fa fas fa-mask"></i>
-                        <label>players</label>
-                    </a>
-                <? endif; ?>
-                <? if (mmrpg_prototype_battles_complete('dr-light') >= 1): ?>
-                    <span class="pipe">|</span>
-                    <a class="link link_robots" data-step="edit_robots" data-index="<?= $this_menu_indexes['robots'] ?>" data-source="frames/edit_robots.php?action=robots" data-music="misc/robot-editor" data-tooltip="<?= $this_menu_tooltips['robots'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                    <a class="link link_robots" data-step="edit_robots" data-index="<?= $this_menu_indexes['robots'] ?>" data-source="frames/edit_robots.php?action=robots" data-music="misc/robot-editor" data-maybe-tooltip="<?= $this_menu_tooltips['robots'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <i class="fa fas fa-robot"></i>
-                        <label>robots</label>
+                        <label><?= mmrpg_prototype_robots_unlocked('dr-light') > 1 ? 'robots' : 'robot' ?></label>
                     </a>
                 <? endif; ?>
-                <span class="pipe">|</span>
-                <a class="link link_data" data-step="database" data-index="<?= $this_menu_indexes['database'] ?>" data-source="frames/database.php" data-music="misc/data-base" data-tooltip="<?= $this_menu_tooltips['database'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-                    <i class="fa fas fa-book"></i>
-                    <label>database</label>
-                </a>
+                <? if (mmrpg_prototype_battles_complete('dr-light') >= MMRPG_SETTINGS_CHAPTER1_MISSIONS): ?>
+                    <span class="pipe">|</span>
+                    <a class="link link_players" data-step="edit_players" data-index="<?= $this_menu_indexes['players'] ?>" data-source="frames/edit_players.php?action=players" data-music="misc/player-editor" data-maybe-tooltip="<?= $this_menu_tooltips['players'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                        <i class="fa fas fa-user-circle"></i>
+                        <label><?= mmrpg_prototype_players_unlocked() > 1 ? 'players' : 'player' ?></label>
+                    </a>
+                <? endif; ?>
+                <? if (mmrpg_prototype_abilities_unlocked() >= 2): ?>
+                    <span class="pipe">|</span>
+                    <a class="link link_abilities" data-step="abilities" data-index="<?= $this_menu_indexes['abilities'] ?>" data-source="frames/abilities.php" data-music="misc/item-viewer" data-maybe-tooltip="<?= $this_menu_tooltips['abilities'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                        <i class="fa fas fa-fire-alt"></i>
+                        <label>abilities</label>
+                    </a>
+                <? endif; ?>
                 <? if (mmrpg_prototype_items_unlocked() > 0): ?>
                     <span class="pipe">|</span>
-                    <a class="link link_items" data-step="items" data-index="<?= $this_menu_indexes['items'] ?>" data-source="frames/items.php" data-music="misc/item-viewer" data-tooltip="<?= $this_menu_tooltips['items'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                    <a class="link link_items" data-step="items" data-index="<?= $this_menu_indexes['items'] ?>" data-source="frames/items.php" data-music="misc/item-viewer" data-maybe-tooltip="<?= $this_menu_tooltips['items'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <i class="fa fas fa-briefcase"></i>
-                        <label>inventory</label>
-                    </a>
-                <? endif; ?>
-                <? if (mmrpg_prototype_abilities_unlocked() > 2): ?>
-                    <span class="pipe">|</span>
-                    <a class="link link_abilities" data-step="abilities" data-index="<?= $this_menu_indexes['abilities'] ?>" data-source="frames/abilities.php" data-music="misc/item-viewer" data-tooltip="<?= $this_menu_tooltips['abilities'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-                        <i class="fa fas fa-fire-alt"></i>
-                        <label>arsenal</label>
+                        <label>items</label>
                     </a>
                 <? endif; ?>
                 <? if (mmrpg_prototype_stars_unlocked() > 0): ?>
                     <span class="pipe">|</span>
-                    <a class="link link_stars" data-step="stars" data-index="<?= $this_menu_indexes['stars'] ?>" data-source="frames/starforce.php" data-music="misc/star-force" data-tooltip="<?= $this_menu_tooltips['stars'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                    <a class="link link_stars" data-step="stars" data-index="<?= $this_menu_indexes['stars'] ?>" data-source="frames/starforce.php" data-music="misc/star-force" data-maybe-tooltip="<?= $this_menu_tooltips['stars'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <i class="fa fas fa-star"></i>
                         <label>stars</label>
                     </a>
                 <? endif; ?>
+                <span class="pipe">|</span>
+                <a class="link link_data" data-step="database" data-index="<?= $this_menu_indexes['database'] ?>" data-source="frames/database.php" data-music="misc/data-base" data-maybe-tooltip="<?= $this_menu_tooltips['database'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                    <i class="fa fas fa-compact-disc"></i>
+                    <label>database</label>
+                </a>
 
             </div>
         </div>
@@ -555,29 +555,13 @@ foreach ($this_menu_tooltips AS $token => $text){
          */
         if (!empty($_SESSION[$session_token]['DEMO'])){
 
-            // Only show robot select if the player has more than two robots
-            if (mmrpg_prototype_robots_unlocked('dr-light') > 3){
-
-                // Print out the opening tags for the robot select container
-                echo '<div class="menu menu_hide select_this_player_robots" data-step="3" data-limit="" data-title="Robot Select" data-select="this_player_robots">'."\n";
-                echo '<span class="header block_1 header_types type_none"><span class="count">Robot Select</span></span>'."\n";
-
-                // Require the prototype robots display file
-                require_once(MMRPG_CONFIG_ROOTDIR.'prototype/robots.php');
-
-                // Print out the back button for going back to player select
-                echo '<a class="option option_back block_1" data-back="2">&#9668; Back</a>'."\n";
-
-                // Print out the closing tags for the robot select container
-                echo '</div>'."\n";
-
-            }
+            // There is no demo get out of here!
 
         }
         /*
          * NORMAL ROBOT SELECT
          */
-        else {
+        elseif (mmrpg_prototype_robots_unlocked() > 1){
 
             // Print out the opening tags for the robot select container
             echo '<div class="menu menu_hide select_this_player_robots" data-step="3" data-limit="" data-title="Robot Select" data-select="this_player_robots">'."\n";
@@ -634,7 +618,8 @@ foreach ($this_menu_tooltips AS $token => $text){
 <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
-// Define the game WAP and cache flags/values
+
+// Update relevent game settings and flags
 <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 gameSettings.fadeIn = true;
 gameSettings.demo = false;
@@ -643,8 +628,10 @@ gameSettings.startLink = '<?= $prototype_start_link ?>';
 gameSettings.windowEventsCanvas = [];
 gameSettings.windowEventsMessages = [];
 gameSettings.totalPlayerOptions = <?= $unlock_count_players ?>;
+gameSettings.totalRobotOptions = <?= mmrpg_prototype_robots_unlocked() ?>;
 gameSettings.prototypeBannerKey = 0;
 gameSettings.prototypeBanners = ['prototype-banners_title-screen_01.gif'];
+
 // Define any preset menu selections
 battleOptions['this_user_id'] = <?= $this_userid ?>;
 <? if (!empty($_SESSION[$session_token]['battle_settings']['this_player_token'])){ ?>
@@ -654,6 +641,10 @@ battleOptions['this_user_id'] = <?= $this_userid ?>;
     battleOptions['this_player_id'] = <?= $mmrpg_index_players['dr-light']['player_id'] ?>;
     battleOptions['this_player_token'] = 'dr-light';
 <? } ?>
+<? if ($unlock_count_players === 1 && mmrpg_prototype_robots_unlocked() === 1){ ?>
+    battleOptions['this_player_robots'] = ['101_mega-man'];
+<? } ?>
+
 // Create the document ready events
 $(document).ready(function(){
 
@@ -671,6 +662,64 @@ $(document).ready(function(){
     <? endif; ?>
 
     <?
+
+    /*
+
+    // Re-sort the events to make sure they are in player order
+    if (isset($_SESSION[$session_token]['EVENTS'])
+        && is_array($_SESSION[$session_token]['EVENTS'])){
+
+        // Manually define event priority so it's easier to sort stuff
+        $event_priority_bracket = array(
+            'critical-issue',
+            'prototype-complete',
+            'prototype-postgame',
+            'new-chapter',
+            'new-player',
+            'new-robot',
+            'new-ability',
+            'new-shop',
+            'new-item',
+            'other'
+            );
+        $event_priority_bracket_tiers = count($event_priority_bracket);
+
+        // Collect the list of player tokens so that we can sort by them
+        $mmrpg_index_players_tokens = array_keys($mmrpg_index_players);
+        $mmrpg_index_players_tokens_count = count($mmrpg_index_players_tokens);
+
+        // Start sorting the events now that we have everything set up
+        usort($_SESSION[$session_token]['EVENTS'], function($event_a, $event_b) use (
+            $event_priority_bracket, $event_priority_bracket_tiers,
+            $mmrpg_index_players_tokens, $mmrpg_index_players_tokens_count
+            ){
+
+            // First sort by player so at least that's in order
+            $a_position = isset($event_a['player_token']) ? array_search($event_a['player_token'], $mmrpg_index_players_tokens) : $mmrpg_index_players_tokens_count;
+            $b_position = isset($event_b['player_token']) ? array_search($event_b['player_token'], $mmrpg_index_players_tokens) : $mmrpg_index_players_tokens_count;
+            if ($a_position < $b_position){ return -1; }
+            elseif ($a_position > $b_position){ return 1; }
+
+            // If same player, sort by event priority
+            $a_priority = isset($event_a['event_type']) ? array_search($event_a['event_type'], $event_priority_bracket) : $event_priority_bracket_tiers;
+            $b_priority = isset($event_b['event_type']) ? array_search($event_b['event_type'], $event_priority_bracket) : $event_priority_bracket_tiers;
+            if ($a_priority < $b_priority){ return -1; }
+            elseif ($a_priority > $b_priority){ return 1; }
+
+            // If either event has an 'event_sort' parameter, collect it and treat it like priority
+            $a_sort = isset($event_a['event_sort']) ? $event_a['event_sort'] : 99;
+            $b_sort = isset($event_b['event_sort']) ? $event_b['event_sort'] : 99;
+            if ($a_sort < $b_sort){ return -1; }
+            elseif ($a_sort > $b_sort){ return 1; }
+
+            // If all else fails, return zero
+            return 0;
+
+            });
+    }
+
+    error_log('$_SESSION[$session_token][\'EVENTS\'] = '.print_r($_SESSION[$session_token]['EVENTS'], true));
+
     // If there were any prototype window events created, display them
     if (!empty($_SESSION[$session_token]['EVENTS'])){
         foreach ($_SESSION[$session_token]['EVENTS'] AS $temp_key => $temp_event){
@@ -680,6 +729,13 @@ $(document).ready(function(){
             echo 'gameSettings.windowEventsMessages.push("'.$temp_messages_markup.'");'."\n";
         }
     }
+
+    // If there were any events in the session, automatically add remove them from the session
+    //if (!empty($_SESSION[$session_token]['EVENTS'])){ $_SESSION[$session_token]['EVENTS'] = array(); }
+    error_log('Make sure we clear the event session LOL (A)');
+
+    */
+
     ?>
 
     <? if (rpg_game::is_user()){ ?>
@@ -699,8 +755,6 @@ require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php');
 </html>
 <?
 
-// If there were any events in the session, automatically add remove them from the session
-if (!empty($_SESSION[$session_token]['EVENTS'])){ $_SESSION[$session_token]['EVENTS'] = array(); }
 // Unset the database variable
 unset($db);
 

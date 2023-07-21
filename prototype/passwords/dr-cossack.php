@@ -9,6 +9,7 @@ if (!isset($mmrpg_index_players) || empty($mmrpg_index_players)){
 
 // Collect the temp battle flags
 $temp_flags = !empty($_SESSION['GAME']['flags']) ? $_SESSION['GAME']['flags'] : array();
+//error_log(basename(__FILE__).'//$temp_flags: '.print_r($temp_flags, true));
 
 // If the UNLOCK RHYTHM password was created
 if (!empty($temp_flags['drcossack_password_robotgetrhythmandblues'])){
@@ -63,5 +64,7 @@ if (!empty($temp_flags['drlight_password_abilitygetwithallmyheartandsoul'])){
         exit();
     }
 }
+
+// No rival to unlock at the moment....
 
 ?>

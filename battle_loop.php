@@ -511,14 +511,14 @@ elseif ($this_action == 'ability'){
 // Else if the player's robot is using an item
 elseif ($this_action == 'item'){
 
-    // Require the ability-item action file
+    // Require the ability-item action file (player uses item, target uses ability)
     require_once('battle/actions/ability_item.php');
 
 }
 // Else if the player is switching robots, they go first
 elseif ($this_action == 'switch'){
 
-    // Require the ability-switch action file
+    // Require the ability-switch action file (player uses switch, target uses ability)
     require_once('battle/actions/ability_switch.php');
 
 }
@@ -1061,7 +1061,9 @@ if (!empty($this_battle->flags['challenge_battle'])
 
 // If canvas refresh is needed, create an empty event
 if ($canvas_refresh && $this_battle->battle_status != 'complete'){
-    $this_battle->events_create(false, false, '', '');
+    $this_battle->events_create(false, false, '', '', array(
+        'event_flag_camera_reset' => true
+        ));
 }
 
 // Stop the output buffer and collect contents

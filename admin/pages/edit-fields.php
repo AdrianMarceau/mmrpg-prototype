@@ -89,6 +89,10 @@
     $admin_include_common_styles[] = 'codemirror';
     $admin_include_common_scripts[] = 'codemirror';
 
+    // Require codemirror scripts and styles for this page
+    $admin_include_common_styles[] = 'howler';
+    $admin_include_common_scripts[] = 'howler';
+
 
     /* -- Form Setup Actions -- */
 
@@ -1138,24 +1142,48 @@
                                             <strong>Field Music</strong>
                                             <em>default music that plays on this stage</em>
                                         </div>
-                                        <select class="select" name="field_music">
-                                            <?
-                                            if (!empty($field_data['field_music'])
-                                                && !strstr($music_options_markup, 'value="'.$field_data['field_music'].'"')){
-                                                ?>
-                                                <option value="">-</option>
-                                                <optgroup label="Legacy Support">
-                                                    <option value="<?= $field_data['field_music'] ?>" selected="selected"><?= ucwords(str_replace('-', ' ', $field_data['field_music'])).' (Legacy)' ?></option>
-                                                </optgroup>
-                                                <?= str_replace('value="'.$field_data['field_music'].'"', 'value="'.$field_data['field_music'].'" selected="selected"', str_replace('<option value="">-</option>', '', $music_options_markup)) ?>
+                                        <div class="subfield">
+                                            <select class="select" name="field_music">
                                                 <?
-                                            } else {
+                                                if (!empty($field_data['field_music'])
+                                                    && !strstr($music_options_markup, 'value="'.$field_data['field_music'].'"')){
+                                                    ?>
+                                                    <option value="">-</option>
+                                                    <optgroup label="Legacy Support">
+                                                        <option value="<?= $field_data['field_music'] ?>" selected="selected"><?= ucwords(str_replace('-', ' ', $field_data['field_music'])).' (Legacy)' ?></option>
+                                                    </optgroup>
+                                                    <?= str_replace('value="'.$field_data['field_music'].'"', 'value="'.$field_data['field_music'].'" selected="selected"', str_replace('<option value="">-</option>', '', $music_options_markup)) ?>
+                                                    <?
+                                                } else {
+                                                    ?>
+                                                    <?= str_replace('value="'.$field_data['field_music'].'"', 'value="'.$field_data['field_music'].'" selected="selected"', $music_options_markup) ?>
+                                                    <?
+                                                }
                                                 ?>
-                                                <?= str_replace('value="'.$field_data['field_music'].'"', 'value="'.$field_data['field_music'].'" selected="selected"', $music_options_markup) ?>
-                                                <?
-                                            }
-                                            ?>
-                                        </select><span></span>
+                                            </select><span></span>
+                                        </div>
+                                        <?
+                                        $data_path = '';
+                                        $data_backup_path = '';
+                                        if (!empty($field_data['field_music'])){
+                                            $mmrpg_music_path = 'prototype/sounds/';
+                                            $mmrpg_music_rootdir = MMRPG_CONFIG_CDN_ROOTDIR.$mmrpg_music_path;
+                                            $mmrpg_music_rooturl = MMRPG_CONFIG_CDN_ROOTURL.$mmrpg_music_path;
+                                            $this_music_path = $field_data['field_music'].'/';
+                                            $data_path = $mmrpg_music_rooturl.$this_music_path.'audio.mp3';
+                                            $data_backup_path = $mmrpg_music_rooturl.$this_music_path.'audio.ogg';
+                                        }
+                                        ?>
+                                        <div class="audio-player light-theme"
+                                            style="margin: 5px auto 0 0;"
+                                            data-kind="music"
+                                            data-path="<?= $data_path ?>"
+                                            data-backup-path="<?= $data_backup_path ?>"
+                                            data-select="field_music"
+                                            data-select-path-base="<?= $mmrpg_music_rooturl ?>"
+                                            data-select-path-sources="/audio.mp3,/audio.ogg"
+                                            ><i class="loading fa fas fa-music"></i>
+                                        </div>
                                     </div>
 
                                 </div>
@@ -1221,6 +1249,8 @@
 
                                     <div class="field fullsize has2cols widecols multirow sprites has-filebars">
 
+                                        <div class="subfield" style="float: none; margin-bottom: 10px;"><strong class="label">Required Images</strong></div>
+
                                         <?
 
                                         // Define an array for required field files
@@ -1228,7 +1258,15 @@
 
                                         // Define the field files that are required
                                         $field_files_required[] = array(
-                                            'label' => 'primary background image',
+                                            'label' => 'background image (preview)',
+                                            'help' => 'non-animated preview of the background image',
+                                            'path' => $field_file_path,
+                                            'name' => 'battle-field_preview.png',
+                                            'width' => $base_field_width,
+                                            'height' => $base_field_height
+                                            );
+                                        $field_files_required[] = array(
+                                            'label' => 'background image (animated)',
                                             'help' => 'base background image, fully-animated, opaque',
                                             'path' => $field_file_path,
                                             'name' => 'battle-field_background_base.gif',
@@ -1236,12 +1274,20 @@
                                             'height' => $base_field_height
                                             );
                                         $field_files_required[] = array(
-                                            'label' => 'primary foreground image',
-                                            'help' => 'base foreground image, not animated, transparent',
+                                            'label' => 'foreground image',
+                                            'help' => 'base foreground image, partially transparent',
                                             'path' => $field_file_path,
                                             'name' => 'battle-field_foreground_base.png',
                                             'width' => $base_field_width,
                                             'height' => $base_field_height
+                                            );
+                                        $field_files_required[] = array(
+                                            'label' => 'avatar image',
+                                            'help' => 'square image for avatars w/ bg & fg visible',
+                                            'path' => $field_file_path,
+                                            'name' => 'battle-field_avatar.png',
+                                            'width' => 100,
+                                            'height' => 100
                                             );
 
                                         // Loop through required files and display filebars for them
@@ -1291,6 +1337,8 @@
 
                                     <div class="field fullsize has2cols widecols multirow sprites has-filebars">
 
+                                        <div class="subfield" style="float: none; margin-bottom: 10px;"><strong class="label">Optional Images</strong></div>
+
                                         <?
 
                                         // Define an array for required field files
@@ -1298,30 +1346,11 @@
 
                                         // Define the field files that are required
                                         $field_files_required[] = array(
-                                            'label' => 'background frames (stacked)',
-                                            'help' => 'background animation frames, stacked vertically',
+                                            'label' => 'background image (stacked)',
+                                            'help' => 'all background animation frames stacked vertically',
                                             'path' => $field_file_path,
                                             'name' => 'battle-field_background_base.png',
-                                            'width' => $base_field_width,
-                                            'auto-generated' => true
-                                            );
-                                        $field_files_required[] = array(
-                                            'label' => 'background preview (static)',
-                                            'help' => 'non-animated version of the background image',
-                                            'path' => $field_file_path,
-                                            'name' => 'battle-field_preview.png',
-                                            'width' => $base_field_width,
-                                            'height' => $base_field_height,
-                                            'auto-generated' => true
-                                            );
-                                        $field_files_required[] = array(
-                                            'label' => 'field avatar',
-                                            'help' => 'small square image for avatar backgrounds',
-                                            'path' => $field_file_path,
-                                            'name' => 'battle-field_avatar.png',
-                                            'width' => 100,
-                                            'height' => 100,
-                                            'auto-generated' => true
+                                            'width' => $base_field_width
                                             );
 
                                         // Loop through required files and display filebars for them
@@ -1366,6 +1395,107 @@
                                         ?>
 
                                     </div>
+
+                                    <?
+
+                                    // Define an array for required field files
+                                    $field_files_variants = array();
+
+                                    // Collect a list of image files in this field's directory so we can parse
+                                    $possible_variants_config = array();
+                                    $possible_variants_config[] = array('/^battle-field_preview_([-_a-z0-9]+).png$/i', 'background image (preview) [???]');
+                                    $possible_variants_config[] = array('/^battle-field_background_base_([-_a-z0-9]+).gif$/i', 'background image (animated) [???]');
+                                    $possible_variants_config[] = array('/^battle-field_foreground_base_([-_a-z0-9]+).png$/i', 'foreground image [???]');
+                                    $possible_variants_config[] = array('/^battle-field_avatar_([-_a-z0-9]+).png$/i', 'avatar image [???]');
+                                    $possible_variants_config[] = array('/^battle-field_background_base_([-_a-z0-9]+).png$/i', 'background image (stacked) [???]');
+                                    //error_log('$field_files_existing = '.print_r($field_files_existing, true));
+                                    foreach ($possible_variants_config AS $variant_key => $variant_config){
+                                        list($variant_regex, $variant_label) = $variant_config;
+                                        foreach ($field_files_existing AS $key => $file){
+                                            //error_log('check if '.$file.' matches '.PHP_EOL.$variant_regex.PHP_EOL);
+                                            if (preg_match($variant_regex, $file, $matches)){
+                                                $field_files_variants[] = array(
+                                                    'label' => str_replace('[???]', '['.$matches[1].']', $variant_label),
+                                                    'help' => '',
+                                                    'path' => $field_file_path,
+                                                    'name' => $file,
+                                                    'width' => $base_field_width
+                                                    );
+                                                //error_log('$matches = '.print_r($matches, true));
+                                            }
+                                        }
+                                    }
+                                    //error_log('$field_files_variants = '.print_r($field_files_variants, true));
+
+                                    // If there are variant images already uploaded, we should display inputs for them
+                                    if (!empty($field_files_variants)){
+                                        ?>
+
+                                        <hr />
+
+                                        <div class="field fullsize has2cols widecols multirow sprites has-filebars">
+
+                                            <div class="subfield" style="float: none; margin-bottom: 10px;"><strong class="label">Detected Variant Images</strong></div>
+
+                                            <?
+
+                                            /*
+                                            // Define the field files that are required
+                                            $field_files_variants[] = array(
+                                                'label' => 'background image (animated) [dr-light]',
+                                                'help' => '',
+                                                'path' => $field_file_path,
+                                                'name' => 'battle-field_background_base_dr-light.gif',
+                                                'width' => $base_field_width
+                                                );
+                                            */
+
+                                            // Loop through required files and display filebars for them
+                                            foreach ($field_files_variants AS $file_key => $filebar_info){
+                                                ?>
+                                                <div class="subfield fullsize" style="<?= $file_key % 2 == 0 ? 'clear: left;' : '' ?>" data-group="images" data-size="<?= $base_field_width ?>">
+                                                    <div class="sublabel" style="font-size: 90%; margin-bottom: 2px;">
+                                                        <strong><?= $filebar_info['label'] ?></strong>
+                                                        <?= !empty($filebar_info['help']) ? ('<em>'.$filebar_info['help'].'</em>') : '' ?>
+                                                    </div>
+                                                    <ul class="files">
+                                                        <?
+                                                        $display_path = 'images';
+                                                        $this_sprite_path = rtrim($filebar_info['path'], '/').'/';
+                                                        $sheet_width = !empty($filebar_info['width']) ? $filebar_info['width'] : '';
+                                                        $sheet_height = !empty($filebar_info['height']) ? $filebar_info['height'] : '';
+                                                        $file_name = $filebar_info['name'];
+                                                        $file_href = MMRPG_CONFIG_ROOTURL.$this_sprite_path.$file_name;
+                                                        $file_exists = in_array($file_name, $field_files_existing) ? true : false;
+                                                        $file_kind = preg_replace('/^([^.]+)\.([^.]+)$/i', 'image/$2', $file_name);
+                                                        $file_is_unused = false;
+                                                        $file_is_optional = false;
+                                                        echo('<li>');
+                                                            echo('<div class="filebar" data-auto="file-bar" data-file-path="'.$this_sprite_path.'" data-file-name="'.$file_name.'" data-file-kind="'.$file_kind.'" data-file-width="'.$sheet_width.'" data-file-height="'.$sheet_height.'">');
+                                                                echo($file_exists ? '<a class="link view" href="'.$file_href.'?'.time().'" target="_blank" data-href="'.$file_href.'">'.$display_path.'/'.$file_name.'</a>' : '<a class="link view disabled" target="_blank" data-href="'.$file_href.'">'.$display_path.'/'.$file_name.'</a>');
+                                                                echo('<span class="info size">'.(!empty($sheet_width) ? $sheet_width : '').'w &times; '.(!empty($sheet_height) ? $sheet_height : '').'h</span>');
+                                                                echo($file_exists ? '<span class="info status good">&check;</span>' : '<span class="info status bad">&cross;</span>');
+                                                                echo('<a class="action delete'.(!$file_exists ? ' disabled' : '').'" data-action="delete" data-file-hash="'.md5('delete/'.$this_sprite_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">Delete</a>');
+                                                                echo('<a class="action upload'.($file_exists ? ' disabled' : '').'" data-action="upload" data-file-hash="'.md5('upload/'.$this_sprite_path.$file_name.'/'.MMRPG_SETTINGS_PASSWORD_SALT).'">');
+                                                                    echo('<span class="text">Upload</span>');
+                                                                    echo('<input class="input" type="file" name="file_info" value=""'.($file_exists ? ' disabled="disabled"' : '').' />');
+                                                                echo('</a>');
+                                                            echo('</div>');
+                                                        echo('</li>'.PHP_EOL);
+
+                                                        ?>
+                                                    </ul>
+                                                </div>
+                                                <?
+                                            }
+
+                                            ?>
+
+                                        </div>
+                                        <?
+                                    }
+
+                                    ?>
 
                                 </div>
                             <? } ?>

@@ -130,7 +130,7 @@ class rpg_item extends rpg_object {
         $this->item_frame_span = isset($this_iteminfo['item_frame_span']) ? $this_iteminfo['item_frame_span'] : 1;
         $this->item_frame_animate = isset($this_iteminfo['item_frame_animate']) ? $this_iteminfo['item_frame_animate'] : array($this->item_frame);
         $this->item_frame_index = isset($this_iteminfo['item_frame_index']) ? $this_iteminfo['item_frame_index'] : array('00');
-        $this->item_frame_offset = isset($this_iteminfo['item_frame_offset']) ? $this_iteminfo['item_frame_offset'] : array('x' => 0, 'y' => 0, 'z' => 1);
+        $this->item_frame_offset = !empty($this_iteminfo['item_frame_offset']) && is_array($this_iteminfo['item_frame_offset']) ? $this_iteminfo['item_frame_offset'] : array('x' => 0, 'y' => 0, 'z' => 1);
         $this->item_frame_styles = isset($this_iteminfo['item_frame_styles']) ? $this_iteminfo['item_frame_styles'] : '';
         $this->item_frame_classes = isset($this_iteminfo['item_frame_classes']) ? $this_iteminfo['item_frame_classes'] : '';
         $this->attachment_frame = isset($this_iteminfo['attachment_frame']) ? $this_iteminfo['attachment_frame'] : 'base';
@@ -435,12 +435,79 @@ class rpg_item extends rpg_object {
 
     }
 
+    // Define a function for getting the parsed version of an item's description
+    public function get_parsed_description($options = array()){
+        $item = $this;
+        $objects = array(
+            'this_battle' => $this->battle,
+            'this_player' => $this->player,
+            'this_robot' => $this->robot,
+            'this_item' => $this
+            );
+        return self::get_parsed_item_description($item, $objects, $options);
+    }
+
+    // Define a static function for getting the parsed version of an item's description
+    public static function get_parsed_item_description($item, $objects = array(), $options = array()){
+
+        // Validate or clean provided optional arguments
+        if (empty($objects) || !is_array($objects)){ $objects = array(); }
+        if (empty($options) || !is_array($options)){ $options = array(); }
+
+        // Extract the objects array into the current scope
+        extract($objects);
+
+        // Define the placeholder text in case we need it
+        $placeholder_text = '...';
+
+        // Initialize item info depending on item type
+        if (is_array($item)){
+            $item_info = $item;
+        } elseif (is_object($item) && method_exists($item, 'export_array')){
+            $item_info = $item->export_array();
+        } else {
+            throw new Exception('Invalid item format. Expected an array or an object with an export_array method.');
+            return $placeholder_text;
+        }
+
+        // Ensure there is an item description
+        if (!isset($item_info['item_description'])) {
+            throw new Exception('No item description found.');
+        } elseif (empty($item_info['item_description'])){
+            return $placeholder_text;
+        }
+
+        // Define the tags and their corresponding replacements
+        $tags = array('{}', '{DAMAGE}', '{DAMAGE2}', '{RECOVERY}', '{RECOVERY2}', '{ACCURACY}');
+        $replacements = array($placeholder_text,
+            isset($item_info['item_damage']) ? $item_info['item_damage'] : '',
+            isset($item_info['item_damage2']) ? $item_info['item_damage2'] : '',
+            isset($item_info['item_recovery']) ? $item_info['item_recovery'] : '',
+            isset($item_info['item_recovery2']) ? $item_info['item_recovery2'] : '',
+            isset($item_info['item_accuracy']) ? $item_info['item_accuracy'] : ''
+            );
+
+        // Collect the base description string and apply any options provided
+        $item_description = $item_info['item_description'];
+        if (!empty($options['show_use_desc'])){ $item_description .= ' '.trim($item_info['item_description_use']); }
+        if (!empty($options['show_hold_desc'])){ $item_description .= ' '.trim($item_info['item_description_hold']); }
+        if (!empty($options['show_shop_desc'])){ $item_description .= ' '.trim($item_info['item_description_shop']); }
+
+        // Replace the tags in the description and return the result
+        $parsed_description = str_replace($tags, $replacements, $item_description);
+        return $parsed_description;
+    }
+
     // Define public print functions for markup generation
     public function print_name($plural = false){
         $type_class = !empty($this->item_type) ? $this->item_type : 'none';
         if ($type_class != 'none' && !empty($this->item_type2)){ $type_class .= '_'.$this->item_type2; }
         elseif ($type_class == 'none' && !empty($this->item_type2)){ $type_class = $this->item_type2; }
         return '<span class="item_name item_type item_type_'.$type_class.'">'.$this->item_name.($plural ? 's' : '').'</span>';
+    }
+    public function print_name_s(){
+        $ends_with_s = substr($this->item_name, -1) === 's' ? true : false;
+        return $this->print_name()."'".(!$ends_with_s ? 's' : '');
     }
     //public function print_name(){ return '<span class="item_name">'.$this->item_name.'</span>'; }
     public function print_token(){ return '<span class="item_token">'.$this->item_token.'</span>'; }
@@ -1190,13 +1257,7 @@ class rpg_item extends rpg_object {
         if ($item_info['item_class'] != 'item' && $temp_item_target != 'auto'){ $temp_item_title .= ' | Select Target'; }
 
         if (!empty($item_info['item_description'])){
-            $temp_find = array('{RECOVERY}', '{RECOVERY2}', '{DAMAGE}', '{DAMAGE2}');
-            $temp_replace = array($temp_item_recovery, $temp_item_recovery2, $temp_item_damage, $temp_item_damage2);
-            $temp_description = trim($item_info['item_description']);
-            if ($print_options['show_use_desc']){ $temp_description .= ' '.trim($item_info['item_description_use']); }
-            if ($print_options['show_hold_desc']){ $temp_description .= ' '.trim($item_info['item_description_hold']); }
-            if ($print_options['show_shop_desc']){ $temp_description .= ' '.trim($item_info['item_description_shop']); }
-            $temp_description = str_replace($temp_find, $temp_replace, $temp_description);
+            $temp_description = self::get_parsed_item_description($item_info, false, $print_options);
             $temp_item_title .= ' // '.$temp_description;
         }
 
@@ -1346,20 +1407,33 @@ class rpg_item extends rpg_object {
         if ($item_info_recovery_percent && $item_info_recovery > 100){ $item_info_recovery = 100; }
         if ($item_info_recovery2_percent && $item_info_recovery2 > 100){ $item_info_recovery2 = 100; }
         $item_info_accuracy = !empty($item_info['item_accuracy']) ? $item_info['item_accuracy'] : 0;
-        $item_info_description = !empty($item_info['item_description']) ? $item_info['item_description'] : '';
-        $item_info_description = str_replace('{DAMAGE}', $item_info_damage, $item_info_description);
-        $item_info_description = str_replace('{RECOVERY}', $item_info_recovery, $item_info_description);
-        $item_info_description = str_replace('{DAMAGE2}', $item_info_damage2, $item_info_description);
-        $item_info_description = str_replace('{RECOVERY2}', $item_info_recovery2, $item_info_description);
+        $item_info_description = self::get_parsed_item_description($item_info);
         $item_info_class_type = !empty($item_info['item_type']) ? $item_info['item_type'] : 'none';
         if (!empty($item_info['item_type2'])){ $item_info_class_type = $item_info_class_type != 'none' ? $item_info_class_type.'_'.$item_info['item_type2'] : $item_info['item_type2']; }
         $item_info_title = rpg_item::print_editor_title_markup($robot_info, $item_info);
-        //$item_info_title_plain = strip_tags(str_replace('<br />', '//', $item_info_title));
         $item_info_title_tooltip = htmlentities($item_info_title, ENT_QUOTES, 'UTF-8');
-        $item_info_title_html = str_replace(' ', '&nbsp;', $item_info_name);
-        $item_info_title_html .= '<span class="count">x '.$item_info_count.'</span>';
         $temp_select_options = str_replace('value="'.$item_info_token.'"', 'value="'.$item_info_token.'" selected="selected" disabled="disabled"', $item_rewards_options);
-        $item_info_title_html = '<label style="background-image: url(images/items/'.$item_info_token.'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">'.$item_info_title_html.'</label>';
+
+        $type_or_none = $item_info['item_type'] ? $item_info['item_type'] : 'none';
+        $type2_or_false = !empty($item_info['item_type2']) ? $item_info['item_type2'] : false;
+        $types_available = array_filter(array($item_info['item_type'], $item_info['item_type2']));
+        $all_types_or_none = !empty($types_available) ? implode('_', $types_available) : 'none';
+        $any_type_or_none = !empty($types_available) ? array_shift($types_available) : 'none';
+
+        $btn_type = 'item_type item_type_'.$all_types_or_none;
+        $btn_info_circle = '<span class="info color" data-click-tooltip="'.$item_info_title_tooltip.'" data-tooltip-type="'.$btn_type.'">';
+            $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$any_type_or_none.'"></i>';
+            if (!empty($type2_or_false) && $type2_or_false !== $any_type_or_none){ $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$type2_or_false.'"></i>'; }
+        $btn_info_circle .= '</span>';
+
+        $item_info_title_html = '';
+        $item_info_title_html .= '<label style="background-image: url(images/items/'.$item_info_token.'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">';
+            $item_info_title_html .= str_replace(' ', '&nbsp;', $item_info_name);
+            $item_info_title_html .= '<span class="count">&times; '.$item_info_count.'</span>';
+            $item_info_title_html .= '<span class="arrow"><i class="fa fas fa-angle-double-down"></i></span>';
+        $item_info_title_html .= '</label>';
+        $item_info_title_html .= $btn_info_circle;
+
         $this_select_markup = '<a '.
             'class="item_name type type_'.$item_info_class_type.'" '.
             'data-id="'.$item_info_id.'" '.
@@ -1690,22 +1764,9 @@ class rpg_item extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td class="right">
-                                        <div class="item_description" style="white-space: normal; text-align: left; <?= $print_options['layout_style'] == 'event' ? 'font-size: 12px; ' : '' ?> "><?
-                                        // Define the search/replace pairs for the description
-                                        $temp_find = array('{DAMAGE}', '{RECOVERY}', '{DAMAGE2}', '{RECOVERY2}', '{}');
-                                        $temp_replace = array(
-                                            (!empty($item_info['item_damage']) ? number_format($item_info['item_damage'], 0, '.', ',') : 0), // {DAMAGE}
-                                            (!empty($item_info['item_recovery']) ? number_format($item_info['item_recovery'], 0, '.', ',') : 0), // {RECOVERY}
-                                            (!empty($item_info['item_damage2']) ? number_format($item_info['item_damage2'], 0, '.', ',') : 0), // {DAMAGE2}
-                                            (!empty($item_info['item_recovery2']) ? number_format($item_info['item_recovery2'], 0, '.', ',') : 0) // {RECOVERY2}
-                                            );
-                                        $temp_description = trim($item_info['item_description']);
-                                        if ($print_options['show_use_desc']){ $temp_description .= ' '.trim($item_info['item_description_use']); }
-                                        if ($print_options['show_hold_desc']){ $temp_description .= ' '.trim($item_info['item_description_hold']); }
-                                        if ($print_options['show_shop_desc']){ $temp_description .= ' '.trim($item_info['item_description_shop']); }
-                                        $temp_description = str_replace($temp_find, $temp_replace, $temp_description);
-                                        echo !empty($temp_description) ? $temp_description : '&hellip;'
-                                        ?></div>
+                                        <div class="item_description" style="white-space: normal; text-align: left; <?= $print_options['layout_style'] == 'event' ? 'font-size: 12px; ' : '' ?> ">
+                                            <?= self::get_parsed_item_description($item_info, false, $print_options) ?>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -1847,7 +1908,7 @@ class rpg_item extends rpg_object {
 
                     ?>
 
-                    <h2 id="sprites" class="header header_full <?= $item_header_types ?>" style="margin: 10px 0 0; text-align: left; overflow: hidden; height: auto;">
+                    <h2 <?= $print_options['layout_style'] == 'website' ? 'id="sprites"' : '' ?> class="header header_full sprites_header <?= $item_header_types ?>" style="margin: 10px 0 0; text-align: left; overflow: hidden; height: auto;">
                         Sprite Sheets
                         <span class="header_links image_link_container">
                             <span class="images" style="<?= count($temp_alts_array) == 1 ? 'display: none;' : '' ?>"><?
@@ -1889,7 +1950,7 @@ class rpg_item extends rpg_object {
                         </span>
                     </h2>
 
-                    <div id="sprites_body" class="body body_full sprites_body solid">
+                    <div <?= $print_options['layout_style'] == 'website' ? 'id="sprites_body"' : '' ?> class="body body_full sprites_body solid">
                         <?= $this_sprite_markup ?>
                         <?
                         // Define the editor title based on ID
@@ -2037,10 +2098,16 @@ class rpg_item extends rpg_object {
                 $existing_shields = !empty($this_robot->robot_attachments) ? substr_count(implode('|', array_keys($this_robot->robot_attachments)), 'ability_core-shield_') : 0;
                 $core_shield_info = rpg_ability::get_static_core_shield($core_type, $base_core_duration, $existing_shields);
                 $this_robot->set_attachment($core_shield_token, $core_shield_info);
+                $event_options = array();
+                $event_options['canvas_show_this_item_overlay'] = true;
+                $event_options['event_flag_camera_action'] = true;
+                $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
+                $event_options['event_flag_camera_focus'] = $this_robot->robot_position;
+                $event_options['event_flag_camera_depth'] = $this_robot->robot_key;
                 $this_battle->events_create($this_robot, false, $this_robot->robot_name.'\'s '.$this_item->item_name,
                     $this_robot->print_name().' triggers '.$this_robot->get_pronoun('possessive2').' '.$this_item->print_name().'!<br />'.
                     'The held item generated a new '.rpg_type::print_span($core_type, 'Core Shield').'!',
-                    array('canvas_show_this_item_overlay' => true)
+                    $event_options
                     );
             }
         }
@@ -2057,6 +2124,7 @@ class rpg_item extends rpg_object {
         extract($objects);
 
         // Target this robot's self and print item use text
+        $this_battle->queue_sound_effect('use-recovery-item');
         $this_item->target_options_update(array(
             'frame' => 'summon',
             'success' => array(0, 40, -2, 99,
@@ -2081,7 +2149,8 @@ class rpg_item extends rpg_object {
 
             // Call the global stat boost function with customized options
             rpg_ability::ability_function_stat_boost($target_robot, $stat_token, $stat_boost_amount, $this_item, array(
-                'is_fixed_amount' => true
+                'is_fixed_amount' => true,
+                'skip_canvas_header' => true
                 ));
 
         }

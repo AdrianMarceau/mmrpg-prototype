@@ -28,6 +28,7 @@ class rpg_ability_damage extends rpg_damage {
         if (!isset($trigger_options['referred_damage'])){ $trigger_options['referred_damage'] = false; }
         if (!isset($trigger_options['referred_damage_id'])){ $trigger_options['referred_damage_id'] = 0; }
         if (!isset($trigger_options['referred_damage_stats'])){ $trigger_options['referred_damage_stats'] = array(); }
+        if (!isset($trigger_options['force_flags'])){ $trigger_options['force_flags'] = array(); }
 
         // If this is referred damage, collect the actual target
         if (!empty($trigger_options['referred_damage']) && !empty($trigger_options['referred_damage_id'])){
@@ -85,6 +86,25 @@ class rpg_ability_damage extends rpg_damage {
         $event_options['this_ability'] = $this_ability;
         $event_options['this_ability_results'] = array();
 
+        // Apply appropriate camera action flags to the event options
+        rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $this_ability, 'damage');
+
+        // Set the camera options for this target event
+        /*
+        $event_options['event_flag_camera_reaction'] = true;
+        $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
+        $event_options['event_flag_camera_focus'] = $this_robot->robot_position;
+        $event_options['event_flag_camera_depth'] = $this_robot->robot_key;
+        $kickback_shift_threshold = 20;
+        if (!empty($this_ability->damage_options['damage_kickback']['x'])
+            && $this_ability->damage_options['damage_kickback']['x'] != 0
+            && abs($this_ability->damage_options['damage_kickback']['x']) >= $kickback_shift_threshold){
+            error_log('damage_kickback_x for '.$this_ability->ability_token.' = '.$this_ability->damage_options['damage_kickback']['x']);
+            $event_options['event_flag_camera_offset'] = 1 * round(($this_ability->damage_options['damage_kickback']['x'] / $kickback_shift_threshold), 1);
+            error_log('event_flag_camera_offset = '.$event_options['event_flag_camera_offset']);
+        }
+        */
+
         // Create an options object for this function and populate
         $options = rpg_game::new_options_object();
         $options->damage_target = $this_robot;
@@ -115,7 +135,7 @@ class rpg_ability_damage extends rpg_damage {
         foreach ($trigger_options AS $key => $value){
             if ($value === true){ $debug .= $key.'=true; ';  }
             elseif ($value === false){ $debug .= $key.'=false; ';  }
-            elseif (is_array($value) && !empty($value)){ $debug .= $key.'='.implode(',', $value).'; '; }
+            elseif (is_array($value) && !empty($value)){ $debug .= $key.'='.str_replace('"', '', json_encode($value, true)).'; '; }
             elseif (is_array($value)){ $debug .= $key.'=[]; '; }
             else { $debug .= $key.'='.$value.'; '; }
         }
@@ -181,6 +201,24 @@ class rpg_ability_damage extends rpg_damage {
 
                 // If target robot has immunity to the ability (based on type2)
                 if ($this_robot->has_immunity($this_ability->damage_options['damage_type2'])){
+                    $this_ability->ability_results['counter_immunities'] += 1;
+                    $this_ability->ability_results['flag_immunity'] = true;
+                }
+
+                // If any force flags have been applied, it's best to parse them now
+                if (in_array('flag_weakness', $trigger_options['force_flags'])){
+                    $this_ability->ability_results['counter_weaknesses'] += 1;
+                    $this_ability->ability_results['flag_weakness'] = true;
+                }
+                if (in_array('flag_affinity', $trigger_options['force_flags'])){
+                    $this_ability->ability_results['counter_affinities'] += 1;
+                    $this_ability->ability_results['flag_affinity'] = true;
+                }
+                if (in_array('flag_resistance', $trigger_options['force_flags'])){
+                    $this_ability->ability_results['counter_resistances'] += 1;
+                    $this_ability->ability_results['flag_resistance'] = true;
+                }
+                if (in_array('flag_immunity', $trigger_options['force_flags'])){
                     $this_ability->ability_results['counter_immunities'] += 1;
                     $this_ability->ability_results['flag_immunity'] = true;
                 }
@@ -253,6 +291,12 @@ class rpg_ability_damage extends rpg_damage {
                         $ability_coreboost_multipliers[] = MMRPG_SETTINGS_SUBCOREBOOST_MULTIPLIER;
                     }
 
+                }
+
+                // If any force flags have been applied, it's best to parse them now
+                if (in_array('flag_coreboost', $trigger_options['force_flags'])){
+                    $this_ability->ability_results['counter_coreboosts'] += 1;
+                    $this_ability->ability_results['flag_coreboost'] = true;
                 }
 
                 // If any coreboosts were present, update the flag
@@ -658,6 +702,12 @@ class rpg_ability_damage extends rpg_damage {
                     $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | flag_critical | x '.$this_ability->damage_options['critical_multiplier'].' = '.$this_ability->ability_results['this_amount'].'');
                 } else {
                     $this_ability->ability_results['flag_critical'] = false;
+                }
+
+                // If any force flags have been applied, it's best to parse them now
+                if (in_array('flag_critical', $trigger_options['force_flags'])){
+                    $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] * $this_ability->damage_options['critical_multiplier'];
+                    $this_ability->ability_results['flag_critical'] = true;
                 }
 
             }
@@ -1154,6 +1204,7 @@ class rpg_ability_damage extends rpg_damage {
 
             // Update this robot's history with the triggered damage amount
             $this_robot->history['triggered_damage'][] = $this_ability->ability_results['this_amount'];
+            $this_robot->history['triggered_damage_by'][] = $this_ability->ability_token;
 
             // Update the robot's history with the triggered damage types
             if (!empty($this_ability->ability_results['damage_type'])){
@@ -1162,7 +1213,7 @@ class rpg_ability_damage extends rpg_damage {
                 if (!empty($this_ability->ability_results['damage_type2'])){ $temp_types[] = $this_ability->ability_results['damage_type2']; }
                 $this_robot->history['triggered_damage_types'][] = $temp_types;
             } else {
-                $this_robot->history['triggered_damage_types'][] = array();
+                $this_robot->history['triggered_damage_types'][] = null; //array();
             }
 
         }
@@ -1218,6 +1269,35 @@ class rpg_ability_damage extends rpg_damage {
         $this_robot->trigger_custom_function('rpg-ability_trigger-damage_middle', $extra_objects);
         $target_robot->trigger_custom_function('rpg-ability_trigger-damage_middle', $extra_objects);
         if ($options->return_early){ return $options->return_value; }
+
+        // Define the sound effects for this damage event so it plays for the player
+        $damage_sounds = array();
+        if ($this_ability->ability_results['this_amount'] > 0){
+            if (!empty($this_ability->ability_results['flag_weakness'])
+                || !empty($this_ability->ability_results['flag_critical'])){
+                $damage_sounds[] = array('name' => 'damage-critical', 'volume' => 0.9);
+                $damage_sounds[] = array('name' => 'damage-reverb', 'volume' => 1.0, 'delay' => 100);
+                $damage_sounds[] = array('name' => 'damage-reverb', 'volume' => 0.8, 'delay' => 200);
+            } elseif (!empty($this_ability->ability_results['flag_resistance'])){
+                $damage_sounds[] = array('name' => 'damage-reduced', 'volume' => 0.9);
+            } elseif ($this_ability->ability_results['this_amount'] === 1){
+                $damage_sounds[] = array('name' => 'damage-hindered', 'volume' => 0.9);
+            } else {
+                $damage_sounds[] = array('name' => 'damage', 'volume' => 0.9);
+                $damage_sounds[] = array('name' => 'damage-reverb', 'volume' => 0.8, 'delay' => 100);
+            }
+            if (!empty($this_ability->ability_results['energy_ohko'])){
+                $delay = count($damage_sounds) * 100;
+                $damage_sounds[] = array('name' => 'damage-reverb', 'volume' => 0.8, 'delay' => $delay + 100);
+                $damage_sounds[] = array('name' => 'damage-reverb', 'volume' => 0.8, 'delay' => $delay + 200);
+                $damage_sounds[] = array('name' => 'damage-reverb', 'volume' => 0.8, 'delay' => $delay + 300);
+            }
+        } else {
+            $damage_sounds[] = array('name' => 'no-effect');
+        }
+        foreach ($damage_sounds AS $damage_sound){
+            $this_battle->queue_sound_effect($damage_sound);
+        }
 
         // Generate an event with the collected damage results based on damage type
         $temp_event_header = $this_ability->damage_options['damage_header'];

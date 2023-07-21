@@ -9,6 +9,7 @@ if (!isset($mmrpg_index_players) || empty($mmrpg_index_players)){
 
 // Collect the temp battle flags
 $temp_flags = !empty($_SESSION['GAME']['flags']) ? $_SESSION['GAME']['flags'] : array();
+//error_log(basename(__FILE__).'//$temp_flags: '.print_r($temp_flags, true));
 
 // If the UNLOCK ROLL password was created
 if (!empty($temp_flags['drlight_password_robotgetletsrocknroll'])){
@@ -74,6 +75,17 @@ if (!empty($temp_flags['drlight_password_abilitygetwithallmyheartandsoul'])){
     if (!mmrpg_prototype_ability_unlocked('dr-light', false, 'copy-soul')){
         // Unlock Copy Shot as an equippable ability
         mmrpg_game_unlock_ability($mmrpg_index_players['dr-light'], false, array('ability_token' => 'copy-soul'), true);
+        header('Location: '.MMRPG_CONFIG_ROOTURL.'prototype.php');
+        exit();
+    }
+}
+
+// If the UNLOCK RIVAL DR WILY password was created
+if (!empty($temp_flags['drlight_password_playergettimetotakeovertheworld'])){
+    if (!mmrpg_prototype_player_unlocked('dr-wily')){
+        // Unlock Dr. Wily as a playable character
+        $unlock_player_info = $mmrpg_index_players['dr-wily'];
+        mmrpg_game_unlock_player($unlock_player_info, true, true);
         header('Location: '.MMRPG_CONFIG_ROOTURL.'prototype.php');
         exit();
     }

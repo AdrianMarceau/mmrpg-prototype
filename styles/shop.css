@@ -474,6 +474,7 @@
     height: auto;
     width: auto;
     max-width: 50%;
+    max-width: calc(100% - 175px);
     font-size: 12px;
     line-height: 16px;
     text-align: left;
@@ -489,12 +490,106 @@
     text-decoration: none;
     cursor: default;
 }
+#shop #console .event .item_name,
+#shop #console .event .ability_name,
+#shop #console .event .robot_name,
+#shop #console .event .field_name {
+    overflow: visible;
+    font-size: 10px;
+}
+#shop #console .event .item_name:after,
+#shop #console .event .ability_name:after,
+#shop #console .event .robot_name:after,
+#shop #console .event .field_name:after {
+    content: "";
+    display: block;
+    clear: both;
+}
 #shop #console .event .item_name:hover,
 #shop #console .event .ability_name:hover,
 #shop #console .event .robot_name:hover,
 #shop #console .event .field_name:hover {
     display: block;
 }
+
+#shop #console .event .item_name,
+#shop #console .event .ability_name,
+#shop #console .event .robot_name,
+#shop #console .event .field_name,
+#shop #console .event .buy_button,
+#shop #console .event .sell_button,
+#shop #console .event .confirm_button,
+#shop #console .event .cancel_button,
+#shop #console .event .player_button,
+#shop #console .event .item_quantity_mods a {
+    position: relative;
+    cursor: pointer;
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    transform: scale(1);
+    transform-origin: center;
+    transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+}
+#shop #console .event .item_name,
+#shop #console .event .ability_name,
+#shop #console .event .robot_name,
+#shop #console .event .field_name {
+    transform-origin: left;
+}
+
+#shop #console .event .item_name > .wrap {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#shop #console .event .item_name .icon_sprite {
+    float: left;
+    width: 18px;
+    height: 16px;
+    overflow: visible;
+    box-sizing: border-box;
+    margin: 0;
+    margin-right: 5px;
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+#shop #console .event .item_name .icon_sprite .sprite {
+    position: relative;
+    left: -14px;
+    top: -10px;
+}
+#shop #console .event .item_name .icon_sprite .sprite_40x40 {
+    left: -14px;
+    top: -10px;
+}
+#shop #console .event .item_name .icon_sprite .sprite_80x80 {
+    left: -34px;
+    top: 10px;
+}
+#shop #console .event .item_name .icon_sprite .sprite_160x160 {
+    left: -54px;
+    top: 30px;
+}
+#shop #console .event .item_name.robot_name .icon_sprite .sprite,
+#shop #console .event .item_name.robot_alt_name .icon_sprite .sprite {
+    transform: scale(0.5);
+}
+
+#shop #console .event .item_cell:not(.item_cell_disabled) .item_name:hover,
+#shop #console .event .item_cell:not(.item_cell_disabled) .ability_name:hover,
+#shop #console .event .item_cell:not(.item_cell_disabled) .robot_name:hover,
+#shop #console .event .item_cell:not(.item_cell_disabled) .field_name:hover,
+#shop #console .event .item_cell:not(.item_cell_disabled) .buy_button:hover,
+#shop #console .event .item_cell:not(.item_cell_disabled) .sell_button:hover,
+#shop #console .event .item_cell:not(.item_cell_disabled) .confirm_button:hover,
+#shop #console .event .item_cell:not(.item_cell_disabled) .cancel_button:hover,
+#shop #console .event .item_cell:not(.item_cell_disabled) .player_button:hover,
+#shop #console .event .item_cell:not(.item_cell_disabled) .item_quantity_mods a:hover {
+    border-color: #ffffff !important;
+    transform: scale(1.1);
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+}
+
 #shop #console .event .item_cell_confirm .item_name {
     float: right;
     margin-right: 30px;
@@ -554,6 +649,7 @@
 #shop #console .event .item_quantity_mods a {
     margin: 2px;
     width: 26px;
+    max-width: none;
     height: 19px;
     text-align: center;
     box-sizing: border-box;
@@ -834,7 +930,7 @@
 
     #mmrpg,
     #mmrpg #prototype {
-        width: 1024px;
+        width: 768;
     }
     #prototype #canvas {
         width: 100% !important;

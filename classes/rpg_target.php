@@ -75,6 +75,14 @@ class rpg_target {
         $event_options['this_ability_results'] = $this_ability->ability_results;
         if (isset($trigger_options['canvas_show_this_ability'])){ $event_options['canvas_show_this_ability'] = $trigger_options['canvas_show_this_ability'];  }
 
+        // Apply appropriate camera action flags to the event options
+        rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $this_ability, 'target');
+
+        // If sound effects were supplied in the trigger options, apply them now
+        //error_log('$trigger_options = '.print_r($trigger_options, true));
+        $event_options['event_flag_sound_effects'] = !empty($trigger_options['event_flag_sound_effects']) ? $trigger_options['event_flag_sound_effects'] : false;
+        //error_log('event_flag_sound_effects = '.print_r($event_options['event_flag_sound_effects'], true));
+
         // Create a new entry in the event log for the targeting event
         $temp_event_header = $this_ability->target_options['target_header'];
         $temp_event_body = $this_ability->ability_results['this_text'];
@@ -120,6 +128,9 @@ class rpg_target {
         $event_options['this_item_target_position'] = $target_robot->robot_position;
         $event_options['this_item_results'] = array();
         $event_options['console_show_target'] = false;
+        $event_options['canvas_show_this_item'] = true;
+        $event_options['canvas_show_this_item_overlay'] = false;
+        $event_options['canvas_show_this_item_underlay'] = true;
 
         // Empty any text from the previous item result
         $this_item->item_results['this_text'] = '';
@@ -168,6 +179,14 @@ class rpg_target {
         // Update the event options with the item results
         $event_options['this_item_results'] = $this_item->item_results;
         if (isset($trigger_options['canvas_show_this_item'])){ $event_options['canvas_show_this_item'] = $trigger_options['canvas_show_this_item'];  }
+        if (isset($trigger_options['canvas_show_this_item_overlay'])){ $event_options['canvas_show_this_item_overlay'] = $trigger_options['canvas_show_this_item_overlay'];  }
+        if (isset($trigger_options['canvas_show_this_item_underlay'])){ $event_options['canvas_show_this_item_underlay'] = $trigger_options['canvas_show_this_item_underlay'];  }
+
+        // Apply appropriate camera action flags to the event options
+        rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $this_item, 'target');
+
+        // If sound effects were supplied in the trigger options, apply them now
+        $event_options['event_flag_sound_effects'] = !empty($trigger_options['event_flag_sound_effects']) ? $trigger_options['event_flag_sound_effects'] : false;
 
         // Create a new entry in the event log for the targeting event
         $this_robot->battle->events_create($this_robot, $target_robot, $this_item->target_options['target_header'], $this_item->item_results['this_text'], $event_options);
@@ -213,6 +232,9 @@ class rpg_target {
         $event_options['console_show_this'] = true;
         $event_options['console_show_this_player'] = false;
         $event_options['console_show_this_robot'] = true;
+        $event_options['canvas_show_this_skill'] = true;
+        $event_options['canvas_show_this_skill_overlay'] = false;
+        $event_options['canvas_show_this_skill_underlay'] = true;
 
         // Empty any text from the previous skill result
         $this_skill->skill_results['this_text'] = '';
@@ -246,7 +268,15 @@ class rpg_target {
 
         // Update the event options with the skill results
         $event_options['this_skill_results'] = $this_skill->skill_results;
-        $event_options['canvas_show_this_skill'] = false;
+        if (isset($trigger_options['canvas_show_this_skill'])){ $event_options['canvas_show_this_skill'] = $trigger_options['canvas_show_this_skill'];  }
+        if (isset($trigger_options['canvas_show_this_skill_overlay'])){ $event_options['canvas_show_this_skill_overlay'] = $trigger_options['canvas_show_this_skill_overlay'];  }
+        if (isset($trigger_options['canvas_show_this_skill_underlay'])){ $event_options['canvas_show_this_skill_underlay'] = $trigger_options['canvas_show_this_skill_underlay'];  }
+
+        // Apply appropriate camera action flags to the event options
+        rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $this_skill, 'target');
+
+        // If sound effects were supplied in the trigger options, apply them now
+        $event_options['event_flag_sound_effects'] = !empty($trigger_options['event_flag_sound_effects']) ? $trigger_options['event_flag_sound_effects'] : false;
 
         // Create a new entry in the event log for the targeting event
         $this_robot->battle->events_create($this_robot, $target_robot, $this_skill->target_options['target_header'], $this_skill->skill_results['this_text'], $event_options);

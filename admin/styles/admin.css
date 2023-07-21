@@ -738,6 +738,9 @@ a:hover {
 .adminform .editor .readonly .CodeMirror {
     background-color: #efefef;
 }
+.adminform .editor .CodeMirror-wrap pre {
+    word-break: break-word;
+}
 
 
 
@@ -887,17 +890,6 @@ tr:nth-child(odd) td {
 .adminform table.backups thead th {
     background-color: #e0e0e0;
     color: #090909;
-}
-
-.adminform .field,
-.adminform .field .subfield {
-    overflow: visible;
-}
-.adminform .field:after,
-.adminform .field .subfield:after {
-    content: "";
-    display: block;
-    clear: both;
 }
 
 .adminform .field.hidden,
@@ -1145,41 +1137,18 @@ tr:nth-child(odd) td {
     color: #e6e6e6;
     transition: color 0.3s;
 }
+.adminform .editor.groups ul.groups li.group a.move-handle i {
+    font-size: 20px;
+    line-height: 20px;
+}
 .adminform .editor.groups ul.groups li.group a.move-handle:hover {
     color: #696969;
-}
-.adminform .editor.groups ul.groups li.group a.move-handle:after {
-    content: "";
-    display: block;
-    position: relative;
-    width: auto;
-    height: auto;
-    background-color: transparent;
-
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    display: inline-block;
-    font-style: normal;
-    font-variant: normal;
-    text-rendering: auto;
-    line-height: 1;
-    font-size: 15px;
-
-    content: "\f338";
 }
 .adminform .editor.groups ul.groups li.group a.move-handle[data-direction="up"] {
     top: 0;
 }
 .adminform .editor.groups ul.groups li.group a.move-handle[data-direction="down"] {
     bottom: -4px;
-}
-.adminform .editor.groups ul.groups li.group a.move-handle[data-direction="up"]:after {
-    content: "\f062";
-}
-.adminform .editor.groups ul.groups li.group a.move-handle[data-direction="down"]:after {
-    content: "\f063";
 }
 .adminform .editor.groups ul.groups li.group.readonly a.move-handle,
 .adminform .editor.groups ul.groups li.group a.move-handle.hidden {
@@ -1256,33 +1225,18 @@ tr:nth-child(odd) td {
     font-style: normal;
     color: #c6c6c6;
 }
-.adminform .editor.groups li.group_child_token:after {
-    content: "";
-    display: block;
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    bottom: 5px;
-    width: auto;
-    height: auto;
+.adminform .editor.groups li.group_child_token > i {
     background-color: transparent;
     color: #e6e6e6;
     transition: color 0.3s;
-
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    display: inline-block;
-    font-style: normal;
-    font-variant: normal;
-    text-rendering: auto;
     line-height: 1;
     font-size: 16px;
-
-    content: "\f58e";
+    line-height: 1;
+    position: absolute;
+    top: 5px;
+    right: 6px;
 }
-.adminform .editor.groups li.group_child_token:hover:after {
+.adminform .editor.groups li.group_child_token:hover > i {
     color: #696969;
 }
 .adminform .editor.groups .formfoot {
@@ -1542,6 +1496,11 @@ tr:nth-child(odd) td {
     margin: 0 auto;
     position: relative;
 }
+.adminform .editor ul.files > li .filebar:after {
+    content: "";
+    display: block;
+    clear: both;
+}
 .adminform .editor ul.files > li .filebar .link {
     color: #008aab;
     text-decoration: underline;
@@ -1610,7 +1569,7 @@ tr:nth-child(odd) td {
 }
 
 .adminform .editor ul.files > li .filebar .action.upload {
-    max-width: 42px;
+    max-width: 46px;
     overflow: hidden;
     position: relative;
     cursor: pointer;
@@ -1628,6 +1587,7 @@ tr:nth-child(odd) td {
     opacity: 0;
     cursor: inherit;
 }
+
 
 /* Chrome/Safari and web-kit-based browsers
    (if it doesn't work, try maybe also on the parent/wrapper)
@@ -1727,6 +1687,16 @@ input[type=file] {
     line-height: 16px;
     min-height: 50px;
     position: relative;
+}
+.adminform .field,
+.adminform .field .subfield {
+    overflow: visible;
+}
+.adminform .field:after,
+.adminform .field .subfield:after {
+    content: "";
+    display: block;
+    clear: both;
 }
 .adminform .field.autosize {
     width: auto;
@@ -2004,6 +1974,17 @@ input[type=file] {
 .adminform .field.hasXcols .subfield input[type="password"] {
     width: 100%;
     margin-right: 0;
+}
+
+.adminform .field.has2cols .subfield.fullsize,
+.adminform .field.has3cols .subfield.fullsize,
+.adminform .field.has4cols .subfield.fullsize,
+.adminform .field.has5cols .subfield.fullsize,
+.adminform .field.has6cols .subfield.fullsize,
+.adminform .field.hasXcols .subfield.fullsize {
+    width: 100%;
+    float: none;
+    clear: both;
 }
 
 
@@ -2937,4 +2918,134 @@ input[type=file] {
 }
 
 
+.adminform .audio-player {
+    display: inline-block;
+    margin: 0 auto 0 10px;
+    background-color: #5a5a5a;
+    color: #ffffff;
+    text-shadow: 1px 1px 0 #000000;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    font-size: 150%;
+    line-height: 1;
+    border: 0 none transparent;
+    border-radius: 3px;
+    padding: 2px 2px 2px 4px;
+    position: relative;
+    user-select: none;
+    min-width: 1em;
+    min-height: 1em;
+    transition: width 0.3s, color 0.3s, background-color 0.3s;
+    overflow: hidden;
+    text-overflow: clip;
+    white-space: nowrap;
+}
+.adminform .audio-player > i.loading {
+    transform: scale(0.6);
+    opacity: 0.6;
+    margin-right: 4px;
+}
+.adminform .audio-player .button,
+.adminform .audio-player .widget {
+    display: inline-block;
+    margin: 0 4px 0 0;
+    opacity: 1.0;
+    transform: scale(1);
+    transition: opacity 0.2s, transform 0.2s, color 0.2s;
+}
+.adminform .audio-player .button {
+    cursor: pointer;
+    opacity: 0.9;
+}
+.adminform .audio-player .widget {
 
+}
+
+.adminform .audio-player[data-audio-state="play"],
+.adminform .audio-player[data-audio-state="pause"] {
+    background-color: #4b8bb2;
+}
+
+.adminform .audio-player[data-audio-state] .button {
+    opacity: 0.3;
+}
+.adminform .audio-player[data-audio-state] .button:hover {
+    opacity: 1.0;
+    transform: scale(1.3);
+}
+.adminform .audio-player[data-audio-state="play"] .button.play,
+.adminform .audio-player[data-audio-state="pause"] .button.pause,
+.adminform .audio-player[data-audio-state="stop"] .button.stop {
+    opacity: 1.0;
+}
+.adminform .audio-player[data-audio-state="stop"] .button.pause,
+.adminform .audio-player[data-audio-state="stop"] .button.stop {
+    cursor: default;
+    pointer-events: none;
+}
+.adminform .audio-player[data-audio-state="play"] .button.pause,
+.adminform .audio-player[data-audio-state="pause"] .button.play,
+.adminform .audio-player[data-audio-state="stop"] .button.pause {
+    display: none;
+}
+
+@keyframes pulse-widget-state-active {
+    0%, 100% {
+        transform: scale(0.5);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.0);
+        opacity: 1.0;
+    }
+}
+.adminform .audio-player .widget.timer {
+    padding: 0 6px;
+    background-color: #404040;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 2px;
+    font-weight: normal;
+}
+.adminform .audio-player .widget.timer .current,
+.adminform .audio-player .widget.timer .total {
+    font-size: 80%;
+    position: relative;
+    bottom: 1px;
+    padding: 0 4px;
+    font-weight: normal;
+}
+.adminform .audio-player .widget.timer .total {
+    opacity: 0.5;
+}
+.adminform .audio-player .widget.state {
+    opacity: 0.2;
+    transform: scale(0.5);
+    color: #ffffff;
+}
+.adminform .audio-player[data-audio-state="play"] .widget.state {
+    animation: pulse-widget-state-active 2s infinite;
+}
+.adminform .audio-player[data-audio-state="pause"] .widget.state {
+    opacity: 0.6;
+    transform: scale(0.75);
+}
+
+.adminform .audio-player.light-theme {
+    background-color: #dedede;
+    color: #008aab;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
+}
+.adminform .audio-player.light-theme[data-audio-state="play"],
+.adminform .audio-player.light-theme[data-audio-state="pause"] {
+    background-color: #c5e2f4;
+}
+.adminform .audio-player.light-theme .widget.timer {
+    background-color: rgba(255, 255, 255, 0.6);
+    text-shadow: none;
+    color: #262626;
+}
+.adminform .audio-player.light-theme .widget.timer .current {
+    user-select: all;
+}
+.adminform .audio-player.light-theme .widget.state {
+    color: #5d97b6;
+}

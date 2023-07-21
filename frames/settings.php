@@ -252,6 +252,40 @@ if (!empty($form_actions)){
 
         };
 
+    // Define an update function for the "Extra Settings" tab
+    $update_functions['game_settings'] = function() use (&$updated_tabs, &$form_messages, &$form_data){
+        global $db, $current_user_id, $current_user_info;
+
+        $form_data = array();
+
+        $form_data['masterVolume'] = !empty($_POST['masterVolume']) && is_numeric($_POST['masterVolume']) ? $_POST['masterVolume'] : MMRPG_SETTINGS_AUDIODEFAULT_MASTERVOLUME;
+        $form_data['musicVolume'] = !empty($_POST['musicVolume']) && is_numeric($_POST['musicVolume']) ? $_POST['musicVolume'] : MMRPG_SETTINGS_AUDIODEFAULT_MUSICVOLUME;
+        $form_data['effectVolume'] = !empty($_POST['effectVolume']) && is_numeric($_POST['effectVolume']) ? $_POST['effectVolume'] : MMRPG_SETTINGS_AUDIODEFAULT_EFFECTVOLUME;
+
+        $allowed_render_modes = array('default', 'crisp-edges', 'pixelated');
+        $form_data['spriteRenderMode'] = !empty($_POST['spriteRenderMode']) && in_array($_POST['spriteRenderMode'], $allowed_render_modes) ? $_POST['spriteRenderMode'] : $allowed_render_modes[0];
+
+        //error_log('$form_data = '.print_r($form_data, true));
+
+        $audioBalanceConfig = array();
+        $audioBalanceConfig['masterVolume'] = $form_data['masterVolume'] >= 0 && $form_data['masterVolume'] <= 1 ? $form_data['masterVolume'] : MMRPG_SETTINGS_AUDIODEFAULT_MASTERVOLUME;
+        $audioBalanceConfig['musicVolume'] = $form_data['musicVolume'] >= 0 && $form_data['musicVolume'] <= 1 ? $form_data['musicVolume'] : MMRPG_SETTINGS_AUDIODEFAULT_MUSICVOLUME;
+        $audioBalanceConfig['effectVolume'] = $form_data['effectVolume'] >= 0 && $form_data['effectVolume'] <= 1 ? $form_data['effectVolume'] : MMRPG_SETTINGS_AUDIODEFAULT_EFFECTVOLUME;
+        //error_log('$audioBalanceConfig = '.print_r($audioBalanceConfig, true));
+
+        $spriteRenderMode = !empty($form_data['spriteRenderMode']) ? $form_data['spriteRenderMode'] : $allowed_render_modes[0];
+        //error_log('$spriteRenderMode = '.print_r($spriteRenderMode, true));
+
+        $session_token = rpg_game::session_token();
+        $_SESSION[$session_token]['battle_settings']['audioBalanceConfig'] = $audioBalanceConfig;
+        $_SESSION[$session_token]['battle_settings']['spriteRenderMode'] = $spriteRenderMode;
+
+        //error_log('(A) $_SESSION[$session_token][\'battle_settings\'][\'audioBalanceConfig\'] = '.print_r($_SESSION[$session_token]['battle_settings']['audioBalanceConfig'], true));
+
+        return true;
+
+        };
+
     /*
     // Define an update function for the "Extra Settings" tab
     $update_functions['extra_settings'] = function() use (&$updated_tabs, &$form_messages, &$form_data){
@@ -289,6 +323,115 @@ if (!empty($form_actions)){
 // Define an array to hold settings tabs and content
 $settings_tabs = array();
 
+// Generate markup for GAME SETTINGS if applicable
+if (true){
+
+    // Define the markup for this section
+    $tab_token = 'game_settings';
+    $tab_name = 'Game Settings';
+    ob_start();
+    ?>
+
+        <div class="game-settings">
+
+            <?
+
+            // Collect current values if they exist so we can display them as such
+            $session_token = rpg_game::session_token();
+            $battleSettings = $_SESSION[$session_token]['battle_settings'];
+            $spriteRenderMode = isset($battleSettings['spriteRenderMode']) ? $battleSettings['spriteRenderMode'] : 'default';
+            $audioBalanceConfig = isset($battleSettings['audioBalanceConfig']) ? $battleSettings['audioBalanceConfig'] : array(
+                'masterVolume' => MMRPG_SETTINGS_AUDIODEFAULT_MASTERVOLUME,
+                'musicVolume' => MMRPG_SETTINGS_AUDIODEFAULT_MUSICVOLUME,
+                'effectVolume' => MMRPG_SETTINGS_AUDIODEFAULT_EFFECTVOLUME,
+                );
+
+            ?>
+
+            <div class="field" data-setting="audioBalanceConfig">
+                <div class="label">
+                    <strong>Audio Balancing</strong>
+                </div>
+                <div class="subfield input-group">
+                    <div class="subfield">
+                        <label class="label" for="masterVolume">Master Volume</label>
+                        <input class="slider" type="range" name="masterVolume" min="0" max="1" step="0.01" value="<?= $audioBalanceConfig['masterVolume'] ?>">
+                    </div>
+                    <div class="subfield">
+                        <label class="label" for="musicVolume">Music Volume</label>
+                        <input class="slider" type="range" name="musicVolume" min="0" max="1" step="0.01" value="<?= $audioBalanceConfig['musicVolume'] ?>">
+                    </div>
+                    <div class="subfield">
+                        <label class="label" for="effectVolume">SFX Volume</label>
+                        <input class="slider" type="range" name="effectVolume" min="0" max="1" step="0.01" value="<?= $audioBalanceConfig['effectVolume'] ?>">
+                    </div>
+                </div>
+            </div>
+
+            <div class="field" data-setting="spriteRenderMode">
+                <div class="label">
+                    <strong>Sprite Rendering</strong>
+                </div>
+                <div class="subfield input-group">
+                    <? $active = empty($spriteRenderMode) || $spriteRenderMode === 'default'; ?>
+                    <div class="radiofield <?= $active ? 'active' : '' ?>">
+                        <input type="radio" name="spriteRenderMode" value="default" <?= $active ? 'checked="checked"' : '' ?> />
+                        <label for="auto">Auto</label>
+                    </div>
+                    <? $active = $spriteRenderMode === 'crisp-edges'; ?>
+                    <div class="radiofield <?= $active ? 'active' : '' ?>">
+                        <input type="radio" name="spriteRenderMode" value="crisp-edges" <?= $active ? 'checked="checked"' : '' ?> />
+                        <label for="crisp-edges">Crisp Edges</label>
+                    </div>
+                    <? $active = $spriteRenderMode === 'pixelated'; ?>
+                    <div class="radiofield <?= $active ? 'active' : '' ?>">
+                        <input type="radio" name="spriteRenderMode" value="pixelated" <?= $active ? 'checked="checked"' : '' ?> />
+                        <label for="pixelated">Pixelated</label>
+                    </div>
+                </div>
+                <div id="canvas" class="samples">
+                    <?
+                    // Print out some sample sprites to show how things look
+                    $samples = array();
+                    $samples[40] = 'images/robots/mega-man/sprite_right_40x40.png';
+                    $samples[80] = 'images/robots/proto-man/sprite_right_80x80.png';
+                    foreach ($samples AS $size => $path){
+                        ?>
+                        <div class="group of2" data-base="<?= $size ?>">
+                            <?
+                            for ($i = 0; $i <= 3; $i++){
+                                $s = 40 + (20 * ($i * 1));
+                                ?>
+                                <div class="sprite" style="
+                                    background-image: url('<?= $path ?>');
+                                    width: <?= $s ?>px;
+                                    height: <?= $s ?>px;
+                                    bottom: 0;
+                                    left: <?= -10 + ($i * ($s / 2)) - ($i * $i * 3) ?>px;
+                                    "></div>
+                                <?
+                            }
+                            ?>
+                        </div>
+                        <?
+                    }
+                    ?>
+                </div>
+            </div>
+
+        </div>
+
+    <?
+    $tab_markup = trim(ob_get_clean());
+    if (!empty($tab_markup)){
+        $settings_tabs[] = array(
+        'token' => $tab_token,
+        'name' => $tab_name,
+        'markup' => $tab_markup
+        );
+    }
+}
+
 // Generate markup for ACCOUNT SETTINGS if applicable
 if (true){
 
@@ -312,8 +455,8 @@ if (true){
             <div class="label">
                 <strong>Account Type</strong>
             </div>
-            <input type="hidden" name="role_name" value="<?= $current_user_info['role_id'] ?>" readonly="readonly" />
-            <input class="textbox" type="text" name="role_name" value="<?= $current_user_info['role_name_full'] ?>" maxlength="64" readonly="readonly" disabled="disabled" />
+            <input type="hidden" name="role_name" value="<?= $current_user_info['role_id'] ? >" readonly="readonly" />
+            <input class="textbox" type="text" name="role_name" value="<?= $current_user_info['role_name_full'] ? >" maxlength="64" readonly="readonly" disabled="disabled" />
         </div>
         */ ?>
 
@@ -338,7 +481,7 @@ if (true){
                 <strong>Date of Birth</strong>
                 <em>used for age verification</em>
             </div>
-            <input class="textbox" type="date" name="user_date_birth" value="<?= !empty($current_user_info['user_date_birth']) ? date('Y-m-d', $current_user_info['user_date_birth']) : '' ?>" required="required" maxlength="10" placeholder="YYYY-MM-DD" />
+            <input class="textbox" type="date" name="user_date_birth" value="<?= !empty($current_user_info['user_date_birth']) ? date('Y-m-d', $current_user_info['user_date_birth']) : '' ? >" required="required" maxlength="10" placeholder="YYYY-MM-DD" />
         </div>
         */ ?>
 
@@ -471,12 +614,12 @@ if (true){
 
 }
 
-// Generate markup for GAME OPTIONS if applicable
+// Generate markup for ADVANCED SETTINGS if applicable
 if (true){
 
     // Define the markup for this section
-    $tab_token = 'game_options';
-    $tab_name = 'Game Options';
+    $tab_token = 'advanced_settings';
+    $tab_name = 'Advanced Settings';
     ob_start();
     ?>
 
@@ -609,8 +752,8 @@ if (!empty($_REQUEST['current_tab']) && in_array($_REQUEST['current_tab'], $allo
 <meta name="items" content="noindex,nofollow" />
 <meta name="format-detection" content="telephone=no" />
 <link rel="shortcut icon" type="image/x-icon" href="images/assets/<?= mmrpg_get_favicon() ?>">
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/solid.css" integrity="sha384-+0VIRx+yz1WBcCTXBkVQYIBVNEFH1eP6Zknm16roZCyeNg2maWEpk/l/KsyFKs7G" crossorigin="anonymous">
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/fontawesome.css" integrity="sha384-jLuaxTTBR42U2qJ/pm4JRouHkEDHkVqH0T1nyQXn1mZ7Snycpf6Rl25VBNthU4z0" crossorigin="anonymous">
+<link type="text/css" href=".libs/fontawesome/v5.6.3/css/solid.css" rel="stylesheet" />
+<link type="text/css" href=".libs/fontawesome/v5.6.3/css/fontawesome.css" rel="stylesheet" />
 <link type="text/css" href=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.css" rel="stylesheet" />
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
@@ -660,8 +803,8 @@ if (!empty($_REQUEST['current_tab']) && in_array($_REQUEST['current_tab'], $allo
                         </div>
 
                         <div class="tab_buttons">
-                            <input class="button save type type_nature" type="submit" value="Save Changes" />
-                            <input class="button reset type type_flame" type="reset" value="Discard Changes" onclick="javascript: window.location.href = window.location.href;" />
+                            <input class="button save clickonce type type_nature" type="submit" value="Save Changes" />
+                            <input class="button reset clickonce type type_flame" type="reset" value="Discard Changes" onclick="javascript: window.location.href = window.location.href;" />
                         </div>
 
                     </form>

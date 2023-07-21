@@ -34,11 +34,14 @@ body:before {
     #mmrpg,
     #prototype {
         width: auto !important;
+        height: auto;
+        height: 100svh;
         min-width: 768px;
         min-height: 924px;
-        height: auto;
-        background-color: #262626;
-        background-image: none;
+    }
+
+    #mmrpg.windowFlag_landscapeMode {
+        width: 1024px !important;
     }
 
 }
@@ -50,6 +53,19 @@ body:before {
         content: "11";
     }
 
+    #mmrpg.index {
+        padding-top: 20px;
+        min-height: calc(100svh - 20px);
+        height: auto;
+    }
+    #mmrpg.index #window {
+        border-radius: 0.75em;
+    }
+    #mmrpg.index #music,
+    #mmrpg.index #animate,
+    #mmrpg.index #events {
+        border-radius: 0.5em;
+    }
 
 }
 
@@ -81,6 +97,26 @@ body:before {
 
 }
 
+@media (min-width: 800px){
+
+    body:before {
+        content: "11";
+    }
+
+    #mmrpg.index {
+        padding-top: 20px;
+        min-height: calc(100svh - 20px);
+    }
+    #mmrpg.index #window {
+        border-radius: 0.75em;
+    }
+    #mmrpg.index #music,
+    #mmrpg.index #animate,
+    #mmrpg.index #events {
+        border-radius: 0.5em;
+    }
+
+}
 @media (max-width: 800px){
 
     body:before {
@@ -127,6 +163,13 @@ body:before {
 
     body:before {
         content: "05";
+    }
+
+    body,
+    #mmrpg,
+    #prototype {
+        background-color: #262626;
+        background-image: none;
     }
 
     #prototype .option_1x1 div label .maintext .icons.stats {

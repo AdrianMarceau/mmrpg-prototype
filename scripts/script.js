@@ -1,5 +1,5 @@
 // Initialize the MMRPG global variables
-var mmrpgBody = mmrpgBody;
+var mmrpgBody = false;
 var gameWindow = false;
 var gameEngine = false;
 var gameConnect = false;
@@ -21,14 +21,18 @@ gameSettings.baseHref = 'http://localhost/'; // the base href where this game is
 gameSettings.wapFlag = false; // whether or not this game is running in mobile mode
 gameSettings.wapFlagIphone = false; // whether or not this game is running in mobile iphone mode
 gameSettings.wapFlagIpad = false; // whether or not this game is running in mobile iphone mode
-gameSettings.baseVolume = 0.2; // default animation frame base internal
-gameSettings.eventTimeout = 1250; // default animation frame base internal
+gameSettings.eventTimeout = 800; // default animation frame base internal
 gameSettings.eventTimeoutThreshold = 250; // timeout theshold for when frames stop cross-fading
 gameSettings.eventAutoPlay = true; // whether or not to automatically advance events
 gameSettings.eventCrossFade = true; // whether or not to canvas events have crossfade animation
-gameSettings.spriteRenderMode = 'default'; // the render mode we should be using for sprites
+gameSettings.eventCameraShift = true; // whether or not to canvas events have camera shifts
+gameSettings.eventSoundEffects = true; // whether or not to use sound effects for battle events
+gameSettings.eventHooks = []; // default to empty but may be filled at runtime and used later
+gameSettings.gameHasStarted = false; // default to false so we can only set to true when ready
 gameSettings.idleAnimation = true; // default to allow idle animations
 gameSettings.indexLoaded = false; // default to false until the index is loaded
+gameSettings.currentGameState = {}; // default to empty but may be filled at runtime and used later
+gameSettings.currentActionPanel = 'loading'; // default to loading until changed elsewhere
 gameSettings.autoScrollTop = false; // default to true to prevent too much scrolling
 gameSettings.autoResizeWidth = true; // allow auto reszing of the game window width
 gameSettings.autoResizeHeight = true; // allow auto reszing of the game window height
@@ -36,6 +40,22 @@ gameSettings.currentBodyWidth = 0; // collect the current window width and updat
 gameSettings.currentBodyHeight = 0; // collect the current window width and update when necessary
 gameSettings.allowEditing = true; // default to true to allow all editing unless otherwise stated
 gameSettings.audioBaseHref = ''; // the base href where audio comes from (empty if same as baseHref)
+gameSettings.onGameStart = []; // define an array to hold  events that have to wait until game start
+gameSettings.customIndex = {}; // default to empty but may be filled at runtime and used later
+gameSettings.customIndex.musicIndex = {} // predefine to be filled later so we don't get errors
+gameSettings.customIndex.soundsIndex = {} // predefine to be filled later so we don't get errors
+gameSettings.customIndex.soundsAliasesIndex = {} // predefine to be filled later so we don't get errors
+
+// Define the customizable MMRPG settings variables
+gameSettings.maxVolume = 1.0; // max volume for the game that cannot be exceeded (because that would be rude)
+gameSettings.masterVolume = 0.5; // master volume for the game that is exactly in the middle of the road
+gameSettings.musicVolume = 0.4; // music volume for the game, relative to master, slightly lower than effects
+gameSettings.effectVolume = 0.6; // effect volume for the game, relative to master, slightly higher than e
+gameSettings.menuEffectVolume = 0.8; // menu effect volume modifier, relative effect volume, may be unique later
+gameSettings.musicVolumeEnabled = true; // default to true to allow music unless otherwise stated
+gameSettings.effectVolumeEnabled = true; // default to true to allow music unless otherwise stated
+gameSettings.audioBalanceConfig = {}; // default to empty but can hold custom overrides for above
+gameSettings.spriteRenderMode = 'default'; // the render mode we should be using for sprites
 
 // Define an object to hold change events for settings when/if they happen
 var gameSettingsChangeEvents = {};
@@ -95,6 +115,21 @@ $(document).ready(function(){
     gameSettings.wapFlagIphone = (navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)) ? true : false;
     gameSettings.wapFlagIpad = navigator.userAgent.match(/iPad/i) ? true : false;
 
+    // If this window is not running as top, we need to overwrite some variables and functions
+    if (window.self !== window.top){
+
+        // Collect a reference to the topmost window
+        var selfWindow = window.self;
+        var topWindow = window.top;
+
+        // Update the gameHasStarted variable by asking the parent for its setting
+        if (typeof topWindow.gameSettings !== 'undefined'
+            && typeof topWindow.gameSettings.gameHasStarted !== 'undefined'){
+            gameSettings.gameHasStarted = topWindow.gameSettings.gameHasStarted;
+        }
+
+    }
+
 
     /*
      * INDEX EVENTS
@@ -114,6 +149,11 @@ $(document).ready(function(){
         // Attempt to attach tooltips regardless of device
         if (true){
 
+            var tooltipDelay = 1200; //600;
+            var tooltipTimeout = false;
+            var tooltipShowing = false;
+            var tooltipInitiator = false;
+
             // Define the function for showing the tooltip
             var showTooltipFunction = function(e){
                 var thisElement = $(this);
@@ -124,6 +164,7 @@ $(document).ready(function(){
                 var thisClassList = thisElement.attr('class') != undefined ? thisElement.attr('class').split(/\s+/) : '';
                 var thisTitle = thisElement.attr('data-backup-title') != undefined ? thisElement.attr('data-backup-title') : (thisElement.attr('title') != undefined ? thisElement.attr('title') : '');
                 var thisTooltip = thisElement.attr('data-tooltip') != undefined ? thisElement.attr('data-tooltip') : '';
+                if (!thisTooltip.length && thisElement.attr('data-click-tooltip') != undefined){ thisTooltip = thisElement.attr('data-click-tooltip'); }
                 if (!thisTitle.length && !thisTooltip.length){ return false; }
                 else if (thisTitle.length && !thisTooltip.length){ thisTooltip = thisTitle; }
                 thisTooltip = thisTooltip.replace(/\n/g, '<br />').replace(/\|\|/g, '<br />').replace(/\|/g, '<span class="pipe">|</span>').replace(/\s?\/\/\s?/g, '<br />').replace(/\[\[([^\[\]]+)\]\]/ig, '<span class="subtext">$1</span>');
@@ -151,10 +192,11 @@ $(document).ready(function(){
                 //$('.tooltip', mmrpgBody).css({width:''});
                 //var toolwidth = $('.tooltip', mmrpgBody).outerWidth();
                 //$('.tooltip', mmrpgBody).css({width:toolwidth+'px'});
-                var thisDate = new Date();
-                var thisTime = thisDate.getTime();
-                //console.log('animation should be done at '+thisTime);
                 alignTooltipFunction.call(this, e);
+                tooltipShowing = true;
+                if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
+                    top.mmrpg_play_sound_effect('tooltip-text');
+                    }
                 };
 
             // Define the function for positioning the tooltip
@@ -177,18 +219,14 @@ $(document).ready(function(){
 
                 };
 
+            /*
             // Define the live MOUSEENTER events for any elements with a title tag (which should be many)
-            var tooltipDelay = 1200; //600;
-            var tooltipTimeout = false;
-            var tooltipShowing = false;
-            var tooltipSelector = '*[title],*[data-backup-title],*[data-tooltip]';
+            var tooltipSelector = '*[title],*[data-backup-title]:not([data-click-tooltip]),*[data-tooltip]';
             $(tooltipSelector, mmrpgBody).live('mouseenter', function(e){
                 e.preventDefault();
                 if (tooltipTimeout == false){
-                    var thisDate = new Date();
-                    var thisTime = thisDate.getTime();
                     var thisObject = this;
-                    //console.log('set tooltip timeout for '+tooltipDelay+' at '+thisTime);
+                    tooltipInitiator = thisObject;
                     requestAnimationFrame(function(){
                         tooltipTimeout = setTimeout(function(){
                             tooltipShowing = true;
@@ -202,6 +240,32 @@ $(document).ready(function(){
                         }
                     }
                 });
+            */
+
+            // Define the live CLICK events for any elements with a click-title tag (which should be a few)
+            var tooltipSelector = '*[data-click-tooltip]';
+            $(tooltipSelector, mmrpgBody).live('click', function(e){
+                e.preventDefault();
+                e.stopPropagation();
+                if (tooltipShowing){
+                    $('.tooltip', mmrpgBody).empty();
+                    clearTimeout(tooltipTimeout);
+                    tooltipTimeout = false;
+                    tooltipShowing = false;
+                    } else {
+                    if (tooltipTimeout == false){
+                        var thisObject = this;
+                        tooltipInitiator = thisObject;
+                        requestAnimationFrame(function(){
+                            tooltipShowing = true;
+                            showTooltipFunction.call(thisObject, e);
+                            if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
+                                top.mmrpg_play_sound_effect('tooltip-open');
+                                }
+                            });
+                        }
+                    }
+                });
 
             // Define the live MOUSEMOVE events for any elements with a title tag (which should be many)
             $(tooltipSelector, mmrpgBody).live('mousemove', function(e){
@@ -212,19 +276,20 @@ $(document).ready(function(){
             // Define the live MOUSELEAVE events for any elements with a title tag (which should be many)
             $(tooltipSelector, mmrpgBody).live('mouseleave', function(e){
                 e.preventDefault();
-                var thisElement = $(this);
                 $('.tooltip', mmrpgBody).empty();
-                //thisElement.attr('title', thisElement.attr('data-backup-title'));
-                var thisDate = new Date();
-                var thisTime = thisDate.getTime();
-                //console.log('clear tooltip timeout at '+thisTime);
                 clearTimeout(tooltipTimeout);
                 tooltipTimeout = false;
                 tooltipShowing = false;
                 });
 
-                //$('*', mmrpgBody).click(function(e){ $('.tooltip', mmrpgBody).remove(); });
-                $('*', mmrpgBody).click(function(e){ $('.tooltip', mmrpgBody).empty(); });
+            // If the user clicks somewhere in the body, immediately remove the tooltip
+            $('*', mmrpgBody).click(function(e){
+                if (e.target === tooltipInitiator){ return; }
+                $('.tooltip', mmrpgBody).empty();
+                clearTimeout(tooltipTimeout);
+                tooltipTimeout = false;
+                tooltipShowing = false;
+                });
 
             }
 
@@ -251,22 +316,93 @@ $(document).ready(function(){
                 }
             });
 
+        // -- GAME MUSIC & AUDIO FUNCTIONS -- //
+
         // Set up the game music options
-        if (true){
+        if (gameMusic.length){
+
+            // Autmatically load the music index in json format via ajax into memory for later if not there
+            if (typeof gameSettings.customIndex.musicIndex === 'undefined'
+                || !Object.keys(gameSettings.customIndex.musicIndex).length){
+                gameSettings.customIndex.musicIndex = {};
+                //console.log('gameSettings.customIndex.musicIndex =', gameSettings.customIndex.musicIndex);
+                if (!Object.keys(gameSettings.customIndex.musicIndex).length){
+                    //console.log('loading the music index!');
+                    $.ajax({
+                        url: 'api/v2/music/index',
+                        dataType: 'json',
+                        success: function(response){
+                            //console.log('api/v2/music/index returned ', response);
+                            if (typeof response.data !== 'undefined'
+                                && typeof response.data.music !== 'undefined'){
+                                gameSettings.customIndex.musicIndex = response.data.music;
+                                //console.log('gameSettings.customIndex.musicIndex =', gameSettings.customIndex.musicIndex);
+                                }
+                            }
+                        });
+                    }
+                }
+
+            // Automatically define the sounds index to we don't get errors if it hasn't been defined
+            if (typeof gameSettings.customIndex.soundsIndex === 'undefined'
+                || !Object.keys(gameSettings.customIndex.soundsIndex).length){
+                gameSettings.customIndex.soundsIndex = {};
+                }
+
+            // If a sounds index exists, use it to populate the internal effect sources and sprites index
+            //console.log('gameSettings.customIndex.soundsIndex =', gameSettings.customIndex.soundsIndex);
+            if (typeof gameSettings.customIndex.soundsIndex !== 'undefined'
+                && Object.keys(gameSettings.customIndex.soundsIndex).length){
+                var soundsIndexIndex = gameSettings.customIndex.soundsIndex;
+                var rawSoundSources = soundsIndexIndex.src;
+                var soundSources = [];
+                for (var i = 0; i < rawSoundSources.length; i++){
+                    var sourcePath = 'sounds/'+rawSoundSources[i];
+                    var sourcePathFull = gameSettings.audioBaseHref+sourcePath;
+                    soundSources.push(sourcePathFull);
+                    }
+                var rawSoundSprites = soundsIndexIndex.sprite;
+                var soundSprites = {};
+                var soundSpritesTokens = [];
+                soundSpritesTokens = Object.keys(rawSoundSprites);
+                for (var i = 0; i < soundSpritesTokens.length; i++){
+                    var spriteToken = soundSpritesTokens[i];
+                    var spriteData = rawSoundSprites[spriteToken];
+                    soundSprites[spriteToken] = [spriteData['start'], spriteData['duration'], spriteData['loop']];
+                    }
+                gameSettings.soundEffectSources = soundSources;
+                gameSettings.soundEffectSprites = soundSprites;
+                //console.log('rawSoundSources = ', rawSoundSources);
+                //console.log('rawSoundSprites = ', rawSoundSprites);
+                //console.log('soundSources = ', soundSources);
+                //console.log('soundSprites = ', soundSprites);
+                }
+
+
+            // Automatically load the title screen music
+            mmrpg_music_load('misc/player-select', true, false);
 
             // Add the click-events to the music toggle button
             $('a.toggle', gameMusic).bind('click touch', function(e){
                 e.preventDefault();
                 if (gameSettings.indexLoaded){
-                    //$('body').prepend('<div style="background-color: red;">WTF</div>'); // DEBUG
                     if ($('iframe', gameWindow).hasClass('loading')){ $('iframe', gameWindow).css({opacity:0}).removeClass('loading').animate({opacity:1}, 1000, 'swing'); } // DEBUG
                     if (gameMusic.hasClass('onload')){
+                        // THIS is the GAME START button
                         gameMusic.removeClass('onload');
                         gameMusic.find('.start').remove();
-                        if (gameSettings.wapFlag){
-                            mmrpg_music_toggle();
+                        mmrpg_music_toggle();
+                        gameSettings.gameHasStarted = true;
+                        mmrpg_play_sound_effect('game-start');
+                        if (gameSettings.onGameStart.length){
+                            //console.log('gameSettings.onGameStart =', gameSettings.onGameStart);
+                            while (gameSettings.onGameStart.length){
+                                var onGameStart = gameSettings.onGameStart.shift();
+                                if (typeof onGameStart === 'function'){ onGameStart.call(); }
+                                }
                             }
                         } else {
+                        // THIS is just a simple MUSIC TOGGLE
                         mmrpg_music_toggle();
                         }
                     return true;
@@ -274,12 +410,17 @@ $(document).ready(function(){
                     return false;
                     }
                 });
-            // Automatically load the title screen music
-            mmrpg_music_load('misc/player-select');
 
             }
 
     }
+
+
+    /*
+     * RENDER MODE TRIGGERS
+     */
+
+
 
 
     /*
@@ -290,7 +431,12 @@ $(document).ready(function(){
     if (gameEngine.length){
 
         // Define a list of valid render modes we can use
-        var allowedRenderModes = ['default', 'auto', 'smooth', 'pixelated', 'high-quality', 'crisp-edges'];
+        //var allowedRenderModes = ['default', 'auto', 'smooth', 'pixelated', 'high-quality', 'crisp-edges'];
+        var allowedRenderModes = ['default', 'pixelated', 'crisp-edges'];
+
+        // Update the body to use the requested sprite rendering mode
+        //console.log('setting data-render-mode to ', gameSettings['spriteRenderMode']);
+        mmrpgBody.attr('data-render-mode', gameSettings['spriteRenderMode']);
 
         // If a localStorage value has been set, load that instead
         if (typeof window.localStorage !== 'undefined'){
@@ -300,10 +446,6 @@ $(document).ready(function(){
             }
         }
 
-        // Update the body to use the requested sprite rendering mode
-        //console.log('setting data-render-mode to ', gameSettings['spriteRenderMode']);
-        mmrpgBody.attr('data-render-mode', gameSettings['spriteRenderMode']);
-
         // Define a change event for whenever this game setting is altered
         gameSettingsChangeEvents['spriteRenderMode'] = function(newValue){
             //console.log('setting data-render-mode to ', newValue);
@@ -311,7 +453,62 @@ $(document).ready(function(){
             if (typeof window.localStorage !== 'undefined'){
                 window.localStorage.setItem('spriteRenderMode', newValue);
                 }
+            var $actionButton = $('.button.action_option[data-panel="settings_spriteRenderMode"]', gameActions);
+            if ($actionButton.length){
+                var newValueTitle = newValue.replace('/\-/g', ' ').replace(/\b\w/g, function(l){ return l.toUpperCase() });
+                if (typeof gameSettings.customIndex.renderModes !== 'undefined'){
+                    var renderModesIndex = gameSettings.customIndex.renderModes;
+                    newValueTitle = renderModesIndex[newValue]['name'];
+                    }
+                $actionButton.find('.value').html(newValueTitle);
+                }
             };
+        gameSettingsChangeEvents['spriteRenderMode'](gameSettings.spriteRenderMode);
+
+        // Define a change event for whenever this game setting is altered
+        gameSettingsChangeEvents['eventTimeout'] = function(newValue){
+            //console.log('setting eventTimeout to ', newValue, typeof newValue);
+            updateCameraShiftTransitionDuration();
+            var $actionButton = $('.button.action_option[data-panel="settings_eventTimeout"]', gameActions);
+            if ($actionButton.length){
+                var newValueTitle = '(1f/'+newValue+'ms)';
+                if (typeof gameSettings.customIndex.gameSpeeds !== 'undefined'){
+                    var gameSpeedIndex = gameSettings.customIndex.gameSpeeds;
+                    newValueTitle = gameSpeedIndex[newValue]['name'];
+                    }
+                $actionButton.find('.value').html(newValueTitle);
+                }
+            };
+        gameSettingsChangeEvents['eventTimeout'](gameSettings.eventTimeout);
+
+        // Define a change event for whenever this game setting is altered
+        gameSettingsChangeEvents['eventCrossFade'] = function(newValue){
+            //console.log('setting eventCrossFade to ', newValue, ' w/ timeout at ', gameSettings.eventTimeout);
+            updateCameraShiftTransitionDuration();
+            };
+        gameSettingsChangeEvents['eventCrossFade'](gameSettings.eventCrossFade);
+
+        // Define a change event for whenever this game setting is altered
+        gameSettingsChangeEvents['eventCameraShift'] = function(newValue){
+            //console.log('setting eventCameraShift to ', newValue);
+            updateCameraShiftTransitionDuration(0);
+            if (newValue === false){
+                mmrpg_canvas_camera_shift();
+                }
+            else if (newValue === true
+                && gameSettings.currentActionPanel !== 'loading'
+                && !mmrpgEvents.length){
+                canvasAnimationCameraShift = {
+                    shift: 'left',
+                    focus: 'active',
+                    depth: 0,
+                    depthInc: 1,
+                    offset: 0,
+                    };
+                }
+            updateCameraShiftTransitionDuration();
+            };
+        gameSettingsChangeEvents['eventCameraShift'](gameSettings.eventCameraShift);
 
         // Auto-highlight settings buttons that are "active"
         var settingsWithActiveStates = ['eventTimeout', 'eventCrossFade', 'spriteRenderMode'];
@@ -331,6 +528,7 @@ $(document).ready(function(){
             //console.log('gameEngine.submit() triggered, setting timeout');
             clearTimeout(gameEngineSubmitTimeout);
             gameEngineSubmitTimeout = false;
+            canvasAnimationCameraTimer = 0;
             requestAnimationFrame(function(){
                 gameEngineSubmitTimeout = setTimeout(gameEngineSubmitFunction, 120000);
                 });
@@ -649,11 +847,18 @@ function windowResizeUpdate(updateType){
 
     //console.log({windowWidth:windowWidth,windowHeight:windowHeight,gameWidth:gameWidth,gameHeight:gameHeight,gameSettings:gameSettings});
 
+    var windowModWidth = localStorage.getItem('mmrpg-window-width') || 'small';
+    var windowModHeight = localStorage.getItem('mmrpg-window-height') || 'small';
+
     // Check if the window is in landscape mode and update the session
     var thisRequestType = 'session';
     var thisRequestData = 'index_settings,windowFlag,';
-    if (windowWidth >= (1024 + 12)){ $('body').addClass('windowFlag_landscapeMode'); thisRequestData += 'landscapeMode'; }
-    else { $('body').removeClass('windowFlag_landscapeMode'); thisRequestData += 'portraitMode'; }
+    //if (windowWidth >= (1024 + 12)){ $('body').addClass('windowFlag_landscapeMode'); thisRequestData += 'landscapeMode'; }
+    //if (Math.ceil(windowModWidth === 'flex' ? windowWidth : gameWidth) >= 1024){ $('body').addClass('windowFlag_landscapeMode'); thisRequestData += 'landscapeMode'; }
+    //else { $('body').removeClass('windowFlag_landscapeMode'); thisRequestData += 'portraitMode'; }
+    $('body').removeClass('windowFlag_portraitMode'); // we hate "portraitMode" now
+    $('body').removeClass('windowFlag_landscapeMode'); // we hate "landscapeMode" now
+    thisRequestData += 'portraitMode'; // we still gotta send "portraitMode" every update I guess
     if (windowResizeUpdateTimeout !== false){ clearTimeout(windowResizeUpdateTimeout); }
     windowResizeUpdateTimeout = setTimeout(function(){
         $.post('scripts/script.php',{requestType:thisRequestType,requestData:thisRequestData});
@@ -762,17 +967,103 @@ function localFunction(myMessage){
     alert(myMessage);
 }
 
-// Define a function for randomly animating canvas robots
+// Define a function for randomly animating canvas robots (idle animation, background animation, more)
 var backgroundDirection = 'left';
 var canvasAnimationTimeout = false;
+var canvasAnimationCameraShift = false;
+var canvasAnimationCameraLastShift = false;
+var canvasAnimationCameraTimer = 0;
+var canvasAnimationCameraDelay = 5;
 function mmrpg_canvas_animate(){
     //console.log('mmrpg_canvas_animate();');
+    //console.log('gameSettings.idleAnimation:', gameSettings.idleAnimation);
+    //console.log('canvasAnimationCameraTimer:', canvasAnimationCameraTimer, 'canvasAnimationCameraDelay:', canvasAnimationCameraDelay);
     //clearTimeout(canvasAnimationTimeout);
     clearInterval(canvasAnimationTimeout);
     if (!gameSettings.idleAnimation){  return false; }
+
     // Collect the current battle status and result
     var battleStatus = $('input[name=this_battle_status]', gameEngine).val();
     var battleResult = $('input[name=this_battle_result]', gameEngine).val();
+
+
+    // Check to see if we should skip camera animations for any reason
+    var skipCameraShift = false;
+    var currentGameState = gameSettings.currentGameState;
+    var currentAction = currentGameState['this_action'];
+    var currentActionPanel = gameSettings.currentActionPanel;
+    //console.log({eventCameraShift:gameSettings.eventCameraShift,currentActionPanel:gameSettings.currentActionPanel,mmrpgEventsLength:mmrpgEvents.length});
+    //console.log('currentGameState:', currentGameState);
+    //console.log('currentAction:', currentAction);
+    //console.log('currentActionPanel:', currentActionPanel);
+    if (currentActionPanel === 'loading' && currentAction === 'start'){ skipCameraShift = true; }
+    //console.log('skipCameraShift:', skipCameraShift);
+
+    // If the camera is not yet shifted, checked to see if we randomly should
+    if (!skipCameraShift
+        && gameSettings.eventCameraShift
+        && !mmrpgEvents.length){
+
+        // Increment the camera shift timer and, when ready, trigger some motion
+        //console.log('canvasAnimationCameraTimer = ', canvasAnimationCameraTimer);
+        var canvasAnimationCameraTimerMax = canvasAnimationCameraDelay;
+        if (battleStatus == 'complete'){ canvasAnimationCameraTimerMax = Math.ceil(canvasAnimationCameraTimerMax / 2); }
+        if (!canvasAnimationCameraShift
+            && canvasAnimationCameraTimer >= canvasAnimationCameraTimerMax){
+            var shiftRandom = Math.floor(Math.random() * 100);
+            if (shiftRandom <= 33){
+                var lastShift = canvasAnimationCameraLastShift;
+                if (typeof lastShift.shift !== 'undefined'){ var shiftDirection = lastShift.shift !== 'left' ? 'left' : 'right'; }
+                else { var shiftDirection = (shiftRandom % 2 === 0 ? 'left' : 'right'); }
+                var focusRandom = Math.floor(Math.random() * 100);
+                var depthRandom = Math.floor(Math.random() * 100);
+                canvasAnimationCameraShift = {
+                    shift: shiftDirection,
+                    focus: (focusRandom % 3 === 0 ? 'bench' : 'active'),
+                    depth: (depthRandom % 2 === 0 ? 0 : 8),
+                    depthInc: (depthRandom % 2 === 0 ? 1 : -1),
+                    offset: 0,
+                    };
+                if (battleStatus == 'complete'){
+                    if (battleResult == 'victory'){ canvasAnimationCameraShift.shift = 'left'; }
+                    else if (battleResult == 'defeat'){ canvasAnimationCameraShift.shift = 'right'; }
+                    }
+                canvasAnimationCameraTimer = 0;
+                canvasAnimationCameraLastShift = canvasAnimationCameraShift;
+                //console.log('canvasAnimationCameraShift:', canvasAnimationCameraShift);
+                }
+            }
+
+        // If the camera is currently being shifted, we need to animate that
+        if (canvasAnimationCameraShift){
+            canvasAnimationCameraShift.depth += canvasAnimationCameraShift.depthInc;
+            if (canvasAnimationCameraShift.depth > 8
+                || canvasAnimationCameraShift.depth < 1){
+                canvasAnimationCameraShift = false;
+                updateCameraShiftTransitionTiming();
+                updateCameraShiftTransitionDuration();
+                mmrpg_canvas_camera_shift();
+                } else {
+                mmrpg_canvas_camera_shift(
+                    canvasAnimationCameraShift.shift,
+                    canvasAnimationCameraShift.focus,
+                    canvasAnimationCameraShift.depth,
+                    canvasAnimationCameraShift.offset
+                    );
+                updateCameraShiftTransitionTiming('linear');
+                updateCameraShiftTransitionDuration(1);
+                }
+            } else {
+            canvasAnimationCameraTimer++;
+            }
+
+        } else {
+
+        // We should not be animating now
+        canvasAnimationCameraShift = false;
+
+        }
+
     // Loop through all field layers on the canvas
     $('.background[data-animate],.foreground[data-animate]', gameCanvas).each(function(){
         // Trigger an animation frame change for this field
@@ -801,12 +1092,14 @@ function mmrpg_canvas_animate(){
             //var mugshotSprite = $('.sprite[data-mugshotid='+spriteID+']', gameCanvas);
             //alert('Shadowsprite '+(shadowSprite.length ? 'exists' : 'does not exist')+'!');
             if (gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold){
+                //console.log('normal animation');
                 // We're at a normal speed, so we can animate normally
                 thisSprite.stop(true, true).animate({opacity:0},Math.ceil(gameSettings.eventTimeout / 2),'linear',function(){
                     $(this).remove();
                     if (shadowSprite.length){ shadowSprite.stop(true, true).animate({opacity:0},Math.ceil(gameSettings.eventTimeout / 2),'linear',function(){ $(this).remove(); }); }
                     });
                 } else {
+                //console.log('speedy animation');
                 // We're at a super-fast speed, so we should NOT cross-fade
                 thisSprite.stop(true, true).remove();
                 if (shadowSprite.length){ shadowSprite.stop(true, true).remove(); }
@@ -826,6 +1119,7 @@ function mmrpg_canvas_animate(){
         var thisRandom = Math.floor(Math.random() * 100);
         // Default the new frame to base
         var newFrame = 'base';
+        var extraStyles = {};
         // Define the relative battle result
         var relativeResult = 'pending';
         if (battleStatus == 'complete'){
@@ -840,26 +1134,31 @@ function mmrpg_canvas_animate(){
                 } else {
                 // Higher animation freqency if not active
                 if (thisPlayer.attr('data-position') != 'active'){
-                    if (battleStatus == 'complete' && thisRandom >= 60){
+                    if (battleStatus == 'complete' && thisRandom >= 50){
                         newFrame = relativeResult;
-                        } else if (thisRandom >= 30){
+                        } else if (thisRandom >= 80){
                         newFrame = 'taunt';
-                        } else if (thisRandom >= 10){
+                        } else if (thisRandom >= 60){
                         newFrame = 'base2';
                         }
                     } else {
-                    if (battleStatus == 'complete' && thisRandom >= 60){
+                    if (battleStatus == 'complete' && thisRandom >= 50){
                         newFrame = relativeResult;
-                        } else if (thisRandom >= 30){
+                        } else if (thisRandom >= 80){
                         newFrame = 'taunt';
-                        } else if (thisRandom >= 10){
+                        } else if (thisRandom >= 60){
                         newFrame = 'base2';
                         }
                     }
                 }
+            // Check to see if we should be applying any extra styles
+            if (newFrame !== 'base' && thisRandom % 11 === 0){ extraStyles = {transform: 'scaleX(-1) translateX(-10%)'}; }
+            else if (thisRandom % 3 === 0){ extraStyles = {transform: ''}; }
             }
+
         // Trigger the player frame advancement
-        mmrpg_canvas_player_frame(thisPlayer, newFrame);
+        //console.log('thisRandom:', thisRandom, 'newFrame:', newFrame, 'extraStyles:', extraStyles);
+        mmrpg_canvas_player_frame(thisPlayer, newFrame, extraStyles);
 
         });
 
@@ -872,7 +1171,9 @@ function mmrpg_canvas_animate(){
         // Ensure the robot has not been disabled
         if (thisRobot.attr('data-status') != 'disabled'){
             // Generate a random number
+            var shiftChance = Math.floor(Math.random() * 100);
             var thisRandom = Math.floor(Math.random() * 100);
+            //console.log('shiftChance =', shiftChance);
             // Default the new frame to base
             var newFrame = 'base';
             var currentFrame = thisRobot.attr('data-frame');
@@ -893,7 +1194,7 @@ function mmrpg_canvas_animate(){
                         // Animation freqency based on position
                         if (thisRobot.attr('data-position') != 'active'){
                             // Higher animation freqency if not active (BENCH)
-                            if (battleStatus == 'complete' && thisRandom >= 50){
+                            if (battleStatus == 'complete' && shiftChance >= 90){
                                 newFrame = relativeResult;
                                 } else if (thisRandom >= 80){
                                 newFrame = 'base2';
@@ -904,7 +1205,7 @@ function mmrpg_canvas_animate(){
                                 }
                             } else {
                             // Lower animation freqency if active (ACTIVE)
-                            if (battleStatus == 'complete' && thisRandom >= 50){
+                            if (battleStatus == 'complete' && shiftChance >= 80){
                                 newFrame = relativeResult;
                                 } else if (thisRandom >= 90){
                                 newFrame = 'base2';
@@ -924,12 +1225,17 @@ function mmrpg_canvas_animate(){
             var shadowSprite = $('.sprite[data-shadowid='+spriteID+']', gameCanvas);
             if (shadowSprite.length){ mmrpg_canvas_robot_frame(shadowSprite, newFrame);  }
 
-            } else if (thisRobot.attr('data-status') == 'disabled' && thisRobot.attr('data-direction') == 'right'){
+            }
+        else if (thisRobot.attr('data-status') == 'disabled' && thisRobot.attr('data-direction') == 'right'){
+
             // Default the new frame to base
             //var newFrame = 'base';
             // Trigger the robot frame advancement
             //mmrpg_canvas_robot_frame(thisRobot, newFrame);
-            } else {
+
+            }
+        else {
+
             //alert('robot is disabled');
             // Fade this robot off-screen
             var spriteKind = thisRobot.attr('data-type');
@@ -945,7 +1251,6 @@ function mmrpg_canvas_animate(){
                 if (detailsSprite.length){ detailsSprite.stop(true, true).animate({opacity:0},1000,'linear',function(){ $(this).remove(); }); }
                 if (mugshotSprite.length){ mugshotSprite.stop(true, true).animate({opacity:0},1000,'linear',function(){ $(this).remove(); }); }
                 });
-
 
             }
 
@@ -1019,6 +1324,7 @@ function mmrpg_canvas_robot_frame(thisRobot, newFrame){
     var thisPosition = thisRobot.attr('data-position');
     var thisDirection = thisRobot.attr('data-direction');
     var thisStatus = thisRobot.attr('data-status');
+    var thisKey = parseInt(thisRobot.attr('data-key'));
     var thisFrame = thisRobot.attr('data-frame');
     var isShadow = thisRobot.attr('data-shadowid') != undefined ? true : false;
     var newFramePosition = spriteFrameIndex.robots.indexOf(newFrame) || 0;
@@ -1044,6 +1350,21 @@ function mmrpg_canvas_robot_frame(thisRobot, newFrame){
         thisRobot.stop(true, true).css({opacity:0,backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).removeClass(currentClass).addClass(newClass);
         thisRobot.stop(true, true).animate({opacity:1}, {duration:400,easing:'swing',queue:false});
         cloneRobot.stop(true, true).animate({opacity:0}, {duration:400,easing:'swing',queue:false,complete:function(){ $(this).remove(); }});
+        /*
+        // Maybe play a sound effect if allowed and frame is correct?
+        // No I hate it now, this can't work until everyone's movements
+        // are independent of the event timer and more organic sounding
+        if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
+            if (newFrame === 'defend' || newFrame === 'taunt'){
+                if (thisPosition === 'bench'){
+                    var delay = 100 + (thisKey + 50);
+                    setTimeout(function(){ top.mmrpg_play_sound_effect('defend-sound', {volume: 0.1}, false); }, delay);
+                    } else {
+                    top.mmrpg_play_sound_effect('defend-sound', {volume: 0.1}, false);
+                    }
+                }
+            }
+        */
         } else {
         // Update the existing sprite's frame without crossfade by swapping the classsa
         thisRobot.stop(true, true).css({backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).removeClass(currentClass).addClass(newClass);
@@ -1056,7 +1377,7 @@ function mmrpg_canvas_robot_frame(thisRobot, newFrame){
 
 // Define a function for updating a player's frame with animation
 spriteFrameIndex.players = ['base','taunt','victory','defeat','command','damage','base2'];
-function mmrpg_canvas_player_frame(thisPlayer, newFrame){
+function mmrpg_canvas_player_frame(thisPlayer, newFrame, extraStyles){
     // Collect this player's data fields
     var thisSize = thisPlayer.attr('data-size');
     var thisPosition = thisPlayer.attr('data-position');
@@ -1064,6 +1385,7 @@ function mmrpg_canvas_player_frame(thisPlayer, newFrame){
     var thisStatus = thisPlayer.attr('data-status');
     var thisFrame = thisPlayer.attr('data-frame');
     var newFramePosition = spriteFrameIndex.players.indexOf(newFrame) || 0;
+    if (typeof extraStyles !== 'object' || !extraStyles){ extraStyles = false; }
     //if (true){ alert(newFrame+' : '+newFramePosition); }
     // If the new frame is the same as the current, return
     if (thisFrame == newFrame){ return false; }
@@ -1080,11 +1402,13 @@ function mmrpg_canvas_player_frame(thisPlayer, newFrame){
         // Create a clone object with the new class and crossfade it into view
         var clonePlayer = thisPlayer.clone().css('z-index', '-=1').appendTo(thisPlayer.parent());
         thisPlayer.stop(true, true).css({opacity:0,backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).removeClass(currentClass).addClass(newClass);
+        if (extraStyles){ thisPlayer.css(extraStyles); }
         thisPlayer.stop(true, true).animate({opacity:1}, {duration:400,easing:'swing',queue:false});
         clonePlayer.stop(true, true).animate({opacity:0}, {duration:400,easing:'swing',queue:false,complete:function(){ $(this).remove(); }});
         } else {
         // Update the existing sprite's frame without crossfade by swapping the classsa
         thisPlayer.stop(true, true).css({backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).removeClass(currentClass).addClass(newClass);
+        if (extraStyles){ thisPlayer.css(extraStyles); }
         }
     // Return true on success
     return true;
@@ -1184,7 +1508,7 @@ function mmrpg_canvas_attachment_frame(thisAttachment, newFrame){
 
 // Define a function for triggering an action submit
 function mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel){
-    //alert('thisAction : '+thisAction);
+    //console.log('thisAction : '+thisAction);
     // Return false if this is a continue click
     if (thisAction == 'continue'){ return false; }
     if (thisTarget == undefined){ thisTarget = 'auto'; }
@@ -1233,7 +1557,8 @@ function mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel){
         mmrpg_engine_update({this_action_token:thisAbility});
         thisAction = 'ability';
 
-        } else if (thisAction.match(/^item_([-a-z0-9_]+)$/i)){
+        }
+    else if (thisAction.match(/^item_([-a-z0-9_]+)$/i)){
 
         // Parse the item token and clean the main action token
         var thisItem = thisAction.replace(/^item_([-a-z0-9_]+)$/i, '$1');
@@ -1262,21 +1587,24 @@ function mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel){
         mmrpg_engine_update({this_action_token:thisItem});
         thisAction = 'item';
 
-        } else if (thisAction.match(/^switch_([-a-z0-9_]+)$/i)){
+        }
+    else if (thisAction.match(/^switch_([-a-z0-9_]+)$/i)){
 
         // Parse the switch token and clean the main action token
         var thisSwitch = thisAction.replace(/^switch_([-a-z0-9_]+)$/i, '$1');
         mmrpg_engine_update({this_action_token:thisSwitch});
         thisAction = 'switch';
 
-        } else if (thisAction.match(/^scan_([-a-z0-9_]+)$/i)){
+        }
+    else if (thisAction.match(/^scan_([-a-z0-9_]+)$/i)){
 
         // Parse the scan token and clean the main action token
         var thisScan = thisAction.replace(/^scan_([-a-z0-9_]+)$/i, '$1');
         mmrpg_engine_update({this_action_token:thisScan});
         thisAction = 'scan';
 
-        } else if (thisAction.match(/^target_([-a-z0-9_]+)$/i)){
+        }
+    else if (thisAction.match(/^target_([-a-z0-9_]+)$/i)){
 
         // Parse the target token and clean the main action token
         var thisTarget = thisAction.replace(/^target_([-a-z0-9_]+)$/i, '$1');
@@ -1286,7 +1614,8 @@ function mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel){
         mmrpg_engine_update({target_robot_token:thisTarget[1]});
         thisAction = '';
 
-        } else if (thisAction.match(/^settings_([-a-z0-9]+)_([-a-z0-9_]+)$/i)){
+        }
+    else if (thisAction.match(/^settings_([-a-z0-9]+)_([-a-z0-9_]+)$/i)){
 
         // Parse the settings token and value, then clean the action token
         var thisSettingToken = thisAction.replace(/^settings_([-a-z0-9]+)_([-a-z0-9_]+)$/i, '$1');
@@ -1426,6 +1755,9 @@ function mmrpg_engine_update(newValues){
         // Loop through the game engine values and update them
         for (var thisName in newValues){
             var thisValue = newValues[thisName];
+            // Update the value in the global settings object
+            gameSettings.currentGameState[thisName] = thisValue;
+            // And then also update it in the DOM for form submission
             if ($('input[name='+thisName+']', gameEngine).length){
                 $('input[name='+thisName+']', gameEngine).val(thisValue);
                 } else {
@@ -1437,6 +1769,9 @@ function mmrpg_engine_update(newValues){
 
 // Define a function for switching to a different action panel
 function mmrpg_action_panel(thisPanel, currentPanel){
+
+    // Update the current panel in the game settings for reference
+    gameSettings.currentActionPanel = thisPanel;
 
     // Switch to the event actions panel
     $('.wrapper', gameActions).css({display:'none'});
@@ -1534,6 +1869,7 @@ String.prototype.replaceAll = function(search, replace) {
 var actionPanelCache = [];
 function mmrpg_action_panel_update(thisPanel, thisMarkup){
     // Update the requested panel with the supplied markup
+    //console.log('mmrpg_action_panel_update('+thisPanel+', [thisMarkup])');
     var thisActionPanel = $('#actions_'+thisPanel, gameActions);
     thisActionPanel.empty().html(thisMarkup);
     // Search for any sprites in this panel's markup
@@ -1556,7 +1892,7 @@ function mmrpg_event(flagsMarkup, dataMarkup, canvasMarkup, consoleMarkup){
     if (dataMarkup.length){ dataMarkup = $.parseJSON(dataMarkup); }
     else { dataMarkup = {}; }
     mmrpgEvents.push({
-        'event_functions' : function(){
+        'event_functions' : function(eventFlags){
             if (dataMarkup.length){
                 //dataMarkup = $.parseJSON(dataMarkup);
                 /*
@@ -1571,32 +1907,53 @@ function mmrpg_event(flagsMarkup, dataMarkup, canvasMarkup, consoleMarkup){
                 */
                 }
             if (canvasMarkup.length){
-                mmrpg_canvas_event(canvasMarkup); //, flagsMarkup
+                mmrpg_canvas_event(canvasMarkup, eventFlags); //, flagsMarkup
                 }
             if (consoleMarkup.length){
-                mmrpg_console_event(consoleMarkup);  //, flagsMarkup
+                mmrpg_console_event(consoleMarkup, eventFlags);  //, flagsMarkup
                 }
             },
         'event_flags' : flagsMarkup //$.parseJSON(flagsMarkup)
             });
+    //console.log('mmrpgEvents.push() w/ new size', mmrpgEvents.length);
 }
 // Define a function for playing the events
+var eventAlreadyQueued = false;
+var battleResultsDisplayed = false;
 function mmrpg_events(){
+
+    if (eventAlreadyQueued){ return; }
 
     //console.log('mmrpg_events()');
     //clearTimeout(canvasAnimationTimeout);
     clearInterval(canvasAnimationTimeout);
+    canvasAnimationCameraTimer = 0;
+    updateCameraShiftTransitionTiming();
+    updateCameraShiftTransitionDuration();
 
     var thisEvent = false;
     if (mmrpgEvents.length){
+        //console.log('mmrpgEvents.length =', mmrpgEvents.length);
         // Switch to the events panel
         mmrpg_action_panel('event');
         // Collect the topmost event and execute it
         thisEvent = mmrpgEvents.shift();
-        thisEvent.event_functions();
+        thisEvent.event_functions(thisEvent.event_flags);
+        // Loop through eventhooks functions if there are any in gameSettings.eventHooks and process them with this event
+        if (gameSettings.eventHooks.length){
+            $.each(gameSettings.eventHooks, function(){
+                var thisEventHook = this;
+                if (typeof thisEventHook == 'function'){ thisEventHook(thisEvent.event_flags); }
+                });
+            }
         }
 
     if (mmrpgEvents.length < 1){
+        // Assuming we're allowed to use camera stuff, reset the camera if it's not already
+        if (gameSettings.eventCameraShift){
+            //console.log('events are done, reset the camera');
+            mmrpg_canvas_camera_shift();
+        }
         // Switch to the specified "next" action
         var nextAction = $('input[name=next_action]', gameEngine).val();
         if (nextAction.length){ mmrpg_action_panel(nextAction); }
@@ -1608,11 +1965,16 @@ function mmrpg_events(){
         } else if (mmrpgEvents.length >= 1){
             var autoClickTimer = false;
             if (gameSettings.eventAutoPlay && thisEvent.event_flags.autoplay != false){
-                requestAnimationFrame(function(){
-                    autoClickTimer = setTimeout(function(){
+                //console.log('queue next event');
+                eventAlreadyQueued = true;
+                clearTimeout(autoClickTimer);
+                autoClickTimer = setTimeout(function(){
+                    requestAnimationFrame(function(){
+                        //console.log('fire next event');
+                        eventAlreadyQueued = false;
                         mmrpg_events();
-                        }, parseInt(gameSettings.eventTimeout));
-                    });
+                        });
+                    }, parseInt(gameSettings.eventTimeout));
                 $('a[data-action="continue"]').addClass('button_disabled');
                 } else {
                 $('a[data-action="continue"]').removeClass('button_disabled');
@@ -1630,47 +1992,120 @@ function mmrpg_events(){
     var battleResult = $('input[name=this_battle_result]', gameEngine).val();
 
     // Check for specific value triggers and execute events
-    if (battleStatus == 'complete'){
+    if (battleStatus == 'complete'
+        && battleResultsDisplayed === false){
         //console.log('checkpoint | battleStatus='+battleStatus+' battleResult='+battleResult);
-        // Collect object referenences for the two sound objects
-        //var musicController = document.getElementById('volumeControl_musicLevels');
-        var musicController = $('#volumeControl_musicLevels');
-        //var soundController = document.getElementById('volumeControl_soundLevels');
-        var soundController = $('#volumeControl_soundLevels');
-        // Collect the current volume of the background music
-        var musicVolume = musicController.volume;
+        //console.log('thisEvent.event_flags =', thisEvent.event_flags);
+
         // Based on the battle result, play the victory or defeat music
-        if (battleResult == 'victory' && thisEvent.event_flags.victory != undefined && thisEvent.event_flags.victory != false){
+        if (battleResult == 'victory'
+            && typeof thisEvent.event_flags.victory !== 'undefined'
+            && thisEvent.event_flags.victory === true){
             // Play the victory music
             //console.log('mmrpg_events() / Play the victory music');
-            parent.mmrpg_music_load('misc/battle-victory', false, true);
-            } else if (battleResult == 'defeat' && thisEvent.event_flags.defeat != undefined && thisEvent.event_flags.defeat != false){
+            parent.mmrpg_music_volume(0, false);
+            parent.mmrpg_play_sound_effect('battle-victory-sound');
+            setTimeout(function(){
+                parent.mmrpg_music_load('misc/leader-board', true, false);
+                //parent.mmrpg_reset_music_volume();
+                }, 1000);
+            if (mmrpgEvents.length < canvasAnimationCameraDelay){ canvasAnimationCameraTimer = canvasAnimationCameraDelay - mmrpgEvents.length; }
+            battleResultsDisplayed = true;
+            }
+        if (battleResult == 'defeat'
+            && typeof thisEvent.event_flags.defeat !== 'undefined'
+            && thisEvent.event_flags.defeat === true){
             // Play the failure music
             //console.log('mmrpg_events() / Play the failure music');
-            parent.mmrpg_music_load('misc/battle-defeat', false, true);
+            parent.mmrpg_music_volume(0, false);
+            parent.mmrpg_play_sound_effect('battle-defeat-sound');
+            setTimeout(function(){
+                parent.mmrpg_music_load('misc/leader-board', true, false);
+                //parent.mmrpg_reset_music_volume();
+                }, 2500);
+            if (mmrpgEvents.length < canvasAnimationCameraDelay){ canvasAnimationCameraTimer = canvasAnimationCameraDelay - mmrpgEvents.length; }
+            battleResultsDisplayed = true;
             }
+
         }
 
 
 }
 
 // Define a function for creating a new layer on the canvas
-function mmrpg_canvas_event(thisMarkup){ //, flagsMarkup
+function mmrpg_canvas_event(thisMarkup, eventFlags){ //, flagsMarkup
     var thisContext = $('.wrapper', gameCanvas);
     if (thisContext.length){
+        //console.log('mmrpg_canvas_event(thisMarkup, eventFlags) | eventFlags =', eventFlags);
+        //console.log('gameSettings.eventTimeout =', gameSettings.eventTimeout, 'gameSettings.eventTimeoutThreshold =', gameSettings.eventTimeoutThreshold);
         // Drop all the z-indexes to a single amount
         $('.event:not(.sticky)', thisContext).css({zIndex:500});
         // Calculate the top offset based on previous event height
         var eventTop = $('.event:not(.sticky):first-child', thisContext).outerHeight();
         // Prepend the event to the current stack but bring it to the front
-        var thisEvent = $('<div class="event clearback">'+thisMarkup+'</div>');
+        var thisEvent = $('<div class="event event_frame clearback">'+thisMarkup+'</div>');
         thisEvent.css({opacity:0.0,zIndex:600});
         thisContext.prepend(thisEvent);
+
         // Wait for all the event's assets to finish loading
         thisEvent.waitForImages(function(){
 
             // Find all the details in this event markup and move them to the sticky
             $(this).find('.details').addClass('hidden').css({opacity:0}).appendTo('.event_details', gameCanvas);
+
+            // If camera shift settings are enabled, we can process them
+            if (gameSettings.eventCameraShift){
+                // If this event has any camera action going on, make sure we update the canvas
+                var currentShift = thisContext.attr('data-camera-shift') || '';
+                var currentFocus = thisContext.attr('data-camera-focus') || '';
+                var currentDepth = thisContext.attr('data-camera-depth') || '';
+                var currentOffset = thisContext.attr('data-camera-offset') || '';
+                var newCameraShift = '';
+                var newCameraFocus = '';
+                var newCameraDepth = 0;
+                var newCameraOffset = 0;
+                // Check to see if camera shift settings were provided in the frame
+                if (typeof eventFlags.camera !== 'undefined'
+                    && eventFlags.camera !== false){
+                    //console.log('we have camera action!', eventFlags.camera);
+                    newCameraShift = eventFlags.camera.side;
+                    newCameraFocus = eventFlags.camera.focus;
+                    newCameraDepth = eventFlags.camera.depth;
+                    newCameraOffset = eventFlags.camera.offset;
+                }
+                // If any of the shift values have changed, we need to update everything
+                if (currentShift !== newCameraShift
+                    || currentFocus !== newCameraFocus
+                    || currentDepth !== newCameraDepth
+                    || newCameraOffset !== newCameraOffset){
+                    mmrpg_canvas_camera_shift(newCameraShift, newCameraFocus, newCameraDepth, newCameraOffset);
+                }
+            }
+
+            // If found effect settings are enabled, we can process them
+            if (gameSettings.eventSoundEffects
+                && typeof top.mmrpg_play_sound_effect !== 'undefined'){
+                //console.log('we can react to sound effects!');
+                //console.log('eventFlags =', eventFlags);
+                // Check to see if camera shift settings were provided in the frame
+                if (typeof eventFlags.sounds !== 'undefined'
+                    && eventFlags.sounds !== false){
+                    //console.log('we have sound effect(s)!', eventFlags.sounds);
+                    for (var i = 0; i < eventFlags.sounds.length; i++){
+                        var effectConfig = eventFlags.sounds[i];
+                        var effectName = effectConfig.name;
+                        //console.log('effectName =', effectName);
+                        //console.log('effectConfig =', effectConfig);
+                        if (typeof effectConfig.delay === 'number'){
+                            setTimeout(function(){
+                                top.mmrpg_play_sound_effect(effectName, effectConfig, false);
+                                }, effectConfig.delay);
+                            } else {
+                            top.mmrpg_play_sound_effect(effectName, effectConfig, false);
+                            }
+                    }
+                }
+            }
 
             // If we're allowed to cross-fade transition the normal way, otherwise straight-up replace the event
             if (gameSettings.eventCrossFade === true){
@@ -1711,7 +2146,8 @@ function mmrpg_canvas_event(thisMarkup){ //, flagsMarkup
                     $(this).css({zIndex:500});
                     }
 
-                } else {
+            }
+            else {
 
                     // Make sure the new event is visible then remove the old ones
                     $(this).css({opacity:1.0,zIndex:500});
@@ -1720,7 +2156,7 @@ function mmrpg_canvas_event(thisMarkup){ //, flagsMarkup
                     $('.details', thisContext).css({opacity:1}).removeClass('hidden');
                     $('.event:not(.sticky):gt(0)', thisContext).remove();
 
-                }
+            }
 
             // Loop through all field layers on the canvas and trigger animations
             $('.background[data-animate],.foreground[data-animate]', gameCanvas).each(function(){
@@ -1762,10 +2198,108 @@ function mmrpg_canvas_update(thisBattle, thisPlayer, thisRobot, targetPlayer, ta
 }
 
 
+// Define a change event for whenever this game setting is altered
+gameSettings.currentCameraShift = {shift:'',focus:'',depth:'',offset:''};
+function mmrpg_canvas_camera_shift(newCameraShift, newCameraFocus, newCameraDepth, newCameraOffset){
+    //console.log('mmrpg_canvas_camera_shift() w/ ', newCameraShift, newCameraFocus, newCameraDepth, newCameraOffset);
+
+    if (typeof newCameraShift === 'undefined' || !newCameraShift){ newCameraShift = ''; }
+    if (typeof newCameraFocus === 'undefined' || !newCameraFocus){ newCameraFocus = ''; }
+    if (typeof newCameraDepth === 'undefined' || !newCameraDepth){ newCameraDepth = 0; }
+    if (typeof newCameraOffset === 'undefined' || !newCameraOffset){ newCameraOffset = 0; }
+    //console.log('mmrpg_canvas_camera_shift() w/ ', newCameraShift, newCameraFocus, newCameraDepth, newCameraOffset);
+
+    // Collect the canvas context and immediately return false if not exists
+    var thisContext = $('.wrapper', gameCanvas);
+    if (!thisContext.length){ return false; }
+
+    // Collect current shift values for reference and updating
+    var currentCameraShift = gameSettings.currentCameraShift;
+    //console.log('currentCameraShift:', currentCameraShift);
+
+    // If the values haven't changed at all, we should just return
+    if (currentCameraShift.shift === newCameraShift
+        && currentCameraShift.focus === newCameraFocus
+        && currentCameraShift.depth === newCameraDepth
+        && currentCameraShift.offset === newCameraOffset){
+        return;
+    }
+
+    // Update the data attributes on the canvas wrapper
+    currentCameraShift.shift = newCameraShift;
+    currentCameraShift.focus = newCameraFocus;
+    currentCameraShift.depth = newCameraDepth;
+    currentCameraShift.offset = newCameraOffset;
+    thisContext.attr('data-camera-shift', newCameraShift);
+    thisContext.attr('data-camera-focus', newCameraFocus);
+    thisContext.attr('data-camera-depth', newCameraDepth);
+    thisContext.attr('data-camera-offset', newCameraOffset);
+    var offsetCameraDepth = newCameraDepth + newCameraOffset;
+    if (offsetCameraDepth < -8){ offsetCameraDepth - -8; }
+    else if (offsetCameraDepth > 8){ offsetCameraDepth = 8; }
+
+    // This first value is used for camera shifts on the bench
+    if (offsetCameraDepth !== 0){
+        var diffValue = ((Math.abs(offsetCameraDepth) - 1) * 0.1);
+        var depthModValue = 1 - diffValue;
+        if (offsetCameraDepth < 0){ depthModValue = depthModValue * -1; }
+        updateCameraShiftVariable('depth-mod', depthModValue);
+    } else {
+        updateCameraShiftVariable('depth-mod', 1);
+    }
+
+    // This second value is used for camera shifts in the foreground
+    if (offsetCameraDepth !== 0){
+        var diffValue = ((Math.abs(offsetCameraDepth) - 1) * 0.1);
+        var depthMod2Value = 1.8 - diffValue;
+        if (offsetCameraDepth < 0){ depthMod2Value = depthMod2Value * -1; }
+        updateCameraShiftVariable('depth-mod2', depthMod2Value);
+    } else {
+        updateCameraShiftVariable('depth-mod2', 1.8);
+    }
+
+}
+
+// Define a function for easily updating camera-related CSS variables on the canvas
+function updateCameraShiftVariable(varName, varValue){
+    //console.log('updateCameraShiftVariable((varName:', varName, ', varValue:', varValue, ')');
+    var cssVarName = '--camera-shift-'+varName;
+    var cssVarValue = varValue;
+    //console.log('setting '+cssVarName+' to:', cssVarValue);
+    document.documentElement.style.setProperty(cssVarName, cssVarValue);
+}
+
+// Define a quick function for updating the camera shift transition timing variable
+function updateCameraShiftTransitionTiming(newValue){
+    //console.log('updateCameraShiftTransitionTiming(', newValue, ')');
+    if (typeof newValue !== 'string' || !newValue){ newValue = 'ease'; }
+    var transitionTimingValue = newValue;
+    updateCameraShiftVariable('transition-timing', transitionTimingValue);
+};
+
+// Define a quick function for updating the camera shift transition duration variable
+function updateCameraShiftTransitionDuration(newValue){
+    //console.log('updateCameraShiftTransitionDuration(', typeof newValue, newValue, ')');
+    if (typeof newValue !== 'number'){ newValue = 0.5; }
+    var transitionDurationValue = (function(modValue){
+        //console.log('transitionDurationValue(', modValue, ')');
+        if (typeof modValue !== 'number'){ modValue = 1; }
+        var duration = Math.ceil(gameSettings.eventTimeout * modValue);
+        if (!gameSettings.eventCrossFade){ duration = 0; }
+        else if (!gameSettings.eventCameraShift){ duration = 0; }
+        else if (gameSettings.eventTimeout <= gameSettings.eventTimeoutThreshold){ duration = 0; }
+        var cssValue = duration > 0 ? (duration / 1000)+'s' : 'none';
+        //console.log('duration:', duration, 'cssValue:', cssValue);
+        return cssValue;
+        })(newValue);
+    updateCameraShiftVariable('transition-duration', transitionDurationValue);
+};
+
 // Define a function for appending a event to the console window
-function mmrpg_console_event(thisMarkup){ //, flagsMarkup
+function mmrpg_console_event(thisMarkup, eventFlags){ //, flagsMarkup
     var thisContext = $('.wrapper', gameConsole);
     if (thisContext.length){
+        //console.log('mmrpg_console_event(thisMarkup, eventFlags) | eventFlags =', eventFlags);
         // Append the event to the current stack
         //thisContext.prepend('<div class="event" style="top: -100px;">'+thisMarkup+'</div>');
         thisContext.prepend(thisMarkup);
@@ -1832,34 +2366,137 @@ function mmrpg_stop_animation(){
     return gameSettings.idleAnimation;
 }
 
-// Define a function for toggling the music player
-var mmrpgMusicInit = false;
-var musicStreamObject = false;
-var mmrpgMusicEndedDefault = function(){ /*console.log('default music ended event triggered, this.play()!');*/ musicStreamObject.play(); return false; };
+
+// -- AUDIO FUNCTIONS -- //
+
+// If our dependency, the Howler.js library, is not loaded, then we'll define a dummy function to prevent errors
+if (typeof window.Howl === 'undefined'){
+    var no = function(){ return false; };
+    Howl = function(){
+        return {
+            play: no,
+            playing: no,
+            stop: no,
+            pause: no,
+            volume: no,
+            fade: no
+            }
+        };
+}
+
+// Define required music objects to handle audio playback and set up some defaults
+var mmrpgMusicSound = false;
+var mmrpgMusicConfig = {};
+var mmrpgFanfareSound = false;
+var mmrpgMusicEndedDefault = function(){ /* ... */ };
+var mmrpgFanfareEndedDefault = function(){ /* ... */ };
 var mmrpgMusicEnded = mmrpgMusicEndedDefault;
+var mmrpgFanfareEnded = mmrpgFanfareEndedDefault;
+var mmrpgMusicInit = false;
+
+// Define a function for adjusting the master volume of basically everything
+function mmrpg_master_volume(newMasterVolume, saveToSettings, updateMusic, updateSoundEffects){
+    if (!mmrpgMusicSound){ return false; }
+    if (!gameSettings.soundEffectPool){ return false; }
+    //console.log('mmrpg_master_volume(newMasterVolume:', newMasterVolume, ', saveToSettings:', saveToSettings, ', updateMusic:', updateMusic, ', updateSoundEffects:', updateSoundEffects, ')');
+    //console.log('mmrpg_master_volume // gameSettings.masterVolume =', gameSettings.masterVolume);
+    //console.log('mmrpg_master_volume // gameSettings.musicVolume =', gameSettings.musicVolume);
+    //console.log('mmrpg_master_volume // gameSettings.effectVolume =', gameSettings.effectVolume);
+    if (typeof saveToSettings !== 'boolean'){ saveToSettings = true; }
+    if (typeof updateMusic !== 'boolean'){ updateMusic = true; }
+    if (typeof updateSoundEffects !== 'boolean'){ updateSoundEffects = true; }
+    if (newMasterVolume < 0){ newMasterVolume = 0; }
+    if (newMasterVolume > 1){ newMasterVolume = 1; }
+    var currentMasterVolume = gameSettings.masterVolume;
+    //console.log('mmrpg_master_volume // adjusted currentMasterVolume =', currentMasterVolume);
+    //console.log('mmrpg_master_volume // adjusted newMasterVolume =', newMasterVolume);
+    gameSettings.masterVolume = newMasterVolume;
+    if (updateMusic){ mmrpg_music_volume(gameSettings.musicVolume, saveToSettings, 0); }
+    if (updateSoundEffects){ mmrpg_sound_effect_volume(gameSettings.effectVolume, saveToSettings); }
+    if (!saveToSettings){ gameSettings.masterVolume = currentMasterVolume; }
+}
+// Define a function for adjusting the currently playing music's volume
+function mmrpg_music_volume(newVolume, saveToSettings, fadeDuration){
+    if (!mmrpgMusicSound){ return false; }
+    //console.log('mmrpg_music_volume(newVolume:', newVolume, ', saveToSettings:', saveToSettings, ', fadeDuration:', fadeDuration, ')');
+    //console.log('mmrpg_music_volume // gameSettings.masterVolume =', gameSettings.masterVolume);
+    //console.log('mmrpg_music_volume // gameSettings.musicVolume =', gameSettings.musicVolume);
+    //console.log('mmrpg_music_volume // gameSettings.effectVolume =', gameSettings.effectVolume);
+    if (typeof saveToSettings !== 'boolean'){ saveToSettings = true; }
+    if (typeof fadeDuration !== 'number'){ fadeDuration = 500; }
+    if (newVolume < 0){ newVolume = 0; }
+    if (newVolume > 1){ newVolume = 1; }
+    if (saveToSettings){ gameSettings.musicVolume = newVolume; }
+    //console.log('mmrpg_music_volume // adjusted newVolume =', newVolume);
+    var currentMusicVolume = gameSettings.musicVolume * gameSettings.masterVolume;
+    var relativeMusicVolume = newVolume * gameSettings.masterVolume;
+    //console.log('mmrpg_music_volume // currentMusicVolume =', currentMusicVolume);
+    //console.log('mmrpg_music_volume // relativeMusicVolume =', relativeMusicVolume);
+    if (fadeDuration > 0){ mmrpgMusicSound.fade(currentMusicVolume, relativeMusicVolume, fadeDuration);  }
+    else { mmrpgMusicSound.volume(relativeMusicVolume); }
+}
+// Define a function for resetting the currently playing music's volume
+function mmrpg_reset_music_volume(fadeDuration){
+    if (!mmrpgMusicSound){ return false; }
+    //console.log('mmrpg_reset_music_volume(fadeDuration:', fadeDuration, ')');
+    //console.log('mmrpg_reset_music_volume // gameSettings.masterVolume =', gameSettings.masterVolume);
+    //console.log('mmrpg_reset_music_volume // gameSettings.musicVolume =', gameSettings.musicVolume);
+    //console.log('mmrpg_reset_music_volume // gameSettings.effectVolume =', gameSettings.effectVolume);
+    if (typeof fadeDuration !== 'number'){ fadeDuration = 500; }
+    var resetToVolume = gameSettings.musicVolume;
+    if (resetToVolume < 0){ resetToVolume = 0; }
+    if (resetToVolume > 1){ resetToVolume = 1; }
+    //console.log('mmrpg_reset_music_volume // calculated resetToVolume =', resetToVolume);
+    var currentMusicVolume = mmrpgMusicSound.volume();
+    var relativeMusicVolume = resetToVolume * gameSettings.masterVolume;
+    //console.log('mmrpg_reset_music_volume // currentMusicVolume =', currentMusicVolume);
+    //console.log('mmrpg_reset_music_volume // relativeMusicVolume =', relativeMusicVolume);
+    if (fadeDuration > 0){ mmrpgMusicSound.fade(currentMusicVolume, relativeMusicVolume, fadeDuration);  }
+    else { mmrpgMusicSound.volume(relativeMusicVolume); }
+}
+// Define a function for adjusting the volume if in-game sound effects
+function mmrpg_sound_effect_volume(newVolume, saveToSettings){
+    if (!gameSettings.soundEffectPool){ return false; }
+    //console.log('mmrpg_sound_effect_volume(newVolume:', newVolume, 'saveToSettings:', saveToSettings, ')');
+    if (typeof saveToSettings !== 'boolean'){ saveToSettings = true; }
+    if (newVolume < 0){ newVolume = 0; }
+    if (newVolume > 1){ newVolume = 1; }
+    if (saveToSettings){ gameSettings.effectVolume = newVolume; }
+    //console.log('mmrpg_sound_effect_volume // adjusted newVolume =', newVolume);
+    var relativeEffectVolume = newVolume * gameSettings.masterVolume;
+    var currentEffectVolume = gameSettings.effectVolume * gameSettings.masterVolume;
+    //console.log('mmrpg_sound_effect_volume // relativeEffectVolume =', relativeEffectVolume);
+    if (gameSettings.soundEffectPool.length){
+        var soundIDs = Object.keys(gameSettings.soundEffectPool);
+        for (var i = 0; i < soundIDs.length; i++){
+            var soundID = soundIDs[i];
+            var sound = gameSettings.soundEffectPool[soundID];
+            sound.volume(relativeEffectVolume);
+        }
+    }
+}
+
+// Define a function for toggling the music player
 function mmrpg_music_toggle(){
-    //alert('clicked');
+    //console.log('mmrpg_music_toggle()');
     var musicToggle = $('a.toggle', gameMusic);
-    var musicStream = $('audio.stream', gameMusic);
-    musicStreamObject = musicStream.get(0);
-    if (musicStreamObject.paused){
-        //alert('starting playback');
-        musicStream.removeClass('paused').addClass('playing');
-        musicStreamObject.volume = gameSettings.baseVolume;
-        musicStreamObject.play();
+    if (!mmrpgMusicSound.playing()){
+        gameSettings.musicVolumeEnabled = true;
+        gameSettings.effectVolumeEnabled = true;
+        mmrpg_reset_music_volume();
+        mmrpg_music_play();
         musicToggle.html('&#9658;');
         musicToggle.removeClass('paused').addClass('playing');
-        } else {
-        //alert('stopping playback');
-        musicStream.removeClass('playing').addClass('paused');
-        musicStreamObject.volume = 0;
-        musicStreamObject.pause();
+    } else {
+        gameSettings.musicVolumeEnabled = false;
+        gameSettings.effectVolumeEnabled = false;
+        mmrpg_music_volume(0, false);
+        mmrpgMusicSound.pause();
         musicToggle.html('&#8226;');
         musicToggle.removeClass('playing').addClass('paused');
-        }
-    if (mmrpgMusicInit != true){
-        //console.log('first music toggle!  init the music with the function caller');
-        musicStreamObject.addEventListener('ended', function(){ return mmrpgMusicEnded(); }, true);
+    }
+    if (!mmrpgMusicInit){
+        mmrpgMusicSound.on('end', mmrpgMusicEnded);
         mmrpgMusicInit = true;
     }
 }
@@ -1867,114 +2504,181 @@ function mmrpg_music_toggle(){
 // Define a function for playing the current music
 function mmrpg_music_play(){
     var musicToggle = $('a.toggle', gameMusic);
-    var musicStream = $('audio.stream', gameMusic);
+    var musicStream = $('.audio-stream.music', gameMusic);
     var musicStreamSource = $('source', musicStream).attr('src');
-    //console.log('mmrpg_music_play('+musicStreamSource+')');
-    if (musicStream.get(0).paused){
-        //console.log('starting playback');
-        musicStream.removeClass('paused').addClass('playing');
-        musicStream.get(0).volume = gameSettings.baseVolume;
-        musicStream.get(0).addEventListener('canplay', function(){
-            musicStream.get(0).play();
-            musicToggle.html('&#9658;');
-            musicToggle.removeClass('paused').addClass('playing');
-            this.removeEventListener('canplay', arguments.callee, false);
+    // Define local function for playing sprite music
+    var playSpriteMusic = function(){
+        mmrpgMusicSound.once('end', function(){
+            mmrpgMusicSound.stop();
+            mmrpgMusicSound.play('loop');
             });
+        mmrpgMusicSound.play('intro');
+        };
+    if (!mmrpgMusicSound.playing()){
+        mmrpg_reset_music_volume();
+        if (typeof mmrpgMusicConfig.sprite !== 'undefined'
+            && typeof mmrpgMusicConfig.sprite.intro !== 'undefined'
+            && typeof mmrpgMusicConfig.sprite.loop !== 'undefined'){
+            if (mmrpgMusicSound.state() === 'loaded'){
+                playSpriteMusic();
+                } else {
+                mmrpgMusicSound.once('load', playSpriteMusic);
+                }
+            }
+        else {
+            if (mmrpgMusicSound.state() === 'loaded'){
+                mmrpgMusicSound.play();
+                } else {
+                mmrpgMusicSound.once('load', function(){
+                    mmrpgMusicSound.play();
+                    });
+                }
+            }
+        musicToggle.html('&#9658;');
+        musicToggle.removeClass('paused').addClass('playing');
         }
 }
 
 // Define a function for stopping the current music
 function mmrpg_music_stop(){
-    //alert('clicked');
+    //console.log('mmrpg_music_stop()');
+    //console.log('gameSettings.indexLoaded =', gameSettings.indexLoaded);
+    //console.log('mmrpgMusicSound =', typeof mmrpgMusicSound, mmrpgMusicSound);
     var musicToggle = $('a.toggle', gameMusic);
-    var musicStream = $('audio.stream', gameMusic);
-    if (musicStream.get(0) != undefined && !musicStream.get(0).paused){
-        //alert('stopping playback');
-        musicStream.removeClass('playing').addClass('paused');
-        musicStream.get(0).volume = 0;
-        musicStream.get(0).pause();
-        musicToggle.html('PLAY');
+    if (mmrpgMusicSound && mmrpgMusicSound.playing()){
+        //console.log('updating the sound and toggle');
+        mmrpg_music_volume(0, false);
+        mmrpgMusicSound.stop();
+        musicToggle.find('span').html('PLAY');
         musicToggle.removeClass('playing').addClass('paused');
-        }
+    }
 }
 // Define a function for stopping the current music
 function mmrpg_music_onend(onendFunction){
-    //alert('clicked');
     var musicToggle = $('a.toggle', gameMusic);
-    var musicStream = $('audio.stream', gameMusic);
-    if (musicStream.get(0) != undefined && !musicStream.get(0).paused){
+    var musicStream = $('.audio-stream.music', gameMusic);
+    if (mmrpgMusicSound && mmrpgMusicSound.playing()){
         return onendFunction(musicToggle, musicStream);
-        }
+    }
 }
 // Define a function for playing the current music
-var mmrpgMusicNextTrack = false;
-function mmrpg_music_load(newTrack, resartTrack, playOnce){
-    //console.log('mmrpg_music_load(newTrack['+newTrack+'], resartTrack['+(resartTrack ? 'true' : 'false')+'], playOnce['+(playOnce ? 'true' : 'false')+'])');
-    var musicStream = $('audio.stream', gameMusic);
-    musicStreamObject = musicStream.get(0);
+function mmrpg_music_load(newTrack, resartTrack, playOnce, onendFunction){
+    //console.log('mmrpg_music_load()', newTrack, resartTrack, playOnce);
+    var musicStream = $('.audio-stream.music', gameMusic);
+    var musicToggle = $('a.toggle', gameMusic);
     var thisTrack = musicStream.attr('data-track');
-    var isPaused = musicStreamObject == undefined || musicStreamObject.paused ? true : false;
-    var isRestart = resartTrack === true ? true : false;
-    var isPlayOnce = playOnce == true ? true : false;
+    var isPaused = !mmrpgMusicSound || !mmrpgMusicSound.playing();
+    var isRestart = typeof resartTrack === 'boolean' ? resartTrack : true;
+    var isPlayOnce = typeof playOnce === 'boolean' ? playOnce : false;
+    var onplayFunction = function(){ musicToggle.removeClass('paused').addClass('playing'); };
+    var onendFunction = typeof onendFunction === 'function' ? onendFunction : mmrpgMusicEndedDefault;
     if (newTrack == 'last-track'){
         var lastTrack = musicStream.attr('data-last-track');
-        if (lastTrack != 'misc/battle-victory' && lastTrack != 'misc/battle-defeat'){ newTrack = lastTrack; }
-        else { return false; }
+        if (lastTrack.length){ newTrack = lastTrack; }
         }
-    if (isRestart == false && newTrack == thisTrack){ return false; }
-    if (thisTrack != newTrack || isRestart){
-        if (thisTrack != newTrack){
-            //console.log('loading new track '+newTrack);
-            } else if (isRestart){
-            //console.log('restarting track '+newTrack);
-            }
-        mmrpg_music_stop();
-        var newSourceMP3 = '<source src="'+gameSettings.audioBaseHref+'sounds/'+newTrack+'/audio.mp3?'+gameSettings.cacheTime+'" type="audio/mp3" />';
-        var newSourceOGG = '<source src="'+gameSettings.audioBaseHref+'sounds/'+newTrack+'/audio.ogg?'+gameSettings.cacheTime+'" type="audio/ogg" />';
-        musicStream.empty();
-        if (isIE || isOpera || isSafari){ musicStream.append(newSourceMP3);  }
-        else if (isChrome || isFirefox){ musicStream.append(newSourceOGG); }
-        else { musicStream.append(newSourceMP3); }
-        musicStream.attr('data-track', newTrack);
-        if (musicStreamObject != undefined){ musicStreamObject.load(); }
-        if (!isPaused){ mmrpg_music_play(); }
-        musicStream.attr('data-last-track', thisTrack);
+    if (isRestart == false && newTrack == thisTrack){
+        return false;
         }
+    var waitTime = mmrpgMusicSound && mmrpgMusicSound.playing() ? 500 : 0;
+    var musicMeta = typeof gameSettings.customIndex.musicIndex[newTrack] === 'object' ? gameSettings.customIndex.musicIndex[newTrack] : false;
+    var musicBaseVolume = gameSettings.musicVolume * gameSettings.masterVolume;
+    //console.log('music object created with gameSettings.musicVolume:', gameSettings.musicVolume, ' * gameSettings.masterVolume:', gameSettings.masterVolume, ' = musicBaseVolume:', musicBaseVolume);
+    if (!gameSettings.musicVolumeEnabled){ musicBaseVolume = 0; }
+    var audioConfig = {
+        src: [gameSettings.audioBaseHref+'sounds/'+newTrack+'/audio.mp3?'+gameSettings.cacheTime,
+              gameSettings.audioBaseHref+'sounds/'+newTrack+'/audio.ogg?'+gameSettings.cacheTime],
+        autoplay: !isPaused,
+        volume: musicBaseVolume,
+        loop: isPlayOnce ? false : true,
+        onplay: onplayFunction,
+        onend: onendFunction
+        };
+    if (musicMeta !== false
+        && typeof musicMeta.loop !== 'undefined'
+        && typeof musicMeta.loop.start === 'number'
+        && typeof musicMeta.loop.end === 'number'){
+        var milliFrame = Math.ceil(1000 / 60);
+        var introStart = 0;
+        var introDuration = musicMeta.loop.start - (milliFrame * 10);
+        var loopStart = musicMeta.loop.start + (milliFrame * 2);
+        var loopDuration = musicMeta.loop.end - musicMeta.loop.start;
+        audioConfig.loop = false;
+        audioConfig.sprite = {
+            intro: [introStart, introDuration, false],
+            loop: [loopStart, loopDuration, true]
+            };
+        }
+    if (waitTime > 0){ audioConfig.autoplay = false; }
+    //console.log('musicMeta =', musicMeta);
+    //console.log('audioConfig =', audioConfig);
+    mmrpg_music_volume(0, false);
+    mmrpg_music_stop();
+    musicStream.attr('data-track', newTrack);
+    musicStream.attr('data-last-track', thisTrack);
+    // Create a new Howl object and load the new track
+    mmrpgMusicSound = new Howl(audioConfig);
+    mmrpgMusicConfig = audioConfig;
+    if (waitTime > 0){
+        var loadTimeout = setTimeout(function(){
+            mmrpg_music_play();
+            }, waitTime);
+        }
+}
 
-    // Only continue if the media stream object is not undefined
-    if (musicStreamObject != undefined){
+// Define a function for playing a specific fanfare track
+function mmrpg_fanfare_load(newTrack, resartTrack, playOnce, fadeMusic, onendFunction){
+    //console.log('mmrpg_fanfare_load(', newTrack, resartTrack, playOnce, ')');
+    var fanfareStream = $('.audio-stream.fanfare', gameMusic);
+    //console.log('fanfareStream =', fanfareStream.length, fanfareStream);
+    var thisTrack = fanfareStream.attr('data-track');
+    var isRestart = typeof resartTrack === 'boolean' ? resartTrack : true;
+    var isPlayOnce = typeof playOnce === 'boolean' ? playOnce : true;
+    var fadeMusic = typeof fadeMusic === 'boolean' ? fadeMusic : true;
+    var onendFunction = typeof onendFunction === 'function' ? onendFunction : mmrpgFanfareEndedDefault;
+    if (newTrack == 'last-track'){
+        var lastTrack = fanfareStream.attr('data-last-track');
+        if (lastTrack.length){ newTrack = lastTrack; }
+        }
+    if (isRestart == false && newTrack == thisTrack){
+        return false;
+        }
+    if (mmrpgFanfareSound !== false
+        && mmrpgFanfareSound.playing()){
+        mmrpgFanfareSound.stop();
+        }
+    fanfareStream.attr('data-track', newTrack);
+    fanfareStream.attr('data-last-track', thisTrack);
+    // Create a new Howl object and load the new track
+    if (fadeMusic){ mmrpg_music_volume(0, false, 300); }
+    var fanfareVolume = gameSettings.musicVolume * gameSettings.masterVolume;
+    if (!gameSettings.musicVolumeEnabled){ musicBaseVolume = 0; }
+    if (mmrpgFanfareSound === false){
 
-        // If the user requested this track to only play once, otherwise just repeat
-        if (isPlayOnce == true){
+        mmrpgFanfareSound = new Howl({
+            src: [gameSettings.audioBaseHref+'sounds/'+newTrack+'/audio.mp3?'+gameSettings.cacheTime,
+                  gameSettings.audioBaseHref+'sounds/'+newTrack+'/audio.ogg?'+gameSettings.cacheTime],
+            autoplay: false,
+            volume: fanfareVolume,
+            loop: isPlayOnce ? false : true,
+            onend: function(){
+                if (fadeMusic){ mmrpg_reset_music_volume(); }
+                onendFunction();
+                },
+            onload: function(){
+                this.volume(fanfareVolume);
+                }
+            });
+        mmrpgFanfareSound.once('load', function(){
+            this.stop();
+            this.volume(fanfareVolume);
+            this.play();
+            });
 
-            //console.log('isPlayOnce is true, creating new onended event to prevent from replaying');
+        } else {
 
-            // Update the event listener that will prevent this from replaying
-            mmrpgMusicEnded = function(){
-                //console.log('onended event called...');
-
-                // Decide what to do based on the requested music or sound effect
-                if (newTrack == 'misc/battle-victory' || newTrack == 'misc/battle-defeat'){
-                    //console.log('new track was '+newTrack+' so we\'re going to leaderboard now that complete');
-                    mmrpg_music_load('misc/leader-board', true, false);
-                    } else {
-                    //console.log('new track was '+newTrack+' so we\'re simply playing last track now that complete');
-                    mmrpg_music_load('last-track', true, false);
-                    }
-
-                return false;
-
-                };
-
-            } else {
-
-            //console.log('isPlayOnce is false, resetting onended event to default and replay track');
-
-            // Create the event listener that will ensure this continues replaying
-            //console.log('Update the event listener function with the default');
-            mmrpgMusicEnded = mmrpgMusicEndedDefault;
-
-            }
+        mmrpgFanfareSound.stop();
+        mmrpgFanfareSound.volume(fanfareVolume);
+        mmrpgFanfareSound.play();
 
         }
 
@@ -2000,10 +2704,283 @@ function mmrpg_music_preload(newTrack){
         }
 }
 
+// Define variables related to sound effects for game runtime
+gameSettings.soundEffectSources = [];
+gameSettings.soundEffectSprites = {};
+gameSettings.soundEffectPool = [];
+gameSettings.soundEffectPoolLimit = 20;
+// Define a list of sound effect aliases we can use in the code to abstract a bit
+gameSettings.customIndex.soundsIndex = {};
+gameSettings.customIndex.soundsAliasesIndex = {};
+// Define a function to play sound effects during game runtime
+function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
+    //console.log('mmrpg_play_sound_effect(effectName:', effectName, 'effectConfig:', typeof effectConfig, effectConfig, 'isMenuSound:', isMenuSound, ')');
+    //console.log('gameSettings.soundEffectPool =', Object.keys(gameSettings.soundEffectPool).length, gameSettings.soundEffectPool);
+    //console.log('gameSettings.soundEffectSources =', gameSettings.soundEffectSources.length, gameSettings.soundEffectSources);
+    //console.log('gameSettings.soundEffectSprites =', Object.keys(gameSettings.soundEffectSprites).length, gameSettings.soundEffectSprites);
+
+    // If the game hasn't loaded we shoudln't be playing anything
+    if (!gameSettings.indexLoaded){ return false; }
+    if (!mmrpgMusicSound.playing()){ return false; }
+    if (mmrpgMusicSound === false){ return false; }
+
+    // Define variables that have not been defined yet in the args
+    if (typeof effectConfig !== 'object'){ effectConfig = {}; }
+    if (typeof isMenuSound !== 'boolean'){ isMenuSound = true; }
+
+    // Otherwise, define a base volume for these sound effects to use
+    var baseEffectVolume = gameSettings.effectVolume * gameSettings.masterVolume;
+
+    // Collect this effect's volume, rate factor, and loop boolean for use
+    var effectVolume = baseEffectVolume;
+    var effectRate = 1;
+    var effectLoop = false;
+    //if (isMenuSound !== true){ effectVolume *= gameSettings.menuEffectVolume; } // TODO re-enable this when ready
+    if (typeof effectConfig.volume === 'number'){ effectVolume *= effectConfig.volume; }
+    if (typeof effectConfig.rate === 'number'){ effectRate = effectConfig.rate; }
+    if (typeof effectConfig.loop === 'boolean'){ effectLoop = effectConfig.loop; }
+    if (!gameSettings.effectVolumeEnabled){ effectVolume = 0; }
+    if (effectVolume < 0){ effectVolume = 0; }
+    if (effectVolume > 1){ effectVolume = 1; }
+    //console.log('effectName:', effectName, 'effectVolume:', effectVolume, 'effectRate:', effectRate, 'effectLoop:', effectLoop);
+
+    // Get the next sound object from the pool
+    if (typeof gameSettings.soundEffectPool[effectName] === 'undefined'
+        || typeof gameSettings.soundEffectPool[effectName].sound === 'undefined'){
+
+        // We must create a new sound object before we can use it
+        var sound = new Howl({
+            src: gameSettings.soundEffectSources,
+            sprite: gameSettings.soundEffectSprites,
+            autoplay: false,
+            volume: effectVolume,
+            rate: effectRate,
+            loop: effectLoop,
+            pool: 8
+            });
+        gameSettings.soundEffectPool[effectName] = {
+            name: effectName,
+            sound: sound,
+            time: Date.now()
+            };
+
+        } else {
+
+        // We can pull an existing sound object to use from the pool
+        var effect = gameSettings.soundEffectPool[effectName];
+        var sound = effect.sound;
+        effect.time = Date.now();
+
+        }
+
+    // Replace the effect name if we're using an alias at the moment
+    if (typeof gameSettings.customIndex.soundsAliasesIndex[effectName] !== 'undefined'){
+        effectName = gameSettings.customIndex.soundsAliasesIndex[effectName];
+        //console.log('alias triggered // new effectName =', effectName);
+        } else {
+        //console.log('using RAW name // effectName =', effectName);
+        // TODO:  Make sure this effectName actually exists in the index of sound effect sprites
+        }
+
+    //console.log('sound =', sound);
+    //console.log('sound._volume', sound._volume);
+    //console.log('sound.volume() =', sound.volume());
+    //console.log('sound._sprite['+effectName+'] =', sound._sprite[effectName]);
+
+    // Stop any currently playing sound
+    sound.stop();
+
+    // Play the sound when ready using a function that checks load status
+    var playSoundWhenReady = function(effectName){
+        if (sound.state() !== 'loaded'){
+            sound.on('play', function(){
+                //console.log('sound on play');
+                this.volume(effectVolume);
+                this.rate(effectRate);
+                this.loop(effectLoop);
+                });
+            sound.on('load', function(){
+                //console.log('sound on loaded');
+                this.stop();
+                this.volume(effectVolume);
+                this.play(effectName);
+                });
+            } else {
+            //console.log('sound immediate invoke');
+            sound.stop();
+            sound.volume(effectVolume);
+            sound.play(effectName);
+            }
+        return true;
+        };
+    playSoundWhenReady(effectName);
+
+    // Now that the sound is actually playing we can do cleanup
+    // If the sound effect pool is full, we need to remove the oldest sound
+    var effectPoolSizeCurrent = Object.keys(gameSettings.soundEffectPool).length;
+    if (effectPoolSizeCurrent > gameSettings.soundEffectPoolLimit){
+        //console.log('soundEffectPool is full (', effectPoolSizeCurrent, ' / ', gameSettings.soundEffectPoolLimit, '), removing oldest sound');
+        var oldestSound = false;
+        var oldestSoundTime = false;
+        for (var soundName in gameSettings.soundEffectPool){
+            var sound = gameSettings.soundEffectPool[soundName];
+            if (oldestSoundTime === false || sound.time < oldestSoundTime){
+                oldestSound = sound;
+                oldestSoundTime = sound.time;
+                }
+            }
+        if (oldestSound !== false){
+            //console.log('removing oldest sound:', oldestSound.name);
+            oldestSound.sound.unload();
+            delete gameSettings.soundEffectPool[oldestSound.name];
+            }
+        }
+
+    // Return now that we're done
+    return true;
+
+}
+
+// Define a function for queueing something for when the game has started
+function mmrpg_queue_for_game_start(onGameStart){
+    gameSettings.onGameStart.push(onGameStart);
+    if (!gameSettings.gameHasStarted){ return; }
+    while (gameSettings.onGameStart.length){
+        var onGameStart = gameSettings.onGameStart.shift();
+        onGameStart.call();
+        }
+}
+
+
+// -- POPUP WINDOW EVENT FUNCTIONS -- //
+
+// Define a function that checks the server for any event popups to display
+function windowEventsPull(){
+    //console.log('windowEventsPull()');
+    // Do not pull events if we're currently in a sub-menu iframe
+    var $mmrpg = $('#mmrpg');
+    var $prototype = $('#prototype');
+    if (!$mmrpg.length || $mmrpg.is('.iframe')){ return -1; }
+    else if ($mmrpg.is('.iframe')){ return -2; }
+    else if (!$prototype.length){ return -3; }
+    // Otherwise we can pull events from the server and display them
+    $.ajax({
+        url: 'scripts/get-events.php',
+        dataType: 'json',
+        success: function(response){
+            //console.log('scripts/get-events.php returned ', response);
+            if (typeof response.data !== 'undefined'
+                && typeof response.data.events !== 'undefined'
+                && typeof response.data.messages !== 'undefined'){
+                //console.log('creating event');
+                var eventsMarkup = response.data.events;
+                var messagesMarkup = response.data.messages;
+                if (eventsMarkup.length && messagesMarkup.length){
+                    windowEventCreate(eventsMarkup, messagesMarkup, false);
+                    windowEventDisplay();
+                    }
+                }
+            }
+        });
+}
+
+// Define a function for displaying event messages to the player
+gameSettings.canvasMarkupArray = [];
+gameSettings.messagesMarkupArray = [];
+function windowEventCreate(canvasMarkupArray, messagesMarkupArray, autoDisplay){
+    //console.log('windowEventCreate('+canvasMarkupArray+', '+messagesMarkupArray+')');
+    if (typeof autoDisplay !== 'boolean'){ autoDisplay = true; }
+    gameSettings.canvasMarkupArray = canvasMarkupArray;
+    gameSettings.messagesMarkupArray = messagesMarkupArray;
+    if (autoDisplay){
+        if (!gameSettings.gameHasStarted){
+            gameSettings.onGameStart.push(function(){ setTimeout(windowEventDisplay, 1000); });
+            }
+        else {
+            windowEventDisplay();
+            }
+        }
+}
+
+// Define a function for displaying event messages to the player
+function windowEventDisplay(){
+    //console.log('windowEventDisplay()');
+
+    // Check if the event container exists and, if not, create it
+    var $eventContainer = $('#events');
+    if (!$eventContainer.length){
+
+        // Define the markup for the event window dynamically
+        $eventContainer = $(
+            '<div id="events" class="hidden">'+
+                '<div class="event_wrapper">'+
+                    '<div class="event_container">'+
+                        '<div id="canvas" class="event_canvas"></div>'+
+                        '<div id="messages" class="event_messages"></div>'+
+                        '<div id="buttons" class="event_buttons"><a class="event_continue">Continue</a></div>'+
+                    '</div>'+
+                '</div>'+
+            '</div>'
+            );
+
+        // Detect which parent window is available and then append the window to it
+        var $eventContainerParent = false;
+        if ($('#window').length){ $eventContainerParent = $('#window').first(); }
+        else if ($('#prototype').length){ $eventContainerParent = $('#prototype').first(); }
+        else if ($('#battle').length){ $eventContainerParent = $('#battle').first(); }
+        $eventContainerParent.append($eventContainer);
+
+        // Define a click event for the event window continue button
+        var eventContinue = $('#buttons .event_continue', $eventContainer);
+        eventContinue.bind('click', function(e){
+            e.preventDefault();
+            //alert('clicked');
+            if (typeof window.top.mmrpg_play_sound_effect !== 'undefined'){
+                window.top.mmrpg_play_sound_effect('link-click');
+                }
+            windowEventDestroy();
+            if (gameSettings.canvasMarkupArray.length || gameSettings.messagesMarkupArray.length){
+                windowEventDisplay();
+                }
+            });
+
+        }
+
+    // Collect the canvas and message markup to be added to the event container
+    var canvasMarkup = gameSettings.canvasMarkupArray.length ? gameSettings.canvasMarkupArray.shift() : '';
+    var messagesMarkup = gameSettings.messagesMarkupArray.length ? gameSettings.messagesMarkupArray.shift() : '';
+    //console.log('canvasMarkup:', canvasMarkup, 'messagesMarkup:', messagesMarkup);
+
+    // Empty the canvas and messages of any leftover, fill them with new markup, then show 'em
+    $('#canvas', $eventContainer).empty().html(canvasMarkup);
+    $('#messages', $eventContainer).empty().html(messagesMarkup);
+    $eventContainer.css({opacity:0}).removeClass('hidden').animate({opacity:1},300,'swing');
+    $('#messages', $eventContainer).perfectScrollbar(thisScrollbarSettings);
+    $(window).focus();
+
+    // Play the appropriate sound effect
+    if (typeof window.top.mmrpg_play_sound_effect !== 'undefined'){
+        //console.log('play sound effect');
+        window.top.mmrpg_play_sound_effect('event-sound');
+        }
+
+}
+
+// Define a function for displaying event messages to the player
+function windowEventDestroy(){
+    var $eventContainer = $('#events');
+    //console.log('windowEventDestroy()');
+    $('#canvas', $eventContainer).empty();
+    $('#messages', $eventContainer).empty();
+    $eventContainer.addClass('hidden');
+    //alert(eventMarkup);
+}
+
 // Define a function for updating the loaded status of the main index page
 function mmrpg_toggle_index_loaded(toggleValue){
-    //alert('game loaded!');
+    //console.log('game loaded!');
     if (toggleValue == true && gameSettings.indexLoaded != true){
+        //console.log('unfade the splash loader');
         // Fade out the splash loader text, change it to PLAY, then flade it in
         $('a.toggle span', gameMusic).css({opacity:1}).animate({opacity:0}, 1000, 'swing', function(){
             $('a.toggle span', gameMusic).html('<div class="start"><div class="title">START</div><div class="subtitle">MEGA MAN RPG PROTOTYPE</div><div class="info">(Toggle music with &nbsp;&nbsp;)<div class="icon">&nbsp;</div></div></div>').animate({opacity:1}, 1000, 'swing', function(){
@@ -2035,6 +3012,45 @@ function mmrpg_toggle_debug_mode(element){
     var thisRequestType = 'session';
     var thisRequestData = 'debug_mode,'+newValue;
     $.post('scripts/script.php',{requestType:thisRequestType,requestData:thisRequestData});
+    return true;
+}
+
+// Define a function for updating the loaded status of the main index page
+function mmrpg_toggle_settings_option(element){
+    //console.log('mmrpg_toggle_settings_option()');
+
+    // Collect the object references to the button and internal label
+    var thisButton = $(element);
+    var thisLabel = $('.multi', thisButton);
+
+    // Parse the settings token and value, then clean the action token
+    var thisSettingToken = thisButton.attr('data-setting-token');
+    var thisSettingValue = parseInt(thisButton.attr('data-setting-value'));
+    if (thisSettingValue === 1){ thisSettingValue = true; }
+    else if (thisSettingValue === 0){ thisSettingValue = false; }
+    //console.log('thisSettingToken =', thisSettingToken);
+    //console.log('thisSettingValue =', thisSettingValue);
+
+    // Pull the current value and use it to calculate new ones
+    var newSettingValue = !thisSettingValue ? true : false;
+    var newSettingValueText = newSettingValue ? 'ON' : 'OFF';
+    var newSettingValueClass = 'value type type_';
+    newSettingValueClass += (newSettingValue ? 'nature' : 'flame');
+    //console.log('newSettingValue =', newSettingValue);
+
+    // Update the local setting in case we need to work with it again
+    gameSettings[thisSettingToken] = newSettingValue;
+    //console.log('gameSettings[' + thisSettingToken + '] = ' + newSettingValue + ';');
+
+    // Update the button value and label text/colour
+    thisButton.attr('data-setting-value', (newSettingValue ? 1 : 0));
+    thisLabel.find('.value').html(newSettingValueText).removeClass().addClass(newSettingValueClass);
+    var thisRequestType = 'session';
+    var thisRequestData = 'battle_settings,'+thisSettingToken+','+(newSettingValue ? 'true' : 'false');
+    //console.log('thisRequestData =', thisRequestData);
+    $.post('scripts/script.php',{requestType: thisRequestType, requestData: thisRequestData});
+    if (typeof gameSettingsChangeEvents[thisSettingToken] === 'function'){ gameSettingsChangeEvents[thisSettingToken](newSettingValue); }
+
     return true;
 }
 
@@ -2170,135 +3186,151 @@ function dump(arr,level) {
 
 // Define a jQuery function for waiting for images
 ;(function($) {
+
         // Namespace all events.
         var eventNamespace = 'waitForImages';
 
         // CSS properties which contain references to images.
         $.waitForImages = {
-                hasImageProperties: [
-                'backgroundImage',
-                'listStyleImage',
-                'borderImage',
-                'borderCornerImage'
-                ]
+            hasImageProperties: [
+            'backgroundImage',
+            'listStyleImage',
+            'borderImage',
+            'borderCornerImage'
+            ]
         };
 
         // Custom selector to find `img` elements that have a valid `src` attribute and have not already loaded.
         $.expr[':'].uncached = function(obj) {
-                // Ensure we are dealing with an `img` element with a valid `src` attribute.
-                if ( ! $(obj).is('img[src!=""]')) {
-                        return false;
-                }
-
-                // Firefox's `complete` property will always be`true` even if the image has not been downloaded.
-                // Doing it this way works in Firefox.
-                var img = document.createElement('img');
-                img.src = obj.src;
-                return ! img.complete;
+            // Ensure we are dealing with an `img` element with a valid `src` attribute.
+            if ( ! $(obj).is('img[src!=""]')) {
+                return false;
+            }
+            // Firefox's `complete` property will always be`true` even if the image has not been downloaded.
+            // Doing it this way works in Firefox.
+            var img = document.createElement('img');
+            img.src = obj.src;
+            return ! img.complete;
         };
 
         $.fn.waitForImages = function(finishedCallback, eachCallback, waitForAll) {
-
-                // Handle options object.
-                if ($.isPlainObject(arguments[0])) {
-                        eachCallback = finishedCallback.each;
-                        waitForAll = finishedCallback.waitForAll;
-                        finishedCallback = finishedCallback.finished;
-                }
-
-                // Handle missing callbacks.
-                finishedCallback = finishedCallback || $.noop;
-                eachCallback = eachCallback || $.noop;
-
-                // Convert waitForAll to Boolean
-                waitForAll = !! waitForAll;
-
-                // Ensure callbacks are functions.
-                if (!$.isFunction(finishedCallback) || !$.isFunction(eachCallback)) {
-                        throw new TypeError('An invalid callback was supplied.');
-                };
-
-                return this.each(function() {
-                        // Build a list of all imgs, dependent on what images will be considered.
-                        var obj = $(this),
-                                allImgs = [];
-
-                        if (waitForAll) {
-                                // CSS properties which may contain an image.
-                                var hasImgProperties = $.waitForImages.hasImageProperties || [],
-                                        matchUrl = /url\((['"]?)(.*?)\1\)/g;
-
-                                // Get all elements, as any one of them could have a background image.
-                                obj.find('*').each(function() {
-                                        var element = $(this);
-
-                                        // If an `img` element, add it. But keep iterating in case it has a background image too.
-                                        if (element.is('img:uncached')) {
-                                                allImgs.push({
-                                                        src: element.attr('src'),
-                                                        element: element[0]
-                                                });
-                                        }
-
-                                        $.each(hasImgProperties, function(i, property) {
-                                                var propertyValue = element.css(property);
-                                                // If it doesn't contain this property, skip.
-                                                if ( ! propertyValue) {
-                                                        return true;
-                                                }
-
-                                                // Get all url() of this element.
-                                                var match;
-                                                while (match = matchUrl.exec(propertyValue)) {
-                                                        allImgs.push({
-                                                                src: match[2],
-                                                                element: element[0]
-                                                        });
-                                                };
+            // Handle options object.
+            if ($.isPlainObject(arguments[0])) {
+                eachCallback = finishedCallback.each;
+                waitForAll = finishedCallback.waitForAll;
+                finishedCallback = finishedCallback.finished;
+            }
+            // Handle missing callbacks.
+            finishedCallback = finishedCallback || $.noop;
+            eachCallback = eachCallback || $.noop;
+            // Convert waitForAll to Boolean
+            waitForAll = !! waitForAll;
+            // Ensure callbacks are functions.
+            if (!$.isFunction(finishedCallback) || !$.isFunction(eachCallback)) {
+                throw new TypeError('An invalid callback was supplied.');
+            };
+            return this.each(function() {
+                // Build a list of all imgs, dependent on what images will be considered.
+                var obj = $(this);
+                var allImgs = [];
+                var processedImages = new Set();
+                if (waitForAll){
+                    // CSS properties which may contain an image.
+                    var hasImgProperties = $.waitForImages.hasImageProperties || [];
+                    var matchUrl = /url\((['"]?)(.*?)\1\)/g;
+                    // Get all elements, as any one of them could have a background image.
+                    obj.find('*').each(function(){
+                        var element = $(this);
+                        // If an `img` element, add it. But keep iterating in case it has a background image too.
+                        if (element.is('img:uncached')
+                            && !processedImages.has(element.attr('src'))){
+                            allImgs.push({
+                                src: element.attr('src'),
+                                element: element[0]
+                                });
+                            processedImages.add(element.attr('src'));
+                        }
+                        $.each(hasImgProperties, function(i, property){
+                            var propertyValue = element.css(property);
+                            // If it doesn't contain this property, skip.
+                            if (!propertyValue){
+                                return true;
+                                }
+                            // Get all url() of this element.
+                            var match;
+                            while (match = matchUrl.exec(propertyValue)){
+                                if (!processedImages.has(match[2])){
+                                    allImgs.push({
+                                        src: match[2],
+                                        element: element[0]
                                         });
-                                });
-                        } else {
-                                // For images only, the task is simpler.
-                                obj
-                                 .find('img:uncached')
-                                 .each(function() {
-                                        allImgs.push({
-                                                src: this.src,
-                                                element: this
-                                        });
-                                });
-                        };
-
-                        var allImgsLength = allImgs.length,
-                                allImgsLoaded = 0;
-
-                        // If no images found, don't bother.
-                        if (allImgsLength == 0) {
-                                finishedCallback.call(obj[0]);
-                        };
-
-                        $.each(allImgs, function(i, img) {
-
-                                var image = new Image;
-
-                                // Handle the image loading and error with the same callback.
-                                $(image).bind('load.' + eventNamespace + ' error.' + eventNamespace, function(event) {
-                                        allImgsLoaded++;
-
-                                        // If an error occurred with loading the image, set the third argument accordingly.
-                                        eachCallback.call(img.element, allImgsLoaded, allImgsLength, event.type == 'load');
-
-                                        if (allImgsLoaded == allImgsLength) {
-                                                finishedCallback.call(obj[0]);
-                                                return false;
-                                        };
-
-                                });
-
-                                image.src = img.src;
+                                    processedImages.add(match[2]);
+                                    }
+                                };
+                            });
                         });
+                } else {
+                    // For images only, the task is simpler.
+                    obj.find('img:uncached').each(function(){
+                            allImgs.push({
+                                src: this.src,
+                                element: this
+                                });
+                            });
+                };
+                var allImgsLength = allImgs.length;
+                var allImgsLoaded = 0;
+                // If no images found, don't bother.
+                if (allImgsLength == 0){
+                    finishedCallback.call(obj[0]);
+                    };
+                //console.log('allImgs =', allImgs, allImgs.length);
+                $.each(allImgs, function(i, img) {
+                    var image = new Image;
+                    var loadedOrErrored = false;  // Add this line
+                    // Update the callback
+                    $(image).bind('load.' + eventNamespace + ' error.' + eventNamespace, function(event) {
+                        // Only increment if this is the first event for this image
+                        if (!loadedOrErrored) {
+                            loadedOrErrored = true;
+                            allImgsLoaded++;
+                            // If an error occurred with loading the image, set the third argument accordingly.
+                            eachCallback.call(img.element, allImgsLoaded, allImgsLength, event.type == 'load');
+                            if (allImgsLoaded == allImgsLength) {
+                                finishedCallback.call(obj[0]);
+                                return false;
+                            };
+                        }
+                    });
+                    image.src = img.src;
                 });
+            });
         };
+
+})(jQuery);
+
+// Extend jQuery to offer a "triggerSilentClick" trigger so that we can do menu stuff in the background without
+// triggering associated sound effects prematurely (as well as other helpful functionality, presumably)
+(function($) {
+    $.fn.triggerSilentClick = function() {
+        return this.each(function() {
+            var $this = $(this);
+
+            // Your special functionality goes here.
+            // For example, if you need to log some information
+            //console.log('Pre-click special functionality executed!');
+
+            // Add a data attribute to the element
+            $this.data('silentClick', true);
+
+            // Then, trigger the click event
+            $this.trigger('click');
+
+            // After the click event, remove the data attribute
+            $this.removeData('silentClick');
+
+        });
+    };
 })(jQuery);
 
 // Fix the indexOf issue for IE8 and lower

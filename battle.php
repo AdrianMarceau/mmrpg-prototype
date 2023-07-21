@@ -161,7 +161,9 @@ if (empty($this_player_robots)){
             // Push this error message into the event queue
             array_push($_SESSION[$session_token]['EVENTS'], array(
                 'canvas_markup' => $temp_canvas_markup,
-                'console_markup' => $temp_console_markup
+                'console_markup' => $temp_console_markup,
+                'player_token' => !empty($this_player_token) ? $this_player_token : 'player',
+                'event_type' => 'critical-issue'
                 ));
         }
 
@@ -219,6 +221,8 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
 <meta name="format-detection" content="telephone=no" />
 <link rel="shortcut icon" type="image/x-icon" href="images/assets/<?= mmrpg_get_favicon() ?>">
 <link type="text/css" href="styles/reset.css" rel="stylesheet" />
+<link type="text/css" href=".libs/fontawesome/v5.6.3/css/solid.css" rel="stylesheet" />
+<link type="text/css" href=".libs/fontawesome/v5.6.3/css/fontawesome.css" rel="stylesheet" />
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.css" rel="stylesheet" />
 <link type="text/css" href="styles/battle.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
@@ -263,7 +267,7 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
             <div class="canvas_overlay_header canvas_overlay_hidden" style="">&nbsp;</div>
 
             <div id="animate" style="opacity: 0;"><a class="toggle paused" href="#" onclick=""><span><span>loading&hellip;</span></span></a></div>
-            <div class="event sticky" style="z-index: 1;">
+            <div class="event event_fieldback sticky" style="z-index: 1;">
                 <?
 
                 // If field data was provided, preload the background/foreground
@@ -282,8 +286,34 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                         else { $background_animate[] = str_pad($this_field_data['field_background_frame'], 2, '0', STR_PAD_LEFT); }
                     }
                     $background_data_animate = count($background_animate) > 1 ? implode(',', $background_animate) : false;
+
                     // Display the markup of the background layer
-                    echo '<div class="'.(!$flag_skip_fadein ? 'animate_fadein ' : '').'background_canvas background background_00" data-frame="00" style="background-color: #000000; background-image: url(images/fields/'.$this_field_data['field_background'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
+                    $field_background_class = 'background_canvas has_pixels background background_00'.(!$flag_skip_fadein ? ' animate_fadein' : '');
+                    $field_background_style = 'background-color: #000000; background-image: url(images/fields/'.$this_field_data['field_background'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');';
+                    echo '<div class="'.$field_background_class.'" style="'.$field_background_style.'" data-frame="00">&nbsp;</div>';
+
+                    // Display the markup of the background layer
+                    $field_background_class = 'background_canvas has_pixels background background_00'.(!$flag_skip_fadein ? ' animate_fadein' : '');
+                    $field_background_style = 'background-color: #000000;';
+                    if (!empty($this_field_data['field_background'])){
+                        $image_name = 'battle-field_background_base';
+                        $image_path = 'images/fields/'.$this_field_data['field_background'].'/';
+                        $image_path_full = $image_path.$image_name.'.gif';
+                        //error_log('$image_path_full = '.print_r($image_path_full, true));
+                        if (!empty($this_field_data['field_background_variant'])){
+                            $new_image_name = $image_name.'_'.$this_field_data['field_background_variant'];
+                            $new_image_path_full = $image_path.$new_image_name.'.gif';
+                            //error_log('$new_image_path_full = '.print_r($new_image_path_full, true));
+                            if (rpg_game::sprite_exists($new_image_path_full)){
+                                //error_log(basename($new_image_path_full).' exists!');
+                                $image_name = $new_image_name;
+                                $image_path_full = $new_image_path_full;
+                            }
+                        }
+                        $field_background_style .= ' background-image: url('.$image_path_full.'?'.MMRPG_CONFIG_CACHE_DATE.');';
+                    }
+                    echo '<div class="'.$field_background_class.'" style="'.$field_background_style.'" data-frame="00">&nbsp;</div>';
+
 
                     // Loop through and display the markup of any background attachments
                     if (!empty($this_field_data['field_background_attachments'])){
@@ -367,8 +397,32 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                     }
                     $foreground_data_animate = count($foreground_animate) > 1 ? implode(',', $foreground_animate) : false;
 
+                    // Display the markup of the background layer
+                    $field_foreground_class = 'foreground_canvas has_pixels foreground foreground_00'.(!$flag_skip_fadein ? ' animate_fadein' : '');
+                    $field_foreground_style = '';
+                    if (!empty($this_field_data['field_foreground'])){
+                        $image_name = 'battle-field_foreground_base';
+                        $image_path = 'images/fields/'.$this_field_data['field_foreground'].'/';
+                        $image_path_full = $image_path.$image_name.'.png';
+                        //error_log('$image_path_full = '.print_r($image_path_full, true));
+                        if (!empty($this_field_data['field_foreground_variant'])){
+                            $new_image_name = $image_name.'_'.$this_field_data['field_foreground_variant'];
+                            $new_image_path_full = $image_path.$new_image_name.'.png';
+                            //error_log('$new_image_path_full = '.print_r($new_image_path_full, true));
+                            if (rpg_game::sprite_exists($new_image_path_full)){
+                                //error_log(basename($new_image_path_full).' exists!');
+                                $image_name = $new_image_name;
+                                $image_path_full = $new_image_path_full;
+                            }
+                        }
+                        $field_foreground_style .= ' background-image: url('.$image_path_full.'?'.MMRPG_CONFIG_CACHE_DATE.');';
+                    }
+                    echo '<div class="'.$field_foreground_class.'" style="'.$field_foreground_style.'" data-frame="00">&nbsp;</div>';
+
+                    /*
                     // Display the markup of the foreground layer
-                    echo '<div class="'.(!$flag_skip_fadein ? 'animate_fadein ' : '').' foreground_canvas foreground foreground_00" data-frame="00" style="background-image: url(images/fields/'.$this_field_data['field_foreground'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
+                    echo '<div class="'.(!$flag_skip_fadein ? 'animate_fadein ' : '').' foreground_canvas has_pixels foreground foreground_00" data-frame="00" style="background-image: url(images/fields/'.$this_field_data['field_foreground'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</div>';
+                    */
 
                     // Check if this field has a field or fusion star in it
                     if (!empty($this_battle_data['values']['field_star'])){
@@ -392,11 +446,12 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                             'class' => 'item',
                             'size' => 80,
                             'offset_x' => 331,
-                            'offset_y' => 90,
+                            'offset_y' => 130,
+                            'offset_z' => -1,
                             'item_token' => 'star',
                             'item_image' => $temp_star_image,
                             'item_frame' => array(0, 0, 0, 0),
-                            'item_frame_shift' => array('331,90', '331,95', '331,100', '331,95'),
+                            'item_frame_shift' => array('331,130', '331,125', '331,130', '331,135'),
                             'item_direction' => 'left',
                             'item_text' => $temp_star_text
                             );
@@ -408,11 +463,12 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                             'is_shadow' => true,
                             'size' => 80,
                             'offset_x' => 331,
-                            'offset_y' => 75,
+                            'offset_y' => 85,
+                            'offset_z' => -1,
                             'item_token' => 'star',
                             'item_image' => $temp_shadow_image,
                             'item_frame' => array(2, 1, 0, 1),
-                            'item_frame_shift' => array('331,75', '331,75', '331,75', '331,75'),
+                            'item_frame_shift' => array('331,85', '331,85', '331,85', '331,85'),
                             'item_direction' => 'left',
                             'item_text' => ''
                             );
@@ -431,11 +487,12 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                             'subclass' => 'common_object',
                             'size' => 80,
                             'offset_x' => 331,
-                            'offset_y' => 90,
+                            'offset_y' => 130,
+                            'offset_z' => -1,
                             'object_token' => 'challenge-marker',
                             'object_image' => $temp_skull_image,
                             'object_frame' => array(0, 0, 0, 0),
-                            'object_frame_shift' => array('331,90', '331,95', '331,100', '331,95'),
+                            'object_frame_shift' => array('331,130', '331,125', '331,130', '331,135'),
                             'object_direction' => 'left',
                             'object_text' => ''
                             );
@@ -447,11 +504,12 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                             'subclass' => 'common_object',
                             'size' => 80,
                             'offset_x' => 331,
-                            'offset_y' => 75,
+                            'offset_y' => 85,
+                            'offset_z' => -1,
                             'object_token' => 'challenge-marker',
                             'object_image' => $temp_shadow_image,
                             'object_frame' => array(2, 1, 0, 1),
-                            'object_frame_shift' => array('331,75', '331,75', '331,75', '331,75'),
+                            'object_frame_shift' => array('331,85', '331,85', '331,85', '331,85'),
                             'object_direction' => 'left',
                             'object_text' => ''
                             );
@@ -460,80 +518,99 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
 
                     // Loop through and display the markup of any foreground attachments
                     if (!empty($this_field_data['field_foreground_attachments'])){
-                        echo '<div class="'.(!$flag_skip_fadein ? 'animate_fadein ' : '').' foreground_event event clearback sticky" style="z-index: 60; border-color: transparent;">';
-                        $this_key = -1;
-                        foreach ($this_field_data['field_foreground_attachments'] AS $this_id => $this_info){
-                            if ($flag_wap && preg_match('/^mecha/i', $this_id)){ continue; }
-                            $this_key++;
-                            $this_class = $this_info['class'];
-                            $this_size = intval($this_info['size']);
-                            $this_boxsize = $this_size.'x'.$this_size;
-                            $this_offset_x = $this_info['offset_x'];
-                            $this_offset_y = $this_info['offset_y'];
-                            $this_offset_z = isset($this_info['offset_z']) ? $this_info['offset_z'] : $this_key + 1;
-                            $this_token = $this_info[$this_class.'_token'];
-                            $this_text = !empty($this_info[$this_class.'_text']) ? $this_info[$this_class.'_text'] : '&nbsp;';
-                            $this_path = $class_paths[$this_class];
-                            if (isset($this_info['is_shadow']) && $this_info['is_shadow'] === true){ $this_path .= '_shadows'; }
-                            $this_image = !empty($this_info[$this_class.'_image']) ? $this_info[$this_class.'_image'] : $this_token;
-                            if ($this_class === 'object' && (!isset($this_info['subclass']) || $this_info['subclass'] !== 'common_object')){
-                                $this_path = $class_paths['field'];
-                                $this_image = $this_field_data['field_foreground'].'_'.$this_image;
-                            }
-                            $this_frames = $this_info[$this_class.'_frame'];
-                            // We want mechas, but not actual robots replaced
-                            if ($this_class == 'robot' && !empty($this_field_data['field_mechas']) && preg_match('/^mecha/i', $this_id)){
-                                $this_token = $this_field_data['field_mechas'][array_rand($this_field_data['field_mechas'])];
-                                if (!isset($this_robot_index[$this_token])){ $this_robot_index[$this_token] = rpg_robot::get_index_info($this_token); }
-                                $this_index = $this_robot_index[$this_token];
-                                $this_image = $this_token;
-                                if (!empty($this_battle_data['battle_complete']['battle_count'])
-                                    && !empty($this_index['robot_image_alts'])){
-                                    $images = array($this_token);
-                                    foreach ($this_index['robot_image_alts'] AS $alt){
-                                        if (count($images) > $this_battle_data['battle_complete']['battle_count']){ break; }
-                                        $images[] = $this_token.'_'.$alt['token'];
-                                    }
-                                    shuffle($images);
-                                    $this_image = array_shift($images);
-                                }
-                                $temp_size = (intval($this_index['robot_image_size']) * 2);
-                                if ($temp_size !== $this_size){
-                                    $tmp_diff = $temp_size - $this_size;
-                                    $this_size = $temp_size;
-                                    $this_boxsize = $temp_size.'x'.$temp_size;
-                                    $this_offset_x -= round($tmp_diff / 2);
-                                }
-                                $this_frames = array();
-                                $temp_frames = mt_rand(1, 20);
-                                $temp_options = array(0, 1, 2, 8);
-                                for ($i = 0; $i < $temp_frames; $i++){ $this_frames[] = $temp_options[array_rand($temp_options)]; }
-                                foreach ($temp_options AS $i){ if (!in_array($i, $this_frames)){ $this_frames[] = $i; } }
-                            }
-
-                            $this_frames_shift = isset($this_info[$this_class.'_frame_shift']) ? $this_info[$this_class.'_frame_shift'] : array();
-                            foreach ($this_frames AS $key => $frame){ if (is_numeric($frame)){ $this_frames[$key] = str_pad($frame, 2, '0', STR_PAD_LEFT); } }
-                            $this_frame = $this_frames[0];
-                            $this_animate = implode(',', $this_frames);
-                            $this_animate_shift = implode('|', $this_frames_shift);
-                            $this_animate_enabled = count($this_frames) > 1 ? true : false;
-                            $this_direction = $this_info[$this_class.'_direction'];
-                            $this_float = $this_direction == 'left' ? 'right' : 'left';
-                            $this_image_url = 'images/'.$this_path.'/'.$this_image.'/sprite_'.$this_direction.'_'.$this_boxsize.'.png';
-                            echo '<div '.
-                                'data-id="foreground_attachment_'.$this_id.'" '.
-                                'data-type="attachment" '.
-                                'data-position="foreground" '.
-                                'data-size="'.$this_size.'" '.
-                                'data-direction="'.$this_direction.'" '.
-                                'data-frame="'.$this_frame.'" '.
-                                ''.(!empty($this_animate_enabled) ? 'data-animate="'.$this_animate.'"' : '').' '.
-                                ''.(!empty($this_animate_shift) ? 'data-animate-shift="'.$this_animate_shift.'"' : '').' '.
-                                'class="sprite sprite_'.$this_boxsize.' sprite_'.$this_boxsize.'_'.$this_direction.' sprite_'.$this_boxsize.'_'.$this_frame.'" '.
-                                'style="'.$this_float.': '.$this_offset_x.'px; bottom: '.$this_offset_y.'px; z-index: '.$this_offset_z.'; background-image: url('.$this_image_url.'?'.MMRPG_CONFIG_CACHE_DATE.'); '.($debug_flag_spriteboxes ? 'background-color: rgba(255, 0, 0, 0.5); opacity: 0.75; ' : '').'" '.
-                                '>'.$this_text.'</div>';
+                        $attachments_by_layer = array();
+                        $attachments = $this_field_data['field_foreground_attachments'];
+                        foreach ($attachments AS $id => $info){
+                            $layer = isset($info['offset_z']) ? $info['offset_z'] : 0;
+                            if (!isset($attachments_by_layer[$layer])){ $attachments_by_layer[$layer] = array(); }
+                            $attachments_by_layer[$layer][$id] = $info;
                         }
-                        echo '</div>';
+                        foreach ($attachments_by_layer AS $layer_key => $attachments_list){
+                            $layer_offset_z = 60 + $layer_key;
+                            echo '<div class="'.(!$flag_skip_fadein ? 'animate_fadein ' : '').' foreground_event '.($layer_key < 0 ? 'foreground_subevent' : '').' event clearback sticky" data-layer="'.$layer_key.'" style="z-index: '.$layer_offset_z.'; border-color: transparent;">';
+                            $this_key = -1;
+                            foreach ($attachments_list AS $this_id => $this_info){
+                                if ($flag_wap && preg_match('/^mecha/i', $this_id)){ continue; }
+                                $this_key++;
+                                $this_class = $this_info['class'];
+                                $this_size = intval($this_info['size']);
+                                $this_boxsize = $this_size.'x'.$this_size;
+                                $this_offset_x = $this_info['offset_x'];
+                                $this_offset_y = $this_info['offset_y'];
+                                $this_offset_z = isset($this_info['offset_z']) ? $this_info['offset_z'] : $this_key + 1;
+                                $this_token = $this_info[$this_class.'_token'];
+                                $this_text = !empty($this_info[$this_class.'_text']) ? $this_info[$this_class.'_text'] : '&nbsp;';
+                                $this_path = $class_paths[$this_class];
+                                if (isset($this_info['is_shadow']) && $this_info['is_shadow'] === true){ $this_path .= '_shadows'; }
+                                $this_image = !empty($this_info[$this_class.'_image']) ? $this_info[$this_class.'_image'] : $this_token;
+                                if ($this_class === 'object' && (!isset($this_info['subclass']) || $this_info['subclass'] !== 'common_object')){
+                                    $this_path = $class_paths['field'];
+                                    $this_image = $this_field_data['field_foreground'].'_'.$this_image;
+                                }
+                                $this_frames = $this_info[$this_class.'_frame'];
+                                // We want mechas, but not actual robots replaced
+                                if ($this_class == 'robot' && !empty($this_field_data['field_mechas']) && preg_match('/^mecha/i', $this_id)){
+                                    $this_token = $this_field_data['field_mechas'][array_rand($this_field_data['field_mechas'])];
+                                    if (!isset($this_robot_index[$this_token])){ $this_robot_index[$this_token] = rpg_robot::get_index_info($this_token); }
+                                    $this_index = $this_robot_index[$this_token];
+                                    $this_image = $this_token;
+                                    if (!empty($this_battle_data['battle_complete']['battle_count'])
+                                        && !empty($this_index['robot_image_alts'])){
+                                        $images = array($this_token);
+                                        foreach ($this_index['robot_image_alts'] AS $alt){
+                                            if (count($images) > $this_battle_data['battle_complete']['battle_count']){ break; }
+                                            $images[] = $this_token.'_'.$alt['token'];
+                                        }
+                                        shuffle($images);
+                                        $this_image = array_shift($images);
+                                    }
+                                    $temp_size = (intval($this_index['robot_image_size']) * 2);
+                                    if ($temp_size !== $this_size){
+                                        $tmp_diff = $temp_size - $this_size;
+                                        $this_size = $temp_size;
+                                        $this_boxsize = $temp_size.'x'.$temp_size;
+                                        $this_offset_x -= round($tmp_diff / 2);
+                                    }
+                                    $this_frames = array();
+                                    $temp_frames = mt_rand(1, 20);
+                                    $temp_options = array(0, 1, 2, 8);
+                                    for ($i = 0; $i < $temp_frames; $i++){ $this_frames[] = $temp_options[array_rand($temp_options)]; }
+                                    foreach ($temp_options AS $i){ if (!in_array($i, $this_frames)){ $this_frames[] = $i; } }
+                                }
+
+                                $this_frames_shift = isset($this_info[$this_class.'_frame_shift']) ? $this_info[$this_class.'_frame_shift'] : array();
+                                foreach ($this_frames AS $key => $frame){ if (is_numeric($frame)){ $this_frames[$key] = str_pad($frame, 2, '0', STR_PAD_LEFT); } }
+                                $this_frame_styles = isset($this_info[$this_class.'_frame_styles']) ? $this_info[$this_class.'_frame_styles'] : '';
+                                $this_frame = $this_frames[0];
+                                $this_animate = implode(',', $this_frames);
+                                $this_animate_shift = implode('|', $this_frames_shift);
+                                $this_animate_enabled = count($this_frames) > 1 ? true : false;
+                                $this_direction = $this_info[$this_class.'_direction'];
+                                $this_float = $this_direction == 'left' ? 'right' : 'left';
+                                $this_image_url = 'images/'.$this_path.'/'.$this_image.'/sprite_'.$this_direction.'_'.$this_boxsize.'.png';
+                                $this_style_attr = '';
+                                $this_style_attr .= $this_float.': '.$this_offset_x.'px; ';
+                                $this_style_attr .= 'bottom: '.$this_offset_y.'px; ';
+                                $this_style_attr .= 'z-index: '.$this_offset_z.'; ';
+                                $this_style_attr .= 'background-image: url('.$this_image_url.'?'.MMRPG_CONFIG_CACHE_DATE.'); ';
+                                $this_style_attr .= ($debug_flag_spriteboxes ? 'background-color: rgba(255, 0, 0, 0.5); opacity: 0.75; ' : '');
+                                $this_style_attr .= (!empty($this_frame_styles) ? trim($this_frame_styles).' ' : '');
+                                echo '<div '.
+                                    'data-id="foreground_attachment_'.$this_id.'" '.
+                                    'data-type="attachment" '.
+                                    'data-position="foreground" '.
+                                    'data-size="'.$this_size.'" '.
+                                    'data-direction="'.$this_direction.'" '.
+                                    'data-frame="'.$this_frame.'" '.
+                                    ''.(!empty($this_animate_enabled) ? 'data-animate="'.$this_animate.'"' : '').' '.
+                                    ''.(!empty($this_animate_shift) ? 'data-animate-shift="'.$this_animate_shift.'"' : '').' '.
+                                    'class="sprite sprite_'.$this_boxsize.' sprite_'.$this_boxsize.'_'.$this_direction.' sprite_'.$this_boxsize.'_'.$this_frame.'" '.
+                                    'style="'.$this_style_attr.'" '.
+                                    '>'.$this_text.'</div>';
+                            }
+                            echo '</div>';
+                        }
+
                     }
 
                 }
@@ -648,20 +725,157 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
             </div>
             <div class="sub_actions"><a data-order="3" class="button action_back" type="button" data-panel="option"><label>Back</label></a></div>
         </div>
-        <div id="actions_settings_eventTimeout" class="actions_settings actions_settings_eventTimeout wrapper">
-            <div class="main_actions">
-                <a data-order="1" class="button action_setting block_1" type="button" data-action="settings_eventTimeout_1600"><label><span class="multi">Super&nbsp;Slow<br />(1f/1600ms)</span></label></a>
-                <a data-order="2" class="button action_setting block_2" type="button" data-action="settings_eventTimeout_1250"><label><span class="multi">Medium&nbsp;Slow<br />(1f/1250ms)</span></label></a>
-                <a data-order="3" class="button action_setting block_3" type="button" data-action="settings_eventTimeout_1000"><label><span class="multi">Normal&nbsp;Slow<br />(1f/1000ms)</span></label></a>
-                <a data-order="4" class="button action_setting block_4" type="button" data-action="settings_eventTimeout_900"><label><span class="multi">Normal<br />(1f/900ms)</span></label></a>
-                <a data-order="5" class="button action_setting block_5" type="button" data-action="settings_eventTimeout_800"><label><span class="multi">Normal&nbsp;Fast<br />(1f/800ms)</span></label></a>
-                <a data-order="6" class="button action_setting block_6" type="button" data-action="settings_eventTimeout_700"><label><span class="multi">Medium&nbsp;Fast<br />(1f/700ms)</span></label></a>
-                <a data-order="7" class="button action_setting block_7" type="button" data-action="settings_eventTimeout_600"><label><span class="multi">Super&nbsp;Fast<br />(1f/600ms)</span></label></a>
-                <a data-order="8" class="button action_setting block_8" type="button" data-action="settings_eventTimeout_250"><label><span class="multi">Ultra&nbsp;Fast<br />(1f/250ms)</span></label></a>
+        <div id="actions_settings_animationEffects" class="actions_settings actions_settings_animationEffects wrapper">
+            <?
+
+            // Precollect the animation effects index so we can use it later
+            $animation_effects_index = rpg_canvas::get_animation_effects_index();
+
+            // Predefine the game speeds index so we can use it later
+            $game_speeds_index = array(
+                1600 => array('token' => 'super-slow', 'name' => 'Super Slow', 'value' => 1600),
+                1250 => array('token' => 'medium-slow', 'name' => 'Medium Slow', 'value' => 1250),
+                1000 => array('token' => 'normal-slow', 'name' => 'Normal Slow', 'value' => 1000),
+                900 => array('token' => 'normal', 'name' => 'Normal', 'value' => 900),
+                800 => array('token' => 'normal-fast', 'name' => 'Normal Fast', 'value' => 800),
+                700 => array('token' => 'medium-fast', 'name' => 'Medium Fast', 'value' => 700),
+                600 => array('token' => 'super-fast', 'name' => 'Super Fast', 'value' => 600),
+                250 => array('token' => 'ultra-fast', 'name' => 'Ultra Fast', 'value' => 250)
+                );
+
+            // Predefine the render modes index
+            $render_modes_index = array(
+                'default' => array('token' => 'default', 'name' => 'Default', 'label' => 'Default'),
+                //'auto' => array('token' => 'auto', 'name' => 'Auto', 'label' => 'Browser "Auto"'),
+                //'smooth' => array('token' => 'smooth', 'name' => 'Smooth', 'label' => 'Browser "Smooth"'),
+                //'high-quality' => array('token' => 'high-quality', 'name' => 'High-Quality', 'label' => 'Browser "High-Quality"'),
+                'crisp-edges' => array('token' => 'crisp-edges', 'name' => 'Crisp-Edges', 'label' => 'Browser "Crisp-Edges"'),
+                'pixelated' => array('token' => 'pixelated', 'name' => 'Pixelated', 'label' => 'Browser "Pixelated"')
+                );
+
+            ?>
+            <div class="main_actions main_actions_hastitle">
+                <span class="main_actions_title">Customize Animation Settings</span>
+                <?
+
+                // Predefine a block number counter for later
+                $block_num = 0;
+
+                // Manually add buttons for sub-menus related to animation
+                if (true){
+
+                    // Add a button for the GAME SPEED submenu
+                    $block_num++;
+                    $setting_name = 'Game Speed';
+                    $setting_token = 'eventTimeout';
+                    $default_value = 'normal';
+                    $current_value = $default_value;
+                    if (isset($_SESSION['GAME']['battle_settings'][$setting_token])){
+                        $value = $_SESSION['GAME']['battle_settings'][$setting_token];
+                        if (empty($value) || $value === 'false'){ $value = false; }
+                        elseif (!empty($value) && $value === 'true'){ $value = true; }
+                        $current_value = $value;
+                    }
+                    $current_value_title = $current_value;
+                    if (isset($game_speeds_index[$current_value]['name'])){ $current_value_title = $game_speeds_index[$current_value]['name']; }
+                    echo('<a data-order="'.$block_num.'" class="button action_option action_setting block_'.$block_num.'" type="button" data-panel="settings_'.$setting_token.'">');
+                        echo('<label><span class="multi">');
+                            echo('<span class="title">'.$setting_name.'</span>');
+                            echo('<br />');
+                            echo('<span class="value type type_time">');
+                                echo($current_value_title);
+                            echo('</span>');
+                        echo('</span></label>');
+                    echo('</a>');
+
+
+                }
+
+                // Loop through the defined ON/OFF animation effects and print buttons for each
+                foreach ($animation_effects_index AS $effect_key => $effect_info){
+                    $block_num++;
+                    $setting_name = $effect_info['name'];
+                    $setting_token = $effect_info['token'];
+                    $default_value = $effect_info['default'];
+                    $current_value = $default_value;
+                    if (isset($_SESSION['GAME']['battle_settings'][$setting_token])){
+                        $value = $_SESSION['GAME']['battle_settings'][$setting_token];
+                        if (empty($value) || $value === 'false'){ $value = false; }
+                        elseif (!empty($value) && $value === 'true'){ $value = true; }
+                        $current_value = $value;
+                    }
+                    $next_value = !$current_value ? true : false;
+                    $data_attrs = '';
+                    $data_attrs .= 'data-order="'.$block_num.'" ';
+                    $data_attrs .= 'onclick="mmrpg_toggle_settings_option(this);"  data-setting-token="'.$setting_token.'" data-setting-value="'.($current_value ? 1 : 0).'" ';
+                    echo('<a class="button action_option action_setting block_'.$block_num.'" type="button" '.$data_attrs.'>');
+                        echo('<label><span class="multi">');
+                            echo('<span class="title">'.$setting_name.'</span>');
+                            echo('<br />');
+                            echo('<span class="value type type_'.($current_value ? 'nature' : 'flame').'">');
+                                echo($current_value ? 'ON' : 'OFF');
+                            echo('</span>');
+                        echo('</span></label>');
+                    echo('</a>');
+                }
+
+                // Manually add buttons for sub-menus related to animation
+                if (true){
+
+                    // Add a button for the SPRITE RENDERING submenu
+                    $block_num++;
+                    $setting_name = 'Sprite Rendering';
+                    $setting_token = 'spriteRenderMode';
+                    $default_value = 'default';
+                    $current_value = $default_value;
+                    if (isset($_SESSION['GAME']['battle_settings'][$setting_token])){
+                        $value = $_SESSION['GAME']['battle_settings'][$setting_token];
+                        if (empty($value) || $value === 'false'){ $value = false; }
+                        elseif (!empty($value) && $value === 'true'){ $value = true; }
+                        $current_value = $value;
+                    }
+                    $current_value_title = ucwords(str_replace('-', ' ', $current_value));
+                    if (isset($render_modes_index[$current_value]['name'])){ $current_value_title = $render_modes_index[$current_value]['name']; }
+                    echo('<a data-order="'.$block_num.'" class="button action_option action_setting block_'.$block_num.'" type="button" data-panel="settings_'.$setting_token.'">');
+                        echo('<label><span class="multi">');
+                            echo('<span class="title">'.$setting_name.'</span>');
+                            echo('<br />');
+                            echo('<span class="value type type_explode">');
+                                echo($current_value_title);
+                            echo('</span>');
+                        echo('</span></label>');
+                    echo('</a>');
+
+
+                }
+
+                // If there were less than eight buttons, we should print spacers
+                while ($block_num < 8){
+                    $block_num++;
+                    echo('<a class="button action_setting button_disabled block_'.$block_num.'" type="button">&nbsp;</a>');
+                }
+
+                ?>
             </div>
             <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="option"><label>Back</label></a></div>
         </div>
+        <div id="actions_settings_eventTimeout" class="actions_settings actions_settings_eventTimeout wrapper">
+            <div class="main_actions">
+                <? $block_num = 0;
+                foreach ($game_speeds_index as $value => $speed){ $block_num++; ?>
+                    <a data-order="<?= $block_num ?>" class="button action_setting block_<?= $block_num ?>" type="button" data-action="settings_eventTimeout_<?= $speed['value'] ?>"><label><span class="multi"><?= $speed['name'] ?><br />(1f/<?= $speed['value'] ?>ms)</span></label></a>
+                <? } ?>
+            </div>
+            <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="settings_animationEffects"><label>Back</label></a></div>
+        </div>
         <div id="actions_settings_spriteRenderMode" class="actions_settings actions_settings_spriteRenderMode wrapper">
+            <div class="main_actions">
+                <? $block_num = 0;
+                foreach ($render_modes_index as $token => $mode){ $block_num++; ?>
+                    <a data-order="<?= $block_num ?>" class="button action_setting block_<?= $block_num ?>" type="button" data-action="settings_spriteRenderMode_<?= $mode['token'] ?>"><label><span class="multi"><?= str_replace(' ', '<br />', str_replace('"', '&quot;', $mode['label'])) ?></span></label></a>
+                <? } ?>
+            </div>
+            <!--
             <div class="main_actions">
                 <a data-order="1" class="button action_setting block_1" type="button" data-action="settings_spriteRenderMode_default"><label><span>Default</span></label></a>
                 <a data-order="2" class="button action_setting block_2" type="button" data-action="settings_spriteRenderMode_auto"><label><span class="multi">Browser<br />&quot;Auto&quot;</span></label></a>
@@ -672,20 +886,8 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                 <a class="button action_setting button_disabled block_7" type="button">&nbsp;</a>
                 <a class="button action_setting button_disabled block_8" type="button">&nbsp;</a>
             </div>
-            <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="option"><label>Back</label></a></div>
-        </div>
-        <div id="actions_settings_eventCrossFade" class="actions_settings actions_settings_eventCrossFade wrapper">
-            <div class="main_actions">
-                <a data-order="1" class="button action_setting block_1" type="button" data-action="settings_eventCrossFade_false"><label><span>None</span></label></a>
-                <a data-order="2" class="button action_setting block_2" type="button" data-action="settings_eventCrossFade_true"><label><span class="multi">Cross-Fade<br />Frames</span></label></a>
-                <a class="button action_setting button_disabled block_3" type="button">&nbsp;</a>
-                <a class="button action_setting button_disabled block_4" type="button">&nbsp;</a>
-                <a class="button action_setting button_disabled block_5" type="button">&nbsp;</a>
-                <a class="button action_setting button_disabled block_6" type="button">&nbsp;</a>
-                <a class="button action_setting button_disabled block_7" type="button">&nbsp;</a>
-                <a class="button action_setting button_disabled block_8" type="button">&nbsp;</a>
-            </div>
-            <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="option"><label>Back</label></a></div>
+            -->
+            <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="settings_animationEffects"><label>Back</label></a></div>
         </div>
         <div id="actions_event" class="actions_event wrapper">
             <div class="main_actions">
@@ -706,21 +908,16 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
 <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/battle.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
-// Update game setting flags
+
+// Update relevent game settings and flags
 <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 gameSettings.idleAnimation = <?= $debug_flag_animation ? 'true' : 'false' ?>;
 gameSettings.fieldMusic = '<?= !strstr($this_field_data['field_music'], '/') ? 'fields/'.$this_field_data['field_music'] : $this_field_data['field_music'] ?>';
-<?
-// Update the event timeout setting if set
-$event_timeout = !empty($_SESSION['GAME']['battle_settings']['eventTimeout']) ? $_SESSION['GAME']['battle_settings']['eventTimeout'] : 0;
-if (!empty($event_timeout)){ echo "gameSettings.eventTimeout = {$event_timeout};\n"; }
-// Update the sprite render mode setting if set
-$sprite_render_mode = !empty($_SESSION['GAME']['battle_settings']['spriteRenderMode']) ? $_SESSION['GAME']['battle_settings']['spriteRenderMode'] : 0;
-if (!empty($sprite_render_mode)){ echo "gameSettings.spriteRenderMode = '{$sprite_render_mode}';\n"; }
-// Update the event cross fade setting if set
-$event_cross_fade = !empty($_SESSION['GAME']['battle_settings']['eventCrossFade']) ? $_SESSION['GAME']['battle_settings']['eventCrossFade'] : 0;
-if (!empty($event_cross_fade)){ echo "gameSettings.eventCrossFade = {$event_cross_fade};\n"; }
-?>
+gameSettings.customIndex.animationEffects = <?= json_encode($animation_effects_index) ?>;
+gameSettings.customIndex.gameSpeeds = <?= json_encode($game_speeds_index) ?>;
+gameSettings.customIndex.renderModes = <?= json_encode($render_modes_index) ?>;
+gameSettings.currentBattleData = <?= json_encode($this_battle_data) ?>;
+
 // Create the document ready events
 $(document).ready(function(){
 

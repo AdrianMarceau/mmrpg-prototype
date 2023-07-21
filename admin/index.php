@@ -317,6 +317,7 @@ $actionMap = [
     'edit-user-challenges' => 'edit-challenges_user.php',
     'edit-stars' => 'edit-stars.php',
     'edit-pages' => 'edit-pages.php',
+    'edit-music' => 'edit-music.php',
     'watch-error-log' => 'error-log.php',
     'view-sprites' => 'view-sprites.php',
     'generate-prompts' => 'generate-prompts.php',
@@ -370,13 +371,14 @@ unset($db);
 <link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon-2k19_72x72.png" />
 <meta name="viewport" content="user-scalable=yes, width=device-width, initial-scale=1.0">
 <link rel="shortcut icon" type="image/x-icon" href="images/assets/<?= mmrpg_get_favicon() ?>">
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/solid.css" integrity="sha384-+0VIRx+yz1WBcCTXBkVQYIBVNEFH1eP6Zknm16roZCyeNg2maWEpk/l/KsyFKs7G" crossorigin="anonymous">
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/fontawesome.css" integrity="sha384-jLuaxTTBR42U2qJ/pm4JRouHkEDHkVqH0T1nyQXn1mZ7Snycpf6Rl25VBNthU4z0" crossorigin="anonymous">
+<link type="text/css" href=".libs/fontawesome/v5.6.3/css/solid.css" rel="stylesheet" />
+<link type="text/css" href=".libs/fontawesome/v5.6.3/css/fontawesome.css" rel="stylesheet" />
 <? if (!empty($admin_include_stylesheets)){ ?>
     <?= $admin_include_stylesheets ?>
 <? } ?>
 <? if (in_array('codemirror', $admin_include_common_styles)){ ?>
     <link rel="stylesheet" href=".libs/codemirror/lib/codemirror.css?<?= MMRPG_CONFIG_CACHE_DATE ?>">
+    <link rel="stylesheet" href=".libs/codemirror/addon/dialog/dialog.css?<?= MMRPG_CONFIG_CACHE_DATE ?>">
 <? } ?>
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
@@ -387,6 +389,9 @@ unset($db);
 <?endif;?>
 <link type="text/css" href="admin/styles/admin.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="admin/styles/admin-responsive.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<? if (file_exists(MMRPG_CONFIG_ROOTDIR.'admin/styles/admin_'.$this_page_action.'.css')){ ?>
+    <link type="text/css" href="admin/styles/admin_<?= $this_page_action ?>.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<? } ?>
 </head>
 <body id="mmrpg">
     <div id="admin">
@@ -422,6 +427,10 @@ unset($db);
 <? if (in_array('codemirror', $admin_include_common_scripts)){ ?>
     <script type="text/javascript" src=".libs/codemirror/lib/codemirror.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
     <script type="text/javascript" src=".libs/codemirror/addon/edit/matchbrackets.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
+    <script type="text/javascript" src=".libs/codemirror/addon/search/search.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
+    <script type="text/javascript" src=".libs/codemirror/addon/search/searchcursor.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
+    <script type="text/javascript" src=".libs/codemirror/addon/search/jump-to-line.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
+    <script type="text/javascript" src=".libs/codemirror/addon/dialog/dialog.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
     <script type="text/javascript" src=".libs/codemirror/mode/htmlmixed/htmlmixed.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
     <script type="text/javascript" src=".libs/codemirror/mode/xml/xml.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
     <script type="text/javascript" src=".libs/codemirror/mode/javascript/javascript.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
@@ -432,10 +441,18 @@ unset($db);
 <? if (in_array('sortable', $admin_include_common_scripts)){ ?>
     <script type="text/javascript" src=".libs/jquery-ui-sortable/jquery.sortable.min.js"></script>
 <? } ?>
-<script type="text/javascript" src="admin/scripts/admin.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
+<? if (in_array('howler', $admin_include_common_scripts)){ ?>
+    <script src=".libs/howler-js/howler.core.min.js"></script>
+    <script src=".libs/howler-js/howler.min.js"></script>
+<? } ?>
 <script type="text/javascript">
-    thisRootURL = '<?= MMRPG_CONFIG_ROOTURL ?>';
+    var thisRootURL = '<?= MMRPG_CONFIG_ROOTURL ?>';
+    var mmrpgConfigRootURL = '<?= MMRPG_CONFIG_ROOTURL ?>';
 </script>
+<script type="text/javascript" src="admin/scripts/admin.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
+<? if (file_exists(MMRPG_CONFIG_ROOTDIR.'admin/scripts/admin_'.$this_page_action.'.js')){ ?>
+    <script type="text/javascript" src="admin/scripts/admin_<?= $this_page_action ?>.js?<?= MMRPG_CONFIG_CACHE_DATE ?>"></script>
+<? } ?>
 <? if (!empty($admin_inline_javascript)){ ?>
     <?= $admin_inline_javascript ?>
 <? } ?>

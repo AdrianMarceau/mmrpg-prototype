@@ -92,6 +92,7 @@ class rpg_skill extends rpg_object {
             $temp_backup_id = $this_skillinfo['skill_id'];
             if (empty($this_skillinfo_backup['_parsed']) && !empty($this_indexinfo)){
                 $robot_skillinfo = $this->robot->get_skill_info($this->robot->robot_skill);
+                if (empty($robot_skillinfo)){ $robot_skillinfo = array(); }
                 $this_skillinfo = array_replace($this_indexinfo, $robot_skillinfo, $this_skillinfo_backup);
             }
         }
@@ -322,6 +323,11 @@ class rpg_skill extends rpg_object {
         $print_type = !empty($skill_info['skill_display_type']) ? $skill_info['skill_display_type'] : 'none';
         if (!empty($pseudo_name)){ $print_name = $pseudo_name; }
         return '<span class="skill_name skill_type type_'.$print_type.'">'.$print_name.'</span>';
+    }
+    public function print_name_s($pseudo_name = ''){
+        $print_name = $this->print_name($pseudo_name);
+        $ends_with_s = substr(trim(strip_tags($print_name)), -1) === 's' ? true : false;
+        return $print_name."'".(!$ends_with_s ? 's' : '');
     }
     public function print_token(){
         return '<span class="skill_token">'.$this->skill_token.'</span>';

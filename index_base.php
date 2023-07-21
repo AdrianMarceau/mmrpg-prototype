@@ -327,8 +327,8 @@ if (empty($this_markup_body)
     <link type="text/css" href=".libs/colorbox/example3/colorbox.css" rel="stylesheet" />
 <? endif; ?>
 
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/solid.css" integrity="sha384-+0VIRx+yz1WBcCTXBkVQYIBVNEFH1eP6Zknm16roZCyeNg2maWEpk/l/KsyFKs7G" crossorigin="anonymous">
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/fontawesome.css" integrity="sha384-jLuaxTTBR42U2qJ/pm4JRouHkEDHkVqH0T1nyQXn1mZ7Snycpf6Rl25VBNthU4z0" crossorigin="anonymous">
+<link type="text/css" href=".libs/fontawesome/v5.6.3/css/solid.css" rel="stylesheet" />
+<link type="text/css" href=".libs/fontawesome/v5.6.3/css/fontawesome.css" rel="stylesheet" />
 
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.css" rel="stylesheet" />
@@ -370,6 +370,7 @@ if ($this_current_page == 'file' // File sub-pages
         <div class="banner <?= defined('MMRPG_INDEX_COMPACT_MODE') ? 'compact' : '' ?>">
 
             <?
+
             // Define variables based on login status
             if (!defined('MMRPG_CRITICAL_ERROR') && !rpg_user::is_guest()){
                 // Define the avatar class and path variables
@@ -393,9 +394,14 @@ if ($this_current_page == 'file' // File sub-pages
                 if (defined('MMRPG_INDEX_COMPACT_MODE')){ $temp_background_path = str_replace('.gif', '.png', $temp_background_path); }
             }
             //die($temp_background_path);
+
+            // Define a variable to hold the background image style
+            $temp_background_style = 'background-image: url('.(!empty($temp_background_path) ? $temp_background_path : 'images/fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN.'/battle-field_background_base.gif').'?'.MMRPG_CONFIG_CACHE_DATE.');';
+
             ?>
             <a class="anchor" id="top">&nbsp;</a>
-            <div class="sprite background banner_background" style="background-image: url(<?= !empty($temp_background_path) ? $temp_background_path : 'images/fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN.'/battle-field_background_base.gif' ?>?<?=MMRPG_CONFIG_CACHE_DATE?>);"></div>
+            <div class="sprite background banner_background blur" style="<?= $temp_background_style ?>"></div>
+            <div class="sprite background banner_background focus" style="<?= $temp_background_style ?>"></div>
             <?
             // Only continue if we're NOT in critical error mode
             if (!defined('MMRPG_CRITICAL_ERROR')){
@@ -449,7 +455,7 @@ if ($this_current_page == 'file' // File sub-pages
             }
             ?>
             <div class="foreground scanlines" style="background-image: url(images/assets/canvas-scanlines.png?<?=MMRPG_CONFIG_CACHE_DATE?>);">&nbsp;</div>
-            <div class="sprite credits banner_credits"><a href="<?= MMRPG_CONFIG_ROOTURL ?>"><strong>Mega Man RPG Prototype | PlutoLighthouse.NET</strong></a></div>
+            <div class="sprite credits banner_credits"><a href="<?= MMRPG_CONFIG_ROOTURL ?>"><h1>Mega Man RPG Prototype | Browser-Based Battle Simulator</h1></a></div>
             <div class="sprite overlay banner_overlay" style="">&nbsp;</div>
 
             <div class="header_social_icons x16">
@@ -521,17 +527,11 @@ if ($this_current_page == 'file' // File sub-pages
 
     </div>
 
-    <div id="credits">
-        <? if ($this_current_page != 'home'): ?>
-            <a href="<?= MMRPG_CONFIG_ROOTURL ?>">&laquo; Back to Home</a> |
-        <? endif; ?>
-        Mega Man and all related names and characters are &copy; <a href="http://www.capcom.com/" target="_blank" rel="nofollow">Capcom</a> 1986 - <?= date('Y') ?>.
-        | <a href="<?= MMRPG_CONFIG_ROOTURL ?>cookies/">Cookie Policy</a>
-        | <a href="<?= MMRPG_CONFIG_ROOTURL ?>contact/">Contact &amp; Feedback</a>
-        | <a rel="nofollow" href="<?= MMRPG_CONFIG_ROOTURL ?>api/v2/" target="_blank">Data API</a>
-        <?= !$flag_iphone ? '<br />' : '' ?>
-        This game is fan-made by <a href="https://github.com/AdrianMarceau" target="_blank" rel="author">Adrian Marceau</a>, not affiliated or endorsed by Capcom at all, and is in no way official. Any and all <a href="contact/" target="_blank">feedback</a> is appreciated. :)
-    </div>
+    <?
+    // Require the common footer
+    $footer_context = 'base';
+    require(MMRPG_CONFIG_ROOTDIR.'includes/footer.php');
+    ?>
 
     <a id="topscroll" href="<?= $this_current_url ?>"></a>
 

@@ -141,8 +141,12 @@ if (count($matches)>1){
 
 <style type="text/css"> html, body { background-color: #262626; } </style>
 
-<link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href=".libs/fontawesome/v5.6.3/css/solid.css" rel="stylesheet" />
+<link type="text/css" href=".libs/fontawesome/v5.6.3/css/fontawesome.css" rel="stylesheet" />
+
 <link type="text/css" href=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.css" rel="stylesheet" />
+
+<link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype-responsive.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 
@@ -160,16 +164,16 @@ if (count($matches)>1){
 
     <?if($this_online_flag && $this_browser_flag):?>
         <?if(!$flag_wap):?>
-            <iframe class="loading" name="battle" src="<?= MMRPG_CONFIG_ROOTURL ?>prototype.php?wap=false" width="768" height="1004" frameborder="1" scrolling="no"></iframe>
+            <iframe class="loading" name="prototype" src="<?= MMRPG_CONFIG_ROOTURL ?>prototype.php?wap=false" width="768" height="1004" frameborder="1" scrolling="no"></iframe>
         <?else:?>
-            <iframe class="loading" name="battle" src="<?= MMRPG_CONFIG_ROOTURL ?>prototype.php?wap=true" width="768" height="748" frameborder="0" scrolling="no"></iframe>
+            <iframe class="loading" name="prototype" src="<?= MMRPG_CONFIG_ROOTURL ?>prototype.php?wap=true" width="768" height="748" frameborder="0" scrolling="no"></iframe>
         <?endif;?>
         <div id="music" class="onload">
-            <a class="toggle paused" href="#" onclick=""><span><span>loading&hellip;</span></span></a>
-            <audio class="stream paused" onended="this.play();">
-                <div style="color: white; background-color: black; padding: 10px;">Your browser does not support the audio tag.</div>
-            </audio>
+            <a class="toggle paused has_pixels" href="#" onclick=""><span><span>loading&hellip;</span></span></a>
+            <input type="hidden" class="audio-stream music paused" />
+            <input type="hidden" class="audio-stream effects paused" />
         </div>
+        <? /*
         <div id="events" class="hidden">
             <div class="event_wrapper">
                 <div class="event_container">
@@ -179,6 +183,7 @@ if (count($matches)>1){
                 </div>
             </div>
         </div>
+        */ ?>
     <?elseif(!$this_online_flag):?>
         <strong style="display: block; margin: 100px auto; font-size: 13px; line-height: 19px; color: #DEDEDE; ">
             The <strong>Mega Man RPG Prototype</strong> is temporarily down for maintenance.<br />
@@ -193,92 +198,182 @@ if (count($matches)>1){
     <?endif;?>
 
 </div>
-<?if(!$flag_wap):?>
-<div id="credits">
-    <a href="<?= MMRPG_CONFIG_ROOTURL ?>">&laquo; Back to Website</a> |
-    Mega Man and all related names and characters are &copy; <a href="http://www.capcom.com/" target="_blank" rel="nofollow">Capcom</a> 1986 - <?= date('Y') ?>.
-    | <a href="<?= MMRPG_CONFIG_ROOTURL ?>contact/">Contact &amp; Feedback &raquo;</a>
-    | <a rel="nofollow" href="<?= MMRPG_CONFIG_ROOTURL ?>api/v2/" target="_blank">Data API</a>
-    <?= !$flag_iphone ? '<br />' : '' ?>
-    This game is fan-made by <a href="https://github.com/AdrianMarceau" target="_blank" rel="author">Adrian Marceau</a>, not affiliated or endorsed by Capcom at all, and is in no way official. Any and all <a href="contact/" target="_blank">feedback</a> is appreciated. :)
+<?
+// Require the common footer
+$footer_context = 'base';
+require(MMRPG_CONFIG_ROOTDIR.'includes/footer.php');
+?>
+<div id="winmods">
+    <fieldset class="field width" style="display: none;">
+        <legend class="label" alt="Adjust Window Width">
+            <i class="fa fas fa-tablet-alt" style="position: relative; bottom: 4px;"></i>
+            <i class="fa fas fa-arrows-alt-h" style="position: absolute; bottom: -4px; left: 50%; transform: translate(-50%, 0);"></i>
+        </legend>
+        <a type="button" class="button" data-mod-name="width" data-mod-value="small">Small</a>
+        <a type="button" class="button" data-mod-name="width" data-mod-value="large">Large</a>
+        <a type="button" class="button" data-mod-name="width" data-mod-value="flex">Flex</a>
+    </fieldset>
+    <fieldset class="field height">
+        <legend class="label" alt="Adjust Window Height">
+            <i class="fa fas fa-tablet-alt"></i>
+            <i class="fa fas fa-arrows-alt-v"></i>
+        </legend>
+        <a type="button" class="button" data-mod-name="height" data-mod-value="small">Small</a>
+        <a type="button" class="button" data-mod-name="height" data-mod-value="large">Large</a>
+        <a type="button" class="button" data-mod-name="height" data-mod-value="flex">Flex</a>
+    </fieldset>
 </div>
-<?endif;?>
 <script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
 <script type="text/javascript" src=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.js"></script>
+<script type="text/javascript" src=".libs/howler-js/howler.core.min.js"></script>
+<script type="text/javascript" src=".libs/howler-js/howler.min.js"></script>
 <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
 // Define the key client variables
 <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 var thisScrollbarSettings = {wheelSpeed:0.3};
+// Define the music and sound effects details for use in the script
+<?
+
+// Define the root paths for the music and sound files
+$mmrpg_music_path = 'prototype/sounds/';
+$mmrpg_music_rootdir = MMRPG_CONFIG_CDN_ROOTDIR.$mmrpg_music_path;
+$mmrpg_music_rooturl = MMRPG_CONFIG_CDN_ROOTURL.$mmrpg_music_path;
+
+// Collect the music index from the database and then output to the JS
+$this_music_track_index = rpg_music_track::get_index(true, false, 'music_token', 'music_album+/+music_token');
+$this_music_track_index = array_map(function($info){ return array(
+    'token' => $info['music_token'],
+    'album' => $info['music_album'],
+    'game' => $info['music_game'],
+    'name' => $info['music_name'],
+    'link' => $info['music_link'],
+    'loop' => $info['music_loop'],
+    'order' => $info['music_order']
+    ); }, $this_music_track_index);
+//error_log('$this_music_track_index ='.print_r($this_music_track_index, true));
+echo 'gameSettings.customIndex.musicIndex = '.json_encode($this_music_track_index).';'.PHP_EOL;
+
+// Collect the sound effects index from the file and then output to the JS
+$this_sound_effects_path = $mmrpg_music_rootdir.'misc/sound-effects-curated/';
+$this_sound_effects_index = array();
+$this_sound_effects_index_raw = file_exists($this_sound_effects_path.'audio.json') ? json_decode(file_get_contents($this_sound_effects_path.'audio.json'), true) : array();
+if (!empty($this_sound_effects_index_raw['resources'])
+    && !empty($this_sound_effects_index_raw['spritemap'])){
+    $this_sound_effects_index['src'] = array();
+    $this_sound_effects_index['sprite'] = array();
+    foreach ($this_sound_effects_index_raw['resources'] AS $key => $resource){
+        if (!preg_match('/\.(ogg|mp3)$/i', $resource)){ continue; }
+        $source = 'misc/'.$resource.'?'.MMRPG_CONFIG_CACHE_DATE;
+        $this_sound_effects_index['src'][] = $source;
+    }
+    foreach ($this_sound_effects_index_raw['spritemap'] AS $token => $spritemap){
+        $sprite = array();
+        $sprite['start'] = ceil($spritemap['start'] * 1000);
+        $sprite['end'] = ceil($spritemap['end'] * 1000);
+        $sprite['duration'] = $sprite['end'] - $sprite['start'];
+        $this_sound_effects_index['sprite'][$token] = $sprite;
+    }
+}
+//error_log('$this_sound_effects_index ='.print_r($this_sound_effects_index, true));
+echo 'gameSettings.customIndex.soundsIndex = '.json_encode($this_sound_effects_index).';'.PHP_EOL;
+
+// Collect the sound effect aliases index from teh file and then outpyt to the JS
+$raw_json = trim(file_get_contents(MMRPG_CONFIG_ROOTDIR.'includes/sounds.json'));
+$raw_json = !empty($raw_json) ? preg_replace('!//.*$!m', '', $raw_json) : '';
+$raw_json_array = !empty($raw_json) ? json_decode($raw_json, true) : array();
+//error_log('$raw_json_array ='.print_r($raw_json_array, true));
+$sound_effects_aliases_index = array();
+if (!empty($raw_json_array)){
+    foreach ($raw_json_array AS $sfx_category => $sfx_category_info){
+        if (!empty($sfx_category_info['index'])){
+            $sound_effects_aliases_index = array_merge($sound_effects_aliases_index, $sfx_category_info['index']);
+        }
+    }
+}
+//error_log('$sound_effects_aliases_index ='.print_r($sound_effects_aliases_index, true));
+echo 'gameSettings.customIndex.soundsAliasesIndex = '.json_encode($sound_effects_aliases_index).';'.PHP_EOL;
+
+?>
 </script>
 <script type="text/javascript">
+
 // When the document is ready for event binding
 $(document).ready(function(){
+
     // Preload essential audio tracks
     mmrpg_music_preload('misc/player-select');
     mmrpg_music_preload('misc/stage-select-dr-light');
-    //mmrpg_music_preload('misc/stage-select-dr-wily');
-    //mmrpg_music_preload('misc/data-base');
-    //mmrpg_music_preload('misc/leader-board');
-    //mmrpg_music_preload('misc/file-menu');
-    //mmrpg_music_preload('misc/robot-editor');
-    // Check if we're running the game in mobile mode
-    if (false && gameSettings.wapFlag){
-        // Let the user know about the full-screen option for mobile browsers
-        if (('standalone' in window.navigator) && !window.navigator.standalone){
-            //alert('launched from full-screen ready browser, but not in full screen...');
-            alert('Use the "Add to Home Screen" option for fullscreen view! :)');
-            } else if (('standalone' in window.navigator) && window.navigator.standalone){
-            //alert('launched from full-screen ready browser, and in full screen!');
-            } else {
-            //alert('launched from a regular old browser...');
-            }
-        }
-    // Collect a reference to the continue button
-    var eventContinue = $('#events #buttons .event_continue');
-    // Create the continue event for the event window
-    eventContinue.click(function(e){
-        e.preventDefault();
-        //alert('clicked');
-        windowEventDestroy();
-        if (gameSettings.canvasMarkupArray.length || gameSettings.messagesMarkupArray.length){
-            windowEventDisplay();
-            }
-        });
+
+    // If window mod tools exist on the page, we should bind events to them
+    var $gameWindow = $('#window');
+    var $windowMods = $('#winmods');
+    if ($gameWindow.length
+        && $windowMods.length){
+
+        // Load previous preferences if present
+        var previousWidth = localStorage.getItem('mmrpg-window-width') || 'small';
+        var previousHeight = localStorage.getItem('mmrpg-window-height') || 'small';
+
+        // Set previous preferences
+        $gameWindow.attr('data-window-width', previousWidth);
+        $gameWindow.attr('data-window-height', previousHeight);
+
+        // Collect references to the different buttons
+        var $widthButtons = $('.width .button', $windowMods);
+        var $heightButtons = $('.height .button', $windowMods);
+
+        // Highlight active buttons
+        $widthButtons.removeClass('active').filter('[data-mod-value="' + previousWidth + '"]').addClass('active');
+        $heightButtons.removeClass('active').filter('[data-mod-value="' + previousHeight + '"]').addClass('active');
+
+        // Width functionality
+        $widthButtons.bind('click', function() {
+            var value = $(this).data('mod-value');
+            $gameWindow.attr('data-window-width', value);
+            localStorage.setItem('mmrpg-window-width', value);
+            $widthButtons.removeClass('active');
+            $(this).addClass('active');
+            });
+
+        // Height functionality
+        $heightButtons.bind('click', function() {
+            var value = $(this).data('mod-value');
+            $gameWindow.attr('data-window-height', value);
+            localStorage.setItem('mmrpg-window-height', value);
+            $heightButtons.removeClass('active');
+            $(this).addClass('active');
+            });
+    }
 
 });
-//function updateMobileCache(event){ window.applicationCache.swapCache(); }
-// Define a function for displaying event messages to the player
-gameSettings.canvasMarkupArray = [];
-gameSettings.messagesMarkupArray = [];
-function windowEventCreate(canvasMarkupArray, messagesMarkupArray){
-    //console.log('windowEventCreate('+canvasMarkupArray+', '+messagesMarkupArray+')');
-    gameSettings.canvasMarkupArray = canvasMarkupArray;
-    gameSettings.messagesMarkupArray = messagesMarkupArray;
-    windowEventDisplay();
-}
-// Define a function for displaying event messages to the player
-function windowEventDisplay(){
-    var eventContainer = $('#events');
-    //console.log('windowEventDisplay()');
-    var canvasMarkup = gameSettings.canvasMarkupArray.length ? gameSettings.canvasMarkupArray.shift() : '';
-    var messagesMarkup = gameSettings.messagesMarkupArray.length ? gameSettings.messagesMarkupArray.shift() : '';
-    $('#canvas', eventContainer).empty().html(canvasMarkup);
-    $('#messages', eventContainer).empty().html(messagesMarkup);
-    eventContainer.css({opacity:0}).removeClass('hidden').animate({opacity:1},300,'swing');
-    $('#messages', eventContainer).perfectScrollbar(thisScrollbarSettings);
-    $(window).focus();
-    //alert(eventMarkup);
-}
-// Define a function for displaying event messages to the player
-function windowEventDestroy(){
-    var eventContainer = $('#events');
-    //console.log('windowEventDestroy()');
-    $('#canvas', eventContainer).empty();
-    $('#messages', eventContainer).empty();
-    eventContainer.addClass('hidden');
-    //alert(eventMarkup);
-}
+
+
+// Add some functionality for a "cinema mode" where it fades credits and stuff
+(function(){
+    var $body = $('body');
+    var $gameWindow = $('#window')
+    // When the parent window loses focus, we'll assume the user is playing
+    $(window).bind('blur', function(){
+        //console.log('Window lost focus, user must be playing');
+        $body.attr('data-cinema-mode', 'true');
+        });
+    // When the document is clicked outside the game window, we'll assume the user is configuring
+    $(document).bind('click', function(event) {
+        if ($(event.target).closest('#window').length){ return; }
+        if ($(event.target).closest('#music').length){ return; }
+        if ($(event.target).closest('#events').length){ return; }
+        //console.log('Clicked outside game window, user must be configuring');
+        $body.attr('data-cinema-mode', 'false');
+        });
+    // When the START button is clicked (disgused music button) we can start cinema mode
+    $('#music').bind('click', function(e){
+        //console.log('User clicked start, user must be playing');
+        $body.attr('data-cinema-mode', 'true');
+        e.stopPropagation();
+        });
+})();
+
 </script>
 <?
 // Require the remote bottom in case we're in viewer mode

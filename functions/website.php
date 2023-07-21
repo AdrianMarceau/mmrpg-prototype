@@ -1783,6 +1783,8 @@ function number_is_plural($number, $zero_is_plural = true){
     else { return $real_number !== 1 ? true : false; }
 }
 
+// -- ARRAY MANIPULATION FUNCTIONS -- //
+
 // Define a recursive function for flattening a nested array into one depth w/ a separator
 function flatten_nested_array_recursive(array &$out, $key, array $in, $glue = '_'){
     foreach($in as $k=>$v){
@@ -1825,5 +1827,39 @@ function inflate_nested_array($arr, $divider_char = "/") {
     return $ret;
 }
 
+// -- TIME CONVERSION FUNCTIONS -- //
+
+// Define a function for converting integer-based minutes, seconds, and frames into just milliseconds
+function convert_to_milliseconds($minutes = 0, $seconds = 0, $frames = 0){
+    $minutes = (int) $minutes;
+    $seconds = (int) $seconds;
+    $frames = (int) $frames;
+    return (($minutes * 60 + $seconds) * 1000) + ($frames * 1000 / 24);
+}
+
+// Define a function for converting milliseconds to a string
+function convert_from_milliseconds($totalMilliseconds = 0) {
+    $totalMilliseconds = (int) $totalMilliseconds;
+    $minutes = floor($totalMilliseconds / 60000);
+    $totalMilliseconds %= 60000;
+    $seconds = floor($totalMilliseconds / 1000);
+    $frames = round(($totalMilliseconds % 1000) * 24 / 1000);
+    return array('minutes' => $minutes, 'seconds' => $seconds, 'frames' => $frames);
+}
+
+// Define a function that takes a string-based timestamp, separates it, and then returns it in milliseconds
+function get_milliseconds_from_timestamp($timestamp = ''){
+    $parts = explode(':', $timestamp);
+    $minutes = intval($parts[0]);
+    $seconds = intval($parts[1]);
+    $frames = intval($parts[2]);
+    return convert_to_milliseconds($minutes, $seconds, $frames);
+}
+
+// Define a function that takes milliseconds and returns a string-based timestamp
+function get_timestamp_from_milliseconds($milliseconds = 0){
+    $parts = convert_from_milliseconds($milliseconds);
+    return sprintf('%02d:%02d:%02d', $parts['minutes'], $parts['seconds'], $parts['frames']);
+}
 
 ?>

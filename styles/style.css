@@ -24,7 +24,7 @@ strong {
     font-weight: bold;
 }
 body {
-    font-family: Arial, Verdana;
+    font-family: 'Open Sans', Arial, Verdana, sans-serif !important;
     font-size: 12px;
     line-height: 15px;
     text-align: center;
@@ -195,7 +195,59 @@ body.index #header {
     margin: 0 auto;
 }
 
+#mmrpg .info[data-click-tooltip] {
+    cursor: help;
+}
+#mmrpg .info[data-click-tooltip] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: auto;
+    bottom: auto;
+    display: block;
+    text-align: center;
+    line-height: 1;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: #ffffff;
+    background-color: #000000;
+    border: 1px solid #1A1A1A;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    overflow: hidden;
+    z-index: 100;
+    cursor: help;
+    transform: scale(1);
+    transition: transform 0.3s;
+    white-space: break-spaces;
+}
+#mmrpg .info[data-click-tooltip].color {
+    background-color: #ffffff;
+}
+#mmrpg .info[data-click-tooltip]:hover {
+    transform: scale(1.2);
+}
+#mmrpg .info[data-click-tooltip] > i {
+    text-align: center;
+    text-shadow: none;
+}
+#mmrpg .info[data-click-tooltip] > i:before {
+    display: block;
+}
+#mmrpg .info[data-click-tooltip] > i + i {
+    position: relative;
+    top: -22px;
+    height: 8px;
+    overflow: hidden;
+}
+#mmrpg .info[data-click-tooltip] > i + i:before {
 
+}
+#mmrpg [data-click-tooltip] > * {
+    pointer-events: none;
+}
 
 #mmrpg .animate_fadein {
     display: none !important;
@@ -219,6 +271,29 @@ body.index #header {
     color: transparent;
     position: absolute;
     background: transparent none scroll no-repeat 0 0;
+}
+#mmrpg .sprite.scaled {
+
+}
+#mmrpg .sprite[data-shadowid] {
+    display: none;
+    filter: brightness(0) opacity(0.2);
+    -moz-mix-blend-mode: multiply;
+    -webkit-mix-blend-mode: multiply;
+    mix-blend-mode: multiply;
+}
+@supports (filter: grayscale(1)) and (transform: skewX(10deg)) {
+    #mmrpg .sprite[data-shadowid] {
+        display: block;
+    }
+}
+
+#mmrpg .sprite,
+#mmrpg .sprite_image,
+#mmrpg .has_pixels,
+#mmrpg .sprite img,
+#mmrpg .sprite_image img,
+#mmrpg .has_pixels img {
     -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
     image-rendering: -moz-crisp-edges;         /* Firefox */
     image-rendering:   -o-crisp-edges;         /* Opera */
@@ -227,59 +302,44 @@ body.index #header {
     image-rendering: crisp-edges;
     image-rendering: pixelated;
 }
-#mmrpg .sprite.scaled {
-    -ms-interpolation-mode: bicubic;
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: optimizeQuality;
-    image-rendering: smooth;
-    image-rendering: high-quality;
-}
+
 
 /* -- Sprite Modes -- */
 
-#mmrpg[data-render-mode="auto"] .sprite,
-#mmrpg[data-render-mode="auto"] .sprite.scaled,
-#mmrpg[data-render-mode="auto"] #canvas .sprite,
-#mmrpg[data-render-mode="auto"] img.has_pixels {
-    image-rendering: auto !important;
-}
-
-#mmrpg[data-render-mode="smooth"] .sprite,
-#mmrpg[data-render-mode="smooth"] .sprite.scaled,
-#mmrpg[data-render-mode="smooth"] #canvas .sprite,
-#mmrpg[data-render-mode="smooth"] img.has_pixels {
-    -ms-interpolation-mode: bicubic !important;
-    image-rendering: optimizeQuality !important;
-    image-rendering: smooth !important;
-}
-
-#mmrpg[data-render-mode="pixelated"] .sprite,
-#mmrpg[data-render-mode="pixelated"] .sprite.scaled,
-#mmrpg[data-render-mode="pixelated"] #canvas .sprite,
-#mmrpg[data-render-mode="pixelated"] img.has_pixels {
-    -ms-interpolation-mode: nearest-neighbor !important;
-    image-rendering: optimizeSpeed !important;
-    image-rendering: pixelated !important;
-}
-
-#mmrpg[data-render-mode="high-quality"] .sprite,
-#mmrpg[data-render-mode="high-quality"] .sprite.scaled,
-#mmrpg[data-render-mode="high-quality"] #canvas .sprite,
-#mmrpg[data-render-mode="high-quality"] img.has_pixels {
-    image-rendering: high-quality !important;
-}
-
-#mmrpg[data-render-mode="crisp-edges"] .sprite,
-#mmrpg[data-render-mode="crisp-edges"] .sprite.scaled,
+#mmrpg .sprite.smooth-scaling,
+#mmrpg[data-render-mode="default"] #canvas .sprite,
+#mmrpg[data-render-mode="default"] #canvas .sprite_image,
+#mmrpg[data-render-mode="default"] #canvas .has_pixels,
+#mmrpg[data-render-mode="default"] #canvas .sprite img,
+#mmrpg[data-render-mode="default"] #canvas .sprite_image img,
+#mmrpg[data-render-mode="default"] #canvas .has_pixels img,
 #mmrpg[data-render-mode="crisp-edges"] #canvas .sprite,
-#mmrpg[data-render-mode="crisp-edges"] img.has_pixels {
-    -ms-interpolation-mode: nearest-neighbor !important;
-    image-rendering: -webkit-optimize-contrast !important;
-    image-rendering: -moz-crisp-edges !important;
-    image-rendering:   -o-crisp-edges !important;
-    image-rendering: crisp-edges !important;
+#mmrpg[data-render-mode="crisp-edges"] #canvas .sprite_image,
+#mmrpg[data-render-mode="crisp-edges"] #canvas .has_pixels,
+#mmrpg[data-render-mode="crisp-edges"] #canvas .sprite img,
+#mmrpg[data-render-mode="crisp-edges"] #canvas .sprite_image img,
+#mmrpg[data-render-mode="crisp-edges"] #canvas .has_pixels img {
+    -ms-interpolation-mode: bicubic;  /* IE (non-standard property) */
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    image-rendering:   -o-crisp-edges;         /* Opera */
+    image-rendering: -moz-crisp-edges;         /* Firefox */
+    image-rendering: -webkit-optimize-contrast; /* Webkit (non-standard naming) */
 }
-
+#mmrpg .sprite.pixel-scaling,
+#mmrpg[data-render-mode="pixelated"] #canvas .sprite,
+#mmrpg[data-render-mode="pixelated"] #canvas .sprite_image,
+#mmrpg[data-render-mode="pixelated"] #canvas .has_pixels,
+#mmrpg[data-render-mode="pixelated"] #canvas .sprite img,
+#mmrpg[data-render-mode="pixelated"] #canvas .sprite_image img,
+#mmrpg[data-render-mode="pixelated"] #canvas .has_pixels img {
+    -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
+    image-rendering: -webkit-optimize-contrast;/* Webkit (non-standard naming) */
+    image-rendering: -moz-crisp-edges;         /* Firefox */
+    image-rendering:   -o-crisp-edges;         /* Opera */
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+}
 
 #mmrpg .sprite_fullscreen {
     width: auto !important;
@@ -526,7 +586,7 @@ body.index #header {
 }
 #mmrpg .player_position_bench,
 #mmrpg .robot_position_bench {
-    /*opacity: 0.9;*/
+
 }
 
 #mmrpg .robot_details {
@@ -540,27 +600,16 @@ body.index #header {
     font-size: 1px;
     line-height: 1px;
 }
-/*
-#mmrpg .robot_details_idle {
-    opacity: 0.9 !important;
-    filter: alpha(opacity=90) !important;
-}
-#mmrpg .robot_details:hover,
-#mmrpg .robot_details_idle:hover {
-    opacity: 1.0 !important;
-    filter: alpha(opacity=100) !important;
-}
-*/
 
 #mmrpg .robot_details_left {
-    background-image: url(../images/assets/battle-scene_robot-details-4.png?20181214-01);
+    background-image: url(../images/assets/battle-scene_robot-details-5.png?20230609-6);
     background-position: 0 0;
     text-align: left;
     top: 4px;
     left: 4px;
 }
 #mmrpg .robot_details_right {
-    background-image: url(../images/assets/battle-scene_robot-details-4.png?20181214-01);
+    background-image: url(../images/assets/battle-scene_robot-details-5.png?20230609-6);
     background-position: -271px 0;
     text-align: right;
     top: 4px;
@@ -680,30 +729,37 @@ body.index #header {
 }
 
 #mmrpg #canvas .robot_mugshot_type {
-    z-index: 9100;
-    border-radius: 2px;
+    /*z-index: 9100;*/
+    z-index: 8900;
+    width: 46px;
+    height: 46px;
+    top: 8px;
+    position: absolute;
+    border: 1px solid #000000;
     -moz-border-radius: 2px;
     -webkit-border-radius: 2px;
-    width: 38px;
-    height: 38px;
-    top: 12px;
-    border: 1px solid #000000;
-    position: absolute;
+    border-radius: 2px;
 }
 #mmrpg #canvas .robot_mugshot_type .sprite {
     position: relative;
     border: 1px solid #000000;
     border-radius: 3px;
     background-color: rgb(0, 0, 0);
-    background-color: rgba(0, 0, 0, .5);
-    top: 2px;
-    left: 2px;
+    background-color: rgba(0, 0, 0, 0.3);
+    top: 6px;
+    left: 6px;
     right: 2px;
     width: 32px;
     height: 32px;
 }
 #mmrpg #canvas .robot_mugshot .robot_mugshot {
     pointer-events: none;
+}
+#mmrpg #canvas .robot_mugshot_type.sprite_mugshot_left {
+    left: 8px;
+}
+#mmrpg #canvas .robot_mugshot_type.sprite_mugshot_right {
+    right: 8px;
 }
 
 #mmrpg .sprite_mugshot_left {
@@ -769,18 +825,20 @@ body.index #header {
     width: 144px;
     top: 7px;
     letter-spacing: 2px;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
 }
 #mmrpg .robot_details .robot_level {
-    height: 12px;
-    font-size: 9px;
-    line-height: 12px;
+    height: 16px;
+    font-size: 10px;
+    line-height: 16px;
     text-transform: none;
     width: 50px;
     top: 9px;
     padding: 0 5px;
-    border-radius: 0.3em;
-    -moz-border-radius: 0.3em;
-    -webkit-border-radius: 0.3em;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+    -moz-border-radius: 0.2em;
+    -webkit-border-radius: 0.2em;
+    border-radius: 0.2em;
 }
 #mmrpg .robot_details .robot_attack,
 #mmrpg .robot_details .robot_defense,
@@ -789,7 +847,8 @@ body.index #header {
     height: 10px;
     width: 43px;
     text-align: center;
-    font-family: "Courier New";
+    /* font-family: "Courier New";  */
+    font-size: 10px;
 }
 #mmrpg .robot_details .robot_item {
     display: block;
@@ -801,7 +860,7 @@ body.index #header {
     text-indent: -9999px;
     color: transparent;
     border: 0 none transparent;
-    background: transparent url(../images/assets/battle-scene_robot-details_item.png?20150725-01) scroll no-repeat 0 0;
+    background: transparent url(../images/assets/battle-scene_robot-details-5_item.png?20230609-3) scroll no-repeat 0 0;
 }
 #mmrpg .robot_details .robot_item .wrap {
     display: block;
@@ -998,12 +1057,14 @@ body.index #header {
     right: 57px;
 }
 
+/*
 #mmrpg #canvas .robot_mugshot_type .sprite.robot_mugshot,
 #mmrpg #canvas .robot_details .robot_item .wrap .sprite {
     -ms-interpolation-mode: nearest-neighbor;
     image-rendering: optimizeSpeed;
     image-rendering: pixelated;
 }
+*/
 
 #mmrpg .ability_damage,
 #mmrpg .ability_recovery,
@@ -1013,14 +1074,20 @@ body.index #header {
     width: 52px;
     height: 41px;
     color: #FFFFFF;
-    font-family: "Courier New";
     text-align: center;
     text-indent: 0;
     font-weight: bold;
     font-size: 10px;
-    line-height: 48px;
+    line-height: 41px;
     letter-spacing: 0;
-    background: transparent url(../images/assets/battle-scene_robot-results.png?20130828-2) scroll no-repeat 0 0;
+    text-shadow: 1px 1px 0 #000;
+    background-color: transparent;
+    /* background-image: url(../images/assets/battle-scene_robot-results.png?20130828-2); */
+    background-image: url(../images/assets/battle-scene_robot-results_2k23.png?20230608-3);
+    background-attachment: scroll;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+
 }
 
 #mmrpg .ability_recovery_energy { background-position: 0 0; }
@@ -1152,18 +1219,58 @@ body.index #header {
 #mmrpg .item_damage_experience_high { width: 68px; font-size: 14px; line-height: 50px; background-position: -259px -205px; }
 #mmrpg .item_damage_level_high { width: 68px; font-size: 14px; line-height: 50px; background-position: -328px -205px; }
 
+#mmrpg .ability_damage > strong,
+#mmrpg .ability_recovery > strong,
+#mmrpg .item_damage > strong,
+#mmrpg .item_recovery > strong {
+    position: relative;
+    background-color: rgb(0, 0, 0);
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    padding: 0 6px;
+    line-height: 1;
+}
+#mmrpg .ability_damage > strong,
+#mmrpg .item_damage > strong {
+    bottom: -22px;
+    background-color: rgba(80, 0, 0, 0.8);
+}
+#mmrpg .ability_recovery > strong,
+#mmrpg .item_recovery > strong {
+    bottom: 8px;
+    background-color: rgba(0, 80, 0, 0.8);
+}
+
+#mmrpg .ability_damage_experience > strong,
+#mmrpg .item_damage_experience > strong,
+#mmrpg .ability_damage_level > strong,
+#mmrpg .item_damage_level > strong {
+    bottom: -19px;
+}
+#mmrpg .ability_recovery_experience > strong,
+#mmrpg .item_recovery_experience > strong,
+#mmrpg .ability_recovery_level > strong,
+#mmrpg .item_recovery_level > strong {
+    bottom: 16px;
+}
+
+#mmrpg .ability_recovery_level,
+#mmrpg .ability_damage_level {
+    transform: scale(1.2);
+}
 
 #mmrpg .ability_overlay,
 #mmrpg .item_overlay,
 #mmrpg .scan_overlay {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: -50%;
+    left: -50%;
     z-index: 5000;
     border: 0 none transparent;
     background: #000000 none scroll no-repeat 0 0;
-    width: 100%;
-    height: 100%;
+    width: 200%;
+    height: 200%;
     padding: 0;
     overflow: hidden;
     font-size: 1px;
@@ -1186,6 +1293,7 @@ body.index #header {
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
     -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
     -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+    background-color: #262626;
 }
 #window iframe {
     margin: 0 auto;
@@ -1197,21 +1305,103 @@ body.index #header {
     overflow: hidden;
     background-color: transparent;
 }
-#credits {
-    margin: 0 auto;
+
+#credits,
+#winmods {
+    margin: 10px auto 0;
     padding-bottom: 10px;
-    font-size: 10px;
+    font-size: 12px;
+    line-height: 1.5;
     color: #414141;
+    opacity: 1.0;
 }
-#credits a {
+#credits a,
+#winmods a {
     padding: 0;
     color: #464646;
     text-decoration: none;
 }
-#credits a:hover {
+#credits a:hover,
+#winmods a:hover {
     color: #494949;
     text-decoration: underline;
 }
+
+#winmods {
+    margin: 0 auto;
+}
+#winmods .field {
+    display: inline-block;
+    margin: 0 3px;
+    padding: 0 3px;
+}
+#winmods .field:after {
+    content: "|";
+    display: inline-block;
+    margin: 0 3px;
+    padding: 0 3px;
+}
+#winmods .field:last-child:after {
+    content: "";
+    display: none;
+}
+#winmods .field .label {
+    display: inline-block;
+    vertical-align: middle;
+    float: left;
+    margin: 0 6px 0 0;
+    font-weight: bold;
+    position: relative;
+}
+#winmods .field .button {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 0 3px;
+    margin: 0 0 0 6px;
+    text-decoration: none;
+    cursor: pointer;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    background-color: #292929;
+    color: #121212;
+}
+#winmods .field .button.active,
+#winmods .field .button:hover {
+    background-color: #393939;
+    text-decoration: none;
+}
+
+
+#winmods:hover .field .button {
+    background-color: #494949;
+}
+#winmods:hover .field .button.active,
+#winmods:hover .field .button:hover {
+    background-color: #797979;
+}
+
+
+#window[data-window-width="small"] {
+    width: 768px !important;
+}
+#window[data-window-width="large"] {
+    width: 1024px !important;
+}
+#window[data-window-height="small"] {
+    height: 626px !important;
+}
+#window[data-window-height="large"] {
+    height: 876px !important;
+}
+#window[data-window-width="small"] iframe,
+#window[data-window-width="large"] iframe,
+#window[data-window-height="small"] iframe,
+#window[data-window-height="large"] iframe {
+    width: 100% !important;
+    height: 100% !important;
+}
+
 
 #music,
 #animate,
@@ -1409,36 +1599,40 @@ body.index #header {
     line-height: 15px;
     text-transform: none;
     text-align: center;
-    background-color: transparent;
-    background-color: rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(0, 0, 0, 0.6);
-    border-width: 1px 0 0;
-    padding: 10px; color: #FFFFFF;
+    padding: 5px;
+    color: #FFFFFF;
     text-indent: 0;
     z-index: 999999;
+    background-color: transparent;
+    border: 0 none transparent;
+    background-image: -webkit-linear-gradient(bottom, rgba(0,0,0,0.3) 10%, rgba(0,0,0,0.0) 80%);
+    background-image: -moz-linear-gradient(center top, rgba(0,0,0,0.3) 10%, rgba(0,0,0,0.0) 80%);
+    background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.3) 10%, rgba(0, 0, 0, 0) 80%);
 }
 #mmrpg .canvas_overlay_hidden {
     opacity: 0;
 }
 #mmrpg .canvas_overlay_footer .overlay_label {
-    display: block;
-    font-size: 9px;
-    line-height: 11px;
-    background-color: rgb(0, 0, 0);
-    background-color: rgba(0, 0, 0, 0.60);
-    width: 140px;
-    margin: -8px auto 2px;
-    border-radius: 0.5em;
-    -moz-border-radius: 0.5em;
-    -webkit-border-radius: 0.5em;
+    display: inline-block;
+    font-size: 7px;
+    line-height: 12px;
+    background-color: #191919;
+    border: 0 none transparent;
+    width: 126px;
+    text-indent: 3px;
+    margin: 0 3px 0 0;
+    -moz-border-radius: 9px 3px 9px 3px;
+    -webkit-border-radius: 9px 3px 9px 3px;
+    border-radius: 9px 3px 9px 3px;
+    text-shadow: 1px 1px 0 #000000;
 }
 #mmrpg .canvas_overlay_footer .field_multiplier {
     margin: 0 5px;
     border-style: solid;
     border-width: 1px;
-    border-radius: 0.5em;
-    -moz-border-radius: 0.5em;
-    -webkit-border-radius: 0.5em;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
     padding: 0 6px;
     box-shadow: 1px 1px 1px #000000;
     letter-spacing: 1px;
@@ -1483,6 +1677,9 @@ body.index #header {
     text-overflow: clip;
     */
 }
+#mmrpg .canvas_overlay_footer .overlay_multiplier_count_7 .field_multiplier,
+#mmrpg .canvas_overlay_footer .overlay_multiplier_count_8 .field_multiplier,
+#mmrpg .canvas_overlay_footer .overlay_multiplier_count_9 .field_multiplier,
 #mmrpg .canvas_overlay_footer .overlay_multiplier_count_10 .field_multiplier,
 #mmrpg .canvas_overlay_footer .overlay_multiplier_count_11 .field_multiplier,
 #mmrpg .canvas_overlay_footer .overlay_multiplier_count_12 .field_multiplier,
@@ -1491,8 +1688,10 @@ body.index #header {
     margin: 0 1px !important;
 }
 
+#mmrpg .canvas_battle_results,
 #mmrpg .canvas_ability_details,
-#mmrpg .canvas_item_details {
+#mmrpg .canvas_item_details,
+#mmrpg .canvas_skill_details {
     position: absolute;
     text-indent: 0;
     left: 250px;
@@ -1506,11 +1705,14 @@ body.index #header {
     border-radius: 5px;
     white-space: nowrap;
     overflow: hidden;
+    text-shadow: 1px 1px 4px #333333;
     text-overflow: ellipsis;
     z-index: 5100;
 }
+#canvas .canvas_battle_results .results_icon,
 #canvas .canvas_ability_details .ability_icon,
-#canvas .canvas_item_details .item_icon {
+#canvas .canvas_item_details .item_icon,
+#canvas .canvas_skill_details .skill_icon {
     top: 5px;
     left: 5px;
     width: 30px;
@@ -1521,22 +1723,45 @@ body.index #header {
     -webkit-border-radius: 5px 0 0 5px;
     background: #000000 none scroll no-repeat -5px -5px;
 }
+#canvas .canvas_battle_results .results_icon_40x40,
+#canvas .canvas_ability_details .ability_icon_40x40,
+#canvas .canvas_item_details .item_icon_40x40,
+#canvas .canvas_skill_details .skill_icon_40x40 {
+    background-position: -5px -5px;
+}
+#canvas .canvas_battle_results .results_icon_80x80,
+#canvas .canvas_ability_details .ability_icon_80x80,
+#canvas .canvas_item_details .item_icon_80x80,
+#canvas .canvas_skill_details .skill_icon_80x80 {
+    background-position: -25px -25px;
+}
+#canvas .canvas_battle_results .results_icon_160x160,
+#canvas .canvas_ability_details .ability_icon_160x160,
+#canvas .canvas_item_details .item_icon_160x160,
+#canvas .canvas_skill_details .skill_icon_160x160 {
+    background-position: -45px -45px;
+}
+#canvas .canvas_battle_results .results_icon + .results_icon,
 #canvas .canvas_ability_details .ability_icon + .ability_icon,
-#canvas .canvas_item_details .item_icon + .item_icon {
+#canvas .canvas_item_details .item_icon + .item_icon,
+#canvas .canvas_skill_details .skill_icon + .skill_icon {
     border-color: transparent;
     background-color: transparent;
 }
+#canvas .canvas_battle_results .results_icon_right,
 #canvas .canvas_ability_details .ability_icon_right,
-#canvas .canvas_item_details .item_icon_right {
+#canvas .canvas_item_details .item_icon_right,
+#canvas .canvas_skill_details .skill_icon_right {
     left: auto;
     right: 5px;
     border-radius: 0 5px 5px 0;
     -moz-border-radius: 0 5px 5px 0;
     -webkit-border-radius: 0 5px 5px 0;
 }
+#canvas .canvas_battle_results .results_name,
 #canvas .canvas_ability_details .ability_name,
 #canvas .canvas_item_details .item_name,
-#canvas .canvas_item_details .skill_name {
+#canvas .canvas_skill_details .skill_name {
     text-indent: 0;
     color: #FFFFFF;
     font-size: 12px;
@@ -1550,24 +1775,36 @@ body.index #header {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    position: relative;
 }
-
-body.mobileFlag_landscapeMode #battle .canvas_overlay_header,
-body.windowFlag_landscapeMode #battle .canvas_overlay_header,
-body.mobileFlag_landscapeMode #battle .canvas_overlay_footer,
-body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
-    left: 2;
-    right: 0px;
-    border-radius: 0;
-    -moz-border-radius: 0;
-    -webkit-border-radius: 0;
+#canvas .canvas_ability_details .ability_name,
+#canvas .canvas_item_details .item_name,
+#canvas .canvas_skill_details .skill_name {
+    padding-top: 10px;
+    line-height: 20px;
 }
-body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
-    left: -130px;
-    right: -127px;
-    border-radius: 0 0 5px 5px;
-    -moz-border-radius: 0 0 5px 5px;
-    -webkit-border-radius: 0 0 5px 5px;
+#canvas .canvas_ability_details .ability_name:before,
+#canvas .canvas_item_details .item_name:before,
+#canvas .canvas_skill_details .skill_name:before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 2px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    font-size: 8px;
+    line-height: 10px;
+    text-transform: uppercase;
+    color: #ababab;
+}
+#canvas .canvas_ability_details .ability_name:before {
+    content: "Ability";
+}
+#canvas .canvas_item_details .item_name:before {
+    content: "Item";
+}
+#canvas .canvas_skill_details .skill_name:before {
+    content: "Skill";
 }
 
 #events {
@@ -1633,6 +1870,9 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     line-height: 22px;
     text-align: left;
     padding: 0 5px 5px;
+}
+#events .event_container p:last-child {
+    padding-bottom: 0;
 }
 #events .event_container p a {
     text-decoration: none;
@@ -1714,6 +1954,7 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     -webkit-box-decoration-break: clone;
     -o-box-decoration-break: clone;
     box-decoration-break: clone;
+    box-shadow: 1px 2px 0 #000000;
 }
 #events #messages div.headline,
 #events #messages p.headline {
@@ -1740,6 +1981,30 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 }
 #events #messages p.centertext {
     text-align: center;
+}
+#events #messages p.smalltext {
+    font-size: 100%;
+    line-height: 1.6;
+}
+#events #messages div.inset_panel .sprite,
+#events #messages p.inset_panel .sprite {
+
+}
+#events #messages div.inset_panel .sprite_player,
+#events #messages p.inset_panel .sprite_player {
+
+}
+#events #messages div.inset_panel .sprite.float_left,
+#events #messages p.inset_panel .sprite.float_left {
+    top: calc(50% - 5px);
+    left: calc(50% - 120px);
+    transform: translate(-50%, -50%);
+}
+#events #messages div.inset_panel .sprite.float_right,
+#events #messages p.inset_panel .sprite.float_right {
+    top: calc(50% - 5px);
+    left: calc(50% + 120px);
+    transform: translate(-50%, -50%);
 }
 
 
@@ -2074,9 +2339,22 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     overflow: hidden;
 
 }
+#canvas > .wrapper {
+    border-radius: 6px;
+    border: 2px solid #1A1A1A;
+    overflow: hidden;
+}
+#canvas > .wrapper > .event {
+    border-radius: 0;
+    border: 0 none transparent;
+}
 #canvas .clearback {
     background: transparent none scroll no-repeat 0 0;
-    left: -2px;
+    text-shadow: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    /* left: -2px;  */
 }
 #canvas .event_details {
     z-index: 1000;
@@ -2159,6 +2437,362 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #canvas .event .foreground_09 {
     background-position: center -2232px;
 }
+#canvas .event .battle_scene,
+#canvas .event .battle_overlay {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+#canvas .event .battle_overlay.under {
+    z-index: 1;
+}
+#canvas .event .battle_scene {
+    z-index: 2;
+}
+#canvas .event .battle_overlay.over {
+    z-index: 3;
+    pointer-events: none;
+}
+
+:root {
+    --camera-shift-transition-duration: 0.250s;
+    --camera-shift-transition-timing: ease;
+    --camera-shift-depth-mod: 1;
+    --camera-shift-depth-mod2: 1.8;
+    --camera-shift-zoom-perspective: 248px;
+}
+
+#canvas [data-camera-shift] .event .background_canvas,
+#canvas [data-camera-shift] .event .background_event,
+#canvas [data-camera-shift] .event .foreground_canvas,
+#canvas [data-camera-shift] .event .foreground_event,
+#canvas [data-camera-shift] .event .battle_scene {
+    transform: translate(0) scale(1);
+    filter: blur(0) brightness(1);
+    transition: 0.250s;
+}
+#canvas [data-camera-shift] .event .foreground_canvas {
+    transform-style: preserve-3d;
+    transform:
+        perspective(var(--camera-shift-zoom-perspective))
+        translate(0)
+        scale(1)
+        skew(0)
+        rotate(0)
+        ;
+}
+#canvas [data-camera-shift] .event .background_canvas {
+    transition:
+        calc(var(--camera-shift-transition-duration) * 1.20)
+        var(--camera-shift-transition-timing)
+        ;
+}
+#canvas [data-camera-shift] .event .background_event {
+    transition:
+        calc(var(--camera-shift-transition-duration) * 1.15)
+        var(--camera-shift-transition-timing)
+        ;
+}
+#canvas [data-camera-shift] .event .foreground_canvas {
+    transition:
+        calc(var(--camera-shift-transition-duration) * 1.05)
+        var(--camera-shift-transition-timing)
+        ;
+}
+#canvas [data-camera-shift] .event .foreground_event.foreground_subevent {
+    transition:
+        calc(var(--camera-shift-transition-duration) * 1.025)
+        var(--camera-shift-transition-timing)
+        ;
+}
+#canvas [data-camera-shift] .canvas_battle_results,
+#canvas [data-camera-shift] .event:first-child .battle_scene {
+    transition:
+        calc(var(--camera-shift-transition-duration) * 1.05)
+        var(--camera-shift-transition-timing)
+        ;
+}
+#canvas [data-camera-shift] .event .foreground_event {
+    transition:
+        calc(var(--camera-shift-transition-duration) * 0.95)
+        var(--camera-shift-transition-timing)
+        ;
+}
+#canvas [data-camera-shift="left"] .event .background_canvas,
+#canvas [data-camera-shift="right"] .event .background_canvas {
+    filter: blur(1px) brightness(0.8);
+}
+#canvas [data-camera-shift="left"] .event .background_event,
+#canvas [data-camera-shift="right"] .event .background_event {
+    filter: blur(1px) brightness(0.9);
+}
+#canvas [data-camera-shift="left"] .event .foreground_subevent,
+#canvas [data-camera-shift="right"] .event .foreground_subevent {
+    filter: brightness(0.8);
+}
+
+
+
+
+/* LEFT and ACTIVE-focused camera angles */
+#canvas [data-camera-shift="left"] .event .background_canvas,
+#canvas [data-camera-shift="left"] .event .background_event {
+    transform: translate(-4%, 0) scale(1.2);
+    transform:
+        translate(calc(-4% * var(--camera-shift-depth-mod2)), 0)
+        scale(1.2)
+        ;
+}
+#canvas [data-camera-shift="left"] .event .foreground_canvas,
+#canvas [data-camera-shift="left"] .event .foreground_event {
+    transform: translate(8%, -5%) scale(1.3);
+    transform: translate(calc(8% * var(--camera-shift-depth-mod2)), 5%) scale(1.3);
+}
+#canvas [data-camera-shift="left"] .event .foreground_canvas {
+    transform:
+        perspective(var(--camera-shift-zoom-perspective))
+        translate(calc(8% * var(--camera-shift-depth-mod2)), 5%)
+        scale(1.3)
+        skew(calc(8deg * var(--camera-shift-depth-mod)))
+        rotateX(10deg)
+        ;
+}
+#canvas [data-camera-shift="left"] .event .foreground_event {
+    transform: translate(8%, -5%) scale(1.3);
+    transform: translate(calc(8% * var(--camera-shift-depth-mod2)), 5%) scale(1.3);
+}
+#canvas [data-camera-shift="left"] .event .battle_scene {
+    transform: translate(9%, -5%) scale(1.3);
+    transform: translate(calc(9% * var(--camera-shift-depth-mod2)), 5%) scale(1.3);
+}
+
+/* RIGHT and ACTIVE-focused camera angles */
+#canvas [data-camera-shift="right"] .event .background_canvas,
+#canvas [data-camera-shift="right"] .event .background_event {
+    transform: translate(4%, 0) scale(1.2);
+    transform: translate(calc(4% * var(--camera-shift-depth-mod2)), 0) scale(1.2);
+}
+#canvas [data-camera-shift="right"] .event .foreground_canvas,
+#canvas [data-camera-shift="right"] .event .foreground_event {
+    transform: translate(-8%, -5%) scale(1.3);
+    transform: translate(calc(-8% * var(--camera-shift-depth-mod2)), 5%) scale(1.3);
+}
+#canvas [data-camera-shift="right"] .event .foreground_canvas {
+    transform:
+        perspective(var(--camera-shift-zoom-perspective))
+        translate(calc(-8% * var(--camera-shift-depth-mod2)), 5%)
+        scale(1.3)
+        skew(calc(-8deg * var(--camera-shift-depth-mod)))
+        rotateX(10deg)
+        ;
+}
+#canvas [data-camera-shift="right"] .event .foreground_event {
+    transform: translate(-8%, -5%) scale(1.3);
+    transform: translate(calc(-8% * var(--camera-shift-depth-mod2)), 5%) scale(1.3);
+}
+#canvas [data-camera-shift="right"] .event .battle_scene {
+    transform: translate(-9%, -5%) scale(1.3);
+    transform: translate(calc(-9% * var(--camera-shift-depth-mod2)), 5%) scale(1.3);
+}
+
+/* LEFT and BENCH-focused camera angles */
+#canvas [data-camera-shift="left"][data-camera-focus="bench"] .event .background_canvas,
+#canvas [data-camera-shift="left"][data-camera-focus="bench"] .event .background_event {
+    transform: translate(-7%, 0) scale(1.2);
+    transform: translate(calc(-7% * var(--camera-shift-depth-mod)), 0) scale(1.2);
+}
+#canvas [data-camera-shift="left"][data-camera-focus="bench"] .event .foreground_canvas,
+#canvas [data-camera-shift="left"][data-camera-focus="bench"] .event .foreground_event {
+    transform: translate(14%, 5%) scale(1.3);
+    transform: translate(calc(14% * var(--camera-shift-depth-mod)), 5%) scale(1.3);
+}
+#canvas [data-camera-shift="left"][data-camera-focus="bench"] .event .foreground_canvas {
+    transform:
+        perspective(var(--camera-shift-zoom-perspective))
+        translate(calc(14% * var(--camera-shift-depth-mod)), 5%)
+        scale(1.3)
+        skew(calc(14deg * var(--camera-shift-depth-mod)))
+        rotateX(10deg)
+        ;
+}
+#canvas [data-camera-shift="left"][data-camera-focus="bench"] .event .battle_scene {
+    transform: translate(16%, 5%) scale(1.3);
+    transform: translate(calc(16% * var(--camera-shift-depth-mod)), 5%) scale(1.3);
+}
+
+/* RIGHT and BENCH-focused camera angles */
+#canvas [data-camera-shift="right"][data-camera-focus="bench"] .event .background_canvas,
+#canvas [data-camera-shift="right"][data-camera-focus="bench"] .event .background_event {
+    transform: translate(7%, 0) scale(1.2);
+    transform: translate(calc(7% * var(--camera-shift-depth-mod)), 0) scale(1.2);
+}
+#canvas [data-camera-shift="right"][data-camera-focus="bench"] .event .foreground_canvas,
+#canvas [data-camera-shift="right"][data-camera-focus="bench"] .event .foreground_event {
+    transform: translate(-14%, 5%) scale(1.3);
+    transform: translate(calc(-14% * var(--camera-shift-depth-mod)), 5%) scale(1.3);
+}
+#canvas [data-camera-shift="right"][data-camera-focus="bench"] .event .foreground_canvas {
+    transform:
+        perspective(var(--camera-shift-zoom-perspective))
+        translate(calc(-14% * var(--camera-shift-depth-mod)), 5%)
+        scale(1.3)
+        skew(calc(-14deg * var(--camera-shift-depth-mod)))
+        rotateX(10deg)
+        ;
+}
+#canvas [data-camera-shift="right"][data-camera-focus="bench"] .event .battle_scene {
+    transform: translate(-16%, 5%) scale(1.3);
+    transform: translate(calc(-16% * var(--camera-shift-depth-mod)), 5%) scale(1.3);
+}
+
+
+/* Batle Field Gridlines / Position Panels / Cell Borders */
+
+@keyframes foreground_canvas_fade {
+  0% { opacity: 0.2; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.2; }
+}
+#canvas .event .foreground_canvas:before,
+#canvas .event .foreground_canvas:after {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0);
+    bottom: 35px;
+    width: 750px;
+    height: 84px;
+    background-color: transparent;
+    background-image: none;
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+
+    -ms-interpolation-mode: bicubic;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    image-rendering:   -o-crisp-edges;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+
+}
+
+#canvas .event .foreground_canvas:before,
+#canvas .event .foreground_canvas:after {
+    bottom: 35px;
+    width: 1290px;
+    height: 168px;
+    background-image: url(../images/assets/battle-scene_gridlines-2k23.png?20230611);
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    transform: translateX(-50%) perspective(90px) rotateX(26deg);
+    transform-origin: center bottom;
+    -moz-mix-blend-mode: overlay;
+    -webkit-mix-blend-mode: overlay;
+    mix-blend-mode: overlay;
+}
+#canvas .event .foreground_canvas:before {
+    z-index: 1;
+    background-image: url(../images/assets/battle-scene_gridlines-2k23_under.png?20230616);
+    opacity: 0.6;
+    -moz-mix-blend-mode: overlay;
+    -webkit-mix-blend-mode: overlay;
+    mix-blend-mode: overlay;
+
+    /* Animation properties */
+    animation-name: foreground_canvas_fade;
+    animation-duration: 5s; /* Adjust the duration as per your preference */
+    animation-duration: calc(var(--camera-shift-transition-duration) * 10);
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+#canvas .event .foreground_canvas:after {
+    z-index: 2;
+    background-image: url(../images/assets/battle-scene_gridlines-2k23_over.png?20230616);
+    opacity: 0.8;
+    -moz-mix-blend-mode: overlay;
+    -webkit-mix-blend-mode: overlay;
+    mix-blend-mode: overlay;
+}
+
+
+
+/*
+#canvas .event .foreground_canvas:before,
+#canvas .event .foreground_canvas:after {
+    width: 1290px;
+    height: 84px;
+    background-position: center bottom;
+    background-size: auto 100%;
+    opacity: 0.2;
+}
+#canvas .event .foreground_canvas:before {
+    z-index: 1;
+    background-image: url(../images/assets/battle-scene_gridlines-resized_under.png?20230616);
+    opacity: 0.6;
+    -moz-mix-blend-mode: overlay;
+    -webkit-mix-blend-mode: overlay;
+    mix-blend-mode: overlay;
+}
+#canvas .event .foreground_canvas:after {
+    z-index: 2;
+    background-image: url(../images/assets/battle-scene_gridlines-resized_over.png?20230616);
+    opacity: 0.4;
+    -moz-mix-blend-mode: overlay;
+    -webkit-mix-blend-mode: overlay;
+    mix-blend-mode: overlay;
+}
+*/
+
+/*
+#canvas .event .foreground_canvas:before,
+#canvas .event .foreground_canvas:after {
+    bottom: 35px;
+    width: 1290px;
+    height: 168px;
+    background-image: url(../images/assets/battle-scene_gridlines-2k23.png?20230611);
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    transform: translateX(-50%) perspective(90px) rotateX(26deg);
+    transform-origin: center bottom;
+    -moz-mix-blend-mode: overlay;
+    -webkit-mix-blend-mode: overlay;
+    mix-blend-mode: overlay;
+}
+#canvas .event .foreground_canvas:before {
+    z-index: 1;
+    background-image: url(../images/assets/battle-scene_gridlines-2k23_under.png?20230616);
+    opacity: 1.0;
+}
+#canvas .event .foreground_canvas:after {
+    z-index: 2;
+    background-image: url(../images/assets/battle-scene_gridlines-2k23_over.png?20230616);
+    opacity: 0.6;
+}
+*/
+
+
+/*
+#canvas .event .battle_scene .sprite[data-robotid] {
+    box-sizing: border-box;
+    border-bottom: 2px solid red;
+}
+#canvas .event .battle_scene .sprite[data-robotid][data-direction="left"] {
+    border-left: 2px solid rgba(255, 0, 0, 0.25);
+    border-right: 2px solid rgba(0, 0, 255, 0.25);
+}
+#canvas .event .battle_scene .sprite[data-robotid][data-direction="right"] {
+    border-right: 2px solid rgba(255, 0, 0, 0.25);
+    border-left: 2px solid rgba(0, 0, 255, 0.25);
+}
+*/
+
 #canvas .event pre {
     position: absolute;
     z-index: 9999;
@@ -2833,24 +3467,37 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .main_actions_hastitle .main_actions_title .float_title {
     position: static;
     float: left;
-    width: 49%;
-    text-align: right;
+    width: 34%;
+    margin-left: 33%;
+    text-align: center;
 }
 #actions .main_actions_hastitle .main_actions_title .float_links {
     position: static;
     float: right;
-    width: 49%;
-    text-align: left;
+    text-align: right;
+    padding-right: 15px;
+    width: calc(33% - 15px);
 }
 #actions .main_actions_hastitle .main_actions_title .float_links .page {
     color: #696969;
+    vertical-align: middle;
 }
 #actions .main_actions_hastitle .main_actions_title .float_links .num {
+    display: inline-block;
+    float: none;
+    position: static;
     color: #696969;
-    padding-left: 10px;
     text-decoration: none;
     cursor: pointer;
-    _cursor: hand;
+    font-size: 8px;
+    line-height: 12px;
+    border-width: 1px;
+    padding: 2px 4px 2px 7px;
+    margin: 0 0 0 6px;
+    vertical-align: middle;
+    text-align: center;
+    text-decoration: none;
+    transition: color 0.3s;
 }
 
 #actions .main_actions .button .label {
@@ -2884,11 +3531,15 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     bottom: -12px;
     left: -6px;
 }
+#actions .actions_item .main_actions_hastitle .main_actions_title .float_links .button[data-action] .info[data-click-tooltip] {
+    top: -2px;
+    right: -8px;
+}
 
 #actions .main_actions_hastitle .main_actions_title .float_links .num:hover,
 #actions .main_actions_hastitle .main_actions_title .float_links .active {
-    color: #797979;
-    text-decoration: underline;
+    color: #ffffff;
+
 }
 #actions .main_actions_hastitle .main_actions_title_disabled,
 #actions .main_actions_hastitle .main_actions_title_disabled * {
@@ -2913,8 +3564,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     position: absolute;
     text-indent: -9999px;
     color: transparent;
-    right: -5px;
-    bottom: -5px;
+    right: -2px;
+    bottom: -2px;
     width: 5px;
     height: 5px;
     border-radius: 3px;
@@ -2932,10 +3583,14 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     filter: alpha(opacity=10);
 }
 #mmrpg.env_local #actions .actions_resend {
-    opacity: 0.5;
+    opacity: 0;
     border-color: red !important;
-    right: 5px;
-    bottom: 5px;
+    right: -2px;
+    bottom: -2px;
+    transition: opacity 0.3s;
+}
+#mmrpg.env_local #actions .actions_resend:hover {
+    opacity: 0.5;
 }
 
 #actions .actions_loading .main_actions {
@@ -3035,10 +3690,10 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     height: 36px;
     line-height: 36px;
 }
-#actions .actions_battle .action_switch {
+#actions .actions_battle .action_scan {
     margin-right: 0;
 }
-#actions .actions_battle .action_switch label {
+#actions .actions_battle .action_scan label {
     width: auto;
 }
 
@@ -3086,6 +3741,26 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     margin: 0 3px 3px 0;
     letter-spacing: 2px;
 }
+#actions .actions_switch .action_switch[data-position="active/0"],
+#actions .actions_scan .action_scan[data-position="active/0"],
+#actions .actions_target .action_target[data-position="active/0"] {
+
+}
+#actions .actions_switch .action_switch[data-position="active/0"] .sprite,
+#actions .actions_scan .action_scan[data-position="active/0"] .sprite,
+#actions .actions_target .action_target[data-position="active/0"] .sprite {
+    border-bottom-width: 3px;
+}
+#actions .actions_switch .action_switch[data-position^="bench/"],
+#actions .actions_scan .action_scan[data-position^="bench/"],
+#actions .actions_target .action_target[data-position^="bench/"] {
+
+}
+#actions .actions_switch .action_switch[data-position^="bench/"] .sprite,
+#actions .actions_scan .action_scan[data-position^="bench/"] .sprite,
+#actions .actions_target .action_target[data-position^="bench/"] .sprite {
+
+}
 #actions .actions_option .action_option label,
 #actions .actions_settings .action_setting label,
 #actions .actions_settings_eventTimeout .action_setting label,
@@ -3101,6 +3776,19 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     line-height: 56px;
     padding-left: 48px;
 }
+#actions .actions_option .action_option label .info,
+#actions .actions_settings .action_setting label .info,
+#actions .actions_settings_eventTimeout .action_setting label .info,
+#actions .actions_settings_volumeControl .action_setting label .info,
+#actions .actions_settings_autoScan .action_setting label .info,
+#actions .actions_switch .action_switch label .info,
+#actions .actions_scan .action_scan label .info,
+#actions .actions_target .action_target label .info,
+#actions .actions_ability .action_ability label .info,
+#actions .actions_item .action_item label .info {
+    top: -3px;
+    right: -3px;
+}
 #actions .actions_option .action_option label .multi,
 #actions .actions_settings .action_setting label .multi,
 #actions .actions_settings_eventTimeout .action_setting label .multi,
@@ -3115,7 +3803,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     line-height: 14px;
     margin-top: 13px;
 }
-#actions .actions_option .action_option label .multi .type {
+#actions .actions_option .action_option label .multi .type,
+#actions .actions_settings .action_setting label .multi .type {
     display: inline-block;
     line-height: 14px;
     padding: 0 6px 0 9px;
@@ -3123,7 +3812,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     -webkit-border-radius: 3px;
     border-radius: 3px;
 }
-#actions .actions_option .action_option label .multi .type.value {
+#actions .actions_option .action_option label .multi .type.value,
+#actions .actions_settings .action_setting label .multi .type.value {
     position: relative;
     top: 3px;
 }
@@ -3157,11 +3847,11 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
     -moz-border-radius: 5px 5px 0 0;
     -webkit-border-radius: 5px 5px 0 0;
 }
-#actions .actions_switch .action_switch label .sprite_40x40_weapons,
-#actions .actions_scan .action_scan label .sprite_40x40_weapons,
-#actions .actions_target .action_target label .sprite_40x40_weapons,
-#actions .actions_ability .action_ability label .sprite_40x40_weapons,
-#actions .actions_item .action_item label .sprite_40x40_weapons {
+#actions .actions_switch .action_switch label .sprite_40x40_cost,
+#actions .actions_scan .action_scan label .sprite_40x40_cost,
+#actions .actions_target .action_target label .sprite_40x40_cost,
+#actions .actions_ability .action_ability label .sprite_40x40_cost,
+#actions .actions_item .action_item label .sprite_40x40_cost {
     height: 8px;
     padding-bottom: 4px;
     border-radius: 0 0 5px 5px;
@@ -3364,7 +4054,8 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .actions_ability .action_ability label .maintext,
 #actions .actions_item .action_item label .maintext {
     margin-bottom: 0;
-    font-size: 11px;
+    /* font-size: 11px;  */
+    font-size: 10px;
     line-height: 14px;
     font-weight: bold;
 }
@@ -3373,6 +4064,7 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 #actions .actions_target .action_target label .maintext sup,
 #actions .actions_ability .action_ability label .maintext sup,
 #actions .actions_item .action_item label .maintext sup {
+    display: none;
     font-size: 8px;
     line-height: 8px;
     font-weight: normal;
@@ -3427,6 +4119,68 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 }
 
 
+#actions .actions_ability .action_ability label,
+#actions .actions_ability .action_item label {
+    padding-left: 36px;
+}
+#actions .actions_ability .action_ability label .sprite_40x40_ability,
+#actions .actions_ability .action_ability label .sprite_40x40_cost,
+#actions .actions_ability .action_item label .sprite_40x40_item,
+#actions .actions_ability .action_item label .sprite_40x40_cost {
+    width: 30px;
+}
+#actions .actions_ability .action_ability label .sprite_40x40_ability,
+#actions .actions_ability .action_item label .sprite_40x40_item {
+    top: 5px;
+    left: 5px;
+    height: 32px;
+    background-position-x: -5px !important;
+}
+#actions .actions_ability .action_ability label .sprite_40x40_cost,
+#actions .actions_ability .action_item label .sprite_40x40_cost {
+    top: 38px;
+    left: 5px;
+    height: 8px;
+}
+#actions .actions_ability .action_ability label .subtext,
+#actions .actions_ability .action_item label .subtext {
+    margin-top: 2px;
+}
+#actions .actions_ability .action_ability label .multi,
+#actions .actions_ability .action_item label .multi {
+    margin-top: 5px;
+}
+#actions .actions_option .action_option label .big-digit,
+#actions .actions_settings .action_setting label .big-digit,
+#actions .actions_switch .action_switch label .big-digit,
+#actions .actions_scan .action_scan label .big-digit,
+#actions .actions_target .action_target label .big-digit,
+#actions .actions_ability .action_ability label .big-digit,
+#actions .actions_item .action_item label .big-digit {
+    display: inline-block;
+    box-sizing: border-box;
+    background-color: #000000;
+    padding: 0 4px 0 6px;
+    margin-right: 4px;
+    -moz-border-radius: 6px 2px;
+    -webkit-border-radius: 6px 2px;
+    border-radius: 6px 2px;
+    font-size: 100%;
+    text-align: center;
+    font-weight: bold;
+}
+#actions .actions_option .action_option label .big-digit sup,
+#actions .actions_settings .action_setting label .big-digit sup,
+#actions .actions_switch .action_switch label .big-digit sup,
+#actions .actions_scan .action_scan label .big-digit sup,
+#actions .actions_target .action_target label .big-digit sup,
+#actions .actions_ability .action_ability label .big-digit sup,
+#actions .actions_item .action_item label .big-digit sup {
+    font-size: 80%;
+}
+
+
+
 #mmrpg .achievement_icon {
     display: block;
     width: 19px;
@@ -3462,197 +4216,6 @@ body.windowFlag_landscapeMode #battle .canvas_overlay_footer {
 }
 
 
-/* WINDOW SIZE STYLES */
-
-body.windowFlag_landscapeMode {
-    /*width: 1024px;*/
-}
-body.windowFlag_landscapeMode #prototype,
-body.windowFlag_landscapeMode #window,
-body.windowFlag_landscapeMode #window iframe,
-body.windowFlag_landscapeMode #battle {
-    width: 1024px;
-}
-body.windowFlag_landscapeMode #prototype .banner {
-    width: 1004px;
-}
-body.windowFlag_landscapeMode #prototype .header,
-body.windowFlag_landscapeMode #prototype .option {
-    width: 1004px;
-}
-body.windowFlag_landscapeMode #prototype .option_prototype-4 {
-    /*width: 1004px;*/
-}
-body.windowFlag_landscapeMode #prototype .block_2,
-body.windowFlag_landscapeMode #prototype .block_4,
-body.windowFlag_landscapeMode #prototype .block_6,
-body.windowFlag_landscapeMode #prototype .block_8,
-body.windowFlag_landscapeMode #prototype .block_10 {
-    /*width: 499px;*/
-}
-body.windowFlag_landscapeMode #canvas {
-    width: 1024px;
-}
-body.windowFlag_landscapeMode #canvas .event {
-    width: 1006px;
-}
-
-body.windowFlag_landscapeMode #events .event_wrapper,
-body.mobileFlag_landscapeMode #events .event_wrapper {
-    left: 235px;
-}
-
-body.windowFlag_landscapeMode #canvas .clearback {
-    width: 750px;
-    border-color: transparent;
-    box-shadow: 0 0 0 transparent;
-    -moz-box-shadow: 0 0 0 transparent;
-    -webkit-box-shadow: 0 0 0 transparent;
-    left: auto;
-    right: 124px;
-    overflow: visible;
-}
-body.windowFlag_landscapeMode #canvas .clearback .robot_details_left {
-    left: -124px;
-}
-body.windowFlag_landscapeMode #canvas .clearback .robot_details_right {
-    right: -124px;
-}
-body.windowFlag_landscapeMode #canvas .clearback .sprite_mugshot_left {
-    left: -116px;
-}
-body.windowFlag_landscapeMode #canvas .clearback .sprite_80x80_mugshot_left {
-    left: -136px;
-}
-body.windowFlag_landscapeMode #canvas .clearback .sprite_160x160_mugshot_left {
-    left: -163px;
-}
-body.windowFlag_landscapeMode #canvas .clearback .sprite_mugshot_right {
-    right: -116px;
-}
-body.windowFlag_landscapeMode #canvas .clearback .sprite_80x80_mugshot_right {
-    right: -136px;
-}
-body.windowFlag_landscapeMode #canvas .clearback .sprite_160x160_mugshot_right {
-    right: -163px;
-}
-body.windowFlag_landscapeMode #canvas .clearback .ability_overlay,
-body.windowFlag_landscapeMode #canvas .clearback .item_overlay,
-body.windowFlag_landscapeMode #canvas .clearback .scan_overlay {
-    width: auto;
-    left: -130px;
-    right: -130px;
-}
-body.windowFlag_landscapeMode #console {
-    width: 1024px;
-}
-body.windowFlag_landscapeMode #actions {
-    width: 1024px;
-}
-body.windowFlag_landscapeMode #actions .action_back label {
-    width: auto;
-}
-body.windowFlag_landscapeMode #actions .actions_start .action_start label {
-    width: auto;
-}
-body.windowFlag_landscapeMode #actions .actions_loading .action_loading label {
-    width: auto;
-}
-body.windowFlag_landscapeMode #actions .actions_event .action_continue label {
-    width: auto;
-}
-body.windowFlag_landscapeMode #actions .sub_actions .button,
-body.windowFlag_landscapeMode #actions .actions_battle .action_target {
-    width: 245px;
-}
-body.windowFlag_landscapeMode #actions .sub_actions[data-size="3"] .button {
-    width: 330px;
-}
-body.windowFlag_landscapeMode #actions .sub_actions .action_back,
-body.windowFlag_landscapeMode #actions .sub_actions[data-size="3"] .action_back {
-    width: auto;
-}
-body.windowFlag_landscapeMode #actions .sub_actions .button label,
-body.windowFlag_landscapeMode #actions .actions_battle .action_target label {
-    width: auto;
-}
-body.windowFlag_landscapeMode #actions .actions_battle .action_switch label {
-    width: auto;
-}
-
-body.windowFlag_landscapeMode #actions .actions_option .action_option,
-body.windowFlag_landscapeMode #actions .actions_settings .action_setting,
-body.windowFlag_landscapeMode #actions .actions_settings_eventTimeout .action_setting,
-body.windowFlag_landscapeMode #actions .actions_settings_volumeControl .action_setting,
-body.windowFlag_landscapeMode #actions .actions_settings_autoScan .action_setting,
-body.windowFlag_landscapeMode #actions .actions_switch .action_switch,
-body.windowFlag_landscapeMode #actions .actions_scan .action_scan,
-body.windowFlag_landscapeMode #actions .actions_target .action_target,
-body.windowFlag_landscapeMode #actions .actions_ability .action_ability,
-body.windowFlag_landscapeMode #actions .actions_item .action_item {
-    width: 245px;
-}
-body.windowFlag_landscapeMode #actions .actions_option .action_option label,
-body.windowFlag_landscapeMode #actions .actions_settings .action_setting label,
-body.windowFlag_landscapeMode #actions .actions_settings_eventTimeout .action_setting label,
-body.windowFlag_landscapeMode #actions .actions_settings_volumeControl .action_setting label,
-body.windowFlag_landscapeMode #actions .actions_settings_autoScan .action_setting label,
-body.windowFlag_landscapeMode #actions .actions_scan .action_scan label,
-body.windowFlag_landscapeMode #actions .actions_target .action_target label {
-    width: auto;
-}
-body.windowFlag_landscapeMode #actions .actions_scan .action_switch label {
-    width: auto;
-}
-
-body.windowFlag_landscapeMode #actions .actions_battle .action_ability label {
-    width: auto;
-}
-
-body.windowFlag_landscapeMode #actions .actions_option .action_option label,
-body.windowFlag_landscapeMode #actions .actions_option .action_option label,
-body.windowFlag_landscapeMode #actions .actions_settings .action_setting label,
-body.windowFlag_landscapeMode #actions .actions_settings_eventTimeout .action_setting label,
-body.windowFlag_landscapeMode #actions .actions_settings_volumeControl .action_setting label,
-body.windowFlag_landscapeMode #actions .actions_settings_autoScan .action_setting label,
-body.windowFlag_landscapeMode #actions .actions_scan .action_scan label,
-body.windowFlag_landscapeMode #actions .actions_target .action_target label,
-body.windowFlag_landscapeMode #actions .actions_ability .action_ability label,
-body.windowFlag_landscapeMode #actions .actions_item .action_item label,
-body.windowFlag_landscapeMode #actions .actions_switch .action_switch label {
-    width: auto;
-}
-body.windowFlag_landscapeMode #actions .actions_option .action_option label,
-body.windowFlag_landscapeMode #actions .actions_settings .action_setting label,
-body.windowFlag_landscapeMode #actions .actions_settings_eventTimeout .action_setting label,
-body.windowFlag_landscapeMode #actions .actions_settings_volumeControl .action_setting label,
-body.windowFlag_landscapeMode #actions .actions_settings_autoScan .action_setting label {
-    width: auto;
-}
-
-body.windowFlag_landscapeMode #actions .block_4,
-body.windowFlag_landscapeMode #actions .block_8 {
-    width: 248px !important;
-}
-body.windowFlag_landscapeMode #actions .block_4 label,
-body.windowFlag_landscapeMode #actions .block_8 label {
-
-}
-body.windowFlag_landscapeMode #actions .actions_option .block_4 label,
-body.windowFlag_landscapeMode #actions .actions_option .block_8 label,
-body.windowFlag_landscapeMode #actions .actions_settings .block_4 label,
-body.windowFlag_landscapeMode #actions .actions_settings .block_8 label,
-body.windowFlag_landscapeMode #actions .actions_settings_eventTimeout .block_4 label,
-body.windowFlag_landscapeMode #actions .actions_settings_eventTimeout .block_8 label,
-body.windowFlag_landscapeMode #actions .actions_settings_volumeControl .block_4 label,
-body.windowFlag_landscapeMode #actions .actions_settings_volumeControl .block_8 label,
-body.windowFlag_landscapeMode #actions .actions_settings_autoScan .block_4 label,
-body.windowFlag_landscapeMode #actions .actions_settings_autoScan .block_8 label {
-
-}
-
-
-
 /* -- DEBUG DEBUG DEBUG DEBUG DEBUG --
 
 #connect {
@@ -3663,12 +4226,6 @@ body.windowFlag_landscapeMode #actions .actions_settings_autoScan .block_8 label
     height: 380px;
     border-color: rgba(200, 200, 200, 0.3);
     background-color: rgba(125, 125, 125, 0.2);
-}
-body.windowFlag_landscapeMode #prototype,
-body.windowFlag_landscapeMode #window,
-body.windowFlag_landscapeMode #window iframe,
-body.windowFlag_landscapeMode #battle {
-    height: 1024px !important;
 }
 
 */

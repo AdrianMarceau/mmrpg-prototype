@@ -92,6 +92,7 @@ define('MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX', 8); // The maximum number of r
 // Define the global multiplier for battle points per level
 define('MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL', 1000); // The point rate per robot master level for normal battles
 define('MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL2', 100); // The point rate per support mecha level for normal battles
+define('MMRPG_SETTINGS_BATTLETURNS_PERBOSS', 9); // The point rate per target robot master for normal battles
 define('MMRPG_SETTINGS_BATTLETURNS_PERROBOT', 3); // The point rate per target robot master for normal battles
 define('MMRPG_SETTINGS_BATTLETURNS_PERMECHA', 1); // The point rate per target support mecha for normal battles
 define('MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER', 0.05); // The conversion rate for battle points into zenny rewards
@@ -154,8 +155,14 @@ define('MMRPG_SETTINGS_THREADS_RECENT', 6); // How many threads should be listed
 define('MMRPG_SETTINGS_POSTS_PERPAGE', 20); // How many discussion threads should be displayed per page
 define('MMRPG_SETTINGS_THREADS_PERPAGE', 50); // How many comment posts should be displayed per page
 
+// Define the global values for robot unlocks in each campaign
+define('MMRPG_SETTINGS_GAMESTORY1_STARTLEVEL', 1); // The level the first player's hero robot starts at
+define('MMRPG_SETTINGS_GAMESTORY2_STARTLEVEL', 9); // The level the second player's hero robot starts at
+define('MMRPG_SETTINGS_GAMESTORY3_STARTLEVEL', 19); // The level the third player's hero robot starts at
+
 // Define the global counters for missions in each campaign
-define('MMRPG_SETTINGS_CHAPTER1_MISSIONS', 1);  // Intro
+define('MMRPG_SETTINGS_CHAPTER0_MISSIONS', 0);  // Void
+define('MMRPG_SETTINGS_CHAPTER1_MISSIONS', 3);  // Intro
 define('MMRPG_SETTINGS_CHAPTER2_MISSIONS', 8);  // Masters
 define('MMRPG_SETTINGS_CHAPTER3_MISSIONS', 1);  // Rivals
 define('MMRPG_SETTINGS_CHAPTER4_MISSIONS', 4);  // Fusions
@@ -174,6 +181,11 @@ define('MMRPG_SETTINGS_CHAPTER2_STARLOCK', MMRPG_SETTINGS_CHAPTER1_STARLOCK + 0)
 define('MMRPG_SETTINGS_CHAPTER3_STARLOCK', MMRPG_SETTINGS_CHAPTER2_STARLOCK + 0);             // 0   (Rivals)
 define('MMRPG_SETTINGS_CHAPTER4_STARLOCK', MMRPG_SETTINGS_CHAPTER3_STARLOCK + (3 * 8));       // 24  (Fusions)
 define('MMRPG_SETTINGS_CHAPTER5_STARLOCK', MMRPG_SETTINGS_CHAPTER4_STARLOCK + (3 * 4));       // 36  (Finals)
+
+// Define the global constants related to audio defaults
+define('MMRPG_SETTINGS_AUDIODEFAULT_MASTERVOLUME', 0.7); // Not quite full blast
+define('MMRPG_SETTINGS_AUDIODEFAULT_MUSICVOLUME', 0.4); // Slightly lower than the sfx
+define('MMRPG_SETTINGS_AUDIODEFAULT_EFFECTVOLUME', 0.6); // Slightly higher than the music
 
 // Back-up definition in case COPPA is not defined
 if (!defined('MMRPG_CONFIG_COPPA_PERMISSIONS')){

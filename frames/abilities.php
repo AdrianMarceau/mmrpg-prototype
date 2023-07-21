@@ -181,7 +181,7 @@ if (true){
 
                                             ?>
                                             <td class="<?= $ability_cell_float ?> ability_cell<?= $temp_is_disabled ? ' ability_cell_disabled' : '' ?><?= !$temp_is_complete ? ' ability_cell_incomplete' : '' ?>" data-kind="ability" data-action="use-ability" data-token="<?= !$temp_is_comingsoon ? $ability_info_token : 'comingsoon' ?>" data-unlocked="<?= $temp_is_comingsoon ? 'coming-soon' : 'true' ?>">
-                                                <span class="ability_number ability_type ability_type_empty">No. <?= str_replace(' ', '&nbsp;', str_pad($ability_counter, 2, ' ', STR_PAD_LEFT)); ?></span><span class="ability_name ability_type ability_type_<?= $ability_info_type ?>" <?= !empty($temp_info_tooltip) ? 'data-tooltip="'.$temp_info_tooltip.'"' : '' ?>><?= $ability_info_name ?></span>
+                                                <span class="ability_number ability_type ability_type_empty">No. <?= str_replace(' ', '&nbsp;', str_pad($ability_counter, 2, ' ', STR_PAD_LEFT)); ?></span><span class="ability_name ability_type ability_type_<?= $ability_info_type ?>" <?= !empty($temp_info_tooltip) ? 'data-click-tooltip="'.$temp_info_tooltip.'"' : '' ?>><?= $ability_info_name ?></span>
                                                 <? if (!$temp_is_comingsoon): ?>
                                                     <span class="ability_sprite ability_type ability_type_empty"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/abilities/<?= $ability_sprite_image ?>/icon_right_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE?>);"></span></span>
                                                 <? else: ?>
@@ -286,8 +286,8 @@ if (true){
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="abilities" content="noindex,nofollow" />
 <meta name="format-detection" content="telephone=no" />
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/solid.css" integrity="sha384-+0VIRx+yz1WBcCTXBkVQYIBVNEFH1eP6Zknm16roZCyeNg2maWEpk/l/KsyFKs7G" crossorigin="anonymous">
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/fontawesome.css" integrity="sha384-jLuaxTTBR42U2qJ/pm4JRouHkEDHkVqH0T1nyQXn1mZ7Snycpf6Rl25VBNthU4z0" crossorigin="anonymous">
+<link type="text/css" href=".libs/fontawesome/v5.6.3/css/solid.css" rel="stylesheet" />
+<link type="text/css" href=".libs/fontawesome/v5.6.3/css/fontawesome.css" rel="stylesheet" />
 <link type="text/css" href=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.css" rel="stylesheet" />
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />

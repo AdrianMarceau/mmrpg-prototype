@@ -13,6 +13,76 @@ $(document).ready(function(){
     thisWindow = $(window);
     thisShop = $('#shop', thisBody);
 
+    // -- SOUND EFFECT FUNCTIONALITY -- //
+
+    // Define some interaction sound effects for the shop menu
+    var thisContext = $('#shop');
+    var playSoundEffect = function(){};
+    if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+
+        // Define a quick local function for routing sound effect plays to the parent
+        playSoundEffect = function(soundName, options){
+            if (this instanceof jQuery || this instanceof Element){
+                if ($(this).data('silentClick')){ return; }
+                if ($(this).is('.disabled')){ return; }
+                if ($(this).is('.button_disabled')){ return; }
+                if ($(this).is('.item_cell_disabled *')){ return; }
+                }
+            top.mmrpg_play_sound_effect(soundName, options);
+            };
+
+        // SHOP KEEPER LINKS
+
+        // Add hover and click sounds to the buttons in the shop keeper menu
+        $('#canvas .sprite_player', thisContext).live('mouseenter', function(){
+            playSoundEffect.call(this, 'link-hover', {volume: 0.5});
+            });
+        $('#canvas .sprite_player', thisContext).live('click', function(){
+            playSoundEffect.call(this, 'link-click', {volume: 1.0});
+            });
+
+        // SHOP TAB LINKS
+
+        // Add hover and click sounds to the buttons in the shop keeper tabs
+        $('#console .event .shop_tabs_links .tab_link', thisContext).live('mouseenter', function(){
+            playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
+            });
+        $('#console .event .shop_tabs_links .tab_link', thisContext).live('click', function(){
+            playSoundEffect.call(this, 'icon-click', {volume: 1.0});
+            });
+
+        // SHOP INVENTORY LINKS
+
+        // Add hover and click sounds to the buttons in the shop inventory spans
+        $('#console .event .item_cell span[data-click-tooltip]', thisContext).live('mouseenter', function(){
+            playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
+            });
+        $('#console .event .item_cell span[data-click-tooltip]', thisContext).live('click', function(){
+            // [tooltip takes care of this one]
+            });
+
+        // SHOP BUY/SELL BUTTONS
+
+        // Add hover and click sounds to the buttons in the shop buy and sell buttons
+        var selector = '';
+        selector += '#console .event .buy_button';
+        selector += ',#console .event .sell_button';
+        selector += ',#console .event .confirm_button';
+        selector += ',#console .event .cancel_button';
+        selector += ',#console .event .player_button';
+        selector += ',#console .event .item_quantity_mods a';
+        $(selector, thisContext).live('mouseenter', function(){
+            if ($(this).is('.cancel_button')){ playSoundEffect.call(this, 'back-hover', {volume: 0.75}); }
+            playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
+            });
+        $(selector, thisContext).live('click', function(){
+            if ($(this).is('.cancel_button')){ playSoundEffect.call(this, 'back-click', {volume: 0.75}); }
+            else if ($(this).is('.item_quantity_mods a')){ playSoundEffect.call(this, 'icon-click-mini', {volume: 0.75}); }
+            else { playSoundEffect.call(this, 'icon-click', {volume: 0.75}); }
+            });
+
+        }
+
     // Update the player and player count by counting elements
     thisShopData.shopTotal = $('#canvas .wrapper[data-shop]', thisShop).length;
     //console.log('thisShopData', thisShopData);
@@ -50,11 +120,11 @@ $(document).ready(function(){
             $(dataSelectorCurrent, gameConsole).stop().animate({opacity:0},250,'swing',function(){
                 $(this).removeClass('event_visible').addClass('event_hidden').css({opacity:1});
                 $(dataSelectorNext, gameConsole).css({opacity:0}).removeClass('event_hidden').addClass('event_visible').animate({opacity:1.0},250,'swing');
-                $(dataSelectorNext, gameConsole).find('.tab_link').first().trigger('click');
+                $(dataSelectorNext, gameConsole).find('.tab_link').first().triggerSilentClick();
                 });
             } else {
                 $(dataSelectorNext, gameConsole).css({opacity:0}).removeClass('event_hidden').addClass('event_visible').animate({opacity:1.0},250,'swing');
-                $(dataSelectorNext, gameConsole).find('.tab_link').first().trigger('click');
+                $(dataSelectorNext, gameConsole).find('.tab_link').first().triggerSilentClick();
             }
 
         });
@@ -208,7 +278,7 @@ $(document).ready(function(){
             //console.log('We should auto-confirm stars being shown!');
             thisCell.addClass('item_cell_disabled');
             itemCellConfirm.find('a.cancel_button').remove();
-            itemCellConfirm.find('a.confirm_button').html('Scanning&hellip;').trigger('click');
+            itemCellConfirm.find('a.confirm_button').html('Scanning&hellip;').triggerSilentClick();
             }
         return true;
         });
@@ -373,6 +443,7 @@ $(document).ready(function(){
                     var newZennyTotal = data[3] != undefined ? parseInt(data[3]) : false;
                     var newPointsTotal = data[4] != undefined && data[4].indexOf('points:') !== -1 ? parseInt(data[4].replace('points:', '')) : false;
                     var newLeaderboardRank = data[5] != undefined && data[5].indexOf('rank:') !== -1 ? data[5].replace('rank:', '') : false;
+                    var zennyDifference = Math.abs(newZennyTotal - thisShopData.zennyCounter);
                     //console.log({newItemCount:newItemCount,newZennyTotal:newZennyTotal,newPointsTotal:newPointsTotal,newLeaderboardRank:newLeaderboardRank});
 
                     // Define the change text
@@ -412,6 +483,17 @@ $(document).ready(function(){
                         }
 
                     updateItemCells();
+
+                    if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+                        playSoundEffect('shop-success', {volume: 1.0});
+                        playSoundEffect('zenny-spent', {volume: 1.0});
+                        var loops = Math.ceil(zennyDifference / 1000);
+                        for (var i = 0; i < loops; i++){
+                            setTimeout(function(){
+                                playSoundEffect('zenny-spent', {volume: 1.0});
+                                }, 100 + (100 * i));
+                            }
+                        }
 
                     // Animate the cell to show that an action has been completed
                     thisConfirmCell.stop().animate({opacity:1.0},300,'swing',function(){
@@ -457,7 +539,7 @@ $(document).ready(function(){
                                             var maxCount = parseInt($coreWrap.attr('data-max-count'));
                                             //console.log('oldCount =', oldCount, 'newCount =', newCount);
                                             $coreWrap.attr('data-count', newCount);
-                                            $coreWrap.attr('data-tooltip', $coreWrap.attr('data-tooltip').replace(/\s[0-9]+$/, ' '+newCount));
+                                            $coreWrap.attr('data-click-tooltip', $coreWrap.attr('data-click-tooltip').replace(/\s[0-9]+$/, ' '+newCount));
                                             $coreWrap.css({opacity:(0.1 + ((newCount < 3 ? newCount / 3 : 1) * 0.9))});
                                             if (newCount < maxCount){ $coreWrap.find('.count').html(newCount); }
                                             else { $coreWrap.find('.count').html('&bigstar;'); }
@@ -470,6 +552,15 @@ $(document).ready(function(){
 
                             });
                         });
+
+                    // Make sure we always poll the server for popup events after our action
+                    //console.log('queuing the windowEventsPull event (via shop)');
+                    if (typeof window.top.mmrpg_queue_for_game_start !== 'undefined'){
+                        window.top.mmrpg_queue_for_game_start(function(){
+                            //console.log('i guess the game has started');
+                            setTimeout(function(){ parent.windowEventsPull(); }, 1000);
+                            });
+                        }
 
                     return true;
 
@@ -501,7 +592,7 @@ $(document).ready(function(){
     $('#console .scroll_wrapper', thisShop).perfectScrollbar({suppressScrollX: true, scrollYMarginOffset: 6});
 
     // Automatically click the first shop link
-    $('#canvas #links .sprite[data-token]').first().trigger('click');
+    $('#canvas #links .sprite[data-token]').first().triggerSilentClick();
     //console.log('updating perfect scrollbar 3');
     $('#console .scroll_wrapper', thisShop).perfectScrollbar('update');
 

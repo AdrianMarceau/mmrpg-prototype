@@ -27,9 +27,58 @@ $(document).ready(function(){
     thisWindow = $(window);
     thisContainer = $('.stars', thisPrototype);
 
+    // -- SOUND EFFECT FUNCTIONALITY -- //
+
+    // Define some interaction sound effects for the items menu
+    var thisContext = $('#prototype .menu .stars');
+    var playSoundEffect = function(){};
+    if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
+
+        // Define a quick local function for routing sound effect plays to the parent
+        playSoundEffect = function(soundName, options){
+            if (this instanceof jQuery || this instanceof Element){
+                if ($(this).data('silentClick')){ return; }
+                if ($(this).is('.disabled')){ return; }
+                if ($(this).is('.button_disabled')){ return; }
+                }
+            top.mmrpg_play_sound_effect(soundName, options);
+            };
+
+        // STAR GRID ARROWS & AVATARS
+
+        // Add hover and click sounds to the buttons in star grid
+        $('.starchart .grouplist .arrow', thisContext).live('mouseenter', function(){
+            playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
+            });
+        $('.starchart .grouplist .group .robots .icon', thisContext).live('mouseenter', function(){
+            playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
+            });
+
+        // STAR CHART STARS
+
+        // Add hover and click sounds to the stars in star grid
+        $('.starchart .starlist .sprite_star', thisContext).live('mouseenter', function(){
+            if ($(this).is('.empty_star')){ return; }
+            playSoundEffect.call(this, 'cosmic-sound', {volume: 0.5, rate: 2});
+            });
+
+
+        // STAR FORCE CHART & BUTTONS
+
+        // Add hover and click sounds to the button in the toolbar menu
+        $('.starforce .size_toggle', thisContext).live('mouseenter', function(){
+            playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
+            });
+        $('.starforce .size_toggle', thisContext).live('click', function(){
+            playSoundEffect.call(this, 'icon-click-mini', {volume: 1.0});
+            });
+
+        }
+
     thisWindow.resize(function(){ windowResizeStarforce(); });
     setTimeout(function(){ windowResizeStarforce(); }, 1000);
     windowResizeStarforce();
+    refreshArrowButtons();
 
     var windowHeight = $(window).height();
     var htmlHeight = $('html').height();
@@ -45,7 +94,7 @@ $(document).ready(function(){
 
     // Define click events for the prev and next buttons
     var groupLists = $('.starchart .grouplist', thisBody);
-    $('.arrow[data-dir]', groupLists).click(function(e){
+    $('.arrow[data-dir]', groupLists).bind('click', function(e){
         e.preventDefault();
 
         // Collect key object references and values
@@ -76,8 +125,11 @@ $(document).ready(function(){
         currentGroupContainer.removeClass('current');
         newGroupContainer.addClass('current');
 
-        // Trigger a refresh of the visible stars
-        return refreshStarchart();
+        // Trigger a refresh of the buttons and visible stars
+        playSoundEffect.call(this, 'icon-click', {volume: 1.0});
+        refreshArrowButtons();
+        refreshStarchart();
+        return true;
 
         });
 
@@ -190,4 +242,25 @@ function refreshStarchart(){
         });
 
     return true;
+}
+
+// Define a function that checks each arrow button to see if it should be enabled or not
+function refreshArrowButtons(){
+    var $thisBody = $('#mmrpg');
+    var $groupLists = $('.starchart .grouplist', $thisBody);
+    var $arrowButtons = $('.arrow[data-dir]', $groupLists);
+    //console.log('$groupLists =', $groupLists.length, $groupLists);
+    //console.log('$arrowButtons =', $arrowButtons.length, $arrowButtons);
+    $arrowButtons.each(function(){
+        var $thisButton = $(this);
+        var thisDirection = $thisButton.attr('data-dir');
+        var thisGroupList = $thisButton.closest('.grouplist');
+        var thisCurrentGroup = thisGroupList.attr('data-current');
+        var thisCurrentGroupContainer = thisGroupList.find('.group[data-group="'+thisCurrentGroup+'"]');
+        var thisNewGroupContainer = thisDirection == 'prev' ? thisCurrentGroupContainer.prev('.group') : thisCurrentGroupContainer.next('.group');
+        var thisNewGroup = thisNewGroupContainer.attr('data-group');
+        var thisButtonEnabled = thisNewGroupContainer.length ? true : false;
+        if (thisButtonEnabled){ $thisButton.removeClass('disabled'); }
+        else { $thisButton.addClass('disabled'); }
+        });
 }

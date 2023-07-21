@@ -1472,6 +1472,10 @@ class rpg_player extends rpg_object {
         }
         return '<span class="player_name player_type'.(!empty($type_class) ? ' '.$type_class : '').'">'.$this->player_name.'</span>';
     }
+    public function print_name_s(){
+        $ends_with_s = substr($this->player_name, -1) === 's' ? true : false;
+        return $this->print_name()."'".(!$ends_with_s ? 's' : '');
+    }
     public function print_token(){ return '<span class="player_token">'.$this->player_token.'</span>'; }
     public function print_description(){ return '<span class="player_description">'.$this->player_description.'</span>'; }
     public function print_quote($quote_type, $this_find = array(), $this_replace = array()){
@@ -1506,6 +1510,46 @@ class rpg_player extends rpg_object {
 
         // Delegate markup generation to the console class
         return rpg_console::player_markup($this, $options);
+
+    }
+
+    // Define a function to trigger when all attack damage has been dealt and we need to apply disabled status to robots
+    public function check_robots_disabled($target_player, $target_robot){
+
+        // Loop through all robots on the target side and check to see if any need to be disabled
+        $robots_to_disable = array();
+        $robots_still_active = $this->get_robots();
+        foreach ($robots_still_active AS $key => $robot){
+            if (($robot->robot_energy < 1 || $robot->robot_status == 'disabled')
+                && empty($robot->flags['apply_disabled_state'])){
+                $robots_to_disable[] = $robot;
+            }
+        }
+
+        // Sort the robots to ensure we process benched ones first, then active ones last
+        usort($robots_to_disable, function($r1, $r2){
+            if ($r1->robot_position === 'active' && $r2->robot_position !== 'active'){ return 1; }
+            elseif ($r1->robot_position !== 'active' && $r2->robot_position === 'active'){ return -1; }
+            elseif ($r1->robot_key < $r2->robot_key){ return -1; }
+            elseif ($r1->robot_key > $r2->robot_key){ return 1; }
+            else { return 0; }
+            });
+
+        // Loop through robots to disable and trigger it, delaying experience gains until the end
+        while (!empty($robots_to_disable)){
+
+            // Collect the robot object we'll be working with
+            $robot = array_shift($robots_to_disable);
+
+            // And now we can process the actual disabled status and cleanup
+            $options = array();
+            if (!empty($robots_to_disable)){
+                $options['delay_stat_bonuses'] = true;
+                $options['delay_experience_points'] = true;
+            }
+            $robot->trigger_disabled($target_robot, $options);
+
+        }
 
     }
 
@@ -1576,12 +1620,17 @@ class rpg_player extends rpg_object {
 
     }
 
+    // Define a function to trigger when an enemy robot drops an item (in this context, "target" is the player getting the item, and "this" if the one who dropped it)
     public static function trigger_item_drop($this_battle, $target_player, $target_robot, $this_robot, $item_reward_key, $item_reward_token, $item_quantity_dropped = 1){
+
+        // Collect a reference to the player who owned the robot who dropped the item
+        $this_player = $this_robot->player;
 
         // Create the temporary item object for event creation
         $item_reward_info = rpg_item::get_index_info($item_reward_token);
         if (empty($item_reward_info)){ return false; }
-        $temp_item = rpg_game::get_item($this_battle, $target_player, $target_robot, $item_reward_info);
+        //$temp_item = rpg_game::get_item($this_battle, $target_player, $target_robot, $item_reward_info);
+        $temp_item = rpg_game::get_item($this_battle, $this_player, $this_robot, $item_reward_info);
         $temp_item->item_name = $item_reward_info['item_name'];
         $temp_item->item_image = $item_reward_info['item_token'];
         $temp_item->item_quantity = $item_quantity_dropped;
@@ -1625,7 +1674,7 @@ class rpg_player extends rpg_object {
 
         // Update the item frame and offsets then save
         $temp_item->item_frame = 0;
-        $temp_item->item_frame_offset = array('x' => 260, 'y' => 0, 'z' => 10);
+        $temp_item->item_frame_offset = array('x' => 50, 'y' => 0, 'z' => 10);
         if ($item_quantity_dropped > 1){ $temp_item->item_name = $temp_item->item_base_name.'s'; }
         else { $temp_item->item_name = $temp_item->item_base_name; }
         $temp_item->update_session();
@@ -1664,6 +1713,10 @@ class rpg_player extends rpg_object {
 
         }
 
+        // Given everything, check to see if shards will be fusing this turn
+        $shards_fusing_this_turn = false;
+        if ($shards_remaining !== false && $shards_remaining < 1){ $shards_fusing_this_turn = true; }
+
         // Display the robot reward message markup
         $event_header = $temp_item_name.' Item Drop';
         if ($item_quantity_dropped > 1){
@@ -1675,8 +1728,8 @@ class rpg_player extends rpg_object {
         //$event_body .= ' ('.$temp_item_quantity_old.' &raquo; '.$temp_item_quantity_new.')';
         $event_options = array();
         $event_options['console_show_target'] = false;
-        $event_options['this_header_float'] = $target_player->player_side;
-        $event_options['this_body_float'] = $target_player->player_side;
+        $event_options['this_header_float'] = $this_player->player_side;
+        $event_options['this_body_float'] = $this_player->player_side;
         $event_options['this_item'] = $temp_item;
         $event_options['this_item_image'] = 'icon';
         $event_options['this_item_quantity'] = $item_quantity_dropped;
@@ -1684,7 +1737,24 @@ class rpg_player extends rpg_object {
         $event_options['console_show_this_robot'] = false;
         $event_options['console_show_this_item'] = true;
         $event_options['canvas_show_this_item'] = true;
-        $this_battle->events_create($target_robot, $target_robot, $event_header, $event_body, $event_options);
+        $event_options['event_flag_sound_effects'] = array(
+            array('name' => 'get-item', 'volume' => 1.0)
+            );
+        rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $temp_item);
+        $this_battle->events_create($this_robot, false, $event_header, $event_body, $event_options);
+        if ($shards_fusing_this_turn){
+            $event_options['event_flag_sound_effects'] = array(
+                array('name' => 'shards-fusing', 'volume' => 0.8)
+                );
+            $temp_item->set_frame_styles('filter: brightness(2); ');
+            $this_battle->events_create($this_robot, false, '', '', $event_options);
+            $event_options['this_item_quantity'] = MMRPG_SETTINGS_SHARDS_MAXQUANTITY;
+            $this_battle->events_create($this_robot, false, '', '', $event_options);
+            $temp_item->set_frame_styles('');
+        } else {
+            $temp_item->set_frame_styles('');
+            $this_battle->events_create(false, false, '', '', array_filter($event_options, function($k){ return strstr($k, '_camera_'); }, ARRAY_FILTER_USE_KEY));
+        }
 
         // Create and/or increment the session variable for this item increasing its quantity
         if (empty($_SESSION['GAME']['values']['battle_items'][$temp_item_token])){ $_SESSION['GAME']['values']['battle_items'][$temp_item_token] = 0; }
@@ -1706,7 +1776,7 @@ class rpg_player extends rpg_object {
         }
 
         // If this was a shard, and it was the LAST shard
-        if ($shards_remaining !== false && $shards_remaining < 1){
+        if ($shards_fusing_this_turn){
 
             // Define the new core token and increment value in session
             $temp_core_token = str_replace('shard', 'core', $temp_item_token);
@@ -1716,7 +1786,7 @@ class rpg_player extends rpg_object {
             // Create the temporary item object for event creation
             $item_core_info['item_id'] = $item_reward_info['item_id'] + 1;
             $item_core_info['item_token'] = $temp_core_token;
-            $temp_core = rpg_game::get_item($this_battle, $target_player, $target_robot, $item_core_info);
+            $temp_core = rpg_game::get_item($this_battle, $this_player, $this_robot, $item_core_info);
             $temp_core->item_name = $item_core_info['item_name'];
             $temp_core->item_image = $item_core_info['item_token'];
             $temp_core->update_session();
@@ -1752,19 +1822,24 @@ class rpg_player extends rpg_object {
             $event_body .= ' <span class="item_stat item_type item_type_none">'.$temp_core_quantity_old.' <sup style="bottom: 2px;">&raquo;</sup> '.$temp_core_quantity_new.'</span>';
             $event_options = array();
             $event_options['console_show_target'] = false;
-            $event_options['this_header_float'] = $target_player->player_side;
-            $event_options['this_body_float'] = $target_player->player_side;
+            $event_options['this_header_float'] = $this_player->player_side;
+            $event_options['this_body_float'] = $this_player->player_side;
             $event_options['this_item'] = $temp_core;
             $event_options['this_item_image'] = 'icon';
             $event_options['console_show_this_player'] = false;
             $event_options['console_show_this_robot'] = false;
             $event_options['console_show_this_item'] = true;
             $event_options['canvas_show_this_item'] = true;
+            $event_options['event_flag_sound_effects'] = array(
+                array('name' => 'get-big-item', 'volume' => 1.0)
+                );
             $target_player->set_frame(($item_reward_key + 1 % 3 == 0 ? 'taunt' : 'victory'));
             $target_robot->set_frame($item_reward_key % 2 == 0 ? 'base' : 'taunt');
             $temp_core->set_frame('base');
-            $temp_core->set_frame_offset(array('x' => 220, 'y' => 0, 'z' => 10));
-            $this_battle->events_create($target_robot, false, $event_header, $event_body, $event_options);
+            $temp_core->set_frame_offset(array('x' => 50, 'y' => 0, 'z' => 10));
+            rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $temp_core);
+            $this_battle->events_create($this_robot, false, $event_header, $event_body, $event_options);
+            $this_battle->events_create(false, false, '', '', array_filter($event_options, function($k){ return strstr($k, '_camera_'); }, ARRAY_FILTER_USE_KEY));
 
             // Set the old shard counter back to zero now that they've fused
             $_SESSION['GAME']['values']['battle_items'][$temp_item_token] = 0;
@@ -2341,16 +2416,16 @@ class rpg_player extends rpg_object {
             if (!isset($print_options['show_quotes'])){ $print_options['show_quotes'] = true; }
             if (!isset($print_options['show_description'])){ $print_options['show_description'] = true; }
             if (!isset($print_options['show_sprites'])){ $print_options['show_sprites'] = true; }
-            if (!isset($print_options['show_abilities'])){ $print_options['show_abilities'] = true; }
+            if (!isset($print_options['show_abilities'])){ $print_options['show_abilities'] = false; }
             if (!isset($print_options['show_records'])){ $print_options['show_records'] = true; }
             if (!isset($print_options['show_footer'])){ $print_options['show_footer'] = true; }
             if (!isset($print_options['show_key'])){ $print_options['show_key'] = false; }
         } elseif ($print_options['layout_style'] == 'website_compact'){
             if (!isset($print_options['show_basics'])){ $print_options['show_basics'] = true; }
             if (!isset($print_options['show_mugshot'])){ $print_options['show_mugshot'] = true; }
-            if (!isset($print_options['show_quotes'])){ $print_options['show_quotes'] = true; }
+            if (!isset($print_options['show_quotes'])){ $print_options['show_quotes'] = false; }
             if (!isset($print_options['show_description'])){ $print_options['show_description'] = false; }
-            if (!isset($print_options['show_sprites'])){ $print_options['show_sprites'] = false; }
+            if (!isset($print_options['show_sprites'])){ $print_options['show_sprites'] = true; }
             if (!isset($print_options['show_abilities'])){ $print_options['show_abilities'] = false; }
             if (!isset($print_options['show_records'])){ $print_options['show_records'] = false; }
             if (!isset($print_options['show_footer'])){ $print_options['show_footer'] = true; }
@@ -2403,9 +2478,6 @@ class rpg_player extends rpg_object {
                         <? else: ?>
                             <?= $player_info['player_name'] ?>
                         <? endif; ?>
-                        <? if (!empty($player_info['player_type'])): ?>
-                            <span class="header_core ability_type" style="border-color: rgba(0, 0, 0, 0.2) !important; background-color: rgba(0, 0, 0, 0.2) !important;"><?= ucfirst($player_info['player_type']) ?> Type</span>
-                        <? endif; ?>
                     </h2>
 
                     <div class="body body_left" style="margin-right: 0; padding: 0 0 2px;">
@@ -2425,13 +2497,13 @@ class rpg_player extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td class="right">
-                                        <label style="display: block; float: left;">Bonus :</label>
+                                        <label style="display: block; float: left;">Skill :</label>
                                         <?
                                             // Display any special boosts this player has
-                                            if (!empty($player_info['player_energy'])){ echo '<span class="player_name player_type player_type_energy">Robot Energy +'.$player_info['player_energy'].'%</span>'; }
-                                            elseif (!empty($player_info['player_attack'])){ echo '<span class="player_name player_type player_type_attack">Robot Attack +'.$player_info['player_attack'].'%</span>'; }
-                                            elseif (!empty($player_info['player_defense'])){ echo '<span class="player_name player_type player_type_defense">Robot Defense +'.$player_info['player_defense'].'%</span>'; }
-                                            elseif (!empty($player_info['player_speed'])){ echo '<span class="player_name player_type player_type_speed">Robot Speed +'.$player_info['player_speed'].'%</span>'; }
+                                            if (!empty($player_info['player_energy'])){ echo '<span class="player_name player_type player_type_energy">Energy +'.$player_info['player_energy'].'%</span>'; }
+                                            elseif (!empty($player_info['player_attack'])){ echo '<span class="player_name player_type player_type_attack">Attack +'.$player_info['player_attack'].'%</span>'; }
+                                            elseif (!empty($player_info['player_defense'])){ echo '<span class="player_name player_type player_type_defense">Defense +'.$player_info['player_defense'].'%</span>'; }
+                                            elseif (!empty($player_info['player_speed'])){ echo '<span class="player_name player_type player_type_speed">Speed +'.$player_info['player_speed'].'%</span>'; }
                                             else { echo '<span class="player_name player_type player_type_none">None</span>'; }
                                         ?>
                                     </td>
@@ -2502,12 +2574,16 @@ class rpg_player extends rpg_object {
                         $show_sizes = array();
                         $base_size = $player_image_size;
                         $zoom_size = $player_image_size * 2;
-                        $show_sizes[$base_size] = $base_size.'x'.$base_size;
-                        $show_sizes[$zoom_size] = $zoom_size.'x'.$zoom_size;
+                        $base_size_text = $base_size.'x'.$base_size;
+                        $zoom_size_text = $zoom_size.'x'.$zoom_size;
+                        $show_sizes[$base_size] = $base_size_text;
+                        $show_sizes[$zoom_size] = $zoom_size_text;
+                        if ($print_options['layout_style'] === 'website_compact'){ unset($show_sizes[$base_size]); }
                         $size_key = -1;
                         foreach ($show_sizes AS $size_value => $sprite_size_text){
                             $size_key++;
                             $size_is_final = $size_key == (count($show_sizes) - 1);
+                            $show_sprite_labels = $size_is_final && $print_options['layout_style'] !== 'website_compact' ? true : false;
 
                             // Start the output buffer and prepare to collect sprites
                             ob_start();
@@ -2535,8 +2611,8 @@ class rpg_player extends rpg_object {
                                         $temp_title = htmlentities($temp_title, ENT_QUOTES, 'UTF-8', true);
                                         $temp_label = 'Mugshot '.ucfirst(substr($temp_direction, 0, 1));
                                         echo '<div class="frame_container" data-clickcopy="'.$temp_embed.'" data-direction="'.$temp_direction.'" data-image="'.$temp_player_image_token.'" data-frame="mugshot" style="'.($size_is_final ? 'padding-top: 20px;' : 'padding: 0;').' float: left; position: relative; margin: 0; box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.75); width: '.$size_value.'px; height: '.$size_value.'px; overflow: hidden;">';
-                                            echo '<img class="has_pixels" style="margin-left: 0; height: '.$size_value.'px;" data-tooltip="'.$temp_title.'" src="images/players/'.$temp_player_image_token.'/mug_'.$temp_direction.'_'.$show_sizes[$base_size].'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
-                                            if ($size_is_final){ echo '<label style="position: absolute; left: 5px; top: 0; color: #EFEFEF; font-size: 10px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);">'.$temp_label.'</label>'; }
+                                            echo '<img class="has_pixels" style="margin-left: 0; height: '.$size_value.'px;" data-tooltip="'.$temp_title.'" src="images/players/'.$temp_player_image_token.'/mug_'.$temp_direction.'_'.$sprite_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
+                                            if ($show_sprite_labels){ echo '<label style="position: absolute; left: 5px; top: 0; color: #EFEFEF; font-size: 10px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);">'.$temp_label.'</label>'; }
                                         echo '</div>';
                                     }
 
@@ -2559,7 +2635,7 @@ class rpg_player extends rpg_object {
                                             //if ($temp_sheet > 1){ $temp_player_image_token .= '-'.$temp_sheet; }
                                             echo '<div class="frame_container" data-clickcopy="'.$temp_embed.'" data-direction="'.$temp_direction.'" data-image="'.$temp_player_image_token.'" data-frame="'.$frame_relative.'" style="'.($size_is_final ? 'padding-top: 20px;' : 'padding: 0;').' float: left; position: relative; margin: 0; box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.75); width: '.$size_value.'px; height: '.$size_value.'px; overflow: hidden;">';
                                                 echo '<img class="has_pixels" style="margin-left: '.$margin_left.'px; height: '.$size_value.'px;" data-tooltip="'.$temp_title.'" alt="'.$temp_imgalt.'" src="images/players/'.$temp_player_image_token.'/sprite_'.$temp_direction.'_'.$sprite_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'" />';
-                                                if ($size_is_final){ echo '<label style="position: absolute; left: 5px; top: 0; color: #EFEFEF; font-size: 10px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);">'.$temp_label.'</label>'; }
+                                                if ($show_sprite_labels){ echo '<label style="position: absolute; left: 5px; top: 0; color: #EFEFEF; font-size: 10px; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);">'.$temp_label.'</label>'; }
                                             echo '</div>';
                                         }
                                     }
@@ -2576,7 +2652,7 @@ class rpg_player extends rpg_object {
 
                     ?>
 
-                    <h2 id="sprites" class="header header_full <?= $player_header_types ?>" style="margin: 10px 0 0; text-align: left; overflow: hidden; height: auto;">
+                    <h2 <?= $print_options['layout_style'] == 'website' ? 'id="sprites"' : '' ?> class="header header_full sprites_header <?= $player_header_types ?>" style="margin: 10px 0 0; text-align: left; overflow: hidden; height: auto; <?= $print_options['layout_style'] == 'website_compact' ? 'display: none;' : '' ?>">
                         Sprite Sheets
                         <span class="header_links image_link_container">
                             <span class="images" style="<?= count($temp_alts_array) == 1 ? 'display: none;' : '' ?>"><?
@@ -2618,7 +2694,7 @@ class rpg_player extends rpg_object {
                         </span>
                     </h2>
 
-                    <div id="sprites_body" class="body body_full sprites_body solid">
+                    <div <?= $print_options['layout_style'] == 'website' ? 'id="sprites_body"' : '' ?> class="body body_full sprites_body solid">
                         <?= $this_sprite_markup ?>
                         <?
                         // Define the editor title based on ID
@@ -2703,7 +2779,7 @@ class rpg_player extends rpg_object {
 
                 <? endif; ?>
 
-                <? if ($print_options['show_quotes'] && $print_options['layout_style'] == 'website'): ?>
+                <? if ($print_options['show_quotes']): ?>
 
                     <h2 id="quotes" class="header player_type_<?= $player_type_token ?>" style="margin: 10px 0 0; text-align: left; ">
                         Battle Quotes
@@ -2832,11 +2908,7 @@ class rpg_player extends rpg_object {
                                                 if ($this_ability_recovery_percent && $this_ability_recovery > 100){ $this_ability_recovery = 100; }
                                                 if ($this_ability_recovery2_percent && $this_ability_recovery2 > 100){ $this_ability_recovery2 = 100; }
                                                 $this_ability_accuracy = !empty($this_ability['ability_accuracy']) ? $this_ability['ability_accuracy'] : 0;
-                                                $this_ability_description = !empty($this_ability['ability_description']) ? $this_ability['ability_description'] : '';
-                                                $this_ability_description = str_replace('{DAMAGE}', $this_ability_damage, $this_ability_description);
-                                                $this_ability_description = str_replace('{RECOVERY}', $this_ability_recovery, $this_ability_description);
-                                                $this_ability_description = str_replace('{DAMAGE2}', $this_ability_damage2, $this_ability_description);
-                                                $this_ability_description = str_replace('{RECOVERY2}', $this_ability_recovery2, $this_ability_description);
+                                                $this_ability_description = rpg_ability::get_parsed_ability_description($this_ability);
                                                 //$this_ability_title_plain = $this_ability_name;
                                                 //if (!empty($this_ability_type)){ $this_ability_title_plain .= ' | '.$this_ability_type; }
                                                 //if (!empty($this_ability_damage)){ $this_ability_title_plain .= ' | '.$this_ability_damage.' Damage'; }
@@ -3046,8 +3118,13 @@ class rpg_player extends rpg_object {
         // DEBUG
         //echo(print_r($player_field_rewards, true));
 
+            // Check to see which size this player container should be based on unlocks
+            $event_container_size = 1;
+            if (mmrpg_prototype_item_unlocked('wily-program')){ $event_container_size++; }
+            if (mmrpg_prototype_item_unlocked('cossack-program')){ $event_container_size++; }
+
             ?>
-            <div class="event event_double event_<?= $player_key == $first_player_token ? 'visible' : 'hidden' ?>" data-token="<?=$player_info['player_token'].'_'.$player_info['player_token']?>">
+            <div class="event event_double event_<?= $player_key == $first_player_token ? 'visible' : 'hidden' ?>" data-token="<?=$player_info['player_token'].'_'.$player_info['player_token']?>" data-size="<?= $event_container_size ?>">
 
                 <div class="this_sprite sprite_left" style="top: 4px; left: 4px; width: 36px; height: 36px; background-image: url(images/fields/<?= $player_info['player_field'] ?>/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center center; border: 1px solid #1A1A1A;">
                     <? $temp_margin = -1 * ceil(($player_info['player_image_size'] - 40) * 0.5); ?>
@@ -3078,8 +3155,8 @@ class rpg_player extends rpg_object {
 
                     ?>
                     <span class="core player_type">
-                        <span class="wrap"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/items/<?= !empty($player_info['player_stat_type']) ? $player_info['player_stat_type'].'-capsule' : 'item' ?>/icon_left_40x40.png);"></span></span>
-                        <span class="text"><?= ucfirst($player_info['player_stat_type']).' +'.$player_info['player_'.$player_info['player_stat_type']].'%' ?></span>
+                        <!-- <span class="wrap"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/items/<?= !empty($player_info['player_stat_type']) ? $player_info['player_stat_type'].'-pellet' : 'item' ?>/icon_left_40x40.png);"></span></span> -->
+                        <span class="text">Skill: <?= ucfirst($player_info['player_stat_type']).' +'.$player_info['player_'.$player_info['player_stat_type']].'%' ?></span>
                     </span>
                 </div>
 
@@ -3436,9 +3513,9 @@ class rpg_player extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td class="right" style="padding-top: 4px;">
-                                        <label class="field_header">Players Fields :
+                                        <label class="field_header">Mission Customizer :
                                             <span style="font-size: 80%; color: #969696; position: relative; bottom: 1px;">
-                                            (Used in Chapter 2 + 4 mission generation. Also influence online Player Battle appearances.)
+                                            (Used in Chapter 2 + 4 of the player's campaign. Also influences Player Battles.)
                                             </span></label>
                                         <div class="field_container" style="height: auto;">
                                         <?
@@ -3639,7 +3716,7 @@ class rpg_player extends rpg_object {
             $bonus_stat_token = $temp_player_type['type_token'];
             $bonus_stat_name = $temp_player_type['type_name'];
             $bonus_stat_value = !empty($player_info['player_'.$bonus_stat_token]) ? $player_info['player_'.$bonus_stat_token] : 0;
-            $temp_description .= 'Bonus : +'.$bonus_stat_value.'% '.$bonus_stat_name.'';
+            $temp_description .= 'Skill : +'.$bonus_stat_value.'% '.$bonus_stat_name.'';
         }
 
         $temp_player_title .= ' // '.$temp_description;
@@ -3714,6 +3791,32 @@ class rpg_player extends rpg_object {
                 );
         } else {
             return $intro_field;
+        }
+    }
+
+    // Define a function for getting a list of homebase fields for players
+    public static function get_homebase_fields(){
+        return array(
+            'default' => 'intro-field',
+            'dr-light' => 'light-laboratory',
+            'dr-wily' => 'wily-castle',
+            'dr-cossack' => 'cossack-citadel'
+            );
+    }
+
+
+    // Define a function for calculating the homebase field for a given player
+    public static function get_homebase_field($player_token = '', $return_info_array = false){
+        $homebase_field_index = self::get_homebase_fields();
+        if (isset($homebase_field_index[$player_token])){ $homebase_field = $homebase_field_index[$player_token]; }
+        else { $homebase_field = $homebase_field_index['default']; }
+        if ($return_info_array){
+            return array(
+                'field_token' => $homebase_field,
+                'field_name' => ucwords(str_replace('-', ' ', $homebase_field))
+                );
+        } else {
+            return $homebase_field;
         }
     }
 

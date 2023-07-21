@@ -213,6 +213,13 @@
     $contributor_options_markup = implode(PHP_EOL, $contributor_options_markup);
 
 
+    /* -- Page Script/Style Dependencies  -- */
+
+    // Require codemirror scripts and styles for this page
+    $admin_include_common_styles[] = 'howler';
+    $admin_include_common_scripts[] = 'howler';
+
+
     /* -- Form Setup Actions -- */
 
     // Define a function for exiting a challenge edit action
@@ -999,13 +1006,37 @@
 
                                         <div class="field">
                                             <strong class="label">Field Music</strong>
-                                            <select class="select" name="challenge_field_data[field_music]">
-                                                <? if (!empty($challenge_field_data)){ ?>
-                                                    <?= str_replace('value="'.$challenge_field_data['field_music'].'"', 'value="'.$challenge_field_data['field_music'].'" selected="selected"', $music_options_markup) ?>
-                                                <? } else { ?>
-                                                    <?= $music_options_markup ?>
-                                                <? } ?>
-                                            </select><span></span>
+                                            <div class="subfield">
+                                                <select class="select" name="challenge_field_data[field_music]">
+                                                    <? if (!empty($challenge_field_data)){ ?>
+                                                        <?= str_replace('value="'.$challenge_field_data['field_music'].'"', 'value="'.$challenge_field_data['field_music'].'" selected="selected"', $music_options_markup) ?>
+                                                    <? } else { ?>
+                                                        <?= $music_options_markup ?>
+                                                    <? } ?>
+                                                </select><span></span>
+                                            </div>
+                                            <?
+                                            $data_path = '';
+                                            $data_backup_path = '';
+                                            if (!empty($challenge_field_data['field_music'])){
+                                                $mmrpg_music_path = 'prototype/sounds/';
+                                                $mmrpg_music_rootdir = MMRPG_CONFIG_CDN_ROOTDIR.$mmrpg_music_path;
+                                                $mmrpg_music_rooturl = MMRPG_CONFIG_CDN_ROOTURL.$mmrpg_music_path;
+                                                $this_music_path = $challenge_field_data['field_music'].'/';
+                                                $data_path = $mmrpg_music_rooturl.$this_music_path.'audio.mp3';
+                                                $data_backup_path = $mmrpg_music_rooturl.$this_music_path.'audio.ogg';
+                                            }
+                                            ?>
+                                            <div class="audio-player light-theme"
+                                                style="margin: 5px auto 0 0;"
+                                                data-kind="music"
+                                                data-path="<?= $data_path ?>"
+                                                data-backup-path="<?= $data_backup_path ?>"
+                                                data-select="challenge_field_data[field_music]"
+                                                data-select-path-base="<?= $mmrpg_music_rooturl ?>"
+                                                data-select-path-sources="/audio.mp3,/audio.ogg"
+                                                ><i class="loading fa fas fa-music"></i>
+                                            </div>
                                         </div>
 
                                         <hr />

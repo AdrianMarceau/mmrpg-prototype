@@ -149,7 +149,7 @@ if (true){
                             $core_max_level = !empty($core_max_levels[$type_token]) ? $core_max_levels[$type_token]['core_max'] : 9;
                             $core_opacity = 0.1 + (($core_level < 3 ? $core_level / 3 : 1) * 0.9);
                             ?>
-                            <div class="element" style="opacity: <?= $core_opacity ?>;" data-type="<?= $type_token ?>" data-count="<?= $core_level ?>" data-max-count="<?= $core_max_level ?>" data-tooltip="<?= $core_name.' Cores &times; '.$core_level ?>" data-tooltip-type="item_type type_<?= $type_token ?>">
+                            <div class="element" style="opacity: <?= $core_opacity ?>;" data-type="<?= $type_token ?>" data-count="<?= $core_level ?>" data-max-count="<?= $core_max_level ?>" data-click-tooltip="<?= $core_name.' Cores &times; '.$core_level ?>" data-tooltip-type="item_type type_<?= $type_token ?>">
                                 <div class="sprite sprite_left sprite_left_40x40" style="background-image: url(images/items/<?= $type_token ?>-core/icon_left_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"></div>
                                 <div class="count"><?= $core_level >= $core_max_level ? '&bigstar;' : $core_level ?></div>
                             </div>
@@ -180,7 +180,7 @@ if (true){
                     ?>
                     <span class="core player_type">
                         <span class="wrap"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/items/<?= !empty($shop_info['shop_seeking_image']) ? $shop_info['shop_seeking_image'] : 'item' ?>/icon_left_40x40.png);"></span></span>
-                        <span class="text"><?= ucfirst(rtrim($shop_info['shop_seeking'], 's')) ?> Seeker</span>
+                        <span class="text"><?= $shop_info['shop_seeking_text'] ?></span>
                     </span>
                 </div>
 
@@ -321,8 +321,8 @@ if (true){
 <meta name="shops" content="noindex,nofollow" />
 <meta name="format-detection" content="telephone=no" />
 <link rel="shortcut icon" type="image/x-icon" href="images/assets/<?= mmrpg_get_favicon() ?>">
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/solid.css" integrity="sha384-+0VIRx+yz1WBcCTXBkVQYIBVNEFH1eP6Zknm16roZCyeNg2maWEpk/l/KsyFKs7G" crossorigin="anonymous">
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/fontawesome.css" integrity="sha384-jLuaxTTBR42U2qJ/pm4JRouHkEDHkVqH0T1nyQXn1mZ7Snycpf6Rl25VBNthU4z0" crossorigin="anonymous">
+<link type="text/css" href=".libs/fontawesome/v5.6.3/css/solid.css" rel="stylesheet" />
+<link type="text/css" href=".libs/fontawesome/v5.6.3/css/fontawesome.css" rel="stylesheet" />
 <link type="text/css" href=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.css" rel="stylesheet" />
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />

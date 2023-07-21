@@ -105,9 +105,13 @@
                         $ability_counter++;
                         $ability_cell_float = $ability_counter % 2 == 0 ? 'right' : 'left';
 
+                        $ability_sprite_image = !empty($ability_info['ability_image']) ? $ability_info['ability_image'] : $ability_info['ability_token'];
+                        $ability_sprite_image_markup = '<span class="icon_sprite"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/abilities/'.$ability_sprite_image.'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span></span>';
+                        $ability_info_name = $ability_sprite_image_markup.'<span class="wrap">'.$ability_info_name.'</span>';
+
                         ?>
                             <td class="<?= $ability_cell_float ?> item_cell" data-kind="ability" data-action="buy" data-token="<?= $ability_info_token ?>" data-unlocked="<?= implode(',', $ability_info_unlocked) ?>">
-                                <span class="item_name ability_type ability_type_<?= $ability_info_type ?>" data-tooltip="<?= $temp_info_tooltip ?>"><?= $ability_info_name ?></span>
+                                <span class="item_name ability_type ability_type_<?= $ability_info_type ?>" data-click-tooltip="<?= $temp_info_tooltip ?>"><?= $ability_info_name ?></span>
                                 <a class="buy_button ability_type ability_type_none" href="#">Buy</a>
                                 <label class="item_quantity" data-quantity="0"><?= !empty($ability_info_quantity) ? '&#10004;' : '-' ?></label>
                                 <label class="item_price" data-price="<?= $ability_info_price ?>">&hellip; <?= $ability_info_price ?>z</label>

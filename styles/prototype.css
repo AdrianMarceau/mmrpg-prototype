@@ -2,6 +2,9 @@ body.prototype {
     background-color: #262626;
     border-color: #262626;
 }
+#mmrpg {
+    transition: background 0.3s, padding 0.3s, min-height 0.3s;
+}
 #falloff {
     display: block;
     position: absolute;
@@ -404,6 +407,20 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .banner .options .link i {
     margin-right: -2px;
     font-size: 90%;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.2);
+    color: white;
+    border-radius: 4px;
+    padding: 0 0 0 2px;
+    line-height: 1.2;
+}
+#prototype .banner .options .link i:before {
+    display: inline-block;
+    transform: scale(1.0);
+    transition: transform 0.1s;
+}
+#prototype .banner .options .link:hover i:before {
+    transform: scale(1.4);
 }
 #prototype .banner .options .pipe {
     padding: 0 4px;
@@ -453,6 +470,14 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     opacity: 0.6;
     transition: opacity 0.3s;
     color: #ffffff;
+}
+#prototype .banner .options_userinfo .config i:before {
+    display: inline-block;
+    transform: scale(1.0);
+    transition: transform 0.1s;
+}
+#prototype .banner .options_userinfo:hover .config i:before {
+    transform: scale(1.4);
 }
 #prototype .banner .options_userinfo[data-step],
 #prototype .banner .options_userinfo[data-step] * {
@@ -672,9 +697,9 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     text-transform: uppercase;
     text-decoration: none;
     padding: 0;
-    border-radius: 0.75em;
     -moz-border-radius: 0.75em;
     -webkit-border-radius: 0.75em;
+    border-radius: 0.75em;
     color: #FFFFFF;
     border: 2px solid #1A1A1A;
     background-color: #222222;
@@ -729,9 +754,9 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     right: 6px;
     cursor: pointer;
     _cursor: hand;
-    border-radius: 0.3em;
     -moz-border-radius: 0.3em;
     -webkit-border-radius: 0.3em;
+    border-radius: 0.3em;
 }
 #prototype .header .reselect:hover,
 #prototype .header .prev:hover,
@@ -751,13 +776,13 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     background-position: 0 0;
 }
 #prototype .header_dr-light {
-    background-image: url(../images/menus/menu-options_this-dr-light-player-select.gif);
+    background-image: url(../images/menus/menu-options_this-dr-light-player-select.gif) !important;
 }
 #prototype .header_dr-wily {
-    background-image: url(../images/menus/menu-options_this-dr-wily-player-select.gif);
+    background-image: url(../images/menus/menu-options_this-dr-wily-player-select.gif) !important;
 }
 #prototype .header_dr-cossack {
-    background-image: url(../images/menus/menu-options_this-dr-cossack-player-select.gif);
+    background-image: url(../images/menus/menu-options_this-dr-cossack-player-select.gif) !important;
 }
 
 #prototype .header_types {
@@ -766,13 +791,18 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     position: relative;
 }
 #prototype .header_types[data-player="dr-light"] {
-    background-image: url(../images/menus/menu-options_this-dr-light-player-select.gif);
+    background-image: url(../images/menus/menu-options_this-dr-light-player-select.gif) !important;
 }
 #prototype .header_types[data-player="dr-wily"] {
-    background-image: url(../images/menus/menu-options_this-dr-wily-player-select.gif);
+    background-image: url(../images/menus/menu-options_this-dr-wily-player-select.gif) !important;
 }
 #prototype .header_types[data-player="dr-cossack"] {
-    background-image: url(../images/menus/menu-options_this-dr-cossack-player-select.gif);
+    background-image: url(../images/menus/menu-options_this-dr-cossack-player-select.gif) !important;
+}
+#prototype .header_types[data-player="dr-light"]:before,
+#prototype .header_types[data-player="dr-wily"]:before,
+#prototype .header_types[data-player="dr-cossack"]:before {
+    display: none;
 }
 
 #prototype .header_types {
@@ -796,9 +826,6 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .header_types .count {
     position: relative;
     z-index: 2;
-}
-#prototype .header_types[data-player]:before {
-    display: none;
 }
 
 
@@ -853,13 +880,39 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .option_wrapper {
     display: block;
     height: 284px;
-    overflow: hidden;
+    overflow: visible;
+}
+#prototype .option_wrapper:after {
+    content: "";
+    display: block;
+    clear: both;
 }
 #prototype .menu[data-select] .option_wrapper > .wrap {
     display: block;
+    padding-top: 4px;
+    margin-top: -4px;
     overflow: hidden;
     position: relative;
     height: inherit;
+}
+#prototype .menu[data-select] .option_wrapper > .wrap.ps-container {
+    padding-right: 10px;
+}
+#prototype .menu[data-select] .option_wrapper > .wrap .option_1x1,
+#prototype .menu[data-select] .option_wrapper > .wrap.ps-container .option_1x1 {
+    width: calc((100% / 4) - 8px);
+}
+#prototype .menu[data-select] .option_wrapper > .wrap .option_1x2,
+#prototype .menu[data-select] .option_wrapper > .wrap.ps-container .option_1x2 {
+    width: calc((100% / 2) - 8px);
+}
+#prototype .menu[data-select] .option_wrapper > .wrap .option_1x3,
+#prototype .menu[data-select] .option_wrapper > .wrap.ps-container .option_1x3 {
+    width: calc(((100% / 4) * 3) - 8px);
+}
+#prototype .menu[data-select] .option_wrapper > .wrap .option_1x4,
+#prototype .menu[data-select] .option_wrapper > .wrap.ps-container .option_1x4 {
+    width: calc(100% - 8px);
 }
 
 #prototype .select_this_player_robots .option_wrapper {
@@ -1071,11 +1124,10 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
     margin: 0 0 3px 0;
     vertical-align: top;
     border: 2px solid #1A1A1A;
-    border-color: #1A1A1A !important;
+    border-color: #1A1A1A;
     font-size: 10px;
     line-height: 65px;
     letter-spacing: 2px;
-    /*text-transform: uppercase;*/
     text-decoration: none;
     padding: 0;
     border-radius: 0.75em;
@@ -1108,6 +1160,11 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
     -o-user-select: none;
     user-select: none;
 }
+/*
+#prototype .option {
+    border-color: #1A1A1A !important;
+}
+*/
 #prototype .option_message {
     margin-top: 10px;
     background-color: transparent;
@@ -1287,9 +1344,19 @@ body[data-source="website"] #prototype .menu {
     */
 }
 
+@keyframes player-button-background-scroll {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: -100% 0;
+    }
+}
 #mmrpg #prototype .option_this-player-select {
     background-image: url(../images/menus/menu-options_this-player-select.gif);
     background-repeat: repeat;
+    background-position: 0 0;
+    animation: player-button-background-scroll 60s linear infinite;
 }
 #mmrpg #prototype .option_this-battle-select {
     background-image: url(../images/menus/menu-options_this-battle-select.gif);
@@ -1306,6 +1373,7 @@ body[data-source="website"] #prototype .menu {
 }
 #mmrpg #prototype .option_this-dr-light-player-select {
     background-image: url(../images/menus/menu-options_this-dr-light-player-select.gif);
+    animation: player-button-background-scroll 120s linear infinite;
 }
 #mmrpg #prototype .option_this-dr-light-battle-select {
     background-image: url(../images/menus/menu-options_this-dr-light-battle-select.gif);
@@ -1322,6 +1390,7 @@ body[data-source="website"] #prototype .menu {
 }
 #mmrpg #prototype .option_this-dr-wily-player-select {
     background-image: url(../images/menus/menu-options_this-dr-wily-player-select.gif);
+    animation: player-button-background-scroll 90s linear infinite;
 }
 #mmrpg #prototype .option_this-dr-wily-battle-select {
     background-image: url(../images/menus/menu-options_this-dr-wily-battle-select.gif);
@@ -1338,6 +1407,7 @@ body[data-source="website"] #prototype .menu {
 }
 #mmrpg #prototype .option_this-dr-cossack-player-select {
     background-image: url(../images/menus/menu-options_this-dr-cossack-player-select.gif);
+    animation: player-button-background-scroll 60s linear infinite;
 }
 #mmrpg #prototype .option_this-dr-cossack-battle-select {
     background-image: url(../images/menus/menu-options_this-dr-cossack-battle-select.gif);
@@ -1351,8 +1421,85 @@ body[data-source="website"] #prototype .menu {
 
 #mmrpg #prototype .option_this-robot-select .sprite {
     pointer-events: none;
+    right: auto;
+}
+#mmrpg #prototype .option_this-robot-select .sprite_40x40 {
+    left: 5px;
+}
+#mmrpg #prototype .option_this-robot-select .sprite_80x80 {
+    left: -15px;
+}
+#mmrpg #prototype .option_this-robot-select .sprite_robot {
+    top: -8px;
+    z-index: 2;
+}
+#mmrpg #prototype .option_this-robot-select .has_image .sprite_item {
+    left: -8px;
+    bottom: -5px;
+    z-index: 3;
+    background-color: rgba(255, 0, 0, 0);
+}
+#mmrpg #prototype .option_this-robot-select .has_image.has_rewards .sprite_item {
+    bottom: 2px;
+    background-color: rgba(0, 255, 0, 0);
+}
+#mmrpg #prototype .option_this-robot-select .icons.stats,
+#mmrpg #prototype .option_this-robot-select .icons.favs,
+#mmrpg #prototype .option_this-robot-select .icons.info {
+    position: absolute;
+    text-align: center;
+}
+#mmrpg #prototype .option_this-robot-select .icons.stats {
+    bottom: 0;
+    left: 5px;
+    font-size: 8px;
+    letter-spacing: 1px;
+    width: 40px;
+    text-align: center;
+    background-color: transparent;
+}
+#mmrpg #prototype .option_this-robot-select .icons.favs {
+    top: -9px;
+    left: -2px;
+    font-size: 12px;
+    color: #ffffff;
+    transform: rotate(-15deg);
+}
+#mmrpg #prototype .option_this-robot-select .icons.favs i {
+    position: relative;
+}
+#mmrpg #prototype .option_this-robot-select .icons.favs i:after {
+    content: "";
+    display: block;
+    width: 60%;
+    height: 0;
+    border-top: 1px solid #000000;
+    border-bottom: 1px solid #202020;
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    transform: translate(-60%, 0);
+}
+#mmrpg #prototype .option_this-robot-select .icons.info[data-click-tooltip] {
+    top: -13px;
+    right: -13px;
+    left: auto;
+    bottom: auto;
 }
 
+#mmrpg #prototype .option_this-robot-select .multi {
+    text-align: right;
+    width: 65%;
+    height: 100%;
+    margin-left: 40px;
+    padding-left: 6px;
+    border-left: 1px solid rgba(0, 0, 0, 0.2);
+}
+#mmrpg #prototype .option_this-robot-select .multi .maintext,
+#mmrpg #prototype .option_this-robot-select .multi .subtext,
+#mmrpg #prototype .option_this-robot-select .multi .subtext2 {
+    width: auto;
+}
 
 
 #mmrpg #prototype .canvas_overlay_footer {
@@ -1503,9 +1650,9 @@ body[data-source="website"] #prototype .menu {
     background-size: cover;
 }
 @keyframes border-pulsate {
-    0%   { border-color: #1A1A1A; }
-    50% { border-color: #C0C0C0; }
-    100%   { border-color: #1A1A1A; }
+    0%   { border-color: #C0C0C0; }
+    50% { border-color: #1A1A1A; }
+    100%   { border-color: #C0C0C0; }
 }
 #mmrpg #prototype .option[data-token] {
     -moz-transition: border 0.1s linear;
@@ -1527,6 +1674,10 @@ body[data-source="website"] #prototype .menu {
     -o-animation: none;
     -webkit-animation: none;
     animation: none;
+}
+#mmrpg #prototype .banner .option_this-player-select[data-token] {
+    background-position: 0 0;
+    animation: player-button-background-scroll 40s linear infinite;
 }
 
 #mmrpg #prototype .option_wrapper_missions .option[data-token="dr-light-endless-mission"],
@@ -1670,6 +1821,7 @@ body[data-source="website"] #prototype .menu {
 
 #prototype .option_message .inset {
     background-color: rgb(15, 15, 15);
+    overflow: hidden;
 }
 
 #prototype .option_1x1 div label,
@@ -1803,6 +1955,15 @@ body[data-source="website"] #prototype .menu {
     line-height: 11px;
     text-align: left;
     top: 1px;
+    bottom: 1px;
+    height: 100%;
+}
+#prototype .option_1x1 div label .info[data-click-tooltip],
+#prototype .option_1x2 div label .info[data-click-tooltip],
+#prototype .option_1x3 div label .info[data-click-tooltip],
+#prototype .option_1x4 div label .info[data-click-tooltip] {
+    top: -13px;
+    right: -14px;
 }
 #prototype .option_1x1 div label .multi .online_type,
 #prototype .option_1x2 div label .multi .online_type,
@@ -1824,7 +1985,7 @@ body[data-source="website"] #prototype .menu {
 #prototype .option_1x4 div label .maintext {
     display: block;
     position: absolute;
-    width: 65%;
+    width: 85%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1834,16 +1995,18 @@ body[data-source="website"] #prototype .menu {
     top: 3px;
     z-index: 20;
 }
+#prototype .option_1x1 div label .maintext {
+    font-size: 9px;
+}
+#prototype .option_1x2 div label .maintext {
+    font-size: 10px;
+}
+#prototype .option_1x1 div label .icons {
+    position: absolute;
+}
 #prototype .option_1x1 div label .maintext .icons {
     position: relative;
     bottom: 2px;
-}
-#prototype .option_1x1 div label .maintext .icons.favs {
-    font-size: 11px;
-}
-#prototype .option_1x1 div label .maintext .icons.stats {
-    font-size: 9px;
-    letter-spacing: 0;
 }
 #prototype .option div label .subtext .pipe,
 #prototype .option div label .subtext2 .pipe {
@@ -1886,7 +2049,44 @@ body[data-source="website"] #prototype .menu {
     padding: 0;
     position: absolute;
     top: 0;
-    right: 3px;
+    right: 5px;
+    width: 1em;
+    overflow: visible;
+    white-space: nowrap;
+}
+#prototype .option_1x1 div label .arrow i,
+#prototype .option_1x2 div label .arrow i,
+#prototype .option_1x3 div label .arrow i,
+#prototype .option_1x4 div label .arrow i {
+    display: inline-block;
+    font-size: 90%;
+    position: relative;
+    z-index: 3;
+}
+#prototype .option_1x1 div label .arrow i + i,
+#prototype .option_1x2 div label .arrow i + i,
+#prototype .option_1x3 div label .arrow i + i,
+#prototype .option_1x4 div label .arrow i + i {
+    margin-left: -0.5em;
+    z-index: 2;
+}
+#prototype .option_1x1 div label .arrow i + i + i,
+#prototype .option_1x2 div label .arrow i + i + i,
+#prototype .option_1x3 div label .arrow i + i + i,
+#prototype .option_1x4 div label .arrow i + i + i {
+    z-index: 1;
+}
+#prototype .option_1x1 div label .arrow.s2 i:first-child,
+#prototype .option_1x2 div label .arrow.s2 i:first-child,
+#prototype .option_1x3 div label .arrow.s2 i:first-child,
+#prototype .option_1x4 div label .arrow.s2 i:first-child {
+    margin-left: -0.25em;
+}
+#prototype .option_1x1 div label .arrow.s3 i:first-child,
+#prototype .option_1x2 div label .arrow.s3 i:first-child,
+#prototype .option_1x3 div label .arrow.s3 i:first-child,
+#prototype .option_1x4 div label .arrow.s3 i:first-child {
+    margin-left: -0.5em;
 }
 
 #prototype .banner .option div label .arrow,
@@ -1925,7 +2125,6 @@ body[data-source="website"] #prototype .menu {
 #prototype .option_wrapper .option_1x4.starfield div label.no_image .arrow {
     padding-right: calc(50% - 12px);
 }
-
 
 @keyframes starshake {
   1%, 9% { transform: translate(-1px, 0) rotate(0); }
@@ -1992,6 +2191,55 @@ body[data-source="website"] #prototype .menu {
     -webkit-animation-name: starshakeX;
     animation-name: starshakeX;
 }
+
+#prototype > div:not(.banner) .option_1x1.starfield div label .info[data-click-tooltip],
+#prototype > div:not(.banner) .option_1x2.starfield div label .info[data-click-tooltip],
+#prototype > div:not(.banner) .option_1x3.starfield div label .info[data-click-tooltip],
+#prototype > div:not(.banner) .option_1x4.starfield div label .info[data-click-tooltip] {
+    right: -200%;
+    right: calc(-200% - 3px);
+}
+
+@keyframes starhover {
+  0% { transform: translate(0, 0); }
+  33% { transform: translate(0, -4px); }
+  66% { transform: translate(0, 0); }
+  100% { transform: translate(0, 0); }
+}
+#prototype .option_wrapper .option_1x1.starfield:hover div label.has_image .sprite,
+#prototype .option_wrapper .option_1x2.starfield:hover div label.has_image .sprite,
+#prototype .option_wrapper .option_1x3.starfield:hover div label.has_image .sprite,
+#prototype .option_wrapper .option_1x4.starfield:hover div label.has_image .sprite,
+#prototype .banner .option_1x1.starfield div label.has_image .sprite,
+#prototype .banner .option_1x2.starfield div label.has_image .sprite,
+#prototype .banner .option_1x3.starfield div label.has_image .sprite,
+#prototype .banner .option_1x4.starfield div label.has_image .sprite {
+
+    transform: translate(0, 0);
+    transition: none;
+
+    -moz-animation-name: none;
+    -webkit-animation-name: none;
+    animation-name: none;
+
+    -moz-animation-duration: 2s;
+    -webkit-animation-duration: 2s;
+    animation-duration: 2s;
+
+    -moz-animation-iteration-count: infinite;
+    -webkit-animation-iteration-count: infinite;
+    animation-iteration-count: infinite;
+
+    -moz-animation-delay: 0s;
+    -webkit-animation-delay: 0s;
+    animation-delay: 0s;
+
+    -moz-animation-name: starhover;
+    -webkit-animation-name: starhover;
+    animation-name: starhover;
+
+}
+
 
 
 /* ROGUE STAR STYLES */
@@ -2150,70 +2398,23 @@ body[data-source="website"] #prototype .menu {
 }
 
 
-/* WINDOW SIZE STYLES */
+/* CINEMA MODE STYLES */
 
-body.windowFlag_landscapeMode #prototype {
-    width: 1024px;
+#mmrpg.index[data-cinema-mode] {
+    transition: background 0.3s, padding 0.3s;
 }
-body.windowFlag_landscapeMode #prototype .banner {
-    width: auto;
-    float: none;
-    clear: both;
-}
-body.windowFlag_landscapeMode #prototype .header,
-body.windowFlag_landscapeMode #prototype .option_1x4 {
-    width: auto;
-    float: none;
-    clear: both;
-}
-body.windowFlag_landscapeMode #prototype .option_scroll {
-    width: 34px;
-}
-body.windowFlag_landscapeMode #prototype .option_1x1,
-body.windowFlag_landscapeMode #prototype .option_1x2,
-body.windowFlag_landscapeMode #prototype .option_1x3,
-body.windowFlag_landscapeMode #prototype .option_1x4 {
-    /*
-    height: 73px;
-    line-height: 73px;
-    */
-}
-body.windowFlag_landscapeMode #prototype .option_1x1 {
-    width: 245px;
-}
-body.windowFlag_landscapeMode #prototype .option_1x2 {
-    width: 497px;
-}
-body.windowFlag_landscapeMode #prototype .option_1x3 {
-    width: 741px;
-}
-body.windowFlag_landscapeMode #prototype .option_1x4 {
-    width: 1000px;
+#mmrpg.index[data-cinema-mode] #credits,
+#mmrpg.index[data-cinema-mode] #winmods {
+    filter: brightness(1.0);
+    transition: filter 0.3s;
 }
 
-body.windowFlag_landscapeMode #prototype .option_1x1 .inset,
-body.windowFlag_landscapeMode #prototype .option_1x2 .inset,
-body.windowFlag_landscapeMode #prototype .option_1x3 .inset,
-body.windowFlag_landscapeMode #prototype .option_1x4 .inset {
-    /*
-    height: 48px;
-    line-height: 48px;
-    */
+#mmrpg.index[data-cinema-mode="true"] {
+    background-color: #292929;
+    background-image: url(../images/assets/index-background.png);
+    overflow: hidden;
 }
-body.windowFlag_landscapeMode #prototype .option_1x1 div label,
-body.windowFlag_landscapeMode #prototype .option_1x2 div label,
-body.windowFlag_landscapeMode #prototype .option_1x3 div label,
-body.windowFlag_landscapeMode #prototype .option_1x4 div label {
-    background-color: transparent;
-    border-color: transparent;
-    box-shadow: none;
-    -moz-box-shadow: none;
-    -webkit-box-shadow: none;
-}
-body.windowFlag_landscapeMode #prototype .block_2,
-body.windowFlag_landscapeMode #prototype .block_4,
-body.windowFlag_landscapeMode #prototype .block_6,
-body.windowFlag_landscapeMode #prototype .block_8,
-body.windowFlag_landscapeMode #prototype .block_10 {
-    /*width: 499px;*/
+#mmrpg.index[data-cinema-mode="true"] #credits,
+#mmrpg.index[data-cinema-mode="true"] #winmods {
+    filter: brightness(0.6);
 }

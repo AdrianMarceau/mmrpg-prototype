@@ -217,6 +217,11 @@ body.windowFlag_landscapeMode #prototype {
 #edit #canvas .wrapper .sort_wrapper .label {
     color: rgba(255, 255, 255, 0.90);
 }
+#edit #canvas .wrapper .sort_wrapper .label:after {
+    content: ":";
+    filter: brightness(0.5);
+    padding-left: 3px;
+}
 #edit #canvas .wrapper .sort_wrapper .sort {
     margin-left: 4px;
     color: rgba(255, 255, 255, 0.60);
@@ -519,7 +524,7 @@ body.windowFlag_landscapeMode #prototype {
 
 #edit #console .event .robot_favourite {
     display: block;
-    font-size: 20px;
+    font-size: 12px;
     line-height: 20px;
     margin: -2px auto 0;
     text-align: center;
@@ -527,8 +532,11 @@ body.windowFlag_landscapeMode #prototype {
     text-decoration: none;
     color: #2A2A2A;
 }
-#edit #console .event .robot_favourite:hover,
-#edit #console .event .robot_favourite_active {
+#edit #console .event .robot_favourite:hover {
+    color: #616161;
+}
+#edit #console .event .robot_favourite_active,
+#edit #console .event .robot_favourite_active:hover {
     color: #DEDEDE;
 }
 #edit #console .event span.robot_favourite,
@@ -552,15 +560,24 @@ body.windowFlag_landscapeMode #prototype {
     margin: 2px 0 0;
     width: 155px;
     text-align: center;
-    overflow: hidden;
+    overflow: visible;
     text-overflow: ellipsis;
     white-space: nowrap;
     height: 13px;
     cursor: pointer;
-    _cursor: hand;
+    position: relative;
+}
+#edit #console .event a.player_name:after,
+#edit #console .event a.item_name:after,
+#edit #console .event span.skill_name:after {
+    content: "";
 }
 #edit #console .event a.item_name {
-
+    width: 185px;
+}
+#edit #console .event a.item_name .info[data-click-tooltip] {
+    top: -2px;
+    right: -2px;
 }
 #edit #console .event span.skill_name {
     width: auto;
@@ -592,7 +609,7 @@ body.windowFlag_landscapeMode #prototype {
     background-position: 0 -3px;
     background-size: 17px 17px;
     position: relative;
-    bottom: -1px;
+    bottom: 0;
 }
 #edit #console .event a.item_name label {
 
@@ -644,15 +661,18 @@ body.windowFlag_landscapeMode #prototype {
     height: auto;
     text-align: center;
     cursor: pointer;
-    _cursor: hand;
     color: #FFFFFF;
     position: absolute;
-    top: 3px;
+    top: 50%;
     right: 4px;
-    font-size: 8px;
+    transform: translate(0, -50%);
+    font-size: 100%;
     line-height: 8px;
     opacity: 0.10;
-    filter: alpha(opacity=10);
+}
+#edit #console .event a.ability_name label .arrow,
+#edit #console .event a.item_name label .arrow {
+    right: 20px;
 }
 body[data-mode="viewer"] #edit #console .event a.player_name label .arrow,
 body[data-mode="viewer"] #edit #console .event a.ability_name label .arrow,
@@ -761,13 +781,22 @@ body[data-mode="viewer"] #edit #console .event a.item_name label .arrow {
     margin: 0 5px 5px 0;
     width: 140px;
     text-align: center;
-    overflow: hidden;
+    overflow: visible;
     text-overflow: ellipsis;
     white-space: nowrap;
     height: 13px;
     cursor: pointer;
     _cursor: hand;
     background-clip: padding-box;
+    position: relative;
+}
+#edit #console .event a.ability_name:after,
+#edit #canvas .player_canvas a.player_name:after,
+#edit #canvas .ability_canvas a.ability_name:after,
+#edit #canvas .item_canvas a.item_name:after {
+    content: "";
+    display: block;
+    margin: 0 auto;
 }
 body[data-mode="viewer"] #edit #console .event a.ability_name,
 body[data-mode="viewer"] #edit #canvas .player_canvas a.player_name,
@@ -852,7 +881,7 @@ body[data-mode="viewer"] #edit #canvas .item_canvas a.item_name {
 #edit #canvas .item_canvas a.item_name label .count {
     float: right;
     font-size: 80%;
-    margin-right: 2px;
+    margin-right: 20px;
 }
 #edit #console .event select.player_name,
 #edit #console .event select.player_name:hover,
@@ -971,6 +1000,58 @@ body[data-mode="viewer"] #edit #canvas .item_canvas a.item_name {
 }
 #edit .section .formatter {
     width: 100%;
+}
+
+#edit #console .ability_presets {
+    display: block;
+    float: right;
+    width: auto;
+    height: 8px;
+    margin: 2px 2px 2px auto;
+    padding: 2px 6px 2px 8px;
+    font-size: 8px;
+    line-height: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #FFFFFF;
+    border: 0 none transparent;
+    background-color: #191919;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 0.3em;
+    -moz-border-radius: 0.3em;
+    -webkit-border-radius: 0.3em;
+}
+#edit #console .ability_presets .label,
+#edit #console .ability_presets .preset {
+    display: block;
+    position: static;
+    float: left;
+    font-size: 7px;
+    line-height: 7px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+}
+#edit #console .ability_presets .label {
+    color: rgba(255, 255, 255, 0.90);
+    margin-right: 3px;
+}
+#edit #console .ability_presets .label:after {
+    content: ":";
+    filter: brightness(0.5);
+    padding-left: 3px;
+}
+#edit #console .ability_presets .preset {
+    margin-left: 6px;
+    color: rgba(255, 255, 255, 0.60);
+}
+#edit #console .ability_presets .preset {
+    cursor: pointer;
+}
+#edit #console .ability_container:not([data-status="disabled"]) .ability_presets .preset:hover {
+    color: rgba(255, 255, 255, 0.90);
+    text-shadow: 1px 1px 0 #000000;
+    transform: translate(-1px, -1px);
 }
 
 

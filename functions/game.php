@@ -356,6 +356,7 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
         $this_attack_boost = round($robot_info['robot_attack'] * 0.05, 1);
         $this_defense_boost = round($robot_info['robot_defense'] * 0.05, 1);
         $this_speed_boost = round($robot_info['robot_speed'] * 0.05, 1);
+        $this_robot_core_or_none = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none';
         $this_find = array('{this_player}', '{this_robot}', '{target_player}', '{target_robot}');
         $this_replace = array($player_info['player_name'], $robot_info['robot_name'], $player_info['player_name'], ($this_player_token == 'dr-light' ? 'Mega Man' : ($this_player_token == 'dr-wily' ? 'Bass' : ($this_player_token == 'dr-cossack' ? 'Proto Man' : 'Robot'))));
         $this_quote = !empty($robot_info['robot_quotes']['battle_taunt']) ? str_replace($this_find, $this_replace, $robot_info['robot_quotes']['battle_taunt']) : '...';
@@ -364,10 +365,8 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
         if (empty($this_field['field_flag_complete'])){ $this_field = rpg_field::get_index_info($default_field); }
 
         $this_pronoun = rpg_robot::get_robot_pronoun($robot_info['robot_class'], $robot_info['robot_gender'], 'subject');
-        $this_posessive2 = rpg_robot::get_robot_pronoun($robot_info['robot_class'], $robot_info['robot_gender'], 'possessive2');
-
-        $this_congrats = 'Congratulations!';
-        if ($robot_info['robot_core'] === '' && $robot_info['robot_gender'] === 'female'){ $this_congrats = '<strong>'.$this_name.'</strong> to the rescue!'; }
+        $this_pronoun_object = rpg_robot::get_robot_pronoun($robot_info['robot_class'], $robot_info['robot_gender'], 'object');
+        $this_pronoun_posessive2 = rpg_robot::get_robot_pronoun($robot_info['robot_class'], $robot_info['robot_gender'], 'possessive2');
 
         $this_best_stat_value = 0;
         $this_best_stat_kind = '';
@@ -391,9 +390,9 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
         $source_game_name = rpg_game::get_source_name($robot_info['robot_game'], true);
         $source_game_info = rpg_game::get_source_info($robot_info['robot_game']);
         if (in_array($robot_info['robot_token'], array('bond-man'))){
-            $this_first_appearance = 'making '.$this_posessive2.' first playable debut in the <em>'.$source_game_name.'</em>';
+            $this_first_appearance = 'making '.$this_pronoun_posessive2.' first playable debut in the <em>'.$source_game_name.'</em>';
         } elseif (strstr($robot_info['robot_game'], 'MMRPG')){
-            $this_first_appearance = 'making '.$this_posessive2.' debut in the <em>'.$source_game_name.'</em>';
+            $this_first_appearance = 'making '.$this_pronoun_posessive2.' debut in the <em>'.$source_game_name.'</em>';
         } else {
             if ($source_game_info['source_kind'] !== 'game'){ $this_first_appearance = 'that first appeared in the <em>'.$source_game_name.'</em> '.$source_game_info['source_kind']; }
             else { $this_first_appearance = 'that first appeared in <em>'.$source_game_name.'</em> for the '.$source_game_info['source_systems']; }
@@ -415,23 +414,51 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
         foreach ($this_resistances AS $key => $token){ $this_resistances[$key] = '<strong class="ability_type ability_type_'.$token.'">'.ucfirst($token).'</strong>'; }
         foreach ($this_affinities AS $key => $token){ $this_affinities[$key] = '<strong class="ability_type ability_type_'.$token.'">'.ucfirst($token).'</strong>'; }
         foreach ($this_immunities AS $key => $token){ $this_immunities[$key] = '<strong class="ability_type ability_type_'.$token.'">'.ucfirst($token).'</strong>'; }
-        //$this_weaknesses = implode(', ', $this_weaknesses);
-        //$this_resistances = implode(', ', $this_resistances);
-        //$this_affinities = implode(', ', $this_affinities);
-        //$this_immunities = implode(', ', $this_immunities);
+
         // Generate the window event's canvas and message markup then append to the global array
-        $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">'.$this_field['field_name'].'</div>';
-        $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">'.$this_field['field_name'].'</div>';
-        $temp_canvas_markup .= '<div class="sprite sprite_'.$robot_info_size_token.' sprite_'.$robot_info_size_token.'_victory" style="background-image: url(images/robots/'.$robot_info['robot_token'].'/sprite_right_'.$robot_info_size_token.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: '.(200 - (($robot_info_size - 80) * 0.5)).'px;">'.$robot_info['robot_name'].'</div>';
-        $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/players/'.$player_info['player_token'].'/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; right: 200px;">'.$player_info['player_name'].'</div>';
-        //$temp_console_markup = '<p>Congratulations!  <strong>'.$player_info['player_name'].'</strong> unlocked <strong>'.$this_name.'</strong> '.(!empty($this_description) ? '- the '.str_replace('Robot', 'robot', $this_description).' -' : '').' ('.$this_number.') as a playable character! &quot;<em>'.$this_quote.'</em>&quot; <strong>'.$this_name.'</strong> is '.$this_best_attribute.' '.(!empty($robot_info['robot_core']) ? '<strong class="robot_type robot_type_'.$robot_info['robot_core'].'">'.ucfirst($robot_info['robot_core']).' Core</strong> ' : '<strong class="robot_type robot_type_none">Neutral Core</strong> ').'robot '.$this_first_appearance.'.</p>';
-        $temp_console_markup = '<p>'.$this_congrats.'  <strong>'.$player_info['player_name'].'</strong> unlocked <strong>'.$this_name.'</strong> as a playable character! <strong>'.$this_name.'</strong> is '.$this_best_attribute.' '.(!empty($robot_info['robot_core']) ? '<strong data-class="robot_type robot_type_'.$robot_info['robot_core'].'">'.ucfirst($robot_info['robot_core']).' Core</strong> ' : '<strong data-class="robot_type robot_type_none">Neutral Core</strong> ').'robot '.$this_first_appearance.'. <strong>'.$this_name.'</strong>&#39;s data was '.($temp_data_existed ? 'updated in ' : 'added to ' ).' the <strong>Robot Database</strong>.</p>';
-        $temp_console_markup .= '<div id="console" style="width: auto; height: auto;"><div class="extra"><div class="extra2">'.preg_replace('/\s+/', ' ', rpg_robot::print_database_markup($robot_info, array('layout_style' => 'event'))).'</div></div></div>';
-        //die(''.$this_robot_token.': '.$temp_console_markup);
+
+        $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto; filter: blur(2px) brightness(0.7);">'.$this_field['field_name'].'</div>';
+        $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto; filter: brightness(0.8);">'.$this_field['field_name'].'</div>';
+        $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/players/'.$player_info['player_token'].'/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 50px; left: calc(50% + 45px); transform: scale(1, 0.25) translate(-50%, 0) skew(-26deg, 0); transform-origin: bottom left; filter: brightness(0); opacity: 0.1"></div>';
+        $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/players/'.$player_info['player_token'].'/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 50px; left: calc(50% + 45px); transform: scale(1) translate(-50%, 0); transform-origin: bottom left; filter: brightness(0.9);"></div>';
+        $temp_canvas_markup .= '<div class="sprite sprite_'.$robot_info_size_token.' sprite_'.$robot_info_size_token.'_victory" style="background-image: url(images/robots/'.$robot_info['robot_token'].'/sprite_right_'.$robot_info_size_token.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 20px; left: calc(50% - 10px); transform: scale(1.5, 0.5) translate('.(-50 + ($robot_info_size > 80 ? 5 : 0)).'%, 0) skew(26deg, 0); transform-origin: bottom right; filter: brightness(0); opacity: 0.1;"></div>';
+        $temp_canvas_markup .= '<div class="sprite sprite_'.$robot_info_size_token.' sprite_'.$robot_info_size_token.'_victory" style="background-image: url(images/robots/'.$robot_info['robot_token'].'/sprite_right_'.$robot_info_size_token.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 20px; left: calc(50% - 10px); transform: scale(1.5) translate('.(-50 + ($robot_info_size > 80 ? 5 : 0)).'%, 0); transform-origin: bottom right;"></div>';
+
+
+        $temp_console_markup = '';
+        $temp_console_markup .= '<p style="text-align: center; margin: 5px auto 10px;">';
+            $temp_console_markup .= '<strong '.
+                'class="ability_type type_'.$player_info['player_type'].'" '.
+                'style="display: inline-block; text-transform: uppercase; padding: 0 30px; margin: 0 auto; filter: brightness(1.3);">'.
+                'You Got A New Robot!'.
+                '</strong>';
+        $temp_console_markup .= '</p>';
+        $temp_console_markup .= '<p style="text-align: center; margin: 5px auto;">';
+            $temp_console_markup .= rpg_type::print_span($player_info['player_type'], $player_info['player_name']).' unlocked '.rpg_type::print_span($robot_info['robot_core'], $robot_info['robot_name'], true).' as a robot fighter!';
+        $temp_console_markup .= '</p>';
+        $temp_console_markup .= '<p style="text-align: center; margin: 5px auto;">';
+            $temp_console_markup .= ($this_pronoun === 'they' ? 'They\'re' : ucfirst($this_pronoun).'\'s').' '.$this_best_attribute.' '.rpg_type::print_span($robot_info['robot_core'], ucfirst(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'Neutral').' Core').' robot master ';
+            $temp_console_markup .= '<br /> '.$this_first_appearance.'. ';
+        $temp_console_markup .= '</p>';
+        //$temp_console_markup .= '<p style="text-align: center; margin-top: 5px;">';
+        //    $temp_console_markup .= ''.rpg_type::print_span($robot_info['robot_core'], $robot_info['robot_name'], true).'\'s data was '.($temp_data_existed ? 'updated in ' : 'added to ' ).' the <strong>Robot Database</strong>.</p>';
+        //$temp_console_markup .= '</p>';
+        $temp_console_markup .= '<div id="console" style="width: auto; height: auto; font-size: 120%; line-height: 1.6; margin: 10px auto;">';
+            $temp_console_markup .= '<div class="extra"><div class="extra2" style="max-width: 460px; margin: 0 auto; position: relative;">';
+                $temp_console_markup .= '<i class="fa fas fa-quote-left" style="font-size: 80%; filter: brightness(1); position: absolute; top: 0; left: -15px;"></i> ';
+                $temp_console_markup .= '<span class="color '.$this_robot_core_or_none.'" style="filter: brightness(2); text-shadow: none;">'.$this_quote.'</span> ';
+                $temp_console_markup .= '<i class="fa fas fa-quote-right" style="font-size: 80%; filter: brightness(1); position: absolute; top: 0; right: -15px;"></i>';
+            $temp_console_markup .= '</div></div>';
+        $temp_console_markup .= '</div>';
+        $temp_console_markup .= '<p style="text-align: center; font-size: 90%; margin: 5px auto; filter: brightness(1);">';
+            $temp_console_markup .= 'Check '.$this_pronoun_posessive2.' entry in the <strong><i class="fa fas fa-compact-disc"></i> <ins>database</ins></strong> tab '.(mmrpg_prototype_robots_unlocked() > 1 ? 'or customize '.$this_pronoun_object.' from the <strong><i class="fa fas fa-robot"></i> <ins>robots</ins></strong> tab' : 'for more info').'!';
+        $temp_console_markup .= '</p>';
 
         $_SESSION[$session_token]['EVENTS'][] = array(
             'canvas_markup' => $temp_canvas_markup,
-            'console_markup' => $temp_console_markup
+            'console_markup' => $temp_console_markup,
+            'player_token' => $this_player_token,
+            'event_type' => 'new-robot'
             );
 
     }
@@ -772,25 +799,23 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
         global $db;
         $this_player_token = $player_info['player_token'];
         $player_info = rpg_player::get_index_info($this_player_token);
+        $player_type = !empty($player_info['player_type']) ? $player_info['player_type'] : 'none';
         $ability_info_size = isset($ability_info['ability_image_size']) ? $ability_info['ability_image_size'] * 2 : 40 * 2;
         $ability_info_size_token = $ability_info_size.'x'.$ability_info_size;
+        $ability_type_or_none = !empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none';
         $this_name = $ability_info['ability_name'];
         $this_type_token = !empty($ability_info['ability_type']) ? $ability_info['ability_type'] : '';
         if (!empty($ability_info['ability_type2'])){ $this_type_token .= '_'.$ability_info['ability_type2']; }
         if (empty($this_type_token)){ $this_type_token = 'none'; }
-        $this_description = !empty($ability_info['ability_description']) && $ability_info['ability_description'] != '...' ? $ability_info['ability_description'] : '';
-        $this_find = array('{this_player}', '{this_ability}', '{target_player}', '{target_ability}');
-        $this_replace = array($player_info['player_name'], $ability_info['ability_name'], $player_info['player_name'], ($this_player_token == 'dr-light' ? 'Mega Man' : ($this_player_token == 'dr-wily' ? 'Bass' : ($this_player_token == 'dr-cossack' ? 'Proto Man' : 'Robot'))));
-        $this_field = rpg_player::get_intro_field($this_player_token, true);
-        $db_ability_fields = rpg_ability::get_index_fields(true);
-        $temp_ability_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+        $this_description = rpg_ability::get_parsed_ability_description($ability_info);
+        $this_field = mmrpg_prototype_robots_unlocked($player_info['player_token']) > 1 ? rpg_player::get_homebase_field($this_player_token, true) : rpg_player::get_intro_field($this_player_token, true);
+        $temp_ability_index = rpg_ability::get_index(true);
         // Generate the window event's canvas and message markup then append to the global array
-        $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">'.$this_field['field_name'].'</div>';
-        $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">'.$this_field['field_name'].'</div>';
-
-        $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/players/'.$player_info['player_token'].'/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 220px;">'.$player_info['player_name'].'</div>';
-
-        $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/abilities/'.str_replace('dr-', '', $player_info['player_token']).'-buster/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; right: 200px;">&nbsp;</div>';
+        $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto; filter: blur(1px) brightness(0.7);"></div>';
+        $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto; brightness(0.8);"></div>';
+        $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/players/'.$player_info['player_token'].'/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 20px; left: 220px; transform: scale(1.5, 0.5) skew(26deg, 0); transform-origin: bottom; filter: brightness(0); opacity: 0.1;"></div>';
+        $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/players/'.$player_info['player_token'].'/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 20px; left: 220px; transform: scale(1.5); transform-origin: bottom;"></div>';
+        $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/abilities/'.str_replace('dr-', '', $player_info['player_token']).'-buster/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; right: 200px; filter: brightness(2) blur(10px); opacity: 0.5;">&nbsp;</div>';
         $temp_canvas_markup .= '<div class="ability_type ability_type_'.$this_type_token.' sprite sprite_40x40 sprite_40x40_00" style="
             position: absolute;
             bottom: 52px;
@@ -824,13 +849,46 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
             right: -18px;
             ">'.$ability_info['ability_name'].'</div></div>';
 
-        $temp_console_markup = '<p>Congratulations!  <strong>'.$player_info['player_name'].'</strong> unlocked the <strong>'.$this_name.'</strong> ability! </p>'; //<strong>'.$this_name.'</strong> is '.(!empty($ability_info['ability_type']) ? (preg_match('/^(a|e|i|o|u|y)/i', $ability_info['ability_type']) ? 'an ' : 'a ').'<strong data-class="ability_type ability_type_'.$ability_info['ability_type'].(!empty($ability_info['ability_type2']) ? '_'.$ability_info['ability_type2'] : '').'">'.ucfirst($ability_info['ability_type']).(!empty($ability_info['ability_type2']) ? ' and '.ucfirst($ability_info['ability_type2']) : '').' Type</strong> ' : '<strong data-class="ability_type ability_type_none">Neutral Type</strong> ').'ability. <strong>'.$this_name.'</strong>&#39;s data was '.($temp_data_existed ? 'updated in ' : 'added to ' ).' the <strong>Robot Database</strong>.
-        $temp_console_markup .= '<div id="console" style="width: auto; height: auto;"><div class="extra"><div class="extra2">'.preg_replace('/\s+/', ' ', rpg_ability::print_database_markup($ability_info, array('layout_style' => 'event'))).'</div></div></div>';
-        //die(''.$this_ability_token.': '.$temp_console_markup);
+        $temp_console_type_text = rpg_type::print_span(array($ability_info['ability_type'], $ability_info['ability_type2']), '', ' / ');
+        $temp_console_extra_text = 'ability';
+        if (!empty($ability_info['ability_damage'])){ $temp_console_extra_text = 'attacking move with '.rpg_type::print_span('none', $ability_info['ability_damage']).' base power'; }
+        elseif (!empty($ability_info['ability_recovery'])){ $temp_console_extra_text = 'recovery move with '.rpg_type::print_span('none', $ability_info['ability_recovery']).' base power'; }
+        else { $temp_console_extra_text = 'special move with unique effects'; }
+
+        $temp_console_markup = '';
+        $temp_console_markup .= '<p style="text-align: center; margin: 5px auto 10px;">';
+            $temp_console_markup .= '<strong '.
+                'class="ability_type type_'.$player_info['player_type'].'" '.
+                'style="display: inline-block; text-transform: uppercase; padding: 0 30px; margin: 0 auto; filter: brightness(1.3);">'.
+                'You Got A New Ability!'.
+                '</strong>';
+        $temp_console_markup .= '</p>';
+        $temp_console_markup .= '<p style="text-align: center; margin: 5px auto;">';
+            $temp_console_markup .= rpg_type::print_span($player_type, $player_info['player_name']).' unlocked the '.rpg_type::print_span($this_type_token, $this_name).' ability!';
+        $temp_console_markup .= '</p>';
+        $temp_console_markup .= '<p style="text-align: center; margin: 5px auto;">';
+            $temp_console_markup .= 'It\'s '.(!empty($ability_info['ability_type']) && preg_match('/^(a|e|i|o|u)/i', $ability_info['ability_type']) ? 'an ' : 'a ').$temp_console_type_text.' type '.$temp_console_extra_text.'!';
+        $temp_console_markup .= '</p>';
+        $temp_console_markup .= '<div id="console" style="width: auto; height: auto; font-size: 120%; line-height: 1.6; margin: 10px auto;">';
+            $temp_console_markup .= '<div class="extra"><div class="extra2" style="max-width: 460px; margin: 0 auto; position: relative;">';
+                $temp_console_markup .= '<i class="fa fas fa-quote-left" style="font-size: 80%; filter: brightness(1); position: absolute; top: 0; left: -15px;"></i> ';
+                $temp_span_style = 'text-shadow: none; ';
+                if ($ability_type_or_none === 'shadow'){ $temp_span_style .= 'filter: brightness(3); '; }
+                else { $temp_span_style .= 'filter: brightness(1.5); '; }
+                $temp_console_markup .= '<span class="color '.$ability_type_or_none.'" style="'.$temp_span_style.'">'.$this_description.'</span> ';
+                $temp_console_markup .= '<i class="fa fas fa-quote-right" style="font-size: 80%; filter: brightness(1); position: absolute; top: 0; right: -15px;"></i>';
+            $temp_console_markup .= '</div></div>';
+        $temp_console_markup .= '</div>';
+        $temp_console_markup .= '<p style="text-align: center; font-size: 90%; margin: 5px auto; filter: brightness(1);">';
+            $temp_console_markup .= 'Check the <strong><i class="fa fas fa-fire-alt"></i> <ins>abilities</ins></strong> tab for more info'.(mmrpg_prototype_robots_unlocked() > 1 ? ' or the <strong><i class="fa fas fa-robot"></i> <ins>robots</ins></strong> tab to equip it to compatible robots!' : '!');
+        $temp_console_markup .= '</p>';
 
         $_SESSION[$session_token]['EVENTS'][] = array(
             'canvas_markup' => preg_replace('/\s+/', ' ', $temp_canvas_markup),
-            'console_markup' => $temp_console_markup
+            'console_markup' => $temp_console_markup,
+            'player_token' => $this_player_token,
+            'event_type' => 'new-ability',
+            'event_sort' => $ability_info['ability_energy']
             );
 
     }
@@ -901,25 +959,28 @@ function mmrpg_game_unlock_item($item_token, $print_options = array()){
         if (!empty($this_type_token) && !empty($item_info['item_type2'])){ $this_type_token .= '_'.$item_info['item_type2']; }
         elseif (!empty($item_info['item_type2'])){ $this_type_token = $item_info['item_type2']; }
         if (empty($this_type_token)){ $this_type_token = 'none'; }
-        $this_description = !empty($item_info['item_description']) && $item_info['item_description'] != '...' ? $item_info['item_description'] : '';
+        $this_description = rpg_item::get_parsed_item_description($item_info);
 
         // If not empty, collect details about this player
         $player_token = !empty($print_options['player_token']) ? $print_options['player_token'] : 'player';
         $player_info = rpg_player::get_index_info($player_token);
+        $player_type = !empty($player_info['player_type']) ? $player_info['player_type'] : 'none';
 
         // If not empty, collect details about this shop
         $shop_token = !empty($print_options['shop_token']) ? $print_options['shop_token'] : 'shop';
         $shop_info = array('shop_token' => $shop_token, 'shop_name' => ucfirst($shop_token));
+        $is_shop_item = $shop_token !== 'shop' ? true : false;
 
         // Define basic details about the intro field background
-        $this_field = rpg_player::get_intro_field($player_token, true);
+        $this_field_background = !empty($print_options['field_background']) ? rpg_field::get_index_info($print_options['field_background']) : rpg_player::get_intro_field($player_token, true);
+        $this_field_foreground = !empty($print_options['field_foreground']) ? rpg_field::get_index_info($print_options['field_foreground']) : $this_field_background;
 
         // Generate the window event's canvas and message markup then append to the global array
         $temp_canvas_markup = '';
 
         // Append the field background markup to the canvas
-        $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
-        $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+        $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field_background['field_token'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+        $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field_foreground['field_token'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
 
         // Count the number of character images to displau
         $display_image_count = 0;
@@ -986,24 +1047,46 @@ function mmrpg_game_unlock_item($item_token, $print_options = array()){
             ">'.$item_info['item_name'].'</div></div>';
 
         // Generate the search and replace arrays for the console event text
-        $console_search = array('{item}');
-        $console_replace = array('<strong>'.$this_name.'</strong>');
+        $console_search = array();
+        $console_replace = array();
+        $console_search[] = '{item}';
+        $console_replace[] = rpg_type::print_span(array($item_info['item_type'], $item_info['item_type2']), $item_info['item_name']);
         $console_search[] = '{player}';
-        $console_replace[] = '<strong>'.ucfirst($player_info['player_name']).'</strong>';
+        $console_replace[] = rpg_type::print_span($player_type, $player_info['player_name']);
         $console_search[] = '{shop}';
-        $console_replace[] = '<strong>'.ucfirst($shop_info['shop_name']).'</strong>';
+        $console_replace[] = rpg_type::print_span(array($item_info['item_type'], $item_info['item_type2']), ucfirst($shop_info['shop_name']));
 
         // Print out the parsed event text and the item database markup
-        $temp_console_markup = '<p>';
+        $temp_console_markup = '';
+        $temp_console_markup .= '<p style="text-align: center; margin: 5px auto 10px;">';
+            $temp_console_markup .= '<strong '.
+                'class="ability_type type_'.$player_info['player_type'].'" '.
+                'style="display: inline-block; text-transform: uppercase; padding: 0 30px; margin: 0 auto; filter: brightness(1.3);">'.
+                ($is_shop_item ? 'You Got A New Shop' : 'You Got A New Item').'!'.
+                '</strong>';
+        $temp_console_markup .= '</p>';
+        $temp_console_markup .= '<p style="text-align: center; line-height: 2;">';
             $temp_console_markup .= $print_options['positive_word'].' ';
             $temp_console_markup .= str_replace($console_search, $console_replace, $print_options['event_text']);
         $temp_console_markup .= '</p>';
-        $temp_console_markup .= '<div id="console" style="width: auto; height: auto;"><div class="extra"><div class="extra2">'.preg_replace('/\s+/', ' ', rpg_item::print_database_markup($item_info, array('layout_style' => 'event'))).'</div></div></div>';
+        $temp_console_markup .= '<div id="console" style="width: auto; height: auto; font-size: 120%; line-height: 1.6; margin-top: 5px;">';
+            $temp_console_markup .= '<div class="extra"><div class="extra2" style="max-width: 460px; margin: 0 auto; position: relative;">';
+                $temp_console_markup .= '<i class="fa fas fa-quote-left" style="font-size: 80%; filter: brightness(1); position: absolute; top: 0; left: -15px;"></i> ';
+                $temp_console_markup .= '<span class="color '.$player_type.'" style="filter: brightness(2); text-shadow: none;">'.$this_description.'</span> ';
+                $temp_console_markup .= '<i class="fa fas fa-quote-right" style="font-size: 80%; filter: brightness(1); position: absolute; top: 0; right: -15px;"></i>';
+            $temp_console_markup .= '</div></div>';
+        $temp_console_markup .= '</div>';
+        $temp_console_markup .= '<p style="text-align: center; font-size: 90%; margin-top: 10px; filter: brightness(1);">';
+            if ($is_shop_item){ $temp_console_markup .= 'Check the <strong><i class="fa fas fa-shopping-cart"></i> <ins>shop</ins></strong> tab to see what\'s available!'; }
+            else { $temp_console_markup .= 'Check the <strong><i class="fa fas fa-briefcase"></i> <ins>items</ins></strong> tab for more info!'; }
+        $temp_console_markup .= '</p>';
 
         // Append this event to the global events array for display
         $_SESSION[$session_token]['EVENTS'][] = array(
             'canvas_markup' => preg_replace('/\s+/', ' ', $temp_canvas_markup),
-            'console_markup' => $temp_console_markup
+            'console_markup' => $temp_console_markup,
+            'player_token' => $player_token,
+            'event_type' => ($is_shop_item ? 'new-shop' : 'new-item')
             );
 
     }

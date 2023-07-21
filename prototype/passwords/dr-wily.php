@@ -9,6 +9,7 @@ if (!isset($mmrpg_index_players) || empty($mmrpg_index_players)){
 
 // Collect the temp battle flags
 $temp_flags = !empty($_SESSION['GAME']['flags']) ? $_SESSION['GAME']['flags'] : array();
+//error_log(basename(__FILE__).'//$temp_flags: '.print_r($temp_flags, true));
 
 // If the UNLOCK DISCO password was created
 if (!empty($temp_flags['drwily_password_robotgetpanicatthedisco'])){
@@ -55,10 +56,21 @@ if (!empty($temp_flags['drwily_password_abilitygetnowivegotyourpower'])){
 }
 
 // If the UNLOCK COPY SOUL password was created
-if (!empty($temp_flags['drlight_password_abilitygetwithallmyheartandsoul'])){
+if (!empty($temp_flags['drwily_password_abilitygetwithallmyheartandsoul'])){
     if (!mmrpg_prototype_ability_unlocked('dr-wily', false, 'copy-soul')){
         // Unlock Copy Shot as an equippable ability
         mmrpg_game_unlock_ability($mmrpg_index_players['dr-wily'], false, array('ability_token' => 'copy-soul'), true);
+        header('Location: '.MMRPG_CONFIG_ROOTURL.'prototype.php');
+        exit();
+    }
+}
+
+// If the UNLOCK RIVAL DR COSSACK password was created
+if (!empty($temp_flags['drwily_password_playergethacktheplanetastheysay'])){
+    if (!mmrpg_prototype_player_unlocked('dr-cossack')){
+        // Unlock Dr. Cossack as a playable character
+        $unlock_player_info = $mmrpg_index_players['dr-cossack'];
+        mmrpg_game_unlock_player($unlock_player_info, true, true);
         header('Location: '.MMRPG_CONFIG_ROOTURL.'prototype.php');
         exit();
     }

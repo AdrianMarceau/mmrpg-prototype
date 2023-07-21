@@ -8,6 +8,7 @@ class rpg_battle extends rpg_object {
     // Define global class variables
     public $events;
     public $actions;
+    public $queue;
     public $endofturn_actions;
 
     // Define the constructor class
@@ -19,6 +20,9 @@ class rpg_battle extends rpg_object {
         $this->session_id = 'battle_id';
         $this->class = 'battle';
         $this->multi = 'battles';
+
+        // Create any required sub-objects
+        $this->queue['sound_effects'] = array();
 
         // Collect any provided arguments
         $args = func_get_args();
@@ -267,6 +271,7 @@ class rpg_battle extends rpg_object {
     }
 
     public function get_attachment($key, $token){ return $this->get_info('battle_attachments', $key, $token); }
+    public function has_attachment($key, $token){ return $this->get_info('battle_attachments', $key, $token) ? true : false; }
     public function set_attachment($key, $token, $value){ $this->set_info('battle_attachments', $key, $token, $value); }
     public function unset_attachment($key, $token){ return $this->unset_info('battle_attachments', $key, $token); }
 
@@ -731,6 +736,9 @@ class rpg_battle extends rpg_object {
                 $event_options['console_show_target'] = false;
                 $event_options['event_flag_defeat'] = true;
                 $event_options['this_header_float'] = $event_options['this_body_float'] = $this_player->player_side;
+                $event_options['event_flag_sound_effects'] = array(
+                    // maybe nothing?
+                    );
                 if ($this_player->player_token != 'player'
                     && isset($this_player->player_quotes['battle_victory'])){
                     $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
@@ -1001,11 +1009,11 @@ class rpg_battle extends rpg_object {
             // Loop through any ability rewards for this battle
             $this_ability_rewards = !empty($this->battle_rewards['abilities']) ? $this->battle_rewards['abilities'] : array();
             if (!empty($this_ability_rewards) && empty($_SESSION['GAME']['DEMO'])){
-                $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+                $temp_abilities_index = rpg_ability::get_index(true);
                 foreach ($this_ability_rewards AS $ability_reward_key => $ability_reward_info){
 
                     // Collect the ability info from the index
-                    $ability_info = rpg_ability::parse_index_info($temp_abilities_index[$ability_reward_info['token']]);
+                    $ability_info = $temp_abilities_index[$ability_reward_info['token']];
                     // Create the temporary robot object for event creation
                     $temp_ability = rpg_game::get_ability($this, $this_player, $this_robot, $ability_info);
 
@@ -1035,8 +1043,8 @@ class rpg_battle extends rpg_object {
 
                     // Display the robot reward message markup
                     $event_header = $ability_info['ability_name'].' Unlocked';
-                    $event_body = rpg_battle::random_positive_word().' <span class="player_name">'.$this_player_info['player_name'].'</span> unlocked new ability data!<br />';
-                    $event_body .= '<span class="ability_name">'.$ability_info['ability_name'].'</span> can now be used in battle!';
+                    $event_body = rpg_battle::random_positive_word().' <span class="player_name">'.$this_player_info['player_name'].'</span> unlocked a new ability!<br />';
+                    $event_body .= ''.$temp_ability->print_name().' can now be used in battle!';
                     $event_options = array();
                     $event_options['console_show_target'] = false;
                     $event_options['this_header_float'] = $this_player->player_side;
@@ -1047,6 +1055,14 @@ class rpg_battle extends rpg_object {
                     $event_options['console_show_this_robot'] = false;
                     $event_options['console_show_this_ability'] = true;
                     $event_options['canvas_show_this_ability'] = false;
+                    $event_options['event_flag_camera_action'] = true;
+                    $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
+                    $event_options['event_flag_camera_focus'] = 'active';
+                    $event_options['event_flag_camera_depth'] = 0;
+                    $event_options['event_flag_camera_offset'] = 0;
+                    $event_options['event_flag_sound_effects'] = array(
+                        array('name' => 'get-big-item', 'volume' => 1.0)
+                        );
                     $this_player->player_frame = 'victory';
                     $this_player->update_session();
                     $temp_ability->ability_frame = 'base';
@@ -1297,11 +1313,11 @@ class rpg_battle extends rpg_object {
                 if ($this_mission_number >= $old_waves_completed
                     && $this_mission_number > $global_waves_completed){
                     $first_event_body_foot .= ' <span style="opacity:0.25;">|</span>';
-                    $first_event_body_foot .= ' <span title="Previous Record: '.$global_waves_completed.' Missions">'.rpg_type::print_span('electric_water', 'New Global Record!').'</span>';
+                    $first_event_body_foot .= ' <span data-click-tooltip="Previous Record: '.$global_waves_completed.' Missions">'.rpg_type::print_span('electric_water', 'New Global Record!').'</span>';
                 } elseif (!empty($old_waves_completed)){
                     if ($this_mission_number >= $old_waves_completed){
                         $first_event_body_foot .= ' <span style="opacity:0.25;">|</span>';
-                        $first_event_body_foot .= ' <span title="Previous Record: '.$old_waves_completed.' Missions">'.rpg_type::print_span('electric', 'New Personal Record!').'</span>';
+                        $first_event_body_foot .= ' <span data-click-tooltip="Previous Record: '.$old_waves_completed.' Missions">'.rpg_type::print_span('electric', 'New Personal Record!').'</span>';
                     } else {
                         $first_event_body_foot .= ' <span style="opacity:0.25;">|</span>';
                         $first_event_body_foot .= ' <span>Personal Record: '.$old_waves_completed.'</span>';
@@ -1344,8 +1360,14 @@ class rpg_battle extends rpg_object {
         $event_options['this_event_class'] = false;
         $event_options['console_show_this'] = false;
         $event_options['console_show_target'] = false;
-        if ($this->battle_result === 'victory'){ $event_options['event_flag_victory'] = true; }
-        elseif ($this->battle_result === 'defeat'){ $event_options['event_flag_defeat'] = true; }
+        $event_options['event_flag_sound_effects'] = array();
+        if ($this->battle_result === 'victory'){
+            $event_options['event_flag_victory'] = true;
+            $event_options['event_flag_sound_effects'][] = array('name' => 'victory-result', 'volume' => 1.0);
+        } elseif ($this->battle_result === 'defeat'){
+            $event_options['event_flag_defeat'] = true;
+            $event_options['event_flag_sound_effects'][] = array('name' => 'failure-result', 'volume' => 1.0);
+        }
         $event_options['console_container_classes'] = 'field_type field_type_event field_type_'.($this->battle_result == 'victory' ? 'nature' : 'flame');
         $this->events_create($target_robot, $this_robot, $first_event_header, $first_event_body, $event_options);
 
@@ -1392,31 +1414,84 @@ class rpg_battle extends rpg_object {
             if ($this_action == 'start'){
 
                 // Ensure this is an actual player
-                if ($this_player->player_token != 'player'){
+                if ($this_player->player_token !== 'player'){
 
-                    /*
-                    // Create the enter event for this robot
-                    $event_header = $this_player->player_name.'&#39;s '.$this_robot->robot_name;
-                    if ($target_player->player_token != 'player'){ $event_body = "{$this_robot->print_name()} enters the battle!<br />"; }
-                    else { $event_body = "{$this_robot->print_name()} prepares for battle!<br />"; }
-                    $this_robot->robot_frame = 'base';
-                    $this_player->player_frame = 'command';
-                    $this_robot->robot_position = 'active';
-                    if (isset($this_robot->robot_quotes['battle_start'])){
-                        $this_robot->robot_frame = 'taunt';
-                        $event_body .= '&quot;<em>'.$this_robot->robot_quotes['battle_start'].'</em>&quot;';
+                    // If there's a whole team, we should display it as a team entrance
+                    if ($this_player->counters['robots_active'] > 1){
+
+                        // Create the enter event for the target player's active robot
+                        $event_header = ''.$this_player->player_name.'\'s Robots';
+                        $event_body = $this_player->print_name_s().' robots appear on the battle field!<br />';
+                        //if (isset($this_player->player_quotes['battle_start'])){ $event_body .= '&quot;<em>'.$this_player->player_quotes['battle_start'].'</em>&quot;'; }
+                        if ($this_player->player_token != 'player'
+                            && isset($this_player->player_quotes['battle_start'])){
+                            $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
+                            $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
+                            $event_body .= $this_player->print_quote('battle_start', $this_find, $this_replace);
+                        }
+                        $event_options = array();
+                        $event_options['this_header_float'] = $event_options['this_body_float'] = $this_player->player_side;
+                        $event_options['console_show_this_player'] = true;
+                        $event_options['console_show_target'] = false;
+                        $event_options['console_show_target_player'] = false;
+                        $event_options['event_flag_camera_action'] = true;
+                        $event_options['event_flag_camera_side'] = $this_player->player_side;
+                        $event_options['event_flag_camera_focus'] = 'active';
+                        $event_options['event_flag_sound_effects'] = array(
+                            array('name' => $this_robot->robot_class.'-teleport-in', 'volume' => 1.0)
+                            );
+                        $this_player->set_frame('taunt');
+                        $this_robot->set_frame('taunt');
+                        $this_robot->set_frame_styles('');
+                        $this_robot->set_detail_styles('');
+                        $this_robot->set_position('active');
+                        $this->events_create($this_robot, $target_robot, $event_header, $event_body, $event_options);
+                        $this_player->set_frame('base');
+                        $this_robot->set_frame('base');
+
                     }
-                    $this_robot->update_session();
-                    $this_player->update_session();
-                    $this->events_create($this_robot, false, $event_header, $event_body, array('canvas_show_target' => false, 'console_show_target' => false));
-                    */
+                    // Otherwise, we can display this as a heroic single-robot entrance
+                    else {
+
+                        // Create the enter event for this player's robots
+                        $event_header = ''.$this_player->player_name.'\'s '.$this_robot->robot_name;
+                        $event_body = $this_robot->print_name().' '.($this_player->player_side === 'left' ? 'joins' : 'enters').' the battle!<br />';
+                        if ($this_robot->robot_token != 'robot'
+                            && isset($this_robot->robot_quotes['battle_start'])){
+                            $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
+                            $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
+                            $event_body .= $this_robot->print_quote('battle_start', $this_find, $this_replace);
+                        }
+                        $event_options = array();
+                        $event_options['this_header_float'] = $event_options['this_body_float'] = 'left';
+                        $event_options['canvas_show_this'] = true;
+                        $event_options['canvas_show_target'] = $event_options['console_show_target'] = false;
+                        $event_options['console_show_this_robot'] = true;
+                        $event_options['console_show_target_player'] = false;
+                        $event_options['event_flag_camera_action'] = true;
+                        $event_options['event_flag_camera_side'] = $this_player->player_side;
+                        $event_options['event_flag_camera_focus'] = 'active';
+                        $event_options['event_flag_sound_effects'] = array(
+                            array('name' => $this_robot->robot_class.'-teleport-in', 'volume' => 1.0)
+                            );
+                        $this_player->set_frame('taunt');
+                        $this_robot->set_frame('taunt');
+                        $this_robot->set_frame_styles('');
+                        $this_robot->set_detail_styles('');
+                        $this_robot->set_position('active');
+                        $this->events_create($this_robot, $target_robot, $event_header, $event_body, $event_options);
+                        $this_player->set_frame('base');
+                        $this_robot->set_frame('base');
+
+                    }
 
                 }
                 // Otherwise, if the player is empty
                 else {
 
                     // Create the enter event for this robot
-                    $event_header = $this_robot->robot_name;
+                    $event_header = ''.$this_robot->robot_name;
+                    if ($this_player->counters['robots_active'] > 1){ $event_header .= ' & Team'; }
                     $event_body = "{$this_robot->print_name()} wants to fight!<br />";
                     $this_robot->set_frame('defend');
                     $this_robot->set_frame_styles('');
@@ -1428,12 +1503,29 @@ class rpg_battle extends rpg_object {
                         $event_body .= $this_robot->print_quote('battle_start', $this_find, $this_replace);
                     }
                     $this_player->update_variables();
-                    $this->events_create($this_robot, false, $event_header, $event_body, array('canvas_show_target' => false, 'console_show_target' => false));
+                    $event_options = array();
+                    $event_options['canvas_show_target'] = false;
+                    $event_options['console_show_target'] = false;
+                    $event_options['event_flag_camera_action'] = true;
+                    $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
+                    $event_options['event_flag_camera_focus'] = $this_robot->robot_position;
+                    $event_options['event_flag_sound_effects'] = array(
+                        array('name' => $this_robot->robot_class.'-teleport-in', 'volume' => 1.0)
+                        );
+                    $this->events_create($this_robot, false, $event_header, $event_body, $event_options);
 
                     // Create an event for this robot teleporting in
-                    if ($this_player->counters['robots_active'] == 1){
+                    if ($this_player->counters['robots_active'] == 1
+                        || $this_robot->robot_position = 'active'){
+                        $event_options = array();
+                        $event_options['event_flag_camera_action'] = true;
+                        $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
+                        $event_options['event_flag_camera_focus'] = $this_robot->robot_position;
+                        $event_options['event_flag_sound_effects'] = array(
+                            array('name' => $this_robot->robot_class.'-taunt-sound', 'volume' => 1.0)
+                            );
                         $this_robot->set_frame('taunt');
-                        $this->events_create(false, false, '', '');
+                        $this->events_create(false, false, '', '', $event_options);
                     }
                     $this_robot->set_frame('base');
                     $this_robot->set_frame_styles('');
@@ -1445,7 +1537,7 @@ class rpg_battle extends rpg_object {
                 foreach ($this_player->values['robots_active'] AS $key => $info){
                     if (!preg_match('/display:\s?none;/i', $info['robot_frame_styles'])){ continue; }
                     if ($this_robot->robot_id == $info['robot_id']){
-                        $this_robot->set_frame('taunt');
+                        $this_robot->set_frame('defend');
                         $this_robot->set_frame_styles('');
                         $this_robot->set_detail_styles('');
                     } else {
@@ -1457,7 +1549,27 @@ class rpg_battle extends rpg_object {
                 }
 
                 // Create an event to show the robots in their taunt sprites
-                $this->events_create(false, false, '', '');
+                $num_benched_robots = count($this_player->values['robots_active']) - 1;
+                $has_benched_robots = $num_benched_robots > 0 ? true : false;
+                $event_options = array();
+                $event_options['event_flag_camera_action'] = true;
+                $event_options['event_flag_camera_side'] = $this_player->player_side;
+                $event_options['event_flag_camera_focus'] = 'active';
+                if ($has_benched_robots){
+                    $event_options['event_flag_camera_focus'] = 'bench';
+                    $event_options['event_flag_sound_effects'] = array();
+                    foreach ($this_player->values['robots_active'] AS $key => $info){
+                        if ($this_robot->robot_id == $info['robot_id']){ continue; }
+                        $temp_robot = rpg_game::get_robot($this, $this_player, $info);
+                        $event_options['event_flag_sound_effects'][] = array(
+                            'name' => $temp_robot->robot_class.'-teleport-in',
+                            'volume' => 1.0,
+                            'delay' => ($key * 100)
+                            );
+
+                    }
+                }
+                $this->events_create(false, false, '', '', $event_options);
 
                 // Change all this player's robot sprite back to their base, then update
                 foreach ($this_player->values['robots_active'] AS $key => $info){
@@ -1475,6 +1587,10 @@ class rpg_battle extends rpg_object {
                     $temp_abilities_index = rpg_ability::get_index(true);
                     foreach ($this_robot->robot_abilities AS $this_key => $this_token){
                         // Define the current ability object using the loaded ability data
+                        if (!isset($temp_abilities_index[$this_token])){
+                            unset($this_robot->robot_abilities[$this_key]);
+                            continue;
+                        }
                         $temp_abilityinfo = $temp_abilities_index[$this_token];
                         $temp_ability = rpg_game::get_ability($this, $this_player, $this_robot, $temp_abilityinfo);
                     }
@@ -1566,10 +1682,15 @@ class rpg_battle extends rpg_object {
                         //$this_quote_text = str_replace($this_find, $this_replace, $this_robot->robot_quotes['battle_taunt']);
                         $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : '').$this_robot->print_name().' taunts the opponent!<br />';
                         $event_body .= $this_robot->print_quote('battle_taunt', $this_find, $this_replace);
+                        $event_options = array();
+                        $event_options['console_show_target'] = false;
+                        $event_options['event_flag_sound_effects'] = array(
+                            array('name' => 'lets-go', 'volume' => 1.0)
+                            );
                         //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
                         $this_robot->set_frame('taunt');
                         $actual_target_robot->set_frame('base');
-                        $this->events_create($this_robot, $actual_target_robot, $event_header, $event_body, array('console_show_target' => false));
+                        $this->events_create($this_robot, $actual_target_robot, $event_header, $event_body, $event_options);
                         $this_robot->set_frame('base');
                         // Create the quote flag to ensure robots don't repeat themselves
                         $this_robot->set_flag('robot_quotes', 'battle_taunt', true);
@@ -1613,10 +1734,15 @@ class rpg_battle extends rpg_object {
                             //$this_quote_text = str_replace($this_find, $this_replace, $this_robot->robot_quotes['battle_taunt']);
                             $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : '').$this_robot->print_name().' taunts the opponent!<br />';
                             $event_body .= $this_robot->print_quote('battle_taunt', $this_find, $this_replace);
+                            $event_options = array();
+                            $event_options['console_show_target'] = false;
+                            $event_options['event_flag_sound_effects'] = array(
+                                array('name' => 'lets-go', 'volume' => 1.0)
+                                );
                             //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
                             $this_robot->set_frame('taunt');
                             $actual_target_robot->set_frame('base');
-                            $this->events_create($this_robot, $actual_target_robot, $event_header, $event_body, array('console_show_target' => false));
+                            $this->events_create($this_robot, $actual_target_robot, $event_header, $event_body, $event_options);
                             $this_robot->set_frame('base');
                             // Create the quote flag to ensure robots don't repeat themselves
                             $this_robot->set_flag('robot_quotes', 'battle_taunt', true);
@@ -1701,9 +1827,14 @@ class rpg_battle extends rpg_object {
                         $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : '').$this_robot->print_name().' taunts the opponent!<br />';
                         $event_body .= $this_robot->print_quote('battle_taunt', $this_find, $this_replace);
                         //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
+                        $event_options = array();
+                        $event_options['console_show_target'] = false;
+                        $event_options['event_flag_sound_effects'] = array(
+                            array('name' => $this_robot->robot_class.'-taunt-sound', 'volume' => 1.0)
+                            );
                         $this_robot->set_frame('taunt');
                         $target_robot->set_frame('base');
-                        $this->events_create($this_robot, $target_robot, $event_header, $event_body, array('console_show_target' => false));
+                        $this->events_create($this_robot, $target_robot, $event_header, $event_body, $event_options);
                         $this_robot->set_frame('base');
                         // Create the quote flag to ensure robots don't repeat themselves
                         $this_robot->set_flag('robot_quotes', 'battle_taunt', true);
@@ -1840,6 +1971,13 @@ class rpg_battle extends rpg_object {
                         $this_player->set_value('current_robot_enter', false);
                         $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$old_robot->robot_name;
                         $event_body = $old_robot->print_name().' is '.$this_switch_reason.' from battle!';
+                        $event_options = array();
+                        $event_options['canvas_show_disabled_bench'] = $old_robot->robot_id.'_'.$old_robot->robot_token;
+                        $event_options['event_flag_camera_action'] = true;
+                        $event_options['event_flag_camera_side'] = $old_robot->player->player_side;
+                        $event_options['event_flag_camera_focus'] = 'active';
+                        $event_options['event_flag_camera_depth'] = 0;
+                        $event_options['event_flag_camera_offset'] = 0;
                         if ($old_robot->robot_status != 'disabled' && isset($old_robot->robot_quotes['battle_retreat'])){
                             $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                             $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $old_robot->robot_name);
@@ -1849,7 +1987,7 @@ class rpg_battle extends rpg_object {
                         }
                         // Only show the removed event or the withdraw event if there's more than one robot
                         if ($this_switch_reason == 'removed' || $this_player->counters['robots_active'] > 1){
-                            $this_battle->events_create($old_robot, false, $event_header, $event_body, array('canvas_show_disabled_bench' => $old_robot->robot_id.'_'.$old_robot->robot_token));
+                            $this_battle->events_create($old_robot, false, $event_header, $event_body, $event_options);
                         }
                         $old_robot->set_frame_styles('');
                     }
@@ -1875,7 +2013,9 @@ class rpg_battle extends rpg_object {
                         $this_player->set_value('current_robot', $temp_new_robot->robot_string);
                         $this_player->set_value('current_robot_enter', $this_battle->counters['battle_turn']);
                         $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$temp_new_robot->robot_name;
-                        $event_body = "{$temp_new_robot->print_name()} joins the battle!<br />";
+                        $event_body = "{$temp_new_robot->print_name()} ".($this_player->player_side === 'left' ? 'joins' : 'enters')." the battle!<br />";
+                        $event_options = array();
+                        rpg_canvas::apply_camera_action_flags($event_options, $temp_new_robot);
                         if (isset($temp_new_robot->robot_quotes['battle_start'])){
                             $temp_new_robot->set_frame('taunt');
                             $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
@@ -1885,7 +2025,12 @@ class rpg_battle extends rpg_object {
 
                         // Only show the enter event if the switch reason was removed or if there is more then one robot
                         if ($this_switch_reason == 'removed' || $this_player->counters['robots_active'] > 1){
-                            $this_battle->events_create($temp_new_robot, false, $event_header, $event_body);
+                            $event_options['event_flag_sound_effects'] = array(
+                                array('name' => $old_robot->robot_class.'-switch-in', 'volume' => 1.0),
+                                array('name' => $temp_new_robot->robot_class.'-teleport-in', 'volume' => 1.0, 'delay' => 200)
+                                );
+                            $this_battle->events_create($temp_new_robot, false, $event_header, $event_body, $event_options);
+                            $this_battle->events_create(false, false, '', '');
                         }
 
                     }
@@ -2033,9 +2178,13 @@ class rpg_battle extends rpg_object {
                 $this_robot->trigger_custom_function('rpg-battle_scan-target_before', $extra_objects);
                 $temp_target_robot->trigger_custom_function('rpg-battle_scan-target_before', $extra_objects);
 
+                // Check to see if this is a "new" scan for this player
+                $is_new_scan = false;
+                if (empty($_SESSION['GAME']['values']['robot_database'][$temp_target_robot->robot_token]['robot_scanned'])){ $is_new_scan = true; }
+
                 // Create an event showing the scanned robot's data
                 $event_header = ($temp_target_player->player_token != 'player' ? $temp_target_player->player_name.'&#39;s ' : '').$temp_target_robot->robot_name;
-                if (empty($_SESSION['GAME']['values']['robot_database'][$temp_target_robot->robot_token]['robot_scanned'])){ $event_header .= '  <span class="robot_stat robot_type robot_type_electric" style="font-size: 90%; top: -1px;">New!</span>'; }
+                if ($is_new_scan){ $event_header .= '  <span class="robot_stat robot_type robot_type_electric" style="font-size: 90%; top: -1px;">New!</span>'; }
                 $event_body = '';
                 ob_start();
                 ?>
@@ -2061,28 +2210,28 @@ class rpg_battle extends rpg_object {
                                     <td  class="right"><?= !empty($temp_target_robot_weaknesses) ? $temp_target_robot_weaknesses : '<span class="robot_weakness">None</span>' ?></td>
                                     <td class="center">&nbsp;</td>
                                     <td class="left">Energy : </td>
-                                    <td  class="right"><span title="<?= floor(($temp_target_robot->robot_energy / $temp_target_robot->robot_base_energy) * 100).'% | '.$temp_target_robot->robot_energy.' / '.$temp_target_robot->robot_base_energy ?>"data-tooltip-type="robot_type robot_type_energy" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_energy_base_padding ?>px;"><span class="robot_stat robot_type robot_type_energy" style="padding-left: <?= $temp_energy_padding ?>px;"><?= $temp_target_robot->robot_energy ?></span></span></td>
+                                    <td  class="right"><span data-click-tooltip="<?= floor(($temp_target_robot->robot_energy / $temp_target_robot->robot_base_energy) * 100).'% | '.$temp_target_robot->robot_energy.' / '.$temp_target_robot->robot_base_energy ?>"data-tooltip-type="robot_type robot_type_energy" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_energy_base_padding ?>px;"><span class="robot_stat robot_type robot_type_energy" style="padding-left: <?= $temp_energy_padding ?>px;"><?= $temp_target_robot->robot_energy ?></span></span></td>
                                 </tr>
                                 <tr>
                                     <td class="left">Resistances : </td>
                                     <td  class="right"><?= !empty($temp_target_robot_resistances) ? $temp_target_robot_resistances : '<span class="robot_resistance">None</span>' ?></td>
                                     <td class="center">&nbsp;</td>
                                     <td class="left">Attack : </td>
-                                    <td  class="right"><span title="<?= floor(($temp_target_robot->robot_attack / $temp_target_robot->robot_base_attack) * 100).'% | '.$temp_target_robot->robot_attack.' / '.$temp_target_robot->robot_base_attack ?>"data-tooltip-type="robot_type robot_type_attack" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_attack_base_padding ?>px;"><span class="robot_stat robot_type robot_type_attack" style="padding-left: <?= $temp_attack_padding ?>px;"><?= $temp_attack_mod_icon.' '.$temp_target_robot->robot_attack ?></span></span></td>
+                                    <td  class="right"><span data-click-tooltip="<?= floor(($temp_target_robot->robot_attack / $temp_target_robot->robot_base_attack) * 100).'% | '.$temp_target_robot->robot_attack.' / '.$temp_target_robot->robot_base_attack ?>"data-tooltip-type="robot_type robot_type_attack" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_attack_base_padding ?>px;"><span class="robot_stat robot_type robot_type_attack" style="padding-left: <?= $temp_attack_padding ?>px;"><?= $temp_attack_mod_icon.' '.$temp_target_robot->robot_attack ?></span></span></td>
                                 </tr>
                                 <tr>
                                     <td class="left">Affinities : </td>
                                     <td  class="right"><?= !empty($temp_target_robot_affinities) ? $temp_target_robot_affinities : '<span class="robot_affinity">None</span>' ?></td>
                                     <td class="center">&nbsp;</td>
                                     <td class="left">Defense : </td>
-                                    <td  class="right"><span title="<?= floor(($temp_target_robot->robot_defense / $temp_target_robot->robot_base_defense) * 100).'% | '.$temp_target_robot->robot_defense.' / '.$temp_target_robot->robot_base_defense ?>"data-tooltip-type="robot_type robot_type_defense" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_defense_base_padding ?>px;"><span class="robot_stat robot_type robot_type_defense" style="padding-left: <?= $temp_defense_padding ?>px;"><?= $temp_defense_mod_icon.' '.$temp_target_robot->robot_defense ?></span></span></td>
+                                    <td  class="right"><span data-click-tooltip="<?= floor(($temp_target_robot->robot_defense / $temp_target_robot->robot_base_defense) * 100).'% | '.$temp_target_robot->robot_defense.' / '.$temp_target_robot->robot_base_defense ?>"data-tooltip-type="robot_type robot_type_defense" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_defense_base_padding ?>px;"><span class="robot_stat robot_type robot_type_defense" style="padding-left: <?= $temp_defense_padding ?>px;"><?= $temp_defense_mod_icon.' '.$temp_target_robot->robot_defense ?></span></span></td>
                                 </tr>
                                 <tr>
                                     <td class="left">Immunities : </td>
                                     <td  class="right"><?= !empty($temp_target_robot_immunities) ? $temp_target_robot_immunities : '<span class="robot_immunity">None</span>' ?></td>
                                     <td class="center">&nbsp;</td>
                                     <td class="left">Speed : </td>
-                                    <td  class="right"><span title="<?= floor(($temp_target_robot->robot_speed / $temp_target_robot->robot_base_speed) * 100).'% | '.$temp_target_robot->robot_speed.' / '.$temp_target_robot->robot_base_speed ?>"data-tooltip-type="robot_type robot_type_speed" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_speed_base_padding ?>px;"><span class="robot_stat robot_type robot_type_speed" style="padding-left: <?= $temp_speed_padding ?>px;"><?= $temp_speed_mod_icon.' '.$temp_target_robot->robot_speed ?></span></span></td>
+                                    <td  class="right"><span data-click-tooltip="<?= floor(($temp_target_robot->robot_speed / $temp_target_robot->robot_base_speed) * 100).'% | '.$temp_target_robot->robot_speed.' / '.$temp_target_robot->robot_base_speed ?>"data-tooltip-type="robot_type robot_type_speed" data-tooltip-align="right" class="robot_stat robot_type robot_type_empty" style="padding: 0 0 0 <?= $temp_speed_base_padding ?>px;"><span class="robot_stat robot_type robot_type_speed" style="padding-left: <?= $temp_speed_padding ?>px;"><?= $temp_speed_mod_icon.' '.$temp_target_robot->robot_speed ?></span></span></td>
                                 </tr>
                                 <? if (($options->show_skills || MMRPG_CONFIG_DEBUG_MODE) && !empty($temp_target_robot->robot_skill)){ ?>
                                     <?
@@ -2161,10 +2310,27 @@ class rpg_battle extends rpg_object {
                     </div>
                 <?
                 $event_body .= preg_replace('#\s+#', ' ', trim(ob_get_clean()));
-                $this->events_create($temp_target_robot, false, $event_header, $event_body, array('console_container_height' => 2, 'canvas_show_this' => false)); //, 'event_flag_autoplay' => false
+                $event_options = array();
+                $event_options['console_container_height'] = 2;
+                $event_options['canvas_show_this'] = false;
+                $event_options['event_flag_camera_action'] = true;
+                $event_options['event_flag_camera_side'] = $temp_target_robot->player->player_side;
+                $event_options['event_flag_camera_focus'] = $temp_target_robot->robot_position;
+                $event_options['event_flag_camera_depth'] = $temp_target_robot->robot_key;
+                $event_options['event_flag_sound_effects'] = array(
+                    array('name' => 'scan-start', 'volume' => 1.0)
+                    );
+                $temp_target_robot->set_frame('defend');
+                $this->events_create($temp_target_robot, false, $event_header, $event_body, $event_options);
 
                 // Ensure the target robot's frame is set to its base
+                $event_options['event_flag_sound_effects'] = array();
+                $event_options['event_flag_sound_effects'][] = array('name' => 'scan-success', 'volume' => 1.0);
+                if ($is_new_scan){ $event_options['event_flag_sound_effects'][] = array('name' => 'scan-success-new', 'volume' => 1.0, 'delay' => 150); }
+                $temp_target_robot->set_frame('taunt');
+                $this->events_create(false, false, '', '', $event_options);
                 $temp_target_robot->set_frame('base');
+                $this->events_create(false, false, '', '');
 
                 // Add this robot to the global robot database array
                 if (!isset($_SESSION['GAME']['values']['robot_database'][$temp_target_robot->robot_token])){ $_SESSION['GAME']['values']['robot_database'][$temp_target_robot->robot_token] = array('robot_token' => $temp_target_robot->robot_token); }
@@ -2319,148 +2485,146 @@ class rpg_battle extends rpg_object {
 
     }
 
-    // Define a public function for calculating canvas markup offsets
-    public function canvas_markup_offset($sprite_key, $sprite_position, $sprite_size, $bench_size = 1){
+    // Define a public function for calculating canvas markup offsets w/ perspective
+    public function canvas_markup_offset($sprite_key, $sprite_position, $sprite_size, $team_size = 1){
 
-        // Generate with perspective mode if the user has requested it, otherwise legacy
-        if (MMRPG_CONFIG_PERSPECTIVE_MODE === true){
-            return $this->canvas_markup_offset_perspective($sprite_key, $sprite_position, $sprite_size, $bench_size);
-        } else {
-            return $this->canvas_markup_offset_legacy($sprite_key, $sprite_position, $sprite_size);
-        }
+        // Define the max bench size so we can shift later
+        $max_team_size = 8;
+        $max_bench_size = 7;
+        $base_sprite_size = 40;
+        $zoom_sprite_size = $base_sprite_size * 2;
 
-    }
+        // Define the size of the grid (in pixels)
+        $grid_width = ceil(750 / 2); // Half the canvas width
+        $grid_width -= ceil($grid_width / 9); // Pull back for the "middle" tile
+        $grid_height = 84; // Grid height
+        $grid_offset_bottom = 35; // Offset from the bottom of the canvas
 
-    // Define a public function for calculating canvas markup offsets
-    public function canvas_markup_offset_legacy($sprite_key, $sprite_position, $sprite_size){
+        // Define minimum and maximum Z-offset for sprites.
+        $z_min = 4900; // Smallest Z-offset for sprites at the farthest row
+        $z_max = 5100; // Largest Z-offset for sprites at the closest row
 
-        // Define the data array to be returned later
-        $this_data = array();
+        // Define the number of cells in the grid
+        $grid_columns = 4;
+        $grid_rows = 7;
+        $grid_row_middle = ceil($grid_rows / 2);
+        $grid_column_offsets = array();
 
-        // Define the base canvas offsets for this sprite
-        $this_data['canvas_offset_x'] = 165;
-        $this_data['canvas_offset_y'] = 55;
-        $this_data['canvas_offset_z'] = $sprite_position == 'active' ? 5100 : 4900;
-        $this_data['canvas_scale'] = $sprite_position == 'active' ? 1 : 0.5 + (((8 - $sprite_key) / 8) * 0.5);
+        // Manually define the height of rows because it's just not working
+        $grid_row_tilt = 26; // degrees
+        $grid_row_heights = array(19, 16, 13, 10, 9, 8, 6);
+        $grid_col_widths = array(132, 117, 106, 98, 91, 85, 79);
+        $grid_row_height = function($row = 1, $column = 1) use ($grid_row_heights) { return $row >= 1 ? $grid_row_heights[$row - 1] : 0; };
+        $grid_col_width = function($row = 1, $column = 1) use ($grid_col_widths) { return $row >= 1 ? $grid_col_widths[$row - 1] : 0; };
+        $grid_row_heights_total = function($row = 1, $column = 1) use ($grid_row_heights) { return $row >= 1 ? array_sum(array_slice($grid_row_heights, 0, ($row - 1))) : 0; };
+        $grid_col_widths_total = function($row = 1, $column = 1) use ($grid_col_widths) { return $row >= 1 && $column >= 1 ? ($grid_col_widths[$row - 1] * ($column - 1)) : 0; };
 
-        // If the robot is on the bench, calculate position offsets based on key
-        if ($sprite_position == 'bench'){
+        // Define minimum and maximum scale factors for sprites
+        $scale_base = 1.0;
+        $scale_shift = 0.2;
+        $scale_min = $scale_base - ($scale_base * $scale_shift);  // Smallest scale for sprites at the farthest row
+        $scale_max = $scale_base + ($scale_base * $scale_shift);  // Largest scale for sprites at the closest row
 
-            $this_data['canvas_offset_z'] -= 100 * $sprite_key;
-            $position_modifier = ($sprite_key + 1) / 8;
-            $position_modifier_2 = 1 - $position_modifier;
-            $temp_seed_1 = 40; //$sprite_size;
-            $temp_seed_2 = 20; //ceil($sprite_size / 2);
-            $this_data['canvas_offset_x'] = (-1 * $temp_seed_2) + ceil(($sprite_key + 1) * ($temp_seed_1 + 2)) - ceil(($sprite_key + 1) * $temp_seed_2);
-            //if ($sprite_size > 40){ $this_data['canvas_offset_x'] -= 40; }
-            //if ($sprite_size > 40){ $this_data['canvas_offset_x'] = ceil($this_data['canvas_offset_x'] / 4); }
-            $temp_seed_1 = $sprite_size;
-            $temp_seed_2 = ceil($sprite_size / 2);
-            $this_data['canvas_offset_y'] = ($temp_seed_1 + 6) + ceil(($sprite_key + 1) * 14) - ceil(($sprite_key + 1) * 7) - ($sprite_size - 40);
-            $temp_seed_3 = 0;
-            if ($sprite_key == 0){ $temp_seed_3 = -10; }
-            elseif ($sprite_key == 1){ $temp_seed_3 = 0; }
-            elseif ($sprite_key == 2){ $temp_seed_3 = 10; }
-            elseif ($sprite_key == 3){ $temp_seed_3 = 20; }
-            elseif ($sprite_key == 4){ $temp_seed_3 = 30; }
-            elseif ($sprite_key == 5){ $temp_seed_3 = 40; }
-            elseif ($sprite_key == 6){ $temp_seed_3 = 50; }
-            elseif ($sprite_key == 7){ $temp_seed_3 = 60; }
-            if ($sprite_size > 40){ $temp_seed_3 -= ceil(40 * $this_data['canvas_scale']); }
-            //$temp_seed_3 = ceil($temp_seed_3 * 0.5);
-            $this_data['canvas_offset_x'] += $temp_seed_3;
-            $this_data['canvas_offset_x'] += 20;
+        // Define the size of a cell (in pixels)
+        $cell_width = $grid_width / $grid_columns;
+        $cell_height = $grid_height / $grid_rows;
 
-        }
-        // Otherwise, if the robot is in active position
-        elseif ($sprite_position == 'active'){
+        // Define the default row and column for a sprite
+        $sprite_row = 1;
+        $sprite_column = 1;
 
-            if ($sprite_size > 80){
-                $this_data['canvas_offset_x'] -= 60;
+        // Push all sprites are pushed from the middle column
+        $sprite_column += 1;
+
+        // Further adjust the row and column based on the sprite's position (active/bench) and position key
+        //error_log('|| $sprite key ('.$sprite_key.') && position ('.$sprite_position.') ('.$sprite_row.', '.$sprite_column.') w/ team-size ('.$team_size.') ');
+        if ($sprite_position == 'active') {
+            $sprite_row = $grid_row_middle;
+            //error_log('--> adjusted '.$sprite_position.' $sprite position ('.$sprite_row.', '.$sprite_column.')');
+        } elseif ($sprite_position == 'bench'){
+            $sprite_column += 1;
+            $sprite_row += ($sprite_key - 1);
+            if ($team_size > 1){
+                $current_bench_size = $team_size - 1;
+                $extra_bench_slots = $current_bench_size < $max_bench_size ? ($max_bench_size - $current_bench_size) : 0;
+                $bench_shift_amount = $extra_bench_slots >= 2 ? floor($extra_bench_slots / 2) : 0;
+                if ($current_bench_size % 2 === 0 && $sprite_key > ($current_bench_size / 2)){ $bench_shift_amount += 1; } // adjust position on non-odd numbered teams for centering purposes
+                //error_log('$current_bench_size = '.$current_bench_size);
+                //error_log('$extra_bench_slots = '.$extra_bench_slots);
+                //error_log('$bench_shift_amount = '.$bench_shift_amount);
+                if ($bench_shift_amount){ $sprite_row += $bench_shift_amount; }
+                if ($sprite_row > $grid_rows){ $sprite_row = $grid_rows - $sprite_row; }
+                //error_log('--> adjusted '.$sprite_position.' $sprite position ('.$sprite_row.', '.$sprite_column.')');
             }
+        }
+        //error_log('--> $sprite key ('.$sprite_key.') && position ('.$sprite_position.') ('.$sprite_row.', '.$sprite_column.') w/ team-size ('.$team_size.') ');
 
+        /*
+        // DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
+        // DEBUG (just to test positions) DEBUG
+        $sprite_row = 1; //7;
+        $sprite_column = 2; //($sprite_key + 1);
+        */
+
+        // Calculate how much the scale should change per row
+        $scale_step = round(($scale_max - $scale_min) / ($grid_rows - 1), 2);
+        $canvas_scale = ($scale_max - ($sprite_row - 1) * $scale_step);
+        //error_log('$scale_step: '.$scale_step);
+        //error_log('$canvas_scale: '.$canvas_scale);
+        $rel_sprite_size = ($canvas_scale * $sprite_size);
+        $rel_base_sprite_size = ($canvas_scale * $base_sprite_size);
+        $rel_zoom_sprite_size = ($canvas_scale * $zoom_sprite_size);
+        $rel_cell_height = ($canvas_scale * $cell_height);
+        $rel_cell_width = ($canvas_scale * $cell_width);
+
+        // Calculate the canvas Y-offset based on the sprite's size first and foremost
+        $canvas_offset_y = 0;
+        $canvas_offset_y += $grid_offset_bottom; // start at the outer edge
+        $canvas_offset_y += ($grid_row_height($sprite_row, $sprite_column) / 2); // push them up half the height of their panel to vertically align
+        $canvas_offset_y += $grid_row_heights_total($sprite_row, $sprite_column); // push them up for all the rows beneath theirs
+
+        // Calculate the canvas X-offset based on the sprite's size first and foremost
+        $canvas_offset_x = 0; // start at the outer edge
+        $canvas_offset_x += $grid_width; // push them all the way to the inner middle
+        $canvas_offset_x -= $grid_col_widths_total($sprite_row, $sprite_column); // pull them back for all the columns to their left
+        if ($sprite_size > $zoom_sprite_size){
+            $temp_size_diff = $sprite_size - $zoom_sprite_size;
+            $canvas_offset_x -= ($temp_size_diff / 2);
         }
 
-        // Return the generated canvas data for this robot
-        return $this_data;
+        // Adjust the X and Y to ensure pixel-ratio compatible values
+        $canvas_offset_y = round($canvas_offset_y) % 2 === 0 ? round($canvas_offset_y) : floor($canvas_offset_y);
+        $canvas_offset_x = round($canvas_offset_x) % 2 === 0 ? round($canvas_offset_x) : floor($canvas_offset_x);
 
-    }
+        // Calculate how much the Z-offset should change per row
+        $z_step = (($z_max - $z_min) / ($grid_rows - 1));
+        $canvas_offset_z = ceil($z_max - (($sprite_row - 1) * $z_step));
 
+        // Calculate the depth and focus values based on field depth to use as needed
+        $canvas_depth = 1 - ($sprite_row * 0.04);
 
-    // Define a public function for calculating canvas markup offsets
-    public function canvas_markup_offset_perspective($sprite_key, $sprite_position, $sprite_size, $bench_size = 1){
+        // Calculate the focus and focus values based on field depth to use as needed
+        $canvas_focus = 1;
+        if ($sprite_row > $grid_row_middle){ $focus_shift = ($sprite_row - $grid_row_middle); }
+        elseif ($sprite_row < $grid_row_middle){ $focus_shift = ($grid_row_middle - $sprite_row); }
+        if (isset($focus_shift)){ $canvas_focus -= $focus_shift * 0.05; }
 
-        // Collect the max bench size
-        $max_bench_size = MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX;
-        $current_max_bench_size = $this->counters['robots_perside_max'];
+        // Put it all together to define the canvas offset values
+        $offset_values = array(
+            'canvas_grid_column' => $sprite_column,
+            'canvas_grid_row' => $sprite_row,
+            'canvas_scale' => 1, //$canvas_scale,
+            'canvas_depth' => $canvas_depth,
+            'canvas_focus' => $canvas_focus,
+            'canvas_offset_x' => $canvas_offset_x,
+            'canvas_offset_y' => $canvas_offset_y,
+            'canvas_offset_z' => $canvas_offset_z
+            );
 
-        // Calculate the half-key representing the middle of this side of the field
-        $half_key = -1 + ceil($current_max_bench_size / 2);
-
-        // Define the data array to be returned later
-        $this_data = array();
-
-        // Define the base canvas offsets for this sprite
-        $this_data['canvas_offset_x'] = 165;
-        $this_data['canvas_offset_y'] = 55;
-        $this_data['canvas_offset_z'] = $sprite_position == 'active' ? 5100 : 4900;
-
-        // If the robot is on the bench, calculate position offsets based on key
-        if ($sprite_position == 'bench'){
-
-            // If this bench is smaller than max, we should offset a bit
-            /*
-            if ($bench_size < $current_max_bench_size){
-                $bench_diff = $current_max_bench_size - $bench_size;
-                $sprite_key += ceil($bench_diff / 2);
-            }
-            */
-            $this_data['canvas_offset_z'] -= 100 * $sprite_key;
-
-            // Base the scale on this robot's position on the bench
-            $this_data['canvas_scale'] = 0.5 + ((($max_bench_size - $sprite_key) / $max_bench_size) * 0.5);
-
-            $position_modifier = ($sprite_key + 1) / $max_bench_size;
-            $position_modifier_2 = 1 - $position_modifier;
-
-            $temp_seed_1 = 40;
-            $temp_seed_2 = 20;
-            $this_data['canvas_offset_x'] = (-1 * $temp_seed_2) + ceil(($sprite_key + 1) * ($temp_seed_1 + 2)) - ceil(($sprite_key + 1) * $temp_seed_2);
-            $temp_seed_1 = $sprite_size;
-            $temp_seed_2 = ceil($sprite_size / 2);
-            $this_data['canvas_offset_y'] = ($temp_seed_1 + 6) + ceil(($sprite_key + 1) * 14) - ceil(($sprite_key + 1) * 7) - ($sprite_size - 40);
-
-            $temp_seed_3 = 0;
-            if ($sprite_key == 0){ $temp_seed_3 = -10; }
-            elseif ($sprite_key == 1){ $temp_seed_3 = 0; }
-            elseif ($sprite_key == 2){ $temp_seed_3 = 10; }
-            elseif ($sprite_key == 3){ $temp_seed_3 = 20; }
-            elseif ($sprite_key == 4){ $temp_seed_3 = 30; }
-            elseif ($sprite_key == 5){ $temp_seed_3 = 40; }
-            elseif ($sprite_key == 6){ $temp_seed_3 = 50; }
-            elseif ($sprite_key == 7){ $temp_seed_3 = 60; }
-            if ($sprite_size > 40){ $temp_seed_3 -= ceil(40 * $this_data['canvas_scale']); }
-            $this_data['canvas_offset_x'] += $temp_seed_3;
-            $this_data['canvas_offset_x'] += 64 - ($max_bench_size * 4);
-
-        }
-        // Otherwise, if the robot is in active position
-        elseif ($sprite_position == 'active'){
-
-            // Base the scale on the half-way position of robots on this side of the field
-            $this_data['canvas_scale'] = 0.5 + ((($max_bench_size - $half_key) / $max_bench_size) * 0.5); //1;
-
-            $this_data['canvas_offset_x'] += round(($half_key * (40 * $this_data['canvas_scale'])) * $this_data['canvas_scale']);
-            $this_data['canvas_offset_y'] += $half_key * 6;
-
-            if ($sprite_size > 80){
-                $this_data['canvas_offset_x'] -= round(60 * $this_data['canvas_scale']);
-            }
-
-        }
-
-        // Return the generated canvas data for this robot
-        return $this_data;
+        // Return the canvas offsets
+        //error_log(PHP_EOL.'$sprite_key: '.$sprite_key.PHP_EOL.'$sprite_size:'.$sprite_size.PHP_EOL.'$sprite_position: '.$sprite_position);
+        //error_log('canvas_offset_perspective: ' . print_r($offset_values, true));
+        return $offset_values;
 
     }
 
@@ -2485,6 +2649,7 @@ class rpg_battle extends rpg_object {
         $options['console_show_this_robot'] = isset($eventinfo['event_options']['console_show_this_robot']) ? $eventinfo['event_options']['console_show_this_robot'] : true;
         $options['console_show_this_ability'] = isset($eventinfo['event_options']['console_show_this_ability']) ? $eventinfo['event_options']['console_show_this_ability'] : false;
         $options['console_show_this_item'] = isset($eventinfo['event_options']['console_show_this_item']) ? $eventinfo['event_options']['console_show_this_item'] : false;
+        $options['console_show_this_skill'] = isset($eventinfo['event_options']['console_show_this_skill']) ? $eventinfo['event_options']['console_show_this_skill'] : false;
         $options['console_show_this_star'] = isset($eventinfo['event_options']['console_show_this_star']) ? $eventinfo['event_options']['console_show_this_star'] : false;
         $options['console_show_target'] = isset($eventinfo['event_options']['console_show_target']) ? $eventinfo['event_options']['console_show_target'] : true;
         $options['console_show_target_player'] = isset($eventinfo['event_options']['console_show_target_player']) ? $eventinfo['event_options']['console_show_target_player'] : true;
@@ -2496,10 +2661,15 @@ class rpg_battle extends rpg_object {
         $options['canvas_show_this_ability_overlay'] = isset($eventinfo['event_options']['canvas_show_this_ability_overlay']) ? $eventinfo['event_options']['canvas_show_this_ability_overlay'] : false;
         $options['canvas_show_this_item'] = isset($eventinfo['event_options']['canvas_show_this_item']) ? $eventinfo['event_options']['canvas_show_this_item'] : true;
         $options['canvas_show_this_item_overlay'] = isset($eventinfo['event_options']['canvas_show_this_item_overlay']) ? $eventinfo['event_options']['canvas_show_this_item_overlay'] : false;
+        $options['canvas_show_this_item_underlay'] = isset($eventinfo['event_options']['canvas_show_this_item_underlay']) ? $eventinfo['event_options']['canvas_show_this_item_underlay'] : true;
+        $options['canvas_show_this_skill'] = isset($eventinfo['event_options']['canvas_show_this_skill']) ? $eventinfo['event_options']['canvas_show_this_skill'] : true;
+        $options['canvas_show_this_skill_overlay'] = isset($eventinfo['event_options']['canvas_show_this_skill_overlay']) ? $eventinfo['event_options']['canvas_show_this_skill_overlay'] : false;
+        $options['canvas_show_this_skill_underlay'] = isset($eventinfo['event_options']['canvas_show_this_skill_underlay']) ? $eventinfo['event_options']['canvas_show_this_skill_underlay'] : true;
         $options['canvas_show_target'] = isset($eventinfo['event_options']['canvas_show_target']) ? $eventinfo['event_options']['canvas_show_target'] : true;
         $options['canvas_show_target_robots'] = isset($eventinfo['event_options']['canvas_show_target_robots']) ? $eventinfo['event_options']['canvas_show_target_robots'] : true;
         $options['canvas_show_target_ability'] = isset($eventinfo['event_options']['canvas_show_target_ability']) ? $eventinfo['event_options']['canvas_show_target_ability'] : true;
         $options['canvas_show_target_item'] = isset($eventinfo['event_options']['canvas_show_target_item']) ? $eventinfo['event_options']['canvas_show_target_item'] : true;
+        $options['canvas_show_target_skill'] = isset($eventinfo['event_options']['canvas_show_target_skill']) ? $eventinfo['event_options']['canvas_show_target_skill'] : true;
         $options['this_ability'] = isset($eventinfo['event_options']['this_ability']) ? $eventinfo['event_options']['this_ability'] : false;
         $options['this_ability_target'] = isset($eventinfo['event_options']['this_ability_target']) ? $eventinfo['event_options']['this_ability_target'] : false;
         $options['this_ability_target_key'] = isset($eventinfo['event_options']['this_ability_target_key']) ? $eventinfo['event_options']['this_ability_target_key'] : 0;
@@ -2522,15 +2692,95 @@ class rpg_battle extends rpg_object {
         $options['this_robot_image'] = isset($eventinfo['event_options']['this_robot_image']) ? $eventinfo['event_options']['this_robot_image'] : 'sprite';
         $options['this_ability_image'] = isset($eventinfo['event_options']['this_ability_image']) ? $eventinfo['event_options']['this_ability_image'] : 'sprite';
         $options['this_item_image'] = isset($eventinfo['event_options']['this_item_image']) ? $eventinfo['event_options']['this_item_image'] : 'sprite';
+        $options['this_skill_image'] = isset($eventinfo['event_options']['this_skill_image']) ? $eventinfo['event_options']['this_skill_image'] : 'sprite';
+        $options['event_flag_camera_action'] = isset($eventinfo['event_options']['event_flag_camera_action']) ? $eventinfo['event_options']['event_flag_camera_action'] : false;
+        $options['event_flag_camera_reaction'] = isset($eventinfo['event_options']['event_flag_camera_reaction']) ? $eventinfo['event_options']['event_flag_camera_reaction'] : false;
+        $options['event_flag_camera_side'] = isset($eventinfo['event_options']['event_flag_camera_side']) ? $eventinfo['event_options']['event_flag_camera_side'] : 'left';
+        $options['event_flag_camera_focus'] = isset($eventinfo['event_options']['event_flag_camera_focus']) ? $eventinfo['event_options']['event_flag_camera_focus'] : 'active';
+        $options['event_flag_camera_depth'] = isset($eventinfo['event_options']['event_flag_camera_depth']) ? $eventinfo['event_options']['event_flag_camera_depth'] : 0;
+        $options['event_flag_camera_offset'] = isset($eventinfo['event_options']['event_flag_camera_offset']) ? $eventinfo['event_options']['event_flag_camera_offset'] : 0;
+        $options['event_flag_sound_effects'] = isset($eventinfo['event_options']['event_flag_sound_effects']) ? $eventinfo['event_options']['event_flag_sound_effects'] : false;
+
+        // If it doesn't exist or a camera reset was provided, we should reset the array to empty
+        if (!isset($this->values['last_camera_action'])
+            || !empty($eventinfo['event_options']['event_flag_camera_reset'])){
+            //error_log('creating last_camera_action ('.(!isset($this->values['last_camera_action']) ? 'not exists' : 'reset requested').')');
+            $this->values['last_camera_action'] = array();
+        }
+
+        // Check to see if any camera action settings were provided in the event info
+        $camera_action_provided = false;
+        if (isset($eventinfo['event_options']['event_flag_camera_action'])
+            || isset($eventinfo['event_options']['event_flag_camera_reaction'])
+            || isset($eventinfo['event_options']['event_flag_camera_side'])
+            || isset($eventinfo['event_options']['event_flag_camera_focus'])
+            || isset($eventinfo['event_options']['event_flag_camera_depth'])
+            || isset($eventinfo['event_options']['event_flag_camera_offset'])
+            || isset($eventinfo['event_options']['event_flag_camera_reset'])
+            ){
+            $camera_action_provided = true;
+        }
 
         // Define the variable to collect markup
         $this_markup = array();
 
         // Generate the event flags markup
         $event_flags = array();
+
         $event_flags['autoplay'] = $options['event_flag_autoplay'];
+
+        // Collect the victory and defeat event flags
         $event_flags['victory'] = $options['event_flag_victory'];
         $event_flags['defeat'] = $options['event_flag_defeat'];
+
+        // Collect the camera action flags if provided in the event options
+        $event_flags['camera'] = array();
+        $event_flags['camera']['action'] = $options['event_flag_camera_action'];
+        $event_flags['camera']['reaction'] = $options['event_flag_camera_reaction'];
+        $event_flags['camera']['side'] = $options['event_flag_camera_side'];
+        $event_flags['camera']['focus'] = $options['event_flag_camera_focus'];
+        $event_flags['camera']['depth'] = $options['event_flag_camera_depth'];
+        $event_flags['camera']['offset'] = $options['event_flag_camera_offset'];
+        if (!$event_flags['camera']['action'] && !$event_flags['camera']['reaction']){ $event_flags['camera'] = false; }
+
+        // Otherwise, save this camera action for next time, if necessary
+        if (!empty($event_flags['camera'])){
+            $this->values['last_camera_action'] = $event_flags['camera'];
+        }
+
+        // If no camera action was provided, and we have backup settings, let's use those
+        if (!$camera_action_provided
+            && !empty($this->values['last_camera_action'])){
+            //error_log('applying saved camera action');
+            $event_flags['camera'] = $this->values['last_camera_action'];
+            $event_flags['camera']['offset'] = 0;
+            $this->values['last_camera_action'] = array();
+        }
+
+        // Collect the camera action flags if they've been queued up in the sound queue
+        $event_flags['sounds'] = array();
+        if (!empty($this->queue['sound_effects'])){
+            do {
+                $effect = array_shift($this->queue['sound_effects']);
+                if (empty($effect['name'])){ continue; }
+                $event_flags['sounds'][] = $effect;
+            } while (count($this->queue['sound_effects']) > 0);
+        }
+        if (!empty($options['event_flag_sound_effects'])){
+            foreach ($options['event_flag_sound_effects'] AS $key => $effect){
+                if (empty($effect['name'])){ continue; }
+                $event_flags['sounds'][] = $effect;
+            }
+        }
+        if (empty($event_flags['sounds'])
+            && !empty($eventinfo['event_header'])
+            && !empty($eventinfo['event_body'])
+            ){
+            $event_flags['sounds'][] = array('name' => 'text-sound', 'volume' => 1.0);
+        }
+        if (empty($event_flags['sounds'])){ $event_flags['sounds'] = false; }
+
+        // Compress all these flags into JSON so we can send them to the client
         $this_markup['flags'] = json_encode($event_flags);
 
         // Generate the console message markup
@@ -2565,6 +2815,35 @@ class rpg_battle extends rpg_object {
         return $this->events;
 
     }
+
+    // Define an event for queueing sound effects to be played at the next canvas and/or console event
+    public function queue_sound_effect($effect_config){
+        //error_log('rpg_battle::queue_sound_effect($effect_config:' . print_r($effect_config, true) . ')');
+        if (empty($effect_config)){ return false; }
+
+        // If no sound name is provided return false
+        if (is_string($effect_config)){ $effect_config = array('name' => $effect_config); }
+        else if (empty($effect_config['name'])){ return false; }
+
+        // Otherwise simply sanitize the results a bit (volume: 0 - 1, rate: 0.1 - 4.0)
+        if (isset($effect_config['volume'])){
+            if ($effect_config['volume'] > 1){ $effect_config['volume'] = 1; }
+            elseif ($effect_config['volume'] < 0){ $effect_config['volume'] = 0; }
+        }
+        if (isset($effect_config['rate'])){
+            if ($effect_config['rate'] > 4){ $effect_config['rate'] = 4; }
+            elseif ($effect_config['rate'] < 0.1){ $effect_config['rate'] = 0.1; }
+        }
+
+        // Add the sound to the event sounds queue
+        if (!isset($this->queue['sound_effects'])){ $this->queue['sound_effects'] = array(); }
+        $this->queue['sound_effects'][] = $effect_config;
+
+        // Return true
+        return true;
+
+    }
+
 
     // Define a function for calculating the amount of BATTLE POINTS a player gets in battle
     public function calculate_battle_zenny($this_player, $base_zenny = 0, $base_turns = 0){
@@ -2800,12 +3079,12 @@ class rpg_battle extends rpg_object {
         // Define the back star's markup
         $this_data['star_markup_class'] = 'sprite sprite_star sprite_star_sprite sprite_40x40 sprite_40x40_'.$temp_star_back['frame'].' ';
         $this_data['star_markup_style'] = 'background-image: url('.$temp_star_back['path'].'); margin-top: 5px; ';
-        $temp_back_markup = '<div class="'.$this_data['star_markup_class'].'" style="'.$this_data['star_markup_style'].'" title="'.$this_data['star_title'].'">'.$this_data['star_title'].'</div>';
+        $temp_back_markup = '<div class="'.$this_data['star_markup_class'].'" style="'.$this_data['star_markup_style'].'" data-click-tooltip="'.$this_data['star_title'].'">'.$this_data['star_title'].'</div>';
 
         // Define the back star's markup
         $this_data['star_markup_class'] = 'sprite sprite_star sprite_star_sprite sprite_40x40 sprite_40x40_'.$temp_star_front['frame'].' ';
         $this_data['star_markup_style'] = 'background-image: url('.$temp_star_front['path'].'); margin-top: -42px; ';
-        $temp_front_markup = '<div class="'.$this_data['star_markup_class'].'" style="'.$this_data['star_markup_style'].'" title="'.$this_data['star_title'].'">'.$this_data['star_title'].'</div>';
+        $temp_front_markup = '<div class="'.$this_data['star_markup_class'].'" style="'.$this_data['star_markup_style'].'" data-click-tooltip="'.$this_data['star_title'].'">'.$this_data['star_title'].'</div>';
 
         // Generate the final markup for the console star
         $this_data['star_markup'] = '';

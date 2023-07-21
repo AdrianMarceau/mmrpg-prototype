@@ -14,6 +14,10 @@ foreach ($mmrpg_index_types AS $type_token => $type_info){
         border-color: rgb(<?= implode(',', $type_info['type_colour_dark']) ?>) !important;
         background-color: rgb(<?= implode(',', $type_info['type_colour_light']) ?>) !important;
     }
+    #mmrpg .color.<?= $type_info['type_token'] ?>,
+    #mmrpg .color_<?= $type_info['type_token'] ?> {
+        color: rgb(<?= implode(',', $type_info['type_colour_light']) ?>) !important;
+    }
     <?
     // Loop through all the types again for the dual-type ability styles
     foreach ($mmrpg_index_types AS $type2_token => $type2_info){
@@ -41,6 +45,11 @@ foreach ($mmrpg_index_types AS $type_token => $type_info){
             background-image: -webkit-linear-gradient(right, rgb(<?= implode(',', $type_info['type_colour_light']) ?>) 0%, rgb(<?= implode(',', $type2_info['type_colour_light']) ?>) 100%) !important;
             background-image: -ms-linear-gradient(right, rgb(<?= implode(',', $type_info['type_colour_light']) ?>) 0%, rgb(<?= implode(',', $type2_info['type_colour_light']) ?>) 100%) !important;
             background-image: linear-gradient(to right, rgb(<?= implode(',', $type_info['type_colour_light']) ?>) 0%, rgb(<?= implode(',', $type2_info['type_colour_light']) ?>) 100%) !important;
+        }
+        #mmrpg .color.<?= $type_info['type_token'] ?>.<?= $type2_info['type_token'] ?>,
+        #mmrpg .color.<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,
+        #mmrpg .color_<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?> {
+            color: rgb(<?= implode(',', $type_info['type_colour_light']) ?>) !important;
         }
         <?
 

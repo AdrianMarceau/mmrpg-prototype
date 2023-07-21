@@ -77,6 +77,8 @@ class rpg_field extends rpg_object {
         $this->field_foreground = isset($this_fieldinfo['field_foreground']) ? $this_fieldinfo['field_foreground'] : 'field';
         $this->field_background_attachments = isset($this_fieldinfo['field_background_attachments']) ? $this_fieldinfo['field_background_attachments'] : array();
         $this->field_foreground_attachments = isset($this_fieldinfo['field_foreground_attachments']) ? $this_fieldinfo['field_foreground_attachments'] : array();
+        $this->field_background_variant = isset($this_fieldinfo['field_background_variant']) ? $this_fieldinfo['field_background_variant'] : '';
+        $this->field_foreground_variant = isset($this_fieldinfo['field_foreground_variant']) ? $this_fieldinfo['field_foreground_variant'] : '';
         $this->field_music = isset($this_fieldinfo['field_music']) ? $this_fieldinfo['field_music'] : 'field';
 
         // Define the internal field base values using the fields index array
@@ -89,6 +91,8 @@ class rpg_field extends rpg_object {
         $this->field_base_foreground = isset($this_fieldinfo['field_base_foreground']) ? $this_fieldinfo['field_base_foreground'] : $this->field_foreground;
         $this->field_base_background_attachments = isset($this_fieldinfo['field_base_background_attachments']) ? $this_fieldinfo['field_base_background_attachments'] : $this->field_background_attachments;
         $this->field_base_foreground_attachments = isset($this_fieldinfo['field_base_foreground_attachments']) ? $this_fieldinfo['field_base_foreground_attachments'] : $this->field_foreground_attachments;
+        $this->field_base_background_variant = isset($this_fieldinfo['field_base_background_variant']) ? $this_fieldinfo['field_base_background_variant'] : $this->field_background_variant;
+        $this->field_base_foreground_variant = isset($this_fieldinfo['field_base_foreground_variant']) ? $this_fieldinfo['field_base_foreground_variant'] : $this->field_foreground_variant;
         $this->field_base_music = isset($this_fieldinfo['field_base_music']) ? $this_fieldinfo['field_base_music'] : $this->field_music;
 
         // Collect any functions associated with this field
@@ -501,6 +505,8 @@ class rpg_field extends rpg_object {
             'field_foreground' => $this->field_foreground,
             'field_background_attachments' => $this->field_background_attachments,
             'field_foreground_attachments' => $this->field_foreground_attachments,
+            'field_background_variant' => $this->field_background_variant,
+            'field_foreground_variant' => $this->field_foreground_variant,
             'field_music' => $this->field_music,
             'field_base_name' => $this->field_base_name,
             'field_base_token' => $this->field_base_token,
@@ -511,6 +517,8 @@ class rpg_field extends rpg_object {
             'field_base_foreground' => $this->field_base_foreground,
             'field_base_background_attachments' => $this->field_base_background_attachments,
             'field_base_foreground_attachments' => $this->field_base_foreground_attachments,
+            'field_base_background_variant' => $this->field_base_background_variant,
+            'field_base_foreground_variant' => $this->field_base_foreground_variant,
             'field_base_music' => $this->field_base_music,
             'flags' => $this->flags,
             'counters' => $this->counters,
@@ -1358,10 +1366,10 @@ class rpg_field extends rpg_object {
 
                 <? if($print_options['show_sprites'] && $field_image_token != 'field'): ?>
 
-                    <h2 id="sprites" class="header header_full field_type_<?= $field_type_token ?>" style="margin: 10px 0 0; text-align: left;">
+                    <h2 <?= $print_options['layout_style'] == 'website' ? 'id="sprites"' : '' ?> class="header header_full sprites_header field_type_<?= $field_type_token ?>" style="margin: 10px 0 0; text-align: left;">
                         Sprite Sheets
                     </h2>
-                    <div id="sprites_body" class="body body_full sprites_body field_sprites_body solid">
+                    <div <?= $print_options['layout_style'] == 'website' ? 'id="sprites_body"' : '' ?> class="body body_full sprites_body field_sprites_body solid">
                         <div id="sprite_container" class="sprite_container">
                             <div class="sprite_background" style="background-image: url(images/fields/<?= $field_info['field_background'] ?>/battle-field_background_base.gif?<?= MMRPG_CONFIG_CACHE_DATE ?>);">
                                 <div class="sprite_foreground" style="background-image: url(images/fields/<?= $field_info['field_background'] ?>/battle-field_foreground_base.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">
@@ -1502,15 +1510,6 @@ class rpg_field extends rpg_object {
             if (!empty($temp_field_master)){ $temp_field_title .= 'Master : '.$temp_field_master['robot_name'].' // '; }
             if (!empty($temp_field_mechas)){ $temp_field_title .= 'Mecha'.(count($temp_field_mechas) > 1 ? 's' : '').' : '.implode(', ', $temp_field_mechas).' // '; }
         $temp_field_title .= '  ]] ';
-        /*
-        if (!empty($field_info['field_description'])){
-            //$temp_find = array('{RECOVERY}', '{RECOVERY2}', '{DAMAGE}', '{DAMAGE2}');
-            //$temp_replace = array($temp_field_recovery, $temp_field_recovery2, $temp_field_damage, $temp_field_damage2);
-            //$temp_description = str_replace($temp_find, $temp_replace, $field_info['field_description']);
-            //$temp_field_title .= ' <br />'.$temp_description;
-            $temp_field_title .= $field_info['field_description'];
-        }
-        */
         // Return the generated option markup
         return $temp_field_title;
     }

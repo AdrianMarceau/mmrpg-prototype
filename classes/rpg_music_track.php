@@ -36,6 +36,7 @@ class rpg_music_track {
             'music_game',
             'music_name',
             'music_link',
+            'music_loop',
             'music_order',
             'legacy_music_token',
             'legacy_music_album',
@@ -59,6 +60,28 @@ class rpg_music_track {
 
     }
 
+    /**
+     * Get a list of all JSON-based music index fields as an array or, optionally, imploded into a string
+     * @param bool $implode
+     * @return mixed
+     */
+    public static function get_json_index_fields($implode = false){
+
+        // Define the various json index fields for player objects
+        $json_index_fields = array(
+            'music_loop'
+            );
+
+        // Implode the index fields into a string if requested
+        if ($implode){
+            $json_index_fields = implode(', ', $json_index_fields);
+        }
+
+        // Return the index fields, array or string
+        return $json_index_fields;
+
+    }
+
     // Define an alias function name for the above
     public static function get_fields($implode = false, $table = ''){
         return self::get_index_fields($implode, $table);
@@ -71,7 +94,7 @@ class rpg_music_track {
      * @param string $index_field (optional)
      * @return array
      */
-    public static function get_index($include_hidden = false, $include_disabled = false, $index_field = 'music_id'){
+    public static function get_index($include_hidden = false, $include_disabled = false, $index_field = 'music_id', $composite_field = false){
 
         // Pull in global variables
         $db = cms_database::get_database();
@@ -79,12 +102,37 @@ class rpg_music_track {
         // Define the query condition based on args
         $temp_where = '';
         //if (!$include_hidden){ ... }
-        if (!$include_disabled){ $temp_where .= 'AND music_flag_enabled = 1 '; }
+        //if (!$include_disabled){ $temp_where .= 'AND music_flag_enabled = 1 '; }
 
         // Collect every music's info from the database index
-        $music_dbname = self::get_dbname();
-        $music_fields = self::get_fields(true);
-        $music_index = $db->get_array_list("SELECT {$music_fields} FROM {$music_dbname}.mmrpg_index_music WHERE music_id <> 0 {$temp_where};", $index_field);
+        $music_dbname = (method_exists(__CLASS__, 'get_dbname') ? self::get_dbname() : MMRPG_CONFIG_CDN_DBNAME);
+        $music_fields = self::get_fields(true, 'music');
+        $music_query = "SELECT
+            {$music_fields}
+            FROM {$music_dbname}.`mmrpg_index_music` AS `music`
+            LEFT JOIN {$music_dbname}.`mmrpg_index_sources` AS `sources` ON `music`.`music_game` = `sources`.`source_token`
+            WHERE `music_id` <> 0 {$temp_where}
+            ORDER BY
+            `sources`.`source_order` ASC,
+            `music`.`music_order` ASC
+            ;";
+        $music_index = $db->get_array_list($music_query, $index_field);
+
+        // If the index field has multiple fields, we're parse that
+        if (!empty($composite_field)){
+            $new_music_index = array();
+            $composite_fields = strstr($composite_field, '+') ? explode('+', $composite_field) : array($composite_field);
+            foreach ($music_index AS $music_id => $music_info){
+                $lookup_token = array();
+                foreach ($composite_fields AS $field_name){
+                    if (isset($music_info[$field_name])){ $lookup_token[] = $music_info[$field_name]; }
+                    else { $lookup_token[] = $field_name; }
+                }
+                $lookup_token = implode('', $lookup_token);
+                $new_music_index[$lookup_token] = $music_info;
+            }
+            $music_index = $new_music_index;
+        }
 
         // Parse and return the data if not empty, else nothing
         if (!empty($music_index)){
@@ -119,7 +167,7 @@ class rpg_music_track {
         $where_string = implode(' OR ', $where_string);
 
         // Collect the requested music's info from the database index
-        $music_dbname = self::get_dbname();
+        $music_dbname = (method_exists(__CLASS__, 'get_dbname') ? self::get_dbname() : MMRPG_CONFIG_CDN_DBNAME);
         $music_fields = self::get_fields(true);
         $music_index = $db->get_array_list("SELECT {$music_fields} FROM {$music_dbname}.mmrpg_index_music WHERE music_id <> 0 AND ({$where_string});", $index_field);
 
@@ -148,10 +196,10 @@ class rpg_music_track {
         // Define the query condition based on args
         $temp_where = '';
         //if (!$include_hidden){ ... }
-        if (!$include_disabled){ $temp_where .= 'AND music_flag_enabled = 1 '; }
+        //if (!$include_disabled){ $temp_where .= 'AND music_flag_enabled = 1 '; }
 
         // Collect an array of music tokens from the database
-        $music_dbname = self::get_dbname();
+        $music_dbname = (method_exists(__CLASS__, 'get_dbname') ? self::get_dbname() : MMRPG_CONFIG_CDN_DBNAME);
         $music_index = $db->get_array_list("SELECT DISTINCT {$index_field} FROM {$music_dbname}.mmrpg_index_music WHERE music_id <> 0 {$temp_where};", $index_field);
 
         // Return the tokens if not empty, else nothing
@@ -189,7 +237,7 @@ class rpg_music_track {
 
         // Collect this music's info from the database index
         $lookup = !is_numeric($music_lookup) ? "music_type = '{$music_lookup}'" : "music_id = {$music_lookup}";
-        $music_dbname = self::get_dbname();
+        $music_dbname = (method_exists(__CLASS__, 'get_dbname') ? self::get_dbname() : MMRPG_CONFIG_CDN_DBNAME);
         $music_fields = self::get_fields(true);
         $music_index = $db->get_array("SELECT {$music_fields} FROM {$music_dbname}.mmrpg_index_music WHERE {$lookup};");
 
@@ -212,7 +260,7 @@ class rpg_music_track {
 
         // Loop through each entry and parse its data
         foreach ($music_index AS $token => $info){
-            $music_index[$token] = self::parse_music_info($info);
+            $music_index[$token] = self::parse_info($info);
         }
 
         // Return the parsed index
@@ -234,9 +282,24 @@ class rpg_music_track {
         if (!empty($music_info['_parsed'])){ return $music_info; }
         else { $music_info['_parsed'] = true; }
 
+        // Explode the weaknesses, resistances, affinities, and immunities into an array
+        $temp_field_names = self::get_json_index_fields();
+        foreach ($temp_field_names AS $field_name){
+            if (!empty($music_info[$field_name])){ $music_info[$field_name] = json_decode($music_info[$field_name], true); }
+            else { $music_info[$field_name] = array(); }
+        }
+
         // Return the parsed music info
         return $music_info;
     }
+
+
+
+    // -- MISC HELPER FUNCTIONS -- //
+
+
+    /* ... */
+
 
 }
 ?>

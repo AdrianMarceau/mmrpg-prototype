@@ -139,16 +139,7 @@ if (!empty($mmrpg_database_items)){
         $item_image_token = !empty($item_info['item_image']) ? $item_info['item_image'] : $item_token;
         $item_image_incomplete = $item_image_token == 'item' ? true : false;
         $item_is_active = !empty($this_current_token) && $this_current_token == $item_info['item_token'] ? true : false;
-        $item_title_text = $item_info['item_name']; //.' | '.$item_info['item_game'].' | '.$item_info['item_group'];;
-        //$item_image_path = 'images/items/'.$item_image_token.'/icon_right_'.$item_image_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
-        if (false && !empty($item_info['item_description'])){
-            $temp_description = $item_info['item_description'];
-            $temp_description = str_replace('{DAMAGE}', $item_info['item_damage'], $temp_description);
-            $temp_description = str_replace('{DAMAGE2}', $item_info['item_damage2'], $temp_description);
-            $temp_description = str_replace('{RECOVERY}', $item_info['item_recovery'], $temp_description);
-            $temp_description = str_replace('{RECOVERY2}', $item_info['item_recovery2'], $temp_description);
-            $item_title_text .= '|| [['.$temp_description.']]';
-        }
+        $item_title_text = $item_info['item_name'];
         $item_image_path = 'images/items/'.$item_image_token.'/icon_right_'.$item_image_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
         $item_type_class = !empty($item_info['item_type']) ? $item_info['item_type'] : 'none';
         if ($item_type_class != 'none' && !empty($item_info['item_type2'])){ $item_type_class .= '_'.$item_info['item_type2']; }

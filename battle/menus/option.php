@@ -7,13 +7,13 @@ ob_start();
 	$temp_options = array();
 	$block_num = 0;
 
-	// Display the option for CHARGE WEAPONS
-	$block_num++;
-	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_defense" type="button" data-action="ability_9_action-chargeweapons"><label><span class="multi">Charge<br />Weapons</span></label></a>';
-
 	// Display the option for SKIP TURN
 	$block_num++;
 	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_speed" type="button" data-action="ability_8_action-noweapons"><label><span class="multi">Skip<br />Turn</span></label></a>';
+
+	// Display the option for CHARGE WEAPONS
+	$block_num++;
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_defense" type="button" data-action="ability_9_action-chargeweapons"><label><span class="multi">Manual<br />Recharge</span></label></a>';
 
 	// Display the option for RESTART BATTLE
 	$block_num++;
@@ -23,21 +23,21 @@ ob_start();
 	$block_num++;
 	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_attack" type="button" data-action="prototype"><label><span class="multi">Return&nbsp;To<br />Main&nbsp;Menu</span></label></a>';
 
+    // Display a SPACERs in this slot
+    $block_num++;
+    $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option button_disabled block_'.$block_num.'" type="button">&nbsp;</a>';
+
+    // Display the option for ANIMATION SETTINGS
+    $block_num++;
+    $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-panel="settings_animationEffects"><label><span class="multi">Animation<br />Settings</span></label></a>';
+
     // Display the option for RESTART MUSIC
     $block_num++;
     $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" onclick="parent.mmrpg_music_load(\''.(!strstr($this_field->field_music, '/') ? 'fields/'.$this_field->field_music : $this_field->field_music).'\', true);"><label><span class="multi">Restart<br />Music</span></label></a>';
 
-    // Display the option for RENDER MODE
-    $block_num++;
-    $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-panel="settings_spriteRenderMode"><label><span class="multi">Sprite<br />Rendering</span></label></a>';
-
-    // Display the option for ANIMATION SPEED
-    $block_num++;
-    $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-panel="settings_eventTimeout"><label><span class="multi">Animation<br />Speed</span></label></a>';
-
-    // Display the option for ANIMATION EFFECT
-    $block_num++;
-    $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-panel="settings_eventCrossFade"><label><span class="multi">Animation<br />Effect</span></label></a>';
+    // Display a SPACER in this slot
+    //$block_num++;
+    //$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option button_disabled block_'.$block_num.'" type="button">&nbsp;</a>';
 
 	// If we're on the LOCAL or DEV build, display exrta options
 	if (MMRPG_CONFIG_SERVER_ENV === 'local' || MMRPG_CONFIG_SERVER_ENV === 'dev'){
@@ -75,7 +75,7 @@ ob_start();
                 echo '<span class="float_title">Select Option</span> ';
                 echo '<span class="float_links">';
                     echo '<span class="page">Page</span>';
-                    for ($i = 1; $i <= $current_options_pages; $i++){ echo '<a class="num'.($i == $temp_selected_page ? ' active' : '').'" href="#'.$i.'">'.$i.'</a>'; }
+                    for ($i = 1; $i <= $current_options_pages; $i++){ echo '<a class="button num'.($i == $temp_selected_page ? ' active' : '').'" href="#'.$i.'">'.$i.'</a>'; }
                 echo '</span> ';
             }
             // Otherwise, simply print the item select text label

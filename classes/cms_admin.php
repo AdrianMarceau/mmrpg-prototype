@@ -53,12 +53,25 @@ class cms_admin {
     }
 
     // Define a function for checking if a given string of PHP code has valid syntax
-    public static function is_valid_php_syntax($fileContent){
-        $filename = tempnam('/tmp', '_');
-        file_put_contents($filename, $fileContent);
-        exec("php -l {$filename}", $output, $return);
+    public static function is_valid_php_syntax($file_content){
+        $file_name = tempnam('/tmp', '_');
+        file_put_contents($file_name, $file_content);
+        //error_log('cms_admin::is_valid_php_syntax($file_content)');
+        /*
+        $command = "which php";
+        exec($command, $output, $return);
         $output = trim(implode(PHP_EOL, $output));
-        unlink($filename);
+        error_log('$command = '.print_r($command, true));
+        error_log('$output = '.print_r($output, true));
+        error_log('$return = '.print_r($return, true));
+        */
+        $command = "php -l {$file_name}";
+        exec($command, $output, $return);
+        $output = trim(implode(PHP_EOL, $output));
+        //error_log('$command = '.print_r($command, true));
+        //error_log('$output = '.print_r($output, true));
+        //error_log('$return = '.print_r($return, true));
+        unlink($file_name);
         return $return === 0 ? true : false;
     }
 

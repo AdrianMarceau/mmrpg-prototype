@@ -23,24 +23,71 @@ if (strstr($page_content_parsed, $find)){
     $page_content_parsed = str_replace($find, $replace, $page_content_parsed);
 }
 
+// Parse the pseudo-code tag <!-- MMRPG_LEADERBOARD_SUBHEAD_FILTER -->
+$find = '<!-- MMRPG_LEADERBOARD_SUBHEAD_FILTER -->';
+if (strstr($page_content_parsed, $find)){
+    $replace = '';
+    $replace = '(Ranked by '.$this_leaderboard_metric_info['name'].')';
+    $page_content_parsed = str_replace($find, $replace, $page_content_parsed);
+}
+
+// Parse the pseudo-code tag <!-- MMRPG_LEADERBOARD_METRIC_NAME -->
+$find = '<!-- MMRPG_LEADERBOARD_METRIC_NAME -->';
+if (strstr($page_content_parsed, $find)){
+    $replace = $this_leaderboard_metric_info['name'];
+    $page_content_parsed = str_replace($find, $replace, $page_content_parsed);
+}
+
+// Parse the pseudo-code tag <!-- MMRPG_LEADERBOARD_METRIC_SHORTNAME -->
+$find = '<!-- MMRPG_LEADERBOARD_METRIC_SHORTNAME -->';
+if (strstr($page_content_parsed, $find)){
+    $replace = ucfirst($this_leaderboard_metric_info['url']);
+    $page_content_parsed = str_replace($find, $replace, $page_content_parsed);
+}
+
 // Parse the pseudo-code tag <!-- MMRPG_LEADERBOARD_METRIC_TEXT -->
 $find = '<!-- MMRPG_LEADERBOARD_METRIC_TEXT -->';
 if (strstr($page_content_parsed, $find)){
-    $replace = '';
-    if ($this_leaderboard_metric === 'battle_points'){ $replace = 'Battle Point'; }
-    elseif ($this_leaderboard_metric === 'battle_zenny'){ $replace = 'zenny'; }
+    $replace = strtolower($this_leaderboard_metric_info['name']);
     $page_content_parsed = str_replace($find, $replace, $page_content_parsed);
 }
 
 // Parse the pseudo-code tag <!-- MMRPG_LEADERBOARD_METRIC_METHOD -->
 $find = '<!-- MMRPG_LEADERBOARD_METRIC_METHOD -->';
 if (strstr($page_content_parsed, $find)){
-    $replace = '';
-    if ($this_leaderboard_metric === 'battle_points'){
-        $replace = 'Players earn Battle Points throughout the course of the game by completing certain events, collecting items, unlocking new robots or abilities, and by doing or collecting lots of other things as well.';
-    } elseif ($this_leaderboard_metric === 'battle_zenny'){
-        $replace = 'Players earn zenny throughout the course of the game by completing missions, selling items, or other miscellaneous tasks.';
+    $replace = $this_leaderboard_metric_info['text'];
+    $page_content_parsed = str_replace($find, $replace, $page_content_parsed);
+}
+
+// Parse the pseudo-code tag <!-- MMRPG_LEADERBOARD_FILTER_OPTIONS -->
+$find = '<!-- MMRPG_LEADERBOARD_FILTER_OPTIONS -->';
+if (strstr($page_content_parsed, $find)){
+    ob_start();
+    if (true){
+        ?>
+        <div class="ranking-options">
+            <div class="event text">
+                <strong class="label"><span>Ranked By</span>:</strong>
+                <?
+                $leaderboard_metric_index_tokens = array_keys($leaderboard_metric_index);
+                foreach ($leaderboard_metric_index_tokens AS $key => $token){
+                    if ($key > 0){ echo('<span class="pipe">|</span> '); }
+                    $info = $leaderboard_metric_index[$token];
+                    $active = $token === $this_leaderboard_metric ? true : false;
+                    $class = 'ranking';
+                    $class .= ($active ? ' active type_span type_'.MMRPG_SETTINGS_CURRENT_FIELDTYPE : '');
+                    $url = $base_leaderboard_url.($token !== MMRPG_SETTINGS_DEFAULT_LEADERBOARD_METRIC ? 'by-'.$info['url'].'/' : '');
+                    echo('<a class="'.$class.'" href="'.$url.'">');
+                        echo('<strong>'.ucfirst($info['url']).'</strong>');
+                        if (!empty($info['icon'])){ echo(' <i class="fa fa-fw '.$info['icon'].'"></i>'); }
+                        else { echo(' <i class="fa fa-fw pfa-'.str_replace('_', '-', $token).'"></i>'); }
+                    echo('</a> ');
+                } ?>
+            </div>
+        </div>
+        <?
     }
+    $replace = ob_get_clean();
     $page_content_parsed = str_replace($find, $replace, $page_content_parsed);
 }
 
@@ -50,20 +97,22 @@ if (strstr($page_content_parsed, $find)){
     ob_start();
     if (!empty($this_leaderboard_online_players)){
         ?>
-        <p class="event text" style="min-height: 1px; text-align: right; font-size: 10px; line-height: 13px; margin-top: 30px; padding-bottom: 5px;">
-                <span><strong style="display: block; text-decoration: underline; margin-bottom: 6px;">Online Players</strong></span>
+        <div class="online-players">
+            <div class="event text">
+                <strong class="label">Online Players</strong>
                 <? foreach ($this_leaderboard_online_players AS $key => $info){
-                        if (empty($info['image'])){ $info['image'] = 'robots/mega-man/40'; }
-                        list($path, $token, $size) = explode('/', $info['image']);
-                        $frame = $info['placeint'] <= 3 ? 'victory' : 'base';
-                        $colour = $info['colour'].(!empty($info['colour']) && !empty($info['colour2']) ? '_'.$info['colour2'] : '');
-                        if ($key > 0 && $key % 5 == 0){ echo '<br />'; }
-                        echo ' <a data-playerid="'.$info['id'].'" class="player_type player_type_'.$colour.'" href="leaderboard/'.$info['token'].'/" style="text-decoration: none; line-height: 20px; padding-right: 12px; margin: 0 0 0 6px; white-space: nowrap;">';
-                                echo '<span style="pointer-events: none; display: inline-block; width: 34px; height: 14px; position: relative;"><span class="sprite sprite_'.$size.'x'.$size.' sprite_'.$size.'x'.$size.'_'.$frame.'" style="margin: 0; position: absolute; left: '.($size == 40 ? -4 : -26).'px; bottom: 0; background-image: url(images/'.$path.'/'.$token.'/sprite_left_'.$size.'x'.$size.'.png?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</span></span>';
-                                echo '<span style="vertical-align: top; line-height: 18px; white-space: nowrap;">'.strip_tags($info['place']).' : '.$info['name'].'</span>';
-                        echo '</a>';
+                    if (empty($info['image'])){ $info['image'] = 'robots/mega-man/40'; }
+                    list($path, $token, $size) = explode('/', $info['image']);
+                    $frame = $info['placeint'] <= 3 ? 'victory' : 'base';
+                    $colour = $info['colour'].(!empty($info['colour']) && !empty($info['colour2']) ? '_'.$info['colour2'] : '');
+                    if ($key > 0 && $key % 5 == 0){ echo '<br />'; }
+                    echo('<a data-playerid="'.$info['id'].'" class="player_type player_type_'.$colour.'" href="'.$current_leaderboard_url.$info['token'].'/">');
+                        echo('<span class="sprite-wrap"><span class="sprite sprite_'.$size.'x'.$size.' sprite_'.$size.'x'.$size.'_'.$frame.'" style="left: '.($size == 40 ? -4 : -26).'px; background-image: url(images/'.$path.'/'.$token.'/sprite_left_'.$size.'x'.$size.'.png?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</span></span>');
+                        echo('<span class="name-wrap">'.strip_tags($info['place']).' : '.$info['name'].'</span>');
+                    echo('</a> ');
                 } ?>
-        </p>
+            </div>
+        </div>
         <?
     }
     $replace = ob_get_clean();
@@ -126,7 +175,7 @@ if (strstr($page_content_parsed, $find)){
                             if ($new_display_limit < $this_display_limit_default){ $new_display_limit = 0; }
                             if ($new_start_key < 0){ $new_start_key = 0; }
                             $previous_page_num = $this_current_num - 1;
-                            echo '<a class="link prev" href="leaderboard/'.$previous_page_num.'/" >&laquo; Prev</a>';
+                            echo '<a class="link prev" href="'.$current_leaderboard_url.$previous_page_num.'/" >&laquo; Prev</a>';
                         }
 
                         // If not displaying all players, create a link to show more
@@ -134,11 +183,11 @@ if (strstr($page_content_parsed, $find)){
                             $new_display_limit = $this_display_limit + $this_display_limit_default;
                             if ($new_display_limit > $this_leaderboard_count){ $new_display_limit = $this_leaderboard_count; }
                             $next_page_num = $this_current_num + 1;
-                            echo '<a class="link next" href="leaderboard/'.$next_page_num.'/" >Next &raquo;</a>';
+                            echo '<a class="link next" href="'.$current_leaderboard_url.$next_page_num.'/" >Next &raquo;</a>';
                         }
                         // If we're already on the last page, display a link to go to the first
                         elseif ($this_display_limit >= $this_leaderboard_count){
-                            echo '<a class="link next" href="leaderboard/">First &raquo;</a>';
+                            echo '<a class="link next" href="'.$current_leaderboard_url.'">First &raquo;</a>';
                         }
 
                         // Create links for all the page numbers one by one
@@ -154,7 +203,7 @@ if (strstr($page_content_parsed, $find)){
                                 $show_num_type = $show_page_num ? 'number' : 'bullet';
                                 $show_online = in_array($this_page_num, $this_leaderboard_online_pages) ? true : false;
                                 if ($this_current_num == $this_page_num){ echo '<a class="link '.$show_num_type.' active '.($show_online ? 'field_type field_type_nature' : '').'"><span>'.$this_page_num.'</span></a>'; }
-                                else { echo '<a class="link '.$show_num_type.' '.($show_online ? 'field_type field_type_nature' : '').'" href="leaderboard/'.($this_page_num > 1 ? $this_page_num.'/' : '').'" ><span>'.$this_page_num.'</span></a>'; }
+                                else { echo '<a class="link '.$show_num_type.' '.($show_online ? 'field_type field_type_nature' : '').'" href="'.$current_leaderboard_url.($this_page_num > 1 ? $this_page_num.'/' : '').'" ><span>'.$this_page_num.'</span></a>'; }
                             }
                         }
 

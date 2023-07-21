@@ -7,8 +7,9 @@ $this_prototype_data['this_player_token'] = 'dr-wily';
 $this_prototype_data['this_intro_field'] = 'maniacal-hideaway';
 $this_prototype_data['this_player_field'] = 'wily-castle';
 $this_prototype_data['this_support_robot'] = 'disco';
+$this_prototype_data['this_intro_targets'] = array('met', 'skeleton-joe', 'trill/defense');
 $this_prototype_data['this_chapter_levels'] = array(
-    0 => 1,   // Intro
+    0 => 10,   // Intro
     1 => 12,  // Singles
     2 => 20,  // Rivals
     3 => 25,  // Doubles
@@ -22,12 +23,13 @@ $this_prototype_data['battle_phase'] = 0;
 $this_prototype_data['battle_options'] = array();
 $this_prototype_data['missions_markup'] = '';
 $this_prototype_data['battles_complete'] = mmrpg_prototype_battles_complete($this_prototype_data['this_player_token']);
-$this_prototype_data['battles_complete_debug'] = $battle_complete_counter_wily;
 $this_prototype_data['phase_token'] = 'phase'.$this_prototype_data['battle_phase'];
 $this_prototype_data['phase_battle_token'] = $this_prototype_data['this_player_token'].'-'.$this_prototype_data['phase_token'];
 $this_prototype_data['robots_unlocked'] = mmrpg_prototype_robots_unlocked($this_prototype_data['this_player_token']);
 $this_prototype_data['points_unlocked'] = mmrpg_prototype_player_points($this_prototype_data['this_player_token']);
 $this_prototype_data['prototype_complete'] = $prototype_complete_flag_wily;
+$this_prototype_data['prev_player_token'] = 'dr-light';
+$this_prototype_data['next_player_token'] = 'dr-cossack';
 
 // Define the stage select music based on progression
 $this_music_token = $this_prototype_data['battles_complete'] >= 10 ? $this_prototype_data['target_player_token'] : $this_prototype_data['this_player_token'];

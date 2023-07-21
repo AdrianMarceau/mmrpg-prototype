@@ -251,6 +251,15 @@ body.windowFlag_landscapeMode #prototype {
     margin: 0;
     min-height: 278px;
 }
+#edit #console .event[data-size="1"] {
+    min-height: 140px;
+}
+#edit #console .event[data-size="2"] {
+    min-height: 202px;
+}
+#edit #console .event[data-size="2"] {
+    min-height: 278px;
+}
 #edit #console .event_hidden {
     display: none;
 }

@@ -120,9 +120,23 @@ class rpg_game {
         // If the field index has not been created, do so
         if (!isset(self::$index['fields'])){ self::$index['fields'] = array(); }
 
+        // If the field was not provided at all, we can assume a stub
+        if (empty($this_fieldinfo)){ $this_fieldinfo = array('field_token' => 'field'); }
+
         // Check if a field ID has been defined
         if (isset($this_fieldinfo['field_id'])){
             $field_id = $this_fieldinfo['field_id'];
+        }
+        // Otherwise if only a field token was defined
+        elseif (isset($this_fieldinfo['field_token'])){
+            $field_id = 0;
+            $field_token = $this_fieldinfo['field_token'];
+            foreach (self::$index['fields'] AS $field){
+                if ($field_token == $field->field_token){
+                    $field_id = $field->field_id;
+                    break;
+                }
+            }
         }
 
         // If this field has already been created, retrieve it
@@ -157,6 +171,9 @@ class rpg_game {
 
         // If the player index has not been created, do so
         if (!isset(self::$index['players'])){ self::$index['players'] = array(); }
+
+        // If the player was not provided at all, we can assume a stub
+        if (empty($this_playerinfo)){ $this_playerinfo = array('player_token' => 'player'); }
 
         // Check if a player ID has been defined
         if (isset($this_playerinfo['player_id'])){
@@ -217,6 +234,9 @@ class rpg_game {
         // If the robot index has not been created, do so
         if (!isset(self::$index['robots'])){ self::$index['robots'] = array(); }
 
+        // If the robot was not provided at all, we can assume a stub
+        if (empty($this_robotinfo)){ $this_robotinfo = array('robot_token' => 'robot'); }
+
         // Check if a robot ID has been defined
         if (isset($this_robotinfo['robot_id'])){
             $robot_id = $this_robotinfo['robot_id'];
@@ -276,6 +296,9 @@ class rpg_game {
 
         // If the ability index has not been created, do so
         if (!isset(self::$index['abilities'])){ self::$index['abilities'] = array(); }
+
+        // If the ability was not provided at all, we can assume a stub
+        if (empty($this_abilityinfo)){ $this_abilityinfo = array('ability_token' => 'ability'); }
 
         // Check if a ability ID has been defined
         if (isset($this_abilityinfo['ability_id'])){
@@ -338,6 +361,9 @@ class rpg_game {
         // If the item index has not been created, do so
         if (!isset(self::$index['items'])){ self::$index['items'] = array(); }
 
+        // If the item was not provided at all, we can assume a stub
+        if (empty($this_iteminfo)){ $this_iteminfo = array('item_token' => 'item'); }
+
         // Check if a item ID has been defined
         if (isset($this_iteminfo['item_id'])){
             $item_id = $this_iteminfo['item_id'];
@@ -398,6 +424,9 @@ class rpg_game {
 
         // If the skill index has not been created, do so
         if (!isset(self::$index['skills'])){ self::$index['skills'] = array(); }
+
+        // If the skill was not provided at all, we can assume a stub
+        if (empty($this_skillinfo)){ $this_skillinfo = array('skill_token' => 'skill'); }
 
         // Check if a skill ID has been defined
         if (isset($this_skillinfo['skill_id'])){
@@ -872,191 +901,7 @@ class rpg_game {
 
     // Define a function for unlocking a game robot for use in battle
     public static function unlock_robot($player_info, $robot_info, $unlock_abilities = true, $events_create = true){
-
-        // Reference the global variables
-        global $db;
-        global $mmrpg_index_players;
-        if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
-
-        //$_SESSION[$session_token] = &$_SESSION[self::session_token()];
-        $session_token = self::session_token();
-
-        // If the player info was a string, create the info array
-        if (is_string($player_info)){ $player_info = array('player_token' => $player_info); }
-        // Else if the player token does not exist, return false
-        elseif (is_array($player_info) && !isset($player_info['player_token'])){ return false; }
-
-        // If the robot info was a string, create the info array
-        if (is_string($robot_info)){ $robot_info = array('robot_token' => $robot_info); }
-        // Else if the robot token does not exist, return false
-        elseif (is_array($robot_info) && !isset($robot_info['robot_token'])){ return false; }
-
-        // Define a reference to the game's session flag variable
-        if (empty($_SESSION[$session_token]['flags'])){ $_SESSION[$session_token]['flags'] = array(); }
-        $temp_game_flags = &$_SESSION[$session_token]['flags'];
-
-        // If this robot does not exist in the global index, return false
-        //if (!isset($player_info['player_token'])){ echo 'player_info<pre>'.print_r($player_info, true).'</pre>'; }
-        $player_index_info = $mmrpg_index_players[$player_info['player_token']];
-        $robot_index_info = !empty($robot_info['_parsed']) ? $robot_info : rpg_robot::get_index_info($robot_info['robot_token']);
-        if (!isset($player_index_info)){ return false; }
-        if (!isset($robot_index_info)){ return false; }
-
-        // Collect the robot info from the inde
-        $this_robot_token = $robot_info['robot_token'];
-        $this_player_token = $player_info['player_token'];
-        $this_robot_level = !empty($robot_info['robot_level']) ? $robot_info['robot_level'] : 1;
-        $this_robot_experience = !empty($robot_info['robot_experience']) ? $robot_info['robot_experience'] : 0;
-        $player_info = array_replace($player_index_info, $player_info);
-        $robot_info = array_replace($robot_index_info, $robot_info);
-
-        // Collect or define the robot points and robot rewards variables
-        $this_robot_rewards = !empty($robot_info['robot_rewards']) ? $robot_info['robot_rewards'] : array();
-
-        // Automatically unlock this robot for use in battle and create the settings array
-        $this_reward = array(
-            'flags' => array(),
-            'values' => array(),
-            'counters' => array(),
-            'robot_token' => $this_robot_token,
-            'robot_level' => $this_robot_level,
-            'robot_experience' => $this_robot_experience,
-            'robot_energy' => 0,
-            'robot_attack' => 0,
-            'robot_defense' => 0,
-            'robot_speed' => 0,
-            'robot_energy_pending' => 0,
-            'robot_attack_pending' => 0,
-            'robot_defense_pending' => 0,
-            'robot_speed_pending' => 0
-            );
-        $_SESSION[$session_token]['values']['battle_rewards'][$player_info['player_token']]['player_robots'][$this_robot_token] = $this_reward;
-        if (empty($_SESSION[$session_token]['values']['battle_settings'][$player_info['player_token']]['player_robots'])
-            || empty($_SESSION[$session_token]['values']['battle_settings'][$player_info['player_token']]['player_robots'][$this_robot_token])
-            || count($_SESSION[$session_token]['values']['battle_settings'][$player_info['player_token']]['player_robots']) < 8){
-            $this_setting = array(
-                'flags' => array(),
-                'values' => array(),
-                'counters' => array(),
-                'robot_token' => $this_robot_token,
-                'robot_abilities' => array(),
-                'original_player' => $player_info['player_token']
-                );
-            $_SESSION[$session_token]['values']['battle_settings'][$player_info['player_token']]['player_robots'][$this_robot_token] = $this_setting;
-        }
-
-        // Add this robot to the global robot database array
-        $temp_data_existed = !empty($_SESSION[$session_token]['values']['robot_database'][$this_robot_token]) ? true : false;
-        if (!isset($_SESSION[$session_token]['values']['robot_database'][$this_robot_token])){ $_SESSION[$session_token]['values']['robot_database'][$this_robot_token] = array('robot_token' => $this_robot_token); }
-        if (!isset($_SESSION[$session_token]['values']['robot_database'][$this_robot_token]['robot_unlocked'])){ $_SESSION[$session_token]['values']['robot_database'][$this_robot_token]['robot_unlocked'] = 1; }
-        if (!isset($_SESSION[$session_token]['values']['robot_database'][$this_robot_token]['robot_summoned'])){ $_SESSION[$session_token]['values']['robot_database'][$this_robot_token]['robot_summoned'] = 0; }
-        if (!isset($_SESSION[$session_token]['values']['robot_database'][$this_robot_token]['robot_encountered'])){ $_SESSION[$session_token]['values']['robot_database'][$this_robot_token]['robot_encountered'] = 0; }
-        if (!isset($_SESSION[$session_token]['values']['robot_database'][$this_robot_token]['robot_scanned'])){ $_SESSION[$session_token]['values']['robot_database'][$this_robot_token]['robot_scanned'] = 0; }
-        //$_SESSION[$session_token]['values']['robot_database'][$this_robot_token]['robot_unlocked']++;
-
-        // Only show the event if allowed by the function args
-        if ($events_create){
-
-            // Generate the attributes and text variables for this robot unlock
-            $robot_info_size = isset($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] * 2 : 40 * 2;
-            $robot_info_size_token = $robot_info_size.'x'.$robot_info_size;
-            $this_name = $robot_info['robot_name'];
-            $this_description = !empty($robot_info['robot_description']) && $robot_info['robot_description'] != '...' ? $robot_info['robot_description'] : '';
-            $this_number = $robot_info['robot_number'];
-            $this_energy_boost = round($robot_info['robot_energy'] * 0.05, 1);
-            $this_attack_boost = round($robot_info['robot_attack'] * 0.05, 1);
-            $this_defense_boost = round($robot_info['robot_defense'] * 0.05, 1);
-            $this_speed_boost = round($robot_info['robot_speed'] * 0.05, 1);
-            $this_find = array('{this_player}', '{this_robot}', '{target_player}', '{target_robot}');
-            $this_replace = array($player_info['player_name'], $robot_info['robot_name'], $player_info['player_name'], ($this_player_token == 'dr-light' ? 'Mega Man' : ($this_player_token == 'dr-wily' ? 'Bass' : ($this_player_token == 'dr-cossack' ? 'Proto Man' : 'Robot'))));
-            $this_quote = !empty($robot_info['robot_quotes']['battle_taunt']) ? str_replace($this_find, $this_replace, $robot_info['robot_quotes']['battle_taunt']) : '...';
-            $default_field = rpg_player::get_intro_field($this_player_token);
-            $this_field = rpg_field::get_index_info(!empty($robot_info['robot_field']) ? $robot_info['robot_field'] : $default_field);
-
-            $this_pronoun = rpg_robot::get_robot_pronoun($robot_info['robot_class'], $robot_info['robot_gender'], 'subject');
-            $this_posessive2 = rpg_robot::get_robot_pronoun($robot_info['robot_class'], $robot_info['robot_gender'], 'possessive2');
-
-            $this_congrats = 'Congratulations!';
-            if ($robot_info['robot_core'] === '' && $robot_info['robot_gender'] === 'female'){ $this_congrats = '<strong>'.$this_name.'</strong> to the rescue!'; }
-
-            $this_best_stat = $robot_info['robot_energy'];
-            $this_best_attribute = empty($robot_info['robot_core']) ? 'a support' : 'a hardy';
-            if ($robot_info['robot_attack'] > $this_best_stat){ $this_best_stat = $robot_info['robot_attack']; $this_best_attribute = 'a powerful'; }
-            elseif ($robot_info['robot_defense'] > $this_best_stat){ $this_best_stat = $robot_info['robot_defense']; $this_best_attribute = 'a defensive'; }
-            elseif ($robot_info['robot_speed'] > $this_best_stat){ $this_best_stat = $robot_info['robot_speed']; $this_best_attribute = 'a speedy'; }
-            if ($robot_info['robot_token'] == 'met'){ $this_best_attribute = 'bonus'; }
-
-            $source_game_name = self::get_source_name($robot_info['robot_game'], true);
-            $source_game_info = self::get_source_info($robot_info['robot_game']);
-            if (in_array($robot_info['robot_token'], array('bond-man'))){
-                $this_first_appearance = 'making '.$this_posessive2.' first playable debut in the <em>'.$source_game_name.'</em>';
-            } elseif (strstr($robot_info['robot_game'], 'MMRPG')){
-                $this_first_appearance = 'making '.$this_posessive2.' debut in the <em>'.$source_game_name.'</em>';
-            } else {
-                if ($source_game_info['source_kind'] !== 'game'){ $this_first_appearance = 'that first appeared in the <em>'.$source_game_name.'</em> '.$source_game_info['source_kind']; }
-                else { $this_first_appearance = 'that first appeared in <em>'.$source_game_name.'</em> for the '.$source_game_info['source_systems']; }
-            }
-
-
-            $this_first_ability = array('level' => 0, 'token' => 'buster-shot');
-            $this_count_abilities = count($robot_info['robot_rewards']['abilities']);
-            //die('<pre>'.print_r($robot_info['robot_rewards']['abilities'], true).'</pre>');
-            foreach ($robot_info['robot_rewards']['abilities'] AS $temp_key => $temp_reward){ if ($temp_reward['token'] != 'buster-shot' && $temp_reward['level'] > 0){ $this_first_ability = $temp_reward; break; } }
-            //die('<pre>'.print_r($this_first_ability, true).'</pre>');
-            if ($this_first_ability['level'] == 0){ $this_level = 1; }
-            else { $this_level = $this_first_ability['level']; }
-
-            $this_weaknesses = !empty($robot_info['robot_weaknesses']) ? $robot_info['robot_weaknesses'] : array();
-            $this_resistances = !empty($robot_info['robot_resistances']) ? $robot_info['robot_resistances'] : array();
-            $this_affinities = !empty($robot_info['robot_affinities']) ? $robot_info['robot_affinities'] : array();
-            $this_immunities = !empty($robot_info['robot_immunities']) ? $robot_info['robot_immunities'] : array();
-            foreach ($this_weaknesses AS $key => $token){ $this_weaknesses[$key] = '<strong class="ability_type ability_type_'.$token.'">'.ucfirst($token).'</strong>'; }
-            foreach ($this_resistances AS $key => $token){ $this_resistances[$key] = '<strong class="ability_type ability_type_'.$token.'">'.ucfirst($token).'</strong>'; }
-            foreach ($this_affinities AS $key => $token){ $this_affinities[$key] = '<strong class="ability_type ability_type_'.$token.'">'.ucfirst($token).'</strong>'; }
-            foreach ($this_immunities AS $key => $token){ $this_immunities[$key] = '<strong class="ability_type ability_type_'.$token.'">'.ucfirst($token).'</strong>'; }
-            //$this_weaknesses = implode(', ', $this_weaknesses);
-            //$this_resistances = implode(', ', $this_resistances);
-            //$this_affinities = implode(', ', $this_affinities);
-            //$this_immunities = implode(', ', $this_immunities);
-            // Generate the window event's canvas and message markup then append to the global array
-            $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">'.$this_field['field_name'].'</div>';
-            $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">'.$this_field['field_name'].'</div>';
-            $temp_canvas_markup .= '<div class="sprite sprite_'.$robot_info_size_token.' sprite_'.$robot_info_size_token.'_victory" style="background-image: url(images/robots/'.$robot_info['robot_token'].'/sprite_right_'.$robot_info_size_token.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: '.(200 - (($robot_info_size - 80) * 0.5)).'px;">'.$robot_info['robot_name'].'</div>';
-            $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/players/'.$player_info['player_token'].'/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; right: 200px;">'.$player_info['player_name'].'</div>';
-            //$temp_console_markup = '<p>Congratulations!  <strong>'.$player_info['player_name'].'</strong> unlocked <strong>'.$this_name.'</strong> '.(!empty($this_description) ? '- the '.str_replace('Robot', 'robot', $this_description).' -' : '').' ('.$this_number.') as a playable character! &quot;<em>'.$this_quote.'</em>&quot; <strong>'.$this_name.'</strong> is '.$this_best_attribute.' '.(!empty($robot_info['robot_core']) ? '<strong class="robot_type robot_type_'.$robot_info['robot_core'].'">'.ucfirst($robot_info['robot_core']).' Core</strong> ' : '<strong class="robot_type robot_type_none">Neutral Core</strong> ').'robot '.$this_first_appearance.'.</p>';
-            $temp_console_markup = '<p>'.$this_congrats.'  <strong>'.$player_info['player_name'].'</strong> unlocked <strong>'.$this_name.'</strong> as a playable character! <strong>'.$this_name.'</strong> is '.$this_best_attribute.' '.(!empty($robot_info['robot_core']) ? '<strong data-class="robot_type robot_type_'.$robot_info['robot_core'].'">'.ucfirst($robot_info['robot_core']).' Core</strong> ' : '<strong data-class="robot_type robot_type_none">Neutral Core</strong> ').'robot '.$this_first_appearance.'. <strong>'.$this_name.'</strong>&#39;s data was '.($temp_data_existed ? 'updated in ' : 'added to ' ).' the <strong>Robot Database</strong>.</p>';
-            $temp_console_markup .= '<div id="console" style="width: auto; height: auto;"><div class="extra"><div class="extra2">'.preg_replace('/\s+/', ' ', rpg_robot::print_database_markup($robot_info, array('layout_style' => 'event'))).'</div></div></div>';
-            //die(''.$this_robot_token.': '.$temp_console_markup);
-
-            $_SESSION[$session_token]['EVENTS'][] = array(
-                'canvas_markup' => $temp_canvas_markup,
-                'console_markup' => $temp_console_markup
-                );
-
-        }
-
-        // Loop through the ability rewards for this robot if set
-        if ($unlock_abilities && !empty($this_robot_rewards['abilities'])){
-            // Collect the ability index for calculation purposes
-            $this_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
-            foreach ($this_robot_rewards['abilities'] AS $ability_reward_key => $ability_reward_info){
-                // Check if the required amount of points have been met by this robot
-                if ($this_robot_level >= $ability_reward_info['level']){
-                    // Unlock this ability
-                    $this_ability_info = rpg_ability::parse_index_info($this_ability_index[$ability_reward_info['token']]);
-                    $this_ability_info['ability_points'] = $ability_reward_info['level'];
-                    $show_event = !self::ability_unlocked('', '', $ability_reward_info['token']) ? true : false;
-                    self::unlock_ability($player_info, $robot_info, $this_ability_info, $show_event);
-                }
-            }
-        }
-
-        // Create the event flag for unlocking this robot
-        $temp_game_flags['events']['unlocked-robot_'.$this_robot_token] = true;
-        if (!empty($this_player_token)){ $temp_game_flags['events']['unlocked-robot_'.$this_player_token.'_'.$this_robot_token] = true; }
-
-        // Return true on success
-        return true;
+        return mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities, $events_create);
     }
 
 
@@ -1311,126 +1156,7 @@ class rpg_game {
 
     // Define a function for unlocking a game ability for use in battle
     public static function unlock_ability($player_info, $robot_info, $ability_info, $events_create = false){
-        //$GAME_SESSION = &$_SESSION[self::session_token()];
-        $session_token = self::session_token();
-
-        // Define a reference to the game's session flag variable
-        if (empty($_SESSION[$session_token]['flags'])){ $_SESSION[$session_token]['flags'] = array(); }
-        $temp_game_flags = &$_SESSION[$session_token]['flags'];
-
-        // If the ability token does not exist, return false
-        if (!isset($ability_info['ability_token'])){ return false; }
-        // Turn off the event if it's been turned on and shouldn't be
-        if ($ability_info['ability_token'] == 'buster-shot'){ $events_create = false; }
-        if (self::ability_unlocked('', '', $ability_info['ability_token'])){ $events_create = false; }
-        if (!empty($_SESSION[$session_token]['DEMO'])){ $events_create = false; }
-
-        // Attempt to collect info for this ability
-        $ability_index = rpg_ability::get_index_info($ability_info['ability_token']);
-        // If this ability does not exist in the global index, return false
-        if (empty($ability_index)){ return false; }
-        // Collect the ability info from the index
-        $ability_info = array_replace($ability_index, $ability_info);
-        // Collect or define the ability variables
-        $this_ability_token = $ability_info['ability_token'];
-        // Automatically unlock this ability for use in battle
-        $this_reward = $this_setting = array('ability_token' => $this_ability_token);
-
-        // Check if player info and robot info has been provided, and unlock for this robot if it has
-        if (!empty($player_info) && !empty($robot_info)){
-            // This is for a robot, so let's unlock it for that robot
-            $_SESSION[$session_token]['values']['battle_rewards'][$player_info['player_token']]['player_robots'][$robot_info['robot_token']]['robot_abilities'][$this_ability_token] = $this_reward;
-            // If this robot has less than eight abilities equipped, automatically attach this one
-            if (empty($_SESSION[$session_token]['values']['battle_settings'][$player_info['player_token']]['player_robots'][$robot_info['robot_token']]['robot_abilities'])
-                || count($_SESSION[$session_token]['values']['battle_settings'][$player_info['player_token']]['player_robots'][$robot_info['robot_token']]['robot_abilities']) < 8){
-                // Create the ability reward setting and insert it into the session array
-                $_SESSION[$session_token]['values']['battle_settings'][$player_info['player_token']]['player_robots'][$robot_info['robot_token']]['robot_abilities'][$this_ability_token] = $this_setting;
-            }
-        }
-
-        // Check to see if player info has been provided, and unlock for this player if it has
-        if (!empty($player_info)){
-            // This request is for a player, so let's unlocked
-            $_SESSION[$session_token]['values']['battle_rewards'][$player_info['player_token']]['player_abilities'][$this_ability_token] = $this_reward;
-        }
-
-        // No matter what, always unlock new abilities in the main array
-        if (!isset($_SESSION[$session_token]['values']['battle_abilities'])){ $_SESSION[$session_token]['values']['battle_abilities'] = array(); }
-        $_SESSION[$session_token]['values']['battle_abilities'][$this_ability_token] = $this_reward;
-
-        // Only show the event if allowed by the function args
-        if ($events_create != false){
-
-            // Generate the attributes and text variables for this ability unlock
-            global $db;
-            $this_player_token = $player_info['player_token'];
-            $ability_info_size = isset($ability_info['ability_image_size']) ? $ability_info['ability_image_size'] * 2 : 40 * 2;
-            $ability_info_size_token = $ability_info_size.'x'.$ability_info_size;
-            $this_name = $ability_info['ability_name'];
-            $this_type_token = !empty($ability_info['ability_type']) ? $ability_info['ability_type'] : '';
-            if (!empty($ability_info['ability_type2'])){ $this_type_token .= '_'.$ability_info['ability_type2']; }
-            if (empty($this_type_token)){ $this_type_token = 'none'; }
-            $this_description = !empty($ability_info['ability_description']) && $ability_info['ability_description'] != '...' ? $ability_info['ability_description'] : '';
-            $this_find = array('{this_player}', '{this_ability}', '{target_player}', '{target_ability}');
-            $this_replace = array($player_info['player_name'], $ability_info['ability_name'], $player_info['player_name'], ($this_player_token == 'dr-light' ? 'Mega Man' : ($this_player_token == 'dr-wily' ? 'Bass' : ($this_player_token == 'dr-cossack' ? 'Proto Man' : 'Robot'))));
-            $this_field = rpg_player::get_intro_field($this_player_token, true);
-            // Generate the window event's canvas and message markup then append to the global array
-            $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">'.$this_field['field_name'].'</div>';
-            $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;">'.$this_field['field_name'].'</div>';
-
-            $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/players/'.$player_info['player_token'].'/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: 220px;">'.$player_info['player_name'].'</div>';
-
-            $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/abilities/'.str_replace('dr-', '', $player_info['player_token']).'-buster/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; right: 200px;">&nbsp;</div>';
-            $temp_canvas_markup .= '<div class="ability_type ability_type_'.$this_type_token.' sprite sprite_40x40 sprite_40x40_00" style="
-                position: absolute;
-                bottom: 52px;
-                right: 212px;
-                padding: 4px;
-                -moz-border-radius: 10px;
-                -webkit-border-radius: 10px;
-                border-radius: 10px;
-                border-style: solid;
-                border-color: #181818;
-                border-width: 4px;
-                box-shadow: inset 1px 1px 6px rgba(0, 0, 0, 0.8);
-                ">&nbsp;</div>';
-            $temp_canvas_markup .= '<div class="sprite" style="
-                bottom: 57px;
-                right: 217px;
-                width: 44px;
-                height: 44px;
-                overflow: hidden;
-                background-color: rgba(13,13,13,0.33);
-                -moz-border-radius: 6px;
-                -webkit-border-radius: 6px;
-                border-radius: 6px;
-                border-style: solid;
-                border-color: #292929;
-                border-width: 1px;
-                box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
-                "><div class="sprite sprite_'.$ability_info_size_token.' sprite_'.$ability_info_size_token.'_base" style="
-                background-image: url(images/abilities/'.$ability_info['ability_token'].'/icon_right_'.$ability_info_size_token.'.png?'.MMRPG_CONFIG_CACHE_DATE.');
-                bottom: -18px;
-                right: -18px;
-                ">'.$ability_info['ability_name'].'</div></div>';
-
-            $temp_console_markup = '<p>Congratulations!  <strong>'.$player_info['player_name'].'</strong> unlocked the <strong>'.$this_name.'</strong> ability! </p>'; //<strong>'.$this_name.'</strong> is '.(!empty($ability_info['ability_type']) ? (preg_match('/^(a|e|i|o|u|y)/i', $ability_info['ability_type']) ? 'an ' : 'a ').'<strong data-class="ability_type ability_type_'.$ability_info['ability_type'].(!empty($ability_info['ability_type2']) ? '_'.$ability_info['ability_type2'] : '').'">'.ucfirst($ability_info['ability_type']).(!empty($ability_info['ability_type2']) ? ' and '.ucfirst($ability_info['ability_type2']) : '').' Type</strong> ' : '<strong data-class="ability_type ability_type_none">Neutral Type</strong> ').'ability. <strong>'.$this_name.'</strong>&#39;s data was '.($temp_data_existed ? 'updated in ' : 'added to ' ).' the <strong>Robot Database</strong>.
-            $temp_console_markup .= '<div id="console" style="width: auto; height: auto;"><div class="extra"><div class="extra2">'.preg_replace('/\s+/', ' ', rpg_ability::print_database_markup($ability_info, array('layout_style' => 'event'))).'</div></div></div>';
-            //die(''.$this_ability_token.': '.$temp_console_markup);
-
-            $_SESSION[$session_token]['EVENTS'][] = array(
-                'canvas_markup' => preg_replace('/\s+/', ' ', $temp_canvas_markup),
-                'console_markup' => $temp_console_markup
-                );
-
-        }
-
-        // Create the event flag for unlocking this robot
-        $temp_game_flags['events']['unlocked-ability_'.$this_ability_token] = true;
-        if (!empty($this_player_token)){ $temp_game_flags['events']['unlocked-ability_'.$this_player_token.'_'.$this_ability_token] = true; }
-
-        // Return true on success
-        return true;
+        return mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $events_create);
     }
 
 
@@ -1875,7 +1601,7 @@ class rpg_game {
                 $title .= ' / '.$source_info['source_name_aka'];
             }
             $title .= ' ('.$source_info['source_systems'].')';
-            $source_name = '<span title="'.htmlspecialchars($title, ENT_QUOTES, 'UTF-8', true).'">'.$source_name.'</span>';
+            $source_name = '<span data-click-tooltip="'.htmlspecialchars($title, ENT_QUOTES, 'UTF-8', true).'">'.$source_name.'</span>';
         }
         return $source_name;
     }
@@ -2199,17 +1925,18 @@ class rpg_game {
 
         // First check to ensure it matches the established condition format
         // examples: "attack < 3" or "defense >= 2" or "energy < 50%"
-        if (!preg_match('/^([-_a-z]+)\s?([\<\>\=\!\%]+)\s?(\-?[0-9]+\%?)$/i', $condition, $matches)){
+        if (!preg_match('/^([-_a-z]+)\s?([\<\>\=\!\%]+)\s?(\-?[0-9]+\%?|[-_a-z0-9]+)$/i', $condition, $matches)){
             error_log('skill parameter "condition" was set but was invalid ('.$this_object_token.':'.__LINE__.')');
             error_log('$condition = '.print_r($condition, true));
             return false;
         }
         // Now check to make sure the individual parts of the condition are allowed
+        $allowed_condition_keywords = array('field-type', 'robot-position');
         $allowed_condition_stats = array('energy', 'weapons', 'attack', 'defense', 'speed');
         $allowed_condition_operators = array('=', '<=', '>=', '<', '>', '<>');
         list($x, $c_stat, $c_operator, $c_value) = $matches;
-        if (!in_array($c_stat, $allowed_condition_stats)
-            && $c_stat !== 'field-type'
+        if (!in_array($c_stat, $allowed_condition_keywords)
+            && !in_array($c_stat, $allowed_condition_stats)
             && !preg_match('/^field-multiplier-([a-z]+)$/', $c_stat)){
             error_log('skill parameter "condition" stat was set but was invalid ('.$this_object_token.':'.__LINE__.')');
             error_log('$c_stat = '.print_r($c_stat, true));
@@ -2222,6 +1949,7 @@ class rpg_game {
             // Validate the value parameter differently for energy/weapons vs attack/defense/speed stats
             $is_energy_c_stat = $c_stat === 'energy' || $c_stat === 'weapons' ? true : false;
             $is_field_type_c_stat = $c_stat === 'field-type' ? true : false;
+            $is_robot_position_c_stat = $c_stat === 'robot-position' ? true : false;
             $is_field_multiplier_c_stat = preg_match('/^field-multiplier-([a-z]+)$/', $c_stat) ? true : false;
             if ($is_energy_c_stat){
                 if (!strstr($c_value, '%')){
@@ -2237,6 +1965,13 @@ class rpg_game {
                 $allowed_field_types = array_keys(rpg_type::get_index(false, false, false, false));
                 if (!in_array($c_value, $allowed_field_types)){
                     error_log('skill parameter "condition" value must be a valid type for field types ('.$this_object_token.':'.__LINE__.')');
+                    error_log('$c_value = '.print_r($c_value, true));
+                    return false;
+                }
+            } elseif ($is_robot_position_c_stat) {
+                $allowed_position_values = array('active', 'bench');
+                if (!in_array($c_value, $allowed_position_values)){
+                    error_log('skill parameter "condition" value must be a valid for robot positions ('.$this_object_token.':'.__LINE__.')');
                     error_log('$c_value = '.print_r($c_value, true));
                     return false;
                 }

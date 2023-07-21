@@ -15,7 +15,7 @@ define('MMRPG_CONFIG_API_ROOTDIR', MMRPG_CONFIG_ROOTDIR.MMRPG_CONFIG_API_DIR);
 // If a valid kind and script are provided, include the API file, else show the readme
 if (!empty($_GET['kind'])
     && !empty($_GET['script'])
-    && preg_match('/^(players|robots|mechas|bosses|fields|abilities|items|types)$/', $_GET['kind'])
+    && preg_match('/^(players|robots|mechas|bosses|fields|abilities|items|types|music)$/', $_GET['kind'])
     && preg_match('/^(tokens|index|data)$/', $_GET['script'])
     && file_exists('scripts/'.$_GET['kind'].'/'.$_GET['script'].'.php')){
     require('scripts/'.$_GET['kind'].'/'.$_GET['script'].'.php');

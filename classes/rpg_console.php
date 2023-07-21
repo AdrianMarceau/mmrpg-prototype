@@ -36,7 +36,8 @@ class rpg_console {
         // If this was an undefined player, do not create markup
         if ($this_player->player_token != 'player'){
             $this_data['player_markup'] .= '<div class="'.$this_data['container_class'].'" style="'.$this_data['container_style'].'">';
-            $this_data['player_markup'] .= '<div class="'.$this_data['player_class'].'" style="'.$this_data['player_style'].'" title="'.$this_data['player_title'].'" data-tooltip-align="'.$this_data['player_float'].'">'.$this_data['player_title'].'</div>';
+            //$this_data['player_markup'] .= '<div class="'.$this_data['player_class'].'" style="'.$this_data['player_style'].'" title="'.$this_data['player_title'].'" data-tooltip-align="'.$this_data['player_float'].'">'.$this_data['player_title'].'</div>';
+            $this_data['player_markup'] .= '<div class="'.$this_data['player_class'].'" style="'.$this_data['player_style'].'"></div>';
             $this_data['player_markup'] .= '</div>';
         }
 
@@ -150,10 +151,14 @@ class rpg_console {
         $this_data['robot_markup'] .= '<div class="'.$this_data['container_class'].'" style="'.$this_data['container_style'].'">';
 
             // Print out the robot sprite inside the event container
-            $this_data['robot_markup'] .= '<div class="'.$this_data['robot_class'].'" style="'.$this_data['robot_style'].'" title="'.$this_data['robot_title'].'" data-tooltip-type="robot_type type_'.$this_data['robot_type_class'].'">'.$this_data['robot_title'].'</div>';
+            //$this_data['robot_markup'] .= '<div class="'.$this_data['robot_class'].'" style="'.$this_data['robot_style'].'" title="'.$this_data['robot_title'].'" data-tooltip-type="robot_type type_'.$this_data['robot_type_class'].'">'.$this_data['robot_title'].'</div>';
+            $this_data['robot_markup'] .= '<div class="'.$this_data['robot_class'].'" style="'.$this_data['robot_style'].'"></div>';
 
             // If this wasn't a mugshot, we should include the relative energy bar
-            if ($this_data['image_type'] != 'mug'){ $this_data['robot_markup'] .= '<div class="'.$this_data['energy_class'].'" style="'.$this_data['energy_style'].'" title="'.$this_data['energy_title'].'">'.$this_data['energy_title'].'</div>'; }
+            if ($this_data['image_type'] != 'mug'){
+                //$this_data['robot_markup'] .= '<div class="'.$this_data['energy_class'].'" style="'.$this_data['energy_style'].'" title="'.$this_data['energy_title'].'">'.$this_data['energy_title'].'</div>';
+                $this_data['robot_markup'] .= '<div class="'.$this_data['energy_class'].'" style="'.$this_data['energy_style'].'"></div>';
+            }
 
         $this_data['robot_markup'] .= '</div>';
 
@@ -191,7 +196,8 @@ class rpg_console {
         // Generate the final markup for the console ability
         $this_data['ability_markup'] = '';
         $this_data['ability_markup'] .= '<div class="'.$this_data['container_class'].'" style="'.$this_data['container_style'].'">';
-        $this_data['ability_markup'] .= '<div class="'.$this_data['ability_markup_class'].'" style="'.$this_data['ability_markup_style'].'" title="'.$this_data['ability_title'].'">'.$this_data['ability_title'].'</div>';
+            //$this_data['ability_markup'] .= '<div class="'.$this_data['ability_markup_class'].'" style="'.$this_data['ability_markup_style'].'" title="'.$this_data['ability_title'].'">'.$this_data['ability_title'].'</div>';
+            $this_data['ability_markup'] .= '<div class="'.$this_data['ability_markup_class'].'" style="'.$this_data['ability_markup_style'].'"></div>';
         $this_data['ability_markup'] .= '</div>';
 
         // Return the ability console data
@@ -209,8 +215,8 @@ class rpg_console {
         $this_data['item_name'] = isset($options['item_name']) ? $options['item_name'] : $this_item->item_name;
         $this_data['item_title'] = $this_data['item_name'];
         $this_data['item_token'] = $this_item->item_token;
-        $this_data['item_direction'] = 'right';
-        $this_data['item_float'] = !empty($robot_data['robot_id']) && $robot_data['robot_id'] == $this_item->robot_id ? $robot_data['robot_float'] : ($robot_data['robot_direction'] == 'left' ? 'right' : 'left');
+        $this_data['item_direction'] = !empty($robot_data['robot_id']) && $robot_data['robot_id'] == $this_item->robot_id ? $robot_data['robot_direction'] : (isset($robot_data['robot_direction']) && $robot_data['robot_direction'] == 'left' ? 'right' : 'left');
+        $this_data['item_float'] = !empty($robot_data['robot_id']) && $robot_data['robot_id'] == $this_item->robot_id ? $robot_data['robot_float'] : (isset($robot_data['robot_direction']) && $robot_data['robot_direction'] == 'left' ? 'right' : 'left');
         $this_data['item_size'] = $this_item->item_image_size;
         $this_data['item_frame'] = isset($options['item_frame']) ? $options['item_frame'] : $this_item->item_frame;
         if (is_numeric($this_data['item_frame']) && $this_data['item_frame'] >= 0){ $this_data['item_frame'] = str_pad($this_data['item_frame'], 2, '0', STR_PAD_LEFT); }
@@ -246,7 +252,8 @@ class rpg_console {
                 }
             } else {
                 $this_data['item_markup_style'] .= 'background-image: url('.$this_data['item_image'].'); ';
-                $this_data['item_markup'] .= '<div class="'.$this_data['item_markup_class'].'" style="'.$this_data['item_markup_style'].'" title="'.$this_data['item_title'].'">'.$this_data['item_title'].'</div>';
+                //$this_data['item_markup'] .= '<div class="'.$this_data['item_markup_class'].'" style="'.$this_data['item_markup_style'].'" title="'.$this_data['item_title'].'">'.$this_data['item_title'].'</div>';
+                $this_data['item_markup'] .= '<div class="'.$this_data['item_markup_class'].'" style="'.$this_data['item_markup_style'].'"></div>';
             }
 
         // Close the item markup container

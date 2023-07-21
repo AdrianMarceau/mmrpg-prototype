@@ -22,6 +22,38 @@ body:before {
     z-index: 9999;
 }
 
+/* -- Big Mode -- */
+@media (min-width: 1124px){
+
+    body:before {
+        content: "XL";
+    }
+
+    #window {
+        height: auto !important;
+        width: auto !important;
+        max-width: 1280px;
+        margin: 0 auto;
+    }
+    #window .banner {
+        width: auto !important;
+        margin: 8px 8px 0;
+    }
+    #window .banner .banner_background {
+
+    }
+    #window .banner .background_event {
+
+    }
+    #mmrpg #window .menu {
+        width: auto !important;
+    }
+    #window .header {
+        width: auto !important;
+    }
+
+}
+
 /* -- Landscape Mode -- */
 @media (min-width: 1024px){
 
@@ -99,9 +131,7 @@ body:before {
         width: auto;
     }
     #window .banner .event {
-        left: auto;
-        right: 123px;
-        overflow: visible;
+
     }
     #window {
         width: 1024px;
@@ -873,6 +903,11 @@ body:before {
         bottom: 16px;
     }
 
+    #window .page_leaderboard .online-players .event.text {
+        text-align: inherit;
+    }
+
+
     /* -- Credit Page Styles -- */
 
     #window .page_credits .body .creditblock .text .details .label {
@@ -1631,6 +1666,11 @@ body:before {
         right: 0;
     }
 
+    #window .page_leaderboard .ranking-options .event.text .label {
+        display: block;
+        margin-bottom: 6px;
+    }
+
     #window .page .body .community .search_form .section {
         float: none;
         clear: both;
@@ -1699,7 +1739,8 @@ body:before {
     }
 
 
-    #window .page .leaderboard .file .records .count.robots + .pipe {
+    #window .page .leaderboard .file .records .count.stars + .pipe,
+    #window .page .leaderboard .file .records .count.waves + .pipe {
         display: block;
         height: 0px;
         clear: both;

@@ -28,6 +28,7 @@ class rpg_ability_recovery extends rpg_recovery {
         if (!isset($trigger_options['referred_recovery'])){ $trigger_options['referred_recovery'] = false; }
         if (!isset($trigger_options['referred_recovery_id'])){ $trigger_options['referred_recovery_id'] = 0; }
         if (!isset($trigger_options['referred_recovery_stats'])){ $trigger_options['referred_recovery_stats'] = array(); }
+        if (!isset($trigger_options['force_flags'])){ $trigger_options['force_flags'] = array(); }
 
         // If this is referred recovery, collect the actual target
         if (!empty($trigger_options['referred_recovery']) && !empty($trigger_options['referred_recovery_id'])){
@@ -80,6 +81,9 @@ class rpg_ability_recovery extends rpg_recovery {
         $event_options['console_container_height'] = 1;
         $event_options['this_ability'] = $this_ability;
         $event_options['this_ability_results'] = array();
+
+        // Apply appropriate camera action flags to the event options
+        rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $this_ability, 'recovery');
 
         // Create an options object for this function and populate
         $options = rpg_game::new_options_object();
@@ -181,6 +185,24 @@ class rpg_ability_recovery extends rpg_recovery {
                     $this_ability->ability_results['flag_immunity'] = true;
                 }
 
+                // If any force flags have been applied, it's best to parse them now
+                if (in_array('flag_weakness', $trigger_options['force_flags'])){
+                    $this_ability->ability_results['counter_weaknesses'] += 1;
+                    $this_ability->ability_results['flag_weakness'] = true;
+                }
+                if (in_array('flag_affinity', $trigger_options['force_flags'])){
+                    $this_ability->ability_results['counter_affinities'] += 1;
+                    $this_ability->ability_results['flag_affinity'] = true;
+                }
+                if (in_array('flag_resistance', $trigger_options['force_flags'])){
+                    $this_ability->ability_results['counter_resistances'] += 1;
+                    $this_ability->ability_results['flag_resistance'] = true;
+                }
+                if (in_array('flag_immunity', $trigger_options['force_flags'])){
+                    $this_ability->ability_results['counter_immunities'] += 1;
+                    $this_ability->ability_results['flag_immunity'] = true;
+                }
+
             }
 
             // Collect this ability's type tokens if they exist
@@ -249,6 +271,12 @@ class rpg_ability_recovery extends rpg_recovery {
                         $ability_coreboost_multipliers[] = MMRPG_SETTINGS_SUBCOREBOOST_MULTIPLIER;
                     }
 
+                }
+
+                // If any force flags have been applied, it's best to parse them now
+                if (in_array('flag_coreboost', $trigger_options['force_flags'])){
+                    $this_ability->ability_results['counter_coreboosts'] += 1;
+                    $this_ability->ability_results['flag_coreboost'] = true;
                 }
 
                 // If any coreboosts were present, update the flag
@@ -642,6 +670,12 @@ class rpg_ability_recovery extends rpg_recovery {
                     $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | flag_critical | x '.$this_ability->recovery_options['critical_multiplier'].' = '.$this_ability->ability_results['this_amount'].'');
                 } else {
                     $this_ability->ability_results['flag_critical'] = false;
+                }
+
+                // If any force flags have been applied, it's best to parse them now
+                if (in_array('flag_critical', $trigger_options['force_flags'])){
+                    $this_ability->ability_results['this_amount'] = $this_ability->ability_results['this_amount'] * $this_ability->damage_options['critical_multiplier'];
+                    $this_ability->ability_results['flag_critical'] = true;
                 }
 
             }
@@ -1135,6 +1169,8 @@ class rpg_ability_recovery extends rpg_recovery {
 
         // Update this robot's history with the triggered recovery amount
         $this_robot->history['triggered_recovery'][] = $this_ability->ability_results['this_amount'];
+        $this_robot->history['triggered_recovery_by'][] = $this_ability->ability_token;
+
         // Update the robot's history with the triggered recovery types
         if (!empty($this_ability->ability_results['recovery_type'])){
             $temp_types = array();
@@ -1164,6 +1200,24 @@ class rpg_ability_recovery extends rpg_recovery {
         $this_robot->trigger_custom_function('rpg-ability_trigger-recovery_middle', $extra_objects);
         $target_robot->trigger_custom_function('rpg-ability_trigger-recovery_middle', $extra_objects);
         if ($options->return_early){ return $options->return_value; }
+
+        // Define the sound effects for this recovery event so it plays for the player
+        $recovery_sounds = array();
+        if ($this_ability->ability_results['this_amount'] > 0){
+            $percent = ceil(($this_ability->ability_results['this_amount'] / $this_robot->robot_base_energy) * 100);
+            if ($this_ability->recovery_options['recovery_kind'] == 'energy'){
+                $recovery_sounds[] = array('name' => 'recovery-energy', 'delay' => 200);
+                if ($percent > 50){ $recovery_sounds[] = array('name' => 'recovery-energy', 'delay' => 400); }
+            } elseif ($this_ability->recovery_options['recovery_kind'] == 'weapons'){
+                $recovery_sounds[] = array('name' => 'recovery-weapons', 'delay' => 200);
+                if ($percent > 50){ $recovery_sounds[] = array('name' => 'recovery-weapons', 'delay' => 400); }
+            }
+        } else {
+            $recovery_sounds[] = array('name' => 'no-effect');
+        }
+        foreach ($recovery_sounds AS $recovery_sound){
+            $this_battle->queue_sound_effect($recovery_sound);
+        }
 
         // Generate an event with the collected recovery results based on recovery type
         $temp_event_header = $this_ability->recovery_options['recovery_header'];
