@@ -56,6 +56,7 @@ $sound_effects_aliases_index = array(
     'master-destroyed-sound' => 'dead_mmi-gb',
     'mecha-destroyed-sound' => 'dead_mmv-gb',
     'boss-destroyed-sound' => 'dead_mmii-gb',
+    'super-boss-destroyed-sound' => 'biggest-boom_mmv-gb',
     'get-item' => 'one-up_mmv-gb',
     'get-big-item' => 'get-beat_mmv-gb',
     'get-weird-item' => 'weapon-get_mmii-gb',
@@ -95,7 +96,7 @@ $sound_effects_aliases_index = array(
     'full-screen-down' => 'wily-escape-iii-b_mmv-gb',
     'full-screen-suck' => 'space-suck-cropped_mmv-gb',
     'intense-charge-sound' => 'buzzsaw_mmi-gb',
-    'intense-growing-sound' => 'rush-space-loop-cropped_mmv-gb',
+    'intense-growing-sound' => 'rush-space-zoom-cropped_mmv-gb',
     'hyper-charge-sound' => 'charge_mmxi-gb',
     'hyper-slide-sound' => 'power-stone_mmv-gb',
     'hyper-summon-sound' => 'pharoah-shot-a_mmv-gb',
@@ -114,7 +115,6 @@ $sound_effects_aliases_index = array(
     'swing-sound' => 'pharoah-shot-b_mmv-gb',
     'upward-impact' => 'floor-break_mmv-gb',
     'downward-impact' => 'punk-dig_mmv-gb',
-    'big-cannon-sound' => 'bigger-big-boom_mmv-gb',
     'rapid-fire-sound' => 'break-dash_mmv-gb',
     'horn-toot-sound' => 'charge-man-toot_mmv-gb',
     'horn-blow-sound' => 'buzz_mmv-gb',
@@ -128,13 +128,19 @@ $sound_effects_aliases_index = array(
     // Elemental Ability Sound Effects
     'flame-sound' => 'fire-storm_mmi-gb',
     'fireball-sound' => 'pharoah-shot-b_mmv-gb',
+    'explode-sound' => 'biggerest-boom_mmv-gb',
     'splash-sound' => 'splash_mmv-gb',
     'water-sound' => 'salt-water_mmv-gb',
     'rain-sound' => 'rain-flush_mmv-gb',
+    'bubble-sound' => 'wily-escape-iv-b-crop-2_mmv-gb',
+    'spray-sound' => 'space-suck-cropped-2_mmv-gb',
+    'blob-sound' => 'wily-escape-iv-b-crop-3_mmv-gb',
+    'wobble-sound' => 'wily-waggle-mod-1_mmv-gb',
     'thunder-sound' => 'thunder_mmv-gb',
     'electric-sound' => 'electric-shock_mmv-gb',
     'electric-laser-sound' => 'thunder-beam_mmi-gb',
     'cannon-sound' => 'big-boom_mmv-gb',
+    'big-cannon-sound' => 'bigger-boom_mmv-gb',
     'black-hole-sound' => 'black-hole_mmv-gb',
     'drilling-sound' => 'drill-bomb_mmv-gb',
     'timer-sound' => 'flash-stopper_mmv-gb',
@@ -154,6 +160,17 @@ $sound_effects_aliases_index = array(
     'traintrack-sound' => 'train-tracks_mmv-gb',
     'laser-sound' => 'wily-star-laser-b_mmv-gb',
     'long-laser-sound' => 'wily-star-laser-c_mmv-gb',
+    'shining-sound' => 'selected-mod-1_mmv-gb',
+    'blowing-sound' => 'rush-space-zoom-mod-1_mmv-gb',
+
+    /*
+    '' => 'hurt_mmi-gb',
+    '' => 'hurt_mmi-gb',
+    '' => 'hurt_mmi-gb',
+    '' => 'hurt_mmi-gb',
+    '' => 'hurt_mmi-gb',
+    '' => 'hurt_mmi-gb',
+    */
 
     );
 
