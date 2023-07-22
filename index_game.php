@@ -302,6 +302,7 @@ echo 'gameSettings.customIndex.soundsAliasesIndex = '.json_encode($sound_effects
 $(document).ready(function(){
 
     // Preload essential audio tracks
+    mmrpg_music_preload('misc/sound-effects-curated');
     mmrpg_music_preload('misc/player-select');
     mmrpg_music_preload('misc/stage-select-dr-light');
 
