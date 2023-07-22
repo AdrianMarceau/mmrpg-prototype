@@ -56,6 +56,8 @@ gameSettings.musicVolumeEnabled = true; // default to true to allow music unless
 gameSettings.effectVolumeEnabled = true; // default to true to allow music unless otherwise stated
 gameSettings.audioBalanceConfig = {}; // default to empty but can hold custom overrides for above
 gameSettings.spriteRenderMode = 'default'; // the render mode we should be using for sprites
+gameSettings.enableGameMusic = true; // default to true to turn off on unsupported devices
+gameSettings.enableSoundEffects = true; // default to true to turn off on unsupported devices
 
 // Define an object to hold change events for settings when/if they happen
 var gameSettingsChangeEvents = {};
@@ -112,8 +114,12 @@ $(document).ready(function(){
     gamePrototype = $('#prototype');
 
     // Check if iPhone or iPad detected
+    gameSettings.wapFlagiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     gameSettings.wapFlagIphone = (navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)) ? true : false;
     gameSettings.wapFlagIpad = navigator.userAgent.match(/iPad/i) ? true : false;
+
+    // If we're on either iPhone or iPad, we can't handle both music and sfx
+    if (gameSettings.wapFlagiOS){ gameSettings.enableSoundEffects = false; }
 
     // If this window is not running as top, we need to overwrite some variables and functions
     if (window.self !== window.top){
@@ -2721,8 +2727,13 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
 
     // If the game hasn't loaded we shoudln't be playing anything
     if (!gameSettings.indexLoaded){ return false; }
+    if (gameSettings.enableSoundEffects === false){ return false; }
     if (!mmrpgMusicSound.playing()){ return false; }
     if (mmrpgMusicSound === false){ return false; }
+
+    // If we don't have sound effect sounces or sprites loaded, we can't do anything
+    if (!gameSettings.soundEffectSources.length){ return false; }
+    if (gameSettings.soundEffectSprites === {}){ return false; }
 
     // Define variables that have not been defined yet in the args
     if (typeof effectConfig !== 'object'){ effectConfig = {}; }

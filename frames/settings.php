@@ -362,7 +362,7 @@ if (true){
                         <input class="slider" type="range" name="musicVolume" min="0" max="1" step="0.01" value="<?= $audioBalanceConfig['musicVolume'] ?>">
                     </div>
                     <div class="subfield">
-                        <label class="label" for="effectVolume">SFX Volume</label>
+                        <label class="label" for="effectVolume">SFX Volume <sup class="help">* on supported devices</sup></label>
                         <input class="slider" type="range" name="effectVolume" min="0" max="1" step="0.01" value="<?= $audioBalanceConfig['effectVolume'] ?>">
                     </div>
                 </div>
