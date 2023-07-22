@@ -25,8 +25,9 @@ class rpg_mission_bonus extends rpg_mission {
         global $this_omega_factors_nine;
         global $this_omega_factors_ten;
         global $this_omega_factors_eleven;
-        global $mmrpg_index_types;
-        if (empty($mmrpg_index_types)){ $mmrpg_index_types = rpg_type::get_index(); }
+
+        // Collect the types index for calculation purposes
+        $mmrpg_index_types = rpg_type::get_index();
 
         // Collect the robot index for calculation purposes
         $db_robot_fields = rpg_robot::get_index_fields(true);
@@ -196,14 +197,20 @@ class rpg_mission_bonus extends rpg_mission {
         // Create the randomized field multupliers
         $temp_types = $mmrpg_index_types;
         $temp_allow_special = array(); //, 'damage', 'recovery', 'experience'
-        foreach ($temp_types AS $key => $temp_type){ if (!empty($temp_type['type_class']) && $temp_type['type_class'] == 'special' && !in_array($temp_type['type_token'], $temp_allow_special)){ unset($temp_types[$key]); } }
+        foreach ($temp_types AS $key => $temp_type){
+            if (!empty($temp_type['type_class'])
+                && $temp_type['type_class'] == 'special'
+                && !in_array($temp_type['type_token'], $temp_allow_special)){
+                unset($temp_types[$key]);
+            }
+        }
         //$temp_battle_omega['battle_field_base']['field_multipliers']['experience'] = round((mt_rand(200, 300) / 100), 1);
         //$temp_battle_omega['battle_field_base']['field_type'] = $temp_types[array_rand($temp_types)]['type_token'];
         //do { $temp_battle_omega['battle_field_base']['field_type2'] = $temp_types[array_rand($temp_types)]['type_token'];
         //} while($temp_battle_omega['battle_field_base']['field_type2'] == $temp_battle_omega['battle_field_base']['field_type']);
 
         $temp_battle_omega['battle_field_base']['field_multipliers'] = array();
-        while (count($temp_battle_omega['battle_field_base']['field_multipliers']) < 6){
+        while (!empty($temp_types) && count($temp_battle_omega['battle_field_base']['field_multipliers']) < 6){
             $temp_type = $temp_types[array_rand($temp_types)];
             $temp_multiplier = 1;
             while ($temp_multiplier == 1){ $temp_multiplier = round((mt_rand(10, 990) / 100), 1); }
