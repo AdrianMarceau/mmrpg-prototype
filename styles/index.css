@@ -2375,6 +2375,48 @@ button {
     -webkit-border-radius: 5px;
 }
 
+#window .page .body .subbody.home_epilogue {
+    display: block;
+    position: relative;
+}
+#window .page .body .subbody.home_epilogue .text {
+    font-size: 14px;
+    line-height: 23px;
+    padding: 2px 70px 6px;
+    letter-spacing: 1px;
+    text-align: center;
+    color: rgb(157, 220, 255);
+}
+#window .page .body .subbody.home_epilogue .float,
+#window .page .body .subbody.home_epilogue .float.float_left,
+#window .page .body .subbody.home_epilogue .float.float_right {
+    border: 0 none transparent;
+    background-color: transparent;
+    float: none;
+    position: absolute;
+    top: 5px;
+}
+#window .page .body .subbody.home_epilogue .float.float_left {
+    left: 5px;
+}
+#window .page .body .subbody.home_epilogue .float.float_right {
+    right: 5px;
+}
+#window .page .body .subbody.home_description {
+
+}
+#window .page .body .subbody.home_description .text.subtext {
+    clear: both;
+    font-size: 90%;
+    line-height: 1.6;
+    color: #cacaca;
+    border-top: 1px solid #363636;
+    padding: 10px 0;
+    margin-top: 10px;
+    text-align: center;
+}
+
+
 /* -- LEADERBOARD PAGE STYLES -- */
 
 #window .page .leaderboard {
@@ -4823,6 +4865,15 @@ body.windowFlag_landscapeMode #window .page .type_block {
 
 /* COMMUNITY PAGE STYLES */
 
+
+#window .page .body .community {
+    display: block;
+}
+#window .page .body .community:after {
+    content: "";
+    display: block;
+    clear: both;
+}
 
 #window .page .body .community .avatar {
     margin: 5px;

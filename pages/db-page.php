@@ -59,6 +59,25 @@ ob_start();
         $replace = MMRPG_SETTINGS_CURRENT_FIELDMECHA;
         $page_content_parsed = str_replace($find, $replace, $page_content_parsed);
 
+        // Parse the pseudo-code tag <!-- MMRPG_PLAYER_FLOAT_SPRITE(player, direction, frame, [size]) -->
+        $temp_float_player_matches = array();
+        preg_match_all('/<!--\s+MMRPG_PLAYER_FLOAT_SPRITE\(([-_a-z0-9\'",\s\|]+)\)\s+-->/im', $page_content_parsed, $temp_float_player_matches);
+        if (!empty($temp_float_player_matches[0])){
+            foreach ($temp_float_player_matches[0] AS $key => $find){
+                $args = $temp_float_player_matches[1][$key];
+                $args = array_map(function($s){ return trim($s, '\'" '); }, explode(',', $args));
+                $num_args = count($args);
+                if ($num_args < 3){ continue; }
+                $player = $direction = $frame = $size = false;
+                if ($num_args === 4){ list($player, $direction, $frame, $size) = $args; }
+                elseif ($num_args === 3){ list($player, $direction, $frame) = $args; }
+                if (strstr($frame, '|')){ $frames = explode('|',$frame); $frame = $frames[mt_rand(0, (count($frames) - 1))]; }
+                if ($size !== false){ $replace = mmrpg_website_text_float_player_markup($player, $direction, $frame, $size); }
+                else { $replace = mmrpg_website_text_float_player_markup($player, $direction, $frame); }
+                $page_content_parsed = str_replace($find, $replace, $page_content_parsed);
+            }
+        }
+
         // Parse the pseudo-code tag <!-- MMRPG_ROBOT_FLOAT_SPRITE(robot, direction, frame, [size]) -->
         $temp_float_robot_matches = array();
         preg_match_all('/<!--\s+MMRPG_ROBOT_FLOAT_SPRITE\(([-_a-z0-9\'",\s\|]+)\)\s+-->/im', $page_content_parsed, $temp_float_robot_matches);

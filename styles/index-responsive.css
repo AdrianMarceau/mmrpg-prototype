@@ -846,6 +846,26 @@ body:before {
         height: auto;
     }
 
+    /* -- Home Page Styles -- */
+
+    #window .page .body .subbody.home_epilogue .float,
+    #window .page .body .subbody.home_epilogue .float.float_left,
+    #window .page .body .subbody.home_epilogue .float.float_right {
+        top: 0;
+        display: none;
+    }
+    #window .page .body .subbody.home_epilogue .float.float_left {
+        left: calc(50% - 100px);
+    }
+    #window .page .body .subbody.home_epilogue .float.float_right {
+        right: calc(50% - 100px);
+    }
+    #window .page .body .subbody.home_epilogue .text {
+        padding: 72px 6px 6px;
+        padding-top: 0;
+        text-align: left;
+    }
+
     /* -- Leaderboard Page Styles -- */
 
     #window .page .leaderboard .file .inset {
@@ -1737,7 +1757,6 @@ body:before {
     #window .page {
         padding: 0 6px;
     }
-
 
     #window .page .leaderboard .file .records .count.stars + .pipe,
     #window .page .leaderboard .file .records .count.waves + .pipe {

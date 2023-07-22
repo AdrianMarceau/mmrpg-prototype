@@ -4,6 +4,39 @@
  * WEBSITE FUNCTIONS
  */
 
+// Define a function for generating the float player markup for the various website pages
+function mmrpg_website_text_float_player_markup($player_token, $float_side = 'right', $frame_key = '00', $player_image_size = 40, $player_alt_token = '', $player_item_token = '', $extra_float_classes = ''){
+    $zoom_size = $player_image_size * 2;
+    $zoom_size_text = $zoom_size.'x'.$zoom_size;
+    $player_direction = $float_side != 'left' ? 'left' : 'right';
+    $player_image_name = $player_token.(!empty($player_alt_token) ? '_'.$player_alt_token : '');
+    $player_image_path = 'images/players/'.$player_image_name.'/sprite_'.$player_direction.'_'.$player_image_size.'x'.$player_image_size.'.png';
+    $player_image_path .= '?'.MMRPG_CONFIG_CACHE_DATE;
+    $player_image_styles = 'background-image: url('.$player_image_path.'); background-size: auto '.$zoom_size.'px; ';
+    if ($player_image_size >= 80){ $player_image_styles .= 'margin: -'.($player_image_size + 10).'px auto 0 -'.($player_image_size / 2).'px; '; }
+    else { $player_image_styles .= 'margin: -10px auto 0 0; '; }
+    $player_image_styles .= 'z-index: 1; ';
+    $player_image_classes = 'sprite sprite_'.$zoom_size_text.' sprite_'.$zoom_size_text.'_'.$frame_key;
+    if (!empty($player_item_token)){
+        $item_image_size = 40;
+        $zoom_size = $item_image_size * 2;
+        $zoom_size_text = $zoom_size.'x'.$zoom_size;
+        $item_image_path = 'images/items/'.$player_item_token.'/icon_'.$player_direction.'_'.$item_image_size.'x'.$item_image_size.'.png';
+        $item_image_path .= '?'.MMRPG_CONFIG_CACHE_DATE;
+        $item_image_styles = 'background-image: url('.$item_image_path.'); background-size: auto '.$zoom_size.'px; ';
+        $item_image_styles .= 'position: absolute; top: -10px; right: -30px; ';
+        $item_image_styles .= 'z-index: 2; ';
+        $item_image_classes = 'sprite sprite_'.$zoom_size_text.' sprite_'.$zoom_size_text.'_00';
+    }
+    return '<div class="float float_'.$float_side.' float_80x80 '.$extra_float_classes.'" title="'.
+                (ucwords(str_replace('-', ' ', $player_token))).
+                (!empty($player_item_token) ? ' w/ '.ucwords(str_replace('-', ' ', $player_item_token)) : '').
+                '">'.
+            '<div class="'.$player_image_classes.'" style="'.$player_image_styles.'"></div>'.
+            (isset($item_image_classes) && isset($item_image_styles) ? '<div class="'.$item_image_classes.'" style="'.$item_image_styles.'"></div>' : '').
+        '</div>';
+}
+
 // Define a function for generating the float robot markup for the various website pages
 function mmrpg_website_text_float_robot_markup($robot_token, $float_side = 'right', $frame_key = '00', $robot_image_size = 40, $robot_alt_token = '', $robot_item_token = '', $extra_float_classes = ''){
     $zoom_size = $robot_image_size * 2;
