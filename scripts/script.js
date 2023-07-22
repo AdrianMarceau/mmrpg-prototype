@@ -2714,7 +2714,8 @@ function mmrpg_music_preload(newTrack){
 gameSettings.soundEffectSources = [];
 gameSettings.soundEffectSprites = {};
 gameSettings.soundEffectPool = [];
-gameSettings.soundEffectPoolLimit = 20;
+gameSettings.soundEffectPoolKey = -1;
+gameSettings.soundEffectPoolLimit = 10;
 // Define a list of sound effect aliases we can use in the code to abstract a bit
 gameSettings.customIndex.soundsIndex = {};
 gameSettings.customIndex.soundsAliasesIndex = {};
@@ -2756,8 +2757,11 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
     //console.log('effectName:', effectName, 'effectVolume:', effectVolume, 'effectRate:', effectRate, 'effectLoop:', effectLoop);
 
     // Get the next sound object from the pool
-    if (typeof gameSettings.soundEffectPool[effectName] === 'undefined'
-        || typeof gameSettings.soundEffectPool[effectName].sound === 'undefined'){
+    gameSettings.soundEffectPoolKey++;
+    if (gameSettings.soundEffectPoolKey >= gameSettings.soundEffectPoolLimit){ gameSettings.soundEffectPoolKey = 0; }
+    var soundEffectPoolKey = gameSettings.soundEffectPoolKey;
+    if (typeof gameSettings.soundEffectPool[soundEffectPoolKey] === 'undefined'
+        || typeof gameSettings.soundEffectPool[soundEffectPoolKey].sound === 'undefined'){
 
         // We must create a new sound object before we can use it
         var sound = new Howl({
@@ -2769,7 +2773,8 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
             loop: effectLoop,
             pool: 8
             });
-        gameSettings.soundEffectPool[effectName] = {
+        gameSettings.soundEffectPool[soundEffectPoolKey] = {
+            key: soundEffectPoolKey,
             name: effectName,
             sound: sound,
             time: Date.now()
@@ -2778,7 +2783,7 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
         } else {
 
         // We can pull an existing sound object to use from the pool
-        var effect = gameSettings.soundEffectPool[effectName];
+        var effect = gameSettings.soundEffectPool[soundEffectPoolKey];
         var sound = effect.sound;
         effect.time = Date.now();
 
