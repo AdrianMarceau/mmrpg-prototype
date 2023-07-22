@@ -134,6 +134,8 @@ $(document).ready(function(){
     var forwardKeys = [39,40];
     $(this).keydown(function(evt){
         //console.log('key-down '+evt.keyCode);
+        // If there are currently events in the queue, return false
+        if (mmrpgEvents.length){ return false; }
         // If the user has pressed the space bar
         if (confirmKeys.indexOf(evt.keyCode) != -1){ // space bar or enter key
             //console.log('space bar!');
@@ -145,12 +147,23 @@ $(document).ready(function(){
             var hoverButtonOrder = hoverButton.attr('data-order') != undefined ? parseInt(hoverButton.attr('data-order')) : 0;
             var firstButton = currentButtons.first();
             var firstButtonOrder = firstButton.attr('data-order') != undefined ? parseInt(firstButton.attr('data-order')) : 0;
-            if (actionContinue.is(':visible')){
+            if (actionContinue.length
+                && actionContinue.is(':visible')
+                && actionContinue.not('.button_disabled')){
                 actionContinue.trigger('click');
-                } else if (hoverButton.length){
+                }
+            else if (hoverButton.length
+                && hoverButton.is(':visible')
+                && !hoverButton.is('.button_disabled')){
                 hoverButton.trigger('click');
-                } else if (firstButton.length){
+                }
+            else if (firstButton.length
+                && firstButton.is(':visible')
+                && !firstButton.is('.button_disabled')){
                 firstButton.trigger('click');
+                }
+            else {
+                return false;
                 }
             }
         // Else if the user has pressed a previous key
