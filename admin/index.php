@@ -361,7 +361,7 @@ unset($db);
 
 ?>
 <!DOCTYPE html>
-<html>
+<html data-index="admin">
 <head>
 <meta charset="UTF-8" />
 <title><?= $this_page_tabtitle ?> | Mega Man RPG Prototype | Last Updated <?= mmrpg_print_cache_date() ?></title>
