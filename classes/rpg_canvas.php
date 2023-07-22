@@ -21,6 +21,8 @@ class rpg_canvas {
             $this_data['player_frame'] = $this_player->player_frame !== false ? $this_player->player_frame : 'base'; // IMPORTANT
             //$this_data['player_frame'] = str_pad(array_search($this_data['player_frame'], $this_player->player_frame_index), 2, '0', STR_PAD_LEFT);
             $this_data['player_frame_index'] = !empty($this_player->player_frame_index) ? $this_player->player_frame_index : array('base');
+            $this_data['player_frame_classes'] = !empty($this_robot->player_frame_classes) ? $this_robot->player_frame_classes : '';
+            $this_data['player_frame_styles'] = !empty($this_robot->player_frame_styles) ? $this_robot->player_frame_styles : '';
             $this_data['player_title'] = $this_player->player_name;
             $this_data['player_token'] = $this_player->player_token;
             $this_data['player_float'] = $this_player->player_side;
@@ -115,10 +117,8 @@ class rpg_canvas {
 
             $sprite_xsize = $this_data['player_sprite_size'].'x'.$this_data['player_sprite_size'];
             $this_data['player_markup_class'] = 'sprite sprite_player sprite_player_'.$this_data['image_type'].' sprite_'.$sprite_xsize.' sprite_'.$sprite_xsize.'_'.$this_data['player_frame'].' ';
-
-            if ($this_player->player_image_size !== $this_data['player_sprite_size']){
-                $this_data['player_markup_class'] .= 'scaled ';
-            }
+            if ($this_player->player_image_size !== $this_data['player_sprite_size']){ $this_data['player_markup_class'] .= 'scaled '; }
+            $this_data['player_markup_class'] .= $this_data['player_frame_classes'];
 
             $frame_position = array_search($this_data['player_frame'], $this_data['player_frame_index']);
             if ($frame_position === false){ $frame_position = 0; }
@@ -126,6 +126,7 @@ class rpg_canvas {
             $this_data['player_markup_style'] = 'background-position: '.$frame_background_offset.'px 0; ';
             $this_data['player_markup_style'] .= 'z-index: '.$this_data['canvas_offset_z'].'; '.$this_data['player_float'].': '.$this_data['canvas_offset_x'].'px; bottom: '.$this_data['canvas_offset_y'].'px; ';
             $this_data['player_markup_style'] .= 'background-image: url('.$this_data['player_image'].'); width: '.$this_data['player_sprite_size'].'px; height: '.$this_data['player_sprite_size'].'px; background-size: '.$this_data['player_image_width'].'px '.$this_data['player_image_height'].'px; ';
+            $this_data['player_markup_style'] .= $this_data['player_frame_styles'];
 
             $camera_action_styles = '';
             $camera_has_action = self::has_camera_action(array(

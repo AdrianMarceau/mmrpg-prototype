@@ -93,6 +93,8 @@ class rpg_player extends rpg_object {
         $this->player_frame = isset($this_playerinfo['player_frame']) ? $this_playerinfo['player_frame'] : 'base';
         $this->player_frame_index = isset($this_playerinfo['player_frame_index']) ? $this_playerinfo['player_frame_index'] : array('base','taunt','victory','defeat','command','damage','base2');
         $this->player_frame_offset = isset($this_playerinfo['player_frame_offset']) ? $this_playerinfo['player_frame_offset'] : array('x' => 0, 'y' => 0, 'z' => 0);
+        $this->player_frame_classes = isset($this_playerinfo['player_frame_classes']) ? $this_playerinfo['player_frame_classes'] : '';
+        $this->player_frame_styles = isset($this_playerinfo['player_frame_styles']) ? $this_playerinfo['player_frame_styles'] : '';
         $this->player_points = isset($this_playerinfo['player_points']) ? $this_playerinfo['player_points'] : 0;
         $this->player_switch = isset($this_playerinfo['player_switch']) ? $this_playerinfo['player_switch'] : 1;
         $this->player_next_action = isset($this_playerinfo['player_next_action']) ? $this_playerinfo['player_next_action'] : 'auto';
@@ -1306,6 +1308,15 @@ class rpg_player extends rpg_object {
         $this->set_info('player_frame_offset', $offset);
     }
 
+    // Define functions for getting or setting frame classes
+    public function get_frame_classes(){ return $this->get_info('player_frame_classes'); }
+    public function set_frame_classes($value){ $this->set_info('player_frame_classes', $value); }
+
+    // Define functions for getting or setting frame styles
+    public function get_frame_styles(){ return $this->get_info('player_frame_styles'); }
+    public function set_frame_styles($value){ $this->set_info('player_frame_styles', $value); }
+    public function reset_frame_styles(){ $this->set_info('player_frame_styles', ''); }
+
 
     // -- POINTS FUNCTIONS -- //
 
@@ -2389,6 +2400,8 @@ class rpg_player extends rpg_object {
             'player_frame' => $this->player_frame,
             'player_frame_index' => $this->player_frame_index,
             'player_frame_offset' => $this->player_frame_offset,
+            'player_frame_classes' => $this->player_frame_classes,
+            'player_frame_styles' => $this->player_frame_styles,
             'flags' => $this->flags,
             'counters' => $this->counters,
             'values' => $this->values,
