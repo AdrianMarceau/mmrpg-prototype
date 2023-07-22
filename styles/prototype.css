@@ -1,3 +1,8 @@
+html:not([data-index]),
+html:not([data-index]) body {
+    width: 768px !important;
+    max-width: 768px !important;
+}
 body.prototype {
     background-color: #262626;
     border-color: #262626;

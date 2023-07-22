@@ -294,7 +294,7 @@ if (empty($this_markup_body)
 
 ?>
 <!DOCTYPE html>
-<html lang="en" xmlns:og="http://opengraphprotocol.org/schema/">
+<html lang="en" xmlns:og="http://opengraphprotocol.org/schema/" data-index="base">
 <head>
 
 <meta charset="UTF-8" />

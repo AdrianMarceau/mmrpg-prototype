@@ -112,7 +112,7 @@ if (count($matches)>1){
 
 ?>
 <!DOCTYPE html>
-<html lang="en" xmlns:og="http://opengraphprotocol.org/schema/">
+<html lang="en" xmlns:og="http://opengraphprotocol.org/schema/" data-index="game">
 <head>
 
 <meta charset="UTF-8" />
