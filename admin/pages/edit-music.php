@@ -808,16 +808,18 @@
                                             $this_file_urls_w_cache[] = $file_url.'?'.MMRPG_CONFIG_CACHE_DATE;
                                         }
                                     }
-                                    $this_data_attrs = '';
-                                    $this_data_attrs .= 'data-kind="music" ';
-                                    $this_data_attrs .= 'data-path="'.$this_file_urls_w_cache[0].'" ';
-                                    if (isset($this_file_urls_w_cache[1])){ $this_data_attrs .= 'data-backup-path="'.$this_file_urls_w_cache[1].'" '; }
-                                    if (!empty($this_music_loop['start'])){ $this_data_attrs .= 'data-loop-start="'.$this_music_loop['start'].'" '; }
-                                    if (!empty($this_music_loop['end'])){ $this_data_attrs .= 'data-loop-end="'.$this_music_loop['end'].'" '; }
-                                    $music_player_markup .= '<br />';
-                                    $music_player_markup .= '<span class="audio-player light-theme no-preload" '.$this_data_attrs.' style="margin: 3px auto 0 0;">';
-                                        $music_player_markup .= '<i class="loading fa fas fa-music"></i>';
-                                    $music_player_markup .= '</span>';
+                                    if (!empty($this_file_urls_w_cache)){
+                                        $this_data_attrs = '';
+                                        $this_data_attrs .= 'data-kind="music" ';
+                                        $this_data_attrs .= 'data-path="'.$this_file_urls_w_cache[0].'" ';
+                                        if (isset($this_file_urls_w_cache[1])){ $this_data_attrs .= 'data-backup-path="'.$this_file_urls_w_cache[1].'" '; }
+                                        if (!empty($this_music_loop['start'])){ $this_data_attrs .= 'data-loop-start="'.$this_music_loop['start'].'" '; }
+                                        if (!empty($this_music_loop['end'])){ $this_data_attrs .= 'data-loop-end="'.$this_music_loop['end'].'" '; }
+                                        $music_player_markup .= '<br />';
+                                        $music_player_markup .= '<span class="audio-player light-theme no-preload" '.$this_data_attrs.' style="margin: 3px auto 0 0;">';
+                                            $music_player_markup .= '<i class="loading fa fas fa-music"></i>';
+                                        $music_player_markup .= '</span>';
+                                    }
                                 }
 
                                 $music_edit = 'admin/edit-music/editor/music_id='.$music_id;
