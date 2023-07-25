@@ -422,6 +422,131 @@ body:before {
         display: none;
     }
 
+
+
+    .adminform .results table.list {
+        display: block;
+    }
+    .adminform .results table.list,
+    .adminform .results table.list thead,
+    .adminform .results table.list tfoot,
+    .adminform .results table.list tbody,
+    .adminform .results table.list thead tr,
+    .adminform .results table.list tfoot tr,
+    .adminform .results table.list tbody tr,
+    .adminform .results table.list thead tr th,
+    .adminform .results table.list tfoot tr td,
+    .adminform .results table.list tbody tr td {
+        display: block;
+        box-sizing: border-box;
+        width: 100%;
+    }
+    .adminform .results table.list thead tr:after,
+    .adminform .results table.list tfoot tr:after,
+    .adminform .results table.list tbody tr:after {
+        content: "";
+        display: block;
+        clear: both;
+    }
+    .adminform .results table.list thead tr th,
+    .adminform .results table.list tfoot tr td,
+    .adminform .results table.list tbody tr td {
+        padding: 6px;
+    }
+    .adminform .results table.list tfoot {
+        display: none;
+    }
+    .adminform .results table.list thead {
+        background-color: #262626;
+    }
+    .adminform .results table.list thead tr th {
+        width: auto;
+        float: left;
+        text-align: left;
+        margin-right: 10px;
+    }
+    .adminform .results table.list thead tr:last-child th {
+        display: none;
+    }
+    .adminform .results table.list thead th.head.count {
+        display: block;
+        float: none;
+        clear: both;
+        margin: 0 auto;
+        padding: 3px 6px;
+    }
+    .adminform .results table.list thead tr th.actions {
+        float: right;
+        text-align: right;
+        margin: 0 0 0 auto;
+    }
+
+
+    .adminform .results table.list tbody tr:nth-child(odd) {
+        background-color: #F0F0F0;
+    }
+    .adminform .results table.list tbody tr:nth-child(even) {
+        background-color: #FAFAFA;
+    }
+    .adminform .results table.list tbody tr:nth-child(odd) td,
+    .adminform .results table.list tbody tr:nth-child(even) td {
+        background-color: transparent;
+    }
+
+    .adminform .results table.list tbody tr {
+        position: relative;
+    }
+    .adminform .results table.list tbody tr td,
+    .adminform .results table.list tbody tr td > .wrap {
+        text-align: left;
+    }
+    .adminform .results table.list tbody tr td > .wrap {
+        width: auto;
+    }
+    .adminform .results table.list tbody tr td,
+    .adminform .results table.list tbody tr td.flag,
+    .adminform .results table.list tbody tr td.date,
+    .adminform .results table.list tbody tr td.count {
+        display: block;
+        width: auto;
+        float: left;
+        margin-right: 6px;
+    }
+    .adminform .results table.list tbody tr td.name,
+    .adminform .results table.list tbody tr td.actions {
+        display: block;
+        float: none;
+        clear: both;
+        margin: 0 auto;
+    }
+    .adminform .results table.list tbody tr td.name {
+        text-align: left;
+        padding-left: 52px;
+        border-bottom: 1px dashed rgba(0, 0, 0, 0.03);
+    }
+    .adminform .results table.list tbody tr td.actions {
+        text-align: right;
+        border-top: 1px dashed rgba(0, 0, 0, 0.03);
+    }
+    .adminform .results table.list tbody tr td.id {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        width: auto;
+        min-width: 40px;
+        padding: 0;
+        border-radius: 3px;
+        background-color: transparent;
+        text-align: center;
+    }
+    .adminform .results table.list tbody tr:nth-child(odd) td.id {
+        background-color: #FAFAFA;
+    }
+    .adminform .results table.list tbody tr:nth-child(even) td.id {
+        background-color: #F0F0F0;
+    }
+
+
 }
 
 /* -- So Close to iPhone Portrait Mode -- */

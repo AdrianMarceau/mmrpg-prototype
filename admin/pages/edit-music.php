@@ -726,12 +726,12 @@
                         <colgroup>
                             <col class="id" width="60" />
                             <col class="name" width="" />
-                            <col class="token" width="160" />
-                            <col class="album" width="90" />
+                            <col class="token" width="150" />
+                            <col class="album" width="80" />
                             <col class="game" width="80" />
-                            <col class="flag hasfiles" width="80" />
-                            <col class="flag hasloop" width="80" />
-                            <col class="flag haslink" width="80" />
+                            <col class="flag hasfiles" width="70" />
+                            <col class="flag hasloop" width="70" />
+                            <col class="flag haslink" width="70" />
                             <col class="actions" width="100" />
                         </colgroup>
                         <thead>

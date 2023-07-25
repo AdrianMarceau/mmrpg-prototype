@@ -1287,7 +1287,7 @@ body.loaded #window .banner:hover .banner_foreground {
     width: 10px;
     height: 10px;
     position: relative;
-    top: -1px;
+    top: -2px;
     overflow: hidden;
     background-color: transparent;
     background-image: url(../images/assets/website-subheader_orb-icon-2k23.png);
