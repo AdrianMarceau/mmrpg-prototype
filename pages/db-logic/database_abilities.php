@@ -161,6 +161,7 @@ ob_start();
 
     // If we're in the index view, loop through and display all abilities
     if (empty($this_current_token)){
+        echo('<div class="database_listing">'.PHP_EOL);
         // Loop through the ability database and display the appropriate data
         $key_counter = 0;
         if (!empty($mmrpg_database_abilities)){
@@ -180,6 +181,7 @@ ob_start();
                 $key_counter++;
             }
         }
+        echo('</div>'.PHP_EOL);
     }
 
 // Collect the output buffer contents and overwrite default index markup

@@ -375,85 +375,41 @@ if ($this_current_page == 'file' // File sub-pages
             if (!defined('MMRPG_CRITICAL_ERROR') && !rpg_user::is_guest()){
                 // Define the avatar class and path variables
                 $temp_avatar_path = !empty($this_userinfo['user_image_path']) ? $this_userinfo['user_image_path'] : 'robots/mega-man/40';
-                $temp_background_path = !empty($this_userinfo['user_background_path']) ? $this_userinfo['user_background_path'] : 'fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN;
                 //$temp_colour_token = !empty($this_userinfo['user_colour_token']) ? $this_userinfo['user_colour_token'] : '';
                 list($temp_avatar_kind, $temp_avatar_token, $temp_avatar_size) = explode('/', $temp_avatar_path);
-                list($temp_background_kind, $temp_background_token) = explode('/', $temp_background_path);
                 $temp_avatar_class = 'avatar avatar_40x40';
                 $temp_sprite_class = 'sprite sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.' sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.'_00';
                 $temp_sprite_path = 'images/'.$temp_avatar_kind.'/'.$temp_avatar_token.'/sprite_left_'.$temp_avatar_size.'x'.$temp_avatar_size.'.png?'.MMRPG_CONFIG_CACHE_DATE;
+                $temp_background_path = !empty($this_userinfo['user_background_path']) ? $this_userinfo['user_background_path'] : 'fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN;
+                $temp_foreground_path = !empty($this_userinfo['user_foreground_path']) ? $this_userinfo['user_foreground_path'] : 'fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN;
+                list($temp_background_kind, $temp_background_token) = explode('/', $temp_background_path);
+                list($temp_foreground_kind, $temp_foreground_token) = explode('/', $temp_foreground_path);
                 $temp_background_path = 'images/'.$temp_background_kind.'/'.$temp_background_token.'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE;
+                $temp_foreground_path = 'images/'.$temp_foreground_kind.'/'.$temp_foreground_token.'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE;
                 if (defined('MMRPG_INDEX_COMPACT_MODE')){ $temp_background_path = str_replace('.gif', '.png', $temp_background_path); }
                 // Define the user name variables
                 $temp_user_name = !empty($this_userinfo['user_name_public']) && !empty($this_userinfo['user_flag_postpublic']) ? $this_userinfo['user_name_public'] : $this_userinfo['user_name'];
                 //echo '<div class="avatar avatar_40x40" style=""><div class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/robots/robot/sprite_left_40x40.png);">Guest</div></div>';
             } else {
                 $temp_background_path = 'fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN;
+                $temp_foreground_path = 'fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN;
                 list($temp_background_kind, $temp_background_token) = explode('/', $temp_background_path);
+                list($temp_foreground_kind, $temp_foreground_token) = explode('/', $temp_foreground_path);
                 $temp_background_path = 'images/'.$temp_background_kind.'/'.$temp_background_token.'/battle-field_background_base.gif';
+                $temp_foreground_path = 'images/'.$temp_foreground_kind.'/'.$temp_foreground_token.'/battle-field_foreground_base.png';
                 if (defined('MMRPG_INDEX_COMPACT_MODE')){ $temp_background_path = str_replace('.gif', '.png', $temp_background_path); }
+
             }
             //die($temp_background_path);
 
             // Define a variable to hold the background image style
             $temp_background_style = 'background-image: url('.(!empty($temp_background_path) ? $temp_background_path : 'images/fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN.'/battle-field_background_base.gif').'?'.MMRPG_CONFIG_CACHE_DATE.');';
+            $temp_foreground_style = 'background-image: url('.(!empty($temp_foreground_path) ? $temp_foreground_path : 'images/fields/'.MMRPG_SETTINGS_CURRENT_FIELDTOKEN.'/battle-field_foreground_base.png').'?'.MMRPG_CONFIG_CACHE_DATE.');';
 
             ?>
             <a class="anchor" id="top">&nbsp;</a>
-            <div class="sprite background banner_background blur" style="<?= $temp_background_style ?>"></div>
-            <div class="sprite background banner_background focus" style="<?= $temp_background_style ?>"></div>
-            <?
-            // Only continue if we're NOT in critical error mode
-            if (!defined('MMRPG_CRITICAL_ERROR')){
-
-                // Define the paths for the different attachment types
-                $class_paths = array('ability' => 'abilities', 'battle' => 'battles', 'field' => 'fields', 'player' => 'players', 'robot' => 'robots', 'object' => 'objects');
-                // Loop through and display the markup of any background attachments
-                if (!empty($temp_field_data['field_background_attachments']) && !empty($temp_field_data['field_mechas'])){
-                    echo '<div class="background_event event clearback sticky" style="z-index: 15; border-color: transparent;">';
-                    $this_key = -1;
-                    $cached_robot_info = array();
-                    foreach ($temp_field_data['field_background_attachments'] AS $this_info){
-                        $this_key++;
-                        $this_class = $this_info['class'];
-                        $this_size = intval($this_info['size']);
-                        $this_boxsize = $this_size.'x'.$this_size;
-                        $this_path = $class_paths[$this_class];
-                        $this_offset_x = $this_info['offset_x'];
-                        $this_offset_y = $this_info['offset_y'];
-                        $this_offset_z = $this_key + 1;
-                        if ($this_class == 'robot'){
-                            $this_token = $temp_field_data['field_mechas'][array_rand($temp_field_data['field_mechas'])]; //$this_info[$this_class.'_token'];
-                            if (!isset($cached_robot_info[$this_token])){ $cached_robot_info[$this_token] = rpg_robot::get_index_info($this_token); }
-                            $this_data = $cached_robot_info[$this_token];
-                            $temp_size = intval($this_data['robot_image_size']);
-                            if ($temp_size !== $this_size){
-                                $tmp_diff = $temp_size - $this_size;
-                                $this_size = $temp_size;
-                                $this_boxsize = $temp_size.'x'.$temp_size;
-                                $this_offset_x -= round($tmp_diff / 2);
-                            }
-                            $temp_sprite_frame = array('base', 'defend', 'taunt', 'victory');
-                            $temp_sprite_frame = $temp_sprite_frame[array_rand($temp_sprite_frame)];
-                            $this_frames = array($temp_sprite_frame); //$this_info[$this_class.'_frame'];
-                        } else {
-                            $this_token = $this_info[$this_class.'_token'];
-                            $this_frames = $this_info[$this_class.'_frame'];
-                        }
-                        foreach ($this_frames AS $key => $frame){ if (is_numeric($frame)){ $this_frames[$key] = str_pad($frame, 2, '0', STR_PAD_LEFT); } }
-                        $this_frame = $this_frames[0];
-                        //if ($debug_flag_animation){ $this_animate = implode(',', $this_frames); }
-                        //else { $this_animate = $this_frame; }
-                        $this_animate = implode(',', $this_frames);
-                        $this_direction = $this_info[$this_class.'_direction'];
-                        $this_float = $this_direction == 'left' ? 'right' : 'left';
-                        echo '<div data-id="background_attachment_'.$this_key.'" class="sprite sprite_'.$this_boxsize.' sprite_'.$this_boxsize.'_'.$this_direction.' sprite_'.$this_boxsize.'_'.$this_frame.'" data-type="attachment" data-position="background" data-size="'.$this_size.'" data-direction="'.$this_direction.'" data-frame="'.$this_frame.'" data-animate="'.$this_animate.'" style="'.$this_float.': '.$this_offset_x.'px; bottom: '.$this_offset_y.'px; z-index: '.$this_offset_z.'; background-image: url(images/'.$this_path.'/'.$this_token.'/sprite_'.$this_direction.'_'.$this_boxsize.'.png?'.MMRPG_CONFIG_CACHE_DATE.');"></div>';
-                    }
-                    echo '</div>';
-                }
-
-            }
-            ?>
+            <div class="sprite background banner_background" style="<?= $temp_background_style ?>"></div>
+            <div class="sprite foreground banner_foreground" style="<?= $temp_foreground_style ?>"></div>
             <div class="foreground scanlines" style="background-image: url(images/assets/canvas-scanlines.png?<?=MMRPG_CONFIG_CACHE_DATE?>);">&nbsp;</div>
             <div class="sprite credits banner_credits"><a href="<?= MMRPG_CONFIG_ROOTURL ?>"><h1>Mega Man RPG Prototype | Browser-Based Battle Simulator</h1></a></div>
             <div class="sprite overlay banner_overlay" style="">&nbsp;</div>
@@ -513,7 +469,13 @@ if ($this_current_page == 'file' // File sub-pages
             <? if (!empty($this_markup_header)): ?>
                 <div class="header">
                     <div class="header_wrapper">
-                        <h1 class="title"><?= $this_current_page != 'home' ? preg_replace('/((?:the )?Mega Man RPG Prototype)/', '<span class="brand">$1</span>', $this_markup_header) : $this_markup_header ?></h1>
+                        <h1 class="title">
+                            <span class="wrap">
+                                <i class="head-icon left"></i>
+                                <i class="head-icon right"></i>
+                                <?= $this_current_page != 'home' ? preg_replace('/((?:the )?Mega Man RPG Prototype)/', '<span class="brand">$1</span>', $this_markup_header) : $this_markup_header ?>
+                            </span>
+                        </h1>
                         <?= !empty($this_markup_counter) ? $this_markup_counter."\n" : '' ?>
                     </div>
                 </div>

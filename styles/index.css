@@ -302,9 +302,11 @@ button {
     -moz-background-clip: padding;
     -webkit-background-clip: padding;
 }
-#window .banner .background {
+#window .banner .background,
+#window .banner .foreground {
     z-index: 10;
-    opacity: 0.75;
+    opacity: 1.0;
+    filter: brightness(0.8);
 }
 #window .banner .foreground {
     z-index: 20;
@@ -316,28 +318,137 @@ button {
     background-repeat: no-repeat;
     background-position: center top;
 }
-#window .banner .banner_background {
+#window .banner .banner_background,
+#window .banner .banner_foreground {
     width: 1124px;
     left: 50%;
-    transform: translate(-50%, 0);
+    transform: translate(-50%, 0) scale(1.0);
+    transition: none;
 }
-#window .banner .background_event {
+#window .banner .background_event,
+#window .banner .foreground_event {
     width: 750px;
     left: 50%;
     transform: translate(-50%, 0);
     right: auto;
 }
-#window .banner .banner_background.blur {
+#window .banner .banner_background,
+#window .banner .banner_foreground {
+    z-index: 12;
     width: 100%;
     background-size: cover;
-    background-position: center center;
-    filter: brightness(0.6);
+    background-position: center top;
+    background-repeat: repeat-x;
+}
+#window .banner .banner_background {
+    filter: brightness(0.6) blur(2px);
+    background-size: auto 100%;
+}
+#window .banner .banner_foreground {
+    filter: brightness(0.7) blur(0);
+    background-size: auto;
+    background-position: center -40px;
+}
+
+#window .banner .banner_background {
+    filter: brightness(0.7) blur(0);
+    transform: translate(-50%, 0) scale(1.5);
+}
+#window .banner .banner_foreground {
+    filter: brightness(0.8) blur(0);
+    transform: translate(-50%, 0) scale(2.0);
+}
+body.loaded #window .banner .banner_background,
+body.loaded #window .banner .banner_foreground {
+    transition: 120s;
+    transition-delay: 0;
+}
+body.loaded #window .banner .banner_background {
+    filter: brightness(0.6) blur(2px);
+    transform: translate(-50%, 0) scale(1.0);
+}
+body.loaded #window .banner .banner_foreground {
+    filter: brightness(0.7) blur(1px);
+    transform: translate(-50%, 0) scale(1.0);
+}
+body.loaded #window .banner:hover .banner_background {
+    filter: brightness(0.7) blur(0);
+    transform: translate(-50%, 0) scale(1.5);
+}
+body.loaded #window .banner:hover .banner_foreground {
+    filter: brightness(0.8) blur(0);
+    transform: translate(-50%, 0) scale(2.0);
+}
+
+@keyframes foreground_canvas_fade {
+  0% { opacity: 0.2; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.2; }
+}
+#window .banner .banner_foreground:before,
+#window .banner .banner_foreground:after {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0);
+    bottom: 35px;
+    width: 750px;
+    height: 84px;
+    background-color: transparent;
+    background-image: none;
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+
+    -ms-interpolation-mode: bicubic;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    image-rendering:   -o-crisp-edges;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+
+}
+#window .banner .banner_foreground:before,
+#window .banner .banner_foreground:after {
+    bottom: -16px;
+    width: 1290px;
+    height: 168px;
+    background-image: url(../images/assets/battle-scene_gridlines-2k23.png?20230611);
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    transform: translateX(-50%) perspective(90px) rotateX(26deg);
+    transform-origin: center bottom;
+    -moz-mix-blend-mode: overlay;
+    -webkit-mix-blend-mode: overlay;
+    mix-blend-mode: overlay;
+}
+#window .banner .banner_foreground:before {
+    z-index: 1;
+    background-image: url(../images/assets/battle-scene_gridlines-2k23_under.png?20230616);
     opacity: 0.6;
-    z-index: 11;
+    -moz-mix-blend-mode: overlay;
+    -webkit-mix-blend-mode: overlay;
+    mix-blend-mode: overlay;
+
+    /* Animation properties */
+    animation-name: foreground_canvas_fade;
+    animation-duration: 5s; /* Adjust the duration as per your preference */
+    animation-duration: calc(var(--camera-shift-transition-duration) * 10);
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
 }
-#window .banner .banner_background.focus {
-    z-index: 12;
+#window .banner .banner_foreground:after {
+    z-index: 2;
+    background-image: url(../images/assets/battle-scene_gridlines-2k23_over.png?20230616);
+    opacity: 0.8;
+    -moz-mix-blend-mode: overlay;
+    -webkit-mix-blend-mode: overlay;
+    mix-blend-mode: overlay;
 }
+
+
 #window .banner .credits > a {
     display: block;
     width: 244px;
@@ -857,9 +968,9 @@ button {
     text-transform: none;
     text-decoration: none;
     padding: 0;
-    border-radius: 0.75em;
-    -moz-border-radius: 0.75em;
-    -webkit-border-radius: 0.75em;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
     color: #FFFFFF;
     border: 2px solid #1A1A1A;
     background-color: #222222;
@@ -884,8 +995,120 @@ button {
     padding: 0 10px;
 }
 
+
+@keyframes header-wrapper-background-scroll {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: -300px 0;
+    }
+}
+@keyframes header-wrapper-background-scroll-invert {
+    from {
+        background-position: -300px 0;
+    }
+    to {
+        background-position: 0 0;
+    }
+}
+#window .page > .header {
+    position: relative;
+    border: 2px solid #1A1A1A;
+    padding: 0;
+    background-image: none;
+    border-image: url(../images/assets/website-header_border-image-2k23.png);
+    border-image-outset: 0;
+    border-image-width: 10px;
+    border-image-repeat: repeat;
+    border-image-slice: 10 fill;
+}
+#window .page > .header:before,
+#window .page > .header:after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    pointer-events: none;
+    border-radius: 5px;
+    overflow: hidden;
+    background-image: none;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-size: auto 100%;
+    background-blend-mode: luminosity;
+}
+#window .page > .header:before {
+    z-index: 1;
+    background-image: url(../images/assets/website-header_circuit-texture-2k23_middle-back.png);
+    background-repeat: repeat;
+    background-size: auto;
+    background-blend-mode: overlay;
+    background-position: 0 0;
+    animation: header-wrapper-background-scroll 150s linear infinite;
+}
+#window .page > .header:after {
+    z-index: 2;
+    background-image: url(../images/assets/website-header_circuit-texture-2k23_middle-top.png);
+    background-repeat: repeat;
+    background-size: auto;
+    background-blend-mode: overlay;
+    background-position: 0 0;
+    animation: header-wrapper-background-scroll-invert 300s linear infinite;
+}
+#window .page > .header .header_wrapper {
+    position: relative;
+    z-index: 3;
+    margin: 5px;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.6);
+    border: 0 solid transparent;
+    border-radius: 5px;
+}
 #window .header .title {
     line-height: 32px;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.9);
+}
+#window .header .title > .wrap {
+    display: inline-block;
+}
+#window .header .title .head-icon {
+    content: "";
+    display: inline-block;
+    background-color: transparent;
+    background-image: none;
+    background-position: 0 -15px;
+    background-repeat: no-repeat;
+    background-size: auto;
+    width: 16px;
+    height: 15px;
+    overflow: hidden;
+    image-rendering: -moz-crisp-edges;         /* Firefox */
+    image-rendering:   -o-crisp-edges;         /* Opera */
+    image-rendering: -webkit-optimize-contrast;/* Webkit (non-standard naming) */
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
+}
+#window .header .title .head-icon.left {
+    background-image: url(../images/assets/website-header_head-icon-2k23_mega.png);
+    float: left;
+    margin: 6px 6px 0 0;
+}
+#window .header .title .head-icon.right {
+    background-image: url(../images/assets/website-header_head-icon-2k23_slur.png);
+    float: right;
+    margin: 6px 0 0 6px;
+}
+#window .header:hover .title .head-icon,
+#window .header:hover .title .head-icon.left,
+#window .header:hover .title .head-icon.right {
+    background-position: 0 0;
 }
 
 #window .page .body,
@@ -909,8 +1132,8 @@ button {
     margin: 0 0 4px;
     padding: 5px 10px;
     color: #FFFFFF;
-    font-size: 14px;
-    line-height: 16px;
+    font-size: 16px;
+    line-height: 19px;
     text-align: left;
     background-color: #3f3f3f;
     border: 1px solid transparent !important;
@@ -951,7 +1174,7 @@ button {
 }
 #window .page .body .subheader .inline_link {
     display: inline-block;
-    margin: 0;
+    margin: 0 0 0 -4px;
     padding: 0;
     color: #FFFFFF;
     text-decoration: none;
@@ -965,12 +1188,14 @@ button {
     opacity: 0.50;
     font-size: 11px;
     cursor: default;
+    font-weight: normal;
 }
 #window .page .header .count {
     display: block;
     font-size: 13px;
     line-height: 16px;
-    margin: -3px 0 9px;
+    margin: -3px 0 0;
+    padding-bottom: 9px;
 }
 #window .page .header .count.float,
 #window .page .body .subheader .count.float {
@@ -1055,6 +1280,34 @@ button {
     line-height: 17px;
     right: 0;
 }
+#window .page .body .subheader[class*="field_type_"] .subheader_typewrapper:before {
+    content: "";
+    display: inline-block;
+    margin: 0 6px 0 -3px;
+    width: 10px;
+    height: 10px;
+    position: relative;
+    top: -1px;
+    overflow: hidden;
+    background-color: transparent;
+    background-image: url(../images/assets/website-subheader_orb-icon-2k23.png);
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    background-size: auto;
+    vertical-align: middle;
+    image-rendering: -moz-crisp-edges;         /* Firefox */
+    image-rendering:   -o-crisp-edges;         /* Opera */
+    image-rendering: -webkit-optimize-contrast;/* Webkit (non-standard naming) */
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
+    filter: brightness(1.0);
+    transition: filter 0.3s;
+}
+#window .page .body .subheader[class*="field_type_"]:hover .subheader_typewrapper:before {
+    filter: brightness(1.5);
+}
 #window .page .body .subheader.subheader_button:before,
 #window .page .body .subheader.thread_posts_count:before {
     display: none;
@@ -1074,7 +1327,13 @@ button {
     -moz-border-radius: 0.3em;
     -webkit-border-radius: 0.3em;
     overflow: hidden;
+    background-image: url(../images/assets/website-header_circuit-texture-2k23_corner-white.png);
+    background-position: bottom right;
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-blend-mode: overlay;
 }
+
 #window .page .body .subbody.threads {
     padding: 5px 10px;
 }
@@ -2375,6 +2634,68 @@ button {
     -webkit-border-radius: 5px;
 }
 
+
+#window .page .body .subbody.home_screenshots {
+    display: block;
+    position: relative;
+}
+#window .page .body .subbody.home_screenshots:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+#window .page .body .subbody.home_screenshots .screenshot {
+    display: block;
+    float: none;
+    margin: 0 3px;
+    width: 30%;
+    width: calc((100% / 3) - 6px);
+    overflow: hidden;
+    border: 1px solid #1A1A1A;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+    position: relative;
+}
+#window .page .body .subbody.home_screenshots .screenshot.dr-light {
+    margin: 0 auto;
+    float: none;
+}
+#window .page .body .subbody.home_screenshots .screenshot.dr-cossack {
+    margin-left: 0;
+    position: absolute;
+    top: 4px;
+    left: 4px;
+}
+#window .page .body .subbody.home_screenshots .screenshot.dr-wily {
+    margin-right: 0;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+}
+#window .page .body .subbody.home_screenshots .screenshot img {
+    display: block;
+    width: 100%;
+    height: auto;
+    position: relative;
+    z-index: 1;
+}
+#window .page .body .subbody.home_screenshots .screenshot:after {
+    content: "";
+    display: block;
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    background-color: transparent;
+    background-image: url(../images/assets/canvas-scanlines.png?20230725-1300);
+    background-position: center center;
+    background-repeat: repeat;
+    background-size: auto;
+}
+
 #window .page .body .subbody.home_epilogue {
     display: block;
     position: relative;
@@ -2414,6 +2735,10 @@ button {
     padding: 10px 0;
     margin-top: 10px;
     text-align: center;
+}
+#window .page .body .subbody.home_description .site_name {
+    font-weight: bold;
+    text-decoration: underline;
 }
 
 
@@ -2522,7 +2847,7 @@ button {
     border-bottom-width: 2px;
 }
 #window .page .leaderboard .file_1st {
-    background-color: rgba(136, 113, 19, 0.75);
+    background-color: rgba(218, 178, 16, 0.75);
     box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.3);
     -moz-box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.3);
     -webkit-box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.3);
@@ -4876,7 +5201,7 @@ body.windowFlag_landscapeMode #window .page .type_block {
 }
 
 #window .page .body .community .avatar {
-    margin: 5px;
+    margin: 0;
 }
 #window .page .body .community .avatar_40x40 {
     width: 40px;
@@ -4952,13 +5277,14 @@ body.windowFlag_landscapeMode #window .page .type_block {
 
 #window .page .body .community .thread_subbody_small {
     text-align: left;
-    padding: 5px;
-    opacity: 0.50;
+    opacity: 1.0;
     cursor: pointer;
-    margin: 2px 0;
+    margin: 0 0 8px;
+    padding: 4px 4px 0;
 }
 #window .page .body .community .thread_subbody_small_nohover {
     margin: 30px 0 4px;
+    opacity: 0.6;
 }
 #window .page .body .community .thread_subbody_small_nohover,
 #window .page .body .community .thread_subbody_small:hover {
@@ -4972,17 +5298,20 @@ body.windowFlag_landscapeMode #window .page .type_block {
     -moz-box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
     -webkit-box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
     background-position: center center !important;
+    position: relative;
+    z-index: 1;
 }
 #window .page .body .community .thread_subbody_small .avatar_userimage {
     position: relative;
+    z-index: 2;
 }
 #window .page .body .community .thread_subbody_small .avatar_userimage_left {
-    left: -52px;
-    margin-right: -52px;
+    left: -42px;
+    margin-right: -42px;
 }
 #window .page .body .community .thread_subbody_small .avatar_userimage_right {
-    right: -52px;
-    margin-left: -52px;
+    right: -42px;
+    margin-left: -42px;
 }
 #window .page .body .community .thread_subbody_small {
     position: relative;
@@ -5039,7 +5368,7 @@ body.windowFlag_landscapeMode #window .page .type_block {
 }
 #window .page .body .community .thread_subbody_full .avatar_userimage {
     position: relative;
-    margin-bottom: 40px;
+    margin-bottom: 50px;
 }
 #window .page .body .community .thread_subbody_full_left .avatar_userimage {
     left: -102px;
@@ -5057,6 +5386,7 @@ body.windowFlag_landscapeMode #window .page .type_block {
 
 
 #window .page .body .community .post_subbody {
+    background-image: url(../images/assets/website-header_circuit-texture-2k23_corner-black.png);
     background-color: rgba(255, 255, 255, 0.025);
     border-color: rgb(26, 26, 26);
     margin: 4px 0;
@@ -5249,6 +5579,10 @@ body.windowFlag_landscapeMode #window .page .type_block {
     bottom: 4px;
     text-decoration: none;
     font-size: 10px;
+    transition: color 0.3s;
+}
+#window .page .body .community .post_subbody .postscroll:hover {
+    color: #cacaca;
 }
 #window .page .body .community .post_subbody .postscroll.right {
     right: 12px;
@@ -5516,11 +5850,12 @@ body.windowFlag_landscapeMode #window .page .type_block {
     overflow: hidden;
     text-align: left;
     margin: 2px 2px 0 0;
+    padding: 2px;
     box-sizing: border-box;
     width: 48%;
     width: calc(50% - 2px);
     min-height: 56px;
-    opacity: 0.50;
+    opacity: 1.0;
     cursor: default;
 }
 #window .page .body .community .thread_subbody_compact:nth-child(even) {
@@ -5531,13 +5866,22 @@ body.windowFlag_landscapeMode #window .page .type_block {
     opacity: 1.00;
 }
 #window .page .body .community .thread_subbody .thread_linkblock {
-    padding: 3px 0 5px 60px;
+    padding: 4px 8px 6px;
+    margin-left: 46px;
     border-radius: 0.3em;
     -moz-border-radius: 0.3em;
     -webkit-border-radius: 0.3em;
-    background-color: rgb(46, 46, 46);
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgb(38, 38, 38);
+    /* background-color: rgba(0, 0, 0, 0.3); */
+    background-image: url(../images/assets/website-header_circuit-texture-2k23_corner-black.png);
+    background-repeat: no-repeat;
+    background-position: bottom right;
+    background-blend-mode: multiply;
     min-height: 46px;
+    font-size: 14px;
+    line-height: 14px;
+    position: relative;
+    z-index: 3;
 }
 #window .page .body .community .thread_subbody .thread_linkblock_left {
 
@@ -5545,14 +5889,17 @@ body.windowFlag_landscapeMode #window .page .type_block {
 #window .page .body .community .thread_subbody .thread_linkblock_right {
     text-align: right;
 }
+body[data-page="community_personal"] #window .page .body .community .thread_subbody .thread_linkblock {
+    margin-right: 46px;
+}
 #window .page .body .community .thread_subbody .thread_linkblock .link {
     display: block;
     float: none;
     clear: none;
-    padding: 0 0 6px;
+    padding: 0 0 3px;
     margin: 0;
-    font-size: 14px;
-    line-height: 14px;
+    font-size: 120%;
+    line-height: 1.4;
     text-decoration: none;
     font-weight: bold;
     white-space: nowrap;
@@ -5572,6 +5919,10 @@ body.windowFlag_landscapeMode #window .page .type_block {
 #window .page .body .community .thread_path,
 #window .page .body .community .thread_title {
     overflow: hidden;
+}
+#window .page .body .subheader[class*="field_type_"].thread_title .subheader_typewrapper:before {
+    float: left;
+    top: 4px;
 }
 #window .page .body .community .thread_path .wrap,
 #window .page .body .community .thread_title .name,
@@ -5595,10 +5946,12 @@ body.windowFlag_landscapeMode #window .page .type_block {
     font-size: 80%;
 }
 #window .page .body .community .thread_subbody .thread_linkblock .info {
-    margin: 0 0 3px;
-    font-size: 12px;
-    line-height: 12px;
-    opacity: 0.75;
+    margin: 0;
+    padding: 0 0 3px;
+    font-size: 100%;
+    line-height: 1.2;
+    opacity: 1.0;
+    color: #cacaca;
     text-align: left;
     overflow: hidden;
     white-space: nowrap;
@@ -5614,10 +5967,11 @@ body.windowFlag_landscapeMode #window .page .type_block {
     font-size: 10px;
 }
 #window .page .body .community .thread_subbody .thread_linkblock .count {
-    margin: 5px 0 0;
-    font-size: 10px;
-    line-height: 10px;
-    opacity: 0.75;
+    margin: 0;
+    padding: 3px 0 3px;
+    font-size: 90%;
+    line-height: 1.2;
+    opacity: 1;
 }
 #window .page .body .community .thread_subbody .thread_linkblock .info .player_type,
 #window .page .body .community .thread_subbody .thread_linkblock .comments,
@@ -5626,6 +5980,9 @@ body.windowFlag_landscapeMode #window .page .type_block {
     border-radius: 5px;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
+}
+#window .page .body .community .thread_subbody .thread_linkblock .info .player_type {
+    color: #ffffff;
 }
 #window .page .body .community .thread_subbody .thread_linkblock .comments {
     text-decoration: none;
@@ -5651,6 +6008,9 @@ body.windowFlag_landscapeMode #window .page .type_block {
     text-align: left;
     margin-right: 6px;
     font-weight: normal;
+}
+#window .page .body .community .thread_posts_count .thread_posts_total > i {
+    margin-right: 4px;
 }
 #window .page .body .community .thread_posts_count.haslinks .thread_posts_total:after {
     content: "|";
@@ -5742,6 +6102,8 @@ body.windowFlag_landscapeMode #window .page .type_block {
 
 #window .page .body .community .post_subbody .published .full {
     display: block;
+    float: left;
+    width: calc(100% - 40px);
 }
 #window .page .body .community .post_subbody .published .short {
     display: none;
@@ -6275,6 +6637,22 @@ body.windowFlag_landscapeMode #window .page .type_block {
     transition: color 0.3s, text-shadow 0.3s;
     padding: 0 10px;
 }
+#window .page .body .bodytext .spoiler_span:hover {
+    color: rgba(255, 255, 255, 1.0);
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+#window .page .body .bodytext .spoiler_span i {
+    color: rgba(255, 255, 255, 0.6);
+    display: inline-block;
+    font-style: normal;
+    line-height: 1;
+    margin-right: 5px;
+}
+#window .page .body .bodytext .spoiler_span:hover i {
+    color: rgba(255, 255, 255, 1.0);
+}
+/*
 #window .page .body .bodytext .spoiler_span:before {
     content: "\f06e";
     color: rgba(255, 255, 255, 0.6);
@@ -6289,14 +6667,10 @@ body.windowFlag_landscapeMode #window .page .type_block {
     line-height: 1;
     margin-right: 5px;
 }
-#window .page .body .bodytext .spoiler_span:hover {
-    color: rgba(255, 255, 255, 1.0);
-    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
-}
 #window .page .body .bodytext .spoiler_span:hover:before {
     color: rgba(255, 255, 255, 1.0);
 }
-
+*/
 
 #window .page .body .bodytext .comic_layout {
     display: block;

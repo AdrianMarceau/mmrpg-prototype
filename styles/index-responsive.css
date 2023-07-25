@@ -54,6 +54,15 @@ body:before {
 
 }
 
+/* -- Bigger Than Landscape Mode -- */
+@media (min-width: 1025px){
+
+    #window .banner .banner_background {
+
+    }
+
+}
+
 /* -- Landscape Mode -- */
 @media (min-width: 1024px){
 
@@ -211,6 +220,10 @@ body:before {
     }
     #window .page .type_block {
         width: 86px;
+    }
+
+    #window .page .body .subbody.home_description .text.subtext br {
+        display: none;
     }
 
 }
@@ -407,6 +420,11 @@ body:before {
     #window .banner .credits {
         transform: none;
         background-position: center 6px;
+    }
+
+    #window .banner .banner_foreground:before,
+    #window .banner .banner_foreground:after {
+        bottom: 26px;
     }
 
     #window .banner .userinfo {
@@ -652,6 +670,11 @@ body:before {
     }
 
 
+    #window .page {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
     #window .page .body .subbody .text a,
     #window .page .body .subbody .text span {
         white-space: normal;
@@ -725,6 +748,20 @@ body:before {
 
     #window .page .body .subbody .text {
         text-align: left;
+    }
+
+    #window .page .body .subbody.home_screenshots .screenshot,
+    #window .page .body .subbody.home_screenshots .screenshot.dr-light,
+    #window .page .body .subbody.home_screenshots .screenshot.dr-wily,
+    #window .page .body .subbody.home_screenshots .screenshot.dr-cossack {
+        position: relative;
+        float: none;
+        margin: 0 auto 4px;
+        width: auto;
+        top: auto;
+        left: auto;
+        right: auto;
+        bottom: auto;
     }
 
     #window .page .database_container .subbody .body table.full.basic,
@@ -856,9 +893,19 @@ body:before {
     }
     #window .page .body .subbody.home_epilogue .float.float_left {
         left: calc(50% - 100px);
+
+        display: block;
+        position: static;
+        float: left;
+        margin: 0 5px 5px -15px;
     }
     #window .page .body .subbody.home_epilogue .float.float_right {
         right: calc(50% - 100px);
+
+        display: block;
+        position: static;
+        float: right;
+        margin: 0 -15px 5px 5px;
     }
     #window .page .body .subbody.home_epilogue .text {
         padding: 72px 6px 6px;
@@ -1214,10 +1261,16 @@ body:before {
     #window .page .body .header_typewrapper,
     #window .page .body .subheader_typewrapper {
         display: block;
-        overflow: hidden;
+        overflow: visible;
         line-height: 16px;
         padding-top: 3px;
         padding-bottom: 6px;
+    }
+    #window .page .body .header_typewrapper:after,
+    #window .page .body .subheader_typewrapper:after {
+        content: "";
+        display: block;
+        clear: both;
     }
     #window .page .body .subheader .inline_link {
         font-size: 14px;
@@ -1394,15 +1447,18 @@ body:before {
     #window .page .body .community .thread_subbody .thread_linkblock .count {
         width: 98%;
         width: calc(100% - 10px);
-        line-height: 16px;
     }
     #window .page .body .community .thread_subbody .thread_linkblock .link {
         white-space: normal;
         text-align: left;
+        margin-bottom: 3px;
+    }
+    #window .page .body .community .thread_subbody .thread_linkblock .info,
+    #window .page .body .community .thread_subbody .thread_linkblock .count {
+        font-size: 78%;
     }
     #window .page .body .community .thread_subbody .thread_linkblock .count {
-        margin-top: -2px;
-        padding-top: 3px;
+        padding-top: 6px;
     }
     #window .page .body .community .thread_subbody .thread_linkblock .count .comments,
     #window .page .body .community .thread_subbody .thread_linkblock .count .newpost {
@@ -1422,7 +1478,8 @@ body:before {
         max-width: 96%;
         overflow: hidden;
         text-overflow: ellipsis;
-        margin: 4px 0 0;
+        margin: 6px 0 0;
+        padding-left: 0;
     }
 
     #window .page_home #youtube_playlist,

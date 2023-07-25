@@ -403,7 +403,10 @@ ob_start();
                 // Print out the comment listing's header and links
                 ?>
                 <div id="comment-listing" class="<?= $comment_header_class ?>">
-                    <h3 class="thread_posts_total"><?= $comment_header_title ?></h3>
+                    <h3 class="thread_posts_total">
+                        <i class="fa fas fa-comments"></i>
+                        <?= $comment_header_title ?>
+                    </h3>
                     <? if (!empty($comment_header_links)){ ?>
                         <div class="thread_posts_pages">
                             <span class="label">Page :</span>
@@ -569,7 +572,10 @@ ob_start();
                 // Print out the comment listing's footer and links
                 ?>
                 <div class="<?= $comment_header_class ?>">
-                    <strong class="thread_posts_total"><?= $comment_header_title ?></strong>
+                    <strong class="thread_posts_total">
+                        <i class="fa fas fa-comments"></i>
+                        <?= $comment_header_title ?>
+                    </strong>
                     <? if (!empty($comment_header_links)){ ?>
                         <div class="thread_posts_pages">
                             <span class="label">Page :</span>
