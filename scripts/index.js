@@ -15,6 +15,9 @@ $(document).ready(function(){
     thisHeaderBanner = $('.banner', thisIndex);
     thisHeaderMenu = $('.menu', thisIndex);
 
+    // Page has loaded so let's add a class for that
+    thisBody.addClass('loaded');
+
     // Create the window resize events to ensure scrolling works
     /*
     thisWindow.resize(function(){ windowResizePage(); });
