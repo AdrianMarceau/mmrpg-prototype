@@ -2474,10 +2474,13 @@ function mmrpg_sound_effect_volume(newVolume, saveToSettings){
     //console.log('mmrpg_sound_effect_volume // relativeEffectVolume =', relativeEffectVolume);
     if (gameSettings.soundEffectPool.length){
         var soundIDs = Object.keys(gameSettings.soundEffectPool);
+        //console.log('gameSettings.soundEffectPool =', gameSettings.soundEffectPool);
+        //console.log('soundIDs =', soundIDs);
         for (var i = 0; i < soundIDs.length; i++){
             var soundID = soundIDs[i];
-            var sound = gameSettings.soundEffectPool[soundID];
-            sound.volume(relativeEffectVolume);
+            var soundObj = gameSettings.soundEffectPool[soundID];
+            //console.log('soundID =', soundID, '| soundObj =', soundObj);
+            soundObj.sound.volume(relativeEffectVolume);
         }
     }
 }
