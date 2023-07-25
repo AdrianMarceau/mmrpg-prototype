@@ -238,7 +238,7 @@ function mmrpg_formatting_decode($string){
         $mmrpg_formatting_array += array(
 
             // spoiler tags
-            '/\[([^\[\]]+)\]\{spoiler\}/i' => '<span class="type type_span ability_type ability_type_space spoiler_span">$1</span>',
+            '/\[([^\[\]]+)\]\{spoiler\}/i' => '<span class="type type_span ability_type ability_type_space spoiler_span"><i class="fa fas fa-eye"></i> $1</span>',
 
             /*
 
@@ -1180,8 +1180,16 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
             }
         }
 
+        // Collect the defined thread colour if set, otherwise (if personal messages) use the author colour
+        $temp_thread_colour = !empty($this_thread_info['thread_colour']) ? $this_thread_info['thread_colour'] : 'none';
+        if ($temp_category_token == 'personal'
+            && $temp_thread_colour === 'none'
+            && $temp_thread_author_colour !== 'none'){
+            $temp_thread_colour = $temp_thread_author_colour;
+        }
+
         ?>
-        <div id="thread-<?= $temp_thread_id ?>" data-group="<?= $temp_date_group ?>" class="subbody thread_subbody thread_subbody_small <?= $header_mode ? 'thread_subbody_small_nohover' : '' ?> <?= $temp_date_group == 'sticky' ? 'thread_is_sticky' : '' ?> <?= $compact_mode ? 'thread_subbody_compact' : '' ?> thread_right field_type_<?= !empty($this_thread_info['thread_colour']) ? $this_thread_info['thread_colour'] : 'none' ?>">
+        <div id="thread-<?= $temp_thread_id ?>" data-group="<?= $temp_date_group ?>" class="subbody thread_subbody thread_subbody_small <?= $header_mode ? 'thread_subbody_small_nohover' : '' ?> <?= $temp_date_group == 'sticky' ? 'thread_is_sticky' : '' ?> <?= $compact_mode ? 'thread_subbody_compact' : '' ?> thread_right field_type_<?= $temp_thread_colour ?>">
             <?
             // If this thread has a specific target, display their avatar to the right
             if ($this_thread_info['thread_target'] != 0){
@@ -1194,6 +1202,7 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
                 $temp_background_path = !empty($this_thread_info['user_background_path']) ? $this_thread_info['user_background_path'] : 'fields/gentle-countryside';
                 if ($is_system_thread){ $temp_avatar_path = 'robots/robot/40'; $temp_background_path = 'fields/field'; }
                 list($temp_avatar_kind, $temp_avatar_token, $temp_avatar_size) = explode('/', $temp_avatar_path);
+                if ($temp_avatar_kind === 'players' && (int)($temp_avatar_frame) > 6){ $temp_avatar_frame = '06'; }
                 list($temp_background_kind, $temp_background_token) = explode('/', $temp_background_path);
                 $temp_avatar_class = 'avatar avatar_40x40 float float_'.$temp_avatar_float.' ';
                 $temp_sprite_class = 'sprite sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.' sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.'_'.$temp_avatar_frame;
@@ -1214,6 +1223,7 @@ function mmrpg_website_community_thread_linkblock($this_thread_key, $this_thread
                 $temp_background_path = !empty($this_thread_info['target_user_background_path']) ? $this_thread_info['target_user_background_path'] : 'fields/gentle-countryside';
                 //if ($is_system_thread){ $temp_avatar_path = 'robots/robot/40'; $temp_background_path = 'fields/field'; }
                 list($temp_avatar_kind, $temp_avatar_token, $temp_avatar_size) = explode('/', $temp_avatar_path);
+                if ($temp_avatar_kind === 'players' && (int)($temp_avatar_frame) > 6){ $temp_avatar_frame = '06'; }
                 list($temp_background_kind, $temp_background_token) = explode('/', $temp_background_path);
                 $temp_avatar_class = 'avatar avatar_40x40 float float_'.$temp_avatar_float.' ';
                 $temp_sprite_class = 'sprite sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.' sprite_'.$temp_avatar_size.'x'.$temp_avatar_size.'_'.$temp_avatar_frame;
