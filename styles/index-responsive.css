@@ -58,6 +58,9 @@ body:before {
 @media (min-width: 1025px){
 
     #window .banner .banner_background {
+        background-size: 100% auto;
+    }
+    #window .banner .banner_foreground {
 
     }
 
@@ -424,7 +427,7 @@ body:before {
 
     #window .banner .banner_foreground:before,
     #window .banner .banner_foreground:after {
-        bottom: 26px;
+        bottom: 38px;
     }
 
     #window .banner .userinfo {

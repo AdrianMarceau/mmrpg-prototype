@@ -341,15 +341,17 @@ button {
     background-repeat: repeat-x;
 }
 #window .banner .banner_background {
-    filter: brightness(0.6) blur(2px);
-    background-size: auto 100%;
+    background-size: auto;
+    background-position: center -20px;
+    filter: brightness(0.8) blur(0);
 }
 #window .banner .banner_foreground {
-    filter: brightness(0.7) blur(0);
     background-size: auto;
-    background-position: center -40px;
+    background-position: center -50px;
+    filter: brightness(0.9) blur(0);
 }
 
+/*
 #window .banner .banner_background {
     filter: brightness(0.7) blur(0);
     transform: translate(-50%, 0) scale(1.5);
@@ -379,6 +381,7 @@ body.loaded #window .banner:hover .banner_foreground {
     filter: brightness(0.8) blur(0);
     transform: translate(-50%, 0) scale(2.0);
 }
+*/
 
 @keyframes foreground_canvas_fade {
   0% { opacity: 0.2; }
@@ -411,7 +414,7 @@ body.loaded #window .banner:hover .banner_foreground {
 }
 #window .banner .banner_foreground:before,
 #window .banner .banner_foreground:after {
-    bottom: -16px;
+    bottom: -8px;
     width: 1290px;
     height: 168px;
     background-image: url(../images/assets/battle-scene_gridlines-2k23.png?20230611);
@@ -1341,6 +1344,7 @@ body.loaded #window .banner:hover .banner_foreground {
     display: block;
     margin: 0 0 6px;
     text-align: justify;
+    line-height: 1.8;
 }
 #window .page .body .subbody .text p,
 #window .page .body .subbody .text div {
