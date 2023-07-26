@@ -364,7 +364,6 @@ if ($this_current_page == 'file' // File sub-pages
 <? $temp_window_flag = !empty($_SESSION['GAME']['index_settings']['windowFlag']) ? $_SESSION['GAME']['index_settings']['windowFlag'] : false; ?>
 <body id="mmrpg" data-page="<?= trim(str_replace('/', '_', $this_current_uri), '_') ?>" class="index <?= !empty($temp_window_flag) ? 'windowFlag_'.$temp_window_flag : '' ?>">
 
-<div id="fb-root"></div>
     <div id="window" style="position: relative; height: auto !important;">
 
         <div class="banner <?= defined('MMRPG_INDEX_COMPACT_MODE') ? 'compact' : '' ?>">
