@@ -40,7 +40,7 @@ body:before {
         margin: 8px 8px 0;
     }
     #window .banner .banner_background {
-
+        background-position: center -32px;
     }
     #window .banner .background_event {
 

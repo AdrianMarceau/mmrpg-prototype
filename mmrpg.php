@@ -278,13 +278,29 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
 
         // Collect the date-stamp for holiday themes
         $date_month = (int)(date('m'));
+        $date_month_name = strtolower(date('F'));
         $date_day = (int)(date('d'));
+        //error_log('$date_month = '.print_r($date_month, true));
+        //error_log('$date_month_name = '.print_r($date_month_name, true));
+        //error_log('$date_day = '.print_r($date_day, true));
 
-        // From December through January, force a Freeze-type theme for the holidays
-        if ($date_month === 12 || $date_month === 1){
-            $temp_field_path = 'fields/wintry-forefront';
-            $temp_field_type = 'water_space';
-            $temp_mecha_tokens = array('peng');
+
+        // Include the list of monthly themes we can pick from
+        $mmrpg_monthly_themes = array();
+        require(MMRPG_CONFIG_ROOTDIR.'includes/themes.php');
+        //error_log('$mmrpg_monthly_themes = '.print_r($mmrpg_monthly_themes, true));
+        if (!empty($_GET['month']) && isset($mmrpg_monthly_themes[$_GET['month']])){
+            $date_month_name = $_GET['month'];
+        }
+
+        // If an appropriate theme exists for this month, use it
+        if (isset($mmrpg_monthly_themes[$date_month_name])){
+            $temp_theme = $mmrpg_monthly_themes[$date_month_name];
+            //error_log('$temp_theme = '.print_r($temp_theme, true));
+            $temp_field_path = !empty($temp_theme['field']) ? $temp_theme['field'] : 'fields/gentle-countryside';
+            $temp_field_type = !empty($temp_theme['type']) ? $temp_theme['type'] : 'none';
+            if (!empty($temp_theme['type2'])){ $temp_field_type .= '_'.$temp_theme['type2']; }
+            $temp_mecha_tokens = !empty($temp_theme['mechas']) ? $temp_theme['mechas'] : array();
         }
         // Otherwise, we can refuse normal theme functionality
         else {
