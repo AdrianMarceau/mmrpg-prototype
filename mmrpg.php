@@ -66,6 +66,9 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
  * PAGE REQUESTS
  */
 
+// Print out request to error log for debugging
+//error_log('$_GET (before) = '.print_r($_GET, true));
+
 // Collect an index of valid pages if available
 $mmrpg_page_index = array();
 if (!defined('MMRPG_CRITICAL_ERROR')){
@@ -341,5 +344,8 @@ if (!defined('MMRPG_INDEX_SESSION') && !defined('MMRPG_INDEX_STYLES')){
     define('MMRPG_SETTINGS_CURRENT_FIELDMECHA', (!empty($temp_field_data['field_mechas']) ? $temp_field_data['field_mechas'][0] : 'met'));
 
 }
+
+// Print out request to error log for debugging
+//error_log('$_GET (after) = '.print_r($_GET, true));
 
 ?>

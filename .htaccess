@@ -65,6 +65,14 @@ RewriteRule ^(images|database)/items/core-([a-z]+)/(.*)?$ /$1/items/$2-core/$3 [
 RewriteRule ^(images|database)/items/screw-([a-z]+)/(.*)?$ /$1/items/$2-screw/$3 [R,L]
 RewriteRule ^images/abilities/attachment-defeat/(.*)?$ /images/objects/defeat-explosion/$1 [R,L]
 
+####################################
+# -- COMPOSITE IMAGE REWRITES -- #
+####################################
+
+# Redirect requests for composite images to the script responsible
+
+RewriteRule ^images/(abilities|fields|items|skills|players|robots)/all/([^/]+)/(.*)$ /scripts/get-images.php?kind=composite&type=$1&args=$2&file=$3 [L,QSA]
+RewriteRule ^images/(abilities|fields|items|skills|players|robots)/all/(.*)$ /scripts/get-images.php?kind=composite&type=$1&file=$2 [L,QSA]
 
 #####################################
 # -- LEGACY SPRITE PATH REWRITES -- #

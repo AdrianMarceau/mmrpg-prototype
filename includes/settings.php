@@ -135,6 +135,7 @@ define('MMRPG_SETTINGS_PLAYER_FRAMEINDEX', 'base/taunt/victory/defeat/command/da
 define('MMRPG_SETTINGS_ROBOT_FRAMEINDEX', 'base/taunt/victory/defeat/shoot/throw/summon/slide/defend/damage/base2'); // Define the sprite index
 define('MMRPG_SETTINGS_ABILITY_FRAMEINDEX', '00/01/02/03/04/05/06/07/08/09'); // Define the sprite index
 define('MMRPG_SETTINGS_ITEM_FRAMEINDEX', '00/01/02/03/04/05/06/07/08/09'); // Define the sprite index
+define('MMRPG_SETTINGS_SKILL_FRAMEINDEX', '00/01/02/03/04/05/06/07/08/09'); // Define the sprite index
 define('MMRPG_SETTINGS_ATTACHMENT_FRAMEINDEX', '00/01/02/03/04/05/06/07/08/09'); // Define the sprite index
 
 // Define the global ability target index for looping through in editors/database
