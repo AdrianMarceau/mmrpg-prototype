@@ -941,10 +941,17 @@ body:before {
         font-size: 20px;
         line-height: 26px;
     }
+    #window .page .leaderboard .file .userinfo,
+    #window .page .leaderboard .file .records {
+        position: relative;
+        top: auto;
+        bottom: auto;
+        left: auto;
+        right: auto;
+    }
     #window .page .leaderboard .file .userinfo {
         display: block;
         float: none;
-        position: static;
         width: auto;
         text-align: left;
         white-space: normal;
@@ -954,7 +961,6 @@ body:before {
     #window .page .leaderboard .file .records {
         display: block;
         float: none;
-        position: static;
         width: auto;
         width: calc(100% - 62px);
         text-align: left;
