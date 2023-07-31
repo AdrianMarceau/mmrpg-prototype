@@ -735,6 +735,7 @@ class rpg_canvas {
                 // If this robot is holding an item, add it to the display
                 if (!empty($this_robot->robot_item)){
                     $temp_item_info = rpg_item::get_index_info($this_robot->robot_item);
+                    $temp_item_disabled = !empty($this_robot->counters['item_disabled']) ? true : false;
                     $details_data['item_title'] = $temp_item_info['item_name'];
                     $details_data['item_type'] = !empty($temp_item_info['item_type']) ? $temp_item_info['item_type'] : 'none';
                     $details_data['item_type2'] = !empty($temp_item_info['item_type2']) ? $temp_item_info['item_type2'] : '';
@@ -746,10 +747,11 @@ class rpg_canvas {
                         if ($details_data['item_title_type'] != 'none'){ $details_data['item_title_type'] .= '_'.$details_data['item_type2']; }
                         else { $details_data['item_title_type'] = $details_data['item_type2']; }
                     }
-                    $item_markup = '<div class="robot_item">';
+                    $item_markup = '<div class="robot_item'.($temp_item_disabled ? ' robot_item_disabled' : '').'">';
                         $item_markup .= '<div class="wrap type '.$details_data['item_title_type'].'">';
                             $item_markup .= '<div class="'.$details_data['item_class'].'" style="'.$details_data['item_style'].'" data-click-tooltip="'.$details_data['item_title'].'" data-tooltip-type="type '.$details_data['item_title_type'].'">&nbsp;</div>';
                         $item_markup .= '</div>';
+                        if ($temp_item_disabled){ $item_markup .= '<span class="disabled"><i class="fa fas fa-slash"></i></span>'; }
                     $item_markup .= '</div>';
                     $details_data['robot_details'] .= $item_markup;
                 }

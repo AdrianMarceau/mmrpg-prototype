@@ -895,6 +895,34 @@ body.index #header {
     -webkit-border-radius: 2px;
     border-radius: 2px;
 }
+#mmrpg .robot_details .robot_item.robot_item_disabled {
+
+}
+#mmrpg .robot_details .robot_item.robot_item_disabled .wrap {
+    opacity: 0.3;
+}
+#mmrpg .robot_details .robot_item.robot_item_disabled .disabled {
+    position: absolute;
+    z-index: 10;
+    top: 5px;
+    left: 10px;
+    display: block;
+    width: 29px;
+    height: 28px;
+    font-size: 16px;
+    line-height: 28px;
+    text-align: center;
+    font-weight: normal;
+    text-indent: 0;
+    color: #767676;
+}
+#mmrpg .robot_details .robot_item.robot_item_disabled .disabled i:before {
+    display: inline-block;
+    transform: translateX(8%);
+}
+#mmrpg .robot_details .robot_item.robot_item_disabled .wrap .sprite {
+
+}
 #mmrpg .robot_details .robot_attack {
     top: 63px;
 }

@@ -418,6 +418,7 @@ class rpg_prototype {
         // Display the robot's item if it exists
         if ($show_items
             && !empty($robot->robot_item)
+            && empty($robot->counters['item_disabled'])
             && !empty($mmrpg_items_index[$robot->robot_item])){
             $robot_title .= ' | + '.$mmrpg_items_index[$robot->robot_item]['item_name'].' ';
         }

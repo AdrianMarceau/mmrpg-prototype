@@ -484,7 +484,7 @@ class rpg_robot extends rpg_object {
         if (empty($mmrpg_index_items)){ $mmrpg_index_items = rpg_item::get_index(); }
 
         // Check to make sure this robot has a held item, else return now
-        $item_token = $this->robot_item;
+        $item_token = empty($this->counters['item_disabled']) ? $this->robot_item : '';
         if (empty($item_token)){ return; }
 
         // Collect the item's index info if exists, else return now
@@ -520,8 +520,8 @@ class rpg_robot extends rpg_object {
         static $mmrpg_index_skills;
         if (empty($mmrpg_index_skills)){ $mmrpg_index_skills = rpg_skill::get_index(); }
 
-        // Check to make sure this robot has a held skill, else return now
-        $skill_token = $this->robot_skill;
+        // Check to make sure this robot has a skill, else return now
+        $skill_token = empty($this->counters['skill_disabled']) ? $this->robot_skill : '';
         if (empty($skill_token)){ return; }
 
         // Collect the skill's index info if exists, else return now
@@ -800,7 +800,8 @@ class rpg_robot extends rpg_object {
      */
     public function has_item(){
         $args = func_get_args();
-        $item = $this->get_info('robot_item');
+        $counter = $this->get_counter('item_disabled');
+        $item = empty($counter) ? $this->get_info('robot_item') : '';
         if (!empty($args[0])){ return $item == $args[0] ? true : false; }
         else { return !empty($item) ? true : false; }
     }
@@ -2607,10 +2608,10 @@ class rpg_robot extends rpg_object {
             $robot_info = array();
             $robot_info['robot_token'] = $this->robot_token;
             $robot_info['robot_class'] = $this->robot_class;
-            $robot_info['robot_core'] = $this->robot_core;
-            $robot_info['robot_core2'] = $this->robot_core2;
-            $robot_info['robot_item'] = $this->robot_item;
-            $robot_info['robot_skill'] = $this->robot_skill;
+            $robot_info['robot_core'] = empty($this->counters['core_disabled']) ? $this->robot_core : '';
+            $robot_info['robot_core2'] = empty($this->counters['core_disabled']) ? $this->robot_core2 : '';
+            $robot_info['robot_item'] = empty($this->counters['item_disabled']) ? $this->robot_item : '';
+            $robot_info['robot_skill'] = empty($this->counters['skill_disabled']) ? $this->robot_skill : '';
             $robot_info['robot_rewards'] = $this->robot_rewards;
 
             // If this was the noweapons/chargeweapons action, everything is zero
@@ -5961,6 +5962,56 @@ class rpg_robot extends rpg_object {
         // Trigger this robot's item function if one has been defined for this context
         $function_name = 'rpg-robot_check-items'.(!empty($phase) ? '_'.$phase : '');
         $this->trigger_custom_function($function_name, $extra_objects, $extra_item_info);
+
+        // If this robot has an item disabled counter, decrement it
+        $item_disabled_ended = false;
+        if (isset($this->counters['item_disabled'])){
+
+            // If the counter has exactly one left, we can display the robot looking for the item
+            if ($this->counters['item_disabled'] === 1){
+                // First show the robot turning around to pick up the item
+                $this->set_frame('defend');
+                $this->set_frame_styles('transform: scaleX(-1);');
+                $this_battle->events_create(false, false, '', '', array(
+                    'event_flag_camera_action' => true,
+                    'event_flag_camera_side' => $this->player->player_side,
+                    'event_flag_camera_focus' => $this->robot_position,
+                    'event_flag_camera_depth' => $this->robot_key
+                    ));
+                $this->reset_frame();
+                $this->reset_frame_styles();
+            }
+
+            // Now we should actually reduce the counter and remove it if it's at zero now
+            $this->decrease_counter('item_disabled', 1);
+            if ($this->get_counter('item_disabled') < 1){
+                $this->unset_counter('item_disabled');
+                $item_disabled_ended = true;
+            }
+
+        }
+
+        // If we restored an item this turn, make sure we display it
+        if ($item_disabled_ended){
+
+            // Now show the robot re-equipping the picked up item
+            $temp_item = rpg_game::get_item($this_battle, $this->player, $this, array('item_token' => $this->robot_item), false);
+            $event_head = $this->robot_name.'\'s '.$temp_item->item_name;
+            $event_body = $this->print_name().' found '.$this->get_pronoun('possessive2').' dropped item!';
+            $event_body .= '<br /> The '.$temp_item->print_name().' was restored!';
+            $this->set_frame('taunt');
+            $this_battle->events_create($this_robot, false, $event_head, $event_body, array(
+                'this_item' => $temp_item,
+                'this_item_image' => $temp_item->item_image,
+                'canvas_show_this_item' => true,
+                'event_flag_camera_action' => true,
+                'event_flag_camera_side' => $this->player->player_side,
+                'event_flag_camera_focus' => $this->robot_position,
+                'event_flag_camera_depth' => $this->robot_key
+                ));
+            $this->reset_frame();
+
+        }
 
     }
 
