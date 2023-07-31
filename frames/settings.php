@@ -259,8 +259,8 @@ if (!empty($form_actions)){
         $form_data = array();
 
         $form_data['masterVolume'] = !empty($_POST['masterVolume']) && is_numeric($_POST['masterVolume']) ? $_POST['masterVolume'] : MMRPG_SETTINGS_AUDIODEFAULT_MASTERVOLUME;
-        $form_data['musicVolume'] = !empty($_POST['musicVolume']) && is_numeric($_POST['musicVolume']) ? $_POST['musicVolume'] : MMRPG_SETTINGS_AUDIODEFAULT_MUSICVOLUME;
-        $form_data['effectVolume'] = !empty($_POST['effectVolume']) && is_numeric($_POST['effectVolume']) ? $_POST['effectVolume'] : MMRPG_SETTINGS_AUDIODEFAULT_EFFECTVOLUME;
+        $form_data['musicVolume'] = isset($_POST['musicVolume']) && is_numeric($_POST['musicVolume']) ? $_POST['musicVolume'] : MMRPG_SETTINGS_AUDIODEFAULT_MUSICVOLUME;
+        $form_data['effectVolume'] = isset($_POST['effectVolume']) && is_numeric($_POST['effectVolume']) ? $_POST['effectVolume'] : MMRPG_SETTINGS_AUDIODEFAULT_EFFECTVOLUME;
 
         $allowed_render_modes = array('default', 'crisp-edges', 'pixelated');
         $form_data['spriteRenderMode'] = !empty($_POST['spriteRenderMode']) && in_array($_POST['spriteRenderMode'], $allowed_render_modes) ? $_POST['spriteRenderMode'] : $allowed_render_modes[0];
