@@ -1067,6 +1067,7 @@ body.loaded #window .banner:hover .banner_foreground {
     position: relative;
     z-index: 3;
     margin: 5px;
+    padding: 10px;
     box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.6);
     border: 0 solid transparent;
     border-radius: 5px;
@@ -1075,8 +1076,14 @@ body.loaded #window .banner:hover .banner_foreground {
     line-height: 32px;
     font-weight: bold;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.9);
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
 }
 #window .header .title > .wrap {
+    display: inline-block;
+}
+#window .header .title > .wrap h1 {
     display: inline-block;
 }
 #window .header .title .head-icon {
@@ -2698,6 +2705,7 @@ body.loaded #window .banner:hover .banner_foreground {
     background-position: center center;
     background-repeat: repeat;
     background-size: auto;
+    pointer-events: none;
 }
 
 #window .page .body .subbody.home_epilogue {
