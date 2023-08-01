@@ -32,13 +32,15 @@ $this_prototype_data['prev_player_token'] = 'dr-cossack';
 $this_prototype_data['next_player_token'] = 'dr-wily';
 
 // Define the stage select music based on progression
-$this_music_token = $this_prototype_data['battles_complete'] >= 10 ? $this_prototype_data['target_player_token'] : $this_prototype_data['this_player_token'];
-$this_prototype_data['missions_music'] = 'misc/stage-select-'.$this_music_token;
+//$this_music_token = $this_prototype_data['battles_complete'] >= 10 ? $this_prototype_data['target_player_token'] : $this_prototype_data['this_player_token'];
+//$this_prototype_data['missions_music'] = 'misc/stage-select-'.$this_music_token;
 
 // Define the robot omega array for dynamic battle options
 $temp_session_key = $this_prototype_data['this_player_token'].'_target-robot-omega_prototype';
 $this_prototype_data['target_robot_omega'] = !empty($_SESSION['GAME']['values'][$temp_session_key]) ? $_SESSION['GAME']['values'][$temp_session_key] : array();
 $this_prototype_data['this_player_fields'] = !empty($_SESSION['GAME']['values']['battle_settings'][$this_prototype_data['this_player_token']]['player_fields']) ? $_SESSION['GAME']['values']['battle_settings'][$this_prototype_data['this_player_token']]['player_fields'] : array();
+$this_prototype_data['missions_music'] = mmrpg_prototype_get_player_mission_music($this_prototype_data['this_player_token'], 'GAME');
+
 // If the options have not already been defined, generate them
 $temp_save = false;
 if (empty($this_prototype_data['target_robot_omega'])){

@@ -303,8 +303,7 @@ $(document).ready(function(){
 
     // Preload essential audio tracks
     mmrpg_music_preload('misc/sound-effects-curated');
-    mmrpg_music_preload('misc/player-select');
-    mmrpg_music_preload('misc/stage-select-dr-light');
+    mmrpg_music_preload('misc/player-select');;
 
     // If window mod tools exist on the page, we should bind events to them
     var $gameWindow = $('#window');
