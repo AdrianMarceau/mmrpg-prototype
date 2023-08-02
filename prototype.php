@@ -665,6 +665,10 @@ $(document).ready(function(){
         mmrpg_keep_session_alive(<?= rpg_game::get_userid() ?>);
     <? } ?>
 
+    // Make sure we turn off any temp-UI modifications
+    mmrpg_toggle_screenshot_mode(false);
+    parent.mmrpg_toggle_screenshot_mode(false);
+
 });
 </script>
 <?

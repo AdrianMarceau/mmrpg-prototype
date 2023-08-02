@@ -4208,6 +4208,7 @@ body.index #header {
 }
 
 
+/* -- Achievement Icon Styles -- */
 
 #mmrpg .achievement_icon {
     display: block;
@@ -4242,6 +4243,38 @@ body.index #header {
     background-image: url(../images/assets/achievements/dr-cossack-complete.png);
     width: 15px;
 }
+
+
+
+/* -- Screenshot Mode Styles -- */
+
+#mmrpg #window.screenshot-mode {
+
+
+
+}
+#mmrpg #window.screenshot-mode #music {
+    display: none;
+}
+
+#mmrpg #canvas.screenshot-mode {
+
+
+
+}
+#mmrpg #canvas.screenshot-mode #animate,
+#mmrpg #canvas.screenshot-mode .robot_mugshot,
+#mmrpg #canvas.screenshot-mode .robot_details,
+#mmrpg #canvas.screenshot-mode .canvas_overlay_header,
+#mmrpg #canvas.screenshot-mode .canvas_overlay_footer,
+#mmrpg #canvas.screenshot-mode .canvas_battle_results,
+#mmrpg #canvas.screenshot-mode .canvas_ability_details,
+#mmrpg #canvas.screenshot-mode .canvas_item_details,
+#mmrpg #canvas.screenshot-mode .canvas_skill_details {
+    display: none;
+}
+
+
 
 
 /* -- DEBUG DEBUG DEBUG DEBUG DEBUG --

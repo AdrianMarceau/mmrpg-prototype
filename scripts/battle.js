@@ -129,13 +129,40 @@ $(document).ready(function(){
         });
 
     // Trigger a click on the continue button
-    var confirmKeys = [32,13];
-    var previousKeys = [37,38];
-    var forwardKeys = [39,40];
+    var confirmKeys = [32,13]; // "Space Bar" and "Enter/Return"
+    var previousKeys = [37,38]; // "Left Arrow" and "Up Arrow"
+    var forwardKeys = [39,40]; // "Right Arrow" and "Down Arrow"
+    var pauseKeys = [80,27]; // "P" and "Esc"
+    var overlayKeys = [79]; // "O"
     $(this).keydown(function(evt){
         //console.log('key-down '+evt.keyCode);
-        // If there are currently events in the queue, return false
-        if (mmrpgEvents.length){ return false; }
+
+        // If the user has pressed a pause key at any time, respect that
+        if (pauseKeys.indexOf(evt.keyCode) != -1){
+            //console.log('pause key!');
+            evt.preventDefault();
+            mmrpg_toggle_animation();
+            }
+        // If the user has pressed the toggle overlay key, do it
+        else if (overlayKeys.indexOf(evt.keyCode) != -1){
+            //console.log('overlay key!');
+            evt.preventDefault();
+            var newValue = !gameSettings.screenshotMode ? true : false;
+            mmrpg_toggle_screenshot_mode(newValue);
+            parent.mmrpg_toggle_screenshot_mode(newValue);
+            }
+
+        // Otherwise, if there are currently events in the queue, return false
+        if (mmrpgEvents.length){
+            var allowClick = false;
+            if (confirmKeys.indexOf(evt.keyCode) != -1
+                && gameSettings.idleAnimation === false
+                && !$(':animated', gameCanvas).length){
+                allowClick = true;
+            }
+            if (!allowClick){ return false; }
+        }
+
         // If the user has pressed the space bar
         if (confirmKeys.indexOf(evt.keyCode) != -1){ // space bar or enter key
             //console.log('space bar!');

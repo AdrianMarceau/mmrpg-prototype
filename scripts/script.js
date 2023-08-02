@@ -2346,6 +2346,22 @@ function mmrpg_console_event(thisMarkup, eventFlags){ //, flagsMarkup
 
 
 // Define a function for toggling the canvas animation
+gameSettings.screenshotMode = false;
+function mmrpg_toggle_screenshot_mode(screenshotMode){
+    //console.log('mmrpg_toggle_screenshot_mode(screenshotMode:', typeof screenshotMode, screenshotMode, ')');
+    if (typeof screenshotMode === 'undefined'){ screenshotMode = !gameSettings.screenshotMode ? true : false; }
+    gameSettings.screenshotMode = screenshotMode;
+    if (gameCanvas.length){
+        if (gameSettings.screenshotMode){ gameCanvas.addClass('screenshot-mode'); }
+        else { gameCanvas.removeClass('screenshot-mode'); }
+        }
+    if (gameWindow.length){
+        if (gameSettings.screenshotMode){ gameWindow.addClass('screenshot-mode'); }
+        else { gameWindow.removeClass('screenshot-mode'); }
+        }
+}
+
+// Define a function for toggling the canvas animation
 function mmrpg_toggle_animation(){
     if (gameSettings.idleAnimation != false){ return mmrpg_stop_animation(); }
     else { return mmrpg_start_animation(); }

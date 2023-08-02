@@ -35,6 +35,10 @@ ob_start();
     $block_num++;
     $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" onclick="parent.mmrpg_music_load(\''.(!strstr($this_field->field_music, '/') ? 'fields/'.$this_field->field_music : $this_field->field_music).'\', true);"><label><span class="multi">Restart<br />Music</span></label></a>';
 
+    // Display the option for TOGGLE OVERLAYS
+    $block_num++;
+    $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" onclick="parent.mmrpg_toggle_screenshot_mode();"><label><span class="multi">Toggle<br />Overlay</span></label></a>';
+
     // Display a SPACER in this slot
     //$block_num++;
     //$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option button_disabled block_'.$block_num.'" type="button">&nbsp;</a>';
