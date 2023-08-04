@@ -4270,7 +4270,11 @@ body.index #header {
 #mmrpg #canvas.screenshot-mode .canvas_battle_results,
 #mmrpg #canvas.screenshot-mode .canvas_ability_details,
 #mmrpg #canvas.screenshot-mode .canvas_item_details,
-#mmrpg #canvas.screenshot-mode .canvas_skill_details {
+#mmrpg #canvas.screenshot-mode .canvas_skill_details,
+#mmrpg #canvas.screenshot-mode .ability_damage,
+#mmrpg #canvas.screenshot-mode .ability_recovery,
+#mmrpg #canvas.screenshot-mode .item_damage,
+#mmrpg #canvas.screenshot-mode .item_recovery {
     display: none;
 }
 
