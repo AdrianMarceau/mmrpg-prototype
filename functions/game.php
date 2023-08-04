@@ -434,10 +434,10 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
                 '</strong>';
         $temp_console_markup .= '</p>';
         $temp_console_markup .= '<p style="text-align: center; margin: 5px auto;">';
-            $temp_console_markup .= rpg_type::print_span($player_info['player_type'], $player_info['player_name']).' unlocked '.rpg_type::print_span($robot_info['robot_core'], $robot_info['robot_name'], true).' as a robot fighter!';
+            $temp_console_markup .= rpg_type::print_span($player_info['player_type'], $player_info['player_name']).' unlocked the robot master '.rpg_type::print_span($robot_info['robot_core'], $robot_info['robot_name'], true).'!';
         $temp_console_markup .= '</p>';
         $temp_console_markup .= '<p style="text-align: center; margin: 5px auto;">';
-            $temp_console_markup .= ($this_pronoun === 'they' ? 'They\'re' : ucfirst($this_pronoun).'\'s').' '.$this_best_attribute.' '.rpg_type::print_span($robot_info['robot_core'], ucfirst(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'Neutral').' Core').' robot master ';
+            $temp_console_markup .= ($this_pronoun === 'they' ? 'They\'re' : ucfirst($this_pronoun).'\'s').' '.$this_best_attribute.' '.rpg_type::print_span($robot_info['robot_core'], ucfirst(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'Neutral').' Core').' robot ';
             $temp_console_markup .= '<br /> '.$this_first_appearance.'. ';
         $temp_console_markup .= '</p>';
         //$temp_console_markup .= '<p style="text-align: center; margin-top: 5px;">';
