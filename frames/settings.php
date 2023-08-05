@@ -763,7 +763,7 @@ if (!empty($_REQUEST['current_tab']) && in_array($_REQUEST['current_tab'], $allo
 <link type="text/css" href="styles/prototype-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?endif;?>
 </head>
-<body id="mmrpg" class="iframe" data-mode="<?= $global_allow_editing ? 'editor' : 'viewer' ?>" data-source="<?= $global_frame_source ?>">
+<body id="mmrpg" class="iframe" data-frame="settings" data-mode="<?= $global_allow_editing ? 'editor' : 'viewer' ?>" data-source="<?= $global_frame_source ?>">
     <div id="prototype" class="hidden" style="opacity: 0;">
         <div id="settings" class="menu">
 

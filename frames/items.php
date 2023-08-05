@@ -363,7 +363,7 @@ if (true){
 <link type="text/css" href="styles/prototype-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?endif;?>
 </head>
-<body id="mmrpg" class="iframe" data-mode="<?= $global_allow_editing ? 'editor' : 'viewer' ?>" data-source="<?= $global_frame_source ?>">
+<body id="mmrpg" class="iframe" data-frame="items" data-mode="<?= $global_allow_editing ? 'editor' : 'viewer' ?>" data-source="<?= $global_frame_source ?>">
     <div id="prototype" class="hidden" style="opacity: 0;">
         <div id="item" class="menu">
             <div id="item_overlay">&nbsp;</div>

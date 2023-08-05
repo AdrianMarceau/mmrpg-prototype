@@ -153,7 +153,7 @@ $first_robot_token = $allowed_edit_robots[0];
 <link type="text/css" href="styles/prototype-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?endif;?>
 </head>
-<body id="mmrpg" class="iframe" data-mode="<?= $global_allow_editing ? 'editor' : 'viewer' ?>" data-source="<?= $global_frame_source ?>">
+<body id="mmrpg" class="iframe" data-frame="edit_robots" data-mode="<?= $global_allow_editing ? 'editor' : 'viewer' ?>" data-source="<?= $global_frame_source ?>">
     <div id="prototype" class="hidden" style="opacity: 0;">
         <div id="edit" class="menu" style="position: relative;">
             <div id="edit_overlay" style="">&nbsp;</div>

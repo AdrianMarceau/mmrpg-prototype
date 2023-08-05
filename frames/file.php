@@ -694,7 +694,7 @@ function windowResizeFrame(){
 }
 </script>
 </head>
-<body id="mmrpg" class="iframe">
+<body id="mmrpg" class="iframe" data-frame="file">
     <div id="prototype" style="<?= $this_action == 'load' ? 'padding: 60px 0;' : '' ?>">
 
         <form class="menu" action="frames/file.php?action=<?= $this_action ?>" method="post" autocomplete="on">

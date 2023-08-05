@@ -101,7 +101,7 @@ function windowResizeLeaderboard(){
 }
 </script>
 </head>
-<body id="mmrpg" class="iframe">
+<body id="mmrpg" class="iframe" data-frame="leaderboard">
 
     <div id="prototype" class="<?= $this_start_key == 0 ? 'hidden' : '' ?>">
 

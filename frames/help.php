@@ -150,7 +150,7 @@ function windowResizeLeaderboard(){
 }
 </script>
 </head>
-<body id="mmrpg" class="iframe">
+<body id="mmrpg" class="iframe" data-frame="help">
 
   <div id="prototype">
 
