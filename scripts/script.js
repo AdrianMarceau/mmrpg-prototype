@@ -2949,6 +2949,7 @@ function windowEventDisplay(){
             '<div id="events" class="hidden">'+
                 '<div class="event_wrapper">'+
                     '<div class="event_container">'+
+                        '<div id="headline" class="event_headline"></div>'+
                         '<div id="canvas" class="event_canvas"></div>'+
                         '<div id="messages" class="event_messages"></div>'+
                         '<div id="buttons" class="event_buttons"><a class="event_continue">Continue</a></div>'+
@@ -2981,11 +2982,28 @@ function windowEventDisplay(){
         }
 
     // Collect the canvas and message markup to be added to the event container
+    var headlineMarkup = '';
     var canvasMarkup = gameSettings.canvasMarkupArray.length ? gameSettings.canvasMarkupArray.shift() : '';
     var messagesMarkup = gameSettings.messagesMarkupArray.length ? gameSettings.messagesMarkupArray.shift() : '';
     //console.log('canvasMarkup:', canvasMarkup, 'messagesMarkup:', messagesMarkup);
 
+    if (messagesMarkup.indexOf('headline') !== -1){
+        //console.log('headline class was found in the markup!');
+        var $tempMessages = $('<div>'+messagesMarkup+'</div>');
+        var $tempHeadline = $tempMessages.find('.headline');
+        //console.log('$tempMessages =', $tempMessages);
+        //console.log('$tempHeadline =', $tempHeadline);
+        if ($tempHeadline.length){
+            headlineMarkup = $tempHeadline.prop('outerHTML');
+            messagesMarkup = messagesMarkup.replace(headlineMarkup, '');
+            //console.log('new headlineMarkup =', headlineMarkup);
+            //console.log('new messagesMarkup =', messagesMarkup);
+        }
+    }
+
+
     // Empty the canvas and messages of any leftover, fill them with new markup, then show 'em
+    $('#headline', $eventContainer).empty().html(headlineMarkup);
     $('#canvas', $eventContainer).empty().html(canvasMarkup);
     $('#messages', $eventContainer).empty().html(messagesMarkup);
     $eventContainer.css({opacity:0}).removeClass('hidden').animate({opacity:1},300,'swing');

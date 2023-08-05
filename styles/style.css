@@ -1920,6 +1920,7 @@ body.index #header {
     font-weight: bold;
 }
 #events #canvas,
+#events #headline,
 #events #messages {
     width: auto;
     height: 150px;
@@ -1930,6 +1931,7 @@ body.index #header {
     overflow: auto;
 }
 #events #canvas:empty,
+#events #headline:empty,
 #events #messages:empty {
     display: none;
 }
@@ -1965,6 +1967,7 @@ body.index #header {
             rgba(09,09,09,0.75) 75%
     );
 }
+#events #headline,
 #events #messages {
     margin: 5px 0 0;
     border: 0 none transparent !important;
@@ -1973,18 +1976,26 @@ body.index #header {
     padding-right: 15px;
     width: 576px;
     height: auto;
-    max-height: 300px;
+}
+#events #messages {
+    max-height: 310px;
+}
+#events #headline {
+    margin: 0 auto 10px;
+}
+#events #headline p {
+    margin: 0 auto;
 }
 #events #buttons {
     margin: 10px 0 0;
     border: 0 none transparent !important;
     color: #FFFFFF;
 }
-#events #messages .player_type,
-#events #messages .robot_type,
-#events #messages .ability_type,
-#events #messages .item_type,
-#events #messages .field_type {
+#events .event_wrapper .player_type,
+#events .event_wrapper .robot_type,
+#events .event_wrapper .ability_type,
+#events .event_wrapper .item_type,
+#events .event_wrapper .field_type {
     padding: 0 6px;
     border-radius: 0.3em;
     -moz-border-radius: 0.3em;
@@ -1996,52 +2007,52 @@ body.index #header {
     box-decoration-break: clone;
     box-shadow: 1px 2px 0 #000000;
 }
-#events #messages div.headline,
-#events #messages p.headline {
+#events .event_wrapper div.headline,
+#events .event_wrapper p.headline {
     text-align: center;
     font-size: 160%;
     line-height: 1.6;
     margin: 5px auto 10px;
 }
-#events #messages div.inset_panel,
-#events #messages p.inset_panel {
+#events .event_wrapper div.inset_panel,
+#events .event_wrapper p.inset_panel {
     font-size: 100%;
     line-height: 1.6;
     padding: 20px 10px;
     background-color: rgba(0, 0, 0, 0.3) !important;
     background-image: none;
 }
-#events #messages p.bigtext {
+#events .event_wrapper p.bigtext {
     font-size: 140%;
     line-height: 1.6;
 }
-#events #messages p.hugetext {
+#events .event_wrapper p.hugetext {
     font-size: 160%;
     line-height: 1.6;
 }
-#events #messages p.centertext {
+#events .event_wrapper p.centertext {
     text-align: center;
 }
-#events #messages p.smalltext {
+#events .event_wrapper p.smalltext {
     font-size: 100%;
     line-height: 1.6;
 }
-#events #messages div.inset_panel .sprite,
-#events #messages p.inset_panel .sprite {
+#events .event_wrapper div.inset_panel .sprite,
+#events .event_wrapper p.inset_panel .sprite {
 
 }
-#events #messages div.inset_panel .sprite_player,
-#events #messages p.inset_panel .sprite_player {
+#events .event_wrapper div.inset_panel .sprite_player,
+#events .event_wrapper p.inset_panel .sprite_player {
 
 }
-#events #messages div.inset_panel .sprite.float_left,
-#events #messages p.inset_panel .sprite.float_left {
+#events .event_wrapper div.inset_panel .sprite.float_left,
+#events .event_wrapper p.inset_panel .sprite.float_left {
     top: calc(50% - 5px);
     left: calc(50% - 120px);
     transform: translate(-50%, -50%);
 }
-#events #messages div.inset_panel .sprite.float_right,
-#events #messages p.inset_panel .sprite.float_right {
+#events .event_wrapper div.inset_panel .sprite.float_right,
+#events .event_wrapper p.inset_panel .sprite.float_right {
     top: calc(50% - 5px);
     left: calc(50% + 120px);
     transform: translate(-50%, -50%);
@@ -2219,15 +2230,15 @@ body.index #header {
     margin-bottom: 4px;
 }
 
-#events #messages .event .header_left {
+#events .event_wrapper .event .header_left {
     text-align: left;
 }
-#events #messages .event .header_right {
+#events .event_wrapper .event .header_right {
     text-align: right;
 }
 
-#events #messages .event .header_left .header_core,
-#events #messages .event .header_right .header_core {
+#events .event_wrapper .event .header_left .header_core,
+#events .event_wrapper .event .header_right .header_core {
     display: block;
     color: #F2F2F2;
     font-weight: bold;
@@ -2236,15 +2247,15 @@ body.index #header {
     margin: 3px 0 0;
     padding: 0 6px;
 }
-#events #messages .event .header_left .header_core,
-#events #messages .event .header_right .header_core {
+#events .event_wrapper .event .header_left .header_core,
+#events .event_wrapper .event .header_right .header_core {
     border-color: rgba(0, 0, 0, 0.2) !important;
     background-color: rgba(0, 0, 0, 0.2) !important;
 }
-#events #messages .event .header_left .header_core {
+#events .event_wrapper .event .header_left .header_core {
     float: right;
 }
-#events #messages .event .header_right .header_core {
+#events .event_wrapper .event .header_right .header_core {
     float: left;
 }
 
