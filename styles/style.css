@@ -195,6 +195,11 @@ body.index #header {
     margin: 0 auto;
 }
 
+@keyframes info-tooltip-new-pulse {
+    0%   { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100%   { transform: scale(1); }
+}
 #mmrpg .info[data-click-tooltip] {
     cursor: help;
 }
@@ -228,6 +233,13 @@ body.index #header {
 }
 #mmrpg .info[data-click-tooltip]:hover {
     transform: scale(1.2);
+}
+#mmrpg .info[data-click-tooltip].new {
+    -moz-animation: info-tooltip-new-pulse 2s infinite;
+    -ms-animation: info-tooltip-new-pulse 2s infinite;
+    -o-animation: info-tooltip-new-pulse 2s infinite;
+    -webkit-animation: info-tooltip-new-pulse 2s infinite;
+    animation: info-tooltip-new-pulse 2s infinite;
 }
 #mmrpg .info[data-click-tooltip] > i {
     text-align: center;

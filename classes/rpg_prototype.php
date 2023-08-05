@@ -302,7 +302,8 @@ class rpg_prototype {
         $mmrpg_abilities_index = rpg_ability::get_index();
 
         // Collect basic details about the robot we might need later
-        $robot_direction = $robot->player->player_side == 'left' ? 'right' : 'left';
+        $player_side = $robot->player->player_side;
+        $robot_direction = $player_side == 'left' ? 'right' : 'left';
         $action_token = strstr($button_context, 'target_') ? 'target' : $button_context;
         $block_num = $robot_key + 1;
 
@@ -497,11 +498,30 @@ class rpg_prototype {
         $order_button_markup = $allow_button ? 'data-order="'.$order_counter.'"' : '';
         $order_counter += $allow_button ? 1 : 0;
 
+        // Check to see if this robot should be shown as "new" to the player
+        static $session_robot_database;
+        $show_as_new = false;
+        if ($player_side === 'right'){
+            if (empty($session_robot_database)){
+                $session_token = rpg_game::session_token();
+                $session_robot_database = !empty($_SESSION[$session_token]['values']['robot_database']) ? $_SESSION[$session_token]['values']['robot_database'] : array();
+            }
+            //error_log('$session_robot_database = '.print_r($session_robot_database, true));
+            if (empty($session_robot_database[$robot->robot_token])){
+                $show_as_new = true;
+            } elseif (empty($session_robot_database[$robot->robot_token]['robot_unlocked'])){
+                if (empty($session_robot_database[$robot->robot_token]['robot_scanned'])){
+                    $show_as_new = true;
+                }
+            }
+        }
+
         // Now use the new object to generate a snapshot of this switch button
         $btn_type = 'robot_type robot_type_'.(!empty($robot->robot_core) ? $robot->robot_core : 'none').(!empty($robot->robot_core2_type) ? '_'.$robot->robot_core2_type : '');
         $btn_class = 'button action_'.$action_token.' '.$action_token.'_'.$robot->robot_token.' '.$btn_type.' block_'.$block_num.' ';
         $btn_action = $action_token.'_'.$robot->robot_id.'_'.$robot->robot_token;
-        $btn_info_circle = '<span class="info color" data-click-tooltip="'.$robot_title_tooltip.'" data-tooltip-type="'.$btn_type.'">';
+        $btn_info_new = $show_as_new ? ' new' : '';
+        $btn_info_circle = '<span class="info color'.$btn_info_new.'" data-click-tooltip="'.$robot_title_tooltip.'" data-tooltip-type="'.$btn_type.'">';
             $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$robot_core_or_none.'"></i>';
             if (!empty($robot_core2)){ $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$robot_core2.'"></i>'; }
         $btn_info_circle .= '</span>';
