@@ -2560,6 +2560,7 @@ class rpg_robot extends rpg_object {
         // Show a quick pre-defeat defend sprite for dramatic pause
         $this->set_frame('defend');
         $this->set_frame_styles('filter: brightness(3.0);');
+        $this->battle->queue_sound_effect($this->robot_class.'-overloading-sound');
         $this->battle->events_create(false, false, '', '', array(
             'event_flag_camera_action' => true,
             'event_flag_camera_side' => $this->player->player_side,
