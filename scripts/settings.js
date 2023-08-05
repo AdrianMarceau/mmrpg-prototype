@@ -23,13 +23,13 @@ $(document).ready(function(){
     if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
 
         // Define a quick local function for routing sound effect plays to the parent
-        playSoundEffect = function(soundName, options){
+        playSoundEffect = function(soundName, options, isMenuSound){
             if (this instanceof jQuery || this instanceof Element){
                 if ($(this).data('silentClick')){ return; }
                 if ($(this).is('.disabled')){ return; }
                 if ($(this).is('.button_disabled')){ return; }
                 }
-            top.mmrpg_play_sound_effect(soundName, options);
+            top.mmrpg_play_sound_effect(soundName, options, isMenuSound);
             };
 
         // SETTINGS MENU TABS
@@ -219,18 +219,30 @@ $(document).ready(function(){
         var $spriteRenderModeField = $('.field[data-setting="spriteRenderMode"]', $gameSettings);
 
         // Define a function for updating the audio balance config w/ form changes
+        var prevMasterVolume = false;
+        var prevMusicVolume = false;
+        var prevEffectVolume = false;
         function updateAudioBalanceConfig(newConfig){
             //console.log('updateAudioBalanceConfig(newConfig) w/', newConfig);
             if (typeof newConfig !== 'object'){ return false; }
             var masterVolume = typeof newConfig.masterVolume === 'number' ? newConfig.masterVolume : thisGameSettings.masterVolume;
             var musicVolume = typeof newConfig.musicVolume === 'number' ? newConfig.musicVolume : thisGameSettings.musicVolume;
             var effectVolume = typeof newConfig.effectVolume === 'number' ? newConfig.effectVolume : thisGameSettings.effectVolume;
-            //thisGameSettings.masterVolume = masterVolume;
-            //thisGameSettings.musicVolume = musicVolume;
-            //thisGameSettings.effectVolume = effectVolume;
-            if (typeof thisMusicWindow.mmrpg_master_volume !== 'undefined'){ thisMusicWindow.mmrpg_master_volume(masterVolume); }
-            if (typeof thisMusicWindow.mmrpg_music_volume !== 'undefined'){ thisMusicWindow.mmrpg_music_volume(musicVolume); }
-            if (typeof thisMusicWindow.mmrpg_sound_effect_volume !== 'undefined'){ thisMusicWindow.mmrpg_sound_effect_volume(effectVolume); }
+            if (masterVolume !== prevMasterVolume
+                && typeof thisMusicWindow.mmrpg_master_volume !== 'undefined'){
+                thisMusicWindow.mmrpg_master_volume(masterVolume);
+                prevMasterVolume = masterVolume;
+                }
+            if (musicVolume !== prevMusicVolume
+                && typeof thisMusicWindow.mmrpg_music_volume !== 'undefined'){
+                thisMusicWindow.mmrpg_music_volume(musicVolume);
+                prevMusicVolume = musicVolume;
+                }
+            if (effectVolume !== prevEffectVolume
+                && typeof thisMusicWindow.mmrpg_sound_effect_volume !== 'undefined'){
+                thisMusicWindow.mmrpg_sound_effect_volume(effectVolume, true);
+                prevEffectVolume = effectVolume;
+                }
             return true;
         }
 
@@ -283,7 +295,7 @@ $(document).ready(function(){
             //console.log('change event on audio balance config field');
             var newConfig = parseAudioBalanceConfig();
             updateAudioBalanceConfig(newConfig);
-            playSoundEffect.call(this, 'icon-click-mini', {volume: 1.0});
+            playSoundEffect.call(this, 'icon-click-mini', {volume: 1.0}, true);
             });
 
         // Make it so when the user clicks on a radio button's container it automatically triggers the radio button inside
