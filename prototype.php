@@ -631,6 +631,12 @@ gameSettings.totalPlayerOptions = <?= $unlock_count_players ?>;
 gameSettings.totalRobotOptions = <?= mmrpg_prototype_robots_unlocked() ?>;
 gameSettings.prototypeBannerKey = 0;
 gameSettings.prototypeBanners = ['prototype-banners_title-screen_01.gif'];
+<?
+// Define any menu frames already seen so know what's new
+$menu_frames_seen = !empty($_SESSION[$session_token]['battle_settings']['menu_frames_seen']) ? $_SESSION[$session_token]['battle_settings']['menu_frames_seen'] : 'home';
+$menu_frames_seen = strstr($menu_frames_seen, '|') ? explode('|', $menu_frames_seen) : array($menu_frames_seen);
+echo('gameSettings.menuFramesSeen = '.json_encode($menu_frames_seen).';'.PHP_EOL);
+?>
 
 // Define any preset menu selections
 battleOptions['this_user_id'] = <?= $this_userid ?>;

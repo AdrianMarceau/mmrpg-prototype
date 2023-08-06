@@ -13,6 +13,7 @@ gameSettings.nextStepName = 'home';
 gameSettings.nextSlideDirection = 'left';
 gameSettings.startLink = 'home';
 gameSettings.skipPlayerSelect = false;
+gameSettings.menuFramesSeen = [];
 var battleOptions = {};
 
 // Define the perfect scrollbar settings
@@ -264,6 +265,18 @@ $(document).ready(function(){
 
             });
 
+        // If this script is being loaded from within an iframe, let the parent prototype window know
+        if (thisBody.hasClass('iframe')){
+            var frameToken = thisBody.is('[data-frame]') ? thisBody.attr('data-frame') : 'unknown';
+            //top.console.log('we have loaded '+frameToken+' from within an iframe');
+            parent.prototype_menu_frame_seen(frameToken);
+            parent.prototype_menu_links_refresh();
+            }
+        // Otherwise, we can immediately trigger the menu links refresh
+        else {
+            prototype_menu_frame_seen('home');
+            prototype_menu_links_refresh();
+            }
 
         // Define the click event for the chapter select menu links
         var thisChapterSelects = $('.option_wrapper_missions .chapter_select', thisContext);
@@ -1778,4 +1791,40 @@ function prototype_update_profile_settings(newSettings){
         }
     // Return true on success
     return true;
+}
+
+// Define a function for marking a prototype menu frame as having been seen already
+var menuFrameSeenTimeout = false;
+function prototype_menu_frame_seen(frameToken){
+    //console.log('prototype_menu_frame_seen(frameToken:', frameToken, ')');
+    //console.log('gameSettings.menuFramesSeen (before) =', gameSettings.menuFramesSeen);
+    if (gameSettings.menuFramesSeen.indexOf(frameToken) === -1){
+        gameSettings.menuFramesSeen.push(frameToken);
+    }
+    //console.log('gameSettings.menuFramesSeen (after) =', gameSettings.menuFramesSeen);
+    if (menuFrameSeenTimeout !== false){ clearTimeout(menuFrameSeenTimeout); }
+    menuFrameSeenTimeout = setTimeout(function(){
+        //console.log('update server w/ gameSettings.menuFramesSeen =', gameSettings.menuFramesSeen);
+        $.post('scripts/script.php',{requestType:'session',requestData:'battle_settings,menu_frames_seen,'+gameSettings.menuFramesSeen.join('|')});
+        }, 1000);
+}
+
+// Define a function for updating the prototype menu given seen/unseen link status
+function prototype_menu_links_refresh(){
+    //console.log('prototype_menu_links_refresh()');
+    //console.log('gameSettings.menuFramesSeen =', gameSettings.menuFramesSeen);
+    var $thisPrototype = $('#prototype');
+    if ($thisPrototype.length){
+        var $bannerLinks = $('.banner .link[data-step]', $thisPrototype);
+        $bannerLinks.each(function(){
+            var $bannerLink = $(this);
+            var stepToken = $bannerLink.attr('data-step');
+            var stepIsNumeric = !isNaN(stepToken);
+            $('i.new', $bannerLink).remove();
+            if (!stepIsNumeric
+                && gameSettings.menuFramesSeen.indexOf(stepToken) === -1){
+                $bannerLink.append('<i class="new type electric"></i>');
+                }
+            });
+        }
 }
