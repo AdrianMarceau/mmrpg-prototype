@@ -1731,10 +1731,8 @@ class rpg_game {
 
     // -- SPRITE FUNCTIONS -- //
 
-    // Define a function for checking to see if a given sprite exists (at its real location)
-    public static function sprite_exists($sym_path){
-
-        // Define the symlink patterns and replacements for looping
+    // Define a function for conversating a symbolic sprite path into it's real content path
+    public static function get_real_sprite_path($sym_path, $force_full_path = false){
         static $sym_patterns;
         if (empty($sym_patterns)){
             $sym_patterns['^images/(abilities|fields|items|players|robots)/(ability|field|item|player|robot)(_[-_a-z0-9]+)?/(.*)?$'] = 'content/$1/.$2/sprites$3/$4';
@@ -1742,8 +1740,7 @@ class rpg_game {
             $sym_patterns['^images/(abilities|fields|items|players|robots)/([-a-z0-9]+)(_[-_a-z0-9]+)?/(.*)?$'] = 'content/$1/$2/sprites$3/$4';
             $sym_patterns['^images/(abilities|fields|items|players|robots)_shadows/([-a-z0-9]+)(_[-_a-z0-9]+)?/(.*)?$'] = 'content/$1/$2/shadows$3/$4';
         }
-
-        // Attempt to calculate the real path given the symlink path
+        $had_full_path = strstr($sym_path, MMRPG_CONFIG_ROOTDIR) ? true : false;
         $real_path = str_replace(MMRPG_CONFIG_ROOTDIR, '', $sym_path);
         foreach ($sym_patterns AS $find => $replace){
             if (preg_match('#'.$find.'#i', $real_path)){
@@ -1751,6 +1748,18 @@ class rpg_game {
                 break;
             }
         }
+        if ($had_full_path
+            || $force_full_path){
+            $real_path = MMRPG_CONFIG_ROOTDIR.$real_path;
+        }
+        return $real_path;
+    }
+
+    // Define a function for checking to see if a given sprite exists (at its real location)
+    public static function sprite_exists($sym_path){
+
+        // Get the real path given the sym link
+        $real_path = self::get_real_sprite_path($sym_path);
 
         //echo('$sym_path = '.$sym_path.'<br />');
         //echo('$real_path = '.$real_path.'<br />');
@@ -1798,6 +1807,317 @@ class rpg_game {
     }
 
 
+    // -- EVENT BANNER FUNCTIONS -- //
+
+    // Define a function for generating an event banner given an array of parameters
+    public static function generate_event_banner($banner_config = array(), $output_to_file = false){
+
+        // Define default values for any missing parameters
+        if (!isset($banner_config['background'])){ $banner_config['background'] = array(38, 38, 38); }
+        if (!isset($banner_config['width'])){ $banner_config['width'] = 765; }
+        if (!isset($banner_config['height'])){ $banner_config['height'] = 216; }
+        if (!isset($banner_config['event_name'])){ $banner_config['event_name'] = ''; }
+        if (!isset($banner_config['field_background'])){ $banner_config['field_background'] = ''; }
+        if (!isset($banner_config['field_foreground'])){ $banner_config['field_foreground'] = ''; }
+        if (!isset($banner_config['field_gridlines'])){ $banner_config['field_gridlines'] = true; }
+        if (!isset($banner_config['field_sprites'])){ $banner_config['field_sprites'] = array(); }
+        if (!isset($banner_config['frame_colour'])){ $banner_config['frame_colour'] = array(26, 26, 26); }
+        //error_log('$banner_config = '.print_r($banner_config, true));
+
+        // If there are field sprites, we should do some pre-processing so they're easier to work with
+        if (!empty($banner_config['field_sprites'])) {
+            // Loop through all the sprites and generate a "layer" value based on the "bottom" and it's percent between the min and max (only allow 8 layers total)
+            $sprite_bottom_min = 30;
+            $sprite_bottom_max = 115;
+            $sprite_bottom_range = $sprite_bottom_max - $sprite_bottom_min;
+            foreach ($banner_config['field_sprites'] AS $sprite_key => $sprite_data){
+                // If the sprite doesn't have a bottom value, skip it
+                if (!isset($sprite_data['bottom'])){ continue; }
+                // Otherwise, calculate the layer value
+                $sprite_layer = round(1 + (7 * (($sprite_data['bottom'] - $sprite_bottom_min) / $sprite_bottom_range)));
+                //error_log('$sprite_data[\'bottom\'] = '.$sprite_data['bottom'].'; $sprite_layer = '.$sprite_layer);
+                // If the layer value is less than 1, set it to 1
+                if ($sprite_layer < 1){ $sprite_layer = 1; }
+                // If the layer value is greater than 8, set it to 8
+                if ($sprite_layer > 8){ $sprite_layer = 8; }
+                // Add the layer value to the sprite data
+                $banner_config['field_sprites'][$sprite_key]['layer'] = $sprite_layer;
+            }
+            // Revise the entire field sprites array so layers start at "1" rather than 3, 4, 5, etc.
+            $min_layer_value = 99;
+            foreach ($banner_config['field_sprites'] AS $key => $data){ if ($data['layer'] < $min_layer_value){ $min_layer_value = $data['layer']; } }
+            foreach ($banner_config['field_sprites'] AS $key => $data){ $banner_config['field_sprites'][$key]['layer'] = $data['layer'] - ($min_layer_value - 1); }
+            // Pre-sort the sprites by their bottom value which is a more fine-grained layer value
+            usort($banner_config['field_sprites'], function($a, $b){
+                $a_bottom = isset($a['bottom']) ? $a['bottom'] : 0;
+                $b_bottom = isset($b['bottom']) ? $b['bottom'] : 0;
+                if ($a_bottom == $b_bottom){ return 0; }
+                return ($a_bottom < $b_bottom) ? 1 : -1;
+            });
+            // Print out some debug info in case we need it
+            //error_log('$banner_config[\'field_sprites\'] = '.print_r($banner_config['field_sprites'], true));
+        }
+
+        // Create a blank image with the specified dimensions
+        $banner_image = imagecreatetruecolor($banner_config['width'], $banner_config['height']);
+        //error_log('-> created event banner at '.$banner_config['width'].' by '.$banner_config['height']);
+
+        // Fill the background with the color #262626
+        list($bgR, $bgG, $bgB) = $banner_config['background'];
+        $bgColor = imagecolorallocate($banner_image, $bgR, $bgG, $bgB);
+        imagefill($banner_image, 0, 0, $bgColor);
+        //error_log('-> filled event banner with rgb('.implode(', ', $banner_config['background']).')');
+
+        // Add the background image (blurred 1px, darkened)
+        if (!empty($banner_config['field_background'])){
+            $backgroundImagePath = 'images/fields/'.$banner_config['field_background'].'/battle-field_background_base.gif';
+            $backgroundImagePath = rpg_game::get_real_sprite_path($backgroundImagePath, true);
+            $backgroundImage = imagecreatefromgif($backgroundImagePath);
+            self::convert_sprite_to_true_colour($backgroundImage);
+            self::darken_event_banner_sprite($backgroundImage, 15);
+            self::blur_event_banner_sprite($backgroundImage, 2);
+            $backgroundImageWidth = imagesx($backgroundImage);
+            $backgroundImageHeight = imagesy($backgroundImage);
+            $backgroundOffsetY = 0;
+            $backgroundOffsetX = ceil(($banner_config['width'] - $backgroundImageWidth) / 2);
+            imagecopy($banner_image, $backgroundImage, $backgroundOffsetX, $backgroundOffsetY, 0, 0, $backgroundImageWidth, $backgroundImageHeight);
+            //error_log('-> layered event banner with background '.$backgroundImagePath);
+            imagedestroy($backgroundImage);
+        }
+
+        // Add the foreground image (2x zoom)
+        if (!empty($banner_config['field_foreground'])){
+            $foregroundImagePath = 'images/fields/'.$banner_config['field_foreground'].'/battle-field_foreground_base.png';
+            $foregroundImagePath = rpg_game::get_real_sprite_path($foregroundImagePath, true);
+            $foregroundImage = imagecreatefrompng($foregroundImagePath);
+            $foregroundImageWidth = imagesx($foregroundImage);
+            $foregroundImageHeight = imagesy($foregroundImage);
+            $transparentColor = imagecolorallocatealpha($foregroundImage, 0, 0, 0, 127);
+            imagefill($foregroundImage, 0, 0, $transparentColor);
+            imagealphablending($foregroundImage, false);
+            imagesavealpha($foregroundImage, true);
+            $foregroundOffsetY = -25;
+            $foregroundOffsetX = ceil(($banner_config['width'] - $foregroundImageWidth) / 2);
+            //$foregroundImage = imagescale($foregroundImage, ($foregroundImageWidth * 2), -1, IMG_NEAREST_NEIGHBOUR);
+            imagecopy($banner_image, $foregroundImage, $foregroundOffsetX, $foregroundOffsetY, 0, 0, $foregroundImageWidth, $foregroundImageHeight);
+            //error_log('-> layered event banner with foreground '.$foregroundImagePath);
+            imagedestroy($foregroundImage);
+        }
+
+        // Add the gridline image to the field
+        if (!empty($banner_config['field_gridlines'])){
+            $gridlinesImagePath = 'images/assets/battle-scene_gridlines-resized_event-banner.png';
+            $gridlinesImagePath = rpg_game::get_real_sprite_path($gridlinesImagePath, true);
+            $gridlinesImage = imagecreatefrompng($gridlinesImagePath);
+            $gridlinesImageWidth = imagesx($gridlinesImage);
+            $gridlinesImageHeight = imagesy($gridlinesImage);
+            $gridlinesImage = rpg_game::generate_event_banner_sprite($gridlinesImagePath, $gridlinesImageWidth, 0);
+            $gridlinesOffsetY = 104;
+            $gridlinesOffsetX = ceil(($banner_config['width'] - $gridlinesImageWidth) / 2);
+            imagecopy($banner_image, $gridlinesImage, $gridlinesOffsetX, $gridlinesOffsetY, 0, 0, $gridlinesImageWidth, $gridlinesImageHeight);
+            //error_log('-> layered event banner with gridlines '.$gridlinesImagePath);
+            imagedestroy($gridlinesImage);
+        }
+
+        // Loop through the sprites array and render each one
+        $kind_to_path_index = array();
+        $kind_to_path_index['player'] = 'players';
+        $kind_to_path_index['robot'] = 'robots';
+        $kind_to_path_index['ability'] = 'abilities';
+        $kind_to_path_index['item'] = 'items';
+        $kind_to_path_index['object'] = 'objects';
+        if (!empty($banner_config['field_sprites'])) {
+            // Loop through the actual sprites and add them to the banner image
+            foreach ($banner_config['field_sprites'] as $sprite) {
+                $spriteKind = $sprite['kind'];
+                $spriteImage = $sprite['image'];
+                $spriteImageSheet = $spriteImageAlt = '';
+                if (strstr($sprite['image'], '_')){ list($spriteImage, $spriteImageAlt) = explode('_', $sprite['image']); }
+                elseif (preg_match('/-([0-9]+)$/', $sprite['image'])){ list($spriteImage, $spriteImageAlt) = explode('_', preg_replace('/^([-_a-z0-9]+)-([0-9]+)$/', '$1_$2', $sprite['image'])); }
+                if (strstr($sprite['image'], '/')){ list($spriteImage, $spriteImageSheet) = explode('/', $sprite['image']); }
+                $spriteSize = $sprite['size'];
+                $spriteFrame = $sprite['frame'];
+                $spriteDirection = $sprite['direction'];
+                $spriteLayer = isset($sprite['layer']) ? $sprite['layer'] : 1;
+                $spriteLeft = isset($sprite['left']) ? $sprite['left'] : 0;
+                $spriteRight = isset($sprite['right']) ? $sprite['right'] : 0;
+                $spriteBottom = isset($sprite['bottom']) ? $sprite['bottom'] : 0;
+                $spriteFile = 'sprite_' . $spriteDirection . '_' . $spriteSize . 'x' . $spriteSize . '.png';
+                $spritePath = 'images/'.$kind_to_path_index[$spriteKind].'/';
+                $spritePath .= $spriteImage;
+                $spritePath .= (!empty($spriteImageAlt) ? '_'.$spriteImageAlt : '');
+                $spritePath .= '/';
+                $spritePath .= (!empty($spriteImageSheet) ? $spriteImageSheet.'/' : '');
+                $spritePath .= $spriteFile;
+                $spriteObj = rpg_game::generate_event_banner_sprite($spritePath, $spriteSize, $spriteFrame, true);
+                if ($spriteLayer > 1){ self::darken_event_banner_sprite($spriteObj, (($spriteLayer - 1) * 5)); }
+                $destY = $banner_config['height'] - $spriteBottom - ($spriteSize * 2);
+                $destX = $sprite['float'] === 'left' ? $spriteLeft : ($banner_config['width'] - $spriteRight - ($spriteSize * 2));
+                if ($spriteSize > 40){ $destX += ($sprite['float'] === 'left' ? -1 : 1) * ($spriteSize - 40); }
+                imagecopy($banner_image, $spriteObj, $destX, $destY, 0, 0, ($spriteSize * 2), ($spriteSize * 2));
+                imagedestroy($spriteObj);
+            }
+        }
+
+        // Draw a player-coloured rectangle on the left side of the banner
+        if (!empty($banner_config['frame_colour'])){
+
+            // Check if this is a bonus event chapter
+            $is_bonus_chapter = !preg_match('/^chapter-([0-9]+)-unlocked$/i', $banner_config['event_name']) ? true : false;
+
+            // Collect the one or two frame colours to use
+            $frame_colour = $banner_config['frame_colour'];
+            $frame_colour2 = isset($banner_config['frame_colour2']) ? $banner_config['frame_colour2'] : $banner_config['frame_colour'];
+            $frame_colour3 = array(241, 182, 41);
+
+            // Add a frame on the left side of the event banner
+            if ($is_bonus_chapter){ self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $frame_colour3, 'position' => 'left', 'width' => 320)); }
+            self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $frame_colour2, 'position' => 'left', 'width' => 300));
+            self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $frame_colour, 'position' => 'left', 'width' => 200));
+
+            // Add a frame on the right side of the event banner
+            if ($is_bonus_chapter){ self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $frame_colour3, 'position' => 'right', 'width' => 320)); }
+            self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $frame_colour2, 'position' => 'right', 'width' => 300));
+            self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $frame_colour, 'position' => 'right', 'width' => 200));
+        }
+
+
+        // If a file path was provided, let's put it there
+        if (!empty($output_to_file)){
+
+            // Output the image to the file path
+            $output_path = !strstr($output_to_file, MMRPG_CONFIG_ROOTDIR) ? MMRPG_CONFIG_ROOTDIR.$output_to_file : $output_to_file;
+            imagepng($banner_image, $output_path);
+            imagedestroy($banner_image);
+            return;
+
+        }
+        // Otherwise we can output it directly
+        else {
+
+            // Output the image to the browser
+            header('Content-type: image/png;');
+            header('Content-Disposition: inline; filename="event-banner.png"');
+            imagepng($banner_image);
+            imagedestroy($banner_image);
+            exit();
+
+        }
+
+    }
+
+    // Define a function for loading and preparing a sprite image for use in an event banner
+    public static function generate_event_banner_sprite($path, $size, $frame, $zoom = false){
+        // Load the sprite sheet as an image object to start
+        $spritePath = rpg_game::get_real_sprite_path($path, true);
+        $spriteSheet = imagecreatefrompng($spritePath);
+        // Create the new sprite at the requested size
+        $sprite = imagecreatetruecolor($size, $size);
+        // Define a transparent color
+        $transparentColor = imagecolorallocatealpha($sprite, 0, 0, 0, 127);
+        // Fill the new image with the transparent color
+        imagefill($sprite, 0, 0, $transparentColor);
+        // Turn off blending mode
+        imagealphablending($sprite, false);
+        // Enable saving of alpha channel
+        imagesavealpha($sprite, true);
+        // Copy the requested frame from the sprite sheet to the new sprite
+        $frameOffset = $frame * $size;
+        imagecopy($sprite, $spriteSheet, 0, 0, $frameOffset, 0, $size, $size);
+        // If requested, scale the sprite up 2x with the standard zoom factor
+        $zoomSize = $size * 2; // 2x zoom
+        if ($zoom){ $sprite = imagescale($sprite, $zoomSize, -1, IMG_NEAREST_NEIGHBOUR); }
+        // Return the generated sprite
+        return $sprite;
+    }
+
+    // Define a function for converting a given sprite to true colour if it's not already
+    public static function convert_sprite_to_true_colour(&$sprite){
+        // Check if the sprite is already true colour
+        if (imageistruecolor($sprite)){ return $sprite; }
+        // Otherwise, convert it to true colour
+        $true_colour_sprite = imagecreatetruecolor(imagesx($sprite), imagesy($sprite));
+        imagecopy($true_colour_sprite, $sprite, 0, 0, 0, 0, imagesx($sprite), imagesy($sprite));
+        $sprite = $true_colour_sprite;
+        return true;
+    }
+
+    // Define a function for darkening a sprite image by a given percentage
+    public static function darken_event_banner_sprite(&$sprite, $percent = 10){
+        if ($percent < 0){ $percent = 0; }
+        if ($percent > 100){ $percent = 100; }
+        imagefilter($sprite, IMG_FILTER_BRIGHTNESS, (-1 * (255 * $percent / 100)));
+        return true;
+    }
+
+    // Define a function for blurring a sprite image by a given factor
+    public static function blur_event_banner_sprite(&$sprite, $factor = 1){
+        for ($i = 0; $i < $factor; $i++){ imagefilter($sprite, IMG_FILTER_GAUSSIAN_BLUR); }
+        return true;
+    }
+
+    // Define a function for adding a frame to an event banner with the requested config
+    public static function overlay_frame_on_event_banner(&$banner_image, $banner_config, $frame_config){
+
+        // Set default values for the frame config array if not provided
+        if (!isset($frame_config['colour'])){ $frame_config['colour'] = array(0, 0, 0); }
+        if (!isset($frame_config['width'])){ $frame_config['width'] = 100; }
+        if (!isset($frame_config['position'])){ $frame_config['position'] = 'left'; }
+
+        // Define the blue color (e.g., 0, 0, 255 for pure blue)
+        list($fcR, $fcG, $fcB) = $frame_config['colour'];
+        $blue = imagecolorallocate($banner_image, $fcR, $fcG, $fcB);
+
+        // Define the width of the blue rectangles (e.g., 20 pixels)
+        $rectangle_width = $frame_config['width'];
+        $rectangle_height = $banner_config['height'] * 2;
+
+        // Create a new image resource for the left rectangle
+        $left_rectangle = imagecreatetruecolor($rectangle_width, $rectangle_height);
+
+        // Enable transparency and set alpha blending
+        imagealphablending($left_rectangle, false);
+        imagesavealpha($left_rectangle, true);
+
+        // Allocate a transparent color
+        $transparent = imagecolorallocatealpha($left_rectangle, 0, 0, 0, 127);
+        imagefilledrectangle($left_rectangle, 0, 0, $rectangle_width, $rectangle_height, $transparent);
+
+        // Fill the coloured rectangle
+        imagefilledrectangle($left_rectangle, 0, 0, $rectangle_width, $rectangle_height, $blue);
+
+        // Rotate the rectangle before adding to image
+        $left_rotate = 0;
+        if ($frame_config['position'] === 'left'){ $left_rotate = -10; }
+        elseif ($frame_config['position'] === 'right'){ $left_rotate = -10; }
+        elseif (is_array($frame_config['position']) && isset($frame_config['position'][2])){ $left_rotate = $frame_config['position'][2]; }
+        $rotated_width = abs(cos(deg2rad($left_rotate)) * $rectangle_width);
+        if (is_array($frame_config['position'])){
+            $left_offsetX = isset($frame_config['position'][0]) ? $frame_config['position'][0] : 0;
+            $left_offsetY = isset($frame_config['position'][1]) ? $frame_config['position'][1] : 0;
+        } else {
+            $left_offsetX = 0;
+            $left_offsetY = 0 - ceil($rectangle_height / 4);
+            if ($frame_config['position'] === 'left'){
+                $left_offsetX -= ceil($banner_config['width'] * 0.045);
+                $left_offsetX -= ceil($rectangle_width * 0.9);
+            } elseif ($frame_config['position'] === 'right'){
+                $left_offsetX += ceil($banner_config['width'] * 0.95);
+                $left_offsetX -= ceil($rectangle_width * 0.10);
+            }
+        }
+        if ($left_rotate > 0 || $left_rotate < 0){
+            $left_rectangle = imagerotate($left_rectangle, $left_rotate, $transparent); // Apply transparent color here!!!
+        }
+
+        // Finally, add the rotated rectangle to the banner image
+        imagecopy($banner_image, $left_rectangle, $left_offsetX, $left_offsetY, 0, 0, imagesx($left_rectangle), imagesy($left_rectangle));
+        imagedestroy($left_rectangle);
+
+        // Return true on success
+        return true;
+
+    }
 
 
     // -- SESSION FUNCTIONS -- //
