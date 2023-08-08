@@ -3833,5 +3833,80 @@ class rpg_player extends rpg_object {
         }
     }
 
+    // Define a function for getting a list of starter robots for players
+    public static function get_starter_robots(){
+        return array(
+            'default' => 'robot',
+            'dr-light' => 'mega-man',
+            'dr-wily' => 'bass',
+            'dr-cossack' => 'proto-man'
+            );
+    }
+
+    // Define a function for calculating the starter robot for a given player
+    public static function get_starter_robot($player_token = '', $return_info_array = false){
+        $starter_robot_index = self::get_starter_robots();
+        if (isset($starter_robot_index[$player_token])){ $starter_robot = $starter_robot_index[$player_token]; }
+        else { $starter_robot = $starter_robot_index['default']; }
+        if ($return_info_array){
+            return array(
+                'robot_token' => $starter_robot,
+                'robot_name' => ucwords(str_replace('-', ' ', $starter_robot))
+                );
+        } else {
+            return $starter_robot;
+        }
+    }
+
+    // Define a function for getting a list of support robots for players
+    public static function get_support_robots(){
+        return array(
+            'default' => 'robot',
+            'dr-light' => 'roll',
+            'dr-wily' => 'disco',
+            'dr-cossack' => 'rhythm'
+            );
+    }
+
+    // Define a function for calculating the support robot for a given player
+    public static function get_support_robot($player_token = '', $return_info_array = false){
+        $support_robot_index = self::get_support_robots();
+        if (isset($support_robot_index[$player_token])){ $support_robot = $support_robot_index[$player_token]; }
+        else { $support_robot = $support_robot_index['default']; }
+        if ($return_info_array){
+            return array(
+                'robot_token' => $support_robot,
+                'robot_name' => ucwords(str_replace('-', ' ', $support_robot))
+                );
+        } else {
+            return $support_robot;
+        }
+    }
+
+    // Define a function for getting a list of support robots for players
+    public static function get_support_mechas(){
+        return array(
+            'default' => 'met',
+            'dr-light' => 'sniper-joe',
+            'dr-wily' => 'skeleton-joe',
+            'dr-cossack' => 'crystal-joe'
+            );
+    }
+
+    // Define a function for calculating the support robot for a given player
+    public static function get_support_mecha($player_token = '', $return_info_array = false){
+        $support_mecha_index = self::get_support_mechas();
+        if (isset($support_mecha_index[$player_token])){ $support_mecha = $support_mecha_index[$player_token]; }
+        else { $support_mecha = $support_mecha_index['default']; }
+        if ($return_info_array){
+            return array(
+                'robot_token' => $support_mecha,
+                'robot_name' => ucwords(str_replace('-', ' ', $support_mecha))
+                );
+        } else {
+            return $support_mecha;
+        }
+    }
+
 }
 ?>
