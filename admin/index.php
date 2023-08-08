@@ -320,6 +320,7 @@ $actionMap = [
     'edit-music' => 'edit-music.php',
     'watch-error-log' => 'error-log.php',
     'view-sprites' => 'view-sprites.php',
+    'view-banners' => 'view-banners.php',
     'generate-prompts' => 'generate-prompts.php',
     'purge-bogus-users' => 'purge.php',
     'delete-cached-files' => 'delete-cache.php',

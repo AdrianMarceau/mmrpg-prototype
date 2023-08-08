@@ -703,6 +703,20 @@
                 $this_group_options[] = $this_option;
             }
 
+            if (
+                rpg_user::current_user_has_permission('edit-players')
+                || rpg_user::current_user_has_permission('edit-robots')
+                || rpg_user::current_user_has_permission('edit-abilities')
+                || rpg_user::current_user_has_permission('edit-items')
+                || rpg_user::current_user_has_permission('edit-fields')
+                ){
+                $this_option = array(
+                    'link' => array('url' => 'admin/view-banners/?kind=event&refresh=false', 'text' => 'View Events', 'target' => '_blank', 'bullet' => 'rectangle-wide'),
+                    'desc' => 'Quickly review all in-game event banners at once',
+                    );
+                $this_group_options[] = $this_option;
+            }
+
             // Merge in the common game database group options to all envs
             $this_group_options = array_merge($this_group_options, $common_group_kinds_options['game_database']);
 
