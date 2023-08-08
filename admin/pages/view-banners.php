@@ -37,7 +37,7 @@
                 ];
                 chapters.forEach(chapter => {
                     players.forEach(player => {
-                        let imgSrc = `http://local.prototype.mmrpg-world.net/scripts/get-banner.php?kind=event&event=${chapter}&player=${player}<?= $force_refresh ? '&refresh=true' : '' ?>`;
+                        let imgSrc = `<?= MMRPG_CONFIG_ROOTURL ?>scripts/get-banner.php?kind=event&event=${chapter}&player=${player}<?= $force_refresh ? '&refresh=true' : '' ?>`;
                         document.write(`
                             <div class="banner-cell">
                                 <strong class="banner-caption">${chapter}</strong>
