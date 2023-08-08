@@ -883,10 +883,11 @@ foreach ($chapter_unlock_players AS $player_key => $player_token){
             $player_info = $mmrpg_index_players[$player_token];
             $player_name = $player_info['player_name'];
             $player_type = $player_info['player_type'];
+            $banner_image_path = 'images/events/event-banner_'.$chapter_token.'-unlocked_'.$player_token.'.png?'.MMRPG_CONFIG_CACHE_DATE;
             $headline_text = $chapter_is_intro ? $chapter_unlock_config['welcome'] : 'Congratulations!';
             $temp_headline_markup = '<p class="headline ability_type ability_type_'.$player_type.'"><strong>'.$headline_text.'</strong></p>';
             $temp_canvas_markup = '';
-            $temp_canvas_markup .= '<div class="sprite sprite_80x80 smooth-scaling" style="background-image: url(images/events/event-banner_'.$chapter_token.'-unlocked_'.$player_token.'.jpg?'.MMRPG_CONFIG_CACHE_DATE.'); background-size: cover; background-position: center top; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+            $temp_canvas_markup .= '<div class="sprite sprite_80x80 smooth-scaling" style="background-image: url('.$banner_image_path.'); background-size: cover; background-position: center top; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
             $temp_console_markup = '';
             $temp_console_markup .= $temp_headline_markup;
             $temp_console_markup .= '<div class="ability_type inset_panel">';

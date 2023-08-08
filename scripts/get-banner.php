@@ -82,7 +82,7 @@ if ($request_kind === 'event'){
     }
 
     // Define the cache filename and variables for event banners
-    $cache_file_name = 'event-banner_'.$request_event.'_'.$request_player.'.'.$request_format;
+    $cache_file_name = 'event-banner_'.$request_player.'_'.$request_event.'.'.$request_format;
     $cache_file_path_full = $cache_path_full.$cache_file_name;
     //error_log('cache_file_path_full: '.$cache_file_path_full);
 
@@ -102,7 +102,7 @@ if ($request_kind === 'event'){
     }
 
     // A cached image could not be found, so that means we're generating anew
-    error_log('generating a NEW image file for '.$cache_file_name);
+    //error_log('generating a NEW image file for '.$cache_file_name);
 
     // Define the default banner config
     $banner_config = array(
