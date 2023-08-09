@@ -41,6 +41,9 @@ gameSettings.currentBodyHeight = 0; // collect the current window width and upda
 gameSettings.allowEditing = true; // default to true to allow all editing unless otherwise stated
 gameSettings.audioBaseHref = ''; // the base href where audio comes from (empty if same as baseHref)
 gameSettings.onGameStart = []; // define an array to hold  events that have to wait until game start
+gameSettings.customValues = {}; // define an object to hold miscelaneous custom values during runtime
+gameSettings.customCounters = {}; // define an object to hold miscelaneous custom counters during runtime
+gameSettings.customFlags = {}; // define an object to hold miscelaneous custom flags during runtime
 gameSettings.customIndex = {}; // default to empty but may be filled at runtime and used later
 gameSettings.customIndex.musicIndex = {} // predefine to be filled later so we don't get errors
 gameSettings.customIndex.soundsIndex = {} // predefine to be filled later so we don't get errors
@@ -1158,8 +1161,22 @@ function mmrpg_canvas_animate(){
                     }
                 }
             // Check to see if we should be applying any extra styles
-            if (newFrame !== 'base' && thisRandom % 11 === 0){ extraStyles = {transform: 'scaleX(-1) translateX(-10%)'}; }
-            else if (thisRandom % 3 === 0){ extraStyles = {transform: ''}; }
+            //console.log('gameSettings.currentActionPanel =', gameSettings.currentActionPanel);
+            if (typeof gameSettings.customFlags.isSwitching === 'undefined'){
+                gameSettings.customFlags.isSwitching = false;
+                }
+            if (gameSettings.currentActionPanel === 'switch'){
+                gameSettings.customFlags.isSwitching = true;
+                extraStyles = {transform: 'scaleX(-1) translateX(-10%)'};
+                }
+            else if (gameSettings.customFlags.isSwitching === true) {
+                gameSettings.customFlags.isSwitching = false;
+                extraStyles = {transform: ''};
+                }
+            else {
+                if (newFrame !== 'base' && thisRandom % 11 === 0){ extraStyles = {transform: 'scaleX(-1) translateX(-10%)'}; }
+                else if (thisRandom % 3 === 0){ extraStyles = {transform: ''}; }
+                }
             }
 
         // Trigger the player frame advancement
