@@ -454,6 +454,19 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
             $temp_console_markup .= 'Check '.$this_pronoun_posessive2.' entry in the <strong><i class="fa fas fa-compact-disc"></i> <ins>database</ins></strong> tab '.(mmrpg_prototype_robots_unlocked() > 1 ? 'or customize '.$this_pronoun_object.' from the <strong><i class="fa fas fa-robot"></i> <ins>robots</ins></strong> tab' : 'for more info').'!';
         $temp_console_markup .= '</p>';
 
+        // Remove the robot editor frame from the history array so that it appears with the "new" indicator
+        $clear_seen_frame_token = 'edit_robots';
+        if (isset($_SESSION[$session_token]['battle_settings']['menu_frames_seen'])){
+            $menu_frames_seen = $_SESSION[$session_token]['battle_settings']['menu_frames_seen'];
+            $menu_frames_seen = strstr($menu_frames_seen, '|') ? explode('|', $menu_frames_seen) : array($menu_frames_seen);
+            if (($key = array_search($clear_seen_frame_token, $menu_frames_seen)) !== false){
+                unset($menu_frames_seen[$key]);
+                $menu_frames_seen = implode('|', $menu_frames_seen);
+                $_SESSION[$session_token]['battle_settings']['menu_frames_seen'] = $menu_frames_seen;
+            }
+        }
+
+        // Append this event to the global events array
         $_SESSION[$session_token]['EVENTS'][] = array(
             'canvas_markup' => $temp_canvas_markup,
             'console_markup' => $temp_console_markup,
@@ -883,6 +896,18 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
             $temp_console_markup .= 'Check the <strong><i class="fa fas fa-fire-alt"></i> <ins>abilities</ins></strong> tab for more info'.(mmrpg_prototype_robots_unlocked() > 1 ? ' or the <strong><i class="fa fas fa-robot"></i> <ins>robots</ins></strong> tab to equip it to compatible robots!' : '!');
         $temp_console_markup .= '</p>';
 
+        // Remove the abilities frame from the history array so that it appears with the "new" indicator
+        $clear_seen_frame_token = 'abilities';
+        if (isset($_SESSION[$session_token]['battle_settings']['menu_frames_seen'])){
+            $menu_frames_seen = $_SESSION[$session_token]['battle_settings']['menu_frames_seen'];
+            $menu_frames_seen = strstr($menu_frames_seen, '|') ? explode('|', $menu_frames_seen) : array($menu_frames_seen);
+            if (($key = array_search($clear_seen_frame_token, $menu_frames_seen)) !== false){
+                unset($menu_frames_seen[$key]);
+                $menu_frames_seen = implode('|', $menu_frames_seen);
+                $_SESSION[$session_token]['battle_settings']['menu_frames_seen'] = $menu_frames_seen;
+            }
+        }
+
         $_SESSION[$session_token]['EVENTS'][] = array(
             'canvas_markup' => preg_replace('/\s+/', ' ', $temp_canvas_markup),
             'console_markup' => $temp_console_markup,
@@ -1080,6 +1105,18 @@ function mmrpg_game_unlock_item($item_token, $print_options = array()){
             if ($is_shop_item){ $temp_console_markup .= 'Check the <strong><i class="fa fas fa-shopping-cart"></i> <ins>shop</ins></strong> tab to see what\'s available!'; }
             else { $temp_console_markup .= 'Check the <strong><i class="fa fas fa-briefcase"></i> <ins>items</ins></strong> tab for more info!'; }
         $temp_console_markup .= '</p>';
+
+        // Remove the shop/item frame from the history array so that it appears with the "new" indicator
+        $clear_seen_frame_token = $is_shop_item ? 'shop' : 'items';
+        if (isset($_SESSION[$session_token]['battle_settings']['menu_frames_seen'])){
+            $menu_frames_seen = $_SESSION[$session_token]['battle_settings']['menu_frames_seen'];
+            $menu_frames_seen = strstr($menu_frames_seen, '|') ? explode('|', $menu_frames_seen) : array($menu_frames_seen);
+            if (($key = array_search($clear_seen_frame_token, $menu_frames_seen)) !== false){
+                unset($menu_frames_seen[$key]);
+                $menu_frames_seen = implode('|', $menu_frames_seen);
+                $_SESSION[$session_token]['battle_settings']['menu_frames_seen'] = $menu_frames_seen;
+            }
+        }
 
         // Append this event to the global events array for display
         $_SESSION[$session_token]['EVENTS'][] = array(
