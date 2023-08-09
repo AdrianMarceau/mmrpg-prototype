@@ -25,46 +25,52 @@ $hh = substr($new_cache_time, 0, 2); $ii = substr($new_cache_time, 2, 2);
 $mmrpg_config_cache_time = mktime($hh, $ii, 0, $mm, $dd, $yyyy);
 //error_log('$mmrpg_config_cache_time = '.print_r($mmrpg_config_cache_time, true));
 
+// Collect an index of players and robots for validation purposes
+$mmrpg_index_types = array();
+$mmrpg_index_players = array();
+$mmrpg_index_robots = array();
+$mmrpg_index_abilities = array();
+$mmrpg_index_items = array();
+$mmrpg_index_objects = array();
+function mmrpgGetIndex($kind){
+    global $mmrpg_index_types, $mmrpg_index_players, $mmrpg_index_robots, $mmrpg_index_abilities, $mmrpg_index_items;
+    switch ($kind){
+        case 'type': case 'types':
+            if (empty($mmrpg_index_types)){ $mmrpg_index_types = rpg_type::get_index(true); }
+            return $mmrpg_index_types;
+        case 'player': case 'players':
+            if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(); }
+            return $mmrpg_index_players;
+        case 'robot': case 'robots':
+            if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = rpg_robot::get_index(); }
+            return $mmrpg_index_robots;
+        case 'ability': case 'abilities':
+            if (empty($mmrpg_index_abilities)){ $mmrpg_index_abilities = rpg_ability::get_index(); }
+            return $mmrpg_index_abilities;
+        case 'item': case 'items':
+            if (empty($mmrpg_index_items)){ $mmrpg_index_items = rpg_item::get_index(); }
+            return $mmrpg_index_items;
+        case 'object': case 'objects':
+            if (empty($mmrpg_index_objects)){
+                $mmrpg_index_objects = array();
+                $mmrpg_index_objects['challenge-markers'] = array(
+                    'object_token' => 'challenge-markers',
+                    'object_image_size' => 40
+                    );
+            }
+            return $mmrpg_index_objects;
+    }
+    return array();
+}
+
+// Define the default banner config
+$banner_config = array(
+    'field_background' => 'field',
+    'field_foreground' => 'field',
+    );
+
 // Otherwise, we can process the different kinds of banner requests
 if ($request_kind === 'event'){
-
-    // Collect an index of players and robots for validation purposes
-    $mmrpg_index_types = array();
-    $mmrpg_index_players = array();
-    $mmrpg_index_robots = array();
-    $mmrpg_index_abilities = array();
-    $mmrpg_index_items = array();
-    $mmrpg_index_objects = array();
-    function mmrpgGetIndex($kind){
-        global $mmrpg_index_types, $mmrpg_index_players, $mmrpg_index_robots, $mmrpg_index_abilities, $mmrpg_index_items;
-        switch ($kind){
-            case 'type': case 'types':
-                if (empty($mmrpg_index_types)){ $mmrpg_index_types = rpg_type::get_index(true); }
-                return $mmrpg_index_types;
-            case 'player': case 'players':
-                if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(); }
-                return $mmrpg_index_players;
-            case 'robot': case 'robots':
-                if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = rpg_robot::get_index(); }
-                return $mmrpg_index_robots;
-            case 'ability': case 'abilities':
-                if (empty($mmrpg_index_abilities)){ $mmrpg_index_abilities = rpg_ability::get_index(); }
-                return $mmrpg_index_abilities;
-            case 'item': case 'items':
-                if (empty($mmrpg_index_items)){ $mmrpg_index_items = rpg_item::get_index(); }
-                return $mmrpg_index_items;
-            case 'object': case 'objects':
-                if (empty($mmrpg_index_objects)){
-                    $mmrpg_index_objects = array();
-                    $mmrpg_index_objects['challenge-markers'] = array(
-                        'object_token' => 'challenge-markers',
-                        'object_image_size' => 40
-                        );
-                }
-                return $mmrpg_index_objects;
-        }
-        return array();
-    }
 
     // Collect other arguments specific to event banners
     $allowed_players = array_keys(mmrpgGetIndex('players'));
@@ -104,28 +110,23 @@ if ($request_kind === 'event'){
     // A cached image could not be found, so that means we're generating anew
     //error_log('generating a NEW image file for '.$cache_file_name);
 
-    // Define the default banner config
-    $banner_config = array(
-        'field_background' => 'field',
-        'field_foreground' => 'field',
-        );
-
     // If the player has requested the banner for unlocking CHAPTER 1 (Unexpected Attack)
     if ($request_event === 'chapter-1-unlocked'){
 
         // Construct the banner config for the given event banner
         $player_token = $request_player;
-        $robot_token = rpg_player::get_starter_robot($player_token);
-        $field_token = rpg_player::get_intro_field($player_token);
-        $mecha_token = rpg_player::get_support_mecha($player_token);
+        $robot_token = $player_token !== 'player' ? rpg_player::get_starter_robot($player_token) : 'met';
+        $field_token = $player_token !== 'player' ? rpg_player::get_intro_field($player_token) : 'field';
+        $mecha_token = 'met'; //rpg_player::get_support_mecha($player_token);
+        $boss_token = $player_token !== 'player' ? 'trill' : 'met';
         $banner_config = array(
             'field_background' => $field_token,
             'field_foreground' => $field_token,
             'field_sprites' => array(
                 array('kind' => 'player', 'image' => $player_token, 'frame' => 5, 'direction' => 'right', 'float' => 'left', 'left' => 200, 'bottom' => 86),
                 array('kind' => 'robot', 'image' => $robot_token, 'frame' => 4, 'direction' => 'right', 'float' => 'left', 'left' => 250, 'bottom' => 80),
-                array('kind' => 'robot', 'image' => 'met', 'frame' => 1, 'direction' => 'left', 'float' => 'right', 'right' => 250, 'bottom' => 80),
-                array('kind' => 'robot', 'image' => 'trill', 'frame' => 8, 'direction' => 'left', 'float' => 'right', 'right' => 210, 'bottom' => 82),
+                array('kind' => 'robot', 'image' => $mecha_token, 'frame' => 1, 'direction' => 'left', 'float' => 'right', 'right' => 250, 'bottom' => 80),
+                array('kind' => 'robot', 'image' => $boss_token, 'frame' => 8, 'direction' => 'left', 'float' => 'right', 'right' => 210, 'bottom' => 82),
                 )
             );
 
@@ -135,13 +136,15 @@ if ($request_kind === 'event'){
 
         // Construct the banner config for the given event banner
         $player_token = $request_player;
-        $robot_token = rpg_player::get_starter_robot($player_token);
-        $support_token = rpg_player::get_support_robot($player_token);
+        $robot_token = $player_token !== 'player' ? rpg_player::get_starter_robot($player_token) : 'met';
+        $support_token = $player_token !== 'player' ? rpg_player::get_support_robot($player_token) : 'met';
         $target_sprites = array(
             array('kind' => 'robot', 'image' => 'robot', 'frame' => 1, 'direction' => 'left', 'float' => 'right', 'right' => 250, 'bottom' => 80),
             array('kind' => 'robot', 'image' => 'robot', 'frame' => 0, 'direction' => 'left', 'float' => 'right', 'right' => 130, 'bottom' => 70),
             array('kind' => 'robot', 'image' => 'robot', 'frame' => 1, 'direction' => 'left', 'float' => 'right', 'right' => 160, 'bottom' => 90),
             );
+        $field_token = 'field';
+        $target_tokens = array('met', 'met', 'met');
         if ($player_token === 'dr-light'){
             $field_token = 'mountain-mines';
             $target_tokens = array('guts-man', 'picket-man', 'picket-man');
@@ -179,14 +182,15 @@ if ($request_kind === 'event'){
 
         // Construct the banner config for the given event banner
         $player_token = $request_player;
+        $rival_token = 'player';
         if ($player_token === 'dr-light'){ $rival_token = 'dr-wily'; }
         elseif ($player_token === 'dr-wily'){ $rival_token = 'dr-cossack'; }
         elseif ($player_token === 'dr-cossack'){ $rival_token = 'dr-light'; }
-        $player_robot_token = rpg_player::get_starter_robot($player_token);
-        $player_support_token = rpg_player::get_support_robot($player_token);
-        $rival_robot_token = rpg_player::get_starter_robot($rival_token);
-        $rival_support_token = rpg_player::get_support_robot($rival_token);
-        $field_token = rpg_player::get_homebase_field($rival_token);
+        $player_robot_token = $player_token !== 'player' ? rpg_player::get_starter_robot($player_token) : 'met';
+        $player_support_token = $player_token !== 'player' ? rpg_player::get_support_robot($player_token) : 'met';
+        $rival_robot_token = $player_token !== 'player' ? rpg_player::get_starter_robot($rival_token) : 'met';
+        $rival_support_token = $player_token !== 'player' ? rpg_player::get_support_robot($rival_token) : 'met';
+        $field_token = $player_token !== 'player' ? rpg_player::get_homebase_field($rival_token) : 'field';
         if ($player_token === 'dr-cossack'){
             $rival_token = false;
             $rival_robot_token .= '_alt9';
@@ -212,14 +216,17 @@ if ($request_kind === 'event'){
 
         // Construct the banner config for the given event banner
         $player_token = $request_player;
-        $robot_token = rpg_player::get_starter_robot($player_token);
-        $support_token = rpg_player::get_support_robot($player_token);
+        $robot_token = $player_token !== 'player' ? rpg_player::get_starter_robot($player_token) : 'met';
+        $support_token = $player_token !== 'player' ? rpg_player::get_support_robot($player_token) : 'met';
         $target_sprites = array(
             array('kind' => 'robot', 'image' => 'robot', 'frame' => 0, 'direction' => 'left', 'float' => 'right', 'right' => 220, 'bottom' => 70),
             array('kind' => 'robot', 'image' => 'robot', 'frame' => 10, 'direction' => 'left', 'float' => 'right', 'right' => 260, 'bottom' => 90),
             array('kind' => 'robot', 'image' => 'robot', 'frame' => 5, 'direction' => 'left', 'float' => 'right', 'right' => 130, 'bottom' => 70),
             array('kind' => 'robot', 'image' => 'robot', 'frame' => 1, 'direction' => 'left', 'float' => 'right', 'right' => 160, 'bottom' => 90),
             );
+        $field_token = 'field';
+        $field_token2 = 'field';
+        $target_tokens = array('met', 'met', 'met', 'met');
         if ($player_token === 'dr-light'){
             $field_token = 'abandoned-warehouse';
             $field_token2 = 'orb-city';
@@ -260,8 +267,12 @@ if ($request_kind === 'event'){
 
         // Construct the banner config for the given event banner
         $player_token = $request_player;
-        $robot_token = rpg_player::get_starter_robot($player_token);
-        $support_token = rpg_player::get_support_robot($player_token);
+        $robot_token = $player_token !== 'player' ? rpg_player::get_starter_robot($player_token) : 'met';
+        $support_token = $player_token !== 'player' ? rpg_player::get_support_robot($player_token) : 'met';
+        $field_token = 'field';
+        $defender_token = 'met';
+        $darksoul_tokens = array('met', 'met', 'met');
+        $final_boss_token = $player_token !== 'player' ? 'slur' : 'met';
         if ($player_token === 'dr-light'){
             $field_token = 'final-destination';
             $defender_token = 'enker';
@@ -285,7 +296,7 @@ if ($request_kind === 'event'){
                 array('kind' => 'robot', 'image' => $support_token, 'frame' => 7, 'direction' => 'right', 'float' => 'left', 'left' => 255, 'bottom' => 90),
 
                 array('kind' => 'robot', 'image' => $defender_token, 'frame' => 8, 'direction' => 'left', 'float' => 'right', 'right' => 250, 'bottom' => 80),
-                array('kind' => 'robot', 'image' => 'slur', 'frame' => 1, 'direction' => 'left', 'float' => 'right', 'right' => 200, 'bottom' => 82),
+                array('kind' => 'robot', 'image' => $final_boss_token, 'frame' => 1, 'direction' => 'left', 'float' => 'right', 'right' => 200, 'bottom' => 82),
                 array('kind' => 'robot', 'image' => $darksoul_tokens[2], 'frame' => 8, 'direction' => 'left', 'float' => 'right', 'right' => 150, 'bottom' => 90),
                 array('kind' => 'robot', 'image' => $darksoul_tokens[1], 'frame' => 0, 'direction' => 'left', 'float' => 'right', 'right' => 135, 'bottom' => 82),
                 array('kind' => 'robot', 'image' => $darksoul_tokens[0], 'frame' => 10, 'direction' => 'left', 'float' => 'right', 'right' => 120, 'bottom' => 70),
@@ -299,9 +310,12 @@ if ($request_kind === 'event'){
 
         // Construct the banner config for the given event banner
         $player_token = $request_player;
-        $field_token = 'prototype-complete';
-        $robot_token = rpg_player::get_starter_robot($player_token);
-        $support_token = rpg_player::get_support_robot($player_token);
+        $field_token = $player_token !== 'player' ? 'prototype-complete' : 'field';
+        $robot_token = $player_token !== 'player' ? rpg_player::get_starter_robot($player_token) : 'met';
+        $support_token = $player_token !== 'player' ? rpg_player::get_support_robot($player_token) : 'met';
+        $support_alt_token = $player_token !== 'player' ? '_alt2' : '';
+        $rival_mecha_tokens = array('met', 'met', 'met');
+        $rival_robot_tokens = array('met', 'met', 'met');
         if ($player_token === 'dr-light'){
             $rival_mecha_tokens = array('tackle-fire', 'met', 'pyre-fly');
             $rival_robot_tokens = array('elec-man_alt', 'fire-man_alt3', 'ice-man');
@@ -319,7 +333,7 @@ if ($request_kind === 'event'){
 
                 array('kind' => 'player', 'image' => $player_token, 'frame' => 2, 'direction' => 'right', 'float' => 'left', 'left' => 245, 'bottom' => 82),
                 array('kind' => 'robot', 'image' => $robot_token, 'frame' => 7, 'direction' => 'right', 'float' => 'left', 'left' => 165, 'bottom' => 70),
-                array('kind' => 'robot', 'image' => $support_token.'_alt2', 'frame' => 4, 'direction' => 'right', 'float' => 'left', 'left' => 195, 'bottom' => 90),
+                array('kind' => 'robot', 'image' => $support_token.$support_alt_token, 'frame' => 4, 'direction' => 'right', 'float' => 'left', 'left' => 195, 'bottom' => 90),
 
                 array('kind' => 'robot', 'image' => $rival_mecha_tokens[0], 'frame' => 0, 'direction' => 'left', 'float' => 'right', 'right' => 216, 'bottom' => 66),
                 array('kind' => 'robot', 'image' => $rival_mecha_tokens[1], 'frame' => 1, 'direction' => 'left', 'float' => 'right', 'right' => 242, 'bottom' => 82),
@@ -338,8 +352,13 @@ if ($request_kind === 'event'){
 
         // Construct the banner config for the given event banner
         $player_token = $request_player;
-        $robot_token = rpg_player::get_starter_robot($player_token);
-        $support_token = rpg_player::get_support_robot($player_token);
+        $robot_token = $player_token !== 'player' ? rpg_player::get_starter_robot($player_token) : 'met';
+        $support_token = $player_token !== 'player' ? rpg_player::get_support_robot($player_token) : 'met';
+        $support_alt_token = $player_token !== 'player' ? '_alt2' : '';
+        $field_token = 'field';
+        $field_token2 = 'field';
+        $rival_robot_tokens = array('met', 'met', 'met');
+        $rival_star_types = array('none', 'none', 'none');
         if ($player_token === 'dr-light'){
             $field_token = 'reflection-chamber';
             $field_token2 = 'power-plant';
@@ -363,7 +382,7 @@ if ($request_kind === 'event'){
 
                 array('kind' => 'player', 'image' => $player_token, 'frame' => 1, 'direction' => 'right', 'float' => 'left', 'left' => 245, 'bottom' => 82),
                 array('kind' => 'robot', 'image' => $robot_token, 'frame' => 4, 'direction' => 'right', 'float' => 'left', 'left' => 165, 'bottom' => 70),
-                array('kind' => 'robot', 'image' => $support_token.'_alt2', 'frame' => 6, 'direction' => 'right', 'float' => 'left', 'left' => 195, 'bottom' => 90),
+                array('kind' => 'robot', 'image' => $support_token.$support_alt_token, 'frame' => 6, 'direction' => 'right', 'float' => 'left', 'left' => 195, 'bottom' => 90),
 
                 array('kind' => 'item', 'image' => 'fusion-star_'.$rival_star_types[0], 'frame' => 0, 'direction' => 'right', 'float' => 'left', 'left' => 344, 'bottom' => 90),
 
@@ -383,29 +402,39 @@ if ($request_kind === 'event'){
 
         // Construct the banner config for the given event banner
         $player_token = $request_player;
-        if ($player_token === 'dr-light'){ $rival_token = 'dr-wily'; $rival_alt_tokens = array('flame', 'nature', 'water'); }
-        elseif ($player_token === 'dr-wily'){ $rival_token = 'dr-cossack'; $rival_alt_tokens = array('water', 'flame', 'nature'); }
-        elseif ($player_token === 'dr-cossack'){ $rival_token = 'dr-light'; $rival_alt_tokens = array('nature', 'water', 'flame'); }
-        $player_robot_token = rpg_player::get_starter_robot($player_token);
-        $player_support_token = rpg_player::get_support_robot($player_token);
-        $rival_robot_token = rpg_player::get_starter_robot($rival_token);
-        $rival_support_token = rpg_player::get_support_robot($rival_token);
-        $field_token = rpg_player::get_homebase_field($rival_token);
+        $rival_token = 'player';
+        $rival_alt_tokens = array('', '', '');
+        if ($player_token === 'dr-light'){
+            $rival_token = 'dr-wily';
+            $rival_alt_tokens = array('_flame', '_nature', '_water');
+        } elseif ($player_token === 'dr-wily'){
+            $rival_token = 'dr-cossack';
+            $rival_alt_tokens = array('_water', '_flame', '_nature');
+        } elseif ($player_token === 'dr-cossack'){
+            $rival_token = 'dr-light';
+            $rival_alt_tokens = array('_nature', '_water', '_flame');
+        }
+        $player_robot_token = $player_token !== 'player' ? rpg_player::get_starter_robot($player_token) : 'met';
+        $player_support_token = $player_token !== 'player' ? rpg_player::get_support_robot($player_token) : 'met';
+        $player_support_alt_token = $player_token !== 'player' ? '_alt2' : '';
+        $rival_robot_token = $player_token !== 'player' ? rpg_player::get_starter_robot($rival_token) : 'met';
+        $rival_support_token = $player_token !== 'player' ? rpg_player::get_support_robot($rival_token) : 'met';
+        $field_token = $player_token !== 'player' ? rpg_player::get_homebase_field($rival_token) : 'field';
         $banner_config = array(
             'field_background' => $field_token,
             'field_foreground' => $field_token,
             'field_sprites' => array(
 
                 array('kind' => 'player', 'image' => $player_token, 'frame' => 4, 'direction' => 'right', 'float' => 'left', 'left' => 245, 'bottom' => 82),
-                array('kind' => 'robot', 'image' => $player_support_token.'_alt2', 'frame' => 7, 'direction' => 'right', 'float' => 'left', 'left' => 165, 'bottom' => 70),
+                array('kind' => 'robot', 'image' => $player_support_token.$player_support_alt_token, 'frame' => 7, 'direction' => 'right', 'float' => 'left', 'left' => 165, 'bottom' => 70),
                 array('kind' => 'robot', 'image' => $player_robot_token, 'frame' => 6, 'direction' => 'right', 'float' => 'left', 'left' => 195, 'bottom' => 90),
 
                 array('kind' => 'player', 'image' => $rival_token, 'frame' => 1, 'direction' => 'left', 'float' => 'right', 'right' => 260, 'bottom' => 82),
                 array('kind' => 'player', 'image' => $rival_token, 'frame' => 0, 'direction' => 'left', 'float' => 'right', 'right' => 130, 'bottom' => 70),
                 array('kind' => 'player', 'image' => $rival_token, 'frame' => 6, 'direction' => 'left', 'float' => 'right', 'right' => 177, 'bottom' => 92),
-                array('kind' => 'robot', 'image' => $rival_robot_token.'_'.$rival_alt_tokens[0], 'frame' => 1, 'direction' => 'left', 'float' => 'right', 'right' => 225, 'bottom' => 80),
-                array('kind' => 'robot', 'image' => $rival_robot_token.'_'.$rival_alt_tokens[1], 'frame' => 0, 'direction' => 'left', 'float' => 'right', 'right' => 100, 'bottom' => 68),
-                array('kind' => 'robot', 'image' => $rival_robot_token.'_'.$rival_alt_tokens[2], 'frame' => 6, 'direction' => 'left', 'float' => 'right', 'right' => 145, 'bottom' => 90),
+                array('kind' => 'robot', 'image' => $rival_robot_token.$rival_alt_tokens[0], 'frame' => 1, 'direction' => 'left', 'float' => 'right', 'right' => 225, 'bottom' => 80),
+                array('kind' => 'robot', 'image' => $rival_robot_token.$rival_alt_tokens[1], 'frame' => 0, 'direction' => 'left', 'float' => 'right', 'right' => 100, 'bottom' => 68),
+                array('kind' => 'robot', 'image' => $rival_robot_token.$rival_alt_tokens[2], 'frame' => 6, 'direction' => 'left', 'float' => 'right', 'right' => 145, 'bottom' => 90),
                 )
             );
 
@@ -415,8 +444,14 @@ if ($request_kind === 'event'){
 
         // Construct the banner config for the given event banner
         $player_token = $request_player;
-        $robot_token = rpg_player::get_starter_robot($player_token);
-        $support_token = rpg_player::get_support_robot($player_token);
+        $robot_token = $player_token !== 'player' ? rpg_player::get_starter_robot($player_token) : 'met';
+        $support_token = $player_token !== 'player' ? rpg_player::get_support_robot($player_token) : 'met';
+        $support_alt_token = $player_token !== 'player' ? '_alt2' : '';
+        $field_token = 'field';
+        $field_token2 = 'field';
+        $rival_robot_tokens = array('met', 'met', 'met', 'met');
+        $rival_block_sheet = 1;
+        $rival_block_frame = 0;
         if ($player_token === 'dr-light'){
             $field_token = 'power-plant';
             $field_token2 = 'space-simulator';
@@ -442,24 +477,24 @@ if ($request_kind === 'event'){
             'field_sprites' => array(
 
                 array('kind' => 'player', 'image' => $player_token, 'frame' => 3, 'direction' => 'right', 'float' => 'left', 'left' => 245, 'bottom' => 82),
-                array('kind' => 'robot', 'image' => $support_token.'_alt2', 'frame' => 10, 'direction' => 'right', 'float' => 'left', 'left' => 165, 'bottom' => 70),
+                array('kind' => 'robot', 'image' => $support_token.$support_alt_token, 'frame' => 10, 'direction' => 'right', 'float' => 'left', 'left' => 165, 'bottom' => 70),
                 array('kind' => 'robot', 'image' => $robot_token, 'frame' => 8, 'direction' => 'right', 'float' => 'left', 'left' => 195, 'bottom' => 90),
 
                 array('kind' => 'object', 'image' => 'challenge-markers/gold', 'frame' => 0, 'direction' => 'right', 'float' => 'left', 'left' => 342, 'bottom' => 90),
 
                 array('kind' => 'robot', 'image' => $rival_robot_tokens[0], 'frame' => 10, 'direction' => 'left', 'float' => 'right', 'right' => 260, 'bottom' => 82),
-                array('kind' => 'ability', 'image' => 'super-arm-'.$rival_block_sheet, 'frame' => $rival_block_frame, 'direction' => 'left', 'float' => 'right', 'right' => 220, 'bottom' => 84),
+                array('kind' => 'ability', 'image' => 'super-arm'.($rival_block_sheet > 1 ? '-'.$rival_block_sheet : ''), 'frame' => $rival_block_frame, 'direction' => 'left', 'float' => 'right', 'right' => 220, 'bottom' => 84),
 
                 array('kind' => 'robot', 'image' => $rival_robot_tokens[1], 'frame' => 8, 'direction' => 'left', 'float' => 'right', 'right' => 130, 'bottom' => 70),
-                array('kind' => 'ability', 'image' => 'super-arm-'.$rival_block_sheet, 'frame' => $rival_block_frame, 'direction' => 'left', 'float' => 'right', 'right' => 100, 'bottom' => 72),
+                array('kind' => 'ability', 'image' => 'super-arm'.($rival_block_sheet > 1 ? '-'.$rival_block_sheet : ''), 'frame' => $rival_block_frame, 'direction' => 'left', 'float' => 'right', 'right' => 100, 'bottom' => 72),
 
                 //
                 array('kind' => 'robot', 'image' => $rival_robot_tokens[2], 'frame' => 0, 'direction' => 'left', 'float' => 'right', 'right' => 145, 'bottom' => 82),
-                array('kind' => 'ability', 'image' => 'super-arm-'.$rival_block_sheet, 'frame' => $rival_block_frame, 'direction' => 'left', 'float' => 'right', 'right' => 115, 'bottom' => 80),
+                array('kind' => 'ability', 'image' => 'super-arm'.($rival_block_sheet > 1 ? '-'.$rival_block_sheet : ''), 'frame' => $rival_block_frame, 'direction' => 'left', 'float' => 'right', 'right' => 115, 'bottom' => 80),
                 // new
 
                 array('kind' => 'robot', 'image' => $rival_robot_tokens[3], 'frame' => 1, 'direction' => 'left', 'float' => 'right', 'right' => 166, 'bottom' => 92),
-                array('kind' => 'ability', 'image' => 'super-arm-'.$rival_block_sheet, 'frame' => $rival_block_frame, 'direction' => 'left', 'float' => 'right', 'right' => 136, 'bottom' => 94),
+                array('kind' => 'ability', 'image' => 'super-arm'.($rival_block_sheet > 1 ? '-'.$rival_block_sheet : ''), 'frame' => $rival_block_frame, 'direction' => 'left', 'float' => 'right', 'right' => 136, 'bottom' => 94),
                 )
             );
 
@@ -499,7 +534,8 @@ if ($request_kind === 'event'){
     if (!empty($banner_config['field_sprites'])){
         //error_log('BANNER CONFIG (BEFORE): '.print_r($banner_config, true));
         foreach ($banner_config['field_sprites'] AS $key => $sprite){
-            if (empty($sprite['image'])){
+            if (empty($sprite['image'])
+                || $sprite['image'] === $sprite['kind']){
                 unset($banner_config['field_sprites'][$key]);
                 continue;
             }
@@ -535,8 +571,8 @@ if ($request_kind === 'event'){
         $types_index = mmrpgGetIndex('types');
         $players_index = mmrpgGetIndex('players');
         $player_token = $request_player;
-        $player_info = $players_index[$player_token];
-        $player_type = $player_info['player_type'];
+        $player_info = $player_token !== 'player' ? $players_index[$player_token] : false;
+        $player_type = $player_token !== 'player' && !empty($player_info) ? $player_info['player_type'] : 'empty';
         $player_type_info = $types_index[$player_type];
         $banner_config['frame_colour'] = $player_type_info['type_colour_light'];
         $banner_config['frame_colour2'] = $player_type_info['type_colour_dark'];
