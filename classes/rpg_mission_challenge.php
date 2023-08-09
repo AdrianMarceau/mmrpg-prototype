@@ -24,7 +24,7 @@ class rpg_mission_challenge extends rpg_mission {
         // Pull data from the database given filters and ordering
         $challenge_fields = self::get_index_fields(true, 'challenges');
         $challenge_table = $challenge_kind === 'user' ? 'mmrpg_users_challenges' : 'mmrpg_challenges';
-        $raw_data_list = $db->get_array_list("SELECT
+        $raw_data_sql = ("SELECT
             {$challenge_fields},
             (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS challenge_creator_name
             FROM {$challenge_table} AS challenges
@@ -33,7 +33,8 @@ class rpg_mission_challenge extends rpg_mission {
             ORDER BY {$challenge_order}
             {$challenge_limit}
             ;");
-        //exit("SELECT {$challenge_fields} FROM {$challenge_table} WHERE {$challenge_filters} ORDER BY {$challenge_order} {$challenge_limit};");
+        $raw_data_list = $db->get_array_list($raw_data_sql);
+        //error_log($raw_data_sql);
         if (empty($raw_data_list)){ return false; }
         $parsed_data_list = array();
         foreach ($raw_data_list AS $key => $raw_data){
@@ -122,11 +123,11 @@ class rpg_mission_challenge extends rpg_mission {
             if (substr($challenge_id, 0, 1) === 'u'){ $challenge_xid = (int)(substr($challenge_id, 1)); }
             else { $challenge_xid = (int)($challenge_id); }
             $challenge_table = 'mmrpg_users_challenges';
-            $raw_data = $db->get_array("SELECT {$challenge_fields} FROM {$challenge_table} WHERE challenge_id = {$challenge_xid};");
+            $raw_data = $db->get_array("SELECT {$challenge_fields}, (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS challenge_creator_name FROM {$challenge_table} AS challenges LEFT JOIN mmrpg_users AS users ON users.user_id = challenges.challenge_creator WHERE challenge_id = {$challenge_xid};");
         } else {
             $challenge_xid = (int)($challenge_id);
             $challenge_table = 'mmrpg_challenges';
-            $raw_data = $db->get_array("SELECT {$challenge_fields} FROM {$challenge_table} WHERE challenge_id = {$challenge_xid};");
+            $raw_data = $db->get_array("SELECT {$challenge_fields}, (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS challenge_creator_name FROM {$challenge_table} AS challenges LEFT JOIN mmrpg_users AS users ON users.user_id = challenges.challenge_creator WHERE challenge_id = {$challenge_xid};");
         }
         if (empty($raw_data)){ return false; }
         $parsed_data = self::parse_mission($this_prototype_data, $raw_data);
