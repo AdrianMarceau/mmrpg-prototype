@@ -418,21 +418,21 @@ if ($request_kind === 'event'){
         $robot_token = rpg_player::get_starter_robot($player_token);
         $support_token = rpg_player::get_support_robot($player_token);
         if ($player_token === 'dr-light'){
-            $field_token = 'lighting-control';
-            $field_token2 = 'prototype-subspace';
-            $rival_robot_tokens = array('sheep-man', 'dynamo-man', 'elec-man');
+            $field_token = 'power-plant';
+            $field_token2 = 'space-simulator';
+            $rival_robot_tokens = array('sheep-man', 'elec-man_alt9', 'spark-man_alt9', 'gravity-man_alt9');
             $rival_block_sheet = 5;
             $rival_block_frame = 4;
         } elseif ($player_token === 'dr-wily'){
-            $field_token = 'serpent-column';
-            $field_token2 = 'prototype-subspace';
-            $rival_robot_tokens = array('slash-man', 'plant-man', 'wood-man');
+            $field_token = 'waterfall-institute';
+            $field_token2 = 'arctic-jungle';
+            $rival_robot_tokens = array('aqua-man', 'ice-man_alt9', 'freeze-man_alt9', 'bubble-man_alt9');
             $rival_block_sheet = 8;
             $rival_block_frame = 0;
         } elseif ($player_token === 'dr-cossack'){
-            $field_token = 'mineral-quarry';
-            $field_token2 = 'prototype-subspace';
-            $rival_robot_tokens = array('jewel-man', 'crystal-man', 'gemini-man');
+            $field_token = 'atomic-furnace';
+            $field_token2 = 'preserved-forest';
+            $rival_robot_tokens = array('solar-man', 'guts-man_alt9', 'hard-man_alt9', 'dive-man_alt9', 'quick-man_alt9');
             $rival_block_sheet = 5;
             $rival_block_frame = 2;
         }
@@ -453,7 +453,12 @@ if ($request_kind === 'event'){
                 array('kind' => 'robot', 'image' => $rival_robot_tokens[1], 'frame' => 8, 'direction' => 'left', 'float' => 'right', 'right' => 130, 'bottom' => 70),
                 array('kind' => 'ability', 'image' => 'super-arm-'.$rival_block_sheet, 'frame' => $rival_block_frame, 'direction' => 'left', 'float' => 'right', 'right' => 100, 'bottom' => 72),
 
-                array('kind' => 'robot', 'image' => $rival_robot_tokens[2], 'frame' => 1, 'direction' => 'left', 'float' => 'right', 'right' => 166, 'bottom' => 92),
+                //
+                array('kind' => 'robot', 'image' => $rival_robot_tokens[2], 'frame' => 0, 'direction' => 'left', 'float' => 'right', 'right' => 145, 'bottom' => 82),
+                array('kind' => 'ability', 'image' => 'super-arm-'.$rival_block_sheet, 'frame' => $rival_block_frame, 'direction' => 'left', 'float' => 'right', 'right' => 115, 'bottom' => 80),
+                // new
+
+                array('kind' => 'robot', 'image' => $rival_robot_tokens[3], 'frame' => 1, 'direction' => 'left', 'float' => 'right', 'right' => 166, 'bottom' => 92),
                 array('kind' => 'ability', 'image' => 'super-arm-'.$rival_block_sheet, 'frame' => $rival_block_frame, 'direction' => 'left', 'float' => 'right', 'right' => 136, 'bottom' => 94),
                 )
             );
