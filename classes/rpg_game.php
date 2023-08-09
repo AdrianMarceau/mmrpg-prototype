@@ -1816,7 +1816,7 @@ class rpg_game {
         if (!isset($banner_config['background'])){ $banner_config['background'] = array(38, 38, 38); }
         if (!isset($banner_config['width'])){ $banner_config['width'] = 765; }
         if (!isset($banner_config['height'])){ $banner_config['height'] = 216; }
-        if (!isset($banner_config['event_name'])){ $banner_config['event_name'] = ''; }
+        if (!isset($banner_config['banner_token'])){ $banner_config['banner_token'] = ''; }
         if (!isset($banner_config['field_background'])){ $banner_config['field_background'] = ''; }
         if (!isset($banner_config['field_foreground'])){ $banner_config['field_foreground'] = ''; }
         if (!isset($banner_config['field_gridlines'])){ $banner_config['field_gridlines'] = true; }
@@ -1963,7 +1963,7 @@ class rpg_game {
         if (!empty($banner_config['frame_colour'])){
 
             // Check if this is a bonus event chapter
-            $is_bonus_chapter = !preg_match('/^chapter-([0-9]+)-unlocked$/i', $banner_config['event_name']) ? true : false;
+            $is_bonus_chapter = !preg_match('/^chapter-([0-9]+)-unlocked$/i', $banner_config['banner_token']) ? true : false;
 
             // Collect the one or two frame colours to use
             $frame_colour = $banner_config['frame_colour'];
