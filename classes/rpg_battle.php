@@ -2487,6 +2487,11 @@ class rpg_battle extends rpg_object {
 
     // Define a public function for calculating canvas markup offsets w/ perspective
     public function canvas_markup_offset($sprite_key, $sprite_position, $sprite_size, $team_size = 1){
+        return self::calculate_canvas_markup_offset($sprite_key, $sprite_position, $sprite_size, $team_size);
+    }
+
+    // Define a public function for calculating canvas markup offsets w/ perspective
+    public static function calculate_canvas_markup_offset($sprite_key, $sprite_position, $sprite_size, $team_size = 1){
 
         // Define the max bench size so we can shift later
         $max_team_size = 8;
@@ -2540,7 +2545,7 @@ class rpg_battle extends rpg_object {
         //error_log('|| $sprite key ('.$sprite_key.') && position ('.$sprite_position.') ('.$sprite_row.', '.$sprite_column.') w/ team-size ('.$team_size.') ');
         if ($sprite_position == 'active') {
             $sprite_row = $grid_row_middle;
-            //error_log('--> adjusted '.$sprite_position.' $sprite position ('.$sprite_row.', '.$sprite_column.')');
+            //error_log('--> adjusted (A) '.$sprite_position.' $sprite position ('.$sprite_row.', '.$sprite_column.')');
         } elseif ($sprite_position == 'bench'){
             $sprite_column += 1;
             $sprite_row += ($sprite_key - 1);
@@ -2548,13 +2553,17 @@ class rpg_battle extends rpg_object {
                 $current_bench_size = $team_size - 1;
                 $extra_bench_slots = $current_bench_size < $max_bench_size ? ($max_bench_size - $current_bench_size) : 0;
                 $bench_shift_amount = $extra_bench_slots >= 2 ? floor($extra_bench_slots / 2) : 0;
-                if ($current_bench_size % 2 === 0 && $sprite_key > ($current_bench_size / 2)){ $bench_shift_amount += 1; } // adjust position on non-odd numbered teams for centering purposes
-                //error_log('$current_bench_size = '.$current_bench_size);
-                //error_log('$extra_bench_slots = '.$extra_bench_slots);
-                //error_log('$bench_shift_amount = '.$bench_shift_amount);
+                // adjust position on non-odd numbered teams for centering purposes
+                if ($current_bench_size % 2 === 0 && $sprite_key > ($current_bench_size / 2)){
+                    //error_log('- shift position on non-odd numbered teams for centering purposes');
+                    $bench_shift_amount += 1;
+                }
+                //error_log('- $current_bench_size = '.$current_bench_size);
+                //error_log('- $extra_bench_slots = '.$extra_bench_slots);
+                //error_log('- $bench_shift_amount = '.$bench_shift_amount);
                 if ($bench_shift_amount){ $sprite_row += $bench_shift_amount; }
                 if ($sprite_row > $grid_rows){ $sprite_row = $grid_rows - $sprite_row; }
-                //error_log('--> adjusted '.$sprite_position.' $sprite position ('.$sprite_row.', '.$sprite_column.')');
+                //error_log('--> adjusted (B) '.$sprite_position.' $sprite position ('.$sprite_row.', '.$sprite_column.')');
             }
         }
         //error_log('--> $sprite key ('.$sprite_key.') && position ('.$sprite_position.') ('.$sprite_row.', '.$sprite_column.') w/ team-size ('.$team_size.') ');
