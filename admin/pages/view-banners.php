@@ -18,7 +18,7 @@
     if (!$kind) { die("Error: Missing required `kind` parameter."); }
 
     // Update the tab name with the page name
-    $this_page_tabtitle = 'Edit adadadsasd | '.$this_page_tabtitle;
+    $this_page_tabtitle = 'View '.ucfirst($kind_singular).' Banners | '.$this_page_tabtitle;
 
     // Generate the markup for the sprite filters
     ob_start();
@@ -43,10 +43,13 @@
                     chapters.forEach(chapter => {
                         players.forEach(player => {
                             let imgSrc = `<?= MMRPG_CONFIG_ROOTURL ?>scripts/get-banner.php?kind=event&event=${chapter}&player=${player}<?= $force_refresh ? '&refresh=true' : '' ?>`;
+                            let btnHref = `<?= MMRPG_CONFIG_ROOTURL ?>images/events/event-banner_${chapter}_${player}.png`;
                             document.write(`
                                 <div class="banner-cell">
                                     <strong class="banner-caption">${chapter}</strong>
-                                    <img class="banner-image" src="${imgSrc}" alt="${chapter} - ${player}" />
+                                    <a class="banner-image" href="${btnHref}" target="_blank">
+                                        <img  src="${imgSrc}" alt="${chapter} - ${player}" />
+                                    </a>
                                 </div>
                             `);
                         });
@@ -162,10 +165,13 @@
                         challenges.forEach(challenge => {
                             players.forEach(player => {
                                 let imgSrc = `<?= MMRPG_CONFIG_ROOTURL ?>scripts/get-banner.php?kind=challenge&challenge=${challenge}&player=${player}<?= $force_refresh ? '&refresh=true' : '' ?>`;
+                                let btnHref = `<?= MMRPG_CONFIG_ROOTURL ?>images/events/challenge-banner_${challenge}_${player}.png`;
                                 document.write(`
                                     <div class="banner-cell">
                                         <strong class="banner-caption">${challenge}</strong>
-                                        <img class="banner-image" src="${imgSrc}" alt="${challenge} - ${player}" />
+                                        <a class="banner-image" href="${btnHref}" target="_blank">
+                                            <img src="${imgSrc}" alt="${challenge} - ${player}" />
+                                        </a>
                                     </div>
                                 `);
                             });
@@ -230,11 +236,20 @@
             font-size: 90%;
         }
         .banner-cell .banner-image {
+            display: block;
             width: 100%;
             height: auto;
             border: 1px solid #1a1a1a;
             border-radius: 5px;
             overflow: hidden;
+        }
+        .banner-cell .banner-image img {
+            display: block;
+            box-sizing: border-box;
+            width: 100%;
+            height: auto;
+            margin: 0 auto;
+            border: 0 none transparent;
         }
         .link-cell {
             width: 50%;
