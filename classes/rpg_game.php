@@ -1979,17 +1979,17 @@ class rpg_game {
             // Collect the one or two frame colours to use
             $frame_colour = $banner_config['frame_colour'];
             $frame_colour2 = isset($banner_config['frame_colour2']) ? $banner_config['frame_colour2'] : $banner_config['frame_colour'];
-            $frame_colour3 = array(241, 182, 41);
-            $challenge_frame_colour = array(0, 0, 0);
+            $frame_colour3 = isset($banner_config['frame_colour3']) ? $banner_config['frame_colour3'] : array(241, 182, 41);
+            $frame_colour4 = isset($banner_config['frame_colour4']) ? $banner_config['frame_colour4'] : array(230, 230, 230);
 
             // Add a frame on the left side of the event banner
-            if ($is_challenge_banner){ self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $challenge_frame_colour, 'position' => 'left', 'width' => 310)); }
+            if ($is_challenge_banner){ self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $frame_colour4, 'position' => 'left', 'width' => 330)); }
             elseif ($is_bonus_chapter){ self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $frame_colour3, 'position' => 'left', 'width' => 320)); }
             self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $frame_colour2, 'position' => 'left', 'width' => 300));
             self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $frame_colour, 'position' => 'left', 'width' => 200));
 
             // Add a frame on the right side of the event banner
-            if ($is_challenge_banner){ self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $challenge_frame_colour, 'position' => 'right', 'width' => 310)); }
+            if ($is_challenge_banner){ self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $frame_colour4, 'position' => 'right', 'width' => 330)); }
             elseif ($is_bonus_chapter){ self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $frame_colour3, 'position' => 'right', 'width' => 320)); }
             self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $frame_colour2, 'position' => 'right', 'width' => 300));
             self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $frame_colour, 'position' => 'right', 'width' => 200));

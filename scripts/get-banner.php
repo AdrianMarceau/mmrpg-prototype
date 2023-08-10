@@ -634,7 +634,7 @@ elseif ($request_kind === 'challenge'){
         $challenge_player_info = !empty($challenge_mission_info['battle_target_player']) ? $challenge_mission_info['battle_target_player'] : false;
         $challenge_player_robots = !empty($challenge_player_info['player_robots']) ? $challenge_player_info['player_robots'] : false;
         $challenge_player_team_size = count($challenge_player_robots);
-        //error_log('$challenge_field_info: '.print_r($challenge_field_info, true));
+        error_log('$challenge_field_info: '.print_r($challenge_field_info, true));
         //error_log('$challenge_player_info: '.print_r($challenge_player_info, true));
         //error_log('$challenge_player_robots: '.print_r($challenge_player_robots, true));
 
@@ -851,9 +851,21 @@ elseif ($request_kind === 'challenge'){
             }
         }
 
-
-        // TODO: Offset-correct all the sprites here in bulk rather than individually above
-
+        // Update the extra frame colour based on the field type
+        if (!empty($challenge_field_info['field_type'])
+            || !empty($challenge_field_info['field_type2'])){
+            $field_types = array();
+            if (!empty($challenge_field_info['field_type'])){ $field_types[] = $challenge_field_info['field_type']; }
+            if (!empty($challenge_field_info['field_type2'])){ $field_types[] = $challenge_field_info['field_type2']; }
+            $field_types = array_unique($field_types);
+            $types_index = mmrpgGetIndex('types');
+            error_log('$field_types: '.print_r($field_types, true));
+            error_log('$types_index: '.print_r($types_index, true));
+            if (isset($field_types[0]) && isset($types_index[$field_types[0]])){ $banner_config['frame_colour'] = $types_index[$field_types[0]]['type_colour_dark']; }
+            if (isset($field_types[1]) && isset($types_index[$field_types[1]])){ $banner_config['frame_colour2'] = $types_index[$field_types[1]]['type_colour_light']; }
+            elseif (isset($field_types[0]) && isset($types_index[$field_types[0]])){ $banner_config['frame_colour2'] = $types_index[$field_types[0]]['type_colour_light']; }
+            error_log('$banner_config: '.print_r($banner_config, true));
+        }
 
     }
     // Else if the player has requested the banner for unlocking CHAPTER 2 (Robot Master Revival)
@@ -935,8 +947,8 @@ if ($request_kind === 'event'
         $player_info = $player_token !== 'player' ? $players_index[$player_token] : false;
         $player_type = $player_token !== 'player' && !empty($player_info) ? $player_info['player_type'] : 'empty';
         $player_type_info = $types_index[$player_type];
-        $banner_config['frame_colour'] = $player_type_info['type_colour_light'];
-        $banner_config['frame_colour2'] = $player_type_info['type_colour_dark'];
+        if (!isset($banner_config['frame_colour'])){ $banner_config['frame_colour'] = $player_type_info['type_colour_light']; }
+        if (!isset($banner_config['frame_colour2'])){ $banner_config['frame_colour2'] = $player_type_info['type_colour_dark']; }
 
     }
 }
