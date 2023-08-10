@@ -697,7 +697,7 @@
                 || rpg_user::current_user_has_permission('edit-fields')
                 ){
                 $this_option = array(
-                    'link' => array('url' => 'admin/view-sprites/', 'text' => 'View Sprites', 'target' => '_blank', 'bullet' => 'running'),
+                    'link' => array('url' => 'admin/view-sprites/', 'text' => 'View Game Sprites', 'target' => '_blank', 'bullet' => 'running'),
                     'desc' => 'Quickly view game sprites all together in bulk',
                     );
                 $this_group_options[] = $this_option;
@@ -711,8 +711,22 @@
                 || rpg_user::current_user_has_permission('edit-fields')
                 ){
                 $this_option = array(
-                    'link' => array('url' => 'admin/view-banners/?kind=event&refresh=false', 'text' => 'View Events', 'target' => '_blank', 'bullet' => 'rectangle-wide'),
+                    'link' => array('url' => 'admin/view-banners/?kind=events&refresh=false', 'text' => 'View Event Banners', 'target' => '_blank', 'bullet' => 'rectangle-wide'),
                     'desc' => 'Quickly review all in-game event banners at once',
+                    );
+                $this_group_options[] = $this_option;
+            }
+
+            if (
+                rpg_user::current_user_has_permission('edit-players')
+                || rpg_user::current_user_has_permission('edit-robots')
+                || rpg_user::current_user_has_permission('edit-abilities')
+                || rpg_user::current_user_has_permission('edit-items')
+                || rpg_user::current_user_has_permission('edit-fields')
+                ){
+                $this_option = array(
+                    'link' => array('url' => 'admin/view-banners/?kind=challenges&refresh=false&max=10&page=1', 'text' => 'View Challenge Banners', 'target' => '_blank', 'bullet' => 'rectangle-wide'),
+                    'desc' => 'Quickly review challenge mission banners at once',
                     );
                 $this_group_options[] = $this_option;
             }
