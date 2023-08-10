@@ -73,7 +73,7 @@ RewriteRule ^images/abilities/attachment-([a-z]+)/(.*)?$ /images/objects/$1/$2 [
 # Redirect requests for dynamic event banners to the script responsible
 
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^images/events/([a-zA-Z0-9-]+)-banner_([a-zA-Z0-9-]+)_([a-zA-Z0-9-]+)\.([a-z0-9]{2,4})$ scripts/get-banner.php?kind=$1&event=$2&player=$3&format=$4 [L,QSA]
+RewriteRule ^images/events/([a-zA-Z0-9-]+)-banner_([a-zA-Z0-9-]+)_([a-zA-Z0-9-]+)\.([a-z0-9]{2,4})$ scripts/get-banner.php?kind=$1&$1=$2&player=$3&format=$4 [L,QSA]
 
 ####################################
 # -- COMPOSITE IMAGE REWRITES -- #
