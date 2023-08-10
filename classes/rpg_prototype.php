@@ -554,6 +554,31 @@ class rpg_prototype {
     }
 
 
+    // -- IN-GAME "NEW" SEEN/UNSEEN MENU/CONTENT FUNCTIONS -- //
+
+    // Define a function for marking a menu frame as seen by adding it to the history array
+    public static function mark_menu_frame_as_seen($frame_token){
+        // Ensure the session array exists before continuing
+        $session_token = rpg_game::session_token();
+        // Add the requested frame to the history array if not already present
+        $menu_frames_seen = isset($_SESSION[$session_token]['battle_settings']['menu_frames_seen']) ? $_SESSION[$session_token]['battle_settings']['menu_frames_seen'] : '';
+        $menu_frames_seen = strstr($menu_frames_seen, '|') ? explode('|', $menu_frames_seen) : array($menu_frames_seen);
+        if (!in_array($frame_token, $menu_frames_seen)){ $menu_frames_seen[] = $frame_token; }
+        $menu_frames_seen = implode('|', $menu_frames_seen);
+        $_SESSION[$session_token]['battle_settings']['menu_frames_seen'] = $menu_frames_seen;
+    }
+
+    // Define a function for marking a menu frame as seen by removing it from the history array
+    public static function mark_menu_frame_as_unseen($frame_token){
+        // Ensure the session array exists before continuing
+        $session_token = rpg_game::session_token();
+        // Remove the requested frame from the history array if exists so that it appears with the "new" indicator
+        $menu_frames_seen = isset($_SESSION[$session_token]['battle_settings']['menu_frames_seen']) ? $_SESSION[$session_token]['battle_settings']['menu_frames_seen'] : '';
+        $menu_frames_seen = strstr($menu_frames_seen, '|') ? explode('|', $menu_frames_seen) : array($menu_frames_seen);
+        if (($key = array_search($frame_token, $menu_frames_seen)) !== false){ unset($menu_frames_seen[$key]); }
+        $menu_frames_seen = implode('|', $menu_frames_seen);
+        $_SESSION[$session_token]['battle_settings']['menu_frames_seen'] = $menu_frames_seen;
+    }
 
 
 }

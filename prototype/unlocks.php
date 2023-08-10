@@ -948,15 +948,7 @@ if ($unlock_flag_wily){
             'event_type' => 'new-player'
             ));
         $clear_seen_frame_token = 'edit_players';
-        if (isset($_SESSION[$session_token]['battle_settings']['menu_frames_seen'])){
-            $menu_frames_seen = $_SESSION[$session_token]['battle_settings']['menu_frames_seen'];
-            $menu_frames_seen = strstr($menu_frames_seen, '|') ? explode('|', $menu_frames_seen) : array($menu_frames_seen);
-            if (($key = array_search($clear_seen_frame_token, $menu_frames_seen)) !== false){
-                unset($menu_frames_seen[$key]);
-                $menu_frames_seen = implode('|', $menu_frames_seen);
-                $_SESSION[$session_token]['battle_settings']['menu_frames_seen'] = $menu_frames_seen;
-            }
-        }
+        rpg_prototype::mark_menu_frame_as_unseen($clear_seen_frame_token);
     }
 
     // If Wily has been unlocked but somehow Bass was not
@@ -995,15 +987,7 @@ if ($unlock_flag_cossack){
             'event_type' => 'new-player'
             ));
         $clear_seen_frame_token = 'edit_players';
-        if (isset($_SESSION[$session_token]['battle_settings']['menu_frames_seen'])){
-            $menu_frames_seen = $_SESSION[$session_token]['battle_settings']['menu_frames_seen'];
-            $menu_frames_seen = strstr($menu_frames_seen, '|') ? explode('|', $menu_frames_seen) : array($menu_frames_seen);
-            if (($key = array_search($clear_seen_frame_token, $menu_frames_seen)) !== false){
-                unset($menu_frames_seen[$key]);
-                $menu_frames_seen = implode('|', $menu_frames_seen);
-                $_SESSION[$session_token]['battle_settings']['menu_frames_seen'] = $menu_frames_seen;
-            }
-        }
+        rpg_prototype::mark_menu_frame_as_unseen($clear_seen_frame_token);
     }
 
     // If Cossack has been unlocked but somehow Proto Man was not

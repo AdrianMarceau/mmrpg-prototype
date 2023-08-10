@@ -456,15 +456,7 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
 
         // Remove the robot editor frame from the history array so that it appears with the "new" indicator
         $clear_seen_frame_token = 'edit_robots';
-        if (isset($_SESSION[$session_token]['battle_settings']['menu_frames_seen'])){
-            $menu_frames_seen = $_SESSION[$session_token]['battle_settings']['menu_frames_seen'];
-            $menu_frames_seen = strstr($menu_frames_seen, '|') ? explode('|', $menu_frames_seen) : array($menu_frames_seen);
-            if (($key = array_search($clear_seen_frame_token, $menu_frames_seen)) !== false){
-                unset($menu_frames_seen[$key]);
-                $menu_frames_seen = implode('|', $menu_frames_seen);
-                $_SESSION[$session_token]['battle_settings']['menu_frames_seen'] = $menu_frames_seen;
-            }
-        }
+        rpg_prototype::mark_menu_frame_as_unseen($clear_seen_frame_token);
 
         // Append this event to the global events array
         $_SESSION[$session_token]['EVENTS'][] = array(
@@ -898,16 +890,9 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
 
         // Remove the abilities frame from the history array so that it appears with the "new" indicator
         $clear_seen_frame_token = 'abilities';
-        if (isset($_SESSION[$session_token]['battle_settings']['menu_frames_seen'])){
-            $menu_frames_seen = $_SESSION[$session_token]['battle_settings']['menu_frames_seen'];
-            $menu_frames_seen = strstr($menu_frames_seen, '|') ? explode('|', $menu_frames_seen) : array($menu_frames_seen);
-            if (($key = array_search($clear_seen_frame_token, $menu_frames_seen)) !== false){
-                unset($menu_frames_seen[$key]);
-                $menu_frames_seen = implode('|', $menu_frames_seen);
-                $_SESSION[$session_token]['battle_settings']['menu_frames_seen'] = $menu_frames_seen;
-            }
-        }
+        rpg_prototype::mark_menu_frame_as_unseen($clear_seen_frame_token);
 
+        // Append this event to the global events array for display
         $_SESSION[$session_token]['EVENTS'][] = array(
             'canvas_markup' => preg_replace('/\s+/', ' ', $temp_canvas_markup),
             'console_markup' => $temp_console_markup,
@@ -1108,15 +1093,7 @@ function mmrpg_game_unlock_item($item_token, $print_options = array()){
 
         // Remove the shop/item frame from the history array so that it appears with the "new" indicator
         $clear_seen_frame_token = $is_shop_item ? 'shop' : 'items';
-        if (isset($_SESSION[$session_token]['battle_settings']['menu_frames_seen'])){
-            $menu_frames_seen = $_SESSION[$session_token]['battle_settings']['menu_frames_seen'];
-            $menu_frames_seen = strstr($menu_frames_seen, '|') ? explode('|', $menu_frames_seen) : array($menu_frames_seen);
-            if (($key = array_search($clear_seen_frame_token, $menu_frames_seen)) !== false){
-                unset($menu_frames_seen[$key]);
-                $menu_frames_seen = implode('|', $menu_frames_seen);
-                $_SESSION[$session_token]['battle_settings']['menu_frames_seen'] = $menu_frames_seen;
-            }
-        }
+        rpg_prototype::mark_menu_frame_as_unseen($clear_seen_frame_token);
 
         // Append this event to the global events array for display
         $_SESSION[$session_token]['EVENTS'][] = array(
