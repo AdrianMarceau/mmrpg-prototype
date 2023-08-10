@@ -3020,11 +3020,13 @@ function windowEventDisplay(){
 
 
     // Empty the canvas and messages of any leftover, fill them with new markup, then show 'em
+    $('.event_container', $eventContainer).removeClass('animate');
     $('#headline', $eventContainer).empty().html(headlineMarkup);
     $('#canvas', $eventContainer).empty().html(canvasMarkup);
     $('#messages', $eventContainer).empty().html(messagesMarkup);
     $eventContainer.css({opacity:0}).removeClass('hidden').animate({opacity:1},300,'swing');
     $('#messages', $eventContainer).perfectScrollbar(thisScrollbarSettings);
+    setTimeout(function(){ $('.event_container', $eventContainer).addClass('animate'); }, 600);
     $(window).focus();
 
     // Play the appropriate sound effect
@@ -3041,6 +3043,7 @@ function windowEventDestroy(){
     //console.log('windowEventDestroy()');
     $('#canvas', $eventContainer).empty();
     $('#messages', $eventContainer).empty();
+    $('.event_container', $eventContainer).removeClass('animate');
     $eventContainer.addClass('hidden');
     //alert(eventMarkup);
 }
