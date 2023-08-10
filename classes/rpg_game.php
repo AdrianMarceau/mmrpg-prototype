@@ -1816,6 +1816,7 @@ class rpg_game {
         if (!isset($banner_config['background'])){ $banner_config['background'] = array(38, 38, 38); }
         if (!isset($banner_config['width'])){ $banner_config['width'] = 765; }
         if (!isset($banner_config['height'])){ $banner_config['height'] = 216; }
+        if (!isset($banner_config['banner_kind'])){ $banner_config['banner_kind'] = ''; }
         if (!isset($banner_config['banner_token'])){ $banner_config['banner_token'] = ''; }
         if (!isset($banner_config['field_background'])){ $banner_config['field_background'] = ''; }
         if (!isset($banner_config['field_foreground'])){ $banner_config['field_foreground'] = ''; }
@@ -1830,6 +1831,8 @@ class rpg_game {
             $sprite_bottom_min = 30;
             $sprite_bottom_max = 115;
             $sprite_bottom_range = $sprite_bottom_max - $sprite_bottom_min;
+            $sprite_layer_min = 10;
+            $sprite_layer_max = -10;
             foreach ($banner_config['field_sprites'] AS $sprite_key => $sprite_data){
                 // If the sprite doesn't have a bottom value, skip it
                 if (!isset($sprite_data['bottom'])){ continue; }
@@ -1841,8 +1844,11 @@ class rpg_game {
                 // If the layer value is greater than 8, set it to 8
                 if ($sprite_layer > 8){ $sprite_layer = 8; }
                 // Add the layer value to the sprite data
+                if ($sprite_layer < $sprite_layer_min){ $sprite_layer_min = $sprite_layer; }
+                if ($sprite_layer > $sprite_layer_max){ $sprite_layer_max = $sprite_layer; }
                 $banner_config['field_sprites'][$sprite_key]['layer'] = $sprite_layer;
             }
+            $sprite_layer_middle = ceil($sprite_layer_max / 2);
             // Revise the entire field sprites array so layers start at "1" rather than 3, 4, 5, etc.
             $min_layer_value = 99;
             foreach ($banner_config['field_sprites'] AS $key => $data){ if ($data['layer'] < $min_layer_value){ $min_layer_value = $data['layer']; } }
@@ -1851,6 +1857,8 @@ class rpg_game {
             usort($banner_config['field_sprites'], function($a, $b){
                 $a_bottom = isset($a['bottom']) ? $a['bottom'] : 0;
                 $b_bottom = isset($b['bottom']) ? $b['bottom'] : 0;
+                if (isset($a['depth'])){ $a_bottom -= $a['depth']; }
+                if (isset($b['depth'])){ $b_bottom -= $b['depth']; }
                 if ($a_bottom == $b_bottom){ return 0; }
                 return ($a_bottom < $b_bottom) ? 1 : -1;
             });
@@ -1939,6 +1947,7 @@ class rpg_game {
                 $spriteFrame = $sprite['frame'];
                 $spriteDirection = $sprite['direction'];
                 $spriteLayer = isset($sprite['layer']) ? $sprite['layer'] : 1;
+                $spriteLayerDiff = abs($spriteLayer - $sprite_layer_middle);
                 $spriteLeft = isset($sprite['left']) ? $sprite['left'] : 0;
                 $spriteRight = isset($sprite['right']) ? $sprite['right'] : 0;
                 $spriteBottom = isset($sprite['bottom']) ? $sprite['bottom'] : 0;
@@ -1950,7 +1959,7 @@ class rpg_game {
                 $spritePath .= (!empty($spriteImageSheet) ? $spriteImageSheet.'/' : '');
                 $spritePath .= $spriteFile;
                 $spriteObj = rpg_game::generate_event_banner_sprite($spritePath, $spriteSize, $spriteFrame, true);
-                if ($spriteLayer > 1){ self::darken_event_banner_sprite($spriteObj, (($spriteLayer - 1) * 5)); }
+                if ($spriteLayerDiff > 1){ self::darken_event_banner_sprite($spriteObj, (($spriteLayerDiff - 1) * 5)); }
                 $destY = $banner_config['height'] - $spriteBottom - ($spriteSize * 2);
                 $destX = $sprite['float'] === 'left' ? $spriteLeft : ($banner_config['width'] - $spriteRight - ($spriteSize * 2));
                 if ($spriteSize > 40){ $destX += ($sprite['float'] === 'left' ? -1 : 1) * ($spriteSize - 40); }
@@ -1963,20 +1972,25 @@ class rpg_game {
         if (!empty($banner_config['frame_colour'])){
 
             // Check if this is a bonus event chapter
+            $is_event_banner = $banner_config['banner_kind'] === 'event' ? true : false;
+            $is_challenge_banner = $banner_config['banner_kind'] === 'challenge' ? true : false;
             $is_bonus_chapter = !preg_match('/^chapter-([0-9]+)-unlocked$/i', $banner_config['banner_token']) ? true : false;
 
             // Collect the one or two frame colours to use
             $frame_colour = $banner_config['frame_colour'];
             $frame_colour2 = isset($banner_config['frame_colour2']) ? $banner_config['frame_colour2'] : $banner_config['frame_colour'];
             $frame_colour3 = array(241, 182, 41);
+            $challenge_frame_colour = array(0, 0, 0);
 
             // Add a frame on the left side of the event banner
-            if ($is_bonus_chapter){ self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $frame_colour3, 'position' => 'left', 'width' => 320)); }
+            if ($is_challenge_banner){ self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $challenge_frame_colour, 'position' => 'left', 'width' => 310)); }
+            elseif ($is_bonus_chapter){ self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $frame_colour3, 'position' => 'left', 'width' => 320)); }
             self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $frame_colour2, 'position' => 'left', 'width' => 300));
             self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $frame_colour, 'position' => 'left', 'width' => 200));
 
             // Add a frame on the right side of the event banner
-            if ($is_bonus_chapter){ self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $frame_colour3, 'position' => 'right', 'width' => 320)); }
+            if ($is_challenge_banner){ self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $challenge_frame_colour, 'position' => 'right', 'width' => 310)); }
+            elseif ($is_bonus_chapter){ self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $frame_colour3, 'position' => 'right', 'width' => 320)); }
             self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $frame_colour2, 'position' => 'right', 'width' => 300));
             self::overlay_frame_on_event_banner($banner_image, $banner_config, array('colour' => $frame_colour, 'position' => 'right', 'width' => 200));
         }
