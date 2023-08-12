@@ -1275,11 +1275,18 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
     background-color: #595959;
     background-image: none;
     color: #CACACA;
-    opacity: 0.45;
 }
 #prototype .option_wrapper_default .option_complete:hover,
 #prototype .option_wrapper_complete .option_complete:hover {
-    opacity: 0.75;
+
+}
+#prototype .option_wrapper_default .option_complete .platform,
+#prototype .option_wrapper_complete .option_complete .platform {
+    filter: brightness(0.6) saturate(1.2);
+}
+#prototype .option_wrapper_default .option_complete:hover .platform,
+#prototype .option_wrapper_complete .option_complete:hover .platform {
+    filter: brightness(0.9) saturate(1.0);
 }
 #prototype .option_wrapper_complete .option_complete {
     opacity: 0.75;
@@ -1289,8 +1296,8 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
 }
 
 #prototype .option_disabled {
-    opacity: 0.2;
     cursor: default;
+    filter: brightness(0.5);
 }
 #prototype .option_hidden {
     display: none;
@@ -2282,7 +2289,7 @@ body[data-source="website"] #prototype .menu {
     background-size: 768px 934px;
     animation: prototype-background-zoom-animation 240s linear infinite;
 }
-#prototype {
+#mmrpg.prototype #prototype {
     background-image: url(../images/assets/prototype-background-2k23_code-only.png);
     background-position: 0 0;
     background-repeat: repeat;

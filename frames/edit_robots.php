@@ -173,6 +173,7 @@ $first_robot_token = $allowed_edit_robots[0];
                         <tbody>
                             <tr>
                                 <td class="console">
+                                    <div class="placeholder"><i>..........</i></div>
                                     <div id="console" class="noresize">
                                         <div id="robots" class="wrapper"></div>
                                     </div>
@@ -180,17 +181,18 @@ $first_robot_token = $allowed_edit_robots[0];
                             </tr>
                             <tr>
                                 <td class="canvas">
+                                    <div class="placeholder"><i>..........</i></div>
                                     <div id="canvas">
-                                        <div class="robot_canvas" data-canvas="robots">
+                                        <div class="robot_canvas hidden" data-canvas="robots">
                                             <div class="links"></div>
                                         </div>
-                                        <div class="player_canvas" data-canvas="players">
+                                        <div class="player_canvas hidden" data-canvas="players">
                                             <div class="links"></div>
                                         </div>
-                                        <div class="ability_canvas" data-canvas="abilities">
+                                        <div class="ability_canvas hidden" data-canvas="abilities">
                                             <div class="links"></div>
                                         </div>
-                                        <div class="item_canvas" data-canvas="items">
+                                        <div class="item_canvas hidden" data-canvas="items">
                                             <div class="links"></div>
                                         </div>
                                     </div>

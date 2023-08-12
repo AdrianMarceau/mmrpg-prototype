@@ -167,6 +167,7 @@ $(document).ready(function(){
 
     // Define the batch function for loading robot data in a loop
     loadConsoleRobotMarkup = function(thisSprite, index, complete){
+        //console.log('loadConsoleRobotMarkup() for '+thisSprite.attr('data-player')+' '+thisSprite.attr('data-robot'));
 
         thisBody.addClass('loading');
 
@@ -184,8 +185,15 @@ $(document).ready(function(){
             player: thisPlayerToken,
             robot: thisRobotToken
             }, function(data, status){
-
             //console.log('console data received, appending '+thisPlayerToken+' '+thisRobotToken+'...');
+
+            var firstLoad = false;
+            var $placeHolderBlock = gameConsole.parent().find('.placeholder');
+            if ($placeHolderBlock.length){
+                var marginTop = (-1 * $placeHolderBlock.outerHeight()) + 'px';
+                $placeHolderBlock.animate({opacity:0,marginTop:marginTop},600,'swing',function(){ $(this).remove(); });
+                firstLoad = true;
+                }
 
             if (index == 0){
                 thisConsole.animate({height:'230px',opacity:1},300,'swing',function(){
@@ -194,19 +202,19 @@ $(document).ready(function(){
                     });
                 }
 
-            //$('#console #robots').find('.event[data-player='+thisPlayerToken+'][data-robot='+thisRobotToken+']').remove();
             $('#console #robots').append(data);
 
-            thisSprite.animate({opacity:0.3},{duration:300,queue:false,easing:'swing',complete:function(){
+            var fadeDuration = firstLoad ? 600 : 300;
+            thisSprite.animate({opacity:0.3},{duration:fadeDuration,queue:false,easing:'swing',complete:function(){
                 //console.log( thisPlayerToken+' '+thisRobotToken+' sprite animation complete');
                 $(this).removeClass('notloaded').css({opacity:''});
+                $(this).find('i.new').remove();
                 thisBody.removeClass('loading');
                 complete();
                 }});
 
             countRobotsLoaded++;
             loadedConsoleRobotTokens.push(thisRobotToken);
-            //$('.header', thisEditor).html('Robot Editor ('+countRobotsLoaded+' Robots)')
 
             });
 
@@ -806,7 +814,7 @@ $(document).ready(function(){
         var postData = {action:'ability',player:targetPlayerToken,robot:targetRobotToken,key:targetAbilityKey};
         if (thisAbilityToken.length){ postData.ability = thisAbilityToken; }
         else { postData.ability = ''; }
-        console.log('postData =', postData);
+        //console.log('postData =', postData);
 
         // Post this change back to the server
         thisBody.addClass('loading');
@@ -1600,11 +1608,15 @@ function windowResizeFrame(){
 
 // Define an initialization function to run when document ready
 function robotEditorCanvasInit(){
+    //console.log('robotEditorCanvasInit()');
 
     var robotCanvas = $('.robot_canvas', gameCanvas);
     var robotCanvasPlayerWrappers = false;
 
+    robotCanvas.addClass('hidden');
     robotCanvas.css({height:0,opacity:0});
+
+    //console.log('sending request for canvas markup...');
 
     $.post('frames/edit_robots.php', {
         action: 'canvas_markup',
@@ -1612,10 +1624,18 @@ function robotEditorCanvasInit(){
         edit: gameSettings.allowEditing ? 'true' : 'false',
         user_id: gameSettings.userNumber
         }, function(data, status){
-
             //console.log('canvas data received, appending...', data);
+
+            var $placeHolderBlock = gameCanvas.parent().find('.placeholder');
+            if ($placeHolderBlock.length){
+                var marginTop = (-1 * $placeHolderBlock.outerHeight()) + 'px';
+                $placeHolderBlock.animate({opacity:0,marginTop:marginTop},600,'swing',function(){ $(this).remove(); });
+                }
+
             $('.links', robotCanvas).empty().append(data);
-            robotCanvas.animate({height:'154px',opacity:1},2000,'swing',function(){
+
+            robotCanvas.removeClass('hidden');
+            robotCanvas.animate({height:'154px',opacity:1},600,'swing',function(){
                 //console.log('canvas animation complete');
                 $(this).css({height:'auto'});
                 });
@@ -1633,7 +1653,6 @@ function robotEditorCanvasInit(){
             countRobotsTriggered = 0;
             countRobotsLoaded = 0;
             countWrapperLoop = 0;
-            //$('.robot_canvas .sprite[data-player][data-robot]', gameCanvas).css({opacity:0.2});
             $('.sprite[data-robot]', robotCanvas).addClass('notloaded');
             while (countRobotsTriggered < countRobotLinks){
 

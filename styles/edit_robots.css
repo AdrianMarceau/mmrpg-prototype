@@ -29,6 +29,12 @@ body.windowFlag_landscapeMode #prototype {
 #edit .header {
     width: 100%;
 }
+
+#edit #canvas,
+#edit #console {
+
+}
+
 #edit #canvas,
 #edit #canvas .robot_canvas,
 #edit #canvas .player_canvas,
@@ -256,7 +262,7 @@ body.windowFlag_landscapeMode #prototype {
     width: 100%;
 }
 #edit #canvas .sprite_robot {
-    position: static;
+    position: relative;
     float: left;
     height: 24px;
     width: 22px;
@@ -266,22 +272,77 @@ body.windowFlag_landscapeMode #prototype {
     border-radius: 0.25em;
     -moz-border-radius: 0.25em;
     -webkit-border-radius: 0.25em;
-    margin: 0 6px 6px 0;
+    margin: 3px;
     background-position: -8px -12px;
     box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
     -moz-box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
     -webkit-box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
-    opacity: 0.30;
+    background-color: inherit;
+    filter: brightness(1.0);
+    transition: filter 0.3s;
 }
 #edit #canvas .sprite_robot.notloaded {
-    opacity: 0.15 !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+/*
+#edit #canvas .sprite_robot.notloaded {
+    filter: brightness(0.15) !important;
 }
 #edit #canvas .sprite_robot:hover {
-    opacity: 0.90 !important;
+    filter: brightness(0.90) !important;
 }
 #edit #canvas .sprite_robot_current,
 #edit #canvas .sprite_robot_current:hover {
+    filter: brightness(1.0);
+}
+*/
+#edit #canvas .sprite_robot .sprite {
+    position: absolute;
+    z-index: 1;
+    display: block;
+    top: -1px;
+    left: -1px;
+    width: 30px;
+    height: 26px;
+    border-radius: 3px;
+    overflow: hidden;
+    background-position: 0 0;
     opacity: 1.0;
+    filter: brightness(0.5) saturate(1.0);
+    transition: opacity 0.3s, brightness 0.3s;
+    pointer-events: none;
+    cursor: pointer;
+}
+#edit #canvas .sprite_robot.notloaded .sprite {
+    filter: brightness(0.3) saturate(0.8) !important;
+}
+#edit #canvas .sprite_robot:hover .sprite {
+    filter: brightness(0.9) saturate(1.0) !important;
+}
+#edit #canvas .sprite_robot_current .sprite,
+#edit #canvas .sprite_robot_current:hover .sprite {
+    filter: brightness(1.0) saturate(1.0);
+}
+#edit #canvas .sprite_robot i.new {
+    display: inline-block;
+    box-sizing: border-box;
+    position: absolute;
+    z-index: 2;
+    top: -4px;
+    left: -4px;
+    font-size: 90%;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0 0 0 2px;
+    line-height: 1.2;
+    width: 8px;
+    height: 8px;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    pointer-events: none;
 }
 /*
 #edit #canvas .sprite_robot_dr-light_current {
@@ -387,6 +448,9 @@ body.windowFlag_landscapeMode #prototype {
     color: rgb(190, 141, 223) !important;
 }
 
+#edit #console #robots {
+
+}
 
 #edit #console .event .event_robot_mugshot,
 #edit #console .event .event_robot_images,
@@ -1000,6 +1064,43 @@ body[data-mode="viewer"] #edit #canvas .item_canvas a.item_name {
 }
 #edit .section .formatter {
     width: 100%;
+}
+
+#edit .section .canvas > .placeholder,
+#edit .section .console > .placeholder {
+    display: block;
+    margin: 0 auto;
+    padding: 6px 12px;
+    font-size: 100%;
+    line-height: 1;
+    background-color: #1f1f1f;
+    color: #969696;
+    border-radius: 6px;
+    overflow: hidden;
+    text-align: center;
+}
+
+@keyframes increment-placeholder-width {
+    from { width: 0; }
+    to { width: 5em; }
+}
+#edit .section .canvas > .placeholder > i,
+#edit .section .console > .placeholder > i {
+    display: inline-block;
+    padding-bottom: 9px;
+    text-align: right;
+    color: inherit;
+    width: 1em;
+    font-size: 1em;
+    letter-spacing: 0.25em;
+    overflow: hidden;
+    animation: none;
+}
+#mmrpg.loading #edit .section .canvas > .placeholder > i {
+    animation: increment-placeholder-width 5s steps(10) infinite;
+}
+#mmrpg.loading #edit .section .console > .placeholder > i {
+    animation: increment-placeholder-width 10s steps(10) infinite;
 }
 
 #edit #console .ability_presets {

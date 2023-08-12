@@ -10,6 +10,11 @@ require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 //require(MMRPG_CONFIG_ROOTDIR.'database/robots.php');
 $mmrpg_database_robots = rpg_robot::get_index(true, false);
 
+// Collect the array of unseen menu frame robots if there is one, then clear it
+$frame_token = 'edit_robots';
+$menu_frame_content_unseen = rpg_prototype::get_menu_frame_content_unseen($frame_token);
+rpg_prototype::clear_menu_frame_content_unseen($frame_token);
+
 // Loop through the allowed edit data for all players
 $key_counter = 0;
 $player_counter = 0;
@@ -50,11 +55,17 @@ foreach($allowed_edit_data AS $player_token => $player_info){
                     $robot_info['robot_experience'] = !empty($temp_robot_rewards['robot_experience']) ? $temp_robot_rewards['robot_experience'] : 0;
                     if ($robot_info['robot_level'] >= 100){ $robot_info['robot_experience'] = '&#8734;'; }
                     $robot_image_offset = $robot_info['robot_image_size'] > 40 ? ceil(($robot_info['robot_image_size'] - 40) * 0.5) : 0;
-                    $robot_image_offset_x = -6 - $robot_image_offset;
+                    $robot_image_offset_x = -5 - $robot_image_offset;
                     $robot_image_offset_y = -10 - $robot_image_offset;
                     $robot_tooltip_text = $robot_info['robot_name'].' ('.(!empty($robot_info['robot_core']) ? ucfirst($robot_info['robot_core']).' Core' : 'Neutral Core').') &lt;br /&gt;Lv '.$robot_info['robot_level'].' | '.$robot_info['robot_experience'].' Exp';
-                    $robot_link_styles = 'background-image: url(images/robots/'.(!empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token']).'/mug_right_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: '.$robot_image_offset_x.'px '.$robot_image_offset_y.'px;';
+                    $robot_is_new = !empty($menu_frame_content_unseen[$robot_token]) ? true : false;
+
+                    $robot_link_styles = 'background-image: none;';
                     $robot_link_classes = 'sprite sprite_robot sprite_robot_'.$player_token.' sprite_robot_sprite sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].' sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'_mugshot robot_status_active robot_position_active '.($robot_key == 0 ? 'sprite_robot_current sprite_robot_'.$player_token.'_current ' : '').' robot_type robot_type_'.(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none').'';
+
+                    $robot_sprite_styles = 'background-image: url(images/robots/'.(!empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token']).'/mug_right_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: '.$robot_image_offset_x.'px '.$robot_image_offset_y.'px;';
+                    $robot_sprite_classes = 'sprite sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].' sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'_mugshot';
+
                     echo '<a data-number="'.$robot_info['robot_number'].
                         '" data-level="'.$robot_info['robot_level'].
                         '" data-token="'.$player_info['player_token'].'_'.$robot_info['robot_token'].
@@ -64,7 +75,10 @@ foreach($allowed_edit_data AS $player_token => $player_info){
                         '" data-tooltip="'.$robot_tooltip_text.
                         '" style="'.$robot_link_styles.
                         '" class="'.$robot_link_classes
-                        .'">'.$robot_info['robot_name'].
+                        .'">'.
+                        '<span class="'.$robot_sprite_classes.'" style="'.$robot_sprite_styles.'"></span>'.
+                        '<span class="name">'.$robot_info['robot_name'].'</span>'.
+                        ($robot_is_new ? '<i class="new type electric"></i>' : '').
                         '</a>'."\n";
                     $key_counter++;
                 }
