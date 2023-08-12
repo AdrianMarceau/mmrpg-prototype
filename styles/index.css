@@ -1017,14 +1017,18 @@ body.loaded #window .banner:hover .banner_foreground {
 }
 #window .page > .header {
     position: relative;
-    border: 2px solid #1A1A1A;
     padding: 0;
     background-image: none;
+    /*
+    border: 2px solid #1A1A1A;
     border-image: url(../images/assets/website-header_border-image-2k23.png);
     border-image-outset: 0;
     border-image-width: 10px;
     border-image-repeat: repeat;
     border-image-slice: 10 fill;
+    */
+    background-color: #191919;
+    border: 1px solid #1A1A1A;
 }
 #window .page > .header:before,
 #window .page > .header:after {
@@ -1066,7 +1070,7 @@ body.loaded #window .banner:hover .banner_foreground {
 #window .page > .header .header_wrapper {
     position: relative;
     z-index: 3;
-    margin: 5px;
+    margin: 0 auto;
     padding: 10px;
     box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.6);
     border: 0 solid transparent;
@@ -1077,8 +1081,9 @@ body.loaded #window .banner:hover .banner_foreground {
     font-weight: bold;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.9);
     background-color: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.10);
+    border: 0 none transparent;
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
+    border-radius: 5px;
 }
 #window .header .title > .wrap {
     display: inline-block;
