@@ -1904,19 +1904,28 @@ body.index #header {
     padding: 5px;
 }
 #events .event_container {
-    padding: 5px;
+    padding: 5px 0 5px 10px;
     background-image: url(../images/assets/popup-background-2k23_misc-event.png);
     background-blend-mode: multiply;
     background-position: center center;
     background-repeat: no-repeat;
-    background-size: 100%;
+    background-size: 100% 100%;
     border-radius: 6px;
     box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.4);
 }
-@keyframes zoom-event-container-background { to { background-size: 200%; } }
-#events .event_container.animate {
-    animation: zoom-event-container-background 120s forwards;
+@keyframes zoom-event-container-background {
+    0%, 100% { background-size: 100% 100%; }
+    50% { background-size: 200% 200%; }
 }
+#events .event_container.animate {
+    animation: zoom-event-container-background 200s ease-in-out infinite;
+}
+#events[data-type="new-chapter"] .event_container,
+#events[data-type="prototype-complete"] .event_container,
+#events[data-type="prototype-postgame"] .event_container {
+    background-image: url(../images/assets/popup-background-2k23_story-event.png);
+}
+
 #events .event_container p {
     font-size: 14px;
     line-height: 22px;
@@ -1931,6 +1940,11 @@ body.index #header {
     color: #FFFFFF;
     font-weight: bold;
 }
+
+#events .event_container p + #console {
+
+}
+
 #events #canvas,
 #events #headline,
 #events #messages {
@@ -1963,6 +1977,8 @@ body.index #header {
 }
 #events #canvas {
     overflow: hidden;
+    width: calc(100% - 13px);
+    width: 576px;
     margin: 0 0 5px;
     background-color: rgb(13,13,13);
     background-color: rgba(13,13,13,0.85);
@@ -1976,6 +1992,7 @@ body.index #header {
     background-image: -moz-linear-gradient(
             center bottom,
             rgba(13,13,13,0.75) 15%,
+
             rgba(09,09,09,0.75) 75%
     );
 }
@@ -1993,13 +2010,13 @@ body.index #header {
     max-height: 310px;
 }
 #events #headline {
-    margin: 0 auto 10px;
+    margin: 0 auto 5px;
 }
 #events #headline p {
     margin: 0 auto;
 }
 #events #buttons {
-    margin: 10px 0 0;
+    margin: 5px 0 0;
     border: 0 none transparent !important;
     color: #FFFFFF;
 }
@@ -2028,11 +2045,23 @@ body.index #header {
 }
 #events .event_wrapper div.inset_panel,
 #events .event_wrapper p.inset_panel {
+    display: block;
+    position: relative;
     font-size: 100%;
     line-height: 1.6;
     padding: 20px 10px;
     background-color: rgba(0, 0, 0, 0.3) !important;
     background-image: none;
+    border-radius: 6px;
+    margin: 0 auto;
+}
+#events .event_wrapper div.inset_panel.compact,
+#events .event_wrapper p.inset_panel.compact {
+    padding: 10px;
+}
+#events .event_wrapper div.inset_panel + .inset_panel,
+#events .event_wrapper p.inset_panel + .inset_panel {
+    margin-top: 5px;
 }
 #events .event_wrapper p.bigtext {
     font-size: 140%;
@@ -2068,6 +2097,122 @@ body.index #header {
     top: calc(50% - 5px);
     left: calc(50% + 120px);
     transform: translate(-50%, -50%);
+}
+
+#events #canvas .sprite {
+
+}
+#events #canvas .sprite_wrapper {
+    display: block;
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background-color: transparent;
+    border: 0 none transparent;
+
+
+    /* background-color: rgba(200, 0, 50, 0.5); */
+}
+#events #canvas .sprite_wrapper > .wrap {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background-color: transparent;
+    border: 0 none transparent;
+
+    /* border: 1px solid rgba(50, 0, 200, 0.5);  */
+}
+
+/* define a quick and simple hover animation for appropriate sprite wrappers */
+@keyframes sprite-wrapper-hovering-animation {
+    0%, 100% { transform: translateY(5%); }
+    50% { transform: translateY(-5%); }
+}
+#events #canvas .sprite_wrapper.hovering_animation {
+    transform: translateY(0);
+    transform-origin: center center;
+    animation: sprite-wrapper-hovering-animation 3s linear infinite;
+}
+/* define a quick and subtle flipping animation for appropriate sprite wrappers */
+@keyframes sprite-wrapper-flipping-animation {
+    0% { transform: scaleX(1); }
+    25% { transform: scaleX(0.05); }
+    50% { transform: scaleX(1); }
+    75% { transform: scaleX(0.05); }
+    100% { transform: scaleX(1); }
+}
+#events #canvas .sprite_wrapper.flipping_animation {
+    transform: scaleX(1);
+    transform-origin: center bottom;
+    animation: sprite-wrapper-flipping-animation 9s infinite;
+}
+/* define a quick and subtle breathing animation for appropriate sprite wrappers */
+@keyframes sprite-wrapper-breathing-animation {
+    0% { transform: scale(1, 1); }
+    25% { transform: scale(0.95, 1.10); }
+    30% { transform: scale(0.95, 1.09); }
+    75% { transform: scale(1.05, 0.95); }
+    100% { transform: scale(1, 1); }
+}
+#events #canvas .sprite_wrapper.breathing_animation {
+    transform: scale(1, 1);
+    transform-origin: center bottom;
+    animation: sprite-wrapper-breathing-animation 1.5s infinite;
+    animation-delay: 1s;
+    animation-iteration-count: 1;
+}
+@keyframes sprite-wrapper-breathing-animation-for-sprite {
+    0%   { background-position: -40px 0; }
+    25%  { background-position: -80px 0; }
+    50%  { background-position: -40px 0; }
+    75%  { background-position: -400px 0; }
+    100% { background-position: -40px 0; }
+}
+@keyframes sprite-wrapper-breathing-animation-for-sprite-x80 {
+    0%   { background-position: -80px 0; }
+    25%  { background-position: -160px 0; }
+    50%  { background-position: -80px 0; }
+    75%  { background-position: -800px 0; }
+    100% { background-position: -80px 0; }
+}
+@keyframes sprite-wrapper-breathing-animation-for-sprite-x160 {
+    0%   { background-position: -160px 0; }
+    25%  { background-position: -320px 0; }
+    50%  { background-position: -160px 0; }
+    75%  { background-position: -1600px 0; }
+    100% { background-position: -160px 0; }
+}
+#events #canvas .sprite_wrapper.breathing_animation .sprite_robot {
+    animation: sprite-wrapper-breathing-animation-for-sprite 10s steps(1) infinite;
+    animation-delay: 5s;
+}
+#events #canvas .sprite_wrapper.breathing_animation .sprite_robot.sprite_80x80 {
+    animation-name: sprite-wrapper-breathing-animation-for-sprite-x80;
+}
+#events #canvas .sprite_wrapper.breathing_animation .sprite_robot.sprite_160x160 {
+    animation-name: sprite-wrapper-breathing-animation-for-sprite-x160;
+}
+
+/* define a quick animation for the event banners so that they start zoomed in on pageload but then zoom outward to 100% and stay that way */
+@keyframes event-banner-zoom-animation {
+    0% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+#events #canvas .sprite.event_banner {
+    background-image: none;
+    background-size: cover;
+    background-position: center top;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: auto;
+    height: auto;
+    transform: scale(1);
+    transform-origin: center center;
+    animation: event-banner-zoom-animation 1.5s ease-out;
+    animation-iteration-count: 1;
 }
 
 
@@ -2271,14 +2416,21 @@ body.index #header {
     float: left;
 }
 
+#events #buttons input:hover {
+    background-color: rgb(33,33,33);
+    background-color: rgba(33,33,33,1.0);
+}
+
 #events #buttons .event_continue {
     display: block;
     box-sizing: border-box;
-    width: 100%;
+    width: calc(100% - 13px);
+    width: 576px;
     height: 36px;
-    font-size: 16px;
+    font-size: 12px;
     line-height: 34px;
     text-decoration: none;
+    text-transform: uppercase;
     color: #EFEFEF;
     border: 2px solid #000000;
     border-radius: 0.5em;
@@ -2299,12 +2451,13 @@ body.index #header {
             rgba(09,09,09,0.75) 75%
     );
     cursor: pointer;
+    transform: scale(1);
+    transition: color 0.3s, transform 0.3s;
 }
-#events #buttons input:hover {
-    background-color: rgb(33,33,33);
-    background-color: rgba(33,33,33,1.0);
+#events #buttons .event_continue:hover {
+    color: #ffffff;
+    transform: scale(1.02);
 }
-
 
 #battle {
     margin: 0 auto;
@@ -3352,7 +3505,7 @@ body.index #header {
     padding: 3px 9px;
     line-height: 1.4;
     width: auto;
-    max-width: calc(100% - 15px);
+    max-width: calc(100% - 13px);
     white-space: normal;
     font-weight: normal;
     text-align: right;

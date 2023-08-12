@@ -885,28 +885,28 @@ foreach ($chapter_unlock_players AS $player_key => $player_token){
             $player_type = $player_info['player_type'];
             $banner_image_path = 'images/events/event-banner_'.$chapter_token.'-unlocked_'.$player_token.'.png?'.MMRPG_CONFIG_CACHE_DATE;
             $headline_text = $chapter_is_intro ? $chapter_unlock_config['welcome'] : 'Congratulations!';
-            $temp_headline_markup = '<p class="headline ability_type ability_type_'.$player_type.'"><strong>'.$headline_text.'</strong></p>';
             $temp_canvas_markup = '';
-            $temp_canvas_markup .= '<div class="sprite sprite_80x80 smooth-scaling" style="background-image: url('.$banner_image_path.'); background-size: cover; background-position: center top; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+            $temp_canvas_markup .= '<div class="sprite event_banner sprite_80x80 smooth-scaling" style="background-image: url('.$banner_image_path.'); background-size: cover; background-position: center top; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
             $temp_console_markup = '';
-            $temp_console_markup .= $temp_headline_markup;
-            $temp_console_markup .= '<div class="ability_type inset_panel">';
+            $temp_console_markup .= '<p class="headline ability_type ability_type_'.$player_type.'"><strong>'.$headline_text.'</strong></p>';
+            $temp_console_markup .= '<div class="inset_panel">';
                 $temp_console_markup .= '<p class="bigtext centertext"><strong class="ability_type ability_type_'.$player_type.'">'.$player_name.'</strong> '.$chapter_unlock_text.' a new chapter!</p>';
                 $temp_console_markup .= '<p class="bigtext centertext">&quot;<strong>'.$chapter_subname.'</strong>&quot;'.(!$chapter_is_intro ? '<br /> is now available!' : '').'</p>';
             $temp_console_markup .= '</div>';
             if (!$chapter_is_bonus){
                 if (!$chapter_is_intro){
                     $temp_limit_hearts = mmrpg_prototype_limit_hearts_earned($player_token);
-                    $temp_console_markup .= '<div class="ability_type inset_panel" style="margin-top: 5px; padding: 10px;">';
+                    $temp_limit_hearts_icons = trim(str_repeat('<i class="fa fa-heart"></i> ', $temp_limit_hearts));
+                    $temp_console_markup .= '<div class="inset_panel compact">';
                         $temp_console_markup .= '<p class="smalltext centertext">The doctor also earned a '.rpg_type::print_span('copy', '<i class="fa fas fa-heart"></i> Limit Heart').' for his progress!</p>';
-                        $temp_console_markup .= '<p class="smalltext centertext">He feels strong enough to bring <strong>'.$temp_limit_hearts.'</strong> robots into battle now!</p>';
+                        $temp_console_markup .= '<p class="smalltext centertext">He feels strong enough to bring <strong>'.$temp_limit_hearts.' robots '.$temp_limit_hearts_icons.'</strong> into battle now!</p>';
                     $temp_console_markup .= '</div>';
                 } else {
                     $letsgo_template_text = $chapter_unlock_config['letsgo_template'];
                     $letsgo_robot_token = $chapter_unlock_config['letsgo_robot']['token'];
                     $letsgo_robot_name = $chapter_unlock_config['letsgo_robot']['name'];
                     $letsgo_text = str_replace('{ROBOT}', ' '.rpg_type::print_span('copy', $letsgo_robot_name).' ', $letsgo_template_text);
-                    $temp_console_markup .= '<div class="ability_type inset_panel" style="margin-top: 5px; padding: 10px;">';
+                    $temp_console_markup .= '<div class="inset_panel compact">';
                         $temp_console_markup .= '<span class="sprite sprite_40x40 sprite_40x40_taunt float_left" style="background-image: url(images/players/'.$player_token.'/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span>';
                         $temp_console_markup .= '<p class="smalltext centertext">'.$letsgo_text.'</p>';
                         $temp_console_markup .= '<span class="sprite sprite_40x40 sprite_40x40_defend float_right" style="background-image: url(images/robots/'.$letsgo_robot_token.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span>';

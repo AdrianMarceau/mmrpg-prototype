@@ -2998,6 +2998,9 @@ function windowEventDisplay(){
 
         }
 
+    // Collect a reference to the inner event container within the parent one
+    var $innerEventContainer = $('.event_container', $eventContainer);
+
     // Collect the canvas and message markup to be added to the event container
     var headlineMarkup = '';
     var canvasMarkup = gameSettings.canvasMarkupArray.length ? gameSettings.canvasMarkupArray.shift() : '';
@@ -3020,20 +3023,55 @@ function windowEventDisplay(){
 
 
     // Empty the canvas and messages of any leftover, fill them with new markup, then show 'em
-    $('.event_container', $eventContainer).removeClass('animate');
     $('#headline', $eventContainer).empty().html(headlineMarkup);
     $('#canvas', $eventContainer).empty().html(canvasMarkup);
     $('#messages', $eventContainer).empty().html(messagesMarkup);
-    $eventContainer.css({opacity:0}).removeClass('hidden').animate({opacity:1},300,'swing');
-    $('#messages', $eventContainer).perfectScrollbar(thisScrollbarSettings);
-    setTimeout(function(){ $('.event_container', $eventContainer).addClass('animate'); }, 600);
-    $(window).focus();
+    $eventContainer.css({opacity:0}).removeClass('hidden');
 
-    // Play the appropriate sound effect
-    if (typeof window.top.mmrpg_play_sound_effect !== 'undefined'){
-        //console.log('play sound effect');
-        window.top.mmrpg_play_sound_effect('event-sound');
+    // Collect details about this event from the meta data if it exists
+    var $metaData = $('meta[name][content]', $eventContainer);
+    var metaData = {};
+    if ($metaData.length){
+        $metaData.each(function(){
+            var $this = $(this);
+            var name = $this.attr('name');
+            var content = $this.attr('content');
+            metaData[name] = content;
+            });
         }
+    if (typeof metaData['event_type'] === 'undefined'){ metaData['event_type'] = ''; }
+    if (typeof metaData['player_token'] === 'undefined'){ metaData['player_token'] = ''; }
+    console.log('$metaData:', $metaData);
+    console.log('metaData:', metaData);
+
+    // Check if this event is a story event based on the event type provided
+    var isStoryEvent = false;
+    var storyEventTypes = ['new-chapter', 'prototype-complete', 'prototype-postgame'];
+    if (storyEventTypes.indexOf(metaData['event_type']) !== -1){ isStoryEvent = true; }
+
+    // Update the event container with any visual changes as per the meta data
+    if (metaData['event_type'].length){ $eventContainer.attr('data-type', metaData['event_type']); }
+    else { $eventContainer.removeAttr('data-type'); }
+    if (metaData['player_token'].length){ $eventContainer.attr('data-player', metaData['player_token']); }
+    else { $eventContainer.removeAttr('data-player'); }
+
+    // Now that everything is set up, wait for all images before we actually display
+    $eventContainer.waitForImages(function(){
+
+        // Animate the event container into view and re-add the animate class to ensure it players
+        $innerEventContainer.removeClass('animate');
+        $eventContainer.animate({opacity:1},300,'swing');
+        $('#messages', $eventContainer).perfectScrollbar(thisScrollbarSettings);
+        setTimeout(function(){ $innerEventContainer.addClass('animate'); }, 250);
+        $(window).focus();
+
+        // Play the appropriate sound effect
+        if (typeof window.top.mmrpg_play_sound_effect !== 'undefined'){
+            //console.log('play sound effect');
+            window.top.mmrpg_play_sound_effect('event-sound');
+            }
+
+        }, null, true);
 
 }
 
