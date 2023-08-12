@@ -118,6 +118,11 @@ if (true){
                 <div class="ability_tabs_containers" style="margin: 0 auto 10px;">
                     <?
 
+                    // Collect the array of unseen menu frame abilities if there is one, then clear it
+                    $frame_token = 'abilities';
+                    $menu_frame_content_unseen = rpg_prototype::get_menu_frame_content_unseen($frame_token);
+                    rpg_prototype::clear_menu_frame_content_unseen($frame_token);
+
                     // Loop through the ability categories and display tab containers for them
                     foreach ($global_battle_ability_categories AS $category_token => $category_info){
                         $category_name = $category_info['category_name'];
@@ -155,6 +160,7 @@ if (true){
                                             $temp_is_disabled = false;
                                             $temp_is_comingsoon = false;
                                             $temp_is_complete = !empty($ability_info['ability_flag_complete']) ? $ability_info['ability_flag_complete'] : false;
+                                            $temp_is_new = in_array($ability_info_token, $menu_frame_content_unseen) ? true : false;
 
                                             // Define the editor title markup print options
                                             $ability_print_options = array('show_accuracy' => false);
@@ -181,7 +187,8 @@ if (true){
 
                                             ?>
                                             <td class="<?= $ability_cell_float ?> ability_cell<?= $temp_is_disabled ? ' ability_cell_disabled' : '' ?><?= !$temp_is_complete ? ' ability_cell_incomplete' : '' ?>" data-kind="ability" data-action="use-ability" data-token="<?= !$temp_is_comingsoon ? $ability_info_token : 'comingsoon' ?>" data-unlocked="<?= $temp_is_comingsoon ? 'coming-soon' : 'true' ?>">
-                                                <span class="ability_number ability_type ability_type_empty">No. <?= str_replace(' ', '&nbsp;', str_pad($ability_counter, 2, ' ', STR_PAD_LEFT)); ?></span><span class="ability_name ability_type ability_type_<?= $ability_info_type ?>" <?= !empty($temp_info_tooltip) ? 'data-click-tooltip="'.$temp_info_tooltip.'"' : '' ?>><?= $ability_info_name ?></span>
+                                                <span class="ability_number ability_type ability_type_empty"><span>No. <?= str_replace(' ', '&nbsp;', str_pad($ability_counter, 2, ' ', STR_PAD_LEFT)); ?></span><?= ($temp_is_new ? '<i class="new type electric"></i>' : '') ?></span>
+                                                <span class="ability_name ability_type ability_type_<?= $ability_info_type ?>" <?= !empty($temp_info_tooltip) ? 'data-click-tooltip="'.$temp_info_tooltip.'"' : '' ?>><?= $ability_info_name ?></span>
                                                 <? if (!$temp_is_comingsoon): ?>
                                                     <span class="ability_sprite ability_type ability_type_empty"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/abilities/<?= $ability_sprite_image ?>/icon_right_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE?>);"></span></span>
                                                 <? else: ?>
