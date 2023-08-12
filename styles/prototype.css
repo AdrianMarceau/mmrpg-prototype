@@ -2269,6 +2269,28 @@ body[data-source="website"] #prototype .menu {
 }
 
 
+/* 2k23 ANIMATION AND TWEAKS */
+
+@keyframes prototype-background-zoom-animation {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 -934px; }
+}
+#mmrpg.prototype {
+    background-image: url(../images/assets/prototype-background-2k23_stars-only.png);
+    background-position: 0 0;
+    background-repeat: repeat;
+    background-size: 768px 934px;
+    animation: prototype-background-zoom-animation 240s linear infinite;
+}
+#prototype {
+    background-image: url(../images/assets/prototype-background-2k23_code-only.png);
+    background-position: 0 0;
+    background-repeat: repeat;
+    background-size: 768px 934px;
+    animation: prototype-background-zoom-animation 120s linear infinite;
+}
+
+
 
 /* ROGUE STAR STYLES */
 
