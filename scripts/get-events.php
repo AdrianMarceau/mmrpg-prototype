@@ -71,8 +71,12 @@ if ($is_logged_in){
     // If there were any prototype window events created, display them
     if (!empty($_SESSION[$session_token]['EVENTS'])){
         foreach ($_SESSION[$session_token]['EVENTS'] AS $temp_key => $temp_event){
-            $window_canvas_events[] = $temp_event['canvas_markup'];
-            $window_canvas_messages[] = $temp_event['console_markup'];
+            $meta_data = array();
+            if (isset($temp_event['event_type'])){ $meta_data[] = '<meta name="event_type" content="'.$temp_event['event_type'].'" />'; }
+            if (isset($temp_event['player_token'])){ $meta_data[] = '<meta name="player_token" content="'.$temp_event['player_token'].'" />'; }
+            $meta_data = !empty($meta_data) ? implode('', $meta_data) : '';
+            $window_canvas_events[] = $temp_event['canvas_markup'].$meta_data;
+            $window_canvas_messages[] = $temp_event['console_markup']; //.$meta_data;
         }
     }
 
