@@ -1665,6 +1665,7 @@ class rpg_player extends rpg_object {
         else { $temp_item_quantity_max = MMRPG_SETTINGS_ITEMS_MAXQUANTITY; }
 
         // Create the session variable for this item if it does not exist and collect its value
+        $temp_item_is_new = !isset($_SESSION['GAME']['values']['battle_items'][$temp_item_token]) ? true : false;
         if (empty($_SESSION['GAME']['values']['battle_items'][$temp_item_token])){ $_SESSION['GAME']['values']['battle_items'][$temp_item_token] = 0; }
         $temp_item_quantity = $_SESSION['GAME']['values']['battle_items'][$temp_item_token];
         $temp_item_quantity_old = $temp_item_quantity;
@@ -1675,6 +1676,14 @@ class rpg_player extends rpg_object {
             $_SESSION['GAME']['values']['battle_items'][$temp_item_token] = $temp_item_quantity_max;
             $temp_item_quantity = $temp_item_quantity_max;
             if (!$allow_over_max){ return true; }
+        }
+
+        // Remove the shop/item frame from the history array so that it appears with the "new" indicator
+        if ($temp_item_is_new){
+            $menu_frame_token = 'items';
+            $menu_frame_content_token = $temp_item_token;
+            rpg_prototype::mark_menu_frame_as_unseen($menu_frame_token);
+            rpg_prototype::mark_menu_frame_content_as_unseen($menu_frame_token, $menu_frame_content_token);
         }
 
         // Update the target player and robot's frames and update

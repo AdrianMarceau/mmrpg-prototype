@@ -125,6 +125,11 @@ if (true){
                 <div class="item_tabs_containers" style="margin: 0 auto 10px;">
                     <?
 
+                    // Collect the array of unseen menu frame items if there is one, then clear it
+                    $frame_token = 'items';
+                    $menu_frame_content_unseen = rpg_prototype::get_menu_frame_content_unseen($frame_token);
+                    rpg_prototype::clear_menu_frame_content_unseen($frame_token);
+
                     // Loop through the item categories and display tab containers for them
                     foreach ($global_battle_item_categories AS $category_token => $category_info){
                         $category_name = $category_info['category_name'];
@@ -184,6 +189,7 @@ if (true){
                                             $item_cell_float = $item_counter % 2 == 0 ? 'right' : 'left';
                                             $temp_is_disabled = false;
                                             $temp_is_comingsoon = false;
+                                            $temp_is_new = in_array($item_info_token, $menu_frame_content_unseen) ? true : false;
 
                                             // Check to see if this is a special item type
                                             $item_is_shard = strstr($item_token, '-shard') ? true : false;
@@ -245,7 +251,8 @@ if (true){
 
                                             ?>
                                             <td class="<?= $item_cell_float ?> item_cell <?= $temp_is_disabled ? 'item_cell_disabled' : '' ?>" data-kind="item" data-action="use-item" data-token="<?= !$temp_is_comingsoon ? $item_info_token : 'comingsoon' ?>" data-unlocked="<?= $temp_is_comingsoon ? 'coming-soon' : 'true' ?>" data-count="<?= $item_info_quantity ?>">
-                                                <span class="item_number item_type item_type_empty">No. <?= str_replace(' ', '&nbsp;', str_pad($item_counter, 2, ' ', STR_PAD_LEFT)); ?></span><span class="item_name item_type item_type_<?= $item_info_type ?>" <?= !empty($temp_info_tooltip) ? 'data-click-tooltip="'.$temp_info_tooltip.'"' : '' ?>><?= $item_info_name ?></span>
+                                                <span class="item_number item_type item_type_empty"><span>No. <?= str_replace(' ', '&nbsp;', str_pad($item_counter, 2, ' ', STR_PAD_LEFT)); ?></span><?= ($temp_is_new ? '<i class="new type electric"></i>' : '') ?></span>
+                                                <span class="item_name item_type item_type_<?= $item_info_type ?>" <?= !empty($temp_info_tooltip) ? 'data-click-tooltip="'.$temp_info_tooltip.'"' : '' ?>><?= $item_info_name ?></span>
                                                 <? /* <a class="use_button item_type item_type_none" href="#">Use</a> */ ?>
                                                 <? if (!$temp_is_comingsoon): ?>
                                                     <span class="item_sprite item_type item_type_empty"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/items/<?= $item_sprite_image ?>/icon_right_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE?>);"></span></span>
