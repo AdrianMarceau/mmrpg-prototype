@@ -21,7 +21,7 @@ ob_start();
         // Display available main actions
         ?><div class="main_actions"><?
             if (!empty($temp_player_ability_actions) || $this_robot->robot_class == 'mecha'){
-                ?><a class="button action_ability" type="button" data-panel="ability" data-order="<?= $dataOrder ?>"><label>Ability</label></a><?
+                ?><a class="button action_ability" type="button" data-panel="ability" data-order="<?= $dataOrder ?>"><label><i class="fa fas fa-fire-alt"></i> <strong>Ability</strong></label></a><?
             } else {
                 ?><a class="button button_disabled action_ability" type="button" data-action="ability_8_action-noweapons" data-order="<?= $dataOrder ?>"><label style="text-decoration: line-through;">Ability</label></a><?
             } $dataOrder++;
@@ -33,28 +33,28 @@ ob_start();
             // Display the SWITCH option
             if ($switch_allowed){
                 $temp_disabled = false;
-                ?><a class="button action_switch <?= $temp_disabled ? 'button_disabled' : '' ?>" type="button" <?= !$temp_disabled ? 'data-panel="switch"' : '' ?> <?= !$temp_disabled ? 'data-order="'.$dataOrder.'"' : '' ?>><label>Switch</label></a><?
+                ?><a class="button action_switch <?= $temp_disabled ? 'button_disabled' : '' ?>" type="button" <?= !$temp_disabled ? 'data-panel="switch"' : '' ?> <?= !$temp_disabled ? 'data-order="'.$dataOrder.'"' : '' ?>><label><i class="fa fas fa-sync-alt"></i> <strong>Switch</strong></label></a><?
                 $dataOrder++;
             }
 
             // Display the ITEM option if it's been unlocked
             if ($items_unlocked){
                 $temp_disabled = false;
-                ?><a class="button action_item <?= $temp_disabled ? 'button_disabled' : '' ?>" type="button" <?= !$temp_disabled ? 'data-panel="item"' : '' ?> <?= !$temp_disabled ? 'data-order="'.$dataOrder.'"' : '' ?>><label>Item</label></a><?
+                ?><a class="button action_item <?= $temp_disabled ? 'button_disabled' : '' ?>" type="button" <?= !$temp_disabled ? 'data-panel="item"' : '' ?> <?= !$temp_disabled ? 'data-order="'.$dataOrder.'"' : '' ?>><label><i class="fa fas fa-briefcase"></i> <strong>Item</strong></label></a><?
                 $dataOrder++;
             }
 
             // Display the OPTION option
-            ?><a class="button action_option" type="button" data-panel="option" data-order="<?= $dataOrder ?>"><label>Option</label></a><?
+            ?><a class="button action_option" type="button" data-panel="option" data-order="<?= $dataOrder ?>"><label><i class="fa fas fa-cog"></i> <strong>Option</strong></label></a><?
             $dataOrder++;
 
             // Display the SCAN option
             if ($target_player->counters['robots_active'] > 1){
-                ?><a class="button action_scan" type="button" <?= $target_player->counters['robots_active'] > 1 ? 'data-panel="scan"' : 'data-action="scan_'.$target_robot->robot_id.'_'.$target_robot->robot_token.'"' ?> data-order="<?= $dataOrder ?>"><label>Scan</label></a><?
+                ?><a class="button action_scan" type="button" <?= $target_player->counters['robots_active'] > 1 ? 'data-panel="scan"' : 'data-action="scan_'.$target_robot->robot_id.'_'.$target_robot->robot_token.'"' ?> data-order="<?= $dataOrder ?>"><label><i class="fa fas fa-crosshairs"></i> <strong>Scan</strong></label></a><?
             } else {
                 foreach ($target_player->values['robots_active'] AS $key => $info){
                     if ($info['robot_position'] != 'active'){ continue; }
-                    ?><a class="button action_scan" type="button" data-action="scan_<?= $info['robot_id'].'_'.$info['robot_token'] ?>" data-order="<?= $dataOrder ?>"><label>Scan</label></a><?
+                    ?><a class="button action_scan" type="button" data-action="scan_<?= $info['robot_id'].'_'.$info['robot_token'] ?>" data-order="<?= $dataOrder ?>"><label><i class="fa fas fa-crosshairs"></i> <strong>Scan</strong></label></a><?
                     break;
                 }
             }

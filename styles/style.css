@@ -1334,6 +1334,7 @@ body.index #header {
     -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
     -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
     background-color: #262626;
+    overflow: hidden;
 }
 #window iframe {
     margin: 0 auto;
@@ -1680,6 +1681,7 @@ body.index #header {
     font-family: Arial;
     font-size: 9px;
     line-height: 9px;
+    text-shadow: 1px 1px 0 #000000;
 }
 #mmrpg .canvas_overlay_footer .field_multiplier .type {
 
@@ -2903,7 +2905,7 @@ body.index #header {
     bottom: 35px;
     width: 1290px;
     height: 168px;
-    background-image: url(../images/assets/battle-scene_gridlines-2k23.png?20230611);
+    background-image: url('../images/assets/battle-scene_gridlines-2k23.png?20230611');
     background-position: 0 0;
     background-repeat: no-repeat;
     background-size: 100% 100%;
@@ -2915,7 +2917,7 @@ body.index #header {
 }
 #canvas .event .foreground_canvas:before {
     z-index: 1;
-    background-image: url(../images/assets/battle-scene_gridlines-2k23_under.png?20230616);
+    background-image: url('../images/assets/battle-scene_gridlines-2k23_under.png?20230616');
     opacity: 0.6;
     -moz-mix-blend-mode: overlay;
     -webkit-mix-blend-mode: overlay;
@@ -2930,7 +2932,7 @@ body.index #header {
 }
 #canvas .event .foreground_canvas:after {
     z-index: 2;
-    background-image: url(../images/assets/battle-scene_gridlines-2k23_over.png?20230616);
+    background-image: url('../images/assets/battle-scene_gridlines-2k23_over.png?20230616');
     opacity: 0.8;
     -moz-mix-blend-mode: overlay;
     -webkit-mix-blend-mode: overlay;
@@ -3093,6 +3095,48 @@ body.index #header {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
     -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    background-image: none;
+    background-size: auto;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-blend-mode: overlay;
+}
+#console .event.event_left {
+    background-position: top right;
+    background-image: url('../images/assets/website-texture_circuit-board-2k23_corner-white_top-right.png');
+    background-image:
+        url('../images/assets/website-texture_circuit-board-2k23_corner-white_top-right.png'),
+        url('../images/assets/website-texture_circuit-board-2k23_corner-black_bottom-left.png');
+    background-position: top right, bottom left;
+    background-repeat: no-repeat, no-repeat;
+}
+#console .event.event_right {
+    background-position: bottom left;
+    background-image: url('../images/assets/website-texture_circuit-board-2k23_corner-black_bottom-left.png');
+    background-image:
+        url('../images/assets/website-texture_circuit-board-2k23_corner-white_top-left.png'),
+        url('../images/assets/website-texture_circuit-board-2k23_corner-black_bottom-right.png');
+    background-position: top left, bottom right;
+    background-repeat: no-repeat, no-repeat;
+}
+#console .event.event_middle {
+    background-position: center bottom;
+    background-image: url('../images/assets/website-texture_circuit-board-2k23_full-black.png');
+    background-image:
+        url('../images/assets/website-texture_circuit-board-2k23_corner-black_bottom-left.png'),
+        url('../images/assets/website-texture_circuit-board-2k23_corner-black_bottom-right.png');
+    background-position: left bottom, right bottom;
+    background-repeat: no-repeat, no-repeat;
+}
+#console .event.event_special {
+    background-position: center bottom;
+    background-image: url('../images/assets/website-texture_circuit-board-2k23_full-white.png');
+    background-image: url('../images/assets/website-texture_circuit-board-2k23_corner-white_top-left.png'),
+                      url('../images/assets/website-texture_circuit-board-2k23_corner-white_top-right.png'),
+                      url('../images/assets/website-texture_circuit-board-2k23_corner-black_bottom-left.png'),
+                      url('../images/assets/website-texture_circuit-board-2k23_corner-black_bottom-right.png');
+    background-position: left top, right top, left bottom, right bottom;
+    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
 }
 #console .wrapper.ps-container .event {
     margin: 3px 16px;
@@ -3889,6 +3933,35 @@ body.index #header {
     height: 132px;
     line-height: 132px;
 }
+#actions .actions_battle .action_ability label:before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    background-image: url('../images/assets/battle-scene_gridlines-resized_event-banner.png');
+    background-blend-mode: luminosity;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 100%;
+    background-size: cover;
+    mix-blend-mode: multiply;
+    opacity: 0.2;
+}
+#actions .actions_battle .action_ability label > i {
+    position: relative;
+    z-index: 2;
+    font-size: 10px;
+    bottom: 1px;
+    color: #cacaca;
+}
+#actions .actions_battle .action_ability label > strong {
+    position: relative;
+    z-index: 3;
+}
 #actions .sub_actions .button,
 #actions .actions_battle .action_target {
     width: 181px;
@@ -3906,6 +3979,13 @@ body.index #header {
     width: auto;
     height: 36px;
     line-height: 36px;
+}
+#actions .sub_actions .button label > i,
+#actions .actions_battle .action_target label > i {
+    font-size: 9px;
+    bottom: 2px;
+    position: relative;
+    color: #cacaca;
 }
 #actions .actions_battle .action_scan {
     margin-right: 0;

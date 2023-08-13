@@ -46,6 +46,8 @@ body.prototype {
     border-radius: 0.5em 0.5em 0 0;
     -moz-border-radius: 0.5em 0.5em 0 0;
     -webkit-border-radius: 0.5em 0.5em 0 0;
+    position: relative;
+    z-index: 10;
 }
 #prototype.hidden {
     display: none;
@@ -717,7 +719,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     float: left;
     height: 50px;
     width: 750px;
-    margin: 0 0 3px 0;
+    margin: 0 0 2px 0;
     vertical-align: top;
     font-size: 14px;
     line-height: 45px;
@@ -924,7 +926,12 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     height: inherit;
 }
 #prototype .menu[data-select] .option_wrapper > .wrap.ps-container {
+    padding-right: 0;
+}
+#prototype .menu[data-select] .option_wrapper > .wrap.ps-container.ps-active-y {
     padding-right: 10px;
+    padding-left: 10px;
+    min-height: 232px;
 }
 #prototype .menu[data-select] .option_wrapper > .wrap .option_1x1,
 #prototype .menu[data-select] .option_wrapper > .wrap.ps-container .option_1x1 {
@@ -942,9 +949,12 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .menu[data-select] .option_wrapper > .wrap.ps-container .option_1x4 {
     width: calc(100% - 8px);
 }
-
+#prototype .menu[data-select="this_player_robots"] .option_wrapper,
+#prototype .menu[data-select="this_player_robots"] .option_wrapper > .wrap {
+    min-height: 257px;
+}
 #prototype .select_this_player_robots .option_wrapper {
-
+    padding-top: 80px;
 }
 #prototype .option_wrapper_full {
     height: auto;
@@ -957,7 +967,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 
 }
 #prototype .option_wrapper_missions {
-    padding-top: 12px;
+    padding-top: 13px;
     position: relative;
 }
 #prototype .option_wrapper_missions .chapter_select {
@@ -1005,15 +1015,15 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
     -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
     -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
-    padding: 2px 4px 4px;
+    padding: 3px 4px 4px;
     background-color: #2A2A2A;
     box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.25);
     -moz-box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.25);
     -webkit-box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.25);
     border-top-style: none;
-    border-radius: 0 0 0.75em 0.75em;
-    -moz-border-radius: 0 0 0.75em 0.75em;
-    -webkit-border-radius: 0 0 0.75em 0.75em;
+    border-radius: 3px 3px 6px 6px;
+    -moz-border-radius: 3px 3px 6px 6px;
+    -webkit-border-radius: 3px 3px 6px 6px;
     position: relative;
 }
 body.windowFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link,
@@ -1026,7 +1036,7 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
     display: block;
     position: absolute;
     pointer-events: none;
-    top: -2px;
+    top: 0;
     left: 1%;
 }
 #prototype .option_wrapper_missions .chapter_select_5 .chapter_link img.marker {
@@ -1297,6 +1307,8 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
 
 #prototype .option_disabled {
     cursor: default;
+}
+#prototype .option_disabled .platform {
     filter: brightness(0.5);
 }
 #prototype .option_hidden {
@@ -1311,17 +1323,18 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
     background-image: none;
     color: #CACACA;
     position: absolute;
-    bottom: 0;
+    bottom: -25px;
     left: 8px;
-    z-index: 20;
+    z-index: 200;
 }
 #prototype .option_back:hover {
     background-color: #292929;
 }
-#prototype .option_this-team-select {
+#prototype .option.option_this-team-select {
     position: absolute;
-    bottom: 54px;
-    left: 8px;
+    top: 55px;
+    left: 5px;
+    min-width: 750px;
 }
 #prototype .option_this-team-select .chrome label {
     width: 100px !important;
@@ -1855,8 +1868,12 @@ body[data-source="website"] #prototype .menu {
 
 
 #prototype .option_message .inset {
-    background-color: rgb(15, 15, 15);
+    background-color: #1a1a1a;
+    border-color: #1a1a1a;
     overflow: hidden;
+}
+#prototype .option_message .inset .multi .maintext {
+    top: 2px;
 }
 
 #prototype .option_1x1 div label,
@@ -2282,6 +2299,47 @@ body[data-source="website"] #prototype .menu {
     0% { background-position: 0 0; }
     100% { background-position: 0 -934px; }
 }
+@keyframes prototype-background-zoom-fade-animation {
+    0% { background-position: 0 0; opacity: 0.5; }
+    100% { background-position: 0 -934px; opacity: 1.0; }
+}
+
+#mmrpg.prototype #prototype .bgfx-layer {
+    display: block;
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: auto;
+    height: auto;
+    opacity: 1.0;
+    background-image: none;
+    background-position: 0 0;
+    background-repeat: repeat;
+    background-size: 768px 934px;
+    animation: none;
+    pointer-events: none;
+}
+#mmrpg.prototype #prototype .bgfx-layer.layer-1 {
+    background-image: url(../images/assets/prototype-background-2k23_stars-only.png);
+    animation: prototype-background-zoom-animation 240s linear infinite;
+    z-index: 1;
+
+}
+#mmrpg.prototype #prototype .bgfx-layer.layer-2 {
+    background-image: url(../images/assets/prototype-background-2k23_waves-only.png);
+    animation: prototype-background-zoom-fade-animation 120s linear infinite;
+    z-index: 2;
+}
+#mmrpg.prototype #prototype > .banner,
+#mmrpg.prototype #prototype > .menu {
+    position: relative;
+    z-index: 100;
+}
+
+/*
 #mmrpg.prototype {
     background-image: url(../images/assets/prototype-background-2k23_stars-only.png);
     background-position: 0 0;
@@ -2290,13 +2348,13 @@ body[data-source="website"] #prototype .menu {
     animation: prototype-background-zoom-animation 240s linear infinite;
 }
 #mmrpg.prototype #prototype {
-    background-image: url(../images/assets/prototype-background-2k23_code-only.png);
+    background-image: url(../images/assets/prototype-background-2k23_waves-only.png);
     background-position: 0 0;
     background-repeat: repeat;
     background-size: 768px 934px;
     animation: prototype-background-zoom-animation 120s linear infinite;
 }
-
+*/
 
 
 /* ROGUE STAR STYLES */

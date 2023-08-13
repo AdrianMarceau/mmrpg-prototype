@@ -417,8 +417,14 @@ class rpg_console {
             if ($options['console_container_height'] == 1){ $event_class .= 'event_single '; }
             if ($options['console_container_height'] == 2){ $event_class .= 'event_double '; }
             if ($options['console_container_height'] == 3){ $event_class .= 'event_triple '; }
-            if (!empty($options['console_container_classes'])){ $event_class .= $options['console_container_classes']; }
-            if (!empty($options['console_container_styles'])){ $event_style .= $options['console_container_styles']; }
+            if (!empty($options['console_container_classes'])){ $event_class .= trim($options['console_container_classes']).' '; }
+            if (!empty($options['console_container_styles'])){ $event_style .= trim($options['console_container_styles']).' '; }
+            if (!empty($options['console_body_float'] && $options['console_body_float'] === 'left')){ $event_class .= 'event_left '; }
+            elseif (!empty($options['console_body_float'] && $options['console_body_float'] === 'right')){ $event_class .= 'event_right '; }
+            else { $event_class .= 'event_middle '; }
+
+            // If the special event flag has been set, make sure we display this one as special
+            if (!empty($options['event_flag_is_special'])){ $event_class .= 'event_special '; }
 
             // Generate the opening event tag
             $this_markup .= '<div class="'.$event_class.'" style="'.$event_style.'">';

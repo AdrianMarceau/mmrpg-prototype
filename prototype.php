@@ -320,6 +320,8 @@ foreach ($this_menu_tooltips AS $token => $text){
 <body id="mmrpg" class="prototype <?= 'env_'.MMRPG_CONFIG_SERVER_ENV ?>">
 
 <div id="prototype" class="hidden">
+    <div class="bgfx-layer layer-1"></div>
+    <div class="bgfx-layer layer-2"></div>
 
     <div class="banner">
         <div class="sprite background banner_background" style="background-image: url(images/menus/menu-banner_this-battle-select.png);">&nbsp;</div>
@@ -599,8 +601,8 @@ foreach ($this_menu_tooltips AS $token => $text){
 
     <div class="menu menu_hide menu_help" data-step="help" data-source="frames/help.php"></div>
 
-    <div class="menu menu_hide menu_loading" data-step="loading" style="min-height: 600px;">
-        <div class="option_wrapper option_wrapper_noscroll" style="color: white; font-weight: bold; line-height: 150px; letter-spacing: 4px; opacity: 0.75; margin-right: 0; background-color: rgba(0, 0, 0, 0.10); border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; overflow: hidden; min-height: 600px; ">
+    <div class="menu menu_hide menu_loading" data-step="loading" style="min-height: 480px;">
+        <div class="option_wrapper option_wrapper_noscroll" style="color: white; font-weight: bold; line-height: 150px; letter-spacing: 4px; opacity: 0.75; margin-right: 0; background-color: rgba(0, 0, 0, 0.10); border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; overflow: hidden; min-height: 475px; ">
             <div style="line-height: 40px; margin-top: 50px;">
                 <span class="sprite sprite_40x40 sprite_40x40_left_00 " style="display: inline-block; position: static; background-image: url(images/assets/robot-loader_mega-man.gif); ">&nbsp;</span><br />
                 <span class="label" style="display: inline-block;">loading</span>

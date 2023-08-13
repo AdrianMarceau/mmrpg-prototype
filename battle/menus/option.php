@@ -37,7 +37,7 @@ ob_start();
 
     // Display the option for TOGGLE OVERLAYS
     $block_num++;
-    $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" onclick="parent.mmrpg_toggle_screenshot_mode();"><label><span class="multi">Toggle<br />Overlay</span></label></a>';
+    $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" onclick="window.mmrpg_toggle_screenshot_mode();"><label><span class="multi">Toggle<br />Overlay</span></label></a>';
 
     // Display a SPACER in this slot
     //$block_num++;

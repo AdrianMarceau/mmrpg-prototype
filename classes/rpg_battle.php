@@ -1360,6 +1360,7 @@ class rpg_battle extends rpg_object {
         $event_options['this_event_class'] = false;
         $event_options['console_show_this'] = false;
         $event_options['console_show_target'] = false;
+        $event_options['event_flag_is_special'] = true;
         $event_options['event_flag_sound_effects'] = array();
         if ($this->battle_result === 'victory'){
             $event_options['event_flag_victory'] = true;
@@ -2702,6 +2703,7 @@ class rpg_battle extends rpg_object {
         $options['this_ability_image'] = isset($eventinfo['event_options']['this_ability_image']) ? $eventinfo['event_options']['this_ability_image'] : 'sprite';
         $options['this_item_image'] = isset($eventinfo['event_options']['this_item_image']) ? $eventinfo['event_options']['this_item_image'] : 'sprite';
         $options['this_skill_image'] = isset($eventinfo['event_options']['this_skill_image']) ? $eventinfo['event_options']['this_skill_image'] : 'sprite';
+        $options['event_flag_is_special'] = isset($eventinfo['event_options']['event_flag_is_special']) ? $eventinfo['event_options']['event_flag_is_special'] : false;
         $options['event_flag_camera_action'] = isset($eventinfo['event_options']['event_flag_camera_action']) ? $eventinfo['event_options']['event_flag_camera_action'] : false;
         $options['event_flag_camera_reaction'] = isset($eventinfo['event_options']['event_flag_camera_reaction']) ? $eventinfo['event_options']['event_flag_camera_reaction'] : false;
         $options['event_flag_camera_side'] = isset($eventinfo['event_options']['event_flag_camera_side']) ? $eventinfo['event_options']['event_flag_camera_side'] : 'left';

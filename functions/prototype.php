@@ -1194,6 +1194,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             // Generate the option markup for the event message
             $temp_optiontitle = $this_info['option_maintext'];
             $temp_optionimages = !empty($this_info['option_images']) ? $this_info['option_images'] : '';
+            if (empty($temp_optionimages)){ $this_info['option_maintext'] = '<i class="fa fas fa-book"></i> '.$this_info['option_maintext']; }
             $temp_optiontext = '<span class="multi"><span class="maintext">'.$this_info['option_maintext'].'</span></span>';
             $this_markup .= '<a data-chapter="'.$this_info['option_chapter'].'" class="option option_message option_1x4 option_this-'.$player_token.'-message" style="'.(!empty($this_info['option_style']) ? $this_info['option_style'] : '').'"><div class="chrome"><div class="inset"><label class="'.(!empty($temp_optionimages) ? 'has_image' : '').'">'.$temp_optionimages.$temp_optiontext.'</label></div></div></a>'."\n";
 

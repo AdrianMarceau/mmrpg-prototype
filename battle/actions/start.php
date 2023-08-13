@@ -188,6 +188,7 @@ $event_header = $first_event_header;
 $event_body = $first_event_body;
 $event_options = array();
 $event_options['this_header_float'] = $event_options['this_body_float'] = 'center';
+$event_options['event_flag_is_special'] = true;
 $event_options['canvas_show_this'] = $event_options['console_show_this'] = false;
 $event_options['canvas_show_this_robots'] = false;
 $event_options['canvas_show_target'] = $event_options['console_show_target'] = false;
