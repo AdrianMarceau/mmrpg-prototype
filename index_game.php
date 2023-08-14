@@ -303,7 +303,9 @@ $(document).ready(function(){
 
     // Preload essential audio tracks
     mmrpg_music_preload('misc/sound-effects-curated');
-    mmrpg_music_preload('misc/player-select');;
+    mmrpg_music_preload('misc/player-select');
+    mmrpg_preload_misc_image('images/assets/mmrpg-game-start_logo-base.png?20230813');
+    mmrpg_preload_misc_image('images/assets/mmrpg-game-start_logo-full.png?20230813');
 
     // If window mod tools exist on the page, we should bind events to them
     var $gameWindow = $('#window');

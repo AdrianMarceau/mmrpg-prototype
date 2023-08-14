@@ -1745,6 +1745,7 @@ var robotSpriteCache = {};
 var robotSpriteTypes = ['mug', 'sprite'];
 var robotSpriteExtension = 'png';
 function mmrpg_preload_robot_sprites(thisRobotToken, thisRobotDirection, thisRobotSize){
+    //console.log('mmrpg_preload_robot_sprites(thisRobotToken:', thisRobotToken, ', thisRobotDirection:', thisRobotDirection, ', thisRobotSize:', thisRobotSize, ')');
     // If this sprite has not already been cached
     if (thisRobotToken == false || thisRobotToken == 0 || thisRobotToken == ''){ return false; }
     var thisCacheToken = thisRobotToken+'_'+thisRobotDirection+'_'+thisRobotSize;
@@ -1761,15 +1762,30 @@ function mmrpg_preload_robot_sprites(thisRobotToken, thisRobotDirection, thisRob
             var thisSpriteType = robotSpriteTypes[i];
             var thisSpriteToken = thisSpriteType+'_'+thisRobotDirection+'_'+thisRobotSize+'x'+thisRobotSize;
             var thisSpriteFilename = thisSpriteToken+'.'+robotSpriteExtension;
+            //console.log('thisSpriteFilename =', thisSpriteFilename, ';');
             // Cache this image in the apporiate array
             var thisCacheImage = document.createElement('img');
-            thisCacheImage.src = robotSpritePath+thisSpriteFilename;
+            thisCacheImage.src = robotSpritePath+thisSpriteFilename+'?'+gameSettings.cacheTime;
             robotSpriteCache[thisCacheToken].push(thisCacheImage);
-            //alert('thisCacheImage.src = '+robotSpritePath+thisSpriteFilename+';');
-            //alert(robotSpritePath+thisSpriteFilename);
+            //console.log('thisCacheImage.src =', thisCacheImage.src, ';');
         }
     }
-    //alert('sprite cache '+sprite_cache[thisRobotToken].length);
+    //console.log('robotSpriteCache (', robotSpriteCache.length, ') =', robotSpriteCache);
+}
+
+// Using the same format as above, create a function for preloading any other type of image by partial URL
+function mmrpg_preload_misc_image(thisImageURL, includeCacheTime){
+    // Define default for optional arguments
+    if (includeCacheTime == undefined){ includeCacheTime = false; }
+    // If this sprite has not already been cached
+    if (!robotSpriteCache[thisImageURL]){
+        // Define the container for this robot's cache
+        robotSpriteCache[thisImageURL] = [];
+        // Cache this image in the apporiate array
+        var thisCacheImage = document.createElement('img');
+        thisCacheImage.src = thisImageURL+(includeCacheTime ? '?'+gameSettings.cacheTime : '');
+        robotSpriteCache[thisImageURL].push(thisCacheImage);
+    }
 }
 
 // Define a function for updating the engine form
@@ -2209,14 +2225,14 @@ function mmrpg_canvas_update(thisBattle, thisPlayer, thisRobot, targetPlayer, ta
     // Preload all this robot's sprite image files if not already
     if (thisPlayer.player_side && thisRobot.robot_token){
         var thisRobotToken = thisRobot.robot_token;
-        var thisRobotSide = thisPlayer.player_side == 'right' ? 'left' : 'right';
-        mmrpg_preload_robot_sprites(thisRobotToken, thisRobotSide);
+        var thisRobotDirection = thisPlayer.player_side == 'right' ? 'left' : 'right';
+        mmrpg_preload_robot_sprites(thisRobotToken, thisRobotDirection);
         }
     // Preload all the target robot's sprite image files if not already
     if (targetPlayer.player_side && targetRobot.robot_token){
         var targetRobotToken = targetRobot.robot_token;
-        var targetRobotSide = targetPlayer.player_side == 'right' ? 'left' : 'right';
-        mmrpg_preload_robot_sprites(targetRobotToken, targetRobotSide);
+        var targetRobotDirection = targetPlayer.player_side == 'right' ? 'left' : 'right';
+        mmrpg_preload_robot_sprites(targetRobotToken, targetRobotDirection);
         }
 }
 
@@ -3041,8 +3057,8 @@ function windowEventDisplay(){
         }
     if (typeof metaData['event_type'] === 'undefined'){ metaData['event_type'] = ''; }
     if (typeof metaData['player_token'] === 'undefined'){ metaData['player_token'] = ''; }
-    console.log('$metaData:', $metaData);
-    console.log('metaData:', metaData);
+    //console.log('$metaData:', $metaData);
+    //console.log('metaData:', metaData);
 
     // Check if this event is a story event based on the event type provided
     var isStoryEvent = false;

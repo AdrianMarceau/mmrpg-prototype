@@ -1330,21 +1330,6 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
 #prototype .option_back:hover {
     background-color: #292929;
 }
-#prototype .option.option_this-team-select {
-    position: absolute;
-    top: 55px;
-    left: 5px;
-    min-width: 750px;
-}
-#prototype .option_this-team-select .chrome label {
-    width: 100px !important;
-    margin-left: 460px !important;
-    padding-left: 0 !important;
-}
-body.windowFlag_landscapeMode #prototype .option_this-team-select .chrome label,
-body.mobileFlag_landscapeMode #prototype .option_this-team-select .chrome label {
-    margin-left: 560px !important;
-}
 #prototype .option label {
     padding: 15px 50px;
     background-color: #2A2A2A;
@@ -1414,6 +1399,9 @@ body[data-source="website"] #prototype .menu {
 }
 #mmrpg #prototype .option_this-team-select {
     background-image: url(../images/menus/menu-options_this-team-select.gif);
+}
+#mmrpg #prototype .option_this-robot-select:not([data-token]) {
+    opacity: 0.1;
 }
 
 #mmrpg #prototype .option_this-dr-light-select {
@@ -1547,6 +1535,48 @@ body[data-source="website"] #prototype .menu {
 #mmrpg #prototype .option_this-robot-select .multi .subtext,
 #mmrpg #prototype .option_this-robot-select .multi .subtext2 {
     width: auto;
+}
+
+/* write a keyframe animation that moves the team select background image to the left infinitly over time slowly */
+@keyframes team-select-background-scroll {
+    0% { background-position: 0 0; }
+    100% { background-position: -100px 0; }
+}
+#prototype .option.option_this-team-select {
+    position: absolute;
+    top: 55px;
+    left: 5px;
+    min-width: 750px;
+    animation: team-select-background-scroll 60s linear infinite;
+}
+#prototype .option.option_this-team-select .count {
+    text-transform: uppercase;
+    color: #ffffff;
+}
+#prototype .option_disabled.option_this-team-select .platform {
+    filter: brightness(1.0);
+}
+@keyframes team-select-inset-pulse {
+    0% { background-color: #2a2a2a; }
+    50% { background-color: #242424; }
+    100% { background-color: #2a2a2a; }
+}
+#prototype .option_disabled.option_this-team-select .platform .inset {
+    background-color: #2a2a2a;
+    animation: team-select-inset-pulse 2s infinite;
+}
+
+#prototype .option_disabled.option_this-team-select .platform .sprite {
+    filter: brightness(2.0) opacity(0.8);
+}
+#prototype .option_this-team-select .chrome label {
+    width: 100px !important;
+    margin-left: 460px !important;
+    padding-left: 0 !important;
+}
+body.windowFlag_landscapeMode #prototype .option_this-team-select .chrome label,
+body.mobileFlag_landscapeMode #prototype .option_this-team-select .chrome label {
+    margin-left: 560px !important;
 }
 
 
@@ -2148,10 +2178,6 @@ body[data-source="website"] #prototype .menu {
 #prototype .banner .option[data-select="this_battle_token"] div label .subtext,
 #prototype .banner .option[data-select="this_battle_token"] div label .subtext2 {
     text-transform: none;
-}
-
-#prototype .option_this-team-select .count {
-    text-transform: uppercase;
 }
 
 
